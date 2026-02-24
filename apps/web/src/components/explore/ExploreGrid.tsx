@@ -49,20 +49,9 @@ const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
 
 type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "researchImportance" | "tacticalValue" | "quality" | "wordCount" | "recentlyEdited" | "recentlyCreated";
 
-/** Compute a blended "recommended" score that favors recent, high-quality content. */
+/** Use pre-computed recommended score from build-time (see build-data.mjs). */
 function recommendedScore(item: ExploreItem): number {
-  // Recency: exponential decay with ~120-day half-life (0-10 scale)
-  let recency = 0;
-  if (item.lastUpdated) {
-    const daysAgo = (Date.now() - new Date(item.lastUpdated).getTime()) / 86_400_000;
-    recency = 10 * Math.exp(-daysAgo / 120);
-  }
-  const quality = item.quality || 0;
-  const importance = item.readerImportance || 0;
-  // Small bonus for substantive content (log-scaled, capped)
-  const wordBonus = item.wordCount ? Math.min(2, Math.log10(item.wordCount + 1) - 1.5) : 0;
-
-  return recency * 2 + quality * 2 + importance * 0.5 + wordBonus;
+  return item.recommendedScore ?? 0;
 }
 
 /**

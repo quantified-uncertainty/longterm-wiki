@@ -209,6 +209,30 @@ interface DatabaseShape {
   /** Page → resource IDs mapping (computed at build time from inline <R>, cited_by, URL matching) */
   pageResources: Record<string, string[]>;
   stats: Record<string, unknown>;
+  /** Pre-computed update schedule items (staleness, priority, etc.) */
+  updateSchedule?: Array<{
+    id: string;
+    numericId: string;
+    title: string;
+    quality: number | null;
+    readerImportance: number | null;
+    lastUpdated: string | null;
+    updateFrequency: number;
+    daysSinceUpdate: number;
+    daysUntilDue: number;
+    staleness: number;
+    priority: number;
+    category: string;
+  }>;
+  /** Pre-aggregated hallucination risk statistics */
+  riskStats?: {
+    total: number;
+    high: number;
+    medium: number;
+    low: number;
+    avgScore: number;
+    topFactors: Array<{ factor: string; count: number }>;
+  };
 }
 
 // ============================================================================
@@ -475,6 +499,12 @@ export interface Page {
     ratingsString?: string;
     factCount?: number;
   };
+  /** Pre-computed reader importance rank (1 = most important) */
+  readerRank?: number;
+  /** Pre-computed research importance rank (1 = most important) */
+  researchRank?: number;
+  /** Pre-computed blended "recommended" score for ExploreGrid default sort */
+  recommendedScore?: number;
 }
 
 // ============================================================================
@@ -618,49 +648,8 @@ export interface UpdateScheduleItem {
 }
 
 export function getUpdateSchedule(): UpdateScheduleItem[] {
-  const db = getDatabase();
-  const pages = db.pages || [];
-  const now = Date.now();
-
-  const items: UpdateScheduleItem[] = [];
-
-  for (const page of pages) {
-    if (!page.updateFrequency) continue;
-    if (page.evergreen === false) continue;
-
-    const lastUpdated = page.lastUpdated;
-    const daysSince = lastUpdated
-      ? Math.floor((now - new Date(lastUpdated).getTime()) / (1000 * 60 * 60 * 24))
-      : 999;
-    const daysUntil = page.updateFrequency - daysSince;
-    const staleness = daysSince / page.updateFrequency;
-    const readerImp = page.readerImportance ?? 50;
-    const tv = page.tacticalValue ?? 0;
-    // Tactical value can boost priority for high-shareability content (e.g. tables)
-    const effectiveImportance = tv > readerImp ? (readerImp + tv) / 2 : readerImp;
-    const priority = staleness * (effectiveImportance / 100);
-
-    const numericId = db.idRegistry?.bySlug[page.id] || page.id;
-
-    items.push({
-      id: page.id,
-      numericId,
-      title: page.title,
-      quality: page.quality,
-      readerImportance: page.readerImportance,
-      lastUpdated,
-      updateFrequency: page.updateFrequency,
-      daysSinceUpdate: daysSince,
-      daysUntilDue: daysUntil,
-      staleness: Math.round(staleness * 100) / 100,
-      priority: Math.round(priority * 100) / 100,
-      category: page.category,
-    });
-  }
-
-  // Sort by priority descending (most urgent first)
-  items.sort((a, b) => b.priority - a.priority);
-  return items;
+  // Pre-computed at build time in build-data.mjs (staleness, priority, daysSince, daysUntil)
+  return getDatabase().updateSchedule || [];
 }
 
 export interface PageRankingItem {
@@ -681,6 +670,7 @@ export function getPageRankings(): PageRankingItem[] {
   const db = getDatabase();
   const pages = db.pages || [];
 
+  // Ranks are pre-computed at build time in build-data.mjs
   const items = pages
     .filter((p: Page) => p.readerImportance != null || p.researchImportance != null)
     .map((p: Page) => ({
@@ -689,20 +679,13 @@ export function getPageRankings(): PageRankingItem[] {
       title: p.title,
       quality: p.quality,
       readerImportance: p.readerImportance,
-      readerRank: null as number | null,
+      readerRank: p.readerRank ?? null,
       researchImportance: p.researchImportance,
-      researchRank: null as number | null,
+      researchRank: p.researchRank ?? null,
       tacticalValue: p.tacticalValue,
       category: p.category,
       wordCount: p.wordCount ?? p.metrics?.wordCount ?? 0,
     }));
-
-  // Derive ranks from score ordering (scores are derived from rank, so this recovers position)
-  const byReader = items.filter((i) => i.readerImportance != null).sort((a, b) => (b.readerImportance ?? 0) - (a.readerImportance ?? 0));
-  byReader.forEach((item, idx) => { item.readerRank = idx + 1; });
-
-  const byResearch = items.filter((i) => i.researchImportance != null).sort((a, b) => (b.researchImportance ?? 0) - (a.researchImportance ?? 0));
-  byResearch.forEach((item, idx) => { item.researchRank = idx + 1; });
 
   // Default sort by readership importance
   items.sort((a, b) => (b.readerImportance ?? 0) - (a.readerImportance ?? 0));
@@ -894,6 +877,23 @@ export function getPageCoverageItems(): PageCoverageItem[] {
 export function getPageCitationHealth(pageId: string) {
   const page = getPageById(pageId);
   return page?.citationHealth ?? null;
+}
+
+// ============================================================================
+// RISK STATS (pre-aggregated at build time)
+// ============================================================================
+
+export interface RiskStats {
+  total: number;
+  high: number;
+  medium: number;
+  low: number;
+  avgScore: number;
+  topFactors: Array<{ factor: string; count: number }>;
+}
+
+export function getRiskStats(): RiskStats | null {
+  return getDatabase().riskStats ?? null;
 }
 
 export function getResourceCredibility(
@@ -1475,6 +1475,8 @@ export interface ExploreItem {
   href?: string;
   meta?: string;
   sourceTitle?: string;
+  /** Pre-computed blended score for "recommended" sort (build-time) */
+  recommendedScore?: number;
 }
 
 // Map page categories to entity-like types for display
@@ -1528,6 +1530,7 @@ export function getExploreItems(): ExploreItem[] {
       lastUpdated: page?.lastUpdated ?? null,
       dateCreated: page?.dateCreated ?? null,
       contentFormat: page?.contentFormat,
+      recommendedScore: page?.recommendedScore,
     };
   });
 
@@ -1554,6 +1557,7 @@ export function getExploreItems(): ExploreItem[] {
       lastUpdated: page.lastUpdated ?? null,
       dateCreated: page.dateCreated ?? null,
       contentFormat: page.contentFormat,
+      recommendedScore: page.recommendedScore,
     }));
 
   // Diagram items — entities with causeEffectGraph data

@@ -1531,6 +1531,29 @@ async function main() {
   }
   console.log(`  hallucinationRisk: ${riskHigh} high, ${riskMedium} medium, ${riskLow} low`);
 
+  // Pre-aggregate risk stats for the dashboard (avoids re-iterating on every render)
+  const riskFactorCounts = {};
+  let riskScoreSum = 0;
+  const riskTotal = riskHigh + riskMedium + riskLow;
+  for (const page of pages) {
+    if (!page.hallucinationRisk) continue;
+    riskScoreSum += page.hallucinationRisk.score;
+    for (const f of page.hallucinationRisk.factors || []) {
+      riskFactorCounts[f] = (riskFactorCounts[f] || 0) + 1;
+    }
+  }
+  database.riskStats = {
+    total: riskTotal,
+    high: riskHigh,
+    medium: riskMedium,
+    low: riskLow,
+    avgScore: riskTotal > 0 ? Math.round(riskScoreSum / riskTotal) : 0,
+    topFactors: Object.entries(riskFactorCounts)
+      .sort(([, a], [, b]) => /** @type {number} */ (b) - /** @type {number} */ (a))
+      .slice(0, 10)
+      .map(([factor, count]) => ({ factor, count })),
+  };
+
   // Record risk snapshots to wiki server (optional — skips if server unavailable)
   if (process.env.LONGTERMWIKI_SERVER_URL) {
     const snapshots = pages
@@ -1786,6 +1809,80 @@ async function main() {
     else coverageRed++;
   }
   console.log(`  pageCoverage: ${coverageGreen} green, ${coverageAmber} amber, ${coverageRed} red`);
+
+  // =========================================================================
+  // PAGE RANKINGS — pre-compute readerRank and researchRank per page.
+  // Avoids re-sorting ~600 pages on every server-component render.
+  // =========================================================================
+  console.log('  Computing page rankings...');
+  const rankedPages = pages.filter(p => p.readerImportance != null || p.researchImportance != null);
+  const byReader = rankedPages.filter(p => p.readerImportance != null).sort((a, b) => (b.readerImportance ?? 0) - (a.readerImportance ?? 0));
+  byReader.forEach((page, idx) => { page.readerRank = idx + 1; });
+  const byResearch = rankedPages.filter(p => p.researchImportance != null).sort((a, b) => (b.researchImportance ?? 0) - (a.researchImportance ?? 0));
+  byResearch.forEach((page, idx) => { page.researchRank = idx + 1; });
+  console.log(`  pageRankings: ${byReader.length} reader-ranked, ${byResearch.length} research-ranked`);
+
+  // =========================================================================
+  // RECOMMENDED SCORE — pre-compute blended "recommended" score per page.
+  // Used by ExploreGrid's default sort. Avoids Date.now() + Math.exp on
+  // every client-side re-render / keystroke.
+  // =========================================================================
+  console.log('  Computing recommended scores...');
+  const buildNow = Date.now();
+  for (const page of pages) {
+    let recency = 0;
+    if (page.lastUpdated) {
+      const daysAgo = (buildNow - new Date(page.lastUpdated).getTime()) / 86_400_000;
+      recency = 10 * Math.exp(-daysAgo / 120);
+    }
+    const quality = page.quality || 0;
+    const importance = page.readerImportance || 0;
+    const wordBonus = page.wordCount ? Math.min(2, Math.log10(page.wordCount + 1) - 1.5) : 0;
+    page.recommendedScore = Math.round((recency * 2 + quality * 2 + importance * 0.5 + wordBonus) * 100) / 100;
+  }
+  console.log(`  recommendedScores: computed for ${pages.length} pages`);
+
+  // =========================================================================
+  // UPDATE SCHEDULE — pre-compute staleness, priority, daysSince, daysUntil.
+  // Time-dependent values use buildNow as the reference timestamp so they're
+  // consistent with the data snapshot.
+  // =========================================================================
+  console.log('  Computing update schedule...');
+  const updateScheduleItems = [];
+  for (const page of pages) {
+    if (!page.updateFrequency) continue;
+    if (page.evergreen === false) continue;
+
+    const lastUpdated = page.lastUpdated;
+    const daysSince = lastUpdated
+      ? Math.floor((buildNow - new Date(lastUpdated).getTime()) / (1000 * 60 * 60 * 24))
+      : 999;
+    const daysUntil = page.updateFrequency - daysSince;
+    const staleness = daysSince / page.updateFrequency;
+    const readerImp = page.readerImportance ?? 50;
+    const tv = page.tacticalValue ?? 0;
+    const effectiveImportance = tv > readerImp ? (readerImp + tv) / 2 : readerImp;
+    const priority = staleness * (effectiveImportance / 100);
+
+    updateScheduleItems.push({
+      id: page.id,
+      numericId: slugToNumericId[page.id] || page.id,
+      title: page.title,
+      quality: page.quality ?? null,
+      readerImportance: page.readerImportance ?? null,
+      lastUpdated,
+      updateFrequency: page.updateFrequency,
+      daysSinceUpdate: daysSince,
+      daysUntilDue: daysUntil,
+      staleness: Math.round(staleness * 100) / 100,
+      priority: Math.round(priority * 100) / 100,
+      category: page.category,
+    });
+  }
+  updateScheduleItems.sort((a, b) => b.priority - a.priority);
+  database.updateSchedule = updateScheduleItems;
+  const overdue = updateScheduleItems.filter(i => i.daysUntilDue < 0).length;
+  console.log(`  updateSchedule: ${updateScheduleItems.length} pages tracked, ${overdue} overdue`);
 
   database.pages = pages;
 
