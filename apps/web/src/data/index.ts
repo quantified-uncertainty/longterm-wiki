@@ -161,41 +161,13 @@ export interface CruxData {
   summary?: string;
 }
 
-export interface Intervention {
-  id: string;
-  name: string;
-  category?: string;
-  description?: string;
-  riskCoverage?: {
-    accident?: string;
-    misuse?: string;
-    structural?: string;
-    epistemic?: string;
-  };
-  primaryMechanism?: string;
-  tractability?: string;
-  neglectedness?: string;
-  importance?: string;
-  overallPriority?: string;
-  timelineFit?: string;
-  currentState?: string;
-  fundingLevel?: string;
-  fundingShare?: string;
-  recommendedShift?: string;
-  wikiPageId?: string;
-  relatedInterventions?: string[];
-  relevantResearch?: Array<{ title: string; url?: string }>;
-}
-
 interface DatabaseShape {
   typedEntities?: Array<Record<string, unknown>>;
   resources: Resource[];
   publications: Publication[];
   experts: Expert[];
   organizations: Organization[];
-  interventions: Intervention[];
   cruxes: CruxData[];
-  proposals: Proposal[];
   prItems: PrItem[];
   backlinks: Record<string, BacklinkEntry[]>;
   relatedGraph: Record<string, RelatedGraphEntry[]>;
@@ -1475,15 +1447,6 @@ export function getFactUsage(): Record<string, FactUsagePage[]> {
 }
 
 // ============================================================================
-// INTERVENTIONS
-// ============================================================================
-
-export function getInterventions(): Intervention[] {
-  const db = getDatabase();
-  return db.interventions || [];
-}
-
-// ============================================================================
 // CRUXES
 // ============================================================================
 
@@ -1509,31 +1472,6 @@ export function getCruxesByDomain(domain: string): CruxData[] {
   return getCruxes().filter(
     (c) => c.domain?.toLowerCase() === domain.toLowerCase()
   );
-}
-
-// ============================================================================
-// PROPOSALS
-// ============================================================================
-
-export interface Proposal {
-  id: string;
-  name: string;
-  description?: string;
-  sourcePageId?: string;
-  domain?: string;
-  stance?: string;
-  costEstimate?: string;
-  evEstimate?: string;
-  feasibility?: string;
-  honestConcerns?: string;
-  status?: string;
-  leadOrganizations?: string[];
-  relatedProposals?: string[];
-}
-
-export function getProposals(): Proposal[] {
-  const db = getDatabase();
-  return db.proposals || [];
 }
 
 // ============================================================================
