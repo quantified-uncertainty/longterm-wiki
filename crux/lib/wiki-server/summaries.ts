@@ -30,7 +30,7 @@ export interface UpsertSummaryBatchResult {
 export async function upsertSummary(
   item: UpsertSummaryItem,
 ): Promise<ApiResult<UpsertSummaryResult>> {
-  return apiRequest<UpsertSummaryResult>('POST', '/api/summaries', item);
+  return apiRequest<UpsertSummaryResult>('POST', '/api/summaries', item, undefined, 'content');
 }
 
 export async function upsertSummaryBatch(
@@ -40,6 +40,8 @@ export async function upsertSummaryBatch(
     'POST',
     '/api/summaries/batch',
     { items },
+    undefined,
+    'content',
   );
 }
 

@@ -40,7 +40,7 @@ export interface AgentSessionEntry {
 export async function upsertAgentSession(
   session: CreateAgentSession,
 ): Promise<ApiResult<AgentSessionEntry>> {
-  return apiRequest<AgentSessionEntry>('POST', '/api/agent-sessions', session);
+  return apiRequest<AgentSessionEntry>('POST', '/api/agent-sessions', session, undefined, 'project');
 }
 
 /**
@@ -63,7 +63,7 @@ export async function updateAgentSession(
   id: number,
   updates: UpdateAgentSession,
 ): Promise<ApiResult<AgentSessionEntry>> {
-  return apiRequest<AgentSessionEntry>('PATCH', `/api/agent-sessions/${id}`, updates);
+  return apiRequest<AgentSessionEntry>('PATCH', `/api/agent-sessions/${id}`, updates, undefined, 'project');
 }
 
 /**

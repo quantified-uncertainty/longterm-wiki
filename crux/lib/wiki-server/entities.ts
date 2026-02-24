@@ -87,6 +87,8 @@ export async function syncEntities(
       'POST',
       '/api/entities/sync',
       { entities: batch },
+      undefined,
+      'content',
     );
 
     if (!result.ok) {

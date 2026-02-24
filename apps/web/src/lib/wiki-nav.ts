@@ -394,6 +394,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Wiki Generation Architecture", href: internalHref("wiki-generation-architecture") },
         { label: "Schema Overview", href: internalHref("__index__/internal/schema", "/wiki/E781") },
         { label: "Entity Reference", href: internalHref("entities") },
+        { label: "Server Environments", href: internalHref("wiki-server-architecture") },
         { label: "Schema Diagrams", href: internalHref("diagrams") },
       ],
     },

@@ -209,6 +209,7 @@ export async function syncFacts(
       bodyKey: "facts",
       responseCountKey: "upserted",
       itemLabel: "facts",
+      scope: 'content',
       _sleep: options._sleep,
     },
   );

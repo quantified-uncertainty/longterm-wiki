@@ -192,6 +192,7 @@ export async function syncAutoUpdateRuns(
           `  Run ${batchNum}/${totalBatches} (${run.date}): inserted (id: ${r.id}, ${r.resultsInserted} results)`,
         );
       },
+      scope: 'project',
       _sleep: options._sleep,
     },
   );

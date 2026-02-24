@@ -56,13 +56,13 @@ export interface LatestDatesResult {
 export async function appendEditLogToServer(
   entry: EditLogApiEntry,
 ): Promise<ApiResult<AppendResult>> {
-  return apiRequest<AppendResult>('POST', '/api/edit-logs', entry);
+  return apiRequest<AppendResult>('POST', '/api/edit-logs', entry, undefined, 'project');
 }
 
 export async function appendEditLogBatch(
   items: EditLogApiEntry[],
 ): Promise<ApiResult<BatchResult>> {
-  return apiRequest<BatchResult>('POST', '/api/edit-logs/batch', { items });
+  return apiRequest<BatchResult>('POST', '/api/edit-logs/batch', { items }, undefined, 'project');
 }
 
 export async function getEditLogsForPage(

@@ -45,6 +45,8 @@ export async function recordRiskSnapshots(
       'POST',
       '/api/hallucination-risk/batch',
       { snapshots: batch },
+      undefined,
+      'content',
     );
 
     if (!result.ok) {

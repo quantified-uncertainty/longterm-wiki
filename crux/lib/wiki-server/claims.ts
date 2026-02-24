@@ -62,7 +62,7 @@ export async function getClaimsByEntity(
 export async function insertClaim(
   item: InsertClaimItem,
 ): Promise<ApiResult<InsertClaimResult>> {
-  return apiRequest<InsertClaimResult>('POST', '/api/claims', item);
+  return apiRequest<InsertClaimResult>('POST', '/api/claims', item, undefined, 'content');
 }
 
 export async function insertClaimBatch(
@@ -72,6 +72,8 @@ export async function insertClaimBatch(
     'POST',
     '/api/claims/batch',
     { items },
+    undefined,
+    'content',
   );
 }
 
@@ -82,6 +84,8 @@ export async function clearClaimsForEntity(
     'POST',
     '/api/claims/clear',
     { entityId },
+    undefined,
+    'content',
   );
 }
 
