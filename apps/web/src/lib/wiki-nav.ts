@@ -231,7 +231,7 @@ export function getAtmNav(): NavSection[] {
   // Top-level items (overview, parameter table)
   const topItems = [
     { label: "Overview", href: "/wiki/ai-transition-model" },
-    { label: "Parameter Table", href: "/wiki/table" },
+    { label: "Parameter Table", href: getEntityHref("table") },
   ];
 
   const sections: NavSection[] = [
