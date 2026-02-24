@@ -649,6 +649,19 @@ export function getResourcesForPage(pageId: string): string[] {
   return db.pageResources?.[resolveId(pageId)] ?? [];
 }
 
+/** Get page IDs that cite a given resource (reverse lookup of pageResources) */
+export function getPagesForResource(resourceId: string): string[] {
+  const db = getDatabase();
+  const pr = db.pageResources ?? {};
+  const pages: string[] = [];
+  for (const [pageId, ids] of Object.entries(pr)) {
+    if ((ids as string[]).includes(resourceId)) {
+      pages.push(pageId);
+    }
+  }
+  return pages;
+}
+
 /** Get footnote index data for a page (computed at build time from MDX footnotes) */
 export function getFootnoteIndex(pageId: string): FootnoteIndexEntry | undefined {
   const db = getDatabase();

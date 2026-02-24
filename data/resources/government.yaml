@@ -1,7 +1,3 @@
-# Government Resources
-# Government documents, policy reports, and regulatory materials
-# Part of the split resources system - see src/data/resources/
-
 - id: 689a9ff80da2437f
   url: https://pubmed.ncbi.nlm.nih.gov/
   title: Academic papers
@@ -3124,3 +3120,17 @@
     - safety
   cited_by:
     - slow-takeoff-muddle
+- id: 518d2089142d1862
+  url: https://corpgov.law.harvard.edu/
+  title: Flanigan, Jessica, and Talia Gillis.
+  type: government
+  cited_by:
+    - anthropic
+  tags: []
+- id: 8800264a3e0026cc
+  url: https://www.nextgov.com/artificial-intelligence/2025/10/anthropic-ceo-defends-support-ai-regulations-alignment-trump-policies/408959/
+  title: Anthropic CEO defends support for AI regulations, alignment with Trump policies - Nextgov/FCW
+  type: government
+  cited_by:
+    - anthropic
+  tags: []

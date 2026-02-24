@@ -27,10 +27,13 @@ import { DataInfoBox } from "@/components/wiki/DataInfoBox";
 import { ContentConfidenceBanner } from "@/components/wiki/ContentConfidenceBanner";
 import { TableOfContents } from "@/components/wiki/TableOfContents";
 import { CitationOverlay } from "@/components/wiki/CitationOverlay";
+import { InlineCitationCards } from "@/components/wiki/InlineCitationCards";
 import { CitationHealthBanner } from "@/components/wiki/CitationHealthBanner";
 import { CitationQuotesProvider } from "@/components/wiki/CitationQuotesContext";
 import { References } from "@/components/wiki/References";
+import { UnifiedReferences } from "@/components/wiki/UnifiedReferences";
 import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
+import { getFootnoteIndex } from "@data";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
@@ -325,13 +328,25 @@ async function ContentView({
           {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
           {showToc && <TableOfContents headings={tocHeadings} />}
           {page.content}
-          {/* Auto-render References for non-internal pages using build-time pageResources */}
-          {!isInternal && <References pageId={slug} />}
+          {/* Unified bibliography: merges footnote data, resource metadata, and verification */}
+          {!isInternal && (() => {
+            const fnIndex = getFootnoteIndex(slug);
+            return fnIndex
+              ? <UnifiedReferences pageId={slug} />
+              : <References pageId={slug} />;
+          })()}
         </article>
         {/* Citation verification overlay — decorates footnote refs with status indicators */}
-        {citationQuotes && citationQuotes.length > 0 && (
-          <CitationOverlay quotes={citationQuotes} />
-        )}
+        {citationQuotes && citationQuotes.length > 0 && (() => {
+          const fnIndex = getFootnoteIndex(slug);
+          return fnIndex
+            ? <InlineCitationCards
+                quotes={citationQuotes}
+                footnotes={fnIndex.footnotes}
+                sources={fnIndex.sources}
+              />
+            : <CitationOverlay quotes={citationQuotes} />;
+        })()}
       </CitationQuotesProvider>
       {/* Related pages rendered outside prose to avoid inherited link styles */}
       {isArticle && !isInternal && <RelatedPages entityId={slug} entity={entity} />}

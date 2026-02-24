@@ -1,7 +1,3 @@
-# General Web Resources
-# Other web resources not categorized elsewhere
-# Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
-
 - id: 1312df71e6a1ca40
   url: https://www.edelman.com/trust/2024/trust-barometer
   title: 2024 Edelman Trust Barometer
@@ -2057,7 +2053,7 @@
   publication_id: cnbc
 - id: 787a2639f9e64ca5
   url: https://www.cnbc.com/2025/11/18/anthropic-ai-azure-microsoft-nvidia.html
-  title: "Anthropic valued at $350 billion following investment deal with Microsoft, Nvidia"
+  title: Anthropic valued at $350 billion following investment deal with Microsoft, Nvidia
   type: web
   local_filename: 787a2639f9e64ca5.txt
   summary: Microsoft and Nvidia are making substantial investments in Anthropic, expanding their AI
@@ -4716,14 +4712,12 @@
   title: Kalshi
   type: web
   local_filename: 8d054aa535ed84ad.txt
-  summary: >-
-    Kalshi is a federally regulated prediction market exchange in the United States.
+  summary: Kalshi is a federally regulated prediction market exchange in the United States.
 - id: 36eaf35d3d38bab3
   url: https://research.contrary.com/company/kalshi
-  title: "Kalshi's Business Breakdown & Founding Story"
+  title: Kalshi's Business Breakdown & Founding Story
   type: report
-  summary: >-
-    Contrary Research's detailed analysis of Kalshi's business model, founding story,
+  summary: Contrary Research's detailed analysis of Kalshi's business model, founding story,
     regulatory journey, and competitive position in the prediction markets space.
   tags:
     - prediction-markets
@@ -4732,19 +4726,17 @@
   url: https://sigma.world/news/from-launch-to-lawsuits-kalshis-tumultous-timeline/
   title: "From Launch to Lawsuits: Kalshi's Tumultuous Timeline"
   type: blog
-  summary: >-
-    Timeline of Kalshi's journey from CFTC approval through regulatory battles,
-    including the landmark election market lawsuit and subsequent legal developments.
+  summary: Timeline of Kalshi's journey from CFTC approval through regulatory battles, including the
+    landmark election market lawsuit and subsequent legal developments.
   tags:
     - prediction-markets
     - governance
 - id: 59636b12f8080da8
   url: https://gamblingharm.org/is-kalshi-just-gambling-risks-legality-and-safety-explained
-  title: "Is Kalshi Just Gambling? Risks, Legality, And Safety Explained"
+  title: Is Kalshi Just Gambling? Risks, Legality, And Safety Explained
   type: blog
-  summary: >-
-    Analysis of whether prediction markets like Kalshi constitute gambling,
-    examining regulatory frameworks, consumer protections, and risk factors.
+  summary: Analysis of whether prediction markets like Kalshi constitute gambling, examining
+    regulatory frameworks, consumer protections, and risk factors.
   tags:
     - prediction-markets
     - governance
@@ -4752,15 +4744,13 @@
   url: https://kalshi.com/about
   title: About Kalshi
   type: web
-  summary: >-
-    Kalshi's official about page describing the company's mission, leadership, and history.
+  summary: Kalshi's official about page describing the company's mission, leadership, and history.
 - id: 649efd40087bd0bc
   url: https://news.kalshi.com/p/kalshi-11-billion-valuation-series-e
-  title: "Kalshi Reaches $11 Billion Valuation as App Takes over America"
+  title: Kalshi Reaches $11 Billion Valuation as App Takes over America
   type: blog
-  summary: >-
-    Coverage of Kalshi's Series E funding round at an $11 billion valuation,
-    driven by surging event contract trading volumes.
+  summary: Coverage of Kalshi's Series E funding round at an $11 billion valuation, driven by surging
+    event contract trading volumes.
   tags:
     - prediction-markets
     - economic
@@ -4806,7 +4796,7 @@
     - prediction-markets
 - id: eb308b834079ec34
   url: https://signalhub.substack.com/p/turning-150k-into-700m-in-6-years
-  title: "Turning $150K into $700M in 6 Years"
+  title: Turning $150K into $700M in 6 Years
   type: blog
   cited_by:
     - kalshi
@@ -4958,7 +4948,7 @@
     - prediction-markets
 - id: 23ac39225d7b5a18
   url: https://nexteventhorizon.substack.com/p/why-wasnt-kalshi-paying-traders-that-won-nfl-futures
-  title: "Why Wasn't Kalshi Paying Traders That Won NFL Futures"
+  title: Why Wasn't Kalshi Paying Traders That Won NFL Futures
   type: blog
   cited_by:
     - kalshi
@@ -8249,19 +8239,18 @@
   title: The Singapore Consensus on Global AI Safety Research Priorities
   type: web
   local_filename: 504a3ff51cc0c66b.txt
-  summary: >-
-    The Singapore Consensus on Global AI Safety Research Priorities (arXiv:2506.20702) is a
-    consensus document produced by the 2025 Singapore Conference on AI (SCAI), held April 26,
-    2025, alongside ICLR 2025. Authored by Yoshua Bengio, Stuart Russell, Max Tegmark, Dawn
-    Song, and 84 additional co-authors from 11 countries, it builds on the 2025 International AI
-    Safety Report. The document organizes AI safety research into a defence-in-depth framework
-    with three areas: (1) Assessment — methods to measure AI system impacts, enhanced metrology,
-    and third-party audit infrastructure; (2) Development — specification, training, and
-    verification of trustworthy systems, including limiting AGI risk by constraining autonomy,
-    generality, or intelligence; (3) Control — post-deployment monitoring, ecosystem oversight,
-    societal resilience, and AI control setups robust to active subversion. Uniquely identifies
-    areas of mutual interest where even competitors benefit from cooperation on shared risk
-    thresholds, evaluation protocols, and safety benchmarks.
+  summary: "The Singapore Consensus on Global AI Safety Research Priorities (arXiv:2506.20702) is a
+    consensus document produced by the 2025 Singapore Conference on AI (SCAI), held April 26, 2025,
+    alongside ICLR 2025. Authored by Yoshua Bengio, Stuart Russell, Max Tegmark, Dawn Song, and 84
+    additional co-authors from 11 countries, it builds on the 2025 International AI Safety Report.
+    The document organizes AI safety research into a defence-in-depth framework with three areas:
+    (1) Assessment — methods to measure AI system impacts, enhanced metrology, and third-party audit
+    infrastructure; (2) Development — specification, training, and verification of trustworthy
+    systems, including limiting AGI risk by constraining autonomy, generality, or intelligence; (3)
+    Control — post-deployment monitoring, ecosystem oversight, societal resilience, and AI control
+    setups robust to active subversion. Uniquely identifies areas of mutual interest where even
+    competitors benefit from cooperation on shared risk thresholds, evaluation protocols, and safety
+    benchmarks."
   cited_by:
     - international-summits
   fetched_at: 2025-12-28 02:03:25
@@ -21926,3 +21915,180 @@
   type: web
   cited_by:
     - takeoff
+- id: 926e4c583994b48d
+  url: https://www.pminsights.com/insights/anthropic-approaches-7b-run-rate-in-2025-outpaces-openai
+  title: Anthropic Approaches $7B Run Rate in 2025, Outpaces OpenAI | PM Insights
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: 3a07423e8bf204c2
+  url: https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/
+  title: Enterprises prefer Anthropic's AI models over anyone else's, including OpenAI's | TechCrunch
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+  summary: Enterprises prefer Anthropic&#039;s AI models over anyone else&#039;s, including
+    OpenAI&#039;s | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with
+    Super Early Bird rates.
+- id: 632366427b7fcd19
+  url: https://colah.github.io/about.html
+  title: About Me - colah's blog
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+  summary: About Me - colah's blog Christopher Olah I work on reverse engineering artificial neural
+    networks into human understandable algorithms.
+- id: 7f104ac618c94ccc
+  url: https://www.semafor.com/article/11/21/2023/how-effective-altruism-led-to-a-crisis-at-openai
+  title: The AI industry turns against its favorite philosophy, effective altruism | Semafor
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: 99038cb6447dc5e7
+  url: https://aimagazine.com/news/openai-vs-anthropic-the-results-of-the-ai-safety-test
+  title: "AI Magazine: OpenAI vs Anthropic Safety Test Results"
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: 7f6f2c3a7b7b2f19
+  url: https://zapier.com/blog/claude-vs-chatgpt/
+  title: "Claude vs. ChatGPT: What&#x27;s the difference?"
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+  summary: Claude vs.
+- id: 771942ad7e9fd4a5
+  url: https://www.rezolve.ai/blog/claude-vs-gpt4
+  title: "Claude vs GPT4: In-Depth Comparison for 2025"
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: c5bc9f611b600301
+  url: https://kanerika.com/blogs/claude-3-5-vs-gpt-4o/
+  title: "Claude 3.5 vs GPT-4o: Best AI for Enterprise 2026?"
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+  summary: "Claude 3.5 vs GPT-4o: Best AI for Enterprise 2026?"
+- id: 3a4cf664bf7b27a8
+  url: https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/
+  title: "Mechanistic interpretability: 10 Breakthrough Technologies 2026 | MIT Technology Review"
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+  summary: "Mechanistic interpretability: 10 Breakthrough Technologies 2026 | MIT Technology Review
+    You need to enable JavaScript to view this site."
+- id: 7f1b77ef2a66f02d
+  url: https://eu.36kr.com/en/p/3443299194705538
+  title: 'GPT vs Claude: OpenAI Didn&#x27;t Win Every Match, AI Security "Ultimate Test" Truth Unveiled'
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+  summary: 'GPT vs Claude: OpenAI Didn&#x27;t Win Every Match, AI Security "Ultimate Test" Truth
+    Unveiled English 中文 Deutsch Home Article GPT goes head-to-head with Claude, yet OpenAI
+    didn&#x27;t win every match.'
+- id: b19b69648c87845c
+  url: https://fortune.com
+  title: Fortune (https://fortune.com)
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: 41d531ade5826f78
+  url: https://www.verdict.co.uk
+  title: Verdict (https://www.verdict.co.uk)
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: a62a60db9153e5d6
+  url: https://www.cnbc.com
+  title: CNBC (https://www.cnbc.com)
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: eeb8ba2765a4109e
+  url: https://www.axios.com/2024/07/25/exclusive-anthropic-weighs-in-on-california-ai-bill
+  title: "Axios: Anthropic Weighs In on California AI Bill (July 2024)"
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: 3aad6bf4e6bae66e
+  url: https://www.nbcnews.com/tech/tech-news/anthropic-backs-californias-sb-53-ai-bill-rcna229908
+  title: Anthropic backs California&#x27;s SB 53 AI bill
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+  summary: Anthropic backs California&#x27;s SB 53 AI bill IE 11 is not supported.
+- id: e76f688da38ef0fd
+  url: https://www.axios.com/2025/05/23/anthropic-ai-deception-risk
+  title: "Axios: Anthropic AI Deception Risk (May 2025)"
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: de18440757f72c95
+  url: https://www.bankinfosecurity.com/models-strategically-lie-finds-anthropic-study-a-27136
+  title: Models Can Strategically Lie, Finds Anthropic Study
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: 1e1267e5d0a9cf6b
+  url: https://the-decoder.com/claude-jailbreak-results-are-in-and-the-hackers-won/
+  title: Claude Jailbreak results are in, and the hackers won
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: ab73eadb1eca528e
+  url: https://infosecwriteups.com/cve-2025-54794-hijacking-claude-ai-with-a-prompt-injection-the-jailbreak-that-talked-back-d6754078b311
+  title: "InfoSec Write-ups: CVE-2025-54794 Claude AI Prompt Injection"
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: 65cf1112a4149a11
+  url: https://www.semafor.com/article/10/17/2025/white-house-feud-with-anthropic-reveals-broader-ai-safety-concerns
+  title: White House feud with Anthropic reveals broader AI safety concerns | Semafor
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: 25bbf79a2dec9ae2
+  url: https://www.themidasproject.com/article-list/how-anthropic-s-ai-safety-framework-misses-the-mark
+  title: How Anthropic’s AI Safety Framework Misses the Mark | The Midas Project
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: 5c4489ae88119049
+  url: https://www.verdict.co.uk/us-doj-google-anthropic-partnership/
+  title: US DoJ seeks to unwind Google-Anthropic partnership
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+  summary: "US DoJ seeks to unwind Google-Anthropic partnership Switch language: .translate --> The
+    DoJ proposal to undwind Google-Anthropic deal is part of a broader strategy to address
+    Google&#8217;s alleged monopoly in online search."
+- id: 150ce5e988bc1e00
+  url: https://www.glassdoor.com/Overview/Working-at-Anthropic-EI_IE8109027.11,20.htm
+  title: "Glassdoor: Working at Anthropic"
+  type: web
+  cited_by:
+    - anthropic
+  tags: []

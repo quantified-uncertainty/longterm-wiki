@@ -1,10 +1,6 @@
-# AI Labs
-# Resources from major AI labs and companies
-# Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
-
 - id: 862e2d851c171321
   url: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
-  title: "Microsoft and OpenAI extend partnership"
+  title: Microsoft and OpenAI extend partnership
   type: web
   publication_id: microsoft
   cited_by:
@@ -12,7 +8,6 @@
   tags:
     - funding
     - ai-labs
-
 - id: 384cd95f0c4dbbc6
   url: https://scholar.google.com/scholar?q=replika+parasocial+relationship
   title: Academic research on Replika relationships
@@ -2907,11 +2902,9 @@
     - alignment
     - truthfulness
     - user-experience
-
-# Anthropic official announcements (fact sources)
 - id: 83a73ffe5e230d5f
   url: https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation
-  title: "Anthropic raises $13B Series F at $183B post-money valuation"
+  title: Anthropic raises $13B Series F at $183B post-money valuation
   type: web
   publication_id: anthropic
   cited_by:
@@ -2919,10 +2912,9 @@
   tags:
     - funding
     - ai-labs
-
 - id: 52c1c2def0184008
   url: https://www.anthropic.com/news/anthropic-invests-50-billion-in-american-ai-infrastructure
-  title: "Anthropic invests $50 billion in American AI infrastructure"
+  title: Anthropic invests $50 billion in American AI infrastructure
   type: web
   publication_id: anthropic
   cited_by:
@@ -2930,11 +2922,9 @@
   tags:
     - infrastructure
     - ai-labs
-
-# World (Worldcoin) official announcements
 - id: 8a37ca8f26efa9bc
   url: https://world.org/blog/announcements/at-last-trust-in-the-age-of-ai
-  title: "At Last, Trust In the Age of AI"
+  title: At Last, Trust In the Age of AI
   type: web
   publication_id: world-network
   cited_by:
@@ -2942,3 +2932,45 @@
   tags:
     - identity
     - cryptocurrency
+- id: b58bb99dfec2e318
+  url: https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation
+  title: "Anthropic: Raises \\$30 Billion Series G Funding at \\$380 Billion Post-Money Valuation"
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: c050aa0c7cd8f1bc
+  url: https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems
+  title: Anthropic raises $124 million to build more reliable, general AI systems \ Anthropic
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+  summary: Anthropic raises $124 million to build more reliable, general AI systems \ Anthropic
+    Announcements Anthropic raises $124 million to build more reliable, general AI systems May 28,
+    2021 Anthropic, an AI safety and research company, has raised $124 million in a Series A.
+- id: 57f01cae307e1cb1
+  url: https://www.anthropic.com/news/claude-opus-4-5
+  title: Introducing Claude Opus 4.5 \ Anthropic
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+  summary: Announcements Introducing Claude Opus 4.5 Nov 24, 2025 Our newest model, Claude Opus 4.5,
+    is available today.
+- id: c3f0e3c4b12ff103
+  url: https://assets.anthropic.com/m/7b1761976975203a/original/Anthropic-Interpretability-info-sheet.pdf
+  title: "Anthropic: Interpretability Info Sheet (PDF)"
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+- id: b9e7915be186b2b9
+  url: https://www.anthropic.com/transparency
+  title: Anthropic’s Transparency Hub \ Anthropic
+  type: web
+  cited_by:
+    - anthropic
+  tags: []
+  summary: Anthropic’s Transparency Hub A look at Anthropic&#x27;s key processes, programs, and
+    practices for responsible AI development.
