@@ -623,6 +623,62 @@ function maxDate(a, b) {
 }
 
 /**
+ * Build git-based date maps for all content files.
+ * Returns two Maps keyed by repo-relative file path:
+ *   - gitCreatedMap: path → YYYY-MM-DD of first commit (approximate, when file was added)
+ *   - gitModifiedMap: path → YYYY-MM-DD of last commit
+ * Falls back to empty maps if git is unavailable (e.g. shallow clones, no git installed).
+ */
+function buildGitDateMaps() {
+  const gitCreatedMap = new Map();
+  const gitModifiedMap = new Map();
+
+  try {
+    // Single git log pass: newest-first, all content file changes.
+    // "COMMIT <date>" marker lines separate commits; filenames follow.
+    const result = spawnSync('git', [
+      'log',
+      '--format=COMMIT %ad',
+      '--date=short',
+      '--name-only',
+      '--',
+      'content/docs/',
+    ], {
+      cwd: REPO_ROOT,
+      maxBuffer: 50 * 1024 * 1024,
+      encoding: 'utf-8',
+    });
+
+    if (result.status !== 0 || result.error) {
+      const reason = result.error?.message || result.stderr?.trim() || `exit ${result.status}`;
+      console.log(`  gitDateMaps: skipped (${reason})`);
+      return { gitCreatedMap, gitModifiedMap };
+    }
+
+    let currentDate = null;
+    for (const line of result.stdout.split('\n')) {
+      if (line.startsWith('COMMIT ')) {
+        currentDate = line.slice(7).trim();
+      } else if (currentDate && line.trim()) {
+        const filePath = line.trim();
+        // git log is newest-first: first occurrence = most recent modification
+        if (!gitModifiedMap.has(filePath)) {
+          gitModifiedMap.set(filePath, currentDate);
+        }
+        // Keep overwriting: last occurrence = oldest = approximate creation date
+        gitCreatedMap.set(filePath, currentDate);
+      }
+    }
+
+    console.log(`  gitDateMaps: ${gitModifiedMap.size} files tracked`);
+  } catch (err) {
+    console.log(`  gitDateMaps: skipped (${err.message || 'unknown error'})`);
+  }
+
+  return { gitCreatedMap, gitModifiedMap };
+}
+
+/**
  * Fetch latest edit dates per page from the wiki-server API.
  * Falls back to an empty map if the server is unavailable.
  */
@@ -730,7 +786,8 @@ function extractFrontmatter(content) {
  * Extracts frontmatter including quality, lastUpdated, title, etc.
  * Also detects unconverted links (markdown links with matching resources)
  */
-function buildPagesRegistry(urlToResource, editLogDates) {
+function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps) {
+  const { gitCreatedMap = new Map(), gitModifiedMap = new Map() } = gitDateMaps || {};
   const pages = [];
 
   function scanDirectory(dir, urlPrefix = '') {
@@ -785,10 +842,14 @@ function buildPagesRegistry(urlToResource, editLogDates) {
           uncertainty: fm.uncertainty != null ? Number(fm.uncertainty) : null,
           causalLevel: fm.causalLevel || null,
           lastUpdated: maxDate(
-            toDateString(fm.lastUpdated),
-            maxDate(toDateString(fm.lastEdited), editLogDates.get(isIndexFile ? null : id) || null)
+            editLogDates.get(isIndexFile ? null : id) || null,
+            maxDate(
+              gitModifiedMap.get(relative(REPO_ROOT, fullPath)) || null,
+              maxDate(toDateString(fm.lastUpdated), toDateString(fm.lastEdited))
+            )
           ),
-          dateCreated: toDateString(fm.createdAt) || toDateString(fm.dateCreated) || null,
+          // Derive creation date from git first-commit; fall back to frontmatter for legacy pages.
+          dateCreated: gitCreatedMap.get(relative(REPO_ROOT, fullPath)) || toDateString(fm.createdAt) || toDateString(fm.dateCreated) || null,
           llmSummary: fm.llmSummary || null,
           structuredSummary: fm.structuredSummary || null,
           description: fm.description || null,
@@ -1328,13 +1389,15 @@ async function main() {
   console.log(`  urlToResource: ${urlToResource.size} URL variations mapped`);
 
   // Fetch edit log dates and citation stats from wiki-server (parallel)
+  // Also build git-based date maps (synchronous, fast).
+  const gitDateMaps = buildGitDateMaps();
   const [editLogDates, citationStats] = await Promise.all([
     buildEditLogDateMap(),
     buildCitationStatsMap(),
   ]);
 
   // Build pages registry with frontmatter data (quality, etc.)
-  const pages = buildPagesRegistry(urlToResource, editLogDates);
+  const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps);
 
   // =========================================================================
   // CONTENT ENTITY LINKS — scan MDX for <EntityLink> references
