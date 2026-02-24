@@ -17,13 +17,13 @@ import { loadPages, findPage, getFilePath } from './utils.ts';
 import { runPipeline } from './pipeline.ts';
 import { triagePhase } from './phases.ts';
 import { runOrchestratorPipeline } from '../orchestrator/index.ts';
-import { runBatch, parseBatchPageIds } from '../batch-runner.ts';
+import { runBatch, runBatchDryRun, parseBatchPageIds } from '../batch-runner.ts';
 import type { OrchestratorTier } from '../orchestrator/types.ts';
 
 // Re-export public API for any direct importers
 export { runPipeline } from './pipeline.ts';
 export { runOrchestratorPipeline } from '../orchestrator/index.ts';
-export { runBatch, parseBatchPageIds } from '../batch-runner.ts';
+export { runBatch, runBatchDryRun, parseBatchPageIds } from '../batch-runner.ts';
 export { triagePhase } from './phases.ts';
 export { loadPages, findPage, getFilePath } from './utils.ts';
 export type { TriageResult, PipelineResults, PageData, PipelineOptions } from './types.ts';
@@ -133,6 +133,9 @@ Batch mode (V2 only):
   --resume                        Skip pages already completed in a previous batch run
   --report-file=report.md         Write summary report to a file
   --quality-report-file=path.json Write quality report JSON (default: .claude/temp/batch-quality-report.json)
+  --dry-run                       Preview batch: shows tier, cost estimates, skip reasons (NO API calls)
+  --output=plan.json              Write dry-run plan as JSON (use with --dry-run)
+  --limit=N                       Max pages to auto-select for dry-run (default: 20, no --batch needed)
 
 Tiers:
   polish    Quick single-pass, no research (~$2-3)
@@ -147,6 +150,9 @@ Examples:
   node crux/authoring/page-improver/index.ts -- cea --tier polish
   node crux/authoring/page-improver/index.ts -- cea --triage
   node crux/authoring/page-improver/index.ts -- --list --limit 30
+  node crux/authoring/page-improver/index.ts -- --engine=v2 --dry-run --limit=10
+  node crux/authoring/page-improver/index.ts -- --engine=v2 --batch=anthropic,miri --dry-run
+  node crux/authoring/page-improver/index.ts -- --engine=v2 --dry-run --output=batch-plan.json
 `);
     return;
   }
@@ -158,7 +164,7 @@ Examples:
   }
 
   // ── Batch mode (V2 only) — checked before pageId so --batch works without positional arg
-  if (opts.batch || opts['batch-file']) {
+  if (opts.batch || opts['batch-file'] || (opts['dry-run'] && opts.engine === 'v2')) {
     if (opts.engine !== 'v2') {
       console.error('Batch mode requires --engine=v2');
       process.exit(1);
@@ -173,13 +179,39 @@ Examples:
       process.exit(1);
     }
 
-    const pageIds = parseBatchPageIds(
+    let pageIds = parseBatchPageIds(
       opts.batch as string | undefined,
       opts['batch-file'] as string | undefined,
     );
+
+    // Dry-run without explicit page list: auto-select pages from registry
+    if (pageIds.length === 0 && opts['dry-run']) {
+      const limit = opts.limit ? parseInt(opts.limit as string, 10) : 20;
+      const allPages = loadPages();
+      pageIds = allPages
+        .filter(p => !p.path.includes('/models/'))
+        .slice(0, limit)
+        .map(p => p.id);
+      if (pageIds.length === 0) {
+        console.error('No pages found in registry. Run build-data first.');
+        process.exit(1);
+      }
+    }
+
     if (pageIds.length === 0) {
       console.error('No page IDs provided. Use --batch=id1,id2 or --batch-file=pages.txt');
       process.exit(1);
+    }
+
+    // Dry-run mode: preview without API calls
+    if (opts['dry-run']) {
+      await runBatchDryRun({
+        pageIds,
+        tier: v2Tier,
+        budgetLimit: opts['batch-budget'] ? parseFloat(opts['batch-budget'] as string) : undefined,
+        outputFile: opts['output'] as string | undefined,
+      });
+      return;
     }
 
     await runBatch({
