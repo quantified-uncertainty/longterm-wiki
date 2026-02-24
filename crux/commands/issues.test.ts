@@ -1210,6 +1210,56 @@ describe('issues create — file-based body (#766)', () => {
 });
 
 // ---------------------------------------------------------------------------
+// camelCase option keys (crux.mjs converts kebab-case → camelCase before dispatch)
+// ---------------------------------------------------------------------------
+
+describe('issues create — camelCase option keys from CLI parser', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('reads problem from camelCase problemFile key', async () => {
+    const { writeFileSync, unlinkSync } = await import('fs');
+    const tmpPath = '/tmp/test-issue-camel-problem.md';
+    writeFileSync(tmpPath, 'Body via camelCase `problemFile` key.');
+
+    mockGithubApi.mockResolvedValueOnce({ number: 220, html_url: 'https://github.com/test/issues/220', title: 'Test' });
+    mockGithubApi.mockResolvedValueOnce({}); // label
+    mockGithubApi.mockResolvedValueOnce({}); // label
+
+    const result = await commands.create(['Test camelCase problemFile'], {
+      problemFile: tmpPath,
+      model: 'sonnet',
+      criteria: 'Fixed|Tests pass',
+    });
+    expect(result.exitCode).toBe(0);
+
+    const apiCall = mockGithubApi.mock.calls[0];
+    const sentBody = (apiCall[1] as { body: { body: string } }).body.body;
+    expect(sentBody).toContain('Body via camelCase `problemFile` key.');
+
+    unlinkSync(tmpPath);
+  });
+
+  it('reads body from camelCase bodyFile key', async () => {
+    const { writeFileSync, unlinkSync } = await import('fs');
+    const tmpPath = '/tmp/test-issue-camel-body.md';
+    writeFileSync(tmpPath, '## Problem\n\nFull body via camelCase `bodyFile`.');
+
+    mockGithubApi.mockResolvedValueOnce({ number: 221, html_url: 'https://github.com/test/issues/221', title: 'Test' });
+
+    const result = await commands.create(['Test camelCase bodyFile'], { bodyFile: tmpPath });
+    expect(result.exitCode).toBe(0);
+
+    const apiCall = mockGithubApi.mock.calls[0];
+    const sentBody = (apiCall[1] as { body: { body: string } }).body.body;
+    expect(sentBody).toContain('Full body via camelCase `bodyFile`.');
+
+    unlinkSync(tmpPath);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // update-body --body-file support
 // ---------------------------------------------------------------------------
 
