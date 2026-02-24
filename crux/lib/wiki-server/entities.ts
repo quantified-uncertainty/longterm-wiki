@@ -2,10 +2,18 @@
  * Entities API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
+ * Response types are imported from api-types.ts (single source of truth).
  */
 
 import { batchedRequest, getServerUrl, apiRequest, type ApiResult } from './client.ts';
-import type { SyncEntity } from '../../../apps/wiki-server/src/api-types.ts';
+import type {
+  SyncEntity,
+  SyncEntitiesResult,
+  EntityRow,
+  EntityListResult,
+  EntitySearchResult,
+  EntityStatsResult,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -13,46 +21,14 @@ import type { SyncEntity } from '../../../apps/wiki-server/src/api-types.ts';
 
 export type SyncEntityItem = SyncEntity;
 
-export interface SyncEntitiesResult {
-  upserted: number;
-}
+// ---------------------------------------------------------------------------
+// Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-export interface EntityEntry {
-  id: string;
-  numericId: string | null;
-  entityType: string;
-  title: string;
-  description: string | null;
-  website: string | null;
-  tags: string[] | null;
-  clusters: string[] | null;
-  status: string | null;
-  lastUpdated: string | null;
-  customFields: Array<{ label: string; value: string; link?: string }> | null;
-  relatedEntries: Array<{ id: string; type: string; relationship?: string }> | null;
-  sources: Array<{ title: string; url?: string; author?: string; date?: string }> | null;
-  syncedAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export type { SyncEntitiesResult, EntityListResult, EntitySearchResult, EntityStatsResult };
 
-export interface EntityListResult {
-  entities: EntityEntry[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface EntitySearchResult {
-  results: EntityEntry[];
-  query: string;
-  total: number;
-}
-
-export interface EntityStatsResult {
-  total: number;
-  byType: Record<string, number>;
-}
+/** Backward-compatible alias for EntityRow. */
+export type EntityEntry = EntityRow;
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -129,4 +105,3 @@ export async function searchEntities(
 export async function getEntityStats(): Promise<ApiResult<EntityStatsResult>> {
   return apiRequest<EntityStatsResult>('GET', '/api/entities/stats');
 }
-

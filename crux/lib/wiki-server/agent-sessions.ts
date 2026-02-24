@@ -3,31 +3,22 @@
  *
  * Stores and retrieves agent checklist state in PostgreSQL,
  * replacing the previous pattern of committing .claude/wip-checklist.md to git.
+ * Response types are imported from api-types.ts (single source of truth).
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
 import type {
   CreateAgentSession,
   UpdateAgentSession,
+  AgentSessionRow,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — response (re-exported from canonical api-types.ts)
 // ---------------------------------------------------------------------------
 
-export interface AgentSessionEntry {
-  id: number;
-  branch: string;
-  task: string;
-  sessionType: 'content' | 'infrastructure' | 'bugfix' | 'refactor' | 'commands';
-  issueNumber: number | null;
-  checklistMd: string;
-  status: 'active' | 'completed';
-  startedAt: string;
-  completedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+/** Backward-compatible alias for AgentSessionRow. */
+export type AgentSessionEntry = AgentSessionRow;
 
 // ---------------------------------------------------------------------------
 // API functions

@@ -3,66 +3,33 @@
  *
  * Saves and retrieves intermediate artifacts from V2 orchestrator
  * and page-improver pipeline runs. See GitHub issue #826.
+ * Response types are imported from api-types.ts (single source of truth).
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
-import type { SaveArtifacts } from '../../../apps/wiki-server/src/api-types.ts';
+import type {
+  SaveArtifacts,
+  SaveArtifactsResult,
+  ArtifactRow,
+  GetArtifactsResult,
+  GetArtifactsPagedResult,
+  ArtifactStatsResult,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
 export type SaveArtifactsInput = SaveArtifacts;
 
-export interface SaveArtifactsResult {
-  id: number;
-  pageId: string;
-  engine: string;
-  startedAt: string;
-  createdAt: string;
-}
+// ---------------------------------------------------------------------------
+// Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-export interface ArtifactEntry {
-  id: number;
-  pageId: string;
-  engine: string;
-  tier: string;
-  directions: string | null;
-  startedAt: string;
-  completedAt: string | null;
-  durationS: number | null;
-  totalCost: number | null;
-  sourceCache: unknown;
-  researchSummary: string | null;
-  citationAudit: unknown;
-  costEntries: unknown;
-  costBreakdown: Record<string, number> | null;
-  sectionDiffs: unknown;
-  qualityMetrics: unknown;
-  qualityGatePassed: boolean | null;
-  qualityGaps: string[] | null;
-  toolCallCount: number | null;
-  refinementCycles: number | null;
-  phasesRun: string[] | null;
-  createdAt: string;
-}
+export type { SaveArtifactsResult, GetArtifactsResult, GetArtifactsPagedResult, ArtifactStatsResult };
 
-export interface GetArtifactsResult {
-  entries: ArtifactEntry[];
-}
-
-export interface GetArtifactsPagedResult {
-  entries: ArtifactEntry[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface ArtifactStatsResult {
-  totalRuns: number;
-  byEngine: Record<string, number>;
-  byTier: Record<string, number>;
-}
+/** Backward-compatible alias for ArtifactRow. */
+export type ArtifactEntry = ArtifactRow;
 
 // ---------------------------------------------------------------------------
 // API functions

@@ -2,10 +2,15 @@
  * Summaries API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
+ * Response types are imported from the canonical api-types.ts definitions.
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
-import type { UpsertSummary } from '../../../apps/wiki-server/src/api-types.ts';
+import type {
+  UpsertSummary,
+  UpsertSummaryResult,
+  UpsertSummaryBatchResult,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -13,15 +18,11 @@ import type { UpsertSummary } from '../../../apps/wiki-server/src/api-types.ts';
 
 export type UpsertSummaryItem = UpsertSummary;
 
-export interface UpsertSummaryResult {
-  entityId: string;
-  entityType: string;
-}
+// ---------------------------------------------------------------------------
+// Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-export interface UpsertSummaryBatchResult {
-  upserted: number;
-  results: Array<{ entityId: string; entityType: string }>;
-}
+export type { UpsertSummaryResult, UpsertSummaryBatchResult };
 
 // ---------------------------------------------------------------------------
 // API functions

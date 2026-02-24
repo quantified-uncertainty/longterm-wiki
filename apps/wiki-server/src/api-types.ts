@@ -65,6 +65,46 @@ export const EditLogBatchSchema = z.object({
 });
 export type EditLogBatch = z.infer<typeof EditLogBatchSchema>;
 
+// -- Edit Logs: Response types ------------------------------------------------
+
+export interface EditLogAppendResult {
+  id: number;
+  pageId: string;
+  date: string;
+  createdAt: string;
+}
+
+export interface EditLogBatchResult {
+  inserted: number;
+  results: Array<{ id: number; pageId: string }>;
+}
+
+export interface EditLogRow {
+  id: number;
+  pageId: string;
+  date: string;
+  tool: string;
+  agency: string;
+  requestedBy: string | null;
+  note: string | null;
+  createdAt: string;
+}
+
+export interface EditLogEntriesResult {
+  entries: EditLogRow[];
+}
+
+export interface EditLogStatsResult {
+  totalEntries: number;
+  pagesWithLogs: number;
+  byTool: Record<string, number>;
+  byAgency: Record<string, number>;
+}
+
+export interface EditLogLatestDatesResult {
+  dates: Record<string, string>;
+}
+
 // ---------------------------------------------------------------------------
 // Citation Quotes
 // ---------------------------------------------------------------------------
@@ -90,6 +130,44 @@ export type UpsertCitationQuote = z.infer<typeof UpsertCitationQuoteSchema>;
 export const UpsertCitationQuoteBatchSchema = z.object({
   items: z.array(UpsertCitationQuoteSchema).min(1).max(100),
 });
+
+// -- Citation Quotes: Response types ------------------------------------------
+
+export interface CitationQuoteRow {
+  id: number;
+  pageId: string;
+  footnote: number;
+  url: string | null;
+  resourceId: string | null;
+  claimText: string;
+  claimContext: string | null;
+  sourceQuote: string | null;
+  sourceLocation: string | null;
+  quoteVerified: boolean;
+  verificationScore: number | null;
+  sourceTitle: string | null;
+  sourceType: string | null;
+  accuracyVerdict: string | null;
+  accuracyScore: number | null;
+}
+
+export interface UpsertCitationQuoteResult {
+  id: number;
+  pageId: string;
+  footnote: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpsertCitationQuoteBatchResult {
+  results: Array<{ id: number; pageId: string; footnote: number }>;
+}
+
+export interface CitationQuotesResult {
+  quotes: CitationQuoteRow[];
+  pageId: string;
+  total: number;
+}
 
 // ---------------------------------------------------------------------------
 // Citation Accuracy
@@ -122,6 +200,73 @@ export const MarkAccuracyBatchSchema = z.object({
   items: z.array(MarkAccuracySchema).min(1).max(100),
 });
 
+// -- Citation Accuracy: Response types ----------------------------------------
+
+export interface MarkAccuracyResult {
+  updated: true;
+  pageId: string;
+  footnote: number;
+  verdict: string;
+}
+
+export interface MarkAccuracyBatchResult {
+  updated: number;
+  results: Array<{ pageId: string; footnote: number; verdict: string }>;
+}
+
+export interface AccuracySnapshotResult {
+  snapshotCount: number;
+  pages: string[];
+}
+
+export interface AccuracyDashboardData {
+  exportedAt: string;
+  summary: {
+    totalCitations: number;
+    checkedCitations: number;
+    accurateCitations: number;
+    inaccurateCitations: number;
+    unsupportedCitations: number;
+    minorIssueCitations: number;
+    uncheckedCitations: number;
+    averageScore: number | null;
+  };
+  verdictDistribution: Record<string, number>;
+  difficultyDistribution: Record<string, number>;
+  pages: Array<{
+    pageId: string;
+    totalCitations: number;
+    checked: number;
+    accurate: number;
+    inaccurate: number;
+    unsupported: number;
+    minorIssues: number;
+    accuracyRate: number | null;
+    avgScore: number | null;
+  }>;
+  flaggedCitations: Array<{
+    pageId: string;
+    footnote: number;
+    claimText: string;
+    sourceTitle: string | null;
+    url: string | null;
+    verdict: string;
+    score: number | null;
+    issues: string | null;
+    difficulty: string | null;
+    checkedAt: string | null;
+  }>;
+  domainAnalysis: Array<{
+    domain: string;
+    totalCitations: number;
+    checked: number;
+    accurate: number;
+    inaccurate: number;
+    unsupported: number;
+    inaccuracyRate: number | null;
+  }>;
+}
+
 // ---------------------------------------------------------------------------
 // Citation Content
 // ---------------------------------------------------------------------------
@@ -143,6 +288,55 @@ export const UpsertCitationContentSchema = z.object({
   contentHash: z.string().max(64).nullable().optional(),
 });
 export type UpsertCitationContent = z.infer<typeof UpsertCitationContentSchema>;
+
+// -- Citation Content: Response types -----------------------------------------
+
+export interface CitationContentRow {
+  url: string;
+  fetchedAt: string;
+  httpStatus: number | null;
+  contentType: string | null;
+  pageTitle: string | null;
+  fullTextPreview: string | null;
+  fullText: string | null;
+  contentLength: number | null;
+  contentHash: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CitationContentListEntry {
+  url: string;
+  fetchedAt: string;
+  httpStatus: number | null;
+  contentType: string | null;
+  pageTitle: string | null;
+  contentLength: number | null;
+  contentHash: string | null;
+  hasFullText: boolean;
+  hasPreview: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CitationContentListResult {
+  entries: CitationContentListEntry[];
+  total: number;
+  withFullText: number;
+  withPreview: number;
+  limit: number;
+  offset: number;
+}
+
+export interface CitationContentStatsResult {
+  total: number;
+  withFullText: number;
+  withPreview: number;
+  coverage: number;
+  okCount: number;
+  deadCount: number;
+  avgContentLength: number | null;
+}
 
 // ---------------------------------------------------------------------------
 // Sessions
@@ -172,6 +366,61 @@ export type CreateSession = z.infer<typeof CreateSessionSchema>;
 export const CreateSessionBatchSchema = z.object({
   items: z.array(CreateSessionSchema).min(1).max(MAX_BATCH_SIZE),
 });
+
+// -- Sessions: Response types -------------------------------------------------
+
+export interface SessionRow {
+  id: number;
+  date: string;
+  branch: string | null;
+  title: string;
+  summary: string | null;
+  model: string | null;
+  duration: string | null;
+  cost: string | null;
+  prUrl: string | null;
+  checksYaml: string | null;
+  issuesJson: unknown;
+  learningsJson: unknown;
+  recommendationsJson: unknown;
+  pages: string[];
+  createdAt: string;
+}
+
+export interface CreateSessionResult {
+  id: number;
+  date: string;
+  title: string;
+  pages: string[];
+  createdAt: string;
+}
+
+export interface SessionBatchResult {
+  upserted: number;
+  results: Array<{ id: number; title: string; pageCount: number }>;
+}
+
+export interface SessionListResult {
+  sessions: SessionRow[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface SessionByPageResult {
+  sessions: SessionRow[];
+}
+
+export interface SessionStatsResult {
+  totalSessions: number;
+  uniquePages: number;
+  totalPageEdits: number;
+  byModel: Record<string, number>;
+}
+
+export interface SessionPageChangesResult {
+  sessions: SessionRow[];
+}
 
 // ---------------------------------------------------------------------------
 // Auto-Update Runs
@@ -206,6 +455,52 @@ export const RecordAutoUpdateRunSchema = z.object({
 });
 export type RecordAutoUpdateRun = z.infer<typeof RecordAutoUpdateRunSchema>;
 
+// -- Auto-Update Runs: Response types -----------------------------------------
+
+export interface RecordAutoUpdateRunResult {
+  id: number;
+  date: string;
+  startedAt: string;
+  createdAt: string;
+  resultsInserted: number;
+}
+
+export interface AutoUpdateRunRow {
+  id: number;
+  date: string;
+  startedAt: string;
+  completedAt: string | null;
+  trigger: string;
+  budgetLimit: number | null;
+  budgetSpent: number | null;
+  sourcesChecked: number | null;
+  sourcesFailed: number | null;
+  itemsFetched: number | null;
+  itemsRelevant: number | null;
+  pagesPlanned: number | null;
+  pagesUpdated: number | null;
+  pagesFailed: number | null;
+  pagesSkipped: number | null;
+  newPagesCreated: string[];
+  results: AutoUpdateResult[];
+  createdAt: string;
+}
+
+export interface AutoUpdateRunsListResult {
+  entries: AutoUpdateRunRow[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface AutoUpdateStatsResult {
+  totalRuns: number;
+  totalBudgetSpent: number;
+  totalPagesUpdated: number;
+  totalPagesFailed: number;
+  byTrigger: Record<string, number>;
+}
+
 // ---------------------------------------------------------------------------
 // Auto-Update News Items
 // ---------------------------------------------------------------------------
@@ -230,6 +525,35 @@ export const AutoUpdateNewsBatchSchema = z.object({
   items: z.array(AutoUpdateNewsItemSchema).min(1).max(500),
 });
 
+// -- Auto-Update News: Response types -----------------------------------------
+
+export interface AutoUpdateNewsRow {
+  id: number;
+  runId: number;
+  title: string;
+  url: string;
+  sourceId: string;
+  publishedAt: string | null;
+  summary: string | null;
+  relevanceScore: number | null;
+  topics: string[];
+  entities: string[];
+  routedToPageId: string | null;
+  routedToPageTitle: string | null;
+  routedTier: string | null;
+  runDate?: string | null;
+  createdAt: string;
+}
+
+export interface AutoUpdateNewsBatchResult {
+  inserted: number;
+}
+
+export interface AutoUpdateNewsDashboardResult {
+  items: AutoUpdateNewsRow[];
+  runDates: string[];
+}
+
 // ---------------------------------------------------------------------------
 // Hallucination Risk
 // ---------------------------------------------------------------------------
@@ -246,6 +570,25 @@ export type RiskSnapshotInput = z.infer<typeof RiskSnapshotSchema>;
 export const RiskSnapshotBatchSchema = z.object({
   snapshots: z.array(RiskSnapshotSchema).min(1).max(700),
 });
+
+// -- Hallucination Risk: Response types ---------------------------------------
+
+export interface RiskBatchResult {
+  inserted: number;
+}
+
+export interface RiskPageRow {
+  pageId: string;
+  score: number;
+  level: "low" | "medium" | "high";
+  factors: string[] | null;
+  integrityIssues: string[] | null;
+  computedAt: string;
+}
+
+export interface RiskLatestResult {
+  pages: RiskPageRow[];
+}
 
 // ---------------------------------------------------------------------------
 // Summaries
@@ -267,6 +610,18 @@ export type UpsertSummary = z.infer<typeof UpsertSummarySchema>;
 export const UpsertSummaryBatchSchema = z.object({
   items: z.array(UpsertSummarySchema).min(1).max(MAX_BATCH_SIZE),
 });
+
+// -- Summaries: Response types ------------------------------------------------
+
+export interface UpsertSummaryResult {
+  entityId: string;
+  entityType: string;
+}
+
+export interface UpsertSummaryBatchResult {
+  upserted: number;
+  results: Array<{ entityId: string; entityType: string }>;
+}
 
 // ---------------------------------------------------------------------------
 // Claims
@@ -291,6 +646,41 @@ export const InsertClaimBatchSchema = z.object({
 export const ClearClaimsSchema = z.object({
   entityId: z.string().min(1).max(300),
 });
+
+// -- Claims: Response types ---------------------------------------------------
+
+export interface ClaimRow {
+  id: number;
+  entityId: string;
+  entityType: string;
+  claimType: string;
+  claimText: string;
+  value: string | null;
+  unit: string | null;
+  confidence: string | null;
+  sourceQuote: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InsertClaimResult {
+  id: number;
+  entityId: string;
+  claimType: string;
+}
+
+export interface InsertClaimBatchResult {
+  inserted: number;
+  results: Array<{ id: number; entityId: string; claimType: string }>;
+}
+
+export interface ClearClaimsResult {
+  deleted: number;
+}
+
+export interface GetClaimsResult {
+  claims: ClaimRow[];
+}
 
 // ---------------------------------------------------------------------------
 // Page Links
@@ -317,6 +707,74 @@ export const SyncLinksBatchSchema = z.object({
   links: z.array(PageLinkSchema).min(1).max(5000),
   replace: z.boolean().optional().default(false),
 });
+
+// -- Page Links: Response types -----------------------------------------------
+
+export interface SyncLinksResult {
+  upserted: number;
+}
+
+export interface PageSearchResult {
+  results: Array<{
+    id: string;
+    numericId: string | null;
+    title: string;
+    description: string | null;
+    entityType: string | null;
+    category: string | null;
+    readerImportance: number | null;
+    quality: number | null;
+    score: number;
+  }>;
+  query: string;
+  total: number;
+}
+
+export interface PageDetailRow {
+  id: string;
+  numericId: string | null;
+  title: string;
+  description: string | null;
+  llmSummary: string | null;
+  category: string | null;
+  subcategory: string | null;
+  entityType: string | null;
+  tags: string | null;
+  quality: number | null;
+  readerImportance: number | null;
+  hallucinationRiskLevel: string | null;
+  hallucinationRiskScore: number | null;
+  contentPlaintext: string | null;
+  wordCount: number | null;
+  lastUpdated: string | null;
+  contentFormat: string | null;
+  syncedAt: string;
+}
+
+export interface RelatedPagesResult {
+  entityId: string;
+  related: Array<{
+    id: string;
+    type: string;
+    title: string;
+    score: number;
+    label?: string;
+  }>;
+  total: number;
+}
+
+export interface BacklinksResult {
+  targetId: string;
+  backlinks: Array<{
+    id: string;
+    type: string;
+    title: string;
+    relationship?: string;
+    linkType: string;
+    weight: number;
+  }>;
+  total: number;
+}
 
 // ---------------------------------------------------------------------------
 // Resources
@@ -346,6 +804,13 @@ export type UpsertResource = z.infer<typeof UpsertResourceSchema>;
 export const UpsertResourceBatchSchema = z.object({
   items: z.array(UpsertResourceSchema).min(1).max(MAX_BATCH_SIZE),
 });
+
+// -- Resources: Response types ------------------------------------------------
+
+export interface UpsertResourceResult {
+  id: string;
+  url: string;
+}
 
 // ---------------------------------------------------------------------------
 // Entities
@@ -403,6 +868,49 @@ export const SyncEntitiesBatchSchema = z.object({
   entities: z.array(SyncEntitySchema).min(1).max(MAX_BATCH_SIZE),
 });
 
+// -- Entities: Response types -------------------------------------------------
+
+export interface SyncEntitiesResult {
+  upserted: number;
+}
+
+export interface EntityRow {
+  id: string;
+  numericId: string | null;
+  entityType: string;
+  title: string;
+  description: string | null;
+  website: string | null;
+  tags: string[] | null;
+  clusters: string[] | null;
+  status: string | null;
+  lastUpdated: string | null;
+  customFields: Array<{ label: string; value: string; link?: string }> | null;
+  relatedEntries: Array<{ id: string; type: string; relationship?: string }> | null;
+  sources: Array<{ title: string; url?: string; author?: string; date?: string }> | null;
+  syncedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EntityListResult {
+  entities: EntityRow[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface EntitySearchResult {
+  results: EntityRow[];
+  query: string;
+  total: number;
+}
+
+export interface EntityStatsResult {
+  total: number;
+  byType: Record<string, number>;
+}
+
 // ---------------------------------------------------------------------------
 // Facts
 // ---------------------------------------------------------------------------
@@ -429,6 +937,70 @@ export type SyncFact = z.infer<typeof SyncFactSchema>;
 export const SyncFactsBatchSchema = z.object({
   facts: z.array(SyncFactSchema).min(1).max(500),
 });
+
+// -- Facts: Response types ----------------------------------------------------
+
+export interface SyncFactsResult {
+  upserted: number;
+}
+
+export interface FactRow {
+  id: number;
+  entityId: string;
+  factId: string;
+  label: string | null;
+  value: string | null;
+  numeric: number | null;
+  low: number | null;
+  high: number | null;
+  asOf: string | null;
+  measure: string | null;
+  subject: string | null;
+  note: string | null;
+  source: string | null;
+  sourceResource: string | null;
+  format: string | null;
+  formatDivisor: number | null;
+  syncedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FactsByEntityResult {
+  entityId: string;
+  facts: FactRow[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface FactTimeseriesResult {
+  entityId: string;
+  measure: string;
+  points: FactRow[];
+  total: number;
+}
+
+export interface StaleFactsResult {
+  facts: Array<{
+    entityId: string;
+    factId: string;
+    label: string | null;
+    asOf: string | null;
+    measure: string | null;
+    value: string | null;
+    numeric: number | null;
+  }>;
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface FactStatsResult {
+  total: number;
+  uniqueEntities: number;
+  uniqueMeasures: number;
+}
 
 // ---------------------------------------------------------------------------
 // Jobs
@@ -502,6 +1074,53 @@ export const SweepJobsSchema = z.object({
 });
 export type SweepJobs = z.infer<typeof SweepJobsSchema>;
 
+// -- Jobs: Response types -----------------------------------------------------
+
+export interface JobRow {
+  id: number;
+  type: string;
+  status: string;
+  params: Record<string, unknown> | null;
+  result: Record<string, unknown> | null;
+  error: string | null;
+  priority: number;
+  retries: number;
+  maxRetries: number;
+  createdAt: string;
+  claimedAt: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  workerId: string | null;
+}
+
+export interface ListJobsResult {
+  entries: JobRow[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface ClaimJobResult {
+  job: JobRow | null;
+}
+
+export interface JobStatsResult {
+  totalJobs: number;
+  byType: Record<
+    string,
+    {
+      byStatus: Record<string, number>;
+      avgDurationMs?: number;
+      failureRate?: number;
+    }
+  >;
+}
+
+export interface SweepJobsResult {
+  swept: number;
+  jobs: Array<{ id: number; type: string }>;
+}
+
 // ---------------------------------------------------------------------------
 // Improve Run Artifacts
 // ---------------------------------------------------------------------------
@@ -559,6 +1178,58 @@ export const SaveArtifactsSchema = z.object({
   phasesRun: z.array(z.string().max(100)).max(20).nullable().optional(),
 });
 export type SaveArtifacts = z.infer<typeof SaveArtifactsSchema>;
+
+// -- Artifacts: Response types ------------------------------------------------
+
+export interface SaveArtifactsResult {
+  id: number;
+  pageId: string;
+  engine: string;
+  startedAt: string;
+  createdAt: string;
+}
+
+export interface ArtifactRow {
+  id: number;
+  pageId: string;
+  engine: string;
+  tier: string;
+  directions: string | null;
+  startedAt: string;
+  completedAt: string | null;
+  durationS: number | null;
+  totalCost: number | null;
+  sourceCache: unknown;
+  researchSummary: string | null;
+  citationAudit: unknown;
+  costEntries: unknown;
+  costBreakdown: Record<string, number> | null;
+  sectionDiffs: unknown;
+  qualityMetrics: unknown;
+  qualityGatePassed: boolean | null;
+  qualityGaps: string[] | null;
+  toolCallCount: number | null;
+  refinementCycles: number | null;
+  phasesRun: string[] | null;
+  createdAt: string;
+}
+
+export interface GetArtifactsResult {
+  entries: ArtifactRow[];
+}
+
+export interface GetArtifactsPagedResult {
+  entries: ArtifactRow[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface ArtifactStatsResult {
+  totalRuns: number;
+  byEngine: Record<string, number>;
+  byTier: Record<string, number>;
+}
 
 // ---------------------------------------------------------------------------
 // Pages
@@ -622,3 +1293,19 @@ export const UpdateAgentSessionSchema = z.object({
   status: z.enum(["active", "completed"]).optional(),
 });
 export type UpdateAgentSession = z.infer<typeof UpdateAgentSessionSchema>;
+
+// -- Agent Sessions: Response types -------------------------------------------
+
+export interface AgentSessionRow {
+  id: number;
+  branch: string;
+  task: string;
+  sessionType: "content" | "infrastructure" | "bugfix" | "refactor" | "commands";
+  issueNumber: number | null;
+  checklistMd: string;
+  status: "active" | "completed";
+  startedAt: string;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

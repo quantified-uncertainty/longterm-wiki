@@ -5,7 +5,14 @@
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
-import type { EditLogEntry } from '../../../apps/wiki-server/src/api-types.ts';
+import type {
+  EditLogEntry,
+  EditLogAppendResult,
+  EditLogBatchResult,
+  EditLogEntriesResult,
+  EditLogStatsResult,
+  EditLogLatestDatesResult,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -13,41 +20,15 @@ import type { EditLogEntry } from '../../../apps/wiki-server/src/api-types.ts';
 
 export type EditLogApiEntry = EditLogEntry;
 
-export interface AppendResult {
-  id: number;
-  pageId: string;
-  date: string;
-  createdAt: string;
-}
+// ---------------------------------------------------------------------------
+// Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-export interface BatchResult {
-  inserted: number;
-  results: Array<{ id: number; pageId: string }>;
-}
-
-export interface GetEntriesResult {
-  entries: Array<{
-    id: number;
-    pageId: string;
-    date: string;
-    tool: string;
-    agency: string;
-    requestedBy: string | null;
-    note: string | null;
-    createdAt: string;
-  }>;
-}
-
-export interface StatsResult {
-  totalEntries: number;
-  pagesWithLogs: number;
-  byTool: Record<string, number>;
-  byAgency: Record<string, number>;
-}
-
-export interface LatestDatesResult {
-  dates: Record<string, string>;
-}
+export type AppendResult = EditLogAppendResult;
+export type BatchResult = EditLogBatchResult;
+export type GetEntriesResult = EditLogEntriesResult;
+export type StatsResult = EditLogStatsResult;
+export type LatestDatesResult = EditLogLatestDatesResult;
 
 // ---------------------------------------------------------------------------
 // API functions (return ApiResult<T>)
