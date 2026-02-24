@@ -96,6 +96,16 @@ const SCRIPTS = {
     passthrough: ['json', 'no-fetch', 'threshold', 'model', 'delay'],
     positional: true,
   },
+  'backfill-content': {
+    script: 'citations/backfill-citation-content.ts',
+    description: 'Backfill citation_content full text from SQLite to PostgreSQL',
+    passthrough: ['dry-run'],
+  },
+  'content-coverage': {
+    script: 'citations/citation-content-coverage.ts',
+    description: 'Show citation content coverage stats (SQLite vs PostgreSQL)',
+    passthrough: ['json'],
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'report');
