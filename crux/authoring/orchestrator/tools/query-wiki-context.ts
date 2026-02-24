@@ -68,7 +68,7 @@ export const tool: ToolRegistration = {
       if (relatedResult.ok) {
         response.relatedPages = {
           total: relatedResult.data.total,
-          items: relatedResult.data.related.map((r: Record<string, unknown>) => ({
+          items: relatedResult.data.related.map((r) => ({
             id: r.id,
             title: r.title,
             type: r.type,
@@ -83,7 +83,7 @@ export const tool: ToolRegistration = {
       if (backlinksResult.ok) {
         response.backlinks = {
           total: backlinksResult.data.total,
-          items: backlinksResult.data.backlinks.map((b: Record<string, unknown>) => ({
+          items: backlinksResult.data.backlinks.map((b) => ({
             id: b.id,
             title: b.title,
             type: b.type,

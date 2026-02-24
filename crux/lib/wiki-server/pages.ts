@@ -12,6 +12,8 @@ import type {
   PageDetailRow,
   RelatedPagesResult,
   BacklinksResult,
+  BacklinkEntry,
+  RelatedEntry,
   CitationQuoteRow,
   CitationQuotesResult,
 } from '../../../apps/wiki-server/src/api-types.ts';
@@ -20,7 +22,7 @@ import type {
 // Types — response (re-exported from canonical api-types.ts)
 // ---------------------------------------------------------------------------
 
-export type { PageSearchResult, BacklinksResult, CitationQuotesResult };
+export type { PageSearchResult, BacklinksResult, CitationQuotesResult, BacklinkEntry, RelatedEntry };
 
 /** Backward-compatible alias for PageDetailRow. */
 export type PageDetail = PageDetailRow;

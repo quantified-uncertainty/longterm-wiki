@@ -765,28 +765,32 @@ export interface PageDetailRow {
   updatedAt: string;
 }
 
+export interface RelatedEntry {
+  id: string;
+  type: string;
+  title: string;
+  score: number;
+  label?: string;
+}
+
 export interface RelatedPagesResult {
   entityId: string;
-  related: Array<{
-    id: string;
-    type: string;
-    title: string;
-    score: number;
-    label?: string;
-  }>;
+  related: RelatedEntry[];
   total: number;
+}
+
+export interface BacklinkEntry {
+  id: string;
+  type: string;
+  title: string;
+  relationship?: string;
+  linkType: string;
+  weight: number;
 }
 
 export interface BacklinksResult {
   targetId: string;
-  backlinks: Array<{
-    id: string;
-    type: string;
-    title: string;
-    relationship?: string;
-    linkType: string;
-    weight: number;
-  }>;
+  backlinks: BacklinkEntry[];
   total: number;
 }
 
@@ -1323,3 +1327,4 @@ export interface AgentSessionRow {
   createdAt: string;
   updatedAt: string;
 }
+
