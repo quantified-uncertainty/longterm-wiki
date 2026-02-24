@@ -376,7 +376,7 @@ function pLimit(concurrencyLimit: number) {
 // ---------------------------------------------------------------------------
 
 /** Resolve source content for a URL, returning the FetchedSource or null. */
-async function resolveSource(
+export async function resolveSource(
   url: string,
   sourceCache: SourceCache | undefined,
   fetchMissing: boolean,

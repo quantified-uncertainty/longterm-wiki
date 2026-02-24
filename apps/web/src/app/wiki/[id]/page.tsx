@@ -7,7 +7,7 @@ import {
   isMdxError,
 } from "@/lib/mdx";
 import type { MdxPage, MdxError } from "@/lib/mdx";
-import { getEntityById, getPageById, getEntityPath, getResourcesForPage, getFactsForEntity } from "@/data";
+import { getEntityById, getPageById, getEntityPath, getResourcesForPage, getFactsForEntityWithFallback } from "@/data";
 import type { Page, ContentFormat } from "@/data";
 import { CONTENT_FORMAT_INFO, isFullWidth } from "@/lib/page-types";
 import { PageStatus } from "@/components/PageStatus";
@@ -214,7 +214,7 @@ function MdxErrorView({ error }: { error: MdxError }) {
   );
 }
 
-function ContentView({
+async function ContentView({
   page,
   pageData,
   entityPath,
@@ -248,6 +248,10 @@ function ContentView({
     page.frontmatter.toc !== false &&
     wordCount > 1500 &&
     tocHeadings.length >= 3;
+
+  const factCount = entity
+    ? Object.keys((await getFactsForEntityWithFallback(slug)).data).length
+    : undefined;
 
   // Compute citation health from live quotes (not stale build-time data)
   const liveCitationHealth = citationQuotes && citationQuotes.length > 0
@@ -312,7 +316,7 @@ function ContentView({
         resourceCount={getResourcesForPage(slug).length}
         citationHealth={liveCitationHealth}
         ratings={pageData?.ratings ?? undefined}
-        factCount={entity ? Object.keys(getFactsForEntity(slug)).length : undefined}
+        factCount={factCount}
         coverage={pageData?.coverage}
       />
       <CitationQuotesProvider quotes={citationQuotes ?? []}>

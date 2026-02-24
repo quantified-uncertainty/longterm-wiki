@@ -171,7 +171,7 @@ export default async function HallucinationRiskPage() {
 
   // Use pre-computed stats from build-time when using local data source,
   // fall back to runtime aggregation for API-sourced data
-  const precomputed = source === "local" ? getRiskStats() : null;
+  const precomputed = source === "local" ? await getRiskStats() : null;
 
   const highCount = precomputed?.high ?? riskPages.filter((p) => p.level === "high").length;
   const mediumCount = precomputed?.medium ?? riskPages.filter((p) => p.level === "medium").length;

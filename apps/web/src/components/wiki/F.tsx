@@ -1,4 +1,4 @@
-import { getFact } from "@/data";
+import { getFactWithFallback } from "@/data";
 import { cn } from "@/lib/utils";
 
 interface FProps {
@@ -19,8 +19,8 @@ interface FProps {
  * Renders a fact value from the canonical facts store with a hover tooltip
  * showing metadata (asOf, source, note, computed status).
  */
-export function F({ e, f, showDate, children, className }: FProps) {
-  const fact = getFact(e, f);
+export async function F({ e, f, showDate, children, className }: FProps) {
+  const fact = await getFactWithFallback(e, f);
 
   if (!fact) {
     return (

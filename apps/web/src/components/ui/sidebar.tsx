@@ -32,15 +32,13 @@ export function SidebarProvider({
 }: React.ComponentProps<"div"> & {
   defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = React.useState(defaultOpen);
+  const [open, setOpen] = React.useState(() => {
+    if (typeof window === "undefined") return defaultOpen;
+    const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+    return stored !== null ? stored === "true" : defaultOpen;
+  });
   // Mobile sidebar is closed by default
   const [mobileOpen, setMobileOpen] = React.useState(false);
-
-  // Sync initial state from localStorage on mount
-  React.useEffect(() => {
-    const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
-    if (stored !== null) setOpen(stored === "true");
-  }, []);
 
   const toggleSidebar = React.useCallback(() => {
     setOpen((prev) => {

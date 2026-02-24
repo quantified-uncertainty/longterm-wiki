@@ -109,7 +109,7 @@ async function main() {
   } else if (!pgStats) {
     console.log(`  ${c.red}Could not fetch PG stats${c.reset}`);
   } else {
-    const pct = Math.round(pgStats.coverage * 100);
+    const pct = pgStats.coverage > 1 ? Math.round(pgStats.coverage) : Math.round(pgStats.coverage * 100);
     console.log(`  Total URLs:    ${pgStats.total}`);
     console.log(`  With full text: ${c.green}${pgStats.withFullText}${c.reset} / ${pgStats.total} (${pct}%)`);
     console.log(`  With preview:  ${pgStats.withPreview}`);

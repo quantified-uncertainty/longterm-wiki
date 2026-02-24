@@ -11,7 +11,7 @@ import {
   getPageById,
   getEntityPath,
   getBacklinksFor,
-  getFactsForEntity,
+  getFactsForEntityWithFallback,
   getExternalLinks,
 } from "@/data";
 
@@ -56,8 +56,9 @@ async function fetchPageClaims(pageId: string): Promise<ClaimRow[] | null> {
       }
     );
     if (!res.ok) return null;
-    const data = await res.json() as { claims: ClaimRow[] };
-    return data.claims ?? null;
+    const data = await res.json();
+    if (!data || !Array.isArray(data.claims)) return null;
+    return data.claims as ClaimRow[];
   } catch {
     return null;
   }
@@ -211,7 +212,7 @@ export default async function WikiInfoPage({ params }: PageProps) {
   const pageData = getPageById(slug);
   const entityPath = getEntityPath(slug);
   const backlinks = getBacklinksFor(slug);
-  const facts = getFactsForEntity(slug);
+  const facts = (await getFactsForEntityWithFallback(slug)).data;
   const externalLinks = getExternalLinks(slug);
   const rawMdx = getRawMdxSource(slug);
   const claims = await fetchPageClaims(slug);

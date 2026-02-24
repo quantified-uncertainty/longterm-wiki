@@ -8,6 +8,18 @@ vi.mock("js-yaml", () => ({
   default: { load: vi.fn(() => []) },
 }));
 
+// Mock wiki-server to skip network calls — withApiFallback just calls localLoader directly
+vi.mock("@lib/wiki-server", () => ({
+  fetchFromWikiServer: vi.fn(async () => null),
+  withApiFallback: vi.fn(async (_apiLoader: unknown, localLoader: () => unknown) => ({
+    data: localLoader(),
+    source: "local" as const,
+  })),
+  fetchDetailed: vi.fn(async () => ({ ok: false, error: { type: "not-configured" } })),
+  getWikiServerConfig: vi.fn(() => null),
+  dataSourceLabel: vi.fn((source: string) => source === "api" ? "wiki-server API" : "local files"),
+}));
+
 // Create a minimal mock database
 const mockDatabase = {
   entities: [
@@ -480,8 +492,9 @@ describe("Data Layer", () => {
   describe("getUpdateSchedule", () => {
     it("includes internal pages in update schedule", async () => {
       const { getUpdateSchedule } = await import("../../data/index");
-      const items = getUpdateSchedule();
-      const internalItem = items.find((i) => i.id === "internal-doc");
+      const result = await getUpdateSchedule();
+      const items = result.data;
+      const internalItem = items.find((i: { id: string }) => i.id === "internal-doc");
       expect(internalItem).toBeDefined();
       expect(internalItem!.category).toBe("internal");
     });
@@ -523,7 +536,7 @@ describe("Data Layer", () => {
   describe("getPageCitationHealth", () => {
     it("returns citation health for page with data", async () => {
       const { getPageCitationHealth } = await import("../../data/index");
-      const health = getPageCitationHealth("test-entity");
+      const health = await getPageCitationHealth("test-entity");
       expect(health).toBeDefined();
       expect(health?.total).toBe(10);
       expect(health?.accurate).toBe(4);
@@ -533,13 +546,13 @@ describe("Data Layer", () => {
 
     it("returns null for page without citation health", async () => {
       const { getPageCitationHealth } = await import("../../data/index");
-      const health = getPageCitationHealth("table-entity");
+      const health = await getPageCitationHealth("table-entity");
       expect(health).toBeNull();
     });
 
     it("returns null for nonexistent page", async () => {
       const { getPageCitationHealth } = await import("../../data/index");
-      const health = getPageCitationHealth("nonexistent");
+      const health = await getPageCitationHealth("nonexistent");
       expect(health).toBeNull();
     });
   });

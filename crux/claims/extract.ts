@@ -44,6 +44,8 @@ function cleanMdxForExtraction(body: string): string {
   return body
     // Remove import/export statements
     .replace(/^(import|export)\s+.*$/gm, '')
+    // Convert <R id="HASH">Text</R> to [^R:HASH] citation markers before stripping JSX
+    .replace(/<R\s+id="([^"]+)">[^<]*<\/R>/g, '[^R:$1]')
     // Remove JSX self-closing tags: <EntityLink id="..." />, <F id="..." />, etc.
     .replace(/<\w[\w.]*[^>]*\/>/g, ' ')
     // Remove JSX block components: <InfoBox>...</InfoBox>, <Callout>...</Callout>
@@ -117,7 +119,7 @@ const EXTRACT_SYSTEM_PROMPT = `You are a fact-extraction assistant. Given a sect
 For each claim:
 - "claimText": a single atomic, self-contained statement (not a question or heading)
 - "claimType": one of "factual" (specific facts, numbers, dates), "evaluative" (assessments or judgments), "causal" (cause-effect statements), or "historical" (historical events or trends)
-- "footnoteRefs": array of footnote numbers (as strings) that cite this claim — look for [^N] patterns near the claim
+- "footnoteRefs": array of citation references (as strings) that cite this claim — look for [^N] footnote patterns (e.g. [^1], [^3]) and [^R:HASH] resource references (e.g. [^R:abc123]) near the claim. Include both types.
 
 Rules:
 - Each claim must be atomic (one assertion per claim)
@@ -128,7 +130,7 @@ Rules:
 - Return only claims that appear in the given text
 
 Respond ONLY with JSON:
-{"claims": [{"claimText": "...", "claimType": "factual", "footnoteRefs": ["1", "3"]}]}`;
+{"claims": [{"claimText": "...", "claimType": "factual", "footnoteRefs": ["1", "R:abc123"]}]}`;
 
 async function extractClaimsFromSection(
   section: Section,
@@ -167,7 +169,9 @@ Extract atomic claims from this section. Return JSON only.`;
           ? (c as ExtractedClaim).footnoteRefs.map(String)
           : [],
       }));
-  } catch {
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`  [warn] Section "${section.heading}" — extraction failed: ${msg.slice(0, 120)}`);
     return [];
   }
 }

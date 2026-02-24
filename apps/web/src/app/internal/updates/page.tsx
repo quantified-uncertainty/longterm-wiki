@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   description: "Pages ranked by update priority based on staleness and importance.",
 };
 
-export default function UpdatesPage() {
-  const items = getUpdateSchedule();
+export default async function UpdatesPage() {
+  const { data: items } = await getUpdateSchedule();
 
   return (
     <article className="prose max-w-none">
