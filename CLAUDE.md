@@ -1,8 +1,8 @@
 # Longterm Wiki - Claude Code Config
 
-AI safety wiki with ~625 MDX pages, Next.js frontend, YAML data layer, and CLI tooling.
+AI safety wiki with ~700 MDX pages, Next.js frontend, YAML data layer, and CLI tooling.
 
-**Keep CLAUDE.md as a routing document** — brief instructions and pointers to detailed guides. Detailed style guidance, checklists, and templates live in `content/docs/internal/` (see Page templates below). Do not expand CLAUDE.md with long explanations; instead add detail to the appropriate internal style guide and reference it from here.
+**This is a routing document.** Detailed guides live in `content/docs/internal/` and `.claude/rules/`. Use `pnpm crux <domain> --help` for full CLI reference.
 
 ## MANDATORY FIRST ACTION — Do this before anything else
 
@@ -14,200 +14,59 @@ pnpm crux agent-checklist init --issue=N   # if working on a GitHub issue
 pnpm crux agent-checklist init "Task description" --type=X   # if not on an issue
 ```
 
-**"Before writing code" is not good enough** — quick fixes, research, and file reads all count. If you skip this and dive straight in, you will forget it entirely. Run it first, then proceed.
+**"Before writing code" is not good enough** — quick fixes, research, and file reads all count. Run it first, then proceed. See `.claude/rules/agent-session-workflow.md` for full workflow.
 
-### Worktree setup (one-time per worktree)
-
-If running in a git worktree (check: `git worktree list`), symlink the env file and node_modules to avoid missing credentials and missing packages:
-
-```bash
-# From the worktree root:
-ln -sf ../../../.env .env                                                 # env vars (GITHUB_TOKEN etc.)
-ln -sf /Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/node_modules apps/web/node_modules  # app packages
-```
-
-Without these, `crux` won't have `GITHUB_TOKEN` and the gate check will fail with `Cannot find package 'minisearch'`.
-
-See `## Agent Session Workflow — MANDATORY` below and `.claude/rules/agent-session-workflow.md` for full details.
+At session end, run `/agent-session-ready-PR`. At bare minimum, always run `/push-and-ensure-green`.
 
 ## Quick Reference
 
 ```bash
-# First-time setup
-pnpm setup                       # Full setup: install, build data, validate
-pnpm setup:quick                 # Install + build data only (skip validation)
-pnpm setup:check                 # Check environment without changing anything
+# Setup
+pnpm setup:quick                 # Install + build data (first-time)
 
 # Development
-pnpm dev                         # Start dev server on port 3001
-pnpm build                      # Production build (runs assign-ids + build-data automatically)
-
-# Numeric ID assignment (requires wiki server — run from apps/web/)
-(cd apps/web && node scripts/assign-ids.mjs)              # Assign numericIds to new entities/pages
-(cd apps/web && node scripts/assign-ids.mjs --dry-run)    # Preview assignments without writing files
-
-# Testing
+pnpm dev                         # Dev server on port 3001
+pnpm build                      # Production build
 pnpm test                        # Run vitest tests
 
 # Pre-push gate (CI-blocking checks)
-pnpm crux validate gate          # Build data + tests + blocking validations (with LLM triage)
-pnpm crux validate gate --full   # Also runs full Next.js build
-pnpm crux validate gate --no-triage  # Skip LLM triage, run all checks
-pnpm crux validate gate --full-gate  # Force all checks (implies --no-triage)
+pnpm crux validate gate --fix    # Build data + tests + validations + auto-fix
 
-# Tooling (Crux CLI)
-pnpm crux validate               # Run all validation checks
-pnpm crux --help                 # Show all CLI domains
-pnpm crux content improve <id>   # Improve a wiki page
-pnpm crux edit-log view <id>     # View edit history for a page
-pnpm crux maintain               # Run maintenance sweep (PRs, issues, cruft)
-pnpm crux maintain status        # Check when maintenance last ran
+# After any page edit
+pnpm crux fix escaping           # Auto-fix dollar signs, comparisons, tildes
+pnpm crux fix markdown           # Auto-fix list formatting, bold labels
 
-# System wellness checks
-pnpm crux health                 # Run all wellness checks (server, DB, API, Actions, freshness)
-pnpm crux health --check=server  # Server & DB health only
-pnpm crux health --check=actions # GitHub Actions workflow health only
-pnpm crux health --json          # JSON output for scripting
+# Page authoring
+pnpm crux content create "Title" --tier=standard
+pnpm crux content improve <id> --tier=standard --apply
 
-# Agent checklists
-pnpm crux agent-checklist init "Task" --type=X    # Generate typed checklist
-pnpm crux agent-checklist init --issue=N          # Auto-detect type from issue labels
-pnpm crux agent-checklist check <id> [id2...]     # Check off items by ID
-pnpm crux agent-checklist check --na <id>         # Mark items as N/A
-pnpm crux agent-checklist verify                  # Auto-verify items with verifyCommand
-pnpm crux agent-checklist pre-push-check          # Auto-verify + warn if < 25% complete (called by pre-push hook)
-pnpm crux agent-checklist status                  # Show checklist progress
-pnpm crux agent-checklist complete                # Validate all items checked
-pnpm crux agent-checklist snapshot                # Output checks: YAML block for session log
+# Querying (use instead of grepping YAML files)
+pnpm crux query search "topic"   # Full-text search
+pnpm crux query entity <id>      # Entity data
+pnpm crux query related <id>     # Related pages
 
-# GitHub issue tracking
-pnpm crux issues                 # List open issues ranked by priority
-pnpm crux issues next            # Show next highest-priority issue to work on
-pnpm crux issues lint            # Check all issues for formatting problems
-pnpm crux issues lint <N>        # Lint a single issue
-pnpm crux issues create "title" --label=tooling \
-  --problem="..." --model=sonnet \          # --model is REQUIRED
-  --criteria="item1|item2" --cost="~$2-4"  # --criteria is REQUIRED
-pnpm crux issues update-body <N> --model=sonnet --problem="..." --criteria="a|b"
-pnpm crux issues start <N>       # Signal start: comment + add claude-working label
-pnpm crux issues done <N>        # Signal completion: comment + remove label
-pnpm crux issues cleanup         # Detect stale claude-working labels + potential duplicates
-pnpm crux issues cleanup --fix   # Auto-remove stale labels
-pnpm crux issues close <N> --duplicate=M  # Close issue as duplicate of another
-pnpm crux issues close <N> --reason="..."  # Close with comment
+# Research context (saves many tool calls)
+pnpm crux context for-page <id>  # Full context for a page
+pnpm crux context for-issue <N>  # Context for a GitHub issue
 
-# GitHub PR management (corruption-safe — always use instead of raw curl)
-# IMPORTANT: For multi-line PR bodies, use --body-file or stdin (NOT inline --body with heredoc):
-pnpm crux pr create --title="..." --body-file=/tmp/pr-body.md  # Create PR from file (recommended)
-pnpm crux pr create --title="..." <<'EOF'        # Create PR from stdin heredoc (also safe)
-## Summary
-- change 1
-EOF
-# Inline --body is only safe for single-line bodies; heredoc in $() fails with sh/dash:
-pnpm crux pr detect              # Check if PR exists for current branch
-pnpm crux pr detect --ci         # JSON output for scripts
-pnpm crux pr fix-body            # Auto-fix literal \n in PR body
-
-# Issue formatting standard (enforced by crux issues lint)
-# Well-formatted issues require:
-#   1. ## Problem section (or long freeform body)
-#   2. ## Acceptance Criteria section or - [ ] checkboxes
-#   3. ## Recommended Model section with **Haiku/Sonnet/Opus** or [model] in title
-
-# Hallucination risk & review tracking
-pnpm crux validate hallucination-risk         # Risk assessment report
-pnpm crux validate hallucination-risk --top=20  # Top 20 highest-risk pages
-pnpm crux review mark <id> --reviewer="name"  # Mark page as human-reviewed
-pnpm crux review list                         # List reviewed pages
-
-# Hallucination detection evals & adversarial agents
-pnpm crux evals run --suite=injection --pages=anthropic,miri  # Error injection eval
-pnpm crux evals run --suite=fake-entity                       # Fake entity resistance eval
-pnpm crux evals run --suite=cross-ref --limit=200             # Cross-reference consistency
-pnpm crux evals hunt --agent=reference-sniffer --page=anthropic --no-llm  # Hunt uncited claims
-pnpm crux evals hunt --agent=description-auditor --page=miri  # Audit descriptions
-pnpm crux evals inject anthropic --count=2                    # Manually inject errors
-
-# Session log management
-pnpm crux sessions write "Title"             # Scaffold a session YAML (pre-fills date+branch)
-pnpm crux sessions write "Title" --pages=a,b --sync  # Write + sync to wiki-server immediately
-pnpm crux validate session-logs              # Check session log format/fields
-pnpm crux validate session-logs --ci         # JSON output for CI
-
-# Citation verification & archival
-pnpm crux citations verify <id>              # Verify all citations on a page
-pnpm crux citations verify --all --limit=20  # Verify top 20 pages with citations
-pnpm crux citations status <id>              # Show verification results for a page
-pnpm crux citations report                   # Summary across all archived pages
-pnpm crux citations report --broken          # List all broken citations
-
-# Citation quote extraction & verification
-pnpm crux citations extract-quotes <id>              # Extract supporting quotes for a page
-pnpm crux citations extract-quotes --all --limit=10  # Batch extract quotes
-pnpm crux citations quote-report                     # Quote coverage statistics
-pnpm crux citations quote-report --broken            # Show broken/drifted quotes
-pnpm crux citations verify-quotes <id>               # Re-verify stored quotes
-pnpm crux citations verify-quotes --all              # Re-verify all stored quotes
-
-# Research context bundles (pre-assembled context for Claude Code sessions)
-pnpm crux context for-issue <N>          # Context bundle for GitHub issue N
-pnpm crux context for-page <page-id>     # Context bundle for a wiki page
-pnpm crux context for-entity <id>        # Context bundle for an entity
-pnpm crux context for-topic "topic"      # Context bundle for a free-text topic
-# Writes to .claude/wip-context.md by default; use --output=<path> to override
-# Use --print to write to stdout instead of a file
-
-# Querying wiki data (use instead of grepping YAML files)
-pnpm crux query search "topic"           # Full-text search (ranked by relevance)
-pnpm crux query entity <id>              # Structured entity data
-pnpm crux query facts <entity-id>        # Numeric facts for an entity
-pnpm crux query related <page-id>        # Related pages (graph query)
-pnpm crux query backlinks <page-id>      # What links here?
-pnpm crux query page <page-id>           # Full page metadata + risk score
-pnpm crux query recent-changes --days=7  # What changed this week?
-pnpm crux query recent-edits --days=7    # Recent edit log entries
-pnpm crux query citations <page-id>      # Citation health for a page
-pnpm crux query citations --broken       # Wiki-wide broken citations
-pnpm crux query risk <page-id>           # Hallucination risk score
-pnpm crux query risk --level=high        # All high-risk pages
-pnpm crux query stats                    # Wiki-wide statistics
-pnpm crux query blocks <page-id>         # Section structure from block-level IR
-pnpm crux query blocks --entity=<id>     # Sections referencing a given entity
-pnpm crux query blocks --component=squiggle  # Pages using a component type
-pnpm crux query blocks --uncited         # Sections with no citations (>50 words)
-# All commands support --json for machine-readable output
-# Requires LONGTERMWIKI_SERVER_URL (set in environment)
-
-# Research context bundles (saves 5-15 tool calls per session)
-pnpm crux context for-page <page-id>     # Full context for editing a page (metadata, related, citations, entity YAML)
-pnpm crux context for-entity <id>        # Full context for an entity (facts, backlinks, sources, YAML)
-pnpm crux context for-issue <N>          # Context assembled from GitHub issue (finds related pages/entities)
-pnpm crux context for-topic "query"      # Context for a free-text topic (search + related)
-# All commands write to .claude/wip-context.md by default (override with --output=<path>)
+# Full CLI reference
+pnpm crux --help                 # All domains
+pnpm crux <domain> --help        # Domain-specific help
 ```
 
 ## Repository Structure
 
 ```
 longterm-wiki/
-├── content/docs/               # ~625 MDX wiki pages
+├── content/docs/               # ~700 MDX wiki pages
 ├── data/                       # YAML source data (entities, facts, resources, etc.)
 │   ├── entities/               # Entity YAML definitions
 │   ├── facts/                  # Canonical facts
 │   ├── resources/              # External resource links
-│   ├── insights/               # Cross-page insights
 │   ├── graphs/                 # Cause-effect graph data
 │   └── auto-update/            # Auto-update system state, sources, runs
-├── apps/web/                    # Next.js 15 frontend
-│   ├── src/                    # App source code
-│   ├── scripts/                # Build scripts (build-data.mjs)
-│   └── package.json            # App dependencies
+├── apps/web/                    # Next.js 15 frontend (see apps/web/CLAUDE.md)
 ├── crux/                       # Crux CLI + validation (see crux/README.md)
-│   ├── crux.mjs                # CLI entry point
-│   ├── commands/               # CLI domain handlers
-│   ├── authoring/              # Page authoring scripts (create, improve, grade)
-│   ├── lib/                    # Shared utilities, validation rules, page templates
-│   └── validate/               # Validation scripts
 └── package.json                # Workspace root
 ```
 
@@ -218,216 +77,61 @@ longterm-wiki/
 3. Next.js app reads `database.json` at build time
 4. MDX pages in `content/docs/` are compiled via next-mdx-remote
 
-## Querying Wiki Data
+## Page Authoring
 
-The wiki-server has a PostgreSQL database with full-text search, entity graphs, facts, citations, and edit history. **Use `crux query` instead of grepping YAML files** — it's faster, returns structured results, and accesses data unavailable in flat files (risk scores, backlinks, citation accuracy).
+**Always use the Crux content pipeline.** Do not manually write wiki pages from scratch.
 
 ```bash
-pnpm crux query search "topic"           # Full-text search (ranked)
-pnpm crux query entity <id>              # Structured entity data
-pnpm crux query facts <entity-id>        # Numeric facts for an entity
-pnpm crux query related <page-id>        # Related pages (graph query)
-pnpm crux query backlinks <page-id>      # What links here?
-pnpm crux query page <page-id>           # Full page metadata
-pnpm crux query recent-changes --days=7  # What changed this week?
-pnpm crux query citations <page-id>      # Citation health for a page
-pnpm crux query risk <page-id>           # Hallucination risk score
-pnpm crux query stats                    # Wiki-wide statistics
-pnpm crux query blocks <page-id>         # Section structure (local block-index.json)
-pnpm crux query blocks --entity=<id>     # Sections referencing entity
-pnpm crux query blocks --component=squiggle  # Pages using component type
-pnpm crux query blocks --uncited         # Uncited sections (>50 words)
+pnpm crux content create "Page Title" --tier=standard    # budget | standard | premium
+pnpm crux content improve <page-id> --tier=standard --apply  # polish | standard | deep
 ```
 
-All commands support `--json` for machine-readable output. Server commands require `LONGTERMWIKI_SERVER_URL`. The `blocks` command reads from local `block-index.json` (built by `build-data.mjs`).
+**If the pipeline fails, fix the pipeline** — do not bypass it. See the crux source code in `crux/` to diagnose and fix issues. Manually written pages are missing citations, EntityLink validation, frontmatter syncing, and quality grading.
 
-## Page Authoring Workflow
+Session logs are written automatically after `--apply` runs. Do not also run `/agent-session-ready-PR` for improve-only sessions.
 
-When creating or editing wiki pages, **always use the Crux content pipeline**. Do not manually write wiki pages from scratch.
+### After any page edit
 
-### Prerequisites
+Run `pnpm crux fix escaping` and `pnpm crux fix markdown`, then verify with `pnpm crux validate gate --fix`.
 
-If `apps/web/src/data/pages.json` doesn't exist, generate it first:
-```bash
-pnpm run --filter longterm-next sync:data
-```
-
-### Creating a new page
-```bash
-pnpm crux content create "Page Title" --tier=standard
-```
-Tiers: `budget` (~$2-3), `standard` (default, ~$4-6), `premium` (~$8-12)
-
-**API keys are in environment variables** (`process.env`), NOT in `.env` files. Check `env | grep -i API` to verify available keys before assuming they're missing. Required keys: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`. Optional: `FIRECRAWL_KEY`, `SCRY_API_KEY`, `EXA_API_KEY` (auto-update web search — faster/cheaper than LLM search), `GITHUB_TOKEN` (required for `crux issues` commands and the `/internal/github-issues` dashboard).
-
-### Improving an existing page
-```bash
-pnpm crux content improve <page-id> --tier=standard --apply    # Improve + auto-logs session to DB
-pnpm crux content improve <page-id> --tier=standard --apply --skip-session-log  # Skip session log
-```
-Tiers: `polish` (~$2-3), `standard` (default, ~$5-8), `deep` (~$10-15)
-Use `--directions "specific instructions"` for targeted improvements.
-Use `--apply` to write changes directly (otherwise outputs to temp file for review).
-Use `--grade` with `--apply` to auto-grade after improvement.
-
-**Session logs are written automatically after every `--apply` run.** No manual step needed for improve pipeline runs. Manual sessions (edits, fixes, content creation) still require running `/agent-session-ready-PR` at session end. Do not run `/agent-session-ready-PR` for improve-only sessions — it would create a duplicate log entry.
-
-### After any page edit (manual or pipeline)
-```bash
-pnpm crux fix escaping              # Auto-fix dollar signs, comparisons, tildes
-pnpm crux fix markdown              # Auto-fix list formatting, bold labels
-pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only  # MUST pass (blocking in CI)
-pnpm crux validate schema           # MUST pass (blocking in CI) — validates YAML entity types, fields
-pnpm crux validate unified --rules=frontmatter-schema,no-quoted-subcategory --errors-only  # MUST pass (blocking in CI) — validates MDX frontmatter
-pnpm crux validate unified --rules=prefer-entitylink --errors-only   # MUST pass (blocking in CI) — use EntityLink for registered entities (auto-fixable: --fix)
-pnpm crux validate                  # Full validation (advisory)
-```
-**Six checks are blocking CI gates:** `unified --rules=comparison-operators,dollar-signs`, `schema`, `unified --rules=frontmatter-schema,no-quoted-subcategory`, `unified --rules=numeric-id-integrity`, and `unified --rules=prefer-entitylink`. All must pass before committing.
-
-When you write a markdown link like `[MIRI](/knowledge-base/organizations/miri/)` and `miri` is a registered entity, the gate will fail. Fix with `pnpm crux validate unified --rules=prefer-entitylink --fix`.
+**Six checks are CI-blocking:** comparison-operators, dollar-signs, schema, frontmatter-schema, numeric-id-integrity, prefer-entitylink. All are included in the gate.
 
 ### Self-review checklist (before committing any page)
 
-Re-read the full page and verify:
+1. **Links resolve**: Every `<EntityLink id="X">` has a matching entity in `data/entities/*.yaml`
+2. **Prose matches data**: Claims agree with numbers in tables/charts on the same page
+3. **No `{/* NEEDS CITATION */}` markers**: Search before committing
+4. **Cross-page consistency**: If you edited a person page, check the linked org page for conflicts
+5. **MDX rendering**: For `\$`, `^`, `{}` — think through rendering. When in doubt, use plain text
 
-1. **Links resolve**: Every `<EntityLink id="X">` has a matching `- id: X` in `data/entities/*.yaml`
-2. **Prose matches data**: Claims in prose agree with numbers in tables/charts on the same page
-3. **Units are consistent**: Same unit throughout (don't mix years in overview with months in tables)
-4. **Rendering works**: For `\$`, `^`, `{}` or LaTeX-like notation, think through MDX rendering. When in doubt, use plain text.
-5. **No `{/* NEEDS CITATION */}` markers**: Search for these before committing — `grep -r "NEEDS CITATION" content/docs/`. Standard/deep pipeline improvements should never leave these behind. If found, either add a source or remove the claim.
-6. **Cross-page consistency**: If you edited a person page, skim the linked org page for conflicting facts (funding, dates, key people), and vice versa. Pages sharing entities often drift apart. If you changed a funding claim or founding date on one page, check the other.
-7. **Temporal voice (historical pages)**: If you edited a `/history/` page, confirm "Looking Forward" sections are clearly framed as historical projections, not present-day expectations.
-
-For model/analysis pages, also run the full review checklist in `content/docs/internal/models.mdx` (Part 7).
-
-### CRITICAL: If the Crux pipeline fails, FIX THE PIPELINE — do NOT bypass it
-
-**NEVER write a wiki page manually as a workaround when `pnpm crux content create` or `pnpm crux content improve` fails.** This is the single most important rule for page authoring.
-
-When the crux library fails:
-1. **Read the error output carefully.** Identify the root cause (missing data, bad import, schema issue, API error, etc.)
-2. **Investigate the relevant crux source code** in `crux/` — the commands, authoring scripts, lib utilities, and validation code are all in this repo and are all fixable.
-3. **Fix the bug in the crux library itself**, then re-run the pipeline command.
-4. If the fix is non-trivial, ask the user for guidance — but still do not fall back to manual page writing.
-
-Manually written pages are missing: proper citations, EntityLink validation, frontmatter metric syncing, template structure, research integration, and quality grading. They create technical debt that is harder to fix later than fixing the pipeline now.
-
-### If you must create a page manually (last resort, only with explicit user approval)
-Write the initial draft, then immediately run the improve pipeline on it:
-```bash
-pnpm crux content improve <page-id> --tier=polish --apply
-```
-This adds proper citations, fixes escaping, validates EntityLinks, and syncs frontmatter metrics.
-
-## Agent Session Workflow — MANDATORY
-
-Run `/agent-session-start` **before taking any action** — before reading files, running commands, or writing code. See `## MANDATORY FIRST ACTION` at the top of this file and `.claude/rules/agent-session-workflow.md` for full instructions.
-
-At session end, run `/agent-session-ready-PR` to verify the checklist, polish the PR, and ship.
-
-## GitHub Issue Tracking — MANDATORY
-
-When a session works on a GitHub issue, signal activity on that issue. See `.claude/rules/github-issue-tracking.md` for full instructions. Summary:
-
-1. **At session start**: `pnpm crux issues start <N>` — posts a comment + adds `claude-working` label
-2. **At session end**: `pnpm crux issues done <N> --pr=<URL>` — posts completion comment + removes label
-3. **To pick the next issue**: `/next-issue` — fetches and ranks open issues, starts work on the top one
-
-## GitHub MCP Server
-
-A GitHub MCP server is configured at project level (`.mcp.json`). This gives Claude Code direct access to GitHub APIs via MCP tools.
-
-**When to use which:**
-- **`crux issues/pr/ci` commands**: For all workflow operations (issue tracking, PR creation, CI monitoring). These route through `githubApi()` which validates for shell-expansion corruption. Always prefer crux for writes.
-- **MCP GitHub tools**: For ad-hoc reads — checking a PR diff, reading a file from another branch, looking up a user, browsing repo contents. MCP tools bypass bash entirely, so shell-expansion corruption doesn't apply.
-
-**Do NOT** use raw `curl` commands for GitHub API calls. Use either crux commands (for workflow operations) or MCP tools (for ad-hoc reads).
-
-## PR Review & Ship Workflow — MANDATORY
-
-Before finishing any session, run the full review-and-ship workflow defined in `.claude/rules/pr-review-guidelines.md`. Run `/agent-session-ready-PR` to verify the checklist, polish the PR, and ship. At bare minimum, always run `/push-and-ensure-green`.
-
-## CI Verification — MANDATORY
+## CI Verification
 
 **Never assume CI will pass. Always verify.**
 
-### Before pushing: run the gate check
 ```bash
-pnpm crux validate gate          # Runs: build-data, tests, validations, typecheck (with LLM triage)
-pnpm crux validate gate --fix    # Auto-fix escaping + markdown before validating
-pnpm crux validate gate --full   # Also runs full Next.js build
-pnpm crux validate gate --no-triage  # Skip LLM triage, run all checks
-pnpm crux validate gate --full-gate  # Force all checks (implies --no-triage)
-```
-The gate check bundles all CI-blocking checks into one command. It fails fast — if any step fails, it stops and reports. The `.githooks/pre-push` hook runs this automatically on every `git push`.
-
-LLM triage (enabled by default locally) uses Haiku to analyze the git diff and skip checks that are clearly irrelevant to the changed files. It's conservative (skips only when safe), has a 3-second timeout with graceful fallback, and is auto-disabled in CI.
-
-**Setup (one-time):** `git config core.hooksPath .githooks`
-
-The gate runs these steps sequentially:
-1. Build data layer (`apps/web/scripts/build-data.mjs`)
-2. Run vitest tests
-3. *(with `--fix` only)* Auto-fix escaping and markdown formatting
-4. MDX syntax check (comparison-operators, dollar-signs)
-5. YAML schema validation
-6. Frontmatter schema validation
-7. Numeric ID integrity (cross-entity/page duplicate detection)
-8. TypeScript type check (`tsc --noEmit`)
-9. *(with `--full` only)* Full Next.js production build
-
-### After pushing: confirm CI is green
-```bash
-pnpm crux ci status              # Check current CI status
-pnpm crux ci status --wait       # Poll every 30s until all checks complete
-```
-1. **Do not say "CI should pass" — wait for actual confirmation**
-2. If checks show `queued` or `in_progress`, use `--wait` to poll automatically
-3. If checks fail, investigate the failure, fix locally, and push again
-4. Do not consider work complete until CI is green
-
-### CI jobs
-- **build-and-test**: Builds the app and runs vitest (blocking)
-- **validate**: Runs four blocking checks (MDX syntax, YAML schema, frontmatter schema, numeric ID integrity), then the full validation suite (advisory/non-blocking)
-
-## Auto-Update System
-
-News-driven automatic wiki updates. Fetches from RSS feeds and web searches, routes relevant news to wiki pages, and runs improvements. See `crux/auto-update/` for implementation and `data/auto-update/sources.yaml` for source configuration.
-
-```bash
-pnpm crux auto-update plan                    # Preview what would be updated
-pnpm crux auto-update run --budget=30         # Run with $30 budget cap
-pnpm crux auto-update digest                  # Just fetch and show news digest
-pnpm crux auto-update sources                 # List configured sources
-pnpm crux auto-update history                 # Show past runs
+pnpm crux validate gate --fix    # Before pushing (also runs as pre-push hook)
+pnpm crux ci status --wait       # After pushing — poll until green
 ```
 
-GitHub Actions workflow (`.github/workflows/auto-update.yml`) runs daily at 06:00 UTC. Configurable via `workflow_dispatch` with budget, page count, and source filters.
+Do not consider work complete until CI is green.
 
 ## Key Conventions
 
-- **Path aliases**: Use `@/`, `@components/`, `@data/`, `@lib/` in app code
-- **Entity types**: Canonical list in `apps/web/src/data/entity-type-names.ts`. Category-mapped types (used by page creator): person, organization, risk, approach, model, concept, intelligence-paradigm, capability, crux, debate, event, metric, project. Additional types include: risk-factor, safety-agenda, policy, case-study, scenario, resource, funder, historical, analysis, parameter, argument, table, diagram, insight
+- **Path aliases**: `@/`, `@components/`, `@data/`, `@lib/` in app code
+- **Entity types**: Canonical list in `apps/web/src/data/entity-type-names.ts`
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
 - **Squiggle models**: See `apps/web/CLAUDE.md` for SquiggleEstimate style guide
-- **Internal sidebar** (`apps/web/src/lib/internal-nav.ts`): When adding internal pages, place them in the correct section. "Research" is for research reports/proposals only. Schema/architecture/technical docs go in "Architecture & Schema". Check existing section semantics before adding.
-- **Canonical facts & Calc**: Follow `content/docs/internal/canonical-facts.mdx` style guide — use `<F>` for volatile numbers, `<Calc>` for derived computations, `showDate` for temporal claims. Facts YAML in `data/facts/`.
-- **Mermaid diagrams**: Follow `content/docs/internal/mermaid-diagrams.mdx` style guide — prefer `flowchart TD`, max 3-4 parallel nodes, use tables for taxonomies, max 15-20 nodes per diagram.
-- **Page templates**: Defined in `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
-- **Edit logs**: Per-page edit history stored in PostgreSQL (wiki-server). Use `pnpm crux edit-log view <page-id>` to inspect. See `crux/lib/edit-log.ts` for the API.
+- **Page templates**: `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
+- **Canonical facts & Calc**: Follow `content/docs/internal/canonical-facts.mdx` — `<F>` for volatile numbers, `<Calc>` for derived computations
+- **Internal sidebar**: `apps/web/src/lib/internal-nav.ts` — check existing section semantics before adding pages
+- **Internal dashboards**: For features with data/status over time, create `/internal/<name>` pages following patterns in `apps/web/src/app/internal/`
+- **GitHub API**: Use `crux issues/pr/ci` commands for writes. Use MCP GitHub tools for ad-hoc reads. Never raw `curl`.
+- **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
 
-## Internal Dashboards for New Features
+## Detailed Guides (loaded automatically by Claude Code)
 
-**When building significant new features, always consider creating an internal dashboard page** (`/internal/<feature>`) to visualize the feature's data, status, and history. Dashboards are essential for debugging, monitoring, and iterating on features later.
-
-**When to build a dashboard:** Any feature that produces data over time (run history, discovered items, status tracking, metrics) or that involves a pipeline with multiple stages (where seeing intermediate results aids debugging).
-
-**How to build one:**
-1. Create `apps/web/src/app/internal/<name>/page.tsx` (server component — loads data)
-2. Create `apps/web/src/app/internal/<name>/<name>-table.tsx` (client component — `"use client"` with `DataTable` from `@/components/ui/data-table.tsx`)
-3. Add navigation entry in `apps/web/src/lib/wiki-nav.ts` under "Dashboards & Tools"
-4. Server components can read YAML/JSON files directly via `fs` for operational data
-5. Follow existing patterns in `apps/web/src/app/internal/updates/` or `auto-update-runs/`
-
-**Examples:** Update Schedule, Page Changes, Fact Dashboard, Auto-Update Runs, Auto-Update News, Importance Rankings, Page Similarity, Interventions, Proposals.
+- `.claude/rules/agent-session-workflow.md` — Session start/end workflow
+- `.claude/rules/github-issue-tracking.md` — Issue tracking with `crux issues`
+- `.claude/rules/pr-review-guidelines.md` — PR review and ship process
+- `.claude/rules/session-logging.md` — Session log format and storage
