@@ -53,6 +53,8 @@ export async function syncPageLinks(
       'POST',
       '/api/links/sync',
       { links: batch, replace: isFirst },
+      undefined,
+      'content',
     );
 
     if (!result.ok) {

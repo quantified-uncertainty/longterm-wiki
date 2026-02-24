@@ -57,7 +57,7 @@ export type SnapshotResult = AccuracySnapshotResult;
 export async function upsertCitationQuote(
   item: UpsertCitationQuoteItem,
 ): Promise<ApiResult<UpsertCitationQuoteResult>> {
-  return apiRequest<UpsertCitationQuoteResult>('POST', '/api/citations/quotes/upsert', item);
+  return apiRequest<UpsertCitationQuoteResult>('POST', '/api/citations/quotes/upsert', item, undefined, 'content');
 }
 
 export async function upsertCitationQuoteBatch(
@@ -67,6 +67,8 @@ export async function upsertCitationQuoteBatch(
     'POST',
     '/api/citations/quotes/upsert-batch',
     { items },
+    undefined,
+    'content',
   );
 }
 
@@ -77,7 +79,7 @@ export async function upsertCitationQuoteBatch(
 export async function markCitationAccuracy(
   item: MarkAccuracyItem,
 ): Promise<ApiResult<MarkAccuracyResult>> {
-  return apiRequest<MarkAccuracyResult>('POST', '/api/citations/quotes/mark-accuracy', item);
+  return apiRequest<MarkAccuracyResult>('POST', '/api/citations/quotes/mark-accuracy', item, undefined, 'content');
 }
 
 export async function markCitationAccuracyBatch(
@@ -87,11 +89,13 @@ export async function markCitationAccuracyBatch(
     'POST',
     '/api/citations/quotes/mark-accuracy-batch',
     { items },
+    undefined,
+    'content',
   );
 }
 
 export async function createAccuracySnapshot(): Promise<ApiResult<SnapshotResult>> {
-  return apiRequest<SnapshotResult>('POST', '/api/citations/accuracy-snapshot', {});
+  return apiRequest<SnapshotResult>('POST', '/api/citations/accuracy-snapshot', {}, undefined, 'content');
 }
 
 export async function getAccuracyDashboard(): Promise<ApiResult<AccuracyDashboardData>> {
@@ -109,7 +113,7 @@ export type { CitationContentRow, CitationContentListEntry, CitationContentListR
 export async function upsertCitationContent(
   item: UpsertCitationContentInput,
 ): Promise<ApiResult<{ url: string }>> {
-  return apiRequest<{ url: string }>('POST', '/api/citations/content/upsert', item);
+  return apiRequest<{ url: string }>('POST', '/api/citations/content/upsert', item, undefined, 'content');
 }
 
 export async function getCitationContentByUrl(

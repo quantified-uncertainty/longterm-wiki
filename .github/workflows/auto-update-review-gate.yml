@@ -45,6 +45,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          LONGTERMWIKI_PROJECT_KEY: ${{ secrets.LONGTERMWIKI_PROJECT_KEY }}
 
       - name: Run citation audit
         id: audit

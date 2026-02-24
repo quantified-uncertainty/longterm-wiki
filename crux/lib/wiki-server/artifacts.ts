@@ -42,7 +42,7 @@ export type ArtifactEntry = ArtifactRow;
 export async function saveArtifacts(
   input: SaveArtifactsInput,
 ): Promise<ApiResult<SaveArtifactsResult>> {
-  return apiRequest<SaveArtifactsResult>('POST', '/api/artifacts', input);
+  return apiRequest<SaveArtifactsResult>('POST', '/api/artifacts', input, undefined, 'content');
 }
 
 /** Get artifacts for a specific page (most recent first). */

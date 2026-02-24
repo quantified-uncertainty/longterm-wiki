@@ -63,6 +63,8 @@ export async function syncFacts(
       'POST',
       '/api/facts/sync',
       { facts: batch },
+      undefined,
+      'content',
     );
 
     if (!result.ok) {

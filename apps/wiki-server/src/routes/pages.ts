@@ -239,7 +239,7 @@ pagesRoute.post("/sync", async (c) => {
   const parsed = SyncBatchSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const { pages } = parsed.data;
+  const { pages, syncedFromBranch, syncedFromCommit } = parsed.data;
   const db = getDrizzleDb();
   let upserted = 0;
 
@@ -271,6 +271,8 @@ pagesRoute.post("/sync", async (c) => {
       wordCount: page.wordCount ?? null,
       lastUpdated: page.lastUpdated ?? null,
       contentFormat: page.contentFormat ?? null,
+      syncedFromBranch: syncedFromBranch ?? null,
+      syncedFromCommit: syncedFromCommit ?? null,
     }));
 
     await tx
@@ -302,6 +304,8 @@ pagesRoute.post("/sync", async (c) => {
           wordCount: sql`excluded.word_count`,
           lastUpdated: sql`excluded.last_updated`,
           contentFormat: sql`excluded.content_format`,
+          syncedFromBranch: sql`excluded.synced_from_branch`,
+          syncedFromCommit: sql`excluded.synced_from_commit`,
           syncedAt: sql`now()`,
           updatedAt: sql`now()`,
         },

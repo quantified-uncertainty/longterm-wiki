@@ -16,17 +16,43 @@
 const TIMEOUT_MS = 5_000;
 export const BATCH_TIMEOUT_MS = 30_000;
 
+/** API key scope — determines which env var to prefer for authentication. */
+export type ApiKeyScope = 'project' | 'content';
+
 export function getServerUrl(): string {
   return process.env.LONGTERMWIKI_SERVER_URL || '';
 }
 
-export function getApiKey(): string {
+/**
+ * Get the API key for a given scope.
+ *
+ * Resolution order:
+ *   - 'project' → LONGTERMWIKI_PROJECT_KEY, then LONGTERMWIKI_SERVER_API_KEY
+ *   - 'content' → LONGTERMWIKI_CONTENT_KEY, then LONGTERMWIKI_SERVER_API_KEY
+ *   - undefined  → LONGTERMWIKI_SERVER_API_KEY (backward compatible)
+ */
+export function getApiKey(scope?: ApiKeyScope): string {
+  if (scope === 'project') {
+    return process.env.LONGTERMWIKI_PROJECT_KEY
+      || process.env.LONGTERMWIKI_SERVER_API_KEY
+      || '';
+  }
+  if (scope === 'content') {
+    return process.env.LONGTERMWIKI_CONTENT_KEY
+      || process.env.LONGTERMWIKI_SERVER_API_KEY
+      || '';
+  }
+  // No scope specified — use legacy key (backward compatible)
   return process.env.LONGTERMWIKI_SERVER_API_KEY || '';
 }
 
-export function buildHeaders(): Record<string, string> {
+/**
+ * Build HTTP headers with the appropriate API key for the given scope.
+ * If no scope is provided, uses the legacy key for backward compatibility.
+ */
+export function buildHeaders(scope?: ApiKeyScope): Record<string, string> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  const apiKey = getApiKey();
+  const apiKey = getApiKey(scope);
   if (apiKey) {
     headers['Authorization'] = `Bearer ${apiKey}`;
   }
@@ -78,6 +104,7 @@ export async function apiRequest<T>(
   path: string,
   body?: unknown,
   timeoutMs: number = TIMEOUT_MS,
+  scope?: ApiKeyScope,
 ): Promise<ApiResult<T>> {
   const serverUrl = getServerUrl();
   if (!serverUrl) return apiErr('unavailable', 'LONGTERMWIKI_SERVER_URL not set');
@@ -88,7 +115,7 @@ export async function apiRequest<T>(
 
     const options: RequestInit = {
       method,
-      headers: buildHeaders(),
+      headers: buildHeaders(scope),
       signal: controller.signal,
     };
 
@@ -126,8 +153,9 @@ export async function batchedRequest<T>(
   path: string,
   body?: unknown,
   timeoutMs: number = BATCH_TIMEOUT_MS,
+  scope?: ApiKeyScope,
 ): Promise<ApiResult<T>> {
-  return apiRequest<T>(method, path, body, timeoutMs);
+  return apiRequest<T>(method, path, body, timeoutMs, scope);
 }
 
 // ---------------------------------------------------------------------------

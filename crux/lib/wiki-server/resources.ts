@@ -30,6 +30,6 @@ export type { UpsertResourceResult };
 export async function upsertResource(
   item: UpsertResourceItem,
 ): Promise<ApiResult<UpsertResourceResult>> {
-  return apiRequest<UpsertResourceResult>('POST', '/api/resources', item);
+  return apiRequest<UpsertResourceResult>('POST', '/api/resources', item, undefined, 'content');
 }
 

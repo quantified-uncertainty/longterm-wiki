@@ -55,7 +55,7 @@ export type NewsDashboardResult = AutoUpdateNewsDashboardResult;
 export async function recordAutoUpdateRun(
   run: RecordAutoUpdateRunInput,
 ): Promise<ApiResult<RecordRunResult>> {
-  return apiRequest<RecordRunResult>('POST', '/api/auto-update-runs', run);
+  return apiRequest<RecordRunResult>('POST', '/api/auto-update-runs', run, undefined, 'project');
 }
 
 export async function getAutoUpdateRuns(
@@ -93,6 +93,8 @@ export async function insertAutoUpdateNewsItems(
       'POST',
       '/api/auto-update-news/batch',
       { runId, items: batch },
+      undefined,
+      'project',
     );
     if (result.ok) {
       totalInserted += result.data.inserted;

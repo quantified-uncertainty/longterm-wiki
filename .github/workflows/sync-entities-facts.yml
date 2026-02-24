@@ -40,9 +40,11 @@ jobs:
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          LONGTERMWIKI_CONTENT_KEY: ${{ secrets.LONGTERMWIKI_CONTENT_KEY }}
 
       - name: Sync facts to wiki-server
         run: pnpm crux wiki-server sync-facts
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          LONGTERMWIKI_CONTENT_KEY: ${{ secrets.LONGTERMWIKI_CONTENT_KEY }}
