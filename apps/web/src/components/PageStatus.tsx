@@ -1166,7 +1166,6 @@ export function PageStatus({
   coverage,
 }: PageStatusProps) {
   const detectedType = detectPageType(pathname || "", pageType);
-  const isATMPage = detectedType === "ai-transition-model";
 
   const hasEditorialContent =
     quality ||
@@ -1178,7 +1177,7 @@ export function PageStatus({
     todo ||
     (todos && todos.length > 0) ||
     (changeHistory && changeHistory.length > 0);
-  if (!hasEditorialContent && !isATMPage) {
+  if (!hasEditorialContent) {
     return null;
   }
 

@@ -24,7 +24,6 @@ import {
   BarChart3,
   Rocket,
   ClipboardList,
-  Route,
   Banknote,
   Microscope,
   Gauge,
@@ -146,13 +145,6 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
     badgeColor: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
     headerColor: "#475569",
   },
-  scenario: {
-    label: "Scenario",
-    icon: Route,
-    iconColor: "text-purple-600 dark:text-purple-400",
-    badgeColor: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-    headerColor: "#7c3aed",
-  },
   resource: {
     label: "Resource",
     icon: BookOpen,
@@ -194,13 +186,6 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
     iconColor: "text-fuchsia-600 dark:text-fuchsia-400",
     badgeColor: "bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/30 dark:text-fuchsia-300",
     headerColor: "#c026d3",
-  },
-  metric: {
-    label: "Metric",
-    icon: Activity,
-    iconColor: "text-cyan-600 dark:text-cyan-400",
-    badgeColor: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-    headerColor: "#0891b2",
   },
   argument: {
     label: "Argument",

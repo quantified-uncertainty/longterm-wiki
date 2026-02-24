@@ -96,12 +96,11 @@ function deriveType(
   return "concept";
 }
 
-/** Base conditions shared by all queries (excludes stubs, schema, internal, ai-transition-model). */
+/** Base conditions shared by all queries (excludes stubs, schema, internal). */
 const BASE_CONDITIONS = `
   wp.word_count > 0
   AND wp.category != 'schema'
   AND wp.category != 'internal'
-  AND (wp.entity_type IS NULL OR wp.entity_type NOT LIKE 'ai-transition-model%')
 `;
 
 /** The derived type expression used for grouping and filtering. */

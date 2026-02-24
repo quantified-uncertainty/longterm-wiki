@@ -114,7 +114,7 @@ const pagesWithoutWikiLink = new Set(
 
 // Types we SKIP (titles are custom to this wiki, won't exist on Grokipedia):
 // model, analysis, crux, argument, overview, parameter, scenario, internal,
-// insight, table, diagram, project, safety-agenda, ai-transition-model-*
+// insight, table, diagram, project, safety-agenda
 
 const titleMatchTypes = new Set(["person", "organization"]);
 

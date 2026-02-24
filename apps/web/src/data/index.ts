@@ -12,7 +12,7 @@ import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
 import { fetchFromWikiServer, withApiFallback, type WithSource } from "@lib/wiki-server";
-import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry } from "@wiki-server/api-types";
+import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry, CitationHealthResult } from "@wiki-server/api-types";
 import {
   TypedEntitySchema,
   type TypedEntity,
@@ -259,20 +259,15 @@ export function getTypedEntities(): AnyEntity[] {
     if (result.success) {
       entities.push(result.data);
     } else {
-      // Unknown entity types (ai-transition-model-*, etc.) — keep all fields as-is.
+      // Unknown entity types — keep all fields as-is.
       // Don't re-parse through GenericEntitySchema as Zod would strip extra keys
       // like content, currentAssessment, ratings, causeEffectGraph.
       if (isDev) {
         const id = (raw as Record<string, unknown>).id;
         const type = (raw as Record<string, unknown>).entityType as string;
-        // Suppress warnings for known catch-all types that intentionally skip
-        // the discriminated union (they carry extra fields Zod would strip).
-        const isCatchAll = typeof type === "string" && type.startsWith("ai-transition-model-");
-        if (!isCatchAll) {
-          console.warn(
-            `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
-          );
-        }
+        console.warn(
+          `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
+        );
       }
       entities.push(raw as unknown as GenericEntity);
     }
@@ -1002,15 +997,9 @@ export function getPageCoverageItems(): PageCoverageItem[] {
 
 export async function getPageCitationHealth(pageId: string) {
   const result = await withApiFallback(
-    () => fetchFromWikiServer<{
-      total: number;
-      withQuotes: number;
-      verified: number;
-      accuracyChecked: number;
-      accurate: number;
-      inaccurate: number;
-      avgScore: number | null;
-    }>(`/api/citations/health/${pageId}`),
+    () => fetchFromWikiServer<CitationHealthResult>(
+      `/api/citations/health/${encodeURIComponent(pageId)}`
+    ),
     () => {
       const page = getPageById(pageId);
       return page?.citationHealth ?? null;

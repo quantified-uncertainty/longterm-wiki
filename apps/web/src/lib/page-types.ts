@@ -9,7 +9,6 @@ type PageType =
   | "response"
   | "stub"
   | "documentation"
-  | "ai-transition-model"
   | "overview";
 
 export type ContentFormat = "article" | "table" | "diagram" | "index" | "dashboard";
@@ -102,11 +101,6 @@ export const PAGE_TYPE_INFO: Record<PageType, PageTypeInfo> = {
     description: "Internal docs, style guides, examples",
     color: "bg-purple-500/20 text-purple-400 border-purple-500/40",
   },
-  "ai-transition-model": {
-    label: "AI Transition Model",
-    description: "Structured factor/scenario/parameter page",
-    color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/40",
-  },
   overview: {
     label: "Overview",
     description: "Section navigation page",
@@ -130,7 +124,6 @@ export function detectPageType(
   if (frontmatterType === "documentation") return "documentation";
 
   if (pathname) {
-    if (pathname.includes("/ai-transition-model/")) return "ai-transition-model";
     if (pathname.includes("/knowledge-base/risks/")) return "risk";
     if (pathname.includes("/knowledge-base/responses/")) return "response";
     if (pathname.startsWith("/internal")) return "documentation";

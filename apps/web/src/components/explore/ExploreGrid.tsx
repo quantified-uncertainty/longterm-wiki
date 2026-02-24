@@ -476,7 +476,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       });
     }
     // Fallback: client-side counts
-    const articleItems = fallbackItems.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount);
+    const articleItems = fallbackItems.filter((item) => item.wordCount);
     const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
     return FIELD_GROUPS.map((group) => {
       if (group.entityType) return searchFiltered.filter((item) => item.type === group.entityType).length;
@@ -493,7 +493,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       });
     }
     // Fallback: client-side counts
-    const articleItems = fallbackItems.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount);
+    const articleItems = fallbackItems.filter((item) => item.wordCount);
     const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
     const fieldGroup = FIELD_GROUPS[activeField];
     const fieldFiltered = fieldGroup.entityType
@@ -515,7 +515,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       });
     }
     // Fallback: client-side counts
-    const articleItems = fallbackItems.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount);
+    const articleItems = fallbackItems.filter((item) => item.wordCount);
     const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
     const fieldGroup = FIELD_GROUPS[activeField];
     const fieldFiltered = fieldGroup.entityType
@@ -544,7 +544,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       });
     }
     // Fallback: client-side counts
-    const articleItems = fallbackItems.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount);
+    const articleItems = fallbackItems.filter((item) => item.wordCount);
     const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
     const riskItems = searchFiltered.filter((item) => item.type === "risk");
     return RISK_CATEGORY_GROUPS.map((group) => {
@@ -562,7 +562,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     }
 
     // Fallback: full client-side filtering pipeline
-    let items = fallbackItems.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount);
+    let items = fallbackItems.filter((item) => item.wordCount);
 
     // Search
     if (search.trim()) items = textFilter(items, search);

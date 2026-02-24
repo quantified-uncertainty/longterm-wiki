@@ -303,17 +303,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // --- citation_content: INSERT ... ON CONFLICT DO UPDATE ---
   if (q.includes("insert into") && q.includes("citation_content")) {
     const url = params[0] as string;
-    const fetchedAt = params[1];
-    const httpStatus = params[2];
-    const contentType = params[3];
-    const pageTitle = params[4];
-    const fullTextPreview = params[5];
-    const contentLength = params[6];
-    const contentHash = params[7];
+    const resourceId = params[1];
+    const fetchedAt = params[2];
+    const httpStatus = params[3];
+    const contentType = params[4];
+    const pageTitle = params[5];
+    const fullTextPreview = params[6];
+    const contentLength = params[7];
+    const contentHash = params[8];
     const now = new Date();
     const existing = contentStore.get(url);
     const row: Record<string, unknown> = {
-      url, fetched_at: fetchedAt,
+      url, resource_id: resourceId, fetched_at: fetchedAt,
       http_status: httpStatus, content_type: contentType,
       page_title: pageTitle, full_text_preview: fullTextPreview,
       content_length: contentLength, content_hash: contentHash,
@@ -817,6 +818,50 @@ describe("Citation Server API", () => {
       const body = await res.json();
       expect(body.summary.totalCitations).toBe(0);
       expect(body.pages).toHaveLength(0);
+    });
+  });
+
+  // ---- Health ----
+
+  describe("GET /api/citations/health/:pageId", () => {
+    it("returns zero-filled health for page with no quotes", async () => {
+      const res = await app.request("/api/citations/health/empty-page");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.pageId).toBe("empty-page");
+      expect(body.total).toBe(0);
+      expect(body.withQuotes).toBe(0);
+      expect(body.verified).toBe(0);
+      expect(body.accuracyChecked).toBe(0);
+      expect(body.accurate).toBe(0);
+      expect(body.inaccurate).toBe(0);
+      expect(body.avgScore).toBeNull();
+    });
+
+    it("returns health summary for a page with mixed statuses", async () => {
+      await upsertQuote(app, "health-page", 1, "Claim 1");
+      await upsertQuote(app, "health-page", 2, "Claim 2");
+      await upsertQuote(app, "health-page", 3, "Claim 3");
+
+      await postJson(app, "/api/citations/quotes/mark-accuracy", {
+        pageId: "health-page", footnote: 1, verdict: "accurate", score: 0.9,
+      });
+      await postJson(app, "/api/citations/quotes/mark-accuracy", {
+        pageId: "health-page", footnote: 2, verdict: "inaccurate", score: 0.3,
+      });
+      await postJson(app, "/api/citations/quotes/mark-verified", {
+        pageId: "health-page", footnote: 3, method: "text-match", score: 0.8,
+      });
+
+      const res = await app.request("/api/citations/health/health-page");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.pageId).toBe("health-page");
+      expect(body.total).toBe(3);
+      expect(body.accuracyChecked).toBe(2);
+      expect(body.accurate).toBe(1);
+      expect(body.inaccurate).toBe(1);
+      expect(body.verified).toBe(1);
     });
   });
 

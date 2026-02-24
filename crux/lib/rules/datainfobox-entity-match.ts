@@ -28,12 +28,9 @@ export const datainfoboxEntityMatchRule = createRule({
     const pageNumericId = content.frontmatter?.numericId as string | undefined;
     if (!pageNumericId) return issues;
 
-    // Skip ai-transition-model pages: they intentionally use DataInfoBox for a
-    // related entity (e.g., the factor entity E5 for "AI Capabilities") while
-    // having their own page numericId. This is by design.
-    // Also skip internal/ pages (templates and docs that embed multiple DataInfoBoxes).
+    // Skip internal/ pages (templates and docs that embed multiple DataInfoBoxes).
     const rel = content.relativePath;
-    if (rel.startsWith('ai-transition-model/') || rel.startsWith('internal/')) {
+    if (rel.startsWith('internal/')) {
       return issues;
     }
 

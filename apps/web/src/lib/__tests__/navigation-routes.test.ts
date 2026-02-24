@@ -61,10 +61,6 @@ function formatCategory(category: string): string {
 }
 
 describe("formatCategory", () => {
-  it("formats 'ai-transition-model' as 'AI Transition Model'", () => {
-    expect(formatCategory("ai-transition-model")).toBe("AI Transition Model");
-  });
-
   it("formats 'knowledge-base' as 'Knowledge Base'", () => {
     expect(formatCategory("knowledge-base")).toBe("Knowledge Base");
   });
@@ -128,7 +124,6 @@ describe("MDX internal links", () => {
     "/tools",
     "/about",
     "/knowledge-base",  // redirects
-    "/ai-transition-model",
   ];
 
   it("all MDX internal links resolve to known pages or routes", () => {
@@ -201,23 +196,6 @@ describe("wiki-nav sidebar hrefs", () => {
     // Check slug in idRegistry (bySlug) or pathRegistry
     return id in idRegistry || id in pathRegistry;
   }
-
-  it("ATM Parameter Table href resolves to a known entity", () => {
-    // getEntityHref("table") should resolve to /wiki/E675 or similar
-    // If it falls back to /wiki/table, "table" should still be in the registry
-    const tableInRegistry = "table" in pathRegistry || "table" in idRegistry;
-    expect(tableInRegistry).toBe(true);
-  });
-
-  it("ATM overview href /wiki/ai-transition-model resolves (via index slug or direct)", () => {
-    // Index pages are stored as "__index__/ai-transition-model" in pathRegistry
-    // so /wiki/ai-transition-model resolves via the wiki route's slug lookup
-    const indexSlug = "__index__/ai-transition-model";
-    const directSlug = "ai-transition-model";
-    const resolvedViaIndex = indexSlug in pathRegistry || indexSlug in idRegistry;
-    const resolvedViaDirect = directSlug in pathRegistry || directSlug in idRegistry;
-    expect(resolvedViaIndex || resolvedViaDirect).toBe(true);
-  });
 
   it("all pathRegistry slugs are non-empty strings", () => {
     for (const [slug, pagePath] of Object.entries(pathRegistry)) {
