@@ -249,6 +249,22 @@ function ContentView({
     wordCount > 1500 &&
     tocHeadings.length >= 3;
 
+  // Compute citation health from live quotes (not stale build-time data)
+  const liveCitationHealth = citationQuotes && citationQuotes.length > 0
+    ? (() => {
+        const h = computeCitationHealth(citationQuotes);
+        return {
+          total: h.total,
+          withQuotes: h.total - h.unchecked,
+          verified: h.verified + h.accurate + h.inaccurate + h.unsupported + h.minorIssues,
+          accuracyChecked: h.accurate + h.inaccurate + h.unsupported + h.minorIssues,
+          accurate: h.accurate,
+          inaccurate: h.inaccurate,
+          avgScore: null as number | null,
+        };
+      })()
+    : pageData?.citationHealth ?? undefined;
+
   return (
     <InfoBoxVisibilityProvider>
       {!isInternal && <JsonLd pageData={pageData} title={page.frontmatter.title} slug={slug} />}
@@ -294,7 +310,7 @@ function ContentView({
         contentFormat={contentFormat}
         hasEntity={!!entity}
         resourceCount={getResourcesForPage(slug).length}
-        citationHealth={pageData?.citationHealth}
+        citationHealth={liveCitationHealth}
       />
       <CitationQuotesProvider quotes={citationQuotes ?? []}>
         <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
