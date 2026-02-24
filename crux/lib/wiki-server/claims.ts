@@ -28,9 +28,36 @@ export interface ClearClaimsResult {
   deleted: number;
 }
 
+export interface ClaimRow {
+  id: number;
+  entityId: string;
+  entityType: string;
+  claimType: string;
+  claimText: string;
+  value: string | null;
+  unit: string | null;
+  confidence: string | null;
+  sourceQuote: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GetClaimsResult {
+  claims: ClaimRow[];
+}
+
 // ---------------------------------------------------------------------------
 // API functions
 // ---------------------------------------------------------------------------
+
+export async function getClaimsByEntity(
+  entityId: string,
+): Promise<ApiResult<GetClaimsResult>> {
+  return apiRequest<GetClaimsResult>(
+    'GET',
+    `/api/claims/by-entity/${encodeURIComponent(entityId)}`,
+  );
+}
 
 export async function insertClaim(
   item: InsertClaimItem,
