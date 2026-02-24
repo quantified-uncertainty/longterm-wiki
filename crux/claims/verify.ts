@@ -233,7 +233,7 @@ async function main() {
       process.stdout.write(`  ${c.green}✓${c.reset} [verified] ${claim.claimText.slice(0, 60)}...\n`);
     } else {
       unsupported++;
-      updatedClaims.push({ ...claim, newConfidence: 'unverified', newSourceQuote: '' });
+      updatedClaims.push({ ...claim, newConfidence: 'unsupported', newSourceQuote: '' });
       process.stdout.write(`  ${c.red}✗${c.reset} [unsupported] ${claim.claimText.slice(0, 60)}...\n`);
     }
   }
@@ -243,6 +243,15 @@ async function main() {
   console.log(`  ${c.red}Unsupported:${c.reset} ${unsupported}`);
   console.log(`  ${c.yellow}Unsourced:${c.reset}   ${unsourced}`);
   console.log(`  ${c.dim}No source:${c.reset}   ${noSource}`);
+
+  // Hint when most sourced claims have no cached source text
+  const sourcedTotal = claims.length - unsourced;
+  if (noSource > 0 && sourcedTotal > 0 && noSource / sourcedTotal > 0.5) {
+    console.log(`\n  ${c.yellow}Most sourced claims lack cached source text.${c.reset}`);
+    console.log(`  Run this first to fetch and cache citation full text:`);
+    console.log(`    pnpm crux citations verify ${pageId}`);
+    console.log(`  Then re-run: pnpm crux claims verify ${pageId}`);
+  }
 
   if (dryRun) {
     console.log(`\n${c.green}Dry run complete. Remove --dry-run to store results.${c.reset}\n`);

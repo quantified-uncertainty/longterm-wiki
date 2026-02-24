@@ -90,11 +90,12 @@ async function main() {
   console.log(`  Unsourced:      ${claims.length - sourced}`);
 
   console.log(`\n${c.bold}By Confidence:${c.reset}`);
-  const confOrder = ['verified', 'unverified', 'unsourced'];
+  const confOrder = ['verified', 'unsupported', 'unverified', 'unsourced'];
   const confColors: Record<string, string> = {
     verified: c.green,
+    unsupported: c.red,
     unverified: c.yellow,
-    unsourced: c.red,
+    unsourced: c.dim,
   };
   for (const conf of [...confOrder, ...Object.keys(byConfidence).filter(k => !confOrder.includes(k))]) {
     if (byConfidence[conf] !== undefined) {
