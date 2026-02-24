@@ -108,6 +108,10 @@ import { blockSectionQualityRule } from './block-section-quality.ts';
 import { datainfoboxEntityMatchRule } from './datainfobox-entity-match.ts';
 import { officialWebsiteLabelRule } from './official-website-label.ts';
 
+// Content quality rules (issues #916, #922)
+import { placeholderTextRule } from './placeholder-text.ts';
+import { personOrgAffiliationRule } from './person-org-affiliation.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -164,6 +168,8 @@ export {
   blockSectionQualityRule,
   datainfoboxEntityMatchRule,
   officialWebsiteLabelRule,
+  placeholderTextRule,
+  personOrgAffiliationRule,
 };
 
 export const allRules: Rule[] = [
@@ -221,6 +227,8 @@ export const allRules: Rule[] = [
   blockSectionQualityRule,
   datainfoboxEntityMatchRule,
   officialWebsiteLabelRule,
+  placeholderTextRule,
+  personOrgAffiliationRule,
 ];
 
 export default allRules;
