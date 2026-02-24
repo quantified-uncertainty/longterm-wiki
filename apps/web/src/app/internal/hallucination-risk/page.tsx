@@ -8,6 +8,7 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { HallucinationRiskDashboard } from "./hallucination-risk-dashboard";
 import type { Metadata } from "next";
+import type { RiskPageRow } from "@wiki-server/api-types";
 
 // Render on-demand — avoid build-time timeout when wiki-server is unreachable
 export const dynamic = "force-dynamic";
@@ -29,17 +30,6 @@ export interface RiskPageData {
   factors: string[];
 }
 
-// ── API types ────────────────────────────────────────────────────────────────
-
-interface ApiRiskPage {
-  pageId: string;
-  score: number;
-  level: "low" | "medium" | "high";
-  factors: string[] | null;
-  integrityIssues: string[] | null;
-  computedAt: string;
-}
-
 // ── Data loading ─────────────────────────────────────────────────────────────
 
 /**
@@ -53,7 +43,7 @@ async function loadRiskDataFromApi(): Promise<FetchResult<RiskPageData[]>> {
 
   try {
     // Paginate to fetch all risk scores (guard against infinite loop)
-    const allApiPages: ApiRiskPage[] = [];
+    const allApiPages: RiskPageRow[] = [];
     let offset = 0;
     const pageSize = 200;
     const maxPages = 20; // Safety limit: 20 × 200 = 4000 pages max
@@ -74,7 +64,7 @@ async function loadRiskDataFromApi(): Promise<FetchResult<RiskPageData[]>> {
         };
       }
 
-      const data = (await res.json()) as { pages: ApiRiskPage[] };
+      const data = (await res.json()) as { pages: RiskPageRow[] };
       allApiPages.push(...data.pages);
 
       if (data.pages.length < pageSize) break;

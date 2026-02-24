@@ -424,8 +424,6 @@
       type: safety-agenda
     - id: compute-governance
       type: concept
-    - id: international-coordination
-      type: concept
     - id: anthropic
       type: lab
     - id: eu-ai-act
@@ -509,8 +507,6 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: alignment-progress
-      type: concept
     - id: capability-alignment-race
       type: analysis
     - id: openai

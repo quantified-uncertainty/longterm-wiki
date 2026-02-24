@@ -22,6 +22,7 @@ import {
 import {
   UpsertResourceSchema as SharedUpsertResourceSchema,
   UpsertResourceBatchSchema,
+  type ResourceStatsResult,
 } from "../api-types.js";
 
 export const resourcesRoute = new Hono();
@@ -29,6 +30,34 @@ export const resourcesRoute = new Hono();
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
+
+// ---- URL normalization ----
+
+/**
+ * Generate common URL variants for fuzzy lookup.
+ * Tries with/without www, with/without trailing slash.
+ */
+function urlVariants(url: string): string[] {
+  const variants = new Set<string>();
+  try {
+    const parsed = new URL(url);
+    const base = parsed.href.replace(/\/$/, "");
+    variants.add(base);
+    variants.add(base + "/");
+    if (parsed.hostname.startsWith("www.")) {
+      const noWww = base.replace("://www.", "://");
+      variants.add(noWww);
+      variants.add(noWww + "/");
+    } else {
+      const withWww = base.replace("://", "://www.");
+      variants.add(withWww);
+      variants.add(withWww + "/");
+    }
+  } catch {
+    variants.add(url);
+  }
+  return Array.from(variants);
+}
 
 // ---- Schemas (from shared api-types) ----
 
@@ -274,38 +303,57 @@ resourcesRoute.get("/search", async (c) => {
 resourcesRoute.get("/stats", async (c) => {
   const db = getDrizzleDb();
 
-  const totalResult = await db.select({ count: count() }).from(resources);
+  const [totalResult, citationCountResult, citedPagesResult, byType] =
+    await Promise.all([
+      db.select({ count: count() }).from(resources),
+      db.select({ count: count() }).from(resourceCitations),
+      db
+        .select({
+          count: sql<number>`count(distinct ${resourceCitations.pageId})`,
+        })
+        .from(resourceCitations),
+      db
+        .select({ type: resources.type, count: count() })
+        .from(resources)
+        .groupBy(resources.type)
+        .orderBy(desc(count())),
+    ]);
+
   const totalResources = totalResult[0].count;
-
-  const citationCountResult = await db
-    .select({ count: count() })
-    .from(resourceCitations);
   const totalCitations = citationCountResult[0].count;
-
-  const citedPagesResult = await db
-    .select({
-      count: sql<number>`count(distinct ${resourceCitations.pageId})`,
-    })
-    .from(resourceCitations);
   const citedPages = Number(citedPagesResult[0].count);
 
-  const byType = await db
-    .select({
-      type: resources.type,
-      count: count(),
-    })
-    .from(resources)
-    .groupBy(resources.type)
-    .orderBy(desc(count()));
+  // Extra stats: orphaned, metadata coverage, fetched count
+  const [orphanedResult, withMetadataResult, fetchedResult] = await Promise.all(
+    [
+      db.execute(sql`
+        SELECT count(*) AS c FROM resources r
+        LEFT JOIN resource_citations rc ON rc.resource_id = r.id
+        WHERE rc.resource_id IS NULL
+      `),
+      db.execute(sql`
+        SELECT count(*) AS c FROM resources
+        WHERE summary IS NOT NULL OR review IS NOT NULL OR key_points IS NOT NULL
+      `),
+      db.execute(sql`
+        SELECT count(*) AS c FROM resources WHERE fetched_at IS NOT NULL
+      `),
+    ]
+  );
 
-  return c.json({
+  const result: ResourceStatsResult = {
     totalResources,
     totalCitations,
     citedPages,
     byType: Object.fromEntries(
       byType.map((r) => [r.type ?? "unknown", r.count])
     ),
-  });
+    orphanedCount: Number((orphanedResult as any)[0]?.c ?? 0),
+    withMetadata: Number((withMetadataResult as any)[0]?.c ?? 0),
+    fetched: Number((fetchedResult as any)[0]?.c ?? 0),
+  };
+
+  return c.json(result);
 });
 
 // ---- GET /by-page/:pageId (resources cited by a page) ----
@@ -331,18 +379,36 @@ resourcesRoute.get("/by-page/:pageId", async (c) => {
   return c.json({ resources: rows });
 });
 
-// ---- GET /lookup?url=X (lookup by URL) ----
+// ---- GET /lookup?url=X (lookup by URL, with normalization) ----
 
 resourcesRoute.get("/lookup", async (c) => {
   const url = c.req.query("url");
   if (!url) return validationError(c, "url query parameter is required");
 
   const db = getDrizzleDb();
-  const rows = await db
+
+  // Try exact match first
+  let rows = await db
     .select()
     .from(resources)
     .where(eq(resources.url, url))
     .limit(1);
+
+  // If not found, try normalized variants (www/no-www, trailing slash)
+  if (rows.length === 0) {
+    const variants = urlVariants(url);
+    if (variants.length > 1) {
+      const variantList = sql.join(
+        variants.map((v) => sql`${v}`),
+        sql`, `
+      );
+      rows = await db
+        .select()
+        .from(resources)
+        .where(sql`${resources.url} IN (${variantList})`)
+        .limit(1);
+    }
+  }
 
   if (rows.length === 0) {
     return notFoundError(c, `No resource found for URL: ${url}`);
