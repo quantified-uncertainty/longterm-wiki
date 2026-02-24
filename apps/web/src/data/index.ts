@@ -470,6 +470,18 @@ export interface Page {
       footnotes: number;
       references: number;
     };
+    actuals?: {
+      tables: number;
+      diagrams: number;
+      internalLinks: number;
+      externalLinks: number;
+      footnotes: number;
+      references: number;
+      quotesWithQuotes: number;
+      quotesTotal: number;
+      accuracyChecked: number;
+      accuracyTotal: number;
+    };
     items: Record<string, "green" | "amber" | "red">;
     editHistoryCount?: number;
     ratingsString?: string;
@@ -838,15 +850,31 @@ export interface PageCoverageItem {
   schedule: boolean;
   entity: boolean;
   editHistory: boolean;
-  // Numeric item statuses
+  // Numeric item statuses + actual/target values
   tables: "green" | "amber" | "red";
+  tablesActual: number;
+  tablesTarget: number;
   diagrams: "green" | "amber" | "red";
+  diagramsActual: number;
+  diagramsTarget: number;
   internalLinks: "green" | "amber" | "red";
+  internalLinksActual: number;
+  internalLinksTarget: number;
   externalLinks: "green" | "amber" | "red";
+  externalLinksActual: number;
+  externalLinksTarget: number;
   footnotes: "green" | "amber" | "red";
+  footnotesActual: number;
+  footnotesTarget: number;
   references: "green" | "amber" | "red";
+  referencesActual: number;
+  referencesTarget: number;
   quotes: "green" | "amber" | "red";
+  quotesActual: number;
+  quotesTotal: number;
   accuracy: "green" | "amber" | "red";
+  accuracyActual: number;
+  accuracyTotal: number;
 }
 
 export function getPageCoverageItems(): PageCoverageItem[] {
@@ -876,13 +904,29 @@ export function getPageCoverageItems(): PageCoverageItem[] {
       entity: cov.items.entity === "green",
       editHistory: cov.items.editHistory === "green",
       tables: cov.items.tables as "green" | "amber" | "red",
+      tablesActual: cov.actuals?.tables ?? 0,
+      tablesTarget: cov.targets.tables,
       diagrams: cov.items.diagrams as "green" | "amber" | "red",
+      diagramsActual: cov.actuals?.diagrams ?? 0,
+      diagramsTarget: cov.targets.diagrams,
       internalLinks: cov.items.internalLinks as "green" | "amber" | "red",
+      internalLinksActual: cov.actuals?.internalLinks ?? 0,
+      internalLinksTarget: cov.targets.internalLinks,
       externalLinks: cov.items.externalLinks as "green" | "amber" | "red",
+      externalLinksActual: cov.actuals?.externalLinks ?? 0,
+      externalLinksTarget: cov.targets.externalLinks,
       footnotes: cov.items.footnotes as "green" | "amber" | "red",
+      footnotesActual: cov.actuals?.footnotes ?? 0,
+      footnotesTarget: cov.targets.footnotes,
       references: cov.items.references as "green" | "amber" | "red",
+      referencesActual: cov.actuals?.references ?? 0,
+      referencesTarget: cov.targets.references,
       quotes: cov.items.quotes as "green" | "amber" | "red",
+      quotesActual: cov.actuals?.quotesWithQuotes ?? 0,
+      quotesTotal: cov.actuals?.quotesTotal ?? 0,
       accuracy: cov.items.accuracy as "green" | "amber" | "red",
+      accuracyActual: cov.actuals?.accuracyChecked ?? 0,
+      accuracyTotal: cov.actuals?.accuracyTotal ?? 0,
     });
   }
 

@@ -27,6 +27,19 @@ export interface CoverageTargets {
   references: number;
 }
 
+export interface CoverageActuals {
+  tables: number;
+  diagrams: number;
+  internalLinks: number;
+  externalLinks: number;
+  footnotes: number;
+  references: number;
+  quotesWithQuotes: number;
+  quotesTotal: number;
+  accuracyChecked: number;
+  accuracyTotal: number;
+}
+
 export interface PageCoverage {
   /** Number of items with 'green' status */
   passing: number;
@@ -34,6 +47,8 @@ export interface PageCoverage {
   total: number;
   /** Recommended targets based on wordCount + contentFormat */
   targets: CoverageTargets;
+  /** Actual metric counts */
+  actuals: CoverageActuals;
   /** Per-item status keyed by item name */
   items: Record<string, CoverageStatus>;
   /** Number of edit history entries */
@@ -199,6 +214,18 @@ export function computePageCoverage(input: CoverageInput): PageCoverage {
     passing,
     total,
     targets,
+    actuals: {
+      tables: input.tableCount,
+      diagrams: input.diagramCount,
+      internalLinks: input.internalLinks,
+      externalLinks: input.externalLinks,
+      footnotes: input.footnoteCount,
+      references: input.resourceCount,
+      quotesWithQuotes: input.quotesWithQuotes,
+      quotesTotal: input.quotesTotal,
+      accuracyChecked: input.accuracyChecked,
+      accuracyTotal: input.accuracyTotal,
+    },
     items,
     editHistoryCount: input.changeHistoryCount || undefined,
     ratingsString,

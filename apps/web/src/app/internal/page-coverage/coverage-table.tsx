@@ -20,14 +20,49 @@ import type { PageCoverageItem } from "@/data";
 
 type Status = "green" | "amber" | "red";
 
-function StatusDot({ status }: { status: Status }) {
-  const color =
-    status === "green"
-      ? "bg-emerald-500"
-      : status === "amber"
-        ? "bg-amber-500"
-        : "bg-red-400/60";
-  return <span className={`inline-block w-2 h-2 rounded-full ${color}`} />;
+const statusColor: Record<Status, string> = {
+  green: "text-emerald-600",
+  amber: "text-amber-600",
+  red: "text-red-400/80",
+};
+
+/** Shows "actual/target" with status color, e.g. "7/10" in green or "0/3" in red */
+function MetricCell({
+  actual,
+  target,
+  status,
+}: {
+  actual: number;
+  target: number;
+  status: Status;
+}) {
+  return (
+    <span className={`text-xs tabular-nums font-medium ${statusColor[status]}`}>
+      {actual}
+      <span className="text-muted-foreground/40">/{target}</span>
+    </span>
+  );
+}
+
+/** Shows "actual/total" as a ratio metric (quotes, accuracy) */
+function RatioCell({
+  actual,
+  total,
+  status,
+}: {
+  actual: number;
+  total: number;
+  status: Status;
+}) {
+  if (total === 0) {
+    return <span className="text-xs text-muted-foreground/30">-</span>;
+  }
+  return (
+    <span className={`text-xs tabular-nums font-medium ${statusColor[status]}`}>
+      {actual}
+      <span className="text-muted-foreground/40">/{total}</span>
+    </span>
+  );
 }
 
 function BoolIcon({ value, label }: { value: boolean; label: string }) {
@@ -160,7 +195,7 @@ const columns: ColumnDef<PageCoverageItem>[] = [
     sortUndefined: "last",
     header: ({ column }) => (
       <SortableHeader column={column} title="Reader importance score (0–100)">
-        Importance
+        Imp
       </SortableHeader>
     ),
     cell: ({ row }) => (
@@ -221,101 +256,131 @@ const columns: ColumnDef<PageCoverageItem>[] = [
   },
   {
     id: "tables",
-    accessorKey: "tables",
+    accessorKey: "tablesActual",
     header: ({ column }) => (
-      <SortableHeader column={column} title="Tables: green if meets target, amber if some present, red if none">
+      <SortableHeader column={column} title="Tables: actual count / recommended target">
         Tbl
       </SortableHeader>
     ),
-    cell: ({ row }) => <StatusDot status={row.original.tables} />,
-    sortingFn: (a, b) =>
-      statusOrder(a.original.tables) - statusOrder(b.original.tables),
+    cell: ({ row }) => (
+      <MetricCell
+        actual={row.original.tablesActual}
+        target={row.original.tablesTarget}
+        status={row.original.tables}
+      />
+    ),
   },
   {
     id: "diagrams",
-    accessorKey: "diagrams",
+    accessorKey: "diagramsActual",
     header: ({ column }) => (
-      <SortableHeader column={column} title="Diagrams: green if meets target, amber if some present, red if none">
+      <SortableHeader column={column} title="Diagrams: actual count / recommended target">
         Dia
       </SortableHeader>
     ),
-    cell: ({ row }) => <StatusDot status={row.original.diagrams} />,
-    sortingFn: (a, b) =>
-      statusOrder(a.original.diagrams) - statusOrder(b.original.diagrams),
+    cell: ({ row }) => (
+      <MetricCell
+        actual={row.original.diagramsActual}
+        target={row.original.diagramsTarget}
+        status={row.original.diagrams}
+      />
+    ),
   },
   {
     id: "internalLinks",
-    accessorKey: "internalLinks",
+    accessorKey: "internalLinksActual",
     header: ({ column }) => (
-      <SortableHeader column={column} title="Internal links to other wiki pages">
+      <SortableHeader column={column} title="Internal links: actual / recommended target">
         Int
       </SortableHeader>
     ),
-    cell: ({ row }) => <StatusDot status={row.original.internalLinks} />,
-    sortingFn: (a, b) =>
-      statusOrder(a.original.internalLinks) -
-      statusOrder(b.original.internalLinks),
+    cell: ({ row }) => (
+      <MetricCell
+        actual={row.original.internalLinksActual}
+        target={row.original.internalLinksTarget}
+        status={row.original.internalLinks}
+      />
+    ),
   },
   {
     id: "externalLinks",
-    accessorKey: "externalLinks",
+    accessorKey: "externalLinksActual",
     header: ({ column }) => (
-      <SortableHeader column={column} title="External links to outside sources">
+      <SortableHeader column={column} title="External links: actual / recommended target">
         Ext
       </SortableHeader>
     ),
-    cell: ({ row }) => <StatusDot status={row.original.externalLinks} />,
-    sortingFn: (a, b) =>
-      statusOrder(a.original.externalLinks) -
-      statusOrder(b.original.externalLinks),
+    cell: ({ row }) => (
+      <MetricCell
+        actual={row.original.externalLinksActual}
+        target={row.original.externalLinksTarget}
+        status={row.original.externalLinks}
+      />
+    ),
   },
   {
     id: "footnotes",
-    accessorKey: "footnotes",
+    accessorKey: "footnotesActual",
     header: ({ column }) => (
-      <SortableHeader column={column} title="Footnotes / inline citations">
+      <SortableHeader column={column} title="Footnotes: actual / recommended target">
         Fn
       </SortableHeader>
     ),
-    cell: ({ row }) => <StatusDot status={row.original.footnotes} />,
-    sortingFn: (a, b) =>
-      statusOrder(a.original.footnotes) - statusOrder(b.original.footnotes),
+    cell: ({ row }) => (
+      <MetricCell
+        actual={row.original.footnotesActual}
+        target={row.original.footnotesTarget}
+        status={row.original.footnotes}
+      />
+    ),
   },
   {
     id: "references",
-    accessorKey: "references",
+    accessorKey: "referencesActual",
     header: ({ column }) => (
-      <SortableHeader column={column} title="External resource references">
+      <SortableHeader column={column} title="Resource references: actual / recommended target">
         Ref
       </SortableHeader>
     ),
-    cell: ({ row }) => <StatusDot status={row.original.references} />,
-    sortingFn: (a, b) =>
-      statusOrder(a.original.references) - statusOrder(b.original.references),
+    cell: ({ row }) => (
+      <MetricCell
+        actual={row.original.referencesActual}
+        target={row.original.referencesTarget}
+        status={row.original.references}
+      />
+    ),
   },
   {
     id: "quotes",
-    accessorKey: "quotes",
+    accessorKey: "quotesActual",
     header: ({ column }) => (
-      <SortableHeader column={column} title="Citations with supporting quotes (≥75% = green)">
+      <SortableHeader column={column} title="Citations with supporting quotes: verified / total citations (≥75% = green)">
         Qt
       </SortableHeader>
     ),
-    cell: ({ row }) => <StatusDot status={row.original.quotes} />,
-    sortingFn: (a, b) =>
-      statusOrder(a.original.quotes) - statusOrder(b.original.quotes),
+    cell: ({ row }) => (
+      <RatioCell
+        actual={row.original.quotesActual}
+        total={row.original.quotesTotal}
+        status={row.original.quotes}
+      />
+    ),
   },
   {
     id: "accuracy",
-    accessorKey: "accuracy",
+    accessorKey: "accuracyActual",
     header: ({ column }) => (
-      <SortableHeader column={column} title="Citations with accuracy verification (≥75% = green)">
+      <SortableHeader column={column} title="Accuracy verified citations: checked / total citations (≥75% = green)">
         Acc
       </SortableHeader>
     ),
-    cell: ({ row }) => <StatusDot status={row.original.accuracy} />,
-    sortingFn: (a, b) =>
-      statusOrder(a.original.accuracy) - statusOrder(b.original.accuracy),
+    cell: ({ row }) => (
+      <RatioCell
+        actual={row.original.accuracyActual}
+        total={row.original.accuracyTotal}
+        status={row.original.accuracy}
+      />
+    ),
   },
   {
     accessorKey: "category",
