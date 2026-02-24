@@ -163,6 +163,57 @@ jobs:
           fi
           echo "All NEEDS CITATION markers resolved."
 
+      - name: Paranoid review of changed pages
+        if: success()
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          # Find MDX files modified by the auto-update pipeline (not yet committed)
+          CHANGED_MDX=$(git diff --name-only HEAD -- content/docs/ | grep '\.mdx$' || true)
+
+          if [ -z "$CHANGED_MDX" ]; then
+            echo "No MDX files changed — skipping paranoid review"
+            exit 0
+          fi
+
+          COUNT=$(echo "$CHANGED_MDX" | wc -l | tr -d ' ')
+          echo "Running paranoid review on $COUNT changed page(s)..."
+
+          BLOCKED=""
+          for FILE in $CHANGED_MDX; do
+            PAGE_ID=$(basename "$FILE" .mdx)
+            echo "Reviewing: $PAGE_ID ($FILE)"
+
+            RESULT=$(pnpm crux content review "$PAGE_ID" \
+              --model=claude-haiku-4-5-20251001 --json 2>/dev/null \
+              || echo '{"error":"review failed","gapCount":0,"needsReResearch":false}')
+
+            NEEDS_RESEARCH=$(echo "$RESULT" | jq -r '.needsReResearch // false')
+            GAP_COUNT=$(echo "$RESULT" | jq -r '.gapCount // 0')
+            ASSESSMENT=$(echo "$RESULT" | jq -r '.overallAssessment // "No assessment"')
+            ERROR=$(echo "$RESULT" | jq -r '.error // ""')
+
+            if [ -n "$ERROR" ] && [ "$ERROR" != "null" ]; then
+              echo "::warning::$PAGE_ID — review failed: $ERROR"
+            elif [ "$NEEDS_RESEARCH" = "true" ]; then
+              echo "::error::$PAGE_ID — needs re-research ($GAP_COUNT gap(s)): $ASSESSMENT"
+              BLOCKED="$BLOCKED $PAGE_ID"
+            elif [ "$GAP_COUNT" -gt 0 ]; then
+              echo "::warning::$PAGE_ID — $GAP_COUNT gap(s) (editorial): $ASSESSMENT"
+            else
+              echo "  $PAGE_ID: clean"
+            fi
+          done
+
+          if [ -n "$BLOCKED" ]; then
+            echo "::error::Paranoid review blocked commit for:$BLOCKED"
+            echo "Re-run the improve pipeline on these pages or fix the issues manually."
+            exit 1
+          fi
+
+          echo "All changed pages passed paranoid review"
+
       - name: Find run report
         id: report
         if: always()
