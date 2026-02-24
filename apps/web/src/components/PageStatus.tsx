@@ -41,6 +41,16 @@ interface PageIssues {
   };
 }
 
+interface CitationHealth {
+  total: number;
+  withQuotes: number;
+  verified: number;
+  accuracyChecked: number;
+  accurate: number;
+  inaccurate: number;
+  avgScore: number | null;
+}
+
 export interface PageStatusProps {
   quality?: number;
   importance?: number;
@@ -61,6 +71,9 @@ export interface PageStatusProps {
   pageType?: string;
   pathname?: string;
   contentFormat?: ContentFormat;
+  hasEntity?: boolean;
+  resourceCount?: number;
+  citationHealth?: CitationHealth;
 }
 
 // ============================================================================
@@ -257,64 +270,18 @@ function IconCheck({ className }: { className?: string }) {
   );
 }
 
+function IconX({ className }: { className?: string }) {
+  return (
+    <svg className={className} width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="4.5" y1="4.5" x2="11.5" y2="11.5" />
+      <line x1="11.5" y1="4.5" x2="4.5" y2="11.5" />
+    </svg>
+  );
+}
+
 // ============================================================================
 // SUB-COMPONENTS
 // ============================================================================
-
-function ScoreRing({
-  value,
-  max,
-  size = 44,
-  strokeWidth = 3.5,
-  color,
-  children,
-}: {
-  value: number;
-  max: number;
-  size?: number;
-  strokeWidth?: number;
-  color: string;
-  children?: React.ReactNode;
-}) {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const progress = (value / max) * circumference;
-
-  return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-        className="-rotate-90 block"
-      >
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="var(--border)"
-          strokeWidth={strokeWidth}
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth={strokeWidth}
-          strokeDasharray={`${progress} ${circumference - progress}`}
-          strokeDashoffset={circumference / 4}
-          strokeLinecap="round"
-          className="transition-[stroke-dasharray] duration-500 ease-out"
-        />
-      </svg>
-      <span className="absolute inset-0 flex items-center justify-center">
-        {children}
-      </span>
-    </div>
-  );
-}
 
 function PageTypeBadge({
   pageType,
@@ -353,6 +320,68 @@ function ContentFormatBadge({
   );
 }
 
+/** Compact score bar: colored left accent + number + label + level */
+function ScoreBar({
+  value,
+  max,
+  label,
+  levelLabel,
+  color,
+  tooltipTitle,
+  tooltipDesc,
+  extraTooltip,
+}: {
+  value: number;
+  max: number;
+  label: string;
+  levelLabel: string;
+  color: string;
+  tooltipTitle: string;
+  tooltipDesc: string;
+  extraTooltip?: React.ReactNode;
+}) {
+  const pct = Math.round((value / max) * 100);
+  return (
+    <span className={cn(styles.wrapper, "cursor-help flex items-center gap-2 min-w-0")}>
+      <span className="flex items-center gap-2 min-w-0">
+        {/* Thin progress accent */}
+        <span className="relative shrink-0 w-1 h-6 rounded-full bg-border overflow-hidden">
+          <span
+            className="absolute bottom-0 left-0 w-full rounded-full transition-all duration-300"
+            style={{ height: `${pct}%`, backgroundColor: color }}
+          />
+        </span>
+        <span className="tabular-nums text-sm font-bold text-foreground leading-none">
+          {value}
+        </span>
+        <span className="flex flex-col min-w-0">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
+            {label}
+          </span>
+          <span className="text-[11px] font-semibold leading-tight truncate" style={{ color }}>
+            {levelLabel}
+          </span>
+        </span>
+      </span>
+      <span
+        className={cn(
+          styles.tooltip,
+          "absolute left-0 top-full mt-1 z-50 w-[240px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+        )}
+        role="tooltip"
+      >
+        <span className="block font-semibold text-foreground text-sm mb-1">
+          {tooltipTitle}
+        </span>
+        <span className="block text-muted-foreground text-xs leading-snug">
+          {tooltipDesc}
+        </span>
+        {extraTooltip}
+      </span>
+    </span>
+  );
+}
+
 function QualityDisplay({
   quality,
   suggestedQuality,
@@ -367,45 +396,22 @@ function QualityDisplay({
     Math.abs(quality - suggestedQuality) >= 20;
 
   return (
-    <span className={cn(styles.wrapper, "cursor-help")}>
-      <span className="inline-flex items-center gap-2">
-        <ScoreRing value={quality} max={100} color={colors.ring}>
-          <span className="text-[13px] font-bold tabular-nums text-foreground">
-            {quality}
-          </span>
-        </ScoreRing>
-        <span className="flex flex-col">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
-            Quality
-          </span>
-          <span className={`text-[13px] font-semibold leading-snug inline-flex items-center gap-1.5 ${colors.text}`}>
-            {qualityLabels[level]}
-            {hasDiscrepancy && (
-              <span className="inline-block size-1.5 rounded-full bg-amber-500" />
-            )}
-          </span>
-        </span>
-      </span>
-      <span
-        className={cn(
-          styles.tooltip,
-          "absolute left-0 top-full mt-1 z-50 w-[240px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
-        )}
-        role="tooltip"
-      >
-        <span className="block font-semibold text-foreground text-sm mb-1">
-          Quality: {quality}/100
-        </span>
-        <span className="block text-muted-foreground text-xs leading-snug">
-          LLM-assigned rating of overall page quality, considering depth, accuracy, and completeness.
-        </span>
-        {hasDiscrepancy && (
+    <ScoreBar
+      value={quality}
+      max={100}
+      label="Quality"
+      levelLabel={`${qualityLabels[level]}${hasDiscrepancy ? " •" : ""}`}
+      color={colors.ring}
+      tooltipTitle={`Quality: ${quality}/100`}
+      tooltipDesc="LLM-assigned rating of overall page quality, considering depth, accuracy, and completeness."
+      extraTooltip={
+        hasDiscrepancy ? (
           <span className="block mt-2 text-xs text-amber-500">
             Structure suggests {suggestedQuality}
           </span>
-        )}
-      </span>
-    </span>
+        ) : undefined
+      }
+    />
   );
 }
 
@@ -414,37 +420,15 @@ function ImportanceDisplay({ importance }: { importance: number }) {
   const colors = importanceColors[level];
 
   return (
-    <span className={cn(styles.wrapper, "cursor-help")}>
-      <span className="inline-flex items-center gap-2">
-        <ScoreRing value={importance} max={100} color={colors.ring}>
-          <span className="text-[13px] font-bold tabular-nums text-foreground">
-            {importance}
-          </span>
-        </ScoreRing>
-        <span className="flex flex-col">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
-            Importance
-          </span>
-          <span className={`text-[13px] font-semibold leading-snug ${colors.text}`}>
-            {importanceLabels[level]}
-          </span>
-        </span>
-      </span>
-      <span
-        className={cn(
-          styles.tooltip,
-          "absolute left-0 top-full mt-1 z-50 w-[240px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
-        )}
-        role="tooltip"
-      >
-        <span className="block font-semibold text-foreground text-sm mb-1">
-          Importance: {importance}/100
-        </span>
-        <span className="block text-muted-foreground text-xs leading-snug">
-          How central this topic is to AI safety. Higher scores mean greater relevance to understanding or mitigating AI risk.
-        </span>
-      </span>
-    </span>
+    <ScoreBar
+      value={importance}
+      max={100}
+      label="Importance"
+      levelLabel={importanceLabels[level]}
+      color={colors.ring}
+      tooltipTitle={`Importance: ${importance}/100`}
+      tooltipDesc="How central this topic is to AI safety. Higher scores mean greater relevance to understanding or mitigating AI risk."
+    />
   );
 }
 
@@ -453,148 +437,15 @@ function ResearchDisplay({ researchImportance }: { researchImportance: number })
   const colors = researchColors[level];
 
   return (
-    <span className={cn(styles.wrapper, "cursor-help")}>
-      <span className="inline-flex items-center gap-2">
-        <ScoreRing value={researchImportance} max={100} color={colors.ring}>
-          <span className="text-[13px] font-bold tabular-nums text-foreground">
-            {researchImportance}
-          </span>
-        </ScoreRing>
-        <span className="flex flex-col">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
-            Research
-          </span>
-          <span className={`text-[13px] font-semibold leading-snug ${colors.text}`}>
-            {researchLabels[level]}
-          </span>
-        </span>
-      </span>
-      <span
-        className={cn(
-          styles.tooltip,
-          "absolute left-0 top-full mt-1 z-50 w-[240px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
-        )}
-        role="tooltip"
-      >
-        <span className="block font-semibold text-foreground text-sm mb-1">
-          Research Value: {researchImportance}/100
-        </span>
-        <span className="block text-muted-foreground text-xs leading-snug">
-          How much value deeper investigation of this topic could yield. Higher scores indicate under-explored topics with high insight potential.
-        </span>
-      </span>
-    </span>
-  );
-}
-
-function structureItemScore(
-  value: number,
-  thresholds: [number, number][] // [[threshold, points], ...]
-): number {
-  for (const [threshold, points] of thresholds) {
-    if (value >= threshold) return points;
-  }
-  return 0;
-}
-
-function StructureDisplay({ metrics }: { metrics: PageMetrics }) {
-  const score = metrics.structuralScore;
-  const scoreColor =
-    score >= 10 ? "#10b981" : score >= 6 ? "#f59e0b" : "#ef4444";
-  const scoreTextClass =
-    score >= 10
-      ? "text-emerald-500"
-      : score >= 6
-        ? "text-amber-500"
-        : "text-red-500";
-
-  // Reconstruct the per-item scores for the breakdown
-  const breakdown = [
-    { label: "Word count", max: 2, earned: structureItemScore(metrics.wordCount, [[800, 2], [300, 1]]) },
-    { label: "Tables", max: 3, earned: structureItemScore(metrics.tableCount, [[3, 3], [2, 2], [1, 1]]) },
-    { label: "Diagrams", max: 2, earned: structureItemScore(metrics.diagramCount, [[2, 2], [1, 1]]) },
-    { label: "Internal links", max: 2, earned: structureItemScore(metrics.internalLinks, [[4, 2], [1, 1]]) },
-    { label: "Citations", max: 3, earned: structureItemScore(metrics.footnoteCount + metrics.externalLinks, [[6, 3], [3, 2], [1, 1]]) },
-    { label: "Prose ratio", max: 2, earned: metrics.bulletRatio < 0.3 ? 2 : metrics.bulletRatio < 0.5 ? 1 : 0 },
-    { label: "Overview section", max: 1, earned: metrics.hasOverview ? 1 : 0 },
-  ];
-
-  return (
-    <span className={cn(styles.wrapper, "cursor-help")}>
-      <span className="inline-flex items-center gap-2">
-        <ScoreRing value={score} max={15} color={scoreColor}>
-          <span className="text-[11px] font-bold tabular-nums text-foreground">
-            {score}
-          </span>
-        </ScoreRing>
-        <span className="flex flex-col">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
-            Structure
-          </span>
-          <span className={`text-[13px] font-semibold leading-snug ${scoreTextClass}`}>
-            {score}/15
-          </span>
-        </span>
-      </span>
-      <span
-        className={cn(
-          styles.tooltip,
-          "absolute left-0 top-full mt-1 z-50 w-[220px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
-        )}
-        role="tooltip"
-      >
-        <span className="block font-semibold text-foreground text-sm mb-1">
-          Structure: {score}/15
-        </span>
-        <span className="block text-muted-foreground text-xs leading-snug mb-2">
-          Automated score based on measurable content features.
-        </span>
-        <span className="block flex flex-col gap-0.5">
-          {breakdown.map((item) => (
-            <span key={item.label} className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">{item.label}</span>
-              <span className={cn(
-                "tabular-nums font-medium",
-                item.earned === item.max ? "text-emerald-500" : item.earned > 0 ? "text-foreground" : "text-muted-foreground/50"
-              )}>
-                {item.earned}/{item.max}
-              </span>
-            </span>
-          ))}
-        </span>
-      </span>
-    </span>
-  );
-}
-
-function MetricChip({
-  icon,
-  value,
-  label,
-  description,
-}: {
-  icon: React.ReactNode;
-  value: number | string;
-  label: string;
-  description?: string;
-}) {
-  return (
-    <span className={cn(styles.wrapper, "inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground whitespace-nowrap cursor-help")}>
-      <span className="flex items-center opacity-60">{icon}</span>
-      <span className="font-semibold tabular-nums text-foreground">{value}</span>
-      <span
-        className={cn(
-          styles.tooltip,
-          "absolute right-0 top-full mt-1 z-50 w-[200px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
-        )}
-        role="tooltip"
-      >
-        <span className="block font-semibold text-foreground text-xs mb-0.5">{label}</span>
-        {description && (
-          <span className="block text-muted-foreground text-[11px] leading-snug">{description}</span>
-        )}
-      </span>
-    </span>
+    <ScoreBar
+      value={researchImportance}
+      max={100}
+      label="Research"
+      levelLabel={researchLabels[level]}
+      color={colors.ring}
+      tooltipTitle={`Research Value: ${researchImportance}/100`}
+      tooltipDesc="How much value deeper investigation of this topic could yield. Higher scores indicate under-explored topics with high insight potential."
+    />
   );
 }
 
@@ -746,6 +597,387 @@ function IssuesSection({
 // ============================================================================
 
 // ============================================================================
+// CONTENT COVERAGE SECTION
+// ============================================================================
+
+interface BooleanCoverageItem {
+  label: string;
+  present: boolean;
+  detail?: string;
+  hint?: string;
+  description: string;
+  anchor: string;
+}
+
+interface NumericMetric {
+  label: string;
+  actual: number;
+  target?: number; // undefined = ratio-based (no target)
+  ratio?: string; // e.g. "83/87" for quotes/accuracy
+  hint?: string;
+  description: string;
+  anchor: string;
+}
+
+function getRecommendedMetrics(
+  wordCount: number,
+  contentFormat: ContentFormat
+): {
+  tables: number;
+  diagrams: number;
+  internalLinks: number;
+  footnotes: number;
+  references: number;
+} {
+  const kWords = wordCount / 1000;
+
+  if (contentFormat === "table") {
+    return {
+      tables: Math.max(2, Math.round(kWords * 2)),
+      diagrams: Math.max(0, Math.round(kWords * 0.2)),
+      internalLinks: Math.max(2, Math.round(kWords * 2)),
+      footnotes: Math.max(1, Math.round(kWords * 1.5)),
+      references: Math.max(1, Math.round(kWords * 1.5)),
+    };
+  }
+  if (contentFormat === "diagram") {
+    return {
+      tables: Math.max(0, Math.round(kWords * 0.5)),
+      diagrams: Math.max(1, Math.round(kWords * 0.8)),
+      internalLinks: Math.max(2, Math.round(kWords * 2)),
+      footnotes: Math.max(1, Math.round(kWords * 1.5)),
+      references: Math.max(1, Math.round(kWords * 1.5)),
+    };
+  }
+  if (contentFormat === "index" || contentFormat === "dashboard") {
+    return {
+      tables: Math.max(0, Math.round(kWords * 0.5)),
+      diagrams: 0,
+      internalLinks: Math.max(5, Math.round(kWords * 5)),
+      footnotes: 0,
+      references: Math.max(0, Math.round(kWords * 0.5)),
+    };
+  }
+
+  // Default: article format
+  return {
+    tables: Math.max(1, Math.round(kWords * 1.2)),
+    diagrams: Math.max(0, Math.round(kWords * 0.3)),
+    internalLinks: Math.max(2, Math.round(kWords * 3)),
+    footnotes: Math.max(2, Math.round(kWords * 2.5)),
+    references: Math.max(1, Math.round(kWords * 2)),
+  };
+}
+
+function getMetricStatus(actual: number, target?: number): "green" | "amber" | "red" {
+  if (target === undefined || target === 0) {
+    return actual > 0 ? "green" : "red";
+  }
+  if (actual >= target) return "green";
+  if (actual > 0) return "amber";
+  return "red";
+}
+
+function getRatioStatus(numerator: number, denominator: number): "green" | "amber" | "red" {
+  if (denominator === 0) return "red";
+  const pct = numerator / denominator;
+  if (pct >= 0.75) return "green";
+  if (numerator > 0) return "amber";
+  return "red";
+}
+
+const statusIcons = {
+  green: <IconCheck className="shrink-0 text-emerald-500" />,
+  amber: (
+    <span className="shrink-0 w-[14px] h-[14px] flex items-center justify-center text-amber-500 text-[11px] font-bold">
+      –
+    </span>
+  ),
+  red: <IconX className="shrink-0 text-red-400/60" />,
+};
+
+function ContentCoverageSection({
+  structuredSummary,
+  llmSummary,
+  updateFrequency,
+  hasEntity,
+  metrics,
+  resourceCount,
+  citationHealth,
+  changeHistory,
+  wordCount,
+  contentFormat,
+}: {
+  structuredSummary?: StructuredSummary;
+  llmSummary?: string;
+  updateFrequency?: number;
+  hasEntity?: boolean;
+  metrics?: PageMetrics;
+  resourceCount?: number;
+  citationHealth?: CitationHealth;
+  changeHistory?: ChangeEntry[];
+  wordCount?: number;
+  contentFormat?: ContentFormat;
+}) {
+  const format = contentFormat || "article";
+  const recommended = getRecommendedMetrics(wordCount || 0, format);
+
+  // --- Boolean items (yes/no chips) ---
+  const booleanItems: BooleanCoverageItem[] = [
+    {
+      label: "LLM summary",
+      present: !!llmSummary,
+      hint: "crux content improve <id>",
+      description: "Basic text summary used in search results, entity link tooltips, info boxes, and related page cards.",
+      anchor: "structured-summary",
+    },
+    {
+      label: "Structured summary",
+      present: !!structuredSummary,
+      hint: "crux content improve <id> --tier=standard",
+      description: "Rich summary with one-liner, key points, and bottom line. Shown in Key Takeaways and PageStatus.",
+      anchor: "structured-summary",
+    },
+    {
+      label: "Schedule",
+      present: updateFrequency != null,
+      hint: "Set updateFrequency in frontmatter",
+      description: "How often the page should be refreshed. Drives the overdue tracking system.",
+      anchor: "update-schedule",
+    },
+    {
+      label: "Entity",
+      present: !!hasEntity,
+      hint: "Add entity YAML in data/entities/",
+      description: "YAML entity definition with type, description, and related entries.",
+      anchor: "entity-data",
+    },
+    {
+      label: "Edit history",
+      present: (changeHistory?.length ?? 0) > 0,
+      detail: changeHistory && changeHistory.length > 0 ? `${changeHistory.length}` : undefined,
+      hint: "crux edit-log view <id>",
+      description: "Tracked changes from improve pipeline runs and manual edits.",
+      anchor: "edit-history",
+    },
+  ];
+
+  // --- Numeric metrics (table rows) ---
+  const tableCount = metrics?.tableCount ?? 0;
+  const diagramCount = metrics?.diagramCount ?? 0;
+  const internalLinks = metrics?.internalLinks ?? 0;
+  const footnoteCount = metrics?.footnoteCount ?? 0;
+  const refCount = resourceCount ?? 0;
+  const quoteNum = citationHealth?.withQuotes ?? 0;
+  const quoteTotal = citationHealth?.total ?? 0;
+  const accNum = citationHealth?.accuracyChecked ?? 0;
+  const accTotal = citationHealth?.total ?? 0;
+
+  const numericMetrics: NumericMetric[] = [
+    {
+      label: "Tables",
+      actual: tableCount,
+      target: recommended.tables,
+      hint: "Add data tables to the page",
+      description: "Data tables for structured comparisons and reference material.",
+      anchor: "tables-diagrams",
+    },
+    {
+      label: "Diagrams",
+      actual: diagramCount,
+      target: recommended.diagrams,
+      hint: "Add Mermaid diagrams or Squiggle models",
+      description: "Visual content — Mermaid diagrams, charts, or Squiggle estimate models.",
+      anchor: "tables-diagrams",
+    },
+    {
+      label: "Int. links",
+      actual: internalLinks,
+      target: recommended.internalLinks,
+      hint: "Add links to other wiki pages",
+      description: "Links to other wiki pages. More internal links = better graph connectivity.",
+      anchor: "tables-diagrams",
+    },
+    {
+      label: "Footnotes",
+      actual: footnoteCount,
+      target: recommended.footnotes,
+      hint: "Add [^N] footnote citations",
+      description: "Footnote citations [^N] with source references at the bottom of the page.",
+      anchor: "references",
+    },
+    {
+      label: "References",
+      actual: refCount,
+      target: recommended.references,
+      hint: "Add <R> resource links",
+      description: "Curated external resources linked via <R> components or cited_by in YAML.",
+      anchor: "references",
+    },
+    {
+      label: "Quotes",
+      actual: quoteNum,
+      ratio: quoteTotal > 0 ? `${quoteNum}/${quoteTotal}` : undefined,
+      hint: "crux citations extract-quotes <id>",
+      description: "Supporting quotes extracted from cited sources to back up page claims.",
+      anchor: "citation-quotes",
+    },
+    {
+      label: "Accuracy",
+      actual: accNum,
+      ratio: accTotal > 0 ? `${accNum}/${accTotal}` : undefined,
+      hint: "crux citations verify <id>",
+      description: "Citations verified against their sources for factual accuracy.",
+      anchor: "accuracy-checked",
+    },
+  ];
+
+  // --- Scoring ---
+  const booleanPassing = booleanItems.filter((i) => i.present).length;
+  const numericPassing = numericMetrics.filter((m) => {
+    if (m.ratio !== undefined) {
+      const total = m.label === "Quotes" ? quoteTotal : accTotal;
+      return getRatioStatus(m.actual, total) === "green";
+    }
+    return getMetricStatus(m.actual, m.target) === "green";
+  }).length;
+  const presentCount = booleanPassing + numericPassing;
+  const total = booleanItems.length + numericMetrics.length;
+  const pct = presentCount / total;
+  const badgeColor =
+    pct >= 0.75
+      ? "bg-emerald-500/15 text-emerald-500"
+      : pct >= 0.5
+        ? "bg-amber-500/15 text-amber-500"
+        : "bg-red-500/15 text-red-500";
+
+  return (
+    <div className="border-t border-border px-3.5 pt-2 pb-2">
+      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">
+        Content
+        <span
+          className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold ${badgeColor}`}
+        >
+          {presentCount}/{total}
+        </span>
+      </div>
+
+      <div className="flex gap-2">
+        {/* Boolean items — stacked vertically */}
+        <div className="flex flex-col gap-1">
+          {booleanItems.map((item) => (
+            <span
+              key={item.label}
+              className={cn(
+                styles.wrapper,
+                "!inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-2 py-0.5 text-[11px] cursor-help",
+                item.present
+                  ? "border-emerald-500/20 bg-emerald-500/[0.04] text-foreground"
+                  : "border-border bg-muted/50 text-muted-foreground/50"
+              )}
+            >
+              {item.present ? (
+                <IconCheck className="shrink-0 text-emerald-500" />
+              ) : (
+                <IconX className="shrink-0 text-muted-foreground/30" />
+              )}
+              <Link
+                href={`/internal/coverage-guide#${item.anchor}`}
+                className="no-underline hover:underline"
+                style={{ color: "inherit" }}
+              >
+                {item.label}
+              </Link>
+              {item.present && item.detail && (
+                <span className="tabular-nums text-[10px] text-muted-foreground font-medium">
+                  {item.detail}
+                </span>
+              )}
+              <span
+                className={cn(
+                  styles.tooltip,
+                  "absolute left-0 top-full mt-1 z-50 w-[260px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+                )}
+                role="tooltip"
+              >
+                <span className="block font-semibold text-foreground text-xs mb-1">
+                  {item.label}
+                </span>
+                <span className="block text-muted-foreground text-[11px] leading-snug whitespace-normal">
+                  {item.description}
+                </span>
+                {!item.present && item.hint && (
+                  <span className="block mt-1.5 pt-1.5 border-t border-border text-muted-foreground text-[11px] font-mono whitespace-normal">
+                    {item.hint}
+                  </span>
+                )}
+              </span>
+            </span>
+          ))}
+        </div>
+
+        {/* Numeric metrics table — bordered */}
+        <div className="rounded-md border border-border">
+          {numericMetrics.map((m, i) => {
+            const isRatio = m.ratio !== undefined;
+            const status = isRatio
+              ? getRatioStatus(m.actual, m.label === "Quotes" ? quoteTotal : accTotal)
+              : getMetricStatus(m.actual, m.target);
+
+            return (
+              <span
+                key={m.label}
+                className={cn(
+                  styles.wrapper,
+                  "!flex items-center gap-1.5 px-2 py-[3px] text-[11px] cursor-help",
+                  i > 0 && "border-t border-border"
+                )}
+              >
+                {statusIcons[status]}
+                <Link
+                  href={`/internal/coverage-guide#${m.anchor}`}
+                  className="no-underline hover:underline w-[62px] shrink-0 text-muted-foreground"
+                  style={{ color: "inherit" }}
+                >
+                  {m.label}
+                </Link>
+                <span className="tabular-nums font-medium text-foreground w-[36px] text-right shrink-0">
+                  {isRatio ? m.ratio : m.actual}
+                </span>
+                {!isRatio && m.target !== undefined && m.target > 0 && (
+                  <span className="tabular-nums text-[10px] text-muted-foreground/50 shrink-0">
+                    / ~{m.target}
+                  </span>
+                )}
+                <span
+                  className={cn(
+                    styles.tooltip,
+                    "absolute left-0 top-full mt-1 z-50 w-[260px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+                  )}
+                  role="tooltip"
+                >
+                  <span className="block font-semibold text-foreground text-xs mb-1">
+                    {m.label}
+                  </span>
+                  <span className="block text-muted-foreground text-[11px] leading-snug whitespace-normal">
+                    {m.description}
+                  </span>
+                  {status !== "green" && m.hint && (
+                    <span className="block mt-1.5 pt-1.5 border-t border-border text-muted-foreground text-[11px] font-mono whitespace-normal">
+                      {m.hint}
+                    </span>
+                  )}
+                </span>
+              </span>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
 // CHANGE HISTORY SECTION
 // ============================================================================
 
@@ -829,6 +1061,9 @@ export function PageStatus({
   pageType,
   pathname,
   contentFormat,
+  hasEntity,
+  resourceCount,
+  citationHealth,
 }: PageStatusProps) {
   const detectedType = detectPageType(pathname || "", pageType);
   const isATMPage = detectedType === "ai-transition-model";
@@ -847,7 +1082,7 @@ export function PageStatus({
     return null;
   }
 
-  const metaItems: string[] = [];
+  const metaItems: React.ReactNode[] = [];
   if (lastEdited) metaItems.push(`Edited ${formatAge(lastEdited)}`);
   if (wordCount && wordCount > 0) metaItems.push(`${formatWordCount(wordCount)} words`);
   if (backlinkCount && backlinkCount > 0) metaItems.push(`${backlinkCount} backlinks`);
@@ -857,10 +1092,29 @@ export function PageStatus({
       ? getUpdateStatus(lastEdited, updateFrequency)
       : null;
 
+  // Add update schedule info to meta items
+  if (evergreen === false) {
+    metaItems.push("Point-in-time");
+  } else if (updateFrequency) {
+    metaItems.push(
+      <span key="schedule" className="inline-flex items-center gap-1">
+        Updated {formatFrequency(updateFrequency)}
+        {updateStatus && (
+          <>
+            <span className="mx-1 inline-block size-[3px] rounded-full bg-border" />
+            <span className={updateStatus.isOverdue ? "font-medium text-amber-500" : ""}>
+              {updateStatus.label}
+            </span>
+          </>
+        )}
+      </span>
+    );
+  }
+
   return (
-    <div className="page-status page-status-dev-only mb-6 overflow-hidden rounded-xl border border-border bg-card text-[13px] shadow-sm">
+    <div className="page-status page-status-dev-only mb-6 rounded-xl border border-border bg-card text-[13px] shadow-sm">
       {/* Top bar */}
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-border bg-muted px-3.5 py-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-border bg-muted px-3.5 py-2 rounded-t-xl">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
             Page Status
@@ -880,75 +1134,18 @@ export function PageStatus({
         </div>
       </div>
 
-      {/* Score rings + metric chips */}
-      <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 px-3.5 py-3">
-        <div className="flex flex-wrap items-center gap-5">
-          {quality !== undefined && quality > 0 && (
-            <QualityDisplay quality={quality} suggestedQuality={suggestedQuality} />
-          )}
-          {importance !== undefined && (
-            <ImportanceDisplay importance={importance} />
-          )}
-          {researchImportance !== undefined && (
-            <ResearchDisplay researchImportance={researchImportance} />
-          )}
-          {metrics && <StructureDisplay metrics={metrics} />}
-        </div>
-
-        {metrics && (
-          <div className="flex flex-wrap gap-1.5">
-            <MetricChip icon={<IconTable />} value={metrics.tableCount} label="Tables" description="Data tables in the page" />
-            <MetricChip icon={<IconDiagram />} value={metrics.diagramCount} label="Diagrams" description="Charts and visual diagrams" />
-            <MetricChip icon={<IconLink />} value={metrics.internalLinks} label="Internal Links" description="Links to other wiki pages" />
-            <MetricChip icon={<IconBook />} value={metrics.footnoteCount} label="Footnotes" description="Footnote citations [^N] with sources" />
-            <MetricChip icon={<IconLink />} value={metrics.externalLinks} label="External Links" description="Markdown links to outside URLs" />
-            <MetricChip
-              icon={<span className="text-[10px] font-bold">%</span>}
-              value={`${Math.round(metrics.bulletRatio * 100)}%`}
-              label="Bullet Ratio"
-              description="Percentage of content in bullet lists"
-            />
-          </div>
+      {/* Ratings — editorial judgments */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-3.5 py-2.5">
+        {quality !== undefined && quality > 0 && (
+          <QualityDisplay quality={quality} suggestedQuality={suggestedQuality} />
+        )}
+        {importance !== undefined && (
+          <ImportanceDisplay importance={importance} />
+        )}
+        {researchImportance !== undefined && (
+          <ResearchDisplay researchImportance={researchImportance} />
         )}
       </div>
-
-      {/* Update Schedule / Evergreen status */}
-      {evergreen === false ? (
-        <div className="flex items-center gap-2 border-t border-border px-3.5 py-2 text-xs text-muted-foreground">
-          <IconCalendar className="shrink-0 opacity-60" />
-          <span className="text-muted-foreground">
-            Point-in-time content
-          </span>
-          <span className="inline-block size-[3px] rounded-full bg-border" />
-          <span className="text-muted-foreground/70">
-            Not on update schedule
-          </span>
-        </div>
-      ) : updateFrequency ? (
-        <div className="flex items-center gap-2 border-t border-border px-3.5 py-2 text-xs text-muted-foreground">
-          <IconCalendar className="shrink-0 opacity-60" />
-          <span>
-            Updated{" "}
-            <Link href="/internal/updates" className="font-medium text-foreground hover:underline no-underline">
-              {formatFrequency(updateFrequency)}
-            </Link>
-          </span>
-          {updateStatus && (
-            <>
-              <span className="inline-block size-[3px] rounded-full bg-border" />
-              <span
-                className={
-                  updateStatus.isOverdue
-                    ? "font-medium text-amber-500"
-                    : "text-muted-foreground"
-                }
-              >
-                {updateStatus.label}
-              </span>
-            </>
-          )}
-        </div>
-      ) : null}
 
       {/* Summary — structured if available, else flat llmSummary */}
       {structuredSummary ? (
@@ -980,6 +1177,23 @@ export function PageStatus({
         </div>
       ) : null}
 
+      {/* Content — boolean chips + numeric metrics table */}
+      <ContentCoverageSection
+        structuredSummary={structuredSummary}
+        llmSummary={llmSummary}
+        updateFrequency={updateFrequency}
+        hasEntity={hasEntity}
+        metrics={metrics}
+        resourceCount={resourceCount}
+        citationHealth={citationHealth}
+        changeHistory={changeHistory}
+        wordCount={wordCount}
+        contentFormat={contentFormat}
+      />
+
+      {/* Change history */}
+      <ChangeHistorySection changeHistory={changeHistory} />
+
       {/* Issues */}
       <IssuesSection
         issues={issues}
@@ -990,9 +1204,6 @@ export function PageStatus({
         contentFormat={contentFormat}
         evergreen={evergreen}
       />
-
-      {/* Change history */}
-      <ChangeHistorySection changeHistory={changeHistory} />
 
       {/* Single todo */}
       {todo && (

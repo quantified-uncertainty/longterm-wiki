@@ -7,7 +7,7 @@ import {
   isMdxError,
 } from "@/lib/mdx";
 import type { MdxPage, MdxError } from "@/lib/mdx";
-import { getEntityById, getPageById, getEntityPath } from "@/data";
+import { getEntityById, getPageById, getEntityPath, getResourcesForPage } from "@/data";
 import type { Page, ContentFormat } from "@/data";
 import { CONTENT_FORMAT_INFO, isFullWidth } from "@/lib/page-types";
 import { PageStatus } from "@/components/PageStatus";
@@ -268,33 +268,36 @@ function ContentView({
       {!isInternal && citationQuotes && citationQuotes.length > 0 && (
         <CitationHealthBanner health={computeCitationHealth(citationQuotes)} />
       )}
+      {/* PageStatus rendered above article so it spans full width (not squeezed by info box) */}
+      <PageStatus
+        quality={pageData?.quality ?? undefined}
+        importance={pageData?.readerImportance ?? undefined}
+        researchImportance={pageData?.researchImportance ?? undefined}
+        llmSummary={pageData?.llmSummary ?? undefined}
+        structuredSummary={pageData?.structuredSummary ?? undefined}
+        lastEdited={pageData?.lastUpdated ?? undefined}
+        updateFrequency={pageData?.updateFrequency ?? undefined}
+        evergreen={pageData?.evergreen}
+        todo={page.frontmatter.todo}
+        todos={page.frontmatter.todos}
+        wordCount={pageData?.wordCount}
+        backlinkCount={pageData?.backlinkCount}
+        metrics={pageData?.metrics}
+        suggestedQuality={pageData?.suggestedQuality}
+        changeHistory={pageData?.changeHistory}
+        issues={{
+          unconvertedLinkCount: pageData?.unconvertedLinkCount,
+          redundancy: pageData?.redundancy,
+        }}
+        pageType={page.frontmatter.pageType}
+        pathname={entityPath}
+        contentFormat={contentFormat}
+        hasEntity={!!entity}
+        resourceCount={getResourcesForPage(slug).length}
+        citationHealth={pageData?.citationHealth}
+      />
       <CitationQuotesProvider quotes={citationQuotes ?? []}>
         <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
-          {/* PageStatus shown for graded formats or pages with editorial content */}
-          <PageStatus
-            quality={pageData?.quality ?? undefined}
-            importance={pageData?.readerImportance ?? undefined}
-            researchImportance={pageData?.researchImportance ?? undefined}
-            llmSummary={pageData?.llmSummary ?? undefined}
-            structuredSummary={pageData?.structuredSummary ?? undefined}
-            lastEdited={pageData?.lastUpdated ?? undefined}
-            updateFrequency={pageData?.updateFrequency ?? undefined}
-            evergreen={pageData?.evergreen}
-            todo={page.frontmatter.todo}
-            todos={page.frontmatter.todos}
-            wordCount={pageData?.wordCount}
-            backlinkCount={pageData?.backlinkCount}
-            metrics={pageData?.metrics}
-            suggestedQuality={pageData?.suggestedQuality}
-            changeHistory={pageData?.changeHistory}
-            issues={{
-              unconvertedLinkCount: pageData?.unconvertedLinkCount,
-              redundancy: pageData?.redundancy,
-            }}
-            pageType={page.frontmatter.pageType}
-            pathname={entityPath}
-            contentFormat={contentFormat}
-          />
           {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
           {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
           {showToc && <TableOfContents headings={tocHeadings} />}
