@@ -819,11 +819,26 @@ export interface BacklinksResult {
 // Resources
 // ---------------------------------------------------------------------------
 
+/** Canonical resource types — mirrors data/schema.ts ResourceType. */
+export const ResourceTypeSchema = z.enum([
+  "paper",
+  "blog",
+  "report",
+  "book",
+  "talk",
+  "podcast",
+  "government",
+  "reference",
+  "web",
+]);
+export type ResourceType = z.infer<typeof ResourceTypeSchema>;
+export const RESOURCE_TYPES = ResourceTypeSchema.options;
+
 export const UpsertResourceSchema = z.object({
   id: z.string().min(1).max(200),
   url: z.string().url().max(2000),
   title: z.string().max(1000).nullable().optional(),
-  type: z.string().max(50).nullable().optional(),
+  type: ResourceTypeSchema.nullable().optional(),
   summary: z.string().max(50000).nullable().optional(),
   review: z.string().max(50000).nullable().optional(),
   abstract: z.string().max(50000).nullable().optional(),
@@ -849,6 +864,53 @@ export const UpsertResourceBatchSchema = z.object({
 export interface UpsertResourceResult {
   id: string;
   url: string;
+}
+
+export interface ResourceRow {
+  id: string;
+  url: string;
+  title: string | null;
+  type: string | null;
+  summary: string | null;
+  review: string | null;
+  abstract: string | null;
+  keyPoints: string[] | null;
+  publicationId: string | null;
+  authors: string[] | null;
+  publishedDate: string | null;
+  tags: string[] | null;
+  localFilename: string | null;
+  credibilityOverride: number | null;
+  fetchedAt: string | null;
+  contentHash: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ResourceStatsResult {
+  totalResources: number;
+  totalCitations: number;
+  citedPages: number;
+  byType: Record<string, number>;
+  /** Resources that exist in the DB but have zero citation links. */
+  orphanedCount: number;
+  /** Resources with a summary, review, or key_points filled in. */
+  withMetadata: number;
+  /** Resources that have been fetched (fetchedAt is set). */
+  fetched: number;
+}
+
+export interface ResourceSearchResult {
+  results: ResourceRow[];
+  count: number;
+  query: string;
+}
+
+export interface ResourceListResult {
+  resources: ResourceRow[];
+  total: number;
+  limit: number;
+  offset: number;
 }
 
 // ---------------------------------------------------------------------------

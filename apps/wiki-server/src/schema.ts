@@ -402,7 +402,9 @@ export const resources = pgTable(
     uniqueIndex("idx_res_url").on(table.url),
     index("idx_res_type").on(table.type),
     index("idx_res_publication_id").on(table.publicationId),
-    // GIN index on search_vector is created in migration SQL
+    index("idx_res_created_at").on(table.createdAt),
+    // GIN indexes on tags, authors, and search_vector are created in migration SQL
+    // (Drizzle doesn't support GIN index declarations)
   ]
 );
 
