@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { validator } from "hono/validator";
 import { z } from "zod";
 import { eq, and, count, asc, sql, isNotNull, lte } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
@@ -8,21 +9,13 @@ import {
   validationError,
   invalidJsonError,
 } from "./utils.js";
-import {
-  SyncFactSchema as SharedSyncFactSchema,
-  SyncFactsBatchSchema,
-} from "../api-types.js";
-
-export const factsRoute = new Hono();
+import { SyncFactsBatchSchema } from "../api-types.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
 
-// ---- Schemas (from shared api-types) ----
-
-const SyncFactSchema = SharedSyncFactSchema;
-const SyncBatchSchema = SyncFactsBatchSchema;
+// ---- Query schemas ----
 
 const ByEntityQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
@@ -40,6 +33,21 @@ const StalenessQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
+
+// ---- Zod validator helper (uses Hono's built-in validator for RPC type inference) ----
+
+function zv<T extends z.ZodType>(target: "query", schema: T) {
+  return validator(target, (value, c) => {
+    const result = schema.safeParse(value);
+    if (!result.success) {
+      return c.json(
+        { error: "validation_error" as const, message: result.error.message },
+        400
+      );
+    }
+    return result.data as z.infer<T>;
+  });
+}
 
 // ---- Helpers ----
 
@@ -67,207 +75,209 @@ function formatFact(f: typeof facts.$inferSelect) {
   };
 }
 
-// ---- GET /stats ----
+// ---- Route definition (method-chained for Hono RPC type inference) ----
 
-factsRoute.get("/stats", async (c) => {
-  const db = getDrizzleDb();
+const factsApp = new Hono()
 
-  const totalResult = await db.select({ count: count() }).from(facts);
-  const total = totalResult[0].count;
+  // ---- GET /stats ----
+  .get("/stats", async (c) => {
+    const db = getDrizzleDb();
 
-  const entityCountResult = await db
-    .select({
-      count: sql<number>`count(distinct ${facts.entityId})`,
-    })
-    .from(facts);
-  const uniqueEntities = Number(entityCountResult[0].count);
+    const totalResult = await db.select({ count: count() }).from(facts);
+    const total = totalResult[0].count;
 
-  const measureCountResult = await db
-    .select({
-      count: sql<number>`count(distinct ${facts.measure})`,
-    })
-    .from(facts)
-    .where(isNotNull(facts.measure));
-  const uniqueMeasures = Number(measureCountResult[0].count);
+    const entityCountResult = await db
+      .select({
+        count: sql<number>`count(distinct ${facts.entityId})`,
+      })
+      .from(facts);
+    const uniqueEntities = Number(entityCountResult[0].count);
 
-  return c.json({
-    total,
-    uniqueEntities,
-    uniqueMeasures,
-  });
-});
+    const measureCountResult = await db
+      .select({
+        count: sql<number>`count(distinct ${facts.measure})`,
+      })
+      .from(facts)
+      .where(isNotNull(facts.measure));
+    const uniqueMeasures = Number(measureCountResult[0].count);
 
-// ---- GET /stale ----
+    return c.json({
+      total,
+      uniqueEntities,
+      uniqueMeasures,
+    });
+  })
 
-factsRoute.get("/stale", async (c) => {
-  const parsed = StalenessQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
+  // ---- GET /stale ----
+  .get("/stale", zv("query", StalenessQuery), async (c) => {
+    const { olderThan, limit, offset } = c.req.valid("query");
+    const db = getDrizzleDb();
 
-  const { olderThan, limit, offset } = parsed.data;
-  const db = getDrizzleDb();
+    const conditions = [isNotNull(facts.asOf)];
+    if (olderThan) {
+      conditions.push(lte(facts.asOf, olderThan));
+    }
 
-  const conditions = [isNotNull(facts.asOf)];
-  if (olderThan) {
-    conditions.push(lte(facts.asOf, olderThan));
-  }
+    const whereClause = and(...conditions);
 
-  const whereClause = and(...conditions);
+    const rows = await db
+      .select({
+        entityId: facts.entityId,
+        factId: facts.factId,
+        label: facts.label,
+        asOf: facts.asOf,
+        measure: facts.measure,
+        value: facts.value,
+        numeric: facts.numeric,
+      })
+      .from(facts)
+      .where(whereClause)
+      .orderBy(asc(facts.asOf))
+      .limit(limit)
+      .offset(offset);
 
-  const rows = await db
-    .select({
-      entityId: facts.entityId,
-      factId: facts.factId,
-      label: facts.label,
-      asOf: facts.asOf,
-      measure: facts.measure,
-      value: facts.value,
-      numeric: facts.numeric,
-    })
-    .from(facts)
-    .where(whereClause)
-    .orderBy(asc(facts.asOf))
-    .limit(limit)
-    .offset(offset);
+    const countResult = await db
+      .select({ count: count() })
+      .from(facts)
+      .where(whereClause);
+    const total = countResult[0].count;
 
-  const countResult = await db
-    .select({ count: count() })
-    .from(facts)
-    .where(whereClause);
-  const total = countResult[0].count;
+    return c.json({ facts: rows, total, limit, offset });
+  })
 
-  return c.json({ facts: rows, total, limit, offset });
-});
+  // ---- GET /timeseries/:entityId ----
+  .get("/timeseries/:entityId", zv("query", TimeseriesQuery), async (c) => {
+    const entityId = c.req.param("entityId");
 
-// ---- GET /timeseries/:entityId ----
+    const { measure, limit } = c.req.valid("query");
+    const db = getDrizzleDb();
 
-factsRoute.get("/timeseries/:entityId", async (c) => {
-  const entityId = c.req.param("entityId");
-  if (!entityId) return validationError(c, "Entity ID is required");
-
-  const parsed = TimeseriesQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
-
-  const { measure, limit } = parsed.data;
-  const db = getDrizzleDb();
-
-  const rows = await db
-    .select()
-    .from(facts)
-    .where(
-      and(
-        eq(facts.entityId, entityId),
-        eq(facts.measure, measure),
-        isNotNull(facts.asOf)
+    const rows = await db
+      .select()
+      .from(facts)
+      .where(
+        and(
+          eq(facts.entityId, entityId),
+          eq(facts.measure, measure),
+          isNotNull(facts.asOf)
+        )
       )
-    )
-    .orderBy(asc(facts.asOf))
-    .limit(limit);
+      .orderBy(asc(facts.asOf))
+      .limit(limit);
 
-  return c.json({
-    entityId,
-    measure,
-    points: rows.map(formatFact),
-    total: rows.length,
-  });
-});
+    return c.json({
+      entityId,
+      measure,
+      points: rows.map(formatFact),
+      total: rows.length,
+    });
+  })
 
-// ---- GET /by-entity/:entityId ----
+  // ---- GET /by-entity/:entityId ----
+  .get("/by-entity/:entityId", zv("query", ByEntityQuery), async (c) => {
+    const entityId = c.req.param("entityId");
 
-factsRoute.get("/by-entity/:entityId", async (c) => {
-  const entityId = c.req.param("entityId");
-  if (!entityId) return validationError(c, "Entity ID is required");
+    const { limit, offset, measure } = c.req.valid("query");
+    const db = getDrizzleDb();
 
-  const parsed = ByEntityQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
+    const conditions = [eq(facts.entityId, entityId)];
+    if (measure) conditions.push(eq(facts.measure, measure));
 
-  const { limit, offset, measure } = parsed.data;
-  const db = getDrizzleDb();
+    const whereClause = and(...conditions);
 
-  const conditions = [eq(facts.entityId, entityId)];
-  if (measure) conditions.push(eq(facts.measure, measure));
+    const rows = await db
+      .select()
+      .from(facts)
+      .where(whereClause)
+      .orderBy(asc(facts.factId))
+      .limit(limit)
+      .offset(offset);
 
-  const whereClause = and(...conditions);
+    const countResult = await db
+      .select({ count: count() })
+      .from(facts)
+      .where(whereClause);
+    const total = countResult[0].count;
 
-  const rows = await db
-    .select()
-    .from(facts)
-    .where(whereClause)
-    .orderBy(asc(facts.factId))
-    .limit(limit)
-    .offset(offset);
+    return c.json({
+      entityId,
+      facts: rows.map(formatFact),
+      total,
+      limit,
+      offset,
+    });
+  })
 
-  const countResult = await db
-    .select({ count: count() })
-    .from(facts)
-    .where(whereClause);
-  const total = countResult[0].count;
+  // ---- POST /sync ----
+  // Uses manual JSON parsing to preserve the "invalid_json" error code
+  // for malformed request bodies.
+  .post("/sync", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
 
-  return c.json({
-    entityId,
-    facts: rows.map(formatFact),
-    total,
-    limit,
-    offset,
-  });
-});
+    const parsed = SyncFactsBatchSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-// ---- POST /sync ----
+    const { facts: items } = parsed.data;
+    const db = getDrizzleDb();
+    let upserted = 0;
 
-factsRoute.post("/sync", async (c) => {
-  const body = await parseJsonBody(c);
-  if (!body) return invalidJsonError(c);
+    await db.transaction(async (tx) => {
+      const allVals = items.map((f) => ({
+        entityId: f.entityId,
+        factId: f.factId,
+        label: f.label ?? null,
+        value: f.value ?? null,
+        numeric: f.numeric ?? null,
+        low: f.low ?? null,
+        high: f.high ?? null,
+        asOf: f.asOf ?? null,
+        measure: f.measure ?? null,
+        subject: f.subject ?? null,
+        note: f.note ?? null,
+        source: f.source ?? null,
+        sourceResource: f.sourceResource ?? null,
+        format: f.format ?? null,
+        formatDivisor: f.formatDivisor ?? null,
+      }));
 
-  const parsed = SyncBatchSchema.safeParse(body);
-  if (!parsed.success) return validationError(c, parsed.error.message);
+      await tx
+        .insert(facts)
+        .values(allVals)
+        .onConflictDoUpdate({
+          target: [facts.entityId, facts.factId],
+          set: {
+            label: sql`excluded.label`,
+            value: sql`excluded.value`,
+            numeric: sql`excluded.numeric`,
+            low: sql`excluded.low`,
+            high: sql`excluded.high`,
+            asOf: sql`excluded.as_of`,
+            measure: sql`excluded.measure`,
+            subject: sql`excluded.subject`,
+            note: sql`excluded.note`,
+            source: sql`excluded.source`,
+            sourceResource: sql`excluded.source_resource`,
+            format: sql`excluded.format`,
+            formatDivisor: sql`excluded.format_divisor`,
+            syncedAt: sql`now()`,
+            updatedAt: sql`now()`,
+          },
+        });
+      upserted = allVals.length;
+    });
 
-  const { facts: items } = parsed.data;
-  const db = getDrizzleDb();
-  let upserted = 0;
-
-  await db.transaction(async (tx) => {
-    const allVals = items.map((f) => ({
-      entityId: f.entityId,
-      factId: f.factId,
-      label: f.label ?? null,
-      value: f.value ?? null,
-      numeric: f.numeric ?? null,
-      low: f.low ?? null,
-      high: f.high ?? null,
-      asOf: f.asOf ?? null,
-      measure: f.measure ?? null,
-      subject: f.subject ?? null,
-      note: f.note ?? null,
-      source: f.source ?? null,
-      sourceResource: f.sourceResource ?? null,
-      format: f.format ?? null,
-      formatDivisor: f.formatDivisor ?? null,
-    }));
-
-    await tx
-      .insert(facts)
-      .values(allVals)
-      .onConflictDoUpdate({
-        target: [facts.entityId, facts.factId],
-        set: {
-          label: sql`excluded.label`,
-          value: sql`excluded.value`,
-          numeric: sql`excluded.numeric`,
-          low: sql`excluded.low`,
-          high: sql`excluded.high`,
-          asOf: sql`excluded.as_of`,
-          measure: sql`excluded.measure`,
-          subject: sql`excluded.subject`,
-          note: sql`excluded.note`,
-          source: sql`excluded.source`,
-          sourceResource: sql`excluded.source_resource`,
-          format: sql`excluded.format`,
-          formatDivisor: sql`excluded.format_divisor`,
-          syncedAt: sql`now()`,
-          updatedAt: sql`now()`,
-        },
-      });
-    upserted = allVals.length;
+    return c.json({ upserted });
   });
 
-  return c.json({ upserted });
-});
+// ---- Exports ----
+
+/**
+ * Facts route handler — mount at `/api/facts` in the main app.
+ *
+ * Also exports `FactsRoute` type for Hono RPC client type inference.
+ * Clients import this type and use `hc<FactsRoute>(baseUrl)` to get
+ * compile-time type-safe API calls with inferred request/response types.
+ */
+export const factsRoute = factsApp;
+export type FactsRoute = typeof factsApp;

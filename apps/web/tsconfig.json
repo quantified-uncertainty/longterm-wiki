@@ -21,7 +21,8 @@
       "@data": ["./src/data/index.ts"],
       "@data/*": ["./src/data/*"],
       "@lib/*": ["./src/lib/*"],
-      "@wiki-server/api-types": ["../wiki-server/src/api-types.ts"]
+      "@wiki-server/api-types": ["../wiki-server/src/api-types.ts"],
+      "@wiki-server/facts-route": ["../wiki-server/src/routes/facts.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
