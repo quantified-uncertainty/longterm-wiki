@@ -8,6 +8,18 @@ vi.mock("js-yaml", () => ({
   default: { load: vi.fn(() => []) },
 }));
 
+// Mock wiki-server to skip network calls — withApiFallback just calls localLoader directly
+vi.mock("@lib/wiki-server", () => ({
+  fetchFromWikiServer: vi.fn(async () => null),
+  withApiFallback: vi.fn(async (_apiLoader: unknown, localLoader: () => unknown) => ({
+    data: localLoader(),
+    source: "local" as const,
+  })),
+  fetchDetailed: vi.fn(async () => ({ ok: false, error: { type: "not-configured" } })),
+  getWikiServerConfig: vi.fn(() => null),
+  dataSourceLabel: vi.fn((source: string) => source === "api" ? "wiki-server API" : "local files"),
+}));
+
 // Create a minimal mock database
 const mockDatabase = {
   entities: [
@@ -480,7 +492,7 @@ describe("Data Layer", () => {
   describe("getUpdateSchedule", () => {
     it("includes internal pages in update schedule", async () => {
       const { getUpdateSchedule } = await import("../../data/index");
-      const items = getUpdateSchedule();
+      const { data: items } = await getUpdateSchedule();
       const internalItem = items.find((i: { id: string }) => i.id === "internal-doc");
       expect(internalItem).toBeDefined();
       expect(internalItem!.category).toBe("internal");
