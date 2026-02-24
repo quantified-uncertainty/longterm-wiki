@@ -526,10 +526,10 @@ describe('component-imports rule', () => {
 
 describe('frontmatter-schema rule', () => {
   it('valid frontmatter passes', () => {
-    const raw = '---\ntitle: Good Page\ndescription: A valid page\nquality: 50\n---\nContent';
+    const raw = '---\ntitle: Good Page\ndescription: A valid page\nquality: 50\ncreatedAt: 2025-01-01\n---\nContent';
     const content = mockContent('Content', {
       raw,
-      frontmatter: { title: 'Good Page', description: 'A valid page', quality: 50 },
+      frontmatter: { title: 'Good Page', description: 'A valid page', quality: 50, createdAt: new Date('2025-01-01') },
     });
     const issues = check(frontmatterSchemaRule, content);
     expect(issues.length).toBe(0);
