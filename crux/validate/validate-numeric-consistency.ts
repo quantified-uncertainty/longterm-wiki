@@ -109,8 +109,8 @@ function extractEntityContextClaims(
 
   // Find lines that mention the entity (via EntityLink or slug)
   const entityPatterns = [
-    new RegExp(`EntityLink[^>]*id=["']${entityId}["']`, 'gi'),
-    new RegExp(`\\b${entityId.replace(/-/g, '[- ]')}\\b`, 'gi'),
+    new RegExp(`EntityLink[^>]*id=["']${entityId}["']`, 'i'),
+    new RegExp(`\\b${entityId.replace(/-/g, '[- ]')}\\b`, 'i'),
   ];
 
   const entityLineNums = new Set<number>();
@@ -394,7 +394,7 @@ async function main() {
   const limit = topArg ? parseInt(topArg.split('=')[1], 10) : 20;
 
   const result = await runNumericConsistency({ entityId, json, limit });
-  process.exit(result.passed ? 0 : 0); // advisory only — never block CI
+  process.exit(0); // advisory only — never block CI
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
