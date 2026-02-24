@@ -6,10 +6,15 @@ interface BreadcrumbItem {
   href?: string;
 }
 
+const ACRONYMS: Record<string, string> = {
+  ai: "AI",
+  ml: "ML",
+};
+
 function formatCategory(category: string): string {
   return category
     .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .map((w) => ACRONYMS[w.toLowerCase()] ?? w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
 
@@ -30,10 +35,14 @@ export function Breadcrumbs({
       ? [{ label: "Internal", href: "/wiki/E779" }]
       : [{ label: "Wiki", href: "/wiki" }];
 
+  const CATEGORY_HREFS: Record<string, string> = {
+    "ai-transition-model": "/wiki/ai-transition-model",
+  };
+
   if (category && !isInternal) {
     items.push({
       label: formatCategory(category),
-      href: `/wiki?entity=${encodeURIComponent(category)}`,
+      href: CATEGORY_HREFS[category] ?? `/wiki?entity=${encodeURIComponent(category)}`,
     });
   }
 
