@@ -282,7 +282,7 @@
       value: Partial automation, human-led
   relatedEntries:
     - id: fast-takeoff
-      type: scenario
+      type: model
     - id: coding
       type: capability
     - id: superintelligence

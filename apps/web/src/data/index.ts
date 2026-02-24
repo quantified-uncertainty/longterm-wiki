@@ -285,20 +285,15 @@ export function getTypedEntities(): AnyEntity[] {
     if (result.success) {
       entities.push(result.data);
     } else {
-      // Unknown entity types (ai-transition-model-*, etc.) — keep all fields as-is.
+      // Unknown entity types — keep all fields as-is.
       // Don't re-parse through GenericEntitySchema as Zod would strip extra keys
       // like content, currentAssessment, ratings, causeEffectGraph.
       if (isDev) {
         const id = (raw as Record<string, unknown>).id;
         const type = (raw as Record<string, unknown>).entityType as string;
-        // Suppress warnings for known catch-all types that intentionally skip
-        // the discriminated union (they carry extra fields Zod would strip).
-        const isCatchAll = typeof type === "string" && type.startsWith("ai-transition-model-");
-        if (!isCatchAll) {
-          console.warn(
-            `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
-          );
-        }
+        console.warn(
+          `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
+        );
       }
       entities.push(raw as unknown as GenericEntity);
     }

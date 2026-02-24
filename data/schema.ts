@@ -552,12 +552,6 @@ export const EntityType = z.enum([
   'overview',
   'intelligence-paradigm',
   'internal',
-  // AI Transition Model specific types
-  'ai-transition-model-parameter',
-  'ai-transition-model-metric',
-  'ai-transition-model-scenario',
-  'ai-transition-model-factor',
-  'ai-transition-model-subitem',
   // --- Aliases (legacy/plural forms kept for backward compat) ---
   'researcher',        // → person
   'lab',               // → organization
@@ -989,8 +983,7 @@ export type FactsFile = z.infer<typeof FactsFile>;
  * A measure definition — a reusable "measurement type" that groups related facts.
  * Facts with the same measure across entities and time form a timeseries.
  *
- * We use "measure" (not "metric") to avoid collision with the existing wiki
- * entity type "metric" which represents measurement domain pages.
+ * We use "measure" (not "metric") as the canonical term for measurement types.
  */
 export const FactMeasure = z.object({
   label: z.string(),                           // Display name (e.g., "Valuation")

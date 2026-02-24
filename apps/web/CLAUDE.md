@@ -120,12 +120,11 @@ Facts are defined in `data/facts/*.yaml`, computed by `build-data.mjs`, and acce
 Content directories are **flat** (max 2 levels). Grouping is done via frontmatter `subcategory` metadata, not directory nesting:
 ```
 knowledge-base/models/          # All models flat — no risk-models/ subdirectory
-ai-transition-model/            # All ATM pages flat — no factors/ subdirectory
 ```
-Each page's `subcategory` field (e.g., `risk-models`, `factors-ai-capabilities`) is extracted at build time and used for sidebar navigation grouping.
+Each page's `subcategory` field (e.g., `risk-models`) is extracted at build time and used for sidebar navigation grouping.
 
 ### Wiki Sidebar Navigation
-`src/lib/wiki-nav.ts` builds contextual sidebars for Models and ATM pages. It uses `page.subcategory` for grouping — **not** file path parsing. The `detectSidebarType()` function checks top-level path prefixes to decide which sidebar to show.
+`src/lib/wiki-nav.ts` builds contextual sidebars for knowledge-base sections. It uses `page.subcategory` for grouping — **not** file path parsing. The `detectSidebarType()` function checks top-level path prefixes to decide which sidebar to show.
 
 ### Entity Type System
 - **Canonical types** are defined in `src/data/entity-ontology.ts` (labels, icons, colors, badges)

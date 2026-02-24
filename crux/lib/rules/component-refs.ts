@@ -203,8 +203,7 @@ export const componentRefsRule = createRule({
         const isValid = entities.has(id) ||
                         safetyApproaches.has(id) ||
                         id.startsWith('__index__/') ||
-                        entities.has(`__index__/${id}`) ||
-                        entities.has(`__index__/ai-transition-model/factors/${id}`);
+                        entities.has(`__index__/${id}`);
 
         if (!isValid) {
           issues.push(new Issue({

@@ -15,8 +15,6 @@ export const suggestions: SuggestedPage[] = [
   { title: "Frontier Model (Concept)", type: "concept", priority: 95, mentions: 161, reason: "The concept of 'frontier model' is used on 161 pages with no definition page." },
   { title: "Training Data", type: "concept", priority: 94, mentions: 111, reason: "Fundamental topic (curation, bias, consent, copyright) — 111 page mentions." },
   { title: "Safety Evaluations", type: "response", priority: 93, mentions: 106, reason: "Referenced on 106 pages; evals are how labs demonstrate safety." },
-  { title: "Misalignment Potential", type: "ai-transition-model", priority: 92, mentions: 110, reason: "110 EntityLinks to this transition-model factor, no page exists." },
-  { title: "Civilizational Competence", type: "ai-transition-model", priority: 91, mentions: 104, reason: "104 EntityLinks to this transition-model factor, no page exists." },
 
   // --- 85–94: 40–99 page mentions ---
   { title: "Model Evaluation (Methodology)", type: "response", priority: 90, mentions: 55, reason: "Referenced on 55 pages. Capability evals, dangerous-capability evals, eval science — no methodology page." },
@@ -41,7 +39,6 @@ export const suggestions: SuggestedPage[] = [
   { title: "Benchmarks & Leaderboards", type: "concept", priority: 73, mentions: 28, reason: "How capabilities are measured; gaming and limitations. 28 mentions." },
   { title: "Mistral AI", type: "organization", priority: 72, mentions: 27, reason: "Leading European frontier lab. Important for EU AI Act context." },
   { title: "DPO & RLHF Alternatives", type: "response", priority: 71, mentions: 27, reason: "DPO, IPO, KTO — alternatives to RLHF for alignment. 27 mentions." },
-  { title: "Transition Turbulence", type: "ai-transition-model", priority: 70, mentions: 26, reason: "26 EntityLinks to this transition-model factor, no page." },
 
   // --- 60–69: 15–25 page mentions, significant gaps ---
   { title: "Synthetic Data", type: "concept", priority: 69, mentions: 24, reason: "Self-play and synthetic training data — model collapse risk. 24 mentions." },
@@ -50,7 +47,6 @@ export const suggestions: SuggestedPage[] = [
   { title: "Knowledge Distillation", type: "concept", priority: 66, mentions: 20, reason: "Compressing large models; safety properties may not transfer. 20 mentions." },
   { title: "Post-Training (RLHF, Safety)", type: "concept", priority: 65, mentions: 20, reason: "Where safety alignment happens in practice. 20 mentions." },
   { title: "Content Provenance & C2PA", type: "response", priority: 64, mentions: 19, reason: "Technical countermeasure to deepfakes and AI content. 19 mentions." },
-  { title: "Misuse Potential", type: "ai-transition-model", priority: 63, mentions: 18, reason: "18 EntityLinks to this transition-model factor, no page." },
   { title: "AI Watermarking", type: "response", priority: 62, mentions: 18, reason: "SynthID, text watermarks — detection of AI-generated content." },
   { title: "Data Annotation & AI Labor", type: "concept", priority: 61, mentions: 18, reason: "Ghost work, RLHF annotators, labor conditions. 18 mentions." },
   { title: "Intelligence Explosion", type: "concept", priority: 60, mentions: 17, reason: "Core AI safety concept (Good, Bostrom). 17 mentions, no page." },

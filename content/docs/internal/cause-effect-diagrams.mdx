@@ -1,7 +1,7 @@
 ---
 numericId: E758
 title: "Cause-Effect Diagram Style Guide"
-description: "Guidelines for creating cause-effect diagrams in the AI Transition Model"
+description: "Guidelines for creating cause-effect diagrams in YAML format"
 sidebar:
   order: 4
 entityType: internal
@@ -11,7 +11,7 @@ researchImportance: 10
 lastEdited: "2026-02-17"
 update_frequency: 90
 evergreen: true
-llmSummary: "Comprehensive technical documentation for creating cause-effect diagrams in YAML format, covering node types (leaf/cause/intermediate/effect), edge properties (strength/confidence/effect), semantic color coding, scoring dimensions (novelty/sensitivity/changeability/certainty), and layout best practices with 15-20 node limits."
+llmSummary: "Technical documentation for creating cause-effect diagrams in YAML format, covering node types (leaf/cause/intermediate/effect), edge properties (strength/confidence/effect), semantic color coding, scoring dimensions (novelty/sensitivity/changeability/certainty), and layout best practices with 15-20 node limits."
 ratings:
   novelty: 0
   rigor: 6.5
@@ -26,8 +26,8 @@ import {EntityLink} from '@components/wiki';
 Cause-effect diagrams are defined in YAML under the `causeEffectGraph` property of entities:
 
 ```yaml
-- id: tmc-compute
-  type: ai-transition-model-subitem
+- id: example-compute
+  type: concept
   title: Compute
   causeEffectGraph:
     title: "What Drives Effective AI Compute?"
@@ -369,22 +369,12 @@ edges:
 
 ## Integration with Pages
 
-### Using TransitionModelContent
-
-For AI Transition Model pages, diagrams are automatically rendered by `TransitionModelContent`:
-
-```mdx
-import {TransitionModelContent} from '@components/wiki/TransitionModelContent';
-
-<TransitionModelContent slug="compute" />
-```
-
 ### Standalone Viewer
 
 Link to the standalone diagram viewer for presentations or full-screen viewing:
 
 ```
-/diagrams?entity=tmc-compute
+/diagrams?entity=<entity-id>
 ```
 
 ## Color Reference

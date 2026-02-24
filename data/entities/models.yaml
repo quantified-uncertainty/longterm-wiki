@@ -2426,8 +2426,6 @@
   relatedEntries:
     - id: pre-tai-capital-deployment
       type: model
-    - id: compute-hardware
-      type: ai-transition-model-metric
     - id: compute-governance
       type: policy
     - id: winner-take-all-concentration

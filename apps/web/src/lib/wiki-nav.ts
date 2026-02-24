@@ -174,91 +174,6 @@ export function getKbSectionNav(
 }
 
 // ============================================================================
-// AI TRANSITION MODEL NAV
-// ============================================================================
-
-// ATM section grouping based on subcategory values (set during content flattening)
-const ATM_SECTIONS: {
-  title: string;
-  subcategories: string[];
-  defaultOpen?: boolean;
-}[] = [
-  {
-    title: "Outcomes",
-    subcategories: ["outcomes"],
-  },
-  {
-    title: "Scenarios",
-    subcategories: [
-      "scenarios",
-      "scenarios-ai-takeover",
-      "scenarios-human-catastrophe",
-      "scenarios-long-term-lockin",
-    ],
-  },
-  {
-    title: "AI Factors",
-    subcategories: [
-      "factors",
-      "factors-ai-capabilities",
-      "factors-ai-uses",
-      "factors-ai-ownership",
-      "factors-misalignment-potential",
-    ],
-  },
-  {
-    title: "Civilizational Factors",
-    subcategories: [
-      "factors-civilizational-competence",
-      "factors-transition-turbulence",
-      "factors-misuse-potential",
-    ],
-  },
-  {
-    title: "Quantitative Models",
-    subcategories: ["models"],
-  },
-];
-
-export function getAtmNav(): NavSection[] {
-  const pages = getAllPages().filter(
-    (p) =>
-      p.filePath &&
-      p.filePath.startsWith("ai-transition-model/") &&
-      !isIndexFile(p.filePath)
-  );
-
-  // Top-level items (overview, parameter table)
-  const topItems = [
-    { label: "Overview", href: "/wiki/ai-transition-model" },
-    { label: "Parameter Table", href: getEntityHref("table") },
-  ];
-
-  const sections: NavSection[] = [
-    { title: "AI Transition Model", defaultOpen: true, items: topItems },
-  ];
-
-  for (const section of ATM_SECTIONS) {
-    const sectionPages = pages.filter(
-      (p) => p.subcategory && section.subcategories.includes(p.subcategory)
-    );
-    if (sectionPages.length === 0) continue;
-
-    const items = sectionPages
-      .map((p) => ({ label: p.title, href: getEntityHref(p.id) }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-
-    sections.push({
-      title: section.title,
-      defaultOpen: section.defaultOpen,
-      items,
-    });
-  }
-
-  return sections;
-}
-
-// ============================================================================
 // ABOUT NAV (user-facing pages)
 // ============================================================================
 
@@ -370,7 +285,6 @@ export function getInternalNav(): NavSection[] {
         { label: "Page Coverage Guide", href: internalHref("coverage-guide") },
         { label: "Cause-Effect Diagrams", href: internalHref("cause-effect-diagrams") },
         { label: "Research Reports", href: internalHref("research-reports") },
-        { label: "AI Transition Model", href: internalHref("ai-transition-model-style-guide") },
       ],
     },
     {
@@ -404,7 +318,7 @@ export function getInternalNav(): NavSection[] {
 // DETECT WHICH SIDEBAR TO SHOW
 // ============================================================================
 
-export type WikiSidebarType = "models" | "atm" | "internal" | "about" | "kb" | "section" | null;
+export type WikiSidebarType = "models" | "internal" | "about" | "kb" | "section" | null;
 
 /**
  * Determine which sidebar to show based on the entity path.
@@ -421,10 +335,6 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
     entityPath.startsWith("/knowledge-base/metrics/")
   ) {
     return "models";
-  }
-
-  if (entityPath.startsWith("/ai-transition-model/")) {
-    return "atm";
   }
 
   // About pages live under /internal/ but get their own sidebar.
@@ -498,8 +408,6 @@ export function getWikiNav(
         ...getKbSectionNav("models"),
         ...getKbSectionNav("metrics", false),
       ];
-    case "atm":
-      return getAtmNav();
     case "about":
       return getAboutNav();
     case "internal":
