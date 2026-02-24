@@ -121,5 +121,68 @@ describe("search", () => {
       // "xyz" doesn't appear in title or description, falls back to both
       expect(results[0].match["xyz"]).toEqual(["title", "description"]);
     });
+
+    it("passes through server snippet when present", async () => {
+      const serverResponse = {
+        results: [
+          {
+            id: "anthropic",
+            numericId: "E50",
+            title: "Anthropic",
+            description: "AI safety company founded by Dario Amodei",
+            entityType: "organization",
+            category: "organizations",
+            readerImportance: 80,
+            quality: 85,
+            score: 2.5,
+            snippet: "AI safety company founded by Dario <mark>Amodei</mark>",
+          },
+        ],
+        query: "amodei",
+        total: 1,
+      };
+
+      global.fetch = vi.fn().mockResolvedValueOnce(
+        new Response(JSON.stringify(serverResponse), { status: 200 }),
+      );
+
+      const { searchWiki } = await import("../search");
+      const results = await searchWiki("amodei");
+
+      expect(results).toHaveLength(1);
+      expect(results[0].snippet).toBe(
+        "AI safety company founded by Dario <mark>Amodei</mark>",
+      );
+    });
+
+    it("returns undefined snippet when server sends null", async () => {
+      const serverResponse = {
+        results: [
+          {
+            id: "test",
+            numericId: "E1",
+            title: "Test",
+            description: "A page",
+            entityType: "concept",
+            category: null,
+            readerImportance: null,
+            quality: null,
+            score: 1.0,
+            snippet: null,
+          },
+        ],
+        query: "test",
+        total: 1,
+      };
+
+      global.fetch = vi.fn().mockResolvedValueOnce(
+        new Response(JSON.stringify(serverResponse), { status: 200 }),
+      );
+
+      const { searchWiki } = await import("../search");
+      const results = await searchWiki("test");
+
+      expect(results[0].snippet).toBeUndefined();
+    });
   });
 });

@@ -1,21 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * GET /api/search?q=...&limit=20
+ * GET /api/explore?limit=50&offset=0&search=...&entityType=...&category=...&cluster=...&sort=...
  *
- * Proxies search requests to the wiki-server's PostgreSQL full-text search.
- * Returns 503 when the wiki-server is unavailable so the client can
- * degrade gracefully (empty results).
+ * Proxies explore requests to the wiki-server's /api/explore endpoint.
+ * Returns 503 when the wiki-server is unavailable so the client can fall back
+ * to local data.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
-  const q = searchParams.get("q");
-  const rawLimit = parseInt(searchParams.get("limit") ?? "20", 10);
-  const limit = Math.min(Math.max(isNaN(rawLimit) ? 20 : rawLimit, 1), 100);
-
-  if (!q || !q.trim()) {
-    return NextResponse.json({ results: [], query: "", total: 0 });
-  }
 
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
   if (!serverUrl) {
@@ -32,10 +25,11 @@ export async function GET(request: NextRequest) {
       headers["Authorization"] = `Bearer ${apiKey}`;
     }
 
-    const url = `${serverUrl}/api/pages/search?q=${encodeURIComponent(q)}&limit=${limit}`;
+    // Forward all query params to the wiki-server
+    const url = `${serverUrl}/api/explore?${searchParams.toString()}`;
     const res = await fetch(url, {
       headers,
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!res.ok) {

@@ -25,7 +25,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- wiki_pages: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("wiki_pages")) {
-    const COLS = 19;
+    const COLS = 24;
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
@@ -46,14 +46,19 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         tags: params[o + 8],
         quality: params[o + 9],
         reader_importance: params[o + 10],
-        hallucination_risk_level: params[o + 11],
-        hallucination_risk_score: params[o + 12],
-        content_plaintext: params[o + 13],
-        word_count: params[o + 14],
-        last_updated: params[o + 15],
-        content_format: params[o + 16],
-        synced_from_branch: params[o + 17],
-        synced_from_commit: params[o + 18],
+        research_importance: params[o + 11],
+        tactical_value: params[o + 12],
+        backlink_count: params[o + 13],
+        risk_category: params[o + 14],
+        date_created: params[o + 15],
+        recommended_score: params[o + 16],
+        clusters: params[o + 17],
+        hallucination_risk_level: params[o + 18],
+        hallucination_risk_score: params[o + 19],
+        content_plaintext: params[o + 20],
+        word_count: params[o + 21],
+        last_updated: params[o + 22],
+        content_format: params[o + 23],
         synced_at: now,
         created_at: existing?.created_at ?? now,
         updated_at: now,
@@ -69,13 +74,16 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return []; // No-op in tests — tsvector is a Postgres feature
   }
 
-  // --- wiki_pages: Full-text search via search_vector ---
-  if (q.includes("search_vector") && q.includes("plainto_tsquery") && !q.includes("update")) {
-    const searchQuery = params[0] as string;
-    const limit = (params[2] as number) || 20;
+  // --- wiki_pages: Full-text search via search_vector (prefix tsquery or plain) ---
+  if (q.includes("search_vector") && (q.includes("to_tsquery") || q.includes("plainto_tsquery")) && !q.includes("update")) {
+    // First param is the tsquery string (e.g. "anthropic:*" for prefix search)
+    const rawQuery = params[0] as string;
+    // Strip :* suffixes and & operators to get plain search words
+    const searchWords = rawQuery.replace(/:\*/g, "").replace(/\s*&\s*/g, " ").trim();
+    const limit = (params[1] as number) || 20;
     const results: Record<string, unknown>[] = [];
     for (const row of pagesStore.values()) {
-      if (simpleTextMatch(row, searchQuery)) {
+      if (simpleTextMatch(row, searchWords)) {
         results.push({
           id: row.id,
           numeric_id: row.numeric_id,
@@ -86,6 +94,33 @@ function dispatch(query: string, params: unknown[]): unknown[] {
           reader_importance: row.reader_importance,
           quality: row.quality,
           rank: 1.0,
+          snippet: row.description || null,
+        });
+      }
+    }
+    return results.slice(0, limit);
+  }
+
+  // --- wiki_pages: Trigram similarity fallback search ---
+  if (q.includes("similarity") && q.includes("wiki_pages") && !q.includes("update")) {
+    const searchQuery = params[0] as string;
+    const limit = (params[1] as number) || 20;
+    const excludeIds = (params[2] as string[]) || [];
+    const results: Record<string, unknown>[] = [];
+    for (const row of pagesStore.values()) {
+      if (excludeIds.includes(row.id as string)) continue;
+      if (simpleTextMatch(row, searchQuery)) {
+        results.push({
+          id: row.id,
+          numeric_id: row.numeric_id,
+          title: row.title,
+          description: row.description,
+          entity_type: row.entity_type,
+          category: row.category,
+          reader_importance: row.reader_importance,
+          quality: row.quality,
+          rank: 0.5,
+          snippet: row.description || null,
         });
       }
     }

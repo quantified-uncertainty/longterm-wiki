@@ -52,6 +52,13 @@ interface PageData {
   tags?: string[];
   quality?: number;
   readerImportance?: number;
+  researchImportance?: number;
+  tacticalValue?: number;
+  backlinkCount?: number;
+  riskCategory?: string;
+  dateCreated?: string;
+  recommendedScore?: number;
+  clusters?: string[];
   hallucinationRisk?: {
     level?: string;
     score?: number;
@@ -73,6 +80,13 @@ interface SyncPage {
   tags: string | null;
   quality: number | null;
   readerImportance: number | null;
+  researchImportance: number | null;
+  tacticalValue: number | null;
+  backlinkCount: number | null;
+  riskCategory: string | null;
+  dateCreated: string | null;
+  recommendedScore: number | null;
+  clusters: string[] | null;
   hallucinationRiskLevel: string | null;
   hallucinationRiskScore: number | null;
   contentPlaintext: string | null;
@@ -109,6 +123,13 @@ function transformPage(page: PageData): SyncPage {
     tags: page.tags ? JSON.stringify(page.tags) : null,
     quality: page.quality ?? null,
     readerImportance: page.readerImportance != null ? Math.round(page.readerImportance) : null,
+    researchImportance: page.researchImportance != null ? Math.round(page.researchImportance) : null,
+    tacticalValue: page.tacticalValue != null ? Math.round(page.tacticalValue) : null,
+    backlinkCount: page.backlinkCount ?? null,
+    riskCategory: page.riskCategory ?? null,
+    dateCreated: page.dateCreated ?? null,
+    recommendedScore: page.recommendedScore ?? null,
+    clusters: page.clusters ?? null,
     hallucinationRiskLevel: page.hallucinationRisk?.level ?? null,
     hallucinationRiskScore: page.hallucinationRisk?.score ?? null,
     contentPlaintext: content,
