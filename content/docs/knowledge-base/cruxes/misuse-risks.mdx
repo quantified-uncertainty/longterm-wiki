@@ -27,10 +27,10 @@ import {Crux, CruxList, DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid} 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
 | **Overall Severity** | High | AI misuse incidents rose 8x since 2022; <EntityLink id="deepfakes">deepfakes</EntityLink> responsible for 6.5% of all fraud ([AI Incident Database](https://incidentdatabase.ai/)) |
-| **Current Uplift Evidence** | Mixed | RAND 2024 <EntityLink id="bioweapons">bioweapons</EntityLink> study found no significant uplift; <EntityLink id="openai">OpenAI</EntityLink> cyber CTF scores improved <F e="openai" f="be463d29">27%</F> to <F e="openai" f="25d2308f">76%</F> in 3 months ([RAND](https://www.rand.org/pubs/research_reports/RRA2977-2.html), [OpenAI](https://openai.com/index/strengthening-cyber-resilience/)) |
-| **Bioweapons Risk** | Contested | <F e="openai" f="931278d9">13</F>/57 AI bio-tools rated "Red" risk; OpenAI o3 at <F e="openai" f="84af6115">94th</F> percentile virology; wet-lab bottleneck may dominate |
+| **Current Uplift Evidence** | Mixed | RAND 2024 <EntityLink id="bioweapons">bioweapons</EntityLink> study found no significant uplift; <EntityLink id="openai">OpenAI</EntityLink> cyber CTF scores improved 27% to 76% in 3 months ([RAND](https://www.rand.org/pubs/research_reports/RRA2977-2.html), [OpenAI](https://openai.com/index/strengthening-cyber-resilience/)) |
+| **Bioweapons Risk** | Contested | 13/57 AI bio-tools rated "Red" risk; OpenAI o3 at 94th percentile virology; wet-lab bottleneck may dominate |
 | **Cyber Risk** | Escalating | 68% of analysts say AI phishing harder to detect; 703% increase in credential phishing H2 2024 ([Deepstrike](https://deepstrike.io/blog/ai-cybersecurity-threats-2025)) |
-| **<EntityLink id="disinformation">Disinformation</EntityLink> Risk** | High | Deepfake fraud up 2,137% since 2022; human detection accuracy only <F e="openai" f="84af6115">24.5%</F> ([UNESCO](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing)) |
+| **<EntityLink id="disinformation">Disinformation</EntityLink> Risk** | High | Deepfake fraud up 2,137% since 2022; human detection accuracy only 24.5% ([UNESCO](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing)) |
 | **Mitigation Effectiveness** | Partial | Guardrails reduce casual misuse; open-source models bypass restrictions; DNA screening at 97% after 2024 patch |
 | **Trend** | Worsening | Q1 2025 deepfake incidents exceeded all of 2024 by 19%; AI cyber capabilities accelerating faster than defenses |
 
@@ -66,7 +66,7 @@ flowchart TD
         BIO[Bioweapons<br/>RAND: no significant uplift]
         CYBER[Cyberweapons<br/>CTF: 27% to 76%]
         DISINFO[Disinformation<br/>8M deepfakes by 2025]
-        AWS[Autonomous Weapons<br/>UN Resolution <F e="openai" f="be463d29">166</F>-3]
+        AWS[Autonomous Weapons<br/>UN Resolution 166-3]
     end
 
     subgraph Responses["Policy Responses"]
@@ -127,7 +127,7 @@ flowchart TD
 | **Deepfakes** | Avg. business loss per incident | ≈\$100,000 | [Deloitte Financial Services](https://www2.deloitte.com/us/en/pages/financial-services/articles/deepfakes-financial-services.html) | 2024 |
 | **Deepfakes** | Fraud incidents involving deepfakes | >6% of all fraud | [European Parliament Research](https://www.europarl.europa.eu/RegData/etudes/BRIE/2025/775855/EPRS_BRI(2025)775855_EN.pdf) | 2025 |
 | **Deepfakes** | Human detection accuracy (video) | 24.5% | Academic studies | 2024 |
-| **Deepfakes** | Tool detection accuracy | ≈<F e="openai" f="84af6115">75%</F> | [UNESCO Report](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing) | 2024 |
+| **Deepfakes** | Tool detection accuracy | ≈75% | [UNESCO Report](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing) | 2024 |
 | **Disinformation** | Political deepfakes documented | 82 cases in 38 countries | Academic research | 2024 |
 | **Fraud** | Projected GenAI fraud losses (US) | \$12.3B (2023) to \$10B (2027) | [Deloitte Forecast](https://www2.deloitte.com/us/en/pages/financial-services/articles/deepfakes-financial-services.html) | 2024 |
 
@@ -265,7 +265,7 @@ flowchart TD
 
 | Capability | Offensive Potential | Defensive Potential | Current Balance | Trend | Evidence |
 |------------|-------------------|-------------------|-----------------|-------|----------|
-| **Vulnerability Discovery** | High - CTF scores <F e="openai" f="25d2308f">27%->76%</F> (3 months) | Medium - AI-assisted patching | Favors offense | Accelerating | [OpenAI 2025](https://openai.com/index/strengthening-cyber-resilience/) |
+| **Vulnerability Discovery** | High - CTF scores 27%->76% (3 months) | Medium - AI-assisted patching | Favors offense | Accelerating | [OpenAI 2025](https://openai.com/index/strengthening-cyber-resilience/) |
 | **Social Engineering** | Very High - voice phishing up 442% | Low - human factor remains | Strongly favors offense | Widening gap | 49% of businesses report deepfake fraud |
 | **Incident Response** | Low | High - automated threat hunting | Favors defense | Strengthening | \$1B+ annual AI cybersecurity investment |
 | **Malware Development** | Medium - autonomous malware adapting in real-time | High - behavioral detection | Roughly balanced | Evolving | [Microsoft 2025 DDR](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025) |

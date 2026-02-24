@@ -29,7 +29,7 @@ import {DataInfoBox, Mermaid, R, DataExternalLinks, EntityLink} from '@component
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| Capability Level | **Superhuman on structured tasks** | GPT-5.2: 100% AIME <F e="openai" f="609b9796">20</F>25 (no tools); Claude Opus 4.5: 80.9% SWE-bench; o4-mini: 99.5% AIME (w/ tools) |
+| Capability Level | **Superhuman on structured tasks** | GPT-5.2: 100% AIME 2025 (no tools); Claude Opus 4.5: 80.9% SWE-bench; o4-mini: 99.5% AIME (w/ tools) |
 | Abstract Reasoning | **Approaching human parity** | ARC-AGI-2: GPT-5.2 reaches 52.9%, Poetiq 54% vs. 60% human average; dramatic progress from less than 3% in early 2025 |
 | Rate of Progress | **Accelerating with efficiency gains** | 390x cost reduction for ARC-AGI-1 (88%) in one year; FrontierMath: GPT-5.2 solves 40.3% |
 | Interpretability Value | **Moderate but fragile** | CoT provides visibility, but hint acknowledgment only 19-41% ([Anthropic 2025](https://www.anthropic.com/research/reasoning-models-dont-say-think)) |
@@ -73,7 +73,7 @@ Several variants of CoT have emerged, including few-shot CoT where examples of r
 | Claude 3.7 Sonnet | 54.8% | 62.3% | — | — | 68-85% | — |
 | Claude Opus 4 | 75.5-90% | 72.5% | — | 8.6% | — | — |
 | Claude Opus 4.5 | 93-100% | **80.9%** | — | 37.6% | — | — |
-| o3 | 88.9% | <F e="openai" f="25d2308f">71.7</F>% | <F e="openai" f="84af6115">87.5%</F> | less than 3% | <F e="openai" f="84af6115">83</F>.3% | 25.2% |
+| o3 | 88.9% | 71.7% | 87.5% | less than 3% | 83.3% | 25.2% |
 | o4-mini (w/ Python) | 99.5% | — | 41% | 2.3% | — | — |
 | GPT-5 | 94.6% | 74.9% | — | 9.9% | 84.2% | — |
 | GPT-5.2 (Thinking) | **100%** | — | 90.5% | **52.9%** | **93.2%** | **40.3%** |
@@ -84,7 +84,7 @@ Several variants of CoT have emerged, including few-shot CoT where examples of r
 
 *Sources: [OpenAI GPT-5](https://openai.com/index/introducing-gpt-5/), [OpenAI GPT-5.2](https://openai.com/index/introducing-gpt-5-2/), [ARC Prize Leaderboard](https://arcprize.org/leaderboard), [Anthropic Opus 4.5](https://www.anthropic.com/news/claude-opus-4-5), [Gemini 2.5](https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/)*
 
-The performance improvements achieved by o1 are dramatic. On the <R id="9edf2bd5938d8386">American Invitational Mathematics Examination (AIME)</R>, o1 achieved a score of 74-<F e="openai" f="84af6115">83%</F> compared to GPT-4o's 12%. A score of 83% (12.5/15) places it among the top 500 students nationally and above the cutoff for the USA Mathematical Olympiad. In competitive programming contests, o1 reached the 89th percentile on Codeforces problems, demonstrating sophisticated algorithmic thinking. The model also showed PhD-level performance on physics, biology, and chemistry problems, often providing detailed derivations and explanations that rival expert human solutions.
+The performance improvements achieved by o1 are dramatic. On the <R id="9edf2bd5938d8386">American Invitational Mathematics Examination (AIME)</R>, o1 achieved a score of 74-83% compared to GPT-4o's 12%. A score of 83% (12.5/15) places it among the top 500 students nationally and above the cutoff for the USA Mathematical Olympiad. In competitive programming contests, o1 reached the 89th percentile on Codeforces problems, demonstrating sophisticated algorithmic thinking. The model also showed PhD-level performance on physics, biology, and chemistry problems, often providing detailed derivations and explanations that rival expert human solutions.
 
 The training methodology for o1 likely involves reinforcement learning on reasoning processes, where the model is rewarded not just for correct final answers but for the quality and accuracy of intermediate reasoning steps. This represents a significant departure from traditional language model training, which focuses primarily on next-token prediction. The approach suggests that reasoning can be explicitly trained and optimized, rather than simply emerging as a byproduct of language modeling capabilities.
 
@@ -243,7 +243,7 @@ However, significant limitations persist in areas requiring creative insight, ha
 
 ## Open-Source Reasoning: DeepSeek R1
 
-<R id="afad87e802e53736">DeepSeek R1</R>, released January 2025, represents a significant development: open-source reasoning capabilities approaching frontier closed models. The model achieves <F e="openai" f="84af6115">79.8%</F> on AIME and 2,029 Codeforces Elo—competitive with o1—while being fully open-weight with a 671B parameter Mixture of Experts architecture (37B active per forward pass).
+<R id="afad87e802e53736">DeepSeek R1</R>, released January 2025, represents a significant development: open-source reasoning capabilities approaching frontier closed models. The model achieves 79.8% on AIME and 2,029 Codeforces Elo—competitive with o1—while being fully open-weight with a 671B parameter Mixture of Experts architecture (37B active per forward pass).
 
 Notably, DeepSeek demonstrated that reasoning capabilities can emerge purely through reinforcement learning without supervised fine-tuning. Their DeepSeek-R1-Zero model developed self-verification, reflection, and extended chain-of-thought capabilities through RL alone—"the first open research to validate that reasoning capabilities of LLMs can be incentivized purely through RL."
 

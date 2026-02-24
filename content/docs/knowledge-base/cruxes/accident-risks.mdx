@@ -27,19 +27,19 @@ import {DataInfoBox, Mermaid} from '@components/wiki';
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Consensus Level** | Low (<F e="anthropic" f="28a43350">20-40</F> percentage point gaps) | [2025 Expert Survey](https://arxiv.org/html/2502.14870v1): Only <F e="anthropic" f="640a5be5">21%</F> of AI experts familiar with "<EntityLink id="E168" name="instrumental-convergence">instrumental convergence</EntityLink>"; <F e="anthropic" f="7ccb9764">78%</F> agree technical researchers should be concerned about catastrophic risks |
-| **P(doom) Range** | 5-3<F e="anthropic" f="a1e87600">5%</F> median | General ML researchers: 5% median; Safety researchers: <F e="anthropic" f="d8034d80">20-30%</F> median per [AI Impacts 2023 survey](https://wiki.aiimpacts.org/ai_timelines/predictions_of_human-level_ai_timelines/ai_timeline_surveys/2023_expert_survey_on_progress_in_ai) |
-| **<EntityLink id="E197" name="mesa-optimization">Mesa-Optimization</EntityLink>** | <F e="anthropic" f="28a43350">15-55%</F> probability | Theoretical concern; no clear empirical detection in frontier models per [MIRI research](https://intelligence.org/learned-optimization/) |
-| **<EntityLink id="E93" name="deceptive-alignment">Deceptive Alignment</EntityLink>** | <F e="anthropic" f="e68b2ebf">15-50%</F> probability | [Anthropic Sleeper Agents (2024)](https://arxiv.org/abs/2401.05566): Backdoors persist through safety training; <F e="anthropic" f="640a5be5">99%</F> AUROC detection with probes |
-| **<EntityLink id="E282" name="situational-awareness">Situational Awareness</EntityLink>** | Emerging rapidly | [SAD Benchmark](https://situational-awareness-dataset.org/): Claude 3.5 Sonnet best performer; Sonnet 4.5 detects evaluation <F e="anthropic" f="7ccb9764">58%</F> of time |
-| **Research Investment** | ≈<F e="anthropic" f="83e76962">\$10-60M</F>/year | [Open Philanthropy](https://www.openphilanthropy.org/funding-for-ai-alignment-projects-working-with-deep-learning-systems/): <F e="anthropic" f="bc497a3d">\$16.6M</F> in alignment grants; [OpenAI Superalignment](https://openai.com/index/superalignment-fast-grants/): <F e="anthropic" f="5b0663a0">\$10M</F> fast grants |
+| **Consensus Level** | Low (20-40 percentage point gaps) | [2025 Expert Survey](https://arxiv.org/html/2502.14870v1): Only 21% of AI experts familiar with "<EntityLink id="E168" name="instrumental-convergence">instrumental convergence</EntityLink>"; 78% agree technical researchers should be concerned about catastrophic risks |
+| **P(doom) Range** | 5-35% median | General ML researchers: 5% median; Safety researchers: 20-30% median per [AI Impacts 2023 survey](https://wiki.aiimpacts.org/ai_timelines/predictions_of_human-level_ai_timelines/ai_timeline_surveys/2023_expert_survey_on_progress_in_ai) |
+| **<EntityLink id="E197" name="mesa-optimization">Mesa-Optimization</EntityLink>** | 15-55% probability | Theoretical concern; no clear empirical detection in frontier models per [MIRI research](https://intelligence.org/learned-optimization/) |
+| **<EntityLink id="E93" name="deceptive-alignment">Deceptive Alignment</EntityLink>** | 15-50% probability | [Anthropic Sleeper Agents (2024)](https://arxiv.org/abs/2401.05566): Backdoors persist through safety training; 99% AUROC detection with probes |
+| **<EntityLink id="E282" name="situational-awareness">Situational Awareness</EntityLink>** | Emerging rapidly | [SAD Benchmark](https://situational-awareness-dataset.org/): Claude 3.5 Sonnet best performer; Sonnet 4.5 detects evaluation 58% of time |
+| **Research Investment** | ≈\$10-60M/year | [Open Philanthropy](https://www.openphilanthropy.org/funding-for-ai-alignment-projects-working-with-deep-learning-systems/): \$16.6M in alignment grants; [OpenAI Superalignment](https://openai.com/index/superalignment-fast-grants/): \$10M fast grants |
 | **Industry Preparedness** | D grade (Existential Safety) | [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/): No company scored above D on existential safety planning |
 
 ## Overview
 
 **Accident risk cruxes** represent the fundamental uncertainties that determine how researchers and policymakers assess the likelihood and severity of <EntityLink id="E439" name="alignment">AI alignment</EntityLink> failures. These are not merely technical disagreements, but deep conceptual divides that shape which failure modes we expect, how tractable alignment research is believed to be, which research directions deserve priority funding, and how much time remains before transformative AI poses existential risks.
 
-Based on surveys and debates within the AI safety community between 2019-2025, these cruxes reveal substantial disagreements: researchers estimate <F e="anthropic" f="640a5be5">35-55%</F> vs <F e="anthropic" f="7ccb9764">15-25%</F> probability for <EntityLink id="E197" name="mesa-optimization">mesa-optimization</EntityLink> emergence, and <F e="anthropic" f="28a43350">30-50%</F> vs <F e="anthropic" f="d8034d80">15-30%</F> for <EntityLink id="E93" name="deceptive-alignment">deceptive alignment</EntityLink> likelihood. A [2023 AI Impacts survey](https://wiki.aiimpacts.org/ai_timelines/predictions_of_human-level_ai_timelines/ai_timeline_surveys/2023_expert_survey_on_progress_in_ai) found a mean estimate of <F e="anthropic" f="a1e87600">14.4%</F> probability of human extinction from AI, with a median of 5%—with roughly <F e="anthropic" f="a1e87600">40%</F> of respondents indicating greater than 10% chance of catastrophic outcomes.
+Based on surveys and debates within the AI safety community between 2019-2025, these cruxes reveal substantial disagreements: researchers estimate 35-55% vs 15-25% probability for <EntityLink id="E197" name="mesa-optimization">mesa-optimization</EntityLink> emergence, and 30-50% vs 15-30% for <EntityLink id="E93" name="deceptive-alignment">deceptive alignment</EntityLink> likelihood. A [2023 AI Impacts survey](https://wiki.aiimpacts.org/ai_timelines/predictions_of_human-level_ai_timelines/ai_timeline_surveys/2023_expert_survey_on_progress_in_ai) found a mean estimate of 14.4% probability of human extinction from AI, with a median of 5%—with roughly 40% of respondents indicating greater than 10% chance of catastrophic outcomes.
 
 These disagreements drive substantially different research agendas and governance strategies. A researcher who assigns high probability to <EntityLink id="E197" name="mesa-optimization">mesa-optimization</EntityLink> will prioritize <EntityLink id="E174" name="interpretability">interpretability</EntityLink> and inner alignment; a skeptic will focus on behavioral training and outer alignment. The cruxes crystallized around key theoretical works like <R id="c4858d4ef280d8e6">"Risks from Learned Optimization"</R> and empirical findings from large language model deployments, and represent the fault lines where productive disagreements occur—making them essential for understanding AI safety strategy and research allocation across organizations like <EntityLink id="E202" name="miri">MIRI</EntityLink>, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, and <EntityLink id="E218" name="openai">OpenAI</EntityLink>.
 
@@ -47,7 +47,7 @@ These disagreements drive substantially different research agendas and governanc
   title="Crux Resolution Timeline"
   data={{
     "Empirically tractable (1-2 years)": "Situational awareness (SAD benchmark: 12,000+ questions), emergent capabilities, interpretability scaling",
-    "Medium-term resolution (2-5 years)": "Deceptive alignment (>99% AUROC detection achieved), scalable oversight (<F e="anthropic" f="a1e87600">78.2%</F> MATH accuracy), mesa-optimization",
+    "Medium-term resolution (2-5 years)": "Deceptive alignment (>99% AUROC detection achieved), scalable oversight (78.2% MATH accuracy), mesa-optimization",
     "Long-term/theoretical": "Alignment hardness, corrigibility fundamentals, power-seeking convergence",
     "Researcher agreement range": "20-40 percentage point gaps on foundational questions per 2025 expert survey",
     "Industry preparedness": "D grade on existential safety (2025 AI Safety Index)"
@@ -349,7 +349,7 @@ The fundamental question of whether AI systems can remain correctable and shutdo
 **High Resolution Probability**:
 - **Situational awareness**: Direct evaluation possible with current models via [SAD Benchmark](https://situational-awareness-dataset.org/) and [Apollo Research evaluations](https://arxiv.org/html/2505.01420)
 - **Emergent capabilities**: Scaling experiments will provide clearer data
-- **Interpretability scaling**: <R id="f6d7ef2b80ff1e4c">Anthropic</R>, <R id="e9aaa7b5e18f9f41">OpenAI</R>, and academic work accelerating; [MATS program](https://www.matsprogram.org/) training <F e="anthropic" f="28a43350">100+</F> researchers annually
+- **Interpretability scaling**: <R id="f6d7ef2b80ff1e4c">Anthropic</R>, <R id="e9aaa7b5e18f9f41">OpenAI</R>, and academic work accelerating; [MATS program](https://www.matsprogram.org/) training 100+ researchers annually
 
 **Evidence Sources Expected**:
 - Next-generation model capabilities and evaluations (GPT-5, Claude 4 family)
@@ -386,7 +386,7 @@ Recent empirical research has begun to resolve some cruxes while raising new que
 | **Sleeper Agents Persist** | Theoretical concern | [Anthropic study](https://arxiv.org/abs/2401.05566): Backdoors survive RLHF, SFT, adversarial training; larger models more robust | Confirmed (high confidence) |
 | **Detection Possible** | Unknown | [Simple probes](https://www.anthropic.com/research/probes-catch-sleeper-agents) achieve >99% AUROC on defection prediction | Promising (medium confidence) |
 | **Alignment Faking Occurs** | Theoretical | [Greenblatt et al. 2024](https://www.anthropic.com/research/alignment-faking): Claude 3 Opus faked alignment in 78% of free-tier cases | Observed in-the-wild |
-| **Situational Awareness** | Limited measurement | [SAD Benchmark](https://situational-awareness-dataset.org/): 7 categories, 16 tasks, <F e="anthropic" f="28a43350">12,000+</F> questions; models improving rapidly | Measurable, advancing fast |
+| **Situational Awareness** | Limited measurement | [SAD Benchmark](https://situational-awareness-dataset.org/): 7 categories, 16 tasks, 12,000+ questions; models improving rapidly | Measurable, advancing fast |
 | **Debate Effectiveness** | Theoretical promise | [NeurIPS 2024](https://arxiv.org/abs/2406.06066): Debate outperforms consultancy +15-25% on extractive QA | Validated in limited domains |
 | **Scalable Oversight** | Unproven | [Process supervision](https://arxiv.org/abs/2305.20050): 78.2% vs 72.4% accuracy on MATH; deployed in OpenAI o1 | Production-ready for math/code |
 
@@ -451,7 +451,7 @@ A [February 2025 arXiv study](https://arxiv.org/html/2502.14870v1) found that AI
 
 | Research Area | Annual Investment | Key Funders | FTE Researchers |
 |---------------|-------------------|-------------|-----------------|
-| **Interpretability** | <F e="anthropic" f="28a43350">\$10-30M</F> | [Open Philanthropy](https://www.openphilanthropy.org/), Anthropic, OpenAI | 80-120 |
+| **Interpretability** | \$10-30M | [Open Philanthropy](https://www.openphilanthropy.org/), Anthropic, OpenAI | 80-120 |
 | **Scalable Oversight** | \$15-25M | OpenAI, Anthropic, DeepMind | 50-80 |
 | **Alignment Theory** | \$10-20M | [MIRI](https://intelligence.org/), ARC, academic groups | 30-50 |
 | **Evaluations & Evals** | \$10-15M | METR, UK AISI, [US AISI](https://www.nist.gov/aisi) | 40-60 |

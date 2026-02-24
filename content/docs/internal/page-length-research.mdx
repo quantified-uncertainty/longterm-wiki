@@ -13,7 +13,7 @@ evergreen: false
 
 ## Problem Statement
 
-The wiki has ~<F e="ssi" f="a0502d56">625</F> pages ranging from empty stubs (0 words) to comprehensive analyses (10,000+ words). Different readers want different levels of depth:
+The wiki has ~625 pages ranging from empty stubs (0 words) to comprehensive analyses (10,000+ words). Different readers want different levels of depth:
 
 - **Skimmers** want a 2-sentence takeaway
 - **Decision-makers** want a structured 200-word summary with key numbers
@@ -94,8 +94,8 @@ Keep full SSG but make sections below the overview collapsed by default on long 
 1. **Auto-wrap H2 sections** in a `<CollapsibleSection>` component during MDX compilation. The Radix UI Collapsible primitive already exists in the codebase (`app/src/components/ui/collapsible.tsx`).
 
 2. **Default behavior by page length:**
-   - \< <F e="ssi" f="a0502d56">1,500</F> words: all sections expanded (short page, no need to collapse)
-   - 1,500–<F e="ssi" f="a0502d56">4,000</F> words: Overview expanded, rest collapsed
+   - \< 1,500 words: all sections expanded (short page, no need to collapse)
+   - 1,500–4,000 words: Overview expanded, rest collapsed
    - \> 4,000 words: Overview expanded, rest collapsed, with a "Expand all" button
 
 3. **Remember user state**: Use localStorage (pattern already established with `DevModeToggle` and `InfoBoxVisibility`) to remember which sections the user expanded.
@@ -113,13 +113,13 @@ Give readers a "Summary / Standard / Full" toggle that controls how much of the 
 **What to do:**
 
 1. **Three view modes:**
-   - **Summary**: InfoBox + structured summary + key takeaways only (~<F e="ssi" f="a0502d56">200–400</F> words). No article body.
-   - **Standard**: Overview section + Quick Assessment + collapsed detail sections (~<F e="ssi" f="a0502d56">800–1,500</F> words visible).
+   - **Summary**: InfoBox + structured summary + key takeaways only (~200–400 words). No article body.
+   - **Standard**: Overview section + Quick Assessment + collapsed detail sections (~800–1,500 words visible).
    - **Full**: Everything expanded, as today.
 
 2. **A `<ViewModeProvider>` context** (following the `InfoBoxVisibilityProvider` pattern) wrapping the page layout. A toggle in the page header or breadcrumb bar.
 
-3. **Persist preference** in localStorage. Default to "Standard" for pages over <F e="ssi" f="a0502d56">3,000</F> words, "Full" for shorter pages.
+3. **Persist preference** in localStorage. Default to "Standard" for pages over 3,000 words, "Full" for shorter pages.
 
 4. **URL parameter support**: `?view=summary` so links can point to a specific view. Useful for sharing with non-technical audiences.
 

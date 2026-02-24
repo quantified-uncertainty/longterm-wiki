@@ -89,12 +89,12 @@ EntityLinks are added during synthesis, then validated. But the system doesn't r
 
 | Innovation | How It Works | Relevance to Us |
 |------------|-------------|-----------------|
-| **Perspective-guided research** | Discovers multiple perspectives by surveying similar articles, then simulates conversations from each perspective | We could mine perspectives from our existing <F e="anthropic" f="28a43350">625</F> pages on related topics |
+| **Perspective-guided research** | Discovers multiple perspectives by surveying similar articles, then simulates conversations from each perspective | We could mine perspectives from our existing 625 pages on related topics |
 | **Simulated expert conversations** | A "writer" agent asks questions to a "topic expert" agent grounded in search results. Follow-up questions arise naturally | Better than our "dump all research into one synthesis prompt" approach |
 | **Two-stage pipeline** | Pre-writing (research + outline) is separated from writing. Outline quality correlates with article quality | We already do this loosely; could formalize it |
 | **Co-STORM mind map** | Organizes collected information into a hierarchical concept structure updated throughout the process | Maps to our entity graph, but dynamically maintained during authoring |
 
-**Key finding**: STORM articles were rated <F e="anthropic" f="fac5b934">25%</F> better organized and <F e="anthropic" f="a1e87600">10%</F> broader in coverage than baseline RAG approaches by Wikipedia editors.
+**Key finding**: STORM articles were rated 25% better organized and 10% broader in coverage than baseline RAG approaches by Wikipedia editors.
 
 **Limitation**: STORM produces Wikipedia-style articles but doesn't handle our specific requirements: EntityLinks, Squiggle models, Mermaid diagrams, YAML entity synchronization, or the frontmatter/grading system.
 
@@ -120,7 +120,7 @@ The pattern: Researcher -> Writer -> Editor -> Specialist, with each agent optim
 
 ### Self-Refine (Madaan et al., 2023)
 
-[Self-Refine](https://selfrefine.info/) demonstrates that iterative `generate -> feedback -> refine` loops improve LLM output by ~<F e="anthropic" f="d8034d80">20%</F> on average. The key: the same model generates, critiques, and refines, but with different prompts for each role.
+[Self-Refine](https://selfrefine.info/) demonstrates that iterative `generate -> feedback -> refine` loops improve LLM output by ~20% on average. The key: the same model generates, critiques, and refines, but with different prompts for each role.
 
 **Key finding**: The refine loop works best when feedback is *specific and actionable* (not "make it better" but "paragraph 3 lacks a citation for the 40% claim"). This maps to our validation rules, which already produce specific, fixable issues.
 
@@ -132,7 +132,7 @@ The pattern: Researcher -> Writer -> Editor -> Specialist, with each agent optim
 
 ### Anthropic Multi-Agent Research System (2025)
 
-[Anthropic's own research system](https://www.anthropic.com/engineering/multi-agent-research-system) uses an orchestrator-worker pattern: a lead agent analyzes a query, develops strategy, and spawns subagents to explore different aspects in parallel. Multi-agent Opus + Sonnet outperformed single-agent Opus by **<F e="anthropic" f="640a5be5">90.2%</F>** on their research eval.
+[Anthropic's own research system](https://www.anthropic.com/engineering/multi-agent-research-system) uses an orchestrator-worker pattern: a lead agent analyzes a query, develops strategy, and spawns subagents to explore different aspects in parallel. Multi-agent Opus + Sonnet outperformed single-agent Opus by **90.2%** on their research eval.
 
 **Key insight**: Use expensive models (Opus) for orchestration and synthesis, cheap models (Sonnet/Haiku) for parallel research and extraction. This is exactly the cost structure we should adopt.
 

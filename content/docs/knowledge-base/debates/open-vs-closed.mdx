@@ -27,7 +27,7 @@ import {ComparisonTable, DisagreementMap, InfoBox, KeyQuestions, DataExternalLin
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
 | **Market Trajectory** | Open models closing gap rapidly | Performance difference narrowed from 8% to 1.7% in one year ([Stanford HAI 2025](https://hai.stanford.edu/ai-index/2025-ai-index-report)) |
-| **Adoption Scale** | <F e="meta-ai" f="7ca19e9d">1.2B</F>+ Llama downloads by April 2025 | [Meta reports](https://ai.meta.com/blog/future-of-ai-built-with-llama/) <F e="meta-ai" f="a1122c60">53%</F> growth in Q1 2025; 50%+ Fortune 500 experimenting |
+| **Adoption Scale** | 1.2B+ Llama downloads by April 2025 | [Meta reports](https://ai.meta.com/blog/future-of-ai-built-with-llama/) 53% growth in Q1 2025; 50%+ Fortune 500 experimenting |
 | **Enterprise Share** | Open source declining slightly | 11-13% enterprise workloads use open models, down from 19% in 2024 ([Menlo Ventures](https://menlovc.com/perspective/2025-mid-year-llm-market-update/)) |
 | **Cost Efficiency** | Open dramatically cheaper | DeepSeek R1 runs 20-50x cheaper than comparable closed models; 90-95% training cost reduction |
 | **Safety Guardrails** | Significant vulnerability | Fine-tuning can remove safety training in hours; "uncensored" variants appear within days of release |
@@ -119,7 +119,7 @@ flowchart TD
 
 ## What's At Stake
 
-**Open weights** (often called "open source" though technically distinct) means releasing model weights so anyone can download, modify, and run the model locally. Meta clarified in 2024 that Llama models are "open weight" rather than fully open source, as the training data and code remain proprietary. Examples include Llama 2/3, Mistral, Falcon, and DeepSeek-R1. As of April 2025, Llama models alone had been downloaded over <F e="meta-ai" f="7ca19e9d">1.2 billion</F> times, with 20,000+ derivative models published on [Hugging Face](https://huggingface.co/). Once released, weights cannot be recalled or controlled, and anyone can fine-tune for any purpose—including removing safety features. Research shows that "jailbreak-tuning" can remove essentially all safety training within hours using modest compute ([FAR.AI 2024](https://far.ai/post/2024-10-poisoning/)). Within days of Meta releasing Llama 2, "uncensored" versions appeared on Hugging Face with safety guardrails stripped away.
+**Open weights** (often called "open source" though technically distinct) means releasing model weights so anyone can download, modify, and run the model locally. Meta clarified in 2024 that Llama models are "open weight" rather than fully open source, as the training data and code remain proprietary. Examples include Llama 2/3, Mistral, Falcon, and DeepSeek-R1. As of April 2025, Llama models alone had been downloaded over 1.2 billion times, with 20,000+ derivative models published on [Hugging Face](https://huggingface.co/). Once released, weights cannot be recalled or controlled, and anyone can fine-tune for any purpose—including removing safety features. Research shows that "jailbreak-tuning" can remove essentially all safety training within hours using modest compute ([FAR.AI 2024](https://far.ai/post/2024-10-poisoning/)). Within days of Meta releasing Llama 2, "uncensored" versions appeared on Hugging Face with safety guardrails stripped away.
 
 **Closed source** means keeping weights proprietary, providing access only via API. Examples include GPT-4, Claude, and Gemini. Labs maintain control and can monitor usage patterns, update models, revoke access for policy violations, and refuse harmful requests. However, this concentrates power in a small number of corporations.
 
@@ -135,7 +135,7 @@ The landscape shifted dramatically with DeepSeek's January 2025 release of R1, d
 | **Llama cumulative downloads** | 1.2 billion (April 2025) | [Meta](https://ai.meta.com/blog/future-of-ai-built-with-llama/) | +53% in Q1 2025 |
 | **Enterprise open source share** | 11-13% of LLM workloads | [Menlo Ventures](https://menlovc.com/perspective/2025-mid-year-llm-market-update/) | Down from 19% in 2024 |
 | **Performance gap (open vs closed)** | 1.7% on Chatbot Arena | [Stanford HAI](https://hai.stanford.edu/ai-index/2025-ai-index-report) | Narrowed from 8% in Jan 2024 |
-| **Global AI spending** | <F e="meta-ai" f="2dd47673">\$17B</F> in 2025 | [Menlo Ventures](https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/) | 3.2x YoY increase from \$11.5B |
+| **Global AI spending** | \$17B in 2025 | [Menlo Ventures](https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/) | 3.2x YoY increase from \$11.5B |
 | **DeepSeek R1 training cost** | Under \$1 million | [World Economic Forum](https://www.weforum.org/stories/2025/02/open-source-ai-innovation-deepseek/) | 90-95% below Western frontier models |
 | **Fortune 500 Llama adoption** | 50%+ experimenting | [Meta](https://ai.meta.com/blog/future-of-ai-built-with-llama/) | Including Spotify, AT&T, DoorDash |
 

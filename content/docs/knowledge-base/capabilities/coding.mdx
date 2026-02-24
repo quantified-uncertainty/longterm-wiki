@@ -28,8 +28,8 @@ import {DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid} from '@component
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Current Capability** | Near-human on isolated tasks, 40-55% on complex engineering | SWE-bench Verified: <F e="openai" f="25d2308f">70-76%</F> (top systems); SWE-bench Pro: 23-44% ([Scale AI leaderboard](https://scale.com/leaderboard/swe_bench_pro_public)) |
-| **Productivity Impact** | 30-55% faster task completion; 46% of code AI-assisted | [GitHub research](https://github.blog/news-insights/research/research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/): 55.8% faster; <F e="openai" f="599b42cc">15M+</F> Copilot users |
+| **Current Capability** | Near-human on isolated tasks, 40-55% on complex engineering | SWE-bench Verified: 70-76% (top systems); SWE-bench Pro: 23-44% ([Scale AI leaderboard](https://scale.com/leaderboard/swe_bench_pro_public)) |
+| **Productivity Impact** | 30-55% faster task completion; 46% of code AI-assisted | [GitHub research](https://github.blog/news-insights/research/research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/): 55.8% faster; 15M+ Copilot users |
 | **Security Risks** | 38-70% of AI code contains vulnerabilities | [Veracode 2025](https://www.veracode.com/blog/genai-code-security-report/): 45% vulnerability rate; Java highest at 70%+ |
 | **Economic Value** | \$2.6-4.4T annual potential (software engineering key driver) | [McKinsey 2023](https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/the-economic-potential-of-generative-ai-the-next-productivity-frontier); software engineering in top 4 value areas |
 | **Self-Improvement Risk** | Medium-High; AI systems writing ML code actively | AI systems contributing to own development; recursive loops emerging |
@@ -79,7 +79,7 @@ The dual-use nature of coding capabilities presents significant risks. While AI 
 | System | Organization | SWE-bench Performance | Key Strengths | Deployment Scale |
 |--------|-------------|----------------------|---------------|------------------|
 | GitHub Copilot | Microsoft/OpenAI | 40-50% (with agent mode) | IDE integration, 46% code acceptance | [15M+ developers](https://github.blog/news-insights/research/research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/) |
-| Claude Code | Anthropic | 43.6% (SWE-bench Pro) | Agentic workflows, 200K context, <F e="anthropic" f="d08706cf">83.8%</F> PR merge rate | Enterprise/research |
+| Claude Code | Anthropic | 43.6% (SWE-bench Pro) | Agentic workflows, 200K context, 83.8% PR merge rate | Enterprise/research |
 | Cursor | Cursor Inc. | 45-55% estimated | Multi-file editing, agent mode, VS Code fork | Fastest-growing IDE |
 | Devin | Cognition | 13.9% (original SWE-bench) | Full autonomy, cloud environment, web browsing | Limited beta access |
 | OpenAI Codex CLI | OpenAI | 41.8% (GPT-5 on Pro) | Terminal integration, MCP support | Developer preview |
@@ -277,7 +277,7 @@ This connection makes autonomous coding a key capability to monitor for warning 
 
 | Approach | Description | Current Readiness | Effectiveness |
 |----------|-------------|-------------------|---------------|
-| Secure Code Generation | Training on verified, secure code patterns | Early development | Reduces vulnerabilities <F e="anthropic" f="a1e87600">20-30%</F> in trials |
+| Secure Code Generation | Training on verified, secure code patterns | Early development | Reduces vulnerabilities 20-30% in trials |
 | Formal Verification Integration | Automated proof generation for critical code | Research stage | Promising for safety-critical systems |
 | Sandboxed Execution | Isolated environments for testing AI code | Partially deployed | Standard in Devin, Claude Code |
 | Human-in-the-Loop Systems | Mandatory review for critical decisions | Widely used | 83.8% PR merge rate with review (Claude Code) |

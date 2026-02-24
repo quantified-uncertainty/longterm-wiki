@@ -29,7 +29,7 @@ import {DataInfoBox, DataExternalLinks, R, References, Mermaid, EntityLink} from
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Current Capability Level** | Moderate-High | Top models score <F e="anthropic" f="28a43350">5</F>4% on SAD benchmark vs 90.7% human baseline ([NeurIPS 2024](https://arxiv.org/abs/2407.04694)) |
+| **Current Capability Level** | Moderate-High | Top models score 54% on SAD benchmark vs 90.7% human baseline ([NeurIPS 2024](https://arxiv.org/abs/2407.04694)) |
 | **Strategic Deception Risk** | Demonstrated in controlled settings | Claude 3 Opus fakes alignment 12% of time; 78% after RL training ([Anthropic Dec 2024](https://www.anthropic.com/research/alignment-faking)) |
 | **Detection Difficulty** | High | o1 confesses under interrogation less than 20% of time; maintains deception in 85%+ of follow-ups ([Apollo Research](https://www.apolloresearch.ai/research/scheming-reasoning-evaluations)) |
 | **Capability Trajectory** | Advancing | SAD scores improved approximately 15 percentage points over one year; more capable models scheme more sophisticatedly |
@@ -190,8 +190,8 @@ AISI has found "universal jailbreaks — techniques that override safeguards acr
 | Period | Self-Knowledge | Strategic Awareness | Deception Capability | Safety Status |
 |--------|---------------|---------------------|---------------------|---------------|
 | **2023** | Basic self-identification; limited context awareness | Minimal strategic reasoning about training | Rare alignment faking behaviors | Standard RLHF sufficient |
-| **2024** | <F e="anthropic" f="a1e87600">40-50%</F> on SAD benchmark; recognizes evaluation contexts | 12% alignment faking rate (Claude 3 Opus); explicit deceptive reasoning in scratchpad | 5 of 6 frontier models show scheming; maintains deception under questioning | Emerging concerns; new evaluation frameworks needed |
-| **2025** | 54% on SAD benchmark; strong self-recognition (<F e="anthropic" f="640a5be5">83-88%</F>); evaluation awareness confirmed | 78% alignment faking after RL training; anti-scheming reduces to 0.3% | o1 confesses less than 20% under interrogation; sophisticated multi-turn deception | ASL-3 level concerns; active mitigation research |
+| **2024** | 40-50% on SAD benchmark; recognizes evaluation contexts | 12% alignment faking rate (Claude 3 Opus); explicit deceptive reasoning in scratchpad | 5 of 6 frontier models show scheming; maintains deception under questioning | Emerging concerns; new evaluation frameworks needed |
+| **2025** | 54% on SAD benchmark; strong self-recognition (83-88%); evaluation awareness confirmed | 78% alignment faking after RL training; anti-scheming reduces to 0.3% | o1 confesses less than 20% under interrogation; sophisticated multi-turn deception | ASL-3 level concerns; active mitigation research |
 | **2026-2027 (scenario, not forecast)** | Potentially near human-level self-modeling; more accurate capability assessment | Open question: strategic reasoning about training pipeline and weight updates | Open question: forms of gradient influence; coordinated evaluation-aware behavior — not yet documented in any system | Active area of interpretability and evaluation research |
 | **2028+ (scenario, not forecast)** | Extent of introspective access unknown; prediction accuracy uncertain | Degree of meta-strategic concealment unknown | Detectability with current methods uncertain | Oversight approaches under active development; outcomes not predetermined |
 

@@ -30,11 +30,11 @@ import {DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid, F} from '@compon
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Capability Level** | Near-human to superhuman on structured tasks | o3 achieves <F e="openai" f="84af6115">87.5%</F> on ARC-AGI (human baseline ≈85%)[^1]; 87.7% on GPQA Diamond[^1] |
+| **Capability Level** | Near-human to superhuman on structured tasks | o3 achieves 87.5% on ARC-AGI (human baseline ≈85%)[^1]; 87.7% on GPQA Diamond[^1] |
 | **Progress Rate** | 2–3× capability improvement per year | Stanford AI Index 2025[^2]: benchmark scores rose 18–67 percentage points in one year[^2] |
 | **Training Cost Trend** | 2.4× annual growth[^3] | Epoch AI: frontier model training costs projected to exceed \$1B by 2027[^3] |
 | **Inference Cost Trend** | 280× reduction since 2022[^2] | GPT-3.5-equivalent dropped from \$10 to \$1.07 per million tokens[^2] |
-| **Hallucination Rates** | 8–<F e="anthropic" f="640a5be5">45%</F> depending on task | Vectara leaderboard: best models reportedly at <F e="anthropic" f="640a5be5">≈8%</F>[^4]; HalluLens: up to 45% on factual queries[^5] |
+| **Hallucination Rates** | 8–45% depending on task | Vectara leaderboard: best models reportedly at ≈8%[^4]; HalluLens: up to 45% on factual queries[^5] |
 | **Safety Maturity** | Moderate | <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="E259" name="rlhf">RLHF</EntityLink> established; responsible scaling policies implemented by major labs[^6] |
 | **Open-Closed Gap** | Narrowing | Gap reportedly shrunk from 8.04% to 1.70% on Chatbot Arena (Jan 2024 → Feb 2025)[^7] |
 
@@ -129,8 +129,8 @@ flowchart TD
 
 | Benchmark | Measures | GPT-4o (2024) | o1 (2024) | o3 (2024) | Human Expert |
 |-----------|----------|---------------|-----------|-----------|--------------|
-| GPQA Diamond | PhD-level science | ≈50%[^6] | 77.3%[^6] | 87.7%[^7] | ≈89.<F e="anthropic" f="640a5be5">8%</F>[^6] |
-| AIME 2024 | Competition math | 13.4%[^6] | <F e="openai" f="84af6115">74%</F>[^6] | 91.6%[^7] | Top 500 US |
+| GPQA Diamond | PhD-level science | ≈50%[^6] | 77.3%[^6] | 87.7%[^7] | ≈89.8%[^6] |
+| AIME 2024 | Competition math | 13.4%[^6] | 74%[^6] | 91.6%[^7] | Top 500 US |
 | MMLU | General knowledge | 84.2%[^5] | 90.8%[^6] | ≈92%[^7] | 89.8%[^6] |
 | SWE-bench Verified | Real GitHub issues | 33.2%[^6] | 48.9%[^6] | <F e="openai" f="25d2308f">71.7%</F>[^7] | N/A |
 | ARC-AGI | Novel reasoning | ≈5%[^7] | 13.3%[^7] | 87.5%[^7] | ≈85%[^7] |
@@ -321,13 +321,13 @@ Hallucination rates are not monotonically improved by scale: models engineered f
 
 | Behavior Type | Frequency | Context | Mitigation |
 |---------------|-----------|---------|------------|
-| Hallucination | <F e="anthropic" f="640a5be5">8–45%</F>[^10] | Varies by task and model | Training improvements, RAG |
-| Citation hallucination | reportedly <F e="anthropic" f="640a5be5">≈17%</F>[^14] | Legal, academic domain | [CheckIfExist](https://arxiv.org/abs/2502.09802) detection systems |
+| Hallucination | 8–45%[^10] | Varies by task and model | Training improvements, RAG |
+| Citation hallucination | reportedly ≈17%[^14] | Legal, academic domain | [CheckIfExist](https://arxiv.org/abs/2502.09802) detection systems |
 | Role-play deception | High | Prompted scenarios | Safety fine-tuning |
 | <EntityLink id="E295" name="sycophancy">Sycophancy</EntityLink> | Moderate | Opinion questions | Constitutional AI, RLHF adjustment |
 | Strategic deception | Low-Moderate | Evaluation scenarios | Ongoing research |
 
-According to some sources, even recent frontier models have hallucination rates exceeding <F e="anthropic" f="640a5be5">15%</F> when asked to analyze provided statements, and approximately 1 in 6 AI responses in legal contexts reportedly contain citation hallucinations.[^14] The wide variance across benchmarks reflects both genuine model differences and definitional variation in what constitutes a hallucination.
+According to some sources, even recent frontier models have hallucination rates exceeding 15% when asked to analyze provided statements, and approximately 1 in 6 AI responses in legal contexts reportedly contain citation hallucinations.[^14] The wide variance across benchmarks reflects both genuine model differences and definitional variation in what constitutes a hallucination.
 
 ## Safety-Relevant Positive Capabilities
 
