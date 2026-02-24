@@ -13,6 +13,12 @@ import {
   SyncPageSchema as SharedSyncPageSchema,
   SyncPagesBatchSchema,
 } from "../api-types.js";
+import {
+  buildPrefixTsquery,
+  TRIGRAM_SIMILARITY_THRESHOLD,
+  TRIGRAM_FALLBACK_THRESHOLD,
+  TS_HEADLINE_OPTIONS,
+} from "../search-utils.js";
 
 export const pagesRoute = new Hono();
 
@@ -47,19 +53,50 @@ pagesRoute.get("/search", async (c) => {
   const { q, limit } = parsed.data;
   const rawDb = getDb();
 
-  // Use plainto_tsquery for simple user queries (handles spaces naturally).
+  // Phase 1: Prefix search with to_tsquery — supports search-as-you-type.
+  // Each word gets a :* suffix for prefix matching, ANDed together.
   // Weighted ranking: title (A=1.0), description (B=0.4), llm_summary (C=0.2), tags+entityType (D=0.1).
-  // Boost by reader_importance for tiebreaking.
-  const results = await rawDb`
-    SELECT
-      id, numeric_id, title, description, entity_type, category,
-      reader_importance, quality,
-      ts_rank_cd(search_vector, plainto_tsquery('english', ${q}), 1) AS rank
-    FROM wiki_pages
-    WHERE search_vector @@ plainto_tsquery('english', ${q})
-    ORDER BY rank DESC, reader_importance DESC NULLS LAST
-    LIMIT ${limit}
-  `;
+  const prefixQuery = buildPrefixTsquery(q);
+
+  let results: any[] = [];
+
+  if (prefixQuery) {
+    results = await rawDb.unsafe(
+      `SELECT
+        id, numeric_id, title, description, entity_type, category,
+        reader_importance, quality,
+        ts_rank_cd(search_vector, to_tsquery('english', $1), 1) AS rank,
+        ts_headline('english', coalesce(description, ''),
+          to_tsquery('english', $1),
+          '${TS_HEADLINE_OPTIONS}'
+        ) AS snippet
+      FROM wiki_pages
+      WHERE search_vector @@ to_tsquery('english', $1)
+      ORDER BY rank DESC, reader_importance DESC NULLS LAST
+      LIMIT $2`,
+      [prefixQuery, limit],
+    );
+  }
+
+  // Phase 2: If FTS returned few results, fall back to pg_trgm similarity
+  // for typo tolerance (e.g. "antrhopic" → "anthropic").
+  if (results.length < TRIGRAM_FALLBACK_THRESHOLD) {
+    const trigramResults = await rawDb.unsafe(
+      `SELECT
+        id, numeric_id, title, description, entity_type, category,
+        reader_importance, quality,
+        similarity(title, $1) AS rank,
+        description AS snippet
+      FROM wiki_pages
+      WHERE word_count > 0
+        AND similarity(title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
+        AND id NOT IN (SELECT unnest($3::text[]))
+      ORDER BY similarity(title, $1) DESC, reader_importance DESC NULLS LAST
+      LIMIT $2`,
+      [q, limit - results.length, results.map((r: any) => r.id)],
+    );
+    results = [...results, ...trigramResults];
+  }
 
   return c.json({
     results: results.map((r: any) => ({
@@ -72,6 +109,7 @@ pagesRoute.get("/search", async (c) => {
       readerImportance: r.reader_importance,
       quality: r.quality,
       score: parseFloat(r.rank),
+      snippet: r.snippet || null,
     })),
     query: q,
     total: results.length,
@@ -220,6 +258,13 @@ pagesRoute.post("/sync", async (c) => {
       tags: page.tags ?? null,
       quality: page.quality ?? null,
       readerImportance: page.readerImportance ?? null,
+      researchImportance: page.researchImportance ?? null,
+      tacticalValue: page.tacticalValue ?? null,
+      backlinkCount: page.backlinkCount ?? null,
+      riskCategory: page.riskCategory ?? null,
+      dateCreated: page.dateCreated ?? null,
+      recommendedScore: page.recommendedScore ?? null,
+      clusters: page.clusters ?? null,
       hallucinationRiskLevel: page.hallucinationRiskLevel ?? null,
       hallucinationRiskScore: page.hallucinationRiskScore ?? null,
       contentPlaintext: page.contentPlaintext ?? null,
@@ -244,6 +289,13 @@ pagesRoute.post("/sync", async (c) => {
           tags: sql`excluded.tags`,
           quality: sql`excluded.quality`,
           readerImportance: sql`excluded.reader_importance`,
+          researchImportance: sql`excluded.research_importance`,
+          tacticalValue: sql`excluded.tactical_value`,
+          backlinkCount: sql`excluded.backlink_count`,
+          riskCategory: sql`excluded.risk_category`,
+          dateCreated: sql`excluded.date_created`,
+          recommendedScore: sql`excluded.recommended_score`,
+          clusters: sql`excluded.clusters`,
           hallucinationRiskLevel: sql`excluded.hallucination_risk_level`,
           hallucinationRiskScore: sql`excluded.hallucination_risk_score`,
           contentPlaintext: sql`excluded.content_plaintext`,

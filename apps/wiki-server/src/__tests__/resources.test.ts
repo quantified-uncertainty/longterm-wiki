@@ -165,11 +165,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .map((c) => ({ page_id: c.page_id }));
   }
 
-  // ---- Full-text search (raw SQL with plainto_tsquery) ----
-  // params: [q, q, limit] — q appears twice in the SQL (rank + WHERE)
-  if (q.includes("plainto_tsquery") && q.includes("resources")) {
-    const searchTerm = (params[0] as string).toLowerCase();
-    const limit = (params[2] as number) || 20;
+  // ---- Full-text search (raw SQL with to_tsquery or plainto_tsquery) ----
+  // params: [prefixQuery, limit] for to_tsquery; [q, q, limit] for plainto_tsquery
+  if ((q.includes("to_tsquery") || q.includes("plainto_tsquery")) && q.includes("resources")) {
+    const rawQuery = (params[0] as string);
+    // Strip :* suffixes and & operators to get plain search words
+    const searchTerm = rawQuery.replace(/:\*/g, "").replace(/\s*&\s*/g, " ").trim().toLowerCase();
+    const limit = (params[1] as number) || 20;
     const results: Record<string, unknown>[] = [];
     for (const r of resourceStore.values()) {
       const title = ((r.title as string) || "").toLowerCase();

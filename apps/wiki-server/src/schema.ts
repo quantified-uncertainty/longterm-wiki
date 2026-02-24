@@ -87,6 +87,13 @@ export const wikiPages = pgTable(
     tags: text("tags"),
     quality: integer("quality"),
     readerImportance: integer("reader_importance"),
+    researchImportance: integer("research_importance"),
+    tacticalValue: integer("tactical_value"),
+    backlinkCount: integer("backlink_count"),
+    riskCategory: text("risk_category"),
+    dateCreated: text("date_created"),
+    recommendedScore: real("recommended_score"),
+    clusters: jsonb("clusters").$type<string[]>(),
     hallucinationRiskLevel: text("hallucination_risk_level"),
     hallucinationRiskScore: integer("hallucination_risk_score"),
     contentPlaintext: text("content_plaintext"),
@@ -110,6 +117,7 @@ export const wikiPages = pgTable(
     index("idx_wp_category").on(table.category),
     index("idx_wp_entity_type").on(table.entityType),
     index("idx_wp_reader_importance").on(table.readerImportance),
+    index("idx_wp_recommended_score").on(table.recommendedScore),
     // GIN index on search_vector is created in migration SQL
   ]
 );

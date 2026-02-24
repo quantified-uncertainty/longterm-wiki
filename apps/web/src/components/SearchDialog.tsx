@@ -40,8 +40,8 @@ const UNFILTERED_LIMIT = 30;
 
 /**
  * Cmd+K search dialog with live results (server-side PostgreSQL FTS
- * with MiniSearch fallback), faceted entity-type filtering, highlighted
- * snippets, and sort toggle.
+ * with prefix matching and typo tolerance), faceted entity-type filtering,
+ * highlighted snippets, and sort toggle.
  */
 export function SearchDialog() {
   const [open, setOpen] = useState(false);
@@ -381,11 +381,26 @@ export function SearchDialog() {
 
 /**
  * Renders a description snippet with highlighted matching terms.
- * Uses the `match` and `terms` info from MiniSearch to find and
- * highlight the matched portions of the description text.
+ * Prefers server-generated ts_headline() snippets (HTML with <mark> tags)
+ * when available, falling back to client-side term highlighting.
  */
 function HighlightedSnippet({ result }: { result: SearchResult }) {
-  const { description, match, terms } = result;
+  const { description, match, terms, snippet } = result;
+
+  // Prefer server-generated snippet with <mark> tags from ts_headline()
+  if (snippet && snippet.includes("<mark>")) {
+    // Sanitize: strip all HTML except <mark> and </mark>
+    const safe = snippet
+      .replace(/<(?!\/?mark>)[^>]*>/g, "")
+      .replace(/&(?!amp;|lt;|gt;|quot;)/g, "&amp;");
+    return (
+      <div
+        className="text-xs text-muted-foreground line-clamp-2 mt-0.5 [&_mark]:bg-yellow-200/70 dark:[&_mark]:bg-yellow-500/30 [&_mark]:text-foreground [&_mark]:rounded-sm [&_mark]:px-0.5"
+        dangerouslySetInnerHTML={{ __html: safe }}
+      />
+    );
+  }
+
   if (!description) return null;
 
   // Collect terms that matched in the description field
@@ -444,8 +459,8 @@ interface TextFragment {
 
 /**
  * Split text into fragments, highlighting substrings that match
- * any of the given terms (case-insensitive prefix matching to align
- * with MiniSearch's prefix search behavior).
+ * any of the given terms (case-insensitive substring matching).
+ * Used as a fallback when server-side ts_headline snippets are unavailable.
  */
 function highlightText(text: string, terms: string[]): TextFragment[] {
   if (terms.length === 0) return [{ text, highlight: false }];

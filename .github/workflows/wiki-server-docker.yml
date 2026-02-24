@@ -160,7 +160,7 @@ jobs:
           fi
 
           # 2. Sync smoke test — send a single dummy page to verify the sync endpoint works end-to-end
-          SYNC_BODY='{"pages":[{"id":"__smoke-test__","numericId":null,"title":"Smoke Test","description":null,"llmSummary":null,"category":null,"subcategory":null,"entityType":null,"tags":null,"quality":null,"readerImportance":null,"hallucinationRiskLevel":null,"hallucinationRiskScore":null,"contentPlaintext":null,"wordCount":null,"lastUpdated":null,"contentFormat":null}]}'
+          SYNC_BODY='{"pages":[{"id":"__smoke-test__","numericId":null,"title":"Smoke Test","description":null,"llmSummary":null,"category":null,"subcategory":null,"entityType":null,"tags":null,"quality":null,"readerImportance":null,"researchImportance":null,"tacticalValue":null,"backlinkCount":null,"riskCategory":null,"dateCreated":null,"recommendedScore":null,"clusters":null,"hallucinationRiskLevel":null,"hallucinationRiskScore":null,"contentPlaintext":null,"wordCount":null,"lastUpdated":null,"contentFormat":null}]}'
           SYNC_RESPONSE=$(curl -sf -X POST \
             -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
             -H "Content-Type: application/json" \

@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
+import { buildPrefixTsquery } from "../search-utils.js";
 import {
   eq,
   count,
@@ -223,19 +224,24 @@ resourcesRoute.get("/search", async (c) => {
   const { q, limit } = parsed.data;
   const rawDb = getDb();
 
-  // Full-text search with ranking (same pattern as wiki_pages search)
-  const rows = await rawDb`
-    SELECT
-      id, url, title, type, summary, review, abstract,
-      key_points, publication_id, authors, published_date,
-      tags, local_filename, credibility_override,
-      fetched_at, content_hash, created_at, updated_at,
-      ts_rank_cd(search_vector, plainto_tsquery('english', ${q}), 1) AS rank
-    FROM resources
-    WHERE search_vector @@ plainto_tsquery('english', ${q})
-    ORDER BY rank DESC
-    LIMIT ${limit}
-  `;
+  // Full-text search with prefix matching (same pattern as wiki_pages search)
+  const prefixQuery = buildPrefixTsquery(q);
+
+  const rows = prefixQuery
+    ? await rawDb.unsafe(
+        `SELECT
+          id, url, title, type, summary, review, abstract,
+          key_points, publication_id, authors, published_date,
+          tags, local_filename, credibility_override,
+          fetched_at, content_hash, created_at, updated_at,
+          ts_rank_cd(search_vector, to_tsquery('english', $1), 1) AS rank
+        FROM resources
+        WHERE search_vector @@ to_tsquery('english', $1)
+        ORDER BY rank DESC
+        LIMIT $2`,
+        [prefixQuery, limit],
+      )
+    : [];
 
   return c.json({
     results: rows.map((r: any) => ({
