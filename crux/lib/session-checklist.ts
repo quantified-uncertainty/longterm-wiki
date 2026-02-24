@@ -360,6 +360,14 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     applicableTypes: 'all',
   },
   {
+    id: 'lockfile-fresh',
+    label: 'Lockfile up to date',
+    description: 'If `package.json` changed, run `pnpm install` to update `pnpm-lock.yaml`. CI uses `--frozen-lockfile` and will fail on drift.',
+    phase: 'ship',
+    applicableTypes: 'all',
+    verifyCommand: 'pnpm install --frozen-lockfile',
+  },
+  {
     id: 'gate-passes',
     label: 'Gate passes',
     description: '`pnpm crux validate gate --fix` passes. Record exact test count.',
