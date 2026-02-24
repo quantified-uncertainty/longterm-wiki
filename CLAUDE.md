@@ -26,7 +26,7 @@ ln -sf ../../../.env .env                                                 # env 
 ln -sf /Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/node_modules apps/web/node_modules  # app packages
 ```
 
-Without these, `crux` won't have `GITHUB_TOKEN` and the gate check will fail with `Cannot find package 'minisearch'`.
+Without these, `crux` won't have `GITHUB_TOKEN` and the gate check will fail with missing package errors.
 
 See `## Agent Session Workflow — MANDATORY` below and `.claude/rules/agent-session-workflow.md` for full details.
 
