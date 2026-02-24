@@ -19,12 +19,48 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+interface ClaimRow {
+  id: number;
+  entityId: string;
+  entityType: string;
+  claimType: string;
+  claimText: string;
+  value: string | null;   // section name
+  unit: string | null;    // comma-separated footnote refs
+  confidence: string | null;
+  sourceQuote: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 function isNumericId(id: string): boolean {
   return /^E\d+$/i.test(id);
 }
 
 export async function generateStaticParams() {
   return getAllNumericIds().map((id) => ({ id }));
+}
+
+/** Fetch claims for a page from the wiki-server. Returns null if unavailable. */
+async function fetchPageClaims(pageId: string): Promise<ClaimRow[] | null> {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+  if (!serverUrl) return null;
+
+  try {
+    const res = await fetch(
+      `${serverUrl}/api/claims/by-entity/${encodeURIComponent(pageId)}`,
+      {
+        headers: { ...(apiKey ? { "x-api-key": apiKey } : {}) },
+        next: { revalidate: 300 },
+      }
+    );
+    if (!res.ok) return null;
+    const data = await res.json() as { claims: ClaimRow[] };
+    return data.claims ?? null;
+  } catch {
+    return null;
+  }
 }
 
 function Section({
@@ -54,6 +90,107 @@ function JsonDump({ data }: { data: unknown }) {
   );
 }
 
+function ConfidenceBadge({ confidence }: { confidence: string | null }) {
+  const val = confidence ?? "unverified";
+  const colorMap: Record<string, string> = {
+    verified: "bg-green-100 text-green-800",
+    unverified: "bg-yellow-100 text-yellow-800",
+    unsourced: "bg-red-100 text-red-800",
+  };
+  const cls = colorMap[val] ?? "bg-gray-100 text-gray-800";
+  return (
+    <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-medium ${cls}`}>
+      {val}
+    </span>
+  );
+}
+
+function ClaimsSection({ claims }: { claims: ClaimRow[] }) {
+  // Summary counts by confidence
+  const byConfidence: Record<string, number> = {};
+  for (const c of claims) {
+    const key = c.confidence ?? "unverified";
+    byConfidence[key] = (byConfidence[key] ?? 0) + 1;
+  }
+
+  // Group by section
+  const sections = [...new Set(claims.map(c => c.value ?? "Unknown"))];
+
+  return (
+    <div>
+      {/* Summary bar */}
+      <div className="flex gap-3 mb-4 flex-wrap">
+        {Object.entries(byConfidence).map(([conf, count]) => (
+          <div key={conf} className="flex items-center gap-1">
+            <ConfidenceBadge confidence={conf} />
+            <span className="text-xs text-gray-600">{count}</span>
+          </div>
+        ))}
+        <span className="text-xs text-gray-500 ml-auto">{claims.length} total claims</span>
+      </div>
+
+      {/* Section heatmap */}
+      {sections.length > 1 && (
+        <div className="mb-4">
+          <p className="text-xs font-medium text-gray-600 mb-2">Section breakdown:</p>
+          <div className="flex flex-wrap gap-2">
+            {sections.map(section => {
+              const sectionClaims = claims.filter(c => (c.value ?? "Unknown") === section);
+              const verifiedCount = sectionClaims.filter(c => c.confidence === "verified").length;
+              const pct = sectionClaims.length > 0 ? Math.round((verifiedCount / sectionClaims.length) * 100) : 0;
+              const heatColor = pct >= 70 ? "bg-green-100 border-green-300"
+                : pct >= 40 ? "bg-yellow-100 border-yellow-300"
+                : "bg-red-100 border-red-300";
+              return (
+                <span key={section} className={`text-xs px-2 py-1 rounded border ${heatColor}`}>
+                  {section.slice(0, 30)} ({verifiedCount}/{sectionClaims.length})
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Claims table */}
+      <table className="text-xs w-full border-collapse">
+        <thead>
+          <tr className="border-b text-left bg-gray-50">
+            <th className="p-2 w-1/2">Claim</th>
+            <th className="p-2">Type</th>
+            <th className="p-2">Confidence</th>
+            <th className="p-2">Section</th>
+            <th className="p-2">Citations</th>
+          </tr>
+        </thead>
+        <tbody>
+          {claims.map((claim) => (
+            <tr key={claim.id} className="border-b hover:bg-gray-50">
+              <td className="p-2 max-w-[400px]">
+                <span title={claim.claimText}>{claim.claimText}</span>
+                {claim.sourceQuote && (
+                  <p className="text-gray-400 italic mt-0.5 truncate" title={claim.sourceQuote}>
+                    &ldquo;{claim.sourceQuote.slice(0, 80)}&rdquo;
+                  </p>
+                )}
+              </td>
+              <td className="p-2 font-mono">{claim.claimType}</td>
+              <td className="p-2">
+                <ConfidenceBadge confidence={claim.confidence} />
+              </td>
+              <td className="p-2 text-gray-600 max-w-[120px] truncate" title={claim.value ?? ""}>
+                {claim.value ?? "—"}
+              </td>
+              <td className="p-2 font-mono">
+                {claim.unit ? claim.unit.split(",").map(ref => `[^${ref.trim()}]`).join(" ") : "—"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default async function WikiInfoPage({ params }: PageProps) {
   const { id } = await params;
 
@@ -77,6 +214,7 @@ export default async function WikiInfoPage({ params }: PageProps) {
   const facts = getFactsForEntity(slug);
   const externalLinks = getExternalLinks(slug);
   const rawMdx = getRawMdxSource(slug);
+  const claims = await fetchPageClaims(slug);
 
   const title = entity?.title || pageData?.title || slug;
 
@@ -109,6 +247,22 @@ export default async function WikiInfoPage({ params }: PageProps) {
 
       <Section title="Entity Data" defaultOpen>
         {entity ? <JsonDump data={entity} /> : <p className="text-sm text-gray-500">No entity found for &quot;{slug}&quot;</p>}
+      </Section>
+
+      <Section title={`Claims ${claims && claims.length > 0 ? `(${claims.length})` : ""}`}>
+        {claims === null ? (
+          <p className="text-sm text-gray-500">
+            Claims data unavailable (wiki-server offline or not configured).{" "}
+            <span className="font-mono text-xs">Set LONGTERMWIKI_SERVER_URL to enable.</span>
+          </p>
+        ) : claims.length === 0 ? (
+          <p className="text-sm text-gray-500">
+            No claims extracted yet. Run:{" "}
+            <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">pnpm crux claims extract {slug}</code>
+          </p>
+        ) : (
+          <ClaimsSection claims={claims} />
+        )}
       </Section>
 
       <Section title={`Canonical Facts (${Object.keys(facts).length})`}>
