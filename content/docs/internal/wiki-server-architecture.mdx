@@ -1,0 +1,170 @@
+---
+title: "Wiki-Server Environment Architecture"
+description: "Analysis of environment isolation in the wiki-server — the ID allocation tension, risk scenarios, and a tiered plan for separating shared vs per-environment concerns"
+sidebar:
+  order: 5
+  label: "Server Environments"
+entityType: internal
+pageType: documentation
+lastEdited: "2026-02-24"
+update_frequency: 90
+evergreen: true
+---
+
+This document analyzes how the wiki-server handles (or fails to handle) environment isolation between development, preview, and production. It identifies the core architectural tension — entity ID allocation must be globally shared, but content data should not — and proposes a tiered remediation plan.
+
+**Status:** Analysis complete (Feb 2026). No implementation started yet.
+
+---
+
+## Background: What the Wiki-Server Does
+
+The wiki-server (`apps/wiki-server/`) is a Hono + PostgreSQL service deployed to Kubernetes at `wiki-server.k8s.quantifieduncertainty.org`. It provides:
+
+| Capability | Endpoints | Used by |
+|---|---|---|
+| **Entity ID allocation** | `/api/ids/*` | `assign-ids.mjs` (build-time), crux CLI |
+| **Content sync** | `/api/pages/sync`, `/api/entities/sync`, `/api/facts/sync` | CI (main-branch only), crux CLI |
+| **Query/read** | `/api/search/*`, `/api/explore/*`, `/api/citations/*`, `/api/facts/*` | Next.js runtime (ISR), crux CLI |
+| **Operational data** | `/api/sessions/*`, `/api/edit-logs/*`, `/api/jobs/*` | Crux CLI, internal dashboards |
+
+All of these share **one PostgreSQL database** with **zero environment isolation** — no `environment` column, no tenant separation, no namespace filtering.
+
+---
+
+## The Core Tension: Shared IDs vs Isolated Content
+
+Entity IDs are allocated via a PostgreSQL sequence (`entity_id_seq`): E1, E2, E3... These are monotonic, globally unique, and write-once. **Both dev and prod must share the same ID sequence.** If a dev branch allocates E42 independently, it will conflict when merged into production.
+
+This one legitimate shared concern — ID allocation — currently **drags everything else into shared space**. Because there is only one server and one database, pages, facts, sessions, and citations all live in the same unpartitioned tables.
+
+---
+
+## Why This Is Getting Worse: The Runtime Read Migration
+
+Before February 2026, the wiki-server was primarily a **build-time** dependency. The Next.js app read from a static `database.json` generated at build time. The server was used for ID allocation, content sync, and internal dashboards.
+
+Recent PRs have been migrating data fetching from static build-time to **live runtime reads** via the `withApiFallback` pattern:
+
+| PR | What moved to runtime server reads |
+|---|---|
+| #947 | Related pages and backlinks |
+| #945 | Claims data |
+| #952 | Citation health and hallucination risk |
+| #954 | Update schedule (staleness) |
+| #955 | Facts and timeseries |
+| #951 (open) | Explore page with pagination, filtering, sorting |
+
+All of these use ISR with `revalidate: 300` (5-minute cache), meaning the **production site constantly re-fetches from the server**. This changes the server from "build convenience" to "runtime dependency." If server data is corrupted, the live production site is affected.
+
+### The `withApiFallback` Pattern
+
+```typescript
+// apps/web/src/lib/wiki-server.ts
+async function withApiFallback<T>(
+  apiLoader: () => Promise<FetchResult<T> | T | null>,
+  localLoader: () => T | null
+): Promise<WithSource<T | null>>
+```
+
+This tries the server first, falls back to local `database.json`, and tracks which source was used. It handles **availability** well (site works without the server), but **masks the isolation problem** — production reads might return data corrupted by a dev sync, with no way to detect this.
+
+---
+
+## Current Safeguards
+
+| Safeguard | What it protects against | Weakness |
+|---|---|---|
+| CI sync is main-only | Feature branch CI writing to prod DB | Local `pnpm crux wiki-server sync` bypasses this |
+| API key required | Unauthorized writes | Anyone with the key can write from any branch |
+| `withApiFallback` | Server downtime | Doesn't detect corrupted data |
+| Vercel skips `claude/*` branches | Unnecessary preview builds | Doesn't address server isolation |
+
+**Missing safeguards:**
+- No write guard that checks the source branch/environment
+- No audit trail (who synced what, from which branch)
+- No versioning or rollback capability on synced data
+- No way to distinguish "prod data" from "dev data" in the database
+
+---
+
+## Risk Scenarios
+
+1. **Accidental dev sync**: A developer runs `pnpm crux wiki-server sync` from a feature branch with `.env` configured. Production database now has half-written page content.
+
+2. **ID sequence burn**: A feature branch runs `assign-ids.mjs` for entities that are later deleted before merge. Those IDs are permanently consumed from the global sequence.
+
+3. **Race condition**: Two CI runs (main merge + scheduled maintenance) sync simultaneously. Last-write-wins produces undefined row state.
+
+4. **Preview pollution**: Vercel preview deployments inherit the same `LONGTERMWIKI_SERVER_URL`. They read production data, potentially mixing it with local branch content in confusing ways.
+
+5. **Operational noise**: Dev session logs, test edit-log entries, and experiment jobs are mixed into production operational data, cluttering internal dashboards.
+
+---
+
+## Proposed Solution: Tiered Approach
+
+### Tier 1 — Immediate (single PR, minimal risk)
+
+**A. Write guards on sync endpoints.** Add a required `X-Wiki-Environment` header. Only `production` is allowed to write content:
+
+```typescript
+// Middleware for content write routes
+app.post("/api/pages/sync", (c, next) => {
+  const env = c.req.header("X-Wiki-Environment");
+  if (env !== "production") {
+    return c.json({ error: "Content writes restricted to production" }, 403);
+  }
+  return next();
+});
+```
+
+CI passes `X-Wiki-Environment: production`. Local dev and preview are blocked from writing content. ID allocation remains unguarded (shared by design).
+
+**B. Default local dev to local-only mode.** Remove `LONGTERMWIKI_SERVER_URL` from the default `.env` setup. Most dev work edits existing pages and doesn't need the server. Only set it explicitly when running `assign-ids.mjs` for new entities.
+
+**C. Add branch/commit tracking to syncs.** Add `synced_from_branch` and `synced_from_commit` columns to `wiki_pages`. This creates an audit trail and enables future rollback.
+
+### Tier 2 — Medium-term (moderate effort)
+
+**D. Logical service separation within one deployment.** Group routes into services with different auth/isolation rules:
+
+| Service | Routes | Write access | Read access |
+|---|---|---|---|
+| **ID Registry** | `/api/ids/*` | All environments (shared) | All environments |
+| **Content** | `/api/pages/*`, `/api/entities/*`, `/api/facts/*` | Production only | All (production from DB, dev from local) |
+| **Query** | `/api/search/*`, `/api/explore/*`, `/api/citations/*` | N/A (read-only) | All environments |
+| **Operations** | `/api/sessions/*`, `/api/edit-logs/*`, `/api/jobs/*` | All, but tagged with `environment` | Filtered by environment |
+
+This doesn't require separate deployments — just middleware per route group.
+
+**E. Add `environment` column to operational tables.** For `sessions`, `edit_logs`, `auto_update_runs`, `jobs`: add `environment TEXT NOT NULL DEFAULT 'production'`. Reads filter by environment. Dev session logs stop cluttering production dashboards.
+
+### Tier 3 — Longer-term (highest effort, cleanest result)
+
+**F. Dedicated ID microservice.** Extract ID allocation into its own tiny service (or even a standalone PostgreSQL function). This is the one thing that truly must be shared. Everything else can then be per-environment without compromise.
+
+**G. Per-environment databases.** With IDs separated:
+- `longterm_wiki_prod` — production content + ops
+- `longterm_wiki_dev` — dev content + ops (optional, only if needed)
+- `longterm_wiki_ids` — shared ID registry
+
+Preview deployments use local `database.json` only (no server writes, no server reads except IDs).
+
+---
+
+## How PR #951 (Server-Driven Explore) Fits In
+
+PR #951 adds a complex `/api/explore` endpoint with SQL-driven pagination, filtering, and faceted counts. This accelerates the runtime-read trend significantly — `database.json` cannot replicate this functionality well.
+
+The `ExploreGrid` hybrid mode (server when available, client-side fallback when not) is the right pattern for graceful degradation, but it means the production explore UX depends on the server returning correct, non-corrupted data. This makes Tier 1 write guards more urgent.
+
+---
+
+## Recommendation
+
+**Start with Tier 1A + 1B.** Adding write guards and defaulting dev to local-only mode is the highest-value, lowest-effort change. It directly prevents the most likely failure mode (accidental dev sync) while preserving the correctly-shared ID allocation.
+
+Tier 2D (logical service separation) should follow as the runtime-read pattern stabilizes and more endpoints move to server-first fetching.
+
+**Key principle:** Entity ID allocation is the only concern that truly must be shared across environments. Everything else can and should be isolated.
