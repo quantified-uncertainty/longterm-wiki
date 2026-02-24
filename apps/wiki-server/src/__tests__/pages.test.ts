@@ -25,7 +25,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- wiki_pages: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("wiki_pages")) {
-    const COLS = 17;
+    const COLS = 24;
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
@@ -46,12 +46,19 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         tags: params[o + 8],
         quality: params[o + 9],
         reader_importance: params[o + 10],
-        hallucination_risk_level: params[o + 11],
-        hallucination_risk_score: params[o + 12],
-        content_plaintext: params[o + 13],
-        word_count: params[o + 14],
-        last_updated: params[o + 15],
-        content_format: params[o + 16],
+        research_importance: params[o + 11],
+        tactical_value: params[o + 12],
+        backlink_count: params[o + 13],
+        risk_category: params[o + 14],
+        date_created: params[o + 15],
+        recommended_score: params[o + 16],
+        clusters: params[o + 17],
+        hallucination_risk_level: params[o + 18],
+        hallucination_risk_score: params[o + 19],
+        content_plaintext: params[o + 20],
+        word_count: params[o + 21],
+        last_updated: params[o + 22],
+        content_format: params[o + 23],
         synced_at: now,
         created_at: existing?.created_at ?? now,
         updated_at: now,

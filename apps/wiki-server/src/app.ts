@@ -19,6 +19,7 @@ import { factsRoute } from "./routes/facts.js";
 import { agentSessionsRoute } from "./routes/agent-sessions.js";
 import { jobsRoute } from "./routes/jobs.js";
 import { artifactsRoute } from "./routes/artifacts.js";
+import { exploreRoute } from "./routes/explore.js";
 
 export function createApp() {
   const app = new Hono();
@@ -69,6 +70,7 @@ export function createApp() {
   app.route("/api/agent-sessions", agentSessionsRoute);
   app.route("/api/jobs", jobsRoute);
   app.route("/api/artifacts", artifactsRoute);
+  app.route("/api/explore", exploreRoute);
 
   return app;
 }

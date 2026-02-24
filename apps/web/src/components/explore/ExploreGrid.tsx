@@ -22,8 +22,6 @@ const FIELD_GROUPS: { label: string; cluster: string | null; entityType?: string
 ];
 
 // SECTION filter — based on page category (wiki section).
-// "Other" uses a special empty-array marker and is computed dynamically at render
-// to catch any category not explicitly listed in the named groups.
 const NAMED_SECTION_GROUPS: { label: string; categories: string[] }[] = [
   { label: "Risks", categories: ["risks"] },
   { label: "Responses", categories: ["responses"] },
@@ -35,7 +33,6 @@ const NAMED_SECTION_GROUPS: { label: string; categories: string[] }[] = [
   { label: "Concepts", categories: ["cruxes", "debates", "worldviews"] },
 ];
 
-// All explicitly-claimed categories (used to compute "Other" dynamically)
 const NAMED_CATEGORIES = new Set(NAMED_SECTION_GROUPS.flatMap((g) => g.categories));
 
 // RISK CATEGORY filter
@@ -61,15 +58,12 @@ function recommendedScore(item: ExploreItem): number {
 function resolveEntityGroupIndex(param: string): number {
   const lower = param.toLowerCase();
 
-  // Direct label match (e.g. "risks" -> "Risks", "people" -> "People")
   let idx = ENTITY_GROUPS.findIndex((g) => g.label.toLowerCase() === lower);
   if (idx >= 0) return idx;
 
-  // Entity type match (e.g. "organization" found in group types)
   idx = ENTITY_GROUPS.findIndex((g) => g.types.includes(lower));
   if (idx >= 0) return idx;
 
-  // Singularize path-based categories (e.g. "organizations" -> "organization")
   if (lower.endsWith("ies")) {
     const singular = lower.slice(0, -3) + "y";
     idx = ENTITY_GROUPS.findIndex((g) => g.types.includes(singular));
@@ -139,20 +133,105 @@ function textFilter(items: ExploreItem[], query: string): ExploreItem[] {
   );
 }
 
-export function ExploreGrid({ items }: { items: ExploreItem[] }) {
+// ---- Server-driven explore API types ----
+
+interface ExploreFacets {
+  clusters: Record<string, number>;
+  categories: Record<string, number>;
+  entityTypes: Record<string, number>;
+  riskCategories: Record<string, number>;
+}
+
+interface ExploreResponse {
+  items: ExploreItem[];
+  total: number;
+  limit: number;
+  offset: number;
+  facets: ExploreFacets;
+}
+
+// ---- Server-driven mode hook ----
+
+const PAGE_SIZE = 50;
+
+/**
+ * Fetch explore data from the Next.js API route.
+ * Returns null if the server is unavailable (503).
+ */
+async function fetchExploreData(params: {
+  limit: number;
+  offset: number;
+  search?: string;
+  cluster?: string;
+  category?: string;
+  entityType?: string;
+  riskCategory?: string;
+  sort: string;
+}): Promise<ExploreResponse | null> {
+  const searchParams = new URLSearchParams();
+  searchParams.set("limit", String(params.limit));
+  searchParams.set("offset", String(params.offset));
+  searchParams.set("sort", params.sort);
+  if (params.search) searchParams.set("search", params.search);
+  if (params.cluster) searchParams.set("cluster", params.cluster);
+  if (params.category) searchParams.set("category", params.category);
+  if (params.entityType) searchParams.set("entityType", params.entityType);
+  if (params.riskCategory) searchParams.set("riskCategory", params.riskCategory);
+
+  try {
+    const res = await fetch(`/api/explore?${searchParams.toString()}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+// ---- Props ----
+
+export interface ExploreGridProps {
+  /** Initial items for the first render (first page from server, or all items for fallback). */
+  initialItems: ExploreItem[];
+  /** Total number of items matching the initial query (for server mode). Null = fallback mode. */
+  initialTotal: number | null;
+  /** Initial faceted counts from server. Null = fallback mode. */
+  initialFacets: ExploreFacets | null;
+  /** All items for fallback mode (when server is unavailable). */
+  allItems?: ExploreItem[];
+}
+
+// ---- Component ----
+
+export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItems }: ExploreGridProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
+  // Determine if we're in server-driven mode
+  const serverAvailable = initialTotal !== null;
+
+  // Server mode state
+  const [serverItems, setServerItems] = useState<ExploreItem[]>(initialItems);
+  const [serverTotal, setServerTotal] = useState(initialTotal ?? 0);
+  const [serverFacets, setServerFacets] = useState<ExploreFacets | null>(initialFacets);
+  const [serverOffset, setServerOffset] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Track whether we've fallen back to local mode after a server failure
+  const [fallbackToLocal, setFallbackToLocal] = useState(!serverAvailable);
+
+  // Use allItems for fallback, or initialItems if no allItems provided
+  const fallbackItems = allItems ?? initialItems;
+
   // Build section groups with dynamic "Other" catch-all.
-  // "Other" collects any category not claimed by a named group.
   const SECTION_GROUPS = useMemo(() => {
+    const sourceItems = fallbackToLocal ? fallbackItems : serverItems;
+    // In server mode, we rely on facets for categories
+    const knownCategories = fallbackToLocal
+      ? sourceItems.map((item) => item.category).filter((c): c is string => !!c)
+      : Object.keys(serverFacets?.categories ?? {});
     const otherCategories = [
-      ...new Set(
-        items
-          .map((item) => item.category)
-          .filter((c): c is string => !!c && !NAMED_CATEGORIES.has(c))
-      ),
+      ...new Set(knownCategories.filter((c) => !NAMED_CATEGORIES.has(c))),
     ];
     return [
       { label: "All", categories: [] as string[] },
@@ -161,7 +240,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
         ? [{ label: "Other", categories: otherCategories }]
         : []),
     ];
-  }, [items]);
+  }, [fallbackToLocal, fallbackItems, serverItems, serverFacets]);
 
   // Read initial state from URL params
   const initialTag = searchParams.get("tag") || "";
@@ -200,12 +279,112 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
 
   // Debounced URL update for search
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Debounced server fetch for search
+  const fetchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Abort controller for in-flight fetches
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (fetchDebounceRef.current) clearTimeout(fetchDebounceRef.current);
+      abortRef.current?.abort();
     };
   }, []);
+
+  // ---- Server fetch logic ----
+
+  /** Build server fetch params from current filter state. */
+  const getServerParams = useCallback(
+    (overrides?: Partial<{
+      search: string;
+      activeField: number;
+      activeSection: number;
+      activeEntity: number;
+      activeRiskCat: number;
+      sortKey: SortKey;
+      offset: number;
+    }>) => {
+      const s = overrides?.search ?? search;
+      const field = overrides?.activeField ?? activeField;
+      const section = overrides?.activeSection ?? activeSection;
+      const entity = overrides?.activeEntity ?? activeEntity;
+      const riskCat = overrides?.activeRiskCat ?? activeRiskCat;
+      const sk = overrides?.sortKey ?? sortKey;
+      const off = overrides?.offset ?? 0;
+
+      const fieldGroup = FIELD_GROUPS[field];
+      const sectionGroup = SECTION_GROUPS[section];
+      const entityGroup = ENTITY_GROUPS[entity];
+      const riskCatGroup = RISK_CATEGORY_GROUPS[riskCat];
+
+      // Map "relevance" to "recommended" for server (relevance is client-only composite)
+      const serverSort = sk === "relevance" ? "recommended" : sk;
+
+      return {
+        limit: PAGE_SIZE,
+        offset: off,
+        search: s || undefined,
+        cluster: fieldGroup.entityType ? undefined : (fieldGroup.cluster || undefined),
+        // For "Internal" field, filter by entityType instead of cluster
+        entityType: fieldGroup.entityType
+          ? fieldGroup.entityType
+          : entityGroup.types.length > 0
+            ? entityGroup.types[0] // Use first type as representative
+            : undefined,
+        category: sectionGroup.categories.length === 1
+          ? sectionGroup.categories[0]
+          : undefined,
+        riskCategory: riskCatGroup.value || undefined,
+        sort: serverSort,
+      };
+    },
+    [search, activeField, activeSection, activeEntity, activeRiskCat, sortKey, SECTION_GROUPS]
+  );
+
+  /** Fetch data from the server and update state. */
+  const fetchFromServer = useCallback(
+    async (overrides?: Parameters<typeof getServerParams>[0]) => {
+      if (fallbackToLocal) return;
+
+      setIsLoading(true);
+      const params = getServerParams(overrides);
+
+      const data = await fetchExploreData(params);
+      if (data) {
+        setServerItems(data.items);
+        setServerTotal(data.total);
+        setServerOffset(0);
+        if (data.facets) setServerFacets(data.facets);
+      } else {
+        // Server failed — fall back to local mode
+        setFallbackToLocal(true);
+      }
+      setIsLoading(false);
+    },
+    [fallbackToLocal, getServerParams]
+  );
+
+  /** Load more items from the server (append to existing). */
+  const loadMore = useCallback(async () => {
+    if (fallbackToLocal) {
+      setVisibleCount((c) => c + 60);
+      return;
+    }
+
+    const newOffset = serverOffset + PAGE_SIZE;
+    setIsLoading(true);
+    const params = getServerParams({ offset: newOffset });
+
+    const data = await fetchExploreData({ ...params, offset: newOffset });
+    if (data) {
+      setServerItems((prev) => [...prev, ...data.items]);
+      setServerOffset(newOffset);
+    }
+    setIsLoading(false);
+  }, [fallbackToLocal, serverOffset, getServerParams]);
+
+  // ---- URL param management ----
 
   const updateUrlParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -223,6 +402,8 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     [searchParams, router, pathname]
   );
 
+  // ---- Filter change handlers ----
+
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
     setVisibleCount(60);
@@ -230,13 +411,22 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     debounceRef.current = setTimeout(() => {
       updateUrlParams({ tag: value || null });
     }, 300);
-  }, [updateUrlParams]);
+
+    // Debounced server fetch
+    if (!fallbackToLocal) {
+      if (fetchDebounceRef.current) clearTimeout(fetchDebounceRef.current);
+      fetchDebounceRef.current = setTimeout(() => {
+        fetchFromServer({ search: value });
+      }, 300);
+    }
+  }, [updateUrlParams, fallbackToLocal, fetchFromServer]);
 
   function handleFieldChange(index: number) {
     setActiveField(index);
     setVisibleCount(60);
     const cluster = FIELD_GROUPS[index].cluster;
     updateUrlParams({ cluster: cluster || null });
+    if (!fallbackToLocal) fetchFromServer({ activeField: index });
   }
 
   function handleSectionChange(index: number) {
@@ -244,11 +434,13 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     setVisibleCount(60);
     const group = SECTION_GROUPS[index];
     updateUrlParams({ section: group.categories.length > 0 ? group.label.toLowerCase() : null });
+    if (!fallbackToLocal) fetchFromServer({ activeSection: index });
   }
 
   function handleEntityChange(index: number) {
     setActiveEntity(index);
     setVisibleCount(60);
+    if (!fallbackToLocal) fetchFromServer({ activeEntity: index });
   }
 
   function handleRiskCatChange(index: number) {
@@ -256,6 +448,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     setVisibleCount(60);
     const value = RISK_CATEGORY_GROUPS[index].value;
     updateUrlParams({ riskCategory: value });
+    if (!fallbackToLocal) fetchFromServer({ activeRiskCat: index });
   }
 
   function handleViewChange(mode: ViewMode) {
@@ -267,91 +460,139 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     setSortKey(key);
     setVisibleCount(60);
     updateUrlParams({ sort: key === "recommended" ? null : key });
+    if (!fallbackToLocal) fetchFromServer({ sortKey: key });
   }
 
-  // Filter out AI transition model subitems (internal model data, not articles)
-  // and stub pages with no content (wordCount 0 or undefined)
-  const articleItems = useMemo(
-    () => items.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount),
-    [items]
-  );
+  // ---- Faceted counts (computed from server facets or client-side) ----
 
-  // Items after search filter (text-based client-side filter)
-  const searchFiltered = useMemo(() => {
-    if (!search.trim()) return articleItems;
-    return textFilter(articleItems, search);
-  }, [articleItems, search]);
-
-  // Compute field filter counts (against search-filtered items)
   const fieldCounts = useMemo(() => {
+    if (!fallbackToLocal && serverFacets) {
+      return FIELD_GROUPS.map((group) => {
+        if (group.entityType) {
+          return serverFacets.entityTypes[group.entityType] ?? 0;
+        }
+        if (!group.cluster) return serverTotal;
+        return serverFacets.clusters[group.cluster] ?? 0;
+      });
+    }
+    // Fallback: client-side counts
+    const articleItems = fallbackItems.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount);
+    const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
     return FIELD_GROUPS.map((group) => {
       if (group.entityType) return searchFiltered.filter((item) => item.type === group.entityType).length;
       if (!group.cluster) return searchFiltered.length;
       return searchFiltered.filter((item) => item.clusters.includes(group.cluster!)).length;
     });
-  }, [searchFiltered]);
+  }, [fallbackToLocal, serverFacets, serverTotal, fallbackItems, search]);
 
-  // Items after search + field filter
-  const fieldFiltered = useMemo(() => {
-    const group = FIELD_GROUPS[activeField];
-    if (group.entityType) return searchFiltered.filter((item) => item.type === group.entityType);
-    if (!group.cluster) return searchFiltered;
-    return searchFiltered.filter((item) => item.clusters.includes(group.cluster!));
-  }, [searchFiltered, activeField]);
-
-  // Compute section filter counts (against search + field-filtered items)
   const sectionCounts = useMemo(() => {
+    if (!fallbackToLocal && serverFacets) {
+      return SECTION_GROUPS.map((group) => {
+        if (group.categories.length === 0) return serverTotal;
+        return group.categories.reduce((sum, cat) => sum + (serverFacets.categories[cat] ?? 0), 0);
+      });
+    }
+    // Fallback: client-side counts
+    const articleItems = fallbackItems.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount);
+    const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
+    const fieldGroup = FIELD_GROUPS[activeField];
+    const fieldFiltered = fieldGroup.entityType
+      ? searchFiltered.filter((item) => item.type === fieldGroup.entityType)
+      : fieldGroup.cluster
+        ? searchFiltered.filter((item) => item.clusters.includes(fieldGroup.cluster!))
+        : searchFiltered;
     return SECTION_GROUPS.map((group) => {
       if (group.categories.length === 0) return fieldFiltered.length;
       return fieldFiltered.filter((item) => item.category && group.categories.includes(item.category)).length;
     });
-  }, [fieldFiltered, SECTION_GROUPS]);
+  }, [fallbackToLocal, serverFacets, serverTotal, fallbackItems, search, activeField, SECTION_GROUPS]);
 
-  // Items after search + field + section filter
-  const sectionFiltered = useMemo(() => {
-    const group = SECTION_GROUPS[activeSection];
-    if (group.categories.length === 0) return fieldFiltered;
-    return fieldFiltered.filter((item) => item.category && group.categories.includes(item.category));
-  }, [fieldFiltered, activeSection, SECTION_GROUPS]);
-
-  // Compute entity type counts (against search + field + section-filtered items)
   const entityCounts = useMemo(() => {
+    if (!fallbackToLocal && serverFacets) {
+      return ENTITY_GROUPS.map((group) => {
+        if (group.types.length === 0) return serverTotal;
+        return group.types.reduce((sum, t) => sum + (serverFacets.entityTypes[t] ?? 0), 0);
+      });
+    }
+    // Fallback: client-side counts
+    const articleItems = fallbackItems.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount);
+    const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
+    const fieldGroup = FIELD_GROUPS[activeField];
+    const fieldFiltered = fieldGroup.entityType
+      ? searchFiltered.filter((item) => item.type === fieldGroup.entityType)
+      : fieldGroup.cluster
+        ? searchFiltered.filter((item) => item.clusters.includes(fieldGroup.cluster!))
+        : searchFiltered;
+    const sectionGroup = SECTION_GROUPS[activeSection];
+    const sectionFiltered = sectionGroup.categories.length === 0
+      ? fieldFiltered
+      : fieldFiltered.filter((item) => item.category && sectionGroup.categories.includes(item.category));
     return ENTITY_GROUPS.map((group) => {
       if (group.types.length === 0) return sectionFiltered.length;
       return sectionFiltered.filter((item) => group.types.includes(item.type)).length;
     });
-  }, [sectionFiltered]);
+  }, [fallbackToLocal, serverFacets, serverTotal, fallbackItems, search, activeField, activeSection, SECTION_GROUPS]);
 
-  // Show risk category filter only when viewing Risks
   const showRiskCatFilter = activeEntity === 1;
 
-  // Compute risk category counts (against search + field + section-filtered risk items)
   const riskCatCounts = useMemo(() => {
-    const riskItems = sectionFiltered.filter((item) => item.type === "risk");
+    if (!fallbackToLocal && serverFacets) {
+      const totalRisks = Object.values(serverFacets.riskCategories).reduce((a, b) => a + b, 0);
+      return RISK_CATEGORY_GROUPS.map((group) => {
+        if (!group.value) return totalRisks;
+        return serverFacets.riskCategories[group.value] ?? 0;
+      });
+    }
+    // Fallback: client-side counts
+    const articleItems = fallbackItems.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount);
+    const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
+    const riskItems = searchFiltered.filter((item) => item.type === "risk");
     return RISK_CATEGORY_GROUPS.map((group) => {
       if (!group.value) return riskItems.length;
       return riskItems.filter((item) => item.riskCategory === group.value).length;
     });
-  }, [sectionFiltered]);
+  }, [fallbackToLocal, serverFacets, fallbackItems, search]);
 
-  const filtered = useMemo(() => {
-    let result = sectionFiltered;
+  // ---- Compute displayed items ----
+
+  const displayedItems = useMemo(() => {
+    if (!fallbackToLocal) {
+      // In server mode, items are already filtered/sorted by the server
+      return serverItems;
+    }
+
+    // Fallback: full client-side filtering pipeline
+    let items = fallbackItems.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount);
+
+    // Search
+    if (search.trim()) items = textFilter(items, search);
+
+    // Field filter
+    const fieldGroup = FIELD_GROUPS[activeField];
+    if (fieldGroup.entityType) items = items.filter((item) => item.type === fieldGroup.entityType);
+    else if (fieldGroup.cluster) items = items.filter((item) => item.clusters.includes(fieldGroup.cluster!));
+
+    // Section filter
+    const sectionGroup = SECTION_GROUPS[activeSection];
+    if (sectionGroup.categories.length > 0) {
+      items = items.filter((item) => item.category && sectionGroup.categories.includes(item.category));
+    }
 
     // Entity type filter
-    const group = ENTITY_GROUPS[activeEntity];
-    if (group.types.length > 0) {
-      result = result.filter((item) => group.types.includes(item.type));
+    const entityGroup = ENTITY_GROUPS[activeEntity];
+    if (entityGroup.types.length > 0) {
+      items = items.filter((item) => entityGroup.types.includes(item.type));
     }
 
     // Risk category filter
     const riskCatGroup = RISK_CATEGORY_GROUPS[activeRiskCat];
     if (riskCatGroup.value) {
-      result = result.filter((item) => item.riskCategory === riskCatGroup.value);
+      items = items.filter((item) => item.riskCategory === riskCatGroup.value);
     }
 
     // Sort — skip in table mode since TanStack handles its own column sorting
     if (viewMode !== "table") {
-      result = [...result].sort((a, b) => {
+      items = [...items].sort((a, b) => {
         switch (sortKey) {
           case "title":
             return a.title.localeCompare(b.title);
@@ -382,8 +623,16 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
       });
     }
 
-    return result;
-  }, [sectionFiltered, activeEntity, activeRiskCat, sortKey, viewMode]);
+    return items;
+  }, [fallbackToLocal, serverItems, fallbackItems, search, activeField, activeSection, activeEntity, activeRiskCat, sortKey, viewMode, SECTION_GROUPS]);
+
+  const totalCount = fallbackToLocal ? displayedItems.length : serverTotal;
+  const hasMore = fallbackToLocal
+    ? displayedItems.length > visibleCount
+    : serverItems.length < serverTotal;
+  const remaining = fallbackToLocal
+    ? displayedItems.length - visibleCount
+    : serverTotal - serverItems.length;
 
   return (
     <div>
@@ -436,7 +685,10 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
 
         {/* Results header */}
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-muted-foreground">{filtered.length} items</span>
+          <span className="text-sm text-muted-foreground">
+            {totalCount} items
+            {isLoading && <span className="ml-2 opacity-60">Loading...</span>}
+          </span>
           <div className="flex items-center gap-3">
             {/* View toggle */}
             <div className="flex items-center border border-border rounded-md overflow-hidden">
@@ -502,18 +754,22 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
       {viewMode === "cards" && (
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filtered.slice(0, visibleCount).map((item) =>
+            {(fallbackToLocal
+              ? displayedItems.slice(0, visibleCount)
+              : displayedItems
+            ).map((item) => (
               <ContentCard key={item.id} item={item} />
-            )}
+            ))}
           </div>
 
-          {filtered.length > visibleCount && (
+          {hasMore && remaining > 0 && (
             <div className="flex justify-center mt-6">
               <button
-                onClick={() => setVisibleCount((c) => c + 60)}
-                className="px-6 py-2.5 text-sm border border-border rounded-lg bg-background text-foreground hover:bg-muted transition-colors"
+                onClick={loadMore}
+                disabled={isLoading}
+                className="px-6 py-2.5 text-sm border border-border rounded-lg bg-background text-foreground hover:bg-muted transition-colors disabled:opacity-50"
               >
-                Show more ({filtered.length - visibleCount} remaining)
+                {isLoading ? "Loading..." : `Show more (${remaining} remaining)`}
               </button>
             </div>
           )}
@@ -523,11 +779,25 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
       {/* Table view — full page width */}
       {viewMode === "table" && (
         <div className="px-6">
-          <ExploreTable items={filtered} onSearchChange={handleSearchChange} />
+          <ExploreTable
+            items={fallbackToLocal ? displayedItems : serverItems}
+            onSearchChange={handleSearchChange}
+          />
+          {!fallbackToLocal && hasMore && (
+            <div className="flex justify-center mt-4 mb-6">
+              <button
+                onClick={loadMore}
+                disabled={isLoading}
+                className="px-6 py-2.5 text-sm border border-border rounded-lg bg-background text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+              >
+                {isLoading ? "Loading..." : `Load more for table (${remaining} remaining)`}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {filtered.length === 0 && (
+      {displayedItems.length === 0 && !isLoading && (
         <div className="text-center py-12 text-muted-foreground">
           No entities found matching your criteria.
         </div>
