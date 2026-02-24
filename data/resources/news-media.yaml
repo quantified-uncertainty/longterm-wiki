@@ -1474,3 +1474,52 @@
   tags:
     - biography
     - investments
+- id: e5226f7f627066bc
+  url: https://www.bbc.com/news/technology-63601025
+  title: Grantees Affected by FTX Collapse Including Our World in Data (BBC, 2022)
+  type: web
+  cited_by:
+    - ea-longtermist-wins-losses
+  tags: []
+- id: 01b07421699a1fd3
+  url: https://www.reuters.com/technology/artificial-intelligence/openai-may-seek-500-billion-valuation-2025-fundraise-ft-reports-2025-01-08/
+  title: Reuters - OpenAI May Seek \$500B Valuation
+  type: web
+  cited_by:
+    - frontier-lab-cost-structure
+  tags: []
+- id: 900d79803983e05b
+  url: https://www.reuters.com/technology/artificial-intelligence/anthropic-fundraising-talks-value-it-350-billion-report-says-2025-01-22/
+  title: Reuters - Anthropic \$350B Valuation Talks
+  type: web
+  cited_by:
+    - frontier-lab-cost-structure
+  tags: []
+- id: 76963570d1adbbc5
+  url: https://www.reuters.com/technology/big-tech-ai-spending-2025-01-30/
+  title: Reuters - Big Tech to spend over \$300B on AI capex in 2025
+  type: web
+  cited_by:
+    - pre-tai-capital-deployment
+  tags: []
+- id: 7eb73d50547bf685
+  url: https://www.reuters.com/technology/stargate-ai-infrastructure-2025/
+  title: "Reuters - Inside Stargate: the \\$500B AI data center plan"
+  type: web
+  cited_by:
+    - pre-tai-capital-deployment
+  tags: []
+- id: 798153854144fb3b
+  url: https://www.nytimes.com/2023/02/28/opinion/sam-bankman-fried-effective-altruism.html
+  title: "\"Sam Bankman-Fried's Biggest Protector Was Effective Altruism\" (2023)"
+  type: web
+  cited_by:
+    - ftx-collapse-ea-funding-lessons
+  tags: []
+- id: 7fb5e0d33b0193c0
+  url: https://www.reuters.com/technology/artificial-intelligence/musk-led-group-offers-974-billion-acquire-openais-non-profit-2025-02-10/
+  title: Reuters - Musk-led group offers \$97.4 billion for OpenAI nonprofit
+  type: web
+  cited_by:
+    - openai-foundation
+  tags: []

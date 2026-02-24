@@ -2974,3 +2974,280 @@
   tags: []
   summary: Anthropic’s Transparency Hub A look at Anthropic&#x27;s key processes, programs, and
     practices for responsible AI development.
+- id: 8a20a28f94410f17
+  url: https://openai.com/research/language-unsupervised
+  title: Radford et al., "Improving Language Understanding by Generative Pre-Training" (OpenAI, 2018).
+  type: web
+  cited_by:
+    - language-models
+  tags: []
+- id: 5b72ca40b22da25b
+  url: https://openai.com/research/better-language-models
+  title: Radford et al., "Better Language Models and Their Implications" (OpenAI, 2019).
+  type: web
+  cited_by:
+    - language-models
+  tags: []
+- id: 370658949c0fdca7
+  url: https://openai.com/research/unsupervised-sentiment-neuron
+  title: Radford et al., "Learning to Generate Reviews and Discovering Sentiment" (OpenAI, 2017).
+  type: web
+  cited_by:
+    - language-models
+  tags: []
+- id: 87fa21e4250398f4
+  url: https://openai.com/research/learning-to-reason-with-llms
+  title: OpenAI, "Learning to Reason with LLMs" (2024).
+  type: web
+  cited_by:
+    - language-models
+  tags: []
+- id: 817c3cbf13144f20
+  url: https://openai.com/index/gpt-5-system-card/
+  title: OpenAI.
+  type: web
+  cited_by:
+    - language-models
+  tags: []
+- id: 1fa908f4a1b1af47
+  url: https://openai.com/index/why-language-models-hallucinate/
+  title: OpenAI, "Why language models hallucinate"
+    (https://openai.com/index/why-language-models-hallucinate/)
+  type: web
+  cited_by:
+    - language-models
+    - reducing-hallucinations
+  tags: []
+- id: 75d7c3f9f6277696
+  url: https://openai.com/index/shipping-smarter-agents/
+  title: Shipping Smarter Agents with Every New Model, OpenAI.
+  type: web
+  cited_by:
+    - language-models
+  tags: []
+- id: 75b66340eb2fadc2
+  url: https://openai.com/index/collective-alignment-aug-2025-updates/
+  title: "Collective Alignment: Public Input on Our Model Spec"
+  type: web
+  cited_by:
+    - why-alignment-hard
+  tags: []
+- id: ccac2622760fd6c8
+  url: https://openai.com/index/emergent-misalignment/
+  title: Toward Understanding and Preventing Misalignment Generalization
+  type: web
+  cited_by:
+    - why-alignment-hard
+  tags: []
+- id: 461e3e64a9d99bd1
+  url: https://openai.com/index/openai-elon-musk/
+  title: OpenAI and Elon Musk | OpenAI
+  type: web
+  cited_by:
+    - deep-learning-era
+  tags: []
+- id: e388403add7d489b
+  url: https://openai.com/research/openai-five
+  title: OpenAI Five | OpenAI
+  type: web
+  cited_by:
+    - deep-learning-era
+  tags: []
+- id: fdcaadbbe674abde
+  url: https://www.anthropic.com/news/detecting-countering-misuse-aug-2025
+  title: "Detecting and countering misuse of AI: August 2025"
+  type: web
+  cited_by:
+    - claude-code-espionage-2025
+  tags: []
+- id: ce3ac91af6150e19
+  url: https://anthropic.com/research/constitutional-classifiers
+  title: "Constitutional Classifiers: Defending against universal jailbreaks
+    (https://anthropic.com/research/constitutional-cla..."
+  type: web
+  cited_by:
+    - alignment-progress
+  tags: []
+- id: d875cbfb1b50d2a2
+  url: https://alignment.anthropic.com/2025/honesty-elicitation
+  title: Evaluating honesty and lie detection techniques on a diverse suite of dishonest models
+    (https://alignment.anthropic.c...
+  type: web
+  cited_by:
+    - alignment-progress
+    - alignment-robustness-trajectory
+  tags: []
+- id: e0032f5116b390be
+  url: https://anthropic.com/news/strategic-warning-for-ai-risk-progress-and-insights-from-our-frontier-red-team
+  title: Anthropic Frontier Red Team, *Progress from our Frontier Red Team*
+    (https://anthropic.com/news/strategic-warning-for-...
+  type: web
+  cited_by:
+    - alignment-progress
+  tags: []
+- id: 75d5c32883c85b64
+  url: https://anthropic.com/asl3-deployment-safeguards
+  title: Anthropic ASL-3 Deployment Safeguards (https://anthropic.com/asl3-deployment-safeguards)
+  type: web
+  cited_by:
+    - alignment-progress
+  tags: []
+- id: e768e19742eed3d7
+  url: https://red.anthropic.com/2025/nuclear-safeguards
+  title: Nuclear Safeguards — red.anthropic.com (https://red.anthropic.com/2025/nuclear-safeguards)
+  type: web
+  cited_by:
+    - alignment-progress
+  tags: []
+- id: 8919b8ee25621cf0
+  url: https://anthropic.com/research/next-generation-constitutional-classifiers
+  title: Next-generation Constitutional Classifiers
+    (https://anthropic.com/research/next-generation-constitutional-classifiers)
+  type: web
+  cited_by:
+    - alignment-progress
+    - alignment-robustness-trajectory
+  tags: []
+- id: 2884da7da6068d30
+  url: https://anthropic.com/research/agentic-misalignment
+  title: "Agentic Misalignment: How LLMs Could Be Insider Threats | Anthropic
+    (https://anthropic.com/research/agentic-misalignm..."
+  type: web
+  cited_by:
+    - alignment-progress
+  tags: []
+- id: db56a00a00382f4e
+  url: https://www.anthropic.com/news/jailbreak-challenge
+  title: Jailbreak Challenge Results (Anthropic, 2025)
+  type: web
+  cited_by:
+    - lab-behavior
+  tags: []
+- id: b04b9022f4d7e470
+  url: https://alignment.anthropic.com/2025/alignment-faking-mitigations/
+  title: Alignment Faking Mitigations - Anthropic
+  type: web
+  cited_by:
+    - model-organisms-of-misalignment
+  tags: []
+- id: c740b6d477e87fd3
+  url: https://alignment.anthropic.com/2025/subliminal-learning/
+  title: Subliminal Learning - Anthropic Alignment
+  type: web
+  cited_by:
+    - model-organisms-of-misalignment
+  tags: []
+- id: 3d12a07734e3957a
+  url: https://www.anthropic.com/news/microsoft-nvidia-anthropic-announce-strategic-partnerships
+  title: Anthropic, "Microsoft, Nvidia, Anthropic Announce Strategic Partnerships"
+    (https://www.anthropic.com/news/microsoft-n...
+  type: web
+  cited_by:
+    - anthropic-investors
+  tags: []
+- id: e51a9f82540a1841
+  url: https://www.anthropic.com/news/anthropic-expands-global-leadership-in-enterprise-ai-naming-chris-ciauri-as-managing-director-of
+  title: Anthropic expands global leadership in enterprise AI
+  type: web
+  cited_by:
+    - anthropic-ipo
+  tags: []
+- id: 155d4f497d76c742
+  url: https://openai.com/safety/how-we-think-about-safety-alignment/
+  title: OpenAI - How We Think About Safety Alignment
+  type: web
+  cited_by:
+    - elicit
+  tags: []
+- id: d6c83eff09565929
+  url: https://www.anthropic.com/news/the-long-term-benefit-trust
+  title: "Anthropic: The Long-Term Benefit Trust"
+  type: web
+  cited_by:
+    - long-term-benefit-trust
+    - openai-foundation
+  tags: []
+- id: 2c6738a6e16d290c
+  url: https://www.anthropic.com/news/mariano-florentino-long-term-benefit-trust
+  title: "Anthropic: Mariano-Florentino Long-Term Benefit Trust"
+  type: web
+  cited_by:
+    - long-term-benefit-trust
+  tags: []
+- id: 9a18de135c2216fe
+  url: https://openai.com/foundation/
+  title: OpenAI Foundation - Official Website
+  type: web
+  cited_by:
+    - openai-foundation
+  tags: []
+- id: e5a371169a1d9c79
+  url: https://openai.com/index/built-to-benefit-everyone/
+  title: Built to Benefit Everyone - OpenAI Blog
+  type: web
+  cited_by:
+    - openai-foundation
+  tags: []
+- id: c61924d997cdada9
+  url: https://openai.com/our-structure/
+  title: Our Structure - OpenAI
+  type: web
+  cited_by:
+    - openai-foundation
+  tags: []
+- id: 2b6386e535146185
+  url: https://openai.com/index/people-first-ai-fund-grantees/
+  title: People-First AI Fund Grantees - OpenAI Blog
+  type: web
+  cited_by:
+    - openai-foundation
+  tags: []
+- id: e2c4f60e2fb02a7c
+  url: https://openai.com/index/ai-mental-health-research-grants/
+  title: AI and Mental Health Research Grants - OpenAI
+  type: web
+  cited_by:
+    - openai-foundation
+  tags: []
+- id: edc1663b7d3b8ac2
+  url: https://openai.com/index/sora-2/
+  title: Sora 2 is here
+  type: web
+  cited_by:
+    - openai
+  tags: []
+- id: 238f28c96d8780f6
+  url: https://openai.com/global-affairs/openai-for-countries/
+  title: Introducing OpenAI for Countries
+  type: web
+  cited_by:
+    - openai
+  tags: []
+- id: ee7628aa3f6282e5
+  url: https://openai.com/index/deliberative-alignment/
+  title: "Deliberative alignment: reasoning enables safer language models"
+  type: web
+  cited_by:
+    - openai
+  tags: []
+- id: 35a1956016db2d64
+  url: https://cdn.openai.com/pdf/d04913be-3f6f-4d2b-b283-ff432ef4aaa5/why-language-models-hallucinate.pdf
+  title: "OpenAI: Why Language Models Hallucinate PDF"
+  type: web
+  cited_by:
+    - reducing-hallucinations
+  tags: []
+- id: 7b09f4ed03e4c0ce
+  url: https://openai.com/index/mixpanel-incident/
+  title: OpenAI Blog
+  type: web
+  cited_by:
+    - compute-concentration
+  tags: []
+- id: c2e3d7e5c92d5689
+  url: https://openai.com/index/governance-of-superintelligence/
+  title: OpenAI. Governance of superintelligence
+  type: web
+  cited_by:
+    - superintelligence
+  tags: []

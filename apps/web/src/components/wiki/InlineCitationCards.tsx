@@ -120,6 +120,7 @@ function FootnoteCard({
   // Merge source title from resource data or citation data
   const sourceTitle = quote.sourceTitle || footnoteData?.title || sourceData?.title;
   const sourceDomain = sourceData?.domain;
+  const resourceId = sourceData?.resourceId || footnoteData?.resourceId;
 
   return createPortal(
     <HoverCard.Root openDelay={200} closeDelay={150}>
@@ -204,6 +205,16 @@ function FootnoteCard({
               View in References
             </a>
           </div>
+          {resourceId && (
+            <div className="mt-1.5">
+              <a
+                href={`/source/${resourceId}`}
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline !no-underline hover:!underline"
+              >
+                View source details
+              </a>
+            </div>
+          )}
 
           <HoverCard.Arrow className="fill-border" />
         </HoverCard.Content>

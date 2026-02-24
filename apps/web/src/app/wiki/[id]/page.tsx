@@ -331,7 +331,8 @@ async function ContentView({
           {/* Unified bibliography: merges footnote data, resource metadata, and verification */}
           {!isInternal && (() => {
             const fnIndex = getFootnoteIndex(slug);
-            return fnIndex
+            const hasUnifiedData = fnIndex && fnIndex.sources.length > 0;
+            return hasUnifiedData
               ? <UnifiedReferences pageId={slug} />
               : <References pageId={slug} />;
           })()}
@@ -339,7 +340,8 @@ async function ContentView({
         {/* Citation verification overlay — decorates footnote refs with status indicators */}
         {citationQuotes && citationQuotes.length > 0 && (() => {
           const fnIndex = getFootnoteIndex(slug);
-          return fnIndex
+          const hasUnifiedData = fnIndex && fnIndex.sources.length > 0;
+          return hasUnifiedData
             ? <InlineCitationCards
                 quotes={citationQuotes}
                 footnotes={fnIndex.footnotes}

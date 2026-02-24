@@ -186,7 +186,14 @@ function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
       </span>
       {/* Title + metadata */}
       <span className="flex-1 min-w-0">
-        {url ? (
+        {resource?.id ? (
+          <a
+            href={`/source/${resource.id}`}
+            className="text-[13px] text-accent-foreground !no-underline hover:!underline leading-tight"
+          >
+            {title}
+          </a>
+        ) : url ? (
           <a
             href={url}
             target="_blank"

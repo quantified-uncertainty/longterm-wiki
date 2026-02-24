@@ -3134,3 +3134,525 @@
   cited_by:
     - anthropic
   tags: []
+- id: a1653d6794b9fa5f
+  url: https://www.ftc.gov/reports/data-brokers-call-transparency-accountability-report-federal-trade-commission-may-2014
+  title: https://www.ftc.gov/reports/data-brokers-call-transparency-accountability-report-federal-trade-commission-may-2014
+  type: government
+  cited_by:
+    - ai-powered-investigation
+  tags: []
+- id: bfec963619a2f651
+  url: https://www.thecorporategovernanceinstitute.com/insights/news-analysis/governance-causes-ftx-collapse/
+  title: Governance Causes of the FTX Collapse
+  type: government
+  cited_by:
+    - ea-epistemic-failures-in-the-ftx-era
+  tags: []
+- id: 71f04d637739f6d0
+  url: https://www.gov.uk/government/publications/charity-inquiry-effective-ventures-foundation-uk/charity-inquiry-effective-ventures-foundation-uk
+  title: "Charity Inquiry: Effective Ventures Foundation UK"
+  type: government
+  cited_by:
+    - ea-epistemic-failures-in-the-ftx-era
+    - cea
+  tags: []
+- id: 8394204271e96e7b
+  url: https://www.whitehouse.gov/cea/
+  title: US Council of Economic Advisers (https://www.whitehouse.gov/cea/)
+  type: government
+  cited_by:
+    - geopolitics
+  tags: []
+- id: 32b908bd4ea10439
+  url: https://www.gov.uk/government/news/uk-and-us-agree-landmark-partnership-on-artificial-intelligence-safety
+  title: UK Department for Science, Innovation and Technology, *UK and US agree landmark partnership
+    on AI safety* (https://ww...
+  type: government
+  cited_by:
+    - geopolitics
+  tags: []
+- id: 59ddffa05fc15cdf
+  url: https://www.nist.gov/news-events/news/2024/12/nist-releases-pre-deployment-safety-evaluation-openais-o1-model
+  title: Pre-Deployment Evaluation of OpenAI's o1 Model (NIST, December 2024)
+  type: government
+  cited_by:
+    - lab-behavior
+  tags: []
+- id: 311f728497587caf
+  url: https://www.cisa.gov/sites/default/files/2024-11/CISA_AI_Red_Teaming_Guide.pdf
+  title: "AI Red Teaming: Applying Software TEVV for AI Evaluations (CISA, November 2024)"
+  type: government
+  cited_by:
+    - lab-behavior
+  tags: []
+- id: 07bbfdc7df05b11a
+  url: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/
+  title: Ensuring a National Policy Framework for Artificial Intelligence (The White House, December
+    11, 2025)
+  type: government
+  cited_by:
+    - lab-behavior
+    - pause-ai
+    - colorado-ai-act
+    - us-state-legislation
+  tags: []
+- id: 265c4b8ef9178e05
+  url: https://www.congress.gov/bill/119th-congress/senate-bill/1792/text
+  title: S.1792 - AI Whistleblower Protection Act (U.S. Congress, May 2025)
+  type: government
+  cited_by:
+    - lab-behavior
+  tags: []
+- id: 6aaf36a7ca97c4d0
+  url: https://aisi.gov.uk/blog/aisis-research-direction-for-technical-solutions
+  title: AISI, *How we're addressing the gap between AI capabilities and mitigations*
+    (https://aisi.gov.uk/blog/aisis-research...
+  type: government
+  cited_by:
+    - capability-alignment-race
+  tags: []
+- id: e0a695ac99bfa019
+  url: https://governance.ai/research-paper/safety-not-guaranteed-international-strategic-dynamics-of-risky-technology-races
+  title: "GovAI, *Safety Not Guaranteed: International Strategic Dynamics of Risky Technology Races*
+    (https://governance.ai/res..."
+  type: government
+  cited_by:
+    - capability-alignment-race
+  tags: []
+- id: 1c9e6c3c84c1faa3
+  url: https://aisi.gov.uk/blog/funding-60-projects-to-advance-ai-alignment-research
+  title: AISI, "Funding 60 projects to advance AI alignment research"
+    (https://aisi.gov.uk/blog/funding-60-projects-to-advance...
+  type: government
+  cited_by:
+    - capability-alignment-race
+  tags: []
+- id: 05f66d9d8a450d5b
+  url: https://www.whitehouse.gov/briefing-room/statements-releases/2025/01/21/fact-sheet-president-donald-j-trump-announces-the-stargate-project/
+  title: White House - Stargate Project Announcement
+  type: government
+  cited_by:
+    - frontier-lab-cost-structure
+  tags: []
+- id: a68e822e3bde0345
+  url: https://www.sec.gov/edgar
+  title: SEC EDGAR Database
+  type: government
+  cited_by:
+    - projecting-compute-spending
+  tags: []
+- id: c714168b4eaf2317
+  url: https://www.governance.ai/research-paper/computing-power-and-the-governance-of-ai
+  title: Compute Governance and International Security
+  type: government
+  cited_by:
+    - short-timeline-policy-implications
+  tags: []
+- id: d1ee4794f8e26344
+  url: https://www.justice.gov/usao-sdny/pr/sam-bankman-fried-indicted-manhattan-federal-court-fraud-charges-related-collapse
+  title: Sam Bankman-Fried Indicted in Manhattan Federal Court for Fraud Charges Related to Collapse
+    of FTX
+  type: government
+  cited_by:
+    - ftx
+  tags: []
+- id: 84fca7d9f3ded9b0
+  url: https://www.cftc.gov/PressRoom/PressReleases/8715-23
+  title: CFTC Wins \$12.7 Billion Against FTX and Samuel Bankman-Fried
+  type: government
+  cited_by:
+    - ftx
+  tags: []
+- id: 50e9e21412a282a2
+  url: https://www.srbija.gov.rs/specijal/en/236368
+  title: GPAI Summit 2024 - Government of Serbia
+  type: government
+  cited_by:
+    - gpai
+  tags: []
+- id: 518a2ccfe835dc2f
+  url: https://www.congress.gov/119/meeting/house/118773/witnesses/HHRG-119-IF02-Wstate-PannuJ-20251217.pdf
+  title: Jassi Pannu Congressional Testimony
+  type: government
+  cited_by:
+    - johns-hopkins-center-for-health-security
+  tags: []
+- id: 357cf00ad44eea37
+  url: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
+  title: "Harvard Law School Forum on Corporate Governance: Anthropic Long-Term Benefit Trust"
+  type: government
+  cited_by:
+    - long-term-benefit-trust
+  tags: []
+- id: 766e0db9dff449f3
+  url: https://www.nist.gov/timeline
+  title: NIST Timeline
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: e2a474cafba15a65
+  url: https://www.nist.gov/document/aisi-strategic-vision-document
+  title: AISI Strategic Vision Document
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: d59a2ba1cc9ad0fd
+  url: https://www.nist.gov/news-events/news/2024/02/us-commerce-secretary-gina-raimondo-announces-key-executive-leadership-us
+  title: "NIST News: Commerce Secretary Announces AISI Leadership"
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: aefd41e0bf670a85
+  url: https://www.nist.gov/itl/about-itl/itl-history-timeline
+  title: NIST ITL About ITL - ITL History Timeline
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: aaffbbbc309ac098
+  url: https://csrc.nist.gov/nist-cyber-history
+  title: NIST Cyber History
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: 7f1710c52717b585
+  url: https://www.nist.gov/artificial-intelligence/ai-research
+  title: NIST Artificial Intelligence - AI Research
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: e63572e7230052e6
+  url: https://www.nextgov.com/artificial-intelligence/2024/04/nist-adds-5-new-members-its-ai-safety-institute/395783/
+  title: "Nextgov: NIST Adds 5 New Members to AI Safety Institute"
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: 563d1d66cd664c48
+  url: https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical-infrastructure
+  title: "NIST News: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure"
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: "137112373e543278"
+  url: https://www.nist.gov/artificial-intelligence/nist-ai-consortium
+  title: NIST AI Consortium
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: 2f39199a307f2fc8
+  url: https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-5.pdf
+  title: "NIST AI 100-5: A Plan for Global Engagement on AI Standards (PDF)"
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: d8acad4a18d8b13d
+  url: https://www.nist.gov/news-events/news/2025/08/nist-awards-over-18-million-small-businesses-advancing-ai-semiconductors
+  title: "NIST News: NIST Awards Over \\$1.8 Million to Small Businesses"
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: b30afd5cb5ccd662
+  url: https://www.nist.gov/news-events/news/2024/07/nist-announces-funding-opportunity-ai-focused-manufacturing-usa-institute
+  title: "NIST News: NIST Announces Funding Opportunity for AI-Focused Manufacturing USA Institute"
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: 9f6acd0c1e030aa7
+  url: https://digital.gov/event/2020/11/04/overview-of-nist-initiatives-on-ai-standards-principles-and-critical-ai-issues
+  title: "Digital.gov: Overview of NIST Initiatives on AI Standards"
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: 5697844765df8988
+  url: https://www.nist.gov/artificial-intelligence/comments-received-proposal-identifying-and-managing-bias-artificial
+  title: "NIST: Comments Received on Proposal for Identifying and Managing Bias in AI"
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: e621922bd1b767c1
+  url: https://www.nist.gov/news-events/news/2022/03/theres-more-ai-bias-biased-data-nist-report-highlights
+  title: "NIST News: There's More to AI Bias Than Biased Data"
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: 9d434a8743369a7a
+  url: https://www.nextgov.com/artificial-intelligence/2025/08/artificial-intelligence-friend-foe-or-frenemy-nist-wants-find-out/407792/
+  title: "Nextgov: Artificial Intelligence Friend, Foe, or Frenemy - NIST Wants to Find Out"
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: b86735c62b1cd9c5
+  url: https://www.nist.gov/artificial-intelligence/technical-contributions-ai-governance
+  title: "NIST: Technical Contributions to AI Governance"
+  type: government
+  cited_by:
+    - nist-ai
+  tags: []
+- id: b85a6c317febe716
+  url: https://www.irs.gov/charities-non-profits/private-foundations/excess-business-holdings-of-private-foundation-defined
+  title: IRS - Excess Business Holdings of Private Foundation
+  type: government
+  cited_by:
+    - openai-foundation
+  tags: []
+- id: f4f3235621c72078
+  url: https://oag.ca.gov/charities
+  title: California AG Charitable Trusts
+  type: government
+  cited_by:
+    - openai-foundation
+  tags: []
+- id: d6ecbc5232c558d8
+  url: https://www.irs.gov/compliance/whistleblower-office
+  title: IRS Whistleblower Office
+  type: government
+  cited_by:
+    - openai-foundation
+  tags: []
+- id: 6c4d05a6c32fead5
+  url: https://ritchietorres.house.gov/posts/in-response-to-suspicious-polymarket-trade-preceding-maduro-operation-rep-ritchie-torres-introduces-legislation-to-crack-down-on-insider-trading-on-prediction-markets
+  title: Rep. Ritchie Torres Introduces Legislation on Prediction Markets - Ritchie Torres
+  type: government
+  cited_by:
+    - polymarket
+  tags: []
+- id: df7e48e6d0a50b90
+  url: https://www.nist.gov/document/ai-eo-14110-rfi-comments-securebio
+  title: SecureBio NIST RFI Submission
+  type: government
+  cited_by:
+    - securebio
+  tags: []
+- id: 51ce16d3b66e8792
+  url: https://find-and-update.company-information.service.gov.uk/company/14003610
+  title: Swift Centre - Companies House Registration
+  type: government
+  cited_by:
+    - swift-centre
+  tags: []
+- id: 0bc9204c074b6771
+  url: https://adviserinfo.sec.gov/firm/summary/319135
+  title: SEC Investment Adviser Public Disclosure - VARA
+  type: government
+  cited_by:
+    - vara
+  tags: []
+- id: c2e7724254cedd7c
+  url: https://www.justice.gov/archives/opa/pr/samuel-bankman-fried-sentenced-25-years-his-orchestration-multiple-fraudulent-schemes
+  title: U.S. Department of Justice - Samuel Bankman-Fried Sentenced 25 Years
+  type: government
+  cited_by:
+    - sam-bankman-fried
+  tags: []
+- id: 923a9a0e93385419
+  url: https://www.sec.gov/newsroom/press-releases/2022-219
+  title: SEC Press Release - SBF Charges
+  type: government
+  cited_by:
+    - sam-bankman-fried
+  tags: []
+- id: a6df5717790c33c9
+  url: https://www.congress.gov/crs-product/IF13151
+  title: '"Agentic AI and Cyberattacks"'
+  type: government
+  cited_by:
+    - alignment
+  tags: []
+- id: fc055497788c9ff5
+  url: https://www.gov.uk/government/news/historic-first-as-companies-spanning-north-america-asia-europe-and-middle-east-agree-safety-commitments-on-development-of-ai
+  title: "UK Government: Historic First as Companies Agree Safety Commitments on AI"
+  type: government
+  cited_by:
+    - bletchley-declaration
+  tags: []
+- id: bf53f65297df2402
+  url: https://www.gov.ca.gov/2025/09/29/governor-newsom-signs-sb-53-advancing-californias-world-leading-artificial-intelligence-industry/
+  title: Governor Newsom Signs SB 53, California Governor's Office
+  type: government
+  cited_by:
+    - california-sb53
+  tags: []
+- id: 82d0804dfdcab2b5
+  url: https://sd11.senate.ca.gov/news/governor-newsom-signs-senator-wieners-landmark-ai-law-set-commonsense-guardrails-boost
+  title: Governor Newsom Signs Senator Wiener's Landmark AI Law, California State Senate
+  type: government
+  cited_by:
+    - california-sb53
+  tags: []
+- id: 1c6119776766d52d
+  url: https://www.nist.gov/publications/towards-standard-identifying-and-managing-bias-artificial-intelligence
+  title: "NIST Special Publication 1270: Towards a Standard for Identifying and Managing Bias in AI"
+  type: government
+  cited_by:
+    - colorado-ai-act
+  tags: []
+- id: 482b71342542a659
+  url: https://www.governance.ai/analysis/computing-power-and-the-governance-of-ai
+  title: GovAI - Computing Power and the Governance of AI
+  type: government
+  cited_by:
+    - compute-governance
+  tags: []
+- id: 503d5c9feb25aff6
+  url: https://www.whitehouse.gov/presidential-actions/2025/07/promoting-the-export-of-the-american-ai-technology-stack/
+  title: White House - Promoting the Export of the American AI Technology Stack
+  type: government
+  cited_by:
+    - compute-governance
+  tags: []
+- id: b6939175cd95cd38
+  url: https://www.bis.gov/press-release/department-commerce-announces-rescission-biden-era-artificial-intelligence-diffusion-rule-strengthens
+  title: BIS - Department of Commerce Announces Rescission of Biden-Era AI Diffusion Rule
+  type: government
+  cited_by:
+    - compute-governance
+  tags: []
+- id: 104ef027f750b0ee
+  url: https://www.governance.ai/research-paper/export-controls-and-export-promotion
+  title: GovAI - Export Controls and Export Promotion
+  type: government
+  cited_by:
+    - compute-governance
+  tags: []
+- id: 5907b6750da90f60
+  url: https://cdn.governance.ai/Accessing_Controlled_AI_Chips_via_Infrastructure-as-a-Service.pdf
+  title: GovAI - Accessing Controlled AI Chips via Infrastructure-as-a-Service
+  type: government
+  cited_by:
+    - compute-governance
+  tags: []
+- id: 9d0f72e6330f3700
+  url: https://khanna.house.gov/media/press-releases/release-khanna-leads-california-congressional-delegation-letter-governor-newsom
+  title: Khanna leads California congressional delegation letter
+  type: government
+  cited_by:
+    - failed-stalled-proposals
+  tags: []
+- id: ecd2bcb3b4f89b59
+  url: https://www.congress.gov/bill/118th-congress/house-bill/5628
+  title: H.R.5628 - Algorithmic Accountability Act
+  type: government
+  cited_by:
+    - failed-stalled-proposals
+  tags: []
+- id: f300d1a5045bba60
+  url: https://www.congress.gov/bill/118th-congress/house-bill/815
+  title: H.R.815
+  type: government
+  cited_by:
+    - failed-stalled-proposals
+  tags: []
+- id: 3cc3f98bd8de0bf1
+  url: https://www.senate.gov/legislative/LIS/roll_call_votes/vote1182/vote_118_2_00234.htm
+  title: Senate Vote 234
+  type: government
+  cited_by:
+    - failed-stalled-proposals
+  tags: []
+- id: 8cdd7b7b21977891
+  url: https://www.whitehouse.gov/briefing-room/statements-releases/2024/09/24/fact-sheet-biden-harris-administration-announces-key-ai-actions-following-president-bidens-commitment-to-ai-governance-at-the-united-nations/
+  title: Biden-Harris Administration AI Actions
+  type: government
+  cited_by:
+    - failed-stalled-proposals
+  tags: []
+- id: 189d89e530b5f013
+  url: https://corpgov.law.harvard.edu/2025/04/02/ai-in-focus-in-2025-boards-and-shareholders-set-their-sights-on-ai/
+  title: "AI in Focus in 2025: Boards and Shareholders Set Their Sights on AI"
+  type: government
+  cited_by:
+    - failed-stalled-proposals
+  tags: []
+- id: ab5a6d166583a57e
+  url: https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models
+  title: NY Governor's Office - Governor Hochul Signs Nation-Leading Legislation
+  type: government
+  cited_by:
+    - new-york-raise-act
+  tags: []
+- id: a562dd579be46ab9
+  url: https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf
+  title: NIST AI Risk Management Framework
+  type: government
+  cited_by:
+    - nist-ai-rmf
+  tags: []
+- id: d63d3ee303806c47
+  url: https://csrc.nist.gov/projects/cosais
+  title: NIST COSAIS Project
+  type: government
+  cited_by:
+    - nist-ai-rmf
+  tags: []
+- id: 326b4b738527b669
+  url: https://capitol.texas.gov/tlodocs/89R/analysis/html/HB00149S.htm
+  title: Texas Legislature Analysis - HB 149
+  type: government
+  cited_by:
+    - texas-traiga
+  tags: []
+- id: 6d250be61a0b37b2
+  url: https://www.tennessee.gov/governor/news/2024/3/21/gov--lee-signs-elvis-act-legislation-to-protect-tennessee-songwriters--artists
+  title: Tennessee Governor - Gov. Lee Signs ELVIS Act Legislation
+  type: government
+  cited_by:
+    - us-state-legislation
+  tags: []
+- id: 18f5afaa5045cb5b
+  url: https://gov.texas.gov/news/post/governor-abbott-signs-responsible-ai-governance-act-traiga
+  title: Texas Governor - Governor Abbott Signs Responsible AI Governance Act
+  type: government
+  cited_by:
+    - us-state-legislation
+  tags: []
+- id: 8eef494b166943d4
+  url: https://www.state.gov/reports/2024-adherence-to-and-compliance-with-arms-control-nonproliferation-and-disarmament-agreements-and-commitments/
+  title: U.S.
+  type: government
+  cited_by:
+    - bioweapons
+  tags: []
+- id: c797ac9b60348d83
+  url: https://www.justice.gov/archive/amerithrax/docs/amx-investigative-summary.pdf
+  title: "FBI summary of the Amerithrax investigation: Federal Bureau of Investigation, *Amerithrax
+    Investigative Summary* (201..."
+  type: government
+  cited_by:
+    - bioweapons
+  tags: []
+- id: 7f1a94b5cd350ddb
+  url: https://www.congress.gov/bill/115th-congress/house-bill/4943
+  title: Congress.gov
+  type: government
+  cited_by:
+    - compute-concentration
+  tags: []
+- id: 53a3dbcef700ccc2
+  url: https://media.bis.gov/press-release/department-commerce-rescinds-biden-era-artificial-intelligence-diffusion-rule-strengthens-chip-related
+  title: BIS Press Release
+  type: government
+  cited_by:
+    - compute-concentration
+  tags: []
+- id: 4ca776fdd7437e6d
+  url: https://media.defense.gov/2026/Jan/12/2003855671/-1/-1/0/ARTIFICIAL-INTELLIGENCE-STRATEGY-FOR-THE-DEPARTMENT-OF-WAR.PDF
+  title: DoD Publication
+  type: government
+  cited_by:
+    - compute-concentration
+  tags: []
