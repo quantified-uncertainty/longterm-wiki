@@ -136,6 +136,29 @@ interface RelatedGraphEntry {
   label?: string;
 }
 
+export interface CruxPosition {
+  view: string;
+  probability?: string;
+  holders?: string[];
+  implications?: string;
+}
+
+export interface CruxData {
+  id: string;
+  question: string;
+  domain?: string;
+  description?: string;
+  importance?: string;
+  resolvability?: string;
+  currentState?: string;
+  positions?: CruxPosition[];
+  wouldUpdateOn?: string[];
+  relatedCruxes?: string[];
+  relevantResearch?: Array<{ title: string; url?: string }>;
+  timeframe?: string;
+  summary?: string;
+}
+
 export interface Intervention {
   id: string;
   name: string;
@@ -169,6 +192,7 @@ interface DatabaseShape {
   experts: Expert[];
   organizations: Organization[];
   interventions: Intervention[];
+  cruxes: CruxData[];
   proposals: Proposal[];
   prItems: PrItem[];
   backlinks: Record<string, BacklinkEntry[]>;
@@ -1002,6 +1026,34 @@ export function getFactUsage(): Record<string, FactUsagePage[]> {
 export function getInterventions(): Intervention[] {
   const db = getDatabase();
   return db.interventions || [];
+}
+
+// ============================================================================
+// CRUXES
+// ============================================================================
+
+let _cruxIndex: Map<string, CruxData> | null = null;
+
+function cruxIndex(): Map<string, CruxData> {
+  if (_cruxIndex) return _cruxIndex;
+  const db = getDatabase();
+  _cruxIndex = new Map((db.cruxes || []).map((c) => [c.id, c]));
+  return _cruxIndex;
+}
+
+export function getCruxById(id: string): CruxData | undefined {
+  return cruxIndex().get(id);
+}
+
+export function getCruxes(): CruxData[] {
+  const db = getDatabase();
+  return db.cruxes || [];
+}
+
+export function getCruxesByDomain(domain: string): CruxData[] {
+  return getCruxes().filter(
+    (c) => c.domain?.toLowerCase() === domain.toLowerCase()
+  );
 }
 
 // ============================================================================

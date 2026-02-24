@@ -1,6 +1,7 @@
 import React from "react";
 import { cn } from "@lib/utils";
 import { priorityBadge, categoryBadge } from "./badge-styles";
+import { getInterventions } from "@data";
 
 interface InterventionSummary {
   id: string;
@@ -13,11 +14,22 @@ interface InterventionSummary {
 
 interface InterventionListProps {
   title?: string;
-  interventions: InterventionSummary[];
+  interventions?: InterventionSummary[];
+  category?: string;
   className?: string;
 }
 
-export function InterventionList({ title, interventions, className }: InterventionListProps) {
+export function InterventionList({ title, interventions: inlineInterventions, category, className }: InterventionListProps) {
+  let interventions: InterventionSummary[];
+  if (inlineInterventions && inlineInterventions.length > 0) {
+    interventions = inlineInterventions;
+  } else {
+    const all = getInterventions();
+    interventions = category
+      ? all.filter((i) => i.category?.toLowerCase() === category.toLowerCase())
+      : all;
+  }
+
   if (!interventions || interventions.length === 0) return null;
 
   return (
