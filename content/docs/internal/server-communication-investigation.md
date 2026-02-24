@@ -1,3 +1,7 @@
+---
+title: Server Communication Investigation
+---
+
 # Server Communication Investigation
 
 **Date:** 2026-02-24
