@@ -250,6 +250,31 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
     size: 80,
   },
   {
+    id: "sources",
+    accessorFn: (row) => row.sources?.length ?? 0,
+    header: ({ column }) => (
+      <SortableHeader column={column}>Src</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const count = row.original.sources?.length ?? 0;
+      if (count === 0) return <span className="text-muted-foreground/40 text-xs">—</span>;
+      return (
+        <span
+          className={`inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded text-[10px] font-medium ${
+            count >= 3
+              ? "bg-emerald-100 text-emerald-700"
+              : count >= 1
+                ? "bg-blue-100 text-blue-700"
+                : ""
+          }`}
+        >
+          {count}
+        </span>
+      );
+    },
+    size: 45,
+  },
+  {
     accessorKey: "claimCategory",
     header: ({ column }) => (
       <SortableHeader column={column}>Category</SortableHeader>

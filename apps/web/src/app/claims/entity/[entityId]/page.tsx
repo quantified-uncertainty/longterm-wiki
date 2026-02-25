@@ -51,6 +51,20 @@ export default async function EntityClaimsPage({ params }: PageProps) {
     .map((id) => getResourceById(id))
     .filter((r): r is NonNullable<typeof r> => r !== undefined);
 
+  // Count how many claims cite each resource (by resourceId or URL match)
+  const resourceCitationCounts = new Map<string, number>();
+  for (const claim of claims) {
+    if (!claim.sources) continue;
+    for (const source of claim.sources) {
+      if (source.resourceId) {
+        resourceCitationCounts.set(
+          source.resourceId,
+          (resourceCitationCounts.get(source.resourceId) ?? 0) + 1
+        );
+      }
+    }
+  }
+
   // Compute stats
   const verified = claims.filter((c) => c.confidence === "verified").length;
   const multiEntity = claims.filter(
@@ -144,6 +158,7 @@ export default async function EntityClaimsPage({ params }: PageProps) {
             <div className="mt-3 space-y-2">
               {resources.map((resource) => {
                 const credibility = getResourceCredibility(resource);
+                const citedInCount = resourceCitationCounts.get(resource.id) ?? 0;
                 return (
                   <div
                     key={resource.id}
@@ -153,15 +168,18 @@ export default async function EntityClaimsPage({ params }: PageProps) {
                       {getResourceTypeIcon(resource.type)}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <Link
+                        href={`/source/${resource.id}`}
                         className="font-medium text-blue-600 hover:underline"
                       >
                         {resource.title}
-                      </a>
+                      </Link>
                     </div>
+                    {citedInCount > 0 && (
+                      <span className="text-[10px] text-muted-foreground shrink-0">
+                        {citedInCount} {citedInCount === 1 ? "claim" : "claims"}
+                      </span>
+                    )}
                     <span className="text-[10px] text-muted-foreground capitalize shrink-0">
                       {resource.type}
                     </span>
