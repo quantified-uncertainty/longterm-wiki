@@ -7,6 +7,7 @@ export interface ClaimFilters {
   confidence: string;
   claimMode: string;
   multiEntity: boolean;
+  numericOnly: boolean;
 }
 
 export function ClaimsFilterBar({
@@ -26,7 +27,8 @@ export function ClaimsFilterBar({
     filters.category ||
     filters.confidence ||
     filters.claimMode ||
-    filters.multiEntity;
+    filters.multiEntity ||
+    filters.numericOnly;
 
   return (
     <div className="flex flex-wrap gap-2 mb-4">
@@ -89,6 +91,15 @@ export function ClaimsFilterBar({
         />
         Multi-entity only
       </label>
+      <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+        <input
+          type="checkbox"
+          checked={filters.numericOnly}
+          onChange={(e) => onFilterChange("numericOnly", e.target.checked)}
+          className="rounded"
+        />
+        Numeric only
+      </label>
       {hasFilters && (
         <button
           type="button"
@@ -99,6 +110,7 @@ export function ClaimsFilterBar({
             onFilterChange("confidence", "");
             onFilterChange("claimMode", "");
             onFilterChange("multiEntity", false);
+            onFilterChange("numericOnly", false);
           }}
           className="text-xs text-blue-600 hover:underline cursor-pointer"
         >

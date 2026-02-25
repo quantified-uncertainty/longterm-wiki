@@ -796,6 +796,7 @@ export interface ClaimStatsResult {
   factLinkedClaims: number;
   withSourcesClaims: number;
   attributedClaims: number;
+  numericClaims?: number;
 }
 
 // ---------------------------------------------------------------------------

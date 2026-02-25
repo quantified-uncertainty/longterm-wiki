@@ -43,10 +43,12 @@ function ExpandedClaimDetail({ claim }: { claim: ClaimRow }) {
         <p className="mt-0.5">{claim.claimText}</p>
       </div>
 
-      {/* Epistemic mode */}
-      {claim.claimMode && claim.claimMode !== "endorsed" && (
+      {/* Epistemic mode — show badge for attributed; always show asOf when set */}
+      {(claim.claimMode === "attributed" || claim.asOf) && (
         <div className="flex items-center gap-2">
-          <ClaimModeBadge mode={claim.claimMode} attributedTo={claim.attributedTo} />
+          {claim.claimMode === "attributed" && (
+            <ClaimModeBadge mode={claim.claimMode} attributedTo={claim.attributedTo} />
+          )}
           {claim.asOf && (
             <span className="text-[10px] text-muted-foreground">as of {claim.asOf}</span>
           )}
@@ -193,16 +195,33 @@ const columns: ColumnDef<ClaimRow>[] = [
   {
     accessorKey: "claimText",
     header: "Claim",
-    cell: ({ row }) => (
-      <span
-        className="text-xs leading-relaxed"
-        title={row.original.claimText}
-      >
-        {row.original.claimText.length > 200
-          ? row.original.claimText.slice(0, 200) + "..."
-          : row.original.claimText}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const c = row.original;
+      const hasNumeric = c.valueNumeric != null || c.valueLow != null || c.valueHigh != null;
+      return (
+        <div className="space-y-0.5">
+          <span
+            className="text-xs leading-relaxed"
+            title={c.claimText}
+          >
+            {c.claimText.length > 200
+              ? c.claimText.slice(0, 200) + "..."
+              : c.claimText}
+          </span>
+          {hasNumeric && (
+            <div>
+              <NumericValueDisplay
+                value={c.valueNumeric}
+                low={c.valueLow}
+                high={c.valueHigh}
+                measure={c.measure}
+                compact
+              />
+            </div>
+          )}
+        </div>
+      );
+    },
     size: 400,
   },
   {
