@@ -30,3 +30,23 @@ export function firstOrThrow<T>(rows: T[], context: string): T {
   }
   return rows[0];
 }
+
+/**
+ * Return a 500 database error response and log context for debugging.
+ * Use this inside catch blocks around transaction or DB operations.
+ */
+export function dbError(
+  c: Context,
+  operation: string,
+  err: unknown,
+  context?: Record<string, unknown>
+) {
+  console.error(`[db] ${operation} failed:`, {
+    ...(context ?? {}),
+    error: err instanceof Error ? err.message : String(err),
+  });
+  return c.json(
+    { error: "database_error", message: `${operation} failed` },
+    500
+  );
+}

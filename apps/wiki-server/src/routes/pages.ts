@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  dbError,
 } from "./utils.js";
 import {
   SyncPageSchema as SharedSyncPageSchema,
@@ -245,85 +246,89 @@ pagesRoute.post("/sync", async (c) => {
 
   const pageIds = pages.map((p) => p.id);
 
-  await db.transaction(async (tx) => {
-    const allVals = pages.map((page) => ({
-      id: page.id,
-      numericId: page.numericId ?? null,
-      title: page.title,
-      description: page.description ?? null,
-      llmSummary: page.llmSummary ?? null,
-      category: page.category ?? null,
-      subcategory: page.subcategory ?? null,
-      entityType: page.entityType ?? null,
-      tags: page.tags ?? null,
-      quality: page.quality ?? null,
-      readerImportance: page.readerImportance ?? null,
-      researchImportance: page.researchImportance ?? null,
-      tacticalValue: page.tacticalValue ?? null,
-      backlinkCount: page.backlinkCount ?? null,
-      riskCategory: page.riskCategory ?? null,
-      dateCreated: page.dateCreated ?? null,
-      recommendedScore: page.recommendedScore ?? null,
-      clusters: page.clusters ?? null,
-      hallucinationRiskLevel: page.hallucinationRiskLevel ?? null,
-      hallucinationRiskScore: page.hallucinationRiskScore ?? null,
-      contentPlaintext: page.contentPlaintext ?? null,
-      wordCount: page.wordCount ?? null,
-      lastUpdated: page.lastUpdated ?? null,
-      contentFormat: page.contentFormat ?? null,
-      syncedFromBranch: syncedFromBranch ?? null,
-      syncedFromCommit: syncedFromCommit ?? null,
-    }));
+  try {
+    await db.transaction(async (tx) => {
+      const allVals = pages.map((page) => ({
+        id: page.id,
+        numericId: page.numericId ?? null,
+        title: page.title,
+        description: page.description ?? null,
+        llmSummary: page.llmSummary ?? null,
+        category: page.category ?? null,
+        subcategory: page.subcategory ?? null,
+        entityType: page.entityType ?? null,
+        tags: page.tags ?? null,
+        quality: page.quality ?? null,
+        readerImportance: page.readerImportance ?? null,
+        researchImportance: page.researchImportance ?? null,
+        tacticalValue: page.tacticalValue ?? null,
+        backlinkCount: page.backlinkCount ?? null,
+        riskCategory: page.riskCategory ?? null,
+        dateCreated: page.dateCreated ?? null,
+        recommendedScore: page.recommendedScore ?? null,
+        clusters: page.clusters ?? null,
+        hallucinationRiskLevel: page.hallucinationRiskLevel ?? null,
+        hallucinationRiskScore: page.hallucinationRiskScore ?? null,
+        contentPlaintext: page.contentPlaintext ?? null,
+        wordCount: page.wordCount ?? null,
+        lastUpdated: page.lastUpdated ?? null,
+        contentFormat: page.contentFormat ?? null,
+        syncedFromBranch: syncedFromBranch ?? null,
+        syncedFromCommit: syncedFromCommit ?? null,
+      }));
 
-    await tx
-      .insert(wikiPages)
-      .values(allVals)
-      .onConflictDoUpdate({
-        target: wikiPages.id,
-        set: {
-          numericId: sql`excluded.numeric_id`,
-          title: sql`excluded.title`,
-          description: sql`excluded.description`,
-          llmSummary: sql`excluded.llm_summary`,
-          category: sql`excluded.category`,
-          subcategory: sql`excluded.subcategory`,
-          entityType: sql`excluded.entity_type`,
-          tags: sql`excluded.tags`,
-          quality: sql`excluded.quality`,
-          readerImportance: sql`excluded.reader_importance`,
-          researchImportance: sql`excluded.research_importance`,
-          tacticalValue: sql`excluded.tactical_value`,
-          backlinkCount: sql`excluded.backlink_count`,
-          riskCategory: sql`excluded.risk_category`,
-          dateCreated: sql`excluded.date_created`,
-          recommendedScore: sql`excluded.recommended_score`,
-          clusters: sql`excluded.clusters`,
-          hallucinationRiskLevel: sql`excluded.hallucination_risk_level`,
-          hallucinationRiskScore: sql`excluded.hallucination_risk_score`,
-          contentPlaintext: sql`excluded.content_plaintext`,
-          wordCount: sql`excluded.word_count`,
-          lastUpdated: sql`excluded.last_updated`,
-          contentFormat: sql`excluded.content_format`,
-          syncedFromBranch: sql`excluded.synced_from_branch`,
-          syncedFromCommit: sql`excluded.synced_from_commit`,
-          syncedAt: sql`now()`,
-          updatedAt: sql`now()`,
-        },
-      });
-    upserted = allVals.length;
+      await tx
+        .insert(wikiPages)
+        .values(allVals)
+        .onConflictDoUpdate({
+          target: wikiPages.id,
+          set: {
+            numericId: sql`excluded.numeric_id`,
+            title: sql`excluded.title`,
+            description: sql`excluded.description`,
+            llmSummary: sql`excluded.llm_summary`,
+            category: sql`excluded.category`,
+            subcategory: sql`excluded.subcategory`,
+            entityType: sql`excluded.entity_type`,
+            tags: sql`excluded.tags`,
+            quality: sql`excluded.quality`,
+            readerImportance: sql`excluded.reader_importance`,
+            researchImportance: sql`excluded.research_importance`,
+            tacticalValue: sql`excluded.tactical_value`,
+            backlinkCount: sql`excluded.backlink_count`,
+            riskCategory: sql`excluded.risk_category`,
+            dateCreated: sql`excluded.date_created`,
+            recommendedScore: sql`excluded.recommended_score`,
+            clusters: sql`excluded.clusters`,
+            hallucinationRiskLevel: sql`excluded.hallucination_risk_level`,
+            hallucinationRiskScore: sql`excluded.hallucination_risk_score`,
+            contentPlaintext: sql`excluded.content_plaintext`,
+            wordCount: sql`excluded.word_count`,
+            lastUpdated: sql`excluded.last_updated`,
+            contentFormat: sql`excluded.content_format`,
+            syncedFromBranch: sql`excluded.synced_from_branch`,
+            syncedFromCommit: sql`excluded.synced_from_commit`,
+            syncedAt: sql`now()`,
+            updatedAt: sql`now()`,
+          },
+        });
+      upserted = allVals.length;
 
-    // Update search vectors inside the same transaction
-    const idList = sql.join(pageIds.map(id => sql`${id}`), sql`, `);
-    await tx.execute(sql`
-      UPDATE wiki_pages SET search_vector =
-        setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
-        setweight(to_tsvector('english', coalesce(description, '')), 'B') ||
-        setweight(to_tsvector('english', coalesce(llm_summary, '')), 'C') ||
-        setweight(to_tsvector('english', coalesce(tags, '')), 'D') ||
-        setweight(to_tsvector('english', coalesce(entity_type, '')), 'D')
-      WHERE id IN (${idList})
-    `);
-  });
+      // Update search vectors inside the same transaction
+      const idList = sql.join(pageIds.map(id => sql`${id}`), sql`, `);
+      await tx.execute(sql`
+        UPDATE wiki_pages SET search_vector =
+          setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+          setweight(to_tsvector('english', coalesce(description, '')), 'B') ||
+          setweight(to_tsvector('english', coalesce(llm_summary, '')), 'C') ||
+          setweight(to_tsvector('english', coalesce(tags, '')), 'D') ||
+          setweight(to_tsvector('english', coalesce(entity_type, '')), 'D')
+        WHERE id IN (${idList})
+      `);
+    });
+  } catch (err) {
+    return dbError(c, "pages sync", err, { pageCount: pages.length });
+  }
 
   return c.json({ upserted });
 });
