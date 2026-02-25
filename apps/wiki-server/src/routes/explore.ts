@@ -16,7 +16,8 @@ const ExploreQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
   search: z.string().max(500).optional(),
   entityType: z.string().max(100).optional(),
-  category: z.string().max(100).optional(),
+  /** Single category or comma-separated list, e.g. "capabilities,intelligence-paradigms" */
+  category: z.string().max(500).optional(),
   cluster: z.string().max(100).optional(),
   riskCategory: z.string().max(50).optional(),
   sort: z
@@ -147,8 +148,15 @@ function buildFilterConditions(opts: {
   }
 
   if (opts.category) {
-    conditions.push(`wp.category = $${paramIdx}`);
-    params.push(opts.category);
+    const cats = opts.category.split(",").map((c) => c.trim()).filter(Boolean);
+    if (cats.length === 1) {
+      conditions.push(`wp.category = $${paramIdx}`);
+      params.push(cats[0]);
+    } else {
+      // Multiple categories — use ANY for an IN-style match
+      conditions.push(`wp.category = ANY($${paramIdx}::text[])`);
+      params.push(cats);
+    }
     paramIdx++;
   }
 

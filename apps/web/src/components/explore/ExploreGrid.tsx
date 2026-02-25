@@ -332,8 +332,8 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
           : entityGroup.types.length > 0
             ? entityGroup.types[0] // Use first type as representative
             : undefined,
-        category: sectionGroup.categories.length === 1
-          ? sectionGroup.categories[0]
+        category: sectionGroup.categories.length > 0
+          ? sectionGroup.categories.join(",")
           : undefined,
         riskCategory: riskCatGroup.value || undefined,
         sort: serverSort,
@@ -642,14 +642,29 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       {/* Search + filters — constrained width */}
       <div className="max-w-7xl mx-auto px-6">
         {/* Search */}
-        <div className="mb-4">
+        <div className="mb-4 relative">
           <input
             type="text"
             placeholder="Search entities..."
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring pr-10"
+            suppressHydrationWarning
           />
+          {isLoading && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <svg
+                className="w-4 h-4 text-muted-foreground animate-spin"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path strokeLinecap="round" d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+            </div>
+          )}
         </div>
 
         {/* Filter rows */}
