@@ -15,10 +15,12 @@ import { join } from 'path';
 const REPO_ROOT = join(__dirname, '../..');
 const APP_DIR = join(REPO_ROOT, 'apps/web');
 
-/** Run a command and return stdout + exit code */
+/** Run a command and return combined stdout+stderr + exit code */
 function run(cmd: string, cwd: string = REPO_ROOT): { stdout: string; exitCode: number } {
+  // Redirect stderr to stdout so we capture all output (pnpm banners go to stderr)
+  const fullCmd = `${cmd} 2>&1`;
   try {
-    const stdout = execSync(cmd, {
+    const stdout = execSync(fullCmd, {
       cwd,
       encoding: 'utf-8',
       timeout: 120_000,
