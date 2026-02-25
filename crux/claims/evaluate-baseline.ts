@@ -1,13 +1,19 @@
 /**
  * Evaluate extracted claims quality baseline.
  *
- * Reads dry-run log files from /tmp/claims-baseline/, evaluates a sample
- * of claims from each page using Claude Sonnet, and produces a summary report.
+ * Two modes:
+ *   --from-db (default): Read stored claims from the wiki-server database
+ *   --from-logs:         Read from dry-run log files in /tmp/claims-baseline/
+ *
+ * Evaluates a random sample of claims from each page using Claude Sonnet,
+ * and produces a summary report.
  *
  * Usage:
- *   pnpm crux claims evaluate-baseline
+ *   pnpm crux claims evaluate-baseline              # from database
+ *   pnpm crux claims evaluate-baseline --from-logs   # from dry-run logs
+ *   pnpm crux claims evaluate-baseline --sample=20   # 20 claims per page
  *
- * Requires: ANTHROPIC_API_KEY, dry-run logs in /tmp/claims-baseline/
+ * Requires: ANTHROPIC_API_KEY
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
@@ -17,8 +23,12 @@ import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { getColors } from '../lib/output.ts';
+import { getClaimsByEntity } from '../lib/wiki-server/claims.ts';
+import { isServerAvailable } from '../lib/wiki-server/client.ts';
+import { parseCliArgs } from '../lib/cli.ts';
 
 const LOG_DIR = '/tmp/claims-baseline';
+const DEFAULT_SAMPLE_SIZE = 15;
 
 interface ClaimEval {
   claimText: string;
@@ -51,13 +61,29 @@ const PAGES: PageConfig[] = [
   { id: 'interpretability', type: 'concept' },
 ];
 
-/**
- * Parse claims from a dry-run extraction log.
- * Extracts from both "Multi-entity claims:" and "Sample claims:" sections.
- */
-function parseClaimsFromLog(logPath: string): { claimText: string; claimType: string }[] {
+// ---------------------------------------------------------------------------
+// Claim sources: database or log files
+// ---------------------------------------------------------------------------
+
+interface ClaimInput {
+  claimText: string;
+  claimType: string;
+}
+
+/** Fetch claims for a page from the wiki-server database. */
+async function fetchClaimsFromDb(pageId: string): Promise<ClaimInput[]> {
+  const result = await getClaimsByEntity(pageId);
+  if (!result.ok || !result.data) return [];
+  return result.data.claims.map((c) => ({
+    claimText: c.claimText,
+    claimType: c.claimType,
+  }));
+}
+
+/** Parse claims from a dry-run extraction log (legacy mode). */
+function parseClaimsFromLog(logPath: string): ClaimInput[] {
   const log = readFileSync(logPath, 'utf-8');
-  const claims: { claimText: string; claimType: string }[] = [];
+  const claims: ClaimInput[] = [];
   const seen = new Set<string>();
 
   // Strip ANSI escape codes for reliable parsing
@@ -82,7 +108,6 @@ function parseClaimsFromLog(logPath: string): { claimText: string; claimType: st
   const sampleMatch = clean.match(/Sample claims:[\s\S]*?(?=\.\.\. and \d+ more|Dry run complete)/);
   if (sampleMatch) {
     for (const line of sampleMatch[0].split('\n')) {
-      // Match [type/category ...] or [type/category [date] [=val] ...] lines
       const m = line.trim().match(/^\[(\w+)\/\w+(?:\s+[^\]]*?)?\]\s+(.+?)(?:\s+\[\^[^\]]*\]|\s+\(unsourced\))?$/);
       if (m) {
         const text = m[2].trim();
@@ -97,6 +122,21 @@ function parseClaimsFromLog(logPath: string): { claimText: string; claimType: st
   return claims;
 }
 
+/** Pick a random sample of N items from an array. */
+function randomSample<T>(arr: T[], n: number): T[] {
+  if (arr.length <= n) return arr;
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, n);
+}
+
+// ---------------------------------------------------------------------------
+// Evaluation
+// ---------------------------------------------------------------------------
+
 function readPageContent(pageId: string): string {
   const filePath = findPageFile(pageId);
   if (!filePath) return '';
@@ -107,10 +147,11 @@ function readPageContent(pageId: string): string {
 async function evaluatePage(
   client: ReturnType<typeof createClient>,
   page: PageConfig,
-  claims: { claimText: string; claimType: string }[],
+  claims: ClaimInput[],
   pageContent: string,
+  sampleSize: number,
 ): Promise<ClaimEval[]> {
-  const sample = claims.slice(0, 15);
+  const sample = randomSample(claims, sampleSize);
 
   const claimList = sample.map((c, i) =>
     `${i + 1}. [${c.claimType}] "${c.claimText}"`
@@ -145,7 +186,6 @@ ${claimList}`;
   try {
     const evals = JSON.parse(jsonMatch[0]) as Array<Record<string, string>>;
     return evals.map((e) => {
-      // Use the claim number from response for proper alignment (1-based)
       const idx = e.claim ? Number(e.claim) - 1 : -1;
       const src = idx >= 0 && idx < sample.length ? sample[idx] : null;
       return {
@@ -166,23 +206,69 @@ ${claimList}`;
   }
 }
 
+// ---------------------------------------------------------------------------
+// Reporting
+// ---------------------------------------------------------------------------
+
+function pct(n: number, d: number): string {
+  return d > 0 ? `${((n / d) * 100).toFixed(0)}%` : 'n/a';
+}
+
+function printRow(label: string, evals: ClaimEval[]) {
+  const n = evals.length;
+  const acc = evals.filter(e => e.accurate === 'yes' || e.accurate === 'partial').length;
+  const useful = evals.filter(e => e.useful === 'yes').length;
+  const correctType = evals.filter(e => e.correctType === 'yes').length;
+  const atom = evals.filter(e => e.atomic === 'yes').length;
+  const scope = evals.filter(e => e.wellScoped === 'yes').length;
+
+  console.log(
+    `  ${label.padEnd(22)} ${String(n).padStart(3)}  ${pct(acc, n).padStart(5)}  ${pct(useful, n).padStart(5)}  ${pct(correctType, n).padStart(5)}  ${pct(atom, n).padStart(5)}  ${pct(scope, n).padStart(5)}`
+  );
+}
+
+const SEPARATOR = `  ${'─'.repeat(22)} ${'───'}  ${'─────'}  ${'─────'}  ${'─────'}  ${'─────'}  ${'─────'}`;
+const HEADER = `  ${'Type'.padEnd(22)} ${'N'.padStart(3)}  ${'Accur'.padStart(5)}  ${'Usefl'.padStart(5)}  ${'Type'.padStart(5)}  ${'Atom'.padStart(5)}  ${'Scope'.padStart(5)}`;
+
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
+
 export async function runEvaluation() {
   const c = getColors();
+  const args = parseCliArgs(process.argv.slice(2));
+  const fromLogs = args.options['from-logs'] === true;
+  const sampleSize = Number(args.options['sample']) || DEFAULT_SAMPLE_SIZE;
   const client = createClient();
   const allEvals: ClaimEval[] = [];
 
-  console.log(`\n${c.bold}${c.blue}Claims Extraction Quality Baseline${c.reset}\n`);
+  const source = fromLogs ? 'dry-run logs' : 'database';
+  console.log(`\n${c.bold}${c.blue}Claims Extraction Quality Baseline${c.reset} (source: ${source}, sample: ${sampleSize}/page)\n`);
+
+  if (!fromLogs) {
+    const serverOk = await isServerAvailable();
+    if (!serverOk) {
+      console.error(`${c.red}Wiki server not available. Use --from-logs to read from dry-run log files.${c.reset}`);
+      process.exit(1);
+    }
+  }
 
   for (const page of PAGES) {
-    const logPath = join(LOG_DIR, `${page.id}-extract.log`);
-    if (!existsSync(logPath)) {
-      console.log(`  ${c.yellow}Skipping ${page.id} — no log file at ${logPath}${c.reset}`);
-      continue;
+    let claims: ClaimInput[];
+
+    if (fromLogs) {
+      const logPath = join(LOG_DIR, `${page.id}-extract.log`);
+      if (!existsSync(logPath)) {
+        console.log(`  ${c.yellow}Skipping ${page.id} — no log file at ${logPath}${c.reset}`);
+        continue;
+      }
+      claims = parseClaimsFromLog(logPath);
+    } else {
+      claims = await fetchClaimsFromDb(page.id);
     }
 
-    const claims = parseClaimsFromLog(logPath);
     if (claims.length === 0) {
-      console.log(`  ${c.yellow}Skipping ${page.id} — no claims parsed${c.reset}`);
+      console.log(`  ${c.yellow}Skipping ${page.id} — no claims found${c.reset}`);
       continue;
     }
 
@@ -192,75 +278,59 @@ export async function runEvaluation() {
       continue;
     }
 
-    process.stdout.write(`  Evaluating ${page.id} (${page.type}, ${claims.length} claims)... `);
+    process.stdout.write(`  Evaluating ${page.id} (${page.type}, ${claims.length} total, sampling ${Math.min(sampleSize, claims.length)})... `);
 
-    const evals = await evaluatePage(client, page, claims, pageContent);
+    const evals = await evaluatePage(client, page, claims, pageContent, sampleSize);
     console.log(`${c.green}${evals.length} evaluated${c.reset}`);
     allEvals.push(...evals);
+  }
+
+  if (allEvals.length === 0) {
+    console.log(`\n${c.yellow}No claims evaluated. Ensure claims exist in the database or log files.${c.reset}`);
+    return;
   }
 
   // Write raw results
   mkdirSync(LOG_DIR, { recursive: true });
   writeFileSync(join(LOG_DIR, 'evaluation-results.json'), JSON.stringify(allEvals, null, 2));
 
-  // ═══════════════════════════════════════════════════
   // Summary by page type
-  // ═══════════════════════════════════════════════════
   console.log(`\n${c.bold}Summary by Page Type${c.reset}\n`);
 
   const grouped = new Map<string, ClaimEval[]>();
   for (const e of allEvals) {
-    const key = e.pageType;
-    grouped.set(key, [...(grouped.get(key) || []), e]);
+    const list = grouped.get(e.pageType) || [];
+    list.push(e);
+    grouped.set(e.pageType, list);
   }
 
-  // Also group by broader category
   const broader = new Map<string, ClaimEval[]>();
   for (const e of allEvals) {
     let cat = 'other';
     if (e.pageType.includes('org')) cat = 'organizations';
     else if (e.pageType.includes('person')) cat = 'people';
     else if (e.pageType === 'concept') cat = 'concepts';
-    broader.set(cat, [...(broader.get(cat) || []), e]);
+    const list = broader.get(cat) || [];
+    list.push(e);
+    broader.set(cat, list);
   }
 
-  function pct(n: number, d: number): string {
-    return d > 0 ? `${((n / d) * 100).toFixed(0)}%` : 'n/a';
-  }
-
-  function printRow(label: string, evals: ClaimEval[]) {
-    const n = evals.length;
-    const acc = evals.filter(e => e.accurate === 'yes' || e.accurate === 'partial').length;
-    const useful = evals.filter(e => e.useful === 'yes').length;
-    const type = evals.filter(e => e.correctType === 'yes').length;
-    const atom = evals.filter(e => e.atomic === 'yes').length;
-    const scope = evals.filter(e => e.wellScoped === 'yes').length;
-
-    console.log(
-      `  ${label.padEnd(22)} ${String(n).padStart(3)}  ${pct(acc, n).padStart(5)}  ${pct(useful, n).padStart(5)}  ${pct(type, n).padStart(5)}  ${pct(atom, n).padStart(5)}  ${pct(scope, n).padStart(5)}`
-    );
-  }
-
-  console.log(`  ${'Type'.padEnd(22)} ${'N'.padStart(3)}  ${'Accur'.padStart(5)}  ${'Usefl'.padStart(5)}  ${'Type'.padStart(5)}  ${'Atom'.padStart(5)}  ${'Scope'.padStart(5)}`);
-  console.log(`  ${'─'.repeat(22)} ${'───'}  ${'─────'}  ${'─────'}  ${'─────'}  ${'─────'}  ${'─────'}`);
-
+  console.log(HEADER);
+  console.log(SEPARATOR);
   for (const [type, evals] of [...grouped.entries()].sort()) {
     printRow(type, evals);
   }
-
-  console.log(`  ${'─'.repeat(22)} ${'───'}  ${'─────'}  ${'─────'}  ${'─────'}  ${'─────'}  ${'─────'}`);
+  console.log(SEPARATOR);
 
   console.log(`\n${c.bold}Summary by Broad Category${c.reset}\n`);
-  console.log(`  ${'Category'.padEnd(22)} ${'N'.padStart(3)}  ${'Accur'.padStart(5)}  ${'Usefl'.padStart(5)}  ${'Type'.padStart(5)}  ${'Atom'.padStart(5)}  ${'Scope'.padStart(5)}`);
-  console.log(`  ${'─'.repeat(22)} ${'───'}  ${'─────'}  ${'─────'}  ${'─────'}  ${'─────'}  ${'─────'}`);
+  console.log(HEADER.replace('Type'.padEnd(22), 'Category'.padEnd(22)));
+  console.log(SEPARATOR);
   for (const [cat, evals] of [...broader.entries()].sort()) {
     printRow(cat, evals);
   }
   printRow('OVERALL', allEvals);
 
-  // ═══════════════════════════════════════════════════
   // Failure analysis
-  // ═══════════════════════════════════════════════════
   console.log(`\n${c.bold}Notable Failures${c.reset}\n`);
   const failures = allEvals.filter(e =>
     e.accurate === 'no' || e.useful === 'no' || e.wellScoped === 'no'

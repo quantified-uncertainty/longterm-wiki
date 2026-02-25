@@ -29,7 +29,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
-import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
+import { callOpenRouter, stripCodeFences, parseJsonWithRepair, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
   insertClaimBatch,
@@ -188,7 +188,7 @@ Extract atomic claims from this section. Return JSON only.`;
     });
 
     const json = stripCodeFences(raw);
-    const parsed = JSON.parse(json) as { claims?: unknown[] };
+    const parsed = parseJsonWithRepair<{ claims?: unknown[] }>(json);
 
     if (!Array.isArray(parsed.claims)) return [];
 
