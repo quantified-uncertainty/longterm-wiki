@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, or, and, count, asc, sql } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
-import { wikiPages } from "../schema.js";
+import { wikiPages, entityIds } from "../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -125,20 +125,39 @@ pagesRoute.get("/:id", async (c) => {
 
   const db = getDrizzleDb();
 
-  // Look up by slug or numeric ID
+  // If the ID looks like a numeric entity ID (E42), resolve to slug via entityIds table.
+  // The wiki_pages.numeric_id column is sparsely populated, so we use the authoritative
+  // entityIds table for the mapping and fall back to wiki_pages.numeric_id for legacy data.
+  let resolvedSlug: string | null = null;
+  if (/^E\d+$/i.test(id)) {
+    const numericValue = parseInt(id.slice(1), 10);
+    const idRows = await db
+      .select({ slug: entityIds.slug })
+      .from(entityIds)
+      .where(eq(entityIds.numericId, numericValue));
+    if (idRows.length > 0) {
+      resolvedSlug = idRows[0].slug;
+    }
+  }
+
+  // Look up by resolved slug, original ID as slug, or legacy numericId column
+  const lookupSlug = resolvedSlug || id;
   const rows = await db
     .select()
     .from(wikiPages)
-    .where(or(eq(wikiPages.id, id), eq(wikiPages.numericId, id)));
+    .where(or(eq(wikiPages.id, lookupSlug), eq(wikiPages.numericId, id)));
 
   if (rows.length === 0) {
     return notFoundError(c, `No page found for id: ${id}`);
   }
 
   const page = rows[0];
+  // Use the canonical numeric ID from the entityIds resolution if available,
+  // falling back to whatever is stored in wiki_pages
+  const numericId = resolvedSlug ? id.toUpperCase() : page.numericId;
   return c.json({
     id: page.id,
-    numericId: page.numericId,
+    numericId,
     title: page.title,
     description: page.description,
     llmSummary: page.llmSummary,

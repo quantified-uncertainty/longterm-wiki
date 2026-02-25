@@ -131,7 +131,7 @@
       type: capability
       relationship: prerequisite
     - id: anthropic
-      type: lab
+      type: organization
       relationship: research
   tags:
     - probability

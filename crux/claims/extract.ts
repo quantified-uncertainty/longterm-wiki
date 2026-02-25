@@ -1,3 +1,8 @@
+? (c.relatedEntities as unknown[]).map(String).filter(s => s.length > 0).map(s => s.toLowerCase())
+          : [],
+
+Here is the resolved file:
+
 /**
  * Claims Extract — extract atomic claims from a wiki page
  *
@@ -220,7 +225,7 @@ Extract atomic claims from this section. Return JSON only.`;
           ? (c.footnoteRefs as unknown[]).map(String)
           : [],
         relatedEntities: Array.isArray(c.relatedEntities)
-          ? (c.relatedEntities as unknown[]).map(String).filter(s => s.length > 0)
+          ? (c.relatedEntities as unknown[]).map(String).filter(s => s.length > 0).map(s => s.toLowerCase())
           : [],
       }));
   } catch (err) {

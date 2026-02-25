@@ -9,7 +9,6 @@ readerImportance: 39
 researchImportance: 69.5
 lastEdited: "2026-02-17"
 update_frequency: 90
-evergreen: true
 llmSummary: "Internal project management document providing implementation instructions for creating parameter pages in a knowledge base. Outlines workflow, templates, and batch assignments for parallel development work."
 ratings:
   novelty: 0

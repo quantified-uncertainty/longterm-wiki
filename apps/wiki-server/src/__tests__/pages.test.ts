@@ -2,12 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { mockDbModule, postJson } from "./test-utils.js";
 
-// ---- In-memory store simulating Postgres wiki_pages table ----
+// ---- In-memory stores simulating Postgres tables ----
 
 let pagesStore: Map<string, Record<string, unknown>>;
+let entityIdsStore: Map<number, { slug: string; description: string | null; created_at: Date }>;
 
 function resetStores() {
   pagesStore = new Map();
+  entityIdsStore = new Map();
 }
 
 /**
@@ -190,9 +192,19 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
+  // --- entity_ids: SELECT slug WHERE numeric_id = ? (numeric ID resolution) ---
+  if (q.includes("entity_ids") && q.includes("where") && q.includes("numeric_id") && !q.includes("count(*)")) {
+    const numericId = params[0] as number;
+    const entry = entityIdsStore.get(numericId);
+    if (entry) {
+      return [{ slug: entry.slug }];
+    }
+    return [];
+  }
+
   // --- entity_ids: COUNT (for health check) ---
   if (q.includes("count(*)") && !q.includes("wiki_pages")) {
-    return [{ count: 0 }];
+    return [{ count: entityIdsStore.size }];
   }
 
   // --- sequence health check ---
@@ -333,10 +345,34 @@ describe("Pages API", () => {
       expect(body.numericId).toBe("E42");
     });
 
-    it("returns page by numeric ID", async () => {
+    it("returns page by numeric ID (legacy wiki_pages.numericId)", async () => {
       await seedPage(app, "anthropic", "Anthropic", { numericId: "E42" });
 
       const res = await app.request("/api/pages/E42");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.id).toBe("anthropic");
+    });
+
+    it("returns page by numeric ID via entityIds table when wiki_pages.numericId is null", async () => {
+      // Seed a page WITHOUT numericId (as most pages are in production)
+      await seedPage(app, "anthropic", "Anthropic", { numericId: null });
+      // Seed the entityIds mapping: E22 → anthropic
+      entityIdsStore.set(22, { slug: "anthropic", description: null, created_at: new Date() });
+
+      const res = await app.request("/api/pages/E22");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.id).toBe("anthropic");
+      expect(body.numericId).toBe("E22");
+    });
+
+    it("returns page by case-insensitive numeric ID", async () => {
+      await seedPage(app, "anthropic", "Anthropic", { numericId: null });
+      entityIdsStore.set(22, { slug: "anthropic", description: null, created_at: new Date() });
+
+      // Lowercase e22 should also work
+      const res = await app.request("/api/pages/e22");
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.id).toBe("anthropic");

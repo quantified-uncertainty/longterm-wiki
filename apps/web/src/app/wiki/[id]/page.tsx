@@ -321,6 +321,7 @@ async function ContentView({
         pathname={entityPath}
         contentFormat={contentFormat}
         hasEntity={!!entity}
+        entityType={pageData?.entityType ?? undefined}
         resourceCount={getResourcesForPage(slug).length}
         citationHealth={liveCitationHealth}
         ratings={pageData?.ratings ?? undefined}

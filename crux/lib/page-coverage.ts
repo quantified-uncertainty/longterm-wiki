@@ -43,7 +43,7 @@ export interface CoverageActuals {
 export interface PageCoverage {
   /** Number of items with 'green' status */
   passing: number;
-  /** Total scored items (5 boolean + 8 numeric = 13) */
+  /** Total scored items — varies by page type and format */
   total: number;
   /** Recommended targets based on wordCount + contentFormat */
   targets: CoverageTargets;
@@ -58,6 +58,20 @@ export interface PageCoverage {
   /** Number of canonical facts for this entity */
   factCount?: number;
 }
+
+/**
+ * Entity types that benefit from canonical facts. Limited to real-world entities
+ * (people and organizations) where biographical/organizational facts are applicable.
+ * Excludes analytical model pages, research approach pages, etc.
+ * Keep in sync with ENTITY_LIKE_TYPES in apps/web/src/lib/coverage.ts.
+ */
+export const ENTITY_LIKE_TYPES = new Set([
+  'person',
+  'organization',
+]);
+
+/** Facts threshold: pages with >= this many facts score green. */
+export const FACTS_GREEN_THRESHOLD = 5;
 
 export interface CoverageInput {
   wordCount: number;
@@ -83,6 +97,10 @@ export interface CoverageInput {
     completeness?: number;
   } | null;
   factCount?: number;
+  /** Whether the page has a ## Overview heading section */
+  hasOverview?: boolean;
+  /** Entity type slug (e.g. 'person', 'organization', 'model') for type-specific scoring */
+  entityType?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -176,11 +194,18 @@ export function computePageCoverage(input: CoverageInput): PageCoverage {
 
   const items: Record<string, CoverageStatus> = {};
 
-  // Boolean items (4)
+  // Boolean items (4 core)
   items.llmSummary = input.llmSummary ? 'green' : 'red';
   items.schedule = input.updateFrequency != null ? 'green' : 'red';
   items.entity = input.hasEntity ? 'green' : 'red';
   items.editHistory = input.changeHistoryCount > 0 ? 'green' : 'red';
+
+  // Overview section — scored for article and diagram formats
+  // Index/table/dashboard pages don't need a prose overview
+  const isOverviewFormat = input.contentFormat === 'article' || input.contentFormat === 'diagram' || !input.contentFormat;
+  if (isOverviewFormat && input.hasOverview !== undefined) {
+    items.overview = input.hasOverview ? 'green' : 'red';
+  }
 
   // Numeric metrics (6 target-based)
   items.tables = getMetricStatus(input.tableCount, targets.tables);
@@ -190,12 +215,20 @@ export function computePageCoverage(input: CoverageInput): PageCoverage {
   items.footnotes = getMetricStatus(input.footnoteCount, targets.footnotes);
   items.references = getMetricStatus(input.resourceCount, targets.references);
 
+  // Facts — scored only for person and organization pages
+  // For concept/risk/analysis/approach/model pages, facts are tracked as info-only via factCount
+  const isEntityLike = input.entityType && ENTITY_LIKE_TYPES.has(input.entityType);
+  if (isEntityLike) {
+    const facts = input.factCount ?? 0;
+    items.facts = facts >= FACTS_GREEN_THRESHOLD ? 'green' : facts >= 1 ? 'amber' : 'red';
+  }
+
   // Ratio metrics (2)
   items.quotes = getRatioStatus(input.quotesWithQuotes, input.quotesTotal);
   items.accuracy = getRatioStatus(input.accuracyChecked, input.accuracyTotal);
 
   const passing = Object.values(items).filter((s) => s === 'green').length;
-  const total = Object.keys(items).length; // 13
+  const total = Object.keys(items).length;
 
   // Build compact ratings string
   let ratingsString: string | undefined;
