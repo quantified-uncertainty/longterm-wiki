@@ -411,7 +411,6 @@ const columns: ColumnDef<PageCoverageItem>[] = [
     cell: ({ row }) => (
       <span className="inline-flex items-center gap-1">
         <BoolIcon value={row.original.llmSummary} label="LLM Summary" />
-        <BoolIcon value={row.original.structuredSummary} label="Structured Summary" />
         <BoolIcon value={row.original.schedule} label="Update Schedule" />
         <BoolIcon value={row.original.entity} label="Entity" />
         <BoolIcon value={row.original.editHistory} label="Edit History" />

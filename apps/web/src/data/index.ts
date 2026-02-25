@@ -335,7 +335,14 @@ export interface Resource {
   authors?: string[];
   published_date?: string;
   type: string;
+  local_filename?: string;
+  importance?: number;
+  abstract?: string;
   summary?: string;
+  review?: string;
+  key_points?: string[];
+  cited_by?: string[] | null;
+  fetched_at?: string;
   tags?: string[];
   publication_id?: string;
   credibility_override?: number;
@@ -380,12 +387,6 @@ interface BacklinkEntry {
 
 export type ContentFormat = 'article' | 'table' | 'diagram' | 'index' | 'dashboard';
 
-export interface StructuredSummary {
-  oneLiner: string;
-  keyPoints: string[];
-  bottomLine: string;
-}
-
 export interface ChangeEntry {
   date: string;
   branch: string;
@@ -414,7 +415,6 @@ export interface Page {
   lastUpdated: string | null;
   dateCreated?: string | null;
   llmSummary: string | null;
-  structuredSummary: StructuredSummary | null;
   description: string | null;
   ratings: {
     novelty?: number;
@@ -609,6 +609,12 @@ export function getEntityById(id: string): Entity | undefined {
 
 export function getResourceById(id: string): Resource | undefined {
   return resourceIndex().get(id);
+}
+
+/** Get all resources */
+export function getAllResources(): Resource[] {
+  const db = getDatabase();
+  return db.resources ?? [];
 }
 
 /** Get resource IDs for a page (computed at build time from inline <R>, cited_by, URL matching) */
@@ -876,7 +882,6 @@ export interface PageCoverageItem {
   unconvertedLinkCount: number;
   // Boolean items
   llmSummary: boolean;
-  structuredSummary: boolean;
   schedule: boolean;
   entity: boolean;
   editHistory: boolean;
@@ -958,7 +963,6 @@ export function getPageCoverageItems(): PageCoverageItem[] {
       unconvertedLinkCount: page.unconvertedLinkCount ?? 0,
       // Booleans
       llmSummary: cov.items.llmSummary === "green",
-      structuredSummary: cov.items.structuredSummary === "green",
       schedule: cov.items.schedule === "green",
       entity: cov.items.entity === "green",
       editHistory: cov.items.editHistory === "green",

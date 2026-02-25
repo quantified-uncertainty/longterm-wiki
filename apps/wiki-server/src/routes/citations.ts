@@ -2,7 +2,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { citationQuotes, citationContent, citationAccuracySnapshots, resources } from "../schema.js";
+import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources } from "../schema.js";
+import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
   validationError,
@@ -185,6 +186,21 @@ citationsRoute.post("/quotes/upsert", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const db = getDrizzleDb();
+
+  // Validate page reference
+  const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, [parsed.data.pageId]);
+  if (missingPages.length > 0) {
+    return validationError(c, `Referenced page not found: ${missingPages.join(", ")}`);
+  }
+
+  // Validate resource reference (optional)
+  if (parsed.data.resourceId) {
+    const missingRes = await checkRefsExist(db, resources, resources.id, [parsed.data.resourceId]);
+    if (missingRes.length > 0) {
+      return validationError(c, `Referenced resource not found: ${missingRes.join(", ")}`);
+    }
+  }
+
   const rows = await upsertQuote(db, parsed.data);
 
   const row = firstOrThrow(rows, "citation quote upsert");
@@ -208,6 +224,30 @@ citationsRoute.post("/quotes/upsert-batch", async (c) => {
 
   const { items } = parsed.data;
   const db = getDrizzleDb();
+
+  // Validate page references
+  const pageIds = [...new Set(items.map((d) => d.pageId))];
+  const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, pageIds);
+  if (missingPages.length > 0) {
+    return validationError(
+      c,
+      `Referenced pages not found: ${missingPages.join(", ")}`
+    );
+  }
+
+  // Validate resource references (optional field)
+  const resourceIds = [
+    ...new Set(items.map((d) => d.resourceId).filter((r): r is string => r != null)),
+  ];
+  if (resourceIds.length > 0) {
+    const missingResources = await checkRefsExist(db, resources, resources.id, resourceIds);
+    if (missingResources.length > 0) {
+      return validationError(
+        c,
+        `Referenced resources not found: ${missingResources.join(", ")}`
+      );
+    }
+  }
 
   const results = await db.transaction(async (tx) => {
     return await tx

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { eq, and, count, asc, sql, ilike, or } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { entities } from "../schema.js";
+import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
   validationError,
@@ -196,6 +197,28 @@ entitiesRoute.post("/sync", async (c) => {
 
   const { entities: items } = parsed.data;
   const db = getDrizzleDb();
+
+  // Validate relatedEntries references: check that referenced entity IDs exist
+  // (excluding IDs being created in this same batch, which are valid self-refs)
+  const batchIds = new Set(items.map((e) => e.id));
+  const relatedIds = [
+    ...new Set(
+      items
+        .flatMap((e) => e.relatedEntries ?? [])
+        .map((r) => r.id)
+        .filter((id) => !batchIds.has(id))
+    ),
+  ];
+  if (relatedIds.length > 0) {
+    const missing = await checkRefsExist(db, entities, entities.id, relatedIds);
+    if (missing.length > 0) {
+      return validationError(
+        c,
+        `Referenced entities not found in relatedEntries: ${missing.join(", ")}`
+      );
+    }
+  }
+
   let upserted = 0;
 
   await db.transaction(async (tx) => {

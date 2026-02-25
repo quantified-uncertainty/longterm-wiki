@@ -10,7 +10,8 @@ import {
 } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { getDrizzleDb, getDb } from "../db.js";
-import { resources, resourceCitations, citationContent } from "../schema.js";
+import { resources, resourceCitations, wikiPages, citationContent } from "../schema.js";
+import { checkRefsExist } from "./ref-check.js";
 import type * as schema from "../schema.js";
 import {
   parseJsonBody,
@@ -200,6 +201,18 @@ resourcesRoute.post("/", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const db = getDrizzleDb();
+
+  // Validate citedBy page references (optional field)
+  if (parsed.data.citedBy && parsed.data.citedBy.length > 0) {
+    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, parsed.data.citedBy);
+    if (missingPages.length > 0) {
+      return validationError(
+        c,
+        `Referenced pages not found in citedBy: ${missingPages.join(", ")}`
+      );
+    }
+  }
+
   const result = await upsertResource(db, parsed.data);
   return c.json(result, 201);
 });
@@ -214,9 +227,24 @@ resourcesRoute.post("/batch", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { items } = parsed.data;
-  const results: Array<{ id: string; url: string }> = [];
 
   const db = getDrizzleDb();
+
+  // Validate citedBy page references
+  const allCitedBy = [
+    ...new Set(items.flatMap((item) => item.citedBy ?? [])),
+  ];
+  if (allCitedBy.length > 0) {
+    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, allCitedBy);
+    if (missingPages.length > 0) {
+      return validationError(
+        c,
+        `Referenced pages not found in citedBy: ${missingPages.join(", ")}`
+      );
+    }
+  }
+
+  const results: Array<{ id: string; url: string }> = [];
   await db.transaction(async (tx) => {
     for (const item of items) {
       // Skip per-row search_vector update; handled in bulk below

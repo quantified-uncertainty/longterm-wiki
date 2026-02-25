@@ -1,8 +1,12 @@
 # Agent Session Workflow — MANDATORY
 
-Every session that involves writing or changing code MUST follow this two-step workflow.
+Every session that involves writing or changing code MUST follow this workflow.
 
-## At Session Start — BEFORE taking any action
+## Step 0: Create a feature branch
+
+Always work on a `claude/short-description` branch. Never commit directly to `main`.
+
+## Step 1: Session Start — BEFORE taking any action
 
 Run `/agent-session-start` as the very first thing — before reading files, running commands, or writing any code. "Before writing code" is not sufficient; quick fixes and file reads count too. If you start without this, you will forget it entirely.
 
@@ -19,14 +23,15 @@ Valid types: `content`, `infrastructure`, `bugfix`, `refactor`, `commands`. Defa
 
 Then read `.claude/wip-checklist.md` and keep it updated as you work.
 
-## At Session End — BEFORE considering work complete
+## Step 2: Session End — BEFORE considering work complete
 
-Run `/agent-session-ready-PR`. It verifies the checklist, polishes the PR, and ships.
+Run `/agent-session-ready-PR`. It verifies the checklist, polishes the PR description, updates GitHub issues, creates a session log, and ships.
 
 See `.claude/rules/pr-review-guidelines.md` for the full end-of-session workflow.
 
 ## Why this matters
 
+- PRs give the user a chance to review before changes land on main
 - The checklist catches issues that are easy to skip under time pressure (security review, no regressions, CI green)
 - It creates a paper trail of decisions for future sessions
 - Skipping it is how things like "forgot to verify CI" or "no tests written" happen

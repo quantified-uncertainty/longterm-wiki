@@ -128,7 +128,7 @@ The Kalshi page is a good exemplar because it exercises the full system:
 <Mermaid chart={`
 flowchart TD
     subgraph Authoring["Authoring (MDX)"]
-        FN["[^N]: [Title](URL)\nStandard Markdown footnotes"]
+        FN["[^N]: Title: URL\nStandard Markdown footnotes"]
     end
 
     subgraph DataLayer["Data Layer"]
@@ -173,7 +173,7 @@ flowchart TD
 
 New crux command: `pnpm crux citations register-resources <pageId>`
 
-1. Parse all `[^N]: [Title](URL)` definitions from MDX
+1. Parse all `[^N]: Title: URL` definitions from MDX
 2. Extract unique URLs (87 footnotes \> \~35 unique URLs for Kalshi)
 3. For each URL without a resource YAML entry:
    - Use citation\_content cache or fetch the URL
