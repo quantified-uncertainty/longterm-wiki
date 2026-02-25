@@ -35,7 +35,7 @@ import { NumericValueDisplay } from "./numeric-value-display";
 
 function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; entityNames?: Record<string, string> }) {
   return (
-    <div className="px-4 py-3 bg-muted/30 space-y-2 text-sm">
+    <div className="px-4 py-3 space-y-2 text-sm">
       <div>
         <span className="font-medium text-xs text-muted-foreground">
           Full Claim:
@@ -184,7 +184,7 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
     cell: ({ row }) => (
       <Link
         href={`/claims/claim/${row.original.id}`}
-        className="font-mono text-[10px] text-muted-foreground hover:text-blue-600 hover:underline"
+        className="font-mono text-xs text-blue-600 hover:underline"
         onClick={(e) => e.stopPropagation()}
       >
         {row.original.id}
@@ -408,7 +408,7 @@ export function ClaimsTable({
                   </TableRow>
                   {row.getIsExpanded() && (
                     <TableRow>
-                      <TableCell colSpan={columns.length} className="p-0">
+                      <TableCell colSpan={columns.length} className="p-0 bg-muted/30">
                         <ExpandedClaimDetail claim={row.original} entityNames={entityNames} />
                       </TableCell>
                     </TableRow>
