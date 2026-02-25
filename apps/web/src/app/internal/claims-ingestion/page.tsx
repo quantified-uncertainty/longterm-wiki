@@ -136,7 +136,7 @@ export default async function ClaimsIngestionPage() {
   const endorsedCount = stats?.byClaimMode?.endorsed ?? 0;
   const attributedCount = stats?.byClaimMode?.attributed ?? 0;
   const contestedCount = stats?.byClaimMode?.contested ?? 0;
-  const noModeCount = (stats?.total ?? 0) - endorsedCount - attributedCount - contestedCount;
+  const noModeCount = Math.max(0, (stats?.total ?? 0) - endorsedCount - attributedCount - contestedCount);
 
   return (
     <article className="prose max-w-none">

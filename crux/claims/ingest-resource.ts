@@ -118,6 +118,7 @@ export interface ExtractedResourceClaim {
   claimText: string;
   claimType: ClaimTypeValue;
   relevance: 'direct' | 'contextual' | 'background';
+  // Phase 2 fields — only 'endorsed' and 'attributed' are currently accepted by the server schema
   claimMode: 'endorsed' | 'attributed';
   attributedTo?: string;
   asOf?: string;
