@@ -30,10 +30,14 @@ export const citationQuotes = pgTable(
   "citation_quotes",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id").notNull(),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
     footnote: integer("footnote").notNull(),
     url: text("url"),
-    resourceId: text("resource_id"),
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
     claimText: text("claim_text").notNull(),
     claimContext: text("claim_context"),
     sourceQuote: text("source_quote"),
@@ -153,7 +157,9 @@ export const citationAccuracySnapshots = pgTable(
   "citation_accuracy_snapshots",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id").notNull(),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
     totalCitations: integer("total_citations").notNull(),
     checkedCitations: integer("checked_citations").notNull(),
     accurateCount: integer("accurate_count").notNull().default(0),
@@ -176,7 +182,9 @@ export const editLogs = pgTable(
   "edit_logs",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id").notNull(),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
     date: date("date").notNull(),
     tool: text("tool").notNull(),
     agency: text("agency").notNull(),
@@ -197,7 +205,9 @@ export const hallucinationRiskSnapshots = pgTable(
   "hallucination_risk_snapshots",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id").notNull(),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
     score: integer("score").notNull(),
     level: text("level").notNull(), // 'low' | 'medium' | 'high'
     factors: jsonb("factors").$type<string[]>(),
@@ -246,7 +256,9 @@ export const sessionPages = pgTable(
     sessionId: bigint("session_id", { mode: "number" })
       .notNull()
       .references(() => sessions.id, { onDelete: "cascade" }),
-    pageId: text("page_id").notNull(),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
   },
   (table) => [
     primaryKey({ columns: [table.sessionId, table.pageId] }),
@@ -292,7 +304,9 @@ export const autoUpdateResults = pgTable(
     runId: bigint("run_id", { mode: "number" })
       .notNull()
       .references(() => autoUpdateRuns.id, { onDelete: "cascade" }),
-    pageId: text("page_id").notNull(),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
     status: text("status").notNull(),
     tier: text("tier"),
     durationMs: integer("duration_ms"),
@@ -308,7 +322,9 @@ export const autoUpdateResults = pgTable(
 export const summaries = pgTable(
   "summaries",
   {
-    entityId: text("entity_id").primaryKey(),
+    entityId: text("entity_id")
+      .primaryKey()
+      .references(() => entities.id, { onDelete: "cascade" }),
     entityType: text("entity_type").notNull(),
     oneLiner: text("one_liner"),
     summary: text("summary"),
@@ -334,18 +350,14 @@ export const summaries = pgTable(
   ]
 );
 
-/**
- * Claims extracted from wiki pages.
- *
- * `entityId` is a logical reference to a wiki entity (page or data entity)
- * but is NOT enforced via FK — claims may reference entities from multiple
- * source tables (wikiPages, summaries, etc.) or entities not yet synced.
- */
+/** Claims extracted from wiki pages. */
 export const claims = pgTable(
   "claims",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    entityId: text("entity_id").notNull(), // logical FK — see table comment above
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.id, { onDelete: "cascade" }),
     entityType: text("entity_type").notNull(),
     claimType: text("claim_type").notNull(),
     claimText: text("claim_text").notNull(),
@@ -409,7 +421,9 @@ export const resourceCitations = pgTable(
     resourceId: text("resource_id")
       .notNull()
       .references(() => resources.id, { onDelete: "cascade" }),
-    pageId: text("page_id").notNull(),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -477,7 +491,9 @@ export const facts = pgTable(
   "facts",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    entityId: text("entity_id").notNull(),
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.id, { onDelete: "cascade" }),
     factId: text("fact_id").notNull(),
     label: text("label"),
     value: text("value"), // String representation of the value
@@ -486,10 +502,14 @@ export const facts = pgTable(
     high: real("high"), // Upper bound for range values
     asOf: text("as_of"), // Point-in-time (YYYY-MM, YYYY, or ISO date)
     measure: text("measure"), // Measure ID for timeseries grouping
-    subject: text("subject"), // Entity override (defaults to parent entity)
+    subject: text("subject").references(() => entities.id, {
+      onDelete: "set null",
+    }),
     note: text("note"),
     source: text("source"), // URL to source
-    sourceResource: text("source_resource"), // Resource ID
+    sourceResource: text("source_resource").references(() => resources.id, {
+      onDelete: "set null",
+    }),
     format: text("format"),
     formatDivisor: real("format_divisor"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
@@ -603,7 +623,9 @@ export const autoUpdateNewsItems = pgTable(
     relevanceScore: integer("relevance_score"),
     topicsJson: jsonb("topics_json").$type<string[]>(),
     entitiesJson: jsonb("entities_json").$type<string[]>(),
-    routedToPageId: text("routed_to_page_id"),
+    routedToPageId: text("routed_to_page_id").references(() => wikiPages.id, {
+      onDelete: "set null",
+    }),
     routedToPageTitle: text("routed_to_page_title"),
     routedTier: text("routed_tier"),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -637,7 +659,9 @@ export const pageImproveRuns = pgTable(
   "page_improve_runs",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id").notNull(),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
     engine: text("engine").notNull(), // 'v1' | 'v2'
     tier: text("tier").notNull(), // 'polish' | 'standard' | 'deep'
     directions: text("directions"),

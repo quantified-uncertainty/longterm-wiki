@@ -204,6 +204,13 @@
       "when": 1771901800000,
       "tag": "0025_search_improvements",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1771901900000,
+      "tag": "0026_add_referential_integrity_fks",
+      "breakpoints": true
     }
   ]
 }
