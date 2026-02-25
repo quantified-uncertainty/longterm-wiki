@@ -9,6 +9,7 @@
     "start": "NODE_USE_ENV_PROXY=1 next start --port 3001",
     "assign-ids": "node scripts/assign-ids.mjs",
     "sync:data": "node scripts/assign-ids.mjs && NODE_USE_ENV_PROXY=1 node --import tsx/esm scripts/build-data.mjs",
+    "sync:data:content": "node scripts/assign-ids.mjs --skip && NODE_USE_ENV_PROXY=1 node --import tsx/esm scripts/build-data.mjs --scope=content",
     "prebuild": "node scripts/assign-ids.mjs && NODE_USE_ENV_PROXY=1 node --import tsx/esm scripts/build-data.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
