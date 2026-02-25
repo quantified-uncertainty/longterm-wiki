@@ -305,6 +305,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Architecture", href: internalHref("architecture") },
         { label: "Wiki Generation Architecture", href: internalHref("wiki-generation-architecture") },
         { label: "Content Pipeline Architecture", href: internalHref("content-pipeline-architecture") },
+        { label: "Claims Development Roadmap", href: internalHref("claims-system-development-roadmap") },
         { label: "Schema Overview", href: internalHref("__index__/internal/schema", "/wiki/E781") },
         { label: "Entity Reference", href: internalHref("entities") },
         { label: "Server Environments", href: internalHref("wiki-server-architecture") },
