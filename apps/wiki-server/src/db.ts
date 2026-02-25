@@ -50,9 +50,17 @@ const __dirname = path.dirname(__filename);
 
 export async function initDb() {
   const db = getDrizzleDb();
-  await migrate(db, {
-    migrationsFolder: path.resolve(__dirname, "../drizzle"),
-  });
+  console.log("[db] Running migrations...");
+  const startMs = Date.now();
+  try {
+    await migrate(db, {
+      migrationsFolder: path.resolve(__dirname, "../drizzle"),
+    });
+    console.log(`[db] Migrations completed in ${Date.now() - startMs}ms`);
+  } catch (err) {
+    console.error("[db] Migration failed:", err);
+    throw err;
+  }
 }
 
 export async function closeDb() {
