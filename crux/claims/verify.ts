@@ -109,7 +109,7 @@ async function verifyClaim(
   try {
     const raw = await callOpenRouter(VERIFY_SYSTEM_PROMPT, userPrompt, {
       model: opts.model ?? DEFAULT_CITATION_MODEL,
-      maxTokens: 400,
+      maxTokens: 800,
       title: 'LongtermWiki Claim Verification',
     });
 
@@ -192,7 +192,7 @@ async function main() {
   let noSource = 0;
 
   for (const claim of claims) {
-    const footnoteRefs = (claim.footnoteRefs ?? claim.unit) ? (claim.footnoteRefs ?? claim.unit)!.split(',').map(s => s.trim()) : [];
+    const footnoteRefs = claim.footnoteRefs ? claim.footnoteRefs.split(',').map(s => s.trim()) : [];
 
     // If no footnote refs, mark as unsourced
     if (footnoteRefs.length === 0) {
@@ -295,7 +295,15 @@ async function main() {
       factId: claim.factId ?? null,
       resourceIds: claim.resourceIds ?? null,
       section: claim.section ?? claim.value ?? null,
-      footnoteRefs: claim.footnoteRefs ?? claim.unit ?? null,
+      footnoteRefs: claim.footnoteRefs ?? null,
+      // Phase 2 fields — preserve from original claim
+      claimMode: claim.claimMode ?? null,
+      attributedTo: claim.attributedTo ?? null,
+      asOf: claim.asOf ?? null,
+      measure: claim.measure ?? null,
+      valueNumeric: claim.valueNumeric ?? null,
+      valueLow: claim.valueLow ?? null,
+      valueHigh: claim.valueHigh ?? null,
     }));
 
     const result = await insertClaimBatch(items);

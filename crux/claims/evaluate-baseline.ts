@@ -237,8 +237,8 @@ const HEADER = `  ${'Type'.padEnd(22)} ${'N'.padStart(3)}  ${'Accur'.padStart(5)
 export async function runEvaluation() {
   const c = getColors();
   const args = parseCliArgs(process.argv.slice(2));
-  const fromLogs = args.options['from-logs'] === true;
-  const sampleSize = Number(args.options['sample']) || DEFAULT_SAMPLE_SIZE;
+  const fromLogs = args['from-logs'] === true;
+  const sampleSize = typeof args['sample'] === 'string' ? parseInt(args['sample'], 10) || DEFAULT_SAMPLE_SIZE : DEFAULT_SAMPLE_SIZE;
   const client = createClient();
   const allEvals: ClaimEval[] = [];
 
