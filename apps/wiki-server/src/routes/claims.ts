@@ -2,7 +2,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, or, count, desc, asc, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { claims } from "../schema.js";
+import { claims, entities } from "../schema.js";
+import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
   validationError,
@@ -94,6 +95,13 @@ claimsRoute.post("/", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const db = getDrizzleDb();
+
+  // Validate entity reference
+  const missing = await checkRefsExist(db, entities, entities.id, [parsed.data.entityId]);
+  if (missing.length > 0) {
+    return validationError(c, `Referenced entity not found: ${missing.join(", ")}`);
+  }
+
   const vals = claimValues(parsed.data);
 
   const rows = await db
@@ -119,6 +127,14 @@ claimsRoute.post("/batch", async (c) => {
 
   const { items } = parsed.data;
   const db = getDrizzleDb();
+
+  // Validate entity references
+  const entityIds = [...new Set(items.map((i) => i.entityId))];
+  const missing = await checkRefsExist(db, entities, entities.id, entityIds);
+  if (missing.length > 0) {
+    return validationError(c, `Referenced entities not found: ${missing.join(", ")}`);
+  }
+
   const allVals = items.map(claimValues);
 
   const results = await db

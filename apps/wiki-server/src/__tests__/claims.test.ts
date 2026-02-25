@@ -31,6 +31,12 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ last_value: 0, is_called: false }];
   }
 
+  // ---- ref-check: SELECT id FROM entities/resources/wiki_pages WHERE id IN (...) ----
+  if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
+    // Return all queried IDs as existing (ref check passes)
+    return params.map((p) => ({ id: p }));
+  }
+
   // ---- INSERT INTO claims ----
   if (q.includes("insert into") && q.includes('"claims"')) {
     const now = new Date();

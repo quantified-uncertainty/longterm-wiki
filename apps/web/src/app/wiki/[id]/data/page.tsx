@@ -4,10 +4,8 @@ import {
   getAllNumericIds,
   numericIdToSlug,
   slugToNumericId,
-  getRawMdxSource,
 } from "@/lib/mdx";
 import {
-  getEntityById,
   getPageById,
   getEntityPath,
   getBacklinksFor,
@@ -44,17 +42,22 @@ async function fetchPageClaims(pageId: string): Promise<ClaimRow[] | null> {
 
 function Section({
   title,
+  subtitle,
   children,
   defaultOpen = false,
 }: {
   title: string;
+  subtitle?: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
 }) {
   return (
     <details open={defaultOpen} className="mb-4 border border-gray-200 rounded">
-      <summary className="cursor-pointer px-4 py-2 bg-gray-50 font-semibold text-sm select-none hover:bg-gray-100">
-        {title}
+      <summary className="cursor-pointer px-4 py-2 bg-gray-50 select-none hover:bg-gray-100">
+        <span className="font-semibold text-sm">{title}</span>
+        {subtitle && (
+          <span className="ml-2 text-xs text-gray-400 font-normal">{subtitle}</span>
+        )}
       </summary>
       <div className="p-4 overflow-x-auto">{children}</div>
     </details>
@@ -436,47 +439,79 @@ export default async function WikiInfoPage({ params }: PageProps) {
 
   if (!slug) notFound();
 
-  const entity = getEntityById(slug);
   const pageData = getPageById(slug);
   const entityPath = getEntityPath(slug);
   const backlinks = getBacklinksFor(slug);
   const facts = (await getFactsForEntityWithFallback(slug)).data;
   const externalLinks = getExternalLinks(slug);
-  const rawMdx = getRawMdxSource(slug);
   const fnIndex = getFootnoteIndex(slug);
   const claims = await fetchPageClaims(slug);
 
-  const title = entity?.title || pageData?.title || slug;
+  const title = pageData?.title || slug;
+  const entityType = pageData?.entityType || null;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
+      {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-2xl font-bold">{title}</h1>
-          <span className="text-sm text-gray-500 font-mono">
-            {slug}
-            {numericId && ` (${numericId})`}
-          </span>
+        <div className="flex items-start gap-3 mb-2">
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold mb-1">{title}</h1>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+              <span className="font-mono text-gray-500">{slug}</span>
+              {entityType && (
+                <span className="px-1.5 py-0.5 bg-gray-100 rounded text-xs">{entityType}</span>
+              )}
+              {entityPath && (
+                <span className="text-gray-400 text-xs">Path: {entityPath}</span>
+              )}
+            </div>
+          </div>
+          {/* EID — the canonical numeric entity identifier used in URLs and EntityLink refs */}
+          {numericId && (
+            <div className="shrink-0 flex flex-col items-end gap-1">
+              <span className="font-mono text-2xl font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-lg select-all">
+                {numericId}
+              </span>
+              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Entity ID (EID)</span>
+            </div>
+          )}
         </div>
-        <div className="flex gap-3 text-sm">
+
+        <div className="flex flex-wrap gap-4 text-sm mt-3">
           <Link
             href={`/wiki/${numericId || slug}`}
             className="text-blue-600 hover:underline"
           >
             &larr; Back to page
           </Link>
-          {entityPath && (
-            <span className="text-gray-400">Path: {entityPath}</span>
+          <span className="text-gray-400">
+            {Object.keys(facts).length} facts
+            {" · "}
+            {backlinks.length} backlinks
+            {claims !== null && ` · ${claims.length} claims`}
+          </span>
+          {pageData?.quality != null && (
+            <span className="text-gray-500">
+              Quality: <span className="font-medium">{pageData.quality}</span>
+            </span>
+          )}
+          {pageData?.lastUpdated && (
+            <span className="text-gray-500">
+              Updated: <span className="font-medium">{pageData.lastUpdated}</span>
+            </span>
           )}
         </div>
       </div>
 
-      <Section title="Page Metadata" defaultOpen>
-        {pageData ? <JsonDump data={pageData} /> : <p className="text-sm text-gray-500">No page data found for &quot;{slug}&quot;</p>}
-      </Section>
-
-      <Section title="Entity Data" defaultOpen>
-        {entity ? <JsonDump data={entity} /> : <p className="text-sm text-gray-500">No entity found for &quot;{slug}&quot;</p>}
+      <Section
+        title="Page Record"
+        subtitle="database.json — merged from MDX frontmatter + Entity YAML + computed metrics at build time"
+        defaultOpen
+      >
+        {pageData
+          ? <JsonDump data={pageData} />
+          : <p className="text-sm text-gray-500">No compiled record found for &quot;{slug}&quot;</p>}
       </Section>
 
       <Section title={`Claims ${claims && claims.length > 0 ? `(${claims.length})` : ""}`}>
@@ -541,7 +576,9 @@ export default async function WikiInfoPage({ params }: PageProps) {
       </Section>
 
       <Section title="External Links">
-        {externalLinks ? <JsonDump data={externalLinks} /> : <p className="text-sm text-gray-500">No external links</p>}
+        {externalLinks
+          ? <JsonDump data={externalLinks} />
+          : <p className="text-sm text-gray-500">No external links</p>}
       </Section>
 
       <Section title={`Backlinks (${backlinks.length})`}>
@@ -575,19 +612,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
         )}
       </Section>
 
-      <Section title="Frontmatter">
-        {rawMdx ? <JsonDump data={rawMdx.frontmatter} /> : <p className="text-sm text-gray-500">No MDX file found</p>}
-      </Section>
-
-      <Section title="Raw MDX Source">
-        {rawMdx ? (
-          <pre className="text-xs bg-gray-50 p-3 rounded overflow-x-auto max-h-[800px] overflow-y-auto whitespace-pre-wrap break-words font-mono">
-            {rawMdx.raw}
-          </pre>
-        ) : (
-          <p className="text-sm text-gray-500">No MDX file found</p>
-        )}
-      </Section>
     </div>
   );
 }
