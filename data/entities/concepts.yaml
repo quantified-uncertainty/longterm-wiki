@@ -162,6 +162,7 @@
       url: https://www.aisafetysummit.gov.uk/
     - title: CSET Publications
       url: https://cset.georgetown.edu/publications/
+  description: "The broad domain of regulatory, legal, and institutional frameworks governing the development and deployment of AI systems. Encompasses national AI strategies, international coordination mechanisms, voluntary commitments by labs, and technical standards bodies."
   tags:
     - international
     - compute-governance

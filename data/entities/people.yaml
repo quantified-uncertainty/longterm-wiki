@@ -177,6 +177,7 @@
       value: Co-founder & President
     - label: Known For
       value: Co-founding Anthropic, Operations and business leadership
+  description: "Co-founder and President of Anthropic, previously VP of Operations at OpenAI. Leads the business and operational strategy of Anthropic alongside her brother Dario Amodei as CEO."
 - id: dario-amodei
   numericId: E91
   type: person
@@ -238,6 +239,7 @@
   numericId: E101
   type: person
   title: Demis Hassabis
+  description: "Co-founder and CEO of Google DeepMind, the merged entity of DeepMind and Google Brain. Nobel Prize in Chemistry co-recipient (2024) for AlphaFold protein structure prediction. A key architect of DeepMind's reinforcement learning and scientific AI research agenda."
 - id: eliezer-yudkowsky
   numericId: E114
   type: person
@@ -310,6 +312,7 @@
   numericId: E129
   type: person
   title: Evan Hubinger
+  description: "AI safety researcher formerly at Anthropic and MIRI, known for the influential risks from learned optimization framework and the concept of deceptive alignment (mesa-optimization). Author of key foundational work on inner alignment and corrigibility."
 - id: gary-marcus
   numericId: E148
   type: person
@@ -735,10 +738,12 @@
   numericId: E260
   type: person
   title: Robin Hanson
+  description: "Economist and futurist at George Mason University, known for work on prediction markets, near-term AI economics, and the Em scenario (brain emulation). Author of The Age of Em and co-author of The Elephant in the Brain."
 - id: sam-altman
   numericId: E269
   type: person
   title: Sam Altman
+  description: "CEO of OpenAI since its founding. Previously president of Y Combinator. Central figure in the 2023 OpenAI board crisis and subsequent reinstatement. Known for public advocacy of both AI's transformative potential and the importance of safety governance."
 - id: shane-legg
   numericId: E280
   type: person
