@@ -307,6 +307,114 @@ describe("getInternalNav (mocked data)", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Dashboard MDX migration — unit tests
+// ---------------------------------------------------------------------------
+
+describe("dashboard MDX migration (mocked data)", () => {
+  beforeEach(() => {
+    setMockRegistry({
+      byNumericId: {
+        E898: "fact-dashboard",
+        E899: "page-coverage-dashboard",
+        E900: "update-schedule-dashboard",
+        E1: "architecture",
+      },
+      bySlug: {
+        "fact-dashboard": "E898",
+        "page-coverage-dashboard": "E899",
+        "update-schedule-dashboard": "E900",
+        architecture: "E1",
+      },
+    });
+  });
+
+  it("migrated dashboards appear in auto-discovered 'Dashboards' section", () => {
+    setMockPages([
+      makePage({ id: "fact-dashboard", filePath: "internal/fact-dashboard.mdx", title: "Canonical Facts Dashboard", subcategory: "dashboards" }),
+      makePage({ id: "page-coverage-dashboard", filePath: "internal/page-coverage-dashboard.mdx", title: "Pages", subcategory: "dashboards" }),
+      makePage({ id: "update-schedule-dashboard", filePath: "internal/update-schedule-dashboard.mdx", title: "Update Schedule", subcategory: "dashboards" }),
+    ]);
+
+    const sections = getInternalNav();
+    const dashboardsSection = sections.find(s => s.title === "Dashboards");
+    expect(dashboardsSection).toBeDefined();
+    const labels = dashboardsSection!.items.map(i => i.label);
+    expect(labels).toContain("Canonical Facts Dashboard");
+    expect(labels).toContain("Pages");
+    expect(labels).toContain("Update Schedule");
+  });
+
+  it("migrated dashboards get /wiki/E<id> hrefs, not /internal/ hrefs", () => {
+    setMockPages([
+      makePage({ id: "fact-dashboard", filePath: "internal/fact-dashboard.mdx", title: "Canonical Facts Dashboard", subcategory: "dashboards" }),
+    ]);
+
+    const sections = getInternalNav();
+    const dashboardsSection = sections.find(s => s.title === "Dashboards");
+    expect(dashboardsSection).toBeDefined();
+    const factItem = dashboardsSection!.items.find(i => i.label === "Canonical Facts Dashboard");
+    expect(factItem).toBeDefined();
+    expect(factItem!.href).toBe("/wiki/E898");
+  });
+
+  it("migrated dashboards are NOT in the hardcoded 'Dashboards & Tools' section", () => {
+    setMockPages([]);
+    const sections = getInternalNav();
+    const hardcodedSection = sections.find(s => s.title === "Dashboards & Tools");
+    expect(hardcodedSection).toBeDefined();
+
+    const labels = hardcodedSection!.items.map(i => i.label);
+    expect(labels).not.toContain("Fact Dashboard");
+    expect(labels).not.toContain("Pages");
+    expect(labels).not.toContain("Update Schedule");
+  });
+
+  it("non-migrated dashboards remain in hardcoded section", () => {
+    setMockPages([]);
+    const sections = getInternalNav();
+    const hardcodedSection = sections.find(s => s.title === "Dashboards & Tools");
+    expect(hardcodedSection).toBeDefined();
+
+    const labels = hardcodedSection!.items.map(i => i.label);
+    // Spot-check a few entries that should still be hardcoded
+    expect(labels).toContain("Suggested Pages");
+    expect(labels).toContain("GitHub Issues");
+    expect(labels).toContain("Agent Sessions");
+    expect(labels).toContain("Claims");
+    expect(labels).toContain("Job Queue");
+  });
+
+  it("migrated dashboards do not duplicate across hardcoded and auto-discovered sections", () => {
+    setMockPages([
+      makePage({ id: "fact-dashboard", filePath: "internal/fact-dashboard.mdx", title: "Canonical Facts Dashboard", subcategory: "dashboards" }),
+      makePage({ id: "page-coverage-dashboard", filePath: "internal/page-coverage-dashboard.mdx", title: "Pages", subcategory: "dashboards" }),
+      makePage({ id: "update-schedule-dashboard", filePath: "internal/update-schedule-dashboard.mdx", title: "Update Schedule", subcategory: "dashboards" }),
+    ]);
+
+    const sections = getInternalNav();
+    const allHrefs = sections.flatMap(s => s.items.map(i => i.href));
+    const uniqueHrefs = new Set(allHrefs);
+    expect(allHrefs.length).toBe(uniqueHrefs.size);
+  });
+
+  it("both hardcoded and auto-discovered dashboard sections coexist", () => {
+    setMockPages([
+      makePage({ id: "fact-dashboard", filePath: "internal/fact-dashboard.mdx", title: "Canonical Facts Dashboard", subcategory: "dashboards" }),
+      makePage({ id: "architecture", filePath: "internal/architecture.mdx", title: "Architecture", subcategory: "architecture" }),
+    ]);
+
+    const sections = getInternalNav();
+    const titles = sections.map(s => s.title);
+    // Hardcoded section with non-migrated dashboards
+    expect(titles).toContain("Dashboards & Tools");
+    // Auto-discovered section with migrated dashboards
+    expect(titles).toContain("Dashboards");
+    // Regular content section
+    expect(titles).toContain("Architecture");
+  });
+});
+
+// ---------------------------------------------------------------------------
 // getWikiNav dispatch
 // ---------------------------------------------------------------------------
 
@@ -524,6 +632,122 @@ describe("internal sidebar completeness (real data)", () => {
         `${missing.length} React dashboard page(s) missing from sidebar "Dashboards & Tools" section:\n` +
         missing.map(d => `  - apps/web/src/app/internal/${d}/page.tsx`).join("\n") +
         `\n\nAdd an entry to the dashboardSection in wiki-nav.ts getInternalNav(), or migrate to MDX stub.`
+      );
+    }
+  });
+
+  // -----------------------------------------------------------------------
+  // Test: Every migrated dashboard has a valid MDX stub and redirect
+  // -----------------------------------------------------------------------
+
+  it("every redirect page.tsx points to an EID that exists in database.json", () => {
+    if (!fs.existsSync(APP_INTERNAL_DIR)) return;
+
+    const dbPath = path.join(DATA_DIR, "database.json");
+    if (!fs.existsSync(dbPath)) return;
+
+    const db = loadJson<{
+      idRegistry: { byNumericId: Record<string, string> };
+    }>(dbPath);
+
+    const errors: string[] = [];
+    for (const entry of fs.readdirSync(APP_INTERNAL_DIR, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const pagePath = path.join(APP_INTERNAL_DIR, entry.name, "page.tsx");
+      if (!fs.existsSync(pagePath)) continue;
+
+      const source = fs.readFileSync(pagePath, "utf-8");
+      const redirectMatch = source.match(/redirect\(["']\/wiki\/(E\d+)["']\)/);
+      if (!redirectMatch) continue;
+
+      const eid = redirectMatch[1];
+      if (!db.idRegistry.byNumericId[eid]) {
+        errors.push(`${entry.name}/page.tsx redirects to /wiki/${eid} but ${eid} not in database`);
+      }
+    }
+
+    if (errors.length > 0) {
+      throw new Error(
+        `Redirect(s) point to unregistered EIDs:\n` +
+        errors.map(e => `  - ${e}`).join("\n")
+      );
+    }
+  });
+
+  it("every migrated dashboard MDX stub has contentFormat: dashboard", () => {
+    if (!fs.existsSync(APP_INTERNAL_DIR)) return;
+
+    const errors: string[] = [];
+    for (const entry of fs.readdirSync(APP_INTERNAL_DIR, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const pagePath = path.join(APP_INTERNAL_DIR, entry.name, "page.tsx");
+      if (!fs.existsSync(pagePath)) continue;
+
+      const source = fs.readFileSync(pagePath, "utf-8");
+      const redirectMatch = source.match(/redirect\(["']\/wiki\/(E\d+)["']\)/);
+      if (!redirectMatch) continue;
+
+      // This is a migrated dashboard — find its MDX stub
+      const dbPath = path.join(DATA_DIR, "database.json");
+      if (!fs.existsSync(dbPath)) continue;
+
+      const db = loadJson<{
+        idRegistry: { byNumericId: Record<string, string> };
+        pages: Array<{ id: string; contentFormat: string; subcategory: string }>;
+      }>(dbPath);
+
+      const eid = redirectMatch[1];
+      const slug = db.idRegistry.byNumericId[eid];
+      if (!slug) continue;
+
+      const page = db.pages.find(p => p.id === slug);
+      if (!page) {
+        errors.push(`${entry.name}: slug '${slug}' not found in pages`);
+        continue;
+      }
+
+      if (page.contentFormat !== "dashboard") {
+        errors.push(`${entry.name}: MDX stub '${slug}' has contentFormat '${page.contentFormat}' (expected 'dashboard')`);
+      }
+      if (page.subcategory !== "dashboards") {
+        errors.push(`${entry.name}: MDX stub '${slug}' has subcategory '${page.subcategory}' (expected 'dashboards')`);
+      }
+    }
+
+    if (errors.length > 0) {
+      throw new Error(
+        `Migrated dashboard MDX stub(s) have incorrect metadata:\n` +
+        errors.map(e => `  - ${e}`).join("\n")
+      );
+    }
+  });
+
+  it("every migrated dashboard redirect has a corresponding content component file", () => {
+    if (!fs.existsSync(APP_INTERNAL_DIR)) return;
+
+    const errors: string[] = [];
+    for (const entry of fs.readdirSync(APP_INTERNAL_DIR, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const pagePath = path.join(APP_INTERNAL_DIR, entry.name, "page.tsx");
+      if (!fs.existsSync(pagePath)) continue;
+
+      const source = fs.readFileSync(pagePath, "utf-8");
+      if (!/redirect\(["']\/wiki\/E\d+["']\)/.test(source)) continue;
+
+      // This is a migrated dashboard — it should have a *-content.tsx file
+      const dirPath = path.join(APP_INTERNAL_DIR, entry.name);
+      const files = fs.readdirSync(dirPath);
+      const hasContentFile = files.some(f => f.endsWith("-content.tsx"));
+
+      if (!hasContentFile) {
+        errors.push(`${entry.name}/ has redirect but no *-content.tsx component file`);
+      }
+    }
+
+    if (errors.length > 0) {
+      throw new Error(
+        `Migrated dashboard(s) missing content component files:\n` +
+        errors.map(e => `  - ${e}`).join("\n")
       );
     }
   });
