@@ -562,6 +562,21 @@ async function prePushCheck(_args: string[], options: CommandOptions): Promise<C
       ? Math.round((finalStatus.totalChecked / finalStatus.totalItems) * 100)
       : 0;
 
+  // Count unchecked blocking items separately from advisory
+  const allItems = finalStatus.phases.flatMap(p => p.items);
+  const uncheckedBlocking: string[] = [];
+  const uncheckedAdvisory: string[] = [];
+  for (const item of allItems) {
+    if (item.status === 'unchecked') {
+      const catalogItem = CHECKLIST_ITEMS.find(ci => ci.id === item.id);
+      if (catalogItem?.priority === 'advisory') {
+        uncheckedAdvisory.push(item.id);
+      } else {
+        uncheckedBlocking.push(item.id);
+      }
+    }
+  }
+
   if (pct < 10) {
     // Hard block: checklist was initialized but barely touched — the session
     // skipped the end-of-session workflow entirely. Exit 1 to block the push.
@@ -571,10 +586,24 @@ async function prePushCheck(_args: string[], options: CommandOptions): Promise<C
     return { output, exitCode: 1 };
   }
 
-  if (pct < 25) {
+  if (uncheckedBlocking.length > 0 && pct < 75) {
+    output += `\n${c.yellow}⚠️  WARNING: ${uncheckedBlocking.length} blocking item(s) unchecked:${c.reset}\n`;
+    for (const id of uncheckedBlocking.slice(0, 5)) {
+      output += `  ${c.red}[ ]${c.reset} ${id}\n`;
+    }
+    if (uncheckedBlocking.length > 5) {
+      output += `  ${c.dim}...and ${uncheckedBlocking.length - 5} more${c.reset}\n`;
+    }
+    output += `${c.yellow}   Did you run /agent-session-ready-PR before pushing?${c.reset}\n`;
+    output += `${c.dim}   To bypass: git push --no-verify${c.reset}\n\n`;
+  } else if (pct < 25) {
     output += `\n${c.yellow}⚠️  WARNING: Agent checklist is only ${finalStatus.totalChecked}/${finalStatus.totalItems} items complete (${pct}%).${c.reset}\n`;
     output += `${c.yellow}   Did you run /agent-session-ready-PR before pushing?${c.reset}\n`;
     output += `${c.dim}   To bypass: git push --no-verify${c.reset}\n\n`;
+  }
+
+  if (uncheckedAdvisory.length > 0) {
+    output += `${c.dim}  ${uncheckedAdvisory.length} advisory item(s) skipped (non-blocking)${c.reset}\n`;
   }
 
   // Step 4: Warn if tooling-gaps-found is checked but Key Decisions is empty.

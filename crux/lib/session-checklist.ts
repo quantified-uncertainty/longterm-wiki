@@ -18,12 +18,19 @@ export type ChecklistPhase = 'understand' | 'implement' | 'review' | 'ship';
 
 export type CheckStatus = 'checked' | 'unchecked' | 'na';
 
+export type ChecklistPriority = 'blocking' | 'advisory';
+
 export interface ChecklistItem {
   id: string;
   label: string;
   description: string;
   phase: ChecklistPhase;
   applicableTypes: SessionType[] | 'all';
+  /**
+   * blocking = must be checked before shipping (or explicitly marked N/A with reason).
+   * advisory = should be checked but won't block the pre-push hook.
+   */
+  priority: ChecklistPriority;
   /** Shell command that can programmatically verify this item. Exit 0 = pass. */
   verifyCommand?: string;
 }
@@ -70,17 +77,22 @@ const PHASE_LABELS: Record<ChecklistPhase, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// Checklist Item Catalog (43 items total; ~28-31 per session depending on type)
+// Checklist Item Catalog (53 items total; ~32-38 per session depending on type)
+// Items marked 'blocking' must be checked or N/A'd before shipping.
+// Items marked 'advisory' are recommended but won't block the pre-push hook.
 // ---------------------------------------------------------------------------
 
 export const CHECKLIST_ITEMS: ChecklistItem[] = [
+  // =========================================================================
   // Phase 1: Understand
+  // =========================================================================
   {
     id: 'read-issue',
     label: 'Read the issue/request',
     description: 'Read the issue or request carefully. List acceptance criteria.',
     phase: 'understand',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'explore-code',
@@ -88,6 +100,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Read files that will be modified. Understand existing patterns.',
     phase: 'understand',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'plan-approach',
@@ -95,6 +108,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'For non-trivial changes, think through the design before coding.',
     phase: 'understand',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'root-cause',
@@ -102,6 +116,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Identify and document the root cause before attempting a fix.',
     phase: 'understand',
     applicableTypes: ['bugfix'],
+    priority: 'blocking',
   },
   {
     id: 'research-content',
@@ -109,15 +124,25 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Gather sources, verify facts, and understand the topic before writing.',
     phase: 'understand',
     applicableTypes: ['content'],
+    priority: 'blocking',
   },
 
+  // =========================================================================
   // Phase 2: Implement
+  // =========================================================================
+  // --- Change 2: Test-first ---
   {
     id: 'tests-written',
-    label: 'Tests written',
-    description: 'Tests cover happy paths AND edge cases.',
+    label: 'Tests written BEFORE implementation',
+    description:
+      'Write tests FIRST, from acceptance criteria, before writing the implementation. ' +
+      'The test encodes what the code SHOULD do, not what it DOES do. ' +
+      'Cover happy paths AND edge cases. For schema changes: write a round-trip test (insert → read → compare). ' +
+      'For CLI flags: test that each flag reaches its handler. ' +
+      'For bug fixes: write the failing test first, then make it pass.',
     phase: 'implement',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'no-hardcoded',
@@ -125,6 +150,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'URLs, magic numbers, and thresholds are in config or shared constants.',
     phase: 'implement',
     applicableTypes: 'all',
+    priority: 'advisory',
   },
   {
     id: 'fix-escaping',
@@ -132,6 +158,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Run `pnpm crux fix escaping` after any MDX or content changes.',
     phase: 'implement',
     applicableTypes: 'all',
+    priority: 'blocking',
     verifyCommand: 'pnpm crux fix escaping',
   },
   {
@@ -140,6 +167,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'New code is in TypeScript where possible.',
     phase: 'implement',
     applicableTypes: ['infrastructure', 'refactor', 'commands'],
+    priority: 'advisory',
   },
   {
     id: 'crux-pipeline',
@@ -147,6 +175,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Page created/improved via `crux content create` or `crux content improve`, not manually.',
     phase: 'implement',
     applicableTypes: ['content'],
+    priority: 'blocking',
   },
   {
     id: 'fix-minimal',
@@ -154,6 +183,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Change is the smallest possible fix for the root cause. No scope creep.',
     phase: 'implement',
     applicableTypes: ['bugfix'],
+    priority: 'blocking',
   },
   {
     id: 'regression-test',
@@ -161,6 +191,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'A test that would have caught this bug before the fix.',
     phase: 'implement',
     applicableTypes: ['bugfix'],
+    priority: 'blocking',
   },
   {
     id: 'behavior-unchanged',
@@ -168,6 +199,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Existing behavior is preserved. No functional changes beyond the refactor.',
     phase: 'implement',
     applicableTypes: ['refactor'],
+    priority: 'blocking',
   },
   {
     id: 'callers-updated',
@@ -175,6 +207,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Every call site of modified functions/types has been updated.',
     phase: 'implement',
     applicableTypes: ['refactor'],
+    priority: 'blocking',
   },
   {
     id: 'command-registered',
@@ -182,6 +215,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'New command is registered in `crux/crux.mjs` and accessible via CLI.',
     phase: 'implement',
     applicableTypes: ['commands'],
+    priority: 'blocking',
   },
   {
     id: 'command-documented',
@@ -189,23 +223,86 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Help text, CLAUDE.md quick reference, and getHelp() are updated.',
     phase: 'implement',
     applicableTypes: ['commands'],
+    priority: 'advisory',
   },
 
+  // =========================================================================
   // Phase 3: Review
+  // =========================================================================
   {
     id: 'correctness',
     label: 'Correctness verified',
     description: 'Traced logic step by step. No off-by-one, flipped conditions, wrong variable names.',
     phase: 'review',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
+  // --- Change 1: Execution-based paranoid review ---
   {
     id: 'paranoid-review',
-    label: 'Paranoid review done',
+    label: 'Execution-based review done',
     description:
-      'Spawn a fresh Task subagent with no prior context. Give it the git diff and this adversarial prompt: "Find every bug, DRY violation, dead code, missing export, test coverage gap, hardcoded constant, and deferred work item." Review all findings. Fix or document every issue raised before checking this off.',
+      'Spawn a fresh Task subagent with the git diff AND these execution instructions. ' +
+      'The reviewer must RUN things and paste output — not just read code. Instructions: ' +
+      '(1) For each new/changed function: run it with typical input AND with empty/null/edge-case input, paste both outputs. ' +
+      '(2) For each DB/schema change: write a verification query that checks the expected invariant (e.g. row counts, column values), run it, paste the result. ' +
+      '(3) For each CLI flag: run the command WITH the flag and WITHOUT it, show both outputs differ as expected. ' +
+      '(4) For each UI data dependency: fetch the API endpoint the component uses, print the response keys, verify they match the component props. ' +
+      '(5) Check for DRY violations, dead code, missing exports. ' +
+      'Fix every issue found. Paste verification output into Key Decisions.',
     phase: 'review',
     applicableTypes: ['infrastructure', 'commands', 'refactor', 'bugfix'],
+    priority: 'blocking',
+  },
+  // --- Change 3: Category-specific verification items ---
+  {
+    id: 'verify-schema',
+    label: 'Schema verification',
+    description:
+      'For every new/changed DB column: (1) Is the type correct? (REAL vs DOUBLE PRECISION, nullable vs NOT NULL — state your choice and why.) ' +
+      '(2) Write an INSERT + SELECT round-trip test. (3) Run the migration, then run a verification query and paste the result. ' +
+      '(4) For array/JSONB columns: test with empty arrays and null. ' +
+      'Paste all query outputs into Key Decisions.',
+    phase: 'review',
+    applicableTypes: ['infrastructure', 'commands'],
+    priority: 'blocking',
+  },
+  {
+    id: 'verify-cli',
+    label: 'CLI flag verification',
+    description:
+      'For every CLI flag added or changed: (1) Trace the flag from its yargs/command definition through dispatch to where it is actually used. ' +
+      '(2) Run the command with the flag and paste the output. (3) Run without the flag and confirm the behavior differs as expected. ' +
+      '(4) If the flag is forwarded to a subprocess, log the subprocess args and verify the flag arrives. ' +
+      'Paste command outputs into Key Decisions.',
+    phase: 'review',
+    applicableTypes: ['infrastructure', 'commands'],
+    priority: 'blocking',
+  },
+  {
+    id: 'verify-ui',
+    label: 'UI data contract verification',
+    description:
+      'For every UI component that fetches data: (1) Fetch the API endpoint it uses (curl or script). ' +
+      '(2) Print the response JSON keys and compare to what the component destructures/expects. ' +
+      '(3) Check: what renders when the data is empty? When a field is null? When the list has 0 items vs 1000? ' +
+      'Paste the API response shape and component prop comparison into Key Decisions.',
+    phase: 'review',
+    applicableTypes: ['infrastructure', 'bugfix'],
+    priority: 'blocking',
+  },
+  {
+    id: 'verify-llm-boundary',
+    label: 'LLM output boundary check',
+    description:
+      'For any code that parses LLM output: (1) Run the extraction/pipeline on one real input and paste 2-3 example outputs. ' +
+      '(2) Test with malformed JSON (missing closing brace), truncated response, and empty response. ' +
+      '(3) Verify entity names are normalized (lowercased, trimmed, checked against existing entities). ' +
+      '(4) Verify numeric values round-trip without precision loss. ' +
+      'Paste example outputs into Key Decisions.',
+    phase: 'review',
+    applicableTypes: ['infrastructure', 'commands'],
+    priority: 'blocking',
   },
   {
     id: 'shell-injection',
@@ -213,6 +310,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Any `curl -d` with variables uses `jq -n --arg`, not raw string interpolation.',
     phase: 'review',
     applicableTypes: 'all',
+    priority: 'advisory',
   },
   {
     id: 'security',
@@ -220,6 +318,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'No hardcoded secrets, no unsanitized user input, nothing that should be in .gitignore.',
     phase: 'review',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'no-dead-code',
@@ -227,6 +326,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Changes did not make existing code redundant. Grepped for replaced functions.',
     phase: 'review',
     applicableTypes: 'all',
+    priority: 'advisory',
   },
   {
     id: 'no-dry-violations',
@@ -234,6 +334,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'New logic does not duplicate existing utilities.',
     phase: 'review',
     applicableTypes: 'all',
+    priority: 'advisory',
   },
   {
     id: 'full-integration',
@@ -241,6 +342,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'New types have consumers, new CLI commands are registered, new pages are in sidebar nav.',
     phase: 'review',
     applicableTypes: 'all',
+    priority: 'advisory',
   },
   {
     id: 'no-regressions',
@@ -248,14 +350,21 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Grepped for patterns related to changes and verified nothing is stale or inconsistent.',
     phase: 'review',
     applicableTypes: 'all',
+    priority: 'advisory',
   },
+  // --- Change 4: Structural live-data test ---
   {
     id: 'live-data-test',
-    label: 'Tested on live data',
+    label: 'Live data output pasted',
     description:
-      'If possible, run the code against real data, review the output, and adjust. Repeat the loop until results look correct. Do not ship untested scripts.',
+      'Run the new/changed code against real data. Paste the ACTUAL command output into Key Decisions — ' +
+      'not "I verified it works" but the literal output. For DB changes: paste query results showing real rows. ' +
+      'For CLI: paste the command and its output. For API endpoints: paste the curl response. ' +
+      'If the output is too long, paste a representative sample with row/item counts. ' +
+      'This item is not checked until output is visible in Key Decisions or the PR description.',
     phase: 'review',
     applicableTypes: ['infrastructure', 'commands', 'bugfix', 'refactor'],
+    priority: 'blocking',
   },
   {
     id: 'entitylinks-resolve',
@@ -263,6 +372,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Every `<EntityLink id="X">` has a matching entity in `data/entities/*.yaml`.',
     phase: 'review',
     applicableTypes: ['content'],
+    priority: 'blocking',
     verifyCommand: 'pnpm crux validate unified --rules=entity-links --errors-only',
   },
   {
@@ -271,6 +381,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'No `numericId` values were removed or changed in entity YAML.',
     phase: 'review',
     applicableTypes: ['content'],
+    priority: 'blocking',
     verifyCommand: 'pnpm crux validate unified --rules=numeric-id-integrity --errors-only',
   },
   {
@@ -281,6 +392,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
       'The gate runs `assign-ids.mjs` automatically, but allocating early prevents conflicts between concurrent agents.',
     phase: 'review',
     applicableTypes: 'all',
+    priority: 'blocking',
     verifyCommand: 'node --import tsx/esm apps/web/scripts/assign-ids.mjs --dry-run',
   },
   {
@@ -289,6 +401,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'No unescaped `$` or `<` in prose. Run `crux validate unified --rules=comparison-operators,dollar-signs`.',
     phase: 'review',
     applicableTypes: ['content'],
+    priority: 'blocking',
     verifyCommand: 'pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only',
   },
   {
@@ -297,6 +410,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'No round-number statistics without citations, no claims contradicting page data.',
     phase: 'review',
     applicableTypes: ['content'],
+    priority: 'blocking',
   },
   {
     id: 'citations-have-urls',
@@ -305,6 +419,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
       'Every `[^N]:` footnote definition contains a markdown link `[Title](https://...)` or bare URL. Run `pnpm crux validate unified --rules=no-url-footnotes,citation-urls` to catch placeholders and missing URLs automatically.',
     phase: 'review',
     applicableTypes: ['content'],
+    priority: 'blocking',
     verifyCommand: 'pnpm crux validate unified --rules=no-url-footnotes,citation-urls --errors-only',
   },
   {
@@ -314,6 +429,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
       'For high-importance pages or pages with many new citations: run `pnpm crux citations verify <page-id>` to check URLs return 200 and match claimed titles. Focus on any footnote added in this session.',
     phase: 'review',
     applicableTypes: ['content'],
+    priority: 'advisory',
   },
   {
     id: 'backward-compatible',
@@ -321,6 +437,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Changes do not break existing consumers, APIs, or data formats.',
     phase: 'review',
     applicableTypes: ['infrastructure', 'refactor'],
+    priority: 'blocking',
   },
   {
     id: 'multi-environment',
@@ -328,6 +445,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Works in Claude Code web sandboxes (limited network) and local dev.',
     phase: 'review',
     applicableTypes: ['infrastructure', 'commands'],
+    priority: 'advisory',
   },
   {
     id: 'ci-coverage',
@@ -335,6 +453,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'If you added a new test suite, package, or build step: verify it is wired into `.github/workflows/ci.yml`. New `pnpm test` invocations or scripts need a corresponding CI job step — they do not run automatically.',
     phase: 'review',
     applicableTypes: ['infrastructure', 'commands', 'refactor'],
+    priority: 'advisory',
   },
   {
     id: 'tooling-gaps-found',
@@ -345,15 +464,19 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
       'Examples: patterns caught at PR review, fixes applied by hand that could be automated, CI checks that are missing.',
     phase: 'review',
     applicableTypes: 'all',
+    priority: 'advisory',
   },
 
+  // =========================================================================
   // Phase 4: Ship
+  // =========================================================================
   {
     id: 'self-audit-commands',
     label: 'Re-ran commands',
     description: 'Every command claimed to run has been re-run and output matches claims.',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'self-audit-files',
@@ -361,6 +484,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Every file said to be modified has been re-read and confirmed correct.',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'self-audit-no-fabrication',
@@ -368,6 +492,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Test counts, line counts, and error counts match actual output.',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'lockfile-fresh',
@@ -375,6 +500,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'If `package.json` changed, run `pnpm install` to update `pnpm-lock.yaml`. CI uses `--frozen-lockfile` and will fail on drift.',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'blocking',
     verifyCommand: 'pnpm install --frozen-lockfile',
   },
   {
@@ -383,6 +509,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: '`pnpm crux validate gate --fix` passes. Record exact test count.',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'blocking',
     verifyCommand: 'pnpm crux validate gate --fix',
   },
   {
@@ -392,6 +519,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
       'Summary, key changes, test plan. All items checked and true. Run `pnpm crux pr fix-body` to auto-repair any literal \\n in the PR body.',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'blocking',
     verifyCommand: 'pnpm crux pr fix-body',
   },
   {
@@ -400,6 +528,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: '`pnpm crux issues done <N> --pr=<URL>` if working on an issue.',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'session-log',
@@ -407,6 +536,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Session log synced to wiki-server DB (via `/agent-session-ready-PR` or `crux wiki-server sync-session`).',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'push-ci-green',
@@ -414,6 +544,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Pushed to remote. CI checks pass (use `pnpm crux ci status --wait`).',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'no-merge-conflicts',
@@ -421,6 +552,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'PR is mergeable (not "dirty"). If conflicts exist, rebase onto main.',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'check-recent-merges',
@@ -428,6 +560,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Reviewed commits merged to main since session started. No conflicts or relevant overlapping changes.',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'blocking',
   },
   {
     id: 'tooling-gaps-actioned',
@@ -437,6 +570,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
       'For harder ones: `pnpm crux issues create "Add validation: <desc>" --label=tooling --model=haiku --criteria="..."` — then paste the URL in Key Decisions.',
     phase: 'ship',
     applicableTypes: 'all',
+    priority: 'advisory',
   },
   {
     id: 'crux-typescript',
@@ -444,6 +578,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: '`cd crux && npx tsc --noEmit` passes (if crux/ files changed).',
     phase: 'ship',
     applicableTypes: ['infrastructure', 'commands', 'refactor'],
+    priority: 'blocking',
     verifyCommand: 'cd crux && npx tsc --noEmit',
   },
 ];
@@ -516,12 +651,26 @@ export function buildChecklist(type: SessionType, metadata: ChecklistMetadata): 
     const phaseItems = items.filter(item => item.phase === phase);
     if (phaseItems.length === 0) continue;
 
+    const blockingItems = phaseItems.filter(item => item.priority === 'blocking');
+    const advisoryItems = phaseItems.filter(item => item.priority === 'advisory');
+
     lines.push(`## ${PHASE_LABELS[phase]}`);
     lines.push('');
-    for (const item of phaseItems) {
-      itemNumber++;
-      const autoTag = item.verifyCommand ? ' *(auto-verify)*' : '';
-      lines.push(`${itemNumber}. [ ] \`${item.id}\` **${item.label}**: ${item.description}${autoTag}`);
+    if (blockingItems.length > 0) {
+      for (const item of blockingItems) {
+        itemNumber++;
+        const autoTag = item.verifyCommand ? ' *(auto-verify)*' : '';
+        lines.push(`${itemNumber}. [ ] \`${item.id}\` **${item.label}**: ${item.description}${autoTag}`);
+      }
+    }
+    if (advisoryItems.length > 0) {
+      lines.push('');
+      lines.push('*Advisory (recommended but non-blocking):*');
+      for (const item of advisoryItems) {
+        itemNumber++;
+        const autoTag = item.verifyCommand ? ' *(auto-verify)*' : '';
+        lines.push(`${itemNumber}. [ ] \`${item.id}\` ${item.label}: ${item.description}${autoTag}`);
+      }
     }
     lines.push('');
   }
@@ -555,8 +704,8 @@ export function checkItems(
   const checked: string[] = [];
   const notFound: string[] = [];
 
-  // Pattern for new numbered format: "1. [ ] `id` **Label**: ..."
-  const numberedPattern = /^(\d+)\. \[([ x~])\] `([^`]+)` \*\*([^*]+)\*\*/;
+  // Pattern for new numbered format: "1. [ ] `id` **Label**: ..." (blocking) or "1. [ ] `id` Label: ..." (advisory)
+  const numberedPattern = /^(\d+)\. \[([ x~])\] `([^`]+)` (?:\*\*([^*]+)\*\*|([^:]+)):/;
   // Pattern for old unnumbered format: "- [ ] **Label**: ..."
   const unnumberedPattern = /^- \[([ x~])\] \*\*([^*]+)\*\*/;
 
@@ -633,8 +782,8 @@ export function parseChecklist(markdown: string): ChecklistStatus {
 
   const phasePattern = /^## Phase (\d): (\w+)/;
   const decisionsPattern = /^## Key Decisions/;
-  // New numbered format: "1. [ ] `id` **Label**: ..."
-  const numberedItemPattern = /^\d+\. \[([ x~])\] `([^`]+)` \*\*([^*]+)\*\*/;
+  // New numbered format: "1. [ ] `id` **Label**: ..." (blocking) or "1. [ ] `id` Label: ..." (advisory)
+  const numberedItemPattern = /^\d+\. \[([ x~])\] `([^`]+)` (?:\*\*([^*]+)\*\*|([^:]+)):/;
   // Old unnumbered format: "- [ ] **Label**: ..."
   const unnumberedItemPattern = /^- \[([ x~])\] \*\*([^*]+)\*\*/;
   const decisionItemPattern = /^- (.+)/;
@@ -694,7 +843,7 @@ export function parseChecklist(markdown: string): ChecklistStatus {
       if (numberedMatch) {
         const marker = numberedMatch[1];
         const id = numberedMatch[2];
-        const label = numberedMatch[3].replace(/:$/, '');
+        const label = (numberedMatch[3] || numberedMatch[4]).replace(/:$/, '');
         let status: CheckStatus;
         if (marker === 'x') status = 'checked';
         else if (marker === '~') status = 'na';
@@ -767,13 +916,18 @@ export function formatStatus(status: ChecklistStatus, c: FormatColors): string {
     lines.push(`${phaseColor}${PHASE_LABELS[phase.phase]}: ${phase.checked}/${phase.total}${c.reset}`);
 
     for (const item of phase.items) {
+      // Look up priority from catalog; default to blocking for unknown items
+      const catalogItem = CHECKLIST_ITEMS.find(ci => ci.id === item.id);
+      const isAdvisory = catalogItem?.priority === 'advisory';
+      const prefix = isAdvisory ? `${c.dim}(advisory)${c.reset} ` : '';
       if (item.status === 'checked') {
-        lines.push(`  ${c.green}[x]${c.reset} ${c.dim}${item.id}${c.reset} ${item.label}`);
+        lines.push(`  ${c.green}[x]${c.reset} ${c.dim}${item.id}${c.reset} ${prefix}${item.label}`);
       } else if (item.status === 'na') {
         const reasonSuffix = item.naReason ? ` (N/A: ${item.naReason})` : ' (N/A)';
-        lines.push(`  ${c.dim}[~]${c.reset} ${c.dim}${item.id}${c.reset} ${c.dim}${item.label}${reasonSuffix}${c.reset}`);
+        lines.push(`  ${c.dim}[~]${c.reset} ${c.dim}${item.id}${c.reset} ${prefix}${c.dim}${item.label}${reasonSuffix}${c.reset}`);
       } else {
-        lines.push(`  ${c.red}[ ]${c.reset} ${c.dim}${item.id}${c.reset} ${item.label}`);
+        const color = isAdvisory ? c.yellow : c.red;
+        lines.push(`  ${color}[ ]${c.reset} ${c.dim}${item.id}${c.reset} ${prefix}${item.label}`);
       }
     }
   }

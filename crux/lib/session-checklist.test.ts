@@ -131,12 +131,43 @@ describe('getItemsForType', () => {
     const item = CHECKLIST_ITEMS.find(i => i.id === 'paranoid-review');
     expect(item).toBeDefined();
     expect(item!.phase).toBe('review');
-    expect(item!.label).toBe('Paranoid review done');
+    expect(item!.label).toBe('Execution-based review done');
     expect(item!.description).toContain('fresh Task subagent');
-    expect(item!.description).toContain('adversarial prompt');
-    expect(item!.description).toContain('test coverage gap');
+    expect(item!.description).toContain('RUN things and paste output');
+    expect(item!.description).toContain('verification query');
     // Must NOT have a verifyCommand — this item requires human/agent action
     expect(item!.verifyCommand).toBeUndefined();
+    expect(item!.priority).toBe('blocking');
+  });
+
+  it('category-specific verification items exist for infra/commands', () => {
+    const infraItems = getItemsForType('infrastructure');
+    expect(infraItems.some(i => i.id === 'verify-schema')).toBe(true);
+    expect(infraItems.some(i => i.id === 'verify-cli')).toBe(true);
+    expect(infraItems.some(i => i.id === 'verify-ui')).toBe(true);
+    expect(infraItems.some(i => i.id === 'verify-llm-boundary')).toBe(true);
+    // Content type should NOT have these
+    const contentItems = getItemsForType('content');
+    expect(contentItems.some(i => i.id === 'verify-schema')).toBe(false);
+    expect(contentItems.some(i => i.id === 'verify-cli')).toBe(false);
+  });
+
+  it('tests-written is test-first and blocking', () => {
+    const item = CHECKLIST_ITEMS.find(i => i.id === 'tests-written');
+    expect(item).toBeDefined();
+    expect(item!.label).toContain('BEFORE');
+    expect(item!.description).toContain('Write tests FIRST');
+    expect(item!.description).toContain('acceptance criteria');
+    expect(item!.priority).toBe('blocking');
+  });
+
+  it('live-data-test requires pasted output', () => {
+    const item = CHECKLIST_ITEMS.find(i => i.id === 'live-data-test');
+    expect(item).toBeDefined();
+    expect(item!.label).toContain('pasted');
+    expect(item!.description).toContain('Paste the ACTUAL command output');
+    expect(item!.description).toContain('Key Decisions');
+    expect(item!.priority).toBe('blocking');
   });
 });
 
@@ -233,6 +264,23 @@ describe('buildChecklist', () => {
     const readLine = md.split('\n').find(l => l.includes('`read-issue`'));
     expect(readLine).not.toContain('*(auto-verify)*');
   });
+
+  it('advisory items appear under an advisory header', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    expect(md).toContain('*Advisory (recommended but non-blocking):*');
+  });
+
+  it('advisory items use plain label (no bold) to visually distinguish from blocking', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    const lines = md.split('\n');
+    const advisorySection = lines.findIndex(l => l.includes('Advisory (recommended but non-blocking)'));
+    expect(advisorySection).toBeGreaterThan(-1);
+    // The line after the advisory header should be a numbered item without bold **
+    const nextItemLine = lines.slice(advisorySection + 1).find(l => /^\d+\./.test(l));
+    if (nextItemLine) {
+      expect(nextItemLine).not.toContain('**');
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -295,9 +343,9 @@ describe('parseChecklist (numbered format)', () => {
     const expectedCount = getItemsForType('bugfix').length;
     expect(status.totalItems).toBe(expectedCount);
     expect(status.totalChecked).toBe(0);
-    // Verify IDs match catalog
-    const allParsedIds = status.phases.flatMap(p => p.items.map(i => i.id));
-    const expectedIds = getItemsForType('bugfix').map(i => i.id);
+    // Verify all IDs from catalog are present (order may differ: blocking before advisory)
+    const allParsedIds = new Set(status.phases.flatMap(p => p.items.map(i => i.id)));
+    const expectedIds = new Set(getItemsForType('bugfix').map(i => i.id));
     expect(allParsedIds).toEqual(expectedIds);
   });
 });
@@ -695,9 +743,22 @@ describe('checklist catalog integrity', () => {
     }
   });
 
-  it('catalog has exactly 49 items (update this when adding/removing items)', () => {
+  it('catalog has exactly 53 items (update this when adding/removing items)', () => {
     // This test locks in the expected catalog size. If you add or remove items,
     // update this count AND the comment on the CHECKLIST_ITEMS declaration.
-    expect(CHECKLIST_ITEMS.length).toBe(49);
+    expect(CHECKLIST_ITEMS.length).toBe(53);
+  });
+
+  it('all items have valid priority', () => {
+    const validPriorities = new Set(['blocking', 'advisory']);
+    for (const item of CHECKLIST_ITEMS) {
+      expect(validPriorities.has(item.priority)).toBe(true);
+    }
+  });
+
+  it('majority of items are blocking (by design)', () => {
+    const blocking = CHECKLIST_ITEMS.filter(i => i.priority === 'blocking');
+    const advisory = CHECKLIST_ITEMS.filter(i => i.priority === 'advisory');
+    expect(blocking.length).toBeGreaterThan(advisory.length);
   });
 });
