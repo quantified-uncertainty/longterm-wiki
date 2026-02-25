@@ -184,7 +184,7 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
     cell: ({ row }) => (
       <Link
         href={`/claims/claim/${row.original.id}`}
-        className="font-mono text-[10px] text-muted-foreground hover:text-blue-600 hover:underline"
+        className="font-mono text-xs text-blue-600 hover:underline"
         onClick={(e) => e.stopPropagation()}
       >
         {row.original.id}
