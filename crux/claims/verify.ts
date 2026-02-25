@@ -19,7 +19,7 @@
 import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
+import { callOpenRouter, stripCodeFences, parseJsonWithRepair, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
   getClaimsByEntity,
@@ -114,7 +114,7 @@ async function verifyClaim(
     });
 
     const json = stripCodeFences(raw);
-    const parsed = JSON.parse(json) as { verdict?: string; relevantQuote?: string; explanation?: string };
+    const parsed = parseJsonWithRepair<{ verdict?: string; relevantQuote?: string; explanation?: string }>(json);
     const verdict = parsed.verdict === 'verified' ? 'verified' : 'unsupported';
 
     return {
