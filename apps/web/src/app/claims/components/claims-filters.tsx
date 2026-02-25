@@ -5,6 +5,7 @@ export interface ClaimFilters {
   entity: string;
   category: string;
   confidence: string;
+  claimMode: string;
   multiEntity: boolean;
 }
 
@@ -24,6 +25,7 @@ export function ClaimsFilterBar({
     filters.entity ||
     filters.category ||
     filters.confidence ||
+    filters.claimMode ||
     filters.multiEntity;
 
   return (
@@ -69,6 +71,15 @@ export function ClaimsFilterBar({
         <option value="unverified">unverified</option>
         <option value="unsourced">unsourced</option>
       </select>
+      <select
+        value={filters.claimMode}
+        onChange={(e) => onFilterChange("claimMode", e.target.value)}
+        className="text-xs border rounded px-2 py-1.5"
+      >
+        <option value="">All modes</option>
+        <option value="endorsed">endorsed</option>
+        <option value="attributed">attributed</option>
+      </select>
       <label className="flex items-center gap-1.5 text-xs cursor-pointer">
         <input
           type="checkbox"
@@ -86,6 +97,7 @@ export function ClaimsFilterBar({
             onFilterChange("entity", "");
             onFilterChange("category", "");
             onFilterChange("confidence", "");
+            onFilterChange("claimMode", "");
             onFilterChange("multiEntity", false);
           }}
           className="text-xs text-blue-600 hover:underline cursor-pointer"
