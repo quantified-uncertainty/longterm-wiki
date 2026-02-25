@@ -1,0 +1,251 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { fetchFromWikiServer } from "@lib/wiki-server";
+import type { ClaimRow } from "@wiki-server/api-types";
+import { StatCard } from "./components/stat-card";
+import { DistributionBar } from "./components/distribution-bar";
+
+export const metadata: Metadata = {
+  title: "Claims Explorer | Longterm Wiki",
+  description:
+    "Browse extracted claims across all wiki pages: categories, relationships, and verification status.",
+};
+
+interface StatsResponse {
+  total: number;
+  byClaimType: Record<string, number>;
+  byEntityType: Record<string, number>;
+  byClaimCategory: Record<string, number>;
+  multiEntityClaims: number;
+  factLinkedClaims: number;
+}
+
+interface AllClaimsResponse {
+  claims: ClaimRow[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+async function fetchAllClaims(): Promise<ClaimRow[]> {
+  const PAGE_SIZE = 200;
+  const all: ClaimRow[] = [];
+  let offset = 0;
+
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const page = await fetchFromWikiServer<AllClaimsResponse>(
+      `/api/claims/all?limit=${PAGE_SIZE}&offset=${offset}`,
+      { revalidate: 300 }
+    );
+    if (!page || page.claims.length === 0) break;
+    all.push(...page.claims);
+    if (all.length >= page.total) break;
+    offset += PAGE_SIZE;
+  }
+  return all;
+}
+
+export default async function ClaimsOverviewPage() {
+  const [stats, claims] = await Promise.all([
+    fetchFromWikiServer<StatsResponse>("/api/claims/stats", {
+      revalidate: 300,
+    }),
+    fetchAllClaims(),
+  ]);
+
+  if (!stats) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold mb-2">Claims Explorer</h1>
+        <p className="text-muted-foreground">
+          Wiki-server unavailable. Set <code>LONGTERMWIKI_SERVER_URL</code> to
+          enable.
+        </p>
+      </div>
+    );
+  }
+
+  // Build per-entity breakdown
+  const entityMap = new Map<
+    string,
+    {
+      total: number;
+      verified: number;
+      multiEntity: number;
+    }
+  >();
+  for (const claim of claims) {
+    const eid = claim.entityId;
+    if (!entityMap.has(eid)) {
+      entityMap.set(eid, { total: 0, verified: 0, multiEntity: 0 });
+    }
+    const entry = entityMap.get(eid)!;
+    entry.total++;
+    if (claim.confidence === "verified") entry.verified++;
+    if (claim.relatedEntities && claim.relatedEntities.length > 0)
+      entry.multiEntity++;
+  }
+
+  const entityRows = [...entityMap.entries()]
+    .map(([entityId, data]) => ({ entityId, ...data }))
+    .sort((a, b) => b.total - a.total);
+
+  // Build relationship counts
+  const pairCounts = new Map<
+    string,
+    { from: string; to: string; count: number; sample: string }
+  >();
+  for (const claim of claims) {
+    if (!claim.relatedEntities || claim.relatedEntities.length === 0) continue;
+    for (const related of claim.relatedEntities) {
+      const pair = [claim.entityId, related].sort().join(" <-> ");
+      if (!pairCounts.has(pair)) {
+        pairCounts.set(pair, {
+          from: claim.entityId,
+          to: related,
+          count: 0,
+          sample: claim.claimText.slice(0, 80),
+        });
+      }
+      pairCounts.get(pair)!.count++;
+    }
+  }
+
+  const relationshipRows = [...pairCounts.values()].sort(
+    (a, b) => b.count - a.count
+  );
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold mb-2">Claims Explorer</h1>
+      <p className="text-muted-foreground mb-6">
+        Extracted claims across all wiki pages.{" "}
+        <span className="font-medium text-foreground">
+          {stats.total.toLocaleString()}
+        </span>{" "}
+        total claims from{" "}
+        <span className="font-medium text-foreground">
+          {entityRows.length}
+        </span>{" "}
+        entities.
+      </p>
+
+      {/* Global stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-8">
+        <StatCard label="Total Claims" value={stats.total} />
+        <StatCard label="Entities" value={entityRows.length} />
+        <StatCard label="Multi-Entity" value={stats.multiEntityClaims} />
+        <StatCard label="Fact-Linked" value={stats.factLinkedClaims} />
+        <StatCard label="Relationships" value={relationshipRows.length} />
+        <StatCard
+          label="Categorized"
+          value={
+            stats.total - (stats.byClaimCategory["uncategorized"] ?? 0)
+          }
+        />
+      </div>
+
+      {/* Category distribution */}
+      <div className="rounded-lg border p-4 mb-6">
+        <h3 className="text-sm font-semibold mb-3">Claim Categories</h3>
+        <DistributionBar
+          data={stats.byClaimCategory}
+          total={stats.total}
+        />
+      </div>
+
+      {/* Type distribution */}
+      <div className="rounded-lg border p-4 mb-6">
+        <h3 className="text-sm font-semibold mb-3">Claim Types</h3>
+        <DistributionBar data={stats.byClaimType} total={stats.total} />
+      </div>
+
+      {/* Top entities */}
+      <div className="rounded-lg border p-4 mb-6">
+        <h3 className="text-sm font-semibold mb-3">Top Entities by Claims</h3>
+        <div className="space-y-2">
+          {entityRows.slice(0, 10).map((row) => {
+            const verifiedPct =
+              row.total > 0
+                ? Math.round((row.verified / row.total) * 100)
+                : 0;
+            return (
+              <div key={row.entityId} className="flex items-center gap-3">
+                <Link
+                  href={`/claims/entity/${row.entityId}`}
+                  className="font-mono text-sm text-blue-600 hover:underline w-40 truncate"
+                >
+                  {row.entityId}
+                </Link>
+                <div className="flex-1 flex items-center gap-2">
+                  <div className="flex-1 h-4 bg-gray-100 rounded overflow-hidden">
+                    <div
+                      className="h-full bg-green-400 rounded-l"
+                      style={{
+                        width: `${(row.total / entityRows[0].total) * 100}%`,
+                      }}
+                    />
+                  </div>
+                  <span className="text-xs tabular-nums w-8 text-right">
+                    {row.total}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground w-14 text-right tabular-nums">
+                    {verifiedPct}% verified
+                  </span>
+                </div>
+                {row.multiEntity > 0 && (
+                  <span className="text-[10px] text-teal-600 whitespace-nowrap">
+                    {row.multiEntity} linked
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Top relationships */}
+      {relationshipRows.length > 0 && (
+        <div className="rounded-lg border p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold">Top Entity Relationships</h3>
+            <Link
+              href="/claims/relationships"
+              className="text-xs text-blue-600 hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+          <div className="space-y-1.5">
+            {relationshipRows.slice(0, 15).map((rel, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm">
+                <Link
+                  href={`/claims/entity/${rel.from}`}
+                  className="font-mono text-blue-600 hover:underline text-xs"
+                >
+                  {rel.from}
+                </Link>
+                <span className="text-muted-foreground text-xs">
+                  &harr;
+                </span>
+                <Link
+                  href={`/claims/entity/${rel.to}`}
+                  className="font-mono text-blue-600 hover:underline text-xs"
+                >
+                  {rel.to}
+                </Link>
+                <span className="tabular-nums font-medium text-xs ml-auto">
+                  {rel.count}
+                </span>
+                <span className="text-[10px] text-muted-foreground truncate max-w-[300px]">
+                  {rel.sample}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
