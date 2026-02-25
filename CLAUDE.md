@@ -46,6 +46,10 @@ pnpm test                        # Run vitest tests
 # Pre-push gate (CI-blocking checks)
 pnpm crux validate gate --fix    # Build data + tests + validations + auto-fix
 
+# Fast content-only validation (after editing MDX/YAML only)
+pnpm crux validate gate --scope=content --fix   # ~15s vs ~5min
+pnpm build-data:content          # Content-only data build (~15s)
+
 # After any page edit
 pnpm crux fix escaping           # Auto-fix dollar signs, comparisons, tildes
 pnpm crux fix markdown           # Auto-fix list formatting, bold labels

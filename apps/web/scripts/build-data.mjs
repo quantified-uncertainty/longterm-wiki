@@ -5,7 +5,12 @@
  * Also computes backlinks, tag index, and statistics.
  * Run this before building the site.
  *
- * Usage: node scripts/build-data.mjs
+ * Usage: node scripts/build-data.mjs [--scope=content]
+ *
+ * Flags:
+ *   --scope=content  Skip expensive non-content steps (git dates, block IR,
+ *                    redundancy, server sync, LLM files). Produces a valid
+ *                    database.json for local dev but omits dashboard data.
  */
 
 import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
@@ -73,6 +78,15 @@ function formatFactRange(lo, hi, measure) {
 /** Remove trailing .0 from formatted numbers: 380.0 → "380", 2.5 → "2.5" */
 function cleanDecimal(n) {
   return n % 1 === 0 ? String(n) : n.toFixed(1);
+}
+
+// ---------------------------------------------------------------------------
+// Scope flag — `--scope=content` skips expensive non-content steps
+// ---------------------------------------------------------------------------
+const SCOPE = process.argv.find(a => a.startsWith('--scope='))?.split('=')[1] || 'full';
+const CONTENT_ONLY = SCOPE === 'content';
+if (CONTENT_ONLY) {
+  console.log('⚡ Running in content-only scope (skipping git dates, block IR, redundancy, server sync, LLM files)\n');
 }
 
 const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
@@ -1388,11 +1402,13 @@ async function main() {
 
   // Fetch edit log dates and citation stats from wiki-server (parallel)
   // Also build git-based date maps (synchronous, fast).
-  const gitDateMaps = buildGitDateMaps();
-  const [editLogDates, citationStats] = await Promise.all([
-    buildEditLogDateMap(),
-    buildCitationStatsMap(),
-  ]);
+  const gitDateMaps = CONTENT_ONLY ? { gitCreatedMap: new Map(), gitModifiedMap: new Map() } : buildGitDateMaps();
+  const [editLogDates, citationStats] = CONTENT_ONLY
+    ? [new Map(), new Map()]
+    : await Promise.all([
+        buildEditLogDateMap(),
+        buildCitationStatsMap(),
+      ]);
 
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps);
@@ -1460,33 +1476,37 @@ async function main() {
   // citations, components, word counts) via remark AST parsing.
   // IMPORTANT: Must run BEFORE rawContent is deleted (below).
   // =========================================================================
-  console.log('  Extracting block-level IR...');
-  let blockIRExtracted = 0;
-  let blockIRSections = 0;
-  const blockIRErrorPages = [];
   const blockIndex = {};
-  try {
-    const { extractBlockIR } = await import('../../../crux/lib/block-ir.ts');
-    for (const page of pages) {
-      if (!page.rawContent) continue;
-      try {
-        const ir = extractBlockIR(page.id, page.rawContent);
-        blockIndex[page.id] = ir;
-        blockIRExtracted++;
-        blockIRSections += ir.sections.length;
-      } catch (err) {
-        blockIRErrorPages.push(page.id);
-        if (blockIRErrorPages.length <= 5) {
-          console.warn(`    ⚠ block-ir parse error on ${page.id}: ${err.message}`);
+  if (CONTENT_ONLY) {
+    console.log('  blockIR: skipped (content-only scope)');
+  } else {
+    console.log('  Extracting block-level IR...');
+    let blockIRExtracted = 0;
+    let blockIRSections = 0;
+    const blockIRErrorPages = [];
+    try {
+      const { extractBlockIR } = await import('../../../crux/lib/block-ir.ts');
+      for (const page of pages) {
+        if (!page.rawContent) continue;
+        try {
+          const ir = extractBlockIR(page.id, page.rawContent);
+          blockIndex[page.id] = ir;
+          blockIRExtracted++;
+          blockIRSections += ir.sections.length;
+        } catch (err) {
+          blockIRErrorPages.push(page.id);
+          if (blockIRErrorPages.length <= 5) {
+            console.warn(`    ⚠ block-ir parse error on ${page.id}: ${err.message}`);
+          }
         }
       }
+      if (blockIRErrorPages.length > 5) {
+        console.warn(`    ⚠ ...and ${blockIRErrorPages.length - 5} more parse errors`);
+      }
+      console.log(`  blockIR: ${blockIRSections} sections across ${blockIRExtracted} pages${blockIRErrorPages.length > 0 ? ` (${blockIRErrorPages.length} parse errors — typically complex JSX expressions)` : ''}`);
+    } catch (err) {
+      console.warn(`  ⚠ block-ir extraction skipped: ${err.message}`);
     }
-    if (blockIRErrorPages.length > 5) {
-      console.warn(`    ⚠ ...and ${blockIRErrorPages.length - 5} more parse errors`);
-    }
-    console.log(`  blockIR: ${blockIRSections} sections across ${blockIRExtracted} pages${blockIRErrorPages.length > 0 ? ` (${blockIRErrorPages.length} parse errors — typically complex JSX expressions)` : ''}`);
-  } catch (err) {
-    console.warn(`  ⚠ block-ir extraction skipped: ${err.message}`);
   }
 
   // Re-count backlinks after merging content links
@@ -1553,7 +1573,9 @@ async function main() {
   };
 
   // Record risk snapshots to wiki server (optional — skips if server unavailable)
-  if (process.env.LONGTERMWIKI_SERVER_URL) {
+  if (CONTENT_ONLY) {
+    console.log('  riskSnapshots: skipped (content-only scope)');
+  } else if (process.env.LONGTERMWIKI_SERVER_URL) {
     const snapshots = pages
       .filter(p => p.hallucinationRisk)
       .map(p => ({
@@ -1704,27 +1726,38 @@ async function main() {
   }
 
   // Compute redundancy scores (needs rawContent)
-  console.log('  Computing redundancy scores...');
-  const { pageRedundancy, pairs: redundancyPairs } = computeRedundancy(pages);
+  if (CONTENT_ONLY) {
+    console.log('  redundancy: skipped (content-only scope)');
+    // Still need to clean rawContent from pages
+    for (const page of pages) {
+      page.redundancy = { maxSimilarity: 0, similarPages: [] };
+      delete page.rawContent;
+      delete page._fullPath;
+    }
+    database.redundancyPairs = [];
+  } else {
+    console.log('  Computing redundancy scores...');
+    const { pageRedundancy, pairs: redundancyPairs } = computeRedundancy(pages);
 
-  // Add redundancy data to pages and remove rawContent
-  for (const page of pages) {
-    const redundancy = pageRedundancy.get(page.id);
-    page.redundancy = redundancy ? {
-      maxSimilarity: redundancy.maxSimilarity,
-      similarPages: redundancy.similarPages,
-    } : {
-      maxSimilarity: 0,
-      similarPages: [],
-    };
-    // Remove internal fields to keep JSON size reasonable
-    delete page.rawContent;
-    delete page._fullPath;
+    // Add redundancy data to pages and remove rawContent
+    for (const page of pages) {
+      const redundancy = pageRedundancy.get(page.id);
+      page.redundancy = redundancy ? {
+        maxSimilarity: redundancy.maxSimilarity,
+        similarPages: redundancy.similarPages,
+      } : {
+        maxSimilarity: 0,
+        similarPages: [],
+      };
+      // Remove internal fields to keep JSON size reasonable
+      delete page.rawContent;
+      delete page._fullPath;
+    }
+
+    // Store redundancy pairs for analysis
+    database.redundancyPairs = redundancyPairs.slice(0, 100); // Top 100 pairs
+    console.log(`  redundancy: ${redundancyPairs.length} similar pairs found`);
   }
-
-  // Store redundancy pairs for analysis
-  database.redundancyPairs = redundancyPairs.slice(0, 100); // Top 100 pairs
-  console.log(`  redundancy: ${redundancyPairs.length} similar pairs found`);
 
   // =========================================================================
   // RELATED GRAPH — unified bidirectional graph combining all signals:
@@ -1735,7 +1768,9 @@ async function main() {
   console.log(`  relatedGraph: ${Object.keys(relatedGraph).length} entities have connections`);
 
   // Sync page links to wiki-server (optional — skips if server unavailable)
-  if (process.env.LONGTERMWIKI_SERVER_URL) {
+  if (CONTENT_ONLY) {
+    console.log('  linkSync: skipped (content-only scope)');
+  } else if (process.env.LONGTERMWIKI_SERVER_URL) {
     const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex);
     console.log(`  linkSignals: ${linkSignals.length} link signals collected for server sync`);
     const linkResult = await syncPageLinks(linkSignals);
@@ -1750,79 +1785,86 @@ async function main() {
   // SESSION LOG → PAGE CHANGE HISTORY
   // Try fetching from wiki-server API first, fall back to parsing YAML files.
   // =========================================================================
-  let pageChangeHistory = null;
-  let changeHistorySource = 'yaml';
+  let prItems = [];
+  if (CONTENT_ONLY) {
+    console.log('  changeHistory: skipped (content-only scope)');
+    console.log('  prItems: skipped (content-only scope)');
+    database.prItems = prItems;
+  } else {
+    let pageChangeHistory = null;
+    let changeHistorySource = 'yaml';
 
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (serverUrl) {
-    try {
-      const headers = { 'Content-Type': 'application/json' };
-      const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-      if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+    const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+    if (serverUrl) {
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+        if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
-      const res = await fetch(`${serverUrl}/api/sessions/page-changes`, {
-        headers,
-        signal: AbortSignal.timeout(15_000),
-      });
+        const res = await fetch(`${serverUrl}/api/sessions/page-changes`, {
+          headers,
+          signal: AbortSignal.timeout(15_000),
+        });
 
-      if (res.ok) {
-        const data = await res.json();
-        // Transform API response into pageId → ChangeEntry[] map
-        pageChangeHistory = {};
-        for (const session of data.sessions) {
-          const entry = {
-            date: session.date,
-            branch: session.branch || '',
-            title: session.title,
-            summary: session.summary || '',
-            ...(session.prUrl && { pr: extractPrNumber(session.prUrl) }),
-            ...(session.model && { model: session.model }),
-            ...(session.duration && { duration: session.duration }),
-            ...(session.cost && { cost: session.cost }),
-          };
-          for (const pageId of session.pages) {
-            if (!pageChangeHistory[pageId]) pageChangeHistory[pageId] = [];
-            pageChangeHistory[pageId].push(entry);
+        if (res.ok) {
+          const data = await res.json();
+          // Transform API response into pageId → ChangeEntry[] map
+          pageChangeHistory = {};
+          for (const session of data.sessions) {
+            const entry = {
+              date: session.date,
+              branch: session.branch || '',
+              title: session.title,
+              summary: session.summary || '',
+              ...(session.prUrl && { pr: extractPrNumber(session.prUrl) }),
+              ...(session.model && { model: session.model }),
+              ...(session.duration && { duration: session.duration }),
+              ...(session.cost && { cost: session.cost }),
+            };
+            for (const pageId of session.pages) {
+              if (!pageChangeHistory[pageId]) pageChangeHistory[pageId] = [];
+              pageChangeHistory[pageId].push(entry);
+            }
           }
+          changeHistorySource = 'api';
+          console.log(`  changeHistory: fetched ${data.sessions.length} sessions from API`);
         }
-        changeHistorySource = 'api';
-        console.log(`  changeHistory: fetched ${data.sessions.length} sessions from API`);
+      } catch {
+        // Fall through to YAML
       }
-    } catch {
-      // Fall through to YAML
     }
-  }
 
-  if (!pageChangeHistory) {
-    // Fallback: parse YAML/Markdown session files
-    const sessionLogPath = join(REPO_ROOT, '.claude', 'session-log.md');
-    const sessionsDir = join(REPO_ROOT, '.claude', 'sessions');
-    pageChangeHistory = parseAllSessionLogs(sessionLogPath, sessionsDir);
+    if (!pageChangeHistory) {
+      // Fallback: parse YAML/Markdown session files
+      const sessionLogPath = join(REPO_ROOT, '.claude', 'session-log.md');
+      const sessionsDir = join(REPO_ROOT, '.claude', 'sessions');
+      pageChangeHistory = parseAllSessionLogs(sessionLogPath, sessionsDir);
 
-    // Auto-populate PR numbers from GitHub API for entries that don't have them
-    const branchToPr = await fetchBranchToPrMap();
-    const prEnriched = enrichWithPrNumbers(pageChangeHistory, branchToPr);
-    if (branchToPr.size > 0) {
-      console.log(`  changeHistory: enriched ${prEnriched} entries with PR numbers (${branchToPr.size} PRs fetched)`);
+      // Auto-populate PR numbers from GitHub API for entries that don't have them
+      const branchToPr = await fetchBranchToPrMap();
+      const prEnriched = enrichWithPrNumbers(pageChangeHistory, branchToPr);
+      if (branchToPr.size > 0) {
+        console.log(`  changeHistory: enriched ${prEnriched} entries with PR numbers (${branchToPr.size} PRs fetched)`);
+      }
     }
-  }
 
-  let pagesWithHistory = 0;
-  for (const page of pages) {
-    const history = pageChangeHistory[page.id];
-    if (history && history.length > 0) {
-      page.changeHistory = history;
-      pagesWithHistory++;
+    let pagesWithHistory = 0;
+    for (const page of pages) {
+      const history = pageChangeHistory[page.id];
+      if (history && history.length > 0) {
+        page.changeHistory = history;
+        pagesWithHistory++;
+      }
     }
-  }
-  console.log(`  changeHistory: ${Object.keys(pageChangeHistory).length} pages have session history (source: ${changeHistorySource})`);
+    console.log(`  changeHistory: ${Object.keys(pageChangeHistory).length} pages have session history (source: ${changeHistorySource})`);
 
-  // =========================================================================
-  // PR DESCRIPTIONS — full PR metadata for the dashboard
-  // =========================================================================
-  const prItems = await fetchPrItems();
-  database.prItems = prItems;
-  console.log(`  prItems: ${prItems.length} PRs fetched for dashboard`);
+    // =========================================================================
+    // PR DESCRIPTIONS — full PR metadata for the dashboard
+    // =========================================================================
+    prItems = await fetchPrItems();
+    database.prItems = prItems;
+    console.log(`  prItems: ${prItems.length} PRs fetched for dashboard`);
+  }
 
   // =========================================================================
   // PAGE COVERAGE — compute per-page coverage scores from structural signals.
@@ -2053,20 +2095,24 @@ async function main() {
   console.log('✓ Written derived data files (backlinks, tagIndex, stats, pathRegistry)');
 
   // Generate link health data
-  console.log('\nGenerating link health data...');
-  const linkHealthPath = join(OUTPUT_DIR, 'link-health.json');
-  const linkValidation = spawnSync('node', [
-    'scripts/validate/validate-internal-links.mjs',
-    '--ci',
-    `--output=${linkHealthPath}`
-  ], { encoding: 'utf-8', cwd: process.cwd() });
-
-  if (linkValidation.status === 0 || linkValidation.status === 1) {
-    // Exit 0 = all valid, Exit 1 = broken links found
-    // Both are acceptable for data generation
-    console.log('✓ Link health data generated');
+  if (CONTENT_ONLY) {
+    console.log('\nLink health: skipped (content-only scope)');
   } else {
-    console.error('⚠️  Link health generation failed:', linkValidation.stderr);
+    console.log('\nGenerating link health data...');
+    const linkHealthPath = join(OUTPUT_DIR, 'link-health.json');
+    const linkValidation = spawnSync('node', [
+      'scripts/validate/validate-internal-links.mjs',
+      '--ci',
+      `--output=${linkHealthPath}`
+    ], { encoding: 'utf-8', cwd: process.cwd() });
+
+    if (linkValidation.status === 0 || linkValidation.status === 1) {
+      // Exit 0 = all valid, Exit 1 = broken links found
+      // Both are acceptable for data generation
+      console.log('✓ Link health data generated');
+    } else {
+      console.error('⚠️  Link health generation failed:', linkValidation.stderr);
+    }
   }
 
   // Print summary stats
@@ -2086,7 +2132,11 @@ async function main() {
   // ==========================================================================
   // LLM Accessibility Files
   // ==========================================================================
-  generateLLMFiles();
+  if (CONTENT_ONLY) {
+    console.log('LLM files: skipped (content-only scope)');
+  } else {
+    generateLLMFiles();
+  }
 
   // ==========================================================================
   // Zod Schema Validation

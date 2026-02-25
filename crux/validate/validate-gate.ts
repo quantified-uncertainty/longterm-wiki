@@ -26,6 +26,8 @@
  *   --fix          Auto-fix escaping + markdown before validation
  *   --full         Include full Next.js production build
  *   --ci           JSON output for CI pipelines (implies --no-cache)
+ *   --scope=content  Content-only: skip build-data/tests/typechecks, run only
+ *                    unified-blocking + yaml-schema (no stamp cache written)
  *
  * Exit codes:
  *   0 = All checks passed
@@ -45,6 +47,8 @@ const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
 const FULL_GATE: boolean = args.includes('--full-gate');
 const NO_TRIAGE: boolean = args.includes('--no-triage') || FULL_GATE || CI_MODE;
 const NO_CACHE: boolean = args.includes('--no-cache') || FULL_GATE || CI_MODE;
+const SCOPE: string = args.find(a => a.startsWith('--scope='))?.split('=')[1] || '';
+const CONTENT_ONLY: boolean = SCOPE === 'content';
 
 // ── Stamp-based caching ──────────────────────────────────────────────────────
 // After a successful gate run, we write the HEAD commit hash + mode to a stamp
@@ -427,6 +431,43 @@ async function main(): Promise<void> {
         process.exit(0);
       }
     }
+  }
+
+  // ── Content-only scope — skip build pipeline, run only content validations ──
+  if (CONTENT_ONLY) {
+    if (!CI_MODE) {
+      console.log(`\n${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}`);
+      console.log(`${c.bold}${c.blue}  Gate Check (content-only scope)${c.reset}`);
+      console.log(`${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}\n`);
+      console.log(`${c.dim}  Skipping build-data, tests, typechecks — content validation only${c.reset}\n`);
+    }
+
+    // Phase 2: Auto-fix (if requested)
+    if (FIX_MODE) {
+      for (const step of FIX_STEPS) {
+        const result = await runSequential(step);
+        allResults.push(result);
+        if (!result.passed) {
+          printSummary(allResults, totalStart);
+          process.exit(1);
+        }
+      }
+    }
+
+    // Phase 3 (subset): Only content-relevant checks
+    const contentSteps = PARALLEL_STEPS.filter(s =>
+      s.id === 'unified-blocking' || s.id === 'yaml-schema'
+    );
+    const contentResults = await runParallel(contentSteps);
+    allResults.push(...contentResults);
+
+    printSummary(allResults, totalStart);
+
+    if (contentResults.some(r => !r.passed && !r.advisory)) {
+      process.exit(1);
+    }
+    // Do NOT write stamp cache for content-only runs
+    process.exit(0);
   }
 
   // ── Phase 0: Triage — decide which checks to skip ─────────────────────────

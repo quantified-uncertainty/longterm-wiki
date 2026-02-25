@@ -119,7 +119,7 @@ const SCRIPTS = {
   gate: {
     script: 'validate/validate-gate.ts',
     description: 'CI-blocking checks (pre-push gate)',
-    passthrough: ['ci', 'full', 'fix', 'fullGate', 'noTriage', 'noCache'],
+    passthrough: ['ci', 'full', 'fix', 'fullGate', 'noTriage', 'noCache', 'scope'],
   },
   'id-server-sync': {
     script: 'validate/validate-id-server-sync.ts',
@@ -157,6 +157,7 @@ Options:
   --quick         Fast mode (compile only)
   --list          List available rules (unified only)
   --fail-fast     Stop on first failure (all only)
+  --scope=content Content-only gate: skip build-data/tests/typechecks (gate only)
 
 Examples:
   crux validate                           Run all checks
@@ -165,6 +166,7 @@ Examples:
   crux validate gate --no-triage          Skip LLM triage, run all checks
   crux validate gate --no-cache           Force re-run even if stamp matches HEAD
   crux validate gate --full-gate          Force all checks (implies --no-triage, --no-cache)
+  crux validate gate --scope=content      Content-only checks (~15s vs ~5min)
   crux validate compile --quick           Quick compile check
   crux validate unified --rules=dollar-signs,markdown-lists
   crux validate unified --fix             Auto-fix unified rule issues
