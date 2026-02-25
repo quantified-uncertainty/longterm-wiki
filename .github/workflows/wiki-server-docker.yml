@@ -107,25 +107,44 @@ jobs:
           EXPECTED_TAG="sha-${{ github.sha }}"
           echo "Expected image tag: ${EXPECTED_TAG}"
 
-          APP_JSON=$(argocd app get longterm-wiki-server \
-            --refresh \
-            --output json \
-            --auth-token "${ARGOCD_AUTH_TOKEN}" \
-            --server "${ARGOCD_SERVER}" \
-            --grpc-web)
+          # ArgoCD reconciliation and K8s pod rollout can lag behind `argocd app wait`.
+          # Old pods may still appear in status.summary.images for 10-30s after wait
+          # returns. Retry up to 5 times (50s total) before declaring failure.
+          MAX_ATTEMPTS=5
+          DELAY=10
+          VERIFIED=false
 
-          IMAGES=$(echo "$APP_JSON" | jq -r '.status.summary.images[]')
-          echo "Running images: ${IMAGES}"
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            APP_JSON=$(argocd app get longterm-wiki-server \
+              --refresh \
+              --output json \
+              --auth-token "${ARGOCD_AUTH_TOKEN}" \
+              --server "${ARGOCD_SERVER}" \
+              --grpc-web 2>&1 || true)
 
-          if echo "$IMAGES" | grep -q "${EXPECTED_TAG}"; then
-            echo "SHA verification passed: ${EXPECTED_TAG} is running"
-          else
-            echo "::error::SHA verification failed! Expected ${EXPECTED_TAG} but got: ${IMAGES}"
+            IMAGES=$(echo "$APP_JSON" | jq -r '.status.summary.images[] // empty' 2>/dev/null || true)
+            SYNC_STATUS=$(echo "$APP_JSON" | jq -r '.status.sync.status // empty' 2>/dev/null || true)
+            HEALTH_STATUS=$(echo "$APP_JSON" | jq -r '.status.health.status // empty' 2>/dev/null || true)
+
+            echo "Attempt $i/$MAX_ATTEMPTS — images: ${IMAGES:-<none>} | sync: ${SYNC_STATUS} | health: ${HEALTH_STATUS}"
+
+            if echo "$IMAGES" | grep -q "${EXPECTED_TAG}"; then
+              echo "SHA verification passed: ${EXPECTED_TAG} is running"
+              VERIFIED=true
+              break
+            fi
+
+            if [ "$i" -lt "$MAX_ATTEMPTS" ]; then
+              echo "Tag not yet visible, waiting ${DELAY}s..."
+              sleep $DELAY
+            fi
+          done
+
+          if [ "$VERIFIED" != "true" ]; then
+            echo "::error::SHA verification failed after $MAX_ATTEMPTS attempts! Expected ${EXPECTED_TAG} but saw: ${IMAGES:-<no images>}"
             exit 1
           fi
 
-          SYNC_STATUS=$(echo "$APP_JSON" | jq -r '.status.sync.status')
-          HEALTH_STATUS=$(echo "$APP_JSON" | jq -r '.status.health.status')
           echo "Sync status: ${SYNC_STATUS}"
           echo "Health status: ${HEALTH_STATUS}"
 
