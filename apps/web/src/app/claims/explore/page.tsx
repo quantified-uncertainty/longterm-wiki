@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { fetchAllClaims } from "../components/claims-data";
+import {
+  fetchAllClaims,
+  collectEntitySlugs,
+  buildEntityNameMap,
+} from "../components/claims-data";
 import { ClaimsExplorer } from "./claims-explorer";
 
 export const metadata: Metadata = {
-  title: "Browse Claims | Longterm Wiki",
+  title: "Browse Claims",
   description: "Search and filter all extracted claims across wiki pages.",
 };
 
@@ -15,6 +19,7 @@ export default async function ExplorePage() {
   const categories = [
     ...new Set(claims.map((c) => c.claimCategory ?? "uncategorized")),
   ].sort();
+  const entityNames = buildEntityNameMap(collectEntitySlugs(claims));
 
   return (
     <div>
@@ -31,6 +36,7 @@ export default async function ExplorePage() {
           claims={claims}
           entities={entities}
           categories={categories}
+          entityNames={entityNames}
         />
       </Suspense>
     </div>

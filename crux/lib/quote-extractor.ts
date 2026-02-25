@@ -72,6 +72,36 @@ export function stripCodeFences(content: string): string {
     .trim();
 }
 
+/**
+ * Attempt to repair common JSON issues from LLM output.
+ * Handles trailing commas, unescaped control chars, and truncated output.
+ */
+export function repairJson(json: string): string {
+  let fixed = json;
+  // Remove trailing commas before ] or }
+  fixed = fixed.replace(/,\s*([\]}])/g, '$1');
+  // Replace unescaped control characters inside strings
+  fixed = fixed.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (match) => {
+    return match
+      .replace(/(?<!\\)\n/g, '\\n')
+      .replace(/(?<!\\)\t/g, '\\t')
+      .replace(/(?<!\\)\r/g, '\\r');
+  });
+  return fixed;
+}
+
+/**
+ * Parse JSON with automatic repair on failure.
+ * First tries JSON.parse directly; on failure, applies repairJson and retries.
+ */
+export function parseJsonWithRepair<T = unknown>(json: string): T {
+  try {
+    return JSON.parse(json) as T;
+  } catch {
+    return JSON.parse(repairJson(json)) as T;
+  }
+}
+
 interface OpenRouterChatResponse {
   choices: Array<{ message: { content: string } }>;
   error?: { message: string };

@@ -116,6 +116,13 @@ function loadEntities(): Set<string> {
       ids.add(eid);
     }
 
+    // Page IDs — EntityLinks may also reference pages that lack a YAML entity definition
+    // (internal docs, overview pages, style guides, etc.)
+    const pages = (database as Record<string, unknown>).pages as Array<{ id: string }> | undefined;
+    for (const p of pages ?? []) {
+      ids.add(p.id);
+    }
+
     return ids;
   } catch {
     log.warn('Warning: Could not load entities database. Data layer may need manual rebuild.');
@@ -132,20 +139,6 @@ function loadExternalLinks(): Set<string> {
       pageIds.add(match[1].trim());
     }
     return pageIds;
-  } catch {
-    return new Set();
-  }
-}
-
-function loadSafetyApproaches(): Set<string> {
-  try {
-    const content: string = readFileSync(`${DATA_DIR}/tables/safety-approaches.ts`, 'utf-8');
-    const ids = new Set<string>();
-    const matches = content.matchAll(/id: ['"]([^'"]+)['"]/g);
-    for (const match of matches) {
-      ids.add(match[1]);
-    }
-    return ids;
   } catch {
     return new Set();
   }
@@ -234,7 +227,6 @@ function findComponentRefs(content: string): ComponentRef[] {
 export async function runCheck(options: ValidatorOptions = {}): Promise<ValidatorResult> {
   const entities: Set<string> = loadEntities();
   const externalLinks: Set<string> = loadExternalLinks();
-  const safetyApproaches: Set<string> = loadSafetyApproaches();
 
   const files: string[] = findMdxFiles(CONTENT_DIR);
 
@@ -264,9 +256,8 @@ export async function runCheck(options: ValidatorOptions = {}): Promise<Validato
       switch (ref.component) {
         case 'EntityLink':
           isValid = entities.has(ref.value) ||
-                    safetyApproaches.has(ref.value) ||
                     ref.value.startsWith('__index__/');
-          dataSource = 'entities/safety-approaches';
+          dataSource = 'entities/pages';
           break;
 
         case 'DataInfoBox':
@@ -318,11 +309,9 @@ async function main(): Promise<void> {
   log.dim('Loading data sources...');
   const entities: Set<string> = loadEntities();
   const externalLinks: Set<string> = loadExternalLinks();
-  const safetyApproaches: Set<string> = loadSafetyApproaches();
 
-  log.dim(`  Entities: ${entities.size}`);
+  log.dim(`  Entities + Pages: ${entities.size}`);
   log.dim(`  External Links: ${externalLinks.size}`);
-  log.dim(`  Safety Approaches: ${safetyApproaches.size}`);
   console.log();
 
   const files: string[] = findMdxFiles(CONTENT_DIR);
@@ -357,9 +346,8 @@ async function main(): Promise<void> {
       switch (ref.component) {
         case 'EntityLink':
           isValid = entities.has(ref.value) ||
-                    safetyApproaches.has(ref.value) ||
                     ref.value.startsWith('__index__/');
-          dataSource = 'entities/safety-approaches';
+          dataSource = 'entities/pages';
           break;
 
         case 'DataInfoBox':

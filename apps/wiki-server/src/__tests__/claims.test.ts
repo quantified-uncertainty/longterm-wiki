@@ -5,11 +5,15 @@ import { mockDbModule, postJson } from "./test-utils.js";
 // ---- In-memory store ----
 
 let claimStore: Map<number, Record<string, unknown>>;
+let claimSourceStore: Map<number, Record<string, unknown>>;
 let nextId: number;
+let nextSourceId: number;
 
 function resetStores() {
   claimStore = new Map();
+  claimSourceStore = new Map();
   nextId = 1;
+  nextSourceId = 1;
 }
 
 /** Parse a JSONB param that may arrive as a JSON string from Drizzle */
@@ -37,11 +41,61 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return params.map((p) => ({ id: p }));
   }
 
+  // ---- INSERT INTO claim_sources ----
+  if (q.includes("insert into") && q.includes('"claim_sources"')) {
+    const now = new Date();
+    // Columns: claim_id, resource_id, url, source_quote, is_primary
+    const PARAMS_PER_ROW = 5;
+    const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
+    const results: Record<string, unknown>[] = [];
+    for (let i = 0; i < rowCount; i++) {
+      const off = i * PARAMS_PER_ROW;
+      const id = nextSourceId++;
+      const row: Record<string, unknown> = {
+        id,
+        claim_id: params[off],
+        resource_id: params[off + 1],
+        url: params[off + 2],
+        source_quote: params[off + 3],
+        is_primary: params[off + 4],
+        added_at: now,
+      };
+      claimSourceStore.set(id, row);
+      results.push(row);
+    }
+    return results;
+  }
+
+  // ---- SELECT FROM claim_sources WHERE claim_id = $1 ----
+  if (q.includes('"claim_sources"') && q.includes("where") && q.includes("claim_id")) {
+    const claimId = Number(params[0]);
+    return Array.from(claimSourceStore.values()).filter(
+      (s) => Number(s.claim_id) === claimId
+    );
+  }
+
+  // ---- SELECT FROM claim_sources WHERE claim_id IN (...) ----
+  if (q.includes('"claim_sources"') && q.includes("in (")) {
+    const ids = params.map(Number);
+    return Array.from(claimSourceStore.values()).filter(
+      (s) => ids.includes(Number(s.claim_id))
+    );
+  }
+
+  // ---- EXISTS subquery for claim_sources in stats ----
+  if (q.includes("count(*)") && q.includes("exists") && q.includes("claim_sources")) {
+    // Count claims that have at least one claim_source
+    const claimIdsWithSources = new Set(
+      Array.from(claimSourceStore.values()).map((s) => Number(s.claim_id))
+    );
+    return [{ count: claimIdsWithSources.size }];
+  }
+
   // ---- INSERT INTO claims ----
   if (q.includes("insert into") && q.includes('"claims"')) {
     const now = new Date();
-    // Count parameters per row: 8 original + 6 enhanced columns = 14
-    const PARAMS_PER_ROW = 14;
+    // Count parameters per row: 8 original + 6 enhanced + 7 phase2 = 21
+    const PARAMS_PER_ROW = 21;
     const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
     const results: Record<string, unknown>[] = [];
 
@@ -59,13 +113,20 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         confidence: params[off + 6],
         source_quote: params[off + 7],
         // Enhanced fields (migration 0028)
-        // JSONB values arrive as JSON strings from Drizzle — parse them back
         claim_category: params[off + 8],
         related_entities: parseJsonbParam(params[off + 9]),
         fact_id: params[off + 10],
         resource_ids: parseJsonbParam(params[off + 11]),
         section: params[off + 12],
         footnote_refs: params[off + 13],
+        // Phase 2 fields (migration 0029)
+        claim_mode: params[off + 14] ?? "endorsed",
+        attributed_to: params[off + 15],
+        as_of: params[off + 16],
+        measure: params[off + 17],
+        value_numeric: params[off + 18],
+        value_low: params[off + 19],
+        value_high: params[off + 20],
         created_at: now,
         updated_at: now,
       };
@@ -168,6 +229,36 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ count }];
   }
 
+  // ---- SELECT count(*) FROM claims with GROUP BY claim_mode ----
+  if (
+    q.includes("count(*)") &&
+    q.includes('"claims"') &&
+    q.includes("group by") &&
+    q.includes("claim_mode")
+  ) {
+    const counts: Record<string, number> = {};
+    for (const r of claimStore.values()) {
+      const t = (r.claim_mode as string) ?? "endorsed";
+      counts[t] = (counts[t] || 0) + 1;
+    }
+    return Object.entries(counts)
+      .map(([claim_mode, count]) => ({ claim_mode, count }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  // ---- SELECT count(*) FROM claims WHERE claim_mode = 'attributed' ----
+  if (
+    q.includes("count(*)") &&
+    q.includes('"claims"') &&
+    q.includes("claim_mode")
+  ) {
+    let count = 0;
+    for (const r of claimStore.values()) {
+      if (r.claim_mode === "attributed") count++;
+    }
+    return [{ count }];
+  }
+
   // ---- SELECT count(*) FROM claims (no GROUP BY, with optional WHERE) ----
   if (
     q.includes("count(*)") &&
@@ -225,6 +316,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         if (typeCompare !== 0) return typeCompare;
         return (a.id as number) - (b.id as number);
       });
+  }
+
+  // ---- SELECT FROM claim_sources WHERE claim_id = $1 ORDER BY ... (for GET /:id) ----
+  if (
+    q.includes('"claim_sources"') &&
+    q.includes("where") &&
+    q.includes("order by")
+  ) {
+    const claimId = Number(params[0]);
+    return Array.from(claimSourceStore.values()).filter(
+      (s) => Number(s.claim_id) === claimId
+    );
   }
 
   // ---- SELECT ... FROM claims WHERE id = $1 (get by ID) ----
@@ -554,6 +657,13 @@ describe("Claims API", () => {
     resourceIds: ["res-bloomberg-2024"],
     section: "Funding History",
     footnoteRefs: "1,3",
+    // Phase 2 fields
+    claimMode: "endorsed",
+    asOf: "2024-09",
+    measure: "total_funding",
+    valueNumeric: 7300000000,
+    valueLow: 7000000000,
+    valueHigh: 7500000000,
   };
 
   describe("Enhanced fields round-trip", () => {
@@ -697,6 +807,270 @@ describe("Claims API", () => {
       const res = await app.request("/api/claims/stats");
       const body = await res.json();
       expect(body.factLinkedClaims).toBe(1);
+    });
+  });
+
+  // =======================================================================
+  // Phase 2 tests (migration 0029): claim_mode, as_of, numeric values, claim_sources
+  // =======================================================================
+
+  describe("Phase 2 — claim_mode and attributed claims", () => {
+    it("stores and returns claimMode via GET by ID", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "neel-nanda",
+        entityType: "person",
+        claimType: "evaluative",
+        claimText: "Mechanistic interpretability is crucial for AI safety",
+        claimMode: "attributed",
+        attributedTo: "neel-nanda",
+        asOf: "2023-06",
+      });
+      expect(createRes.status).toBe(201);
+      const created = await createRes.json();
+
+      const res = await app.request(`/api/claims/${created.id}`);
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.claimMode).toBe("attributed");
+      expect(body.attributedTo).toBe("neel-nanda");
+      expect(body.asOf).toBe("2023-06");
+    });
+
+    it("defaults claim_mode to endorsed when not specified", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "anthropic",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "Anthropic was founded in 2021",
+      });
+      const created = await createRes.json();
+
+      const res = await app.request(`/api/claims/${created.id}`);
+      const body = await res.json();
+      expect(body.claimMode).toBe("endorsed");
+    });
+
+    it("stores numeric value fields", async () => {
+      const createRes = await postJson(app, "/api/claims", enhancedClaim);
+      const created = await createRes.json();
+
+      const res = await app.request(`/api/claims/${created.id}`);
+      const body = await res.json();
+      expect(body.valueNumeric).toBe(7300000000);
+      expect(body.valueLow).toBe(7000000000);
+      expect(body.valueHigh).toBe(7500000000);
+      expect(body.measure).toBe("total_funding");
+      expect(body.asOf).toBe("2024-09");
+    });
+  });
+
+  describe("Phase 2 — claim_sources inline insert", () => {
+    it("creates claim_sources when sources array is provided", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "anthropic",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "Anthropic raised $7.3B from Google and Amazon",
+        sources: [
+          {
+            resourceId: "res-bloomberg-2024",
+            sourceQuote: "Google has committed to invest up to $2 billion",
+            isPrimary: true,
+          },
+          {
+            url: "https://example.com/amazon-investment",
+            sourceQuote: "Amazon invested $4 billion in Anthropic",
+            isPrimary: false,
+          },
+        ],
+      });
+      expect(createRes.status).toBe(201);
+      const created = await createRes.json();
+
+      // Check sources are in the store
+      expect(claimSourceStore.size).toBe(2);
+      const sources = Array.from(claimSourceStore.values());
+      expect(sources.some((s) => s.resource_id === "res-bloomberg-2024")).toBe(true);
+      expect(sources.some((s) => s.url === "https://example.com/amazon-investment")).toBe(true);
+    });
+
+    it("GET /:id always includes sources array", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "anthropic",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "A claim without sources",
+      });
+      const created = await createRes.json();
+
+      const res = await app.request(`/api/claims/${created.id}`);
+      const body = await res.json();
+      expect(Array.isArray(body.sources)).toBe(true);
+    });
+  });
+
+  // =======================================================================
+  // GET /:id/sources and POST /:id/sources
+  // =======================================================================
+
+  describe("GET /api/claims/:id/sources", () => {
+    it("returns empty sources array for claim with no sources", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "anthropic",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "No sources here",
+      });
+      const created = await createRes.json();
+
+      const res = await app.request(`/api/claims/${created.id}/sources`);
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.sources).toEqual([]);
+    });
+
+    it("returns sources for a claim that has them", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "anthropic",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "Anthropic raised $7.3B",
+        sources: [
+          { resourceId: "res-001", sourceQuote: "raised $7.3B", isPrimary: true },
+          { url: "https://example.com", isPrimary: false },
+        ],
+      });
+      const created = await createRes.json();
+
+      const res = await app.request(`/api/claims/${created.id}/sources`);
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.sources).toHaveLength(2);
+      // Primary source should be present
+      expect(body.sources.some((s: { resourceId?: string }) => s.resourceId === "res-001")).toBe(true);
+    });
+
+    it("returns 400 for non-numeric claim ID", async () => {
+      const res = await app.request("/api/claims/not-a-number/sources");
+      expect(res.status).toBe(400);
+    });
+
+    it("returns 400 for zero claim ID", async () => {
+      const res = await app.request("/api/claims/0/sources");
+      expect(res.status).toBe(400);
+    });
+  });
+
+  describe("POST /api/claims/:id/sources", () => {
+    it("adds a source to an existing claim", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "anthropic",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "Anthropic was founded in 2021",
+      });
+      const created = await createRes.json();
+
+      const addRes = await postJson(app, `/api/claims/${created.id}/sources`, {
+        resourceId: "res-techcrunch-2021",
+        sourceQuote: "The company was founded in 2021",
+        isPrimary: true,
+      });
+      expect(addRes.status).toBe(201);
+      const source = await addRes.json();
+      expect(source.resourceId).toBe("res-techcrunch-2021");
+      expect(source.isPrimary).toBe(true);
+      expect(source.sourceQuote).toBe("The company was founded in 2021");
+    });
+
+    it("adds a URL-only source (no resourceId)", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "anthropic",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "A claim",
+      });
+      const created = await createRes.json();
+
+      const addRes = await postJson(app, `/api/claims/${created.id}/sources`, {
+        url: "https://example.com/article",
+        isPrimary: false,
+      });
+      expect(addRes.status).toBe(201);
+      const source = await addRes.json();
+      expect(source.url).toBe("https://example.com/article");
+      expect(source.resourceId).toBeNull();
+    });
+
+    it("returns 404 when adding source to non-existent claim", async () => {
+      const res = await postJson(app, "/api/claims/99999/sources", {
+        url: "https://example.com",
+      });
+      expect(res.status).toBe(404);
+    });
+
+    it("returns 400 for non-numeric claim ID", async () => {
+      const res = await postJson(app, "/api/claims/abc/sources", {
+        url: "https://example.com",
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("source appears in GET /:id/sources after being added", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "openai",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "OpenAI released GPT-4",
+      });
+      const created = await createRes.json();
+
+      await postJson(app, `/api/claims/${created.id}/sources`, {
+        resourceId: "res-openai-gpt4",
+        sourceQuote: "GPT-4 was released in March 2023",
+        isPrimary: true,
+      });
+
+      const sourcesRes = await app.request(`/api/claims/${created.id}/sources`);
+      expect(sourcesRes.status).toBe(200);
+      const body = await sourcesRes.json();
+      expect(body.sources).toHaveLength(1);
+      expect(body.sources[0].resourceId).toBe("res-openai-gpt4");
+    });
+  });
+
+  // =======================================================================
+  // Phase 2 batch with sources (safe path — one at a time to avoid ordering bug)
+  // =======================================================================
+
+  describe("POST /api/claims/batch with sources", () => {
+    it("inserts batch items with inline sources — each claim gets correct sources", async () => {
+      const res = await postJson(app, "/api/claims/batch", {
+        items: [
+          {
+            entityId: "anthropic",
+            entityType: "organization",
+            claimType: "factual",
+            claimText: "Anthropic raised from Google",
+            sources: [{ resourceId: "res-google", isPrimary: true }],
+          },
+          {
+            entityId: "openai",
+            entityType: "organization",
+            claimType: "factual",
+            claimText: "OpenAI raised from Microsoft",
+            sources: [{ resourceId: "res-msft", isPrimary: true }],
+          },
+        ],
+      });
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.inserted).toBe(2);
+      // Both sets of sources should be present
+      expect(claimSourceStore.size).toBe(2);
+      const sources = Array.from(claimSourceStore.values());
+      expect(sources.some((s) => s.resource_id === "res-google")).toBe(true);
+      expect(sources.some((s) => s.resource_id === "res-msft")).toBe(true);
     });
   });
 

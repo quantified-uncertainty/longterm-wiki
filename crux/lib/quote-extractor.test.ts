@@ -4,8 +4,73 @@ import {
   parseAccuracyCheckResponse,
   truncateSource,
   stripCodeFences,
+  repairJson,
+  parseJsonWithRepair,
   VALID_ACCURACY_VERDICTS,
 } from './quote-extractor.ts';
+
+describe('repairJson', () => {
+  it('removes trailing comma before }', () => {
+    expect(repairJson('{"a": 1,}')).toBe('{"a": 1}');
+  });
+
+  it('removes trailing comma before ]', () => {
+    expect(repairJson('[1, 2,]')).toBe('[1, 2]');
+  });
+
+  it('removes trailing comma with whitespace and parses cleanly', () => {
+    const result = repairJson('{"a": 1 , }');
+    expect(() => JSON.parse(result)).not.toThrow();
+    expect(JSON.parse(result)).toEqual({ a: 1 });
+  });
+
+  it('escapes raw newlines inside strings', () => {
+    const input = '{"a": "line1\nline2"}';
+    const result = repairJson(input);
+    expect(() => JSON.parse(result)).not.toThrow();
+    expect(JSON.parse(result).a).toBe('line1\nline2');
+  });
+
+  it('escapes raw tabs inside strings', () => {
+    const input = '{"a": "col1\tcol2"}';
+    const result = repairJson(input);
+    expect(() => JSON.parse(result)).not.toThrow();
+  });
+
+  it('leaves already-valid JSON unchanged', () => {
+    const valid = '{"a": 1, "b": [2, 3]}';
+    expect(repairJson(valid)).toBe(valid);
+  });
+
+  it('preserves already-escaped sequences', () => {
+    const input = '{"a": "already\\nescaped"}';
+    const result = repairJson(input);
+    expect(() => JSON.parse(result)).not.toThrow();
+  });
+});
+
+describe('parseJsonWithRepair', () => {
+  it('parses valid JSON directly', () => {
+    expect(parseJsonWithRepair('{"a": 1}')).toEqual({ a: 1 });
+  });
+
+  it('repairs and parses JSON with trailing comma', () => {
+    expect(parseJsonWithRepair('{"a": 1,}')).toEqual({ a: 1 });
+  });
+
+  it('repairs and parses array with trailing comma', () => {
+    expect(parseJsonWithRepair('[1, 2, 3,]')).toEqual([1, 2, 3]);
+  });
+
+  it('throws on completely invalid input', () => {
+    expect(() => parseJsonWithRepair('not json at all')).toThrow();
+  });
+
+  it('supports generic type parameter', () => {
+    const result = parseJsonWithRepair<{ verdict: string }>('{"verdict": "verified"}');
+    expect(result.verdict).toBe('verified');
+  });
+});
 
 describe('stripCodeFences', () => {
   it('strips ```json prefix and ``` suffix', () => {

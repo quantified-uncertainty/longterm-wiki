@@ -26,6 +26,7 @@
     - title: Seoul Declaration on AISI Network
       url: https://www.gov.uk/government/publications/seoul-declaration-for-safe-innovative-and-inclusive-ai
       author: Summit Participants
+  description: "Government-run institutions dedicated to evaluating frontier AI systems for dangerous capabilities and safety properties. Pioneered by the UK AISI in 2023, with analogues in the US (USAISI), EU, Japan, and others. Play a key role in pre-deployment evaluations and responsible scaling policy thresholds."
   lastUpdated: 2025-12
 - id: california-sb1047
   numericId: E48
@@ -77,7 +78,7 @@
     - state-policy
     - frontier-models
     - liability
-    - compute-thresholds
+    - thresholds
     - california
     - political-strategy
   lastUpdated: 2025-12
@@ -212,7 +213,7 @@
       value: Emerging policy area
   relatedEntries:
     - id: govai
-      type: lab
+      type: organization
     - id: governance-policy
       type: approach
     - id: racing-dynamics
@@ -246,104 +247,12 @@
     provides a tractable way to govern AI before models are built.
   tags:
     - export-controls
-    - compute-thresholds
+    - thresholds
     - know-your-customer
     - hardware-governance
     - international
     - semiconductors
     - cloud-computing
-  lastUpdated: 2025-12
-- id: compute-thresholds
-  numericId: E67
-  type: policy
-  summaryPage: governance-overview
-  title: Compute Thresholds
-  customFields:
-    - label: Approach
-      value: Define capability boundaries via compute
-    - label: Status
-      value: Established in US and EU policy
-  relatedEntries:
-    - id: compute-governance
-      type: policy
-    - id: eu-ai-act
-      type: policy
-    - id: ai-executive-order
-      type: policy
-  sources:
-    - title: EU AI Act GPAI Thresholds
-      url: https://artificialintelligenceact.eu/
-    - title: US Executive Order Compute Thresholds
-      url: >-
-        https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
-  description: >-
-    Compute thresholds define capability boundaries using training compute (measured in FLOP) as a proxy. The EU AI Act
-    uses 10^25 FLOP for GPAI obligations; the US Executive Order uses 10^26 FLOP for reporting requirements. These
-    thresholds aim to capture frontier models while minimizing regulatory burden on smaller systems.
-  tags:
-    - compute-governance
-    - regulation
-    - flop-thresholds
-  lastUpdated: 2025-12
-- id: compute-monitoring
-  numericId: E66
-  type: policy
-  summaryPage: governance-overview
-  title: Compute Monitoring
-  customFields:
-    - label: Approach
-      value: Track compute usage to detect dangerous training
-    - label: Status
-      value: Proposed, limited implementation
-  relatedEntries:
-    - id: compute-governance
-      type: policy
-    - id: govai
-      type: lab
-  sources:
-    - title: Computing Power and the Governance of AI
-      url: https://www.governance.ai/research-papers/computing-power-and-the-governance-of-artificial-intelligence
-      author: Heim et al.
-    - title: Secure Governable Chips
-      url: https://arxiv.org/abs/2303.11341
-  description: >-
-    Compute monitoring involves tracking how computational resources are used to detect unauthorized or dangerous AI
-    training runs. Approaches include know-your-customer requirements for cloud providers, hardware-based monitoring,
-    and training run detection algorithms. Raises privacy and implementation challenges.
-  tags:
-    - compute-governance
-    - monitoring
-    - kyc
-    - cloud-computing
-  lastUpdated: 2025-12
-- id: international-compute-regimes
-  numericId: E170
-  type: policy
-  summaryPage: governance-overview
-  title: International Compute Regimes
-  customFields:
-    - label: Approach
-      value: Coordinate compute governance globally
-    - label: Status
-      value: Early discussions, no formal regime
-  relatedEntries:
-    - id: compute-governance
-      type: policy
-  sources:
-    - title: International Institutions for AI Safety
-      url: https://www.governance.ai/research-papers/international-institutions-for-advanced-ai
-      author: GovAI
-    - title: IAEA Model for AI Governance
-      url: https://www.governance.ai/research
-  description: >-
-    International compute regimes would coordinate compute governance across borders. Proposals include IAEA-like
-    inspection bodies, multilateral export control agreements, and international compute monitoring frameworks. Faces
-    challenges of verification, sovereignty concerns, and China-US competition.
-  tags:
-    - compute-governance
-    - international
-    - coordination
-    - iaea-model
   lastUpdated: 2025-12
 - id: eu-ai-act
   numericId: E127
@@ -361,7 +270,7 @@
     - id: uk-aisi
       type: policy
     - id: govai
-      type: lab
+      type: organization
   sources:
     - title: EU AI Act Full Text
       url: https://artificialintelligenceact.eu/
@@ -377,7 +286,7 @@
     - gpai
     - foundation-models
     - risk-based-regulation
-    - compute-thresholds
+    - thresholds
   lastUpdated: 2025-12
 - id: export-controls
   numericId: E136
@@ -545,6 +454,7 @@
       url: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
       author: Google DeepMind
       date: May 2024
+  description: "Voluntary commitments by frontier AI labs to pause or restrict development when models exceed defined capability thresholds unless corresponding safety measures are in place. Pioneered by Anthropic's RSP and adopted in similar forms by OpenAI and Google DeepMind. Central to debates about binding vs. voluntary safety governance."
   lastUpdated: 2025-12
 - id: seoul-declaration
   numericId: E279
@@ -592,6 +502,7 @@
     - title: EU AI Act Standardisation
       url: https://digital-strategy.ec.europa.eu/en/policies/ai-standards
       author: European Commission
+  description: "International and national organizations that develop technical standards for AI systems, including measurement methodologies, safety requirements, and evaluation protocols. Key bodies include ISO/IEC JTC 1/SC 42, NIST, and IEEE, whose standards increasingly inform government AI regulation."
   lastUpdated: 2025-12
 - id: us-executive-order
   numericId: E366
@@ -635,7 +546,7 @@
     30, 2023, is the most comprehensive US government action on AI to date. It establishes safety requirements for
     frontier AI systems, mandates government agency actions, and creates oversight mechanisms.
   tags:
-    - compute-thresholds
+    - thresholds
     - governance
     - us-aisi
     - cloud-computing
@@ -684,9 +595,9 @@
     - id: international-summits
       type: policy
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
   sources:
     - title: 'White House Fact Sheet: Voluntary AI Commitments'
       url: >-
@@ -799,43 +710,6 @@
     - content-authentication
     - information-security
   lastUpdated: 2025-12
-- id: pause-advocacy
-  numericId: E221
-  type: approach
-  title: Pause Advocacy
-  customFields:
-    - label: Approach
-      value: Advocate for slowing or pausing frontier AI development
-    - label: Tractability
-      value: Low (major political/economic barriers)
-    - label: Key Organizations
-      value: Future of Life Institute, Pause AI
-  relatedEntries:
-    - id: racing-dynamics
-      type: risk
-    - id: deceptive-alignment
-      type: risk
-    - id: treacherous-turn
-      type: risk
-    - id: lock-in
-      type: risk
-    - id: compute-governance
-      type: policy
-  sources:
-    - title: 'Pause Giant AI Experiments: An Open Letter'
-      url: https://futureoflife.org/open-letter/pause-giant-ai-experiments/
-      author: Future of Life Institute
-      date: '2023'
-  description: >
-    Pause advocacy involves advocating for slowing down or pausing the development of frontier AI systems until safety
-    can be ensured. The core theory of change is that buying time allows safety research to catch up with capabilities,
-    enables governance frameworks to mature, and reduces the probability of deploying systems we cannot control.
-  tags:
-    - governance
-    - policy
-    - racing-dynamics
-    - coordination
-  lastUpdated: 2025-12
 - id: ai-control
   numericId: E6
   type: safety-agenda
@@ -846,8 +720,8 @@
     - label: Key Research
       value: Redwood Research
   relatedEntries:
-    - id: redwood
-      type: lab
+    - id: redwood-research
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: scheming
@@ -892,7 +766,7 @@
       value: Active
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: interpretability
       type: safety-agenda
     - id: scalable-oversight
@@ -937,6 +811,7 @@
       type: risk
     - id: treacherous-turn
       type: risk
+  description: "The property of an AI system that allows it to be safely corrected, adjusted, or shut down by its operators. Highly corrigible systems defer to human judgment; the key research challenge is making corrigibility robust under capability scaling."
   tags:
     - shutdown-problem
     - ai-control
@@ -963,6 +838,7 @@
       type: risk
     - id: cyberweapons
       type: risk
+  description: "AI evaluation—systematic methods for measuring model capabilities, safety properties, and alignment. Includes capability evaluations (red-teaming, benchmarks), dangerous capability evaluations, and behavioral assessments used by frontier labs in their responsible scaling policies."
   tags:
     - benchmarks
     - red-teaming
@@ -978,7 +854,7 @@
       value: Anthropic, DeepMind
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: mesa-optimization
@@ -989,8 +865,8 @@
       type: risk
     - id: reward-hacking
       type: risk
-    - id: redwood
-      type: lab
+    - id: redwood-research
+      type: organization
   sources:
     - title: Scaling Monosemanticity
       url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
@@ -1024,9 +900,9 @@
       value: Anthropic, OpenAI, DeepMind
   relatedEntries:
     - id: arc
-      type: lab
+      type: organization
     - id: deepmind
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: sycophancy
@@ -1529,11 +1405,11 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: apollo-research
-      type: lab
+      type: organization
     - id: responsible-scaling-policies
       type: policy
     - id: evaluation-awareness
@@ -1560,9 +1436,9 @@
     - governance
   relatedEntries:
     - id: apollo-research
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: eval-saturation
@@ -1589,9 +1465,9 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: reward-hacking
@@ -1619,11 +1495,11 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: metr
-      type: lab
+      type: organization
     - id: apollo-research
-      type: lab
+      type: organization
     - id: eval-saturation
       type: approach
     - id: evaluation-awareness
@@ -1648,11 +1524,11 @@
     - ai-safety
   relatedEntries:
     - id: apollo-research
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: scheming
@@ -1679,11 +1555,11 @@
     - governance
   relatedEntries:
     - id: metr
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: scheming
       type: risk
     - id: responsible-scaling-policies
@@ -1709,11 +1585,11 @@
     - governance
   relatedEntries:
     - id: metr
-      type: lab
+      type: organization
     - id: apollo-research
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: sandbagging
       type: risk
   lastUpdated: 2026-02
@@ -1737,13 +1613,13 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: deepmind
-      type: lab
+      type: organization
     - id: apollo-research
-      type: lab
+      type: organization
     - id: scheming
       type: risk
   lastUpdated: 2026-02
@@ -1767,7 +1643,7 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: scheming
@@ -1794,9 +1670,9 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: weak-to-strong
       type: approach
     - id: constitutional-ai
@@ -1822,9 +1698,9 @@
     - governance
   relatedEntries:
     - id: metr
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: scheming
@@ -1852,11 +1728,11 @@
     - governance
   relatedEntries:
     - id: apollo-research
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: scheming
       type: risk
     - id: deceptive-alignment
@@ -1882,11 +1758,11 @@
     - cyber
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: metr
-      type: lab
+      type: organization
     - id: responsible-scaling-policies
       type: policy
   lastUpdated: 2026-02
@@ -1910,9 +1786,9 @@
     - governance
   relatedEntries:
     - id: metr
-      type: lab
+      type: organization
     - id: apollo-research
-      type: lab
+      type: organization
     - id: eu-ai-act
       type: policy
     - id: scheming
@@ -1937,7 +1813,7 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: rlhf
       type: approach
     - id: alignment
@@ -1964,9 +1840,9 @@
     - ai-safety
   relatedEntries:
     - id: openai
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: rlhf
       type: approach
     - id: reward-hacking
@@ -1993,7 +1869,7 @@
     - ai-safety
   relatedEntries:
     - id: cais
-      type: lab
+      type: organization
     - id: representation-engineering
       type: approach
     - id: responsible-scaling-policies
@@ -2018,9 +1894,9 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: rlhf
       type: approach
     - id: reward-hacking
@@ -2045,7 +1921,7 @@
     - ai-safety
   relatedEntries:
     - id: openai
-      type: lab
+      type: organization
     - id: reward-hacking
       type: risk
     - id: rlhf
@@ -2073,9 +1949,9 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: rlhf
       type: approach
     - id: deceptive-alignment
@@ -2192,7 +2068,7 @@
     - id: fli
       type: organization
     - id: stuart-russell
-      type: researcher
+      type: person
     - id: racing-dynamics
       type: risk
     - id: pause
@@ -2295,7 +2171,7 @@
     targeting 10^26 FLOP threshold is implementable now via three major providers controlling 60%+
     of cloud infrastructure, while hardware-level governance faces 3-5 year development timelines.
   tags:
-    - compute-monitoring
+    - monitoring
     - cloud-kyc
     - compute-governance
     - training-runs
@@ -2324,7 +2200,7 @@
     challenges including algorithmic efficiency improvements that may render static thresholds
     obsolete within 3-5 years.
   tags:
-    - compute-thresholds
+    - thresholds
     - regulation
     - eu-ai-act
     - flop-thresholds
@@ -2383,7 +2259,7 @@
     place. Analysis suggests 15-40% probability of meaningful policy implementation by 2030, with
     potential to provide 2-5 years of additional safety research time if achieved.
   tags:
-    - pause-advocacy
+    - pause
     - development-moratorium
     - political-advocacy
     - public-opinion
@@ -2566,7 +2442,7 @@
   tags:
     - model-registration
     - governance-infrastructure
-    - compute-thresholds
+    - thresholds
     - incident-reporting
     - transparency
   clusters:
@@ -2772,7 +2648,7 @@
     - id: scheming
       type: risk
     - id: anthropic
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: circuit-breakers
@@ -2801,7 +2677,7 @@
     - id: refusal-training
       type: approach
     - id: anthropic
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: representation-engineering
@@ -2858,7 +2734,7 @@
     - id: deceptive-alignment
       type: risk
     - id: anthropic
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: eliciting-latent-knowledge
@@ -2914,9 +2790,9 @@
     - id: deceptive-alignment
       type: risk
     - id: anthropic
-      type: lab-frontier
+      type: organization
     - id: openai
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: formal-verification
@@ -3004,7 +2880,7 @@
     - id: metr
       type: organization
     - id: anthropic
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: structured-access
@@ -3031,9 +2907,9 @@
     - id: sandboxing
       type: approach
     - id: openai
-      type: lab-frontier
+      type: organization
     - id: anthropic
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: tool-restrictions
@@ -3064,9 +2940,9 @@
     - id: metr
       type: organization
     - id: anthropic
-      type: lab-frontier
+      type: organization
     - id: openai
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: multi-agent

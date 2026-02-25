@@ -4,13 +4,11 @@ title: "Project Roadmap"
 description: "Future work, infrastructure improvements, and project tracking"
 sidebar:
   order: 10
-entityType: internal
 quality: 29
 readerImportance: 14
 researchImportance: 8.5
 lastEdited: "2026-01-02"
 update_frequency: 30
-evergreen: true
 llmSummary: "Internal project roadmap tracking wiki infrastructure status (14 validators, quality grading, dashboard all complete as of Jan 2026) and future priorities including batch content improvement for high-importance/low-quality pages and increased citation coverage. Emphasizes pragmatic approach: avoid over-engineering, adapt style guidelines to content."
 ratings:
   novelty: 0

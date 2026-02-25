@@ -5,8 +5,6 @@ description: Project documentation, style guides, and roadmap
 sidebar:
   order: 0
   label: Overview
-entityType: internal
-evergreen: true
 ---
 import {EntityLink} from '@components/wiki';
 
