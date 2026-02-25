@@ -94,7 +94,7 @@
     - label: Entry Barrier
       value: Low to Medium
   relatedEntries:
-    - id: redwood
+    - id: redwood-research
       type: organization
     - id: anthropic
       type: organization
@@ -188,7 +188,7 @@
       type: organization
     - id: arc-evals
       type: organization
-    - id: redwood
+    - id: redwood-research
       type: organization
   sources:
     - title: Constitutional AI
@@ -241,7 +241,7 @@
       type: safety-agenda
     - id: anthropic
       type: organization
-    - id: redwood
+    - id: redwood-research
       type: organization
     - id: deceptive-alignment
       type: risk

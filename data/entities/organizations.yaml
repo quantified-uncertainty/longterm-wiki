@@ -393,7 +393,7 @@
       type: safety-agenda
     - id: anthropic
       type: organization
-    - id: redwood
+    - id: redwood-research
       type: organization
     - id: prosaic-alignment
       type: safety-agenda
@@ -732,55 +732,6 @@
     - sharp-left-turn
     - security-mindset
     - deconfusion
-  lastUpdated: 2025-12
-- id: redwood
-  numericId: E247
-  type: organization
-  orgType: safety-org
-  title: Redwood Research
-  website: https://redwoodresearch.org
-  relatedEntries:
-    - id: interpretability
-      type: safety-agenda
-    - id: ai-control
-      type: safety-agenda
-    - id: scheming
-      type: risk
-    - id: sandbagging
-      type: risk
-    - id: anthropic
-      type: organization
-    - id: arc
-      type: organization
-    - id: miri
-      type: organization
-  sources:
-    - title: Redwood Research Website
-      url: https://redwoodresearch.org
-    - title: AI Control Paper
-      url: https://arxiv.org/abs/2312.06942
-    - title: Causal Scrubbing
-      url: https://www.alignmentforum.org/posts/JvZhhzycHu2Yd57RN/causal-scrubbing-a-method-for-rigorously-testing
-    - title: Adversarial Training for High-Stakes Safety
-      url: https://arxiv.org/abs/2205.01663
-    - title: Redwood Research on Alignment Forum
-      url: https://www.alignmentforum.org/users/redwood-research
-    - title: Neel Nanda's Interpretability Work
-      url: https://www.neelnanda.io/mechanistic-interpretability
-  description: >-
-    Redwood Research is an AI safety lab founded in 2021 that has made significant contributions to mechanistic
-    interpretability and, more recently, pioneered the "AI control" research agenda.
-  tags:
-    - interpretability
-    - causal-scrubbing
-    - ai-control
-    - adversarial-robustness
-    - polysemanticity
-    - scheming
-    - deception-detection
-    - red-teaming
-    - monitoring
-    - safety-protocols
   lastUpdated: 2025-12
 - id: uk-aisi
   numericId: E364
@@ -1949,11 +1900,48 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Redwood Research
+  website: https://redwoodresearch.org
+  relatedEntries:
+    - id: interpretability
+      type: safety-agenda
+    - id: ai-control
+      type: safety-agenda
+    - id: scheming
+      type: risk
+    - id: sandbagging
+      type: risk
+    - id: anthropic
+      type: organization
+    - id: arc
+      type: organization
+    - id: miri
+      type: organization
+  sources:
+    - title: Redwood Research Website
+      url: https://redwoodresearch.org
+    - title: AI Control Paper
+      url: https://arxiv.org/abs/2312.06942
+    - title: Causal Scrubbing
+      url: https://www.alignmentforum.org/posts/JvZhhzycHu2Yd57RN/causal-scrubbing-a-method-for-rigorously-testing
+    - title: Adversarial Training for High-Stakes Safety
+      url: https://arxiv.org/abs/2205.01663
+    - title: Redwood Research on Alignment Forum
+      url: https://www.alignmentforum.org/users/redwood-research
   description: >-
     A nonprofit AI safety and security research organization founded in 2021,
     known for pioneering AI Control research, developing causal scrubbing
     interpretability methods, and conducting landmark alignment faking studies
     with Anthropic.
+  tags:
+    - interpretability
+    - causal-scrubbing
+    - ai-control
+    - adversarial-robustness
+    - scheming
+    - deception-detection
+    - red-teaming
+    - monitoring
+    - safety-protocols
   clusters:
     - ai-safety
     - community

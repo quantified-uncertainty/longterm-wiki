@@ -7424,7 +7424,7 @@
     - power-seeking-conditions
     - scheming-likelihood-model
     - warning-signs-model
-    - redwood
+    - redwood-research
     - ai-control
     - research-agendas
     - technical-research
@@ -11954,7 +11954,7 @@
   type: web
   cited_by:
     - mesa-optimization-analysis
-    - redwood
+    - redwood-research
     - technical-research
   tags:
     - mesa-optimization
@@ -12705,7 +12705,7 @@
   type: web
   cited_by:
     - conjecture
-    - redwood
+    - redwood-research
   tags:
     - safety
     - cognitive-emulation
@@ -12747,7 +12747,7 @@
   title: Research Fellowship
   type: web
   cited_by:
-    - redwood
+    - redwood-research
   tags:
     - interpretability
     - causal-scrubbing

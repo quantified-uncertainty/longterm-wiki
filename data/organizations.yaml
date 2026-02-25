@@ -99,21 +99,6 @@
     ELK (Eliciting Latent Knowledge), scalable oversight, evaluation of
     dangerous capabilities.
 
-- id: redwood
-  name: Redwood Research
-  type: safety-org
-  founded: "2021"
-  headquarters: Berkeley, CA
-  website: https://redwoodresearch.org
-  description: >
-    Applied alignment research organization. Focus on empirical safety research.
-  keyPeople:
-    - buck-shlegeris
-    - neel-nanda
-  funding: "~$8M/year"
-  employees: "~25"
-  safetyFocus: >
-    Interpretability, adversarial training, ARENA training program.
 
 # =============================================================================
 # ACADEMIC INSTITUTIONS

@@ -257,8 +257,8 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   if (!ciMode) console.log(`\n${colors.blue}Checking expert affiliations...${colors.reset}`);
 
   for (const expert of experts) {
-    if (expert.affiliation && !orgIds.has(expert.affiliation)) {
-      console.log(`${colors.yellow}⚠️  Expert "${expert.id}": affiliation "${expert.affiliation}" not found in organizations${colors.reset}`);
+    if (expert.affiliation && !orgIds.has(expert.affiliation) && !entityIds.has(expert.affiliation)) {
+      console.log(`${colors.yellow}⚠️  Expert "${expert.id}": affiliation "${expert.affiliation}" not found in organizations or entities${colors.reset}`);
       warnings++;
     }
   }
