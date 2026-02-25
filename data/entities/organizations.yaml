@@ -3,19 +3,20 @@
 
 - id: anthropic
   numericId: E22
-  type: lab
+  type: organization
+  orgType: frontier-lab
   summaryPage: labs-overview
   title: Anthropic
   website: https://anthropic.com
   relatedEntries:
     - id: dario-amodei
-      type: researcher
+      type: person
       relationship: leads-to
     - id: chris-olah
-      type: researcher
+      type: person
       relationship: research
     - id: jan-leike
-      type: researcher
+      type: person
       relationship: research
     - id: openai
       type: organization
@@ -72,16 +73,17 @@
   lastUpdated: 2025-12
 - id: deepmind
   numericId: E98
-  type: lab
+  type: organization
+  orgType: frontier-lab
   summaryPage: labs-overview
   title: Google DeepMind
   website: https://deepmind.google
   relatedEntries:
     - id: demis-hassabis
-      type: researcher
+      type: person
       relationship: leads-to
     - id: shane-legg
-      type: researcher
+      type: person
       relationship: leads-to
     - id: openai
       type: organization
@@ -145,19 +147,20 @@
   lastUpdated: 2025-12
 - id: openai
   numericId: E218
-  type: lab
+  type: organization
+  orgType: frontier-lab
   summaryPage: labs-overview
   title: OpenAI
   website: https://openai.com
   relatedEntries:
     - id: sam-altman
-      type: researcher
+      type: person
       relationship: leads-to
     - id: ilya-sutskever
-      type: researcher
+      type: person
       relationship: leads-to
     - id: jan-leike
-      type: researcher
+      type: person
       relationship: research
     - id: anthropic
       type: organization
@@ -217,13 +220,14 @@
   lastUpdated: 2025-12
 - id: xai
   numericId: E378
-  type: lab
+  type: organization
+  orgType: frontier-lab
   summaryPage: labs-overview
   title: xAI
   website: https://x.ai
   relatedEntries:
     - id: elon-musk
-      type: researcher
+      type: person
     - id: openai
       type: organization
     - id: anthropic
@@ -231,9 +235,9 @@
     - id: racing-dynamics
       type: risk
     - id: content-moderation
-      type: concepts
+      type: concept
     - id: agi-race
-      type: concepts
+      type: concept
   sources:
     - title: xAI Website
       url: https://x.ai
@@ -261,7 +265,8 @@
   lastUpdated: 2025-12
 - id: chai
   numericId: E57
-  type: lab-academic
+  type: organization
+  orgType: academic
   summaryPage: safety-orgs-overview
   title: CHAI
   website: https://humancompatible.ai
@@ -292,7 +297,8 @@
   lastUpdated: 2025-12
 - id: apollo-research
   numericId: E24
-  type: lab-research
+  type: organization
+  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Apollo Research
   website: https://www.apolloresearch.ai
@@ -344,7 +350,8 @@
   lastUpdated: 2025-12
 - id: cais
   numericId: E47
-  type: lab-research
+  type: organization
+  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: CAIS
   website: https://safe.ai
@@ -354,7 +361,7 @@
     - id: power-seeking
       type: risk
     - id: anthropic
-      type: lab
+      type: organization
   sources:
     - title: CAIS Website
       url: https://safe.ai
@@ -374,13 +381,14 @@
   lastUpdated: 2025-12
 - id: conjecture
   numericId: E70
-  type: lab-research
+  type: organization
+  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Conjecture
   website: https://conjecture.dev
   relatedEntries:
     - id: connor-leahy
-      type: researcher
+      type: person
     - id: interpretability
       type: safety-agenda
     - id: anthropic
@@ -419,17 +427,18 @@
   lastUpdated: 2025-12
 - id: far-ai
   numericId: E138
-  type: lab-research
+  type: organization
+  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: FAR AI
   website: https://far.ai
   relatedEntries:
     - id: dan-hendrycks
-      type: researcher
+      type: person
     - id: adversarial-robustness
       type: safety-agenda
     - id: natural-abstractions
-      type: concepts
+      type: concept
     - id: benchmarking
       type: safety-agenda
     - id: metr
@@ -465,7 +474,8 @@
   lastUpdated: 2025-12
 - id: govai
   numericId: E153
-  type: lab-research
+  type: organization
+  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: GovAI
   website: https://governance.ai
@@ -473,7 +483,7 @@
     - id: compute-governance
       type: policy
     - id: deepmind
-      type: lab
+      type: organization
   sources:
     - title: GovAI Website
       url: https://governance.ai
@@ -492,15 +502,16 @@
   lastUpdated: 2025-12
 - id: metr
   numericId: E201
-  type: lab-research
+  type: organization
+  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: METR
   website: https://metr.org
   relatedEntries:
     - id: beth-barnes
-      type: researcher
+      type: person
     - id: paul-christiano
-      type: researcher
+      type: person
     - id: arc
       type: organization
     - id: apollo-research
@@ -558,7 +569,7 @@
   website: https://alignment.org
   relatedEntries:
     - id: paul-christiano
-      type: researcher
+      type: person
     - id: scalable-oversight
       type: safety-agenda
     - id: deceptive-alignment
@@ -572,7 +583,7 @@
     - id: miri
       type: organization
     - id: uk-aisi
-      type: policies
+      type: policy
   sources:
     - title: ARC Website
       url: https://alignment.org
@@ -616,15 +627,15 @@
   website: https://epochai.org
   relatedEntries:
     - id: compute-governance
-      type: policies
+      type: policy
     - id: transformative-ai
-      type: concepts
+      type: concept
     - id: scaling-laws
-      type: concepts
+      type: concept
     - id: ai-timelines
-      type: concepts
+      type: concept
     - id: data-constraints
-      type: concepts
+      type: concept
   sources:
     - title: Epoch AI Website
       url: https://epochai.org
@@ -666,11 +677,11 @@
   website: https://intelligence.org
   relatedEntries:
     - id: eliezer-yudkowsky
-      type: researcher
+      type: person
     - id: nate-soares
-      type: researcher
+      type: person
     - id: paul-christiano
-      type: researcher
+      type: person
     - id: instrumental-convergence
       type: risk
     - id: corrigibility-failure
@@ -678,7 +689,7 @@
     - id: sharp-left-turn
       type: risk
     - id: compute-governance
-      type: policies
+      type: policy
     - id: arc
       type: organization
   sources:
@@ -775,7 +786,7 @@
   website: https://www.aisi.gov.uk
   relatedEntries:
     - id: ian-hogarth
-      type: researcher
+      type: person
     - id: us-aisi
       type: organization
     - id: metr
@@ -783,7 +794,7 @@
     - id: apollo-research
       type: organization
     - id: ai-safety-summit
-      type: events
+      type: event
     - id: anthropic
       type: organization
     - id: openai
@@ -834,9 +845,9 @@
     - id: apollo-research
       type: organization
     - id: compute-governance
-      type: policies
+      type: policy
     - id: ai-executive-order
-      type: policies
+      type: policy
     - id: anthropic
       type: organization
     - id: openai
@@ -879,7 +890,7 @@
   status: stub
   relatedEntries:
     - id: metr
-      type: lab-research
+      type: organization
     - id: capability-evaluations
       type: concept
   tags:
@@ -895,7 +906,7 @@
   status: stub
   relatedEntries:
     - id: nick-bostrom
-      type: researcher
+      type: person
     - id: existential-risk
       type: concept
   tags:
@@ -927,11 +938,11 @@
     - id: openai
       type: organization
     - id: sam-altman
-      type: researcher
+      type: person
     - id: long-term-benefit-trust
       type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: giving-pledge
       type: concept
   lastUpdated: 2026-02
@@ -957,7 +968,7 @@
     - id: openai
       type: organization
     - id: marc-andreessen
-      type: researcher
+      type: person
   lastUpdated: 2026-02
 
 - id: johns-hopkins-center-for-health-security
@@ -981,7 +992,7 @@
     - id: open-philanthropy
       type: organization
     - id: anthropic
-      type: lab
+      type: organization
   lastUpdated: 2026-02
 
 - id: nist-ai
@@ -1005,14 +1016,15 @@
     - community
   relatedEntries:
     - id: paul-christiano
-      type: researcher
+      type: person
     - id: openai
       type: organization
   lastUpdated: 2026-02
 
 - id: ssi
   numericId: E425
-  type: lab-research
+  type: organization
+  orgType: safety-org
   summaryPage: labs-overview
   title: Safe Superintelligence Inc (SSI)
   description: >-
@@ -1031,13 +1043,13 @@
     - governance
   relatedEntries:
     - id: ilya-sutskever
-      type: researcher
+      type: person
     - id: openai
       type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: deepmind
-      type: lab
+      type: organization
   lastUpdated: 2026-02
 
 - id: controlai
@@ -1063,7 +1075,7 @@
     - id: conjecture
       type: organization
     - id: connor-leahy
-      type: researcher
+      type: person
     - id: eu-ai-act
       type: concept
   lastUpdated: 2026-02
@@ -1089,18 +1101,19 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: deepmind
-      type: lab
+      type: organization
     - id: openai
       type: organization
     - id: jaan-tallinn
-      type: researcher
+      type: person
   lastUpdated: 2026-02
 
 - id: palisade-research
   numericId: E428
-  type: lab-research
+  type: organization
+  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Palisade Research
   description: >-
@@ -1119,11 +1132,11 @@
     - cyber
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: yoshua-bengio
-      type: researcher
+      type: person
     - id: dario-amodei
-      type: researcher
+      type: person
     - id: sff
       type: organization
     - id: alignment
@@ -1157,7 +1170,8 @@
 
 - id: goodfire
   numericId: E430
-  type: lab-research
+  type: organization
+  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Goodfire
   description: >-
@@ -1174,15 +1188,15 @@
     - community
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: dario-amodei
-      type: researcher
+      type: person
     - id: chris-olah
-      type: researcher
+      type: person
     - id: openai
       type: organization
     - id: deepmind
-      type: lab
+      type: organization
     - id: interpretability
       type: safety-agenda
   lastUpdated: 2026-02
@@ -2150,7 +2164,7 @@
       type: organization
       relationship: leads-to
     - id: beth-barnes
-      type: researcher
+      type: person
       relationship: leads-to
     - id: metr
       type: organization
@@ -2246,9 +2260,9 @@
   website: https://www.givingwhatwecan.org/
   relatedEntries:
     - id: toby-ord
-      type: researcher
+      type: person
     - id: will-macaskill
-      type: researcher
+      type: person
     - id: cea
       type: organization
     - id: open-philanthropy

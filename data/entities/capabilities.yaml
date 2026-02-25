@@ -16,7 +16,7 @@
     - id: power-seeking
       type: risk
     - id: anthropic
-      type: lab
+      type: organization
   sources:
     - title: Claude Computer Use
       url: https://anthropic.com/claude/computer-use
@@ -50,7 +50,7 @@
     - id: tool-use
       type: capability
     - id: openai
-      type: lab
+      type: organization
   sources:
     - title: 'SWE-bench: Can Language Models Resolve Real-World GitHub Issues?'
       url: https://arxiv.org/abs/2310.06770
@@ -83,7 +83,7 @@
     - id: agentic-ai
       type: capability
     - id: openai
-      type: lab
+      type: organization
   sources:
     - title: Language Models are Few-Shot Learners (GPT-3)
       url: https://arxiv.org/abs/2005.14165
@@ -192,7 +192,7 @@
     - id: self-improvement
       type: capability
     - id: openai
-      type: lab
+      type: organization
   sources:
     - title: Learning to Reason with LLMs
       url: https://openai.com/index/learning-to-reason-with-llms/
@@ -248,7 +248,7 @@
     - id: dual-use
       type: risk
     - id: deepmind
-      type: lab
+      type: organization
   sources:
     - title: Highly accurate protein structure prediction with AlphaFold
       url: https://www.nature.com/articles/s41586-021-03819-2
@@ -329,9 +329,9 @@
     - id: evals
       type: capability
     - id: arc
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
   sources:
     - title: Sleeper Agents Paper
       url: https://arxiv.org/abs/2401.05566
@@ -395,7 +395,7 @@
     - id: coding
       type: capability
     - id: anthropic
-      type: lab
+      type: organization
   sources:
     - title: Claude Computer Use
       url: https://www.anthropic.com/news/3-5-models-and-computer-use

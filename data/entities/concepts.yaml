@@ -44,11 +44,11 @@
       value: Very High
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: deepmind
-      type: lab
+      type: organization
     - id: racing-dynamics
       type: risk
   sources:
@@ -95,9 +95,9 @@
       value: Low to Medium
   relatedEntries:
     - id: redwood
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
   sources:
     - title: ARENA Program
       url: https://www.arena.education/
@@ -143,7 +143,7 @@
     - id: eu-ai-act
       type: policy
     - id: govai
-      type: lab
+      type: organization
     - id: racing-dynamics
       type: risk
   sources:
@@ -183,7 +183,7 @@
       value: Alignment Difficulty, Timelines
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: miri
       type: organization
     - id: arc-evals
@@ -240,9 +240,9 @@
     - id: interpretability
       type: safety-agenda
     - id: anthropic
-      type: lab
+      type: organization
     - id: redwood
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
   sources:
@@ -368,7 +368,7 @@
   status: stub
   relatedEntries:
     - id: metr
-      type: lab-research
+      type: organization
     - id: arc-evals
       type: organization
   tags:
@@ -695,7 +695,7 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: rethink-priorities
       type: organization
     - id: sycophancy
@@ -792,7 +792,7 @@
     - id: situational-awareness
       type: concept
     - id: anthropic
-      type: lab
+      type: organization
     - id: miri
       type: organization
   lastUpdated: 2026-02
@@ -935,9 +935,9 @@
     - id: prediction-markets
       type: concept
     - id: sam-altman
-      type: researcher
+      type: person
     - id: dario-amodei
-      type: researcher
+      type: person
     - id: metaculus
       type: organization
     - id: ai-impacts
@@ -969,7 +969,7 @@
     - id: deceptive-alignment
       type: risk
     - id: anthropic
-      type: lab
+      type: organization
     - id: emergent-capabilities
       type: concept
     - id: interpretability
@@ -997,9 +997,9 @@
     - governance
   relatedEntries:
     - id: openai
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: dense-transformers
       type: concept
     - id: light-scaffolding
@@ -1058,7 +1058,7 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: rlhf
       type: concept
     - id: constitutional-ai

@@ -228,7 +228,7 @@
     - id: cyberweapons
       type: risk
     - id: anthropic
-      type: lab
+      type: organization
   sources:
     - title: The Precipice
       author: Toby Ord
@@ -555,7 +555,7 @@
     - id: evals
       type: approach
     - id: anthropic
-      type: lab
+      type: organization
   sources:
     - title: Risks from Learned Optimization
       url: https://arxiv.org/abs/1906.01820
@@ -1309,7 +1309,7 @@
     - id: corrigibility
       type: safety-agenda
     - id: miri
-      type: lab
+      type: organization
   sources:
     - title: The Basic AI Drives
       url: https://selfawaresystems.files.wordpress.com/2008/01/ai_drives_final.pdf
@@ -1682,7 +1682,7 @@
     - id: goal-misgeneralization
       type: risk
     - id: miri
-      type: lab
+      type: organization
   sources:
     - title: Risks from Learned Optimization
       url: https://arxiv.org/abs/1906.01820
@@ -1776,7 +1776,7 @@
     - id: corrigibility
       type: safety-agenda
     - id: cais
-      type: lab
+      type: organization
   sources:
     - title: Optimal Policies Tend to Seek Power
       url: https://arxiv.org/abs/2206.13477
@@ -1928,9 +1928,9 @@
     - id: compute-governance
       type: policy
     - id: anthropic
-      type: lab
+      type: organization
     - id: govai
-      type: lab
+      type: organization
   sources:
     - title: 'Racing to the Precipice: A Model of AI Development'
       url: https://nickbostrom.com/papers/racing.pdf
@@ -2088,7 +2088,7 @@
     - id: situational-awareness
       type: capability
     - id: arc
-      type: lab
+      type: organization
   sources:
     - title: Evaluating Language-Model Agents on Realistic Autonomous Tasks
       url: https://evals.alignment.org/
@@ -2237,7 +2237,7 @@
     - id: goal-misgeneralization
       type: risk
     - id: miri
-      type: lab
+      type: organization
     - id: mesa-optimization
       type: risk
   sources:
@@ -2333,7 +2333,7 @@
     - id: reward-hacking
       type: risk
     - id: anthropic
-      type: lab
+      type: organization
     - id: scalable-oversight
       type: safety-agenda
   sources:
@@ -2732,9 +2732,9 @@
     - id: scheming
       type: risk
     - id: evan-hubinger
-      type: researcher
+      type: person
     - id: anthropic
-      type: lab
+      type: organization
     - id: situational-awareness
       type: concept
   lastUpdated: 2026-02
