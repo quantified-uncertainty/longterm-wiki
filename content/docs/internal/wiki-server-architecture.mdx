@@ -9,7 +9,6 @@ entityType: internal
 pageType: documentation
 lastEdited: "2026-02-24"
 update_frequency: 90
-evergreen: true
 ---
 
 This document analyzes how the wiki-server handles (or fails to handle) environment isolation between development, preview, and production. It identifies the core architectural tension — entity ID allocation must be globally shared, but content data should not — and proposes a tiered remediation plan.

@@ -6,7 +6,6 @@ sidebar:
   order: 0
   label: Overview
 entityType: internal
-evergreen: true
 ---
 import {EntityLink} from '@components/wiki';
 
