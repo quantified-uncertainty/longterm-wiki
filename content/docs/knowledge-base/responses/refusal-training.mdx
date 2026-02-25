@@ -19,7 +19,7 @@ ratings:
 clusters:
   - ai-safety
 ---
-import {Mermaid, R, EntityLink} from '@components/wiki';
+import { Mermaid, EntityLink } from '@components/wiki';
 
 
 ## Overview
@@ -247,7 +247,7 @@ This suggests fundamental rather than incremental limitations. However, the AISI
 
 | Risk | Relevance | How Refusal Training Helps | Limitations |
 |------|-----------|---------------------------|-------------|
-| <EntityLink id="misuse-potential" /> | High | Blocks obvious harmful requests | Bypassed by sophisticated users |
+|  | High | Blocks obvious harmful requests | Bypassed by sophisticated users |
 | <EntityLink id="bioweapons" /> | Medium | Refuses synthesis instructions | Information often available elsewhere |
 | Cyberattacks | Medium | Declines to write malware | Determined attackers can jailbreak |
 | <EntityLink id="deceptive-alignment" /> | None | No protection | Deceptive models would pass refusal training |
@@ -368,14 +368,3 @@ This creates both opportunities (more robust safety mechanisms) and risks (adver
 4. **Arms race dynamic**: Jailbreak discovery time is decreasing, but effort required for some models increasing
 
 ---
-
-## AI Transition Model Context
-
-Refusal training affects the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="misuse-potential" />:
-
-| Parameter | Impact |
-|-----------|--------|
-| <EntityLink id="misuse-potential" /> | Moderate reduction in casual misuse |
-| <EntityLink id="alignment-robustness" /> | No meaningful improvement |
-
-Refusal training is a deployment necessity but not a path to safe AI. It should be understood as harm reduction for current systems, not a solution to alignment.

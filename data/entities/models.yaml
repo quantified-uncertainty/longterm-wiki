@@ -133,12 +133,6 @@
     - id: anthropic
       type: lab
       relationship: research
-    - id: alignment-robustness
-      type: parameter
-      relationship: models
-    - id: human-oversight-quality
-      type: parameter
-      relationship: affects
   tags:
     - probability
     - decomposition
@@ -171,12 +165,6 @@
     - id: deceptive-alignment-decomposition
       type: model
       relationship: related
-    - id: alignment-robustness
-      type: parameter
-      relationship: models
-    - id: racing-intensity
-      type: parameter
-      relationship: models
   tags:
     - probability
     - decomposition
@@ -398,12 +386,6 @@
     - id: ai-control
       type: safety-agenda
       relationship: mitigation
-    - id: alignment-robustness
-      type: parameter
-      relationship: models
-    - id: human-oversight-quality
-      type: parameter
-      relationship: affects
   tags:
     - causal-model
     - corrigibility
@@ -426,9 +408,6 @@
     - id: bioweapons
       type: risk
       relationship: related
-    - id: biological-threat-exposure
-      type: parameter
-      relationship: models
   tags:
     - probability
     - decomposition
@@ -452,9 +431,6 @@
     - id: bioweapons
       type: risk
       relationship: related
-    - id: biological-threat-exposure
-      type: parameter
-      relationship: affects
   tags:
     - uplift
     - comparison
@@ -502,15 +478,6 @@
     - id: multipolar-trap
       type: risk
       relationship: related
-    - id: racing-intensity
-      type: parameter
-      relationship: models
-    - id: safety-capability-gap
-      type: parameter
-      relationship: affects
-    - id: coordination-capacity
-      type: parameter
-      relationship: affects
   tags:
     - risk-factor
     - competition
@@ -536,12 +503,6 @@
     - id: racing-dynamics
       type: risk
       relationship: related
-    - id: international-coordination
-      type: parameter
-      relationship: models
-    - id: racing-intensity
-      type: parameter
-      relationship: affects
   tags:
     - risk-factor
     - game-theory
@@ -589,12 +550,6 @@
     - id: expertise-atrophy
       type: risk
       relationship: related
-    - id: human-expertise
-      type: parameter
-      relationship: models
-    - id: human-oversight-quality
-      type: parameter
-      relationship: affects
     - id: automation-bias
       type: risk
       relationship: related
@@ -623,12 +578,6 @@
     - id: winner-take-all
       type: risk
       relationship: related
-    - id: economic-stability
-      type: parameter
-      relationship: models
-    - id: human-agency
-      type: parameter
-      relationship: affects
   tags:
     - risk-factor
     - economics
@@ -679,12 +628,6 @@
     - id: economic-disruption
       type: risk
       relationship: related
-    - id: ai-control-concentration
-      type: parameter
-      relationship: models
-    - id: economic-stability
-      type: parameter
-      relationship: affects
   tags:
     - risk-factor
     - concentration
@@ -707,9 +650,6 @@
     - id: cyberweapons
       type: risk
       relationship: related
-    - id: cyber-threat-exposure
-      type: parameter
-      relationship: models
   tags:
     - offense-defense
     - cybersecurity
@@ -732,9 +672,6 @@
     - id: cyberweapons
       type: risk
       relationship: related
-    - id: cyber-threat-exposure
-      type: parameter
-      relationship: affects
   tags:
     - timeline
     - automation
@@ -889,12 +826,6 @@
     - id: deepfakes
       type: risk
       relationship: related
-    - id: information-authenticity
-      type: parameter
-      relationship: models
-    - id: societal-trust
-      type: parameter
-      relationship: affects
   tags:
     - authentication
     - deepfakes
@@ -925,15 +856,6 @@
     - id: epistemic-collapse
       type: risk
       relationship: leads-to
-    - id: societal-trust
-      type: parameter
-      relationship: models
-    - id: epistemic-health
-      type: parameter
-      relationship: affects
-    - id: information-authenticity
-      type: parameter
-      relationship: affects
   tags:
     - epistemic
     - cascade
@@ -965,12 +887,6 @@
     - id: learned-helplessness
       type: risk
       relationship: leads-to
-    - id: preference-authenticity
-      type: parameter
-      relationship: models
-    - id: societal-trust
-      type: parameter
-      relationship: affects
   tags:
     - epistemic
     - feedback-loops
@@ -1003,12 +919,6 @@
     - id: deepfakes
       type: risk
       relationship: related
-    - id: information-authenticity
-      type: parameter
-      relationship: models
-    - id: epistemic-health
-      type: parameter
-      relationship: affects
   tags:
     - epistemic
     - timeline
@@ -1040,12 +950,6 @@
     - id: epistemic-collapse
       type: risk
       relationship: contributes-to
-    - id: human-expertise
-      type: parameter
-      relationship: models
-    - id: human-agency
-      type: parameter
-      relationship: affects
   tags:
     - epistemic
     - cascade
@@ -1080,15 +984,6 @@
     - id: learned-helplessness
       type: risk
       relationship: outcome
-    - id: epistemic-health
-      type: parameter
-      relationship: models
-    - id: reality-coherence
-      type: parameter
-      relationship: affects
-    - id: societal-trust
-      type: parameter
-      relationship: affects
   tags:
     - epistemic
     - threshold
@@ -1114,15 +1009,6 @@
     - id: reality-fragmentation
       type: risk
       relationship: analyzes
-    - id: reality-coherence
-      type: parameter
-      relationship: models
-    - id: epistemic-health
-      type: parameter
-      relationship: affects
-    - id: preference-authenticity
-      type: parameter
-      relationship: affects
     - id: epistemic-sycophancy
       type: risk
       relationship: mechanism
@@ -1162,15 +1048,6 @@
     - id: concentration-of-power
       type: risk
       relationship: outcome
-    - id: racing-intensity
-      type: parameter
-      relationship: models
-    - id: safety-culture-strength
-      type: parameter
-      relationship: affects
-    - id: international-coordination
-      type: parameter
-      relationship: affects
   tags:
     - game-theory
     - coordination
@@ -1233,12 +1110,6 @@
     - id: economic-disruption
       type: risk
       relationship: related
-    - id: ai-control-concentration
-      type: parameter
-      relationship: models
-    - id: economic-stability
-      type: parameter
-      relationship: affects
   tags:
     - market-structure
     - power-law
@@ -1273,12 +1144,6 @@
     - id: authoritarian-takeover
       type: risk
       relationship: scenario
-    - id: ai-control-concentration
-      type: parameter
-      relationship: models
-    - id: human-agency
-      type: parameter
-      relationship: affects
   tags:
     - power-dynamics
     - systems-thinking
@@ -1578,12 +1443,6 @@
     - id: sycophancy-feedback-loop
       type: model
       relationship: related
-    - id: preference-authenticity
-      type: parameter
-      relationship: models
-    - id: human-agency
-      type: parameter
-      relationship: affects
   tags:
     - autonomy
     - manipulation
@@ -1611,12 +1470,6 @@
     - id: trust-cascade-model
       type: model
       relationship: related
-    - id: societal-trust
-      type: parameter
-      relationship: models
-    - id: institutional-quality
-      type: parameter
-      relationship: affects
   tags:
     - trust
     - institutions
@@ -1645,12 +1498,6 @@
     - id: erosion-of-agency
       type: risk
       relationship: related
-    - id: human-oversight-quality
-      type: parameter
-      relationship: models
-    - id: human-expertise
-      type: parameter
-      relationship: affects
   tags:
     - human-ai-interaction
     - cognitive-bias
@@ -1746,12 +1593,6 @@
     - id: multipolar-trap
       type: risk
       relationship: related
-    - id: safety-culture-strength
-      type: parameter
-      relationship: models
-    - id: racing-intensity
-      type: parameter
-      relationship: affects
   tags:
     - racing-dynamics
     - incentives
@@ -1858,10 +1699,6 @@
       value: Layered Safety Architecture
     - label: Key Insight
       value: Multiple independent safety layers provide robustness against single-point failures
-  relatedEntries:
-    - id: societal-resilience
-      type: parameter
-      relationship: models
   tags:
     - defense
     - security
@@ -1885,12 +1722,6 @@
     - id: racing-dynamics
       type: risk
       relationship: related
-    - id: regulatory-capacity
-      type: parameter
-      relationship: models
-    - id: institutional-quality
-      type: parameter
-      relationship: affects
   tags:
     - institutions
     - adaptation
@@ -1917,15 +1748,6 @@
     - id: racing-dynamics
       type: risk
       relationship: related
-    - id: international-coordination
-      type: parameter
-      relationship: models
-    - id: coordination-capacity
-      type: parameter
-      relationship: affects
-    - id: ai-control-concentration
-      type: parameter
-      relationship: affects
   tags:
     - game-theory
     - international-coordination
@@ -2062,12 +1884,6 @@
     - id: racing-dynamics
       type: risk
       relationship: related
-    - id: safety-capability-gap
-      type: parameter
-      relationship: models
-    - id: alignment-robustness
-      type: parameter
-      relationship: affects
   tags:
     - tradeoffs
     - safety
@@ -2200,18 +2016,6 @@
     - id: risk-interaction-network
       type: model
       relationship: related
-    - id: epistemic-health
-      type: parameter
-      relationship: models
-    - id: institutional-quality
-      type: parameter
-      relationship: models
-    - id: societal-trust
-      type: parameter
-      relationship: affects
-    - id: racing-intensity
-      type: parameter
-      relationship: affects
   tags:
     - networks
     - parameters
@@ -2241,12 +2045,6 @@
     - id: racing-dynamics-model
       type: model
       relationship: related
-    - id: safety-culture-strength
-      type: parameter
-      relationship: models
-    - id: racing-intensity
-      type: parameter
-      relationship: models
   tags:
     - equilibrium
     - safety-culture
@@ -2271,12 +2069,6 @@
     - id: institutional-adaptation-speed
       type: model
       relationship: related
-    - id: regulatory-capacity
-      type: parameter
-      relationship: models
-    - id: institutional-quality
-      type: parameter
-      relationship: models
   tags:
     - governance
     - regulation
@@ -2304,15 +2096,6 @@
     - id: safety-capability-tradeoff
       type: model
       relationship: related
-    - id: alignment-robustness
-      type: parameter
-      relationship: models
-    - id: safety-capability-gap
-      type: parameter
-      relationship: affects
-    - id: human-oversight-quality
-      type: parameter
-      relationship: affects
   tags:
     - alignment
     - scaling
@@ -2426,8 +2209,6 @@
   relatedEntries:
     - id: pre-tai-capital-deployment
       type: model
-    - id: compute-hardware
-      type: ai-transition-model-metric
     - id: compute-governance
       type: policy
     - id: winner-take-all-concentration

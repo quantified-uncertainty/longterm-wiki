@@ -34,7 +34,6 @@ const CONFIG = {
     { key: 'funders', label: 'Funders' },
     { key: 'concepts', label: 'Concepts' },
     { key: 'forecasting', label: 'Forecasting' },
-    { key: 'ai-transition-model', label: 'AI Transition Model' },
     { key: 'analysis', label: 'Analysis' },
   ],
 };

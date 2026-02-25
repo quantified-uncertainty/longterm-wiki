@@ -19,7 +19,7 @@ ratings:
 clusters:
   - ai-safety
 ---
-import {Mermaid, R, EntityLink} from '@components/wiki';
+import { Mermaid, EntityLink } from '@components/wiki';
 
 
 ## Overview
@@ -230,7 +230,7 @@ The [TOFU benchmark](https://arxiv.org/abs/2401.06121) (published at COLM 2024) 
 |------|-----------|---------------------|-------------|
 | <EntityLink id="bioweapons" /> | **High** | Removes pathogen synthesis, enhancement knowledge | Dual-use biology knowledge entangled |
 | Cyberattacks | **High** | Removes exploit development, attack techniques | Security knowledge widely distributed |
-| <EntityLink id="misuse-potential" /> | **High** | Directly reduces dangerous capability surface | Recovery via fine-tuning possible |
+|  | **High** | Directly reduces dangerous capability surface | Recovery via fine-tuning possible |
 | Open Sourcing Risk | **High** | Critical for open-weight releases where runtime controls absent | Verification impossible before release |
 | Capability Overhang | **Medium** | Reduces latent dangerous capabilities | Does not address emergent capabilities |
 
@@ -273,15 +273,3 @@ The [TOFU benchmark](https://arxiv.org/abs/2401.06121) (published at COLM 2024) 
 | **Representation Engineering** | Activation-based removal | [Springer survey](https://link.springer.com/article/10.1007/s10462-024-11078-6) |
 
 ---
-
-## AI Transition Model Context
-
-Capability unlearning affects the <EntityLink id="ai-transition-model" /> through direct capability reduction:
-
-| Factor | Parameter | Impact |
-|--------|-----------|--------|
-| <EntityLink id="misuse-potential" /> | Dangerous capabilities | Directly reduces misuse potential |
-| Bioweapon Risk | Biosecurity | Removes pathogen synthesis knowledge |
-| Cyberattack Risk | Cybersecurity | Removes attack technique knowledge |
-
-Capability unlearning is a promising near-term intervention for specific dangerous capabilities, particularly valuable for open-weight model releases where behavioral controls cannot be relied upon. However, verification challenges and recovery risks mean it should be part of a defense-in-depth strategy rather than relied upon alone.

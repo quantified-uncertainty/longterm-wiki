@@ -221,7 +221,6 @@ const IntelligenceParadigmEntitySchema = BaseEntity.extend({
 });
 
 // Catch-all for entity types we haven't explicitly modeled
-// (e.g., ai-transition-model-* types)
 const GenericEntitySchema = BaseEntity.extend({
   entityType: z.string(),
 });

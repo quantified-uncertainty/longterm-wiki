@@ -11,15 +11,6 @@ researchImportance: 82.5
 lastEdited: "2026-01-29"
 update_frequency: 21
 llmSummary: Mechanistic interpretability has extracted 34M+ interpretable features from Claude 3 Sonnet with 90% automated labeling accuracy and demonstrated 75-85% success in causal validation, though less than 5% of frontier model computations are currently understood. With $75-150M annual investment and a 3-7 year timeline to safety-critical applications, it shows promise for deception detection (25-39% hint rate in reasoning models) but faces significant scalability challenges.
-structuredSummary:
-  oneLiner: "Mechanistic interpretability reverse-engineers neural network internals to detect deception and verify alignment, but currently understands less than 5% of frontier model computations."
-  keyPoints:
-    - "34M+ interpretable features extracted from Claude 3 Sonnet with 90% automated labeling accuracy"
-    - "Current investment is \\$75-150M/year globally; named MIT Technology Review's 2026 Breakthrough Technology"
-    - "Deception detection achieves only 25-39% hint rate in reasoning models — frontier models can hide their reasoning"
-    - "Anthropic targets 'reliably detect most model problems' by 2027; 3-7 year timeline to safety-critical use"
-    - "DeepMind deprioritized SAEs after limited safety application results; scalability remains the core challenge"
-  bottomLine: "Mechanistic interpretability is the most promising path to verifiable AI safety, but the gap between current capabilities (less than 5% understood) and what's needed for safety guarantees remains enormous. Progress is real but may not arrive fast enough."
 ratings:
   novelty: 4.5
   rigor: 7
@@ -28,7 +19,7 @@ ratings:
 clusters:
   - ai-safety
 ---
-import {DataInfoBox, KeyPeople, Section, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink, KeyTakeaways} from '@components/wiki';
+import { DataInfoBox, KeyPeople, Section, DisagreementMap, Mermaid, R, EntityLink, KeyTakeaways } from '@components/wiki';
 
 
 <DataInfoBox entityId="E174" />
@@ -343,15 +334,3 @@ Despite these uncertainties, mechanistic interpretability represents one of the 
 - **Mechanistic Interpretability Workshop:** <R id="e78a965cde8d82bd">NeurIPS 2025 Workshop</R> - Annual academic gathering
 
 ---
-
-## AI Transition Model Context
-
-Interpretability improves the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="misalignment-potential" />:
-
-| Parameter | Impact |
-|-----------|--------|
-| <EntityLink id="interpretability-coverage" /> | Direct improvement—this is the core parameter interpretability affects |
-| <EntityLink id="alignment-robustness" /> | Enables verification that alignment techniques actually work |
-| <EntityLink id="safety-capability-gap" /> | Helps close the gap by providing tools to understand advanced AI |
-
-Interpretability reduces <EntityLink id="existential-catastrophe" /> probability by enabling detection of <EntityLink id="scheming" /> and <EntityLink id="deceptive-alignment" />.

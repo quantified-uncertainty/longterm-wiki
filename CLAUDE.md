@@ -30,7 +30,7 @@ Without these, `crux` won't have `GITHUB_TOKEN` and the gate check will fail wit
 
 See `## Agent Session Workflow — MANDATORY` below and `.claude/rules/agent-session-workflow.md` for full details.
 
-At session end, run `/agent-session-ready-PR`. At bare minimum, always run `/push-and-ensure-green`.
+At session end, run `/agent-session-ready-PR`. Always open a PR — never push directly to `main`.
 
 ## Quick Reference
 

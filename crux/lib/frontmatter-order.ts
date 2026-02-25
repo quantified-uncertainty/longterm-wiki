@@ -60,7 +60,6 @@ export const FRONTMATTER_FIELD_ORDER: string[] = [
 
   // --- Group 5: Summaries ---
   'llmSummary',
-  'structuredSummary',
 
   // --- Group 6: Ratings ---
   'ratings',

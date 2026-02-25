@@ -2,16 +2,18 @@
  * Facts API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
+ * Response types are imported from api-types.ts (single source of truth).
  */
 
 import { batchedRequest, getServerUrl, apiRequest, type ApiResult } from './client.ts';
 import type {
   SyncFact,
-  FactEntryResponse,
-  FactsByEntityResponse,
-  FactTimeseriesResponse,
-  StaleFactsResponse,
-  FactStatsResponse,
+  SyncFactsResult,
+  FactRow,
+  FactsByEntityResult,
+  FactTimeseriesResult,
+  StaleFactsResult,
+  FactStatsResult,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -20,16 +22,17 @@ import type {
 
 export type SyncFactItem = SyncFact;
 
-export interface SyncFactsResult {
-  upserted: number;
-}
+// ---------------------------------------------------------------------------
+// Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-// Re-export shared response types for backward compatibility
-export type FactEntry = FactEntryResponse;
-export type FactsByEntityResult = FactsByEntityResponse;
-export type TimeseriesResult = FactTimeseriesResponse;
-export type StaleFactsResult = StaleFactsResponse;
-export type FactStatsResult = FactStatsResponse;
+export type { SyncFactsResult, FactsByEntityResult, StaleFactsResult, FactStatsResult };
+
+/** Backward-compatible alias for FactRow. */
+export type FactEntry = FactRow;
+
+/** Backward-compatible alias for FactTimeseriesResult. */
+export type TimeseriesResult = FactTimeseriesResult;
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -110,4 +113,3 @@ export async function getStaleFacts(
 export async function getFactStats(): Promise<ApiResult<FactStatsResult>> {
   return apiRequest<FactStatsResult>('GET', '/api/facts/stats');
 }
-

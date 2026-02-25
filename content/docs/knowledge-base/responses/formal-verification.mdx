@@ -19,7 +19,7 @@ ratings:
 clusters:
   - ai-safety
 ---
-import {Mermaid, R, EntityLink} from '@components/wiki';
+import { Mermaid, EntityLink } from '@components/wiki';
 
 
 ## Overview
@@ -237,7 +237,7 @@ The seL4 microkernel represents the gold standard for formal verification of com
 
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
-| <EntityLink id="misalignment-potential" /> | High | Could mathematically prove that system objectives align with specified goals |
+|  | High | Could mathematically prove that system objectives align with specified goals |
 | <EntityLink id="deceptive-alignment" /> | Very High | Proofs are immune to deception—a deceptive AI cannot fake a valid proof |
 | Robustness Failures | High | Proven bounds on behavior under adversarial inputs or distribution shift |
 | Capability Control | Medium | Could verify containment properties and access restrictions |
@@ -291,14 +291,3 @@ The seL4 microkernel represents the gold standard for formal verification of com
 | **[ARIA Programme Thesis](https://www.aria.org.uk/media/3nhijno4/aria-safeguarded-ai-programme-thesis-v1.pdf)** | Detailed roadmap for provably safe AI development |
 
 ---
-
-## AI Transition Model Context
-
-Formal verification affects the <EntityLink id="ai-transition-model" /> through safety guarantees:
-
-| Factor | Parameter | Impact |
-|--------|-----------|--------|
-| <EntityLink id="alignment-robustness" /> | Verification strength | Could provide mathematical guarantees of alignment |
-| <EntityLink id="safety-capability-gap" /> | Gap closure | Verified systems would have provable safety properties |
-
-Formal verification represents a potential path to extremely strong safety guarantees, but faces fundamental scalability challenges that may or may not be surmountable. Investment is warranted as high-risk, high-reward research, but current techniques cannot provide safety assurances for frontier AI systems.

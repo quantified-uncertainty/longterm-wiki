@@ -5,51 +5,21 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { JobsTable } from "./jobs-table";
 import type { Metadata } from "next";
+import type { JobRow as ApiJobRow } from "@wiki-server/api-types";
 
 export const metadata: Metadata = {
   title: "Job Queue | Longterm Wiki Internal",
   description: "Background job queue status, history, and statistics.",
 };
 
-export interface JobRow {
-  id: number;
-  type: string;
-  status: string;
-  params: Record<string, unknown> | null;
-  result: Record<string, unknown> | null;
-  error: string | null;
-  priority: number;
-  retries: number;
-  maxRetries: number;
-  createdAt: string;
-  claimedAt: string | null;
-  startedAt: string | null;
-  completedAt: string | null;
-  workerId: string | null;
+export interface JobRow extends ApiJobRow {
   durationSeconds: number | null;
 }
 
 // ── API Data Loading ──────────────────────────────────────────────────────
 
-interface ApiJobEntry {
-  id: number;
-  type: string;
-  status: string;
-  params: Record<string, unknown> | null;
-  result: Record<string, unknown> | null;
-  error: string | null;
-  priority: number;
-  retries: number;
-  maxRetries: number;
-  createdAt: string;
-  claimedAt: string | null;
-  startedAt: string | null;
-  completedAt: string | null;
-  workerId: string | null;
-}
-
 async function loadJobsFromApi() {
-  const result = await fetchDetailed<{ entries: ApiJobEntry[] }>(
+  const result = await fetchDetailed<{ entries: ApiJobRow[] }>(
     "/api/jobs?limit=200",
     { revalidate: 30 }
   );

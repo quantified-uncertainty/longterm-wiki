@@ -19,7 +19,7 @@ ratings:
 clusters:
   - ai-safety
 ---
-import {Mermaid, R, EntityLink} from '@components/wiki';
+import { Mermaid, EntityLink } from '@components/wiki';
 
 
 ## Overview
@@ -294,7 +294,7 @@ Understanding goal misgeneralization addresses core alignment challenges:
 
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
-| **<EntityLink id="misalignment-potential" />** | High | Understanding how misalignment arises is prerequisite to preventing it |
+| **** | High | Understanding how misalignment arises is prerequisite to preventing it |
 | **<EntityLink id="reward-hacking" />** | High | Related failure mode; misgeneralization can enable sophisticated reward hacking |
 | **<EntityLink id="deceptive-alignment" />** | Medium | Misgeneralized goals may include deceptive strategies that work during training |
 | **<EntityLink id="sycophancy" />** | High | Sycophancy is a concrete LLM manifestation; [Anthropic research](https://www.anthropic.com/research/towards-understanding-sycophancy-in-language-models) shows RLHF incentivizes matching user beliefs over truth |
@@ -340,14 +340,3 @@ Understanding goal misgeneralization addresses core alignment challenges:
 | **Distributional Shift** | Underlying cause |
 
 ---
-
-## AI Transition Model Context
-
-Goal misgeneralization research affects the <EntityLink id="ai-transition-model" /> through alignment understanding:
-
-| Factor | Parameter | Impact |
-|--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | Alignment robustness | Understanding helps predict and prevent failures |
-| <EntityLink id="alignment-robustness" /> | Goal generalization | Core problem for maintaining alignment under distribution shift |
-
-Goal misgeneralization is a core challenge for AI alignment that becomes more important as systems are deployed in increasingly diverse situations. While the problem is well-characterized, solutions remain elusive, making this an important area for continued research investment.

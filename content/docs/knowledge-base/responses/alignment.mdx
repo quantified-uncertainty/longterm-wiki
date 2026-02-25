@@ -25,7 +25,7 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
 
 ## Overview
 
-AI alignment research addresses the fundamental challenge of ensuring AI systems pursue intended goals and remain beneficial as their capabilities scale. This field encompasses technical methods for training, monitoring, and controlling AI systems to prevent misaligned behavior that could lead to <EntityLink id="existential-catastrophe">catastrophic outcomes</EntityLink>.
+AI alignment research addresses the fundamental challenge of ensuring AI systems pursue intended goals and remain beneficial as their capabilities scale. This field encompasses technical methods for training, monitoring, and controlling AI systems to prevent misaligned behavior that could lead to catastrophic outcomes.
 
 Current alignment approaches show promise for existing systems but face critical scalability challenges. As capabilities advance toward AGI, the gap between alignment research and capability development continues to widen, creating what some researchers describe as the "<EntityLink id="capability-alignment-race">capability-alignment race</EntityLink>" — though others contend that alignment and capabilities research are more complementary than competitive. A growing body of adversarial research further complicates the picture: safety mechanisms embedded in deployed models can be extracted, reverse-engineered, and weaponized by adversaries, raising questions about the long-term robustness of alignment that go beyond training-time concerns.
 
@@ -432,44 +432,3 @@ Individual expert predictions vary widely. <EntityLink id="sam-altman">Sam Altma
 | **Regulatory** | [Second-Order Impacts of Civil AI Regulation on Defense (Atlantic Council)](https://www.atlanticcouncil.org/in-depth-research-reports/report/second-order-impacts-of-civil-artificial-intelligence-regulation-on-defense-why-the-national-security-community-must-engage/) | Dual-use governance analysis |
 
 ---
-
-## AI Transition Model Context
-
-AI alignment research is the primary intervention for reducing <EntityLink id="misalignment-potential">Misalignment Potential</EntityLink> in the <EntityLink id="alignment">AI Alignment</EntityLink> model:
-
-| Factor | Parameter | Impact |
-|--------|-----------|--------|
-| <EntityLink id="misalignment-potential">Misalignment Potential</EntityLink> | <EntityLink id="alignment-robustness">Alignment Robustness</EntityLink> | Core objective: ensure AI systems pursue intended goals reliably |
-| <EntityLink id="misalignment-potential">Misalignment Potential</EntityLink> | <EntityLink id="safety-capability-gap">Safety-Capability Gap</EntityLink> | Research must keep pace with capability advances to maintain safety margins |
-| <EntityLink id="misalignment-potential">Misalignment Potential</EntityLink> | <EntityLink id="human-oversight-quality">Human Oversight Quality</EntityLink> | Scalable oversight extends human control to superhuman systems |
-| <EntityLink id="misalignment-potential">Misalignment Potential</EntityLink> | <EntityLink id="interpretability-coverage">Interpretability Coverage</EntityLink> | Understanding model internals enables verification of alignment |
-
-Alignment research directly addresses whether advanced AI systems will be safe and beneficial, making it central to all scenarios in the AI transition model.
-
----
-
-[^1]: The alignment faking behavior in Claude 3 Opus was documented in controlled experiments; the finding has not been independently replicated across other model families as of early 2026.
-
-[^2]: ["Safety Alignment Should Be Made More Than Skin-Deep"](https://openreview.net/pdf?id=6Mxhg9PtDE), OpenReview, 2024. The paper demonstrates that refusal-level alignment can be bypassed by circumventing refusal prefixes, and proposes augmented fine-tuning as a deeper alignment approach evaluated across AlpacaEval, MMLU, BBH, MATH, GSM8k, and HumanEval benchmarks.
-
-[^3]: ["Unforgotten Safety: Preserving Safety Alignment of LLMs with Continual Learning"](https://arxiv.org/html/2512.10150v1), December 2025. Evaluated on Mistral-7B and Gemma-2B; DER identified as a robust continual learning defense.
-
-[^4]: ["Targeting Alignment: Extracting Safety Classifiers of Aligned LLMs"](https://arxiv.org/abs/2501.16534), Noirot Ferrand, Beugin, Pauley, Sheatsley, McDaniel; accepted to IEEE SaTML 2026; arXiv:2501.16534, January 2025. Assumes white-box access throughout; licensed CC BY-NC-ND 4.0.
-
-[^5]: ["Safety Misalignment Against Large Language Models"](https://www.ndss-symposium.org/wp-content/uploads/2025-1089-paper.pdf), NDSS Symposium 2025. Covers system-prompt modification, fine-tuning, and model editing attack vectors; introduces SSRA.
-
-[^6]: ["To Distill or Not to Distill: Knowledge Transfer Undermines Safety of LLMs"](https://openreview.net/forum?id=AEKji3PwD9), OpenReview, October 2025. Logit-based soft label distillation produces up to 50% greater safety degradation than fine-tuning on equivalent data.
-
-[^7]: ["Unforgotten Safety: Preserving Safety Alignment of LLMs with Continual Learning"](https://arxiv.org/html/2512.10150v1), arXiv, December 2025.
-
-[^8]: ["AI Safety at the Frontier: Paper Highlights of November 2025"](https://www.lesswrong.com/posts/8bLSDMWnL4BcHgA6k/ai-safety-at-the-frontier-paper-highlights-of-november-2025), LessWrong, November 2025. BCT results reported on ClearHarm benchmark for Gemini 2.5 Flash.
-
-[^9]: ["Congress Moves Forward with AI Measures in Key Defense Legislation"](https://www.akingump.com/en/insights/alerts/congress-moves-forward-with-ai-measures-in-key-defense-legislation), Akin Gump, 2024-2025.
-
-[^10]: ["Agentic AI and Cyberattacks"](https://www.congress.gov/crs-product/IF13151), Congressional Research Service, 2025-2026.
-
-[^11]: ["Second-Order Impacts of Civil AI Regulation on Defense"](https://www.atlanticcouncil.org/in-depth-research-reports/report/second-order-impacts-of-civil-artificial-intelligence-regulation-on-defense-why-the-national-security-community-must-engage/), Atlantic Council, 2024-2025.
-
-[^12]: Congressional Research Service, ["Agentic AI and Cyberattacks"](https://www.congress.gov/crs-product/IF13151), 2025-2026.
-
-[^13]: ["Before It's Too Late: Why a World of Interacting AI Agents Demands New Safeguards"](https://www.sipri.org/commentary/essay/2025/its-too-late-why-world-interacting-ai-agents-demands-new-safeguards), SIPRI, 2025.

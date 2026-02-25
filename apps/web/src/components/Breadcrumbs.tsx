@@ -35,9 +35,7 @@ export function Breadcrumbs({
       ? [{ label: "Internal", href: "/wiki/E779" }]
       : [{ label: "Wiki", href: "/wiki" }];
 
-  const CATEGORY_HREFS: Record<string, string> = {
-    "ai-transition-model": "/wiki/ai-transition-model",
-  };
+  const CATEGORY_HREFS: Record<string, string> = {};
 
   if (category && !isInternal) {
     items.push({

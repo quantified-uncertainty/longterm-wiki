@@ -43,7 +43,7 @@ Reorders MDX frontmatter fields to follow canonical ordering:
   2. Structure (sidebar, entityType, subcategory, ...)
   3. Quality scores (quality, readerImportance, ...)
   4. Temporal (lastEdited, update_frequency, ...)
-  5. Summaries (llmSummary, structuredSummary)
+  5. Summaries (llmSummary)
   6. Ratings block
   7. Collections (clusters, roles, todos, ...)
   8. Unknown fields (alphabetical)

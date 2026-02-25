@@ -8,7 +8,7 @@ import {
   CONTENT_FORMAT_INFO,
   type ContentFormat,
 } from "@/lib/page-types";
-import type { StructuredSummary, ChangeEntry, Page } from "@/data";
+import type { ChangeEntry, Page } from "@/data";
 import { getRatioStatus } from "@/lib/coverage";
 import type { CoverageStatus } from "@/lib/coverage";
 import styles from "@/components/wiki/tooltip.module.css";
@@ -65,7 +65,6 @@ export interface PageStatusProps {
   importance?: number;
   researchImportance?: number;
   llmSummary?: string;
-  structuredSummary?: StructuredSummary;
   lastEdited?: string;
   updateFrequency?: number;
   evergreen?: boolean;
@@ -708,7 +707,6 @@ const statusIcons = {
 };
 
 function ContentCoverageSection({
-  structuredSummary,
   llmSummary,
   updateFrequency,
   hasEntity,
@@ -722,7 +720,6 @@ function ContentCoverageSection({
   factCount,
   coverage,
 }: {
-  structuredSummary?: StructuredSummary;
   llmSummary?: string;
   updateFrequency?: number;
   hasEntity?: boolean;
@@ -746,13 +743,6 @@ function ContentCoverageSection({
       present: !!llmSummary,
       hint: "crux content improve <id>",
       description: "Basic text summary used in search results, entity link tooltips, info boxes, and related page cards.",
-      anchor: "structured-summary",
-    },
-    {
-      label: "Structured summary",
-      present: !!structuredSummary,
-      hint: "crux content improve <id> --tier=standard",
-      description: "Rich summary with one-liner, key points, and bottom line. Shown in Key Takeaways and PageStatus.",
       anchor: "structured-summary",
     },
     {
@@ -1143,7 +1133,6 @@ export function PageStatus({
   importance,
   researchImportance,
   llmSummary,
-  structuredSummary,
   lastEdited,
   updateFrequency,
   evergreen,
@@ -1166,19 +1155,17 @@ export function PageStatus({
   coverage,
 }: PageStatusProps) {
   const detectedType = detectPageType(pathname || "", pageType);
-  const isATMPage = detectedType === "ai-transition-model";
 
   const hasEditorialContent =
     quality ||
     importance ||
     researchImportance ||
     llmSummary ||
-    structuredSummary ||
     lastEdited ||
     todo ||
     (todos && todos.length > 0) ||
     (changeHistory && changeHistory.length > 0);
-  if (!hasEditorialContent && !isATMPage) {
+  if (!hasEditorialContent) {
     return null;
   }
 
@@ -1247,28 +1234,8 @@ export function PageStatus({
         )}
       </div>
 
-      {/* Summary — structured if available, else flat llmSummary */}
-      {structuredSummary ? (
-        <div className="border-t border-border px-3.5 pt-2 pb-2.5">
-          <SectionHeader>Summary</SectionHeader>
-          <p className="m-0 mb-2 text-[13px] leading-relaxed text-foreground font-medium">
-            {structuredSummary.oneLiner}
-          </p>
-          <ul className="m-0 mb-2 pl-4 flex flex-col gap-0.5">
-            {structuredSummary.keyPoints.map((point, i) => (
-              <li key={i} className="text-[13px] leading-relaxed text-muted-foreground list-disc">
-                {point}
-              </li>
-            ))}
-          </ul>
-          <div className="flex items-start gap-1.5 rounded-md bg-indigo-500/[0.06] px-2.5 py-1.5 text-[13px] leading-relaxed text-foreground/90">
-            <span className="shrink-0 text-indigo-500 font-semibold text-[11px] uppercase tracking-wide mt-px">
-              Bottom line
-            </span>
-            <span>{structuredSummary.bottomLine}</span>
-          </div>
-        </div>
-      ) : llmSummary ? (
+      {/* Summary */}
+      {llmSummary ? (
         <div className="border-t border-border px-3.5 pt-2 pb-2.5">
           <SectionHeader>Summary</SectionHeader>
           <p className="m-0 text-[13px] leading-relaxed text-muted-foreground">
@@ -1279,7 +1246,6 @@ export function PageStatus({
 
       {/* Content — boolean chips + numeric metrics table */}
       <ContentCoverageSection
-        structuredSummary={structuredSummary}
         llmSummary={llmSummary}
         updateFrequency={updateFrequency}
         hasEntity={hasEntity}

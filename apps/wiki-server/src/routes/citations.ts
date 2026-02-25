@@ -18,6 +18,7 @@ import {
   MarkAccuracyBatchSchema as SharedMarkAccuracyBatchSchema,
   UpsertCitationContentSchema,
   CITATION_CONTENT_PREVIEW_MAX,
+  type CitationHealthResult,
 } from "../api-types.js";
 
 export const citationsRoute = new Hono();
@@ -94,6 +95,86 @@ function upsertQuote(
       updatedAt: citationQuotes.updatedAt,
     });
 }
+
+/**
+ * Compute per-page citation health from a set of quote rows.
+ * Shared between the /health/:pageId endpoint and batch aggregations.
+ */
+function computePageHealth(
+  pageId: string,
+  rows: Array<{
+    sourceQuote: string | null;
+    quoteVerified: boolean;
+    verificationScore: number | null;
+    accuracyVerdict: string | null;
+    accuracyScore: number | null;
+  }>
+): CitationHealthResult {
+  let withQuotes = 0;
+  let verified = 0;
+  let accuracyChecked = 0;
+  let accurate = 0;
+  let inaccurate = 0;
+  let unsupported = 0;
+  let minorIssues = 0;
+  let notVerifiable = 0;
+  let scoreSum = 0;
+  let scoreCount = 0;
+
+  for (const q of rows) {
+    if (q.sourceQuote != null) withQuotes++;
+    if (q.quoteVerified) verified++;
+    if (q.verificationScore != null) {
+      scoreSum += q.verificationScore;
+      scoreCount++;
+    }
+    if (q.accuracyVerdict != null) {
+      accuracyChecked++;
+      switch (q.accuracyVerdict) {
+        case "accurate": accurate++; break;
+        case "inaccurate": inaccurate++; break;
+        case "unsupported": unsupported++; break;
+        case "minor_issues": minorIssues++; break;
+        case "not_verifiable": notVerifiable++; break;
+      }
+    }
+  }
+
+  return {
+    pageId,
+    total: rows.length,
+    withQuotes,
+    verified,
+    accuracyChecked,
+    accurate,
+    inaccurate,
+    unsupported,
+    minorIssues,
+    notVerifiable,
+    avgScore: scoreCount > 0 ? Math.round((scoreSum / scoreCount) * 100) / 100 : null,
+  };
+}
+
+// ---- GET /health/:pageId ----
+// Per-page citation health summary — used by the Next.js frontend.
+
+citationsRoute.get("/health/:pageId", async (c) => {
+  const pageId = c.req.param("pageId");
+  const db = getDrizzleDb();
+
+  const rows = await db
+    .select({
+      sourceQuote: citationQuotes.sourceQuote,
+      quoteVerified: citationQuotes.quoteVerified,
+      verificationScore: citationQuotes.verificationScore,
+      accuracyVerdict: citationQuotes.accuracyVerdict,
+      accuracyScore: citationQuotes.accuracyScore,
+    })
+    .from(citationQuotes)
+    .where(eq(citationQuotes.pageId, pageId));
+
+  return c.json(computePageHealth(pageId, rows));
+});
 
 // ---- POST /quotes/upsert ----
 
@@ -457,6 +538,7 @@ citationsRoute.post("/content/upsert", async (c) => {
 
   const vals = {
     url: d.url,
+    resourceId: d.resourceId ?? null,
     fetchedAt: new Date(d.fetchedAt),
     httpStatus: d.httpStatus ?? null,
     contentType: d.contentType ?? null,
@@ -900,5 +982,76 @@ citationsRoute.get("/content/stats", async (c) => {
     okCount: Number(r.okCount),
     deadCount: Number(r.deadCount),
     avgContentLength: r.avgContentLength != null ? Math.round(Number(r.avgContentLength)) : null,
+  });
+});
+
+// ---- POST /content/link-resources ----
+// Batch-links citation_content rows to their matching resources by URL.
+// This bridges the gap between fetched content (URL-keyed) and curated resources (ID-keyed).
+
+citationsRoute.post("/content/link-resources", async (c) => {
+  const db = getDrizzleDb();
+
+  // Find all citation_content rows that have no resource_id
+  // and match a resource by URL.
+  const result = await db.execute(sql`
+    UPDATE citation_content cc
+    SET resource_id = r.id
+    FROM resources r
+    WHERE cc.url = r.url
+      AND cc.resource_id IS NULL
+  `);
+
+  const linked = Number((result as any).count ?? 0);
+  return c.json({ linked });
+});
+
+// ---- GET /quotes-by-url?url=X ----
+// Returns all citation quotes across all pages for a given source URL.
+// Used by resource pages to show cross-page citations.
+
+citationsRoute.get("/quotes-by-url", async (c) => {
+  const url = c.req.query("url");
+  if (!url) return validationError(c, "url query parameter is required");
+
+  const limitParam = c.req.query("limit");
+  const limit = limitParam
+    ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500)
+    : 100;
+
+  const db = getDrizzleDb();
+  const rows = await db
+    .select()
+    .from(citationQuotes)
+    .where(eq(citationQuotes.url, url))
+    .orderBy(asc(citationQuotes.pageId), asc(citationQuotes.footnote))
+    .limit(limit);
+
+  // Also get aggregate stats
+  const stats = await db
+    .select({
+      totalPages: sql<number>`count(distinct ${citationQuotes.pageId})`,
+      totalQuotes: count(),
+      verified: sql<number>`count(case when ${citationQuotes.quoteVerified} = true then 1 end)`,
+      accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+      inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+      unsupported: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+      minorIssues: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
+    })
+    .from(citationQuotes)
+    .where(eq(citationQuotes.url, url));
+
+  const s = stats[0];
+  return c.json({
+    quotes: rows,
+    stats: {
+      totalPages: Number(s.totalPages),
+      totalQuotes: s.totalQuotes,
+      verified: Number(s.verified),
+      accurate: Number(s.accurate),
+      inaccurate: Number(s.inaccurate),
+      unsupported: Number(s.unsupported),
+      minorIssues: Number(s.minorIssues),
+    },
   });
 });

@@ -12,7 +12,7 @@ import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
 import { fetchFromWikiServer, withApiFallback, type WithSource } from "@lib/wiki-server";
-import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry } from "@wiki-server/api-types";
+import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry, CitationHealthResult } from "@wiki-server/api-types";
 import {
   TypedEntitySchema,
   type TypedEntity,
@@ -182,6 +182,8 @@ interface DatabaseShape {
   factUsage: Record<string, FactUsagePage[]>;
   /** Page → resource IDs mapping (computed at build time from inline <R>, cited_by, URL matching) */
   pageResources: Record<string, string[]>;
+  /** Footnote index: page → { footnotes, sources } for unified citation rendering */
+  footnoteIndex?: Record<string, FootnoteIndexEntry>;
   stats: Record<string, unknown>;
   /** Pre-computed update schedule items (staleness, priority, etc.) */
   updateSchedule?: Array<{
@@ -257,20 +259,15 @@ export function getTypedEntities(): AnyEntity[] {
     if (result.success) {
       entities.push(result.data);
     } else {
-      // Unknown entity types (ai-transition-model-*, etc.) — keep all fields as-is.
+      // Unknown entity types — keep all fields as-is.
       // Don't re-parse through GenericEntitySchema as Zod would strip extra keys
       // like content, currentAssessment, ratings, causeEffectGraph.
       if (isDev) {
         const id = (raw as Record<string, unknown>).id;
         const type = (raw as Record<string, unknown>).entityType as string;
-        // Suppress warnings for known catch-all types that intentionally skip
-        // the discriminated union (they carry extra fields Zod would strip).
-        const isCatchAll = typeof type === "string" && type.startsWith("ai-transition-model-");
-        if (!isCatchAll) {
-          console.warn(
-            `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
-          );
-        }
+        console.warn(
+          `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
+        );
       }
       entities.push(raw as unknown as GenericEntity);
     }
@@ -309,6 +306,28 @@ interface Entity {
   content?: unknown;
 }
 
+/** Single footnote entry in the footnoteIndex */
+export interface FootnoteEntry {
+  url: string | null;
+  title: string | null;
+  resourceId?: string;
+}
+
+/** Source group in the footnoteIndex — deduped by URL */
+export interface FootnoteSourceEntry {
+  url: string;
+  title: string;
+  domain: string;
+  footnoteNumbers: number[];
+  resourceId: string | null;
+}
+
+/** Per-page footnote index data */
+export interface FootnoteIndexEntry {
+  footnotes: Record<number, FootnoteEntry>;
+  sources: FootnoteSourceEntry[];
+}
+
 export interface Resource {
   id: string;
   url: string;
@@ -316,7 +335,14 @@ export interface Resource {
   authors?: string[];
   published_date?: string;
   type: string;
+  local_filename?: string;
+  importance?: number;
+  abstract?: string;
   summary?: string;
+  review?: string;
+  key_points?: string[];
+  cited_by?: string[] | null;
+  fetched_at?: string;
   tags?: string[];
   publication_id?: string;
   credibility_override?: number;
@@ -361,12 +387,6 @@ interface BacklinkEntry {
 
 export type ContentFormat = 'article' | 'table' | 'diagram' | 'index' | 'dashboard';
 
-export interface StructuredSummary {
-  oneLiner: string;
-  keyPoints: string[];
-  bottomLine: string;
-}
-
 export interface ChangeEntry {
   date: string;
   branch: string;
@@ -395,7 +415,6 @@ export interface Page {
   lastUpdated: string | null;
   dateCreated?: string | null;
   llmSummary: string | null;
-  structuredSummary: StructuredSummary | null;
   description: string | null;
   ratings: {
     novelty?: number;
@@ -592,10 +611,35 @@ export function getResourceById(id: string): Resource | undefined {
   return resourceIndex().get(id);
 }
 
+/** Get all resources */
+export function getAllResources(): Resource[] {
+  const db = getDatabase();
+  return db.resources ?? [];
+}
+
 /** Get resource IDs for a page (computed at build time from inline <R>, cited_by, URL matching) */
 export function getResourcesForPage(pageId: string): string[] {
   const db = getDatabase();
   return db.pageResources?.[resolveId(pageId)] ?? [];
+}
+
+/** Get page IDs that cite a given resource (reverse lookup of pageResources) */
+export function getPagesForResource(resourceId: string): string[] {
+  const db = getDatabase();
+  const pr = db.pageResources ?? {};
+  const pages: string[] = [];
+  for (const [pageId, ids] of Object.entries(pr)) {
+    if ((ids as string[]).includes(resourceId)) {
+      pages.push(pageId);
+    }
+  }
+  return pages;
+}
+
+/** Get footnote index data for a page (computed at build time from MDX footnotes) */
+export function getFootnoteIndex(pageId: string): FootnoteIndexEntry | undefined {
+  const db = getDatabase();
+  return db.footnoteIndex?.[resolveId(pageId)];
 }
 
 export function getPublicationById(id: string): Publication | undefined {
@@ -838,7 +882,6 @@ export interface PageCoverageItem {
   unconvertedLinkCount: number;
   // Boolean items
   llmSummary: boolean;
-  structuredSummary: boolean;
   schedule: boolean;
   entity: boolean;
   editHistory: boolean;
@@ -920,7 +963,6 @@ export function getPageCoverageItems(): PageCoverageItem[] {
       unconvertedLinkCount: page.unconvertedLinkCount ?? 0,
       // Booleans
       llmSummary: cov.items.llmSummary === "green",
-      structuredSummary: cov.items.structuredSummary === "green",
       schedule: cov.items.schedule === "green",
       entity: cov.items.entity === "green",
       editHistory: cov.items.editHistory === "green",
@@ -959,15 +1001,9 @@ export function getPageCoverageItems(): PageCoverageItem[] {
 
 export async function getPageCitationHealth(pageId: string) {
   const result = await withApiFallback(
-    () => fetchFromWikiServer<{
-      total: number;
-      withQuotes: number;
-      verified: number;
-      accuracyChecked: number;
-      accurate: number;
-      inaccurate: number;
-      avgScore: number | null;
-    }>(`/api/citations/health/${pageId}`),
+    () => fetchFromWikiServer<CitationHealthResult>(
+      `/api/citations/health/${encodeURIComponent(pageId)}`
+    ),
     () => {
       const page = getPageById(pageId);
       return page?.citationHealth ?? null;

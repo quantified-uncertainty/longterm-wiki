@@ -23,4 +23,4 @@ If `/agent-session-start` was run at session start and `.claude/wip-checklist.md
 
 If `/agent-session-start` was not run (e.g., a quick fix session), run `/agent-session-ready-PR` directly — it will generate a checklist on the fly if one doesn't exist, then walk through completion and shipping.
 
-As a bare minimum, always run `/push-and-ensure-green` before considering work complete.
+As a bare minimum, always open a PR before considering work complete.

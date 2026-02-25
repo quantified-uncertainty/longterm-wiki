@@ -20,11 +20,12 @@
  *   4. Full Next.js production build
  *
  * Flags:
- *   --full-gate    Force all checks, no triage (implies --no-triage)
+ *   --full-gate    Force all checks, no triage (implies --no-triage, --no-cache)
  *   --no-triage    Skip LLM triage call, run all checks
+ *   --no-cache     Ignore stamp cache, force full re-run
  *   --fix          Auto-fix escaping + markdown before validation
  *   --full         Include full Next.js production build
- *   --ci           JSON output for CI pipelines
+ *   --ci           JSON output for CI pipelines (implies --no-cache)
  *
  * Exit codes:
  *   0 = All checks passed
@@ -32,6 +33,8 @@
  */
 
 import { execSync, spawn, type ChildProcess } from 'child_process';
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
 import { categorizeFiles, canSkipBuildData, triageGateChecks, type TriageResult } from './gate-triage.ts';
@@ -41,6 +44,42 @@ const FIX_MODE: boolean = args.includes('--fix');
 const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
 const FULL_GATE: boolean = args.includes('--full-gate');
 const NO_TRIAGE: boolean = args.includes('--no-triage') || FULL_GATE || CI_MODE;
+const NO_CACHE: boolean = args.includes('--no-cache') || FULL_GATE || CI_MODE;
+
+// ── Stamp-based caching ──────────────────────────────────────────────────────
+// After a successful gate run, we write the HEAD commit hash + mode to a stamp
+// file inside .git/. On subsequent runs, if HEAD hasn't changed and the mode
+// is compatible, we skip the entire gate. This prevents re-running a ~5min
+// check suite on repeated push attempts for the same commit.
+
+const STAMP_FILE = join(PROJECT_ROOT, '.git', 'gate-stamp');
+
+function getHeadHash(): string {
+  try {
+    return execSync('git rev-parse HEAD', { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
+  } catch {
+    return '';
+  }
+}
+
+function readStamp(): { hash: string; mode: string } | null {
+  try {
+    const content = readFileSync(STAMP_FILE, 'utf-8').trim();
+    const [hash, mode] = content.split(' ');
+    if (hash && mode) return { hash, mode };
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function writeStamp(hash: string, mode: string): void {
+  try {
+    writeFileSync(STAMP_FILE, `${hash} ${mode}\n`);
+  } catch {
+    // Non-fatal: stamp write failure just means next push will re-run the gate
+  }
+}
 
 /**
  * Get the list of files changed on this branch vs main.
@@ -365,6 +404,24 @@ async function main(): Promise<void> {
   let triageResult: TriageResult | null = null;
   let skippedBuildData = false;
 
+  // ── Stamp cache check — skip gate if HEAD unchanged since last pass ────────
+  if (!NO_CACHE) {
+    const headHash = getHeadHash();
+    const stamp = readStamp();
+    if (headHash && stamp && stamp.hash === headHash) {
+      // A "full" stamp satisfies both full and fast requests.
+      // A "fast" stamp only satisfies fast requests.
+      const modeOk = stamp.mode === 'full' || !FULL_MODE;
+      if (modeOk) {
+        if (!CI_MODE) {
+          console.log(`\n${c.green}${c.bold}  ✅ Gate already passed for this commit${c.reset} ${c.dim}(${headHash.slice(0, 8)}, ${stamp.mode} mode)${c.reset}`);
+          console.log(`${c.dim}  Skipping re-run. Use --no-cache to force.${c.reset}\n`);
+        }
+        process.exit(0);
+      }
+    }
+  }
+
   // ── Phase 0: Triage — decide which checks to skip ─────────────────────────
   if (!NO_TRIAGE && changedFiles.length > 0) {
     const categories = categorizeFiles(changedFiles);
@@ -470,6 +527,13 @@ async function main(): Promise<void> {
   }
 
   printSummary(allResults, totalStart, skippedCount);
+
+  // Write stamp so subsequent pushes of the same commit skip the gate
+  const headHash = getHeadHash();
+  if (headHash) {
+    writeStamp(headHash, FULL_MODE ? 'full' : 'fast');
+  }
+
   process.exit(0);
 }
 

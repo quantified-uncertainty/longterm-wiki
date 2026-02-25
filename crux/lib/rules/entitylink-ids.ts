@@ -29,8 +29,8 @@ function pathStyleIdResolvesToFile(id: string): boolean {
   // Only applies to IDs that look like paths (contain /)
   if (!id.includes('/')) return false;
 
-  // Check both knowledge-base and ai-transition-model top-level dirs
-  const prefixes = ['knowledge-base', 'ai-transition-model'];
+  // Check knowledge-base top-level dir
+  const prefixes = ['knowledge-base'];
 
   for (const prefix of prefixes) {
     const possiblePaths = [
@@ -164,8 +164,7 @@ export const entityLinkIdsRule = createRule({
         const id = rawId;
         const inPathRegistry = engine.pathRegistry && (
           engine.pathRegistry[id] ||
-          engine.pathRegistry[`__index__/${id}`] ||
-          engine.pathRegistry[`__index__/ai-transition-model/factors/${id}`]
+          engine.pathRegistry[`__index__/${id}`]
         );
         const inEntities = engine.entities && (engine.entities as Record<string, unknown>)[id];
         const resolvesViaPath = pathStyleIdResolvesToFile(id);

@@ -11,7 +11,7 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { PageChangesSessions } from "./page-changes-sessions";
 import type { Metadata } from "next";
-import type { SessionEntry } from "@wiki-server/api-types";
+import type { SessionRow } from "@wiki-server/api-types";
 
 export const metadata: Metadata = {
   title: "Page Changes | Longterm Wiki Internal",
@@ -33,7 +33,7 @@ function extractPrNumber(prUrl: string | null): number | undefined {
  * Returns null if the server is unavailable.
  */
 async function loadSessionsFromApi() {
-  const result = await fetchDetailed<{ sessions: SessionEntry[] }>(
+  const result = await fetchDetailed<{ sessions: SessionRow[] }>(
     "/api/sessions/page-changes?limit=500",
     { revalidate: 300 }
   );

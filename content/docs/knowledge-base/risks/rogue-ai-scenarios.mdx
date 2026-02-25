@@ -333,18 +333,3 @@ Most AI safety work focuses on prevention—<EntityLink id="sandboxing">containm
 | 4 | Training process auditing | Training signal corruption | Technical: third-party monitoring of training dynamics; develop methods to detect feedback loops |
 | 5 | Sandbox formal verification | Sandbox escape | Technical: provably-correct containment for agentic systems; formal verification of permission boundaries |
 | 6 | Instrumental convergence empirics | Emergent self-preservation | Empirical: red-team testing for resource-seeking behavior in long-running agents; characterize conditions under which self-preservation emerges |
-
-## AI Transition Model Context
-
-These scenarios connect to several factors in the <EntityLink id="ai-transition-model" />:
-
-| Factor | Connection | Scenarios |
-|--------|-----------|-----------|
-| <EntityLink id="ai-takeover" /> | Pathways to loss of control | All five scenarios represent distinct pathways |
-| <EntityLink id="misalignment-potential" /> | Misalignment without explicit scheming | Self-preservation, training corruption |
-| <EntityLink id="alignment-robustness" /> | Alignment failures under optimization pressure | Training corruption, correlated failure |
-| <EntityLink id="human-oversight-quality" /> | Oversight degradation across delegation | Delegation chains, sandbox escape |
-
-[^1]: See research on algorithmic bias and fairness, including: Mehrabi et al., "A Survey on Bias and Fairness in Machine Learning" (ACM Computing Surveys, 2021); Buolamwini & Gebru, "Gender Shades: Intersectional Accuracy Disparities in Commercial Gender Classification" (2018). These document correlated failures in ML systems but focus on fairness rather than safety implications in agentic systems.
-
-[^2]: Michael J. D. Vermeer, "Evaluating Select Global Technical Options for Countering a Rogue AI," RAND Corporation, PE-A4361-1, November 2025. [https://www.rand.org/pubs/perspectives/PEA4361-1.html](https://www.rand.org/pubs/perspectives/PEA4361-1.html)

@@ -96,12 +96,11 @@ function deriveType(
   return "concept";
 }
 
-/** Base conditions shared by all queries (excludes stubs, schema, internal, ai-transition-model). */
+/** Base conditions shared by all queries (excludes stubs, schema, internal). */
 const BASE_CONDITIONS = `
   wp.word_count > 0
   AND wp.category != 'schema'
   AND wp.category != 'internal'
-  AND (wp.entity_type IS NULL OR wp.entity_type NOT LIKE 'ai-transition-model%')
 `;
 
 /** The derived type expression used for grouping and filtering. */
@@ -177,7 +176,7 @@ const SORT_COLUMNS: Record<string, string> = {
   researchImportance: "wp.research_importance",
   tacticalValue: "wp.tactical_value",
   recentlyEdited: "wp.last_updated",
-  recentlyCreated: "wp.date_created",
+  recentlyCreated: "CAST(SUBSTRING(wp.numeric_id FROM 2) AS INTEGER)",
   wordCount: "wp.word_count",
   title: "wp.title",
 };

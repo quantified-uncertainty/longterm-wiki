@@ -329,8 +329,6 @@
   relatedEntries:
     - id: compute-governance
       type: policy
-    - id: international-coordination
-      type: policy
   sources:
     - title: International Institutions for AI Safety
       url: https://www.governance.ai/research-papers/international-institutions-for-advanced-ai
@@ -993,18 +991,6 @@
       type: risk
     - id: redwood
       type: lab
-    - id: alignment-robustness
-      type: parameter
-      relationship: increases
-    - id: interpretability-coverage
-      type: parameter
-      relationship: increases
-    - id: safety-capability-gap
-      type: parameter
-      relationship: supports
-    - id: human-oversight-quality
-      type: parameter
-      relationship: increases
   sources:
     - title: Scaling Monosemanticity
       url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
@@ -1051,15 +1037,6 @@
       type: risk
     - id: corrigibility-failure
       type: risk
-    - id: human-oversight-quality
-      type: parameter
-      relationship: increases
-    - id: alignment-robustness
-      type: parameter
-      relationship: supports
-    - id: human-agency
-      type: parameter
-      relationship: supports
   sources:
     - title: AI Safety via Debate
       url: https://arxiv.org/abs/1805.00899
@@ -2156,8 +2133,6 @@
     - governance
     - community
   relatedEntries:
-    - id: tmc-technical-ai-safety
-      type: concept
     - id: coefficient-giving
       type: organization
     - id: responsible-scaling-policies
@@ -2575,8 +2550,6 @@
       type: policy
     - id: thresholds
       type: policy
-    - id: tmc-ai-governance
-      type: policy
     - id: openai
       type: organization
   lastUpdated: 2026-02
@@ -2766,8 +2739,6 @@
   relatedEntries:
     - id: coefficient-giving
       type: organization
-    - id: tmc-technical-ai-safety
-      type: concept
     - id: training-programs
       type: approach
     - id: intervention-portfolio
@@ -3570,8 +3541,6 @@
       type: risk
     - id: export-controls
       type: policy
-    - id: geopolitics
-      type: ai-transition-model-metric
   tags:
     - governance
     - legal-framework

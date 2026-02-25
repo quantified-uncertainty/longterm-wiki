@@ -9,6 +9,7 @@ import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { CitationAccuracyDashboard } from "./citation-accuracy-dashboard";
 import { VERDICT_COLORS } from "./verdict-colors";
 import type { Metadata } from "next";
+import type { AccuracyDashboardData } from "@wiki-server/api-types";
 
 export const metadata: Metadata = {
   title: "Citation Accuracy | Longterm Wiki Internal",
@@ -16,60 +17,11 @@ export const metadata: Metadata = {
     "Accuracy verification results for wiki citations: verdicts, flagged claims, and domain analysis.",
 };
 
-// Types matching the crux export format
-export interface DashboardData {
-  exportedAt: string;
-  summary: {
-    totalCitations: number;
-    checkedCitations: number;
-    accurateCitations: number;
-    inaccurateCitations: number;
-    unsupportedCitations: number;
-    minorIssueCitations: number;
-    uncheckedCitations: number;
-    averageScore: number | null;
-  };
-  verdictDistribution: Record<string, number>;
-  difficultyDistribution: Record<string, number>;
-  pages: PageSummary[];
-  flaggedCitations: FlaggedCitation[];
-  domainAnalysis: DomainSummary[];
-}
-
-export interface PageSummary {
-  pageId: string;
-  totalCitations: number;
-  checked: number;
-  accurate: number;
-  inaccurate: number;
-  unsupported: number;
-  minorIssues: number;
-  accuracyRate: number | null;
-  avgScore: number | null;
-}
-
-export interface FlaggedCitation {
-  pageId: string;
-  footnote: number;
-  claimText: string;
-  sourceTitle: string | null;
-  url: string | null;
-  verdict: string;
-  score: number | null;
-  issues: string | null;
-  difficulty: string | null;
-  checkedAt: string | null;
-}
-
-export interface DomainSummary {
-  domain: string;
-  totalCitations: number;
-  checked: number;
-  accurate: number;
-  inaccurate: number;
-  unsupported: number;
-  inaccuracyRate: number | null;
-}
+// Types from canonical api-types.ts
+export type DashboardData = AccuracyDashboardData;
+export type PageSummary = AccuracyDashboardData["pages"][number];
+export type FlaggedCitation = AccuracyDashboardData["flaggedCitations"][number];
+export type DomainSummary = AccuracyDashboardData["domainAnalysis"][number];
 
 /**
  * Try loading dashboard data from the wiki-server API (PostgreSQL source of truth).
