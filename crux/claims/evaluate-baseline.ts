@@ -27,7 +27,7 @@ import { getClaimsByEntity } from '../lib/wiki-server/claims.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 
-const LOG_DIR = '/tmp/claims-baseline';
+const BASE_LOG_DIR = '/tmp/claims-baseline';
 const DEFAULT_SAMPLE_SIZE = 15;
 
 interface ClaimEval {
@@ -238,12 +238,15 @@ export async function runEvaluation() {
   const c = getColors();
   const args = parseCliArgs(process.argv.slice(2));
   const fromLogs = args['from-logs'] === true;
+  const variantArg = typeof args.variant === 'string' ? args.variant : 'baseline';
   const sampleSize = typeof args['sample'] === 'string' ? parseInt(args['sample'], 10) || DEFAULT_SAMPLE_SIZE : DEFAULT_SAMPLE_SIZE;
+  const LOG_DIR = variantArg !== 'baseline' ? `${BASE_LOG_DIR}/${variantArg}` : BASE_LOG_DIR;
   const client = createClient();
   const allEvals: ClaimEval[] = [];
 
   const source = fromLogs ? 'dry-run logs' : 'database';
-  console.log(`\n${c.bold}${c.blue}Claims Extraction Quality Baseline${c.reset} (source: ${source}, sample: ${sampleSize}/page)\n`);
+  const variantLabel = variantArg !== 'baseline' ? ` [variant: ${variantArg}]` : '';
+  console.log(`\n${c.bold}${c.blue}Claims Extraction Quality Baseline${c.reset} (source: ${source}, sample: ${sampleSize}/page)${variantLabel}\n`);
 
   if (!fromLogs) {
     const serverOk = await isServerAvailable();
@@ -291,8 +294,9 @@ export async function runEvaluation() {
   }
 
   // Write raw results
-  mkdirSync(LOG_DIR, { recursive: true });
-  writeFileSync(join(LOG_DIR, 'evaluation-results.json'), JSON.stringify(allEvals, null, 2));
+  const outputDir = variantArg !== 'baseline' ? `${BASE_LOG_DIR}/${variantArg}` : BASE_LOG_DIR;
+  mkdirSync(outputDir, { recursive: true });
+  writeFileSync(join(outputDir, 'evaluation-results.json'), JSON.stringify(allEvals, null, 2));
 
   // Summary by page type
   console.log(`\n${c.bold}Summary by Page Type${c.reset}\n`);
@@ -362,7 +366,7 @@ export async function runEvaluation() {
     console.log();
   }
 
-  console.log(`\nResults: ${join(LOG_DIR, 'evaluation-results.json')}`);
+  console.log(`\nResults: ${join(outputDir, 'evaluation-results.json')}`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

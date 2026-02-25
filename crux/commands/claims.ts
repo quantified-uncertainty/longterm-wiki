@@ -17,7 +17,7 @@ const SCRIPTS = {
   extract: {
     script: 'claims/extract.ts',
     description: 'Extract atomic claims from a wiki page using LLM',
-    passthrough: ['dry-run', 'model'],
+    passthrough: ['dry-run', 'model', 'variant', 'page-type'],
     positional: true,
   },
   verify: {
@@ -53,7 +53,13 @@ const SCRIPTS = {
   'evaluate-baseline': {
     script: 'claims/evaluate-baseline.ts',
     description: 'Evaluate extraction quality baseline across test pages',
-    passthrough: ['from-logs', 'sample'],
+    passthrough: ['from-logs', 'sample', 'variant'],
+    positional: false,
+  },
+  'run-experiments': {
+    script: 'claims/run-experiments.ts',
+    description: 'Run Sprint 2 extraction experiments across all variants and pages',
+    passthrough: ['variant', 'evaluate-only', 'sample'],
     positional: false,
   },
   audit: {

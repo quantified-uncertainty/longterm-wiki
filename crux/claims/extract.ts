@@ -38,6 +38,7 @@ import {
 } from '../lib/wiki-server/claims.ts';
 import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../lib/claim-utils.ts';
 import type { ClaimTypeValue } from '../lib/claim-utils.ts';
+import { getVariantPrompt, VARIANT_NAMES, type VariantName, type PageType } from './experiment-variants.ts';
 
 // ---------------------------------------------------------------------------
 // MDX preprocessing — strip JSX components and get clean text
@@ -172,9 +173,9 @@ Rules:
 Respond ONLY with JSON:
 {"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "sourceQuote": "exact text from the wiki section", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
 
-async function extractClaimsFromSection(
+export async function extractClaimsFromSection(
   section: Section,
-  opts: { model?: string } = {},
+  opts: { model?: string; systemPrompt?: string } = {},
 ): Promise<ExtractedClaim[]> {
   const userPrompt = `SECTION: ${section.heading}
 
@@ -183,7 +184,7 @@ ${section.content}
 Extract atomic claims from this section. Return JSON only.`;
 
   try {
-    const raw = await callOpenRouter(EXTRACT_SYSTEM_PROMPT, userPrompt, {
+    const raw = await callOpenRouter(opts.systemPrompt ?? EXTRACT_SYSTEM_PROMPT, userPrompt, {
       model: opts.model ?? DEFAULT_CITATION_MODEL,
       maxTokens: 2500,
       title: 'LongtermWiki Claims Extraction',
@@ -243,6 +244,8 @@ async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const dryRun = args['dry-run'] === true;
   const model = typeof args.model === 'string' ? args.model : undefined;
+  const variantArg = typeof args.variant === 'string' ? args.variant : 'baseline';
+  const pageTypeArg = typeof args['page-type'] === 'string' ? args['page-type'] as PageType : undefined;
   const c = getColors(false);
   const positional = (args._positional as string[]) || [];
   const pageId = positional[0];
@@ -250,8 +253,19 @@ async function main() {
   if (!pageId) {
     console.error(`${c.red}Error: provide a page ID${c.reset}`);
     console.error(`  Usage: pnpm crux claims extract <page-id>`);
+    console.error(`  Variants: ${VARIANT_NAMES.join(', ')}`);
     process.exit(1);
   }
+
+  // Validate variant
+  if (!VARIANT_NAMES.includes(variantArg as VariantName)) {
+    console.error(`${c.red}Error: unknown variant "${variantArg}". Valid: ${VARIANT_NAMES.join(', ')}${c.reset}`);
+    process.exit(1);
+  }
+  const variant = variantArg as VariantName;
+
+  // Get variant system prompt
+  const systemPrompt = getVariantPrompt(variant, pageTypeArg);
 
   // Check server availability (unless dry-run)
   if (!dryRun) {
@@ -277,6 +291,12 @@ async function main() {
 
   console.log(`\n${c.bold}${c.blue}Claims Extract: ${pageId}${c.reset}\n`);
   console.log(`  Sections found: ${sections.length}`);
+  if (variant !== 'baseline') {
+    console.log(`  Variant: ${c.bold}${variant}${c.reset}${pageTypeArg ? ` (page-type: ${pageTypeArg})` : ''}`);
+  }
+  if (model) {
+    console.log(`  Model: ${model}`);
+  }
   if (dryRun) {
     console.log(`  ${c.yellow}DRY RUN — claims will not be stored${c.reset}`);
   }
@@ -287,7 +307,7 @@ async function main() {
 
   for (const section of sections) {
     process.stdout.write(`  ${c.dim}Extracting: ${section.heading.slice(0, 50)}...${c.reset}`);
-    const claims = await extractClaimsFromSection(section, { model });
+    const claims = await extractClaimsFromSection(section, { model, systemPrompt });
     allClaims.push(...claims.map(c => ({ ...c, section: section.heading })));
     console.log(` ${c.green}${claims.length} claims${c.reset}`);
   }
