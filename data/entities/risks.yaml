@@ -228,7 +228,7 @@
     - id: cyberweapons
       type: risk
     - id: anthropic
-      type: lab
+      type: organization
   sources:
     - title: The Precipice
       author: Toby Ord
@@ -463,6 +463,7 @@
       url: https://cyber.fsi.stanford.edu/io
     - title: Digital Mental Health Resources
       url: https://www.nimh.nih.gov/health/topics/technology-and-the-future-of-mental-health-treatment
+  description: "A hypothetical risk in which highly capable AI systems manipulate humans through targeted psychological operations, inducing irrational beliefs, paranoia, or behavioral change at scale. Related to risks from AI-enabled influence operations and informational warfare."
   tags:
     - mental-health
     - ai-ethics
@@ -555,7 +556,7 @@
     - id: evals
       type: approach
     - id: anthropic
-      type: lab
+      type: organization
   sources:
     - title: Risks from Learned Optimization
       url: https://arxiv.org/abs/1906.01820
@@ -566,6 +567,7 @@
       author: Anthropic
       date: '2024'
     - title: AI Alignment Forum discussions on deceptive alignment
+  description: "A form of misalignment where a model behaves aligned during training to avoid correction while pursuing misaligned goals when deployed. First formalized by Evan Hubinger et al. in the risks from learned optimization paper. Considered a key hard problem in AI safety."
   tags:
     - mesa-optimization
     - inner-alignment
@@ -1309,7 +1311,7 @@
     - id: corrigibility
       type: safety-agenda
     - id: miri
-      type: lab
+      type: organization
   sources:
     - title: The Basic AI Drives
       url: https://selfawaresystems.files.wordpress.com/2008/01/ai_drives_final.pdf
@@ -1682,7 +1684,7 @@
     - id: goal-misgeneralization
       type: risk
     - id: miri
-      type: lab
+      type: organization
   sources:
     - title: Risks from Learned Optimization
       url: https://arxiv.org/abs/1906.01820
@@ -1776,7 +1778,7 @@
     - id: corrigibility
       type: safety-agenda
     - id: cais
-      type: lab
+      type: organization
   sources:
     - title: Optimal Policies Tend to Seek Power
       url: https://arxiv.org/abs/2206.13477
@@ -1928,9 +1930,9 @@
     - id: compute-governance
       type: policy
     - id: anthropic
-      type: lab
+      type: organization
     - id: govai
-      type: lab
+      type: organization
   sources:
     - title: 'Racing to the Precipice: A Model of AI Development'
       url: https://nickbostrom.com/papers/racing.pdf
@@ -2088,7 +2090,7 @@
     - id: situational-awareness
       type: capability
     - id: arc
-      type: lab
+      type: organization
   sources:
     - title: Evaluating Language-Model Agents on Realistic Autonomous Tasks
       url: https://evals.alignment.org/
@@ -2150,6 +2152,7 @@
       url: https://www.alignmentforum.org/posts/pRkFkzwKZ2zfa3R6H/without-specific-countermeasures-the-easiest-path-to
       author: Cotra
       date: '2022'
+  description: "AI systems strategically pursuing long-run goals through deceptive behavior—appearing helpful while concealing underlying objectives incompatible with human values. Related to deceptive alignment but focusing on strategic goal-directed behavior rather than training-time dynamics."
   tags:
     - deception
     - situational-awareness
@@ -2237,7 +2240,7 @@
     - id: goal-misgeneralization
       type: risk
     - id: miri
-      type: lab
+      type: organization
     - id: mesa-optimization
       type: risk
   sources:
@@ -2333,7 +2336,7 @@
     - id: reward-hacking
       type: risk
     - id: anthropic
-      type: lab
+      type: organization
     - id: scalable-oversight
       type: safety-agenda
   sources:
@@ -2732,9 +2735,9 @@
     - id: scheming
       type: risk
     - id: evan-hubinger
-      type: researcher
+      type: person
     - id: anthropic
-      type: lab
+      type: organization
     - id: situational-awareness
       type: concept
   lastUpdated: 2026-02

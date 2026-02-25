@@ -10,7 +10,6 @@ readerImportance: 14
 researchImportance: 9.5
 lastEdited: "2026-02-17"
 update_frequency: 90
-evergreen: true
 llmSummary: "Internal documentation providing guidelines for creating minimal placeholder pages (stubs) in the knowledge base, including when to use them, required formatting, and when to convert them to full pages. Covers basic content structure and validation procedures."
 ratings:
   novelty: 0.5

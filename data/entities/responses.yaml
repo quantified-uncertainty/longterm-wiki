@@ -26,6 +26,7 @@
     - title: Seoul Declaration on AISI Network
       url: https://www.gov.uk/government/publications/seoul-declaration-for-safe-innovative-and-inclusive-ai
       author: Summit Participants
+  description: "Government-run institutions dedicated to evaluating frontier AI systems for dangerous capabilities and safety properties. Pioneered by the UK AISI in 2023, with analogues in the US (USAISI), EU, Japan, and others. Play a key role in pre-deployment evaluations and responsible scaling policy thresholds."
   lastUpdated: 2025-12
 - id: california-sb1047
   numericId: E48
@@ -212,7 +213,7 @@
       value: Emerging policy area
   relatedEntries:
     - id: govai
-      type: lab
+      type: organization
     - id: governance-policy
       type: approach
     - id: racing-dynamics
@@ -299,7 +300,7 @@
     - id: compute-governance
       type: policy
     - id: govai
-      type: lab
+      type: organization
   sources:
     - title: Computing Power and the Governance of AI
       url: https://www.governance.ai/research-papers/computing-power-and-the-governance-of-artificial-intelligence
@@ -361,7 +362,7 @@
     - id: uk-aisi
       type: policy
     - id: govai
-      type: lab
+      type: organization
   sources:
     - title: EU AI Act Full Text
       url: https://artificialintelligenceact.eu/
@@ -545,6 +546,7 @@
       url: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
       author: Google DeepMind
       date: May 2024
+  description: "Voluntary commitments by frontier AI labs to pause or restrict development when models exceed defined capability thresholds unless corresponding safety measures are in place. Pioneered by Anthropic's RSP and adopted in similar forms by OpenAI and Google DeepMind. Central to debates about binding vs. voluntary safety governance."
   lastUpdated: 2025-12
 - id: seoul-declaration
   numericId: E279
@@ -592,6 +594,7 @@
     - title: EU AI Act Standardisation
       url: https://digital-strategy.ec.europa.eu/en/policies/ai-standards
       author: European Commission
+  description: "International and national organizations that develop technical standards for AI systems, including measurement methodologies, safety requirements, and evaluation protocols. Key bodies include ISO/IEC JTC 1/SC 42, NIST, and IEEE, whose standards increasingly inform government AI regulation."
   lastUpdated: 2025-12
 - id: us-executive-order
   numericId: E366
@@ -684,9 +687,9 @@
     - id: international-summits
       type: policy
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
   sources:
     - title: 'White House Fact Sheet: Voluntary AI Commitments'
       url: >-
@@ -846,8 +849,8 @@
     - label: Key Research
       value: Redwood Research
   relatedEntries:
-    - id: redwood
-      type: lab
+    - id: redwood-research
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: scheming
@@ -892,7 +895,7 @@
       value: Active
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: interpretability
       type: safety-agenda
     - id: scalable-oversight
@@ -937,6 +940,7 @@
       type: risk
     - id: treacherous-turn
       type: risk
+  description: "The property of an AI system that allows it to be safely corrected, adjusted, or shut down by its operators. Highly corrigible systems defer to human judgment; the key research challenge is making corrigibility robust under capability scaling."
   tags:
     - shutdown-problem
     - ai-control
@@ -963,6 +967,7 @@
       type: risk
     - id: cyberweapons
       type: risk
+  description: "AI evaluation—systematic methods for measuring model capabilities, safety properties, and alignment. Includes capability evaluations (red-teaming, benchmarks), dangerous capability evaluations, and behavioral assessments used by frontier labs in their responsible scaling policies."
   tags:
     - benchmarks
     - red-teaming
@@ -978,7 +983,7 @@
       value: Anthropic, DeepMind
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: mesa-optimization
@@ -989,8 +994,8 @@
       type: risk
     - id: reward-hacking
       type: risk
-    - id: redwood
-      type: lab
+    - id: redwood-research
+      type: organization
   sources:
     - title: Scaling Monosemanticity
       url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
@@ -1024,9 +1029,9 @@
       value: Anthropic, OpenAI, DeepMind
   relatedEntries:
     - id: arc
-      type: lab
+      type: organization
     - id: deepmind
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: sycophancy
@@ -1529,11 +1534,11 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: apollo-research
-      type: lab
+      type: organization
     - id: responsible-scaling-policies
       type: policy
     - id: evaluation-awareness
@@ -1560,9 +1565,9 @@
     - governance
   relatedEntries:
     - id: apollo-research
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: eval-saturation
@@ -1589,9 +1594,9 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: reward-hacking
@@ -1619,11 +1624,11 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: metr
-      type: lab
+      type: organization
     - id: apollo-research
-      type: lab
+      type: organization
     - id: eval-saturation
       type: approach
     - id: evaluation-awareness
@@ -1648,11 +1653,11 @@
     - ai-safety
   relatedEntries:
     - id: apollo-research
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: scheming
@@ -1679,11 +1684,11 @@
     - governance
   relatedEntries:
     - id: metr
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: scheming
       type: risk
     - id: responsible-scaling-policies
@@ -1709,11 +1714,11 @@
     - governance
   relatedEntries:
     - id: metr
-      type: lab
+      type: organization
     - id: apollo-research
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: sandbagging
       type: risk
   lastUpdated: 2026-02
@@ -1737,13 +1742,13 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: deepmind
-      type: lab
+      type: organization
     - id: apollo-research
-      type: lab
+      type: organization
     - id: scheming
       type: risk
   lastUpdated: 2026-02
@@ -1767,7 +1772,7 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: scheming
@@ -1794,9 +1799,9 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: weak-to-strong
       type: approach
     - id: constitutional-ai
@@ -1822,9 +1827,9 @@
     - governance
   relatedEntries:
     - id: metr
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: scheming
@@ -1852,11 +1857,11 @@
     - governance
   relatedEntries:
     - id: apollo-research
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: scheming
       type: risk
     - id: deceptive-alignment
@@ -1882,11 +1887,11 @@
     - cyber
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: metr
-      type: lab
+      type: organization
     - id: responsible-scaling-policies
       type: policy
   lastUpdated: 2026-02
@@ -1910,9 +1915,9 @@
     - governance
   relatedEntries:
     - id: metr
-      type: lab
+      type: organization
     - id: apollo-research
-      type: lab
+      type: organization
     - id: eu-ai-act
       type: policy
     - id: scheming
@@ -1937,7 +1942,7 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: rlhf
       type: approach
     - id: alignment
@@ -1964,9 +1969,9 @@
     - ai-safety
   relatedEntries:
     - id: openai
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: rlhf
       type: approach
     - id: reward-hacking
@@ -1993,7 +1998,7 @@
     - ai-safety
   relatedEntries:
     - id: cais
-      type: lab
+      type: organization
     - id: representation-engineering
       type: approach
     - id: responsible-scaling-policies
@@ -2018,9 +2023,9 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: rlhf
       type: approach
     - id: reward-hacking
@@ -2045,7 +2050,7 @@
     - ai-safety
   relatedEntries:
     - id: openai
-      type: lab
+      type: organization
     - id: reward-hacking
       type: risk
     - id: rlhf
@@ -2073,9 +2078,9 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
     - id: rlhf
       type: approach
     - id: deceptive-alignment
@@ -2192,7 +2197,7 @@
     - id: fli
       type: organization
     - id: stuart-russell
-      type: researcher
+      type: person
     - id: racing-dynamics
       type: risk
     - id: pause
@@ -2772,7 +2777,7 @@
     - id: scheming
       type: risk
     - id: anthropic
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: circuit-breakers
@@ -2801,7 +2806,7 @@
     - id: refusal-training
       type: approach
     - id: anthropic
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: representation-engineering
@@ -2858,7 +2863,7 @@
     - id: deceptive-alignment
       type: risk
     - id: anthropic
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: eliciting-latent-knowledge
@@ -2914,9 +2919,9 @@
     - id: deceptive-alignment
       type: risk
     - id: anthropic
-      type: lab-frontier
+      type: organization
     - id: openai
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: formal-verification
@@ -3004,7 +3009,7 @@
     - id: metr
       type: organization
     - id: anthropic
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: structured-access
@@ -3031,9 +3036,9 @@
     - id: sandboxing
       type: approach
     - id: openai
-      type: lab-frontier
+      type: organization
     - id: anthropic
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: tool-restrictions
@@ -3064,9 +3069,9 @@
     - id: metr
       type: organization
     - id: anthropic
-      type: lab-frontier
+      type: organization
     - id: openai
-      type: lab-frontier
+      type: organization
   lastUpdated: 2026-02
 
 - id: multi-agent

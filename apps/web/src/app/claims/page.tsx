@@ -4,10 +4,14 @@ import { fetchFromWikiServer } from "@lib/wiki-server";
 import type { ClaimStatsResult } from "@wiki-server/api-types";
 import { StatCard } from "./components/stat-card";
 import { DistributionBar } from "./components/distribution-bar";
-import { fetchAllClaims } from "./components/claims-data";
+import {
+  fetchAllClaims,
+  collectEntitySlugs,
+  buildEntityNameMap,
+} from "./components/claims-data";
 
 export const metadata: Metadata = {
-  title: "Claims Explorer | Longterm Wiki",
+  title: "Claims Explorer",
   description:
     "Browse extracted claims across all wiki pages: categories, relationships, and verification status.",
 };
@@ -57,7 +61,10 @@ export default async function ClaimsOverviewPage() {
     .map(([entityId, data]) => ({ entityId, ...data }))
     .sort((a, b) => b.total - a.total);
 
-  // Build relationship counts
+  // Build entity name map for display
+  const entityNames = buildEntityNameMap(collectEntitySlugs(claims));
+
+  // Build relationship counts (skip self-referential)
   const pairCounts = new Map<
     string,
     { from: string; to: string; count: number; sample: string }
@@ -65,11 +72,14 @@ export default async function ClaimsOverviewPage() {
   for (const claim of claims) {
     if (!claim.relatedEntities || claim.relatedEntities.length === 0) continue;
     for (const related of claim.relatedEntities) {
-      const pair = [claim.entityId, related].sort().join(" <-> ");
+      const normalizedRel = related.toLowerCase();
+      if (normalizedRel === claim.entityId) continue;
+      const [a, b] = [claim.entityId, normalizedRel].sort();
+      const pair = `${a} <-> ${b}`;
       if (!pairCounts.has(pair)) {
         pairCounts.set(pair, {
-          from: claim.entityId,
-          to: related,
+          from: a,
+          to: b,
           count: 0,
           sample: claim.claimText.slice(0, 80),
         });
@@ -98,18 +108,17 @@ export default async function ClaimsOverviewPage() {
       </p>
 
       {/* Global stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-8">
         <StatCard label="Total Claims" value={stats.total} />
         <StatCard label="Entities" value={entityRows.length} />
         <StatCard label="Multi-Entity" value={stats.multiEntityClaims} />
-        <StatCard label="Fact-Linked" value={stats.factLinkedClaims} />
+        {stats.factLinkedClaims > 0 && (
+          <StatCard label="Fact-Linked" value={stats.factLinkedClaims} />
+        )}
         <StatCard label="Relationships" value={relationshipRows.length} />
-        <StatCard
-          label="Categorized"
-          value={
-            stats.total - (stats.byClaimCategory["uncategorized"] ?? 0)
-          }
-        />
+        {(stats.numericClaims ?? 0) > 0 && (
+          <StatCard label="Numeric" value={stats.numericClaims ?? 0} />
+        )}
       </div>
 
       {/* Category distribution */}
@@ -127,27 +136,48 @@ export default async function ClaimsOverviewPage() {
         <DistributionBar data={stats.byClaimType} total={stats.total} />
       </div>
 
+      {/* Mode distribution (Phase 2) */}
+      {stats.byClaimMode && Object.keys(stats.byClaimMode).length > 0 && (
+        <div className="rounded-lg border p-4 mb-6">
+          <h3 className="text-sm font-semibold mb-3">Epistemic Mode</h3>
+          <DistributionBar data={stats.byClaimMode} total={stats.total} />
+          <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
+            {stats.attributedClaims !== undefined && (
+              <span>
+                <span className="font-medium text-amber-700">
+                  {stats.attributedClaims}
+                </span>{" "}
+                attributed (reported speech)
+              </span>
+            )}
+            {stats.withSourcesClaims !== undefined && (
+              <span>
+                <span className="font-medium text-blue-700">
+                  {stats.withSourcesClaims}
+                </span>{" "}
+                with structured sources
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Top entities */}
       <div className="rounded-lg border p-4 mb-6">
         <h3 className="text-sm font-semibold mb-3">Top Entities by Claims</h3>
         <div className="space-y-2">
-          {entityRows.slice(0, 10).map((row) => {
-            const verifiedPct =
-              row.total > 0
-                ? Math.round((row.verified / row.total) * 100)
-                : 0;
-            return (
+          {entityRows.slice(0, 10).map((row) => (
               <div key={row.entityId} className="flex items-center gap-3">
                 <Link
                   href={`/claims/entity/${row.entityId}`}
-                  className="font-mono text-sm text-blue-600 hover:underline w-40 truncate"
+                  className="text-sm text-blue-600 hover:underline w-40 truncate"
                 >
-                  {row.entityId}
+                  {entityNames[row.entityId] ?? row.entityId}
                 </Link>
                 <div className="flex-1 flex items-center gap-2">
                   <div className="flex-1 h-4 bg-gray-100 rounded overflow-hidden">
                     <div
-                      className="h-full bg-green-400 rounded-l"
+                      className="h-full bg-blue-400 rounded-l"
                       style={{
                         width: `${(row.total / entityRows[0].total) * 100}%`,
                       }}
@@ -156,9 +186,6 @@ export default async function ClaimsOverviewPage() {
                   <span className="text-xs tabular-nums w-8 text-right">
                     {row.total}
                   </span>
-                  <span className="text-[10px] text-muted-foreground w-14 text-right tabular-nums">
-                    {verifiedPct}% verified
-                  </span>
                 </div>
                 {row.multiEntity > 0 && (
                   <span className="text-[10px] text-teal-600 whitespace-nowrap">
@@ -166,8 +193,8 @@ export default async function ClaimsOverviewPage() {
                   </span>
                 )}
               </div>
-            );
-          })}
+            )
+          )}
         </div>
       </div>
 
@@ -188,18 +215,18 @@ export default async function ClaimsOverviewPage() {
               <div key={i} className="flex items-center gap-2 text-sm">
                 <Link
                   href={`/claims/entity/${rel.from}`}
-                  className="font-mono text-blue-600 hover:underline text-xs"
+                  className="text-blue-600 hover:underline text-xs"
                 >
-                  {rel.from}
+                  {entityNames[rel.from] ?? rel.from}
                 </Link>
                 <span className="text-muted-foreground text-xs">
                   &harr;
                 </span>
                 <Link
                   href={`/claims/entity/${rel.to}`}
-                  className="font-mono text-blue-600 hover:underline text-xs"
+                  className="text-blue-600 hover:underline text-xs"
                 >
-                  {rel.to}
+                  {entityNames[rel.to] ?? rel.to}
                 </Link>
                 <span className="tabular-nums font-medium text-xs ml-auto">
                   {rel.count}

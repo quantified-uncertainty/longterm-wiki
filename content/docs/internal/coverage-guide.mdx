@@ -9,7 +9,6 @@ quality: 40
 readerImportance: 10
 researchImportance: 5
 lastEdited: "2026-02-23"
-evergreen: true
 ---
 
 The **Content** checklist in PageStatus tracks content enrichment layers that a page can have. Pages with more layers are better sourced, more useful, and easier to maintain. This guide explains each layer.
@@ -31,11 +30,11 @@ pnpm crux content improve <page-id> --tier=standard --apply
 
 ## Update Schedule
 
-The `updateFrequency` frontmatter field (in days) that says how often a page should be reviewed. Drives the overdue tracking system on the `/internal/updates` dashboard.
+The `update_frequency` frontmatter field (in days) that says how often a page should be reviewed. Drives the overdue tracking system on the `/internal/updates` dashboard.
 
 **Why it matters:** Prevents pages from going stale. Fast-moving topics (LLM capabilities, policy developments) need frequent updates; evergreen topics (historical events) need less.
 
-**How to add:** Set `updateFrequency: N` in the page's frontmatter, where N is the number of days between reviews. Common values: 21 (3 weeks), 60 (bimonthly), 90 (quarterly), 180 (biannual).
+**How to add:** Set `update_frequency: N` in the page's frontmatter, where N is the number of days between reviews. Common values: 21 (3 weeks), 60 (bimonthly), 90 (quarterly), 180 (biannual).
 
 ## Entity Data
 

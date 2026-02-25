@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ReactFlow,
@@ -74,9 +75,11 @@ function layoutGraph(
 function NetworkGraphInner({
   nodes: rawNodes,
   edges: rawEdges,
+  entityNames = {},
 }: {
   nodes: NetworkNode[];
   edges: NetworkEdge[];
+  entityNames?: Record<string, string>;
 }) {
   const router = useRouter();
 
@@ -87,7 +90,7 @@ function NetworkGraphInner({
       id: n.entityId,
       type: "entity",
       position: { x: 0, y: 0 },
-      data: { label: n.entityId, claimCount: n.claimCount },
+      data: { label: entityNames[n.entityId] ?? n.entityId, claimCount: n.claimCount },
     }));
 
     const flowEdges: Edge[] = rawEdges.map((e, i) => ({
@@ -114,7 +117,7 @@ function NetworkGraphInner({
   );
 
   return (
-    <div className="w-full h-[600px] border rounded-lg bg-gray-50">
+    <div className="w-full h-[600px] border rounded-lg bg-gray-50 overflow-hidden">
       <ReactFlow
         nodes={flowNodes}
         edges={flowEdges}
@@ -139,22 +142,35 @@ function NetworkGraphInner({
 export function NetworkGraph({
   nodes,
   edges,
+  entityNames = {},
 }: {
   nodes: NetworkNode[];
   edges: NetworkEdge[];
+  entityNames?: Record<string, string>;
 }) {
   if (nodes.length === 0) {
     return (
-      <div className="border rounded-lg p-8 text-center text-muted-foreground">
-        No network data available. Claims need <code>relatedEntities</code>{" "}
-        data to build the network graph.
+      <div className="border rounded-lg p-8 text-center space-y-3">
+        <p className="text-muted-foreground font-medium">
+          No network data available
+        </p>
+        <p className="text-sm text-muted-foreground">
+          The network graph requires claims with <code className="text-xs bg-muted px-1 py-0.5 rounded">relatedEntities</code> data
+          to build connections between entities. Claims are populated when you
+          run <code className="text-xs bg-muted px-1 py-0.5 rounded">pnpm crux claims extract &lt;entity&gt;</code>.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Try <Link href="/claims/explore" className="text-blue-600 hover:underline">browsing claims</Link> to
+          check if any claims exist, or <Link href="/claims/relationships" className="text-blue-600 hover:underline">view relationships</Link> for
+          a table-based view of entity connections.
+        </p>
       </div>
     );
   }
 
   return (
     <ReactFlowProvider>
-      <NetworkGraphInner nodes={nodes} edges={edges} />
+      <NetworkGraphInner nodes={nodes} edges={edges} entityNames={entityNames} />
     </ReactFlowProvider>
   );
 }
