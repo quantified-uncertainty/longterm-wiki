@@ -78,7 +78,7 @@
     - state-policy
     - frontier-models
     - liability
-    - compute-thresholds
+    - thresholds
     - california
     - political-strategy
   lastUpdated: 2025-12
@@ -247,104 +247,12 @@
     provides a tractable way to govern AI before models are built.
   tags:
     - export-controls
-    - compute-thresholds
+    - thresholds
     - know-your-customer
     - hardware-governance
     - international
     - semiconductors
     - cloud-computing
-  lastUpdated: 2025-12
-- id: compute-thresholds
-  numericId: E67
-  type: policy
-  summaryPage: governance-overview
-  title: Compute Thresholds
-  customFields:
-    - label: Approach
-      value: Define capability boundaries via compute
-    - label: Status
-      value: Established in US and EU policy
-  relatedEntries:
-    - id: compute-governance
-      type: policy
-    - id: eu-ai-act
-      type: policy
-    - id: ai-executive-order
-      type: policy
-  sources:
-    - title: EU AI Act GPAI Thresholds
-      url: https://artificialintelligenceact.eu/
-    - title: US Executive Order Compute Thresholds
-      url: >-
-        https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
-  description: >-
-    Compute thresholds define capability boundaries using training compute (measured in FLOP) as a proxy. The EU AI Act
-    uses 10^25 FLOP for GPAI obligations; the US Executive Order uses 10^26 FLOP for reporting requirements. These
-    thresholds aim to capture frontier models while minimizing regulatory burden on smaller systems.
-  tags:
-    - compute-governance
-    - regulation
-    - flop-thresholds
-  lastUpdated: 2025-12
-- id: compute-monitoring
-  numericId: E66
-  type: policy
-  summaryPage: governance-overview
-  title: Compute Monitoring
-  customFields:
-    - label: Approach
-      value: Track compute usage to detect dangerous training
-    - label: Status
-      value: Proposed, limited implementation
-  relatedEntries:
-    - id: compute-governance
-      type: policy
-    - id: govai
-      type: organization
-  sources:
-    - title: Computing Power and the Governance of AI
-      url: https://www.governance.ai/research-papers/computing-power-and-the-governance-of-artificial-intelligence
-      author: Heim et al.
-    - title: Secure Governable Chips
-      url: https://arxiv.org/abs/2303.11341
-  description: >-
-    Compute monitoring involves tracking how computational resources are used to detect unauthorized or dangerous AI
-    training runs. Approaches include know-your-customer requirements for cloud providers, hardware-based monitoring,
-    and training run detection algorithms. Raises privacy and implementation challenges.
-  tags:
-    - compute-governance
-    - monitoring
-    - kyc
-    - cloud-computing
-  lastUpdated: 2025-12
-- id: international-compute-regimes
-  numericId: E170
-  type: policy
-  summaryPage: governance-overview
-  title: International Compute Regimes
-  customFields:
-    - label: Approach
-      value: Coordinate compute governance globally
-    - label: Status
-      value: Early discussions, no formal regime
-  relatedEntries:
-    - id: compute-governance
-      type: policy
-  sources:
-    - title: International Institutions for AI Safety
-      url: https://www.governance.ai/research-papers/international-institutions-for-advanced-ai
-      author: GovAI
-    - title: IAEA Model for AI Governance
-      url: https://www.governance.ai/research
-  description: >-
-    International compute regimes would coordinate compute governance across borders. Proposals include IAEA-like
-    inspection bodies, multilateral export control agreements, and international compute monitoring frameworks. Faces
-    challenges of verification, sovereignty concerns, and China-US competition.
-  tags:
-    - compute-governance
-    - international
-    - coordination
-    - iaea-model
   lastUpdated: 2025-12
 - id: eu-ai-act
   numericId: E127
@@ -378,7 +286,7 @@
     - gpai
     - foundation-models
     - risk-based-regulation
-    - compute-thresholds
+    - thresholds
   lastUpdated: 2025-12
 - id: export-controls
   numericId: E136
@@ -638,7 +546,7 @@
     30, 2023, is the most comprehensive US government action on AI to date. It establishes safety requirements for
     frontier AI systems, mandates government agency actions, and creates oversight mechanisms.
   tags:
-    - compute-thresholds
+    - thresholds
     - governance
     - us-aisi
     - cloud-computing
@@ -801,43 +709,6 @@
     - media-literacy
     - content-authentication
     - information-security
-  lastUpdated: 2025-12
-- id: pause-advocacy
-  numericId: E221
-  type: approach
-  title: Pause Advocacy
-  customFields:
-    - label: Approach
-      value: Advocate for slowing or pausing frontier AI development
-    - label: Tractability
-      value: Low (major political/economic barriers)
-    - label: Key Organizations
-      value: Future of Life Institute, Pause AI
-  relatedEntries:
-    - id: racing-dynamics
-      type: risk
-    - id: deceptive-alignment
-      type: risk
-    - id: treacherous-turn
-      type: risk
-    - id: lock-in
-      type: risk
-    - id: compute-governance
-      type: policy
-  sources:
-    - title: 'Pause Giant AI Experiments: An Open Letter'
-      url: https://futureoflife.org/open-letter/pause-giant-ai-experiments/
-      author: Future of Life Institute
-      date: '2023'
-  description: >
-    Pause advocacy involves advocating for slowing down or pausing the development of frontier AI systems until safety
-    can be ensured. The core theory of change is that buying time allows safety research to catch up with capabilities,
-    enables governance frameworks to mature, and reduces the probability of deploying systems we cannot control.
-  tags:
-    - governance
-    - policy
-    - racing-dynamics
-    - coordination
   lastUpdated: 2025-12
 - id: ai-control
   numericId: E6
@@ -2300,7 +2171,7 @@
     targeting 10^26 FLOP threshold is implementable now via three major providers controlling 60%+
     of cloud infrastructure, while hardware-level governance faces 3-5 year development timelines.
   tags:
-    - compute-monitoring
+    - monitoring
     - cloud-kyc
     - compute-governance
     - training-runs
@@ -2329,7 +2200,7 @@
     challenges including algorithmic efficiency improvements that may render static thresholds
     obsolete within 3-5 years.
   tags:
-    - compute-thresholds
+    - thresholds
     - regulation
     - eu-ai-act
     - flop-thresholds
@@ -2388,7 +2259,7 @@
     place. Analysis suggests 15-40% probability of meaningful policy implementation by 2030, with
     potential to provide 2-5 years of additional safety research time if achieved.
   tags:
-    - pause-advocacy
+    - pause
     - development-moratorium
     - political-advocacy
     - public-opinion
@@ -2571,7 +2442,7 @@
   tags:
     - model-registration
     - governance-infrastructure
-    - compute-thresholds
+    - thresholds
     - incident-reporting
     - transparency
   clusters:

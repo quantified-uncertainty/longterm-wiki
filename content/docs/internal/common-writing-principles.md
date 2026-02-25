@@ -4,7 +4,6 @@ title: "Common Writing Principles"
 description: "Cross-cutting writing standards that apply to all content types. Covers epistemic honesty, language neutrality, and analytical tone."
 sidebar:
   order: 9
-entityType: internal
 quality: 0
 readerImportance: 73.5
 researchImportance: 71

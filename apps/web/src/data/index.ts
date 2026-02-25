@@ -22,6 +22,7 @@ import {
   isOrganization,
   isPolicy,
 } from "./entity-schemas";
+import type { ValidSubcategory } from "./valid-subcategories";
 
 // database.json is generated here by prebuild
 const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
@@ -423,7 +424,7 @@ export interface Page {
     completeness?: number;
   } | null;
   category: string;
-  subcategory?: string | null;
+  subcategory?: ValidSubcategory | null;
   tags?: string[];
   clusters?: string[];
   updateFrequency?: number | null;
@@ -856,7 +857,7 @@ export interface PageCoverageItem {
   wordCount: number;
   category: string;
   entityType: string | null;
-  subcategory: string | null;
+  subcategory: ValidSubcategory | null;
   // Coverage score
   score: number;      // passing count
   total: number;      // total items (13)
