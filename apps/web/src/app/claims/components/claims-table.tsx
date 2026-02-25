@@ -165,7 +165,7 @@ const columns: ColumnDef<ClaimRow>[] = [
     cell: ({ row }) => (
       <button
         type="button"
-        onClick={() => row.toggleExpanded()}
+        onClick={(e) => { e.stopPropagation(); row.toggleExpanded(); }}
         className="p-0.5 text-muted-foreground hover:text-foreground cursor-pointer"
       >
         {row.getIsExpanded() ? (
@@ -176,6 +176,20 @@ const columns: ColumnDef<ClaimRow>[] = [
       </button>
     ),
     size: 30,
+  },
+  {
+    id: "claimId",
+    header: "#",
+    cell: ({ row }) => (
+      <Link
+        href={`/claims/claim/${row.original.id}`}
+        className="font-mono text-[10px] text-muted-foreground hover:text-blue-600 hover:underline"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {row.original.id}
+      </Link>
+    ),
+    size: 40,
   },
   {
     accessorKey: "entityId",

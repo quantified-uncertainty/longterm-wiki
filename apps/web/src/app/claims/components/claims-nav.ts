@@ -9,9 +9,13 @@ interface PaginatedClaimsResponse {
   offset: number;
 }
 
+/** Max entities shown in sidebar before truncating with a "Browse all" link */
+const MAX_SIDEBAR_ENTITIES = 20;
+
 /**
  * Build sidebar navigation for the Claims Explorer section.
  * Fetches entity list from the wiki-server API to populate the Entities section.
+ * Entities are sorted by claim count (descending) so the most active appear first.
  */
 export async function getClaimsNav(): Promise<NavSection[]> {
   const sections: NavSection[] = [
@@ -34,17 +38,33 @@ export async function getClaimsNav(): Promise<NavSection[]> {
   );
 
   if (result) {
-    const entityIds = [
-      ...new Set(result.claims.map((c) => c.entityId)),
-    ].sort();
+    // Count claims per entity and sort by count descending
+    const entityCounts = new Map<string, number>();
+    for (const c of result.claims) {
+      entityCounts.set(c.entityId, (entityCounts.get(c.entityId) ?? 0) + 1);
+    }
 
-    if (entityIds.length > 0) {
+    const sorted = [...entityCounts.entries()]
+      .sort((a, b) => b[1] - a[1]);
+
+    if (sorted.length > 0) {
+      const displayed = sorted.slice(0, MAX_SIDEBAR_ENTITIES);
+      const items = displayed.map(([id, count]) => ({
+        label: `${id} (${count})`,
+        href: `/claims/entity/${id}`,
+      }));
+
+      // If there are more entities than the cap, add a "Browse all" link
+      if (sorted.length > MAX_SIDEBAR_ENTITIES) {
+        items.push({
+          label: `Browse all ${sorted.length} entities...`,
+          href: "/claims/explore",
+        });
+      }
+
       sections.push({
-        title: "Entities",
-        items: entityIds.map((id) => ({
-          label: id,
-          href: `/claims/entity/${id}`,
-        })),
+        title: `Entities (${sorted.length})`,
+        items,
       });
     }
   }
