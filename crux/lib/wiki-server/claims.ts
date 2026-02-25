@@ -113,3 +113,21 @@ export async function clearClaimsForEntity(
   );
 }
 
+/**
+ * Delete only the claims for a specific entity+section pair.
+ * Used by resource ingestion --force to re-ingest one resource without
+ * clobbering claims from page extraction or other resources.
+ */
+export async function clearClaimsBySection(
+  entityId: string,
+  section: string,
+): Promise<ApiResult<ClearClaimsResult>> {
+  return apiRequest<ClearClaimsResult>(
+    'POST',
+    '/api/claims/clear-by-section',
+    { entityId, section },
+    undefined,
+    'content',
+  );
+}
+

@@ -15,6 +15,7 @@ import {
   InsertClaimSchema as SharedInsertClaimSchema,
   InsertClaimBatchSchema,
   ClearClaimsSchema,
+  ClearClaimsBySectionSchema,
 } from "../api-types.js";
 
 export const claimsRoute = new Hono();
@@ -271,6 +272,31 @@ claimsRoute.post("/clear", async (c) => {
   const deleted = await db
     .delete(claims)
     .where(eq(claims.entityId, parsed.data.entityId))
+    .returning({ id: claims.id });
+
+  return c.json({ deleted: deleted.length });
+});
+
+// ---- POST /clear-by-section (delete only claims matching entity+section) ----
+// Used by resource ingestion --force to re-ingest a single resource without
+// clobbering claims from page extraction or other resources.
+
+claimsRoute.post("/clear-by-section", async (c) => {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = ClearClaimsBySectionSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const db = getDrizzleDb();
+  const deleted = await db
+    .delete(claims)
+    .where(
+      and(
+        eq(claims.entityId, parsed.data.entityId),
+        eq(claims.section, parsed.data.section)
+      )
+    )
     .returning({ id: claims.id });
 
   return c.json({ deleted: deleted.length });
