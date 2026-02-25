@@ -26,7 +26,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // ---- INSERT INTO claims ----
   if (q.includes("insert into") && q.includes('"claims"')) {
     const now = new Date();
-    const PARAMS_PER_ROW = 8;
+    // Count parameters per row: 8 original + 6 enhanced columns = 14
+    const PARAMS_PER_ROW = 14;
     const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
     const results: Record<string, unknown>[] = [];
 
@@ -43,6 +44,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         unit: params[off + 5],
         confidence: params[off + 6],
         source_quote: params[off + 7],
+        // Enhanced fields (migration 0028)
+        claim_category: params[off + 8],
+        related_entities: params[off + 9],
+        fact_id: params[off + 10],
+        resource_ids: params[off + 11],
+        section: params[off + 12],
+        footnote_refs: params[off + 13],
         created_at: now,
         updated_at: now,
       };
@@ -99,6 +107,52 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .sort((a, b) => b.count - a.count);
   }
 
+  // ---- SELECT count(*) FROM claims with GROUP BY claim_category ----
+  if (
+    q.includes("count(*)") &&
+    q.includes('"claims"') &&
+    q.includes("group by") &&
+    q.includes("claim_category")
+  ) {
+    const counts: Record<string, number> = {};
+    for (const r of claimStore.values()) {
+      const t = (r.claim_category as string) ?? "uncategorized";
+      counts[t] = (counts[t] || 0) + 1;
+    }
+    return Object.entries(counts)
+      .map(([claim_category, count]) => ({ claim_category, count }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  // ---- SELECT count(*) FROM claims WHERE related_entities IS NOT NULL (multi-entity) ----
+  if (
+    q.includes("count(*)") &&
+    q.includes('"claims"') &&
+    q.includes("related_entities") &&
+    q.includes("is not null")
+  ) {
+    let count = 0;
+    for (const r of claimStore.values()) {
+      const re = r.related_entities;
+      if (re && Array.isArray(re) && re.length > 0) count++;
+    }
+    return [{ count }];
+  }
+
+  // ---- SELECT count(*) FROM claims WHERE fact_id IS NOT NULL ----
+  if (
+    q.includes("count(*)") &&
+    q.includes('"claims"') &&
+    q.includes("fact_id") &&
+    q.includes("is not null")
+  ) {
+    let count = 0;
+    for (const r of claimStore.values()) {
+      if (r.fact_id) count++;
+    }
+    return [{ count }];
+  }
+
   // ---- SELECT count(*) FROM claims (no GROUP BY, with optional WHERE) ----
   if (
     q.includes("count(*)") &&
@@ -125,25 +179,29 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ count: claimStore.size }];
   }
 
-  // ---- SELECT ... FROM claims WHERE entity_id = $1 (by-entity) ----
+  // ---- SELECT ... FROM claims WHERE entity_id = $1 OR related_entities @> ... (by-entity) ----
   if (
     q.includes('"claims"') &&
     q.includes("where") &&
-    q.includes("order by")
+    q.includes("order by") &&
+    (q.includes('"entity_id"') || q.includes("related_entities"))
   ) {
-    const whereClause = q.split("where")[1] || "";
-    if (whereClause.includes('"entity_id"')) {
-      const entityId = params[0] as string;
-      return Array.from(claimStore.values())
-        .filter((r) => r.entity_id === entityId)
-        .sort((a, b) => {
-          const typeCompare = (a.claim_type as string).localeCompare(
-            b.claim_type as string
-          );
-          if (typeCompare !== 0) return typeCompare;
-          return (a.id as number) - (b.id as number);
-        });
-    }
+    const entityId = params[0] as string;
+    return Array.from(claimStore.values())
+      .filter((r) => {
+        if (r.entity_id === entityId) return true;
+        // Check relatedEntities JSONB array
+        const re = r.related_entities;
+        if (Array.isArray(re) && re.includes(entityId)) return true;
+        return false;
+      })
+      .sort((a, b) => {
+        const typeCompare = (a.claim_type as string).localeCompare(
+          b.claim_type as string
+        );
+        if (typeCompare !== 0) return typeCompare;
+        return (a.id as number) - (b.id as number);
+      });
   }
 
   // ---- SELECT ... FROM claims WHERE id = $1 (get by ID) ----
