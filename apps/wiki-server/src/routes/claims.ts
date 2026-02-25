@@ -34,6 +34,11 @@ const PaginationQuery = z.object({
   entityType: z.string().max(100).optional(),
   claimType: z.string().max(100).optional(),
   claimCategory: z.string().max(100).optional(),
+  search: z.string().max(500).optional(),
+  confidence: z.string().max(50).optional(),
+  entityId: z.string().max(200).optional(),
+  multiEntity: z.coerce.boolean().optional(),
+  sort: z.enum(["newest", "entity", "confidence"]).optional(),
 });
 
 const DeleteByEntitySchema = ClearClaimsSchema;
@@ -265,13 +270,20 @@ claimsRoute.get("/all", async (c) => {
   const parsed = PaginationQuery.safeParse(c.req.query());
   if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const { limit, offset, entityType, claimType, claimCategory } = parsed.data;
+  const {
+    limit, offset, entityType, claimType, claimCategory,
+    search, confidence, entityId, multiEntity, sort,
+  } = parsed.data;
   const db = getDrizzleDb();
 
   const conditions = [];
   if (entityType) conditions.push(eq(claims.entityType, entityType));
   if (claimType) conditions.push(eq(claims.claimType, claimType));
   if (claimCategory) conditions.push(eq(claims.claimCategory, claimCategory));
+  if (search) conditions.push(sql`${claims.claimText} ILIKE ${"%" + search + "%"}`);
+  if (confidence) conditions.push(eq(claims.confidence, confidence));
+  if (entityId) conditions.push(eq(claims.entityId, entityId));
+  if (multiEntity) conditions.push(sql`${claims.relatedEntities} IS NOT NULL AND jsonb_array_length(${claims.relatedEntities}) > 0`);
 
   const whereClause =
     conditions.length > 0
@@ -280,11 +292,17 @@ claimsRoute.get("/all", async (c) => {
         : and(...conditions)
       : undefined;
 
+  const orderBy =
+    sort === "newest" ? desc(claims.id)
+    : sort === "entity" ? asc(claims.entityId)
+    : sort === "confidence" ? asc(claims.confidence)
+    : asc(claims.id);
+
   const rows = await db
     .select()
     .from(claims)
     .where(whereClause)
-    .orderBy(asc(claims.id))
+    .orderBy(orderBy)
     .limit(limit)
     .offset(offset);
 
@@ -300,6 +318,90 @@ claimsRoute.get("/all", async (c) => {
     limit,
     offset,
   });
+});
+
+// ---- GET /relationships (entity-pair relationships) ----
+
+claimsRoute.get("/relationships", async (c) => {
+  const db = getDrizzleDb();
+  const rows = await db
+    .select()
+    .from(claims)
+    .where(
+      sql`${claims.relatedEntities} IS NOT NULL AND jsonb_array_length(${claims.relatedEntities}) > 0`
+    );
+
+  const pairMap = new Map<
+    string,
+    { entityA: string; entityB: string; claimCount: number; sampleClaims: string[] }
+  >();
+
+  for (const row of rows) {
+    const related = row.relatedEntities as string[] | null;
+    if (!related) continue;
+    for (const rel of related) {
+      const [a, b] = [row.entityId, rel].sort();
+      const key = `${a}|||${b}`;
+      if (!pairMap.has(key)) {
+        pairMap.set(key, { entityA: a, entityB: b, claimCount: 0, sampleClaims: [] });
+      }
+      const entry = pairMap.get(key)!;
+      entry.claimCount++;
+      if (entry.sampleClaims.length < 3) {
+        entry.sampleClaims.push(row.claimText.slice(0, 150));
+      }
+    }
+  }
+
+  const relationships = [...pairMap.values()].sort((a, b) => b.claimCount - a.claimCount);
+  return c.json({ relationships });
+});
+
+// ---- GET /network (graph-ready node/edge data) ----
+
+claimsRoute.get("/network", async (c) => {
+  const db = getDrizzleDb();
+
+  const entityCounts = await db
+    .select({ entityId: claims.entityId, count: count() })
+    .from(claims)
+    .groupBy(claims.entityId);
+
+  const rows = await db
+    .select()
+    .from(claims)
+    .where(
+      sql`${claims.relatedEntities} IS NOT NULL AND jsonb_array_length(${claims.relatedEntities}) > 0`
+    );
+
+  const edgeMap = new Map<string, { source: string; target: string; weight: number }>();
+  const nodeIds = new Set<string>();
+
+  for (const row of rows) {
+    nodeIds.add(row.entityId);
+    const related = row.relatedEntities as string[] | null;
+    if (!related) continue;
+    for (const rel of related) {
+      nodeIds.add(rel);
+      const [source, target] = [row.entityId, rel].sort();
+      const key = `${source}|||${target}`;
+      if (!edgeMap.has(key)) {
+        edgeMap.set(key, { source, target, weight: 0 });
+      }
+      edgeMap.get(key)!.weight++;
+    }
+  }
+
+  const countMap = Object.fromEntries(
+    entityCounts.map((r) => [r.entityId, r.count])
+  );
+  const nodes = [...nodeIds].map((id) => ({
+    entityId: id,
+    claimCount: countMap[id] ?? 0,
+  }));
+  const edges = [...edgeMap.values()].sort((a, b) => b.weight - a.weight);
+
+  return c.json({ nodes, edges });
 });
 
 // ---- GET /:id (get by ID) ----
