@@ -13,16 +13,16 @@ describe("search", () => {
   });
 
   describe("searchWiki", () => {
-    it("returns ok:true with empty results for empty query", async () => {
+    it("returns empty array for empty query", async () => {
       const { searchWiki } = await import("../search");
-      const result = await searchWiki("");
-      expect(result).toEqual({ ok: true, results: [] });
+      const results = await searchWiki("");
+      expect(results).toEqual([]);
     });
 
-    it("returns ok:true with empty results for whitespace-only query", async () => {
+    it("returns empty array for whitespace-only query", async () => {
       const { searchWiki } = await import("../search");
-      const result = await searchWiki("   ");
-      expect(result).toEqual({ ok: true, results: [] });
+      const results = await searchWiki("   ");
+      expect(results).toEqual([]);
     });
 
     it("uses server search when available", async () => {
@@ -49,16 +49,14 @@ describe("search", () => {
       );
 
       const { searchWiki } = await import("../search");
-      const result = await searchWiki("miri");
+      const results = await searchWiki("miri");
 
-      expect(result.ok).toBe(true);
-      if (!result.ok) throw new Error("expected ok");
-      expect(result.results).toHaveLength(1);
-      expect(result.results[0].id).toBe("miri");
-      expect(result.results[0].title).toBe("MIRI");
-      expect(result.results[0].type).toBe("organization");
-      expect(result.results[0].terms).toEqual(["miri"]);
-      expect(result.results[0].match).toHaveProperty("miri");
+      expect(results).toHaveLength(1);
+      expect(results[0].id).toBe("miri");
+      expect(results[0].title).toBe("MIRI");
+      expect(results[0].type).toBe("organization");
+      expect(results[0].terms).toEqual(["miri"]);
+      expect(results[0].match).toHaveProperty("miri");
 
       // Should have called /api/search
       expect(global.fetch).toHaveBeenCalledWith(
@@ -67,25 +65,25 @@ describe("search", () => {
       );
     });
 
-    it("returns ok:false when server returns error", async () => {
+    it("returns empty array when server returns error", async () => {
       global.fetch = vi.fn().mockResolvedValueOnce(
         new Response(JSON.stringify({ error: "unavailable" }), { status: 503 }),
       );
 
       const { searchWiki } = await import("../search");
-      const result = await searchWiki("miri");
+      const results = await searchWiki("miri");
 
-      expect(result).toEqual({ ok: false, error: "unavailable" });
+      expect(results).toEqual([]);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
-    it("returns ok:false when server fetch throws", async () => {
+    it("returns empty array when server fetch throws", async () => {
       global.fetch = vi.fn().mockRejectedValueOnce(new Error("Network error"));
 
       const { searchWiki } = await import("../search");
-      const result = await searchWiki("miri");
+      const results = await searchWiki("miri");
 
-      expect(result).toEqual({ ok: false, error: "unavailable" });
+      expect(results).toEqual([]);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
@@ -113,17 +111,15 @@ describe("search", () => {
       );
 
       const { searchWiki } = await import("../search");
-      const result = await searchWiki("test xyz");
+      const results = await searchWiki("test xyz");
 
-      expect(result.ok).toBe(true);
-      if (!result.ok) throw new Error("expected ok");
-      expect(result.results[0].terms).toEqual(["test", "xyz"]);
+      expect(results[0].terms).toEqual(["test", "xyz"]);
       // "test" appears in both title and description
-      expect(result.results[0].match["test"]).toEqual(
+      expect(results[0].match["test"]).toEqual(
         expect.arrayContaining(["title", "description"]),
       );
       // "xyz" doesn't appear in title or description, falls back to both
-      expect(result.results[0].match["xyz"]).toEqual(["title", "description"]);
+      expect(results[0].match["xyz"]).toEqual(["title", "description"]);
     });
 
     it("passes through server snippet when present", async () => {
@@ -151,12 +147,10 @@ describe("search", () => {
       );
 
       const { searchWiki } = await import("../search");
-      const result = await searchWiki("amodei");
+      const results = await searchWiki("amodei");
 
-      expect(result.ok).toBe(true);
-      if (!result.ok) throw new Error("expected ok");
-      expect(result.results).toHaveLength(1);
-      expect(result.results[0].snippet).toBe(
+      expect(results).toHaveLength(1);
+      expect(results[0].snippet).toBe(
         "AI safety company founded by Dario <mark>Amodei</mark>",
       );
     });
@@ -186,11 +180,9 @@ describe("search", () => {
       );
 
       const { searchWiki } = await import("../search");
-      const result = await searchWiki("test");
+      const results = await searchWiki("test");
 
-      expect(result.ok).toBe(true);
-      if (!result.ok) throw new Error("expected ok");
-      expect(result.results[0].snippet).toBeUndefined();
+      expect(results[0].snippet).toBeUndefined();
     });
   });
 });

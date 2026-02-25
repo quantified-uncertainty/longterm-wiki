@@ -2,8 +2,7 @@
  * Client-side Search
  *
  * Uses server-side PostgreSQL full-text search via /api/search proxy.
- * Distinguishes between "no results found" and "search unavailable" so callers
- * can show appropriate messaging.
+ * If the server is unreachable, returns an empty result set with an error flag.
  */
 
 export interface SearchDoc {
@@ -52,7 +51,7 @@ interface ServerSearchResponse {
 
 /**
  * Search via the server-side PostgreSQL FTS proxy.
- * Returns null on network/timeout failure (distinct from empty results).
+ * Returns null if the server is unavailable.
  */
 async function searchServer(
   query: string,
@@ -61,7 +60,7 @@ async function searchServer(
   try {
     const url = `/api/search?q=${encodeURIComponent(query)}&limit=${limit}`;
     const res = await fetch(url, {
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(4000),
     });
 
     if (!res.ok) return null;
@@ -105,22 +104,16 @@ async function searchServer(
 // Public API
 // ---------------------------------------------------------------------------
 
-export type SearchWikiResult =
-  | { ok: true; results: SearchResult[] }
-  | { ok: false; error: "unavailable" };
-
 /**
  * Search the wiki via server-side PostgreSQL FTS.
- * Returns { ok: false, error: "unavailable" } when the server times out or
- * errors — callers can distinguish this from genuine "no results found".
+ * Returns an empty array if the server is unreachable.
  */
 export async function searchWiki(
   query: string,
   limit = 20,
-): Promise<SearchWikiResult> {
-  if (!query.trim()) return { ok: true, results: [] };
+): Promise<SearchResult[]> {
+  if (!query.trim()) return [];
 
   const results = await searchServer(query, limit);
-  if (results === null) return { ok: false, error: "unavailable" };
-  return { ok: true, results };
+  return results ?? [];
 }
