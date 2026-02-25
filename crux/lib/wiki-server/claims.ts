@@ -12,7 +12,9 @@ import type {
   InsertClaimBatchResult,
   ClearClaimsResult,
   ClaimRow,
+  ClaimSourceRow,
   GetClaimsResult,
+  ClaimStatsResult,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -25,7 +27,15 @@ export type InsertClaimItem = InsertClaim;
 // Types — response (re-exported from canonical api-types.ts)
 // ---------------------------------------------------------------------------
 
-export type { InsertClaimResult, InsertClaimBatchResult, ClearClaimsResult, ClaimRow, GetClaimsResult };
+export type {
+  InsertClaimResult,
+  InsertClaimBatchResult,
+  ClearClaimsResult,
+  ClaimRow,
+  ClaimSourceRow,
+  GetClaimsResult,
+  ClaimStatsResult,
+};
 
 // ---------------------------------------------------------------------------
 // API functions
@@ -33,11 +43,44 @@ export type { InsertClaimResult, InsertClaimBatchResult, ClearClaimsResult, Clai
 
 export async function getClaimsByEntity(
   entityId: string,
+  options?: { includeSources?: boolean },
 ): Promise<ApiResult<GetClaimsResult>> {
+  const params = options?.includeSources ? '?includeSources=true' : '';
   return apiRequest<GetClaimsResult>(
     'GET',
-    `/api/claims/by-entity/${encodeURIComponent(entityId)}`,
+    `/api/claims/by-entity/${encodeURIComponent(entityId)}${params}`,
   );
+}
+
+export async function getClaimSources(
+  claimId: number,
+): Promise<ApiResult<{ sources: ClaimSourceRow[] }>> {
+  return apiRequest<{ sources: ClaimSourceRow[] }>(
+    'GET',
+    `/api/claims/${claimId}/sources`,
+  );
+}
+
+export async function addClaimSource(
+  claimId: number,
+  source: {
+    resourceId?: string | null;
+    url?: string | null;
+    sourceQuote?: string | null;
+    isPrimary?: boolean;
+  },
+): Promise<ApiResult<ClaimSourceRow>> {
+  return apiRequest<ClaimSourceRow>(
+    'POST',
+    `/api/claims/${claimId}/sources`,
+    source,
+    undefined,
+    'content',
+  );
+}
+
+export async function getClaimStats(): Promise<ApiResult<ClaimStatsResult>> {
+  return apiRequest<ClaimStatsResult>('GET', '/api/claims/stats');
 }
 
 export async function insertClaim(

@@ -679,6 +679,9 @@ export const ClaimTypeSchema = z.enum([
 ]);
 export type ClaimType = z.infer<typeof ClaimTypeSchema>;
 
+export const ClaimModeSchema = z.enum(["endorsed", "attributed"]);
+export type ClaimMode = z.infer<typeof ClaimModeSchema>;
+
 export const InsertClaimSchema = z.object({
   entityId: z.string().min(1).max(300),
   entityType: z.string().min(1).max(100),
@@ -689,13 +692,28 @@ export const InsertClaimSchema = z.object({
   unit: z.string().max(100).nullable().optional(),
   confidence: z.string().max(100).nullable().optional(),
   sourceQuote: z.string().max(10000).nullable().optional(),
-  // Enhanced fields
+  // Enhanced fields (migration 0028)
   claimCategory: ClaimCategorySchema.nullable().optional(),
   relatedEntities: z.array(z.string().max(300)).nullable().optional(),
   factId: z.string().max(300).nullable().optional(),
   resourceIds: z.array(z.string().max(300)).nullable().optional(),
   section: z.string().max(1000).nullable().optional(),
   footnoteRefs: z.string().max(500).nullable().optional(),
+  // Phase 2 fields (migration 0029)
+  claimMode: ClaimModeSchema.nullable().optional(),
+  attributedTo: z.string().max(300).nullable().optional(),
+  asOf: z.string().max(20).nullable().optional(), // YYYY-MM or YYYY-MM-DD
+  measure: z.string().max(200).nullable().optional(),
+  valueNumeric: z.number().nullable().optional(),
+  valueLow: z.number().nullable().optional(),
+  valueHigh: z.number().nullable().optional(),
+  // Inline sources — optional list of sources to create in claim_sources table
+  sources: z.array(z.object({
+    resourceId: z.string().max(300).nullable().optional(),
+    url: z.string().max(2000).nullable().optional(),
+    sourceQuote: z.string().max(10000).nullable().optional(),
+    isPrimary: z.boolean().optional(),
+  })).nullable().optional(),
 });
 export type InsertClaim = z.infer<typeof InsertClaimSchema>;
 
@@ -709,6 +727,16 @@ export const ClearClaimsSchema = z.object({
 
 // -- Claims: Response types ---------------------------------------------------
 
+export interface ClaimSourceRow {
+  id: number;
+  claimId: number;
+  resourceId: string | null;
+  url: string | null;
+  sourceQuote: string | null;
+  isPrimary: boolean;
+  addedAt: string;
+}
+
 export interface ClaimRow {
   id: number;
   entityId: string;
@@ -719,13 +747,22 @@ export interface ClaimRow {
   unit: string | null;
   confidence: string | null;
   sourceQuote: string | null;
-  // Enhanced fields
+  // Enhanced fields (migration 0028)
   claimCategory: string | null;
   relatedEntities: string[] | null;
   factId: string | null;
   resourceIds: string[] | null;
   section: string | null;
   footnoteRefs: string | null;
+  // Phase 2 fields (migration 0029)
+  claimMode: string | null;       // 'endorsed' | 'attributed'
+  attributedTo: string | null;    // entity_id of person/org making claim
+  asOf: string | null;            // YYYY-MM or YYYY-MM-DD
+  measure: string | null;         // measure ID from facts taxonomy
+  valueNumeric: number | null;    // central numeric value
+  valueLow: number | null;        // lower bound
+  valueHigh: number | null;       // upper bound
+  sources: ClaimSourceRow[];      // populated when ?includeSources=true
   createdAt: string;
   updatedAt: string;
 }
@@ -754,8 +791,11 @@ export interface ClaimStatsResult {
   byClaimType: Record<string, number>;
   byEntityType: Record<string, number>;
   byClaimCategory: Record<string, number>;
+  byClaimMode: Record<string, number>;
   multiEntityClaims: number;
   factLinkedClaims: number;
+  withSourcesClaims: number;
+  attributedClaims: number;
 }
 
 // ---------------------------------------------------------------------------
