@@ -257,6 +257,7 @@ export function getInternalNav(): NavSection[] {
         { label: "GitHub Issues", href: "/internal/github-issues" },
         { label: "Agent Sessions", href: "/internal/agent-sessions" },
         { label: "Citation Accuracy", href: "/internal/citation-accuracy" },
+        { label: "Resources", href: "/internal/resources" },
         { label: "Citation Content", href: "/internal/citation-content" },
         { label: "Pages", href: "/internal/page-coverage" },
         { label: "Hallucination Risk", href: "/internal/hallucination-risk" },

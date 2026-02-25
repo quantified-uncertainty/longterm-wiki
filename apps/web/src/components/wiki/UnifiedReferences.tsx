@@ -121,6 +121,33 @@ function BackRefs({ numbers }: { numbers: number[] }) {
   );
 }
 
+/** Compact dot showing whether resource content has been fetched */
+function FetchStatusDot({ resource }: { resource: Resource | null }) {
+  if (!resource) return null;
+  if (resource.local_filename) {
+    return (
+      <span
+        className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 ml-1 align-middle"
+        title={`Full text fetched${resource.fetched_at ? ` on ${resource.fetched_at.slice(0, 10)}` : ""}`}
+      />
+    );
+  }
+  if (resource.fetched_at) {
+    return (
+      <span
+        className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 ml-1 align-middle"
+        title={`Metadata only — fetched ${resource.fetched_at.slice(0, 10)}`}
+      />
+    );
+  }
+  return (
+    <span
+      className="inline-block w-1.5 h-1.5 rounded-full bg-red-400/50 ml-1 align-middle"
+      title="Not fetched"
+    />
+  );
+}
+
 function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
   const { resource, index, credibility, publicationName, peerReviewed, url, title, footnoteNumbers, rawText } = entry;
   const year = resource?.published_date?.slice(0, 4);
@@ -207,6 +234,7 @@ function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
             {title}
           </span>
         )}
+        <FetchStatusDot resource={resource} />
         {url && <ReferenceCitationDot url={url} />}
         {metaParts.length > 0 && (
           <span className="text-xs text-muted-foreground ml-1.5">

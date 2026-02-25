@@ -204,6 +204,20 @@
       "when": 1771901800000,
       "tag": "0025_search_improvements",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1771901900000,
+      "tag": "0026_citation_content_resource_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1771902000000,
+      "tag": "0027_resource_indexes",
+      "breakpoints": true
     }
   ]
 }

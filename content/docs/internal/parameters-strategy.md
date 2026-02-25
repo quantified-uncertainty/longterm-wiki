@@ -95,7 +95,7 @@ lastEdited: "2025-12-28"
 ---
 import {DataInfoBox, Mermaid, R} from '@components/wiki';
 
-{/* Replace with actual entity ID, e.g.: <DataInfoBox entityId="alignment-robustness" /> */}
+{/* Replace with actual entity ID, e.g.:  */}
 
 ## Overview
 
