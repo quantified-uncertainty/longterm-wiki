@@ -695,9 +695,9 @@ describe('checklist catalog integrity', () => {
     }
   });
 
-  it('catalog has exactly 48 items (update this when adding/removing items)', () => {
+  it('catalog has exactly 49 items (update this when adding/removing items)', () => {
     // This test locks in the expected catalog size. If you add or remove items,
     // update this count AND the comment on the CHECKLIST_ITEMS declaration.
-    expect(CHECKLIST_ITEMS.length).toBe(48);
+    expect(CHECKLIST_ITEMS.length).toBe(49);
   });
 });
