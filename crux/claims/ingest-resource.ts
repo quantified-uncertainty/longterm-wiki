@@ -30,7 +30,7 @@ import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
+import { callOpenRouter, stripCodeFences, parseJsonWithRepair, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
   insertClaimBatch,
@@ -184,7 +184,7 @@ export async function extractClaimsForEntity(
     });
 
     const json = stripCodeFences(raw);
-    const parsed = JSON.parse(json) as { claims?: unknown[] };
+    const parsed = parseJsonWithRepair<{ claims?: unknown[] }>(json);
 
     if (!Array.isArray(parsed.claims)) return [];
 

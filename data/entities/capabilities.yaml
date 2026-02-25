@@ -60,6 +60,7 @@
       url: https://arxiv.org/abs/2203.07814
     - title: GitHub Copilot Research
       url: https://github.blog/category/research/
+  description: "The ability of AI systems to write, analyze, debug, and generate software code across multiple programming languages and problem domains. Coding capability has advanced significantly, with frontier models now able to solve complex programming challenges, contribute to real codebases, and automate software development workflows."
   tags:
     - software-engineering
     - code-generation
@@ -229,6 +230,7 @@
       type: risk
     - id: scalable-oversight
       type: safety-agenda
+  description: "Reinforcement Learning from Human Feedback (RLHF) is a training technique that fine-tunes AI models using human preference ratings to align outputs with human values and intentions. Pioneered at OpenAI and Anthropic, RLHF became a core component of instruction-following models and is central to debates about scalability of alignment techniques."
   tags:
     - training
     - human-feedback

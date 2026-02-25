@@ -32,7 +32,7 @@ The claims system is architecturally ambitious (see <EntityLink id="claims-archi
 
 | Component | Status | Maturity |
 |---|---|---|
-| **Claim extraction from pages** | Working (Gemini Flash) | Low — quality varies wildly by page type |
+| **Claim extraction from pages** | Working (Gemini Flash) | Moderate — 100% accuracy, 84% usefulness (Sprint 1 baseline) |
 | **Claim verification** | Working | Low — most claims permanently `unverified` |
 | **Schema (Phase 2)** | PR #1048 open | Adds `claim_mode`, `as_of`, numeric values, `claim_sources` join table |
 | **Resource ingestion (Phase 3)** | PR #1048 open | `ingest-resource` and `ingest-batch` commands built, untested at scale |
@@ -44,7 +44,7 @@ The claims system is architecturally ambitious (see <EntityLink id="claims-archi
 **Pages with claims today:** \~5-10 pages, Kalshi is the exemplar (192 claims, 37 sources, inline verification).
 
 **Known quality issues:**
-- Extraction quality is excellent on dense factual content (Kalshi), poor on person pages (\~60% useful) and conceptual pages (\~40-50% useful)
+- Extraction accuracy is 100% but usefulness drops on concept pages (69%) and person pages (78-86%)
 - The `endorsed` vs `attributed` distinction is untested at scale
 - Deduplication doesn't exist — same claim appears as separate records on multiple pages
 - Resource ingestion entity routing is untested
@@ -181,6 +181,73 @@ For each page:
 - *"Manual labeling is subjective."* True, but we need the calibration data. Have two people label a subset independently to measure inter-rater agreement. If agreement is \<70%, the labeling criteria are too vague.
 - *"10 pages isn't enough."* It's enough to identify systematic failure patterns. If extraction fails on 3/3 person pages, that's a clear signal. Statistical precision can come later.
 - *"This delays building things."* That's the point. Building on top of bad extraction wastes more time than measuring first.
+
+---
+
+### Sprint 1 Results (Feb 25, 2026)
+
+**Extraction was run on all 10 test pages, producing 1,665 total claims:**
+
+| Page | Type | Claims Extracted |
+|---|---|---|
+| Kalshi | commercial-org | 200 |
+| Anthropic | major-org | 227 |
+| MIRI | research-org | 121 |
+| Redwood Research | research-org | 95 |
+| Dario Amodei | person-prominent | 171 |
+| Stuart Russell | person-academic | 248 |
+| Neel Nanda | person-researcher | 62 |
+| Paul Christiano | person-researcher | 103 |
+| RLHF | concept | 233 |
+| Interpretability | concept | 205 |
+
+**Extraction failures:** 10 sections across all pages failed with JSON parse errors from Gemini Flash (bad escaped characters, unterminated strings). This represents a ~3% section failure rate.
+
+**Evaluation:** 77 claims were evaluated by Claude Sonnet across 5 dimensions (sample from dry-run output; the full extraction produces ~10-15x more claims per page).
+
+| Page Type | N | Accurate | Useful | Correct Type | Atomic | Well-Scoped |
+|---|---|---|---|---|---|---|
+| commercial-org | 8 | 100% | 88% | 100% | 88% | 100% |
+| major-org | 4 | 100% | 100% | 100% | 100% | 100% |
+| research-org | 16 | 100% | 94% | 100% | 100% | 100% |
+| person-prominent | 9 | 100% | 78% | 100% | 100% | 89% |
+| person-academic | 7 | 100% | 86% | 100% | 100% | 100% |
+| person-researcher | 20 | 100% | 85% | 100% | 100% | 100% |
+| concept | 13 | 100% | 69% | 100% | 100% | 92% |
+| **OVERALL** | **77** | **100%** | **84%** | **100%** | **99%** | **97%** |
+
+**By broad category:**
+
+| Category | N | Accurate | Useful | Correct Type | Atomic | Well-Scoped |
+|---|---|---|---|---|---|---|
+| Organizations | 28 | 100% | 93% | 100% | 96% | 100% |
+| People | 36 | 100% | 83% | 100% | 100% | 97% |
+| Concepts | 13 | 100% | 69% | 100% | 100% | 92% |
+
+**Key findings:**
+
+1. **Accuracy is excellent** — 100% across all page types (all claims at least partially accurate). This exceeds the >85% target.
+2. **Usefulness is the primary quality issue** — 84% overall, but drops to 69% on concept pages. The 12 "not useful" claims fall into clear patterns:
+   - **Redundant claims** (same fact stated twice in slightly different ways): 3 instances
+   - **Trivially obvious statements** ("X is a regulated prediction market exchange" on the X page): 3 instances
+   - **Vague/qualitative claims** ("Research investment is high", "Model coverage is low"): 4 instances
+   - **Truncated claims** that lost meaning from text cutoff: 2 instances
+
+3. **Type classification is perfect** — 100% correct type across all 77 claims.
+4. **Atomicity is near-perfect** — Only 1 claim flagged as too-broad (bundling multiple market categories).
+5. **Well-scoped at 97%** — 2 overscoped claims: one vaguely stated "high probability" when the page gave a specific 10-25% figure, and one where the page itself had inconsistent numbers.
+
+**Failure pattern: Concept pages produce the lowest-value claims.** The extraction prompt asks for factual assertions, but concept pages are more definitional and evaluative. Vague claims like "Research investment is high" are technically accurate but add no value. This confirms the hypothesis that concept pages may need different extraction prompts (Sprint 2B).
+
+**Failure pattern: Person pages produce redundant claims.** When a person's risk estimate appears in multiple sections, it gets extracted multiple times. Dedup or section-aware extraction would help.
+
+**Critical finding: Source linking is broken.** All 200+ Kalshi claims in the live database show `sourceQuote: null` and `confidence: "unverified"`. The extraction pipeline captures `footnoteRefs` (reference numbers like "74") but never resolves them to actual URLs or quotes. The verification pipeline (`crux claims verify`) exists but was never run. This means the live claims UI shows every claim as "unverified" with no source evidence — undermining trust despite high extraction quality.
+
+**Implications for Sprint 2:**
+- Accuracy is not the bottleneck — usefulness is. Sprint 2 should focus on filtering low-value claims rather than improving accuracy.
+- Concept pages need specialized treatment. Consider either specialized prompts (2B) or focused extraction ("extract the 5-10 most important claims per section" variant from 2D).
+- The source linking gap should be addressed before scaling — claims without sources look untrustworthy regardless of actual quality.
+- JSON parse failures (~3%) are a minor but real issue. Consider adding retry-with-repair for malformed JSON.
 
 ---
 

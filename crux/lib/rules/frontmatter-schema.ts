@@ -7,7 +7,7 @@
 import { z } from 'zod';
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { ALL_ENTITY_TYPE_NAMES } from '../../../apps/web/src/data/entity-type-names.ts';
-import { VALID_SUBCATEGORIES } from '../../../apps/web/src/data/valid-subcategories.ts';
+import { VALID_SUBCATEGORIES } from '../valid-subcategories.ts';
 
 // Mapping from entityType to subcategories that are typical for that type.
 // Used for cross-field validation (WARNING, not ERROR — judgment-based).

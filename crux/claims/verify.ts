@@ -19,7 +19,7 @@
 import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
+import { callOpenRouter, stripCodeFences, parseJsonWithRepair, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
   getClaimsByEntity,
@@ -109,12 +109,12 @@ async function verifyClaim(
   try {
     const raw = await callOpenRouter(VERIFY_SYSTEM_PROMPT, userPrompt, {
       model: opts.model ?? DEFAULT_CITATION_MODEL,
-      maxTokens: 400,
+      maxTokens: 800,
       title: 'LongtermWiki Claim Verification',
     });
 
     const json = stripCodeFences(raw);
-    const parsed = JSON.parse(json) as { verdict?: string; relevantQuote?: string; explanation?: string };
+    const parsed = parseJsonWithRepair<{ verdict?: string; relevantQuote?: string; explanation?: string }>(json);
     const verdict = parsed.verdict === 'verified' ? 'verified' : 'unsupported';
 
     return {
@@ -192,7 +192,7 @@ async function main() {
   let noSource = 0;
 
   for (const claim of claims) {
-    const footnoteRefs = (claim.footnoteRefs ?? claim.unit) ? (claim.footnoteRefs ?? claim.unit)!.split(',').map(s => s.trim()) : [];
+    const footnoteRefs = claim.footnoteRefs ? claim.footnoteRefs.split(',').map(s => s.trim()) : [];
 
     // If no footnote refs, mark as unsourced
     if (footnoteRefs.length === 0) {
@@ -295,7 +295,15 @@ async function main() {
       factId: claim.factId ?? null,
       resourceIds: claim.resourceIds ?? null,
       section: claim.section ?? claim.value ?? null,
-      footnoteRefs: claim.footnoteRefs ?? claim.unit ?? null,
+      footnoteRefs: claim.footnoteRefs ?? null,
+      // Phase 2 fields — preserve from original claim
+      claimMode: claim.claimMode ?? null,
+      attributedTo: claim.attributedTo ?? null,
+      asOf: claim.asOf ?? null,
+      measure: claim.measure ?? null,
+      valueNumeric: claim.valueNumeric ?? null,
+      valueLow: claim.valueLow ?? null,
+      valueHigh: claim.valueHigh ?? null,
     }));
 
     const result = await insertClaimBatch(items);

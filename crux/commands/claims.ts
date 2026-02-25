@@ -23,7 +23,7 @@ const SCRIPTS = {
   verify: {
     script: 'claims/verify.ts',
     description: 'Verify extracted claims against citation_content full text',
-    passthrough: ['dry-run', 'model'],
+    passthrough: ['dry-run', 'model', 'fetch'],
     positional: true,
   },
   status: {
@@ -49,6 +49,12 @@ const SCRIPTS = {
     description: 'Extract claims from a URL — fetch, route to entities, deduplicate',
     passthrough: ['dry-run', 'model', 'entity', 'no-auto-resource', 'batch', 'limit'],
     positional: true,
+  },
+  'evaluate-baseline': {
+    script: 'claims/evaluate-baseline.ts',
+    description: 'Evaluate extraction quality baseline across test pages',
+    passthrough: ['from-logs', 'sample'],
+    positional: false,
   },
 };
 

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { fetchFromWikiServer } from "@lib/wiki-server";
+import { buildEntityNameMap } from "../components/claims-data";
 import { NetworkGraph } from "../components/network-graph";
 
 export const metadata: Metadata = {
-  title: "Entity Network | Longterm Wiki Claims",
+  title: "Entity Network",
   description:
     "Interactive network graph showing entity relationships via shared claims.",
 };
@@ -21,6 +22,7 @@ export default async function NetworkPage() {
 
   const nodes = result?.nodes ?? [];
   const edges = result?.edges ?? [];
+  const entityNames = buildEntityNameMap(nodes.map((n) => n.entityId));
 
   return (
     <div>
@@ -32,7 +34,7 @@ export default async function NetworkPage() {
         <span className="font-medium text-foreground">{edges.length}</span>{" "}
         connections. Click a node to view its claims.
       </p>
-      <NetworkGraph nodes={nodes} edges={edges} />
+      <NetworkGraph nodes={nodes} edges={edges} entityNames={entityNames} />
     </div>
   );
 }
