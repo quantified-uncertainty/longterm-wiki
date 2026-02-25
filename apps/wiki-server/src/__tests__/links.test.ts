@@ -40,13 +40,54 @@ function linkKey(sourceId: string, targetId: string, linkType: string) {
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
+  // --- pg_advisory_xact_lock (no-op in tests) ---
+  if (q.includes("pg_advisory_xact_lock")) {
+    return [];
+  }
+
   // --- page_links: DELETE all ---
   if (q.includes("delete from") && q.includes("page_links")) {
     linksStore.clear();
     return [];
   }
 
-  // --- page_links: INSERT ... ON CONFLICT DO UPDATE (multi-row) ---
+  // --- page_links: INSERT via jsonb_to_recordset (raw SQL sync endpoint) ---
+  if (q.includes("insert into") && q.includes("page_links") && q.includes("jsonb_to_recordset")) {
+    const jsonStr = params[0] as string;
+    const batch = JSON.parse(jsonStr) as Array<{
+      sourceId: string;
+      targetId: string;
+      linkType: string;
+      relationship?: string | null;
+      weight: number;
+    }>;
+    const rows: LinkRow[] = [];
+    const now = new Date();
+    for (const link of batch) {
+      const row: LinkRow = {
+        id: nextId++,
+        source_id: link.sourceId,
+        target_id: link.targetId,
+        link_type: link.linkType,
+        relationship: link.relationship || null,
+        weight: link.weight,
+        created_at: now,
+      };
+      const key = linkKey(row.source_id, row.target_id, row.link_type);
+      const existing = linksStore.get(key);
+      if (existing) {
+        existing.weight = row.weight;
+        existing.relationship = row.relationship;
+        rows.push(existing);
+      } else {
+        linksStore.set(key, row);
+        rows.push(row);
+      }
+    }
+    return rows;
+  }
+
+  // --- page_links: INSERT ... ON CONFLICT DO UPDATE (Drizzle multi-row, used by other tests) ---
   if (q.includes("insert into") && q.includes("page_links")) {
     const COLS = 5;
     const numRows = params.length / COLS;
