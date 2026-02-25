@@ -4,10 +4,8 @@ import {
   getAllNumericIds,
   numericIdToSlug,
   slugToNumericId,
-  getRawMdxSource,
 } from "@/lib/mdx";
 import {
-  getEntityById,
   getPageById,
   getEntityPath,
   getBacklinksFor,
@@ -352,18 +350,16 @@ export default async function WikiInfoPage({ params }: PageProps) {
 
   if (!slug) notFound();
 
-  const entity = getEntityById(slug);
   const pageData = getPageById(slug);
   const entityPath = getEntityPath(slug);
   const backlinks = getBacklinksFor(slug);
   const facts = (await getFactsForEntityWithFallback(slug)).data;
   const externalLinks = getExternalLinks(slug);
-  const rawMdx = getRawMdxSource(slug);
   const fnIndex = getFootnoteIndex(slug);
   const claims = await fetchPageClaims(slug);
 
-  const title = entity?.title || pageData?.title || slug;
-  const entityType = entity?.type || pageData?.entityType || null;
+  const title = pageData?.title || slug;
+  const entityType = pageData?.entityType || null;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
@@ -419,48 +415,14 @@ export default async function WikiInfoPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/*
-        Three data sources shown below:
-
-        1. Compiled Page Record — built at `pnpm build-data` by merging:
-             MDX frontmatter + Entity YAML + computed metrics
-           Stored in: apps/web/src/data/database.json
-
-        2. Entity YAML — canonical entity definition (type, relatedEntries,
-             sources, customFields). Source: data/entities/*.yaml
-
-        3. MDX Frontmatter — editorial metadata authored in the .mdx file
-             (quality, importance, llmSummary, ratings, etc.)
-             Source: content/docs/…
-      */}
-
       <Section
-        title="Compiled Page Record"
+        title="Page Record"
         subtitle="database.json — merged from MDX frontmatter + Entity YAML + computed metrics at build time"
         defaultOpen
       >
         {pageData
           ? <JsonDump data={pageData} />
           : <p className="text-sm text-gray-500">No compiled record found for &quot;{slug}&quot;</p>}
-      </Section>
-
-      <Section
-        title="Entity YAML"
-        subtitle="data/entities/*.yaml — canonical entity definition (numericId, type, relatedEntries, sources)"
-        defaultOpen
-      >
-        {entity
-          ? <JsonDump data={entity} />
-          : <p className="text-sm text-gray-500">No entity YAML found for &quot;{slug}&quot; — this page has no associated entity</p>}
-      </Section>
-
-      <Section
-        title="MDX Frontmatter"
-        subtitle={`${pageData?.filePath ?? "content/docs/…"} — raw frontmatter as authored (quality, scores, llmSummary, ratings)`}
-      >
-        {rawMdx
-          ? <JsonDump data={rawMdx.frontmatter} />
-          : <p className="text-sm text-gray-500">No MDX file found</p>}
       </Section>
 
       <Section title={`Claims ${claims && claims.length > 0 ? `(${claims.length})` : ""}`}>
@@ -561,15 +523,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
         )}
       </Section>
 
-      <Section title="Raw MDX Source">
-        {rawMdx ? (
-          <pre className="text-xs bg-gray-50 p-3 rounded overflow-x-auto max-h-[800px] overflow-y-auto whitespace-pre-wrap break-words font-mono">
-            {rawMdx.raw}
-          </pre>
-        ) : (
-          <p className="text-sm text-gray-500">No MDX file found</p>
-        )}
-      </Section>
     </div>
   );
 }
