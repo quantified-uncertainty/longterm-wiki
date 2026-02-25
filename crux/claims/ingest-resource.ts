@@ -11,7 +11,10 @@
  *   entityType    = "wiki-page"
  *   resourceIds   = [resource.id]   ← links claim back to source
  *   confidence    = "unverified"
- *   sourceQuote   = relevant excerpt (when available)
+ *   claimMode     = "attributed"    ← resource says X, wiki doesn't endorse
+ *   attributedTo  = resource.authors[0] (when available)
+ *   asOf          = resource.published_date (when available)
+ *   sources[]     = inline source with resourceId, url, sourceQuote
  *
  * Usage:
  *   pnpm crux claims ingest-resource <resource-id>
@@ -36,7 +39,7 @@ import {
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
 import { loadResources } from '../resource-io.ts';
-import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../lib/claim-utils.ts';
+import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue, deduplicateClaims } from '../lib/claim-utils.ts';
 import type { ClaimTypeValue } from '../lib/claim-utils.ts';
 import type { Resource } from '../resource-types.ts';
 
@@ -56,7 +59,7 @@ const CACHE_SOURCES_PDF = join(PROJECT_ROOT, '.cache', 'sources', 'pdf');
  * Build a text corpus from a resource for LLM extraction.
  * Priority: local cached text file > wiki-server content > YAML metadata fields.
  */
-function buildResourceText(resource: Resource & { localFilename?: string }): string {
+export function buildResourceText(resource: Resource & { localFilename?: string }): string {
   // Try local cached text file (from knowledge.db sync)
   if (resource.localFilename) {
     const txtPath = join(CACHE_SOURCES_TEXT, resource.localFilename);
@@ -111,7 +114,7 @@ function buildResourceText(resource: Resource & { localFilename?: string }): str
 // LLM extraction — resource-aware, entity-targeted
 // ---------------------------------------------------------------------------
 
-interface ExtractedResourceClaim {
+export interface ExtractedResourceClaim {
   claimText: string;
   claimType: ClaimTypeValue;
   relevance: 'direct' | 'contextual' | 'background';
@@ -126,7 +129,7 @@ interface ExtractedResourceClaim {
   relatedEntities?: string[];
 }
 
-function buildExtractionPrompt(resource: Resource, targetEntity: string): string {
+export function buildExtractionPrompt(resource: Resource, targetEntity: string): string {
   return `You are extracting factual claims from an external resource (paper, article, report) that is relevant to a wiki article about "${targetEntity}".
 
 Resource metadata:
@@ -163,7 +166,7 @@ Respond ONLY with JSON:
 {"claims": [{"claimText": "...", "claimType": "factual", "relevance": "direct", "claimMode": "endorsed", "sourceQuote": "...", "relatedEntities": []}]}`;
 }
 
-async function extractClaimsForEntity(
+export async function extractClaimsForEntity(
   resourceText: string,
   resource: Resource,
   targetEntity: string,
@@ -223,6 +226,77 @@ async function extractClaimsForEntity(
     console.warn(`  [warn] Entity "${targetEntity}" — extraction failed: ${msg.slice(0, 120)}`);
     return [];
   }
+}
+
+// ---------------------------------------------------------------------------
+// Build InsertClaimItem from extracted claim + resource context
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert an extracted resource claim into an InsertClaimItem ready for DB insertion.
+ */
+export function buildInsertItem(
+  claim: ExtractedResourceClaim,
+  entity: string,
+  resource: Resource,
+): InsertClaimItem {
+  return {
+    entityId: entity,
+    entityType: 'wiki-page',
+    claimType: claim.claimType,
+    claimText: claim.claimText,
+    confidence: 'unverified',
+    sourceQuote: claim.sourceQuote ?? null,
+    // Enhanced fields
+    claimCategory: claimTypeToCategory(claim.claimType),
+    relatedEntities: claim.relatedEntities && claim.relatedEntities.length > 0
+      ? claim.relatedEntities
+      : null,
+    // Phase 2 fields
+    claimMode: claim.claimMode,
+    attributedTo: claim.attributedTo ?? resource.authors?.[0] ?? null,
+    asOf: claim.asOf ?? resource.published_date ?? null,
+    measure: claim.measure ?? null,
+    valueNumeric: claim.valueNumeric ?? null,
+    valueLow: claim.valueLow ?? null,
+    valueHigh: claim.valueHigh ?? null,
+    // Resource linkage via claim_sources + legacy resourceIds
+    resourceIds: [resource.id],
+    sources: claim.sourceQuote
+      ? [{ resourceId: resource.id, sourceQuote: claim.sourceQuote, isPrimary: true }]
+      : [{ resourceId: resource.id, isPrimary: true }],
+    // Legacy fields
+    value: `From: ${resource.title?.slice(0, 200) ?? resource.id}`,
+    unit: claim.relevance,
+    section: `Resource: ${resource.id}`,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Deduplication helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch existing claim texts for an entity and deduplicate new claims against them.
+ */
+async function deduplicateAgainstExisting(
+  entity: string,
+  claims: ExtractedResourceClaim[],
+  c: ReturnType<typeof getColors>,
+): Promise<ExtractedResourceClaim[]> {
+  const existingResult = await getClaimsByEntity(entity);
+  if (!existingResult.ok || existingResult.data.claims.length === 0) {
+    return claims;
+  }
+
+  const existingTexts = existingResult.data.claims.map(cl => cl.claimText);
+  const { unique, duplicateCount } = deduplicateClaims(claims, existingTexts);
+
+  if (duplicateCount > 0) {
+    console.log(`  ${c.dim}Dedup: ${duplicateCount} duplicate(s) removed for ${entity}${c.reset}`);
+  }
+
+  return unique;
 }
 
 // ---------------------------------------------------------------------------
@@ -335,10 +409,18 @@ async function main() {
 
   for (const entity of entitiesToProcess) {
     process.stdout.write(`  ${c.dim}Extracting for ${entity}...${c.reset}`);
-    const claims = await extractClaimsForEntity(resourceText, resource, entity, { model });
+    let claims = await extractClaimsForEntity(resourceText, resource, entity, { model });
+    const rawCount = claims.length;
+
+    // Deduplicate against existing claims (skip during dry-run to avoid server dependency)
+    if (!dryRun && claims.length > 0) {
+      claims = await deduplicateAgainstExisting(entity, claims, c);
+    }
+
     allResults.push({ entity, claims });
     const directCount = claims.filter(cl => cl.relevance === 'direct').length;
-    console.log(` ${c.green}${claims.length} claims${c.reset} (${directCount} direct)`);
+    const dedupNote = rawCount !== claims.length ? `, ${rawCount - claims.length} deduped` : '';
+    console.log(` ${c.green}${claims.length} claims${c.reset} (${directCount} direct${dedupNote})`);
   }
 
   const totalClaims = allResults.reduce((s, r) => s + r.claims.length, 0);
@@ -380,36 +462,9 @@ async function main() {
   for (const { entity, claims } of allResults) {
     if (claims.length === 0) continue;
 
-    const items: InsertClaimItem[] = claims.map(claim => ({
-      entityId: entity,
-      entityType: 'wiki-page',
-      claimType: claim.claimType,
-      claimText: claim.claimText,
-      confidence: 'unverified',
-      sourceQuote: claim.sourceQuote ?? null,
-      // Enhanced fields
-      claimCategory: claimTypeToCategory(claim.claimType),
-      relatedEntities: claim.relatedEntities && claim.relatedEntities.length > 0
-        ? claim.relatedEntities
-        : null,
-      // Phase 2 fields
-      claimMode: claim.claimMode,
-      attributedTo: claim.attributedTo ?? null,
-      asOf: claim.asOf ?? null,
-      measure: claim.measure ?? null,
-      valueNumeric: claim.valueNumeric ?? null,
-      valueLow: claim.valueLow ?? null,
-      valueHigh: claim.valueHigh ?? null,
-      // Resource linkage via claim_sources (Phase 2) + legacy resourceIds for backward compat
-      resourceIds: [resource.id],
-      sources: claim.sourceQuote
-        ? [{ resourceId: resource.id, sourceQuote: claim.sourceQuote, isPrimary: true }]
-        : [{ resourceId: resource.id, isPrimary: true }],
-      // Legacy fields
-      value: `From: ${resource.title?.slice(0, 200) ?? resource.id}`,
-      unit: claim.relevance,
-      section: `Resource: ${resource.id}`,
-    }));
+    const items: InsertClaimItem[] = claims.map(claim =>
+      buildInsertItem(claim, entity, resource),
+    );
 
     // Insert in batches
     for (let i = 0; i < items.length; i += BATCH_SIZE) {
