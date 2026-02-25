@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
+import { getEntityById } from "@data";
 import type { ClaimRow } from "@wiki-server/api-types";
+import { buildEntityNameMap } from "../../components/claims-data";
 import { CategoryBadge } from "../../components/category-badge";
 import { ConfidenceBadge } from "../../components/confidence-badge";
 import { ClaimModeBadge } from "../../components/claim-mode-badge";
@@ -20,7 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
   if (!claim) return { title: "Claim Not Found" };
   return {
-    title: `Claim #${claim.id} | Longterm Wiki`,
+    title: `Claim #${claim.id}`,
     description: claim.claimText.slice(0, 160),
   };
 }
@@ -32,6 +34,11 @@ export default async function ClaimDetailPage({ params }: PageProps) {
   });
 
   if (!claim) notFound();
+
+  const entity = getEntityById(claim.entityId);
+  const entityDisplayName = entity?.title ?? claim.entityId;
+  const allSlugs = [claim.entityId, ...(claim.relatedEntities ?? []).map(s => s.toLowerCase())];
+  const entityNames = buildEntityNameMap(allSlugs);
 
   return (
     <div className="max-w-3xl">
@@ -45,7 +52,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
             href={`/claims/entity/${claim.entityId}`}
             className="hover:underline"
           >
-            {claim.entityId}
+            {entityDisplayName}
           </Link>
           <span>/</span>
           <span>#{claim.id}</span>
@@ -122,9 +129,9 @@ export default async function ClaimDetailPage({ params }: PageProps) {
           </span>
           <Link
             href={`/claims/entity/${claim.entityId}`}
-            className="font-mono text-sm text-blue-600 hover:underline"
+            className="text-sm text-blue-600 hover:underline"
           >
-            {claim.entityId}
+            {entityDisplayName}
           </Link>
           <span className="text-xs text-muted-foreground ml-2">
             ({claim.entityType})
@@ -202,10 +209,10 @@ export default async function ClaimDetailPage({ params }: PageProps) {
             {claim.relatedEntities.map((eid) => (
               <Link
                 key={eid}
-                href={`/claims/entity/${eid}`}
+                href={`/claims/entity/${eid.toLowerCase()}`}
                 className="inline-block px-2 py-1 rounded text-xs bg-gray-100 text-gray-700 hover:bg-gray-200"
               >
-                {eid}
+                {entityNames[eid.toLowerCase()] ?? eid}
               </Link>
             ))}
           </div>

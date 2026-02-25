@@ -15,11 +15,13 @@ export function ClaimsFilterBar({
   categories,
   filters,
   onFilterChange,
+  entityNames = {},
 }: {
   entities: string[];
   categories: string[];
   filters: ClaimFilters;
   onFilterChange: (key: string, value: string | boolean) => void;
+  entityNames?: Record<string, string>;
 }) {
   const hasFilters =
     filters.search ||
@@ -47,7 +49,7 @@ export function ClaimsFilterBar({
         <option value="">All entities</option>
         {entities.map((eid) => (
           <option key={eid} value={eid}>
-            {eid}
+            {entityNames[eid] ?? eid}
           </option>
         ))}
       </select>

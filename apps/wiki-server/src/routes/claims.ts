@@ -529,6 +529,8 @@ claimsRoute.get("/relationships", async (c) => {
     for (const rel of related) {
       // Normalize to lowercase slug to merge capitalized variants (e.g. "Anthropic" → "anthropic")
       const normalizedRel = rel.toLowerCase();
+      // Skip self-referential pairs
+      if (normalizedRel === row.entityId) continue;
       const [a, b] = [row.entityId, normalizedRel].sort();
       const key = `${a}|||${b}`;
       if (!pairMap.has(key)) {
@@ -573,6 +575,8 @@ claimsRoute.get("/network", async (c) => {
     for (const rel of related) {
       // Normalize to lowercase slug to merge capitalized variants (e.g. "Anthropic" → "anthropic")
       const normalizedRel = rel.toLowerCase();
+      // Skip self-loops
+      if (normalizedRel === row.entityId) continue;
       nodeIds.add(normalizedRel);
       const [source, target] = [row.entityId, normalizedRel].sort();
       const key = `${source}|||${target}`;

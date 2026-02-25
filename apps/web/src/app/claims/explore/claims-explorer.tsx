@@ -10,10 +10,12 @@ export function ClaimsExplorer({
   claims,
   entities,
   categories,
+  entityNames = {},
 }: {
   claims: ClaimRow[];
   entities: string[];
   categories: string[];
+  entityNames?: Record<string, string>;
 }) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -88,11 +90,12 @@ export function ClaimsExplorer({
         categories={categories}
         filters={filters}
         onFilterChange={onFilterChange}
+        entityNames={entityNames}
       />
       <div className="text-xs text-muted-foreground mb-2">
         {filteredClaims.length} of {claims.length} claims
       </div>
-      <ClaimsTable claims={filteredClaims} />
+      <ClaimsTable claims={filteredClaims} entityNames={entityNames} />
     </div>
   );
 }
