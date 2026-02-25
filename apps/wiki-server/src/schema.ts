@@ -7,6 +7,7 @@ import {
   bigserial,
   boolean,
   real,
+  doublePrecision,
   date,
   timestamp,
   jsonb,
@@ -395,13 +396,13 @@ export const claims = pgTable(
     section: text("section"), // section heading where claim appears
     footnoteRefs: text("footnote_refs"), // comma-separated footnote refs (e.g. "1,3,7")
     // --- Phase 2 fields (migration 0029) ---
-    claimMode: text("claim_mode"),      // 'endorsed' | 'attributed'
+    claimMode: text("claim_mode").notNull().default("endorsed"), // 'endorsed' | 'attributed'
     attributedTo: text("attributed_to"), // entity_id of person/org making the claim
     asOf: text("as_of"),                // temporal index: YYYY-MM or YYYY-MM-DD
     measure: text("measure"),           // measure ID linking to facts taxonomy
-    valueNumeric: real("value_numeric"), // central numeric value (machine-readable)
-    valueLow: real("value_low"),        // lower bound for range values
-    valueHigh: real("value_high"),      // upper bound for range values
+    valueNumeric: doublePrecision("value_numeric"), // central numeric value (machine-readable)
+    valueLow: doublePrecision("value_low"),        // lower bound for range values
+    valueHigh: doublePrecision("value_high"),      // upper bound for range values
     // --- Timestamps ---
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

@@ -32,7 +32,7 @@ import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
   insertClaimBatch,
   getClaimsByEntity,
-  clearClaimsForEntity,
+  clearClaimsBySection,
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
 import { loadResources } from '../resource-io.ts';
@@ -308,10 +308,11 @@ async function main() {
           console.log(`  ${c.yellow}Skipping ${entity}: already has claims from ${resource.id}. Use --force to re-ingest.${c.reset}`);
           continue;
         }
-        // --force: clear all entity claims before re-ingesting
-        const cleared = await clearClaimsForEntity(entity);
+        // --force: clear only claims from THIS resource (not page extraction or other resources)
+        const sectionKey = `Resource: ${resource.id}`;
+        const cleared = await clearClaimsBySection(entity, sectionKey);
         if (cleared.ok) {
-          console.log(`  ${c.dim}Cleared ${cleared.data.deleted} existing claims for ${entity} (--force)${c.reset}`);
+          console.log(`  ${c.dim}Cleared ${cleared.data.deleted} existing claims for ${entity} from ${resource.id} (--force)${c.reset}`);
         }
       }
       entitiesToProcess.push(entity);

@@ -725,6 +725,12 @@ export const ClearClaimsSchema = z.object({
   entityId: z.string().min(1).max(300),
 });
 
+/** Clear only claims for a specific entity+section combination (used by --force on resource ingestion). */
+export const ClearClaimsBySectionSchema = z.object({
+  entityId: z.string().min(1).max(300),
+  section: z.string().min(1).max(500),
+});
+
 // -- Claims: Response types ---------------------------------------------------
 
 export interface ClaimSourceRow {
