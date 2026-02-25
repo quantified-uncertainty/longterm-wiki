@@ -1,45 +1,11 @@
 "use client";
 
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useCallback } from "react";
-
 export interface ClaimFilters {
   search: string;
   entity: string;
   category: string;
   confidence: string;
   multiEntity: boolean;
-}
-
-export function useClaimFilters(): [ClaimFilters, (key: string, value: string | boolean) => void] {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const filters: ClaimFilters = {
-    search: searchParams.get("q") ?? "",
-    entity: searchParams.get("entity") ?? "",
-    category: searchParams.get("category") ?? "",
-    confidence: searchParams.get("confidence") ?? "",
-    multiEntity: searchParams.get("multiEntity") === "true",
-  };
-
-  const updateParam = useCallback(
-    (key: string, value: string | boolean) => {
-      const params = new URLSearchParams(searchParams.toString());
-      const paramKey = key === "search" ? "q" : key;
-      const strValue = typeof value === "boolean" ? (value ? "true" : "") : value;
-      if (strValue) {
-        params.set(paramKey, strValue);
-      } else {
-        params.delete(paramKey);
-      }
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    },
-    [searchParams, router, pathname]
-  );
-
-  return [filters, updateParam];
 }
 
 export function ClaimsFilterBar({

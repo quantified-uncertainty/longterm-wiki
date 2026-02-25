@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import Link from "next/link";
 import type { ColumnDef, SortingState, ExpandedState } from "@tanstack/react-table";
 import {
@@ -191,7 +191,6 @@ const columns: ColumnDef<ClaimRow>[] = [
       );
     },
     size: 200,
-    meta: { hideBelow: 1200 },
   },
   {
     id: "relatedEntities",
@@ -272,9 +271,8 @@ export function ClaimsTable({
           <TableBody>
             {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <>
+                <Fragment key={row.id}>
                   <TableRow
-                    key={row.id}
                     className="cursor-pointer"
                     onClick={() => row.toggleExpanded()}
                   >
@@ -288,13 +286,13 @@ export function ClaimsTable({
                     ))}
                   </TableRow>
                   {row.getIsExpanded() && (
-                    <TableRow key={`${row.id}-expanded`}>
+                    <TableRow>
                       <TableCell colSpan={columns.length} className="p-0">
                         <ExpandedClaimDetail claim={row.original} />
                       </TableCell>
                     </TableRow>
                   )}
-                </>
+                </Fragment>
               ))
             ) : (
               <TableRow>

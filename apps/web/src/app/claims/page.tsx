@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
-import type { ClaimRow } from "@wiki-server/api-types";
+import type { ClaimStatsResult } from "@wiki-server/api-types";
 import { StatCard } from "./components/stat-card";
 import { DistributionBar } from "./components/distribution-bar";
+import { fetchAllClaims } from "./components/claims-data";
 
 export const metadata: Metadata = {
   title: "Claims Explorer | Longterm Wiki",
@@ -11,44 +12,9 @@ export const metadata: Metadata = {
     "Browse extracted claims across all wiki pages: categories, relationships, and verification status.",
 };
 
-interface StatsResponse {
-  total: number;
-  byClaimType: Record<string, number>;
-  byEntityType: Record<string, number>;
-  byClaimCategory: Record<string, number>;
-  multiEntityClaims: number;
-  factLinkedClaims: number;
-}
-
-interface AllClaimsResponse {
-  claims: ClaimRow[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-async function fetchAllClaims(): Promise<ClaimRow[]> {
-  const PAGE_SIZE = 200;
-  const all: ClaimRow[] = [];
-  let offset = 0;
-
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const page = await fetchFromWikiServer<AllClaimsResponse>(
-      `/api/claims/all?limit=${PAGE_SIZE}&offset=${offset}`,
-      { revalidate: 300 }
-    );
-    if (!page || page.claims.length === 0) break;
-    all.push(...page.claims);
-    if (all.length >= page.total) break;
-    offset += PAGE_SIZE;
-  }
-  return all;
-}
-
 export default async function ClaimsOverviewPage() {
   const [stats, claims] = await Promise.all([
-    fetchFromWikiServer<StatsResponse>("/api/claims/stats", {
+    fetchFromWikiServer<ClaimStatsResult>("/api/claims/stats", {
       revalidate: 300,
     }),
     fetchAllClaims(),

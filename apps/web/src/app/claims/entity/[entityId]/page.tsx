@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
-import type { ClaimRow } from "@wiki-server/api-types";
+import type { GetClaimsResult } from "@wiki-server/api-types";
 import { StatCard } from "../../components/stat-card";
 import { ClaimsTable } from "../../components/claims-table";
 import { DistributionBar } from "../../components/distribution-bar";
 
 interface PageProps {
   params: Promise<{ entityId: string }>;
-}
-
-interface GetClaimsResult {
-  claims: ClaimRow[];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

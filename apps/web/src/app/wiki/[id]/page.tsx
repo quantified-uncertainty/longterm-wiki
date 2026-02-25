@@ -188,6 +188,11 @@ function ContentMeta({
             Data
           </a>
         )}
+        {numId && (
+          <a href={`/claims/entity/${slug}`} className="page-meta-github">
+            Claims
+          </a>
+        )}
         <PageFeedback pageTitle={pageTitle} pageSlug={slug} />
         {!isInternal && <InfoBoxToggle />}
       </div>
