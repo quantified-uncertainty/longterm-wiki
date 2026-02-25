@@ -1436,26 +1436,15 @@ export async function getMeasureTimeseriesWithFallback(
 }
 
 /**
- * Fetch all timeseries data for an entity from wiki-server.
- * Returns a map of measureId → sorted observations.
- * Uses Hono RPC client. Falls back to local database.json.
- *
- * Note: The server endpoint requires a `measure` query param, so this function
- * uses the existing fetchFromWikiServer for the "all measures" case and falls
- * back to local data. A future server endpoint could support this natively.
+ * Fetch all timeseries data for an entity.
+ * Currently loads from local database.json only — the server's timeseries
+ * endpoint requires a `measure` query param, so "all measures" isn't supported.
+ * TODO: Add a server endpoint for bulk timeseries (see issue tracking).
  */
 export async function getEntityTimeseriesWithFallback(
   entityId: string
 ): Promise<Record<string, TimeseriesPoint[]>> {
-  const result = await withApiFallback(
-    async () => {
-      // The server's timeseries endpoint requires a `measure` query param,
-      // so we can't fetch all measures at once via RPC. Fall through to local.
-      return null;
-    },
-    () => getEntityTimeseries(entityId)
-  );
-  return result.data;
+  return getEntityTimeseries(entityId);
 }
 
 // ============================================================================

@@ -411,6 +411,40 @@ describe("Facts API", () => {
     it("requires measure parameter", async () => {
       const res = await app.request("/api/facts/timeseries/anthropic");
       expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toBe("validation_error");
+      expect(body.message).toBeDefined();
+    });
+  });
+
+  // ---- Validation error shape (zv helper) ----
+
+  describe("zv() validator error shape", () => {
+    it("returns validation_error for invalid by-entity query params", async () => {
+      const res = await app.request(
+        "/api/facts/by-entity/anthropic?limit=-1"
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toBe("validation_error");
+      expect(typeof body.message).toBe("string");
+    });
+
+    it("returns validation_error for invalid stale query params", async () => {
+      const res = await app.request("/api/facts/stale?limit=0");
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toBe("validation_error");
+      expect(typeof body.message).toBe("string");
+    });
+
+    it("returns validation_error for exceeding max page size", async () => {
+      const res = await app.request(
+        "/api/facts/by-entity/anthropic?limit=999"
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toBe("validation_error");
     });
   });
 
