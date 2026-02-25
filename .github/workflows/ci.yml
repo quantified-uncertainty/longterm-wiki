@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
+  ci:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,6 +29,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # --- Build data (once, shared by all subsequent steps) ---
+
       - name: Build data
         run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
         env:
@@ -36,6 +38,63 @@ jobs:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
           LONGTERMWIKI_PROJECT_KEY: ${{ secrets.LONGTERMWIKI_PROJECT_KEY }}
+
+      # --- Validation (fail fast before expensive Next.js build) ---
+
+      - name: MDX syntax check (blocking)
+        run: pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
+
+      - name: YAML schema validation (blocking)
+        run: pnpm crux validate schema
+
+      - name: Frontmatter schema validation (blocking)
+        run: pnpm crux validate unified --rules=frontmatter-schema --errors-only
+
+      - name: Numeric ID integrity (blocking)
+        run: pnpm crux validate unified --rules=numeric-id-integrity --errors-only
+
+      - name: TypeScript type checks (parallel)
+        run: |
+          pids=()
+          (cd apps/web && npx tsc --noEmit) &
+          pids+=($!)
+          (cd apps/discord-bot && npx tsc --noEmit) &
+          pids+=($!)
+          (cd apps/wiki-server && npx tsc --noEmit) &
+          pids+=($!)
+          failed=0
+          for pid in "${pids[@]}"; do
+            wait "$pid" || failed=1
+          done
+          exit $failed
+
+      - name: TypeScript type check — crux (advisory, baseline-guarded)
+        continue-on-error: true
+        run: npx tsx crux/validate/validate-crux-tsc.ts --ci
+
+      - name: .returning() guard check (blocking)
+        run: npx tsx crux/validate/validate-returning-guard.ts
+
+      - name: Drizzle migration journal integrity (blocking)
+        run: npx tsx crux/validate/validate-drizzle-journal.ts
+
+      - name: Auto-update orchestrator smoke test (dry-run)
+        if: "!cancelled()"
+        continue-on-error: true
+        run: |
+          pnpm crux auto-update run --dry-run --skip-fetch --trigger=ci-check --budget=0 --count=0 \
+            || echo "::warning::Auto-update dry-run failed (advisory — check orchestrator for regressions)"
+
+      - name: Component reference validation (blocking)
+        run: pnpm crux validate refs
+
+      - name: Run validation suite (advisory)
+        if: "!cancelled()"
+        continue-on-error: true
+        run: |
+          pnpm crux validate || echo "::warning::Validation has pre-existing failures (non-blocking)"
+
+      # --- Tests ---
 
       - name: Run tests
         run: cd apps/web && pnpm test
@@ -49,16 +108,27 @@ jobs:
       - name: Run crux tests
         run: pnpm test:crux
 
+      # --- Next.js build (most expensive step — runs last) ---
+
+      - name: Restore Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: apps/web/.next/cache
+          key: nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('apps/web/src/**', 'content/docs/**') }}
+          restore-keys: |
+            nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
+
       - name: Build Next.js
         run: cd apps/web && pnpm build
         env:
+          SKIP_PREBUILD: "1"
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
           LONGTERMWIKI_PROJECT_KEY: ${{ secrets.LONGTERMWIKI_PROJECT_KEY }}
 
   sync-content:
     # Sync wiki page content to wiki-server after build succeeds on main.
-    needs: [build-and-test]
+    needs: [ci]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -93,8 +163,7 @@ jobs:
     # Trigger a Vercel production deployment after CI passes on main.
     # This ensures prod is rebuilt exactly once per PR merge, naturally
     # capping deploys at ~1 per merged PR (<10/day in practice).
-    # The scheduled-deploy workflow provides a daily fallback for quiet periods.
-    needs: [build-and-test]
+    needs: [ci]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -121,79 +190,3 @@ jobs:
             echo "::error::Vercel deploy hook returned HTTP $RESPONSE"
             exit 1
           fi
-
-  validate:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build data (needed for validation)
-        id: build-data
-        run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
-          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
-          LONGTERMWIKI_PROJECT_KEY: ${{ secrets.LONGTERMWIKI_PROJECT_KEY }}
-
-      - name: MDX syntax check (blocking)
-        run: pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
-
-      - name: YAML schema validation (blocking)
-        run: pnpm crux validate schema
-
-      - name: Frontmatter schema validation (blocking)
-        run: pnpm crux validate unified --rules=frontmatter-schema --errors-only
-
-      - name: Numeric ID integrity (blocking)
-        run: pnpm crux validate unified --rules=numeric-id-integrity --errors-only
-
-      - name: TypeScript type check — app (blocking)
-        run: cd apps/web && npx tsc --noEmit
-
-      - name: TypeScript type check — discord-bot (blocking)
-        run: cd apps/discord-bot && npx tsc --noEmit
-
-      - name: TypeScript type check — wiki-server (blocking)
-        run: cd apps/wiki-server && npx tsc --noEmit
-
-      - name: TypeScript type check — crux (advisory, baseline-guarded)
-        continue-on-error: true
-        run: npx tsx crux/validate/validate-crux-tsc.ts --ci
-
-      - name: .returning() guard check (blocking)
-        run: npx tsx crux/validate/validate-returning-guard.ts
-
-      - name: Drizzle migration journal integrity (blocking)
-        run: npx tsx crux/validate/validate-drizzle-journal.ts
-
-      - name: Auto-update orchestrator smoke test (dry-run)
-        # Verifies the orchestrator pipeline doesn't crash — specifically guards
-        # against missing mkdirSync before writeFileSync in saveRunDetails / saveRunReport.
-        # Uses --skip-fetch to avoid 9-minute RSS fetch; verifies code paths only.
-        # continue-on-error so failures show as warnings, not blockers.
-        if: "!cancelled()"
-        continue-on-error: true
-        run: |
-          pnpm crux auto-update run --dry-run --skip-fetch --trigger=ci-check --budget=0 --count=0 \
-            || echo "::warning::Auto-update dry-run failed (advisory — check orchestrator for regressions)"
-
-      - name: Component reference validation (blocking)
-        run: pnpm crux validate refs
-
-      - name: Run validation suite (advisory)
-        if: "!cancelled()"
-        continue-on-error: true
-        run: |
-          pnpm crux validate || echo "::warning::Validation has pre-existing failures (non-blocking)"

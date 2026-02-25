@@ -1,17 +1,12 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { sql } from "drizzle-orm";
-import { getDrizzleDb, getDb } from "../db.js";
-import { pageLinks } from "../schema.js";
+import { getDb, type SqlQuery } from "../db.js";
 import {
   parseJsonBody,
   validationError,
   invalidJsonError,
 } from "./utils.js";
-import {
-  PageLinkSchema as SharedLinkSchema,
-  SyncLinksBatchSchema,
-} from "../api-types.js";
+import { SyncLinksBatchSchema } from "../api-types.js";
 
 export const linksRoute = new Hono();
 
@@ -61,7 +56,6 @@ const INVERSE_LABEL: Record<string, string> = {
 
 // ---- Schemas (from shared api-types) ----
 
-const LinkSchema = SharedLinkSchema;
 const SyncBatchSchema = SyncLinksBatchSchema;
 
 const BacklinksQuery = z.object({
@@ -74,6 +68,10 @@ const RelatedQuery = z.object({
 
 // ---- POST /sync ----
 
+// Advisory lock key for serializing page_links sync operations.
+// Prevents deadlocks when multiple callers (CI, local builds) sync concurrently.
+const PAGE_LINKS_SYNC_LOCK = 7_294_801;
+
 linksRoute.post("/sync", async (c) => {
   const body = await parseJsonBody(c);
   if (!body) return invalidJsonError(c);
@@ -82,38 +80,35 @@ linksRoute.post("/sync", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { links, replace } = parsed.data;
-  const db = getDrizzleDb();
+  const rawDb = getDb();
 
   let upserted = 0;
 
-  await db.transaction(async (tx) => {
+  // Use a raw postgres transaction with an advisory lock to serialize concurrent
+  // sync operations. Without this, two concurrent syncs deadlock on the unique
+  // index when inserting overlapping rows.
+  await rawDb.begin(async (txRaw) => {
+    const tx = txRaw as unknown as SqlQuery;
+    await tx`SELECT pg_advisory_xact_lock(${PAGE_LINKS_SYNC_LOCK})`;
+
     if (replace) {
-      await tx.delete(pageLinks);
+      await tx`DELETE FROM page_links`;
     }
 
     // Batch upsert — on conflict (source, target, type) update weight + relationship
     for (let i = 0; i < links.length; i += 500) {
       const batch = links.slice(i, i + 500);
-      const vals = batch.map((link) => ({
-        sourceId: link.sourceId,
-        targetId: link.targetId,
-        linkType: link.linkType,
-        relationship: link.relationship ?? null,
-        weight: link.weight,
-      }));
 
-      await tx
-        .insert(pageLinks)
-        .values(vals)
-        .onConflictDoUpdate({
-          target: [pageLinks.sourceId, pageLinks.targetId, pageLinks.linkType],
-          set: {
-            weight: sql`excluded.weight`,
-            relationship: sql`excluded.relationship`,
-          },
-        });
+      await tx`
+        INSERT INTO page_links (source_id, target_id, link_type, relationship, weight)
+        SELECT "sourceId", "targetId", "linkType", relationship, weight
+        FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb)
+        AS t("sourceId" text, "targetId" text, "linkType" text, relationship text, weight real)
+        ON CONFLICT (source_id, target_id, link_type)
+        DO UPDATE SET weight = EXCLUDED.weight, relationship = EXCLUDED.relationship
+      `;
 
-      upserted += vals.length;
+      upserted += batch.length;
     }
   });
 

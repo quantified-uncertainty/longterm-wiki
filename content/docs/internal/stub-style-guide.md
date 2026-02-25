@@ -4,7 +4,7 @@ title: "Stub Pages Style Guide"
 description: "Guidelines for minimal placeholder pages"
 sidebar:
   order: 13
-entityType: internal
+subcategory: style-guides
 quality: 19
 readerImportance: 14
 researchImportance: 9.5

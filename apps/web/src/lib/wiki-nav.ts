@@ -61,16 +61,20 @@ function getSectionTitle(prefix: string, sectionKey: string): string {
  * Build sidebar navigation for any section by reading page data.
  * Groups pages by subcategory, deriving labels from slugs.
  * Section title comes from the index page's frontmatter title.
+ *
+ * @param excludeIds - Optional set of page IDs to exclude from navigation.
  */
 function buildSectionNav(
   filePathPrefix: string,
   sectionKey: string,
+  excludeIds?: Set<string>,
 ): NavSection[] {
   const pages = getAllPages().filter(
     (p) =>
       p.filePath &&
       p.filePath.startsWith(`${filePathPrefix}/`) &&
-      !isIndexFile(p.filePath)
+      !isIndexFile(p.filePath) &&
+      (!excludeIds || !excludeIds.has(p.id))
   );
 
   if (pages.length === 0) return [];
@@ -225,9 +229,11 @@ export function getAboutNav(): NavSection[] {
 // ============================================================================
 
 /**
- * Build internal navigation with resolved /wiki/E<id> URLs.
- * For MDX content pages, uses getEntityHref() to produce canonical /wiki/E<id> links.
- * For React dashboard pages (no entity), keeps /internal/ URLs.
+ * Build internal navigation with auto-discovered MDX pages + hardcoded dashboards.
+ *
+ * MDX content pages are discovered via buildSectionNav() and grouped by subcategory.
+ * React dashboard pages (which have no entity in the database) are hardcoded.
+ * About pages are excluded (they use a separate sidebar via getAboutNav()).
  */
 export function getInternalNav(): NavSection[] {
   return [
@@ -244,10 +250,10 @@ export function getInternalNav(): NavSection[] {
       items: [
         { label: "Enhancement Queue", href: internalHref("enhancement-queue") },
         { label: "Suggested Pages", href: "/internal/suggested-pages" },
-        { label: "Update Schedule", href: "/internal/updates" },
+        { label: "Update Schedule", href: internalHref("update-schedule-dashboard") },
         { label: "Page Changes", href: "/internal/page-changes" },
         { label: "PR Descriptions", href: "/internal/pr-descriptions" },
-        { label: "Fact Dashboard", href: "/internal/facts" },
+        { label: "Fact Dashboard", href: internalHref("fact-dashboard") },
         { label: "Entities Dashboard", href: "/internal/entities" },
         { label: "Automation Tools", href: internalHref("automation-tools") },
         { label: "Content Database", href: internalHref("content-database") },
@@ -259,7 +265,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Citation Accuracy", href: "/internal/citation-accuracy" },
         { label: "Resources", href: "/internal/resources" },
         { label: "Citation Content", href: "/internal/citation-content" },
-        { label: "Pages", href: "/internal/page-coverage" },
+        { label: "Pages", href: internalHref("page-coverage-dashboard") },
         { label: "Hallucination Risk", href: "/internal/hallucination-risk" },
         { label: "Hallucination Evals", href: "/internal/hallucination-evals" },
         { label: "Improve Runs", href: "/internal/improve-runs" },
@@ -284,6 +290,8 @@ export function getInternalNav(): NavSection[] {
         { label: "Page Coverage Guide", href: internalHref("coverage-guide") },
         { label: "Cause-Effect Diagrams", href: internalHref("cause-effect-diagrams") },
         { label: "Research Reports", href: internalHref("research-reports") },
+        { label: "Doc Maintenance", href: internalHref("documentation-maintenance") },
+        { label: "Anthropic Refactor Notes", href: internalHref("anthropic-pages-refactor-notes") },
       ],
     },
     {
@@ -298,6 +306,8 @@ export function getInternalNav(): NavSection[] {
         { label: "Page Creator Pipeline", href: internalHref("page-creator-pipeline") },
         { label: "Gap Analysis (Feb 2026)", href: internalHref("gap-analysis-2026-02") },
         { label: "Consistency Audit (Feb 2026)", href: internalHref("website-consistency-audit-2026-02") },
+        { label: "Importance Ranking", href: internalHref("importance-ranking") },
+        { label: "Page Length Research", href: internalHref("page-length-research") },
       ],
     },
     {
@@ -306,10 +316,16 @@ export function getInternalNav(): NavSection[] {
         { label: "Architecture", href: internalHref("architecture") },
         { label: "Wiki Generation Architecture", href: internalHref("wiki-generation-architecture") },
         { label: "Content Pipeline Architecture", href: internalHref("content-pipeline-architecture") },
+        { label: "Claim-First Architecture", href: internalHref("claim-first-architecture") },
+        { label: "Claims Architecture Decisions", href: internalHref("claims-architecture-decisions") },
+        { label: "Citation Architecture", href: internalHref("citation-architecture") },
+        { label: "Knowledge Graph Ontology", href: internalHref("knowledge-graph-ontology") },
+        { label: "Fact System Strategy", href: internalHref("fact-system-strategy") },
         { label: "Claims Development Roadmap", href: internalHref("claims-system-development-roadmap") },
         { label: "Schema Overview", href: internalHref("__index__/internal/schema", "/wiki/E781") },
         { label: "Entity Reference", href: internalHref("entities") },
         { label: "Server Environments", href: internalHref("wiki-server-architecture") },
+        { label: "Server Communication", href: internalHref("server-communication-investigation") },
         { label: "Schema Diagrams", href: internalHref("diagrams") },
       ],
     },

@@ -4,7 +4,6 @@ title: "Project Roadmap"
 description: "Future work, infrastructure improvements, and project tracking"
 sidebar:
   order: 10
-entityType: internal
 quality: 29
 readerImportance: 14
 researchImportance: 8.5
