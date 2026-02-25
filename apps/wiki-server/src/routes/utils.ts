@@ -23,6 +23,20 @@ export function notFoundError(c: Context, message: string) {
   return c.json({ error: "not_found", message }, 404);
 }
 
+/** Return a 500 database error response, logging the underlying error. */
+export function dbError(
+  c: Context,
+  operation: string,
+  err: unknown,
+  context?: Record<string, unknown>
+) {
+  console.error(`[db] ${operation} failed:`, {
+    ...(context ?? {}),
+    error: err instanceof Error ? err.message : String(err),
+  });
+  return c.json({ error: "database_error", message: `${operation} failed` }, 500);
+}
+
 /** Extract the first row from a query result, throwing if empty. */
 export function firstOrThrow<T>(rows: T[], context: string): T {
   if (rows.length === 0) {
