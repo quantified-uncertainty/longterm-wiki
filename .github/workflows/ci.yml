@@ -186,6 +186,9 @@ jobs:
           pnpm crux auto-update run --dry-run --skip-fetch --trigger=ci-check --budget=0 --count=0 \
             || echo "::warning::Auto-update dry-run failed (advisory — check orchestrator for regressions)"
 
+      - name: Component reference validation (blocking)
+        run: pnpm crux validate refs
+
       - name: Run validation suite (advisory)
         if: "!cancelled()"
         continue-on-error: true
