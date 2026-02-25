@@ -334,6 +334,14 @@ claimsRoute.get("/stats", async (c) => {
     .from(claims)
     .where(eq(claims.claimMode, "attributed"));
 
+  // Claims with numeric value (central, low, or high)
+  const numericResult = await db
+    .select({ count: count() })
+    .from(claims)
+    .where(
+      sql`${claims.valueNumeric} IS NOT NULL OR ${claims.valueLow} IS NOT NULL OR ${claims.valueHigh} IS NOT NULL`
+    );
+
   return c.json({
     total,
     byClaimType: Object.fromEntries(byType.map((r) => [r.claimType, r.count])),
@@ -348,6 +356,7 @@ claimsRoute.get("/stats", async (c) => {
     factLinkedClaims: factLinkedResult[0].count,
     withSourcesClaims: withSourcesResult[0].count,
     attributedClaims: attributedResult[0].count,
+    numericClaims: numericResult[0].count,
   });
 });
 

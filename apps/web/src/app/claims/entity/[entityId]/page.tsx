@@ -37,6 +37,9 @@ export default async function EntityClaimsPage({ params }: PageProps) {
   const withSources = claims.filter(
     (c) => c.sources && c.sources.length > 0
   ).length;
+  const withNumeric = claims.filter(
+    (c) => c.valueNumeric != null || c.valueLow != null || c.valueHigh != null
+  ).length;
 
   const byCategory: Record<string, number> = {};
   for (const c of claims) {
@@ -71,7 +74,7 @@ export default async function EntityClaimsPage({ params }: PageProps) {
 
       {claims.length > 0 && (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
             <StatCard label="Total Claims" value={claims.length} />
             <StatCard label="Verified" value={verified} />
             <StatCard label="Multi-Entity" value={multiEntity} />
@@ -81,6 +84,7 @@ export default async function EntityClaimsPage({ params }: PageProps) {
             />
             <StatCard label="Attributed" value={attributed} />
             <StatCard label="With Sources" value={withSources} />
+            <StatCard label="Numeric" value={withNumeric} />
           </div>
 
           {Object.keys(byCategory).length > 1 && (

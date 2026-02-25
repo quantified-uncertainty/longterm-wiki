@@ -26,6 +26,7 @@ export function ClaimsExplorer({
     confidence: searchParams.get("confidence") ?? "",
     claimMode: searchParams.get("claimMode") ?? "",
     multiEntity: searchParams.get("multiEntity") === "true",
+    numericOnly: searchParams.get("numericOnly") === "true",
   };
 
   function onFilterChange(key: string, value: string | boolean) {
@@ -70,6 +71,11 @@ export function ClaimsExplorer({
     if (filters.multiEntity) {
       result = result.filter(
         (c) => c.relatedEntities && c.relatedEntities.length > 0
+      );
+    }
+    if (filters.numericOnly) {
+      result = result.filter(
+        (c) => c.valueNumeric != null || c.valueLow != null || c.valueHigh != null
       );
     }
     return result;
