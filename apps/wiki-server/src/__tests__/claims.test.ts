@@ -909,6 +909,171 @@ describe("Claims API", () => {
     });
   });
 
+  // =======================================================================
+  // GET /:id/sources and POST /:id/sources
+  // =======================================================================
+
+  describe("GET /api/claims/:id/sources", () => {
+    it("returns empty sources array for claim with no sources", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "anthropic",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "No sources here",
+      });
+      const created = await createRes.json();
+
+      const res = await app.request(`/api/claims/${created.id}/sources`);
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.sources).toEqual([]);
+    });
+
+    it("returns sources for a claim that has them", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "anthropic",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "Anthropic raised $7.3B",
+        sources: [
+          { resourceId: "res-001", sourceQuote: "raised $7.3B", isPrimary: true },
+          { url: "https://example.com", isPrimary: false },
+        ],
+      });
+      const created = await createRes.json();
+
+      const res = await app.request(`/api/claims/${created.id}/sources`);
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.sources).toHaveLength(2);
+      // Primary source should be present
+      expect(body.sources.some((s: { resourceId?: string }) => s.resourceId === "res-001")).toBe(true);
+    });
+
+    it("returns 400 for non-numeric claim ID", async () => {
+      const res = await app.request("/api/claims/not-a-number/sources");
+      expect(res.status).toBe(400);
+    });
+
+    it("returns 400 for zero claim ID", async () => {
+      const res = await app.request("/api/claims/0/sources");
+      expect(res.status).toBe(400);
+    });
+  });
+
+  describe("POST /api/claims/:id/sources", () => {
+    it("adds a source to an existing claim", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "anthropic",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "Anthropic was founded in 2021",
+      });
+      const created = await createRes.json();
+
+      const addRes = await postJson(app, `/api/claims/${created.id}/sources`, {
+        resourceId: "res-techcrunch-2021",
+        sourceQuote: "The company was founded in 2021",
+        isPrimary: true,
+      });
+      expect(addRes.status).toBe(201);
+      const source = await addRes.json();
+      expect(source.resourceId).toBe("res-techcrunch-2021");
+      expect(source.isPrimary).toBe(true);
+      expect(source.sourceQuote).toBe("The company was founded in 2021");
+    });
+
+    it("adds a URL-only source (no resourceId)", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "anthropic",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "A claim",
+      });
+      const created = await createRes.json();
+
+      const addRes = await postJson(app, `/api/claims/${created.id}/sources`, {
+        url: "https://example.com/article",
+        isPrimary: false,
+      });
+      expect(addRes.status).toBe(201);
+      const source = await addRes.json();
+      expect(source.url).toBe("https://example.com/article");
+      expect(source.resourceId).toBeNull();
+    });
+
+    it("returns 404 when adding source to non-existent claim", async () => {
+      const res = await postJson(app, "/api/claims/99999/sources", {
+        url: "https://example.com",
+      });
+      expect(res.status).toBe(404);
+    });
+
+    it("returns 400 for non-numeric claim ID", async () => {
+      const res = await postJson(app, "/api/claims/abc/sources", {
+        url: "https://example.com",
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("source appears in GET /:id/sources after being added", async () => {
+      const createRes = await postJson(app, "/api/claims", {
+        entityId: "openai",
+        entityType: "organization",
+        claimType: "factual",
+        claimText: "OpenAI released GPT-4",
+      });
+      const created = await createRes.json();
+
+      await postJson(app, `/api/claims/${created.id}/sources`, {
+        resourceId: "res-openai-gpt4",
+        sourceQuote: "GPT-4 was released in March 2023",
+        isPrimary: true,
+      });
+
+      const sourcesRes = await app.request(`/api/claims/${created.id}/sources`);
+      expect(sourcesRes.status).toBe(200);
+      const body = await sourcesRes.json();
+      expect(body.sources).toHaveLength(1);
+      expect(body.sources[0].resourceId).toBe("res-openai-gpt4");
+    });
+  });
+
+  // =======================================================================
+  // Phase 2 batch with sources (safe path — one at a time to avoid ordering bug)
+  // =======================================================================
+
+  describe("POST /api/claims/batch with sources", () => {
+    it("inserts batch items with inline sources — each claim gets correct sources", async () => {
+      const res = await postJson(app, "/api/claims/batch", {
+        items: [
+          {
+            entityId: "anthropic",
+            entityType: "organization",
+            claimType: "factual",
+            claimText: "Anthropic raised from Google",
+            sources: [{ resourceId: "res-google", isPrimary: true }],
+          },
+          {
+            entityId: "openai",
+            entityType: "organization",
+            claimType: "factual",
+            claimText: "OpenAI raised from Microsoft",
+            sources: [{ resourceId: "res-msft", isPrimary: true }],
+          },
+        ],
+      });
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.inserted).toBe(2);
+      // Both sets of sources should be present
+      expect(claimSourceStore.size).toBe(2);
+      const sources = Array.from(claimSourceStore.values());
+      expect(sources.some((s) => s.resource_id === "res-google")).toBe(true);
+      expect(sources.some((s) => s.resource_id === "res-msft")).toBe(true);
+    });
+  });
+
   describe("Filtering by claimCategory", () => {
     it("filters /all endpoint by claimCategory", async () => {
       await postJson(app, "/api/claims", {

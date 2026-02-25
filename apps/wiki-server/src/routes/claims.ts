@@ -194,47 +194,63 @@ claimsRoute.post("/batch", async (c) => {
     return validationError(c, `Referenced entities not found: ${missing.join(", ")}`);
   }
 
-  const allVals = items.map(claimValues);
+  const itemsWithSources = items.filter(
+    (item) => item.sources && item.sources.length > 0
+  );
 
-  const results = await db
-    .insert(claims)
-    .values(allVals)
-    .returning({
-      id: claims.id,
-      entityId: claims.entityId,
-      claimType: claims.claimType,
-    });
+  // PostgreSQL's RETURNING clause does not guarantee row ordering matches
+  // insertion order, so we cannot safely correlate results[i] with items[i]
+  // when sources need to be attached to specific claims.
+  //
+  // Strategy: if no item has sources, use a fast multi-row batch insert.
+  // If any item has sources, insert one-at-a-time so each claim's ID is known.
+  const allResults: Array<{ id: number; entityId: string; claimType: string }> = [];
 
-  // Insert claim_sources for any items that include inline sources
-  const sourcesToInsert: Array<{
-    claimId: number;
-    resourceId: string | null;
-    url: string | null;
-    sourceQuote: string | null;
-    isPrimary: boolean;
-  }> = [];
+  if (itemsWithSources.length === 0) {
+    // Fast path: bulk insert, no source correlation needed
+    const allVals = items.map(claimValues);
+    const rows = await db
+      .insert(claims)
+      .values(allVals)
+      .returning({ id: claims.id, entityId: claims.entityId, claimType: claims.claimType });
+    allResults.push(...rows);
+  } else {
+    // Safe path: insert one at a time to guarantee ID correlation for source rows
+    const sourcesToInsert: Array<{
+      claimId: number;
+      resourceId: string | null;
+      url: string | null;
+      sourceQuote: string | null;
+      isPrimary: boolean;
+    }> = [];
 
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    const result = results[i];
-    if (item.sources && item.sources.length > 0 && result) {
-      for (const s of item.sources) {
-        sourcesToInsert.push({
-          claimId: result.id,
-          resourceId: s.resourceId ?? null,
-          url: s.url ?? null,
-          sourceQuote: s.sourceQuote ?? null,
-          isPrimary: s.isPrimary ?? false,
-        });
+    for (const item of items) {
+      const [row] = await db
+        .insert(claims)
+        .values(claimValues(item))
+        .returning({ id: claims.id, entityId: claims.entityId, claimType: claims.claimType });
+
+      allResults.push(row);
+
+      if (item.sources && item.sources.length > 0) {
+        for (const s of item.sources) {
+          sourcesToInsert.push({
+            claimId: row.id,
+            resourceId: s.resourceId ?? null,
+            url: s.url ?? null,
+            sourceQuote: s.sourceQuote ?? null,
+            isPrimary: s.isPrimary ?? false,
+          });
+        }
       }
+    }
+
+    if (sourcesToInsert.length > 0) {
+      await db.insert(claimSources).values(sourcesToInsert);
     }
   }
 
-  if (sourcesToInsert.length > 0) {
-    await db.insert(claimSources).values(sourcesToInsert);
-  }
-
-  return c.json({ inserted: results.length, results }, 201);
+  return c.json({ inserted: allResults.length, results: allResults }, 201);
 });
 
 // ---- POST /clear (delete all claims for an entity) ----
