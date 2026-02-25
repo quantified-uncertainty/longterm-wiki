@@ -98,7 +98,7 @@ export default async function ClaimsOverviewPage() {
       </p>
 
       {/* Global stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
         <StatCard label="Total Claims" value={stats.total} />
         <StatCard label="Entities" value={entityRows.length} />
         <StatCard label="Multi-Entity" value={stats.multiEntityClaims} />
@@ -110,6 +110,7 @@ export default async function ClaimsOverviewPage() {
             stats.total - (stats.byClaimCategory["uncategorized"] ?? 0)
           }
         />
+        <StatCard label="Numeric" value={stats.numericClaims ?? 0} />
       </div>
 
       {/* Category distribution */}
@@ -126,6 +127,32 @@ export default async function ClaimsOverviewPage() {
         <h3 className="text-sm font-semibold mb-3">Claim Types</h3>
         <DistributionBar data={stats.byClaimType} total={stats.total} />
       </div>
+
+      {/* Mode distribution (Phase 2) */}
+      {stats.byClaimMode && Object.keys(stats.byClaimMode).length > 0 && (
+        <div className="rounded-lg border p-4 mb-6">
+          <h3 className="text-sm font-semibold mb-3">Epistemic Mode</h3>
+          <DistributionBar data={stats.byClaimMode} total={stats.total} />
+          <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
+            {stats.attributedClaims !== undefined && (
+              <span>
+                <span className="font-medium text-amber-700">
+                  {stats.attributedClaims}
+                </span>{" "}
+                attributed (reported speech)
+              </span>
+            )}
+            {stats.withSourcesClaims !== undefined && (
+              <span>
+                <span className="font-medium text-blue-700">
+                  {stats.withSourcesClaims}
+                </span>{" "}
+                with structured sources
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Top entities */}
       <div className="rounded-lg border p-4 mb-6">

@@ -30,6 +30,8 @@ import {
 import type { ClaimRow } from "@wiki-server/api-types";
 import { CategoryBadge } from "./category-badge";
 import { ConfidenceBadge } from "./confidence-badge";
+import { ClaimModeBadge } from "./claim-mode-badge";
+import { NumericValueDisplay } from "./numeric-value-display";
 
 function ExpandedClaimDetail({ claim }: { claim: ClaimRow }) {
   return (
@@ -40,6 +42,29 @@ function ExpandedClaimDetail({ claim }: { claim: ClaimRow }) {
         </span>
         <p className="mt-0.5">{claim.claimText}</p>
       </div>
+
+      {/* Epistemic mode — show badge for attributed; always show asOf when set */}
+      {(claim.claimMode === "attributed" || claim.asOf) && (
+        <div className="flex items-center gap-2">
+          {claim.claimMode === "attributed" && (
+            <ClaimModeBadge mode={claim.claimMode} attributedTo={claim.attributedTo} />
+          )}
+          {claim.asOf && (
+            <span className="text-[10px] text-muted-foreground">as of {claim.asOf}</span>
+          )}
+        </div>
+      )}
+
+      {/* Numeric value — show if any numeric field is present (central, low, or high) */}
+      {(claim.valueNumeric != null || claim.valueLow != null || claim.valueHigh != null) && (
+        <NumericValueDisplay
+          value={claim.valueNumeric}
+          low={claim.valueLow}
+          high={claim.valueHigh}
+          measure={claim.measure}
+        />
+      )}
+
       {claim.sourceQuote && (
         <div>
           <span className="font-medium text-xs text-muted-foreground">
@@ -50,6 +75,49 @@ function ExpandedClaimDetail({ claim }: { claim: ClaimRow }) {
           </p>
         </div>
       )}
+
+      {/* claim_sources */}
+      {claim.sources && claim.sources.length > 0 && (
+        <div>
+          <span className="font-medium text-xs text-muted-foreground block mb-1">
+            Sources ({claim.sources.length}):
+          </span>
+          <div className="space-y-1">
+            {claim.sources.map((s) => (
+              <div key={s.id} className="text-xs flex items-start gap-2">
+                {s.isPrimary && (
+                  <span className="bg-blue-100 text-blue-700 px-1 py-0.5 rounded text-[9px] shrink-0">
+                    primary
+                  </span>
+                )}
+                {s.resourceId ? (
+                  <Link
+                    href={`/source/${s.resourceId}`}
+                    className="text-blue-600 hover:underline font-mono"
+                  >
+                    {s.resourceId}
+                  </Link>
+                ) : s.url ? (
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline truncate"
+                  >
+                    {s.url}
+                  </a>
+                ) : null}
+                {s.sourceQuote && (
+                  <span className="italic text-muted-foreground truncate">
+                    &ldquo;{s.sourceQuote.slice(0, 80)}&rdquo;
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-4 text-xs">
         {claim.section && (
           <span>
@@ -127,16 +195,33 @@ const columns: ColumnDef<ClaimRow>[] = [
   {
     accessorKey: "claimText",
     header: "Claim",
-    cell: ({ row }) => (
-      <span
-        className="text-xs leading-relaxed"
-        title={row.original.claimText}
-      >
-        {row.original.claimText.length > 200
-          ? row.original.claimText.slice(0, 200) + "..."
-          : row.original.claimText}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const c = row.original;
+      const hasNumeric = c.valueNumeric != null || c.valueLow != null || c.valueHigh != null;
+      return (
+        <div className="space-y-0.5">
+          <span
+            className="text-xs leading-relaxed"
+            title={c.claimText}
+          >
+            {c.claimText.length > 200
+              ? c.claimText.slice(0, 200) + "..."
+              : c.claimText}
+          </span>
+          {hasNumeric && (
+            <div>
+              <NumericValueDisplay
+                value={c.valueNumeric}
+                low={c.valueLow}
+                high={c.valueHigh}
+                measure={c.measure}
+                compact
+              />
+            </div>
+          )}
+        </div>
+      );
+    },
     size: 400,
   },
   {
@@ -158,6 +243,23 @@ const columns: ColumnDef<ClaimRow>[] = [
       <CategoryBadge
         category={row.original.claimCategory ?? "uncategorized"}
       />
+    ),
+    size: 90,
+  },
+  {
+    id: "claimMode",
+    header: "Mode",
+    cell: ({ row }) => (
+      <div className="space-y-1">
+        <ClaimModeBadge
+          mode={row.original.claimMode}
+          attributedTo={row.original.attributedTo}
+          compact
+        />
+        {row.original.asOf && (
+          <div className="text-[9px] text-muted-foreground">{row.original.asOf}</div>
+        )}
+      </div>
     ),
     size: 90,
   },

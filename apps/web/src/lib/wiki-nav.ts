@@ -264,6 +264,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Hallucination Evals", href: "/internal/hallucination-evals" },
         { label: "Improve Runs", href: "/internal/improve-runs" },
         { label: "Claims", href: "/claims" },
+        { label: "Claims Ingestion", href: "/internal/claims-ingestion" },
         { label: "Job Queue", href: "/internal/jobs" },
       ],
     },

@@ -17,7 +17,7 @@ export async function fetchAllClaims(): Promise<ClaimRow[]> {
   // eslint-disable-next-line no-constant-condition
   while (true) {
     const page = await fetchFromWikiServer<PaginatedClaimsResponse>(
-      `/api/claims/all?limit=${PAGE_SIZE}&offset=${offset}`,
+      `/api/claims/all?limit=${PAGE_SIZE}&offset=${offset}&includeSources=true`,
       { revalidate: 300 }
     );
     if (!page || page.claims.length === 0) break;

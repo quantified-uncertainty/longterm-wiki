@@ -36,7 +36,7 @@ import {
   clearClaimsForEntity,
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
-import { VALID_CLAIM_TYPES, claimTypeToCategory } from '../lib/claim-utils.ts';
+import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../lib/claim-utils.ts';
 import type { ClaimTypeValue } from '../lib/claim-utils.ts';
 
 // ---------------------------------------------------------------------------
@@ -109,14 +109,21 @@ function splitIntoSections(body: string): Section[] {
 }
 
 // ---------------------------------------------------------------------------
-// LLM claim extraction
+// LLM claim extraction — Phase 2
 // ---------------------------------------------------------------------------
 
 interface ExtractedClaim {
   claimText: string;
   claimType: ClaimTypeValue;
-  footnoteRefs: string[];  // e.g. ["1", "3", "7"]
-  relatedEntities?: string[];  // entity IDs mentioned in the claim
+  claimMode: 'endorsed' | 'attributed';  // Phase 2
+  attributedTo?: string;                  // Phase 2: entity_id of claim author
+  asOf?: string;                          // Phase 2: YYYY-MM or YYYY-MM-DD
+  measure?: string;                       // Phase 2: measure ID (e.g. "valuation", "employee_count")
+  valueNumeric?: number;                  // Phase 2: central numeric value
+  valueLow?: number;                      // Phase 2: lower bound
+  valueHigh?: number;                     // Phase 2: upper bound
+  footnoteRefs: string[];
+  relatedEntities?: string[];
 }
 
 const EXTRACT_SYSTEM_PROMPT = `You are a fact-extraction assistant. Given a section of a wiki article, extract specific, verifiable claims.
@@ -129,26 +136,39 @@ For each claim, provide:
     "historical" — historical events or timeline items
     "evaluative" — subjective assessments, value judgments, or opinions
     "causal" — cause-effect assertions or inferences
-    "consensus" — claims about what is "widely believed" or "generally accepted" (need multiple sources)
+    "consensus" — claims about what is "widely believed" or "generally accepted"
     "speculative" — predictions, projections, or uncertain future claims
     "relational" — comparisons between entities or cross-entity assertions
-- "footnoteRefs": array of citation references (as strings) — look for [^N] (e.g. [^1]) and [^R:HASH] (e.g. [^R:abc123]) patterns near the claim
-- "relatedEntities": array of entity IDs or names mentioned in the claim other than the page's primary subject (e.g., if a claim on the Kalshi page mentions "Polymarket", include ["polymarket"])
+- "claimMode": one of:
+    "endorsed" — the wiki article itself asserts this claim (most claims)
+    "attributed" — the article is reporting what someone ELSE claims (e.g. "CEO X said...", "According to OpenAI...", "Researchers believe...")
+- "attributedTo": (only when claimMode="attributed") the entity_id or name of who is making the claim (e.g. "sam-altman", "openai", "researchers")
+- "asOf": (optional) the date this claim was true, in YYYY-MM or YYYY-MM-DD format (e.g. "2024-03" for "as of March 2024")
+- "measure": (optional, only for numeric claims) a snake_case identifier for what is being measured:
+    Use "valuation" for company valuations, "funding_total" for total funding raised,
+    "employee_count" for headcount, "revenue" for revenue, "parameters" for model parameter counts,
+    "benchmark_score" for benchmark scores. Leave null if no standard measure applies.
+- "valueNumeric": (optional, only for numeric claims) the central numeric value as a plain number (e.g. 7300000000 for $7.3B, 0.92 for 92%)
+- "valueLow": (optional) lower bound if a range is given
+- "valueHigh": (optional) upper bound if a range is given
+- "footnoteRefs": array of citation references (as strings) — look for [^N] (e.g. [^1]) and [^R:HASH] patterns near the claim
+- "relatedEntities": array of entity IDs or names mentioned in the claim other than the page's primary subject
 
 Rules:
 - Each claim must be atomic (one assertion per claim)
 - Include specific numbers, names, dates when present
 - Skip headings, navigation text, and pure descriptions
 - Skip claims that are just definitions without verifiable content
-- Use "numeric" for any claim containing specific dollar amounts, percentages, or counts
-- Use "consensus" for claims using language like "widely", "generally", "most experts"
-- Use "speculative" for claims with hedging language: "may", "might", "could", "expected to"
-- Use "relational" for claims comparing two or more entities
+- Use "endorsed" for most claims — the wiki is making the assertion
+- Use "attributed" when the text uses phrases like "X says", "according to Y", "Y believes", "Y announced"
+- Use "numeric" for any claim with specific dollar amounts, percentages, counts, or model sizes
+- Always include valueNumeric for numeric claims — extract the number even if written out (e.g. "$7.3 billion" → 7300000000)
+- Include asOf whenever the text specifies a date or "as of" qualifier for the claim
 - Extract 3-10 claims per section (skip trivial or duplicate content)
 - Return only claims that appear in the given text
 
 Respond ONLY with JSON:
-{"claims": [{"claimText": "...", "claimType": "factual", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
+{"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
 
 async function extractClaimsFromSection(
   section: Section,
@@ -163,7 +183,7 @@ Extract atomic claims from this section. Return JSON only.`;
   try {
     const raw = await callOpenRouter(EXTRACT_SYSTEM_PROMPT, userPrompt, {
       model: opts.model ?? DEFAULT_CITATION_MODEL,
-      maxTokens: 2000,
+      maxTokens: 2500,
       title: 'LongtermWiki Claims Extraction',
     });
 
@@ -173,21 +193,34 @@ Extract atomic claims from this section. Return JSON only.`;
     if (!Array.isArray(parsed.claims)) return [];
 
     return parsed.claims
-      .filter((c): c is ExtractedClaim =>
+      .filter((c): c is Record<string, unknown> =>
         typeof c === 'object' && c !== null &&
-        typeof (c as ExtractedClaim).claimText === 'string' &&
-        (c as ExtractedClaim).claimText.length > 10
+        typeof (c as Record<string, unknown>).claimText === 'string' &&
+        ((c as Record<string, unknown>).claimText as string).length > 10
       )
       .map(c => ({
-        claimText: (c as ExtractedClaim).claimText,
-        claimType: (VALID_CLAIM_TYPES.includes((c as ExtractedClaim).claimType as ClaimTypeValue)
-          ? (c as ExtractedClaim).claimType
+        claimText: c.claimText as string,
+        claimType: (VALID_CLAIM_TYPES.includes(c.claimType as ClaimTypeValue)
+          ? c.claimType
           : 'factual') as ClaimTypeValue,
-        footnoteRefs: Array.isArray((c as ExtractedClaim).footnoteRefs)
-          ? (c as ExtractedClaim).footnoteRefs.map(String)
+        claimMode: (c.claimMode === 'attributed' ? 'attributed' : 'endorsed') as 'endorsed' | 'attributed',
+        attributedTo: typeof c.attributedTo === 'string' && c.attributedTo.length > 0
+          ? c.attributedTo
+          : undefined,
+        asOf: typeof c.asOf === 'string' && /^\d{4}(-\d{2}(-\d{2})?)?$/.test(c.asOf)
+          ? c.asOf
+          : undefined,
+        measure: typeof c.measure === 'string' && c.measure.length > 0
+          ? c.measure
+          : undefined,
+        valueNumeric: parseNumericValue(c.valueNumeric),
+        valueLow: parseNumericValue(c.valueLow),
+        valueHigh: parseNumericValue(c.valueHigh),
+        footnoteRefs: Array.isArray(c.footnoteRefs)
+          ? (c.footnoteRefs as unknown[]).map(String)
           : [],
-        relatedEntities: Array.isArray((c as ExtractedClaim).relatedEntities)
-          ? (c as ExtractedClaim).relatedEntities!.map(String).filter(s => s.length > 0)
+        relatedEntities: Array.isArray(c.relatedEntities)
+          ? (c.relatedEntities as unknown[]).map(String).filter(s => s.length > 0)
           : [],
       }));
   } catch (err) {
@@ -257,14 +290,22 @@ async function main() {
   console.log(`\n  Total extracted: ${c.bold}${allClaims.length}${c.reset} claims`);
 
   if (dryRun) {
-    // Show type/category breakdown
+    // Show type/category/mode breakdown
     const typeCounts: Record<string, number> = {};
     const catCounts: Record<string, number> = {};
+    const modeCounts: Record<string, number> = {};
+    let numericCount = 0;
+    let attributedCount = 0;
+
     for (const claim of allClaims) {
       typeCounts[claim.claimType] = (typeCounts[claim.claimType] ?? 0) + 1;
       const cat = claimTypeToCategory(claim.claimType);
       catCounts[cat] = (catCounts[cat] ?? 0) + 1;
+      modeCounts[claim.claimMode] = (modeCounts[claim.claimMode] ?? 0) + 1;
+      if (claim.valueNumeric !== undefined) numericCount++;
+      if (claim.claimMode === 'attributed') attributedCount++;
     }
+
     console.log(`\n${c.bold}By type:${c.reset}`);
     for (const [type, cnt] of Object.entries(typeCounts).sort((a, b) => b[1] - a[1])) {
       console.log(`  ${type.padEnd(14)} ${cnt}`);
@@ -272,6 +313,16 @@ async function main() {
     console.log(`\n${c.bold}By category:${c.reset}`);
     for (const [cat, cnt] of Object.entries(catCounts).sort((a, b) => b[1] - a[1])) {
       console.log(`  ${cat.padEnd(14)} ${cnt}`);
+    }
+    console.log(`\n${c.bold}By mode:${c.reset}`);
+    for (const [mode, cnt] of Object.entries(modeCounts).sort((a, b) => b[1] - a[1])) {
+      console.log(`  ${mode.padEnd(14)} ${cnt}`);
+    }
+    if (numericCount > 0) {
+      console.log(`\n  ${c.green}${numericCount}${c.reset} numeric claims with extracted values`);
+    }
+    if (attributedCount > 0) {
+      console.log(`  ${c.yellow}${attributedCount}${c.reset} attributed claims (reported speech)`);
     }
 
     const withEntities = allClaims.filter(c2 => c2.relatedEntities && c2.relatedEntities.length > 0);
@@ -286,7 +337,10 @@ async function main() {
     for (const claim of allClaims.slice(0, 10)) {
       const refs = claim.footnoteRefs.length > 0 ? ` [^${claim.footnoteRefs.join(', ^')}]` : ' (unsourced)';
       const cat = claimTypeToCategory(claim.claimType);
-      console.log(`  [${claim.claimType}/${cat}] ${claim.claimText.slice(0, 100)}${refs}`);
+      const modeTag = claim.claimMode === 'attributed' ? ` [by:${claim.attributedTo ?? '?'}]` : '';
+      const numTag = claim.valueNumeric !== undefined ? ` [=${claim.valueNumeric}]` : '';
+      const asOfTag = claim.asOf ? ` [${claim.asOf}]` : '';
+      console.log(`  [${claim.claimType}/${cat}${modeTag}${asOfTag}${numTag}] ${claim.claimText.slice(0, 90)}${refs}`);
     }
     if (allClaims.length > 10) {
       console.log(`  ... and ${allClaims.length - 10} more`);
@@ -321,13 +375,21 @@ async function main() {
       unit: claim.footnoteRefs.length > 0 ? claim.footnoteRefs.join(',') : null,
       confidence: 'unverified',
       sourceQuote: null,
-      // Enhanced fields
+      // Enhanced fields (migration 0028)
       claimCategory: claimTypeToCategory(claim.claimType),
       relatedEntities: claim.relatedEntities && claim.relatedEntities.length > 0
         ? claim.relatedEntities
         : null,
       section: claim.section,
       footnoteRefs: claim.footnoteRefs.length > 0 ? claim.footnoteRefs.join(',') : null,
+      // Phase 2 fields (migration 0029)
+      claimMode: claim.claimMode,
+      attributedTo: claim.attributedTo ?? null,
+      asOf: claim.asOf ?? null,
+      measure: claim.measure ?? null,
+      valueNumeric: claim.valueNumeric ?? null,
+      valueLow: claim.valueLow ?? null,
+      valueHigh: claim.valueHigh ?? null,
     }));
 
     const result = await insertClaimBatch(items);
@@ -338,10 +400,15 @@ async function main() {
     }
   }
 
+  const attributedCount = allClaims.filter(c2 => c2.claimMode === 'attributed').length;
+  const numericCount = allClaims.filter(c2 => c2.valueNumeric !== undefined).length;
+
   console.log(`\n${c.bold}Done:${c.reset}`);
-  console.log(`  Inserted: ${c.green}${inserted}${c.reset} claims`);
+  console.log(`  Inserted:  ${c.green}${inserted}${c.reset} claims`);
+  if (attributedCount > 0) console.log(`  Attributed: ${c.yellow}${attributedCount}${c.reset} claims with attribution`);
+  if (numericCount > 0) console.log(`  Numeric:    ${c.green}${numericCount}${c.reset} claims with extracted values`);
   if (failed > 0) {
-    console.log(`  Failed:   ${c.red}${failed}${c.reset}`);
+    console.log(`  Failed:    ${c.red}${failed}${c.reset}`);
   }
   console.log(`\n  Next steps:`);
   console.log(`    pnpm crux claims verify ${pageId}    # Verify claims against source text`);
