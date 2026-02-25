@@ -63,13 +63,14 @@ function runExtraction(page: PageConfig, variant: VariantName, c: ReturnType<typ
     const output = execSync(cmd, {
       cwd: PROJECT_ROOT,
       encoding: 'utf-8',
-      timeout: 120_000,
+      timeout: 300_000,
       env: { ...process.env },
     });
     writeFileSync(logFile, output);
 
-    // Parse claim count from output
-    const match = output.match(/Total extracted:\s*(\d+)/);
+    // Parse claim count from output (strip ANSI codes first)
+    const clean = output.replace(/\x1b\[[0-9;]*m/g, '');
+    const match = clean.match(/Total extracted:\s*(\d+)/);
     const claims = match ? parseInt(match[1], 10) : 0;
     return { claims, ok: true };
   } catch (err) {
