@@ -44,7 +44,7 @@ import type { ClaimTypeValue } from '../lib/claim-utils.ts';
 // ---------------------------------------------------------------------------
 
 /** Strip MDX/JSX components and return plain text suitable for LLM analysis. */
-function cleanMdxForExtraction(body: string): string {
+export function cleanMdxForExtraction(body: string): string {
   return body
     // Remove import/export statements
     .replace(/^(import|export)\s+.*$/gm, '')
@@ -67,14 +67,14 @@ function cleanMdxForExtraction(body: string): string {
 // Section splitting
 // ---------------------------------------------------------------------------
 
-interface Section {
+export interface Section {
   heading: string;
   content: string;
   level: number;
 }
 
 /** Split MDX body into sections by H2/H3 headings. */
-function splitIntoSections(body: string): Section[] {
+export function splitIntoSections(body: string): Section[] {
   const lines = body.split('\n');
   const sections: Section[] = [];
   let currentHeading = 'Introduction';
@@ -122,11 +122,12 @@ interface ExtractedClaim {
   valueNumeric?: number;                  // Phase 2: central numeric value
   valueLow?: number;                      // Phase 2: lower bound
   valueHigh?: number;                     // Phase 2: upper bound
+  sourceQuote?: string;                   // Verbatim excerpt from wiki text supporting the claim
   footnoteRefs: string[];
   relatedEntities?: string[];
 }
 
-const EXTRACT_SYSTEM_PROMPT = `You are a fact-extraction assistant. Given a section of a wiki article, extract specific, verifiable claims.
+export const EXTRACT_SYSTEM_PROMPT = `You are a fact-extraction assistant. Given a section of a wiki article, extract specific, verifiable claims.
 
 For each claim, provide:
 - "claimText": a single atomic, self-contained statement (not a question or heading)
@@ -151,6 +152,7 @@ For each claim, provide:
 - "valueNumeric": (optional, only for numeric claims) the central numeric value as a plain number (e.g. 7300000000 for $7.3B, 0.92 for 92%)
 - "valueLow": (optional) lower bound if a range is given
 - "valueHigh": (optional) upper bound if a range is given
+- "sourceQuote": a SHORT verbatim excerpt (max 200 chars) copied exactly from the wiki text that contains or directly supports this claim. Must be an exact substring of the input text.
 - "footnoteRefs": array of citation references (as strings) — look for [^N] (e.g. [^1]) and [^R:HASH] patterns near the claim
 - "relatedEntities": array of entity IDs or names mentioned in the claim other than the page's primary subject
 
@@ -168,7 +170,7 @@ Rules:
 - Return only claims that appear in the given text
 
 Respond ONLY with JSON:
-{"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
+{"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "sourceQuote": "exact text from the wiki section", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
 
 async function extractClaimsFromSection(
   section: Section,
@@ -216,6 +218,9 @@ Extract atomic claims from this section. Return JSON only.`;
         valueNumeric: parseNumericValue(c.valueNumeric),
         valueLow: parseNumericValue(c.valueLow),
         valueHigh: parseNumericValue(c.valueHigh),
+        sourceQuote: typeof c.sourceQuote === 'string' && c.sourceQuote.length > 5
+          ? c.sourceQuote.slice(0, 500)
+          : undefined,
         footnoteRefs: Array.isArray(c.footnoteRefs)
           ? (c.footnoteRefs as unknown[]).map(String)
           : [],
@@ -374,7 +379,7 @@ async function main() {
       value: claim.section,
       unit: claim.footnoteRefs.length > 0 ? claim.footnoteRefs.join(',') : null,
       confidence: 'unverified',
-      sourceQuote: null,
+      sourceQuote: claim.sourceQuote ?? null,
       // Enhanced fields (migration 0028)
       claimCategory: claimTypeToCategory(claim.claimType),
       relatedEntities: claim.relatedEntities && claim.relatedEntities.length > 0

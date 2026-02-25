@@ -150,7 +150,7 @@ For each claim, provide:
 - "valueNumeric": (optional) central numeric value as plain number (e.g. 7300000000 for $7.3B, 0.92 for 92%)
 - "valueLow": (optional) lower bound if a range is given
 - "valueHigh": (optional) upper bound if a range is given
-- "sourceQuote": a SHORT verbatim quote (max 200 chars) from the resource text that supports this claim, if available
+- "sourceQuote": REQUIRED — a SHORT verbatim quote (max 200 chars) copied exactly from the resource text that supports this claim. Every claim MUST include a sourceQuote.
 - "relatedEntities": other entity IDs/names mentioned alongside ${targetEntity} in the claim
 
 Rules:
@@ -162,6 +162,7 @@ Rules:
 - Prefer "direct" relevance claims
 - Use "numeric" claimType for any claim with specific dollar amounts, percentages, counts, or sizes
 - Always include valueNumeric for numeric claims — extract the number even if written out (e.g. "$7.3 billion" → 7300000000)
+- ALWAYS include sourceQuote — every claim must be grounded with an exact verbatim excerpt from the resource text
 
 Respond ONLY with JSON:
 {"claims": [{"claimText": "...", "claimType": "factual", "relevance": "direct", "claimMode": "endorsed", "sourceQuote": "...", "relatedEntities": []}]}`;
