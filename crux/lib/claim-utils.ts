@@ -1,3 +1,17 @@
+/**
+ * Parse a raw value (number, string, or unknown) into a finite number.
+ * Handles string-encoded numbers like "7300000000" or "7,300,000,000".
+ * Returns undefined if the value cannot be parsed.
+ */
+export function parseNumericValue(v: unknown): number | undefined {
+  if (typeof v === 'number' && isFinite(v)) return v;
+  if (typeof v === 'string') {
+    const n = parseFloat(v.replace(/,/g, ''));
+    if (isFinite(n)) return n;
+  }
+  return undefined;
+}
+
 /** Valid claim types — expanded taxonomy from claim-first architecture. */
 export const VALID_CLAIM_TYPES = [
   'factual', 'evaluative', 'causal', 'historical',

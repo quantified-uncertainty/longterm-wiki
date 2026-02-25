@@ -36,7 +36,7 @@ import {
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
 import { loadResources } from '../resource-io.ts';
-import { VALID_CLAIM_TYPES, claimTypeToCategory } from '../lib/claim-utils.ts';
+import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../lib/claim-utils.ts';
 import type { ClaimTypeValue } from '../lib/claim-utils.ts';
 import type { Resource } from '../resource-types.ts';
 
@@ -124,15 +124,6 @@ interface ExtractedResourceClaim {
   valueHigh?: number;
   sourceQuote?: string;
   relatedEntities?: string[];
-}
-
-function parseNumericValue(v: unknown): number | undefined {
-  if (typeof v === 'number' && isFinite(v)) return v;
-  if (typeof v === 'string') {
-    const n = parseFloat(v.replace(/,/g, ''));
-    if (isFinite(n)) return n;
-  }
-  return undefined;
 }
 
 function buildExtractionPrompt(resource: Resource, targetEntity: string): string {
