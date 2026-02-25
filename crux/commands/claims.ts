@@ -56,6 +56,12 @@ const SCRIPTS = {
     passthrough: ['from-logs', 'sample'],
     positional: false,
   },
+  audit: {
+    script: 'claims/audit.ts',
+    description: 'Run data integrity audit on claims DB (checks for known bug artifacts)',
+    passthrough: ['json'],
+    positional: false,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'status');
