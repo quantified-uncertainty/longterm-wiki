@@ -8,6 +8,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  VALIDATION_ERROR,
 } from "./utils.js";
 import { SyncFactsBatchSchema } from "../api-types.js";
 
@@ -41,7 +42,7 @@ function zv<T extends z.ZodType>(target: "query", schema: T) {
     const result = schema.safeParse(value);
     if (!result.success) {
       return c.json(
-        { error: "validation_error" as const, message: result.error.message },
+        { error: VALIDATION_ERROR, message: result.error.message },
         400
       );
     }

@@ -1040,68 +1040,10 @@ export const SyncFactsBatchSchema = z.object({
 });
 
 // -- Facts: Response types ----------------------------------------------------
-
-export interface SyncFactsResult {
-  upserted: number;
-}
-
-export interface FactRow {
-  id: number;
-  entityId: string;
-  factId: string;
-  label: string | null;
-  value: string | null;
-  numeric: number | null;
-  low: number | null;
-  high: number | null;
-  asOf: string | null;
-  measure: string | null;
-  subject: string | null;
-  note: string | null;
-  source: string | null;
-  sourceResource: string | null;
-  format: string | null;
-  formatDivisor: number | null;
-  syncedAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface FactsByEntityResult {
-  entityId: string;
-  facts: FactRow[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface FactTimeseriesResult {
-  entityId: string;
-  measure: string;
-  points: FactRow[];
-  total: number;
-}
-
-export interface StaleFactsResult {
-  facts: Array<{
-    entityId: string;
-    factId: string;
-    label: string | null;
-    asOf: string | null;
-    measure: string | null;
-    value: string | null;
-    numeric: number | null;
-  }>;
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface FactStatsResult {
-  total: number;
-  uniqueEntities: number;
-  uniqueMeasures: number;
-}
+// Removed in favour of Hono RPC-inferred types (PR #1004).
+// Canonical response types are now derived from the server route definition
+// via `InferResponseType` in crux/lib/wiki-server/facts.ts and
+// apps/web/src/lib/wiki-server.ts. See FactsRoute in routes/facts.ts.
 
 // ---------------------------------------------------------------------------
 // Jobs
