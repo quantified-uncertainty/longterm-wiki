@@ -50,6 +50,12 @@ const SCRIPTS = {
     passthrough: ['dry-run', 'model', 'entity', 'no-auto-resource', 'batch', 'limit'],
     positional: true,
   },
+  'evaluate-baseline': {
+    script: 'claims/evaluate-baseline.ts',
+    description: 'Evaluate extraction quality baseline across test pages',
+    passthrough: [],
+    positional: false,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'status');
