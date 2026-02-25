@@ -36,6 +36,8 @@ import {
   clearClaimsForEntity,
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
+import { VALID_CLAIM_TYPES, claimTypeToCategory } from '../lib/claim-utils.ts';
+import type { ClaimTypeValue } from '../lib/claim-utils.ts';
 
 // ---------------------------------------------------------------------------
 // MDX preprocessing — strip JSX components and get clean text
@@ -109,35 +111,6 @@ function splitIntoSections(body: string): Section[] {
 // ---------------------------------------------------------------------------
 // LLM claim extraction
 // ---------------------------------------------------------------------------
-
-/** Valid claim types — expanded taxonomy from claim-first architecture. */
-const VALID_CLAIM_TYPES = [
-  'factual', 'evaluative', 'causal', 'historical',
-  'numeric', 'consensus', 'speculative', 'relational',
-] as const;
-type ClaimTypeValue = (typeof VALID_CLAIM_TYPES)[number];
-
-/** Map from granular claimType → high-level claimCategory. */
-function claimTypeToCategory(claimType: ClaimTypeValue): string {
-  switch (claimType) {
-    case 'factual':
-    case 'numeric':
-    case 'historical':
-      return 'factual';
-    case 'evaluative':
-      return 'opinion';
-    case 'causal':
-      return 'analytical';
-    case 'consensus':
-      return 'opinion';
-    case 'speculative':
-      return 'speculative';
-    case 'relational':
-      return 'relational';
-    default:
-      return 'factual';
-  }
-}
 
 interface ExtractedClaim {
   claimText: string;

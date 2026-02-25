@@ -150,6 +150,11 @@ claimsRoute.post("/batch", async (c) => {
 });
 
 // ---- POST /clear (delete all claims for an entity) ----
+// NOTE: This deletes claims where `entityId` matches (primary entity only).
+// Claims where the entity appears in `relatedEntities` are NOT deleted.
+// This is intentional — relatedEntities are secondary references owned by
+// the primary entity's extraction, and should only be removed when that
+// primary entity's claims are cleared.
 
 claimsRoute.post("/clear", async (c) => {
   const body = await parseJsonBody(c);
