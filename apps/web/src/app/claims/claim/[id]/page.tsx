@@ -87,9 +87,17 @@ export default async function ClaimDetailPage({ params }: PageProps) {
       {/* Source quote (legacy field) */}
       {claim.sourceQuote && (!claim.sources || claim.sources.length === 0) && (
         <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 mb-4">
-          <span className="text-xs font-medium text-amber-700 block mb-1">
-            Source Quote
-          </span>
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-medium text-amber-700">
+              Source Quote
+            </span>
+            <Link
+              href={`/wiki/${claim.entityId}`}
+              className="text-xs text-amber-600 hover:underline"
+            >
+              From wiki page &rarr;
+            </Link>
+          </div>
           <p className="text-sm italic text-amber-900">
             &ldquo;{claim.sourceQuote}&rdquo;
           </p>
@@ -139,9 +147,13 @@ export default async function ClaimDetailPage({ params }: PageProps) {
         </div>
         <div>
           <span className="text-xs text-muted-foreground block mb-1">
-            Mode
+            Epistemic Status
           </span>
-          <ClaimModeBadge mode={claim.claimMode} attributedTo={claim.attributedTo} />
+          {(!claim.claimMode || claim.claimMode === "endorsed") ? (
+            <span className="text-xs text-muted-foreground">Stated as fact</span>
+          ) : (
+            <ClaimModeBadge mode={claim.claimMode} attributedTo={claim.attributedTo} />
+          )}
         </div>
         <div>
           <span className="text-xs text-muted-foreground block mb-1">
@@ -223,9 +235,25 @@ export default async function ClaimDetailPage({ params }: PageProps) {
       {claim.footnoteRefs && (
         <div className="mb-6">
           <span className="text-xs text-muted-foreground block mb-1">
-            Footnote References
+            Wiki Page Citations
           </span>
-          <span className="font-mono text-xs">{claim.footnoteRefs}</span>
+          <div className="flex flex-wrap gap-1">
+            {claim.footnoteRefs.split(",").map((ref) => {
+              const num = ref.trim();
+              return (
+                <Link
+                  key={num}
+                  href={`/wiki/${claim.entityId}#fn-${num}`}
+                  className="font-mono text-xs px-1.5 py-0.5 rounded bg-gray-100 text-blue-600 hover:bg-gray-200 hover:underline"
+                >
+                  [{num}]
+                </Link>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Footnote numbers from the source wiki page
+          </p>
         </div>
       )}
 
