@@ -1,5 +1,6 @@
 ---
 numericId: E740
+subcategory: architecture
 title: "Parameters Strategy"
 description: "Strategy for AI transition model parameters"
 pageType: "documentation"

@@ -246,10 +246,8 @@ export function getInternalNav(): NavSection[] {
     items: [
       { label: "Enhancement Queue", href: internalHref("enhancement-queue") },
       { label: "Suggested Pages", href: "/internal/suggested-pages" },
-      { label: "Update Schedule", href: "/internal/updates" },
       { label: "Page Changes", href: "/internal/page-changes" },
       { label: "PR Descriptions", href: "/internal/pr-descriptions" },
-      { label: "Fact Dashboard", href: "/internal/facts" },
       { label: "Entities Dashboard", href: "/internal/entities" },
       { label: "Automation Tools", href: internalHref("automation-tools") },
       { label: "Content Database", href: internalHref("content-database") },
@@ -261,7 +259,6 @@ export function getInternalNav(): NavSection[] {
       { label: "Citation Accuracy", href: "/internal/citation-accuracy" },
       { label: "Resources", href: "/internal/resources" },
       { label: "Citation Content", href: "/internal/citation-content" },
-      { label: "Pages", href: "/internal/page-coverage" },
       { label: "Hallucination Risk", href: "/internal/hallucination-risk" },
       { label: "Hallucination Evals", href: "/internal/hallucination-evals" },
       { label: "Improve Runs", href: "/internal/improve-runs" },

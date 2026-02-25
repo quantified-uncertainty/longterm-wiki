@@ -1,5 +1,6 @@
 ---
 numericId: E890
+subcategory: research
 title: "Server Communication Investigation"
 description: "Evaluation of wiki-server client/server architecture — pain points, framework options (Hono RPC, ts-rest, oRPC), and pragmatic improvement plan for type-safe API communication."
 readerImportance: 15

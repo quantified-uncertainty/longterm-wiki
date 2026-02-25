@@ -1,5 +1,6 @@
 ---
 numericId: E753
+subcategory: style-guides
 title: "Stub Pages Style Guide"
 description: "Guidelines for minimal placeholder pages"
 sidebar:
