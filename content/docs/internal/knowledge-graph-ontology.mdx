@@ -1,0 +1,1265 @@
+---
+numericId: E894
+title: "Knowledge Graph Ontology: From Facts to Structured Claims"
+description: "Design document for extending the wiki's data layer from numeric facts to a full knowledge graph with typed properties, entity relationships, and structured claims — including a concrete refactoring of the Kalshi page as a worked example"
+sidebar:
+  order: 37
+entityType: internal
+quality: 45
+readerImportance: 85
+researchImportance: 80
+lastEdited: "2026-02-25"
+createdAt: 2026-02-25
+evergreen: false
+llmSummary: "Architecture document proposing a property ontology for the wiki's knowledge graph. Extends the existing fact-measures system to cover non-numeric claims using typed properties with domain/range constraints, qualifiers, and confidence levels. Includes a complete worked example decomposing the Kalshi wiki page into 60+ structured claims across 6 claim types and 18 properties, demonstrating how the system would work in practice."
+ratings:
+  novelty: 7
+  rigor: 6
+  actionability: 8
+  completeness: 7
+---
+
+import { Mermaid } from '@components/wiki';
+
+## Motivation
+
+The wiki currently has two data layers that represent knowledge:
+
+1. **Numeric facts** (`data/facts/*.yaml`) — 139 structured entries with measures, temporal metadata, source attribution. Well-typed but narrow: only quantitative data.
+2. **Prose claims** — Thousands of assertions embedded in \~700 MDX pages. Unstructured, unqueryable, prone to staleness and cross-page inconsistency.
+
+The <EntityLink id="fact-system-strategy">Fact System Strategy</EntityLink> refined how numeric facts work. The <EntityLink id="claim-first-architecture">Claim-First Architecture</EntityLink> proposed making all claims first-class data objects. This document tackles the missing piece between those two: **the property ontology** — what types of claims exist, what constraints they have, and how they connect to entities.
+
+Without a property ontology, a claim store is just a bag of strings. With one, it becomes a queryable knowledge graph.
+
+## What We Already Have
+
+The existing system maps surprisingly well to knowledge graph concepts:
+
+| Knowledge graph concept | Our current equivalent | Status |
+|---|---|---|
+| **Entity classes** (types) | `entityType` field — 24 canonical types | Mature, well-defined |
+| **Numeric properties** | `fact-measures.yaml` — 25 measures | Working, has `applicableTo` constraints |
+| **Domain constraints** | `applicableTo: [organization]` on measures | Exists for numeric facts only |
+| **Temporal qualifiers** | `asOf` field on facts | Exists for numeric facts only |
+| **Source attribution** | `sourceResource` linking to `data/resources/` | Exists but incomplete coverage |
+| **Entity relationships** | `relatedEntries` in entity YAML (45 relationship types) | Exists but unstructured |
+| **Non-numeric claims** | Embedded in MDX prose | Not structured at all |
+
+The gap: we have a working property system for numeric data (measures) but **no property vocabulary for non-numeric claims**. We have 45 relationship types in `relatedEntries` but they lack the metadata that makes claims useful (sources, confidence, temporality).
+
+## Design Principles
+
+### 1. Schema.org over Wikidata
+
+Wikidata's property constraints are **advisory warnings** that flag violations. Schema.org's approach is softer: `domainIncludes` means "this property is typically used with these types," not "using it elsewhere is wrong."
+
+For our system — where LLM agents do much of the authoring — Schema.org's descriptive approach is better. Properties should suggest what's expected, not hard-block. This matches how `applicableTo` on measures already works.
+
+### 2. Small vocabulary, enforced at write time
+
+Wikidata has \~13,200 properties. Schema.org has \~1,500. SNOMED (biomedical) has 65 relationship types for millions of concepts.
+
+For \~700 entities across 24 types, the research suggests **80-150 total properties**. But most value comes from a small core — Wikidata's top 100 properties cover the vast majority of statements. We should start with **30-50 properties** and grow based on actual data needs.
+
+The critical constraint from Wikidata's experience: properties are hard to remove once data uses them. Be thoughtful about additions, but don't let that paralyze progress.
+
+### 3. Qualifiers over property explosion
+
+Without qualifiers, you get property proliferation:
+
+```yaml
+# BAD: separate properties for temporal variants
+kalshi-valuation-series-d: $5B
+kalshi-valuation-series-e: $11B
+
+# GOOD: one property with qualifiers
+- property: valuation
+  value: 11000000000
+  qualifiers:
+    pointInTime: 2025-12
+    fundingRound: Series E
+    source: resource-abc
+```
+
+The `asOf` field on existing facts is already a qualifier. Extending this pattern to all claims is natural.
+
+### 4. Resources as the authoring unit
+
+A single TechCrunch article produces 8-12 claims. A single annual report might produce 50+. The **resource \to batch of claims** relationship is the natural unit for authoring and review. Claims should track which resource they were extracted from, enabling workflows like "show me everything we learned from this source."
+
+## Proposed Property Ontology
+
+### Layer 1: Universal Properties (apply to all entity types)
+
+These partially exist in entity YAML frontmatter already:
+
+| Property | Value type | Description | Currently exists? |
+|---|---|---|---|
+| `name` | string | Primary name | Yes (title) |
+| `description` | string | Short description | Yes |
+| `foundedDate` | date | When created/founded | Partial (in prose) |
+| `endDate` | date | When dissolved/died | No |
+| `status` | enum | active, inactive, dissolved, deceased | No |
+| `officialUrl` | url | Primary website | Partial (in prose) |
+| `wikipediaUrl` | url | Wikipedia page | Partial (in prose) |
+| `wikidataId` | string | Wikidata Q-identifier | No |
+| `parentEntity` | entity | Parent org, broader concept | Partial (relatedEntries) |
+
+### Layer 2: Type-Specific Properties
+
+Following the "properties for this type" pattern (Wikidata's P1963):
+
+**Organization properties:**
+
+| Property | Value type | Qualifiers | Notes |
+|---|---|---|---|
+| `headquarters` | entity/string | | Location |
+| `founder` | entity\[\] (person) | | |
+| `ceo` | entity (person) | startTime, endTime | |
+| `industry` | enum\[\] | | ai, prediction-markets, finance, ... |
+| `legalForm` | enum | | nonprofit, llc, corp, ... |
+| `orgType` | enum | | Already exists: frontier-lab, safety-org, funder, ... |
+| `regulatoryStatus` | string | jurisdiction, grantedDate | CFTC-licensed, SEC-registered, etc. |
+| `numberOfEmployees` | quantity | pointInTime | Maps to existing `headcount` measure |
+| `numberOfUsers` | quantity | pointInTime | Maps to existing `user-count` measure |
+| `tradingVolume` | quantity | period, pointInTime | Domain-specific |
+| `marketCategory` | string\[\] | | What markets/products |
+| `revenueModel` | string | | How it makes money |
+
+**Person properties:**
+
+| Property | Value type | Qualifiers | Notes |
+|---|---|---|---|
+| `birthDate` | date | | |
+| `nationality` | string\[\] | | |
+| `educatedAt` | entity\[\] (org) | degree, field | |
+| `employedAt` | entity\[\] (org) | role, startTime, endTime | |
+| `fieldOfWork` | entity\[\] (concept) | | |
+| `notableWork` | entity\[\] | | |
+
+**Risk/concept properties:**
+
+| Property | Value type | Qualifiers | Notes |
+|---|---|---|---|
+| `riskCategory` | enum | | existential, catastrophic, systemic |
+| `affectedBy` | entity\[\] | | capabilities, approaches |
+| `mitigatedBy` | entity\[\] | | approaches, policies |
+| `estimatedProbability` | quantity | timeHorizon, source, method | |
+
+### Layer 3: Relationship Properties (cross-entity claims)
+
+These are the "verbs" connecting entities — currently buried in prose:
+
+| Property | Domain | Range | Qualifiers | Example |
+|---|---|---|---|---|
+| `investedIn` | org, person | org | amount, date, round | "Sequoia invested in Kalshi" |
+| `fundedBy` | org | org, person | amount, date, round | Inverse of investedIn |
+| `acquiredBy` | org | org | amount, date | |
+| `partneredWith` | org | org | type, startDate, scope | "Kalshi partnered with NHL" |
+| `regulatedBy` | org | org | jurisdiction, status | "Kalshi regulated by CFTC" |
+| `suedBy` | org, person | org, person | date, jurisdiction, status | "Kalshi sued by Nevada" |
+| `competesWith` | org | org | market, basis | "Kalshi competes with Polymarket" |
+| `employedAt` | person | org | role, startTime, endTime | |
+| `foundedOrg` | person | org | date | |
+| `addresses` | approach, policy | risk | | |
+| `implementedBy` | approach | org, project | | |
+
+### Layer 4: Claim Types and Confidence
+
+Following the taxonomy from the <EntityLink id="claim-first-architecture">Claim-First Architecture</EntityLink>:
+
+| Claim type | Verification strategy | Confidence levels | Example |
+|---|---|---|---|
+| **factual** | Check against source | verified, partial, unverified | "Kalshi was founded in 2018" |
+| **numeric** | Check value + source; link to fact store | verified, estimated | "\$11B valuation in Dec 2025" |
+| **consensus** | Multiple independent sources | strong, moderate, weak | "Leading regulated US prediction market" |
+| **analytical** | Check inference from supporting claims | supported, speculative | "Fee structure incentivizes liquidity" |
+| **speculative** | Cannot verify — flag uncertainty | plausible, uncertain, contested | "Regulatory moat may narrow" |
+| **relational** | Cross-entity verification | verified, partial | "Growth rate exceeded Polymarket's" |
+
+---
+
+## Worked Example: Kalshi Page Decomposed
+
+The Kalshi wiki page contains \~332 lines of prose with 87 footnoted citations. Below is how its content would decompose into structured claims using the property ontology above.
+
+### Entity Profile (Structured Properties)
+
+These are property-value pairs on the Kalshi entity itself — the equivalent of a Wikidata item's core statements:
+
+```yaml
+# data/claims/kalshi-profile.yaml
+entity: kalshi
+entityType: organization
+
+properties:
+  name: "Kalshi"
+  previousName: "Kownig"
+  foundedDate: 2018
+  headquarters: "New York, NY"
+  officialUrl: "https://kalshi.com"
+  wikipediaUrl: "https://en.wikipedia.org/wiki/Kalshi"
+  wikidataId: "Q114586938"
+  industry: [prediction-markets, financial-services, sports-betting]
+  legalForm: corporation
+  revenueModel: "Transaction fees (maker-taker: 0.07%-7% on takers)"
+  regulatoryStatus:
+    value: "CFTC-licensed Designated Contract Market (DCM)"
+    qualifiers:
+      grantedDate: 2020-11
+      jurisdiction: federal
+      source: sigma-world-timeline
+  marketCategories:
+    - politics
+    - sports
+    - economics
+    - climate
+    - finance-crypto
+    - culture
+    - technology-science
+
+  founder:
+    - entity: tarek-mansour
+      role: CEO
+    - entity: luana-lopes-lara
+      role: COO
+
+  # These link to numeric facts (existing system)
+  factRefs:
+    valuation: { factId: tbd, asOf: 2025-12, value: 11000000000 }
+    totalFunding: { factId: tbd, asOf: 2025-12, value: 1500000000 }
+    tradingVolume: { factId: tbd, asOf: 2025-12, value: "40-50B annualized" }
+```
+
+### Factual Claims (52 claims)
+
+These are verifiable assertions extracted from the prose. Each links to its source and can be independently verified, updated, or superseded.
+
+```yaml
+# data/claims/kalshi.yaml
+entity: kalshi
+claims:
+
+  # === FOUNDING & HISTORY (8 claims) ===
+
+  - id: c-kalshi-001
+    property: foundedBy
+    text: "Founded in 2018 by MIT graduates Tarek Mansour and Luana Lopes Lara"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: contrary-research-kalshi
+        quote: "Founded in 2018 by Tarek Mansour and Luana Lopes Lara"
+        support: full
+    temporal: { type: historical, date: 2018 }
+    entityRefs:
+      - { id: kalshi, role: subject }
+      - { id: tarek-mansour, role: founder }
+      - { id: luana-lopes-lara, role: founder }
+    cluster: kalshi-founding
+
+  - id: c-kalshi-002
+    property: educatedAt
+    text: "Founders met at MIT studying computer science, mathematics, and electrical engineering"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: contrary-research-kalshi
+        support: full
+    temporal: { type: historical }
+    entityRefs:
+      - { id: tarek-mansour, role: subject }
+      - { id: luana-lopes-lara, role: subject }
+    cluster: kalshi-founding
+
+  - id: c-kalshi-003
+    property: employedAt
+    text: "Founders completed internships at Goldman Sachs, Palantir, Five Rings Capital, and Citadel"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: contrary-research-kalshi
+        support: full
+    temporal: { type: historical }
+    entityRefs:
+      - { id: tarek-mansour, role: subject }
+      - { id: luana-lopes-lara, role: subject }
+    cluster: kalshi-founding
+
+  - id: c-kalshi-004
+    property: employedAt
+    text: "Mansour worked as a quantitative trader at Citadel (May 2018 to May 2019)"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: contrary-research-kalshi
+        support: full
+    temporal: { type: historical, startDate: 2018-05, endDate: 2019-05 }
+    entityRefs:
+      - { id: tarek-mansour, role: subject }
+    cluster: kalshi-founding
+
+  - id: c-kalshi-005
+    text: "Company was initially named 'Kownig'"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: contrary-research-kalshi
+        support: full
+    temporal: { type: historical, date: 2018 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-founding
+
+  - id: c-kalshi-006
+    text: "Joined Y Combinator Winter 2019 batch"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: contrary-research-kalshi
+        support: full
+    temporal: { type: historical, date: 2019 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-founding
+
+  - id: c-kalshi-007
+    text: "Founders motivated by gaps in hedging event outcomes, particularly after observing Brexit market shocks"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: contrary-research-kalshi
+        support: full
+    temporal: { type: historical }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-founding
+
+  - id: c-kalshi-008
+    text: "Early years focused on regulatory compliance — built exchange, broker, and surveillance systems before acquiring users"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: contrary-research-kalshi
+        support: full
+    temporal: { type: historical }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-founding
+
+  # === REGULATORY MILESTONES (7 claims) ===
+
+  - id: c-kalshi-010
+    property: regulatedBy
+    text: "CFTC approved Kalshi as first designated contract market (DCM) for event contracts"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: sigma-world-timeline
+        support: full
+    temporal: { type: historical, date: 2020-11 }
+    entityRefs:
+      - { id: kalshi, role: subject }
+    cluster: kalshi-regulation
+
+  - id: c-kalshi-011
+    text: "Official platform launch enabling trades on economic events"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: sigma-world-timeline
+        support: full
+    temporal: { type: historical, date: 2021-07 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-regulation
+
+  - id: c-kalshi-012
+    text: "CFTC began examining political event contracts proposal"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: sigma-world-timeline
+        support: full
+    temporal: { type: historical, date: 2022-08 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-regulation
+
+  - id: c-kalshi-013
+    text: "CFTC rejected political contracts, citing gambling risks"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: sigma-world-timeline
+        support: full
+    temporal: { type: historical, date: 2023-09 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-regulation
+
+  - id: c-kalshi-014
+    property: suedBy
+    text: "Kalshi sued CFTC for regulatory overreach"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: sigma-world-timeline
+        support: full
+    temporal: { type: historical, date: 2023-11 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-regulation
+
+  - id: c-kalshi-015
+    text: "Federal court ruled unanimously in Kalshi's favor, allowing election contracts to resume"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: sigma-world-timeline
+        support: full
+    temporal: { type: historical, date: 2024-09 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-regulation
+
+  - id: c-kalshi-016
+    text: "Robinhood launched prediction hub on Kalshi infrastructure"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: sigma-world-timeline
+        support: full
+    temporal: { type: historical, date: 2024-11 }
+    entityRefs:
+      - { id: kalshi, role: subject }
+    cluster: kalshi-partnerships
+
+  # === FUNDING ROUNDS (7 claims) ===
+
+  - id: c-kalshi-020
+    property: fundedBy
+    text: "Raised $6.1 million in seed round"
+    type: numeric
+    confidence: verified
+    value: 6100000
+    measure: funding-round
+    sources:
+      - resourceId: nasdaq-private-market-kalshi
+        support: full
+    temporal: { type: historical, date: 2020-03 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-funding
+
+  - id: c-kalshi-021
+    property: fundedBy
+    text: "Raised $30 million Series A at $120 million valuation"
+    type: numeric
+    confidence: verified
+    value: 30000000
+    measure: funding-round
+    qualifiers:
+      valuation: 120000000
+      round: "Series A"
+    sources:
+      - resourceId: cbinsights-kalshi
+        support: full
+    temporal: { type: historical, date: 2020-12 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-funding
+
+  - id: c-kalshi-022
+    property: fundedBy
+    text: "Raised $60 million Series B"
+    type: numeric
+    confidence: verified
+    value: 60000000
+    measure: funding-round
+    qualifiers:
+      round: "Series B"
+    sources:
+      - resourceId: nasdaq-private-market-kalshi
+        support: full
+    temporal: { type: historical, date: 2025-06 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-funding
+
+  - id: c-kalshi-023
+    property: fundedBy
+    text: "Raised $125 million Series C"
+    type: numeric
+    confidence: verified
+    value: 125000000
+    measure: funding-round
+    qualifiers:
+      round: "Series C"
+    sources:
+      - resourceId: nasdaq-private-market-kalshi
+        support: full
+    temporal: { type: historical, date: 2025-06 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-funding
+
+  - id: c-kalshi-024
+    property: fundedBy
+    text: "Raised $300 million Series D at $5 billion valuation, led by Sequoia Capital and Andreessen Horowitz"
+    type: numeric
+    confidence: verified
+    value: 300000000
+    measure: funding-round
+    qualifiers:
+      valuation: 5000000000
+      round: "Series D"
+      leadInvestor: [sequoia-capital, andreessen-horowitz]
+    sources:
+      - resourceId: equityzen-kalshi
+        support: full
+    temporal: { type: historical, date: 2025-10 }
+    entityRefs:
+      - { id: kalshi, role: subject }
+      - { id: sequoia-capital, role: investor }
+      - { id: andreessen-horowitz, role: investor }
+    cluster: kalshi-funding
+
+  - id: c-kalshi-025
+    property: fundedBy
+    text: "Raised $1 billion Series E at $11 billion valuation"
+    type: numeric
+    confidence: verified
+    value: 1000000000
+    measure: funding-round
+    qualifiers:
+      valuation: 11000000000
+      round: "Series E"
+      leadInvestor: [paradigm]
+      participants: [sequoia-capital, andreessen-horowitz, meritech-capital,
+                     ivp, ark-invest, anthos-capital, capitalg, y-combinator]
+    sources:
+      - resourceId: kalshi-series-e-announcement
+        quote: "$11 billion valuation"
+        support: full
+    temporal: { type: historical, date: 2025-12 }
+    entityRefs:
+      - { id: kalshi, role: subject }
+    cluster: kalshi-funding
+
+  - id: c-kalshi-026
+    text: "Total funding raised exceeds $1.5 billion across nine rounds"
+    type: numeric
+    confidence: verified
+    value: 1500000000
+    measure: total-funding
+    sources:
+      - resourceId: cbinsights-kalshi
+        support: full
+    temporal: { type: point-in-time, asOf: 2025-12 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-funding
+
+  # === PLATFORM OPERATIONS (6 claims) ===
+
+  - id: c-kalshi-030
+    text: "Operates as peer-to-peer marketplace using central limit order book (CLOB)"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: contrary-research-kalshi
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-platform
+
+  - id: c-kalshi-031
+    text: "Binary yes/no contracts on verifiable real-world events; price reflects market probability"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: kalshi-how-markets-work
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-platform
+
+  - id: c-kalshi-032
+    text: "Maker-taker fee structure: makers pay no fees, takers pay 0.07%-7%"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: sacra-kalshi
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-platform
+
+  - id: c-kalshi-033
+    text: "Real-time sentiment data valued at over $50,000 annually by institutional clients"
+    type: numeric
+    confidence: partial
+    sources:
+      - resourceId: sacra-kalshi
+        support: partial  # Sacra estimate, not Kalshi-confirmed
+    temporal: { type: point-in-time, asOf: 2025 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-platform
+
+  - id: c-kalshi-034
+    text: "Trading volumes exceeding $1 billion weekly by late 2025"
+    type: numeric
+    confidence: verified
+    sources:
+      - resourceId: kalshi-series-e-announcement
+        support: full
+    temporal: { type: point-in-time, asOf: 2025-12 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-scale
+
+  - id: c-kalshi-035
+    text: "Sports betting accounts for approximately 90% of trading volume"
+    type: numeric
+    confidence: verified
+    sources:
+      - resourceId: natlawreview-kalshi-records
+        support: full
+    temporal: { type: point-in-time, asOf: 2025-12 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-scale
+
+  # === PARTNERSHIPS (10 claims) ===
+
+  - id: c-kalshi-040
+    property: partneredWith
+    text: "Multiyear partnership with NHL including official data, logos, and broadcast signage"
+    type: factual
+    confidence: verified
+    qualifiers:
+      partnershipType: sports-data
+      startDate: 2025
+    sources:
+      - resourceId: nhl-kalshi-partnership
+        support: full
+    temporal: { type: ongoing }
+    entityRefs:
+      - { id: kalshi, role: subject }
+    cluster: kalshi-partnerships
+
+  - id: c-kalshi-041
+    property: partneredWith
+    text: "First brand partnership between a North American sports team and a prediction market (Chicago Blackhawks)"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: kalshi-blackhawks
+        support: full
+    temporal: { type: historical, date: 2025 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-partnerships
+
+  - id: c-kalshi-042
+    property: partneredWith
+    text: "Three-year strategic partnership with STATSCORE for premium sports data"
+    type: factual
+    confidence: verified
+    qualifiers:
+      partnershipType: data-provider
+      duration: "3 years"
+    sources:
+      - resourceId: statscore-kalshi
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-partnerships
+
+  - id: c-kalshi-043
+    property: partneredWith
+    text: "StockX partnership for sneaker/apparel/collectible event contracts"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: kalshi-stockx
+        support: full
+    temporal: { type: historical, date: 2025-11 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-partnerships
+
+  - id: c-kalshi-044
+    property: partneredWith
+    text: "Barchart partnership providing prediction data to 32 million investors"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: kalshi-barchart
+        support: full
+    temporal: { type: historical, date: 2025-11 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-partnerships
+
+  - id: c-kalshi-045
+    property: partneredWith
+    text: "Robinhood prediction hub built on Kalshi infrastructure; accounts for over half of Kalshi's betting volume"
+    type: factual
+    confidence: partial
+    sources:
+      - resourceId: cryptopolitan-kalshi-2026
+        support: partial  # "reportedly" qualifier in source
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-partnerships
+
+  - id: c-kalshi-046
+    property: partneredWith
+    text: "CNN integration with real-time prediction market news ticker"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: popular-info-casinofication
+        support: full
+    temporal: { type: historical, date: 2025 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-partnerships
+
+  - id: c-kalshi-047
+    property: partneredWith
+    text: "CNBC partnership for 2026 editorial coverage integration"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: popular-info-casinofication
+        support: full
+    temporal: { type: historical, date: 2026 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-partnerships
+
+  - id: c-kalshi-048
+    property: partneredWith
+    text: "Coinbase Custody partnership for USDC-powered event trading"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: kalshi-coinbase-custody
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-partnerships
+
+  - id: c-kalshi-049
+    text: "Integration with TRON network, Phantom crypto wallet; serving as in-house prediction market for Coinbase"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: natlawreview-kalshi-records
+        support: full
+    temporal: { type: historical, date: 2025 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-partnerships
+
+  # === COMPETITION (4 claims) ===
+
+  - id: c-kalshi-050
+    property: competesWith
+    text: "Kalshi and Polymarket form a duopoly, collectively over $44 billion trading volume in 2025"
+    type: relational
+    confidence: verified
+    sources:
+      - resourceId: cryptopolitan-kalshi-2026
+        support: full
+    temporal: { type: point-in-time, asOf: 2025 }
+    entityRefs:
+      - { id: kalshi, role: subject }
+      - { id: polymarket, role: competitor }
+    cluster: kalshi-competition
+
+  - id: c-kalshi-051
+    text: "Combined daily volume record of $799 million across both platforms (Jan 17, 2026)"
+    type: numeric
+    confidence: verified
+    sources:
+      - resourceId: thestreet-prediction-markets
+        support: full
+    temporal: { type: historical, date: 2026-01-17 }
+    entityRefs:
+      - { id: kalshi, role: subject }
+      - { id: polymarket, role: mentioned }
+    cluster: kalshi-competition
+
+  - id: c-kalshi-052
+    text: "Polymarket operates using cryptocurrency and has faced restrictions on US users"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: contrary-research-kalshi
+        support: full
+    temporal: { type: ongoing }
+    entityRefs:
+      - { id: polymarket, role: subject }
+      - { id: kalshi, role: implied_comparison }
+    cluster: kalshi-competition
+
+  - id: c-kalshi-053
+    text: "Kalshi's competitive advantages: legal clarity for US users, segregated customer funds with deposit insurance, institutional partnerships"
+    type: analytical
+    confidence: partial
+    supportingClaims: [c-kalshi-010, c-kalshi-040, c-kalshi-045]
+    sources:
+      - resourceId: kalshi-about
+        support: partial
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-competition
+
+  # === REGULATORY CHALLENGES (7 claims) ===
+
+  - id: c-kalshi-060
+    property: suedBy
+    text: "New York State Gaming Commission issued cease and desist for offering sports betting without state license"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: cbs-kalshi-regulation
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-legal
+
+  - id: c-kalshi-061
+    property: suedBy
+    text: "Federal judge ruled Kalshi must stop offering prediction contracts in Nevada"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: nevada-independent-kalshi
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-legal
+
+  - id: c-kalshi-062
+    text: "Nearly two dozen states and tribal gaming authorities have filed federal lawsuits"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: nevada-independent-kalshi
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-legal
+
+  - id: c-kalshi-063
+    text: "US District Judge Andrew Gordon ruled event contracts on sporting outcomes do not fall within CFTC's exclusive jurisdiction"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: nevada-independent-kalshi
+        quote: "do not fall within the CFTC's exclusive jurisdiction"
+        support: full
+    temporal: { type: historical }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-legal
+
+  - id: c-kalshi-064
+    text: "Native American gaming tribes filed briefs calling activities 'brazenly illegal'"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: nexteventhorizon-kalshi-nfl
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-legal
+
+  - id: c-kalshi-065
+    text: "Class action lawsuit claiming market makers place customers at disadvantage"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: igaming-kalshi-class-action
+        support: full
+    temporal: { type: historical, date: 2025 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-legal
+
+  - id: c-kalshi-066
+    text: "Separate New York class action alleging illegal sports betting and deceptive practices"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: wikipedia-kalshi
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-legal
+
+  # === OPERATIONAL CONCERNS (5 claims) ===
+
+  - id: c-kalshi-070
+    text: "Incorrectly graded multiple NFL win totals markets; refunded original amounts without paying winners"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: nexteventhorizon-kalshi-nfl
+        support: full
+    temporal: { type: historical }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-operations
+
+  - id: c-kalshi-071
+    text: "Minimal age verification mechanisms despite advertising as legal for 18+"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: gamblingharm-kalshi
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-operations
+
+  - id: c-kalshi-072
+    text: "No prominent messaging or resources for users experiencing gambling problems"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: gamblingharm-kalshi
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-operations
+
+  - id: c-kalshi-073
+    text: "Insider trading violations do not currently carry criminal penalties on regulated prediction platforms"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: axios-kalshi-insider-trading
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-operations
+
+  - id: c-kalshi-074
+    text: "$30,000 bet on Polymarket yielded $436,760 from suspected insider information (Maduro capture contract)"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: axios-kalshi-insider-trading
+        support: full
+    temporal: { type: historical }
+    entityRefs:
+      - { id: polymarket, role: subject }
+      - { id: kalshi, role: context }
+    cluster: kalshi-operations
+
+  # === AI SAFETY RELEVANCE (3 claims) ===
+
+  - id: c-kalshi-080
+    text: "AI Research Pause Market (KXAI PAUSE-27) assigns 12% probability to any major AI company pausing research for safety before January 2027"
+    type: numeric
+    confidence: verified
+    value: 0.12
+    sources:
+      - resourceId: kalshi-ai-pause-market
+        support: full
+    temporal: { type: point-in-time, asOf: 2026-02 }
+    entityRefs:
+      - { id: kalshi, role: platform }
+      - { id: anthropic, role: mentioned }
+      - { id: openai, role: mentioned }
+    cluster: kalshi-ai-safety
+
+  - id: c-kalshi-081
+    text: "Offers contracts on whether AI regulation will become federal law by January 2027 (KXAI LEGISLATION-27)"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: kalshi-ai-legislation-market
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: platform }]
+    cluster: kalshi-ai-safety
+
+  - id: c-kalshi-082
+    text: "Low probability assignments suggest trader skepticism about imminent AI safety pauses"
+    type: analytical
+    confidence: partial
+    supportingClaims: [c-kalshi-080]
+    sources: []
+    temporal: { type: point-in-time, asOf: 2026-02 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-ai-safety
+
+  # === CONSENSUS & ANALYTICAL CLAIMS (5 claims) ===
+
+  - id: c-kalshi-090
+    text: "Kalshi's mission is to democratize finance by enabling everyday users to capitalize on opinions and hedge personal risks"
+    type: factual
+    confidence: verified
+    sources:
+      - resourceId: kalshi-about
+        support: full
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+
+  - id: c-kalshi-091
+    text: "EA Forum communities give generally positive but cautious reception; recognize legal milestones but note attention costs and limited EA-relevant coverage"
+    type: consensus
+    confidence: moderate
+    consensusBreadth: 3
+    sources:
+      - resourceId: ea-forum-prediction-markets-corporate
+        support: partial
+      - resourceId: ea-forum-predicting-for-good
+        support: partial
+      - resourceId: kalshi-harnessing-prediction-markets
+        support: partial
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-reception
+
+  - id: c-kalshi-092
+    text: "Fee structure designed to incentivize liquidity provision while remaining competitive with traditional sportsbook vigorish"
+    type: analytical
+    confidence: partial
+    supportingClaims: [c-kalshi-032]
+    reasoning: "Zero maker fees + low taker fees (0.07-7%) is typical exchange design for liquidity. Fee range is lower than typical sportsbook vig (5-10%)."
+    sources: []
+    temporal: { type: ongoing }
+    entityRefs: [{ id: kalshi, role: subject }]
+
+  - id: c-kalshi-093
+    text: "Prediction markets systematically fail on fat-tailed, improbable events like revolutions"
+    type: consensus
+    confidence: moderate
+    consensusBreadth: 2
+    sources:
+      - resourceId: kalshi-harnessing-prediction-markets
+        support: partial
+    temporal: { type: ongoing }
+    entityRefs:
+      - { id: kalshi, role: context }
+      - { id: prediction-markets, role: subject }
+      - { id: philip-tetlock, role: mentioned }
+    cluster: kalshi-reception
+
+  - id: c-kalshi-094
+    text: "5.5x valuation increase from Series D to Series E in just six months"
+    type: numeric
+    confidence: verified
+    value: 5.5
+    supportingClaims: [c-kalshi-024, c-kalshi-025]
+    sources:
+      - resourceId: signalhub-kalshi
+        support: full
+    temporal: { type: historical, date: 2025-12 }
+    entityRefs: [{ id: kalshi, role: subject }]
+    cluster: kalshi-funding
+```
+
+### Summary Statistics
+
+| Category | Claim count | Types |
+|---|---|---|
+| Founding & history | 8 | 8 factual |
+| Regulatory milestones | 7 | 7 factual |
+| Funding rounds | 7 | 6 numeric, 1 factual |
+| Platform operations | 6 | 4 factual, 2 numeric |
+| Partnerships | 10 | 10 factual |
+| Competition | 4 | 1 relational, 1 numeric, 1 factual, 1 analytical |
+| Legal challenges | 7 | 7 factual |
+| Operational concerns | 5 | 5 factual |
+| AI safety relevance | 3 | 1 numeric, 1 factual, 1 analytical |
+| Consensus & analytical | 5 | 2 consensus, 2 analytical, 1 numeric |
+| **Total** | **62** | **48 factual, 7 numeric, 2 consensus, 3 analytical, 1 relational, 1 numeric-derived** |
+
+### Clusters Used
+
+| Cluster | Claims | What it groups |
+|---|---|---|
+| `kalshi-founding` | 8 | Origin story, founders, early decisions |
+| `kalshi-regulation` | 7 | CFTC approval and political contracts saga |
+| `kalshi-funding` | 8 | All funding rounds + totals |
+| `kalshi-platform` | 4 | How the product works |
+| `kalshi-scale` | 2 | Volume and usage metrics |
+| `kalshi-partnerships` | 10 | All partnership claims |
+| `kalshi-competition` | 4 | Polymarket comparison, market dynamics |
+| `kalshi-legal` | 7 | State lawsuits, tribal opposition, class actions |
+| `kalshi-operations` | 5 | Grading errors, consumer protection, insider trading |
+| `kalshi-ai-safety` | 3 | AI-related prediction markets |
+| `kalshi-reception` | 2 | EA/forecasting community views |
+
+### Properties Used
+
+| Property | Usage count | Domain constraint |
+|---|---|---|
+| `partneredWith` | 9 | organization |
+| `fundedBy` | 6 | organization |
+| `suedBy` | 3 | organization, person |
+| `employedAt` | 2 | person |
+| `foundedBy` | 1 | organization |
+| `educatedAt` | 1 | person |
+| `regulatedBy` | 1 | organization |
+| `competesWith` | 1 | organization |
+| *(no property — free claim)* | 38 | — |
+
+This reveals something important: **24 of 62 claims use typed relationship properties** (39%), while **38 are free-text claims** without a formal property. This is expected and fine — not every assertion maps cleanly to a property. The free claims still benefit from structured metadata (source, confidence, temporality, entity refs, cluster).
+
+---
+
+## Observations from the Kalshi Exercise
+
+### What decomposition reveals
+
+1. **Source concentration.** Of 62 claims, 12 come from a single source (Contrary Research). Processing that one resource yields \~20% of all claims. This validates the resource-centric authoring workflow.
+
+2. **Temporal diversity matters.** Claims span historical (founding, milestones), point-in-time (valuations, volumes), and ongoing (platform operations, legal status). Without temporal typing, a system can't distinguish "founded in 2018" (never changes) from "90% sports volume" (changes quarterly).
+
+3. **Cross-entity claims are high-value.** The competition claims (c-kalshi-050 through c-kalshi-053) reference both Kalshi and Polymarket. These are exactly the claims that should appear on both entity pages and on a prediction markets comparison page — the multi-page reuse case.
+
+4. **Analytical claims need explicit reasoning chains.** Claims c-kalshi-053, c-kalshi-082, and c-kalshi-092 are the wiki's own analysis. Making `supportingClaims` explicit prevents these from being treated as sourced facts and enables validation ("do the supporting claims actually support this inference?").
+
+5. **Clusters emerge naturally.** The 11 clusters correspond roughly to the page's section structure but aren't identical. The `kalshi-partnerships` cluster spans what's actually two page sections (Sports + Data/Technology), while `kalshi-regulation` spans three sections. Clusters reflect topical groupings; page sections reflect editorial choices about presentation.
+
+6. **Most claims don't need relationship properties.** Only 39% of claims use typed properties. The rest are free assertions with structured metadata. This means the property vocabulary can stay small — you don't need a property for every possible assertion.
+
+### What this enables
+
+With these 62 claims structured, you could:
+
+- **Generate a comparison page** — Pull all `competesWith` claims plus numeric facts for Kalshi and Polymarket, compose a comparison view automatically.
+- **Detect staleness** — The trading volume and AI market probability claims have `temporal.asOf: 2025-12`. If it's now March 2026, flag them for update.
+- **Track source quality** — 12 claims from Contrary Research, 7 from Sigma World, 6 from Kalshi's own announcements. If Contrary Research publishes an update, you know which claims to re-verify.
+- **Build entity timelines** — Filter claims by `temporal.date`, sort chronologically, and you have a timeline view without any additional authoring.
+- **Cross-entity consistency** — If Polymarket's page says "\$44B combined volume" but the Kalshi page says "\$44B," the system can surface that these reference the same underlying fact via the shared cluster.
+- **Surface analytical gaps** — The `kalshi-ai-safety` cluster has only 3 claims, all fairly shallow. A dashboard could flag "AI safety relevance is under-developed for this entity."
+
+---
+
+## Property Ontology Design Decisions
+
+### Decision 1: How many properties to start with?
+
+Start with **25-30** relationship properties covering the most common cross-entity relationships in the wiki domain. Based on the Kalshi exercise and the wiki's entity types:
+
+**Recommended initial vocabulary:**
+
+| # | Property | Domain | Range |
+|---|---|---|---|
+| 1 | `foundedBy` | organization | person |
+| 2 | `ceo` | organization | person |
+| 3 | `employedAt` | person | organization |
+| 4 | `educatedAt` | person | organization |
+| 5 | `investedIn` | organization, person | organization |
+| 6 | `fundedBy` | organization | organization, person |
+| 7 | `acquiredBy` | organization | organization |
+| 8 | `partneredWith` | organization | organization |
+| 9 | `regulatedBy` | organization | organization |
+| 10 | `suedBy` | organization | organization, person |
+| 11 | `competesWith` | organization | organization |
+| 12 | `parentOrg` | organization | organization |
+| 13 | `subsidiaryOf` | organization | organization |
+| 14 | `addresses` | approach, policy, project | risk, risk-factor |
+| 15 | `mitigatedBy` | risk | approach, policy |
+| 16 | `implementedBy` | approach | organization, project |
+| 17 | `critiquedBy` | any | person, argument |
+| 18 | `endorsedBy` | any | person, organization |
+| 19 | `developedModel` | organization | model |
+| 20 | `authoredBy` | resource, argument | person |
+| 21 | `advisorTo` | person | organization |
+| 22 | `boardMemberOf` | person | organization |
+| 23 | `previouslyAt` | person | organization |
+| 24 | `causedBy` | event, risk | any |
+| 25 | `ledTo` | event | event |
+
+### Decision 2: Where do properties live?
+
+A new file: `data/properties.yaml`, following the pattern of `data/fact-measures.yaml`:
+
+```yaml
+# data/properties.yaml
+properties:
+  foundedBy:
+    label: "Founded by"
+    description: "Person(s) who founded an organization"
+    domainIncludes: [organization]
+    rangeIncludes: [person]
+    inverse: foundedOrg
+    cardinality: multi        # can have multiple founders
+    qualifiers: [date]
+
+  investedIn:
+    label: "Invested in"
+    description: "Financial investment by one entity in another"
+    domainIncludes: [organization, person, funder]
+    rangeIncludes: [organization]
+    inverse: fundedBy
+    cardinality: multi
+    qualifiers: [amount, date, round, leadInvestor]
+
+  partneredWith:
+    label: "Partnered with"
+    description: "Business or strategic partnership"
+    domainIncludes: [organization]
+    rangeIncludes: [organization]
+    symmetric: true           # A partners with B implies B partners with A
+    cardinality: multi
+    qualifiers: [partnershipType, startDate, duration, scope]
+```
+
+### Decision 3: How do claims and facts coexist?
+
+Numeric claims should **reference** fact entries rather than duplicate them:
+
+```yaml
+# Claim references a fact
+- id: c-kalshi-025
+  property: fundedBy
+  text: "Raised $1 billion Series E at $11 billion valuation"
+  type: numeric
+  factRef:
+    entity: kalshi
+    factId: abc123        # Points to data/facts/kalshi.yaml
+  # ...
+```
+
+This avoids two sources of truth for the same number. The fact store handles display formatting, timeseries, staleness detection. The claim store handles provenance, confidence, entity relationships.
+
+### Decision 4: Advisory constraints or hard enforcement?
+
+**Advisory** (Schema.org style). Constraints in `properties.yaml` serve three purposes:
+
+1. **Dashboard filtering** — Show "all `investedIn` claims" on a funding overview page
+2. **Validation warnings** — `crux validate` flags a `foundedBy` claim on a risk entity as unusual
+3. **Authoring suggestions** — When extracting claims for an organization entity, suggest organization-applicable properties
+
+But never block a claim from being created because it uses a property outside its declared domain. Real-world data is messy.
+
+---
+
+## Implementation Path
+
+### Phase 1: Property vocabulary (data layer only)
+
+1. Create `data/properties.yaml` with the initial 25 properties
+2. Add a `Property` Zod schema to `data/schema.ts`
+3. Validate property references in build-data
+
+### Phase 2: Kalshi pilot
+
+1. Create `data/claims/kalshi.yaml` with the 62 claims above
+2. Build a basic `/internal/claims/` dashboard showing claims by entity, cluster, and property
+3. Verify the Kalshi wiki page could be regenerated from claims (don't actually regenerate — just verify coverage)
+
+### Phase 3: Extraction tooling
+
+1. Extend `crux facts extract` to produce full claims (not just numeric facts)
+2. Add `crux claims extract <entity>` that processes an MDX page into structured claims
+3. Add `crux claims validate` that checks property constraints, source coverage, and temporal freshness
+
+### Phase 4: Second entity, iteration
+
+1. Pick a well-developed entity (Anthropic, OpenAI) and extract its claims
+2. Test cross-entity queries (e.g., all `investedIn` claims mentioning both)
+3. Refine the property vocabulary based on what's missing or redundant
+
+---
+
+## Open Questions
+
+1. **Claim ID format.** The `c-kalshi-001` format is readable but doesn't scale across entities. Alternative: 8-char hex like fact IDs. Trade-off: readability vs. collision resistance.
+
+2. **Claim file granularity.** One file per entity (`data/claims/kalshi.yaml`) or one file per cluster (`data/claims/kalshi/funding.yaml`)? Per-entity is simpler; per-cluster is more manageable for large entities.
+
+3. **Who maintains claims?** The content pipeline (`crux content improve`) writes prose. Should it also update claims? Or should claims be a separate pipeline that the prose pipeline reads from?
+
+4. **How do claims and prose stay in sync?** If a claim is updated (new valuation), the prose page should reflect it. If prose is edited directly, should claims be re-extracted? The E892 proposal's answer is "claims are primary, prose is derived" — but that's the long-term vision. In the short term, they'll coexist.
+
+5. **Property hierarchy.** Should `fundedBy` be a sub-property of `investedIn`? Schema.org uses `rdfs:subPropertyOf`. For 25 properties this probably isn't needed yet, but as the vocabulary grows, grouping related properties becomes useful for dashboard navigation.
