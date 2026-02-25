@@ -4,10 +4,8 @@ import {
   getAllNumericIds,
   numericIdToSlug,
   slugToNumericId,
-  getRawMdxSource,
 } from "@/lib/mdx";
 import {
-  getEntityById,
   getPageById,
   getEntityPath,
   getBacklinksFor,
@@ -44,17 +42,22 @@ async function fetchPageClaims(pageId: string): Promise<ClaimRow[] | null> {
 
 function Section({
   title,
+  subtitle,
   children,
   defaultOpen = false,
 }: {
   title: string;
+  subtitle?: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
 }) {
   return (
     <details open={defaultOpen} className="mb-4 border border-gray-200 rounded">
-      <summary className="cursor-pointer px-4 py-2 bg-gray-50 font-semibold text-sm select-none hover:bg-gray-100">
-        {title}
+      <summary className="cursor-pointer px-4 py-2 bg-gray-50 select-none hover:bg-gray-100">
+        <span className="font-semibold text-sm">{title}</span>
+        {subtitle && (
+          <span className="ml-2 text-xs text-gray-400 font-normal">{subtitle}</span>
+        )}
       </summary>
       <div className="p-4 overflow-x-auto">{children}</div>
     </details>
@@ -75,11 +78,49 @@ function ConfidenceBadge({ confidence }: { confidence: string | null }) {
     verified: "bg-green-100 text-green-800",
     unverified: "bg-yellow-100 text-yellow-800",
     unsourced: "bg-red-100 text-red-800",
+    unsupported: "bg-red-100 text-red-800",
   };
   const cls = colorMap[val] ?? "bg-gray-100 text-gray-800";
   return (
     <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-medium ${cls}`}>
       {val}
+    </span>
+  );
+}
+
+/** Badge for claim category (factual, opinion, analytical, speculative, relational) */
+function CategoryBadge({ category }: { category: string | null }) {
+  if (!category) return null;
+  const colorMap: Record<string, string> = {
+    factual: "bg-blue-50 text-blue-700 border-blue-200",
+    opinion: "bg-purple-50 text-purple-700 border-purple-200",
+    analytical: "bg-amber-50 text-amber-700 border-amber-200",
+    speculative: "bg-orange-50 text-orange-700 border-orange-200",
+    relational: "bg-teal-50 text-teal-700 border-teal-200",
+  };
+  const cls = colorMap[category] ?? "bg-gray-50 text-gray-600 border-gray-200";
+  return (
+    <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium border ${cls}`}>
+      {category}
+    </span>
+  );
+}
+
+/** Render related entity badges as links */
+function RelatedEntityBadges({ entities }: { entities: string[] | null }) {
+  if (!entities || entities.length === 0) return null;
+  return (
+    <span className="inline-flex gap-1 flex-wrap">
+      {entities.map(eid => (
+        <Link
+          key={eid}
+          href={`/wiki/${eid}`}
+          className="inline-block px-1 py-0.5 rounded text-[10px] bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
+          title={`Related entity: ${eid}`}
+        >
+          {eid}
+        </Link>
+      ))}
     </span>
   );
 }
@@ -131,6 +172,16 @@ function CredDots({ level }: { level: number }) {
 type RefEntry = { title: string | null; url: string | null; resourceId?: string; domain?: string };
 type SourceEntry = RefEntry & { footnoteNum: number; credibility?: number; claimCount: number };
 
+/** Get the section name for a claim, preferring the new field over legacy */
+function getClaimSection(claim: ClaimRow): string {
+  return claim.section ?? claim.value ?? "Unknown";
+}
+
+/** Get footnote ref string, preferring new field over legacy */
+function getClaimFootnoteRefs(claim: ClaimRow): string | null {
+  return claim.footnoteRefs ?? claim.unit ?? null;
+}
+
 /** Build shared data structures from claims + footnote index */
 function buildClaimsData(claims: ClaimRow[], fnIndex?: FootnoteIndexEntry) {
   const byConfidence: Record<string, number> = {};
@@ -139,7 +190,13 @@ function buildClaimsData(claims: ClaimRow[], fnIndex?: FootnoteIndexEntry) {
     byConfidence[key] = (byConfidence[key] ?? 0) + 1;
   }
 
-  const sections = [...new Set(claims.map(c => c.value ?? "Unknown"))];
+  const byCategory: Record<string, number> = {};
+  for (const c of claims) {
+    const cat = c.claimCategory ?? "uncategorized";
+    byCategory[cat] = (byCategory[cat] ?? 0) + 1;
+  }
+
+  const sections = [...new Set(claims.map(c => getClaimSection(c)))];
 
   const refMap = new Map<number, RefEntry>();
   if (fnIndex) {
@@ -155,7 +212,7 @@ function buildClaimsData(claims: ClaimRow[], fnIndex?: FootnoteIndexEntry) {
 
   const allFootnoteNums = new Set<number>();
   for (const claim of claims) {
-    for (const n of parseFootnoteNums(claim.unit)) allFootnoteNums.add(n);
+    for (const n of parseFootnoteNums(getClaimFootnoteRefs(claim))) allFootnoteNums.add(n);
   }
 
   const seenUrls = new Set<string>();
@@ -168,29 +225,51 @@ function buildClaimsData(claims: ClaimRow[], fnIndex?: FootnoteIndexEntry) {
     seenUrls.add(key);
     const resource = entry.resourceId ? getResourceById(entry.resourceId) : undefined;
     const credibility = resource ? getResourceCredibility(resource) : undefined;
-    const claimCount = claims.filter(c => parseFootnoteNums(c.unit).includes(n)).length;
+    const claimCount = claims.filter(c => parseFootnoteNums(getClaimFootnoteRefs(c)).includes(n)).length;
     uniqueSources.push({ footnoteNum: n, ...entry, credibility, claimCount });
   }
   uniqueSources.sort((a, b) => b.claimCount - a.claimCount);
 
-  return { byConfidence, sections, refMap, uniqueSources };
+  // Count multi-entity claims
+  const multiEntityCount = claims.filter(c =>
+    c.relatedEntities && c.relatedEntities.length > 0
+  ).length;
+
+  return { byConfidence, byCategory, sections, refMap, uniqueSources, multiEntityCount };
 }
 
 function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: FootnoteIndexEntry }) {
-  const { byConfidence, sections, refMap } = buildClaimsData(claims, fnIndex);
+  const { byConfidence, byCategory, sections, refMap, multiEntityCount } = buildClaimsData(claims, fnIndex);
 
   return (
     <div>
-      {/* Summary bar */}
-      <div className="flex gap-3 mb-4 flex-wrap">
-        {Object.entries(byConfidence).map(([conf, count]) => (
+      {/* Summary bar: confidence distribution */}
+      <div className="flex gap-3 mb-3 flex-wrap">
+        {Object.entries(byConfidence).map(([conf, cnt]) => (
           <div key={conf} className="flex items-center gap-1">
             <ConfidenceBadge confidence={conf} />
-            <span className="text-xs text-gray-600">{count}</span>
+            <span className="text-xs text-gray-600">{cnt}</span>
           </div>
         ))}
         <span className="text-xs text-gray-500 ml-auto">{claims.length} total claims</span>
       </div>
+
+      {/* Category distribution bar */}
+      {Object.keys(byCategory).length > 1 && (
+        <div className="flex gap-3 mb-3 flex-wrap">
+          {Object.entries(byCategory).sort((a, b) => b[1] - a[1]).map(([cat, cnt]) => (
+            <div key={cat} className="flex items-center gap-1">
+              <CategoryBadge category={cat} />
+              <span className="text-xs text-gray-600">{cnt}</span>
+            </div>
+          ))}
+          {multiEntityCount > 0 && (
+            <span className="text-xs text-gray-500 ml-auto">
+              {multiEntityCount} multi-entity
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Section heatmap */}
       {sections.length > 1 && (
@@ -198,7 +277,7 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
           <p className="text-xs font-medium text-gray-600 mb-2">Section breakdown:</p>
           <div className="flex flex-wrap gap-2">
             {sections.map(section => {
-              const sectionClaims = claims.filter(c => (c.value ?? "Unknown") === section);
+              const sectionClaims = claims.filter(c => getClaimSection(c) === section);
               const verifiedCount = sectionClaims.filter(c => c.confidence === "verified").length;
               const pct = sectionClaims.length > 0 ? Math.round((verifiedCount / sectionClaims.length) * 100) : 0;
               const heatColor = pct >= 70 ? "bg-green-100 border-green-300"
@@ -217,56 +296,69 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
       <table className="text-xs w-full border-collapse">
         <thead>
           <tr className="border-b text-left bg-gray-50">
-            <th className="p-2 w-[28%]">Claim</th>
-            <th className="p-2 w-[22%]">Source Quote</th>
+            <th className="p-2 w-[26%]">Claim</th>
+            <th className="p-2 w-[18%]">Source Quote</th>
             <th className="p-2">Type</th>
+            <th className="p-2">Category</th>
             <th className="p-2">Confidence</th>
             <th className="p-2">Section</th>
-            <th className="p-2">Source</th>
+            <th className="p-2">Related</th>
             <th className="p-2">Citations</th>
           </tr>
         </thead>
         <tbody>
           {claims.map((claim) => {
-            const footnoteNums = parseFootnoteNums(claim.unit);
+            const footnoteNums = parseFootnoteNums(getClaimFootnoteRefs(claim));
             const firstRef = footnoteNums.length > 0 ? refMap.get(footnoteNums[0]) : null;
+            const sectionName = getClaimSection(claim);
             return (
               <tr key={claim.id} className="border-b hover:bg-gray-50 align-top">
-                <td className="p-2">{claim.claimText}</td>
+                <td className="p-2">
+                  {claim.claimText}
+                  {claim.factId && (
+                    <span className="block mt-0.5 text-[10px] text-gray-400 font-mono" title="Linked to fact system">
+                      fact: {claim.factId}
+                    </span>
+                  )}
+                </td>
                 <td className="p-2 text-gray-500 italic">
                   {claim.sourceQuote
-                    ? <span title={claim.sourceQuote}>&ldquo;{claim.sourceQuote.slice(0, 120)}{claim.sourceQuote.length > 120 ? "…" : ""}&rdquo;</span>
+                    ? <span title={claim.sourceQuote}>&ldquo;{claim.sourceQuote.slice(0, 100)}{claim.sourceQuote.length > 100 ? "…" : ""}&rdquo;</span>
                     : <span className="text-gray-300 not-italic">—</span>}
                 </td>
-                <td className="p-2 font-mono whitespace-nowrap">{claim.claimType}</td>
+                <td className="p-2 font-mono whitespace-nowrap text-[10px]">{claim.claimType}</td>
+                <td className="p-2 whitespace-nowrap">
+                  <CategoryBadge category={claim.claimCategory} />
+                </td>
                 <td className="p-2 whitespace-nowrap">
                   <ConfidenceBadge confidence={claim.confidence} />
                 </td>
-                <td className="p-2 text-gray-600 max-w-[110px] truncate" title={claim.value ?? ""}>
-                  {claim.value ?? "—"}
+                <td className="p-2 text-gray-600 max-w-[100px] truncate" title={sectionName}>
+                  {sectionName}
                 </td>
-                <td className="p-2 max-w-[140px]">
-                  {firstRef ? (
-                    firstRef.resourceId ? (
-                      <Link href={`/source/${firstRef.resourceId}`} className="text-blue-600 hover:underline truncate block" title={firstRef.title ?? ""}>
-                        {firstRef.domain ?? firstRef.title?.slice(0, 25) ?? "—"}
-                      </Link>
-                    ) : firstRef.url ? (
-                      <a href={firstRef.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate block" title={firstRef.title ?? ""}>
-                        {firstRef.domain ?? "link"}
-                      </a>
-                    ) : (
-                      <span className="text-gray-400 truncate block">{firstRef.title?.slice(0, 25) ?? "—"}</span>
-                    )
-                  ) : "—"}
-                  {footnoteNums.length > 1 && (
-                    <span className="text-gray-400 text-[10px] block">+{footnoteNums.length - 1} more</span>
+                <td className="p-2 max-w-[120px]">
+                  <RelatedEntityBadges entities={claim.relatedEntities} />
+                  {(!claim.relatedEntities || claim.relatedEntities.length === 0) && (
+                    firstRef ? (
+                      firstRef.resourceId ? (
+                        <Link href={`/source/${firstRef.resourceId}`} className="text-blue-600 hover:underline truncate block text-[10px]" title={firstRef.title ?? ""}>
+                          {firstRef.domain ?? firstRef.title?.slice(0, 20) ?? "—"}
+                        </Link>
+                      ) : firstRef.url ? (
+                        <a href={firstRef.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate block text-[10px]" title={firstRef.title ?? ""}>
+                          {firstRef.domain ?? "link"}
+                        </a>
+                      ) : <span className="text-gray-400 text-[10px]">—</span>
+                    ) : <span className="text-gray-400 text-[10px]">—</span>
                   )}
                 </td>
                 <td className="p-2 whitespace-nowrap">
                   {footnoteNums.length > 0
-                    ? footnoteNums.map(n => <CitationBadge key={n} num={n} fnIndex={fnIndex} />)
+                    ? footnoteNums.slice(0, 3).map(n => <CitationBadge key={n} num={n} fnIndex={fnIndex} />)
                     : "—"}
+                  {footnoteNums.length > 3 && (
+                    <span className="text-gray-400 text-[10px]">+{footnoteNums.length - 3}</span>
+                  )}
                 </td>
               </tr>
             );
@@ -347,47 +439,79 @@ export default async function WikiInfoPage({ params }: PageProps) {
 
   if (!slug) notFound();
 
-  const entity = getEntityById(slug);
   const pageData = getPageById(slug);
   const entityPath = getEntityPath(slug);
   const backlinks = getBacklinksFor(slug);
   const facts = (await getFactsForEntityWithFallback(slug)).data;
   const externalLinks = getExternalLinks(slug);
-  const rawMdx = getRawMdxSource(slug);
   const fnIndex = getFootnoteIndex(slug);
   const claims = await fetchPageClaims(slug);
 
-  const title = entity?.title || pageData?.title || slug;
+  const title = pageData?.title || slug;
+  const entityType = pageData?.entityType || null;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
+      {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-2xl font-bold">{title}</h1>
-          <span className="text-sm text-gray-500 font-mono">
-            {slug}
-            {numericId && ` (${numericId})`}
-          </span>
+        <div className="flex items-start gap-3 mb-2">
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold mb-1">{title}</h1>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+              <span className="font-mono text-gray-500">{slug}</span>
+              {entityType && (
+                <span className="px-1.5 py-0.5 bg-gray-100 rounded text-xs">{entityType}</span>
+              )}
+              {entityPath && (
+                <span className="text-gray-400 text-xs">Path: {entityPath}</span>
+              )}
+            </div>
+          </div>
+          {/* EID — the canonical numeric entity identifier used in URLs and EntityLink refs */}
+          {numericId && (
+            <div className="shrink-0 flex flex-col items-end gap-1">
+              <span className="font-mono text-2xl font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-lg select-all">
+                {numericId}
+              </span>
+              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Entity ID (EID)</span>
+            </div>
+          )}
         </div>
-        <div className="flex gap-3 text-sm">
+
+        <div className="flex flex-wrap gap-4 text-sm mt-3">
           <Link
             href={`/wiki/${numericId || slug}`}
             className="text-blue-600 hover:underline"
           >
             &larr; Back to page
           </Link>
-          {entityPath && (
-            <span className="text-gray-400">Path: {entityPath}</span>
+          <span className="text-gray-400">
+            {Object.keys(facts).length} facts
+            {" · "}
+            {backlinks.length} backlinks
+            {claims !== null && ` · ${claims.length} claims`}
+          </span>
+          {pageData?.quality != null && (
+            <span className="text-gray-500">
+              Quality: <span className="font-medium">{pageData.quality}</span>
+            </span>
+          )}
+          {pageData?.lastUpdated && (
+            <span className="text-gray-500">
+              Updated: <span className="font-medium">{pageData.lastUpdated}</span>
+            </span>
           )}
         </div>
       </div>
 
-      <Section title="Page Metadata" defaultOpen>
-        {pageData ? <JsonDump data={pageData} /> : <p className="text-sm text-gray-500">No page data found for &quot;{slug}&quot;</p>}
-      </Section>
-
-      <Section title="Entity Data" defaultOpen>
-        {entity ? <JsonDump data={entity} /> : <p className="text-sm text-gray-500">No entity found for &quot;{slug}&quot;</p>}
+      <Section
+        title="Page Record"
+        subtitle="database.json — merged from MDX frontmatter + Entity YAML + computed metrics at build time"
+        defaultOpen
+      >
+        {pageData
+          ? <JsonDump data={pageData} />
+          : <p className="text-sm text-gray-500">No compiled record found for &quot;{slug}&quot;</p>}
       </Section>
 
       <Section title={`Claims ${claims && claims.length > 0 ? `(${claims.length})` : ""}`}>
@@ -452,7 +576,9 @@ export default async function WikiInfoPage({ params }: PageProps) {
       </Section>
 
       <Section title="External Links">
-        {externalLinks ? <JsonDump data={externalLinks} /> : <p className="text-sm text-gray-500">No external links</p>}
+        {externalLinks
+          ? <JsonDump data={externalLinks} />
+          : <p className="text-sm text-gray-500">No external links</p>}
       </Section>
 
       <Section title={`Backlinks (${backlinks.length})`}>
@@ -486,19 +612,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
         )}
       </Section>
 
-      <Section title="Frontmatter">
-        {rawMdx ? <JsonDump data={rawMdx.frontmatter} /> : <p className="text-sm text-gray-500">No MDX file found</p>}
-      </Section>
-
-      <Section title="Raw MDX Source">
-        {rawMdx ? (
-          <pre className="text-xs bg-gray-50 p-3 rounded overflow-x-auto max-h-[800px] overflow-y-auto whitespace-pre-wrap break-words font-mono">
-            {rawMdx.raw}
-          </pre>
-        ) : (
-          <p className="text-sm text-gray-500">No MDX file found</p>
-        )}
-      </Section>
     </div>
   );
 }

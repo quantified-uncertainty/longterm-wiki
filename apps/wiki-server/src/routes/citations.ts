@@ -2,13 +2,15 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { citationQuotes, citationContent, citationAccuracySnapshots, resources } from "../schema.js";
+import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources } from "../schema.js";
+import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
   validationError,
   invalidJsonError,
   notFoundError,
   firstOrThrow,
+  dbError,
 } from "./utils.js";
 import {
   UpsertCitationQuoteSchema,
@@ -185,6 +187,21 @@ citationsRoute.post("/quotes/upsert", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const db = getDrizzleDb();
+
+  // Validate page reference
+  const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, [parsed.data.pageId]);
+  if (missingPages.length > 0) {
+    return validationError(c, `Referenced page not found: ${missingPages.join(", ")}`);
+  }
+
+  // Validate resource reference (optional)
+  if (parsed.data.resourceId) {
+    const missingRes = await checkRefsExist(db, resources, resources.id, [parsed.data.resourceId]);
+    if (missingRes.length > 0) {
+      return validationError(c, `Referenced resource not found: ${missingRes.join(", ")}`);
+    }
+  }
+
   const rows = await upsertQuote(db, parsed.data);
 
   const row = firstOrThrow(rows, "citation quote upsert");
@@ -209,34 +226,63 @@ citationsRoute.post("/quotes/upsert-batch", async (c) => {
   const { items } = parsed.data;
   const db = getDrizzleDb();
 
-  const results = await db.transaction(async (tx) => {
-    return await tx
-      .insert(citationQuotes)
-      .values(items.map((d) => quoteValues(d)))
-      .onConflictDoUpdate({
-        target: [citationQuotes.pageId, citationQuotes.footnote],
-        set: {
-          url: sql`excluded.url`,
-          resourceId: sql`excluded.resource_id`,
-          claimText: sql`excluded.claim_text`,
-          claimContext: sql`excluded.claim_context`,
-          sourceQuote: sql`excluded.source_quote`,
-          sourceLocation: sql`excluded.source_location`,
-          quoteVerified: sql`excluded.quote_verified`,
-          verificationMethod: sql`excluded.verification_method`,
-          verificationScore: sql`excluded.verification_score`,
-          sourceTitle: sql`excluded.source_title`,
-          sourceType: sql`excluded.source_type`,
-          extractionModel: sql`excluded.extraction_model`,
-          updatedAt: sql`now()`,
-        },
-      })
-      .returning({
-        id: citationQuotes.id,
-        pageId: citationQuotes.pageId,
-        footnote: citationQuotes.footnote,
-      });
-  });
+  // Validate page references
+  const pageIds = [...new Set(items.map((d) => d.pageId))];
+  const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, pageIds);
+  if (missingPages.length > 0) {
+    return validationError(
+      c,
+      `Referenced pages not found: ${missingPages.join(", ")}`
+    );
+  }
+
+  // Validate resource references (optional field)
+  const resourceIds = [
+    ...new Set(items.map((d) => d.resourceId).filter((r): r is string => r != null)),
+  ];
+  if (resourceIds.length > 0) {
+    const missingResources = await checkRefsExist(db, resources, resources.id, resourceIds);
+    if (missingResources.length > 0) {
+      return validationError(
+        c,
+        `Referenced resources not found: ${missingResources.join(", ")}`
+      );
+    }
+  }
+
+  let results;
+  try {
+    results = await db.transaction(async (tx) => {
+      return await tx
+        .insert(citationQuotes)
+        .values(items.map((d) => quoteValues(d)))
+        .onConflictDoUpdate({
+          target: [citationQuotes.pageId, citationQuotes.footnote],
+          set: {
+            url: sql`excluded.url`,
+            resourceId: sql`excluded.resource_id`,
+            claimText: sql`excluded.claim_text`,
+            claimContext: sql`excluded.claim_context`,
+            sourceQuote: sql`excluded.source_quote`,
+            sourceLocation: sql`excluded.source_location`,
+            quoteVerified: sql`excluded.quote_verified`,
+            verificationMethod: sql`excluded.verification_method`,
+            verificationScore: sql`excluded.verification_score`,
+            sourceTitle: sql`excluded.source_title`,
+            sourceType: sql`excluded.source_type`,
+            extractionModel: sql`excluded.extraction_model`,
+            updatedAt: sql`now()`,
+          },
+        })
+        .returning({
+          id: citationQuotes.id,
+          pageId: citationQuotes.pageId,
+          footnote: citationQuotes.footnote,
+        });
+    });
+  } catch (err) {
+    return dbError(c, "citation quotes upsert-batch", err, { itemCount: items.length });
+  }
 
   return c.json({ results });
 });
@@ -533,35 +579,39 @@ citationsRoute.post("/quotes/mark-accuracy-batch", async (c) => {
   const db = getDrizzleDb();
   const results: Array<{ pageId: string; footnote: number; verdict: string }> = [];
 
-  await db.transaction(async (tx) => {
-    for (const d of items) {
-      const rows = await tx
-        .update(citationQuotes)
-        .set({
-          accuracyVerdict: d.verdict,
-          accuracyScore: d.score,
-          accuracyIssues: d.issues ?? null,
-          accuracySupportingQuotes: d.supportingQuotes ?? null,
-          verificationDifficulty: d.verificationDifficulty ?? null,
-          accuracyCheckedAt: sql`now()`,
-          updatedAt: sql`now()`,
-        })
-        .where(
-          and(
-            eq(citationQuotes.pageId, d.pageId),
-            eq(citationQuotes.footnote, d.footnote)
+  try {
+    await db.transaction(async (tx) => {
+      for (const d of items) {
+        const rows = await tx
+          .update(citationQuotes)
+          .set({
+            accuracyVerdict: d.verdict,
+            accuracyScore: d.score,
+            accuracyIssues: d.issues ?? null,
+            accuracySupportingQuotes: d.supportingQuotes ?? null,
+            verificationDifficulty: d.verificationDifficulty ?? null,
+            accuracyCheckedAt: sql`now()`,
+            updatedAt: sql`now()`,
+          })
+          .where(
+            and(
+              eq(citationQuotes.pageId, d.pageId),
+              eq(citationQuotes.footnote, d.footnote)
+            )
           )
-        )
-        .returning({
-          pageId: citationQuotes.pageId,
-          footnote: citationQuotes.footnote,
-        });
+          .returning({
+            pageId: citationQuotes.pageId,
+            footnote: citationQuotes.footnote,
+          });
 
-      if (rows.length > 0) {
-        results.push({ pageId: rows[0].pageId, footnote: rows[0].footnote, verdict: d.verdict });
+        if (rows.length > 0) {
+          results.push({ pageId: rows[0].pageId, footnote: rows[0].footnote, verdict: d.verdict });
+        }
       }
-    }
-  });
+    });
+  } catch (err) {
+    return dbError(c, "citation quotes mark-accuracy-batch", err, { itemCount: items.length });
+  }
 
   return c.json({ updated: results.length, results });
 });
@@ -954,13 +1004,18 @@ citationsRoute.post("/content/link-resources", async (c) => {
 
   // Find all citation_content rows that have no resource_id
   // and match a resource by URL.
-  const result = await db.execute(sql`
-    UPDATE citation_content cc
-    SET resource_id = r.id
-    FROM resources r
-    WHERE cc.url = r.url
-      AND cc.resource_id IS NULL
-  `);
+  let result;
+  try {
+    result = await db.execute(sql`
+      UPDATE citation_content cc
+      SET resource_id = r.id
+      FROM resources r
+      WHERE cc.url = r.url
+        AND cc.resource_id IS NULL
+    `);
+  } catch (err) {
+    return dbError(c, "citation content link-resources", err);
+  }
 
   const linked = Number((result as any).count ?? 0);
   return c.json({ linked });

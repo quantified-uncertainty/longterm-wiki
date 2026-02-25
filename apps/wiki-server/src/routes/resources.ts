@@ -10,7 +10,8 @@ import {
 } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { getDrizzleDb, getDb } from "../db.js";
-import { resources, resourceCitations, citationContent } from "../schema.js";
+import { resources, resourceCitations, wikiPages, citationContent } from "../schema.js";
+import { checkRefsExist } from "./ref-check.js";
 import type * as schema from "../schema.js";
 import {
   parseJsonBody,
@@ -18,6 +19,7 @@ import {
   invalidJsonError,
   notFoundError,
   firstOrThrow,
+  dbError,
 } from "./utils.js";
 import {
   UpsertResourceSchema as SharedUpsertResourceSchema,
@@ -200,6 +202,18 @@ resourcesRoute.post("/", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const db = getDrizzleDb();
+
+  // Validate citedBy page references (optional field)
+  if (parsed.data.citedBy && parsed.data.citedBy.length > 0) {
+    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, parsed.data.citedBy);
+    if (missingPages.length > 0) {
+      return validationError(
+        c,
+        `Referenced pages not found in citedBy: ${missingPages.join(", ")}`
+      );
+    }
+  }
+
   const result = await upsertResource(db, parsed.data);
   return c.json(result, 201);
 });
@@ -214,32 +228,51 @@ resourcesRoute.post("/batch", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { items } = parsed.data;
-  const results: Array<{ id: string; url: string }> = [];
 
   const db = getDrizzleDb();
-  await db.transaction(async (tx) => {
-    for (const item of items) {
-      // Skip per-row search_vector update; handled in bulk below
-      const result = await upsertResource(tx as unknown as DbClient, item, {
-        skipSearchVector: true,
-      });
-      results.push({ id: result.id, url: result.url });
-    }
 
-    // Bulk search_vector update for all upserted resources (one query)
-    const idList = sql.join(
-      results.map((r) => sql`${r.id}`),
-      sql`, `
-    );
-    await tx.execute(sql`
-      UPDATE resources SET search_vector =
-        setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
-        setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
-        setweight(to_tsvector('english', coalesce(abstract, '')), 'C') ||
-        setweight(to_tsvector('english', coalesce(review, '')), 'D')
-      WHERE id IN (${idList})
-    `);
-  });
+  // Validate citedBy page references
+  const allCitedBy = [
+    ...new Set(items.flatMap((item) => item.citedBy ?? [])),
+  ];
+  if (allCitedBy.length > 0) {
+    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, allCitedBy);
+    if (missingPages.length > 0) {
+      return validationError(
+        c,
+        `Referenced pages not found in citedBy: ${missingPages.join(", ")}`
+      );
+    }
+  }
+
+  const results: Array<{ id: string; url: string }> = [];
+  try {
+    await db.transaction(async (tx) => {
+      for (const item of items) {
+        // Skip per-row search_vector update; handled in bulk below
+        const result = await upsertResource(tx as unknown as DbClient, item, {
+          skipSearchVector: true,
+        });
+        results.push({ id: result.id, url: result.url });
+      }
+
+      // Bulk search_vector update for all upserted resources (one query)
+      const idList = sql.join(
+        results.map((r) => sql`${r.id}`),
+        sql`, `
+      );
+      await tx.execute(sql`
+        UPDATE resources SET search_vector =
+          setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+          setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
+          setweight(to_tsvector('english', coalesce(abstract, '')), 'C') ||
+          setweight(to_tsvector('english', coalesce(review, '')), 'D')
+        WHERE id IN (${idList})
+      `);
+    });
+  } catch (err) {
+    return dbError(c, "resources batch upsert", err, { itemCount: items.length });
+  }
 
   return c.json({ upserted: results.length, results }, 201);
 });

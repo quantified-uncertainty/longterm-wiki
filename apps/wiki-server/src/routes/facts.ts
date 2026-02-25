@@ -3,7 +3,8 @@ import { validator } from "hono/validator";
 import { z } from "zod";
 import { eq, and, count, asc, sql, isNotNull, lte } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { facts } from "../schema.js";
+import { facts, entities, resources } from "../schema.js";
+import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
   validationError,
@@ -221,6 +222,52 @@ const factsApp = new Hono()
 
     const { facts: items } = parsed.data;
     const db = getDrizzleDb();
+
+    // Validate entity references
+    const entityIds = [...new Set(items.map((f) => f.entityId))];
+    const missingEntities = await checkRefsExist(db, entities, entities.id, entityIds);
+    if (missingEntities.length > 0) {
+      return validationError(
+        c,
+        `Referenced entities not found: ${missingEntities.join(", ")}`
+      );
+    }
+
+    // Validate subject references (optional field, also points to entities)
+    const subjectIds = [
+      ...new Set(items.map((f) => f.subject).filter((s): s is string => s != null)),
+    ];
+    if (subjectIds.length > 0) {
+      const missingSubjects = await checkRefsExist(db, entities, entities.id, subjectIds);
+      if (missingSubjects.length > 0) {
+        return validationError(
+          c,
+          `Referenced subject entities not found: ${missingSubjects.join(", ")}`
+        );
+      }
+    }
+
+    // Validate sourceResource references (optional field, points to resources)
+    const resourceIds = [
+      ...new Set(
+        items.map((f) => f.sourceResource).filter((r): r is string => r != null)
+      ),
+    ];
+    if (resourceIds.length > 0) {
+      const missingResources = await checkRefsExist(
+        db,
+        resources,
+        resources.id,
+        resourceIds
+      );
+      if (missingResources.length > 0) {
+        return validationError(
+          c,
+          `Referenced resources not found: ${missingResources.join(", ")}`
+        );
+      }
+    }
+
     let upserted = 0;
 
     await db.transaction(async (tx) => {

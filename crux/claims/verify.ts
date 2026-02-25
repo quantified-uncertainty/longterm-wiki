@@ -192,7 +192,7 @@ async function main() {
   let noSource = 0;
 
   for (const claim of claims) {
-    const footnoteRefs = claim.unit ? claim.unit.split(',').map(s => s.trim()) : [];
+    const footnoteRefs = (claim.footnoteRefs ?? claim.unit) ? (claim.footnoteRefs ?? claim.unit)!.split(',').map(s => s.trim()) : [];
 
     // If no footnote refs, mark as unsourced
     if (footnoteRefs.length === 0) {
@@ -284,10 +284,18 @@ async function main() {
       entityType: claim.entityType,
       claimType: claim.claimType,
       claimText: claim.claimText,
+      // Legacy fields
       value: claim.value,
       unit: claim.unit,
       confidence: claim.newConfidence,
       sourceQuote: claim.newSourceQuote || null,
+      // Enhanced fields — preserve from original claim
+      claimCategory: claim.claimCategory ?? null,
+      relatedEntities: claim.relatedEntities ?? null,
+      factId: claim.factId ?? null,
+      resourceIds: claim.resourceIds ?? null,
+      section: claim.section ?? claim.value ?? null,
+      footnoteRefs: claim.footnoteRefs ?? claim.unit ?? null,
     }));
 
     const result = await insertClaimBatch(items);

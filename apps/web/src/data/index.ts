@@ -387,12 +387,6 @@ interface BacklinkEntry {
 
 export type ContentFormat = 'article' | 'table' | 'diagram' | 'index' | 'dashboard';
 
-export interface StructuredSummary {
-  oneLiner: string;
-  keyPoints: string[];
-  bottomLine: string;
-}
-
 export interface ChangeEntry {
   date: string;
   branch: string;
@@ -421,7 +415,6 @@ export interface Page {
   lastUpdated: string | null;
   dateCreated?: string | null;
   llmSummary: string | null;
-  structuredSummary: StructuredSummary | null;
   description: string | null;
   ratings: {
     novelty?: number;
@@ -889,7 +882,6 @@ export interface PageCoverageItem {
   unconvertedLinkCount: number;
   // Boolean items
   llmSummary: boolean;
-  structuredSummary: boolean;
   schedule: boolean;
   entity: boolean;
   editHistory: boolean;
@@ -971,7 +963,6 @@ export function getPageCoverageItems(): PageCoverageItem[] {
       unconvertedLinkCount: page.unconvertedLinkCount ?? 0,
       // Booleans
       llmSummary: cov.items.llmSummary === "green",
-      structuredSummary: cov.items.structuredSummary === "green",
       schedule: cov.items.schedule === "green",
       entity: cov.items.entity === "green",
       editHistory: cov.items.editHistory === "green",
