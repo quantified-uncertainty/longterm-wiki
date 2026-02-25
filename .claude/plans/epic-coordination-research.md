@@ -214,7 +214,210 @@ If the coordination document aspect isn't needed yet, skip Discussions entirely 
 - Weakest for actual task tracking (no assignees, no PR auto-close)
 - Would need manual progress tracking
 
-**Option 4: Wait for Linear integration**
+**Option 4: Linear for epics, GitHub for tasks (incremental)**
 - Purpose-built agent API with sessions, assignment, progress
 - New dependency outside GitHub
 - Could be added later alongside GitHub-native approach
+- See detailed analysis below
+
+---
+
+## Appendix: Linear Deep Dive
+
+### Overview
+
+Linear shipped "Linear for Agents" in May 2025 — a dedicated API that treats AI agents as first-class workspace members. Of all non-GitHub tools evaluated, Linear is the clear standout for agent coordination. This section documents what's actually there, what works, and where the gaps are.
+
+### Agent Sessions — The Core Abstraction
+
+An `AgentSession` tracks the lifecycle of a single agent run. Sessions are **created automatically** when an agent is @mentioned or assigned ("delegated") an issue. The agent doesn't manage session state manually — Linear infers it from emitted activities.
+
+**Five session states:** `pending` → `active` → `complete` (or `error` / `awaitingInput`)
+
+**Five activity types:**
+
+| Type | Purpose | Content Fields |
+|---|---|---|
+| `thought` | Internal reasoning (shown as collapsible) | `{ type: "thought", body: string }` |
+| `action` | Tool call (file read, search, etc.) | `{ type: "action", action: string, parameter: string, result?: string }` |
+| `elicitation` | Question for the human | `{ type: "elicitation", body: string }` |
+| `response` | Final output (marks session complete) | `{ type: "response", body: string }` |
+| `error` | Something went wrong | `{ type: "error", body: string }` |
+
+**Plan tracking:** Sessions have a `plan` field — an array of `{ content: string, status: "pending" | "inProgress" | "completed" | "canceled" }`. Must be replaced in full on each update. Linear renders this as a checklist in the UI.
+
+**External URLs:** Sessions can link to external dashboards/PRs via `externalUrls: [{ label, url }]`. Setting this also prevents the session from being marked unresponsive.
+
+**Timing constraints:**
+- Webhook must return within **5 seconds**
+- Agent must emit an activity or update external URL within **10 seconds** of session creation, or it's marked unresponsive
+- This means you need a webhook receiver, not polling
+
+### Authentication Model
+
+**OAuth2 with `actor=app`** — creates a dedicated app identity in the workspace (not impersonating a user). The agent gets its own ID, name, and avatar.
+
+Key scopes:
+- `app:assignable` — agent appears in issue assignment menus
+- `app:mentionable` — agent can be @mentioned
+- `read`, `write`, `issues:create`, `comments:create` — standard CRUD
+- **Cannot use `admin` scope** with `actor=app`
+
+**Client credentials grant** available for server-to-server (no browser flow needed). Token valid for 30 days. Only one active client_credentials token per app.
+
+**Token refresh:** Access tokens expire in 24 hours. Refresh token rotation is mandatory for apps created after Oct 1, 2025. Migration deadline: April 1, 2026.
+
+### GitHub Integration
+
+Linear has **native bidirectional GitHub sync** (launched Dec 2023):
+
+| Feature | Direction | Details |
+|---|---|---|
+| PR linking | GitHub → Linear | Issue ID in branch name, PR title, or magic words auto-links |
+| Status auto-update | GitHub → Linear | Draft PR → "In Progress", merged → "Done" (configurable per team) |
+| Issues Sync | Bidirectional | Title, description, status, labels, assignee, comments all sync |
+| Comment threads | Bidirectional | Reply to GitHub comments from Linear; private Linear threads stay private |
+
+**Source of truth:** Not explicitly defined by Linear for conflicting edits. Both platforms can modify synced items.
+
+**Gotcha:** Tagging existing issues with a sync label sometimes doesn't trigger sync — only newly created issues sync reliably.
+
+### Sub-Issues
+
+Linear supports parent-child issue relationships via `parentId` on `issueCreate`/`issueUpdate`. No explicit maximum nesting depth documented (unlike GitHub's 8 levels). Auto-close behavior: when all sub-issues complete, parent auto-closes (configurable per team).
+
+### Rate Limits
+
+| Auth Method | Requests/Hour | Complexity Points/Hour |
+|---|---|---|
+| API key | 5,000 | 250,000 |
+| OAuth app (`actor=app`) | 500 (some sources say higher) | 2,000,000 |
+| Unauthenticated | 60 | 10,000 |
+
+**Per-user scoping:** API key limits are per-user. OAuth app limits are per user/app combination. If each agent is a separate OAuth app installation, they each get their own quota. For 5 concurrent agents with separate tokens, this would be 5 × 500 = 2,500 req/hr.
+
+**Dynamic scaling:** OAuth apps get dynamically increased limits based on paid workspace size.
+
+**Complexity formula:** Each property = 0.1 point, each object = 1 point, connections multiply by pagination arg (default 50). Max single query: 10,000 points.
+
+### Agent Guidance
+
+Two levels of instruction documents for agents:
+- **Workspace-level:** Settings → Agents → Additional guidance (markdown)
+- **Team-level:** Team settings → Agents → Additional guidance (overrides workspace)
+
+Delivered via the `promptContext` field in webhook payloads, formatted as XML with `<guidance>` elements. Not queryable directly via API — only arrives through webhooks.
+
+### MCP Server
+
+Official remote server at `https://mcp.linear.app/mcp`. 21-22 tools including `list_issues`, `create_issue`, `update_issue`, `delete_issue`, project management, comments, teams, labels.
+
+**Claude Code setup:**
+```bash
+claude mcp add --transport http linear https://mcp.linear.app/mcp
+```
+
+Uses OAuth 2.1 with dynamic client registration. After adding, run `/mcp` to authenticate.
+
+### SDK
+
+`@linear/sdk` v75.0.0 (Feb 2026). TypeScript, auto-generated from GraphQL schema, actively maintained. Node 18+.
+
+```typescript
+import { LinearClient } from "@linear/sdk";
+const client = new LinearClient({ apiKey: process.env.LINEAR_API_KEY });
+
+// Create sub-issue
+const result = await client.createIssue({
+  title: "Implement auth middleware",
+  teamId: "TEAM_UUID",
+  parentId: "PARENT_ISSUE_UUID",
+  assigneeId: "AGENT_UUID",
+});
+
+// Emit agent activity
+await client.createAgentActivity({
+  agentSessionId: "SESSION_UUID",
+  content: { type: "thought", body: "Analyzing requirements..." },
+});
+```
+
+### Pricing
+
+| Plan | Cost | Issues | Teams | Agent API |
+|---|---|---|---|---|
+| Free | $0 | 250 active | 2 | Yes |
+| Basic | $10/user/mo | Unlimited | 5 | Yes |
+| Business | $16/user/mo | Unlimited | Unlimited | Yes |
+| Enterprise | Custom | Unlimited | Unlimited | Yes + sub-initiatives |
+
+Agents don't count as billable users. 75% off for nonprofits. No dedicated open-source program.
+
+**The 250-issue cap on Free is the critical constraint** for this project. With ~700 wiki pages and active development, you'd exceed this unless aggressively archiving.
+
+### Real-World Agent Integrations (Shipping Today)
+
+**Cursor:** Assign a Linear issue to Cursor → agent reads context, creates branch, writes code, emits thoughts/actions, opens PR, updates Linear. Implementation took ~1 day using the SDK.
+
+**Factory AI ("Droids"):** Delegate an issue → Factory provisions a remote workspace, launches a Droid with full context. Supports hundreds of concurrent Droids. Opens PRs linked to originating issues.
+
+**Cyrus** (open-source, `github.com/ceedaragents/cyrus`): Monitors Linear/GitHub issues, creates isolated git worktrees, runs Claude Code, streams activity updates back to Linear agent sessions. Supports multiple AI backends (Claude, Cursor, Codex, Gemini).
+
+### Limitations and Gotchas
+
+1. **Developer Preview** — APIs are actively changing. `AgentSession.type` already deprecated.
+2. **Delegation, not assignment** — agents are delegates; humans retain ownership.
+3. **Admin-only install** — requires workspace admin to authorize OAuth app.
+4. **10-second liveness requirement** — must emit activity within 10s of webhook or marked unresponsive. Requires always-on webhook receiver.
+5. **Webhook-first architecture** — guidance/context only arrives via webhooks, not queryable. This is architecturally incompatible with Claude Code's session-based model (no persistent webhook receiver).
+6. **No public visibility** — external contributors can't see Linear issues. Requires GitHub Issues Sync for community-facing work.
+7. **250-issue cap on Free** — inadequate for active projects without aggressive archiving.
+8. **MCP server reliability** — remote MCP connections still early, may need retries.
+9. **Dual-system cognitive load** — teams report ~23% slower cycle times when PM lives outside the codebase (Zenhub research).
+
+### Assessment for This Project
+
+**What Linear does better than GitHub:**
+- Agent sessions with plan tracking, activity timeline, and liveness monitoring
+- Purpose-built UI showing agent progress alongside human work
+- Native agent guidance (workspace-wide instruction documents)
+- Richer project hierarchy (initiatives → projects → issues → sub-issues)
+- Cycles (sprints) with automatic scheduling
+
+**What doesn't fit this project:**
+- **Webhook-first model** — Claude Code sessions are ephemeral. There's no persistent server to receive webhooks. The 10-second liveness requirement assumes an always-on agent service (like Cursor's cloud or Factory's Droids), not a CLI tool.
+- **250-issue Free cap** — would need Basic ($10/user/mo minimum) for serious use.
+- **No public visibility** — this is an open-source project; contributors need to see issues.
+- **Dual-system overhead** — adding Linear on top of GitHub Issues + `crux` CLI introduces context switching for humans and sync complexity for automation.
+- **Developer Preview risk** — building on APIs that may change before GA.
+
+**If Linear were adopted, the most viable path:**
+1. Use Linear Projects as the "epic" layer (replacing GitHub Discussions).
+2. Keep GitHub Issues for individual tasks (preserve `crux issues start/done`).
+3. Use Linear's GitHub Issues Sync to bidirectionally connect them.
+4. Add `crux linear` commands alongside existing `crux issues`/`crux epic`.
+5. This gives agent sessions + progress tracking from Linear while keeping community-facing work on GitHub.
+
+**But this requires:** A webhook receiver (could be wiki-server), Basic plan ($10/user/mo), and maintaining two systems in sync. The benefit over the GitHub Sub-Issues + Discussions hybrid is primarily the agent session UI — which is nice but not essential for coordination.
+
+---
+
+## Updated Decision Matrix
+
+| Option | Complexity | Cost | Agent Coordination | Human Visibility | Community Access | Requires Webhook Server |
+|---|---|---|---|---|---|---|
+| **1. Sub-Issues + Discussions** | Medium | Free | Good (manual) | Good | Full | No |
+| **2. Sub-Issues Only** | Low | Free | Basic | Good | Full | No |
+| **3. Discussions Only (current)** | Low | Free | Weak | Good | Full | No |
+| **4. Linear for Epics** | High | $10+/user/mo | Excellent | Excellent | Requires sync | Yes |
+| **5. Linear Full** | Very High | $10+/user/mo | Excellent | Excellent | Requires sync | Yes |
+
+### Bottom Line
+
+Linear's agent API is genuinely impressive — it's the best-designed agent coordination system available today. But for this project, the **architectural mismatch** (webhook-first vs. ephemeral CLI sessions) and **operational overhead** (paid plan, dual-system sync, webhook server) outweigh the benefits. The GitHub Sub-Issues + Discussions hybrid covers the core needs (task decomposition, progress tracking, coordination documents) at zero cost with zero new infrastructure.
+
+Linear becomes compelling if/when:
+- The project runs persistent agent services (not just CLI sessions)
+- The team grows beyond solo/small where Linear's PM features add value
+- The 250-issue Free cap is addressed or a paid plan is justified
+- Linear's agent API reaches GA with stable contracts
