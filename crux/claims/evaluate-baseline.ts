@@ -10,7 +10,7 @@
  * Requires: ANTHROPIC_API_KEY, dry-run logs in /tmp/claims-baseline/
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { join } from 'path';
 import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
@@ -60,8 +60,11 @@ function parseClaimsFromLog(logPath: string): { claimText: string; claimType: st
   const claims: { claimText: string; claimType: string }[] = [];
   const seen = new Set<string>();
 
+  // Strip ANSI escape codes for reliable parsing
+  const clean = log.replace(/\x1b\[[0-9;]*m/g, '');
+
   // Parse multi-entity claims: [type] Text → {entities}
-  const multiMatch = log.match(/Multi-entity claims:[\s\S]*?(?=\nSample claims:|\n\n\[1m)/);
+  const multiMatch = clean.match(/Multi-entity claims:[\s\S]*?(?=\nSample claims:|\n\n)/);
   if (multiMatch) {
     for (const line of multiMatch[0].split('\n')) {
       const m = line.trim().match(/^\[(\w+)\]\s+(.+?)(?:\s+→\s+\{.*?\})?$/);
@@ -76,10 +79,11 @@ function parseClaimsFromLog(logPath: string): { claimText: string; claimType: st
   }
 
   // Parse sample claims: [type/category ...] Text [^refs] or (unsourced)
-  const sampleMatch = log.match(/Sample claims:[\s\S]*?(?=\.\.\. and \d+ more|Dry run complete)/);
+  const sampleMatch = clean.match(/Sample claims:[\s\S]*?(?=\.\.\. and \d+ more|Dry run complete)/);
   if (sampleMatch) {
     for (const line of sampleMatch[0].split('\n')) {
-      const m = line.trim().match(/^\[(\w+)\/\w+[^\]]*\]\s+(.+?)(?:\s+\[\^[^\]]*\]|\s+\(unsourced\))?$/);
+      // Match [type/category ...] or [type/category [date] [=val] ...] lines
+      const m = line.trim().match(/^\[(\w+)\/\w+(?:\s+[^\]]*?)?\]\s+(.+?)(?:\s+\[\^[^\]]*\]|\s+\(unsourced\))?$/);
       if (m) {
         const text = m[2].trim();
         if (!seen.has(text)) {
@@ -140,18 +144,23 @@ ${claimList}`;
 
   try {
     const evals = JSON.parse(jsonMatch[0]) as Array<Record<string, string>>;
-    return evals.map((e, i) => ({
-      claimText: sample[i]?.claimText ?? '',
-      claimType: sample[i]?.claimType ?? '',
-      pageId: page.id,
-      pageType: page.type,
-      accurate: e.accurate ?? 'unknown',
-      useful: e.useful ?? 'unknown',
-      correctType: e.correctType ?? 'unknown',
-      atomic: e.atomic ?? 'unknown',
-      wellScoped: e.wellScoped ?? 'unknown',
-      notes: e.notes ?? '',
-    }));
+    return evals.map((e) => {
+      // Use the claim number from response for proper alignment (1-based)
+      const idx = e.claim ? Number(e.claim) - 1 : -1;
+      const src = idx >= 0 && idx < sample.length ? sample[idx] : null;
+      return {
+        claimText: src?.claimText ?? '',
+        claimType: src?.claimType ?? '',
+        pageId: page.id,
+        pageType: page.type,
+        accurate: e.accurate ?? 'unknown',
+        useful: e.useful ?? 'unknown',
+        correctType: e.correctType ?? 'unknown',
+        atomic: e.atomic ?? 'unknown',
+        wellScoped: e.wellScoped ?? 'unknown',
+        notes: e.notes ?? '',
+      };
+    }).filter(e => e.claimText !== '');
   } catch {
     return [];
   }
@@ -191,6 +200,7 @@ export async function runEvaluation() {
   }
 
   // Write raw results
+  mkdirSync(LOG_DIR, { recursive: true });
   writeFileSync(join(LOG_DIR, 'evaluation-results.json'), JSON.stringify(allEvals, null, 2));
 
   // ═══════════════════════════════════════════════════
