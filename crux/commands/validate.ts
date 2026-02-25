@@ -116,6 +116,11 @@ const SCRIPTS = {
     description: 'CI-blocking checks (pre-push gate)',
     passthrough: ['ci', 'full', 'fix', 'fullGate', 'noTriage'],
   },
+  'id-server-sync': {
+    script: 'validate/validate-id-server-sync.ts',
+    description: 'Verify local numericIds match wiki-server allocations',
+    passthrough: ['ci'],
+  },
   'hallucination-risk': {
     script: 'validate/validate-hallucination-risk.ts',
     description: 'Hallucination risk assessment report',
