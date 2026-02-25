@@ -402,7 +402,7 @@
     - arc
     - conjecture
     - miri
-    - redwood
+    - redwood-research
     - dario-amodei
     - paul-christiano
   publication_id: alignment-forum
@@ -419,7 +419,7 @@
   cited_by:
     - capabilities-to-safety-pipeline
     - worldview-intervention-mapping
-    - redwood
+    - redwood-research
     - holden-karnofsky
   publication_id: ea-forum
   tags:
@@ -541,7 +541,7 @@
   title: Alignment Forum
   type: blog
   cited_by:
-    - redwood
+    - redwood-research
   publication_id: alignment-forum
   tags:
     - alignment

@@ -588,7 +588,7 @@ describe('frontmatter-schema rule', () => {
     expect(evergreenIssues.length).toBe(0);
   });
 
-  it('allows evergreen: true with update_frequency', () => {
+  it('rejects evergreen: true (only false is a meaningful value)', () => {
     const raw = '---\ntitle: Test\nevergreen: true\nupdate_frequency: 7\nlastEdited: "2025-01-01"\n---\nContent';
     const content = mockContent('Content', {
       raw,
@@ -596,7 +596,7 @@ describe('frontmatter-schema rule', () => {
     });
     const issues = check(frontmatterSchemaRule, content);
     const evergreenIssues = issues.filter((i: any) => i.message.includes('evergreen'));
-    expect(evergreenIssues.length).toBe(0);
+    expect(evergreenIssues.length).toBeGreaterThan(0);
   });
 
   it('does not warn about missing update_frequency for graded format when evergreen: false', () => {

@@ -9,12 +9,13 @@ quality: 40
 readerImportance: 10
 researchImportance: 5
 lastEdited: "2026-02-23"
-evergreen: true
 ---
 
-The **Content** checklist in PageStatus tracks eleven data enrichment layers that a page can have. Pages with more layers are better sourced, more useful, and easier to maintain. This guide explains each layer.
+The **Content** checklist in PageStatus tracks content enrichment layers that a page can have. Pages with more layers are better sourced, more useful, and easier to maintain. This guide explains each layer.
 
-Numeric metrics (tables, diagrams, links, footnotes, references) show a **target** that scales with page word count — a 5,000-word article is expected to have more tables and citations than a 500-word stub. Targets also vary by content format (table-format pages expect more tables; index pages expect more links). Boolean items (summary, schedule, entity, edit history) are simply present or absent.
+Some items are **type-specific**: the Overview check only applies to article and diagram format pages; the Facts check only applies to person and organization pages. Other items appear on all pages.
+
+Numeric metrics (tables, diagrams, links, footnotes, references) show a **target** that scales with page word count — a 5,000-word article is expected to have more tables and citations than a 500-word stub. Targets also vary by content format (table-format pages expect more tables; index pages expect more links). Boolean items (summary, schedule, entity, edit history, overview) are simply present or absent.
 
 ## Structured Summary
 
@@ -29,11 +30,11 @@ pnpm crux content improve <page-id> --tier=standard --apply
 
 ## Update Schedule
 
-The `updateFrequency` frontmatter field (in days) that says how often a page should be reviewed. Drives the overdue tracking system on the `/internal/updates` dashboard.
+The `update_frequency` frontmatter field (in days) that says how often a page should be reviewed. Drives the overdue tracking system on the `/internal/updates` dashboard.
 
 **Why it matters:** Prevents pages from going stale. Fast-moving topics (LLM capabilities, policy developments) need frequent updates; evergreen topics (historical events) need less.
 
-**How to add:** Set `updateFrequency: N` in the page's frontmatter, where N is the number of days between reviews. Common values: 21 (3 weeks), 60 (bimonthly), 90 (quarterly), 180 (biannual).
+**How to add:** Set `update_frequency: N` in the page's frontmatter, where N is the number of days between reviews. Common values: 21 (3 weeks), 60 (bimonthly), 90 (quarterly), 180 (biannual).
 
 ## Entity Data
 
@@ -42,6 +43,16 @@ A YAML entity definition in `data/entities/` with type, description, related ent
 **Why it matters:** Pages without entity data are invisible to the wiki's graph — they don't appear in related pages, can't be linked via `<EntityLink>`, and lack structured metadata.
 
 **How to add:** Create a YAML file in the appropriate `data/entities/*.yaml` file for the entity's type. See existing entities for the schema.
+
+## Overview Section
+
+A `## Overview` heading section that introduces the page's topic and scope. Detected by the presence of a heading literally named "Overview" in the page content. Scored for article and diagram format pages only.
+
+**Why it matters:** An overview section helps readers orient themselves quickly and improves AI-generated summaries and search snippets. Structural quality scoring rewards pages that clearly introduce their topic.
+
+**How to add:** Add `## Overview` as the first or second heading in the MDX file, followed by 1-3 paragraphs that summarize the topic. Many high-quality wiki pages use this pattern.
+
+**Anchor:** `overview-section`
 
 ## Tables
 
@@ -112,3 +123,23 @@ Tracked changes from improve pipeline runs and manual editing sessions. Stored i
 **Why it matters:** Edit history creates accountability — you can see when a page was last improved, by which model, and what changed. It also helps identify pages that haven't been touched in a long time.
 
 **How to add:** Edit history is created automatically by the improve pipeline (`--apply` flag) and by manual session logs. Use `pnpm crux edit-log view <page-id>` to inspect.
+
+## Entity Facts
+
+Canonical facts defined for this entity in `data/facts/` YAML files. Used by `<F>` components in the page content to render structured data inline. Scored for **person and organization pages only** (not concept, approach, risk, or analysis pages).
+
+Scoring: green = 5+ facts, amber = 1-4 facts, red = 0 facts.
+
+**Why it matters:** Canonical facts make entity data machine-readable and maintainable. Instead of burying numbers in prose (where they go stale), facts are defined once and updated in a single YAML file.
+
+**How to add:** Create or update the entity's entry in `data/facts/` YAML files. Example: `data/facts/organizations.yaml` for organization pages. Use `<F entity="slug" fact="founded">` in the page content to render values.
+
+**Anchor:** `entity-facts`
+
+## Backlinks (info-only)
+
+The number of other wiki pages that link to this page. Shown as an informational item — not scored (it's not directly under the page author's control).
+
+**Why it matters:** A page with many backlinks is well-integrated into the knowledge graph. Low backlink counts suggest the page is an orphan that readers can't easily discover.
+
+**How to increase:** Add EntityLink references (pointing to this page) from related pages. Improve the page quality so other pages naturally reference it.

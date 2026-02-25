@@ -922,12 +922,10 @@
   links:
     lesswrong: https://www.lesswrong.com/tag/ai-capabilities
     stampy: https://aisafety.info/questions/6268/What-is-an-intelligence-explosion
-- pageId: redwood
+- pageId: redwood-research
   links:
     lesswrong: https://www.lesswrong.com/tag/redwood-research
     eaForum: https://forum.effectivealtruism.org/topics/redwood-research
-- pageId: redwood-research
-  links:
     grokipedia: https://grokipedia.com/page/Redwood_Research
 - pageId: regulation
   links:

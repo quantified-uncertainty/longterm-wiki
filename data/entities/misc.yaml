@@ -46,9 +46,9 @@
     - id: long-term-benefit-trust
       type: analysis
     - id: openai
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
   lastUpdated: 2026-02
 
 - id: anthropic-valuation
@@ -71,13 +71,13 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: anthropic-ipo
       type: analysis
     - id: anthropic-investors
       type: analysis
     - id: openai
-      type: lab
+      type: organization
   lastUpdated: 2026-02
 
 - id: anthropic-stakeholders
@@ -100,7 +100,7 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: anthropic-investors
       type: analysis
     - id: anthropic-valuation
@@ -108,13 +108,13 @@
     - id: anthropic-ipo
       type: analysis
     - id: jaan-tallinn
-      type: researcher
+      type: person
     - id: dustin-moskovitz
-      type: researcher
+      type: person
     - id: dario-amodei
-      type: researcher
+      type: person
     - id: daniela-amodei
-      type: researcher
+      type: person
   lastUpdated: 2026-02
 
 - id: anthropic-investors
@@ -140,13 +140,13 @@
     - id: anthropic-valuation
       type: analysis
     - id: anthropic
-      type: lab
+      type: organization
     - id: anthropic-ipo
       type: analysis
     - id: jaan-tallinn
-      type: researcher
+      type: person
     - id: dustin-moskovitz
-      type: researcher
+      type: person
   lastUpdated: 2026-02
 
 - id: long-term-benefit-trust
@@ -168,15 +168,15 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: dario-amodei
-      type: researcher
+      type: person
     - id: daniela-amodei
-      type: researcher
+      type: person
     - id: paul-christiano
-      type: researcher
+      type: person
     - id: cea
-      type: lab
+      type: organization
   lastUpdated: 2026-02
 
 - id: musk-openai-lawsuit
@@ -202,11 +202,11 @@
     - id: openai-foundation
       type: funder
     - id: elon-musk
-      type: researcher
+      type: person
     - id: openai
-      type: lab
+      type: organization
     - id: sam-altman
-      type: researcher
+      type: person
   lastUpdated: 2026-02
 
 - id: anthropic-ipo
@@ -230,13 +230,13 @@
     - id: anthropic-valuation
       type: analysis
     - id: anthropic
-      type: lab
+      type: organization
     - id: anthropic-investors
       type: analysis
     - id: dario-amodei
-      type: researcher
+      type: person
     - id: daniela-amodei
-      type: researcher
+      type: person
   lastUpdated: 2026-02
 
 - id: elon-musk-philanthropy
@@ -259,15 +259,15 @@
     - governance
   relatedEntries:
     - id: elon-musk
-      type: researcher
+      type: person
     - id: giving-pledge
       type: concept
     - id: dustin-moskovitz
-      type: researcher
+      type: person
     - id: openai
-      type: lab
+      type: organization
     - id: jaan-tallinn
-      type: researcher
+      type: person
   lastUpdated: 2026-02
 
 - id: anthropic-pledge-enforcement
@@ -300,7 +300,7 @@
     - id: giving-pledge
       type: concept
     - id: dario-amodei
-      type: researcher
+      type: person
   lastUpdated: 2026-02
 
 - id: anthropic-pre-ipo-daf-transfers
@@ -334,7 +334,7 @@
     - id: giving-pledge
       type: concept
     - id: dario-amodei
-      type: researcher
+      type: person
   lastUpdated: 2026-02
 
 - id: anthropic-impact
@@ -357,15 +357,15 @@
     - governance
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: anthropic-valuation
       type: analysis
     - id: anthropic-investors
       type: analysis
     - id: openai
-      type: lab
+      type: organization
     - id: deepmind
-      type: lab
+      type: organization
   lastUpdated: 2026-02
 
 - id: capability-alignment-race
@@ -391,13 +391,13 @@
     - id: scalable-oversight
       type: safety-agenda
     - id: anthropic
-      type: lab
+      type: organization
     - id: paul-christiano
-      type: researcher
+      type: person
     - id: racing-dynamics
       type: concept
     - id: epoch-ai
-      type: lab
+      type: organization
   lastUpdated: 2026-02
 
 - id: short-timeline-policy-implications
@@ -425,7 +425,7 @@
     - id: compute-governance
       type: concept
     - id: anthropic
-      type: lab
+      type: organization
     - id: eu-ai-act
       type: concept
   lastUpdated: 2026-02
@@ -455,9 +455,9 @@
     - id: scalable-oversight
       type: safety-agenda
     - id: anthropic
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
   lastUpdated: 2026-02
 
 - id: feedback-loops
@@ -484,7 +484,7 @@
     - id: racing-dynamics
       type: concept
     - id: anthropic
-      type: lab
+      type: organization
   lastUpdated: 2026-02
 
 - id: multi-actor-landscape
@@ -510,9 +510,9 @@
     - id: capability-alignment-race
       type: analysis
     - id: openai
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
   lastUpdated: 2026-02
 
 - id: model-organisms-of-misalignment
@@ -535,11 +535,11 @@
     - ai-safety
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: evan-hubinger
-      type: researcher
+      type: person
     - id: paul-christiano
-      type: researcher
+      type: person
     - id: deceptive-alignment
       type: risk
     - id: interpretability
@@ -571,12 +571,12 @@
     - id: open-philanthropy
       type: funder
     - id: securebio
-      type: lab
+      type: organization
     - id: securedna
-      type: lab
+      type: organization
     - id: anthropic
-      type: lab
+      type: organization
     - id: blueprint-biosecurity
-      type: lab
+      type: organization
   lastUpdated: 2026-02
 

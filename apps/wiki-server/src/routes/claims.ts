@@ -527,7 +527,9 @@ claimsRoute.get("/relationships", async (c) => {
     const related = row.relatedEntities as string[] | null;
     if (!related) continue;
     for (const rel of related) {
-      const [a, b] = [row.entityId, rel].sort();
+      // Normalize to lowercase slug to merge capitalized variants (e.g. "Anthropic" → "anthropic")
+      const normalizedRel = rel.toLowerCase();
+      const [a, b] = [row.entityId, normalizedRel].sort();
       const key = `${a}|||${b}`;
       if (!pairMap.has(key)) {
         pairMap.set(key, { entityA: a, entityB: b, claimCount: 0, sampleClaims: [] });
@@ -569,8 +571,10 @@ claimsRoute.get("/network", async (c) => {
     const related = row.relatedEntities as string[] | null;
     if (!related) continue;
     for (const rel of related) {
-      nodeIds.add(rel);
-      const [source, target] = [row.entityId, rel].sort();
+      // Normalize to lowercase slug to merge capitalized variants (e.g. "Anthropic" → "anthropic")
+      const normalizedRel = rel.toLowerCase();
+      nodeIds.add(normalizedRel);
+      const [source, target] = [row.entityId, normalizedRel].sort();
       const key = `${source}|||${target}`;
       if (!edgeMap.has(key)) {
         edgeMap.set(key, { source, target, weight: 0 });

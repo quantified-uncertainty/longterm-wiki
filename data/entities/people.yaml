@@ -3,7 +3,7 @@
 
 - id: buck-shlegeris
   numericId: E46
-  type: researcher
+  type: person
   title: Buck Shlegeris
   description: CEO of Redwood Research, focused on AI safety research and alignment techniques.
   website: https://redwoodresearch.org
@@ -14,16 +14,16 @@
       value: AI safety research, Redwood Research leadership
 - id: chris-olah
   numericId: E59
-  type: researcher
+  type: person
   title: Chris Olah
   website: https://colah.github.io
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: interpretability
       type: safety-agenda
     - id: dario-amodei
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Co-founder, Head of Interpretability
@@ -68,16 +68,16 @@
   lastUpdated: 2025-12
 - id: connor-leahy
   numericId: E71
-  type: researcher
+  type: person
   title: Connor Leahy
   website: https://conjecture.dev
   relatedEntries:
     - id: interpretability
       type: safety-agenda
     - id: chris-olah
-      type: researcher
+      type: person
     - id: neel-nanda
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: CEO & Co-founder
@@ -119,16 +119,16 @@
   lastUpdated: 2025-12
 - id: dan-hendrycks
   numericId: E89
-  type: researcher
+  type: person
   title: Dan Hendrycks
   website: https://hendrycks.com
   relatedEntries:
     - id: cais
-      type: lab
+      type: organization
     - id: compute-governance
       type: policy
     - id: yoshua-bengio
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Director
@@ -169,7 +169,7 @@
   lastUpdated: 2025-12
 - id: daniela-amodei
   numericId: E90
-  type: researcher
+  type: person
   title: Daniela Amodei
   website: https://anthropic.com
   customFields:
@@ -177,20 +177,21 @@
       value: Co-founder & President
     - label: Known For
       value: Co-founding Anthropic, Operations and business leadership
+  description: "Co-founder and President of Anthropic, previously VP of Operations at OpenAI. Leads the business and operational strategy of Anthropic alongside her brother Dario Amodei as CEO."
 - id: dario-amodei
   numericId: E91
-  type: researcher
+  type: person
   title: Dario Amodei
   website: https://anthropic.com
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: anthropic-core-views
       type: safety-agenda
     - id: jan-leike
-      type: researcher
+      type: person
     - id: chris-olah
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Co-founder & CEO
@@ -236,22 +237,23 @@
   lastUpdated: 2025-12
 - id: demis-hassabis
   numericId: E101
-  type: researcher
+  type: person
   title: Demis Hassabis
+  description: "Co-founder and CEO of Google DeepMind, the merged entity of DeepMind and Google Brain. Nobel Prize in Chemistry co-recipient (2024) for AlphaFold protein structure prediction. A key architect of DeepMind's reinforcement learning and scientific AI research agenda."
 - id: eliezer-yudkowsky
   numericId: E114
-  type: researcher
+  type: person
   title: Eliezer Yudkowsky
   website: https://intelligence.org
   relatedEntries:
     - id: miri
-      type: lab
+      type: organization
     - id: deceptive-alignment
       type: risk
     - id: sharp-left-turn
       type: risk
     - id: paul-christiano
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Co-founder & Research Fellow
@@ -298,7 +300,7 @@
   lastUpdated: 2025-12
 - id: elizabeth-kelly
   numericId: E115
-  type: researcher
+  type: person
   title: Elizabeth Kelly (US AISI Director)
   description: Director of the US AI Safety Institute (AISI), leading federal AI safety evaluation and policy efforts.
   customFields:
@@ -308,23 +310,24 @@
       value: Leading US AI Safety Institute, AI policy
 - id: evan-hubinger
   numericId: E129
-  type: researcher
+  type: person
   title: Evan Hubinger
+  description: "AI safety researcher formerly at Anthropic and MIRI, known for the influential risks from learned optimization framework and the concept of deceptive alignment (mesa-optimization). Author of key foundational work on inner alignment and corrigibility."
 - id: gary-marcus
   numericId: E148
-  type: researcher
+  type: person
   title: Gary Marcus
   description: Cognitive scientist and AI critic, known for skepticism of deep learning's path to AGI and advocacy for hybrid AI approaches.
 - id: geoffrey-hinton
   numericId: E149
-  type: researcher
+  type: person
   title: Geoffrey Hinton
   website: https://www.cs.toronto.edu/~hinton/
   relatedEntries:
     - id: yoshua-bengio
-      type: researcher
+      type: person
     - id: deepmind
-      type: lab
+      type: organization
   customFields:
     - label: Role
       value: Professor Emeritus, AI Safety Advocate
@@ -368,7 +371,7 @@
   lastUpdated: 2025-12
 - id: ajeya-cotra
   numericId: E864
-  type: researcher
+  type: person
   title: Ajeya Cotra
   website: https://metr.org
   relatedEntries:
@@ -377,9 +380,9 @@
     - id: coefficient-giving
       type: organization
     - id: holden-karnofsky
-      type: researcher
+      type: person
     - id: paul-christiano
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Member of Technical Staff at METR (formerly Senior Advisor at Coefficient Giving)
@@ -400,14 +403,14 @@
 
 - id: holden-karnofsky
   numericId: E156
-  type: researcher
+  type: person
   title: Holden Karnofsky
   website: https://coefficientgiving.org
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: toby-ord
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Former Co-CEO (now at Anthropic)
@@ -450,7 +453,7 @@
   lastUpdated: 2025-12
 - id: ian-hogarth
   numericId: E162
-  type: researcher
+  type: person
   title: Ian Hogarth
   description: Chair of the UK AI Safety Institute, AI investor, and author of influential writing on frontier AI risks.
   customFields:
@@ -460,16 +463,16 @@
       value: Leading UK AI Safety Institute, AI investor and writer
 - id: ilya-sutskever
   numericId: E163
-  type: researcher
+  type: person
   title: Ilya Sutskever
   website: https://ssi.inc
   relatedEntries:
     - id: openai
-      type: lab
+      type: organization
     - id: jan-leike
-      type: researcher
+      type: person
     - id: geoffrey-hinton
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Co-founder & Chief Scientist
@@ -511,18 +514,18 @@
   lastUpdated: 2025-12
 - id: jan-leike
   numericId: E182
-  type: researcher
+  type: person
   title: Jan Leike
   website: https://anthropic.com
   relatedEntries:
     - id: anthropic
-      type: lab
+      type: organization
     - id: scalable-oversight
       type: safety-agenda
     - id: dario-amodei
-      type: researcher
+      type: person
     - id: paul-christiano
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Head of Alignment
@@ -565,19 +568,19 @@
   lastUpdated: 2025-12
 - id: nate-soares
   numericId: E212
-  type: researcher
+  type: person
   title: Nate Soares (MIRI)
   description: Executive Director of the Machine Intelligence Research Institute (MIRI), focused on mathematical foundations of AI alignment.
 - id: neel-nanda
   numericId: E214
-  type: researcher
+  type: person
   title: Neel Nanda
   website: https://www.neelnanda.io
   relatedEntries:
     - id: deepmind
-      type: lab
+      type: organization
     - id: chris-olah
-      type: researcher
+      type: person
     - id: interpretability
       type: safety-agenda
   customFields:
@@ -623,7 +626,7 @@
   lastUpdated: 2025-12
 - id: nick-bostrom
   numericId: E215
-  type: researcher
+  type: person
   title: Nick Bostrom
   website: https://nickbostrom.com
   relatedEntries:
@@ -632,7 +635,7 @@
     - id: treacherous-turn
       type: risk
     - id: toby-ord
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Founding Director (until FHI closure in 2024)
@@ -676,18 +679,18 @@
   lastUpdated: 2025-12
 - id: paul-christiano
   numericId: E220
-  type: researcher
+  type: person
   title: Paul Christiano
   website: https://alignment.org
   relatedEntries:
     - id: arc
-      type: lab
+      type: organization
     - id: scalable-oversight
       type: safety-agenda
     - id: eliezer-yudkowsky
-      type: researcher
+      type: person
     - id: jan-leike
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Founder
@@ -733,15 +736,17 @@
   lastUpdated: 2025-12
 - id: robin-hanson
   numericId: E260
-  type: researcher
+  type: person
   title: Robin Hanson
+  description: "Economist and futurist at George Mason University, known for work on prediction markets, near-term AI economics, and the Em scenario (brain emulation). Author of The Age of Em and co-author of The Elephant in the Brain."
 - id: sam-altman
   numericId: E269
-  type: researcher
+  type: person
   title: Sam Altman
+  description: "CEO of OpenAI since its founding. Previously president of Y Combinator. Central figure in the 2023 OpenAI board crisis and subsequent reinstatement. Known for public advocacy of both AI's transformative potential and the importance of safety governance."
 - id: shane-legg
   numericId: E280
-  type: researcher
+  type: person
   title: Shane Legg
   description: Co-founder and Chief AGI Scientist at Google DeepMind, early pioneer of machine superintelligence research.
   website: https://deepmind.google
@@ -752,16 +757,16 @@
       value: Co-founding DeepMind, Early work on AGI, Machine super intelligence thesis
 - id: stuart-russell
   numericId: E290
-  type: researcher
+  type: person
   title: Stuart Russell
   website: https://people.eecs.berkeley.edu/~russell/
   relatedEntries:
     - id: chai
-      type: lab
+      type: organization
     - id: corrigibility-failure
       type: risk
     - id: paul-christiano
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Professor of Computer Science, CHAI Founder
@@ -806,14 +811,14 @@
   lastUpdated: 2025-12
 - id: toby-ord
   numericId: E355
-  type: researcher
+  type: person
   title: Toby Ord
   website: https://www.tobyord.com
   relatedEntries:
     - id: nick-bostrom
-      type: researcher
+      type: person
     - id: holden-karnofsky
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Senior Research Fellow in Philosophy
@@ -858,12 +863,12 @@
   lastUpdated: 2025-12
 - id: yoshua-bengio
   numericId: E380
-  type: researcher
+  type: person
   title: Yoshua Bengio
   website: https://yoshuabengio.org
   relatedEntries:
     - id: geoffrey-hinton
-      type: researcher
+      type: person
     - id: interpretability
       type: safety-agenda
   customFields:
@@ -910,28 +915,28 @@
   lastUpdated: 2025-12
 - id: elon-musk
   numericId: E116
-  type: researcher
+  type: person
   title: Elon Musk (AI Industry)
   description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
   status: stub
   relatedEntries:
     - id: xai
-      type: lab
+      type: organization
     - id: openai
-      type: lab
+      type: organization
   tags:
     - entrepreneur
     - ai-labs
   lastUpdated: 2025-12
 - id: beth-barnes
   numericId: E39
-  type: researcher
+  type: person
   title: Beth Barnes
   description: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
   status: stub
   relatedEntries:
     - id: metr
-      type: lab-research
+      type: organization
     - id: arc-evals
       type: organization
   tags:
@@ -943,7 +948,7 @@
 
 - id: david-sacks
   numericId: E431
-  type: researcher
+  type: person
   title: David Sacks (White House AI Czar)
   description: >-
     South African-American entrepreneur, venture capitalist, and White House AI and
@@ -960,11 +965,11 @@
     - governance
   relatedEntries:
     - id: elon-musk
-      type: researcher
+      type: person
     - id: anthropic
-      type: lab
+      type: organization
     - id: dario-amodei
-      type: researcher
+      type: person
     - id: open-philanthropy
       type: organization
     - id: openai
@@ -973,7 +978,7 @@
 
 - id: marc-andreessen
   numericId: E432
-  type: researcher
+  type: person
   title: Marc Andreessen (AI Investor)
   description: >-
     American software engineer, entrepreneur, and venture capitalist who co-created
@@ -989,7 +994,7 @@
     - governance
   relatedEntries:
     - id: elon-musk
-      type: researcher
+      type: person
     - id: alignment
       type: concept
     - id: bioweapons
@@ -1000,7 +1005,7 @@
 
 - id: max-tegmark
   numericId: E433
-  type: researcher
+  type: person
   title: Max Tegmark
   description: >-
     Swedish-American physicist at MIT, co-founder of the Future of Life Institute,
@@ -1020,9 +1025,9 @@
     - id: fli
       type: organization
     - id: elon-musk
-      type: researcher
+      type: person
     - id: yoshua-bengio
-      type: researcher
+      type: person
     - id: interpretability
       type: safety-agenda
     - id: prediction-markets
@@ -1031,7 +1036,7 @@
 
 - id: philip-tetlock
   numericId: E434
-  type: researcher
+  type: person
   title: Philip Tetlock (Forecasting Pioneer)
   description: >-
     Psychologist and forecasting researcher who pioneered the science of
@@ -1057,7 +1062,7 @@
 
 - id: eli-lifland
   numericId: E435
-  type: researcher
+  type: person
   title: Eli Lifland
   description: >-
     AI researcher, forecaster, and entrepreneur specializing in AGI timelines
@@ -1088,7 +1093,7 @@
 
 - id: dustin-moskovitz
   numericId: E436
-  type: researcher
+  type: person
   title: Dustin Moskovitz (AI Safety Funder)
   description: >-
     Facebook co-founder who became the world's youngest self-made billionaire in
@@ -1112,7 +1117,7 @@
     - id: open-philanthropy
       type: organization
     - id: jaan-tallinn
-      type: researcher
+      type: person
     - id: sff
       type: organization
   lastUpdated: 2026-02
@@ -1121,7 +1126,7 @@
 # === Auto-generated stubs for pages missing entities ===
 - id: gwern
   numericId: E574
-  type: researcher
+  type: person
   title: Gwern Branwen
   description: >-
     Comprehensive biographical profile of pseudonymous researcher Gwern Branwen,
@@ -1134,7 +1139,7 @@
   lastUpdated: 2026-02
 - id: helen-toner
   numericId: E575
-  type: researcher
+  type: person
   title: Helen Toner
   description: >-
     Comprehensive biographical profile of Helen Toner documenting her career
@@ -1147,7 +1152,7 @@
   lastUpdated: 2026-02
 - id: issa-rice
   numericId: E576
-  type: researcher
+  type: person
   title: Issa Rice
   description: >-
     Issa Rice is an independent researcher who has created valuable knowledge
@@ -1160,7 +1165,7 @@
   lastUpdated: 2026-02
 - id: jaan-tallinn
   numericId: E577
-  type: researcher
+  type: person
   title: Jaan Tallinn
   description: >-
     Comprehensive profile of Jaan Tallinn documenting $150M+ lifetime AI safety
@@ -1173,7 +1178,7 @@
   lastUpdated: 2026-02
 - id: leopold-aschenbrenner
   numericId: E578
-  type: researcher
+  type: person
   title: Leopold Aschenbrenner
   description: >-
     Comprehensive biographical profile of Leopold Aschenbrenner, covering his
@@ -1186,7 +1191,7 @@
   lastUpdated: 2026-02
 - id: nuno-sempere
   numericId: E579
-  type: researcher
+  type: person
   title: Nuño Sempere
   description: >-
     Nuño Sempere is a Spanish superforecaster who co-founded the highly
@@ -1199,7 +1204,7 @@
   lastUpdated: 2026-02
 - id: vidur-kapur
   numericId: E580
-  type: researcher
+  type: person
   title: Vidur Kapur
   description: >-
     Vidur Kapur is a superforecaster and AI policy researcher involved in
@@ -1213,7 +1218,7 @@
   lastUpdated: 2026-02
 - id: vipul-naik
   numericId: E581
-  type: researcher
+  type: person
   title: Vipul Naik
   description: >-
     Vipul Naik is a mathematician and EA community member who has funded ~$255K
@@ -1226,7 +1231,7 @@
   lastUpdated: 2026-02
 - id: yann-lecun
   numericId: E582
-  type: researcher
+  type: person
   title: Yann LeCun
   description: >-
     Comprehensive biographical profile of Yann LeCun documenting his technical
@@ -1263,7 +1268,7 @@
 
 - id: nick-beckstead
   numericId: E861
-  type: researcher
+  type: person
   title: Nick Beckstead
   website: https://www.nickbeckstead.com/
   relatedEntries:
@@ -1272,7 +1277,7 @@
     - id: ftx-future-fund
       type: organization
     - id: toby-ord
-      type: researcher
+      type: person
   customFields:
     - label: Role
       value: Philosopher, longtermist philanthropist, former Open Philanthropy program officer
@@ -1299,7 +1304,7 @@
 
 - id: will-macaskill
   numericId: E862
-  type: researcher
+  type: person
   title: Will MacAskill
   website: https://www.willmacaskill.com/
   relatedEntries:
@@ -1308,7 +1313,7 @@
     - id: cea
       type: organization
     - id: toby-ord
-      type: researcher
+      type: person
     - id: open-philanthropy
       type: organization
   customFields:

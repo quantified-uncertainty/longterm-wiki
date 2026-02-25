@@ -1,0 +1,313 @@
+---
+numericId: E895
+title: "Content Pipeline Architecture: Faster Page Creation"
+description: "Design document analyzing options for reducing the time it takes an AI agent to create and publish a wiki page — from the current 15-30 minutes down to seconds"
+sidebar:
+  order: 36
+entityType: internal
+quality: 50
+readerImportance: 80
+researchImportance: 75
+lastEdited: "2026-02-25"
+createdAt: 2026-02-25
+evergreen: false
+llmSummary: "Architecture document analyzing why adding a wiki page takes 15-30 minutes and evaluating six options to reduce that latency: full database migration, git repo split, hybrid draft-in-DB, ISR with webhooks, lightweight write path, and incremental builds. Recommends a phased approach starting with quick build optimizations, then a draft/preview system, then ISR. Includes detailed red-teaming of each option."
+ratings:
+  novelty: 6
+  rigor: 7
+  actionability: 8
+  completeness: 7
+---
+
+## The Problem
+
+Adding a single page to the wiki currently takes an AI agent 15-30 minutes end-to-end. Compare this to a POST request to a database, which takes about 20 seconds.
+
+| Step | Time | Bottleneck |
+|------|------|-----------|
+| Agent writes MDX + YAML | 2-5 min | LLM generation |
+| `assign-ids.mjs` (requires wiki-server) | 5-10 sec | Server dependency |
+| `build-data.mjs` | 30-90 sec | Full rebuild of all 700+ pages |
+| Local validations (gate) | 60-120 sec | Sequential checks |
+| `git push` + CI | 5-10 min | Full install + build + validate |
+| Merge + Vercel deploy | 3-5 min | Full static site rebuild |
+| **Total** | **≈15-30 min** | |
+
+The core tension: **git gives versioning, review, and auditability, but forces a batch rebuild model.** A database gives instant writes, but loses the review workflow.
+
+---
+
+## Current Architecture
+
+### What Lives Where
+
+**In Git (authoritative source of truth):**
+- `data/entities/*.yaml` — entity definitions, relationships, sources
+- `data/facts/*.yaml` — canonical numeric facts
+- `content/docs/**/*.mdx` — wiki page content
+- `numericId` fields in both (assigned by server, written back to files)
+
+**In Postgres (wiki-server — read mirrors + operational data):**
+- `entity_ids` — single source of truth for ID allocation (PostgreSQL sequence)
+- `entities`, `wiki_pages`, `facts`, `resources` — read mirrors of YAML/MDX data
+- `edit_logs`, `sessions`, `hallucination_risk_snapshots` — operational data
+- `citation_quotes`, `citation_accuracy_snapshots` — verification results
+- `auto_update_runs`, `auto_update_news_items` — auto-update pipeline records
+
+### The Build Pipeline
+
+`build-data.mjs` (2,050 lines) is the heart of the data pipeline. It:
+
+1. Loads all YAML files from `data/` into memory
+2. Merges entity sources (YAML entities + auto-created frontmatter entities)
+3. Builds the ID registry from `numericId` fields
+4. Computes backlinks from YAML `relatedEntries`
+5. Builds tag index, path registry
+6. Loads canonical facts, normalizes values
+7. Builds git date maps (one pass of `git log --name-only` for every content file)
+8. Fetches enrichment data from wiki-server (edit logs, citation stats, session history)
+9. Scans MDX for EntityLinks, fact usage, block-level IR
+10. Computes hallucination risk scores per page
+11. Computes TF-IDF similarity between all page pairs
+12. Builds the related graph (5-signal weighted bidirectional)
+13. Computes derived scores (coverage, rankings, staleness)
+14. Writes `database.json` (\~50-100MB) plus individual data files
+
+This takes 30-90 seconds locally. The output `database.json` is the single artifact consumed by Next.js — all 700+ pages are pre-rendered from it at build time.
+
+### Key Architectural Properties
+
+- **`database.json` is monolithic.** The entire wiki's data is in one file. Changing one page triggers recomputation of cross-page data (related graph, similarity scores, backlinks).
+- **Static generation means full rebuilds.** A content change requires a complete Vercel build (\~3-5 min) to appear live. No incremental page rebuilding.
+- **The wiki-server runs continuously** (Hono/Node.js, port 3100). It's accessed during local dev (for ID assignment and queries) and during CI builds (for enriching `database.json`).
+- **Two parallel content flows exist:** manual agent edits (committed directly) and automated daily updates (`auto-update.yml` creates PRs). Both merge to main and trigger Vercel deploys.
+
+---
+
+## Options Evaluated
+
+### Option 1: Move Content to Postgres (Full DB-First)
+
+MDX content lives in Postgres as source of truth. Git becomes a downstream mirror or is dropped. Next.js reads from the DB at request time (SSR) or via ISR.
+
+**Strengths:**
+- Write a page = one API call. Instantly queryable.
+- No build step for content changes. ISR revalidates individual pages in seconds.
+- ID assignment is trivial (auto-increment column).
+- Agent workflow becomes: call API, done. No git, no CI, no Vercel rebuild.
+
+**Weaknesses:**
+- **Loses the git review workflow.** PRs are the primary quality control mechanism. Without them, every agent write goes live immediately — or you need to build a review/staging system in the DB.
+- **Loses offline editing.** Can't open an MDX file in VS Code.
+- **Migration is massive.** 700 pages of MDX with complex frontmatter, EntityLinks, Squiggle components, custom MDX components — all need DB storage, versioning, and rendering.
+- **MDX compilation at request time** is expensive (\~100-500ms per page). Needs aggressive caching or pre-compilation.
+- **Loses the entire crux validation pipeline.** All validators assume files on disk.
+- **Single point of failure.** DB down = wiki down. Currently the static site serves from Vercel CDN even when wiki-server is offline.
+- **Version history is harder.** Git gives full history for free. In a DB you need shadow tables or event sourcing.
+
+**Red team:** This is the "rewrite the whole system" option. The migration is 2-4 weeks of work, and you lose the one thing git is genuinely good at: review before publish. The wiki's quality depends heavily on validation gates and PR review.
+
+**Verdict:** Too much disruption for the payoff. The problem isn't "git is the wrong model for content" — it's "the build pipeline is too heavy for small changes."
+
+---
+
+### Option 2: Separate Content Repo (Git Split)
+
+Split `content/docs/` and `data/` into a dedicated `longterm-wiki-content` repo. The main repo has only the Next.js app and crux tooling.
+
+**Strengths:**
+- Content PRs don't trigger app builds — lighter CI.
+- Content repo can have simplified CI (just validations, no Next.js build).
+- Agents working on content don't need the full app checkout.
+
+**Weaknesses:**
+- **Doesn't solve the speed problem.** You still need `build-data.mjs` + Vercel deploy for changes to go live. You've just moved where files live.
+- **Submodule complexity.** Git submodules are painful. Every developer, CI job, and agent needs to manage two repos.
+- **Crux tooling depends on both.** Validators read MDX files AND import TypeScript from `apps/web/`. Splitting means duplicating code or cross-repo dependencies.
+- **Cross-repo PRs.** Content changes that require component changes (common with new Squiggle models, new EntityLink types) need coordinated PRs.
+- **`build-data.mjs` needs everything.** It reads YAML, MDX, and app TypeScript. It can't run in the content repo alone.
+
+**Red team:** Adds complexity (submodules, cross-repo coordination) without fixing the latency. The deploy pipeline is still: merge content PR, trigger app rebuild, Vercel build, live. You save maybe 2-3 minutes on CI by skipping app tests, but the Vercel build is unchanged.
+
+**Verdict:** Pain without sufficient gain. The build pipeline, not git structure, is the bottleneck.
+
+---
+
+### Option 3: Hybrid — Draft in DB, Publish via Git
+
+Add a "draft" mode to the wiki-server. Agents POST content to the DB. Drafts are instantly visible at a preview URL. When ready, a "publish" action creates a git commit + PR automatically.
+
+**Architecture:**
+
+```
+Agent writes → POST /api/pages/draft → Postgres (instant, ~1 sec)
+                                      → Preview at /preview/E894 (SSR from DB)
+
+Agent publishes → POST /api/pages/publish → Creates git branch
+                                          → Writes MDX file
+                                          → Runs validations
+                                          → Opens PR
+                                          → (merge → Vercel deploy → live)
+```
+
+**Strengths:**
+- **Instant feedback loop.** Agent sees its page immediately. Iterates fast.
+- **Git review preserved.** Publishing still goes through PR review, CI, validations.
+- **Incremental adoption.** Can add alongside the existing system. Old workflow still works.
+- **Preview URLs for review.** Humans review draft pages before they enter the git pipeline.
+- **Batch publishing.** An agent could draft 10 pages, then publish all at once in one PR.
+- **Simpler agent workflow.** No git operations needed during drafting. Just API calls.
+- **Validation on draft.** The API runs schema validation, escaping checks, etc. on draft content — instant feedback without the full gate.
+
+**Weaknesses:**
+- **Two sources of truth during draft phase.** A page exists in the DB but not in git. Needs clear status tracking (draft/published/outdated).
+- **MDX rendering from DB differs from file-based.** Must ensure preview renderer matches production renderer exactly.
+- **Still need the full pipeline to publish.** 15-30 minute publish latency doesn't go away — but feedback latency drops from 15 min to 1 sec.
+- **Drift risk.** If someone edits the MDX file directly while a draft exists in the DB, you have a conflict.
+- **Need to build preview infrastructure.** SSR pages, draft management UI, publish automation.
+
+**Red team:** The main risk is complexity — maintaining two rendering paths (file-based SSG and DB-based SSR). Mitigated by using the same MDX compilation pipeline for both, just with different content sources. Drift risk is manageable with status flags and last-modified timestamps.
+
+**Verdict:** Strong option. Solves the feedback latency problem while preserving the review workflow.
+
+---
+
+### Option 4: Incremental Static Regeneration (ISR) + Webhook Deploy
+
+Switch from full static builds to Next.js ISR. When content changes, a webhook triggers revalidation of only the affected pages.
+
+**Architecture:**
+
+```
+Merge to main → GitHub webhook → POST /api/revalidate?pages=E894,E22
+              → Next.js ISR revalidates only those pages
+              → Live in ~10-30 seconds
+```
+
+**Strengths:**
+- **Dramatically faster deploy.** Individual page revalidation is 1-5 seconds, not 3-5 minutes.
+- **Minimal architectural change.** Next.js ISR is built in.
+- **Still git-based.** No change to source of truth or review workflow.
+
+**Weaknesses:**
+- **`build-data.mjs` is the real bottleneck, not Next.js.** Even with ISR, you need to rebuild `database.json` when content changes, because it contains cross-page data. Changing one page affects scores on dozens of others.
+- **`database.json` is monolithic.** ISR works for page-level revalidation, but the data layer is wiki-level, not page-level.
+- **Cold start penalty.** First request after revalidation compiles MDX + fetches data.
+- **Vercel ISR quirks.** Revalidation is best-effort, not guaranteed. Stale-while-revalidate semantics can be confusing.
+- **Doesn't help the local dev/CI pipeline.** The agent still runs build-data + validations locally.
+
+**Red team:** This treats the symptom (slow Vercel builds) rather than the disease (the monolithic build-data pipeline). The pipeline that takes 30-90 seconds locally and forces sequential validation is the actual agent bottleneck. ISR helps deployment but not authoring.
+
+**Verdict:** Worth doing eventually as a deployment optimization, but doesn't solve the core agent workflow problem.
+
+---
+
+### Option 5: Lightweight Write Path + Async Validation
+
+Decouple the "write" path from the "validate + build" path. Agent commits the MDX file and pushes immediately with only minimal validation. Full validation happens asynchronously in CI.
+
+**What to cut from the local gate:**
+- Drop `build-data.mjs` from pre-push (runs in CI anyway)
+- Drop `tsc --noEmit` from pre-push
+- Keep only: escaping check, frontmatter schema, YAML schema (\<5 sec)
+
+**Strengths:**
+- **Near-zero local overhead.** Push in \<15 seconds.
+- **No architectural changes.** Same git workflow, same CI, same Vercel deploys.
+- **Easy to implement.** Just modify `.githooks/pre-push` and `validate gate`.
+- **CI still catches everything.** No validation actually skipped — runs in a different place.
+
+**Weaknesses:**
+- **Feedback loop is slower.** Agent doesn't know if the page is valid until CI finishes (5-10 min).
+- **More failed CI runs.** Moving validation to CI means more red builds, more fix-and-push cycles.
+- **Doesn't help with deployment latency.**
+- **Risk of "push and forget."** Agent pushes, assumes it's fine, session ends. CI fails, nobody fixes it.
+
+**Red team:** This is the "just make the local step faster" option. It helps agent throughput at the cost of reliability. The pre-push gate exists precisely because agents were pushing broken content. The fix-in-CI loop (push, wait for CI, fix, push again) could be *slower* than fixing locally.
+
+**Verdict:** Quick win for reducing local friction, but risky without good CI-failure recovery automation.
+
+---
+
+### Option 6: Split `build-data.mjs` Into Incremental + Full Modes
+
+Refactor the monolithic build script to support incremental builds. When adding one page, only compute data for that page + its direct neighbors.
+
+**Architecture:**
+
+```
+Full build (CI/deploy):  build-data.mjs --full         → 30-90 sec (unchanged)
+Incremental (local):     build-data.mjs --incremental   → 3-5 sec (new)
+```
+
+Incremental mode would:
+1. Read the existing `database.json`
+2. Parse only the changed MDX file(s) (from git diff)
+3. Update: that page's entry, its direct backlinks, its entity data
+4. Skip: similarity scores, full related graph, git date maps, wiki-server enrichment
+5. Write a patched `database.json`
+
+**Strengths:**
+- **Dramatically faster local builds.** 3-5 sec instead of 30-90 sec.
+- **Preserves accuracy.** Full build still runs in CI and on deploy.
+- **No architectural change.** Same files, same format, same consumers.
+
+**Weaknesses:**
+- **Incremental data is slightly stale.** Related graph, similarity scores, and risk scores for neighboring pages won't update until the full CI build.
+- **Complex to implement correctly.** `build-data.mjs` is 2,050 lines with deep interdependencies. Making it incremental requires understanding which computations are page-local vs. wiki-global.
+- **Cache invalidation.** When does a page's neighbors need recomputation? Entity renames, relationship changes, tag changes all have ripple effects.
+- **Testing burden.** Need to verify incremental mode produces correct-enough results and that full mode catches drift.
+
+**Red team:** Engineering-intensive but solves the right problem. The risk is "incremental" and "full" modes slowly diverge. Needs good tests comparing outputs. But the payoff is significant: the local dev loop drops from 2-3 minutes to \~10 seconds.
+
+**Verdict:** High effort, high reward. Best combined with Option 5.
+
+---
+
+## Recommendation: Phased Approach
+
+### Phase 1: Quick Wins (1-2 days)
+
+**Combine Option 5 (lighter gate) + minimal Option 6 (skip expensive build-data steps locally).**
+
+- Add a `--quick` mode to `build-data.mjs` that skips: similarity computation, git date maps, wiki-server enrichment, block-level IR extraction. This alone probably cuts local build time from 60-90s to 10-20s.
+- Add a `--quick` mode to `validate gate` that runs only the 3 fastest blocking checks (escaping, frontmatter schema, YAML schema) and skips build-data, tsc, and tests. For use during rapid iteration; full gate still runs on push.
+- Move `assign-ids.mjs` to be a CI-only step (or make it gracefully no-op when server is unavailable, using a local counter for provisional IDs that get replaced in CI).
+
+**Expected result:** Local page creation drops from \~5 min to \~30 sec.
+
+### Phase 2: Draft/Preview System (1-2 weeks)
+
+**Implement Option 3 (hybrid draft-in-DB).**
+
+- Add `POST /api/pages/draft` to wiki-server. Store MDX content + frontmatter in a `page_drafts` table.
+- Add `/preview/[id]` route that renders from DB (SSR, not SSG).
+- Add `pnpm crux content draft "Title"` that creates a page via API instead of file.
+- Add `pnpm crux content publish <draft-id>` that writes the MDX file to git, commits, and opens a PR.
+- Run lightweight validation (escaping, schema) on draft creation for instant feedback.
+
+**Expected result:** Agent creates a page in \~20 seconds. Preview available immediately. Publishing still goes through git review.
+
+### Phase 3: ISR + Incremental Builds (longer term)
+
+**Implement Options 4 + 6.**
+
+- Refactor `build-data.mjs` into page-local and wiki-global computations.
+- Switch Vercel to ISR with on-demand revalidation webhooks.
+- On merge, revalidate only affected pages instead of full rebuild.
+
+**Expected result:** Time from merge to live drops from 3-5 min to 10-30 seconds.
+
+---
+
+## What to Avoid
+
+- **Full DB migration (Option 1):** Too much disruption, loses git's strengths for review and auditability.
+- **Repo split (Option 2):** Adds complexity without solving the actual bottleneck.
+- **Doing nothing:** The current 20-30 minute cycle is a genuine productivity drain, especially as the wiki grows past 700 pages.
+
+---
+
+## Key Insight
+
+**The feedback latency, not the publish latency, is what hurts agents most.** An agent doesn't mind if deployment takes 5 minutes after merge. It minds that it takes 5 minutes to find out if its content is even valid. Phase 1 attacks that directly with minimal effort.

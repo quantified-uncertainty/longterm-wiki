@@ -41,6 +41,7 @@ try {
 }
 
 const DRY_RUN = process.argv.includes('--dry-run');
+const SKIP = process.argv.includes('--skip');
 
 // Categories to skip when assigning page IDs (mirrors build-data.mjs)
 const SKIP_CATEGORIES = new Set([
@@ -143,6 +144,11 @@ function scanPages() {
 // ============================================================================
 
 async function main() {
+  if (SKIP) {
+    console.log('  assign-ids: skipped (--skip flag)');
+    return;
+  }
+
   if (DRY_RUN) {
     console.log('[dry-run] Checking which IDs would be assigned (no files written)\n');
   }

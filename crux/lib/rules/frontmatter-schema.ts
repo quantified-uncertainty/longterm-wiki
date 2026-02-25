@@ -7,6 +7,7 @@
 import { z } from 'zod';
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { ALL_ENTITY_TYPE_NAMES } from '../../../apps/web/src/data/entity-type-names.ts';
+import { VALID_SUBCATEGORIES } from '../valid-subcategories.ts';
 
 // Mirror the schema from content.config.ts
 const frontmatterSchema = z.object({
@@ -42,7 +43,7 @@ const frontmatterSchema = z.object({
   llmSummary: z.string().optional(),
   lastEdited: z.string().optional(),
   todo: z.string().optional(),
-  todos: z.array(z.string()).optional(),
+  todos: z.array(z.string()).min(1).optional(),
   seeAlso: z.string().optional(),
   ratings: z.object({
     novelty: z.number().min(0).max(10).optional(),
@@ -60,11 +61,11 @@ const frontmatterSchema = z.object({
   maturity: z.string().optional(),
   fullWidth: z.boolean().optional(),
   update_frequency: z.number().positive().optional(),
-  evergreen: z.boolean().optional(),
+  evergreen: z.literal(false).optional(),
   entityType: z.enum(ALL_ENTITY_TYPE_NAMES as unknown as [string, ...string[]]).optional(),
   entityId: z.string().optional(),
   numericId: z.string().regex(/^E\d+$/, 'numericId must match format "E" followed by digits (e.g. "E710")').optional(),
-  subcategory: z.string().optional(),
+  subcategory: z.enum(VALID_SUBCATEGORIES).optional(),
   roles: z.array(z.string()).optional(),
   pageTemplate: z.string().optional(),
   createdAt: z.union([z.date(), z.string()]).optional(), // YAML parser returns dates as strings or Date objects

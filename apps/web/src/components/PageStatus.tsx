@@ -9,7 +9,7 @@ import {
   type ContentFormat,
 } from "@/lib/page-types";
 import type { ChangeEntry, Page } from "@/data";
-import { getRatioStatus } from "@/lib/coverage";
+import { getRatioStatus, getMetricStatus as getCoverageMetricStatus, ENTITY_LIKE_TYPES, FACTS_GREEN_THRESHOLD } from "@/lib/coverage";
 import type { CoverageStatus } from "@/lib/coverage";
 import styles from "@/components/wiki/tooltip.module.css";
 
@@ -80,6 +80,7 @@ export interface PageStatusProps {
   pathname?: string;
   contentFormat?: ContentFormat;
   hasEntity?: boolean;
+  entityType?: string;
   resourceCount?: number;
   citationHealth?: CitationHealth;
   ratings?: PageRatings;
@@ -687,14 +688,9 @@ function getRecommendedMetrics(
   };
 }
 
-function getMetricStatus(actual: number, target?: number): CoverageStatus {
-  if (target === undefined || target === 0) {
-    return actual > 0 ? "green" : "red";
-  }
-  if (actual >= target) return "green";
-  if (actual > 0) return "amber";
-  return "red";
-}
+// getMetricStatus is imported from @/lib/coverage as getCoverageMetricStatus
+// Use the alias to avoid breaking other references in this file
+const getMetricStatus = getCoverageMetricStatus;
 
 const statusIcons = {
   green: <IconCheck className="shrink-0 text-emerald-500" />,
@@ -719,6 +715,8 @@ function ContentCoverageSection({
   ratings,
   factCount,
   coverage,
+  entityType,
+  backlinkCount,
 }: {
   llmSummary?: string;
   updateFrequency?: number;
@@ -732,9 +730,17 @@ function ContentCoverageSection({
   ratings?: PageRatings;
   factCount?: number;
   coverage?: Page["coverage"];
+  entityType?: string;
+  backlinkCount?: number;
 }) {
   // Use pre-computed coverage targets when available, else compute from scratch
   const recommended = coverage?.targets ?? getRecommendedMetrics(wordCount || 0, contentFormat || "article");
+
+  // Entity types where canonical facts are scored (real-world people and organizations)
+  const isEntityLike = entityType && ENTITY_LIKE_TYPES.has(entityType);
+
+  // Overview is scored for article and diagram formats
+  const isOverviewFormat = !contentFormat || contentFormat === "article" || contentFormat === "diagram";
 
   // --- Boolean items (yes/no chips) ---
   const booleanItems: BooleanCoverageItem[] = [
@@ -767,6 +773,13 @@ function ContentCoverageSection({
       description: "Tracked changes from improve pipeline runs and manual edits.",
       anchor: "edit-history",
     },
+    ...(isOverviewFormat && metrics !== undefined ? [{
+      label: "Overview",
+      present: !!(metrics?.hasOverview),
+      hint: "Add a ## Overview section at the top of the page",
+      description: "A ## Overview heading section that orients readers. Helps with search and AI summaries.",
+      anchor: "overview-section",
+    }] : []),
   ];
 
   // --- Numeric metrics (table rows) ---
@@ -846,6 +859,15 @@ function ContentCoverageSection({
       description: "Citations verified against their sources for factual accuracy.",
       anchor: "accuracy-checked",
     },
+    // Facts — scored for person and organization pages only
+    ...(isEntityLike ? [{
+      label: "Facts",
+      actual: factCount ?? 0,
+      target: FACTS_GREEN_THRESHOLD,
+      hint: "Add canonical facts in data/facts/ YAML",
+      description: "Canonical facts for this entity defined in data/facts/ YAML. Used by <F> components for structured data access.",
+      anchor: "entity-facts",
+    }] : []),
   ];
 
   // --- Info-only items (no pass/fail, just data) ---
@@ -866,11 +888,20 @@ function ContentCoverageSection({
     }
   }
 
-  if (factCount != null && factCount > 0) {
+  // Facts as info-only for non-entity-like pages (e.g. concept, risk, analysis)
+  if (!isEntityLike && factCount != null && factCount > 0) {
     infoItems.push({
       label: "Facts",
       value: `${factCount}`,
       description: "Canonical facts defined for this entity in data/facts/ YAML. Used by <F> components.",
+    });
+  }
+
+  if (backlinkCount != null && backlinkCount > 0) {
+    infoItems.push({
+      label: "Backlinks",
+      value: `${backlinkCount}`,
+      description: "Number of other wiki pages that link to this page. Higher backlink count means better integration into the knowledge graph.",
     });
   }
 
@@ -1148,6 +1179,7 @@ export function PageStatus({
   pathname,
   contentFormat,
   hasEntity,
+  entityType,
   resourceCount,
   citationHealth,
   ratings,
@@ -1258,6 +1290,8 @@ export function PageStatus({
         ratings={ratings}
         factCount={factCount}
         coverage={coverage}
+        entityType={entityType}
+        backlinkCount={backlinkCount}
       />
 
       {/* Change history */}
