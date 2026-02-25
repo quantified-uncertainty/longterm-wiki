@@ -20,6 +20,12 @@ function factKey(entityId: string, factId: string) {
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
+  // --- ref-check: SELECT id FROM entities/resources WHERE id IN (...) ---
+  if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
+    // Return all queried IDs as existing (ref check passes)
+    return params.map((p) => ({ id: p }));
+  }
+
   // --- facts: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes('"facts"')) {
     const COLS = 15;

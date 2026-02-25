@@ -2,6 +2,10 @@ import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-serv
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { AgentSessionsTable } from "./sessions-table";
 import type { Metadata } from "next";
+import type {
+  AgentSessionRow as CanonicalAgentSessionRow,
+  SessionRow,
+} from "@wiki-server/api-types";
 
 export const metadata: Metadata = {
   title: "Agent Sessions | Longterm Wiki Internal",
@@ -27,47 +31,24 @@ export interface AgentSessionRow {
   title: string | null;
 }
 
-interface ApiAgentSession {
-  id: number;
-  branch: string;
-  task: string;
-  sessionType: string;
-  issueNumber: number | null;
-  status: string;
-  startedAt: string;
-  completedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface ApiSessionLog {
-  id: number;
-  branch: string | null;
-  title: string;
-  prUrl: string | null;
-  model: string | null;
-  cost: string | null;
-  date: string;
-}
-
 // ── Data Loading ──────────────────────────────────────────────────────────
 
 async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
   // Fetch agent sessions (checklist-based, tracks active work)
-  const agentResult = await fetchDetailed<{ sessions: ApiAgentSession[] }>(
+  const agentResult = await fetchDetailed<{ sessions: CanonicalAgentSessionRow[] }>(
     "/api/agent-sessions?limit=200",
     { revalidate: 30 }
   );
   if (!agentResult.ok) return agentResult;
 
   // Fetch session logs (completed sessions with PR/cost info)
-  const logsResult = await fetchDetailed<{ sessions: ApiSessionLog[] }>(
+  const logsResult = await fetchDetailed<{ sessions: SessionRow[] }>(
     "/api/sessions?limit=500",
     { revalidate: 60 }
   );
 
   // Build a branch → session log map for enrichment
-  const logsByBranch = new Map<string, ApiSessionLog>();
+  const logsByBranch = new Map<string, SessionRow>();
   if (logsResult.ok) {
     for (const log of logsResult.data.sessions) {
       if (log.branch) {

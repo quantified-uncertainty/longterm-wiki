@@ -176,7 +176,7 @@ const SORT_COLUMNS: Record<string, string> = {
   researchImportance: "wp.research_importance",
   tacticalValue: "wp.tactical_value",
   recentlyEdited: "wp.last_updated",
-  recentlyCreated: "wp.date_created",
+  recentlyCreated: "CAST(SUBSTRING(wp.numeric_id FROM 2) AS INTEGER)",
   wordCount: "wp.word_count",
   title: "wp.title",
 };

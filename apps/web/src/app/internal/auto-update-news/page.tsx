@@ -10,6 +10,7 @@ import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { NewsTable } from "./news-table";
 import { SourcesTable } from "./sources-table";
 import type { Metadata } from "next";
+import type { AutoUpdateNewsRow } from "@wiki-server/api-types";
 
 export const metadata: Metadata = {
   title: "Auto-Update News | Longterm Wiki Internal",
@@ -100,32 +101,13 @@ export interface SourceRow {
   lastFetched: string | null;
 }
 
-// ── API Types ────────────────────────────────────────────────────────────
-
-interface ApiNewsItem {
-  id: number;
-  runId: number;
-  title: string;
-  url: string;
-  sourceId: string;
-  publishedAt: string | null;
-  summary: string | null;
-  relevanceScore: number | null;
-  topics: string[];
-  entities: string[];
-  routedToPageId: string | null;
-  routedToPageTitle: string | null;
-  routedTier: string | null;
-  runDate: string | null;
-}
-
 // ── API Data Loading ─────────────────────────────────────────────────────
 
 type NewsData = { items: NewsRow[]; runDates: string[] };
 
 async function loadNewsItemsFromApi(): Promise<FetchResult<NewsData>> {
   const result = await fetchDetailed<{
-    items: ApiNewsItem[];
+    items: AutoUpdateNewsRow[];
     runDates: string[];
   }>("/api/auto-update-news/dashboard?runs=10", { revalidate: 60 });
 

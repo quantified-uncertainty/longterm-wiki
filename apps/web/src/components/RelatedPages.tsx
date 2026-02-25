@@ -186,7 +186,6 @@ export async function RelatedPages({
     .map((entry) => {
       const page = getPageById(entry.id);
       const desc =
-        page?.structuredSummary?.oneLiner ||
         page?.description ||
         page?.llmSummary ||
         undefined;

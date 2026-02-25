@@ -472,8 +472,6 @@
   relatedEntries:
     - id: compute-governance
       type: policy
-    - id: international-coordination
-      type: policy
     - id: deepmind
       type: lab
   sources:
@@ -960,8 +958,6 @@
       type: organization
     - id: marc-andreessen
       type: researcher
-    - id: tmc-ai-governance
-      type: concept
   lastUpdated: 2026-02
 
 - id: johns-hopkins-center-for-health-security
@@ -1012,8 +1008,6 @@
       type: researcher
     - id: openai
       type: organization
-    - id: tmc-ai-governance
-      type: concept
   lastUpdated: 2026-02
 
 - id: ssi

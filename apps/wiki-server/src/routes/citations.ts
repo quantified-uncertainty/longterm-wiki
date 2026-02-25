@@ -2,7 +2,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { citationQuotes, citationContent, citationAccuracySnapshots } from "../schema.js";
+import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources } from "../schema.js";
+import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
   validationError,
@@ -17,6 +18,7 @@ import {
   MarkAccuracyBatchSchema as SharedMarkAccuracyBatchSchema,
   UpsertCitationContentSchema,
   CITATION_CONTENT_PREVIEW_MAX,
+  type CitationHealthResult,
 } from "../api-types.js";
 
 export const citationsRoute = new Hono();
@@ -94,6 +96,86 @@ function upsertQuote(
     });
 }
 
+/**
+ * Compute per-page citation health from a set of quote rows.
+ * Shared between the /health/:pageId endpoint and batch aggregations.
+ */
+function computePageHealth(
+  pageId: string,
+  rows: Array<{
+    sourceQuote: string | null;
+    quoteVerified: boolean;
+    verificationScore: number | null;
+    accuracyVerdict: string | null;
+    accuracyScore: number | null;
+  }>
+): CitationHealthResult {
+  let withQuotes = 0;
+  let verified = 0;
+  let accuracyChecked = 0;
+  let accurate = 0;
+  let inaccurate = 0;
+  let unsupported = 0;
+  let minorIssues = 0;
+  let notVerifiable = 0;
+  let scoreSum = 0;
+  let scoreCount = 0;
+
+  for (const q of rows) {
+    if (q.sourceQuote != null) withQuotes++;
+    if (q.quoteVerified) verified++;
+    if (q.verificationScore != null) {
+      scoreSum += q.verificationScore;
+      scoreCount++;
+    }
+    if (q.accuracyVerdict != null) {
+      accuracyChecked++;
+      switch (q.accuracyVerdict) {
+        case "accurate": accurate++; break;
+        case "inaccurate": inaccurate++; break;
+        case "unsupported": unsupported++; break;
+        case "minor_issues": minorIssues++; break;
+        case "not_verifiable": notVerifiable++; break;
+      }
+    }
+  }
+
+  return {
+    pageId,
+    total: rows.length,
+    withQuotes,
+    verified,
+    accuracyChecked,
+    accurate,
+    inaccurate,
+    unsupported,
+    minorIssues,
+    notVerifiable,
+    avgScore: scoreCount > 0 ? Math.round((scoreSum / scoreCount) * 100) / 100 : null,
+  };
+}
+
+// ---- GET /health/:pageId ----
+// Per-page citation health summary — used by the Next.js frontend.
+
+citationsRoute.get("/health/:pageId", async (c) => {
+  const pageId = c.req.param("pageId");
+  const db = getDrizzleDb();
+
+  const rows = await db
+    .select({
+      sourceQuote: citationQuotes.sourceQuote,
+      quoteVerified: citationQuotes.quoteVerified,
+      verificationScore: citationQuotes.verificationScore,
+      accuracyVerdict: citationQuotes.accuracyVerdict,
+      accuracyScore: citationQuotes.accuracyScore,
+    })
+    .from(citationQuotes)
+    .where(eq(citationQuotes.pageId, pageId));
+
+  return c.json(computePageHealth(pageId, rows));
+});
+
 // ---- POST /quotes/upsert ----
 
 citationsRoute.post("/quotes/upsert", async (c) => {
@@ -104,6 +186,21 @@ citationsRoute.post("/quotes/upsert", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const db = getDrizzleDb();
+
+  // Validate page reference
+  const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, [parsed.data.pageId]);
+  if (missingPages.length > 0) {
+    return validationError(c, `Referenced page not found: ${missingPages.join(", ")}`);
+  }
+
+  // Validate resource reference (optional)
+  if (parsed.data.resourceId) {
+    const missingRes = await checkRefsExist(db, resources, resources.id, [parsed.data.resourceId]);
+    if (missingRes.length > 0) {
+      return validationError(c, `Referenced resource not found: ${missingRes.join(", ")}`);
+    }
+  }
+
   const rows = await upsertQuote(db, parsed.data);
 
   const row = firstOrThrow(rows, "citation quote upsert");
@@ -127,6 +224,30 @@ citationsRoute.post("/quotes/upsert-batch", async (c) => {
 
   const { items } = parsed.data;
   const db = getDrizzleDb();
+
+  // Validate page references
+  const pageIds = [...new Set(items.map((d) => d.pageId))];
+  const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, pageIds);
+  if (missingPages.length > 0) {
+    return validationError(
+      c,
+      `Referenced pages not found: ${missingPages.join(", ")}`
+    );
+  }
+
+  // Validate resource references (optional field)
+  const resourceIds = [
+    ...new Set(items.map((d) => d.resourceId).filter((r): r is string => r != null)),
+  ];
+  if (resourceIds.length > 0) {
+    const missingResources = await checkRefsExist(db, resources, resources.id, resourceIds);
+    if (missingResources.length > 0) {
+      return validationError(
+        c,
+        `Referenced resources not found: ${missingResources.join(", ")}`
+      );
+    }
+  }
 
   const results = await db.transaction(async (tx) => {
     return await tx
@@ -417,6 +538,7 @@ citationsRoute.post("/content/upsert", async (c) => {
 
   const vals = {
     url: d.url,
+    resourceId: d.resourceId ?? null,
     fetchedAt: new Date(d.fetchedAt),
     httpStatus: d.httpStatus ?? null,
     contentType: d.contentType ?? null,
@@ -861,6 +983,27 @@ citationsRoute.get("/content/stats", async (c) => {
     deadCount: Number(r.deadCount),
     avgContentLength: r.avgContentLength != null ? Math.round(Number(r.avgContentLength)) : null,
   });
+});
+
+// ---- POST /content/link-resources ----
+// Batch-links citation_content rows to their matching resources by URL.
+// This bridges the gap between fetched content (URL-keyed) and curated resources (ID-keyed).
+
+citationsRoute.post("/content/link-resources", async (c) => {
+  const db = getDrizzleDb();
+
+  // Find all citation_content rows that have no resource_id
+  // and match a resource by URL.
+  const result = await db.execute(sql`
+    UPDATE citation_content cc
+    SET resource_id = r.id
+    FROM resources r
+    WHERE cc.url = r.url
+      AND cc.resource_id IS NULL
+  `);
+
+  const linked = Number((result as any).count ?? 0);
+  return c.json({ linked });
 });
 
 // ---- GET /quotes-by-url?url=X ----

@@ -2,7 +2,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, gte, count, sql, asc, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { editLogs } from "../schema.js";
+import { editLogs, wikiPages } from "../schema.js";
+import { checkRefsExist } from "./ref-check.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow } from "./utils.js";
 import { EditLogEntrySchema, EditLogBatchSchema } from "../api-types.js";
 
@@ -38,6 +39,12 @@ editLogsRoute.post("/", async (c) => {
   const d = parsed.data;
   const db = getDrizzleDb();
 
+  // Validate page reference
+  const missing = await checkRefsExist(db, wikiPages, wikiPages.id, [d.pageId]);
+  if (missing.length > 0) {
+    return validationError(c, `Referenced page not found: ${missing.join(", ")}`);
+  }
+
   const rows = await db
     .insert(editLogs)
     .values({
@@ -69,6 +76,13 @@ editLogsRoute.post("/batch", async (c) => {
 
   const { items } = parsed.data;
   const db = getDrizzleDb();
+
+  // Validate page references
+  const pageIds = [...new Set(items.map((d) => d.pageId))];
+  const missing = await checkRefsExist(db, wikiPages, wikiPages.id, pageIds);
+  if (missing.length > 0) {
+    return validationError(c, `Referenced pages not found: ${missing.join(", ")}`);
+  }
 
   const results = await db.transaction(async (tx) => {
     return await tx

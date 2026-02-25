@@ -5,13 +5,15 @@
  * then stores them in PostgreSQL for verification and display.
  *
  * Claims are stored in the `claims` table with:
- *   entityId    = page slug (e.g., "kalshi")
- *   entityType  = "wiki-page"
- *   claimType   = "factual" | "evaluative" | "causal" | "historical"
- *   claimText   = the atomic claim
- *   value       = section name where claim appears
- *   unit        = footnote refs as comma-separated string (e.g. "1,3,7")
- *   confidence  = "unverified" (initial) | "verified" | "unsourced"
+ *   entityId       = page slug (e.g., "kalshi")
+ *   entityType     = "wiki-page"
+ *   claimType      = "factual" | "evaluative" | "causal" | "historical" | "numeric" | "consensus" | "speculative" | "relational"
+ *   claimCategory  = "factual" | "opinion" | "analytical" | "speculative" | "relational"
+ *   claimText      = the atomic claim
+ *   section        = section name where claim appears (also stored in legacy 'value')
+ *   footnoteRefs   = footnote refs as comma-separated string (also stored in legacy 'unit')
+ *   confidence     = "unverified" (initial) | "verified" | "unsourced"
+ *   relatedEntities = JSON array of entity IDs mentioned in the claim
  *
  * Usage:
  *   pnpm crux claims extract <page-id>
@@ -108,29 +110,72 @@ function splitIntoSections(body: string): Section[] {
 // LLM claim extraction
 // ---------------------------------------------------------------------------
 
-interface ExtractedClaim {
-  claimText: string;
-  claimType: 'factual' | 'evaluative' | 'causal' | 'historical';
-  footnoteRefs: string[];  // e.g. ["1", "3", "7"]
+/** Valid claim types — expanded taxonomy from claim-first architecture. */
+const VALID_CLAIM_TYPES = [
+  'factual', 'evaluative', 'causal', 'historical',
+  'numeric', 'consensus', 'speculative', 'relational',
+] as const;
+type ClaimTypeValue = (typeof VALID_CLAIM_TYPES)[number];
+
+/** Map from granular claimType → high-level claimCategory. */
+function claimTypeToCategory(claimType: ClaimTypeValue): string {
+  switch (claimType) {
+    case 'factual':
+    case 'numeric':
+    case 'historical':
+      return 'factual';
+    case 'evaluative':
+      return 'opinion';
+    case 'causal':
+      return 'analytical';
+    case 'consensus':
+      return 'opinion';
+    case 'speculative':
+      return 'speculative';
+    case 'relational':
+      return 'relational';
+    default:
+      return 'factual';
+  }
 }
 
-const EXTRACT_SYSTEM_PROMPT = `You are a fact-extraction assistant. Given a section of a wiki article about AI safety, extract the specific, verifiable factual claims.
+interface ExtractedClaim {
+  claimText: string;
+  claimType: ClaimTypeValue;
+  footnoteRefs: string[];  // e.g. ["1", "3", "7"]
+  relatedEntities?: string[];  // entity IDs mentioned in the claim
+}
 
-For each claim:
+const EXTRACT_SYSTEM_PROMPT = `You are a fact-extraction assistant. Given a section of a wiki article, extract specific, verifiable claims.
+
+For each claim, provide:
 - "claimText": a single atomic, self-contained statement (not a question or heading)
-- "claimType": one of "factual" (specific facts, numbers, dates), "evaluative" (assessments or judgments), "causal" (cause-effect statements), or "historical" (historical events or trends)
-- "footnoteRefs": array of citation references (as strings) that cite this claim — look for [^N] footnote patterns (e.g. [^1], [^3]) and [^R:HASH] resource references (e.g. [^R:abc123]) near the claim. Include both types.
+- "claimType": one of:
+    "factual" — specific facts, events, dates verifiable against a single source
+    "numeric" — claims with specific numbers, dollar amounts, percentages, counts
+    "historical" — historical events or timeline items
+    "evaluative" — subjective assessments, value judgments, or opinions
+    "causal" — cause-effect assertions or inferences
+    "consensus" — claims about what is "widely believed" or "generally accepted" (need multiple sources)
+    "speculative" — predictions, projections, or uncertain future claims
+    "relational" — comparisons between entities or cross-entity assertions
+- "footnoteRefs": array of citation references (as strings) — look for [^N] (e.g. [^1]) and [^R:HASH] (e.g. [^R:abc123]) patterns near the claim
+- "relatedEntities": array of entity IDs or names mentioned in the claim other than the page's primary subject (e.g., if a claim on the Kalshi page mentions "Polymarket", include ["polymarket"])
 
 Rules:
 - Each claim must be atomic (one assertion per claim)
 - Include specific numbers, names, dates when present
 - Skip headings, navigation text, and pure descriptions
-- Skip claims that are just definitions or explanations without verifiable content
-- Extract 3-8 claims per section (skip trivial or duplicate content)
+- Skip claims that are just definitions without verifiable content
+- Use "numeric" for any claim containing specific dollar amounts, percentages, or counts
+- Use "consensus" for claims using language like "widely", "generally", "most experts"
+- Use "speculative" for claims with hedging language: "may", "might", "could", "expected to"
+- Use "relational" for claims comparing two or more entities
+- Extract 3-10 claims per section (skip trivial or duplicate content)
 - Return only claims that appear in the given text
 
 Respond ONLY with JSON:
-{"claims": [{"claimText": "...", "claimType": "factual", "footnoteRefs": ["1", "R:abc123"]}]}`;
+{"claims": [{"claimText": "...", "claimType": "factual", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
 
 async function extractClaimsFromSection(
   section: Section,
@@ -162,11 +207,14 @@ Extract atomic claims from this section. Return JSON only.`;
       )
       .map(c => ({
         claimText: (c as ExtractedClaim).claimText,
-        claimType: (['factual', 'evaluative', 'causal', 'historical'].includes((c as ExtractedClaim).claimType)
+        claimType: (VALID_CLAIM_TYPES.includes((c as ExtractedClaim).claimType as ClaimTypeValue)
           ? (c as ExtractedClaim).claimType
-          : 'factual') as ExtractedClaim['claimType'],
+          : 'factual') as ClaimTypeValue,
         footnoteRefs: Array.isArray((c as ExtractedClaim).footnoteRefs)
           ? (c as ExtractedClaim).footnoteRefs.map(String)
+          : [],
+        relatedEntities: Array.isArray((c as ExtractedClaim).relatedEntities)
+          ? (c as ExtractedClaim).relatedEntities!.map(String).filter(s => s.length > 0)
           : [],
       }));
   } catch (err) {
@@ -236,10 +284,36 @@ async function main() {
   console.log(`\n  Total extracted: ${c.bold}${allClaims.length}${c.reset} claims`);
 
   if (dryRun) {
+    // Show type/category breakdown
+    const typeCounts: Record<string, number> = {};
+    const catCounts: Record<string, number> = {};
+    for (const claim of allClaims) {
+      typeCounts[claim.claimType] = (typeCounts[claim.claimType] ?? 0) + 1;
+      const cat = claimTypeToCategory(claim.claimType);
+      catCounts[cat] = (catCounts[cat] ?? 0) + 1;
+    }
+    console.log(`\n${c.bold}By type:${c.reset}`);
+    for (const [type, cnt] of Object.entries(typeCounts).sort((a, b) => b[1] - a[1])) {
+      console.log(`  ${type.padEnd(14)} ${cnt}`);
+    }
+    console.log(`\n${c.bold}By category:${c.reset}`);
+    for (const [cat, cnt] of Object.entries(catCounts).sort((a, b) => b[1] - a[1])) {
+      console.log(`  ${cat.padEnd(14)} ${cnt}`);
+    }
+
+    const withEntities = allClaims.filter(c2 => c2.relatedEntities && c2.relatedEntities.length > 0);
+    if (withEntities.length > 0) {
+      console.log(`\n${c.bold}Multi-entity claims: ${withEntities.length}${c.reset}`);
+      for (const claim of withEntities.slice(0, 5)) {
+        console.log(`  [${claim.claimType}] ${claim.claimText.slice(0, 80)} → {${claim.relatedEntities!.join(', ')}}`);
+      }
+    }
+
     console.log(`\n${c.bold}Sample claims:${c.reset}`);
     for (const claim of allClaims.slice(0, 10)) {
       const refs = claim.footnoteRefs.length > 0 ? ` [^${claim.footnoteRefs.join(', ^')}]` : ' (unsourced)';
-      console.log(`  [${claim.claimType}] ${claim.claimText.slice(0, 100)}${refs}`);
+      const cat = claimTypeToCategory(claim.claimType);
+      console.log(`  [${claim.claimType}/${cat}] ${claim.claimText.slice(0, 100)}${refs}`);
     }
     if (allClaims.length > 10) {
       console.log(`  ... and ${allClaims.length - 10} more`);
@@ -269,10 +343,18 @@ async function main() {
       entityType: 'wiki-page',
       claimType: claim.claimType,
       claimText: claim.claimText,
+      // Legacy fields (kept for backward compat)
       value: claim.section,
       unit: claim.footnoteRefs.length > 0 ? claim.footnoteRefs.join(',') : null,
       confidence: 'unverified',
       sourceQuote: null,
+      // Enhanced fields
+      claimCategory: claimTypeToCategory(claim.claimType),
+      relatedEntities: claim.relatedEntities && claim.relatedEntities.length > 0
+        ? claim.relatedEntities
+        : null,
+      section: claim.section,
+      footnoteRefs: claim.footnoteRefs.length > 0 ? claim.footnoteRefs.join(',') : null,
     }));
 
     const result = await insertClaimBatch(items);

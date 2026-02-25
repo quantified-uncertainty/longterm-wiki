@@ -23,6 +23,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ last_value: 0, is_called: false }];
   }
 
+  // ---- ref-check: SELECT id FROM wiki_pages WHERE id IN (...) ----
+  if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
+    return params.map((p) => ({ id: p }));
+  }
+
   // ---- TRUNCATE ----
   if (q.includes("truncate") && q.includes("resource_citations")) {
     citationStore = [];

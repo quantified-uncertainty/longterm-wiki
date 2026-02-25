@@ -39,6 +39,7 @@
  *   research    Multi-source research → SourceCacheEntry[] (Exa, Perplexity, SCRY)
  *   epic        Multi-issue epic management via GitHub Discussions
  *   health      System wellness checks (server, DB, GitHub Actions, frontend, data freshness)
+ *   ids         Entity ID allocation and lookup (allocate, check, list)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -87,6 +88,7 @@ import * as evalsCommands from './commands/evals.ts';
 import * as healthCommands from './commands/health.ts';
 import * as claimsCommands from './commands/claims.ts';
 import * as epicCommands from './commands/epic.ts';
+import * as idsCommands from './commands/ids.ts';
 
 const domains = {
   validate: validateCommands,
@@ -122,6 +124,7 @@ const domains = {
   health: healthCommands,
   claims: claimsCommands,
   epic: epicCommands,
+  ids: idsCommands,
 };
 
 /**
@@ -202,6 +205,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   evals       Hallucination detection evals & adversarial agents
   claims      Extract and verify atomic factual claims from wiki pages
   epic        Multi-issue epic management (via GitHub Discussions)
+  ids         Entity ID allocation and lookup (allocate, check, list)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
