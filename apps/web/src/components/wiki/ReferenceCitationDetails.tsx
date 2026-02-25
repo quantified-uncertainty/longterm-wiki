@@ -5,7 +5,20 @@ import { useCitationQuotes } from "./CitationQuotesContext";
 import { normalizeUrl, VERDICT_STYLES, VERDICT_SEVERITY, MAX_CLAIMS_SHOWN } from "./resource-utils";
 import type { CitationQuote } from "@/lib/citation-data";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
-import { CheckCircle2, AlertTriangle, XCircle, HelpCircle } from "lucide-react";
+import { CheckCircle2, AlertTriangle, XCircle, HelpCircle, Clock, ExternalLink } from "lucide-react";
+import { isSafeUrl } from "./CitationOverlay";
+
+function formatDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  } catch {
+    return iso;
+  }
+}
 
 /** Icon per verdict — only needed in claim rows, not shared */
 const VERDICT_ICONS: Record<string, typeof CheckCircle2> = {
@@ -32,6 +45,9 @@ function ClaimRow({ quote }: { quote: CitationQuote }) {
     null
   );
 
+  const checkedAt = quote.accuracyCheckedAt ?? quote.verifiedAt;
+  const hasFooter = checkedAt || (quote.sourceTitle && quote.url && isSafeUrl(quote.url));
+
   return (
     <div className="flex gap-3 py-1.5 border-b border-border/40 last:border-b-0">
       {/* Claim from the wiki page */}
@@ -53,6 +69,27 @@ function ClaimRow({ quote }: { quote: CitationQuote }) {
           <p className="text-muted-foreground m-0 mt-0.5">
             {verificationText}
           </p>
+        )}
+        {hasFooter && (
+          <div className="flex items-center gap-2 mt-1 pt-1 border-t border-border/30">
+            {checkedAt && (
+              <span className="text-[10px] text-muted-foreground/70 flex items-center gap-0.5">
+                <Clock className="w-2.5 h-2.5 shrink-0" />
+                {formatDate(checkedAt)}
+              </span>
+            )}
+            {quote.sourceTitle && quote.url && isSafeUrl(quote.url) && (
+              <a
+                href={quote.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] text-blue-500 hover:underline flex items-center gap-0.5 ml-auto truncate max-w-[120px]"
+              >
+                <span className="truncate">{quote.sourceTitle}</span>
+                <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+              </a>
+            )}
+          </div>
         )}
       </div>
     </div>
