@@ -345,15 +345,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
         )}
       </Section>
 
-      <Section title="Raw MDX Source">
-        {rawMdx ? (
-          <pre className="text-xs bg-gray-50 p-3 rounded overflow-x-auto max-h-[800px] overflow-y-auto whitespace-pre-wrap break-words font-mono">
-            {rawMdx.raw}
-          </pre>
-        ) : (
-          <p className="text-sm text-gray-500">No MDX file found</p>
-        )}
-      </Section>
     </div>
   );
 }
