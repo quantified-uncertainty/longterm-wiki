@@ -232,7 +232,27 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   }
 
   // ==========================================================================
-  // 4. Validate required fields
+  // 4. Check for possible duplicate entities (same title + type)
+  // ==========================================================================
+  if (!ciMode) console.log(`\n${colors.blue}Checking for duplicate entity titles...${colors.reset}`);
+
+  const titleTypeMap = new Map<string, { title: string; type: string; ids: string[] }>();
+  for (const entity of entities) {
+    if (!entity.title || !entity.type) continue;
+    const normalizedTitle = String(entity.title).toLowerCase().trim();
+    const key = `${normalizedTitle}\x00${entity.type}`;
+    if (!titleTypeMap.has(key)) titleTypeMap.set(key, { title: normalizedTitle, type: entity.type, ids: [] });
+    titleTypeMap.get(key)!.ids.push(entity.id);
+  }
+  for (const { title, type, ids } of titleTypeMap.values()) {
+    if (ids.length > 1) {
+      console.log(`${colors.yellow}⚠️  Possible duplicate ${type} entities with title "${title}": ${ids.join(', ')}${colors.reset}`);
+      warnings++;
+    }
+  }
+
+  // ==========================================================================
+  // 5. Validate required fields
   // ==========================================================================
   if (!ciMode) console.log(`\n${colors.blue}Checking required fields...${colors.reset}`);
 
@@ -252,7 +272,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   }
 
   // ==========================================================================
-  // 5. Check expert affiliations reference valid organizations
+  // 6. Check expert affiliations reference valid organizations
   // ==========================================================================
   if (!ciMode) console.log(`\n${colors.blue}Checking expert affiliations...${colors.reset}`);
 
@@ -264,7 +284,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   }
 
   // ==========================================================================
-  // 6. Check MDX files that use DataInfoBox have corresponding entities
+  // 7. Check MDX files that use DataInfoBox have corresponding entities
   // ==========================================================================
   if (!ciMode) console.log(`\n${colors.blue}Checking DataInfoBox references...${colors.reset}`);
 

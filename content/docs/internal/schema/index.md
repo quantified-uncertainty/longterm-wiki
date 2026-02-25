@@ -6,7 +6,6 @@ sidebar:
   label: Schema Overview
   order: 0
 entityType: internal
-evergreen: true
 ---
 
 import {Mermaid, EntityLink} from '@components/wiki';
