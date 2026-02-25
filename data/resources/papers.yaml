@@ -478,7 +478,7 @@
     - sycophancy-feedback-loop
     - warning-signs-model
     - worldview-intervention-mapping
-    - redwood
+    - redwood-research
     - dario-amodei
     - ai-control
     - anthropic-core-views
@@ -3192,7 +3192,7 @@
     - long-horizon
     - defense-in-depth-model
     - intervention-effectiveness-matrix
-    - redwood
+    - redwood-research
     - alignment
     - research-agendas
   authors:
@@ -7409,7 +7409,7 @@
   title: Causal Scrubbing Paper
   type: paper
   cited_by:
-    - redwood
+    - redwood-research
   authors:
     - Jing Huang
     - Atticus Geiger
@@ -7440,7 +7440,7 @@
   title: Adversarial Robustness Studies
   type: paper
   cited_by:
-    - redwood
+    - redwood-research
   publication_id: arxiv
   tags:
     - interpretability

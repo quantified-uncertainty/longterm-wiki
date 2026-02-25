@@ -849,7 +849,7 @@
     - label: Key Research
       value: Redwood Research
   relatedEntries:
-    - id: redwood
+    - id: redwood-research
       type: organization
     - id: deceptive-alignment
       type: risk
@@ -994,7 +994,7 @@
       type: risk
     - id: reward-hacking
       type: risk
-    - id: redwood
+    - id: redwood-research
       type: organization
   sources:
     - title: Scaling Monosemanticity

@@ -228,7 +228,7 @@
   title: GitHub Repository
   type: web
   cited_by:
-    - redwood
+    - redwood-research
   publication_id: github
   tags:
     - interpretability
