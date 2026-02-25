@@ -24,6 +24,7 @@ export function ClaimsExplorer({
     entity: searchParams.get("entity") ?? "",
     category: searchParams.get("category") ?? "",
     confidence: searchParams.get("confidence") ?? "",
+    claimMode: searchParams.get("claimMode") ?? "",
     multiEntity: searchParams.get("multiEntity") === "true",
   };
 
@@ -59,6 +60,11 @@ export function ClaimsExplorer({
     if (filters.confidence) {
       result = result.filter(
         (c) => (c.confidence ?? "unverified") === filters.confidence
+      );
+    }
+    if (filters.claimMode) {
+      result = result.filter(
+        (c) => (c.claimMode ?? "endorsed") === filters.claimMode
       );
     }
     if (filters.multiEntity) {

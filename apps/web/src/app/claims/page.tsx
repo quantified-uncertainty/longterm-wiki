@@ -127,6 +127,32 @@ export default async function ClaimsOverviewPage() {
         <DistributionBar data={stats.byClaimType} total={stats.total} />
       </div>
 
+      {/* Mode distribution (Phase 2) */}
+      {stats.byClaimMode && Object.keys(stats.byClaimMode).length > 0 && (
+        <div className="rounded-lg border p-4 mb-6">
+          <h3 className="text-sm font-semibold mb-3">Epistemic Mode</h3>
+          <DistributionBar data={stats.byClaimMode} total={stats.total} />
+          <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
+            {stats.attributedClaims !== undefined && (
+              <span>
+                <span className="font-medium text-amber-700">
+                  {stats.attributedClaims}
+                </span>{" "}
+                attributed (reported speech)
+              </span>
+            )}
+            {stats.withSourcesClaims !== undefined && (
+              <span>
+                <span className="font-medium text-blue-700">
+                  {stats.withSourcesClaims}
+                </span>{" "}
+                with structured sources
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Top entities */}
       <div className="rounded-lg border p-4 mb-6">
         <h3 className="text-sm font-semibold mb-3">Top Entities by Claims</h3>
