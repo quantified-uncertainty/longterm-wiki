@@ -26,6 +26,7 @@
     - title: Seoul Declaration on AISI Network
       url: https://www.gov.uk/government/publications/seoul-declaration-for-safe-innovative-and-inclusive-ai
       author: Summit Participants
+  description: "Government-run institutions dedicated to evaluating frontier AI systems for dangerous capabilities and safety properties. Pioneered by the UK AISI in 2023, with analogues in the US (USAISI), EU, Japan, and others. Play a key role in pre-deployment evaluations and responsible scaling policy thresholds."
   lastUpdated: 2025-12
 - id: california-sb1047
   numericId: E48
@@ -545,6 +546,7 @@
       url: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
       author: Google DeepMind
       date: May 2024
+  description: "Voluntary commitments by frontier AI labs to pause or restrict development when models exceed defined capability thresholds unless corresponding safety measures are in place. Pioneered by Anthropic's RSP and adopted in similar forms by OpenAI and Google DeepMind. Central to debates about binding vs. voluntary safety governance."
   lastUpdated: 2025-12
 - id: seoul-declaration
   numericId: E279
@@ -592,6 +594,7 @@
     - title: EU AI Act Standardisation
       url: https://digital-strategy.ec.europa.eu/en/policies/ai-standards
       author: European Commission
+  description: "International and national organizations that develop technical standards for AI systems, including measurement methodologies, safety requirements, and evaluation protocols. Key bodies include ISO/IEC JTC 1/SC 42, NIST, and IEEE, whose standards increasingly inform government AI regulation."
   lastUpdated: 2025-12
 - id: us-executive-order
   numericId: E366
@@ -937,6 +940,7 @@
       type: risk
     - id: treacherous-turn
       type: risk
+  description: "The property of an AI system that allows it to be safely corrected, adjusted, or shut down by its operators. Highly corrigible systems defer to human judgment; the key research challenge is making corrigibility robust under capability scaling."
   tags:
     - shutdown-problem
     - ai-control
@@ -963,6 +967,7 @@
       type: risk
     - id: cyberweapons
       type: risk
+  description: "AI evaluation—systematic methods for measuring model capabilities, safety properties, and alignment. Includes capability evaluations (red-teaming, benchmarks), dangerous capability evaluations, and behavioral assessments used by frontier labs in their responsible scaling policies."
   tags:
     - benchmarks
     - red-teaming
