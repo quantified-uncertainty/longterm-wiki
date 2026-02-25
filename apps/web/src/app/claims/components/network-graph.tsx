@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ReactFlow,
@@ -155,8 +156,8 @@ export function NetworkGraph({
           run <code className="text-xs bg-muted px-1 py-0.5 rounded">pnpm crux claims extract &lt;entity&gt;</code>.
         </p>
         <p className="text-sm text-muted-foreground">
-          Try <a href="/claims/explore" className="text-blue-600 hover:underline">browsing claims</a> to
-          check if any claims exist, or <a href="/claims/relationships" className="text-blue-600 hover:underline">view relationships</a> for
+          Try <Link href="/claims/explore" className="text-blue-600 hover:underline">browsing claims</Link> to
+          check if any claims exist, or <Link href="/claims/relationships" className="text-blue-600 hover:underline">view relationships</Link> for
           a table-based view of entity connections.
         </p>
       </div>

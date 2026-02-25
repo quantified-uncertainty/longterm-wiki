@@ -140,3 +140,48 @@ export async function withApiFallback<T>(
 export function dataSourceLabel(source: DataSource): string {
   return source === "api" ? "wiki-server API" : "local files";
 }
+
+// ============================================================================
+// Hono RPC client — typed facts API (pilot)
+// ============================================================================
+
+import { hc, type InferResponseType } from "hono/client";
+import type { FactsRoute } from "@wiki-server/facts-route";
+
+/**
+ * Create a typed Hono RPC client for the facts API.
+ *
+ * Supports Next.js ISR via a custom fetch wrapper that injects
+ * `{ next: { revalidate } }` into every request.
+ *
+ * Returns null if the server URL is not configured.
+ */
+export function getFactsRpcClient(options?: { revalidate?: number }) {
+  const config = getWikiServerConfig();
+  if (!config) return null;
+
+  const revalidate = options?.revalidate ?? 300;
+
+  // Custom fetch that adds ISR revalidation and timeout
+  const isrFetch: typeof globalThis.fetch = (input, init) => {
+    return globalThis.fetch(input, {
+      ...init,
+      next: { revalidate },
+      signal: init?.signal ?? AbortSignal.timeout(10_000),
+    } as RequestInit);
+  };
+
+  return hc<FactsRoute>(`${config.serverUrl}/api/facts`, {
+    headers: config.headers,
+    fetch: isrFetch,
+  });
+}
+
+// Typed response types for the facts API (inferred from server route)
+type FactsClient = NonNullable<ReturnType<typeof getFactsRpcClient>>;
+
+/** Inferred response type for GET /api/facts/by-entity/:entityId */
+export type RpcFactsByEntityResult = InferResponseType<FactsClient['by-entity'][':entityId']['$get'], 200>;
+
+/** Inferred response type for GET /api/facts/timeseries/:entityId */
+export type RpcTimeseriesResult = InferResponseType<FactsClient['timeseries'][':entityId']['$get'], 200>;
