@@ -30,6 +30,11 @@ import SafetyGeneralizabilityTableView from "@/components/tables/views/SafetyGen
 // Summary components
 import { KeyTakeaways } from "@/components/wiki/KeyTakeaways";
 
+// Dashboard content components (rendered via MDX stubs at /wiki/E<id>)
+import { FactsPageContent } from "@/app/internal/facts/facts-content";
+import { PageCoverageContent } from "@/app/internal/page-coverage/page-coverage-content";
+import { UpdateScheduleContent } from "@/app/internal/updates/updates-content";
+
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
 import { KeyQuestions } from "@/components/wiki/KeyQuestions";
@@ -128,6 +133,11 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
 
   // Anthropic-specific table
   AnthropicStakeholdersTable,
+
+  // Dashboard content components
+  FactsPageContent,
+  PageCoverageContent,
+  UpdateScheduleContent,
 
   // Table view components
   SafetyApproachesTableView,
