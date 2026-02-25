@@ -1,0 +1,444 @@
+---
+title: "GitHub Integrations for Multi-Agent Coordination"
+description: "Research report evaluating GitHub Sub-Issues, Discussions, Gists, and external tools (Linear, Redis, LangGraph) for coordinating multiple AI agents working on shared codebases"
+sidebar:
+  order: 30
+entityType: internal
+readerImportance: 15
+researchImportance: 20
+lastEdited: "2026-02-25"
+createdAt: 2026-02-25
+evergreen: false
+llmSummary: "Comparative analysis of coordination mechanisms for multi-agent workflows, recommending GitHub Sub-Issues for task decomposition and Discussions for coordination artifacts. Sub-issues (GA March 2025) offer automatic progress tracking, PR auto-close, and assignees. Linear's agent API is the best-designed external option but requires a persistent webhook receiver incompatible with CLI-based agent sessions."
+---
+import { EntityLink } from '@components/wiki';
+
+## Executive Summary
+
+| Finding | Key Insight | Implication |
+|---------|-------------|-------------|
+| **Sub-Issues are GA** | REST API, 100 children/parent, 8 nesting levels, automatic progress tracking | Native task decomposition without GraphQL |
+| **Discussions fill coordination gaps** | Editable body (living plan), two-level threading, Q&A with marked answers | Coordination artifacts that Issues lack |
+| **Gists are poor fit** | Owner-only writes, no webhooks, no notifications | No collaborative state store |
+| **Linear is architecturally mismatched** | Webhook-first model with 10-second liveness requirement | Incompatible with ephemeral CLI sessions |
+| **Hybrid wins** | Sub-Issues for tasks + Discussions for plans | Each mechanism covers the other's weakness |
+
+---
+
+## Problem Statement
+
+Multiple Claude Code agents work on related issues in this repository. Today there is no infrastructure to:
+
+- Group issues into a parent "epic" with automatic progress tracking
+- Give agents a shared coordination document (plan, decisions, blockers)
+- Prevent duplicate claims on the same task
+- Show humans a single view of an epic's status
+
+The existing `crux issues` system handles individual issue tracking well (start/done workflow, `claude-working` label). The gap is **multi-issue coordination** — grouping, sequencing, and shared state across agent sessions.
+
+---
+
+## Mechanisms Evaluated
+
+Five approaches were researched across four parallel investigation threads. Each was evaluated for task decomposition, coordination artifacts, API ergonomics, cost, and ecosystem integration.
+
+### A. GitHub Sub-Issues
+
+**How it works:** A regular Issue labeled `epic` becomes the parent. Child issues are attached via REST API. GitHub automatically tracks completion progress.
+
+**API surface:**
+
+```bash
+# Get the database ID (NOT the issue number — a common gotcha)
+CHILD_DB_ID=$(gh api /repos/OWNER/REPO/issues/42 --jq .id)
+
+# Attach child to parent
+gh api /repos/OWNER/REPO/issues/10/sub_issues \
+  -F sub_issue_id=\$CHILD_DB_ID
+
+# Remove child
+gh api -X DELETE /repos/OWNER/REPO/issues/10/sub_issues/SUB_ISSUE_ID
+
+# List children
+gh api /repos/OWNER/REPO/issues/10/sub_issues
+```
+
+Progress tracking requires GraphQL with a feature-flag header:
+
+```bash
+gh api graphql -H "GraphQL-Features: sub_issues" \
+  -f query='query {
+    node(id: "PARENT_NODE_ID") {
+      ... on Issue {
+        subIssuesSummary {
+          total
+          completed
+          percentCompleted
+        }
+      }
+    }
+  }'
+```
+
+| Strength | Weakness |
+|----------|----------|
+| GA since March 2025, actively developed | `sub_issue_id` uses database ID, not issue number |
+| 100 sub-issues per parent, 8 nesting levels | Progress tracking is GraphQL-only with feature flag |
+| Automatic "3 of 7 complete" progress bar in UI | Single parent per issue (no multi-epic membership) |
+| Assignees, labels, PR auto-close all work natively | No coordination document semantics |
+| GitHub Projects board integration | No native `gh issue` CLI support yet |
+| Builds on existing `crux issues` infrastructure | No concurrency control for task claiming |
+
+**Verdict:** Best for **task decomposition and progress tracking**. Weak for **coordination artifacts** (shared plans, decision logs).
+
+### B. GitHub Discussions
+
+**How it works:** A Discussion in an "Epics" category serves as the coordination hub. The body is the living plan (editable by maintainers). Comments form the activity timeline. Issues are cross-referenced for actual task tracking.
+
+**API surface:** GraphQL only — no REST endpoints. Requires `githubGraphQL()` helper (already built on this branch in `crux/lib/github.ts`).
+
+```graphql
+mutation {
+  createDiscussion(input: {
+    repositoryId: "REPO_NODE_ID"
+    categoryId: "CATEGORY_NODE_ID"
+    title: "Epic: Auth Overhaul"
+    body: "## Plan\n\n- [ ] #101 — Implement OAuth\n..."
+  }) {
+    discussion { id number url }
+  }
+}
+```
+
+| Strength | Weakness |
+|----------|----------|
+| Body is semantically "the document" — ideal for living plans | GraphQL-only API, verbose mutations |
+| Two-level threading groups agent session updates naturally | No assignees on discussions |
+| Categories separate epics from Q&A from activity logs | No project board integration |
+| Q&A format with marked answers for blocker resolution | No `Closes #N` PR auto-close |
+| Up to 4 global + 4 per-category pins | No native `gh` CLI commands |
+| Polls for async decision-making | Issue linking requires body parsing |
+
+**Verdict:** Best for **coordination artifacts** (plans, decisions, Q&A). Weak for **task tracking** (no assignees, no progress).
+
+### C. GitHub Gists
+
+**How it works:** A secret Gist holds machine-readable coordination state. Multi-file structure: `state.json`, `decisions.yaml`, `progress.md`. Agents read/write via REST API.
+
+| Strength | Weakness |
+|----------|----------|
+| Clean structured data (JSON/YAML, no markdown wrapping) | Not linked to the repository |
+| Multi-file per gist (one file per agent avoids write conflicts) | Owner-only writes (all agents share one token) |
+| Full version history with SHA-addressable revisions | No labels, assignees, or milestones |
+| Atomic multi-file updates via single PATCH | No webhooks — cannot trigger on state change |
+| `gh gist` CLI works for most operations | No notifications or @mentions |
+
+**Verdict:** Best for **machine-readable shared state**. Poor for **human visibility** and **discoverability**. The lack of webhooks and notifications makes it a weak coordination backbone.
+
+### D. Plain GitHub Issues (Current System)
+
+**How it works:** Continue using `crux issues` with labels and body conventions. Add an `epic` label. Track sub-tasks via markdown checklists in the issue body.
+
+| Strength | Weakness |
+|----------|----------|
+| Already implemented and working | No native parent/child hierarchy |
+| Full ecosystem integration (Projects, PRs, labels) | Body-parsing for task lists is fragile |
+| Humans already know how to use Issues | No automatic progress tracking |
+| `gh issue` CLI works out of the box | No coordination document semantics |
+
+**Verdict:** Adequate for individual tasks but doesn't scale to multi-agent coordination.
+
+### E. External Tools
+
+| Tool | Best For | Key Limitation |
+|------|----------|----------------|
+| **Linear** | Agent-first PM (dedicated agent API with sessions, plans, activities) | Webhook-first architecture; 10-second liveness requirement incompatible with CLI sessions |
+| **Discord/Slack** | Human-agent visibility, real-time status broadcasting | Not a coordination backbone; no structured storage |
+| **Notion** | Rich structured data (20+ property types, relational databases) | 3 req/s rate limit is prohibitive for multi-agent use |
+| **Redis** | Sub-millisecond shared state, message queuing, distributed locks | New infrastructure; no human UI out of the box |
+| **LangGraph** | Best-in-class state management (checkpoints, rollback, reducers) | Framework-level commitment, not a lightweight add-on |
+| **Supabase/Firebase** | Durable storage with real-time subscriptions | Redundant — project already has PostgreSQL via wiki-server |
+| **CrewAI/AutoGen** | Multi-agent orchestration frameworks | Would replace rather than augment existing architecture |
+
+**Verdict:** Linear is the standout external tool (see detailed analysis below). Others either duplicate existing infrastructure or require disproportionate integration effort.
+
+---
+
+## Recommendation: Sub-Issues + Discussions Hybrid
+
+Use **both** GitHub-native mechanisms for their respective strengths.
+
+### Layer 1: Sub-Issues for Task Decomposition (Primary)
+
+- Parent Issue = the epic (labeled `epic`, pinned)
+- Child Issues = individual tasks agents claim and complete
+- Automatic progress tracking via `subIssuesSummary`
+- Full issue ecosystem: assignees, labels, PR auto-close, project boards
+
+### Layer 2: Discussions for Coordination Artifacts (Secondary)
+
+- One Discussion per epic for the "living plan document"
+- Body = current plan, task breakdown rationale, architecture decisions
+- Comments = agent activity timeline (session starts, blockers, decisions)
+- Q&A format for blocker resolution
+- Cross-referenced from the parent Issue body
+
+### Proposed Workflow
+
+```
+1. Create epic:         crux epic create "Auth Overhaul" --pin
+   → Creates Issue #100 with `epic` label
+   → Creates linked Discussion with plan template
+   → Adds "Plan: [Discussion #42](url)" to issue body
+
+2. Add tasks:           crux epic add-task 100 --title "Implement OAuth"
+   → Creates Issue #101
+   → Adds #101 as sub-issue of #100
+
+3. Agent claims task:   crux issues start 101
+   → Existing workflow (adds claude-working label)
+
+4. Agent posts update:  crux epic comment 100 "Starting OAuth implementation"
+   → Posts to the linked Discussion (not the Issue)
+
+5. Agent completes:     crux issues done 101 --pr=URL
+   → PR closes #101
+   → Parent #100 auto-updates progress
+
+6. Check progress:      crux epic status 100
+   → Shows: ████████░░░░ 67% (2/3 done)
+   → Lists open/closed sub-issues
+```
+
+### Why This Hybrid
+
+| Need | Mechanism |
+|------|-----------|
+| "What tasks are in this epic?" | Sub-issues on parent Issue |
+| "How much is done?" | `subIssuesSummary` (automatic) |
+| "Who's working on what?" | Issue assignees + `claude-working` label |
+| "Close task when PR merges" | `Closes #N` (native) |
+| "What's the plan?" | Discussion body (living document) |
+| "What decisions were made?" | Discussion comments (threaded) |
+| "Agent hit a blocker" | Discussion Q&A comment with marked answer |
+| "Show me the Kanban board" | GitHub Projects (Issues only) |
+
+### Simpler Alternative: Sub-Issues Only
+
+If coordination documents aren't needed yet, skip Discussions entirely. The plan goes in the parent Issue body (which is also editable). This is simpler but loses threaded discussion and Q&A semantics. The upgrade path from sub-issues-only to hybrid is additive — nothing needs to be replaced.
+
+---
+
+## Implementation Status
+
+### Already Built (This Branch)
+
+- `githubGraphQL()` in `crux/lib/github.ts` — generic GraphQL executor with corruption detection
+- `getRepoNodeId()` — fetches repository node ID (needed for Discussion creation)
+- `crux/commands/epic.ts` — Discussion-based epic commands (11 commands: list, create, view, comment, update, link, unlink, status, close, categories)
+- Registered in `crux.mjs`, documented in `CLAUDE.md`
+
+### Needed for the Hybrid
+
+1. **Sub-issue commands** in `crux/commands/epic.ts`:
+   - `add-task` — create issue + add as sub-issue
+   - `remove-task` — remove sub-issue link
+   - `status` rework — query `subIssuesSummary` via GraphQL (replace current body-parsing approach)
+
+2. **`create` rework** — create both Issue (parent) and Discussion (coordination doc), cross-link them
+3. **ID resolution helper** — convert issue number to database ID (the `sub_issue_id` gotcha)
+
+### Would Be Removed/Changed
+
+- Current `link`/`unlink` commands parse Discussion body for task lists → replace with sub-issue API
+- Current `status` command fetches linked issues individually → replace with `subIssuesSummary`
+- Current `extractLinkedIssues()` body parsing → no longer needed
+
+---
+
+## Deep Dive: Linear for Agents
+
+Linear shipped "Linear for Agents" in May 2025 — a dedicated API that treats AI agents as first-class workspace members. Of all external tools evaluated, Linear is the clear standout for agent coordination. This section documents what exists, what works, and where the gaps are.
+
+### Agent Sessions
+
+An `AgentSession` tracks the lifecycle of a single agent run. Sessions are created automatically when an agent is @mentioned or delegated an issue. The agent doesn't manage state manually — Linear infers it from emitted activities.
+
+**Five session states:** `pending` → `active` → `complete` (or `error` / `awaitingInput`)
+
+**Five activity types:**
+
+| Type | Purpose | Schema |
+|------|---------|--------|
+| `thought` | Internal reasoning (shown as collapsible) | `{ type: "thought", body: string }` |
+| `action` | Tool call (file read, search, etc.) | `{ type: "action", action: string, parameter: string, result?: string }` |
+| `elicitation` | Question for the human | `{ type: "elicitation", body: string }` |
+| `response` | Final output (marks session complete) | `{ type: "response", body: string }` |
+| `error` | Something went wrong | `{ type: "error", body: string }` |
+
+Sessions also have a **plan** field — an array of `{ content, status }` items rendered as a checklist in the UI. Status values: `pending`, `inProgress`, `completed`, `canceled`. The entire array must be replaced on each update.
+
+### Authentication and Identity
+
+OAuth2 with `actor=app` creates a dedicated app identity in the workspace (not impersonating a user). Key scopes:
+
+| Scope | Purpose |
+|-------|---------|
+| `app:assignable` | Agent appears in issue assignment menus |
+| `app:mentionable` | Agent can be @mentioned |
+| `read`, `write` | Standard CRUD |
+
+Agents are **delegates**, not assignees. When a user assigns an issue to an agent, the human remains the assignee (accountable) and the agent is the delegate (doing the work). You cannot filter by `assignee` — you must use the `delegate` filter.
+
+### Timing Constraints
+
+- Webhook handler must return within **5 seconds**
+- Agent must emit an activity or set an external URL within **10 seconds** of session creation, or the session is marked "unresponsive"
+- This requires a persistent webhook receiver, not a polling-based or CLI-invoked model
+
+### GitHub Integration
+
+Linear has native bidirectional GitHub sync (launched December 2023):
+
+| Feature | Direction | Notes |
+|---------|-----------|-------|
+| PR linking | GitHub → Linear | Issue ID in branch name or magic words auto-links |
+| Status auto-update | GitHub → Linear | Draft → "In Progress", merged → "Done" (configurable) |
+| Issues Sync | Bidirectional | Title, description, status, labels, assignee, comments |
+| Comment threads | Bidirectional | Private Linear threads stay private |
+
+### Rate Limits
+
+| Auth Method | Requests/Hour | Complexity Points/Hour |
+|-------------|---------------|------------------------|
+| API key | 5,000 | 250,000 |
+| OAuth app (`actor=app`) | 5,000 (dynamically scaled) | 2,000,000 |
+| Unauthenticated | 60 | 10,000 |
+
+Limits are per app-user: each OAuth app installation gets its own quota. Five separate agents as five OAuth apps each get 5,000 req/hr. Five agents sharing one OAuth app share a single 5,000 req/hr quota.
+
+### MCP Server
+
+Official remote server at `https://mcp.linear.app/mcp` with 21-22 tools (issues, search, projects, teams, labels, comments, users). Does **not** support agent session management — activities, plans, and session state require the direct GraphQL API.
+
+### Pricing
+
+| Plan | Cost | Active Issues | Agent API |
+|------|------|---------------|-----------|
+| Free | \$0 | 250 | Yes |
+| Basic | \$10/user/mo | Unlimited | Yes |
+| Business | \$16/user/mo | Unlimited | Yes |
+
+Agents don't count as billable users. 75% off for nonprofits. The 250-issue Free cap is the critical constraint — with ~700 wiki pages and active development, aggressive archiving would be required.
+
+### Real-World Integrations
+
+**Cursor:** Assign a Linear issue → agent reads context, creates branch, writes code, emits thoughts/actions, opens PR, updates Linear. Implementation took approximately one day using the SDK.
+
+**Factory AI:** Delegate an issue → Factory provisions a remote workspace, launches a "Droid" with full context. Supports hundreds of concurrent agents. PRs linked to originating issues automatically.
+
+**Cyrus** (open-source, `github.com/ceedaragents/cyrus`): Monitors Linear/GitHub issues, creates isolated git worktrees, runs Claude Code sessions, streams activity updates back to Linear. Closest architectural analog to this project's agent model.
+
+### Assessment for This Project
+
+**What Linear does better than GitHub:**
+- Agent sessions with plan tracking, activity timeline, and liveness monitoring
+- Purpose-built UI showing agent progress alongside human work
+- Native agent guidance documents (workspace-wide instruction prompts)
+- Richer project hierarchy (initiatives → projects → issues → sub-issues)
+
+**What doesn't fit:**
+- **Webhook-first model** — Claude Code sessions are ephemeral. There is no persistent server to receive webhooks. The 10-second liveness requirement assumes an always-on agent service (like Cursor's cloud or Factory's Droids), not a CLI tool.
+- **250-issue Free cap** — would need Basic (\$10/user/mo) for serious use
+- **No public visibility** — this is an open-source project; contributors need to see issues
+- **Dual-system overhead** — adding Linear on top of GitHub Issues + `crux` CLI introduces context switching and sync complexity
+- **Developer Preview risk** — APIs are actively changing (`AgentSession.type` already deprecated)
+
+**Linear becomes compelling when:**
+- The project runs persistent agent services (not just CLI sessions)
+- The team grows beyond solo/small where Linear's PM features add value
+- Linear's agent API reaches GA with stable contracts
+
+---
+
+## Decision Matrix
+
+| Option | Complexity | Cost | Task Tracking | Coordination | Community Access | Persistent Server? |
+|--------|-----------|------|---------------|--------------|------------------|--------------------|
+| **Sub-Issues + Discussions** | Medium | Free | Automatic progress | Living plans, Q&A | Full | No |
+| **Sub-Issues only** | Low | Free | Automatic progress | Issue body only | Full | No |
+| **Discussions only** (current impl) | Low | Free | Manual | Living plans, Q&A | Full | No |
+| **Linear for epics** | High | \$10+/user/mo | Agent sessions | Native guidance | Requires sync | Yes |
+
+---
+
+## Sub-Issues API Reference
+
+Quick reference for the sub-issues REST API (GA March 2025).
+
+### Endpoints
+
+| Operation | Method | Endpoint |
+|-----------|--------|----------|
+| List sub-issues | GET | `/repos/{owner}/{repo}/issues/{number}/sub_issues` |
+| Add sub-issue | POST | `/repos/{owner}/{repo}/issues/{number}/sub_issues` |
+| Remove sub-issue | DELETE | `/repos/{owner}/{repo}/issues/{number}/sub_issues/{sub_issue_id}` |
+| Reprioritize | PATCH | `/repos/{owner}/{repo}/issues/{number}/sub_issues/{sub_issue_id}` |
+
+### Constraints
+
+| Limit | Value |
+|-------|-------|
+| Max sub-issues per parent | 100 |
+| Max nesting depth | 8 levels |
+| Parents per issue | 1 (single parent only) |
+| ID type for POST body | Database ID (`issue.id`), not issue number |
+
+### Gotchas
+
+1. **Database ID vs issue number:** `sub_issue_id` in the POST body requires the issue's database ID (the `id` field from the API), not its human-readable number. Use `gh api /repos/OWNER/REPO/issues/42 --jq .id` to get it.
+2. **Progress tracking is GraphQL-only:** The `subIssuesSummary` field requires the `GraphQL-Features: sub_issues` header. No REST equivalent exists.
+3. **No `gh issue` CLI support:** Must use `gh api` for all sub-issue operations. No `gh issue add-sub` command exists yet.
+4. **Replaced Tasklists:** The older Tasklists feature was deprecated in April 2025. Sub-issues are the official replacement.
+
+---
+
+## Open Questions
+
+| Question | Context | Current Thinking |
+|----------|---------|------------------|
+| **Is the Discussion layer worth the complexity?** | Adds GraphQL dependency and cross-referencing logic | Start with sub-issues only, add Discussions when coordination artifacts are actually needed |
+| **How to handle concurrent claims?** | Two agents could claim the same sub-issue simultaneously | `claude-working` label + check-before-claim pattern; accept rare races |
+| **Should progress be shown in the wiki?** | `/internal/epics/` dashboard showing live epic status | Yes, if the sub-issue data is available at build time via the wiki-server |
+| **When does Linear become worth revisiting?** | Agent API is in Developer Preview, likely GA in 2026 | When persistent agent services exist and the webhook receiver is already running |
+
+---
+
+## Sources
+
+### GitHub Sub-Issues
+- [GitHub Sub-Issues API Documentation](https://docs.github.com/en/rest/issues/sub-issues) — REST API reference
+- [GitHub Changelog: Sub-Issues GA](https://github.blog/changelog/2025-03-04-sub-issues-public-preview/) — March 2025 launch
+- [GitHub Sub-Issues GraphQL](https://docs.github.com/en/graphql/reference/objects#subissuessummary) — Progress tracking via GraphQL
+
+### GitHub Discussions
+- [GitHub Discussions API (GraphQL)](https://docs.github.com/en/graphql/reference/objects#discussion) — Full schema reference
+- [GitHub Discussions Documentation](https://docs.github.com/en/discussions) — Feature overview
+
+### GitHub Gists
+- [GitHub Gists API](https://docs.github.com/en/rest/gists/gists) — REST API reference
+
+### Linear
+- [Linear for Agents](https://linear.app/agents) — Agent platform overview
+- [Linear Developers: Agent Interaction](https://linear.app/developers/agent-interaction) — Session and activity API
+- [Linear Developers: OAuth Actor Authorization](https://linear.app/developers/oauth-actor-authorization) — App identity setup
+- [Linear Developers: Rate Limiting](https://linear.app/developers/rate-limiting) — Quota details
+- [Linear Docs: GitHub Integration](https://linear.app/docs/github-integration) — Bidirectional sync
+- [Linear Docs: MCP Server](https://linear.app/docs/mcp) — Claude Code integration
+- [Linear Pricing](https://linear.app/pricing) — Plan comparison
+- [How Cursor Integrated with Linear](https://linear.app/now/how-cursor-integrated-with-linear-for-agents) — Implementation case study
+- [Cyrus: Claude Code + Linear Agent](https://github.com/ceedaragents/cyrus) — Open-source reference implementation
+
+### Multi-Agent Coordination
+- [LangGraph Documentation](https://langchain-ai.github.io/langgraph/) — State management for agent workflows
+- [CrewAI Documentation](https://docs.crewai.com/) — Multi-agent orchestration framework

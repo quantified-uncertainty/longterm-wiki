@@ -158,3 +158,86 @@ export async function githubApiPaginated<T>(
 
   return allItems;
 }
+
+// ---------------------------------------------------------------------------
+// GraphQL API (for GitHub Discussions — no REST equivalent)
+// ---------------------------------------------------------------------------
+
+export interface GraphQLResponse<T> {
+  data?: T;
+  errors?: Array<{ message: string; type?: string; path?: string[] }>;
+}
+
+/**
+ * Execute a GitHub GraphQL query or mutation.
+ *
+ * Unlike REST, the Discussions API is only available via GraphQL. This function
+ * wraps the GitHub GraphQL endpoint with the same corruption detection and auth
+ * handling as `githubApi()`.
+ *
+ * @param query - GraphQL query or mutation string
+ * @param variables - Variables to pass to the query
+ * @returns The `data` field from the response
+ * @throws On HTTP errors or GraphQL-level errors
+ */
+export async function githubGraphQL<T = unknown>(
+  query: string,
+  variables: Record<string, unknown> = {},
+): Promise<T> {
+  const token = getGitHubToken();
+
+  // Validate all variable strings for corruption
+  for (const str of collectStrings(variables)) {
+    const problem = detectCorruption(str);
+    if (problem) {
+      throw new Error(
+        `GitHub GraphQL variables failed corruption check: ${problem}\n` +
+        `Offending content (first 200 chars): ${str.slice(0, 200)}`
+      );
+    }
+  }
+
+  const resp = await fetch('https://api.github.com/graphql', {
+    method: 'POST',
+    headers: {
+      Authorization: `bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => '(no body)');
+    throw new Error(`GitHub GraphQL returned ${resp.status}: ${text}`);
+  }
+
+  const result = (await resp.json()) as GraphQLResponse<T>;
+
+  if (result.errors?.length) {
+    const msgs = result.errors.map((e) => e.message).join('; ');
+    throw new Error(`GitHub GraphQL error: ${msgs}`);
+  }
+
+  if (!result.data) {
+    throw new Error('GitHub GraphQL returned no data');
+  }
+
+  return result.data;
+}
+
+/**
+ * Get the GraphQL node ID for the repository.
+ * Required for mutations like createDiscussion that take repositoryId.
+ */
+export async function getRepoNodeId(): Promise<string> {
+  const [owner, name] = REPO.split('/');
+  const data = await githubGraphQL<{
+    repository: { id: string };
+  }>(
+    `query($owner: String!, $name: String!) {
+      repository(owner: $owner, name: $name) { id }
+    }`,
+    { owner, name },
+  );
+  return data.repository.id;
+}

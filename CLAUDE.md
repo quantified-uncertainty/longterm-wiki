@@ -67,6 +67,12 @@ pnpm crux ids check <slug>       # Look up existing ID for a slug
 pnpm crux context for-page <id>  # Full context for a page
 pnpm crux context for-issue <N>  # Context for a GitHub issue
 
+# Epic management (multi-issue tracking via GitHub Discussions)
+pnpm crux epic                   # List open epics
+pnpm crux epic create "Title"    # Create a new epic
+pnpm crux epic link <N> --issue=M  # Link issue to epic
+pnpm crux epic status <N>        # Progress bar + issue status
+
 # Full CLI reference
 pnpm crux --help                 # All domains
 pnpm crux <domain> --help        # Domain-specific help
@@ -144,7 +150,8 @@ Do not consider work complete until CI is green.
 - **Canonical facts & Calc**: Follow `content/docs/internal/canonical-facts.mdx` — `<F>` for volatile numbers, `<Calc>` for derived computations
 - **Internal sidebar**: `apps/web/src/lib/internal-nav.ts` — check existing section semantics before adding pages
 - **Internal dashboards**: For features with data/status over time, create `/internal/<name>` pages following patterns in `apps/web/src/app/internal/`
-- **GitHub API**: Use `crux issues/pr/ci` commands for writes. Use MCP GitHub tools for ad-hoc reads. Never raw `curl`.
+- **GitHub API**: Use `crux issues/pr/ci/epic` commands for writes. Use MCP GitHub tools for ad-hoc reads. Never raw `curl`.
+- **Epics**: Use `crux epic` for multi-issue coordination via GitHub Discussions. Individual tasks stay as Issues.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
 - **Entity IDs**: **Never manually invent numericIds** (E42, E886, etc.). Always allocate from the wiki-server: `pnpm crux ids allocate <slug>`. The gate runs `assign-ids.mjs` automatically as a safety net, but allocating early prevents conflicts between concurrent agents. Use `pnpm crux ids check <slug>` to look up existing IDs.
 
