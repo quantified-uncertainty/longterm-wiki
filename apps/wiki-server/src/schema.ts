@@ -376,7 +376,7 @@ export const claims = pgTable(
   "claims",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    entityId: text("entity_id")
+    entityId: text("entity_id") // primary entity (extraction source)
       .notNull()
       .references(() => entities.id, { onDelete: "cascade" }),
     entityType: text("entity_type").notNull(),
@@ -408,6 +408,8 @@ export const claims = pgTable(
     index("idx_cl_claim_type").on(table.claimType),
     index("idx_cl_claim_category").on(table.claimCategory),
     index("idx_cl_fact_id").on(table.factId),
+    // GIN index on relatedEntities is created in migration 0028
+    // (Drizzle doesn't support GIN index declarations on JSONB)
   ]
 );
 

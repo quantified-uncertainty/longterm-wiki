@@ -749,6 +749,15 @@ export interface GetClaimsResult {
   claims: ClaimRow[];
 }
 
+export interface ClaimStatsResult {
+  total: number;
+  byClaimType: Record<string, number>;
+  byEntityType: Record<string, number>;
+  byClaimCategory: Record<string, number>;
+  multiEntityClaims: number;
+  factLinkedClaims: number;
+}
+
 // ---------------------------------------------------------------------------
 // Page Links
 // ---------------------------------------------------------------------------

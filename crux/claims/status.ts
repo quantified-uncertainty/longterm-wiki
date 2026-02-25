@@ -49,17 +49,20 @@ async function main() {
     process.exit(0);
   }
 
-  // Count by type and confidence
+  // Count by type, category, and confidence
   const byType: Record<string, number> = {};
+  const byCategory: Record<string, number> = {};
   const byConfidence: Record<string, number> = {};
   const bySection: Record<string, number> = {};
-  const sourced = claims.filter(c => c.unit && c.unit.length > 0).length;
+  const sourced = claims.filter(c => (c.footnoteRefs ?? c.unit) && (c.footnoteRefs ?? c.unit)!.length > 0).length;
 
   for (const claim of claims) {
     byType[claim.claimType] = (byType[claim.claimType] ?? 0) + 1;
+    const cat = claim.claimCategory ?? 'uncategorized';
+    byCategory[cat] = (byCategory[cat] ?? 0) + 1;
     const conf = claim.confidence ?? 'unverified';
     byConfidence[conf] = (byConfidence[conf] ?? 0) + 1;
-    const section = claim.value ?? 'Unknown';
+    const section = claim.section ?? claim.value ?? 'Unknown';
     bySection[section] = (bySection[section] ?? 0) + 1;
   }
 
@@ -70,16 +73,20 @@ async function main() {
       sourced,
       unsourced: claims.length - sourced,
       byType,
+      byCategory,
       byConfidence,
       bySection,
       claims: claims.map(cl => ({
         id: cl.id,
         claimText: cl.claimText,
         claimType: cl.claimType,
-        section: cl.value,
-        footnoteRefs: cl.unit ? cl.unit.split(',') : [],
+        claimCategory: cl.claimCategory ?? null,
+        section: cl.section ?? cl.value,
+        footnoteRefs: (cl.footnoteRefs ?? cl.unit) ? (cl.footnoteRefs ?? cl.unit)!.split(',') : [],
         confidence: cl.confidence,
         sourceQuote: cl.sourceQuote ?? null,
+        relatedEntities: cl.relatedEntities ?? null,
+        factId: cl.factId ?? null,
       })),
     }, null, 2));
     return;
@@ -108,6 +115,13 @@ async function main() {
   console.log(`\n${c.bold}By Claim Type:${c.reset}`);
   for (const [type, count] of Object.entries(byType).sort((a, b) => b[1] - a[1])) {
     console.log(`  ${type.padEnd(14)}  ${count}`);
+  }
+
+  if (Object.keys(byCategory).length > 1 || !byCategory['uncategorized']) {
+    console.log(`\n${c.bold}By Category:${c.reset}`);
+    for (const [cat, count] of Object.entries(byCategory).sort((a, b) => b[1] - a[1])) {
+      console.log(`  ${cat.padEnd(14)}  ${count}`);
+    }
   }
 
   console.log(`\n${c.bold}By Section:${c.reset}`);
