@@ -59,6 +59,10 @@ pnpm crux query search "topic"   # Full-text search
 pnpm crux query entity <id>      # Entity data
 pnpm crux query related <id>     # Related pages
 
+# Entity ID allocation (never invent IDs manually)
+pnpm crux ids allocate <slug>    # Allocate or retrieve numeric ID from server
+pnpm crux ids check <slug>       # Look up existing ID for a slug
+
 # Research context (saves many tool calls)
 pnpm crux context for-page <id>  # Full context for a page
 pnpm crux context for-issue <N>  # Context for a GitHub issue
@@ -142,6 +146,7 @@ Do not consider work complete until CI is green.
 - **Internal dashboards**: For features with data/status over time, create `/internal/<name>` pages following patterns in `apps/web/src/app/internal/`
 - **GitHub API**: Use `crux issues/pr/ci` commands for writes. Use MCP GitHub tools for ad-hoc reads. Never raw `curl`.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
+- **Entity IDs**: **Never manually invent numericIds** (E42, E886, etc.). Always allocate from the wiki-server: `pnpm crux ids allocate <slug>`. The gate runs `assign-ids.mjs` automatically as a safety net, but allocating early prevents conflicts between concurrent agents. Use `pnpm crux ids check <slug>` to look up existing IDs.
 
 ## Detailed Guides (loaded automatically by Claude Code)
 

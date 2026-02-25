@@ -274,6 +274,16 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     verifyCommand: 'pnpm crux validate unified --rules=numeric-id-integrity --errors-only',
   },
   {
+    id: 'ids-server-allocated',
+    label: 'Entity IDs from server',
+    description:
+      'Any new entities or pages have `numericId` allocated from the wiki-server via `pnpm crux ids allocate <slug>` — never manually invented. ' +
+      'The gate runs `assign-ids.mjs` automatically, but allocating early prevents conflicts between concurrent agents.',
+    phase: 'review',
+    applicableTypes: 'all',
+    verifyCommand: 'node --import tsx/esm apps/web/scripts/assign-ids.mjs --dry-run',
+  },
+  {
     id: 'mdx-escaping',
     label: 'MDX escaping correct',
     description: 'No unescaped `$` or `<` in prose. Run `crux validate unified --rules=comparison-operators,dollar-signs`.',

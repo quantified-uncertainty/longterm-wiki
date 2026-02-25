@@ -25,6 +25,11 @@ function quoteKey(pageId: string, footnote: number) {
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
+  // --- ref-check: SELECT id FROM wiki_pages/resources WHERE id IN (...) ---
+  if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
+    return params.map((p) => ({ id: p }));
+  }
+
   // --- citation_quotes: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("citation_quotes") && q.includes("do update")) {
     const COLS = 14;
