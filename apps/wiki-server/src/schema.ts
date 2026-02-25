@@ -389,6 +389,8 @@ export const claims = pgTable(
     index("idx_cl_claim_type").on(table.claimType),
     index("idx_cl_claim_category").on(table.claimCategory),
     index("idx_cl_fact_id").on(table.factId),
+    // GIN index on relatedEntities is created in migration 0028
+    // (Drizzle doesn't support GIN index declarations on JSONB)
   ]
 );
 
