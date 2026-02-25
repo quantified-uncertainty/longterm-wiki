@@ -1442,21 +1442,6 @@
     - community
     - epistemics
   lastUpdated: 2026-02
-- id: epistemic-orgs-epoch-ai
-  numericId: E527
-  type: organization
-  orgType: generic
-  title: Epoch AI
-  description: >-
-    Epoch AI maintains comprehensive databases tracking 3,200+ ML models showing
-    4.4x annual compute growth and projects data exhaustion 2026-2032. Their
-    empirical work directly informed EU AI Act's 10^25 FLOP threshold and US EO
-    14110, with their Epoch Capabilities Index showing ~90% acceleration in AI
-  clusters:
-    - community
-    - epistemics
-    - ai-safety
-  lastUpdated: 2026-02
 - id: fli
   numericId: E528
   type: organization
@@ -1962,23 +1947,6 @@
     - ai-safety
     - governance
     - epistemics
-  lastUpdated: 2026-02
-- id: safety-orgs-epoch-ai
-  numericId: E559
-  type: organization
-  orgType: generic
-  title: Epoch AI
-  description: >-
-    Epoch AI provides empirical AI progress tracking showing training compute
-    growing 4.4x annually (2010-2024), 300 trillion tokens of high-quality
-    training data with exhaustion projected 2026-2032, and algorithmic
-    efficiency doubling every 6-12 months. Their 3,200+ model database directly
-    informs US E
-  clusters:
-    - ai-safety
-    - community
-    - epistemics
-    - governance
   lastUpdated: 2026-02
 - id: samotsvety
   numericId: E560

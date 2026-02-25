@@ -1098,6 +1098,24 @@
     - ai-safety
     - epistemics
   lastUpdated: 2026-02
+- id: ea-funding-absorption-capacity
+  numericId: E695
+  type: concept
+  title: EA Funding Absorption Capacity
+  description: >-
+    Analysis of how much capital the effective altruism ecosystem can productively deploy per year.
+    Current absorption capacity is estimated at $500M-2B/year for AI safety, far below expected
+    Anthropic-linked capital. Key constraints are talent, management capacity, and strategic clarity.
+  lastUpdated: 2026-02
+- id: ftx-collapse-ea-funding-lessons
+  numericId: E696
+  type: concept
+  title: "FTX Collapse: Lessons for EA Funding Resilience"
+  description: >-
+    Retrospective analysis of the FTX collapse's impact on EA funding and lessons for managing
+    future capital concentration risks. The collapse resulted in ~$160M in committed grants never
+    disbursed and revealed structural vulnerabilities in EA's funding infrastructure.
+  lastUpdated: 2026-02
 - id: optimistic
   numericId: E506
   type: concept

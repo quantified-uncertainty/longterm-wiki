@@ -112,7 +112,7 @@ ranking:
   - solutions
   - case-for-xrisk
   - persuasion
-  - safety-orgs-epoch-ai
+  - epoch-ai
   - miri-era
   - cser
   - coefficient-giving
@@ -439,7 +439,7 @@ ranking:
   - dario-amodei
   - ilya-sutskever
   - ea-biosecurity-scope
-  - compute-thresholds
+  - thresholds
   - deepfake-detection
   - corporate-influence
   - california-sb1047
@@ -500,7 +500,6 @@ ranking:
   - donations-list-website
   - weak-to-strong
   - safety-approaches-table
-  - thresholds
   - structured-access
   - reliability-tracking
   - provenance-tracing
@@ -642,9 +641,7 @@ ranking:
   - anthropic-pages-refactor-notes
   - vipul-naik
   - cirl
-  - compute-monitoring
   - controlled-vocabulary
-  - epistemic-orgs-epoch-ai
   - human-expertise
   - institutional-adaptation-speed
   - intervention-effectiveness-matrix
