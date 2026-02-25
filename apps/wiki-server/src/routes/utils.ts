@@ -1,5 +1,9 @@
 import type { Context } from "hono";
 
+/** Standard error codes for 400 responses. */
+export const VALIDATION_ERROR = "validation_error" as const;
+export const INVALID_JSON_ERROR = "invalid_json" as const;
+
 /** Safely parse JSON body, returning null on parse failure. */
 export function parseJsonBody(c: Context) {
   return c.req.json().catch(() => null);
@@ -7,13 +11,13 @@ export function parseJsonBody(c: Context) {
 
 /** Return a 400 validation error response. */
 export function validationError(c: Context, message: string) {
-  return c.json({ error: "validation_error", message }, 400);
+  return c.json({ error: VALIDATION_ERROR, message }, 400);
 }
 
 /** Return a 400 invalid JSON error response. */
 export function invalidJsonError(c: Context) {
   return c.json(
-    { error: "invalid_json", message: "Request body must be valid JSON" },
+    { error: INVALID_JSON_ERROR, message: "Request body must be valid JSON" },
     400
   );
 }

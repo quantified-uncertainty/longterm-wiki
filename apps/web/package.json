@@ -29,6 +29,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "gray-matter": "^4.0.3",
+    "hono": "^4.7.0",
     "js-yaml": "^4.1.1",
     "katex": "^0.16.32",
     "lucide-react": "^0.562.0",
