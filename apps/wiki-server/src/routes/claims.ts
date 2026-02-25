@@ -1,8 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, desc, asc } from "drizzle-orm";
+import { eq, and, or, count, desc, asc, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { claims } from "../schema.js";
+import { claims, entities } from "../schema.js";
+import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
   validationError,
@@ -32,6 +33,7 @@ const PaginationQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
   entityType: z.string().max(100).optional(),
   claimType: z.string().max(100).optional(),
+  claimCategory: z.string().max(100).optional(),
 });
 
 const DeleteByEntitySchema = ClearClaimsSchema;
@@ -50,6 +52,13 @@ function claimValues(d: ClaimInput) {
     unit: d.unit ?? null,
     confidence: d.confidence ?? null,
     sourceQuote: d.sourceQuote ?? null,
+    // Enhanced fields
+    claimCategory: d.claimCategory ?? null,
+    relatedEntities: d.relatedEntities ?? null,
+    factId: d.factId ?? null,
+    resourceIds: d.resourceIds ?? null,
+    section: d.section ?? d.value ?? null,
+    footnoteRefs: d.footnoteRefs ?? d.unit ?? null,
   };
 }
 
@@ -64,6 +73,13 @@ function formatClaim(r: typeof claims.$inferSelect) {
     unit: r.unit,
     confidence: r.confidence,
     sourceQuote: r.sourceQuote,
+    // Enhanced fields
+    claimCategory: r.claimCategory,
+    relatedEntities: r.relatedEntities as string[] | null,
+    factId: r.factId,
+    resourceIds: r.resourceIds as string[] | null,
+    section: r.section,
+    footnoteRefs: r.footnoteRefs,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
   };
@@ -79,6 +95,13 @@ claimsRoute.post("/", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const db = getDrizzleDb();
+
+  // Validate entity reference
+  const missing = await checkRefsExist(db, entities, entities.id, [parsed.data.entityId]);
+  if (missing.length > 0) {
+    return validationError(c, `Referenced entity not found: ${missing.join(", ")}`);
+  }
+
   const vals = claimValues(parsed.data);
 
   const rows = await db
@@ -104,6 +127,14 @@ claimsRoute.post("/batch", async (c) => {
 
   const { items } = parsed.data;
   const db = getDrizzleDb();
+
+  // Validate entity references
+  const entityIds = [...new Set(items.map((i) => i.entityId))];
+  const missing = await checkRefsExist(db, entities, entities.id, entityIds);
+  if (missing.length > 0) {
+    return validationError(c, `Referenced entities not found: ${missing.join(", ")}`);
+  }
+
   const allVals = items.map(claimValues);
 
   const results = await db
@@ -162,6 +193,29 @@ claimsRoute.get("/stats", async (c) => {
     .groupBy(claims.entityType)
     .orderBy(desc(count()));
 
+  const byCategory = await db
+    .select({
+      claimCategory: claims.claimCategory,
+      count: count(),
+    })
+    .from(claims)
+    .groupBy(claims.claimCategory)
+    .orderBy(desc(count()));
+
+  // Count claims that have relatedEntities (multi-entity claims)
+  const multiEntityResult = await db
+    .select({ count: count() })
+    .from(claims)
+    .where(sql`${claims.relatedEntities} IS NOT NULL AND jsonb_array_length(${claims.relatedEntities}) > 0`);
+  const multiEntityCount = multiEntityResult[0].count;
+
+  // Count claims linked to facts
+  const factLinkedResult = await db
+    .select({ count: count() })
+    .from(claims)
+    .where(sql`${claims.factId} IS NOT NULL`);
+  const factLinkedCount = factLinkedResult[0].count;
+
   return c.json({
     total,
     byClaimType: Object.fromEntries(
@@ -170,19 +224,31 @@ claimsRoute.get("/stats", async (c) => {
     byEntityType: Object.fromEntries(
       byEntityType.map((r) => [r.entityType, r.count])
     ),
+    byClaimCategory: Object.fromEntries(
+      byCategory.map((r) => [r.claimCategory ?? "uncategorized", r.count])
+    ),
+    multiEntityClaims: multiEntityCount,
+    factLinkedClaims: factLinkedCount,
   });
 });
 
 // ---- GET /by-entity/:entityId (claims for a specific entity) ----
+// Returns claims where entityId matches OR the entity appears in relatedEntities.
 
 claimsRoute.get("/by-entity/:entityId", async (c) => {
   const entityId = c.req.param("entityId");
   const db = getDrizzleDb();
 
+  // Query: primary entity match OR entity appears in the relatedEntities JSONB array
   const rows = await db
     .select()
     .from(claims)
-    .where(eq(claims.entityId, entityId))
+    .where(
+      or(
+        eq(claims.entityId, entityId),
+        sql`${claims.relatedEntities} @> ${JSON.stringify([entityId])}::jsonb`
+      )
+    )
     .orderBy(asc(claims.claimType), asc(claims.id));
 
   return c.json({ claims: rows.map(formatClaim) });
@@ -194,12 +260,13 @@ claimsRoute.get("/all", async (c) => {
   const parsed = PaginationQuery.safeParse(c.req.query());
   if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const { limit, offset, entityType, claimType } = parsed.data;
+  const { limit, offset, entityType, claimType, claimCategory } = parsed.data;
   const db = getDrizzleDb();
 
   const conditions = [];
   if (entityType) conditions.push(eq(claims.entityType, entityType));
   if (claimType) conditions.push(eq(claims.claimType, claimType));
+  if (claimCategory) conditions.push(eq(claims.claimCategory, claimCategory));
 
   const whereClause =
     conditions.length > 0

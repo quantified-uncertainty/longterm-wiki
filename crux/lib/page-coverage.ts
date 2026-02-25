@@ -63,7 +63,6 @@ export interface CoverageInput {
   wordCount: number;
   contentFormat: string;
   llmSummary?: string | null;
-  structuredSummary?: unknown | null;
   updateFrequency?: number | null;
   hasEntity: boolean;
   changeHistoryCount: number;
@@ -177,9 +176,8 @@ export function computePageCoverage(input: CoverageInput): PageCoverage {
 
   const items: Record<string, CoverageStatus> = {};
 
-  // Boolean items (5)
+  // Boolean items (4)
   items.llmSummary = input.llmSummary ? 'green' : 'red';
-  items.structuredSummary = input.structuredSummary ? 'green' : 'red';
   items.schedule = input.updateFrequency != null ? 'green' : 'red';
   items.entity = input.hasEntity ? 'green' : 'red';
   items.editHistory = input.changeHistoryCount > 0 ? 'green' : 'red';

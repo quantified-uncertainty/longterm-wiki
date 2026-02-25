@@ -4,6 +4,7 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { RunsTable } from "./runs-table";
 import type { Metadata } from "next";
+import type { ArtifactRow } from "@wiki-server/api-types";
 
 export const metadata: Metadata = {
   title: "Improve Runs | Longterm Wiki Internal",
@@ -32,30 +33,9 @@ export interface ImproveRunRow {
   costBreakdown: Record<string, number> | null;
 }
 
-interface ApiArtifactEntry {
-  id: number;
-  pageId: string;
-  engine: string;
-  tier: string;
-  directions: string | null;
-  startedAt: string;
-  completedAt: string | null;
-  durationS: number | null;
-  totalCost: number | null;
-  sourceCache: unknown[] | null;
-  citationAudit: unknown | null;
-  costBreakdown: Record<string, number> | null;
-  sectionDiffs: unknown[] | null;
-  qualityGatePassed: boolean | null;
-  qualityGaps: string[] | null;
-  toolCallCount: number | null;
-  refinementCycles: number | null;
-  phasesRun: string[] | null;
-}
-
 async function loadRunsFromApi() {
   const result = await fetchDetailed<{
-    entries: ApiArtifactEntry[];
+    entries: ArtifactRow[];
     total: number;
   }>("/api/artifacts/all?limit=100", { revalidate: 60 });
   if (!result.ok) return result;

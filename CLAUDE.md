@@ -30,7 +30,7 @@ Without these, `crux` won't have `GITHUB_TOKEN` and the gate check will fail wit
 
 See `## Agent Session Workflow — MANDATORY` below and `.claude/rules/agent-session-workflow.md` for full details.
 
-At session end, run `/agent-session-ready-PR`. At bare minimum, always run `/push-and-ensure-green`.
+At session end, run `/agent-session-ready-PR`. Always open a PR — never push directly to `main`.
 
 ## Quick Reference
 
@@ -58,6 +58,10 @@ pnpm crux content improve <id> --tier=standard --apply
 pnpm crux query search "topic"   # Full-text search
 pnpm crux query entity <id>      # Entity data
 pnpm crux query related <id>     # Related pages
+
+# Entity ID allocation (never invent IDs manually)
+pnpm crux ids allocate <slug>    # Allocate or retrieve numeric ID from server
+pnpm crux ids check <slug>       # Look up existing ID for a slug
 
 # Research context (saves many tool calls)
 pnpm crux context for-page <id>  # Full context for a page
@@ -149,6 +153,7 @@ Do not consider work complete until CI is green.
 - **GitHub API**: Use `crux issues/pr/ci/epic` commands for writes. Use MCP GitHub tools for ad-hoc reads. Never raw `curl`.
 - **Epics**: Use `crux epic` for multi-issue coordination via GitHub Discussions. Individual tasks stay as Issues.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
+- **Entity IDs**: **Never manually invent numericIds** (E42, E886, etc.). Always allocate from the wiki-server: `pnpm crux ids allocate <slug>`. The gate runs `assign-ids.mjs` automatically as a safety net, but allocating early prevents conflicts between concurrent agents. Use `pnpm crux ids check <slug>` to look up existing IDs.
 
 ## Detailed Guides (loaded automatically by Claude Code)
 

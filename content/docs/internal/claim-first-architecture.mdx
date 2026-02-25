@@ -1,0 +1,1658 @@
+---
+numericId: E892
+title: "Claim-First Wiki Architecture: Data Layer as Primary Artifact"
+description: "Architecture brainstorm for inverting the wiki generation pipeline — researching and verifying atomic claims first, then composing pages as derived views from a verified claim store"
+sidebar:
+  order: 36
+entityType: internal
+quality: 40
+readerImportance: 80
+lastEdited: "2026-02-23"
+createdAt: 2026-02-23
+evergreen: false
+llmSummary: "Brainstorm document proposing a fundamental architectural inversion: instead of writing prose documents and verifying claims afterward, the wiki would maintain a structured store of verified atomic claims, pre-built assets (tables, diagrams, models), and editorial direction metadata. Wiki pages become derived views — one of potentially many presentation formats — composed from the verified data layer. Includes claim taxonomy, schema proposals, prior art survey, migration strategy from the current system, and a concrete experiment design using the Kalshi page."
+ratings:
+  novelty: 8
+  rigor: 5
+  actionability: 7
+  completeness: 6
+---
+
+import { Mermaid } from '@components/wiki';
+
+## Context and Motivation
+
+This document explores an architectural inversion of the wiki generation pipeline. It is a companion to the <EntityLink id="wiki-generation-architecture">Multi-Agent Multi-Pass Architecture</EntityLink> document, which proposes decomposing page generation into specialist agents and composable passes. That proposal improves *how* we write pages. This proposal questions *what the primary artifact should be*.
+
+**The core question**: Should the wiki's primary artifact be prose documents (with data extracted and verified after the fact), or should it be a verified data layer (with prose documents composed as derived views)?
+
+### The Current Architecture: Document-First
+
+```
+Research (text blobs) → Synthesize prose document → Extract claims → Verify claims → Store verification results
+```
+
+The prose document is the primary artifact. Everything else — citation archives, fact YAML, entity links — is metadata *about* the document. When we improve a page, we rewrite the document and re-verify.
+
+This has consequences:
+
+1. **Claims are embedded in prose.** A claim like "Kalshi reached an \$11B valuation in 2025" lives inside a paragraph. To verify it, we must first extract it from the prose, then check it against a source. If the source changes, we must find and update the prose.
+
+2. **Verification is post-hoc.** The writer generates text, then a separate pass checks whether the text is supported. The Kalshi page's citation verification panel (showing "Minor issues 85%" for claims where the LLM embellished beyond what the source actually said) is a symptom: the writer was making claims first and asking questions later.
+
+3. **Assets are coupled to documents.** A comparison table of prediction market platforms lives inside the Kalshi page. If we want the same table on the Polymarket page, we duplicate it. If a number changes, we update both copies.
+
+4. **No reuse across views.** The same facts about Kalshi (founding date, valuation, regulatory status) could appear in a wiki page, a comparison with Polymarket, a prediction markets overview, or an executive briefing. Today, each would require independent research and writing.
+
+### The Proposed Architecture: Claim-First
+
+```
+Research → Extract atomic claims → Verify each claim → Store in claim DB → Compose views from verified claims
+```
+
+The verified claim store is the primary artifact. Wiki pages are *derived views* — one rendering of selected claims, assets, and editorial direction.
+
+---
+
+## Part 1: What Is a "Claim"?
+
+A claim is the atomic unit of knowledge in this system. It's a single assertion that can be independently verified, stored, and composed into different views.
+
+### Claim Taxonomy
+
+Not all claims are equal. Different types require different verification strategies:
+
+**Type 1: Factual Claims (verifiable against sources)**
+
+> "Kalshi was founded in 2018 by Tarek Mansour and Luana Lopes Lara, who met at MIT."
+
+These have a clear truth value and can be verified by checking a source. They're the easiest to handle — check the source, confirm or refute. The current citation verification system already does this for claims embedded in prose.
+
+**Type 2: Numeric Claims (verifiable against data)**
+
+> "Kalshi reached an \$11 billion valuation in August 2025."
+
+A subset of factual claims, but with a specific numeric value that may change over time. These map directly to the existing `data/facts/` system. The claim store should link to fact entries rather than duplicate them.
+
+**Type 3: Consensus Claims (partially verifiable)**
+
+> "Kalshi is widely viewed as the leading regulated US prediction market."
+
+These assert that a consensus exists. Verification means finding multiple independent sources that express the same view. No single source can fully verify a consensus claim — you need breadth. The current system has no special handling for these; they get treated as factual claims and flagged as "partial support" because no single source says exactly what the wiki says.
+
+**Type 4: Analytical Claims (wiki's own analysis)**
+
+> "The fee structure is designed to incentivize liquidity provision while remaining competitive with traditional sportsbook vigorish."
+
+These are inferences the wiki draws from facts. The Kalshi page's "Minor issues 85%" claim (shown in the citation verification panel) was exactly this — the source said Kalshi charges transaction fees, but the wiki added the analytical framing about incentivizing liquidity. These claims need a different verification standard: not "does a source say this?" but "does this inference follow from the evidence?"
+
+**Type 5: Speculative/Uncertain Claims**
+
+> "Kalshi's regulatory moat may narrow if the CFTC opens the market to additional exchanges."
+
+These are explicitly uncertain projections. They can't be verified against current sources — they're predictions. The appropriate metadata is not "verified/unverified" but rather the confidence level and the reasoning chain.
+
+**Type 6: Relational Claims (cross-entity)**
+
+> "Kalshi's growth rate in 2025 exceeded Polymarket's in regulated US markets."
+
+These assert relationships between entities. Verification requires claims from multiple entities. They're the foundation for comparison pages and relationship analysis.
+
+### Why the Taxonomy Matters
+
+The current system treats all claims the same: extract from prose, check against a source, report support level. But:
+
+- Factual claims should be fully verified before inclusion
+- Numeric claims should link to the canonical facts system
+- Consensus claims need multiple sources, not just one
+- Analytical claims need inference validation, not source matching
+- Speculative claims need explicit uncertainty markers
+- Relational claims need cross-entity consistency checks
+
+A claim store that understands these types can apply appropriate verification to each, and the view composer can render them differently (e.g., speculative claims get hedging language, analytical claims get "our analysis" framing).
+
+---
+
+## Part 2: The Four-Layer Architecture
+
+<Mermaid chart={`
+flowchart TD
+    subgraph L1["Layer 1: Research & Claim Production"]
+        R1[Web Search]
+        R2[Academic Search]
+        R3[Source Fetching]
+        R4[Claim Extraction]
+        R5[Claim Verification]
+    end
+
+    subgraph L2["Layer 2: Verified Data Store"]
+        CS[Claim Store\nper-entity YAML]
+        FS[Fact Store\ndata/facts/]
+        AS[Asset Store\ntables, diagrams, models]
+        RS[Resource Store\ndata/resources/]
+        CA[Citation Archive\nfetched source content]
+    end
+
+    subgraph L3["Layer 3: Editorial Direction"]
+        ED1[Entity Importance]
+        ED2[Narrative Framing]
+        ED3[Section Planning]
+        ED4[Audience Targeting]
+    end
+
+    subgraph L4["Layer 4: View Composition"]
+        V1[Wiki Page]
+        V2[Comparison Page]
+        V3[Executive Briefing]
+        V4[Data Dashboard]
+        V5[Blog Post]
+    end
+
+    R1 --> R4
+    R2 --> R4
+    R3 --> R4
+    R4 --> R5
+    R5 --> CS
+    R5 --> FS
+    R5 --> CA
+    CS --> AS
+
+    CS --> L3
+    FS --> L3
+    AS --> L3
+
+    L3 --> V1
+    L3 --> V2
+    L3 --> V3
+    L3 --> V4
+    L3 --> V5
+`} />
+
+### Layer 1: Research and Claim Production
+
+The research phase's job changes from "produce a blob of text for the writer" to "produce a list of verified atomic claims." This is a fundamental shift in what the research agent optimizes for.
+
+**Current research output** (blob):
+```
+Kalshi is a prediction market platform founded in 2018. The company was founded
+by Tarek Mansour and Luana Lopes Lara who met at MIT. They received CFTC approval
+in 2020 and launched publicly. The company has raised significant funding...
+```
+
+**Claim-first research output** (structured):
+```yaml
+claims:
+  - text: "Kalshi was incorporated in 2018"
+    sources: [{ url: "...", quote: "Founded in 2018..." }]
+    confidence: verified
+    type: factual
+
+  - text: "Co-founders Tarek Mansour and Luana Lopes Lara met at MIT"
+    sources: [{ url: "...", quote: "met while studying at MIT" }]
+    confidence: verified
+    type: factual
+
+  - text: "Kalshi received CFTC designation as a Designated Contract Market (DCM) in 2020"
+    sources: [{ url: "...", quote: "received DCM designation from the CFTC" }]
+    confidence: verified
+    type: factual
+```
+
+The research agent should:
+1. Search broadly (web, academic, SCRY) — same as today
+2. Fetch sources — same as today (source-fetcher)
+3. **Extract atomic claims from each source** — new step
+4. **Deduplicate claims** across sources (same fact from 3 sources = 1 claim with 3 sources)
+5. **Verify each claim** against its source(s) — existing citation verification, but earlier
+6. **Classify claim type** — new step
+7. **Store to claim store** — new step
+
+Steps 3-4 are where the biggest change happens. Instead of dumping source text into a synthesis prompt, we decompose it into claims. This is the FActScore/SAFE decomposition approach, applied proactively.
+
+**Cost implications**: Claim extraction adds an LLM call per source (≈\$0.05 with Haiku per source, ≈\$1 for 20 sources). Verification is comparable to current citation audit costs. The total research phase cost increases by ≈\$1-2 but produces dramatically more structured output.
+
+### Layer 2: The Verified Data Store
+
+This is the heart of the system. Five interconnected stores:
+
+**Claim Store** (`data/claims/<entity>.yaml`): Atomic claims per entity, each with provenance, type, confidence, temporal metadata, and entity cross-references. This is the new primary data type.
+
+**Fact Store** (`data/facts/<entity>.yaml`): Numeric facts with time series. Already exists. Claims of type "numeric" should reference fact entries rather than storing values directly.
+
+**Asset Store** (`data/assets/<entity>/`): Pre-built structured content — tables, Mermaid diagrams, Squiggle models, timelines. Each asset is independently usable and links back to the claims it visualizes. Currently, assets exist only embedded in MDX pages. Making them independent allows reuse across views.
+
+**Resource Store** (`data/resources/*.yaml`): External source metadata. Already exists with 10 categorized YAML files.
+
+**Citation Archive** (`data/citation-archive/*.yaml`): Fetched source content and verification results. Already exists with 137 files.
+
+The key new relationship: **claims link to everything**. A claim references its sources (resource store), its fetched content (citation archive), its numeric value (fact store), and its visual representation (asset store). The claim is the connective tissue.
+
+### Layer 3: Editorial Direction
+
+This is the hardest layer to systematize, and the most important for producing pages that feel purposeful rather than encyclopedic.
+
+**What editorial direction includes:**
+
+1. **Entity importance ranking**: Already exists (`data/reader-importance-ranking.yaml`, `data/research-ranking.yaml`). Determines how much space an entity gets.
+
+2. **Narrative framing**: What's the story? For Kalshi, is it "scrappy startup disrupts prediction markets" or "regulatory arbitrage play in gambling markets" or "tool for calibrated forecasting"? The same claims support all three framings. The editorial layer chooses which framing serves the reader.
+
+3. **Section planning**: Which claims go in which section? How are they ordered? What transitions connect them? This is where the template system (`crux/lib/page-templates.ts`) provides structure, but editorial direction adds judgment about emphasis.
+
+4. **Audience targeting**: A wiki page serves researchers. A briefing serves executives. A blog post serves the general public. Same claims, different emphasis and language level.
+
+5. **Cross-page coherence**: If the Kalshi page frames prediction markets as valuable epistemics tools, the Polymarket page should maintain a consistent analytical framework. Editorial direction ensures pages don't contradict each other's framings.
+
+**How to implement editorial direction:**
+
+Option A: **LLM-generated, human-reviewable.** An "editorial agent" reads the claim store and produces a structured editorial brief:
+
+```yaml
+# data/editorial/kalshi.yaml
+entity: kalshi
+framing: "Regulated prediction market platform with rapid growth; moderate AI safety relevance through event contracts on AI policy"
+keyThemes:
+  - regulatory_story: "First CFTC-regulated exchange, ongoing state-level challenges"
+  - growth_trajectory: "Explosive 2024-2025 growth driven by sports partnerships"
+  - safety_relevance: "Limited to a few AI policy contracts; not a core safety tool"
+emphasis:
+  high: [regulation, growth, competition]
+  medium: [partnerships, technology]
+  low: [ea_community_reception]
+narrativeArc: "founding → regulatory approval → explosive growth → competitive dynamics → uncertain regulatory future"
+```
+
+Option B: **Template-driven defaults with human overrides.** Each entity type (organization, person, risk, concept) has a default editorial template. Humans can override for specific entities.
+
+Option C: **Derived from claim analysis.** Analyze the claim store — what has the most claims? The most diverse sources? The most recent updates? Let the data suggest what's important.
+
+Likely the right answer is a combination: template defaults (Option B) for most entities, with LLM-generated briefs (Option A) for important entities, and human overrides for controversial or subtle topics.
+
+### Layer 4: View Composition
+
+A view composer takes:
+- Selected claims from the claim store
+- Pre-built assets from the asset store
+- Editorial direction
+- A view template (wiki page, briefing, comparison, etc.)
+
+And produces rendered output.
+
+**Why this should be "easy":**
+
+The hard problems (research, verification, asset creation, editorial judgment) are all solved upstream. The view composer's job is:
+1. Select claims relevant to this view (filtering by entity, type, importance)
+2. Group claims into sections (following the editorial direction's section plan)
+3. Write transition prose between claims
+4. Place assets at appropriate locations
+5. Render citations (automatic — claims already have sources)
+6. Add EntityLinks (automatic — claims already have entity references)
+
+The LLM work is mostly transitions and framing — not research, not analysis, not verification. This is why it should be cheap (≈\$0.50-1 per view) and fast.
+
+**What makes a good view composer:**
+
+- **Faithful to claims**: Never invents information beyond what's in the claim store. This is the key anti-hallucination property.
+- **Appropriate hedging**: Renders different claim types differently. Factual claims are stated flatly. Consensus claims say "is generally considered." Analytical claims say "our analysis suggests." Speculative claims say "it remains uncertain whether."
+- **Graceful omission**: If the claim store lacks coverage for a section the editorial direction requests, the composer skips that section (or marks it as needing research) rather than fabricating content.
+- **View-appropriate style**: Wiki pages are encyclopedic. Briefings are telegraphic. Blog posts are narrative. Same claims, different prose style.
+
+---
+
+## Part 3: Claim Store Schema (Detailed)
+
+### Core Claim Structure
+
+```yaml
+# data/claims/<entity>.yaml
+entity: kalshi
+lastUpdated: 2026-02-23
+claimCount: 157
+
+claims:
+  - id: "c-kalshi-001"
+    text: "Kalshi was founded in 2018 by Tarek Mansour and Luana Lopes Lara"
+    type: factual
+    confidence: verified
+
+    # Provenance
+    sources:
+      - resourceId: "8d054aa535ed84ad"    # links to data/resources/
+        url: https://kalshi.com/about
+        quote: "Founded in 2018 by Tarek Mansour and Luana Lopes Lara"
+        quoteContext: "About page, first paragraph"
+        support: full
+        fetchedAt: 2026-02-22
+
+    # Temporal metadata
+    temporal:
+      type: historical         # historical | point-in-time | ongoing | projection
+      date: 2018               # when the claimed event occurred
+
+    # Entity references
+    entityRefs:
+      - id: kalshi
+        role: subject
+      - id: mit
+        role: mentioned
+
+    # Categorization
+    tags: [founding, leadership, history]
+    section_hint: "History and Development"   # suggested placement in wiki view
+
+    # Lifecycle
+    addedAt: 2026-02-23
+    lastVerified: 2026-02-23
+    supersedes: null            # ID of claim this replaces (for updates)
+    supersededBy: null          # ID of claim that replaced this one
+```
+
+### Numeric Claim (Links to Facts)
+
+```yaml
+  - id: "c-kalshi-042"
+    text: "Kalshi reached a valuation of approximately $11 billion"
+    type: numeric
+    confidence: verified
+
+    # Link to canonical fact (avoids duplication)
+    factRef:
+      entity: kalshi
+      factId: "abc123"         # ID in data/facts/kalshi.yaml
+
+    sources:
+      - resourceId: "..."
+        url: https://nasdaqprivatemarket.com/...
+        quote: "$11B valuation"
+        support: full
+        fetchedAt: 2026-02-22
+
+    temporal:
+      type: point-in-time
+      asOf: 2025-08
+
+    entityRefs:
+      - id: kalshi
+        role: subject
+    tags: [valuation, funding]
+    section_hint: "Funding and Growth"
+```
+
+### Consensus Claim (Multiple Sources Required)
+
+```yaml
+  - id: "c-kalshi-089"
+    text: "Kalshi is regarded as the leading regulated prediction market in the US"
+    type: consensus
+    confidence: partial          # partial because "leading" is relative
+
+    sources:
+      - resourceId: "..."
+        url: https://espn.com/...
+        quote: "Kalshi, the largest US-regulated exchange"
+        support: partial         # calls it "largest" not "leading"
+      - resourceId: "..."
+        url: https://sacra.com/...
+        quote: "Market leader in regulated event contracts"
+        support: full
+      - resourceId: "..."
+        url: https://cbinsights.com/...
+        quote: "dominant position in the regulated prediction market space"
+        support: full
+
+    # Consensus-specific metadata
+    consensusBreadth: 3          # number of independent sources
+    dissent: null                # any notable disagreement
+
+    temporal:
+      type: ongoing
+    entityRefs:
+      - id: kalshi
+        role: subject
+      - id: polymarket
+        role: implied_comparison
+    tags: [market-position, competition]
+    section_hint: "Overview"
+```
+
+### Analytical Claim (Wiki's Own Inference)
+
+```yaml
+  - id: "c-kalshi-112"
+    text: "Kalshi's maker-taker fee structure appears designed to incentivize liquidity provision while remaining competitive with traditional sportsbook vigorish"
+    type: analytical
+    confidence: partial
+
+    # Analytical claims reference supporting claims rather than external sources
+    supportingClaims:
+      - "c-kalshi-108"       # "Kalshi charges transaction fees on contract settlement"
+      - "c-kalshi-109"       # "Makers (limit orders) pay no fees; takers pay 0.07%-7%"
+      - "c-kalshi-110"       # "Traditional sportsbooks charge 5-10% vigorish"
+
+    # The inference chain
+    reasoning: "Fee structure (zero maker fees, low taker fees) is typical of exchange designs optimized for liquidity. The fee range (0.07-7%) is lower than typical sportsbook vig (5-10%), suggesting competitive positioning."
+
+    sources: []                # No external source directly states this
+
+    temporal:
+      type: ongoing
+    entityRefs:
+      - id: kalshi
+        role: subject
+    tags: [business-model, fees, analysis]
+    section_hint: "Fee Structure and Revenue Model"
+```
+
+### Relational Claim (Cross-Entity)
+
+```yaml
+  - id: "c-kalshi-polymarket-001"
+    text: "Kalshi and Polymarket have formed a de facto duopoly in the US prediction market space as of 2025"
+    type: consensus
+    confidence: partial
+
+    sources:
+      - url: https://...
+        quote: "the Kalshi-Polymarket duopoly"
+        support: full
+
+    temporal:
+      type: ongoing
+      asOf: 2025
+
+    entityRefs:
+      - id: kalshi
+        role: subject
+      - id: polymarket
+        role: subject
+
+    # Cross-entity metadata
+    relationship:
+      type: competition
+      symmetric: true            # applies equally to both entities
+
+    tags: [competition, market-structure]
+    section_hint: "Market Competition"
+```
+
+### Asset References
+
+Claims can link to pre-built assets:
+
+```yaml
+  - id: "c-kalshi-funding-table"
+    text: "Kalshi has raised approximately $170.8 million across 9 funding rounds from 2019 to 2025"
+    type: factual
+    confidence: verified
+
+    # Links to pre-built table asset
+    assetRef:
+      id: "asset-kalshi-funding-rounds"
+      type: table
+      path: "data/assets/kalshi/funding-rounds.yaml"
+
+    # The table itself is stored separately and contains per-round data
+    # The claim is the summary; the asset is the detail
+
+    sources:
+      - url: https://cbinsights.com/...
+        support: full
+    temporal:
+      type: point-in-time
+      asOf: 2025-12
+    tags: [funding, financial]
+    section_hint: "Funding and Growth"
+```
+
+---
+
+## Part 4: Asset Store Design
+
+Assets are structured content objects that can be embedded in any view. They are independently created, verified, and reusable.
+
+### Table Asset
+
+```yaml
+# data/assets/kalshi/funding-rounds.yaml
+id: asset-kalshi-funding-rounds
+type: table
+entity: kalshi
+title: "Kalshi Funding History"
+lastUpdated: 2026-02-23
+
+columns:
+  - key: round
+    label: Round
+    type: string
+  - key: date
+    label: Date
+    type: date
+  - key: amount
+    label: Amount
+    type: currency
+    unit: USD
+  - key: valuation
+    label: Post-Money Valuation
+    type: currency
+    unit: USD
+  - key: leadInvestors
+    label: Lead Investors
+    type: string
+
+rows:
+  - round: Seed
+    date: 2019
+    amount: 2300000
+    valuation: null
+    leadInvestors: "Y Combinator"
+    sourceClaimId: "c-kalshi-045"
+  - round: Series A
+    date: 2021-02
+    amount: 30000000
+    valuation: null
+    leadInvestors: "Sequoia Capital"
+    sourceClaimId: "c-kalshi-046"
+  # ... more rows
+
+# Rendering hints for the view composer
+renderHints:
+  sortBy: date
+  highlightColumn: amount
+  caption: "Source: CB Insights, Crunchbase, SEC filings"
+```
+
+### Diagram Asset
+
+```yaml
+# data/assets/kalshi/regulatory-timeline.yaml
+id: asset-kalshi-regulatory-timeline
+type: mermaid-diagram
+entity: kalshi
+title: "Kalshi Regulatory Journey"
+lastUpdated: 2026-02-23
+
+mermaid: |
+  flowchart TD
+    A[Founded 2018] --> B[CFTC Application 2019]
+    B --> C[DCM Designation 2020]
+    C --> D[Political Contracts\nBlocked by CFTC 2023]
+    D --> E[Court Victory\nDC Circuit 2024]
+    E --> F[Election Markets\nLaunch Oct 2024]
+    F --> G[State Challenges\n2025-ongoing]
+
+# Each node maps to a claim
+nodeClaimMap:
+  A: "c-kalshi-001"
+  B: "c-kalshi-015"
+  C: "c-kalshi-018"
+  D: "c-kalshi-025"
+  E: "c-kalshi-028"
+  F: "c-kalshi-032"
+  G: "c-kalshi-095"
+```
+
+### Squiggle Model Asset
+
+```yaml
+# data/assets/kalshi/market-growth-model.yaml
+id: asset-kalshi-growth-model
+type: squiggle-model
+entity: kalshi
+title: "Kalshi Market Volume Projection"
+lastUpdated: 2026-02-23
+
+squiggle: |
+  // Based on verified claims about Kalshi's growth trajectory
+  volumeQ42024 = 1e9 to 1.5e9       // Q4 2024 volume (from c-kalshi-065)
+  yearOverYearGrowth = 2 to 5        // 2-5x growth rate (from c-kalshi-070)
+  projectedVolume2025 = volumeQ42024 * 4 * yearOverYearGrowth
+  projectedVolume2025
+
+inputClaims:
+  - "c-kalshi-065"  # Q4 2024 trading volume
+  - "c-kalshi-070"  # Year-over-year growth rate
+  - "c-kalshi-071"  # 2025 volume projections
+
+description: "Projects 2025 annual trading volume based on Q4 2024 actual volume and historical growth rates."
+```
+
+### Why Independent Assets Matter
+
+1. **Reuse**: The funding rounds table can appear on the Kalshi page, a prediction markets comparison page, and a funding landscape dashboard.
+2. **Independent updates**: When a new funding round happens, update the asset once. Every view that includes it gets the update.
+3. **Quality control**: An asset can be verified independently (are the numbers correct? does the diagram render? does the Squiggle model execute?).
+4. **Mixed provenance**: Some assets are auto-generated from claims. Others are human-created. The asset store doesn't care — it just stores them.
+
+---
+
+## Part 5: The View Composer
+
+### Architecture
+
+The view composer is a relatively thin layer that selects and arranges material from the data stores:
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Input["Inputs"]
+        CL[Claim Store]
+        AS[Asset Store]
+        ED[Editorial Direction]
+        TM[View Template]
+    end
+
+    subgraph Composer["View Composer"]
+        SELECT[Claim Selection\n& Filtering]
+        GROUP[Section Grouping\n& Ordering]
+        RENDER[Prose Rendering\n& Transitions]
+        ENRICH[Asset Placement\n& EntityLinks]
+    end
+
+    subgraph Output["Output Views"]
+        WIKI[Wiki Page MDX]
+        BRIEF[Executive Briefing]
+        COMP[Comparison Page]
+    end
+
+    CL --> SELECT
+    ED --> SELECT
+    SELECT --> GROUP
+    TM --> GROUP
+    GROUP --> RENDER
+    AS --> ENRICH
+    RENDER --> ENRICH
+    ENRICH --> WIKI
+    ENRICH --> BRIEF
+    ENRICH --> COMP
+`} />
+
+### Composition Process
+
+**Step 1: Claim Selection**
+
+Filter the claim store based on the view's needs:
+- Wiki page: all verified claims (skip speculative unless marked for inclusion)
+- Executive briefing: only high-importance claims (top 20-30)
+- Comparison page: claims shared between or contrasting two entities
+
+**Step 2: Section Grouping**
+
+Assign claims to sections based on:
+- The claim's `section_hint` (from the claim store)
+- The editorial direction's section plan
+- The view template's required sections
+
+**Step 3: Prose Rendering**
+
+This is the only step that needs a large LLM. The prompt is:
+
+```
+You are composing a wiki section from verified claims.
+
+Section: "Funding and Growth"
+Claims for this section:
+- [c-042] Kalshi reached a valuation of approximately $11 billion (VERIFIED, Aug 2025)
+- [c-045] Kalshi raised $2.3M in seed funding from Y Combinator (VERIFIED, 2019)
+- [c-046] Kalshi raised $30M Series A led by Sequoia Capital (VERIFIED, Feb 2021)
+- [c-048] Total funding reached approximately $170.8M across 9 rounds (VERIFIED)
+
+Asset available: [funding-rounds table]
+
+Write coherent prose that incorporates these claims. Add only transition
+sentences. Do not add any factual claims not in the list above. Place
+[c-XXX] markers after each claim for traceability.
+```
+
+The LLM's job is arrangement and transitions, not research or analysis. This is a dramatically smaller task than "write a section about Kalshi's funding" with a blob of research context.
+
+**Step 4: Asset Placement and Enrichment**
+
+Mechanical steps (no LLM needed):
+- Insert table/diagram/model assets at locations specified in the section plan
+- Add EntityLinks for all entity references in claims
+- Add `<F>` wrappers for claims linked to facts
+- Add footnote citations from claim sources
+- Run validation (escaping, component imports, frontmatter)
+
+### Cost Estimate
+
+| Step | LLM Cost | Notes |
+|------|----------|-------|
+| Claim selection | \$0 | Programmatic filtering |
+| Section grouping | \$0.05 | Haiku for edge cases |
+| Prose rendering | \$0.50-1.00 | Sonnet, per-section, ≈8 sections |
+| Asset placement | \$0 | Programmatic |
+| Validation | \$0 | Existing validation engine |
+| **Total per view** | **\$0.55-1.05** | |
+
+Compare to current page creation (\$4-6) or improvement (\$5-8). The view composition is 5-10x cheaper because all the expensive work (research, verification) already happened.
+
+---
+
+## Part 6: Prior Art and Inspirations
+
+### Stanford STORM (NAACL 2024)
+
+STORM separates research from writing, with perspective-guided research and simulated expert conversations. Its pre-writing stage produces a structured outline from research; our claim store goes further by producing verified atomic claims rather than an outline. STORM's key finding — that the pre-writing stage is more valuable than the writing stage — directly supports the claim-first thesis.
+
+### FActScore (EMNLP 2023) and Google SAFE
+
+FActScore decomposes LLM-generated text into atomic facts and scores each against a knowledge source. When applied to ChatGPT biographies, only 58% of atomic facts were supported. SAFE extends this with multi-step Google Search verification, achieving 72% agreement with human annotators at 1/20th the cost.
+
+These are *verification* tools applied post-hoc. Our proposal applies the same decomposition *proactively* — producing atomic claims before writing rather than extracting them afterward.
+
+### FactNet (February 2026)
+
+The most ambitious verified claim database: 1.7 billion atomic assertions with span-level evidence grounding from 316 Wikipedia editions. Key design principle: strictly deterministic construction with no synthetic claims. Every evidence unit is recoverable with byte-level precision.
+
+FactNet demonstrates that claim-first architectures can scale. Their claim quality (92.1% precision even in long-tail languages) shows that rigorous extraction pipelines produce reliable stores.
+
+### Wikidata → ArticlePlaceholder
+
+Wikidata stores structured triples (born\_in, founded\_in, population). ArticlePlaceholder generates natural-language articles from those triples in 14 under-resourced Wikipedia languages. This is the closest production system to what we're proposing — structured data first, prose second.
+
+Limitation: Wikidata only handles structured triples. Our claim store handles free-text claims, analytical inferences, consensus assertions — the full range of wiki content. Wikidata's triples could never produce a section like "Reception in EA and Forecasting Communities."
+
+### Perplexity Pages
+
+Perplexity's Pages product generates structured articles from search results with citations. The architecture uses multi-stage retrieval and decomposes documents into fine-grained units before generating section-organized articles. This is closer to our vision than STORM because it produces structured, sectioned output — but it doesn't maintain a persistent claim store between sessions.
+
+### Microsoft GraphRAG
+
+GraphRAG extracts entities and relationships from text, builds knowledge graphs, and generates answers from subgraph retrieval. Relevant to us: the entity extraction and community detection could feed our claim store's relational claims and cross-entity analysis.
+
+---
+
+## Part 6b: Existing Data Layer — More Sophisticated Than It Looks
+
+Before discussing migration, it's worth recognizing how much structured data already exists. The claim-first approach isn't starting from zero — it's unifying and extending an existing multi-faceted data layer.
+
+| Data Type | Location | What It Already Does |
+|-----------|----------|---------------------|
+| Verified numeric facts | `data/facts/*.yaml` | Per-entity time series with source URLs, dates, measure types. Anthropic's valuation tracked across 5+ data points. |
+| Expert estimates | `data/estimates.yaml` | Multi-source probability claims with aggregation: "P(Transformative AI by 2030): 10-35%" from 5 independent sources |
+| Resources | `data/resources/*.yaml` | 500+ fetched sources with summaries, key\_points, review text |
+| Entities | `data/entities/*.yaml` | Structured entity data with relationships, tags, clusters |
+| Causal graphs | `data/graphs/*.yaml` | Hierarchical causal models with categories, edges, weights |
+| Citation archive | `data/citation-archive/*.yaml` | Per-page verified citations with HTTP status, content snippets, claim context |
+| Expert positions | `data/experts.yaml` | Named positions on topics with confidence, dates, sources |
+| Importance rankings | `data/reader-importance-ranking.yaml` | Ordered entity importance for editorial prioritization |
+
+**The `estimates.yaml` file is the closest existing precedent for claim-first architecture.** Each estimate is essentially a structured claim with multiple sources, confidence ranges, and temporal metadata:
+
+```yaml
+- id: p-transformative-ai-by-2030
+  variable: P(Transformative AI by 2030)
+  category: timelines
+  description: Probability that we develop AI capable of causing transformative change by 2030
+  aggregateRange: 10-35%
+  estimates:
+    - source: Metaculus Community
+      value: 25%
+      date: "2024"
+    - source: Ajeya Cotra (Open Phil)
+      value: 35%
+      date: "2022"
+      notes: Biological anchors framework
+```
+
+This is already a multi-source, temporally-tagged, confidence-rated claim store — just limited to quantitative probability estimates. The claim-first architecture generalizes this pattern to *all* types of claims.
+
+---
+
+## Part 6c: Three Architectural Options
+
+There are three levels of ambition for implementing claim-first architecture. They're not mutually exclusive — each builds on the previous.
+
+### Option A: Claim Store (Minimal, Evolutionary)
+
+Add `data/claims/` as a new data layer alongside existing data types. Claims are extracted from existing pages and stored as verified units. Pages still live in MDX and are still authored prose-first, but claims provide a verification and consistency layer.
+
+**What changes**: A new YAML directory, new CLI commands (`crux claims extract/verify/status`), and a new validation check ("do page claims match the claim store?").
+
+**What doesn't change**: The authoring pipeline. Writers still write prose, but now they can reference verified claims and the system can check that prose matches the store.
+
+**Pros**: Incremental, backwards-compatible, low risk. The `extract_facts` and `audit_citations` orchestrator tools already do parts of this.
+
+**Cons**: Still fundamentally prose-first. The claim store is a byproduct, not the primary artifact.
+
+### Option B: Knowledge Bundles (Medium — Recommended Starting Point)
+
+The primary output of research is a **knowledge bundle** — a structured package of verified claims, pre-built components, and editorial metadata that can be rendered into different views.
+
+```yaml
+# A knowledge bundle for Kalshi
+id: kalshi-knowledge
+entity: kalshi
+lastResearched: 2026-02-23
+
+claims: [...]           # 80-150 verified atomic claims
+components:             # Pre-built tables, diagrams, squiggle models
+  - id: funding-timeline
+    type: table
+    title: "Kalshi Funding History"
+    description: "For LLM: chronological funding rounds with amounts and valuations"
+    columns: [round, date, amount, valuation, lead_investors]
+    rows: [...]
+    claimRefs: [seed-funding, series-a-funding, ...]
+
+  - id: regulatory-timeline
+    type: mermaid
+    description: "For LLM: key regulatory events from founding to current disputes"
+    chart: "..."
+    claimRefs: [cftc-approval, launch-date, ...]
+
+editorial:
+  keyNarrative: "First-mover in regulated prediction markets, explosive growth, existential regulatory risk"
+  importantAngles:
+    - "CFTC vs state gambling jurisdiction is the central tension"
+    - "Sports = 90% of volume creates concentration risk"
+  missingPerspectives:
+    - "Tribal gaming opposition deserves more depth"
+```
+
+**What changes**: Research produces bundles, not blobs. The writing step becomes view composition — arranging verified material rather than generating from scratch. Components have their own metadata (the `description` field is the key interface between data and presentation layers — it tells the LLM what the component shows and when to use it).
+
+**What doesn't change initially**: Existing pages remain as-is. New pages and major improvements use the bundle pipeline. Migration is entity-by-entity.
+
+**Pros**: Clean separation of concerns. Claims verified before they touch prose. Components are first-class objects. Multiple views from one bundle. The editorial layer provides the "big picture thinking" that a pure claim store lacks.
+
+**Cons**: Significant new infrastructure. The bundle schema needs careful design. The "prose assembly" step might produce stilted writing if over-constrained.
+
+### Option C: Full Semantic Layer (Maximum, Database-Backed)
+
+Knowledge bundles live in PostgreSQL (extending the existing wiki-server). Claims are first-class entities with relationships, provenance chains, and version history. Every claim knows which pages render it, which sources support it, when it was last verified, and what other claims it relates to.
+
+```sql
+-- PostgreSQL schema (extends wiki-server)
+claims (id, text, type, confidence, entity_id, verified_at, ...)
+claim_sources (claim_id, resource_id, quote, support_level, ...)
+claim_uses (claim_id, page_id, section, rendered_text, ...)
+components (id, type, title, data_json, claim_refs[], ...)
+knowledge_bundles (id, entity_id, claims[], components[], editorial_json, ...)
+views (id, bundle_id, view_type, template, content, ...)
+```
+
+**What this enables**:
+- When a source goes dead, you know exactly which claims and pages are affected
+- When a fact changes, you update one claim and all views can be regenerated
+- Cross-page consistency becomes trivial: Anthropic and Kalshi pages share claim objects
+- The auto-update system targets claims, not pages
+- Sophisticated queries: "which claims about Anthropic's valuation are older than 6 months?"
+
+**Pros**: Maximum power. Enables true "living wiki" where fact updates propagate automatically.
+
+**Cons**: Substantial engineering effort. Risk of over-engineering for a 625-page wiki. Database becomes a critical dependency.
+
+### Recommended Path: B → C
+
+Start with Option B (knowledge bundles as YAML files, git-tracked). This validates the architecture without a database dependency. If it works, migrate the bundle store to PostgreSQL (Option C) once the schema stabilizes and the claim count justifies it.
+
+---
+
+## Part 7: Migration Strategy
+
+### Starting Point: What We Already Have
+
+| Component | Current State | Needed For Claim-First |
+|-----------|--------------|----------------------|
+| Fact store (`data/facts/`) | 10 entity files, numeric facts only | Extend schema or link from claim store |
+| Citation archive (`data/citation-archive/`) | 137 files, link verification + content snippets | Add claim-level verification (not just link-level) |
+| Resource store (`data/resources/`) | 10 categorized files, ≈500+ resources | Sufficient — claims reference these |
+| Entity store (`data/entities/`) | 24 files, full ontology | Sufficient — claims reference these |
+| Source fetcher | Exists in pipeline (Firecrawl) | Sufficient — feeds claim extraction |
+| Citation auditor | Exists, per-citation verification | Upgrade to per-claim verification |
+| Page templates | Comprehensive, per-entity-type | Adapt to section-plan format for view composer |
+| Estimates database | `data/estimates.yaml` | Closest existing precedent — generalize this pattern |
+| Orchestrator tools | 18+ composable tools | `extract_facts`, `audit_citations` already do claim-adjacent work |
+
+### Phase 1: Claim Extraction from Existing Pages (Medium)
+
+Extract claims from the 625 existing pages into `data/claims/`. This populates the store without changing how pages are written.
+
+```bash
+pnpm crux claims extract <page-id>     # Extract claims from existing page
+pnpm crux claims extract --all          # Batch extraction
+pnpm crux claims verify <entity-id>     # Verify all claims for an entity
+pnpm crux claims status <entity-id>     # Show claim store health
+```
+
+This is the lowest-risk step. It adds a data layer alongside the existing pages without changing the pipeline.
+
+### Phase 2: Claim-First Research (Medium)
+
+Modify the research phase to output structured claims instead of text blobs. The existing `research.ts` phase in the improve pipeline would get a new mode:
+
+```bash
+pnpm crux content improve <id> --engine=claims   # Research outputs claims, writer uses claim store
+```
+
+The improve pipeline's `improve.ts` phase would be replaced with a view composer that reads from the claim store.
+
+### Phase 3: Independent Assets (Medium)
+
+Extract tables, diagrams, and models from existing pages into `data/assets/`. Build tooling for independent asset creation and validation.
+
+### Phase 4: Editorial Direction (Medium → Maximal)
+
+Add explicit editorial metadata per entity. Start with template-driven defaults, add LLM-generated briefs for important entities.
+
+### Phase 5: Multiple View Types (Maximal)
+
+Build additional view composers for comparison pages, briefings, dashboards. Each reads from the same claim store.
+
+### Backward Compatibility
+
+The existing pipeline (`crux content create/improve`) continues to work unchanged. The claim store is additive — it's a new data layer, not a replacement. Migration can be entity-by-entity: extract claims for Kalshi, test the view composer on Kalshi, and if it works, do more entities.
+
+---
+
+## Part 8: Open Questions and Risks
+
+### Hard Problems
+
+**Claim granularity**: How atomic should claims be? "Kalshi was founded in 2018 by Tarek Mansour and Luana Lopes Lara who met at MIT" is three claims (founding date, founders, where they met) or one. Too granular and the store becomes unwieldy. Too coarse and claims aren't independently verifiable. Need practical heuristics.
+
+**Claim staleness**: A claim verified in January may be outdated by March. The temporal metadata helps, but we need active monitoring. The auto-update system could be adapted to refresh claims rather than (or in addition to) refreshing pages.
+
+**Analytical claim validation**: Factual claims have clear verification. But "the fee structure is designed to incentivize liquidity" is an inference. How do we validate inferences? One approach: require analytical claims to explicitly reference supporting factual claims and document the reasoning chain.
+
+**View composition quality**: The promise is that composing from claims is "easy" and the LLM just writes transitions. But good prose requires narrative flow, appropriate emphasis, reader engagement. Will claim-composed pages feel mechanical? This is the key risk — the experiment (Part 9) should test this.
+
+**Cross-entity consistency**: Relational claims ("Kalshi's growth exceeded Polymarket's") create dependencies between entity claim stores. If the Polymarket claim store disagrees, which wins? Need a consistency checker.
+
+**Cost of initial extraction**: Extracting claims from 625 pages is a one-time investment. At ≈\$1-2 per page for LLM-based extraction, that's \$625-1250. Not prohibitive but not trivial. Could be done incrementally.
+
+### Risks
+
+**Over-engineering**: The four-layer architecture is elegant in theory but complex to implement and maintain. The existing pipeline works. Is the quality improvement worth the implementation cost?
+
+**Loss of narrative quality**: Pages composed from claims may read like "fact, transition, fact, transition" rather than flowing prose. The editorial direction layer is supposed to prevent this, but it's the least developed part of the proposal.
+
+**Schema maintenance burden**: Every claim has rich metadata (type, confidence, temporal, entities, tags, section\_hint). Keeping this metadata accurate as claims are updated is ongoing work.
+
+**Verification bottleneck**: The claim store is only as good as its verification. If verification is slow or expensive, the store becomes a bottleneck rather than an accelerant.
+
+### What This Doesn't Solve
+
+- **Novel analysis**: The wiki's value isn't just facts — it's original analysis. The analytical claim type attempts to capture this, but deep analysis (like comparing three approaches to alignment and synthesizing insights) may not decompose into atomic claims well.
+- **Narrative craft**: Some of the best wiki sections tell a story. Stories don't decompose into claims; they require authorial voice. The view composer may struggle with narrative sections.
+- **Controversial topics**: For topics where reasonable people disagree, the claim store needs to represent the disagreement rather than picking a side. The consensus claim type helps, but structured representation of genuine controversy is hard.
+
+### Five Key Design Decisions
+
+These must be resolved before implementation, ideally informed by the experiment:
+
+**1. Claim granularity**: How atomic? "Kalshi was founded in 2018" vs. "Kalshi was founded in 2018 by MIT graduates Tarek Mansour and Luana Lopes Lara who studied computer science, mathematics, and electrical engineering." Too atomic → thousands of trivial claims. Too coarse → lose verifiability. Heuristic: one claim per footnote's worth of information (roughly maps to what the citation auditor already verifies).
+
+**2. Component metadata for LLMs**: The `description` field on components is the critical interface between the data layer and the view layer. It needs to tell the LLM *when* to use the component and *what* it shows, without duplicating the component's content. Example: `"For LLM: chronological funding rounds table — use when discussing Kalshi's growth trajectory or investor base. Shows 9 rounds from 2019-2025."` Getting this metadata right determines whether the view composer places assets well or awkwardly.
+
+**3. Writer constraint level**: Strictly "only cite verified claims" vs. "prefer verified claims but can add light connective tissue." Too strict → choppy writing ("Founded in 2018. Received CFTC approval in 2020. Launched in 2021."). Too loose → back to the current problem. Suggested rule: factual claims must come from the store. Framing and transitions ("This represented a watershed moment for...") are permitted but flagged as ungrounded.
+
+**4. Storage format**: YAML files in `data/claims/` (git-tracked, consistent with existing data layer, easy to review in PRs) vs. PostgreSQL (more powerful queries, better for scale). Start with YAML; migrate to DB when the schema stabilizes and claim count justifies it (see Option B → C path above).
+
+**5. Backfill strategy**: Extract claims from all 625 pages at once (≈\$200-400, produces immediate wiki-wide claim database) vs. incrementally as pages are improved (lower upfront cost, but the store is sparse for months). Middle ground: batch-extract the top 50 most important entities first (≈\$50-100), then incrementally.
+
+---
+
+## Part 9: Proposed Experiment — The Kalshi Reconstruction
+
+### What Changes in Practice: The Kalshi Example
+
+To make the difference concrete, here's how the Kalshi page would be produced under each approach:
+
+**Current flow (prose-first):**
+
+1. "Write about Kalshi" → Perplexity research finds ~20 sources
+2. All research dumped into a synthesis prompt
+3. LLM writes 4000 words of prose in one pass, embedding 87 citations as it goes
+4. Post-hoc audit finds 3 broken URLs and several partially-supported claims
+5. The maker-taker fee claim (0.07%-7%) gets written into prose; later the verifier flags it as "Minor issues 85%" because the source doesn't mention the specific range
+
+**Claims-first flow:**
+
+1. "Write about Kalshi" → Research agent searches multiple sources, returns raw findings
+2. Claim extractor produces 80-120 atomic claims, each with source quotes
+3. Claim verifier checks each against fetched content:
+   - "Kalshi charges transaction fees on expected earnings" → **verified** (Sacra confirms)
+   - "Fees range from 0.07% to 7%" → **unverified** (no source specifies this range) → flagged as gap
+   - "Fee structure designed to incentivize liquidity" → classified as **analytical** (inference, not source-supported)
+
+4. Component builder creates funding table, regulatory timeline, partnership list — each linked to verified claims
+5. Editorial analyst identifies: key narrative (regulatory first-mover), important angles (CFTC vs states), gaps (tribal opposition needs depth)
+6. Knowledge bundle assembled: 95 verified claims + 8 partial + 3 assets + editorial direction
+7. View composer writes prose section-by-section from verified claims (≈\$1-2)
+8. Light validation pass
+
+The key difference: the fee range claim never makes it into prose. Instead of writing it and discovering the problem later, the system identifies the gap upfront. The writer can say "Kalshi charges transaction fees" (verified) without inventing specifics the sources don't support.
+
+### Why Kalshi
+
+The <EntityLink id="kalshi">Kalshi page</EntityLink> is an ideal test case:
+
+1. **Existing citation verification**: 87 citations already fetched and verified, with claim-level analysis showing exactly where the LLM embellished
+2. **Rich data**: Funding rounds, partnerships, regulatory timeline — good test for structured assets
+3. **Moderate complexity**: ~330 lines, 9 major sections — enough to be meaningful, not so long as to be unmanageable
+4. **Multiple potential views**: Could generate a wiki page, a "prediction markets comparison" entry, and a data dashboard
+5. **Known quality baseline**: Current quality score of 25 — room for improvement, and we can compare outputs
+
+### Experiment Design
+
+**Step 1: Extract claims from the existing Kalshi page**
+
+Run the existing page through a claim extraction pipeline. Decompose every sentence into atomic claims, classify by type, link to existing citations.
+
+Expected output: 100-200 claims in `data/claims/kalshi.yaml`
+
+**Step 2: Verify all claims**
+
+For each claim, check it against its source(s). Flag unsupported claims. This leverages the existing citation archive (87 sources already fetched).
+
+Expected output: Verification status for every claim, with a breakdown by type.
+
+**Step 3: Build structured assets**
+
+Extract the funding rounds table, regulatory timeline, and partnership list into independent assets in `data/assets/kalshi/`.
+
+Expected output: 3-5 independent asset files.
+
+**Step 4: Generate editorial direction**
+
+Have an LLM analyze the claim store and produce a narrative framing and section plan for a wiki page about Kalshi.
+
+Expected output: `data/editorial/kalshi.yaml`
+
+**Step 5: Compose a wiki page from the claim store**
+
+Using only the claim store, assets, and editorial direction (not the original page), compose a fresh wiki page.
+
+Expected output: New Kalshi page MDX
+
+**Step 6: Compare**
+
+Compare the claim-composed page against the original on:
+- Factual accuracy (are claims supported by sources?)
+- Coverage (does it cover the same ground?)
+- Prose quality (does it read well?)
+- Cost (how much did the full pipeline cost vs. the current pipeline?)
+- Verifiability (can every sentence be traced to a claim?)
+
+**Step 7: Attempt a second view**
+
+Using the same claim store, compose a different view — e.g., a 500-word executive briefing or a comparison table with Polymarket.
+
+Expected output: A second rendering of the same data, demonstrating reuse.
+
+### Success Criteria
+
+The experiment succeeds if:
+
+1. The claim-composed page is **at least as accurate** as the original (fewer "Minor issues" in verification)
+2. The claim-composed page is **at least as comprehensive** (covers the same topics)
+3. The prose quality is **acceptable** (may not match the original if the original was written by a strong synthesizer, but should be readable)
+4. Every factual sentence in the output is **traceable** to a claim in the store
+5. The second view (briefing or comparison) is **coherent** and **didn't require new research**
+6. Total cost (extraction + verification + composition) is **within 2x** of the current pipeline cost
+
+### What We Learn
+
+- Is the claim extraction reliable? (How many claims are missed or misclassified?)
+- Is the verification meaningful? (Does it catch real problems?)
+- Does the view composer produce readable prose?
+- Do analytical claims survive the round-trip? (Extract → store → compose)
+- How much editorial direction is needed for acceptable output?
+- What's the marginal cost of additional views from the same claim store?
+
+---
+
+## Part 9b: Experiment Results (Run 3, 2026-02-24)
+
+The claim-first pipeline experiment was implemented and run three times on the Kalshi page. Below are the concrete results from Run 3 (with deduplication, claim budgeting, and improved editorial direction).
+
+### Quantitative Results
+
+| Metric | Original Page | Run 1 | Run 2 | Run 3 |
+|--------|--------------|-------|-------|-------|
+| Claims extracted | — | 150 | 275 | 241 (after dedup) |
+| Verified claims | — | 30 (20%) | 35 (12.7%) | 36 (14.9%) |
+| Composed sections | 12 | 5 | 7 | 9 |
+| Composed words | 3,332 | 1,419 | 3,731 | 3,110 |
+| Unique claims in output | — | — | 44 (16%) | 58 (24.1%) |
+| Cross-section repetition | — | — | High | Low (budget) |
+| AI Safety section | Yes | No | No | Yes |
+| Assets built | — | 2 | 3 | 3 |
+| LLM calls | ≈15 | 35 | 75 | 73 |
+| Estimated tokens | ≈40K | ≈60K | ≈115K | ≈107K |
+
+### Claim Type Breakdown (Run 3)
+
+| Type | Count | Example |
+|------|-------|---------|
+| factual | 170 | "Kalshi was the first CFTC-licensed designated contract market for event contracts" |
+| numeric | 35 | "Kalshi reached an \$11 billion valuation in December 2025" |
+| analytical | 19 | "Sports betting accounting for 90% of volume raises sustainability questions" |
+| consensus | 8 | "EA Forum users acknowledge Kalshi's superior forecasting accuracy" |
+| relational | 5 | "Kalshi and Polymarket have created a duopoly in prediction markets" |
+| speculative | 1 | "Will courts ultimately side with Kalshi's CFTC jurisdiction position?" |
+
+### Success Criteria Assessment
+
+1. **Accuracy**: Partial success. The 14.9% verified rate is still too low. However, this is a verification strictness problem, not an accuracy problem — the claims are mostly accurate; the verifier is comparing against short citation archive snippets rather than full source text.
+
+2. **Coverage**: Success. The composed page covers all major topic areas from the original (overview, founding, operations, partnerships, AI safety, competition, regulatory, operations, EA reception) in 3,110 words — within 7% of the original's 3,332. Run 3's 9 sections (vs 12 original) is a significant improvement from Run 1's 5 sections.
+
+3. **Prose quality**: Success (improved). The claim budget system eliminated cross-section repetition. Each claim now appears in exactly one section. Run 2 had the same claims appearing 3-4 times; Run 3 has 58 unique claim references with no duplicates.
+
+4. **Traceability**: Success. 58 unique claim references appear in the composed page (24.1% coverage). Every factual sentence has a `\{/* claims: c-kalshi-XXX */\}` comment linking back to the claim store.
+
+5. **Second view (executive briefing)**: Success. The briefing was composed from the same claim store with no new research, producing a 385-word structured briefing with BLUF, key facts, strategic context, and watch items.
+
+6. **Cost**: Partial success. At ~107K tokens (≈\$0.15-0.25 depending on model pricing), the full pipeline costs about 2-3x the composition step alone. However, the knowledge bundle is reusable — generating additional views from it costs only ≈\$0.05 each.
+
+### Key Findings
+
+**What worked well:**
+
+- **MDX pre-processing**: Cleaning `\$`, `EntityLink`, and MDX comments before extraction eliminated all JSON parsing failures (Run 1 had 2 sections fail; Run 2 had 0)
+- **Subsection splitting**: Breaking "History and Development" into "Founding Story," "Key Milestones," and "Funding and Growth" chunks produced much more focused claims
+- **Robust JSON parsing**: The 5-strategy fallback parser (direct, cleaned, aggressive, object-by-object) handled all LLM output variations
+- **Asset generation**: The funding table and partnership table built from claims are accurate and useful
+- **Traceability markers**: `\{/* claims: c-kalshi-XXX, c-kalshi-YYY */\}` provide exactly the audit trail we wanted
+
+**What needs improvement:**
+
+- **Verification bottleneck**: 12.7% verified is too low. The citation archive stores short snippets (~100-300 chars), which is insufficient for verification. Need to either: (a) fetch full source pages during verification, or (b) use the existing `supportingQuotes` field from the citation archive more aggressively.
+
+- **Claim deduplication**: The same fact sometimes appears as multiple claims across different sections (e.g., "CFTC-regulated" appears in Quick Assessment, Overview, and Regulatory sections). Need a deduplication pass after extraction.
+
+- **Section repetition in composition**: Because only 44 of 275 claims (16%) are used, and the verified pool is small, the composer reuses the same high-confidence claims across multiple sections. A "claim budget" system that marks claims as consumed would prevent this.
+
+- **Missing AI Safety depth**: The original page has a dedicated "AI Safety Markets" section with specific contract details (KXAI PAUSE-27, KXAI LEGISLATION-27). These claims were extracted but the editorial direction didn't create a standalone AI Safety section — it merged them into the broader "Forecasting Community" section.
+
+- **No founding story**: Despite successful extraction from History subsections, the composer's editorial direction prioritized funding and partnerships over the founding narrative (MIT cofounders, Y Combinator, etc.). The editorial direction needs to be more prescriptive about which claim categories map to which sections.
+
+### Architectural Implications
+
+The experiment reveals that the **middle layer** — between raw claims and composed views — is the critical design point. The claim store and view composer both work. The weaknesses are:
+
+1. **Verification quality is constrained by source data quality.** The existing citation archive was designed for link checking (is this URL valid?), not content verification (does this source support this specific claim?). A claim-first architecture needs richer source archives — either full-text caches or pre-extracted supporting quotes.
+
+2. **Editorial direction is the underappreciated layer.** The difference between a mediocre composed page and a good one isn't the claims or the composer — it's whether the editorial direction correctly maps claims to sections, prevents repetition, and ensures topical balance. This is where human-quality judgment is most needed.
+
+3. **The "claim budget" concept is essential.** Without it, the composer has no way to avoid redundancy. Each section should draw from a disjoint subset of claims, with overflow claims going into a "See also" or "Additional facts" appendix.
+
+### Experiment Code
+
+The full experiment pipeline and intermediate outputs are available in [PR #939](https://github.com/quantified-uncertainty/longterm-wiki/pull/939). Key intermediate outputs from `.claude/claim-first-experiment/`:
+
+- `step1-claims.json` — 275 extracted claims (89.8KB)
+- `step2-verified-claims.json` — claims with verification status (175.8KB)
+- `step3-assets.json` — 3 structured assets (5.5KB)
+- `step4-editorial.json` — editorial direction (2.1KB)
+- `step5-composed-page.mdx` — composed wiki page (39.9KB)
+- `step6-report.md` — comparison metrics
+- `step7-briefing.md` — executive briefing view (3.2KB)
+- `knowledge-bundle-kalshi.json` — full bundle (102.1KB)
+
+---
+
+## Part 10: Relationship to Multi-Agent Architecture
+
+This proposal is complementary to the <EntityLink id="wiki-generation-architecture">multi-agent multi-pass architecture</EntityLink>. That proposal focuses on *how* content is produced (specialist agents, composable passes). This proposal focuses on *what* the intermediate representation is (claims rather than prose drafts).
+
+The two combine naturally:
+
+- The **Researcher agent** produces claims (not text blobs)
+- The **Verifier agent** operates on the claim store
+- The **Graph Analyst** enriches claims with entity references and relational claims
+- The **Enricher** builds assets from claims
+- The **Writer** becomes the view composer, consuming claims rather than research blobs
+- The **Reviewer** evaluates the composed view against the claim store (checking faithfulness)
+
+The claim store is the **shared data structure** that the multi-agent system reads from and writes to. Instead of passing a "page draft" between agents, they pass claims.
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Agents["Multi-Agent System"]
+        ORCH[Orchestrator]
+        RES[Researcher]
+        VER[Verifier]
+        GAP[Graph Analyst]
+        ENR[Enricher]
+        WRT[View Composer]
+        REV[Reviewer]
+    end
+
+    subgraph Store["Claim-First Data Layer"]
+        CS[Claim Store]
+        AS[Asset Store]
+        FS[Fact Store]
+        ED[Editorial Direction]
+    end
+
+    ORCH --> RES
+    RES -->|"produces claims"| CS
+    ORCH --> VER
+    VER -->|"verifies claims"| CS
+    ORCH --> GAP
+    GAP -->|"adds relational claims"| CS
+    GAP -->|"enriches entity refs"| CS
+    ORCH --> ENR
+    ENR -->|"builds assets from claims"| AS
+    CS --> WRT
+    AS --> WRT
+    ED --> WRT
+    WRT -->|"wiki page"| REV
+    REV -->|"identifies missing claims"| ORCH
+`} />
+
+This unification means we don't have to choose between the multi-agent architecture and the claim-first architecture — one provides the agents, the other provides the data model they operate on.
+
+---
+
+## Part 11: Data Model, Relationships, and Visualization
+
+The experiment confirmed three distinct entity types at the core of the system: **Claims**, **Resources**, and **Verifications**. This section specifies the data model, the relationships between entities, and how to present this data to both humans and AIs.
+
+### Core Data Model
+
+The system has three primary entities and one derived metric:
+
+#### 1. Claim
+
+An atomic, verifiable assertion. The fundamental unit of knowledge.
+
+```yaml
+# Example: data/claims/kalshi/c-kalshi-015.yaml
+id: c-kalshi-015
+text: "Kalshi is the first federally regulated prediction market exchange in the United States"
+type: factual          # factual | numeric | consensus | analytical | speculative | relational
+section: Overview      # Which page section this claim appears in
+entityRefs:            # Entities mentioned
+  - kalshi
+  - cftc
+temporal:
+  type: ongoing        # historical | point-in-time | ongoing | projection
+importance: 8          # 1-10: how central is this claim to understanding the entity?
+pageId: kalshi         # Which page this claim was extracted from
+extractedAt: 2026-02-24
+extractedBy: gemini-2.0-flash
+```
+
+**Key design choices:**
+- `importance` is a separate rating from verification confidence. A claim can be highly important but poorly verified (a gap to fill), or well-verified but trivial.
+- `type` determines verification standards. Factual claims need source evidence. Analytical claims need logical consistency. Consensus claims need multiple sources.
+- Claims are **immutable once created**. If a claim needs updating (e.g., a valuation changes), create a new claim and mark the old one as superseded, preserving history.
+
+#### 2. Resource
+
+An external source that can provide evidence for claims. These are the "things we cite."
+
+```yaml
+# Example: data/resources/kalshi/res-kalshi-nhl.yaml
+id: res-kalshi-nhl
+url: "https://www.nhl.com/news/nhl-announces-landmark-multiyear-partnerships-with-kalshi-polymarket"
+title: "NHL Announces Landmark Multiyear Partnerships with Kalshi, Polymarket"
+type: press-release     # press-release | news | academic | blog | official | government | data-source
+importance: 7           # 1-10: source reliability/authority
+publisher: NHL
+publishDate: 2025-03-15
+fetchDate: 2026-02-01
+status: active          # active | broken | archived | paywall
+contentHash: "abc123"   # Hash of fetched content for drift detection
+cachedContent: true     # Whether full text is cached in citation-archive
+pageIds:                # Which wiki pages reference this resource
+  - kalshi
+```
+
+**Key design choices:**
+- `importance` rates the source itself (is NHL.com authoritative for NHL partnership claims?), NOT how well it supports any particular claim. That's the Verification's job.
+- Resources are **shared across pages**. The same Contrary Research article might verify claims on both the Kalshi page and a prediction markets overview page.
+- `type` helps determine verification weight. A government filing is stronger evidence than a blog post.
+
+#### 3. Verification
+
+The join relationship: "Resource X provides evidence that Claim Y is true/false." This is where the actual epistemic work lives.
+
+```yaml
+# Example: data/verifications/kalshi/ver-015-nhl.yaml
+id: ver-015-nhl
+claimId: c-kalshi-015
+resourceId: res-kalshi-nhl
+status: verified          # verified | partial | contradicted | unsupported | unverifiable
+quote: "Kalshi, the first federally regulated prediction market exchange..."
+quoteLocation: paragraph-2
+confidence: 0.95          # 0-1: how confident is the verifier in this judgment?
+note: "Source directly states this in the opening paragraph"
+verifiedAt: 2026-02-24
+verifiedBy: gemini-2.0-flash   # Which model performed the verification
+method: automated               # automated | human-reviewed | cross-referenced
+```
+
+**Key design choices:**
+- A single Claim can have **multiple Verifications** from different Resources. "Kalshi was founded in 2018" might be verified by 5 different sources — each verification is a separate record.
+- `status` is about the relationship between this specific resource and this specific claim. A resource can "verify" one claim and "contradict" another.
+- `contradicted` is a critical status. It means the source actively disagrees with the claim — not just that it doesn't mention it (that's `unsupported`).
+- `method: human-reviewed` is the gold standard. When a human checks a verification, that should be recorded.
+
+#### 4. Derived: Claim Confidence Score
+
+Not stored directly — computed from verifications:
+
+```
+claimConfidence(claim) = aggregate(
+  for each verification of claim:
+    weight = resource.importance * verification.confidence * methodMultiplier(verification.method)
+
+  if any verification.status == "contradicted":
+    return "disputed" (flagged for human review)
+
+  aggregate weighted verifications into a 0-100 score
+)
+```
+
+The score has these bands:
+- **90-100**: High confidence (multiple high-quality sources agree)
+- **70-89**: Good confidence (at least one strong verification)
+- **40-69**: Moderate (partial verifications or only low-importance sources)
+- **1-39**: Low (unverified or only weak evidence)
+- **0**: Unsourced (no verifications at all)
+- **Disputed**: At least one contradiction exists
+
+### Entity Relationship Diagram
+
+<Mermaid chart={`
+erDiagram
+    CLAIM ||--o{ VERIFICATION : "verified by"
+    RESOURCE ||--o{ VERIFICATION : "provides evidence for"
+    CLAIM }o--|| PAGE : "extracted from"
+    RESOURCE }o--o{ PAGE : "cited on"
+    CLAIM }o--o{ ENTITY : "references"
+
+    CLAIM {
+        string id PK
+        string text
+        string type
+        string section
+        int importance
+        string pageId FK
+        json temporal
+        json entityRefs
+    }
+
+    RESOURCE {
+        string id PK
+        string url
+        string title
+        string type
+        int importance
+        string status
+        date publishDate
+    }
+
+    VERIFICATION {
+        string id PK
+        string claimId FK
+        string resourceId FK
+        string status
+        string quote
+        float confidence
+        string verifiedBy
+        string method
+    }
+`} />
+
+### Visualization Design: The "Claims" Tab
+
+The existing wiki page has three navigation buttons: **History**, **Data**, and **Feedback**. The proposal adds a fourth: **Claims**. This tab provides a full evidence transparency view for every factual assertion on the page.
+
+#### Header Summary Bar
+
+Like the existing "Citations verified" banner, but richer:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 📊 Claims Analysis                                          │
+│                                                             │
+│ 241 claims · 36 verified (15%) · 14 partial · 32 unsourced │
+│                                                             │
+│ ████████░░░░░░░░░░░░░░░░░░░░░░  Confidence: 52/100        │
+│ ■ Verified  ■ Partial  ■ Unverified  □ Unsourced           │
+│                                                             │
+│ 28 resources · avg importance: 6.2/10                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+This gives an at-a-glance "how trustworthy is this page?" answer. The confidence score aggregates across all claims weighted by importance.
+
+#### Section Heatmap
+
+Shows verification coverage by page section:
+
+```
+Section                        Claims  Verified  Confidence
+───────────────────────────────────────────────────────────
+Overview                         30     ████████░░  72%
+History > Founding Story         12     ██████░░░░  58%
+History > Key Milestones         16     █████████░  85%
+History > Funding                22     ████████░░  70%
+Platform Operations              30     ██░░░░░░░░  22%  ⚠
+Strategic Partnerships           41     ████████░░  68%
+AI Safety Markets                10     █████░░░░░  45%
+Regulatory Challenges            19     ███████░░░  65%
+Operational Concerns             23     ████░░░░░░  35%  ⚠
+EA Reception                     25     ███░░░░░░░  28%  ⚠
+```
+
+The `⚠` flag highlights sections where confidence is below a threshold (e.g., 40%). This immediately tells the reader: "Trust the History section more than the EA Reception section."
+
+#### Claims Table (expandable)
+
+Each claim is a row. Clicking expands to show verifications:
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│ ▸ c-015 │ factual │ "Kalshi is the first federally     │ ●● │
+│          │         │  regulated prediction market..."   │ 92 │
+├──────────────────────────────────────────────────────────────┤
+│ ▸ c-016 │ factual │ "Users trade binary yes/no         │ ●  │
+│          │         │  contracts on real-world events"   │ 78 │
+├──────────────────────────────────────────────────────────────┤
+│ ▾ c-028 │ numeric │ "Kalshi achieved $11B valuation    │ ●● │
+│          │         │  by late 2025"                     │ 88 │
+│  ├─ ✅ res-kalshi-series-e (imp: 9)                         │
+│  │     "...valued at $11 billion..."                         │
+│  ├─ ✅ res-contrary-research (imp: 7)                        │
+│  │     "The company's valuation reached $11B..."             │
+│  └─ ⚠️ res-equityzen (imp: 5)                                │
+│        Partial: mentions $5B Series D, not $11B Series E     │
+└──────────────────────────────────────────────────────────────┘
+```
+
+Filters: by type (factual/numeric/etc.), by confidence level, by section, by verification status. Sort by importance, confidence, or section order.
+
+#### Resource Panel
+
+A separate view showing all resources, rated and linked:
+
+```
+Resource                              Imp.  Claims  Status
+──────────────────────────────────────────────────────────
+Kalshi Series E Announcement           9     12     ✅ Active
+Contrary Research: Kalshi              8     18     ✅ Active
+Sigma World Timeline                   7      9     ✅ Active
+NHL Partnership Announcement           7      4     ✅ Active
+Gambling Harm Analysis                 4      8     ⚠️ Biased?
+EA Forum Discussion                    5      6     ✅ Active
+──────────────────────────────────────────────────────────
+```
+
+Each resource row is expandable to show: which claims it verifies, the supporting quotes, and whether the cached content has drifted from the live page.
+
+#### Verification Graph
+
+A visual representation of the claim-resource-verification network:
+
+```
+Claims (left)              Verifications           Resources (right)
+                           (connecting lines)
+○ c-015 ─────────── ✅ ──────── ● About Kalshi (imp: 8)
+○ c-016 ──┬──────── ✅ ──────── ● How Markets Work (imp: 7)
+           └──────── ✅ ──────── ● Contrary Research (imp: 8)
+○ c-028 ──┬──────── ✅ ──────── ● Series E Announcement (imp: 9)
+           ├──────── ✅ ──────── ● Contrary Research (imp: 8)
+           └──────── ⚠️ ──────── ● EquityZen (imp: 5)
+○ c-042 ─────────── ❌ ──────── ● Sigma World (imp: 7)  [CONTRADICTED]
+○ c-089 ────────────────────────  (no verifications — unsourced)
+```
+
+This visualization makes it immediately obvious:
+- Which claims have strong multi-source backing (multiple lines to high-importance resources)
+- Which claims are unsourced (orphan nodes on the left)
+- Which claims are disputed (red contradiction lines)
+- Which resources are heavily relied upon (many connections from the right)
+
+### For AI Consumers
+
+The same data needs a machine-readable format. The knowledge bundle JSON already captures this, but we should also expose:
+
+**1. Structured claim annotations in MDX** (already implemented in the experiment):
+
+```mdx
+Kalshi is the first federally regulated prediction market exchange
+in the United States[^1]. {/* claim: c-kalshi-015, confidence: 92 */}
+```
+
+This lets AI agents reading the page instantly know which claims are well-supported and which are weak.
+
+**2. Claims API endpoint** (via wiki-server):
+
+```
+GET /api/claims/kalshi
+→ { claims: [...], resources: [...], verifications: [...], stats: {...} }
+
+GET /api/claims/kalshi/c-kalshi-015
+→ { claim: {...}, verifications: [...], resources: [...] }
+
+GET /api/claims/kalshi?confidence=low
+→ Claims that need better sourcing (for research prioritization)
+```
+
+**3. LLM-readable summary at top of claims data**:
+
+```yaml
+# This entity has 241 claims. 36 are verified by at least one
+# high-quality source. 32 have no sources at all.
+# The weakest sections are: Platform Operations (22% confidence),
+# EA Reception (28%), Operational Concerns (35%).
+# The strongest sections are: Key Milestones (85%), Overview (72%).
+# 3 claims are disputed (contradicted by at least one source).
+# The most-cited resource is Contrary Research (18 claims, importance: 8).
+```
+
+This summary helps AI agents quickly assess the epistemic state of a page before using its claims.
+
+### Relationship to Existing Data Tab
+
+The existing Data tab shows: page metadata, entity YAML, canonical facts, external links, backlinks, frontmatter, and raw MDX. The Claims tab would be a **sibling** — not a replacement:
+
+| Tab | Purpose | Audience |
+|-----|---------|----------|
+| **Data** | Structured entity metadata, facts, links | Developers, data consumers |
+| **Claims** | Evidence transparency for every assertion | Readers, researchers, AI agents |
+| **History** | Edit log, version history | Editors, auditors |
+
+The Claims tab is fundamentally about **trust**. It answers: "Why should I believe what this page says?" The Data tab is about **structure**. It answers: "What structured information exists about this entity?"
+
+### Migration Path from Current Citations
+
+The existing system already has:
+- `data/citation-archive/*.yaml` — 87 sources per page with `contentSnippet`, `supportingQuotes`, `status`
+- Citation verification panel — "68 accurate, 15 flagged"
+- `data/resources/*.yaml` — external resource links
+
+These map naturally to the new model:
+- **citation-archive entries** become **Resources** (with importance ratings added)
+- **citation-archive `supportingQuotes`** become **Verifications** (claim linkage added)
+- **The citation verification panel** evolves into the Claims summary bar
+- **Footnotes** gain explicit claim IDs, making the prose→evidence chain inspectable
+
+The migration is additive — the claim layer sits on top of existing citation infrastructure, enriching it with claim-level granularity rather than replacing it.
+
+## Part 12: Source-First Extraction Experiment
+
+### Hypothesis
+
+The wiki-first experiment (Parts 9–10) extracted claims from the existing Kalshi wiki page, then verified them against sources. This has a fundamental flaw: we're extracting claims from prose that was already synthesized by an LLM, then checking if those synthesized claims match sources. The knowledge is filtered twice.
+
+**Source-first extraction** inverts this: extract claims directly from the 32 raw source documents cached in the SQLite `citation_content` table (379K chars total), compose a wiki page from those claims, and never reference the existing wiki page. This tests whether the claim-first architecture can build knowledge from primary sources.
+
+### Method
+
+1. **Load sources** — Read full text from SQLite `citation_content` cache for all Kalshi-related URLs. Rank by importance (from citation archive YAML).
+2. **Extract claims per source** — Each source processed independently. Claims tagged with topics (founding, funding, regulatory, operations, partnerships, competition, market-data, community-reception, consumer-concerns).
+3. **Cross-source deduplication** — Jaccard similarity ≥0.65 on word sets. Lower threshold than wiki-first (0.8) because cross-source claims use different phrasing for the same fact. Track `sourceCount` and `allSources` for multi-source confidence.
+4. **Editorial direction** — Generate section structure and map topics to sections.
+5. **Compose** — Each section receives up to 25 claims. Multi-source claims get priority placement and confident phrasing. Single-source claims get hedging ("reportedly").
+6. **Compare** — Word count, section count, footnote density vs original page.
+
+### Results
+
+| Metric | Original Page | Wiki-First (Run 3+fulltext) | Source-First |
+|--------|--------------|----------------------------|-------------|
+| Words | 3,332 | 3,110 | 3,805 |
+| Sections | 12 | 9 | 8 |
+| Footnote refs | 174 | 121 | 205 |
+| Claims extracted | — | 241 | 326 |
+| Multi-source claims | — | — | 11 (3.4%) |
+| LLM calls | — | 72 | 40 |
+| Cost (est. tokens) | — | ≈107K | ≈92K |
+
+### Claim Distribution by Topic
+
+| Topic | Count | % |
+|-------|-------|---|
+| operations | 99 | 30.4% |
+| regulatory | 77 | 23.6% |
+| market-data | 54 | 16.6% |
+| partnerships | 38 | 11.7% |
+| funding | 34 | 10.4% |
+| founding | 15 | 4.6% |
+| consumer-concerns | 4 | 1.2% |
+| community-reception | 3 | 0.9% |
+| competition | 2 | 0.6% |
+
+### What Worked
+
+1. **More claims, inherent provenance.** 326 claims vs 241 — raw sources contain more detail than the synthesized wiki page. Every claim has a source URL baked in from extraction, no separate verification step needed.
+2. **Lower cost.** 40 LLM calls vs 72 — eliminating the verification step (claims already have provenance) cuts cost by ~45%.
+3. **Denser citations.** 205 footnotes vs 174 in the original — the composed page cites more granularly.
+4. **Funding section is stronger.** Source-first extracted the full Series A→E timeline with specific dates, amounts, and lead investors from multiple sources (Sacra, CBInsights, Contrary Research, Nasdaq Private Market). The original page had less specific funding detail.
+5. **Regulatory section is comprehensive.** 77 regulatory claims produced a detailed legal history covering CFTC approval, congressional control contracts lawsuit, state-level sports betting battles, and insider trading policies.
+
+### What Didn't Work
+
+1. **Low deduplication rate.** Only 20 duplicates removed (346→326, 5.8%). This is surprisingly low — most sources covered different facets of Kalshi rather than repeating the same facts. This means multi-source confidence is rare: only 11 claims (3.4%) appeared in 2+ sources. The Jaccard threshold may need tuning, or semantic similarity (embedding-based) would catch more cross-source duplicates.
+2. **3 editorial sections skipped.** "Company History and Founding," "Leadership and Organization," and "AI Safety Markets" received 0 claims after topic routing. The founding topic had 15 claims but they were all assigned to Overview. Topic→section routing needs better mapping or multi-section eligibility.
+3. **Competitive Landscape is thin.** Only 2 claims → generated filler prose. Sections below a minimum claim count (e.g., 5) should be merged into adjacent sections or dropped.
+4. **Community section has LLM padding.** When claim density is low, the composer generates hedge-heavy filler paragraphs. Need a minimum claim-per-paragraph threshold.
+5. **No cross-validation.** Unlike wiki-first (which verified claims against sources), source-first takes each source at face value. If a source contains an error, it becomes a claim without challenge. Multi-source claims partially address this, but 96.6% of claims are single-source.
+
+### Key Insight: Two Approaches Complement Each Other
+
+| Approach | Strength | Weakness |
+|----------|----------|----------|
+| **Wiki-first** | Good editorial structure (inherits from human-written page), catches synthesized claims that oversimplify | Filtered through existing prose; misses details not in the wiki |
+| **Source-first** | More claims, inherent provenance, captures details the wiki missed | Thin editorial structure in areas with few sources; no cross-validation |
+
+The optimal pipeline likely combines both:
+1. **Source-first extraction** to build the raw claim store
+2. **Wiki-first extraction** to identify claims in the existing page that sources missed (editorial judgments, cross-entity connections, analytical claims)
+3. **Cross-validation** to check source-first claims against each other and flag conflicts
+4. **Composition** from the merged, validated claim store
+
+### Implications for Architecture
+
+- **Topic routing is a bottleneck.** The current approach assigns each claim one topic at extraction time, then maps topics to sections. This loses nuance — a claim about "Kalshi's CFTC license" could be founding, regulatory, or operations depending on context. Consider extracting claims without topics and letting the editorial step assign them to sections based on the full claim store.
+- **Minimum section thresholds matter.** Sections with \<5 claims produce padding. The composer needs a hard floor: merge thin sections or skip them.
+- **Multi-source confidence is the real prize.** The 11 multi-source claims are the most valuable — they're independently corroborated. Surfacing these prominently (bold, trust indicators, "confirmed by N sources") would be a significant UX improvement.
+- **Semantic deduplication needed.** Jaccard word overlap misses paraphrases. Embedding-based similarity would catch "Kalshi raised \$1B at \$11B valuation" and "The company's \$1 billion round valued Kalshi at eleven billion dollars" as duplicates.

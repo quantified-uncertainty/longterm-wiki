@@ -608,8 +608,11 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
             return (b.wordCount || 0) - (a.wordCount || 0);
           case "recentlyEdited":
             return (b.lastUpdated || "").localeCompare(a.lastUpdated || "");
-          case "recentlyCreated":
-            return (b.dateCreated || "").localeCompare(a.dateCreated || "");
+          case "recentlyCreated": {
+            const aNum = parseInt(a.numericId?.replace(/^E/, "") || "0", 10);
+            const bNum = parseInt(b.numericId?.replace(/^E/, "") || "0", 10);
+            return bNum - aNum;
+          }
           case "relevance": {
             const scoreA = (a.readerImportance || 0) * 2 + (a.quality || 0);
             const scoreB = (b.readerImportance || 0) * 2 + (b.quality || 0);

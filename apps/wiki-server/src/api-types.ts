@@ -169,6 +169,22 @@ export interface CitationQuotesResult {
   total: number;
 }
 
+// -- Citation Health: per-page summary ----------------------------------------
+
+export interface CitationHealthResult {
+  pageId: string;
+  total: number;
+  withQuotes: number;
+  verified: number;
+  accuracyChecked: number;
+  accurate: number;
+  inaccurate: number;
+  unsupported: number;
+  minorIssues: number;
+  notVerifiable: number;
+  avgScore: number | null;
+}
+
 // ---------------------------------------------------------------------------
 // Citation Accuracy
 // ---------------------------------------------------------------------------
@@ -181,6 +197,9 @@ export const AccuracyVerdictSchema = z.enum([
   "not_verifiable",
 ]);
 export type AccuracyVerdict = z.infer<typeof AccuracyVerdictSchema>;
+
+/** Runtime-accessible array of valid verdict values — use for iteration/aggregation. */
+export const ACCURACY_VERDICTS = AccuracyVerdictSchema.options;
 
 export const MarkAccuracySchema = z.object({
   pageId: PageIdSchema,
@@ -278,6 +297,7 @@ export const CITATION_CONTENT_FULL_TEXT_MAX = 5 * 1024 * 1024;
 
 export const UpsertCitationContentSchema = z.object({
   url: z.string().min(1).max(2000),
+  resourceId: z.string().max(200).nullable().optional(),
   fetchedAt: z.string().datetime(),
   httpStatus: z.number().int().nullable().optional(),
   contentType: z.string().max(200).nullable().optional(),
@@ -293,6 +313,7 @@ export type UpsertCitationContent = z.infer<typeof UpsertCitationContentSchema>;
 
 export interface CitationContentRow {
   url: string;
+  resourceId: string | null;
   fetchedAt: string;
   httpStatus: number | null;
   contentType: string | null;
@@ -627,15 +648,54 @@ export interface UpsertSummaryBatchResult {
 // Claims
 // ---------------------------------------------------------------------------
 
+/**
+ * Claim category taxonomy — high-level grouping for how a claim should be
+ * treated, verified, and displayed.
+ */
+export const ClaimCategorySchema = z.enum([
+  "factual", // Verifiable against sources (dates, events, numbers)
+  "opinion", // Subjective evaluations, value judgments
+  "analytical", // Wiki's own inferences drawn from evidence
+  "speculative", // Uncertain projections, predictions
+  "relational", // Cross-entity comparisons or relationships
+]);
+export type ClaimCategory = z.infer<typeof ClaimCategorySchema>;
+
+/**
+ * Claim type — granular classification matching the claim-first architecture
+ * taxonomy (E892). These map to different verification strategies.
+ */
+export const ClaimTypeSchema = z.enum([
+  // Core types (existing)
+  "factual", // Verifiable against a single source
+  "evaluative", // Subjective assessments or judgments
+  "causal", // Cause-effect assertions
+  "historical", // Historical events with dates
+  // Extended types (from claim-first architecture)
+  "numeric", // Numeric values that should link to fact system
+  "consensus", // Claims requiring multiple source agreement
+  "speculative", // Explicit predictions or uncertain projections
+  "relational", // Cross-entity comparisons
+]);
+export type ClaimType = z.infer<typeof ClaimTypeSchema>;
+
 export const InsertClaimSchema = z.object({
   entityId: z.string().min(1).max(300),
   entityType: z.string().min(1).max(100),
   claimType: z.string().min(1).max(100),
   claimText: z.string().min(1).max(10000),
+  // Legacy fields — kept for backward compat
   value: z.string().max(1000).nullable().optional(),
   unit: z.string().max(100).nullable().optional(),
   confidence: z.string().max(100).nullable().optional(),
   sourceQuote: z.string().max(10000).nullable().optional(),
+  // Enhanced fields
+  claimCategory: ClaimCategorySchema.nullable().optional(),
+  relatedEntities: z.array(z.string().max(300)).nullable().optional(),
+  factId: z.string().max(300).nullable().optional(),
+  resourceIds: z.array(z.string().max(300)).nullable().optional(),
+  section: z.string().max(1000).nullable().optional(),
+  footnoteRefs: z.string().max(500).nullable().optional(),
 });
 export type InsertClaim = z.infer<typeof InsertClaimSchema>;
 
@@ -659,6 +719,13 @@ export interface ClaimRow {
   unit: string | null;
   confidence: string | null;
   sourceQuote: string | null;
+  // Enhanced fields
+  claimCategory: string | null;
+  relatedEntities: string[] | null;
+  factId: string | null;
+  resourceIds: string[] | null;
+  section: string | null;
+  footnoteRefs: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -798,11 +865,26 @@ export interface BacklinksResult {
 // Resources
 // ---------------------------------------------------------------------------
 
+/** Canonical resource types — mirrors data/schema.ts ResourceType. */
+export const ResourceTypeSchema = z.enum([
+  "paper",
+  "blog",
+  "report",
+  "book",
+  "talk",
+  "podcast",
+  "government",
+  "reference",
+  "web",
+]);
+export type ResourceType = z.infer<typeof ResourceTypeSchema>;
+export const RESOURCE_TYPES = ResourceTypeSchema.options;
+
 export const UpsertResourceSchema = z.object({
   id: z.string().min(1).max(200),
   url: z.string().url().max(2000),
   title: z.string().max(1000).nullable().optional(),
-  type: z.string().max(50).nullable().optional(),
+  type: ResourceTypeSchema.nullable().optional(),
   summary: z.string().max(50000).nullable().optional(),
   review: z.string().max(50000).nullable().optional(),
   abstract: z.string().max(50000).nullable().optional(),
@@ -828,6 +910,53 @@ export const UpsertResourceBatchSchema = z.object({
 export interface UpsertResourceResult {
   id: string;
   url: string;
+}
+
+export interface ResourceRow {
+  id: string;
+  url: string;
+  title: string | null;
+  type: string | null;
+  summary: string | null;
+  review: string | null;
+  abstract: string | null;
+  keyPoints: string[] | null;
+  publicationId: string | null;
+  authors: string[] | null;
+  publishedDate: string | null;
+  tags: string[] | null;
+  localFilename: string | null;
+  credibilityOverride: number | null;
+  fetchedAt: string | null;
+  contentHash: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ResourceStatsResult {
+  totalResources: number;
+  totalCitations: number;
+  citedPages: number;
+  byType: Record<string, number>;
+  /** Resources that exist in the DB but have zero citation links. */
+  orphanedCount: number;
+  /** Resources with a summary, review, or key_points filled in. */
+  withMetadata: number;
+  /** Resources that have been fetched (fetchedAt is set). */
+  fetched: number;
+}
+
+export interface ResourceSearchResult {
+  results: ResourceRow[];
+  count: number;
+  query: string;
+}
+
+export interface ResourceListResult {
+  resources: ResourceRow[];
+  total: number;
+  limit: number;
+  offset: number;
 }
 
 // ---------------------------------------------------------------------------

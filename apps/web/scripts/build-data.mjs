@@ -850,7 +850,6 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps) {
           // Derive creation date from git first-commit; fall back to frontmatter for legacy pages.
           dateCreated: gitCreatedMap.get(relative(REPO_ROOT, fullPath)) || toDateString(fm.createdAt) || toDateString(fm.dateCreated) || null,
           llmSummary: fm.llmSummary || null,
-          structuredSummary: fm.structuredSummary || null,
           description: fm.description || null,
           // Extract ratings for model pages
           ratings: fm.ratings || null,
@@ -1841,7 +1840,6 @@ async function main() {
       wordCount: page.metrics?.wordCount ?? page.wordCount ?? 0,
       contentFormat: page.contentFormat || 'article',
       llmSummary: page.llmSummary,
-      structuredSummary: page.structuredSummary,
       updateFrequency: page.updateFrequency,
       hasEntity: entityMap.has(page.id),
       changeHistoryCount: page.changeHistory?.length ?? 0,

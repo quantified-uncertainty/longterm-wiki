@@ -647,7 +647,7 @@ function buildIssueBody(opts: {
  * Create a new GitHub issue.
  */
 async function create(args: string[], options: CommandOptions): Promise<CommandResult> {
-  const log = createLogger(options.ci);
+const log = createLogger(options.ci);
   const c = log.colors;
 
   const title = args[0];
@@ -667,8 +667,8 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   let bodyFromFile: string | undefined;
   let problemFromFile: string | undefined;
   try {
-    bodyFromFile = readFileFlag((options.bodyFile ?? options['body-file']) as string | undefined) ?? undefined;
-    problemFromFile = readFileFlag((options.problemFile ?? options['problem-file']) as string | undefined) ?? undefined;
+    bodyFromFile = readFileFlag((options['body-file'] ?? options.bodyFile) as string | undefined) ?? undefined;
+    problemFromFile = readFileFlag((options['problem-file'] ?? options.problemFile) as string | undefined) ?? undefined;
   } catch (e: unknown) {
     return { output: `${c.red}${(e as Error).message}${c.reset}\n`, exitCode: 1 };
   }
@@ -1157,7 +1157,7 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
 
   const issueNum = parseRequiredInt(args[0]);
   if (!issueNum) {
-    return {
+return {
       output: `${c.red}Usage: crux issues update-body <issue-number> [--body-file=path] [--model=haiku|sonnet|opus] [--problem="..."] [--fix="..."] [--depends=N,M] [--criteria="item1|item2"] [--cost="~$2-4"]${c.reset}\n`,
       exitCode: 1,
     };
@@ -1177,8 +1177,8 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
   let bodyFromFile: string | undefined;
   let problemFromFile: string | undefined;
   try {
-    bodyFromFile = readFileFlag((options.bodyFile ?? options['body-file']) as string | undefined) ?? undefined;
-    problemFromFile = readFileFlag((options.problemFile ?? options['problem-file']) as string | undefined) ?? undefined;
+    bodyFromFile = readFileFlag((options['body-file'] ?? options.bodyFile) as string | undefined) ?? undefined;
+    problemFromFile = readFileFlag((options['problem-file'] ?? options.problemFile) as string | undefined) ?? undefined;
   } catch (e: unknown) {
     return { output: `${c.red}${(e as Error).message}${c.reset}\n`, exitCode: 1 };
   }
