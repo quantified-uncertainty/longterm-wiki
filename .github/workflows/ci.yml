@@ -175,6 +175,9 @@ jobs:
       - name: .returning() guard check (blocking)
         run: npx tsx crux/validate/validate-returning-guard.ts
 
+      - name: Drizzle migration journal integrity (blocking)
+        run: npx tsx crux/validate/validate-drizzle-journal.ts
+
       - name: Auto-update orchestrator smoke test (dry-run)
         # Verifies the orchestrator pipeline doesn't crash — specifically guards
         # against missing mkdirSync before writeFileSync in saveRunDetails / saveRunReport.
