@@ -466,6 +466,119 @@ The roadmap has explicit checkpoints where we might change direction:
 
 ---
 
+## Resource Transparency: Making Sources Trustworthy
+
+Claims are only as trustworthy as their sources. The current resource system stores content but is opaque about *what we actually have* and *how reliable it is*. Before scaling claims, we need readers to be able to evaluate provenance themselves.
+
+### Current Gaps
+
+| What readers should know | Current state | Gap |
+|---|---|---|
+| **When was this source fetched?** | `citation_content.fetchedAt` exists but isn't shown prominently | Readers can't see if content was fetched yesterday or 6 months ago |
+| **Did we get the full document or a summary?** | `fullText` vs `fullTextPreview` distinction exists internally | No UI indicator of content completeness |
+| **Is this source still available?** | `httpStatus` tracked in citation_content cache | No persistent availability flag on the resource itself; dead links aren't surfaced |
+| **Is there an archive link?** | Not tracked at all | No Wayback Machine / archive.org fallback URLs |
+| **Is this behind a paywall?** | Paywall detection exists in source-fetcher | Not persisted as a resource-level field; detection is transient |
+| **What type of content did we extract?** | `contentType` in citation_content (HTML/PDF/transcript) | Not shown to readers; not persisted on the resource |
+| **How much of the document do we have?** | `contentLength` tracked | Not exposed; readers can't tell if we have 500 chars or 50,000 |
+
+### Proposed Resource Transparency Fields
+
+Add to the `resources` table (and eventually surface in UI):
+
+```
+availability_status:  'available' | 'paywall' | 'dead' | 'restricted' | 'unknown'
+  — Persistent status, updated on each fetch attempt.
+  — "restricted" for content that exists but can't be freely accessed
+    (login required, institutional access, etc.)
+
+content_coverage:     'full_text' | 'abstract_only' | 'summary_only' | 'metadata_only' | 'none'
+  — What we actually have cached. "full_text" means we have the complete
+    document. "abstract_only" means we have the abstract but couldn't
+    access the full paper. "metadata_only" means title + URL but no content.
+
+archive_url:          text (nullable)
+  — Wayback Machine, archive.org, or archive.today URL.
+  — Populated automatically when availability_status changes to 'dead'.
+
+archive_fetched_at:   timestamp (nullable)
+  — When we last verified the archive link works.
+
+last_verified_at:     timestamp (nullable)
+  — When we last confirmed the original URL is accessible.
+  — Distinct from fetched_at (which is when we last pulled content).
+  — Allows "content fetched 3 months ago, last verified alive yesterday."
+
+content_extraction_method: 'firecrawl' | 'builtin_html' | 'pdf_parse' | 'youtube_transcript' | 'manual'
+  — How the content was extracted. Matters for trust: Firecrawl produces
+    cleaner markdown than the built-in parser; PDF extraction is lossy.
+
+publicly_accessible:  boolean (default true)
+  — Whether the resource is freely available on the open web.
+  — False for: paywalled papers, login-required content, private repos,
+    subscription newsletters. These still exist as resources (we may have
+    obtained content through legitimate access) but readers should know
+    they can't independently verify the content.
+```
+
+### How This Surfaces in the UI
+
+**On the `/source/[id]` page:**
+- Show a clear "Source Status" section at the top:
+  - Green: "Full text available, last verified Feb 2026" + link to view cached content
+  - Amber: "Abstract only — full paper behind paywall" + archive link if available
+  - Red: "Source unavailable (404 since Jan 2026)" + archive link
+- Show content coverage badge: "Full Text" / "Abstract Only" / "Metadata Only"
+- Show extraction method: "Extracted via Firecrawl" / "PDF text extraction" / etc.
+
+**On the `<R>` / `<ResourceLink>` tooltip:**
+- Add a small indicator: green dot (full text available), amber dot (partial), red dot (unavailable)
+- Show "Last verified: Feb 2026" or "Not verified since Dec 2025"
+
+**On claims that cite this resource:**
+- If the source is dead and has no archive: flag the claim's confidence as degraded
+- If the source is paywalled: show "Source not freely accessible" so readers know they can't independently check
+
+### Integration with Claims
+
+Resource transparency directly affects claim verification:
+
+1. **Claims from dead sources** — When `availability_status` changes to `dead`, claims citing only that source should be flagged for re-verification or alternative sourcing. A claim whose only source has 404'd is weaker than one with live sources.
+
+2. **Claims from paywalled sources** — The wiki may have legitimately accessed the content, but readers can't verify. These claims should display `publicly_accessible: false` so the epistemic status is transparent. This isn't a reason to remove the claim — but it's information readers deserve.
+
+3. **Content staleness** — If a resource's content was fetched 6+ months ago, and the claim is about something volatile (e.g., funding amount, team size), the verification may be stale. `last_verified_at` enables staleness detection.
+
+4. **Archive as backup verification** — When a source dies, the archive link lets both the system and readers re-verify claims. Auto-populate archive URLs for all resources as a background task.
+
+### Implementation Approach
+
+This can be done incrementally alongside the claims sprints:
+
+**Quick wins (can do immediately):**
+- Add `availability_status`, `content_coverage`, `publicly_accessible` columns to resources table
+- Populate from existing `citation_content` data (one-time backfill migration)
+- Surface in `/source/[id]` page UI
+
+**Medium-term (during Sprint 3):**
+- Auto-detect archive.org URLs for dead resources
+- Show content status in `<R>` tooltip
+- Flag claims with degraded source status
+
+**Longer-term:**
+- Periodic re-verification of resource URLs (weekly cron)
+- Auto-submit dead URLs to Wayback Machine
+- Track content changes over time (contentHash diffing)
+
+### Red team
+
+- *"This is a lot of new fields for marginal value."* The fields are cheap (one migration, one backfill script). The value compounds: every claim in the system becomes more trustworthy when readers can evaluate its sources. The alternative — claims citing opaque sources — undermines the whole reasoning transparency goal.
+- *"Paywall detection is imperfect."* True. The current heuristic (short content + paywall keywords) has false positives. But `publicly_accessible` is a manually-settable flag that can be corrected, not just auto-detected.
+- *"Archive links go stale too."* Yes, but much more slowly than original URLs. And the Wayback Machine is the most durable web archive available. Checking archive links annually is sufficient.
+- *"Readers won't actually check sources."* Some will. And the presence of verifiable, transparent sourcing creates trust even for readers who don't click through. "This claim has 3 live, full-text sources" is meaningful even if the reader doesn't read them.
+
+---
+
 ## What This Roadmap Doesn't Cover
 
 This is deliberately scoped to the experimentation needed before a bulk run. It does NOT cover:
