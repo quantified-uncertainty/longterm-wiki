@@ -23,7 +23,7 @@ const SCRIPTS = {
   verify: {
     script: 'claims/verify.ts',
     description: 'Verify extracted claims against citation_content full text',
-    passthrough: ['dry-run', 'model'],
+    passthrough: ['dry-run', 'model', 'fetch'],
     positional: true,
   },
   status: {
