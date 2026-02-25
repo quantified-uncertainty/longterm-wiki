@@ -5,6 +5,7 @@ description: "Cross-cutting writing standards that apply to all content types. C
 sidebar:
   order: 9
 entityType: internal
+subcategory: style-guides
 quality: 0
 readerImportance: 73.5
 researchImportance: 71

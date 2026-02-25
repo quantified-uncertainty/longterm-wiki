@@ -4,8 +4,6 @@
  *
  * Used by internal dashboard pages that display data from either
  * the wiki-server PostgreSQL database or local files.
- *
- * Also provides a typed Hono RPC client for the facts API (pilot module).
  */
 
 export type DataSource = "api" | "local";

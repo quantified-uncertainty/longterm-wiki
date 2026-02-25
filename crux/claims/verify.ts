@@ -19,7 +19,7 @@
 import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
+import { callOpenRouter, stripCodeFences, parseJsonWithRepair, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
   getClaimsByEntity,
@@ -109,12 +109,12 @@ async function verifyClaim(
   try {
     const raw = await callOpenRouter(VERIFY_SYSTEM_PROMPT, userPrompt, {
       model: opts.model ?? DEFAULT_CITATION_MODEL,
-      maxTokens: 400,
+      maxTokens: 800,
       title: 'LongtermWiki Claim Verification',
     });
 
     const json = stripCodeFences(raw);
-    const parsed = JSON.parse(json) as { verdict?: string; relevantQuote?: string; explanation?: string };
+    const parsed = parseJsonWithRepair<{ verdict?: string; relevantQuote?: string; explanation?: string }>(json);
     const verdict = parsed.verdict === 'verified' ? 'verified' : 'unsupported';
 
     return {
@@ -162,11 +162,18 @@ async function main() {
     process.exit(1);
   }
 
-  const claims = claimsResult.data.claims;
+  // Only verify primary claims (entityId matches). The API also returns
+  // secondary claims via relatedEntities — skip those to avoid re-inserting
+  // them as primary claims and doubling the count each cycle.
+  const claims = claimsResult.data.claims.filter(cl => cl.entityId === pageId);
   if (claims.length === 0) {
     console.log(`${c.yellow}No claims found for ${pageId}. Run extract first.${c.reset}`);
     console.log(`  pnpm crux claims extract ${pageId}`);
     process.exit(0);
+  }
+  const skippedSecondary = claimsResult.data.claims.length - claims.length;
+  if (skippedSecondary > 0) {
+    console.log(`  ${c.dim}Skipping ${skippedSecondary} secondary claims (from relatedEntities)${c.reset}`);
   }
 
   console.log(`\n${c.bold}${c.blue}Claims Verify: ${pageId}${c.reset}\n`);
@@ -192,18 +199,26 @@ async function main() {
   let noSource = 0;
 
   for (const claim of claims) {
-    const footnoteRefs = (claim.footnoteRefs ?? claim.unit) ? (claim.footnoteRefs ?? claim.unit)!.split(',').map(s => s.trim()) : [];
+    const footnoteRefs = claim.footnoteRefs ? claim.footnoteRefs.split(',').map(s => s.trim()) : [];
 
-    // If no footnote refs, mark as unsourced
-    if (footnoteRefs.length === 0) {
+    // Resource-ingested claims: no footnoteRefs but have resourceIds.
+    // Resolve source text via resource URL instead.
+    const resourceIds: string[] = Array.isArray(claim.resourceIds)
+      ? claim.resourceIds
+      : (typeof claim.resourceIds === 'string' ? [claim.resourceIds] : []);
+
+    // If no footnote refs AND no resource IDs, mark as unsourced
+    if (footnoteRefs.length === 0 && resourceIds.length === 0) {
       unsourced++;
       updatedClaims.push({ ...claim, newConfidence: 'unsourced', newSourceQuote: '' });
       process.stdout.write(`  ${c.yellow}○${c.reset} [unsourced] ${claim.claimText.slice(0, 60)}...\n`);
       continue;
     }
 
-    // Find source text for the first available footnote ref using shared resolveSource()
+    // Find source text — try footnote refs first, then resource IDs
     let sourceText: string | null = null;
+
+    // Try footnote refs → URL → cached text
     for (const ref of footnoteRefs) {
       const url = footnoteUrlMap.get(ref);
       if (url) {
@@ -211,6 +226,20 @@ async function main() {
         if (source?.content && source.content.length >= MIN_SOURCE_CONTENT_LENGTH) {
           sourceText = source.content.slice(0, MAX_SOURCE_CHARS);
           break;
+        }
+      }
+    }
+
+    // If footnotes didn't yield text, try resource IDs → resource URL → cached text
+    if (!sourceText) {
+      for (const resId of resourceIds) {
+        const resource = getResourceById(resId);
+        if (resource?.url) {
+          const source = await resolveSource(resource.url, undefined, fetchMissing);
+          if (source?.content && source.content.length >= MIN_SOURCE_CONTENT_LENGTH) {
+            sourceText = source.content.slice(0, MAX_SOURCE_CHARS);
+            break;
+          }
         }
       }
     }
@@ -295,7 +324,15 @@ async function main() {
       factId: claim.factId ?? null,
       resourceIds: claim.resourceIds ?? null,
       section: claim.section ?? claim.value ?? null,
-      footnoteRefs: claim.footnoteRefs ?? claim.unit ?? null,
+      footnoteRefs: claim.footnoteRefs ?? null,
+      // Phase 2 fields — preserve from original claim
+      claimMode: claim.claimMode ?? null,
+      attributedTo: claim.attributedTo ?? null,
+      asOf: claim.asOf ?? null,
+      measure: claim.measure ?? null,
+      valueNumeric: claim.valueNumeric ?? null,
+      valueLow: claim.valueLow ?? null,
+      valueHigh: claim.valueHigh ?? null,
     }));
 
     const result = await insertClaimBatch(items);

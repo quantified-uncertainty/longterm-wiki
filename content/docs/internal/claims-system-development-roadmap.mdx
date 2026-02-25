@@ -1,0 +1,666 @@
+---
+numericId: E897
+title: "Claims System Development Roadmap"
+description: "Sprint-based experimentation and development plan for the claims system — focused on validating extraction quality, iterating on the claim taxonomy, testing resource ingestion, and building toward reliable bulk operation"
+sidebar:
+  order: 38
+quality: 55
+readerImportance: 85
+researchImportance: 70
+lastEdited: "2026-02-25"
+createdAt: 2026-02-25
+evergreen: false
+llmSummary: "Development roadmap for the claims system organized into experimentation sprints. Addresses the hard design problems: what a 'claim' actually is, extraction quality across page types, the endorsed/attributed distinction, resource-to-entity routing, deduplication, and when claims feed back into page improvement. Each sprint has concrete experiments, success criteria, and red-team failure modes. Designed to validate the system before committing ~$1,000 to bulk page refactoring."
+ratings:
+  novelty: 6
+  rigor: 7
+  actionability: 9
+  completeness: 7
+---
+
+## Goal
+
+We want to reach a point where we can confidently spend ≈\$1,000 running the claims + improve pipeline across many high-importance pages and get reliably good results. This document plans the experimentation needed to get there.
+
+The claims system is architecturally ambitious (see <EntityLink id="claims-architecture-decisions">Architecture Decisions (E896)</EntityLink> and <EntityLink id="claim-first-architecture">Claim-First Architecture (E892)</EntityLink>). The risk isn't that it can't be built — it's that we build it before understanding what "good" looks like. A \$1,000 run on a poorly-calibrated system produces 10,000 mediocre claims that pollute the wiki. A \$1,000 run on a well-calibrated system produces a genuinely useful structured knowledge layer.
+
+**This roadmap is experimentation-first.** Each sprint produces data that informs the next. We don't commit to scaling until the experiments prove the system works.
+
+---
+
+## Current State (as of Feb 2026)
+
+| Component | Status | Maturity |
+|---|---|---|
+| **Claim extraction from pages** | Working (Gemini Flash) | Moderate — 100% accuracy, 84% usefulness (Sprint 1 baseline) |
+| **Claim verification** | Working | Low — most claims permanently `unverified` |
+| **Schema (Phase 2)** | PR #1048 open | Adds `claim_mode`, `as_of`, numeric values, `claim_sources` join table |
+| **Resource ingestion (Phase 3)** | PR #1048 open | `ingest-resource` and `ingest-batch` commands built, untested at scale |
+| **Claims UI** | Working | Basic — explorer, per-entity view, per-page view |
+| **Synthesis (claims → page improvement)** | Not started | — |
+| **Deduplication** | Not started | — |
+| **Bulk orchestration** | Not started | — |
+
+**Pages with claims today:** \~5-10 pages, Kalshi is the exemplar (192 claims, 37 sources, inline verification).
+
+**Known quality issues:**
+- Extraction accuracy is 100% but usefulness drops on concept pages (69%) and person pages (78-86%)
+- The `endorsed` vs `attributed` distinction is untested at scale
+- Deduplication doesn't exist — same claim appears as separate records on multiple pages
+- Resource ingestion entity routing is untested
+- Claims are never consulted during page improvement
+
+---
+
+## The Hard Problems
+
+Before jumping to sprints, these are the design questions that need empirical answers. Each sprint is designed to produce data for one or more of these.
+
+### Problem 1: What is a "claim"?
+
+The system currently extracts a mix of very different things:
+
+| Type | Example | Verification | Shelf life |
+|---|---|---|---|
+| Atomic fact | "Anthropic was founded in 2021" | Trivially verifiable | Stable |
+| Quantitative assertion | "GPT-4 scores 86.4% on MMLU" | Verifiable with source | Changes with updates |
+| Qualitative judgment | "RLHF is the dominant alignment technique" | Debatable | Evolves gradually |
+| Attributed position | "Yann LeCun argues autoregressive LLMs are a dead end" | Verifiable (he said it) | Stable (he said it then) |
+| Prediction | "AI will reach human-level by 2030" | Unverifiable now | Has resolution date |
+
+These need different treatment. The current schema handles them with optional fields (`value_numeric`, `attributed_to`, `as_of`), but the extraction prompts, dedup logic, and display should probably diverge. **Sprint 1 will produce data on what the actual distribution looks like across page types.**
+
+### Problem 2: Extraction quality is the bottleneck
+
+Everything downstream depends on extraction quality. Bad claims can't be verified, can't be deduplicated, can't synthesize good prose. PR #1048 expands the extraction prompt to ask for `claimMode`, `attributedTo`, `asOf`, `measure`, `valueNumeric/Low/High` all in a single pass. More fields = more chances for the LLM to hallucinate or get confused.
+
+**Key question:** Is single-pass extraction with many fields better or worse than multi-pass (extract claims first, enrich with metadata in a second pass)?
+
+### Problem 3: The endorsed/attributed distinction may collapse in practice
+
+In theory: "endorsed" = the wiki asserts this. "Attributed" = we report that someone said this. In practice:
+
+- "Research suggests X" — endorsed or attributed?
+- "According to a 2024 study, X" — attributed, but the wiki chose to include it
+- "X is widely considered to be Y" — endorsed? Attributed to the community?
+
+If LLMs apply this inconsistently, the field becomes noise rather than signal. **Sprint 2 will test whether inter-rater agreement (human vs. LLM, LLM vs. LLM) is high enough to be useful.**
+
+### Problem 4: Resource → entity routing is unsolved
+
+Phase 3 (resource ingestion) requires routing claims from a resource to the right entity pages. A paper about "Scaling Laws" is relevant to 10+ entities. The PR uses LLM-based routing with relevance scoring (direct/contextual/background), but:
+
+- Bad routing puts claims on wrong pages — worse than no claims
+- Over-routing (spraying claims everywhere) creates noise
+- Under-routing (only the obvious entity) misses the point
+
+**Sprint 3 will test routing accuracy empirically before scaling.**
+
+### Problem 5: Deduplication is harder than it looks
+
+Extracting claims from a wiki page AND from the resources cited on that page produces massive overlap:
+- Page: "Anthropic raised \$7.3B in 2024"
+- Resource: "The company's 2024 funding round totaled \$7.3 billion"
+
+Cosine similarity is the obvious approach, but the threshold is a real design question. Too aggressive = losing distinct claims. Too loose = duplicate clutter. And semantic similarity doesn't handle temporal versioning: "Anthropic's valuation is \$61B" and "Anthropic's valuation is \$380B" are similar text but completely different claims.
+
+**Sprint 4 will measure actual overlap rates and test dedup strategies.**
+
+### Problem 6: When do claims feed back into page improvement?
+
+The highest-value outcome is: claims store → better wiki pages. But `crux content improve` currently ignores the claims store entirely. The integration could be:
+
+- **Pre-check:** "These 12 claims from resources aren't mentioned on your page yet"
+- **Fact injection:** Include stored claims in the improve prompt as verified context
+- **Contradiction detection:** Flag page statements that conflict with verified claims
+- **Gap analysis:** "Your page covers domain X but has no claims about domain Y"
+
+**Sprint 5 will prototype the simplest integration and test whether it improves output quality.**
+
+---
+
+## Sprint Plan
+
+### Sprint 0: Merge PR #1048 with Fixes
+
+**Duration:** 1 session. **Cost:** ≈\$0.
+
+**Goal:** Land the Phase 2 schema and Phase 3 resource ingestion infrastructure so subsequent sprints can use them.
+
+**Tasks:**
+1. Fix the `--force` bug in `ingest-resource.ts` — currently clears ALL entity claims, should only clear claims with `section = "Resource: <resource.id>"`
+2. Switch `real` → `double precision` for `value_numeric`, `value_low`, `value_high` columns (4-byte float only has \~7 digits of precision; insufficient for values like 7,300,000,000)
+3. Add `NOT NULL DEFAULT 'endorsed'` constraint on `claim_mode`
+4. Get CI green
+5. Merge
+
+**Red team:** The temptation is to "just merge it, fix later." Don't. The `--force` bug is data-destructive and the numeric precision issue will silently corrupt data. These must be fixed before any claims are inserted with the new schema.
+
+---
+
+### Sprint 1: Extraction Quality Baseline
+
+**Duration:** 1-2 sessions. **Cost:** ≈\$20-30.
+
+**Goal:** Establish ground truth on extraction quality across page types. This is the most important sprint — everything else is predicated on extraction being good enough.
+
+**Experiment design:**
+
+Select 10 pages spanning the entity type spectrum:
+
+| Page Type | Candidates | Why |
+|---|---|---|
+| Commercial org | Kalshi (existing gold standard), Anthropic | Dense factual, numeric, ideal case |
+| Research org | MIRI, Redwood Research | Mix of factual + evaluative |
+| Person (prominent) | Dario Amodei, Stuart Russell | Biographical + attributed positions |
+| Person (researcher) | Neel Nanda, Paul Christiano | Research contributions + stated views |
+| Concept | RLHF, Interpretability | Definitional + evaluative, least factual |
+
+For each page:
+1. Run `crux claims extract <page-id>` with current pipeline
+2. Export all claims to a spreadsheet
+3. Manually label every claim:
+   - **Accurate?** Does the claim faithfully represent what the source says?
+   - **Useful?** Would a reader find this claim valuable?
+   - **Atomic?** Is this one assertion or several bundled together?
+   - **Correct type?** Is the `claimType` classification right?
+   - **Correct mode?** (For Phase 2 fields) Is `endorsed`/`attributed` right?
+
+**Success criteria:**
+- Accuracy >85% across all page types
+- Usefulness >60% across all page types
+- If person pages or concept pages fall below 50% usefulness, document the failure patterns
+
+**What to capture:**
+- Per-page-type accuracy and usefulness rates
+- The 10 most common failure patterns (vague claims, hallucinated facts, wrong atomicity, wrong type, etc.)
+- Which claim types are reliably extracted vs. unreliable
+- Whether person/concept pages need different extraction prompts
+
+**Red team of this sprint:**
+- *"Manual labeling is subjective."* True, but we need the calibration data. Have two people label a subset independently to measure inter-rater agreement. If agreement is \<70%, the labeling criteria are too vague.
+- *"10 pages isn't enough."* It's enough to identify systematic failure patterns. If extraction fails on 3/3 person pages, that's a clear signal. Statistical precision can come later.
+- *"This delays building things."* That's the point. Building on top of bad extraction wastes more time than measuring first.
+
+---
+
+### Sprint 1 Results (Feb 25, 2026)
+
+**Extraction was run on all 10 test pages, producing 1,665 total claims:**
+
+| Page | Type | Claims Extracted |
+|---|---|---|
+| Kalshi | commercial-org | 200 |
+| Anthropic | major-org | 227 |
+| MIRI | research-org | 121 |
+| Redwood Research | research-org | 95 |
+| Dario Amodei | person-prominent | 171 |
+| Stuart Russell | person-academic | 248 |
+| Neel Nanda | person-researcher | 62 |
+| Paul Christiano | person-researcher | 103 |
+| RLHF | concept | 233 |
+| Interpretability | concept | 205 |
+
+**Extraction failures:** 10 sections across all pages failed with JSON parse errors from Gemini Flash (bad escaped characters, unterminated strings). This represents a ~3% section failure rate.
+
+**Evaluation:** 77 claims were evaluated by Claude Sonnet across 5 dimensions (sample from dry-run output; the full extraction produces ~10-15x more claims per page).
+
+| Page Type | N | Accurate | Useful | Correct Type | Atomic | Well-Scoped |
+|---|---|---|---|---|---|---|
+| commercial-org | 8 | 100% | 88% | 100% | 88% | 100% |
+| major-org | 4 | 100% | 100% | 100% | 100% | 100% |
+| research-org | 16 | 100% | 94% | 100% | 100% | 100% |
+| person-prominent | 9 | 100% | 78% | 100% | 100% | 89% |
+| person-academic | 7 | 100% | 86% | 100% | 100% | 100% |
+| person-researcher | 20 | 100% | 85% | 100% | 100% | 100% |
+| concept | 13 | 100% | 69% | 100% | 100% | 92% |
+| **OVERALL** | **77** | **100%** | **84%** | **100%** | **99%** | **97%** |
+
+**By broad category:**
+
+| Category | N | Accurate | Useful | Correct Type | Atomic | Well-Scoped |
+|---|---|---|---|---|---|---|
+| Organizations | 28 | 100% | 93% | 100% | 96% | 100% |
+| People | 36 | 100% | 83% | 100% | 100% | 97% |
+| Concepts | 13 | 100% | 69% | 100% | 100% | 92% |
+
+**Key findings:**
+
+1. **Accuracy is excellent** — 100% across all page types (all claims at least partially accurate). This exceeds the >85% target.
+2. **Usefulness is the primary quality issue** — 84% overall, but drops to 69% on concept pages. The 12 "not useful" claims fall into clear patterns:
+   - **Redundant claims** (same fact stated twice in slightly different ways): 3 instances
+   - **Trivially obvious statements** ("X is a regulated prediction market exchange" on the X page): 3 instances
+   - **Vague/qualitative claims** ("Research investment is high", "Model coverage is low"): 4 instances
+   - **Truncated claims** that lost meaning from text cutoff: 2 instances
+
+3. **Type classification is perfect** — 100% correct type across all 77 claims.
+4. **Atomicity is near-perfect** — Only 1 claim flagged as too-broad (bundling multiple market categories).
+5. **Well-scoped at 97%** — 2 overscoped claims: one vaguely stated "high probability" when the page gave a specific 10-25% figure, and one where the page itself had inconsistent numbers.
+
+**Failure pattern: Concept pages produce the lowest-value claims.** The extraction prompt asks for factual assertions, but concept pages are more definitional and evaluative. Vague claims like "Research investment is high" are technically accurate but add no value. This confirms the hypothesis that concept pages may need different extraction prompts (Sprint 2B).
+
+**Failure pattern: Person pages produce redundant claims.** When a person's risk estimate appears in multiple sections, it gets extracted multiple times. Dedup or section-aware extraction would help.
+
+**Critical finding: Source linking is broken.** All 200+ Kalshi claims in the live database show `sourceQuote: null` and `confidence: "unverified"`. The extraction pipeline captures `footnoteRefs` (reference numbers like "74") but never resolves them to actual URLs or quotes. The verification pipeline (`crux claims verify`) exists but was never run. This means the live claims UI shows every claim as "unverified" with no source evidence — undermining trust despite high extraction quality.
+
+**Implications for Sprint 2:**
+- Accuracy is not the bottleneck — usefulness is. Sprint 2 should focus on filtering low-value claims rather than improving accuracy.
+- Concept pages need specialized treatment. Consider either specialized prompts (2B) or focused extraction ("extract the 5-10 most important claims per section" variant from 2D).
+- The source linking gap should be addressed before scaling — claims without sources look untrustworthy regardless of actual quality.
+- JSON parse failures (~3%) are a minor but real issue. Consider adding retry-with-repair for malformed JSON.
+
+---
+
+### Sprint 2: Extraction Prompt Iteration
+
+**Duration:** 2-3 sessions. **Cost:** ≈\$30-50.
+
+**Goal:** Improve extraction quality based on Sprint 1 findings. Test specific hypotheses about what makes extraction better.
+
+**Experiments (run all on the same 10 pages from Sprint 1 for comparison):**
+
+**Experiment 2A: Single-pass vs. two-pass extraction**
+- Current: One LLM call extracts claims + all metadata (type, mode, numeric values, etc.)
+- Alternative: First pass extracts just claim text + section. Second pass enriches with metadata.
+- Hypothesis: Two-pass will have higher metadata accuracy because the LLM focuses on one task at a time
+- Measure: Compare metadata accuracy (type, mode, numeric values) between approaches
+- Cost trade-off: Two-pass costs \~2x per page. Worth it only if metadata accuracy improves >15%
+
+**Experiment 2B: Page-type-specific prompts**
+- Current: One extraction prompt for all page types
+- Alternative: Different prompts for person pages (focus on biographical facts, stated positions, research contributions), org pages (focus on financial, personnel, strategic), concept pages (focus on definitions, evidence, consensus)
+- Hypothesis: Specialized prompts will improve usefulness by >20% on non-factual page types
+- Measure: Compare usefulness rates per page type
+
+**Experiment 2C: Model comparison**
+- Run extraction with: Gemini Flash (current), Claude Haiku, Claude Sonnet
+- Hypothesis: Sonnet will produce higher quality but at 10-20x cost. Haiku may match Flash.
+- Measure: Accuracy and usefulness per model, cost per page
+- Decision: Is the quality improvement worth the cost for bulk extraction?
+
+**Experiment 2D: Granularity instructions**
+- Test three prompt variants: "extract all verifiable assertions", "focus on quantitative and factual claims", "extract 5-10 of the most important claims per section"
+- Hypothesis: Focused extraction ("most important") will have higher usefulness rate but miss coverage
+- Measure: Usefulness rate, total claim count, coverage (what fraction of important page facts are captured?)
+
+**Success criteria:**
+- At least one variant improves usefulness on person/concept pages to >60%
+- Best variant maintains >85% accuracy
+- Clear recommendation on: single vs. two-pass, specialized prompts, model choice, granularity
+
+**Red team of this sprint:**
+- *"A/B testing on 10 pages can overfit."* True. The goal isn't statistical significance — it's identifying which levers matter most. The top variant gets a broader validation in Sprint 5.
+- *"Two-pass doubles cost."* Yes, and if it doubles quality, it's worth it. If it only marginally helps, don't use it. The experiment answers this.
+- *"Specialized prompts means more maintenance."* Yes. Only adopt them if the quality difference is large enough to justify maintaining 3-4 prompt variants.
+
+---
+
+### Sprint 3: Resource Ingestion Experiment
+
+**Duration:** 2-3 sessions. **Cost:** ≈\$30-50.
+
+**Depends on:** Sprint 0 (PR #1048 merged).
+
+**Goal:** Test whether Phase 3 resource ingestion produces valuable claims, and whether entity routing works.
+
+**Experiment design:**
+
+Select 5 resources of different types:
+
+| Resource Type | Example | Expected Challenge |
+|---|---|---|
+| Landmark paper | "Scaling Laws for Neural Language Models" | Relevant to many entities; routing is hard |
+| Org annual report / blog | Anthropic RSP update | Dense, factual, mostly one entity |
+| Long-form analysis | "AGI Ruin: A List of Lethalities" | Evaluative claims, many entities |
+| News article | Major funding round coverage | Short, factual, well-sourced |
+| Interview / podcast transcript | A Dario Amodei or Stuart Russell interview | Mix of attributed positions and factual claims |
+
+For each resource:
+1. Run `crux claims ingest-resource <id>` in dry-run mode
+2. Evaluate entity routing: For each claim, is the routed entity correct?
+3. Evaluate claim quality (same rubric as Sprint 1)
+4. Run on a page that already has page-extracted claims; measure overlap
+
+**Key measurements:**
+
+**Entity routing accuracy:**
+- Precision: What fraction of routed claims are on the right entity?
+- Recall: What fraction of entities that should get claims actually do?
+- Target: Precision >80%, Recall >60%
+
+**Overlap with page-extracted claims:**
+- For a page with existing claims, what fraction of resource-extracted claims are duplicates?
+- How many resource-extracted claims are genuinely new information?
+- Target: >30% of resource claims should be new (not already on the page)
+
+**Claim quality from resources vs. pages:**
+- Are resource-extracted claims higher or lower quality than page-extracted claims?
+- Hypothesis: Resource claims will be more factual and better-sourced, but less contextualized
+
+**Red team of this sprint:**
+- *"5 resources is tiny."* It's enough to find systematic routing failures. If the Scaling Laws paper routes claims to 15 entities and 8 are wrong, that's a clear signal.
+- *"Resource text quality varies wildly."* Yes — that's why we test different types. A well-structured paper is different from a conversational interview transcript.
+- *"Resource ingestion depends on having the resource text cached."* True. Some resources won't have cached text. Document which resource types work and which don't.
+- *"Entity routing might need the entity list as context."* The current implementation passes entity IDs to the LLM. Test whether passing entity descriptions improves routing.
+
+---
+
+### Sprint 4: Deduplication and Claim Taxonomy
+
+**Duration:** 2 sessions. **Cost:** ≈\$20-30.
+
+**Depends on:** Sprint 1 and Sprint 3 (need claims from both page extraction and resource ingestion).
+
+**Goal:** Determine the right deduplication strategy and refine the claim taxonomy based on empirical data.
+
+**Experiment 4A: Dedup strategy comparison**
+
+Using claims from Sprint 1 (page-extracted) and Sprint 3 (resource-extracted) for the same entities:
+
+1. Extract embeddings for all claims (OpenAI `text-embedding-3-small` or similar)
+2. Compute pairwise cosine similarity within each entity's claim set
+3. Manually label pairs as "same claim" or "different claim"
+4. Test dedup at thresholds: 0.85, 0.90, 0.92, 0.95
+5. Measure precision/recall at each threshold
+
+**Key question:** Is cosine similarity sufficient, or do we need LLM-based dedup?
+
+Test cases that break naive similarity:
+- Temporal versions: "Anthropic's valuation is \$61B" vs. "Anthropic's valuation is \$380B" (different claims, high text similarity)
+- Paraphrases: "Founded in 2021" vs. "Established in 2021" (same claim, moderate similarity)
+- Subset claims: "Neel Nanda studied at Cambridge" vs. "Neel Nanda studied Mathematics at Trinity College, Cambridge" (one subsumes the other)
+
+**Experiment 4B: Taxonomy validation**
+
+Using all claims from Sprints 1 and 3:
+1. Categorize by `claimType`: What's the actual distribution? (E896 proposed: factual, historical, causal, evaluative, predictive, normative, consensus)
+2. Are there natural clusters that don't fit the taxonomy?
+3. Is the taxonomy too fine-grained? (Do raters confuse `factual` vs. `historical`? `evaluative` vs. `consensus`?)
+4. Is the `domain` facet (financial, personnel, research, etc.) useful or unused?
+
+**Success criteria:**
+- Identify a dedup threshold that catches >80% of true duplicates with \<10% false positives
+- Determine whether cosine similarity alone works or LLM-based dedup is needed
+- Simplify the taxonomy if raters can't reliably distinguish categories (better to have 4 reliable types than 8 unreliable ones)
+
+**Red team of this sprint:**
+- *"Embedding-based dedup is expensive infrastructure."* Not really — it's a one-time embedding per claim (\<\$0.001 each) plus nearest-neighbor search. The question is whether it works well enough.
+- *"Temporal dedup is a fundamentally hard problem."* Yes. This sprint should determine whether it's hard enough to need a special solution (e.g., `as_of`-aware dedup) or whether the threshold approach handles it.
+- *"Simplifying the taxonomy loses information."* Only if the information was reliable. Unreliable categories are worse than fewer categories — they create false confidence.
+
+---
+
+### Sprint 5: Claims → Page Improvement Integration
+
+**Duration:** 2-3 sessions. **Cost:** ≈\$50-80.
+
+**Depends on:** Sprints 1-2 (calibrated extraction), Sprint 3 (resource claims available).
+
+**Goal:** Test the highest-value integration: does feeding stored claims into the page improvement pipeline produce better pages?
+
+**Experiment design:**
+
+Select 5 pages with both page-extracted claims AND resource-extracted claims:
+1. Run `crux content improve` on each page **without** claims context (baseline)
+2. Run `crux content improve` on each page **with** claims context injected into the prompt
+3. Blind evaluation: which version is better?
+
+**Claims context injection strategies (test all three):**
+
+**Strategy A: Fact sheet**
+- Include all verified claims for this entity as a "Known Facts" section in the improve prompt
+- Instruct the LLM to reference these facts and add any missing ones to the page
+
+**Strategy B: Gap analysis**
+- Compare stored claims against page content
+- Identify claims not mentioned on the page
+- Include only the gaps: "These verified facts about this entity are not on the page"
+
+**Strategy C: Contradiction check**
+- Compare stored claims against page content
+- Flag any page statements that contradict verified claims
+- Include contradictions in the prompt for resolution
+
+**Evaluation criteria:**
+- Factual accuracy: Does the improved page have fewer errors?
+- Coverage: Does the improved page cover more verified facts?
+- Prose quality: Is the writing better or worse with claims context?
+- Hallucination rate: Does claims context reduce hallucinated content?
+
+**Success criteria:**
+- Claims-informed improvement is preferred >60% of the time in blind evaluation
+- At least one strategy measurably reduces factual errors
+- Claims context doesn't degrade prose quality (the concern is that fact-injection makes writing feel listy)
+
+**Red team of this sprint:**
+- *"Blind evaluation with N=5 is underpowered."* True, but we're looking for a strong signal, not a marginal one. If claims integration is clearly better on 4/5 pages, that's enough to proceed.
+- *"Injecting too many claims will overwhelm the improve prompt."* Test with different claim counts: top 10 claims, top 30, all claims. There's probably a sweet spot.
+- *"This requires the improve pipeline to accept claims as input."* Yes — this sprint includes building that integration. It's a concrete deliverable, not just measurement.
+- *"What if claims integration helps factual pages but hurts conceptual pages?"* Good — that would tell us claims integration should be page-type-specific, not universal.
+
+---
+
+### Sprint 6: Scale Validation and Bulk Infrastructure
+
+**Duration:** 2-3 sessions. **Cost:** ≈\$100-150.
+
+**Depends on:** All previous sprints. This is the "go/no-go" sprint before committing \$1,000.
+
+**Goal:** Validate the calibrated system on a larger sample and build the batch infrastructure needed for bulk runs.
+
+**Part A: Broader validation (30 pages)**
+
+Using the best extraction config from Sprint 2 and the best improvement strategy from Sprint 5:
+1. Select 30 pages: 10 orgs, 10 people, 5 concepts, 5 other
+2. Run full pipeline: extract claims → verify → improve with claims context
+3. Spot-check 50% of outputs for quality
+4. Compute aggregate metrics: accuracy, usefulness, improvement quality
+
+**Part B: Batch infrastructure**
+1. Build `crux claims batch-extract --pages=<list> --budget=<N>`
+2. Build quality regression detection: compare pre/post quality scores, auto-reject improvements that decrease quality by >5 points
+3. Build `/internal/claims-bulk-run/` dashboard: pages processed, quality deltas, cost per page, failure rate
+4. Test with a \$100 pilot run
+
+**Part C: Go/no-go assessment**
+
+Answer these questions:
+1. Is extraction accuracy >85% at scale (not just on cherry-picked pages)?
+2. Is claims-informed improvement consistently better than baseline?
+3. Is the cost per page acceptable (\$5-10 for extract + verify + improve)?
+4. Is the failure rate low enough (\<10% of pages need manual intervention)?
+5. Do the batch controls (budget caps, quality regression, resume-on-failure) work?
+
+**If yes:** Proceed to \$1,000 bulk run.
+
+**If no:** Document what failed and plan another iteration cycle focused on the weakest component.
+
+**Red team of this sprint:**
+- *"30 pages still isn't representative of 700."* It's 4% of the wiki. If the system works well on 30 diverse pages, it will likely work on the rest. Edge cases can be handled as exceptions.
+- *"The \$100 pilot will eat into the \$1,000 budget."* The pilot IS part of the budget. Better to spend \$100 learning than \$1,000 failing.
+- *"Quality regression detection might reject good improvements."* Calibrate the threshold during the pilot. A -5 point threshold may need to be -3 or -10. The pilot data will tell us.
+
+---
+
+## Estimated Total Budget
+
+| Sprint | Sessions | Cost | Calendar |
+|---|---|---|---|
+| Sprint 0: Merge PR #1048 | 1 | ≈\$0 | Day 1 |
+| Sprint 1: Extraction Baseline | 1-2 | ≈\$20-30 | Days 2-3 |
+| Sprint 2: Prompt Iteration | 2-3 | ≈\$30-50 | Days 4-7 |
+| Sprint 3: Resource Ingestion | 2-3 | ≈\$30-50 | Days 5-8 (parallel with Sprint 2) |
+| Sprint 4: Dedup & Taxonomy | 2 | ≈\$20-30 | Days 9-10 |
+| Sprint 5: Claims → Improve | 2-3 | ≈\$50-80 | Days 11-14 |
+| Sprint 6: Scale Validation | 2-3 | ≈\$100-150 | Days 15-18 |
+| **Total pre-bulk** | **12-17 sessions** | **≈\$250-390** | **≈3-4 weeks** |
+| **Bulk run** | 3-5 | **≈\$600-750** | **Week 5** |
+| **Grand total** | **15-22 sessions** | **≈\$850-1,140** | **≈5 weeks** |
+
+---
+
+## Dependencies and Parallelism
+
+```
+Sprint 0 (merge PR) ──→ Sprint 1 (extraction baseline)
+                    ├──→ Sprint 3 (resource ingestion)    ──→ Sprint 4 (dedup)
+                    │                                          │
+Sprint 1 ──→ Sprint 2 (prompt iteration) ──────────────────────┤
+                                                               ↓
+                                                     Sprint 5 (claims → improve)
+                                                               ↓
+                                                     Sprint 6 (scale validation)
+                                                               ↓
+                                                     Bulk run ($1,000)
+```
+
+Sprints 2 and 3 can run in parallel — they test different things (extraction quality vs. resource ingestion). Sprint 4 needs data from both. Sprint 5 needs calibrated extraction from Sprint 2 and resource claims from Sprint 3.
+
+---
+
+## Decision Points and Off-Ramps
+
+The roadmap has explicit checkpoints where we might change direction:
+
+**After Sprint 1:** If extraction accuracy is \<70% across the board, the problem is more fundamental than prompt engineering. Consider: different extraction architecture (e.g., extracting claims from structured data rather than prose), different granularity (only extract quantitative claims), or different scope (only org/commercial pages, not person/concept).
+
+**After Sprint 2:** If no prompt variant improves person/concept page extraction to >50% usefulness, consider: claims system is only for factual entity pages, not the full wiki. This isn't failure — it's scoping to where the system adds value.
+
+**After Sprint 3:** If entity routing precision is \<60%, resource ingestion needs a different approach. Consider: only route to entities explicitly mentioned in the resource, not LLM-inferred ones. Or: require human confirmation of routing before insertion.
+
+**After Sprint 5:** If claims-informed improvement isn't clearly better than baseline, the synthesis integration needs more work. Consider: claims are useful as an audit/quality tool but not as an improvement input. The \$1,000 spend would then be on extraction + verification (building a quality signal), not on claims-informed page rewriting.
+
+---
+
+## Resource Transparency: Making Sources Trustworthy
+
+Claims are only as trustworthy as their sources. The current resource system stores content but is opaque about *what we actually have* and *how reliable it is*. Before scaling claims, we need readers to be able to evaluate provenance themselves.
+
+### Current Gaps
+
+| What readers should know | Current state | Gap |
+|---|---|---|
+| **When was this source fetched?** | `citation_content.fetchedAt` exists but isn't shown prominently | Readers can't see if content was fetched yesterday or 6 months ago |
+| **Did we get the full document or a summary?** | `fullText` vs `fullTextPreview` distinction exists internally | No UI indicator of content completeness |
+| **Is this source still available?** | `httpStatus` tracked in citation_content cache | No persistent availability flag on the resource itself; dead links aren't surfaced |
+| **Is there an archive link?** | Not tracked at all | No Wayback Machine / archive.org fallback URLs |
+| **Is this behind a paywall?** | Paywall detection exists in source-fetcher | Not persisted as a resource-level field; detection is transient |
+| **What type of content did we extract?** | `contentType` in citation_content (HTML/PDF/transcript) | Not shown to readers; not persisted on the resource |
+| **How much of the document do we have?** | `contentLength` tracked | Not exposed; readers can't tell if we have 500 chars or 50,000 |
+
+### Proposed Resource Transparency Fields
+
+Add to the `resources` table (and eventually surface in UI):
+
+```
+availability_status:  'available' | 'paywall' | 'dead' | 'restricted' | 'unknown'
+  — Persistent status, updated on each fetch attempt.
+  — "restricted" for content that exists but can't be freely accessed
+    (login required, institutional access, etc.)
+
+content_coverage:     'full_text' | 'abstract_only' | 'summary_only' | 'metadata_only' | 'none'
+  — What we actually have cached. "full_text" means we have the complete
+    document. "abstract_only" means we have the abstract but couldn't
+    access the full paper. "metadata_only" means title + URL but no content.
+
+archive_url:          text (nullable)
+  — Wayback Machine, archive.org, or archive.today URL.
+  — Populated automatically when availability_status changes to 'dead'.
+
+archive_fetched_at:   timestamp (nullable)
+  — When we last verified the archive link works.
+
+last_verified_at:     timestamp (nullable)
+  — When we last confirmed the original URL is accessible.
+  — Distinct from fetched_at (which is when we last pulled content).
+  — Allows "content fetched 3 months ago, last verified alive yesterday."
+
+content_extraction_method: 'firecrawl' | 'builtin_html' | 'pdf_parse' | 'youtube_transcript' | 'manual'
+  — How the content was extracted. Matters for trust: Firecrawl produces
+    cleaner markdown than the built-in parser; PDF extraction is lossy.
+
+publicly_accessible:  boolean (default true)
+  — Whether the resource is freely available on the open web.
+  — False for: paywalled papers, login-required content, private repos,
+    subscription newsletters. These still exist as resources (we may have
+    obtained content through legitimate access) but readers should know
+    they can't independently verify the content.
+```
+
+### How This Surfaces in the UI
+
+**On the `/source/[id]` page:**
+- Show a clear "Source Status" section at the top:
+  - Green: "Full text available, last verified Feb 2026" + link to view cached content
+  - Amber: "Abstract only — full paper behind paywall" + archive link if available
+  - Red: "Source unavailable (404 since Jan 2026)" + archive link
+- Show content coverage badge: "Full Text" / "Abstract Only" / "Metadata Only"
+- Show extraction method: "Extracted via Firecrawl" / "PDF text extraction" / etc.
+
+**On the `<R>` / `<ResourceLink>` tooltip:**
+- Add a small indicator: green dot (full text available), amber dot (partial), red dot (unavailable)
+- Show "Last verified: Feb 2026" or "Not verified since Dec 2025"
+
+**On claims that cite this resource:**
+- If the source is dead and has no archive: flag the claim's confidence as degraded
+- If the source is paywalled: show "Source not freely accessible" so readers know they can't independently check
+
+### Integration with Claims
+
+Resource transparency directly affects claim verification:
+
+1. **Claims from dead sources** — When `availability_status` changes to `dead`, claims citing only that source should be flagged for re-verification or alternative sourcing. A claim whose only source has 404'd is weaker than one with live sources.
+
+2. **Claims from paywalled sources** — The wiki may have legitimately accessed the content, but readers can't verify. These claims should display `publicly_accessible: false` so the epistemic status is transparent. This isn't a reason to remove the claim — but it's information readers deserve.
+
+3. **Content staleness** — If a resource's content was fetched 6+ months ago, and the claim is about something volatile (e.g., funding amount, team size), the verification may be stale. `last_verified_at` enables staleness detection.
+
+4. **Archive as backup verification** — When a source dies, the archive link lets both the system and readers re-verify claims. Auto-populate archive URLs for all resources as a background task.
+
+### Implementation Approach
+
+This can be done incrementally alongside the claims sprints:
+
+**Quick wins (can do immediately):**
+- Add `availability_status`, `content_coverage`, `publicly_accessible` columns to resources table
+- Populate from existing `citation_content` data (one-time backfill migration)
+- Surface in `/source/[id]` page UI
+
+**Medium-term (during Sprint 3):**
+- Auto-detect archive.org URLs for dead resources
+- Show content status in `<R>` tooltip
+- Flag claims with degraded source status
+
+**Longer-term:**
+- Periodic re-verification of resource URLs (weekly cron)
+- Auto-submit dead URLs to Wayback Machine
+- Track content changes over time (contentHash diffing)
+
+### Red team
+
+- *"This is a lot of new fields for marginal value."* The fields are cheap (one migration, one backfill script). The value compounds: every claim in the system becomes more trustworthy when readers can evaluate its sources. The alternative — claims citing opaque sources — undermines the whole reasoning transparency goal.
+- *"Paywall detection is imperfect."* True. The current heuristic (short content + paywall keywords) has false positives. But `publicly_accessible` is a manually-settable flag that can be corrected, not just auto-detected.
+- *"Archive links go stale too."* Yes, but much more slowly than original URLs. And the Wayback Machine is the most durable web archive available. Checking archive links annually is sufficient.
+- *"Readers won't actually check sources."* Some will. And the presence of verifiable, transparent sourcing creates trust even for readers who don't click through. "This claim has 3 live, full-text sources" is meaningful even if the reader doesn't read them.
+
+---
+
+## What This Roadmap Doesn't Cover
+
+This is deliberately scoped to the experimentation needed before a bulk run. It does NOT cover:
+
+- **Dedup infrastructure at scale** (Sprint 4 evaluates strategies; building the production system is post-bulk-run)
+- **Facts → claims merge** (a long-term architectural question; the bridge works for now)
+- **Public-facing claims display** (the claims UI exists but whether claims should be prominent on public pages is a post-validation question)
+- **Auto-update integration** (connecting claims ingestion to the daily news pipeline is valuable but depends on resource ingestion working first)
+- **Claim clustering and hierarchy** (clusters are nice-to-have; they don't affect extraction quality or improvement integration)
+
+These are all worth doing, but they're sequenced after we know the core system works.
+
+---
+
+## Related Documents
+
+- <EntityLink id="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions, cruxes, worked examples, red-team failure modes
+- <EntityLink id="claim-first-architecture">Claim-First Architecture (E892)</EntityLink> — Long-term vision for claims as the primary wiki artifact
+- <EntityLink id="content-pipeline-architecture">Content Pipeline Architecture (E895)</EntityLink> — Faster page creation infrastructure (orthogonal but complementary)

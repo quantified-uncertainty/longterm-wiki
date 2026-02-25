@@ -236,36 +236,100 @@ export function getAboutNav(): NavSection[] {
  * About pages are excluded (they use a separate sidebar via getAboutNav()).
  */
 export function getInternalNav(): NavSection[] {
-  // Auto-discover MDX content pages, excluding About pages (separate sidebar)
-  const contentSections = buildSectionNav("internal", "internal", ABOUT_PAGE_SLUGS);
-
-  // Hardcoded React dashboard pages (not in the database)
-  const dashboardSection: NavSection = {
-    title: "Dashboards & Tools",
-    defaultOpen: true,
-    items: [
-      { label: "Suggested Pages", href: "/internal/suggested-pages" },
-      { label: "Page Changes", href: "/internal/page-changes" },
-      { label: "PR Descriptions", href: "/internal/pr-descriptions" },
-      { label: "Entities Dashboard", href: "/internal/entities" },
-      { label: "Importance Rankings", href: "/internal/importance-rankings" },
-      { label: "Auto-Update Runs", href: "/internal/auto-update-runs" },
-      { label: "Auto-Update News", href: "/internal/auto-update-news" },
-      { label: "GitHub Issues", href: "/internal/github-issues" },
-      { label: "Agent Sessions", href: "/internal/agent-sessions" },
-      { label: "Citation Accuracy", href: "/internal/citation-accuracy" },
-      { label: "Resources", href: "/internal/resources" },
-      { label: "Citation Content", href: "/internal/citation-content" },
-      { label: "Hallucination Risk", href: "/internal/hallucination-risk" },
-      { label: "Hallucination Evals", href: "/internal/hallucination-evals" },
-      { label: "Improve Runs", href: "/internal/improve-runs" },
-      { label: "Claims", href: "/claims" },
-      { label: "Job Queue", href: "/internal/jobs" },
-    ],
-  };
-
-  // Dashboards first, then auto-discovered content sections
-  return [dashboardSection, ...contentSections];
+  return [
+    {
+      title: "Overview",
+      defaultOpen: true,
+      items: [
+        { label: "Internal Home", href: internalHref("__index__/internal", "/wiki/E779") },
+      ],
+    },
+    {
+      title: "Dashboards & Tools",
+      defaultOpen: true,
+      items: [
+        { label: "Enhancement Queue", href: internalHref("enhancement-queue") },
+        { label: "Suggested Pages", href: "/internal/suggested-pages" },
+        { label: "Update Schedule", href: internalHref("update-schedule-dashboard") },
+        { label: "Page Changes", href: "/internal/page-changes" },
+        { label: "PR Descriptions", href: "/internal/pr-descriptions" },
+        { label: "Fact Dashboard", href: internalHref("fact-dashboard") },
+        { label: "Entities Dashboard", href: "/internal/entities" },
+        { label: "Automation Tools", href: internalHref("automation-tools") },
+        { label: "Content Database", href: internalHref("content-database") },
+        { label: "Importance Rankings", href: "/internal/importance-rankings" },
+        { label: "Auto-Update Runs", href: "/internal/auto-update-runs" },
+        { label: "Auto-Update News", href: "/internal/auto-update-news" },
+        { label: "GitHub Issues", href: "/internal/github-issues" },
+        { label: "Agent Sessions", href: "/internal/agent-sessions" },
+        { label: "Citation Accuracy", href: "/internal/citation-accuracy" },
+        { label: "Resources", href: "/internal/resources" },
+        { label: "Citation Content", href: "/internal/citation-content" },
+        { label: "Pages", href: internalHref("page-coverage-dashboard") },
+        { label: "Hallucination Risk", href: "/internal/hallucination-risk" },
+        { label: "Hallucination Evals", href: "/internal/hallucination-evals" },
+        { label: "Improve Runs", href: "/internal/improve-runs" },
+        { label: "Claims", href: "/claims" },
+        { label: "Claims Ingestion", href: "/internal/claims-ingestion" },
+        { label: "Job Queue", href: "/internal/jobs" },
+      ],
+    },
+    {
+      title: "Style Guides",
+      items: [
+        { label: "Common Writing Principles", href: internalHref("common-writing-principles") },
+        { label: "Page Types", href: internalHref("page-types") },
+        { label: "Knowledge Base", href: internalHref("knowledge-base") },
+        { label: "Risk Pages", href: internalHref("risk-style-guide") },
+        { label: "Response Pages", href: internalHref("response-style-guide") },
+        { label: "Models", href: internalHref("models-style-guide") },
+        { label: "Stub Pages", href: internalHref("stub-style-guide") },
+        { label: "Rating System", href: internalHref("rating-system") },
+        { label: "Mermaid Diagrams", href: internalHref("mermaid-diagrams") },
+        { label: "Canonical Facts & Calc", href: internalHref("canonical-facts") },
+        { label: "Page Coverage Guide", href: internalHref("coverage-guide") },
+        { label: "Cause-Effect Diagrams", href: internalHref("cause-effect-diagrams") },
+        { label: "Research Reports", href: internalHref("research-reports") },
+        { label: "Doc Maintenance", href: internalHref("documentation-maintenance") },
+        { label: "Anthropic Refactor Notes", href: internalHref("anthropic-pages-refactor-notes") },
+      ],
+    },
+    {
+      title: "Research",
+      items: [
+        { label: "Reports Index", href: internalHref("__index__/internal/reports", "/wiki/E780") },
+        { label: "AI Research Workflows", href: internalHref("ai-research-workflows") },
+        { label: "Causal Diagram Visualization", href: internalHref("causal-diagram-visualization") },
+        { label: "Controlled Vocabulary", href: internalHref("controlled-vocabulary") },
+        { label: "Cross-Link Automation", href: internalHref("cross-link-automation-proposal") },
+        { label: "Diagram Naming", href: internalHref("diagram-naming-research") },
+        { label: "Page Creator Pipeline", href: internalHref("page-creator-pipeline") },
+        { label: "Gap Analysis (Feb 2026)", href: internalHref("gap-analysis-2026-02") },
+        { label: "Consistency Audit (Feb 2026)", href: internalHref("website-consistency-audit-2026-02") },
+        { label: "Importance Ranking", href: internalHref("importance-ranking") },
+        { label: "Page Length Research", href: internalHref("page-length-research") },
+      ],
+    },
+    {
+      title: "Architecture & Schema",
+      items: [
+        { label: "Architecture", href: internalHref("architecture") },
+        { label: "Wiki Generation Architecture", href: internalHref("wiki-generation-architecture") },
+        { label: "Content Pipeline Architecture", href: internalHref("content-pipeline-architecture") },
+        { label: "Claim-First Architecture", href: internalHref("claim-first-architecture") },
+        { label: "Claims Architecture Decisions", href: internalHref("claims-architecture-decisions") },
+        { label: "Citation Architecture", href: internalHref("citation-architecture") },
+        { label: "Knowledge Graph Ontology", href: internalHref("knowledge-graph-ontology") },
+        { label: "Fact System Strategy", href: internalHref("fact-system-strategy") },
+        { label: "Claims Development Roadmap", href: internalHref("claims-system-development-roadmap") },
+        { label: "Schema Overview", href: internalHref("__index__/internal/schema", "/wiki/E781") },
+        { label: "Entity Reference", href: internalHref("entities") },
+        { label: "Server Environments", href: internalHref("wiki-server-architecture") },
+        { label: "Server Communication", href: internalHref("server-communication-investigation") },
+        { label: "Schema Diagrams", href: internalHref("diagrams") },
+      ],
+    },
+  ];
 }
 
 // ============================================================================

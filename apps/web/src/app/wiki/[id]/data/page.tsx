@@ -34,7 +34,7 @@ export async function generateStaticParams() {
 /** Fetch claims for a page from the wiki-server. Returns null if unavailable. */
 async function fetchPageClaims(pageId: string): Promise<ClaimRow[] | null> {
   const result = await fetchFromWikiServer<GetClaimsResult>(
-    `/api/claims/by-entity/${encodeURIComponent(pageId)}`,
+    `/api/claims/by-entity/${encodeURIComponent(pageId)}?includeSources=true`,
     { revalidate: 300 }
   );
   return result?.claims ?? null;
@@ -302,6 +302,7 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
             <th className="p-2">Category</th>
             <th className="p-2">Confidence</th>
             <th className="p-2">Section</th>
+            <th className="p-2">Sources</th>
             <th className="p-2">Related</th>
             <th className="p-2">Citations</th>
           </tr>
@@ -335,6 +336,35 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
                 </td>
                 <td className="p-2 text-gray-600 max-w-[100px] truncate" title={sectionName}>
                   {sectionName}
+                </td>
+                <td className="p-2 text-[10px]">
+                  {claim.sources && claim.sources.length > 0 ? (
+                    <div className="space-y-0.5">
+                      {claim.sources.slice(0, 2).map(s => (
+                        <div key={s.id} className="flex items-center gap-1">
+                          {s.isPrimary && (
+                            <span className="bg-blue-100 text-blue-700 px-0.5 rounded text-[9px]">P</span>
+                          )}
+                          {s.resourceId ? (
+                            <Link href={`/source/${s.resourceId}`} className="text-blue-600 hover:underline truncate max-w-[80px] block">
+                              {s.resourceId}
+                            </Link>
+                          ) : s.url ? (
+                            <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate max-w-[80px] block">
+                              {(() => { try { return new URL(s.url).hostname.replace(/^www\./, ""); } catch { return "link"; } })()}
+                            </a>
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </div>
+                      ))}
+                      {claim.sources.length > 2 && (
+                        <span className="text-gray-400">+{claim.sources.length - 2}</span>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-gray-300">—</span>
+                  )}
                 </td>
                 <td className="p-2 max-w-[120px]">
                   <RelatedEntityBadges entities={claim.relatedEntities} />
@@ -526,7 +556,23 @@ export default async function WikiInfoPage({ params }: PageProps) {
             <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">pnpm crux claims extract {slug}</code>
           </p>
         ) : (
-          <ClaimsTable claims={claims} fnIndex={fnIndex} />
+          <div>
+            <div className="flex items-center gap-3 mb-3 text-sm">
+              <Link
+                href={`/wiki/${numericId || slug}/claims`}
+                className="text-blue-600 hover:underline font-medium"
+              >
+                View full claims tab &rarr;
+              </Link>
+              <Link
+                href={`/claims/entity/${slug}`}
+                className="text-muted-foreground hover:underline"
+              >
+                Claims Explorer
+              </Link>
+            </div>
+            <ClaimsTable claims={claims} fnIndex={fnIndex} />
+          </div>
         )}
       </Section>
 
@@ -538,7 +584,23 @@ export default async function WikiInfoPage({ params }: PageProps) {
         ) : claims.length === 0 ? (
           <p className="text-sm text-gray-500">No claims extracted yet — run claims extract first.</p>
         ) : (
-          <ReferencesTable claims={claims} fnIndex={fnIndex} />
+          <div>
+            <div className="flex items-center gap-3 mb-3 text-sm">
+              <Link
+                href={`/wiki/${numericId || slug}/claims`}
+                className="text-blue-600 hover:underline font-medium"
+              >
+                View full claims tab &rarr;
+              </Link>
+              <Link
+                href={`/claims/entity/${slug}`}
+                className="text-muted-foreground hover:underline"
+              >
+                Claims Explorer
+              </Link>
+            </div>
+            <ReferencesTable claims={claims} fnIndex={fnIndex} />
+          </div>
         )}
       </Section>
 

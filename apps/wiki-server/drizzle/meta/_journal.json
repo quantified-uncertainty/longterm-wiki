@@ -232,6 +232,20 @@
       "when": 1771902100000,
       "tag": "0028_enhance_claims",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1771902200000,
+      "tag": "0029_claim_sources_and_modes",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1771902300000,
+      "tag": "0030_claims_precision_and_constraints",
+      "breakpoints": true
     }
   ]
 }

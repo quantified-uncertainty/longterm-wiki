@@ -5,7 +5,9 @@ export interface ClaimFilters {
   entity: string;
   category: string;
   confidence: string;
+  claimMode: string;
   multiEntity: boolean;
+  numericOnly: boolean;
 }
 
 export function ClaimsFilterBar({
@@ -13,18 +15,22 @@ export function ClaimsFilterBar({
   categories,
   filters,
   onFilterChange,
+  entityNames = {},
 }: {
   entities: string[];
   categories: string[];
   filters: ClaimFilters;
   onFilterChange: (key: string, value: string | boolean) => void;
+  entityNames?: Record<string, string>;
 }) {
   const hasFilters =
     filters.search ||
     filters.entity ||
     filters.category ||
     filters.confidence ||
-    filters.multiEntity;
+    filters.claimMode ||
+    filters.multiEntity ||
+    filters.numericOnly;
 
   return (
     <div className="flex flex-wrap gap-2 mb-4">
@@ -43,7 +49,7 @@ export function ClaimsFilterBar({
         <option value="">All entities</option>
         {entities.map((eid) => (
           <option key={eid} value={eid}>
-            {eid}
+            {entityNames[eid] ?? eid}
           </option>
         ))}
       </select>
@@ -69,6 +75,15 @@ export function ClaimsFilterBar({
         <option value="unverified">unverified</option>
         <option value="unsourced">unsourced</option>
       </select>
+      <select
+        value={filters.claimMode}
+        onChange={(e) => onFilterChange("claimMode", e.target.value)}
+        className="text-xs border rounded px-2 py-1.5"
+      >
+        <option value="">All modes</option>
+        <option value="endorsed">endorsed</option>
+        <option value="attributed">attributed</option>
+      </select>
       <label className="flex items-center gap-1.5 text-xs cursor-pointer">
         <input
           type="checkbox"
@@ -78,6 +93,15 @@ export function ClaimsFilterBar({
         />
         Multi-entity only
       </label>
+      <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+        <input
+          type="checkbox"
+          checked={filters.numericOnly}
+          onChange={(e) => onFilterChange("numericOnly", e.target.checked)}
+          className="rounded"
+        />
+        Numeric only
+      </label>
       {hasFilters && (
         <button
           type="button"
@@ -86,7 +110,9 @@ export function ClaimsFilterBar({
             onFilterChange("entity", "");
             onFilterChange("category", "");
             onFilterChange("confidence", "");
+            onFilterChange("claimMode", "");
             onFilterChange("multiEntity", false);
+            onFilterChange("numericOnly", false);
           }}
           className="text-xs text-blue-600 hover:underline cursor-pointer"
         >

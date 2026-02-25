@@ -156,261 +156,86 @@ describe("getInternalNav (mocked data)", () => {
   beforeEach(() => {
     setMockRegistry({
       byNumericId: {
-        E1: "architecture",
-        E2: "canonical-facts",
-        E3: "gap-analysis",
-        E4: "automation-tools",
-        E5: "about-this-wiki",
-        E6: "__index__/internal",
-      },
-      bySlug: {
-        architecture: "E1",
-        "canonical-facts": "E2",
-        "gap-analysis": "E3",
-        "automation-tools": "E4",
-        "about-this-wiki": "E5",
-        "__index__/internal": "E6",
-      },
-    });
-  });
-
-  it("auto-discovers pages grouped by subcategory", () => {
-    setMockPages([
-      makePage({ id: "__index__/internal", filePath: "internal/index.md", title: "Internal" }),
-      makePage({ id: "architecture", filePath: "internal/architecture.mdx", title: "Architecture", subcategory: "architecture" }),
-      makePage({ id: "canonical-facts", filePath: "internal/canonical-facts.mdx", title: "Canonical Facts", subcategory: "style-guides" }),
-      makePage({ id: "gap-analysis", filePath: "internal/gap-analysis.mdx", title: "Gap Analysis", subcategory: "research" }),
-      makePage({ id: "automation-tools", filePath: "internal/automation-tools.mdx", title: "Automation Tools" }),
-    ]);
-
-    const sections = getInternalNav();
-
-    // First section is always Dashboards
-    expect(sections[0].title).toBe("Dashboards & Tools");
-
-    // Second is top-level (from index page)
-    expect(sections[1].title).toBe("Internal");
-    expect(sections[1].items.some(i => i.label === "Overview")).toBe(true);
-
-    // Find subcategory sections
-    const titles = sections.map(s => s.title);
-    expect(titles).toContain("Architecture");
-    expect(titles).toContain("Style Guides");
-    expect(titles).toContain("Research");
-    expect(titles).toContain("Other"); // automation-tools has no subcategory
-  });
-
-  it("excludes About pages from internal nav", () => {
-    setMockPages([
-      makePage({ id: "architecture", filePath: "internal/architecture.mdx", title: "Architecture", subcategory: "architecture" }),
-      makePage({ id: "about-this-wiki", filePath: "internal/about-this-wiki.mdx", title: "About This Wiki" }),
-    ]);
-
-    const sections = getInternalNav();
-    const allLabels = sections.flatMap(s => s.items.map(i => i.label));
-    expect(allLabels).not.toContain("About This Wiki");
-    expect(allLabels).toContain("Architecture");
-  });
-
-  it("excludes index files from nav items", () => {
-    setMockPages([
-      makePage({ id: "__index__/internal", filePath: "internal/index.md", title: "Internal" }),
-      makePage({ id: "architecture", filePath: "internal/architecture.mdx", title: "Architecture", subcategory: "architecture" }),
-    ]);
-
-    const sections = getInternalNav();
-    const allLabels = sections.flatMap(s => s.items.map(i => i.label));
-    // Index page should NOT appear as a regular item (only as Overview link)
-    expect(allLabels).not.toContain("Internal");
-  });
-
-  it("includes pages from subdirectories (reports, schema)", () => {
-    setMockPages([
-      makePage({ id: "ai-research-workflows", filePath: "internal/reports/ai-research-workflows.mdx", title: "AI Research Workflows", subcategory: "research" }),
-      makePage({ id: "diagrams", filePath: "internal/schema/diagrams.mdx", title: "Schema Diagrams", subcategory: "architecture" }),
-    ]);
-
-    const sections = getInternalNav();
-    const allLabels = sections.flatMap(s => s.items.map(i => i.label));
-    expect(allLabels).toContain("AI Research Workflows");
-    expect(allLabels).toContain("Schema Diagrams");
-  });
-
-  it("returns dashboards section even when no MDX pages exist", () => {
-    setMockPages([]);
-    const sections = getInternalNav();
-    expect(sections.length).toBeGreaterThanOrEqual(1);
-    expect(sections[0].title).toBe("Dashboards & Tools");
-    expect(sections[0].items.length).toBeGreaterThan(0);
-  });
-
-  it("dashboard section has defaultOpen: true", () => {
-    setMockPages([]);
-    const sections = getInternalNav();
-    expect(sections[0].defaultOpen).toBe(true);
-  });
-
-  it("does not duplicate pages across sections", () => {
-    setMockPages([
-      makePage({ id: "architecture", filePath: "internal/architecture.mdx", title: "Architecture", subcategory: "architecture" }),
-      makePage({ id: "canonical-facts", filePath: "internal/canonical-facts.mdx", title: "Canonical Facts", subcategory: "style-guides" }),
-    ]);
-
-    const sections = getInternalNav();
-    const allHrefs = sections.flatMap(s => s.items.map(i => i.href));
-    const uniqueHrefs = new Set(allHrefs);
-    expect(allHrefs.length).toBe(uniqueHrefs.size);
-  });
-
-  it("sorts items within each subcategory alphabetically", () => {
-    setMockPages([
-      makePage({ id: "z-page", filePath: "internal/z-page.mdx", title: "Z Page", subcategory: "style-guides" }),
-      makePage({ id: "a-page", filePath: "internal/a-page.mdx", title: "A Page", subcategory: "style-guides" }),
-      makePage({ id: "m-page", filePath: "internal/m-page.mdx", title: "M Page", subcategory: "style-guides" }),
-    ]);
-
-    const sections = getInternalNav();
-    const sgSection = sections.find(s => s.title === "Style Guides");
-    expect(sgSection).toBeDefined();
-    const labels = sgSection!.items.map(i => i.label);
-    expect(labels).toEqual(["A Page", "M Page", "Z Page"]);
-  });
-
-  it("a new page with subcategory appears automatically without code changes", () => {
-    // Simulate adding a brand-new page — no code changes needed
-    setMockPages([
-      makePage({ id: "architecture", filePath: "internal/architecture.mdx", title: "Architecture", subcategory: "architecture" }),
-      makePage({ id: "brand-new-doc", filePath: "internal/brand-new-doc.mdx", title: "Brand New Doc", subcategory: "architecture" }),
-    ]);
-
-    setMockRegistry({
-      byNumericId: { E1: "architecture", E99: "brand-new-doc" },
-      bySlug: { architecture: "E1", "brand-new-doc": "E99" },
-    });
-
-    const sections = getInternalNav();
-    const allLabels = sections.flatMap(s => s.items.map(i => i.label));
-    expect(allLabels).toContain("Brand New Doc");
-  });
-
-  it("a new page without subcategory appears in Other", () => {
-    setMockPages([
-      makePage({ id: "orphan-page", filePath: "internal/orphan-page.mdx", title: "Orphan Page" }),
-      makePage({ id: "categorized", filePath: "internal/categorized.mdx", title: "Categorized", subcategory: "architecture" }),
-    ]);
-
-    const sections = getInternalNav();
-    const otherSection = sections.find(s => s.title === "Other");
-    expect(otherSection).toBeDefined();
-    expect(otherSection!.items.some(i => i.label === "Orphan Page")).toBe(true);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Dashboard MDX migration — unit tests
-// ---------------------------------------------------------------------------
-
-describe("dashboard MDX migration (mocked data)", () => {
-  beforeEach(() => {
-    setMockRegistry({
-      byNumericId: {
         E898: "fact-dashboard",
         E899: "page-coverage-dashboard",
         E900: "update-schedule-dashboard",
-        E1: "architecture",
       },
       bySlug: {
         "fact-dashboard": "E898",
         "page-coverage-dashboard": "E899",
         "update-schedule-dashboard": "E900",
-        architecture: "E1",
       },
     });
-  });
-
-  it("migrated dashboards appear in auto-discovered 'Dashboards' section", () => {
-    setMockPages([
-      makePage({ id: "fact-dashboard", filePath: "internal/fact-dashboard.mdx", title: "Canonical Facts Dashboard", subcategory: "dashboards" }),
-      makePage({ id: "page-coverage-dashboard", filePath: "internal/page-coverage-dashboard.mdx", title: "Pages", subcategory: "dashboards" }),
-      makePage({ id: "update-schedule-dashboard", filePath: "internal/update-schedule-dashboard.mdx", title: "Update Schedule", subcategory: "dashboards" }),
-    ]);
-
-    const sections = getInternalNav();
-    const dashboardsSection = sections.find(s => s.title === "Dashboards");
-    expect(dashboardsSection).toBeDefined();
-    const labels = dashboardsSection!.items.map(i => i.label);
-    expect(labels).toContain("Canonical Facts Dashboard");
-    expect(labels).toContain("Pages");
-    expect(labels).toContain("Update Schedule");
-  });
-
-  it("migrated dashboards get /wiki/E<id> hrefs, not /internal/ hrefs", () => {
-    setMockPages([
-      makePage({ id: "fact-dashboard", filePath: "internal/fact-dashboard.mdx", title: "Canonical Facts Dashboard", subcategory: "dashboards" }),
-    ]);
-
-    const sections = getInternalNav();
-    const dashboardsSection = sections.find(s => s.title === "Dashboards");
-    expect(dashboardsSection).toBeDefined();
-    const factItem = dashboardsSection!.items.find(i => i.label === "Canonical Facts Dashboard");
-    expect(factItem).toBeDefined();
-    expect(factItem!.href).toBe("/wiki/E898");
-  });
-
-  it("migrated dashboards are NOT in the hardcoded 'Dashboards & Tools' section", () => {
     setMockPages([]);
-    const sections = getInternalNav();
-    const hardcodedSection = sections.find(s => s.title === "Dashboards & Tools");
-    expect(hardcodedSection).toBeDefined();
-
-    const labels = hardcodedSection!.items.map(i => i.label);
-    expect(labels).not.toContain("Fact Dashboard");
-    expect(labels).not.toContain("Pages");
-    expect(labels).not.toContain("Update Schedule");
   });
 
-  it("non-migrated dashboards remain in hardcoded section", () => {
-    setMockPages([]);
+  it("returns hardcoded sections: Overview, Dashboards, Style Guides, Research, Architecture", () => {
     const sections = getInternalNav();
-    const hardcodedSection = sections.find(s => s.title === "Dashboards & Tools");
-    expect(hardcodedSection).toBeDefined();
-
-    const labels = hardcodedSection!.items.map(i => i.label);
-    // Spot-check a few entries that should still be hardcoded
-    expect(labels).toContain("Suggested Pages");
-    expect(labels).toContain("GitHub Issues");
-    expect(labels).toContain("Agent Sessions");
-    expect(labels).toContain("Claims");
-    expect(labels).toContain("Job Queue");
+    const titles = sections.map(s => s.title);
+    expect(titles).toContain("Overview");
+    expect(titles).toContain("Dashboards & Tools");
+    expect(titles).toContain("Style Guides");
+    expect(titles).toContain("Research");
+    expect(titles).toContain("Architecture & Schema");
   });
 
-  it("migrated dashboards do not duplicate across hardcoded and auto-discovered sections", () => {
-    setMockPages([
-      makePage({ id: "fact-dashboard", filePath: "internal/fact-dashboard.mdx", title: "Canonical Facts Dashboard", subcategory: "dashboards" }),
-      makePage({ id: "page-coverage-dashboard", filePath: "internal/page-coverage-dashboard.mdx", title: "Pages", subcategory: "dashboards" }),
-      makePage({ id: "update-schedule-dashboard", filePath: "internal/update-schedule-dashboard.mdx", title: "Update Schedule", subcategory: "dashboards" }),
-    ]);
+  it("dashboard section has defaultOpen: true", () => {
+    const sections = getInternalNav();
+    const dashboards = sections.find(s => s.title === "Dashboards & Tools");
+    expect(dashboards?.defaultOpen).toBe(true);
+  });
 
+  it("does not duplicate hrefs across sections", () => {
     const sections = getInternalNav();
     const allHrefs = sections.flatMap(s => s.items.map(i => i.href));
     const uniqueHrefs = new Set(allHrefs);
     expect(allHrefs.length).toBe(uniqueHrefs.size);
   });
 
-  it("both hardcoded and auto-discovered dashboard sections coexist", () => {
-    setMockPages([
-      makePage({ id: "fact-dashboard", filePath: "internal/fact-dashboard.mdx", title: "Canonical Facts Dashboard", subcategory: "dashboards" }),
-      makePage({ id: "architecture", filePath: "internal/architecture.mdx", title: "Architecture", subcategory: "architecture" }),
-    ]);
-
+  it("migrated dashboards use internalHref (resolve to /wiki/E<id>)", () => {
     const sections = getInternalNav();
-    const titles = sections.map(s => s.title);
-    // Hardcoded section with non-migrated dashboards
-    expect(titles).toContain("Dashboards & Tools");
-    // Auto-discovered section with migrated dashboards
-    expect(titles).toContain("Dashboards");
-    // Regular content section
-    expect(titles).toContain("Architecture");
+    const dashboards = sections.find(s => s.title === "Dashboards & Tools")!;
+
+    const factItem = dashboards.items.find(i => i.label === "Fact Dashboard");
+    expect(factItem).toBeDefined();
+    expect(factItem!.href).toBe("/wiki/E898");
+
+    const pagesItem = dashboards.items.find(i => i.label === "Pages");
+    expect(pagesItem).toBeDefined();
+    expect(pagesItem!.href).toBe("/wiki/E899");
+
+    const updatesItem = dashboards.items.find(i => i.label === "Update Schedule");
+    expect(updatesItem).toBeDefined();
+    expect(updatesItem!.href).toBe("/wiki/E900");
+  });
+
+  it("non-migrated dashboards still use /internal/ hrefs", () => {
+    const sections = getInternalNav();
+    const dashboards = sections.find(s => s.title === "Dashboards & Tools")!;
+
+    const suggestedPages = dashboards.items.find(i => i.label === "Suggested Pages");
+    expect(suggestedPages?.href).toBe("/internal/suggested-pages");
+
+    const githubIssues = dashboards.items.find(i => i.label === "GitHub Issues");
+    expect(githubIssues?.href).toBe("/internal/github-issues");
+  });
+
+  it("Style Guides section contains expected entries", () => {
+    const sections = getInternalNav();
+    const styleGuides = sections.find(s => s.title === "Style Guides")!;
+    const labels = styleGuides.items.map(i => i.label);
+    expect(labels).toContain("Common Writing Principles");
+    expect(labels).toContain("Rating System");
+    expect(labels).toContain("Canonical Facts & Calc");
+  });
+
+  it("Architecture section contains expected entries", () => {
+    const sections = getInternalNav();
+    const arch = sections.find(s => s.title === "Architecture & Schema")!;
+    const labels = arch.items.map(i => i.label);
+    expect(labels).toContain("Architecture");
+    expect(labels).toContain("Schema Diagrams");
+    expect(labels).toContain("Knowledge Graph Ontology");
   });
 });
 
@@ -426,7 +251,7 @@ describe("getWikiNav dispatch", () => {
 
   it("returns internal nav for 'internal' type", () => {
     const nav = getWikiNav("internal");
-    expect(nav[0].title).toBe("Dashboards & Tools");
+    expect(nav[0].title).toBe("Overview");
   });
 
   it("returns about nav for 'about' type", () => {
@@ -511,6 +336,7 @@ describe("internal sidebar completeness (real data)", () => {
         "automation-tools.mdx",
         "content-database.mdx",
         "enhancement-queue.mdx",
+        "claims-system-development-roadmap.mdx",
       ]);
 
       const unexpected = missing.filter(f => !KNOWN_NO_SUBCATEGORY.has(f));
@@ -570,7 +396,7 @@ describe("internal sidebar completeness (real data)", () => {
   // in the hardcoded "Dashboards & Tools" section.
   // -----------------------------------------------------------------------
 
-  it("every React dashboard page directory is in the hardcoded dashboard list or migrated to MDX", () => {
+  it("every React dashboard page directory is in the sidebar or migrated to MDX", () => {
     if (!fs.existsSync(APP_INTERNAL_DIR)) return;
 
     // Get all directory entries that contain a page.tsx
@@ -590,36 +416,29 @@ describe("internal sidebar completeness (real data)", () => {
       }
     }
 
-    // Get all hrefs from the Dashboards & Tools section
-    // We can't call getInternalNav() in this context (mocked @/data),
-    // so we read the source file and parse the hardcoded hrefs.
+    // Parse all hrefs and internalHref() calls from the full getInternalNav function
     const navSource = fs.readFileSync(
       path.join(REPO_ROOT, "apps/web/src/lib/wiki-nav.ts"),
       "utf-8",
     );
 
-    // Extract hrefs from the dashboardSection block
-    const dashboardBlock = navSource.match(
-      /title:\s*"Dashboards & Tools"[\s\S]*?items:\s*\[([\s\S]*?)\]/,
+    const navBlock = navSource.match(
+      /export function getInternalNav\(\)[\s\S]*?^}/m,
     );
-
-    if (!dashboardBlock) {
-      throw new Error("Could not find 'Dashboards & Tools' section in wiki-nav.ts");
+    if (!navBlock) {
+      throw new Error("Could not find getInternalNav() in wiki-nav.ts");
     }
 
-    const hrefMatches = [...dashboardBlock[1].matchAll(/href:\s*["']([^"']+)["']/g)];
+    const hrefMatches = [...navBlock[0].matchAll(/href:\s*["']([^"']+)["']/g)];
     const sidebarHrefs = new Set(hrefMatches.map(m => m[1]));
 
-    // Also get hrefs from internalHref() calls (for MDX-backed dashboard pages)
-    const internalHrefMatches = [...dashboardBlock[1].matchAll(/internalHref\(["']([^"']+)["']\)/g)];
-    // These resolve to entity hrefs, but the slug tells us the page identity
+    const internalHrefMatches = [...navBlock[0].matchAll(/internalHref\(["']([^"']+)["']/g)];
 
     const missing: string[] = [];
     for (const dir of dashboardDirs) {
       const expectedHref = `/internal/${dir}`;
-      // Check if the directory's path appears in the sidebar hrefs
       const found = sidebarHrefs.has(expectedHref) ||
-        sidebarHrefs.has(`/${dir}`) || // some like /claims are at root
+        sidebarHrefs.has(`/${dir}`) ||
         internalHrefMatches.some(m => m[1] === dir);
 
       if (!found) {
@@ -629,9 +448,9 @@ describe("internal sidebar completeness (real data)", () => {
 
     if (missing.length > 0) {
       throw new Error(
-        `${missing.length} React dashboard page(s) missing from sidebar "Dashboards & Tools" section:\n` +
+        `${missing.length} React dashboard page(s) missing from sidebar:\n` +
         missing.map(d => `  - apps/web/src/app/internal/${d}/page.tsx`).join("\n") +
-        `\n\nAdd an entry to the dashboardSection in wiki-nav.ts getInternalNav(), or migrate to MDX stub.`
+        `\n\nAdd an entry to getInternalNav() in wiki-nav.ts, or migrate to MDX stub.`
       );
     }
   });
@@ -757,7 +576,7 @@ describe("internal sidebar completeness (real data)", () => {
   // (catches stale entries after dashboard pages are removed).
   // -----------------------------------------------------------------------
 
-  it("no hardcoded dashboard links point to non-existent pages", () => {
+  it("no hardcoded /internal/ links point to non-existent pages", () => {
     if (!fs.existsSync(APP_INTERNAL_DIR)) return;
 
     const navSource = fs.readFileSync(
@@ -765,12 +584,12 @@ describe("internal sidebar completeness (real data)", () => {
       "utf-8",
     );
 
-    const dashboardBlock = navSource.match(
-      /title:\s*"Dashboards & Tools"[\s\S]*?items:\s*\[([\s\S]*?)\]/,
+    const navBlock = navSource.match(
+      /export function getInternalNav\(\)[\s\S]*?^}/m,
     );
-    if (!dashboardBlock) return;
+    if (!navBlock) return;
 
-    const hrefMatches = [...dashboardBlock[1].matchAll(/href:\s*["']\/internal\/([^"']+)["']/g)];
+    const hrefMatches = [...navBlock[0].matchAll(/href:\s*["']\/internal\/([^"']+)["']/g)];
 
     const stale: string[] = [];
     for (const m of hrefMatches) {
@@ -793,9 +612,9 @@ describe("internal sidebar completeness (real data)", () => {
 
     if (stale.length > 0) {
       throw new Error(
-        `${stale.length} dashboard link(s) point to non-existent pages:\n` +
+        `${stale.length} sidebar link(s) point to non-existent pages:\n` +
         stale.map(h => `  - ${h}`).join("\n") +
-        `\n\nRemove these from the dashboardSection in wiki-nav.ts.`
+        `\n\nRemove these from getInternalNav() in wiki-nav.ts.`
       );
     }
   });

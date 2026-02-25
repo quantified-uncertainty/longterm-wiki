@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { fetchFromWikiServer } from "@lib/wiki-server";
+import { buildEntityNameMap } from "../components/claims-data";
 import {
   RelationshipsTable,
   type RelationshipRow,
 } from "./relationships-table";
 
 export const metadata: Metadata = {
-  title: "Entity Relationships | Longterm Wiki Claims",
+  title: "Entity Relationships",
   description:
     "Entity pairs connected by shared claims across wiki pages.",
 };
@@ -22,6 +23,14 @@ export default async function RelationshipsPage() {
   );
 
   const relationships = result?.relationships ?? [];
+
+  // Build entity name map from all entity slugs in relationships
+  const allSlugs = new Set<string>();
+  for (const r of relationships) {
+    allSlugs.add(r.entityA);
+    allSlugs.add(r.entityB);
+  }
+  const entityNames = buildEntityNameMap([...allSlugs]);
 
   return (
     <div>
@@ -40,7 +49,7 @@ export default async function RelationshipsPage() {
           <code>relatedEntities</code> data to build relationships.
         </p>
       ) : (
-        <RelationshipsTable relationships={relationships} />
+        <RelationshipsTable relationships={relationships} entityNames={entityNames} />
       )}
     </div>
   );

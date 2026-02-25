@@ -3,6 +3,7 @@ numericId: E736
 title: "Models Style Guide"
 description: "Style guide for writing model and analysis pages"
 entityType: internal
+subcategory: style-guides
 pageType: "documentation"
 quality: 38
 readerImportance: 45

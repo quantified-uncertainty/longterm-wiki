@@ -60,7 +60,7 @@ ranking:
   - rethink-priorities
   - benchmarking
   - export-controls
-  - epistemic-orgs-epoch-ai
+  - epoch-ai
   - palisade-research
   - safety-culture-equilibrium
   - openai-foundation
@@ -83,7 +83,6 @@ ranking:
   - risk-interaction-matrix
   - center-for-applied-rationality
   - far-ai
-  - safety-orgs-epoch-ai
   - neel-nanda
   - multipolar-trap
   - natural-abstractions
@@ -197,7 +196,7 @@ ranking:
   - table
   - alignment-theoretical-overview
   - ai-control
-  - compute-monitoring
+  - monitoring
   - arc
   - chai
   - interpretability-coverage
@@ -238,7 +237,6 @@ ranking:
   - instrumental-convergence
   - ai-safety-institutes
   - compute-governance
-  - monitoring
   - international-regimes
   - responsible-scaling-policies
   - hybrid-systems
@@ -328,7 +326,6 @@ ranking:
   - scalable-oversight
   - safety-cases
   - rsp
-  - compute-thresholds
   - sleeper-agent-detection
   - govai
   - fhi

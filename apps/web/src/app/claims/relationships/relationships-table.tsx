@@ -33,7 +33,8 @@ export interface RelationshipRow {
   sampleClaims: string[];
 }
 
-const columns: ColumnDef<RelationshipRow>[] = [
+function getColumns(entityNames: Record<string, string>): ColumnDef<RelationshipRow>[] {
+  return [
   {
     accessorKey: "entityA",
     header: ({ column }) => (
@@ -42,9 +43,9 @@ const columns: ColumnDef<RelationshipRow>[] = [
     cell: ({ row }) => (
       <Link
         href={`/claims/entity/${row.original.entityA}`}
-        className="font-mono text-blue-600 hover:underline text-sm"
+        className="text-blue-600 hover:underline text-sm"
       >
-        {row.original.entityA}
+        {entityNames[row.original.entityA] ?? row.original.entityA}
       </Link>
     ),
   },
@@ -56,9 +57,9 @@ const columns: ColumnDef<RelationshipRow>[] = [
     cell: ({ row }) => (
       <Link
         href={`/claims/entity/${row.original.entityB}`}
-        className="font-mono text-blue-600 hover:underline text-sm"
+        className="text-blue-600 hover:underline text-sm"
       >
-        {row.original.entityB}
+        {entityNames[row.original.entityB] ?? row.original.entityB}
       </Link>
     ),
   },
@@ -96,19 +97,23 @@ const columns: ColumnDef<RelationshipRow>[] = [
     },
   },
 ];
+}
 
 export function RelationshipsTable({
   relationships,
+  entityNames = {},
 }: {
   relationships: RelationshipRow[];
+  entityNames?: Record<string, string>;
 }) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "claimCount", desc: true },
   ]);
+  const columns = getColumns(entityNames);
 
   const table = useReactTable({
     data: relationships,
-    columns,
+    columns: columns,
     state: { sorting },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),

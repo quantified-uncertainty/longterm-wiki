@@ -961,7 +961,7 @@
   title: RAND analysis
   type: web
   cited_by:
-    - redwood
+    - redwood-research
   publication_id: rand
   tags:
     - interpretability

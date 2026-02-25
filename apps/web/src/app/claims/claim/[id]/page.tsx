@@ -2,9 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
+import { getEntityById } from "@data";
 import type { ClaimRow } from "@wiki-server/api-types";
+import { buildEntityNameMap } from "../../components/claims-data";
 import { CategoryBadge } from "../../components/category-badge";
 import { ConfidenceBadge } from "../../components/confidence-badge";
+import { ClaimModeBadge } from "../../components/claim-mode-badge";
+import { NumericValueDisplay } from "../../components/numeric-value-display";
+import { ClaimSourcesList } from "../../components/claim-sources-list";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -17,7 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
   if (!claim) return { title: "Claim Not Found" };
   return {
-    title: `Claim #${claim.id} | Longterm Wiki`,
+    title: `Claim #${claim.id}`,
     description: claim.claimText.slice(0, 160),
   };
 }
@@ -29,6 +34,11 @@ export default async function ClaimDetailPage({ params }: PageProps) {
   });
 
   if (!claim) notFound();
+
+  const entity = getEntityById(claim.entityId);
+  const entityDisplayName = entity?.title ?? claim.entityId;
+  const allSlugs = [claim.entityId, ...(claim.relatedEntities ?? []).map(s => s.toLowerCase())];
+  const entityNames = buildEntityNameMap(allSlugs);
 
   return (
     <div className="max-w-3xl">
@@ -42,7 +52,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
             href={`/claims/entity/${claim.entityId}`}
             className="hover:underline"
           >
-            {claim.entityId}
+            {entityDisplayName}
           </Link>
           <span>/</span>
           <span>#{claim.id}</span>
@@ -55,8 +65,27 @@ export default async function ClaimDetailPage({ params }: PageProps) {
         <p className="text-sm leading-relaxed">{claim.claimText}</p>
       </div>
 
-      {/* Source quote */}
-      {claim.sourceQuote && (
+      {/* Epistemic mode banner (attributed only) */}
+      {claim.claimMode === "attributed" && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 mb-4 flex items-center gap-3">
+          <ClaimModeBadge mode={claim.claimMode} attributedTo={claim.attributedTo} />
+          {claim.attributedTo && (
+            <span className="text-sm text-amber-800">
+              This claim is attributed to{" "}
+              <Link
+                href={`/claims/entity/${claim.attributedTo}`}
+                className="font-medium hover:underline"
+              >
+                {claim.attributedTo}
+              </Link>
+              , not asserted by the wiki.
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Source quote (legacy field) */}
+      {claim.sourceQuote && (!claim.sources || claim.sources.length === 0) && (
         <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 mb-4">
           <span className="text-xs font-medium text-amber-700 block mb-1">
             Source Quote
@@ -64,6 +93,31 @@ export default async function ClaimDetailPage({ params }: PageProps) {
           <p className="text-sm italic text-amber-900">
             &ldquo;{claim.sourceQuote}&rdquo;
           </p>
+        </div>
+      )}
+
+      {/* claim_sources */}
+      {claim.sources && claim.sources.length > 0 && (
+        <div className="mb-6">
+          <span className="text-xs font-medium text-muted-foreground block mb-2">
+            Sources ({claim.sources.length})
+          </span>
+          <ClaimSourcesList sources={claim.sources} />
+        </div>
+      )}
+
+      {/* Numeric value — show if any numeric field is present (central, low, or high) */}
+      {(claim.valueNumeric != null || claim.valueLow != null || claim.valueHigh != null) && (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50/30 p-4 mb-4">
+          <span className="text-xs font-medium text-emerald-700 block mb-1">
+            Numeric Value
+          </span>
+          <NumericValueDisplay
+            value={claim.valueNumeric}
+            low={claim.valueLow}
+            high={claim.valueHigh}
+            measure={claim.measure}
+          />
         </div>
       )}
 
@@ -75,13 +129,19 @@ export default async function ClaimDetailPage({ params }: PageProps) {
           </span>
           <Link
             href={`/claims/entity/${claim.entityId}`}
-            className="font-mono text-sm text-blue-600 hover:underline"
+            className="text-sm text-blue-600 hover:underline"
           >
-            {claim.entityId}
+            {entityDisplayName}
           </Link>
           <span className="text-xs text-muted-foreground ml-2">
             ({claim.entityType})
           </span>
+        </div>
+        <div>
+          <span className="text-xs text-muted-foreground block mb-1">
+            Mode
+          </span>
+          <ClaimModeBadge mode={claim.claimMode} attributedTo={claim.attributedTo} />
         </div>
         <div>
           <span className="text-xs text-muted-foreground block mb-1">
@@ -105,6 +165,22 @@ export default async function ClaimDetailPage({ params }: PageProps) {
           </span>
           <span className="font-mono text-sm">{claim.claimType}</span>
         </div>
+        {claim.asOf && (
+          <div>
+            <span className="text-xs text-muted-foreground block mb-1">
+              As Of
+            </span>
+            <span className="text-sm font-mono">{claim.asOf}</span>
+          </div>
+        )}
+        {claim.measure && (
+          <div>
+            <span className="text-xs text-muted-foreground block mb-1">
+              Measure
+            </span>
+            <span className="text-sm font-mono">{claim.measure}</span>
+          </div>
+        )}
         {claim.section && (
           <div>
             <span className="text-xs text-muted-foreground block mb-1">
@@ -133,10 +209,10 @@ export default async function ClaimDetailPage({ params }: PageProps) {
             {claim.relatedEntities.map((eid) => (
               <Link
                 key={eid}
-                href={`/claims/entity/${eid}`}
+                href={`/claims/entity/${eid.toLowerCase()}`}
                 className="inline-block px-2 py-1 rounded text-xs bg-gray-100 text-gray-700 hover:bg-gray-200"
               >
-                {eid}
+                {entityNames[eid.toLowerCase()] ?? eid}
               </Link>
             ))}
           </div>

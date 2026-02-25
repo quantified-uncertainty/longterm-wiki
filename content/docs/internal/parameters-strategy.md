@@ -3,6 +3,7 @@ numericId: E740
 title: "Parameters Strategy"
 description: "Strategy for AI transition model parameters"
 entityType: internal
+subcategory: research
 pageType: "documentation"
 quality: 3
 readerImportance: 39

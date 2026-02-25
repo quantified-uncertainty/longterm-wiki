@@ -438,9 +438,10 @@
 - pageId: epistemic-health
   links:
     eaForum: https://forum.effectivealtruism.org/topics/community-epistemic-health
-- pageId: epistemic-orgs-epoch-ai
+- pageId: epoch-ai
   links:
     grokipedia: https://grokipedia.com/page/Epoch_AI
+    eaForum: https://forum.effectivealtruism.org/topics/epoch-ai
 - pageId: epistemic-sycophancy
   links:
     lesswrong: https://www.lesswrong.com/tag/sycophancy
@@ -449,9 +450,6 @@
     lesswrong: https://www.lesswrong.com/tag/rationality
     eaForum: https://forum.effectivealtruism.org/topics/epistemics
     eightyK: https://80000hours.org/2020/09/good-judgement/
-- pageId: epoch-ai
-  links:
-    eaForum: https://forum.effectivealtruism.org/topics/epoch-ai
 - pageId: erosion-of-agency
   links:
     lesswrong: https://www.lesswrong.com/tag/agency
@@ -922,12 +920,10 @@
   links:
     lesswrong: https://www.lesswrong.com/tag/ai-capabilities
     stampy: https://aisafety.info/questions/6268/What-is-an-intelligence-explosion
-- pageId: redwood
+- pageId: redwood-research
   links:
     lesswrong: https://www.lesswrong.com/tag/redwood-research
     eaForum: https://forum.effectivealtruism.org/topics/redwood-research
-- pageId: redwood-research
-  links:
     grokipedia: https://grokipedia.com/page/Redwood_Research
 - pageId: regulation
   links:
@@ -994,9 +990,6 @@
 - pageId: safety-culture-strength
   links:
     eaForum: https://forum.effectivealtruism.org/topics/ai-lab-safety
-- pageId: safety-orgs-epoch-ai
-  links:
-    grokipedia: https://grokipedia.com/page/Epoch_AI
 - pageId: sam-altman
   links:
     wikipedia: https://en.wikipedia.org/wiki/Sam_Altman

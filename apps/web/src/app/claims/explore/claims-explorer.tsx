@@ -10,10 +10,12 @@ export function ClaimsExplorer({
   claims,
   entities,
   categories,
+  entityNames = {},
 }: {
   claims: ClaimRow[];
   entities: string[];
   categories: string[];
+  entityNames?: Record<string, string>;
 }) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -24,7 +26,9 @@ export function ClaimsExplorer({
     entity: searchParams.get("entity") ?? "",
     category: searchParams.get("category") ?? "",
     confidence: searchParams.get("confidence") ?? "",
+    claimMode: searchParams.get("claimMode") ?? "",
     multiEntity: searchParams.get("multiEntity") === "true",
+    numericOnly: searchParams.get("numericOnly") === "true",
   };
 
   function onFilterChange(key: string, value: string | boolean) {
@@ -61,9 +65,19 @@ export function ClaimsExplorer({
         (c) => (c.confidence ?? "unverified") === filters.confidence
       );
     }
+    if (filters.claimMode) {
+      result = result.filter(
+        (c) => (c.claimMode ?? "endorsed") === filters.claimMode
+      );
+    }
     if (filters.multiEntity) {
       result = result.filter(
         (c) => c.relatedEntities && c.relatedEntities.length > 0
+      );
+    }
+    if (filters.numericOnly) {
+      result = result.filter(
+        (c) => c.valueNumeric != null || c.valueLow != null || c.valueHigh != null
       );
     }
     return result;
@@ -76,11 +90,12 @@ export function ClaimsExplorer({
         categories={categories}
         filters={filters}
         onFilterChange={onFilterChange}
+        entityNames={entityNames}
       />
       <div className="text-xs text-muted-foreground mb-2">
         {filteredClaims.length} of {claims.length} claims
       </div>
-      <ClaimsTable claims={filteredClaims} />
+      <ClaimsTable claims={filteredClaims} entityNames={entityNames} />
     </div>
   );
 }
