@@ -85,6 +85,12 @@ export const VALID_SUBCATEGORIES = [
   'ea-history',
   'ai-history',
   'applications',
+
+  // internal pages
+  'style-guides',
+  'architecture',
+  'research',
+  'dashboards',
 ] as const;
 
 export type ValidSubcategory = typeof VALID_SUBCATEGORIES[number];
