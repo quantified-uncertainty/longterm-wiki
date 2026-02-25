@@ -340,22 +340,42 @@ export const summaries = pgTable(
 /**
  * Claims extracted from wiki pages.
  *
- * `entityId` is a logical reference to a wiki entity (page or data entity)
- * but is NOT enforced via FK — claims may reference entities from multiple
- * source tables (wikiPages, summaries, etc.) or entities not yet synced.
+ * `entityId` is the primary entity this claim was extracted from (page or data entity).
+ * `relatedEntities` is a JSONB array of other entity IDs this claim relates to,
+ * enabling claims to be independent of a single page.
+ *
+ * Claim taxonomy:
+ *   claimType: granular type (factual, evaluative, causal, historical, numeric, consensus, speculative, relational)
+ *   claimCategory: high-level category (factual, opinion, analytical, speculative, relational)
+ *
+ * Integration with other data layers:
+ *   factId: links numeric claims to data/facts/ entries (e.g. "anthropic.6796e194")
+ *   resourceIds: JSONB array of resource IDs from data/resources/ backing this claim
+ *
+ * Legacy columns (value, unit) are retained for backward compatibility but
+ * new code should use section + footnoteRefs instead.
  */
 export const claims = pgTable(
   "claims",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    entityId: text("entity_id").notNull(), // logical FK — see table comment above
+    entityId: text("entity_id").notNull(), // primary entity (extraction source)
     entityType: text("entity_type").notNull(),
     claimType: text("claim_type").notNull(),
     claimText: text("claim_text").notNull(),
+    // Legacy fields — kept for backward compat, prefer section/footnoteRefs
     value: text("value"),
     unit: text("unit"),
     confidence: text("confidence"),
     sourceQuote: text("source_quote"),
+    // --- Enhanced fields (migration 0028) ---
+    claimCategory: text("claim_category"), // factual | opinion | analytical | speculative | relational
+    relatedEntities: jsonb("related_entities"), // string[] — other entity IDs this claim relates to
+    factId: text("fact_id"), // link to facts system: "entity.factKey" (e.g. "anthropic.6796e194")
+    resourceIds: jsonb("resource_ids"), // string[] — resource IDs from data/resources/
+    section: text("section"), // section heading where claim appears
+    footnoteRefs: text("footnote_refs"), // comma-separated footnote refs (e.g. "1,3,7")
+    // --- Timestamps ---
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -367,6 +387,8 @@ export const claims = pgTable(
     index("idx_cl_entity_id").on(table.entityId),
     index("idx_cl_entity_type").on(table.entityType),
     index("idx_cl_claim_type").on(table.claimType),
+    index("idx_cl_claim_category").on(table.claimCategory),
+    index("idx_cl_fact_id").on(table.factId),
   ]
 );
 

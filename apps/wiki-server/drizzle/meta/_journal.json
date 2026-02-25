@@ -218,6 +218,13 @@
       "when": 1771902000000,
       "tag": "0027_resource_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1771902100000,
+      "tag": "0028_enhance_claims",
+      "breakpoints": true
     }
   ]
 }
