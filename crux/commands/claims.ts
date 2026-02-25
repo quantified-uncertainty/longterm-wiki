@@ -53,7 +53,7 @@ const SCRIPTS = {
   'evaluate-baseline': {
     script: 'claims/evaluate-baseline.ts',
     description: 'Evaluate extraction quality baseline across test pages',
-    passthrough: ['from-logs', 'sample', 'variant'],
+    passthrough: ['from-logs', 'sample', 'variant', 'openrouter'],
     positional: false,
   },
   'run-experiments': {

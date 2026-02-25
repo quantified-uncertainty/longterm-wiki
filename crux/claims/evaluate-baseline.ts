@@ -20,6 +20,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { join } from 'path';
 import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
+import { callOpenRouter } from '../lib/quote-extractor.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { getColors } from '../lib/output.ts';
@@ -150,6 +151,7 @@ async function evaluatePage(
   claims: ClaimInput[],
   pageContent: string,
   sampleSize: number,
+  useOpenRouter: boolean = false,
 ): Promise<ClaimEval[]> {
   const sample = randomSample(claims, sampleSize);
 
@@ -173,14 +175,24 @@ ${pageContent.slice(0, 12000)}
 CLAIMS TO EVALUATE:
 ${claimList}`;
 
-  const response = await callClaude(client, {
-    model: MODELS.sonnet,
-    systemPrompt,
-    userPrompt,
-    maxTokens: 4000,
-  });
+  let responseText: string;
+  if (useOpenRouter) {
+    responseText = await callOpenRouter(systemPrompt, userPrompt, {
+      model: 'anthropic/claude-sonnet-4',
+      maxTokens: 4000,
+      title: 'LongtermWiki Claims Evaluation',
+    });
+  } else {
+    const response = await callClaude(client, {
+      model: MODELS.sonnet,
+      systemPrompt,
+      userPrompt,
+      maxTokens: 4000,
+    });
+    responseText = response.text;
+  }
 
-  const jsonMatch = response.text.match(/\[[\s\S]*\]/);
+  const jsonMatch = responseText.match(/\[[\s\S]*\]/);
   if (!jsonMatch) return [];
 
   try {
@@ -240,6 +252,7 @@ export async function runEvaluation() {
   const fromLogs = args['from-logs'] === true;
   const variantArg = typeof args.variant === 'string' ? args.variant : 'baseline';
   const sampleSize = typeof args['sample'] === 'string' ? parseInt(args['sample'], 10) || DEFAULT_SAMPLE_SIZE : DEFAULT_SAMPLE_SIZE;
+  const useOpenRouter = args['openrouter'] === true;
   const LOG_DIR = variantArg !== 'baseline' ? `${BASE_LOG_DIR}/${variantArg}` : BASE_LOG_DIR;
   const client = createClient();
   const allEvals: ClaimEval[] = [];
@@ -283,7 +296,7 @@ export async function runEvaluation() {
 
     process.stdout.write(`  Evaluating ${page.id} (${page.type}, ${claims.length} total, sampling ${Math.min(sampleSize, claims.length)})... `);
 
-    const evals = await evaluatePage(client, page, claims, pageContent, sampleSize);
+    const evals = await evaluatePage(client, page, claims, pageContent, sampleSize, useOpenRouter);
     console.log(`${c.green}${evals.length} evaluated${c.reset}`);
     allEvals.push(...evals);
   }
