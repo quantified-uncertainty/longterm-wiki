@@ -51,7 +51,7 @@ INSERT INTO claim_sources (claim_id, resource_id, is_primary)
 SELECT
   c.id,
   r_id.resource_id,
-  (r_id.idx = 0) AS is_primary
+  (r_id.idx = 1) AS is_primary  -- WITH ORDINALITY starts at 1, not 0
 FROM claims c,
      jsonb_array_elements_text(c.resource_ids) WITH ORDINALITY AS r_id(resource_id, idx)
 WHERE c.resource_ids IS NOT NULL
