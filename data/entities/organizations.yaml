@@ -1024,7 +1024,7 @@
 - id: ssi
   numericId: E425
   type: organization
-  orgType: safety-org
+  orgType: frontier-lab
   summaryPage: labs-overview
   title: Safe Superintelligence Inc (SSI)
   description: >-
