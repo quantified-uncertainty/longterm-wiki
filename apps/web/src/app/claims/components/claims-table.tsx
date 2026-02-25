@@ -53,8 +53,8 @@ function ExpandedClaimDetail({ claim }: { claim: ClaimRow }) {
         </div>
       )}
 
-      {/* Numeric value */}
-      {claim.valueNumeric !== null && (
+      {/* Numeric value — show if any numeric field is present (central, low, or high) */}
+      {(claim.valueNumeric != null || claim.valueLow != null || claim.valueHigh != null) && (
         <NumericValueDisplay
           value={claim.valueNumeric}
           low={claim.valueLow}

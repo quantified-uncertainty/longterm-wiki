@@ -99,8 +99,8 @@ export default async function ClaimDetailPage({ params }: PageProps) {
         </div>
       )}
 
-      {/* Numeric value */}
-      {claim.valueNumeric !== null && (
+      {/* Numeric value — show if any numeric field is present (central, low, or high) */}
+      {(claim.valueNumeric != null || claim.valueLow != null || claim.valueHigh != null) && (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50/30 p-4 mb-4">
           <span className="text-xs font-medium text-emerald-700 block mb-1">
             Numeric Value

@@ -31,10 +31,12 @@ import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
   insertClaimBatch,
+  getClaimsByEntity,
+  clearClaimsForEntity,
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
 import { loadResources } from '../resource-io.ts';
-import { VALID_CLAIM_TYPES, claimTypeToCategory } from '../lib/claim-utils.ts';
+import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../lib/claim-utils.ts';
 import type { ClaimTypeValue } from '../lib/claim-utils.ts';
 import type { Resource } from '../resource-types.ts';
 
@@ -113,7 +115,14 @@ interface ExtractedResourceClaim {
   claimText: string;
   claimType: ClaimTypeValue;
   relevance: 'direct' | 'contextual' | 'background';
-  sourceQuote?: string;  // verbatim quote from the resource, if extractable
+  claimMode: 'endorsed' | 'attributed';
+  attributedTo?: string;
+  asOf?: string;
+  measure?: string;
+  valueNumeric?: number;
+  valueLow?: number;
+  valueHigh?: number;
+  sourceQuote?: string;
   relatedEntities?: string[];
 }
 
@@ -128,16 +137,15 @@ Resource metadata:
 
 For each claim, provide:
 - "claimText": a single atomic, self-contained factual statement
-- "claimType": one of:
-    "factual" — specific facts, events, dates
-    "numeric" — claims with specific numbers, percentages, dollar amounts, counts
-    "historical" — historical events or timeline items
-    "evaluative" — assessments, conclusions, or recommendations
-    "causal" — cause-effect assertions
-    "consensus" — what is broadly agreed upon in the field
-    "speculative" — predictions, projections, or uncertain claims
-    "relational" — comparisons between entities
+- "claimType": one of: "factual", "numeric", "historical", "evaluative", "causal", "consensus", "speculative", "relational"
 - "relevance": "direct" (explicitly about ${targetEntity}), "contextual" (directly related context), or "background" (general field context)
+- "claimMode": "endorsed" (resource asserts this), or "attributed" (resource reports what someone else claims)
+- "attributedTo": (only when claimMode="attributed") the entity or name making the claim (e.g. "openai", "the authors")
+- "asOf": (optional) date this claim was true, YYYY-MM or YYYY-MM-DD format
+- "measure": (optional, only for numeric claims) snake_case measure ID: "valuation", "funding_total", "employee_count", "revenue", "parameters", "benchmark_score"
+- "valueNumeric": (optional) central numeric value as plain number (e.g. 7300000000 for $7.3B, 0.92 for 92%)
+- "valueLow": (optional) lower bound if a range is given
+- "valueHigh": (optional) upper bound if a range is given
 - "sourceQuote": a SHORT verbatim quote (max 200 chars) from the resource text that supports this claim, if available
 - "relatedEntities": other entity IDs/names mentioned alongside ${targetEntity} in the claim
 
@@ -148,9 +156,11 @@ Rules:
 - Skip trivial or overly general statements
 - Extract 5-15 claims (fewer is fine if the resource is brief or tangential)
 - Prefer "direct" relevance claims
+- Use "numeric" claimType for any claim with specific dollar amounts, percentages, counts, or sizes
+- Always include valueNumeric for numeric claims — extract the number even if written out (e.g. "$7.3 billion" → 7300000000)
 
 Respond ONLY with JSON:
-{"claims": [{"claimText": "...", "claimType": "factual", "relevance": "direct", "sourceQuote": "...", "relatedEntities": []}]}`;
+{"claims": [{"claimText": "...", "claimType": "factual", "relevance": "direct", "claimMode": "endorsed", "sourceQuote": "...", "relatedEntities": []}]}`;
 }
 
 async function extractClaimsForEntity(
@@ -175,29 +185,39 @@ async function extractClaimsForEntity(
     if (!Array.isArray(parsed.claims)) return [];
 
     return parsed.claims
-      .filter((c): c is ExtractedResourceClaim =>
+      .filter((c): c is Record<string, unknown> =>
         typeof c === 'object' && c !== null &&
-        typeof (c as ExtractedResourceClaim).claimText === 'string' &&
-        (c as ExtractedResourceClaim).claimText.length > 10
+        typeof (c as Record<string, unknown>).claimText === 'string' &&
+        ((c as Record<string, unknown>).claimText as string).length > 10
       )
-      .map(c => {
-        const item = c as ExtractedResourceClaim;
-        return {
-          claimText: item.claimText,
-          claimType: (VALID_CLAIM_TYPES.includes(item.claimType as ClaimTypeValue)
-            ? item.claimType
-            : 'factual') as ClaimTypeValue,
-          relevance: (['direct', 'contextual', 'background'].includes(item.relevance)
-            ? item.relevance
-            : 'contextual') as 'direct' | 'contextual' | 'background',
-          sourceQuote: typeof item.sourceQuote === 'string' && item.sourceQuote.length > 5
-            ? item.sourceQuote.slice(0, 500)
-            : undefined,
-          relatedEntities: Array.isArray(item.relatedEntities)
-            ? (item.relatedEntities as unknown[]).map(String).filter(s => s.length > 0)
-            : [],
-        };
-      });
+      .map(c => ({
+        claimText: c.claimText as string,
+        claimType: (VALID_CLAIM_TYPES.includes(c.claimType as ClaimTypeValue)
+          ? c.claimType
+          : 'factual') as ClaimTypeValue,
+        relevance: (['direct', 'contextual', 'background'].includes(c.relevance as string)
+          ? c.relevance
+          : 'contextual') as 'direct' | 'contextual' | 'background',
+        claimMode: (c.claimMode === 'attributed' ? 'attributed' : 'endorsed') as 'endorsed' | 'attributed',
+        attributedTo: typeof c.attributedTo === 'string' && c.attributedTo.length > 0
+          ? c.attributedTo
+          : undefined,
+        asOf: typeof c.asOf === 'string' && /^\d{4}(-\d{2}(-\d{2})?)?$/.test(c.asOf)
+          ? c.asOf
+          : undefined,
+        measure: typeof c.measure === 'string' && c.measure.length > 0
+          ? c.measure
+          : undefined,
+        valueNumeric: parseNumericValue(c.valueNumeric),
+        valueLow: parseNumericValue(c.valueLow),
+        valueHigh: parseNumericValue(c.valueHigh),
+        sourceQuote: typeof c.sourceQuote === 'string' && c.sourceQuote.length > 5
+          ? c.sourceQuote.slice(0, 500)
+          : undefined,
+        relatedEntities: Array.isArray(c.relatedEntities)
+          ? (c.relatedEntities as unknown[]).map(String).filter(s => s.length > 0)
+          : [],
+      }));
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.warn(`  [warn] Entity "${targetEntity}" — extraction failed: ${msg.slice(0, 120)}`);
@@ -273,13 +293,46 @@ async function main() {
     console.log('');
   }
 
+  const force = args.force === true;
+
+  // Dedup check: skip entities that already have claims from this resource
+  // (unless --force is passed, in which case clear first)
+  const entitiesToProcess: string[] = [];
+  if (!dryRun) {
+    for (const entity of targetEntities) {
+      const existing = await getClaimsByEntity(entity);
+      const hasResourceClaims = existing.ok &&
+        existing.data.claims.some(cl => cl.section === `Resource: ${resource.id}`);
+      if (hasResourceClaims) {
+        if (!force) {
+          console.log(`  ${c.yellow}Skipping ${entity}: already has claims from ${resource.id}. Use --force to re-ingest.${c.reset}`);
+          continue;
+        }
+        // --force: clear all entity claims before re-ingesting
+        const cleared = await clearClaimsForEntity(entity);
+        if (cleared.ok) {
+          console.log(`  ${c.dim}Cleared ${cleared.data.deleted} existing claims for ${entity} (--force)${c.reset}`);
+        }
+      }
+      entitiesToProcess.push(entity);
+    }
+  } else {
+    entitiesToProcess.push(...targetEntities);
+  }
+
+  if (entitiesToProcess.length === 0) {
+    console.log(`\n${c.yellow}All target entities already have claims from this resource.${c.reset}`);
+    console.log(`  Use --force to re-ingest.\n`);
+    return;
+  }
+
   // Extract claims per target entity
   const allResults: Array<{
     entity: string;
     claims: ExtractedResourceClaim[];
   }> = [];
 
-  for (const entity of targetEntities) {
+  for (const entity of entitiesToProcess) {
     process.stdout.write(`  ${c.dim}Extracting for ${entity}...${c.reset}`);
     const claims = await extractClaimsForEntity(resourceText, resource, entity, { model });
     allResults.push({ entity, claims });
@@ -305,7 +358,10 @@ async function main() {
       console.log(`\n  Sample claims:`);
       for (const cl of claims.slice(0, 5)) {
         const quote = cl.sourceQuote ? ` → "${cl.sourceQuote.slice(0, 60)}..."` : '';
-        console.log(`  [${cl.claimType}/${cl.relevance}] ${cl.claimText.slice(0, 100)}${quote}`);
+        const modeTag = cl.claimMode === 'attributed' ? ` [by:${cl.attributedTo ?? '?'}]` : '';
+        const numTag = cl.valueNumeric !== undefined ? ` [=${cl.valueNumeric}]` : '';
+        const asOfTag = cl.asOf ? ` [${cl.asOf}]` : '';
+        console.log(`  [${cl.claimType}/${cl.relevance}${modeTag}${asOfTag}${numTag}] ${cl.claimText.slice(0, 100)}${quote}`);
       }
       if (claims.length > 5) console.log(`  ... and ${claims.length - 5} more`);
     }
@@ -335,8 +391,19 @@ async function main() {
       relatedEntities: claim.relatedEntities && claim.relatedEntities.length > 0
         ? claim.relatedEntities
         : null,
-      // Resource linkage
+      // Phase 2 fields
+      claimMode: claim.claimMode,
+      attributedTo: claim.attributedTo ?? null,
+      asOf: claim.asOf ?? null,
+      measure: claim.measure ?? null,
+      valueNumeric: claim.valueNumeric ?? null,
+      valueLow: claim.valueLow ?? null,
+      valueHigh: claim.valueHigh ?? null,
+      // Resource linkage via claim_sources (Phase 2) + legacy resourceIds for backward compat
       resourceIds: [resource.id],
+      sources: claim.sourceQuote
+        ? [{ resourceId: resource.id, sourceQuote: claim.sourceQuote, isPrimary: true }]
+        : [{ resourceId: resource.id, isPrimary: true }],
       // Legacy fields
       value: `From: ${resource.title?.slice(0, 200) ?? resource.id}`,
       unit: claim.relevance,
@@ -356,8 +423,14 @@ async function main() {
     }
   }
 
+  const allClaims = allResults.flatMap(r => r.claims);
+  const attributedCount = allClaims.filter(cl => cl.claimMode === 'attributed').length;
+  const numericCount = allClaims.filter(cl => cl.valueNumeric !== undefined).length;
+
   console.log(`\n${c.bold}Done:${c.reset}`);
   console.log(`  Inserted: ${c.green}${inserted}${c.reset} claims`);
+  if (attributedCount > 0) console.log(`  Attributed: ${c.yellow}${attributedCount}${c.reset} claims with attribution`);
+  if (numericCount > 0) console.log(`  Numeric:    ${c.green}${numericCount}${c.reset} claims with extracted values`);
   if (failed > 0) {
     console.log(`  Failed:   ${c.red}${failed}${c.reset}`);
   }

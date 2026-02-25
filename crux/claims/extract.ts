@@ -36,7 +36,7 @@ import {
   clearClaimsForEntity,
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
-import { VALID_CLAIM_TYPES, claimTypeToCategory } from '../lib/claim-utils.ts';
+import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../lib/claim-utils.ts';
 import type { ClaimTypeValue } from '../lib/claim-utils.ts';
 
 // ---------------------------------------------------------------------------
@@ -169,15 +169,6 @@ Rules:
 
 Respond ONLY with JSON:
 {"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
-
-function parseNumericValue(v: unknown): number | undefined {
-  if (typeof v === 'number' && isFinite(v)) return v;
-  if (typeof v === 'string') {
-    const n = parseFloat(v.replace(/,/g, ''));
-    if (isFinite(n)) return n;
-  }
-  return undefined;
-}
 
 async function extractClaimsFromSection(
   section: Section,

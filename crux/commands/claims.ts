@@ -34,7 +34,7 @@ const SCRIPTS = {
   'ingest-resource': {
     script: 'claims/ingest-resource.ts',
     description: 'Extract claims from an external resource and link to cited entities',
-    passthrough: ['dry-run', 'model', 'entity'],
+    passthrough: ['dry-run', 'model', 'entity', 'force'],
     positional: true,
   },
   'ingest-batch': {
@@ -64,7 +64,7 @@ Options:
   --json           JSON output (status only)
   --entity=E       Target entity filter (ingest-resource, ingest-batch)
   --limit=N        Max resources to process (ingest-batch)
-  --force          Re-ingest already-processed resources (ingest-batch)
+  --force          Re-ingest already-processed resources; clear existing claims (ingest-resource, ingest-batch)
 
 Examples:
   crux claims extract kalshi                          Extract claims from the Kalshi page

@@ -104,6 +104,7 @@ async function main() {
     // Build model args string for ingest-resource subprocess
     const extraArgs: string[] = [];
     if (dryRun) extraArgs.push('--dry-run');
+    if (force) extraArgs.push('--force');
     if (model) extraArgs.push(`--model=${model}`);
     for (const entity of entities) extraArgs.push(`--entity=${entity}`);
 
@@ -123,8 +124,9 @@ async function main() {
       });
 
       if (result.status === 0) {
-        // Parse inserted count from output
-        const insertedMatch = result.stdout.match(/Inserted:\s+(\d+)/);
+        // Strip ANSI escape codes before parsing — ingest-resource.ts uses colored output
+        const cleanStdout = result.stdout.replace(/\x1b\[[0-9;]*m/g, '');
+        const insertedMatch = cleanStdout.match(/Inserted:\s+(\d+)/);
         const n = insertedMatch ? parseInt(insertedMatch[1], 10) : 0;
         totalInserted += n;
         console.log(`${c.green}✓ ${n} claims${c.reset}`);
