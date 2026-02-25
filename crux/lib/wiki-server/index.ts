@@ -187,3 +187,14 @@ export {
   getArtifact,
   getArtifactStats,
 } from './artifacts.ts';
+
+// Entity IDs
+export {
+  allocateId,
+  allocateBatch,
+  allocateIds,
+  getIdBySlug,
+  listIds,
+  isConfigured as isIdServerConfigured,
+} from './ids.ts';
+export type { AllocatedId, IdListResult } from './ids.ts';

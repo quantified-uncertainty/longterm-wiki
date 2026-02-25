@@ -13,7 +13,13 @@ function resetStores() {
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
-  // Debug: uncomment to see queries
+  // --- ref-check: SELECT id FROM entities WHERE id IN (...) ---
+  if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
+    // Return only IDs that exist in the entities store
+    return params
+      .filter((p) => entitiesStore.has(p as string))
+      .map((p) => ({ id: p }));
+  }
 
   // --- entities: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes('"entities"')) {
@@ -403,6 +409,12 @@ describe("Entities API", () => {
 
   describe("JSONB fields", () => {
     it("syncs entities with tags, relatedEntries, sources", async () => {
+      // Pre-seed referenced entities so ref-check passes
+      await seedEntity(app, "openai", "OpenAI");
+      await seedEntity(app, "interpretability", "Interpretability", {
+        entityType: "safety-agenda",
+      });
+
       const res = await postJson(app, "/api/entities/sync", {
         entities: [
           {
@@ -424,6 +436,52 @@ describe("Entities API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.upserted).toBe(1);
+    });
+  });
+
+  // ---- Referential integrity ----
+
+  describe("Referential integrity", () => {
+    it("rejects sync with dangling relatedEntries", async () => {
+      const res = await postJson(app, "/api/entities/sync", {
+        entities: [
+          {
+            id: "anthropic",
+            title: "Anthropic",
+            entityType: "organization",
+            relatedEntries: [
+              { id: "nonexistent-org", type: "organization" },
+            ],
+          },
+        ],
+      });
+
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.message).toContain("nonexistent-org");
+    });
+
+    it("accepts relatedEntries pointing to entities in the same batch", async () => {
+      const res = await postJson(app, "/api/entities/sync", {
+        entities: [
+          {
+            id: "alpha",
+            title: "Alpha",
+            entityType: "organization",
+            relatedEntries: [{ id: "beta", type: "organization" }],
+          },
+          {
+            id: "beta",
+            title: "Beta",
+            entityType: "organization",
+            relatedEntries: [{ id: "alpha", type: "organization" }],
+          },
+        ],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.upserted).toBe(2);
     });
   });
 

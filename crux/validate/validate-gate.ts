@@ -140,6 +140,16 @@ interface Step {
 
 const APP_DIR = `${PROJECT_ROOT}/apps/web`;
 
+// Phase 0.5: Assign IDs from wiki-server before build-data
+const ASSIGN_IDS_STEP: Step = {
+  id: 'assign-ids',
+  name: 'Assign entity IDs from server',
+  command: 'node',
+  args: ['--import', 'tsx/esm', 'scripts/assign-ids.mjs'],
+  cwd: APP_DIR,
+  advisory: true, // Don't block if server unavailable
+};
+
 // Phase 1: Must run first — everything else depends on this
 const BUILD_DATA_STEP: Step = {
   id: 'build-data',
@@ -229,6 +239,13 @@ const PARALLEL_STEPS: Step[] = [
     name: '.returning() guard check',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-returning-guard.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'drizzle-journal',
+    name: 'Drizzle migration journal integrity',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-drizzle-journal.ts'],
     cwd: PROJECT_ROOT,
   },
   {
@@ -456,6 +473,20 @@ async function main(): Promise<void> {
       }
     }
     console.log(`${c.dim}  Running ${totalSteps} CI-blocking checks (${activeParallelSteps.length} in parallel)...${c.reset}\n`);
+  }
+
+  // ── Phase 0.5: Assign IDs from server (advisory — doesn't block) ───────────
+  if (skippedBuildData) {
+    if (!CI_MODE) {
+      console.log(`${c.dim}⊘ Assign entity IDs (skipped — no data changes)${c.reset}`);
+    }
+  } else {
+    const assignIdsResult = await runSequential(ASSIGN_IDS_STEP);
+    allResults.push(assignIdsResult);
+    // Advisory: log failure but don't exit — build-data has its own fallback
+    if (!assignIdsResult.passed && !CI_MODE) {
+      console.log(`${c.yellow}  ⚠ ID assignment failed (server may be unavailable) — build-data will use fallback${c.reset}\n`);
+    }
   }
 
   // ── Phase 1: Build data (prerequisite for everything) ──────────────────────

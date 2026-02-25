@@ -100,7 +100,23 @@ interface ValidationIssues {
 function loadEntities(): Set<string> {
   try {
     const database = loadDatabaseJson();
-    return new Set(Object.keys(database.entities || {}));
+    const ids = new Set<string>();
+
+    // Slug-based IDs from typedEntities (primary) or legacy entities array
+    const typed = (database as Record<string, unknown>).typedEntities as Array<{ id: string }> | undefined;
+    const legacy = (database as Record<string, unknown>).entities as Array<{ id: string }> | undefined;
+    for (const e of typed ?? legacy ?? []) {
+      ids.add(e.id);
+    }
+
+    // Numeric IDs (E###) from idRegistry — EntityLinks may reference either form
+    const reg = (database as Record<string, unknown>).idRegistry as
+      { byNumericId?: Record<string, string> } | undefined;
+    for (const eid of Object.keys(reg?.byNumericId ?? {})) {
+      ids.add(eid);
+    }
+
+    return ids;
   } catch {
     log.warn('Warning: Could not load entities database. Data layer may need manual rebuild.');
     return new Set();

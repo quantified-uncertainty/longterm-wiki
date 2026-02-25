@@ -390,6 +390,9 @@ export function loadBlockIndex(): import('./block-ir.ts').BlockIndex {
  * the real file may contain additional keys.
  */
 export interface DatabaseSchema {
+  /** Canonical entity list produced by build-data.mjs (replaces legacy `entities` key). */
+  typedEntities?: Entity[];
+  /** Legacy alias — may not be present in newer builds; prefer typedEntities. */
   entities?: Entity[];
   experts?: ExpertEntry[];
   organizations?: OrganizationEntry[];

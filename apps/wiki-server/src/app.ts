@@ -21,6 +21,7 @@ import { jobsRoute } from "./routes/jobs.js";
 import { artifactsRoute } from "./routes/artifacts.js";
 import { exploreRoute } from "./routes/explore.js";
 import { createOrpcFactsMiddleware } from "./orpc/handler.js";
+import { integrityRoute } from "./routes/integrity.js";
 
 export function createApp() {
   const app = new Hono();
@@ -89,6 +90,7 @@ export function createApp() {
   app.route("/api/jobs", jobsRoute);
   app.route("/api/artifacts", artifactsRoute);
   app.route("/api/explore", exploreRoute);
+  app.route("/api/integrity", integrityRoute);
 
   // oRPC endpoint — facts module pilot (Phase 2a)
   // Serves the same data as /api/facts/* but via the oRPC RPC protocol.

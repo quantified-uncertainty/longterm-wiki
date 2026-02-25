@@ -1,5 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
+import { eq, and, count, asc, sql, isNotNull, lte } from "drizzle-orm";
+import { getDrizzleDb } from "../db.js";
+import { facts, entities, resources } from "../schema.js";
+import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
   validationError,
@@ -110,5 +114,100 @@ factsRoute.post("/sync", async (c) => {
   const parsed = SyncFactsBatchSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
 
-  return c.json(await syncFacts(parsed.data.facts));
+  const { facts: items } = parsed.data;
+  const db = getDrizzleDb();
+
+  // Validate entity references
+  const entityIds = [...new Set(items.map((f) => f.entityId))];
+  const missingEntities = await checkRefsExist(db, entities, entities.id, entityIds);
+  if (missingEntities.length > 0) {
+    return validationError(
+      c,
+      `Referenced entities not found: ${missingEntities.join(", ")}`
+    );
+  }
+
+  // Validate subject references (optional field, also points to entities)
+  const subjectIds = [
+    ...new Set(items.map((f) => f.subject).filter((s): s is string => s != null)),
+  ];
+  if (subjectIds.length > 0) {
+    const missingSubjects = await checkRefsExist(db, entities, entities.id, subjectIds);
+    if (missingSubjects.length > 0) {
+      return validationError(
+        c,
+        `Referenced subject entities not found: ${missingSubjects.join(", ")}`
+      );
+    }
+  }
+
+  // Validate sourceResource references (optional field, points to resources)
+  const resourceIds = [
+    ...new Set(
+      items.map((f) => f.sourceResource).filter((r): r is string => r != null)
+    ),
+  ];
+  if (resourceIds.length > 0) {
+    const missingResources = await checkRefsExist(
+      db,
+      resources,
+      resources.id,
+      resourceIds
+    );
+    if (missingResources.length > 0) {
+      return validationError(
+        c,
+        `Referenced resources not found: ${missingResources.join(", ")}`
+      );
+    }
+  }
+
+  let upserted = 0;
+
+  await db.transaction(async (tx) => {
+    const allVals = items.map((f) => ({
+      entityId: f.entityId,
+      factId: f.factId,
+      label: f.label ?? null,
+      value: f.value ?? null,
+      numeric: f.numeric ?? null,
+      low: f.low ?? null,
+      high: f.high ?? null,
+      asOf: f.asOf ?? null,
+      measure: f.measure ?? null,
+      subject: f.subject ?? null,
+      note: f.note ?? null,
+      source: f.source ?? null,
+      sourceResource: f.sourceResource ?? null,
+      format: f.format ?? null,
+      formatDivisor: f.formatDivisor ?? null,
+    }));
+
+    await tx
+      .insert(facts)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: [facts.entityId, facts.factId],
+        set: {
+          label: sql`excluded.label`,
+          value: sql`excluded.value`,
+          numeric: sql`excluded.numeric`,
+          low: sql`excluded.low`,
+          high: sql`excluded.high`,
+          asOf: sql`excluded.as_of`,
+          measure: sql`excluded.measure`,
+          subject: sql`excluded.subject`,
+          note: sql`excluded.note`,
+          source: sql`excluded.source`,
+          sourceResource: sql`excluded.source_resource`,
+          format: sql`excluded.format`,
+          formatDivisor: sql`excluded.format_divisor`,
+          syncedAt: sql`now()`,
+          updatedAt: sql`now()`,
+        },
+      });
+    upserted = allVals.length;
+  });
+
+  return c.json({ upserted });
 });

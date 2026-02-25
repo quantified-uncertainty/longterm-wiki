@@ -648,15 +648,54 @@ export interface UpsertSummaryBatchResult {
 // Claims
 // ---------------------------------------------------------------------------
 
+/**
+ * Claim category taxonomy — high-level grouping for how a claim should be
+ * treated, verified, and displayed.
+ */
+export const ClaimCategorySchema = z.enum([
+  "factual", // Verifiable against sources (dates, events, numbers)
+  "opinion", // Subjective evaluations, value judgments
+  "analytical", // Wiki's own inferences drawn from evidence
+  "speculative", // Uncertain projections, predictions
+  "relational", // Cross-entity comparisons or relationships
+]);
+export type ClaimCategory = z.infer<typeof ClaimCategorySchema>;
+
+/**
+ * Claim type — granular classification matching the claim-first architecture
+ * taxonomy (E892). These map to different verification strategies.
+ */
+export const ClaimTypeSchema = z.enum([
+  // Core types (existing)
+  "factual", // Verifiable against a single source
+  "evaluative", // Subjective assessments or judgments
+  "causal", // Cause-effect assertions
+  "historical", // Historical events with dates
+  // Extended types (from claim-first architecture)
+  "numeric", // Numeric values that should link to fact system
+  "consensus", // Claims requiring multiple source agreement
+  "speculative", // Explicit predictions or uncertain projections
+  "relational", // Cross-entity comparisons
+]);
+export type ClaimType = z.infer<typeof ClaimTypeSchema>;
+
 export const InsertClaimSchema = z.object({
   entityId: z.string().min(1).max(300),
   entityType: z.string().min(1).max(100),
   claimType: z.string().min(1).max(100),
   claimText: z.string().min(1).max(10000),
+  // Legacy fields — kept for backward compat
   value: z.string().max(1000).nullable().optional(),
   unit: z.string().max(100).nullable().optional(),
   confidence: z.string().max(100).nullable().optional(),
   sourceQuote: z.string().max(10000).nullable().optional(),
+  // Enhanced fields
+  claimCategory: ClaimCategorySchema.nullable().optional(),
+  relatedEntities: z.array(z.string().max(300)).nullable().optional(),
+  factId: z.string().max(300).nullable().optional(),
+  resourceIds: z.array(z.string().max(300)).nullable().optional(),
+  section: z.string().max(1000).nullable().optional(),
+  footnoteRefs: z.string().max(500).nullable().optional(),
 });
 export type InsertClaim = z.infer<typeof InsertClaimSchema>;
 
@@ -680,6 +719,13 @@ export interface ClaimRow {
   unit: string | null;
   confidence: string | null;
   sourceQuote: string | null;
+  // Enhanced fields
+  claimCategory: string | null;
+  relatedEntities: string[] | null;
+  factId: string | null;
+  resourceIds: string[] | null;
+  section: string | null;
+  footnoteRefs: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -701,6 +747,15 @@ export interface ClearClaimsResult {
 
 export interface GetClaimsResult {
   claims: ClaimRow[];
+}
+
+export interface ClaimStatsResult {
+  total: number;
+  byClaimType: Record<string, number>;
+  byEntityType: Record<string, number>;
+  byClaimCategory: Record<string, number>;
+  multiEntityClaims: number;
+  factLinkedClaims: number;
 }
 
 // ---------------------------------------------------------------------------
