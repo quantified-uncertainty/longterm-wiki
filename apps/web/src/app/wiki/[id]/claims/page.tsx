@@ -61,7 +61,7 @@ export default async function WikiClaimsPage({ params }: PageProps) {
   const title = pageData?.title ?? slug;
 
   const result = await fetchFromWikiServer<GetClaimsResult>(
-    `/api/claims/by-entity/${encodeURIComponent(slug)}`,
+    `/api/claims/by-entity/${encodeURIComponent(slug)}?includeSources=true`,
     { revalidate: 300 }
   );
 

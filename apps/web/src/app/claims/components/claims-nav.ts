@@ -7,9 +7,13 @@ interface NetworkResponse {
   edges: { source: string; target: string; weight: number }[];
 }
 
+/** Max entities shown in sidebar before truncating with a "Browse all" link */
+const MAX_SIDEBAR_ENTITIES = 20;
+
 /**
  * Build sidebar navigation for the Claims Explorer section.
  * Uses the network endpoint to get ALL entities with claims (not just first 200).
+ * Entities are sorted by claim count (descending) so the most active appear first.
  */
 export async function getClaimsNav(): Promise<NavSection[]> {
   const sections: NavSection[] = [
@@ -33,21 +37,32 @@ export async function getClaimsNav(): Promise<NavSection[]> {
 
   if (result) {
     // Only show entities that have claims extracted FROM them (claimCount > 0)
-    const entityIds = result.nodes
+    // Sort by claim count descending so the most active appear first
+    const sorted = result.nodes
       .filter((n) => n.claimCount > 0)
-      .map((n) => n.entityId)
-      .sort();
+      .sort((a, b) => b.claimCount - a.claimCount);
 
-    if (entityIds.length > 0) {
+    if (sorted.length > 0) {
+      const displayed = sorted.slice(0, MAX_SIDEBAR_ENTITIES);
+      const items = displayed.map((n) => {
+        const entity = getEntityById(n.entityId);
+        return {
+          label: `${entity?.title ?? n.entityId} (${n.claimCount})`,
+          href: `/claims/entity/${n.entityId}`,
+        };
+      });
+
+      // If there are more entities than the cap, add a "Browse all" link
+      if (sorted.length > MAX_SIDEBAR_ENTITIES) {
+        items.push({
+          label: `Browse all ${sorted.length} entities...`,
+          href: "/claims/explore",
+        });
+      }
+
       sections.push({
-        title: "Entities",
-        items: entityIds.map((id) => {
-          const entity = getEntityById(id);
-          return {
-            label: entity?.title ?? id,
-            href: `/claims/entity/${id}`,
-          };
-        }),
+        title: `Entities (${sorted.length})`,
+        items,
       });
     }
   }

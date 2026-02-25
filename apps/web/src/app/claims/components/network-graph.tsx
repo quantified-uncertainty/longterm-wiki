@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ReactFlow,
@@ -149,9 +150,20 @@ export function NetworkGraph({
 }) {
   if (nodes.length === 0) {
     return (
-      <div className="border rounded-lg p-8 text-center text-muted-foreground">
-        No network data available. Claims need <code>relatedEntities</code>{" "}
-        data to build the network graph.
+      <div className="border rounded-lg p-8 text-center space-y-3">
+        <p className="text-muted-foreground font-medium">
+          No network data available
+        </p>
+        <p className="text-sm text-muted-foreground">
+          The network graph requires claims with <code className="text-xs bg-muted px-1 py-0.5 rounded">relatedEntities</code> data
+          to build connections between entities. Claims are populated when you
+          run <code className="text-xs bg-muted px-1 py-0.5 rounded">pnpm crux claims extract &lt;entity&gt;</code>.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Try <Link href="/claims/explore" className="text-blue-600 hover:underline">browsing claims</Link> to
+          check if any claims exist, or <Link href="/claims/relationships" className="text-blue-600 hover:underline">view relationships</Link> for
+          a table-based view of entity connections.
+        </p>
       </div>
     );
   }

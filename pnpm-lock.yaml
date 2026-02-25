@@ -161,9 +161,6 @@ importers:
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
-      hono:
-        specifier: ^4.7.0
-        version: 4.12.0
       js-yaml:
         specifier: ^4.1.1
         version: 4.1.1
@@ -237,6 +234,9 @@ importers:
       '@vitest/ui':
         specifier: ^4.0.18
         version: 4.0.18(vitest@4.0.18)
+      hono:
+        specifier: ^4.12.0
+        version: 4.12.0
       playwright:
         specifier: ^1.50.0
         version: 1.58.2
