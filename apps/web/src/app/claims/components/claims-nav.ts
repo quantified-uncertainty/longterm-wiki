@@ -1,9 +1,12 @@
 import type { NavSection } from "@/lib/internal-nav";
 import { fetchFromWikiServer } from "@lib/wiki-server";
+import type { ClaimRow } from "@wiki-server/api-types";
 
-interface AllClaimsResponse {
-  claims: { entityId: string }[];
+interface PaginatedClaimsResponse {
+  claims: ClaimRow[];
   total: number;
+  limit: number;
+  offset: number;
 }
 
 /**
@@ -25,7 +28,7 @@ export async function getClaimsNav(): Promise<NavSection[]> {
   ];
 
   // Fetch entities that have claims
-  const result = await fetchFromWikiServer<AllClaimsResponse>(
+  const result = await fetchFromWikiServer<PaginatedClaimsResponse>(
     "/api/claims/all?limit=200",
     { revalidate: 300 }
   );
