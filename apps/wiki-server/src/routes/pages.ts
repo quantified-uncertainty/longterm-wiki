@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  dbError,
 } from "./utils.js";
 import {
   SyncPageSchema as SharedSyncPageSchema,
@@ -245,7 +246,8 @@ pagesRoute.post("/sync", async (c) => {
 
   const pageIds = pages.map((p) => p.id);
 
-  await db.transaction(async (tx) => {
+  try {
+   await db.transaction(async (tx) => {
     const allVals = pages.map((page) => ({
       id: page.id,
       numericId: page.numericId ?? null,
@@ -324,6 +326,9 @@ pagesRoute.post("/sync", async (c) => {
       WHERE id IN (${idList})
     `);
   });
+  } catch (err) {
+    return dbError(c, "pages sync", err, { pageCount: pages.length });
+  }
 
   return c.json({ upserted });
 });

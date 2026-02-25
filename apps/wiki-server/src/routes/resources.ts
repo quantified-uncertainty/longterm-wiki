@@ -19,6 +19,7 @@ import {
   invalidJsonError,
   notFoundError,
   firstOrThrow,
+  dbError,
 } from "./utils.js";
 import {
   UpsertResourceSchema as SharedUpsertResourceSchema,
@@ -245,29 +246,33 @@ resourcesRoute.post("/batch", async (c) => {
   }
 
   const results: Array<{ id: string; url: string }> = [];
-  await db.transaction(async (tx) => {
-    for (const item of items) {
-      // Skip per-row search_vector update; handled in bulk below
-      const result = await upsertResource(tx as unknown as DbClient, item, {
-        skipSearchVector: true,
-      });
-      results.push({ id: result.id, url: result.url });
-    }
+  try {
+    await db.transaction(async (tx) => {
+      for (const item of items) {
+        // Skip per-row search_vector update; handled in bulk below
+        const result = await upsertResource(tx as unknown as DbClient, item, {
+          skipSearchVector: true,
+        });
+        results.push({ id: result.id, url: result.url });
+      }
 
-    // Bulk search_vector update for all upserted resources (one query)
-    const idList = sql.join(
-      results.map((r) => sql`${r.id}`),
-      sql`, `
-    );
-    await tx.execute(sql`
-      UPDATE resources SET search_vector =
-        setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
-        setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
-        setweight(to_tsvector('english', coalesce(abstract, '')), 'C') ||
-        setweight(to_tsvector('english', coalesce(review, '')), 'D')
-      WHERE id IN (${idList})
-    `);
-  });
+      // Bulk search_vector update for all upserted resources (one query)
+      const idList = sql.join(
+        results.map((r) => sql`${r.id}`),
+        sql`, `
+      );
+      await tx.execute(sql`
+        UPDATE resources SET search_vector =
+          setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+          setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
+          setweight(to_tsvector('english', coalesce(abstract, '')), 'C') ||
+          setweight(to_tsvector('english', coalesce(review, '')), 'D')
+        WHERE id IN (${idList})
+      `);
+    });
+  } catch (err) {
+    return dbError(c, "resources batch upsert", err, { itemCount: items.length });
+  }
 
   return c.json({ upserted: results.length, results }, 201);
 });
