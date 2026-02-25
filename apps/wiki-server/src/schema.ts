@@ -394,6 +394,14 @@ export const claims = pgTable(
     resourceIds: jsonb("resource_ids"), // string[] — resource IDs from data/resources/
     section: text("section"), // section heading where claim appears
     footnoteRefs: text("footnote_refs"), // comma-separated footnote refs (e.g. "1,3,7")
+    // --- Phase 2 fields (migration 0029) ---
+    claimMode: text("claim_mode"),      // 'endorsed' | 'attributed'
+    attributedTo: text("attributed_to"), // entity_id of person/org making the claim
+    asOf: text("as_of"),                // temporal index: YYYY-MM or YYYY-MM-DD
+    measure: text("measure"),           // measure ID linking to facts taxonomy
+    valueNumeric: real("value_numeric"), // central numeric value (machine-readable)
+    valueLow: real("value_low"),        // lower bound for range values
+    valueHigh: real("value_high"),      // upper bound for range values
     // --- Timestamps ---
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -408,8 +416,46 @@ export const claims = pgTable(
     index("idx_cl_claim_type").on(table.claimType),
     index("idx_cl_claim_category").on(table.claimCategory),
     index("idx_cl_fact_id").on(table.factId),
+    index("idx_cl_claim_mode").on(table.claimMode),
+    index("idx_cl_attributed_to").on(table.attributedTo),
+    index("idx_cl_as_of").on(table.asOf),
+    index("idx_cl_measure").on(table.measure),
     // GIN index on relatedEntities is created in migration 0028
     // (Drizzle doesn't support GIN index declarations on JSONB)
+  ]
+);
+
+/**
+ * Claim sources — join table linking claims to their supporting resources.
+ *
+ * Each row represents one resource backing a claim.
+ * Replaces the JSONB resource_ids array with proper relational rows,
+ * enabling per-source quotes, primary source flags, and JOIN queries.
+ *
+ * claim_mode on the parent claim tells you whether the wiki endorses the claim
+ * or is attributing it to another entity (e.g., "Anthropic claims that...").
+ */
+export const claimSources = pgTable(
+  "claim_sources",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    claimId: bigint("claim_id", { mode: "number" })
+      .notNull()
+      .references(() => claims.id, { onDelete: "cascade" }),
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
+    url: text("url"), // fallback if resourceId not known
+    sourceQuote: text("source_quote"), // exact excerpt supporting the claim
+    isPrimary: boolean("is_primary").notNull().default(false),
+    addedAt: timestamp("added_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_cs_claim_id").on(table.claimId),
+    index("idx_cs_resource_id").on(table.resourceId),
+    index("idx_cs_is_primary").on(table.isPrimary),
   ]
 );
 
