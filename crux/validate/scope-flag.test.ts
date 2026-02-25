@@ -24,7 +24,7 @@ function run(cmd: string, cwd: string = REPO_ROOT): { stdout: string; exitCode: 
       cwd,
       encoding: 'utf-8',
       timeout: 120_000,
-      env: { ...process.env, NODE_USE_ENV_PROXY: '1' },
+      env: { ...process.env, NODE_USE_ENV_PROXY: '1', CI: '' },
     });
     return { stdout, exitCode: 0 };
   } catch (e: any) {
@@ -67,7 +67,7 @@ describe('--scope=content flag', () => {
 
     it('full build (no --scope) does NOT skip steps', () => {
       const result = run(
-        'node --import tsx/esm scripts/build-data.mjs 2>&1 | head -5',
+        'node --import tsx/esm scripts/build-data.mjs | head -5',
         APP_DIR
       );
 
@@ -88,7 +88,7 @@ describe('--scope=content flag', () => {
   describe('validate gate --scope=content', () => {
     it('runs only content-relevant checks', () => {
       const result = run(
-        'pnpm crux validate gate --scope=content 2>&1',
+        'pnpm crux validate gate --scope=content',
         REPO_ROOT
       );
 
