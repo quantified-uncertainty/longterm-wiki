@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import {
   getResourceById,
   getResourceCredibility,
@@ -256,12 +257,22 @@ export function References({
       )}
       aria-label={title}
     >
-      <h2
-        className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 mt-0 pb-0 border-b-0"
-        id="references"
-      >
-        {title}
-      </h2>
+      <div className="flex items-baseline justify-between mb-2">
+        <h2
+          className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mt-0 pb-0 border-b-0"
+          id="references"
+        >
+          {title}
+        </h2>
+        {pageId && (
+          <Link
+            href={`/claims/entity/${pageId}`}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            View claims →
+          </Link>
+        )}
+      </div>
 
       {refs.length > 0 && (
         <div>
