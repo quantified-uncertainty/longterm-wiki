@@ -553,7 +553,6 @@
 - id: arc
   numericId: E25
   type: organization
-  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: ARC
   website: https://alignment.org
@@ -612,7 +611,6 @@
 - id: epoch-ai
   numericId: E125
   type: organization
-  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Epoch AI
   website: https://epochai.org
@@ -663,7 +661,6 @@
 - id: miri
   numericId: E202
   type: organization
-  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: MIRI
   website: https://intelligence.org
@@ -725,7 +722,6 @@
 - id: redwood
   numericId: E247
   type: organization
-  orgType: safety-org
   title: Redwood Research
   website: https://redwoodresearch.org
   relatedEntries:
@@ -774,7 +770,6 @@
 - id: uk-aisi
   numericId: E364
   type: organization
-  orgType: government
   summaryPage: government-orgs-overview
   title: UK AI Safety Institute
   website: https://www.aisi.gov.uk
@@ -828,7 +823,6 @@
 - id: us-aisi
   numericId: E365
   type: organization
-  orgType: government
   summaryPage: government-orgs-overview
   title: US AI Safety Institute
   website: https://www.nist.gov/aisi
@@ -880,7 +874,6 @@
 - id: arc-evals
   numericId: E26
   type: organization
-  orgType: safety-org
   title: ARC Evaluations
   description: Organization focused on evaluating AI systems for dangerous capabilities. Now largely absorbed into METR.
   status: stub
@@ -896,7 +889,6 @@
 - id: fhi
   numericId: E140
   type: organization
-  orgType: academic
   summaryPage: safety-orgs-overview
   title: Future of Humanity Institute
   description: Oxford University research center focused on existential risks, founded by Nick Bostrom. Closed in 2024.
@@ -917,7 +909,6 @@
 - id: openai-foundation
   numericId: E421
   type: organization
-  orgType: generic
   title: OpenAI Foundation
   description: >-
     Nonprofit organization holding 26% equity stake (~$130B) in OpenAI Group PBC,
@@ -948,7 +939,6 @@
 - id: leading-the-future
   numericId: E422
   type: organization
-  orgType: generic
   title: Leading the Future super PAC
   description: >-
     Pro-AI industry super PAC launched in 2025 to influence federal AI regulation
@@ -973,7 +963,6 @@
 - id: johns-hopkins-center-for-health-security
   numericId: E423
   type: organization
-  orgType: academic
   title: Johns Hopkins Center for Health Security
   description: >-
     Independent nonprofit research organization focused on preventing and preparing
@@ -998,7 +987,6 @@
 - id: nist-ai
   numericId: E424
   type: organization
-  orgType: government
   summaryPage: government-orgs-overview
   title: NIST and AI Safety
   description: >-
@@ -1055,7 +1043,6 @@
 - id: controlai
   numericId: E426
   type: organization
-  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: ControlAI
   description: >-
@@ -1084,7 +1071,6 @@
 - id: frontier-model-forum
   numericId: E427
   type: organization
-  orgType: generic
   summaryPage: safety-orgs-overview
   title: Frontier Model Forum
   description: >-
@@ -1147,7 +1133,6 @@
 - id: centre-for-long-term-resilience
   numericId: E429
   type: organization
-  orgType: safety-org
   title: Centre for Long-Term Resilience
   description: >-
     UK-based think tank focused on extreme risks from AI, biosecurity, and
@@ -1222,7 +1207,6 @@
 - id: 80000-hours
   numericId: E510
   type: organization
-  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: 80,000 Hours
   description: >-
@@ -1238,7 +1222,6 @@
 - id: ai-futures-project
   numericId: E511
   type: organization
-  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: AI Futures Project
   description: >-
@@ -1254,7 +1237,6 @@
 - id: ai-impacts
   numericId: E512
   type: organization
-  orgType: safety-org
   title: AI Impacts
   description: >-
     AI Impacts is a research organization that conducts empirical analysis of AI
@@ -1270,7 +1252,6 @@
 - id: ai-revenue-sources
   numericId: E513
   type: organization
-  orgType: generic
   title: AI Revenue Sources
   description: >-
     Analysis of the AI revenue gap. Hyperscalers are spending ~$700B on AI
@@ -1285,7 +1266,6 @@
 - id: arb-research
   numericId: E514
   type: organization
-  orgType: safety-org
   title: Arb Research
   description: >-
     Arb Research is a small AI safety consulting firm that produces
@@ -1301,7 +1281,6 @@
 - id: blueprint-biosecurity
   numericId: E515
   type: organization
-  orgType: safety-org
   title: Blueprint Biosecurity
   description: >-
     An EA-funded biosecurity nonprofit founded in 2023 by Jake Swett, dedicated
@@ -1316,7 +1295,6 @@
 - id: bridgewater-aia-labs
   numericId: E516
   type: organization
-  orgType: generic
   summaryPage: labs-overview
   title: Bridgewater AIA Labs
   description: >-
@@ -1332,7 +1310,6 @@
 - id: cea
   numericId: E517
   type: organization
-  orgType: safety-org
   summaryPage: community-building-overview
   title: Centre for Effective Altruism
   description: >-
@@ -1359,7 +1336,6 @@
 - id: chan-zuckerberg-initiative
   numericId: E519
   type: organization
-  orgType: funder
   title: Chan Zuckerberg Initiative
   description: >-
     The Chan Zuckerberg Initiative is a philanthropic LLC that has pivoted
@@ -1373,7 +1349,6 @@
 - id: coalition-for-epidemic-preparedness-innovations
   numericId: E520
   type: organization
-  orgType: funder
   title: Coalition for Epidemic Preparedness Innovations
   description: >-
     CEPI is an international vaccine development partnership founded in 2017
@@ -1387,7 +1362,6 @@
 - id: coefficient-giving
   numericId: E521
   type: organization
-  orgType: funder
   title: Coefficient Giving
   description: >-
     Coefficient Giving (formerly Open Philanthropy) has directed $4B+ in grants
@@ -1403,7 +1377,6 @@
 - id: council-on-strategic-risks
   numericId: E522
   type: organization
-  orgType: safety-org
   title: Council on Strategic Risks
   description: >-
     The Council on Strategic Risks is a DC-based nonprofit founded in 2017 that
@@ -1417,7 +1390,6 @@
 - id: cser
   numericId: E523
   type: organization
-  orgType: academic
   summaryPage: safety-orgs-overview
   title: CSER (Centre for the Study of Existential Risk)
   description: >-
@@ -1435,7 +1407,6 @@
 - id: cset
   numericId: E524
   type: organization
-  orgType: academic
   summaryPage: safety-orgs-overview
   title: CSET (Center for Security and Emerging Technology)
   description: >-
@@ -1451,7 +1422,6 @@
 - id: ea-global
   numericId: E525
   type: organization
-  orgType: generic
   summaryPage: community-building-overview
   title: EA Global
   description: >-
@@ -1465,7 +1435,6 @@
 - id: elicit
   numericId: E526
   type: organization
-  orgType: startup
   title: Elicit (AI Research Tool)
   description: >-
     Elicit is an AI research assistant with 2M+ users that searches 138M papers
@@ -1480,7 +1449,6 @@
 - id: epistemic-orgs-epoch-ai
   numericId: E527
   type: organization
-  orgType: generic
   title: Epoch AI
   description: >-
     Epoch AI maintains comprehensive databases tracking 3,200+ ML models showing
@@ -1495,7 +1463,6 @@
 - id: fli
   numericId: E528
   type: organization
-  orgType: safety-org
   title: Future of Life Institute (FLI)
   description: >-
     Comprehensive profile of FLI documenting $25M+ in grants distributed (2015:
@@ -1511,7 +1478,6 @@
 - id: founders-fund
   numericId: E529
   type: organization
-  orgType: funder
   title: Founders Fund
   description: >-
     Founders Fund is a $17B contrarian VC firm that has backed major AI
@@ -1525,7 +1491,6 @@
 - id: futuresearch
   numericId: E530
   type: organization
-  orgType: startup
   title: FutureSearch
   description: >-
     FutureSearch is an AI forecasting startup founded by former Metaculus
@@ -1541,7 +1506,6 @@
 - id: giving-pledge
   numericId: E531
   type: organization
-  orgType: funder
   title: Giving Pledge
   description: >-
     The Giving Pledge, while attracting 250+ billionaire signatories since 2010,
@@ -1554,7 +1518,6 @@
 - id: good-judgment
   numericId: E532
   type: organization
-  orgType: generic
   title: Good Judgment (Forecasting)
   description: >-
     Good Judgment Inc. is a commercial forecasting organization that emerged
@@ -1569,7 +1532,6 @@
 - id: gpai
   numericId: E533
   type: organization
-  orgType: government
   summaryPage: government-orgs-overview
   title: Global Partnership on Artificial Intelligence (GPAI)
   description: >-
@@ -1586,7 +1548,6 @@
 - id: gratified
   numericId: E534
   type: organization
-  orgType: generic
   summaryPage: community-building-overview
   title: Gratified
   description: >-
@@ -1600,7 +1561,6 @@
 - id: hewlett-foundation
   numericId: E535
   type: organization
-  orgType: funder
   title: William and Flora Hewlett Foundation
   description: >-
     The Hewlett Foundation is a $14.8 billion philanthropic organization that
@@ -1614,7 +1574,6 @@
 - id: ibbis
   numericId: E536
   type: organization
-  orgType: academic
   title: IBBIS (International Biosecurity and Biosafety Initiative for Science)
   description: >-
     An independent Swiss foundation launched in February 2024, spun out of NTI |
@@ -1629,7 +1588,6 @@
 - id: kalshi
   numericId: E537
   type: organization
-  orgType: startup
   title: Kalshi (Prediction Market)
   description: >-
     This is a comprehensive corporate profile of Kalshi, a US prediction market
@@ -1644,7 +1602,6 @@
 - id: lesswrong
   numericId: E538
   type: organization
-  orgType: generic
   summaryPage: community-building-overview
   title: LessWrong
   description: >-
@@ -1659,7 +1616,6 @@
 - id: lighthaven
   numericId: E539
   type: organization
-  orgType: generic
   summaryPage: community-building-overview
   title: Lighthaven (Event Venue)
   description: >-
@@ -1689,7 +1645,6 @@
 - id: lionheart-ventures
   numericId: E541
   type: organization
-  orgType: funder
   title: Lionheart Ventures
   description: >-
     Lionheart Ventures is a small venture capital firm ($25M inaugural fund)
@@ -1703,7 +1658,6 @@
 - id: longview-philanthropy
   numericId: E542
   type: organization
-  orgType: funder
   title: Longview Philanthropy
   description: >-
     Longview Philanthropy is a philanthropic advisory organization founded in
@@ -1720,7 +1674,6 @@
 - id: ltff
   numericId: E543
   type: organization
-  orgType: funder
   title: Long-Term Future Fund (LTFF)
   description: >-
     LTFF is a regranting program that has distributed $20M since 2017
@@ -1735,7 +1688,6 @@
 - id: macarthur-foundation
   numericId: E544
   type: organization
-  orgType: funder
   title: MacArthur Foundation
   description: >-
     Comprehensive profile of the $9 billion MacArthur Foundation documenting its
@@ -1748,7 +1700,6 @@
 - id: manifest
   numericId: E545
   type: organization
-  orgType: generic
   summaryPage: community-building-overview
   title: Manifest (Forecasting Conference)
   description: >-
@@ -1763,7 +1714,6 @@
 - id: manifold
   numericId: E546
   type: organization
-  orgType: startup
   title: Manifold (Prediction Market)
   description: >-
     Manifold is a play-money prediction market with millions of predictions and
@@ -1778,7 +1728,6 @@
 - id: manifund
   numericId: E547
   type: organization
-  orgType: funder
   title: Manifund
   description: >-
     Manifund is a $2M+ annual charitable regranting platform (founded 2022) that
@@ -1793,7 +1742,6 @@
 - id: mats
   numericId: E548
   type: organization
-  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: MATS ML Alignment Theory Scholars program
   description: >-
@@ -1809,7 +1757,6 @@
 - id: meta-ai
   numericId: E549
   type: organization
-  orgType: frontier-lab
   summaryPage: labs-overview
   title: Meta AI (FAIR)
   description: >-
@@ -1826,7 +1773,6 @@
 - id: microsoft
   numericId: E550
   type: organization
-  orgType: frontier-lab
   summaryPage: labs-overview
   title: Microsoft AI
   description: >-
@@ -1843,7 +1789,6 @@
 - id: nti-bio
   numericId: E551
   type: organization
-  orgType: safety-org
   title: "NTI | bio (Nuclear Threat Initiative - Biological Program)"
   description: >-
     The biosecurity division of the Nuclear Threat Initiative, NTI | bio works
@@ -1859,7 +1804,6 @@
 - id: open-philanthropy
   numericId: E552
   type: organization
-  orgType: funder
   title: Open Philanthropy
   description: >-
     Open Philanthropy rebranded to Coefficient Giving in November 2025. See the
@@ -1872,7 +1816,6 @@
 - id: pause-ai
   numericId: E553
   type: organization
-  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Pause AI
   description: >-
@@ -1888,7 +1831,6 @@
 - id: peter-thiel-philanthropy
   numericId: E554
   type: organization
-  orgType: funder
   title: Peter Thiel (Funder)
   description: >-
     Peter Thiel funded MIRI ($1.6M+) in its early years but has stated he
@@ -1902,7 +1844,6 @@
 - id: polymarket
   numericId: E555
   type: organization
-  orgType: startup
   title: Polymarket
   description: >-
     This is a comprehensive overview of Polymarket as a prediction market
@@ -1917,7 +1858,6 @@
 - id: red-queen-bio
   numericId: E556
   type: organization
-  orgType: startup
   title: Red Queen Bio
   description: >-
     An AI biosecurity Public Benefit Corporation founded in 2025 by Nikolai
@@ -1932,7 +1872,6 @@
 - id: redwood-research
   numericId: E557
   type: organization
-  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Redwood Research
   description: >-
@@ -1947,7 +1886,6 @@
 - id: rethink-priorities
   numericId: E558
   type: organization
-  orgType: safety-org
   title: Rethink Priorities
   description: >-
     Rethink Priorities is a research organization founded in 2018 that grew from
@@ -1964,7 +1902,6 @@
 - id: safety-orgs-epoch-ai
   numericId: E559
   type: organization
-  orgType: generic
   title: Epoch AI
   description: >-
     Epoch AI provides empirical AI progress tracking showing training compute
@@ -1981,7 +1918,6 @@
 - id: samotsvety
   numericId: E560
   type: organization
-  orgType: generic
   title: Samotsvety
   description: >-
     Elite forecasting group Samotsvety dominated INFER competitions 2020-2022
@@ -1996,7 +1932,6 @@
 - id: schmidt-futures
   numericId: E561
   type: organization
-  orgType: funder
   title: Schmidt Futures
   description: >-
     Schmidt Futures is a major philanthropic initiative founded by Eric Schmidt
@@ -2010,7 +1945,6 @@
 - id: secure-ai-project
   numericId: E562
   type: organization
-  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Secure AI Project
   description: >-
@@ -2027,7 +1961,6 @@
 - id: securebio
   numericId: E563
   type: organization
-  orgType: safety-org
   title: SecureBio
   description: >-
     A biosecurity nonprofit applying the Delay/Detect/Defend framework to
@@ -2044,7 +1977,6 @@
 - id: securedna
   numericId: E564
   type: organization
-  orgType: safety-org
   title: SecureDNA
   description: >-
     A Swiss nonprofit foundation providing free, privacy-preserving DNA
@@ -2060,7 +1992,6 @@
 - id: seldon-lab
   numericId: E565
   type: organization
-  orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Seldon Lab
   description: >-
@@ -2076,7 +2007,6 @@
 - id: sentinel
   numericId: E566
   type: organization
-  orgType: safety-org
   title: Sentinel (Catastrophic Risk Foresight)
   description: >-
     Sentinel is a 2024-founded foresight organization led by Nuño Sempere that
@@ -2092,7 +2022,6 @@
 - id: sff
   numericId: E567
   type: organization
-  orgType: funder
   title: Survival and Flourishing Fund (SFF)
   description: >-
     SFF distributed $141M since 2019 (primarily from Jaan Tallinn's ~$900M
@@ -2108,7 +2037,6 @@
 - id: situational-awareness-lp
   numericId: E568
   type: organization
-  orgType: generic
   title: Situational Awareness LP
   description: >-
     Situational Awareness LP is a hedge fund founded by Leopold Aschenbrenner in
@@ -2123,7 +2051,6 @@
 - id: swift-centre
   numericId: E569
   type: organization
-  orgType: safety-org
   title: Swift Centre
   description: >-
     Swift Centre is a UK forecasting organization that provides conditional
@@ -2137,7 +2064,6 @@
 - id: the-foundation-layer
   numericId: E697
   type: organization
-  orgType: funder
   title: The Foundation Layer
   website: https://foundation-layer.ai
   description: >-
@@ -2161,7 +2087,6 @@
 - id: the-sequences
   numericId: E570
   type: organization
-  orgType: generic
   summaryPage: community-building-overview
   title: The Sequences by Eliezer Yudkowsky
   description: >-
@@ -2175,7 +2100,6 @@
 - id: turion
   numericId: E571
   type: organization
-  orgType: generic
   title: Turion
   description: >-
     Point72's Turion hedge fund, launched October 2024 with $150M seed capital,
@@ -2189,7 +2113,6 @@
 - id: vara
   numericId: E572
   type: organization
-  orgType: generic
   title: Value Aligned Research Advisors
   description: >-
     Value Aligned Research Advisors is a Princeton-based hedge fund managing
@@ -2203,7 +2126,6 @@
 - id: vitalik-buterin-philanthropy
   numericId: E573
   type: organization
-  orgType: funder
   title: Vitalik Buterin (Funder)
   description: >-
     Vitalik Buterin's 2021 donation of $665.8M in cryptocurrency to FLI was one
@@ -2218,7 +2140,6 @@
 - id: astralis-foundation
   numericId: E702
   type: organization
-  orgType: funder
   title: Astralis Foundation
   website: https://astralisfoundation.org
   relatedEntries:
@@ -2259,7 +2180,6 @@
 - id: nvidia
   numericId: E693
   type: organization
-  orgType: frontier-lab
   title: NVIDIA
   website: https://www.nvidia.com
   description: >-
@@ -2275,7 +2195,6 @@
 - id: ftx
   numericId: E856
   type: organization
-  orgType: generic
   title: FTX
   website: https://en.wikipedia.org/wiki/FTX
   description: >-
@@ -2298,7 +2217,6 @@
 - id: ftx-future-fund
   numericId: E855
   type: organization
-  orgType: funder
   title: FTX Future Fund
   website: https://forum.effectivealtruism.org/posts/2mx6xrDrwiEKzfgks/announcing-the-future-fund-1
   description: >-
@@ -2324,7 +2242,6 @@
 - id: giving-what-we-can
   numericId: E863
   type: organization
-  orgType: safety-org
   title: Giving What We Can
   website: https://www.givingwhatwecan.org/
   relatedEntries:
