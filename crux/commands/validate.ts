@@ -111,6 +111,11 @@ const SCRIPTS = {
     description: 'Cross-page numeric claim consistency checker — flag contradictory facts about the same entity',
     passthrough: ['ci', 'json', 'entity', 'top', 'limit'],
   },
+  'drizzle-journal': {
+    script: 'validate/validate-drizzle-journal.ts',
+    description: 'Verify all migration SQL files are registered in Drizzle journal',
+    passthrough: ['ci'],
+  },
   gate: {
     script: 'validate/validate-gate.ts',
     description: 'CI-blocking checks (pre-push gate)',

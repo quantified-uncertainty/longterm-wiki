@@ -242,6 +242,13 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'drizzle-journal',
+    name: 'Drizzle migration journal integrity',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-drizzle-journal.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'mdx-compile',
     name: 'MDX compilation smoke-test (advisory)',
     command: 'npx',
