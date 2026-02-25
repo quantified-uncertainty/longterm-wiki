@@ -75,9 +75,11 @@ function layoutGraph(
 function NetworkGraphInner({
   nodes: rawNodes,
   edges: rawEdges,
+  entityNames = {},
 }: {
   nodes: NetworkNode[];
   edges: NetworkEdge[];
+  entityNames?: Record<string, string>;
 }) {
   const router = useRouter();
 
@@ -88,7 +90,7 @@ function NetworkGraphInner({
       id: n.entityId,
       type: "entity",
       position: { x: 0, y: 0 },
-      data: { label: n.entityId, claimCount: n.claimCount },
+      data: { label: entityNames[n.entityId] ?? n.entityId, claimCount: n.claimCount },
     }));
 
     const flowEdges: Edge[] = rawEdges.map((e, i) => ({
@@ -115,7 +117,7 @@ function NetworkGraphInner({
   );
 
   return (
-    <div className="w-full h-[600px] border rounded-lg bg-gray-50">
+    <div className="w-full h-[600px] border rounded-lg bg-gray-50 overflow-hidden">
       <ReactFlow
         nodes={flowNodes}
         edges={flowEdges}
@@ -140,9 +142,11 @@ function NetworkGraphInner({
 export function NetworkGraph({
   nodes,
   edges,
+  entityNames = {},
 }: {
   nodes: NetworkNode[];
   edges: NetworkEdge[];
+  entityNames?: Record<string, string>;
 }) {
   if (nodes.length === 0) {
     return (
@@ -166,7 +170,7 @@ export function NetworkGraph({
 
   return (
     <ReactFlowProvider>
-      <NetworkGraphInner nodes={nodes} edges={edges} />
+      <NetworkGraphInner nodes={nodes} edges={edges} entityNames={entityNames} />
     </ReactFlowProvider>
   );
 }

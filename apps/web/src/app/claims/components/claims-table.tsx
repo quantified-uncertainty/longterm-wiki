@@ -33,7 +33,7 @@ import { ConfidenceBadge } from "./confidence-badge";
 import { ClaimModeBadge } from "./claim-mode-badge";
 import { NumericValueDisplay } from "./numeric-value-display";
 
-function ExpandedClaimDetail({ claim }: { claim: ClaimRow }) {
+function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; entityNames?: Record<string, string> }) {
   return (
     <div className="px-4 py-3 bg-muted/30 space-y-2 text-sm">
       <div>
@@ -137,10 +137,10 @@ function ExpandedClaimDetail({ claim }: { claim: ClaimRow }) {
             {claim.relatedEntities.map((eid) => (
               <Link
                 key={eid}
-                href={`/claims/entity/${eid}`}
+                href={`/claims/entity/${eid.toLowerCase()}`}
                 className="text-blue-600 hover:underline ml-1"
               >
-                {eid}
+                {entityNames[eid.toLowerCase()] ?? eid}
               </Link>
             ))}
           </span>
@@ -158,7 +158,8 @@ function ExpandedClaimDetail({ claim }: { claim: ClaimRow }) {
   );
 }
 
-const columns: ColumnDef<ClaimRow>[] = [
+function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] {
+  return [
   {
     id: "expand",
     header: "",
@@ -199,9 +200,9 @@ const columns: ColumnDef<ClaimRow>[] = [
     cell: ({ row }) => (
       <Link
         href={`/claims/entity/${row.original.entityId}`}
-        className="font-mono text-blue-600 hover:underline text-xs"
+        className="text-blue-600 hover:underline text-xs"
       >
-        {row.original.entityId}
+        {entityNames[row.original.entityId] ?? row.original.entityId}
       </Link>
     ),
     size: 120,
@@ -320,10 +321,10 @@ const columns: ColumnDef<ClaimRow>[] = [
           {entities.slice(0, 3).map((eid) => (
             <Link
               key={eid}
-              href={`/claims/entity/${eid}`}
+              href={`/claims/entity/${eid.toLowerCase()}`}
               className="inline-block px-1 py-0.5 rounded text-[10px] bg-gray-100 text-gray-600 hover:bg-gray-200"
             >
-              {eid}
+              {entityNames[eid.toLowerCase()] ?? eid}
             </Link>
           ))}
           {entities.length > 3 && (
@@ -337,20 +338,24 @@ const columns: ColumnDef<ClaimRow>[] = [
     size: 120,
   },
 ];
+}
 
 export function ClaimsTable({
   claims,
   pageSize = 30,
+  entityNames = {},
 }: {
   claims: ClaimRow[];
   pageSize?: number;
+  entityNames?: Record<string, string>;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [expanded, setExpanded] = useState<ExpandedState>({});
+  const columns = getColumns(entityNames);
 
   const table = useReactTable({
     data: claims,
-    columns,
+    columns: columns,
     state: { sorting, expanded },
     onSortingChange: setSorting,
     onExpandedChange: setExpanded,
@@ -404,7 +409,7 @@ export function ClaimsTable({
                   {row.getIsExpanded() && (
                     <TableRow>
                       <TableCell colSpan={columns.length} className="p-0">
-                        <ExpandedClaimDetail claim={row.original} />
+                        <ExpandedClaimDetail claim={row.original} entityNames={entityNames} />
                       </TableCell>
                     </TableRow>
                   )}
