@@ -32,6 +32,7 @@ export async function getClaimsNav(): Promise<NavSection[]> {
         { label: "Browse Claims", href: "/claims/explore" },
         { label: "Relationships", href: "/claims/relationships" },
         { label: "Network", href: "/claims/network" },
+        { label: "Publications", href: "/claims/publications" },
         { label: "Resources", href: "/claims/resources" },
         { label: "Fact Dashboard", href: resolvedFactHref },
       ],

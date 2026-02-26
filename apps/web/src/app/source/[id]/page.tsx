@@ -181,7 +181,16 @@ export default async function SourcePage({ params }: PageProps) {
           {metadataItems.map((item, i) => (
             <span key={i} className="inline-flex items-center gap-1.5">
               {i > 0 && <span className="text-muted-foreground/30">&middot;</span>}
-              <span>{item}</span>
+              {publication && item.includes(publication.name) ? (
+                <a
+                  href={`/claims/publications/${publication.id}`}
+                  className="hover:underline text-primary"
+                >
+                  {item}
+                </a>
+              ) : (
+                <span>{item}</span>
+              )}
             </span>
           ))}
           {credibility != null && (

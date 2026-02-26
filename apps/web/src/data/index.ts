@@ -357,6 +357,8 @@ interface Publication {
   peer_reviewed?: boolean;
   domains: string[];
   description?: string;
+  credibility_rationale?: string;
+  website?: string;
 }
 
 interface Expert {
@@ -645,6 +647,17 @@ export function getFootnoteIndex(pageId: string): FootnoteIndexEntry | undefined
 
 export function getPublicationById(id: string): Publication | undefined {
   return publicationIndex().get(id);
+}
+
+/** Get all publications */
+export function getAllPublications(): Publication[] {
+  const db = getDatabase();
+  return db.publications ?? [];
+}
+
+/** Get resources that belong to a publication */
+export function getResourcesForPublication(publicationId: string): Resource[] {
+  return getAllResources().filter((r) => r.publication_id === publicationId);
 }
 
 export function getExpertById(id: string): Expert | undefined {
