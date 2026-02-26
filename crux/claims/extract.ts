@@ -39,6 +39,7 @@ import {
 import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../lib/claim-utils.ts';
 import type { ClaimTypeValue } from '../lib/claim-utils.ts';
 import { getVariantPrompt, VARIANT_NAMES, type VariantName, type PageType } from './experiment-variants.ts';
+import { validateClaimBatch } from './validate-claim.ts';
 
 // ---------------------------------------------------------------------------
 // MDX preprocessing — strip JSX components and get clean text
@@ -156,6 +157,15 @@ Do NOT include claims that:
 - Are vague or could apply to many similar subjects
 - Are trivially obvious from the page title alone
 - Repeat information already captured in another claim
+- Merely define what the entity is (e.g., "Kalshi is a prediction market" on the Kalshi page)
+- Use vague words like "significant", "various", "several" without specific numbers or names
+
+SELF-CONTAINMENT (critical):
+- Every claim MUST be a complete, self-contained assertion. A reader seeing ONLY this claim — with no other context — must understand what it asserts and about whom.
+- Always include the full entity name (e.g., "Anthropic" not "the company", "Kalshi" not "the platform", "GPT-4" not "the model"). Never use "the company", "the model", "the platform", "the organization", "it", "they", or similar pronouns without the entity name.
+- Each claim must contain exactly ONE verifiable assertion. If a sentence has multiple facts, split into separate claims.
+- Never start a claim with "The ", "This ", "However", "Additionally", "Furthermore", "Moreover", "In contrast" — rewrite to be independent.
+- Every claim must end with a period.
 
 For each claim, provide:
 - "claimText": a single atomic, self-contained statement (not a question or heading)
@@ -264,12 +274,33 @@ Extract atomic claims from this section. Return JSON only.`;
 }
 
 // ---------------------------------------------------------------------------
+// Frontmatter title extraction
+// ---------------------------------------------------------------------------
+
+/** Extract the title field from YAML frontmatter. */
+function extractFrontmatterTitle(raw: string): string | undefined {
+  const fmMatch = raw.match(/^---\n([\s\S]*?)\n---/);
+  if (!fmMatch) return undefined;
+  const titleMatch = fmMatch[1].match(/^title:\s*["']?(.+?)["']?\s*$/m);
+  return titleMatch ? titleMatch[1] : undefined;
+}
+
+/** Convert a slug like "sam-altman" to a display name like "Sam Altman". */
+function slugToDisplayName(slug: string): string {
+  return slug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const dryRun = args['dry-run'] === true;
+  const strict = args['strict'] === true;
   const model = typeof args.model === 'string' ? args.model : undefined;
   const variantArg = typeof args.variant === 'string' ? args.variant : 'baseline';
   const pageTypeArg = typeof args['page-type'] === 'string' ? args['page-type'] as PageType : undefined;
@@ -316,13 +347,20 @@ async function main() {
   const cleanBody = cleanMdxForExtraction(body);
   const sections = splitIntoSections(cleanBody);
 
+  // Resolve entity display name for validation
+  const entityName = extractFrontmatterTitle(raw) ?? slugToDisplayName(pageId);
+
   console.log(`\n${c.bold}${c.blue}Claims Extract: ${pageId}${c.reset}\n`);
   console.log(`  Sections found: ${sections.length}`);
+  console.log(`  Entity name: ${entityName}`);
   if (variant !== 'baseline') {
     console.log(`  Variant: ${c.bold}${variant}${c.reset}${pageTypeArg ? ` (page-type: ${pageTypeArg})` : ''}`);
   }
   if (model) {
     console.log(`  Model: ${model}`);
+  }
+  if (strict) {
+    console.log(`  ${c.yellow}STRICT MODE — claims failing validation will be rejected${c.reset}`);
   }
   if (dryRun) {
     console.log(`  ${c.yellow}DRY RUN — claims will not be stored${c.reset}`);
@@ -341,6 +379,33 @@ async function main() {
 
   console.log(`\n  Total extracted: ${c.bold}${allClaims.length}${c.reset} claims`);
 
+  // Post-extraction validation
+  const { accepted, rejected, stats } = validateClaimBatch(allClaims, pageId, entityName, strict);
+
+  if (stats.total > 0 && (stats.warned > 0 || stats.rejected > 0)) {
+    console.log(`\n${c.bold}Validation:${c.reset}`);
+    console.log(`  ${c.green}${stats.valid}${c.reset} valid, ${c.yellow}${stats.warned}${c.reset} warned, ${c.red}${stats.rejected}${c.reset} rejected`);
+    if (Object.keys(stats.issueBreakdown).length > 0) {
+      console.log(`  ${c.dim}Issues:${c.reset}`);
+      for (const [issue, cnt] of Object.entries(stats.issueBreakdown).sort((a, b) => b[1] - a[1])) {
+        console.log(`    ${issue.padEnd(28)} ${cnt}`);
+      }
+    }
+    if (strict && rejected.length > 0) {
+      console.log(`\n  ${c.yellow}Rejected claims (--strict):${c.reset}`);
+      for (const r of rejected.slice(0, 5)) {
+        console.log(`    ${c.red}x${c.reset} ${r.claimText.slice(0, 80)}`);
+        console.log(`      ${c.dim}${r.validationIssues.join('; ')}${c.reset}`);
+      }
+      if (rejected.length > 5) {
+        console.log(`    ... and ${rejected.length - 5} more`);
+      }
+    }
+  }
+
+  // Use validated claims going forward
+  const validatedClaims = accepted;
+
   if (dryRun) {
     // Show type/category/mode breakdown
     const typeCounts: Record<string, number> = {};
@@ -349,7 +414,7 @@ async function main() {
     let numericCount = 0;
     let attributedCount = 0;
 
-    for (const claim of allClaims) {
+    for (const claim of validatedClaims) {
       typeCounts[claim.claimType] = (typeCounts[claim.claimType] ?? 0) + 1;
       const cat = claimTypeToCategory(claim.claimType);
       catCounts[cat] = (catCounts[cat] ?? 0) + 1;
@@ -377,7 +442,7 @@ async function main() {
       console.log(`  ${c.yellow}${attributedCount}${c.reset} attributed claims (reported speech)`);
     }
 
-    const withEntities = allClaims.filter(c2 => c2.relatedEntities && c2.relatedEntities.length > 0);
+    const withEntities = validatedClaims.filter(c2 => c2.relatedEntities && c2.relatedEntities.length > 0);
     if (withEntities.length > 0) {
       console.log(`\n${c.bold}Multi-entity claims: ${withEntities.length}${c.reset}`);
       for (const claim of withEntities.slice(0, 5)) {
@@ -386,7 +451,7 @@ async function main() {
     }
 
     console.log(`\n${c.bold}Sample claims:${c.reset}`);
-    for (const claim of allClaims.slice(0, 10)) {
+    for (const claim of validatedClaims.slice(0, 10)) {
       const refs = claim.footnoteRefs.length > 0 ? ` [^${claim.footnoteRefs.join(', ^')}]` : ' (unsourced)';
       const cat = claimTypeToCategory(claim.claimType);
       const modeTag = claim.claimMode === 'attributed' ? ` [by:${claim.attributedTo ?? '?'}]` : '';
@@ -394,8 +459,8 @@ async function main() {
       const asOfTag = claim.asOf ? ` [${claim.asOf}]` : '';
       console.log(`  [${claim.claimType}/${cat}${modeTag}${asOfTag}${numTag}] ${claim.claimText.slice(0, 90)}${refs}`);
     }
-    if (allClaims.length > 10) {
-      console.log(`  ... and ${allClaims.length - 10} more`);
+    if (validatedClaims.length > 10) {
+      console.log(`  ... and ${validatedClaims.length - 10} more`);
     }
     console.log(`\n${c.green}Dry run complete. Remove --dry-run to store.${c.reset}\n`);
     return;
@@ -415,8 +480,8 @@ async function main() {
   let inserted = 0;
   let failed = 0;
 
-  for (let i = 0; i < allClaims.length; i += BATCH_SIZE) {
-    const batch = allClaims.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < validatedClaims.length; i += BATCH_SIZE) {
+    const batch = validatedClaims.slice(i, i + BATCH_SIZE);
     const items: InsertClaimItem[] = batch.map(claim => ({
       entityId: pageId,
       entityType: 'wiki-page',
@@ -452,8 +517,8 @@ async function main() {
     }
   }
 
-  const attributedCount = allClaims.filter(c2 => c2.claimMode === 'attributed').length;
-  const numericCount = allClaims.filter(c2 => c2.valueNumeric !== undefined).length;
+  const attributedCount = validatedClaims.filter(c2 => c2.claimMode === 'attributed').length;
+  const numericCount = validatedClaims.filter(c2 => c2.valueNumeric !== undefined).length;
 
   console.log(`\n${c.bold}Done:${c.reset}`);
   console.log(`  Inserted:  ${c.green}${inserted}${c.reset} claims`);
