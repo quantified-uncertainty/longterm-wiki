@@ -6,6 +6,7 @@
  * remark-gfm can process.
  *
  * Backward compatible: existing [^1], [^2] etc. pass through unchanged.
+ * TODO(#1162): Remove backward-compat for [^N] after full rollout to DB-driven markers.
  */
 
 // ---------------------------------------------------------------------------
@@ -35,6 +36,7 @@ export interface ReferenceData {
   citations: Map<string, CitationData>;
 }
 
+// TODO(#1162): Remove "legacy" kind after full rollout — all refs will be "claim" or "citation"
 export type RefKind = "claim" | "citation" | "legacy";
 
 export interface RefMapEntry {
@@ -60,6 +62,9 @@ const DB_REF_USAGE_RE = /\[\^(cr-[a-zA-Z0-9]+|rc-[a-zA-Z0-9]+)\]/g;
 /**
  * Regex that matches existing numeric footnote *usage sites*: `[^1]`, `[^23]` etc.
  * Group 1 captures the number.
+ *
+ * TODO(#1162): Remove this backward-compat path after full rollout — once all
+ * pages use [^cr-XXXX] / [^rc-XXXX], there will be no legacy [^N] to detect.
  */
 const LEGACY_FOOTNOTE_USAGE_RE = /\[\^(\d+)\]/g;
 
@@ -124,6 +129,9 @@ export function preprocessReferences(
 
   // -----------------------------------------------------------------------
   // 1. Find the highest existing numeric footnote to avoid collisions
+  // TODO(#1162): Remove this backward-compat path after full rollout.
+  // Once all pages use [^cr-XXXX] / [^rc-XXXX], there will be no legacy
+  // [^N] footnotes and numbering can start from 1 unconditionally.
   // -----------------------------------------------------------------------
   let maxExisting = 0;
   const legacyMatches = mdxContent.matchAll(LEGACY_FOOTNOTE_USAGE_RE);

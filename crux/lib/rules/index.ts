@@ -101,6 +101,9 @@ import { pipelineArtifactsRule } from './pipeline-artifacts.ts';
 // Footnote integrity (orphans, leaked SRC markers)
 import { footnoteIntegrityRule } from './footnote-integrity.ts';
 
+// Numbered footnotes migration (issue #1162)
+import { numberedFootnotesRule } from './numbered-footnotes.ts';
+
 // Block-level structural quality (uses block-index.json IR)
 import { blockSectionQualityRule } from './block-section-quality.ts';
 
@@ -170,6 +173,7 @@ export {
   officialWebsiteLabelRule,
   placeholderTextRule,
   personOrgAffiliationRule,
+  numberedFootnotesRule,
 };
 
 export const allRules: Rule[] = [
@@ -229,6 +233,7 @@ export const allRules: Rule[] = [
   officialWebsiteLabelRule,
   placeholderTextRule,
   personOrgAffiliationRule,
+  numberedFootnotesRule,
 ];
 
 export default allRules;
