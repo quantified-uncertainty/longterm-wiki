@@ -41,14 +41,21 @@ The claims system is architecturally ambitious (see <EntityLink id="claims-archi
 | **Deduplication** | Not started | — |
 | **Bulk orchestration** | Not started | — |
 
-**Pages with claims today:** \~5-10 pages, Kalshi is the exemplar (192 claims, 37 sources, inline verification).
+**Pages with claims today:** 11 entities with 1,514 total claims. Kalshi (242) and Anthropic (325) are the most developed. See entity breakdown in <EntityLink id="claims-data-quality-audit">Quality Audit (E901)</EntityLink>.
 
-**Known quality issues:**
+**Known quality issues (validated by Feb 2026 audit):**
+- 89.1% of claims have at least one quality issue
+- 62.5% missing `relatedEntities` (cross-referencing broken)
+- 58.6% unsourced/unsupported (no citation backing)
+- 45.8% not self-contained (no entity name — meaningless outside page context)
+- 13.1% start with relative phrases ("The", "This", "However")
+- 10.0% exact duplicates (within and cross-entity)
+- 5.2% wrong entity attribution (claim about entity Y filed under entity X)
 - Extraction accuracy is 100% but usefulness drops on concept pages (69%) and person pages (78-86%)
 - The `endorsed` vs `attributed` distinction is untested at scale
 - Deduplication doesn't exist — same claim appears as separate records on multiple pages
 - Resource ingestion entity routing is untested
-- Claims are never consulted during page improvement
+- Claims-improve integration (PR #1150) produced cosmetic changes, not substantive new citations
 
 ---
 
@@ -248,6 +255,37 @@ For each page:
 - Concept pages need specialized treatment. Consider either specialized prompts (2B) or focused extraction ("extract the 5-10 most important claims per section" variant from 2D).
 - The source linking gap should be addressed before scaling — claims without sources look untrustworthy regardless of actual quality.
 - JSON parse failures (~3%) are a minor but real issue. Consider adding retry-with-repair for malformed JSON.
+
+---
+
+### Sprint 1.5: Data Quality Remediation (NEW — Feb 2026)
+
+**Duration:** 1-2 sessions. **Cost:** ≈\$5-10.
+
+**Goal:** Fix the mechanically-fixable quality issues in existing claims before investing in extraction experiments. The <EntityLink id="claims-data-quality-audit">Quality Audit (E901)</EntityLink> found 89% of claims have issues, but many are fixable without re-extraction.
+
+**Tasks (ordered by impact × ease):**
+
+1. **Backfill `relatedEntities`** — Automated script scans claim text for known entity names/aliases, populates the field. Covers 946 claims (62.5%). This is the single highest-impact automated fix.
+
+2. **Run `crux claims verify` on all entities** — Resolves footnoteRefs to actual source URLs and populates sourceQuote + confidence. Addresses the 887 unsourced claims where footnoteRefs exist but were never resolved.
+
+3. **Strip self-references from `relatedEntities`** — Remove cases where `entity_id` appears in its own `relatedEntities` array (165 claims).
+
+4. **Deduplicate exact duplicates** — Merge the 8 confirmed same-entity duplicate rows. For cross-entity duplicates (152 total), document but don't merge yet (dedup strategy is still open per Crux 1).
+
+5. **Resolve `<F>` markup** — Replace canonical fact tags with literal values in claim text.
+
+6. **Flag worst claims for deletion** — Claims with 7+ issues (like "ChatGPT is deployed by OpenAI" under RLHF entity) should be deleted, not fixed.
+
+**Success criteria:**
+- `relatedEntities` populated on \>90% of claims
+- Unsourced rate drops below 30% (from 58.6%)
+- Zero exact within-entity duplicates
+- Zero `<F>` markup in claim text
+- Issue rate drops from 89% to \<50%
+
+**Why this sprint matters:** Sprint 2 experiments compare extraction variants against a baseline. If the baseline data is 89% broken, the experiments measure noise, not signal. Clean the data first, then experiment.
 
 ---
 
@@ -662,5 +700,7 @@ These are all worth doing, but they're sequenced after we know the core system w
 ## Related Documents
 
 - <EntityLink id="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions, cruxes, worked examples, red-team failure modes
+- <EntityLink id="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> — Empirical quality analysis of 1,514 claims
+- <EntityLink id="claims-extraction-quality-patterns">Extraction Quality Patterns (E902)</EntityLink> — Detailed failure mode catalog with detection and fixes
 - <EntityLink id="claim-first-architecture">Claim-First Architecture (E892)</EntityLink> — Long-term vision for claims as the primary wiki artifact
 - <EntityLink id="content-pipeline-architecture">Content Pipeline Architecture (E895)</EntityLink> — Faster page creation infrastructure (orthogonal but complementary)

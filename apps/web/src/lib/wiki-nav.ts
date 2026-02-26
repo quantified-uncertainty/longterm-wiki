@@ -318,6 +318,8 @@ export function getInternalNav(): NavSection[] {
         { label: "Content Pipeline Architecture", href: internalHref("content-pipeline-architecture") },
         { label: "Claim-First Architecture", href: internalHref("claim-first-architecture") },
         { label: "Claims Architecture Decisions", href: internalHref("claims-architecture-decisions") },
+        { label: "Claims Data Quality Audit", href: internalHref("claims-data-quality-audit") },
+        { label: "Claims Extraction Patterns", href: internalHref("claims-extraction-quality-patterns") },
         { label: "Citation Architecture", href: internalHref("citation-architecture") },
         { label: "Knowledge Graph Ontology", href: internalHref("knowledge-graph-ontology") },
         { label: "Fact System Strategy", href: internalHref("fact-system-strategy") },
