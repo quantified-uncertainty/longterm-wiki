@@ -249,8 +249,7 @@ export function getInternalNav(): NavSection[] {
       defaultOpen: true,
       items: [
         { label: "Pages", href: internalHref("page-coverage-dashboard") },
-        { label: "Entities", href: "/internal/entities" },
-        { label: "Importance Rankings", href: "/internal/importance-rankings" },
+        { label: "Entities & Pages", href: "/internal/entities" },
         { label: "Page Changes", href: "/internal/page-changes" },
         { label: "Update Schedule", href: internalHref("update-schedule-dashboard") },
         { label: "Suggested Pages", href: "/internal/suggested-pages" },
