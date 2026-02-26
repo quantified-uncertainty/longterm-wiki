@@ -227,6 +227,8 @@ This is the heart of the system. Five interconnected stores:
 
 The key new relationship: **claims link to everything**. A claim references its sources (resource store), its fetched content (citation archive), its numeric value (fact store), and its visual representation (asset store). The claim is the connective tissue.
 
+Critically, each claim also stores its **reasoning trace** — a record of how the claim was derived from its sources and what inference was involved. For factual claims ("Kalshi was founded in 2018"), the trace is trivial: the source directly states the fact. For derived claims ("Kalshi is the leading regulated prediction market"), the trace documents which sources agree and what "leading" means. For editorial claims ("the fee structure incentivizes liquidity provision"), the trace explains the wiki's analysis and what alternatives were considered. These traces are what make the claim store *auditable* — a reader (or AI verifier) can check not just whether a source exists, but whether the reasoning from source to claim is valid. See <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> for the full data model.
+
 ### Layer 3: Editorial Direction
 
 This is the hardest layer to systematize, and the most important for producing pages that feel purposeful rather than encyclopedic.
@@ -759,6 +761,18 @@ Perplexity's Pages product generates structured articles from search results wit
 ### Microsoft GraphRAG
 
 GraphRAG extracts entities and relationships from text, builds knowledge graphs, and generates answers from subgraph retrieval. Relevant to us: the entity extraction and community detection could feed our claim store's relational claims and cross-entity analysis.
+
+### Reasoning Transparency and Epistemic Spot Checks
+
+Several traditions focus not on *what* claims to store but on *how to make the reasoning behind claims auditable*:
+
+**Elizabeth van Nostrand's [Epistemic Spot Checks](https://www.lesswrong.com/tag/epistemic-spot-check)**: A methodology for assessing source reliability by sampling claims and checking them against primary sources. Her key finding: the most common failure isn't wrong facts but "science-washing" — citing sources that don't actually support attributed claims. Her concept of [Epistemic Legibility](https://www.lesswrong.com/posts/jbE85wCkRr9z7tqmD/epistemic-legibility) ("being easy to argue with is a virtue, separate from being correct") argues for structured, auditable arguments.
+
+**Luke Muehlhauser's [Reasoning Transparency](https://forum.effectivealtruism.org/posts/i9RJjun327SnT3vW8/reasoning-transparency)**: Published at Open Philanthropy, this framework argues content should make it easy for readers to answer "how should I update my views?" Key recommendations: indicate which considerations matter most, express confidence levels and evidence types, provide exact quotes, share underlying data. GiveWell's charity evaluations (125+ endnotes, open research process) are his "extreme model."
+
+**Nanopublications**: A Semantic Web standard for the "smallest publishable unit" of scientific knowledge. Each nanopublication has three parts: assertion (the claim), provenance (how it was derived), and publication metadata. Trusty URIs provide cryptographic content integrity.
+
+These are directly relevant to claim-first architecture because they address the question our claim taxonomy implicitly raises: *what constitutes sufficient evidence for each claim type?* A factual claim needs a source quote. A derived claim needs a reasoning trace showing how inference connects source to assertion. An editorial claim needs an explicit statement of the wiki's judgment and alternatives considered. See <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> for how we propose to implement this.
 
 ---
 

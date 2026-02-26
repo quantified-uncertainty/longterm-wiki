@@ -520,6 +520,50 @@ Answer these questions:
 
 ---
 
+### Sprint 7: Reasoning Traces Infrastructure
+
+**Duration:** 2-3 sessions. **Cost:** ≈\$30-50.
+
+**Depends on:** Sprint 6 (need validated extraction and verification pipelines). Can start Phase 1 earlier if Sprint 2 completes.
+
+**Goal:** Add reasoning traces — structured records of how each claim was derived from source material — to the claims pipeline. This makes verification auditable and enables targeted re-verification. See <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> for the full design.
+
+**Phase 1: Minimal traces (1 session, ≈\$5)**
+
+1. Add `inference_type` enum to claims table: `direct_assertion`, `derived`, `aggregated`, `interpreted`, `editorial`
+2. Add `staleness_profile` enum: `static`, `slow_changing`, `annual`, `quarterly`, `fast_changing`, `event_driven`
+3. Add `review_by` date column
+4. Backfill `inference_type` for existing claims via heuristic: claims with `sourceQuote` matching claim text → `direct_assertion`; evaluative/causal types → `interpreted`; default → `direct_assertion`
+5. Surface `inference_type` as one word in footnote tooltips ("Direct" / "Derived" / "Editorial")
+
+**Phase 2: Structured traces for non-trivial claims (1-2 sessions, ≈\$20-30)**
+
+1. Add `reasoning_trace` JSONB column to claims (stores `inference_step`, `premises`, `alternatives_considered`)
+2. Add `entailment_type` to `claim_sources`: `supports`, `partially_supports`, `provides_context`, `contradicts`
+3. Add `content_hash` to `claim_sources` for source-drift detection
+4. Modify extraction pipeline: for evaluative/causal/speculative claims, generate `inference_step` in extraction prompt
+5. Modify verification pipeline: store verification rationale in reasoning trace
+
+**Experiment: Trace quality assessment**
+
+Run trace-enabled extraction on the same 10 pages from Sprint 1:
+1. For each non-factual claim, evaluate the generated `inference_step`: Does it accurately describe how the source supports the claim? Is it specific enough that an AI verifier could check it?
+2. Compare verification cost: How much does generating traces add? (Hypothesis: ~30% for affected claims, ~0% for direct assertions)
+3. Test re-verification: Given a trace, can a different LLM reproduce the verdict? (This tests whether traces actually aid verification)
+
+**Success criteria:**
+- `inference_type` backfilled on \>90% of existing claims
+- Generated `inference_step` is judged accurate for \>70% of non-factual claims
+- Re-verification using traces matches original verdict \>80% of the time
+- Trace generation adds \<40% to extraction cost per claim
+
+**Red team of this sprint:**
+- *"Reasoning traces are metadata that nobody reads."* The value isn't in humans reading traces — it's in (1) enabling targeted AI re-verification and (2) the discipline of making reasoning explicit during extraction. Even if traces are never displayed, they improve extraction quality by forcing the LLM to justify its output.
+- *"Inference step generation will hallucinate."* Yes, this is a real risk. A wrong trace is worse than no trace (creates false confidence). The experiment measures this directly. If trace accuracy is \<60%, defer to Phase 1 only (minimal traces).
+- *"This adds complexity to an already complex system."* True. Phase 1 is deliberately simple (one enum column). Only proceed to Phase 2 if Phase 1 proves its value. The tiered approach keeps complexity proportional to demonstrated benefit.
+
+---
+
 ## Estimated Total Budget
 
 | Sprint | Sessions | Cost | Calendar |
@@ -531,9 +575,10 @@ Answer these questions:
 | Sprint 4: Dedup & Taxonomy | 2 | ≈\$20-30 | Days 9-10 |
 | Sprint 5: Claims → Improve | 2-3 | ≈\$50-80 | Days 11-14 |
 | Sprint 6: Scale Validation | 2-3 | ≈\$100-150 | Days 15-18 |
-| **Total pre-bulk** | **12-17 sessions** | **≈\$250-390** | **≈3-4 weeks** |
-| **Bulk run** | 3-5 | **≈\$600-750** | **Week 5** |
-| **Grand total** | **15-22 sessions** | **≈\$850-1,140** | **≈5 weeks** |
+| Sprint 7: Reasoning Traces | 2-3 | ≈\$30-50 | Days 19-21 |
+| **Total pre-bulk** | **14-20 sessions** | **≈\$280-440** | **≈4-5 weeks** |
+| **Bulk run** | 3-5 | **≈\$600-750** | **Week 6** |
+| **Grand total** | **17-25 sessions** | **≈\$880-1,190** | **≈6 weeks** |
 
 ---
 
@@ -549,8 +594,12 @@ Sprint 1 ──→ Sprint 2 (prompt iteration) ───────────
                                                                ↓
                                                      Sprint 6 (scale validation)
                                                                ↓
+                                                     Sprint 7 (reasoning traces)
+                                                               ↓
                                                      Bulk run ($1,000)
 ```
+
+Sprint 7 Phase 1 (minimal traces: inference_type enum) can start as early as after Sprint 2, since it only requires adding a column and backfilling. Phase 2 (structured traces with inference steps) depends on Sprint 6 validation proving the pipeline works before adding trace generation cost.
 
 Sprints 2 and 3 can run in parallel — they test different things (extraction quality vs. resource ingestion). Sprint 4 needs data from both. Sprint 5 needs calibrated extraction from Sprint 2 and resource claims from Sprint 3.
 
@@ -570,9 +619,14 @@ The roadmap has explicit checkpoints where we might change direction:
 
 ---
 
-## Resource Transparency: Making Sources Trustworthy
+## Transparency: Making Sources and Reasoning Trustworthy
 
-Claims are only as trustworthy as their sources. The current resource system stores content but is opaque about *what we actually have* and *how reliable it is*. Before scaling claims, we need readers to be able to evaluate provenance themselves.
+Claims are only as trustworthy as their sources — and only as auditable as their reasoning. Two complementary transparency layers are needed:
+
+1. **Resource transparency**: What sources do we have? Are they still available? Can readers access them independently?
+2. **Reasoning transparency**: How did we get from source to claim? What inference was involved? What would change our mind?
+
+See <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> for the full design of the reasoning transparency layer. The resource transparency gaps and proposals below focus on the source side.
 
 ### Current Gaps
 
@@ -702,5 +756,6 @@ These are all worth doing, but they're sequenced after we know the core system w
 - <EntityLink id="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions, cruxes, worked examples, red-team failure modes
 - <EntityLink id="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> — Empirical quality analysis of 1,514 claims
 - <EntityLink id="claims-extraction-quality-patterns">Extraction Quality Patterns (E902)</EntityLink> — Detailed failure mode catalog with detection and fixes
+- <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> — Data model and pipeline design for storing claim derivation chains
 - <EntityLink id="claim-first-architecture">Claim-First Architecture (E892)</EntityLink> — Long-term vision for claims as the primary wiki artifact
 - <EntityLink id="content-pipeline-architecture">Content Pipeline Architecture (E895)</EntityLink> — Faster page creation infrastructure (orthogonal but complementary)

@@ -11,7 +11,7 @@ researchImportance: 80
 lastEdited: "2026-02-26"
 createdAt: 2026-02-26
 evergreen: false
-llmSummary: "Technical deep-dive into 14 specific failure patterns observed in claims extraction. Each pattern includes real examples from the database, root cause analysis, detection heuristics, and proposed fixes. Covers self-containedness failures, markup leakage, entity routing errors, atomicity violations, relative phrase dependencies, and the fundamental tension between extraction cost and quality. Designed to guide extraction prompt improvements and post-processing validation."
+llmSummary: "Technical deep-dive into 15 specific failure patterns observed in claims extraction. Each pattern includes real examples from the database, root cause analysis, detection heuristics, and proposed fixes. Covers self-containedness failures, markup leakage, entity routing errors, atomicity violations, relative phrase dependencies, missing reasoning trails, and the fundamental tension between extraction cost and quality. Designed to guide extraction prompt improvements and post-processing validation."
 ratings:
   novelty: 7
   rigor: 8
@@ -418,6 +418,41 @@ These have numbers but lack crucial context:
 
 ---
 
+## Pattern 13: Extraction Without Reasoning Trail
+
+**Frequency:** ~100% of current claims (the system doesn't generate traces yet).
+
+**What it looks like:**
+
+A claim exists in the database with a verdict ("verified") and a source quote, but no record of *how* the extraction LLM connected the source to the claim — what inference was involved, what alternatives were considered, or why this particular characterization was chosen over others.
+
+| Claim | Source Quote | What's Missing |
+|---|---|---|
+| "Anthropic's Constitutional AI represents a fundamentally different approach from RLHF" | "we use AI feedback to evaluate model outputs rather than human feedback" | Why is "fundamentally different" justified vs. "a variant of" or "an evolution of"? |
+| "Kalshi is the leading regulated prediction market" | "the largest US-regulated exchange" | How did "largest" become "leading"? Are they equivalent? |
+| "Research investment in RLHF has been high across major AI labs" | (no source quote) | What evidence supports "high"? Compared to what baseline? |
+
+**Root cause:** The extraction prompt asks for claims and optionally source quotes, but never asks the LLM to explain its reasoning. The LLM makes implicit judgment calls (interpreting "largest" as "leading," adding the word "fundamentally") without documenting them. These undocumented inference steps are where science-washing occurs — the claim drifts from what the source actually says, and there's no audit trail to catch it.
+
+**Why this is especially damaging for AI verification:** An AI re-verifier checking "is this claim supported by this source?" must reconstruct the reasoning from scratch. Without a trace, it can't tell whether the extraction LLM intended a direct assertion (source says X, claim says X) or an interpreted assertion (source says X, claim infers Y from X). The verifier's job is fundamentally harder.
+
+**Detection heuristics:**
+- Claims with `inferenceType: null` (no trace at all)
+- Claims where claim text uses qualitative language ("leading," "significant," "fundamentally") not present in source quote
+- Claims classified as evaluative/causal/consensus but with no `inferenceStep` explaining the evaluation/causation/consensus
+
+**Proposed fix:**
+
+This is not a post-processing fix — it requires changes to the extraction pipeline:
+
+1. **During extraction:** Add to the prompt: "For each claim, indicate the inference type: 'direct' if the source explicitly states this, 'derived' if you inferred it from the source, or 'editorial' if this is the wiki's own analysis. For derived and editorial claims, briefly explain the reasoning."
+
+2. **Post-extraction validation:** Flag claims where `inferenceType` is `derived` or `editorial` but `inferenceStep` is empty. These are the highest-risk claims for science-washing.
+
+3. **Long-term:** The <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> proposes a full trace model with tiered depth — minimal traces for direct assertions, structured traces for derived claims, full traces for editorial claims.
+
+---
+
 ## Compound Issue: The Quality Cascade
 
 These patterns don't occur independently. A single bad claim often exhibits 3-5 issues simultaneously. The worst claims in the database (7-8 issues each) show a cascading pattern:
@@ -481,4 +516,5 @@ Several open questions that require empirical testing:
 - <EntityLink id="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> — Aggregate statistics and remediation priorities
 - <EntityLink id="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions and cruxes
 - <EntityLink id="claims-system-development-roadmap">Claims Development Roadmap (E897)</EntityLink> — Sprint plan including extraction experiments
+- <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> — Data model for storing claim derivation chains (addresses Pattern 13)
 - <EntityLink id="claim-first-architecture">Claim-First Architecture (E892)</EntityLink> — Long-term vision
