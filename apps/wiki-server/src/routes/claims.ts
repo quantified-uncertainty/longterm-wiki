@@ -327,6 +327,29 @@ claimsRoute.post("/clear-by-section", async (c) => {
   return c.json({ deleted: deleted.length });
 });
 
+// ---- POST /delete-by-ids (batch delete claims by ID array) ----
+// Used by the cleanup command to remove low-quality claims in bulk.
+
+const DeleteByIdsSchema = z.object({
+  ids: z.array(z.number().int().positive()).min(1).max(1000),
+});
+
+claimsRoute.post("/delete-by-ids", async (c) => {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = DeleteByIdsSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const db = getDrizzleDb();
+  const deleted = await db
+    .delete(claims)
+    .where(inArray(claims.id, parsed.data.ids))
+    .returning({ id: claims.id });
+
+  return c.json({ deleted: deleted.length });
+});
+
 // ---- GET /stats ----
 
 claimsRoute.get("/stats", async (c) => {
