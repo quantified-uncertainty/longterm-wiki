@@ -169,6 +169,30 @@ export async function batchUpdateRelatedEntities(
   );
 }
 
+/**
+ * Batch update structured fields (subjectEntity, property, structuredValue, etc.)
+ * on multiple claims at once. Max 500 items per call.
+ */
+export async function batchUpdateStructuredFields(
+  items: Array<{
+    id: number;
+    subjectEntity?: string | null;
+    property?: string | null;
+    structuredValue?: string | null;
+    valueUnit?: string | null;
+    valueDate?: string | null;
+    qualifiers?: Record<string, string> | null;
+  }>,
+): Promise<ApiResult<{ updated: number; total: number }>> {
+  return apiRequest<{ updated: number; total: number }>(
+    'PATCH',
+    '/api/claims/batch-update-structured',
+    { items },
+    30_000,
+    'content',
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Claim Page References API functions
 // ---------------------------------------------------------------------------

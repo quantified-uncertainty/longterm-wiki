@@ -98,6 +98,12 @@ const SCRIPTS = {
     passthrough: ['apply', 'limit', 'entity-id'],
     positional: false,
   },
+  'enrich-structured': {
+    script: 'claims/enrich-structured.ts',
+    description: 'Add structured fields (subject/property/value) to existing claims via LLM',
+    passthrough: ['dry-run', 'model'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'status');
