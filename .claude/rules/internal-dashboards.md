@@ -12,10 +12,12 @@ Any feature that:
 
 1. Create `apps/web/src/app/internal/<name>/page.tsx` (server component — loads data)
 2. Create `apps/web/src/app/internal/<name>/<name>-table.tsx` (client component — `"use client"` with `DataTable` from `@/components/ui/data-table.tsx`)
-3. Add navigation entry in `apps/web/src/lib/wiki-nav.ts` under "Dashboards & Tools"
+3. Add navigation entry in `apps/web/src/lib/wiki-nav.ts` under the appropriate section ("Dashboards", "Claims & Citations", or "Architecture & Reference")
 4. Server components can read YAML/JSON files directly via `fs` for operational data
 5. Follow existing patterns in `apps/web/src/app/internal/updates/` or `auto-update-runs/`
 
 ## Existing dashboards
 
-Update Schedule, Page Changes, Fact Dashboard, Auto-Update Runs, Auto-Update News, Importance Rankings.
+**Dashboards:** Pages, Entities, Importance Rankings, Page Changes, Update Schedule, Suggested Pages, Improve Runs, Agent Sessions, Auto-Update Runs, Auto-Update News.
+
+**Claims & Citations:** Claims Explorer, Fact Dashboard, Resources, Claims Ingestion, Citation Accuracy, Citation Content, Hallucination Risk, Hallucination Evals.
