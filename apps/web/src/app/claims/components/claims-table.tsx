@@ -32,6 +32,7 @@ import { CategoryBadge } from "./category-badge";
 import { ConfidenceBadge } from "./confidence-badge";
 import { ClaimModeBadge } from "./claim-mode-badge";
 import { NumericValueDisplay } from "./numeric-value-display";
+import { VerdictBadge } from "./verdict-badge";
 
 function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; entityNames?: Record<string, string> }) {
   return (
@@ -73,6 +74,26 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
           <p className="mt-0.5 italic text-muted-foreground">
             &ldquo;{claim.sourceQuote}&rdquo;
           </p>
+        </div>
+      )}
+
+      {/* Verdict details */}
+      {claim.claimVerdict && (
+        <div>
+          <span className="font-medium text-xs text-muted-foreground block mb-1">
+            Verdict:
+          </span>
+          <div className="flex items-center gap-2">
+            <VerdictBadge verdict={claim.claimVerdict} score={claim.claimVerdictScore} />
+            {claim.claimVerdictDifficulty && (
+              <span className="text-[10px] text-muted-foreground">
+                Difficulty: {claim.claimVerdictDifficulty}
+              </span>
+            )}
+          </div>
+          {claim.claimVerdictIssues && (
+            <p className="mt-1 text-xs text-muted-foreground">{claim.claimVerdictIssues}</p>
+          )}
         </div>
       )}
 
@@ -314,6 +335,20 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
       />
     ),
     size: 90,
+  },
+  {
+    id: "verdict",
+    accessorFn: (row) => row.claimVerdict,
+    header: ({ column }) => (
+      <SortableHeader column={column}>Verdict</SortableHeader>
+    ),
+    cell: ({ row }) => (
+      <VerdictBadge
+        verdict={row.original.claimVerdict}
+        score={row.original.claimVerdictScore}
+      />
+    ),
+    size: 100,
   },
   {
     accessorKey: "sourceQuote",

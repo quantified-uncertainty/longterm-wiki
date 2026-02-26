@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, or, count, desc, asc, sql, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { claims, claimSources, entities } from "../schema.js";
+import { claims, claimSources, claimPageReferences, entities } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
@@ -16,7 +16,13 @@ import {
   InsertClaimBatchSchema,
   ClearClaimsSchema,
   ClearClaimsBySectionSchema,
+  ClaimPageReferenceInsertSchema,
+  ClaimPageReferenceBatchSchema,
+  type ClaimPageReferenceRow,
 } from "../api-types.js";
+
+/** Pre-computed schema for single page-reference insertion (omits claimId from URL param). */
+const PageRefInsertBodySchema = ClaimPageReferenceInsertSchema.omit({ claimId: true });
 
 export const claimsRoute = new Hono();
 
@@ -79,6 +85,13 @@ function claimValues(d: ClaimInput) {
     valueNumeric: d.valueNumeric ?? null,
     valueLow: d.valueLow ?? null,
     valueHigh: d.valueHigh ?? null,
+    // Verdict fields (migration 0031)
+    claimVerdict: d.claimVerdict ?? null,
+    claimVerdictScore: d.claimVerdictScore ?? null,
+    claimVerdictIssues: d.claimVerdictIssues ?? null,
+    claimVerdictQuotes: d.claimVerdictQuotes ?? null,
+    claimVerdictDifficulty: d.claimVerdictDifficulty ?? null,
+    claimVerdictModel: d.claimVerdictModel ?? null,
   };
 }
 
@@ -93,6 +106,10 @@ function formatClaimSource(s: ClaimSourceRow) {
     sourceQuote: s.sourceQuote,
     isPrimary: s.isPrimary,
     addedAt: s.addedAt,
+    sourceVerdict: s.sourceVerdict,
+    sourceVerdictScore: s.sourceVerdictScore,
+    sourceVerdictIssues: s.sourceVerdictIssues,
+    sourceCheckedAt: s.sourceCheckedAt,
   };
 }
 
@@ -125,6 +142,14 @@ function formatClaim(
     valueNumeric: r.valueNumeric,
     valueLow: r.valueLow,
     valueHigh: r.valueHigh,
+    // Verdict fields (migration 0031)
+    claimVerdict: r.claimVerdict,
+    claimVerdictScore: r.claimVerdictScore,
+    claimVerdictIssues: r.claimVerdictIssues,
+    claimVerdictQuotes: r.claimVerdictQuotes,
+    claimVerdictDifficulty: r.claimVerdictDifficulty,
+    claimVerifiedAt: r.claimVerifiedAt,
+    claimVerdictModel: r.claimVerdictModel,
     sources: sourcesRows.map(formatClaimSource),
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
@@ -420,8 +445,38 @@ claimsRoute.get("/by-entity/:entityId", async (c) => {
     }
   }
 
+  const includePageReferences = c.req.query("includePageReferences") === "true";
+
+  let pageRefsMap = new Map<number, typeof claimPageReferences.$inferSelect[]>();
+  if (includePageReferences && rows.length > 0) {
+    const claimIds = rows.map((r) => r.id);
+    const pageRefRows = await db
+      .select()
+      .from(claimPageReferences)
+      .where(inArray(claimPageReferences.claimId, claimIds));
+    for (const pr of pageRefRows) {
+      const cid = Number(pr.claimId);
+      if (!pageRefsMap.has(cid)) pageRefsMap.set(cid, []);
+      pageRefsMap.get(cid)!.push(pr);
+    }
+  }
+
   return c.json({
-    claims: rows.map((r) => formatClaim(r, sourcesMap.get(Number(r.id)) ?? [])),
+    claims: rows.map((r) => {
+      const claim: ReturnType<typeof formatClaim> & { pageReferences?: ClaimPageReferenceRow[] } =
+        formatClaim(r, sourcesMap.get(Number(r.id)) ?? []);
+      if (includePageReferences) {
+        claim.pageReferences = (pageRefsMap.get(Number(r.id)) ?? []).map((pr) => ({
+          id: Number(pr.id),
+          claimId: Number(pr.claimId),
+          pageId: pr.pageId,
+          footnote: pr.footnote,
+          section: pr.section,
+          createdAt: pr.createdAt?.toISOString() ?? new Date().toISOString(),
+        }));
+      }
+      return claim;
+    }),
   });
 });
 
@@ -695,4 +750,115 @@ claimsRoute.get("/:id", async (c) => {
     .orderBy(desc(claimSources.isPrimary), asc(claimSources.addedAt));
 
   return c.json(formatClaim(rows[0], sourcesRows));
+});
+
+// ---- GET /:id/page-references ----
+
+claimsRoute.get("/:id/page-references", async (c) => {
+  const idStr = c.req.param("id");
+  const id = Number(idStr);
+  if (!Number.isInteger(id) || id <= 0) {
+    return validationError(c, "Claim ID must be a positive integer");
+  }
+
+  const db = getDrizzleDb();
+  const rows = await db
+    .select()
+    .from(claimPageReferences)
+    .where(eq(claimPageReferences.claimId, id))
+    .orderBy(asc(claimPageReferences.pageId), asc(claimPageReferences.footnote));
+
+  return c.json({
+    references: rows.map((r) => ({
+      id: Number(r.id),
+      claimId: Number(r.claimId),
+      pageId: r.pageId,
+      footnote: r.footnote,
+      section: r.section,
+      createdAt: r.createdAt?.toISOString() ?? new Date().toISOString(),
+    })),
+  });
+});
+
+// ---- POST /:id/page-references ----
+
+claimsRoute.post("/:id/page-references", async (c) => {
+  const idStr = c.req.param("id");
+  const id = Number(idStr);
+  if (!Number.isInteger(id) || id <= 0) {
+    return validationError(c, "Claim ID must be a positive integer");
+  }
+
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = PageRefInsertBodySchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const db = getDrizzleDb();
+
+  // Verify claim exists
+  const claimRows = await db.select({ id: claims.id }).from(claims).where(eq(claims.id, id)).limit(1);
+  if (claimRows.length === 0) return notFoundError(c, `Claim not found: ${id}`);
+
+  const rows = await db
+    .insert(claimPageReferences)
+    .values({
+      claimId: id,
+      pageId: parsed.data.pageId,
+      footnote: parsed.data.footnote ?? null,
+      section: parsed.data.section ?? null,
+    })
+    .onConflictDoNothing()
+    .returning();
+
+  if (rows.length === 0) {
+    return c.json({ message: "Reference already exists" }, 200);
+  }
+
+  return c.json({
+    id: Number(rows[0].id),
+    claimId: Number(rows[0].claimId),
+    pageId: rows[0].pageId,
+    footnote: rows[0].footnote,
+    section: rows[0].section,
+    createdAt: rows[0].createdAt?.toISOString() ?? new Date().toISOString(),
+  }, 201);
+});
+
+// ---- POST /:id/page-references/batch ----
+
+claimsRoute.post("/:id/page-references/batch", async (c) => {
+  const idStr = c.req.param("id");
+  const id = Number(idStr);
+  if (!Number.isInteger(id) || id <= 0) {
+    return validationError(c, "Claim ID must be a positive integer");
+  }
+
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = ClaimPageReferenceBatchSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const db = getDrizzleDb();
+
+  // Verify claim exists
+  const claimRows = await db.select({ id: claims.id }).from(claims).where(eq(claims.id, id)).limit(1);
+  if (claimRows.length === 0) return notFoundError(c, `Claim not found: ${id}`);
+
+  const values = parsed.data.items.map((item) => ({
+    claimId: id,
+    pageId: item.pageId,
+    footnote: item.footnote ?? null,
+    section: item.section ?? null,
+  }));
+
+  const rows = await db
+    .insert(claimPageReferences)
+    .values(values)
+    .onConflictDoNothing()
+    .returning();
+
+  return c.json({ inserted: rows.length }, 201);
 });

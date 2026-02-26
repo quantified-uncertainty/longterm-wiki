@@ -10,6 +10,11 @@ import { ConfidenceBadge } from "../../components/confidence-badge";
 import { ClaimModeBadge } from "../../components/claim-mode-badge";
 import { NumericValueDisplay } from "../../components/numeric-value-display";
 import { ClaimSourcesList } from "../../components/claim-sources-list";
+import { VerdictBadge } from "../../components/verdict-badge";
+import {
+  ClaimPageReferences,
+  type PageReference,
+} from "../../components/claim-page-references";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -35,6 +40,13 @@ export default async function ClaimDetailPage({ params }: PageProps) {
   );
 
   if (!claim) notFound();
+
+  // Fetch page references for this claim
+  const pageRefsResult = await fetchFromWikiServer<{ references: PageReference[] }>(
+    `/api/claims/${id}/page-references`,
+    { revalidate: 300 }
+  );
+  const pageReferences = pageRefsResult?.references ?? [];
 
   const entity = getEntityById(claim.entityId);
   const entityDisplayName = entity?.title ?? claim.entityId;
@@ -65,6 +77,49 @@ export default async function ClaimDetailPage({ params }: PageProps) {
       <div className="rounded-lg border p-4 mb-4">
         <p className="text-sm leading-relaxed">{claim.claimText}</p>
       </div>
+
+      {/* Verdict */}
+      {claim.claimVerdict && (
+        <div className="rounded-lg border p-4 mb-4 space-y-2">
+          <h3 className="text-sm font-medium text-muted-foreground">Verdict</h3>
+          <div className="flex items-center gap-2">
+            <VerdictBadge
+              verdict={claim.claimVerdict}
+              score={claim.claimVerdictScore}
+            />
+            {claim.claimVerdictDifficulty && (
+              <span className="text-xs text-muted-foreground">
+                Difficulty: {claim.claimVerdictDifficulty}
+              </span>
+            )}
+          </div>
+          {claim.claimVerdictIssues && (
+            <p className="text-sm text-muted-foreground">
+              {claim.claimVerdictIssues}
+            </p>
+          )}
+          {claim.claimVerdictQuotes && (
+            <p className="text-sm italic text-muted-foreground">
+              &ldquo;{claim.claimVerdictQuotes}&rdquo;
+            </p>
+          )}
+          <div className="flex gap-4 text-xs text-muted-foreground">
+            {claim.claimVerdictModel && (
+              <span>Model: {claim.claimVerdictModel}</span>
+            )}
+            {claim.claimVerifiedAt && (
+              <span>
+                Verified:{" "}
+                {new Date(claim.claimVerifiedAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Epistemic mode banner (attributed only) */}
       {claim.claimMode === "attributed" && (
@@ -229,6 +284,16 @@ export default async function ClaimDetailPage({ params }: PageProps) {
               </Link>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Page references */}
+      {pageReferences.length > 0 && (
+        <div className="mb-6">
+          <span className="text-xs text-muted-foreground block mb-2">
+            Page References ({pageReferences.length})
+          </span>
+          <ClaimPageReferences references={pageReferences} />
         </div>
       )}
 

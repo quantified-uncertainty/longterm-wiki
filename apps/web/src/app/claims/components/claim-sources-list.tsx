@@ -10,6 +10,7 @@ import { getResourceById, getAllResources, getResourceCredibility } from "@data"
 import type { Resource } from "@data";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { normalizeUrl, getResourceTypeIcon } from "@/components/wiki/resource-utils";
+import { SourceVerdictBadge } from "./verdict-badge";
 
 interface Props {
   sources: ClaimSourceRow[];
@@ -103,7 +104,18 @@ export function ClaimSourcesList({ sources, compact = false }: Props) {
                   {source.url}
                 </a>
               ) : null}
+              {source.sourceVerdict && (
+                <SourceVerdictBadge
+                  verdict={source.sourceVerdict}
+                  score={source.sourceVerdictScore}
+                />
+              )}
             </div>
+            {source.sourceVerdictIssues && (
+              <p className="text-xs text-muted-foreground mb-1">
+                {source.sourceVerdictIssues}
+              </p>
+            )}
             {source.sourceQuote && (
               <p className="text-xs italic text-muted-foreground">
                 &ldquo;{source.sourceQuote}&rdquo;

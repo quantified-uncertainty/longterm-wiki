@@ -14,6 +14,12 @@
 import { buildCommands } from '../lib/cli.ts';
 
 const SCRIPTS = {
+  pipeline: {
+    script: 'claims/pipeline.ts',
+    description: 'Run unified extract → link → verify pipeline for a page',
+    passthrough: ['dry-run', 'steps', 'model'],
+    positional: true,
+  },
   extract: {
     script: 'claims/extract.ts',
     description: 'Extract atomic claims from a wiki page using LLM',
@@ -68,6 +74,12 @@ const SCRIPTS = {
     passthrough: ['json'],
     positional: false,
   },
+  'backfill-from-citations': {
+    script: 'claims/backfill-from-citations.ts',
+    description: 'Backfill claims from citation_quotes by grouping on text similarity',
+    passthrough: ['dry-run', 'page-id', 'limit'],
+    positional: false,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'status');
@@ -86,14 +98,19 @@ ${commandList}
 Options:
   --dry-run             Preview without storing to database
   --model=M             LLM model override (default: google/gemini-2.0-flash-001)
+  --steps=S             Comma-separated steps to run: extract,link,verify (pipeline only)
   --json                JSON output (status only)
   --entity=E            Target entity filter (ingest-resource, from-resource)
-  --limit=N             Max resources/URLs to process
+  --limit=N             Max resources/URLs to process (backfill-from-citations: max quotes to load)
+  --page-id=P           Restrict to a single wiki page (backfill-from-citations)
   --force               Re-ingest already-processed resources; clear existing claims (ingest-resource, ingest-batch)
   --batch=<file>        Process URLs from a file, one per line (from-resource)
   --no-auto-resource    Don't auto-create resource YAML for unknown URLs (from-resource)
 
 Examples:
+  crux claims pipeline kalshi                         Run full extract → link → verify pipeline
+  crux claims pipeline kalshi --dry-run               Preview pipeline without storing
+  crux claims pipeline kalshi --steps=extract,link    Run only extraction and linking steps
   crux claims extract kalshi                          Extract claims from the Kalshi page
   crux claims extract kalshi --dry-run                Preview without storing
   crux claims verify kalshi                           Verify claims against citation sources
@@ -108,7 +125,11 @@ Examples:
   crux claims from-resource --batch urls.txt --limit=5   Batch-process URLs from file
 
 Workflow:
-  Page-centric (Phase 1):
+  Unified pipeline (Wave 2c):
+  1. crux claims pipeline <page-id>    Extract + link + verify in one command
+  2. crux claims status <page-id>      Check coverage
+
+  Page-centric (Phase 1, individual steps):
   1. crux claims extract <page-id>     Extract claims from a wiki page
   2. crux claims verify <page-id>      Verify against citation sources
   3. crux claims status <page-id>      Check coverage
@@ -117,6 +138,11 @@ Workflow:
   1. crux claims ingest-resource <resource-id>   Extract from a known resource
   2. crux claims ingest-batch                    Bulk-process all cited resources
   3. crux claims from-resource <url>             Extract from any URL (auto-routes)
+
+  Citation backfill (Wave 2b):
+  1. crux claims backfill-from-citations --dry-run        Preview what would be created
+  2. crux claims backfill-from-citations                  Run against all unlinked quotes
+  3. crux claims backfill-from-citations --page-id=kalshi Run for a single page
 
 Notes:
   - Extraction requires OPENROUTER_API_KEY or ANTHROPIC_API_KEY
