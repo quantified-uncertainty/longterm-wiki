@@ -1,0 +1,414 @@
+pageId: anthropic
+verifiedAt: 2026-02-25
+totalCitations: 37
+verified: 32
+broken: 5
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Anthropic
+    linkText: "Wikipedia: Anthropic"
+    claimContext: Anthropic PBC is an American artificial intelligence company headquartered in San Francisco that develops the Claude family of <EntityLink id="E186" name="language-models">large language models</EntityLink>.[^1] Founded in 2021 by former members of <EntityLink id="E218" name="openai">OpenAI</EntityL
+    fetchedAt: 2026-02-25T20:35:07.917Z
+    httpStatus: 200
+    pageTitle: Anthropic - Wikipedia
+    contentSnippet: Anthropic - Wikipedia Jump to content From Wikipedia, the free encyclopedia American artificial intelligence research company This article is about the company. For other uses, see Anthropic (disambiguation) . Anthropic PBC Logo Company type Public benefit corporation Industry Artificial intelligence Founded 2021 &#59;&#32;5&#160;years ago &#160;( 2021 ) Founders Dario Amodei Daniela Amodei Jared Kaplan &#91; 1 &#93; Jack Clark &#91; 2 &#93; Chris Olah &#91; 3 &#93; Ben Mann &#91; 4 &#93; Sam Mc
+    contentLength: 305111
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://research.contrary.com/company/anthropic
+    linkText: "Contrary Research: Anthropic"
+    claimContext: The company's name was chosen because it "connotes being human centered and human oriented"—and the domain name happened to be available in early 2021.[^2] Anthropic incorporated as a Delaware public-benefit corporation (PBC), a legal structure enabling directors to balance stockholders' financial i
+    fetchedAt: 2026-02-25T20:35:08.268Z
+    httpStatus: 200
+    pageTitle: "Report: Anthropic Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Anthropic Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Anthropic AI / ML Amongst foundation model developers, Anthropic has positioned itself as a company with a particular focus on "
+    contentLength: 3513065
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation
+    linkText: "Anthropic: Raises \\$30 Billion Series G Funding at \\$380 Billion Post-Money Valuation"
+    claimContext: In February 2026, Anthropic closed a <F e="anthropic" f="5b0663a0">\$30 billion</F> Series G funding round at a <F e="anthropic" f="6796e194">\$380 billion</F> post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX.[^4] The company has
+    fetchedAt: 2026-02-25T20:35:08.706Z
+    httpStatus: 200
+    pageTitle: Anthropic raises $30 billion in Series G funding at $380 billion post-money valuation \ Anthropic
+    contentSnippet: "Announcements Anthropic raises $30 billion in Series G funding at $380 billion post-money valuation Feb 12, 2026 We have raised $30 billion in Series G funding led by GIC and Coatue, valuing Anthropic at $380 billion post-money. The round was co-led by D. E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX. The investment will fuel the frontier research, product development, and infrastructure expansions that have made Anthropic the market leader in enterprise AI and coding. Significant "
+    contentLength: 103575
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.pminsights.com/insights/anthropic-approaches-7b-run-rate-in-2025-outpaces-openai
+    linkText: "PM Insights: Anthropic Approaches \\$7B Run Rate in 2025"
+    claimContext: In February 2026, Anthropic closed a <F e="anthropic" f="5b0663a0">\$30 billion</F> Series G funding round at a <F e="anthropic" f="6796e194">\$380 billion</F> post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX.[^4] The company has
+    fetchedAt: 2026-02-25T20:35:08.007Z
+    httpStatus: 200
+    pageTitle: Anthropic Approaches $7B Run Rate in 2025, Outpaces OpenAI | PM Insights
+    contentSnippet: Anthropic Approaches $7B Run Rate in 2025, Outpaces OpenAI | PM Insights Company Valuations Contact us Login Request a demo PM Insights provides independent, market-driven data for Private Growth and Pre-IPO companies, providing unparalleled transparency and helping asset managers, consultants, banks, and regulators understand trading conditions and risk in this dynamic market. This report provides a comprehensive analysis of Anthropic ’s growing influence in the frontier AI landscape, underscor
+    contentLength: 92386
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/
+    linkText: "TechCrunch: Enterprises Prefer Anthropic's AI Models (July 2025)"
+    claimContext: In February 2026, Anthropic closed a <F e="anthropic" f="5b0663a0">\$30 billion</F> Series G funding round at a <F e="anthropic" f="6796e194">\$380 billion</F> post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX.[^4] The company has
+    fetchedAt: 2026-02-25T20:35:07.997Z
+    httpStatus: 200
+    pageTitle: Enterprises prefer Anthropic's AI models over anyone else's, including OpenAI's | TechCrunch
+    contentSnippet: "Enterprises prefer Anthropic&#039;s AI models over anyone else&#039;s, including OpenAI&#039;s | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Anthropic Enterprise Enterprises prefer Anthropic&#8217;s AI models over anyone else&#8217;s, including OpenAI&#8217;s Rebecca Szkutak 1:32 PM PDT · July 31, 2025 AI research lab Anthropic&#"
+    contentLength: 224792
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://colah.github.io/about.html
+    linkText: "Christopher Olah: About"
+    claimContext: "Anthropic emerged from disagreements within OpenAI about the organization's direction. In December 2020, seven co-founders departed to start something new: <EntityLink id=\"E91\" name=\"dario-amodei\">Dario Amodei</EntityLink> (CEO), <EntityLink id=\"E90\" name=\"daniela-amodei\">Daniela Amodei</EntityLink>"
+    fetchedAt: 2026-02-25T20:35:09.828Z
+    httpStatus: 200
+    pageTitle: About Me - colah's blog
+    contentSnippet: About Me - colah's blog Christopher Olah I work on reverse engineering artificial neural networks into human understandable algorithms. I'm one of the co-founders of Anthropic , an AI lab focused on the safety of large models. Previously, I led interpretability research at OpenAI , worked at Google Brain , and co-founded Distill , a scientific journal focused on outstanding communication. My blog should not be taken to reflect the views of any organization I'm affiliated with. Twitter &nbsp-&nbs
+    contentLength: 9875
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems
+    linkText: "Anthropic: Series A Announcement"
+    claimContext: Early funding came primarily from EA-connected investors who prioritized AI safety. <EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink>, co-founder of Skype, reportedly led the Series A at a \$550 million pre-money valuation.[^8] <EntityLink id="E436" name="dustin-moskovitz">Dustin M
+    fetchedAt: 2026-02-25T20:35:11.897Z
+    httpStatus: 200
+    pageTitle: Anthropic raises $124 million to build more reliable, general AI systems \ Anthropic
+    contentSnippet: Anthropic raises $124 million to build more reliable, general AI systems \ Anthropic Announcements Anthropic raises $124 million to build more reliable, general AI systems May 28, 2021 Anthropic, an AI safety and research company, has raised $124 million in a Series A. The financing round will support Anthropic in executing against its research roadmap and building prototypes of reliable and steerable AI systems. The company is led by siblings Dario Amodei (CEO) and Daniela Amodei (President). T
+    contentLength: 83091
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.semafor.com/article/11/21/2023/how-effective-altruism-led-to-a-crisis-at-openai
+    linkText: "Semafor: How Effective Altruism Led to a Crisis at OpenAI (Nov 2023)"
+    claimContext: Early funding came primarily from EA-connected investors who prioritized AI safety. <EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink>, co-founder of Skype, reportedly led the Series A at a \$550 million pre-money valuation.[^8] <EntityLink id="E436" name="dustin-moskovitz">Dustin M
+    fetchedAt: 2026-02-25T20:35:10.204Z
+    httpStatus: 200
+    pageTitle: The AI industry turns against its favorite philosophy, effective altruism | Semafor
+    contentSnippet: "The AI industry turns against its favorite philosophy, effective altruism | Semafor Intelligence for the New World Economy Semafor World Economy The AI industry turns against its favorite philosophy Louise Matsakis and Reed Albergotti Updated Nov 21, 2023, 3:29pm EST Nov 21, 2023, 3:29pm EST Technology Share Semafor/Joey Pfeifer Post Email Whatsapp Copy link Sign up for Semafor Technology: What’s next in the new era of tech. Read it now . Email address Sign Up In this article: The Scene Know Mor"
+    contentLength: 133465
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://taptwicedigital.com/stats/anthropic
+    linkText: "TapTwice Digital: Anthropic Statistics"
+    claimContext: Anthropic's commercial growth accelerated rapidly. At the beginning of 2025, run-rate revenue was approximately <F e="anthropic" f="bc497a3d">\$1 billion</F>.[^10] By June 2025, the company hit <F e="anthropic" f="83e76962">\$4 billion</F> in annualized revenue—quadrupling from December 2024.[^5] By
+    fetchedAt: 2026-02-25T20:35:09.783Z
+    httpStatus: 200
+    pageTitle: "7 Anthropic Statistics (2025): Revenue, Valuation, Users, Funding"
+    contentSnippet: "7 Anthropic Statistics (2025): Revenue, Valuation, Users, Funding 7 Anthropic Statistics (2025): Revenue, Valuation, Users, Funding Last Updated May 17, 2025 Written by the TapTwice Digital Team ON THIS PAGE Anthropic Stats (Highlights) Anthropic Revenue Anthropic Market Share Anthropic Users Anthropic Valuation Anthropic Funding Anthropic Investors Anthropic Employees Anthropic is a leading AI (artificial intelligence) and research company. Founded in 2021 by former OpenAI researchers, Anthropi"
+    contentLength: 215044
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.bloomberg.com/news/articles/2026-01-21/anthropic-s-revenue-run-rate-tops-9-billion-as-vcs-pile-in
+    linkText: "Bloomberg: Anthropic's Revenue Run Rate Tops \\$9 Billion (Jan 2026)"
+    claimContext: Anthropic's commercial growth accelerated rapidly. At the beginning of 2025, run-rate revenue was approximately <F e="anthropic" f="bc497a3d">\$1 billion</F>.[^10] By June 2025, the company hit <F e="anthropic" f="83e76962">\$4 billion</F> in annualized revenue—quadrupling from December 2024.[^5] By
+    fetchedAt: 2026-02-25T20:35:09.835Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 12
+    url: https://techcrunch.com/2025/11/04/anthropic-expects-b2b-demand-to-boost-revenue-to-70b-in-2028-report/
+    linkText: "TechCrunch: Anthropic Expects B2B Demand to Boost Revenue (Nov 2025)"
+    claimContext: Anthropic's commercial growth accelerated rapidly. At the beginning of 2025, run-rate revenue was approximately <F e="anthropic" f="bc497a3d">\$1 billion</F>.[^10] By June 2025, the company hit <F e="anthropic" f="83e76962">\$4 billion</F> in annualized revenue—quadrupling from December 2024.[^5] By
+    fetchedAt: 2026-02-25T20:35:13.304Z
+    httpStatus: 200
+    pageTitle: "Anthropic projects $70B in revenue by 2028: Report | TechCrunch"
+    contentSnippet: "Anthropic projects $70B in revenue by 2028: Report | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Slava Blazer Photography AI Anthropic projects $70B in revenue by 2028: Report Rebecca Bellan 8:48 AM PST · November 4, 2025 The Information reports that Anthropic expects to generate as much as $70 billion in revenue and $17 billion "
+    contentLength: 228510
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.anthropic.com/news/claude-opus-4-5
+    linkText: "Anthropic: Claude Opus 4.5 Announcement"
+    claimContext: "Claude Opus 4.5, released in November 2025, achieved state-of-the-art results on benchmarks for complex enterprise tasks: 80.9% on SWE-bench Verified (the first AI model to exceed 80%), 60%+ on Terminal-Bench 2.0 (the first to exceed 60%), and 61.4% on OSWorld for computer use capabilities (compared"
+    fetchedAt: 2026-02-25T20:35:17.616Z
+    httpStatus: 200
+    pageTitle: Introducing Claude Opus 4.5 \ Anthropic
+    contentSnippet: Announcements Introducing Claude Opus 4.5 Nov 24, 2025 Our newest model, Claude Opus 4.5, is available today. It’s intelligent, efficient, and the best model in the world for coding, agents, and computer use. It’s also meaningfully better at everyday tasks like deep research and working with slides and spreadsheets. Opus 4.5 is a step forward in what AI systems can do, and a preview of larger changes to how work gets done. Claude Opus 4.5 is state-of-the-art on tests of real-world software engin
+    contentLength: 278996
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://aimagazine.com/news/openai-vs-anthropic-the-results-of-the-ai-safety-test
+    linkText: "AI Magazine: OpenAI vs Anthropic Safety Test Results"
+    claimContext: "The joint OpenAI–Anthropic safety evaluation conducted in summer 2025 illustrates the complexity of direct comparisons: OpenAI's o3 and o4-mini models showed greater resistance to certain jailbreak attacks, while Claude 4 models showed advantages in maintaining instruction hierarchy.[^18] Neither co"
+    fetchedAt: 2026-02-25T20:35:13.264Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 19
+    url: https://zapier.com/blog/claude-vs-chatgpt/
+    linkText: "Zapier: Claude vs ChatGPT"
+    claimContext: Claude has several documented limitations. Earlier versions struggled with hallucinations—Sonnet 3 had a 16.3% hallucination rate, though Claude 3.7 Sonnet improved this to 4.4%.[^19] Claude models also have a documented high rejection rate (as high as 70% in some scenarios), which some analysts int
+    fetchedAt: 2026-02-25T20:35:13.579Z
+    httpStatus: 200
+    pageTitle: "Claude vs. ChatGPT: What&#x27;s the difference?"
+    contentSnippet: "Claude vs. ChatGPT: What&#x27;s the difference? Home App picks App comparisons App comparisons 11 min read Claude vs. ChatGPT: What&#x27;s the difference? By Ryan Kane · May 27, 2025 When OpenAI launched ChatGPT in late 2022, tech writers (myself included) became obsessed with testing its limits. Could it write poetry? Debug code? Explain quantum physics to a five-year-old? Once Anthropic&#x27;s Claude entered the scene a few months later, the focus shifted to head-to-head task comparisons (like"
+    contentLength: 910339
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.rezolve.ai/blog/claude-vs-gpt4
+    linkText: "Rezolve AI: Claude vs GPT-4"
+    claimContext: Claude has several documented limitations. Earlier versions struggled with hallucinations—Sonnet 3 had a 16.3% hallucination rate, though Claude 3.7 Sonnet improved this to 4.4%.[^19] Claude models also have a documented high rejection rate (as high as 70% in some scenarios), which some analysts int
+    fetchedAt: 2026-02-25T20:35:13.338Z
+    httpStatus: 200
+    pageTitle: "Claude vs GPT4: In-Depth Comparison for 2025"
+    contentSnippet: "Claude vs GPT4: In-Depth Comparison for 2025 Platform Solutions Resources Company Get Quote View Demo Rezolve Blog Claude vs GPT4: In-Depth Comparison for 2025 AI & Automation Claude vs GPT4: In-Depth Comparison for 2025 Manish Sharma CRO Created on: December 18, 2024 5 min read Last updated on: June 27, 2025 AI & Automation Missed Rezolve.ai Connect 2026? Catch the highlights now. Watch On-Demand → The battle of AI language models continues to heat up, with two heavyweights leading the charge: "
+    contentLength: 128640
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://kanerika.com/blogs/claude-3-5-vs-gpt-4o/
+    linkText: "Kanerika: Claude 3.5 vs GPT-4o"
+    claimContext: Unlike some competitors, Claude does not support native video or audio processing, nor does it generate images directly—relying on external tools when creation is needed. Claude may occasionally struggle with maintaining consistency over longer pieces of text.[^21]
+    fetchedAt: 2026-02-25T20:35:19.309Z
+    httpStatus: 200
+    pageTitle: "Claude 3.5 vs GPT-4o: Detailed AI Model Comparison"
+    contentSnippet: "Claude 3.5 vs GPT-4o: Detailed AI Model Comparison Skip to content Meet us at Fabcon, BOOTH #836 Know More What’s your use case? We have a solution for you Get Free Consultation Related resources December 17, 2025 Named Entity Recognition: A Comprehensive Guide to NLP&#8217;s Key Technology Read More December 17, 2025 Multimodal Models: Everything You Need To Know Read More December 17, 2025 How Multi Cloud Management Transforms Business Efficiency And Security Read More December 17, 2025 Data M"
+    contentLength: 1161413
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://arxiv.org/abs/2212.08073
+    linkText: "arXiv: Constitutional AI Paper"
+    claimContext: Anthropic developed <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> (CAI), a method for aligning <EntityLink id="E186" name="language-models">language models</EntityLink> to abide by high-level normative principles written into a constitution. The method trains a harmle
+    fetchedAt: 2026-02-25T20:35:18.688Z
+    httpStatus: 200
+    pageTitle: "[2212.08073] Constitutional AI: Harmlessness from AI Feedback"
+    contentSnippet: "[2212.08073] Constitutional AI: Harmlessness from AI Feedback arXiv Is Hiring a DevOps Engineer Work on one of the world's most important websites and make an impact on open science. View Jobs --> Computer Science > Computation and Language arXiv:2212.08073 (cs) [Submitted on 15 Dec 2022] Title: Constitutional AI: Harmlessness from AI Feedback Authors: Yuntao Bai , Saurav Kadavath , Sandipan Kundu , Amanda Askell , Jackson Kernion , Andy Jones , Anna Chen , Anna Goldie , Azalia Mirhoseini , Came"
+    contentLength: 57180
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.anthropic.com/news/core-views-on-ai-safety
+    linkText: "Anthropic: Core Views on AI Safety"
+    claimContext: "Anthropic's constitution draws from multiple sources: the UN Declaration of Human Rights, trust and safety best practices, <EntityLink id=\"E98\" name=\"deepmind\">DeepMind</EntityLink>'s Sparrow Principles, efforts to capture non-western perspectives, and principles from early research.[^22] The compan"
+    fetchedAt: 2026-02-25T20:35:21.818Z
+    httpStatus: 200
+    pageTitle: "Core Views on AI Safety: When, Why, What, and How \\ Anthropic"
+    contentSnippet: "Announcements Core Views on AI Safety: When, Why, What, and How Mar 8, 2023 We founded Anthropic because we believe the impact of AI might be comparable to that of the industrial and scientific revolutions, but we aren’t confident it will go well. And we also believe this level of impact could start to arrive soon – perhaps in the coming decade. This view may sound implausible or grandiose, and there are good reasons to be skeptical of it. For one thing, almost everyone who has said “the thing w"
+    contentLength: 205493
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/
+    linkText: "MIT Technology Review: Mechanistic Interpretability 2026 Breakthrough"
+    claimContext: In 2025, Anthropic advanced <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink> research using its "microscope" to reveal sequences of features and trace the path a model takes from prompt to response.[^24] This work was named one of MIT Technology Review's 10 Breakthr
+    fetchedAt: 2026-02-25T20:35:18.694Z
+    httpStatus: 200
+    pageTitle: "Mechanistic interpretability: 10 Breakthrough Technologies 2026 | MIT Technology Review"
+    contentSnippet: "Mechanistic interpretability: 10 Breakthrough Technologies 2026 | MIT Technology Review You need to enable JavaScript to view this site. Skip to Content 10 Breakthrough Technologies 2026 See the full list Hundreds of millions of people now use chatbots every day. And yet the large language models that drive them are so complicated that nobody really understands what they are, how they work, or exactly what they can and can’t do—not even the people who build them. Weird, right? It’s also a proble"
+    contentLength: 455517
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://assets.anthropic.com/m/7b1761976975203a/original/Anthropic-Interpretability-info-sheet.pdf
+    linkText: "Anthropic: Interpretability Info Sheet (PDF)"
+    claimContext: Anthropic monitors around <F e="anthropic" f="28a43350">10 million</F> neural features during evaluation using dictionary learning, mapping to human-interpretable concepts including deception, <EntityLink id="E295" name="sycophancy">sycophancy</EntityLink>, and bias.[^25] The company has a stated go
+    fetchedAt: 2026-02-25T20:35:18.713Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 0
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.anthropic.com/news/frontier-threats-red-teaming-for-ai-safety
+    linkText: "Anthropic: Frontier Threats Red Teaming"
+    claimContext: Over six months, Anthropic spent more than <F e="anthropic" f="28a43350">150</F> hours with biosecurity experts <EntityLink id="E449" name="red-teaming">red teaming</EntityLink> and evaluating their models' ability to output harmful biological information. According to their report, models might soo
+    fetchedAt: 2026-02-25T20:35:24.513Z
+    httpStatus: 200
+    pageTitle: Frontier Threats Red Teaming for AI Safety \ Anthropic
+    contentSnippet: Frontier Threats Red Teaming for AI Safety \ Anthropic Announcements Frontier Threats Red Teaming for AI Safety Jul 26, 2023 “Red teaming,” or adversarial testing, is a recognized technique to measure and increase the safety and security of systems. While previous Anthropic research reported methods and results for red teaming using crowdworkers, for some time, AI researchers have noted that AI models could eventually obtain capabilities in areas relevant to national security. For example, resea
+    contentLength: 182582
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://eu.36kr.com/en/p/3443299194705538
+    linkText: "36Kr: Claude Jailbreak Analysis"
+    claimContext: Claude Sonnet 4 and Claude Opus 4 are most vulnerable to "past-tense" jailbreaks—when harmful requests are presented as past events. In contrast, OpenAI o3 performs better in resisting past-tense jailbreaks, with failure modes mainly limited to base64-style prompts and low-resource language translat
+    fetchedAt: 2026-02-25T20:35:23.645Z
+    httpStatus: 200
+    pageTitle: 'GPT vs Claude: OpenAI Didn&#x27;t Win Every Match, AI Security "Ultimate Test" Truth Unveiled'
+    contentSnippet: 'GPT vs Claude: OpenAI Didn&#x27;t Win Every Match, AI Security "Ultimate Test" Truth Unveiled English 中文 Deutsch Home Article GPT goes head-to-head with Claude, yet OpenAI didn&#x27;t win every match. The truth behind the "ultimate test" of AI security is revealed. 新智元 2025-08-29 10:52 OpenAI and Anthropic conduct a rare joint test on AI model security, with Claude and GPT showing different performances. OpenAI and Anthropic have joined forces in a rare collaboration! After "parting ways" over A'
+    contentLength: 63584
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.axios.com/2024/07/25/exclusive-anthropic-weighs-in-on-california-ai-bill
+    linkText: "Axios: Anthropic Weighs In on California AI Bill (July 2024)"
+    claimContext: Anthropic initially did not support California's SB 1047 AI regulation bill, but worked with Senator Wiener to propose amendments. After revisions incorporating Anthropic's input—including removing a provision for a government AI oversight committee—Anthropic announced support for the amended versio
+    fetchedAt: 2026-02-25T20:35:22.911Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 32
+    url: https://en.wikipedia.org/wiki/Safe_and_Secure_Innovation_for_Frontier_Artificial_Intelligence_Models_Act
+    linkText: "Wikipedia: Safe and Secure Innovation for Frontier AI Models Act"
+    claimContext: Anthropic initially did not support California's SB 1047 AI regulation bill, but worked with Senator Wiener to propose amendments. After revisions incorporating Anthropic's input—including removing a provision for a government AI oversight committee—Anthropic announced support for the amended versio
+    fetchedAt: 2026-02-25T20:35:22.958Z
+    httpStatus: 200
+    pageTitle: Safe and Secure Innovation for Frontier Artificial Intelligence Models Act - Wikipedia
+    contentSnippet: "Safe and Secure Innovation for Frontier Artificial Intelligence Models Act - Wikipedia Jump to content From Wikipedia, the free encyclopedia California bill Safe and Secure Innovation for Frontier Artificial Intelligence Models Act California State Legislature Full name Safe and Secure Innovation for Frontier Artificial Intelligence Models Act Introduced February 7, 2024 Assembly voted August 28, 2024 (48–16) Senate voted August 29, 2024 (30–9) Sponsor Scott Wiener Governor Gavin Newsom Bill SB "
+    contentLength: 241585
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.nbcnews.com/tech/tech-news/anthropic-backs-californias-sb-53-ai-bill-rcna229908
+    linkText: "NBC News: Anthropic Backs California's SB 53"
+    claimContext: Anthropic endorsed California's SB 53 (Transparency in Frontier AI Act), becoming the first major tech company to support this bill creating broad legal requirements for large AI model developers.[^33]
+    fetchedAt: 2026-02-25T20:35:23.415Z
+    httpStatus: 200
+    pageTitle: Anthropic backs California&#x27;s SB 53 AI bill
+    contentSnippet: "Anthropic backs California&#x27;s SB 53 AI bill BREAKING: Cuba says four killed after U.S. boat violates territorial waters IE 11 is not supported. For an optimal experience visit our site on another browser. Skip to Content The Anthropic website. Gabby Jones / Bloomberg via Getty Images file Share Add NBC News to Google Sept. 8, 2025, 6:06 PM EDT By Jared Perlo Artificial intelligence developer Anthropic became the first major tech company Monday to endorse a California bill that would regulate"
+    contentLength: 274068
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.nextgov.com/artificial-intelligence/2025/10/anthropic-ceo-defends-support-ai-regulations-alignment-trump-policies/408959/
+    linkText: "Nextgov: Anthropic CEO Defends Support for AI Regulations (Oct 2025)"
+    claimContext: Anthropic joined other AI companies in opposing a proposed 10-year moratorium on state-level AI laws in Trump's Big, Beautiful Bill.[^34] CEO Dario Amodei has advocated for stronger export controls on advanced US semiconductor technology to China and called for accelerated energy infrastructure deve
+    fetchedAt: 2026-02-25T20:35:25.956Z
+    httpStatus: 200
+    pageTitle: Anthropic CEO defends support for AI regulations, alignment with Trump policies - Nextgov/FCW
+    contentSnippet: Anthropic CEO defends support for AI regulations, alignment with Trump policies - Nextgov/FCW Skip to Content Notice at Collection Your Privacy Choices Exercise Your Privacy Rights Critics sound alarm over HHS plans to restructure evaluation office Exclusive Energy Department patched flaws enabling email impersonation in critical minerals system Treasury sanctions Russian firm said to have stolen and sold US cyber tools CMS saved $2 billion by using AI to fight fraud, official says House Democra
+    contentLength: 143280
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://www.axios.com/2025/05/23/anthropic-ai-deception-risk
+    linkText: "Axios: Anthropic AI Deception Risk (May 2025)"
+    claimContext: In a May 2025 safety report, Anthropic disclosed that Claude Opus 4 showed willingness to conceal intentions and take actions to preserve its own existence in contrived test scenarios designed to <EntityLink id="E526" name="elicit">elicit</EntityLink> such behavior. In some instances, the model thre
+    fetchedAt: 2026-02-25T20:35:25.778Z
+    httpStatus: 200
+    pageTitle: Anthropic&#x27;s Claude 4 Opus schemed and deceived in safety testing
+    contentSnippet: "Anthropic&#x27;s Claude 4 Opus schemed and deceived in safety testing Skip to main content May 23, 2025 - Technology Anthropic&#x27;s new AI model shows ability to deceive and blackmail Ina Fried facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Illustration: Lindsey Bailey/Axios One of Ant"
+    contentLength: 187830
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.bankinfosecurity.com/models-strategically-lie-finds-anthropic-study-a-27136
+    linkText: "Bank Info Security: Models Strategically Lie, Finds Anthropic Study"
+    claimContext: Research found models could engage in "alignment faking"—appearing to adopt new principles while internally maintaining original guidelines. Claude 3 Opus engaged in alignment faking 12% of the time in test scenarios.[^36] Anthropic described this as the first empirical example of a model engaging i
+    fetchedAt: 2026-02-25T20:35:26.686Z
+    httpStatus: 200
+    pageTitle: Models Can Strategically Lie, Finds Anthropic Study
+    contentSnippet: "Models Can Strategically Lie, Finds Anthropic Study Artificial Intelligence & Machine Learning,Next-Generation Technologies & Secure Development'> TRENDING: Virtual Cybersecurity Summit: Implications of AI &bull; The State of Operational Technology and Cybersecurity &bull; Adaptive Risk Management in an Era of Complexity and Change &bull; Artificial Intelligence & Machine Learning , Next-Generation Technologies & Secure Development Models Can Strategically Lie, Finds Anthropic Study AI Can Fake "
+    contentLength: 399957
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.anthropic.com/transparency
+    linkText: "Anthropic: Transparency Report"
+    claimContext: Research found models could engage in "alignment faking"—appearing to adopt new principles while internally maintaining original guidelines. Claude 3 Opus engaged in alignment faking 12% of the time in test scenarios.[^36] Anthropic described this as the first empirical example of a model engaging i
+    fetchedAt: 2026-02-25T20:35:27.051Z
+    httpStatus: 200
+    pageTitle: Anthropic’s Transparency Hub \ Anthropic
+    contentSnippet: Anthropic’s Transparency Hub A look at Anthropic&#x27;s key processes, programs, and practices for responsible AI development. 0 1 Model Report 0 2 System Trust and Reporting 0 3 Voluntary Commitments 0 1 Model Report 0 1 Model Report 0 2 System Trust and Reporting 0 3 Voluntary Commitments Model Report Last updated February 20, 2026 Select a model to see a summary that provides quick access to essential information about Claude models, condensing key details about the models&#x27; capabilities,
+    contentLength: 499363
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://the-decoder.com/claude-jailbreak-results-are-in-and-the-hackers-won/
+    linkText: "The Decoder: Claude Jailbreak Results (Feb 2025)"
+    claimContext: In February 2025, Anthropic held a Constitutional Classifiers Challenge to identify vulnerabilities in Claude's safety systems. The challenge involved over 300,000 messages and an estimated 3,700 hours of collective effort. Four participants successfully discovered jailbreaks through all challenge l
+    fetchedAt: 2026-02-25T20:35:26.856Z
+    httpStatus: 200
+    pageTitle: Claude Jailbreak results are in, and the hackers won
+    contentSnippet: "Claude Jailbreak results are in, and the hackers won Ad Skip to content Claude Jailbreak results are in, and the hackers won Maximilian Schreiner View the LinkedIn Profile of Maximilian Schreiner Feb 15, 2025 Anthropic Update – Feb 15, 2025 Jailbreak update 2 Update from February 15, 2025: The results from Anthropic's Claude jailbreaking challenge are in. After five intense days of probing - involving over 300,000 messages and what Anthropic estimates was 3,700 hours of collective effort - the A"
+    contentLength: 124149
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://infosecwriteups.com/cve-2025-54794-hijacking-claude-ai-with-a-prompt-injection-the-jailbreak-that-talked-back-d6754078b311
+    linkText: "InfoSec Write-ups: CVE-2025-54794 Claude AI Prompt Injection"
+    claimContext: CVE-2025-54794 is a high-severity prompt injection flaw targeting Claude AI that allows carefully crafted prompts to flip the model's role, inject malicious instructions, and leak data.[^39]
+    fetchedAt: 2026-02-25T20:35:28.159Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 40
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: "Anthropic: Disrupting AI Espionage (Sept 2025)"
+    claimContext: In September 2025, a Chinese state-sponsored cyber group manipulated Claude Code to attempt infiltration of roughly thirty global targets, including major tech companies, financial institutions, chemical manufacturers, and government agencies, succeeding in a small number of cases. The attackers byp
+    fetchedAt: 2026-02-25T20:35:28.899Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 110708
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://www.safer-ai.org/anthropics-responsible-scaling-policy-update-makes-a-step-backwards
+    linkText: "SaferAI: Anthropic's RSP Update Makes a Step Backwards"
+    claimContext: On May 14, 2025, Anthropic updated their Responsible Scaling Policy to modify security safeguards intended to reduce the risk of company insiders stealing advanced models.[^41] According to SaferAI's assessment methodology, Anthropic's RSP grade dropped from 2.2 to 1.9.
+    fetchedAt: 2026-02-25T20:35:28.732Z
+    httpStatus: 200
+    pageTitle: Anthropic’s Responsible Scaling Policy Update Makes a Step Backwards &#8211; SaferAI
+    contentSnippet: Anthropic’s Responsible Scaling Policy Update Makes a Step Backwards &#8211; SaferAI We use cookies to make your experience on this website better. Agree Disagree Anthropic’s Responsible Scaling Policy Update Makes a Step Backwards Publication date October 23, 2024 share A week ago, Anthropic released an updated version of their Responsible Scaling Policy (RSP), prompting us to reassess their score in our ratings. We were initially expecting an improvement. Unfortunately, the results are disconc
+    contentLength: 58031
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.semafor.com/article/10/17/2025/white-house-feud-with-anthropic-reveals-broader-ai-safety-concerns
+    linkText: "Semafor: White House Feud with Anthropic (Oct 2025)"
+    claimContext: White House AI Czar <EntityLink id="E431" name="david-sacks">David Sacks</EntityLink> criticized Anthropic Co-founder Jack Clark on X, stating that Clark was concealing what Sacks characterized as "a sophisticated regulatory capture strategy based on fear-mongering."[^42] AI safety commentator Liron
+    fetchedAt: 2026-02-25T20:35:28.154Z
+    httpStatus: 200
+    pageTitle: White House feud with Anthropic reveals broader AI safety concerns | Semafor
+    contentSnippet: "White House feud with Anthropic reveals broader AI safety concerns | Semafor Intelligence for the New World Economy Semafor World Economy From Semafor Technology In your inbox, 2x per week Sign up View / White House feud with Anthropic reveals broader AI safety concerns Reed Albergotti Tech Editor, Semafor Oct 17, 2025, 10:59am EDT Oct 17, 2025, 10:59am EDT Technology North America Share Evelyn Hockstein/Reuters Post Email Whatsapp Copy link Sign up for Semafor Technology: What’s next in the new"
+    contentLength: 122615
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.themidasproject.com/article-list/how-anthropic-s-ai-safety-framework-misses-the-mark
+    linkText: "Midas Project: How Anthropic's AI Safety Framework Misses the Mark"
+    claimContext: "These critiques reflect a tension in Anthropic's positioning: the company builds frontier AI systems while warning about their dangers. Anthropic describes its approach as using a Responsible Scaling Policy as an experimental risk governance framework—an outcome-based approach where success is measu"
+    fetchedAt: 2026-02-25T20:35:28.216Z
+    httpStatus: 200
+    pageTitle: How Anthropic’s AI Safety Framework Misses the Mark | The Midas Project
+    contentSnippet: How Anthropic’s AI Safety Framework Misses the Mark | The Midas Project No headings found How Anthropic’s AI Safety Framework Misses the Mark How Anthropic’s AI Safety Framework Misses the Mark Jack Kelly • Jul 8, 2025 • 9 min read Get updates on AI risk → Join our newsletter Get updates on AI risk → Join our newsletter Anthropic has tried to build a reputation for taking AI safety seriously, and its Responsible Scaling Policy has become a central pillar of that identity. But while the company p
+    contentLength: 293347
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://www.verdict.co.uk/us-doj-google-anthropic-partnership/
+    linkText: "Verdict: US DOJ Google Anthropic Partnership"
+    claimContext: Multiple government agencies are examining Anthropic's relationships with major technology companies. The UK Competition and Markets Authority launched an investigation into Google–Anthropic relations, though it concluded Google hasn't gained "material influence" over Anthropic. The CMA is separatel
+    fetchedAt: 2026-02-25T20:35:31.436Z
+    httpStatus: 200
+    pageTitle: US DoJ seeks to unwind Google-Anthropic partnership
+    contentSnippet: "US DoJ seeks to unwind Google-Anthropic partnership Switch language: .translate --> The DoJ proposal to undwind Google-Anthropic deal is part of a broader strategy to address Google&#8217;s alleged monopoly in online search. Credit: gguy/Shutterstock. The US Department of Justice (DoJ) is pushing to unwind Google&#8217;s partnership with AI startup Anthropic as part of an antitrust case concerning online search, Bloomberg reports. The proposal suggests barring Google from acquiring or collaborat"
+    contentLength: 274755
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.glassdoor.com/Overview/Working-at-Anthropic-EI_IE8109027.11,20.htm
+    linkText: "Glassdoor: Working at Anthropic"
+    claimContext: Anthropic describes itself as a "high-trust, low-ego organization" with a remote-first structure where employees work primarily remotely, expected to visit the office roughly 25% of the time if local.[^45]
+    fetchedAt: 2026-02-25T20:35:29.982Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
