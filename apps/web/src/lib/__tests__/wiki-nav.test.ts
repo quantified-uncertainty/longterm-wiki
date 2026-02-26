@@ -200,10 +200,6 @@ describe("getInternalNav (mocked data)", () => {
     expect(factItem).toBeDefined();
     expect(factItem!.href).toBe("/wiki/E898");
 
-    const pagesItem = dashboards.items.find(i => i.label === "Pages");
-    expect(pagesItem).toBeDefined();
-    expect(pagesItem!.href).toBe("/wiki/E899");
-
     const updatesItem = dashboards.items.find(i => i.label === "Update Schedule");
     expect(updatesItem).toBeDefined();
     expect(updatesItem!.href).toBe("/wiki/E900");
@@ -408,9 +404,9 @@ describe("internal sidebar completeness (real data)", () => {
 
       const pagePath = path.join(APP_INTERNAL_DIR, entry.name, "page.tsx");
       if (fs.existsSync(pagePath)) {
-        // Skip pages that are just redirects (migrated to MDX stubs)
+        // Skip pages that are just redirects (migrated to MDX stubs or consolidated)
         const pageSource = fs.readFileSync(pagePath, "utf-8");
-        if (/redirect\(["']\/wiki\/E\d+["']\)/.test(pageSource)) continue;
+        if (/redirect\(["']\/(wiki\/E\d+|internal\/[^"']+)["']\)/.test(pageSource)) continue;
 
         dashboardDirs.push(entry.name);
       }
