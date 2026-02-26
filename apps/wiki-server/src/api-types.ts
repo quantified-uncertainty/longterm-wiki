@@ -849,6 +849,7 @@ export interface ClaimStatsResult {
   attributedClaims: number;
   numericClaims?: number;
   structuredClaims?: number;
+  byProperty?: Record<string, number>;
 }
 
 // -- Claims: Page References types -------------------------------------------

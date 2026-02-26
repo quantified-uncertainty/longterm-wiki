@@ -440,6 +440,14 @@ claimsRoute.get("/stats", async (c) => {
     .from(claims)
     .where(sql`${claims.property} IS NOT NULL`);
 
+  // Property distribution (for structured claims)
+  const byProperty = await db
+    .select({ property: claims.property, count: count() })
+    .from(claims)
+    .where(sql`${claims.property} IS NOT NULL`)
+    .groupBy(claims.property)
+    .orderBy(desc(count()));
+
   // Verdict distribution
   const byVerdict = await db
     .select({ claimVerdict: claims.claimVerdict, count: count() })
@@ -466,6 +474,9 @@ claimsRoute.get("/stats", async (c) => {
     attributedClaims: attributedResult[0].count,
     numericClaims: numericResult[0].count,
     structuredClaims: structuredResult[0].count,
+    byProperty: Object.fromEntries(
+      byProperty.map((r) => [r.property ?? "unknown", r.count])
+    ),
   });
 });
 
@@ -875,11 +886,64 @@ claimsRoute.patch("/batch-update-related-entities", async (c) => {
   return c.json({ updated, total: parsed.data.items.length });
 });
 
+// ---- PATCH /batch-update-structured (bulk update structured fields) ----
+// Accepts an array of {id, subjectEntity, property, ...} pairs.
+// IMPORTANT: Must be defined before PATCH /:id to avoid wildcard matching.
+
+const BatchUpdateStructuredSchema = z.object({
+  items: z.array(z.object({
+    id: z.number().int().positive(),
+    subjectEntity: z.string().max(300).nullable().optional(),
+    property: z.string().max(200).nullable().optional(),
+    structuredValue: z.string().max(2000).nullable().optional(),
+    valueUnit: z.string().max(100).nullable().optional(),
+    valueDate: z.string().max(20).nullable().optional(),
+    qualifiers: z.record(z.string()).nullable().optional(),
+  })).min(1).max(500),
+});
+
+claimsRoute.patch("/batch-update-structured", async (c) => {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = BatchUpdateStructuredSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const db = getDrizzleDb();
+  const now = new Date();
+  let updated = 0;
+
+  for (const item of parsed.data.items) {
+    const updates: Record<string, unknown> = { updatedAt: now };
+    if (item.subjectEntity !== undefined) updates.subjectEntity = item.subjectEntity;
+    if (item.property !== undefined) updates.property = item.property;
+    if (item.structuredValue !== undefined) updates.structuredValue = item.structuredValue;
+    if (item.valueUnit !== undefined) updates.valueUnit = item.valueUnit;
+    if (item.valueDate !== undefined) updates.valueDate = item.valueDate;
+    if (item.qualifiers !== undefined) updates.qualifiers = item.qualifiers;
+
+    const result = await db
+      .update(claims)
+      .set(updates)
+      .where(eq(claims.id, item.id))
+      .returning({ id: claims.id });
+    if (result.length > 0) updated++;
+  }
+
+  return c.json({ updated, total: parsed.data.items.length });
+});
+
 // ---- PATCH /:id (partial update) ----
-// Currently supports updating relatedEntities only.
+// Supports updating relatedEntities and structured fields.
 
 const PatchClaimSchema = z.object({
   relatedEntities: z.array(z.string().max(300)).nullable().optional(),
+  subjectEntity: z.string().max(300).nullable().optional(),
+  property: z.string().max(200).nullable().optional(),
+  structuredValue: z.string().max(2000).nullable().optional(),
+  valueUnit: z.string().max(100).nullable().optional(),
+  valueDate: z.string().max(20).nullable().optional(),
+  qualifiers: z.record(z.string()).nullable().optional(),
 });
 
 claimsRoute.patch("/:id", async (c) => {
@@ -913,6 +977,12 @@ claimsRoute.patch("/:id", async (c) => {
   if (parsed.data.relatedEntities !== undefined) {
     updates.relatedEntities = parsed.data.relatedEntities;
   }
+  if (parsed.data.subjectEntity !== undefined) updates.subjectEntity = parsed.data.subjectEntity;
+  if (parsed.data.property !== undefined) updates.property = parsed.data.property;
+  if (parsed.data.structuredValue !== undefined) updates.structuredValue = parsed.data.structuredValue;
+  if (parsed.data.valueUnit !== undefined) updates.valueUnit = parsed.data.valueUnit;
+  if (parsed.data.valueDate !== undefined) updates.valueDate = parsed.data.valueDate;
+  if (parsed.data.qualifiers !== undefined) updates.qualifiers = parsed.data.qualifiers;
 
   if (Object.keys(updates).length === 0) {
     return validationError(c, "No fields to update");

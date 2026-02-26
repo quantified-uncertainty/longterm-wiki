@@ -27,6 +27,8 @@ interface ClaimStats {
   byClaimVerdict?: Record<string, number>;
   withSourcesClaims: number;
   attributedClaims: number;
+  structuredClaims?: number;
+  byProperty?: Record<string, number>;
 }
 
 export interface ResourceBreakdownRow {
@@ -146,6 +148,12 @@ export default async function ClaimsIngestionPage() {
   const verdictUnverified = (stats?.total ?? 0) - verdictVerified - verdictDisputed - verdictUnsupported;
   const hasVerdicts = verdictVerified + verdictDisputed + verdictUnsupported > 0;
 
+  // Structured claims
+  const structuredCount = stats?.structuredClaims ?? 0;
+  const byProperty = stats?.byProperty ?? {};
+  const propertyEntries = Object.entries(byProperty).sort(([, a], [, b]) => b - a);
+  const hasStructured = structuredCount > 0;
+
   return (
     <article className="prose max-w-none">
       <h1>Claims Ingestion</h1>
@@ -190,6 +198,30 @@ export default async function ClaimsIngestionPage() {
         </div>
       )}
 
+      {/* Structured claims stat cards */}
+      {hasStructured && (
+        <div className="not-prose grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
+          <StatCard
+            label="Structured Claims"
+            value={structuredCount}
+            sub={`${stats?.total ? ((structuredCount / stats.total) * 100).toFixed(0) : 0}% of total`}
+          />
+          <StatCard
+            label="Unique Properties"
+            value={propertyEntries.length}
+          />
+          <StatCard
+            label="Top Property"
+            value={propertyEntries[0]?.[0]?.replace(/_/g, " ") ?? "—"}
+            sub={propertyEntries[0] ? `${propertyEntries[0][1]} claims` : undefined}
+          />
+          <StatCard
+            label="Unstructured"
+            value={(stats?.total ?? 0) - structuredCount}
+          />
+        </div>
+      )}
+
       {/* Distribution bars */}
       <div className="not-prose space-y-4 my-6">
         <DistributionBar
@@ -227,7 +259,55 @@ export default async function ClaimsIngestionPage() {
             ]}
           />
         )}
+        {hasStructured && (
+          <DistributionBar
+            label="Structured vs Unstructured"
+            items={[
+              { name: "Structured", count: structuredCount, color: "bg-violet-500" },
+              { name: "Unstructured", count: (stats?.total ?? 0) - structuredCount, color: "bg-gray-400" },
+            ]}
+          />
+        )}
       </div>
+
+      {/* Property distribution table */}
+      {hasStructured && propertyEntries.length > 0 && (
+        <>
+          <h2>Property Distribution</h2>
+          <div className="not-prose overflow-x-auto my-4">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="border-b border-border/60">
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Property</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Count</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground w-1/2">Distribution</th>
+                </tr>
+              </thead>
+              <tbody>
+                {propertyEntries.map(([prop, propCount]) => (
+                  <tr key={prop} className="border-b border-border/30 hover:bg-muted/30">
+                    <td className="py-1.5 px-3 font-mono text-xs">{prop}</td>
+                    <td className="py-1.5 px-3 text-right tabular-nums text-xs">{propCount}</td>
+                    <td className="py-1.5 px-3">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-4 bg-muted/50 rounded overflow-hidden">
+                          <div
+                            className="h-full bg-violet-500 rounded"
+                            style={{ width: `${(propCount / structuredCount) * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-[10px] text-muted-foreground tabular-nums w-10 text-right">
+                          {((propCount / structuredCount) * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
 
       {/* Per-resource table */}
       <h2>Per-Resource Breakdown</h2>

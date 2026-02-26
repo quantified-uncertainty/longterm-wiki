@@ -97,6 +97,55 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
         </div>
       )}
 
+      {/* Structured claim fields */}
+      {claim.property && (
+        <div>
+          <span className="font-medium text-xs text-muted-foreground block mb-1">
+            Structured Data:
+          </span>
+          <div className="flex flex-wrap gap-2 text-xs">
+            {claim.subjectEntity && (
+              <span>
+                <span className="text-muted-foreground">Subject:</span>{" "}
+                <span className="font-mono">{claim.subjectEntity}</span>
+              </span>
+            )}
+            <span>
+              <span className="text-muted-foreground">Property:</span>{" "}
+              <span className="font-mono">{claim.property}</span>
+            </span>
+            {claim.structuredValue && (
+              <span>
+                <span className="text-muted-foreground">Value:</span>{" "}
+                <span className="font-mono">{claim.structuredValue}</span>
+              </span>
+            )}
+            {claim.valueUnit && (
+              <span>
+                <span className="text-muted-foreground">Unit:</span>{" "}
+                <span className="font-mono">{claim.valueUnit}</span>
+              </span>
+            )}
+            {claim.valueDate && (
+              <span>
+                <span className="text-muted-foreground">Date:</span>{" "}
+                <span className="font-mono">{claim.valueDate}</span>
+              </span>
+            )}
+            {claim.qualifiers && Object.keys(claim.qualifiers).length > 0 && (
+              <span>
+                <span className="text-muted-foreground">Qualifiers:</span>{" "}
+                {Object.entries(claim.qualifiers).map(([k, v]) => (
+                  <span key={k} className="font-mono ml-1">
+                    {k}={v}
+                  </span>
+                ))}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* claim_sources */}
       {claim.sources && claim.sources.length > 0 && (
         <div>
@@ -349,6 +398,33 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
       />
     ),
     size: 100,
+  },
+  {
+    id: "structured",
+    accessorFn: (row) => row.property,
+    header: ({ column }) => (
+      <SortableHeader column={column}>Structured</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const c = row.original;
+      if (!c.property) return <span className="text-muted-foreground/40 text-xs">&mdash;</span>;
+      const parts: string[] = [c.property];
+      if (c.structuredValue) {
+        parts.push(`= ${c.structuredValue}`);
+      }
+      if (c.valueUnit) {
+        parts.push(`[${c.valueUnit}]`);
+      }
+      return (
+        <span
+          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono bg-violet-100 text-violet-700 max-w-[180px] truncate"
+          title={`${c.property}${c.structuredValue ? ` = ${c.structuredValue}` : ""}${c.valueUnit ? ` [${c.valueUnit}]` : ""}${c.valueDate ? ` @ ${c.valueDate}` : ""}`}
+        >
+          {parts.join(" ")}
+        </span>
+      );
+    },
+    size: 160,
   },
   {
     accessorKey: "sourceQuote",

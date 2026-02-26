@@ -8,6 +8,7 @@ export interface ClaimFilters {
   claimMode: string;
   multiEntity: boolean;
   numericOnly: boolean;
+  structuredOnly: boolean;
 }
 
 export function ClaimsFilterBar({
@@ -30,7 +31,8 @@ export function ClaimsFilterBar({
     filters.confidence ||
     filters.claimMode ||
     filters.multiEntity ||
-    filters.numericOnly;
+    filters.numericOnly ||
+    filters.structuredOnly;
 
   return (
     <div className="flex flex-wrap gap-2 mb-4">
@@ -102,6 +104,15 @@ export function ClaimsFilterBar({
         />
         Numeric only
       </label>
+      <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+        <input
+          type="checkbox"
+          checked={filters.structuredOnly}
+          onChange={(e) => onFilterChange("structuredOnly", e.target.checked)}
+          className="rounded"
+        />
+        Structured only
+      </label>
       {hasFilters && (
         <button
           type="button"
@@ -113,6 +124,7 @@ export function ClaimsFilterBar({
             onFilterChange("claimMode", "");
             onFilterChange("multiEntity", false);
             onFilterChange("numericOnly", false);
+            onFilterChange("structuredOnly", false);
           }}
           className="text-xs text-blue-600 hover:underline cursor-pointer"
         >
