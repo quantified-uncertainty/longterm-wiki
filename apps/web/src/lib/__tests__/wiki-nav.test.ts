@@ -169,11 +169,13 @@ describe("getInternalNav (mocked data)", () => {
     setMockPages([]);
   });
 
-  it("returns hardcoded sections: Overview, Dashboards, Style Guides, Research, Architecture", () => {
+  it("returns hardcoded sections: Overview, Dashboards, Claims & Citations, Reference Pages, Style Guides, Research, Architecture", () => {
     const sections = getInternalNav();
     const titles = sections.map(s => s.title);
     expect(titles).toContain("Overview");
-    expect(titles).toContain("Dashboards & Tools");
+    expect(titles).toContain("Dashboards");
+    expect(titles).toContain("Claims & Citations");
+    expect(titles).toContain("Reference Pages");
     expect(titles).toContain("Style Guides");
     expect(titles).toContain("Research");
     expect(titles).toContain("Architecture & Schema");
@@ -181,7 +183,7 @@ describe("getInternalNav (mocked data)", () => {
 
   it("dashboard section has defaultOpen: true", () => {
     const sections = getInternalNav();
-    const dashboards = sections.find(s => s.title === "Dashboards & Tools");
+    const dashboards = sections.find(s => s.title === "Dashboards");
     expect(dashboards?.defaultOpen).toBe(true);
   });
 
@@ -194,11 +196,7 @@ describe("getInternalNav (mocked data)", () => {
 
   it("migrated dashboards use internalHref (resolve to /wiki/E<id>)", () => {
     const sections = getInternalNav();
-    const dashboards = sections.find(s => s.title === "Dashboards & Tools")!;
-
-    const factItem = dashboards.items.find(i => i.label === "Fact Dashboard");
-    expect(factItem).toBeDefined();
-    expect(factItem!.href).toBe("/wiki/E898");
+    const dashboards = sections.find(s => s.title === "Dashboards")!;
 
     const pagesItem = dashboards.items.find(i => i.label === "Pages");
     expect(pagesItem).toBeDefined();
@@ -209,15 +207,21 @@ describe("getInternalNav (mocked data)", () => {
     expect(updatesItem!.href).toBe("/wiki/E900");
   });
 
+  it("fact dashboard is in Claims & Citations section", () => {
+    const sections = getInternalNav();
+    const claims = sections.find(s => s.title === "Claims & Citations")!;
+
+    const factItem = claims.items.find(i => i.label === "Fact Dashboard");
+    expect(factItem).toBeDefined();
+    expect(factItem!.href).toBe("/wiki/E898");
+  });
+
   it("non-migrated dashboards still use /internal/ hrefs", () => {
     const sections = getInternalNav();
-    const dashboards = sections.find(s => s.title === "Dashboards & Tools")!;
+    const dashboards = sections.find(s => s.title === "Dashboards")!;
 
     const suggestedPages = dashboards.items.find(i => i.label === "Suggested Pages");
     expect(suggestedPages?.href).toBe("/internal/suggested-pages");
-
-    const githubIssues = dashboards.items.find(i => i.label === "GitHub Issues");
-    expect(githubIssues?.href).toBe("/internal/github-issues");
   });
 
   it("Style Guides section contains expected entries", () => {
@@ -335,7 +339,6 @@ describe("internal sidebar completeness (real data)", () => {
       const KNOWN_NO_SUBCATEGORY = new Set([
         "automation-tools.mdx",
         "content-database.mdx",
-        "enhancement-queue.mdx",
         "claims-system-development-roadmap.mdx",
       ]);
 
@@ -393,7 +396,7 @@ describe("internal sidebar completeness (real data)", () => {
 
   // -----------------------------------------------------------------------
   // Test: Every React dashboard directory has a corresponding entry
-  // in the hardcoded "Dashboards & Tools" section.
+  // in the hardcoded sidebar sections (Dashboards, Claims & Citations, etc.).
   // -----------------------------------------------------------------------
 
   it("every React dashboard page directory is in the sidebar or migrated to MDX", () => {
@@ -408,9 +411,9 @@ describe("internal sidebar completeness (real data)", () => {
 
       const pagePath = path.join(APP_INTERNAL_DIR, entry.name, "page.tsx");
       if (fs.existsSync(pagePath)) {
-        // Skip pages that are just redirects (migrated to MDX stubs)
+        // Skip pages that are just redirects (migrated to MDX stubs or moved)
         const pageSource = fs.readFileSync(pagePath, "utf-8");
-        if (/redirect\(["']\/wiki\/E\d+["']\)/.test(pageSource)) continue;
+        if (/redirect\(["'][^"']+["']\)/.test(pageSource)) continue;
 
         dashboardDirs.push(entry.name);
       }
