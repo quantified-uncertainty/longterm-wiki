@@ -58,6 +58,14 @@ export const orphanedFootnotesRule = createRule({
       const defMatch = DEF_RE.exec(line);
       if (defMatch) {
         definitions.push({ marker: defMatch[1], lineIndex: i });
+        // Also check the definition line for inline refs to OTHER footnotes
+        // e.g. [^7]: See also [^3] should count [^3] as referenced
+        const afterDef = line.replace(DEF_RE, '');
+        INLINE_REF_RE.lastIndex = 0;
+        let refInDef: RegExpExecArray | null;
+        while ((refInDef = INLINE_REF_RE.exec(afterDef)) !== null) {
+          inlineRefs.add(refInDef[1]);
+        }
         continue;
       }
 
