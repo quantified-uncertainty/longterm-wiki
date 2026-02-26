@@ -50,6 +50,9 @@ const PaginationQuery = z.object({
   measure: z.string().max(200).optional(),
   multiEntity: z.coerce.boolean().optional(),
   hasNumericValue: z.coerce.boolean().optional(),
+  hasStructuredFields: z.coerce.boolean().optional(),
+  subjectEntity: z.string().max(300).optional(),
+  property: z.string().max(200).optional(),
   includeSources: z.coerce.boolean().optional(),
   sort: z.enum(["newest", "entity", "confidence", "as_of"]).optional(),
 });
@@ -93,6 +96,13 @@ function claimValues(d: ClaimInput) {
     claimVerdictQuotes: d.claimVerdictQuotes ?? null,
     claimVerdictDifficulty: d.claimVerdictDifficulty ?? null,
     claimVerdictModel: d.claimVerdictModel ?? null,
+    // Structured claim fields (migration 0032)
+    subjectEntity: d.subjectEntity ?? null,
+    property: d.property ?? null,
+    structuredValue: d.structuredValue ?? null,
+    valueUnit: d.valueUnit ?? null,
+    valueDate: d.valueDate ?? null,
+    qualifiers: d.qualifiers ?? null,
   };
 }
 
@@ -151,6 +161,13 @@ function formatClaim(
     claimVerdictDifficulty: r.claimVerdictDifficulty,
     claimVerifiedAt: r.claimVerifiedAt,
     claimVerdictModel: r.claimVerdictModel,
+    // Structured claim fields (migration 0032)
+    subjectEntity: r.subjectEntity,
+    property: r.property,
+    structuredValue: r.structuredValue,
+    valueUnit: r.valueUnit,
+    valueDate: r.valueDate,
+    qualifiers: r.qualifiers as Record<string, string> | null,
     sources: sourcesRows.map(formatClaimSource),
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
@@ -394,6 +411,12 @@ claimsRoute.get("/stats", async (c) => {
       sql`${claims.valueNumeric} IS NOT NULL OR ${claims.valueLow} IS NOT NULL OR ${claims.valueHigh} IS NOT NULL`
     );
 
+  // Structured claims (with property set)
+  const structuredResult = await db
+    .select({ count: count() })
+    .from(claims)
+    .where(sql`${claims.property} IS NOT NULL`);
+
   // Verdict distribution
   const byVerdict = await db
     .select({ claimVerdict: claims.claimVerdict, count: count() })
@@ -419,6 +442,7 @@ claimsRoute.get("/stats", async (c) => {
     withSourcesClaims: withSourcesResult[0].count,
     attributedClaims: attributedResult[0].count,
     numericClaims: numericResult[0].count,
+    structuredClaims: structuredResult[0].count,
   });
 });
 
@@ -500,7 +524,9 @@ claimsRoute.get("/all", async (c) => {
   const {
     limit, offset, entityType, claimType, claimCategory, claimMode,
     search, confidence, entityId, attributedTo, measure,
-    multiEntity, hasNumericValue, includeSources, sort,
+    multiEntity, hasNumericValue, hasStructuredFields,
+    subjectEntity, property,
+    includeSources, sort,
   } = parsed.data;
   const db = getDrizzleDb();
 
@@ -522,6 +548,11 @@ claimsRoute.get("/all", async (c) => {
   if (hasNumericValue) {
     conditions.push(sql`${claims.valueNumeric} IS NOT NULL`);
   }
+  if (hasStructuredFields) {
+    conditions.push(sql`${claims.property} IS NOT NULL`);
+  }
+  if (subjectEntity) conditions.push(eq(claims.subjectEntity, subjectEntity));
+  if (property) conditions.push(eq(claims.property, property));
 
   const whereClause =
     conditions.length > 0

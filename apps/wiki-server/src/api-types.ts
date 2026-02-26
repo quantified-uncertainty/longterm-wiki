@@ -725,6 +725,13 @@ export const InsertClaimSchema = z.object({
   claimVerdictQuotes: z.string().max(10000).nullable().optional(),
   claimVerdictDifficulty: VerdictDifficultySchema.nullable().optional(),
   claimVerdictModel: z.string().max(200).nullable().optional(),
+  // Structured claim fields (migration 0032)
+  subjectEntity: z.string().max(300).nullable().optional(),    // entity_id this claim is about
+  property: z.string().max(200).nullable().optional(),         // property from controlled vocabulary
+  structuredValue: z.string().max(2000).nullable().optional(), // normalized value
+  valueUnit: z.string().max(100).nullable().optional(),        // unit of measurement (USD, percent, count, etc.)
+  valueDate: z.string().max(20).nullable().optional(),         // YYYY-MM-DD when the value was true/measured
+  qualifiers: z.record(z.string()).nullable().optional(),      // additional context (e.g. {"round": "Series B"})
   // Inline sources — optional list of sources to create in claim_sources table
   sources: z.array(z.object({
     resourceId: z.string().max(300).nullable().optional(),
@@ -798,6 +805,13 @@ export interface ClaimRow {
   claimVerdictDifficulty: string | null;
   claimVerifiedAt: string | null;
   claimVerdictModel: string | null;
+  // Structured claim fields (migration 0032)
+  subjectEntity: string | null;
+  property: string | null;
+  structuredValue: string | null;
+  valueUnit: string | null;
+  valueDate: string | null;
+  qualifiers: Record<string, string> | null;
   sources: ClaimSourceRow[];      // populated when ?includeSources=true
   createdAt: string;
   updatedAt: string;
@@ -834,6 +848,7 @@ export interface ClaimStatsResult {
   withSourcesClaims: number;
   attributedClaims: number;
   numericClaims?: number;
+  structuredClaims?: number;
 }
 
 // -- Claims: Page References types -------------------------------------------

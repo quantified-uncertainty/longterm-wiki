@@ -127,6 +127,13 @@ interface ExtractedClaim {
   sourceQuote?: string;                   // Verbatim excerpt from wiki text supporting the claim
   footnoteRefs: string[];
   relatedEntities?: string[];
+  // Structured claim fields (Phase 3 — Wikidata-style)
+  subjectEntity?: string;                 // entity_id this claim is about
+  property?: string;                      // property from controlled vocabulary
+  structuredValue?: string;               // normalized value (e.g. "30000000")
+  valueUnit?: string;                     // unit of measurement (e.g. "USD", "percent")
+  valueDate?: string;                     // YYYY-MM-DD when the value was true/measured
+  qualifiers?: Record<string, string>;    // additional context (e.g. {"round": "Series B"})
 }
 
 /**
@@ -194,6 +201,22 @@ For each claim, provide:
 - "footnoteRefs": array of citation references (as strings) — look for [^N] (e.g. [^1]) and [^R:HASH] patterns near the claim
 - "relatedEntities": array of entity IDs or names mentioned in the claim other than the page's primary subject
 
+STRUCTURED FIELDS (optional — for claims that can be decomposed into subject/property/value):
+For claims about measurable quantities, dates, entity relationships, or other structured facts, also provide:
+- "subjectEntity": the entity_id this claim is about (e.g. "anthropic", "openai", "kalshi"). Use lowercase slug form.
+- "property": a snake_case property identifier from this list:
+    Financial: "funding_round_amount", "funding_total", "valuation", "revenue", "market_volume"
+    Organizational: "employee_count", "market_share", "headquarters", "legal_structure"
+    Dates: "founded_date", "launched_date", "announced_date", "shutdown_date"
+    Relations: "founder", "ceo", "parent_org", "acquired_by"
+    Technical: "parameter_count", "benchmark_score", "context_window"
+- "structuredValue": the normalized value as a string (e.g. "30000000" for $30M, "2021" for year, "san-francisco" for location)
+- "valueUnit": unit of measurement — "USD", "percent", "count", "tokens", "year", or null for strings
+- "valueDate": YYYY-MM-DD when this value was true/measured (e.g. "2024-01-15")
+- "qualifiers": object with extra context (e.g. {"round": "Series B", "lead_investor": "spark-capital"})
+
+Leave ALL structured fields null/omitted for evaluative, causal, consensus, or speculative claims that don't have a clear property/value decomposition.
+
 Rules:
 - Each claim must be atomic (one assertion per claim)
 - Include specific numbers, names, dates when present
@@ -203,12 +226,13 @@ Rules:
 - Use "numeric" for any claim with specific dollar amounts, percentages, counts, or model sizes
 - Always include valueNumeric for numeric claims — extract the number even if written out (e.g. "$7.3 billion" → 7300000000)
 - Include asOf whenever the text specifies a date or "as of" qualifier for the claim
+- For structured claims: always include subjectEntity and property together. If you can't identify both, omit all structured fields.
 - Extract EXACTLY 5-10 claims per section — no more, prioritize quality
 - Each claim should pass the "would a knowledgeable reader find this interesting?" test
 - Return only claims that appear in the given text
 
 Respond ONLY with JSON:
-{"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "sourceQuote": "exact text from the wiki section", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
+{"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "sourceQuote": "exact text from the wiki section", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"], "subjectEntity": "entity-slug", "property": "funding_round_amount", "structuredValue": "30000000", "valueUnit": "USD", "valueDate": "2024-01-15", "qualifiers": {"round": "Series B"}}]}`;
 
 export async function extractClaimsFromSection(
   section: Section,
@@ -265,6 +289,29 @@ Extract atomic claims from this section. Return JSON only.`;
         relatedEntities: Array.isArray(c.relatedEntities)
           ? (c.relatedEntities as unknown[]).map(String).filter(s => s.length > 0).map(s => s.toLowerCase())
           : [],
+        // Structured claim fields (Phase 3)
+        subjectEntity: typeof c.subjectEntity === 'string' && c.subjectEntity.length > 0
+          ? c.subjectEntity.toLowerCase()
+          : undefined,
+        property: typeof c.property === 'string' && c.property.length > 0
+          ? c.property
+          : undefined,
+        structuredValue: typeof c.structuredValue === 'string' && c.structuredValue.length > 0
+          ? c.structuredValue
+          : (typeof c.structuredValue === 'number' ? String(c.structuredValue) : undefined),
+        valueUnit: typeof c.valueUnit === 'string' && c.valueUnit.length > 0
+          ? c.valueUnit
+          : undefined,
+        valueDate: typeof c.valueDate === 'string' && /^\d{4}(-\d{2}(-\d{2})?)?$/.test(c.valueDate)
+          ? c.valueDate
+          : undefined,
+        qualifiers: typeof c.qualifiers === 'object' && c.qualifiers !== null && !Array.isArray(c.qualifiers)
+          ? Object.fromEntries(
+              Object.entries(c.qualifiers as Record<string, unknown>)
+                .filter(([, v]) => typeof v === 'string')
+                .map(([k, v]) => [k, v as string])
+            )
+          : undefined,
       }));
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -413,6 +460,7 @@ async function main() {
     const modeCounts: Record<string, number> = {};
     let numericCount = 0;
     let attributedCount = 0;
+    let structuredCount = 0;
 
     for (const claim of validatedClaims) {
       typeCounts[claim.claimType] = (typeCounts[claim.claimType] ?? 0) + 1;
@@ -421,6 +469,7 @@ async function main() {
       modeCounts[claim.claimMode] = (modeCounts[claim.claimMode] ?? 0) + 1;
       if (claim.valueNumeric !== undefined) numericCount++;
       if (claim.claimMode === 'attributed') attributedCount++;
+      if (claim.property) structuredCount++;
     }
 
     console.log(`\n${c.bold}By type:${c.reset}`);
@@ -441,6 +490,9 @@ async function main() {
     if (attributedCount > 0) {
       console.log(`  ${c.yellow}${attributedCount}${c.reset} attributed claims (reported speech)`);
     }
+    if (structuredCount > 0) {
+      console.log(`  ${c.blue}${structuredCount}${c.reset} structured claims (entity/property/value)`);
+    }
 
     const withEntities = validatedClaims.filter(c2 => c2.relatedEntities && c2.relatedEntities.length > 0);
     if (withEntities.length > 0) {
@@ -457,7 +509,8 @@ async function main() {
       const modeTag = claim.claimMode === 'attributed' ? ` [by:${claim.attributedTo ?? '?'}]` : '';
       const numTag = claim.valueNumeric !== undefined ? ` [=${claim.valueNumeric}]` : '';
       const asOfTag = claim.asOf ? ` [${claim.asOf}]` : '';
-      console.log(`  [${claim.claimType}/${cat}${modeTag}${asOfTag}${numTag}] ${claim.claimText.slice(0, 90)}${refs}`);
+      const structTag = claim.property ? ` {${claim.subjectEntity ?? '?'}.${claim.property}=${claim.structuredValue ?? '?'}}` : '';
+      console.log(`  [${claim.claimType}/${cat}${modeTag}${asOfTag}${numTag}${structTag}] ${claim.claimText.slice(0, 90)}${refs}`);
     }
     if (validatedClaims.length > 10) {
       console.log(`  ... and ${validatedClaims.length - 10} more`);
@@ -507,6 +560,13 @@ async function main() {
       valueNumeric: claim.valueNumeric ?? null,
       valueLow: claim.valueLow ?? null,
       valueHigh: claim.valueHigh ?? null,
+      // Structured claim fields (migration 0032)
+      subjectEntity: claim.subjectEntity ?? null,
+      property: claim.property ?? null,
+      structuredValue: claim.structuredValue ?? null,
+      valueUnit: claim.valueUnit ?? null,
+      valueDate: claim.valueDate ?? null,
+      qualifiers: claim.qualifiers ?? null,
     }));
 
     const result = await insertClaimBatch(items);
@@ -519,11 +579,13 @@ async function main() {
 
   const attributedCount = validatedClaims.filter(c2 => c2.claimMode === 'attributed').length;
   const numericCount = validatedClaims.filter(c2 => c2.valueNumeric !== undefined).length;
+  const structuredCount = validatedClaims.filter(c2 => c2.property).length;
 
   console.log(`\n${c.bold}Done:${c.reset}`);
-  console.log(`  Inserted:  ${c.green}${inserted}${c.reset} claims`);
+  console.log(`  Inserted:   ${c.green}${inserted}${c.reset} claims`);
   if (attributedCount > 0) console.log(`  Attributed: ${c.yellow}${attributedCount}${c.reset} claims with attribution`);
   if (numericCount > 0) console.log(`  Numeric:    ${c.green}${numericCount}${c.reset} claims with extracted values`);
+  if (structuredCount > 0) console.log(`  Structured: ${c.blue}${structuredCount}${c.reset} claims with entity/property/value`);
   if (failed > 0) {
     console.log(`  Failed:    ${c.red}${failed}${c.reset}`);
   }
