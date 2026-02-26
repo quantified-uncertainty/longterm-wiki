@@ -81,15 +81,19 @@ export default async function ClaimDetailPage({ params }: PageProps) {
         <p className="text-sm leading-relaxed">{claim.claimText}</p>
       </div>
 
-      {/* Verdict */}
-      {claim.claimVerdict && (
+      {/* Verdict — show if claimVerdict populated, or fallback to legacy confidence+sourceQuote */}
+      {(claim.claimVerdict || (claim.confidence && claim.confidence !== 'unverified')) && (
         <div className="rounded-lg border p-4 mb-4 space-y-2">
-          <h3 className="text-sm font-medium text-muted-foreground">Verdict</h3>
+          <h3 className="text-sm font-medium text-muted-foreground">Verification</h3>
           <div className="flex items-center gap-2">
-            <VerdictBadge
-              verdict={claim.claimVerdict}
-              score={claim.claimVerdictScore}
-            />
+            {claim.claimVerdict ? (
+              <VerdictBadge
+                verdict={claim.claimVerdict}
+                score={claim.claimVerdictScore}
+              />
+            ) : (
+              <ConfidenceBadge confidence={claim.confidence ?? "unverified"} />
+            )}
             {claim.claimVerdictDifficulty && (
               <span className="text-xs text-muted-foreground">
                 Difficulty: {claim.claimVerdictDifficulty}
@@ -101,10 +105,16 @@ export default async function ClaimDetailPage({ params }: PageProps) {
               {claim.claimVerdictIssues}
             </p>
           )}
-          {claim.claimVerdictQuotes && (
-            <p className="text-sm italic text-muted-foreground">
-              &ldquo;{claim.claimVerdictQuotes}&rdquo;
-            </p>
+          {/* Show source quote from verdict fields or legacy field */}
+          {(claim.claimVerdictQuotes || claim.sourceQuote) && (
+            <div className="rounded border border-amber-200 bg-amber-50/50 p-3">
+              <span className="text-xs font-medium text-amber-700 block mb-1">
+                Source Quote
+              </span>
+              <p className="text-sm italic text-amber-900">
+                &ldquo;{claim.claimVerdictQuotes || claim.sourceQuote}&rdquo;
+              </p>
+            </div>
           )}
           <div className="flex gap-4 text-xs text-muted-foreground">
             {claim.claimVerdictModel && (

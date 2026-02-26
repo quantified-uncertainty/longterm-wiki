@@ -334,6 +334,15 @@ async function main() {
       valueNumeric: claim.valueNumeric ?? null,
       valueLow: claim.valueLow ?? null,
       valueHigh: claim.valueHigh ?? null,
+      // Verdict fields — populate from verification result
+      claimVerdict: claim.newConfidence === 'verified' ? 'verified'
+        : claim.newConfidence === 'unsupported' ? 'unsupported'
+        : null,
+      claimVerdictScore: claim.newConfidence === 'verified' ? 1.0
+        : claim.newConfidence === 'unsupported' ? 0.0
+        : null,
+      claimVerdictQuotes: claim.newSourceQuote || null,
+      claimVerdictModel: model ?? DEFAULT_CITATION_MODEL,
     }));
 
     const result = await insertClaimBatch(items);
