@@ -125,15 +125,12 @@ Two-stage approach:
 **Proposed fix:**
 
 Pre-extraction cleanup: strip or resolve MDX before passing to the extraction LLM.
-```typescript
-// Before extraction:
-function cleanMdxForExtraction(mdx: string): string {
-  // Resolve <EntityLink id="X">text</EntityLink> → text
-  // Resolve <F id="X" /> → actual fact value (lookup from facts YAML)
-  // Strip {/* comments */}
-  // Strip other JSX components
-}
-```
+
+Before extraction, cleanMdxForExtraction() should:
+  - Resolve EntityLink tags to plain text (e.g., "Anthropic")
+  - Resolve F tags to actual fact values (lookup from facts YAML)
+  - Strip MDX comments
+  - Strip other JSX components
 
 Note: `cleanMdxForExtraction()` already exists in `crux/claims/extract.ts` but may not handle all cases. Verify coverage.
 

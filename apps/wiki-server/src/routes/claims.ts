@@ -878,7 +878,8 @@ claimsRoute.patch("/:id", async (c) => {
     .where(eq(claimSources.claimId, id))
     .orderBy(desc(claimSources.isPrimary), asc(claimSources.addedAt));
 
-  return c.json(formatClaim(rows[0], sourcesRows));
+  const row = firstOrThrow(rows, "claim update");
+  return c.json(formatClaim(row, sourcesRows));
 });
 
 // ---- GET /:id (get by ID) ----
