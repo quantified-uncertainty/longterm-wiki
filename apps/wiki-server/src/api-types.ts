@@ -828,6 +828,7 @@ export interface ClaimStatsResult {
   byEntityType: Record<string, number>;
   byClaimCategory: Record<string, number>;
   byClaimMode: Record<string, number>;
+  byClaimVerdict: Record<string, number>;
   multiEntityClaims: number;
   factLinkedClaims: number;
   withSourcesClaims: number;

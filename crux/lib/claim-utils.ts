@@ -62,7 +62,7 @@ export function normalizeClaimText(text: string): string {
  * Compute Jaccard similarity between two sets of words.
  * Returns a value in [0, 1].
  */
-function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
+export function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
   if (a.size === 0 && b.size === 0) return 1;
   let intersection = 0;
   for (const word of a) {
@@ -70,6 +70,17 @@ function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
   }
   const union = a.size + b.size - intersection;
   return union === 0 ? 0 : intersection / union;
+}
+
+/**
+ * Compute Jaccard word-level similarity between two text strings.
+ * Normalizes both strings first, then computes Jaccard on word sets.
+ * Returns a value in [0, 1].
+ */
+export function jaccardWordSimilarity(a: string, b: string): number {
+  const wordsA = new Set(normalizeClaimText(a).split(' ').filter(w => w.length > 0));
+  const wordsB = new Set(normalizeClaimText(b).split(' ').filter(w => w.length > 0));
+  return jaccardSimilarity(wordsA, wordsB);
 }
 
 /**
