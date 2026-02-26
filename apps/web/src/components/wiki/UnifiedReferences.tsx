@@ -123,31 +123,11 @@ function BackRefs({ numbers }: { numbers: number[] }) {
   );
 }
 
-/** Compact dot showing whether resource content has been fetched */
-function FetchStatusDot({ resource }: { resource: Resource | null }) {
-  if (!resource) return null;
-  if (resource.local_filename) {
-    return (
-      <span
-        className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 ml-1 align-middle"
-        title={`Full text fetched${resource.fetched_at ? ` on ${resource.fetched_at.slice(0, 10)}` : ""}`}
-      />
-    );
-  }
-  if (resource.fetched_at) {
-    return (
-      <span
-        className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 ml-1 align-middle"
-        title={`Metadata only — fetched ${resource.fetched_at.slice(0, 10)}`}
-      />
-    );
-  }
-  return (
-    <span
-      className="inline-block w-1.5 h-1.5 rounded-full bg-red-400/50 ml-1 align-middle"
-      title="Not fetched"
-    />
-  );
+/** Compact dot showing whether resource content has been fetched.
+ * Hidden from public pages — this is internal operational status, not useful to readers.
+ * Kept as a component for potential use on /internal/ dashboards. */
+function FetchStatusDot({ resource: _resource }: { resource: Resource | null }) {
+  return null;
 }
 
 function UnifiedRefRow({ entry, pageId }: { entry: UnifiedRefEntry; pageId: string }) {
