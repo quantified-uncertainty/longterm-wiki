@@ -12,6 +12,7 @@ import { ReferenceCitationDetails } from "./ReferenceCitationDetails";
 import { ReferenceCitationDot } from "./ReferenceCitationDot";
 import { formatAuthors, getDomain } from "./resource-utils";
 import { cn } from "@lib/utils";
+import { ExternalLink } from "lucide-react";
 
 const TYPE_LABELS: Record<string, string> = {
   paper: "Paper",
@@ -106,13 +107,13 @@ function resolveEntries(
 function BackRefs({ numbers }: { numbers: number[] }) {
   if (numbers.length <= 1) return null;
   return (
-    <span className="text-[10px] text-muted-foreground/50 ml-2">
+    <span className="text-[10px] text-muted-foreground/40 ml-2">
       {numbers.map((n, i) => (
         <React.Fragment key={n}>
           {i > 0 && " "}
           <a
             href={`#user-content-fnref-${n}`}
-            className="hover:text-foreground transition-colors !no-underline"
+            className="hover:text-foreground/60 transition-colors !no-underline"
           >
             [{n}]
           </a>
@@ -149,14 +150,14 @@ function FetchStatusDot({ resource }: { resource: Resource | null }) {
   );
 }
 
-function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
+function UnifiedRefRow({ entry, pageId }: { entry: UnifiedRefEntry; pageId: string }) {
   const { resource, index, credibility, publicationName, peerReviewed, url, title, footnoteNumbers, rawText } = entry;
   const year = resource?.published_date?.slice(0, 4);
   const authorStr = resource?.authors ? formatAuthors(resource.authors) : null;
   const typeLabel = resource?.type ? TYPE_LABELS[resource.type] : null;
   const domain = url ? getDomain(url) : null;
 
-  // Metadata fragments: source · author · year · type
+  // Metadata fragments: source . author . year . type
   const metaParts: React.ReactNode[] = [];
   if (publicationName) {
     metaParts.push(
@@ -181,7 +182,7 @@ function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
   // For academic citations without URLs, show the raw text
   if (!url && rawText) {
     return (
-      <div className="py-1 border-b border-border last:border-b-0">
+      <div className="py-1.5 border-b border-border/50 last:border-b-0">
         {/* Anchor for footnote back-links */}
         {footnoteNumbers.map((n) => (
           <React.Fragment key={n}>
@@ -189,12 +190,12 @@ function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
             <span id={`fn-${n}`} />
           </React.Fragment>
         ))}
-        <div className="-mx-1.5 px-1.5 py-0.5">
+        <div className="-mx-2 px-2 py-0.5">
           <div className="flex items-baseline">
-            <span className="shrink-0 w-7 text-xs font-mono text-muted-foreground/60 tabular-nums text-right pr-2">
+            <span className="shrink-0 w-7 text-xs font-mono text-muted-foreground/50 tabular-nums text-right pr-2">
               {index}
             </span>
-            <span className="flex-1 min-w-0 text-[13px] text-muted-foreground leading-tight">
+            <span className="flex-1 min-w-0 text-[13px] text-muted-foreground leading-relaxed">
               {rawText}
               <BackRefs numbers={footnoteNumbers} />
             </span>
@@ -207,9 +208,9 @@ function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
   const hasExpandableContent = !!resource?.summary || credibility != null || !!url;
 
   const titleRow = (
-    <div className="flex items-baseline">
+    <div className="flex items-baseline gap-1">
       {/* Number gutter */}
-      <span className="shrink-0 w-7 text-xs font-mono text-muted-foreground/60 tabular-nums text-right pr-2">
+      <span className="shrink-0 w-7 text-xs font-mono text-muted-foreground/50 tabular-nums text-right pr-2">
         {index}
       </span>
       {/* Title + metadata */}
@@ -217,7 +218,7 @@ function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
         {resource?.id ? (
           <a
             href={`/source/${resource.id}`}
-            className="text-[13px] text-accent-foreground !no-underline hover:!underline leading-tight"
+            className="text-[13px] text-foreground/80 font-medium !no-underline hover:!underline leading-relaxed"
           >
             {title}
           </a>
@@ -226,19 +227,19 @@ function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[13px] text-accent-foreground !no-underline hover:!underline leading-tight"
+            className="text-[13px] text-foreground/80 font-medium !no-underline hover:!underline leading-relaxed"
           >
             {title}
           </a>
         ) : (
-          <span className="text-[13px] text-accent-foreground leading-tight">
+          <span className="text-[13px] text-foreground/80 font-medium leading-relaxed">
             {title}
           </span>
         )}
         <FetchStatusDot resource={resource} />
         {url && <ReferenceCitationDot url={url} />}
         {metaParts.length > 0 && (
-          <span className="text-xs text-muted-foreground ml-1.5">
+          <span className="text-[11px] text-muted-foreground/60 ml-1.5">
             {metaParts.map((part, i) => (
               <React.Fragment key={i}>
                 {i > 0 && <span className="opacity-30 mx-1">{"\u00b7"}</span>}
@@ -250,8 +251,8 @@ function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
         <BackRefs numbers={footnoteNumbers} />
       </span>
       {hasExpandableContent && (
-        <span className="ref-chevron shrink-0 ml-2 text-muted-foreground/30 text-[10px] transition-transform duration-150 group-hover:text-muted-foreground/60">
-          {"\u25c0"}
+        <span className="ref-chevron shrink-0 ml-1 text-muted-foreground/30 text-[10px] transition-transform duration-200 group-hover:text-muted-foreground/60">
+          {"\u25b8"}
         </span>
       )}
     </div>
@@ -267,23 +268,23 @@ function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
 
   if (!hasExpandableContent) {
     return (
-      <div className="py-1 border-b border-border last:border-b-0">
+      <div className="py-1.5 border-b border-border/50 last:border-b-0">
         {anchors}
-        <div className="-mx-1.5 px-1.5 py-0.5">{titleRow}</div>
+        <div className="-mx-2 px-2 py-0.5">{titleRow}</div>
       </div>
     );
   }
 
   return (
-    <div className="py-1 border-b border-border last:border-b-0">
+    <div className="py-1.5 border-b border-border/50 last:border-b-0">
       {anchors}
       <details className="ref-details group">
-        <summary className="ref-summary cursor-pointer select-none hover:bg-muted/50 -mx-1.5 px-1.5 py-0.5 rounded transition-colors">
+        <summary className="ref-summary cursor-pointer select-none hover:bg-muted/40 -mx-2 px-2 py-0.5 rounded-md transition-colors">
           {titleRow}
         </summary>
-        <div className="mt-1 mb-0.5 overflow-hidden">
+        <div className="mt-1.5 mb-1 ml-7 pl-2 border-l-2 border-border/30">
           {resource?.summary && (
-            <p className="text-xs text-muted-foreground leading-relaxed m-0">
+            <p className="text-xs text-muted-foreground/70 leading-relaxed m-0">
               {resource.summary}
             </p>
           )}
@@ -292,7 +293,20 @@ function UnifiedRefRow({ entry }: { entry: UnifiedRefEntry }) {
               <CredibilityBadge level={credibility} size="sm" />
             </div>
           )}
-          {url && <ReferenceCitationDetails url={url} />}
+          {url && (
+            <div className="mt-1.5 flex items-center gap-2">
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] text-blue-600/70 hover:text-blue-600 transition-colors !no-underline"
+              >
+                <ExternalLink className="w-3 h-3" />
+                <span className="truncate max-w-[250px]">{getDomain(url)}</span>
+              </a>
+            </div>
+          )}
+          {url && <ReferenceCitationDetails url={url} pageId={pageId} />}
         </div>
       </details>
     </div>
@@ -324,16 +338,16 @@ export function UnifiedReferences({ pageId, className }: UnifiedReferencesProps)
 
   return (
     <section
-      className={cn("mt-10 pt-5 border-t border-border", className)}
+      className={cn("mt-10 pt-6 border-t border-border", className)}
       aria-label="References"
     >
-      <div className="flex items-baseline justify-between mb-2">
+      <div className="flex items-baseline justify-between mb-3">
         <h2
           className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mt-0 pb-0 border-b-0"
           id="references"
         >
           References
-          <span className="text-xs font-normal ml-2 opacity-60">
+          <span className="text-xs font-normal ml-2 opacity-50">
             {totalSources} source{totalSources !== 1 ? "s" : ""}
             {withResources.length > 0 &&
               withResources.length < totalSources &&
@@ -342,16 +356,16 @@ export function UnifiedReferences({ pageId, className }: UnifiedReferencesProps)
         </h2>
         <Link
           href={`/claims/entity/${pageId}`}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors !no-underline"
         >
-          View claims →
+          View claims
         </Link>
       </div>
 
       {entries.length > 0 && (
         <div>
           {entries.map((entry, i) => (
-            <UnifiedRefRow key={`ref-${i}`} entry={entry} />
+            <UnifiedRefRow key={`ref-${i}`} entry={entry} pageId={pageId} />
           ))}
         </div>
       )}

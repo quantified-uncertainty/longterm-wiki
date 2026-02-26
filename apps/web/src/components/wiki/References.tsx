@@ -13,6 +13,7 @@ import { ReferenceCitationDetails } from "./ReferenceCitationDetails";
 import { ReferenceCitationDot } from "./ReferenceCitationDot";
 import { formatAuthors, getDomain } from "./resource-utils";
 import { cn } from "@lib/utils";
+import { ExternalLink } from "lucide-react";
 
 const TYPE_LABELS: Record<string, string> = {
   paper: "Paper",
@@ -75,14 +76,14 @@ function resolveRefs(ids: string[]): {
   return { refs, missing };
 }
 
-function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
+function ReferenceEntry({ entry, pageId }: { entry: ResolvedRef; pageId?: string }) {
   const { resource, index, credibility, publicationName, peerReviewed } = entry;
   const year = resource.published_date?.slice(0, 4);
   const authorStr = resource.authors ? formatAuthors(resource.authors) : null;
   const typeLabel = TYPE_LABELS[resource.type];
   const domain = resource.url ? getDomain(resource.url) : null;
 
-  // Metadata fragments: source · author · year · type (source first, type last)
+  // Metadata fragments: source . author . year . type (source first, type last)
   const metaParts: React.ReactNode[] = [];
   if (publicationName) {
     metaParts.push(
@@ -108,12 +109,12 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
   const hasExpandableContent = !!resource.summary || credibility != null || !!resource.url;
 
   const titleRow = (
-    <div className="flex items-baseline">
-      {/* Number gutter — lighter than title text */}
-      <span className="shrink-0 w-7 text-xs font-mono text-muted-foreground/60 tabular-nums text-right pr-2">
+    <div className="flex items-baseline gap-1">
+      {/* Number gutter -- lighter than title text */}
+      <span className="shrink-0 w-7 text-xs font-mono text-muted-foreground/50 tabular-nums text-right pr-2">
         <a
           href={`#cite-${index}`}
-          className="!no-underline !decoration-0 text-muted-foreground/60 hover:text-foreground"
+          className="!no-underline !decoration-0 text-muted-foreground/50 hover:text-foreground"
           title={`Jump back to citation [${index}] in text`}
         >
           {index}
@@ -121,17 +122,26 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
       </span>
       {/* Title + verification dot + meta */}
       <span className="flex-1 min-w-0">
-        <a
-          href={resource.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[13px] text-accent-foreground !no-underline hover:!underline leading-tight"
-        >
-          {resource.title}
-        </a>
+        {resource.id ? (
+          <a
+            href={`/source/${resource.id}`}
+            className="text-[13px] text-foreground/80 font-medium !no-underline hover:!underline leading-relaxed"
+          >
+            {resource.title}
+          </a>
+        ) : (
+          <a
+            href={resource.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] text-foreground/80 font-medium !no-underline hover:!underline leading-relaxed"
+          >
+            {resource.title}
+          </a>
+        )}
         {resource.url && <ReferenceCitationDot url={resource.url} />}
         {metaParts.length > 0 && (
-          <span className="text-xs text-muted-foreground ml-1.5">
+          <span className="text-[11px] text-muted-foreground/60 ml-1.5">
             {metaParts.map((part, i) => (
               <React.Fragment key={i}>
                 {i > 0 && <span className="opacity-30 mx-1">{"\u00b7"}</span>}
@@ -142,8 +152,8 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
         )}
       </span>
       {hasExpandableContent && (
-        <span className="ref-chevron shrink-0 ml-2 text-muted-foreground/30 text-[10px] transition-transform duration-150 group-hover:text-muted-foreground/60">
-          {"\u25c0"}
+        <span className="ref-chevron shrink-0 ml-1 text-muted-foreground/30 text-[10px] transition-transform duration-200 group-hover:text-muted-foreground/60">
+          {"\u25b8"}
         </span>
       )}
     </div>
@@ -153,11 +163,11 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
     return (
       <div
         id={`ref-${index}`}
-        className="py-1 border-b border-border last:border-b-0"
+        className="py-1.5 border-b border-border/50 last:border-b-0"
       >
         <span id={`user-content-fn-${index}`} className="scroll-mt-4" />
         <span id={`fn-${index}`} />
-        <div className="-mx-1.5 px-1.5 py-0.5">
+        <div className="-mx-2 px-2 py-0.5">
           {titleRow}
         </div>
       </div>
@@ -167,18 +177,18 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
   return (
     <div
       id={`ref-${index}`}
-      className="py-1 border-b border-border last:border-b-0"
+      className="py-1.5 border-b border-border/50 last:border-b-0"
     >
       <span id={`user-content-fn-${index}`} className="scroll-mt-4" />
       <span id={`fn-${index}`} />
       <details className="ref-details group">
-        <summary className="ref-summary cursor-pointer select-none hover:bg-muted/50 -mx-1.5 px-1.5 py-0.5 rounded transition-colors">
+        <summary className="ref-summary cursor-pointer select-none hover:bg-muted/40 -mx-2 px-2 py-0.5 rounded-md transition-colors">
           {titleRow}
         </summary>
 
-        <div className="mt-1 mb-0.5 overflow-hidden">
+        <div className="mt-1.5 mb-1 ml-7 pl-2 border-l-2 border-border/30">
           {resource.summary && (
-            <p className="text-xs text-muted-foreground leading-relaxed m-0">
+            <p className="text-xs text-muted-foreground/70 leading-relaxed m-0">
               {resource.summary}
             </p>
           )}
@@ -188,7 +198,20 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
             </div>
           )}
           {resource.url && (
-            <ReferenceCitationDetails url={resource.url} />
+            <div className="mt-1.5 flex items-center gap-2">
+              <a
+                href={resource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] text-blue-600/70 hover:text-blue-600 transition-colors !no-underline"
+              >
+                <ExternalLink className="w-3 h-3" />
+                <span className="truncate max-w-[250px]">{getDomain(resource.url)}</span>
+              </a>
+            </div>
+          )}
+          {resource.url && (
+            <ReferenceCitationDetails url={resource.url} pageId={pageId} />
           )}
         </div>
       </details>
@@ -216,7 +239,7 @@ async function CitationHealthFooter({ pageId }: { pageId: string }) {
   else if (accurate > 0) dotColor = "bg-blue-500";
 
   return (
-    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3 pt-2 border-t border-border">
+    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3 pt-2 border-t border-border/50">
       <span className={cn("inline-block w-1.5 h-1.5 rounded-full", dotColor)} />
       Citation verification: {parts.join(", ")} of {total} total
     </div>
@@ -224,13 +247,13 @@ async function CitationHealthFooter({ pageId }: { pageId: string }) {
 }
 
 /**
- * <References> — Numbered bibliography section for wiki pages.
+ * <References> -- Numbered bibliography section for wiki pages.
  *
  * Each entry becomes an anchor target (#ref-1, #ref-2, etc.)
  * so that <R n={1}> can link to the reference list.
  *
  * Entries are compact by default. Those with extra data (summary, tags)
- * have a ▸ chevron that expands to show details.
+ * have a chevron that expands to show details.
  */
 export function References({
   ids,
@@ -252,12 +275,12 @@ export function References({
   return (
     <section
       className={cn(
-        "mt-10 pt-5 border-t border-border",
+        "mt-10 pt-6 border-t border-border",
         className
       )}
       aria-label={title}
     >
-      <div className="flex items-baseline justify-between mb-2">
+      <div className="flex items-baseline justify-between mb-3">
         <h2
           className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mt-0 pb-0 border-b-0"
           id="references"
@@ -267,9 +290,9 @@ export function References({
         {pageId && (
           <Link
             href={`/claims/entity/${pageId}`}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors !no-underline"
           >
-            View claims →
+            View claims
           </Link>
         )}
       </div>
@@ -277,7 +300,7 @@ export function References({
       {refs.length > 0 && (
         <div>
           {refs.map((r) => (
-            <ReferenceEntry key={r.resource.id} entry={r} />
+            <ReferenceEntry key={r.resource.id} entry={r} pageId={pageId} />
           ))}
         </div>
       )}
