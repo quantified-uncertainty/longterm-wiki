@@ -2,21 +2,31 @@
  * Claims API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
- * Response types are imported from the canonical api-types.ts definitions.
+ * Response types are inferred from the Hono RPC route type (ClaimsRoute) to
+ * stay in sync automatically when the server shape changes.
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
 import type {
   InsertClaim,
-  InsertClaimResult,
-  InsertClaimBatchResult,
-  ClearClaimsResult,
-  ClaimRow,
-  ClaimSourceRow,
-  GetClaimsResult,
-  ClaimStatsResult,
   ClaimPageReferenceRow,
 } from '../../../apps/wiki-server/src/api-types.ts';
+import type { hc, InferResponseType } from 'hono/client';
+import type { ClaimsRoute } from '../../../apps/wiki-server/src/routes/claims.ts';
+
+// ---------------------------------------------------------------------------
+// RPC type inference — response shapes derived from the server route
+// ---------------------------------------------------------------------------
+
+type RpcClient = ReturnType<typeof hc<ClaimsRoute>>;
+
+export type InsertClaimResult = InferResponseType<RpcClient['index']['$post'], 201>;
+export type InsertClaimBatchResult = InferResponseType<RpcClient['batch']['$post'], 201>;
+export type ClearClaimsResult = InferResponseType<RpcClient['clear']['$post'], 200>;
+export type GetClaimsResult = InferResponseType<RpcClient['by-entity'][':entityId']['$get'], 200>;
+export type ClaimStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
+export type ClaimRow = GetClaimsResult['claims'][number];
+export type ClaimSourceRow = InferResponseType<RpcClient[':id']['sources']['$get'], 200>['sources'][number];
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -25,19 +35,10 @@ import type {
 export type InsertClaimItem = InsertClaim;
 
 // ---------------------------------------------------------------------------
-// Types — response (re-exported from canonical api-types.ts)
+// Types — re-exported for consumers
 // ---------------------------------------------------------------------------
 
-export type {
-  InsertClaimResult,
-  InsertClaimBatchResult,
-  ClearClaimsResult,
-  ClaimRow,
-  ClaimSourceRow,
-  GetClaimsResult,
-  ClaimStatsResult,
-  ClaimPageReferenceRow,
-};
+export type { ClaimPageReferenceRow };
 
 // ---------------------------------------------------------------------------
 // API functions
