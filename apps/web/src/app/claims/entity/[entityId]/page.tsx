@@ -13,13 +13,12 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { parse } from "yaml";
 import { StatCard } from "../../components/stat-card";
-import { ClaimsTable } from "../../components/claims-table";
-import { StructuredClaimsTable } from "../../components/structured-claims-table";
 import { DistributionBar } from "../../components/distribution-bar";
 import {
   collectEntitySlugs,
   buildEntityNameMap,
 } from "../../components/claims-data";
+import { EntityClaimsViews } from "./entity-claims-views";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getResourceTypeIcon } from "@/components/wiki/resource-utils";
 
@@ -174,29 +173,7 @@ export default async function EntityClaimsPage({ params }: PageProps) {
             </div>
           )}
 
-          {(() => {
-            const structuredClaims = claims.filter((c) => c.property != null);
-            if (structuredClaims.length === 0) return null;
-            const propertyLabels = loadPropertyLabels();
-            return (
-              <div className="mb-6">
-                <h2 className="text-lg font-semibold mb-3">
-                  Structured Data
-                  <span className="text-sm font-normal text-muted-foreground ml-2">
-                    ({structuredClaims.length})
-                  </span>
-                </h2>
-                <div className="rounded-lg border">
-                  <StructuredClaimsTable
-                    claims={structuredClaims}
-                    propertyLabels={propertyLabels}
-                  />
-                </div>
-              </div>
-            );
-          })()}
-
-          <ClaimsTable claims={claims} entityNames={entityNames} />
+          <EntityClaimsViews claims={claims} entityNames={entityNames} />
         </>
       )}
 
