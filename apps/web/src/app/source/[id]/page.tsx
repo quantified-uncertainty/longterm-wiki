@@ -17,13 +17,8 @@ import { getDomain } from "@/components/wiki/resource-utils";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import {
   ExternalLink,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  HelpCircle,
   Clock,
   FileText,
-  BookOpen,
   Link2,
   Download,
   Database,
@@ -31,6 +26,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { cn } from "@lib/utils";
+import { CollapsibleClaims } from "./CollapsibleClaims";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -47,42 +43,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     robots: { index: false, follow: false },
   };
 }
-
-const VERDICT_CONFIG: Record<
-  string,
-  { icon: typeof CheckCircle2; label: string; color: string; bg: string }
-> = {
-  accurate: {
-    icon: CheckCircle2,
-    label: "Accurate",
-    color: "text-emerald-700 dark:text-emerald-400",
-    bg: "bg-emerald-50 dark:bg-emerald-950/30",
-  },
-  minor_issues: {
-    icon: AlertTriangle,
-    label: "Minor issues",
-    color: "text-amber-700 dark:text-amber-400",
-    bg: "bg-amber-50 dark:bg-amber-950/30",
-  },
-  inaccurate: {
-    icon: XCircle,
-    label: "Inaccurate",
-    color: "text-red-700 dark:text-red-400",
-    bg: "bg-red-50 dark:bg-red-950/30",
-  },
-  unsupported: {
-    icon: XCircle,
-    label: "Unsupported",
-    color: "text-red-600 dark:text-red-400",
-    bg: "bg-red-50 dark:bg-red-950/30",
-  },
-  not_verifiable: {
-    icon: HelpCircle,
-    label: "Not verifiable",
-    color: "text-muted-foreground",
-    bg: "bg-muted/30",
-  },
-};
 
 interface CitationContentData {
   url: string;
@@ -143,13 +103,28 @@ export default async function SourcePage({ params }: PageProps) {
   const quotes = quotesData?.quotes ?? [];
   const stats = quotesData?.stats;
 
-  // Group quotes by page
+  // Group quotes by page and resolve titles/hrefs server-side
   const quotesByPage = new Map<string, typeof quotes>();
   for (const q of quotes) {
     const pageId = q.pageId;
     if (!quotesByPage.has(pageId)) quotesByPage.set(pageId, []);
     quotesByPage.get(pageId)!.push(q);
   }
+
+  const pageGroups = [...quotesByPage.entries()].map(([pageId, pageQuotes]) => ({
+    pageId,
+    pageTitle: getPageTitle(pageId),
+    pageHref: `/wiki/${pageId}`,
+    quotes: pageQuotes.map((q) => ({
+      pageId: q.pageId,
+      claimText: q.claimText,
+      sourceQuote: q.sourceQuote ?? null,
+      accuracyVerdict: q.accuracyVerdict ?? null,
+      accuracyScore: q.accuracyScore ?? null,
+      accuracyIssues: q.accuracyIssues ?? null,
+      accuracyCheckedAt: q.accuracyCheckedAt ?? null,
+    })),
+  }));
 
   // Determine whether content sections exist
   const hasAbstract = !!resource.abstract;
@@ -380,90 +355,12 @@ export default async function SourcePage({ params }: PageProps) {
         </section>
       )}
 
-      {/* Cross-page claims — grouped by wiki page */}
-      {quotesByPage.size > 0 && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            <BookOpen className="w-4 h-4 inline mr-1.5 -mt-0.5" />
-            Claims from Wiki Pages
-          </h2>
-
-          {[...quotesByPage.entries()].map(([pageId, pageQuotes]) => (
-            <div
-              key={pageId}
-              className="mb-6 border border-border rounded-lg overflow-hidden"
-            >
-              <div className="px-4 py-2 bg-muted/50 border-b border-border">
-                <Link
-                  href={`/wiki/${pageId}`}
-                  className="text-sm font-medium text-accent-foreground hover:underline"
-                >
-                  {getPageTitle(pageId)}
-                </Link>
-                <span className="text-xs text-muted-foreground ml-2">
-                  {pageQuotes.length} claim
-                  {pageQuotes.length !== 1 ? "s" : ""}
-                </span>
-              </div>
-
-              <div className="divide-y divide-border">
-                {pageQuotes.map((q, i) => {
-                  const verdict = q.accuracyVerdict
-                    ? VERDICT_CONFIG[q.accuracyVerdict]
-                    : null;
-                  const Icon = verdict?.icon;
-
-                  return (
-                    <div key={i} className={cn("px-4 py-3", verdict?.bg)}>
-                      {/* Claim text with inline markdown */}
-                      <p className="text-sm text-foreground leading-relaxed mb-1.5">
-                        {renderInlineMarkdown(q.claimText)}
-                      </p>
-
-                      {/* Source quote */}
-                      {q.sourceQuote && (
-                        <blockquote className="text-xs text-muted-foreground border-l-2 border-border pl-2.5 mb-2 italic leading-relaxed">
-                          &ldquo;{q.sourceQuote}&rdquo;
-                        </blockquote>
-                      )}
-
-                      {/* Verdict + metadata */}
-                      <div className="flex items-center gap-2 text-xs">
-                        {verdict && Icon && (
-                          <span
-                            className={cn(
-                              "inline-flex items-center gap-1",
-                              verdict.color
-                            )}
-                          >
-                            <Icon className="w-3 h-3" />
-                            {verdict.label}
-                          </span>
-                        )}
-                        {q.accuracyScore != null && (
-                          <span className="text-muted-foreground tabular-nums">
-                            {Math.round(q.accuracyScore * 100)}%
-                          </span>
-                        )}
-                        {q.accuracyIssues && (
-                          <span className="text-amber-600 dark:text-amber-400">
-                            {q.accuracyIssues}
-                          </span>
-                        )}
-                        {q.accuracyCheckedAt && (
-                          <span className="text-muted-foreground/60 ml-auto flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {formatDate(q.accuracyCheckedAt)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </section>
+      {/* Cross-page claims — collapsible, grouped by wiki page */}
+      {pageGroups.length > 0 && (
+        <CollapsibleClaims
+          pageGroups={pageGroups}
+          totalClaims={quotes.length}
+        />
       )}
 
       {/* Citing pages — uses EntityLink-style pill links */}
