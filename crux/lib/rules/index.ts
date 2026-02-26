@@ -101,6 +101,9 @@ import { pipelineArtifactsRule } from './pipeline-artifacts.ts';
 // Footnote integrity (orphans, leaked SRC markers)
 import { footnoteIntegrityRule } from './footnote-integrity.ts';
 
+// Orphaned footnote definitions (auto-removable)
+import { orphanedFootnotesRule } from './orphaned-footnotes.ts';
+
 // Numbered footnotes migration (issue #1162)
 import { numberedFootnotesRule } from './numbered-footnotes.ts';
 
@@ -174,6 +177,7 @@ export {
   placeholderTextRule,
   personOrgAffiliationRule,
   numberedFootnotesRule,
+  orphanedFootnotesRule,
 };
 
 export const allRules: Rule[] = [
@@ -234,6 +238,7 @@ export const allRules: Rule[] = [
   placeholderTextRule,
   personOrgAffiliationRule,
   numberedFootnotesRule,
+  orphanedFootnotesRule,
 ];
 
 export default allRules;

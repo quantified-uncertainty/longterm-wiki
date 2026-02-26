@@ -10,6 +10,37 @@ import { FRONTMATTER_RE } from '../../lib/patterns.ts';
 import { reorderFrontmatterObject } from '../../lib/frontmatter-order.ts';
 import type { PageInfo, GradeResult, Metrics } from './types.ts';
 
+/**
+ * Safely serialize a frontmatter object to YAML.
+ *
+ * Tries PLAIN string type first (clean output), then falls back to
+ * QUOTE_DOUBLE if round-trip validation fails (e.g. llmSummary with colons).
+ */
+function safeStringifyFm(obj: Record<string, unknown>): string {
+  const plainYaml = stringifyYaml(obj, {
+    defaultStringType: 'PLAIN',
+    defaultKeyType: 'PLAIN',
+    lineWidth: 0,
+  });
+
+  // Round-trip validate: parse back to check for corruption
+  try {
+    const roundTripped = parseYaml(plainYaml);
+    // Verify key fields survived the round-trip
+    if (typeof obj.quality === 'number' && roundTripped?.quality !== obj.quality) {
+      throw new Error('quality field lost in round-trip');
+    }
+    return plainYaml;
+  } catch {
+    // PLAIN serialization produced invalid YAML — fall back to quoted strings
+    return stringifyYaml(obj, {
+      defaultStringType: 'QUOTE_DOUBLE',
+      defaultKeyType: 'PLAIN',
+      lineWidth: 0,
+    });
+  }
+}
+
 /** Apply grades to frontmatter YAML in the source file. */
 export function applyGradesToFile(
   page: PageInfo,
@@ -25,7 +56,13 @@ export function applyGradesToFile(
     return false;
   }
 
-  const fm = parseYaml(fmMatch[1]) || {} as Record<string, unknown>;
+  let fm: Record<string, unknown>;
+  try {
+    fm = parseYaml(fmMatch[1]) || {} as Record<string, unknown>;
+  } catch (err) {
+    console.error(`ERROR: Failed to parse frontmatter in ${page.filePath}: ${err instanceof Error ? err.message : err}`);
+    return false;
+  }
 
   fm.readerImportance = grades.readerImportance;
   if (grades.tacticalValue != null) {
@@ -50,11 +87,7 @@ export function applyGradesToFile(
   // fields (e.g. tacticalValue) land in the correct position.
   const orderedFm = reorderFrontmatterObject(fm);
 
-  let newFm: string = stringifyYaml(orderedFm, {
-    defaultStringType: 'PLAIN',
-    defaultKeyType: 'PLAIN',
-    lineWidth: 0,
-  });
+  let newFm: string = safeStringifyFm(orderedFm);
 
   if (!newFm.endsWith('\n')) {
     newFm += '\n';

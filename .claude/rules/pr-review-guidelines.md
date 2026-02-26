@@ -2,6 +2,27 @@
 
 Before considering any session complete, you MUST execute the review-and-ship workflow. Do not skip steps. Do not ask the user whether to do this — it is always required.
 
+## Shell safety: temp files
+
+**Never use `>` to write temp files** — zsh `noclobber` prevents overwriting. Use `>|` (force overwrite) or `mktemp`. Better yet, pipe PR bodies directly via heredoc stdin:
+
+```bash
+# GOOD: pipe directly
+pnpm crux pr create --title="..." <<'PRBODY'
+body here
+PRBODY
+
+# GOOD: force overwrite
+cat >| /tmp/pr-body.md <<'PRBODY'
+body here
+PRBODY
+
+# BAD: fails silently with noclobber, uses stale file content
+cat > /tmp/pr-body.md <<'PRBODY'
+body here
+PRBODY
+```
+
 ## GitHub issue auto-close syntax
 
 When a PR closes GitHub issues, use **one `Closes #N` per line** in the PR body. A comma-separated list (`Closes #1, #2, #3`) is **not** reliably recognized by GitHub and will only close the first issue.
