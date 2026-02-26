@@ -227,9 +227,9 @@ async function main() {
     readFileSync(PAGES_JSON_PATH, "utf-8")
   );
 
-  // Filter out internal/schema pages
+  // Filter out schema pages (internal pages are kept so the explore view can display them)
   const filteredPages = rawPages.filter(
-    (p) => p.category !== "internal" && p.category !== "schema"
+    (p) => p.category !== "schema"
   );
 
   console.log(
