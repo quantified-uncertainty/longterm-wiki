@@ -260,6 +260,13 @@
       "when": 1771902500000,
       "tag": "0032_claims_trigram_index",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1771902600000,
+      "tag": "0032_structured_claims",
+      "breakpoints": true
     }
   ]
 }
