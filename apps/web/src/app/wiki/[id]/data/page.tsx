@@ -89,6 +89,24 @@ function ConfidenceBadge({ confidence }: { confidence: string | null }) {
   );
 }
 
+/** Server-compatible verdict badge (no "use client" dependency) */
+function VerdictBadgeInline({ verdict, score }: { verdict: string | null; score?: number | null }) {
+  if (!verdict) return <span className="text-gray-300">—</span>;
+  const colorMap: Record<string, string> = {
+    verified: "bg-green-100 text-green-800 border-green-200",
+    unsupported: "bg-red-100 text-red-800 border-red-200",
+    disputed: "bg-amber-100 text-amber-800 border-amber-200",
+    unverified: "bg-gray-100 text-gray-500 border-gray-200",
+  };
+  const cls = colorMap[verdict] ?? "bg-gray-100 text-gray-500 border-gray-200";
+  return (
+    <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium border ${cls}`}>
+      {verdict}
+      {score != null && <span className="ml-0.5 opacity-70">({Math.round(score * 100)}%)</span>}
+    </span>
+  );
+}
+
 /** Badge for claim category (factual, opinion, analytical, speculative, relational) */
 function CategoryBadge({ category }: { category: string | null }) {
   if (!category) return null;
@@ -236,11 +254,17 @@ function buildClaimsData(claims: ClaimRow[], fnIndex?: FootnoteIndexEntry) {
     c.relatedEntities && c.relatedEntities.length > 0
   ).length;
 
-  return { byConfidence, byCategory, sections, refMap, uniqueSources, multiEntityCount };
+  const byVerdict: Record<string, number> = {};
+  for (const c of claims) {
+    const v = c.claimVerdict ?? "unverified";
+    byVerdict[v] = (byVerdict[v] ?? 0) + 1;
+  }
+
+  return { byConfidence, byCategory, byVerdict, sections, refMap, uniqueSources, multiEntityCount };
 }
 
 function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: FootnoteIndexEntry }) {
-  const { byConfidence, byCategory, sections, refMap, multiEntityCount } = buildClaimsData(claims, fnIndex);
+  const { byConfidence, byCategory, byVerdict, sections, refMap, multiEntityCount } = buildClaimsData(claims, fnIndex);
 
   return (
     <div>
@@ -254,6 +278,18 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
         ))}
         <span className="text-xs text-gray-500 ml-auto">{claims.length} total claims</span>
       </div>
+
+      {/* Verdict distribution */}
+      {Object.keys(byVerdict).some(v => v !== "unverified") && (
+        <div className="flex gap-3 mb-3 flex-wrap">
+          {Object.entries(byVerdict).map(([v, cnt]) => (
+            <div key={v} className="flex items-center gap-1">
+              <VerdictBadgeInline verdict={v} />
+              <span className="text-xs text-gray-600">{cnt}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Category distribution bar */}
       {Object.keys(byCategory).length > 1 && (
@@ -297,11 +333,12 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
       <table className="text-xs w-full border-collapse">
         <thead>
           <tr className="border-b text-left bg-gray-50">
-            <th className="p-2 w-[26%]">Claim</th>
-            <th className="p-2 w-[18%]">Source Quote</th>
+            <th className="p-2 w-[24%]">Claim</th>
+            <th className="p-2 w-[16%]">Source Quote</th>
             <th className="p-2">Type</th>
             <th className="p-2">Category</th>
             <th className="p-2">Confidence</th>
+            <th className="p-2">Verdict</th>
             <th className="p-2">Section</th>
             <th className="p-2">Sources</th>
             <th className="p-2">Related</th>
@@ -334,6 +371,9 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
                 </td>
                 <td className="p-2 whitespace-nowrap">
                   <ConfidenceBadge confidence={claim.confidence} />
+                </td>
+                <td className="p-2 whitespace-nowrap">
+                  <VerdictBadgeInline verdict={claim.claimVerdict} score={claim.claimVerdictScore} />
                 </td>
                 <td className="p-2 text-gray-600 max-w-[100px] truncate" title={sectionName}>
                   {sectionName}
