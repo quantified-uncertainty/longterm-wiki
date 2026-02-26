@@ -21,7 +21,7 @@ ratings:
 ---
 import {EntityLink} from '@components/wiki';
 
-This file tracks future infrastructure improvements and project priorities. For content-specific tasks, see the <EntityLink id="enhancement-queue">Enhancement Queue</EntityLink>.
+This file tracks future infrastructure improvements and project priorities.
 
 ## Current State (January 2026)
 

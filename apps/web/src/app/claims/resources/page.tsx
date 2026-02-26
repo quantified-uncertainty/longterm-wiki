@@ -1,94 +1,75 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   getAllResources,
   getPagesForResource,
   getResourceCredibility,
   getResourcePublication,
-} from "@data";
-import { getResourceTypeIcon } from "@/components/wiki/resource-utils";
-import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
-import { StatCard } from "../components/stat-card";
-import { DistributionBar } from "../components/distribution-bar";
+} from "@/data";
 import { ResourcesTable } from "./resources-table";
+import type { ResourceRow } from "./resources-table";
 
 export const metadata: Metadata = {
-  title: "Resources — Claims Explorer",
+  title: "Resources — Claims Explorer | Longterm Wiki",
   description:
-    "Browse external resources (papers, articles, reports) referenced across the wiki.",
+    "Browse external resources (papers, articles, reports) referenced across wiki pages.",
 };
 
-export interface PublicResourceRow {
-  id: string;
-  title: string;
-  url: string | undefined;
-  type: string;
-  publishedDate: string | null;
-  publicationName: string | null;
-  credibility: number | null;
-  citingPageCount: number;
-  hasSummary: boolean;
+function deriveFetchStatus(
+  r: { local_filename?: string; fetched_at?: string }
+): "full" | "metadata-only" | "unfetched" {
+  if (r.local_filename) return "full";
+  if (r.fetched_at) return "metadata-only";
+  return "unfetched";
 }
 
 export default function ResourcesPage() {
   const resources = getAllResources();
 
-  const rows: PublicResourceRow[] = resources
-    .map((r) => {
-      const publication = getResourcePublication(r);
-      const credibility = getResourceCredibility(r);
-      const citingPages = getPagesForResource(r.id);
+  const rows: ResourceRow[] = resources.map((r) => {
+    const publication = getResourcePublication(r);
+    const credibility = getResourceCredibility(r);
+    const citingPages = getPagesForResource(r.id);
 
-      return {
-        id: r.id,
-        title: r.title,
-        url: r.url,
-        type: r.type,
-        publishedDate: r.published_date ?? null,
-        publicationName: publication?.name ?? null,
-        credibility: credibility ?? null,
-        citingPageCount: citingPages.length,
-        hasSummary: !!r.summary,
-      };
-    })
-    .sort((a, b) => b.citingPageCount - a.citingPageCount);
+    return {
+      id: r.id,
+      title: r.title,
+      url: r.url,
+      type: r.type,
+      publicationName: publication?.name ?? null,
+      credibility: credibility ?? null,
+      citingPageCount: citingPages.length,
+      publishedDate: r.published_date ?? null,
+      hasSummary: !!r.summary,
+      hasReview: !!r.review,
+      hasKeyPoints: !!(r.key_points && r.key_points.length > 0),
+      fetchStatus: deriveFetchStatus(r),
+      authors: r.authors ?? null,
+      tags: r.tags ?? [],
+    };
+  });
 
-  // Stats
+  const total = rows.length;
   const cited = rows.filter((r) => r.citingPageCount > 0).length;
   const withSummary = rows.filter((r) => r.hasSummary).length;
-
-  // Type distribution
-  const byType: Record<string, number> = {};
-  for (const r of rows) {
-    byType[r.type] = (byType[r.type] ?? 0) + 1;
-  }
+  const fetched = rows.filter((r) => r.fetchStatus === "full").length;
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Resources</h1>
-        <p className="text-muted-foreground text-sm">
-          {resources.length.toLocaleString()} external resources (papers,
-          articles, reports) referenced across wiki pages.
-        </p>
+      <div className="flex items-baseline gap-3 mb-1">
+        <h1 className="text-2xl font-bold">Resources</h1>
+        <span className="text-sm text-muted-foreground">
+          {total.toLocaleString()} total
+        </span>
       </div>
-
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <StatCard label="Total Resources" value={resources.length} />
-        <StatCard label="Cited by Pages" value={cited} />
-        <StatCard label="With Summary" value={withSummary} />
-        <StatCard
-          label="Resource Types"
-          value={Object.keys(byType).length}
-        />
-      </div>
-
-      {Object.keys(byType).length > 0 && (
-        <div className="rounded-lg border p-4 mb-6">
-          <h3 className="text-sm font-semibold mb-3">Type Distribution</h3>
-          <DistributionBar data={byType} total={resources.length} />
-        </div>
-      )}
+      <p className="text-sm text-muted-foreground mb-4">
+        External resources referenced across wiki pages.{" "}
+        <span className="text-foreground">{cited.toLocaleString()}</span> cited
+        by pages &middot;{" "}
+        <span className="text-foreground">{withSummary.toLocaleString()}</span>{" "}
+        with summary &middot;{" "}
+        <span className="text-foreground">{fetched.toLocaleString()}</span>{" "}
+        snapshots saved
+      </p>
 
       <ResourcesTable resources={rows} />
     </div>

@@ -169,7 +169,7 @@ interface DatabaseShape {
   experts: Expert[];
   organizations: Organization[];
   cruxes: CruxData[];
-  prItems: PrItem[];
+  prItems: Record<string, unknown>[];
   backlinks: Record<string, BacklinkEntry[]>;
   relatedGraph: Record<string, RelatedGraphEntry[]>;
   pathRegistry: Record<string, string>;
@@ -1494,29 +1494,6 @@ export function getCruxesByDomain(domain: string): CruxData[] {
   return getCruxes().filter(
     (c) => c.domain?.toLowerCase() === domain.toLowerCase()
   );
-}
-
-// ============================================================================
-// PR ITEMS (GitHub pull request metadata)
-// ============================================================================
-
-export interface PrItem {
-  number: number;
-  title: string;
-  body: string;
-  state: string;
-  branch: string;
-  author: string;
-  createdAt: string;
-  updatedAt: string;
-  mergedAt: string | null;
-  closedAt: string | null;
-  labels: string[];
-}
-
-export function getPrItems(): PrItem[] {
-  const db = getDatabase();
-  return db.prItems || [];
 }
 
 // ============================================================================

@@ -28,7 +28,6 @@ This section contains internal documentation for maintaining and contributing to
 
 ## Project Management
 
-- <EntityLink id="enhancement-queue">Enhancement Queue</EntityLink> - Track content enhancement progress across all page types
 - <EntityLink id="project-roadmap">Project Roadmap</EntityLink> - Future work, infrastructure improvements, and tracking
 
 ## Technical Reports
