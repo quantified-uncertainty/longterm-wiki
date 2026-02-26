@@ -1,11 +1,11 @@
-# Wiki-Server: Hono RPC Migration (Opportunistic)
+# Wiki-Server: Hono RPC Migration (Mandatory for New Routes)
 
-We are incrementally migrating wiki-server routes from hand-written response types to Hono RPC type inference. **Do not batch-migrate** — convert routes when you are already modifying them.
+All **new** wiki-server routes must use Hono RPC method-chaining. Existing routes should be converted when you are already modifying them.
 
 ## Status
 
-- **Migrated**: `facts.ts` (reference implementation)
-- **Not yet migrated**: all other routes (~21 files in `apps/wiki-server/src/routes/`)
+- **Migrated**: `facts.ts` (reference), `claims.ts`, `citations.ts`
+- **Not yet migrated**: remaining routes (~19 files in `apps/wiki-server/src/routes/`)
 
 ## Why
 
@@ -66,3 +66,9 @@ Remove the old hand-written response interfaces from `api-types.ts` once all con
 - Don't convert a route just because you're reading it
 - Don't migrate as a side-effect of an unrelated bug fix
 - Do migrate when you're adding/changing endpoints on a route or restructuring it
+
+## RPC path key gotchas
+
+- Root route `/` maps to `'index'` in the RPC client type (not `'/'`)
+- Path params like `/:id` map to `':id'`
+- Hyphenated paths like `/by-entity` map to `'by-entity'`

@@ -2,28 +2,37 @@
  * Citation Quotes & Accuracy API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
- * Response types are imported from api-types.ts (single source of truth).
+ * Response types are inferred from the Hono RPC route types (single source of truth).
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
+import type { hc, InferResponseType } from 'hono/client';
+import type { CitationsRoute } from '../../../apps/wiki-server/src/routes/citations.ts';
 import type {
   UpsertCitationQuote,
   AccuracyVerdict as AccuracyVerdictType,
   MarkAccuracy,
   UpsertCitationContent,
-  UpsertCitationQuoteResult,
-  UpsertCitationQuoteBatchResult,
-  MarkAccuracyResult,
-  MarkAccuracyBatchResult,
-  AccuracySnapshotResult,
-  AccuracyDashboardData,
-  CitationHealthResult,
-  CitationContentRow,
-  CitationContentListEntry,
-  CitationContentListResult,
-  CitationContentStatsResult,
-  PropagateFromClaimsResult,
 } from '../../../apps/wiki-server/src/api-types.ts';
+
+// ---------------------------------------------------------------------------
+// RPC type inference — response shapes derived from the route handler
+// ---------------------------------------------------------------------------
+
+type RpcClient = ReturnType<typeof hc<CitationsRoute>>;
+
+type UpsertCitationQuoteResult = InferResponseType<RpcClient['quotes']['upsert']['$post'], 200>;
+type UpsertCitationQuoteBatchResult = InferResponseType<RpcClient['quotes']['upsert-batch']['$post'], 200>;
+type MarkAccuracyResult = InferResponseType<RpcClient['quotes']['mark-accuracy']['$post'], 200>;
+type MarkAccuracyBatchResult = InferResponseType<RpcClient['quotes']['mark-accuracy-batch']['$post'], 200>;
+type SnapshotResult = InferResponseType<RpcClient['accuracy-snapshot']['$post'], 201>;
+type AccuracyDashboardData = InferResponseType<RpcClient['accuracy-dashboard']['$get'], 200>;
+type CitationHealthResult = InferResponseType<RpcClient['health'][':pageId']['$get'], 200>;
+type CitationContentRow = InferResponseType<RpcClient['content']['$get'], 200>;
+type CitationContentListResult = InferResponseType<RpcClient['content']['list']['$get'], 200>;
+type CitationContentListEntry = CitationContentListResult['entries'][number];
+type CitationContentStatsResult = InferResponseType<RpcClient['content']['stats']['$get'], 200>;
+type PropagateFromClaimsResult = InferResponseType<RpcClient['quotes']['propagate-from-claims']['$post'], 200>;
 
 // ---------------------------------------------------------------------------
 // Citation Quotes Types — input (derived from server Zod schemas)
@@ -32,7 +41,7 @@ import type {
 export type UpsertCitationQuoteItem = UpsertCitationQuote;
 
 // ---------------------------------------------------------------------------
-// Citation Quotes Types — response (re-exported from canonical api-types.ts)
+// Citation Quotes Types — response (re-exported for consumers)
 // ---------------------------------------------------------------------------
 
 export type { UpsertCitationQuoteResult, UpsertCitationQuoteBatchResult };
@@ -46,11 +55,10 @@ export type AccuracyVerdict = AccuracyVerdictType;
 export type MarkAccuracyItem = MarkAccuracy;
 
 // ---------------------------------------------------------------------------
-// Citation Accuracy Types — response (re-exported from canonical api-types.ts)
+// Citation Accuracy Types — response (re-exported for consumers)
 // ---------------------------------------------------------------------------
 
-export type { MarkAccuracyResult, MarkAccuracyBatchResult, AccuracyDashboardData, CitationHealthResult };
-export type SnapshotResult = AccuracySnapshotResult;
+export type { MarkAccuracyResult, MarkAccuracyBatchResult, SnapshotResult, AccuracyDashboardData, CitationHealthResult };
 
 // ---------------------------------------------------------------------------
 // Citation Quotes API functions
