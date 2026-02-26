@@ -322,6 +322,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Claims Extraction Patterns", href: internalHref("claims-extraction-quality-patterns") },
         { label: "Citation Architecture", href: internalHref("citation-architecture") },
         { label: "Knowledge Graph Ontology", href: internalHref("knowledge-graph-ontology") },
+        { label: "Structured Data Architecture", href: internalHref("structured-data-architecture") },
         { label: "Fact System Strategy", href: internalHref("fact-system-strategy") },
         { label: "Claims Development Roadmap", href: internalHref("claims-system-development-roadmap") },
         { label: "Schema Overview", href: internalHref("__index__/internal/schema", "/wiki/E781") },
