@@ -541,6 +541,8 @@ claimsRoute.get("/by-entity/:entityId", async (c) => {
           pageId: pr.pageId,
           footnote: pr.footnote,
           section: pr.section,
+          quoteText: pr.quoteText,
+          referenceId: pr.referenceId,
           createdAt: pr.createdAt?.toISOString() ?? new Date().toISOString(),
         }));
       }
@@ -1092,6 +1094,8 @@ claimsRoute.post("/:id/page-references", async (c) => {
       pageId: parsed.data.pageId,
       footnote: parsed.data.footnote ?? null,
       section: parsed.data.section ?? null,
+      quoteText: parsed.data.quoteText ?? null,
+      referenceId: parsed.data.referenceId ?? null,
     })
     .onConflictDoNothing()
     .returning();
@@ -1106,6 +1110,8 @@ claimsRoute.post("/:id/page-references", async (c) => {
     pageId: rows[0].pageId,
     footnote: rows[0].footnote,
     section: rows[0].section,
+    quoteText: rows[0].quoteText,
+    referenceId: rows[0].referenceId,
     createdAt: rows[0].createdAt?.toISOString() ?? new Date().toISOString(),
   }, 201);
 });

@@ -2,6 +2,7 @@ import {
   pgTable,
   pgSequence,
   text,
+  varchar,
   integer,
   bigint,
   bigserial,
@@ -504,6 +505,9 @@ export const claimPageReferences = pgTable(
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     footnote: integer("footnote"),
     section: text("section"),
+    // --- Phase 3 fields (migration 0033) ---
+    quoteText: text("quote_text"),
+    referenceId: varchar("reference_id"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -877,5 +881,33 @@ export const jobs = pgTable(
     index("idx_jobs_status_priority").on(table.status, table.priority),
     index("idx_jobs_type_status").on(table.type, table.status),
     index("idx_jobs_created_at").on(table.createdAt),
+  ]
+);
+
+/**
+ * Page citations — regular (non-claim) footnote citations on wiki pages.
+ *
+ * Each row represents a citation that appears as a footnote on a page but is
+ * not backed by a claim. The `referenceId` field provides a shared namespace
+ * with `claim_page_references.reference_id` so the frontend can render both
+ * claim-backed and regular citations in a unified footnote list.
+ */
+export const pageCitations = pgTable(
+  "page_citations",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    referenceId: varchar("reference_id").notNull().unique(),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id),
+    title: varchar("title"),
+    url: varchar("url"),
+    note: text("note"),
+    resourceId: text("resource_id").references(() => resources.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  },
+  (table) => [
+    index("idx_pc_page_id").on(table.pageId),
+    index("idx_pc_reference_id").on(table.referenceId),
   ]
 );

@@ -267,6 +267,13 @@
       "when": 1771902600000,
       "tag": "0032_structured_claims",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1771902700000,
+      "tag": "0033_page_citations",
+      "breakpoints": true
     }
   ]
 }

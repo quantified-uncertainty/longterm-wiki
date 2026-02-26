@@ -49,6 +49,9 @@ import { ModelsList } from "@/components/wiki/ModelsList";
 import { MdxTabs, MdxTabItem } from "@/components/wiki/MdxTabs";
 import { Badge } from "@/components/ui/badge";
 
+// Footnote tooltip — intercepts <sup> to add rich hover cards on footnote refs
+import { FootnoteSup } from "@/components/wiki/FootnoteSup";
+
 // Legacy compat shim: Starlight's <Aside> mapped to our <Callout> component
 type CalloutVariant = "note" | "tip" | "caution" | "warning" | "danger";
 function Aside({ type, title, children }: { type?: string; title?: string; children?: React.ReactNode }) {
@@ -166,6 +169,9 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   ModelsList,
   Tabs: MdxTabs,
   TabItem: MdxTabItem,
+
+  // Override sup to add rich tooltips on footnote superscripts
+  sup: FootnoteSup,
 
   // Override pre/code to detect ```mermaid fenced code blocks
   pre: ({ children, ...props }: React.ComponentProps<"pre">) => {

@@ -779,6 +779,42 @@ async function buildCitationStatsMap() {
 }
 
 /**
+ * Fetch all page references (claim refs + citations) from the wiki-server.
+ * Returns a map of pageId → { claimReferences, citations } for the reference preprocessor.
+ * Falls back to an empty object if the server is unavailable.
+ */
+async function buildPageReferenceIndex() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  pageReferenceIndex: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return {};
+  }
+
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
+    const res = await fetch(`${serverUrl}/api/references/all`, {
+      headers,
+      signal: AbortSignal.timeout(15_000),
+    });
+
+    if (!res.ok) {
+      console.log(`  pageReferenceIndex: skipped (server returned ${res.status})`);
+      return {};
+    }
+
+    const data = await res.json();
+    console.log(`  pageReferenceIndex: ${data.totalPages} pages, ${data.totalClaimRefs} claim refs, ${data.totalCitations} citations`);
+    return data.pages || {};
+  } catch (err) {
+    console.log(`  pageReferenceIndex: skipped (${err.message || 'server unavailable'})`);
+    return {};
+  }
+}
+
+/**
  * Extract frontmatter from MDX/MD content using YAML parser
  * Properly handles nested objects like ratings
  */
@@ -1727,6 +1763,18 @@ async function main() {
 
     database.footnoteIndex = footnoteIndex;
     console.log(`  footnoteIndex: ${totalFootnotesMapped} footnotes across ${pagesWithFootnotes} pages`);
+  }
+
+  // =========================================================================
+  // PAGE REFERENCE INDEX — DB-driven footnote references (claim refs + citations)
+  // Fetched from wiki-server for the reference preprocessor at render time.
+  // =========================================================================
+  if (CONTENT_ONLY) {
+    console.log('  pageReferenceIndex: skipped (content-only scope)');
+    database.pageReferenceIndex = {};
+  } else {
+    console.log('  Fetching page reference index from wiki-server...');
+    database.pageReferenceIndex = await buildPageReferenceIndex();
   }
 
   // Compute redundancy scores (needs rawContent)

@@ -128,6 +128,36 @@ Analysis pages should include honest counter-arguments:
 
 ---
 
+## 4. Citations and Footnotes
+
+The wiki uses **DB-driven reference markers** instead of traditional numbered footnotes. This ensures citation data is centrally managed, verified, and consistent across pages.
+
+### Reference Marker Format
+
+- `[^cr-XXXX]` — **Claim-backed citations**: references tied to verified facts in the claims system. The claim text, source URL, and verification verdict are stored in the database and rendered automatically.
+- `[^rc-XXXX]` — **Regular citations**: external sources without claim verification. The title, URL, and optional notes are stored in the database.
+
+Reference definitions are stored in the database and injected at render time. **Do not** add `[^N]: URL` definitions at the bottom of the page.
+
+### Old-Style Numbered Footnotes
+
+Old-style `[^1]`, `[^2]`, etc. footnotes still render correctly (backward compatibility is maintained), but new content should use the DB-driven format. Existing numbered footnotes will be migrated gradually.
+
+To migrate existing numbered footnotes on a page, run:
+
+```
+pnpm crux claims migrate-footnotes <page-id> --apply
+```
+
+### Why DB-Driven References
+
+1. **Central verification**: Claim references are checked against source material
+2. **Consistency**: The same source cited on multiple pages always shows the same metadata
+3. **Maintainability**: Updating a source URL or title propagates to all pages that cite it
+4. **Quality tracking**: The claims system tracks citation accuracy and can flag stale sources
+
+---
+
 ## Anti-Patterns
 
 ### The "False Certainty" Trap

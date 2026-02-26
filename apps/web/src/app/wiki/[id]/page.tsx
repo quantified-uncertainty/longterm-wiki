@@ -30,12 +30,90 @@ import { CitationOverlay } from "@/components/wiki/CitationOverlay";
 import { InlineCitationCards } from "@/components/wiki/InlineCitationCards";
 import { CitationHealthBanner } from "@/components/wiki/CitationHealthBanner";
 import { CitationQuotesProvider } from "@/components/wiki/CitationQuotesContext";
+import { ReferenceProvider } from "@/components/wiki/ReferenceContext";
+import type { RefMapEntry } from "@/components/wiki/ReferenceContext";
+import type { RefMapEntry as PreprocessorRefMapEntry } from "@/lib/reference-preprocessor";
 import { References } from "@/components/wiki/References";
 import { UnifiedReferences } from "@/components/wiki/UnifiedReferences";
 import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
+import type { CitationQuote } from "@/lib/citation-data";
 import { getFootnoteIndex } from "@data";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
+
+/**
+ * Build a reference map from citation quotes and footnote index data.
+ * Maps footnote numbers to rich reference data for the FootnoteTooltip component.
+ */
+function buildReferenceMap(
+  citationQuotes: CitationQuote[] | undefined,
+  slug: string,
+  preprocessorMap?: Map<number, PreprocessorRefMapEntry>,
+): Map<number, RefMapEntry> {
+  const map = new Map<number, RefMapEntry>();
+
+  // Start with preprocessor entries (from DB-driven [^cr-XXXX] / [^rc-XXXX])
+  if (preprocessorMap) {
+    for (const [num, entry] of preprocessorMap) {
+      if (entry.kind === "claim" && entry.data) {
+        const d = entry.data as { claimId: number; claimText: string; sourceUrl?: string; sourceTitle?: string; verdict?: string; verdictScore?: number };
+        map.set(num, {
+          type: "claim",
+          claimText: d.claimText,
+          sourceUrl: d.sourceUrl ?? null,
+          sourceTitle: d.sourceTitle ?? null,
+        });
+      } else if (entry.kind === "citation" && entry.data) {
+        const d = entry.data as { title?: string; url?: string; note?: string };
+        map.set(num, {
+          type: "citation",
+          title: d.title ?? null,
+          url: d.url ?? null,
+          domain: d.url ? new URL(d.url).hostname.replace(/^www\./, "") : null,
+          note: d.note ?? null,
+        });
+      }
+    }
+  }
+
+  // Layer citation quotes on top (they have richer verification data)
+  if (citationQuotes) {
+    for (const q of citationQuotes) {
+      map.set(q.footnote, {
+        type: "claim",
+        claimText: q.claimText,
+        verdict: q.accuracyVerdict,
+        verdictScore: q.accuracyScore,
+        quoteVerified: q.quoteVerified,
+        sourceUrl: q.url,
+        sourceTitle: q.sourceTitle,
+        sourceQuote: q.sourceQuote,
+        accuracyIssues: q.accuracyIssues,
+        checkedAt: q.accuracyCheckedAt,
+        resourceId: q.resourceId,
+      });
+    }
+  }
+
+  // Fill gaps from footnote index (basic citation data for footnotes without quotes)
+  const fnIndex = getFootnoteIndex(slug);
+  if (fnIndex) {
+    for (const [numStr, fn] of Object.entries(fnIndex.footnotes)) {
+      const num = parseInt(numStr, 10);
+      if (!map.has(num)) {
+        map.set(num, {
+          type: "citation",
+          title: fn.title ?? null,
+          url: fn.url ?? null,
+          domain: fn.url ? new URL(fn.url).hostname.replace(/^www\./, "") : null,
+          resourceId: fn.resourceId ?? null,
+        });
+      }
+    }
+  }
+
+  return map;
+}
 
 const GITHUB_HISTORY_BASE = `${GITHUB_REPO_URL}/commits/main/content/docs`;
 
@@ -329,6 +407,7 @@ async function ContentView({
         coverage={pageData?.coverage}
       />
       <CitationQuotesProvider quotes={citationQuotes ?? []}>
+        <ReferenceProvider referenceMap={buildReferenceMap(citationQuotes, slug, page.referenceMap)}>
         <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
           {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
           {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
@@ -343,6 +422,7 @@ async function ContentView({
               : <References pageId={slug} />;
           })()}
         </article>
+        </ReferenceProvider>
         {/* Citation verification overlay — decorates footnote refs with status indicators */}
         {citationQuotes && citationQuotes.length > 0 && (() => {
           const fnIndex = getFootnoteIndex(slug);

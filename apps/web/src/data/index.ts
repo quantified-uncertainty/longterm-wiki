@@ -201,6 +201,8 @@ interface DatabaseShape {
     priority: number;
     category: string;
   }>;
+  /** Page reference index: page → { claimReferences, citations } for DB-driven footnotes */
+  pageReferenceIndex?: Record<string, SerializedPageReferences>;
   /** Pre-aggregated hallucination risk statistics */
   riskStats?: {
     total: number;
@@ -327,6 +329,36 @@ export interface FootnoteSourceEntry {
 export interface FootnoteIndexEntry {
   footnotes: Record<number, FootnoteEntry>;
   sources: FootnoteSourceEntry[];
+}
+
+// ---------------------------------------------------------------------------
+// DB-driven reference types (for reference-preprocessor)
+// ---------------------------------------------------------------------------
+
+/** Serialized claim reference data stored in database.json */
+export interface SerializedClaimRef {
+  claimId: number;
+  claimText: string;
+  sourceUrl?: string;
+  sourceTitle?: string;
+  verdict?: string;
+  verdictScore?: number;
+  referenceId: string;
+}
+
+/** Serialized citation data stored in database.json */
+export interface SerializedCitation {
+  title?: string;
+  url?: string;
+  note?: string;
+  resourceId?: string;
+  referenceId: string;
+}
+
+/** Per-page reference data stored in database.json */
+export interface SerializedPageReferences {
+  claimReferences: SerializedClaimRef[];
+  citations: SerializedCitation[];
 }
 
 export interface Resource {
@@ -643,6 +675,12 @@ export function getPagesForResource(resourceId: string): string[] {
 export function getFootnoteIndex(pageId: string): FootnoteIndexEntry | undefined {
   const db = getDatabase();
   return db.footnoteIndex?.[resolveId(pageId)];
+}
+
+/** Get DB-driven reference data for a page (for the reference preprocessor) */
+export function getPageReferences(pageId: string): SerializedPageReferences | null {
+  const db = getDatabase();
+  return db.pageReferenceIndex?.[resolveId(pageId)] ?? null;
 }
 
 export function getPublicationById(id: string): Publication | undefined {

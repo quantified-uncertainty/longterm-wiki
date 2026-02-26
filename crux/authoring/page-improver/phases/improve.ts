@@ -12,6 +12,7 @@ import { buildFactLookupForContent } from '../../../lib/fact-lookup.ts';
 import { buildClaimsContextForContent } from '../../../lib/claims-context.ts';
 import { runGapAnalysis, formatGapAnalysisForPrompt } from '../../../claims/gap-analysis.ts';
 import { convertSlugsToNumericIds } from '../../creator/deployment.ts';
+import { convertNewFootnotes } from '../../../claims/convert-new-footnotes.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
 import {
   ROOT, log, getFilePath, getImportPath, writeTemp,
@@ -186,6 +187,23 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   if (slugsConverted > 0) {
     log('improve', `  Converted ${slugsConverted} remaining slug-based EntityLink ID(s) to E## format`);
     improvedContent = convertedContent;
+  }
+
+  // Convert numbered footnotes [^N] to DB-driven [^rc-XXXX] references.
+  // DB entries are NOT created here (dry-run semantics) — they are created
+  // when the pipeline applies changes via --apply. This step only rewrites
+  // the footnote format in the content string.
+  try {
+    const fnResult = await convertNewFootnotes(improvedContent, page.id, {
+      createDbEntries: false,
+    });
+    if (fnResult.convertedCount > 0) {
+      log('improve', `  Converted ${fnResult.convertedCount} numbered footnote(s) to [^rc-XXXX] format`);
+      improvedContent = fnResult.content;
+    }
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('improve', `  Footnote conversion failed: ${error.message} — continuing with numbered footnotes`);
   }
 
   writeTemp(page.id, 'improved.mdx', improvedContent);

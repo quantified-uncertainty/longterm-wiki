@@ -102,7 +102,7 @@ You have research sources. Therefore:
 Make targeted improvements based on the analysis and directions. Follow these guidelines:
 
 ### Wiki Conventions
-- Use GFM footnotes for prose citations: [^1], [^2], etc.
+- Use GFM footnotes for prose citations: [^1], [^2], etc. (numbered footnotes will be auto-converted to DB-driven [^rc-XXXX] format by the pipeline)
 - Use inline links in tables: [Source Name](url)
 - EntityLinks use **numeric IDs**: \`<EntityLink id="E22">Anthropic</EntityLink>\`
 - Escape dollar signs: \\$100M not $100M

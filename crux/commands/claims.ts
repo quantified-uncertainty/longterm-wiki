@@ -98,6 +98,18 @@ const SCRIPTS = {
     passthrough: ['apply', 'limit', 'entity-id'],
     positional: false,
   },
+  'migrate-footnotes': {
+    script: 'claims/migrate-footnotes.ts',
+    description: 'Migrate numbered footnotes to DB-driven references (claim refs + citations)',
+    passthrough: ['apply'],
+    positional: true,
+  },
+  'migrate-footnotes-batch': {
+    script: 'claims/migrate-footnotes-batch.ts',
+    description: 'Batch-migrate numbered footnotes across all pages to DB-driven references',
+    passthrough: ['apply', 'batch-size', 'entity', 'path'],
+    positional: false,
+  },
   'enrich-structured': {
     script: 'claims/enrich-structured.ts',
     description: 'Add structured fields (subject/property/value) to existing claims via LLM',
@@ -130,8 +142,10 @@ Options:
   --force               Re-ingest already-processed resources; clear existing claims (ingest-resource, ingest-batch)
   --batch=<file>        Process URLs from a file, one per line (from-resource)
   --no-auto-resource    Don't auto-create resource YAML for unknown URLs (from-resource)
-  --apply               Write changes to database (backfill-related-entities; default: dry-run)
+  --apply               Write changes to database (backfill-related-entities, migrate-footnotes; default: dry-run)
   --entity-id=E         Filter to single entity (backfill-related-entities)
+  --batch-size=N        Process N pages at a time (migrate-footnotes-batch; default: all)
+  --path=P              Filter pages by relative path prefix (migrate-footnotes-batch)
 
 Examples:
   crux claims pipeline kalshi                         Run full extract → link → verify pipeline
@@ -180,6 +194,14 @@ Workflow:
   1. crux claims backfill-related-entities                Dry-run: scan claims for entity mentions
   2. crux claims backfill-related-entities --apply        Apply changes to database
   3. crux claims backfill-related-entities --entity-id=anthropic --apply  Single entity
+
+  Footnote migration (DB-driven references):
+  1. crux claims migrate-footnotes <page-id>          Dry-run: show what would change
+  2. crux claims migrate-footnotes <page-id> --apply   Rewrite MDX + create DB entries
+  3. crux claims migrate-footnotes-batch               Dry-run all pages with numbered footnotes
+  4. crux claims migrate-footnotes-batch --batch-size=50 --apply   Process 50 pages
+  5. crux claims migrate-footnotes-batch --entity=kalshi           Single entity
+  6. crux claims migrate-footnotes-batch --path=knowledge-base/    Directory filter
 
 Notes:
   - Extraction requires OPENROUTER_API_KEY or ANTHROPIC_API_KEY
