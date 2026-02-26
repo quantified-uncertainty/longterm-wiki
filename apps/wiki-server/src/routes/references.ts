@@ -289,6 +289,85 @@ const app = new Hono()
       .returning();
 
     return c.json({ inserted: rows.length }, 201);
+  })
+
+  // ---- GET /all — all references grouped by page (for build-data.mjs) ----
+  .get("/all", async (c) => {
+    const db = getDrizzleDb();
+
+    // 1. Fetch all claim page references with joined claim data
+    const claimRefRows = await db
+      .select({
+        id: claimPageReferences.id,
+        claimId: claimPageReferences.claimId,
+        pageId: claimPageReferences.pageId,
+        footnote: claimPageReferences.footnote,
+        section: claimPageReferences.section,
+        quoteText: claimPageReferences.quoteText,
+        referenceId: claimPageReferences.referenceId,
+        createdAt: claimPageReferences.createdAt,
+        claimText: claims.claimText,
+        claimVerdict: claims.claimVerdict,
+      })
+      .from(claimPageReferences)
+      .innerJoin(claims, eq(claimPageReferences.claimId, claims.id));
+
+    // 2. Fetch all page citations
+    const citationRows = await db.select().from(pageCitations);
+
+    // 3. Group by pageId
+    const byPage: Record<
+      string,
+      {
+        claimReferences: Array<{
+          claimId: number;
+          claimText: string;
+          verdict: string | null;
+          referenceId: string | null;
+        }>;
+        citations: Array<{
+          referenceId: string;
+          title: string | null;
+          url: string | null;
+          note: string | null;
+          resourceId: string | null;
+        }>;
+      }
+    > = {};
+
+    for (const row of claimRefRows) {
+      const pageId = row.pageId;
+      if (!byPage[pageId]) {
+        byPage[pageId] = { claimReferences: [], citations: [] };
+      }
+      byPage[pageId].claimReferences.push({
+        claimId: Number(row.claimId),
+        claimText: row.claimText,
+        verdict: row.claimVerdict,
+        referenceId: row.referenceId,
+      });
+    }
+
+    for (const row of citationRows) {
+      const pageId = row.pageId;
+      if (!byPage[pageId]) {
+        byPage[pageId] = { claimReferences: [], citations: [] };
+      }
+      byPage[pageId].citations.push({
+        referenceId: row.referenceId,
+        title: row.title,
+        url: row.url,
+        note: row.note,
+        resourceId: row.resourceId,
+      });
+    }
+
+    return c.json({
+      pages: byPage,
+      totalPages: Object.keys(byPage).length,
+      totalClaimRefs: claimRefRows.length,
+      totalCitations: citationRows.length,
+    });
   });
 
 export const referencesRoute = app;

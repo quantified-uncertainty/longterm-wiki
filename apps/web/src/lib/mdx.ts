@@ -8,8 +8,15 @@ import remarkDirective from "remark-directive";
 import rehypeKatex from "rehype-katex";
 import rehypeSlug from "rehype-slug";
 import { mdxComponents } from "@/components/mdx-components";
-import { getIdRegistry } from "@/data";
+import { getIdRegistry, getPageReferences } from "@/data";
+import type { SerializedPageReferences } from "@/data";
 import remarkCallouts from "./remark-callouts";
+import {
+  preprocessReferences,
+  emptyReferenceData,
+  type ReferenceData,
+  type RefMapEntry,
+} from "./reference-preprocessor";
 
 const CONTENT_DIR = path.resolve(process.cwd(), "../../content/docs");
 const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
@@ -108,6 +115,8 @@ export interface MdxPage {
   frontmatter: Record<string, any>;
   slug: string;
   headings: TocHeading[];
+  /** Map of footnote number → reference metadata (populated by reference preprocessor) */
+  referenceMap?: Map<number, RefMapEntry>;
 }
 
 export interface MdxError {
@@ -159,6 +168,42 @@ function extractHeadings(source: string): TocHeading[] {
 }
 
 /**
+ * Convert serialized page reference data (from database.json) into the
+ * Map-based ReferenceData format the preprocessor expects.
+ */
+function toReferenceData(serialized: SerializedPageReferences | null): ReferenceData {
+  if (!serialized) return emptyReferenceData();
+
+  const claimReferences = new Map(
+    (serialized.claimReferences ?? []).map((cr) => [
+      cr.referenceId,
+      {
+        claimId: cr.claimId,
+        claimText: cr.claimText,
+        sourceUrl: cr.sourceUrl,
+        sourceTitle: cr.sourceTitle,
+        verdict: cr.verdict,
+        verdictScore: cr.verdictScore,
+      },
+    ])
+  );
+
+  const citations = new Map(
+    (serialized.citations ?? []).map((c) => [
+      c.referenceId,
+      {
+        title: c.title,
+        url: c.url,
+        note: c.note,
+        resourceId: c.resourceId,
+      },
+    ])
+  );
+
+  return { claimReferences, citations };
+}
+
+/**
  * Compile an MDX/MD file at a given path into a renderable page.
  * Returns MdxError on compilation failure instead of null.
  */
@@ -168,9 +213,14 @@ async function compileFromPath(filePath: string, slug: string): Promise<MdxPage 
   const preprocessed = preprocessMdx(mdxSource);
   const headings = extractHeadings(mdxSource);
 
+  // Run DB-driven reference preprocessor (after preprocessMdx, before compileMDX)
+  const pageRefs = getPageReferences(slug);
+  const refData = toReferenceData(pageRefs);
+  const { content: refProcessed, referenceMap } = preprocessReferences(preprocessed, refData);
+
   try {
     const { content } = await compileMDX({
-      source: preprocessed,
+      source: refProcessed,
       components: mdxComponents,
       options: {
         parseFrontmatter: false,
@@ -186,7 +236,7 @@ async function compileFromPath(filePath: string, slug: string): Promise<MdxPage 
       },
     });
 
-    return { content, frontmatter, slug, headings };
+    return { content, frontmatter, slug, headings, referenceMap };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`Failed to compile MDX for "${slug}" (${filePath}):`, err);

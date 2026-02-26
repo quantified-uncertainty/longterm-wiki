@@ -1,0 +1,236 @@
+/**
+ * Pre-processes MDX content to inject footnote definitions for DB-driven references.
+ *
+ * Scans for [^cr-XXXX] (claim reference) and [^rc-XXXX] (citation reference) markers.
+ * Looks up reference data and generates standard [^N] footnote definitions that
+ * remark-gfm can process.
+ *
+ * Backward compatible: existing [^1], [^2] etc. pass through unchanged.
+ */
+
+// ---------------------------------------------------------------------------
+// Public types
+// ---------------------------------------------------------------------------
+
+export interface ClaimRefData {
+  claimId: number;
+  claimText: string;
+  sourceUrl?: string;
+  sourceTitle?: string;
+  verdict?: string;
+  verdictScore?: number;
+}
+
+export interface CitationData {
+  title?: string;
+  url?: string;
+  note?: string;
+  resourceId?: string;
+}
+
+export interface ReferenceData {
+  /** Keyed by reference_id, e.g. "cr-3d34" */
+  claimReferences: Map<string, ClaimRefData>;
+  /** Keyed by reference_id, e.g. "rc-4552" */
+  citations: Map<string, CitationData>;
+}
+
+export type RefKind = "claim" | "citation" | "legacy";
+
+export interface RefMapEntry {
+  kind: RefKind;
+  originalId: string;
+  footnoteNumber: number;
+  data: ClaimRefData | CitationData | null;
+}
+
+// ---------------------------------------------------------------------------
+// Implementation
+// ---------------------------------------------------------------------------
+
+/**
+ * Regex that matches DB-driven reference *usage sites* in the body text,
+ * i.e. `[^cr-XXXX]` or `[^rc-XXXX]`. The reference ID is captured in group 1.
+ *
+ * NOTE: This intentionally does NOT match the definition form `[^cr-XXXX]: ...`
+ * because we never expect those to be authored — we generate them ourselves.
+ */
+const DB_REF_USAGE_RE = /\[\^(cr-[a-zA-Z0-9]+|rc-[a-zA-Z0-9]+)\]/g;
+
+/**
+ * Regex that matches existing numeric footnote *usage sites*: `[^1]`, `[^23]` etc.
+ * Group 1 captures the number.
+ */
+const LEGACY_FOOTNOTE_USAGE_RE = /\[\^(\d+)\]/g;
+
+/**
+ * Build the footnote definition string for a claim reference.
+ */
+function buildClaimFootnote(data: ClaimRefData): string {
+  const parts: string[] = [];
+  if (data.sourceTitle && data.sourceUrl) {
+    parts.push(`[${data.sourceTitle}](${data.sourceUrl})`);
+  } else if (data.sourceUrl) {
+    parts.push(`[Source](${data.sourceUrl})`);
+  } else if (data.sourceTitle) {
+    parts.push(data.sourceTitle);
+  }
+  if (data.claimText) {
+    // Truncate long claim text to keep footnotes readable
+    const text =
+      data.claimText.length > 200
+        ? data.claimText.slice(0, 197) + "..."
+        : data.claimText;
+    parts.push(`"${text}"`);
+  }
+  if (data.verdict) {
+    parts.push(`(${data.verdict})`);
+  }
+  return parts.join(" — ") || "Claim reference";
+}
+
+/**
+ * Build the footnote definition string for a citation reference.
+ */
+function buildCitationFootnote(data: CitationData): string {
+  if (data.title && data.url) {
+    const link = `[${data.title}](${data.url})`;
+    return data.note ? `${link} — ${data.note}` : link;
+  }
+  if (data.url) {
+    const link = `[${data.url}](${data.url})`;
+    return data.note ? `${link} — ${data.note}` : link;
+  }
+  if (data.title) {
+    return data.note ? `${data.title} — ${data.note}` : data.title;
+  }
+  return data.note || "Citation";
+}
+
+/**
+ * Pre-process MDX content, replacing DB-driven reference markers with standard
+ * numbered footnotes and appending footnote definitions.
+ *
+ * This function is **pure**: it receives content + reference data and returns
+ * transformed content. No side effects, no DB calls.
+ *
+ * @returns The modified content and a map of footnote-number to reference data.
+ */
+export function preprocessReferences(
+  mdxContent: string,
+  referenceData: ReferenceData
+): { content: string; referenceMap: Map<number, RefMapEntry> } {
+  const referenceMap = new Map<number, RefMapEntry>();
+
+  // -----------------------------------------------------------------------
+  // 1. Find the highest existing numeric footnote to avoid collisions
+  // -----------------------------------------------------------------------
+  let maxExisting = 0;
+  const legacyMatches = mdxContent.matchAll(LEGACY_FOOTNOTE_USAGE_RE);
+  for (const m of legacyMatches) {
+    const n = parseInt(m[1], 10);
+    if (n > maxExisting) maxExisting = n;
+  }
+
+  // Also check for existing definitions like `[^N]:` to cover definitions
+  // that may not have a usage site in the body (edge case).
+  const defLineRe = /^\[\^(\d+)\]:/gm;
+  const defMatches = mdxContent.matchAll(defLineRe);
+  for (const m of defMatches) {
+    const n = parseInt(m[1], 10);
+    if (n > maxExisting) maxExisting = n;
+  }
+
+  // -----------------------------------------------------------------------
+  // 2. Collect all unique DB-driven reference IDs used in the content
+  // -----------------------------------------------------------------------
+  const usedRefIds = new Set<string>();
+  const dbMatches = mdxContent.matchAll(DB_REF_USAGE_RE);
+  for (const m of dbMatches) {
+    usedRefIds.add(m[1]);
+  }
+
+  // If there are no DB-driven references, return content unchanged.
+  if (usedRefIds.size === 0) {
+    return { content: mdxContent, referenceMap };
+  }
+
+  // -----------------------------------------------------------------------
+  // 3. Sort reference IDs for deterministic numbering
+  // -----------------------------------------------------------------------
+  const sortedRefIds = Array.from(usedRefIds).sort();
+
+  // -----------------------------------------------------------------------
+  // 4. Assign sequential numbers starting after maxExisting
+  // -----------------------------------------------------------------------
+  const idToNumber = new Map<string, number>();
+  let nextNumber = maxExisting + 1;
+  for (const refId of sortedRefIds) {
+    idToNumber.set(refId, nextNumber);
+    nextNumber++;
+  }
+
+  // -----------------------------------------------------------------------
+  // 5. Replace [^cr-XXXX] / [^rc-XXXX] usage sites with [^N]
+  // -----------------------------------------------------------------------
+  let transformed = mdxContent.replace(DB_REF_USAGE_RE, (_match, refId: string) => {
+    const num = idToNumber.get(refId);
+    return num !== undefined ? `[^${num}]` : _match;
+  });
+
+  // -----------------------------------------------------------------------
+  // 6. Build footnote definitions and the referenceMap
+  // -----------------------------------------------------------------------
+  const footnoteLines: string[] = [];
+
+  for (const refId of sortedRefIds) {
+    const num = idToNumber.get(refId)!;
+    const isClaim = refId.startsWith("cr-");
+
+    let definitionText: string;
+    let kind: RefKind;
+    let data: ClaimRefData | CitationData | null = null;
+
+    if (isClaim) {
+      kind = "claim";
+      const claimData = referenceData.claimReferences.get(refId);
+      if (claimData) {
+        data = claimData;
+        definitionText = buildClaimFootnote(claimData);
+      } else {
+        definitionText = `Claim reference ${refId} (data unavailable)`;
+      }
+    } else {
+      kind = "citation";
+      const citData = referenceData.citations.get(refId);
+      if (citData) {
+        data = citData;
+        definitionText = buildCitationFootnote(citData);
+      } else {
+        definitionText = `Citation ${refId} (data unavailable)`;
+      }
+    }
+
+    footnoteLines.push(`[^${num}]: ${definitionText}`);
+    referenceMap.set(num, { kind, originalId: refId, footnoteNumber: num, data });
+  }
+
+  // -----------------------------------------------------------------------
+  // 7. Append footnote definitions at the end of the content
+  // -----------------------------------------------------------------------
+  // Ensure there's a blank line before footnote definitions
+  const trimmed = transformed.trimEnd();
+  transformed = trimmed + "\n\n" + footnoteLines.join("\n") + "\n";
+
+  return { content: transformed, referenceMap };
+}
+
+/**
+ * Convenience: create an empty ReferenceData for pages with no DB references.
+ */
+export function emptyReferenceData(): ReferenceData {
+  return {
+    claimReferences: new Map(),
+    citations: new Map(),
+  };
+}
