@@ -127,12 +127,13 @@ export default async function WikiClaimsPage({ params }: PageProps) {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
             <StatCard label="Total Claims" value={claims.length} />
             {hasVerdicts ? (
               <>
                 <StatCard label="Verdict: Verified" value={verdictVerified} />
-                <StatCard label="Verdict: Disputed" value={verdictDisputed + verdictUnsupported} />
+                <StatCard label="Verdict: Disputed" value={verdictDisputed} />
+                <StatCard label="Verdict: Unsupported" value={verdictUnsupported} />
                 <StatCard
                   label="Verdict Rate"
                   value={`${Math.round(claims.length > 0 ? ((verdictVerified + verdictDisputed + verdictUnsupported) / claims.length) * 100 : 0)}%`}

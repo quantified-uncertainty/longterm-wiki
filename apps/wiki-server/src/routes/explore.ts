@@ -99,7 +99,7 @@ function deriveType(
 
 /** Base conditions shared by all queries (excludes stubs and schema). */
 const BASE_CONDITIONS = `
-  wp.word_count > 0
+  (wp.word_count > 0 OR wp.content_format IN ('table', 'diagram'))
   AND wp.category != 'schema'
 `;
 
