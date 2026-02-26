@@ -60,7 +60,7 @@ ${currentContent}
 ### Content Preservation (CRITICAL)
 You are EDITING an existing page, not rewriting it from scratch. Your output must preserve:
 - **ALL existing sections** — do not drop, merge, or summarize away existing sections
-- **ALL existing footnotes and citations** — keep every [^N] reference and its definition
+- **ALL existing footnotes and citations** — keep every [^N] reference and its definition. If you remove an inline reference [^N], also remove its definition. Do not leave orphaned footnote definitions.
 - **ALL existing EntityLinks** — keep every <EntityLink> tag
 - **ALL existing data tables** — keep every markdown table
 - **Specific details** — dates, numbers, names, quotes must be preserved verbatim
@@ -74,9 +74,13 @@ Do NOT create sections that repeat content already covered elsewhere on the page
 - Technical challenges listed in both a "Views" section AND a "Research" section
 - Career history repeated in both "Background" and a separate "Career" section
 - The same quotes or facts appearing in multiple sections
+- **Quantitative stats scattered across sections**: If a stat like "40+ members" or "$30M in funding" is already stated in Overview, do NOT repeat it in Current State, Strategic Position, Community Building, etc. State each quantitative fact ONCE in the most relevant section.
 
 If two existing sections cover the same topic, MERGE them into one section rather than keeping both.
 Do NOT add thin, speculative, or padding sections. A section with only 2-3 bullet points of vague content (like "Recognition and Influence: {/* NEEDS CITATION */} has been cited") adds no value. Only add new sections if you have substantive content to put in them.
+
+### Avoid Redundant Link/Resource Tables
+Do NOT generate "Sources & Resources", "Primary Sources", "Key Research Areas", "Related Organizations", or "Additional Resources" tables at the end of the page. These duplicate the inline footnote citations that already appear throughout the page and in the auto-generated References section. If the page already has 10+ inline citations, omit these tables entirely. A short "## External Links" section with 3-5 key URLs is acceptable as a replacement.
 
 ### No Editorial Meta-Comments
 Do NOT add editorial meta-comments in the output like \`{/* Note: Previous version used evaluative language... */}\` or \`{/* Note: This section was restructured... */}\`. The only acceptable MDX comments are \`{/* NEEDS CITATION */}\` markers. The output should be clean wiki content, not a track-changes document.
