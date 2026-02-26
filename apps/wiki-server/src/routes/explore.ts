@@ -51,6 +51,7 @@ const CATEGORY_TO_TYPE: Record<string, string> = {
   forecasting: "model",
   "foundation-models": "capability",
   incidents: "historical",
+  internal: "internal",
   other: "concept",
 };
 
@@ -108,6 +109,7 @@ const DERIVED_TYPE_EXPR = `
     WHEN wp.content_format = 'table' THEN 'table'
     WHEN wp.content_format = 'diagram' THEN 'diagram'
     WHEN wp.entity_type IS NOT NULL THEN wp.entity_type
+    WHEN wp.category = 'internal' THEN 'internal'
     ELSE 'concept'
   END
 `;

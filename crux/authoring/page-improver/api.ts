@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import {
   createLlmClient, runLlmAgent, streamingCreate, extractText,
-  startHeartbeat, withRetry, type ToolHandler,
+  startHeartbeat, withRetry, type ToolHandler, isOpenRouterMode, streamLlmCall,
 } from '../../lib/llm.ts';
 import { MODELS } from '../../lib/anthropic.ts';
 import type { RunAgentOptions } from './types.ts';
@@ -30,6 +30,16 @@ export { startHeartbeat };
 // ── Tool implementations ─────────────────────────────────────────────────────
 
 export async function executeWebSearch(query: string): Promise<string> {
+  // In OpenRouter mode, web_search_20250305 tool isn't available.
+  // Fall back to a plain LLM call that asks for known information.
+  if (isOpenRouterMode()) {
+    return streamLlmCall(getClient(), `Research this topic and provide the most relevant facts, developments, and sources you know about: "${query}". Include specific dates, numbers, and URLs where possible.`, {
+      model: MODELS.sonnet,
+      maxTokens: 4000,
+      retryLabel: 'web_search_fallback',
+    });
+  }
+
   const response = await withRetry(
     () => streamingCreate(getClient(), {
       model: MODELS.sonnet,

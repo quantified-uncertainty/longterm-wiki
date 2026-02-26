@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
-import { getEntityById } from "@data";
+import { getEntityById, getEntityHref } from "@data";
 import type { ClaimRow } from "@wiki-server/api-types";
 import { buildEntityNameMap } from "../../components/claims-data";
 import { CategoryBadge } from "../../components/category-badge";
@@ -29,9 +29,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ClaimDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const claim = await fetchFromWikiServer<ClaimRow>(`/api/claims/${id}`, {
-    revalidate: 300,
-  });
+  const claim = await fetchFromWikiServer<ClaimRow>(
+    `/api/claims/${id}?includeSources=true`,
+    { revalidate: 300 }
+  );
 
   if (!claim) notFound();
 
@@ -87,9 +88,17 @@ export default async function ClaimDetailPage({ params }: PageProps) {
       {/* Source quote (legacy field) */}
       {claim.sourceQuote && (!claim.sources || claim.sources.length === 0) && (
         <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 mb-4">
-          <span className="text-xs font-medium text-amber-700 block mb-1">
-            Source Quote
-          </span>
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-medium text-amber-700">
+              Source Quote
+            </span>
+            <Link
+              href={getEntityHref(claim.entityId)}
+              className="text-xs text-amber-600 hover:underline"
+            >
+              From wiki page &rarr;
+            </Link>
+          </div>
           <p className="text-sm italic text-amber-900">
             &ldquo;{claim.sourceQuote}&rdquo;
           </p>
@@ -139,9 +148,13 @@ export default async function ClaimDetailPage({ params }: PageProps) {
         </div>
         <div>
           <span className="text-xs text-muted-foreground block mb-1">
-            Mode
+            Epistemic Status
           </span>
-          <ClaimModeBadge mode={claim.claimMode} attributedTo={claim.attributedTo} />
+          {(!claim.claimMode || claim.claimMode === "endorsed") ? (
+            <span className="text-xs text-muted-foreground">Stated as fact</span>
+          ) : (
+            <ClaimModeBadge mode={claim.claimMode} attributedTo={claim.attributedTo} />
+          )}
         </div>
         <div>
           <span className="text-xs text-muted-foreground block mb-1">
@@ -223,20 +236,36 @@ export default async function ClaimDetailPage({ params }: PageProps) {
       {claim.footnoteRefs && (
         <div className="mb-6">
           <span className="text-xs text-muted-foreground block mb-1">
-            Footnote References
+            Wiki Page Citations
           </span>
-          <span className="font-mono text-xs">{claim.footnoteRefs}</span>
+          <div className="flex flex-wrap gap-1">
+            {claim.footnoteRefs.split(",").map((ref) => {
+              const num = ref.trim();
+              return (
+                <Link
+                  key={num}
+                  href={`${getEntityHref(claim.entityId)}#fn-${num}`}
+                  className="font-mono text-xs px-1.5 py-0.5 rounded bg-gray-100 text-blue-600 hover:bg-gray-200 hover:underline"
+                >
+                  [{num}]
+                </Link>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Footnote numbers from the source wiki page
+          </p>
         </div>
       )}
 
       {/* Timestamps */}
       <div className="border-t pt-4 text-xs text-muted-foreground">
         <span>
-          Created: {claim.createdAt ? new Date(claim.createdAt).toLocaleString() : "-"}
+          Created: {claim.createdAt ? new Date(claim.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}
         </span>
         {claim.updatedAt && (
           <span className="ml-4">
-            Updated: {new Date(claim.updatedAt).toLocaleString()}
+            Updated: {new Date(claim.updatedAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
           </span>
         )}
       </div>
@@ -244,13 +273,13 @@ export default async function ClaimDetailPage({ params }: PageProps) {
       {/* Actions */}
       <div className="mt-4 flex gap-3">
         <Link
-          href={`/wiki/${claim.entityId}`}
+          href={getEntityHref(claim.entityId)}
           className="text-xs text-blue-600 hover:underline"
         >
           View wiki page &rarr;
         </Link>
         <Link
-          href={`/wiki/${claim.entityId}/data`}
+          href={`${getEntityHref(claim.entityId)}/data`}
           className="text-xs text-muted-foreground hover:underline"
         >
           View data page

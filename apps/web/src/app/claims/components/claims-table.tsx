@@ -35,7 +35,7 @@ import { NumericValueDisplay } from "./numeric-value-display";
 
 function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; entityNames?: Record<string, string> }) {
   return (
-    <div className="px-4 py-3 bg-muted/30 space-y-2 text-sm">
+    <div className="px-4 py-3 space-y-2 text-sm">
       <div>
         <span className="font-medium text-xs text-muted-foreground">
           Full Claim:
@@ -184,7 +184,7 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
     cell: ({ row }) => (
       <Link
         href={`/claims/claim/${row.original.id}`}
-        className="font-mono text-[10px] text-muted-foreground hover:text-blue-600 hover:underline"
+        className="font-mono text-xs text-blue-600 hover:underline"
         onClick={(e) => e.stopPropagation()}
       >
         {row.original.id}
@@ -248,6 +248,31 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
       <span className="font-mono text-[10px]">{row.original.claimType}</span>
     ),
     size: 80,
+  },
+  {
+    id: "sources",
+    accessorFn: (row) => row.sources?.length ?? 0,
+    header: ({ column }) => (
+      <SortableHeader column={column}>Src</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const count = row.original.sources?.length ?? 0;
+      if (count === 0) return <span className="text-muted-foreground/40 text-xs">—</span>;
+      return (
+        <span
+          className={`inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded text-[10px] font-medium ${
+            count >= 3
+              ? "bg-emerald-100 text-emerald-700"
+              : count >= 1
+                ? "bg-blue-100 text-blue-700"
+                : ""
+          }`}
+        >
+          {count}
+        </span>
+      );
+    },
+    size: 45,
   },
   {
     accessorKey: "claimCategory",
@@ -408,7 +433,7 @@ export function ClaimsTable({
                   </TableRow>
                   {row.getIsExpanded() && (
                     <TableRow>
-                      <TableCell colSpan={columns.length} className="p-0">
+                      <TableCell colSpan={columns.length} className="p-0 bg-muted/30">
                         <ExpandedClaimDetail claim={row.original} entityNames={entityNames} />
                       </TableCell>
                     </TableRow>

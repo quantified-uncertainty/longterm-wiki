@@ -16,7 +16,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import {
-  Search,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -65,6 +64,18 @@ const TYPE_COLORS: Record<string, string> = {
     "bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300",
   reference:
     "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300",
+};
+
+const TYPE_LABELS: Record<string, string> = {
+  paper: "Paper",
+  book: "Book",
+  blog: "Blog post",
+  report: "Report",
+  talk: "Talk",
+  podcast: "Podcast",
+  government: "Government",
+  reference: "Reference",
+  web: "Web",
 };
 
 const DEFAULT_TYPE_COLOR =
@@ -124,7 +135,7 @@ function makeColumns(): ColumnDef<ResourceRow>[] {
         const color = TYPE_COLORS[t] || DEFAULT_TYPE_COLOR;
         return (
           <span className={`text-xs px-1.5 py-0.5 rounded ${color} capitalize`}>
-            {t}
+            {TYPE_LABELS[t] ?? t}
           </span>
         );
       },
@@ -229,16 +240,16 @@ export function ResourcesTable({ resources }: { resources: ResourceRow[] }) {
     <div className="space-y-4">
       {/* Search + type filter pills */}
       <div className="space-y-3">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="flex items-center gap-3">
           <input
-            placeholder="Search by title, publication, or URL..."
+            type="text"
+            placeholder="Search resources..."
             value={globalFilter ?? ""}
             onChange={(e) => {
               setGlobalFilter(e.target.value);
               setPagination((p) => ({ ...p, pageIndex: 0 }));
             }}
-            className="h-9 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+            className="flex-1 max-w-xs px-3 py-1.5 text-sm border rounded-md bg-background"
           />
         </div>
 
@@ -269,7 +280,7 @@ export function ResourcesTable({ resources }: { resources: ResourceRow[] }) {
                   : "bg-background text-muted-foreground border-border hover:border-foreground/30"
               }`}
             >
-              {type} ({count.toLocaleString()})
+              {TYPE_LABELS[type] ?? type} ({count.toLocaleString()})
             </button>
           ))}
         </div>
