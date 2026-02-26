@@ -22,7 +22,7 @@ import {
   addClaimPageReferencesBatch,
 } from '../lib/wiki-server/claims.ts';
 import { linkCitationsToClaimsBatch } from '../lib/wiki-server/citations.ts';
-import { isClaimDuplicate, claimTypeToCategory } from '../lib/claim-utils.ts';
+import { isClaimDuplicate, claimTypeToCategory, type ClaimTypeValue } from '../lib/claim-utils.ts';
 import type { ClaimVerdict } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -55,6 +55,44 @@ interface QuotesByPageResponse {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Heuristic claim type detection from claim text.
+ *
+ * Tries to detect numeric, evaluative, causal, historical, and relational
+ * claims based on surface patterns. Falls back to 'factual' when no pattern
+ * matches. This replaces the previous blanket 'factual' default.
+ */
+function detectClaimType(text: string): ClaimTypeValue {
+  const lower = text.toLowerCase();
+
+  // Numeric: contains numbers with units, percentages, dollar amounts, or quantities
+  if (/\$[\d,.]+|\d+%|\d[\d,.]*\s*(billion|million|thousand|trillion|percent|employees|users|people|dollars|usd|eur|gbp)/i.test(text)) {
+    return 'numeric';
+  }
+
+  // Evaluative: subjective assessments, rankings, opinions
+  if (/\b(best|worst|leading|top|most important|considered|regarded|viewed as|believed to|arguably|widely seen)\b/i.test(lower)) {
+    return 'evaluative';
+  }
+
+  // Causal: cause-effect relationships
+  if (/\b(caused|led to|resulted in|because|due to|as a result|contribut(ed|es|ing) to|impact(ed|s|ing) on)\b/i.test(lower)) {
+    return 'causal';
+  }
+
+  // Historical: past events with dates or temporal markers
+  if (/\b(in \d{4}|was founded|established|launched|published|released|announced|merged|acquired)\b/i.test(lower)) {
+    return 'historical';
+  }
+
+  // Relational: relationships between entities
+  if (/\b(partner(ed|ship)|collaborat|subsidiary|acquired by|funded by|member of|affiliated with|part of)\b/i.test(lower)) {
+    return 'relational';
+  }
+
+  return 'factual';
+}
 
 /**
  * Map an accuracy verdict from citation_quotes to a claim verdict.
@@ -223,11 +261,12 @@ async function main() {
 
       // Create the claim
       const claimVerdict = mapAccuracyToClaimVerdict(representative.accuracyVerdict);
+      const detectedType = detectClaimType(representative.claimText);
       const claimResult = await insertClaim({
         entityId: pageId,
         entityType: 'wiki-page',
-        claimType: 'factual',
-        claimCategory: claimTypeToCategory('factual'),
+        claimType: detectedType,
+        claimCategory: claimTypeToCategory(detectedType),
         claimText: representative.claimText,
         sourceQuote: representative.sourceQuote ?? null,
         section: representative.claimContext ?? null,

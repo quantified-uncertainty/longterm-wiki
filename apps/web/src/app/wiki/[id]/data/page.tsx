@@ -89,7 +89,16 @@ function ConfidenceBadge({ confidence }: { confidence: string | null }) {
   );
 }
 
-/** Server-compatible verdict badge (no "use client" dependency) */
+/**
+ * Server-compatible verdict badge — intentionally duplicates the styling from
+ * `@/app/claims/components/verdict-badge.tsx` (VerdictBadge).
+ *
+ * The canonical VerdictBadge is a "use client" component (uses Lucide icons
+ * + shadcn Badge), but this page is a React Server Component and cannot import
+ * client components without a wrapper. Since the inline version is just a tiny
+ * styled <span> with no interactivity, duplicating it here avoids the overhead
+ * of a client boundary for a purely visual element.
+ */
 function VerdictBadgeInline({ verdict, score }: { verdict: string | null; score?: number | null }) {
   if (!verdict) return <span className="text-gray-300">—</span>;
   const colorMap: Record<string, string> = {

@@ -32,9 +32,9 @@ import {
 } from '../lib/wiki-server/claims.ts';
 import { linkCitationsToClaimsBatch } from '../lib/wiki-server/citations.ts';
 import {
-  normalizeClaimText,
   isClaimDuplicate,
   claimTypeToCategory,
+  jaccardWordSimilarity,
 } from '../lib/claim-utils.ts';
 import {
   cleanMdxForExtraction,
@@ -284,14 +284,12 @@ async function main() {
           const linkItems: Array<{ quoteId: number; claimId: number }> = [];
 
           for (const q of unlinked) {
-            // Find best matching claim by text similarity
+            // Find best matching claim by text similarity using Jaccard word similarity
             let bestMatch: { id: number; score: number } | null = null;
 
             for (const claim of existingClaims) {
               if (isClaimDuplicate(q.claimText, claim.claimText, 0.5)) {
-                const normQ = normalizeClaimText(q.claimText);
-                const normC = normalizeClaimText(claim.claimText);
-                const score = normQ === normC ? 1.0 : 0.7;
+                const score = jaccardWordSimilarity(q.claimText, claim.claimText);
                 if (!bestMatch || score > bestMatch.score) {
                   bestMatch = { id: claim.id, score };
                 }

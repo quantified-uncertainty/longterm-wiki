@@ -1117,6 +1117,19 @@ citationsRoute.post("/quotes/link-claims-batch", async (c) => {
 
   const { items } = parsed.data;
   const db = getDrizzleDb();
+
+  // Pre-validate that all referenced claim IDs exist (mirrors the single-item endpoint)
+  const uniqueClaimIds = [...new Set(items.map((i) => i.claimId))];
+  const existingClaims = await db
+    .select({ id: claims.id })
+    .from(claims)
+    .where(sql`${claims.id} = ANY(${uniqueClaimIds})`);
+  const existingClaimIdSet = new Set(existingClaims.map((r) => r.id));
+  const missingClaimIds = uniqueClaimIds.filter((id) => !existingClaimIdSet.has(id));
+  if (missingClaimIds.length > 0) {
+    return validationError(c, `Referenced claims not found: ${missingClaimIds.join(", ")}`);
+  }
+
   let linkedCount = 0;
 
   try {

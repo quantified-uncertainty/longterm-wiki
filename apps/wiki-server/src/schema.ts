@@ -501,10 +501,13 @@ export const claimPageReferences = pgTable(
   (table) => [
     index("idx_cpr_claim_id").on(table.claimId),
     index("idx_cpr_page_id").on(table.pageId),
-    // The COALESCE-based unique index is managed by migration 0031 SQL;
-    // Drizzle doesn't support expressions in uniqueIndex, so we declare
-    // a simpler version here for schema awareness.
-    uniqueIndex("idx_cpr_claim_page_footnote").on(
+    // The real unique constraint is a COALESCE-based expression index in
+    // migration 0031_unify_claims_citations.sql:
+    //   CREATE UNIQUE INDEX idx_cpr_claim_page_footnote
+    //     ON claim_page_references (claim_id, page_id, COALESCE(footnote, -1));
+    // Drizzle doesn't support expression indexes, so we declare a plain
+    // index here for query-planning awareness only.
+    index("idx_cpr_claim_page_footnote").on(
       table.claimId,
       table.pageId,
     ),
