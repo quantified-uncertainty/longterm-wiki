@@ -10,12 +10,12 @@ import {
 } from "@data";
 import type { GetClaimsResult } from "@wiki-server/api-types";
 import { StatCard } from "../../components/stat-card";
-import { ClaimsTable } from "../../components/claims-table";
 import { DistributionBar } from "../../components/distribution-bar";
 import {
   collectEntitySlugs,
   buildEntityNameMap,
 } from "../../components/claims-data";
+import { EntityClaimsViews } from "./entity-claims-views";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getResourceTypeIcon } from "@/components/wiki/resource-utils";
 
@@ -150,7 +150,7 @@ export default async function EntityClaimsPage({ params }: PageProps) {
             </div>
           )}
 
-          <ClaimsTable claims={claims} entityNames={entityNames} />
+          <EntityClaimsViews claims={claims} entityNames={entityNames} />
         </>
       )}
 
