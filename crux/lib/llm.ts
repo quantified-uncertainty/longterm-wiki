@@ -6,6 +6,9 @@
  * that were previously duplicated between page-improver/api.ts and
  * creator/api-direct.ts.
  *
+ * Supports OpenRouter routing: call `setOpenRouterMode(true)` before
+ * pipeline execution to route all Claude calls through OpenRouter.
+ *
  * Usage:
  *   import { createLlmClient, runLlmAgent, streamLlmCall } from '../../lib/llm.ts';
  *
@@ -20,6 +23,33 @@ import type { MessageParam, ToolUseBlock, ToolResultBlockParam } from '@anthropi
 import { createClient, MODELS } from './anthropic.ts';
 import { withRetry, startHeartbeat } from './resilience.ts';
 import type { CostTracker } from './cost-tracker.ts';
+import { getApiKey } from './api-keys.ts';
+
+// ---------------------------------------------------------------------------
+// OpenRouter routing
+// ---------------------------------------------------------------------------
+
+let _useOpenRouter = false;
+
+/** Enable or disable OpenRouter routing for all LLM calls. */
+export function setOpenRouterMode(enabled: boolean): void {
+  _useOpenRouter = enabled;
+  if (enabled) {
+    console.log('[llm] OpenRouter mode enabled — routing Claude calls through OpenRouter');
+  }
+}
+
+/** Check if OpenRouter mode is active. */
+export function isOpenRouterMode(): boolean {
+  return _useOpenRouter;
+}
+
+/** Map Anthropic model IDs to OpenRouter model IDs. */
+function toOpenRouterModel(model: string): string {
+  // If already has a provider prefix, use as-is
+  if (model.includes('/')) return model;
+  return `anthropic/${model}`;
+}
 
 // ---------------------------------------------------------------------------
 // Client creation
@@ -32,9 +62,17 @@ export interface LlmClientOptions {
 
 /**
  * Create an Anthropic client with sensible defaults.
- * Throws if ANTHROPIC_API_KEY is not available.
+ * In OpenRouter mode, still creates a client (for type compatibility)
+ * but streamingCreate will bypass it.
+ * Throws if ANTHROPIC_API_KEY is not available (unless OpenRouter mode).
  */
 export function createLlmClient(options?: LlmClientOptions): Anthropic {
+  if (_useOpenRouter) {
+    // In OpenRouter mode, we still need a client object for type compatibility,
+    // but streamingCreate will bypass it. Create with a dummy key if needed.
+    const key = options?.apiKey || getApiKey('ANTHROPIC_API_KEY') || 'openrouter-mode';
+    return new Anthropic({ apiKey: key });
+  }
   const client = createClient({ apiKey: options?.apiKey });
   if (!client) {
     throw new Error('ANTHROPIC_API_KEY not found in environment');
@@ -58,6 +96,9 @@ export interface StreamingCreateOptions {
  * Execute a streaming Claude API call and return the final message.
  * Handles SSE streaming through proxies.
  *
+ * When OpenRouter mode is active, routes through OpenRouter's API
+ * instead of the Anthropic SDK.
+ *
  * When a CostTracker is provided via options, the call's token usage is
  * automatically recorded — no caller-side bookkeeping needed.
  */
@@ -66,6 +107,11 @@ export async function streamingCreate(
   params: Parameters<typeof client.messages.create>[0],
   options?: StreamingCreateOptions,
 ): Promise<Anthropic.Messages.Message> {
+  if (_useOpenRouter) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return callOpenRouterAsAnthropic(params as any, options);
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const stream = client.messages.stream(params as any);
   const message = await stream.finalMessage();
@@ -80,6 +126,110 @@ export async function streamingCreate(
   }
 
   return message;
+}
+
+/**
+ * Route an Anthropic-formatted request through OpenRouter and return
+ * a response shaped like Anthropic.Messages.Message.
+ */
+async function callOpenRouterAsAnthropic(
+  params: Record<string, unknown>,
+  options?: StreamingCreateOptions,
+): Promise<Anthropic.Messages.Message> {
+  const apiKey = getApiKey('OPENROUTER_API_KEY');
+  if (!apiKey) {
+    throw new Error('OPENROUTER_API_KEY not set — required for OpenRouter mode');
+  }
+
+  const model = toOpenRouterModel(params.model as string);
+
+  // Convert Anthropic message format to OpenRouter (OpenAI-compatible) format
+  const messages: Array<{ role: string; content: string }> = [];
+
+  // System prompt
+  if (params.system) {
+    const systemText = typeof params.system === 'string'
+      ? params.system
+      : Array.isArray(params.system)
+        ? (params.system as Array<{ text: string }>).map(b => b.text).join('\n')
+        : '';
+    if (systemText) {
+      messages.push({ role: 'system', content: systemText });
+    }
+  }
+
+  // User/assistant messages
+  const inputMessages = params.messages as MessageParam[];
+  for (const msg of inputMessages) {
+    if (typeof msg.content === 'string') {
+      messages.push({ role: msg.role, content: msg.content });
+    } else if (Array.isArray(msg.content)) {
+      // Flatten content blocks to text
+      const text = (msg.content as Array<{ type: string; text?: string; content?: string }>)
+        .map((block) => {
+          if (block.type === 'text') return block.text || '';
+          if (block.type === 'tool_result') return block.content || '';
+          return JSON.stringify(block);
+        })
+        .join('\n');
+      messages.push({ role: msg.role, content: text });
+    }
+  }
+
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://www.longtermwiki.com',
+      'X-Title': 'LongtermWiki Content Pipeline',
+    },
+    body: JSON.stringify({
+      model,
+      messages,
+      max_tokens: params.max_tokens || 4000,
+      ...(params.temperature !== undefined && { temperature: params.temperature }),
+    }),
+  });
+
+  const data = await response.json() as {
+    error?: { message?: string };
+    choices: Array<{ message: { content: string }; finish_reason: string }>;
+    model: string;
+    usage: { prompt_tokens: number; completion_tokens: number; cost?: number };
+  };
+
+  if (!response.ok || data.error) {
+    const msg = data.error?.message || `HTTP ${response.status}`;
+    throw new Error(`OpenRouter error: ${msg}`);
+  }
+
+  const text = data.choices[0]?.message?.content || '';
+  const usage = {
+    input_tokens: data.usage?.prompt_tokens || 0,
+    output_tokens: data.usage?.completion_tokens || 0,
+  };
+
+  // Record cost
+  if (options?.tracker) {
+    if (data.usage?.cost) {
+      options.tracker.recordExternalCost(model, data.usage.cost, options.label || 'openrouter');
+    } else {
+      options.tracker.record(model, usage, options.label);
+    }
+  }
+
+  // Return Anthropic-compatible message shape
+  return {
+    id: 'openrouter-' + Date.now(),
+    type: 'message',
+    role: 'assistant',
+    content: [{ type: 'text', text }],
+    model: data.model || model,
+    stop_reason: data.choices[0]?.finish_reason === 'stop' ? 'end_turn' : 'end_turn',
+    stop_sequence: null,
+    usage,
+  } as Anthropic.Messages.Message;
 }
 
 /**
