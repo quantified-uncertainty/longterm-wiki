@@ -428,33 +428,6 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
     size: 100,
   },
   {
-    id: "structured",
-    accessorFn: (row) => row.property,
-    header: ({ column }) => (
-      <SortableHeader column={column}>Structured</SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const c = row.original;
-      if (!c.property) return <span className="text-muted-foreground/40 text-xs">&mdash;</span>;
-      const parts: string[] = [c.property];
-      if (c.structuredValue) {
-        parts.push(`= ${c.structuredValue}`);
-      }
-      if (c.valueUnit) {
-        parts.push(`[${c.valueUnit}]`);
-      }
-      return (
-        <span
-          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono bg-violet-100 text-violet-700 max-w-[180px] truncate"
-          title={`${c.property}${c.structuredValue ? ` = ${c.structuredValue}` : ""}${c.valueUnit ? ` [${c.valueUnit}]` : ""}${c.valueDate ? ` @ ${c.valueDate}` : ""}`}
-        >
-          {parts.join(" ")}
-        </span>
-      );
-    },
-    size: 160,
-  },
-  {
     id: "sourceQuote",
     accessorFn: (row) => {
       // Prefer quote from claim_sources, fall back to legacy sourceQuote (wiki page excerpt)
