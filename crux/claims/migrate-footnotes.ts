@@ -74,7 +74,7 @@ interface MigrationResult {
  * Generate a short, stable reference ID from input data.
  * Format: prefix-XXXX where XXXX is 4 hex chars from a SHA-256 hash.
  */
-function generateReferenceId(
+export function generateReferenceId(
   prefix: 'cr' | 'rc',
   data: string,
   existingIds: Set<string>,

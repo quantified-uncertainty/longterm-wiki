@@ -19,6 +19,7 @@ import type {
 import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
 import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
+import { createDbEntriesForRcFootnotes } from '../../claims/convert-new-footnotes.ts';
 import { isBiographicalPage } from '../../lib/page-analysis.ts';
 import { validateMdxContent } from '../../lib/validate-mdx-content.ts';
 import {
@@ -382,6 +383,18 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
 
     fs.writeFileSync(filePath, contentToApply);
     console.log(`\nChanges applied to ${filePath}`);
+
+    // Create DB citation entries for any [^rc-XXXX] footnotes in the applied content.
+    // These were format-converted during the improve phase; now register them in the DB.
+    try {
+      const rcCreated = await createDbEntriesForRcFootnotes(contentToApply, page.id);
+      if (rcCreated > 0) {
+        log('apply', `Created ${rcCreated} DB citation entries for [^rc-XXXX] footnotes`);
+      }
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      log('apply', `Warning: DB citation creation failed: ${error.message}`);
+    }
 
     const adversarialNote = adversarialLoopResult
       ? ` [adversarial: ${adversarialLoopResult.iterations} iter, ${adversarialLoopResult.adversarialReview.gaps.length} gaps]`
