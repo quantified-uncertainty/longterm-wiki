@@ -20,6 +20,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { join } from 'path';
 import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
+import { callOpenRouter } from '../lib/quote-extractor.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { getColors } from '../lib/output.ts';
@@ -27,7 +28,7 @@ import { getClaimsByEntity } from '../lib/wiki-server/claims.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 
-const LOG_DIR = '/tmp/claims-baseline';
+const BASE_LOG_DIR = '/tmp/claims-baseline';
 const DEFAULT_SAMPLE_SIZE = 15;
 
 interface ClaimEval {
@@ -150,6 +151,7 @@ async function evaluatePage(
   claims: ClaimInput[],
   pageContent: string,
   sampleSize: number,
+  useOpenRouter: boolean = false,
 ): Promise<ClaimEval[]> {
   const sample = randomSample(claims, sampleSize);
 
@@ -173,14 +175,24 @@ ${pageContent.slice(0, 12000)}
 CLAIMS TO EVALUATE:
 ${claimList}`;
 
-  const response = await callClaude(client, {
-    model: MODELS.sonnet,
-    systemPrompt,
-    userPrompt,
-    maxTokens: 4000,
-  });
+  let responseText: string;
+  if (useOpenRouter) {
+    responseText = await callOpenRouter(systemPrompt, userPrompt, {
+      model: 'anthropic/claude-sonnet-4',
+      maxTokens: 4000,
+      title: 'LongtermWiki Claims Evaluation',
+    });
+  } else {
+    const response = await callClaude(client, {
+      model: MODELS.sonnet,
+      systemPrompt,
+      userPrompt,
+      maxTokens: 4000,
+    });
+    responseText = response.text;
+  }
 
-  const jsonMatch = response.text.match(/\[[\s\S]*\]/);
+  const jsonMatch = responseText.match(/\[[\s\S]*\]/);
   if (!jsonMatch) return [];
 
   try {
@@ -238,12 +250,16 @@ export async function runEvaluation() {
   const c = getColors();
   const args = parseCliArgs(process.argv.slice(2));
   const fromLogs = args['from-logs'] === true;
+  const variantArg = typeof args.variant === 'string' ? args.variant : 'baseline';
   const sampleSize = typeof args['sample'] === 'string' ? parseInt(args['sample'], 10) || DEFAULT_SAMPLE_SIZE : DEFAULT_SAMPLE_SIZE;
+  const useOpenRouter = args['openrouter'] === true;
+  const LOG_DIR = variantArg !== 'baseline' ? `${BASE_LOG_DIR}/${variantArg}` : BASE_LOG_DIR;
   const client = createClient();
   const allEvals: ClaimEval[] = [];
 
   const source = fromLogs ? 'dry-run logs' : 'database';
-  console.log(`\n${c.bold}${c.blue}Claims Extraction Quality Baseline${c.reset} (source: ${source}, sample: ${sampleSize}/page)\n`);
+  const variantLabel = variantArg !== 'baseline' ? ` [variant: ${variantArg}]` : '';
+  console.log(`\n${c.bold}${c.blue}Claims Extraction Quality Baseline${c.reset} (source: ${source}, sample: ${sampleSize}/page)${variantLabel}\n`);
 
   if (!fromLogs) {
     const serverOk = await isServerAvailable();
@@ -280,7 +296,7 @@ export async function runEvaluation() {
 
     process.stdout.write(`  Evaluating ${page.id} (${page.type}, ${claims.length} total, sampling ${Math.min(sampleSize, claims.length)})... `);
 
-    const evals = await evaluatePage(client, page, claims, pageContent, sampleSize);
+    const evals = await evaluatePage(client, page, claims, pageContent, sampleSize, useOpenRouter);
     console.log(`${c.green}${evals.length} evaluated${c.reset}`);
     allEvals.push(...evals);
   }
@@ -291,8 +307,9 @@ export async function runEvaluation() {
   }
 
   // Write raw results
-  mkdirSync(LOG_DIR, { recursive: true });
-  writeFileSync(join(LOG_DIR, 'evaluation-results.json'), JSON.stringify(allEvals, null, 2));
+  const outputDir = variantArg !== 'baseline' ? `${BASE_LOG_DIR}/${variantArg}` : BASE_LOG_DIR;
+  mkdirSync(outputDir, { recursive: true });
+  writeFileSync(join(outputDir, 'evaluation-results.json'), JSON.stringify(allEvals, null, 2));
 
   // Summary by page type
   console.log(`\n${c.bold}Summary by Page Type${c.reset}\n`);
@@ -362,7 +379,7 @@ export async function runEvaluation() {
     console.log();
   }
 
-  console.log(`\nResults: ${join(LOG_DIR, 'evaluation-results.json')}`);
+  console.log(`\nResults: ${join(outputDir, 'evaluation-results.json')}`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

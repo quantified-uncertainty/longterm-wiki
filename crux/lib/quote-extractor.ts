@@ -74,14 +74,21 @@ export function stripCodeFences(content: string): string {
 
 /**
  * Attempt to repair common JSON issues from LLM output.
- * Handles trailing commas, unescaped control chars, and truncated output.
+ * Handles trailing commas, unescaped control chars, bad escape sequences,
+ * and truncated output.
  */
 export function repairJson(json: string): string {
   let fixed = json;
   // Remove trailing commas before ] or }
   fixed = fixed.replace(/,\s*([\]}])/g, '$1');
+  // Fix bad escape sequences inside JSON strings (e.g. \s, \', \h → \\s, \\', \\h).
+  // Valid JSON escapes are: \" \\ \/ \b \f \n \r \t \uXXXX.
+  // We match backslash followed by any char that is NOT a valid escape, and double the backslash.
+  fixed = fixed.replace(/"(?:[^"\\]|\\.)*"/g, (match) => {
+    return match.replace(/\\(?!["\\/bfnrtu])/g, '\\\\');
+  });
   // Replace unescaped control characters inside strings
-  fixed = fixed.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (match) => {
+  fixed = fixed.replace(/"(?:[^"\\]|\\.)*"/g, (match) => {
     return match
       .replace(/(?<!\\)\n/g, '\\n')
       .replace(/(?<!\\)\t/g, '\\t')
@@ -91,14 +98,53 @@ export function repairJson(json: string): string {
 }
 
 /**
+ * Attempt to close truncated JSON by adding missing brackets/braces.
+ * Used when LLM output is cut off mid-response.
+ */
+function closeTruncatedJson(json: string): string {
+  let fixed = json.trim();
+  // If ends mid-string, close the string
+  const quoteCount = (fixed.match(/(?<!\\)"/g) || []).length;
+  if (quoteCount % 2 !== 0) {
+    fixed += '"';
+  }
+  // Remove trailing comma
+  fixed = fixed.replace(/,\s*$/, '');
+  // Count unclosed brackets/braces
+  let braces = 0;
+  let brackets = 0;
+  let inString = false;
+  for (let i = 0; i < fixed.length; i++) {
+    const ch = fixed[i];
+    if (ch === '\\' && inString) { i++; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{') braces++;
+    else if (ch === '}') braces--;
+    else if (ch === '[') brackets++;
+    else if (ch === ']') brackets--;
+  }
+  // Close in reverse order
+  for (let i = 0; i < brackets; i++) fixed += ']';
+  for (let i = 0; i < braces; i++) fixed += '}';
+  return fixed;
+}
+
+/**
  * Parse JSON with automatic repair on failure.
  * First tries JSON.parse directly; on failure, applies repairJson and retries.
+ * As a last resort, attempts to close truncated JSON.
  */
 export function parseJsonWithRepair<T = unknown>(json: string): T {
   try {
     return JSON.parse(json) as T;
   } catch {
-    return JSON.parse(repairJson(json)) as T;
+    try {
+      return JSON.parse(repairJson(json)) as T;
+    } catch {
+      // Last resort: repair + close truncation
+      return JSON.parse(closeTruncatedJson(repairJson(json))) as T;
+    }
   }
 }
 
