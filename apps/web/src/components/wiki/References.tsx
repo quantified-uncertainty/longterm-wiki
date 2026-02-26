@@ -6,6 +6,7 @@ import {
   getResourcePublication,
   getPageCitationHealth,
   getResourcesForPage,
+  getFootnoteIndex,
 } from "@data";
 import type { Resource } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
@@ -43,12 +44,35 @@ interface ResolvedRef {
   credibility: number | undefined;
   publicationName: string | undefined;
   peerReviewed: boolean;
+  /** Actual footnote numbers from the page that reference this resource */
+  footnoteNumbers: number[];
 }
 
-function resolveRefs(ids: string[]): {
+function resolveRefs(ids: string[], pageId?: string): {
   refs: ResolvedRef[];
   missing: string[];
 } {
+  // Build a map from resource ID → footnote numbers using the footnote index
+  const resourceFootnotes = new Map<string, number[]>();
+  if (pageId) {
+    const fnIndex = getFootnoteIndex(pageId);
+    if (fnIndex) {
+      for (const source of fnIndex.sources) {
+        if (source.resourceId) {
+          resourceFootnotes.set(source.resourceId, source.footnoteNumbers);
+        }
+      }
+      // Also check individual footnotes for resourceId matches not in sources
+      for (const [numStr, entry] of Object.entries(fnIndex.footnotes)) {
+        if (entry.resourceId && !resourceFootnotes.has(entry.resourceId)) {
+          const existing = resourceFootnotes.get(entry.resourceId) ?? [];
+          existing.push(parseInt(numStr, 10));
+          resourceFootnotes.set(entry.resourceId, existing);
+        }
+      }
+    }
+  }
+
   const refs: ResolvedRef[] = [];
   const missing: string[] = [];
   const seen = new Set<string>();
@@ -70,6 +94,7 @@ function resolveRefs(ids: string[]): {
       credibility: getResourceCredibility(resource),
       publicationName: publication?.name,
       peerReviewed: publication?.peer_reviewed ?? false,
+      footnoteNumbers: resourceFootnotes.get(id) ?? [],
     });
   }
 
@@ -159,15 +184,31 @@ function ReferenceEntry({ entry, pageId }: { entry: ResolvedRef; pageId?: string
     </div>
   );
 
+  // Build anchor elements for actual footnote numbers (for links from claim pages)
+  const { footnoteNumbers } = entry;
+  const fnAnchors = footnoteNumbers.length > 0
+    ? footnoteNumbers.map((n) => (
+        <React.Fragment key={`fn-anchor-${n}`}>
+          <span id={`user-content-fn-${n}`} className="scroll-mt-4" />
+          <span id={`fn-${n}`} />
+        </React.Fragment>
+      ))
+    : (
+      // Fallback: use sequential index when no footnote numbers are available
+      <React.Fragment>
+        <span id={`user-content-fn-${index}`} className="scroll-mt-4" />
+        <span id={`fn-${index}`} />
+      </React.Fragment>
+    );
+
   if (!hasExpandableContent) {
     return (
       <div
         id={`ref-${index}`}
         className="py-1.5 border-b border-border/50 last:border-b-0"
       >
-        <span id={`user-content-fn-${index}`} className="scroll-mt-4" />
-        <span id={`fn-${index}`} />
-        <div className="-mx-2 px-2 py-0.5">
+        {fnAnchors}
+        <div className="-mx-1.5 px-1.5 py-0.5">
           {titleRow}
         </div>
       </div>
@@ -179,8 +220,7 @@ function ReferenceEntry({ entry, pageId }: { entry: ResolvedRef; pageId?: string
       id={`ref-${index}`}
       className="py-1.5 border-b border-border/50 last:border-b-0"
     >
-      <span id={`user-content-fn-${index}`} className="scroll-mt-4" />
-      <span id={`fn-${index}`} />
+      {fnAnchors}
       <details className="ref-details group">
         <summary className="ref-summary cursor-pointer select-none hover:bg-muted/40 -mx-2 px-2 py-0.5 rounded-md transition-colors">
           {titleRow}
@@ -270,7 +310,7 @@ export function References({
 
   if (resolvedIds.length === 0) return null;
 
-  const { refs, missing } = resolveRefs(resolvedIds);
+  const { refs, missing } = resolveRefs(resolvedIds, pageId);
 
   return (
     <section

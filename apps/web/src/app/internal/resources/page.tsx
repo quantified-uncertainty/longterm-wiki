@@ -79,6 +79,15 @@ export default function ResourcesPage() {
   );
 }
 
+const colorClasses: Record<string, string> = {
+  emerald: "text-emerald-600",
+  amber: "text-amber-600",
+  red: "text-red-600",
+  blue: "text-blue-600",
+  purple: "text-purple-600",
+  teal: "text-teal-600",
+};
+
 function StatCard({
   label,
   value,
@@ -93,7 +102,7 @@ function StatCard({
   const pct = total > 0 ? Math.round((value / total) * 100) : 0;
   return (
     <div className="rounded-lg border border-border p-3 text-center">
-      <div className={`text-2xl font-bold tabular-nums text-${color}-600`}>
+      <div className={`text-2xl font-bold tabular-nums ${colorClasses[color] ?? ""}`}>
         {value.toLocaleString()}
       </div>
       <div className="text-[11px] text-muted-foreground mt-0.5">{label}</div>

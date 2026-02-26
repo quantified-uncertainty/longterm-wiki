@@ -163,40 +163,42 @@ export default async function ClaimsOverviewPage() {
       )}
 
       {/* Top entities */}
-      <div className="rounded-lg border p-4 mb-6">
-        <h3 className="text-sm font-semibold mb-3">Top Entities by Claims</h3>
-        <div className="space-y-2">
-          {entityRows.slice(0, 10).map((row) => (
-              <div key={row.entityId} className="flex items-center gap-3">
-                <Link
-                  href={`/claims/entity/${row.entityId}`}
-                  className="text-sm text-blue-600 hover:underline w-40 truncate"
-                >
-                  {entityNames[row.entityId] ?? row.entityId}
-                </Link>
-                <div className="flex-1 flex items-center gap-2">
-                  <div className="flex-1 h-4 bg-gray-100 rounded overflow-hidden">
-                    <div
-                      className="h-full bg-blue-400 rounded-l"
-                      style={{
-                        width: `${(row.total / entityRows[0].total) * 100}%`,
-                      }}
-                    />
+      {entityRows.length > 0 && (
+        <div className="rounded-lg border p-4 mb-6">
+          <h3 className="text-sm font-semibold mb-3">Top Entities by Claims</h3>
+          <div className="space-y-2">
+            {entityRows.slice(0, 10).map((row) => (
+                <div key={row.entityId} className="flex items-center gap-3">
+                  <Link
+                    href={`/claims/entity/${row.entityId}`}
+                    className="text-sm text-blue-600 hover:underline w-40 truncate"
+                  >
+                    {entityNames[row.entityId] ?? row.entityId}
+                  </Link>
+                  <div className="flex-1 flex items-center gap-2">
+                    <div className="flex-1 h-4 bg-gray-100 rounded overflow-hidden">
+                      <div
+                        className="h-full bg-blue-400 rounded-l"
+                        style={{
+                          width: `${(row.total / entityRows[0].total) * 100}%`,
+                        }}
+                      />
+                    </div>
+                    <span className="text-xs tabular-nums w-8 text-right">
+                      {row.total}
+                    </span>
                   </div>
-                  <span className="text-xs tabular-nums w-8 text-right">
-                    {row.total}
-                  </span>
+                  {row.multiEntity > 0 && (
+                    <span className="text-[10px] text-teal-600 whitespace-nowrap">
+                      {row.multiEntity} linked
+                    </span>
+                  )}
                 </div>
-                {row.multiEntity > 0 && (
-                  <span className="text-[10px] text-teal-600 whitespace-nowrap">
-                    {row.multiEntity} linked
-                  </span>
-                )}
-              </div>
-            )
-          )}
+              )
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Top relationships */}
       {relationshipRows.length > 0 && (
