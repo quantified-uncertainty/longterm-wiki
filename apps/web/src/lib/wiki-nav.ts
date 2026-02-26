@@ -324,6 +324,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Knowledge Graph Ontology", href: internalHref("knowledge-graph-ontology") },
         { label: "Fact System Strategy", href: internalHref("fact-system-strategy") },
         { label: "Claims Development Roadmap", href: internalHref("claims-system-development-roadmap") },
+        { label: "Claims Roadmap Diagram", href: internalHref("claims-system-roadmap-diagram") },
         { label: "Schema Overview", href: internalHref("__index__/internal/schema", "/wiki/E781") },
         { label: "Entity Reference", href: internalHref("entities") },
         { label: "Server Environments", href: internalHref("wiki-server-architecture") },

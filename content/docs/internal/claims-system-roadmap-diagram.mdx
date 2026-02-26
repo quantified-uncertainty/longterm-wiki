@@ -1,0 +1,184 @@
+---
+numericId: E903
+title: "Claims System: Roadmap & Dependency Diagram"
+description: "Visual dependency map of all claims-related work — showing completed, in-progress, and planned items with their dependencies and priority ordering"
+sidebar:
+  order: 41
+subcategory: architecture
+quality: 55
+readerImportance: 90
+researchImportance: 70
+lastEdited: "2026-02-26"
+createdAt: 2026-02-26
+evergreen: false
+llmSummary: "Living roadmap page for the claims system. Contains a Mermaid dependency diagram showing all work items from data quality remediation through DB-driven footnotes, with color-coded status (done/in-progress/blocked/planned) and explicit dependency arrows. Updated as work progresses."
+ratings:
+  novelty: 3
+  rigor: 6
+  actionability: 10
+  completeness: 7
+---
+
+import { Mermaid } from '@components/wiki';
+
+## How to Read This Page
+
+This is a **living dependency map** for all claims system work. Each node is a GitHub issue or milestone. Colors indicate status:
+- **Green** = merged/complete
+- **Blue** = PR open or in progress
+- **Orange** = blocked on dependencies
+- **Gray** = planned, not started
+
+Update this page as work progresses. Last updated: Feb 26, 2026.
+
+---
+
+## Master Dependency Diagram
+
+<Mermaid chart={`
+flowchart TD
+    classDef done fill:#22c55e,color:#fff,stroke:#16a34a
+    classDef inprogress fill:#3b82f6,color:#fff,stroke:#2563eb
+    classDef blocked fill:#f97316,color:#fff,stroke:#ea580c
+    classDef planned fill:#94a3b8,color:#fff,stroke:#64748b
+    classDef epic fill:#a855f7,color:#fff,stroke:#9333ea
+
+    subgraph quality["Phase 1: Data Quality Remediation"]
+        Q1["#1166 Backfill<br/>relatedEntities<br/>(PR #1171)"]:::inprogress
+        Q2["#1168 Delete bad<br/>claims + dedup<br/>(code done)"]:::inprogress
+        Q3["#1167 Run verification<br/>on all 11 entities"]:::blocked
+        Q4["#1169 Fix extraction<br/>prompts + validation<br/>(PR #1172)"]:::inprogress
+    end
+
+    subgraph improve["Phase 2: Claims → Page Improvement"]
+        I1["#1170 Substantive<br/>citations pipeline"]:::blocked
+        I2["#1159 Structured<br/>insertion instructions"]:::blocked
+    end
+
+    subgraph footnotes["Phase 3: DB-Driven Footnotes (Epic #1155)"]
+        F1["#1156 Schema:<br/>page_references +<br/>page_citations"]:::planned
+        F2["#1157 Pre-processor:<br/>inject footnotes<br/>from DB"]:::planned
+        F3["#1158 Tooltip<br/>component"]:::planned
+        F4["#1160 Kalshi<br/>proof of concept"]:::planned
+        F5["#1161 Rollout to<br/>all pages"]:::planned
+        F6["#1162 Cleanup old<br/>footnote code"]:::planned
+    end
+
+    subgraph design["Design / Research"]
+        D1["#1164 Structured claims<br/>Wikidata-style"]:::planned
+        D2["#1154 Architecture<br/>design doc"]:::done
+    end
+
+    subgraph docs["Documentation"]
+        DOC1["E901 Quality<br/>Audit"]:::done
+        DOC2["E902 Extraction<br/>Patterns"]:::done
+        DOC3["E896 Architecture<br/>Decisions"]:::done
+        DOC4["E897 Development<br/>Roadmap"]:::done
+    end
+
+    %% Phase 1 dependencies
+    Q1 --> Q3
+    Q2 --> Q3
+    Q4 --> I1
+
+    %% Phase 2 dependencies
+    Q1 --> I1
+    Q3 --> I1
+    Q3 --> I2
+    I2 -.-> I1
+
+    %% Phase 3 dependencies
+    I1 --> F1
+    F1 --> F2
+    F2 --> F3
+    F2 --> F4
+    F3 --> F4
+    F4 --> F5
+    F5 --> F6
+
+    %% Design feeds into future phases
+    D1 -.-> F1
+
+    %% Docs inform everything
+    DOC1 -.-> Q1
+    DOC1 -.-> Q2
+    DOC2 -.-> Q4
+`} />
+
+---
+
+## Issue Index
+
+### Phase 1: Data Quality Remediation (Sprint 1.5)
+
+These fix the existing 1,514 claims. No dependencies on each other (except #1167 needs #1166 first). Target: drop issue rate from 89% to \<50%.
+
+| Issue | Title | Status | PR | Dependencies | Blocks |
+|---|---|---|---|---|---|
+| [#1166](https://github.com/quantified-uncertainty/longterm-wiki/issues/1166) | Backfill relatedEntities | PR open | [#1171](https://github.com/quantified-uncertainty/longterm-wiki/pull/1171) | None | #1167, #1170 |
+| [#1168](https://github.com/quantified-uncertainty/longterm-wiki/issues/1168) | Delete bad claims + dedup | Code done | Pending | None | #1167 |
+| [#1169](https://github.com/quantified-uncertainty/longterm-wiki/issues/1169) | Fix extraction prompts | PR open | [#1172](https://github.com/quantified-uncertainty/longterm-wiki/pull/1172) | None | #1170 |
+| [#1167](https://github.com/quantified-uncertainty/longterm-wiki/issues/1167) | Run verification pipeline | Not started | — | #1166, #1168 | #1170, #1159 |
+
+### Phase 2: Claims Improve Pipeline
+
+Make claims actually improve wiki pages with substantive, cited content.
+
+| Issue | Title | Status | Dependencies | Blocks |
+|---|---|---|---|---|
+| [#1170](https://github.com/quantified-uncertainty/longterm-wiki/issues/1170) | Substantive citations pipeline | Not started | #1166, #1167, #1169 | #1155 epic |
+| [#1159](https://github.com/quantified-uncertainty/longterm-wiki/issues/1159) | Structured insertion instructions | Not started | #1167 | Overlaps #1170 |
+
+### Phase 3: DB-Driven Footnotes (Epic #1155)
+
+Replace numbered footnotes with DB-driven references. Lower priority — depends on Phase 1+2 proving claims are high-quality enough to surface to readers.
+
+| Issue | Title | Status | Dependencies |
+|---|---|---|---|
+| [#1156](https://github.com/quantified-uncertainty/longterm-wiki/issues/1156) | Schema changes | Planned | Phase 2 complete |
+| [#1157](https://github.com/quantified-uncertainty/longterm-wiki/issues/1157) | Pre-processor | Planned | #1156 |
+| [#1158](https://github.com/quantified-uncertainty/longterm-wiki/issues/1158) | Tooltip component | Planned | #1157 |
+| [#1160](https://github.com/quantified-uncertainty/longterm-wiki/issues/1160) | Kalshi POC | Planned | #1157, #1158 |
+| [#1161](https://github.com/quantified-uncertainty/longterm-wiki/issues/1161) | Rollout | Planned | #1160 |
+| [#1162](https://github.com/quantified-uncertainty/longterm-wiki/issues/1162) | Cleanup | Planned | #1161 |
+
+### Design / Research
+
+| Issue | Title | Status | Notes |
+|---|---|---|---|
+| [#1164](https://github.com/quantified-uncertainty/longterm-wiki/issues/1164) | Structured claims (Wikidata-style) | Planned | Informs future schema |
+| [#1154](https://github.com/quantified-uncertainty/longterm-wiki/issues/1154) | Architecture design doc | Done | Superseded by E901/E902 for quality specifics |
+
+---
+
+## Parallelization Guide
+
+**Can run simultaneously right now:**
+- #1166 (backfill relatedEntities) — independent
+- #1168 (cleanup/deletion) — independent
+- #1169 (extraction prompt fixes) — independent
+
+**Must be sequential:**
+- #1166 + #1168 → then #1167 (verification needs clean data)
+- #1167 → then #1170 (improve pipeline needs sourced claims)
+- #1170 → then #1155 epic (footnotes need proven improvement pipeline)
+- Within #1155: strictly sequential (#1156 → #1157 → #1158 → #1160 → #1161 → #1162)
+
+**Estimated cost:**
+| Phase | Sessions | Cost |
+|---|---|---|
+| Phase 1 (data quality) | 2-3 | \≈\$10-20 |
+| Phase 2 (improve pipeline) | 2-3 | \≈\$50-80 |
+| Phase 3 (DB footnotes) | 5-8 | \≈\$100-200 |
+| **Total** | **9-14** | **\≈\$160-300** |
+
+---
+
+## Related Documentation
+
+- <EntityLink id="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> — Empirical findings driving Phase 1
+- <EntityLink id="claims-extraction-quality-patterns">Extraction Quality Patterns (E902)</EntityLink> — Failure patterns driving #1169
+- <EntityLink id="claims-architecture-decisions">Architecture Decisions (E896)</EntityLink> — Core design decisions
+- <EntityLink id="claims-system-development-roadmap">Development Roadmap (E897)</EntityLink> — Sprint plan with experiments
+- <EntityLink id="claim-first-architecture">Claim-First Architecture (E892)</EntityLink> — Long-term vision
+- <EntityLink id="citation-architecture">Citation Architecture (E891)</EntityLink> — Citation system context
