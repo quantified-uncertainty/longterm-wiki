@@ -3,18 +3,19 @@
  *
  * Saves and retrieves intermediate artifacts from V2 orchestrator
  * and page-improver pipeline runs. See GitHub issue #826.
- * Response types are imported from api-types.ts (single source of truth).
+ * Response types are inferred via Hono RPC InferResponseType<>.
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
-import type {
-  SaveArtifacts,
-  SaveArtifactsResult,
-  ArtifactRow,
-  GetArtifactsResult,
-  GetArtifactsPagedResult,
-  ArtifactStatsResult,
-} from '../../../apps/wiki-server/src/api-types.ts';
+import type { hc, InferResponseType } from 'hono/client';
+import type { ArtifactsRoute } from '../../../apps/wiki-server/src/routes/artifacts.ts';
+import type { SaveArtifacts } from '../../../apps/wiki-server/src/api-types.ts';
+
+// ---------------------------------------------------------------------------
+// RPC client type (used only for response type inference)
+// ---------------------------------------------------------------------------
+
+type RpcClient = ReturnType<typeof hc<ArtifactsRoute>>;
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -23,13 +24,16 @@ import type {
 export type SaveArtifactsInput = SaveArtifacts;
 
 // ---------------------------------------------------------------------------
-// Types — response (re-exported from canonical api-types.ts)
+// Types — response (inferred from Hono RPC route)
 // ---------------------------------------------------------------------------
 
-export type { SaveArtifactsResult, GetArtifactsResult, GetArtifactsPagedResult, ArtifactStatsResult };
+export type SaveArtifactsResult = InferResponseType<RpcClient['index']['$post'], 201>;
+export type GetArtifactsResult = InferResponseType<RpcClient['by-page']['$get'], 200>;
+export type GetArtifactsPagedResult = InferResponseType<RpcClient['all']['$get'], 200>;
+export type ArtifactStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 
-/** Backward-compatible alias for ArtifactRow. */
-export type ArtifactEntry = ArtifactRow;
+/** ArtifactEntry inferred from the single-artifact endpoint. */
+export type ArtifactEntry = InferResponseType<RpcClient[':id']['$get'], 200>;
 
 // ---------------------------------------------------------------------------
 // API functions

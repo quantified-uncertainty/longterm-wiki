@@ -1,19 +1,39 @@
 /**
  * Entities API — wiki-server client module
  *
+ * Response types are inferred from the server route via Hono RPC type system,
+ * eliminating hand-written response interfaces and preventing type drift.
+ * All imports from hono/client are type-only — zero runtime cost.
+ *
+ * Runtime HTTP still uses `apiRequest` (for mock compatibility in tests).
  * Input types are derived from the canonical Zod schemas in api-types.ts.
- * Response types are imported from api-types.ts (single source of truth).
  */
 
+import type { hc, InferResponseType } from 'hono/client';
 import { batchedRequest, getServerUrl, apiRequest, type ApiResult } from './client.ts';
-import type {
-  SyncEntity,
-  SyncEntitiesResult,
-  EntityRow,
-  EntityListResult,
-  EntitySearchResult,
-  EntityStatsResult,
-} from '../../../apps/wiki-server/src/api-types.ts';
+import type { EntitiesRoute } from '../../../apps/wiki-server/src/routes/entities.ts';
+import type { SyncEntity } from '../../../apps/wiki-server/src/api-types.ts';
+
+// ---------------------------------------------------------------------------
+// RPC type inference (compile-time only — no runtime cost)
+// ---------------------------------------------------------------------------
+
+type RpcClient = ReturnType<typeof hc<EntitiesRoute>>;
+
+/** Response type for POST /api/entities/sync (inferred from server). */
+export type SyncEntitiesResult = InferResponseType<RpcClient['sync']['$post'], 200>;
+
+/** Response type for GET /api/entities/:id (inferred from server). */
+type EntityRow = InferResponseType<RpcClient[':id']['$get'], 200>;
+
+/** Response type for GET /api/entities (inferred from server). */
+export type EntityListResult = InferResponseType<RpcClient['index']['$get'], 200>;
+
+/** Response type for GET /api/entities/search (inferred from server). */
+export type EntitySearchResult = InferResponseType<RpcClient['search']['$get'], 200>;
+
+/** Response type for GET /api/entities/stats (inferred from server). */
+export type EntityStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -22,10 +42,8 @@ import type {
 export type SyncEntityItem = SyncEntity;
 
 // ---------------------------------------------------------------------------
-// Types — response (re-exported from canonical api-types.ts)
+// Types — response aliases
 // ---------------------------------------------------------------------------
-
-export type { SyncEntitiesResult, EntityListResult, EntitySearchResult, EntityStatsResult };
 
 /** Backward-compatible alias for EntityRow. */
 export type EntityEntry = EntityRow;

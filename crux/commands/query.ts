@@ -556,7 +556,8 @@ export async function citations(args: string[], options: Record<string, unknown>
     return { output: JSON.stringify(result.data, null, 2), exitCode: 0 };
   }
 
-  const { quotes, total } = result.data;
+  const { quotes } = result.data;
+  const total = quotes.length;
 
   if (quotes.length === 0) {
     return { output: `${c.dim}No citations found for "${pageId}"${c.reset}`, exitCode: 0 };

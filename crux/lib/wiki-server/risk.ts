@@ -5,10 +5,12 @@
  */
 
 import { batchedRequest, getServerUrl, type ApiResult } from './client.ts';
-import type {
-  RiskSnapshotInput,
-  RiskBatchResult,
-} from '../../../apps/wiki-server/src/api-types.ts';
+import type { RiskSnapshotInput } from '../../../apps/wiki-server/src/api-types.ts';
+import type { hc, InferResponseType } from 'hono/client';
+import type { HallucinationRiskRoute } from '../../../apps/wiki-server/src/routes/hallucination-risk.ts';
+
+type RpcClient = ReturnType<typeof hc<HallucinationRiskRoute>>;
+export type RiskBatchResult = InferResponseType<RpcClient['batch']['$post'], 201>;
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
