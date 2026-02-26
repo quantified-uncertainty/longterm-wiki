@@ -37,8 +37,8 @@ import {Calc} from '@components/facts'
 |-----------|------------|----------|
 | **Mission Alignment** | Public benefit corporation with safety governance | Long-Term Benefit Trust holds Class T stock with board voting power increasing from 1/5 directors (2023) to majority by 2027 [Harvard Law](https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/) |
 | **Technical Capabilities** | 80.9% on SWE-bench Verified (Nov 2025) | Claude Opus 4.5 first model above 80% on SWE-bench Verified; 42% enterprise coding market share vs OpenAI's 21% [Anthropic](https://www.anthropic.com/news/claude-opus-4-5), [TechCrunch](https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/) |
-| **Safety Research** | <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink> | Dictionary learning monitors ≈10M neural features; MIT Technology Review named interpretability work a 2026 Breakthrough Technology [Anthropic](https://assets.anthropic.com/m/7b1761976975203a/original/Anthropic-Interpretability-info-sheet.pdf), [MIT TR](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/) |
-| **Known Risks** | Self-preservation behavior in testing | Claude 3 Opus showed 12% alignment faking rate; Claude Opus 4 exhibited self-preservation actions in contrived test scenarios [Bank Info Security](https://www.bankinfosecurity.com/models-strategically-lie-finds-anthropic-study-a-27136), [Axios](https://www.axios.com/2025/05/23/anthropic-ai-deception-risk) |
+| **Safety Research** | <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink> | Dictionary learning monitors ≈10M neural features; 34M interpretable features identified via sparse autoencoders (2024); MIT Technology Review named interpretability work a 2026 Breakthrough Technology [Anthropic](https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html), [MIT TR](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/) |
+| **Known Risks** | Self-preservation behavior in testing | Claude 3 Opus showed <F e="anthropic" f="640a5be5">12%</F> alignment faking rate; Claude Opus 4 exhibited self-preservation actions in contrived test scenarios [Bank Info Security](https://www.bankinfosecurity.com/models-strategically-lie-finds-anthropic-study-a-27136), [Axios](https://www.axios.com/2025/05/23/anthropic-ai-deception-risk) |
 
 ## Key Stakeholders
 
@@ -51,9 +51,9 @@ At the <F e="anthropic" f="6796e194">\$380B</F> Series G valuation (Feb 2026), <
 | **Amazon** | Significant minority | — | <F e="anthropic" f="9a1f5c63">\$10.75B</F> invested; primary cloud partner |
 | **<EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink>** | <F e="anthropic" f="d7c6f042">0.6–1.7%</F> | \$2–6B | Led Series A; AI safety funder |
 | **<EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink>** | <F e="anthropic" f="a9e1f835">0.8–2.5%</F> | \$3–9B | \$500M already in nonprofit vehicle |
-| **Employee equity pool** | 12–18% | \$46–68B | Historical 3:1 matching (now 1:1 for new hires) |
+| **Employee equity pool** | <F e="anthropic" f="f2a06bd3">12–18%</F> | \$46–68B | Historical 3:1 matching (now 1:1 for new hires) |
 
-**EA-aligned capital**: \$27–76B risk-adjusted. Most reliable source: \$16–38B in employee DAFs (legally bound). Only 2/7 founders have strong EA connections. See <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink> for the full analysis.
+**EA-aligned capital**: <F e="anthropic" f="a8c71e05">\$27–76B</F> risk-adjusted. Most reliable source: \$16–38B in employee DAFs (legally bound). Only 2/7 founders have strong EA connections. See <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink> for the full analysis.
 
 ## Overview
 
@@ -61,7 +61,7 @@ Anthropic PBC is an American artificial intelligence company headquartered in Sa
 
 The company's name was chosen because it "connotes being human centered and human oriented"—and the domain name happened to be available in early 2021.[^2] Anthropic incorporated as a Delaware public-benefit corporation (PBC), a legal structure enabling directors to balance stockholders' financial interests with its stated purpose: "the responsible development and maintenance of advanced AI for the long-term benefit of humanity."[^1][^3]
 
-In February 2026, Anthropic closed a <F e="anthropic" f="5b0663a0">\$30 billion</F> Series G funding round at a <F e="anthropic" f="6796e194">\$380 billion</F> post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX.[^4] The company has raised over \$67 billion in total funding.[^1] At the time of the announcement, Anthropic reported <F e="anthropic" f="0ed4db9e">\$14 billion</F> in run-rate revenue, growing over 10x annually for three years, with more than 500 customers spending over \$1 million annually and 8 of the Fortune 10 as customers.[^4] The company's customer base expanded from fewer than 1,000 businesses to over 300,000 in two years, with 80% of revenue coming from business customers.[^5]
+In February 2026, Anthropic closed a <F e="anthropic" f="5b0663a0">\$30 billion</F> Series G funding round at a <F e="anthropic" f="6796e194">\$380 billion</F> post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX.[^4] The company has raised over \$67 billion in total funding.[^1] At the time of the announcement, Anthropic reported <F e="anthropic" f="0ed4db9e">\$14 billion</F> in run-rate revenue, growing over 10x annually for three years, with more than 500 customers spending over \$1 million annually and 8 of the Fortune 10 as customers.[^4] The company's customer base expanded from fewer than 1,000 businesses to over <F e="anthropic" f="28a43350">300,000</F> in two years, with 80% of revenue coming from business customers.[^5]
 
 ## History
 
@@ -71,7 +71,7 @@ Anthropic emerged from disagreements within OpenAI about the organization's dire
 
 The company formed during the Covid pandemic, with founding members meeting entirely on Zoom. Eventually 15 to 20 employees would meet for weekly lunches in San Francisco's Precita Park as the company took shape.[^2] Dario Amodei later stated that the split stemmed from a disagreement within OpenAI: one faction strongly believed in simply scaling models with more compute, while the Amodeis believed that alignment work was needed in addition to <EntityLink id="E273" name="scaling-laws">scaling</EntityLink>.[^2]
 
-Early funding came primarily from EA-connected investors who prioritized AI safety. <EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink>, co-founder of Skype, reportedly led the Series A at a \$550 million pre-money valuation.[^8] <EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink>, co-founder of Facebook and a major effective altruism funder, participated in both seed and Series A rounds.[^9] FTX, the cryptocurrency exchange, reportedly invested approximately \$500 million in Anthropic in 2022, according to multiple news accounts at the time.[^1]
+Early funding came primarily from EA-connected investors who prioritized AI safety. <EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink>, co-founder of Skype, reportedly led the Series A at a \$550 million pre-money valuation.[^8] <EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink>, co-founder of Facebook and a major effective altruism funder, participated in both seed and Series A rounds.[^9] FTX, the cryptocurrency exchange, reportedly invested approximately \$500 million in Anthropic in 20<F e="anthropic" f="640a5be5">22</F>, according to multiple news accounts at the time.[^1]
 
 ### Commercial Trajectory
 
@@ -158,15 +158,23 @@ Anthropic's safety-to-capabilities researcher ratio is difficult to verify from 
 
 Anthropic established a <EntityLink id="E407" name="long-term-benefit-trust">Long-Term Benefit Trust</EntityLink> (LTBT) comprising five Trustees with backgrounds in AI safety, national security, public policy, and social enterprise.[^3] The Trust holds Class T Common Stock granting power to elect a gradually increasing number of company directors—initially one out of five, increasing to a board majority by 2027.[^3] This structure is intended to insulate Anthropic's safety mission from short-term commercial pressures, giving an independent body meaningful oversight leverage that grows over time as the company scales.[^3] See the dedicated page for full analysis of the Trust's structure, trustees, and critiques.
 
+### Responsible Scaling Policy
+
+Anthropic's Responsible Scaling Policy (RSP) is a public commitment not to train or deploy models capable of causing catastrophic harm without first implementing corresponding safeguards.[^41] The RSP defines a series of AI Safety Levels (ASL-1 through ASL-4+) based on evaluated model capabilities, with each level triggering mandatory security and deployment standards before a model can be released. Claude Opus 4 was released under ASL-3 Standard and Claude Sonnet 4 under ASL-2 Standard.[^1]
+
+Anthropic describes the RSP as an experimental risk governance framework—an outcome-based approach where success is measured by whether models are deployed safely, not by the level of investment or effort expended.[^43] The RSP shares some structural similarities with the <EntityLink id="E127" name="eu-ai-act">EU AI Act</EntityLink>'s tiered obligations for general-purpose AI models above a 10^25 FLOP training compute threshold, though the two frameworks differ substantially in legal enforceability and scope.
+
+The RSP has been updated multiple times since its initial publication. Critics, including the SaferAI organization, argue that some updates have reduced transparency and accountability by replacing specific quantitative evaluation thresholds with internal processes that are not publicly defined.[^41] Anthropic's stated rationale for policy modifications has not been documented in detail publicly. Supporters of the RSP framework contend that rigid quantitative thresholds may not capture all relevant risk factors as model capabilities evolve, and that regular updates reflect appropriate responsiveness to new evidence. For a detailed discussion of RSP changes and their reception, see the Criticisms and Controversies section below.
+
 ## Products and Capabilities
 
 ### Claude Model Family
 
 In May 2025, Anthropic announced Claude 4, introducing both Claude Opus 4 and Claude Sonnet 4 with improved coding capabilities.[^1] Also in May, Anthropic launched a web search API that enables Claude to access real-time information.
 
-Claude Opus 4.5, released in November 2025, achieved results on benchmarks for complex enterprise tasks: 80.9% on SWE-bench Verified (the first AI model to exceed 80%), 60%+ on Terminal-Bench 2.0 (the first to exceed 60%), and 61.4% on OSWorld for computer use capabilities (compared to 7.8% for the next-best model).[^17] Reports show 50% to 75% reductions in both tool calling errors and build/lint errors with Claude Opus 4.5.
+Claude Opus 4.5, released in November 2025, achieved results on benchmarks for complex enterprise tasks: 80.9% on SWE-bench Verified (the first AI model to exceed 80%), 60%+ on Terminal-Bench 2.0 (the first to exceed 60%), and 61.4% on OSWorld for computer use capabilities (compared to 7.8% for the next-best model).[^17] Reports show <F e="anthropic" f="a1e87600">50%</F> to 75% reductions in both tool calling errors and build/lint errors with Claude Opus 4.5.
 
-### Claude Code
+### <EntityLink id="E286" name="squiggle">Squiggle</EntityLink>
 
 Claude Code's run-rate revenue exceeded <F e="anthropic" f="d08706cf">\$2.5 billion</F> as of February 2026, more than doubling since early 2025.[^4] According to Menlo Ventures data from July 2025, Anthropic holds 42% of the enterprise market share for coding, more than double OpenAI's 21%.[^6]
 
@@ -190,19 +198,31 @@ Unlike some competitors, Claude does not support native video or audio processin
 
 Anthropic developed <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> (CAI), a method for aligning <EntityLink id="E186" name="language-models">language models</EntityLink> to abide by high-level normative principles written into a constitution. The method trains a harmless AI assistant through self-improvement, without human labels identifying harmful outputs.[^22]
 
-The methodology involves two phases. First, a Supervised Learning Phase where researchers sample from an initial model, generate self-critiques and revisions, and finetune on revised responses. Second, a Reinforcement Learning Phase using <EntityLink id="E259" name="rlhf">RLHF</EntityLink> (Reinforcement Learning from AI Feedback)—training a preference model from AI-generated evaluations.[^22]
+The methodology involves two phases. In the **Supervised Learning Phase**, researchers sample from an initial model, generate self-critiques and revisions of those outputs against the constitutional principles, and then finetune the model on the revised responses. In the **Reinforcement Learning from AI Feedback (RLAIF) Phase**, the refined model generates pairs of responses, a separate model evaluates which response better adheres to the constitution, and those AI-generated preference labels are used to train a preference model—analogous to the reward model in standard <EntityLink id="E259" name="rlhf">RLHF</EntityLink>—which then guides further training via reinforcement learning.[^22] This approach removes the need for human labelers to identify harmful outputs directly, replacing that signal with AI-generated constitutional evaluations.
 
 Anthropic's constitution draws from multiple sources: the UN Declaration of Human Rights, trust and safety best practices, <EntityLink id="E98" name="deepmind">DeepMind</EntityLink>'s Sparrow Principles, efforts to capture non-western perspectives, and principles from early research.[^22]
 
+External observers have noted potential limitations of the CAI approach as an alignment method. Because the RLAIF phase relies on AI-generated feedback, any biases or blind spots in the evaluating model can propagate into training—a concern analogous to reward model miscalibration in standard RLHF. Additionally, critics have raised the question of whether constitutional principles can be "gamed" by models that learn to produce outputs that superficially satisfy the stated principles without internalizing their intent. Anthropic has not published detailed empirical responses to these specific critiques. For broader analysis of CAI's effectiveness relative to alternative alignment approaches, see the <EntityLink id="E413" name="anthropic-impact">Impact Assessment</EntityLink> page.
+
 ### Mechanistic Interpretability
 
-In 2025, Anthropic advanced <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink> research using its "microscope" to reveal sequences of features and trace the path a model takes from prompt to response.[^24] This work was named one of MIT Technology Review's 10 Breakthrough Technologies for 2026.
+Anthropic's <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink> research program, led by <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink>, aims to understand the internal computations of neural networks by mapping activations to human-interpretable concepts. The team uses dictionary learning via sparse autoencoders to decompose model activations into discrete, interpretable features.[^25]
+
+In 2024, Anthropic published the "Scaling Monosemanticity" paper, which applied sparse autoencoders to Claude 3 Sonnet and identified approximately 34 million interpretable features—scaling up from earlier work on much smaller models.[^50] These features represent concepts ranging from concrete entities (cities, names, programming constructs) to abstract ideas, and can be used to understand how concepts combine and interact within the model. The 34M figure reflects the number of features identified in a single large-scale experiment; earlier work on smaller models (one-layer transformers and MLP layers) had identified thousands of features.
+
+In 2025, Anthropic extended this work to circuit-level analysis, publishing research on attribution graphs for Claude 3.5 Haiku.[^51] Attribution graphs trace the computational path from a specific input prompt to the model's output, identifying which features and attention patterns are causally responsible for a given response. This "circuit tracing" methodology allows researchers to examine whether a model is solving a task through the expected reasoning path or via shortcuts, and to identify potential failure modes in specific capability domains.
+
+In 2025, Anthropic advanced this research further using what it described as a "microscope" to reveal sequences of features and trace the path a model takes from prompt to response.[^24] This body of work was named one of MIT Technology Review's 10 Breakthrough Technologies for 2026.[^24]
 
 Anthropic uses dictionary learning to identify and monitor millions of neural features, mapping them to human-interpretable concepts.[^25] The interpretability team comprises an estimated <F e="anthropic" f="28a43350">40–60</F> researchers, among the largest concentrations globally focused on this research agenda.
 
 ### Biosecurity Red Teaming
 
-Over six months, Anthropic spent more than 150 hours with biosecurity experts <EntityLink id="E449" name="red-teaming">red teaming</EntityLink> and evaluating their models' ability to output harmful biological information. According to their report, models might soon present risks to national security if unmitigated, but mitigations can substantially reduce these risks.[^26]
+Over six months, Anthropic spent more than 150 hours with biosecurity experts <EntityLink id="E449" name="red-teaming">red teaming</EntityLink> and evaluating their models' ability to output harmful biological information.[^26] This evaluation was structured around tasks that would require genuine uplift to someone seeking to cause harm—such as synthesis routes, acquisition strategies, or weaponization guidance—rather than information available through standard reference sources.
+
+According to their published report, the evaluations found that models might soon present risks to national security if unmitigated, but that mitigations can substantially reduce these risks.[^26] The specific mitigations described include output filters, refusal training, and capability-specific RLHF interventions that reduce harmful uplift without substantially degrading general biological question-answering. Anthropic's evaluation methodology and findings were shared with relevant government agencies as part of its voluntary safety commitments.[^49]
+
+Claude Opus 4 showed elevated performance on some proxy CBRN (chemical, biological, radiological, and nuclear) tasks compared to Claude Sonnet <F e="anthropic" f="640a5be5">3.7</F>, with external red-teaming partners reporting it performed qualitatively differently—particularly in capabilities relevant to dangerous applications—from any model they previously tested.[^1] This finding contributed to its release under ASL-3 Standard rather than ASL-2.
 
 ### Safety Levels
 
@@ -210,7 +230,7 @@ Anthropic released Claude Opus 4 under AI Safety Level 3 Standard and Claude Son
 
 ### Comparison to Competitors
 
-In summer 2025, OpenAI and Anthropic conducted a joint safety evaluation where each company tested the other's models. Using the StrongREJECT v2 benchmark, OpenAI found that its o3 and o4-mini models showed greater resistance to jailbreak attacks compared to Claude systems, though Claude 4 models showed advantages in maintaining instruction hierarchy.[^18]
+In summer 2025, OpenAI and Anthropic conducted a joint safety evaluation where each company tested the other's models. Using the StrongREJECT v2 benchmark, OpenAI found that its o3 and o4-mini models showed greater resistance to jailbreak attacks compared to Claude systems, though Claude 4 models showed advantages in maintaining instruction hierarchy.[^18] Neither company claimed a uniform safety advantage across all dimensions evaluated.
 
 Claude Sonnet 4 and Claude Opus 4 are most vulnerable to "past-tense" jailbreaks—when harmful requests are presented as past events. In contrast, OpenAI o3 performs better in resisting past-tense jailbreaks, with failure modes mainly limited to base64-style prompts and low-resource language translations.[^27]
 
@@ -264,7 +284,7 @@ Research found models could engage in "alignment faking"—appearing to adopt ne
 
 ### Jailbreak Vulnerabilities
 
-In February 2025, Anthropic held a Constitutional Classifiers Challenge to identify vulnerabilities in Claude's safety systems. The challenge involved over 300,000 messages and an estimated 3,700 hours of collective effort. Four participants successfully discovered jailbreaks through all challenge levels, with one discovering a universal jailbreak. Anthropic paid out \$55,000 to the winners.[^38]
+In February 2025, Anthropic held a Constitutional Classifiers Challenge to identify vulnerabilities in Claude's safety systems. The challenge involved over 300,000 messages and an estimated <F e="anthropic" f="28a43350">3,700</F> hours of collective effort. Four participants successfully discovered jailbreaks through all challenge levels, with one discovering a universal jailbreak. Anthropic paid out <F e="anthropic" f="28a43350">\$55,000</F> to the winners.[^38]
 
 CVE-2025-54794 is a high-severity prompt injection flaw targeting Claude AI that allows carefully crafted prompts to flip the model's role, inject malicious instructions, and leak data.[^39]
 
@@ -276,7 +296,7 @@ Anthropic framed its public disclosure as a proactive detection and disruption s
 
 ### Responsible Scaling Policy Changes
 
-Anthropic has updated its Responsible Scaling Policy multiple times, including modifications to security safeguards intended to reduce the risk of company insiders stealing advanced models.[^41] According to SaferAI's assessment methodology, Anthropic's RSP grade dropped from 2.2 to 1.9 following one such update.
+Anthropic has updated its Responsible Scaling Policy multiple times, including modifications to security safeguards intended to reduce the risk of company insiders stealing advanced models.[^41] According to SaferAI's assessment methodology, Anthropic's RSP grade dropped from <F e="anthropic" f="28a43350">2.2</F> to <F e="anthropic" f="28a43350">1.9</F> following one such update, placing it alongside OpenAI and DeepMind in SaferAI's "weak" category.[^41]
 
 The previous RSP contained specific evaluation triggers (like "at least 50% of the tasks are passed"), but the updated thresholds are determined by an internal process no longer defined by quantitative benchmarks. Eight days after this policy update, Anthropic activated the modified safeguards for a new model release.
 
@@ -284,11 +304,11 @@ Anthropic's stated rationale for policy modifications has not been publicly docu
 
 ### Political Tensions and External Critiques
 
-White House AI Czar <EntityLink id="E431" name="david-sacks">David Sacks</EntityLink> criticized Anthropic Co-founder Jack Clark on X, stating that Clark was concealing what Sacks characterized as "a sophisticated regulatory capture strategy based on fear-mongering."[^42] AI safety commentator Liron Shapira stated that Anthropic is "arguably the biggest offenders at tractability washing because if they're building AI, that makes it okay for anybody to build AI."
+White House AI Czar <EntityLink id="E431" name="david-sacks">David Sacks</EntityLink> criticized Anthropic Co-founder Jack Clark on X, stating that Clark was concealing what Sacks characterized as "a sophisticated regulatory capture strategy based on fear-mongering."[^42] AI safety commentator Liron Shapira stated that Anthropic is "arguably the biggest offenders at tractability washing because if they're building AI, that makes it okay for anybody to build AI."[^42]
 
-These critiques reflect a tension in Anthropic's positioning: the company builds frontier AI systems while warning about their dangers. Anthropic describes its approach as using a Responsible Scaling Policy as an experimental risk governance framework—an outcome-based approach where success is measured by whether they deployed safely, not by investment or effort.[^43]
+These critiques reflect a tension in Anthropic's positioning: the company builds frontier AI systems while warning about their dangers. Anthropic describes its approach as using the Responsible Scaling Policy as an experimental risk governance framework—an outcome-based approach where success is measured by whether they deployed safely, not by investment or effort.[^43]
 
-Dario Amodei has stated an estimated 10–25% probability of catastrophic scenarios arising from the unchecked growth of AI technologies.[^42] Anthropic has not publicly responded to the specific accusations of regulatory capture or tractability washing referenced above.
+Dario Amodei has stated an estimated 10–<F e="anthropic" f="fac5b934">25%</F> probability of catastrophic scenarios arising from the unchecked growth of AI technologies.[^42] Anthropic has not publicly responded to the specific accusations of regulatory capture or tractability washing referenced above.
 
 ### Antitrust Investigations
 
@@ -298,7 +318,7 @@ Multiple government agencies are examining Anthropic's relationships with major 
 
 Anthropic describes itself as a "high-trust, low-ego organization" with a remote-first structure where employees work primarily remotely, expected to visit the office roughly 25% of the time if local.[^45]
 
-According to Glassdoor, employees rate Anthropic 4.4 out of 5 stars overall, with 95% recommending the company to a friend.[^45] Glassdoor sub-ratings reportedly include approximately 3.7 for work-life balance, 4.9 for culture and values, and 4.8 for career opportunities, though these figures reflect a snapshot in time and may fluctuate as the review base grows.[^45]
+According to Glassdoor, employees rate Anthropic <F e="anthropic" f="640a5be5">4.4</F> out of 5 stars overall, with <F e="anthropic" f="640a5be5">95%</F> recommending the company to a friend.[^45] Glassdoor sub-ratings reportedly include approximately 3.7 for work-life balance, <F e="anthropic" f="640a5be5">4.9</F> for culture and values, and <F e="anthropic" f="640a5be5">4.8</F> for career opportunities, though these figures reflect a snapshot in time and may fluctuate as the review base grows.[^45]
 
 Salary and benefits details are less comprehensively documented in public sources. Engineer total compensation in the \$300K–\$400K base range and equity matching arrangements have been cited in various forums and anonymized salary databases, but these figures should be treated as approximate and are not independently verified here. Parental leave of 22 weeks, a monthly wellness stipend, and mental health support for dependents have been described in public job postings and employee reviews, though Anthropic has not published a canonical, versioned benefits document that can be cited directly.[^45]
 
@@ -360,3 +380,5 @@ Because Glassdoor ratings are crowd-sourced and updated continuously, all figure
 [^47]: [Dario Amodei: Machines of Loving Grace (Oct 2024)](https://darioamodei.com/machines-of-loving-grace)
 [^48]: [UK Government: The Bletchley Declaration (Nov 2023)](https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration)
 [^49]: [The White House: Voluntary AI Safety Commitments (July 2023)](https://www.whitehouse.gov/briefing-room/statements-releases/2023/07/21/fact-sheet-biden-harris-administration-secures-voluntary-commitments-from-leading-artificial-intelligence-companies-to-manage-the-risks-posed-by-ai/)
+[^50]: [Anthropic: Scaling Monosemanticity — Extracting Interpretable Features from Claude 3 Sonnet (2024)](https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html)
+[^51]: [Anthropic: On the Biology of a Large Language Model — Attribution Graphs for Claude 3.5 Haiku (2025)](https://transformer-circuits.pub/2025/attribution-graphs/biology.html)
