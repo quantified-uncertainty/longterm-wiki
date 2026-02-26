@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, or, count, desc, asc, sql, inArray } from "drizzle-orm";
-import { getDrizzleDb } from "../db.js";
+import { getDrizzleDb, getDb } from "../db.js";
 import { claims, claimSources, claimPageReferences, entities } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
 import {
@@ -22,6 +22,7 @@ import {
   ClaimPropertySchema,
   type ClaimPageReferenceRow,
 } from "../api-types.js";
+import { TRIGRAM_SIMILARITY_THRESHOLD } from "../search-utils.js";
 
 /** Pre-computed schema for single page-reference insertion (omits claimId from URL param). */
 const PageRefInsertBodySchema = ClaimPageReferenceInsertSchema.omit({ claimId: true });
@@ -736,6 +737,60 @@ claimsRoute.get("/network", async (c) => {
   const edges = [...edgeMap.values()].sort((a, b) => b.weight - a.weight);
 
   return c.json({ nodes, edges });
+});
+
+// ---- GET /:id/similar (find similar claims via pg_trgm) ----
+
+claimsRoute.get("/:id/similar", async (c) => {
+  const idStr = c.req.param("id");
+  const id = Number(idStr);
+  if (!Number.isInteger(id) || id <= 0) {
+    return validationError(c, "Claim ID must be a positive integer");
+  }
+
+  const limitParam = c.req.query("limit");
+  const limit = Math.min(Math.max(Number(limitParam) || 5, 1), 20);
+
+  const db = getDrizzleDb();
+
+  // Fetch the target claim's text
+  const targetRows = await db
+    .select({ claimText: claims.claimText })
+    .from(claims)
+    .where(eq(claims.id, id))
+    .limit(1);
+
+  if (targetRows.length === 0) {
+    return notFoundError(c, `Claim not found: ${id}`);
+  }
+
+  const targetText = targetRows[0].claimText;
+
+  // Use raw SQL for the similarity() function (same pattern as pages.ts trigram fallback)
+  const rawDb = getDb();
+  const rows = await rawDb.unsafe(
+    `SELECT
+      id, entity_id, entity_type, claim_text, claim_category, confidence,
+      similarity(claim_text, $1) AS similarity_score
+    FROM claims
+    WHERE id != $2
+      AND similarity(claim_text, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
+    ORDER BY similarity(claim_text, $1) DESC
+    LIMIT $3`,
+    [targetText, id, limit],
+  );
+
+  return c.json({
+    claims: rows.map((r: any) => ({
+      id: Number(r.id),
+      entityId: r.entity_id,
+      entityType: r.entity_type,
+      claimText: r.claim_text,
+      claimCategory: r.claim_category,
+      confidence: r.confidence,
+      similarityScore: parseFloat(r.similarity_score) || 0,
+    })),
+  });
 });
 
 // ---- GET /:id/sources (sources for a specific claim) ----

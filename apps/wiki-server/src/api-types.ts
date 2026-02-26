@@ -901,6 +901,24 @@ export const LinkCitationsClaimsBatchSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Similar Claims (trigram similarity)
+// ---------------------------------------------------------------------------
+
+export interface SimilarClaimItem {
+  id: number;
+  entityId: string;
+  entityType: string;
+  claimText: string;
+  claimCategory: string | null;
+  confidence: string | null;
+  similarityScore: number;
+}
+
+export interface SimilarClaimsResult {
+  claims: SimilarClaimItem[];
+}
+
+// ---------------------------------------------------------------------------
 // Page Links
 // ---------------------------------------------------------------------------
 
