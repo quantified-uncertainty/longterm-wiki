@@ -87,8 +87,9 @@ describe('--scope=content flag', () => {
 
   describe('validate gate --scope=content', () => {
     it('runs only content-relevant checks', () => {
+      // --no-cache ensures gate re-runs even if stamp matches HEAD
       const result = run(
-        'pnpm crux validate gate --scope=content',
+        'pnpm crux validate gate --scope=content --no-cache',
         REPO_ROOT
       );
 

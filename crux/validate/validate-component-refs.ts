@@ -24,6 +24,17 @@ import { CONTENT_DIR, DATA_DIR, loadDatabase as loadDatabaseJson } from '../lib/
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import { ENTITY_LINK_RE } from '../lib/patterns.ts';
 
+/**
+ * Strip fenced code blocks (```...```) from MDX content so validators
+ * don't flag example code as real imports or component references.
+ * Replaces block contents with blank lines to preserve line numbering.
+ */
+function stripFencedCodeBlocks(content: string): string {
+  return content.replace(/^```[^\n]*\n[\s\S]*?^```/gm, (match) => {
+    return '\n'.repeat(match.split('\n').length - 1);
+  });
+}
+
 const log = createLogger();
 const c = log.colors;
 
@@ -238,7 +249,9 @@ export async function runCheck(options: ValidatorOptions = {}): Promise<Validato
 
   for (const file of files) {
     const relPath: string = formatPath(file);
-    const content: string = readFileSync(file, 'utf-8');
+    const rawContent: string = readFileSync(file, 'utf-8');
+    // Strip fenced code blocks to avoid false positives from example code
+    const content: string = stripFencedCodeBlocks(rawContent);
 
     const imports: ParsedImport[] = parseImports(content);
     const unused: UnusedImport[] = findUnusedImports(content, imports);
@@ -326,7 +339,9 @@ async function main(): Promise<void> {
 
   for (const file of files) {
     const relPath: string = formatPath(file);
-    const content: string = readFileSync(file, 'utf-8');
+    const rawContent: string = readFileSync(file, 'utf-8');
+    // Strip fenced code blocks to avoid false positives from example code
+    const content: string = stripFencedCodeBlocks(rawContent);
 
     // Check imports
     const imports: ParsedImport[] = parseImports(content);

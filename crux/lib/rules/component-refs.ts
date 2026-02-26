@@ -15,6 +15,18 @@ import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } 
 import { loadDatabase, loadPathRegistry, loadIdRegistry as loadIdReg, DATA_DIR_ABS, type Entity } from '../content-types.ts';
 import { NUMERIC_ID_RE, ENTITY_LINK_RE } from '../patterns.ts';
 
+/**
+ * Strip fenced code blocks (```...```) from MDX content so validators
+ * don't flag example code as real imports or component references.
+ * Replaces block contents with blank lines to preserve line numbering.
+ * NOTE: Duplicated in crux/validate/validate-component-refs.ts (independent validator).
+ */
+function stripFencedCodeBlocks(content: string): string {
+  return content.replace(/^```[^\n]*\n[\s\S]*?^```/gm, (match) => {
+    return '\n'.repeat(match.split('\n').length - 1);
+  });
+}
+
 const DATA_DIR = DATA_DIR_ABS;
 
 // Cache for loaded data
@@ -169,8 +181,9 @@ export const componentRefsRule = createRule({
 
   check(content: ContentFile, engine: ValidationEngine): Issue[] {
     const issues: Issue[] = [];
-    const raw = content.raw;
-    const body = content.body;
+    // Strip fenced code blocks to avoid false positives from example code
+    const raw = stripFencedCodeBlocks(content.raw);
+    const body = stripFencedCodeBlocks(content.body);
 
     // Skip internal documentation (except for unused imports check)
     const isInternalDoc = content.relativePath.includes('/internal/');
