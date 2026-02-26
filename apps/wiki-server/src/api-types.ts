@@ -888,6 +888,18 @@ export const LinkCitationsClaimsBatchSchema = z.object({
   })).min(1).max(200),
 });
 
+// -- Claims: Backward propagation (claim verdict → citation_quotes) -----------
+
+export const PropagateFromClaimsSchema = z.object({
+  pageId: z.string().min(1).max(300),
+});
+export type PropagateFromClaims = z.infer<typeof PropagateFromClaimsSchema>;
+
+export interface PropagateFromClaimsResult {
+  propagated: number;
+  skipped: number;
+}
+
 // ---------------------------------------------------------------------------
 // Similar Claims (trigram similarity)
 // ---------------------------------------------------------------------------
