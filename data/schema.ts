@@ -716,6 +716,17 @@ export const Entity = z.object({
     'governance',   // Relevant for policy, regulation, international coordination
     'community',    // Relevant for field-building, funding, careers, orgs
   ])).optional(),
+  // Organization sub-type (only used when type is 'organization' or lab-* aliases)
+  orgType: z.enum([
+    'frontier-lab',   // OpenAI, Anthropic, DeepMind
+    'safety-org',     // MIRI, ARC, Redwood
+    'academic',       // FHI, CHAI, CAIS
+    'government',     // UK AISI, US AISI
+    'funder',         // Open Phil, SFF
+    'startup',        // Early-stage AI companies
+    'generic',        // General organizations
+    'other',          // Catch-all for unclassified orgs
+  ]).optional(),
   // InfoBox fields
   severity: z.enum([
     'low', 'medium', 'medium-high', 'high', 'critical', 'catastrophic',
