@@ -131,8 +131,14 @@ export default async function EntityClaimsPage({ params }: PageProps) {
         </div>
         <p className="text-muted-foreground text-sm">
           {claims.length === 0
-            ? "No claims extracted for this entity yet."
-            : `${claims.length} claims extracted from this entity's wiki page.`}
+            ? "No claims found for this entity yet."
+            : (() => {
+                const primary = claims.filter((c) => c.entityId === entityId).length;
+                const mentioned = claims.length - primary;
+                if (mentioned === 0) return `${claims.length} claims extracted from this entity's wiki page.`;
+                if (primary === 0) return `${mentioned} claims mentioning this entity from other pages.`;
+                return `${primary} claims from this entity's page, ${mentioned} mentioning it from other pages.`;
+              })()}
         </p>
       </div>
 
