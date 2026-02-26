@@ -859,6 +859,8 @@ export interface ClaimPageReferenceRow {
   pageId: string;
   footnote: number | null;
   section: string | null;
+  quoteText: string | null;
+  referenceId: string | null;
   createdAt: string;
 }
 
@@ -867,12 +869,41 @@ export const ClaimPageReferenceInsertSchema = z.object({
   pageId: PageIdSchema,
   footnote: z.number().int().min(0).nullable().optional(),
   section: z.string().max(1000).nullable().optional(),
+  quoteText: z.string().max(10000).nullable().optional(),
+  referenceId: z.string().max(500).nullable().optional(),
 });
 export type ClaimPageReferenceInsert = z.infer<typeof ClaimPageReferenceInsertSchema>;
 
 export const ClaimPageReferenceBatchSchema = z.object({
   items: z.array(ClaimPageReferenceInsertSchema.omit({ claimId: true })).min(1).max(200),
 });
+
+// -- Page Citations types (non-claim footnotes) -------------------------------
+
+export const PageCitationInsertSchema = z.object({
+  referenceId: z.string().min(1).max(500),
+  pageId: PageIdSchema,
+  title: z.string().max(2000).optional(),
+  url: z.string().max(5000).optional(),
+  note: z.string().max(10000).optional(),
+  resourceId: z.string().max(200).optional(),
+});
+export type PageCitationInsert = z.infer<typeof PageCitationInsertSchema>;
+
+export const PageCitationBatchSchema = z.object({
+  items: z.array(PageCitationInsertSchema).min(1).max(200),
+});
+
+export interface PageCitationRow {
+  id: number;
+  referenceId: string;
+  pageId: string;
+  title: string | null;
+  url: string | null;
+  note: string | null;
+  resourceId: string | null;
+  createdAt: string;
+}
 
 // -- Claims: Citation linking types ------------------------------------------
 
