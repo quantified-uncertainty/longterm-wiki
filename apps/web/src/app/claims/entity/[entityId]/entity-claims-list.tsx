@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "@lib/utils";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
-import type { ClaimRow } from "@wiki-server/api-types";
+import type { ClaimRow } from "@wiki-server/api-response-types";
 import { VerdictBadge } from "../../components/verdict-badge";
 import { CategoryBadge } from "../../components/category-badge";
 

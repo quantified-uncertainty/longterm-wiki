@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
 import { getEntityById, getEntityHref } from "@data";
-import type { ClaimRow, SimilarClaimsResult } from "@wiki-server/api-types";
+import type { ClaimRow, SimilarClaimsResult } from "@wiki-server/api-response-types";
 import { buildEntityNameMap } from "../../components/claims-data";
 import { CategoryBadge } from "../../components/category-badge";
 import { ConfidenceBadge } from "../../components/confidence-badge";

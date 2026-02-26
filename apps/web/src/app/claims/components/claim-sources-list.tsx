@@ -5,7 +5,7 @@
  * Falls back to URL matching via normalizeUrl() when only a URL is known.
  */
 import Link from "next/link";
-import type { ClaimSourceRow } from "@wiki-server/api-types";
+import type { ClaimSourceRow } from "@wiki-server/api-response-types";
 import { getResourceById, getAllResources, getResourceCredibility } from "@data";
 import type { Resource } from "@data";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";

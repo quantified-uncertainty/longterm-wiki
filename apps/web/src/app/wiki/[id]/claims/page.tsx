@@ -8,7 +8,7 @@ import {
 } from "@/lib/mdx";
 import { getPageById } from "@/data";
 import { fetchFromWikiServer } from "@lib/wiki-server";
-import type { ClaimRow, GetClaimsResult } from "@wiki-server/api-types";
+import type { ClaimRow, GetClaimsResult } from "@wiki-server/api-response-types";
 import { StatCard } from "@/app/claims/components/stat-card";
 import { DistributionBar } from "@/app/claims/components/distribution-bar";
 import { ClaimsTable } from "@/app/claims/components/claims-table";

@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import type {
   AgentSessionRow as CanonicalAgentSessionRow,
   SessionRow,
-} from "@wiki-server/api-types";
+} from "@wiki-server/api-response-types";
 
 export const metadata: Metadata = {
   title: "Agent Sessions | Longterm Wiki Internal",

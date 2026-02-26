@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import type { ClaimRow } from "@wiki-server/api-types";
+import type { ClaimRow } from "@wiki-server/api-response-types";
 import { ClaimsFilterBar } from "../components/claims-filters";
 import { ClaimsTable } from "../components/claims-table";
 

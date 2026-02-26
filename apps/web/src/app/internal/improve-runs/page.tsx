@@ -4,7 +4,7 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { RunsTable } from "./runs-table";
 import type { Metadata } from "next";
-import type { ArtifactRow } from "@wiki-server/api-types";
+import type { ArtifactRow } from "@wiki-server/api-response-types";
 
 export const metadata: Metadata = {
   title: "Improve Runs | Longterm Wiki Internal",
@@ -64,7 +64,7 @@ async function loadRunsFromApi() {
         hasCitationAudit: r.citationAudit != null,
         hasSectionDiffs:
           Array.isArray(r.sectionDiffs) && r.sectionDiffs.length > 0,
-        costBreakdown: r.costBreakdown,
+        costBreakdown: r.costBreakdown as Record<string, number> | null,
       })
     ),
   };

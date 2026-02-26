@@ -1,12 +1,14 @@
 import { fetchFromWikiServer } from "./wiki-server";
 import type {
   CitationHealthResult,
+} from "@wiki-server/api-response-types";
+import type {
   AccuracyVerdict,
 } from "@wiki-server/api-types";
 import { ACCURACY_VERDICTS } from "@wiki-server/api-types";
 
 // Re-export the server type for consumers
-export type { CitationHealthResult } from "@wiki-server/api-types";
+export type { CitationHealthResult } from "@wiki-server/api-response-types";
 
 /**
  * Citation quote data from the wiki-server API.

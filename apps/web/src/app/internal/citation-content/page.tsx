@@ -6,7 +6,7 @@ import type {
   CitationContentListEntry,
   CitationContentListResult,
   CitationContentStatsResult,
-} from "@wiki-server/api-types";
+} from "@wiki-server/api-response-types";
 
 export const metadata: Metadata = {
   title: "Citation Content | Longterm Wiki Internal",
