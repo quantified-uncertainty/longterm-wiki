@@ -1,6 +1,12 @@
 import React from "react";
 import Link from "next/link";
-import { getEntityHref, getEntityById } from "@data";
+
+// Client-safe entity URL builder — avoids server-only fs imports from @data.
+// getEntityHref in @data ignores _type anyway, so the fallback `/wiki/${id}`
+// is equivalent for numeric IDs (E35) and slug IDs alike.
+function buildEntityHref(id: string): string {
+  return `/wiki/${id}`;
+}
 
 /**
  * Render basic inline markdown: **bold**, *italic*, `code`, and
@@ -45,8 +51,7 @@ export function renderInlineMarkdown(text: string): React.ReactNode {
       // <EntityLink id="...">text</EntityLink>
       const entityId = match[5];
       const displayText = match[6];
-      const entity = getEntityById(entityId);
-      const href = getEntityHref(entityId, entity?.type);
+      const href = buildEntityHref(entityId);
       parts.push(
         <Link
           key={key++}
