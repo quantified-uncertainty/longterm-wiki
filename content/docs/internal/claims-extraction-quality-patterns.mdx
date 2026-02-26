@@ -124,9 +124,11 @@ Two-stage approach:
 
 **Proposed fix:**
 
+Pre-extraction cleanup: strip or resolve MDX before passing to the extraction LLM.
+
 Before extraction, cleanMdxForExtraction() should:
-  - Resolve EntityLink tags → plain text (e.g., "Anthropic")
-  - Resolve F tags → actual fact values (lookup from facts YAML)
+  - Resolve EntityLink tags to plain text (e.g., "Anthropic")
+  - Resolve F tags to actual fact values (lookup from facts YAML)
   - Strip MDX comments
   - Strip other JSX components
 

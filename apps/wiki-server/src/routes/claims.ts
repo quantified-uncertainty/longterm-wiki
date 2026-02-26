@@ -787,6 +787,101 @@ claimsRoute.post("/:id/sources", async (c) => {
   return c.json(formatClaimSource(firstOrThrow(rows, "claim_source insert")), 201);
 });
 
+// ---- PATCH /batch-update-related-entities (bulk update relatedEntities) ----
+// Accepts an array of {id, relatedEntities} pairs and updates them all.
+// IMPORTANT: Must be defined before PATCH /:id to avoid wildcard matching.
+
+const BatchUpdateRelatedEntitiesSchema = z.object({
+  items: z.array(z.object({
+    id: z.number().int().positive(),
+    relatedEntities: z.array(z.string().max(300)).nullable(),
+  })).min(1).max(500),
+});
+
+claimsRoute.patch("/batch-update-related-entities", async (c) => {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = BatchUpdateRelatedEntitiesSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const db = getDrizzleDb();
+  const now = new Date();
+  let updated = 0;
+
+  for (const item of parsed.data.items) {
+    const result = await db
+      .update(claims)
+      .set({ relatedEntities: item.relatedEntities, updatedAt: now })
+      .where(eq(claims.id, item.id))
+      .returning({ id: claims.id });
+    if (result.length > 0) updated++;
+  }
+
+  return c.json({ updated, total: parsed.data.items.length });
+});
+
+// ---- PATCH /:id (partial update) ----
+// Currently supports updating relatedEntities only.
+
+const PatchClaimSchema = z.object({
+  relatedEntities: z.array(z.string().max(300)).nullable().optional(),
+});
+
+claimsRoute.patch("/:id", async (c) => {
+  const idStr = c.req.param("id");
+  const id = Number(idStr);
+  if (!Number.isInteger(id) || id <= 0) {
+    return validationError(c, "Claim ID must be a positive integer");
+  }
+
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = PatchClaimSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const db = getDrizzleDb();
+
+  // Verify claim exists
+  const existing = await db
+    .select({ id: claims.id })
+    .from(claims)
+    .where(eq(claims.id, id))
+    .limit(1);
+
+  if (existing.length === 0) {
+    return notFoundError(c, `Claim not found: ${id}`);
+  }
+
+  // Build update set — only include fields that were provided
+  const updates: Record<string, unknown> = {};
+  if (parsed.data.relatedEntities !== undefined) {
+    updates.relatedEntities = parsed.data.relatedEntities;
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return validationError(c, "No fields to update");
+  }
+
+  updates.updatedAt = new Date();
+
+  const rows = await db
+    .update(claims)
+    .set(updates)
+    .where(eq(claims.id, id))
+    .returning();
+
+  const sourcesRows = await db
+    .select()
+    .from(claimSources)
+    .where(eq(claimSources.claimId, id))
+    .orderBy(desc(claimSources.isPrimary), asc(claimSources.addedAt));
+
+  const row = firstOrThrow(rows, "claim update");
+  return c.json(formatClaim(row, sourcesRows));
+});
+
 // ---- GET /:id (get by ID) ----
 
 claimsRoute.get("/:id", async (c) => {
