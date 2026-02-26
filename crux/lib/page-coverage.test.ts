@@ -555,8 +555,8 @@ describe('computePageCoverage — actuals passthrough', () => {
   it('output does NOT contain backlinkCount', () => {
     const result = computePageCoverage(makeInput());
     // PageCoverage type has no backlinkCount field — verify it's absent at runtime
-    expect((result as Record<string, unknown>).backlinkCount).toBeUndefined();
-    expect((result.actuals as Record<string, unknown>).backlinkCount).toBeUndefined();
+    expect((result as unknown as Record<string, unknown>).backlinkCount).toBeUndefined();
+    expect((result.actuals as unknown as Record<string, unknown>).backlinkCount).toBeUndefined();
     expect((result.items as Record<string, unknown>).backlinkCount).toBeUndefined();
   });
 });
