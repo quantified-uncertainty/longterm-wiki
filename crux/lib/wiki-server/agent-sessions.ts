@@ -3,22 +3,34 @@
  *
  * Stores and retrieves agent checklist state in PostgreSQL,
  * replacing the previous pattern of committing .claude/wip-checklist.md to git.
- * Response types are imported from api-types.ts (single source of truth).
+ * Response types are inferred from the Hono route via InferResponseType<>.
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
+import type { hc, InferResponseType } from 'hono/client';
+import type { AgentSessionsRoute } from '../../../apps/wiki-server/src/routes/agent-sessions.ts';
 import type {
   CreateAgentSession,
   UpdateAgentSession,
-  AgentSessionRow,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types — response (re-exported from canonical api-types.ts)
+// Types — response (inferred from Hono RPC route)
 // ---------------------------------------------------------------------------
 
-/** Backward-compatible alias for AgentSessionRow. */
-export type AgentSessionEntry = AgentSessionRow;
+type RpcClient = ReturnType<typeof hc<AgentSessionsRoute>>;
+
+/** Shape returned by GET /by-branch/:branch (200 success). */
+export type AgentSessionEntry = InferResponseType<
+  RpcClient['by-branch'][':branch']['$get'],
+  200
+>;
+
+/** Shape returned by GET / (200 success). */
+export type AgentSessionListResponse = InferResponseType<
+  RpcClient['index']['$get'],
+  200
+>;
 
 // ---------------------------------------------------------------------------
 // API functions
@@ -62,8 +74,8 @@ export async function updateAgentSession(
  */
 export async function listAgentSessions(
   limit = 50,
-): Promise<ApiResult<{ sessions: AgentSessionEntry[] }>> {
-  return apiRequest<{ sessions: AgentSessionEntry[] }>(
+): Promise<ApiResult<AgentSessionListResponse>> {
+  return apiRequest<AgentSessionListResponse>(
     'GET',
     `/api/agent-sessions?limit=${limit}`,
   );

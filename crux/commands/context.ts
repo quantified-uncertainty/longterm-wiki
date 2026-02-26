@@ -392,7 +392,7 @@ async function forPage(
   }
 
   if (citationsResult.ok) {
-    bundle += citationHealthBlock(citationsResult.data.quotes, citationsResult.data.total);
+    bundle += citationHealthBlock(citationsResult.data.quotes, citationsResult.data.quotes.length);
   }
 
   const print = options.print as boolean;
@@ -407,7 +407,7 @@ async function forPage(
     `  Page: ${p.title} (${pageId})`,
     relatedResult.ok ? `  Related pages: ${relatedResult.data.related.length}` : '',
     backlinksResult.ok ? `  Backlinks: ${backlinksResult.data.backlinks.length}` : '',
-    citationsResult.ok ? `  Citations: ${citationsResult.data.total} total` : '',
+    citationsResult.ok ? `  Citations: ${citationsResult.data.quotes.length} total` : '',
   ]
     .filter(Boolean)
     .join('\n');

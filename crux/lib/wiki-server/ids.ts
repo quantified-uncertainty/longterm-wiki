@@ -8,30 +8,24 @@
  * The server guarantees uniqueness via PostgreSQL sequences.
  */
 
+import type { hc, InferResponseType } from 'hono/client';
+import type { IdsRoute } from '../../../apps/wiki-server/src/routes/ids.ts';
 import { apiRequest, getServerUrl, type ApiResult } from './client.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types (inferred from Hono RPC route)
 // ---------------------------------------------------------------------------
 
-export interface AllocatedId {
-  numericId: string;
-  slug: string;
-  description: string | null;
-  created: boolean;
-  createdAt: string;
-}
+type RpcClient = ReturnType<typeof hc<IdsRoute>>;
 
-export interface AllocateBatchResult {
-  results: AllocatedId[];
-}
+export type AllocatedId = InferResponseType<RpcClient['allocate']['$post'], 200>;
 
-export interface IdListResult {
-  ids: AllocatedId[];
-  total: number;
-  limit: number;
-  offset: number;
-}
+export type AllocateBatchResult = InferResponseType<
+  RpcClient['allocate-batch']['$post'],
+  200
+>;
+
+export type IdListResult = InferResponseType<RpcClient['index']['$get'], 200>;
 
 // ---------------------------------------------------------------------------
 // Constants

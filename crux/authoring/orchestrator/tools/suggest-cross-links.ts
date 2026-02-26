@@ -62,11 +62,12 @@ export const tool: ToolRegistration = {
 
       if (backlinksResult.ok) {
         for (const bl of backlinksResult.data.backlinks) {
-          if (bl.id === ctx.page.id || existingRelated.has(bl.id)) continue;
-          const existing = candidates.get(bl.id) || { score: 0, reasons: [], title: bl.title, type: bl.type };
-          existing.score += bl.weight || 1;
+          const blId = String(bl.id);
+          if (blId === ctx.page.id || existingRelated.has(blId)) continue;
+          const existing = candidates.get(blId) || { score: 0, reasons: [], title: bl.title as string, type: bl.type as string };
+          existing.score += (bl.weight as number) || 1;
           existing.reasons.push(`Backlink (${bl.linkType}${bl.relationship ? `: ${bl.relationship}` : ''})`);
-          candidates.set(bl.id, existing);
+          candidates.set(blId, existing);
         }
       }
 

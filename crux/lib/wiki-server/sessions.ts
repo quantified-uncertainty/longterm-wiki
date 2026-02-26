@@ -2,21 +2,14 @@
  * Sessions API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
- * Response types are imported from api-types.ts (single source of truth).
+ * Response types are inferred from the Hono RPC route type (single source of truth).
  */
 
 import type { z } from 'zod';
+import type { hc, InferResponseType } from 'hono/client';
+import type { SessionsRoute } from '../../../apps/wiki-server/src/routes/sessions.ts';
 import { apiRequest, type ApiResult } from './client.ts';
-import type {
-  CreateSessionSchema,
-  CreateSessionResult,
-  SessionBatchResult,
-  SessionRow,
-  SessionListResult,
-  SessionByPageResult,
-  SessionStatsResult,
-  SessionPageChangesResult,
-} from '../../../apps/wiki-server/src/api-types.ts';
+import type { CreateSessionSchema } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -26,17 +19,20 @@ import type {
 export type SessionApiEntry = z.input<typeof CreateSessionSchema>;
 
 // ---------------------------------------------------------------------------
-// Types — response (re-exported from canonical api-types.ts)
+// Types — response (inferred from Hono RPC route)
 // ---------------------------------------------------------------------------
 
-export type {
-  CreateSessionResult,
-  SessionBatchResult,
-  SessionListResult,
-  SessionByPageResult,
-  SessionStatsResult,
-  SessionPageChangesResult,
-};
+type RpcClient = ReturnType<typeof hc<SessionsRoute>>;
+
+export type CreateSessionResult = InferResponseType<RpcClient['index']['$post'], 201>;
+export type SessionBatchResult = InferResponseType<RpcClient['batch']['$post'], 201>;
+export type SessionListResult = InferResponseType<RpcClient['index']['$get'], 200>;
+export type SessionByPageResult = InferResponseType<RpcClient['by-page']['$get'], 200>;
+export type SessionStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
+export type SessionPageChangesResult = InferResponseType<RpcClient['page-changes']['$get'], 200>;
+
+/** SessionRow — extracted from the list result (sessions array element). */
+export type SessionRow = SessionListResult['sessions'][number];
 
 /** Backward-compatible alias for SessionRow. */
 export type SessionEntry = SessionRow;
