@@ -479,7 +479,7 @@ export default async function SourcePage({ params }: PageProps) {
               {contentData.fullTextPreview.slice(0, 3000)}
               {contentData.fullTextPreview.length > 3000 && (
                 <span className="text-muted-foreground/50">
-                  {"\n\n"}... (truncated, {Math.round(contentData.contentLength! / 1024)} KB total)
+                  {"\n\n"}... (truncated{contentData.contentLength != null ? `, ${Math.round(contentData.contentLength / 1024)} KB total` : ""})
                 </span>
               )}
             </pre>
