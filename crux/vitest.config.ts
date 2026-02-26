@@ -14,6 +14,7 @@ export default defineConfig({
       'facts/**/*.test.ts',
       'entity/**/*.test.ts',
       'citations/**/*.test.ts',
+      'claims/**/*.test.ts',
       'validate/**/*.test.ts',
       'wiki-server/**/*.test.ts',
       'evals/**/*.test.ts',

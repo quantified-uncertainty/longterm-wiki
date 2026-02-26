@@ -20,6 +20,8 @@ export interface Resource {
   published_date?: string;
   abstract?: string;
   summary?: string;
+  review?: string;
+  key_points?: string[];
   publication_id?: string;
   tags?: string[];
   cited_by?: string[];
