@@ -11,7 +11,7 @@
  *   claimCategory  = "factual" | "opinion" | "analytical" | "speculative" | "relational"
  *   claimText      = the atomic claim
  *   section        = section name where claim appears (also stored in legacy 'value')
- *   footnoteRefs   = footnote refs as comma-separated string (also stored in legacy 'unit')
+ *   footnoteRefs   = footnote refs as comma-separated string (legacy — also written to claim_page_references table)
  *   confidence     = "unverified" (initial) | "verified" | "unsourced"
  *   relatedEntities = JSON array of entity IDs mentioned in the claim
  *
@@ -34,6 +34,7 @@ import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
   insertClaimBatch,
   clearClaimsForEntity,
+  addClaimPageReferencesBatch,
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
 import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../lib/claim-utils.ts';
@@ -124,6 +125,7 @@ interface ExtractedClaim {
   valueNumeric?: number;                  // Phase 2: central numeric value
   valueLow?: number;                      // Phase 2: lower bound
   valueHigh?: number;                     // Phase 2: upper bound
+  /** @deprecated Routed to sources[] on insert. Kept in extraction output for backward compat. */
   sourceQuote?: string;                   // Verbatim excerpt from wiki text supporting the claim
   footnoteRefs: string[];
   relatedEntities?: string[];
@@ -543,8 +545,15 @@ async function main() {
       // Legacy fields (kept for backward compat)
       value: claim.section,
       unit: claim.footnoteRefs.length > 0 ? claim.footnoteRefs.join(',') : null,
-      confidence: 'unverified',
+      confidence: 'unverified', // @deprecated Use claimVerdict instead
+      /** @deprecated Use sources[] instead. Kept for backward compat (double-write). */
       sourceQuote: claim.sourceQuote ?? null,
+      // Route sourceQuote to claim_sources table (primary location)
+      sources: claim.sourceQuote
+        ? [{ sourceQuote: claim.sourceQuote }]
+        : undefined,
+      // Extraction doesn't verify — leave claimVerdict null (will be set by verify step)
+      claimVerdict: null,
       // Enhanced fields (migration 0028)
       claimCategory: claimTypeToCategory(claim.claimType),
       relatedEntities: claim.relatedEntities && claim.relatedEntities.length > 0
@@ -572,6 +581,20 @@ async function main() {
     const result = await insertClaimBatch(items);
     if (result.ok) {
       inserted += result.data.inserted;
+
+      // Create claim_page_references for claims with footnoteRefs
+      for (let j = 0; j < batch.length; j++) {
+        const claim = batch[j];
+        const claimId = result.data.results[j]?.id;
+        if (!claimId || claim.footnoteRefs.length === 0) continue;
+
+        const refs = claim.footnoteRefs.map(fn => ({
+          pageId,
+          footnote: parseInt(fn, 10) || null,
+          section: claim.section ?? null,
+        }));
+        await addClaimPageReferencesBatch(claimId, refs);
+      }
     } else {
       failed += batch.length;
     }

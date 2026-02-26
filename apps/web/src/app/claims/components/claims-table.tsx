@@ -66,7 +66,9 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
         />
       )}
 
-      {claim.sourceQuote && (
+      {/* Legacy sourceQuote — only show when no claim_sources entries exist */}
+      {/* @deprecated Prefer claim.sources[] (from claim_sources table) */}
+      {claim.sourceQuote && (!claim.sources || claim.sources.length === 0) && (
         <div>
           <span className="font-medium text-xs text-muted-foreground">
             Source Quote:
@@ -427,10 +429,53 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
     size: 100,
   },
   {
-    accessorKey: "sourceQuote",
+    id: "structured",
+    accessorFn: (row) => row.property,
+    header: ({ column }) => (
+      <SortableHeader column={column}>Structured</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const c = row.original;
+      if (!c.property) return <span className="text-muted-foreground/40 text-xs">&mdash;</span>;
+      const parts: string[] = [c.property];
+      if (c.structuredValue) {
+        parts.push(`= ${c.structuredValue}`);
+      }
+      if (c.valueUnit) {
+        parts.push(`[${c.valueUnit}]`);
+      }
+      return (
+        <span
+          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono bg-violet-100 text-violet-700 max-w-[180px] truncate"
+          title={`${c.property}${c.structuredValue ? ` = ${c.structuredValue}` : ""}${c.valueUnit ? ` [${c.valueUnit}]` : ""}${c.valueDate ? ` @ ${c.valueDate}` : ""}`}
+        >
+          {parts.join(" ")}
+        </span>
+      );
+    },
+    size: 160,
+  },
+  {
+    id: "sourceQuote",
+    /** @deprecated Prefer sources[] from claim_sources table */
+    accessorFn: (row) => {
+      // Prefer quote from claim_sources, fall back to legacy sourceQuote
+      if (row.sources && row.sources.length > 0) {
+        const primary = row.sources.find(s => s.isPrimary);
+        return (primary || row.sources[0]).sourceQuote || row.sourceQuote || null;
+      }
+      return row.sourceQuote || null;
+    },
     header: "Source Quote",
     cell: ({ row }) => {
-      const quote = row.original.sourceQuote;
+      // Prefer quote from claim_sources, fall back to legacy sourceQuote
+      let quote: string | null = null;
+      if (row.original.sources && row.original.sources.length > 0) {
+        const primary = row.original.sources.find(s => s.isPrimary);
+        quote = (primary || row.original.sources[0]).sourceQuote || row.original.sourceQuote || null;
+      } else {
+        quote = row.original.sourceQuote || null;
+      }
       if (!quote) return <span className="text-muted-foreground">-</span>;
       return (
         <span

@@ -44,7 +44,8 @@ const PaginationQuery = z.object({
   claimCategory: z.string().max(100).optional(),
   claimMode: z.string().max(50).optional(),
   search: z.string().max(500).optional(),
-  confidence: z.string().max(50).optional(),
+  confidence: z.string().max(50).optional(), // @deprecated Use claimVerdict filter instead. Kept for backward compatibility.
+  claimVerdict: z.string().max(50).optional(),
   entityId: z.string().max(200).optional(),
   attributedTo: z.string().max(300).optional(),
   measure: z.string().max(200).optional(),
@@ -54,7 +55,7 @@ const PaginationQuery = z.object({
   subjectEntity: z.string().max(300).optional(),
   property: z.string().max(200).optional(),
   includeSources: z.coerce.boolean().optional(),
-  sort: z.enum(["newest", "entity", "confidence", "as_of"]).optional(),
+  sort: z.enum(["newest", "entity", "confidence", "as_of", "verdict"]).optional(),
 });
 
 const DeleteByEntitySchema = ClearClaimsSchema;
@@ -69,18 +70,18 @@ function claimValues(d: ClaimInput) {
     entityType: d.entityType,
     claimType: d.claimType,
     claimText: d.claimText,
-    // Legacy fields (kept for backward compat)
+    // @deprecated — legacy text fields; use valueNumeric/valueLow/valueHigh + measure instead
     value: d.value ?? null,
     unit: d.unit ?? null,
-    confidence: d.confidence ?? null,
+    confidence: d.confidence ?? null, // @deprecated Use claimVerdict instead. Kept for backward compatibility.
     sourceQuote: d.sourceQuote ?? null,
     // Enhanced fields (migration 0028)
     claimCategory: d.claimCategory ?? null,
     relatedEntities: d.relatedEntities ?? null,
     factId: d.factId ?? null,
     resourceIds: d.resourceIds ?? null,
-    section: d.section ?? d.value ?? null,
-    footnoteRefs: d.footnoteRefs ?? d.unit ?? null,
+    section: d.section ?? null,
+    footnoteRefs: d.footnoteRefs ?? null,
     // Phase 2 fields (migration 0029)
     claimMode: d.claimMode ?? "endorsed",
     attributedTo: d.attributedTo ?? null,
@@ -134,6 +135,7 @@ function formatClaim(
     entityType: r.entityType,
     claimType: r.claimType,
     claimText: r.claimText,
+    // @deprecated — legacy text fields; use valueNumeric/valueLow/valueHigh + measure instead
     value: r.value,
     unit: r.unit,
     confidence: r.confidence,
@@ -559,7 +561,7 @@ claimsRoute.get("/all", async (c) => {
 
   const {
     limit, offset, entityType, claimType, claimCategory, claimMode,
-    search, confidence, entityId, attributedTo, measure,
+    search, confidence, claimVerdict, entityId, attributedTo, measure,
     multiEntity, hasNumericValue, hasStructuredFields,
     subjectEntity, property,
     includeSources, sort,
@@ -572,7 +574,8 @@ claimsRoute.get("/all", async (c) => {
   if (claimCategory) conditions.push(eq(claims.claimCategory, claimCategory));
   if (claimMode) conditions.push(eq(claims.claimMode, claimMode));
   if (search) conditions.push(sql`${claims.claimText} ILIKE ${"%" + search + "%"}`);
-  if (confidence) conditions.push(eq(claims.confidence, confidence));
+  if (confidence) conditions.push(eq(claims.confidence, confidence)); // @deprecated Use claimVerdict filter instead
+  if (claimVerdict) conditions.push(eq(claims.claimVerdict, claimVerdict));
   if (entityId) conditions.push(eq(claims.entityId, entityId));
   if (attributedTo) conditions.push(eq(claims.attributedTo, attributedTo));
   if (measure) conditions.push(eq(claims.measure, measure));
@@ -600,7 +603,8 @@ claimsRoute.get("/all", async (c) => {
   const orderBy =
     sort === "newest" ? desc(claims.id)
     : sort === "entity" ? asc(claims.entityId)
-    : sort === "confidence" ? asc(claims.confidence)
+    : sort === "confidence" ? asc(claims.confidence) // @deprecated Use sort=verdict instead
+    : sort === "verdict" ? asc(claims.claimVerdict)
     : sort === "as_of" ? desc(claims.asOf)
     : asc(claims.id);
 

@@ -153,7 +153,7 @@ function RelatedEntityBadges({ entities }: { entities: string[] | null }) {
   );
 }
 
-/** Parse the comma-separated footnote number string from claim.unit */
+/** Parse a comma-separated footnote number string (from claim.footnoteRefs). */
 function parseFootnoteNums(unit: string | null): number[] {
   if (!unit) return [];
   return unit.split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
@@ -214,7 +214,7 @@ function getClaimFootnoteRefs(claim: ClaimRow): string | null {
 function buildClaimsData(claims: ClaimRow[], fnIndex?: FootnoteIndexEntry) {
   const byConfidence: Record<string, number> = {};
   for (const c of claims) {
-    const key = c.confidence ?? "unverified";
+    const key = c.claimVerdict ?? c.confidence ?? "unverified";
     byConfidence[key] = (byConfidence[key] ?? 0) + 1;
   }
 
@@ -263,42 +263,24 @@ function buildClaimsData(claims: ClaimRow[], fnIndex?: FootnoteIndexEntry) {
     c.relatedEntities && c.relatedEntities.length > 0
   ).length;
 
-  const byVerdict: Record<string, number> = {};
-  for (const c of claims) {
-    const v = c.claimVerdict ?? "unverified";
-    byVerdict[v] = (byVerdict[v] ?? 0) + 1;
-  }
-
-  return { byConfidence, byCategory, byVerdict, sections, refMap, uniqueSources, multiEntityCount };
+  return { byConfidence, byCategory, sections, refMap, uniqueSources, multiEntityCount };
 }
 
 function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: FootnoteIndexEntry }) {
-  const { byConfidence, byCategory, byVerdict, sections, refMap, multiEntityCount } = buildClaimsData(claims, fnIndex);
+  const { byConfidence, byCategory, sections, refMap, multiEntityCount } = buildClaimsData(claims, fnIndex);
 
   return (
     <div>
-      {/* Summary bar: confidence distribution */}
+      {/* Verdict/confidence distribution (prefers claimVerdict, falls back to confidence) */}
       <div className="flex gap-3 mb-3 flex-wrap">
-        {Object.entries(byConfidence).map(([conf, cnt]) => (
-          <div key={conf} className="flex items-center gap-1">
-            <ConfidenceBadge confidence={conf} />
+        {Object.entries(byConfidence).map(([v, cnt]) => (
+          <div key={v} className="flex items-center gap-1">
+            <VerdictBadgeInline verdict={v} />
             <span className="text-xs text-gray-600">{cnt}</span>
           </div>
         ))}
         <span className="text-xs text-gray-500 ml-auto">{claims.length} total claims</span>
       </div>
-
-      {/* Verdict distribution */}
-      {Object.keys(byVerdict).some(v => v !== "unverified") && (
-        <div className="flex gap-3 mb-3 flex-wrap">
-          {Object.entries(byVerdict).map(([v, cnt]) => (
-            <div key={v} className="flex items-center gap-1">
-              <VerdictBadgeInline verdict={v} />
-              <span className="text-xs text-gray-600">{cnt}</span>
-            </div>
-          ))}
-        </div>
-      )}
 
       {/* Category distribution bar */}
       {Object.keys(byCategory).length > 1 && (
@@ -324,7 +306,7 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
           <div className="flex flex-wrap gap-2">
             {sections.map(section => {
               const sectionClaims = claims.filter(c => getClaimSection(c) === section);
-              const verifiedCount = sectionClaims.filter(c => c.confidence === "verified").length;
+              const verifiedCount = sectionClaims.filter(c => (c.claimVerdict ?? c.confidence) === "verified").length;
               const pct = sectionClaims.length > 0 ? Math.round((verifiedCount / sectionClaims.length) * 100) : 0;
               const heatColor = pct >= 70 ? "bg-green-100 border-green-300"
                 : pct >= 40 ? "bg-yellow-100 border-yellow-300"
@@ -346,7 +328,6 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
             <th className="p-2 w-[16%]">Source Quote</th>
             <th className="p-2">Type</th>
             <th className="p-2">Category</th>
-            <th className="p-2">Confidence</th>
             <th className="p-2">Verdict</th>
             <th className="p-2">Section</th>
             <th className="p-2">Sources</th>
@@ -379,10 +360,7 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
                   <CategoryBadge category={claim.claimCategory} />
                 </td>
                 <td className="p-2 whitespace-nowrap">
-                  <ConfidenceBadge confidence={claim.confidence} />
-                </td>
-                <td className="p-2 whitespace-nowrap">
-                  <VerdictBadgeInline verdict={claim.claimVerdict} score={claim.claimVerdictScore} />
+                  <VerdictBadgeInline verdict={claim.claimVerdict ?? claim.confidence ?? "unverified"} score={claim.claimVerdictScore} />
                 </td>
                 <td className="p-2 text-gray-600 max-w-[100px] truncate" title={sectionName}>
                   {sectionName}

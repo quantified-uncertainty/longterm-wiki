@@ -325,7 +325,9 @@ export interface ClaimInsertData {
   entityType: string;
   claimType: string;
   claimText: string;
+  /** @deprecated Use valueNumeric/valueLow/valueHigh instead */
   value?: string | null;
+  /** @deprecated Use measure instead */
   unit?: string | null;
   confidence?: string | null;
   sourceQuote?: string | null;

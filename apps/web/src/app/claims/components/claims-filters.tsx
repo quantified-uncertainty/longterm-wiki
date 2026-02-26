@@ -72,10 +72,11 @@ export function ClaimsFilterBar({
         onChange={(e) => onFilterChange("confidence", e.target.value)}
         className="text-xs border rounded px-2 py-1.5"
       >
-        <option value="">All confidence</option>
+        <option value="">All verdicts</option>
         <option value="verified">verified</option>
+        <option value="disputed">disputed</option>
+        <option value="unsupported">unsupported</option>
         <option value="unverified">unverified</option>
-        <option value="unsourced">unsourced</option>
       </select>
       <select
         value={filters.claimMode}

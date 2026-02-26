@@ -67,7 +67,7 @@ export default async function WikiClaimsPage({ params }: PageProps) {
 
   const claims = result?.claims ?? [];
 
-  const verified = claims.filter((c) => c.confidence === "verified").length;
+  const verified = claims.filter((c) => (c.claimVerdict ?? c.confidence) === "verified").length;
   const multiEntity = claims.filter(
     (c) => c.relatedEntities && c.relatedEntities.length > 0
   ).length;

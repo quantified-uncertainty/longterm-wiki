@@ -153,7 +153,8 @@ export default async function ClaimDetailPage({ params }: PageProps) {
         </div>
       )}
 
-      {/* Source quote (legacy field) */}
+      {/* Source quote (legacy field — only shown when no claim_sources entries exist) */}
+      {/* @deprecated Prefer claim.sources[] (from claim_sources table) over claim.sourceQuote */}
       {claim.sourceQuote && (!claim.sources || claim.sources.length === 0) && (
         <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 mb-4">
           <div className="flex items-center justify-between mb-1">
@@ -310,8 +311,8 @@ export default async function ClaimDetailPage({ params }: PageProps) {
         </div>
       )}
 
-      {/* Footnote refs */}
-      {claim.footnoteRefs && (
+      {/* Footnote refs (legacy — hidden when page references exist) */}
+      {claim.footnoteRefs && pageReferences.length === 0 && (
         <div className="mb-6">
           <span className="text-xs text-muted-foreground block mb-1">
             Wiki Page Citations
@@ -331,7 +332,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
             })}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            Footnote numbers from the source wiki page
+            Footnote numbers from the source wiki page (legacy)
           </p>
         </div>
       )}

@@ -698,10 +698,13 @@ export const InsertClaimSchema = z.object({
   entityType: z.string().min(1).max(100),
   claimType: z.string().min(1).max(100),
   claimText: z.string().min(1).max(10000),
-  // Legacy fields — kept for backward compat
+  // @deprecated — legacy text fields; use valueNumeric/valueLow/valueHigh + measure instead.
+  // Still accepted for backward compat but not used by new code paths.
   value: z.string().max(1000).nullable().optional(),
   unit: z.string().max(100).nullable().optional(),
+  /** @deprecated Use claimVerdict instead. Kept for backward compatibility. */
   confidence: z.string().max(100).nullable().optional(),
+  /** @deprecated Use sources[] (claim_sources table) instead. Kept for backward compat (double-write). */
   sourceQuote: z.string().max(10000).nullable().optional(),
   // Enhanced fields (migration 0028)
   claimCategory: ClaimCategorySchema.nullable().optional(),
@@ -709,6 +712,7 @@ export const InsertClaimSchema = z.object({
   factId: z.string().max(300).nullable().optional(),
   resourceIds: z.array(z.string().max(300)).nullable().optional(),
   section: z.string().max(1000).nullable().optional(),
+  /** @deprecated Use claim_page_references table instead. Kept for backward compat. */
   footnoteRefs: z.string().max(500).nullable().optional(),
   // Phase 2 fields (migration 0029)
   claimMode: ClaimModeSchema.nullable().optional(),
@@ -778,9 +782,13 @@ export interface ClaimRow {
   entityType: string;
   claimType: string;
   claimText: string;
+  /** @deprecated Use valueNumeric/valueLow/valueHigh instead */
   value: string | null;
+  /** @deprecated Use measure instead */
   unit: string | null;
+  /** @deprecated Use claimVerdict instead. */
   confidence: string | null;
+  /** @deprecated Use sources[] (from claim_sources table) instead. */
   sourceQuote: string | null;
   // Enhanced fields (migration 0028)
   claimCategory: string | null;
@@ -788,6 +796,7 @@ export interface ClaimRow {
   factId: string | null;
   resourceIds: string[] | null;
   section: string | null;
+  /** @deprecated Use claim_page_references table instead. Kept for backward compat. */
   footnoteRefs: string | null;
   // Phase 2 fields (migration 0029)
   claimMode: string | null;       // 'endorsed' | 'attributed'
