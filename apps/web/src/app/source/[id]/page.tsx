@@ -191,20 +191,17 @@ export default async function SourcePage({ params }: PageProps) {
 
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-          <FileText className="w-3.5 h-3.5" />
-          <span>Source</span>
+        <div className="flex items-center gap-3 mb-1.5">
+          <h1 className="text-2xl font-bold">{resource.title}</h1>
           {resource.type && (
-            <>
-              <span className="opacity-30">/</span>
-              <span className="capitalize">{resource.type}</span>
-            </>
+            <span className="shrink-0 inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium capitalize">
+              <FileText className="w-3 h-3" />
+              {resource.type}
+            </span>
           )}
         </div>
 
-        <h1 className="text-2xl font-bold mb-2">{resource.title}</h1>
-
-        {/* Metadata row — single line with separator dots */}
+        {/* Metadata row — authors, year, publication, credibility, and URL on one line */}
         <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-muted-foreground">
           {metadataItems.map((item, i) => (
             <span key={i} className="inline-flex items-center gap-1.5">
@@ -227,22 +224,27 @@ export default async function SourcePage({ params }: PageProps) {
               </span>
             </span>
           )}
+          {resource.url && (() => {
+            const shortUrl = resource.url.replace(/^https?:\/\/(www\.)?/, "");
+            const displayUrl = shortUrl.length > 60 ? shortUrl.slice(0, 57) + "..." : shortUrl;
+            return (
+              <span className="inline-flex items-center gap-1.5">
+                {(metadataItems.length > 0 || credibility != null) && (
+                  <span className="text-muted-foreground/30">&middot;</span>
+                )}
+                <a
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  {displayUrl}
+                </a>
+              </span>
+            );
+          })()}
         </div>
-
-        {/* URL */}
-        {resource.url && (
-          <a
-            href={resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline mt-2"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            {resource.url.length > 80
-              ? resource.url.slice(0, 77) + "..."
-              : resource.url}
-          </a>
-        )}
       </div>
 
       {/* Data Status Banner — simplified, no content-availability pills */}
