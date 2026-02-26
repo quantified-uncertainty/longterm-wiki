@@ -682,6 +682,17 @@ export type ClaimType = z.infer<typeof ClaimTypeSchema>;
 export const ClaimModeSchema = z.enum(["endorsed", "attributed"]);
 export type ClaimMode = z.infer<typeof ClaimModeSchema>;
 
+export const ClaimVerdictSchema = z.enum([
+  "verified",
+  "unsupported",
+  "disputed",
+  "unverified",
+]);
+export type ClaimVerdict = z.infer<typeof ClaimVerdictSchema>;
+
+export const VerdictDifficultySchema = z.enum(["easy", "moderate", "hard"]);
+export type VerdictDifficulty = z.infer<typeof VerdictDifficultySchema>;
+
 export const InsertClaimSchema = z.object({
   entityId: z.string().min(1).max(300),
   entityType: z.string().min(1).max(100),
@@ -707,6 +718,13 @@ export const InsertClaimSchema = z.object({
   valueNumeric: z.number().nullable().optional(),
   valueLow: z.number().nullable().optional(),
   valueHigh: z.number().nullable().optional(),
+  // Verdict fields (migration 0031)
+  claimVerdict: ClaimVerdictSchema.nullable().optional(),
+  claimVerdictScore: z.number().min(0).max(1).nullable().optional(),
+  claimVerdictIssues: z.string().max(10000).nullable().optional(),
+  claimVerdictQuotes: z.string().max(10000).nullable().optional(),
+  claimVerdictDifficulty: VerdictDifficultySchema.nullable().optional(),
+  claimVerdictModel: z.string().max(200).nullable().optional(),
   // Inline sources — optional list of sources to create in claim_sources table
   sources: z.array(z.object({
     resourceId: z.string().max(300).nullable().optional(),
@@ -741,6 +759,10 @@ export interface ClaimSourceRow {
   sourceQuote: string | null;
   isPrimary: boolean;
   addedAt: string;
+  sourceVerdict: string | null;
+  sourceVerdictScore: number | null;
+  sourceVerdictIssues: string | null;
+  sourceCheckedAt: string | null;
 }
 
 export interface ClaimRow {
@@ -768,6 +790,14 @@ export interface ClaimRow {
   valueNumeric: number | null;    // central numeric value
   valueLow: number | null;        // lower bound
   valueHigh: number | null;       // upper bound
+  // Verdict fields (migration 0031)
+  claimVerdict: string | null;
+  claimVerdictScore: number | null;
+  claimVerdictIssues: string | null;
+  claimVerdictQuotes: string | null;
+  claimVerdictDifficulty: string | null;
+  claimVerifiedAt: string | null;
+  claimVerdictModel: string | null;
   sources: ClaimSourceRow[];      // populated when ?includeSources=true
   createdAt: string;
   updatedAt: string;
@@ -804,6 +834,43 @@ export interface ClaimStatsResult {
   attributedClaims: number;
   numericClaims?: number;
 }
+
+// -- Claims: Page References types -------------------------------------------
+
+export interface ClaimPageReferenceRow {
+  id: number;
+  claimId: number;
+  pageId: string;
+  footnote: number | null;
+  section: string | null;
+  createdAt: string;
+}
+
+export const ClaimPageReferenceInsertSchema = z.object({
+  claimId: z.number().int().positive(),
+  pageId: PageIdSchema,
+  footnote: z.number().int().min(0).nullable().optional(),
+  section: z.string().max(1000).nullable().optional(),
+});
+export type ClaimPageReferenceInsert = z.infer<typeof ClaimPageReferenceInsertSchema>;
+
+export const ClaimPageReferenceBatchSchema = z.object({
+  items: z.array(ClaimPageReferenceInsertSchema.omit({ claimId: true })).min(1).max(200),
+});
+
+// -- Claims: Citation linking types ------------------------------------------
+
+export const LinkCitationClaimSchema = z.object({
+  claimId: z.number().int().positive(),
+});
+export type LinkCitationClaim = z.infer<typeof LinkCitationClaimSchema>;
+
+export const LinkCitationsClaimsBatchSchema = z.object({
+  items: z.array(z.object({
+    quoteId: z.number().int().positive(),
+    claimId: z.number().int().positive(),
+  })).min(1).max(200),
+});
 
 // ---------------------------------------------------------------------------
 // Page Links

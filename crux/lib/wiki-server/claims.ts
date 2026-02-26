@@ -15,6 +15,7 @@ import type {
   ClaimSourceRow,
   GetClaimsResult,
   ClaimStatsResult,
+  ClaimPageReferenceRow,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -35,6 +36,7 @@ export type {
   ClaimSourceRow,
   GetClaimsResult,
   ClaimStatsResult,
+  ClaimPageReferenceRow,
 };
 
 // ---------------------------------------------------------------------------
@@ -126,6 +128,45 @@ export async function clearClaimsBySection(
     'POST',
     '/api/claims/clear-by-section',
     { entityId, section },
+    undefined,
+    'content',
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Claim Page References API functions
+// ---------------------------------------------------------------------------
+
+export async function getClaimPageReferences(
+  claimId: number,
+): Promise<ApiResult<{ references: ClaimPageReferenceRow[] }>> {
+  return apiRequest<{ references: ClaimPageReferenceRow[] }>(
+    'GET',
+    `/api/claims/${claimId}/page-references`,
+  );
+}
+
+export async function addClaimPageReference(
+  claimId: number,
+  ref: { pageId: string; footnote?: number | null; section?: string | null },
+): Promise<ApiResult<ClaimPageReferenceRow>> {
+  return apiRequest<ClaimPageReferenceRow>(
+    'POST',
+    `/api/claims/${claimId}/page-references`,
+    ref,
+    undefined,
+    'content',
+  );
+}
+
+export async function addClaimPageReferencesBatch(
+  claimId: number,
+  items: Array<{ pageId: string; footnote?: number | null; section?: string | null }>,
+): Promise<ApiResult<{ inserted: number }>> {
+  return apiRequest<{ inserted: number }>(
+    'POST',
+    `/api/claims/${claimId}/page-references/batch`,
+    { items },
     undefined,
     'content',
   );

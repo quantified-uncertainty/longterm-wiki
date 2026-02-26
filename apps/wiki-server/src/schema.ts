@@ -15,6 +15,7 @@ import {
   index,
   primaryKey,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const entityIdSeq = pgSequence("entity_id_seq", { startWith: 1 });
 
@@ -50,6 +51,9 @@ export const citationQuotes = pgTable(
     sourceTitle: text("source_title"),
     sourceType: text("source_type"),
     extractionModel: text("extraction_model"),
+    claimId: bigint("claim_id", { mode: "number" }).references(() => claims.id, {
+      onDelete: "set null",
+    }),
     accuracyVerdict: text("accuracy_verdict"),
     accuracyIssues: text("accuracy_issues"),
     accuracyScore: real("accuracy_score"),
@@ -75,6 +79,7 @@ export const citationQuotes = pgTable(
     index("idx_cq_verified").on(table.quoteVerified),
     index("idx_cq_accuracy").on(table.accuracyVerdict),
     index("idx_cq_resource_id").on(table.resourceId),
+    index("idx_cq_claim_id").on(table.claimId),
   ]
 );
 
@@ -403,6 +408,14 @@ export const claims = pgTable(
     valueNumeric: doublePrecision("value_numeric"), // central numeric value (machine-readable)
     valueLow: doublePrecision("value_low"),        // lower bound for range values
     valueHigh: doublePrecision("value_high"),      // upper bound for range values
+    // --- Verdict fields (migration 0031) ---
+    claimVerdict: text("claim_verdict"),
+    claimVerdictScore: real("claim_verdict_score"),
+    claimVerdictIssues: text("claim_verdict_issues"),
+    claimVerdictQuotes: text("claim_verdict_quotes"),
+    claimVerdictDifficulty: text("claim_verdict_difficulty"),
+    claimVerifiedAt: timestamp("claim_verified_at", { withTimezone: true }),
+    claimVerdictModel: text("claim_verdict_model"),
     // --- Timestamps ---
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -421,6 +434,8 @@ export const claims = pgTable(
     index("idx_cl_attributed_to").on(table.attributedTo),
     index("idx_cl_as_of").on(table.asOf),
     index("idx_cl_measure").on(table.measure),
+    index("idx_cl_verdict").on(table.claimVerdict),
+    index("idx_cl_verified_at").on(table.claimVerifiedAt),
     // GIN index on relatedEntities is created in migration 0028
     // (Drizzle doesn't support GIN index declarations on JSONB)
   ]
@@ -452,11 +467,47 @@ export const claimSources = pgTable(
     addedAt: timestamp("added_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    // --- Verdict fields (migration 0031) ---
+    sourceVerdict: text("source_verdict"),
+    sourceVerdictScore: real("source_verdict_score"),
+    sourceVerdictIssues: text("source_verdict_issues"),
+    sourceCheckedAt: timestamp("source_checked_at", { withTimezone: true }),
   },
   (table) => [
     index("idx_cs_claim_id").on(table.claimId),
     index("idx_cs_resource_id").on(table.resourceId),
     index("idx_cs_is_primary").on(table.isPrimary),
+    index("idx_cs_source_verdict").on(table.sourceVerdict),
+  ]
+);
+
+/** Claim-to-page references — links a claim to every wiki page it appears on. */
+export const claimPageReferences = pgTable(
+  "claim_page_references",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    claimId: bigint("claim_id", { mode: "number" })
+      .notNull()
+      .references(() => claims.id, { onDelete: "cascade" }),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
+    footnote: integer("footnote"),
+    section: text("section"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_cpr_claim_id").on(table.claimId),
+    index("idx_cpr_page_id").on(table.pageId),
+    // The COALESCE-based unique index is managed by migration 0031 SQL;
+    // Drizzle doesn't support expressions in uniqueIndex, so we declare
+    // a simpler version here for schema awareness.
+    uniqueIndex("idx_cpr_claim_page_footnote").on(
+      table.claimId,
+      table.pageId,
+    ),
   ]
 );
 

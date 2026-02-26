@@ -78,6 +78,9 @@ export default async function EntityClaimsPage({ params }: PageProps) {
   const withNumeric = claims.filter(
     (c) => c.valueNumeric != null || c.valueLow != null || c.valueHigh != null
   ).length;
+  const verdictVerified = claims.filter((c) => c.claimVerdict === "verified").length;
+  const verdictDisputed = claims.filter((c) => c.claimVerdict === "disputed").length;
+  const verdictUnsupported = claims.filter((c) => c.claimVerdict === "unsupported").length;
 
   const byCategory: Record<string, number> = {};
   for (const c of claims) {
@@ -126,6 +129,15 @@ export default async function EntityClaimsPage({ params }: PageProps) {
             )}
             {verified > 0 && (
               <StatCard label="Verified" value={verified} />
+            )}
+            {verdictVerified > 0 && (
+              <StatCard label="Verdict: Verified" value={verdictVerified} />
+            )}
+            {verdictDisputed > 0 && (
+              <StatCard label="Verdict: Disputed" value={verdictDisputed} />
+            )}
+            {verdictUnsupported > 0 && (
+              <StatCard label="Verdict: Unsupported" value={verdictUnsupported} />
             )}
           </div>
 

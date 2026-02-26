@@ -152,3 +152,32 @@ export async function listCitationContent(
 export async function getCitationContentStats(): Promise<ApiResult<CitationContentStatsResult>> {
   return apiRequest<CitationContentStatsResult>('GET', '/api/citations/content/stats');
 }
+
+// ---------------------------------------------------------------------------
+// Citation-Claim Linking API functions
+// ---------------------------------------------------------------------------
+
+export async function linkCitationToClaim(
+  quoteId: number,
+  claimId: number,
+): Promise<ApiResult<{ linked: boolean; quoteId: number; claimId: number }>> {
+  return apiRequest<{ linked: boolean; quoteId: number; claimId: number }>(
+    'PATCH',
+    `/api/citations/quotes/${quoteId}/link-claim`,
+    { claimId },
+    undefined,
+    'content',
+  );
+}
+
+export async function linkCitationsToClaimsBatch(
+  items: Array<{ quoteId: number; claimId: number }>,
+): Promise<ApiResult<{ linked: number }>> {
+  return apiRequest<{ linked: number }>(
+    'POST',
+    '/api/citations/quotes/link-claims-batch',
+    { items },
+    undefined,
+    'content',
+  );
+}

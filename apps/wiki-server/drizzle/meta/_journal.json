@@ -246,6 +246,13 @@
       "when": 1771902300000,
       "tag": "0030_claims_precision_and_constraints",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1771902400000,
+      "tag": "0031_unify_claims_citations",
+      "breakpoints": true
     }
   ]
 }
