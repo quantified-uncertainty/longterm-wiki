@@ -19,6 +19,12 @@ export default async function ExplorePage() {
   const categories = [
     ...new Set(claims.map((c) => c.claimCategory ?? "uncategorized")),
   ].sort();
+  const topics = [
+    ...new Set(claims.map((c) => c.topic ?? "uncategorized")),
+  ].sort();
+  const properties = [
+    ...new Set(claims.filter((c) => c.property).map((c) => c.property!)),
+  ].sort();
   const entityNames = buildEntityNameMap(collectEntitySlugs(claims));
 
   return (
@@ -36,6 +42,8 @@ export default async function ExplorePage() {
           claims={claims}
           entities={entities}
           categories={categories}
+          topics={topics}
+          properties={properties}
           entityNames={entityNames}
         />
       </Suspense>

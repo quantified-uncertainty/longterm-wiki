@@ -682,6 +682,25 @@ export type ClaimType = z.infer<typeof ClaimTypeSchema>;
 export const ClaimModeSchema = z.enum(["endorsed", "attributed"]);
 export type ClaimMode = z.infer<typeof ClaimModeSchema>;
 
+export const ClaimTopicSchema = z.enum([
+  "founding", "funding", "leadership", "governance", "regulation",
+  "capabilities", "operations", "competition", "safety", "impact",
+  "research", "strategy", "controversy", "history",
+]);
+export type ClaimTopic = z.infer<typeof ClaimTopicSchema>;
+
+export const ClaimPropertySchema = z.enum([
+  "foundedDate", "founder", "ceo", "keyPerson",
+  "fundingRaised", "valuation", "revenue", "investedIn", "fundedBy",
+  "headquarters", "employeeCount",
+  "regulatedBy", "competesWith", "partneredWith",
+  "parameters", "benchmarkScore", "trainingData", "releaseDate",
+  "marketShare", "userCount", "productLaunch",
+  "acquisitionPrice", "acquisitionTarget", "parentOrg",
+  "missionStatement",
+]);
+export type ClaimProperty = z.infer<typeof ClaimPropertySchema>;
+
 export const ClaimVerdictSchema = z.enum([
   "verified",
   "unsupported",
@@ -718,6 +737,9 @@ export const InsertClaimSchema = z.object({
   valueNumeric: z.number().nullable().optional(),
   valueLow: z.number().nullable().optional(),
   valueHigh: z.number().nullable().optional(),
+  // Topic/Property fields (migration 0032)
+  topic: ClaimTopicSchema.nullable().optional(),
+  property: ClaimPropertySchema.nullable().optional(),
   // Verdict fields (migration 0031)
   claimVerdict: ClaimVerdictSchema.nullable().optional(),
   claimVerdictScore: z.number().min(0).max(1).nullable().optional(),
@@ -790,6 +812,9 @@ export interface ClaimRow {
   valueNumeric: number | null;    // central numeric value
   valueLow: number | null;        // lower bound
   valueHigh: number | null;       // upper bound
+  // Topic/Property fields (migration 0032)
+  topic: string | null;
+  property: string | null;
   // Verdict fields (migration 0031)
   claimVerdict: string | null;
   claimVerdictScore: number | null;
@@ -828,6 +853,8 @@ export interface ClaimStatsResult {
   byEntityType: Record<string, number>;
   byClaimCategory: Record<string, number>;
   byClaimMode: Record<string, number>;
+  byTopic: Record<string, number>;
+  byProperty: Record<string, number>;
   byClaimVerdict: Record<string, number>;
   multiEntityClaims: number;
   factLinkedClaims: number;

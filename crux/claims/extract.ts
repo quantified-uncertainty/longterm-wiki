@@ -36,8 +36,8 @@ import {
   clearClaimsForEntity,
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
-import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../lib/claim-utils.ts';
-import type { ClaimTypeValue } from '../lib/claim-utils.ts';
+import { VALID_CLAIM_TYPES, VALID_CLAIM_TOPICS, VALID_CLAIM_PROPERTIES, claimTypeToCategory, parseNumericValue } from '../lib/claim-utils.ts';
+import type { ClaimTypeValue, ClaimTopicValue, ClaimPropertyValue } from '../lib/claim-utils.ts';
 import { getVariantPrompt, VARIANT_NAMES, type VariantName, type PageType } from './experiment-variants.ts';
 
 // ---------------------------------------------------------------------------
@@ -123,6 +123,8 @@ interface ExtractedClaim {
   valueNumeric?: number;                  // Phase 2: central numeric value
   valueLow?: number;                      // Phase 2: lower bound
   valueHigh?: number;                     // Phase 2: upper bound
+  topic?: ClaimTopicValue;               // Topical cluster
+  property?: ClaimPropertyValue;         // Structured property name
   sourceQuote?: string;                   // Verbatim excerpt from wiki text supporting the claim
   footnoteRefs: string[];
   relatedEntities?: string[];
@@ -182,6 +184,31 @@ For each claim, provide:
 - "valueHigh": (optional) upper bound if a range is given
 - "sourceQuote": a SHORT verbatim excerpt (max 200 chars) copied exactly from the wiki text that contains or directly supports this claim. Must be an exact substring of the input text.
 - "footnoteRefs": array of citation references (as strings) — look for [^N] (e.g. [^1]) and [^R:HASH] patterns near the claim
+- "topic": REQUIRED — the topical cluster this claim belongs to. Must be one of:
+    "founding" — when the entity was created, incorporation, origin story
+    "funding" — fundraising, investment rounds, valuations
+    "leadership" — CEO, key hires, departures, board changes
+    "governance" — board structure, voting rights, corporate governance
+    "regulation" — regulatory actions, compliance, legal challenges
+    "capabilities" — technical capabilities, model performance, benchmarks
+    "operations" — day-to-day business, products, services, users
+    "competition" — competitive positioning, market dynamics, rivals
+    "safety" — AI safety research, alignment, risk mitigation
+    "impact" — societal impact, influence, market effects
+    "research" — research publications, scientific contributions
+    "strategy" — business strategy, roadmap, future plans
+    "controversy" — disputes, scandals, criticism
+    "history" — historical events, timeline milestones
+- "property": (optional) a structured property name if this claim maps to a known entity property:
+    "foundedDate", "founder", "ceo", "keyPerson",
+    "fundingRaised", "valuation", "revenue", "investedIn", "fundedBy",
+    "headquarters", "employeeCount",
+    "regulatedBy", "competesWith", "partneredWith",
+    "parameters", "benchmarkScore", "trainingData", "releaseDate",
+    "marketShare", "userCount", "productLaunch",
+    "acquisitionPrice", "acquisitionTarget", "parentOrg",
+    "missionStatement"
+    Leave null if no standard property applies.
 - "relatedEntities": array of entity IDs or names mentioned in the claim other than the page's primary subject
 
 Rules:
@@ -198,7 +225,7 @@ Rules:
 - Return only claims that appear in the given text
 
 Respond ONLY with JSON:
-{"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "sourceQuote": "exact text from the wiki section", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
+{"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "topic": "founding", "property": null, "sourceQuote": "exact text from the wiki section", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
 
 export async function extractClaimsFromSection(
   section: Section,
@@ -246,6 +273,12 @@ Extract atomic claims from this section. Return JSON only.`;
         valueNumeric: parseNumericValue(c.valueNumeric),
         valueLow: parseNumericValue(c.valueLow),
         valueHigh: parseNumericValue(c.valueHigh),
+        topic: (VALID_CLAIM_TOPICS as readonly string[]).includes(c.topic as string)
+          ? c.topic as ClaimTopicValue
+          : undefined,
+        property: (VALID_CLAIM_PROPERTIES as readonly string[]).includes(c.property as string)
+          ? c.property as ClaimPropertyValue
+          : undefined,
         sourceQuote: typeof c.sourceQuote === 'string' && c.sourceQuote.length > 5
           ? c.sourceQuote.slice(0, 500)
           : undefined,
@@ -346,6 +379,7 @@ async function main() {
     const typeCounts: Record<string, number> = {};
     const catCounts: Record<string, number> = {};
     const modeCounts: Record<string, number> = {};
+    const topicCounts: Record<string, number> = {};
     let numericCount = 0;
     let attributedCount = 0;
 
@@ -354,6 +388,7 @@ async function main() {
       const cat = claimTypeToCategory(claim.claimType);
       catCounts[cat] = (catCounts[cat] ?? 0) + 1;
       modeCounts[claim.claimMode] = (modeCounts[claim.claimMode] ?? 0) + 1;
+      topicCounts[claim.topic ?? 'none'] = (topicCounts[claim.topic ?? 'none'] ?? 0) + 1;
       if (claim.valueNumeric !== undefined) numericCount++;
       if (claim.claimMode === 'attributed') attributedCount++;
     }
@@ -369,6 +404,10 @@ async function main() {
     console.log(`\n${c.bold}By mode:${c.reset}`);
     for (const [mode, cnt] of Object.entries(modeCounts).sort((a, b) => b[1] - a[1])) {
       console.log(`  ${mode.padEnd(14)} ${cnt}`);
+    }
+    console.log(`\n${c.bold}By topic:${c.reset}`);
+    for (const [topic, cnt] of Object.entries(topicCounts).sort((a, b) => b[1] - a[1])) {
+      console.log(`  ${topic.padEnd(14)} ${cnt}`);
     }
     if (numericCount > 0) {
       console.log(`\n  ${c.green}${numericCount}${c.reset} numeric claims with extracted values`);
@@ -442,6 +481,9 @@ async function main() {
       valueNumeric: claim.valueNumeric ?? null,
       valueLow: claim.valueLow ?? null,
       valueHigh: claim.valueHigh ?? null,
+      // Topic/Property fields (migration 0032)
+      topic: claim.topic ?? null,
+      property: claim.property ?? null,
     }));
 
     const result = await insertClaimBatch(items);

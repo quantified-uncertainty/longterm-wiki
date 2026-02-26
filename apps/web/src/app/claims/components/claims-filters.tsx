@@ -6,6 +6,9 @@ export interface ClaimFilters {
   category: string;
   confidence: string;
   claimMode: string;
+  topic: string;
+  property: string;
+  groupBy: string;
   multiEntity: boolean;
   numericOnly: boolean;
 }
@@ -13,12 +16,16 @@ export interface ClaimFilters {
 export function ClaimsFilterBar({
   entities,
   categories,
+  topics,
+  properties,
   filters,
   onFilterChange,
   entityNames = {},
 }: {
   entities: string[];
   categories: string[];
+  topics: string[];
+  properties: string[];
   filters: ClaimFilters;
   onFilterChange: (key: string, value: string | boolean) => void;
   entityNames?: Record<string, string>;
@@ -29,6 +36,8 @@ export function ClaimsFilterBar({
     filters.category ||
     filters.confidence ||
     filters.claimMode ||
+    filters.topic ||
+    filters.property ||
     filters.multiEntity ||
     filters.numericOnly;
 
@@ -50,6 +59,30 @@ export function ClaimsFilterBar({
         {entities.map((eid) => (
           <option key={eid} value={eid}>
             {entityNames[eid] ?? eid}
+          </option>
+        ))}
+      </select>
+      <select
+        value={filters.topic}
+        onChange={(e) => onFilterChange("topic", e.target.value)}
+        className="text-xs border rounded px-2 py-1.5"
+      >
+        <option value="">All topics</option>
+        {topics.map((t) => (
+          <option key={t} value={t}>
+            {t}
+          </option>
+        ))}
+      </select>
+      <select
+        value={filters.property}
+        onChange={(e) => onFilterChange("property", e.target.value)}
+        className="text-xs border rounded px-2 py-1.5"
+      >
+        <option value="">All properties</option>
+        {properties.map((p) => (
+          <option key={p} value={p}>
+            {p}
           </option>
         ))}
       </select>
@@ -102,6 +135,18 @@ export function ClaimsFilterBar({
         />
         Numeric only
       </label>
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground">Group by:</span>
+        <select
+          value={filters.groupBy}
+          onChange={(e) => onFilterChange("groupBy", e.target.value)}
+          className="text-xs border rounded px-2 py-1.5"
+        >
+          <option value="">None</option>
+          <option value="topic">Topic</option>
+          <option value="property">Property</option>
+        </select>
+      </div>
       {hasFilters && (
         <button
           type="button"
@@ -111,6 +156,9 @@ export function ClaimsFilterBar({
             onFilterChange("category", "");
             onFilterChange("confidence", "");
             onFilterChange("claimMode", "");
+            onFilterChange("topic", "");
+            onFilterChange("property", "");
+            onFilterChange("groupBy", "");
             onFilterChange("multiEntity", false);
             onFilterChange("numericOnly", false);
           }}

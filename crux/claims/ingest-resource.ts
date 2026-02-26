@@ -39,8 +39,8 @@ import {
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
 import { loadResources } from '../resource-io.ts';
-import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue, deduplicateClaims } from '../lib/claim-utils.ts';
-import type { ClaimTypeValue } from '../lib/claim-utils.ts';
+import { VALID_CLAIM_TYPES, VALID_CLAIM_TOPICS, VALID_CLAIM_PROPERTIES, claimTypeToCategory, parseNumericValue, deduplicateClaims } from '../lib/claim-utils.ts';
+import type { ClaimTypeValue, ClaimTopicValue, ClaimPropertyValue } from '../lib/claim-utils.ts';
 import type { Resource } from '../resource-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -126,6 +126,8 @@ export interface ExtractedResourceClaim {
   valueNumeric?: number;
   valueLow?: number;
   valueHigh?: number;
+  topic?: ClaimTopicValue;
+  property?: ClaimPropertyValue;
   sourceQuote?: string;
   relatedEntities?: string[];
 }
@@ -151,6 +153,8 @@ For each claim, provide:
 - "valueLow": (optional) lower bound if a range is given
 - "valueHigh": (optional) upper bound if a range is given
 - "sourceQuote": REQUIRED — a SHORT verbatim quote (max 200 chars) copied exactly from the resource text that supports this claim. Every claim MUST include a sourceQuote.
+- "topic": REQUIRED — topical cluster. One of: "founding", "funding", "leadership", "governance", "regulation", "capabilities", "operations", "competition", "safety", "impact", "research", "strategy", "controversy", "history"
+- "property": (optional) structured property name if applicable: "foundedDate", "founder", "ceo", "keyPerson", "fundingRaised", "valuation", "revenue", "investedIn", "fundedBy", "headquarters", "employeeCount", "regulatedBy", "competesWith", "partneredWith", "parameters", "benchmarkScore", "trainingData", "releaseDate", "marketShare", "userCount", "productLaunch", "acquisitionPrice", "acquisitionTarget", "parentOrg", "missionStatement". Leave null if no property applies.
 - "relatedEntities": other entity IDs/names mentioned alongside ${targetEntity} in the claim
 
 Rules:
@@ -165,7 +169,7 @@ Rules:
 - ALWAYS include sourceQuote — every claim must be grounded with an exact verbatim excerpt from the resource text
 
 Respond ONLY with JSON:
-{"claims": [{"claimText": "...", "claimType": "factual", "relevance": "direct", "claimMode": "endorsed", "sourceQuote": "...", "relatedEntities": []}]}`;
+{"claims": [{"claimText": "...", "claimType": "factual", "relevance": "direct", "claimMode": "endorsed", "topic": "funding", "property": null, "sourceQuote": "...", "relatedEntities": []}]}`;
 }
 
 export async function extractClaimsForEntity(
@@ -216,6 +220,12 @@ export async function extractClaimsForEntity(
         valueNumeric: parseNumericValue(c.valueNumeric),
         valueLow: parseNumericValue(c.valueLow),
         valueHigh: parseNumericValue(c.valueHigh),
+        topic: (VALID_CLAIM_TOPICS as readonly string[]).includes(c.topic as string)
+          ? c.topic as ClaimTopicValue
+          : undefined,
+        property: (VALID_CLAIM_PROPERTIES as readonly string[]).includes(c.property as string)
+          ? c.property as ClaimPropertyValue
+          : undefined,
         sourceQuote: typeof c.sourceQuote === 'string' && c.sourceQuote.length > 5
           ? c.sourceQuote.slice(0, 500)
           : undefined,
@@ -262,6 +272,9 @@ export function buildInsertItem(
     valueNumeric: claim.valueNumeric ?? null,
     valueLow: claim.valueLow ?? null,
     valueHigh: claim.valueHigh ?? null,
+    // Topic/Property fields (migration 0032)
+    topic: claim.topic ?? null,
+    property: claim.property ?? null,
     // Resource linkage via claim_sources + legacy resourceIds
     resourceIds: [resource.id],
     sources: claim.sourceQuote

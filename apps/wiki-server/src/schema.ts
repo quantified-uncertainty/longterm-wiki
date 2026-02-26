@@ -408,6 +408,9 @@ export const claims = pgTable(
     valueNumeric: doublePrecision("value_numeric"), // central numeric value (machine-readable)
     valueLow: doublePrecision("value_low"),        // lower bound for range values
     valueHigh: doublePrecision("value_high"),      // upper bound for range values
+    // --- Topic/Property fields (migration 0032) ---
+    topic: text("topic"),               // topical cluster: founding, funding, leadership, etc.
+    property: text("property"),         // structured property: foundedDate, founder, ceo, etc.
     // --- Verdict fields (migration 0031) ---
     claimVerdict: text("claim_verdict"),
     claimVerdictScore: real("claim_verdict_score"),
@@ -434,6 +437,8 @@ export const claims = pgTable(
     index("idx_cl_attributed_to").on(table.attributedTo),
     index("idx_cl_as_of").on(table.asOf),
     index("idx_cl_measure").on(table.measure),
+    index("idx_cl_topic").on(table.topic),
+    index("idx_cl_property").on(table.property),
     index("idx_cl_verdict").on(table.claimVerdict),
     index("idx_cl_verified_at").on(table.claimVerifiedAt),
     // GIN index on relatedEntities is created in migration 0028

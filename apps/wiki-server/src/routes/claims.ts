@@ -47,6 +47,8 @@ const PaginationQuery = z.object({
   entityId: z.string().max(200).optional(),
   attributedTo: z.string().max(300).optional(),
   measure: z.string().max(200).optional(),
+  topic: z.string().max(100).optional(),
+  property: z.string().max(100).optional(),
   multiEntity: z.coerce.boolean().optional(),
   hasNumericValue: z.coerce.boolean().optional(),
   includeSources: z.coerce.boolean().optional(),
@@ -85,6 +87,9 @@ function claimValues(d: ClaimInput) {
     valueNumeric: d.valueNumeric ?? null,
     valueLow: d.valueLow ?? null,
     valueHigh: d.valueHigh ?? null,
+    // Topic/Property fields (migration 0032)
+    topic: d.topic ?? null,
+    property: d.property ?? null,
     // Verdict fields (migration 0031)
     claimVerdict: d.claimVerdict ?? null,
     claimVerdictScore: d.claimVerdictScore ?? null,
@@ -142,6 +147,9 @@ function formatClaim(
     valueNumeric: r.valueNumeric,
     valueLow: r.valueLow,
     valueHigh: r.valueHigh,
+    // Topic/Property fields (migration 0032)
+    topic: r.topic,
+    property: r.property,
     // Verdict fields (migration 0031)
     claimVerdict: r.claimVerdict,
     claimVerdictScore: r.claimVerdictScore,
@@ -302,6 +310,43 @@ claimsRoute.post("/clear", async (c) => {
   return c.json({ deleted: deleted.length });
 });
 
+// ---- POST /batch-update (update topic/property on existing claims) ----
+
+const BatchUpdateSchema = z.object({
+  items: z.array(z.object({
+    id: z.number().int().positive(),
+    topic: z.string().max(100).nullable().optional(),
+    property: z.string().max(200).nullable().optional(),
+  })).min(1).max(500),
+});
+
+claimsRoute.post("/batch-update", async (c) => {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = BatchUpdateSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const db = getDrizzleDb();
+  let updated = 0;
+
+  for (const item of parsed.data.items) {
+    const updates: Record<string, string | null> = {};
+    if (item.topic !== undefined) updates.topic = item.topic;
+    if (item.property !== undefined) updates.property = item.property;
+    if (Object.keys(updates).length === 0) continue;
+
+    const result = await db
+      .update(claims)
+      .set(updates)
+      .where(eq(claims.id, item.id))
+      .returning({ id: claims.id });
+    updated += result.length;
+  }
+
+  return c.json({ updated });
+});
+
 // ---- POST /clear-by-section (delete only claims matching entity+section) ----
 // Used by resource ingestion --force to re-ingest a single resource without
 // clobbering claims from page extraction or other resources.
@@ -393,6 +438,20 @@ claimsRoute.get("/stats", async (c) => {
       sql`${claims.valueNumeric} IS NOT NULL OR ${claims.valueLow} IS NOT NULL OR ${claims.valueHigh} IS NOT NULL`
     );
 
+  // Topic distribution
+  const byTopic = await db
+    .select({ topic: claims.topic, count: count() })
+    .from(claims)
+    .groupBy(claims.topic)
+    .orderBy(desc(count()));
+
+  // Property distribution
+  const byProperty = await db
+    .select({ property: claims.property, count: count() })
+    .from(claims)
+    .groupBy(claims.property)
+    .orderBy(desc(count()));
+
   // Verdict distribution
   const byVerdict = await db
     .select({ claimVerdict: claims.claimVerdict, count: count() })
@@ -409,6 +468,12 @@ claimsRoute.get("/stats", async (c) => {
     ),
     byClaimMode: Object.fromEntries(
       byMode.map((r) => [r.claimMode ?? "uncategorized", r.count])
+    ),
+    byTopic: Object.fromEntries(
+      byTopic.map((r) => [r.topic ?? "uncategorized", r.count])
+    ),
+    byProperty: Object.fromEntries(
+      byProperty.map((r) => [r.property ?? "none", r.count])
     ),
     byClaimVerdict: Object.fromEntries(
       byVerdict.map((r) => [r.claimVerdict ?? "unverified", r.count])
@@ -499,6 +564,7 @@ claimsRoute.get("/all", async (c) => {
   const {
     limit, offset, entityType, claimType, claimCategory, claimMode,
     search, confidence, entityId, attributedTo, measure,
+    topic, property,
     multiEntity, hasNumericValue, includeSources, sort,
   } = parsed.data;
   const db = getDrizzleDb();
@@ -513,6 +579,8 @@ claimsRoute.get("/all", async (c) => {
   if (entityId) conditions.push(eq(claims.entityId, entityId));
   if (attributedTo) conditions.push(eq(claims.attributedTo, attributedTo));
   if (measure) conditions.push(eq(claims.measure, measure));
+  if (topic) conditions.push(eq(claims.topic, topic));
+  if (property) conditions.push(eq(claims.property, property));
   if (multiEntity) {
     conditions.push(
       sql`${claims.relatedEntities} IS NOT NULL AND jsonb_array_length(${claims.relatedEntities}) > 0`

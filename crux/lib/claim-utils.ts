@@ -43,6 +43,33 @@ export function claimTypeToCategory(claimType: ClaimTypeValue): string {
 }
 
 // ---------------------------------------------------------------------------
+// Canonical topic and property vocabularies
+// ---------------------------------------------------------------------------
+
+/** Valid claim topics — topical cluster for grouping claims. */
+export const VALID_CLAIM_TOPICS = [
+  'founding', 'funding', 'leadership', 'governance', 'regulation',
+  'capabilities', 'operations', 'competition', 'safety', 'impact',
+  'research', 'strategy', 'controversy', 'history',
+] as const;
+
+export type ClaimTopicValue = (typeof VALID_CLAIM_TOPICS)[number];
+
+/** Valid claim properties — structured property names for claims. */
+export const VALID_CLAIM_PROPERTIES = [
+  'foundedDate', 'founder', 'ceo', 'keyPerson',
+  'fundingRaised', 'valuation', 'revenue', 'investedIn', 'fundedBy',
+  'headquarters', 'employeeCount',
+  'regulatedBy', 'competesWith', 'partneredWith',
+  'parameters', 'benchmarkScore', 'trainingData', 'releaseDate',
+  'marketShare', 'userCount', 'productLaunch',
+  'acquisitionPrice', 'acquisitionTarget', 'parentOrg',
+  'missionStatement',
+] as const;
+
+export type ClaimPropertyValue = (typeof VALID_CLAIM_PROPERTIES)[number];
+
+// ---------------------------------------------------------------------------
 // Claim deduplication utilities
 // ---------------------------------------------------------------------------
 

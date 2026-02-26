@@ -33,6 +33,8 @@ import { ConfidenceBadge } from "./confidence-badge";
 import { ClaimModeBadge } from "./claim-mode-badge";
 import { NumericValueDisplay } from "./numeric-value-display";
 import { VerdictBadge } from "./verdict-badge";
+import { TopicBadge } from "./topic-badge";
+import { PropertyBadge } from "./property-badge";
 
 function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; entityNames?: Record<string, string> }) {
   return (
@@ -43,6 +45,24 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
         </span>
         <p className="mt-0.5">{claim.claimText}</p>
       </div>
+
+      {/* Topic & Property */}
+      {(claim.topic || claim.property) && (
+        <div className="flex items-center gap-2">
+          {claim.topic && (
+            <span>
+              <span className="text-muted-foreground text-xs">Topic:</span>{" "}
+              <TopicBadge topic={claim.topic} />
+            </span>
+          )}
+          {claim.property && (
+            <span>
+              <span className="text-muted-foreground text-xs">Property:</span>{" "}
+              <PropertyBadge property={claim.property} />
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Epistemic mode — show badge for attributed; always show asOf when set */}
       {(claim.claimMode === "attributed" || claim.asOf) && (
@@ -269,6 +289,22 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
       <span className="font-mono text-[10px]">{row.original.claimType}</span>
     ),
     size: 80,
+  },
+  {
+    accessorKey: "topic",
+    header: ({ column }) => (
+      <SortableHeader column={column}>Topic</SortableHeader>
+    ),
+    cell: ({ row }) => <TopicBadge topic={row.original.topic} />,
+    size: 90,
+  },
+  {
+    accessorKey: "property",
+    header: ({ column }) => (
+      <SortableHeader column={column}>Property</SortableHeader>
+    ),
+    cell: ({ row }) => <PropertyBadge property={row.original.property} />,
+    size: 100,
   },
   {
     id: "sources",

@@ -253,6 +253,13 @@
       "when": 1771902400000,
       "tag": "0031_unify_claims_citations",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1771902500000,
+      "tag": "0032_add_claim_topic_property",
+      "breakpoints": true
     }
   ]
 }
