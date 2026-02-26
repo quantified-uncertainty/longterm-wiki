@@ -88,23 +88,21 @@ export function buildResourceText(resource: Resource & { localFilename?: string 
   if (resource.authors && resource.authors.length > 0) {
     parts.push(`Authors: ${resource.authors.join(', ')}`);
   }
-  if (resource.published_date || (resource as unknown as { date?: string }).date) {
-    const d = resource.published_date ?? (resource as unknown as { date?: string }).date;
+  if (resource.published_date || resource.date) {
+    const d = resource.published_date ?? resource.date;
     parts.push(`Published: ${d}`);
   }
   if (resource.abstract) {
     parts.push(`\n## Abstract\n${resource.abstract}`);
   }
-  if ((resource as unknown as { summary?: string }).summary) {
-    parts.push(`\n## Summary\n${(resource as unknown as { summary?: string }).summary}`);
+  if (resource.summary) {
+    parts.push(`\n## Summary\n${resource.summary}`);
   }
-  const keyPoints = (resource as unknown as { key_points?: string[] }).key_points;
-  if (keyPoints && keyPoints.length > 0) {
-    parts.push(`\n## Key Points\n${keyPoints.map(p => `- ${p}`).join('\n')}`);
+  if (resource.key_points && resource.key_points.length > 0) {
+    parts.push(`\n## Key Points\n${resource.key_points.map(p => `- ${p}`).join('\n')}`);
   }
-  const review = (resource as unknown as { review?: string }).review;
-  if (review) {
-    parts.push(`\n## Review\n${review}`);
+  if (resource.review) {
+    parts.push(`\n## Review\n${resource.review}`);
   }
 
   return parts.join('\n').trim();
