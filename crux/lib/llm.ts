@@ -226,7 +226,7 @@ async function callOpenRouterAsAnthropic(
     role: 'assistant',
     content: [{ type: 'text', text }],
     model: data.model || model,
-    stop_reason: data.choices[0]?.finish_reason === 'stop' ? 'end_turn' : 'end_turn',
+    stop_reason: data.choices[0]?.finish_reason === 'length' ? 'max_tokens' : 'end_turn',
     stop_sequence: null,
     usage,
   } as Anthropic.Messages.Message;
