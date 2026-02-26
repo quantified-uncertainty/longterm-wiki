@@ -29,6 +29,13 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+/** Normalize partial dates to PostgreSQL DATE format (YYYY-MM-DD). */
+function normalizeDate(d: string): string {
+  if (/^\d{4}$/.test(d)) return `${d}-01-01`;          // "2024" → "2024-01-01"
+  if (/^\d{4}-\d{2}$/.test(d)) return `${d}-01`;       // "2024-03" → "2024-03-01"
+  return d;                                              // "2024-03-15" → as-is
+}
+
 // Load property vocabulary
 function loadProperties(): Array<{ id: string; label: string; description: string; value_type: string; value_unit?: string; category: string }> {
   const yaml = readFileSync(join(__dirname, '../../data/claims-properties.yaml'), 'utf-8');
@@ -138,7 +145,7 @@ ${JSON.stringify(claimList, null, 2)}`;
         : (e.structuredValue as string) ?? '',
       valueUnit: typeof e.valueUnit === 'string' ? e.valueUnit : null,
       valueDate: typeof e.valueDate === 'string' && /^\d{4}(-\d{2}(-\d{2})?)?$/.test(e.valueDate)
-        ? e.valueDate : null,
+        ? normalizeDate(e.valueDate) : null,
       qualifiers: typeof e.qualifiers === 'object' && e.qualifiers !== null
         ? Object.fromEntries(Object.entries(e.qualifiers as Record<string, unknown>).filter(([, v]) => typeof v === 'string')) as Record<string, string>
         : null,
@@ -266,7 +273,7 @@ export async function runEnrichStructured(): Promise<void> {
     if (saveResult.ok) {
       saved += saveResult.data.updated;
     } else {
-      console.error(`  ${c.red}Batch save failed: ${saveResult.error}${c.reset}`);
+      console.error(`  ${c.red}Batch save failed: ${saveResult.error} — ${saveResult.message}${c.reset}`);
     }
   }
 
