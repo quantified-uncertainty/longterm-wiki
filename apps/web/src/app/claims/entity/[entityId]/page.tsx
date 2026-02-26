@@ -3,6 +3,7 @@ import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
 import {
   getEntityById,
+  getEntityHref,
   getResourcesForPage,
   getResourceById,
   getResourceCredibility,
@@ -90,13 +91,13 @@ export default async function EntityClaimsPage({ params }: PageProps) {
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-2xl font-bold">{displayName}</h1>
           <Link
-            href={`/wiki/${entityId}`}
+            href={getEntityHref(entityId)}
             className="text-xs text-blue-600 hover:underline"
           >
             View wiki page &rarr;
           </Link>
           <Link
-            href={`/wiki/${entityId}/data`}
+            href={`${getEntityHref(entityId)}/data`}
             className="text-xs text-muted-foreground hover:underline"
           >
             Data page

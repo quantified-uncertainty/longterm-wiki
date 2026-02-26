@@ -19,6 +19,7 @@ import { triagePhase } from './phases.ts';
 import { runOrchestratorPipeline } from '../orchestrator/index.ts';
 import { runBatch, runBatchDryRun, parseBatchPageIds } from '../batch-runner.ts';
 import type { OrchestratorTier } from '../orchestrator/types.ts';
+import { setOpenRouterMode } from '../../lib/llm.ts';
 
 // Re-export public API for any direct importers
 export { runPipeline } from './pipeline.ts';
@@ -119,6 +120,7 @@ Options:
   --skip-citation-audit           Skip the post-improve citation audit phase
   --citation-audit-model <model>  Override LLM model for per-citation verification
   --no-save-artifacts             Skip saving intermediate artifacts to wiki-server DB
+  --openrouter                    Route all Claude calls through OpenRouter (when Anthropic credits depleted)
   --triage                        Run news-check triage only (no improvement)
   --list                          List pages needing improvement
   --limit N                       Limit list results (default: 20)
@@ -155,6 +157,11 @@ Examples:
   node crux/authoring/page-improver/index.ts -- --engine=v2 --dry-run --output=batch-plan.json
 `);
     return;
+  }
+
+  // Enable OpenRouter mode if requested (routes all Claude calls through OpenRouter)
+  if (opts.openrouter) {
+    setOpenRouterMode(true);
   }
 
   if (opts.list) {
