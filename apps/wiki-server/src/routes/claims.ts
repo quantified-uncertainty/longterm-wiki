@@ -393,6 +393,13 @@ claimsRoute.get("/stats", async (c) => {
       sql`${claims.valueNumeric} IS NOT NULL OR ${claims.valueLow} IS NOT NULL OR ${claims.valueHigh} IS NOT NULL`
     );
 
+  // Verdict distribution
+  const byVerdict = await db
+    .select({ claimVerdict: claims.claimVerdict, count: count() })
+    .from(claims)
+    .groupBy(claims.claimVerdict)
+    .orderBy(desc(count()));
+
   return c.json({
     total,
     byClaimType: Object.fromEntries(byType.map((r) => [r.claimType, r.count])),
@@ -402,6 +409,9 @@ claimsRoute.get("/stats", async (c) => {
     ),
     byClaimMode: Object.fromEntries(
       byMode.map((r) => [r.claimMode ?? "uncategorized", r.count])
+    ),
+    byClaimVerdict: Object.fromEntries(
+      byVerdict.map((r) => [r.claimVerdict ?? "unverified", r.count])
     ),
     multiEntityClaims: multiEntityResult[0].count,
     factLinkedClaims: factLinkedResult[0].count,

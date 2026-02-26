@@ -72,6 +72,11 @@ export default async function WikiClaimsPage({ params }: PageProps) {
     (c) => c.relatedEntities && c.relatedEntities.length > 0
   ).length;
 
+  const verdictVerified = claims.filter((c) => c.claimVerdict === "verified").length;
+  const verdictDisputed = claims.filter((c) => c.claimVerdict === "disputed").length;
+  const verdictUnsupported = claims.filter((c) => c.claimVerdict === "unsupported").length;
+  const hasVerdicts = verdictVerified + verdictDisputed + verdictUnsupported > 0;
+
   const byCategory: Record<string, number> = {};
   for (const c of claims) {
     const cat = c.claimCategory ?? "uncategorized";
@@ -124,14 +129,25 @@ export default async function WikiClaimsPage({ params }: PageProps) {
         <>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
             <StatCard label="Total Claims" value={claims.length} />
-            <StatCard label="Verified" value={verified} />
-            <StatCard label="Multi-Entity" value={multiEntity} />
-            <StatCard
-              label="Verification Rate"
-              value={Math.round(
-                claims.length > 0 ? (verified / claims.length) * 100 : 0
-              )}
-            />
+            {hasVerdicts ? (
+              <>
+                <StatCard label="Verdict: Verified" value={verdictVerified} />
+                <StatCard label="Verdict: Disputed" value={verdictDisputed + verdictUnsupported} />
+                <StatCard
+                  label="Verdict Rate"
+                  value={`${Math.round(claims.length > 0 ? ((verdictVerified + verdictDisputed + verdictUnsupported) / claims.length) * 100 : 0)}%`}
+                />
+              </>
+            ) : (
+              <>
+                <StatCard label="Confidence: Verified" value={verified} />
+                <StatCard label="Multi-Entity" value={multiEntity} />
+                <StatCard
+                  label="Verification Rate"
+                  value={`${Math.round(claims.length > 0 ? (verified / claims.length) * 100 : 0)}%`}
+                />
+              </>
+            )}
           </div>
 
           {Object.keys(byCategory).length > 1 && (

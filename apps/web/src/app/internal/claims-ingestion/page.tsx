@@ -24,6 +24,7 @@ interface ClaimStats {
   total: number;
   byClaimType: Record<string, number>;
   byClaimMode: Record<string, number>;
+  byClaimVerdict?: Record<string, number>;
   withSourcesClaims: number;
   attributedClaims: number;
 }
@@ -138,6 +139,13 @@ export default async function ClaimsIngestionPage() {
   const contestedCount = stats?.byClaimMode?.contested ?? 0;
   const noModeCount = Math.max(0, (stats?.total ?? 0) - endorsedCount - attributedCount - contestedCount);
 
+  // Verdict counts
+  const verdictVerified = stats?.byClaimVerdict?.verified ?? 0;
+  const verdictDisputed = stats?.byClaimVerdict?.disputed ?? 0;
+  const verdictUnsupported = stats?.byClaimVerdict?.unsupported ?? 0;
+  const verdictUnverified = (stats?.total ?? 0) - verdictVerified - verdictDisputed - verdictUnsupported;
+  const hasVerdicts = verdictVerified + verdictDisputed + verdictUnsupported > 0;
+
   return (
     <article className="prose max-w-none">
       <h1>Claims Ingestion</h1>
@@ -168,6 +176,20 @@ export default async function ClaimsIngestionPage() {
         />
       </div>
 
+      {/* Verdict stat cards — only shown if any claims have verdicts */}
+      {hasVerdicts && (
+        <div className="not-prose grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
+          <StatCard label="Verdict: Verified" value={verdictVerified} />
+          <StatCard label="Verdict: Disputed" value={verdictDisputed} />
+          <StatCard label="Verdict: Unsupported" value={verdictUnsupported} />
+          <StatCard
+            label="Verdict Rate"
+            value={`${stats?.total ? (((verdictVerified + verdictDisputed + verdictUnsupported) / stats.total) * 100).toFixed(0) : 0}%`}
+            sub={`${verdictUnverified} remaining`}
+          />
+        </div>
+      )}
+
       {/* Distribution bars */}
       <div className="not-prose space-y-4 my-6">
         <DistributionBar
@@ -194,6 +216,17 @@ export default async function ClaimsIngestionPage() {
             { name: "Unset", count: noModeCount, color: "bg-gray-400" },
           ]}
         />
+        {hasVerdicts && (
+          <DistributionBar
+            label="Claim Verdict"
+            items={[
+              { name: "Verified", count: verdictVerified, color: "bg-green-500" },
+              { name: "Disputed", count: verdictDisputed, color: "bg-amber-500" },
+              { name: "Unsupported", count: verdictUnsupported, color: "bg-red-500" },
+              { name: "Unverified", count: verdictUnverified, color: "bg-gray-400" },
+            ]}
+          />
+        )}
       </div>
 
       {/* Per-resource table */}
