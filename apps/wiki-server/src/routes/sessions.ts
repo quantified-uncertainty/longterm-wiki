@@ -10,8 +10,6 @@ import {
   DateStringSchema,
 } from "../api-types.js";
 
-export const sessionsRoute = new Hono();
-
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 500;
@@ -89,68 +87,21 @@ const sessionConflictSet = {
   recommendationsJson: sql`excluded.recommendations_json`,
 };
 
-// ---- POST / (create or update single session) ----
+// ---- Routes ----
 
-sessionsRoute.post("/", async (c) => {
-  const body = await parseJsonBody(c);
-  if (!body) return invalidJsonError(c);
+const sessionsApp = new Hono()
+  // ---- POST / (create or update single session) ----
+  .post("/", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
 
-  const parsed = CreateSessionSchema.safeParse(body);
-  if (!parsed.success) return validationError(c, parsed.error.message);
+    const parsed = CreateSessionSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const d = parsed.data;
-  const db = getDrizzleDb();
+    const d = parsed.data;
+    const db = getDrizzleDb();
 
-  const result = await db.transaction(async (tx) => {
-    const rows = await tx
-      .insert(sessions)
-      .values(sessionValues(d))
-      .onConflictDoUpdate({
-        target: [sessions.date, sessions.title],
-        set: sessionConflictSet,
-      })
-      .returning({
-        id: sessions.id,
-        date: sessions.date,
-        title: sessions.title,
-        createdAt: sessions.createdAt,
-      });
-
-    const session = firstOrThrow(rows, "session upsert");
-
-    // Replace page associations: delete old, insert new
-    await tx
-      .delete(sessionPages)
-      .where(eq(sessionPages.sessionId, session.id));
-
-    if (d.pages.length > 0) {
-      await tx
-        .insert(sessionPages)
-        .values(d.pages.map((pageId) => ({ sessionId: session.id, pageId })));
-    }
-
-    return { ...session, pages: d.pages };
-  });
-
-  return c.json(result, 201);
-});
-
-// ---- POST /batch (create or update multiple sessions) ----
-
-sessionsRoute.post("/batch", async (c) => {
-  const body = await parseJsonBody(c);
-  if (!body) return invalidJsonError(c);
-
-  const parsed = CreateBatchSchema.safeParse(body);
-  if (!parsed.success) return validationError(c, parsed.error.message);
-
-  const { items } = parsed.data;
-  const db = getDrizzleDb();
-
-  const results = await db.transaction(async (tx) => {
-    const created: Array<{ id: number; title: string; pageCount: number }> = [];
-
-    for (const d of items) {
+    const result = await db.transaction(async (tx) => {
       const rows = await tx
         .insert(sessions)
         .values(sessionValues(d))
@@ -158,9 +109,14 @@ sessionsRoute.post("/batch", async (c) => {
           target: [sessions.date, sessions.title],
           set: sessionConflictSet,
         })
-        .returning({ id: sessions.id, title: sessions.title });
+        .returning({
+          id: sessions.id,
+          date: sessions.date,
+          title: sessions.title,
+          createdAt: sessions.createdAt,
+        });
 
-      const session = firstOrThrow(rows, `session batch upsert "${d.title}"`);
+      const session = firstOrThrow(rows, "session upsert");
 
       // Replace page associations: delete old, insert new
       await tx
@@ -173,197 +129,234 @@ sessionsRoute.post("/batch", async (c) => {
           .values(d.pages.map((pageId) => ({ sessionId: session.id, pageId })));
       }
 
-      created.push({
-        id: session.id,
-        title: session.title,
-        pageCount: d.pages.length,
-      });
+      return { ...session, pages: d.pages };
+    });
+
+    return c.json(result, 201);
+  })
+  // ---- POST /batch (create or update multiple sessions) ----
+  .post("/batch", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = CreateBatchSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { items } = parsed.data;
+    const db = getDrizzleDb();
+
+    const results = await db.transaction(async (tx) => {
+      const created: Array<{ id: number; title: string; pageCount: number }> = [];
+
+      for (const d of items) {
+        const rows = await tx
+          .insert(sessions)
+          .values(sessionValues(d))
+          .onConflictDoUpdate({
+            target: [sessions.date, sessions.title],
+            set: sessionConflictSet,
+          })
+          .returning({ id: sessions.id, title: sessions.title });
+
+        const session = firstOrThrow(rows, `session batch upsert "${d.title}"`);
+
+        // Replace page associations: delete old, insert new
+        await tx
+          .delete(sessionPages)
+          .where(eq(sessionPages.sessionId, session.id));
+
+        if (d.pages.length > 0) {
+          await tx
+            .insert(sessionPages)
+            .values(d.pages.map((pageId) => ({ sessionId: session.id, pageId })));
+        }
+
+        created.push({
+          id: session.id,
+          title: session.title,
+          pageCount: d.pages.length,
+        });
+      }
+
+      return created;
+    });
+
+    return c.json({ upserted: results.length, results }, 201);
+  })
+  // ---- GET / (list sessions, paginated) ----
+  .get("/", async (c) => {
+    const parsed = PaginationQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { limit, offset } = parsed.data;
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(sessions)
+      .orderBy(desc(sessions.date), desc(sessions.id))
+      .limit(limit)
+      .offset(offset);
+
+    const countResult = await db.select({ count: count() }).from(sessions);
+    const total = countResult[0].count;
+
+    // Fetch page associations for each session
+    const sessionIds = rows.map((r) => r.id);
+    let pageMap = new Map<number, string[]>();
+
+    if (sessionIds.length > 0) {
+      const pageRows = await db
+        .select()
+        .from(sessionPages)
+        .where(inArray(sessionPages.sessionId, sessionIds));
+
+      for (const row of pageRows) {
+        const existing = pageMap.get(row.sessionId) || [];
+        existing.push(row.pageId);
+        pageMap.set(row.sessionId, existing);
+      }
     }
 
-    return created;
-  });
+    return c.json({
+      sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])),
+      total,
+      limit,
+      offset,
+    });
+  })
+  // ---- GET /by-page?page_id=X (sessions that modified a specific page) ----
+  .get("/by-page", async (c) => {
+    const pageId = c.req.query("page_id");
+    if (!pageId) return validationError(c, "page_id query parameter is required");
 
-  return c.json({ upserted: results.length, results }, 201);
-});
+    const db = getDrizzleDb();
 
-// ---- GET / (list sessions, paginated) ----
+    // Find session IDs that include this page
+    const spRows = await db
+      .select({ sessionId: sessionPages.sessionId })
+      .from(sessionPages)
+      .where(eq(sessionPages.pageId, pageId));
 
-sessionsRoute.get("/", async (c) => {
-  const parsed = PaginationQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
+    if (spRows.length === 0) {
+      return c.json({ sessions: [] });
+    }
 
-  const { limit, offset } = parsed.data;
-  const db = getDrizzleDb();
+    const sessionIds = spRows.map((r) => r.sessionId);
 
-  const rows = await db
-    .select()
-    .from(sessions)
-    .orderBy(desc(sessions.date), desc(sessions.id))
-    .limit(limit)
-    .offset(offset);
+    const rows = await db
+      .select()
+      .from(sessions)
+      .where(inArray(sessions.id, sessionIds))
+      .orderBy(desc(sessions.date), desc(sessions.id));
 
-  const countResult = await db.select({ count: count() }).from(sessions);
-  const total = countResult[0].count;
-
-  // Fetch page associations for each session
-  const sessionIds = rows.map((r) => r.id);
-  let pageMap = new Map<number, string[]>();
-
-  if (sessionIds.length > 0) {
-    const pageRows = await db
+    // Also fetch all pages for these sessions
+    const allPageRows = await db
       .select()
       .from(sessionPages)
       .where(inArray(sessionPages.sessionId, sessionIds));
 
+    const pageMap = new Map<number, string[]>();
+    for (const row of allPageRows) {
+      const existing = pageMap.get(row.sessionId) || [];
+      existing.push(row.pageId);
+      pageMap.set(row.sessionId, existing);
+    }
+
+    return c.json({
+      sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])),
+    });
+  })
+  // ---- GET /stats ----
+  .get("/stats", async (c) => {
+    const db = getDrizzleDb();
+
+    const totalResult = await db.select({ count: count() }).from(sessions);
+    const totalSessions = totalResult[0].count;
+
+    const pagesResult = await db
+      .select({
+        count: sql<number>`count(distinct ${sessionPages.pageId})`,
+      })
+      .from(sessionPages);
+    const uniquePages = Number(pagesResult[0].count);
+
+    const totalPageEditsResult = await db
+      .select({ count: count() })
+      .from(sessionPages);
+    const totalPageEdits = totalPageEditsResult[0].count;
+
+    const byModel = await db
+      .select({
+        model: sessions.model,
+        count: count(),
+      })
+      .from(sessions)
+      .groupBy(sessions.model)
+      .orderBy(desc(count()));
+
+    return c.json({
+      totalSessions,
+      uniquePages,
+      totalPageEdits,
+      byModel: Object.fromEntries(
+        byModel
+          .filter((r) => r.model !== null)
+          .map((r) => [r.model, r.count])
+      ),
+    });
+  })
+  // ---- GET /page-changes (optimized endpoint for page-changes dashboard) ----
+  .get("/page-changes", async (c) => {
+    const parsed = PageChangesQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { limit, since } = parsed.data;
+    const db = getDrizzleDb();
+
+    // Step 1: Get the limited set of sessions that have at least one page,
+    // with optional date filter pushed into SQL (avoids fetching all rows).
+    const whereClause = since ? gte(sessions.date, since) : undefined;
+
+    const sessionIdRows = await db
+      .select({ id: sessions.id, date: sessions.date })
+      .from(sessions)
+      .innerJoin(sessionPages, eq(sessionPages.sessionId, sessions.id))
+      .where(whereClause)
+      .groupBy(sessions.id, sessions.date)
+      .orderBy(desc(sessions.date), desc(sessions.id))
+      .limit(limit);
+
+    if (sessionIdRows.length === 0) {
+      return c.json({ sessions: [] });
+    }
+
+    // Step 2: Fetch full session data and their page associations
+    const sessionIds = sessionIdRows.map((r) => r.id);
+
+    const [rows, pageRows] = await Promise.all([
+      db
+        .select()
+        .from(sessions)
+        .where(inArray(sessions.id, sessionIds))
+        .orderBy(desc(sessions.date), desc(sessions.id)),
+      db
+        .select()
+        .from(sessionPages)
+        .where(inArray(sessionPages.sessionId, sessionIds)),
+    ]);
+
+    const pageMap = new Map<number, string[]>();
     for (const row of pageRows) {
       const existing = pageMap.get(row.sessionId) || [];
       existing.push(row.pageId);
       pageMap.set(row.sessionId, existing);
     }
-  }
 
-  return c.json({
-    sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])),
-    total,
-    limit,
-    offset,
+    return c.json({
+      sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])),
+    });
   });
-});
 
-// ---- GET /by-page?page_id=X (sessions that modified a specific page) ----
-
-sessionsRoute.get("/by-page", async (c) => {
-  const pageId = c.req.query("page_id");
-  if (!pageId) return validationError(c, "page_id query parameter is required");
-
-  const db = getDrizzleDb();
-
-  // Find session IDs that include this page
-  const spRows = await db
-    .select({ sessionId: sessionPages.sessionId })
-    .from(sessionPages)
-    .where(eq(sessionPages.pageId, pageId));
-
-  if (spRows.length === 0) {
-    return c.json({ sessions: [] });
-  }
-
-  const sessionIds = spRows.map((r) => r.sessionId);
-
-  const rows = await db
-    .select()
-    .from(sessions)
-    .where(inArray(sessions.id, sessionIds))
-    .orderBy(desc(sessions.date), desc(sessions.id));
-
-  // Also fetch all pages for these sessions
-  const allPageRows = await db
-    .select()
-    .from(sessionPages)
-    .where(inArray(sessionPages.sessionId, sessionIds));
-
-  const pageMap = new Map<number, string[]>();
-  for (const row of allPageRows) {
-    const existing = pageMap.get(row.sessionId) || [];
-    existing.push(row.pageId);
-    pageMap.set(row.sessionId, existing);
-  }
-
-  return c.json({
-    sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])),
-  });
-});
-
-// ---- GET /stats ----
-
-sessionsRoute.get("/stats", async (c) => {
-  const db = getDrizzleDb();
-
-  const totalResult = await db.select({ count: count() }).from(sessions);
-  const totalSessions = totalResult[0].count;
-
-  const pagesResult = await db
-    .select({
-      count: sql<number>`count(distinct ${sessionPages.pageId})`,
-    })
-    .from(sessionPages);
-  const uniquePages = Number(pagesResult[0].count);
-
-  const totalPageEditsResult = await db
-    .select({ count: count() })
-    .from(sessionPages);
-  const totalPageEdits = totalPageEditsResult[0].count;
-
-  const byModel = await db
-    .select({
-      model: sessions.model,
-      count: count(),
-    })
-    .from(sessions)
-    .groupBy(sessions.model)
-    .orderBy(desc(count()));
-
-  return c.json({
-    totalSessions,
-    uniquePages,
-    totalPageEdits,
-    byModel: Object.fromEntries(
-      byModel
-        .filter((r) => r.model !== null)
-        .map((r) => [r.model, r.count])
-    ),
-  });
-});
-
-// ---- GET /page-changes (optimized endpoint for page-changes dashboard) ----
-
-sessionsRoute.get("/page-changes", async (c) => {
-  const parsed = PageChangesQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
-
-  const { limit, since } = parsed.data;
-  const db = getDrizzleDb();
-
-  // Step 1: Get the limited set of sessions that have at least one page,
-  // with optional date filter pushed into SQL (avoids fetching all rows).
-  const whereClause = since ? gte(sessions.date, since) : undefined;
-
-  const sessionIdRows = await db
-    .select({ id: sessions.id, date: sessions.date })
-    .from(sessions)
-    .innerJoin(sessionPages, eq(sessionPages.sessionId, sessions.id))
-    .where(whereClause)
-    .groupBy(sessions.id, sessions.date)
-    .orderBy(desc(sessions.date), desc(sessions.id))
-    .limit(limit);
-
-  if (sessionIdRows.length === 0) {
-    return c.json({ sessions: [] });
-  }
-
-  // Step 2: Fetch full session data and their page associations
-  const sessionIds = sessionIdRows.map((r) => r.id);
-
-  const [rows, pageRows] = await Promise.all([
-    db
-      .select()
-      .from(sessions)
-      .where(inArray(sessions.id, sessionIds))
-      .orderBy(desc(sessions.date), desc(sessions.id)),
-    db
-      .select()
-      .from(sessionPages)
-      .where(inArray(sessionPages.sessionId, sessionIds)),
-  ]);
-
-  const pageMap = new Map<number, string[]>();
-  for (const row of pageRows) {
-    const existing = pageMap.get(row.sessionId) || [];
-    existing.push(row.pageId);
-    pageMap.set(row.sessionId, existing);
-  }
-
-  return c.json({
-    sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])),
-  });
-});
+export const sessionsRoute = sessionsApp;
+export type SessionsRoute = typeof sessionsApp;

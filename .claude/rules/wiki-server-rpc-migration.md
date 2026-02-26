@@ -4,8 +4,8 @@ All **new** wiki-server routes must use Hono RPC method-chaining. Existing route
 
 ## Status
 
-- **Migrated**: `facts.ts` (reference), `claims.ts`, `citations.ts`
-- **Not yet migrated**: remaining routes (~19 files in `apps/wiki-server/src/routes/`)
+- **Migrated**: All route files — `facts.ts`, `claims.ts`, `citations.ts`, `references.ts`, `health.ts`, `ids.ts`, `edit-logs.ts`, `summaries.ts`, `artifacts.ts`, `agent-sessions.ts`, `entities.ts`, `explore.ts`, `sessions.ts`, `pages.ts`, `links.ts`, `hallucination-risk.ts`, `jobs.ts`, `resources.ts`, `auto-update-news.ts`, `auto-update-runs.ts`, `integrity.ts`
+- **Utility files** (no migration needed): `ref-check.ts`, `utils.ts`
 
 ## Why
 
@@ -61,11 +61,9 @@ See `getFactsRpcClient()` for the ISR-compatible fetch wrapper pattern.
 
 Remove the old hand-written response interfaces from `api-types.ts` once all consumers use inferred types.
 
-## When NOT to migrate
+## Adding new routes
 
-- Don't convert a route just because you're reading it
-- Don't migrate as a side-effect of an unrelated bug fix
-- Do migrate when you're adding/changing endpoints on a route or restructuring it
+All new routes **must** use method-chaining from the start. Follow the pattern above.
 
 ## RPC path key gotchas
 

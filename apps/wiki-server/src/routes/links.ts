@@ -8,8 +8,6 @@ import {
 } from "./utils.js";
 import { SyncLinksBatchSchema } from "../api-types.js";
 
-export const linksRoute = new Hono();
-
 // ---- Constants ----
 
 const MAX_RELATED = 25;
@@ -72,34 +70,35 @@ const RelatedQuery = z.object({
 // Prevents deadlocks when multiple callers (CI, local builds) sync concurrently.
 const PAGE_LINKS_SYNC_LOCK = 7_294_801;
 
-linksRoute.post("/sync", async (c) => {
-  const body = await parseJsonBody(c);
-  if (!body) return invalidJsonError(c);
+const linksApp = new Hono()
+  .post("/sync", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
 
-  const parsed = SyncBatchSchema.safeParse(body);
-  if (!parsed.success) return validationError(c, parsed.error.message);
+    const parsed = SyncBatchSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const { links, replace } = parsed.data;
-  const rawDb = getDb();
+    const { links, replace } = parsed.data;
+    const rawDb = getDb();
 
-  let upserted = 0;
+    let upserted = 0;
 
-  // Use a raw postgres transaction with an advisory lock to serialize concurrent
-  // sync operations. Without this, two concurrent syncs deadlock on the unique
-  // index when inserting overlapping rows.
-  await rawDb.begin(async (txRaw) => {
-    const tx = txRaw as unknown as SqlQuery;
-    await tx`SELECT pg_advisory_xact_lock(${PAGE_LINKS_SYNC_LOCK})`;
+    // Use a raw postgres transaction with an advisory lock to serialize concurrent
+    // sync operations. Without this, two concurrent syncs deadlock on the unique
+    // index when inserting overlapping rows.
+    await rawDb.begin(async (txRaw) => {
+      const tx = txRaw as unknown as SqlQuery;
+      await tx`SELECT pg_advisory_xact_lock(${PAGE_LINKS_SYNC_LOCK})`;
 
-    if (replace) {
-      await tx`DELETE FROM page_links`;
-    }
+      if (replace) {
+        await tx`DELETE FROM page_links`;
+      }
 
-    // Batch upsert — on conflict (source, target, type) update weight + relationship
-    for (let i = 0; i < links.length; i += 500) {
-      const batch = links.slice(i, i + 500);
+      // Batch upsert — on conflict (source, target, type) update weight + relationship
+      for (let i = 0; i < links.length; i += 500) {
+        const batch = links.slice(i, i + 500);
 
-      await tx`
+        await tx`
         INSERT INTO page_links (source_id, target_id, link_type, relationship, weight)
         SELECT "sourceId", "targetId", "linkType", relationship, weight
         FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb)
@@ -108,30 +107,30 @@ linksRoute.post("/sync", async (c) => {
         DO UPDATE SET weight = EXCLUDED.weight, relationship = EXCLUDED.relationship
       `;
 
-      upserted += batch.length;
-    }
-  });
+        upserted += batch.length;
+      }
+    });
 
-  return c.json({ upserted });
-});
+    return c.json({ upserted });
+  })
 
-// ---- GET /backlinks/:id ----
+  // ---- GET /backlinks/:id ----
 
-linksRoute.get("/backlinks/:id", async (c) => {
-  const targetId = c.req.param("id");
-  if (!targetId) return validationError(c, "Entity ID is required");
+  .get("/backlinks/:id", async (c) => {
+    const targetId = c.req.param("id");
+    if (!targetId) return validationError(c, "Entity ID is required");
 
-  const parsed = BacklinksQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
+    const parsed = BacklinksQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const { limit } = parsed.data;
-  const rawDb = getDb();
+    const { limit } = parsed.data;
+    const rawDb = getDb();
 
-  // Find all pages/entities that link TO this target.
-  // Join with wiki_pages to get title and entity_type for the source.
-  // Deduplicate by source_id (a source may link via multiple link_types),
-  // then order by weight descending (most relevant first).
-  const results = await rawDb`
+    // Find all pages/entities that link TO this target.
+    // Join with wiki_pages to get title and entity_type for the source.
+    // Deduplicate by source_id (a source may link via multiple link_types),
+    // then order by weight descending (most relevant first).
+    const results = await rawDb`
     SELECT * FROM (
       SELECT DISTINCT ON (pl.source_id)
         pl.source_id,
@@ -149,39 +148,39 @@ linksRoute.get("/backlinks/:id", async (c) => {
     LIMIT ${limit}
   `;
 
-  const backlinks = results.map((r: any) => ({
-    id: r.source_id,
-    type: r.source_type || "concept",
-    title: r.source_title || r.source_id,
-    relationship: r.relationship || undefined,
-    linkType: r.link_type,
-    weight: r.weight,
-  }));
+    const backlinks = results.map((r: any) => ({
+      id: r.source_id,
+      type: r.source_type || "concept",
+      title: r.source_title || r.source_id,
+      relationship: r.relationship || undefined,
+      linkType: r.link_type,
+      weight: r.weight,
+    }));
 
-  return c.json({
-    targetId,
-    backlinks,
-    total: backlinks.length,
-  });
-});
+    return c.json({
+      targetId,
+      backlinks,
+      total: backlinks.length,
+    });
+  })
 
-// ---- GET /related/:id ----
+  // ---- GET /related/:id ----
 
-linksRoute.get("/related/:id", async (c) => {
-  const entityId = c.req.param("id");
-  if (!entityId) return validationError(c, "Entity ID is required");
+  .get("/related/:id", async (c) => {
+    const entityId = c.req.param("id");
+    if (!entityId) return validationError(c, "Entity ID is required");
 
-  const parsed = RelatedQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
+    const parsed = RelatedQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const { limit } = parsed.data;
-  const rawDb = getDb();
+    const { limit } = parsed.data;
+    const rawDb = getDb();
 
-  // Compute related pages by aggregating all link signals bidirectionally.
-  // For each neighbor, sum the weights of all link types connecting them.
-  // Apply quality boost: 1 + quality/40 + reader_importance/400 (max ~1.45x).
-  // Relationship labels come from yaml_related links.
-  const results = await rawDb`
+    // Compute related pages by aggregating all link signals bidirectionally.
+    // For each neighbor, sum the weights of all link types connecting them.
+    // Apply quality boost: 1 + quality/40 + reader_importance/400 (max ~1.45x).
+    // Relationship labels come from yaml_related links.
+    const results = await rawDb`
     WITH bidirectional_links AS (
       -- Forward links: entityId is source (is_reverse = false)
       SELECT target_id AS neighbor_id, link_type, relationship, weight, false AS is_reverse
@@ -237,37 +236,37 @@ linksRoute.get("/related/:id", async (c) => {
     LIMIT ${limit * 3}
   `;
 
-  // Type-diverse selection: guarantee MIN_PER_TYPE from each entity type,
-  // then fill remaining slots with highest-scoring entries.
-  const scored = results.map((r: any) => ({
-    id: r.id as string,
-    type: (r.entity_type as string) || "concept",
-    title: (r.title as string) || r.id,
-    score: Math.round(parseFloat(r.score) * 100) / 100,
-    label: formatRelationshipLabel(r.relationship, !!r.relationship_is_reverse) || undefined,
-  }));
+    // Type-diverse selection: guarantee MIN_PER_TYPE from each entity type,
+    // then fill remaining slots with highest-scoring entries.
+    const scored = results.map((r: any) => ({
+      id: r.id as string,
+      type: (r.entity_type as string) || "concept",
+      title: (r.title as string) || r.id,
+      score: Math.round(parseFloat(r.score) * 100) / 100,
+      label: formatRelationshipLabel(r.relationship, !!r.relationship_is_reverse) || undefined,
+    }));
 
-  const selected = typeDiverseSelect(scored, limit);
+    const selected = typeDiverseSelect(scored, limit);
 
-  return c.json({
-    entityId,
-    related: selected,
-    total: selected.length,
-  });
-});
+    return c.json({
+      entityId,
+      related: selected,
+      total: selected.length,
+    });
+  })
 
-// ---- GET /graph/:id ----
+  // ---- GET /graph/:id ----
 
-linksRoute.get("/graph/:id", async (c) => {
-  const entityId = c.req.param("id");
-  if (!entityId) return validationError(c, "Entity ID is required");
+  .get("/graph/:id", async (c) => {
+    const entityId = c.req.param("id");
+    if (!entityId) return validationError(c, "Entity ID is required");
 
-  const rawDb = getDb();
-  const MAX_GRAPH_EDGES = 500;
+    const rawDb = getDb();
+    const MAX_GRAPH_EDGES = 500;
 
-  // Get all direct links (both directions) for the entity.
-  // This provides the raw graph data for visualization.
-  const results = await rawDb`
+    // Get all direct links (both directions) for the entity.
+    // This provides the raw graph data for visualization.
+    const results = await rawDb`
     SELECT
       pl.source_id,
       pl.target_id,
@@ -286,53 +285,53 @@ linksRoute.get("/graph/:id", async (c) => {
     LIMIT ${MAX_GRAPH_EDGES}
   `;
 
-  // Build node and edge sets
-  const nodeMap = new Map<string, { id: string; type: string; title: string }>();
-  const edges: Array<{
-    source: string;
-    target: string;
-    linkType: string;
-    relationship?: string;
-    weight: number;
-  }> = [];
+    // Build node and edge sets
+    const nodeMap = new Map<string, { id: string; type: string; title: string }>();
+    const edges: Array<{
+      source: string;
+      target: string;
+      linkType: string;
+      relationship?: string;
+      weight: number;
+    }> = [];
 
-  for (const r of results as any[]) {
-    if (!nodeMap.has(r.source_id)) {
-      nodeMap.set(r.source_id, {
-        id: r.source_id,
-        type: r.source_type || "concept",
-        title: r.source_title || r.source_id,
+    for (const r of results as any[]) {
+      if (!nodeMap.has(r.source_id)) {
+        nodeMap.set(r.source_id, {
+          id: r.source_id,
+          type: r.source_type || "concept",
+          title: r.source_title || r.source_id,
+        });
+      }
+      if (!nodeMap.has(r.target_id)) {
+        nodeMap.set(r.target_id, {
+          id: r.target_id,
+          type: r.target_type || "concept",
+          title: r.target_title || r.target_id,
+        });
+      }
+      edges.push({
+        source: r.source_id,
+        target: r.target_id,
+        linkType: r.link_type,
+        relationship: r.relationship || undefined,
+        weight: r.weight,
       });
     }
-    if (!nodeMap.has(r.target_id)) {
-      nodeMap.set(r.target_id, {
-        id: r.target_id,
-        type: r.target_type || "concept",
-        title: r.target_title || r.target_id,
-      });
-    }
-    edges.push({
-      source: r.source_id,
-      target: r.target_id,
-      linkType: r.link_type,
-      relationship: r.relationship || undefined,
-      weight: r.weight,
+
+    return c.json({
+      entityId,
+      nodes: Array.from(nodeMap.values()),
+      edges,
     });
-  }
+  })
 
-  return c.json({
-    entityId,
-    nodes: Array.from(nodeMap.values()),
-    edges,
-  });
-});
+  // ---- GET /stats ----
 
-// ---- GET /stats ----
+  .get("/stats", async (c) => {
+    const rawDb = getDb();
 
-linksRoute.get("/stats", async (c) => {
-  const rawDb = getDb();
-
-  const stats = await rawDb`
+    const stats = await rawDb`
     SELECT
       link_type,
       COUNT(*)::int AS count,
@@ -342,27 +341,27 @@ linksRoute.get("/stats", async (c) => {
     ORDER BY count DESC
   `;
 
-  const totalResult = await rawDb`
+    const totalResult = await rawDb`
     SELECT COUNT(*)::int AS total FROM page_links
   `;
 
-  const uniquePagesResult = await rawDb`
+    const uniquePagesResult = await rawDb`
     SELECT COUNT(DISTINCT source_id)::int AS sources,
            COUNT(DISTINCT target_id)::int AS targets
     FROM page_links
   `;
 
-  return c.json({
-    total: (totalResult[0] as any)?.total || 0,
-    uniqueSources: (uniquePagesResult[0] as any)?.sources || 0,
-    uniqueTargets: (uniquePagesResult[0] as any)?.targets || 0,
-    byType: stats.map((s: any) => ({
-      linkType: s.link_type,
-      count: s.count,
-      avgWeight: parseFloat(s.avg_weight),
-    })),
+    return c.json({
+      total: (totalResult[0] as any)?.total || 0,
+      uniqueSources: (uniquePagesResult[0] as any)?.sources || 0,
+      uniqueTargets: (uniquePagesResult[0] as any)?.targets || 0,
+      byType: stats.map((s: any) => ({
+        linkType: s.link_type,
+        count: s.count,
+        avgWeight: parseFloat(s.avg_weight),
+      })),
+    });
   });
-});
 
 // ---- Helpers ----
 
@@ -419,3 +418,6 @@ function typeDiverseSelect(
   // Build final list in score order
   return scored.filter((e) => selected.has(e.id)).slice(0, maxItems);
 }
+
+export const linksRoute = linksApp;
+export type LinksRoute = typeof linksApp;
