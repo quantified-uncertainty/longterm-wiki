@@ -102,6 +102,8 @@ Non-negotiable constraint: every claim in the system must have at least one entr
 
 ### 6. Faceted Classification Over Tags
 
+_See also: <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture</EntityLink> for the full treatment of how reasoning traces integrate with the classification system._
+
 Five orthogonal facets, fixed vocabulary enforced at write time:
 
 | Facet | Values | Purpose |
@@ -113,6 +115,26 @@ Five orthogonal facets, fixed vocabulary enforced at write time:
 | `volatility` | stable, annual, quarterly, unpredictable | How fast it changes |
 
 Tags are explicitly avoided — they degrade past ~1,000 items without strict governance. Optional lightweight `cluster` slugs handle natural groupings (e.g., `anthropic-series-g`) without requiring a taxonomy.
+
+### 7. Claims Store Reasoning Traces, Not Just Verdicts
+
+Non-negotiable constraint: a claim is not fully processed until its **reasoning trace** — the chain of evidence and inference that connects source material to the asserted claim — is stored alongside it. The verdict (`verified`, `disputed`, etc.) is the conclusion; the trace is the proof.
+
+This is inspired by Elizabeth van Nostrand's [Epistemic Spot Checks](https://www.lesswrong.com/tag/epistemic-spot-check) methodology: the most common failure mode in sourced content isn't wrong facts but "science-washing" — citing a source that doesn't actually support the attributed claim. A verdict of "verified" with no trace is unauditable. A trace showing exactly which quote supports which inference is verifiable by both humans and AI systems.
+
+What a reasoning trace includes:
+
+| Field | Purpose | Example |
+|---|---|---|
+| `inferenceType` | How the claim relates to its source | `direct_assertion`, `derived`, `aggregated`, `interpreted` |
+| `inferenceStep` | Natural-language explanation of the reasoning | "Source states '\$7.3B Series E'; claim restates this with added temporal context from article dateline" |
+| `premises` | Other claim IDs this claim depends on | `[claim_247, claim_189]` for a ranking claim derived from two funding claims |
+| `alternativesConsidered` | What else could be true | "xAI may have raised more in undisclosed rounds; excluded because no public confirmation" |
+| `stalenessProfile` | How quickly this might become outdated | `static` (founding date), `annual` (valuation), `fast_changing` (team size) |
+
+Why this matters more for AI verification than human verification: A human spot-checking a claim reads the source and exercises judgment. An AI verifier can do something more systematic — given a reasoning trace, it can check each step independently: Does the source quote exist in the source? Does the inference follow from the quote? Are the premises still verified? Has the staleness window expired? Full traces make exhaustive verification feasible at a cost that would be impractical for humans.
+
+The key cost tradeoff: generating reasoning traces during extraction requires additional LLM output per claim. The question is whether this cost is justified by the downstream value. See <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture</EntityLink> for the full analysis and data model.
 
 ---
 
@@ -137,6 +159,12 @@ claim: "Kalshi's December 2025 post-money valuation was $11 billion"
     - resource_id: [techcrunch-article-id]
       source_quote: "the company reached an $11 billion valuation..."
       is_primary: true
+
+  reasoning_trace:
+    inference_type: direct_assertion
+    inference_step: "Source directly states the $11 billion valuation figure"
+    staleness_profile: annual
+    alternatives_considered: null
 
 claim: "Kalshi charges taker fees ranging from 0.07% to 7%"
   claim_type:   factual
@@ -227,7 +255,14 @@ claim: "Dario Amodei believes Claude will be performing at the level of a Nobel 
     - resource_id: [interview-resource-id]
       source_quote: "I think within one to two years..."
       is_primary: true
+  reasoning_trace:
+    inference_type: direct_assertion
+    inference_step: "Verified that Dario Amodei made this statement in the interview. Note: 'verified' means he said it, not that the prediction is correct. The claim is attributed, not endorsed."
+    staleness_profile: static       ← he said it; that fact won't change
+    alternatives_considered: "Could be interpreted as aspirational rather than predictive; chose 'predictive' because he used concrete timeframe"
 ```
+
+The reasoning traces above illustrate two different patterns. The valuation claim has a trivial trace (direct assertion, no inference needed). The attributed prediction has a more interesting trace: it explains *why* this is classified as `attributed` rather than `endorsed`, and documents the interpretation choice between "aspirational" and "predictive." These traces are most valuable for claims where the connection between source and assertion involves judgment — exactly the cases where AI re-verification needs guidance.
 
 ### Example C: Neel Nanda (Person Page)
 
@@ -420,6 +455,24 @@ The forcing function needs to exist *before* coverage is sufficient. Options:
 - The `<Claim id="...">` component creates a direct incentive (can't use it if claims don't exist)
 - Internal dashboards that make low-coverage pages visually obvious (shame-driven)
 - Automated extraction as part of the auto-update pipeline (zero marginal cost per page)
+
+### Crux 11: Reasoning Trace Depth vs. Cost
+
+How detailed should reasoning traces be? Three options:
+
+**Option A (Minimal):** Store `inferenceType` (one of: direct_assertion, derived, aggregated, interpreted) and nothing else. Zero additional LLM cost.
+- *Pro:* Free. Lets us distinguish "source says X" from "we inferred X from source." That single bit of metadata is already more transparent than Wikipedia.
+- *Con:* An AI verifier can't reproduce the reasoning. "Derived" doesn't explain *how* it was derived.
+
+**Option B (Structured summary):** Store `inferenceType` + a 1-2 sentence `inferenceStep` + `premises` (claim IDs). Adds ~20-30% to extraction cost.
+- *Pro:* Enough for an AI to check: does the inference step follow from the premises and source quote? Catches most science-washing.
+- *Con:* Generating good inference steps is itself an LLM task that can hallucinate. A wrong reasoning trace is worse than no trace (creates false confidence).
+
+**Option C (Full trace):** Store a multi-step reasoning chain including all quotes consulted, intermediate conclusions, alternatives considered, and confidence rationale. Doubles extraction cost.
+- *Pro:* Complete audit trail. Could theoretically generate a "verification report" for any claim.
+- *Con:* Expensive. Most claims don't need this — "Kalshi was founded in 2018" doesn't benefit from a 5-step reasoning chain. Only valuable for complex derived or analytical claims.
+
+**Proposed approach:** Option A for factual/historical claims (the inference is trivially "direct assertion"). Option B for evaluative, causal, consensus, and speculative claims (where the reasoning matters). Option C only for high-stakes claims manually flagged for deep verification. This tiered approach keeps costs proportional to verification value.
 
 ---
 

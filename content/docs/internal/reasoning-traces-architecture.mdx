@@ -1,0 +1,382 @@
+---
+numericId: E903
+title: "Reasoning Traces: Making Every Claim's Derivation Auditable"
+description: "Architecture for storing full reasoning traces — the chain of evidence and inference connecting source material to wiki claims. Covers the data model, verification pipeline integration, human vs. AI verification UX, and prior art from epistemic spot checks, reasoning transparency, and structured fact-checking research."
+sidebar:
+  order: 41
+subcategory: architecture
+quality: 50
+readerImportance: 90
+researchImportance: 85
+lastEdited: "2026-02-26"
+createdAt: 2026-02-26
+evergreen: false
+llmSummary: "Design document for reasoning traces — structured records of how each claim was derived from source material, what inference was involved, and how it can be re-verified. Proposes a tiered trace model (minimal for direct assertions, structured for derived claims, full for high-stakes claims) and integration with the existing claims pipeline. Motivated by the observation that storing verdicts without reasoning makes verification unauditable: a 'verified' claim with no trace is an assertion of authority, not transparency."
+ratings:
+  novelty: 8
+  rigor: 6
+  actionability: 7
+  completeness: 6
+---
+
+## The Core Idea
+
+A wiki that claims to be trustworthy should make it as easy as possible for readers — both human and AI — to verify any assertion on any page. Today's system stores claims, sources, and verdicts, but not the **reasoning** that connects them. We store *that* a claim was verified, not *how* or *why*.
+
+A reasoning trace is the missing link: a structured record of the chain from source material to asserted claim, including what inference was required, what alternatives were considered, and what would make the claim wrong.
+
+### Why This Matters Differently for Humans vs. AIs
+
+**For human readers**, reasoning transparency builds trust through legibility. A reader seeing a claim with a green "Verified" badge and a source link can click through and spot-check. But the cognitive cost is high: they must read the source, find the relevant passage, and assess whether it supports the claim. Most readers won't do this. What they *will* do is look for signals: Is there a source? Does the claim seem specific enough to be checkable? Are there suspicious hedges? Reasoning traces improve these signals — even if a reader never reads the full trace, knowing it exists (and that an AI verified each step) shifts the epistemic status from "trust me" to "here's the proof."
+
+**For AI verifiers**, reasoning traces are transformative. An AI checking "Anthropic raised \$7.3B in its Series E" without a trace must: (1) find the source, (2) extract the relevant passage, (3) determine the inference type, (4) assess support. With a trace, it only needs to check: (1) does the stored source quote still exist in the source? (2) does the stated inference step follow? This is dramatically cheaper and more reliable. Full-trace verification could run exhaustively across every claim on a schedule — something impossible without traces.
+
+---
+
+## Prior Art and Inspiration
+
+### Elizabeth van Nostrand: Epistemic Spot Checks
+
+Van Nostrand's [Epistemic Spot Check](https://www.lesswrong.com/tag/epistemic-spot-check) methodology samples a few claims from a book or paper, checks them against primary sources, and uses the results to assess the work's overall reliability. Her key finding: the most common failure mode is "science-washing" — citing a source that doesn't actually support the attributed claim. A source *exists*, but the link between source and claim is broken.
+
+Her related post on [Epistemic Legibility](https://www.lesswrong.com/posts/jbE85wCkRr9z7tqmD/epistemic-legibility) argues that "being easy to argue with is a virtue, separate from being correct." An epistemically legible argument is one where a reader can identify specific claims, understand the logical structure, and pinpoint disagreements. Reasoning traces are the structured implementation of this principle.
+
+**Implication for our system:** The `sourceQuote` field on claims already captures *what* the source says. What's missing is the explicit link: *how does this quote support this specific claim?* For direct assertions ("source says X, claim says X") the link is trivial. For derived claims ("source says X, claim infers Y from X") the link is where science-washing happens.
+
+### Luke Muehlhauser / Open Philanthropy: Reasoning Transparency
+
+Muehlhauser's [Reasoning Transparency](https://forum.effectivealtruism.org/posts/i9RJjun327SnT3vW8/reasoning-transparency) framework argues that good epistemic writing should make it easy for readers to answer: "How should I update my views in response to this?" His recommendations:
+
+1. Indicate which considerations are most important
+2. Express confidence levels and the type of support (careful study vs. expert opinion vs. intuition)
+3. Provide quotes with page numbers
+4. Share underlying data and code when possible
+
+GiveWell's Against Malaria Foundation review is his "extreme model" — 125 endnotes, research process summaries, open questions flagged. Our reasoning traces aim for a similar level of transparency, but in a structured, machine-readable format rather than prose.
+
+### Academic Fact-Checking: SAFE, VeriScore, AFEV
+
+The academic fact-checking field has converged on a decompose-then-verify pipeline. The most relevant systems:
+
+- **SAFE** (Google DeepMind, 2024): Decomposes text into atomic facts, verifies each via multi-step search. Agrees with human annotators 72% of the time but is 20x cheaper. Key insight: the verification *rationale* (a natural-language explanation of why the claim is supported or refuted) is as important as the verdict.
+
+- **VeriScore** (2024): Distinguishes **verifiable** from **unverifiable** claims — opinions, hypotheticals, and personal experiences are filtered out before verification. This maps directly to our `claimMode` (endorsed vs. attributed) and `claimType` (factual vs. evaluative) distinctions.
+
+- **AFEV** (2025): Uses **iterative** extraction where each atomic fact is verified before the next is extracted, and the verification result informs subsequent extraction. This produces a natural reasoning chain: "I verified X, which led me to extract Y, which depends on X."
+
+- **DecMetrics** (2025): Evaluates decomposition quality itself. Three metrics: completeness (do decomposed claims cover the original?), correctness (are they faithful?), semantic entropy (are they non-redundant?). These directly apply to our extraction pipeline quality assessment.
+
+### Wikidata: Structured Provenance
+
+Wikidata's statement model is the most mature structured claim system. Each statement has: a main assertion (property + value), qualifiers (temporal scope, measurement method), references (source citations with retrieval dates), and a rank (preferred/normal/deprecated). The rank system elegantly handles conflicting claims — multiple values can coexist with different sources and ranks.
+
+**Key insight for reasoning traces:** Wikidata allows multiple conflicting values with different sources rather than picking one "truth." This is more transparent than a single verdict. Our reasoning traces should similarly preserve the full evidence picture, including disconfirming evidence.
+
+### Nanopublications: The Smallest Publishable Unit
+
+Nanopublications represent atomic scientific claims as self-contained, citable units with three RDF graphs: assertion (the claim), provenance (how it was derived), and publication info (who, when). **Trusty URIs** provide cryptographic integrity — the URI itself contains a hash, making the claim immutable and verifiable.
+
+**Key insight:** The three-graph structure (assertion + provenance + metadata) maps naturally to our model: claim + reasoning trace + verification metadata.
+
+### Limits to Legibility
+
+Jan Kulveit's [Limits to Legibility](https://www.lesswrong.com/posts/4gDbqL3Tods8kHDqs/limits-to-legibility) is an important counterpoint: some valuable knowledge resists formalization. Not every editorial judgment can be decomposed into verifiable atomic claims. The system should be honest about where structured reasoning traces end and tacit judgment begins, rather than pretending everything is equally decomposable.
+
+**Practical implication:** Mark claims with `inferenceType: interpreted` or `inferenceType: editorial` when the reasoning involves judgment that can't be fully formalized. The trace for these claims explains the judgment rather than proving it.
+
+---
+
+## Data Model
+
+### The Reasoning Trace Object
+
+Building on the existing claims schema (see <EntityLink id="claims-architecture-decisions">Architecture Decisions E896</EntityLink>), a reasoning trace adds the following fields to each claim:
+
+```
+reasoning_trace: {
+  // How the claim relates to its source(s)
+  inference_type: 'direct_assertion' | 'derived' | 'aggregated' | 'interpreted' | 'editorial'
+
+  // Natural-language explanation of the reasoning step
+  // For direct assertions: null or brief confirmation
+  // For derived claims: "Source states X; claim infers Y because Z"
+  inference_step: string | null
+
+  // Other claim IDs that this claim logically depends on
+  // Enables cascading re-verification: if a premise changes, dependents are flagged
+  premises: claim_id[] | null
+
+  // What else could be true — documents the judgment call
+  // "xAI may have raised more; excluded because no public confirmation"
+  alternatives_considered: string | null
+
+  // How quickly this claim might become outdated
+  staleness_profile: 'static' | 'slow_changing' | 'annual' | 'quarterly' | 'fast_changing' | 'event_driven'
+
+  // When the claim should be re-verified
+  review_by: date | null
+}
+```
+
+### Inference Types Explained
+
+| Type | Description | Example | Trace Depth Needed |
+|---|---|---|---|
+| `direct_assertion` | Source explicitly states the claim | "Anthropic raised \$7.3B" → TechCrunch: "Anthropic announced a \$7.3 billion round" | Minimal (the quote is the trace) |
+| `derived` | Claim follows from source via logical step | "Anthropic is the second-most-funded AI lab" derived from comparing funding totals of multiple labs | Structured (show premises + inference) |
+| `aggregated` | Claim synthesizes multiple sources | "Kalshi is widely viewed as the leading regulated prediction market" from 5 independent sources | Structured (list sources + how they agree) |
+| `interpreted` | Claim involves judgment about what source means | "Anthropic's safety policy is more cautious than OpenAI's" interpreting both companies' published policies | Full (explain the interpretation) |
+| `editorial` | Wiki's own framing or analysis | "The fee structure incentivizes liquidity provision" as our analysis of fee data | Full (this is our reasoning, not the source's) |
+
+### Tiered Trace Depth
+
+Not all claims need the same trace depth (see <EntityLink id="claims-architecture-decisions">Crux 11 in E896</EntityLink>):
+
+**Tier 1 — Minimal (factual, historical, numeric):** Store `inferenceType` only. The `sourceQuote` on `claimSources` IS the trace for direct assertions. ~70% of claims.
+
+**Tier 2 — Structured (evaluative, causal, consensus, speculative, relational):** Store `inferenceType` + `inferenceStep` + `premises`. Enough for an AI to check the reasoning. ~25% of claims.
+
+**Tier 3 — Full (manually flagged, high-importance, or disputed):** Store all fields including `alternativesConsidered`. Reserved for claims where the reasoning is contested or the stakes are high. ~5% of claims.
+
+### Source-Level Enhancements
+
+The existing `claimSources` join table has `sourceQuote` and `sourceVerdict`. Two new fields would complete the reasoning picture:
+
+```
+entailment_type: 'supports' | 'partially_supports' | 'provides_context' | 'contradicts'
+  — How this specific source relates to this specific claim.
+  — "supports" = source directly states the claim
+  — "partially_supports" = source supports part but not all
+  — "provides_context" = source doesn't state the claim but is needed to understand it
+  — "contradicts" = source says something different (preserved for transparency)
+
+content_hash: string
+  — SHA-256 of source content at time of verification.
+  — Enables detecting when a source has changed since we last checked.
+  — If hash differs on re-fetch, flag the claim for re-verification.
+```
+
+---
+
+## How Reasoning Traces Change the Verification Pipeline
+
+### Current Pipeline (Without Traces)
+
+```
+Extract claims → Fetch sources → Compare claim text to source text → Store verdict
+```
+
+The verification step is a black box: an LLM reads the claim and source and outputs "verified" or "disputed." If you disagree with the verdict, you have to re-run the entire check.
+
+### Proposed Pipeline (With Traces)
+
+```
+Extract claims + inference_type → Fetch sources → For each claim:
+  1. If direct_assertion: Check source quote contains claim substance → Store verdict
+  2. If derived: Check each premise is verified → Check inference_step follows from premises → Store verdict + trace
+  3. If aggregated: Check N sources agree → Store which sources support/contradict → Store verdict + trace
+  4. If interpreted/editorial: Flag for human review OR store LLM reasoning as trace
+```
+
+### Cascading Re-Verification
+
+When a claim has `premises`, re-verification becomes a graph traversal:
+
+1. Premise claim #247 ("OpenAI total funding ≈\$17.9B") is re-checked and found outdated
+2. All claims with `premises` including #247 are flagged for re-verification
+3. Claim #312 ("Anthropic is the second-most-funded AI lab") depends on #247
+4. #312 is automatically re-verified with updated premise data
+
+This is the key advantage of structured traces: changes cascade correctly instead of requiring a full re-verification pass.
+
+### Staleness-Driven Scheduling
+
+The `stalenessProfile` field enables intelligent re-verification scheduling:
+
+| Profile | Re-verify Every | Example Claims |
+|---|---|---|
+| `static` | Never (unless source changes) | Founding dates, historical events |
+| `slow_changing` | 6 months | Team composition, research focus |
+| `annual` | 3 months | Revenue, funding, headcount |
+| `quarterly` | 1 month | Market share, benchmark scores |
+| `fast_changing` | 1 week | Stock price, active user counts |
+| `event_driven` | On trigger (news, announcement) | Regulatory status, leadership |
+
+A daily cron job checks which claims have exceeded their staleness window and queues them for re-verification. This replaces the current "verify everything" or "verify nothing" binary with targeted, cost-effective verification.
+
+---
+
+## UX: How Reasoning Traces Surface to Readers
+
+### Footnote Tooltips (Existing — Enhanced)
+
+The DB-driven footnote system (merged Feb 2026) already shows verdict badges and source quotes in hover tooltips. Reasoning traces add one more layer:
+
+**Current tooltip:**
+> Verified (95%) — "the company reached an \$11 billion valuation..." — TechCrunch, Mar 2025
+
+**With reasoning trace (Tier 1 — minimal):**
+> Verified (95%) — Direct assertion — "the company reached an \$11 billion valuation..." — TechCrunch, Mar 2025
+
+**With reasoning trace (Tier 2 — structured):**
+> Verified (82%) — Derived from 2 premises — "Anthropic is the second-most-funded AI lab after OpenAI"
+> Premises: OpenAI funding \$17.9B (verified), Anthropic funding \$11.5B (verified)
+> Reasoning: Ranking follows from comparing verified funding totals; no other AI lab has publicly disclosed higher funding.
+
+The key UX principle: **most readers see the badge and move on.** The trace is available on click/expand for readers who want to audit. The existence of the trace (and the fact that it was machine-verified) is what creates trust, even for readers who never read it.
+
+### Claims Explorer (Enhanced)
+
+The existing claims explorer at `/claims/explore` could add:
+
+- **Filter by inference type**: Show only derived or editorial claims (the ones where reasoning matters most)
+- **Trace completeness indicator**: How many claims have full traces vs. minimal traces
+- **Dependency graph**: For claims with premises, show the dependency chain (which claims depend on which)
+
+### Verification Report (New)
+
+A page-level "Verification Report" showing:
+
+- Total claims on page, broken down by inference type
+- Claims with full traces vs. claims pending trace generation
+- Staleness status: how many claims are past their review-by date
+- Dependency health: are all premise claims still verified?
+
+This would live at `/wiki/[id]/verification` and serve as the comprehensive audit trail for the page.
+
+---
+
+## What This Looks Like in Practice
+
+### Example: Simple Factual Claim (Tier 1)
+
+```yaml
+claim: "Anthropic raised $7.3B in its Series E round in January 2025"
+  entity_id: anthropic
+  claim_type: numeric
+  claim_mode: endorsed
+  as_of: 2025-01
+  value_numeric: 7300000000
+
+  sources:
+    - resource_id: techcrunch-anthropic-series-e
+      source_quote: "Anthropic announced a $7.3 billion Series E round"
+      entailment_type: supports
+      content_hash: "a3d4f..."
+
+  reasoning_trace:
+    inference_type: direct_assertion
+    staleness_profile: static  # one-time event; won't change
+```
+
+The trace is trivial here — the source directly states the claim. The value is in the `content_hash` (detect if TechCrunch updates the article) and `stalenessProfile` (don't bother re-verifying a historical event).
+
+### Example: Derived Ranking Claim (Tier 2)
+
+```yaml
+claim: "Anthropic is the second-most-funded AI lab as of February 2026"
+  entity_id: anthropic
+  claim_type: relational
+  claim_mode: endorsed
+  as_of: 2026-02
+
+  sources:
+    - resource_id: crunchbase-anthropic
+      source_quote: "Total Funding Amount: $11.5B"
+      entailment_type: partially_supports
+    - resource_id: crunchbase-openai
+      source_quote: "Total Funding Amount: $17.9B"
+      entailment_type: provides_context
+
+  reasoning_trace:
+    inference_type: derived
+    inference_step: "Ranking based on publicly disclosed total funding. OpenAI ($17.9B) > Anthropic ($11.5B). No other AI lab has publicly disclosed higher total funding as of this date."
+    premises: [claim_247, claim_189]  # the two funding total claims
+    alternatives_considered: "xAI has raised ~$12B but some rounds are partially undisclosed; Google DeepMind is not independently funded. If xAI's full funding exceeds Anthropic's, this ranking changes."
+    staleness_profile: quarterly  # new funding rounds happen frequently
+    review_by: 2026-05-01
+```
+
+This trace is where the value shows. An AI re-verifier can check: (1) Are claims #247 and #189 still verified? (2) Has any new AI lab disclosed higher funding? (3) Has the staleness window expired? Each check is targeted and cheap.
+
+### Example: Editorial Analysis Claim (Tier 3)
+
+```yaml
+claim: "Anthropic's Constitutional AI approach represents a fundamentally different safety philosophy from RLHF-based alignment"
+  entity_id: anthropic
+  claim_type: evaluative
+  claim_mode: endorsed
+
+  sources:
+    - resource_id: constitutional-ai-paper
+      source_quote: "...we use AI feedback to evaluate model outputs rather than human feedback..."
+      entailment_type: partially_supports
+    - resource_id: rlhf-original-paper
+      source_quote: "...training reward models from human comparisons..."
+      entailment_type: provides_context
+
+  reasoning_trace:
+    inference_type: editorial
+    inference_step: "The wiki characterizes Constitutional AI as 'fundamentally different' from RLHF. This is our editorial judgment based on: (1) the methodological difference (AI feedback vs. human feedback), (2) the philosophical difference (principles-based vs. preference-based), (3) Anthropic's own framing of CAI as an alternative to RLHF. 'Fundamentally different' is a stronger characterization than the sources use — the CAI paper describes it as a complement to RLHF, not a replacement."
+    alternatives_considered: "Could characterize as 'an evolution of RLHF' (weaker) or 'a variant of RLHF' (reductive). Chose 'fundamentally different' because the feedback mechanism is qualitatively different, but acknowledge this is our framing."
+    staleness_profile: slow_changing
+```
+
+This is the most valuable trace type. It makes the wiki's editorial judgment explicit and auditable. A reader who disagrees with "fundamentally different" can see exactly why we chose that framing and what alternatives we considered.
+
+---
+
+## Implementation Path
+
+### Phase 1: Schema + Minimal Traces (Low Cost)
+
+1. Add `inference_type` column to claims table (enum, nullable, default null)
+2. Add `staleness_profile` column (enum, nullable)
+3. Add `review_by` column (date, nullable)
+4. Backfill `inference_type` for existing claims using heuristic: if `sourceQuote` exists and claim text closely matches quote → `direct_assertion`; if `claimType` is evaluative/causal → `interpreted`; else `direct_assertion`
+5. Surface `inference_type` in footnote tooltips (one word: "Direct" / "Derived" / "Editorial")
+
+Cost: One migration, one backfill script, one frontend change. Provides value immediately.
+
+### Phase 2: Structured Traces for Non-Trivial Claims
+
+1. Add `reasoning_trace` JSONB column to claims table
+2. Add `entailment_type` column to `claim_sources` table
+3. Add `content_hash` column to `claim_sources` table
+4. Modify extraction pipeline: for evaluative/causal/speculative claims, generate `inferenceStep` during extraction (adds ~30% to extraction cost for affected claims)
+5. Modify verification pipeline: store verification rationale in `reasoning_trace.inferenceStep`
+6. Surface in claims explorer: filter by inference type, show trace previews
+
+Cost: Moderate. The LLM cost increase only applies to ~25% of claims (non-factual types).
+
+### Phase 3: Cascading Verification + Staleness
+
+1. Add `premises` to reasoning trace (claim ID array)
+2. Build dependency graph: when a premise claim is re-verified, flag dependents
+3. Build staleness scheduler: daily cron checks `review_by` dates
+4. Build re-verification pipeline: targeted re-check of stale or dependency-flagged claims
+5. Build `/wiki/[id]/verification` page showing trace completeness and staleness status
+
+Cost: Significant infrastructure. Only pursue after Phase 2 proves its value.
+
+---
+
+## Open Questions
+
+1. **Should reasoning traces be generated during extraction or during verification?** Extraction is when the LLM first encounters the source, so it has the most context. Verification is when the trace would actually be checked. Generating during extraction is cheaper (one pass) but may produce traces that reflect the extractor's reasoning, not the verifier's.
+
+2. **How do we handle traces for claims extracted before the trace system exists?** The 1,500+ existing claims have no traces. Backfilling `inferenceType` via heuristic is feasible. Generating full traces retroactively requires re-reading each claim's sources — essentially re-running verification with trace generation enabled.
+
+3. **Should traces be visible to all readers or only internal?** Showing traces publicly increases transparency but adds cognitive load. The current footnote tooltip UX is already rich (verdict + quote + source). Adding trace details might overwhelm. Consider: traces visible in the claims explorer and verification report, but only inference type (one word) visible in the main page tooltip.
+
+4. **What's the right `review_by` heuristic?** For `annual` staleness, is review_by = as_of + 6 months? 12 months? This depends on the domain: AI funding rounds happen frequently but founding dates never change. A configurable mapping from staleness_profile to review interval makes sense.
+
+---
+
+## Related Documents
+
+- <EntityLink id="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions including reasoning trace crux (Crux 11) and worked examples with traces
+- <EntityLink id="claims-system-development-roadmap">Claims Development Roadmap (E897)</EntityLink> — Sprint plan including Sprint 7 on reasoning traces
+- <EntityLink id="claim-first-architecture">Claim-First Architecture (E892)</EntityLink> — Long-term vision for claims as primary artifact, enhanced with reasoning transparency layer
+- <EntityLink id="claims-extraction-quality-patterns">Extraction Quality Patterns (E902)</EntityLink> — Failure modes that reasoning traces help detect
+- <EntityLink id="citation-architecture">Citation Architecture (E891)</EntityLink> — Unified footnote system that surfaces reasoning traces to readers
