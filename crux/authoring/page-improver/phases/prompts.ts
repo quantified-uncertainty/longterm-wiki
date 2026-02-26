@@ -19,11 +19,13 @@ interface ImprovePromptArgs {
   entityLookup: string;
   factLookup: string | null;
   claimsContext: string | null;
+  /** Structured directions from claims gap analysis (missing verified facts + contradictions) */
+  gapAnalysisContext: string | null;
   tier: string;
 }
 
 export function IMPROVE_PROMPT(args: ImprovePromptArgs): string {
-  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, factLookup, claimsContext, tier } = args;
+  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, factLookup, claimsContext, gapAnalysisContext, tier } = args;
 
   const isPolish = tier === 'polish';
   const pageType = getPageType(page);
@@ -144,6 +146,16 @@ The following claims have been extracted and verified from this page's sources. 
 If the page is missing information covered by verified claims, consider adding it (with appropriate citations).
 
 ${claimsContext}
+` : ''}${gapAnalysisContext ? `
+### Claims Gap Analysis (PRIORITY -- verified facts to add)
+
+The following analysis identifies specific verified facts from the claims store that are MISSING from this page,
+and contradictions where the page disagrees with verified claims. These are high-confidence, source-backed facts.
+
+**IMPORTANT: Prioritize incorporating these verified facts over general improvements.**
+Each missing fact has a source URL -- add it with a footnote citation.
+
+${gapAnalysisContext}
 ` : ''}
 ### Quality Standards
 - Add citations from the research sources
