@@ -252,8 +252,11 @@ export function buildInsertItem(
     entityType: 'wiki-page',
     claimType: claim.claimType,
     claimText: claim.claimText,
-    confidence: 'unverified',
+    confidence: 'unverified', // @deprecated Use claimVerdict instead
+    /** @deprecated Use sources[] instead. Kept for backward compat (double-write). */
     sourceQuote: claim.sourceQuote ?? null,
+    // Extraction doesn't verify — leave claimVerdict null (will be set by verify step)
+    claimVerdict: null,
     // Enhanced fields
     claimCategory: claimTypeToCategory(claim.claimType),
     relatedEntities: claim.relatedEntities && claim.relatedEntities.length > 0

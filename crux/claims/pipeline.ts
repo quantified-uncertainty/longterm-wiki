@@ -244,8 +244,10 @@ async function main() {
           // Legacy fields (kept for backward compat)
           value: clm.section,
           unit: clm.footnoteRefs.length > 0 ? clm.footnoteRefs.join(',') : null,
-          confidence: 'unverified',
+          confidence: 'unverified', // @deprecated Use claimVerdict instead. Kept for backward compatibility.
           sourceQuote: clm.sourceQuote ?? null,
+          // Extraction doesn't verify — leave claimVerdict null (will be set by verify step)
+          claimVerdict: null,
           // Enhanced fields
           claimCategory: claimTypeToCategory(clm.claimType as Parameters<typeof claimTypeToCategory>[0]),
           relatedEntities: clm.relatedEntities && clm.relatedEntities.length > 0
@@ -266,6 +268,20 @@ async function main() {
         const result = await insertClaimBatch(items);
         if (result.ok) {
           inserted += result.data.inserted;
+
+          // Create claim_page_references for claims with footnoteRefs
+          for (let j = 0; j < batch.length; j++) {
+            const clm = batch[j];
+            const claimId = result.data.results[j]?.id;
+            if (!claimId || clm.footnoteRefs.length === 0) continue;
+
+            const refs = clm.footnoteRefs.map(fn => ({
+              pageId,
+              footnote: parseInt(fn, 10) || null,
+              section: clm.section ?? null,
+            }));
+            await addClaimPageReferencesBatch(claimId, refs);
+          }
         } else {
           failed += batch.length;
           console.error(`  ${c.red}Batch insert failed: ${result.message}${c.reset}`);

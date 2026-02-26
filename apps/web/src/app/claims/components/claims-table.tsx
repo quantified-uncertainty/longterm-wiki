@@ -66,7 +66,9 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
         />
       )}
 
-      {claim.sourceQuote && (
+      {/* Legacy sourceQuote — only show when no claim_sources entries exist */}
+      {/* @deprecated Prefer claim.sources[] (from claim_sources table) */}
+      {claim.sourceQuote && (!claim.sources || claim.sources.length === 0) && (
         <div>
           <span className="font-medium text-xs text-muted-foreground">
             Source Quote:
@@ -427,10 +429,26 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
     size: 160,
   },
   {
-    accessorKey: "sourceQuote",
+    id: "sourceQuote",
+    /** @deprecated Prefer sources[] from claim_sources table */
+    accessorFn: (row) => {
+      // Prefer quote from claim_sources, fall back to legacy sourceQuote
+      if (row.sources && row.sources.length > 0) {
+        const primary = row.sources.find(s => s.isPrimary);
+        return (primary || row.sources[0]).sourceQuote || row.sourceQuote || null;
+      }
+      return row.sourceQuote || null;
+    },
     header: "Source Quote",
     cell: ({ row }) => {
-      const quote = row.original.sourceQuote;
+      // Prefer quote from claim_sources, fall back to legacy sourceQuote
+      let quote: string | null = null;
+      if (row.original.sources && row.original.sources.length > 0) {
+        const primary = row.original.sources.find(s => s.isPrimary);
+        quote = (primary || row.original.sources[0]).sourceQuote || row.original.sourceQuote || null;
+      } else {
+        quote = row.original.sourceQuote || null;
+      }
       if (!quote) return <span className="text-muted-foreground">-</span>;
       return (
         <span

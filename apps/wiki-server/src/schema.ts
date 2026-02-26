@@ -377,7 +377,8 @@ export const summaries = pgTable(
  *   resourceIds: JSONB array of resource IDs from data/resources/ backing this claim
  *
  * Legacy columns (value, unit) are retained for backward compatibility but
- * new code should use section + footnoteRefs instead.
+ * new code should use section instead.
+ * footnoteRefs is also legacy — new code should use claim_page_references table.
  */
 export const claims = pgTable(
   "claims",
@@ -389,10 +390,13 @@ export const claims = pgTable(
     entityType: text("entity_type").notNull(),
     claimType: text("claim_type").notNull(),
     claimText: text("claim_text").notNull(),
-    // Legacy fields — kept for backward compat, prefer section/footnoteRefs
+    // @deprecated — legacy text fields; use valueNumeric/valueLow/valueHigh + measure instead.
+    // Still written for backward compat but not read by new code paths.
     value: text("value"),
     unit: text("unit"),
+    /** @deprecated Use claimVerdict instead. Kept for backward compatibility. */
     confidence: text("confidence"),
+    /** @deprecated Use claim_sources table instead. Kept for backward compat (double-write). */
     sourceQuote: text("source_quote"),
     // --- Enhanced fields (migration 0028) ---
     claimCategory: text("claim_category"), // factual | opinion | analytical | speculative | relational
@@ -400,6 +404,7 @@ export const claims = pgTable(
     factId: text("fact_id"), // link to facts system: "entity.factKey" (e.g. "anthropic.6796e194")
     resourceIds: jsonb("resource_ids"), // string[] — resource IDs from data/resources/
     section: text("section"), // section heading where claim appears
+    /** @deprecated Use claim_page_references table instead. Kept for backward compat. */
     footnoteRefs: text("footnote_refs"), // comma-separated footnote refs (e.g. "1,3,7")
     // --- Phase 2 fields (migration 0029) ---
     claimMode: text("claim_mode").notNull().default("endorsed"), // 'endorsed' | 'attributed'

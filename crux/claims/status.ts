@@ -54,15 +54,15 @@ async function main() {
   const byCategory: Record<string, number> = {};
   const byConfidence: Record<string, number> = {};
   const bySection: Record<string, number> = {};
-  const sourced = claims.filter(c => (c.footnoteRefs ?? c.unit) && (c.footnoteRefs ?? c.unit)!.length > 0).length;
+  const sourced = claims.filter(c => c.footnoteRefs && c.footnoteRefs.length > 0).length;
 
   for (const claim of claims) {
     byType[claim.claimType] = (byType[claim.claimType] ?? 0) + 1;
     const cat = claim.claimCategory ?? 'uncategorized';
     byCategory[cat] = (byCategory[cat] ?? 0) + 1;
-    const conf = claim.confidence ?? 'unverified';
+    const conf = claim.claimVerdict ?? claim.confidence ?? 'unverified';
     byConfidence[conf] = (byConfidence[conf] ?? 0) + 1;
-    const section = claim.section ?? claim.value ?? 'Unknown';
+    const section = claim.section ?? 'Unknown';
     bySection[section] = (bySection[section] ?? 0) + 1;
   }
 
@@ -81,9 +81,10 @@ async function main() {
         claimText: cl.claimText,
         claimType: cl.claimType,
         claimCategory: cl.claimCategory ?? null,
-        section: cl.section ?? cl.value,
-        footnoteRefs: (cl.footnoteRefs ?? cl.unit) ? (cl.footnoteRefs ?? cl.unit)!.split(',') : [],
-        confidence: cl.confidence,
+        section: cl.section ?? null,
+        footnoteRefs: cl.footnoteRefs ? cl.footnoteRefs.split(',') : [],
+        confidence: cl.confidence, // @deprecated Use claimVerdict instead
+        claimVerdict: cl.claimVerdict ?? null,
         sourceQuote: cl.sourceQuote ?? null,
         relatedEntities: cl.relatedEntities ?? null,
         factId: cl.factId ?? null,
@@ -97,10 +98,11 @@ async function main() {
   console.log(`  Sourced:        ${sourced} (have footnote refs)`);
   console.log(`  Unsourced:      ${claims.length - sourced}`);
 
-  console.log(`\n${c.bold}By Confidence:${c.reset}`);
-  const confOrder = ['verified', 'unsupported', 'unverified', 'unsourced'];
+  console.log(`\n${c.bold}By Verdict:${c.reset}`);
+  const confOrder = ['verified', 'disputed', 'unsupported', 'unverified', 'unsourced'];
   const confColors: Record<string, string> = {
     verified: c.green,
+    disputed: c.yellow,
     unsupported: c.red,
     unverified: c.yellow,
     unsourced: c.dim,
@@ -130,7 +132,7 @@ async function main() {
   }
 
   // Show a sample of unverified claims
-  const unverified = claims.filter(cl => cl.confidence === 'unverified');
+  const unverified = claims.filter(cl => (cl.claimVerdict ?? cl.confidence ?? 'unverified') === 'unverified');
   if (unverified.length > 0 && byConfidence['verified'] === undefined) {
     console.log(`\n${c.yellow}No claims verified yet. Run:${c.reset}`);
     console.log(`  pnpm crux claims verify ${pageId}`);

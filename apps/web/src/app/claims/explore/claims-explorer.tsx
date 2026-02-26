@@ -63,7 +63,7 @@ export function ClaimsExplorer({
     }
     if (filters.confidence) {
       result = result.filter(
-        (c) => (c.confidence ?? "unverified") === filters.confidence
+        (c) => (c.claimVerdict ?? c.confidence ?? "unverified") === filters.confidence
       );
     }
     if (filters.claimMode) {
