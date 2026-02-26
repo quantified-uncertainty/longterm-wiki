@@ -12,7 +12,7 @@ Any feature that:
 
 1. Create `apps/web/src/app/internal/<name>/page.tsx` (server component — loads data)
 2. Create `apps/web/src/app/internal/<name>/<name>-table.tsx` (client component — `"use client"` with `DataTable` from `@/components/ui/data-table.tsx`)
-3. Add navigation entry in `apps/web/src/lib/wiki-nav.ts` under the appropriate section ("Dashboards", "Claims & Citations", or "Reference Pages")
+3. Add navigation entry in `apps/web/src/lib/wiki-nav.ts` under the appropriate section ("Dashboards", "Claims & Citations", or "Architecture & Reference")
 4. Server components can read YAML/JSON files directly via `fs` for operational data
 5. Follow existing patterns in `apps/web/src/app/internal/updates/` or `auto-update-runs/`
 

@@ -1,6 +1,6 @@
 import type { NavSection } from "@/lib/internal-nav";
 import { fetchFromWikiServer } from "@lib/wiki-server";
-import { getEntityById } from "@data";
+import { getEntityById, getEntityHref } from "@data";
 
 interface NetworkResponse {
   nodes: { entityId: string; claimCount: number }[];
@@ -17,6 +17,12 @@ export interface ClaimsEntityItem {
 
 /** Static nav sections for the claims explorer (no entity list). */
 export async function getClaimsNav(): Promise<NavSection[]> {
+  // Resolve fact-dashboard to its /wiki/E<id> URL if registered
+  const factDashboardHref = getEntityHref("fact-dashboard");
+  const resolvedFactHref = factDashboardHref.startsWith("/wiki/E")
+    ? factDashboardHref
+    : "/internal/fact-dashboard";
+
   return [
     {
       title: "Explorer",
@@ -27,6 +33,7 @@ export async function getClaimsNav(): Promise<NavSection[]> {
         { label: "Relationships", href: "/claims/relationships" },
         { label: "Network", href: "/claims/network" },
         { label: "Resources", href: "/claims/resources" },
+        { label: "Fact Dashboard", href: resolvedFactHref },
       ],
     },
   ];

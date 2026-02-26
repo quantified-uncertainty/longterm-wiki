@@ -169,16 +169,15 @@ describe("getInternalNav (mocked data)", () => {
     setMockPages([]);
   });
 
-  it("returns hardcoded sections: Overview, Dashboards, Claims & Citations, Reference Pages, Style Guides, Research, Architecture", () => {
+  it("returns hardcoded sections: Overview, Dashboards, Claims & Citations, Style Guides, Research, Architecture & Reference", () => {
     const sections = getInternalNav();
     const titles = sections.map(s => s.title);
     expect(titles).toContain("Overview");
     expect(titles).toContain("Dashboards");
     expect(titles).toContain("Claims & Citations");
-    expect(titles).toContain("Reference Pages");
     expect(titles).toContain("Style Guides");
     expect(titles).toContain("Research");
-    expect(titles).toContain("Architecture & Schema");
+    expect(titles).toContain("Architecture & Reference");
   });
 
   it("dashboard section has defaultOpen: true", () => {
@@ -233,13 +232,15 @@ describe("getInternalNav (mocked data)", () => {
     expect(labels).toContain("Canonical Facts & Calc");
   });
 
-  it("Architecture section contains expected entries", () => {
+  it("Architecture & Reference section contains expected entries", () => {
     const sections = getInternalNav();
-    const arch = sections.find(s => s.title === "Architecture & Schema")!;
+    const arch = sections.find(s => s.title === "Architecture & Reference")!;
     const labels = arch.items.map(i => i.label);
     expect(labels).toContain("Architecture");
     expect(labels).toContain("Schema Diagrams");
     expect(labels).toContain("Knowledge Graph Ontology");
+    expect(labels).toContain("Automation Tools");
+    expect(labels).toContain("Content Database");
   });
 });
 

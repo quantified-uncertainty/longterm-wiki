@@ -263,21 +263,16 @@ export function getInternalNav(): NavSection[] {
     {
       title: "Claims & Citations",
       items: [
+        // User-facing tools
         { label: "Claims Explorer", href: "/claims" },
-        { label: "Fact Dashboard", href: internalHref("fact-dashboard") },
         { label: "Resources", href: "/claims/resources" },
+        { label: "Fact Dashboard", href: internalHref("fact-dashboard") },
+        // Internal monitoring
         { label: "Claims Ingestion", href: "/internal/claims-ingestion" },
         { label: "Citation Accuracy", href: "/internal/citation-accuracy" },
         { label: "Citation Content", href: "/internal/citation-content" },
         { label: "Hallucination Risk", href: "/internal/hallucination-risk" },
         { label: "Hallucination Evals", href: "/internal/hallucination-evals" },
-      ],
-    },
-    {
-      title: "Reference Pages",
-      items: [
-        { label: "Automation Tools", href: internalHref("automation-tools") },
-        { label: "Content Database", href: internalHref("content-database") },
       ],
     },
     {
@@ -317,7 +312,7 @@ export function getInternalNav(): NavSection[] {
       ],
     },
     {
-      title: "Architecture & Schema",
+      title: "Architecture & Reference",
       items: [
         { label: "Architecture", href: internalHref("architecture") },
         { label: "Wiki Generation Architecture", href: internalHref("wiki-generation-architecture") },
@@ -333,6 +328,8 @@ export function getInternalNav(): NavSection[] {
         { label: "Server Environments", href: internalHref("wiki-server-architecture") },
         { label: "Server Communication", href: internalHref("server-communication-investigation") },
         { label: "Schema Diagrams", href: internalHref("diagrams") },
+        { label: "Automation Tools", href: internalHref("automation-tools") },
+        { label: "Content Database", href: internalHref("content-database") },
       ],
     },
   ];
