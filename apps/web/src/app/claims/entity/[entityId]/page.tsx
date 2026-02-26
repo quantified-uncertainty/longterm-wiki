@@ -9,8 +9,12 @@ import {
   getResourceCredibility,
 } from "@data";
 import type { GetClaimsResult } from "@wiki-server/api-types";
+import { readFileSync } from "fs";
+import { join } from "path";
+import { parse } from "yaml";
 import { StatCard } from "../../components/stat-card";
 import { ClaimsTable } from "../../components/claims-table";
+import { StructuredClaimsTable } from "../../components/structured-claims-table";
 import { DistributionBar } from "../../components/distribution-bar";
 import {
   collectEntitySlugs,
@@ -18,6 +22,23 @@ import {
 } from "../../components/claims-data";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getResourceTypeIcon } from "@/components/wiki/resource-utils";
+
+function loadPropertyLabels(): Record<string, string> {
+  try {
+    const raw = readFileSync(
+      join(process.cwd(), "../../data/claims-properties.yaml"),
+      "utf-8"
+    );
+    const data = parse(raw) as { properties: Array<{ id: string; label: string }> };
+    const map: Record<string, string> = {};
+    for (const prop of data.properties) {
+      map[prop.id] = prop.label;
+    }
+    return map;
+  } catch {
+    return {};
+  }
+}
 
 interface PageProps {
   params: Promise<{ entityId: string }>;
@@ -149,6 +170,28 @@ export default async function EntityClaimsPage({ params }: PageProps) {
               <DistributionBar data={byCategory} total={claims.length} />
             </div>
           )}
+
+          {(() => {
+            const structuredClaims = claims.filter((c) => c.property != null);
+            if (structuredClaims.length === 0) return null;
+            const propertyLabels = loadPropertyLabels();
+            return (
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold mb-3">
+                  Structured Data
+                  <span className="text-sm font-normal text-muted-foreground ml-2">
+                    ({structuredClaims.length})
+                  </span>
+                </h2>
+                <div className="rounded-lg border">
+                  <StructuredClaimsTable
+                    claims={structuredClaims}
+                    propertyLabels={propertyLabels}
+                  />
+                </div>
+              </div>
+            );
+          })()}
 
           <ClaimsTable claims={claims} entityNames={entityNames} />
         </>
