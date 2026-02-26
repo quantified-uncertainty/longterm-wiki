@@ -18,7 +18,11 @@ import {
   ClearClaimsBySectionSchema,
   ClaimPageReferenceInsertSchema,
   ClaimPageReferenceBatchSchema,
+  type ClaimPageReferenceRow,
 } from "../api-types.js";
+
+/** Pre-computed schema for single page-reference insertion (omits claimId from URL param). */
+const PageRefInsertBodySchema = ClaimPageReferenceInsertSchema.omit({ claimId: true });
 
 export const claimsRoute = new Hono();
 
@@ -459,15 +463,16 @@ claimsRoute.get("/by-entity/:entityId", async (c) => {
 
   return c.json({
     claims: rows.map((r) => {
-      const claim = formatClaim(r, sourcesMap.get(Number(r.id)) ?? []);
+      const claim: ReturnType<typeof formatClaim> & { pageReferences?: ClaimPageReferenceRow[] } =
+        formatClaim(r, sourcesMap.get(Number(r.id)) ?? []);
       if (includePageReferences) {
-        (claim as any).pageReferences = (pageRefsMap.get(Number(r.id)) ?? []).map((pr) => ({
+        claim.pageReferences = (pageRefsMap.get(Number(r.id)) ?? []).map((pr) => ({
           id: Number(pr.id),
           claimId: Number(pr.claimId),
           pageId: pr.pageId,
           footnote: pr.footnote,
           section: pr.section,
-          createdAt: pr.createdAt,
+          createdAt: pr.createdAt?.toISOString() ?? new Date().toISOString(),
         }));
       }
       return claim;
@@ -770,7 +775,7 @@ claimsRoute.get("/:id/page-references", async (c) => {
       pageId: r.pageId,
       footnote: r.footnote,
       section: r.section,
-      createdAt: r.createdAt,
+      createdAt: r.createdAt?.toISOString() ?? new Date().toISOString(),
     })),
   });
 });
@@ -787,7 +792,7 @@ claimsRoute.post("/:id/page-references", async (c) => {
   const body = await parseJsonBody(c);
   if (!body) return invalidJsonError(c);
 
-  const parsed = ClaimPageReferenceInsertSchema.omit({ claimId: true }).safeParse(body);
+  const parsed = PageRefInsertBodySchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const db = getDrizzleDb();
@@ -817,7 +822,7 @@ claimsRoute.post("/:id/page-references", async (c) => {
     pageId: rows[0].pageId,
     footnote: rows[0].footnote,
     section: rows[0].section,
-    createdAt: rows[0].createdAt,
+    createdAt: rows[0].createdAt?.toISOString() ?? new Date().toISOString(),
   }, 201);
 });
 
