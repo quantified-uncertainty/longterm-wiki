@@ -152,7 +152,7 @@ Do not consider work complete until CI is green.
 - **Squiggle models**: See `apps/web/CLAUDE.md` for SquiggleEstimate style guide
 - **Page templates**: `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
 - **Canonical facts & Calc**: Follow `content/docs/internal/canonical-facts.mdx` — `<F>` for volatile numbers, `<Calc>` for derived computations
-- **Internal sidebar**: `apps/web/src/lib/internal-nav.ts` — check existing section semantics before adding pages
+- **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts` — check existing section semantics before adding pages
 - **Internal dashboards**: For features with data/status over time, create `/internal/<name>` pages following patterns in `apps/web/src/app/internal/`
 - **GitHub API**: Use `crux issues/pr/ci/epic` commands for writes. Use MCP GitHub tools for ad-hoc reads. Never raw `curl`.
 - **Epics**: Use `crux epic` for multi-issue coordination via GitHub Discussions. Individual tasks stay as Issues.
