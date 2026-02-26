@@ -74,6 +74,12 @@ const SCRIPTS = {
     passthrough: ['json'],
     positional: false,
   },
+  synthesize: {
+    script: 'claims/synthesize.ts',
+    description: 'Gap analysis: compare stored claims against page content',
+    passthrough: ['json', 'top', 'model'],
+    positional: true,
+  },
   'backfill-from-citations': {
     script: 'claims/backfill-from-citations.ts',
     description: 'Backfill claims from citation_quotes by grouping on text similarity',
@@ -99,7 +105,7 @@ Options:
   --dry-run             Preview without storing to database
   --model=M             LLM model override (default: google/gemini-2.0-flash-001)
   --steps=S             Comma-separated steps to run: extract,link,verify (pipeline only)
-  --json                JSON output (status only)
+  --json                JSON output (status, synthesize)
   --entity=E            Target entity filter (ingest-resource, from-resource)
   --limit=N             Max resources/URLs to process (backfill-from-citations: max quotes to load)
   --page-id=P           Restrict to a single wiki page (backfill-from-citations)
@@ -138,6 +144,11 @@ Workflow:
   1. crux claims ingest-resource <resource-id>   Extract from a known resource
   2. crux claims ingest-batch                    Bulk-process all cited resources
   3. crux claims from-resource <url>             Extract from any URL (auto-routes)
+
+  Claims synthesis (gap analysis):
+  1. crux claims synthesize <page-id>             Compare claims vs page content
+  2. crux claims synthesize <page-id> --json       Machine-readable output
+  3. crux content improve <page-id> --directions="Incorporate missing claims"
 
   Citation backfill (Wave 2b):
   1. crux claims backfill-from-citations --dry-run        Preview what would be created
