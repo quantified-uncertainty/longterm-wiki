@@ -1,419 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { mockDbModule, postJson } from "./test-utils.js";
+import { TestDb } from "./test-db-helper.js";
 
-// ---- In-memory store ----
+// ---- In-memory test database ----
+// Replaces the old hand-written dispatch with a structured helper that
+// parses INSERT column lists from Drizzle-generated SQL. New columns
+// added via migrations are handled automatically — no more PARAMS_PER_ROW.
 
-let claimStore: Map<number, Record<string, unknown>>;
-let claimSourceStore: Map<number, Record<string, unknown>>;
-let nextId: number;
-let nextSourceId: number;
-
-function resetStores() {
-  claimStore = new Map();
-  claimSourceStore = new Map();
-  nextId = 1;
-  nextSourceId = 1;
-}
-
-/** Parse a JSONB param that may arrive as a JSON string from Drizzle */
-function parseJsonbParam(val: unknown): unknown {
-  if (typeof val === 'string') {
-    try { return JSON.parse(val); } catch { return val; }
-  }
-  return val ?? null;
-}
-
-function dispatch(query: string, params: unknown[]): unknown[] {
-  const q = query.toLowerCase();
-
-  // ---- entity_ids (health check) ----
-  if (q.includes("count(*)") && q.includes("entity_ids")) {
-    return [{ count: 0 }];
-  }
-  if (q.includes("last_value")) {
-    return [{ last_value: 0, is_called: false }];
-  }
-
-  // ---- ref-check: SELECT id FROM entities/resources/wiki_pages WHERE id IN (...) ----
-  if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
-    // Return all queried IDs as existing (ref check passes)
-    return params.map((p) => ({ id: p }));
-  }
-
-  // ---- INSERT INTO claim_sources ----
-  if (q.includes("insert into") && q.includes('"claim_sources"')) {
-    const now = new Date();
-    // Columns: claim_id, resource_id, url, source_quote, is_primary
-    const PARAMS_PER_ROW = 5;
-    const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
-    const results: Record<string, unknown>[] = [];
-    for (let i = 0; i < rowCount; i++) {
-      const off = i * PARAMS_PER_ROW;
-      const id = nextSourceId++;
-      const row: Record<string, unknown> = {
-        id,
-        claim_id: params[off],
-        resource_id: params[off + 1],
-        url: params[off + 2],
-        source_quote: params[off + 3],
-        is_primary: params[off + 4],
-        added_at: now,
-      };
-      claimSourceStore.set(id, row);
-      results.push(row);
-    }
-    return results;
-  }
-
-  // ---- SELECT FROM claim_sources WHERE claim_id = $1 ----
-  if (q.includes('"claim_sources"') && q.includes("where") && q.includes("claim_id")) {
-    const claimId = Number(params[0]);
-    return Array.from(claimSourceStore.values()).filter(
-      (s) => Number(s.claim_id) === claimId
-    );
-  }
-
-  // ---- SELECT FROM claim_sources WHERE claim_id IN (...) ----
-  if (q.includes('"claim_sources"') && q.includes("in (")) {
-    const ids = params.map(Number);
-    return Array.from(claimSourceStore.values()).filter(
-      (s) => ids.includes(Number(s.claim_id))
-    );
-  }
-
-  // ---- EXISTS subquery for claim_sources in stats ----
-  if (q.includes("count(*)") && q.includes("exists") && q.includes("claim_sources")) {
-    // Count claims that have at least one claim_source
-    const claimIdsWithSources = new Set(
-      Array.from(claimSourceStore.values()).map((s) => Number(s.claim_id))
-    );
-    return [{ count: claimIdsWithSources.size }];
-  }
-
-  // ---- INSERT INTO claims ----
-  if (q.includes("insert into") && q.includes('"claims"')) {
-    const now = new Date();
-    // Count parameters per row: 8 original + 6 enhanced + 7 phase2 + 6 verdict + 6 structured = 33
-    const PARAMS_PER_ROW = 33;
-    const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
-    const results: Record<string, unknown>[] = [];
-
-    for (let i = 0; i < rowCount; i++) {
-      const off = i * PARAMS_PER_ROW;
-      const id = nextId++;
-      const row: Record<string, unknown> = {
-        id,
-        entity_id: params[off],
-        entity_type: params[off + 1],
-        claim_type: params[off + 2],
-        claim_text: params[off + 3],
-        value: params[off + 4],
-        unit: params[off + 5],
-        confidence: params[off + 6],
-        source_quote: params[off + 7],
-        // Enhanced fields (migration 0028)
-        claim_category: params[off + 8],
-        related_entities: parseJsonbParam(params[off + 9]),
-        fact_id: params[off + 10],
-        resource_ids: parseJsonbParam(params[off + 11]),
-        section: params[off + 12],
-        footnote_refs: params[off + 13],
-        // Phase 2 fields (migration 0029)
-        claim_mode: params[off + 14] ?? "endorsed",
-        attributed_to: params[off + 15],
-        as_of: params[off + 16],
-        measure: params[off + 17],
-        value_numeric: params[off + 18],
-        value_low: params[off + 19],
-        value_high: params[off + 20],
-        // Verdict fields (migration 0031)
-        claim_verdict: params[off + 21],
-        claim_verdict_score: params[off + 22],
-        claim_verdict_issues: params[off + 23],
-        claim_verdict_quotes: params[off + 24],
-        claim_verdict_difficulty: params[off + 25],
-        claim_verdict_model: params[off + 26],
-        // Structured claim fields (migration 0032)
-        subject_entity: params[off + 27],
-        property: params[off + 28],
-        structured_value: params[off + 29],
-        value_unit: params[off + 30],
-        value_date: params[off + 31],
-        qualifiers: parseJsonbParam(params[off + 32]),
-        created_at: now,
-        updated_at: now,
-      };
-      claimStore.set(id, row);
-      results.push(row);
-    }
-    return results;
-  }
-
-  // ---- DELETE FROM claims WHERE entity_id = $1 ----
-  if (q.includes("delete") && q.includes('"claims"') && q.includes("where")) {
-    const entityId = params[0] as string;
-    const deleted: Record<string, unknown>[] = [];
-    for (const [id, row] of claimStore) {
-      if (row.entity_id === entityId) {
-        deleted.push(row);
-        claimStore.delete(id);
-      }
-    }
-    return deleted;
-  }
-
-  // ---- SELECT count(*) FROM claims with GROUP BY claim_type ----
-  if (
-    q.includes("count(*)") &&
-    q.includes('"claims"') &&
-    q.includes("group by") &&
-    q.includes("claim_type")
-  ) {
-    const counts: Record<string, number> = {};
-    for (const r of claimStore.values()) {
-      const t = r.claim_type as string;
-      counts[t] = (counts[t] || 0) + 1;
-    }
-    return Object.entries(counts)
-      .map(([claim_type, count]) => ({ claim_type, count }))
-      .sort((a, b) => b.count - a.count);
-  }
-
-  // ---- SELECT count(*) FROM claims with GROUP BY entity_type ----
-  if (
-    q.includes("count(*)") &&
-    q.includes('"claims"') &&
-    q.includes("group by") &&
-    q.includes("entity_type")
-  ) {
-    const counts: Record<string, number> = {};
-    for (const r of claimStore.values()) {
-      const t = r.entity_type as string;
-      counts[t] = (counts[t] || 0) + 1;
-    }
-    return Object.entries(counts)
-      .map(([entity_type, count]) => ({ entity_type, count }))
-      .sort((a, b) => b.count - a.count);
-  }
-
-  // ---- SELECT count(*) FROM claims with GROUP BY claim_category ----
-  if (
-    q.includes("count(*)") &&
-    q.includes('"claims"') &&
-    q.includes("group by") &&
-    q.includes("claim_category")
-  ) {
-    const counts: Record<string, number> = {};
-    for (const r of claimStore.values()) {
-      const t = (r.claim_category as string) ?? "uncategorized";
-      counts[t] = (counts[t] || 0) + 1;
-    }
-    return Object.entries(counts)
-      .map(([claim_category, count]) => ({ claim_category, count }))
-      .sort((a, b) => b.count - a.count);
-  }
-
-  // ---- SELECT count(*) FROM claims WHERE related_entities IS NOT NULL (multi-entity) ----
-  if (
-    q.includes("count(*)") &&
-    q.includes('"claims"') &&
-    q.includes("related_entities") &&
-    q.includes("is not null")
-  ) {
-    let count = 0;
-    for (const r of claimStore.values()) {
-      const re = r.related_entities;
-      if (re && Array.isArray(re) && re.length > 0) count++;
-    }
-    return [{ count }];
-  }
-
-  // ---- SELECT count(*) FROM claims WHERE fact_id IS NOT NULL ----
-  if (
-    q.includes("count(*)") &&
-    q.includes('"claims"') &&
-    q.includes("fact_id") &&
-    q.includes("is not null")
-  ) {
-    let count = 0;
-    for (const r of claimStore.values()) {
-      if (r.fact_id) count++;
-    }
-    return [{ count }];
-  }
-
-  // ---- SELECT count(*) FROM claims with GROUP BY claim_mode ----
-  if (
-    q.includes("count(*)") &&
-    q.includes('"claims"') &&
-    q.includes("group by") &&
-    q.includes("claim_mode")
-  ) {
-    const counts: Record<string, number> = {};
-    for (const r of claimStore.values()) {
-      const t = (r.claim_mode as string) ?? "endorsed";
-      counts[t] = (counts[t] || 0) + 1;
-    }
-    return Object.entries(counts)
-      .map(([claim_mode, count]) => ({ claim_mode, count }))
-      .sort((a, b) => b.count - a.count);
-  }
-
-  // ---- SELECT count(*) FROM claims WHERE claim_mode = 'attributed' ----
-  if (
-    q.includes("count(*)") &&
-    q.includes('"claims"') &&
-    q.includes("claim_mode")
-  ) {
-    let count = 0;
-    for (const r of claimStore.values()) {
-      if (r.claim_mode === "attributed") count++;
-    }
-    return [{ count }];
-  }
-
-  // ---- SELECT count(*) FROM claims (no GROUP BY, with optional WHERE) ----
-  if (
-    q.includes("count(*)") &&
-    q.includes('"claims"') &&
-    !q.includes("group by")
-  ) {
-    if (q.includes("where")) {
-      // Extract WHERE portion to avoid matching column names in SELECT
-      const whereClause = q.split("where")[1] ?? "";
-      let count = 0;
-      for (const r of claimStore.values()) {
-        // Check entityType, claimType, and claimCategory filters
-        let match = true;
-        let paramIdx = 0;
-        if (whereClause.includes("entity_type")) {
-          if (r.entity_type !== params[paramIdx]) match = false;
-          paramIdx++;
-        }
-        if (whereClause.includes("claim_type")) {
-          if (r.claim_type !== params[paramIdx]) match = false;
-          paramIdx++;
-        }
-        if (whereClause.includes("claim_category")) {
-          if (r.claim_category !== params[paramIdx]) match = false;
-        }
-        if (match) count++;
-      }
-      return [{ count }];
-    }
-    return [{ count: claimStore.size }];
-  }
-
-  // ---- SELECT ... FROM claims WHERE entity_id = $1 OR related_entities @> ... (by-entity) ----
-  // Distinguish from /all queries by checking the WHERE clause specifically uses "entity_id" =
-  if (
-    q.includes('"claims"') &&
-    q.includes("where") &&
-    q.includes("order by") &&
-    !q.includes("limit") &&
-    (q.includes('"entity_id" =') || q.includes("related_entities @>"))
-  ) {
-    const entityId = params[0] as string;
-    return Array.from(claimStore.values())
-      .filter((r) => {
-        if (r.entity_id === entityId) return true;
-        // Check relatedEntities JSONB array
-        const re = r.related_entities;
-        if (Array.isArray(re) && re.includes(entityId)) return true;
-        return false;
-      })
-      .sort((a, b) => {
-        const typeCompare = (a.claim_type as string).localeCompare(
-          b.claim_type as string
-        );
-        if (typeCompare !== 0) return typeCompare;
-        return (a.id as number) - (b.id as number);
-      });
-  }
-
-  // ---- SELECT FROM claim_sources WHERE claim_id = $1 ORDER BY ... (for GET /:id) ----
-  if (
-    q.includes('"claim_sources"') &&
-    q.includes("where") &&
-    q.includes("order by")
-  ) {
-    const claimId = Number(params[0]);
-    return Array.from(claimSourceStore.values()).filter(
-      (s) => Number(s.claim_id) === claimId
-    );
-  }
-
-  // ---- SELECT ... FROM claims WHERE id = $1 (get by ID) ----
-  if (
-    q.includes('"claims"') &&
-    q.includes("where") &&
-    q.includes("limit") &&
-    !q.includes("order by")
-  ) {
-    const whereClause = q.split("where")[1] || "";
-    if (whereClause.includes('"id"')) {
-      const id = params[0] as number;
-      const r = claimStore.get(id);
-      return r ? [r] : [];
-    }
-  }
-
-  // ---- SELECT ... FROM claims ORDER BY (paginated all) ----
-  if (
-    q.includes('"claims"') &&
-    q.includes("order by") &&
-    q.includes("limit")
-  ) {
-    const allRows = Array.from(claimStore.values()).sort(
-      (a, b) => (a.id as number) - (b.id as number)
-    );
-
-    // Filter by conditions if there's a WHERE clause
-    // Extract only the WHERE portion to avoid matching column names in SELECT
-    let filtered = allRows;
-    const whereIdx = q.indexOf(" where ");
-    const whereClause = whereIdx >= 0 ? q.slice(whereIdx, q.indexOf("order by", whereIdx)) : "";
-    if (whereClause) {
-      // Count filter params (before limit/offset)
-      let filterCount = 0;
-      if (whereClause.includes("entity_type")) filterCount++;
-      if (whereClause.includes("claim_type")) filterCount++;
-      if (whereClause.includes("claim_category")) filterCount++;
-
-      filtered = allRows.filter((r) => {
-        let match = true;
-        let paramIdx = 0;
-        if (whereClause.includes("entity_type")) {
-          if (r.entity_type !== params[paramIdx]) match = false;
-          paramIdx++;
-        }
-        if (whereClause.includes("claim_type")) {
-          if (r.claim_type !== params[paramIdx]) match = false;
-          paramIdx++;
-        }
-        if (whereClause.includes("claim_category")) {
-          if (r.claim_category !== params[paramIdx]) match = false;
-          paramIdx++;
-        }
-        return match;
-      });
-      // Limit/offset come after filter params
-      const limit = (params[filterCount] as number) || 50;
-      const offset = (params[filterCount + 1] as number) || 0;
-      return filtered.slice(offset, offset + limit);
-    }
-
-    const limit = (params[0] as number) || 50;
-    const offset = (params[1] as number) || 0;
-    return filtered.slice(offset, offset + limit);
-  }
-
-  return [];
-}
+const testDb = new TestDb();
 
 // Mock the db module before importing routes
-vi.mock("../db.js", () => mockDbModule(dispatch));
+vi.mock("../db.js", () => mockDbModule(testDb.dispatch));
 
 const { createApp } = await import("../app.js");
 
@@ -423,7 +21,7 @@ describe("Claims API", () => {
   let app: Hono;
 
   beforeEach(() => {
-    resetStores();
+    testDb.reset();
     delete process.env.LONGTERMWIKI_SERVER_API_KEY;
     app = createApp();
   });
@@ -525,7 +123,7 @@ describe("Claims API", () => {
         claimText: "Founded in 2000",
       });
 
-      expect(claimStore.size).toBe(3);
+      expect(testDb.getTable("claims").size).toBe(3);
 
       const res = await postJson(app, "/api/claims/clear", {
         entityId: "anthropic",
@@ -533,7 +131,7 @@ describe("Claims API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.deleted).toBe(2);
-      expect(claimStore.size).toBe(1);
+      expect(testDb.getTable("claims").size).toBe(1);
     });
 
     it("returns 0 for unknown entity", async () => {
@@ -902,8 +500,8 @@ describe("Claims API", () => {
       const created = await createRes.json();
 
       // Check sources are in the store
-      expect(claimSourceStore.size).toBe(2);
-      const sources = Array.from(claimSourceStore.values());
+      expect(testDb.getTable("claim_sources").size).toBe(2);
+      const sources = Array.from(testDb.getTable("claim_sources").values());
       expect(sources.some((s) => s.resource_id === "res-bloomberg-2024")).toBe(true);
       expect(sources.some((s) => s.url === "https://example.com/amazon-investment")).toBe(true);
     });
@@ -1081,8 +679,8 @@ describe("Claims API", () => {
       const body = await res.json();
       expect(body.inserted).toBe(2);
       // Both sets of sources should be present
-      expect(claimSourceStore.size).toBe(2);
-      const sources = Array.from(claimSourceStore.values());
+      expect(testDb.getTable("claim_sources").size).toBe(2);
+      const sources = Array.from(testDb.getTable("claim_sources").values());
       expect(sources.some((s) => s.resource_id === "res-google")).toBe(true);
       expect(sources.some((s) => s.resource_id === "res-msft")).toBe(true);
     });
