@@ -1,0 +1,142 @@
+# Controlled vocabulary for structured claim properties.
+#
+# Each property defines a named attribute that can be extracted from claims.
+# The extraction prompt uses this list to normalize claim properties.
+# Grow organically — add properties as extraction encounters common patterns.
+#
+# See: https://github.com/quantified-uncertainty/longterm-wiki/issues/1164
+
+properties:
+  # ── Financial ──────────────────────────────────────────────────────────
+  - id: funding_round_amount
+    label: "Funding Round Amount"
+    description: "Amount raised in a single funding round"
+    value_type: number
+    value_unit: USD
+    category: financial
+
+  - id: funding_total
+    label: "Total Funding Raised"
+    description: "Cumulative funding raised across all rounds"
+    value_type: number
+    value_unit: USD
+    category: financial
+
+  - id: valuation
+    label: "Company Valuation"
+    description: "Pre-money or post-money valuation"
+    value_type: number
+    value_unit: USD
+    category: financial
+
+  - id: revenue
+    label: "Revenue"
+    description: "Annual or quarterly revenue"
+    value_type: number
+    value_unit: USD
+    category: financial
+
+  - id: market_volume
+    label: "Market/Transaction Volume"
+    description: "Trading or transaction volume over a period"
+    value_type: number
+    value_unit: USD
+    category: financial
+
+  # ── Organizational ─────────────────────────────────────────────────────
+  - id: employee_count
+    label: "Employee Count"
+    description: "Number of employees or headcount"
+    value_type: number
+    value_unit: count
+    category: organizational
+
+  - id: market_share
+    label: "Market Share"
+    description: "Percentage of market captured"
+    value_type: number
+    value_unit: percent
+    category: organizational
+
+  - id: headquarters
+    label: "Headquarters"
+    description: "Location of headquarters"
+    value_type: string
+    category: organizational
+
+  - id: legal_structure
+    label: "Legal Structure"
+    description: "Corporate structure (PBC, C-corp, nonprofit, etc.)"
+    value_type: string
+    category: organizational
+
+  # ── Dates / Milestones ─────────────────────────────────────────────────
+  - id: founded_date
+    label: "Founded Date"
+    description: "Date the entity was founded"
+    value_type: date
+    category: milestone
+
+  - id: launched_date
+    label: "Launched Date"
+    description: "Date a product or initiative was launched"
+    value_type: date
+    category: milestone
+
+  - id: announced_date
+    label: "Announced Date"
+    description: "Date an announcement was made"
+    value_type: date
+    category: milestone
+
+  - id: shutdown_date
+    label: "Shutdown Date"
+    description: "Date an entity or product was shut down"
+    value_type: date
+    category: milestone
+
+  # ── Entity Relations ───────────────────────────────────────────────────
+  - id: founder
+    label: "Founder"
+    description: "Person who founded the entity"
+    value_type: entity
+    category: relation
+
+  - id: ceo
+    label: "CEO"
+    description: "Current chief executive officer"
+    value_type: entity
+    category: relation
+
+  - id: parent_org
+    label: "Parent Organization"
+    description: "Parent or owning organization"
+    value_type: entity
+    category: relation
+
+  - id: acquired_by
+    label: "Acquired By"
+    description: "Entity that acquired this one"
+    value_type: entity
+    category: relation
+
+  # ── Technical / AI-specific ────────────────────────────────────────────
+  - id: parameter_count
+    label: "Parameter Count"
+    description: "Number of model parameters"
+    value_type: number
+    value_unit: count
+    category: technical
+
+  - id: benchmark_score
+    label: "Benchmark Score"
+    description: "Score on a named benchmark"
+    value_type: number
+    category: technical
+
+  - id: context_window
+    label: "Context Window"
+    description: "Maximum context window size in tokens"
+    value_type: number
+    value_unit: tokens
+    category: technical

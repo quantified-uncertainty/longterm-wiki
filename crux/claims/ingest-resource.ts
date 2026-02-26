@@ -128,6 +128,13 @@ export interface ExtractedResourceClaim {
   valueHigh?: number;
   sourceQuote?: string;
   relatedEntities?: string[];
+  // Structured claim fields (Phase 3 — Wikidata-style)
+  subjectEntity?: string;
+  property?: string;
+  structuredValue?: string;
+  valueUnit?: string;
+  valueDate?: string;
+  qualifiers?: Record<string, string>;
 }
 
 export function buildExtractionPrompt(resource: Resource, targetEntity: string): string {
@@ -262,6 +269,13 @@ export function buildInsertItem(
     valueNumeric: claim.valueNumeric ?? null,
     valueLow: claim.valueLow ?? null,
     valueHigh: claim.valueHigh ?? null,
+    // Structured claim fields (migration 0032)
+    subjectEntity: claim.subjectEntity ?? null,
+    property: claim.property ?? null,
+    structuredValue: claim.structuredValue ?? null,
+    valueUnit: claim.valueUnit ?? null,
+    valueDate: claim.valueDate ?? null,
+    qualifiers: claim.qualifiers ?? null,
     // Resource linkage via claim_sources + legacy resourceIds
     resourceIds: [resource.id],
     sources: claim.sourceQuote

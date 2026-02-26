@@ -416,6 +416,13 @@ export const claims = pgTable(
     claimVerdictDifficulty: text("claim_verdict_difficulty"),
     claimVerifiedAt: timestamp("claim_verified_at", { withTimezone: true }),
     claimVerdictModel: text("claim_verdict_model"),
+    // --- Structured claims fields (migration 0032) ---
+    subjectEntity: text("subject_entity"),         // entity_id this claim is about (e.g. "anthropic")
+    property: text("property"),                    // property from controlled vocabulary (e.g. "funding_round_amount")
+    structuredValue: text("structured_value"),      // normalized value (e.g. "30000000")
+    valueUnit: text("value_unit"),                 // unit of measurement (e.g. "USD", "percent", "count")
+    valueDate: date("value_date"),                 // when the value was true/measured
+    qualifiers: jsonb("qualifiers").$type<Record<string, string>>(), // additional context (e.g. {"round": "Series B"})
     // --- Timestamps ---
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -436,6 +443,9 @@ export const claims = pgTable(
     index("idx_cl_measure").on(table.measure),
     index("idx_cl_verdict").on(table.claimVerdict),
     index("idx_cl_verified_at").on(table.claimVerifiedAt),
+    index("idx_cl_subject_entity").on(table.subjectEntity),
+    index("idx_cl_property").on(table.property),
+    index("idx_cl_subject_property").on(table.subjectEntity, table.property),
     // GIN index on relatedEntities is created in migration 0028
     // (Drizzle doesn't support GIN index declarations on JSONB)
   ]
