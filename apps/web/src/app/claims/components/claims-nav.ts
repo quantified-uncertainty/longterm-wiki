@@ -3,7 +3,7 @@ import { fetchFromWikiServer } from "@lib/wiki-server";
 import { getEntityById, getEntityHref } from "@data";
 
 interface NetworkResponse {
-  nodes: { entityId: string; claimCount: number }[];
+  nodes: { entityId: string; claimCount: number; mentionCount?: number }[];
   edges: { source: string; target: string; weight: number }[];
 }
 
@@ -53,15 +53,26 @@ export async function getClaimsEntities(): Promise<ClaimsEntityItem[]> {
   if (!result) return [];
 
   return result.nodes
-    .filter((n) => n.claimCount > 0)
-    .sort((a, b) => b.claimCount - a.claimCount)
+    .filter((n) => {
+      // Include entities with primary claims
+      if (n.claimCount > 0) return true;
+      // Include mention-only entities if they're known wiki entities
+      if ((n.mentionCount ?? 0) > 0 && getEntityById(n.entityId)) return true;
+      return false;
+    })
+    .sort((a, b) => {
+      // Sort by total relevance (primary claims + mentions)
+      const totalA = a.claimCount + (a.mentionCount ?? 0);
+      const totalB = b.claimCount + (b.mentionCount ?? 0);
+      return totalB - totalA;
+    })
     .map((n) => {
       const entity = getEntityById(n.entityId);
       return {
         entityId: n.entityId,
         title: entity?.title ?? n.entityId,
         href: `/claims/entity/${n.entityId}`,
-        claimCount: n.claimCount,
+        claimCount: n.claimCount + (n.mentionCount ?? 0),
         entityType: entity?.type ?? "unknown",
       };
     });

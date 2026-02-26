@@ -724,6 +724,7 @@ const claimsApp = new Hono()
 
     const edgeMap = new Map<string, { source: string; target: string; weight: number }>();
     const nodeIds = new Set<string>();
+    const mentionCounts = new Map<string, number>();
 
     for (const row of rows) {
       nodeIds.add(row.entityId);
@@ -735,6 +736,7 @@ const claimsApp = new Hono()
         // Skip self-loops
         if (normalizedRel === row.entityId) continue;
         nodeIds.add(normalizedRel);
+        mentionCounts.set(normalizedRel, (mentionCounts.get(normalizedRel) ?? 0) + 1);
         const [source, target] = [row.entityId, normalizedRel].sort();
         const key = `${source}|||${target}`;
         if (!edgeMap.has(key)) {
@@ -750,6 +752,7 @@ const claimsApp = new Hono()
     const nodes = [...nodeIds].map((id) => ({
       entityId: id,
       claimCount: countMap[id] ?? 0,
+      mentionCount: mentionCounts.get(id) ?? 0,
     }));
     const edges = [...edgeMap.values()].sort((a, b) => b.weight - a.weight);
 
