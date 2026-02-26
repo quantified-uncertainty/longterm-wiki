@@ -86,6 +86,12 @@ const SCRIPTS = {
     passthrough: ['dry-run', 'page-id', 'limit'],
     positional: false,
   },
+  cleanup: {
+    script: 'claims/cleanup.ts',
+    description: 'Identify and delete low-quality claims (duplicates, truncated, misattributed)',
+    passthrough: ['apply', 'entity', 'json'],
+    positional: false,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'status');
@@ -154,6 +160,12 @@ Workflow:
   1. crux claims backfill-from-citations --dry-run        Preview what would be created
   2. crux claims backfill-from-citations                  Run against all unlinked quotes
   3. crux claims backfill-from-citations --page-id=kalshi Run for a single page
+
+  Cleanup (remove low-quality claims):
+  1. crux claims cleanup                                  Dry-run: show candidates
+  2. crux claims cleanup --apply                          Delete flagged claims
+  3. crux claims cleanup --entity=kalshi                  Restrict to one entity
+  4. crux claims cleanup --json                           JSON output (dry-run)
 
 Notes:
   - Extraction requires OPENROUTER_API_KEY or ANTHROPIC_API_KEY

@@ -5,7 +5,7 @@
  * Response types are imported from the canonical api-types.ts definitions.
  */
 
-import { apiRequest, type ApiResult } from './client.ts';
+import { apiRequest, BATCH_TIMEOUT_MS, type ApiResult } from './client.ts';
 import type {
   InsertClaim,
   InsertClaimResult,
@@ -168,6 +168,22 @@ export async function addClaimPageReferencesBatch(
     `/api/claims/${claimId}/page-references/batch`,
     { items },
     undefined,
+    'content',
+  );
+}
+
+/**
+ * Delete claims by an array of claim IDs.
+ * Used by the cleanup command to batch-delete low-quality claims.
+ */
+export async function deleteClaimsByIds(
+  ids: number[],
+): Promise<ApiResult<ClearClaimsResult>> {
+  return apiRequest<ClearClaimsResult>(
+    'POST',
+    '/api/claims/delete-by-ids',
+    { ids },
+    BATCH_TIMEOUT_MS,
     'content',
   );
 }
