@@ -199,6 +199,61 @@ export default async function ClaimDetailPage({ params }: PageProps) {
         </div>
       )}
 
+      {/* Structured data */}
+      {claim.property && (
+        <div className="rounded-lg border border-violet-200 bg-violet-50/30 p-4 mb-4">
+          <span className="text-xs font-medium text-violet-700 block mb-2">
+            Structured Data
+          </span>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+            {claim.subjectEntity && (
+              <div>
+                <span className="text-xs text-muted-foreground block">Subject</span>
+                <Link
+                  href={`/claims/entity/${claim.subjectEntity}`}
+                  className="font-mono text-blue-600 hover:underline"
+                >
+                  {claim.subjectEntity}
+                </Link>
+              </div>
+            )}
+            <div>
+              <span className="text-xs text-muted-foreground block">Property</span>
+              <span className="font-mono">{claim.property}</span>
+            </div>
+            {claim.structuredValue && (
+              <div>
+                <span className="text-xs text-muted-foreground block">Value</span>
+                <span className="font-mono">{claim.structuredValue}</span>
+                {claim.valueUnit && (
+                  <span className="text-xs text-muted-foreground ml-1">
+                    ({claim.valueUnit})
+                  </span>
+                )}
+              </div>
+            )}
+            {claim.valueDate && (
+              <div>
+                <span className="text-xs text-muted-foreground block">Date</span>
+                <span className="font-mono">{claim.valueDate}</span>
+              </div>
+            )}
+            {claim.qualifiers && Object.keys(claim.qualifiers).length > 0 && (
+              <div className="col-span-2 md:col-span-3">
+                <span className="text-xs text-muted-foreground block">Qualifiers</span>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(claim.qualifiers).map(([k, v]) => (
+                    <span key={k} className="font-mono text-xs px-1.5 py-0.5 rounded bg-violet-100 text-violet-700">
+                      {k}={v}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Metadata grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         <div>
