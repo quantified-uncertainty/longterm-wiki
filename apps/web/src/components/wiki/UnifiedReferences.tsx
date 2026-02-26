@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import {
   getResourceById,
   getResourceCredibility,
@@ -326,18 +327,26 @@ export function UnifiedReferences({ pageId, className }: UnifiedReferencesProps)
       className={cn("mt-10 pt-5 border-t border-border", className)}
       aria-label="References"
     >
-      <h2
-        className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 mt-0 pb-0 border-b-0"
-        id="references"
-      >
-        References
-        <span className="text-xs font-normal ml-2 opacity-60">
-          {totalSources} source{totalSources !== 1 ? "s" : ""}
-          {withResources.length > 0 &&
-            withResources.length < totalSources &&
-            ` \u00b7 ${withResources.length} with metadata`}
-        </span>
-      </h2>
+      <div className="flex items-baseline justify-between mb-2">
+        <h2
+          className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mt-0 pb-0 border-b-0"
+          id="references"
+        >
+          References
+          <span className="text-xs font-normal ml-2 opacity-60">
+            {totalSources} source{totalSources !== 1 ? "s" : ""}
+            {withResources.length > 0 &&
+              withResources.length < totalSources &&
+              ` \u00b7 ${withResources.length} with metadata`}
+          </span>
+        </h2>
+        <Link
+          href={`/claims/entity/${pageId}`}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          View claims →
+        </Link>
+      </div>
 
       {entries.length > 0 && (
         <div>

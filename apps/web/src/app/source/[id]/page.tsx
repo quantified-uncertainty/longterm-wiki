@@ -1,30 +1,32 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
 import {
   getResourceById,
   getResourceCredibility,
   getResourcePublication,
   getPagesForResource,
+  getEntityById,
+  getPageById,
+  getEntityHref,
 } from "@data";
 import { getCitationQuotesByUrl } from "@/lib/citation-data";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getDomain } from "@/components/wiki/resource-utils";
+import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import {
   ExternalLink,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  HelpCircle,
   Clock,
   FileText,
-  BookOpen,
   Link2,
   Download,
   Database,
   FileQuestion,
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@lib/utils";
+import { CollapsibleClaims } from "./CollapsibleClaims";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -41,42 +43,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     robots: { index: false, follow: false },
   };
 }
-
-const VERDICT_CONFIG: Record<
-  string,
-  { icon: typeof CheckCircle2; label: string; color: string; bg: string }
-> = {
-  accurate: {
-    icon: CheckCircle2,
-    label: "Accurate",
-    color: "text-emerald-700 dark:text-emerald-400",
-    bg: "bg-emerald-50 dark:bg-emerald-950/30",
-  },
-  minor_issues: {
-    icon: AlertTriangle,
-    label: "Minor issues",
-    color: "text-amber-700 dark:text-amber-400",
-    bg: "bg-amber-50 dark:bg-amber-950/30",
-  },
-  inaccurate: {
-    icon: XCircle,
-    label: "Inaccurate",
-    color: "text-red-700 dark:text-red-400",
-    bg: "bg-red-50 dark:bg-red-950/30",
-  },
-  unsupported: {
-    icon: XCircle,
-    label: "Unsupported",
-    color: "text-red-600 dark:text-red-400",
-    bg: "bg-red-50 dark:bg-red-950/30",
-  },
-  not_verifiable: {
-    icon: HelpCircle,
-    label: "Not verifiable",
-    color: "text-muted-foreground",
-    bg: "bg-muted/30",
-  },
-};
 
 interface CitationContentData {
   url: string;
@@ -97,6 +63,19 @@ function formatDate(iso: string): string {
   } catch {
     return iso;
   }
+}
+
+/** Resolve a page slug to its display title */
+function getPageTitle(pageId: string): string {
+  const entity = getEntityById(pageId);
+  if (entity?.title) return entity.title;
+  const page = getPageById(pageId);
+  if (page?.title) return page.title;
+  // Fall back to formatting the slug
+  return pageId
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }
 
 export default async function SourcePage({ params }: PageProps) {
@@ -124,7 +103,7 @@ export default async function SourcePage({ params }: PageProps) {
   const quotes = quotesData?.quotes ?? [];
   const stats = quotesData?.stats;
 
-  // Group quotes by page
+  // Group quotes by page and resolve titles/hrefs server-side
   const quotesByPage = new Map<string, typeof quotes>();
   for (const q of quotes) {
     const pageId = q.pageId;
@@ -132,67 +111,127 @@ export default async function SourcePage({ params }: PageProps) {
     quotesByPage.get(pageId)!.push(q);
   }
 
+  const pageGroups = [...quotesByPage.entries()].map(([pageId, pageQuotes]) => ({
+    pageId,
+    pageTitle: getPageTitle(pageId),
+    pageHref: `/wiki/${pageId}`,
+    quotes: pageQuotes.map((q) => ({
+      pageId: q.pageId,
+      claimText: q.claimText,
+      sourceQuote: q.sourceQuote ?? null,
+      accuracyVerdict: q.accuracyVerdict ?? null,
+      accuracyScore: q.accuracyScore ?? null,
+      accuracyIssues: q.accuracyIssues ?? null,
+      accuracyCheckedAt: q.accuracyCheckedAt ?? null,
+    })),
+  }));
+
+  // Determine whether content sections exist
+  const hasAbstract = !!resource.abstract;
+  const hasSummary = !!resource.summary;
+  const hasKeyPoints = resource.key_points && resource.key_points.length > 0;
+  const hasReview = !!resource.review;
+  const hasContentSections = hasAbstract || hasSummary || hasKeyPoints || hasReview;
+
+  // Build metadata items for a single line
+  const metadataItems: string[] = [];
+  if (resource.authors && resource.authors.length > 0) {
+    metadataItems.push(
+      resource.authors.length <= 3
+        ? resource.authors.join(", ")
+        : `${resource.authors[0]} et al.`
+    );
+  }
+  if (resource.published_date) {
+    metadataItems.push(resource.published_date.slice(0, 4));
+  }
+  if (publication) {
+    metadataItems.push(
+      publication.name + (publication.peer_reviewed ? " (peer-reviewed)" : "")
+    );
+  } else if (domain) {
+    metadataItems.push(domain);
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
+      {/* Back link to Resources index */}
+      <Link
+        href="/claims/resources"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        All Resources
+      </Link>
+
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-          <FileText className="w-3.5 h-3.5" />
-          <span>Source</span>
+        <div className="flex items-center gap-3 mb-1.5">
+          <h1 className="text-2xl font-bold">{resource.title}</h1>
           {resource.type && (
-            <>
-              <span className="opacity-30">/</span>
-              <span className="capitalize">{resource.type}</span>
-            </>
-          )}
-        </div>
-
-        <h1 className="text-2xl font-bold mb-2">{resource.title}</h1>
-
-        {/* Metadata row */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-          {publication && (
-            <a
-              href={`/claims/publications/${publication.id}`}
-              className="italic hover:underline text-primary"
-            >
-              {publication.name}
-              {publication.peer_reviewed && " (peer-reviewed)"}
-            </a>
-          )}
-          {!publication && domain && <span>{domain}</span>}
-          {resource.authors && resource.authors.length > 0 && (
-            <span>
-              {resource.authors.length <= 3
-                ? resource.authors.join(", ")
-                : `${resource.authors[0]} et al.`}
+            <span className="shrink-0 inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium capitalize">
+              <FileText className="w-3 h-3" />
+              {resource.type}
             </span>
           )}
-          {resource.published_date && (
-            <span>{resource.published_date.slice(0, 4)}</span>
-          )}
-          {credibility != null && (
-            <CredibilityBadge level={credibility} size="sm" />
-          )}
         </div>
 
-        {/* URL */}
-        {resource.url && (
-          <a
-            href={resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline mt-2"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            {resource.url.length > 80
-              ? resource.url.slice(0, 77) + "..."
-              : resource.url}
-          </a>
-        )}
+        {/* Metadata row — authors, year, publication, credibility, and URL on one line */}
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-muted-foreground">
+          {metadataItems.map((item, i) => (
+            <span key={i} className="inline-flex items-center gap-1.5">
+              {i > 0 && <span className="text-muted-foreground/30">&middot;</span>}
+              {publication && item.includes(publication.name) ? (
+                <a
+                  href={`/claims/publications/${publication.id}`}
+                  className="hover:underline text-primary"
+                >
+                  {item}
+                </a>
+              ) : (
+                <span>{item}</span>
+              )}
+            </span>
+          ))}
+          {credibility != null && (
+            <span className="inline-flex items-center gap-1.5">
+              {metadataItems.length > 0 && (
+                <span className="text-muted-foreground/30">&middot;</span>
+              )}
+              <CredibilityBadge
+                level={credibility}
+                size="sm"
+                showLabel
+              />
+              <span className="text-xs text-muted-foreground/60">
+                {publication ? "(publisher rating)" : "(source rating)"}
+              </span>
+            </span>
+          )}
+          {resource.url && (() => {
+            const shortUrl = resource.url.replace(/^https?:\/\/(www\.)?/, "");
+            const displayUrl = shortUrl.length > 60 ? shortUrl.slice(0, 57) + "..." : shortUrl;
+            return (
+              <span className="inline-flex items-center gap-1.5">
+                {(metadataItems.length > 0 || credibility != null) && (
+                  <span className="text-muted-foreground/30">&middot;</span>
+                )}
+                <a
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  {displayUrl}
+                </a>
+              </span>
+            );
+          })()}
+        </div>
       </div>
 
-      {/* Data Status Banner */}
+      {/* Data Status Banner — simplified, no content-availability pills */}
       <section className="mb-8 p-4 rounded-lg border border-border bg-card">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
           Data Status
@@ -222,85 +261,69 @@ export default async function SourcePage({ params }: PageProps) {
               Fetched {formatDate(resource.fetched_at)}
             </span>
           )}
-          {/* Content availability indicators */}
-          {resource.summary && (
-            <span className="text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-              Summary
-            </span>
-          )}
-          {resource.review && (
-            <span className="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
-              Review
-            </span>
-          )}
-          {resource.key_points && resource.key_points.length > 0 && (
-            <span className="text-xs px-2.5 py-1 rounded-full bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400">
-              Key points
-            </span>
-          )}
-          {resource.abstract && (
-            <span className="text-xs px-2.5 py-1 rounded-full bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400">
-              Abstract
-            </span>
-          )}
         </div>
       </section>
 
-      {/* Abstract */}
-      {resource.abstract && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-            Abstract
-          </h2>
-          <p className="text-sm leading-relaxed text-foreground/90">
-            {resource.abstract}
-          </p>
-        </section>
-      )}
+      {/* Content sections — consolidated in a bordered container */}
+      {hasContentSections && (
+        <section className="mb-8 rounded-lg border border-border overflow-hidden">
+          {/* Abstract */}
+          {hasAbstract && (
+            <div className="px-5 py-4 border-b border-border last:border-b-0">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                Abstract
+              </h3>
+              <p className="text-sm leading-relaxed text-foreground/90">
+                {renderInlineMarkdown(resource.abstract!)}
+              </p>
+            </div>
+          )}
 
-      {/* Summary */}
-      {resource.summary && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-            Summary
-          </h2>
-          <p className="text-sm leading-relaxed text-foreground/90">
-            {resource.summary}
-          </p>
-        </section>
-      )}
+          {/* Summary */}
+          {hasSummary && (
+            <div className="px-5 py-4 border-b border-border last:border-b-0">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                Summary
+              </h3>
+              <p className="text-sm leading-relaxed text-foreground/90">
+                {renderInlineMarkdown(resource.summary!)}
+              </p>
+            </div>
+          )}
 
-      {/* Key Points */}
-      {resource.key_points && resource.key_points.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-            Key Points
-          </h2>
-          <ul className="space-y-1.5">
-            {resource.key_points.map((point, i) => (
-              <li
-                key={i}
-                className="text-sm leading-relaxed text-foreground/90 flex items-start gap-2"
-              >
-                <span className="text-muted-foreground/40 mt-0.5 shrink-0">
-                  &bull;
-                </span>
-                {point}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+          {/* Key Points */}
+          {hasKeyPoints && (
+            <div className="px-5 py-4 border-b border-border last:border-b-0">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                Key Points
+              </h3>
+              <ul className="space-y-1.5">
+                {resource.key_points!.map((point, i) => (
+                  <li
+                    key={i}
+                    className="text-sm leading-relaxed text-foreground/90 flex items-start gap-2"
+                  >
+                    <span className="text-muted-foreground/40 mt-0.5 shrink-0">
+                      &bull;
+                    </span>
+                    <span>{renderInlineMarkdown(point)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-      {/* Review */}
-      {resource.review && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-            Review
-          </h2>
-          <div className="text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
-            {resource.review}
-          </div>
+          {/* Review */}
+          {hasReview && (
+            <div className="px-5 py-4">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                Review
+              </h3>
+              <div className="text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
+                {renderInlineMarkdown(resource.review!)}
+              </div>
+            </div>
+          )}
         </section>
       )}
 
@@ -341,110 +364,37 @@ export default async function SourcePage({ params }: PageProps) {
         </section>
       )}
 
-      {/* Cross-page claims — grouped by wiki page */}
-      {quotesByPage.size > 0 && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            <BookOpen className="w-4 h-4 inline mr-1.5 -mt-0.5" />
-            Claims from Wiki Pages
-          </h2>
-
-          {[...quotesByPage.entries()].map(([pageId, pageQuotes]) => (
-            <div
-              key={pageId}
-              className="mb-6 border border-border rounded-lg overflow-hidden"
-            >
-              <div className="px-4 py-2 bg-muted/50 border-b border-border">
-                <a
-                  href={`/wiki/${pageId}`}
-                  className="text-sm font-medium text-accent-foreground hover:underline"
-                >
-                  {pageId}
-                </a>
-                <span className="text-xs text-muted-foreground ml-2">
-                  {pageQuotes.length} claim
-                  {pageQuotes.length !== 1 ? "s" : ""}
-                </span>
-              </div>
-
-              <div className="divide-y divide-border">
-                {pageQuotes.map((q, i) => {
-                  const verdict = q.accuracyVerdict
-                    ? VERDICT_CONFIG[q.accuracyVerdict]
-                    : null;
-                  const Icon = verdict?.icon;
-
-                  return (
-                    <div key={i} className={cn("px-4 py-3", verdict?.bg)}>
-                      {/* Claim text */}
-                      <p className="text-sm text-foreground leading-relaxed mb-1.5">
-                        {q.claimText}
-                      </p>
-
-                      {/* Source quote — the key differentiator */}
-                      {q.sourceQuote && (
-                        <blockquote className="text-xs text-muted-foreground border-l-2 border-border pl-2.5 mb-2 italic leading-relaxed">
-                          &ldquo;{q.sourceQuote}&rdquo;
-                        </blockquote>
-                      )}
-
-                      {/* Verdict + metadata */}
-                      <div className="flex items-center gap-2 text-xs">
-                        {verdict && Icon && (
-                          <span
-                            className={cn(
-                              "inline-flex items-center gap-1",
-                              verdict.color
-                            )}
-                          >
-                            <Icon className="w-3 h-3" />
-                            {verdict.label}
-                          </span>
-                        )}
-                        {q.accuracyScore != null && (
-                          <span className="text-muted-foreground tabular-nums">
-                            {Math.round(q.accuracyScore * 100)}%
-                          </span>
-                        )}
-                        {q.accuracyIssues && (
-                          <span className="text-amber-600 dark:text-amber-400">
-                            {q.accuracyIssues}
-                          </span>
-                        )}
-                        {q.accuracyCheckedAt && (
-                          <span className="text-muted-foreground/60 ml-auto flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {formatDate(q.accuracyCheckedAt)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </section>
+      {/* Cross-page claims — collapsible, grouped by wiki page */}
+      {pageGroups.length > 0 && (
+        <CollapsibleClaims
+          pageGroups={pageGroups}
+          totalClaims={quotes.length}
+        />
       )}
 
-      {/* Citing pages (from build-time data) */}
+      {/* Citing pages — uses EntityLink-style pill links */}
       {citingPages.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
             <Link2 className="w-4 h-4 inline mr-1.5 -mt-0.5" />
             Referenced by {citingPages.length} page
             {citingPages.length !== 1 ? "s" : ""}
           </h2>
-          <div className="flex flex-wrap gap-2">
-            {citingPages.map((pageId) => (
-              <a
-                key={pageId}
-                href={`/wiki/${pageId}`}
-                className="text-xs px-2.5 py-1 rounded-full border border-border hover:bg-muted transition-colors"
-              >
-                {pageId}
-              </a>
-            ))}
+          <div className="flex flex-wrap gap-1.5">
+            {citingPages.map((pageId) => {
+              const entity = getEntityById(pageId);
+              const href = getEntityHref(pageId, entity?.type);
+              const title = getPageTitle(pageId);
+              return (
+                <Link
+                  key={pageId}
+                  href={href}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-muted rounded text-sm text-accent-foreground no-underline transition-colors hover:bg-muted/80"
+                >
+                  {title}
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}
@@ -482,7 +432,7 @@ export default async function SourcePage({ params }: PageProps) {
               {contentData.fullTextPreview.slice(0, 3000)}
               {contentData.fullTextPreview.length > 3000 && (
                 <span className="text-muted-foreground/50">
-                  {"\n\n"}... (truncated, {Math.round(contentData.contentLength! / 1024)} KB total)
+                  {"\n\n"}... (truncated{contentData.contentLength != null ? `, ${Math.round(contentData.contentLength / 1024)} KB total` : ""})
                 </span>
               )}
             </pre>

@@ -38,6 +38,7 @@ import {
 } from '../lib/wiki-server/claims.ts';
 import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../lib/claim-utils.ts';
 import type { ClaimTypeValue } from '../lib/claim-utils.ts';
+import { getVariantPrompt, VARIANT_NAMES, type VariantName, type PageType } from './experiment-variants.ts';
 
 // ---------------------------------------------------------------------------
 // MDX preprocessing — strip JSX components and get clean text
@@ -127,7 +128,34 @@ interface ExtractedClaim {
   relatedEntities?: string[];
 }
 
-export const EXTRACT_SYSTEM_PROMPT = `You are a fact-extraction assistant. Given a section of a wiki article, extract specific, verifiable claims.
+/**
+ * Default extraction prompt — "top-n" variant (Sprint 2 winner).
+ *
+ * Sprint 2 tested 4 prompt variants across 10 pages:
+ *   baseline:      81% usefulness, 1711 claims
+ *   page-type:     82% usefulness, 1537 claims
+ *   quantitative:  84% usefulness, 991 claims (but 93% accuracy — entity confusion)
+ *   top-n:         91% usefulness, 1329 claims ← winner
+ *
+ * Key improvements over the Sprint 1 baseline (84% usefulness, 69% on concepts):
+ *   - Concept pages: 96% usefulness (was 69%)
+ *   - Org pages: 100% usefulness (was 93%)
+ *   - Overall: 91% usefulness (was 84%)
+ *   - 22% fewer claims with higher quality
+ */
+export const EXTRACT_SYSTEM_PROMPT = `You are a fact-extraction assistant. Given a section of a wiki article, extract ONLY the 5-10 most important and distinctive claims.
+
+For "most important", prioritize claims that:
+1. A reader would be MOST surprised to learn (high information value)
+2. Contain specific, hard-to-guess facts (not common knowledge)
+3. Distinguish this subject from similar subjects
+4. Have significant implications for understanding the topic
+
+Do NOT include claims that:
+- State commonly known facts about the subject
+- Are vague or could apply to many similar subjects
+- Are trivially obvious from the page title alone
+- Repeat information already captured in another claim
 
 For each claim, provide:
 - "claimText": a single atomic, self-contained statement (not a question or heading)
@@ -160,21 +188,21 @@ Rules:
 - Each claim must be atomic (one assertion per claim)
 - Include specific numbers, names, dates when present
 - Skip headings, navigation text, and pure descriptions
-- Skip claims that are just definitions without verifiable content
 - Use "endorsed" for most claims — the wiki is making the assertion
 - Use "attributed" when the text uses phrases like "X says", "according to Y", "Y believes", "Y announced"
 - Use "numeric" for any claim with specific dollar amounts, percentages, counts, or model sizes
 - Always include valueNumeric for numeric claims — extract the number even if written out (e.g. "$7.3 billion" → 7300000000)
 - Include asOf whenever the text specifies a date or "as of" qualifier for the claim
-- Extract 3-10 claims per section (skip trivial or duplicate content)
+- Extract EXACTLY 5-10 claims per section — no more, prioritize quality
+- Each claim should pass the "would a knowledgeable reader find this interesting?" test
 - Return only claims that appear in the given text
 
 Respond ONLY with JSON:
 {"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "sourceQuote": "exact text from the wiki section", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
 
-async function extractClaimsFromSection(
+export async function extractClaimsFromSection(
   section: Section,
-  opts: { model?: string } = {},
+  opts: { model?: string; systemPrompt?: string } = {},
 ): Promise<ExtractedClaim[]> {
   const userPrompt = `SECTION: ${section.heading}
 
@@ -183,7 +211,7 @@ ${section.content}
 Extract atomic claims from this section. Return JSON only.`;
 
   try {
-    const raw = await callOpenRouter(EXTRACT_SYSTEM_PROMPT, userPrompt, {
+    const raw = await callOpenRouter(opts.systemPrompt ?? EXTRACT_SYSTEM_PROMPT, userPrompt, {
       model: opts.model ?? DEFAULT_CITATION_MODEL,
       maxTokens: 2500,
       title: 'LongtermWiki Claims Extraction',
@@ -243,6 +271,8 @@ async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const dryRun = args['dry-run'] === true;
   const model = typeof args.model === 'string' ? args.model : undefined;
+  const variantArg = typeof args.variant === 'string' ? args.variant : 'baseline';
+  const pageTypeArg = typeof args['page-type'] === 'string' ? args['page-type'] as PageType : undefined;
   const c = getColors(false);
   const positional = (args._positional as string[]) || [];
   const pageId = positional[0];
@@ -250,8 +280,19 @@ async function main() {
   if (!pageId) {
     console.error(`${c.red}Error: provide a page ID${c.reset}`);
     console.error(`  Usage: pnpm crux claims extract <page-id>`);
+    console.error(`  Variants: ${VARIANT_NAMES.join(', ')}`);
     process.exit(1);
   }
+
+  // Validate variant
+  if (!VARIANT_NAMES.includes(variantArg as VariantName)) {
+    console.error(`${c.red}Error: unknown variant "${variantArg}". Valid: ${VARIANT_NAMES.join(', ')}${c.reset}`);
+    process.exit(1);
+  }
+  const variant = variantArg as VariantName;
+
+  // Get variant system prompt
+  const systemPrompt = getVariantPrompt(variant, pageTypeArg);
 
   // Check server availability (unless dry-run)
   if (!dryRun) {
@@ -277,6 +318,12 @@ async function main() {
 
   console.log(`\n${c.bold}${c.blue}Claims Extract: ${pageId}${c.reset}\n`);
   console.log(`  Sections found: ${sections.length}`);
+  if (variant !== 'baseline') {
+    console.log(`  Variant: ${c.bold}${variant}${c.reset}${pageTypeArg ? ` (page-type: ${pageTypeArg})` : ''}`);
+  }
+  if (model) {
+    console.log(`  Model: ${model}`);
+  }
   if (dryRun) {
     console.log(`  ${c.yellow}DRY RUN — claims will not be stored${c.reset}`);
   }
@@ -287,7 +334,7 @@ async function main() {
 
   for (const section of sections) {
     process.stdout.write(`  ${c.dim}Extracting: ${section.heading.slice(0, 50)}...${c.reset}`);
-    const claims = await extractClaimsFromSection(section, { model });
+    const claims = await extractClaimsFromSection(section, { model, systemPrompt });
     allClaims.push(...claims.map(c => ({ ...c, section: section.heading })));
     console.log(` ${c.green}${claims.length} claims${c.reset}`);
   }

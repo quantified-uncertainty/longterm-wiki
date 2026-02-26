@@ -1,10 +1,12 @@
 import React from "react";
+import Link from "next/link";
 import {
   getResourceById,
   getResourceCredibility,
   getResourcePublication,
   getPageCitationHealth,
   getResourcesForPage,
+  getFootnoteIndex,
 } from "@data";
 import type { Resource } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
@@ -41,12 +43,35 @@ interface ResolvedRef {
   credibility: number | undefined;
   publicationName: string | undefined;
   peerReviewed: boolean;
+  /** Actual footnote numbers from the page that reference this resource */
+  footnoteNumbers: number[];
 }
 
-function resolveRefs(ids: string[]): {
+function resolveRefs(ids: string[], pageId?: string): {
   refs: ResolvedRef[];
   missing: string[];
 } {
+  // Build a map from resource ID → footnote numbers using the footnote index
+  const resourceFootnotes = new Map<string, number[]>();
+  if (pageId) {
+    const fnIndex = getFootnoteIndex(pageId);
+    if (fnIndex) {
+      for (const source of fnIndex.sources) {
+        if (source.resourceId) {
+          resourceFootnotes.set(source.resourceId, source.footnoteNumbers);
+        }
+      }
+      // Also check individual footnotes for resourceId matches not in sources
+      for (const [numStr, entry] of Object.entries(fnIndex.footnotes)) {
+        if (entry.resourceId && !resourceFootnotes.has(entry.resourceId)) {
+          const existing = resourceFootnotes.get(entry.resourceId) ?? [];
+          existing.push(parseInt(numStr, 10));
+          resourceFootnotes.set(entry.resourceId, existing);
+        }
+      }
+    }
+  }
+
   const refs: ResolvedRef[] = [];
   const missing: string[] = [];
   const seen = new Set<string>();
@@ -68,6 +93,7 @@ function resolveRefs(ids: string[]): {
       credibility: getResourceCredibility(resource),
       publicationName: publication?.name,
       peerReviewed: publication?.peer_reviewed ?? false,
+      footnoteNumbers: resourceFootnotes.get(id) ?? [],
     });
   }
 
@@ -148,14 +174,30 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
     </div>
   );
 
+  // Build anchor elements for actual footnote numbers (for links from claim pages)
+  const { footnoteNumbers } = entry;
+  const fnAnchors = footnoteNumbers.length > 0
+    ? footnoteNumbers.map((n) => (
+        <React.Fragment key={`fn-anchor-${n}`}>
+          <span id={`user-content-fn-${n}`} className="scroll-mt-4" />
+          <span id={`fn-${n}`} />
+        </React.Fragment>
+      ))
+    : (
+      // Fallback: use sequential index when no footnote numbers are available
+      <React.Fragment>
+        <span id={`user-content-fn-${index}`} className="scroll-mt-4" />
+        <span id={`fn-${index}`} />
+      </React.Fragment>
+    );
+
   if (!hasExpandableContent) {
     return (
       <div
         id={`ref-${index}`}
         className="py-1 border-b border-border last:border-b-0"
       >
-        <span id={`user-content-fn-${index}`} className="scroll-mt-4" />
-        <span id={`fn-${index}`} />
+        {fnAnchors}
         <div className="-mx-1.5 px-1.5 py-0.5">
           {titleRow}
         </div>
@@ -168,8 +210,7 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
       id={`ref-${index}`}
       className="py-1 border-b border-border last:border-b-0"
     >
-      <span id={`user-content-fn-${index}`} className="scroll-mt-4" />
-      <span id={`fn-${index}`} />
+      {fnAnchors}
       <details className="ref-details group">
         <summary className="ref-summary cursor-pointer select-none hover:bg-muted/50 -mx-1.5 px-1.5 py-0.5 rounded transition-colors">
           {titleRow}
@@ -246,7 +287,7 @@ export function References({
 
   if (resolvedIds.length === 0) return null;
 
-  const { refs, missing } = resolveRefs(resolvedIds);
+  const { refs, missing } = resolveRefs(resolvedIds, pageId);
 
   return (
     <section
@@ -256,12 +297,22 @@ export function References({
       )}
       aria-label={title}
     >
-      <h2
-        className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 mt-0 pb-0 border-b-0"
-        id="references"
-      >
-        {title}
-      </h2>
+      <div className="flex items-baseline justify-between mb-2">
+        <h2
+          className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mt-0 pb-0 border-b-0"
+          id="references"
+        >
+          {title}
+        </h2>
+        {pageId && (
+          <Link
+            href={`/claims/entity/${pageId}`}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            View claims →
+          </Link>
+        )}
+      </div>
 
       {refs.length > 0 && (
         <div>

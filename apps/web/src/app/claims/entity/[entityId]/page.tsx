@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
-import { getEntityById } from "@data";
+import {
+  getEntityById,
+  getEntityHref,
+  getResourcesForPage,
+  getResourceById,
+  getResourceCredibility,
+} from "@data";
 import type { GetClaimsResult } from "@wiki-server/api-types";
 import { StatCard } from "../../components/stat-card";
 import { ClaimsTable } from "../../components/claims-table";
@@ -10,6 +16,8 @@ import {
   collectEntitySlugs,
   buildEntityNameMap,
 } from "../../components/claims-data";
+import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
+import { getResourceTypeIcon } from "@/components/wiki/resource-utils";
 
 interface PageProps {
   params: Promise<{ entityId: string }>;
@@ -38,6 +46,26 @@ export default async function EntityClaimsPage({ params }: PageProps) {
   const displayName = entity?.title ?? entityId;
   const entityNames = buildEntityNameMap(collectEntitySlugs(claims));
 
+  // Resolve page resources for the "Page Resources" section
+  const resourceIds = getResourcesForPage(entityId);
+  const resources = resourceIds
+    .map((id) => getResourceById(id))
+    .filter((r): r is NonNullable<typeof r> => r !== undefined);
+
+  // Count how many claims cite each resource (by resourceId or URL match)
+  const resourceCitationCounts = new Map<string, number>();
+  for (const claim of claims) {
+    if (!claim.sources) continue;
+    for (const source of claim.sources) {
+      if (source.resourceId) {
+        resourceCitationCounts.set(
+          source.resourceId,
+          (resourceCitationCounts.get(source.resourceId) ?? 0) + 1
+        );
+      }
+    }
+  }
+
   // Compute stats
   const verified = claims.filter((c) => c.confidence === "verified").length;
   const multiEntity = claims.filter(
@@ -63,13 +91,13 @@ export default async function EntityClaimsPage({ params }: PageProps) {
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-2xl font-bold">{displayName}</h1>
           <Link
-            href={`/wiki/${entityId}`}
+            href={getEntityHref(entityId)}
             className="text-xs text-blue-600 hover:underline"
           >
             View wiki page &rarr;
           </Link>
           <Link
-            href={`/wiki/${entityId}/data`}
+            href={`${getEntityHref(entityId)}/data`}
             className="text-xs text-muted-foreground hover:underline"
           >
             Data page
@@ -112,6 +140,59 @@ export default async function EntityClaimsPage({ params }: PageProps) {
 
           <ClaimsTable claims={claims} entityNames={entityNames} />
         </>
+      )}
+
+      {resources.length > 0 && (
+        <div className="mt-8">
+          <details open={resources.length <= 5}>
+            <summary className="text-sm font-semibold cursor-pointer select-none list-none flex items-center gap-2">
+              <span>Page Resources</span>
+              <span className="text-xs font-normal text-muted-foreground">
+                ({resources.length})
+              </span>
+              {resources.length > 5 && (
+                <span className="text-xs text-muted-foreground">
+                  — click to expand
+                </span>
+              )}
+            </summary>
+            <div className="mt-3 space-y-2">
+              {resources.map((resource) => {
+                const credibility = getResourceCredibility(resource);
+                const citedInCount = resourceCitationCounts.get(resource.id) ?? 0;
+                return (
+                  <div
+                    key={resource.id}
+                    className="flex items-center gap-3 rounded border px-3 py-2 text-sm"
+                  >
+                    <span className="text-base leading-none shrink-0">
+                      {getResourceTypeIcon(resource.type)}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <Link
+                        href={`/source/${resource.id}`}
+                        className="font-medium text-blue-600 hover:underline"
+                      >
+                        {resource.title}
+                      </Link>
+                    </div>
+                    {citedInCount > 0 && (
+                      <span className="text-[10px] text-muted-foreground shrink-0">
+                        {citedInCount} {citedInCount === 1 ? "claim" : "claims"}
+                      </span>
+                    )}
+                    <span className="text-[10px] text-muted-foreground capitalize shrink-0">
+                      {resource.type}
+                    </span>
+                    {credibility !== undefined && (
+                      <CredibilityBadge level={credibility} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </details>
+        </div>
       )}
     </div>
   );

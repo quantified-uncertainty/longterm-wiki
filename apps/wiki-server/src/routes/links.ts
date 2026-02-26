@@ -101,8 +101,9 @@ linksRoute.post("/sync", async (c) => {
 
       await tx`
         INSERT INTO page_links (source_id, target_id, link_type, relationship, weight)
-        SELECT * FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb)
-        AS t(source_id text, target_id text, link_type text, relationship text, weight real)
+        SELECT "sourceId", "targetId", "linkType", relationship, weight
+        FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb)
+        AS t("sourceId" text, "targetId" text, "linkType" text, relationship text, weight real)
         ON CONFLICT (source_id, target_id, link_type)
         DO UPDATE SET weight = EXCLUDED.weight, relationship = EXCLUDED.relationship
       `;

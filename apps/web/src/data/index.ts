@@ -1823,6 +1823,7 @@ const CATEGORY_TO_TYPE: Record<string, string> = {
   forecasting: "model",
   "foundation-models": "capability",
   incidents: "historical",
+  internal: "internal",
   other: "concept",
 };
 
