@@ -18,6 +18,8 @@ import {
   ClearClaimsBySectionSchema,
   ClaimPageReferenceInsertSchema,
   ClaimPageReferenceBatchSchema,
+  ClaimTopicSchema,
+  ClaimPropertySchema,
   type ClaimPageReferenceRow,
 } from "../api-types.js";
 
@@ -315,8 +317,8 @@ claimsRoute.post("/clear", async (c) => {
 const BatchUpdateSchema = z.object({
   items: z.array(z.object({
     id: z.number().int().positive(),
-    topic: z.string().max(100).nullable().optional(),
-    property: z.string().max(200).nullable().optional(),
+    topic: ClaimTopicSchema.nullable().optional(),
+    property: ClaimPropertySchema.nullable().optional(),
   })).min(1).max(500),
 });
 
@@ -330,19 +332,23 @@ claimsRoute.post("/batch-update", async (c) => {
   const db = getDrizzleDb();
   let updated = 0;
 
-  for (const item of parsed.data.items) {
-    const updates: Record<string, string | null> = {};
-    if (item.topic !== undefined) updates.topic = item.topic;
-    if (item.property !== undefined) updates.property = item.property;
-    if (Object.keys(updates).length === 0) continue;
+  await db.transaction(async (tx) => {
+    for (const item of parsed.data.items) {
+      const updates: Record<string, string | Date | null> = {};
+      if (item.topic !== undefined) updates.topic = item.topic;
+      if (item.property !== undefined) updates.property = item.property;
+      if (Object.keys(updates).length === 0) continue;
 
-    const result = await db
-      .update(claims)
-      .set(updates)
-      .where(eq(claims.id, item.id))
-      .returning({ id: claims.id });
-    updated += result.length;
-  }
+      updates.updatedAt = new Date();
+
+      const result = await tx
+        .update(claims)
+        .set(updates)
+        .where(eq(claims.id, item.id))
+        .returning({ id: claims.id });
+      updated += result.length;
+    }
+  });
 
   return c.json({ updated });
 });
