@@ -10846,7 +10846,7 @@
   publication_id: metaculus
 - id: f37ebc766aaa61d7
   url: https://digital-strategy.ec.europa.eu/en/policies/ai-office
-  title: "**EU AI Office**"
+  title: "EU AI Office"
   type: web
   cited_by:
     - agi-development

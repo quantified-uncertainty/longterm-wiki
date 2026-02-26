@@ -2,13 +2,17 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import type { ColumnDef, SortingState } from "@tanstack/react-table";
+import type {
+  ColumnDef,
+  SortingState,
+  VisibilityState,
+} from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getSortedRowModel,
   getPaginationRowModel,
-  getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import {
@@ -16,6 +20,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  ExternalLink,
 } from "lucide-react";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import {
@@ -28,7 +33,38 @@ import {
 } from "@/components/ui/table";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getResourceTypeIcon } from "@/components/wiki/resource-utils";
-import type { PublicResourceRow } from "./page";
+
+export interface ResourceRow {
+  id: string;
+  title: string;
+  url: string | undefined;
+  type: string;
+  publicationName: string | null;
+  credibility: number | null;
+  citingPageCount: number;
+  publishedDate: string | null;
+  hasSummary: boolean;
+}
+
+/** Strip markdown bold markers from titles */
+function cleanTitle(title: string): string {
+  return title.replace(/\*\*/g, "");
+}
+
+const TYPE_COLORS: Record<string, string> = {
+  paper: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  blog: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
+  report: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
+  book: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+  web: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+  government:
+    "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300",
+  talk: "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300",
+  podcast:
+    "bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300",
+  reference:
+    "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300",
+};
 
 const TYPE_LABELS: Record<string, string> = {
   paper: "Paper",
@@ -42,192 +78,235 @@ const TYPE_LABELS: Record<string, string> = {
   web: "Web",
 };
 
-const columns: ColumnDef<PublicResourceRow>[] = [
-  {
-    accessorKey: "title",
-    header: "Resource",
-    cell: ({ row }) => {
-      const r = row.original;
-      return (
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-sm leading-none shrink-0">
-            {getResourceTypeIcon(r.type)}
-          </span>
-          <div className="min-w-0">
-            <Link
-              href={`/source/${r.id}`}
-              className="text-xs font-medium text-blue-600 hover:underline leading-tight"
-            >
-              {r.title.length > 100 ? r.title.slice(0, 100) + "..." : r.title}
-            </Link>
-            {r.publicationName && (
-              <div className="text-[10px] text-muted-foreground">
-                {r.publicationName}
-              </div>
+const DEFAULT_TYPE_COLOR =
+  "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+
+function makeColumns(): ColumnDef<ResourceRow>[] {
+  return [
+    {
+      accessorKey: "title",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Resource</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const r = row.original;
+        const icon = getResourceTypeIcon(r.type);
+        return (
+          <div className="flex items-start gap-2 min-w-0">
+            <span className="text-sm shrink-0 mt-0.5" title={r.type}>
+              {icon}
+            </span>
+            <div className="min-w-0">
+              <Link
+                href={`/source/${r.id}`}
+                className="text-primary hover:underline text-sm font-medium block truncate max-w-[340px]"
+                title={cleanTitle(r.title)}
+              >
+                {cleanTitle(r.title)}
+              </Link>
+              {r.publicationName && (
+                <span className="text-xs text-muted-foreground block truncate max-w-[300px]">
+                  {r.publicationName}
+                </span>
+              )}
+            </div>
+            {r.url && (
+              <a
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 text-muted-foreground/50 hover:text-muted-foreground mt-0.5"
+                title="Open source URL"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ExternalLink className="h-3 w-3" />
+              </a>
             )}
           </div>
-        </div>
-      );
+        );
+      },
+      filterFn: "includesString",
     },
-    size: 400,
-    filterFn: (row, _, filterValue) => {
-      const search = (filterValue as string).toLowerCase();
-      const r = row.original;
-      return (
-        r.title.toLowerCase().includes(search) ||
-        r.id.toLowerCase().includes(search) ||
-        (r.publicationName?.toLowerCase().includes(search) ?? false)
-      );
+    {
+      accessorKey: "type",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Type</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const t = row.original.type;
+        const color = TYPE_COLORS[t] || DEFAULT_TYPE_COLOR;
+        return (
+          <span className={`text-xs px-1.5 py-0.5 rounded ${color} capitalize`}>
+            {TYPE_LABELS[t] ?? t}
+          </span>
+        );
+      },
+      filterFn: "includesString",
     },
-  },
-  {
-    accessorKey: "type",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Type</SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <span className="text-[10px] text-muted-foreground capitalize">
-        {TYPE_LABELS[row.original.type] ?? row.original.type}
-      </span>
-    ),
-    size: 80,
-  },
-  {
-    accessorKey: "citingPageCount",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Pages</SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const count = row.original.citingPageCount;
-      if (count === 0) return <span className="text-muted-foreground/40 text-xs">—</span>;
-      return (
-        <span className="text-xs tabular-nums font-medium">{count}</span>
-      );
+    {
+      accessorKey: "citingPageCount",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Pages</SortableHeader>
+      ),
+      cell: ({ row }) => (
+        <span className="text-sm tabular-nums font-medium">
+          {row.original.citingPageCount}
+        </span>
+      ),
     },
-    size: 60,
-  },
-  {
-    accessorKey: "credibility",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Credibility</SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const cred = row.original.credibility;
-      if (cred == null) return <span className="text-muted-foreground/40 text-xs">—</span>;
-      return <CredibilityBadge level={cred} />;
+    {
+      accessorKey: "credibility",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Credibility</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const c = row.original.credibility;
+        if (c == null)
+          return (
+            <span className="text-muted-foreground/40 text-xs">&mdash;</span>
+          );
+        return <CredibilityBadge level={c} size="sm" />;
+      },
+      sortUndefined: "last",
     },
-    size: 80,
-  },
-  {
-    accessorKey: "publishedDate",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Published</SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const date = row.original.publishedDate;
-      if (!date) return <span className="text-muted-foreground/40 text-xs">—</span>;
-      return <span className="text-xs text-muted-foreground tabular-nums">{date.slice(0, 10)}</span>;
+    {
+      accessorKey: "publishedDate",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Published</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const d = row.original.publishedDate;
+        if (!d)
+          return (
+            <span className="text-muted-foreground/40 text-xs">&mdash;</span>
+          );
+        return (
+          <span className="text-xs text-muted-foreground">
+            {d.length > 7 ? d.slice(0, 10) : d}
+          </span>
+        );
+      },
+      sortUndefined: "last",
     },
-    size: 90,
-  },
-];
+  ];
+}
 
-export function ResourcesTable({
-  resources,
-}: {
-  resources: PublicResourceRow[];
-}) {
+export function ResourcesTable({ resources }: { resources: ResourceRow[] }) {
+  const columns = useMemo(() => makeColumns(), []);
+
   const [sorting, setSorting] = useState<SortingState>([
     { id: "citingPageCount", desc: true },
   ]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [columnVisibility] = useState<VisibilityState>({});
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 });
+  const [typeFilter, setTypeFilter] = useState<string>("");
 
-  const filteredResources = useMemo(() => {
-    if (typeFilter === "all") return resources;
+  const types = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of resources) {
+      counts.set(r.type, (counts.get(r.type) || 0) + 1);
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  }, [resources]);
+
+  const filteredData = useMemo(() => {
+    if (!typeFilter) return resources;
     return resources.filter((r) => r.type === typeFilter);
   }, [resources, typeFilter]);
 
-  const types = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const r of resources) {
-      counts[r.type] = (counts[r.type] ?? 0) + 1;
-    }
-    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  }, [resources]);
-
   const table = useReactTable({
-    data: filteredResources,
+    data: filteredData,
     columns,
-    state: { sorting, globalFilter },
-    onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
-    globalFilterFn: (row, _, filterValue) => {
-      const search = (filterValue as string).toLowerCase();
-      const r = row.original;
-      return (
-        r.title.toLowerCase().includes(search) ||
-        r.id.toLowerCase().includes(search) ||
-        (r.publicationName?.toLowerCase().includes(search) ?? false)
-      );
-    },
     getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    initialState: { pagination: { pageSize: 30 } },
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: "includesString",
+    onColumnVisibilityChange: () => {},
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
+    state: {
+      sorting,
+      globalFilter,
+      columnVisibility,
+      pagination,
+    },
   });
 
+  const filtered = table.getFilteredRowModel().rows.length;
+  const total = resources.length;
+
   return (
-    <div>
-      {/* Search + filter bar */}
-      <div className="flex items-center gap-3 mb-4">
-        <input
-          type="text"
-          placeholder="Search resources..."
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="flex-1 max-w-xs px-3 py-1.5 text-sm border rounded-md bg-background"
-        />
-        <div className="flex gap-1.5 flex-wrap">
+    <div className="space-y-4">
+      {/* Search + type filter pills */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <input
+            type="text"
+            placeholder="Search resources..."
+            value={globalFilter ?? ""}
+            onChange={(e) => {
+              setGlobalFilter(e.target.value);
+              setPagination((p) => ({ ...p, pageIndex: 0 }));
+            }}
+            className="flex-1 max-w-xs px-3 py-1.5 text-sm border rounded-md bg-background"
+          />
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
           <button
-            type="button"
-            onClick={() => setTypeFilter("all")}
-            className={`px-2 py-1 text-[10px] rounded cursor-pointer transition-colors ${
-              typeFilter === "all"
-                ? "bg-foreground text-background"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            onClick={() => {
+              setTypeFilter("");
+              setPagination((p) => ({ ...p, pageIndex: 0 }));
+            }}
+            className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+              !typeFilter
+                ? "bg-foreground text-background border-foreground"
+                : "bg-background text-muted-foreground border-border hover:border-foreground/30"
             }`}
           >
-            All ({resources.length})
+            All ({total.toLocaleString()})
           </button>
           {types.map(([type, count]) => (
             <button
               key={type}
-              type="button"
-              onClick={() => setTypeFilter(type === typeFilter ? "all" : type)}
-              className={`px-2 py-1 text-[10px] rounded cursor-pointer transition-colors ${
+              onClick={() => {
+                setTypeFilter(typeFilter === type ? "" : type);
+                setPagination((p) => ({ ...p, pageIndex: 0 }));
+              }}
+              className={`text-xs px-2.5 py-1 rounded-full border transition-colors capitalize ${
                 typeFilter === type
-                  ? "bg-foreground text-background"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  ? "bg-foreground text-background border-foreground"
+                  : "bg-background text-muted-foreground border-border hover:border-foreground/30"
               }`}
             >
-              {TYPE_LABELS[type] ?? type} ({count})
+              {TYPE_LABELS[type] ?? type} ({count.toLocaleString()})
             </button>
           ))}
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Result count */}
+      {filtered !== total && (
+        <p className="text-xs text-muted-foreground">
+          Showing {filtered.toLocaleString()} of {total.toLocaleString()}{" "}
+          resources
+        </p>
+      )}
+
+      {/* Table */}
+      <div className="rounded-lg border border-border/60 shadow-sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow
+                key={headerGroup.id}
+                className="hover:bg-transparent border-b border-border/60"
+              >
                 {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    style={{ width: header.getSize() }}
-                  >
+                  <TableHead key={header.id} className="whitespace-nowrap">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -240,11 +319,11 @@ export function ResourcesTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length > 0 ? (
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="py-2">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -257,9 +336,9 @@ export function ResourcesTable({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="text-center text-muted-foreground py-8"
+                  className="h-24 text-center text-muted-foreground"
                 >
-                  No resources found.
+                  No resources match your search.
                 </TableCell>
               </TableRow>
             )}
@@ -268,51 +347,57 @@ export function ResourcesTable({
       </div>
 
       {/* Pagination */}
-      {table.getPageCount() > 1 && (
-        <div className="flex items-center justify-between px-2 py-3 text-sm">
-          <span className="text-muted-foreground text-xs">
-            {table.getFilteredRowModel().rows.length} resources
-          </span>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-              className="p-1 rounded hover:bg-muted disabled:opacity-30 cursor-pointer disabled:cursor-default"
-            >
-              <ChevronsLeft className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-              className="p-1 rounded hover:bg-muted disabled:opacity-30 cursor-pointer disabled:cursor-default"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <span className="text-xs text-muted-foreground px-2 tabular-nums">
-              {table.getState().pagination.pageIndex + 1} /{" "}
-              {table.getPageCount()}
-            </span>
-            <button
-              type="button"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-              className="p-1 rounded hover:bg-muted disabled:opacity-30 cursor-pointer disabled:cursor-default"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-              className="p-1 rounded hover:bg-muted disabled:opacity-30 cursor-pointer disabled:cursor-default"
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </button>
-          </div>
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Rows per page:</span>
+          <select
+            value={pagination.pageSize}
+            onChange={(e) =>
+              setPagination({ pageIndex: 0, pageSize: Number(e.target.value) })
+            }
+            className="h-7 rounded border border-border bg-background px-2 text-xs"
+          >
+            {[25, 50, 100, 200].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground tabular-nums">
+            Page {pagination.pageIndex + 1} of {table.getPageCount() || 1}
+          </span>
+          <button
+            onClick={() => table.setPageIndex(0)}
+            disabled={!table.getCanPreviousPage()}
+            className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronsLeft className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            disabled={!table.getCanNextPage()}
+            className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronsRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
