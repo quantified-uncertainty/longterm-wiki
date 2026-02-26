@@ -440,6 +440,14 @@ claimsRoute.get("/stats", async (c) => {
     .from(claims)
     .where(sql`${claims.property} IS NOT NULL`);
 
+  // Property distribution (for structured claims)
+  const byProperty = await db
+    .select({ property: claims.property, count: count() })
+    .from(claims)
+    .where(sql`${claims.property} IS NOT NULL`)
+    .groupBy(claims.property)
+    .orderBy(desc(count()));
+
   // Verdict distribution
   const byVerdict = await db
     .select({ claimVerdict: claims.claimVerdict, count: count() })
@@ -466,6 +474,9 @@ claimsRoute.get("/stats", async (c) => {
     attributedClaims: attributedResult[0].count,
     numericClaims: numericResult[0].count,
     structuredClaims: structuredResult[0].count,
+    byProperty: Object.fromEntries(
+      byProperty.map((r) => [r.property ?? "unknown", r.count])
+    ),
   });
 });
 
