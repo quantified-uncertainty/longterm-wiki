@@ -76,8 +76,14 @@ const SCRIPTS = {
   },
   synthesize: {
     script: 'claims/synthesize.ts',
-    description: 'Gap analysis: compare stored claims against page content',
+    description: 'LLM-based gap analysis: compare stored claims against page content',
     passthrough: ['json', 'top', 'model'],
+    positional: true,
+  },
+  'gap-analysis': {
+    script: 'claims/gap-analysis.ts',
+    description: 'Fast text-based gap analysis: find missing verified facts for a page',
+    passthrough: ['json'],
     positional: true,
   },
   'backfill-from-citations': {
@@ -154,9 +160,10 @@ Workflow:
   3. crux claims from-resource <url>             Extract from any URL (auto-routes)
 
   Claims synthesis (gap analysis):
-  1. crux claims synthesize <page-id>             Compare claims vs page content
-  2. crux claims synthesize <page-id> --json       Machine-readable output
-  3. crux content improve <page-id> --directions="Incorporate missing claims"
+  1. crux claims gap-analysis <page-id>            Fast text-based gap analysis (no LLM cost)
+  2. crux claims gap-analysis <page-id> --json     Machine-readable output
+  3. crux claims synthesize <page-id>              LLM-based semantic gap analysis
+  4. crux content improve <page-id> --gap-analysis --apply   Inject missing verified facts into page
 
   Citation backfill (Wave 2b):
   1. crux claims backfill-from-citations --dry-run        Preview what would be created

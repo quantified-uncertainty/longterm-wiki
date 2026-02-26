@@ -145,6 +145,13 @@ export interface PipelineOptions {
    * to the wiki-server DB after the run. Default: true.
    */
   saveArtifacts?: boolean;
+  /**
+   * When true, run claims gap analysis before improvement and inject
+   * specific verified facts as structured directions for the LLM.
+   * Only injects claims with confidence='verified' and non-null sourceQuote/URL.
+   * Default: false (backward compatible).
+   */
+  gapAnalysis?: boolean;
 }
 
 // Re-export AuditResult so callers importing from types.ts get it too

@@ -14,7 +14,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
     script: 'authoring/page-improver/index.ts',
     description: 'Improve an existing page with AI assistance',
-    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'dry-run', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-audit', 'citation-audit-model', 'batch', 'batch-file', 'batch-budget', 'page-timeout', 'resume', 'report-file', 'no-save-artifacts', 'output', 'limit', 'openrouter'],
+    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'dry-run', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-audit', 'citation-audit-model', 'batch', 'batch-file', 'batch-budget', 'page-timeout', 'resume', 'report-file', 'no-save-artifacts', 'output', 'limit', 'openrouter', 'gap-analysis'],
     positional: true,
   },
   create: {
@@ -100,6 +100,7 @@ Options:
   --resume            Resume interrupted batch from batch-state.json (improve)
   --report-file=f.md  Write batch summary report to file (improve)
   --no-save-artifacts Skip saving intermediate artifacts to wiki-server DB (improve)
+  --gap-analysis      Run claims gap analysis: inject missing verified facts as structured directions (improve)
   --dry-run           Preview batch without API calls: shows tier, cost estimates, skip reasons
   --output=plan.json  Write dry-run plan to JSON file (use with --dry-run)
   --limit=N           Max pages to preview in dry-run without --batch (default: 20)

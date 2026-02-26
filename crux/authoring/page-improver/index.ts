@@ -120,6 +120,7 @@ Options:
   --skip-citation-audit           Skip the post-improve citation audit phase
   --citation-audit-model <model>  Override LLM model for per-citation verification
   --no-save-artifacts             Skip saving intermediate artifacts to wiki-server DB
+  --gap-analysis                  Run claims gap analysis: inject missing verified facts as structured directions
   --openrouter                    Route all Claude calls through OpenRouter (when Anthropic credits depleted)
   --triage                        Run news-check triage only (no improvement)
   --list                          List pages needing improvement
@@ -302,6 +303,7 @@ Examples:
       skipCitationAudit: opts['skip-citation-audit'] === true ? true : undefined,
       citationAuditModel: (opts['citation-audit-model'] as string) || undefined,
       saveArtifacts: opts['no-save-artifacts'] === true ? false : undefined,
+      gapAnalysis: opts['gap-analysis'] === true ? true : undefined,
     });
   }
 }
