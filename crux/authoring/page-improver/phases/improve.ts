@@ -9,6 +9,7 @@ import fs from 'fs';
 import { MODELS } from '../../../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../../../lib/entity-lookup.ts';
 import { buildFactLookupForContent } from '../../../lib/fact-lookup.ts';
+import { buildClaimsContextForContent } from '../../../lib/claims-context.ts';
 import { convertSlugsToNumericIds } from '../../creator/deployment.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
 import {
@@ -39,11 +40,27 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   const factLookupCount = factLookup ? factLookup.split('\n').filter(l => l && !l.startsWith('#')).length : 0;
   log('improve', `  Found ${factLookupCount} available facts for wrapping`);
 
+  log('improve', 'Fetching claims context from wiki-server...');
+  let claimsContext: string | null = null;
+  try {
+    const claimsResult = await buildClaimsContextForContent(page.id);
+    if (claimsResult) {
+      claimsContext = claimsResult.promptText;
+      const s = claimsResult.stats;
+      log('improve', `  ${s.total} claims: ${s.verified} verified, ${s.disputed} disputed, ${s.unsupported} unsupported, ${s.unverified} unverified`);
+    } else {
+      log('improve', '  No claims available (server unavailable or no claims for this entity)');
+    }
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('improve', `  Claims fetch failed: ${error.message} — continuing without claims context`);
+  }
+
   const tier = options.tier || 'standard';
   const prompt = IMPROVE_PROMPT({
     page, filePath, importPath, directions,
     analysis, research, objectivityContext,
-    currentContent, entityLookup, factLookup, tier,
+    currentContent, entityLookup, factLookup, claimsContext, tier,
   });
 
   const result = await runAgent(prompt, {

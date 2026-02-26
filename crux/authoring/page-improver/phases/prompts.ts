@@ -18,11 +18,12 @@ interface ImprovePromptArgs {
   currentContent: string;
   entityLookup: string;
   factLookup: string | null;
+  claimsContext: string | null;
   tier: string;
 }
 
 export function IMPROVE_PROMPT(args: ImprovePromptArgs): string {
-  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, factLookup, tier } = args;
+  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, factLookup, claimsContext, tier } = args;
 
   const isPolish = tier === 'polish';
   const pageType = getPageType(page);
@@ -132,6 +133,17 @@ When you encounter a hardcoded number in the prose that matches a fact below, wr
 \`\`\`
 ${factLookup}
 \`\`\`
+` : ''}${claimsContext ? `
+### Claims Context (Verified Facts from Claims Store)
+
+The following claims have been extracted and verified from this page's sources. Use them as follows:
+- **Verified claims** are trusted facts — reference them when making factual assertions. Do not contradict them.
+- **Disputed/unsupported claims** may need rewriting — check if they appear in the page and improve their sourcing or remove them.
+- **Unverified claims with sources** are supplementary context you can draw on for additional information not yet on the page.
+
+If the page is missing information covered by verified claims, consider adding it (with appropriate citations).
+
+${claimsContext}
 ` : ''}
 ### Quality Standards
 - Add citations from the research sources
