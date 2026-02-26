@@ -17,6 +17,12 @@ const SCRIPTS: Record<string, ScriptConfig> = {
     passthrough: ['ci', 'tier', 'directions', 'dryRun', 'dry-run', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-audit', 'citation-audit-model', 'batch', 'batch-file', 'batch-budget', 'page-timeout', 'resume', 'report-file', 'no-save-artifacts', 'output', 'limit', 'openrouter', 'gap-analysis'],
     positional: true,
   },
+  iterate: {
+    script: 'authoring/page-iterator.ts',
+    description: 'Iteratively improve a page until quality stabilizes',
+    passthrough: ['tier', 'directions', 'apply', 'max-rounds', 'pages', 'gap-analysis'],
+    positional: true,
+  },
   create: {
     script: 'authoring/page-creator.ts',
     description: 'Create a new page with research pipeline',
@@ -125,5 +131,8 @@ Examples:
   crux content improve --engine=v2 --dry-run --limit=10            # preview 10 pages (no API calls)
   crux content improve --batch=anthropic,miri --engine=v2 --dry-run  # preview specific pages
   crux content improve --engine=v2 --dry-run --output=batch-plan.json  # save plan to file
+  crux content iterate anthropic --apply                              # iterate until quality stabilizes
+  crux content iterate anthropic --max-rounds=5 --tier=deep --apply   # deep iteration, up to 5 rounds
+  crux content iterate --pages=anthropic,miri,far-ai --apply          # iterate multiple pages
 `;
 }
