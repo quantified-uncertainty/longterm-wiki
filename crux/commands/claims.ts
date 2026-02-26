@@ -86,6 +86,12 @@ const SCRIPTS = {
     passthrough: ['dry-run', 'page-id', 'limit'],
     positional: false,
   },
+  'backfill-related-entities': {
+    script: 'claims/backfill-related-entities.ts',
+    description: 'Scan claim text for entity names and backfill relatedEntities field',
+    passthrough: ['apply', 'limit', 'entity-id'],
+    positional: false,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'status');
@@ -112,6 +118,8 @@ Options:
   --force               Re-ingest already-processed resources; clear existing claims (ingest-resource, ingest-batch)
   --batch=<file>        Process URLs from a file, one per line (from-resource)
   --no-auto-resource    Don't auto-create resource YAML for unknown URLs (from-resource)
+  --apply               Write changes to database (backfill-related-entities; default: dry-run)
+  --entity-id=E         Filter to single entity (backfill-related-entities)
 
 Examples:
   crux claims pipeline kalshi                         Run full extract → link → verify pipeline
@@ -154,6 +162,11 @@ Workflow:
   1. crux claims backfill-from-citations --dry-run        Preview what would be created
   2. crux claims backfill-from-citations                  Run against all unlinked quotes
   3. crux claims backfill-from-citations --page-id=kalshi Run for a single page
+
+  Entity backfill (relatedEntities):
+  1. crux claims backfill-related-entities                Dry-run: scan claims for entity mentions
+  2. crux claims backfill-related-entities --apply        Apply changes to database
+  3. crux claims backfill-related-entities --entity-id=anthropic --apply  Single entity
 
 Notes:
   - Extraction requires OPENROUTER_API_KEY or ANTHROPIC_API_KEY
