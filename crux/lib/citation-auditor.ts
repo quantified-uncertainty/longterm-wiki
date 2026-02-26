@@ -31,6 +31,33 @@ import { getCitationContentByUrl } from './wiki-server/citations.ts';
 /** Minimum source content length (chars) required to attempt LLM verification. */
 export const MIN_SOURCE_CONTENT_LENGTH = 50;
 
+/**
+ * Domains that commonly serve login walls, dynamic JS-rendered content,
+ * or minimal snippets that cause false "unsupported" verdicts.
+ * These are marked 'unchecked' when fetched content is suspiciously short.
+ */
+const DYNAMIC_CONTENT_DOMAINS = [
+  'glassdoor.com',
+  'bloomberg.com',
+  'wsj.com',
+  'ft.com',
+  'nytimes.com',
+  'linkedin.com',
+  'patreon.com',
+  'substack.com',
+  'twitter.com',
+  'x.com',
+];
+
+function isDynamicContentDomain(url: string): boolean {
+  try {
+    const hostname = new URL(url).hostname.replace(/^www\./, '');
+    return DYNAMIC_CONTENT_DOMAINS.some(d => hostname === d || hostname.endsWith('.' + d));
+  } catch {
+    return false;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
@@ -163,14 +190,16 @@ interface VerifierResponse {
 const VERIFIER_SYSTEM_PROMPT = `You are a citation verification assistant. Given a claim from a wiki article and the text of the cited source, determine whether the source supports the claim.
 
 Use exactly one of these verdicts:
-- "verified": the source clearly and directly supports the claim
-- "unsupported": the source does not contain information relevant to this claim
-- "misattributed": the source has related content but the claim misrepresents it (wrong numbers, wrong attribution, overclaim, misleading paraphrase)
+- "verified": the source supports the core factual assertion in the claim. The source need not cover every detail in the sentence — wiki sentences often cite multiple sources, so this source may only support part of the claim.
+- "unsupported": the source does not contain information relevant to this claim at all
+- "misattributed": the source covers the same topic but the claim clearly misrepresents it (inverted meaning, wrong entity, fabricated numbers not found anywhere in the source)
 
 Rules:
 - Search the ENTIRE source for relevant passages before deciding
 - Only return "unsupported" if you have checked the full source and it truly contains no relevant information
-- Be strict about numbers, dates, and names — even small discrepancies count as "misattributed"
+- IMPORTANT: A sentence may cite multiple sources (e.g., [^4][^5][^6]). Each source is only expected to support PART of the claim. If the source supports any substantial factual assertion in the claim, return "verified".
+- Minor phrasing differences or rounding of numbers are acceptable — focus on whether the core fact is directionally correct
+- Only use "misattributed" for clear factual errors: wrong entity attributed, numbers contradicted by the source, inverted conclusions
 - For "relevantQuote", copy the exact passage from the source most relevant to the claim (1-3 sentences). Return "" if no relevant passage exists.
 - For "explanation", give a concise (1-2 sentence) reason for your verdict
 
@@ -270,14 +299,16 @@ async function verifyClaimBatchAgainstSource(
   const batchSystemPrompt = `You are a citation verification assistant. Given MULTIPLE claims from a wiki article and the text of a single cited source, determine whether the source supports each claim.
 
 Use exactly one of these verdicts per claim:
-- "verified": the source clearly and directly supports the claim
-- "unsupported": the source does not contain information relevant to this claim
-- "misattributed": the source has related content but the claim misrepresents it (wrong numbers, wrong attribution, overclaim, misleading paraphrase)
+- "verified": the source supports the core factual assertion in the claim. The source need not cover every detail in the sentence — wiki sentences often cite multiple sources, so this source may only support part of the claim.
+- "unsupported": the source does not contain information relevant to this claim at all
+- "misattributed": the source covers the same topic but the claim clearly misrepresents it (inverted meaning, wrong entity, fabricated numbers not found anywhere in the source)
 
 Rules:
 - Search the ENTIRE source for relevant passages before deciding
 - Only return "unsupported" if you have checked the full source and it truly contains no relevant information
-- Be strict about numbers, dates, and names — even small discrepancies count as "misattributed"
+- IMPORTANT: A sentence may cite multiple sources (e.g., [^4][^5][^6]). Each source is only expected to support PART of the claim. If the source supports any substantial factual assertion in the claim, return "verified".
+- Minor phrasing differences or rounding of numbers are acceptable — focus on whether the core fact is directionally correct
+- Only use "misattributed" for clear factual errors: wrong entity attributed, numbers contradicted by the source, inverted conclusions
 - For "relevantQuote", copy the exact passage from the source most relevant to the claim (1-3 sentences). Return "" if no relevant passage exists.
 - For "explanation", give a concise (1-2 sentence) reason for your verdict
 
@@ -546,6 +577,19 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
         sourceUrl: ext.url,
         verdict: 'unchecked',
         explanation: 'Source returned no usable text content.',
+      });
+      continue;
+    }
+
+    // Handle: domains known for dynamic/login-gated content that
+    // fetches but produces misleading snippets (causes false "unsupported")
+    if (isDynamicContentDomain(ext.url) && source.content.length < 2000) {
+      nonLlmAudits.push({
+        footnoteRef,
+        claim,
+        sourceUrl: ext.url,
+        verdict: 'unchecked',
+        explanation: 'Source domain typically requires login or serves dynamic content — fetched text may be incomplete.',
       });
       continue;
     }
