@@ -64,6 +64,7 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
           low={claim.valueLow}
           high={claim.valueHigh}
           measure={claim.measure}
+          unit={claim.valueUnit}
         />
       )}
 
@@ -303,6 +304,7 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
                 low={c.valueLow}
                 high={c.valueHigh}
                 measure={c.measure}
+                unit={c.valueUnit}
                 compact
               />
             </div>

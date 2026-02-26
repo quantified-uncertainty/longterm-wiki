@@ -23,7 +23,9 @@ import {
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getResourceTypeIcon } from "@/components/wiki/resource-utils";
 
+let _propertyLabelsCache: Record<string, string> | null = null;
 function loadPropertyLabels(): Record<string, string> {
+  if (_propertyLabelsCache) return _propertyLabelsCache;
   try {
     const raw = readFileSync(
       join(process.cwd(), "../../data/claims-properties.yaml"),
@@ -34,6 +36,7 @@ function loadPropertyLabels(): Record<string, string> {
     for (const prop of data.properties) {
       map[prop.id] = prop.label;
     }
+    _propertyLabelsCache = map;
     return map;
   } catch {
     return {};

@@ -82,7 +82,7 @@ export function formatStructuredValue(
   unit: string | null
 ): string {
   const n = Number(rawValue);
-  if (!Number.isNaN(n) && rawValue.trim() !== "") {
+  if (Number.isFinite(n) && rawValue.trim() !== "") {
     return formatValue(n, unit);
   }
   return rawValue;

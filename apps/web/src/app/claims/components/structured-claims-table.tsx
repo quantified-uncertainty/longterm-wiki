@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import Link from "next/link";
 import type { ColumnDef, SortingState, ExpandedState } from "@tanstack/react-table";
 import {
@@ -242,20 +242,63 @@ export function StructuredClaimsTable({ claims, propertyLabels }: Props) {
         <TableBody>
           {table.getRowModel().rows.length > 0 ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                className="cursor-pointer"
-                onClick={() => row.toggleExpanded()}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
+              <Fragment key={row.id}>
+                <TableRow
+                  className="cursor-pointer"
+                  onClick={() => row.toggleExpanded()}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+                {row.getIsExpanded() && (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="p-0 bg-muted/30">
+                      <div className="px-4 py-3 space-y-2 text-sm">
+                        <div>
+                          <span className="font-medium text-xs text-muted-foreground">Full Claim:</span>
+                          <p className="mt-0.5">{row.original.claimText}</p>
+                        </div>
+                        {row.original.sources && row.original.sources.length > 0 && (
+                          <div>
+                            <span className="font-medium text-xs text-muted-foreground block mb-1">
+                              Sources ({row.original.sources.length}):
+                            </span>
+                            <div className="space-y-1">
+                              {row.original.sources.map((s) => (
+                                <div key={s.id} className="text-xs flex items-start gap-2">
+                                  {s.isPrimary && (
+                                    <span className="bg-blue-100 text-blue-700 px-1 py-0.5 rounded text-[9px] shrink-0">primary</span>
+                                  )}
+                                  {s.resourceId ? (
+                                    <Link href={`/source/${s.resourceId}`} className="text-blue-600 hover:underline font-mono">
+                                      {s.resourceId}
+                                    </Link>
+                                  ) : s.url ? (
+                                    <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate">
+                                      {s.url}
+                                    </a>
+                                  ) : null}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        <div className="pt-1">
+                          <Link href={`/claims/claim/${row.original.id}`} className="text-xs text-blue-600 hover:underline">
+                            View full detail &rarr;
+                          </Link>
+                        </div>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </Fragment>
             ))
           ) : (
             <TableRow>

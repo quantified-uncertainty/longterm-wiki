@@ -9,6 +9,7 @@ import { CategoryBadge } from "../../components/category-badge";
 import { ConfidenceBadge } from "../../components/confidence-badge";
 import { ClaimModeBadge } from "../../components/claim-mode-badge";
 import { NumericValueDisplay } from "../../components/numeric-value-display";
+import { formatStructuredValue } from "@lib/format-value";
 import { ClaimSourcesList } from "../../components/claim-sources-list";
 import { VerdictBadge } from "../../components/verdict-badge";
 import {
@@ -195,6 +196,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
             low={claim.valueLow}
             high={claim.valueHigh}
             measure={claim.measure}
+            unit={claim.valueUnit}
           />
         </div>
       )}
@@ -224,12 +226,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
             {claim.structuredValue && (
               <div>
                 <span className="text-xs text-muted-foreground block">Value</span>
-                <span className="font-mono">{claim.structuredValue}</span>
-                {claim.valueUnit && (
-                  <span className="text-xs text-muted-foreground ml-1">
-                    ({claim.valueUnit})
-                  </span>
-                )}
+                <span className="font-mono">{formatStructuredValue(claim.structuredValue, claim.valueUnit)}</span>
               </div>
             )}
             {claim.valueDate && (
