@@ -42,6 +42,7 @@ import {
   extractClaimsFromSection,
   EXTRACT_SYSTEM_PROMPT,
 } from './extract.ts';
+import { validateClaimBatch } from './validate-claim.ts';
 
 // ---------------------------------------------------------------------------
 // Step type
@@ -74,6 +75,7 @@ interface CitationQuote {
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const dryRun = args['dry-run'] === true;
+  const strict = args['strict'] === true;
   const model = typeof args.model === 'string' ? args.model : undefined;
   const c = getColors(false);
   const positional = (args._positional as string[]) || [];
@@ -118,12 +120,20 @@ async function main() {
   console.log(`\n${c.bold}${c.blue}Claims Pipeline: ${pageId}${c.reset}`);
   console.log(`  Steps: ${steps.join(', ')}`);
   if (model) console.log(`  Model: ${model}`);
+  if (strict) console.log(`  ${c.yellow}STRICT MODE — claims failing validation will be rejected${c.reset}`);
   if (dryRun) console.log(`  ${c.yellow}DRY RUN — no DB writes${c.reset}`);
   console.log('');
 
   // Read page content once — shared across steps
   const raw = readFileSync(filePath, 'utf-8');
   const body = stripFrontmatter(raw);
+
+  // Resolve entity display name for validation
+  const fmMatch = raw.match(/^---\n([\s\S]*?)\n---/);
+  const titleMatch = fmMatch ? fmMatch[1].match(/^title:\s*["']?(.+?)["']?\s*$/m) : null;
+  const entityName = titleMatch
+    ? titleMatch[1]
+    : pageId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
   // ------------------------------------------------------------------
   // Step 1: Extract claims from page content
@@ -171,16 +181,36 @@ async function main() {
 
     console.log(`\n  Total extracted: ${c.bold}${allExtracted.length}${c.reset} claims`);
 
+    // Post-extraction validation
+    const { accepted: validatedExtracted, rejected: rejectedExtracted, stats: extractStats } =
+      validateClaimBatch(allExtracted, pageId, entityName, strict);
+
+    if (extractStats.total > 0 && (extractStats.warned > 0 || extractStats.rejected > 0)) {
+      console.log(`\n  ${c.bold}Validation:${c.reset}`);
+      console.log(`    ${c.green}${extractStats.valid}${c.reset} valid, ${c.yellow}${extractStats.warned}${c.reset} warned, ${c.red}${extractStats.rejected}${c.reset} rejected`);
+      if (Object.keys(extractStats.issueBreakdown).length > 0) {
+        for (const [issue, cnt] of Object.entries(extractStats.issueBreakdown).sort((a, b) => b[1] - a[1])) {
+          console.log(`    ${c.dim}${issue.padEnd(28)} ${cnt}${c.reset}`);
+        }
+      }
+      if (strict && rejectedExtracted.length > 0) {
+        console.log(`\n    ${c.yellow}Rejected ${rejectedExtracted.length} claims (--strict)${c.reset}`);
+      }
+    }
+
+    // Use validated claims going forward
+    const allValidated = validatedExtracted;
+
     if (dryRun) {
       console.log(`\n  ${c.bold}Sample claims (first 5):${c.reset}`);
-      for (const clm of allExtracted.slice(0, 5)) {
+      for (const clm of allValidated.slice(0, 5)) {
         const refs = clm.footnoteRefs.length > 0 ? ` [^${clm.footnoteRefs.join(', ^')}]` : ' (unsourced)';
         console.log(`    [${clm.claimType}] ${clm.claimText.slice(0, 90)}${refs}`);
       }
-      if (allExtracted.length > 5) {
-        console.log(`    ... and ${allExtracted.length - 5} more`);
+      if (allValidated.length > 5) {
+        console.log(`    ... and ${allValidated.length - 5} more`);
       }
-    } else if (allExtracted.length > 0) {
+    } else if (allValidated.length > 0) {
       // Get existing claims to deduplicate
       const existingResult = await getClaimsByEntity(pageId);
       const existingTexts = existingResult.ok
@@ -190,10 +220,10 @@ async function main() {
         : [];
 
       // Deduplicate against existing
-      const unique = allExtracted.filter(
+      const unique = allValidated.filter(
         clm => !existingTexts.some(t => isClaimDuplicate(clm.claimText, t, 0.75)),
       );
-      const dupCount = allExtracted.length - unique.length;
+      const dupCount = allValidated.length - unique.length;
       if (dupCount > 0) {
         console.log(`  ${c.dim}Skipped ${dupCount} duplicates of existing claims${c.reset}`);
       }

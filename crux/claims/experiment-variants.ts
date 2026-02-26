@@ -56,6 +56,15 @@ const SOURCE_FIELDS = `- "sourceQuote": a SHORT verbatim excerpt (max 200 chars)
 - "footnoteRefs": array of citation references (as strings) — look for [^N] (e.g. [^1]) and [^R:HASH] patterns near the claim
 - "relatedEntities": array of entity IDs or names mentioned in the claim other than the page's primary subject`;
 
+const SELF_CONTAINMENT_RULES = `SELF-CONTAINMENT (critical):
+- Every claim MUST be a complete, self-contained assertion. A reader seeing ONLY this claim — with no other context — must understand what it asserts and about whom.
+- Always include the full entity name (e.g., "Anthropic" not "the company", "Kalshi" not "the platform", "GPT-4" not "the model"). Never use "the company", "the model", "the platform", "the organization", "it", "they", or similar pronouns without the entity name.
+- Each claim must contain exactly ONE verifiable assertion. If a sentence has multiple facts, split into separate claims.
+- Never start a claim with "The ", "This ", "However", "Additionally", "Furthermore", "Moreover", "In contrast" — rewrite to be independent.
+- Skip claims that merely define what the entity is (e.g., "Kalshi is a prediction market" on the Kalshi page).
+- Skip vague claims using words like "significant", "various", "several" without specific numbers or names.
+- Every claim must end with a period.`;
+
 const SHARED_RULES = `Rules:
 - Each claim must be atomic (one assertion per claim)
 - Include specific numbers, names, dates when present
@@ -65,7 +74,9 @@ const SHARED_RULES = `Rules:
 - Use "numeric" for any claim with specific dollar amounts, percentages, counts, or model sizes
 - Always include valueNumeric for numeric claims — extract the number even if written out (e.g. "$7.3 billion" → 7300000000)
 - Include asOf whenever the text specifies a date or "as of" qualifier for the claim
-- Return only claims that appear in the given text`;
+- Return only claims that appear in the given text
+
+${SELF_CONTAINMENT_RULES}`;
 
 const JSON_FORMAT = `Respond ONLY with JSON:
 {"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "sourceQuote": "exact text from the wiki section", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"]}]}`;
