@@ -152,10 +152,13 @@ export default async function SourcePage({ params }: PageProps) {
         {/* Metadata row */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           {publication && (
-            <span className="italic">
+            <a
+              href={`/claims/publications/${publication.id}`}
+              className="italic hover:underline text-primary"
+            >
               {publication.name}
               {publication.peer_reviewed && " (peer-reviewed)"}
-            </span>
+            </a>
           )}
           {!publication && domain && <span>{domain}</span>}
           {resource.authors && resource.authors.length > 0 && (

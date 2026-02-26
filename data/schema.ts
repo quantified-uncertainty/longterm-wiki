@@ -588,6 +588,8 @@ export const Publication = z.object({
   credibility: z.number().min(1).max(5),        // 1-5, 5 = gold standard
   peer_reviewed: z.boolean().optional(),
   description: z.string().optional(),
+  credibility_rationale: z.string().optional(),  // Explains why the rating was given
+  website: z.string().url().optional(),          // Canonical URL (domains[] is for matching)
 });
 export type Publication = z.infer<typeof Publication>;
 

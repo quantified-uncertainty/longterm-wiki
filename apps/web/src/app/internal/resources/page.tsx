@@ -40,6 +40,7 @@ export default function ResourcesPage() {
       hasReview: !!r.review,
       hasKeyPoints: !!r.key_points && r.key_points.length > 0,
       publicationName: publication?.name ?? null,
+      publicationId: publication?.id ?? null,
       credibility: credibility ?? null,
       citingPageCount: citingPages.length,
       tags: r.tags ?? [],

@@ -25,6 +25,7 @@ export async function getClaimsNav(): Promise<NavSection[]> {
         { label: "Browse Claims", href: "/claims/explore" },
         { label: "Relationships", href: "/claims/relationships" },
         { label: "Network", href: "/claims/network" },
+        { label: "Publications", href: "/claims/publications" },
       ],
     },
   ];
