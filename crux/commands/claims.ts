@@ -98,6 +98,12 @@ const SCRIPTS = {
     passthrough: ['apply', 'limit', 'entity-id'],
     positional: false,
   },
+  'migrate-footnotes': {
+    script: 'claims/migrate-footnotes.ts',
+    description: 'Migrate numbered footnotes to DB-driven references (claim refs + citations)',
+    passthrough: ['apply'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'status');
@@ -124,7 +130,7 @@ Options:
   --force               Re-ingest already-processed resources; clear existing claims (ingest-resource, ingest-batch)
   --batch=<file>        Process URLs from a file, one per line (from-resource)
   --no-auto-resource    Don't auto-create resource YAML for unknown URLs (from-resource)
-  --apply               Write changes to database (backfill-related-entities; default: dry-run)
+  --apply               Write changes to database (backfill-related-entities, migrate-footnotes; default: dry-run)
   --entity-id=E         Filter to single entity (backfill-related-entities)
 
 Examples:
@@ -174,6 +180,10 @@ Workflow:
   1. crux claims backfill-related-entities                Dry-run: scan claims for entity mentions
   2. crux claims backfill-related-entities --apply        Apply changes to database
   3. crux claims backfill-related-entities --entity-id=anthropic --apply  Single entity
+
+  Footnote migration (DB-driven references):
+  1. crux claims migrate-footnotes <page-id>          Dry-run: show what would change
+  2. crux claims migrate-footnotes <page-id> --apply   Rewrite MDX + create DB entries
 
 Notes:
   - Extraction requires OPENROUTER_API_KEY or ANTHROPIC_API_KEY
