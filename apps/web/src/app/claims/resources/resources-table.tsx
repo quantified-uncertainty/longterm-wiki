@@ -37,7 +37,7 @@ import { getResourceTypeIcon } from "@/components/wiki/resource-utils";
 export interface ResourceRow {
   id: string;
   title: string;
-  url: string;
+  url: string | undefined;
   type: string;
   publicationName: string | null;
   credibility: number | null;
@@ -110,16 +110,18 @@ function makeColumns(): ColumnDef<ResourceRow>[] {
                 </span>
               )}
             </div>
-            <a
-              href={r.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 text-muted-foreground/50 hover:text-muted-foreground mt-0.5"
-              title="Open source URL"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <ExternalLink className="h-3 w-3" />
-            </a>
+            {r.url && (
+              <a
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 text-muted-foreground/50 hover:text-muted-foreground mt-0.5"
+                title="Open source URL"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            )}
           </div>
         );
       },
