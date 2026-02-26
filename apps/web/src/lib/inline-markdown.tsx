@@ -1,10 +1,11 @@
 import React from "react";
-import Link from "next/link";
-import { getEntityHref, getEntityById } from "@data";
 
 /**
  * Render basic inline markdown: **bold**, *italic*, `code`, and
- * `<EntityLink id="...">text</EntityLink>` tags as clickable links.
+ * `<EntityLink id="...">text</EntityLink>` tags as styled spans.
+ *
+ * This module is imported by client components, so it must NOT import
+ * from `@data` or any module that uses Node `fs`.
  *
  * Useful for displaying short user-facing text that may contain
  * lightweight formatting without pulling in a full MDX pipeline.
@@ -42,19 +43,16 @@ export function renderInlineMarkdown(text: string): React.ReactNode {
         </code>
       );
     } else if (match[5]) {
-      // <EntityLink id="...">text</EntityLink>
-      const entityId = match[5];
+      // <EntityLink id="...">text</EntityLink> — render as styled text
+      // (cannot resolve entity URLs here since this runs on the client)
       const displayText = match[6];
-      const entity = getEntityById(entityId);
-      const href = getEntityHref(entityId, entity?.type);
       parts.push(
-        <Link
+        <span
           key={key++}
-          href={href}
-          className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-muted rounded text-sm text-accent-foreground no-underline transition-colors hover:bg-muted/80"
+          className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-muted rounded text-sm text-accent-foreground"
         >
           {displayText}
-        </Link>
+        </span>
       );
     }
     lastIndex = match.index + match[0].length;
