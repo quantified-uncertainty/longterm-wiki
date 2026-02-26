@@ -51,6 +51,7 @@ export const QUALITY_RULES: string[] = [
   'prescriptive-language',
   'unsourced-biographical-claims',
   'evaluative-flattery',
+  'orphaned-footnotes',
 ];
 
 export const TIERS: Record<string, TierConfig> = {
