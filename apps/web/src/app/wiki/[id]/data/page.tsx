@@ -18,7 +18,7 @@ import {
 } from "@/data";
 import type { FootnoteIndexEntry } from "@/data";
 import { fetchFromWikiServer } from "@lib/wiki-server";
-import type { ClaimRow, GetClaimsResult } from "@wiki-server/api-types";
+import type { ClaimRow, GetClaimsResult } from "@wiki-server/api-response-types";
 
 interface PageProps {
   params: Promise<{ id: string }>;

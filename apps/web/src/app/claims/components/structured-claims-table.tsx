@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { ClaimRow } from "@wiki-server/api-types";
+import type { ClaimRow } from "@wiki-server/api-response-types";
 import { formatStructuredValue } from "@lib/format-value";
 
 interface Props {

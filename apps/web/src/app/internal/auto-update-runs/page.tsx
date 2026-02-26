@@ -8,7 +8,7 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { RunsTable } from "./runs-table";
 import type { Metadata } from "next";
-import type { AutoUpdateRunRow } from "@wiki-server/api-types";
+import type { AutoUpdateRunRow } from "@wiki-server/api-response-types";
 
 export const metadata: Metadata = {
   title: "Auto-Update Runs | Longterm Wiki Internal",

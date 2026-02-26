@@ -9,7 +9,7 @@ import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { CitationAccuracyDashboard } from "./citation-accuracy-dashboard";
 import { VERDICT_COLORS } from "./verdict-colors";
 import type { Metadata } from "next";
-import type { AccuracyDashboardData } from "@wiki-server/api-types";
+import type { AccuracyDashboardData } from "@wiki-server/api-response-types";
 
 export const metadata: Metadata = {
   title: "Citation Accuracy | Longterm Wiki Internal",

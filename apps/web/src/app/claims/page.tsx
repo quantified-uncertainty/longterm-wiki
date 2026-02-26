@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
-import type { ClaimStatsResult } from "@wiki-server/api-types";
+import type { ClaimStatsResult } from "@wiki-server/api-response-types";
 import { StatCard } from "./components/stat-card";
 import { DistributionBar } from "./components/distribution-bar";
 import {

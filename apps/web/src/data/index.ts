@@ -12,7 +12,7 @@ import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
 import { fetchFromWikiServer, withApiFallback, getFactsRpcClient, type WithSource, type RpcFactsByEntityResult, type RpcTimeseriesResult } from "@lib/wiki-server";
-import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry, CitationHealthResult } from "@wiki-server/api-types";
+import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry, CitationHealthResult } from "@wiki-server/api-response-types";
 import {
   TypedEntitySchema,
   type TypedEntity,
@@ -1164,8 +1164,8 @@ export function getBacklinksFor(
   }));
 }
 
-/** Server response shape for backlinks endpoint — imported from shared api-types */
-type ServerBacklink = ServerBacklinkEntry;
+/** Backlink shape used by both the API and local fallback paths. */
+type NormalizedBacklink = { id: string; type: string; title: string; href: string; relationship?: string };
 
 /**
  * Fetch backlinks from wiki-server with fallback to local database.json.
@@ -1173,24 +1173,21 @@ type ServerBacklink = ServerBacklinkEntry;
  */
 export async function getBacklinksWithFallback(
   entityId: string
-): Promise<WithSource<Array<{
-  id: string;
-  type: string;
-  title: string;
-  href: string;
-  relationship?: string;
-}>>> {
+): Promise<WithSource<NormalizedBacklink[]>> {
   const slug = resolveId(entityId);
 
-  return withApiFallback(
+  return withApiFallback<NormalizedBacklink[]>(
     async () => {
-      const data = await fetchFromWikiServer<{ backlinks: ServerBacklink[] }>(
+      const data = await fetchFromWikiServer<{ backlinks: ServerBacklinkEntry[] }>(
         `/api/links/backlinks/${encodeURIComponent(slug)}`
       );
       if (!data) return null;
-      return data.backlinks.map((link) => ({
-        ...link,
-        href: getEntityHref(link.id, link.type),
+      return data.backlinks.map(({ id, type, title, relationship }): NormalizedBacklink => ({
+        id: String(id),
+        type: String(type),
+        title: String(title),
+        relationship: relationship ? String(relationship) : undefined,
+        href: getEntityHref(String(id), String(type)),
       }));
     },
     () => getBacklinksFor(entityId)

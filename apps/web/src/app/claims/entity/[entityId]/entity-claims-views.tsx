@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { List, Table2 } from "lucide-react";
 import { cn } from "@lib/utils";
-import type { ClaimRow } from "@wiki-server/api-types";
+import type { ClaimRow } from "@wiki-server/api-response-types";
 import { EntityClaimsList } from "./entity-claims-list";
 import { ClaimsTable } from "../../components/claims-table";
 

@@ -11,7 +11,7 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { PageChangesSessions } from "./page-changes-sessions";
 import type { Metadata } from "next";
-import type { SessionRow } from "@wiki-server/api-types";
+import type { SessionRow } from "@wiki-server/api-response-types";
 
 export const metadata: Metadata = {
   title: "Page Changes | Longterm Wiki Internal",

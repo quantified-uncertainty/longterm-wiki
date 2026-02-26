@@ -8,7 +8,7 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { HallucinationRiskDashboard } from "./hallucination-risk-dashboard";
 import type { Metadata } from "next";
-import type { RiskPageRow } from "@wiki-server/api-types";
+import type { RiskPageRow } from "@wiki-server/api-response-types";
 
 // Render on-demand — avoid build-time timeout when wiki-server is unreachable
 export const dynamic = "force-dynamic";

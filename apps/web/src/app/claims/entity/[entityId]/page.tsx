@@ -8,7 +8,7 @@ import {
   getResourceById,
   getResourceCredibility,
 } from "@data";
-import type { GetClaimsResult } from "@wiki-server/api-types";
+import type { GetClaimsResult } from "@wiki-server/api-response-types";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { parse } from "yaml";

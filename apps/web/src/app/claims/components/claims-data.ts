@@ -1,6 +1,6 @@
 import { fetchFromWikiServer } from "@lib/wiki-server";
 import { getEntityById } from "@data";
-import type { ClaimRow } from "@wiki-server/api-types";
+import type { ClaimRow } from "@wiki-server/api-response-types";
 
 interface PaginatedClaimsResponse {
   claims: ClaimRow[];

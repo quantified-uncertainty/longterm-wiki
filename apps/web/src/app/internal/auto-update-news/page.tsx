@@ -10,7 +10,7 @@ import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { NewsTable } from "./news-table";
 import { SourcesTable } from "./sources-table";
 import type { Metadata } from "next";
-import type { AutoUpdateNewsRow } from "@wiki-server/api-types";
+import type { AutoUpdateNewsRow } from "@wiki-server/api-response-types";
 
 export const metadata: Metadata = {
   title: "Auto-Update News | Longterm Wiki Internal",

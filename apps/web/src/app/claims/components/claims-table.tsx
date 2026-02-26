@@ -27,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { ClaimRow } from "@wiki-server/api-types";
+import type { ClaimRow } from "@wiki-server/api-response-types";
 import { CategoryBadge } from "./category-badge";
 import { ConfidenceBadge } from "./confidence-badge";
 import { ClaimModeBadge } from "./claim-mode-badge";
