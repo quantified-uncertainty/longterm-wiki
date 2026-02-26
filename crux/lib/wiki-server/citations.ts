@@ -22,6 +22,7 @@ import type {
   CitationContentListEntry,
   CitationContentListResult,
   CitationContentStatsResult,
+  PropagateFromClaimsResult,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -177,6 +178,24 @@ export async function linkCitationsToClaimsBatch(
     'POST',
     '/api/citations/quotes/link-claims-batch',
     { items },
+    undefined,
+    'content',
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Backward Propagation API functions
+// ---------------------------------------------------------------------------
+
+export type { PropagateFromClaimsResult };
+
+export async function propagateClaimVerdictsToPage(
+  pageId: string,
+): Promise<ApiResult<PropagateFromClaimsResult>> {
+  return apiRequest<PropagateFromClaimsResult>(
+    'POST',
+    '/api/citations/quotes/propagate-from-claims',
+    { pageId },
     undefined,
     'content',
   );

@@ -22,6 +22,7 @@ import {
   type CitationHealthResult,
   LinkCitationClaimSchema,
   LinkCitationsClaimsBatchSchema,
+  PropagateFromClaimsSchema,
 } from "../api-types.js";
 
 export const citationsRoute = new Hono();
@@ -1148,4 +1149,87 @@ citationsRoute.post("/quotes/link-claims-batch", async (c) => {
   }
 
   return c.json({ linked: linkedCount });
+});
+
+// ---- POST /quotes/propagate-from-claims ----
+// Backward-propagate claim verdicts to linked citation_quotes.
+// For each citation_quote with a claim_id, copies the claim's verdict fields
+// to the citation's accuracy fields, using the mapping:
+//   claim verified → citation accurate
+//   claim unsupported → citation unsupported
+//   claim disputed → citation inaccurate
+//   claim unverified → skip (don't overwrite)
+
+citationsRoute.post("/quotes/propagate-from-claims", async (c) => {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = PropagateFromClaimsSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { pageId } = parsed.data;
+  const db = getDrizzleDb();
+
+  // Find all citation_quotes for this page that have a linked claim
+  const linkedQuotes = await db
+    .select({
+      quoteId: citationQuotes.id,
+      claimVerdict: claims.claimVerdict,
+      claimVerdictScore: claims.claimVerdictScore,
+      claimVerdictIssues: claims.claimVerdictIssues,
+      claimVerdictQuotes: claims.claimVerdictQuotes,
+      claimVerdictDifficulty: claims.claimVerdictDifficulty,
+    })
+    .from(citationQuotes)
+    .innerJoin(claims, eq(citationQuotes.claimId, claims.id))
+    .where(
+      and(
+        eq(citationQuotes.pageId, pageId),
+        isNotNull(citationQuotes.claimId),
+      )
+    );
+
+  // Map claim verdict → citation accuracy verdict
+  const VERDICT_MAP: Record<string, string> = {
+    verified: "accurate",
+    unsupported: "unsupported",
+    disputed: "inaccurate",
+  };
+
+  let propagated = 0;
+  let skipped = 0;
+
+  for (const row of linkedQuotes) {
+    const claimVerdict = row.claimVerdict;
+
+    // Skip if claim has no verdict or verdict is 'unverified'
+    if (!claimVerdict || claimVerdict === "unverified") {
+      skipped++;
+      continue;
+    }
+
+    const mappedVerdict = VERDICT_MAP[claimVerdict];
+    if (!mappedVerdict) {
+      // Unknown verdict value — skip
+      skipped++;
+      continue;
+    }
+
+    await db
+      .update(citationQuotes)
+      .set({
+        accuracyVerdict: mappedVerdict,
+        accuracyScore: row.claimVerdictScore,
+        accuracyIssues: row.claimVerdictIssues ?? null,
+        accuracySupportingQuotes: row.claimVerdictQuotes ?? null,
+        verificationDifficulty: row.claimVerdictDifficulty ?? null,
+        accuracyCheckedAt: sql`now()`,
+        updatedAt: sql`now()`,
+      })
+      .where(eq(citationQuotes.id, row.quoteId));
+
+    propagated++;
+  }
+
+  return c.json({ propagated, skipped });
 });

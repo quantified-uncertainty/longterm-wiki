@@ -30,7 +30,7 @@ import {
   addClaimPageReferencesBatch,
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
-import { linkCitationsToClaimsBatch } from '../lib/wiki-server/citations.ts';
+import { linkCitationsToClaimsBatch, propagateClaimVerdictsToPage } from '../lib/wiki-server/citations.ts';
 import {
   isClaimDuplicate,
   claimTypeToCategory,
@@ -395,17 +395,30 @@ async function main() {
   // Step 3: Verify claims against sources
   // ------------------------------------------------------------------
   if (steps.includes('verify')) {
-    console.log(`\n${c.bold}Step 3: Verify claims against sources${c.reset}`);
+    console.log(`\n${c.bold}Step 3: Verify & propagate verdicts${c.reset}`);
 
     if (dryRun) {
-      console.log(`  ${c.yellow}[DRY RUN] Would run claim verification for all claims on this page${c.reset}`);
+      console.log(`  ${c.yellow}[DRY RUN] Would run claim verification and propagate to citation_quotes${c.reset}`);
     } else {
-      console.log(`  Verification delegates to the existing verify pipeline.`);
-      console.log(`  Run separately:`);
-      console.log(`    ${c.bold}pnpm crux claims verify ${pageId}${c.reset}`);
-      if (model) {
-        console.log(`    ${c.bold}pnpm crux claims verify ${pageId} --model=${model}${c.reset}`);
+      // Propagate any existing claim verdicts to citation_quotes
+      const propResult = await propagateClaimVerdictsToPage(pageId);
+      if (propResult.ok) {
+        const { propagated, skipped } = propResult.data;
+        if (propagated > 0) {
+          console.log(`  ${c.green}Propagated ${propagated} claim verdicts to citation_quotes${c.reset}`);
+        }
+        if (skipped > 0) {
+          console.log(`  ${c.dim}Skipped ${skipped} (unverified claims)${c.reset}`);
+        }
+        if (propagated === 0 && skipped === 0) {
+          console.log(`  ${c.dim}No linked claims found to propagate${c.reset}`);
+        }
+      } else {
+        console.log(`  ${c.yellow}Propagation failed: ${propResult.message}${c.reset}`);
       }
+
+      console.log(`\n  For full LLM-based verification, run separately:`);
+      console.log(`    ${c.bold}pnpm crux claims verify ${pageId}${c.reset}`);
     }
   }
 
