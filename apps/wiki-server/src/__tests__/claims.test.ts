@@ -94,8 +94,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // ---- INSERT INTO claims ----
   if (q.includes("insert into") && q.includes('"claims"')) {
     const now = new Date();
-    // Count parameters per row: 8 original + 6 enhanced + 7 phase2 = 21
-    const PARAMS_PER_ROW = 21;
+    // Count parameters per row: 8 original + 6 enhanced + 7 phase2 + 6 verdict + 6 structured = 33
+    const PARAMS_PER_ROW = 33;
     const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
     const results: Record<string, unknown>[] = [];
 
@@ -127,6 +127,20 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         value_numeric: params[off + 18],
         value_low: params[off + 19],
         value_high: params[off + 20],
+        // Verdict fields (migration 0031)
+        claim_verdict: params[off + 21],
+        claim_verdict_score: params[off + 22],
+        claim_verdict_issues: params[off + 23],
+        claim_verdict_quotes: params[off + 24],
+        claim_verdict_difficulty: params[off + 25],
+        claim_verdict_model: params[off + 26],
+        // Structured claim fields (migration 0032)
+        subject_entity: params[off + 27],
+        property: params[off + 28],
+        structured_value: params[off + 29],
+        value_unit: params[off + 30],
+        value_date: params[off + 31],
+        qualifiers: parseJsonbParam(params[off + 32]),
         created_at: now,
         updated_at: now,
       };
