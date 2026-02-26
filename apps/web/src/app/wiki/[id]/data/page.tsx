@@ -14,6 +14,7 @@ import {
   getFootnoteIndex,
   getResourceById,
   getResourceCredibility,
+  getEntityHref,
 } from "@/data";
 import type { FootnoteIndexEntry } from "@/data";
 import { fetchFromWikiServer } from "@lib/wiki-server";
@@ -114,7 +115,7 @@ function RelatedEntityBadges({ entities }: { entities: string[] | null }) {
       {entities.map(eid => (
         <Link
           key={eid}
-          href={`/wiki/${eid}`}
+          href={getEntityHref(eid)}
           className="inline-block px-1 py-0.5 rounded text-[10px] bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
           title={`Related entity: ${eid}`}
         >
@@ -172,14 +173,14 @@ function CredDots({ level }: { level: number }) {
 type RefEntry = { title: string | null; url: string | null; resourceId?: string; domain?: string };
 type SourceEntry = RefEntry & { footnoteNum: number; credibility?: number; claimCount: number };
 
-/** Get the section name for a claim, preferring the new field over legacy */
+/** Get the section name for a claim */
 function getClaimSection(claim: ClaimRow): string {
-  return claim.section ?? claim.value ?? "Unknown";
+  return claim.section ?? "Unknown";
 }
 
-/** Get footnote ref string, preferring new field over legacy */
+/** Get footnote ref string for a claim */
 function getClaimFootnoteRefs(claim: ClaimRow): string | null {
-  return claim.footnoteRefs ?? claim.unit ?? null;
+  return claim.footnoteRefs ?? null;
 }
 
 /** Build shared data structures from claims + footnote index */
