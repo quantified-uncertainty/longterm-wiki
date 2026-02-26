@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
 import { getEntityById, getEntityHref } from "@data";
-import type { ClaimRow } from "@wiki-server/api-types";
+import type { ClaimRow, SimilarClaimsResult } from "@wiki-server/api-types";
 import { buildEntityNameMap } from "../../components/claims-data";
 import { CategoryBadge } from "../../components/category-badge";
 import { ConfidenceBadge } from "../../components/confidence-badge";
@@ -34,20 +34,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ClaimDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const claim = await fetchFromWikiServer<ClaimRow>(
-    `/api/claims/${id}?includeSources=true`,
-    { revalidate: 300 }
-  );
+  const [claim, pageRefsResult, similarResult] = await Promise.all([
+    fetchFromWikiServer<ClaimRow>(`/api/claims/${id}?includeSources=true`, {
+      revalidate: 300,
+    }),
+    fetchFromWikiServer<{ references: PageReference[] }>(
+      `/api/claims/${id}/page-references`,
+      { revalidate: 300 }
+    ),
+    fetchFromWikiServer<SimilarClaimsResult>(`/api/claims/${id}/similar?limit=5`, {
+      revalidate: 300,
+    }),
+  ]);
 
   if (!claim) notFound();
 
-  // Fetch page references for this claim
-  const pageRefsResult = await fetchFromWikiServer<{ references: PageReference[] }>(
-    `/api/claims/${id}/page-references`,
-    { revalidate: 300 }
-  );
   const pageReferences = pageRefsResult?.references ?? [];
-
+  const similarClaims = similarResult?.claims ?? [];
   const entity = getEntityById(claim.entityId);
   const entityDisplayName = entity?.title ?? claim.entityId;
   const allSlugs = [claim.entityId, ...(claim.relatedEntities ?? []).map(s => s.toLowerCase())];
@@ -320,6 +323,42 @@ export default async function ClaimDetailPage({ params }: PageProps) {
           <p className="text-xs text-muted-foreground mt-1">
             Footnote numbers from the source wiki page
           </p>
+        </div>
+      )}
+
+      {/* Similar Claims */}
+      {similarClaims.length > 0 && (
+        <div className="mb-6">
+          <span className="text-xs font-medium text-muted-foreground block mb-2">
+            Similar Claims
+          </span>
+          <div className="space-y-2">
+            {similarClaims.map((sc) => (
+              <Link
+                key={sc.id}
+                href={`/claims/claim/${sc.id}`}
+                className="block rounded-lg border p-3 hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-mono text-xs text-muted-foreground">
+                    #{sc.id}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {Math.round(sc.similarityScore * 100)}% match
+                  </span>
+                  {sc.claimCategory && (
+                    <CategoryBadge category={sc.claimCategory} />
+                  )}
+                  <span className="text-xs text-muted-foreground ml-auto">
+                    {sc.entityId}
+                  </span>
+                </div>
+                <p className="text-sm text-foreground line-clamp-2">
+                  {sc.claimText}
+                </p>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 
