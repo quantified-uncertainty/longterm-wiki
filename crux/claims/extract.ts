@@ -41,6 +41,26 @@ import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../li
 import type { ClaimTypeValue } from '../lib/claim-utils.ts';
 import { getVariantPrompt, VARIANT_NAMES, type VariantName, type PageType } from './experiment-variants.ts';
 import { validateClaimBatch } from './validate-claim.ts';
+import { parseFootnotes, type ParsedFootnote } from '../lib/footnote-parser.ts';
+
+// ---------------------------------------------------------------------------
+// Footnote resolution — resolve footnoteRefs to source URLs
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a map from footnote number → URL by parsing the page's footnote definitions.
+ * This lets us resolve claim footnoteRefs like ["1", "3"] to actual external URLs.
+ */
+function buildFootnoteUrlMap(pageBody: string): Map<number, { url: string; title: string | null }> {
+  const footnotes = parseFootnotes(pageBody);
+  const map = new Map<number, { url: string; title: string | null }>();
+  for (const fn of footnotes) {
+    if (fn.url) {
+      map.set(fn.number, { url: fn.url, title: fn.title });
+    }
+  }
+  return map;
+}
 
 // ---------------------------------------------------------------------------
 // MDX preprocessing — strip JSX components and get clean text
@@ -396,11 +416,15 @@ async function main() {
   const cleanBody = cleanMdxForExtraction(body);
   const sections = splitIntoSections(cleanBody);
 
+  // Build footnote number → URL map for resolving footnoteRefs to sources
+  const footnoteUrlMap = buildFootnoteUrlMap(body);
+
   // Resolve entity display name for validation
   const entityName = extractFrontmatterTitle(raw) ?? slugToDisplayName(pageId);
 
   console.log(`\n${c.bold}${c.blue}Claims Extract: ${pageId}${c.reset}\n`);
   console.log(`  Sections found: ${sections.length}`);
+  console.log(`  Footnotes with URLs: ${footnoteUrlMap.size}`);
   console.log(`  Entity name: ${entityName}`);
   if (variant !== 'baseline') {
     console.log(`  Variant: ${c.bold}${variant}${c.reset}${pageTypeArg ? ` (page-type: ${pageTypeArg})` : ''}`);
@@ -537,7 +561,25 @@ async function main() {
 
   for (let i = 0; i < validatedClaims.length; i += BATCH_SIZE) {
     const batch = validatedClaims.slice(i, i + BATCH_SIZE);
-    const items: InsertClaimItem[] = batch.map(claim => ({
+    const items: InsertClaimItem[] = batch.map(claim => {
+      // Resolve footnoteRefs to source URLs from the page's footnote definitions
+      const resolvedSources: Array<{ url?: string | null; sourceQuote?: string | null; isPrimary?: boolean }> = [];
+
+      for (const ref of claim.footnoteRefs) {
+        const fnNum = parseInt(ref, 10);
+        if (isNaN(fnNum)) continue;
+        const resolved = footnoteUrlMap.get(fnNum);
+        if (resolved?.url) {
+          resolvedSources.push({ url: resolved.url, isPrimary: resolvedSources.length === 0 });
+        }
+      }
+
+      // Also include the wiki page sourceQuote if present and no footnote sources were resolved
+      if (claim.sourceQuote && resolvedSources.length === 0) {
+        resolvedSources.push({ sourceQuote: claim.sourceQuote });
+      }
+
+      return {
       entityId: pageId,
       entityType: 'wiki-page',
       claimType: claim.claimType,
@@ -548,10 +590,8 @@ async function main() {
       confidence: 'unverified', // @deprecated Use claimVerdict instead
       /** @deprecated Use sources[] instead. Kept for backward compat (double-write). */
       sourceQuote: claim.sourceQuote ?? null,
-      // Route sourceQuote to claim_sources table (primary location)
-      sources: claim.sourceQuote
-        ? [{ sourceQuote: claim.sourceQuote }]
-        : undefined,
+      // Resolved sources: footnote URLs (primary) + wiki page quote (fallback)
+      sources: resolvedSources.length > 0 ? resolvedSources : undefined,
       // Extraction doesn't verify — leave claimVerdict null (will be set by verify step)
       claimVerdict: null,
       // Enhanced fields (migration 0028)
@@ -576,7 +616,8 @@ async function main() {
       valueUnit: claim.valueUnit ?? null,
       valueDate: claim.valueDate ?? null,
       qualifiers: claim.qualifiers ?? null,
-    }));
+    };
+    });
 
     const result = await insertClaimBatch(items);
     if (result.ok) {
@@ -603,9 +644,16 @@ async function main() {
   const attributedCount = validatedClaims.filter(c2 => c2.claimMode === 'attributed').length;
   const numericCount = validatedClaims.filter(c2 => c2.valueNumeric !== undefined).length;
   const structuredCount = validatedClaims.filter(c2 => c2.property).length;
+  const withResolvedSources = validatedClaims.filter(c2 => {
+    return c2.footnoteRefs.some(ref => {
+      const n = parseInt(ref, 10);
+      return !isNaN(n) && footnoteUrlMap.has(n);
+    });
+  }).length;
 
   console.log(`\n${c.bold}Done:${c.reset}`);
   console.log(`  Inserted:   ${c.green}${inserted}${c.reset} claims`);
+  if (withResolvedSources > 0) console.log(`  Sourced:    ${c.green}${withResolvedSources}${c.reset} claims with resolved footnote URLs`);
   if (attributedCount > 0) console.log(`  Attributed: ${c.yellow}${attributedCount}${c.reset} claims with attribution`);
   if (numericCount > 0) console.log(`  Numeric:    ${c.green}${numericCount}${c.reset} claims with extracted values`);
   if (structuredCount > 0) console.log(`  Structured: ${c.blue}${structuredCount}${c.reset} claims with entity/property/value`);

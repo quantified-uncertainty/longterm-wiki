@@ -3,21 +3,18 @@
  *
  * Client functions for the job queue system.
  * Input types are derived from the canonical Zod schemas in api-types.ts.
- * Response types are imported from api-types.ts (single source of truth).
+ * Response types are inferred from the Hono RPC route type (single source of truth).
  */
 
 import { apiRequest, batchedRequest, type ApiResult } from './client.ts';
+import type { hc, InferResponseType } from 'hono/client';
+import type { JobsRoute } from '../../../apps/wiki-server/src/routes/jobs.ts';
 import type {
   CreateJobInput,
   ClaimJob,
   CompleteJob,
   FailJob,
   SweepJobs,
-  JobRow,
-  ListJobsResult,
-  ClaimJobResult,
-  JobStatsResult,
-  SweepJobsResult,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -31,19 +28,22 @@ export type { FailJob as FailJobInput };
 export type { SweepJobs as SweepJobsInput };
 
 // ---------------------------------------------------------------------------
-// Types — response (re-exported from canonical api-types.ts)
+// Types — response (inferred from Hono RPC route)
 // ---------------------------------------------------------------------------
 
-export type { ListJobsResult, JobStatsResult };
+type RpcClient = ReturnType<typeof hc<JobsRoute>>;
 
-/** Backward-compatible alias for JobRow. */
-export type JobEntry = JobRow;
+export type ListJobsResult = InferResponseType<RpcClient['index']['$get'], 200>;
+export type JobStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 
-/** Backward-compatible alias for ClaimJobResult. */
-export type ClaimResult = ClaimJobResult;
+/** Backward-compatible alias for the inferred job row shape. */
+export type JobEntry = InferResponseType<RpcClient[':id']['$get'], 200>;
 
-/** Backward-compatible alias for SweepJobsResult. */
-export type SweepResult = SweepJobsResult;
+/** Backward-compatible alias for the inferred claim result shape. */
+export type ClaimResult = InferResponseType<RpcClient['claim']['$post'], 200>;
+
+/** Backward-compatible alias for the inferred sweep result shape. */
+export type SweepResult = InferResponseType<RpcClient['sweep']['$post'], 200>;
 
 // ---------------------------------------------------------------------------
 // API functions

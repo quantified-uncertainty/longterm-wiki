@@ -3,26 +3,45 @@
  *
  * Shared types and wrapper functions for page-related API endpoints.
  * Consumed by crux/commands/context.ts and crux/commands/query.ts.
- * Response types are imported from api-types.ts (single source of truth).
+ * Response types are inferred from server routes via Hono RPC type system,
+ * eliminating hand-written response interfaces and preventing type drift.
+ * All imports from hono/client are type-only — zero runtime cost.
  */
 
+import type { hc, InferResponseType } from 'hono/client';
 import { apiRequest, type ApiResult } from './client.ts';
-import type {
-  PageSearchResult,
-  PageDetailRow,
-  RelatedPagesResult,
-  BacklinksResult,
-  BacklinkEntry,
-  RelatedEntry,
-  CitationQuoteRow,
-  CitationQuotesResult,
-} from '../../../apps/wiki-server/src/api-types.ts';
+import type { PagesRoute } from '../../../apps/wiki-server/src/routes/pages.ts';
+import type { LinksRoute } from '../../../apps/wiki-server/src/routes/links.ts';
+import type { CitationsRoute } from '../../../apps/wiki-server/src/routes/citations.ts';
 
 // ---------------------------------------------------------------------------
-// Types — response (re-exported from canonical api-types.ts)
+// RPC type inference (compile-time only — no runtime cost)
 // ---------------------------------------------------------------------------
 
-export type { PageSearchResult, BacklinksResult, CitationQuotesResult, BacklinkEntry, RelatedEntry };
+type PagesRpcClient = ReturnType<typeof hc<PagesRoute>>;
+type LinksRpcClient = ReturnType<typeof hc<LinksRoute>>;
+type CitationsRpcClient = ReturnType<typeof hc<CitationsRoute>>;
+
+/** Response type for GET /api/pages/search (inferred from server). */
+export type PageSearchResult = InferResponseType<PagesRpcClient['search']['$get'], 200>;
+
+/** Response type for GET /api/pages/:id (inferred from server). */
+export type PageDetailRow = InferResponseType<PagesRpcClient[':id']['$get'], 200>;
+
+/** Response type for GET /api/links/related/:id (inferred from server). */
+export type RelatedPagesResult = InferResponseType<LinksRpcClient['related'][':id']['$get'], 200>;
+
+/** Response type for GET /api/links/backlinks/:id (inferred from server). */
+export type BacklinksResult = InferResponseType<LinksRpcClient['backlinks'][':id']['$get'], 200>;
+
+/** Response type for GET /api/citations/quotes (inferred from server). */
+export type CitationQuotesResult = InferResponseType<CitationsRpcClient['quotes']['$get'], 200>;
+
+/** A single entry from the related pages list. */
+export type RelatedEntry = RelatedPagesResult['related'][number];
+
+/** A single entry from the backlinks list. */
+export type BacklinkEntry = BacklinksResult['backlinks'][number];
 
 /** Backward-compatible alias for PageDetailRow. */
 export type PageDetail = PageDetailRow;
@@ -30,8 +49,8 @@ export type PageDetail = PageDetailRow;
 /** Backward-compatible alias for RelatedPagesResult. */
 export type RelatedResult = RelatedPagesResult;
 
-/** Backward-compatible alias for CitationQuoteRow. */
-export type CitationQuote = CitationQuoteRow;
+/** A single citation quote row from the server. */
+export type CitationQuote = CitationQuotesResult['quotes'][number];
 
 // ---------------------------------------------------------------------------
 // API functions

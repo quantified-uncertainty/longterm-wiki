@@ -1,0 +1,123 @@
+---
+numericId: E904
+title: "Structured Data Architecture"
+description: "Architecture document for the claims-as-foundation approach to structured entity data, including the facts-to-claims migration path."
+sidebar:
+  order: 12
+subcategory: architecture
+quality: 50
+readerImportance: 10
+researchImportance: 35
+lastEdited: "2026-02-26"
+update_frequency: 60
+ratings:
+  novelty: 7
+  rigor: 7
+  actionability: 9
+  completeness: 6
+---
+
+## Overview
+
+The wiki has two systems for structured entity data that partially overlap:
+
+1. **Facts system** \- YAML files in `data/facts/`, \~145 canonical facts across 18 entities. Powers the `\<F\>` inline component for dynamic values with hover tooltips. Measure taxonomy defined in `data/fact-measures.yaml` (35 measures with display formatting metadata).
+
+2. **Structured claims** \- PostgreSQL columns on the `claims` table, \~111 enriched claims. LLM-extracted from wiki page text via `crux claims enrich-structured`. Property taxonomy in `data/claims-properties.yaml` (28 properties).
+
+This document lays out the architectural direction: **claims become the foundation**, and facts become a legacy input format that is eventually migrated.
+
+## Key Decision: Claims Are the Foundation
+
+The claims table (PostgreSQL, LLM-extractable, source-tracked, verifiable) is the primary structured data system. The facts YAML system, while valuable for its display formatting and inline components, is a narrower, less scalable approach.
+
+### Why claims win
+
+| Dimension | Facts (YAML) | Claims (PostgreSQL) |
+|-----------|-------------|-------------------|
+| Storage | Flat YAML files | PostgreSQL with indexes |
+| Extraction | Manual entry | LLM-extractable from page text |
+| Source tracking | Single `source` URL field | Full `claim_sources` join table with primary/quote/resourceId |
+| Verification | None | Verdict system (verified/disputed/unsupported) |
+| Temporal | Single `asOf` field | `valueDate` + `asOf` + temporal qualifiers |
+| Cross-entity | Manual duplication | `relatedEntities` array, `subjectEntity` field |
+| Scale | ≈145 facts, 18 entities | Growing with every enrichment run |
+| API | Build-time JSON | Real-time server queries |
+
+### What facts do better (for now)
+
+- **Display formatting**: `fact-measures.yaml` has rich display config (divisor, prefix, suffix) that the claims system lacks
+- **Inline components**: `\<F e="anthropic" f="valuation-2024"\>` renders beautifully with hover tooltips
+- **Computed values**: Facts support `computed` expressions that derive values from other facts
+
+These capabilities need to be replicated in the claims system before facts can be fully retired.
+
+## Migration Path
+
+### Phase A: Structured claims extraction (done)
+
+Structured claim fields (`property`, `structuredValue`, `valueUnit`, `valueDate`, `qualifiers`) added to the claims table. LLM extraction pipeline (`crux claims enrich-structured`) populates these from claim text.
+
+### Phase B: Better UI and shared formatting (done)
+
+- Shared `formatValue()` / `formatStructuredValue()` utility extracted from the facts system's formatting logic
+- Structured Claims Table component on entity pages showing property/value/date/qualifiers/source
+- Claims table badge shows human-readable formatted values instead of raw numbers
+
+### Phase C: Pinned claims (future)
+
+Add an `isPinned` boolean column to the claims table. A pinned claim is the canonical value for display in `\<F\>` components.
+
+Key semantics:
+- Only one claim can be pinned per entity + property + valueDate triple
+- Pinning is a manual curation action, not automatic
+- A pinned claim can still be unverified \- pinning means "this is the value we display", not "this is confirmed true"
+- CLI command: `crux claims pin \<claim-id\>`
+
+### Phase D: F component reads from claims (future)
+
+Modify the `\<F\>` component to read from pinned claims as its primary data source, with YAML facts as a fallback.
+
+```
+Lookup order:
+1. Pinned claim for (entity, measure, nearest date)
+2. YAML fact (current behavior)
+3. Error display
+```
+
+### Phase E: Batch migration (future)
+
+Script to convert existing facts YAML entries into claims:
+- Each fact becomes a claim with `property` set to the measure ID
+- `structuredValue` from the fact value
+- `valueDate` from the fact `asOf`
+- `isPinned = true` since these were the canonical values
+- Source information preserved from the fact's `source`/`sourceResource`
+
+### Phase F: Retire facts YAML (future)
+
+Once all facts are migrated and the `\<F\>` component reads from claims:
+- Remove `data/facts/*.yaml` files
+- Remove facts pipeline from `build-data.mjs`
+- Remove `data/fact-measures.yaml` (merged into claims property config)
+- Remove `getFact()` / `getFactWithFallback()` from the data layer
+
+## Unified Taxonomy
+
+The current split between `fact-measures.yaml` (35 measures) and `claims-properties.yaml` (28 properties) should eventually merge into a single `data/measures.yaml` that serves both systems.
+
+The merged taxonomy would keep:
+- **From fact-measures**: display config (divisor, prefix, suffix), direction (higher/lower), relatedMeasures, applicableTo
+- **From claims-properties**: non-numeric types (string, entity, date), category grouping
+
+## Current Status
+
+| Component | Status |
+|-----------|--------|
+| Structured claim extraction | Working |
+| Shared value formatting | Working |
+| Structured claims table UI | Working |
+| Pinned claims | Not started |
+| F component migration | Not started |
+| Facts YAML migration | Not started |
+| Taxonomy merge | Not started |

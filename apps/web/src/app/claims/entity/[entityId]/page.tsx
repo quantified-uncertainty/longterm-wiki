@@ -9,15 +9,38 @@ import {
   getResourceCredibility,
 } from "@data";
 import type { GetClaimsResult } from "@wiki-server/api-types";
+import { readFileSync } from "fs";
+import { join } from "path";
+import { parse } from "yaml";
 import { StatCard } from "../../components/stat-card";
-import { ClaimsTable } from "../../components/claims-table";
 import { DistributionBar } from "../../components/distribution-bar";
 import {
   collectEntitySlugs,
   buildEntityNameMap,
 } from "../../components/claims-data";
+import { EntityClaimsViews } from "./entity-claims-views";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getResourceTypeIcon } from "@/components/wiki/resource-utils";
+
+let _propertyLabelsCache: Record<string, string> | null = null;
+function loadPropertyLabels(): Record<string, string> {
+  if (_propertyLabelsCache) return _propertyLabelsCache;
+  try {
+    const raw = readFileSync(
+      join(process.cwd(), "../../data/claims-properties.yaml"),
+      "utf-8"
+    );
+    const data = parse(raw) as { properties: Array<{ id: string; label: string }> };
+    const map: Record<string, string> = {};
+    for (const prop of data.properties) {
+      map[prop.id] = prop.label;
+    }
+    _propertyLabelsCache = map;
+    return map;
+  } catch {
+    return {};
+  }
+}
 
 interface PageProps {
   params: Promise<{ entityId: string }>;
@@ -150,7 +173,7 @@ export default async function EntityClaimsPage({ params }: PageProps) {
             </div>
           )}
 
-          <ClaimsTable claims={claims} entityNames={entityNames} />
+          <EntityClaimsViews claims={claims} entityNames={entityNames} />
         </>
       )}
 

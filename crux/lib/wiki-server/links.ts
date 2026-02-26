@@ -2,12 +2,14 @@
  * Page Links API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
- * Response types are imported from the canonical api-types.ts definitions.
+ * Response types are inferred via Hono RPC InferResponseType<>.
  */
 
 import type { z } from 'zod';
+import type { hc, InferResponseType } from 'hono/client';
+import type { LinksRoute } from '../../../apps/wiki-server/src/routes/links.ts';
 import { batchedRequest, getServerUrl, type ApiResult } from './client.ts';
-import type { PageLinkSchema, SyncLinksResult } from '../../../apps/wiki-server/src/api-types.ts';
+import type { PageLinkSchema } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -17,10 +19,12 @@ import type { PageLinkSchema, SyncLinksResult } from '../../../apps/wiki-server/
 export type PageLinkItem = z.input<typeof PageLinkSchema>;
 
 // ---------------------------------------------------------------------------
-// Types — response (re-exported from canonical api-types.ts)
+// Types — response (inferred from Hono RPC route)
 // ---------------------------------------------------------------------------
 
-export type { SyncLinksResult };
+type RpcClient = ReturnType<typeof hc<LinksRoute>>;
+
+export type SyncLinksResult = InferResponseType<RpcClient['sync']['$post'], 200>;
 
 // ---------------------------------------------------------------------------
 // Constants

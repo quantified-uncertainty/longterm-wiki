@@ -33,6 +33,7 @@ import { ConfidenceBadge } from "./confidence-badge";
 import { ClaimModeBadge } from "./claim-mode-badge";
 import { NumericValueDisplay } from "./numeric-value-display";
 import { VerdictBadge } from "./verdict-badge";
+import { formatStructuredValue } from "@lib/format-value";
 
 function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; entityNames?: Record<string, string> }) {
   return (
@@ -63,6 +64,7 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
           low={claim.valueLow}
           high={claim.valueHigh}
           measure={claim.measure}
+          unit={claim.valueUnit}
         />
       )}
 
@@ -301,6 +303,7 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
                 low={c.valueLow}
                 high={c.valueHigh}
                 measure={c.measure}
+                unit={c.valueUnit}
                 compact
               />
             </div>
@@ -319,19 +322,16 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
     cell: ({ row }) => {
       const c = row.original;
       if (!c.property) return <span className="text-muted-foreground/40 text-xs">&mdash;</span>;
-      const parts: string[] = [c.property];
-      if (c.structuredValue) {
-        parts.push(`= ${c.structuredValue}`);
-      }
-      if (c.valueUnit) {
-        parts.push(`[${c.valueUnit}]`);
-      }
+      const label = c.property.replace(/_/g, " ");
+      const formattedValue = c.structuredValue
+        ? formatStructuredValue(c.structuredValue, c.valueUnit)
+        : null;
       return (
         <span
           className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono bg-violet-100 text-violet-700 max-w-[180px] truncate"
-          title={`${c.property}${c.structuredValue ? ` = ${c.structuredValue}` : ""}${c.valueUnit ? ` [${c.valueUnit}]` : ""}${c.valueDate ? ` @ ${c.valueDate}` : ""}`}
+          title={`${c.property}${c.structuredValue ? `: ${formattedValue}` : ""}${c.valueDate ? ` @ ${c.valueDate}` : ""}`}
         >
-          {parts.join(" ")}
+          {label}{formattedValue ? `: ${formattedValue}` : ""}
         </span>
       );
     },

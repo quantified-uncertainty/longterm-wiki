@@ -27,8 +27,6 @@ import {
   type ResourceStatsResult,
 } from "../api-types.js";
 
-export const resourcesRoute = new Hono();
-
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
@@ -192,106 +190,110 @@ function formatResource(r: typeof resources.$inferSelect) {
   };
 }
 
-// ---- POST / (upsert single resource) ----
+// ---- Route ----
 
-resourcesRoute.post("/", async (c) => {
-  const body = await parseJsonBody(c);
-  if (!body) return invalidJsonError(c);
+const resourcesApp = new Hono()
 
-  const parsed = UpsertResourceSchema.safeParse(body);
-  if (!parsed.success) return validationError(c, parsed.error.message);
+  // ---- POST / (upsert single resource) ----
 
-  const db = getDrizzleDb();
+  .post("/", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
 
-  // Validate citedBy page references (optional field)
-  if (parsed.data.citedBy && parsed.data.citedBy.length > 0) {
-    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, parsed.data.citedBy);
-    if (missingPages.length > 0) {
-      return validationError(
-        c,
-        `Referenced pages not found in citedBy: ${missingPages.join(", ")}`
-      );
-    }
-  }
+    const parsed = UpsertResourceSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const result = await upsertResource(db, parsed.data);
-  return c.json(result, 201);
-});
+    const db = getDrizzleDb();
 
-// ---- POST /batch (upsert multiple resources) ----
-
-resourcesRoute.post("/batch", async (c) => {
-  const body = await parseJsonBody(c);
-  if (!body) return invalidJsonError(c);
-
-  const parsed = UpsertBatchSchema.safeParse(body);
-  if (!parsed.success) return validationError(c, parsed.error.message);
-
-  const { items } = parsed.data;
-
-  const db = getDrizzleDb();
-
-  // Validate citedBy page references
-  const allCitedBy = [
-    ...new Set(items.flatMap((item) => item.citedBy ?? [])),
-  ];
-  if (allCitedBy.length > 0) {
-    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, allCitedBy);
-    if (missingPages.length > 0) {
-      return validationError(
-        c,
-        `Referenced pages not found in citedBy: ${missingPages.join(", ")}`
-      );
-    }
-  }
-
-  const results: Array<{ id: string; url: string }> = [];
-  try {
-    await db.transaction(async (tx) => {
-      for (const item of items) {
-        // Skip per-row search_vector update; handled in bulk below
-        const result = await upsertResource(tx as unknown as DbClient, item, {
-          skipSearchVector: true,
-        });
-        results.push({ id: result.id, url: result.url });
+    // Validate citedBy page references (optional field)
+    if (parsed.data.citedBy && parsed.data.citedBy.length > 0) {
+      const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, parsed.data.citedBy);
+      if (missingPages.length > 0) {
+        return validationError(
+          c,
+          `Referenced pages not found in citedBy: ${missingPages.join(", ")}`
+        );
       }
+    }
 
-      // Bulk search_vector update for all upserted resources (one query)
-      const idList = sql.join(
-        results.map((r) => sql`${r.id}`),
-        sql`, `
-      );
-      await tx.execute(sql`
-        UPDATE resources SET search_vector =
-          setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
-          setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
-          setweight(to_tsvector('english', coalesce(abstract, '')), 'C') ||
-          setweight(to_tsvector('english', coalesce(review, '')), 'D')
-        WHERE id IN (${idList})
-      `);
-    });
-  } catch (err) {
-    return dbError(c, "resources batch upsert", err, { itemCount: items.length });
-  }
+    const result = await upsertResource(db, parsed.data);
+    return c.json(result, 201);
+  })
 
-  return c.json({ upserted: results.length, results }, 201);
-});
+  // ---- POST /batch (upsert multiple resources) ----
 
-// ---- GET /search?q=X (full-text search by title/summary/abstract/review) ----
+  .post("/batch", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
 
-resourcesRoute.get("/search", async (c) => {
-  const parsed = SearchQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
+    const parsed = UpsertBatchSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const { q, limit } = parsed.data;
-  const rawDb = getDb();
+    const { items } = parsed.data;
 
-  // Full-text search with prefix matching (same pattern as wiki_pages search)
-  const prefixQuery = buildPrefixTsquery(q);
+    const db = getDrizzleDb();
 
-  const rows = prefixQuery
-    ? await rawDb.unsafe(
-        `SELECT
+    // Validate citedBy page references
+    const allCitedBy = [
+      ...new Set(items.flatMap((item) => item.citedBy ?? [])),
+    ];
+    if (allCitedBy.length > 0) {
+      const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, allCitedBy);
+      if (missingPages.length > 0) {
+        return validationError(
+          c,
+          `Referenced pages not found in citedBy: ${missingPages.join(", ")}`
+        );
+      }
+    }
+
+    const results: Array<{ id: string; url: string }> = [];
+    try {
+      await db.transaction(async (tx) => {
+        for (const item of items) {
+          // Skip per-row search_vector update; handled in bulk below
+          const result = await upsertResource(tx as unknown as DbClient, item, {
+            skipSearchVector: true,
+          });
+          results.push({ id: result.id, url: result.url });
+        }
+
+        // Bulk search_vector update for all upserted resources (one query)
+        const idList = sql.join(
+          results.map((r) => sql`${r.id}`),
+          sql`, `
+        );
+        await tx.execute(sql`
+          UPDATE resources SET search_vector =
+            setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+            setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
+            setweight(to_tsvector('english', coalesce(abstract, '')), 'C') ||
+            setweight(to_tsvector('english', coalesce(review, '')), 'D')
+          WHERE id IN (${idList})
+        `);
+      });
+    } catch (err) {
+      return dbError(c, "resources batch upsert", err, { itemCount: items.length });
+    }
+
+    return c.json({ upserted: results.length, results }, 201);
+  })
+
+  // ---- GET /search?q=X (full-text search by title/summary/abstract/review) ----
+
+  .get("/search", async (c) => {
+    const parsed = SearchQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { q, limit } = parsed.data;
+    const rawDb = getDb();
+
+    // Full-text search with prefix matching (same pattern as wiki_pages search)
+    const prefixQuery = buildPrefixTsquery(q);
+
+    const rows = prefixQuery
+      ? await rawDb.unsafe(
+          `SELECT
           id, url, title, type, summary, review, abstract,
           key_points, publication_id, authors, published_date,
           tags, local_filename, credibility_override,
@@ -301,254 +303,257 @@ resourcesRoute.get("/search", async (c) => {
         WHERE search_vector @@ to_tsquery('english', $1)
         ORDER BY rank DESC
         LIMIT $2`,
-        [prefixQuery, limit],
-      )
-    : [];
+          [prefixQuery, limit],
+        )
+      : [];
 
-  return c.json({
-    results: rows.map((r: any) => ({
-      id: r.id,
-      url: r.url,
-      title: r.title,
-      type: r.type,
-      summary: r.summary,
-      review: r.review,
-      abstract: r.abstract,
-      keyPoints: r.key_points,
-      publicationId: r.publication_id,
-      authors: r.authors,
-      publishedDate: r.published_date,
-      tags: r.tags,
-      localFilename: r.local_filename,
-      credibilityOverride: r.credibility_override,
-      fetchedAt: r.fetched_at,
-      contentHash: r.content_hash,
-      createdAt: r.created_at,
-      updatedAt: r.updated_at,
-    })),
-    count: rows.length,
-    query: q,
-  });
-});
+    return c.json({
+      results: rows.map((r: any) => ({
+        id: r.id,
+        url: r.url,
+        title: r.title,
+        type: r.type,
+        summary: r.summary,
+        review: r.review,
+        abstract: r.abstract,
+        keyPoints: r.key_points,
+        publicationId: r.publication_id,
+        authors: r.authors,
+        publishedDate: r.published_date,
+        tags: r.tags,
+        localFilename: r.local_filename,
+        credibilityOverride: r.credibility_override,
+        fetchedAt: r.fetched_at,
+        contentHash: r.content_hash,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      })),
+      count: rows.length,
+      query: q,
+    });
+  })
 
-// ---- GET /stats ----
+  // ---- GET /stats ----
 
-resourcesRoute.get("/stats", async (c) => {
-  const db = getDrizzleDb();
+  .get("/stats", async (c) => {
+    const db = getDrizzleDb();
 
-  const [totalResult, citationCountResult, citedPagesResult, byType] =
-    await Promise.all([
-      db.select({ count: count() }).from(resources),
-      db.select({ count: count() }).from(resourceCitations),
-      db
-        .select({
-          count: sql<number>`count(distinct ${resourceCitations.pageId})`,
-        })
-        .from(resourceCitations),
-      db
-        .select({ type: resources.type, count: count() })
-        .from(resources)
-        .groupBy(resources.type)
-        .orderBy(desc(count())),
-    ]);
+    const [totalResult, citationCountResult, citedPagesResult, byType] =
+      await Promise.all([
+        db.select({ count: count() }).from(resources),
+        db.select({ count: count() }).from(resourceCitations),
+        db
+          .select({
+            count: sql<number>`count(distinct ${resourceCitations.pageId})`,
+          })
+          .from(resourceCitations),
+        db
+          .select({ type: resources.type, count: count() })
+          .from(resources)
+          .groupBy(resources.type)
+          .orderBy(desc(count())),
+      ]);
 
-  const totalResources = totalResult[0].count;
-  const totalCitations = citationCountResult[0].count;
-  const citedPages = Number(citedPagesResult[0].count);
+    const totalResources = totalResult[0].count;
+    const totalCitations = citationCountResult[0].count;
+    const citedPages = Number(citedPagesResult[0].count);
 
-  // Extra stats: orphaned, metadata coverage, fetched count
-  const [orphanedResult, withMetadataResult, fetchedResult] = await Promise.all(
-    [
-      db.execute(sql`
+    // Extra stats: orphaned, metadata coverage, fetched count
+    const [orphanedResult, withMetadataResult, fetchedResult] = await Promise.all(
+      [
+        db.execute(sql`
         SELECT count(*) AS c FROM resources r
         LEFT JOIN resource_citations rc ON rc.resource_id = r.id
         WHERE rc.resource_id IS NULL
       `),
-      db.execute(sql`
+        db.execute(sql`
         SELECT count(*) AS c FROM resources
         WHERE summary IS NOT NULL OR review IS NOT NULL OR key_points IS NOT NULL
       `),
-      db.execute(sql`
+        db.execute(sql`
         SELECT count(*) AS c FROM resources WHERE fetched_at IS NOT NULL
       `),
-    ]
-  );
+      ]
+    );
 
-  const result: ResourceStatsResult = {
-    totalResources,
-    totalCitations,
-    citedPages,
-    byType: Object.fromEntries(
-      byType.map((r) => [r.type ?? "unknown", r.count])
-    ),
-    orphanedCount: Number((orphanedResult as any)[0]?.c ?? 0),
-    withMetadata: Number((withMetadataResult as any)[0]?.c ?? 0),
-    fetched: Number((fetchedResult as any)[0]?.c ?? 0),
-  };
+    const result: ResourceStatsResult = {
+      totalResources,
+      totalCitations,
+      citedPages,
+      byType: Object.fromEntries(
+        byType.map((r) => [r.type ?? "unknown", r.count])
+      ),
+      orphanedCount: Number((orphanedResult as any)[0]?.c ?? 0),
+      withMetadata: Number((withMetadataResult as any)[0]?.c ?? 0),
+      fetched: Number((fetchedResult as any)[0]?.c ?? 0),
+    };
 
-  return c.json(result);
-});
+    return c.json(result);
+  })
 
-// ---- GET /by-page/:pageId (resources cited by a page) ----
+  // ---- GET /by-page/:pageId (resources cited by a page) ----
 
-resourcesRoute.get("/by-page/:pageId", async (c) => {
-  const pageId = c.req.param("pageId");
-  const db = getDrizzleDb();
+  .get("/by-page/:pageId", async (c) => {
+    const pageId = c.req.param("pageId");
+    const db = getDrizzleDb();
 
-  const rows = await db
-    .select({
-      id: resources.id,
-      url: resources.url,
-      title: resources.title,
-      type: resources.type,
-      publicationId: resources.publicationId,
-      authors: resources.authors,
-      publishedDate: resources.publishedDate,
-    })
-    .from(resourceCitations)
-    .innerJoin(resources, eq(resourceCitations.resourceId, resources.id))
-    .where(eq(resourceCitations.pageId, pageId));
+    const rows = await db
+      .select({
+        id: resources.id,
+        url: resources.url,
+        title: resources.title,
+        type: resources.type,
+        publicationId: resources.publicationId,
+        authors: resources.authors,
+        publishedDate: resources.publishedDate,
+      })
+      .from(resourceCitations)
+      .innerJoin(resources, eq(resourceCitations.resourceId, resources.id))
+      .where(eq(resourceCitations.pageId, pageId));
 
-  return c.json({ resources: rows });
-});
+    return c.json({ resources: rows });
+  })
 
-// ---- GET /lookup?url=X (lookup by URL, with normalization) ----
+  // ---- GET /lookup?url=X (lookup by URL, with normalization) ----
 
-resourcesRoute.get("/lookup", async (c) => {
-  const url = c.req.query("url");
-  if (!url) return validationError(c, "url query parameter is required");
+  .get("/lookup", async (c) => {
+    const url = c.req.query("url");
+    if (!url) return validationError(c, "url query parameter is required");
 
-  const db = getDrizzleDb();
+    const db = getDrizzleDb();
 
-  // Try exact match first
-  let rows = await db
-    .select()
-    .from(resources)
-    .where(eq(resources.url, url))
-    .limit(1);
+    // Try exact match first
+    let rows = await db
+      .select()
+      .from(resources)
+      .where(eq(resources.url, url))
+      .limit(1);
 
-  // If not found, try normalized variants (www/no-www, trailing slash)
-  if (rows.length === 0) {
-    const variants = urlVariants(url);
-    if (variants.length > 1) {
-      const variantList = sql.join(
-        variants.map((v) => sql`${v}`),
-        sql`, `
-      );
-      rows = await db
-        .select()
-        .from(resources)
-        .where(sql`${resources.url} IN (${variantList})`)
-        .limit(1);
+    // If not found, try normalized variants (www/no-www, trailing slash)
+    if (rows.length === 0) {
+      const variants = urlVariants(url);
+      if (variants.length > 1) {
+        const variantList = sql.join(
+          variants.map((v) => sql`${v}`),
+          sql`, `
+        );
+        rows = await db
+          .select()
+          .from(resources)
+          .where(sql`${resources.url} IN (${variantList})`)
+          .limit(1);
+      }
     }
-  }
 
-  if (rows.length === 0) {
-    return notFoundError(c, `No resource found for URL: ${url}`);
-  }
+    if (rows.length === 0) {
+      return notFoundError(c, `No resource found for URL: ${url}`);
+    }
 
-  return c.json(formatResource(rows[0]));
-});
+    return c.json(formatResource(rows[0]));
+  })
 
-// ---- GET /all (paginated listing) ----
+  // ---- GET /all (paginated listing) ----
 
-resourcesRoute.get("/all", async (c) => {
-  const parsed = PaginationQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
+  .get("/all", async (c) => {
+    const parsed = PaginationQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const { limit, offset, type } = parsed.data;
-  const db = getDrizzleDb();
+    const { limit, offset, type } = parsed.data;
+    const db = getDrizzleDb();
 
-  const conditions: SQL | undefined = type
-    ? eq(resources.type, type)
-    : undefined;
+    const conditions: SQL | undefined = type
+      ? eq(resources.type, type)
+      : undefined;
 
-  const rows = await db
-    .select()
-    .from(resources)
-    .where(conditions)
-    .orderBy(resources.id)
-    .limit(limit)
-    .offset(offset);
+    const rows = await db
+      .select()
+      .from(resources)
+      .where(conditions)
+      .orderBy(resources.id)
+      .limit(limit)
+      .offset(offset);
 
-  const countResult = await db
-    .select({ count: count() })
-    .from(resources)
-    .where(conditions);
-  const total = countResult[0].count;
+    const countResult = await db
+      .select({ count: count() })
+      .from(resources)
+      .where(conditions);
+    const total = countResult[0].count;
 
-  return c.json({
-    resources: rows.map(formatResource),
-    total,
-    limit,
-    offset,
+    return c.json({
+      resources: rows.map(formatResource),
+      total,
+      limit,
+      offset,
+    });
+  })
+
+  // ---- GET /:id/content (resource + linked fetched content) ----
+
+  .get("/:id/content", async (c) => {
+    const id = c.req.param("id");
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(resources)
+      .where(eq(resources.id, id))
+      .limit(1);
+
+    if (rows.length === 0) {
+      return notFoundError(c, `Resource not found: ${id}`);
+    }
+
+    const resource = rows[0];
+
+    // Look up fetched content by exact URL match
+    const contentRows = await db
+      .select({
+        url: citationContent.url,
+        fetchedAt: citationContent.fetchedAt,
+        httpStatus: citationContent.httpStatus,
+        contentType: citationContent.contentType,
+        pageTitle: citationContent.pageTitle,
+        fullTextPreview: citationContent.fullTextPreview,
+        contentLength: citationContent.contentLength,
+        contentHash: citationContent.contentHash,
+      })
+      .from(citationContent)
+      .where(eq(citationContent.url, resource.url))
+      .limit(1);
+
+    return c.json({
+      ...formatResource(resource),
+      content: contentRows.length > 0 ? contentRows[0] : null,
+    });
+  })
+
+  // ---- GET /:id (get by ID) ----
+
+  .get("/:id", async (c) => {
+    const id = c.req.param("id");
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(resources)
+      .where(eq(resources.id, id))
+      .limit(1);
+
+    if (rows.length === 0) {
+      return notFoundError(c, `Resource not found: ${id}`);
+    }
+
+    // Also fetch citations
+    const citations = await db
+      .select({ pageId: resourceCitations.pageId })
+      .from(resourceCitations)
+      .where(eq(resourceCitations.resourceId, id));
+
+    return c.json({
+      ...formatResource(rows[0]),
+      citedBy: citations.map((row) => row.pageId),
+    });
   });
-});
 
-// ---- GET /:id/content (resource + linked fetched content) ----
-
-resourcesRoute.get("/:id/content", async (c) => {
-  const id = c.req.param("id");
-  const db = getDrizzleDb();
-
-  const rows = await db
-    .select()
-    .from(resources)
-    .where(eq(resources.id, id))
-    .limit(1);
-
-  if (rows.length === 0) {
-    return notFoundError(c, `Resource not found: ${id}`);
-  }
-
-  const resource = rows[0];
-
-  // Look up fetched content by exact URL match
-  const contentRows = await db
-    .select({
-      url: citationContent.url,
-      fetchedAt: citationContent.fetchedAt,
-      httpStatus: citationContent.httpStatus,
-      contentType: citationContent.contentType,
-      pageTitle: citationContent.pageTitle,
-      fullTextPreview: citationContent.fullTextPreview,
-      contentLength: citationContent.contentLength,
-      contentHash: citationContent.contentHash,
-    })
-    .from(citationContent)
-    .where(eq(citationContent.url, resource.url))
-    .limit(1);
-
-  return c.json({
-    ...formatResource(resource),
-    content: contentRows.length > 0 ? contentRows[0] : null,
-  });
-});
-
-// ---- GET /:id (get by ID) ----
-
-resourcesRoute.get("/:id", async (c) => {
-  const id = c.req.param("id");
-  const db = getDrizzleDb();
-
-  const rows = await db
-    .select()
-    .from(resources)
-    .where(eq(resources.id, id))
-    .limit(1);
-
-  if (rows.length === 0) {
-    return notFoundError(c, `Resource not found: ${id}`);
-  }
-
-  // Also fetch citations
-  const citations = await db
-    .select({ pageId: resourceCitations.pageId })
-    .from(resourceCitations)
-    .where(eq(resourceCitations.resourceId, id));
-
-  return c.json({
-    ...formatResource(rows[0]),
-    citedBy: citations.map((row) => row.pageId),
-  });
-});
+export const resourcesRoute = resourcesApp;
+export type ResourcesRoute = typeof resourcesApp;

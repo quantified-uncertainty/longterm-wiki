@@ -1,36 +1,77 @@
 /**
  * NumericValueDisplay — renders a numeric claim value with optional range.
- * Formats large numbers using compact notation (1B, 750M, etc.)
+ * Uses the shared formatValue utility for consistent formatting.
  */
+
+import { formatValue } from "@lib/format-value";
 
 interface Props {
   value: number | null;
   low?: number | null;
   high?: number | null;
   measure?: string | null;
+  unit?: string | null;
   compact?: boolean;
 }
 
-function formatNum(n: number): string {
-  const abs = Math.abs(n);
-  if (abs >= 1e12) return `${(n / 1e12).toFixed(1).replace(/\.0$/, "")}T`;
-  if (abs >= 1e9) return `${(n / 1e9).toFixed(1).replace(/\.0$/, "")}B`;
-  if (abs >= 1e6) return `${(n / 1e6).toFixed(1).replace(/\.0$/, "")}M`;
-  if (abs >= 1e3) return `${(n / 1e3).toFixed(1).replace(/\.0$/, "")}K`;
-  if (abs < 1 && abs > 0) return `${(n * 100).toFixed(1)}%`;
-  return n.toLocaleString();
+/** Map measure IDs to display units for formatting. */
+function resolveUnit(measure?: string | null, unit?: string | null): string | null {
+  if (unit) return unit;
+  if (!measure) return null;
+  // Common measure-to-unit mappings based on claims-properties.yaml and fact-measures.yaml
+  const unitMap: Record<string, string> = {
+    revenue: "USD",
+    valuation: "USD",
+    funding_round_amount: "USD",
+    funding_total: "USD",
+    "funding-round": "USD",
+    "total-funding": "USD",
+    "cash-burn": "USD",
+    "product-revenue": "USD",
+    "revenue-guidance": "USD",
+    "infrastructure-investment": "USD",
+    "net-worth": "USD",
+    "equity-value": "USD",
+    "philanthropic-capital": "USD",
+    market_volume: "USD",
+    employee_count: "count",
+    headcount: "count",
+    "customer-count": "count",
+    "user-count": "count",
+    parameter_count: "count",
+    "model-parameters": "count",
+    "safety-researcher-count": "count",
+    "interpretability-team-size": "count",
+    market_share: "percent",
+    "market-share": "percent",
+    "gross-margin": "percent",
+    "safety-staffing-ratio": "percent",
+    "equity-stake-percent": "percent",
+    "customer-concentration": "percent",
+    "retention-rate": "percent",
+    "compute-cost": "percent",
+    "benchmark-score": "percent",
+    benchmark_score: "percent",
+    context_window: "tokens",
+  };
+  return unitMap[measure] ?? null;
 }
 
-export function NumericValueDisplay({ value, low, high, measure, compact }: Props) {
+function formatNum(n: number, displayUnit: string | null): string {
+  return formatValue(n, displayUnit);
+}
+
+export function NumericValueDisplay({ value, low, high, measure, unit, compact }: Props) {
   if (value == null && low == null && high == null) return null;
 
-  const central = value != null ? formatNum(value) : null;
+  const displayUnit = resolveUnit(measure, unit);
+  const central = value != null ? formatNum(value, displayUnit) : null;
   const range =
     low != null && high != null
-      ? `${formatNum(low)} – ${formatNum(high)}`
+      ? `${formatNum(low, displayUnit)} \u2013 ${formatNum(high, displayUnit)}`
       : null;
 
-  const measureLabel = measure
+  const measureLabel = !displayUnit && measure
     ? measure.replace(/_/g, " ")
     : null;
 

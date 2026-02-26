@@ -3,47 +3,37 @@
  *
  * Unified API for both claim-backed and regular page citations.
  * Input types are derived from the canonical Zod schemas in api-types.ts.
- * Response types are imported from api-types.ts (single source of truth).
+ * Response types are inferred from the Hono route via InferResponseType<>.
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
 import type {
   ClaimPageReferenceInsert,
-  ClaimPageReferenceRow,
   PageCitationInsert,
-  PageCitationRow,
 } from '../../../apps/wiki-server/src/api-types.ts';
+import type { hc, InferResponseType } from 'hono/client';
+import type { ReferencesRoute } from '../../../apps/wiki-server/src/routes/references.ts';
 
 // ---------------------------------------------------------------------------
-// Types — re-exported from canonical api-types.ts
+// Inferred response types from Hono RPC
 // ---------------------------------------------------------------------------
 
-export type {
-  ClaimPageReferenceRow,
-  PageCitationRow,
-};
+type RpcClient = ReturnType<typeof hc<ReferencesRoute>>;
 
-// ---------------------------------------------------------------------------
-// Response shapes
-// ---------------------------------------------------------------------------
+export type GetPageReferencesResult = InferResponseType<
+  RpcClient['by-page'][':pageId']['$get'],
+  200
+>;
 
-interface ClaimReferenceItem extends ClaimPageReferenceRow {
-  type: 'claim';
-  claimText: string;
-  claimVerdict: string | null;
-}
+export type ClaimPageReferenceRow = InferResponseType<
+  RpcClient['claim']['$post'],
+  201
+>;
 
-interface CitationItem extends PageCitationRow {
-  type: 'citation';
-}
-
-type UnifiedReference = ClaimReferenceItem | CitationItem;
-
-export interface GetPageReferencesResult {
-  references: UnifiedReference[];
-  totalClaim: number;
-  totalCitation: number;
-}
+export type PageCitationRow = InferResponseType<
+  RpcClient['citation']['$post'],
+  201
+>;
 
 // ---------------------------------------------------------------------------
 // API functions
