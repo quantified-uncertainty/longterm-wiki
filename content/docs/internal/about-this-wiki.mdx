@@ -19,7 +19,7 @@ ratings:
   concreteness: 7.5
   actionability: 6
 ---
-import {EntityLink} from '@components/wiki';
+import {EntityLink, Mermaid} from '@components/wiki';
 
 The Longterm Wiki is a strategic intelligence platform for AI safety prioritization. It serves as a **decision-support tool** for funders, researchers, and policymakers asking: *"Where should the next marginal dollar or researcher-hour go?"*
 
@@ -191,13 +191,11 @@ This shows inbound links, missing inbound links (pages that mention but don't li
 
 Flowcharts, sequences, and graphs for static illustrations:
 
-```mermaid
-flowchart LR
+<Mermaid chart={`flowchart LR
     A[Training] --> B[Alignment Techniques]
     B --> C{Robust?}
     C -->|Yes| D[Safe AI]
-    C -->|No| E[Misalignment Risk]
-```
+    C -->|No| E[Misalignment Risk]`} />
 
 **See <EntityLink id="mermaid-diagrams">Mermaid Diagrams</EntityLink> for guidelines.**
 
