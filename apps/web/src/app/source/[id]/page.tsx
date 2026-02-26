@@ -1,15 +1,20 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
 import {
   getResourceById,
   getResourceCredibility,
   getResourcePublication,
   getPagesForResource,
+  getEntityById,
+  getPageById,
+  getEntityHref,
 } from "@data";
 import { getCitationQuotesByUrl } from "@/lib/citation-data";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getDomain } from "@/components/wiki/resource-utils";
+import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import {
   ExternalLink,
   CheckCircle2,
@@ -23,6 +28,7 @@ import {
   Download,
   Database,
   FileQuestion,
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@lib/utils";
 
@@ -99,6 +105,19 @@ function formatDate(iso: string): string {
   }
 }
 
+/** Resolve a page slug to its display title */
+function getPageTitle(pageId: string): string {
+  const entity = getEntityById(pageId);
+  if (entity?.title) return entity.title;
+  const page = getPageById(pageId);
+  if (page?.title) return page.title;
+  // Fall back to formatting the slug
+  return pageId
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
 export default async function SourcePage({ params }: PageProps) {
   const { id } = await params;
   const resource = getResourceById(id);
@@ -132,8 +151,44 @@ export default async function SourcePage({ params }: PageProps) {
     quotesByPage.get(pageId)!.push(q);
   }
 
+  // Determine whether content sections exist
+  const hasAbstract = !!resource.abstract;
+  const hasSummary = !!resource.summary;
+  const hasKeyPoints = resource.key_points && resource.key_points.length > 0;
+  const hasReview = !!resource.review;
+  const hasContentSections = hasAbstract || hasSummary || hasKeyPoints || hasReview;
+
+  // Build metadata items for a single line
+  const metadataItems: string[] = [];
+  if (resource.authors && resource.authors.length > 0) {
+    metadataItems.push(
+      resource.authors.length <= 3
+        ? resource.authors.join(", ")
+        : `${resource.authors[0]} et al.`
+    );
+  }
+  if (resource.published_date) {
+    metadataItems.push(resource.published_date.slice(0, 4));
+  }
+  if (publication) {
+    metadataItems.push(
+      publication.name + (publication.peer_reviewed ? " (peer-reviewed)" : "")
+    );
+  } else if (domain) {
+    metadataItems.push(domain);
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
+      {/* Back link to Resources index */}
+      <Link
+        href="/claims/resources"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        All Resources
+      </Link>
+
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
@@ -149,27 +204,28 @@ export default async function SourcePage({ params }: PageProps) {
 
         <h1 className="text-2xl font-bold mb-2">{resource.title}</h1>
 
-        {/* Metadata row */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-          {publication && (
-            <span className="italic">
-              {publication.name}
-              {publication.peer_reviewed && " (peer-reviewed)"}
+        {/* Metadata row — single line with separator dots */}
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-muted-foreground">
+          {metadataItems.map((item, i) => (
+            <span key={i} className="inline-flex items-center gap-1.5">
+              {i > 0 && <span className="text-muted-foreground/30">&middot;</span>}
+              <span>{item}</span>
             </span>
-          )}
-          {!publication && domain && <span>{domain}</span>}
-          {resource.authors && resource.authors.length > 0 && (
-            <span>
-              {resource.authors.length <= 3
-                ? resource.authors.join(", ")
-                : `${resource.authors[0]} et al.`}
-            </span>
-          )}
-          {resource.published_date && (
-            <span>{resource.published_date.slice(0, 4)}</span>
-          )}
+          ))}
           {credibility != null && (
-            <CredibilityBadge level={credibility} size="sm" />
+            <span className="inline-flex items-center gap-1.5">
+              {metadataItems.length > 0 && (
+                <span className="text-muted-foreground/30">&middot;</span>
+              )}
+              <CredibilityBadge
+                level={credibility}
+                size="sm"
+                showLabel
+              />
+              <span className="text-xs text-muted-foreground/60">
+                {publication ? "(publisher rating)" : "(source rating)"}
+              </span>
+            </span>
           )}
         </div>
 
@@ -189,7 +245,7 @@ export default async function SourcePage({ params }: PageProps) {
         )}
       </div>
 
-      {/* Data Status Banner */}
+      {/* Data Status Banner — simplified, no content-availability pills */}
       <section className="mb-8 p-4 rounded-lg border border-border bg-card">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
           Data Status
@@ -219,85 +275,69 @@ export default async function SourcePage({ params }: PageProps) {
               Fetched {formatDate(resource.fetched_at)}
             </span>
           )}
-          {/* Content availability indicators */}
-          {resource.summary && (
-            <span className="text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-              Summary
-            </span>
-          )}
-          {resource.review && (
-            <span className="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
-              Review
-            </span>
-          )}
-          {resource.key_points && resource.key_points.length > 0 && (
-            <span className="text-xs px-2.5 py-1 rounded-full bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400">
-              Key points
-            </span>
-          )}
-          {resource.abstract && (
-            <span className="text-xs px-2.5 py-1 rounded-full bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400">
-              Abstract
-            </span>
-          )}
         </div>
       </section>
 
-      {/* Abstract */}
-      {resource.abstract && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-            Abstract
-          </h2>
-          <p className="text-sm leading-relaxed text-foreground/90">
-            {resource.abstract}
-          </p>
-        </section>
-      )}
+      {/* Content sections — consolidated in a bordered container */}
+      {hasContentSections && (
+        <section className="mb-8 rounded-lg border border-border overflow-hidden">
+          {/* Abstract */}
+          {hasAbstract && (
+            <div className="px-5 py-4 border-b border-border last:border-b-0">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                Abstract
+              </h3>
+              <p className="text-sm leading-relaxed text-foreground/90">
+                {renderInlineMarkdown(resource.abstract!)}
+              </p>
+            </div>
+          )}
 
-      {/* Summary */}
-      {resource.summary && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-            Summary
-          </h2>
-          <p className="text-sm leading-relaxed text-foreground/90">
-            {resource.summary}
-          </p>
-        </section>
-      )}
+          {/* Summary */}
+          {hasSummary && (
+            <div className="px-5 py-4 border-b border-border last:border-b-0">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                Summary
+              </h3>
+              <p className="text-sm leading-relaxed text-foreground/90">
+                {renderInlineMarkdown(resource.summary!)}
+              </p>
+            </div>
+          )}
 
-      {/* Key Points */}
-      {resource.key_points && resource.key_points.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-            Key Points
-          </h2>
-          <ul className="space-y-1.5">
-            {resource.key_points.map((point, i) => (
-              <li
-                key={i}
-                className="text-sm leading-relaxed text-foreground/90 flex items-start gap-2"
-              >
-                <span className="text-muted-foreground/40 mt-0.5 shrink-0">
-                  &bull;
-                </span>
-                {point}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+          {/* Key Points */}
+          {hasKeyPoints && (
+            <div className="px-5 py-4 border-b border-border last:border-b-0">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                Key Points
+              </h3>
+              <ul className="space-y-1.5">
+                {resource.key_points!.map((point, i) => (
+                  <li
+                    key={i}
+                    className="text-sm leading-relaxed text-foreground/90 flex items-start gap-2"
+                  >
+                    <span className="text-muted-foreground/40 mt-0.5 shrink-0">
+                      &bull;
+                    </span>
+                    <span>{renderInlineMarkdown(point)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-      {/* Review */}
-      {resource.review && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-            Review
-          </h2>
-          <div className="text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
-            {resource.review}
-          </div>
+          {/* Review */}
+          {hasReview && (
+            <div className="px-5 py-4">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                Review
+              </h3>
+              <div className="text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
+                {renderInlineMarkdown(resource.review!)}
+              </div>
+            </div>
+          )}
         </section>
       )}
 
@@ -352,12 +392,12 @@ export default async function SourcePage({ params }: PageProps) {
               className="mb-6 border border-border rounded-lg overflow-hidden"
             >
               <div className="px-4 py-2 bg-muted/50 border-b border-border">
-                <a
+                <Link
                   href={`/wiki/${pageId}`}
                   className="text-sm font-medium text-accent-foreground hover:underline"
                 >
-                  {pageId}
-                </a>
+                  {getPageTitle(pageId)}
+                </Link>
                 <span className="text-xs text-muted-foreground ml-2">
                   {pageQuotes.length} claim
                   {pageQuotes.length !== 1 ? "s" : ""}
@@ -373,12 +413,12 @@ export default async function SourcePage({ params }: PageProps) {
 
                   return (
                     <div key={i} className={cn("px-4 py-3", verdict?.bg)}>
-                      {/* Claim text */}
+                      {/* Claim text with inline markdown */}
                       <p className="text-sm text-foreground leading-relaxed mb-1.5">
-                        {q.claimText}
+                        {renderInlineMarkdown(q.claimText)}
                       </p>
 
-                      {/* Source quote — the key differentiator */}
+                      {/* Source quote */}
                       {q.sourceQuote && (
                         <blockquote className="text-xs text-muted-foreground border-l-2 border-border pl-2.5 mb-2 italic leading-relaxed">
                           &ldquo;{q.sourceQuote}&rdquo;
@@ -424,24 +464,29 @@ export default async function SourcePage({ params }: PageProps) {
         </section>
       )}
 
-      {/* Citing pages (from build-time data) */}
+      {/* Citing pages — uses EntityLink-style pill links */}
       {citingPages.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
             <Link2 className="w-4 h-4 inline mr-1.5 -mt-0.5" />
             Referenced by {citingPages.length} page
             {citingPages.length !== 1 ? "s" : ""}
           </h2>
-          <div className="flex flex-wrap gap-2">
-            {citingPages.map((pageId) => (
-              <a
-                key={pageId}
-                href={`/wiki/${pageId}`}
-                className="text-xs px-2.5 py-1 rounded-full border border-border hover:bg-muted transition-colors"
-              >
-                {pageId}
-              </a>
-            ))}
+          <div className="flex flex-wrap gap-1.5">
+            {citingPages.map((pageId) => {
+              const entity = getEntityById(pageId);
+              const href = getEntityHref(pageId, entity?.type);
+              const title = getPageTitle(pageId);
+              return (
+                <Link
+                  key={pageId}
+                  href={href}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-muted rounded text-sm text-accent-foreground no-underline transition-colors hover:bg-muted/80"
+                >
+                  {title}
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}
