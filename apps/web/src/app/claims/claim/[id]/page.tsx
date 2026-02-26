@@ -105,14 +105,14 @@ export default async function ClaimDetailPage({ params }: PageProps) {
               {claim.claimVerdictIssues}
             </p>
           )}
-          {/* Show source quote from verdict fields or legacy field */}
-          {(claim.claimVerdictQuotes || claim.sourceQuote) && (
-            <div className="rounded border border-amber-200 bg-amber-50/50 p-3">
-              <span className="text-xs font-medium text-amber-700 block mb-1">
-                Source Quote
+          {/* Show supporting quotes from verification (actual external source evidence) */}
+          {claim.claimVerdictQuotes && (
+            <div className="rounded border border-emerald-200 bg-emerald-50/50 p-3">
+              <span className="text-xs font-medium text-emerald-700 block mb-1">
+                Supporting Evidence
               </span>
-              <p className="text-sm italic text-amber-900">
-                &ldquo;{claim.claimVerdictQuotes || claim.sourceQuote}&rdquo;
+              <p className="text-sm italic text-emerald-900">
+                &ldquo;{claim.claimVerdictQuotes}&rdquo;
               </p>
             </div>
           )}
@@ -153,22 +153,22 @@ export default async function ClaimDetailPage({ params }: PageProps) {
         </div>
       )}
 
-      {/* Source quote (legacy field — only shown when no claim_sources entries exist) */}
-      {/* @deprecated Prefer claim.sources[] (from claim_sources table) over claim.sourceQuote */}
-      {claim.sourceQuote && (!claim.sources || claim.sources.length === 0) && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 mb-4">
+      {/* Wiki page excerpt — the text from the wiki page this claim was extracted from */}
+      {/* Only shown when no structured sources exist and verdictQuotes didn't already cover it */}
+      {claim.sourceQuote && (!claim.sources || claim.sources.length === 0) && !claim.claimVerdictQuotes && (
+        <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4 mb-4">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-amber-700">
-              Source Quote
+            <span className="text-xs font-medium text-muted-foreground">
+              Wiki Page Excerpt
             </span>
             <Link
               href={getEntityHref(claim.entityId)}
-              className="text-xs text-amber-600 hover:underline"
+              className="text-xs text-muted-foreground hover:underline"
             >
               From wiki page &rarr;
             </Link>
           </div>
-          <p className="text-sm italic text-amber-900">
+          <p className="text-sm italic text-muted-foreground">
             &ldquo;{claim.sourceQuote}&rdquo;
           </p>
         </div>

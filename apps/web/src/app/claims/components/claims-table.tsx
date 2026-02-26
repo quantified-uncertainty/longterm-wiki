@@ -66,12 +66,11 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
         />
       )}
 
-      {/* Legacy sourceQuote — only show when no claim_sources entries exist */}
-      {/* @deprecated Prefer claim.sources[] (from claim_sources table) */}
+      {/* Legacy sourceQuote — wiki page excerpt, only show when no claim_sources entries exist */}
       {claim.sourceQuote && (!claim.sources || claim.sources.length === 0) && (
         <div>
           <span className="font-medium text-xs text-muted-foreground">
-            Source Quote:
+            Wiki Page Excerpt:
           </span>
           <p className="mt-0.5 italic text-muted-foreground">
             &ldquo;{claim.sourceQuote}&rdquo;
@@ -457,30 +456,36 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
   },
   {
     id: "sourceQuote",
-    /** @deprecated Prefer sources[] from claim_sources table */
     accessorFn: (row) => {
-      // Prefer quote from claim_sources, fall back to legacy sourceQuote
+      // Prefer quote from claim_sources, fall back to legacy sourceQuote (wiki page excerpt)
       if (row.sources && row.sources.length > 0) {
         const primary = row.sources.find(s => s.isPrimary);
         return (primary || row.sources[0]).sourceQuote || row.sourceQuote || null;
       }
       return row.sourceQuote || null;
     },
-    header: "Source Quote",
+    header: "Excerpt",
     cell: ({ row }) => {
-      // Prefer quote from claim_sources, fall back to legacy sourceQuote
+      // Prefer quote from claim_sources, fall back to legacy sourceQuote (wiki page excerpt)
       let quote: string | null = null;
+      let isFromSource = false;
       if (row.original.sources && row.original.sources.length > 0) {
         const primary = row.original.sources.find(s => s.isPrimary);
-        quote = (primary || row.original.sources[0]).sourceQuote || row.original.sourceQuote || null;
+        const sourceQuote = (primary || row.original.sources[0]).sourceQuote;
+        if (sourceQuote) {
+          quote = sourceQuote;
+          isFromSource = true;
+        } else {
+          quote = row.original.sourceQuote || null;
+        }
       } else {
         quote = row.original.sourceQuote || null;
       }
       if (!quote) return <span className="text-muted-foreground">-</span>;
       return (
         <span
-          className="text-xs text-muted-foreground italic"
-          title={quote}
+          className={`text-xs italic ${isFromSource ? "text-emerald-700" : "text-muted-foreground"}`}
+          title={`${isFromSource ? "[From source] " : "[From wiki page] "}${quote}`}
         >
           &ldquo;
           {quote.length > 80 ? quote.slice(0, 80) + "..." : quote}
