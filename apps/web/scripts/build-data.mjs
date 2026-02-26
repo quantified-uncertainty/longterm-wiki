@@ -1541,6 +1541,10 @@ async function main() {
     const entity = entityMap.get(page.id);
     if (entity?.type) {
       page.entityType = resolveEntityType(entity.type);
+    } else if (page.category === 'internal') {
+      // Internal pages don't have YAML entities, but still need entityType
+      // so the explore page can filter them correctly.
+      page.entityType = 'internal';
     }
 
     if (risk.level === 'high') riskHigh++;
