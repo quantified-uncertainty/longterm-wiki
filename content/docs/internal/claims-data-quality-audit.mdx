@@ -1,0 +1,253 @@
+---
+numericId: E901
+title: "Claims Data Quality Audit (Feb 2026)"
+description: "Empirical analysis of 1,514 claims across 11 entities — documenting the actual quality issues, per-entity breakdowns, worst-case examples, and remediation priorities"
+sidebar:
+  order: 39
+subcategory: architecture
+quality: 65
+readerImportance: 90
+researchImportance: 85
+lastEdited: "2026-02-26"
+createdAt: 2026-02-26
+evergreen: false
+llmSummary: "Empirical quality audit of the claims database, analyzing 1,514 claims across 11 entities. Finds that 89% of claims have at least one quality issue. The three dominant problems are: missing relatedEntities (62.5%), unsourced/unsupported confidence (58.6%), and claims lacking entity names for standalone readability (45.8%). Includes per-entity breakdowns, specific examples of each issue type, and a prioritized remediation plan."
+ratings:
+  novelty: 7
+  rigor: 9
+  actionability: 9
+  completeness: 7
+---
+
+## Purpose
+
+This document reports the results of a systematic quality audit run against all claims in the database as of February 26, 2026. The audit was designed to answer: **how many of our claims are actually usable as standalone, verifiable assertions?**
+
+The answer: fewer than we'd like. 89.1% of claims have at least one quality issue. Many issues are mechanically fixable (missing metadata), but some require re-extraction or manual editing (claims that aren't self-contained).
+
+This audit directly informs the remediation work tracked in [GitHub issue #1163](https://github.com/quantified-uncertainty/longterm-wiki/issues/1163) and the extraction quality improvements in [#1159](https://github.com/quantified-uncertainty/longterm-wiki/issues/1159).
+
+---
+
+## Audit Scope
+
+- **1,514 claims** across **11 entities** with claims in the database
+- Entities: <EntityLink id="anthropic">Anthropic</EntityLink> (325), <EntityLink id="kalshi">Kalshi</EntityLink> (242), <EntityLink id="dario-amodei">Dario Amodei</EntityLink> (168), <EntityLink id="superintelligence">Superintelligence</EntityLink> (72), <EntityLink id="openai">OpenAI</EntityLink> (71), <EntityLink id="ai-timelines">AI Timelines</EntityLink> (40), <EntityLink id="deepmind">DeepMind</EntityLink> (12), <EntityLink id="polymarket">Polymarket</EntityLink> (9), <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, <EntityLink id="miri">MIRI</EntityLink>, <EntityLink id="rlhf">RLHF</EntityLink>
+- Automated checks run via programmatic API analysis
+- Cross-referenced with `crux claims audit` integrity checks
+
+---
+
+## Summary of Findings
+
+**89.1% of claims** (1,349 of 1,514) have at least one quality issue.
+
+| Issue Category | Count | % of Claims | Severity | Fixability |
+|---|---|---|---|---|
+| Missing `relatedEntities` | 946 | 62.5% | Medium | Automated backfill |
+| Unsourced / unsupported | 887 | 58.6% | High | Requires source linking |
+| No entity name in claim text | 694 | 45.8% | High | Re-extraction or editing |
+| Relative phrases (context-dependent) | 198 | 13.1% | High | Re-extraction |
+| Exact duplicates | 152 | 10.0% | Medium | Automated dedup |
+| Wrong entity attribution | 78 | 5.2% | Critical | Manual review |
+| Unresolved references | 71 | 4.7% | High | Re-extraction |
+| MDX/HTML markup in text | 69 | 4.6% | Low | Automated strip |
+| Very short (\< 40 chars) | 62 | 4.1% | Medium | Re-extraction |
+| Very long (\> 300 chars) | 62 | 4.1% | Low | Split or add description |
+| Multiple facts in one claim | 36 | 2.4% | Medium | Re-extraction |
+| Vague language | 20 | 1.3% | Medium | Re-extraction |
+| Opinions tagged as factual | 19 | 1.3% | Medium | Reclassify |
+| Near-duplicates | 13 | 0.9% | Medium | Dedup with similarity |
+
+---
+
+## Per-Entity Issue Rates
+
+| Entity | Total Claims | % With Issues | Dominant Problem |
+|---|---|---|---|
+| dario-amodei | 168 | 100% | No entity name, unsourced |
+| superintelligence | 72 | 100% | No entity name, unsourced |
+| openai | 71 | 100% | No entity name, unsourced |
+| ai-timelines | 40 | 100% | No entity name, unsourced |
+| polymarket | 9 | 100% | No entity name, unsourced |
+| rlhf | ≈130 | 100% | No entity name, unsourced |
+| miri | ≈120 | 99.2% | No entity name, unsourced |
+| stuart-russell | ≈245 | 93.9% | No entity name, unsourced |
+| anthropic | 325 | 88.6% | Unsourced, missing relatedEntities |
+| kalshi | 242 | 83.1% | Missing relatedEntities |
+| deepmind | 12 | 75.0% | Missing relatedEntities |
+
+Kalshi and Anthropic have the highest-quality claims because they were extracted from well-cited, factual pages. Concept entities (RLHF, superintelligence, AI timelines) have near-universal issues because their source pages are more discursive.
+
+---
+
+## Detailed Issue Analysis
+
+### Issue 1: Missing `relatedEntities` (62.5%)
+
+The `relatedEntities` field should list entity IDs referenced by the claim, enabling cross-entity queries ("show me all claims that mention both Anthropic and OpenAI"). Nearly two-thirds of claims have this field as `null` or empty.
+
+**Why this happens:** The extraction pipeline doesn't populate `relatedEntities` consistently. Some extraction runs fill it in, others don't. There's no validation requiring it.
+
+**Example claims with null relatedEntities:**
+- "Research found models could engage in alignment faking" (under anthropic — mentions no entities at all)
+- "State gaming authorities argue that event contracts fall under state gambling jurisdiction" (under kalshi)
+- "CVE-2025-54794 is a high-severity prompt injection flaw targeting Claude AI" (under anthropic — should reference claude)
+
+**Remediation:** Automated backfill script that scans claim text for known entity names/aliases and populates `relatedEntities`. This is the easiest fix with the highest coverage.
+
+### Issue 2: Unsourced / Unsupported (58.6%)
+
+887 claims have `confidence` set to `unsourced` or `unsupported`, meaning they have no citation backing in the database. This is the most damaging issue for trust — the claims UI shows these as unverified with no source evidence.
+
+**Why this happens:** Two causes:
+1. Claims extracted from page sections that lack footnotes (the page makes assertions without citations)
+2. Claims that have `footnoteRefs` (reference numbers like "35") but these were never resolved to actual URLs or verification data
+
+The second cause is particularly frustrating — the claims DO have footnote references, but the pipeline never followed through to verify them against source text.
+
+**Example:**
+- Claim 8174: "Anthropic described Claude 3 Opus' alignment faking as the first empirical example..." — has `footnoteRefs: ["37"]` but `sourceQuote: null` and `confidence: unsupported`
+
+**Remediation:** Run `crux claims verify` on all entities with claims. This resolves footnoteRefs to actual sources and populates sourceQuote + confidence. For claims from uncited page sections, either find and add citations or mark as `editorial` (the wiki's own analysis, not a sourced claim).
+
+### Issue 3: No Entity Name in Claim Text (45.8%)
+
+694 claims don't mention any recognizable entity name. These claims are not self-contained — they depend on knowing which entity page they were extracted from.
+
+**Why this matters:** A claim like "Some analysts interpret the high rejection rate as excessive caution" is meaningless without context. Which product's rejection rate? Whose excessive caution? If this claim appears in a search result, a cross-entity comparison, or a standalone verification report, the reader has no way to interpret it.
+
+**Examples:**
+- "Founded in 2018" (under kalshi — should say "Kalshi was founded in 2018")
+- "The interpretability team has 40-60 researchers" (under anthropic — should say "Anthropic's interpretability team...")
+- "Research investment is high" (under rlhf — vague AND context-dependent)
+
+**Remediation:** This requires re-extraction with stronger self-containedness instructions, or a post-processing step that prepends the entity name. The extraction prompt should explicitly instruct: "Every claim must be understandable and verifiable WITHOUT knowing which page it was extracted from."
+
+### Issue 4: Relative Phrases / Context-Dependent (13.1%)
+
+198 claims start with words like "The ", "This ", "However", "In contrast", "Additionally", "Furthermore", "Moreover" — indicating they were extracted from running prose without being made self-contained.
+
+**Examples:**
+- "The HH-RLHF dataset was created for helpfulness and harmlessness" (starts with "The" — which dataset? Context-dependent)
+- "However, some observers question whether the safety commitments will scale with commercial pressure" (starts with "However" — in contrast to what?)
+- "This represents a significant shift in the regulatory landscape" (starts with "This" — what shift?)
+
+**Remediation:** Extraction prompt should instruct the LLM to rewrite dependent clauses as independent ones. Post-extraction validation should flag claims starting with relative pronouns/conjunctions.
+
+### Issue 5: Exact Duplicates (10.0%)
+
+152 claims are exact text duplicates. Some are within the same entity (extracted from different sections), some are across entities (the same claim appearing under both "anthropic" and "openai").
+
+**The `crux claims audit` tool confirmed 8 true duplicate rows** (same entity_id + claim_text). The higher count from text analysis includes cross-entity duplicates, which may be intentional (the same fact IS relevant to multiple entities) but should share a single canonical claim record.
+
+**Examples of problematic cross-entity duplicates:**
+- "Anthropic emerged from disagreements within OpenAI about the organization's direction" appears under both `anthropic` and `openai`
+- "Claude Opus 4.5 achieved 80.9% on SWE-bench Verified" appears twice under `anthropic`
+
+**Remediation:** Deduplicate within-entity duplicates (automated). For cross-entity duplicates, decide on strategy per <EntityLink id="claims-architecture-decisions">Architecture Decisions Crux 1</EntityLink>: are claims global or per-page?
+
+### Issue 6: Wrong Entity Attribution (5.2%)
+
+78 claims are filed under the wrong entity. They prominently mention entity Y but are stored under entity X's claim set.
+
+**Examples:**
+- Claim about "OpenAI o3 model performance" stored under `anthropic`
+- Claim about "ChatGPT is deployed by OpenAI" stored under `rlhf`
+- Claims about specific Claude model capabilities stored under `dario-amodei` instead of `anthropic`
+
+**Why this happens:** When extracting claims from a page about entity X, everything gets tagged with entity X — even quotes and facts about other entities mentioned in the page.
+
+**Remediation:** Post-extraction validation that checks whether the claim text actually mentions the assigned entity. Claims that mention entity Y but not entity X should be either re-routed to entity Y or flagged for manual review.
+
+### Issue 7: MDX/HTML Markup in Text (4.6%)
+
+69 claims contain raw `<EntityLink>`, `<F>`, or other MDX markup.
+
+**Examples:**
+- `"White House AI Czar <EntityLink id=\"E431\">...</EntityLink> announced new regulations"`
+- `"Anthropic's valuation reached <F id=\"6796e194\" />"` (the canonical fact component)
+
+**Decision:** `<EntityLink>` markup in claims is **acceptable** but needs to render correctly in all display contexts. `<F>` markup should be resolved to the actual value before storage.
+
+**Remediation:** For `<F>` tags: resolve to literal values during extraction. For `<EntityLink>`: keep in claim_text but ensure rendering pipeline handles them. Add a `claim_text_plain` computed field that strips all markup for search/display contexts.
+
+### Issue 8: Self-Referencing relatedEntities (from audit)
+
+The `crux claims audit` flagged 165 claims where the claim's own entity_id appears in its `relatedEntities` array. This is technically redundant — the claim is already associated with that entity via `entity_id`. Including it again in `relatedEntities` inflates cross-reference counts.
+
+**Remediation:** Strip self-references from `relatedEntities` in a cleanup migration.
+
+---
+
+## Worst Claims: Combined Issue Analysis
+
+The claims with the most simultaneous issues (7-8 each) share common patterns:
+
+1. **Claim 8356** (anthropic): "The HH-RLHF dataset was created for helpfulness and harmlessness" — no entity name, starts with "The", wrong attribution (about RLHF technique, not Anthropic specifically), unsourced, duplicate, missing relatedEntities, vague
+2. **Claim 10169** (kalshi): A 400+ character claim with embedded `<EntityLink>` markup, unresolved "the platform" reference, unsupported confidence, missing relatedEntities, and near-duplicate content
+3. **Claim 8381** (rlhf): "ChatGPT is deployed by OpenAI" — very short, unsourced, duplicated, filed under RLHF where it doesn't belong, missing relatedEntities
+
+These worst-case claims illustrate how issues compound: a short, vague, mis-attributed, unsourced claim with no entity name is essentially unusable.
+
+---
+
+## Remediation Priority
+
+### Tier 1: Automated fixes (can run today)
+
+1. **Backfill `relatedEntities`** — scan claim text for known entity names, populate field (946 claims)
+2. **Strip self-references** from relatedEntities (165 claims)
+3. **Deduplicate exact duplicates** within same entity (8 confirmed rows)
+4. **Resolve `<F>` markup** to literal values (small subset of 69 markup claims)
+
+### Tier 2: Pipeline fixes (require code changes)
+
+5. **Run `crux claims verify`** on all entities to resolve footnoteRefs and populate sourceQuote/confidence (887 unsourced claims)
+6. **Post-extraction entity name validation** — reject or flag claims that don't mention their entity
+7. **Post-extraction routing validation** — check that claim text matches assigned entity
+8. **Strip relative phrase openings** or flag for re-extraction
+
+### Tier 3: Extraction prompt improvements (require experimentation)
+
+9. **Self-containedness instructions** — "Every claim must be understandable without page context"
+10. **Atomicity enforcement** — "One verifiable assertion per claim"
+11. **Entity attribution instructions** — "Only extract claims that are ABOUT this entity"
+12. **Separate title/description fields** — for claims that need more context than a single line
+
+### Tier 4: Architectural changes (require design decisions)
+
+13. **Global deduplication strategy** for cross-entity duplicates
+14. **Claim description field** for complex/nuanced claims
+15. **Structured claims** (entity/property/value) alongside free-text — see [#1164](https://github.com/quantified-uncertainty/longterm-wiki/issues/1164)
+
+---
+
+## Comparison with Sprint 1 Evaluation
+
+The <EntityLink id="claims-system-development-roadmap">Development Roadmap</EntityLink> Sprint 1 evaluated 77 claims and found 100% accuracy, 84% usefulness. This audit of 1,514 claims paints a different picture — not because the claims are inaccurate, but because accuracy and usefulness aren't the only quality dimensions that matter.
+
+A claim can be:
+- **Accurate** (faithfully represents a source) but **not self-contained** (meaningless without page context)
+- **Useful** (informative content) but **unsourced** (no citation backing in the database)
+- **Well-typed** (correct claimType) but **mis-attributed** (filed under wrong entity)
+
+The Sprint 1 evaluation focused on the first set of properties (accuracy, usefulness, atomicity). This audit reveals that the metadata and infrastructure properties are the bigger gap.
+
+---
+
+## Open Questions
+
+1. **Should we re-extract or patch?** For the 694 claims missing entity names, is it better to re-run extraction with improved prompts, or to programmatically prepend entity names to existing claims?
+2. **What's the right dedup strategy for cross-entity claims?** If "Anthropic was founded in 2021" appears under both anthropic and openai, should we keep both, merge to one, or keep one as canonical and one as a reference?
+3. **Should unsourced claims be deleted or kept?** The 887 unsourced claims include genuine wiki assertions. Some should get sources; some may be editorial judgment that doesn't need a citation. How do we distinguish?
+4. **How aggressively should we validate at write time?** Currently claims are inserted with minimal validation. Should the API reject claims that fail quality checks (no entity name, too short, etc.)?
+
+---
+
+## Related Documents
+
+- <EntityLink id="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions and cruxes
+- <EntityLink id="claims-system-development-roadmap">Claims Development Roadmap (E897)</EntityLink> — Sprint plan and experimentation approach
+- <EntityLink id="claims-extraction-quality-patterns">Claims Extraction Quality Patterns (E902)</EntityLink> — Detailed analysis of extraction failure modes
+- <EntityLink id="citation-architecture">Citation Architecture (E891)</EntityLink> — The citation system that claims build on
