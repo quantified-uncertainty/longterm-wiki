@@ -75,6 +75,13 @@ const VERIFIED_ONLY_CONFIG: VerdictConfig = {
   badgeBg: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
 };
 
+/** Check if accuracy-issues text just restates the verdict (e.g. "Unsupported" when badge already says that) */
+function isRedundantWithVerdict(issuesText: string, verdictLabel: string): boolean {
+  const normalized = issuesText.trim().toLowerCase();
+  const verdictLower = verdictLabel.trim().toLowerCase();
+  return normalized === verdictLower || normalized.startsWith(verdictLower + ":") || normalized.startsWith(verdictLower + ".");
+}
+
 function getVerdictConfig(quote: CitationQuote): VerdictConfig | null {
   if (quote.accuracyVerdict) {
     return VERDICT_CONFIG[quote.accuracyVerdict] ?? null;
@@ -160,9 +167,9 @@ function FootnoteIndicator({ quote, anchor }: { quote: CitationQuote; anchor: HT
             </blockquote>
           )}
 
-          {/* Issues */}
-          {quote.accuracyIssues && (
-            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5">
+          {/* Issues — skip when text just restates the verdict label */}
+          {quote.accuracyIssues && !isRedundantWithVerdict(quote.accuracyIssues, config.label) && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 line-clamp-3">
               {quote.accuracyIssues}
             </p>
           )}

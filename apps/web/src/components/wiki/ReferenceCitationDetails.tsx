@@ -2,11 +2,10 @@
 
 import { cn } from "@lib/utils";
 import { useCitationQuotes } from "./CitationQuotesContext";
-import { normalizeUrl, VERDICT_STYLES, VERDICT_SEVERITY, MAX_CLAIMS_SHOWN } from "./resource-utils";
+import { normalizeUrl, VERDICT_STYLES, VERDICT_SEVERITY } from "./resource-utils";
 import type { CitationQuote } from "@/lib/citation-data";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
-import { CheckCircle2, AlertTriangle, XCircle, HelpCircle, Clock, ExternalLink } from "lucide-react";
-import { isSafeUrl } from "./CitationOverlay";
+import { CheckCircle2, AlertTriangle, XCircle, HelpCircle, Clock } from "lucide-react";
 import Link from "next/link";
 
 function formatDate(iso: string): string {
@@ -30,6 +29,20 @@ const VERDICT_ICONS: Record<string, typeof CheckCircle2> = {
   not_verifiable: HelpCircle,
 };
 
+/**
+ * Check whether the accuracy-issues text is redundant with the verdict badge.
+ * e.g. accuracyIssues = "Unsupported" when verdict label is already "Unsupported",
+ * or "Unsupported: no matching text" which starts with the verdict word.
+ * In those cases we skip the issues text to avoid showing the verdict 2-3x.
+ */
+function isRedundantIssues(issuesText: string, verdictLabel: string | null | undefined): boolean {
+  if (!issuesText || !verdictLabel) return false;
+  const normalized = issuesText.trim().toLowerCase();
+  const verdictLower = verdictLabel.trim().toLowerCase();
+  // Exact match or starts with the verdict word (possibly followed by colon/period/space)
+  return normalized === verdictLower || normalized.startsWith(verdictLower + ":") || normalized.startsWith(verdictLower + ".");
+}
+
 function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) {
   const verdict = quote.accuracyVerdict;
   const info = verdict ? VERDICT_STYLES[verdict] : null;
@@ -41,7 +54,11 @@ function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) 
 
   // Show the source quote if available; otherwise fall back to accuracy issues or a generic label
   const sourceQuoteText = quote.sourceQuote;
-  const verificationText = quote.accuracyIssues || (
+
+  // Build verification text, but suppress it when it just restates the verdict badge
+  const rawIssues = quote.accuracyIssues;
+  const issuesRedundant = rawIssues ? isRedundantIssues(rawIssues, label) : false;
+  const verificationText = (rawIssues && !issuesRedundant) ? rawIssues : (
     verdict === "accurate" && !sourceQuoteText ? "Supported by source" :
     quote.quoteVerified && !sourceQuoteText ? "Quote verified" :
     null
@@ -52,7 +69,7 @@ function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) 
   return (
     <div className="py-2 border-b border-border/30 last:border-b-0">
       {/* Claim text */}
-      <div className="text-[12px] text-foreground/90 leading-relaxed mb-1.5">
+      <div className="text-[12px] text-foreground/90 leading-relaxed mb-1.5 line-clamp-2">
         {renderInlineMarkdown(quote.claimText)}
       </div>
       {/* Verification result */}
@@ -75,13 +92,13 @@ function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) 
       </div>
       {/* Source quote — shown if available instead of generic "supported by source" */}
       {sourceQuoteText && (
-        <blockquote className="text-[11px] text-muted-foreground/80 border-l-2 border-border/50 pl-2 mt-1.5 leading-relaxed italic line-clamp-3">
+        <blockquote className="text-[11px] text-muted-foreground/80 border-l-2 border-border/50 pl-2 mt-1.5 leading-relaxed italic line-clamp-2">
           &ldquo;{sourceQuoteText}&rdquo;
         </blockquote>
       )}
-      {/* Accuracy issues (shown alongside quote when both exist) */}
+      {/* Accuracy issues — only shown when they add info beyond the verdict badge */}
       {verificationText && (
-        <p className="text-[11px] text-muted-foreground/70 m-0 mt-1">
+        <p className="text-[11px] text-muted-foreground/70 m-0 mt-1 line-clamp-2">
           {verificationText}
         </p>
       )}
@@ -128,7 +145,10 @@ export function ReferenceCitationDetails({ url, pageId }: { url: string; pageId?
     return va - vb;
   });
 
-  const shown = sorted.slice(0, MAX_CLAIMS_SHOWN);
+  // In the reference-row context, show fewer claims to keep rows compact.
+  // MAX_CLAIMS_SHOWN (8) is for dedicated claims pages; here we cap at 3.
+  const INLINE_CLAIMS_LIMIT = 3;
+  const shown = sorted.slice(0, INLINE_CLAIMS_LIMIT);
   const remaining = sorted.length - shown.length;
 
   return (
@@ -152,9 +172,18 @@ export function ReferenceCitationDetails({ url, pageId }: { url: string; pageId?
         ))}
       </div>
       {remaining > 0 && (
-        <span className="text-[11px] text-muted-foreground/50 block mt-1 pb-0.5">
-          +{remaining} more claims
-        </span>
+        pageId ? (
+          <Link
+            href={`/claims/entity/${pageId}`}
+            className="text-[11px] text-muted-foreground/50 hover:text-foreground transition-colors block mt-1 pb-0.5 !no-underline"
+          >
+            +{remaining} more claims
+          </Link>
+        ) : (
+          <span className="text-[11px] text-muted-foreground/50 block mt-1 pb-0.5">
+            +{remaining} more claims
+          </span>
+        )
       )}
     </div>
   );
