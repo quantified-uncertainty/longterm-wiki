@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
-import { getEntityById } from "@data";
+import { getEntityById, getEntityHref } from "@data";
 import type { ClaimRow } from "@wiki-server/api-types";
 import { buildEntityNameMap } from "../../components/claims-data";
 import { CategoryBadge } from "../../components/category-badge";
@@ -29,9 +29,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ClaimDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const claim = await fetchFromWikiServer<ClaimRow>(`/api/claims/${id}`, {
-    revalidate: 300,
-  });
+  const claim = await fetchFromWikiServer<ClaimRow>(
+    `/api/claims/${id}?includeSources=true`,
+    { revalidate: 300 }
+  );
 
   if (!claim) notFound();
 
@@ -92,7 +93,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
               Source Quote
             </span>
             <Link
-              href={`/wiki/${claim.entityId}`}
+              href={getEntityHref(claim.entityId)}
               className="text-xs text-amber-600 hover:underline"
             >
               From wiki page &rarr;
@@ -243,7 +244,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
               return (
                 <Link
                   key={num}
-                  href={`/wiki/${claim.entityId}#fn-${num}`}
+                  href={`${getEntityHref(claim.entityId)}#fn-${num}`}
                   className="font-mono text-xs px-1.5 py-0.5 rounded bg-gray-100 text-blue-600 hover:bg-gray-200 hover:underline"
                 >
                   [{num}]
@@ -260,11 +261,11 @@ export default async function ClaimDetailPage({ params }: PageProps) {
       {/* Timestamps */}
       <div className="border-t pt-4 text-xs text-muted-foreground">
         <span>
-          Created: {claim.createdAt ? new Date(claim.createdAt).toLocaleString() : "-"}
+          Created: {claim.createdAt ? new Date(claim.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}
         </span>
         {claim.updatedAt && (
           <span className="ml-4">
-            Updated: {new Date(claim.updatedAt).toLocaleString()}
+            Updated: {new Date(claim.updatedAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
           </span>
         )}
       </div>
@@ -272,13 +273,13 @@ export default async function ClaimDetailPage({ params }: PageProps) {
       {/* Actions */}
       <div className="mt-4 flex gap-3">
         <Link
-          href={`/wiki/${claim.entityId}`}
+          href={getEntityHref(claim.entityId)}
           className="text-xs text-blue-600 hover:underline"
         >
           View wiki page &rarr;
         </Link>
         <Link
-          href={`/wiki/${claim.entityId}/data`}
+          href={`${getEntityHref(claim.entityId)}/data`}
           className="text-xs text-muted-foreground hover:underline"
         >
           View data page
