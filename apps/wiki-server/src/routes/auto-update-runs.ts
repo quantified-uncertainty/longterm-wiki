@@ -5,8 +5,6 @@ import { getDrizzleDb } from "../db.js";
 import { autoUpdateRuns, autoUpdateResults } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, notFoundError, firstOrThrow } from "./utils.js";
 
-export const autoUpdateRunsRoute = new Hono();
-
 // ---- Constants ----
 
 const MAX_BATCH_SIZE = 100;
@@ -93,207 +91,209 @@ function formatRunEntry(
   };
 }
 
-// ---- POST / (record a complete run with results) ----
+// ---- Route ----
 
-autoUpdateRunsRoute.post("/", async (c) => {
-  const body = await parseJsonBody(c);
-  if (!body) return invalidJsonError(c);
+const autoUpdateRunsApp = new Hono()
+  // ---- POST / (record a complete run with results) ----
+  .post("/", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
 
-  const parsed = RecordRunSchema.safeParse(body);
-  if (!parsed.success) return validationError(c, parsed.error.message);
+    const parsed = RecordRunSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const d = parsed.data;
-  const db = getDrizzleDb();
+    const d = parsed.data;
+    const db = getDrizzleDb();
 
-  // Use a Drizzle transaction to ensure atomicity of run + results insert.
-  // ON CONFLICT DO NOTHING makes this idempotent: re-syncing the same run
-  // (e.g., from YAML files) returns the existing record rather than duplicating it.
-  const result = await db.transaction(async (tx) => {
-    const runRow = await tx
-      .insert(autoUpdateRuns)
-      .values({
-        date: d.date,
-        startedAt: new Date(d.startedAt),
-        completedAt: d.completedAt ? new Date(d.completedAt) : null,
-        trigger: d.trigger,
-        budgetLimit: d.budgetLimit ?? null,
-        budgetSpent: d.budgetSpent ?? null,
-        sourcesChecked: d.sourcesChecked ?? null,
-        sourcesFailed: d.sourcesFailed ?? null,
-        itemsFetched: d.itemsFetched ?? null,
-        itemsRelevant: d.itemsRelevant ?? null,
-        pagesPlanned: d.pagesPlanned ?? null,
-        pagesUpdated: d.pagesUpdated ?? null,
-        pagesFailed: d.pagesFailed ?? null,
-        pagesSkipped: d.pagesSkipped ?? null,
-        newPagesCreated: d.newPagesCreated?.length
-          ? JSON.stringify(d.newPagesCreated)
-          : null,
-      })
-      .onConflictDoNothing({ target: autoUpdateRuns.startedAt }) // idempotent: skip duplicate startedAt
-      .returning({
-        id: autoUpdateRuns.id,
-        date: autoUpdateRuns.date,
-        startedAt: autoUpdateRuns.startedAt,
-        createdAt: autoUpdateRuns.createdAt,
-      });
-
-    // If conflict (duplicate startedAt), fetch the existing run's id
-    if (runRow.length === 0) {
-      const existing = await tx
-        .select({
+    // Use a Drizzle transaction to ensure atomicity of run + results insert.
+    // ON CONFLICT DO NOTHING makes this idempotent: re-syncing the same run
+    // (e.g., from YAML files) returns the existing record rather than duplicating it.
+    const result = await db.transaction(async (tx) => {
+      const runRow = await tx
+        .insert(autoUpdateRuns)
+        .values({
+          date: d.date,
+          startedAt: new Date(d.startedAt),
+          completedAt: d.completedAt ? new Date(d.completedAt) : null,
+          trigger: d.trigger,
+          budgetLimit: d.budgetLimit ?? null,
+          budgetSpent: d.budgetSpent ?? null,
+          sourcesChecked: d.sourcesChecked ?? null,
+          sourcesFailed: d.sourcesFailed ?? null,
+          itemsFetched: d.itemsFetched ?? null,
+          itemsRelevant: d.itemsRelevant ?? null,
+          pagesPlanned: d.pagesPlanned ?? null,
+          pagesUpdated: d.pagesUpdated ?? null,
+          pagesFailed: d.pagesFailed ?? null,
+          pagesSkipped: d.pagesSkipped ?? null,
+          newPagesCreated: d.newPagesCreated?.length
+            ? JSON.stringify(d.newPagesCreated)
+            : null,
+        })
+        .onConflictDoNothing({ target: autoUpdateRuns.startedAt }) // idempotent: skip duplicate startedAt
+        .returning({
           id: autoUpdateRuns.id,
           date: autoUpdateRuns.date,
           startedAt: autoUpdateRuns.startedAt,
           createdAt: autoUpdateRuns.createdAt,
-        })
-        .from(autoUpdateRuns)
-        .where(eq(autoUpdateRuns.startedAt, new Date(d.startedAt)))
-        .limit(1);
-      const run = firstOrThrow(existing, "auto-update run lookup after conflict");
-      return { ...run, resultsInserted: 0 };
+        });
+
+      // If conflict (duplicate startedAt), fetch the existing run's id
+      if (runRow.length === 0) {
+        const existing = await tx
+          .select({
+            id: autoUpdateRuns.id,
+            date: autoUpdateRuns.date,
+            startedAt: autoUpdateRuns.startedAt,
+            createdAt: autoUpdateRuns.createdAt,
+          })
+          .from(autoUpdateRuns)
+          .where(eq(autoUpdateRuns.startedAt, new Date(d.startedAt)))
+          .limit(1);
+        const run = firstOrThrow(existing, "auto-update run lookup after conflict");
+        return { ...run, resultsInserted: 0 };
+      }
+
+      const run = runRow[0];
+      let resultsInserted = 0;
+
+      if (d.results && d.results.length > 0) {
+        await tx.insert(autoUpdateResults).values(
+          d.results.map((r) => ({
+            runId: run.id,
+            pageId: r.pageId,
+            status: r.status,
+            tier: r.tier ?? null,
+            durationMs: r.durationMs ?? null,
+            errorMessage: r.errorMessage ?? null,
+          }))
+        );
+        resultsInserted = d.results.length;
+      }
+
+      return { ...run, resultsInserted };
+    });
+
+    return c.json(result, 201);
+  })
+
+  // ---- GET /all (paginated list of runs) ----
+  .get("/all", async (c) => {
+    const parsed = PaginationQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { limit, offset } = parsed.data;
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(autoUpdateRuns)
+      .orderBy(desc(autoUpdateRuns.startedAt))
+      .limit(limit)
+      .offset(offset);
+
+    const countResult = await db
+      .select({ count: count() })
+      .from(autoUpdateRuns);
+    const total = countResult[0].count;
+
+    // Fetch all results for the page of runs in a single query
+    const runIds = rows.map((r) => r.id);
+    const resultsByRun = new Map<number, (typeof autoUpdateResults.$inferSelect)[]>();
+
+    if (runIds.length > 0) {
+      const allResults = await db
+        .select()
+        .from(autoUpdateResults)
+        .where(inArray(autoUpdateResults.runId, runIds));
+
+      for (const result of allResults) {
+        const existing = resultsByRun.get(result.runId) || [];
+        existing.push(result);
+        resultsByRun.set(result.runId, existing);
+      }
     }
 
-    const run = runRow[0];
-    let resultsInserted = 0;
+    const entries = rows.map((r) =>
+      formatRunEntry(r, resultsByRun.get(r.id) || [])
+    );
 
-    if (d.results && d.results.length > 0) {
-      await tx.insert(autoUpdateResults).values(
-        d.results.map((r) => ({
-          runId: run.id,
-          pageId: r.pageId,
-          status: r.status,
-          tier: r.tier ?? null,
-          durationMs: r.durationMs ?? null,
-          errorMessage: r.errorMessage ?? null,
-        }))
-      );
-      resultsInserted = d.results.length;
+    return c.json({ entries, total, limit, offset });
+  })
+
+  // ---- GET /stats (aggregate statistics) ----
+  .get("/stats", async (c) => {
+    const db = getDrizzleDb();
+
+    const totalResult = await db
+      .select({ count: count() })
+      .from(autoUpdateRuns);
+    const totalRuns = totalResult[0].count;
+
+    const budgetResult = await db
+      .select({
+        total: sql<number>`coalesce(sum(${autoUpdateRuns.budgetSpent}), 0)`,
+      })
+      .from(autoUpdateRuns);
+    const totalBudgetSpent = Number(budgetResult[0].total);
+
+    const updatedResult = await db
+      .select({
+        total: sql<number>`coalesce(sum(${autoUpdateRuns.pagesUpdated}), 0)`,
+      })
+      .from(autoUpdateRuns);
+    const totalPagesUpdated = Number(updatedResult[0].total);
+
+    const failedResult = await db
+      .select({
+        total: sql<number>`coalesce(sum(${autoUpdateRuns.pagesFailed}), 0)`,
+      })
+      .from(autoUpdateRuns);
+    const totalPagesFailed = Number(failedResult[0].total);
+
+    const byTrigger = await db
+      .select({
+        trigger: autoUpdateRuns.trigger,
+        count: count(),
+      })
+      .from(autoUpdateRuns)
+      .groupBy(autoUpdateRuns.trigger);
+
+    return c.json({
+      totalRuns,
+      totalBudgetSpent,
+      totalPagesUpdated,
+      totalPagesFailed,
+      byTrigger: Object.fromEntries(
+        byTrigger.map((r) => [r.trigger, r.count])
+      ),
+    });
+  })
+
+  // ---- GET /:id (single run with results) ----
+  .get("/:id", async (c) => {
+    const id = parseInt(c.req.param("id"), 10);
+    if (isNaN(id)) return validationError(c, "id must be a number");
+
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(autoUpdateRuns)
+      .where(eq(autoUpdateRuns.id, id));
+
+    if (rows.length === 0) {
+      return notFoundError(c, "Run not found");
     }
 
-    return { ...run, resultsInserted };
-  });
-
-  return c.json(result, 201);
-});
-
-// ---- GET /all (paginated list of runs) ----
-
-autoUpdateRunsRoute.get("/all", async (c) => {
-  const parsed = PaginationQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
-
-  const { limit, offset } = parsed.data;
-  const db = getDrizzleDb();
-
-  const rows = await db
-    .select()
-    .from(autoUpdateRuns)
-    .orderBy(desc(autoUpdateRuns.startedAt))
-    .limit(limit)
-    .offset(offset);
-
-  const countResult = await db
-    .select({ count: count() })
-    .from(autoUpdateRuns);
-  const total = countResult[0].count;
-
-  // Fetch all results for the page of runs in a single query
-  const runIds = rows.map((r) => r.id);
-  const resultsByRun = new Map<number, (typeof autoUpdateResults.$inferSelect)[]>();
-
-  if (runIds.length > 0) {
-    const allResults = await db
+    const r = rows[0];
+    const results = await db
       .select()
       .from(autoUpdateResults)
-      .where(inArray(autoUpdateResults.runId, runIds));
+      .where(eq(autoUpdateResults.runId, r.id));
 
-    for (const result of allResults) {
-      const existing = resultsByRun.get(result.runId) || [];
-      existing.push(result);
-      resultsByRun.set(result.runId, existing);
-    }
-  }
-
-  const entries = rows.map((r) =>
-    formatRunEntry(r, resultsByRun.get(r.id) || [])
-  );
-
-  return c.json({ entries, total, limit, offset });
-});
-
-// ---- GET /stats (aggregate statistics) ----
-
-autoUpdateRunsRoute.get("/stats", async (c) => {
-  const db = getDrizzleDb();
-
-  const totalResult = await db
-    .select({ count: count() })
-    .from(autoUpdateRuns);
-  const totalRuns = totalResult[0].count;
-
-  const budgetResult = await db
-    .select({
-      total: sql<number>`coalesce(sum(${autoUpdateRuns.budgetSpent}), 0)`,
-    })
-    .from(autoUpdateRuns);
-  const totalBudgetSpent = Number(budgetResult[0].total);
-
-  const updatedResult = await db
-    .select({
-      total: sql<number>`coalesce(sum(${autoUpdateRuns.pagesUpdated}), 0)`,
-    })
-    .from(autoUpdateRuns);
-  const totalPagesUpdated = Number(updatedResult[0].total);
-
-  const failedResult = await db
-    .select({
-      total: sql<number>`coalesce(sum(${autoUpdateRuns.pagesFailed}), 0)`,
-    })
-    .from(autoUpdateRuns);
-  const totalPagesFailed = Number(failedResult[0].total);
-
-  const byTrigger = await db
-    .select({
-      trigger: autoUpdateRuns.trigger,
-      count: count(),
-    })
-    .from(autoUpdateRuns)
-    .groupBy(autoUpdateRuns.trigger);
-
-  return c.json({
-    totalRuns,
-    totalBudgetSpent,
-    totalPagesUpdated,
-    totalPagesFailed,
-    byTrigger: Object.fromEntries(
-      byTrigger.map((r) => [r.trigger, r.count])
-    ),
+    return c.json(formatRunEntry(r, results));
   });
-});
 
-// ---- GET /:id (single run with results) ----
-
-autoUpdateRunsRoute.get("/:id", async (c) => {
-  const id = parseInt(c.req.param("id"), 10);
-  if (isNaN(id)) return validationError(c, "id must be a number");
-
-  const db = getDrizzleDb();
-
-  const rows = await db
-    .select()
-    .from(autoUpdateRuns)
-    .where(eq(autoUpdateRuns.id, id));
-
-  if (rows.length === 0) {
-    return notFoundError(c, "Run not found");
-  }
-
-  const r = rows[0];
-  const results = await db
-    .select()
-    .from(autoUpdateResults)
-    .where(eq(autoUpdateResults.runId, r.id));
-
-  return c.json(formatRunEntry(r, results));
-});
+export const autoUpdateRunsRoute = autoUpdateRunsApp;
+export type AutoUpdateRunsRoute = typeof autoUpdateRunsApp;

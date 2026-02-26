@@ -16,8 +16,6 @@ import {
   UpsertSummaryBatchSchema,
 } from "../api-types.js";
 
-export const summariesRoute = new Hono();
-
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
@@ -68,185 +66,186 @@ function formatSummary(r: typeof summaries.$inferSelect) {
   };
 }
 
-// ---- POST / (upsert single summary) ----
+// ---- Routes ----
 
-summariesRoute.post("/", async (c) => {
-  const body = await parseJsonBody(c);
-  if (!body) return invalidJsonError(c);
+const summariesApp = new Hono()
+  // ---- POST / (upsert single summary) ----
+  .post("/", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
 
-  const parsed = UpsertSummarySchema.safeParse(body);
-  if (!parsed.success) return validationError(c, parsed.error.message);
+    const parsed = UpsertSummarySchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const db = getDrizzleDb();
+    const db = getDrizzleDb();
 
-  // Validate entity reference
-  const missing = await checkRefsExist(db, entities, entities.id, [parsed.data.entityId]);
-  if (missing.length > 0) {
-    return validationError(c, `Referenced entity not found: ${missing.join(", ")}`);
-  }
+    // Validate entity reference
+    const missing = await checkRefsExist(db, entities, entities.id, [parsed.data.entityId]);
+    if (missing.length > 0) {
+      return validationError(c, `Referenced entity not found: ${missing.join(", ")}`);
+    }
 
-  const vals = summaryValues(parsed.data);
+    const vals = summaryValues(parsed.data);
 
-  const rows = await db
-    .insert(summaries)
-    .values(vals)
-    .onConflictDoUpdate({
-      target: summaries.entityId,
-      set: {
-        entityType: vals.entityType,
-        oneLiner: vals.oneLiner,
-        summary: vals.summary,
-        review: vals.review,
-        keyPoints: vals.keyPoints,
-        keyClaims: vals.keyClaims,
-        model: vals.model,
-        tokensUsed: vals.tokensUsed,
-        generatedAt: sql`now()`,
-        updatedAt: sql`now()`,
-      },
-    })
-    .returning({
-      entityId: summaries.entityId,
-      entityType: summaries.entityType,
+    const rows = await db
+      .insert(summaries)
+      .values(vals)
+      .onConflictDoUpdate({
+        target: summaries.entityId,
+        set: {
+          entityType: vals.entityType,
+          oneLiner: vals.oneLiner,
+          summary: vals.summary,
+          review: vals.review,
+          keyPoints: vals.keyPoints,
+          keyClaims: vals.keyClaims,
+          model: vals.model,
+          tokensUsed: vals.tokensUsed,
+          generatedAt: sql`now()`,
+          updatedAt: sql`now()`,
+        },
+      })
+      .returning({
+        entityId: summaries.entityId,
+        entityType: summaries.entityType,
+      });
+
+    return c.json(firstOrThrow(rows, "summary upsert"), 201);
+  })
+
+  // ---- POST /batch (upsert multiple summaries) ----
+  .post("/batch", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = UpsertBatchSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { items } = parsed.data;
+    const db = getDrizzleDb();
+
+    // Validate entity references
+    const entityIds = [...new Set(items.map((i) => i.entityId))];
+    const missing = await checkRefsExist(db, entities, entities.id, entityIds);
+    if (missing.length > 0) {
+      return validationError(c, `Referenced entities not found: ${missing.join(", ")}`);
+    }
+
+    const allVals = items.map(summaryValues);
+
+    const results = await db
+      .insert(summaries)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: summaries.entityId,
+        set: {
+          entityType: sql`excluded."entity_type"`,
+          oneLiner: sql`excluded."one_liner"`,
+          summary: sql`excluded."summary"`,
+          review: sql`excluded."review"`,
+          keyPoints: sql`excluded."key_points"`,
+          keyClaims: sql`excluded."key_claims"`,
+          model: sql`excluded."model"`,
+          tokensUsed: sql`excluded."tokens_used"`,
+          generatedAt: sql`now()`,
+          updatedAt: sql`now()`,
+        },
+      })
+      .returning({
+        entityId: summaries.entityId,
+        entityType: summaries.entityType,
+      });
+
+    return c.json({ upserted: results.length, results }, 201);
+  })
+
+  // ---- GET /stats ----
+  .get("/stats", async (c) => {
+    const db = getDrizzleDb();
+
+    const totalResult = await db.select({ count: count() }).from(summaries);
+    const total = totalResult[0].count;
+
+    const byType = await db
+      .select({
+        entityType: summaries.entityType,
+        count: count(),
+      })
+      .from(summaries)
+      .groupBy(summaries.entityType)
+      .orderBy(desc(count()));
+
+    const byModel = await db
+      .select({
+        model: summaries.model,
+        count: count(),
+      })
+      .from(summaries)
+      .groupBy(summaries.model)
+      .orderBy(desc(count()));
+
+    return c.json({
+      total,
+      byType: Object.fromEntries(
+        byType.map((r) => [r.entityType, r.count])
+      ),
+      byModel: Object.fromEntries(
+        byModel.map((r) => [r.model ?? "unknown", r.count])
+      ),
     });
+  })
 
-  return c.json(firstOrThrow(rows, "summary upsert"), 201);
-});
+  // ---- GET /all (paginated listing) ----
+  .get("/all", async (c) => {
+    const parsed = PaginationQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-// ---- POST /batch (upsert multiple summaries) ----
+    const { limit, offset, entityType } = parsed.data;
+    const db = getDrizzleDb();
 
-summariesRoute.post("/batch", async (c) => {
-  const body = await parseJsonBody(c);
-  if (!body) return invalidJsonError(c);
+    const conditions = entityType
+      ? eq(summaries.entityType, entityType)
+      : undefined;
 
-  const parsed = UpsertBatchSchema.safeParse(body);
-  if (!parsed.success) return validationError(c, parsed.error.message);
+    const rows = await db
+      .select()
+      .from(summaries)
+      .where(conditions)
+      .orderBy(asc(summaries.entityId))
+      .limit(limit)
+      .offset(offset);
 
-  const { items } = parsed.data;
-  const db = getDrizzleDb();
+    const countResult = await db
+      .select({ count: count() })
+      .from(summaries)
+      .where(conditions);
+    const total = countResult[0].count;
 
-  // Validate entity references
-  const entityIds = [...new Set(items.map((i) => i.entityId))];
-  const missing = await checkRefsExist(db, entities, entities.id, entityIds);
-  if (missing.length > 0) {
-    return validationError(c, `Referenced entities not found: ${missing.join(", ")}`);
-  }
-
-  const allVals = items.map(summaryValues);
-
-  const results = await db
-    .insert(summaries)
-    .values(allVals)
-    .onConflictDoUpdate({
-      target: summaries.entityId,
-      set: {
-        entityType: sql`excluded."entity_type"`,
-        oneLiner: sql`excluded."one_liner"`,
-        summary: sql`excluded."summary"`,
-        review: sql`excluded."review"`,
-        keyPoints: sql`excluded."key_points"`,
-        keyClaims: sql`excluded."key_claims"`,
-        model: sql`excluded."model"`,
-        tokensUsed: sql`excluded."tokens_used"`,
-        generatedAt: sql`now()`,
-        updatedAt: sql`now()`,
-      },
-    })
-    .returning({
-      entityId: summaries.entityId,
-      entityType: summaries.entityType,
+    return c.json({
+      summaries: rows.map(formatSummary),
+      total,
+      limit,
+      offset,
     });
+  })
 
-  return c.json({ upserted: results.length, results }, 201);
-});
+  // ---- GET /:entityId (get by entity ID) ----
+  .get("/:entityId", async (c) => {
+    const entityId = c.req.param("entityId");
+    const db = getDrizzleDb();
 
-// ---- GET /stats ----
+    const rows = await db
+      .select()
+      .from(summaries)
+      .where(eq(summaries.entityId, entityId))
+      .limit(1);
 
-summariesRoute.get("/stats", async (c) => {
-  const db = getDrizzleDb();
+    if (rows.length === 0) {
+      return notFoundError(c, `Summary not found: ${entityId}`);
+    }
 
-  const totalResult = await db.select({ count: count() }).from(summaries);
-  const total = totalResult[0].count;
-
-  const byType = await db
-    .select({
-      entityType: summaries.entityType,
-      count: count(),
-    })
-    .from(summaries)
-    .groupBy(summaries.entityType)
-    .orderBy(desc(count()));
-
-  const byModel = await db
-    .select({
-      model: summaries.model,
-      count: count(),
-    })
-    .from(summaries)
-    .groupBy(summaries.model)
-    .orderBy(desc(count()));
-
-  return c.json({
-    total,
-    byType: Object.fromEntries(
-      byType.map((r) => [r.entityType, r.count])
-    ),
-    byModel: Object.fromEntries(
-      byModel.map((r) => [r.model ?? "unknown", r.count])
-    ),
+    return c.json(formatSummary(rows[0]));
   });
-});
 
-// ---- GET /all (paginated listing) ----
-
-summariesRoute.get("/all", async (c) => {
-  const parsed = PaginationQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
-
-  const { limit, offset, entityType } = parsed.data;
-  const db = getDrizzleDb();
-
-  const conditions = entityType
-    ? eq(summaries.entityType, entityType)
-    : undefined;
-
-  const rows = await db
-    .select()
-    .from(summaries)
-    .where(conditions)
-    .orderBy(asc(summaries.entityId))
-    .limit(limit)
-    .offset(offset);
-
-  const countResult = await db
-    .select({ count: count() })
-    .from(summaries)
-    .where(conditions);
-  const total = countResult[0].count;
-
-  return c.json({
-    summaries: rows.map(formatSummary),
-    total,
-    limit,
-    offset,
-  });
-});
-
-// ---- GET /:entityId (get by entity ID) ----
-
-summariesRoute.get("/:entityId", async (c) => {
-  const entityId = c.req.param("entityId");
-  const db = getDrizzleDb();
-
-  const rows = await db
-    .select()
-    .from(summaries)
-    .where(eq(summaries.entityId, entityId))
-    .limit(1);
-
-  if (rows.length === 0) {
-    return notFoundError(c, `Summary not found: ${entityId}`);
-  }
-
-  return c.json(formatSummary(rows[0]));
-});
+export const summariesRoute = summariesApp;
+export type SummariesRoute = typeof summariesApp;

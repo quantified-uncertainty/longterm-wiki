@@ -7,8 +7,6 @@ import {
   TRIGRAM_SIMILARITY_THRESHOLD,
 } from "../search-utils.js";
 
-export const exploreRoute = new Hono();
-
 // ---- Query Schema ----
 
 const ExploreQuery = z.object({
@@ -182,157 +180,61 @@ const SORT_COLUMNS: Record<string, string> = {
   title: "wp.title",
 };
 
-// ---- GET / (explore items with pagination, filtering, sorting, search, facets) ----
+// ---- Route ----
 
-exploreRoute.get("/", async (c) => {
-  const parsed = ExploreQuery.safeParse(c.req.query());
-  if (!parsed.success) return validationError(c, parsed.error.message);
+const exploreApp = new Hono()
+  // ---- GET / (explore items with pagination, filtering, sorting, search, facets) ----
+  .get("/", async (c) => {
+    const parsed = ExploreQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const {
-    limit,
-    offset,
-    search,
-    entityType,
-    category,
-    cluster,
-    riskCategory,
-    sort,
-    sortDir,
-  } = parsed.data;
-  const rawDb = getDb();
+    const {
+      limit,
+      offset,
+      search,
+      entityType,
+      category,
+      cluster,
+      riskCategory,
+      sort,
+      sortDir,
+    } = parsed.data;
+    const rawDb = getDb();
 
-  // Build main query conditions (all filters applied)
-  const main = buildFilterConditions({
-    search,
-    cluster,
-    category,
-    entityType,
-    riskCategory,
-  });
-  const mainWhere = `WHERE ${main.conditions.join(" AND ")}`;
-
-  // Sort
-  const col = SORT_COLUMNS[sort] || SORT_COLUMNS.recommended;
-  const dir = sort === "title" ? "ASC" : sortDir.toUpperCase();
-  const nullsLast = dir === "DESC" ? "NULLS LAST" : "NULLS FIRST";
-
-  let searchRankSelect = "";
-  let orderBy = `${col} ${dir} ${nullsLast}`;
-
-  if (search) {
-    const prefixQuery = buildPrefixTsquery(search);
-    if (prefixQuery) {
-      searchRankSelect = `, ts_rank_cd(wp.search_vector, to_tsquery('english', $1), 1) AS search_rank`;
-      if (sort === "recommended") {
-        orderBy = `search_rank DESC, ${col} ${dir} ${nullsLast}`;
-      }
-    }
-  }
-
-  // Main data query
-  const limitParamIdx = main.paramIdx;
-  const offsetParamIdx = main.paramIdx + 1;
-  const dataParams = [...main.params, limit, offset];
-
-  const dataQuery = `
-    SELECT
-      wp.id, wp.numeric_id, wp.title, wp.entity_type, wp.content_format,
-      wp.category, COALESCE(wp.llm_summary, wp.description) AS description,
-      wp.tags AS page_tags, wp.clusters AS page_clusters,
-      wp.word_count, wp.quality, wp.reader_importance, wp.research_importance,
-      wp.tactical_value, wp.backlink_count, wp.risk_category,
-      wp.last_updated, wp.date_created, wp.recommended_score,
-      e.tags AS entity_tags, e.clusters AS entity_clusters
-      ${searchRankSelect}
-    FROM wiki_pages wp
-    LEFT JOIN entities e ON wp.id = e.id
-    ${mainWhere}
-    ORDER BY ${orderBy}
-    LIMIT $${limitParamIdx} OFFSET $${offsetParamIdx}
-  `;
-
-  // Count query (same filters, no pagination)
-  const countQuery = `
-    SELECT count(*) AS total
-    FROM wiki_pages wp
-    ${mainWhere}
-  `;
-
-  // Faceted counts — cascading:
-  // 1. Cluster counts: search only
-  // 2. Category counts: search + cluster
-  // 3. Entity type counts: search + cluster + category
-  // 4. Risk category counts: search + cluster + category + entity_type in risk types
-
-  const searchOnly = buildFilterConditions({ search });
-  const searchCluster = buildFilterConditions({ search, cluster });
-  const searchClusterCat = buildFilterConditions({ search, cluster, category });
-  const searchClusterCatRisk = buildFilterConditions({
-    search,
-    cluster,
-    category,
-    entityType: entityType === "risk" ? undefined : entityType,
-  });
-
-  const clusterCountQuery = `
-    SELECT val, count(*) AS cnt
-    FROM wiki_pages wp, jsonb_array_elements_text(wp.clusters) AS val
-    WHERE ${searchOnly.conditions.join(" AND ")}
-    GROUP BY val ORDER BY cnt DESC
-  `;
-
-  const categoryCountQuery = `
-    SELECT wp.category AS val, count(*) AS cnt
-    FROM wiki_pages wp
-    WHERE ${searchCluster.conditions.join(" AND ")} AND wp.category IS NOT NULL
-    GROUP BY wp.category ORDER BY cnt DESC
-  `;
-
-  const entityTypeCountQuery = `
-    SELECT (${DERIVED_TYPE_EXPR}) AS val, count(*) AS cnt
-    FROM wiki_pages wp
-    WHERE ${searchClusterCat.conditions.join(" AND ")}
-    GROUP BY val ORDER BY cnt DESC
-  `;
-
-  const riskCatCountQuery = `
-    SELECT wp.risk_category AS val, count(*) AS cnt
-    FROM wiki_pages wp
-    WHERE ${searchClusterCatRisk.conditions.join(" AND ")}
-      AND wp.entity_type = 'risk' AND wp.risk_category IS NOT NULL
-    GROUP BY wp.risk_category ORDER BY cnt DESC
-  `;
-
-  // Execute all queries in parallel
-  let [rows, countResult, clusterCounts, categoryCounts, entityTypeCounts, riskCatCounts] =
-    await Promise.all([
-      rawDb.unsafe(dataQuery, dataParams as any[]),
-      rawDb.unsafe(countQuery, main.params as any[]),
-      rawDb.unsafe(clusterCountQuery, searchOnly.params as any[]),
-      rawDb.unsafe(categoryCountQuery, searchCluster.params as any[]),
-      rawDb.unsafe(entityTypeCountQuery, searchClusterCat.params as any[]),
-      rawDb.unsafe(riskCatCountQuery, searchClusterCatRisk.params as any[]),
-    ]);
-
-  let total = parseInt(countResult[0]?.total ?? "0", 10);
-
-  // Trigram fallback: if FTS returned nothing and we have a search term,
-  // fall back to pg_trgm similarity on title for typo tolerance.
-  let searchMode: "fts" | "trigram" | null = search ? "fts" : null;
-  if (search && total === 0) {
-    searchMode = "trigram";
-    // Build trigram fallback query with same non-search filters
-    const noSearchFilters = buildFilterConditions({
+    // Build main query conditions (all filters applied)
+    const main = buildFilterConditions({
+      search,
       cluster,
       category,
       entityType,
       riskCategory,
     });
-    const trigramParamIdx = noSearchFilters.paramIdx;
-    const trigramWhere = `WHERE ${noSearchFilters.conditions.join(" AND ")} AND similarity(wp.title, $${trigramParamIdx}) > ${TRIGRAM_SIMILARITY_THRESHOLD}`;
-    const trigramParams = [...noSearchFilters.params, search, limit, offset];
+    const mainWhere = `WHERE ${main.conditions.join(" AND ")}`;
 
-    const trigramQuery = `
+    // Sort
+    const col = SORT_COLUMNS[sort] || SORT_COLUMNS.recommended;
+    const dir = sort === "title" ? "ASC" : sortDir.toUpperCase();
+    const nullsLast = dir === "DESC" ? "NULLS LAST" : "NULLS FIRST";
+
+    let searchRankSelect = "";
+    let orderBy = `${col} ${dir} ${nullsLast}`;
+
+    if (search) {
+      const prefixQuery = buildPrefixTsquery(search);
+      if (prefixQuery) {
+        searchRankSelect = `, ts_rank_cd(wp.search_vector, to_tsquery('english', $1), 1) AS search_rank`;
+        if (sort === "recommended") {
+          orderBy = `search_rank DESC, ${col} ${dir} ${nullsLast}`;
+        }
+      }
+    }
+
+    // Main data query
+    const limitParamIdx = main.paramIdx;
+    const offsetParamIdx = main.paramIdx + 1;
+    const dataParams = [...main.params, limit, offset];
+
+    const dataQuery = `
       SELECT
         wp.id, wp.numeric_id, wp.title, wp.entity_type, wp.content_format,
         wp.category, COALESCE(wp.llm_summary, wp.description) AS description,
@@ -340,74 +242,175 @@ exploreRoute.get("/", async (c) => {
         wp.word_count, wp.quality, wp.reader_importance, wp.research_importance,
         wp.tactical_value, wp.backlink_count, wp.risk_category,
         wp.last_updated, wp.date_created, wp.recommended_score,
-        e.tags AS entity_tags, e.clusters AS entity_clusters,
-        similarity(wp.title, $${trigramParamIdx}) AS search_rank
+        e.tags AS entity_tags, e.clusters AS entity_clusters
+        ${searchRankSelect}
       FROM wiki_pages wp
       LEFT JOIN entities e ON wp.id = e.id
-      ${trigramWhere}
-      ORDER BY similarity(wp.title, $${trigramParamIdx}) DESC
-      LIMIT $${trigramParamIdx + 1} OFFSET $${trigramParamIdx + 2}
-    `;
-    const trigramCountQuery = `
-      SELECT count(*) AS total FROM wiki_pages wp ${trigramWhere}
+      ${mainWhere}
+      ORDER BY ${orderBy}
+      LIMIT $${limitParamIdx} OFFSET $${offsetParamIdx}
     `;
 
-    const [trigramRows, trigramCount] = await Promise.all([
-      rawDb.unsafe(trigramQuery, trigramParams as any[]),
-      rawDb.unsafe(trigramCountQuery, [...noSearchFilters.params, search] as any[]),
-    ]);
-    rows = trigramRows;
-    total = parseInt(trigramCount[0]?.total ?? "0", 10);
-  }
+    // Count query (same filters, no pagination)
+    const countQuery = `
+      SELECT count(*) AS total
+      FROM wiki_pages wp
+      ${mainWhere}
+    `;
 
-  // Transform rows to ExploreItem shape
-  const items = rows.map((r: any) => {
-    const entityTags = Array.isArray(r.entity_tags) ? r.entity_tags : [];
-    const pageTags = parseTags(r.page_tags);
-    const tags = entityTags.length > 0 ? entityTags : pageTags;
+    // Faceted counts — cascading:
+    // 1. Cluster counts: search only
+    // 2. Category counts: search + cluster
+    // 3. Entity type counts: search + cluster + category
+    // 4. Risk category counts: search + cluster + category + entity_type in risk types
 
-    const entityClusters = parseClusters(r.entity_clusters);
-    const pageClusters = parseClusters(r.page_clusters);
-    const clusters =
-      pageClusters.length > 0 ? pageClusters : entityClusters;
+    const searchOnly = buildFilterConditions({ search });
+    const searchCluster = buildFilterConditions({ search, cluster });
+    const searchClusterCat = buildFilterConditions({ search, cluster, category });
+    const searchClusterCatRisk = buildFilterConditions({
+      search,
+      cluster,
+      category,
+      entityType: entityType === "risk" ? undefined : entityType,
+    });
 
-    return {
-      id: r.id,
-      numericId: r.numeric_id || r.id,
-      title: r.title,
-      type: deriveType(r.content_format, r.entity_type, r.category),
-      description: r.description || null,
-      tags,
-      clusters,
-      wordCount: r.word_count ?? null,
-      quality: r.quality ?? null,
-      readerImportance: r.reader_importance ?? null,
-      researchImportance: r.research_importance ?? null,
-      tacticalValue: r.tactical_value ?? null,
-      backlinkCount: r.backlink_count ?? null,
-      category: r.category || null,
-      riskCategory: r.risk_category || null,
-      lastUpdated: r.last_updated || null,
-      dateCreated: r.date_created || null,
-      contentFormat: r.content_format || null,
-      recommendedScore: r.recommended_score ?? null,
-    };
+    const clusterCountQuery = `
+      SELECT val, count(*) AS cnt
+      FROM wiki_pages wp, jsonb_array_elements_text(wp.clusters) AS val
+      WHERE ${searchOnly.conditions.join(" AND ")}
+      GROUP BY val ORDER BY cnt DESC
+    `;
+
+    const categoryCountQuery = `
+      SELECT wp.category AS val, count(*) AS cnt
+      FROM wiki_pages wp
+      WHERE ${searchCluster.conditions.join(" AND ")} AND wp.category IS NOT NULL
+      GROUP BY wp.category ORDER BY cnt DESC
+    `;
+
+    const entityTypeCountQuery = `
+      SELECT (${DERIVED_TYPE_EXPR}) AS val, count(*) AS cnt
+      FROM wiki_pages wp
+      WHERE ${searchClusterCat.conditions.join(" AND ")}
+      GROUP BY val ORDER BY cnt DESC
+    `;
+
+    const riskCatCountQuery = `
+      SELECT wp.risk_category AS val, count(*) AS cnt
+      FROM wiki_pages wp
+      WHERE ${searchClusterCatRisk.conditions.join(" AND ")}
+        AND wp.entity_type = 'risk' AND wp.risk_category IS NOT NULL
+      GROUP BY wp.risk_category ORDER BY cnt DESC
+    `;
+
+    // Execute all queries in parallel
+    let [rows, countResult, clusterCounts, categoryCounts, entityTypeCounts, riskCatCounts] =
+      await Promise.all([
+        rawDb.unsafe(dataQuery, dataParams as any[]),
+        rawDb.unsafe(countQuery, main.params as any[]),
+        rawDb.unsafe(clusterCountQuery, searchOnly.params as any[]),
+        rawDb.unsafe(categoryCountQuery, searchCluster.params as any[]),
+        rawDb.unsafe(entityTypeCountQuery, searchClusterCat.params as any[]),
+        rawDb.unsafe(riskCatCountQuery, searchClusterCatRisk.params as any[]),
+      ]);
+
+    let total = parseInt(countResult[0]?.total ?? "0", 10);
+
+    // Trigram fallback: if FTS returned nothing and we have a search term,
+    // fall back to pg_trgm similarity on title for typo tolerance.
+    let searchMode: "fts" | "trigram" | null = search ? "fts" : null;
+    if (search && total === 0) {
+      searchMode = "trigram";
+      // Build trigram fallback query with same non-search filters
+      const noSearchFilters = buildFilterConditions({
+        cluster,
+        category,
+        entityType,
+        riskCategory,
+      });
+      const trigramParamIdx = noSearchFilters.paramIdx;
+      const trigramWhere = `WHERE ${noSearchFilters.conditions.join(" AND ")} AND similarity(wp.title, $${trigramParamIdx}) > ${TRIGRAM_SIMILARITY_THRESHOLD}`;
+      const trigramParams = [...noSearchFilters.params, search, limit, offset];
+
+      const trigramQuery = `
+        SELECT
+          wp.id, wp.numeric_id, wp.title, wp.entity_type, wp.content_format,
+          wp.category, COALESCE(wp.llm_summary, wp.description) AS description,
+          wp.tags AS page_tags, wp.clusters AS page_clusters,
+          wp.word_count, wp.quality, wp.reader_importance, wp.research_importance,
+          wp.tactical_value, wp.backlink_count, wp.risk_category,
+          wp.last_updated, wp.date_created, wp.recommended_score,
+          e.tags AS entity_tags, e.clusters AS entity_clusters,
+          similarity(wp.title, $${trigramParamIdx}) AS search_rank
+        FROM wiki_pages wp
+        LEFT JOIN entities e ON wp.id = e.id
+        ${trigramWhere}
+        ORDER BY similarity(wp.title, $${trigramParamIdx}) DESC
+        LIMIT $${trigramParamIdx + 1} OFFSET $${trigramParamIdx + 2}
+      `;
+      const trigramCountQuery = `
+        SELECT count(*) AS total FROM wiki_pages wp ${trigramWhere}
+      `;
+
+      const [trigramRows, trigramCount] = await Promise.all([
+        rawDb.unsafe(trigramQuery, trigramParams as any[]),
+        rawDb.unsafe(trigramCountQuery, [...noSearchFilters.params, search] as any[]),
+      ]);
+      rows = trigramRows;
+      total = parseInt(trigramCount[0]?.total ?? "0", 10);
+    }
+
+    // Transform rows to ExploreItem shape
+    const items = rows.map((r: any) => {
+      const entityTags = Array.isArray(r.entity_tags) ? r.entity_tags : [];
+      const pageTags = parseTags(r.page_tags);
+      const tags = entityTags.length > 0 ? entityTags : pageTags;
+
+      const entityClusters = parseClusters(r.entity_clusters);
+      const pageClusters = parseClusters(r.page_clusters);
+      const clusters =
+        pageClusters.length > 0 ? pageClusters : entityClusters;
+
+      return {
+        id: r.id,
+        numericId: r.numeric_id || r.id,
+        title: r.title,
+        type: deriveType(r.content_format, r.entity_type, r.category),
+        description: r.description || null,
+        tags,
+        clusters,
+        wordCount: r.word_count ?? null,
+        quality: r.quality ?? null,
+        readerImportance: r.reader_importance ?? null,
+        researchImportance: r.research_importance ?? null,
+        tacticalValue: r.tactical_value ?? null,
+        backlinkCount: r.backlink_count ?? null,
+        category: r.category || null,
+        riskCategory: r.risk_category || null,
+        lastUpdated: r.last_updated || null,
+        dateCreated: r.date_created || null,
+        contentFormat: r.content_format || null,
+        recommendedScore: r.recommended_score ?? null,
+      };
+    });
+
+    const toCountMap = (rows: any[]) =>
+      Object.fromEntries(rows.map((r: any) => [r.val, parseInt(r.cnt, 10)]));
+
+    return c.json({
+      items,
+      total,
+      limit,
+      offset,
+      searchMode,
+      facets: {
+        clusters: toCountMap(clusterCounts),
+        categories: toCountMap(categoryCounts),
+        entityTypes: toCountMap(entityTypeCounts),
+        riskCategories: toCountMap(riskCatCounts),
+      },
+    });
   });
 
-  const toCountMap = (rows: any[]) =>
-    Object.fromEntries(rows.map((r: any) => [r.val, parseInt(r.cnt, 10)]));
-
-  return c.json({
-    items,
-    total,
-    limit,
-    offset,
-    searchMode,
-    facets: {
-      clusters: toCountMap(clusterCounts),
-      categories: toCountMap(categoryCounts),
-      entityTypes: toCountMap(entityTypeCounts),
-      riskCategories: toCountMap(riskCatCounts),
-    },
-  });
-});
+export const exploreRoute = exploreApp;
+export type ExploreRoute = typeof exploreApp;
