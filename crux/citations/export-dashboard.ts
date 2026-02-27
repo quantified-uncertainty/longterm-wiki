@@ -19,7 +19,7 @@ import { writeFileSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
-import { PROJECT_ROOT } from '../lib/knowledge-db.ts';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';

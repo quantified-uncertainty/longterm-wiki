@@ -60,7 +60,7 @@ const CACHE_SOURCES_PDF = join(PROJECT_ROOT, '.cache', 'sources', 'pdf');
  * Priority: local cached text file > wiki-server content > YAML metadata fields.
  */
 export function buildResourceText(resource: Resource & { localFilename?: string }): string {
-  // Try local cached text file (from knowledge.db sync)
+  // Try local cached text file
   if (resource.localFilename) {
     const txtPath = join(CACHE_SOURCES_TEXT, resource.localFilename);
     if (existsSync(txtPath)) {

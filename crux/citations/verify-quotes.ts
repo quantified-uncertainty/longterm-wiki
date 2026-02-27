@@ -11,7 +11,10 @@
 
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { citationContent } from '../lib/knowledge-db.ts';
+import {
+  getCachedContent,
+  setCachedContent,
+} from '../lib/citation-content-cache.ts';
 import { fetchCitationUrl, saveFetchResultToPostgres } from '../lib/citation-archive.ts';
 import {
   getCitationContentByUrl,
@@ -67,16 +70,13 @@ async function verifyQuotesForPage(
         const fetchResult = await fetchCitationUrl(q.url);
         if (fetchResult.fullText) {
           sourceText = fetchResult.fullText;
-          // Update cache (SQLite)
-          citationContent.upsert({
+          // Update in-memory cache
+          setCachedContent(q.url, {
             url: q.url,
-            pageId,
-            footnote: q.footnote,
             fetchedAt: new Date().toISOString(),
             httpStatus: fetchResult.httpStatus,
             contentType: fetchResult.contentType,
             pageTitle: fetchResult.pageTitle,
-            fullHtml: fetchResult.fullHtml,
             fullText: fetchResult.fullText,
             contentLength: fetchResult.contentLength,
           });
@@ -84,25 +84,22 @@ async function verifyQuotesForPage(
           saveFetchResultToPostgres(q.url, fetchResult);
         }
       } else {
-        // Use cached content: SQLite first, then PostgreSQL
-        const cached = citationContent.getByUrl(q.url);
-        if (cached?.full_text) {
-          sourceText = cached.full_text;
+        // Use cached content: memory cache first, then PostgreSQL
+        const cached = getCachedContent(q.url);
+        if (cached?.fullText) {
+          sourceText = cached.fullText;
         } else {
           // Try PostgreSQL (cross-environment cache)
           const pgResult = await getCitationContentByUrl(q.url);
           if (pgResult.ok && pgResult.data.fullText && pgResult.data.fullText.length > 0) {
             sourceText = pgResult.data.fullText;
-            // Backfill SQLite
-            citationContent.upsert({
+            // Store in memory cache for subsequent calls
+            setCachedContent(q.url, {
               url: q.url,
-              pageId,
-              footnote: q.footnote,
               fetchedAt: pgResult.data.fetchedAt,
               httpStatus: pgResult.data.httpStatus,
               contentType: pgResult.data.contentType,
               pageTitle: pgResult.data.pageTitle,
-              fullHtml: null,
               fullText: pgResult.data.fullText,
               contentLength: pgResult.data.contentLength,
             });

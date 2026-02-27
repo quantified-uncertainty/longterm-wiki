@@ -11,8 +11,8 @@
  *
  * Caching strategy:
  *   - In-memory Map for session-level deduplication (cleared on process exit)
+ *   - In-memory citation content cache for cross-request deduplication within a session
  *   - PostgreSQL (wiki-server) citation_content.full_text — durable cross-machine cache
- *   - SQLite citation_content table — fast local fallback
  *
  * Usage:
  *   import { fetchSource, fetchSources, extractRelevantExcerpts } from './source-fetcher.ts';
@@ -27,7 +27,11 @@
  */
 
 import { getApiKey } from './api-keys.ts';
-import { citationContent } from './knowledge-db.ts';
+import {
+  getCachedContent,
+  setCachedContent,
+  type CachedCitationContent,
+} from './citation-content-cache.ts';
 import {
   upsertCitationContent,
   getCitationContentByUrl,
@@ -57,7 +61,7 @@ export interface FetchRequest {
   updateResourceStatus?: boolean;
   /**
    * Maximum age (ms) for cached content before triggering a re-fetch.
-   * Applies to SQLite and PostgreSQL caches. Default: 30 days.
+   * Applies to the PostgreSQL cache. Default: 30 days.
    */
   maxAgeMs?: number;
 }
@@ -487,67 +491,34 @@ async function fetchWithBuiltin(url: string): Promise<BuiltinFetchResult> {
 }
 
 // ---------------------------------------------------------------------------
-// SQLite cross-session cache helpers
+// Content type helpers and in-memory cache bridge
 // ---------------------------------------------------------------------------
 
-/** Default TTL for SQLite cache entries: 7 days (in milliseconds). */
-const DB_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-
-/** Map our internal content type to MIME string for SQLite / PostgreSQL storage. */
+/** Map our internal content type to MIME string for PostgreSQL storage. */
 function contentTypeToMime(ct: FetchedSourceContentType): string {
   if (ct === 'pdf') return 'application/pdf';
   if (ct === 'transcript') return 'text/plain';
   return 'text/html';
 }
 
-/** Map a MIME string from SQLite / PostgreSQL storage to our internal content type. */
+/** Map a MIME string from PostgreSQL storage to our internal content type. */
 function mimeToContentType(mime: string | null): FetchedSourceContentType {
   if (mime === 'application/pdf') return 'pdf';
   if (mime === 'text/plain') return 'transcript';
   return 'html';
 }
 
-/** Try to load a previously fetched result from SQLite. Returns null if expired or missing (#676). */
-function loadFromDb(url: string, maxAgeMs: number = DB_CACHE_TTL_MS): (Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> & { contentType: FetchedSourceContentType }) | null {
-  try {
-    const row = citationContent.getByUrl(url);
-    if (row?.full_text && row.full_text.length > 0) {
-      // Check TTL — skip stale entries so sources are periodically re-fetched.
-      if (row.fetched_at) {
-        const age = Date.now() - new Date(row.fetched_at).getTime();
-        if (age > maxAgeMs) return null;
-      }
-      return {
-        title: row.page_title ?? '',
-        content: row.full_text,
-        fetchedAt: row.fetched_at ?? new Date().toISOString(),
-        contentType: mimeToContentType(row.content_type),
-      };
-    }
-  } catch {
-    // DB unavailable — fine, proceed without cache
-  }
-  return null;
-}
-
-/** Store fetched content in SQLite for cross-session reuse. */
-function saveToDb(url: string, title: string, content: string, httpStatus: number, contentType: FetchedSourceContentType = 'html'): void {
-  try {
-    citationContent.upsert({
-      url,
-      pageId: '_source-fetcher',
-      footnote: 0,
-      fetchedAt: new Date().toISOString(),
-      httpStatus,
-      contentType: contentTypeToMime(contentType),
-      pageTitle: title,
-      fullHtml: null,
-      fullText: content,
-      contentLength: content.length,
-    });
-  } catch {
-    // DB unavailable — fine, proceed without cache
-  }
+/** Store fetched content in the in-memory session cache (replaces SQLite tier). */
+function saveToMemoryCache(url: string, title: string, content: string, httpStatus: number, contentType: FetchedSourceContentType = 'html'): void {
+  setCachedContent(url, {
+    url,
+    fetchedAt: new Date().toISOString(),
+    httpStatus,
+    contentType: contentTypeToMime(contentType),
+    pageTitle: title,
+    fullText: content,
+    contentLength: content.length,
+  });
 }
 
 async function loadFromPostgres(
@@ -642,7 +613,7 @@ function resolveRequest(request: FetchRequest): { url: string; resource: Resourc
 // ---------------------------------------------------------------------------
 
 /**
- * Internal: perform the actual fetch (cache → SQLite → network → store).
+ * Internal: perform the actual fetch (memory cache → PG → network → store).
  * Separated from fetchSource so in-flight deduplication can wrap it.
  */
 async function _fetchSourceCore(
@@ -653,7 +624,6 @@ async function _fetchSourceCore(
 ): Promise<FetchedSource> {
   const { extractMode, query } = request;
   const pgMaxAgeMs = request.maxAgeMs ?? PG_CACHE_TTL_MS;
-  const dbMaxAgeMs = request.maxAgeMs ?? DB_CACHE_TTL_MS;
   const now = new Date().toISOString();
 
   // ---- 1. Unverifiable domains ----
@@ -666,8 +636,35 @@ async function _fetchSourceCore(
     return result;
   }
 
-  // ---- 2. PostgreSQL cross-machine cache (async, durable source of truth) ----
-  // Applies to all URL types including YouTube (transcripts are cached after first fetch).
+  // ---- 2. In-memory content cache (replaces SQLite tier) ----
+  const memoryCached = getCachedContent(url);
+  if (memoryCached?.fullText && memoryCached.fullText.length > 0) {
+    // Check TTL — skip stale entries so sources are periodically re-fetched.
+    const memAge = memoryCached.fetchedAt
+      ? Date.now() - new Date(memoryCached.fetchedAt).getTime()
+      : 0;
+    if (memAge <= pgMaxAgeMs) {
+      const memContentType = mimeToContentType(memoryCached.contentType);
+      const excerpts = extractMode === 'relevant' && query
+        ? extractRelevantExcerpts(memoryCached.fullText, query)
+        : [];
+      const paywall = detectPaywall(memoryCached.fullText);
+      const result: FetchedSource = {
+        url,
+        title: memoryCached.pageTitle || resource?.title || '',
+        fetchedAt: memoryCached.fetchedAt,
+        content: memoryCached.fullText,
+        relevantExcerpts: excerpts,
+        status: paywall ? 'paywall' : 'ok',
+        contentType: memContentType,
+        resource: resourceMeta,
+      };
+      sessionCacheSet(url, result);
+      return result;
+    }
+  }
+
+  // ---- 3. PostgreSQL cross-machine cache (durable source of truth) ----
   const pgRow = await loadFromPostgres(url, pgMaxAgeMs);
   if (pgRow) {
     const excerpts = extractMode === 'relevant' && query
@@ -684,29 +681,8 @@ async function _fetchSourceCore(
       contentType: pgRow.contentType,
       resource: resourceMeta,
     };
-    // Backfill SQLite so subsequent calls are served from the fast local cache
-    saveToDb(url, pgRow.title, pgRow.content, pgRow.httpStatus ?? 200, pgRow.contentType);
-    sessionCacheSet(url, result);
-    return result;
-  }
-
-  // ---- 3. SQLite local cache (fast fallback when PostgreSQL is unavailable) ----
-  const dbRow = loadFromDb(url, dbMaxAgeMs);
-  if (dbRow) {
-    const excerpts = extractMode === 'relevant' && query
-      ? extractRelevantExcerpts(dbRow.content, query)
-      : [];
-    const paywall = detectPaywall(dbRow.content);
-    const result: FetchedSource = {
-      url,
-      title: dbRow.title || resource?.title || '',
-      fetchedAt: dbRow.fetchedAt,
-      content: dbRow.content,
-      relevantExcerpts: excerpts,
-      status: paywall ? 'paywall' : 'ok',
-      contentType: dbRow.contentType,
-      resource: resourceMeta,
-    };
+    // Store in memory cache so subsequent calls within this session are fast
+    saveToMemoryCache(url, pgRow.title, pgRow.content, pgRow.httpStatus ?? 200, pgRow.contentType);
     sessionCacheSet(url, result);
     return result;
   }
@@ -732,7 +708,7 @@ async function _fetchSourceCore(
     };
     // Cache successful transcript fetches for cross-session reuse
     if (content.length > 0) {
-      saveToDb(url, result.title, content, 200, 'transcript');
+      saveToMemoryCache(url, result.title, content, 200, 'transcript');
       saveToPostgres(url, result.title, content, 200, 'transcript');
       sessionCacheSet(url, result);
     }
@@ -801,9 +777,9 @@ async function _fetchSourceCore(
     status = 'ok';
   }
 
-  // ---- 6. Persist to SQLite (fast local cache) and PostgreSQL (durable source of truth) ----
+  // ---- 6. Persist to in-memory cache and PostgreSQL (durable source of truth) ----
   if (content.length > 0) {
-    saveToDb(url, title, content, httpStatus, fetchedContentType);
+    saveToMemoryCache(url, title, content, httpStatus, fetchedContentType);
     saveToPostgres(url, title, content, httpStatus, fetchedContentType);
   }
 
@@ -846,13 +822,13 @@ async function _fetchSourceCore(
  * Caching layers:
  *   1. In-memory session cache (fastest, LRU-evicted at 500 entries)
  *   2. In-flight dedup (concurrent requests for same URL share one fetch)
- *   3. PostgreSQL (wiki-server) — durable cross-machine source of truth (all URL types incl. YouTube)
- *   4. SQLite — fast local fallback (used when PostgreSQL is unavailable)
+ *   3. In-memory citation content cache (avoids redundant PG calls within a session)
+ *   4. PostgreSQL (wiki-server) — durable cross-machine source of truth (all URL types incl. YouTube)
  *   5. YouTube transcript API (if URL is YouTube and no cache hit)
- *   5. Network fetch (Firecrawl preferred, built-in fallback; arXiv rewritten to ar5iv)
+ *   6. Network fetch (Firecrawl preferred, built-in fallback; arXiv rewritten to ar5iv)
  *
- * Writes: successful network fetches are stored in both SQLite (fast local cache)
- * and PostgreSQL (durable, fire-and-forget).
+ * Writes: successful network fetches are stored in memory cache and
+ * PostgreSQL (durable, fire-and-forget).
  */
 export async function fetchSource(request: FetchRequest): Promise<FetchedSource> {
   const { extractMode, query } = request;

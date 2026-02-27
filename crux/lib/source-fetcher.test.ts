@@ -22,13 +22,14 @@ import {
   type FetchedSource,
 } from './source-fetcher.ts';
 
-// Mock the SQLite knowledge-db layer so tests are fully offline and deterministic.
+// Mock the in-memory citation content cache so tests are deterministic.
 // The session-level in-memory cache is still exercised (it lives in source-fetcher.ts).
-vi.mock('./knowledge-db.ts', () => ({
-  citationContent: {
-    getByUrl: vi.fn(() => null),
-    upsert: vi.fn(),
-  },
+vi.mock('./citation-content-cache.ts', () => ({
+  getCachedContent: vi.fn(() => null),
+  setCachedContent: vi.fn(),
+  clearContentCache: vi.fn(),
+  contentCacheSize: vi.fn(() => 0),
+  contentCacheEvictions: vi.fn(() => 0),
 }));
 
 // Mock the wiki-server citations client so PostgreSQL calls don't require a server.
@@ -372,43 +373,43 @@ describe('fetchSource', () => {
     expect(result.content).toBe('');
   });
 
-  it('serves from SQLite cache when session cache is empty', async () => {
-    const { citationContent } = await import('./knowledge-db.ts');
-    const getByUrlMock = citationContent.getByUrl as ReturnType<typeof vi.fn>;
-    const upsertMock = citationContent.upsert as ReturnType<typeof vi.fn>;
+  it('serves from memory cache when session cache is empty', async () => {
+    const { getCachedContent, setCachedContent } = await import('./citation-content-cache.ts');
+    const getCachedMock = getCachedContent as ReturnType<typeof vi.fn>;
+    const setCachedMock = setCachedContent as ReturnType<typeof vi.fn>;
     // Clear accumulated call counts from earlier tests in this describe block
-    getByUrlMock.mockClear();
-    upsertMock.mockClear();
+    getCachedMock.mockClear();
+    setCachedMock.mockClear();
 
-    // Simulate a SQLite cache hit (recent enough to be within TTL)
-    getByUrlMock.mockReturnValueOnce({
-      full_text: 'Cached content about AI safety from SQLite.',
-      page_title: 'Cached Title',
-      fetched_at: new Date().toISOString(),
+    // Simulate a memory cache hit (recent enough to be within TTL)
+    getCachedMock.mockReturnValueOnce({
+      fullText: 'Cached content about AI safety from memory cache.',
+      pageTitle: 'Cached Title',
+      fetchedAt: new Date().toISOString(),
     });
 
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
 
-    const result = await fetchSource({ url: 'https://example.com/sqlite-cached', extractMode: 'full' });
+    const result = await fetchSource({ url: 'https://example.com/memory-cached', extractMode: 'full' });
 
     expect(result.status).toBe('ok');
     expect(result.title).toBe('Cached Title');
-    expect(result.content).toBe('Cached content about AI safety from SQLite.');
+    expect(result.content).toBe('Cached content about AI safety from memory cache.');
     expect(fetchMock).not.toHaveBeenCalled(); // Should not network-fetch
-    expect(upsertMock).not.toHaveBeenCalled(); // Should not re-save
+    expect(setCachedMock).not.toHaveBeenCalled(); // Should not re-save
   });
 
-  it('skips stale SQLite cache entries past TTL (#676)', async () => {
-    const { citationContent } = await import('./knowledge-db.ts');
-    const getByUrlMock = citationContent.getByUrl as ReturnType<typeof vi.fn>;
+  it('skips stale memory cache entries past TTL (#676)', async () => {
+    const { getCachedContent } = await import('./citation-content-cache.ts');
+    const getCachedMock = getCachedContent as ReturnType<typeof vi.fn>;
     clearSessionCache();
 
     // Return a cache entry from 2 months ago — past the 7-day TTL
-    getByUrlMock.mockReturnValueOnce({
-      full_text: 'Stale content from months ago.',
-      page_title: 'Old Title',
-      fetched_at: '2024-01-01T00:00:00.000Z',
+    getCachedMock.mockReturnValueOnce({
+      fullText: 'Stale content from months ago.',
+      pageTitle: 'Old Title',
+      fetchedAt: '2024-01-01T00:00:00.000Z',
     });
 
     // The fetch should happen since cache is stale
@@ -851,11 +852,15 @@ describe('LRU cache eviction', () => {
 describe('PostgreSQL write path', () => {
   beforeEach(async () => {
     clearSessionCache();
-    vi.restoreAllMocks();
+    vi.resetAllMocks();
     // Reset wiki-server mock to default (server unavailable)
     const { upsertCitationContent, getCitationContentByUrl } = await import('./wiki-server/citations.ts');
     (upsertCitationContent as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: true, data: { url: 'https://example.com' } });
     (getCitationContentByUrl as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: false, error: 'unavailable', message: 'no server' });
+    // Reset citation-content-cache mock to default (empty)
+    const { getCachedContent, setCachedContent } = await import('./citation-content-cache.ts');
+    (getCachedContent as ReturnType<typeof vi.fn>).mockReturnValue(null);
+    (setCachedContent as ReturnType<typeof vi.fn>).mockImplementation(() => {});
   });
 
   it('calls upsertCitationContent after a successful network fetch', async () => {
@@ -957,31 +962,31 @@ vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({ status: 404
     expect(result.relevantExcerpts.some(e => e.includes('100 million') || e.includes('alignment'))).toBe(true);
   });
 
-  it('falls back to SQLite when PostgreSQL returns unavailable', async () => {
+  it('falls back to memory cache when PostgreSQL returns unavailable', async () => {
     const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
     const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
     // PostgreSQL says unavailable
     getMock.mockResolvedValueOnce({ ok: false, error: 'unavailable', message: 'no server' });
 
-    const { citationContent } = await import('./knowledge-db.ts');
-    const getByUrlMock = citationContent.getByUrl as ReturnType<typeof vi.fn>;
-    getByUrlMock.mockReturnValueOnce({
-      full_text: 'Content from SQLite fallback.',
-      page_title: 'SQLite Title',
-      fetched_at: new Date().toISOString(),
+    const { getCachedContent } = await import('./citation-content-cache.ts');
+    const getCachedMock = getCachedContent as ReturnType<typeof vi.fn>;
+    getCachedMock.mockReturnValueOnce({
+      fullText: 'Content from memory cache fallback.',
+      pageTitle: 'Cached Title',
+      fetchedAt: new Date().toISOString(),
     });
 
-const fetchMock = vi.fn();
+    const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
 
-    const result = await fetchSource({ url: 'https://example.com/sqlite-fallback', extractMode: 'full' });
+    const result = await fetchSource({ url: 'https://example.com/cache-fallback', extractMode: 'full' });
 
     expect(result.status).toBe('ok');
-    expect(result.content).toBe('Content from SQLite fallback.');
+    expect(result.content).toBe('Content from memory cache fallback.');
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('backfills SQLite when served from PostgreSQL cache', async () => {
+  it('updates memory cache when served from PostgreSQL cache', async () => {
     const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
     const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
     const recentDate = new Date(Date.now() - 3600_000).toISOString(); // 1 hour ago (within TTL)
@@ -1002,20 +1007,23 @@ const fetchMock = vi.fn();
       },
     });
 
-    const { citationContent } = await import('./knowledge-db.ts');
-    const upsertSqliteMock = citationContent.upsert as ReturnType<typeof vi.fn>;
-    upsertSqliteMock.mockClear();
+    const { setCachedContent, getCachedContent } = await import('./citation-content-cache.ts');
+    const setCachedMock = setCachedContent as ReturnType<typeof vi.fn>;
+    const getCachedMock = getCachedContent as ReturnType<typeof vi.fn>;
+    setCachedMock.mockClear();
 
     vi.stubGlobal('fetch', vi.fn());
 
-    await fetchSource({ url: 'https://example.com/backfill-test', extractMode: 'full' });
+    const result = await fetchSource({ url: 'https://example.com/backfill-test', extractMode: 'full' });
 
-    // SQLite should be backfilled from PostgreSQL
-    expect(upsertSqliteMock).toHaveBeenCalledOnce();
-    expect(upsertSqliteMock).toHaveBeenCalledWith(expect.objectContaining({
-      url: 'https://example.com/backfill-test',
-      fullText: 'PostgreSQL content for backfill test.',
-    }));
+    // Memory cache should be updated from PostgreSQL
+    expect(setCachedMock).toHaveBeenCalledOnce();
+    expect(setCachedMock).toHaveBeenCalledWith(
+      'https://example.com/backfill-test',
+      expect.objectContaining({
+        fullText: 'PostgreSQL content for backfill test.',
+      }),
+    );
   });
 
   it('skips stale PostgreSQL cache entries past TTL (#693)', async () => {
@@ -1077,10 +1085,10 @@ const fetchMock = vi.fn();
       },
     });
 
-    // SQLite also stale
-    const { citationContent } = await import('./knowledge-db.ts');
-    const getByUrlMock = citationContent.getByUrl as ReturnType<typeof vi.fn>;
-    getByUrlMock.mockReturnValueOnce(null);
+    // Memory cache also empty
+    const { getCachedContent } = await import('./citation-content-cache.ts');
+    const getCachedMock = getCachedContent as ReturnType<typeof vi.fn>;
+    getCachedMock.mockReturnValueOnce(null);
 
     // Network fetch returns fresh content
     const fetchMock = vi.fn().mockResolvedValueOnce(new Response(
@@ -1151,6 +1159,10 @@ describe('PDF extraction', () => {
     const { getCitationContentByUrl, upsertCitationContent } = await import('./wiki-server/citations.ts');
     (getCitationContentByUrl as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: false, error: 'unavailable', message: 'no server' });
     (upsertCitationContent as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: true, data: { url: 'https://example.com' } });
+    // Reset citation-content-cache mock to default (empty)
+    const { getCachedContent, setCachedContent } = await import('./citation-content-cache.ts');
+    (getCachedContent as ReturnType<typeof vi.fn>).mockReturnValue(null);
+    (setCachedContent as ReturnType<typeof vi.fn>).mockImplementation(() => {});
   });
 
   it('returns ok status and contentType=pdf when pdf-parse extracts text', async () => {
@@ -1280,13 +1292,13 @@ describe('YouTube transcript', () => {
     clearSessionCache();
     vi.restoreAllMocks();
     // Re-setup module-level mocks after restoreAllMocks resets their implementations.
-    // YouTube URLs now go through PG/SQLite cache checks before the transcript API,
+    // YouTube URLs now go through PG/memory cache checks before the transcript API,
     // so these mocks must be present (defaulting to "unavailable") for all YouTube tests.
     const { getCitationContentByUrl, upsertCitationContent } = await import('./wiki-server/citations.ts');
     (getCitationContentByUrl as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: false, error: 'unavailable', message: 'no server' });
     (upsertCitationContent as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: true, data: { url: 'https://example.com' } });
-    const { citationContent } = await import('./knowledge-db.ts');
-    (citationContent.getByUrl as ReturnType<typeof vi.fn>).mockReturnValue(null);
+    const { getCachedContent } = await import('./citation-content-cache.ts');
+    (getCachedContent as ReturnType<typeof vi.fn>).mockReturnValue(null);
   });
 
   it('returns ok status and contentType=transcript for YouTube URLs', async () => {

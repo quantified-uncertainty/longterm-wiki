@@ -5,8 +5,8 @@
  * structured summary for CI/PR use. Reuses the scoring logic from
  * validate-hallucination-risk.ts instead of shelling out and parsing JSON.
  *
- * SQLite note: uses loadAccuracyMap() which gracefully returns null when
- * the knowledge.db file doesn't exist (e.g., in GitHub Actions).
+ * Uses loadAccuracyMap() which gracefully returns null when
+ * accuracy data is unavailable (e.g., in GitHub Actions).
  *
  * Usage (via crux CLI):
  *   pnpm crux auto-update risk-scores <page-id> [page-id...]

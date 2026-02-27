@@ -17,7 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import { citationContent } from './knowledge-db.ts';
+import { setCachedContent } from './citation-content-cache.ts';
 import { upsertCitationContent } from './wiki-server/citations.ts';
 
 // ---------------------------------------------------------------------------
@@ -585,32 +585,24 @@ export async function fetchCitationUrl(url: string): Promise<FetchResult> {
 }
 
 /**
- * Store full fetched content in the SQLite knowledge database.
- * knowledge-db uses lazy initialization, so this is safe to call without
- * triggering DB creation until the upsert actually runs.
+ * Store full fetched content in the in-memory session cache.
+ * This replaces the SQLite tier — PG is the durable store.
  */
 function storeCitationContent(
   url: string,
-  pageId: string,
-  footnote: number,
+  _pageId: string,
+  _footnote: number,
   result: FetchResult,
 ) {
-  try {
-    citationContent.upsert({
-      url,
-      pageId,
-      footnote,
-      fetchedAt: new Date().toISOString(),
-      httpStatus: result.httpStatus,
-      contentType: result.contentType,
-      pageTitle: result.pageTitle,
-      fullHtml: result.fullHtml,
-      fullText: result.fullText,
-      contentLength: result.contentLength,
-    });
-  } catch {
-    // SQLite storage is best-effort — don't fail verification if DB is unavailable
-  }
+  setCachedContent(url, {
+    url,
+    fetchedAt: new Date().toISOString(),
+    httpStatus: result.httpStatus,
+    contentType: result.contentType,
+    pageTitle: result.pageTitle,
+    fullText: result.fullText,
+    contentLength: result.contentLength,
+  });
 }
 
 /**
@@ -640,8 +632,8 @@ export function saveFetchResultToPostgres(url: string, result: FetchResult): voi
 
 /**
  * Verify all citations on a page: fetch each URL, store results.
- * Metadata is saved to YAML (in git). Full content is stored in SQLite (.cache/knowledge.db)
- * and PostgreSQL (wiki-server) for cross-environment access.
+ * Metadata is saved to YAML (in git). Full content is stored in the in-memory
+ * session cache and PostgreSQL (wiki-server) for cross-environment access.
  */
 export async function verifyCitationsForPage(
   pageId: string,
