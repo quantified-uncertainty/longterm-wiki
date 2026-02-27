@@ -4,9 +4,6 @@
  * Scans for [^cr-XXXX] (claim reference) and [^rc-XXXX] (citation reference) markers.
  * Looks up reference data and generates standard [^N] footnote definitions that
  * remark-gfm can process.
- *
- * Backward compatible: existing [^1], [^2] etc. pass through unchanged.
- * TODO(#1162): Remove backward-compat for [^N] after full rollout to DB-driven markers.
  */
 
 // ---------------------------------------------------------------------------
@@ -36,8 +33,7 @@ export interface ReferenceData {
   citations: Map<string, CitationData>;
 }
 
-// TODO(#1162): Remove "legacy" kind after full rollout — all refs will be "claim" or "citation"
-export type RefKind = "claim" | "citation" | "legacy";
+export type RefKind = "claim" | "citation";
 
 export interface RefMapEntry {
   kind: RefKind;
@@ -58,15 +54,6 @@ export interface RefMapEntry {
  * because we never expect those to be authored — we generate them ourselves.
  */
 const DB_REF_USAGE_RE = /\[\^(cr-[a-zA-Z0-9]+|rc-[a-zA-Z0-9]+)\]/g;
-
-/**
- * Regex that matches existing numeric footnote *usage sites*: `[^1]`, `[^23]` etc.
- * Group 1 captures the number.
- *
- * TODO(#1162): Remove this backward-compat path after full rollout — once all
- * pages use [^cr-XXXX] / [^rc-XXXX], there will be no legacy [^N] to detect.
- */
-const LEGACY_FOOTNOTE_USAGE_RE = /\[\^(\d+)\]/g;
 
 /**
  * Build the footnote definition string for a claim reference.
@@ -128,29 +115,7 @@ export function preprocessReferences(
   const referenceMap = new Map<number, RefMapEntry>();
 
   // -----------------------------------------------------------------------
-  // 1. Find the highest existing numeric footnote to avoid collisions
-  // TODO(#1162): Remove this backward-compat path after full rollout.
-  // Once all pages use [^cr-XXXX] / [^rc-XXXX], there will be no legacy
-  // [^N] footnotes and numbering can start from 1 unconditionally.
-  // -----------------------------------------------------------------------
-  let maxExisting = 0;
-  const legacyMatches = mdxContent.matchAll(LEGACY_FOOTNOTE_USAGE_RE);
-  for (const m of legacyMatches) {
-    const n = parseInt(m[1], 10);
-    if (n > maxExisting) maxExisting = n;
-  }
-
-  // Also check for existing definitions like `[^N]:` to cover definitions
-  // that may not have a usage site in the body (edge case).
-  const defLineRe = /^\[\^(\d+)\]:/gm;
-  const defMatches = mdxContent.matchAll(defLineRe);
-  for (const m of defMatches) {
-    const n = parseInt(m[1], 10);
-    if (n > maxExisting) maxExisting = n;
-  }
-
-  // -----------------------------------------------------------------------
-  // 2. Collect all unique DB-driven reference IDs used in the content
+  // 1. Collect all unique DB-driven reference IDs used in the content
   // -----------------------------------------------------------------------
   const usedRefIds = new Set<string>();
   const dbMatches = mdxContent.matchAll(DB_REF_USAGE_RE);
@@ -164,22 +129,22 @@ export function preprocessReferences(
   }
 
   // -----------------------------------------------------------------------
-  // 3. Sort reference IDs for deterministic numbering
+  // 2. Sort reference IDs for deterministic numbering
   // -----------------------------------------------------------------------
   const sortedRefIds = Array.from(usedRefIds).sort();
 
   // -----------------------------------------------------------------------
-  // 4. Assign sequential numbers starting after maxExisting
+  // 3. Assign sequential numbers starting from 1
   // -----------------------------------------------------------------------
   const idToNumber = new Map<string, number>();
-  let nextNumber = maxExisting + 1;
+  let nextNumber = 1;
   for (const refId of sortedRefIds) {
     idToNumber.set(refId, nextNumber);
     nextNumber++;
   }
 
   // -----------------------------------------------------------------------
-  // 5. Replace [^cr-XXXX] / [^rc-XXXX] usage sites with [^N]
+  // 4. Replace [^cr-XXXX] / [^rc-XXXX] usage sites with [^N]
   // -----------------------------------------------------------------------
   let transformed = mdxContent.replace(DB_REF_USAGE_RE, (_match, refId: string) => {
     const num = idToNumber.get(refId);
@@ -187,7 +152,7 @@ export function preprocessReferences(
   });
 
   // -----------------------------------------------------------------------
-  // 6. Build footnote definitions and the referenceMap
+  // 5. Build footnote definitions and the referenceMap
   // -----------------------------------------------------------------------
   const footnoteLines: string[] = [];
 
@@ -224,7 +189,7 @@ export function preprocessReferences(
   }
 
   // -----------------------------------------------------------------------
-  // 7. Append footnote definitions at the end of the content
+  // 6. Append footnote definitions at the end of the content
   // -----------------------------------------------------------------------
   // Ensure there's a blank line before footnote definitions
   const trimmed = transformed.trimEnd();
