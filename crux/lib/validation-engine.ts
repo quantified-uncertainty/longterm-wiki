@@ -413,6 +413,11 @@ export class ValidationEngine {
       const absLine = line + frontmatterEndLine;
       const lineIndex = absLine - 1;
 
+      // Guard against out-of-bounds line references (can happen when
+      // content changes between rule-check and fix-apply, or when a
+      // rule emits a line number past the end of the file).
+      if (lineIndex < 0 || lineIndex >= lines.length) continue;
+
       switch (fix.type) {
         case FixType.INSERT_LINE_BEFORE:
           lines.splice(lineIndex, 0, fix.content ?? '');

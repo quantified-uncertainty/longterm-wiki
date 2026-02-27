@@ -409,7 +409,7 @@ export const claims = pgTable(
     // --- Phase 2 fields (migration 0029) ---
     claimMode: text("claim_mode").notNull().default("endorsed"), // 'endorsed' | 'attributed'
     attributedTo: text("attributed_to"), // entity_id of person/org making the claim
-    asOf: text("as_of"),                // temporal index: YYYY-MM or YYYY-MM-DD
+asOf: text("as_of"),                // temporal index: YYYY-MM or YYYY-MM-DD
     measure: text("measure"),           // measure ID linking to facts taxonomy
     valueNumeric: doublePrecision("value_numeric"), // central numeric value (machine-readable)
     valueLow: doublePrecision("value_low"),        // lower bound for range values
@@ -431,6 +431,8 @@ export const claims = pgTable(
     qualifiers: jsonb("qualifiers").$type<Record<string, string>>(), // additional context (e.g. {"round": "Series B"})
     // --- Reasoning traces (migration 0034) ---
     inferenceType: text("inference_type"),  // direct_assertion | derived | aggregated | interpreted | editorial
+    // --- Pinned claims (migration 0034) ---
+    isPinned: boolean("is_pinned").notNull().default(false), // canonical value for <F> components
     // --- Timestamps ---
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

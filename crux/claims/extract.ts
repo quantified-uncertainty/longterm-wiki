@@ -42,6 +42,7 @@ import type { ClaimTypeValue } from '../lib/claim-utils.ts';
 import { getVariantPrompt, VARIANT_NAMES, type VariantName, type PageType } from './experiment-variants.ts';
 import { validateClaimBatch } from './validate-claim.ts';
 import { parseFootnotes, type ParsedFootnote } from '../lib/footnote-parser.ts';
+import { loadEntitySlugs, buildNormalizationMap, normalizeRelatedEntities } from '../lib/normalize-entity-slugs.ts';
 
 // ---------------------------------------------------------------------------
 // Footnote resolution — resolve footnoteRefs to source URLs
@@ -443,6 +444,10 @@ async function main() {
     }
   }
 
+  // Load entity normalization data for relatedEntities
+  const entitySlugs = loadEntitySlugs(process.cwd());
+  const normMap = buildNormalizationMap(process.cwd());
+
   // Find and read page
   const filePath = findPageFile(pageId);
   if (!filePath) {
@@ -636,7 +641,7 @@ async function main() {
       // Enhanced fields (migration 0028)
       claimCategory: claimTypeToCategory(claim.claimType),
       relatedEntities: claim.relatedEntities && claim.relatedEntities.length > 0
-        ? claim.relatedEntities
+        ? normalizeRelatedEntities(claim.relatedEntities, entitySlugs, normMap)
         : null,
       section: claim.section,
       footnoteRefs: claim.footnoteRefs.length > 0 ? claim.footnoteRefs.join(',') : null,

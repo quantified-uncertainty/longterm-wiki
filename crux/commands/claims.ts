@@ -128,6 +128,12 @@ const SCRIPTS = {
     passthrough: ['json'],
     positional: true,
   },
+  pin: {
+    script: 'claims/pin.ts',
+    description: 'Pin/unpin a structured claim as canonical value, or list pinned claims',
+    passthrough: ['unpin', 'list'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'status');
@@ -159,6 +165,8 @@ Options:
   --entity-id=E         Filter to single entity (backfill-related-entities)
   --batch-size=N        Process N pages at a time (migrate-footnotes-batch; default: all)
   --path=P              Filter pages by relative path prefix (migrate-footnotes-batch)
+  --unpin               Unpin a claim (pin command)
+  --list=<entity-id>    List pinned claims for an entity (pin command)
 
 Examples:
   crux claims pipeline kalshi                         Run full extract → link → verify pipeline
@@ -217,6 +225,11 @@ Workflow:
   2. crux claims cleanup --apply                     Execute cleanup
   3. crux claims cleanup --entity=anthropic           Target a single entity
   4. crux claims cleanup --entity=anthropic --apply   Apply cleanup for one entity
+
+  Pinned claims (canonical structured values):
+  1. crux claims pin 42                           Pin claim #42 as canonical
+  2. crux claims pin 42 --unpin                    Unpin claim #42
+  3. crux claims pin --list=anthropic              List pinned claims for an entity
 
   Footnote migration (DB-driven references):
   1. crux claims migrate-footnotes <page-id>          Dry-run: show what would change

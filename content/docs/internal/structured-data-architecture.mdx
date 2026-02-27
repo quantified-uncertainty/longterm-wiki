@@ -64,15 +64,17 @@ Structured claim fields (`property`, `structuredValue`, `valueUnit`, `valueDate`
 - Structured Claims Table component on entity pages showing property/value/date/qualifiers/source
 - Claims table badge shows human-readable formatted values instead of raw numbers
 
-### Phase C: Pinned claims (future)
+### Phase C: Pinned claims (done)
 
-Add an `isPinned` boolean column to the claims table. A pinned claim is the canonical value for display in `\<F\>` components.
+Added `isPinned` boolean column to the claims table (migration 0034). A pinned claim is the canonical value for display in `\<F\>` components.
 
 Key semantics:
-- Only one claim can be pinned per entity + property + valueDate triple
+- Only one claim should be pinned per entity + property + valueDate triple
 - Pinning is a manual curation action, not automatic
 - A pinned claim can still be unverified \- pinning means "this is the value we display", not "this is confirmed true"
-- CLI command: `crux claims pin \<claim-id\>`
+- CLI: `crux claims pin \<claim-id\>`, `crux claims pin \<id\> --unpin`, `crux claims pin --list=\<entity\>`
+- API: `GET /api/claims/pinned/:entityId` returns pinned claims for an entity
+- `PATCH /api/claims/:id` accepts `isPinned` boolean
 
 ### Phase D: F component reads from claims (future)
 
@@ -102,13 +104,13 @@ Once all facts are migrated and the `\<F\>` component reads from claims:
 - Remove `data/fact-measures.yaml` (merged into claims property config)
 - Remove `getFact()` / `getFactWithFallback()` from the data layer
 
-## Unified Taxonomy
+## Unified Taxonomy (done)
 
-The current split between `fact-measures.yaml` (35 measures) and `claims-properties.yaml` (28 properties) should eventually merge into a single `data/measures.yaml` that serves both systems.
+The `data/fact-measures.yaml` file is now the single source of truth for both the facts system and structured claims. It contains:
+- **Measures** (36 entries): numeric and non-numeric property definitions with display config, direction, relatedMeasures, applicableTo
+- **Property aliases**: a `propertyAliases` map at the bottom that maps snake\_case claim property IDs (e.g., `funding_round_amount`) to kebab-case measure IDs (e.g., `funding-round`)
 
-The merged taxonomy would keep:
-- **From fact-measures**: display config (divisor, prefix, suffix), direction (higher/lower), relatedMeasures, applicableTo
-- **From claims-properties**: non-numeric types (string, entity, date), category grouping
+The `data/claims-properties.yaml` file still exists for backward compatibility with the extraction prompt, but the unified taxonomy in `fact-measures.yaml` is canonical. New measures/properties should be added there.
 
 ## Current Status
 
@@ -117,7 +119,9 @@ The merged taxonomy would keep:
 | Structured claim extraction | Working |
 | Shared value formatting | Working |
 | Structured claims table UI | Working |
-| Pinned claims | Not started |
+| Auto-normalize during extraction | Working |
+| Graph navigation on entity pages | Working |
+| Pinned claims (DB + API + CLI) | Working |
+| Unified taxonomy | Working |
 | F component migration | Not started |
 | Facts YAML migration | Not started |
-| Taxonomy merge | Not started |

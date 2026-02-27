@@ -14,16 +14,18 @@ interface Props {
   compact?: boolean;
 }
 
-/** Map measure IDs to display units for formatting. */
+/**
+ * Map measure/property IDs to display units for formatting.
+ * Source of truth: data/fact-measures.yaml (measures + propertyAliases).
+ * This map includes both kebab-case measure IDs and snake_case claim property IDs.
+ */
 function resolveUnit(measure?: string | null, unit?: string | null): string | null {
   if (unit) return unit;
   if (!measure) return null;
-  // Common measure-to-unit mappings based on claims-properties.yaml and fact-measures.yaml
   const unitMap: Record<string, string> = {
+    // Financial (measures, kebab-case)
     revenue: "USD",
     valuation: "USD",
-    funding_round_amount: "USD",
-    funding_total: "USD",
     "funding-round": "USD",
     "total-funding": "USD",
     "cash-burn": "USD",
@@ -33,16 +35,22 @@ function resolveUnit(measure?: string | null, unit?: string | null): string | nu
     "net-worth": "USD",
     "equity-value": "USD",
     "philanthropic-capital": "USD",
+    "market-volume": "USD",
+    // Financial (claim property aliases, snake_case)
+    funding_round_amount: "USD",
+    funding_total: "USD",
     market_volume: "USD",
-    employee_count: "count",
+    // Organizational — count
     headcount: "count",
     "customer-count": "count",
     "user-count": "count",
-    parameter_count: "count",
+    employee_count: "count",
+    // Technical — count
     "model-parameters": "count",
     "safety-researcher-count": "count",
     "interpretability-team-size": "count",
-    market_share: "percent",
+    parameter_count: "count",
+    // Percentages
     "market-share": "percent",
     "gross-margin": "percent",
     "safety-staffing-ratio": "percent",
@@ -51,7 +59,10 @@ function resolveUnit(measure?: string | null, unit?: string | null): string | nu
     "retention-rate": "percent",
     "compute-cost": "percent",
     "benchmark-score": "percent",
+    market_share: "percent",
     benchmark_score: "percent",
+    // Technical
+    "context-window": "tokens",
     context_window: "tokens",
   };
   return unitMap[measure] ?? null;
