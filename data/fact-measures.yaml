@@ -1,15 +1,20 @@
-# Fact Measure Definitions
+# Measure & Property Definitions
 #
-# Measures are first-class concepts in the knowledge graph — the "verbs/nouns"
-# that describe what is being measured. Each measure has rich metadata for
-# chart generation, cross-entity comparison, and knowledge graph queries.
+# This is the unified taxonomy for structured data across the wiki.
+# Used by both the facts system (<F> components) and structured claims.
 #
-# Every fact observation is a (Subject, Measure, Time, Value) tuple:
+# Numeric measures are (Subject, Measure, Time, Value) tuples:
 #   (Anthropic, valuation, 2026-02, $380B)
 #   (OpenAI,    valuation, 2025,    $500B)
 #
+# Non-numeric properties (string, entity, date) are also included for
+# structured claim extraction and entity attribute tracking.
+#
 # Naming: We use "measure" (not "metric") to avoid collision with the existing
 # wiki entity type "metric" which represents measurement domain pages.
+#
+# Property mapping: Structured claims use snake_case property IDs that map
+# to measures here. See `propertyAliases` at the end of this file.
 
 measures:
   # === Financial ===
@@ -277,3 +282,115 @@ measures:
       suffix: "B"
     relatedMeasures: [net-worth, equity-value]
     applicableTo: [organization, person]
+
+  # === Technical / AI-specific ===
+  context-window:
+    label: "Context Window"
+    unit: tokens
+    category: performance
+    direction: higher
+    description: "Maximum context window size in tokens"
+    applicableTo: [organization]
+
+  # === Dates / Milestones ===
+  founded-date:
+    label: "Founded Date"
+    unit: date
+    category: milestone
+    description: "Date the entity was founded"
+    applicableTo: [organization]
+
+  launched-date:
+    label: "Launched Date"
+    unit: date
+    category: milestone
+    description: "Date a product or initiative was launched"
+    applicableTo: [organization]
+
+  shutdown-date:
+    label: "Shutdown Date"
+    unit: date
+    category: milestone
+    description: "Date an entity or product was shut down"
+    applicableTo: [organization]
+
+  # === Organizational (non-numeric) ===
+  headquarters:
+    label: "Headquarters"
+    unit: string
+    category: organizational
+    description: "Location of headquarters"
+    applicableTo: [organization]
+
+  legal-structure:
+    label: "Legal Structure"
+    unit: string
+    category: organizational
+    description: "Corporate structure (PBC, C-corp, nonprofit, etc.)"
+    applicableTo: [organization]
+
+  # === Entity Relations ===
+  founder:
+    label: "Founder"
+    unit: entity
+    category: relation
+    description: "Person who founded the entity"
+    applicableTo: [organization]
+
+  ceo:
+    label: "CEO"
+    unit: entity
+    category: relation
+    description: "Current chief executive officer"
+    applicableTo: [organization]
+
+  parent-org:
+    label: "Parent Organization"
+    unit: entity
+    category: relation
+    description: "Parent or owning organization"
+    applicableTo: [organization]
+
+  acquired-by:
+    label: "Acquired By"
+    unit: entity
+    category: relation
+    description: "Entity that acquired this one"
+    applicableTo: [organization]
+
+  # === Market ===
+  market-volume:
+    label: "Market/Transaction Volume"
+    unit: USD
+    category: financial
+    direction: higher
+    description: "Trading or transaction volume over a period"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    applicableTo: [organization]
+
+# Mapping from structured claims property IDs (snake_case) to measure IDs (kebab-case).
+# Used by the enrichment pipeline and display layer to unify both naming conventions.
+propertyAliases:
+  funding_round_amount: funding-round
+  funding_total: total-funding
+  valuation: valuation
+  revenue: revenue
+  market_volume: market-volume
+  employee_count: headcount
+  market_share: market-share
+  headquarters: headquarters
+  legal_structure: legal-structure
+  founded_date: founded-date
+  launched_date: launched-date
+  announced_date: launched-date  # maps to closest equivalent
+  shutdown_date: shutdown-date
+  founder: founder
+  ceo: ceo
+  parent_org: parent-org
+  acquired_by: acquired-by
+  parameter_count: model-parameters
+  benchmark_score: benchmark-score
+  context_window: context-window

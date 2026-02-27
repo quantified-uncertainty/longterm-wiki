@@ -821,6 +821,8 @@ export interface ClaimRow {
   valueUnit: string | null;
   valueDate: string | null;
   qualifiers: Record<string, string> | null;
+  // Pinned claims (migration 0034)
+  isPinned: boolean;
   sources: ClaimSourceRow[];      // populated when ?includeSources=true
   createdAt: string;
   updatedAt: string;
