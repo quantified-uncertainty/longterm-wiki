@@ -5,13 +5,18 @@
  * Also computes backlinks, tag index, and statistics.
  * Run this before building the site.
  *
- * Usage: node scripts/build-data.mjs [--scope=content]
+ * Usage: node scripts/build-data.mjs [options]
  *
  * Flags:
  *   --scope=content  Skip expensive non-content steps (git dates, block IR,
  *                    redundancy, server sync, LLM files). Produces a valid
  *                    database.json for local dev but omits dashboard data.
- */
+ *   --quick          Alias for --scope=content
+ *   --phase=<name>   Run only a specific phase (for debugging). Valid names:
+ *                    yaml, ids, mdx, derived, facts, pages, links, blocks,
+ *                    risk, resources, footnotes, refs, redundancy, graph,
+ *                    history, coverage, rankings, schedule, transform, write
+*/
 
 import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
 import { spawnSync } from 'child_process';
@@ -19,7 +24,6 @@ import { join, basename, relative } from 'path';
 import { parse } from 'yaml';
 import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../../crux/lib/metrics-extractor.ts';
 import { computeHallucinationRisk as computeCanonicalRisk, resolveEntityType } from '../../../crux/lib/hallucination-risk.ts';
-import { recordRiskSnapshots } from './lib/risk-client.mjs';
 import { syncPageLinks } from './lib/links-client.mjs';
 import { computeRedundancy } from './lib/redundancy.mjs';
 import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
@@ -27,63 +31,24 @@ import { generateLLMFiles } from './generate-llm-files.mjs';
 import { buildUrlToResourceMap, findUnconvertedLinks, countConvertedLinks } from './lib/unconverted-links.mjs';
 import { generateMdxFromYaml } from './lib/mdx-generator.mjs';
 import { computeStats } from './lib/statistics.mjs';
-import { parseNumericValue, resolveComputedFacts } from './lib/computed-facts.mjs';
 import { transformEntities } from './lib/entity-transform.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 import { fetchBranchToPrMap, enrichWithPrNumbers, fetchPrItems } from './lib/github-pr-lookup.mjs';
 import { computePageCoverage } from '../../../crux/lib/page-coverage.ts';
+import { parseFootnoteSources } from '../../../crux/lib/footnote-parser.ts';
+import { buildIdRegistry, extendIdRegistryWithPages } from './lib/id-registry.mjs';
+import { computePageRankings, computeRecommendedScores, buildUpdateSchedule } from './lib/page-rankings.mjs';
+import { loadFacts, loadFactMeasures, normalizeFactValues, enrichFactSources, buildFactTimeseries } from './lib/facts-loader.mjs';
+import { computeAllHallucinationRisks, syncRiskSnapshots } from './lib/hallucination-risk-build.mjs';
 
 // ---------------------------------------------------------------------------
-// Structured value formatting — converts numeric fact values to display strings
+// Scope flag — `--scope=content` or `--quick` skips expensive non-content steps
 // ---------------------------------------------------------------------------
-
-/** Format a single number into a human-readable string using measure context */
-function formatFactNumber(n, measure) {
-  if (measure?.unit === 'USD') {
-    if (Math.abs(n) >= 1e12) return `$${cleanDecimal(n / 1e12)} trillion`;
-    if (Math.abs(n) >= 1e9) return `$${cleanDecimal(n / 1e9)} billion`;
-    if (Math.abs(n) >= 1e6) return `$${cleanDecimal(n / 1e6)} million`;
-    return `$${n.toLocaleString('en-US')}`;
-  }
-  if (measure?.unit === 'percent') return `${cleanDecimal(n)}%`;
-  if (measure?.unit === 'count') {
-    if (Math.abs(n) >= 1e9) return `${cleanDecimal(n / 1e9)} billion`;
-    if (Math.abs(n) >= 1e6) return `${cleanDecimal(n / 1e6)} million`;
-    return n.toLocaleString('en-US');
-  }
-  // Fallback for other units
-  if (Math.abs(n) >= 1e9) return `${cleanDecimal(n / 1e9)} billion`;
-  if (Math.abs(n) >= 1e6) return `${cleanDecimal(n / 1e6)} million`;
-  return n.toLocaleString('en-US');
-}
-
-/** Format a [low, high] range into a human-readable string */
-function formatFactRange(lo, hi, measure) {
-  if (measure?.unit === 'percent') return `${cleanDecimal(lo)}-${cleanDecimal(hi)}%`;
-  if (measure?.unit === 'USD') {
-    // Same scale: "$20-26 billion"
-    if (lo >= 1e9 && hi >= 1e9) return `$${cleanDecimal(lo / 1e9)}-${cleanDecimal(hi / 1e9)} billion`;
-    if (lo >= 1e6 && hi >= 1e6) return `$${cleanDecimal(lo / 1e6)}-${cleanDecimal(hi / 1e6)} million`;
-    return `$${lo.toLocaleString('en-US')}-$${hi.toLocaleString('en-US')}`;
-  }
-  if (measure?.unit === 'count') {
-    if (lo >= 1e6 && hi >= 1e6) return `${cleanDecimal(lo / 1e6)}-${cleanDecimal(hi / 1e6)} million`;
-    return `${lo.toLocaleString('en-US')}-${hi.toLocaleString('en-US')}`;
-  }
-  return `${lo.toLocaleString('en-US')}-${hi.toLocaleString('en-US')}`;
-}
-
-/** Remove trailing .0 from formatted numbers: 380.0 → "380", 2.5 → "2.5" */
-function cleanDecimal(n) {
-  return n % 1 === 0 ? String(n) : n.toFixed(1);
-}
-
-// ---------------------------------------------------------------------------
-// Scope flag — `--scope=content` skips expensive non-content steps
-// ---------------------------------------------------------------------------
-const SCOPE = process.argv.find(a => a.startsWith('--scope='))?.split('=')[1] || 'full';
+const hasQuickFlag = process.argv.includes('--quick');
+const SCOPE = hasQuickFlag ? 'content' : (process.argv.find(a => a.startsWith('--scope='))?.split('=')[1] || 'full');
 const CONTENT_ONLY = SCOPE === 'content';
+
 if (CONTENT_ONLY) {
   console.log('⚡ Running in content-only scope (skipping git dates, block IR, redundancy, server sync, LLM files)\n');
 }
@@ -1107,62 +1072,9 @@ async function main() {
 
   // =========================================================================
   // ID REGISTRY — derive from numericId fields in source files (YAML + MDX)
-  //
-  // IDs are stored in source files (YAML `numericId:` or MDX frontmatter).
-  // The assign-ids.mjs pre-build script assigns new IDs via the wiki server
-  // and writes them back to source files. This section only READS existing
-  // IDs and detects conflicts.
   // =========================================================================
-  const slugToNumericId = {};
-  const numericIdToSlug = {};
-  const conflicts = [];
-
-  // Collect numericIds from all entities (YAML + frontmatter)
-  for (const entity of entities) {
-    if (entity.numericId) {
-      // Detect conflicts: two different entities claiming the same numericId
-      if (numericIdToSlug[entity.numericId] && numericIdToSlug[entity.numericId] !== entity.id) {
-        conflicts.push(`${entity.numericId} claimed by both "${numericIdToSlug[entity.numericId]}" and "${entity.id}"`);
-      }
-      numericIdToSlug[entity.numericId] = entity.id;
-      slugToNumericId[entity.id] = entity.numericId;
-    }
-  }
-
-  if (conflicts.length > 0) {
-    console.error('\n  ERROR: numericId conflicts detected:');
-    for (const c of conflicts) console.error(`    ${c}`);
-    process.exit(1);
-  }
-
-  // Assign IDs in-memory to entities that don't have one yet.
-  // NOTE: In production, assign-ids.mjs runs first and all entities should
-  // already have IDs from the server. This fallback keeps the build working
-  // for local dev when assign-ids.mjs wasn't run.
-  let nextId = 1;
-  for (const numId of Object.keys(numericIdToSlug)) {
-    const n = parseInt(numId.slice(1));
-    if (n >= nextId) nextId = n + 1;
-  }
-  let newAssignments = 0;
-  for (const entity of entities) {
-    if (!entity.numericId) {
-      const numId = `E${nextId}`;
-      entity.numericId = numId;
-      numericIdToSlug[numId] = entity.id;
-      slugToNumericId[entity.id] = numId;
-      nextId++;
-      newAssignments++;
-    }
-  }
-
-  if (newAssignments > 0) {
-    console.log(`  idRegistry: assigned ${newAssignments} new IDs in-memory (run \`node scripts/assign-ids.mjs\` to persist)`);
-  } else {
-    console.log(`  idRegistry: all ${Object.keys(numericIdToSlug).length} entities have IDs`);
-  }
-
-  // Build lookup maps for database output
+  const { slugToNumericId, numericIdToSlug, nextId: nextIdInit } = buildIdRegistry(entities);
+  let nextId = nextIdInit;
   const idRegistryOutput = {
     byNumericId: { ...numericIdToSlug },
     bySlug: { ...slugToNumericId },
@@ -1204,230 +1116,16 @@ async function main() {
   database.pathRegistry = pathRegistry;
   console.log(`  pathRegistry: ${Object.keys(pathRegistry).length} paths mapped`);
 
-  // Load canonical facts from src/data/facts/*.yaml
-  const factsDir = join(DATA_DIR, 'facts');
-  const facts = {};
-  if (existsSync(factsDir)) {
-    const factFiles = readdirSync(factsDir).filter(f => f.endsWith('.yaml'));
-    let totalFacts = 0;
-    for (const file of factFiles) {
-      const filepath = join(factsDir, file);
-      const content = readFileSync(filepath, 'utf-8');
-      let parsed;
-      try {
-        parsed = parse(content);
-      } catch (e) {
-        console.error(`Failed to parse YAML ${filepath}: ${e.message}`);
-        process.exitCode = 1;
-        continue;
-      }
-      if (parsed && parsed.entity && parsed.facts) {
-        for (const [factId, factData] of Object.entries(parsed.facts)) {
-          const key = `${parsed.entity}.${factId}`;
-          facts[key] = { ...factData, entity: parsed.entity, factId };
-          totalFacts++;
-        }
-      }
-    }
-
-    console.log(`  facts: ${totalFacts} canonical facts from ${factFiles.length} files`);
-  }
-
-  // Load fact measure definitions from data/fact-measures.yaml (needed for value normalization)
-  const factMeasuresPath = join(DATA_DIR, 'fact-measures.yaml');
-  const factMeasures = {};
-  if (existsSync(factMeasuresPath)) {
-    const measuresContent = readFileSync(factMeasuresPath, 'utf-8');
-    let measuresParsed;
-    try {
-      measuresParsed = parse(measuresContent);
-    } catch (e) {
-      console.error(`Failed to parse YAML ${factMeasuresPath}: ${e.message}`);
-      process.exitCode = 1;
-    }
-    if (measuresParsed && measuresParsed.measures) {
-      for (const [measureId, measureDef] of Object.entries(measuresParsed.measures)) {
-        factMeasures[measureId] = { id: measureId, ...measureDef };
-      }
-    }
-    console.log(`  factMeasures: ${Object.keys(factMeasures).length} measure definitions`);
-  }
+  // Load and process canonical facts (extracted to facts-loader.mjs)
+  const facts = loadFacts(DATA_DIR);
+  const factMeasures = loadFactMeasures(DATA_DIR);
   database.factMeasures = factMeasures;
-
-  // Validate measure references and count assignments.
-  // Note: measure auto-inference from fact IDs is no longer supported — facts use hash IDs
-  // and must specify their measure explicitly via `measure:` in YAML.
-  const knownMeasureIds = new Set(Object.keys(factMeasures));
-  let measuredCount = 0;
-  for (const [key, fact] of Object.entries(facts)) {
-    if (fact.measure) {
-      measuredCount++;
-      if (!knownMeasureIds.has(fact.measure)) {
-        console.warn(`  WARNING: fact ${key} references unknown measure "${fact.measure}"`);
-      }
-    }
-  }
-  if (measuredCount > 0) {
-    console.log(`  measures: ${measuredCount} facts have explicit measure assignments`);
-  }
-
-  // Normalize structured values → flat format (value string, numeric, low, high)
-  // Structured values: number, [low, high], { min: N }
-  // After normalization, fact.value is always a display string and numeric/low/high are numbers.
-  let structuredCount = 0;
-  for (const [key, fact] of Object.entries(facts)) {
-    const val = fact.value;
-    const measure = fact.measure ? factMeasures[fact.measure] : null;
-
-    if (typeof val === 'number') {
-      // Precise numeric value — derive display string from measure
-      if (measure?.unit === 'percent') {
-        fact.numeric = val / 100;  // 40 → 0.4 for computation
-      } else {
-        fact.numeric = val;
-      }
-      fact.value = formatFactNumber(val, measure);
-      structuredCount++;
-
-    } else if (Array.isArray(val) && val.length === 2 && typeof val[0] === 'number') {
-      // Range [low, high]
-      const [lo, hi] = val;
-      if (measure?.unit === 'percent') {
-        fact.low = lo / 100;
-        fact.high = hi / 100;
-        fact.numeric = (lo + hi) / 200;
-      } else {
-        fact.low = lo;
-        fact.high = hi;
-        fact.numeric = (lo + hi) / 2;
-      }
-      fact.value = formatFactRange(lo, hi, measure);
-      structuredCount++;
-
-    } else if (val && typeof val === 'object' && !Array.isArray(val) && 'min' in val) {
-      // Lower bound { min: N }
-      const n = val.min;
-      if (measure?.unit === 'percent') {
-        fact.numeric = n / 100;
-      } else {
-        fact.numeric = n;
-      }
-      fact.value = formatFactNumber(n, measure) + '+';
-      structuredCount++;
-
-    } else if (typeof val === 'string') {
-      // Legacy string value — auto-parse numeric where possible
-      if (fact.numeric == null && !fact.compute) {
-        const parsed = parseNumericValue(val);
-        if (parsed !== null) {
-          fact.numeric = parsed;
-        }
-      }
-    }
-  }
-  if (structuredCount > 0) {
-    console.log(`  values: normalized ${structuredCount} structured values`);
-  }
-
-  // Evaluate computed facts (topological order) — must happen after value normalization
-  {
-    const computedCount = resolveComputedFacts(facts);
-    if (computedCount > 0) {
-      console.log(`  computed: ${computedCount} facts resolved`);
-    }
-  }
+  normalizeFactValues(facts, factMeasures);
+  enrichFactSources(facts, database.resources || [], database.publications || []);
   database.facts = facts;
 
-  // Resolve sourceResource IDs → enrich facts with resource metadata
-  // Also auto-match fact source URLs to known resources
-  {
-    const allResources = database.resources || [];
-    const resourceById = new Map(allResources.map(r => [r.id, r]));
-    const publicationById = new Map((database.publications || []).map(p => [p.id, p]));
-
-    // Build URL → resource ID map for auto-matching
-    const sourceUrlToResourceId = new Map();
-    for (const r of allResources) {
-      if (!r.url) continue;
-      sourceUrlToResourceId.set(r.url, r.id);
-      // Also try without trailing slash
-      sourceUrlToResourceId.set(r.url.replace(/\/$/, ''), r.id);
-      if (!r.url.endsWith('/')) sourceUrlToResourceId.set(r.url + '/', r.id);
-    }
-
-    let resolvedCount = 0;
-    let autoMatchedCount = 0;
-
-    for (const [key, fact] of Object.entries(facts)) {
-      // Auto-match: if fact has a source URL but no sourceResource, try to find a matching resource
-      if (fact.source && !fact.sourceResource) {
-        const matchedId = sourceUrlToResourceId.get(fact.source) || sourceUrlToResourceId.get(fact.source.replace(/\/$/, ''));
-        if (matchedId) {
-          fact.sourceResource = matchedId;
-          autoMatchedCount++;
-        }
-      }
-
-      // Resolve: if fact has sourceResource, enrich with resource metadata
-      if (fact.sourceResource) {
-        const resource = resourceById.get(fact.sourceResource);
-        if (resource) {
-          fact.sourceTitle = resource.title;
-          if (resource.publication_id) {
-            const pub = publicationById.get(resource.publication_id);
-            if (pub) {
-              fact.sourcePublication = pub.name;
-              fact.sourceCredibility = pub.credibility;
-            }
-          }
-          if (resource.credibility_override != null) {
-            fact.sourceCredibility = resource.credibility_override;
-          }
-          // Backfill source URL from resource if fact doesn't have one
-          if (!fact.source && resource.url) {
-            fact.source = resource.url;
-          }
-          resolvedCount++;
-        } else {
-          console.warn(`  ⚠ fact ${key}: sourceResource "${fact.sourceResource}" not found in resources`);
-        }
-      }
-    }
-
-    if (resolvedCount > 0 || autoMatchedCount > 0) {
-      console.log(`  sourceResource: ${resolvedCount} resolved, ${autoMatchedCount} auto-matched from URLs`);
-    }
-  }
-
-  // Build timeseries index: group facts by measure, sorted chronologically
-  // Facts with a `subject` override are excluded from the parent entity's timeseries
-  // (they represent benchmarks/comparisons, not entity-owned data)
-  const factTimeseries = {};
-  for (const [key, fact] of Object.entries(facts)) {
-    if (!fact.measure || !fact.asOf) continue;
-    if (fact.subject) continue; // Skip benchmark/comparison facts
-    if (!factTimeseries[fact.measure]) {
-      factTimeseries[fact.measure] = [];
-    }
-    factTimeseries[fact.measure].push({
-      entity: fact.entity,
-      factId: fact.factId,
-      measure: fact.measure,
-      asOf: fact.asOf,
-      value: fact.value,
-      numeric: fact.numeric,
-      low: fact.low,
-      high: fact.high,
-      note: fact.note,
-      source: fact.source,
-    });
-  }
-  // Sort each timeseries chronologically (oldest first)
-  for (const series of Object.values(factTimeseries)) {
-    series.sort((a, b) => a.asOf.localeCompare(b.asOf));
-  }
-  const timeseriesCount = Object.values(factTimeseries).reduce((sum, s) => sum + s.length, 0);
-  console.log(`  factTimeseries: ${timeseriesCount} observations across ${Object.keys(factTimeseries).length} measures`);
+  // Build timeseries index
+  const factTimeseries = buildFactTimeseries(facts);
   database.factTimeseries = factTimeseries;
 
   // Build URL → resource map for unconverted link detection
@@ -1563,74 +1261,17 @@ async function main() {
 
   // =========================================================================
   // HALLUCINATION RISK — compute per-page risk score from structural signals.
-  // Used by both reader-facing banners and AI agents for verification triage.
-  // Must run BEFORE rawContent is deleted (integrity checks need the body).
   // =========================================================================
-  console.log('  Computing hallucination risk scores...');
-  let riskHigh = 0, riskMedium = 0, riskLow = 0;
-  for (const page of pages) {
-    const risk = computeHallucinationRisk(page, entityMap);
-    page.hallucinationRisk = risk;
+  const { riskStats } = computeAllHallucinationRisks({
+    pages,
+    entityMap,
+    computeRisk: computeHallucinationRisk,
+    resolveEntityType,
+  });
+  database.riskStats = riskStats;
 
-    // Also attach resolved entityType for frontend use
-    const entity = entityMap.get(page.id);
-    if (entity?.type) {
-      page.entityType = resolveEntityType(entity.type);
-    } else if (page.category === 'internal') {
-      // Internal pages don't have YAML entities, but still need entityType
-      // so the explore page can filter them correctly.
-      page.entityType = 'internal';
-    }
-
-    if (risk.level === 'high') riskHigh++;
-    else if (risk.level === 'medium') riskMedium++;
-    else riskLow++;
-  }
-  console.log(`  hallucinationRisk: ${riskHigh} high, ${riskMedium} medium, ${riskLow} low`);
-
-  // Pre-aggregate risk stats for the dashboard (avoids re-iterating on every render)
-  const riskFactorCounts = {};
-  let riskScoreSum = 0;
-  const riskTotal = riskHigh + riskMedium + riskLow;
-  for (const page of pages) {
-    if (!page.hallucinationRisk) continue;
-    riskScoreSum += page.hallucinationRisk.score;
-    for (const f of page.hallucinationRisk.factors || []) {
-      riskFactorCounts[f] = (riskFactorCounts[f] || 0) + 1;
-    }
-  }
-  database.riskStats = {
-    total: riskTotal,
-    high: riskHigh,
-    medium: riskMedium,
-    low: riskLow,
-    avgScore: riskTotal > 0 ? Math.round(riskScoreSum / riskTotal) : 0,
-    topFactors: Object.entries(riskFactorCounts)
-      .sort(([, a], [, b]) => /** @type {number} */ (b) - /** @type {number} */ (a))
-      .slice(0, 10)
-      .map(([factor, count]) => ({ factor, count })),
-  };
-
-  // Record risk snapshots to wiki server (optional — skips if server unavailable)
-  if (CONTENT_ONLY) {
-    console.log('  riskSnapshots: skipped (content-only scope)');
-  } else if (process.env.LONGTERMWIKI_SERVER_URL) {
-    const snapshots = pages
-      .filter(p => p.hallucinationRisk)
-      .map(p => ({
-        pageId: p.id,
-        score: p.hallucinationRisk.score,
-        level: p.hallucinationRisk.level,
-        factors: p.hallucinationRisk.factors,
-        integrityIssues: p.hallucinationRisk.integrityIssues || null,
-      }));
-    const result = await recordRiskSnapshots(snapshots);
-    if (result) {
-      console.log(`  riskSnapshots: recorded ${result.inserted} snapshots to wiki server`);
-    } else {
-      console.log('  riskSnapshots: skipped (server unavailable or error)');
-    }
-  }
+  // Record risk snapshots to wiki server (optional)
+  await syncRiskSnapshots(pages, CONTENT_ONLY);
 
   // =========================================================================
   // PAGE RESOURCES — compute page → resourceId mappings at build time.
@@ -1895,75 +1536,19 @@ async function main() {
   console.log(`  pageCoverage: ${coverageGreen} green, ${coverageAmber} amber, ${coverageRed} red`);
 
   // =========================================================================
-  // PAGE RANKINGS — pre-compute readerRank and researchRank per page.
-  // Avoids re-sorting ~600 pages on every server-component render.
+  // PAGE RANKINGS, RECOMMENDED SCORES, UPDATE SCHEDULE
   // =========================================================================
   console.log('  Computing page rankings...');
-  const rankedPages = pages.filter(p => p.readerImportance != null || p.researchImportance != null);
-  const byReader = rankedPages.filter(p => p.readerImportance != null).sort((a, b) => (b.readerImportance ?? 0) - (a.readerImportance ?? 0));
-  byReader.forEach((page, idx) => { page.readerRank = idx + 1; });
-  const byResearch = rankedPages.filter(p => p.researchImportance != null).sort((a, b) => (b.researchImportance ?? 0) - (a.researchImportance ?? 0));
-  byResearch.forEach((page, idx) => { page.researchRank = idx + 1; });
-  console.log(`  pageRankings: ${byReader.length} reader-ranked, ${byResearch.length} research-ranked`);
+  const { readerRanked, researchRanked } = computePageRankings(pages);
+  console.log(`  pageRankings: ${readerRanked} reader-ranked, ${researchRanked} research-ranked`);
 
-  // =========================================================================
-  // RECOMMENDED SCORE — pre-compute blended "recommended" score per page.
-  // Used by ExploreGrid's default sort. Avoids Date.now() + Math.exp on
-  // every client-side re-render / keystroke.
-  // =========================================================================
   console.log('  Computing recommended scores...');
   const buildNow = Date.now();
-  for (const page of pages) {
-    let recency = 0;
-    if (page.lastUpdated) {
-      const daysAgo = (buildNow - new Date(page.lastUpdated).getTime()) / 86_400_000;
-      recency = 10 * Math.exp(-daysAgo / 120);
-    }
-    const quality = page.quality || 0;
-    const importance = page.readerImportance || 0;
-    const wordBonus = page.wordCount ? Math.min(2, Math.log10(page.wordCount + 1) - 1.5) : 0;
-    page.recommendedScore = Math.round((recency * 2 + quality * 2 + importance * 0.5 + wordBonus) * 100) / 100;
-  }
+  computeRecommendedScores(pages, buildNow);
   console.log(`  recommendedScores: computed for ${pages.length} pages`);
 
-  // =========================================================================
-  // UPDATE SCHEDULE — pre-compute staleness, priority, daysSince, daysUntil.
-  // Time-dependent values use buildNow as the reference timestamp so they're
-  // consistent with the data snapshot.
-  // =========================================================================
   console.log('  Computing update schedule...');
-  const updateScheduleItems = [];
-  for (const page of pages) {
-    if (!page.updateFrequency) continue;
-    if (page.evergreen === false) continue;
-
-    const lastUpdated = page.lastUpdated;
-    const daysSince = lastUpdated
-      ? Math.floor((buildNow - new Date(lastUpdated).getTime()) / (1000 * 60 * 60 * 24))
-      : 999;
-    const daysUntil = page.updateFrequency - daysSince;
-    const staleness = daysSince / page.updateFrequency;
-    const readerImp = page.readerImportance ?? 50;
-    const tv = page.tacticalValue ?? 0;
-    const effectiveImportance = tv > readerImp ? (readerImp + tv) / 2 : readerImp;
-    const priority = staleness * (effectiveImportance / 100);
-
-    updateScheduleItems.push({
-      id: page.id,
-      numericId: slugToNumericId[page.id] || page.id,
-      title: page.title,
-      quality: page.quality ?? null,
-      readerImportance: page.readerImportance ?? null,
-      lastUpdated,
-      updateFrequency: page.updateFrequency,
-      daysSinceUpdate: daysSince,
-      daysUntilDue: daysUntil,
-      staleness: Math.round(staleness * 100) / 100,
-      priority: Math.round(priority * 100) / 100,
-      category: page.category,
-    });
-  }
-  updateScheduleItems.sort((a, b) => b.priority - a.priority);
+  const updateScheduleItems = buildUpdateSchedule(pages, slugToNumericId, buildNow);
   database.updateSchedule = updateScheduleItems;
   const overdue = updateScheduleItems.filter(i => i.daysUntilDue < 0).length;
   console.log(`  updateSchedule: ${updateScheduleItems.length} pages tracked, ${overdue} overdue`);
@@ -1971,66 +1556,16 @@ async function main() {
   database.pages = pages;
 
   // =========================================================================
-  // EXTEND ID REGISTRY — collect numericIds from page-only content (no entity)
-  // Pages can declare numericId in MDX frontmatter. New pages get auto-assigned.
+  // EXTEND ID REGISTRY — page-only numericIds
   // =========================================================================
   const entityIds = new Set(entities.map(e => e.id));
-  // Skip infrastructure categories — only assign IDs to non-content pages
-  // Note: 'internal', 'reports', 'schema' removed — internal pages now get entity IDs
-  const skipCategories = new Set([
-    'style-guides', 'tools',
-    'dashboard', 'project', 'guides',
-  ]);
-  let pageIdAssignments = 0;
-  // Pass 1: Collect existing page-level numericIds from frontmatter
-  for (const page of pages) {
-    if (entityIds.has(page.id)) continue;
-    if (slugToNumericId[page.id]) continue;
-    if (skipCategories.has(page.category)) continue;
-    if (page.contentFormat === 'dashboard') continue;
-
-    if (page.numericId) {
-      // Page already has a numericId from frontmatter.
-      // Check for conflicts: another entity/page may already own this numericId.
-      const existingOwner = numericIdToSlug[page.numericId];
-      if (existingOwner && existingOwner !== page.id) {
-        // For generated stubs, the numericId may already be assigned to the parent
-        // entity (e.g., a page inherits a numericId from an entity with a different slug).
-        // That's fine — just log a warning. But if they're unrelated, it's a real conflict.
-        console.warn(`    WARNING: ${page.numericId} claimed by "${existingOwner}" and page "${page.id}" — keeping "${existingOwner}"`);
-      }
-      if (!numericIdToSlug[page.numericId]) {
-        numericIdToSlug[page.numericId] = page.id;
-      }
-      slugToNumericId[page.id] = page.numericId;
-    }
-  }
-
-  // Pass 2: Assign new numericIds in-memory to pages that don't have one yet.
-  // NOTE: In production, assign-ids.mjs runs first via the wiki server and all
-  // pages should already have IDs. This fallback keeps the build working for
-  // local dev when assign-ids.mjs wasn't run.
-  for (const page of pages) {
-    if (entityIds.has(page.id)) continue;
-    if (slugToNumericId[page.id]) continue;
-    if (skipCategories.has(page.category)) continue;
-    if (page.contentFormat === 'dashboard') continue;
-
-    const numId = `E${nextId}`;
-    numericIdToSlug[numId] = page.id;
-    slugToNumericId[page.id] = numId;
-    page.numericId = numId;
-    nextId++;
-    pageIdAssignments++;
-  }
-
-  // Update registry output maps (page-only entries may have added slugs)
+  const { nextId: _finalNextId } = extendIdRegistryWithPages({
+    pages, entityIds, slugToNumericId, numericIdToSlug, pathRegistry, nextId,
+  });
+  // Update registry output maps
   idRegistryOutput.byNumericId = { ...numericIdToSlug };
   idRegistryOutput.bySlug = { ...slugToNumericId };
   database.idRegistry = idRegistryOutput;
-  if (pageIdAssignments > 0) {
-    console.log(`  idRegistry: assigned ${pageIdAssignments} new page IDs in-memory (run \`node scripts/assign-ids.mjs\` to persist)`);
-  }
 
   const pagesWithQuality = pages.filter(p => p.quality !== null).length;
   const pagesWithUnconvertedLinks = pages.filter(p => p.unconvertedLinkCount > 0).length;

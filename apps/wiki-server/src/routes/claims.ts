@@ -210,6 +210,13 @@ const BatchUpdateRelatedEntitiesSchema = z.object({
   })).min(1).max(500),
 });
 
+const BatchUpdateTextSchema = z.object({
+  items: z.array(z.object({
+    id: z.number().int().positive(),
+    claimText: z.string().min(1).max(2000),
+  })).min(1).max(500),
+});
+
 const BatchUpdateStructuredSchema = z.object({
   items: z.array(z.object({
     id: z.number().int().positive(),
@@ -957,6 +964,31 @@ const claimsApp = new Hono()
       }
       return count;
     });
+
+    return c.json({ updated, total: parsed.data.items.length });
+  })
+  // ---- PATCH /batch-update-text (bulk update claimText) ----
+  // Used by `crux claims fix strip-markup` and `crux claims fix self-contain`.
+  // IMPORTANT: Must be defined before PATCH /:id to avoid wildcard matching.
+  .patch("/batch-update-text", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = BatchUpdateTextSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const db = getDrizzleDb();
+    const now = new Date();
+    let updated = 0;
+
+    for (const item of parsed.data.items) {
+      const result = await db
+        .update(claims)
+        .set({ claimText: item.claimText, updatedAt: now })
+        .where(eq(claims.id, item.id))
+        .returning({ id: claims.id });
+      if (result.length > 0) updated++;
+    }
 
     return c.json({ updated, total: parsed.data.items.length });
   })

@@ -173,7 +173,7 @@ async function processPage(
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
   const options = parseOptions(process.argv.slice(2));
 
   console.log('Content Grading Script — 3-Step Pipeline');
