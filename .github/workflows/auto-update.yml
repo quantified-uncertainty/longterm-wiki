@@ -220,6 +220,51 @@ jobs:
 
           echo "All changed pages passed paranoid review"
 
+      - name: Check for content truncation
+        if: success()
+        run: |
+          # Compare word counts of changed MDX files against their main branch versions.
+          # A page shrinking by >30% likely indicates truncation (lost content, dangling footnotes).
+          CHANGED_MDX=$(git diff --name-only HEAD -- content/docs/ | grep '\.mdx$' || true)
+
+          if [ -z "$CHANGED_MDX" ]; then
+            echo "No MDX files changed — skipping truncation check"
+            exit 0
+          fi
+
+          THRESHOLD=30  # percent shrinkage that triggers a block
+          BLOCKED=""
+
+          for FILE in $CHANGED_MDX; do
+            # Get word count from main branch (before update)
+            BEFORE=$(git show HEAD:"$FILE" 2>/dev/null | wc -w | tr -d ' ' || echo "0")
+            # Get word count from working tree (after update)
+            AFTER=$(wc -w < "$FILE" 2>/dev/null | tr -d ' ' || echo "0")
+
+            if [ "$BEFORE" -eq 0 ]; then
+              continue  # New file, skip
+            fi
+
+            DROP=$(( (BEFORE - AFTER) * 100 / BEFORE ))
+
+            if [ "$DROP" -ge "$THRESHOLD" ]; then
+              PAGE_ID=$(basename "$FILE" .mdx)
+              echo "::error::$PAGE_ID shrank by ${DROP}% ($BEFORE → $AFTER words) — possible truncation"
+              BLOCKED="$BLOCKED $PAGE_ID"
+            elif [ "$DROP" -ge 15 ]; then
+              PAGE_ID=$(basename "$FILE" .mdx)
+              echo "::warning::$PAGE_ID shrank by ${DROP}% ($BEFORE → $AFTER words)"
+            fi
+          done
+
+          if [ -n "$BLOCKED" ]; then
+            echo "::error::Truncation check blocked:$BLOCKED"
+            echo "Pages lost significant content. Review for dangling footnotes or missing sections."
+            exit 1
+          fi
+
+          echo "Truncation check passed"
+
       - name: Find run report
         id: report
         if: always()
