@@ -48,6 +48,9 @@ import {
 } from "@/components/ui/table";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 
+/** Approximate row height in px for spacer calculation (keeps table height stable across pages) */
+const TABLE_ROW_HEIGHT_PX = 33;
+
 export interface ResourceRow {
   id: string;
   title: string;
@@ -510,7 +513,7 @@ export function ResourcesTable({ resources }: { resources: ResourceRow[] }) {
                   <tr>
                     <td
                       colSpan={columns.length}
-                      style={{ height: `${(pagination.pageSize - table.getRowModel().rows.length) * 33}px` }}
+                      style={{ height: `${(pagination.pageSize - table.getRowModel().rows.length) * TABLE_ROW_HEIGHT_PX}px` }}
                     />
                   </tr>
                 )}

@@ -5,8 +5,6 @@ import Link from "next/link";
 import {
   CheckCircle2,
   AlertTriangle,
-  XCircle,
-  HelpCircle,
   Clock,
   ChevronDown,
   ChevronRight,
@@ -18,36 +16,7 @@ import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import type { ClaimRow } from "@wiki-server/api-response-types";
 import { VerdictBadge } from "../../components/verdict-badge";
 import { CategoryBadge } from "../../components/category-badge";
-
-const VERDICT_CONFIG: Record<
-  string,
-  { icon: typeof CheckCircle2; label: string; color: string; bg: string }
-> = {
-  verified: {
-    icon: CheckCircle2,
-    label: "Verified",
-    color: "text-emerald-700 dark:text-emerald-400",
-    bg: "bg-emerald-50 dark:bg-emerald-950/30",
-  },
-  disputed: {
-    icon: AlertTriangle,
-    label: "Disputed",
-    color: "text-amber-700 dark:text-amber-400",
-    bg: "bg-amber-50 dark:bg-amber-950/30",
-  },
-  unsupported: {
-    icon: XCircle,
-    label: "Unsupported",
-    color: "text-red-700 dark:text-red-400",
-    bg: "bg-red-50 dark:bg-red-950/30",
-  },
-  not_verifiable: {
-    icon: HelpCircle,
-    label: "Not verifiable",
-    color: "text-muted-foreground",
-    bg: "bg-muted/30",
-  },
-};
+import { CLAIM_VERDICT_CONFIG } from "../../components/verdict-config";
 
 function formatDate(iso: string): string {
   try {
@@ -84,7 +53,7 @@ const INITIAL_VISIBLE = 5;
 
 function ClaimCard({ claim }: { claim: ClaimRow }) {
   const verdict = claim.claimVerdict
-    ? VERDICT_CONFIG[claim.claimVerdict]
+    ? CLAIM_VERDICT_CONFIG[claim.claimVerdict]
     : null;
   const Icon = verdict?.icon;
 

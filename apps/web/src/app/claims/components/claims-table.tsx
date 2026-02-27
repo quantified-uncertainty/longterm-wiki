@@ -35,6 +35,9 @@ import { NumericValueDisplay } from "./numeric-value-display";
 import { VerdictBadge } from "./verdict-badge";
 import { formatStructuredValue } from "@lib/format-value";
 
+/** Approximate row height in px for spacer calculation (keeps table height stable across pages) */
+const TABLE_ROW_HEIGHT_PX = 37;
+
 function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; entityNames?: Record<string, string> }) {
   return (
     <div className="px-4 py-3 space-y-2 text-sm">
@@ -580,7 +583,7 @@ export function ClaimsTable({
                   <tr>
                     <td
                       colSpan={columns.length}
-                      style={{ height: `${(pageSize - table.getRowModel().rows.length) * 37}px` }}
+                      style={{ height: `${(pageSize - table.getRowModel().rows.length) * TABLE_ROW_HEIGHT_PX}px` }}
                     />
                   </tr>
                 )}
