@@ -16,6 +16,7 @@ import {
   getEntityHref,
 } from "@/data";
 import { fetchFromWikiServer } from "@lib/wiki-server";
+import { getDomain } from "@/components/wiki/resource-utils";
 import type { ClaimRow, GetClaimsResult } from "@wiki-server/api-response-types";
 
 interface PageProps {
@@ -155,12 +156,6 @@ function RelatedEntityBadges({ entities }: { entities: string[] | null }) {
 function parseFootnoteNums(unit: string | null): number[] {
   if (!unit) return [];
   return unit.split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
-}
-
-/** Render a citation badge */
-function CitationBadge({ num }: { num: number }) {
-  const label = `[^${num}]`;
-  return <span className="inline-block font-mono text-gray-500 mr-1">{label}</span>;
 }
 
 /** Credibility dot (1–5 scale) */
@@ -323,7 +318,7 @@ function ClaimsTable({ claims }: { claims: ClaimRow[] }) {
                             </Link>
                           ) : s.url ? (
                             <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate max-w-[80px] block">
-                              {(() => { try { return new URL(s.url).hostname.replace(/^www\./, ""); } catch { return "link"; } })()}
+                              {getDomain(s.url) ?? "link"}
                             </a>
                           ) : (
                             <span className="text-gray-400">—</span>
@@ -346,7 +341,9 @@ function ClaimsTable({ claims }: { claims: ClaimRow[] }) {
                 </td>
                 <td className="p-2 whitespace-nowrap">
                   {footnoteNums.length > 0
-                    ? footnoteNums.slice(0, 3).map(n => <CitationBadge key={n} num={n} />)
+                    ? footnoteNums.slice(0, 3).map(n => (
+                        <span key={n} className="inline-block font-mono text-gray-500 mr-1">[^{n}]</span>
+                      ))
                     : "—"}
                   {footnoteNums.length > 3 && (
                     <span className="text-gray-400 text-[10px]">+{footnoteNums.length - 3}</span>
@@ -364,7 +361,7 @@ function ClaimsTable({ claims }: { claims: ClaimRow[] }) {
 function ReferencesTable({ claims }: { claims: ClaimRow[] }) {
   // Build unique sources from claim source data
   const seenUrls = new Set<string>();
-  const uniqueSources: { url: string | null; title: string | null; resourceId?: string; domain?: string; claimCount: number; credibility?: number }[] = [];
+  const uniqueSources: { url: string | null; title: string | null; resourceId?: string; domain: string | null; credibility?: number }[] = [];
   for (const claim of claims) {
     if (!claim.sources) continue;
     for (const s of claim.sources) {
@@ -373,8 +370,7 @@ function ReferencesTable({ claims }: { claims: ClaimRow[] }) {
       seenUrls.add(key);
       const resource = s.resourceId ? getResourceById(s.resourceId) : undefined;
       const credibility = resource ? getResourceCredibility(resource) : undefined;
-      const domain = s.url ? (() => { try { return new URL(s.url!).hostname.replace(/^www\./, ""); } catch { return undefined; } })() : undefined;
-      uniqueSources.push({ url: s.url ?? null, title: resource?.title ?? null, resourceId: s.resourceId ?? undefined, domain, claimCount: 1, credibility });
+      uniqueSources.push({ url: s.url ?? null, title: resource?.title ?? null, resourceId: s.resourceId ?? undefined, domain: s.url ? getDomain(s.url) : null, credibility });
     }
   }
 
