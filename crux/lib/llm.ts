@@ -20,7 +20,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import type { MessageParam, ToolUseBlock, ToolResultBlockParam } from '@anthropic-ai/sdk/resources/messages';
-import { createClient, MODELS } from './anthropic.ts';
+import { createClient, MODELS, resolveModel } from './anthropic.ts';
 import { withRetry, startHeartbeat } from './resilience.ts';
 import type { CostTracker } from './cost-tracker.ts';
 import { getApiKey } from './api-keys.ts';
@@ -107,6 +107,10 @@ export async function streamingCreate(
   params: Parameters<typeof client.messages.create>[0],
   options?: StreamingCreateOptions,
 ): Promise<Anthropic.Messages.Message> {
+  // Resolve shorthand model names ('sonnet' → 'claude-sonnet-4-6', etc.)
+  // so callers can use either shorthand or full model IDs.
+  params = { ...params, model: resolveModel(params.model) };
+
   if (_useOpenRouter) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return callOpenRouterAsAnthropic(params as any, options);
