@@ -289,7 +289,7 @@ export async function runAuditGate(options: {
   }
 
   // Export dashboard data with all results
-  exportDashboardData();
+  await exportDashboardData();
 
   // Calculate totals
   const totalInaccurate = results.reduce(

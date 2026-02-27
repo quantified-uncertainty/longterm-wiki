@@ -59,11 +59,6 @@ interface AllClaimsResponse {
   offset: number;
 }
 
-interface ClaimStatsResponse {
-  total: number;
-  [key: string]: unknown;
-}
-
 interface PageGap {
   pageId: string;
   totalQuotes: number;

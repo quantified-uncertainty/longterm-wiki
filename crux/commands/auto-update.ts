@@ -503,7 +503,7 @@ async function riskScores(args: string[], options: AutoUpdateOptions): Promise<C
     return { output: 'No page IDs provided. Use positional args or --from-report=<path>.', exitCode: 0 };
   }
 
-  const result = computeRiskScores(ids);
+  const result = await computeRiskScores(ids);
 
   if (options.json || options.ci) {
     return { output: JSON.stringify(result, null, 2), exitCode: 0 };

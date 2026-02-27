@@ -11,7 +11,12 @@
 
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { citationQuotes } from '../lib/knowledge-db.ts';
+import {
+  getCitationStats,
+  getCitationPageStats,
+  getCitationSourceTypeStats,
+  getCitationBrokenQuotes,
+} from '../lib/wiki-server/citations.ts';
 
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));
@@ -21,12 +26,21 @@ async function main() {
   const colors = getColors(ci || json);
   const c = colors;
 
-  const stats = citationQuotes.stats();
-  const pageStats = citationQuotes.getPageStats();
-  const sourceTypeStats = citationQuotes.getSourceTypeStats();
+  const statsResult = await getCitationStats();
+  if (!statsResult.ok) {
+    console.error(`${c.red}Error fetching citation stats: ${statsResult.error}${c.reset}`);
+    process.exit(1);
+  }
+  const stats = statsResult.data;
+
+  const pageStatsResult = await getCitationPageStats();
+  const pageStats = pageStatsResult.ok ? pageStatsResult.data.pages : [];
+
+  const sourceTypeStatsResult = await getCitationSourceTypeStats();
+  const sourceTypeStats = sourceTypeStatsResult.ok ? sourceTypeStatsResult.data.stats : [];
 
   if (json || ci) {
-    const totalChecked = pageStats.reduce((s, p) => s + p.accuracy_checked, 0);
+    const totalChecked = pageStats.reduce((s, p) => s + p.accuracyChecked, 0);
     const totalAccurate = pageStats.reduce((s, p) => s + p.accurate, 0);
     const totalInaccurate = pageStats.reduce((s, p) => s + p.inaccurate, 0);
     const data: Record<string, unknown> = {
@@ -38,7 +52,8 @@ async function main() {
       sourceTypeStats,
     };
     if (broken) {
-      data.brokenQuotes = citationQuotes.getBrokenQuotes();
+      const brokenResult = await getCitationBrokenQuotes();
+      data.brokenQuotes = brokenResult.ok ? brokenResult.data.broken : [];
     }
     console.log(JSON.stringify(data, null, 2));
     process.exit(0);
@@ -66,16 +81,16 @@ async function main() {
   }
 
   // Accuracy stats (if any accuracy checks have been run)
-  const totalChecked = pageStats.reduce((s, p) => s + p.accuracy_checked, 0);
+  const totalChecked = pageStats.reduce((s, p) => s + p.accuracyChecked, 0);
   if (totalChecked > 0) {
-    const totalAccurate = pageStats.reduce((s, p) => s + p.accurate, 0);
-    const totalInaccurate = pageStats.reduce((s, p) => s + p.inaccurate, 0);
-    const totalMinorOrOther = totalChecked - totalAccurate - totalInaccurate;
+    const totalAccurate2 = pageStats.reduce((s, p) => s + p.accurate, 0);
+    const totalInaccurate2 = pageStats.reduce((s, p) => s + p.inaccurate, 0);
+    const totalMinorOrOther = totalChecked - totalAccurate2 - totalInaccurate2;
     console.log(`\n${c.bold}Accuracy (second pass):${c.reset}`);
     console.log(`  Claims checked:           ${totalChecked}`);
-    console.log(`  ${c.green}Accurate:${c.reset}               ${totalAccurate} (${totalChecked > 0 ? ((totalAccurate / totalChecked) * 100).toFixed(0) : 0}%)`);
-    if (totalInaccurate > 0) {
-      console.log(`  ${c.red}Inaccurate/unsupported:${c.reset} ${totalInaccurate} (${((totalInaccurate / totalChecked) * 100).toFixed(0)}%)`);
+    console.log(`  ${c.green}Accurate:${c.reset}               ${totalAccurate2} (${totalChecked > 0 ? ((totalAccurate2 / totalChecked) * 100).toFixed(0) : 0}%)`);
+    if (totalInaccurate2 > 0) {
+      console.log(`  ${c.red}Inaccurate/unsupported:${c.reset} ${totalInaccurate2} (${((totalInaccurate2 / totalChecked) * 100).toFixed(0)}%)`);
     }
     if (totalMinorOrOther > 0) {
       console.log(`  ${c.yellow}Minor/other:${c.reset}            ${totalMinorOrOther}`);
@@ -88,10 +103,10 @@ async function main() {
     for (const st of sourceTypeStats) {
       const pct =
         st.count > 0
-          ? ` (${((st.with_quotes / st.count) * 100).toFixed(0)}% with quotes)`
+          ? ` (${((st.withQuotes / st.count) * 100).toFixed(0)}% with quotes)`
           : '';
       console.log(
-        `  ${st.source_type.padEnd(12)} ${String(st.count).padStart(4)} citations, ${String(st.with_quotes).padStart(4)} with quotes${pct}`,
+        `  ${st.sourceType.padEnd(12)} ${String(st.count).padStart(4)} citations, ${String(st.withQuotes).padStart(4)} with quotes${pct}`,
       );
     }
   }
@@ -102,9 +117,9 @@ async function main() {
     const topPages = pageStats.slice(0, 15);
     for (const p of topPages) {
       const scoreStr =
-        p.avg_score !== null ? ` avg:${(p.avg_score * 100).toFixed(0)}%` : '';
+        p.avgScore !== null ? ` avg:${(Number(p.avgScore) * 100).toFixed(0)}%` : '';
       console.log(
-        `  ${p.page_id.padEnd(40)} ${String(p.total).padStart(3)} total, ${String(p.with_quotes).padStart(3)} quoted, ${String(p.verified).padStart(3)} verified${scoreStr}`,
+        `  ${p.pageId.padEnd(40)} ${String(p.total).padStart(3)} total, ${String(p.withQuotes).padStart(3)} quoted, ${String(p.verified).padStart(3)} verified${scoreStr}`,
       );
     }
     if (pageStats.length > 15) {
@@ -116,21 +131,22 @@ async function main() {
 
   // Broken quotes
   if (broken) {
-    const brokenQuotes = citationQuotes.getBrokenQuotes();
+    const brokenResult = await getCitationBrokenQuotes();
+    const brokenQuotes = brokenResult.ok ? brokenResult.data.broken : [];
     if (brokenQuotes.length > 0) {
       console.log(
         `\n${c.red}${c.bold}Broken Quotes (extracted but not found in source):${c.reset}`,
       );
       for (const bq of brokenQuotes) {
         const scoreStr =
-          bq.verification_score !== null
-            ? ` (${(bq.verification_score * 100).toFixed(0)}%)`
+          bq.verificationScore !== null
+            ? ` (${(Number(bq.verificationScore) * 100).toFixed(0)}%)`
             : '';
         console.log(
-          `  [^${bq.footnote}] ${bq.page_id}${scoreStr}`,
+          `  [^${bq.footnote}] ${bq.pageId}${scoreStr}`,
         );
         console.log(
-          `    ${c.dim}${bq.claim_text.slice(0, 100)}${c.reset}`,
+          `    ${c.dim}${bq.claimText.slice(0, 100)}${c.reset}`,
         );
         if (bq.url) {
           console.log(`    ${c.dim}${bq.url.slice(0, 80)}${c.reset}`);

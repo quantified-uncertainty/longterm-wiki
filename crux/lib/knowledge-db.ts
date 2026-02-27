@@ -1,11 +1,9 @@
 /**
  * Knowledge Database Module
  *
- * Local SQLite cache for articles, sources, summaries, claims, and citation quotes.
- * PostgreSQL (wiki-server) is the authoritative store for citations, claims, and
- * summaries. Write operations dual-write to both SQLite and PG; read operations
- * use SQLite for local/offline access but PG should be preferred when available
- * (especially for citation data where PG has ~5K records vs sparse SQLite).
+ * Local SQLite cache for articles, sources, and citation content.
+ * PostgreSQL (wiki-server) is the authoritative store for citation quotes,
+ * claims, and summaries — those have been fully migrated to the API.
  *
  * The database is lazy-initialized on first access via getDb(). Importing
  * this module loads better-sqlite3 bindings but does NOT create the SQLite
@@ -14,7 +12,7 @@
  * they don't call functions that invoke getDb().
  *
  * Usage:
- *   import { getDb, articles, sources, summaries } from './lib/knowledge-db.ts';
+ *   import { getDb, articles, sources } from './lib/knowledge-db.ts';
  */
 
 import Database from 'better-sqlite3';
@@ -22,16 +20,6 @@ import { createHash } from 'crypto';
 import { existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import {
-  upsertCitationQuote as upsertCitationQuoteOnServer,
-  markCitationAccuracy as markAccuracyOnServer,
-  type UpsertCitationQuoteItem,
-} from './wiki-server/citations.ts';
-import { upsertSummary as upsertSummaryOnServer } from './wiki-server/summaries.ts';
-import {
-  insertClaim as insertClaimOnServer,
-  clearClaimsForEntity as clearClaimsOnServer,
-} from './wiki-server/claims.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -88,64 +76,11 @@ function initSchema(db: InstanceType<typeof Database>) {
       created_at TEXT DEFAULT (datetime('now'))
     );
 
-    -- Article -> Source relationships
-    CREATE TABLE IF NOT EXISTS article_sources (
-      article_id TEXT REFERENCES articles(id) ON DELETE CASCADE,
-      source_id TEXT REFERENCES sources(id) ON DELETE CASCADE,
-      citation_context TEXT,
-      PRIMARY KEY (article_id, source_id)
-    );
-
-    -- AI-generated summaries
-    -- TODO: Summaries pipeline not wired up yet — 0 records in both SQLite and PG.
-    -- Table is kept for the planned summarization feature.
-    CREATE TABLE IF NOT EXISTS summaries (
-      entity_id TEXT PRIMARY KEY,
-      entity_type TEXT NOT NULL,
-      one_liner TEXT,
-      summary TEXT,
-      review TEXT,
-      key_points TEXT,
-      key_claims TEXT,
-      model TEXT,
-      tokens_used INTEGER,
-      generated_at TEXT DEFAULT (datetime('now'))
-    );
-
-    -- Extracted claims (for consistency checking)
-    CREATE TABLE IF NOT EXISTS claims (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      entity_id TEXT NOT NULL,
-      entity_type TEXT NOT NULL,
-      claim_type TEXT NOT NULL,
-      claim_text TEXT NOT NULL,
-      value TEXT,
-      unit TEXT,
-      confidence TEXT,
-      source_quote TEXT,
-      created_at TEXT DEFAULT (datetime('now'))
-    );
-
     -- Indexes for performance
     CREATE INDEX IF NOT EXISTS idx_sources_url ON sources(url);
     CREATE INDEX IF NOT EXISTS idx_sources_doi ON sources(doi);
     CREATE INDEX IF NOT EXISTS idx_sources_status ON sources(fetch_status);
-    CREATE INDEX IF NOT EXISTS idx_summaries_type ON summaries(entity_type);
-    CREATE INDEX IF NOT EXISTS idx_claims_entity ON claims(entity_id);
-    CREATE INDEX IF NOT EXISTS idx_claims_type ON claims(claim_type);
   `);
-
-  // Migrations
-
-  // Add review column to summaries table if it doesn't exist
-  try {
-    db.exec('ALTER TABLE summaries ADD COLUMN review TEXT');
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (!msg.includes('duplicate column') && !msg.includes('already exists')) {
-      console.warn('Warning: ALTER TABLE summaries migration failed:', msg);
-    }
-  }
 
   // Add citation_content table for full article text storage (issue #200)
   db.exec(`
@@ -165,55 +100,6 @@ function initSchema(db: InstanceType<typeof Database>) {
     );
     CREATE INDEX IF NOT EXISTS idx_citation_content_page ON citation_content(page_id);
   `);
-
-  // Add citation_quotes table for storing extracted supporting quotes
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS citation_quotes (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      page_id TEXT NOT NULL,
-      footnote INTEGER NOT NULL,
-      url TEXT,
-      resource_id TEXT,
-      claim_text TEXT NOT NULL,
-      claim_context TEXT,
-      source_quote TEXT,
-      source_location TEXT,
-      quote_verified INTEGER DEFAULT 0,
-      verification_method TEXT,
-      verification_score REAL,
-      verified_at TEXT,
-      source_title TEXT,
-      source_type TEXT,
-      extraction_model TEXT,
-      created_at TEXT DEFAULT (datetime('now')),
-      updated_at TEXT DEFAULT (datetime('now')),
-      UNIQUE(page_id, footnote)
-    );
-    CREATE INDEX IF NOT EXISTS idx_citation_quotes_page ON citation_quotes(page_id);
-    CREATE INDEX IF NOT EXISTS idx_citation_quotes_url ON citation_quotes(url);
-    CREATE INDEX IF NOT EXISTS idx_citation_quotes_verified ON citation_quotes(quote_verified);
-    CREATE INDEX IF NOT EXISTS idx_citation_quotes_resource ON citation_quotes(resource_id);
-  `);
-
-  // Add accuracy columns (migration-safe — only adds if missing)
-  try {
-    db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_verdict TEXT`);
-  } catch { /* column already exists */ }
-  try {
-    db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_issues TEXT`);
-  } catch { /* column already exists */ }
-  try {
-    db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_score REAL`);
-  } catch { /* column already exists */ }
-  try {
-    db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_checked_at TEXT`);
-  } catch { /* column already exists */ }
-  try {
-    db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_supporting_quotes TEXT`);
-  } catch { /* column already exists */ }
-  try {
-    db.exec(`ALTER TABLE citation_quotes ADD COLUMN verification_difficulty TEXT`);
-  } catch { /* column already exists */ }
 }
 
 /**
@@ -294,62 +180,12 @@ export interface SourceUpsertData {
   sourceType?: string;
 }
 
-export interface SummaryRow {
-  entity_id: string;
-  entity_type: string;
-  one_liner: string | null;
-  summary: string | null;
-  review: string | null;
-  key_points: string | null;
-  key_claims: string | null;
-  model: string | null;
-  tokens_used: number | null;
-  generated_at: string;
-  // Parsed fields
-  keyPoints?: unknown[];
-  keyClaims?: unknown[];
-}
-
-export interface SummaryUpsertData {
-  oneLiner: string;
-  summary: string;
-  review?: string | null;
-  keyPoints?: unknown[];
-  keyClaims?: unknown[];
-  model: string;
-  tokensUsed: number;
-}
-
-export interface ClaimInsertData {
-  entityId: string;
-  entityType: string;
-  claimType: string;
-  claimText: string;
-  /** @deprecated Use valueNumeric/valueLow/valueHigh instead */
-  value?: string | null;
-  /** @deprecated Use measure instead */
-  unit?: string | null;
-  confidence?: string | null;
-  sourceQuote?: string | null;
-}
-
 export interface SourceStats {
   total: number;
   pending: number;
   fetched: number;
   failed: number;
   manual: number;
-}
-
-export interface SummaryStats {
-  entity_type: string;
-  count: number;
-  total_tokens: number;
-}
-
-export interface ClaimStats {
-  claim_type: string;
-  count: number;
 }
 
 // =============================================================================
@@ -403,15 +239,10 @@ export const articles = {
   },
 
   /**
-   * Get article with its summary
+   * Get article with its summary (legacy — summaries now in PG)
    */
   getWithSummary(id: string): ArticleRow | undefined {
-    return getDb().prepare(`
-      SELECT a.*, s.one_liner, s.summary, s.key_points, s.key_claims
-      FROM articles a
-      LEFT JOIN summaries s ON a.id = s.entity_id AND s.entity_type = 'article'
-      WHERE a.id = ?
-    `).get(id) as ArticleRow | undefined;
+    return getDb().prepare('SELECT * FROM articles WHERE id = ?').get(id) as ArticleRow | undefined;
   },
 
   /**
@@ -422,27 +253,10 @@ export const articles = {
   },
 
   /**
-   * Get articles that need summaries
+   * Get articles that need summaries (legacy — summaries now in PG)
    */
   needingSummary(): ArticleRow[] {
-    return getDb().prepare(`
-      SELECT a.* FROM articles a
-      LEFT JOIN summaries s ON a.id = s.entity_id AND s.entity_type = 'article'
-      WHERE s.entity_id IS NULL
-      ORDER BY a.quality DESC, a.title
-    `).all() as ArticleRow[];
-  },
-
-  /**
-   * Get articles where content has changed since last summary
-   */
-  needingResummary(): ArticleRow[] {
-    return getDb().prepare(`
-      SELECT a.* FROM articles a
-      JOIN summaries s ON a.id = s.entity_id AND s.entity_type = 'article'
-      WHERE a.updated_at > s.generated_at
-      ORDER BY a.quality DESC, a.title
-    `).all() as ArticleRow[];
+    return getDb().prepare('SELECT * FROM articles ORDER BY quality DESC, title').all() as ArticleRow[];
   },
 
   /**
@@ -587,9 +401,18 @@ export const sources = {
   },
 
   /**
-   * Link a source to an article
+   * Link a source to an article (legacy — article_sources table kept for compatibility)
    */
   linkToArticle(articleId: string, sourceId: string, citationContext: string | null = null) {
+    // Ensure article_sources table exists for legacy data
+    getDb().exec(`
+      CREATE TABLE IF NOT EXISTS article_sources (
+        article_id TEXT REFERENCES articles(id) ON DELETE CASCADE,
+        source_id TEXT REFERENCES sources(id) ON DELETE CASCADE,
+        citation_context TEXT,
+        PRIMARY KEY (article_id, source_id)
+      );
+    `);
     const stmt = getDb().prepare(`
       INSERT INTO article_sources (article_id, source_id, citation_context)
       VALUES (?, ?, ?)
@@ -599,14 +422,13 @@ export const sources = {
   },
 
   /**
-   * Get sources needing summaries
+   * Get sources needing summaries (legacy — summaries now in PG)
    */
   needingSummary(): SourceRow[] {
     return getDb().prepare(`
-      SELECT s.* FROM sources s
-      LEFT JOIN summaries sm ON s.id = sm.entity_id AND sm.entity_type = 'source'
-      WHERE s.fetch_status = 'fetched' AND s.content IS NOT NULL AND sm.entity_id IS NULL
-      ORDER BY s.created_at
+      SELECT * FROM sources
+      WHERE fetch_status = 'fetched' AND content IS NOT NULL
+      ORDER BY created_at
     `).all() as SourceRow[];
   },
 
@@ -637,168 +459,6 @@ export const sources = {
    */
   count(): number {
     return (getDb().prepare('SELECT COUNT(*) as count FROM sources').get() as { count: number }).count;
-  }
-};
-
-// =============================================================================
-// SUMMARIES
-// =============================================================================
-
-export const summaries = {
-  /**
-   * Insert or update a summary
-   */
-  upsert(entityId: string, entityType: string, data: SummaryUpsertData) {
-    const stmt = getDb().prepare(`
-      INSERT INTO summaries (entity_id, entity_type, one_liner, summary, review, key_points, key_claims, model, tokens_used, generated_at)
-      VALUES (@entityId, @entityType, @oneLiner, @summary, @review, @keyPoints, @keyClaims, @model, @tokensUsed, datetime('now'))
-      ON CONFLICT(entity_id) DO UPDATE SET
-        one_liner = @oneLiner,
-        summary = @summary,
-        review = @review,
-        key_points = @keyPoints,
-        key_claims = @keyClaims,
-        model = @model,
-        tokens_used = @tokensUsed,
-        generated_at = datetime('now')
-    `);
-    const result = stmt.run({
-      entityId,
-      entityType,
-      oneLiner: data.oneLiner,
-      summary: data.summary,
-      review: data.review || null,
-      keyPoints: JSON.stringify(data.keyPoints || []),
-      keyClaims: JSON.stringify(data.keyClaims || []),
-      model: data.model,
-      tokensUsed: data.tokensUsed
-    });
-
-    // Fire-and-forget write to wiki-server DB
-    upsertSummaryOnServer({
-      entityId,
-      entityType,
-      oneLiner: data.oneLiner,
-      summary: data.summary,
-      review: data.review ?? null,
-      keyPoints: (data.keyPoints as string[]) ?? null,
-      keyClaims: (data.keyClaims as string[]) ?? null,
-      model: data.model,
-      tokensUsed: data.tokensUsed,
-    }).catch(() => {
-      // Silently ignore — PG is authoritative; SQLite is a local cache
-    });
-
-    return result;
-  },
-
-  /**
-   * Get a summary
-   */
-  get(entityId: string): SummaryRow | undefined {
-    const summary = getDb().prepare('SELECT * FROM summaries WHERE entity_id = ?').get(entityId) as SummaryRow | undefined;
-    if (summary) {
-      summary.keyPoints = JSON.parse(summary.key_points || '[]');
-      summary.keyClaims = JSON.parse(summary.key_claims || '[]');
-    }
-    return summary;
-  },
-
-  /**
-   * Get all summaries of a type
-   */
-  getAll(entityType: string): SummaryRow[] {
-    return getDb().prepare('SELECT * FROM summaries WHERE entity_type = ?').all(entityType) as SummaryRow[];
-  },
-
-  /**
-   * Get summary statistics
-   */
-  stats(): SummaryStats[] {
-    return getDb().prepare(`
-      SELECT
-        entity_type,
-        COUNT(*) as count,
-        SUM(tokens_used) as total_tokens
-      FROM summaries
-      GROUP BY entity_type
-    `).all() as SummaryStats[];
-  },
-
-  /**
-   * Export all summaries as a lookup object
-   */
-  export(): Record<string, { type: string; oneLiner: string | null; summary: string | null; keyPoints: unknown[]; keyClaims: unknown[] }> {
-    const all = getDb().prepare('SELECT * FROM summaries').all() as SummaryRow[];
-    const result: Record<string, { type: string; oneLiner: string | null; summary: string | null; keyPoints: unknown[]; keyClaims: unknown[] }> = {};
-    for (const s of all) {
-      result[s.entity_id] = {
-        type: s.entity_type,
-        oneLiner: s.one_liner,
-        summary: s.summary,
-        keyPoints: JSON.parse(s.key_points || '[]'),
-        keyClaims: JSON.parse(s.key_claims || '[]')
-      };
-    }
-    return result;
-  }
-};
-
-// =============================================================================
-// CLAIMS
-// =============================================================================
-
-export const claims = {
-  /**
-   * Insert a claim
-   */
-  insert(claim: ClaimInsertData) {
-    const stmt = getDb().prepare(`
-      INSERT INTO claims (entity_id, entity_type, claim_type, claim_text, value, unit, confidence, source_quote)
-      VALUES (@entityId, @entityType, @claimType, @claimText, @value, @unit, @confidence, @sourceQuote)
-    `);
-    const result = stmt.run(claim);
-
-    // Fire-and-forget write to wiki-server DB
-    insertClaimOnServer({
-      entityId: claim.entityId,
-      entityType: claim.entityType,
-      claimType: claim.claimType,
-      claimText: claim.claimText,
-      value: claim.value ?? null,
-      unit: claim.unit ?? null,
-      confidence: claim.confidence ?? null,
-      sourceQuote: claim.sourceQuote ?? null,
-    }).catch(() => {
-      // Silently ignore — PG is authoritative; SQLite is a local cache
-    });
-
-    return result;
-  },
-
-  /**
-   * Clear claims for an entity (for regeneration)
-   */
-  clearForEntity(entityId: string) {
-    const result = getDb().prepare('DELETE FROM claims WHERE entity_id = ?').run(entityId);
-
-    // Fire-and-forget write to wiki-server DB
-    clearClaimsOnServer(entityId).catch(() => {
-      // Silently ignore — PG is authoritative; SQLite is a local cache
-    });
-
-    return result;
-  },
-
-  /**
-   * Get claim statistics
-   */
-  stats(): ClaimStats[] {
-    return getDb().prepare(`
-      SELECT claim_type, COUNT(*) as count
-      FROM claims
-      GROUP BY claim_type
-    `).all() as ClaimStats[];
   }
 };
 
@@ -892,391 +552,9 @@ export const citationContent = {
   },
 };
 
-// =============================================================================
-// CITATION QUOTES (extracted supporting quotes from sources)
-// =============================================================================
-
-export interface CitationQuoteRow {
-  id: number;
-  page_id: string;
-  footnote: number;
-  url: string | null;
-  resource_id: string | null;
-  claim_text: string;
-  claim_context: string | null;
-  source_quote: string | null;
-  source_location: string | null;
-  quote_verified: number;
-  verification_method: string | null;
-  verification_score: number | null;
-  verified_at: string | null;
-  source_title: string | null;
-  source_type: string | null;
-  extraction_model: string | null;
-  accuracy_verdict: string | null;
-  accuracy_issues: string | null;
-  accuracy_score: number | null;
-  accuracy_checked_at: string | null;
-  accuracy_supporting_quotes: string | null;
-  verification_difficulty: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CitationQuoteUpsertData {
-  pageId: string;
-  footnote: number;
-  url?: string | null;
-  resourceId?: string | null;
-  claimText: string;
-  claimContext?: string | null;
-  sourceQuote?: string | null;
-  sourceLocation?: string | null;
-  quoteVerified?: boolean;
-  verificationMethod?: string | null;
-  verificationScore?: number | null;
-  sourceTitle?: string | null;
-  sourceType?: string | null;
-  extractionModel?: string | null;
-}
-
-export interface CitationQuoteStats {
-  totalQuotes: number;
-  withQuotes: number;
-  verified: number;
-  unverified: number;
-  totalPages: number;
-  averageScore: number | null;
-}
-
-export const citationQuotes = {
-  /**
-   * Insert or update a citation quote record.
-   * Keyed on (page_id, footnote) — one quote per footnote per page.
-   */
-  upsert(data: CitationQuoteUpsertData) {
-    const result = getDb().prepare(`
-      INSERT INTO citation_quotes (
-        page_id, footnote, url, resource_id, claim_text, claim_context,
-        source_quote, source_location, quote_verified, verification_method,
-        verification_score, verified_at, source_title, source_type, extraction_model,
-        updated_at
-      ) VALUES (
-        @pageId, @footnote, @url, @resourceId, @claimText, @claimContext,
-        @sourceQuote, @sourceLocation, @quoteVerified, @verificationMethod,
-        @verificationScore, @verifiedAt, @sourceTitle, @sourceType, @extractionModel,
-        datetime('now')
-      )
-      ON CONFLICT(page_id, footnote) DO UPDATE SET
-        url = @url,
-        resource_id = @resourceId,
-        claim_text = @claimText,
-        claim_context = @claimContext,
-        source_quote = @sourceQuote,
-        source_location = @sourceLocation,
-        quote_verified = @quoteVerified,
-        verification_method = @verificationMethod,
-        verification_score = @verificationScore,
-        verified_at = @verifiedAt,
-        source_title = @sourceTitle,
-        source_type = @sourceType,
-        extraction_model = @extractionModel,
-        updated_at = datetime('now')
-    `).run({
-      pageId: data.pageId,
-      footnote: data.footnote,
-      url: data.url || null,
-      resourceId: data.resourceId || null,
-      claimText: data.claimText,
-      claimContext: data.claimContext || null,
-      sourceQuote: data.sourceQuote || null,
-      sourceLocation: data.sourceLocation || null,
-      quoteVerified: data.quoteVerified ? 1 : 0,
-      verificationMethod: data.verificationMethod || null,
-      verificationScore: data.verificationScore ?? null,
-      verifiedAt: data.quoteVerified ? new Date().toISOString() : null,
-      sourceTitle: data.sourceTitle || null,
-      sourceType: data.sourceType || null,
-      extractionModel: data.extractionModel || null,
-    });
-
-    // Fire-and-forget write to wiki-server DB
-    const serverItem: UpsertCitationQuoteItem = {
-      pageId: data.pageId,
-      footnote: data.footnote,
-      claimText: data.claimText,
-      url: data.url ?? null,
-      resourceId: data.resourceId ?? null,
-      claimContext: data.claimContext ?? null,
-      sourceQuote: data.sourceQuote ?? null,
-      sourceLocation: data.sourceLocation ?? null,
-      quoteVerified: data.quoteVerified ?? false,
-      verificationMethod: data.verificationMethod ?? null,
-      verificationScore: data.verificationScore ?? null,
-      sourceTitle: data.sourceTitle ?? null,
-      sourceType: data.sourceType ?? null,
-      extractionModel: data.extractionModel ?? null,
-    };
-    upsertCitationQuoteOnServer(serverItem).catch(() => {
-      // Silently ignore — PG is authoritative; SQLite is a local cache
-    });
-
-    return result;
-  },
-
-  /**
-   * Get all quotes for a page.
-   */
-  getByPage(pageId: string): CitationQuoteRow[] {
-    return getDb().prepare(
-      'SELECT * FROM citation_quotes WHERE page_id = ? ORDER BY footnote',
-    ).all(pageId) as CitationQuoteRow[];
-  },
-
-  /**
-   * Get all citation quotes, ordered by page and footnote.
-   */
-  getAll(): CitationQuoteRow[] {
-    return getDb().prepare(
-      'SELECT * FROM citation_quotes ORDER BY page_id, footnote',
-    ).all() as CitationQuoteRow[];
-  },
-
-  /**
-   * Get quotes by URL (across all pages).
-   */
-  getByUrl(url: string): CitationQuoteRow[] {
-    return getDb().prepare(
-      'SELECT * FROM citation_quotes WHERE url = ? ORDER BY page_id, footnote',
-    ).all(url) as CitationQuoteRow[];
-  },
-
-  /**
-   * Get quotes by resource ID (across all pages).
-   */
-  getByResourceId(resourceId: string): CitationQuoteRow[] {
-    return getDb().prepare(
-      'SELECT * FROM citation_quotes WHERE resource_id = ? ORDER BY page_id, footnote',
-    ).all(resourceId) as CitationQuoteRow[];
-  },
-
-  /**
-   * Get all unverified quotes (quotes extracted but not yet verified).
-   */
-  getUnverified(limit: number = 100): CitationQuoteRow[] {
-    return getDb().prepare(
-      'SELECT * FROM citation_quotes WHERE source_quote IS NOT NULL AND quote_verified = 0 ORDER BY created_at LIMIT ?',
-    ).all(limit) as CitationQuoteRow[];
-  },
-
-  /**
-   * Mark a quote as verified with a specific method and score.
-   */
-  markVerified(
-    pageId: string,
-    footnote: number,
-    method: string,
-    score: number,
-  ) {
-    return getDb().prepare(`
-      UPDATE citation_quotes
-      SET quote_verified = 1, verification_method = ?, verification_score = ?, verified_at = datetime('now'), updated_at = datetime('now')
-      WHERE page_id = ? AND footnote = ?
-    `).run(method, score, pageId, footnote);
-  },
-
-  /**
-   * Mark a quote as unverified (e.g., after re-verification fails).
-   */
-  markUnverified(
-    pageId: string,
-    footnote: number,
-    method: string,
-    score: number,
-  ) {
-    return getDb().prepare(`
-      UPDATE citation_quotes
-      SET quote_verified = 0, verification_method = ?, verification_score = ?, updated_at = datetime('now')
-      WHERE page_id = ? AND footnote = ?
-    `).run(method, score, pageId, footnote);
-  },
-
-  /**
-   * Get a single quote by page and footnote.
-   */
-  get(pageId: string, footnote: number): CitationQuoteRow | null {
-    return getDb().prepare(
-      'SELECT * FROM citation_quotes WHERE page_id = ? AND footnote = ?',
-    ).get(pageId, footnote) as CitationQuoteRow | null;
-  },
-
-  /**
-   * Get aggregate statistics.
-   */
-  stats(): CitationQuoteStats {
-    const row = getDb().prepare(`
-      SELECT
-        COUNT(*) as totalQuotes,
-        COALESCE(SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' THEN 1 ELSE 0 END), 0) as withQuotes,
-        COALESCE(SUM(CASE WHEN quote_verified = 1 THEN 1 ELSE 0 END), 0) as verified,
-        COALESCE(SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' AND quote_verified = 0 THEN 1 ELSE 0 END), 0) as unverified,
-        COUNT(DISTINCT page_id) as totalPages,
-        AVG(CASE WHEN verification_score IS NOT NULL THEN verification_score END) as averageScore
-      FROM citation_quotes
-    `).get() as CitationQuoteStats;
-    return row;
-  },
-
-  /**
-   * Get per-page aggregated statistics for the quote report.
-   */
-  getPageStats(): Array<{
-    page_id: string;
-    total: number;
-    with_quotes: number;
-    verified: number;
-    avg_score: number | null;
-    accuracy_checked: number;
-    accurate: number;
-    inaccurate: number;
-  }> {
-    return getDb().prepare(`
-      SELECT
-        page_id,
-        COUNT(*) as total,
-        SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' THEN 1 ELSE 0 END) as with_quotes,
-        SUM(CASE WHEN quote_verified = 1 THEN 1 ELSE 0 END) as verified,
-        AVG(CASE WHEN verification_score IS NOT NULL THEN verification_score END) as avg_score,
-        SUM(CASE WHEN accuracy_verdict IS NOT NULL THEN 1 ELSE 0 END) as accuracy_checked,
-        SUM(CASE WHEN accuracy_verdict = 'accurate' THEN 1 ELSE 0 END) as accurate,
-        SUM(CASE WHEN accuracy_verdict IN ('inaccurate', 'unsupported') THEN 1 ELSE 0 END) as inaccurate
-      FROM citation_quotes
-      GROUP BY page_id
-      ORDER BY total DESC
-    `).all() as Array<{
-      page_id: string; total: number; with_quotes: number; verified: number;
-      avg_score: number | null; accuracy_checked: number; accurate: number; inaccurate: number;
-    }>;
-  },
-
-  /**
-   * Get aggregated statistics by source type.
-   */
-  getSourceTypeStats(): Array<{
-    source_type: string;
-    count: number;
-    with_quotes: number;
-  }> {
-    return getDb().prepare(`
-      SELECT
-        COALESCE(source_type, 'unknown') as source_type,
-        COUNT(*) as count,
-        SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' THEN 1 ELSE 0 END) as with_quotes
-      FROM citation_quotes
-      GROUP BY source_type
-      ORDER BY count DESC
-    `).all() as Array<{ source_type: string; count: number; with_quotes: number }>;
-  },
-
-  /**
-   * Get broken quotes (extracted but not verified, low score).
-   */
-  getBrokenQuotes(): Array<{
-    page_id: string;
-    footnote: number;
-    url: string | null;
-    claim_text: string;
-    verification_score: number | null;
-  }> {
-    return getDb().prepare(`
-      SELECT page_id, footnote, url, claim_text, verification_score
-      FROM citation_quotes
-      WHERE source_quote IS NOT NULL
-        AND source_quote != ''
-        AND quote_verified = 0
-        AND verification_score IS NOT NULL
-        AND verification_score < 0.4
-      ORDER BY verification_score ASC
-    `).all() as Array<{
-      page_id: string; footnote: number; url: string | null;
-      claim_text: string; verification_score: number | null;
-    }>;
-  },
-
-  /**
-   * Get all pages that have stored quotes (for batch operations).
-   */
-  getPagesWithQuotes(): Array<{ page_id: string; quote_count: number }> {
-    return getDb().prepare(`
-      SELECT DISTINCT page_id, COUNT(*) as quote_count
-      FROM citation_quotes
-      WHERE source_quote IS NOT NULL AND source_quote != ''
-      GROUP BY page_id
-      ORDER BY quote_count DESC
-    `).all() as Array<{ page_id: string; quote_count: number }>;
-  },
-
-  /**
-   * Mark accuracy check result for a citation.
-   */
-  markAccuracy(
-    pageId: string,
-    footnote: number,
-    verdict: string,
-    score: number,
-    issues: string | null,
-    supportingQuotes?: string | null,
-    verificationDifficulty?: string | null,
-  ) {
-    const result = getDb().prepare(`
-      UPDATE citation_quotes
-      SET accuracy_verdict = ?, accuracy_score = ?, accuracy_issues = ?,
-          accuracy_supporting_quotes = ?, verification_difficulty = ?,
-          accuracy_checked_at = datetime('now'), updated_at = datetime('now')
-      WHERE page_id = ? AND footnote = ?
-    `).run(verdict, score, issues, supportingQuotes ?? null, verificationDifficulty ?? null, pageId, footnote);
-
-    // Fire-and-forget write to wiki-server DB
-    const validVerdicts = ['accurate', 'inaccurate', 'unsupported', 'minor_issues', 'not_verifiable'] as const;
-    const typedVerdict = validVerdicts.includes(verdict as typeof validVerdicts[number])
-      ? verdict as typeof validVerdicts[number]
-      : null;
-    if (typedVerdict) {
-      const validDifficulties = ['easy', 'moderate', 'hard'] as const;
-      markAccuracyOnServer({
-        pageId,
-        footnote,
-        verdict: typedVerdict,
-        score,
-        issues: issues ?? null,
-        supportingQuotes: supportingQuotes ?? null,
-        verificationDifficulty: validDifficulties.includes(verificationDifficulty as typeof validDifficulties[number])
-          ? verificationDifficulty as 'easy' | 'moderate' | 'hard'
-          : null,
-      }).catch(() => {
-        // Silently ignore — PG is authoritative; SQLite is a local cache
-      });
-    } else {
-      // Verdict not in recognized set — skip server write but warn
-      console.warn(`  WARN: markAccuracy verdict "${verdict}" not in recognized set, skipping server dual-write`);
-    }
-
-    return result;
-  },
-
-  /**
-   * Count total records.
-   */
-  count(): number {
-    return (getDb().prepare('SELECT COUNT(*) as count FROM citation_quotes').get() as { count: number }).count;
-  },
-};
-
 export interface DatabaseStats {
   articles: number;
   sources: SourceStats;
-  summaries: SummaryStats[];
-  claims: ClaimStats[];
 }
 
 /**
@@ -1286,8 +564,6 @@ export function getStats(): DatabaseStats {
   return {
     articles: articles.count(),
     sources: sources.stats(),
-    summaries: summaries.stats(),
-    claims: claims.stats()
   };
 }
 

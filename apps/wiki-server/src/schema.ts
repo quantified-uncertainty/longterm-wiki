@@ -493,6 +493,10 @@ export const claimSources = pgTable(
     sourceVerdictScore: real("source_verdict_score"),
     sourceVerdictIssues: text("source_verdict_issues"),
     sourceCheckedAt: timestamp("source_checked_at", { withTimezone: true }),
+    // --- Metadata fields (migration 0037) ---
+    sourceTitle: text("source_title"),
+    sourceType: text("source_type"),
+    sourceLocation: text("source_location"),
   },
   (table) => [
     index("idx_cs_claim_id").on(table.claimId),

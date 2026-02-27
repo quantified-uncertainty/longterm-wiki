@@ -64,9 +64,9 @@ export function buildRiskSummary(pages: PageRiskResult[]): string {
 
 // ── Main pipeline ────────────────────────────────────────────────────────────
 
-export function computeRiskScores(pageIds: string[]): RiskScoresResult {
-  // Load accuracy data from SQLite if available (null if DB doesn't exist)
-  const accuracyMap = loadAccuracyMap();
+export async function computeRiskScores(pageIds: string[]): Promise<RiskScoresResult> {
+  // Load accuracy data from wiki-server if available (null if API not reachable)
+  const accuracyMap = await loadAccuracyMap();
 
   const pages: PageRiskResult[] = [];
 

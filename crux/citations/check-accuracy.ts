@@ -15,13 +15,18 @@
 import { fileURLToPath } from 'url';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { citationQuotes, citationContent } from '../lib/knowledge-db.ts';
+import { citationContent } from '../lib/knowledge-db.ts';
+import {
+  getQuotesByPage,
+  getPagesWithQuotes,
+  markCitationAccuracy,
+  createAccuracySnapshot,
+} from '../lib/wiki-server/citations.ts';
 import { checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import type { AccuracyVerdict } from '../lib/quote-extractor.ts';
 import { exportDashboardData } from './export-dashboard.ts';
 import { logBatchProgress } from './shared.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
-import { createAccuracySnapshot } from '../lib/wiki-server/citations.ts';
 
 export interface AccuracyResult {
   pageId: string;
@@ -49,11 +54,15 @@ export async function checkAccuracyForPage(
   const recheck = opts.recheck ?? false;
   const delayMs = opts.delayMs ?? 500;
 
-  const quotes = citationQuotes.getByPage(pageId);
+  const quotesResult = await getQuotesByPage(pageId, 500);
+  if (!quotesResult.ok) {
+    throw new Error(`Failed to fetch quotes for ${pageId}: ${quotesResult.error}`);
+  }
+  const quotes = quotesResult.data.quotes;
   const withQuotes = quotes.filter(
-    (q) => q.source_quote && q.source_quote.length > 0
+    (q) => q.sourceQuote && q.sourceQuote.length > 0
       // Skip quotes with very low verification scores — likely bad extractions
-      && (q.verification_score === null || q.verification_score >= 0.4),
+      && (q.verificationScore === null || Number(q.verificationScore) >= 0.4),
   );
 
   const result: AccuracyResult = {
@@ -72,25 +81,25 @@ export async function checkAccuracyForPage(
     const q = withQuotes[i];
 
     // Skip already checked unless --recheck
-    if (!recheck && q.accuracy_verdict) {
+    if (!recheck && q.accuracyVerdict) {
       if (verbose) {
-        console.log(`  [^${q.footnote}] (already checked: ${q.accuracy_verdict})`);
+        console.log(`  [^${q.footnote}] (already checked: ${q.accuracyVerdict})`);
       }
       // Still count in results
-      switch (q.accuracy_verdict as AccuracyVerdict) {
+      switch (q.accuracyVerdict as AccuracyVerdict) {
         case 'accurate': result.accurate++; break;
         case 'minor_issues': result.minorIssues++; break;
         case 'inaccurate': result.inaccurate++; break;
         case 'unsupported': result.unsupported++; break;
         default: result.notVerifiable++; break;
       }
-      if (q.accuracy_verdict !== 'accurate' && q.accuracy_issues) {
+      if (q.accuracyVerdict !== 'accurate' && q.accuracyIssues) {
         result.issues.push({
           footnote: q.footnote,
-          verdict: q.accuracy_verdict,
-          score: q.accuracy_score ?? 0,
-          claim: q.claim_text.slice(0, 120),
-          issues: q.accuracy_issues.split('\n').filter(Boolean),
+          verdict: q.accuracyVerdict,
+          score: q.accuracyScore != null ? Number(q.accuracyScore) : 0,
+          claim: q.claimText.slice(0, 120),
+          issues: q.accuracyIssues.split('\n').filter(Boolean),
         });
       }
       continue;
@@ -103,7 +112,7 @@ export async function checkAccuracyForPage(
     try {
       // Use full cached source text when available (much better accuracy),
       // fall back to the narrow extracted quote
-      let sourceText = q.source_quote!;
+      let sourceText = q.sourceQuote!;
       if (q.url) {
         const cached = citationContent.getByUrl(q.url);
         if (cached?.full_text && cached.full_text.length > sourceText.length) {
@@ -112,21 +121,30 @@ export async function checkAccuracyForPage(
       }
 
       const check = await checkClaimAccuracy(
-        q.claim_text,
+        q.claimText,
         sourceText,
-        { sourceTitle: q.source_title ?? undefined },
+        { sourceTitle: q.sourceTitle ?? undefined },
       );
 
-      // Store result in local SQLite (also dual-writes to wiki-server via fire-and-forget)
-      citationQuotes.markAccuracy(
-        pageId,
-        q.footnote,
-        check.verdict,
-        check.score,
-        check.issues.length > 0 ? check.issues.join('\n') : null,
-        check.supportingQuotes.length > 0 ? check.supportingQuotes.join('\n---\n') : null,
-        check.verificationDifficulty || null,
-      );
+      // Store result in wiki-server DB
+      const validVerdicts = ['accurate', 'inaccurate', 'unsupported', 'minor_issues', 'not_verifiable'] as const;
+      const typedVerdict = validVerdicts.includes(check.verdict as typeof validVerdicts[number])
+        ? check.verdict as typeof validVerdicts[number]
+        : null;
+      if (typedVerdict) {
+        const validDifficulties = ['easy', 'moderate', 'hard'] as const;
+        await markCitationAccuracy({
+          pageId,
+          footnote: q.footnote,
+          verdict: typedVerdict,
+          score: check.score,
+          issues: check.issues.length > 0 ? check.issues.join('\n') : null,
+          supportingQuotes: check.supportingQuotes.length > 0 ? check.supportingQuotes.join('\n---\n') : null,
+          verificationDifficulty: validDifficulties.includes(check.verificationDifficulty as typeof validDifficulties[number])
+            ? check.verificationDifficulty as 'easy' | 'moderate' | 'hard'
+            : null,
+        });
+      }
 
       switch (check.verdict) {
         case 'accurate': result.accurate++; break;
@@ -141,7 +159,7 @@ export async function checkAccuracyForPage(
           footnote: q.footnote,
           verdict: check.verdict,
           score: check.score,
-          claim: q.claim_text.slice(0, 120),
+          claim: q.claimText.slice(0, 120),
           issues: check.issues,
         });
       }
@@ -205,7 +223,12 @@ async function main() {
   }
 
   if (all) {
-    const pages = citationQuotes.getPagesWithQuotes();
+    const pagesResult = await getPagesWithQuotes();
+    if (!pagesResult.ok) {
+      console.error(`${c.red}Error fetching pages: ${pagesResult.error}${c.reset}`);
+      process.exit(1);
+    }
+    const pages = pagesResult.data.pages;
 
     let pagesToProcess = pages;
     if (limit > 0) {
@@ -222,13 +245,13 @@ async function main() {
       console.log(`  Concurrency: ${concurrency}\n`);
     }
 
-    const totalQuoteCount = pagesToProcess.reduce((s, p) => s + p.quote_count, 0);
+    const totalQuoteCount = pagesToProcess.reduce((s, p) => s + p.quoteCount, 0);
 
     // Dry-run: show what would be processed and exit
     if (args['dry-run']) {
       console.log(`${c.bold}Dry run — would process:${c.reset}`);
       for (const page of pagesToProcess) {
-        console.log(`  ${page.page_id} (${page.quote_count} quotes)`);
+        console.log(`  ${page.pageId} (${page.quoteCount} quotes)`);
       }
       console.log(`\n  Total: ${pagesToProcess.length} pages, ${totalQuoteCount} quotes`);
       console.log(`  Estimated LLM calls: ~${totalQuoteCount} (one per quote)`);
@@ -245,23 +268,23 @@ async function main() {
         batch.map(async (page, batchIdx) => {
           const globalIdx = i + batchIdx;
           console.log(
-            `${c.dim}[${globalIdx + 1}/${pagesToProcess.length}]${c.reset} ${c.bold}${page.page_id}${c.reset} (${page.quote_count} quotes)`,
+            `${c.dim}[${globalIdx + 1}/${pagesToProcess.length}]${c.reset} ${c.bold}${page.pageId}${c.reset} (${page.quoteCount} quotes)`,
           );
 
           try {
-            const result = await checkAccuracyForPage(page.page_id, {
+            const result = await checkAccuracyForPage(page.pageId, {
               verbose: concurrency === 1,
               recheck,
             });
             if (concurrency > 1) {
               console.log(
-                `  ${c.green}${page.page_id}:${c.reset} ${result.accurate} accurate, ${result.minorIssues} minor, ${result.inaccurate} inaccurate, ${result.errors} errors`,
+                `  ${c.green}${page.pageId}:${c.reset} ${result.accurate} accurate, ${result.minorIssues} minor, ${result.inaccurate} inaccurate, ${result.errors} errors`,
               );
             }
             return result;
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
-            console.log(`  ${c.red}${page.page_id}: Error — ${msg}${c.reset}`);
+            console.log(`  ${c.red}${page.pageId}: Error — ${msg}${c.reset}`);
             return null;
           }
         }),
@@ -294,7 +317,7 @@ async function main() {
     }
 
     // Auto-export dashboard data after accuracy checks
-    const exportResult = exportDashboardData();
+    const exportResult = await exportDashboardData();
     if (!exportResult && !json && !ci) {
       console.log(`${c.yellow}Warning: could not export dashboard data${c.reset}`);
     }
@@ -312,9 +335,14 @@ async function main() {
   }
 
   // Single page
-  const quotes = citationQuotes.getByPage(pageId);
-  const withQuotes = quotes.filter(
-    (q) => q.source_quote && q.source_quote.length > 0,
+  const singleResult = await getQuotesByPage(pageId, 500);
+  if (!singleResult.ok) {
+    console.error(`${c.red}Error fetching quotes for ${pageId}: ${singleResult.error}${c.reset}`);
+    process.exit(1);
+  }
+  const singleQuotes = singleResult.data.quotes;
+  const withQuotes = singleQuotes.filter(
+    (q) => q.sourceQuote && q.sourceQuote.length > 0,
   );
 
   if (withQuotes.length === 0) {
@@ -335,7 +363,7 @@ async function main() {
   });
 
   // Auto-export dashboard data after accuracy checks
-  const exportPath = exportDashboardData();
+  const exportPath = await exportDashboardData();
   if (!exportPath && !json && !ci) {
     console.log(`${c.yellow}Warning: could not export dashboard data${c.reset}`);
   }

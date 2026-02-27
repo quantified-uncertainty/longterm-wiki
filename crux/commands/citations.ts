@@ -68,11 +68,6 @@ const SCRIPTS = {
     description: 'Export accuracy data as YAML for the internal dashboard',
     passthrough: ['json', 'local-only'],
   },
-  'migrate-accuracy': {
-    script: 'citations/migrate-accuracy-to-db.ts',
-    description: 'Migrate citation accuracy data from SQLite to PostgreSQL',
-    passthrough: ['dry-run'],
-  },
   'backfill-resource-ids': {
     script: 'citations/backfill-resource-ids.ts',
     description: 'Backfill resource_id for existing citation quotes',
@@ -95,11 +90,6 @@ const SCRIPTS = {
     description: 'Independent post-hoc verification: check claims against source content',
     passthrough: ['json', 'no-fetch', 'threshold', 'model', 'delay'],
     positional: true,
-  },
-  'backfill-content': {
-    script: 'citations/backfill-citation-content.ts',
-    description: 'Backfill citation_content full text from SQLite to PostgreSQL',
-    passthrough: ['dry-run'],
   },
   'content-coverage': {
     script: 'citations/citation-content-coverage.ts',
@@ -158,8 +148,6 @@ Examples:
   crux citations normalize-footnotes --fix <id>     Fix one page
   crux citations export-dashboard                  Export data for web dashboard (prefers PG)
   crux citations export-dashboard --local-only     Force local SQLite only
-  crux citations migrate-accuracy                   Migrate accuracy data to PostgreSQL
-  crux citations migrate-accuracy --dry-run         Preview migration
   crux citations backfill-resource-ids               Backfill resource_id for existing quotes
   crux citations backfill-resource-ids --dry-run    Preview matches without writing
   crux citations fix-inaccuracies                   Dry-run fix proposals for all flagged

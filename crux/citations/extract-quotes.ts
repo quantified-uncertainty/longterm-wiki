@@ -25,11 +25,13 @@ import {
   fetchCitationUrl,
   saveFetchResultToPostgres,
 } from '../lib/citation-archive.ts';
+import { citationContent } from '../lib/knowledge-db.ts';
 import {
-  citationContent,
-  citationQuotes,
-} from '../lib/knowledge-db.ts';
-import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
+  getCitationContentByUrl,
+  getQuote,
+  getQuotesByPage,
+  upsertCitationQuote,
+} from '../lib/wiki-server/citations.ts';
 import { extractSupportingQuote, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { verifyQuoteInSource } from '../lib/quote-verifier.ts';
 import {
@@ -144,8 +146,9 @@ export async function extractQuotesForPage(
 
     // Check if already processed
     if (!recheck) {
-      const existing = citationQuotes.get(pageId, cit.footnote);
-      if (existing?.source_quote) {
+      const existingResult = await getQuote(pageId, cit.footnote);
+      const existing = existingResult.ok ? existingResult.data.quote : null;
+      if (existing?.sourceQuote) {
         result.skipped++;
         if (verbose) {
           console.log(
@@ -245,8 +248,8 @@ export async function extractQuotesForPage(
       const resource = cit.url ? getResourceByUrl(cit.url) : null;
       const resourceId = resource?.id ?? null;
 
-      // Store in SQLite
-      citationQuotes.upsert({
+      // Store in wiki-server DB
+      await upsertCitationQuote({
         pageId,
         footnote: cit.footnote,
         url: cit.url || null,
@@ -292,7 +295,7 @@ export async function extractQuotesForPage(
 
       // Still store the claim even if extraction failed
       const errResource = cit.url ? getResourceByUrl(cit.url) : null;
-      citationQuotes.upsert({
+      await upsertCitationQuote({
         pageId,
         footnote: cit.footnote,
         url: cit.url || null,
@@ -353,10 +356,14 @@ async function main() {
 
     // Skip already-processed pages unless --recheck
     if (!recheck) {
-      pages = pages.filter((p) => {
-        const existing = citationQuotes.getByPage(p.pageId);
-        return existing.length === 0;
-      });
+      const filteredPages = [];
+      for (const p of pages) {
+        const existing = await getQuotesByPage(p.pageId, 1);
+        if (!existing.ok || existing.data.quotes.length === 0) {
+          filteredPages.push(p);
+        }
+      }
+      pages = filteredPages;
       console.log(
         `  ${pages.length} pages need processing (use --recheck to re-extract all)\n`,
       );
@@ -494,7 +501,8 @@ async function main() {
   });
 
   if (json || ci) {
-    const quotes = citationQuotes.getByPage(pageId);
+    const quotesOut = await getQuotesByPage(pageId, 500);
+    const quotes = quotesOut.ok ? quotesOut.data.quotes : [];
     console.log(JSON.stringify({ ...result, quotes }, null, 2));
     process.exit(0);
   }
@@ -509,37 +517,38 @@ async function main() {
   }
 
   // Show extracted quotes
-  const stored = citationQuotes.getByPage(pageId);
+  const storedResult = await getQuotesByPage(pageId, 500);
+  const stored = storedResult.ok ? storedResult.data.quotes : [];
   const withQuotes = stored.filter(
-    (q) => q.source_quote && q.source_quote.length > 0,
+    (q) => q.sourceQuote && q.sourceQuote.length > 0,
   );
   if (withQuotes.length > 0) {
     console.log(`\n${c.bold}Extracted Quotes:${c.reset}`);
     for (const q of withQuotes) {
       const verifiedIcon =
-        q.quote_verified
+        q.quoteVerified
           ? `${c.green}\u2713${c.reset}`
           : `${c.yellow}~${c.reset}`;
       const scoreStr =
-        q.verification_score !== null
-          ? ` (${(q.verification_score * 100).toFixed(0)}%)`
+        q.verificationScore !== null
+          ? ` (${(Number(q.verificationScore) * 100).toFixed(0)}%)`
           : '';
 
       console.log(
-        `\n  [^${q.footnote}] ${verifiedIcon}${scoreStr} ${c.dim}${q.verification_method || ''}${c.reset}`,
+        `\n  [^${q.footnote}] ${verifiedIcon}${scoreStr} ${c.dim}${q.verificationMethod || ''}${c.reset}`,
       );
-      console.log(`  ${c.dim}Claim:${c.reset} ${q.claim_text.slice(0, 120)}`);
+      console.log(`  ${c.dim}Claim:${c.reset} ${q.claimText.slice(0, 120)}`);
       console.log(
-        `  ${c.dim}Quote:${c.reset} "${q.source_quote!.slice(0, 200)}${q.source_quote!.length > 200 ? '...' : ''}"`,
+        `  ${c.dim}Quote:${c.reset} "${q.sourceQuote!.slice(0, 200)}${q.sourceQuote!.length > 200 ? '...' : ''}"`,
       );
-      if (q.source_location) {
-        console.log(`  ${c.dim}Location:${c.reset} ${q.source_location}`);
+      if (q.sourceLocation) {
+        console.log(`  ${c.dim}Location:${c.reset} ${q.sourceLocation}`);
       }
     }
   }
 
   console.log(
-    `\n${c.dim}Quotes stored in .cache/knowledge.db${c.reset}\n`,
+    `\n${c.dim}Quotes stored in wiki-server DB${c.reset}\n`,
   );
 
   process.exit(0);

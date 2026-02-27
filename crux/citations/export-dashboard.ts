@@ -15,15 +15,15 @@
  *   pnpm crux citations export-dashboard --json
  */
 
-import { writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
+import { writeFileSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
-import { citationQuotes, PROJECT_ROOT } from '../lib/knowledge-db.ts';
+import { PROJECT_ROOT } from '../lib/knowledge-db.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
-import { getAccuracyDashboard } from '../lib/wiki-server/citations.ts';
+import { getAccuracyDashboard, getAllQuotes } from '../lib/wiki-server/citations.ts';
 
 // ---------------------------------------------------------------------------
 // Types (shared with the dashboard — keep in sync)
@@ -96,12 +96,15 @@ function extractDomain(url: string | null): string | null {
   }
 }
 
-export function buildDashboardExport(): DashboardExport | null {
-  const dbPath = join(PROJECT_ROOT, '.cache', 'knowledge.db');
-  if (!existsSync(dbPath)) return null;
-
-  // Get all citation quotes via DAO
-  const allQuotes = citationQuotes.getAll();
+export async function buildDashboardExport(): Promise<DashboardExport | null> {
+  // Fetch all citation quotes from wiki-server API
+  // Note: max 5000 per request. If total exceeds this, data is truncated.
+  const quotesResult = await getAllQuotes(5000, 0);
+  if (!quotesResult.ok) return null;
+  const allQuotes = quotesResult.data.quotes;
+  if (quotesResult.data.total > allQuotes.length) {
+    console.warn(`Warning: ${quotesResult.data.total} quotes exist but only ${allQuotes.length} fetched (max page size). Dashboard data is incomplete.`);
+  }
 
   if (allQuotes.length === 0) return null;
 
@@ -141,10 +144,10 @@ export function buildDashboardExport(): DashboardExport | null {
   const flagged: FlaggedCitation[] = [];
 
   for (const q of allQuotes) {
-    const pageId = q.page_id;
-    const verdict = q.accuracy_verdict;
-    const score = q.accuracy_score;
-    const difficulty = q.verification_difficulty;
+    const pageId = q.pageId;
+    const verdict = q.accuracyVerdict;
+    const score = q.accuracyScore != null ? Number(q.accuracyScore) : null;
+    const difficulty = q.verificationDifficulty;
     const url = q.url;
     const domain = extractDomain(url);
 
@@ -207,14 +210,14 @@ export function buildDashboardExport(): DashboardExport | null {
         flagged.push({
           pageId,
           footnote: q.footnote,
-          claimText: q.claim_text,
-          sourceTitle: q.source_title,
+          claimText: q.claimText,
+          sourceTitle: q.sourceTitle,
           url,
           verdict,
           score,
-          issues: q.accuracy_issues,
+          issues: q.accuracyIssues,
           difficulty,
-          checkedAt: q.accuracy_checked_at,
+          checkedAt: q.accuracyCheckedAt ? String(q.accuracyCheckedAt) : null,
         });
       }
     }
@@ -304,8 +307,8 @@ function truncateClaim(text: string): string {
  * Export dashboard data to YAML files.
  * @param fromDbData - If provided, uses this data instead of building from SQLite
  */
-export function exportDashboardData(fromDbData?: DashboardExport | null): { path: string; data: DashboardExport } | null {
-  const data = fromDbData ?? buildDashboardExport();
+export async function exportDashboardData(fromDbData?: DashboardExport | null): Promise<{ path: string; data: DashboardExport } | null> {
+  const data = fromDbData ?? await buildDashboardExport();
   if (!data) return null;
   mkdirSync(ACCURACY_DIR, { recursive: true });
   mkdirSync(ACCURACY_PAGES_DIR, { recursive: true });
@@ -388,7 +391,7 @@ async function main() {
     }
   }
 
-  const result = exportDashboardData(dbData);
+  const result = await exportDashboardData(dbData);
 
   if (!result) {
     if (json) {

@@ -34,6 +34,20 @@ type CitationContentListEntry = CitationContentListResult['entries'][number];
 type CitationContentStatsResult = InferResponseType<RpcClient['content']['stats']['$get'], 200>;
 type PropagateFromClaimsResult = InferResponseType<RpcClient['quotes']['propagate-from-claims']['$post'], 200>;
 
+// New query types
+type CitationStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
+type CitationPageStatsResult = InferResponseType<RpcClient['page-stats']['$get'], 200>;
+type CitationSourceTypeStatsResult = InferResponseType<RpcClient['source-type-stats']['$get'], 200>;
+type CitationBrokenQuotesResult = InferResponseType<RpcClient['broken']['$get'], 200>;
+type QuotesByPageResult = InferResponseType<RpcClient['quotes']['$get'], 200>;
+type AllQuotesResult = InferResponseType<RpcClient['quotes']['all']['$get'], 200>;
+type PagesWithQuotesResult = InferResponseType<RpcClient['pages-with-quotes']['$get'], 200>;
+type UnverifiedQuotesResult = InferResponseType<RpcClient['unverified']['$get'], 200>;
+type MarkVerifiedResult = InferResponseType<RpcClient['quotes']['mark-verified']['$post'], 200>;
+type MarkUnverifiedResult = InferResponseType<RpcClient['quotes']['mark-unverified']['$post'], 200>;
+type SingleQuoteResult = InferResponseType<RpcClient['quotes'][':pageId'][':footnote']['$get'], 200>;
+type AccuracySummaryResult = InferResponseType<RpcClient['accuracy-summary']['$get'], 200>;
+
 // ---------------------------------------------------------------------------
 // Citation Quotes Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
@@ -44,7 +58,22 @@ export type UpsertCitationQuoteItem = UpsertCitationQuote;
 // Citation Quotes Types — response (re-exported for consumers)
 // ---------------------------------------------------------------------------
 
-export type { UpsertCitationQuoteResult, UpsertCitationQuoteBatchResult };
+export type {
+  UpsertCitationQuoteResult,
+  UpsertCitationQuoteBatchResult,
+  CitationStatsResult,
+  CitationPageStatsResult,
+  CitationSourceTypeStatsResult,
+  CitationBrokenQuotesResult,
+  QuotesByPageResult,
+  AllQuotesResult,
+  PagesWithQuotesResult,
+  UnverifiedQuotesResult,
+  MarkVerifiedResult,
+  MarkUnverifiedResult,
+  SingleQuoteResult,
+  AccuracySummaryResult,
+};
 
 // ---------------------------------------------------------------------------
 // Citation Accuracy Types — input (derived from server Zod schemas)
@@ -207,4 +236,93 @@ export async function propagateClaimVerdictsToPage(
     undefined,
     'content',
   );
+}
+
+// ---------------------------------------------------------------------------
+// Citation Quotes Query API functions (replacing SQLite DAO reads)
+// ---------------------------------------------------------------------------
+
+export async function getCitationStats(): Promise<ApiResult<CitationStatsResult>> {
+  return apiRequest<CitationStatsResult>('GET', '/api/citations/stats');
+}
+
+export async function getCitationPageStats(): Promise<ApiResult<CitationPageStatsResult>> {
+  return apiRequest<CitationPageStatsResult>('GET', '/api/citations/page-stats');
+}
+
+export async function getCitationSourceTypeStats(): Promise<ApiResult<CitationSourceTypeStatsResult>> {
+  return apiRequest<CitationSourceTypeStatsResult>('GET', '/api/citations/source-type-stats');
+}
+
+export async function getCitationBrokenQuotes(): Promise<ApiResult<CitationBrokenQuotesResult>> {
+  return apiRequest<CitationBrokenQuotesResult>('GET', '/api/citations/broken');
+}
+
+export async function getQuotesByPage(pageId: string, limit = 100): Promise<ApiResult<QuotesByPageResult>> {
+  return apiRequest<QuotesByPageResult>(
+    'GET',
+    `/api/citations/quotes?page_id=${encodeURIComponent(pageId)}&limit=${limit}`,
+  );
+}
+
+export async function getAllQuotes(limit = 100, offset = 0): Promise<ApiResult<AllQuotesResult>> {
+  return apiRequest<AllQuotesResult>(
+    'GET',
+    `/api/citations/quotes/all?limit=${limit}&offset=${offset}`,
+  );
+}
+
+export async function getPagesWithQuotes(): Promise<ApiResult<PagesWithQuotesResult>> {
+  return apiRequest<PagesWithQuotesResult>('GET', '/api/citations/pages-with-quotes');
+}
+
+export async function getUnverifiedQuotes(limit = 100): Promise<ApiResult<UnverifiedQuotesResult>> {
+  return apiRequest<UnverifiedQuotesResult>(
+    'GET',
+    `/api/citations/unverified?limit=${limit}`,
+  );
+}
+
+export async function getQuote(
+  pageId: string,
+  footnote: number,
+): Promise<ApiResult<SingleQuoteResult>> {
+  return apiRequest<SingleQuoteResult>(
+    'GET',
+    `/api/citations/quotes/${encodeURIComponent(pageId)}/${footnote}`,
+  );
+}
+
+export async function markQuoteVerified(
+  pageId: string,
+  footnote: number,
+  method: string,
+  score: number,
+): Promise<ApiResult<MarkVerifiedResult>> {
+  return apiRequest<MarkVerifiedResult>(
+    'POST',
+    '/api/citations/quotes/mark-verified',
+    { pageId, footnote, method, score },
+    undefined,
+    'content',
+  );
+}
+
+export async function markQuoteUnverified(
+  pageId: string,
+  footnote: number,
+  method: string,
+  score: number,
+): Promise<ApiResult<MarkUnverifiedResult>> {
+  return apiRequest<MarkUnverifiedResult>(
+    'POST',
+    '/api/citations/quotes/mark-unverified',
+    { pageId, footnote, method, score },
+    undefined,
+    'content',
+  );
+}
+
+export async function getAccuracySummary(): Promise<ApiResult<AccuracySummaryResult>> {
+  return apiRequest<AccuracySummaryResult>('GET', '/api/citations/accuracy-summary');
 }

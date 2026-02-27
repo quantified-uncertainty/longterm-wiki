@@ -28,7 +28,8 @@
  */
 
 import { fileURLToPath } from 'url';
-import { articles, sources, summaries } from '../lib/knowledge-db.ts';
+import { articles, sources } from '../lib/knowledge-db.ts';
+import { upsertSummary } from '../lib/wiki-server/summaries.ts';
 import { getColors } from '../lib/output.ts';
 import { createClient, resolveModel, sleep } from '../lib/anthropic.ts';
 import { extractText } from '../lib/llm.ts';
@@ -229,9 +230,16 @@ async function summarizeArticle(article: Article): Promise<SummaryResult> {
 
   const result = await generateSummary(prompt);
 
-  summaries.upsert(article.id, 'article', {
-    ...result,
-    model: MODEL_ID
+  await upsertSummary({
+    entityId: article.id,
+    entityType: 'article',
+    oneLiner: result.oneLiner,
+    summary: result.summary,
+    review: result.review ?? null,
+    keyPoints: (result.keyPoints as string[]) ?? null,
+    keyClaims: result.keyClaims?.map(kc => `${kc.claim}: ${kc.value}`) ?? null,
+    model: MODEL_ID,
+    tokensUsed: result.tokensUsed,
   });
 
   return result;
@@ -265,9 +273,16 @@ async function summarizeSource(source: Source): Promise<SummaryResult> {
 
   const result = await generateSummary(prompt);
 
-  summaries.upsert(source.id, 'source', {
-    ...result,
-    model: MODEL_ID
+  await upsertSummary({
+    entityId: source.id,
+    entityType: 'source',
+    oneLiner: result.oneLiner,
+    summary: result.summary,
+    review: result.review ?? null,
+    keyPoints: (result.keyPoints as string[]) ?? null,
+    keyClaims: result.keyClaims?.map(kc => `${kc.claim}: ${kc.value}`) ?? null,
+    model: MODEL_ID,
+    tokensUsed: result.tokensUsed,
   });
 
   return result;
@@ -356,7 +371,7 @@ async function main(): Promise<void> {
   } else if (TYPE === 'articles') {
     // Get articles needing summaries
     items = (RESUMMARY
-      ? articles.needingResummary().slice(0, BATCH_SIZE)
+      ? articles.needingSummary().slice(0, BATCH_SIZE)
       : articles.needingSummary().slice(0, BATCH_SIZE)) as any;
   } else if (TYPE === 'sources') {
     // Get sources needing summaries

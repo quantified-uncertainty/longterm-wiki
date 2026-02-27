@@ -361,6 +361,44 @@ const citationsApp = new Hono()
     return c.json({ updated: true, pageId, footnote });
   })
 
+  // ---- POST /quotes/mark-unverified ----
+  .post("/quotes/mark-unverified", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = MarkVerifiedSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { pageId, footnote, method, score } = parsed.data;
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .update(citationQuotes)
+      .set({
+        quoteVerified: false,
+        verificationMethod: method,
+        verificationScore: score,
+        updatedAt: sql`now()`,
+      })
+      .where(
+        and(
+          eq(citationQuotes.pageId, pageId),
+          eq(citationQuotes.footnote, footnote)
+        )
+      )
+      .returning({
+        id: citationQuotes.id,
+        pageId: citationQuotes.pageId,
+        footnote: citationQuotes.footnote,
+      });
+
+    if (rows.length === 0) {
+      return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+    }
+
+    return c.json({ updated: true, pageId, footnote });
+  })
+
   // ---- POST /quotes/mark-accuracy ----
   .post("/quotes/mark-accuracy", async (c) => {
     const body = await parseJsonBody(c);
@@ -1212,6 +1250,106 @@ const citationsApp = new Hono()
     });
 
     return c.json({ propagated, skipped });
+  })
+
+  // ---- GET /source-type-stats ----
+  .get("/source-type-stats", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        sourceType: sql<string>`coalesce(${citationQuotes.sourceType}, 'unknown')`,
+        count: count(),
+        withQuotes: sql<number>`count(case when ${citationQuotes.sourceQuote} is not null and ${citationQuotes.sourceQuote} != '' then 1 end)`,
+      })
+      .from(citationQuotes)
+      .groupBy(citationQuotes.sourceType)
+      .orderBy(desc(count()));
+
+    return c.json({
+      stats: rows.map((r) => ({
+        sourceType: r.sourceType,
+        count: r.count,
+        withQuotes: Number(r.withQuotes),
+      })),
+    });
+  })
+
+  // ---- GET /pages-with-quotes ----
+  .get("/pages-with-quotes", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        pageId: citationQuotes.pageId,
+        quoteCount: count(),
+      })
+      .from(citationQuotes)
+      .where(
+        and(
+          isNotNull(citationQuotes.sourceQuote),
+          sql`${citationQuotes.sourceQuote} != ''`
+        )
+      )
+      .groupBy(citationQuotes.pageId)
+      .orderBy(desc(count()));
+
+    return c.json({
+      pages: rows.map((r) => ({
+        pageId: r.pageId,
+        quoteCount: r.quoteCount,
+      })),
+    });
+  })
+
+  // ---- GET /unverified ----
+  .get("/unverified", async (c) => {
+    const limitParam = c.req.query("limit");
+    const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), MAX_PAGE_SIZE) : 100;
+
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(citationQuotes)
+      .where(
+        and(
+          isNotNull(citationQuotes.sourceQuote),
+          sql`${citationQuotes.sourceQuote} != ''`,
+          eq(citationQuotes.quoteVerified, false)
+        )
+      )
+      .orderBy(asc(citationQuotes.createdAt))
+      .limit(limit);
+
+    return c.json({ quotes: rows });
+  })
+
+  // ---- GET /quotes/:pageId/:footnote ----
+  .get("/quotes/:pageId/:footnote", async (c) => {
+    const pageId = c.req.param("pageId");
+    const footnoteStr = c.req.param("footnote");
+    const footnote = parseInt(footnoteStr, 10);
+    if (isNaN(footnote)) return validationError(c, "footnote must be a number");
+
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(citationQuotes)
+      .where(
+        and(
+          eq(citationQuotes.pageId, pageId),
+          eq(citationQuotes.footnote, footnote)
+        )
+      )
+      .limit(1);
+
+    if (rows.length === 0) {
+      return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+    }
+
+    return c.json({ quote: rows[0] });
   });
 
 export const citationsRoute = citationsApp;
