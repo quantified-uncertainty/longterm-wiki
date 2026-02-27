@@ -137,22 +137,6 @@ export async function clearClaimsBySection(
 // ---------------------------------------------------------------------------
 
 /**
- * Update the relatedEntities field on an existing claim.
- */
-export async function updateClaimRelatedEntities(
-  claimId: number,
-  relatedEntities: string[] | null,
-): Promise<ApiResult<ClaimRow>> {
-  return apiRequest<ClaimRow>(
-    'PATCH',
-    `/api/claims/${claimId}`,
-    { relatedEntities },
-    undefined,
-    'content',
-  );
-}
-
-/**
  * Batch update relatedEntities on multiple claims at once.
  * Max 500 items per call.
  */

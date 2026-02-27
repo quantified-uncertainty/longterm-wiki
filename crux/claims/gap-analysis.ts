@@ -20,6 +20,7 @@
  */
 
 import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
@@ -153,7 +154,6 @@ function isClaimOnPage(claim: string, pageTextLower: string): boolean {
 function findContradictions(
   claim: ClaimWithSource,
   pageLines: string[],
-  pageTextLower: string,
 ): string | null {
   const claimNumbers = extractNumbers(claim.claimText);
   if (claimNumbers.length === 0) return null;
@@ -274,7 +274,7 @@ export async function runGapAnalysis(pageId: string): Promise<GapAnalysisResult 
       onPage++;
 
       // Even if on page, check for contradictions
-      const contradictingLine = findContradictions(claimWithSource, pageLines, pageTextLower);
+      const contradictingLine = findContradictions(claimWithSource, pageLines);
       if (contradictingLine) {
         contradictions.push({ claim: claimWithSource, pageText: contradictingLine });
       }
@@ -440,7 +440,7 @@ async function main() {
 }
 
 // Run CLI when invoked directly
-const isMain = process.argv[1]?.includes('gap-analysis');
+const isMain = process.argv[1] === fileURLToPath(import.meta.url);
 if (isMain) {
   main().catch(err => {
     console.error('Error:', err instanceof Error ? err.message : String(err));
