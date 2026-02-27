@@ -858,7 +858,7 @@ const claimsApp = new Hono()
 
     // Use raw SQL for the similarity() function (same pattern as pages.ts trigram fallback)
     const rawDb = getDb();
-    const rows = (await rawDb.unsafe(
+    const rows = await rawDb.unsafe<SimilarClaimDbRow[]>(
       `SELECT
       id, entity_id, entity_type, claim_text, claim_category, confidence,
       similarity(claim_text, $1) AS similarity_score
@@ -868,7 +868,7 @@ const claimsApp = new Hono()
     ORDER BY similarity(claim_text, $1) DESC
     LIMIT $3`,
       [targetText, id, limit],
-    )) as unknown as SimilarClaimDbRow[];
+    );
 
     return c.json({
       claims: rows.map((r) => ({

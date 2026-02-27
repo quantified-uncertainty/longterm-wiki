@@ -7,7 +7,19 @@ import type {
 import type {
   AccuracyVerdict,
 } from "@wiki-server/api-types";
-import { ACCURACY_VERDICTS } from "@wiki-server/api-types";
+
+/**
+ * Valid accuracy verdict values — mirrors ACCURACY_VERDICTS from api-types.
+ * Inlined here to avoid a runtime import of @wiki-server/api-types
+ * (vitest can't resolve it as a runtime dependency).
+ */
+const ACCURACY_VERDICTS: readonly string[] = [
+  "accurate",
+  "inaccurate",
+  "unsupported",
+  "minor_issues",
+  "not_verifiable",
+];
 
 // Re-export the server type for consumers
 export type { CitationHealthResult } from "@wiki-server/api-response-types";
@@ -52,6 +64,17 @@ export interface CitationHealthSummary {
 }
 
 /**
+ * Narrow a string | null to AccuracyVerdict | null at runtime.
+ * Returns null for unrecognized values instead of silently mis-typing them.
+ */
+function toAccuracyVerdict(value: string | null): AccuracyVerdict | null {
+  if (value === null) return null;
+  return (ACCURACY_VERDICTS as readonly string[]).includes(value)
+    ? (value as AccuracyVerdict)
+    : null;
+}
+
+/**
  * Fetch citation verification data for a specific page from the wiki-server.
  * Returns an empty array if the server is unavailable or the page has no data.
  *
@@ -68,11 +91,27 @@ export async function getCitationQuotes(
   if (!result?.quotes) return [];
 
   // Only include quotes that have some verification data worth showing.
-  // Cast needed: server returns accuracyVerdict as string|null (DB row),
-  // but CitationQuote narrows it to AccuracyVerdict|null.
-  return result.quotes.filter(
-    (q) => q.quoteVerified || q.accuracyVerdict !== null
-  ) as unknown as CitationQuote[];
+  // Map server rows to CitationQuote, narrowing accuracyVerdict from string to the union type.
+  return result.quotes
+    .filter((q) => q.quoteVerified || q.accuracyVerdict !== null)
+    .map((q): CitationQuote => ({
+      footnote: q.footnote,
+      url: q.url,
+      resourceId: q.resourceId,
+      claimText: q.claimText,
+      sourceQuote: q.sourceQuote,
+      sourceTitle: q.sourceTitle,
+      sourceType: q.sourceType,
+      quoteVerified: q.quoteVerified,
+      verificationScore: q.verificationScore,
+      verifiedAt: q.verifiedAt,
+      accuracyVerdict: toAccuracyVerdict(q.accuracyVerdict),
+      accuracyScore: q.accuracyScore,
+      accuracyIssues: q.accuracyIssues,
+      accuracySupportingQuotes: q.accuracySupportingQuotes,
+      verificationDifficulty: q.verificationDifficulty,
+      accuracyCheckedAt: q.accuracyCheckedAt,
+    }));
 }
 
 /** Citation quote with page context — returned by quotes-by-url endpoint */

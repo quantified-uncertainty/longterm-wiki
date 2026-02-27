@@ -30,6 +30,17 @@ export interface RiskPageData {
   factors: string[];
 }
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+const VALID_RISK_LEVELS = new Set<string>(["low", "medium", "high"]);
+
+/** Narrow a string to the RiskLevel union, defaulting to "medium" for unknown values. */
+function toRiskLevel(value: string): "low" | "medium" | "high" {
+  return VALID_RISK_LEVELS.has(value)
+    ? (value as "low" | "medium" | "high")
+    : "medium";
+}
+
 // ── Data loading ─────────────────────────────────────────────────────────────
 
 /**
@@ -97,7 +108,7 @@ async function loadRiskDataFromApi(): Promise<FetchResult<RiskPageData[]>> {
           entityType: meta?.entityType,
           quality: meta?.quality ?? null,
           wordCount: meta?.wordCount,
-          level: r.level as "low" | "medium" | "high",
+          level: toRiskLevel(r.level),
           score: r.score,
           factors: r.factors || [],
         };

@@ -179,7 +179,7 @@ const hallucinationRiskApp = new Hono()
     const uniquePages = Number(pagesResult[0].count);
 
     // Level distribution (from latest snapshot per page) using DISTINCT ON
-    const levelDist = await rawDb`
+    const levelDist = await rawDb<LevelDistRow[]>`
       SELECT level, count(*)::int AS count
       FROM (
         SELECT DISTINCT ON (page_id) level
@@ -193,7 +193,7 @@ const hallucinationRiskApp = new Hono()
       totalSnapshots,
       uniquePages,
       levelDistribution: Object.fromEntries(
-        (levelDist as unknown as LevelDistRow[]).map((r) => [r.level, r.count])
+        levelDist.map((r) => [r.level, r.count])
       ),
     });
   })
@@ -209,7 +209,7 @@ const hallucinationRiskApp = new Hono()
 
     // Use DISTINCT ON for efficient "latest per page" query
     const rows = level
-      ? await rawDb`
+      ? await rawDb<RiskPageDbRow[]>`
           SELECT page_id, score, level, factors, integrity_issues, computed_at
           FROM (
             SELECT DISTINCT ON (page_id) *
@@ -220,7 +220,7 @@ const hallucinationRiskApp = new Hono()
           ORDER BY score DESC
           LIMIT ${limit} OFFSET ${offset}
         `
-      : await rawDb`
+      : await rawDb<RiskPageDbRow[]>`
           SELECT page_id, score, level, factors, integrity_issues, computed_at
           FROM (
             SELECT DISTINCT ON (page_id) *
@@ -232,7 +232,7 @@ const hallucinationRiskApp = new Hono()
         `;
 
     return c.json({
-      pages: (rows as unknown as RiskPageDbRow[]).map((r) => ({
+      pages: rows.map((r) => ({
         pageId: r.page_id,
         score: r.score,
         level: r.level,

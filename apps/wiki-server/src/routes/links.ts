@@ -180,7 +180,7 @@ const linksApp = new Hono()
     // Join with wiki_pages to get title and entity_type for the source.
     // Deduplicate by source_id (a source may link via multiple link_types),
     // then order by weight descending (most relevant first).
-    const results = await rawDb`
+    const results = await rawDb<BacklinkDbRow[]>`
     SELECT * FROM (
       SELECT DISTINCT ON (pl.source_id)
         pl.source_id,
@@ -198,7 +198,7 @@ const linksApp = new Hono()
     LIMIT ${limit}
   `;
 
-    const backlinks = (results as unknown as BacklinkDbRow[]).map((r) => ({
+    const backlinks = results.map((r) => ({
       id: r.source_id,
       type: r.source_type || "concept",
       title: r.source_title || r.source_id,
@@ -230,7 +230,7 @@ const linksApp = new Hono()
     // For each neighbor, sum the weights of all link types connecting them.
     // Apply quality boost: 1 + quality/40 + reader_importance/400 (max ~1.45x).
     // Relationship labels come from yaml_related links.
-    const results = await rawDb`
+    const results = await rawDb<RelatedDbRow[]>`
     WITH bidirectional_links AS (
       -- Forward links: entityId is source (is_reverse = false)
       SELECT target_id AS neighbor_id, link_type, relationship, weight, false AS is_reverse
@@ -288,10 +288,10 @@ const linksApp = new Hono()
 
     // Type-diverse selection: guarantee MIN_PER_TYPE from each entity type,
     // then fill remaining slots with highest-scoring entries.
-    const scored = (results as unknown as RelatedDbRow[]).map((r) => ({
-      id: r.id as string,
-      type: (r.entity_type as string) || "concept",
-      title: (r.title as string) || r.id,
+    const scored = results.map((r) => ({
+      id: r.id,
+      type: r.entity_type || "concept",
+      title: r.title || r.id,
       score: Math.round(parseFloat(r.score) * 100) / 100,
       label: formatRelationshipLabel(r.relationship, !!r.relationship_is_reverse) || undefined,
     }));
@@ -316,7 +316,7 @@ const linksApp = new Hono()
 
     // Get all direct links (both directions) for the entity.
     // This provides the raw graph data for visualization.
-    const results = await rawDb`
+    const results = await rawDb<GraphEdgeDbRow[]>`
     SELECT
       pl.source_id,
       pl.target_id,
@@ -345,7 +345,7 @@ const linksApp = new Hono()
       weight: number;
     }> = [];
 
-    for (const r of results as unknown as GraphEdgeDbRow[]) {
+    for (const r of results) {
       if (!nodeMap.has(r.source_id)) {
         nodeMap.set(r.source_id, {
           id: r.source_id,
@@ -381,7 +381,7 @@ const linksApp = new Hono()
   .get("/stats", async (c) => {
     const rawDb = getDb();
 
-    const stats = await rawDb`
+    const stats = await rawDb<LinkStatsRow[]>`
     SELECT
       link_type,
       COUNT(*)::int AS count,
@@ -391,25 +391,24 @@ const linksApp = new Hono()
     ORDER BY count DESC
   `;
 
-    const totalResult = await rawDb`
+    const totalResult = await rawDb<TotalRow[]>`
     SELECT COUNT(*)::int AS total FROM page_links
   `;
 
-    const uniquePagesResult = await rawDb`
+    const uniquePagesResult = await rawDb<UniqueCountRow[]>`
     SELECT COUNT(DISTINCT source_id)::int AS sources,
            COUNT(DISTINCT target_id)::int AS targets
     FROM page_links
   `;
 
-    const total = (totalResult as unknown as TotalRow[])[0]?.total || 0;
-    const unique = (uniquePagesResult as unknown as UniqueCountRow[])[0];
-    const typedStats = stats as unknown as LinkStatsRow[];
+    const total = totalResult[0]?.total || 0;
+    const unique = uniquePagesResult[0];
 
     return c.json({
       total,
       uniqueSources: unique?.sources || 0,
       uniqueTargets: unique?.targets || 0,
-      byType: typedStats.map((s) => ({
+      byType: stats.map((s) => ({
         linkType: s.link_type,
         count: s.count,
         avgWeight: parseFloat(s.avg_weight),

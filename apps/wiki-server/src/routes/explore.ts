@@ -151,9 +151,12 @@ const DERIVED_TYPE_EXPR = `
   END
 `;
 
+/** SQL parameter type compatible with postgres.js unsafe() */
+type SqlParam = string | number;
+
 /**
  * Build parameterized conditions and collect params.
- * Returns { conditions: string[], params: unknown[], paramIdx: number }.
+ * Returns { conditions: string[], params: SqlParam[], paramIdx: number }.
  */
 function buildFilterConditions(opts: {
   search?: string;
@@ -162,9 +165,9 @@ function buildFilterConditions(opts: {
   entityType?: string;
   riskCategory?: string;
   startParamIdx?: number;
-}): { conditions: string[]; params: unknown[]; paramIdx: number } {
+}): { conditions: string[]; params: SqlParam[]; paramIdx: number } {
   const conditions: string[] = [BASE_CONDITIONS];
-  const params: unknown[] = [];
+  const params: SqlParam[] = [];
   let paramIdx = opts.startParamIdx ?? 1;
 
   if (opts.search) {
@@ -345,12 +348,12 @@ const exploreApp = new Hono()
     // Execute all queries in parallel
     let [rows, countResult, clusterCounts, categoryCounts, entityTypeCounts, riskCatCounts] =
       await Promise.all([
-        rawDb.unsafe(dataQuery, dataParams as any[]),
-        rawDb.unsafe(countQuery, main.params as any[]),
-        rawDb.unsafe(clusterCountQuery, searchOnly.params as any[]),
-        rawDb.unsafe(categoryCountQuery, searchCluster.params as any[]),
-        rawDb.unsafe(entityTypeCountQuery, searchClusterCat.params as any[]),
-        rawDb.unsafe(riskCatCountQuery, searchClusterCatRisk.params as any[]),
+        rawDb.unsafe<ExploreDataRow[]>(dataQuery, dataParams),
+        rawDb.unsafe<{ total: string }[]>(countQuery, main.params),
+        rawDb.unsafe<FacetCountRow[]>(clusterCountQuery, searchOnly.params),
+        rawDb.unsafe<FacetCountRow[]>(categoryCountQuery, searchCluster.params),
+        rawDb.unsafe<FacetCountRow[]>(entityTypeCountQuery, searchClusterCat.params),
+        rawDb.unsafe<FacetCountRow[]>(riskCatCountQuery, searchClusterCatRisk.params),
       ]);
 
     let total = parseInt(countResult[0]?.total ?? "0", 10);
@@ -392,15 +395,15 @@ const exploreApp = new Hono()
       `;
 
       const [trigramRows, trigramCount] = await Promise.all([
-        rawDb.unsafe(trigramQuery, trigramParams as any[]),
-        rawDb.unsafe(trigramCountQuery, [...noSearchFilters.params, search] as any[]),
+        rawDb.unsafe<ExploreDataRow[]>(trigramQuery, trigramParams),
+        rawDb.unsafe<{ total: string }[]>(trigramCountQuery, [...noSearchFilters.params, search]),
       ]);
       rows = trigramRows;
       total = parseInt(trigramCount[0]?.total ?? "0", 10);
     }
 
     // Transform rows to ExploreItem shape
-    const items = (rows as unknown as ExploreDataRow[]).map((r) => {
+    const items = rows.map((r) => {
       const entityTags = Array.isArray(r.entity_tags) ? r.entity_tags : [];
       const pageTags = parseTags(r.page_tags);
       const tags = entityTags.length > 0 ? entityTags : pageTags;
@@ -412,7 +415,8 @@ const exploreApp = new Hono()
 
       return {
         id: r.id,
-        numericId: r.numeric_id as string,
+        // Safe non-null assertion: BASE_CONDITIONS includes `AND wp.numeric_id IS NOT NULL`
+        numericId: r.numeric_id!,
         title: r.title,
         type: deriveType(r.content_format, r.entity_type, r.category),
         description: r.description || null,
@@ -433,9 +437,9 @@ const exploreApp = new Hono()
       };
     });
 
-    const toCountMap = (rows: unknown[]) =>
+    const toCountMap = (rows: FacetCountRow[]) =>
       Object.fromEntries(
-        (rows as FacetCountRow[]).map((r) => [r.val, parseInt(r.cnt, 10)])
+        rows.map((r) => [r.val, parseInt(r.cnt, 10)])
       );
 
     return c.json({

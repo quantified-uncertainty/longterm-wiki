@@ -75,7 +75,7 @@ const pagesApp = new Hono()
     let results: PageSearchRow[] = [];
 
     if (prefixQuery) {
-      results = (await rawDb.unsafe(
+      results = await rawDb.unsafe<PageSearchRow[]>(
         `SELECT
         id, numeric_id, title, description, entity_type, category,
         reader_importance, quality,
@@ -90,13 +90,13 @@ const pagesApp = new Hono()
       ORDER BY rank DESC, reader_importance DESC NULLS LAST
       LIMIT $2`,
         [prefixQuery, limit],
-      )) as unknown as PageSearchRow[];
+      );
     }
 
     // Phase 2: If FTS returned few results, fall back to pg_trgm similarity
     // for typo tolerance (e.g. "antrhopic" → "anthropic").
     if (results.length < TRIGRAM_FALLBACK_THRESHOLD) {
-      const trigramResults = await rawDb.unsafe(
+      const trigramResults = await rawDb.unsafe<PageSearchRow[]>(
         `SELECT
         id, numeric_id, title, description, entity_type, category,
         reader_importance, quality,
@@ -111,7 +111,7 @@ const pagesApp = new Hono()
       LIMIT $2`,
         [q, limit - results.length, results.map((r) => r.id)],
       );
-      results = [...results, ...(trigramResults as unknown as PageSearchRow[])];
+      results = [...results, ...trigramResults];
     }
 
     return c.json({
