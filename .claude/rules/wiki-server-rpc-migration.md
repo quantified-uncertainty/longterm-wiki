@@ -1,72 +1,162 @@
-# Wiki-Server: Hono RPC Migration (Mandatory for New Routes)
+# Wiki-Server: Hono RPC Type System — MANDATORY
 
-All **new** wiki-server routes must use Hono RPC method-chaining. Existing routes should be converted when you are already modifying them.
+All wiki-server routes use Hono RPC method-chaining. Response types are inferred at compile-time via `InferResponseType<>`. **Never write hand-written response interfaces** — the route handler is the single source of truth.
 
-## Status
+## Architecture Overview
 
-- **Migrated**: All route files — `facts.ts`, `claims.ts`, `citations.ts`, `references.ts`, `health.ts`, `ids.ts`, `edit-logs.ts`, `summaries.ts`, `artifacts.ts`, `agent-sessions.ts`, `entities.ts`, `explore.ts`, `sessions.ts`, `pages.ts`, `links.ts`, `hallucination-risk.ts`, `jobs.ts`, `resources.ts`, `auto-update-news.ts`, `auto-update-runs.ts`, `integrity.ts`
-- **Utility files** (no migration needed): `ref-check.ts`, `utils.ts`
+```
+Route handler (c.json({...}))          ← SINGLE SOURCE OF TRUTH
+    │
+    ├── export type MyRoute = typeof myApp
+    │
+    ├── crux/lib/wiki-server/<name>.ts     ← InferResponseType<RpcClient[...], 200>
+    │       Uses apiRequest() for HTTP calls, types are compile-time only
+    │
+    └── api-response-types.ts              ← InferResponseType<RpcClient[...], 200>
+            Frontend imports via @wiki-server/api-response-types
+```
 
-## Why
+Three type layers, all derived from the route:
+1. **Server route** — method-chained Hono app, exports `type MyRoute = typeof myApp`
+2. **Crux CLI client** — `crux/lib/wiki-server/<name>.ts`, uses `InferResponseType<>` from the route type
+3. **Frontend** — `apps/wiki-server/src/api-response-types.ts`, uses `InferResponseType<>` from route types; frontend imports via `@wiki-server/api-response-types` tsconfig alias
 
-Today, API response types are manually duplicated in 3 places:
-1. `apps/wiki-server/src/api-types.ts` (interface definitions)
-2. Route handler (actual `c.json(...)` return shape)
-3. Client code (`crux/lib/wiki-server/`, `apps/web/src/data/`)
+## Adding a New Route — Complete Checklist
 
-These drift silently. The facts migration caught 2 real bugs: `entity` vs `entityId` and `timeseries` vs `points` field mismatches that had gone unnoticed.
-
-With Hono RPC, the route handler is the single source of truth and client types are inferred at compile-time via `InferResponseType<>`.
-
-## How to migrate a route
-
-Follow the pattern in `apps/wiki-server/src/routes/facts.ts`:
-
-### 1. Server: use method-chaining and export the route type
+### Step 1: Create the route file
 
 ```typescript
-const myApp = new Hono()
-  .get("/endpoint", zv("query", MyQuerySchema), async (c) => {
+// apps/wiki-server/src/routes/my-feature.ts
+import { Hono } from "hono";
+import { zv } from "../utils.js";
+import { z } from "zod";
+
+const myFeatureApp = new Hono()
+  .get("/", zv("query", z.object({ limit: z.coerce.number().default(50) })), async (c) => {
+    const { limit } = c.req.valid("query");
     // ... handler logic
-    return c.json({ result });
+    return c.json({ items: [], total: 0 });
   })
-  .post("/other", async (c) => {
+  .post("/", async (c) => {
+    const body = await c.req.json();
     // ...
-    return c.json({ ok: true });
+    return c.json({ id: "new-id" }, 201);
   });
 
-export const myRoute = myApp;
-export type MyRoute = typeof myApp;
+export const myFeatureRoute = myFeatureApp;
+export type MyFeatureRoute = typeof myFeatureApp;
 ```
 
-Key: the method-chaining (`.get().post()`) is what lets TypeScript infer the full route type. Standalone `myApp.get(...)` calls break inference.
+**Key rules:**
+- Method-chaining (`.get().post()`) is required — standalone `myApp.get(...)` breaks type inference
+- Use `zv()` (Hono validator wrapper) for query/body validation — this gives typed params AND proper error responses
+- **Avoid `(r: any)` for raw SQL results** — this makes InferResponseType produce `any`-typed fields. Instead, type the intermediate:
+  ```typescript
+  // BAD — produces any-typed fields in InferResponseType
+  const items = rows.map((r: any) => ({ id: r.id, name: r.name }));
 
-### 2. CLI client: replace hand-written types with InferResponseType
+  // GOOD — produces properly-typed fields
+  interface DbRow { id: string; name: string }
+  const items = rows.map((r: DbRow) => ({ id: r.id, name: r.name }));
+
+  // ALSO GOOD — use Drizzle typed queries instead of raw SQL
+  const items = await db.select().from(myTable).where(...);
+  ```
+
+### Step 2: Register in `app.ts`
+
+Two things to add in `apps/wiki-server/src/app.ts`:
 
 ```typescript
-import type { hc, InferResponseType } from 'hono/client';
-import type { MyRoute } from '../../../apps/wiki-server/src/routes/my-route.ts';
+// 1. Auth middleware — choose the right scope:
+//    "content" = wiki data (facts, claims, citations, entities, resources, etc.)
+//    "project" = operational/infrastructure (sessions, jobs, agent-sessions, ids, etc.)
+app.use("/api/my-feature/*", requireWriteScope("content"));
 
-type RpcClient = ReturnType<typeof hc<MyRoute>>;
-type MyEndpointResult = InferResponseType<RpcClient['endpoint']['$get'], 200>;
+// 2. Mount the route
+app.route("/api/my-feature", myFeatureRoute);
 ```
 
-Keep using `apiRequest()` for the actual HTTP calls (test mock compatibility). Only the types change.
+### Step 3: Add crux CLI client (if crux needs to call it)
 
-### 3. Frontend (if applicable): use the RPC client from `apps/web/src/lib/wiki-server.ts`
+```typescript
+// crux/lib/wiki-server/my-feature.ts
+import type { hc, InferResponseType } from 'hono/client';
+import type { MyFeatureRoute } from '../../../apps/wiki-server/src/routes/my-feature.ts';
+import { apiRequest, type ApiResult } from './client.ts';
 
-See `getFactsRpcClient()` for the ISR-compatible fetch wrapper pattern.
+type RpcClient = ReturnType<typeof hc<MyFeatureRoute>>;
 
-### 4. Clean up
+// Response types — derived from route, NOT hand-written
+export type MyFeatureListResult = InferResponseType<RpcClient['index']['$get'], 200>;
+export type MyFeatureCreateResult = InferResponseType<RpcClient['index']['$post'], 201>;
 
-Remove the old hand-written response interfaces from `api-types.ts` once all consumers use inferred types.
+// API functions — use apiRequest() for HTTP calls
+export async function listMyFeatures(limit = 50): Promise<ApiResult<MyFeatureListResult>> {
+  return apiRequest<MyFeatureListResult>('GET', `/api/my-feature?limit=${limit}`);
+}
+```
 
-## Adding new routes
+Then re-export from `crux/lib/wiki-server/index.ts`.
 
-All new routes **must** use method-chaining from the start. Follow the pattern above.
+### Step 4: Add frontend types (if frontend consumes the API)
 
-## RPC path key gotchas
+Add to `apps/wiki-server/src/api-response-types.ts`:
 
-- Root route `/` maps to `'index'` in the RPC client type (not `'/'`)
-- Path params like `/:id` map to `':id'`
-- Hyphenated paths like `/by-entity` map to `'by-entity'`
+```typescript
+import type { MyFeatureRoute } from './routes/my-feature.js';
+
+type MyFeatureRpc = ReturnType<typeof hc<MyFeatureRoute>>;
+
+export type MyFeatureListResult = InferResponseType<MyFeatureRpc['index']['$get'], 200>;
+export type MyFeatureItem = MyFeatureListResult['items'][number];
+```
+
+Frontend files import via: `import type { MyFeatureItem } from "@wiki-server/api-response-types"`
+
+### Step 5: Verify
+
+```bash
+cd apps/web && npx tsc --noEmit   # Frontend types compile
+cd apps/wiki-server && npx tsc --noEmit  # Server types compile
+pnpm crux validate gate --fix     # Full gate
+```
+
+## RPC Path Key Mapping
+
+| Route pattern | RPC client key | Example |
+|---------------|---------------|---------|
+| `/` (root) | `'index'` | `RpcClient['index']['$get']` |
+| `/:id` | `[':id']` | `RpcClient[':id']['$get']` |
+| `/by-entity` | `['by-entity']` | `RpcClient['by-entity']['$get']` |
+| `/by-entity/:entityId` | `['by-entity'][':entityId']` | `RpcClient['by-entity'][':entityId']['$get']` |
+| `/stats` | `['stats']` | `RpcClient['stats']['$get']` |
+
+**Never use leading slashes** in keys: `['stats']` not `['/stats']`.
+
+## Known Issue: `(r: any)` Raw SQL Regressions
+
+Several existing routes use `(r: any)` mapping for raw SQL results, which causes InferResponseType to produce `any`-typed fields. This is **worse** than hand-written types. Affected routes:
+
+- `links.ts` — backlinks and related endpoints (BacklinkEntry, RelatedEntry have `any` fields)
+- `claims.ts` — similar claims endpoint (SimilarClaimItem has `any` fields)
+- `hallucination-risk.ts` — latest endpoint (RiskPageRow has `any` fields)
+- `explore.ts`, `pages.ts`, `resources.ts` — search endpoints
+
+When modifying these routes, fix the `(r: any)` by adding typed interfaces for the raw SQL result shape.
+
+## What Belongs Where
+
+| File | Contains | Example |
+|------|----------|---------|
+| `api-types.ts` | Zod input schemas, runtime constants, enum types | `InsertClaim`, `AccuracyVerdict`, `ACCURACY_VERDICTS` |
+| `api-response-types.ts` | InferResponseType exports for frontend | `ClaimRow`, `BacklinkEntry`, `SessionRow` |
+| `crux/lib/wiki-server/<name>.ts` | InferResponseType exports + apiRequest() functions for CLI | `GetClaimsResult`, `upsertClaim()` |
+| Route files | The actual response shapes (via `c.json()`) | Single source of truth |
+
+**Never add response interfaces to `api-types.ts`** — that file is for inputs and runtime values only.
+
+## Circular Import Prevention
+
+- `api-response-types.ts` imports route types → routes import Zod schemas from `api-types.ts`
+- **`api-types.ts` must NEVER import from `api-response-types.ts` or route files** — this would create a cycle
