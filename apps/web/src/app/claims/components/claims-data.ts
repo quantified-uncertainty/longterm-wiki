@@ -20,14 +20,15 @@ export function buildEntityNameMap(slugs: string[]): Record<string, string> {
   return map;
 }
 
-/** Collect all unique entity slugs from claims (both entityId and relatedEntities) */
+/** Collect all unique entity slugs from claims (both entityId and relatedEntities).
+ *  relatedEntities are already normalized (lowercased) by the server. */
 export function collectEntitySlugs(claims: ClaimRow[]): string[] {
   const slugs = new Set<string>();
   for (const claim of claims) {
     slugs.add(claim.entityId);
     if (claim.relatedEntities) {
       for (const rel of claim.relatedEntities) {
-        slugs.add(rel.toLowerCase());
+        slugs.add(rel);
       }
     }
   }

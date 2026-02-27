@@ -64,7 +64,8 @@ export default async function ClaimsOverviewPage() {
   // Build entity name map for display
   const entityNames = buildEntityNameMap(collectEntitySlugs(claims));
 
-  // Build relationship counts (skip self-referential)
+  // Build relationship counts (skip self-referential).
+  // relatedEntities are already normalized (lowercased) by the server.
   const pairCounts = new Map<
     string,
     { from: string; to: string; count: number; sample: string }
@@ -72,9 +73,8 @@ export default async function ClaimsOverviewPage() {
   for (const claim of claims) {
     if (!claim.relatedEntities || claim.relatedEntities.length === 0) continue;
     for (const related of claim.relatedEntities) {
-      const normalizedRel = related.toLowerCase();
-      if (normalizedRel === claim.entityId) continue;
-      const [a, b] = [claim.entityId, normalizedRel].sort();
+      if (related === claim.entityId) continue;
+      const [a, b] = [claim.entityId, related].sort();
       const pair = `${a} <-> ${b}`;
       if (!pairCounts.has(pair)) {
         pairCounts.set(pair, {

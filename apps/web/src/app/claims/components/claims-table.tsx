@@ -213,10 +213,10 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
             {claim.relatedEntities.map((eid) => (
               <Link
                 key={eid}
-                href={`/claims/entity/${eid.toLowerCase()}`}
+                href={`/claims/entity/${eid}`}
                 className="text-blue-600 hover:underline ml-1"
               >
-                {entityNames[eid.toLowerCase()] ?? eid}
+                {entityNames[eid] ?? eid}
               </Link>
             ))}
           </span>
@@ -483,10 +483,10 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
           {entities.slice(0, 3).map((eid) => (
             <Link
               key={eid}
-              href={`/claims/entity/${eid.toLowerCase()}`}
+              href={`/claims/entity/${eid}`}
               className="inline-block px-1 py-0.5 rounded text-[10px] bg-gray-100 text-gray-600 hover:bg-gray-200"
             >
-              {entityNames[eid.toLowerCase()] ?? eid}
+              {entityNames[eid] ?? eid}
             </Link>
           ))}
           {entities.length > 3 && (
