@@ -22,6 +22,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+/** Approximate row height in px for spacer calculation (keeps table height stable across pages) */
+const TABLE_ROW_HEIGHT_PX = 37;
+
 export interface FactDataRow {
   key: string;
   entity: string;
@@ -401,7 +404,7 @@ export function FactsDataTable({
                   <tr>
                     <td
                       colSpan={columns.length}
-                      style={{ height: `${(pagination.pageSize - table.getRowModel().rows.length) * 37}px` }}
+                      style={{ height: `${(pagination.pageSize - table.getRowModel().rows.length) * TABLE_ROW_HEIGHT_PX}px` }}
                     />
                   </tr>
                 )}

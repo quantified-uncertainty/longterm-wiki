@@ -29,6 +29,9 @@ import type { RelationshipRow } from "@wiki-server/api-response-types";
 
 export type { RelationshipRow };
 
+/** Approximate row height in px for spacer calculation (keeps table height stable across pages) */
+const TABLE_ROW_HEIGHT_PX = 37;
+
 function getColumns(entityNames: Record<string, string>): ColumnDef<RelationshipRow>[] {
   return [
   {
@@ -153,11 +156,11 @@ export function RelationshipsTable({
                 </TableRow>
               ))}
               {/* Spacer row to maintain consistent table height across pages */}
-              {table.getRowModel().rows.length < 25 && (
+              {table.getRowModel().rows.length < table.getState().pagination.pageSize && (
                 <tr>
                   <td
                     colSpan={columns.length}
-                    style={{ height: `${(25 - table.getRowModel().rows.length) * 37}px` }}
+                    style={{ height: `${(table.getState().pagination.pageSize - table.getRowModel().rows.length) * TABLE_ROW_HEIGHT_PX}px` }}
                   />
                 </tr>
               )}

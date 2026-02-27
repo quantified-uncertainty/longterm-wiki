@@ -37,6 +37,9 @@ export interface PublicationResourceRow {
   citingPageCount: number;
 }
 
+/** Approximate row height in px for spacer calculation (keeps table height stable across pages) */
+const TABLE_ROW_HEIGHT_PX = 37;
+
 const TYPE_COLORS: Record<string, string> = {
   paper: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
   blog: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
@@ -222,7 +225,7 @@ export function PublicationResourcesTable({
                   <tr>
                     <td
                       colSpan={columns.length}
-                      style={{ height: `${(pagination.pageSize - table.getRowModel().rows.length) * 37}px` }}
+                      style={{ height: `${(pagination.pageSize - table.getRowModel().rows.length) * TABLE_ROW_HEIGHT_PX}px` }}
                     />
                   </tr>
                 )}
