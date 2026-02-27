@@ -122,6 +122,18 @@ const SCRIPTS = {
     passthrough: ['unpin', 'list'],
     positional: true,
   },
+  fix: {
+    script: 'claims/fix-quality.ts',
+    description: 'Auto-fix common quality issues: strip-markup, dedup, normalize-entities',
+    passthrough: ['apply', 'entity', 'entity-id', 'limit'],
+    positional: true,
+  },
+  'quality-report': {
+    script: 'claims/quality-report.ts',
+    description: 'Per-entity quality breakdown: validation issues, duplicates, markup leakage',
+    passthrough: ['json', 'entity', 'entity-id', 'top'],
+    positional: false,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'status');
@@ -207,6 +219,14 @@ Workflow:
   1. crux claims pin 42                           Pin claim #42 as canonical
   2. crux claims pin 42 --unpin                    Unpin claim #42
   3. crux claims pin --list=anthropic              List pinned claims for an entity
+
+  Quality fixes (automated remediation):
+  1. crux claims fix                               Dry-run all fixers
+  2. crux claims fix --apply                       Apply all fixers
+  3. crux claims fix strip-markup --apply           Strip MDX/JSX from claim text
+  4. crux claims fix dedup --entity=anthropic       Dedup single entity (dry-run)
+  5. crux claims fix dedup --apply                  Dedup all entities
+  6. crux claims fix normalize-entities --apply     Normalize relatedEntities slugs
 
   Footnote migration (DB-driven references):
   1. crux claims migrate-footnotes <page-id>          Dry-run: show what would change

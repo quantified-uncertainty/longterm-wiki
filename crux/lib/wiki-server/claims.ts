@@ -192,6 +192,38 @@ export async function batchUpdateStructuredFields(
   );
 }
 
+/**
+ * Batch update claim text on multiple claims at once.
+ * Max 500 items per call. Used by `crux claims fix strip-markup`.
+ */
+export async function batchUpdateClaimText(
+  items: Array<{ id: number; claimText: string }>,
+): Promise<ApiResult<{ updated: number; total: number }>> {
+  return apiRequest<{ updated: number; total: number }>(
+    'PATCH',
+    '/api/claims/batch-update-text',
+    { items },
+    30_000,
+    'content',
+  );
+}
+
+/**
+ * Delete claims by their IDs. Max 1000 IDs per call.
+ * Used by `crux claims fix dedup` to remove duplicate claims.
+ */
+export async function deleteClaimsByIds(
+  ids: number[],
+): Promise<ApiResult<{ deleted: number }>> {
+  return apiRequest<{ deleted: number }>(
+    'POST',
+    '/api/claims/delete-by-ids',
+    { ids },
+    30_000,
+    'content',
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Claim Page References API functions
 // ---------------------------------------------------------------------------
