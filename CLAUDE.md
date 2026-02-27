@@ -71,6 +71,11 @@ pnpm crux ids check <slug>       # Look up existing ID for a slug
 pnpm crux context for-page <id>  # Full context for a page
 pnpm crux context for-issue <N>  # Context for a GitHub issue
 
+# Code quality
+pnpm crux maintain health-snapshot       # Quantified code health metrics
+pnpm crux maintain health-snapshot --json  # JSON for trend tracking
+pnpm crux maintain detect-cruft          # Find TODOs, large files, dead code
+
 # Epic management (multi-issue tracking via GitHub Discussions)
 pnpm crux epic                   # List open epics
 pnpm crux epic create "Title"    # Create a new epic
@@ -142,6 +147,8 @@ pnpm crux ci status --wait       # After pushing — poll until green
 ```
 
 Do not consider work complete until CI is green.
+
+For non-trivial changes (>5 files or >300 lines), run `/review-pr` before shipping — it spawns a fresh-context reviewer subagent.
 
 ## Key Conventions
 
