@@ -291,7 +291,7 @@ async function main() {
         ...(representative.accuracySupportingQuotes
           ? { claimVerdictQuotes: representative.accuracySupportingQuotes }
           : {}),
-        ...(representative.verificationDifficulty
+        ...(representative.verificationDifficulty && ['easy', 'moderate', 'hard'].includes(representative.verificationDifficulty)
           ? { claimVerdictDifficulty: representative.verificationDifficulty as 'easy' | 'moderate' | 'hard' }
           : {}),
         // Inline source if a URL or resourceId is available
