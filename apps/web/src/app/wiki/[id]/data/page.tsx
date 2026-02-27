@@ -27,15 +27,16 @@ function isNumericId(id: string): boolean {
   return /^E\d+$/i.test(id);
 }
 
-export async function generateStaticParams() {
-  return getAllNumericIds().map((id) => ({ id }));
-}
+// Opt out of static generation — these pages fetch from the wiki-server
+// which can't handle hundreds of concurrent requests during build.
+// They'll be rendered on-demand with ISR revalidation instead.
+export const dynamicParams = true;
 
 /** Fetch claims for a page from the wiki-server. Returns null if unavailable. */
 async function fetchPageClaims(pageId: string): Promise<ClaimRow[] | null> {
   const result = await fetchFromWikiServer<GetClaimsResult>(
     `/api/claims/by-entity/${encodeURIComponent(pageId)}?includeSources=true`,
-    { revalidate: 300 }
+    { revalidate: 300, timeoutMs: 30_000 }
   );
   return result?.claims ?? null;
 }

@@ -21,9 +21,10 @@ function isNumericId(id: string): boolean {
   return /^E\d+$/i.test(id);
 }
 
-export async function generateStaticParams() {
-  return getAllNumericIds().map((id) => ({ id }));
-}
+// Opt out of static generation — these pages fetch from the wiki-server
+// which can't handle hundreds of concurrent requests during build.
+// They'll be rendered on-demand with ISR revalidation instead.
+export const dynamicParams = true;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;

@@ -4,6 +4,8 @@ import type { ClaimsRelationshipsResult } from "@wiki-server/api-response-types"
 import { buildEntityNameMap } from "../components/claims-data";
 import { RelationshipsTable } from "./relationships-table";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Entity Relationships",
   description:

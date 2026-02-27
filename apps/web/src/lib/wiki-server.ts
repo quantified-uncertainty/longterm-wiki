@@ -69,7 +69,7 @@ export async function fetchDetailed<T>(
  */
 export async function fetchFromWikiServer<T>(
   path: string,
-  options?: { revalidate?: number }
+  options?: { revalidate?: number; timeoutMs?: number }
 ): Promise<T | null> {
   const result = await fetchDetailed<T>(path, options);
   return result.ok ? result.data : null;
