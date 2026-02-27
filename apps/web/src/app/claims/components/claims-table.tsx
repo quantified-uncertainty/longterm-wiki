@@ -37,18 +37,12 @@ import { ClaimModeBadge } from "./claim-mode-badge";
 import { NumericValueDisplay } from "./numeric-value-display";
 import { VerdictBadge } from "./verdict-badge";
 import { formatStructuredValue } from "@lib/format-value";
+import { hasMarkup } from "./claim-quality";
 
 /** Approximate row height in px for spacer calculation (keeps table height stable across pages) */
 const TABLE_ROW_HEIGHT_PX = 37;
 
 const STORAGE_KEY = "claims-table-column-visibility";
-
-/** Detect MDX/JSX markup leakage in claim text */
-const MARKUP_RE = /<[A-Z][A-Za-z]*[\s/>]|<\/[A-Z]|\[.*?\]\(.*?\)|```|{\/\*|\*\*[^*]+\*\*/;
-
-function hasMarkup(text: string): boolean {
-  return MARKUP_RE.test(text);
-}
 
 /** Column visibility presets */
 const COLUMN_PRESETS: Record<string, { label: string; columns: VisibilityState }> = {
