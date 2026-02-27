@@ -25,6 +25,9 @@ import type { AutoUpdateNewsRoute } from './routes/auto-update-news.js';
 import type { LinksRoute } from './routes/links.js';
 import type { HallucinationRiskRoute } from './routes/hallucination-risk.js';
 import type { ExploreRoute } from './routes/explore.js';
+import type { FactsRoute } from './routes/facts.js';
+import type { EntitiesRoute } from './routes/entities.js';
+import type { PagesRoute } from './routes/pages.js';
 
 // ---------------------------------------------------------------------------
 // RPC client phantom types (compile-time only)
@@ -40,6 +43,9 @@ type AutoUpdateNewsRpc = ReturnType<typeof hc<AutoUpdateNewsRoute>>;
 type LinksRpc = ReturnType<typeof hc<LinksRoute>>;
 type HallucinationRiskRpc = ReturnType<typeof hc<HallucinationRiskRoute>>;
 type ExploreRpc = ReturnType<typeof hc<ExploreRoute>>;
+type FactsRpc = ReturnType<typeof hc<FactsRoute>>;
+type EntitiesRpc = ReturnType<typeof hc<EntitiesRoute>>;
+type PagesRpc = ReturnType<typeof hc<PagesRoute>>;
 
 // ---------------------------------------------------------------------------
 // Claims
@@ -187,3 +193,54 @@ export type ExploreResult = InferResponseType<ExploreRpc['index']['$get'], 200>;
 
 /** A single explore item. */
 export type ExploreItem = ExploreResult['items'][number];
+
+// ---------------------------------------------------------------------------
+// Facts
+// ---------------------------------------------------------------------------
+
+/** Facts by entity response. */
+export type FactsByEntityResult = InferResponseType<FactsRpc['by-entity'][':entityId']['$get'], 200>;
+
+/** A single fact entry. */
+export type FactEntry = FactsByEntityResult['facts'][number];
+
+/** Facts stats response. */
+export type FactsStatsResult = InferResponseType<FactsRpc['stats']['$get'], 200>;
+
+/** Facts timeseries response. */
+export type FactsTimeseriesResult = InferResponseType<FactsRpc['timeseries'][':entityId']['$get'], 200>;
+
+// ---------------------------------------------------------------------------
+// Entities
+// ---------------------------------------------------------------------------
+
+/** Entity search response. */
+export type EntitySearchResult = InferResponseType<EntitiesRpc['search']['$get'], 200>;
+
+/** A single entity search row. */
+export type EntitySearchRow = EntitySearchResult['results'][number];
+
+/** Entity detail response. */
+export type EntityDetailResult = InferResponseType<EntitiesRpc[':id']['$get'], 200>;
+
+/** Entities stats response. */
+export type EntitiesStatsResult = InferResponseType<EntitiesRpc['stats']['$get'], 200>;
+
+/** Entity list response. */
+export type EntityListResult = InferResponseType<EntitiesRpc['index']['$get'], 200>;
+
+// ---------------------------------------------------------------------------
+// Pages
+// ---------------------------------------------------------------------------
+
+/** Page search response. */
+export type PageSearchResult = InferResponseType<PagesRpc['search']['$get'], 200>;
+
+/** A single page search row. */
+export type PageSearchRow = PageSearchResult['results'][number];
+
+/** Page detail response. */
+export type PageDetailResult = InferResponseType<PagesRpc[':id']['$get'], 200>;
+
+/** Page list response. */
+export type PageListResult = InferResponseType<PagesRpc['index']['$get'], 200>;

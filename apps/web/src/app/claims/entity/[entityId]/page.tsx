@@ -73,6 +73,59 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+/** Compute related entity stats and render a chip-list for graph navigation. */
+function ConnectedEntities({
+  claims,
+  entityId,
+  entityNames,
+}: {
+  claims: GetClaimsResult["claims"];
+  entityId: string;
+  entityNames: Record<string, string>;
+}) {
+  const eidLower = entityId.toLowerCase();
+  const relatedStats = new Map<string, number>();
+  for (const c of claims) {
+    if (!c.relatedEntities) continue;
+    for (const rel of c.relatedEntities) {
+      const normalized = rel.toLowerCase();
+      if (normalized === eidLower) continue;
+      relatedStats.set(normalized, (relatedStats.get(normalized) ?? 0) + 1);
+    }
+  }
+  // Also count claims where this entity appears as a relatedEntity (not primary)
+  for (const c of claims) {
+    if (c.entityId !== entityId && c.entityId) {
+      relatedStats.set(c.entityId, (relatedStats.get(c.entityId) ?? 0) + 1);
+    }
+  }
+  const related = [...relatedStats.entries()].sort((a, b) => b[1] - a[1]);
+  if (related.length === 0) return null;
+
+  return (
+    <div className="rounded-lg border p-4 mb-6">
+      <h3 className="text-sm font-semibold mb-3">
+        Connected Entities
+        <span className="text-xs font-normal text-muted-foreground ml-2">
+          ({related.length})
+        </span>
+      </h3>
+      <div className="flex flex-wrap gap-2">
+        {related.map(([eid, count]) => (
+          <Link
+            key={eid}
+            href={`/claims/entity/${eid}`}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors"
+          >
+            <span>{entityNames[eid] ?? eid.replace(/-/g, " ")}</span>
+            <span className="text-blue-400 font-mono text-[10px]">{count}</span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default async function EntityClaimsPage({ params }: PageProps) {
   const { entityId } = await params;
 
@@ -197,49 +250,11 @@ export default async function EntityClaimsPage({ params }: PageProps) {
           )}
 
           {/* Related Entities — graph navigation */}
-          {(() => {
-            const eidLower = entityId.toLowerCase();
-            const relatedStats = new Map<string, number>();
-            for (const c of claims) {
-              if (!c.relatedEntities) continue;
-              for (const rel of c.relatedEntities) {
-                const normalized = rel.toLowerCase();
-                if (normalized === eidLower) continue;
-                relatedStats.set(normalized, (relatedStats.get(normalized) ?? 0) + 1);
-              }
-            }
-            // Also count claims where this entity appears as a relatedEntity (not primary)
-            for (const c of claims) {
-              if (c.entityId !== entityId && c.entityId) {
-                relatedStats.set(c.entityId, (relatedStats.get(c.entityId) ?? 0) + 1);
-              }
-            }
-            const related = [...relatedStats.entries()]
-              .sort((a, b) => b[1] - a[1]);
-            if (related.length === 0) return null;
-            return (
-              <div className="rounded-lg border p-4 mb-6">
-                <h3 className="text-sm font-semibold mb-3">
-                  Connected Entities
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({related.length})
-                  </span>
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {related.map(([eid, count]) => (
-                    <Link
-                      key={eid}
-                      href={`/claims/entity/${eid}`}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors"
-                    >
-                      <span>{entityNames[eid] ?? eid.replace(/-/g, " ")}</span>
-                      <span className="text-blue-400 font-mono text-[10px]">{count}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            );
-          })()}
+          <ConnectedEntities
+            claims={claims}
+            entityId={entityId}
+            entityNames={entityNames}
+          />
 
           <EntityClaimsViews claims={claims} entityNames={entityNames} />
         </>

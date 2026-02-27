@@ -7,7 +7,10 @@ export interface ClaimsEntityItem {
   entityId: string;
   title: string;
   href: string;
+  /** Primary claims (entity is the subject). */
   claimCount: number;
+  /** Mentions from other entities' claims. */
+  mentionCount: number;
   entityType: string;
 }
 
@@ -68,7 +71,8 @@ export async function getClaimsEntities(): Promise<ClaimsEntityItem[]> {
         entityId: n.entityId,
         title: entity?.title ?? n.entityId,
         href: `/claims/entity/${n.entityId}`,
-        claimCount: n.claimCount + (n.mentionCount ?? 0),
+        claimCount: n.claimCount,
+        mentionCount: n.mentionCount ?? 0,
         entityType: entity?.type ?? "unknown",
       };
     });

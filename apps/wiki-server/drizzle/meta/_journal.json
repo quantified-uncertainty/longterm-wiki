@@ -265,7 +265,7 @@
       "idx": 36,
       "version": "7",
       "when": 1771902600000,
-      "tag": "0032_structured_claims",
+      "tag": "0035_structured_claims",
       "breakpoints": true
     },
     {
@@ -286,7 +286,7 @@
       "idx": 39,
       "version": "7",
       "when": 1771902900000,
-      "tag": "0034_inference_type",
+      "tag": "0036_inference_type",
       "breakpoints": true
     }
   ]

@@ -4,6 +4,13 @@
  * Fetches all claims for an entity from the wiki-server API and runs 10 quality
  * checks on each claim, reporting a breakdown of issues found.
  *
+ * TODO: This file is 700+ lines. Consider splitting into:
+ *   - validate-quality/checks.ts   — individual check functions (checkSelfContained, etc.)
+ *   - validate-quality/types.ts    — CheckResult, QualityAuditResult, etc.
+ *   - validate-quality/report.ts   — printHumanReport, printJsonReport
+ *   - validate-quality/index.ts    — orchestration (runAllChecks, runAudit, main)
+ * Each check function is already self-contained, making this a straightforward split.
+ *
  * Usage:
  *   pnpm crux claims validate-quality <entity-id>
  *   pnpm crux claims validate-quality <entity-id> --json

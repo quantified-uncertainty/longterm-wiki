@@ -23,17 +23,7 @@ import { createLogger, formatPath } from '../lib/output.ts';
 import { CONTENT_DIR, DATA_DIR, loadDatabase as loadDatabaseJson } from '../lib/content-types.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import { ENTITY_LINK_RE } from '../lib/patterns.ts';
-
-/**
- * Strip fenced code blocks (```...```) from MDX content so validators
- * don't flag example code as real imports or component references.
- * Replaces block contents with blank lines to preserve line numbering.
- */
-function stripFencedCodeBlocks(content: string): string {
-  return content.replace(/^```[^\n]*\n[\s\S]*?^```/gm, (match) => {
-    return '\n'.repeat(match.split('\n').length - 1);
-  });
-}
+import { stripFencedCodeBlocks } from '../lib/mdx-utils.ts';
 
 const log = createLogger();
 const c = log.colors;

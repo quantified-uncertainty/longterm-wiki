@@ -132,6 +132,9 @@ function ClaimsEntityList({ entities }: { entities: ClaimsEntityItem[] }) {
                       <span className="truncate">{entity.title}</span>
                       <span className="ml-1 text-muted-foreground shrink-0 text-xs">
                         {entity.claimCount}
+                        {entity.mentionCount > 0 && (
+                          <span className="text-muted-foreground/60">{` +${entity.mentionCount}`}</span>
+                        )}
                       </span>
                     </Link>
                   </SidebarMenuButton>

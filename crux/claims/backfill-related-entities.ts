@@ -52,6 +52,19 @@ interface BackfillChange {
 // Entity Loading
 // ---------------------------------------------------------------------------
 
+// Short entity names (< 4 chars) that are important enough to match despite
+// the higher false-positive risk. These are well-known acronyms in the AI
+// safety ecosystem. Add entries here when a prominent entity with a short
+// name is being missed by the backfill.
+const SHORT_NAME_WHITELIST = new Set([
+  'fhi',  // Future of Humanity Institute
+  'arc',  // Alignment Research Center
+  'agi',  // Artificial General Intelligence (concept entity)
+  'gpi',  // Global Priorities Institute
+  'cea',  // Centre for Effective Altruism
+  'sff',  // Survival and Flourishing Fund
+]);
+
 /**
  * Load all entity names and slugs from data/entities/ YAML files.
  * Returns a map of lowercase name/title -> entity slug (id).
@@ -59,6 +72,9 @@ interface BackfillChange {
  * We match on:
  *   - Entity title (e.g. "Anthropic" -> "anthropic")
  *   - Entity id/slug if it's multi-word (e.g. "open-philanthropy" -> match "Open Philanthropy")
+ *
+ * Names shorter than 4 characters are excluded to avoid false positives
+ * (e.g. matching "AI" inside "said"), except for entries in SHORT_NAME_WHITELIST.
  */
 function loadEntityNameMap(): Map<string, string> {
   const entitiesDir = path.join(PROJECT_ROOT, 'data/entities');
@@ -76,15 +92,14 @@ function loadEntityNameMap(): Map<string, string> {
 
         // Map title -> slug (case-insensitive)
         const titleLower = entry.title.toLowerCase();
-        // Only register names with 4+ characters to avoid false positives
-        if (titleLower.length >= 4) {
+        if (titleLower.length >= 4 || SHORT_NAME_WHITELIST.has(titleLower)) {
           nameMap.set(titleLower, entry.id);
         }
 
         // Also map slug with hyphens replaced by spaces
         // e.g. "open-philanthropy" -> "open philanthropy"
         const slugAsWords = entry.id.replace(/-/g, ' ');
-        if (slugAsWords.length >= 4 && slugAsWords !== titleLower) {
+        if ((slugAsWords.length >= 4 || SHORT_NAME_WHITELIST.has(slugAsWords)) && slugAsWords !== titleLower) {
           nameMap.set(slugAsWords, entry.id);
         }
       }

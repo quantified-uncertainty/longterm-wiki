@@ -17,6 +17,7 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import yaml from 'js-yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { callOpenRouter, stripCodeFences, parseJsonWithRepair, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
@@ -37,28 +38,22 @@ function normalizeDate(d: string): string {
 }
 
 // Load property vocabulary
-function loadProperties(): Array<{ id: string; label: string; description: string; value_type: string; value_unit?: string; category: string }> {
-  const yaml = readFileSync(join(__dirname, '../../data/claims-properties.yaml'), 'utf-8');
-  // Simple YAML parsing — extract property blocks
-  const props: Array<{ id: string; label: string; description: string; value_type: string; value_unit?: string; category: string }> = [];
-  const blocks = yaml.split(/^  - id: /m).slice(1);
-  for (const block of blocks) {
-    const lines = block.split('\n');
-    const id = lines[0].trim();
-    const get = (key: string) => {
-      const line = lines.find(l => l.trim().startsWith(`${key}:`));
-      return line ? line.split(':').slice(1).join(':').trim().replace(/^["']|["']$/g, '') : '';
-    };
-    props.push({
-      id,
-      label: get('label'),
-      description: get('description'),
-      value_type: get('value_type'),
-      value_unit: get('value_unit') || undefined,
-      category: get('category'),
-    });
-  }
-  return props;
+interface PropertyEntry {
+  id: string;
+  label: string;
+  description: string;
+  value_type: string;
+  value_unit?: string;
+  category: string;
+}
+
+function loadProperties(): PropertyEntry[] {
+  const raw = readFileSync(join(__dirname, '../../data/claims-properties.yaml'), 'utf-8');
+  const parsed = yaml.load(raw) as { properties?: PropertyEntry[] } | null;
+  if (!parsed?.properties || !Array.isArray(parsed.properties)) return [];
+  return parsed.properties.filter(
+    (p): p is PropertyEntry => typeof p?.id === 'string' && typeof p?.label === 'string',
+  );
 }
 
 const ENRICH_SYSTEM_PROMPT = (properties: ReturnType<typeof loadProperties>) => `You are a structured data extraction assistant. Given a list of claims about an entity, decompose each claim into structured fields where possible.
