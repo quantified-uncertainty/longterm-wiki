@@ -1,8 +1,8 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import type { ColumnDef, SortingState, ExpandedState } from "@tanstack/react-table";
+import type { ColumnDef, SortingState, ExpandedState, VisibilityState } from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
@@ -17,6 +17,9 @@ import {
   ChevronsRight,
   ChevronDown,
   ChevronRight as ChevronRightIcon,
+  Settings2,
+  Pin,
+  AlertTriangle,
 } from "lucide-react";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import {
@@ -34,9 +37,77 @@ import { ClaimModeBadge } from "./claim-mode-badge";
 import { NumericValueDisplay } from "./numeric-value-display";
 import { VerdictBadge } from "./verdict-badge";
 import { formatStructuredValue } from "@lib/format-value";
+import { hasMarkup } from "./claim-quality";
 
 /** Approximate row height in px for spacer calculation (keeps table height stable across pages) */
 const TABLE_ROW_HEIGHT_PX = 37;
+
+const STORAGE_KEY = "claims-table-column-visibility";
+
+/** Column visibility presets */
+const COLUMN_PRESETS: Record<string, { label: string; columns: VisibilityState }> = {
+  default: {
+    label: "Default",
+    columns: {
+      expand: true, claimId: true, entityId: true, claimText: true,
+      structured: true, claimType: true, sources: true, claimCategory: true,
+      claimMode: false, confidence: true, verdict: true,
+      sourceQuote: false, relatedEntities: false,
+      hasMarkup: false, hasRelated: false, isPinned: false, inferenceType: false,
+    },
+  },
+  quality: {
+    label: "Quality",
+    columns: {
+      expand: true, claimId: true, entityId: true, claimText: true,
+      structured: false, claimType: false, sources: true, claimCategory: false,
+      claimMode: false, confidence: true, verdict: true,
+      sourceQuote: false, relatedEntities: true,
+      hasMarkup: true, hasRelated: true, isPinned: false, inferenceType: false,
+    },
+  },
+  structured: {
+    label: "Structured",
+    columns: {
+      expand: true, claimId: true, entityId: true, claimText: true,
+      structured: true, claimType: true, sources: false, claimCategory: true,
+      claimMode: true, confidence: false, verdict: false,
+      sourceQuote: false, relatedEntities: false,
+      hasMarkup: false, hasRelated: false, isPinned: true, inferenceType: true,
+    },
+  },
+  full: {
+    label: "All Columns",
+    columns: {
+      expand: true, claimId: true, entityId: true, claimText: true,
+      structured: true, claimType: true, sources: true, claimCategory: true,
+      claimMode: true, confidence: true, verdict: true,
+      sourceQuote: true, relatedEntities: true,
+      hasMarkup: true, hasRelated: true, isPinned: true, inferenceType: true,
+    },
+  },
+};
+
+/** Human-friendly labels for column IDs */
+const COLUMN_LABELS: Record<string, string> = {
+  expand: "Expand",
+  claimId: "#",
+  entityId: "Entity",
+  claimText: "Claim",
+  structured: "Structured",
+  claimType: "Type",
+  sources: "Sources",
+  claimCategory: "Category",
+  claimMode: "Mode",
+  confidence: "Confidence",
+  verdict: "Verdict",
+  sourceQuote: "Excerpt",
+  relatedEntities: "Related",
+  hasMarkup: "Markup",
+  hasRelated: "Has Related",
+  isPinned: "Pinned",
+  inferenceType: "Inference",
+};
 
 function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; entityNames?: Record<string, string> }) {
   return (
@@ -213,10 +284,10 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
             {claim.relatedEntities.map((eid) => (
               <Link
                 key={eid}
-                href={`/claims/entity/${eid.toLowerCase()}`}
+                href={`/claims/entity/${eid}`}
                 className="text-blue-600 hover:underline ml-1"
               >
-                {entityNames[eid.toLowerCase()] ?? eid}
+                {entityNames[eid] ?? eid}
               </Link>
             ))}
           </span>
@@ -483,10 +554,10 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
           {entities.slice(0, 3).map((eid) => (
             <Link
               key={eid}
-              href={`/claims/entity/${eid.toLowerCase()}`}
+              href={`/claims/entity/${eid}`}
               className="inline-block px-1 py-0.5 rounded text-[10px] bg-gray-100 text-gray-600 hover:bg-gray-200"
             >
-              {entityNames[eid.toLowerCase()] ?? eid}
+              {entityNames[eid] ?? eid}
             </Link>
           ))}
           {entities.length > 3 && (
@@ -499,7 +570,141 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
     },
     size: 120,
   },
+  // --- Quality indicator columns ---
+  {
+    id: "hasMarkup",
+    accessorFn: (row) => hasMarkup(row.claimText),
+    header: ({ column }) => (
+      <SortableHeader column={column}>Markup</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const bad = hasMarkup(row.original.claimText);
+      if (!bad) return <span className="text-muted-foreground/40 text-[10px]">-</span>;
+      return (
+        <span className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[10px] bg-amber-100 text-amber-700" title="Contains MDX/JSX markup">
+          <AlertTriangle className="h-3 w-3" /> Yes
+        </span>
+      );
+    },
+    size: 60,
+  },
+  {
+    id: "hasRelated",
+    accessorFn: (row) => (row.relatedEntities?.length ?? 0) > 0,
+    header: ({ column }) => (
+      <SortableHeader column={column}>Has Related</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const count = row.original.relatedEntities?.length ?? 0;
+      if (count === 0) return <span className="text-red-400 text-[10px]">None</span>;
+      return <span className="text-emerald-600 text-[10px]">{count}</span>;
+    },
+    size: 70,
+  },
+  {
+    id: "isPinned",
+    accessorFn: (row) => row.isPinned ?? false,
+    header: ({ column }) => (
+      <SortableHeader column={column}>Pinned</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      if (!row.original.isPinned) return <span className="text-muted-foreground/40 text-[10px]">-</span>;
+      return (
+        <span className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700">
+          <Pin className="h-3 w-3" /> Yes
+        </span>
+      );
+    },
+    size: 55,
+  },
+  {
+    id: "inferenceType",
+    accessorFn: (row) => row.inferenceType,
+    header: ({ column }) => (
+      <SortableHeader column={column}>Inference</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const t = row.original.inferenceType;
+      if (!t) return <span className="text-muted-foreground/40 text-[10px]">-</span>;
+      return <span className="font-mono text-[10px]">{t}</span>;
+    },
+    size: 80,
+  },
 ];
+}
+
+/** Column toggle dropdown with preset buttons */
+function ColumnToggle({
+  columnVisibility,
+  onVisibilityChange,
+  allColumnIds,
+}: {
+  columnVisibility: VisibilityState;
+  onVisibilityChange: (v: VisibilityState) => void;
+  allColumnIds: string[];
+}) {
+  const [open, setOpen] = useState(false);
+
+  // Toggle columns that have a label (skip expand which is always visible)
+  const toggleableIds = allColumnIds.filter((id) => id !== "expand" && COLUMN_LABELS[id]);
+
+  return (
+    <div className="flex items-center gap-2 mb-2 flex-wrap">
+      {/* Preset buttons */}
+      {Object.entries(COLUMN_PRESETS).map(([key, preset]) => (
+        <button
+          key={key}
+          type="button"
+          onClick={() => onVisibilityChange({ ...preset.columns })}
+          className="px-2 py-1 text-xs rounded border border-border hover:bg-muted cursor-pointer"
+        >
+          {preset.label}
+        </button>
+      ))}
+
+      {/* Column toggle dropdown */}
+      <div className="relative ml-auto">
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-border hover:bg-muted cursor-pointer"
+        >
+          <Settings2 className="h-3.5 w-3.5" />
+          Columns
+        </button>
+        {open && (
+          <>
+            {/* Backdrop */}
+            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+            <div className="absolute right-0 top-full mt-1 z-50 w-48 rounded-md border border-border bg-background shadow-lg p-2 space-y-0.5">
+              {toggleableIds.map((id) => {
+                const visible = columnVisibility[id] !== false;
+                return (
+                  <label
+                    key={id}
+                    className="flex items-center gap-2 px-1 py-0.5 rounded text-xs hover:bg-muted cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={visible}
+                      onChange={() => {
+                        onVisibilityChange({
+                          ...columnVisibility,
+                          [id]: !visible,
+                        });
+                      }}
+                      className="rounded border-border"
+                    />
+                    {COLUMN_LABELS[id] ?? id}
+                  </label>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export function ClaimsTable({
@@ -515,12 +720,41 @@ export function ClaimsTable({
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const columns = getColumns(entityNames);
 
+  // Load persisted column visibility from localStorage (or use default preset)
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    () => COLUMN_PRESETS.default.columns
+  );
+
+  // Hydrate from localStorage on mount (avoids SSR mismatch)
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        setColumnVisibility(JSON.parse(stored));
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }, []);
+
+  // Persist to localStorage on change
+  const handleVisibilityChange = useCallback((v: VisibilityState | ((old: VisibilityState) => VisibilityState)) => {
+    setColumnVisibility((prev) => {
+      const next = typeof v === "function" ? v(prev) : v;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+
+  const allColumnIds = columns.map((c) => ("id" in c && c.id) || ("accessorKey" in c && String(c.accessorKey)) || "").filter(Boolean);
+
   const table = useReactTable({
     data: claims,
     columns: columns,
-    state: { sorting, expanded },
+    state: { sorting, expanded, columnVisibility },
     onSortingChange: setSorting,
     onExpandedChange: setExpanded,
+    onColumnVisibilityChange: handleVisibilityChange,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -530,6 +764,11 @@ export function ClaimsTable({
 
   return (
     <div>
+      <ColumnToggle
+        columnVisibility={columnVisibility}
+        onVisibilityChange={handleVisibilityChange}
+        allColumnIds={allColumnIds}
+      />
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
@@ -571,7 +810,7 @@ export function ClaimsTable({
                     </TableRow>
                     {row.getIsExpanded() && (
                       <TableRow>
-                        <TableCell colSpan={columns.length} className="p-0 bg-muted/30">
+                        <TableCell colSpan={table.getVisibleLeafColumns().length} className="p-0 bg-muted/30">
                           <ExpandedClaimDetail claim={row.original} entityNames={entityNames} />
                         </TableCell>
                       </TableRow>
@@ -582,7 +821,7 @@ export function ClaimsTable({
                 {table.getRowModel().rows.length < pageSize && (
                   <tr>
                     <td
-                      colSpan={columns.length}
+                      colSpan={table.getVisibleLeafColumns().length}
                       style={{ height: `${(pageSize - table.getRowModel().rows.length) * TABLE_ROW_HEIGHT_PX}px` }}
                     />
                   </tr>
@@ -591,7 +830,7 @@ export function ClaimsTable({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={table.getVisibleLeafColumns().length}
                   className="text-center text-muted-foreground py-8"
                 >
                   No claims found.

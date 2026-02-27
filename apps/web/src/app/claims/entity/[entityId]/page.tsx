@@ -83,14 +83,13 @@ function ConnectedEntities({
   entityId: string;
   entityNames: Record<string, string>;
 }) {
-  const eidLower = entityId.toLowerCase();
+  // relatedEntities are already normalized (lowercased) by the server
   const relatedStats = new Map<string, number>();
   for (const c of claims) {
     if (!c.relatedEntities) continue;
     for (const rel of c.relatedEntities) {
-      const normalized = rel.toLowerCase();
-      if (normalized === eidLower) continue;
-      relatedStats.set(normalized, (relatedStats.get(normalized) ?? 0) + 1);
+      if (rel === entityId) continue;
+      relatedStats.set(rel, (relatedStats.get(rel) ?? 0) + 1);
     }
   }
   // Also count claims where this entity appears as a relatedEntity (not primary)

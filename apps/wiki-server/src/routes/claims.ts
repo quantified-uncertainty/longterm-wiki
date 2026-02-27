@@ -138,6 +138,28 @@ function formatClaimSource(s: ClaimSourceRowType) {
   };
 }
 
+/**
+ * Normalize a relatedEntities array: lowercase all slugs and deduplicate.
+ * This is the single source of truth for entity slug normalization in claims.
+ * Frontend consumers receive already-normalized data and should NOT re-lowercase.
+ */
+function normalizeRelatedEntitiesSlugs(
+  entities: unknown
+): string[] | null {
+  if (!Array.isArray(entities) || entities.length === 0) return null;
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const e of entities) {
+    if (typeof e !== "string") continue;
+    const normalized = e.toLowerCase();
+    if (!seen.has(normalized)) {
+      seen.add(normalized);
+      result.push(normalized);
+    }
+  }
+  return result.length > 0 ? result : null;
+}
+
 function formatClaim(
   r: typeof claims.$inferSelect,
   sourcesRows: ClaimSourceRowType[] = []
@@ -155,7 +177,7 @@ function formatClaim(
     sourceQuote: r.sourceQuote,
     // Enhanced fields (migration 0028)
     claimCategory: r.claimCategory,
-    relatedEntities: r.relatedEntities as string[] | null,
+    relatedEntities: normalizeRelatedEntitiesSlugs(r.relatedEntities),
     factId: r.factId,
     resourceIds: r.resourceIds as string[] | null,
     section: r.section,
@@ -733,11 +755,9 @@ const claimsApp = new Hono()
     >();
 
     for (const row of rows) {
-      const related = row.relatedEntities as string[] | null;
+      const related = normalizeRelatedEntitiesSlugs(row.relatedEntities);
       if (!related) continue;
-      for (const rel of related) {
-        // Normalize to lowercase slug to merge capitalized variants (e.g. "Anthropic" → "anthropic")
-        const normalizedRel = rel.toLowerCase();
+      for (const normalizedRel of related) {
         // Skip self-referential pairs
         if (normalizedRel === row.entityId) continue;
         const [a, b] = [row.entityId, normalizedRel].sort();
@@ -778,11 +798,9 @@ const claimsApp = new Hono()
 
     for (const row of rows) {
       nodeIds.add(row.entityId);
-      const related = row.relatedEntities as string[] | null;
+      const related = normalizeRelatedEntitiesSlugs(row.relatedEntities);
       if (!related) continue;
-      for (const rel of related) {
-        // Normalize to lowercase slug to merge capitalized variants (e.g. "Anthropic" → "anthropic")
-        const normalizedRel = rel.toLowerCase();
+      for (const normalizedRel of related) {
         // Skip self-loops
         if (normalizedRel === row.entityId) continue;
         nodeIds.add(normalizedRel);

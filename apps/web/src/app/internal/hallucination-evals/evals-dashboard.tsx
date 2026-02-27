@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { BaselineResult } from "./page";
+import type { BaselineResult } from "./hallucination-evals-content";
 
 // ── Types for flattened table data ──────────────────────────────────────────
 

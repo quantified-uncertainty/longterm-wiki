@@ -92,12 +92,6 @@ const SCRIPTS = {
     passthrough: ['dry-run', 'page-id', 'limit'],
     positional: false,
   },
-  'coverage-audit': {
-    script: 'claims/coverage-audit.ts',
-    description: 'Show consolidation progress: citation_quotes → claims coverage',
-    passthrough: ['json'],
-    positional: false,
-  },
   'backfill-related-entities': {
     script: 'claims/backfill-related-entities.ts',
     description: 'Scan claim text for entity names and backfill relatedEntities field',
@@ -134,6 +128,12 @@ const SCRIPTS = {
     passthrough: ['json'],
     positional: true,
   },
+  integrate: {
+    script: 'claims/integrate.ts',
+    description: 'Connect claims to page content: link quotes, convert rc→cr footnotes',
+    passthrough: ['apply', 'skip-extract', 'force'],
+    positional: true,
+  },
   pin: {
     script: 'claims/pin.ts',
     description: 'Pin/unpin a structured claim as canonical value, or list pinned claims',
@@ -150,6 +150,12 @@ const SCRIPTS = {
     script: 'claims/quality-report.ts',
     description: 'Per-entity quality breakdown: validation issues, duplicates, markup leakage',
     passthrough: ['json', 'entity', 'entity-id', 'top'],
+    positional: false,
+  },
+  'coverage-audit': {
+    script: 'claims/coverage-audit.ts',
+    description: 'Gap analysis: citation_quotes vs claims architecture coverage',
+    passthrough: ['json', 'per-page'],
     positional: false,
   },
 };
@@ -178,13 +184,15 @@ Options:
   --force               Re-ingest already-processed resources; clear existing claims (ingest-resource, ingest-batch)
   --batch=<file>        Process URLs from a file, one per line (from-resource)
   --no-auto-resource    Don't auto-create resource YAML for unknown URLs (from-resource)
-  --apply               Write changes to database (backfill-related-entities, migrate-footnotes, cleanup; default: dry-run)
+  --apply               Write changes to database (integrate, backfill, migrate, cleanup; default: dry-run)
+  --skip-extract        Skip claim extraction step (integrate: assumes claims already exist)
   --entity=E            Target entity filter (cleanup)
   --entity-id=E         Filter to single entity (backfill-related-entities)
   --batch-size=N        Process N pages at a time (migrate-footnotes-batch; default: all)
   --path=P              Filter pages by relative path prefix (migrate-footnotes-batch)
   --unpin               Unpin a claim (pin command)
   --list=<entity-id>    List pinned claims for an entity (pin command)
+  --per-page            Include per-page breakdown (coverage-audit)
 
 Examples:
   crux claims pipeline kalshi                         Run full extract → link → verify pipeline
@@ -256,6 +264,15 @@ Workflow:
   4. crux claims fix dedup --entity=anthropic       Dedup single entity (dry-run)
   5. crux claims fix dedup --apply                  Dedup all entities
   6. crux claims fix normalize-entities --apply     Normalize relatedEntities slugs
+
+  Coverage audit (citation_quotes → claims migration tracking):
+  1. crux claims coverage-audit                  Summary of gaps between systems
+  2. crux claims coverage-audit --per-page       Include per-page breakdown
+  3. crux claims coverage-audit --json           Machine-readable JSON output
+  Page-claims integration (end-to-end):
+  1. crux claims integrate <page-id>                 Dry-run: show what would change
+  2. crux claims integrate <page-id> --apply          Link quotes + convert rc→cr + create refs
+  3. crux claims integrate <page-id> --skip-extract   Skip extraction (claims must already exist)
 
   Footnote migration (DB-driven references):
   1. crux claims migrate-footnotes <page-id>          Dry-run: show what would change

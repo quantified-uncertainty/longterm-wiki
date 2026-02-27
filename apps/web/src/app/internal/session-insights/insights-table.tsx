@@ -2,7 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
-import type { InsightRow } from "./page";
+import type { InsightRow } from "./session-insights-content";
 
 function TypeBadge({ type }: { type: string }) {
   const style =

@@ -4,7 +4,7 @@ name: Job Worker
 #
 # Two triggers:
 # 1. workflow_dispatch — called by the server when a new job is created
-# 2. schedule — polls every 5 minutes for unclaimed jobs
+# 2. schedule — polls every 30 minutes for unclaimed jobs
 #
 # The worker claims a job atomically via the /api/jobs/claim endpoint,
 # executes the registered handler, and reports results back via /complete or /fail.
@@ -19,7 +19,7 @@ name: Job Worker
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
     inputs:
       job_type:
@@ -54,7 +54,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        worker: [1, 2, 3]
+        worker: [1]
       fail-fast: false
     steps:
       - name: Checkout
@@ -82,7 +82,7 @@ jobs:
       - name: Configure git
         run: |
           git config user.name "longterm-wiki-bot"
-          git config user.email "bot@longterm.wiki"
+          git config user.email "bot@quantifieduncertainty.org"
 
       - name: Run worker
         id: worker

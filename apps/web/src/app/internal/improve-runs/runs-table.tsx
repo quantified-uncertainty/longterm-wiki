@@ -3,7 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { formatAge } from "@lib/format";
-import type { ImproveRunRow } from "./page";
+import type { ImproveRunRow } from "./improve-runs-content";
 
 function EngineBadge({ engine }: { engine: string }) {
   const isV2 = engine === "v2";

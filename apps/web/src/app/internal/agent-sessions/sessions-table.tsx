@@ -3,7 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { GITHUB_REPO_URL } from "@lib/site-config";
-import type { AgentSessionRow } from "./page";
+import type { AgentSessionRow } from "./agent-sessions-content";
 
 // ── Status Badge ─────────────────────────────────────────────────────────
 

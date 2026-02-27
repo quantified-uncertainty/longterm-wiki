@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
-import type { RiskPageData } from "./page";
+import type { RiskPageData } from "./hallucination-risk-content";
 
 function LevelBadge({ level }: { level: "low" | "medium" | "high" }) {
   const config = {
