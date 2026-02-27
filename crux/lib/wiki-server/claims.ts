@@ -225,6 +225,61 @@ export async function deleteClaimsByIds(
 }
 
 // ---------------------------------------------------------------------------
+// Paginated fetch — shared utility for scripts that need all claims
+// ---------------------------------------------------------------------------
+
+interface AllClaimsResponse {
+  claims: ClaimRow[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+/**
+ * Fetch all claims from the wiki-server, paginating automatically.
+ * Supports optional entity filter and total limit.
+ */
+export async function fetchAllClaims(
+  opts: { entityId?: string; limit?: number } = {},
+): Promise<ClaimRow[]> {
+  const PAGE_SIZE = 200;
+  const allClaims: ClaimRow[] = [];
+  let offset = 0;
+  const maxClaims = opts.limit ?? Infinity;
+
+  while (allClaims.length < maxClaims) {
+    const batchLimit = Math.min(PAGE_SIZE, maxClaims - allClaims.length);
+    const params = new URLSearchParams({
+      limit: String(batchLimit),
+      offset: String(offset),
+    });
+    if (opts.entityId) {
+      params.set('entityId', opts.entityId);
+    }
+
+    const result = await apiRequest<AllClaimsResponse>(
+      'GET',
+      `/api/claims/all?${params.toString()}`,
+      undefined,
+      15_000,
+    );
+
+    if (!result.ok) {
+      throw new Error(`Failed to fetch claims: ${result.message}`);
+    }
+
+    allClaims.push(...result.data.claims);
+
+    if (result.data.claims.length < batchLimit || allClaims.length >= result.data.total) {
+      break;
+    }
+    offset += result.data.claims.length;
+  }
+
+  return allClaims;
+}
+
+// ---------------------------------------------------------------------------
 // Claim Page References API functions
 // ---------------------------------------------------------------------------
 

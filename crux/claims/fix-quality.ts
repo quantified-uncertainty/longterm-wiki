@@ -19,27 +19,21 @@
 
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { apiRequest, isServerAvailable } from '../lib/wiki-server/client.ts';
+import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
+  fetchAllClaims,
   batchUpdateClaimText,
   batchUpdateRelatedEntities,
   deleteClaimsByIds,
   type ClaimRow,
 } from '../lib/wiki-server/claims.ts';
-import { isClaimDuplicate, normalizeClaimText } from '../lib/claim-utils.ts';
+import { isClaimDuplicate } from '../lib/claim-utils.ts';
 import { loadEntitySlugs, buildNormalizationMap, normalizeEntitySlug } from '../lib/normalize-entity-slugs.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-
-interface AllClaimsResponse {
-  claims: ClaimRow[];
-  total: number;
-  limit: number;
-  offset: number;
-}
 
 interface FixResult {
   name: string;
@@ -49,55 +43,11 @@ interface FixResult {
 }
 
 // ---------------------------------------------------------------------------
-// Fetch all claims (paginated)
-// ---------------------------------------------------------------------------
-
-async function fetchAllClaims(
-  opts: { entityId?: string; limit?: number },
-): Promise<ClaimRow[]> {
-  const PAGE_SIZE = 200;
-  const allClaims: ClaimRow[] = [];
-  let offset = 0;
-  const maxClaims = opts.limit ?? Infinity;
-
-  while (allClaims.length < maxClaims) {
-    const batchLimit = Math.min(PAGE_SIZE, maxClaims - allClaims.length);
-    const params = new URLSearchParams({
-      limit: String(batchLimit),
-      offset: String(offset),
-    });
-    if (opts.entityId) {
-      params.set('entityId', opts.entityId);
-    }
-
-    const result = await apiRequest<AllClaimsResponse>(
-      'GET',
-      `/api/claims/all?${params.toString()}`,
-      undefined,
-      15_000,
-    );
-
-    if (!result.ok) {
-      throw new Error(`Failed to fetch claims: ${result.message}`);
-    }
-
-    allClaims.push(...result.data.claims);
-
-    if (result.data.claims.length < batchLimit || allClaims.length >= result.data.total) {
-      break;
-    }
-    offset += result.data.claims.length;
-  }
-
-  return allClaims;
-}
-
-// ---------------------------------------------------------------------------
 // Fixer: strip-markup — remove MDX/JSX artifacts from claim text
 // ---------------------------------------------------------------------------
 
 /** Patterns that indicate MDX/JSX markup leaked into claim text. */
-const MARKUP_PATTERNS: Array<{ pattern: RegExp; replacement: string; label: string }> = [
+export const MARKUP_PATTERNS: Array<{ pattern: RegExp; replacement: string; label: string }> = [
   // <EntityLink id="...">Text</EntityLink> → Text
   { pattern: /<EntityLink\s+id="[^"]*"(?:\s+[^>]*)?>([^<]*)<\/EntityLink>/g, replacement: '$1', label: 'EntityLink' },
   // <F id="..." /> or <F e="..." f="..." /> → empty (canonical fact refs)
@@ -120,7 +70,15 @@ const MARKUP_PATTERNS: Array<{ pattern: RegExp; replacement: string; label: stri
   { pattern: /\\</g, replacement: '<', label: 'escaped-lt' },
 ];
 
-function stripMarkupFromText(text: string): { cleaned: string; strippedLabels: string[] } {
+/** Quick check: does text contain any MDX/JSX markup? */
+export function hasMarkup(text: string): boolean {
+  return MARKUP_PATTERNS.some(({ pattern }) => {
+    pattern.lastIndex = 0;
+    return pattern.test(text);
+  });
+}
+
+export function stripMarkupFromText(text: string): { cleaned: string; strippedLabels: string[] } {
   let cleaned = text;
   const strippedLabels: string[] = [];
 
@@ -396,7 +354,11 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err) => {
-  console.error('Claims fix failed:', err);
-  process.exit(1);
-});
+// Only run when executed directly (not when imported for tests)
+import { fileURLToPath } from 'url';
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error('Claims fix failed:', err);
+    process.exit(1);
+  });
+}

@@ -17,8 +17,8 @@ import path from 'path';
 import yaml from 'js-yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { apiRequest, isServerAvailable } from '../lib/wiki-server/client.ts';
-import { batchUpdateRelatedEntities, type ClaimRow } from '../lib/wiki-server/claims.ts';
+import { isServerAvailable } from '../lib/wiki-server/client.ts';
+import { fetchAllClaims, batchUpdateRelatedEntities, type ClaimRow } from '../lib/wiki-server/claims.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -29,13 +29,6 @@ interface EntityEntry {
   id: string;      // slug, e.g. "anthropic"
   title: string;   // display name, e.g. "Anthropic"
   type?: string;
-}
-
-interface AllClaimsResponse {
-  claims: ClaimRow[];
-  total: number;
-  limit: number;
-  offset: number;
 }
 
 interface BackfillChange {
@@ -152,52 +145,6 @@ function findEntityMentions(
   }
 
   return [...found].sort();
-}
-
-// ---------------------------------------------------------------------------
-// Fetch All Claims (paginated)
-// ---------------------------------------------------------------------------
-
-async function fetchAllClaims(
-  opts: { entityId?: string; limit?: number },
-): Promise<ClaimRow[]> {
-  const PAGE_SIZE = 200;
-  const allClaims: ClaimRow[] = [];
-  let offset = 0;
-  const maxClaims = opts.limit ?? Infinity;
-
-  while (allClaims.length < maxClaims) {
-    const batchLimit = Math.min(PAGE_SIZE, maxClaims - allClaims.length);
-    const params = new URLSearchParams({
-      limit: String(batchLimit),
-      offset: String(offset),
-    });
-    if (opts.entityId) {
-      params.set('entityId', opts.entityId);
-    }
-
-    const result = await apiRequest<AllClaimsResponse>(
-      'GET',
-      `/api/claims/all?${params.toString()}`,
-      undefined,
-      15_000, // 15s timeout for paginated fetches
-    );
-
-    if (!result.ok) {
-      throw new Error(`Failed to fetch claims: ${result.message}`);
-    }
-
-    allClaims.push(...result.data.claims);
-
-    // Check if we've fetched everything
-    if (result.data.claims.length < batchLimit || allClaims.length >= result.data.total) {
-      break;
-    }
-
-    offset += result.data.claims.length;
-  }
-
-  return allClaims;
 }
 
 // ---------------------------------------------------------------------------

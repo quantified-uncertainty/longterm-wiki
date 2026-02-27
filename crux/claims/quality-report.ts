@@ -14,27 +14,18 @@
  *   pnpm crux claims quality-report --top=20             # top 20 entities
  */
 
-import fs from 'fs';
-import path from 'path';
-import yaml from 'js-yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { apiRequest, isServerAvailable } from '../lib/wiki-server/client.ts';
-import type { ClaimRow } from '../lib/wiki-server/claims.ts';
+import { isServerAvailable } from '../lib/wiki-server/client.ts';
+import { fetchAllClaims, type ClaimRow } from '../lib/wiki-server/claims.ts';
 import { validateClaim, type ClaimValidationResult } from './validate-claim.ts';
+import { hasMarkup } from './fix-quality.ts';
 import { isClaimDuplicate } from '../lib/claim-utils.ts';
-import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { loadEntities } from '../lib/content-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-
-interface AllClaimsResponse {
-  claims: ClaimRow[];
-  total: number;
-  limit: number;
-  offset: number;
-}
 
 interface EntityQuality {
   entityId: string;
@@ -57,90 +48,16 @@ interface QualityReport {
 }
 
 // ---------------------------------------------------------------------------
-// MDX markup detection (lightweight — same as fix-quality.ts)
-// ---------------------------------------------------------------------------
-
-const MARKUP_DETECTORS: Array<{ pattern: RegExp; label: string }> = [
-  { pattern: /<EntityLink\s/, label: 'EntityLink' },
-  { pattern: /<F\s+/, label: 'F-tag' },
-  { pattern: /<R\s+id="/, label: 'R-tag' },
-  { pattern: /<Calc>/, label: 'Calc' },
-  { pattern: /\\\$/, label: 'escaped-dollar' },
-  { pattern: /\\</, label: 'escaped-lt' },
-  { pattern: /\{[^}]+\}/, label: 'curly-expr' },
-];
-
-function hasMarkup(text: string): boolean {
-  return MARKUP_DETECTORS.some(({ pattern }) => pattern.test(text));
-}
-
-// ---------------------------------------------------------------------------
-// Entity name loading
+// Entity name loading (via canonical loader)
 // ---------------------------------------------------------------------------
 
 function loadEntityNames(): Map<string, string> {
-  const entitiesDir = path.join(PROJECT_ROOT, 'data/entities');
-  const files = fs.readdirSync(entitiesDir).filter(f => f.endsWith('.yaml'));
+  const entities = loadEntities();
   const names = new Map<string, string>();
-
-  for (const file of files) {
-    try {
-      const raw = fs.readFileSync(path.join(entitiesDir, file), 'utf-8');
-      const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA }) as Array<{ id: string; title: string }> | null;
-      if (!Array.isArray(parsed)) continue;
-      for (const entry of parsed) {
-        if (entry?.id && entry?.title) {
-          names.set(entry.id, entry.title);
-        }
-      }
-    } catch {
-      // Skip malformed files
-    }
+  for (const e of entities) {
+    names.set(e.id, e.title);
   }
-
   return names;
-}
-
-// ---------------------------------------------------------------------------
-// Fetch all claims (paginated)
-// ---------------------------------------------------------------------------
-
-async function fetchAllClaims(
-  opts: { entityId?: string },
-): Promise<ClaimRow[]> {
-  const PAGE_SIZE = 200;
-  const allClaims: ClaimRow[] = [];
-  let offset = 0;
-
-  while (true) {
-    const params = new URLSearchParams({
-      limit: String(PAGE_SIZE),
-      offset: String(offset),
-    });
-    if (opts.entityId) {
-      params.set('entityId', opts.entityId);
-    }
-
-    const result = await apiRequest<AllClaimsResponse>(
-      'GET',
-      `/api/claims/all?${params.toString()}`,
-      undefined,
-      15_000,
-    );
-
-    if (!result.ok) {
-      throw new Error(`Failed to fetch claims: ${result.message}`);
-    }
-
-    allClaims.push(...result.data.claims);
-
-    if (result.data.claims.length < PAGE_SIZE || allClaims.length >= result.data.total) {
-      break;
-    }
-    offset += result.data.claims.length;
-  }
-
-  return allClaims;
 }
 
 // ---------------------------------------------------------------------------
@@ -194,9 +111,10 @@ function computeEntityQuality(
   }
 
   const totalClaims = claims.length;
-  const issueCount = totalClaims - cleanClaims + duplicateCount + markupCount;
+  // Quality score = % of claims that pass all validation checks.
+  // Same formula used for both per-entity and global scores.
   const qualityScore = totalClaims > 0
-    ? Math.round(100 * Math.max(0, 1 - issueCount / (totalClaims * 2)))
+    ? Math.round(100 * cleanClaims / totalClaims)
     : 100;
 
   return {

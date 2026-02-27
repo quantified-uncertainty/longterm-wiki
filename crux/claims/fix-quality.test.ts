@@ -1,43 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { isClaimDuplicate, deduplicateClaims } from '../lib/claim-utils.ts';
-
-// We test the pure functions by importing the module and extracting testable logic.
-// The main script is CLI-oriented, so we test the markup stripping logic directly.
-
-// ---------------------------------------------------------------------------
-// Replicate the stripMarkupFromText logic for unit testing
-// (The actual function isn't exported from fix-quality.ts, so we replicate it)
-// ---------------------------------------------------------------------------
-
-const MARKUP_PATTERNS: Array<{ pattern: RegExp; replacement: string; label: string }> = [
-  { pattern: /<EntityLink\s+id="[^"]*"(?:\s+[^>]*)?>([^<]*)<\/EntityLink>/g, replacement: '$1', label: 'EntityLink' },
-  { pattern: /<F\s+[^>]*\/>/g, replacement: '', label: 'F-tag' },
-  { pattern: /<R\s+id="[^"]*">[^<]*<\/R>/g, replacement: '', label: 'R-tag' },
-  { pattern: /<Calc>[^<]*<\/Calc>/g, replacement: '', label: 'Calc' },
-  { pattern: /<\w[\w.]*[^>]*\/>/g, replacement: '', label: 'JSX-self-closing' },
-  { pattern: /<(\w[\w.]*)(?:\s[^>]*)?>([^<]*)<\/\1>/g, replacement: '$2', label: 'JSX-block' },
-  { pattern: /\{[^}]+\}/g, replacement: '', label: 'curly-expr' },
-  { pattern: /^(?:import|export)\s+.*$/gm, replacement: '', label: 'import/export' },
-  { pattern: /\\\$/g, replacement: '$', label: 'escaped-dollar' },
-  { pattern: /\\</g, replacement: '<', label: 'escaped-lt' },
-];
-
-function stripMarkupFromText(text: string): { cleaned: string; strippedLabels: string[] } {
-  let cleaned = text;
-  const strippedLabels: string[] = [];
-
-  for (const { pattern, replacement, label } of MARKUP_PATTERNS) {
-    pattern.lastIndex = 0;
-    if (pattern.test(cleaned)) {
-      strippedLabels.push(label);
-      pattern.lastIndex = 0;
-      cleaned = cleaned.replace(pattern, replacement);
-    }
-  }
-
-  cleaned = cleaned.replace(/\s{2,}/g, ' ').trim();
-  return { cleaned, strippedLabels };
-}
+import { stripMarkupFromText, hasMarkup } from './fix-quality.ts';
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -102,6 +65,20 @@ describe('stripMarkupFromText', () => {
     const input = 'Anthropic  <F id="abc" />  has funding.';
     const { cleaned } = stripMarkupFromText(input);
     expect(cleaned).toBe('Anthropic has funding.');
+  });
+});
+
+describe('hasMarkup', () => {
+  it('detects EntityLink tags', () => {
+    expect(hasMarkup('<EntityLink id="x">Text</EntityLink>')).toBe(true);
+  });
+
+  it('detects escaped dollar signs', () => {
+    expect(hasMarkup('Raised \\$100M')).toBe(true);
+  });
+
+  it('returns false for clean text', () => {
+    expect(hasMarkup('Anthropic was founded in 2021.')).toBe(false);
   });
 });
 
