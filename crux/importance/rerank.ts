@@ -19,7 +19,8 @@
 import { parseCliArgs } from '../lib/cli.ts';
 import { createLogger, createProgress } from '../lib/output.ts';
 import { loadPages } from '../lib/content-types.ts';
-import { createClient, callClaude, MODELS, sleep } from '../lib/anthropic.ts';
+import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
+import { sleep } from '../lib/anthropic.ts';
 import {
   loadRanking,
   saveRanking,
@@ -178,15 +179,16 @@ const dimPrompts = PROMPTS[dimension] || PROMPTS.readership;
 /** Sort a batch of ≤30 pages using a single LLM prompt. */
 async function sortBatch(
   pages: PageInfo[],
-  client: ReturnType<typeof createClient>,
+  client: ReturnType<typeof createLlmClient>,
 ): Promise<string[]> {
   const pagesText = pages.map(formatPageForBatch).join('\n');
   const prompt = SORT_USER_TEMPLATE.replace('{PAGES}', pagesText);
 
-  const result = await callClaude(client!, {
+  const result = await callLlm(client, {
+    system: dimPrompts.sort,
+    user: prompt,
+  }, {
     model: MODEL,
-    systemPrompt: dimPrompts.sort,
-    userPrompt: prompt,
     maxTokens: 2000,
     temperature: 0,
   });
@@ -215,7 +217,7 @@ async function binarySearchInsert(
   pageInfo: PageInfo,
   ranking: string[],
   pagesMap: Map<string, PageInfo>,
-  client: ReturnType<typeof createClient>,
+  client: ReturnType<typeof createLlmClient>,
 ): Promise<number> {
   if (ranking.length === 0) return 1;
 
@@ -236,10 +238,11 @@ A: "${pageInfo.title}" (${pageInfo.id})${pageInfo.description ? ` — ${pageInfo
 
 B: "${midInfo.title}" (${midInfo.id})${midInfo.description ? ` — ${midInfo.description.slice(0, 150)}` : ''}`;
 
-    const result = await callClaude(client!, {
+    const result = await callLlm(client, {
+      system: dimPrompts.compare,
+      user: prompt,
+    }, {
       model: MODELS.haiku,
-      systemPrompt: dimPrompts.compare,
-      userPrompt: prompt,
       maxTokens: 10,
       temperature: 0,
     });
@@ -263,7 +266,7 @@ B: "${midInfo.title}" (${midInfo.id})${midInfo.description ? ` — ${midInfo.des
 async function verifyRanking(
   ranking: string[],
   pagesMap: Map<string, PageInfo>,
-  client: ReturnType<typeof createClient>,
+  client: ReturnType<typeof createLlmClient>,
 ): Promise<string[]> {
   if (ranking.length <= VERIFY_WINDOW) {
     const pages = ranking.map((id) => pagesMap.get(id)!).filter(Boolean);
@@ -323,11 +326,7 @@ async function main() {
     });
   }
 
-  const client = createClient();
-  if (!client) {
-    log.error('ANTHROPIC_API_KEY required for reranking');
-    process.exit(1);
-  }
+  const client = createLlmClient();
 
   log.dim(`Dimension: ${dimension}`);
 

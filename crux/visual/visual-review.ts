@@ -19,7 +19,7 @@ import fs from 'fs';
 import path from 'path';
 import { spawnSync, execSync } from 'child_process';
 import { parseCliArgs } from '../lib/cli.ts';
-import { createClient, callClaude } from '../lib/anthropic.ts';
+import { createLlmClient, callLlm } from '../lib/llm.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, isCI } from '../lib/output.ts';
@@ -268,8 +268,12 @@ async function reviewWithAI(
   visual: ExtractedVisual,
   pageTitle: string,
 ): Promise<{ score: number; strengths: string[]; issues: string[]; suggestions: string[] } | null> {
-  const client = createClient({ required: false });
-  if (!client) return null;
+  let client;
+  try {
+    client = createLlmClient();
+  } catch {
+    return null;
+  }
 
   const prompt = `Review this ${visual.type} visual from the wiki page "${pageTitle}":
 
@@ -281,10 +285,11 @@ Evaluate the visual for clarity, accuracy, aesthetics, and relevance.
 Return ONLY a JSON object with: score (0-100), strengths (array), issues (array), suggestions (array).`;
 
   try {
-    const result = await callClaude(client, {
+    const result = await callLlm(client, {
+      system: VISUAL_REVIEW_SYSTEM_PROMPT,
+      user: prompt,
+    }, {
       model: 'haiku',
-      systemPrompt: VISUAL_REVIEW_SYSTEM_PROMPT,
-      userPrompt: prompt,
       maxTokens: 1000,
       temperature: 0,
     });

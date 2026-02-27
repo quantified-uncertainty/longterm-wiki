@@ -10,7 +10,8 @@
  * Cost: ~$0.02-0.05 per digest (Haiku, typically <2000 items)
  */
 
-import { createClient, callClaude, MODELS, parseJsonResponse } from '../lib/anthropic.ts';
+import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
+import { parseJsonResponse } from '../lib/anthropic.ts';
 import type { FeedItem, DigestItem, NewsDigest } from './types.ts';
 
 // ── Deduplication ───────────────────────────────────────────────────────────
@@ -53,8 +54,7 @@ async function classifyItems(
   entityIds: string[],
   verbose = false,
 ): Promise<DigestItem[]> {
-  const client = createClient();
-  if (!client) throw new Error('ANTHROPIC_API_KEY required for digest building');
+  const client = createLlmClient();
 
   const BATCH_SIZE = 30;
   const allDigestItems: DigestItem[] = [];
@@ -72,18 +72,16 @@ async function classifyItems(
       `${idx + 1}. [${item.sourceId}] "${item.title}" (${item.publishedAt})\n   ${item.summary.slice(0, 200)}`
     )).join('\n');
 
-    const result = await callClaude(client, {
-      model: MODELS.haiku,
-      maxTokens: 4000,
-      systemPrompt: `You classify news items for an AI safety wiki. Score each item's relevance (0-100) to AI safety, alignment, governance, compute, AI labs, existential risk, or related topics. Extract topic tags and match to wiki entity IDs where possible.
+    const result = await callLlm(client, {
+      system: `You classify news items for an AI safety wiki. Score each item's relevance (0-100) to AI safety, alignment, governance, compute, AI labs, existential risk, or related topics. Extract topic tags and match to wiki entity IDs where possible.
 
 Known wiki entity IDs (sample): ${entitySample}
 
 Output ONLY a JSON array. Each element: { "index": <1-based>, "relevanceScore": <0-100>, "topics": ["tag1", "tag2"], "entities": ["entity-id-1"], "skip": false }
 
 Set skip=true for items clearly irrelevant to AI safety (e.g., sports, entertainment, unrelated tech). Be generous with relevance — if it could plausibly inform any wiki page, include it.`,
-      userPrompt: `Classify these ${batch.length} news items:\n\n${itemList}`,
-    });
+      user: `Classify these ${batch.length} news items:\n\n${itemList}`,
+    }, { model: MODELS.haiku, maxTokens: 4000 });
 
     try {
       const parsed = parseJsonResponse(result.text) as Array<{

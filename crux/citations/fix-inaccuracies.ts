@@ -23,7 +23,7 @@ import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL, checkClaimAccuracy } from '../lib/quote-extractor.ts';
-import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
+import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { appendEditLog } from '../lib/edit-log.ts';
 import { citationQuotes, citationContent } from '../lib/knowledge-db.ts';
 import { checkAccuracyForPage } from './check-accuracy.ts';
@@ -257,10 +257,7 @@ export async function escalateWithClaude(
   allEnriched: EnrichedFlaggedCitation[],
   opts?: { verbose?: boolean },
 ): Promise<SectionRewrite[]> {
-  const client = createClient();
-  if (!client) {
-    throw new Error('ANTHROPIC_API_KEY required for Claude escalation');
-  }
+  const client = createLlmClient();
 
   const groups = groupFlaggedBySection(body, flaggedCitations);
   if (groups.size === 0) return [];
@@ -334,10 +331,11 @@ export async function escalateWithClaude(
     }
 
     try {
-      const result = await callClaude(client, {
+      const result = await callLlm(client, {
+        system: ESCALATION_SYSTEM_PROMPT,
+        user: userPrompt,
+      }, {
         model: MODELS.sonnet,
-        systemPrompt: ESCALATION_SYSTEM_PROMPT,
-        userPrompt,
         maxTokens: 4000,
         temperature: 0,
       });
@@ -501,8 +499,12 @@ export async function secondOpinionCheck(
   flaggedIssues: Array<{ footnote: number; verdict: string; score: number; issues: string[] }>,
   opts?: { verbose?: boolean },
 ): Promise<SecondOpinionResult> {
-  const client = createClient({ required: false });
-  if (!client) return { checked: 0, demoted: 0, details: [] };
+  let client;
+  try {
+    client = createLlmClient();
+  } catch {
+    return { checked: 0, demoted: 0, details: [] };
+  }
 
   const toCheck = flaggedIssues.filter(
     (i) => i.verdict === 'inaccurate' || i.verdict === 'unsupported',
@@ -534,15 +536,16 @@ export async function secondOpinionCheck(
         process.stdout.write(`  [^${issue.footnote}] second opinion... `);
       }
 
-      const llmResult = await callClaude(client, {
-        model: MODELS.haiku,
-        systemPrompt: SECOND_OPINION_PROMPT,
-        userPrompt: [
+      const llmResult = await callLlm(client, {
+        system: SECOND_OPINION_PROMPT,
+        user: [
           `WIKI CLAIM:\n${row.claim_text}`,
           `\nORIGINAL VERDICT: ${issue.verdict}`,
           `ORIGINAL ISSUES: ${issue.issues.join('; ')}`,
           `\nSOURCE TEXT:\n${truncatedSource}`,
         ].join('\n'),
+      }, {
+        model: MODELS.haiku,
         maxTokens: 200,
         temperature: 0,
       });
@@ -597,14 +600,19 @@ export async function secondOpinionCheck(
  * Falls back to buildSearchQuery() if LLM call fails or is unavailable.
  */
 export async function generateSearchQuery(claimText: string): Promise<string> {
-  const client = createClient({ required: false });
-  if (!client) return buildSearchQuery(claimText);
+  let client;
+  try {
+    client = createLlmClient();
+  } catch {
+    return buildSearchQuery(claimText);
+  }
 
   try {
-    const result = await callClaude(client, {
+    const result = await callLlm(client, {
+      system: 'Convert the following wiki claim into a concise web search query (5-12 words) that would find a credible source supporting or containing the specific facts mentioned. Focus on the key factual claims (numbers, dates, names). Return ONLY the search query text, nothing else.',
+      user: claimText.slice(0, 500),
+    }, {
       model: MODELS.haiku,
-      systemPrompt: 'Convert the following wiki claim into a concise web search query (5-12 words) that would find a credible source supporting or containing the specific facts mentioned. Focus on the key factual claims (numbers, dates, names). Return ONLY the search query text, nothing else.',
-      userPrompt: claimText.slice(0, 500),
       maxTokens: 50,
       temperature: 0,
     });

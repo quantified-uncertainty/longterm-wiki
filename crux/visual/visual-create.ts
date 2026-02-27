@@ -15,7 +15,7 @@
 import fs from 'fs';
 import path from 'path';
 import { parseCliArgs } from '../lib/cli.ts';
-import { createClient, callClaude } from '../lib/anthropic.ts';
+import { createLlmClient, callLlm } from '../lib/llm.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors, isCI } from '../lib/output.ts';
 import { getContentBody } from '../lib/mdx-utils.ts';
@@ -162,21 +162,16 @@ async function main(): Promise<void> {
     }
   }
 
-  const client = createClient();
-  if (!client) {
-    console.error(
-      `${colors.red}Error: ANTHROPIC_API_KEY not found${colors.reset}`,
-    );
-    process.exit(1);
-  }
+  const client = createLlmClient();
 
   const systemPrompt = buildSystemPrompt(type);
   const userPrompt = buildUserPrompt(type, page.title, body, directions);
 
-  const result = await callClaude(client, {
+  const result = await callLlm(client, {
+    system: systemPrompt,
+    user: userPrompt,
+  }, {
     model,
-    systemPrompt,
-    userPrompt,
     maxTokens: 4096,
     temperature: 0.3,
   });

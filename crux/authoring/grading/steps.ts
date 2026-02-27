@@ -8,7 +8,8 @@
  * Also includes quality computation and metrics.
  */
 
-import { createClient, callClaude, parseJsonResponse } from '../../lib/anthropic.ts';
+import { callLlm } from '../../lib/llm.ts';
+import { parseJsonResponse } from '../../lib/anthropic.ts';
 import { readFileSync } from 'fs';
 import { stripFrontmatter } from '../../lib/patterns.ts';
 import { ValidationEngine, ContentFile } from '../../lib/validation-engine.ts';
@@ -135,10 +136,11 @@ export async function runChecklistReview(client: Anthropic, page: PageInfo): Pro
     .replace('{{content}}', fullContent);
 
   try {
-    const result = await callClaude(client, {
+    const result = await callLlm(client, {
+      system: CHECKLIST_SYSTEM_PROMPT,
+      user: userPrompt,
+    }, {
       model: 'haiku',
-      systemPrompt: CHECKLIST_SYSTEM_PROMPT,
-      userPrompt,
       maxTokens: 1500,
     });
 
@@ -197,10 +199,11 @@ export async function gradePage(client: Anthropic, page: PageInfo, warningsSumma
     userPrompt += `\n\n---\nPRE-SCREENING WARNINGS (from automated rules and checklist review — factor these into your ratings, especially objectivity, rigor, and concreteness):\n${warningsSummary}\n---`;
   }
 
-  const response = await callClaude(client, {
+  const response = await callLlm(client, {
+    system: SYSTEM_PROMPT,
+    user: userPrompt,
+  }, {
     model: 'sonnet',
-    systemPrompt: SYSTEM_PROMPT,
-    userPrompt,
     maxTokens: 800,
   });
 

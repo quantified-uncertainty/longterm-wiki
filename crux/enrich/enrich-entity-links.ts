@@ -24,7 +24,8 @@ import { readFileSync, writeFileSync } from 'fs';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles, findPageFile } from '../lib/file-utils.ts';
 import { buildEntityLookupForContent } from '../lib/entity-lookup.ts';
-import { createClient, MODELS, callClaude, parseJsonResponse } from '../lib/anthropic.ts';
+import { createLlmClient, MODELS, callLlm } from '../lib/llm.ts';
+import { parseJsonResponse } from '../lib/anthropic.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { NUMERIC_ID_RE } from '../lib/patterns.ts';
@@ -259,7 +260,7 @@ async function callLlmForEntityLinks(
   entityLookup: string,
   alreadyLinked: Set<string>,
 ): Promise<EntityLinkReplacement[]> {
-  const client = createClient();
+  const client = createLlmClient();
 
   const alreadyLinkedList = alreadyLinked.size > 0
     ? `Already linked (SKIP these, do not re-link):\n${[...alreadyLinked].map(t => `  - "${t}"`).join('\n')}`
@@ -299,10 +300,11 @@ ${content}
 
 Identify entity mentions and return replacement instructions as JSON.`;
 
-  const result = await callClaude(client!, {
+  const result = await callLlm(client, {
+    system: systemPrompt,
+    user: userPrompt,
+  }, {
     model: MODELS.haiku,
-    systemPrompt,
-    userPrompt,
     maxTokens: 2000,
     temperature: 0,
   });

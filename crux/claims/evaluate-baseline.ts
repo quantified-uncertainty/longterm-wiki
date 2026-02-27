@@ -19,7 +19,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { join } from 'path';
-import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
+import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { callOpenRouter } from '../lib/quote-extractor.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
@@ -146,7 +146,7 @@ function readPageContent(pageId: string): string {
 }
 
 async function evaluatePage(
-  client: ReturnType<typeof createClient>,
+  client: ReturnType<typeof createLlmClient>,
   page: PageConfig,
   claims: ClaimInput[],
   pageContent: string,
@@ -183,10 +183,11 @@ ${claimList}`;
       title: 'LongtermWiki Claims Evaluation',
     });
   } else {
-    const response = await callClaude(client, {
+    const response = await callLlm(client, {
+      system: systemPrompt,
+      user: userPrompt,
+    }, {
       model: MODELS.sonnet,
-      systemPrompt,
-      userPrompt,
       maxTokens: 4000,
     });
     responseText = response.text;
@@ -254,7 +255,7 @@ export async function runEvaluation() {
   const sampleSize = typeof args['sample'] === 'string' ? parseInt(args['sample'], 10) || DEFAULT_SAMPLE_SIZE : DEFAULT_SAMPLE_SIZE;
   const useOpenRouter = args['openrouter'] === true;
   const LOG_DIR = variantArg !== 'baseline' ? `${BASE_LOG_DIR}/${variantArg}` : BASE_LOG_DIR;
-  const client = createClient();
+  const client = createLlmClient();
   const allEvals: ClaimEval[] = [];
 
   const source = fromLogs ? 'dry-run logs' : 'database';

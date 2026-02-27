@@ -24,7 +24,8 @@ import { readFileSync, writeFileSync } from 'fs';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles, findPageFile } from '../lib/file-utils.ts';
 import { buildFactLookupForContent } from '../lib/fact-lookup.ts';
-import { createClient, MODELS, callClaude, parseJsonResponse } from '../lib/anthropic.ts';
+import { createLlmClient, MODELS, callLlm } from '../lib/llm.ts';
+import { parseJsonResponse } from '../lib/anthropic.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { splitContentForEnrichment } from '../lib/content-chunker.ts';
@@ -309,7 +310,7 @@ async function callLlmForFactRefs(
   content: string,
   factLookup: string,
 ): Promise<FactRefReplacement[]> {
-  const client = createClient();
+  const client = createLlmClient();
 
   const systemPrompt = `You are a fact-ref tagger for an AI safety wiki. Your task is to identify hardcoded numbers in wiki content that match canonical facts in the provided lookup table, and return structured replacement instructions.
 
@@ -349,10 +350,11 @@ ${content}
 
 Identify hardcoded numbers matching canonical facts and return replacement instructions as JSON.`;
 
-  const result = await callClaude(client!, {
+  const result = await callLlm(client, {
+    system: systemPrompt,
+    user: userPrompt,
+  }, {
     model: MODELS.haiku,
-    systemPrompt,
-    userPrompt,
     maxTokens: 2000,
     temperature: 0,
   });

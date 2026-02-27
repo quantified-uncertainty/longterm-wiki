@@ -12,7 +12,8 @@
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
-import { createClient, callClaude, MODELS, parseJsonResponse } from '../lib/anthropic.ts';
+import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
+import { parseJsonResponse } from '../lib/anthropic.ts';
 
 // ── File categories ──────────────────────────────────────────────────────────
 
@@ -182,17 +183,15 @@ export async function triageGateChecks(
 
   // Try to call Haiku with a hard timeout
   try {
-    const client = createClient({ required: false });
-    if (!client) {
-      return { skip: {}, llmCalled: false, durationMs: Date.now() - start };
-    }
+    const client = createLlmClient();
 
     const userPrompt = `Changed files summary:\n${summary}\n\nTotal files: ${changedFiles.length}`;
 
-    const llmPromise = callClaude(client, {
+    const llmPromise = callLlm(client, {
+      system: SYSTEM_PROMPT,
+      user: userPrompt,
+    }, {
       model: MODELS.haiku,
-      systemPrompt: SYSTEM_PROMPT,
-      userPrompt,
       maxTokens: 500,
       temperature: 0,
     });

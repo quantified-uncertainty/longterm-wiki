@@ -12,7 +12,7 @@
  */
 
 import type { AdversarialFinding } from '../types.ts';
-import { callClaude, createClient, MODELS } from '../../lib/anthropic.ts';
+import { callLlm, createLlmClient, MODELS } from '../../lib/llm.ts';
 import { stripFrontmatter } from '../../lib/patterns.ts';
 
 // ---------------------------------------------------------------------------
@@ -112,8 +112,10 @@ export async function verifyClaimsBatch(
   fullContent: string,
   pageId: string,
 ): Promise<AdversarialFinding[]> {
-  const client = createClient({ required: false });
-  if (!client) {
+  let client;
+  try {
+    client = createLlmClient();
+  } catch {
     console.warn('[reference-sniffer] No API key — skipping LLM verification');
     return [];
   }
@@ -124,9 +126,8 @@ export async function verifyClaimsBatch(
     .map((c, i) => `${i + 1}. ${c.claim} [cited: ${c.hasAnyCitation ? 'yes' : 'NO'}] [para: ${c.paragraphIndex}]`)
     .join('\n');
 
-  const result = await callClaude(client, {
-    model: MODELS.haiku,
-    systemPrompt: `You are a fact-checking editor for an AI safety wiki. Your job is to identify claims that are likely hallucinated, fabricated, or unsupported.
+  const result = await callLlm(client, {
+    system: `You are a fact-checking editor for an AI safety wiki. Your job is to identify claims that are likely hallucinated, fabricated, or unsupported.
 
 For each claim, assess:
 1. Is it suspiciously specific without a citation? (e.g., exact dollar amounts, exact dates, exact percentages with no source)
@@ -147,13 +148,15 @@ Respond ONLY with findings — claims you believe are problematic. Use this JSON
 
 If no claims are suspicious, return an empty array [].
 Be conservative — only flag things you are genuinely concerned about. False positives waste human reviewer time.`,
-    userPrompt: `Page: ${pageId}
+    user: `Page: ${pageId}
 
 Claims to verify:
 ${claimList}
 
 Full page context (for internal consistency checking):
 ${fullContent.slice(0, 8000)}`,
+  }, {
+    model: MODELS.haiku,
     maxTokens: 2000,
     temperature: 0,
   });

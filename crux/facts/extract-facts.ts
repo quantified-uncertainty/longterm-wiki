@@ -22,8 +22,8 @@ import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles, findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { createClient, MODELS, parseJsonResponse } from '../lib/anthropic.ts';
-import { callClaude } from '../lib/anthropic.ts';
+import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
+import { parseJsonResponse } from '../lib/anthropic.ts';
 import { getColors } from '../lib/output.ts';
 
 // ---------------------------------------------------------------------------
@@ -193,8 +193,10 @@ async function classifyWithLlm(
   content: string,
   existingFacts: ExistingFactEntry[],
 ): Promise<FactCandidate[]> {
-  const client = createClient({ required: false });
-  if (!client) {
+  let client;
+  try {
+    client = createLlmClient();
+  } catch {
     console.warn('[facts] ANTHROPIC_API_KEY not found — skipping LLM classification');
     return [];
   }
@@ -224,10 +226,11 @@ ${existingNote}
 
 Return JSON with "candidates" array. Focus on high-confidence candidates only.`;
 
-  const result = await callClaude(client, {
+  const result = await callLlm(client, {
+    system: EXTRACTION_SYSTEM_PROMPT,
+    user: prompt,
+  }, {
     model: MODELS.sonnet,
-    systemPrompt: EXTRACTION_SYSTEM_PROMPT,
-    userPrompt: prompt,
     maxTokens: 3000,
     temperature: 0,
   });
