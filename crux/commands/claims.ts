@@ -128,6 +128,12 @@ const SCRIPTS = {
     passthrough: ['json'],
     positional: true,
   },
+  integrate: {
+    script: 'claims/integrate.ts',
+    description: 'Connect claims to page content: link quotes, convert rc→cr footnotes',
+    passthrough: ['apply', 'skip-extract', 'force'],
+    positional: true,
+  },
   pin: {
     script: 'claims/pin.ts',
     description: 'Pin/unpin a structured claim as canonical value, or list pinned claims',
@@ -172,7 +178,8 @@ Options:
   --force               Re-ingest already-processed resources; clear existing claims (ingest-resource, ingest-batch)
   --batch=<file>        Process URLs from a file, one per line (from-resource)
   --no-auto-resource    Don't auto-create resource YAML for unknown URLs (from-resource)
-  --apply               Write changes to database (backfill-related-entities, migrate-footnotes, cleanup; default: dry-run)
+  --apply               Write changes to database (integrate, backfill, migrate, cleanup; default: dry-run)
+  --skip-extract        Skip claim extraction step (integrate: assumes claims already exist)
   --entity=E            Target entity filter (cleanup)
   --entity-id=E         Filter to single entity (backfill-related-entities)
   --batch-size=N        Process N pages at a time (migrate-footnotes-batch; default: all)
@@ -250,6 +257,11 @@ Workflow:
   4. crux claims fix dedup --entity=anthropic       Dedup single entity (dry-run)
   5. crux claims fix dedup --apply                  Dedup all entities
   6. crux claims fix normalize-entities --apply     Normalize relatedEntities slugs
+
+  Page-claims integration (end-to-end):
+  1. crux claims integrate <page-id>                 Dry-run: show what would change
+  2. crux claims integrate <page-id> --apply          Link quotes + convert rc→cr + create refs
+  3. crux claims integrate <page-id> --skip-extract   Skip extraction (claims must already exist)
 
   Footnote migration (DB-driven references):
   1. crux claims migrate-footnotes <page-id>          Dry-run: show what would change
