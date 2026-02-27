@@ -10,6 +10,10 @@ import {
   buildEntityNameMap,
 } from "./components/claims-data";
 
+// Skip static generation — fetches all claims from wiki-server which is
+// too heavy to run during build alongside hundreds of other API requests.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Claims Explorer",
   description:

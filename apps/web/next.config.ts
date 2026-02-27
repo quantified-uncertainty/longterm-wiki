@@ -12,9 +12,10 @@ const nextConfig: NextConfig = {
     "@quri/ui",
   ],
   // Allow more time for static page generation in resource-constrained
-  // environments (CI, cloud dev). Default is 60s which is too tight for
-  // ~1700 pages when the wiki-server is slow or unreachable.
-  staticPageGenerationTimeout: 120,
+  // environments (CI, cloud dev). Dashboard pages embedded via MDX make
+  // wiki-server API calls that compete with hundreds of other pages for
+  // server resources during concurrent static generation.
+  staticPageGenerationTimeout: 300,
 };
 
 export default nextConfig;

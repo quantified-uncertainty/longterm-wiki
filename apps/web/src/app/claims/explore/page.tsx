@@ -7,6 +7,10 @@ import {
 } from "../components/claims-data";
 import { ClaimsExplorer } from "./claims-explorer";
 
+// Skip static generation — fetches all claims from wiki-server which is
+// too heavy to run during build alongside hundreds of other API requests.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Browse Claims",
   description: "Search and filter all extracted claims across wiki pages.",
