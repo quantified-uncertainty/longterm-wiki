@@ -25,13 +25,16 @@ async function main() {
     `\n${c.bold}${c.blue}Backfill resource_id for citation_quotes${c.reset}\n`,
   );
 
-  // Get all quotes (paginated, fetch all)
+  // Get all quotes (max 5000 per request)
   const allResult = await getAllQuotes(5000, 0);
   if (!allResult.ok) {
     console.error(`${c.red}Error fetching quotes: ${allResult.error}${c.reset}`);
     process.exit(1);
   }
   const all = allResult.data.quotes;
+  if (allResult.data.total > all.length) {
+    console.warn(`${c.yellow}Warning: ${allResult.data.total} quotes exist but only ${all.length} fetched. Run again with pagination for full coverage.${c.reset}`);
+  }
   const candidates = all.filter(
     (q) => q.url && q.url.length > 0 && !q.resourceId,
   );

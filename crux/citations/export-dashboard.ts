@@ -98,9 +98,13 @@ function extractDomain(url: string | null): string | null {
 
 export async function buildDashboardExport(): Promise<DashboardExport | null> {
   // Fetch all citation quotes from wiki-server API
+  // Note: max 5000 per request. If total exceeds this, data is truncated.
   const quotesResult = await getAllQuotes(5000, 0);
   if (!quotesResult.ok) return null;
   const allQuotes = quotesResult.data.quotes;
+  if (quotesResult.data.total > allQuotes.length) {
+    console.warn(`Warning: ${quotesResult.data.total} quotes exist but only ${allQuotes.length} fetched (max page size). Dashboard data is incomplete.`);
+  }
 
   if (allQuotes.length === 0) return null;
 

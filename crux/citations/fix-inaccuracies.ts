@@ -244,7 +244,7 @@ async function lookupFootnoteEvidence(pageId: string, footnote: number): Promise
 
     return null;
   } catch {
-    return null; // SQLite unavailable
+    return null; // API unavailable
   }
 }
 
@@ -731,7 +731,7 @@ export async function enrichFromApi(flagged: FlaggedCitation[]): Promise<Enriche
     }
     return results;
   } catch {
-    // SQLite unavailable — return with null enrichments
+    // API unavailable — return with null enrichments
     return flagged.map((f) => ({
       ...f,
       fullClaimText: null,
