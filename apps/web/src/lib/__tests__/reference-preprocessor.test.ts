@@ -40,7 +40,7 @@ describe("preprocessReferences", () => {
     expect(referenceMap.size).toBe(0);
   });
 
-  it("returns content unchanged when there are only legacy [^N] footnotes", () => {
+  it("returns content unchanged when there are only [^N] footnotes", () => {
     const content = [
       "This has a footnote[^1] and another[^2].",
       "",
@@ -162,14 +162,14 @@ describe("preprocessReferences", () => {
   });
 
   // -----------------------------------------------------------------------
-  // Mixed old + new footnotes
+  // Mixed existing + DB-driven footnotes (collision avoidance)
   // -----------------------------------------------------------------------
 
-  it("numbers new references after existing legacy footnotes", () => {
+  it("numbers new references after existing numbered footnotes", () => {
     const content = [
-      "Legacy footnote[^1] and a claim[^cr-aa11] and citation[^rc-bb22].",
+      "Existing footnote[^1] and a claim[^cr-aa11] and citation[^rc-bb22].",
       "",
-      "[^1]: Existing legacy source",
+      "[^1]: Existing source",
     ].join("\n");
 
     const refData = makeReferenceData(
@@ -190,11 +190,11 @@ describe("preprocessReferences", () => {
 
     const { content: result, referenceMap } = preprocessReferences(content, refData);
 
-    // Legacy [^1] should remain untouched
-    expect(result).toContain("Legacy footnote[^1]");
-    expect(result).toContain("[^1]: Existing legacy source");
+    // Existing [^1] should remain untouched
+    expect(result).toContain("Existing footnote[^1]");
+    expect(result).toContain("[^1]: Existing source");
 
-    // New references should start at [^2] — old markers are gone
+    // New references should start at [^2]
     expect(result).not.toContain("[^cr-aa11]");
     expect(result).not.toContain("[^rc-bb22]");
 
@@ -207,7 +207,7 @@ describe("preprocessReferences", () => {
     expect(referenceMap.get(3)?.originalId).toBe("rc-bb22");
   });
 
-  it("handles legacy footnotes with gaps (e.g. [^1], [^5])", () => {
+  it("handles existing footnotes with gaps (e.g. [^1], [^5])", () => {
     const content = [
       "First[^1] then fifth[^5] then new[^cr-zz99].",
       "",

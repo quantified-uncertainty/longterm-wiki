@@ -150,6 +150,7 @@ interface ExtractedClaim {
   sourceQuote?: string;                   // Verbatim excerpt from wiki text supporting the claim
   footnoteRefs: string[];
   relatedEntities?: string[];
+  inferenceType?: string;                 // Reasoning trace: how this claim was derived
   // Structured claim fields (Phase 3 — Wikidata-style)
   subjectEntity?: string;                 // entity_id this claim is about
   property?: string;                      // property from controlled vocabulary
@@ -197,6 +198,14 @@ SELF-CONTAINMENT (critical):
 - Never start a claim with "The ", "This ", "However", "Additionally", "Furthermore", "Moreover", "In contrast" — rewrite to be independent.
 - Every claim must end with a period.
 
+EXAMPLES of self-contained claims:
+- GOOD: "Anthropic raised $2 billion in a Series C round in October 2023."
+- BAD: "The company raised $2 billion in a Series C round in October 2023."
+- GOOD: "Claude 3 Opus scored 86.8% on the MMLU benchmark."
+- BAD: "The model scored 86.8% on the MMLU benchmark."
+- GOOD: "Kalshi received CFTC approval to offer event contracts in November 2020."
+- BAD: "It received CFTC approval to offer event contracts in November 2020."
+
 For each claim, provide:
 - "claimText": a single atomic, self-contained statement (not a question or heading)
 - "claimType": one of:
@@ -240,6 +249,14 @@ For claims about measurable quantities, dates, entity relationships, or other st
 
 Leave ALL structured fields null/omitted for evaluative, causal, consensus, or speculative claims that don't have a clear property/value decomposition.
 
+REASONING TRACE (required):
+- "inferenceType": how this claim was derived from the source text:
+    "direct_assertion" — the source explicitly states this fact verbatim or near-verbatim
+    "derived" — calculated or inferred from source data (e.g., computing growth rate from two data points)
+    "aggregated" — combines information from multiple sources or sections
+    "interpreted" — wiki's interpretation of ambiguous or nuanced source material
+    "editorial" — wiki's own analysis, assessment, or editorial judgment (common for evaluative/causal claims)
+
 Rules:
 - Each claim must be atomic (one assertion per claim)
 - Include specific numbers, names, dates when present
@@ -255,20 +272,37 @@ Rules:
 - Return only claims that appear in the given text
 
 Respond ONLY with JSON:
-{"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "sourceQuote": "exact text from the wiki section", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"], "subjectEntity": "entity-slug", "property": "funding_round_amount", "structuredValue": "30000000", "valueUnit": "USD", "valueDate": "2024-01-15", "qualifiers": {"round": "Series B"}}]}`;
+{"claims": [{"claimText": "...", "claimType": "factual", "claimMode": "endorsed", "inferenceType": "direct_assertion", "sourceQuote": "exact text from the wiki section", "footnoteRefs": ["1"], "relatedEntities": ["entity-id"], "subjectEntity": "entity-slug", "property": "funding_round_amount", "structuredValue": "30000000", "valueUnit": "USD", "valueDate": "2024-01-15", "qualifiers": {"round": "Series B"}}]}`
+
+/**
+ * Build the final system prompt, appending the entity-specific self-containment
+ * reminder so the LLM sees it at the very end (recency bias).
+ */
+function buildSystemPrompt(base: string, entityName: string): string {
+  return `${base}
+
+CRITICAL REMINDER: Every claim MUST include the full entity name — "${entityName}" — not "the company", "it", "they", or any pronoun. Claims missing the entity name will be REJECTED.`;
+}
 
 export async function extractClaimsFromSection(
   section: Section,
-  opts: { model?: string; systemPrompt?: string } = {},
+  opts: { model?: string; systemPrompt?: string; entityName?: string } = {},
 ): Promise<ExtractedClaim[]> {
-  const userPrompt = `SECTION: ${section.heading}
+  const entityLabel = opts.entityName ?? 'the subject';
+  const userPrompt = `ENTITY: ${entityLabel}
+SECTION: ${section.heading}
 
 ${section.content}
 
 Extract atomic claims from this section. Return JSON only.`;
 
+  const basePrompt = opts.systemPrompt ?? EXTRACT_SYSTEM_PROMPT;
+  const finalSystemPrompt = opts.entityName
+    ? buildSystemPrompt(basePrompt, opts.entityName)
+    : basePrompt;
+
   try {
-    const raw = await callOpenRouter(opts.systemPrompt ?? EXTRACT_SYSTEM_PROMPT, userPrompt, {
+    const raw = await callOpenRouter(finalSystemPrompt, userPrompt, {
       model: opts.model ?? DEFAULT_CITATION_MODEL,
       maxTokens: 2500,
       title: 'LongtermWiki Claims Extraction',
@@ -312,6 +346,11 @@ Extract atomic claims from this section. Return JSON only.`;
         relatedEntities: Array.isArray(c.relatedEntities)
           ? (c.relatedEntities as unknown[]).map(String).filter(s => s.length > 0).map(s => s.toLowerCase())
           : [],
+        // Reasoning traces (migration 0034)
+        inferenceType: typeof c.inferenceType === 'string' &&
+          ['direct_assertion', 'derived', 'aggregated', 'interpreted', 'editorial'].includes(c.inferenceType)
+          ? c.inferenceType
+          : undefined,
         // Structured claim fields (Phase 3)
         subjectEntity: typeof c.subjectEntity === 'string' && c.subjectEntity.length > 0
           ? c.subjectEntity.toLowerCase()
@@ -450,7 +489,7 @@ async function main() {
 
   for (const section of sections) {
     process.stdout.write(`  ${c.dim}Extracting: ${section.heading.slice(0, 50)}...${c.reset}`);
-    const claims = await extractClaimsFromSection(section, { model, systemPrompt });
+    const claims = await extractClaimsFromSection(section, { model, systemPrompt, entityName });
     allClaims.push(...claims.map(c => ({ ...c, section: section.heading })));
     console.log(` ${c.green}${claims.length} claims${c.reset}`);
   }
@@ -621,6 +660,8 @@ async function main() {
       valueUnit: claim.valueUnit ?? null,
       valueDate: claim.valueDate ?? null,
       qualifiers: claim.qualifiers ?? null,
+      // Reasoning traces (migration 0034)
+      inferenceType: claim.inferenceType ?? null,
     };
     });
 

@@ -18,6 +18,8 @@ ratings:
   completeness: 7
 ---
 
+<EpicTracker issues={[1043, 1048, 1065, 1074, 1150]} />
+
 ## Goal
 
 We want to reach a point where we can confidently spend ≈\$1,000 running the claims + improve pipeline across many high-importance pages and get reliably good results. This document plans the experimentation needed to get there.
@@ -123,6 +125,18 @@ The highest-value outcome is: claims store → better wiki pages. But `crux cont
 - **Gap analysis:** "Your page covers domain X but has no claims about domain Y"
 
 **Sprint 5 will prototype the simplest integration and test whether it improves output quality.**
+
+---
+
+## Decision Log
+
+| Date | Decision | Rationale | Issue |
+|------|----------|-----------|-------|
+| 2026-02-25 | Sprint-based experimentation approach | Need to iterate quickly on claim quality before committing \$1,000 to scaling | — |
+| 2026-02-25 | Use Gemini Flash for extraction | Cost-effective for high-volume extraction; accuracy is 100% on test set | — |
+| 2026-02-25 | Separate extraction from verification | Each step needs independent iteration and different quality metrics | — |
+| 2026-02-25 | Add Phase 2 schema fields (claim_mode, as_of, numeric values) | Single-pass extraction with richer metadata; test whether it degrades quality | #1048 |
+| 2026-02-25 | Defer deduplication to Sprint 3 | Need baseline quality data before designing dedup logic | — |
 
 ---
 

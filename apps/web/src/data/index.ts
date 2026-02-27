@@ -183,8 +183,6 @@ interface DatabaseShape {
   factUsage: Record<string, FactUsagePage[]>;
   /** Page → resource IDs mapping (computed at build time from inline <R>, cited_by, URL matching) */
   pageResources: Record<string, string[]>;
-  /** Footnote index: page → { footnotes, sources } for unified citation rendering */
-  footnoteIndex?: Record<string, FootnoteIndexEntry>;
   stats: Record<string, unknown>;
   /** Pre-computed update schedule items (staleness, priority, etc.) */
   updateSchedule?: Array<{
@@ -307,28 +305,6 @@ interface Entity {
   sourceRefs?: string[];
   sources?: { title: string; url?: string; author?: string; date?: string }[];
   content?: unknown;
-}
-
-/** Single footnote entry in the footnoteIndex */
-export interface FootnoteEntry {
-  url: string | null;
-  title: string | null;
-  resourceId?: string;
-}
-
-/** Source group in the footnoteIndex — deduped by URL */
-export interface FootnoteSourceEntry {
-  url: string;
-  title: string;
-  domain: string;
-  footnoteNumbers: number[];
-  resourceId: string | null;
-}
-
-/** Per-page footnote index data */
-export interface FootnoteIndexEntry {
-  footnotes: Record<number, FootnoteEntry>;
-  sources: FootnoteSourceEntry[];
 }
 
 // ---------------------------------------------------------------------------
@@ -669,12 +645,6 @@ export function getPagesForResource(resourceId: string): string[] {
     }
   }
   return pages;
-}
-
-/** Get footnote index data for a page (computed at build time from MDX footnotes) */
-export function getFootnoteIndex(pageId: string): FootnoteIndexEntry | undefined {
-  const db = getDatabase();
-  return db.footnoteIndex?.[resolveId(pageId)];
 }
 
 /** Get DB-driven reference data for a page (for the reference preprocessor) */
@@ -1849,12 +1819,16 @@ export function getExploreItems(): ExploreItem[] {
   const pageMap = new Map((db.pages || []).map((p) => [p.id, p]));
   const entityIds = new Set(typedEntities.map((e) => e.id));
 
-  // Items from typed entities (only those with actual content pages)
-  const entityItems: ExploreItem[] = typedEntities.filter((entity) => pageMap.has(entity.id)).map((entity) => {
+  // Items from typed entities (only those with actual content pages and numeric IDs)
+  const entityItems: ExploreItem[] = typedEntities.filter((entity) => {
+    if (!pageMap.has(entity.id)) return false;
+    const numId = entity.numericId || db.idRegistry?.bySlug[entity.id];
+    return !!numId;
+  }).map((entity) => {
     const page = pageMap.get(entity.id)!;
     return {
       id: entity.id,
-      numericId: entity.numericId || db.idRegistry?.bySlug[entity.id] || entity.id,
+      numericId: (entity.numericId || db.idRegistry?.bySlug[entity.id])!,
       title: entity.title,
       type: page?.contentFormat === "table" ? "table" : page?.contentFormat === "diagram" ? "diagram" : entity.entityType,
       description: page?.llmSummary || page?.description || entity.description || null,
@@ -1875,13 +1849,14 @@ export function getExploreItems(): ExploreItem[] {
     };
   });
 
-  // Items from pages that have no entity
+  // Items from pages that have no entity (only those with numeric IDs)
   const pageOnlyItems: ExploreItem[] = (db.pages || [])
     .filter((p) => !entityIds.has(p.id))
     .filter((p) => p.title && p.category !== "schema")
+    .filter((p) => db.idRegistry?.bySlug[p.id])
     .map((page) => ({
       id: page.id,
-      numericId: db.idRegistry?.bySlug[page.id] || page.id,
+      numericId: db.idRegistry!.bySlug[page.id],
       title: page.title,
       type: page.contentFormat === "table" ? "table" : page.contentFormat === "diagram" ? "diagram" : CATEGORY_TO_TYPE[page.category] || "concept",
       description: page.llmSummary || page.description || null,

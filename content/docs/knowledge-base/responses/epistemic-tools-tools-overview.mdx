@@ -26,11 +26,11 @@ import {EntityLink} from '@components/wiki';
 
 ## Overview
 
-Epistemic tools are software platforms and systems designed to improve individual and collective reasoning, particularly for decision-making under uncertainty. These tools implement various mechanisms—from probabilistic programming languages to crowdsourced verification systems—that aim to make beliefs more explicit, quantifiable, and subject to empirical testing.[^1]
+Epistemic tools are software platforms and systems designed to improve individual and collective reasoning, particularly for decision-making under uncertainty. These tools implement various mechanisms—from probabilistic programming languages to crowdsourced verification systems—that aim to make beliefs more explicit, quantifiable, and subject to empirical testing.[^rc-9be7]
 
 The tools documented here span several functional categories: forecasting and prediction platforms that elicit and aggregate probabilistic judgments; knowledge coordination systems that organize information for specific research communities; benchmarking frameworks that evaluate forecasting capabilities; and verification systems that assess claim accuracy at scale. While these tools are used across multiple domains, this overview focuses on platforms with significant adoption or relevance within the AI safety and existential risk research communities.
 
-The effectiveness of epistemic tools varies by context and implementation. <EntityLink id="prediction-markets">Prediction markets</EntityLink> and structured forecasting platforms have demonstrated moderate improvements in accuracy over individual judgment in some domains,[^2] though challenges remain around liquidity, participation incentives, and the selection of questions amenable to these methods. Knowledge coordination tools address different problems—organizing research literature, tracking expert consensus, and reducing information asymmetries—with effectiveness that is harder to quantify systematically.
+The effectiveness of epistemic tools varies by context and implementation. <EntityLink id="prediction-markets">Prediction markets</EntityLink> and structured forecasting platforms have demonstrated moderate improvements in accuracy over individual judgment in some domains,[^rc-9a9f] though challenges remain around liquidity, participation incentives, and the selection of questions amenable to these methods. Knowledge coordination tools address different problems—organizing research literature, tracking expert consensus, and reducing information asymmetries—with effectiveness that is harder to quantify systematically.
 
 ## Tool Categories
 
@@ -40,9 +40,9 @@ Platforms and languages for generating, expressing, and aggregating probabilisti
 
 - **<EntityLink id="squiggle">Squiggle</EntityLink>**: Programming language for expressing uncertainty using probability distributions, enabling Monte Carlo simulation and sensitivity analysis for quantitative models
 - **<EntityLink id="squiggleai">SquiggleAI</EntityLink>**: Experimental system that uses large language models to generate Squiggle code from natural language descriptions of uncertain quantities
-- **<EntityLink id="metaforecast">Metaforecast</EntityLink>**: Aggregator that collected forecasts from multiple prediction platforms (Metaculus, Manifold Markets, Polymarket, and others) into a searchable database; development ceased in 2023[^3]
+- **<EntityLink id="metaforecast">Metaforecast</EntityLink>**: Aggregator that collected forecasts from multiple prediction platforms (Metaculus, Manifold Markets, Polymarket, and others) into a searchable database; development ceased in 2023[^rc-f9ee]
 
-Additional major forecasting platforms not yet documented in this wiki include Metaculus (a free forecasting tournament platform with 100,000+ registered users), Manifold Markets (a play-money prediction market), and Good Judgment Open (run by the research group that outperformed intelligence analysts in IARPA's forecasting tournaments).[^4]
+Additional major forecasting platforms not yet documented in this wiki include Metaculus (a free forecasting tournament platform with 100,000+ registered users), Manifold Markets (a play-money prediction market), and Good Judgment Open (run by the research group that outperformed intelligence analysts in IARPA's forecasting tournaments).[^rc-2266]
 
 ### Benchmarking & Evaluation
 
@@ -61,7 +61,7 @@ Platforms that structure expert collaboration on research questions:
 
 Systems for assessing claim accuracy using crowdsourced evaluation:
 
-- **<EntityLink id="community-notes">X Community Notes</EntityLink>**: Crowdsourced system that allows users to add context to posts on X (formerly Twitter), with notes displayed based on cross-partisan agreement rather than majority vote[^5]
+- **<EntityLink id="community-notes">X Community Notes</EntityLink>**: Crowdsourced system that allows users to add context to posts on X (formerly Twitter), with notes displayed based on cross-partisan agreement rather than majority vote[^rc-b6cb]
 
 ### Knowledge Coordination
 
@@ -97,13 +97,3 @@ These tools reflect different approaches to improving collective reasoning. Fore
 Integration between these tools remains limited. Forecasts from platforms like Metaculus or Manifold Markets are not systematically fed into knowledge bases. Probabilistic models created in Squiggle are typically not connected to forecasting platforms for validation. The research and development of these tools occurs mostly independently, with different codebases, data formats, and user communities.
 
 Most platforms in this space operate as non-profit projects or venture-backed companies with uncertain sustainability models. User bases remain relatively small and concentrated within specific communities interested in rationality, effective altruism, or AI safety. Mainstream adoption of quantified forecasting tools outside these communities has been limited, with notable exceptions like prediction markets focused on political or financial outcomes.
-
-[^1]: Tetlock, P. E., & Gardner, D. (2015). *Superforecasting: The Art and Science of Prediction*. Crown Publishers. Documents research on forecasting accuracy and methods for improving judgment under uncertainty.
-
-[^2]: Atanasov, P., et al. (2017). "Distilling the Wisdom of Crowds: Prediction Markets vs. Prediction Polls." *Management Science*, 63(3), 691-706. Meta-analysis finding prediction markets slightly outperform polls in some contexts, with effect sizes varying by domain.
-
-[^3]: Metaforecast development status from project GitHub repository (last updated October 2023) and maintainer statements on LessWrong.
-
-[^4]: User count for Metaculus from platform about page (accessed 2024); Good Judgment Open performance documented in Mellers, B., et al. (2014). "Psychological Strategies for Winning a Geopolitical Forecasting Tournament." *Psychological Science*, 25(5), 1106-1115.
-
-[^5]: Community Notes algorithm description: Birdwatch/Community Notes Technical Whitepaper, X Corp (2024). Describes bridging-based ranking that prioritizes notes rated helpful by users who typically disagree.

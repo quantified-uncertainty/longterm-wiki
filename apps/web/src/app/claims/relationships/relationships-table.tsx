@@ -29,6 +29,9 @@ import type { RelationshipRow } from "@wiki-server/api-response-types";
 
 export type { RelationshipRow };
 
+/** Approximate row height in px for spacer calculation (keeps table height stable across pages) */
+const TABLE_ROW_HEIGHT_PX = 37;
+
 function getColumns(entityNames: Record<string, string>): ColumnDef<RelationshipRow>[] {
   return [
   {
@@ -139,18 +142,29 @@ export function RelationshipsTable({
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.length > 0 ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            <>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+              {/* Spacer row to maintain consistent table height across pages */}
+              {table.getRowModel().rows.length < table.getState().pagination.pageSize && (
+                <tr>
+                  <td
+                    colSpan={columns.length}
+                    style={{ height: `${(table.getState().pagination.pageSize - table.getRowModel().rows.length) * TABLE_ROW_HEIGHT_PX}px` }}
+                  />
+                </tr>
+              )}
+            </>
           ) : (
             <TableRow>
               <TableCell

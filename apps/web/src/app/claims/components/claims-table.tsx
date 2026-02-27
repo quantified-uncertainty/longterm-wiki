@@ -35,6 +35,9 @@ import { NumericValueDisplay } from "./numeric-value-display";
 import { VerdictBadge } from "./verdict-badge";
 import { formatStructuredValue } from "@lib/format-value";
 
+/** Approximate row height in px for spacer calculation (keeps table height stable across pages) */
+const TABLE_ROW_HEIGHT_PX = 37;
+
 function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; entityNames?: Record<string, string> }) {
   return (
     <div className="px-4 py-3 space-y-2 text-sm">
@@ -550,30 +553,41 @@ export function ClaimsTable({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <Fragment key={row.id}>
-                  <TableRow
-                    className="cursor-pointer"
-                    onClick={() => row.toggleExpanded()}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                  {row.getIsExpanded() && (
-                    <TableRow>
-                      <TableCell colSpan={columns.length} className="p-0 bg-muted/30">
-                        <ExpandedClaimDetail claim={row.original} entityNames={entityNames} />
-                      </TableCell>
+              <>
+                {table.getRowModel().rows.map((row) => (
+                  <Fragment key={row.id}>
+                    <TableRow
+                      className="cursor-pointer"
+                      onClick={() => row.toggleExpanded()}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
                     </TableRow>
-                  )}
-                </Fragment>
-              ))
+                    {row.getIsExpanded() && (
+                      <TableRow>
+                        <TableCell colSpan={columns.length} className="p-0 bg-muted/30">
+                          <ExpandedClaimDetail claim={row.original} entityNames={entityNames} />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
+                ))}
+                {/* Spacer row to maintain consistent table height across pages */}
+                {table.getRowModel().rows.length < pageSize && (
+                  <tr>
+                    <td
+                      colSpan={columns.length}
+                      style={{ height: `${(pageSize - table.getRowModel().rows.length) * TABLE_ROW_HEIGHT_PX}px` }}
+                    />
+                  </tr>
+                )}
+              </>
             ) : (
               <TableRow>
                 <TableCell

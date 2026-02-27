@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, desc, inArray, gte } from "drizzle-orm";
+import { eq, count, sql, desc, inArray, gte, like } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { sessions, sessionPages } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow, paginationQuery } from "./utils.js";
@@ -352,6 +352,71 @@ const sessionsApp = new Hono()
 
     return c.json({
       sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])),
+    });
+  })
+  // ---- GET /insights (learnings + recommendations across sessions) ----
+  .get("/insights", async (c) => {
+    const branchPrefix = c.req.query("branch_prefix");
+    const db = getDrizzleDb();
+
+    // Escape SQL LIKE wildcards in user input
+    const whereClause = branchPrefix
+      ? like(
+          sessions.branch,
+          `${branchPrefix.replace(/%/g, "\\%").replace(/_/g, "\\_")}%`
+        )
+      : undefined;
+
+    const rows = await db
+      .select({
+        date: sessions.date,
+        branch: sessions.branch,
+        title: sessions.title,
+        learningsJson: sessions.learningsJson,
+        recommendationsJson: sessions.recommendationsJson,
+      })
+      .from(sessions)
+      .where(whereClause)
+      .orderBy(desc(sessions.date), desc(sessions.id))
+      .limit(500);
+
+    type Insight = {
+      date: string;
+      branch: string | null;
+      title: string;
+      type: "learning" | "recommendation";
+      text: string;
+    };
+    const insights: Insight[] = [];
+
+    for (const row of rows) {
+      const addInsights = (raw: unknown, type: Insight["type"]) => {
+        const arr = Array.isArray(raw) ? raw : [];
+        for (const item of arr) {
+          if (typeof item === "string") {
+            insights.push({
+              date: row.date,
+              branch: row.branch,
+              title: row.title,
+              type,
+              text: item,
+            });
+          }
+        }
+      };
+
+      if (row.learningsJson) addInsights(row.learningsJson, "learning");
+      if (row.recommendationsJson) addInsights(row.recommendationsJson, "recommendation");
+    }
+
+    const byType: Record<string, number> = {};
+    for (const insight of insights) {
+      byType[insight.type] = (byType[insight.type] || 0) + 1;
+    }
+
+    return c.json({
+      insights,
+      summary: { total: insights.length, byType },
     });
   });
 

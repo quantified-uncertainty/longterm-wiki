@@ -34,6 +34,7 @@ import {
   findRunReport as findRunReportFile,
 } from '../auto-update/ci-verify-citations.ts';
 import { computeRiskScores } from '../auto-update/ci-risk-scores.ts';
+import { runContentChecks } from '../auto-update/ci-content-checks.ts';
 import { buildPrBody } from '../auto-update/ci-pr-body.ts';
 import { createJob } from '../lib/wiki-server/jobs.ts';
 import type { AutoUpdateOptions, RunReport } from '../auto-update/types.ts';
@@ -589,6 +590,44 @@ async function submit(args: string[], options: AutoUpdateOptions): Promise<Comma
   return { output, exitCode: 0 };
 }
 
+/**
+ * Content quality checks (truncation + dangling footnotes) for changed pages.
+ */
+async function contentChecks(args: string[], options: AutoUpdateOptions): Promise<CommandResult> {
+  const diff = args.includes('--diff') || options.diff === true;
+  const baseBranch = typeof options.base === 'string' ? options.base : 'main';
+
+  const pageIds = args.filter(a => !a.startsWith('--'));
+
+  const result = runContentChecks({
+    pageIds: diff ? undefined : pageIds.length > 0 ? pageIds : undefined,
+    baseBranch,
+  });
+
+  if (options.json || options.ci) {
+    return { output: JSON.stringify(result, null, 2), exitCode: result.passed ? 0 : 1 };
+  }
+
+  const c = createLogger(false).colors;
+  let output = '';
+  output += `${c.bold}Content Quality Checks${c.reset}\n`;
+  output += `  Pages: ${result.totalPages}\n`;
+
+  if (result.truncationBlocked.length > 0) {
+    output += `  ${c.red}Truncation blocked: ${result.truncationBlocked.join(', ')}${c.reset}\n`;
+  }
+  if (result.truncationWarned.length > 0) {
+    output += `  ${c.yellow}Truncation warned: ${result.truncationWarned.join(', ')}${c.reset}\n`;
+  }
+  if (result.footnoteBlocked.length > 0) {
+    output += `  ${c.red}Dangling footnotes: ${result.footnoteBlocked.join(', ')}${c.reset}\n`;
+  }
+
+  output += `  Gate: ${result.passed ? `${c.green}PASSED${c.reset}` : `${c.red}FAILED${c.reset}`}\n`;
+
+  return { output, exitCode: result.passed ? 0 : 1 };
+}
+
 // ── Command Registry ────────────────────────────────────────────────────────
 
 export const commands = {
@@ -602,6 +641,7 @@ export const commands = {
   'audit-gate': auditGate,
   'verify-citations': verifyCitations,
   'risk-scores': riskScores,
+  'content-checks': contentChecks,
   'pr-body': prBody,
 };
 
@@ -624,6 +664,7 @@ Commands:
   audit-gate           Run citation audit gate on changed pages (CI)
   verify-citations     Verify citation URLs for specific pages (CI)
   risk-scores          Compute hallucination risk for specific pages (CI)
+  content-checks       Check for truncation + dangling footnotes (CI)
   pr-body              Build PR body from run report + summaries (CI)
 
 Options:

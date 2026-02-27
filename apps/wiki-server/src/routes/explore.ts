@@ -133,10 +133,11 @@ function deriveType(
   return "concept";
 }
 
-/** Base conditions shared by all queries (excludes stubs and schema). */
+/** Base conditions shared by all queries (excludes stubs, schema, and pages without numeric IDs). */
 const BASE_CONDITIONS = `
   (wp.word_count > 0 OR wp.content_format IN ('table', 'diagram'))
   AND wp.category != 'schema'
+  AND wp.numeric_id IS NOT NULL
 `;
 
 /** The derived type expression used for grouping and filtering. */
@@ -411,7 +412,7 @@ const exploreApp = new Hono()
 
       return {
         id: r.id,
-        numericId: r.numeric_id || r.id,
+        numericId: r.numeric_id as string,
         title: r.title,
         type: deriveType(r.content_format, r.entity_type, r.category),
         description: r.description || null,

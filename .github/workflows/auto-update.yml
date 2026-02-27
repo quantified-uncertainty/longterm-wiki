@@ -220,6 +220,10 @@ jobs:
 
           echo "All changed pages passed paranoid review"
 
+      - name: Content quality checks (truncation + footnotes)
+        if: success()
+        run: pnpm crux auto-update content-checks --diff
+
       - name: Find run report
         id: report
         if: always()

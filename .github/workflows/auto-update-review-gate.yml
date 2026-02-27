@@ -111,20 +111,80 @@ jobs:
             gh pr comment ${{ github.event.pull_request.number }} --body "$AUDIT_SUMMARY"
           fi
 
+      - name: Verify citation URLs exist
+        id: url_verify
+        run: |
+          BASE="${{ github.event.pull_request.base.ref }}"
+
+          # Extract changed page IDs from git diff (same logic as audit-gate)
+          CHANGED=$(git diff --name-only "origin/${BASE}...HEAD" -- 'content/docs/**/*.mdx' \
+            | sed 's|.*/||; s|\.mdx$||' \
+            | grep -v '^index$' || true)
+
+          if [ -z "$CHANGED" ]; then
+            echo "No changed pages — skipping URL verification"
+            echo "url_broken=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Verifying citation URLs for changed pages..."
+          BROKEN=0
+          for PAGE_ID in $CHANGED; do
+            echo "  Checking: $PAGE_ID"
+            if ! pnpm --silent crux citations verify "$PAGE_ID" --ci 2>/dev/null; then
+              BROKEN=$((BROKEN + 1))
+              echo "::warning::$PAGE_ID has broken citation URLs"
+            fi
+          done
+
+          echo "url_broken=$BROKEN" >> $GITHUB_OUTPUT
+          if [ "$BROKEN" -gt 0 ]; then
+            echo "::warning::$BROKEN page(s) have broken citation URLs"
+          fi
+
+      - name: Content quality checks (truncation + footnotes)
+        id: content_checks
+        run: |
+          RESULT=$(pnpm crux auto-update content-checks --diff --json 2>&1) || true
+          PASSED=$(echo "$RESULT" | jq -r '.passed // true')
+          echo "content_passed=$PASSED" >> $GITHUB_OUTPUT
+
       - name: Gate decision
         run: |
-          PASSED="${{ steps.audit.outputs.audit_passed }}"
+          AUDIT_PASSED="${{ steps.audit.outputs.audit_passed }}"
           INACCURATE="${{ steps.audit.outputs.total_inaccurate }}"
+          URL_BROKEN="${{ steps.url_verify.outputs.url_broken }}"
+          CONTENT_PASSED="${{ steps.content_checks.outputs.content_passed }}"
 
           echo ""
           echo "=== Audit Gate Decision ==="
           echo "  Inaccurate: $INACCURATE"
           echo "  Unsupported: ${{ steps.audit.outputs.total_unsupported }}"
+          echo "  Broken URLs: $URL_BROKEN"
+          echo "  Content checks: $CONTENT_PASSED"
           echo ""
 
-          if [ "$PASSED" = "true" ]; then
-            echo "Audit gate PASSED — no inaccurate citations found."
-          else
-            echo "Audit gate FAILED — $INACCURATE inaccurate citation(s) remain."
+          FAILED=false
+
+          if [ "$AUDIT_PASSED" != "true" ]; then
+            echo "FAIL: $INACCURATE inaccurate citation(s) remain."
+            FAILED=true
+          fi
+
+          if [ "$URL_BROKEN" -gt 0 ]; then
+            echo "FAIL: $URL_BROKEN page(s) have broken citation URLs (possible fabricated references)."
+            FAILED=true
+          fi
+
+          if [ "$CONTENT_PASSED" != "true" ]; then
+            echo "FAIL: Content quality issues (truncation or dangling footnotes)."
+            FAILED=true
+          fi
+
+          if [ "$FAILED" = "true" ]; then
+            echo ""
+            echo "Audit gate FAILED."
             exit 1
           fi
+
+          echo "Audit gate PASSED."

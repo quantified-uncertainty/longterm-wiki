@@ -37,6 +37,9 @@ export interface PublicationResourceRow {
   citingPageCount: number;
 }
 
+/** Approximate row height in px for spacer calculation (keeps table height stable across pages) */
+const TABLE_ROW_HEIGHT_PX = 37;
+
 const TYPE_COLORS: Record<string, string> = {
   paper: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
   blog: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
@@ -204,18 +207,29 @@ export function PublicationResourcesTable({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-1.5">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              <>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="py-1.5">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+                {/* Spacer row to maintain consistent table height across pages */}
+                {table.getRowModel().rows.length < pagination.pageSize && (
+                  <tr>
+                    <td
+                      colSpan={columns.length}
+                      style={{ height: `${(pagination.pageSize - table.getRowModel().rows.length) * TABLE_ROW_HEIGHT_PX}px` }}
+                    />
+                  </tr>
+                )}
+              </>
             ) : (
               <TableRow>
                 <TableCell

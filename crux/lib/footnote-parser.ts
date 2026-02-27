@@ -3,8 +3,8 @@
  * and maps them to URLs, deduplicating by unique source.
  *
  * Used by:
- *   - build-data.mjs to compute the footnoteIndex
  *   - crux citations register-resources to auto-create YAML entries
+ *   - crux claims migrate-footnotes for batch migration
  */
 
 export interface ParsedFootnote {

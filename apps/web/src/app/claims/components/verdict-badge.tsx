@@ -1,36 +1,16 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, AlertTriangle, HelpCircle } from "lucide-react";
+import { HelpCircle } from "lucide-react";
+import { CLAIM_VERDICT_CONFIG } from "./verdict-config";
 
-const VERDICT_CONFIG: Record<
-  string,
-  {
-    label: string;
-    className: string;
-    Icon: typeof CheckCircle2;
-  }
-> = {
-  verified: {
-    label: "Verified",
-    className: "bg-green-100 text-green-800 border-green-200 hover:bg-green-100",
-    Icon: CheckCircle2,
-  },
-  unsupported: {
-    label: "Unsupported",
-    className: "bg-red-100 text-red-800 border-red-200 hover:bg-red-100",
-    Icon: XCircle,
-  },
-  disputed: {
-    label: "Disputed",
-    className: "bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100",
-    Icon: AlertTriangle,
-  },
-  unverified: {
-    label: "Unverified",
-    className: "bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-100",
-    Icon: HelpCircle,
-  },
+/** Badge-specific styling per verdict (extends shared config with Badge className) */
+const BADGE_STYLES: Record<string, string> = {
+  verified: "bg-green-100 text-green-800 border-green-200 hover:bg-green-100",
+  unsupported: "bg-red-100 text-red-800 border-red-200 hover:bg-red-100",
+  disputed: "bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100",
+  unverified: "bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-100",
+  not_verifiable: "bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-100",
 };
 
 export function VerdictBadge({
@@ -40,9 +20,11 @@ export function VerdictBadge({
   verdict: string | null;
   score?: number | null;
 }) {
-  const config = verdict ? VERDICT_CONFIG[verdict] : VERDICT_CONFIG.unverified;
-  if (!config) return null;
-  const { label, className, Icon } = config;
+  const key = verdict ?? "unverified";
+  const shared = CLAIM_VERDICT_CONFIG[key];
+  const Icon = shared?.icon ?? HelpCircle;
+  const label = shared?.label ?? "Unverified";
+  const className = BADGE_STYLES[key] ?? BADGE_STYLES.unverified;
 
   return (
     <Badge variant="outline" className={`gap-1 text-xs font-medium ${className}`}>

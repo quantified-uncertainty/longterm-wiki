@@ -385,18 +385,18 @@ Studies have shown <EntityLink id="E186" name="language-models">Large Language M
 
 ### RAND Red-Team Study (2024)
 
-The RAND Corporation study ("The Operational Risks of AI in Large-Scale Biological Attacks") is reportedly one of the more rigorous empirical assessments of AI uplift conducted to date.[^24] Researchers Christopher Mouton, Caleb Lucas, and Ella Guest reportedly recruited 15 groups of three people to act as <EntityLink id="E449" name="red-teaming">Red Teaming</EntityLink> "bad guys."[^24]
+The RAND Corporation study ("The Operational Risks of AI in Large-Scale Biological Attacks") is reportedly one of the more rigorous empirical assessments of AI uplift conducted to date.[^rc-a668] Researchers Christopher Mouton, Caleb Lucas, and Ella Guest reportedly recruited 15 groups of three people to act as <EntityLink id="E449" name="red-teaming">Red Teaming</EntityLink> "bad guys."[^rc-a668]
 
-According to the study, twelve teams were given 80 hours each over seven weeks to develop bioweapon attack plans based on one of four scenarios—including a "fringe doomsday cult intent on global catastrophe" and a "private military company seeking to aid an adversary's conventional military operation."[^24] For each scenario, one team had access to an <EntityLink id="E400" name="large-language-models">Large Language Models</EntityLink> chatbot, another had a different chatbot, and control teams used only internet resources.[^24]
+According to the study, twelve teams were given 80 hours each over seven weeks to develop bioweapon attack plans based on one of four scenarios—including a "fringe doomsday cult intent on global catastrophe" and a "private military company seeking to aid an adversary's conventional military operation."[^rc-a668] For each scenario, one team had access to an <EntityLink id="E400" name="large-language-models">Large Language Models</EntityLink> chatbot, another had a different chatbot, and control teams used only internet resources.[^rc-a668]
 
-Expert judges (biologists and security specialists) evaluated the resulting plans for biological and operational feasibility. The reported result: **no statistically significant difference** in plan viability between AI-assisted and non-AI groups.[^24]
+Expert judges (biologists and security specialists) evaluated the resulting plans for biological and operational feasibility. The reported result: **no statistically significant difference** in plan viability between AI-assisted and non-AI groups.[^rc-a668]
 
 **Key methodology details:**
 - Participants had some technical background (science graduates)
 - Testing focused on planning, not actual synthesis
 - Used 2023-era models; capabilities have advanced since
 - Sample size was relatively small (n=12 teams completing the study)
-- LLMs did not generate explicit weaponization instructions, but reportedly provided "guidance and context in critical areas such as agent selection, delivery methods, and operational planning"[^24]
+- LLMs did not generate explicit weaponization instructions, but reportedly provided "guidance and context in critical areas such as agent selection, delivery methods, and operational planning"[^rc-a668]
 
 **Limitations acknowledged by researchers:** The study tested planning capability, not execution. It used participants with technical backgrounds, so may underestimate uplift for complete novices. AI capabilities continue advancing.
 
@@ -404,7 +404,7 @@ Expert judges (biologists and security specialists) evaluated the resulting plan
 
 ### AI-Designed Toxins Evade Screening (2024)
 
-Microsoft researchers reportedly conducted a red-team exercise testing biosecurity in the protein engineering pipeline. According to some sources, DNA screening software—used by synthesis companies to flag dangerous sequences—missed over 75% of AI-designed potential toxins, with one tool flagging only 23% of sequences.[^25] After the research was published, screening systems reportedly improved to catch approximately 72% on average.[^25]
+Microsoft researchers reportedly conducted a red-team exercise testing biosecurity in the protein engineering pipeline. According to some sources, DNA screening software—used by synthesis companies to flag dangerous sequences—missed over 75% of AI-designed potential toxins, with one tool flagging only 23% of sequences.[^rc-bcc1] After the research was published, screening systems reportedly improved to catch approximately 72% on average.[^rc-bcc1]
 
 **Key details:**
 - Tested multiple commercial screening tools
@@ -415,9 +415,9 @@ Microsoft researchers reportedly conducted a red-team exercise testing biosecuri
 
 ### Gryphon Scientific Evaluation (2023)
 
-Anthropic hired Gryphon Scientific to red-team Claude's ability to provide harmful biological information.[^26] According to reports, the evaluation involved more than 150 hours of testing and drew on more than 20 biosecurity experts.[^26]
+Anthropic hired Gryphon Scientific to red-team Claude's ability to provide harmful biological information.[^rc-6227] According to reports, the evaluation involved more than 150 hours of testing and drew on more than 20 biosecurity experts.[^rc-6227]
 
-The findings were described as concerning. Rocco Casagrande, Gryphon's managing director, reportedly stated he was **"personally surprised and dismayed by how capable current LLMs were at providing critical information related to biological weapons."**[^26] He was quoted by Semafor as saying: "These things are developing extremely, extremely fast, they're a lot more capable than I thought they would be when it comes to science."[^26]
+The findings were described as concerning. Rocco Casagrande, Gryphon's managing director, reportedly stated he was **"personally surprised and dismayed by how capable current LLMs were at providing critical information related to biological weapons."**[^rc-6227] He was quoted by Semafor as saying: "These things are developing extremely, extremely fast, they're a lot more capable than I thought they would be when it comes to science."[^rc-6227]
 
 **Key findings (according to reports):**
 - One team member with a postdoctoral fellowship studying a pandemic-capable virus found LLMs could provide "post-doc level knowledge to troubleshoot commonly encountered problems" when working with that virus
@@ -425,21 +425,21 @@ The findings were described as concerning. Rocco Casagrande, Gryphon's managing 
 - Although LLMs often hallucinate, they answered almost all questions accurately at least sometimes, and answered some critical questions nearly always accurately
 - Workshops with biosecurity experts identified concerning misuse scenarios including how to reconstruct information redacted from sensitive scientific documents
 
-Despite the concerning findings, Casagrande reportedly believes "concerted action could ensure safety is built into the most advanced models."[^26]
+Despite the concerning findings, Casagrande reportedly believes "concerted action could ensure safety is built into the most advanced models."[^rc-6227]
 
 ### Anthropic, OpenAI Evaluations
 
 AI labs have conducted extensive internal evaluations testing whether their models could provide "uplift" to potential bioweapon developers.
 
-**Anthropic's approach:** Anthropic's <EntityLink id="E461" name="rsp">Responsible Scaling Policies</EntityLink> (RSP) defines AI Safety Levels (ASL) modeled after biosafety level (BSL) standards.[^27] They reportedly conduct at least 10 different biorisk evaluations for each major model release.[^27] In early 2025, Anthropic reportedly sent a letter to the White House urging immediate action on AI security after its testing revealed alarming improvements in Claude 3.7 Sonnet's ability to assist with aspects of bioweapons development.[^28]
+**Anthropic's approach:** Anthropic's <EntityLink id="E461" name="rsp">Responsible Scaling Policies</EntityLink> (RSP) defines AI Safety Levels (ASL) modeled after biosafety level (BSL) standards.[^rc-4f12] They reportedly conduct at least 10 different biorisk evaluations for each major model release.[^rc-4f12] In early 2025, Anthropic reportedly sent a letter to the White House urging immediate action on AI security after its testing revealed alarming improvements in Claude 3.7 Sonnet's ability to assist with aspects of bioweapons development.[^rc-3b92]
 
-**OpenAI's framework:** OpenAI's Preparedness Framework categorizes biological and chemical capabilities as "Tracked Categories" requiring ongoing evaluation.[^29] They define two thresholds:
-- **High capability:** Could "provide meaningful counterfactual assistance to 'novice' actors (anyone with a basic relevant technical background) that enables them to create known biological or chemical threats"[^29]
-- **Critical capability:** Could "introduce unprecedented new pathways to severe harm"[^29]
+**OpenAI's framework:** OpenAI's Preparedness Framework categorizes biological and chemical capabilities as "Tracked Categories" requiring ongoing evaluation.[^rc-4747] They define two thresholds:
+- **High capability:** Could "provide meaningful counterfactual assistance to 'novice' actors (anyone with a basic relevant technical background) that enables them to create known biological or chemical threats"[^rc-4747]
+- **Critical capability:** Could "introduce unprecedented new pathways to severe harm"[^rc-4747]
 
-OpenAI states their most advanced models "aren't yet capable enough to pose severe risks" in biosecurity—but has reportedly indicated upcoming models may reach "high" capability level.[^29]
+OpenAI states their most advanced models "aren't yet capable enough to pose severe risks" in biosecurity—but has reportedly indicated upcoming models may reach "high" capability level.[^rc-4747]
 
-**US/<EntityLink id="E364" name="uk-aisi">UK AI Safety Institute</EntityLink> joint evaluation (2024):** The first joint government-led model evaluation tested Claude 3.5 Sonnet across biological capabilities, cyber capabilities, software development, and safeguard efficacy.[^30] Elizabeth Kelly, AISI director, was quoted as calling it "the most comprehensive government-led safety evaluation of an advanced AI model to date."[^30]
+**US/<EntityLink id="E364" name="uk-aisi">UK AI Safety Institute</EntityLink> joint evaluation (2024):** The first joint government-led model evaluation tested Claude 3.5 Sonnet across biological capabilities, cyber capabilities, software development, and safeguard efficacy.[^rc-6e22] Elizabeth Kelly, AISI director, was quoted as calling it "the most comprehensive government-led safety evaluation of an advanced AI model to date."[^rc-6e22]
 
 #### Evaluation Methodology Limitations
 
@@ -542,19 +542,12 @@ The Center for Strategic and International Studies reportedly published "Opportu
 
 ---
 
-[^24]: Mouton, C., Lucas, C., & Guest, E. (2024). *The Operational Risks of AI in Large-Scale Biological Attacks*. RAND Corporation. Specific figures (12 teams, 80 hours, 7 weeks, 4 scenarios, 15 groups, n=12 completing) are drawn from this study as reported; independent verification of all sub-figures was not possible from sources available.
 
-[^25]: The 75%, 23%, and 72% screening evasion figures are attributed to Microsoft researchers in multiple secondary accounts; however, no primary paper URL was available for direct verification. These figures are reported "according to some sources" and should be treated as approximate pending primary-source confirmation.
 
-[^26]: Gryphon Scientific evaluation details (150+ hours, 20+ experts, Casagrande quotes) are reported via Semafor coverage and Anthropic disclosures. Direct primary-source documentation was not available in the source cache; figures and quotes are presented as reported.
 
-[^27]: Anthropic. *Responsible Scaling Policy*. https://www.anthropic.com/news/anthropics-responsible-scaling-policy (policy document; specific claim about "at least 10 biorisk evaluations" is reported in secondary accounts and could not be independently verified from the primary document alone).
 
-[^28]: Anthropic's reported letter to the White House regarding Claude 3.7 Sonnet is cited in multiple news accounts (e.g., Reuters, Politico, 2025); primary letter text was not publicly available at time of writing.
 
-[^29]: OpenAI. *Preparedness Framework (Beta)*. https://openai.com/safety/preparedness (definitions of "high" and "critical" capability thresholds drawn directly from this document).
 
-[^30]: UK AI Safety Institute / <EntityLink id="E365" name="us-aisi">US AI Safety Institute</EntityLink>. Joint evaluation of Claude 3.5 Sonnet (2024). Details reported in government press releases and media coverage.
 
 ## How AI Could Help Attackers
 
@@ -610,7 +603,7 @@ Biological threats exist on a spectrum. State programs have historically been th
 
 #### State Bioweapons Programs
 
-Multiple nations have maintained offensive biological weapons programs despite the Biological Weapons Convention (BWC):[^39]
+Multiple nations have maintained offensive biological weapons programs despite the Biological Weapons Convention (BWC):[^rc-f03a]
 
 | Program | Era | Scale | Outcome |
 |---------|-----|-------|-------|
@@ -622,34 +615,34 @@ Multiple nations have maintained offensive biological weapons programs despite t
 
 These programs required vast resources, thousands of scientists, and state-level infrastructure. The concern is that AI could reduce these requirements.
 
-**Current compliance concerns:** According to some sources, the 2024 State Department report raised BWC compliance concerns about **China, Russia, Iran, and North Korea**.[^40] Verification remains difficult because the BWC has no formal verification regime.[^39]
+**Current compliance concerns:** According to some sources, the 2024 State Department report raised BWC compliance concerns about **China, Russia, Iran, and North Korea**.[^rc-d624] Verification remains difficult because the BWC has no formal verification regime.[^rc-f03a]
 
 #### The Soviet Biopreparat Program: A Case Study
 
-The Soviet Union reportedly operated one of the world's largest biological weapons programs—in direct violation of the BWC it had signed.[^39] Understanding this program illuminates both the scale of resources historically required and the ongoing legacy concerns.
+The Soviet Union reportedly operated one of the world's largest biological weapons programs—in direct violation of the BWC it had signed.[^rc-f03a] Understanding this program illuminates both the scale of resources historically required and the ongoing legacy concerns.
 
 **Scale and organization:**
-- <R id="2670dc534d9adb0c">Biopreparat</R> was reportedly created in April 1974 as a civilian cover organization[^41]
-- Reportedly employed **30,000–40,000 personnel** across some 40–50 research facilities, according to accounts by former program insiders[^41]
-- Reportedly included five major military-focused research institutes, numerous design facilities, three pilot plants, and five dual-use production plants[^41]
-- Annual production capacity for weaponized smallpox was reportedly on the order of **90–100 tons**, according to defector accounts[^42]
+- <R id="2670dc534d9adb0c">Biopreparat</R> was reportedly created in April 1974 as a civilian cover organization[^rc-5762]
+- Reportedly employed **30,000–40,000 personnel** across some 40–50 research facilities, according to accounts by former program insiders[^rc-5762]
+- Reportedly included five major military-focused research institutes, numerous design facilities, three pilot plants, and five dual-use production plants[^rc-5762]
+- Annual production capacity for weaponized smallpox was reportedly on the order of **90–100 tons**, according to defector accounts[^rc-e6c0]
 
 **Agents developed:**
 - Weaponized smallpox (reportedly continued even after WHO declared global eradication)
 - Anthrax (including strains developed as enhanced "battle" variants)
 - Plague, Q fever, tularemia, glanders, and Marburg hemorrhagic fever
-- Agents reportedly designed for aerosol dispersal via ballistic or cruise missiles[^41]
+- Agents reportedly designed for aerosol dispersal via ballistic or cruise missiles[^rc-5762]
 
-**The Sverdlovsk incident (1979):** An accidental release of anthrax spores from a Soviet military facility in Sverdlovsk reportedly killed at least 68 people; the true number remains uncertain because KGB records were reportedly destroyed.[^43] The Soviet government initially attributed deaths to contaminated meat; Boris Yeltsin publicly acknowledged the military origin in 1992.[^43]
+**The Sverdlovsk incident (1979):** An accidental release of anthrax spores from a Soviet military facility in Sverdlovsk reportedly killed at least 68 people; the true number remains uncertain because KGB records were reportedly destroyed.[^rc-628e] The Soviet government initially attributed deaths to contaminated meat; Boris Yeltsin publicly acknowledged the military origin in 1992.[^rc-628e]
 
 **Key defectors who revealed the program:**
-- **Vladimir Pasechnik** (defected 1989): Described as a high-level defector to the UK; his reported testimony enabled Western leaders to pressure Gorbachev about the program's scope[^44]
-- **Ken Alibek** (Kanatjan Alibekov, defected 1992): Described as a former first deputy director of Biopreparat; after emigrating he reportedly provided US government with a detailed accounting of the program, including work on tularemia and enhanced anthrax strains[^42]
+- **Vladimir Pasechnik** (defected 1989): Described as a high-level defector to the UK; his reported testimony enabled Western leaders to pressure Gorbachev about the program's scope[^rc-b6fe]
+- **Ken Alibek** (Kanatjan Alibekov, defected 1992): Described as a former first deputy director of Biopreparat; after emigrating he reportedly provided US government with a detailed accounting of the program, including work on tularemia and enhanced anthrax strains[^rc-e6c0]
 
 **Legacy concerns:**
 - Some facilities and scientists were reportedly absorbed into public health institutions after the USSR's dissolution
 - US programs attempted to redirect former weapons scientists to peaceful research
-- According to contemporaneous reporting, in late 1997 the US expanded efforts after detecting what officials described as intensified attempts by Iran and other states to acquire biological expertise from former Soviet institutes[^45]
+- According to contemporaneous reporting, in late 1997 the US expanded efforts after detecting what officials described as intensified attempts by Iran and other states to acquire biological expertise from former Soviet institutes[^rc-aeaa]
 
 **Lesson for AI risk:** Even with massive state resources, Biopreparat reportedly required decades and thousands of scientists to develop reliable weapons. This suggests the wet-lab barrier is formidable—but also that determined state actors with existing infrastructure could integrate AI assistance more easily than non-state actors starting from scratch.
 
@@ -659,21 +652,21 @@ The historical record of non-state biological attacks reveals consistent technic
 
 **1984 Oregon Salmonella Attack (Rajneeshees)**
 - Members of the Rajneeshee religious commune deliberately contaminated restaurant salad bars in The Dalles, Oregon with *Salmonella typhimurium*
-- According to CDC records, the attack caused **751 cases of food poisoning** and **45 hospitalizations**; there were no deaths[^46]
-- The attack occurred in **1984** and remains the largest confirmed bioterrorist attack in U.S. history[^46]
+- According to CDC records, the attack caused **751 cases of food poisoning** and **45 hospitalizations**; there were no deaths[^rc-ee20]
+- The attack occurred in **1984** and remains the largest confirmed bioterrorist attack in U.S. history[^rc-ee20]
 - It used a readily available pathogen requiring no sophisticated laboratory technology
 - **Key insight:** Demonstrated that biological attacks don't require advanced technology, but also that impact was limited without sophisticated delivery
 
 **Aum Shinrikyo (1990s)**
-- Japanese cult with reportedly **\$1 billion in assets**, hundreds of members, and PhD-level scientists[^47]
-- Attempted anthrax, botulinum toxin, and other biological agents—all efforts reportedly failed to produce casualties[^47]
-- An anthrax sprayer reportedly deployed in Tokyo produced no casualties, attributed partly to use of a vaccine strain by mistake[^47]
-- The group eventually succeeded with a sarin chemical attack in the Tokyo subway in 1995, killing **13 people** and injuring thousands[^48]
+- Japanese cult with reportedly **\$1 billion in assets**, hundreds of members, and PhD-level scientists[^rc-f121]
+- Attempted anthrax, botulinum toxin, and other biological agents—all efforts reportedly failed to produce casualties[^rc-f121]
+- An anthrax sprayer reportedly deployed in Tokyo produced no casualties, attributed partly to use of a vaccine strain by mistake[^rc-f121]
+- The group eventually succeeded with a sarin chemical attack in the Tokyo subway in 1995, killing **13 people** and injuring thousands[^rc-ae76]
 - **Key insight:** Even well-funded, technically sophisticated groups with scientific personnel have failed at biological weapons. The wet-lab barrier is real.
 
 **2001 Anthrax Letters (Amerithrax)**
-- Letters containing anthrax spores killed **5 people** and infected **17 others** in the United States[^49]
-- The FBI concluded the perpetrator was **Bruce Ivins**, a senior scientist at USAMRIID with decades of anthrax research experience and legitimate institutional access to spores[^49]
+- Letters containing anthrax spores killed **5 people** and infected **17 others** in the United States[^rc-d8fe]
+- The FBI concluded the perpetrator was **Bruce Ivins**, a senior scientist at USAMRIID with decades of anthrax research experience and legitimate institutional access to spores[^rc-d8fe]
 - **Key insight:** An insider threat—not information access—enabled this attack. The perpetrator already possessed world-class expertise; AI would not have been the limiting factor.
 
 **Why has catastrophic bioterrorism not occurred?**
@@ -695,7 +688,7 @@ DNA synthesis companies already screen orders for dangerous sequences, but scree
 
 | Defense Layer | Coverage | Effectiveness | AI Vulnerability |
 |--------------|----------|---------------|------------------|
-| DNA synthesis screening | Major companies | Reportedly 40–70% (pre-2024); improving[^50] | High (evasion design) |
+| DNA synthesis screening | Major companies | Reportedly 40–70% (pre-2024); improving[^rc-ef26] | High (evasion design) |
 | BSL facility access control | High containment | High | Low |
 | Pathogen inventory tracking | Research labs | Moderate | Low |
 | Export controls (equipment) | Dual-use items | Moderate | Low |
@@ -713,7 +706,7 @@ DNA synthesis screening is considered the key "chokepoint" in the AI-assisted bi
 - High false positive rates require expensive human review
 - Benchtop DNA synthesizers are emerging that could bypass commercial screening entirely
 
-**Post-Microsoft patch status:** After research revealed high evasion rates against existing screening tools, a software patch was deployed to synthesis companies. According to reporting on that effort, the fix reportedly now catches approximately **97% of threats**—but experts have cautioned that the fix remains incomplete and gaps persist.[^51]
+**Post-Microsoft patch status:** After research revealed high evasion rates against existing screening tools, a software patch was deployed to synthesis companies. According to reporting on that effort, the fix reportedly now catches approximately **97% of threats**—but experts have cautioned that the fix remains incomplete and gaps persist.[^rc-ddd8]
 
 **Policy response:** In April 2024, the White House OSTP released a <R id="14ff22ab7e571166">Framework for Nucleic Acid Synthesis Screening</R>, requiring federally funded programs to screen customers and orders, keep records, and report suspicious orders.[^52] NIST is partnering with stakeholders to improve screening standards and mitigate AI-specific risks.[^52]
 
@@ -729,19 +722,6 @@ DNA synthesis screening is considered the key "chokepoint" in the AI-assisted bi
 
 ---
 
-[^39]: The Biological Weapons Convention was opened for signature in 1972 and entered into force in 1975. As of recent counts, it has approximately 187 states parties. See: United Nations Office for Disarmament Affairs, *Biological Weapons Convention* (https://www.un.org/disarmament/wmd/bio/). Specific party counts fluctuate; figures here reflect commonly cited totals.
-[^40]: U.S. Department of State, *2024 Adherence to and Compliance with Arms Control, Nonproliferation, and Disarmament Agreements and Commitments* (https://www.state.gov/reports/2024-adherence-to-and-compliance-with-arms-control-nonproliferation-and-disarmament-agreements-and-commitments/). Claims about specific named countries reflect the content described in that report; readers should consult the primary document.
-[^41]: Figures for Biopreparat's founding date, personnel count, and facility count derive primarily from accounts by former program insiders, including Ken Alibek's memoir *Biohazard* (1999), and from academic analyses such as Milton Leitenberg and Raymond A. Zilinskas, *The Soviet Biological Weapons Program: A History* (Harvard University Press, 2012). Exact figures vary across sources and should be treated as estimates.
-[^42]: Ken Alibek (with Stephen Handelman), *Biohazard: The Chilling True Story of the Largest Covert Biological Weapons Program in the World* (Random House, 1999). Alibek's account is the primary public source for figures including smallpox production capacity; these claims have not been independently verified and should be understood as defector testimony.
-[^43]: The Sverdlovsk anthrax leak is documented in Matthew Meselson et al., "The Sverdlovsk Anthrax Outbreak of 1979," *Science* 266(5188): 1202–1208 (1994) (https://doi.org/10.1126/science.7973702). The figure of at least 68 deaths comes from that study; the authors note that records were incomplete. Yeltsin's 1992 acknowledgment is widely reported in contemporaneous news coverage.
-[^44]: Pasechnik's 1989 defection and its significance are described in multiple accounts, including Tom Mangold and Jeff Goldberg, *Plague Wars* (Macmillan, 1999), and subsequent official British government statements. Specific claims about his briefings to Thatcher and Bush reflect these secondary accounts.
-[^46]: T.J. Torok et al., "A Large Community Outbreak of Salmonellosis Caused by Intentional Contamination of Restaurant Salad Bars," *JAMA* 278(5): 389–395 (1997) (https://doi.org/10.1001/jama.1997.03550050051033). The article documents 751 cases and 45 hospitalizations and confirms deliberate contamination.
-[^47]: Accounts of Aum Shinrikyo's biological program draw on: Richard Danzig et al., *Aum Shinrikyo: Insights into How Terrorists Develop Biological and Chemical Weapons* (Center for a New American Security, 2012) (https://www.cnas.org/publications/reports/aum-shinrikyo-insights-into-how-terrorists-develop-biological-and-chemical-weapons). The \$1 billion asset figure is widely cited but difficult to verify independently; it should be treated as an approximation from journalistic and government sources.
-[^48]: The 1995 Tokyo subway sarin attack casualty figures (13 deaths) are reported by the Tokyo Metropolitan Police and extensively documented in academic and government literature, including Kyle Olson, "Aum Shinrikyo: Once and Future Threat?" *Emerging Infectious Diseases* 5(4): 513–516 (1999) (https://doi.org/10.3201/eid0504.990409).
-[^49]: FBI summary of the Amerithrax investigation: Federal Bureau of Investigation, *Amerithrax Investigative Summary* (2010) (https://www.justice.gov/archive/amerithrax/docs/amx-investigative-summary.pdf). The summary documents 5 deaths and 17 infections and identifies Bruce Ivins as the perpetrator.
-[^50]: The 40–70% pre-2024 screening effectiveness estimate has been cited in policy discussions and academic commentary on biosecurity chokepoints; it is not a single authoritative figure and should be understood as a rough range reflecting expert assessments at the time. See, e.g., discussions in the <EntityLink id="E423" name="johns-hopkins-center-for-health-security">Johns Hopkins Center for Health Security</EntityLink>'s work on nucleic acid synthesis governance.
-[^51]: The claim that post-patch screening reaches approximately 97% effectiveness derives from reporting on Microsoft's biosecurity research collaboration; readers should consult primary reporting (e.g., coverage in *MIT Technology Review* and *STAT News*) and treat this figure as preliminary pending further peer review.
-[^45]: The 1997 US concern about Iranian and other state recruitment of former Soviet bioweapons scientists is described in contemporaneous reporting, including coverage by *The New York Times* and government testimony.
 
 ## Emerging Technologies of Concern
 

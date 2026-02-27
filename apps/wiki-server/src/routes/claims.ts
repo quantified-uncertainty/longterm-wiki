@@ -101,6 +101,8 @@ function claimValues(d: ClaimInput) {
     valueUnit: d.valueUnit ?? null,
     valueDate: d.valueDate ?? null,
     qualifiers: d.qualifiers ?? null,
+    // Reasoning traces (migration 0034)
+    inferenceType: d.inferenceType ?? null,
   };
 }
 
@@ -178,6 +180,8 @@ function formatClaim(
     valueUnit: r.valueUnit,
     valueDate: r.valueDate,
     qualifiers: r.qualifiers as Record<string, string> | null,
+    // Reasoning traces (migration 0034)
+    inferenceType: r.inferenceType,
     // Pinned claims (migration 0034)
     isPinned: r.isPinned,
     sources: sourcesRows.map(formatClaimSource),
@@ -233,6 +237,7 @@ const PatchClaimSchema = z.object({
   valueUnit: z.string().max(100).nullable().optional(),
   valueDate: z.string().max(20).nullable().optional(),
   qualifiers: z.record(z.string()).nullable().optional(),
+  inferenceType: z.string().max(50).nullable().optional(),
   isPinned: z.boolean().optional(),
 });
 
@@ -410,6 +415,16 @@ const claimsApp = new Hono()
 
     const parsed = DeleteByIdsSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
+
+    // Audit log: record bulk deletion before executing it
+    console.log(
+      JSON.stringify({
+        audit: "bulk-claim-delete",
+        timestamp: new Date().toISOString(),
+        count: parsed.data.ids.length,
+        claimIds: parsed.data.ids,
+      })
+    );
 
     const db = getDrizzleDb();
     const deleted = await db
@@ -936,16 +951,19 @@ const claimsApp = new Hono()
 
     const db = getDrizzleDb();
     const now = new Date();
-    let updated = 0;
 
-    for (const item of parsed.data.items) {
-      const result = await db
-        .update(claims)
-        .set({ relatedEntities: item.relatedEntities, updatedAt: now })
-        .where(eq(claims.id, item.id))
-        .returning({ id: claims.id });
-      if (result.length > 0) updated++;
-    }
+    const updated = await db.transaction(async (tx) => {
+      let count = 0;
+      for (const item of parsed.data.items) {
+        const result = await tx
+          .update(claims)
+          .set({ relatedEntities: item.relatedEntities, updatedAt: now })
+          .where(eq(claims.id, item.id))
+          .returning({ id: claims.id });
+        if (result.length > 0) count++;
+      }
+      return count;
+    });
 
     return c.json({ updated, total: parsed.data.items.length });
   })
@@ -986,24 +1004,27 @@ const claimsApp = new Hono()
 
     const db = getDrizzleDb();
     const now = new Date();
-    let updated = 0;
 
-    for (const item of parsed.data.items) {
-      const updates: Record<string, unknown> = { updatedAt: now };
-      if (item.subjectEntity !== undefined) updates.subjectEntity = item.subjectEntity;
-      if (item.property !== undefined) updates.property = item.property;
-      if (item.structuredValue !== undefined) updates.structuredValue = item.structuredValue;
-      if (item.valueUnit !== undefined) updates.valueUnit = item.valueUnit;
-      if (item.valueDate !== undefined) updates.valueDate = item.valueDate;
-      if (item.qualifiers !== undefined) updates.qualifiers = item.qualifiers;
+    const updated = await db.transaction(async (tx) => {
+      let count = 0;
+      for (const item of parsed.data.items) {
+        const updates: Record<string, unknown> = { updatedAt: now };
+        if (item.subjectEntity !== undefined) updates.subjectEntity = item.subjectEntity;
+        if (item.property !== undefined) updates.property = item.property;
+        if (item.structuredValue !== undefined) updates.structuredValue = item.structuredValue;
+        if (item.valueUnit !== undefined) updates.valueUnit = item.valueUnit;
+        if (item.valueDate !== undefined) updates.valueDate = item.valueDate;
+        if (item.qualifiers !== undefined) updates.qualifiers = item.qualifiers;
 
-      const result = await db
-        .update(claims)
-        .set(updates)
-        .where(eq(claims.id, item.id))
-        .returning({ id: claims.id });
-      if (result.length > 0) updated++;
-    }
+        const result = await tx
+          .update(claims)
+          .set(updates)
+          .where(eq(claims.id, item.id))
+          .returning({ id: claims.id });
+        if (result.length > 0) count++;
+      }
+      return count;
+    });
 
     return c.json({ updated, total: parsed.data.items.length });
   })
@@ -1026,7 +1047,7 @@ const claimsApp = new Hono()
 
     // Verify claim exists
     const existing = await db
-      .select({ id: claims.id })
+     .select({ id: claims.id })
       .from(claims)
       .where(eq(claims.id, id))
       .limit(1);
@@ -1046,6 +1067,7 @@ const claimsApp = new Hono()
     if (parsed.data.valueUnit !== undefined) updates.valueUnit = parsed.data.valueUnit;
     if (parsed.data.valueDate !== undefined) updates.valueDate = parsed.data.valueDate;
     if (parsed.data.qualifiers !== undefined) updates.qualifiers = parsed.data.qualifiers;
+    if (parsed.data.inferenceType !== undefined) updates.inferenceType = parsed.data.inferenceType;
     if (parsed.data.isPinned !== undefined) {
       updates.isPinned = parsed.data.isPinned;
       // When pinning, unpin any other claim with the same subject+property

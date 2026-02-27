@@ -19,6 +19,7 @@ import { createLogger } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
+import { listSessions } from '../lib/wiki-server/sessions.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -176,10 +177,65 @@ function parseSessionLog(content: string): SessionLogEntry | null {
   return { date, branch: branch.trim(), title: title.trim(), whatWasDone, pages, issues, learnings };
 }
 
-function loadSessionLogsSince(since: string): SessionLogEntry[] {
+/**
+ * Load session logs from the wiki-server DB (primary source of truth).
+ * Falls back to local files if the server is unavailable.
+ */
+async function loadSessionLogsSince(since: string): Promise<SessionLogEntry[]> {
+  // Try DB-backed sessions first (canonical source per session-logging.md)
+  try {
+    const result = await listSessions(200);
+    if (result.ok) {
+      const entries: SessionLogEntry[] = [];
+      for (const row of result.data.sessions) {
+        const sessionDate = row.date?.slice(0, 10);
+        if (!sessionDate || sessionDate < since) continue;
+
+        // Parse issues and learnings from JSON fields
+        const issues = parseJsonArray(row.issuesJson);
+        const learnings = parseJsonArray(row.learningsJson);
+        const pages = Array.isArray(row.pages) ? row.pages : [];
+
+        entries.push({
+          date: sessionDate,
+          branch: row.branch || '',
+          title: row.title || '',
+          whatWasDone: row.summary || '',
+          pages,
+          issues,
+          learnings,
+        });
+      }
+      return entries;
+    }
+  } catch { /* fall through to local files */ }
+
+  // Fallback: read local files (both .md and .yaml)
+  return loadSessionLogsFromFiles(since);
+}
+
+/** Parse a JSON value that may be an array of strings, a JSON string, or return empty. */
+function parseJsonArray(json: unknown): string[] {
+  if (!json) return [];
+  // If already an array (from jsonb column), use directly
+  if (Array.isArray(json)) return json.filter((s: unknown) => typeof s === 'string');
+  // If a string, try parsing as JSON
+  if (typeof json === 'string') {
+    try {
+      const parsed = JSON.parse(json);
+      if (Array.isArray(parsed)) return parsed.filter((s: unknown) => typeof s === 'string');
+    } catch { /* invalid JSON */ }
+  }
+  return [];
+}
+
+/** Fallback: load session logs from local .md and .yaml files. */
+function loadSessionLogsFromFiles(since: string): SessionLogEntry[] {
   if (!existsSync(SESSIONS_DIR)) return [];
 
-  const files = readdirSync(SESSIONS_DIR).filter(f => f.endsWith('.md')).sort();
+  const files = readdirSync(SESSIONS_DIR)
+    .filter(f => f.endsWith('.md') || f.endsWith('.yaml') || f.endsWith('.yml'))
+    .sort();
   const entries: SessionLogEntry[] = [];
 
   for (const file of files) {
@@ -238,8 +294,8 @@ async function reviewPrs(_args: string[], options: CommandOptions): Promise<Comm
   }
   output += '\n';
 
-  // Load session logs for the same period
-  const sessions = loadSessionLogsSince(since);
+  // Load session logs for the same period (DB-backed with local fallback)
+  const sessions = await loadSessionLogsSince(since);
   output += `${c.bold}Session Logs: ${sessions.length}${c.reset}\n\n`;
 
   // Cross-reference: find sessions with issues
@@ -358,6 +414,33 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
     });
   }
 
+  // Fetch recently-closed issues to find what PRs resolved them
+  // (GitHub auto-closes issues when a PR with "Closes #N" is merged,
+  //  so they won't appear in the open issues list anymore)
+  const closedIssuesData = await githubApi<(GitHubIssueResponse & { closed_at: string | null })[]>(
+    `/repos/${REPO}/issues?state=closed&sort=updated&direction=desc&per_page=50`
+  );
+  const recentlyClosedIssues: Array<GitHubIssue & { closedAt: string }> = [];
+  if (!Array.isArray(closedIssuesData)) {
+    output += `${c.yellow}Warning: Could not fetch recently-closed issues. Triage may be incomplete.${c.reset}\n\n`;
+  } else {
+    const since = parseSinceOption(options);
+    for (const i of closedIssuesData) {
+      if (i.pull_request) continue; // Skip PRs
+      const closedAt = i.closed_at?.slice(0, 10);
+      if (!closedAt || closedAt < since) continue;
+      recentlyClosedIssues.push({
+        number: i.number,
+        title: i.title,
+        labels: (i.labels || []).map(l => l.name),
+        createdAt: i.created_at.slice(0, 10),
+        updatedAt: i.updated_at.slice(0, 10),
+        body: (i.body || '').slice(0, 500),
+        closedAt,
+      });
+    }
+  }
+
   // Fetch recent merged PRs to cross-reference
   const prsData = await githubApi<GitHubPullResponse[]>(
     `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=100`
@@ -385,16 +468,27 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
     'keep': [],
   };
 
+  // Check recently-closed issues — these were resolved by PRs
+  for (const issue of recentlyClosedIssues) {
+    const closingPr = explicitlyClosedByPr.get(issue.number);
+    categories['potentially-resolved'].push({
+      ...issue,
+      reason: closingPr
+        ? `Closed on ${issue.closedAt} by merged ${closingPr}`
+        : `Closed on ${issue.closedAt} (verify resolution)`,
+    });
+  }
+
+  // Check open issues that a PR claims to close but GitHub didn't auto-close
   for (const issue of openIssues) {
     const daysInactive = daysSince(issue.updatedAt);
 
-    // High-confidence signal: merged PR body explicitly closes this issue number
     const closingPr = explicitlyClosedByPr.get(issue.number);
 
     if (closingPr) {
       categories['potentially-resolved'].push({
         ...issue,
-        reason: `Explicitly closed by merged ${closingPr}`,
+        reason: `Still open but referenced by merged ${closingPr}`,
       });
     } else if (daysInactive > 30) {
       categories['stale'].push({
@@ -415,13 +509,17 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
   }
 
   // Output report
-  output += `${c.bold}Open Issues: ${openIssues.length}${c.reset}\n\n`;
+  output += `${c.bold}Open Issues: ${openIssues.length}${c.reset}`;
+  if (recentlyClosedIssues.length > 0) {
+    output += ` ${c.dim}(+ ${recentlyClosedIssues.length} recently closed)${c.reset}`;
+  }
+  output += '\n\n';
 
   const categoryMeta: Record<TriageCategory, { label: string; color: string; desc: string }> = {
     'potentially-resolved': {
-      label: 'Potentially Resolved',
+      label: 'Recently Resolved / Referenced',
       color: c.green,
-      desc: 'A merged PR explicitly closes this issue. Safe to close — verify and confirm.',
+      desc: 'Recently closed issues or open issues referenced by merged PRs. Listed for awareness / verification.',
     },
     'stale': {
       label: 'Stale',
@@ -617,7 +715,7 @@ async function status(_args: string[], options: CommandOptions): Promise<Command
 
   // Count session logs since last run
   const since = lastRun || '2000-01-01';
-  const sessions = loadSessionLogsSince(since);
+  const sessions = await loadSessionLogsSince(since);
   output += `Session logs since last run: ${sessions.length}\n`;
 
   const sessionsWithIssues = sessions.filter(s => s.issues.length > 0);
@@ -713,6 +811,178 @@ async function markRun(_args: string[], _options: CommandOptions): Promise<Comma
 }
 
 // ---------------------------------------------------------------------------
+// Health Snapshot — quantified metrics for trend tracking
+// ---------------------------------------------------------------------------
+
+interface HealthMetrics {
+  date: string;
+  todoCount: number;
+  fixmeCount: number;
+  anyTypeCount: number;
+  largeFiles: { path: string; lines: number }[];
+  largeFileCount: number;
+  testFileCount: number;
+  sourceFileCount: number;
+  testToSourceRatio: number;
+  totalSourceLines: number;
+  recentCommits: { total: number; fixes: number; features: number; fixRatio: number };
+  skippedTests: number;
+}
+
+async function healthSnapshot(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const isJson = options.json || options.ci;
+
+  const execOpts = { encoding: 'utf-8' as const, cwd: PROJECT_ROOT, timeout: 30_000, maxBuffer: 5 * 1024 * 1024 };
+
+  const metrics: HealthMetrics = {
+    date: new Date().toISOString().slice(0, 10),
+    todoCount: 0,
+    fixmeCount: 0,
+    anyTypeCount: 0,
+    largeFiles: [],
+    largeFileCount: 0,
+    testFileCount: 0,
+    sourceFileCount: 0,
+    testToSourceRatio: 0,
+    totalSourceLines: 0,
+    recentCommits: { total: 0, fixes: 0, features: 0, fixRatio: 0 },
+    skippedTests: 0,
+  };
+
+  // 1. TODO/FIXME counts
+  try {
+    const todoOut = execSync(
+      `grep -rc 'TODO' crux/ apps/web/src/ --include='*.ts' --include='*.tsx' 2>/dev/null | awk -F: '{s+=$2} END {print s}'`,
+      execOpts,
+    ).trim();
+    metrics.todoCount = parseInt(todoOut, 10) || 0;
+  } catch { /* empty */ }
+
+  try {
+    const fixmeOut = execSync(
+      `grep -rc 'FIXME\\|HACK\\|XXX' crux/ apps/web/src/ --include='*.ts' --include='*.tsx' 2>/dev/null | awk -F: '{s+=$2} END {print s}'`,
+      execOpts,
+    ).trim();
+    metrics.fixmeCount = parseInt(fixmeOut, 10) || 0;
+  } catch { /* empty */ }
+
+  // 2. Bare `any` type count
+  try {
+    const anyOut = execSync(
+      `grep -rc ': any\\b\\|as any\\b' crux/ apps/web/src/ --include='*.ts' --include='*.tsx' 2>/dev/null | awk -F: '{s+=$2} END {print s}'`,
+      execOpts,
+    ).trim();
+    metrics.anyTypeCount = parseInt(anyOut, 10) || 0;
+  } catch { /* empty */ }
+
+  // 3. Large files (>500 lines)
+  try {
+    const wcOut = execSync(
+      `find crux/ apps/web/src/ \\( -name '*.ts' -o -name '*.tsx' \\) ! -name '*.test.*' ! -name '*.d.ts' | xargs wc -l 2>/dev/null | sort -rn | head -30`,
+      execOpts,
+    );
+    for (const line of wcOut.split('\n').filter(Boolean)) {
+      const match = line.trim().match(/^(\d+)\s+(.+)$/);
+      if (match && match[2] !== 'total') {
+        const lineCount = parseInt(match[1], 10);
+        metrics.totalSourceLines += lineCount;
+        if (lineCount > 500) {
+          metrics.largeFiles.push({ path: match[2], lines: lineCount });
+        }
+      }
+    }
+    metrics.largeFileCount = metrics.largeFiles.length;
+  } catch { /* empty */ }
+
+  // 4. Test vs source file counts
+  try {
+    const testCount = execSync(
+      `find crux/ apps/web/src/ apps/wiki-server/src/ -name '*.test.*' -o -name '*.spec.*' 2>/dev/null | wc -l`,
+      execOpts,
+    ).trim();
+    metrics.testFileCount = parseInt(testCount, 10) || 0;
+  } catch { /* empty */ }
+
+  try {
+    const srcCount = execSync(
+      `find crux/ apps/web/src/ apps/wiki-server/src/ \\( -name '*.ts' -o -name '*.tsx' \\) ! -name '*.test.*' ! -name '*.spec.*' ! -name '*.d.ts' 2>/dev/null | wc -l`,
+      execOpts,
+    ).trim();
+    metrics.sourceFileCount = parseInt(srcCount, 10) || 0;
+  } catch { /* empty */ }
+
+  metrics.testToSourceRatio = metrics.sourceFileCount > 0
+    ? Math.round((metrics.testFileCount / metrics.sourceFileCount) * 100) / 100
+    : 0;
+
+  // 5. Recent commit analysis (last 60 commits)
+  try {
+    const logOut = execSync('git log --oneline -60', execOpts);
+    const lines = logOut.split('\n').filter(Boolean);
+    metrics.recentCommits.total = lines.length;
+    metrics.recentCommits.fixes = lines.filter(l => /\bfix[:(]/i.test(l)).length;
+    metrics.recentCommits.features = lines.filter(l => /\bfeat[:(]/i.test(l)).length;
+    metrics.recentCommits.fixRatio = metrics.recentCommits.total > 0
+      ? Math.round((metrics.recentCommits.fixes / metrics.recentCommits.total) * 100) / 100
+      : 0;
+  } catch { /* empty */ }
+
+  // 6. Skipped tests
+  try {
+    const skipOut = execSync(
+      `grep -rc 'it\\.skip\\|describe\\.skip\\|test\\.skip' crux/ apps/web/src/ apps/wiki-server/src/ --include='*.test.*' 2>/dev/null | awk -F: '{s+=$2} END {print s}'`,
+      execOpts,
+    ).trim();
+    metrics.skippedTests = parseInt(skipOut, 10) || 0;
+  } catch { /* empty */ }
+
+  // Output
+  if (isJson) {
+    return { output: JSON.stringify(metrics, null, 2), exitCode: 0 };
+  }
+
+  let output = '';
+  output += `${c.bold}${c.blue}Code Health Snapshot${c.reset}  ${c.dim}${metrics.date}${c.reset}\n\n`;
+
+  // Color helper for thresholds
+  const rated = (val: number, green: number, yellow: number, invert = false): string => {
+    const isGreen = invert ? val <= green : val >= green;
+    const isYellow = invert ? val <= yellow : val >= yellow;
+    if (isGreen) return `${c.green}${val}${c.reset}`;
+    if (isYellow) return `${c.yellow}${val}${c.reset}`;
+    return `${c.red}${val}${c.reset}`;
+  };
+
+  output += `  TODOs:             ${rated(metrics.todoCount, 20, 50, true)}\n`;
+  output += `  FIXME/HACK/XXX:    ${rated(metrics.fixmeCount, 5, 15, true)}\n`;
+  output += `  \`any\` types:       ${rated(metrics.anyTypeCount, 20, 50, true)}\n`;
+  output += `  Files >500 lines:  ${rated(metrics.largeFileCount, 5, 10, true)}\n`;
+  output += `  Test files:        ${metrics.testFileCount}\n`;
+  output += `  Source files:      ${metrics.sourceFileCount}\n`;
+  output += `  Test:source ratio: ${rated(metrics.testToSourceRatio, 0.15, 0.08)}\n`;
+  output += `  Skipped tests:     ${rated(metrics.skippedTests, 3, 8, true)}\n`;
+  output += '\n';
+  output += `  ${c.bold}Recent commits (last 60):${c.reset}\n`;
+  output += `    Total:    ${metrics.recentCommits.total}\n`;
+  output += `    Fixes:    ${metrics.recentCommits.fixes}\n`;
+  output += `    Features: ${metrics.recentCommits.features}\n`;
+  output += `    Fix ratio: ${rated(metrics.recentCommits.fixRatio, 0.3, 0.5, true)} ${c.dim}(lower is better)${c.reset}\n`;
+
+  if (metrics.largeFiles.length > 0) {
+    output += `\n  ${c.bold}Largest files:${c.reset}\n`;
+    for (const f of metrics.largeFiles.slice(0, 10)) {
+      output += `    ${c.yellow}${f.lines}${c.reset} ${c.dim}${f.path}${c.reset}\n`;
+    }
+  }
+
+  output += `\n${c.dim}Run with --json to get machine-readable output for trend tracking.${c.reset}\n`;
+
+  return { output, exitCode: 0 };
+}
+
+// ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
 
@@ -722,6 +992,7 @@ export const commands = {
   'review-prs': reviewPrs,
   'triage-issues': triageIssues,
   'detect-cruft': detectCruft,
+  'health-snapshot': healthSnapshot,
   status,
   'mark-run': markRun,
 };
@@ -734,12 +1005,13 @@ Gathers signals from PRs, session logs, GitHub issues, and codebase
 analysis. Produces prioritized reports and helps with cleanup.
 
 Commands:
-  report          Run full maintenance report (default)
-  review-prs      Review merged PRs and session logs since last run
-  triage-issues   Triage open GitHub issues for staleness/resolution
-  detect-cruft    Find dead code, TODOs, large files, commented-out code
-  status          Show last maintenance run info and recommended cadences
-  mark-run        Update the last-run timestamp without running a report
+  report           Run full maintenance report (default)
+  review-prs       Review merged PRs and session logs since last run
+  triage-issues    Triage open GitHub issues for staleness/resolution
+  detect-cruft     Find dead code, TODOs, large files, commented-out code
+  health-snapshot  Quantified code health metrics (TODOs, any types, fix ratio, etc.)
+  status           Show last maintenance run info and recommended cadences
+  mark-run         Update the last-run timestamp without running a report
 
 Options:
   --since=DATE    Override the start date (YYYY-MM-DD; default: last run or 7d ago)
@@ -766,6 +1038,8 @@ Examples:
   crux maintain review-prs               Just review PRs + session logs
   crux maintain triage-issues            Just triage GitHub issues
   crux maintain detect-cruft             Just find codebase cruft
+  crux maintain health-snapshot          Code health metrics snapshot
+  crux maintain health-snapshot --json   JSON output for trend tracking
   crux maintain review-prs --since=2026-02-10  Override start date
   crux maintain --json                   Full report as JSON
 

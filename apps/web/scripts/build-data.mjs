@@ -16,7 +16,7 @@
  *                    yaml, ids, mdx, derived, facts, pages, links, blocks,
  *                    risk, resources, footnotes, refs, redundancy, graph,
  *                    history, coverage, rankings, schedule, transform, write
- */
+*/
 
 import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
 import { spawnSync } from 'child_process';
@@ -1278,7 +1278,7 @@ async function main() {
   // Uses 3 sources: inline <R id="...">, cited_by reverse index, URL matching.
   // Must run BEFORE rawContent is deleted (needs page body for URL extraction).
   // =========================================================================
-  // Build URL → resource ID map (shared between pageResources and footnoteIndex)
+  // Build URL → resource ID map (used by pageResources)
   const urlToId = new Map();
   for (const [url, resource] of urlToResource.entries()) {
     urlToId.set(url, resource.id);
@@ -1322,17 +1322,7 @@ async function main() {
         }
       }
 
-      // Source 3: URL matching from footnotes and markdown links
-      const footnoteRe = /^\[\^\d+\]:\s*(.*)/gm;
-      while ((m = footnoteRe.exec(page.rawContent)) !== null) {
-        const urlRe = /https?:\/\/[^\s)>,"']+/g;
-        let urlMatch;
-        while ((urlMatch = urlRe.exec(m[1])) !== null) {
-          const url = urlMatch[0].replace(/[.),:;]+$/, '');
-          const id = urlToId.get(url) ?? urlToId.get(url.replace(/\/$/, '')) ?? urlToId.get(url.replace(/\/$/, '') + '/');
-          if (id && !seen.has(id) && validIds.has(id)) { seen.add(id); mergedIds.push(id); }
-        }
-      }
+      // Source 3: URL matching from markdown links
       const linkRe = /(?<!!)\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
       while ((m = linkRe.exec(page.rawContent)) !== null) {
         const url = m[2];
@@ -1348,61 +1338,6 @@ async function main() {
     }
     database.pageResources = pageResources;
     console.log(`  pageResources: ${totalRefs} resource refs across ${pagesWithRefs} pages`);
-  }
-
-  // =========================================================================
-  // FOOTNOTE INDEX — map each footnote to its resource and URL.
-  // Groups footnotes by unique source for the UnifiedReferences component.
-  // Must run BEFORE rawContent is deleted (needs page body for parsing).
-  // =========================================================================
-  {
-    console.log('  Computing footnoteIndex...');
-    const footnoteIndex = {};
-    let pagesWithFootnotes = 0;
-    let totalFootnotesMapped = 0;
-
-    for (const page of pages) {
-      if (!page.rawContent) continue;
-
-      const result = parseFootnoteSources(page.rawContent, urlToId);
-      if (result.totalFootnotes === 0) continue;
-
-      pagesWithFootnotes++;
-
-      // Build per-footnote mapping
-      const fnMap = {};
-      for (const fn of result.footnotes) {
-        const entry = { url: fn.url, title: fn.title };
-
-        // Find the source group for this footnote to get resourceId
-        if (fn.url) {
-          const source = result.sources.find(s =>
-            s.footnoteNumbers.includes(fn.number)
-          );
-          if (source?.resourceId) {
-            entry.resourceId = source.resourceId;
-          }
-        }
-
-        fnMap[fn.number] = entry;
-        totalFootnotesMapped++;
-      }
-
-      // Also store the deduplicated source groups
-      footnoteIndex[page.id] = {
-        footnotes: fnMap,
-        sources: result.sources.map(s => ({
-          url: s.url,
-          title: s.title,
-          domain: s.domain,
-          footnoteNumbers: s.footnoteNumbers,
-          resourceId: s.resourceId,
-        })),
-      };
-    }
-
-    database.footnoteIndex = footnoteIndex;
-    console.log(`  footnoteIndex: ${totalFootnotesMapped} footnotes across ${pagesWithFootnotes} pages`);
   }
 
   // =========================================================================

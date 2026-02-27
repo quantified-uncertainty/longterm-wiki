@@ -22,6 +22,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+/** Approximate row height in px for spacer calculation (keeps table height stable across pages) */
+const TABLE_ROW_HEIGHT_PX = 37;
+
 export interface FactDataRow {
   key: string;
   entity: string;
@@ -386,15 +389,26 @@ export function FactsDataTable({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-1.5">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              <>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="py-1.5">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+                {/* Spacer row to maintain consistent table height across pages */}
+                {table.getRowModel().rows.length < pagination.pageSize && (
+                  <tr>
+                    <td
+                      colSpan={columns.length}
+                      style={{ height: `${(pagination.pageSize - table.getRowModel().rows.length) * TABLE_ROW_HEIGHT_PX}px` }}
+                    />
+                  </tr>
+                )}
+              </>
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">

@@ -409,7 +409,7 @@ export const claims = pgTable(
     // --- Phase 2 fields (migration 0029) ---
     claimMode: text("claim_mode").notNull().default("endorsed"), // 'endorsed' | 'attributed'
     attributedTo: text("attributed_to"), // entity_id of person/org making the claim
-    asOf: text("as_of"),                // temporal index: YYYY-MM or YYYY-MM-DD
+asOf: text("as_of"),                // temporal index: YYYY-MM or YYYY-MM-DD
     measure: text("measure"),           // measure ID linking to facts taxonomy
     valueNumeric: doublePrecision("value_numeric"), // central numeric value (machine-readable)
     valueLow: doublePrecision("value_low"),        // lower bound for range values
@@ -429,6 +429,8 @@ export const claims = pgTable(
     valueUnit: text("value_unit"),                 // unit of measurement (e.g. "USD", "percent", "count")
     valueDate: date("value_date"),                 // when the value was true/measured
     qualifiers: jsonb("qualifiers").$type<Record<string, string>>(), // additional context (e.g. {"round": "Series B"})
+    // --- Reasoning traces (migration 0034) ---
+    inferenceType: text("inference_type"),  // direct_assertion | derived | aggregated | interpreted | editorial
     // --- Pinned claims (migration 0034) ---
     isPinned: boolean("is_pinned").notNull().default(false), // canonical value for <F> components
     // --- Timestamps ---
@@ -454,6 +456,7 @@ export const claims = pgTable(
     index("idx_cl_subject_entity").on(table.subjectEntity),
     index("idx_cl_property").on(table.property),
     index("idx_cl_subject_property").on(table.subjectEntity, table.property),
+    index("idx_cl_inference_type").on(table.inferenceType),
     // GIN index on relatedEntities is created in migration 0028
     // (Drizzle doesn't support GIN index declarations on JSONB)
   ]
