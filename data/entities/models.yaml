@@ -2356,3 +2356,33 @@
     - ai-safety
     - community
   lastUpdated: 2026-02
+- id: ai-compute-scaling-metrics
+  numericId: E907
+  type: model
+  title: AI Compute Scaling Metrics
+  description: >-
+    Empirical tracking of measurable indicators of AI compute scaling: training
+    compute growth at 4-5x per year, GPU deployment volumes, hyperscaler capital
+    expenditure approaching $700B in 2026, the shift from training-dominant to
+    inference-dominant workloads, and AI coding tool adoption rates.
+  relatedEntries:
+    - id: scaling-laws
+      type: concept
+    - id: projecting-compute-spending
+      type: model
+    - id: scaling-debate
+      type: concept
+    - id: compute-concentration
+      type: risk
+    - id: ai-timelines
+      type: concept
+    - id: epoch-ai
+      type: organization
+  tags:
+    - compute
+    - scaling
+    - infrastructure
+    - metrics
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
