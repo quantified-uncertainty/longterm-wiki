@@ -12,6 +12,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { CitationQuote } from "@/lib/citation-data";
+import { getDomain } from "./resource-utils";
 
 interface VerdictConfig {
   icon: typeof CheckCircle2;
@@ -120,7 +121,7 @@ function FootnoteCard({
   const checkedAt = quote.accuracyCheckedAt || quote.verifiedAt;
 
   const sourceTitle = quote.sourceTitle;
-  const sourceDomain = quote.url ? (() => { try { return new URL(quote.url).hostname.replace(/^www\./, ""); } catch { return undefined; } })() : undefined;
+  const sourceDomain = quote.url ? getDomain(quote.url) : null;
   const resourceId = quote.resourceId;
 
   return createPortal(

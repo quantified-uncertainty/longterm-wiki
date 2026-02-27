@@ -40,7 +40,7 @@ describe("preprocessReferences", () => {
     expect(referenceMap.size).toBe(0);
   });
 
-  it("returns content unchanged when there are only legacy [^N] footnotes", () => {
+  it("returns content unchanged when there are only [^N] footnotes", () => {
     const content = [
       "This has a footnote[^1] and another[^2].",
       "",
@@ -167,9 +167,9 @@ describe("preprocessReferences", () => {
 
   it("numbers new references after existing numbered footnotes", () => {
     const content = [
-      "Legacy footnote[^1] and a claim[^cr-aa11] and citation[^rc-bb22].",
+      "Existing footnote[^1] and a claim[^cr-aa11] and citation[^rc-bb22].",
       "",
-      "[^1]: Existing legacy source",
+      "[^1]: Existing source",
     ].join("\n");
 
     const refData = makeReferenceData(
@@ -191,8 +191,8 @@ describe("preprocessReferences", () => {
     const { content: result, referenceMap } = preprocessReferences(content, refData);
 
     // Existing [^1] should remain untouched
-    expect(result).toContain("Legacy footnote[^1]");
-    expect(result).toContain("[^1]: Existing legacy source");
+    expect(result).toContain("Existing footnote[^1]");
+    expect(result).toContain("[^1]: Existing source");
 
     // New references should start at [^2]
     expect(result).not.toContain("[^cr-aa11]");
