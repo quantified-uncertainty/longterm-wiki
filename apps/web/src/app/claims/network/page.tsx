@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { fetchFromWikiServer } from "@lib/wiki-server";
+import type { ClaimsNetworkResult } from "@wiki-server/api-response-types";
 import { buildEntityNameMap } from "../components/claims-data";
 import { NetworkGraph } from "../components/network-graph";
 
@@ -9,13 +10,8 @@ export const metadata: Metadata = {
     "Interactive network graph showing entity relationships via shared claims.",
 };
 
-interface NetworkResponse {
-  nodes: { entityId: string; claimCount: number }[];
-  edges: { source: string; target: string; weight: number }[];
-}
-
 export default async function NetworkPage() {
-  const result = await fetchFromWikiServer<NetworkResponse>(
+  const result = await fetchFromWikiServer<ClaimsNetworkResult>(
     "/api/claims/network",
     { revalidate: 300 }
   );

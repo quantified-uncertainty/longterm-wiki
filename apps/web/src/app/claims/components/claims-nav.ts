@@ -1,11 +1,7 @@
 import type { NavSection } from "@/lib/internal-nav";
 import { fetchFromWikiServer } from "@lib/wiki-server";
 import { getEntityById, getEntityHref } from "@data";
-
-interface NetworkResponse {
-  nodes: { entityId: string; claimCount: number; mentionCount?: number }[];
-  edges: { source: string; target: string; weight: number }[];
-}
+import type { ClaimsNetworkResult } from "@wiki-server/api-response-types";
 
 export interface ClaimsEntityItem {
   entityId: string;
@@ -45,7 +41,7 @@ export async function getClaimsNav(): Promise<NavSection[]> {
  * Returns ALL entities with claims, sorted by claim count descending.
  */
 export async function getClaimsEntities(): Promise<ClaimsEntityItem[]> {
-  const result = await fetchFromWikiServer<NetworkResponse>(
+  const result = await fetchFromWikiServer<ClaimsNetworkResult>(
     "/api/claims/network",
     { revalidate: 300 }
   );

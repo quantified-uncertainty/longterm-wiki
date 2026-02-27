@@ -25,13 +25,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import type { RelationshipRow } from "@wiki-server/api-response-types";
 
-export interface RelationshipRow {
-  entityA: string;
-  entityB: string;
-  claimCount: number;
-  sampleClaims: string[];
-}
+export type { RelationshipRow };
 
 function getColumns(entityNames: Record<string, string>): ColumnDef<RelationshipRow>[] {
   return [

@@ -1,13 +1,6 @@
 import { fetchFromWikiServer } from "@lib/wiki-server";
 import { getEntityById } from "@data";
-import type { ClaimRow } from "@wiki-server/api-response-types";
-
-interface PaginatedClaimsResponse {
-  claims: ClaimRow[];
-  total: number;
-  limit: number;
-  offset: number;
-}
+import type { ClaimRow, GetAllClaimsResult } from "@wiki-server/api-response-types";
 
 /** Convert a slug like "open-philanthropy" to "Open Philanthropy" as fallback */
 function formatSlugAsTitle(slug: string): string {
@@ -49,7 +42,7 @@ export async function fetchAllClaims(): Promise<ClaimRow[]> {
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    const page = await fetchFromWikiServer<PaginatedClaimsResponse>(
+    const page = await fetchFromWikiServer<GetAllClaimsResult>(
       `/api/claims/all?limit=${PAGE_SIZE}&offset=${offset}&includeSources=true`,
       { revalidate: 300 }
     );

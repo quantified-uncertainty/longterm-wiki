@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { fetchFromWikiServer } from "@lib/wiki-server";
+import type { ClaimsRelationshipsResult } from "@wiki-server/api-response-types";
 import { buildEntityNameMap } from "../components/claims-data";
-import {
-  RelationshipsTable,
-  type RelationshipRow,
-} from "./relationships-table";
+import { RelationshipsTable } from "./relationships-table";
 
 export const metadata: Metadata = {
   title: "Entity Relationships",
@@ -12,12 +10,8 @@ export const metadata: Metadata = {
     "Entity pairs connected by shared claims across wiki pages.",
 };
 
-interface RelationshipsResponse {
-  relationships: RelationshipRow[];
-}
-
 export default async function RelationshipsPage() {
-  const result = await fetchFromWikiServer<RelationshipsResponse>(
+  const result = await fetchFromWikiServer<ClaimsRelationshipsResult>(
     "/api/claims/relationships",
     { revalidate: 300 }
   );

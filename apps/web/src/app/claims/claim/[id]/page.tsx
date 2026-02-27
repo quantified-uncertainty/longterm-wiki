@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
 import { getEntityById, getEntityHref } from "@data";
-import type { ClaimRow, SimilarClaimsResult } from "@wiki-server/api-response-types";
+import type { ClaimRow, SimilarClaimsResult, PageReferencesResult } from "@wiki-server/api-response-types";
 import { buildEntityNameMap } from "../../components/claims-data";
 import { CategoryBadge } from "../../components/category-badge";
 import { ConfidenceBadge } from "../../components/confidence-badge";
@@ -12,10 +12,7 @@ import { NumericValueDisplay } from "../../components/numeric-value-display";
 import { formatStructuredValue } from "@lib/format-value";
 import { ClaimSourcesList } from "../../components/claim-sources-list";
 import { VerdictBadge } from "../../components/verdict-badge";
-import {
-  ClaimPageReferences,
-  type PageReference,
-} from "../../components/claim-page-references";
+import { ClaimPageReferences } from "../../components/claim-page-references";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -39,7 +36,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
     fetchFromWikiServer<ClaimRow>(`/api/claims/${id}?includeSources=true`, {
       revalidate: 300,
     }),
-    fetchFromWikiServer<{ references: PageReference[] }>(
+    fetchFromWikiServer<PageReferencesResult>(
       `/api/claims/${id}/page-references`,
       { revalidate: 300 }
     ),
