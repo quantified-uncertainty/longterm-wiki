@@ -792,76 +792,40 @@ Recent academic work provides strong validation for the proposition-level and cl
 
 ### Proposition-Level Retrieval (Dense X Retrieval)
 
-Chen et al. (EMNLP 2024) define a **proposition** as an atomic, self-contained factual expression with three properties: **minimal** (cannot be further split), **self-contained** (includes resolved coreferences), and **compositional** (the union of all propositions reconstructs full semantics). They built a "Propositionizer" model that decomposes text into propositions and showed that indexing Wikipedia at proposition level **significantly outperformed** both passage-level and sentence-level indexing for retrieval and QA tasks.[^11]
+Chen et al. (EMNLP 2024) define a **proposition** as an atomic, self-contained factual expression with three properties: **minimal** (cannot be further split), **self-contained** (includes resolved coreferences), and **compositional** (the union of all propositions reconstructs full semantics). They built a "Propositionizer" model that decomposes text into propositions and showed that indexing Wikipedia at proposition level **significantly outperformed** both passage-level and sentence-level indexing for retrieval and QA tasks.[^rc-777f]
 
 This is direct evidence for the claim-first thesis: atomic propositions are better retrieval units than paragraphs or documents.
 
 ### Decompose-Then-Verify (FActScore)
 
-FActScore (Min et al., EMNLP 2023) formalized the **decompose-then-verify** pipeline: decompose generated text into atomic facts, retrieve evidence, verify each fact, compute the percentage supported. Applied to ChatGPT biographies, only 58% of atomic facts were supported by sources.[^12] Google's SAFE system extends this with multi-step search verification at 1/20th the cost of human annotators.
+FActScore (Min et al., EMNLP 2023) formalized the **decompose-then-verify** pipeline: decompose generated text into atomic facts, retrieve evidence, verify each fact, compute the percentage supported. Applied to ChatGPT biographies, only 58% of atomic facts were supported by sources.[^rc-c9c3] Google's SAFE system extends this with multi-step search verification at 1/20th the cost of human annotators.
 
 Our pipeline applies the same decomposition *proactively* — producing atomic claims before writing rather than extracting them afterward. The Kalshi experiment (see <EntityLink id="claim-first-architecture">Claim-First Architecture</EntityLink>, Part 9b) confirmed this catches embellishments that post-hoc verification misses.
 
 ### Nanopublications: The Formal Precedent
 
-The Semantic Web community's **nanopublication** framework is the academic formalization of our knowledge bundle idea. Each nanopublication has three parts: **Assertion** (the claim itself as RDF triples), **Provenance** (how the assertion came about — methods, evidence), and **Publication Info** (metadata). Nanopublications are immutable, cryptographically verifiable, and operate on a decentralized server network.[^13]
+The Semantic Web community's **nanopublication** framework is the academic formalization of our knowledge bundle idea. Each nanopublication has three parts: **Assertion** (the claim itself as RDF triples), **Provenance** (how the assertion came about — methods, evidence), and **Publication Info** (metadata). Nanopublications are immutable, cryptographically verifiable, and operate on a decentralized server network.[^rc-ce39]
 
-The **micropublication** extension adds richer argumentation structure: a statement plus supporting evidence, interpretations, and challenges.[^14] This maps directly to our analytical claim type with its `supportingClaims` and `reasoning` fields.
+The **micropublication** extension adds richer argumentation structure: a statement plus supporting evidence, interpretations, and challenges.[^rc-d273] This maps directly to our analytical claim type with its `supportingClaims` and `reasoning` fields.
 
 ### Knowledge-Centric Templatic Views (SURe)
 
-A January 2024 paper introduces **Structure Unified Representation** — capturing the most important knowledge from a document in a structured format, then generating multiple view types (slide decks, newsletters, reports) from that single representation with no supervision.[^15] This is the closest published validation of the "multiple presentation layers from one data layer" pattern that both the multi-agent architecture and claim-first architecture rely on.
+A January 2024 paper introduces **Structure Unified Representation** — capturing the most important knowledge from a document in a structured format, then generating multiple view types (slide decks, newsletters, reports) from that single representation with no supervision.[^rc-d67a] This is the closest published validation of the "multiple presentation layers from one data layer" pattern that both the multi-agent architecture and claim-first architecture rely on.
 
 ### GPTKB: Warning on LLM-Generated Knowledge
 
-GPTKB (2024-2025) built a knowledge base entirely from LLM output: 105 million triples for 2.9 million entities. Their critical finding: **accuracy is far from existing projects** — the LLM generates many incorrect and unverifiable facts.[^16] This strongly validates our design decision that verification must precede storage. The claim-first architecture's insistence on per-claim verification before claims enter the store directly addresses GPTKB's accuracy problems.
+GPTKB (2024-2025) built a knowledge base entirely from LLM output: 105 million triples for 2.9 million entities. Their critical finding: **accuracy is far from existing projects** — the LLM generates many incorrect and unverifiable facts.[^rc-54a0] This strongly validates our design decision that verification must precede storage. The claim-first architecture's insistence on per-claim verification before claims enter the store directly addresses GPTKB's accuracy problems.
 
 ### Multi-Agent Verification (KARMA)
 
-KARMA (2025) uses nine collaborative agents for entity discovery, relation extraction, schema alignment, and conflict resolution. Tested on 1,200 PubMed articles: 38,230 new entities with 83.1% verified correctness, reducing conflict edges by 18.6%.[^8] The modular, multi-agent design with cross-agent verification maps directly to our specialist agent architecture.
+KARMA (2025) uses nine collaborative agents for entity discovery, relation extraction, schema alignment, and conflict resolution. Tested on 1,200 PubMed articles: 38,230 new entities with 83.1% verified correctness, reducing conflict edges by 18.6%.[^rc-c558] The modular, multi-agent design with cross-agent verification maps directly to our specialist agent architecture.
 
 ### Block-Based Knowledge Tools
 
-Production tools like Roam Research, Logseq, and Notion demonstrate that **block-level (claim-level) architectures work at scale**. Logseq's dual-database design (in-memory Datascript + persistent SQLite) with block-level content, typed properties, and Datalog queries is particularly instructive for the claim store's eventual database-backed implementation (Option C in the claim-first architecture).[^17]
+Production tools like Roam Research, Logseq, and Notion demonstrate that **block-level (claim-level) architectures work at scale**. Logseq's dual-database design (in-memory Datascript + persistent SQLite) with block-level content, typed properties, and Datalog queries is particularly instructive for the claim store's eventual database-backed implementation (Option C in the claim-first architecture).[^rc-1d7f]
 
 ### Argumentation Frameworks
 
-For AI safety topics where many claims involve genuine disagreement (timelines, risk levels, alignment difficulty), **claim-augmented argumentation frameworks** provide formal tools for representing competing positions. These extend Dung's abstract argumentation by associating a claim to each argument, enabling re-interpretation at different evaluation stages.[^18] This maps to our consensus and analytical claim types and suggests the claim store should eventually support explicit argumentation structure.
+For AI safety topics where many claims involve genuine disagreement (timelines, risk levels, alignment difficulty), **claim-augmented argumentation frameworks** provide formal tools for representing competing positions. These extend Dung's abstract argumentation by associating a claim to each argument, enabling re-interpretation at different evaluation stages.[^rc-117c] This maps to our consensus and analytical claim types and suggests the claim store should eventually support explicit argumentation structure.
 
 ---
-
-[^1]: [Stanford STORM: Synthesis of Topic Outlines through Retrieval and Multi-perspective Question Asking](https://github.com/stanford-oval/storm) (NAACL 2024)
-
-[^2]: [Microsoft GraphRAG: A modular graph-based Retrieval-Augmented Generation system](https://github.com/microsoft/graphrag) (Microsoft Research, 2024)
-
-[^3]: [Self-Refine: Iterative Refinement with Self-Feedback](https://arxiv.org/abs/2303.17651) (Madaan et al., 2023)
-
-[^4]: [SemanticCite: Citation Verification with AI-Powered Full-Text Analysis](https://arxiv.org/html/2511.16198v1) (2025)
-
-[^5]: [Anthropic: How We Built Our Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system) (2025)
-
-[^6]: [Anthropic: Building Agents with the Claude Agent SDK](https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk) (2025)
-
-[^7]: [CrewAI: How to Build Agentic Systems](https://blog.crewai.com/agentic-systems-with-crewai/) (2025)
-
-[^8]: [KARMA: Leveraging Multi-Agent LLMs for Automated Knowledge Graph Enrichment](https://arxiv.org/html/2502.06472v2) (2025)
-
-[^9]: [Co-STORM Collaborative Knowledge Curation System](https://deepwiki.com/stanford-oval/storm/3-co-storm-collaborative-system) (EMNLP 2024)
-
-[^10]: [Google Developers: Multi-Agent Patterns in ADK](https://developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/) (2025)
-
-[^11]: [Dense X Retrieval: What Retrieval Granularity Should We Use?](https://aclanthology.org/2024.emnlp-main.845/) (Chen et al., EMNLP 2024). See also [Factoid Wiki](https://chentong0.github.io/factoid-wiki/).
-
-[^12]: [FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long Form Text Generation](https://arxiv.org/abs/2305.14251) (Min et al., EMNLP 2023)
-
-[^13]: [Nanopublication-based semantic publishing and reviewing](https://peerj.com/articles/cs-1159/) (PeerJ Computer Science, 2023). See also [Nanopublication Guidelines](https://nanopub.net/guidelines/working_draft/).
-
-[^14]: [Micropublications: a semantic model for claims, evidence, arguments and annotations](https://jbiomedsem.biomedcentral.com/articles/10.1186/2041-1480-5-28) (Journal of Biomedical Semantics, 2014)
-
-[^15]: [Knowledge-Centric Templatic Views of Documents](https://arxiv.org/html/2401.06945v1) (arXiv, January 2024)
-
-[^16]: [GPTKB: Building Very Large Knowledge Bases from Language Models](https://arxiv.org/html/2411.04920v1) (arXiv, November 2024). See also [gptkb.org](https://gptkb.org/).
-
-[^17]: [Logseq Architecture — Block-Level Database Design](https://deepwiki.com/logseq/logseq) (DeepWiki)
-
-[^18]: [Claim-augmented argumentation frameworks](https://www.sciencedirect.com/science/article/pii/S000437022300019X) (Artificial Intelligence, 2023)

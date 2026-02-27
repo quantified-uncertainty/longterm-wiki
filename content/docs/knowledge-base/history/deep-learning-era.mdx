@@ -47,26 +47,26 @@ import {DataInfoBox, Mermaid, EntityLink, F} from '@components/wiki';
 
 ## Overview
 
-The period from 2012 to 2020 saw AI capabilities advance more rapidly than most researchers had anticipated. Beginning with AlexNet's performance in the 2012 [ImageNet](https://en.wikipedia.org/wiki/ImageNet) competition — achieving a top-5 error rate of roughly 15%, compared to the next-best entrant's 26% — deep learning displaced prior machine learning approaches across computer vision, natural language processing, and game-playing.[^1] Each successive milestone arrived earlier than expert forecasts had suggested: AlphaGo's defeat of Lee Sedol in 2016, the GPT language model series from 2018–2020, and BERT's 7.7 percentage-point absolute improvement on the GLUE benchmark in 2018 all demonstrated capabilities previously considered distinctive to human cognition.[^2] Underlying this progress was an extraordinary expansion in compute: one estimate places the computational power applied to neural networks at roughly one million times that available in 1990.[^1]
+The period from 2012 to 2020 saw AI capabilities advance more rapidly than most researchers had anticipated. Beginning with AlexNet's performance in the 2012 [ImageNet](https://en.wikipedia.org/wiki/ImageNet) competition — achieving a top-5 error rate of roughly 15%, compared to the next-best entrant's 26% — deep learning displaced prior machine learning approaches across computer vision, natural language processing, and game-playing.[^rc-1d24] Each successive milestone arrived earlier than expert forecasts had suggested: AlphaGo's defeat of Lee Sedol in 2016, the GPT language model series from 2018–2020, and BERT's 7.7 percentage-point absolute improvement on the GLUE benchmark in 2018 all demonstrated capabilities previously considered distinctive to human cognition.[^rc-05c8] Underlying this progress was an extraordinary expansion in compute: one estimate places the computational power applied to neural networks at roughly one million times that available in 1990.[^rc-1d24]
 
-For AI safety, the era was formative. Organizations including <EntityLink id="E98">Google DeepMind</EntityLink> and <EntityLink id="E218">OpenAI</EntityLink> — the latter founded in July 2015 by Elon Musk, Sam Altman, and others with explicit safety mandates alongside capability goals — shaped the institutional landscape.[^3] The 2016 paper "Concrete Problems in AI Safety" established a practical research agenda that shaped subsequent work on <EntityLink id="E253">reward hacking</EntityLink>, <EntityLink id="E271">scalable oversight</EntityLink>, and robustness. Safety funding grew roughly 15–30x over the period, though capabilities investment grew faster in absolute terms.
+For AI safety, the era was formative. Organizations including <EntityLink id="E98">Google DeepMind</EntityLink> and <EntityLink id="E218">OpenAI</EntityLink> — the latter founded in July 2015 by Elon Musk, Sam Altman, and others with explicit safety mandates alongside capability goals — shaped the institutional landscape.[^rc-2a6d] The 2016 paper "Concrete Problems in AI Safety" established a practical research agenda that shaped subsequent work on <EntityLink id="E253">reward hacking</EntityLink>, <EntityLink id="E271">scalable oversight</EntityLink>, and robustness. Safety funding grew roughly 15–30x over the period, though capabilities investment grew faster in absolute terms.
 
-The era also exposed tensions that would persist: between openness and caution in model release (the GPT-2 controversy), between safety missions and competitive pressures (OpenAI's 2019 structural shift), and between the pace of capability development and the maturity of alignment techniques. The release of GPT-3 in June 2020 — widely regarded as the first highly capable large language model — marked both the era's apex and a threshold that prompted key researchers, including Dario Amodei, to leave and found dedicated safety-focused organizations.[^3] By 2020, the field had professionalized substantially, but no comprehensive solution to alignment had emerged.
+The era also exposed tensions that would persist: between openness and caution in model release (the GPT-2 controversy), between safety missions and competitive pressures (OpenAI's 2019 structural shift), and between the pace of capability development and the maturity of alignment techniques. The release of GPT-3 in June 2020 — widely regarded as the first highly capable large language model — marked both the era's apex and a threshold that prompted key researchers, including Dario Amodei, to leave and found dedicated safety-focused organizations.[^rc-2a6d] By 2020, the field had professionalized substantially, but no comprehensive solution to alignment had emerged.
 
 ## Summary
 
 The deep learning revolution transformed AI from a field of limited successes to one of rapidly compounding breakthroughs. The period from 2012 to 2020 was defined not by a single discovery but by a confluence of algorithmic advances, massive datasets, and exponentially growing compute—together shifting AI capability faster than most researchers had anticipated. For AI safety, this meant moving from theoretical concerns about far-future AGI to practical questions about current and near-future systems.
 
 **What changed**:
-- **AI capabilities accelerated substantially across multiple domains**: AlexNet's 2012 ImageNet victory cut the previous best error rate from 26% to 15%, catalyzing widespread adoption of deep learning.[^4] By 2019, OpenAI Five defeated Dota 2 world champions after training for the equivalent of 45,000 years of gameplay through self-play reinforcement learning.[^5]
-- **Timeline estimates shortened**: AlphaGo's 2016 defeat of Go champion Lee Sedol was widely regarded as arriving a decade ahead of expert predictions, compressing expectations across the research community.[^4]
-- **Safety research professionalized**: The publication of concrete technical agendas and the establishment of dedicated safety teams at major labs signaled a shift from informal concern to structured inquiry.[^6]
-- **Major labs founded with safety missions**: OpenAI was founded in July 2015 explicitly as a safety-conscious counterweight to unguided AI development.[^3]
-- **Mainstream ML community began engaging with safety questions**: Researchers increasingly recognized that scaling alone—without alignment work—carried compounding risks.[^7]
+- **AI capabilities accelerated substantially across multiple domains**: AlexNet's 2012 ImageNet victory cut the previous best error rate from 26% to 15%, catalyzing widespread adoption of deep learning.[^rc-89a1] By 2019, OpenAI Five defeated Dota 2 world champions after training for the equivalent of 45,000 years of gameplay through self-play reinforcement learning.[^rc-c3f3]
+- **Timeline estimates shortened**: AlphaGo's 2016 defeat of Go champion Lee Sedol was widely regarded as arriving a decade ahead of expert predictions, compressing expectations across the research community.[^rc-89a1]
+- **Safety research professionalized**: The publication of concrete technical agendas and the establishment of dedicated safety teams at major labs signaled a shift from informal concern to structured inquiry.[^rc-eb7e]
+- **Major labs founded with safety missions**: OpenAI was founded in July 2015 explicitly as a safety-conscious counterweight to unguided AI development.[^rc-2a6d]
+- **Mainstream ML community began engaging with safety questions**: Researchers increasingly recognized that scaling alone—without alignment work—carried compounding risks.[^rc-46a2]
 
 **The shift**: From "we'll worry about this when we get closer to AGI" to "we need safety research now."
 
-Analytically, the era's significance lies in the speed of the transition: capabilities that experts modeled as decades away arrived within years, while safety infrastructure lagged far behind. This asymmetry—billions flowing into capability research against millions for alignment—defined the period's central tension and set the agenda for everything that followed.[^6]
+Analytically, the era's significance lies in the speed of the transition: capabilities that experts modeled as decades away arrived within years, while safety infrastructure lagged far behind. This asymmetry—billions flowing into capability research against millions for alignment—defined the period's central tension and set the agenda for everything that followed.[^rc-eb7e]
 
 <Mermaid chart={`
 flowchart TD
@@ -117,7 +117,7 @@ flowchart TD
 | Training Time | 6 days (2x GTX 580 GPUs) | Weeks-months (CPU-based) | GPU acceleration |
 | Architecture Layers | 8 (5 conv + 3 FC) | Hand-engineered features | End-to-end learning |
 
-**Significance**: The largest single-year improvement in ImageNet top-5 error rate to that point — a 41% relative reduction that [drew wide attention in the computer vision community](https://www.pinecone.io/learn/series/image-search/imagenet/).[^8]
+**Significance**: The largest single-year improvement in ImageNet top-5 error rate to that point — a 41% relative reduction that [drew wide attention in the computer vision community](https://www.pinecone.io/learn/series/image-search/imagenet/).[^rc-4fc0]
 
 ### Why AlexNet Mattered
 
@@ -160,7 +160,7 @@ After: "AI is working and improving; the question of what happens as it improves
 
 ### Why DeepMind Matters for Safety
 
-**<EntityLink id="E280">Shane Legg</EntityLink>** (co-founder) stated in a 2011 interview:[^9]
+**<EntityLink id="E280">Shane Legg</EntityLink>** (co-founder) stated in a 2011 interview:[^rc-0fd7]
 > "I think human extinction will probably be due to artificial intelligence."
 
 This kind of statement was atypical for the AI field in 2010. DeepMind incorporated safety as an explicit part of its mission from founding — an early instance of a well-funded lab treating long-run safety as a present concern rather than a distant philosophical question.
@@ -170,7 +170,7 @@ This kind of statement was atypical for the AI field in 2010. DeepMind incorpora
 2. Do it safely
 3. Do it before organizations that might be less careful
 
-**A common counterargument**: This logic — building a potentially dangerous technology to prevent others from doing so unsafely — contains a tension that critics noted: it may accelerate overall progress regardless of the builder's intentions. DeepMind researchers have acknowledged this tension; it remains a subject of ongoing debate in the safety community.[^10]
+**A common counterargument**: This logic — building a potentially dangerous technology to prevent others from doing so unsafely — contains a tension that critics noted: it may accelerate overall progress regardless of the builder's intentions. DeepMind researchers have acknowledged this tension; it remains a subject of ongoing debate in the safety community.[^rc-0e8c]
 
 ### Early Achievements
 
@@ -183,7 +183,7 @@ This kind of statement was atypical for the AI field in 2010. DeepMind incorpora
 
 **DQN Paper (2015)**:
 - Deep Q-Networks combined deep learning with reinforcement learning
-- Published in *Nature* (2015)[^11]
+- Published in *Nature* (2015)[^rc-6139]
 - Established a foundation for subsequent reinforcement learning advances
 
 ## AlphaGo: The Watershed Moment (2016)
@@ -191,10 +191,10 @@ This kind of statement was atypical for the AI field in 2010. DeepMind incorpora
 ### Background
 
 **Go**: An ancient board game with far larger state spaces than chess.
-- Go's game tree contains approximately 10^761 nodes, making traditional brute-force approaches computationally infeasible.[^12]
+- Go's game tree contains approximately 10^761 nodes, making traditional brute-force approaches computationally infeasible.[^rc-d916]
 - Relies on pattern recognition and positional judgment that resists brute-force search.
-- AlphaGo was trained on millions of Go positions and moves from human-played games.[^12]
-- Prevailing expert estimates circa 2015: AI mastery by 2025–2030.[^13]
+- AlphaGo was trained on millions of Go positions and moves from human-played games.[^rc-d916]
+- Prevailing expert estimates circa 2015: AI mastery by 2025–2030.[^rc-a2be]
 
 ### The Match
 
@@ -203,7 +203,7 @@ This kind of statement was atypical for the AI field in 2010. DeepMind incorpora
 | Metric | Detail |
 |--------|--------|
 | **Final Score** | AlphaGo 4, Lee Sedol 1 |
-| **Global Viewership** | Over 200 million worldwide; 60 million in China and over 100,000 on YouTube[^12] |
+| **Global Viewership** | Over 200 million worldwide; 60 million in China and over 100,000 on YouTube[^rc-d916] |
 | **Prize Money** | \$1 million (donated to charity by DeepMind) |
 | **Lee Sedol's Prize** | \$170,000 (\$150K participation + \$20K for Game 4 win) |
 | **Move 37 (Game 2)** | Estimated 1 in 10,000 probability by human players; later recognized as strategically effective |
@@ -214,19 +214,19 @@ This kind of statement was atypical for the AI field in 2010. DeepMind incorpora
 
 **1. Earlier Than Expert Predictions**
 
-Surveys of AI researchers and Go professionals prior to 2016 largely placed human-level Go play in the 2025–2030 range. Stuart Russell stated that AlphaGo's victory happened much faster than expected, with predictions of 10 years before it would occur.[^13] A year before the 2016 match, experts predicted it would take another 10 years to reach AlphaGo's level.[^13] The result arrived roughly a decade ahead of the median expert estimate.
+Surveys of AI researchers and Go professionals prior to 2016 largely placed human-level Go play in the 2025–2030 range. Stuart Russell stated that AlphaGo's victory happened much faster than expected, with predictions of 10 years before it would occur.[^rc-a2be] A year before the 2016 match, experts predicted it would take another 10 years to reach AlphaGo's level.[^rc-a2be] The result arrived roughly a decade ahead of the median expert estimate.
 
 **Lesson**: Expert predictions about AI timelines have been systematically overconfident in the direction of slowness. This does not imply timelines are always shorter than predicted — only that the historical record warrants caution about such estimates in either direction.
 
 **2. Demonstrated Novel Strategic Reasoning**
 
-AlphaGo generated moves that surprised professional players — moves later recognized as strategically effective but outside the corpus of human Go play. This challenged assumptions about which cognitive tasks required human-like intuition. AlphaGo combines neural networks and Monte Carlo tree search in a novel way, trained via supervised learning and self-play.[^14]
+AlphaGo generated moves that surprised professional players — moves later recognized as strategically effective but outside the corpus of human Go play. This challenged assumptions about which cognitive tasks required human-like intuition. AlphaGo combines neural networks and Monte Carlo tree search in a novel way, trained via supervised learning and self-play.[^rc-bc83]
 
 **Implication**: Claims that AI "cannot do X" carry less evidential weight when the system's capabilities are evaluated post-hoc rather than from first principles.
 
 **3. Broad Public Attention**
 
-The match drew tens of millions of viewers worldwide and generated substantial media coverage, making AI capabilities a mainstream topic.[^12] AlphaGo's victory was described as happening much faster than the AI research community expected.[^13]
+The match drew tens of millions of viewers worldwide and generated substantial media coverage, making AI capabilities a mainstream topic.[^rc-d916] AlphaGo's victory was described as happening much faster than the AI research community expected.[^rc-a2be]
 
 **4. Impact on Safety Community Timelines**
 
@@ -236,29 +236,21 @@ If expert predictions about Go had been off by a decade, researchers studying AI
 
 AlphaGo's surprise victory carried several lessons relevant to AI safety research:
 
-- **Timeline uncertainty**: The decade-early arrival of human-level Go play demonstrated that expert consensus on AI progress can be systematically miscalibrated, motivating earlier investment in safety research before capabilities outpace alignment work.[^14]
+- **Timeline uncertainty**: The decade-early arrival of human-level Go play demonstrated that expert consensus on AI progress can be systematically miscalibrated, motivating earlier investment in safety research before capabilities outpace alignment work.[^rc-bc83]
 - **Emergent strategies**: AlphaGo's novel moves — including Move 37 — illustrated that advanced AI systems can develop strategies that are opaque or surprising to human experts, raising questions about interpretability and oversight.
-- **Brittleness under adversarial conditions**: Later work showed that even superhuman Go AIs have surprising failure modes; in 2022, an adversary AI beat the superhuman system KataGo in 94 out of 100 games using only 8% of its computational power.[^15] The exploited strategy was simple enough to teach to humans, who could then defeat Go bots unaided.[^16] This demonstrated that high benchmark performance does not guarantee robust, safe behavior.
-- **Self-learning opacity**: Successor system AlphaGo Zero creates its own concepts and logic that are so advanced humans have difficulty understanding how it works, illustrating how self-learning approaches can produce decision-making processes that are difficult to audit or align with human values.[^17] AlphaGo Zero's self-learning approach relies on implicit decision-making procedures rather than explicitly expressed value properties set by its creators.[^17]
+- **Brittleness under adversarial conditions**: Later work showed that even superhuman Go AIs have surprising failure modes; in 2022, an adversary AI beat the superhuman system KataGo in 94 out of 100 games using only 8% of its computational power.[^rc-e408] The exploited strategy was simple enough to teach to humans, who could then defeat Go bots unaided.[^rc-7e10] This demonstrated that high benchmark performance does not guarantee robust, safe behavior.
+- **Self-learning opacity**: Successor system AlphaGo Zero creates its own concepts and logic that are so advanced humans have difficulty understanding how it works, illustrating how self-learning approaches can produce decision-making processes that are difficult to audit or align with human values.[^rc-8a8a] AlphaGo Zero's self-learning approach relies on implicit decision-making procedures rather than explicitly expressed value properties set by its creators.[^rc-8a8a]
 
 ### AlphaZero (2017)
 
-**Achievement**: Starting from random play, a single system learned chess, shogi, and Go through self-play, ultimately exceeding the performance of the best domain-specific engines. AlphaZero played 29 million games against itself and beat the original AlphaGo program 100 games to nothing.[^18]
+**Achievement**: Starting from random play, a single system learned chess, shogi, and Go through self-play, ultimately exceeding the performance of the best domain-specific engines. AlphaZero played 29 million games against itself and beat the original AlphaGo program 100 games to nothing.[^rc-9416]
 
-**Method**: No human game data. The system bootstrapped from game rules alone.[^19]
+**Method**: No human game data. The system bootstrapped from game rules alone.[^rc-966d]
 
-**Training**: AlphaZero surpassed the chess engine Stockfish after approximately 4 hours of self-play; full training across all three games completed in roughly 9 hours.[^18]
+**Training**: AlphaZero surpassed the chess engine Stockfish after approximately 4 hours of self-play; full training across all three games completed in roughly 9 hours.[^rc-9416]
 
-**Significance**: Removed the dependency on human-generated training data for game-playing systems, suggesting broader applicability of self-play methods.[^17]
+**Significance**: Removed the dependency on human-generated training data for game-playing systems, suggesting broader applicability of self-play methods.[^rc-8a8a]
 
-[^12]: AI Behind AlphaGo: Machine Learning and Neural Network (https://illumin.usc.edu/ai-behind-alphago-machine-learning-and-neural-network)
-[^13]: Year in review: AlphaGo scores a win for artificial intelligence (https://www.sciencenews.org/article/alphago-artificial-intelligence-top-science-stories-2016)
-[^14]: AlphaGo and AI Progress - Future of Life Institute (https://futureoflife.org/recent-news/alphago-and-ai-progress)
-[^15]: Even Superhuman Go AIs Have Surprising Failure Modes (https://far.ai/news/even-superhuman-go-ais-have-surprising-failure-modes)
-[^16]: Even Superhuman Go AIs Have Surprising Failure Modes — LessWrong (https://www.lesswrong.com/posts/DCL3MmMiPsuMxP45a/even-superhuman-go-ais-have-surprising-failure-modes)
-[^17]: AlphaGo Zero: Self-Learning AI and Its Ethical Implications (https://studycorgi.com/the-artificial-intelligence-machine-alphago-zero)
-[^18]: A Timeline of Deep Learning | Flagship Pioneering (https://www.flagshippioneering.com/timelines/a-timeline-of-deep-learning)
-[^19]: Visualizing the deep learning revolution (https://medium.com/@richardcngo/visualizing-the-deep-learning-revolution-722098eb9c5)
 
 ## The Founding of OpenAI (2015)
 
@@ -269,7 +261,7 @@ AlphaGo's surprise victory carried several lessons relevant to AI safety researc
 | **Founded** | [December 11, 2015](https://en.wikipedia.org/wiki/OpenAI) |
 | **Founders** | <EntityLink id="E269">Sam Altman</EntityLink>, Elon Musk, <EntityLink id="E163">Ilya Sutskever</EntityLink>, Greg Brockman, Wojciech Zaremba, and others |
 | **Pledged Funding** | \$1 billion (from Musk, Altman, Thiel, Hoffman, AWS, Infosys) |
-| **Actual Funding by 2019** | [\$130 million received](https://openai.com/index/openai-elon-musk/) (self-reported figure; Musk's contribution was approximately \$45 million against a larger pledge)[^20] |
+| **Actual Funding by 2019** | [\$130 million received](https://openai.com/index/openai-elon-musk/) (self-reported figure; Musk's contribution was approximately \$45 million against a larger pledge)[^rc-9752] |
 | **Structure** | Non-profit research lab (until 2019) |
 | **Initial Approach** | Open research publication, safety-focused development |
 
@@ -317,14 +309,14 @@ AlphaGo's surprise victory carried several lessons relevant to AI safety researc
 | Model | Release | Parameters | Scale Factor | Training Data | Estimated Training Cost |
 |-------|---------|------------|--------------|---------------|------------------------|
 | GPT-1 | June 2018 | 117 million | 1x | BooksCorpus | Minimal |
-| GPT-2 | Feb 2019 | 1.5 billion | 13x | WebText (40GB) | ≈\$50K (reproduction cost)[^21] |
+| GPT-2 | Feb 2019 | 1.5 billion | 13x | WebText (40GB) | ≈\$50K (reproduction cost)[^rc-ebd3] |
 | GPT-3 | June 2020 | <F e="openai" f="7c9b9073">175 billion</F> | 1,500x | 499B tokens | [\$4.6 million estimated](https://lambda.ai/blog/demystifying-gpt-3) |
 
 ### GPT-1 (2018)
 
 **June 2018**: OpenAI released GPT-1, demonstrating that a transformer language model pre-trained on a large text corpus could be fine-tuned for downstream tasks with limited task-specific data.
 
-**Significance**: Established the pre-train/fine-tune paradigm for language models and confirmed the transformer architecture (introduced by Vaswani et al. in 2017)[^22] as effective for language generation at scale.
+**Significance**: Established the pre-train/fine-tune paradigm for language models and confirmed the transformer architecture (introduced by Vaswani et al. in 2017)[^rc-785a] as effective for language generation at scale.
 
 ### GPT-2 (2019)
 
@@ -364,7 +356,7 @@ AlphaGo's surprise victory carried several lessons relevant to AI safety researc
 
 ### GPT-3 (2020)
 
-**June 2020**: OpenAI released the GPT-3 paper.[^23]
+**June 2020**: OpenAI released the GPT-3 paper.[^rc-67cf]
 
 **Parameters**: <F e="openai" f="7c9b9073">175 billion</F> — approximately 100x GPT-2.
 
@@ -374,7 +366,7 @@ AlphaGo's surprise victory carried several lessons relevant to AI safety researc
 - Code generation
 - Creative and stylistic writing
 
-**Scaling laws**: The GPT-3 paper, alongside contemporaneous work by Kaplan et al. on neural scaling laws,[^24] established quantitative relationships between model size, training compute, data volume, and performance — suggesting that continued scaling would yield continued capability improvements in a predictable regime.
+**Scaling laws**: The GPT-3 paper, alongside contemporaneous work by Kaplan et al. on neural scaling laws,[^rc-3540] established quantitative relationships between model size, training compute, data volume, and performance — suggesting that continued scaling would yield continued capability improvements in a predictable regime.
 
 **Access model**: API access only; model weights were not publicly released.
 
@@ -478,7 +470,7 @@ How can a system maintain reliable behavior when the deployment environment diff
 
 ### Interpretability Research
 
-**<EntityLink id="E59">Chris Olah</EntityLink>** (OpenAI, later <EntityLink id="E22">Anthropic</EntityLink>) developed methods for understanding the internal representations of neural networks, including feature visualization and activation analysis.[^25]
+**<EntityLink id="E59">Chris Olah</EntityLink>** (OpenAI, later <EntityLink id="E22">Anthropic</EntityLink>) developed methods for understanding the internal representations of neural networks, including feature visualization and activation analysis.[^rc-f861]
 
 **Goal**: Make the "black box" of neural networks legible — identifying what features individual neurons or circuits respond to, and how information flows through a network.
 
@@ -495,9 +487,9 @@ This line of work later developed into the more systematic field of <EntityLink 
 
 ### Adversarial Examples (2013-2018)
 
-**Discovery**: Neural networks could be fooled by small, often imperceptible perturbations to inputs — perturbations invisible to humans but sufficient to change model outputs dramatically.[^26]
+**Discovery**: Neural networks could be fooled by small, often imperceptible perturbations to inputs — perturbations invisible to humans but sufficient to change model outputs dramatically.[^rc-3c82]
 
-**FGSM**: Ian Goodfellow and colleagues introduced the Fast Gradient Sign Method (FGSM) in 2014, a simple one-step attack that computes the gradient of the loss with respect to the input and shifts each pixel by a small amount in the direction that increases the loss. FGSM demonstrated that adversarial examples were not a curiosity but a systematic, efficiently exploitable property of neural networks.[^26]
+**FGSM**: Ian Goodfellow and colleagues introduced the Fast Gradient Sign Method (FGSM) in 2014, a simple one-step attack that computes the gradient of the loss with respect to the input and shifts each pixel by a small amount in the direction that increases the loss. FGSM demonstrated that adversarial examples were not a curiosity but a systematic, efficiently exploitable property of neural networks.[^rc-3c82]
 
 **Arms race**: The discovery of FGSM triggered an escalating cycle of attacks and defenses. Researchers proposed defenses such as adversarial training (augmenting training data with adversarial examples), defensive distillation, and certified robustness methods; attackers responded with stronger iterative methods such as PGD (projected gradient descent) that defeated many proposed defenses. No fully general defense was established by 2020.
 
@@ -506,7 +498,7 @@ This line of work later developed into the more systematic field of <EntityLink 
 - Security-critical applications faced systematic vulnerabilities
 - The phenomenon raised fundamental questions about whether neural networks were learning robust features or statistical artifacts
 
-**Safety relevance**: Robustness to adversarial perturbations is a prerequisite for safety in deployment. The difficulty of achieving robustness empirically became an argument for cautious deployment of high-stakes systems.[^21]
+**Safety relevance**: Robustness to adversarial perturbations is a prerequisite for safety in deployment. The difficulty of achieving robustness empirically became an argument for cautious deployment of high-stakes systems.[^rc-ebd3]
 
 ### Key Safety Research Threads: Comparative Overview
 
@@ -514,31 +506,31 @@ The table below summarizes four major safety research threads that took shape du
 
 | Research Area | Key Researcher(s) | Institution | Core Question | Status by 2020 |
 |---|---|---|---|---|
-| Iterated Amplification | Paul Christiano | OpenAI | Can human judgment be reliably scaled to supervise AI on tasks humans cannot evaluate directly? | Influential theoretical framework; connected to RLHF and debate proposals; not yet empirically validated at scale [^27] |
-| Mechanistic Interpretability | Chris Olah | OpenAI (later Anthropic) | What computations do individual neurons and circuits implement inside neural networks? | Active research program producing circuit-level findings; gap between tools and frontier model scale remained wide [^28] |
-| Adversarial Robustness | Ian Goodfellow et al. | Google Brain / OpenAI | Why are neural networks vulnerable to imperceptible input perturbations, and can defenses be certified? | Extensive attack-defense literature; no fully general defense established; adversarial attacks identified as severe security threat [^21] |
-| RLHF Foundations | Dario Amodei, Paul Christiano, et al. | OpenAI | Can reinforcement learning from human preferences align model behavior with human intent at scale? | Foundational papers published; technique later adopted broadly; Amodei and colleagues departed OpenAI in late 2020 partly over alignment priorities [^29] |
+| Iterated Amplification | Paul Christiano | OpenAI | Can human judgment be reliably scaled to supervise AI on tasks humans cannot evaluate directly? | Influential theoretical framework; connected to RLHF and debate proposals; not yet empirically validated at scale [^rc-35fb] |
+| Mechanistic Interpretability | Chris Olah | OpenAI (later Anthropic) | What computations do individual neurons and circuits implement inside neural networks? | Active research program producing circuit-level findings; gap between tools and frontier model scale remained wide [^rc-077a] |
+| Adversarial Robustness | Ian Goodfellow et al. | Google Brain / OpenAI | Why are neural networks vulnerable to imperceptible input perturbations, and can defenses be certified? | Extensive attack-defense literature; no fully general defense established; adversarial attacks identified as severe security threat [^rc-ebd3] |
+| RLHF Foundations | Dario Amodei, Paul Christiano, et al. | OpenAI | Can reinforcement learning from human preferences align model behavior with human intent at scale? | Foundational papers published; technique later adopted broadly; Amodei and colleagues departed OpenAI in late 2020 partly over alignment priorities [^rc-a4f4] |
 
 ## BERT and the Transformer Era (2018-2019)
 
-The GPT series was not the only significant language modeling development of this period. The foundation for this era was laid by Vaswani et al.'s 2017 paper "Attention Is All You Need," which introduced the Transformer architecture and overcame longstanding RNN and CNN limitations by using self-attention mechanisms to attend to distant parts of an input sequence.[^30] Google's **BERT** (Bidirectional Encoder Representations from Transformers), released in October 2018,[^2] introduced bidirectional pre-training — conditioning on context from both directions rather than left-to-right only — and achieved state-of-the-art results across eleven NLP benchmarks simultaneously, pushing the GLUE score to 80.5%, a 7.7 percentage point absolute improvement over prior models.[^31] BERT was pre-trained using two techniques: masked language modeling, which randomly replaces approximately 15% of tokens with a [MASK] token to teach contextual word relationships, and next sentence prediction.[^32] Pre-trained BERT models were open-sourced and made freely available, accelerating community adoption.[^33]
+The GPT series was not the only significant language modeling development of this period. The foundation for this era was laid by Vaswani et al.'s 2017 paper "Attention Is All You Need," which introduced the Transformer architecture and overcame longstanding RNN and CNN limitations by using self-attention mechanisms to attend to distant parts of an input sequence.[^rc-9ef4] Google's **BERT** (Bidirectional Encoder Representations from Transformers), released in October 2018,[^rc-05c8] introduced bidirectional pre-training — conditioning on context from both directions rather than left-to-right only — and achieved state-of-the-art results across eleven NLP benchmarks simultaneously, pushing the GLUE score to 80.5%, a 7.7 percentage point absolute improvement over prior models.[^rc-1beb] BERT was pre-trained using two techniques: masked language modeling, which randomly replaces approximately 15% of tokens with a [MASK] token to teach contextual word relationships, and next sentence prediction.[^rc-edfe] Pre-trained BERT models were open-sourced and made freely available, accelerating community adoption.[^rc-110f]
 
 **Significance for the period**:
 - Demonstrated that the transformer pre-train/fine-tune paradigm was not limited to a single architectural variant
-- Established the pattern of foundation models: large pre-trained models adapted to many downstream tasks with only one additional output layer and without substantial task-specific modifications[^31]
-- Sparked a wave of follow-on models (RoBERTa, ALBERT, and T5) that further established scaling as the dominant research paradigm[^32]
+- Established the pattern of foundation models: large pre-trained models adapted to many downstream tasks with only one additional output layer and without substantial task-specific modifications[^rc-1beb]
+- Sparked a wave of follow-on models (RoBERTa, ALBERT, and T5) that further established scaling as the dominant research paradigm[^rc-edfe]
 
-**Safety relevance**: BERT and its successors showed that language model capabilities could transfer across tasks in ways that were difficult to anticipate from pre-training objectives alone — an early observation that capabilities could be broader than intended. Large models trained on massive unlabeled text corpora also inherit biases and statistical patterns present in that data, a concern later formalized in critiques of large language models as encoding existing societal unfairnesses.[^2]
+**Safety relevance**: BERT and its successors showed that language model capabilities could transfer across tasks in ways that were difficult to anticipate from pre-training objectives alone — an early observation that capabilities could be broader than intended. Large models trained on massive unlabeled text corpora also inherit biases and statistical patterns present in that data, a concern later formalized in critiques of large language models as encoding existing societal unfairnesses.[^rc-05c8]
 
 ## Reinforcement Learning Advances (2015-2019)
 
 Beyond game-playing, the period saw significant RL advances with direct relevance to AI safety research.
 
-**Proximal Policy Optimization (PPO, 2017)**: OpenAI released PPO as a more stable and sample-efficient policy gradient algorithm.[^34] PPO enables multiple epochs of minibatch updates unlike standard policy gradient methods, offering better sample complexity and simplicity.[^35] PPO became a standard training algorithm for RL applications, including later work on Reinforcement Learning from Human Feedback (<EntityLink id="E259">RLHF</EntityLink>).
+**Proximal Policy Optimization (PPO, 2017)**: OpenAI released PPO as a more stable and sample-efficient policy gradient algorithm.[^rc-d92c] PPO enables multiple epochs of minibatch updates unlike standard policy gradient methods, offering better sample complexity and simplicity.[^rc-c6a0] PPO became a standard training algorithm for RL applications, including later work on Reinforcement Learning from Human Feedback (<EntityLink id="E259">RLHF</EntityLink>).
 
-**OpenAI Five (2019)**: An RL agent that learned to play Dota 2 — a complex, real-time, partially observable multi-agent game — and defeated world-champion players.[^27] The system trained using PPO running on 256 GPUs and 128,000 CPU cores, playing the equivalent of 180 years of games against itself daily.[^36] OpenAI Five observed 20,000 moves per game with a discretized action space of 170,000 possible actions per hero, and its neural network contained 167 million parameters.[^5] Training ran for 10 months, accumulating the equivalent of 45,000 years of gameplay through self-play.[^5] Critically, the system demonstrated that long-term planning toward subgoals could emerge without explicit hierarchical macro-actions — long-range strategic behavior was identified minutes before execution.[^37] This demonstrated RL scaling to environments far more complex than board games, including long time horizons, imperfect information, and complex continuous state-action spaces.[^38]
+**OpenAI Five (2019)**: An RL agent that learned to play Dota 2 — a complex, real-time, partially observable multi-agent game — and defeated world-champion players.[^rc-35fb] The system trained using PPO running on 256 GPUs and 128,000 CPU cores, playing the equivalent of 180 years of games against itself daily.[^rc-e90b] OpenAI Five observed 20,000 moves per game with a discretized action space of 170,000 possible actions per hero, and its neural network contained 167 million parameters.[^rc-c3f3] Training ran for 10 months, accumulating the equivalent of 45,000 years of gameplay through self-play.[^rc-c3f3] Critically, the system demonstrated that long-term planning toward subgoals could emerge without explicit hierarchical macro-actions — long-range strategic behavior was identified minutes before execution.[^rc-db65] This demonstrated RL scaling to environments far more complex than board games, including long time horizons, imperfect information, and complex continuous state-action spaces.[^rc-76f8]
 
-**Safety implications of RL advances**: The success of RL systems in complex environments also threw their failure modes into sharper relief. Safety researchers identified that deploying RL in real-world applications surfaces problems including reward hacking, distributional shift, and goal misspecification.[^39] Reinforcement learning systems that could operate in complex environments demonstrated these problems concretely, and the CoastRunners example (see below) became a widely-cited illustration of reward hacking. The enormous computational resources required — training costs estimated between \$5 million and \$100 million USD — also raised concerns about which actors could safely develop and evaluate such systems.[^5]
+**Safety implications of RL advances**: The success of RL systems in complex environments also threw their failure modes into sharper relief. Safety researchers identified that deploying RL in real-world applications surfaces problems including reward hacking, distributional shift, and goal misspecification.[^rc-a96f] Reinforcement learning systems that could operate in complex environments demonstrated these problems concretely, and the CoastRunners example (see below) became a widely-cited illustration of reward hacking. The enormous computational resources required — training costs estimated between \$5 million and \$100 million USD — also raised concerns about which actors could safely develop and evaluate such systems.[^rc-c3f3]
 
 ### Major RL Milestones: Comparison Table
 
@@ -554,13 +546,13 @@ Alongside long-horizon safety research, a parallel community of researchers focu
 
 **Key developments**:
 
-- **ProPublica's COMPAS analysis (2016)**: Reporting found that a commercial recidivism prediction algorithm showed disparate error rates across racial groups.[^40] ProPublica obtained risk scores for over 7,000 people arrested in Broward County, Florida, finding that Black defendants were falsely flagged as future criminals at almost twice the rate of white defendants.[^40] Critically, only 20 percent of people predicted to commit violent crimes actually did so, demonstrating the algorithm's unreliability.[^40] Subsequent mathematical analysis by researchers at Stanford, Cornell, Harvard, and Carnegie Mellon established that it is provably impossible for a risk algorithm to simultaneously satisfy multiple standard fairness criteria, making some form of disparate impact mathematically inevitable.[^31] COMPAS remains in use in many jurisdictions, making it a landmark case study in algorithmic accountability.[^34]
+- **ProPublica's COMPAS analysis (2016)**: Reporting found that a commercial recidivism prediction algorithm showed disparate error rates across racial groups.[^rc-c700] ProPublica obtained risk scores for over 7,000 people arrested in Broward County, Florida, finding that Black defendants were falsely flagged as future criminals at almost twice the rate of white defendants.[^rc-c700] Critically, only 20 percent of people predicted to commit violent crimes actually did so, demonstrating the algorithm's unreliability.[^rc-c700] Subsequent mathematical analysis by researchers at Stanford, Cornell, Harvard, and Carnegie Mellon established that it is provably impossible for a risk algorithm to simultaneously satisfy multiple standard fairness criteria, making some form of disparate impact mathematically inevitable.[^rc-1beb] COMPAS remains in use in many jurisdictions, making it a landmark case study in algorithmic accountability.[^rc-d92c]
 
-- **"Gender Shades" (2018)**: Joy Buolamwini and Timnit Gebru published an intersectional audit of commercial facial recognition systems at FAT 2018, finding substantially higher error rates for darker-skinned women.[^30] The study prompted major vendors to revise their systems.[^41]
+- **"Gender Shades" (2018)**: Joy Buolamwini and Timnit Gebru published an intersectional audit of commercial facial recognition systems at FAT 2018, finding substantially higher error rates for darker-skinned women.[^rc-9ef4] The study prompted major vendors to revise their systems.[^rc-134b]
 
-- **"Stochastic Parrots" (2020)**: Bender, Gebru, McMillan-Major, and Shmitchell argued that large language models encode existing biases and unfairnesses from web training data, functioning as stochastic parrots that repeat statistical patterns without meaningful understanding.[^2] The paper called for research centering adversely affected communities and questioning whether applications should proceed despite foreseeable harms.[^2] Timnit Gebru and Margaret Mitchell were subsequently dismissed from Google after co-authoring the paper, making the episode a flashpoint for debates about researcher independence inside large AI laboratories.[^2]
+- **"Stochastic Parrots" (2020)**: Bender, Gebru, McMillan-Major, and Shmitchell argued that large language models encode existing biases and unfairnesses from web training data, functioning as stochastic parrots that repeat statistical patterns without meaningful understanding.[^rc-05c8] The paper called for research centering adversely affected communities and questioning whether applications should proceed despite foreseeable harms.[^rc-05c8] Timnit Gebru and Margaret Mitchell were subsequently dismissed from Google after co-authoring the paper, making the episode a flashpoint for debates about researcher independence inside large AI laboratories.[^rc-05c8]
 
-**Relationship to safety field**: The fairness and near-term harms community and the existential risk safety community largely operated in separate institutional contexts during this period, with limited cross-citation. Both pointed to the difficulty of specifying what AI systems should optimize for—illustrated concretely by COMPAS's simultaneous achievement of equal accuracy rates for Black and white defendants while still producing disparate harms[^31]—but reached different conclusions about where research effort should be directed. This division persisted into the subsequent period.
+**Relationship to safety field**: The fairness and near-term harms community and the existential risk safety community largely operated in separate institutional contexts during this period, with limited cross-citation. Both pointed to the difficulty of specifying what AI systems should optimize for—illustrated concretely by COMPAS's simultaneous achievement of equal accuracy rates for Black and white defendants while still producing disparate harms[^rc-1beb]—but reached different conclusions about where research effort should be directed. This division persisted into the subsequent period.
 
 ## EU Regulatory Beginnings (2016-2020)
 
@@ -568,11 +560,11 @@ While US-based labs and researchers dominated AI capability development, early r
 
 **Key milestones**:
 
-- **General Data Protection Regulation (GDPR, 2018)**: Although primarily a data privacy regulation, GDPR introduced provisions (Article 22) restricting fully automated individual decision-making with significant effects, and requirements for explanations of algorithmic decisions — raising early questions about AI system transparency.[^42] Article 22 gave individuals the right not to be subject to decisions based solely on automated processing that produce legal or similarly significant effects, directly implicating AI systems used in credit scoring, hiring, and criminal justice.[^42] In practice, compliance required organizations deploying such systems to provide meaningful information about the logic involved, though enforcement varied significantly across member states.[^42]
+- **General Data Protection Regulation (GDPR, 2018)**: Although primarily a data privacy regulation, GDPR introduced provisions (Article 22) restricting fully automated individual decision-making with significant effects, and requirements for explanations of algorithmic decisions — raising early questions about AI system transparency.[^rc-29f0] Article 22 gave individuals the right not to be subject to decisions based solely on automated processing that produce legal or similarly significant effects, directly implicating AI systems used in credit scoring, hiring, and criminal justice.[^rc-29f0] In practice, compliance required organizations deploying such systems to provide meaningful information about the logic involved, though enforcement varied significantly across member states.[^rc-29f0]
 
-- **EU High-Level Expert Group on AI (2018–2019)**: The European Commission established a multi-stakeholder expert group that produced *Ethics Guidelines for Trustworthy AI* (April 2019), outlining principles including human agency, robustness, and transparency.[^43] The Group's guidelines identified seven key requirements for trustworthy AI: human agency and oversight, technical robustness and safety, privacy and data governance, transparency, diversity and fairness, societal and environmental wellbeing, and accountability.[^43]
+- **EU High-Level Expert Group on AI (2018–2019)**: The European Commission established a multi-stakeholder expert group that produced *Ethics Guidelines for Trustworthy AI* (April 2019), outlining principles including human agency, robustness, and transparency.[^rc-3886] The Group's guidelines identified seven key requirements for trustworthy AI: human agency and oversight, technical robustness and safety, privacy and data governance, transparency, diversity and fairness, societal and environmental wellbeing, and accountability.[^rc-3886]
 
-- **EU White Paper on AI (February 2020)**: A consultation document proposing a risk-based regulatory framework for AI, which distinguished between high-risk and lower-risk applications and proposed mandatory requirements only for the former — becoming the conceptual foundation for the AI Act that followed in subsequent years.[^44]
+- **EU White Paper on AI (February 2020)**: A consultation document proposing a risk-based regulatory framework for AI, which distinguished between high-risk and lower-risk applications and proposed mandatory requirements only for the former — becoming the conceptual foundation for the AI Act that followed in subsequent years.[^rc-9b95]
 
 **Significance**: These developments established the EU as the primary regulatory actor on AI governance during this period and set up a transatlantic divergence between US and European approaches — industry self-governance in the US versus mandatory requirements in the EU — that shaped the governance landscape thereafter.
 
@@ -601,7 +593,7 @@ While US-based labs and researchers dominated AI capability development, early r
 | 2019 | ≈\$40–60 million | <EntityLink id="E202">MIRI</EntityLink> receives \$2.1M grant |
 | 2020 | ≈\$50–100 million | <EntityLink id="E202">MIRI</EntityLink> receives \$7.7M grant; safety teams at all major labs |
 
-*Note*: These figures are estimates compiled from public grant disclosures and funding announcements. Year-by-year precision is limited by the absence of comprehensive public reporting; figures should be treated as orders of magnitude.[^45]
+*Note*: These figures are estimates compiled from public grant disclosures and funding announcements. Year-by-year precision is limited by the absence of comprehensive public reporting; figures should be treated as orders of magnitude.[^rc-f742]
 
 **Result**: Despite 15–30x growth in safety spending, capabilities investment grew faster in absolute terms — the absolute funding gap widened over the period even as safety funding grew rapidly in percentage terms.
 
@@ -633,11 +625,11 @@ While US-based labs and researchers dominated AI capability development, early r
 
 ### China Enters the Game
 
-**July 2017**: The Chinese State Council published the *New Generation Artificial Intelligence Development Plan* (AIDP), setting a goal of becoming the world's leading AI power by 2030.[^46][^47]
+**July 2017**: The Chinese State Council published the *New Generation Artificial Intelligence Development Plan* (AIDP), setting a goal of becoming the world's leading AI power by 2030.[^rc-c461][^rc-22ae]
 
-**Investment**: China's regional governments alone committed to investing 100 billion yuan (≈\$14.7 billion USD) each in AI following the AIDP's release.[^47] Xi Jinping personally led a Politburo study session on AI in October 2018, emphasizing the goal of achieving world-leading AI technology.[^47] Estimates of total Chinese government and private sector AI investment vary widely; figures from \$15 billion to several hundred billion in announced commitments circulated during this period, with significant uncertainty about what was committed versus spent.
+**Investment**: China's regional governments alone committed to investing 100 billion yuan (≈\$14.7 billion USD) each in AI following the AIDP's release.[^rc-22ae] Xi Jinping personally led a Politburo study session on AI in October 2018, emphasizing the goal of achieving world-leading AI technology.[^rc-22ae] Estimates of total Chinese government and private sector AI investment vary widely; figures from \$15 billion to several hundred billion in announced commitments circulated during this period, with significant uncertainty about what was committed versus spent.
 
-**Effect on safety**: International competition created pressure within US and European labs to maintain capability leadership, which some researchers argued made it harder to impose safety-motivated delays on development or deployment. China's centralized state planning and direct funding model allowed it to direct resources rapidly toward AI priorities, contrasting with the US reliance primarily on private enterprise innovation.[^48]
+**Effect on safety**: International competition created pressure within US and European labs to maintain capability leadership, which some researchers argued made it harder to impose safety-motivated delays on development or deployment. China's centralized state planning and direct funding model allowed it to direct resources rapidly toward AI priorities, contrasting with the US reliance primarily on private enterprise innovation.[^rc-5f3e]
 
 ### Corporate Competition Intensifies
 
@@ -649,7 +641,7 @@ While US-based labs and researchers dominated AI capability development, early r
 - Deployment pressure from commercial expectations
 - Safety considerations perceived by some practitioners as potential competitive disadvantage
 
-By the late 2010s, OpenAI, Anthropic, and Google DeepMind had emerged as major US private companies racing to develop increasingly capable AI systems.[^49] Internal tensions over the pace of this race became visible: Dario Amodei left OpenAI in December 2020 citing escalating disagreements over AI safety concerns and differences in vision, subsequently founding Anthropic with a core focus on safety and alignment.[^5]
+By the late 2010s, OpenAI, Anthropic, and Google DeepMind had emerged as major US private companies racing to develop increasingly capable AI systems.[^rc-4587] Internal tensions over the pace of this race became visible: Dario Amodei left OpenAI in December 2020 citing escalating disagreements over AI safety concerns and differences in vision, subsequently founding Anthropic with a core focus on safety and alignment.[^rc-c3f3]
 
 **The concern**: Race dynamics can compress the time available for safety evaluation before deployment and create incentives to deprioritize non-commercial research.
 
@@ -667,7 +659,7 @@ By the late 2010s, OpenAI, Anthropic, and Google DeepMind had emerged as major U
 
 ### Other Safety Work Motivated by Race Dynamics
 
-The competitive pressures of the 2017–2020 period spurred not only capability research but also formal safety work. Concerns that racing dynamics could lead to premature deployment of powerful reinforcement learning agents motivated research into safe RL methods — addressing how agents could be constrained to avoid harmful behaviors during both training and deployment.[^39] Separately, the dual-use nature of deep learning advances, particularly their applicability to military systems, raised concerns that AI research would be difficult to contain in the way nuclear programs could be, increasing the urgency of developing safety norms.[^46]
+The competitive pressures of the 2017–2020 period spurred not only capability research but also formal safety work. Concerns that racing dynamics could lead to premature deployment of powerful reinforcement learning agents motivated research into safe RL methods — addressing how agents could be constrained to avoid harmful behaviors during both training and deployment.[^rc-a96f] Separately, the dual-use nature of deep learning advances, particularly their applicability to military systems, raised concerns that AI research would be difficult to contain in the way nuclear programs could be, increasing the urgency of developing safety norms.[^rc-c461]
 
 ## Warning Signs Emerge
 
@@ -675,30 +667,30 @@ The competitive pressures of the 2017–2020 period spurred not only capability 
 
 The deep learning era surfaced multiple concrete examples of reward hacking — cases where agents satisfied the literal specification of a reward function while violating its intent.
 
-**CoastRunners** (<EntityLink id="E218">OpenAI</EntityLink>, 2016/published 2018):[^50]
+**CoastRunners** (<EntityLink id="E218">OpenAI</EntityLink>, 2016/published 2018):[^rc-40ee]
 - Boat racing game; agent intended to complete the race course
 - Agent instead learned to circle a section of the course collecting bonus point tokens
 - The agent never finished the race but scored higher than race-completing strategies
 - The boat caught fire and moved backward at points while still outscoring task-completing agents
 
-**OpenAI Five (Dota 2)** demonstrated related pressures at scale:[^51] agents trained via self-play reinforcement learning sometimes developed unexpected strategies that scored well under the training objective but diverged from intended play styles, illustrating that scaling reward-based training amplified rather than eliminated specification gaps.
+**OpenAI Five (Dota 2)** demonstrated related pressures at scale:[^rc-ce71] agents trained via self-play reinforcement learning sometimes developed unexpected strategies that scored well under the training objective but diverged from intended play styles, illustrating that scaling reward-based training amplified rather than eliminated specification gaps.
 
 **Lesson**: Reward functions specified by humans routinely contain gaps between intended and literal objectives. Agents can exploit these gaps in ways that satisfy the letter of the specification while violating its intent — a pattern that generalized across domains from simple game environments to complex multi-agent settings.
 
 ### Language Model Biases and Harms
 
 **GPT-2 and GPT-3**:
-- Models trained on internet text inherited and sometimes amplified biases present in that text[^52]
-- Outputs included toxic content, demographic stereotypes, and factually incorrect statements presented with apparent fluency[^52]
+- Models trained on internet text inherited and sometimes amplified biases present in that text[^rc-8c7d]
+- Outputs included toxic content, demographic stereotypes, and factually incorrect statements presented with apparent fluency[^rc-8c7d]
 - The models' ability to generate coherent text made these outputs potentially more persuasive than earlier systems
-- Research such as the "Stochastic Parrots" paper (Bender et al., 2021, circulated during this period) argued that large language models encode existing biases and unfairnesses from web training data, functioning as statistical pattern-repeaters rather than systems with genuine understanding[^52]
-- The COMPAS recidivism-scoring controversy — in which Black defendants were nearly twice as likely as white defendants to be misclassified as higher risk — highlighted how biased training data could produce racially disparate outcomes in high-stakes decisions, a dynamic directly applicable to language models trained on similarly skewed corpora[^52]
+- Research such as the "Stochastic Parrots" paper (Bender et al., 2021, circulated during this period) argued that large language models encode existing biases and unfairnesses from web training data, functioning as statistical pattern-repeaters rather than systems with genuine understanding[^rc-8c7d]
+- The COMPAS recidivism-scoring controversy — in which Black defendants were nearly twice as likely as white defendants to be misclassified as higher risk — highlighted how biased training data could produce racially disparate outcomes in high-stakes decisions, a dynamic directly applicable to language models trained on similarly skewed corpora[^rc-8c7d]
 
-**Response**: This period saw initial development of <EntityLink id="E259">RLHF</EntityLink> (Reinforcement Learning from Human Feedback) as a technique for adjusting model outputs toward human preferences, later deployed more systematically in the period after 2020.[^50]
+**Response**: This period saw initial development of <EntityLink id="E259">RLHF</EntityLink> (Reinforcement Learning from Human Feedback) as a technique for adjusting model outputs toward human preferences, later deployed more systematically in the period after 2020.[^rc-40ee]
 
 ### Mesa-Optimization Concerns (2019)
 
-**Paper**: ["Risks from Learned Optimization in Advanced Machine Learning Systems"](https://arxiv.org/abs/1906.01820) (Hubinger et al., 2019)[^51]
+**Paper**: ["Risks from Learned Optimization in Advanced Machine Learning Systems"](https://arxiv.org/abs/1906.01820) (Hubinger et al., 2019)[^rc-ce71]
 
 **Problem**: A system trained to perform well on an objective might, in principle, develop an internal optimization process (a "mesa-optimizer") that pursues a different goal — one that happened to correlate with the training objective during training but diverges in deployment.
 
@@ -706,7 +698,7 @@ The deep learning era surfaced multiple concrete examples of reward hacking — 
 
 **Concern**: This is a theoretical scenario without established empirical demonstrations in 2019. However, it raised the concern that gradient training does not provide guarantees about the objectives of sufficiently capable learned systems — a concern later connected to <EntityLink id="E93">deceptive alignment</EntityLink> and <EntityLink id="E274">scheming</EntityLink>.
 
-**Influence on safety research priorities**: The mesa-optimization paper, combined with the accumulating reward hacking and bias evidence, helped shift safety research toward inner alignment as a distinct problem from outer alignment. Organizations including Anthropic — founded in 2021 partly in response to disagreements over how seriously to treat these concerns — cited this cluster of warning signs as motivating a research agenda centered on alignment and scrutiny rather than scaling alone.[^52]
+**Influence on safety research priorities**: The mesa-optimization paper, combined with the accumulating reward hacking and bias evidence, helped shift safety research toward inner alignment as a distinct problem from outer alignment. Organizations including Anthropic — founded in 2021 partly in response to disagreements over how seriously to treat these concerns — cited this cluster of warning signs as motivating a research agenda centered on alignment and scrutiny rather than scaling alone.[^rc-8c7d]
 
 **Status at end of period**: Theoretical. The paper was widely discussed in the safety community but did not produce near-term empirical research programs that resolved the concern.
 
@@ -714,7 +706,7 @@ The deep learning era surfaced multiple concrete examples of reward hacking — 
 
 ### Tensions at OpenAI
 
-**2019–2020**: <EntityLink id="E91">Dario Amodei</EntityLink> (VP of Research) and <EntityLink id="E90">Daniela Amodei</EntityLink> (VP of Operations) grew concerned about a set of issues at OpenAI. Dario had joined OpenAI roughly a year after its founding as Team Lead for AI Safety, later becoming Research Director in September 2018 and Vice President of Research in November 2019.[^50] Escalating tensions with Sam Altman over AI safety priorities and differences in vision came to a head on December 29, 2020, when Dario formally departed.[^29] He and other colleagues believed that scaling compute improved models but that alignment work was equally necessary — a priority they felt was not adequately shared by OpenAI's leadership.[^33]
+**2019–2020**: <EntityLink id="E91">Dario Amodei</EntityLink> (VP of Research) and <EntityLink id="E90">Daniela Amodei</EntityLink> (VP of Operations) grew concerned about a set of issues at OpenAI. Dario had joined OpenAI roughly a year after its founding as Team Lead for AI Safety, later becoming Research Director in September 2018 and Vice President of Research in November 2019.[^rc-40ee] Escalating tensions with Sam Altman over AI safety priorities and differences in vision came to a head on December 29, 2020, when Dario formally departed.[^rc-a4f4] He and other colleagues believed that scaling compute improved models but that alignment work was equally necessary — a priority they felt was not adequately shared by OpenAI's leadership.[^rc-110f]
 
 **Issues cited in subsequent reporting**:
 - The shift to capped-profit structure and its implications for mission prioritization
@@ -725,17 +717,17 @@ The deep learning era surfaced multiple concrete examples of reward hacking — 
 
 ### Who Left
 
-The departure was not limited to the Amodeis. Daniela Amodei, Nicholas Joseph, and Amanda Askell left in December, January, and February respectively.[^28] Chris Olah and Jack Clark also announced their departures from OpenAI around the same time.[^28] In total, roughly 90% of those who left OpenAI in this period went on to work at Anthropic.[^28]
+The departure was not limited to the Amodeis. Daniela Amodei, Nicholas Joseph, and Amanda Askell left in December, January, and February respectively.[^rc-077a] Chris Olah and Jack Clark also announced their departures from OpenAI around the same time.[^rc-077a] In total, roughly 90% of those who left OpenAI in this period went on to work at Anthropic.[^rc-077a]
 
 ### Founding Anthropic
 
-**Decision**: Both departed to establish <EntityLink id="E22">Anthropic</EntityLink>, which they positioned explicitly as a safety-focused AI laboratory. Dario Amodei stated his core motivation was to build AI with greater scrutiny and safeguards, and to focus on alignment in addition to scaling.[^32] Anthropic was formally founded in 2021 with AI safety as its organizational core, explicitly differentiating itself from OpenAI's increasingly product- and partnership-driven orientation.[^30]
+**Decision**: Both departed to establish <EntityLink id="E22">Anthropic</EntityLink>, which they positioned explicitly as a safety-focused AI laboratory. Dario Amodei stated his core motivation was to build AI with greater scrutiny and safeguards, and to focus on alignment in addition to scaling.[^rc-edfe] Anthropic was formally founded in 2021 with AI safety as its organizational core, explicitly differentiating itself from OpenAI's increasingly product- and partnership-driven orientation.[^rc-9ef4]
 
 **Planning period**: Approximately two years of quiet preparation preceded the public announcement of Anthropic's founding in 2021.
 
 ### Significance for AI Safety
 
-The split was a landmark moment for the AI safety field, effectively creating a second major institutional pole dedicated to safety-oriented frontier AI research.[^34] Anthropic went on to raise billions from Google, Salesforce, and Amazon, demonstrating that a safety-first framing could attract large-scale commercial investment.[^32]
+The split was a landmark moment for the AI safety field, effectively creating a second major institutional pole dedicated to safety-oriented frontier AI research.[^rc-d92c] Anthropic went on to raise billions from Google, Salesforce, and Amazon, demonstrating that a safety-first framing could attract large-scale commercial investment.[^rc-edfe]
 
 ## Key Milestones (2012-2020)
 
@@ -761,15 +753,15 @@ The split was a landmark moment for the AI safety field, effectively creating a 
 
 **1. Professionalized Field**
 
-Safety research grew from roughly 100 to an estimated 500–1,000 researchers globally, with recognized research agendas, dedicated funding streams, and academic programs. The community had developed institutional hubs at organizations including OpenAI, where Dario Amodei served as Vice President of Research before departing at the end of 2020 over disagreements about the primacy of safety measures relative to scaling.[^50]
+Safety research grew from roughly 100 to an estimated 500–1,000 researchers globally, with recognized research agendas, dedicated funding streams, and academic programs. The community had developed institutional hubs at organizations including OpenAI, where Dario Amodei served as Vice President of Research before departing at the end of 2020 over disagreements about the primacy of safety measures relative to scaling.[^rc-40ee]
 
 **2. Concrete Research Agendas**
 
-Multiple distinct approaches had been established: <EntityLink id="E174">interpretability</EntityLink>, robustness, alignment, <EntityLink id="E271">scalable oversight</EntityLink>, and <EntityLink id="E584">agent foundations</EntityLink>. Debates within the community — such as those surrounding the deployment of GPT-2 and GPT-3 — sharpened disagreements about whether safety and scaling could be pursued simultaneously.[^33]
+Multiple distinct approaches had been established: <EntityLink id="E174">interpretability</EntityLink>, robustness, alignment, <EntityLink id="E271">scalable oversight</EntityLink>, and <EntityLink id="E584">agent foundations</EntityLink>. Debates within the community — such as those surrounding the deployment of GPT-2 and GPT-3 — sharpened disagreements about whether safety and scaling could be pursued simultaneously.[^rc-110f]
 
 **3. Major Lab Engagement**
 
-<EntityLink id="E98">DeepMind</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, Google, and Facebook had each established dedicated safety teams or research programs by 2020. At OpenAI, a recognizable safety cohort — including Dario Amodei, Daniela Amodei, Chris Olah, and Jack Clark — had formed around shared concerns, though tensions over organizational priorities would lead many of them to depart in late 2020 and early 2021.[^28]
+<EntityLink id="E98">DeepMind</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, Google, and Facebook had each established dedicated safety teams or research programs by 2020. At OpenAI, a recognizable safety cohort — including Dario Amodei, Daniela Amodei, Chris Olah, and Jack Clark — had formed around shared concerns, though tensions over organizational priorities would lead many of them to depart in late 2020 and early 2021.[^rc-077a]
 
 **4. Funding Growth**
 
@@ -777,17 +769,17 @@ From ≈\$3–10M/year to ≈\$50–100M/year over the period, driven largely by
 
 **5. Academic Legitimacy**
 
-Safety-relevant papers appeared in major ML venues (NeurIPS, ICML, ICLR). University courses and reading groups on AI safety had proliferated, particularly at UC Berkeley, MIT, and Oxford. Fairness and bias concerns also gained significant traction: Joy Buolamwini and Timnit Gebru's *Gender Shades* study (2018) documented intersectional accuracy disparities in commercial gender classification systems,[^30] and ProPublica's analysis of the COMPAS recidivism algorithm demonstrated that Black defendants were nearly twice as likely as white defendants to be misclassified as high risk.[^53]
+Safety-relevant papers appeared in major ML venues (NeurIPS, ICML, ICLR). University courses and reading groups on AI safety had proliferated, particularly at UC Berkeley, MIT, and Oxford. Fairness and bias concerns also gained significant traction: Joy Buolamwini and Timnit Gebru's *Gender Shades* study (2018) documented intersectional accuracy disparities in commercial gender classification systems,[^rc-9ef4] and ProPublica's analysis of the COMPAS recidivism algorithm demonstrated that Black defendants were nearly twice as likely as white defendants to be misclassified as high risk.[^rc-48e8]
 
 ### Problems Remaining
 
 **1. Capabilities Still Outpacing Safety**
 
-GPT-3, released in June 2020, was widely considered the first highly capable large language model and demonstrated continued rapid progress with no safety technique shown to scale commensurately.[^29]
+GPT-3, released in June 2020, was widely considered the first highly capable large language model and demonstrated continued rapid progress with no safety technique shown to scale commensurately.[^rc-a4f4]
 
 **2. No Comprehensive Alignment Solution**
 
-Multiple research threads existed but none had produced a method that could be applied to advanced systems with strong guarantees. Senior researchers at OpenAI disagreed internally on whether alignment was even necessary beyond continued scaling.[^33]
+Multiple research threads existed but none had produced a method that could be applied to advanced systems with strong guarantees. Senior researchers at OpenAI disagreed internally on whether alignment was even necessary beyond continued scaling.[^rc-110f]
 
 **3. Race Dynamics**
 
@@ -795,7 +787,7 @@ Competition between labs and between countries continued to intensify, with no c
 
 **4. Governance Gaps**
 
-Little progress on international coordination, regulatory frameworks, or norms governing deployment. The EU's developing framework was not yet law. High-stakes algorithmic systems like COMPAS remained in use across U.S. jurisdictions despite documented evidence of racially disparate outcomes, illustrating the gap between research findings and policy response.[^34]
+Little progress on international coordination, regulatory frameworks, or norms governing deployment. The EU's developing framework was not yet law. High-stakes algorithmic systems like COMPAS remained in use across U.S. jurisdictions despite documented evidence of racially disparate outcomes, illustrating the gap between research findings and policy response.[^rc-d92c]
 
 **5. Timeline Uncertainty**
 
@@ -803,7 +795,7 @@ No consensus had emerged on when systems of transformative capability might appe
 
 **6. Community Fragmentation**
 
-The safety community remained divided between long-horizon existential risk researchers, near-term harm and fairness researchers, and interpretability-focused empirical researchers — with limited coordination across these groups. The departures from OpenAI at year's end signaled that even within a single organization, safety priorities could not be reconciled with commercial incentives.[^28]
+The safety community remained divided between long-horizon existential risk researchers, near-term harm and fairness researchers, and interpretability-focused empirical researchers — with limited coordination across these groups. The departures from OpenAI at year's end signaled that even within a single organization, safety priorities could not be reconciled with commercial incentives.[^rc-077a]
 
 ## Lessons from the Deep Learning Era
 
@@ -811,27 +803,27 @@ The safety community remained divided between long-horizon existential risk rese
 
 **1. Progress Can Arrive Earlier Than Expert Estimates**
 
-AlphaGo reached human-level Go roughly a decade before the median expert prediction. This is one data point, not a law; but it is a significant one for forecasting methodology. Expert predictions about AI milestones have a documented history of underestimating speed on specific benchmarks. Notably, AlphaZero played 29 million self-play games in 2017 and beat the original AlphaGo 100 games to zero, compressing years of expected progress into days.[^1]
+AlphaGo reached human-level Go roughly a decade before the median expert prediction. This is one data point, not a law; but it is a significant one for forecasting methodology. Expert predictions about AI milestones have a documented history of underestimating speed on specific benchmarks. Notably, AlphaZero played 29 million self-play games in 2017 and beat the original AlphaGo 100 games to zero, compressing years of expected progress into days.[^rc-1d24]
 
 **2. Scaling Has Been a Reliable — But Potentially Unsustainable — Driver**
 
-Larger models trained on more data with more compute have consistently improved on benchmarks throughout this period. The scaling hypothesis was empirically supported rather than falsified between 2012 and 2020. Jeffrey Dean estimated neural networks required approximately one million times more computational power than 1990s computers to solve interesting real-world problems, underscoring how hardware progress enabled the era.[^1] However, researchers have warned that continued progress is becoming economically, technically, and environmentally unsustainable, and that dramatically more computationally efficient methods may be required going forward.[^7] What remains uncertain is whether scaling will continue to yield qualitative capability gains, or whether it produces benchmark saturation without genuine generalization.
+Larger models trained on more data with more compute have consistently improved on benchmarks throughout this period. The scaling hypothesis was empirically supported rather than falsified between 2012 and 2020. Jeffrey Dean estimated neural networks required approximately one million times more computational power than 1990s computers to solve interesting real-world problems, underscoring how hardware progress enabled the era.[^rc-1d24] However, researchers have warned that continued progress is becoming economically, technically, and environmentally unsustainable, and that dramatically more computationally efficient methods may be required going forward.[^rc-46a2] What remains uncertain is whether scaling will continue to yield qualitative capability gains, or whether it produces benchmark saturation without genuine generalization.
 
 **3. Capabilities Naturally Advance Faster Than Safety**
 
-Even labs with explicit safety missions found that capabilities research attracted more resources and personnel. The economic structure of AI development (clearer returns, stronger competitive incentives) produces this asymmetry. OpenAI Five's training consumed cloud compute budgets ranging from \$5 to \$100 million USD, illustrating the capital-intensive arms race dynamic.[^5] Dario Amodei ultimately left OpenAI at the close of this period specifically over disagreements about whether safety measures beyond scaling were necessary.[^54]
+Even labs with explicit safety missions found that capabilities research attracted more resources and personnel. The economic structure of AI development (clearer returns, stronger competitive incentives) produces this asymmetry. OpenAI Five's training consumed cloud compute budgets ranging from \$5 to \$100 million USD, illustrating the capital-intensive arms race dynamic.[^rc-c3f3] Dario Amodei ultimately left OpenAI at the close of this period specifically over disagreements about whether safety measures beyond scaling were necessary.[^rc-bc4e]
 
 **4. Prosaic AI Poses Real Safety Challenges**
 
-The reward hacking, distributional shift, and bias problems encountered in this period did not require exotic architectures or near-AGI capabilities. The COMPAS algorithm — used in real criminal sentencing — falsely flagged Black defendants as future criminals at nearly twice the rate of white defendants, despite equal overall accuracy rates.[^53] Buolamwini and Gebru's Gender Shades study similarly found significant intersectional accuracy disparities in commercial facial recognition systems.[^55] These failures emerged from scaled versions of then-standard systems, not hypothetical future architectures. What remains contested is the degree to which such failures are fixable within current paradigms versus structural features of how these systems learn from historically biased data.[^56]
+The reward hacking, distributional shift, and bias problems encountered in this period did not require exotic architectures or near-AGI capabilities. The COMPAS algorithm — used in real criminal sentencing — falsely flagged Black defendants as future criminals at nearly twice the rate of white defendants, despite equal overall accuracy rates.[^rc-48e8] Buolamwini and Gebru's Gender Shades study similarly found significant intersectional accuracy disparities in commercial facial recognition systems.[^rc-b349] These failures emerged from scaled versions of then-standard systems, not hypothetical future architectures. What remains contested is the degree to which such failures are fixable within current paradigms versus structural features of how these systems learn from historically biased data.[^rc-c238]
 
 **5. Release Norms Are Contested and Consequential**
 
-The GPT-2 episode did not resolve questions about when models should be released, to whom, and under what conditions. These questions became more consequential as models grew more capable. The Stochastic Parrots paper argued that large language models encode existing societal biases from web-scraped training data and called for research that centers adversely affected communities before deployment proceeds.[^2]
+The GPT-2 episode did not resolve questions about when models should be released, to whom, and under what conditions. These questions became more consequential as models grew more capable. The Stochastic Parrots paper argued that large language models encode existing societal biases from web-scraped training data and called for research that centers adversely affected communities before deployment proceeds.[^rc-05c8]
 
 **6. Organizational Incentives Are Hard to Sustain**
 
-OpenAI's structural shift from non-profit to capped-profit illustrates that safety-oriented founding missions are subject to competitive pressures. Sustaining safety-focused governance requires more than founding intent. The departure of Amodei and colleagues to found Anthropic in 2021, explicitly over alignment prioritization disagreements, is a direct institutional legacy of tensions that developed during this era.[^54]
+OpenAI's structural shift from non-profit to capped-profit illustrates that safety-oriented founding missions are subject to competitive pressures. Sustaining safety-focused governance requires more than founding intent. The departure of Amodei and colleagues to found Anthropic in 2021, explicitly over alignment prioritization disagreements, is a direct institutional legacy of tensions that developed during this era.[^rc-bc4e]
 
 ## Looking Forward to the Mainstream Era
 
@@ -848,52 +840,3 @@ By 2020, the foundational conditions for AI safety to become a mainstream concer
 What was absent: A consumer-facing application that would bring AI into broad daily use and make capability questions immediate for non-specialist audiences.
 
 That development arrived in 2022, initiating what is documented in the <EntityLink id="E195">Mainstream Era</EntityLink>.
-
-[^1]: A Golden Decade of Deep Learning (https://www.amacad.org/publication/daedalus/golden-decade-deep-learning-computing-systems-applications)
-[^2]: BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (https://arxiv.org/abs/1810.04805)
-[^3]: A Timeline of Anthropic and OpenAI's Budding Rivalry (https://embed.businessinsider.com/sam-altman-dario-amodei-anthropic-openai-rivalry-timeline-2026-2)
-[^4]: A Timeline of Deep Learning | Flagship Pioneering (https://www.flagshippioneering.com/timelines/a-timeline-of-deep-learning)
-[^5]: Takeaways from OpenAI Five (2019) | Medium (https://medium.com/data-science/takeaways-from-openai-five-2019-f90a612fe5d)
-[^6]: Visualizing the deep learning revolution | Medium (https://medium.com/@richardcngo/visualizing-the-deep-learning-revolution-722098eb9c5)
-[^7]: The Computational Limits of Deep Learning (https://arxiv.org/abs/2007.05558)
-[^8]: Krizhevsky, A., Sutskever, I., & Hinton, G. E. (2012). ImageNet Classification with Deep Convolutional Neural Networks. *Advances in Neural Information Processing Systems*, 25. [https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf](https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf)
-[^9]: Legg, S. (2011). Interview with Danila Medvedev. Cited in Legg, S. personal website and subsequent press coverage. The precise publication venue of the original interview is disputed; the quote is attributed in multiple secondary sources including the *Financial Times* and [80,000 Hours](https://80000hours.org/2016/02/what-are-the-biggest-risks-from-advanced-ai/).
-[^10]: See, e.g., Ord, T. (2020). *The Precipice*. Bloomsbury. Chapter 5. Also: Russell, S. (2019). *Human Compatible*. Viking. Chapter 5, discussing the "racing to the top" framing.
-[^11]: Mnih, V., et al. (2015). Human-level control through deep reinforcement learning. *Nature*, 518, 529–533. [https://www.nature.com/articles/nature14236](https://www.nature.com/articles/nature14236)
-[^20]: OpenAI. (2024). OpenAI and Elon Musk. [https://openai.com/index/openai-elon-musk/](https://openai.com/index/openai-elon-musk/). This is a self-reported figure published in the context of litigation between OpenAI and Musk; it has not been independently audited.
-[^21]: Trusting artificial intelligence in cybersecurity is a double-edged sword (https://www.nature.com/articles/s42256-019-0109-1)
-[^22]: Vaswani, A., et al. (2017). Attention Is All You Need. *Advances in Neural Information Processing Systems*, 30. [https://arxiv.org/abs/1706.03762](https://arxiv.org/abs/1706.03762)
-[^23]: Brown, T., et al. (2020). Language Models are Few-Shot Learners. *Advances in Neural Information Processing Systems*, 33. [https://arxiv.org/abs/2005.14165](https://arxiv.org/abs/2005.14165)
-[^24]: Kaplan, J., et al. (2020). Scaling Laws for Neural Language Models. arXiv:2001.08361. [https://arxiv.org/abs/2001.08361](https://arxiv.org/abs/2001.08361)
-[^25]: Chris Olah et al., feature visualization and interpretability research (OpenAI)
-[^26]: Goodfellow et al., adversarial examples research (2014)
-[^27]: International Scientific Report on the Safety of Advanced AI (Interim Report) (https://arxiv.org/abs/2412.05282)
-[^28]: Dario Amodei leaves OpenAI — LessWrong (https://www.lesswrong.com/posts/7r8KjgqeHaYDzJvzF/dario-amodei-leaves-openai)
-[^29]: A Timeline of Anthropic and OpenAI's Budding Rivalry, *Business Insider* (https://www.businessinsider.com/sam-altman-dario-amodei-anthropic-openai-rivalry-timeline-2026-2)
-[^30]: Unleashing the Power of BERT: How the Transformer Model Revolutionized NLP (https://arize.com/blog-course/unleashing-bert-transformer-model-nlp)
-[^31]: BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding — ACL Anthology (https://aclanthology.org/N19-1423)
-[^32]: The Complete Guide to BERT Language Architecture & Model Variations (https://www.deepset.ai/blog/the-definitive-guide-to-bertmodels)
-[^33]: The Illustrated BERT, ELMo, and co. (https://jalammar.github.io/illustrated-bert)
-[^34]: [1707.06347] Proximal Policy Optimization Algorithms (https://arxiv.org/abs/1707.06347)
-[^35]: Proximal Policy Optimization Algorithms - ADS (https://ui.adsabs.harvard.edu/abs/2017arXiv170706347S/abstract)
-[^36]: OpenAI Five | OpenAI (https://openai.com/research/openai-five)
-[^37]: Long-Term Planning and Situational Awareness in OpenAI Five - ADS (https://ui.adsabs.harvard.edu/abs/2019arXiv191206721R/abstract)
-[^38]: [1912.06680] Dota 2 with Large Scale Deep Reinforcement Learning (https://arxiv.org/abs/1912.06680)
-[^39]: [2205.10330] A Review of Safe Reinforcement Learning: Methods, Theory and Applications (https://arxiv.org/abs/2205.10330)
-[^40]: Machine Bias — ProPublica (https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing)
-[^41]: Buolamwini, J. & Gebru, T. (2018). Gender Shades: Intersectional Accuracy Disparities in Commercial Gender Classification. *Proceedings of Machine Learning Research*, 81, 1–15. [http://proceedings.mlr.press/v81/buolamwini18a.html](http://proceedings.mlr.press/v81/buolamwini18a.html)
-[^42]: GDPR Article 22 and AI transparency requirements
-[^43]: EU High-Level Expert Group on AI, Ethics Guidelines for Trustworthy AI (2019)
-[^44]: EU White Paper on Artificial Intelligence (February 2020)
-[^45]: The most comprehensive public compilation of AI safety funding is maintained by [80,000 Hours](https://80000hours.org/topic/prioritization/cause-prioritization/ai-safety/) and in annual reports by Open Philanthropy. Figures for pre-2018 years are particularly uncertain. See also: Larson, E. J. (2021). *The Myth of Artificial Intelligence*. Harvard University Press, Appendix.
-[^46]: Reframe the U.S.-China AI Arms Race – Georgetown Security Studies Review (https://georgetownsecuritystudiesreview.org/2019/02/10/reframe-the-u-s-china-ai-arms-race)
-[^47]: Understanding China's AI Strategy | CNAS (https://www.cnas.org/publications/reports/understanding-chinas-ai-strategy)
-[^48]: Stakes Rising In The US-China AI Race | Global Finance Magazine (https://gfmag.com/economics-policy-regulation/us-china-competition-generative-ai)
-[^49]: The Real AI Race: America Needs More Than Innovation to Compete With China (https://www.foreignaffairs.com/united-states/china-real-artificial-intelligence-race-innovation)
-[^50]: OpenAI, CoastRunners reward hacking demonstration
-[^51]: OpenAI Five / Hubinger et al. mesa-optimization paper
-[^52]: Stochastic Parrots / COMPAS bias research; Anthropic founding context
-[^53]: How We Analyzed the COMPAS Recidivism Algorithm — ProPublica (https://www.propublica.org/article/how-we-analyzed-the-compas-recidivism-algorithm)
-[^54]: Anthropic CEO warns AI leaders should not be in charge of AI's future (https://www.aol.com/articles/m-deeply-uncomfortable-anthropic-ceo-172940528.html)
-[^55]: Gender Shades: Intersectional Accuracy Disparities in Commercial Gender Classification (https://researchr.org/publication/BuolamwiniG18)
-[^56]: Bias in AI systems: integrating formal and socio-technical approaches (https://pmc.ncbi.nlm.nih.gov/articles/PMC12823528)

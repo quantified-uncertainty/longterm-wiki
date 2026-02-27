@@ -27,17 +27,14 @@ import { DataInfoBox } from "@/components/wiki/DataInfoBox";
 import { ContentConfidenceBanner } from "@/components/wiki/ContentConfidenceBanner";
 import { TableOfContents } from "@/components/wiki/TableOfContents";
 import { CitationOverlay } from "@/components/wiki/CitationOverlay";
-import { InlineCitationCards } from "@/components/wiki/InlineCitationCards";
 import { CitationHealthBanner } from "@/components/wiki/CitationHealthBanner";
 import { CitationQuotesProvider } from "@/components/wiki/CitationQuotesContext";
 import { ReferenceProvider } from "@/components/wiki/ReferenceContext";
 import type { RefMapEntry } from "@/components/wiki/ReferenceContext";
 import type { RefMapEntry as PreprocessorRefMapEntry } from "@/lib/reference-preprocessor";
 import { References } from "@/components/wiki/References";
-import { UnifiedReferences } from "@/components/wiki/UnifiedReferences";
 import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 import type { CitationQuote } from "@/lib/citation-data";
-import { getFootnoteIndex } from "@data";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
@@ -92,23 +89,6 @@ function buildReferenceMap(
         checkedAt: q.accuracyCheckedAt,
         resourceId: q.resourceId,
       });
-    }
-  }
-
-  // Fill gaps from footnote index (basic citation data for footnotes without quotes)
-  const fnIndex = getFootnoteIndex(slug);
-  if (fnIndex) {
-    for (const [numStr, fn] of Object.entries(fnIndex.footnotes)) {
-      const num = parseInt(numStr, 10);
-      if (!map.has(num)) {
-        map.set(num, {
-          type: "citation",
-          title: fn.title ?? null,
-          url: fn.url ?? null,
-          domain: fn.url ? new URL(fn.url).hostname.replace(/^www\./, "") : null,
-          resourceId: fn.resourceId ?? null,
-        });
-      }
     }
   }
 
@@ -413,28 +393,12 @@ async function ContentView({
           {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
           {showToc && <TableOfContents headings={tocHeadings} />}
           {page.content}
-          {/* Unified bibliography: merges footnote data, resource metadata, and verification */}
-          {!isInternal && (() => {
-            const fnIndex = getFootnoteIndex(slug);
-            const hasUnifiedData = fnIndex && fnIndex.sources.length > 0;
-            return hasUnifiedData
-              ? <UnifiedReferences pageId={slug} />
-              : <References pageId={slug} />;
-          })()}
+          {!isInternal && <References pageId={slug} />}
         </article>
         </ReferenceProvider>
-        {/* Citation verification overlay — decorates footnote refs with status indicators */}
-        {citationQuotes && citationQuotes.length > 0 && (() => {
-          const fnIndex = getFootnoteIndex(slug);
-          const hasUnifiedData = fnIndex && fnIndex.sources.length > 0;
-          return hasUnifiedData
-            ? <InlineCitationCards
-                quotes={citationQuotes}
-                footnotes={fnIndex.footnotes}
-                sources={fnIndex.sources}
-              />
-            : <CitationOverlay quotes={citationQuotes} />;
-        })()}
+        {citationQuotes && citationQuotes.length > 0 && (
+          <CitationOverlay quotes={citationQuotes} />
+        )}
       </CitationQuotesProvider>
       {/* Related pages rendered outside prose to avoid inherited link styles */}
       {isArticle && !isInternal && <RelatedPages entityId={slug} entity={entity} />}

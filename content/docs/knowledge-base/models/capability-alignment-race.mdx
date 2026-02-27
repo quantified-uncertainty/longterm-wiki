@@ -402,7 +402,7 @@ The model tracks how frontier compute (currently 10²⁶ FLOP for largest traini
 
 ## Risk Assessment
 
-The following table synthesizes key risk factors shaping the capability-alignment race. Estimates reflect the interaction of several dynamics: the pace at which training compute is scaling (roughly 4–5× per year)[^1], the brittleness of current safety mitigations[^2], and strategic competitive pressures that incentivize deployment before risks are minimized.[^3] These factors compound: faster scaling shortens the window for alignment work, while competitive dynamics reduce willingness to pause.[^4] Probability estimates are illustrative rather than actuarial, intended to convey relative plausibility.
+The following table synthesizes key risk factors shaping the capability-alignment race. Estimates reflect the interaction of several dynamics: the pace at which training compute is scaling (roughly 4–5× per year)[^rc-f5e8], the brittleness of current safety mitigations[^rc-51a7], and strategic competitive pressures that incentivize deployment before risks are minimized.[^rc-c2fa] These factors compound: faster scaling shortens the window for alignment work, while competitive dynamics reduce willingness to pause.[^rc-72b1] Probability estimates are illustrative rather than actuarial, intended to convey relative plausibility.
 
 | Factor | Severity | Likelihood | Timeline | Trend |
 |--------|----------|------------|----------|-------|
@@ -447,7 +447,7 @@ Quote from <R id="ebb2f8283d5a6014"><EntityLink id="paul-christiano">Paul Christ
 
 ### 2025 Snapshot
 
-The race is in a critical phase with capabilities accelerating faster than alignment solutions. Training compute for frontier models has grown at approximately 4–5x per year since 2010, a pace that outstrips nearly every comparable technology adoption curve in history.[^1] AI performance on demanding benchmarks such as GPQA and SWE-bench improved by roughly 49 and 67 percentage points respectively between 2023 and 2024 alone.[^5] Meanwhile, <EntityLink id="E201" name="metr">METR</EntityLink> has noted that the gap between AI capabilities and safety mitigations is growing fast across multiple risk categories, and current control methods do not reliably scale past certain capability levels without further scientific progress.[^2]
+The race is in a critical phase with capabilities accelerating faster than alignment solutions. Training compute for frontier models has grown at approximately 4–5x per year since 2010, a pace that outstrips nearly every comparable technology adoption curve in history.[^rc-f5e8] AI performance on demanding benchmarks such as GPQA and SWE-bench improved by roughly 49 and 67 percentage points respectively between 2023 and 2024 alone.[^rc-3714] Meanwhile, <EntityLink id="E201" name="metr">METR</EntityLink> has noted that the gap between AI capabilities and safety mitigations is growing fast across multiple risk categories, and current control methods do not reliably scale past certain capability levels without further scientific progress.[^rc-51a7]
 
 Key dimensions of the current situation:
 
@@ -456,7 +456,7 @@ Key dimensions of the current situation:
 - **Governance systems** lagging significantly behind technical progress
 - **Economic incentives** strongly favor rapid deployment over safety
 
-Self-replication evaluation success rates among frontier systems increased from 5% in 2023 to 60% in 2025, illustrating how rapidly dangerous capability thresholds are being crossed.[^6]
+Self-replication evaluation success rates among frontier systems increased from 5% in 2023 to 60% in 2025, illustrating how rapidly dangerous capability thresholds are being crossed.[^rc-131a]
 
 ### 5-Year Projections
 
@@ -469,20 +469,20 @@ Self-replication evaluation success rates among frontier systems increased from 
 
 Based on <R id="8fef0d8c902de618"><EntityLink id="metaculus">Metaculus</EntityLink> forecasts</R> and expert surveys from <R id="38eba87d0a888e2e"><EntityLink id="ai-impacts">AI Impacts</EntityLink></R>.
 
-These projections rest on several key assumptions. First, they assume compute scaling continues at roughly its current rate; Epoch AI projects that training runs will hit a practical 9-month economic ceiling around 2027, after which compute growth must come from hardware scaling or distributed clusters.[^7] Second, they assume algorithmic efficiency gains continue—compute required to reach a given capability level is declining roughly 3x annually—which means effective capability could grow far faster than raw compute figures suggest.[^8] Third, they assume no sudden international coordination. By late 2020s or early 2030s, effective compute accessible to leading labs could reach roughly one million times GPT-4's training compute when algorithmic progress is factored in.[^9] Any of these assumptions shifting substantially would alter the trajectory.
+These projections rest on several key assumptions. First, they assume compute scaling continues at roughly its current rate; Epoch AI projects that training runs will hit a practical 9-month economic ceiling around 2027, after which compute growth must come from hardware scaling or distributed clusters.[^rc-d3cf] Second, they assume algorithmic efficiency gains continue—compute required to reach a given capability level is declining roughly 3x annually—which means effective capability could grow far faster than raw compute figures suggest.[^rc-098c] Third, they assume no sudden international coordination. By late 2020s or early 2030s, effective compute accessible to leading labs could reach roughly one million times GPT-4's training compute when algorithmic progress is factored in.[^rc-d9e6] Any of these assumptions shifting substantially would alter the trajectory.
 
-Open-weight models complicate the picture further: they lag state-of-the-art by only approximately three months on average, meaning safeguards on hosted systems cannot be assumed to contain capability diffusion.[^10]
+Open-weight models complicate the picture further: they lag state-of-the-art by only approximately three months on average, meaning safeguards on hosted systems cannot be assumed to contain capability diffusion.[^rc-8ca0]
 ### Potential Turning Points
 
 Critical junctures that could alter trajectories:
 
-- **Major alignment breakthrough** (20% chance by 2027): Interpretability or oversight advance that halves the gap. The Alignment Project's £27 million international fund, supported by governments, industry, and philanthropy, is specifically targeting interpretability and oversight mechanisms.[^11] Progress here could compress the gap meaningfully, but Anthropic notes that no one currently knows how to train very powerful AI systems to be robustly helpful and harmless.[^4]
+- **Major alignment breakthrough** (20% chance by 2027): Interpretability or oversight advance that halves the gap. The Alignment Project's £27 million international fund, supported by governments, industry, and philanthropy, is specifically targeting interpretability and oversight mechanisms.[^rc-a877] Progress here could compress the gap meaningfully, but Anthropic notes that no one currently knows how to train very powerful AI systems to be robustly helpful and harmless.[^rc-72b1]
 
-- **Capability plateau** (15% chance): Scaling laws break down, slowing capability progress. Epoch AI identifies four plausible constraints—power availability, chip manufacturing capacity, data scarcity, and latency walls—any of which could arrest growth before 2030.[^12]
+- **Capability plateau** (15% chance): Scaling laws break down, slowing capability progress. Epoch AI identifies four plausible constraints—power availability, chip manufacturing capacity, data scarcity, and latency walls—any of which could arrest growth before 2030.[^rc-112f]
 
-- **Coordinated pause** (10% chance): International agreement to pause frontier development. <EntityLink id="E153" name="govai">GovAI</EntityLink> research on strategic dynamics finds that technology laggards willing to cut corners gamble for advantage when they are close in capability to leaders, making coordination fragile.[^3]
+- **Coordinated pause** (10% chance): International agreement to pause frontier development. <EntityLink id="E153" name="govai">GovAI</EntityLink> research on strategic dynamics finds that technology laggards willing to cut corners gamble for advantage when they are close in capability to leaders, making coordination fragile.[^rc-c2fa]
 
-- **Warning shot incident** (60% chance by 2027): Serious but recoverable AI accident that triggers policy response. Anthropic has noted that rapid AI progress may trigger competitive races leading corporations or nations to deploy untrustworthy AI systems with catastrophic results.[^4]
+- **Warning shot incident** (60% chance by 2027): Serious but recoverable AI accident that triggers policy response. Anthropic has noted that rapid AI progress may trigger competitive races leading corporations or nations to deploy untrustworthy AI systems with catastrophic results.[^rc-72b1]
 
 ## Key Uncertainties & Research Cruxes
 
@@ -491,20 +491,20 @@ Critical junctures that could alter trajectories:
 | Question | Current Evidence | Expert Consensus | Implications |
 |----------|------------------|------------------|------------|
 | Can interpretability scale to frontier models? | Limited success on smaller models | 45% optimistic | Determines alignment feasibility |
-| Will scaling laws continue? | Training compute grows ≈4–5× per year[^1] | 70% continue to 2027 | Core driver of capability timeline |
-| How much alignment tax is acceptable? | Safety-focused firms spend 30–40% of dev cycles on alignment[^13] | Target &lt;5% overhead | Adoption vs. safety tradeoff |
+| Will scaling laws continue? | Training compute grows ≈4–5× per year[^rc-f5e8] | 70% continue to 2027 | Core driver of capability timeline |
+| How much alignment tax is acceptable? | Safety-focused firms spend 30–40% of dev cycles on alignment[^rc-db47] | Target &lt;5% overhead | Adoption vs. safety tradeoff |
 
-Current AI control methods do not reliably scale past certain capability levels without further scientific progress.[^2] Empirical benchmarks reveal trade-offs between safety and utility, and no monotonic "bigger is safer" trend exists—high-parameter models remain vulnerable under certain attacks regardless of scale.[^9]
+Current AI control methods do not reliably scale past certain capability levels without further scientific progress.[^rc-51a7] Empirical benchmarks reveal trade-offs between safety and utility, and no monotonic "bigger is safer" trend exists—high-parameter models remain vulnerable under certain attacks regardless of scale.[^rc-d9e6]
 
 ### Governance Questions
 
-- **Regulatory capture**: Will AI labs co-opt government oversight? <R id="5cde1bae73096dd7">CNAS analysis</R> suggests 40% risk. Technology laggards willing to cut corners can gamble for advantage when highly adversarial and capability-close to leaders.[^12]
-- **International coordination**: Can major powers cooperate on AI safety? The gap between AI capabilities and mitigations is growing fast across multiple risk categories.[^10]
+- **Regulatory capture**: Will AI labs co-opt government oversight? <R id="5cde1bae73096dd7">CNAS analysis</R> suggests 40% risk. Technology laggards willing to cut corners can gamble for advantage when highly adversarial and capability-close to leaders.[^rc-112f]
+- **International coordination**: Can major powers cooperate on AI safety? The gap between AI capabilities and mitigations is growing fast across multiple risk categories.[^rc-8ca0]
 - **Democratic response**: Will public concern drive effective policy? Polling shows <R id="6b09f789e606b1d2">growing awareness</R> but uncertain translation to action.
 
 ### Strategic Cruxes
 
-Core disagreements among experts on alignment difficulty reflect genuinely different empirical predictions. If interpretability does scale, the technical optimist position strengthens considerably; if not, coordination or pause strategies become relatively more attractive. Resolution of the alignment-tax question directly affects competitive dynamics: alignment techniques that also improve capabilities—as <EntityLink id="E259" name="rlhf">RLHF</EntityLink> has done—reduce the race pressure the model predicts.[^14] Meanwhile, rapid benchmark improvements (GPQA up 48.9 percentage points between 2023 and 2024[^5]) suggest capability timelines may compress faster than any of the positions below assume.
+Core disagreements among experts on alignment difficulty reflect genuinely different empirical predictions. If interpretability does scale, the technical optimist position strengthens considerably; if not, coordination or pause strategies become relatively more attractive. Resolution of the alignment-tax question directly affects competitive dynamics: alignment techniques that also improve capabilities—as <EntityLink id="E259" name="rlhf">RLHF</EntityLink> has done—reduce the race pressure the model predicts.[^rc-551e] Meanwhile, rapid benchmark improvements (GPQA up 48.9 percentage points between 2023 and 2024[^rc-3714]) suggest capability timelines may compress faster than any of the positions below assume.
 
 1. **Technical optimism**: 35% believe alignment will prove tractable
 2. **Governance solution**: 25% think coordination/pause is the path forward
@@ -513,7 +513,7 @@ Core disagreements among experts on alignment difficulty reflect genuinely diffe
 
 ## Timeline of Critical Events
 
-The table below synthesizes projected milestones across capability development, alignment research, and governance. These projections carry substantial uncertainty: training compute for frontier models has grown approximately 4–5× per year[^1], and algorithmic efficiency improvements mean effective compute could reach roughly one million times GPT-4's training compute by the early 2030s.[^9] Benchmark performance in some domains has been doubling every eight months.[^6] Dates should be treated as rough central estimates rather than firm predictions. Metaculus community forecasts and expert surveys inform the structure of this timeline, though specific outcomes remain deeply contested.
+The table below synthesizes projected milestones across capability development, alignment research, and governance. These projections carry substantial uncertainty: training compute for frontier models has grown approximately 4–5× per year[^rc-f5e8], and algorithmic efficiency improvements mean effective compute could reach roughly one million times GPT-4's training compute by the early 2030s.[^rc-d9e6] Benchmark performance in some domains has been doubling every eight months.[^rc-131a] Dates should be treated as rough central estimates rather than firm predictions. Metaculus community forecasts and expert surveys inform the structure of this timeline, though specific outcomes remain deeply contested.
 | Period | Capability Milestones | Alignment Progress | Governance Developments |
 |--------|----------------------|-------------------|------------------------|
 | **2025** | GPT-5 level, 80% human tasks | Basic interpretability tools | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> implementation |
@@ -526,7 +526,7 @@ Based on <R id="8fef0d8c902de618">Metaculus community predictions</R> and <R id=
 
 ## Resource Requirements & Strategic Investments
 
-Understanding the scale of alignment investment requires context against total AI industry spending. U.S. private AI investment reached \$109.1 billion in 2024, nearly 12 times China's \$9.3 billion.[^5] Against this backdrop, dedicated alignment funding remains a small fraction of total spending. The UK AI Security Institute's Alignment Project had assembled over £27 million in total alignment research funding as of February 2026, with <EntityLink id="E218" name="openai">OpenAI</EntityLink> contributing £5.6 million of that total.[^9] Safety-focused companies like Anthropic and OpenAI report spending 30–40% of development cycles on alignment and safety features.[^1]
+Understanding the scale of alignment investment requires context against total AI industry spending. U.S. private AI investment reached \$109.1 billion in 2024, nearly 12 times China's \$9.3 billion.[^rc-3714] Against this backdrop, dedicated alignment funding remains a small fraction of total spending. The UK AI Security Institute's Alignment Project had assembled over £27 million in total alignment research funding as of February 2026, with <EntityLink id="E218" name="openai">OpenAI</EntityLink> contributing £5.6 million of that total.[^rc-d9e6] Safety-focused companies like Anthropic and OpenAI report spending 30–40% of development cycles on alignment and safety features.[^rc-f5e8]
 
 ### Priority Funding Areas
 
@@ -550,7 +550,7 @@ Leading efforts to address the capability-alignment gap:
 | <EntityLink id="miri">MIRI</EntityLink> | <EntityLink id="agent-foundations">Agent foundations</EntityLink> | \$15M | Theoretical foundations |
 | <EntityLink id="arc">ARC</EntityLink> | Alignment research | \$20M | Empirical alignment |
 
-For historical context, total AI safety spending was estimated at roughly \$9 million in 2017 and approximately \$40 million globally in 2019, with average annual funding increases of about \$13 million per year between 2014 and 2024.[^15] The Alignment Project's first funding round received over 800 applications from 466 institutions across 42 countries, signaling rapidly growing researcher interest relative to available funding.[^11]
+For historical context, total AI safety spending was estimated at roughly \$9 million in 2017 and approximately \$40 million globally in 2019, with average annual funding increases of about \$13 million per year between 2014 and 2024.[^rc-feca] The Alignment Project's first funding round received over 800 applications from 466 institutions across 42 countries, signaling rapidly growing researcher interest relative to available funding.[^rc-a877]
 
 ## Related Models & Cross-References
 
@@ -575,19 +575,3 @@ The model also informs key debates:
 | Scaling Laws | Compute-capability relationship | <R id="85f66a6419d173a7">Kaplan et al. (2020)</R> |
 | Alignment Tax Analysis | Safety overhead quantification | <R id="fe2a3307a3dae3e5">Kenton et al. (2021)</R> |
 | Governance Lag Study | Policy adaptation timelines | [D
-
-[^1]: Epoch AI, *Training compute of frontier AI models grows by 4-5x per year* (https://epoch.ai/blog/training-compute-of-frontier-ai-models-grows-by-4-5x-per-year)
-[^2]: AISI, *How we're addressing the gap between AI capabilities and mitigations* (https://aisi.gov.uk/blog/aisis-research-direction-for-technical-solutions)
-[^3]: GovAI, *Safety Not Guaranteed: International Strategic Dynamics of Risky Technology Races* (https://governance.ai/research-paper/safety-not-guaranteed-international-strategic-dynamics-of-risky-technology-races)
-[^4]: Anthropic, *Core Views on AI Safety* (https://anthropic.com/news/core-views-on-ai-safety)
-[^5]: Stanford HAI, "Artificial Intelligence Index Report 2025" (https://hai-production.s3.amazonaws.com/files/hai_ai_index_report_2025.pdf)
-[^6]: AISI, "Frontier AI Trends Report" (https://aisi.gov.uk/frontier-ai-trends-report)
-[^7]: Epoch AI, "Frontier LLM training runs can't get much longer" (https://epoch.ai/data-insights/longest-training-run)
-[^8]: arXiv, "Compute Requirements for Algorithmic Innovation in Frontier AI Models" (https://arxiv.org/pdf/2507.10618)
-[^9]: CNAS, "Future-Proofing Frontier AI Regulation" (https://cnas.org/publications/reports/future-proofing-frontier-ai-regulation)
-[^10]: Epoch AI Brief, October 2025 (https://epochai.substack.com/p/the-epoch-ai-brief-october-2025)
-[^11]: AISI, "Funding 60 projects to advance AI alignment research" (https://aisi.gov.uk/blog/funding-60-projects-to-advance-ai-alignment-research)
-[^12]: Epoch AI, "Can AI scaling continue through 2030?" (https://epoch.ai/blog/can-ai-scaling-continue-through-2030)
-[^13]: *The AI Alignment Tax* (https://getmonetizely.com/articles/the-ai-alignment-tax-understanding-the-cost-of-safety-in-ai-capability-development)
-[^14]: LessWrong, *Alignment can be the 'clean energy' of AI* (https://lesswrong.com/posts/irxuoCTKdufEdskSk/alignment-can-be-the-clean-energy-of-ai)
-[^15]: LessWrong, *An Overview of the AI Safety Funding Situation* (https://lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation)

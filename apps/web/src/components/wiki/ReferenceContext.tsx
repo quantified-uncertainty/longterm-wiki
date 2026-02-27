@@ -11,7 +11,7 @@ import type { AccuracyVerdict } from "@wiki-server/api-types";
  * the wiki-server's citation_quotes table (via CitationQuote data).
  *
  * When `type` is "citation", only the basic citation fields are populated
- * from the build-time footnoteIndex data.
+ * from the DB-driven reference data.
  */
 export interface RefMapEntry {
   type: "claim" | "citation";
@@ -62,9 +62,9 @@ const ReferenceContext = createContext<ReferenceContextValue>({
  * ReferenceProvider -- wraps MDX content with a map from footnote numbers
  * to rich reference data (claim verification + source metadata).
  *
- * The map is built in the wiki page server component by merging:
+ * The map is built in the wiki page server component from:
  * 1. Citation quotes from the wiki-server (claim verification data)
- * 2. Footnote index from the build-time data pipeline (source metadata)
+ * 2. DB-driven reference data (preprocessor map)
  *
  * Client components (FootnoteTooltip) consume this via useReferenceData().
  */

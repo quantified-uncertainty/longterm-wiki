@@ -76,7 +76,7 @@ AI excels at identifying patterns across datasets too large for human analysis:
 
 ### Inference from Public Data
 
-A 2023 study by Staab et al. at ETH Zurich demonstrated that GPT-4 could correctly infer personal attributes — location, income, age, political views — from Reddit posts with up to 85% accuracy, even when users believed they were posting anonymously.[^1] The cost of this inference was approximately \$0.15 per profile. Earlier research by Kosinski et al. (2013) showed Facebook "Likes" could predict personality, political views, sexual orientation, and other sensitive attributes with high accuracy.[^2] Research by de Montjoye et al. (2013) demonstrated that just four spatiotemporal data points uniquely identify 95% of individuals in a 1.5 million person mobility dataset.[^3]
+A 2023 study by Staab et al. at ETH Zurich demonstrated that GPT-4 could correctly infer personal attributes — location, income, age, political views — from Reddit posts with up to 85% accuracy, even when users believed they were posting anonymously.[^rc-222d] The cost of this inference was approximately \$0.15 per profile. Earlier research by Kosinski et al. (2013) showed Facebook "Likes" could predict personality, political views, sexual orientation, and other sensitive attributes with high accuracy.[^rc-7987] Research by de Montjoye et al. (2013) demonstrated that just four spatiotemporal data points uniquely identify 95% of individuals in a 1.5 million person mobility dataset.[^rc-abcb]
 
 The Staab et al. study is notable for its methodological care: the researchers tested GPT-4 against ground-truth data and found that inference accuracy substantially exceeded random baselines across all attribute categories tested. The \$0.15 per-profile cost estimate reflects 2023 API pricing and will likely decrease further as model costs decline.
 
@@ -92,7 +92,7 @@ The practical implication is a shift from AI as a tool that assists human invest
 
 The open-source intelligence community has demonstrated the power of public-information investigation:
 
-- **Bellingcat** identified the suspects in the MH17 shootdown (2014) and the Skripal poisoning (2018) using primarily open-source data — passport databases, travel records, phone metadata, and social media[^4]
+- **Bellingcat** identified the suspects in the MH17 shootdown (2014) and the Skripal poisoning (2018) using primarily open-source data — passport databases, travel records, phone metadata, and social media[^rc-cc12]
 - OSINT analysts tracked Russian military movements in Ukraine using satellite imagery and social media geolocation
 - The OSINT community demonstrated that public information alone can identify intelligence operatives, track weapons systems, and document war crimes
 
@@ -169,7 +169,7 @@ Current governance frameworks are poorly equipped to address AI investigation ca
 - **EU GDPR** provides some protection through data minimization and purpose limitation, but struggles with the "mosaic effect" — combining individually non-personal public data points into identifying profiles. The GDPR's "legitimate interest" basis for processing creates significant ambiguity for journalism and research use cases.
 - **The <EntityLink id="E127" name="eu-ai-act">EU AI Act</EntityLink>** (2024) classifies some biometric surveillance as prohibited or high-risk, but does not directly address text-based inference or public-data aggregation. The Act's focus on specific application categories leaves much AI investigation activity unregulated.
 - **US** lacks comprehensive federal privacy legislation; the "public information" doctrine means data that is technically public is generally unprotected regardless of how it is combined or analyzed. State-level laws (California's CCPA, for example) provide partial coverage but are inconsistent and contain significant exceptions for journalism.
-- **Data broker industry** (estimated at \$250B+ market globally) operates largely without sector-specific regulation in most jurisdictions, providing substantial raw material for AI investigation. The lack of data broker regulation is widely noted as a gap in privacy frameworks.[^5]
+- **Data broker industry** (estimated at \$250B+ market globally) operates largely without sector-specific regulation in most jurisdictions, providing substantial raw material for AI investigation. The lack of data broker regulation is widely noted as a gap in privacy frameworks.[^rc-2afc]
 - The **"mosaic theory"** of intelligence — individually harmless data points becoming revealing when combined — has no clear legal framework in most jurisdictions. Courts have addressed mosaic concerns in Fourth Amendment contexts (Carpenter v. United States, 2018), but these protections apply to government action and do not constrain private AI investigation.
 
 ### Regulatory Gaps by Jurisdiction
@@ -204,9 +204,3 @@ The following questions remain substantively unresolved in the research literatu
 - **False positive rates at scale**: As AI investigation moves toward population-scale screening rather than targeted investigation, false positive rates that are acceptable in targeted contexts may generate large absolute numbers of incorrect attributions, with significant potential for harm to misidentified individuals.
 
 ## Sources
-
-[^1]: Staab, Robin, et al. "Beyond Memorization: Violating Privacy Via Inference with Large Language Models." ETH Zurich, 2023. [https://arxiv.org/abs/2310.07298](https://arxiv.org/abs/2310.07298)
-[^2]: Kosinski, Michal, David Stillwell, and Thore Graepel. "Private traits and attributes are predictable from digital records of human behavior." *Proceedings of the National Academy of Sciences* 110, no. 15 (2013): 5802–5805. [https://doi.org/10.1073/pnas.1218772110](https://doi.org/10.1073/pnas.1218772110)
-[^3]: de Montjoye, Yves-Alexandre, et al. "Unique in the Crowd: The privacy bounds of human mobility." *Nature Scientific Reports* 3 (2013): 1376. [https://doi.org/10.1038/srep01376](https://doi.org/10.1038/srep01376)
-[^4]: Bellingcat Investigation Team. Investigations into MH17 (2014–2019) and the Skripal poisoning (2018). [https://www.bellingcat.com/](https://www.bellingcat.com/)
-[^5]: Federal Trade Commission. "Data Brokers: A Call for Transparency and Accountability." FTC Report, May 2014. [https://www.ftc.gov/reports/data-brokers-call-transparency-accountability-report-federal-trade-commission-may-2014](https://www.ftc.gov/reports/data-brokers-call-transparency-accountability-report-federal-trade-commission-may-2014)

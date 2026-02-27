@@ -11,12 +11,10 @@ import {
   getBacklinksFor,
   getFactsForEntityWithFallback,
   getExternalLinks,
-  getFootnoteIndex,
   getResourceById,
   getResourceCredibility,
   getEntityHref,
 } from "@/data";
-import type { FootnoteIndexEntry } from "@/data";
 import { fetchFromWikiServer } from "@lib/wiki-server";
 import type { ClaimRow, GetClaimsResult } from "@wiki-server/api-response-types";
 
@@ -159,27 +157,9 @@ function parseFootnoteNums(unit: string | null): number[] {
   return unit.split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
 }
 
-/** Render a citation badge that links to the source page or URL */
-function CitationBadge({ num, fnIndex }: { num: number; fnIndex?: FootnoteIndexEntry }) {
-  const entry = fnIndex?.footnotes[num];
-  const href = entry?.resourceId
-    ? `/source/${entry.resourceId}`
-    : entry?.url ?? null;
+/** Render a citation badge */
+function CitationBadge({ num }: { num: number }) {
   const label = `[^${num}]`;
-
-  if (href) {
-    return (
-      <a
-        href={href}
-        target={entry?.resourceId ? undefined : "_blank"}
-        rel={entry?.resourceId ? undefined : "noopener noreferrer"}
-        className="inline-block font-mono text-blue-600 hover:underline mr-1"
-        title={entry?.title ?? href}
-      >
-        {label}
-      </a>
-    );
-  }
   return <span className="inline-block font-mono text-gray-500 mr-1">{label}</span>;
 }
 
@@ -197,9 +177,6 @@ function CredDots({ level }: { level: number }) {
   );
 }
 
-type RefEntry = { title: string | null; url: string | null; resourceId?: string; domain?: string };
-type SourceEntry = RefEntry & { footnoteNum: number; credibility?: number; claimCount: number };
-
 /** Get the section name for a claim */
 function getClaimSection(claim: ClaimRow): string {
   return claim.section ?? "Unknown";
@@ -210,8 +187,8 @@ function getClaimFootnoteRefs(claim: ClaimRow): string | null {
   return claim.footnoteRefs ?? null;
 }
 
-/** Build shared data structures from claims + footnote index */
-function buildClaimsData(claims: ClaimRow[], fnIndex?: FootnoteIndexEntry) {
+/** Build shared data structures from claims */
+function buildClaimsData(claims: ClaimRow[]) {
   const byConfidence: Record<string, number> = {};
   for (const c of claims) {
     const key = c.claimVerdict ?? c.confidence ?? "unverified";
@@ -226,48 +203,16 @@ function buildClaimsData(claims: ClaimRow[], fnIndex?: FootnoteIndexEntry) {
 
   const sections = [...new Set(claims.map(c => getClaimSection(c)))];
 
-  const refMap = new Map<number, RefEntry>();
-  if (fnIndex) {
-    for (const [numStr, entry] of Object.entries(fnIndex.footnotes)) {
-      refMap.set(parseInt(numStr, 10), {
-        title: entry.title,
-        url: entry.url,
-        resourceId: entry.resourceId,
-        domain: entry.url ? (() => { try { return new URL(entry.url!).hostname.replace(/^www\./, ""); } catch { return undefined; } })() : undefined,
-      });
-    }
-  }
-
-  const allFootnoteNums = new Set<number>();
-  for (const claim of claims) {
-    for (const n of parseFootnoteNums(getClaimFootnoteRefs(claim))) allFootnoteNums.add(n);
-  }
-
-  const seenUrls = new Set<string>();
-  const uniqueSources: SourceEntry[] = [];
-  for (const n of allFootnoteNums) {
-    const entry = refMap.get(n);
-    if (!entry) continue;
-    const key = entry.url ?? `footnote-${n}`;
-    if (seenUrls.has(key)) continue;
-    seenUrls.add(key);
-    const resource = entry.resourceId ? getResourceById(entry.resourceId) : undefined;
-    const credibility = resource ? getResourceCredibility(resource) : undefined;
-    const claimCount = claims.filter(c => parseFootnoteNums(getClaimFootnoteRefs(c)).includes(n)).length;
-    uniqueSources.push({ footnoteNum: n, ...entry, credibility, claimCount });
-  }
-  uniqueSources.sort((a, b) => b.claimCount - a.claimCount);
-
   // Count multi-entity claims
   const multiEntityCount = claims.filter(c =>
     c.relatedEntities && c.relatedEntities.length > 0
   ).length;
 
-  return { byConfidence, byCategory, sections, refMap, uniqueSources, multiEntityCount };
+  return { byConfidence, byCategory, sections, multiEntityCount };
 }
 
-function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: FootnoteIndexEntry }) {
-  const { byConfidence, byCategory, sections, refMap, multiEntityCount } = buildClaimsData(claims, fnIndex);
+function ClaimsTable({ claims }: { claims: ClaimRow[] }) {
+  const { byConfidence, byCategory, sections, multiEntityCount } = buildClaimsData(claims);
 
   return (
     <div>
@@ -338,7 +283,6 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
         <tbody>
           {claims.map((claim) => {
             const footnoteNums = parseFootnoteNums(getClaimFootnoteRefs(claim));
-            const firstRef = footnoteNums.length > 0 ? refMap.get(footnoteNums[0]) : null;
             const sectionName = getClaimSection(claim);
             return (
               <tr key={claim.id} className="border-b hover:bg-gray-50 align-top">
@@ -397,22 +341,12 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
                 <td className="p-2 max-w-[120px]">
                   <RelatedEntityBadges entities={claim.relatedEntities} />
                   {(!claim.relatedEntities || claim.relatedEntities.length === 0) && (
-                    firstRef ? (
-                      firstRef.resourceId ? (
-                        <Link href={`/source/${firstRef.resourceId}`} className="text-blue-600 hover:underline truncate block text-[10px]" title={firstRef.title ?? ""}>
-                          {firstRef.domain ?? firstRef.title?.slice(0, 20) ?? "—"}
-                        </Link>
-                      ) : firstRef.url ? (
-                        <a href={firstRef.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate block text-[10px]" title={firstRef.title ?? ""}>
-                          {firstRef.domain ?? "link"}
-                        </a>
-                      ) : <span className="text-gray-400 text-[10px]">—</span>
-                    ) : <span className="text-gray-400 text-[10px]">—</span>
+                    <span className="text-gray-400 text-[10px]">—</span>
                   )}
                 </td>
                 <td className="p-2 whitespace-nowrap">
                   {footnoteNums.length > 0
-                    ? footnoteNums.slice(0, 3).map(n => <CitationBadge key={n} num={n} fnIndex={fnIndex} />)
+                    ? footnoteNums.slice(0, 3).map(n => <CitationBadge key={n} num={n} />)
                     : "—"}
                   {footnoteNums.length > 3 && (
                     <span className="text-gray-400 text-[10px]">+{footnoteNums.length - 3}</span>
@@ -427,8 +361,22 @@ function ClaimsTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Footno
   );
 }
 
-function ReferencesTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: FootnoteIndexEntry }) {
-  const { uniqueSources } = buildClaimsData(claims, fnIndex);
+function ReferencesTable({ claims }: { claims: ClaimRow[] }) {
+  // Build unique sources from claim source data
+  const seenUrls = new Set<string>();
+  const uniqueSources: { url: string | null; title: string | null; resourceId?: string; domain?: string; claimCount: number; credibility?: number }[] = [];
+  for (const claim of claims) {
+    if (!claim.sources) continue;
+    for (const s of claim.sources) {
+      const key = s.url ?? s.resourceId ?? `claim-${claim.id}`;
+      if (seenUrls.has(key)) continue;
+      seenUrls.add(key);
+      const resource = s.resourceId ? getResourceById(s.resourceId) : undefined;
+      const credibility = resource ? getResourceCredibility(resource) : undefined;
+      const domain = s.url ? (() => { try { return new URL(s.url!).hostname.replace(/^www\./, ""); } catch { return undefined; } })() : undefined;
+      uniqueSources.push({ url: s.url ?? null, title: resource?.title ?? null, resourceId: s.resourceId ?? undefined, domain, claimCount: 1, credibility });
+    }
+  }
 
   if (uniqueSources.length === 0) {
     return <p className="text-sm text-gray-500">No references found. Citations may not be indexed yet.</p>;
@@ -440,14 +388,13 @@ function ReferencesTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Fo
         <tr className="border-b text-left bg-gray-50">
           <th className="p-2">Source</th>
           <th className="p-2">Domain</th>
-          <th className="p-2">Claims</th>
           <th className="p-2">Credibility</th>
           <th className="p-2">Links</th>
         </tr>
       </thead>
       <tbody>
-        {uniqueSources.map(src => (
-          <tr key={src.footnoteNum} className="border-b hover:bg-gray-50">
+        {uniqueSources.map((src, i) => (
+          <tr key={i} className="border-b hover:bg-gray-50">
             <td className="p-2 max-w-[280px]">
               {src.url ? (
                 <a href={src.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" title={src.url}>
@@ -458,7 +405,6 @@ function ReferencesTable({ claims, fnIndex }: { claims: ClaimRow[]; fnIndex?: Fo
               )}
             </td>
             <td className="p-2 text-gray-500">{src.domain ?? "—"}</td>
-            <td className="p-2 text-center">{src.claimCount}</td>
             <td className="p-2">
               {src.credibility != null ? <CredDots level={src.credibility} /> : <span className="text-gray-400">—</span>}
             </td>
@@ -502,7 +448,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
   const backlinks = getBacklinksFor(slug);
   const facts = (await getFactsForEntityWithFallback(slug)).data;
   const externalLinks = getExternalLinks(slug);
-  const fnIndex = getFootnoteIndex(slug);
   const claims = await fetchPageClaims(slug);
 
   const title = pageData?.title || slug;
@@ -599,12 +544,12 @@ export default async function WikiInfoPage({ params }: PageProps) {
                 Claims Explorer
               </Link>
             </div>
-            <ClaimsTable claims={claims} fnIndex={fnIndex} />
+            <ClaimsTable claims={claims} />
           </div>
         )}
       </Section>
 
-      <Section title={`References ${claims && claims.length > 0 ? `(${buildClaimsData(claims, fnIndex).uniqueSources.length})` : ""}`}>
+      <Section title="References">
         {claims === null ? (
           <p className="text-sm text-gray-500">
             Claims data unavailable (wiki-server offline or not configured).
@@ -627,7 +572,7 @@ export default async function WikiInfoPage({ params }: PageProps) {
                 Claims Explorer
               </Link>
             </div>
-            <ReferencesTable claims={claims} fnIndex={fnIndex} />
+            <ReferencesTable claims={claims} />
           </div>
         )}
       </Section>

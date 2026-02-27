@@ -5,9 +5,8 @@
  * DB-driven reference markers: [^cr-XXXX] for claim references and
  * [^rc-XXXX] for regular citations.
  *
- * This rule supports the gradual migration to DB-driven footnotes. It reports
- * warnings (not errors) because backward compatibility is still maintained
- * during the migration period.
+ * Migration is complete — all pages have been converted to DB-driven footnotes.
+ * This rule now enforces ERROR severity to prevent regression.
  *
  * Skips:
  * - Files in content/docs/internal/ (internal docs don't get migrated)
@@ -29,7 +28,7 @@ export const numberedFootnotesRule = {
   id: 'numbered-footnotes',
   name: 'Numbered Footnotes',
   description: 'Detect old-style [^N] footnotes that should be migrated to DB-driven [^cr-XXXX] / [^rc-XXXX] markers',
-  severity: Severity.WARNING,
+  severity: Severity.ERROR,
 
   check(contentFile: ContentFile, _engine: ValidationEngine): Issue[] {
     const issues: Issue[] = [];
@@ -79,7 +78,7 @@ export const numberedFootnotesRule = {
           rule: 'numbered-footnotes',
           file: contentFile.path,
           message: `Page has ${seenNumbers.size} old-style numbered footnote(s) ([^N]). Migrate to DB-driven markers: [^cr-XXXX] or [^rc-XXXX]. Run: pnpm crux claims migrate-footnotes ${contentFile.slug} --apply`,
-          severity: Severity.WARNING,
+          severity: Severity.ERROR,
         })
       );
     }

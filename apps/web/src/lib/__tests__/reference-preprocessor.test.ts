@@ -162,10 +162,10 @@ describe("preprocessReferences", () => {
   });
 
   // -----------------------------------------------------------------------
-  // Mixed old + new footnotes
+  // Mixed existing + DB-driven footnotes (collision avoidance)
   // -----------------------------------------------------------------------
 
-  it("numbers new references after existing legacy footnotes", () => {
+  it("numbers new references after existing numbered footnotes", () => {
     const content = [
       "Legacy footnote[^1] and a claim[^cr-aa11] and citation[^rc-bb22].",
       "",
@@ -190,11 +190,11 @@ describe("preprocessReferences", () => {
 
     const { content: result, referenceMap } = preprocessReferences(content, refData);
 
-    // Legacy [^1] should remain untouched
+    // Existing [^1] should remain untouched
     expect(result).toContain("Legacy footnote[^1]");
     expect(result).toContain("[^1]: Existing legacy source");
 
-    // New references should start at [^2] — old markers are gone
+    // New references should start at [^2]
     expect(result).not.toContain("[^cr-aa11]");
     expect(result).not.toContain("[^rc-bb22]");
 
@@ -207,7 +207,7 @@ describe("preprocessReferences", () => {
     expect(referenceMap.get(3)?.originalId).toBe("rc-bb22");
   });
 
-  it("handles legacy footnotes with gaps (e.g. [^1], [^5])", () => {
+  it("handles existing footnotes with gaps (e.g. [^1], [^5])", () => {
     const content = [
       "First[^1] then fifth[^5] then new[^cr-zz99].",
       "",

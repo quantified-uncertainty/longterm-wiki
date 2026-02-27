@@ -6,7 +6,6 @@ import {
   getResourcePublication,
   getPageCitationHealth,
   getResourcesForPage,
-  getFootnoteIndex,
 } from "@data";
 import type { Resource } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
@@ -48,31 +47,10 @@ interface ResolvedRef {
   footnoteNumbers: number[];
 }
 
-function resolveRefs(ids: string[], pageId?: string): {
+function resolveRefs(ids: string[]): {
   refs: ResolvedRef[];
   missing: string[];
 } {
-  // Build a map from resource ID → footnote numbers using the footnote index
-  const resourceFootnotes = new Map<string, number[]>();
-  if (pageId) {
-    const fnIndex = getFootnoteIndex(pageId);
-    if (fnIndex) {
-      for (const source of fnIndex.sources) {
-        if (source.resourceId) {
-          resourceFootnotes.set(source.resourceId, source.footnoteNumbers);
-        }
-      }
-      // Also check individual footnotes for resourceId matches not in sources
-      for (const [numStr, entry] of Object.entries(fnIndex.footnotes)) {
-        if (entry.resourceId && !resourceFootnotes.has(entry.resourceId)) {
-          const existing = resourceFootnotes.get(entry.resourceId) ?? [];
-          existing.push(parseInt(numStr, 10));
-          resourceFootnotes.set(entry.resourceId, existing);
-        }
-      }
-    }
-  }
-
   const refs: ResolvedRef[] = [];
   const missing: string[] = [];
   const seen = new Set<string>();
@@ -94,7 +72,7 @@ function resolveRefs(ids: string[], pageId?: string): {
       credibility: getResourceCredibility(resource),
       publicationName: publication?.name,
       peerReviewed: publication?.peer_reviewed ?? false,
-      footnoteNumbers: resourceFootnotes.get(id) ?? [],
+      footnoteNumbers: [],
     });
   }
 
@@ -310,7 +288,7 @@ export function References({
 
   if (resolvedIds.length === 0) return null;
 
-  const { refs, missing } = resolveRefs(resolvedIds, pageId);
+  const { refs, missing } = resolveRefs(resolvedIds);
 
   return (
     <section
