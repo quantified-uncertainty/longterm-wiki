@@ -39,7 +39,7 @@ concurrency:
 jobs:
   maintain:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     steps:
       - name: Determine cadence
         id: cadence
@@ -100,6 +100,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: "--max-turns 15"
           additional_permissions: |
             actions: read
           prompt: |
