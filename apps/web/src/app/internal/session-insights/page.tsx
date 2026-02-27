@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { fetchDetailed, withApiFallback } from "@/lib/wiki-server";
 import { DataSourceBanner } from "@/components/internal/DataSourceBanner";
 import { InsightsTable } from "./insights-table";
+
+export const metadata: Metadata = { title: "Session Insights" };
 
 export type InsightRow = {
   date: string;
