@@ -11,7 +11,7 @@ import {
   generateSearchQuery,
   parseLLMFixResponse,
   applyFixes,
-  enrichFromSqlite,
+  enrichFromApi,
 } from './fix-inaccuracies.ts';
 import type { FlaggedCitation } from './export-dashboard.ts';
 import type { SectionRewrite } from './fix-inaccuracies.ts';
@@ -193,9 +193,9 @@ describe('applyFixes', () => {
   });
 });
 
-describe('enrichFromSqlite', () => {
-  it('returns enriched objects with null fields when SQLite is unavailable', () => {
-    // When SQLite is not available (no .cache/knowledge.db), enrichFromSqlite
+describe('enrichFromApi', () => {
+  it('returns enriched objects with null fields when API is unavailable', async () => {
+    // When the wiki-server is not available, enrichFromApi
     // should gracefully return the original data with null enrichment fields
     const flagged: FlaggedCitation[] = [
       {
@@ -212,11 +212,11 @@ describe('enrichFromSqlite', () => {
       },
     ];
 
-    const enriched = enrichFromSqlite(flagged);
+    const enriched = await enrichFromApi(flagged);
     expect(enriched).toHaveLength(1);
     expect(enriched[0].pageId).toBe('test-page');
     expect(enriched[0].claimText).toBe('truncated claim...');
-    // Enrichment fields should be present (null if SQLite unavailable)
+    // Enrichment fields should be present (null if API unavailable)
     expect('fullClaimText' in enriched[0]).toBe(true);
     expect('sourceQuote' in enriched[0]).toBe(true);
     expect('supportingQuotes' in enriched[0]).toBe(true);

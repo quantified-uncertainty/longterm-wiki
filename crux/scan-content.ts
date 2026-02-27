@@ -259,8 +259,6 @@ function main(): void {
     console.log('Database Statistics:');
     console.log(`  Articles: ${stats.articles}`);
     console.log(`  Sources: ${JSON.stringify(stats.sources)}`);
-    console.log(`  Summaries: ${JSON.stringify(stats.summaries)}`);
-    console.log(`  Claims: ${JSON.stringify(stats.claims)}`);
     process.exit(0);
   }
 

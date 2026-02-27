@@ -26,7 +26,7 @@ import { checkAccuracyForPage } from './check-accuracy.ts';
 import { exportDashboardData } from './export-dashboard.ts';
 import {
   loadFlaggedCitations,
-  enrichFromSqlite,
+  enrichFromApi,
   generateFixesForPage,
   applyFixes,
   escalateWithClaude,
@@ -100,7 +100,7 @@ async function main() {
   console.log(`\n  ${c.green}Accurate:${c.reset} ${accuracyResult.accurate}  ${c.yellow}Minor:${c.reset} ${accuracyResult.minorIssues}  ${c.red}Inaccurate:${c.reset} ${accuracyResult.inaccurate}  ${c.red}Unsupported:${c.reset} ${accuracyResult.unsupported}`);
 
   // Export dashboard data after accuracy check
-  exportDashboardData();
+  await exportDashboardData();
 
   // ── Step 2b: Second opinion (Haiku) ──────────────────────────────────
   // Re-check flagged citations with a different model to reduce false positives
@@ -122,7 +122,7 @@ async function main() {
         if (d.newVerdict === 'accurate') accuracyResult.accurate++;
         else accuracyResult.minorIssues++;
       }
-      exportDashboardData(); // Re-export with corrected verdicts
+      await exportDashboardData(); // Re-export with corrected verdicts
       console.log(`\n  ${c.green}${soResult.demoted} false positive(s) demoted${c.reset}`);
     } else {
       console.log(`\n  ${c.dim}All flags confirmed — no false positives found.${c.reset}`);
@@ -146,7 +146,7 @@ async function main() {
     process.exit(0);
   }
 
-  const enriched = enrichFromSqlite(flagged);
+  const enriched = await enrichFromApi(flagged);
   const withSource = enriched.filter(
     (e) => e.supportingQuotes || e.sourceQuote || e.sourceFullText,
   ).length;
@@ -255,7 +255,7 @@ async function main() {
     // Quick re-check to find remaining unsupported citations
     await extractQuotesForPage(pageId, currentBody, { verbose: false, recheck: true });
     await checkAccuracyForPage(pageId, { verbose: false, recheck: true });
-    exportDashboardData();
+    await exportDashboardData();
     step3cRanRecheck = true;
 
     const remainingFlagged = loadFlaggedCitations({ pageId });
@@ -267,7 +267,7 @@ async function main() {
       console.log(`\n${c.bold}Step 3c: Source Replacement Search${c.reset}\n`);
       console.log(`  ${remainingUnsupported.length} unsupported citation(s) — searching for better sources...\n`);
 
-      const remainingEnriched = enrichFromSqlite(remainingUnsupported);
+      const remainingEnriched = await enrichFromApi(remainingUnsupported);
       const replacements = await findReplacementSources(remainingEnriched, { verbose: true });
 
       if (replacements.length > 0) {
@@ -321,7 +321,7 @@ async function main() {
     recheck: true,
   });
 
-  exportDashboardData();
+  await exportDashboardData();
 
   const beforeProblems = accuracyResult.inaccurate + accuracyResult.unsupported;
   let afterProblems = reVerify.inaccurate + reVerify.unsupported;
@@ -334,7 +334,7 @@ async function main() {
 
     const pass2Flagged = loadFlaggedCitations({ pageId });
     if (pass2Flagged.length > 0) {
-      const pass2Enriched = enrichFromSqlite(pass2Flagged);
+      const pass2Enriched = await enrichFromApi(pass2Flagged);
       const pass2Content = readFileSync(filePath, 'utf-8');
       const pass2Proposals = await generateFixesForPage(pageId, pass2Enriched, pass2Content, { model });
 
@@ -357,7 +357,7 @@ async function main() {
           const finalBody = stripFrontmatter(finalRaw);
           await extractQuotesForPage(pageId, finalBody, { verbose: false, recheck: true });
           const finalVerify = await checkAccuracyForPage(pageId, { verbose: false, recheck: true });
-          exportDashboardData();
+          await exportDashboardData();
 
           const finalProblems = finalVerify.inaccurate + finalVerify.unsupported;
           const pass2Improved = afterProblems - finalProblems;

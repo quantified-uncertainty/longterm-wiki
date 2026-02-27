@@ -16,7 +16,7 @@
  * Part of the hallucination risk reduction initiative (issue #200).
  */
 
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join, relative, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { PROJECT_ROOT, CONTENT_DIR_ABS } from '../lib/content-types.ts';
@@ -28,7 +28,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { readReviews } from '../lib/review-tracking.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { getEntityTypeFromPath } from '../lib/page-analysis.ts';
-import { citationQuotes } from '../lib/knowledge-db.ts';
+import { getAccuracySummary } from '../lib/wiki-server/citations.ts';
 import {
   computeHallucinationRisk,
   computeAccuracyRisk,
@@ -142,21 +142,18 @@ export function assessPage(
 // Accuracy data loader
 // ---------------------------------------------------------------------------
 
-export function loadAccuracyMap(): AccuracyMap | null {
-  // Guard: only query if the DB file already exists. getDb() would create an
-  // empty DB otherwise, returning empty results rather than signaling "no data".
-  const dbPath = join(PROJECT_ROOT, '.cache', 'knowledge.db');
-  if (!existsSync(dbPath)) return null;
-
+export async function loadAccuracyMap(): Promise<AccuracyMap | null> {
   try {
-    const rows = (citationQuotes as any).getAccuracySummaryAllPages();
+    const result = await getAccuracySummary();
+    if (!result.ok) return null;
+
     const map: AccuracyMap = new Map();
-    for (const row of rows) {
-      map.set(row.page_id, { checked: row.checked, inaccurate: row.inaccurate });
+    for (const row of result.data.pages) {
+      map.set(row.pageId, { checked: Number(row.checked), inaccurate: Number(row.inaccurate) });
     }
     return map;
   } catch {
-    // DB not available or query failed — skip accuracy data
+    // API not available — skip accuracy data
     return null;
   }
 }
@@ -165,15 +162,15 @@ export function loadAccuracyMap(): AccuracyMap | null {
 // Main
 // ---------------------------------------------------------------------------
 
-function main() {
+async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const ci = args.ci === true;
   const json = args.json === true;
   const topN = parseInt((args.top as string) || '0', 10);
   const colors = getColors(ci || json);
 
-  // Load accuracy data from SQLite (if available)
-  const accuracyMap = loadAccuracyMap();
+  // Load accuracy data from wiki-server (if available)
+  const accuracyMap = await loadAccuracyMap();
 
   // Assess all pages
   const files = findMdxFiles(CONTENT_DIR_ABS);
@@ -310,10 +307,8 @@ function main() {
 
 // Only run when executed directly (not when imported in tests)
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  try {
-    main();
-  } catch (err: unknown) {
+  main().catch((err: unknown) => {
     console.error('Error:', err instanceof Error ? err.message : String(err));
     process.exit(1);
-  }
+  });
 }

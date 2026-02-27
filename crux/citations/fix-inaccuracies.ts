@@ -25,7 +25,8 @@ import { stripFrontmatter } from '../lib/patterns.ts';
 import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL, checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { appendEditLog } from '../lib/edit-log.ts';
-import { citationQuotes, citationContent } from '../lib/knowledge-db.ts';
+import { citationContent } from '../lib/knowledge-db.ts';
+import { getQuote, markCitationAccuracy } from '../lib/wiki-server/citations.ts';
 import { checkAccuracyForPage } from './check-accuracy.ts';
 import { extractQuotesForPage } from './extract-quotes.ts';
 import { exportDashboardData, ACCURACY_DIR, ACCURACY_PAGES_DIR } from './export-dashboard.ts';
@@ -205,26 +206,27 @@ Rules:
 const MAX_SOURCE_PER_ESCALATION = 6_000;
 
 /**
- * Look up source evidence for a non-flagged footnote directly from SQLite.
+ * Look up source evidence for a non-flagged footnote from wiki-server.
  * Used in escalation to provide context for neighboring citations.
  */
-function lookupFootnoteEvidence(pageId: string, footnote: number): string | null {
+async function lookupFootnoteEvidence(pageId: string, footnote: number): Promise<string | null> {
   try {
-    const row = citationQuotes.get(pageId, footnote);
-    if (!row) return null;
+    const result = await getQuote(pageId, footnote);
+    if (!result.ok) return null;
+    const row = result.data.quote;
 
     const parts: string[] = [];
 
     // Supporting quotes (best evidence)
-    if (row.accuracy_supporting_quotes) {
+    if (row.accuracySupportingQuotes) {
       parts.push('Key passages from source:');
-      parts.push(row.accuracy_supporting_quotes);
+      parts.push(row.accuracySupportingQuotes);
     }
 
     // Extracted quote
-    if (row.source_quote && !row.accuracy_supporting_quotes?.includes(row.source_quote.slice(0, 50))) {
+    if (row.sourceQuote && !row.accuracySupportingQuotes?.includes(row.sourceQuote.slice(0, 50))) {
       parts.push('Extracted quote:');
-      parts.push(row.source_quote);
+      parts.push(row.sourceQuote);
     }
 
     if (parts.length > 0) return parts.join('\n');
@@ -292,8 +294,8 @@ export async function escalateWithClaude(
           evidenceParts.push(`Source evidence:\n${evidence.slice(0, MAX_SOURCE_PER_ESCALATION)}`);
         }
       } else {
-        // For non-flagged footnotes, look up evidence directly from SQLite
-        const evidence = lookupFootnoteEvidence(pageId, fn);
+        // For non-flagged footnotes, look up evidence from wiki-server
+        const evidence = await lookupFootnoteEvidence(pageId, fn);
         if (evidence) {
           evidenceParts.push(`Source evidence:\n${evidence.slice(0, MAX_SOURCE_PER_ESCALATION)}`);
         }
@@ -515,11 +517,13 @@ export async function secondOpinionCheck(
 
   for (const issue of toCheck) {
     try {
-      const row = citationQuotes.get(pageId, issue.footnote);
-      if (!row?.claim_text) continue;
+      const rowResult = await getQuote(pageId, issue.footnote);
+      if (!rowResult.ok) continue;
+      const row = rowResult.data.quote;
+      if (!row.claimText) continue;
 
       // Get the best source text available
-      let sourceText = row.source_quote || '';
+      let sourceText = row.sourceQuote || '';
       if (row.url) {
         const cached = citationContent.getByUrl(row.url);
         if (cached?.full_text && cached.full_text.length > sourceText.length) {
@@ -539,7 +543,7 @@ export async function secondOpinionCheck(
       const llmResult = await callLlm(client, {
         system: SECOND_OPINION_PROMPT,
         user: [
-          `WIKI CLAIM:\n${row.claim_text}`,
+          `WIKI CLAIM:\n${row.claimText}`,
           `\nORIGINAL VERDICT: ${issue.verdict}`,
           `ORIGINAL ISSUES: ${issue.issues.join('; ')}`,
           `\nSOURCE TEXT:\n${truncatedSource}`,
@@ -555,15 +559,15 @@ export async function secondOpinionCheck(
 
       if (!opinion.agree && (opinion.verdict === 'accurate' || opinion.verdict === 'minor_issues')) {
         // Haiku disagrees — demote the flag
-        citationQuotes.markAccuracy(
+        await markCitationAccuracy({
           pageId,
-          issue.footnote,
-          opinion.verdict,
-          opinion.verdict === 'accurate' ? 0.9 : 0.7,
-          null,
-          null,
-          null,
-        );
+          footnote: issue.footnote,
+          verdict: opinion.verdict as 'accurate' | 'minor_issues' | 'inaccurate' | 'unsupported' | 'not_verifiable',
+          score: opinion.verdict === 'accurate' ? 0.9 : 0.7,
+          issues: null,
+          supportingQuotes: null,
+          verificationDifficulty: null,
+        });
         result.demoted++;
         result.details.push({
           footnote: issue.footnote,
@@ -701,13 +705,15 @@ export interface EnrichedFlaggedCitation extends FlaggedCitation {
 }
 
 /**
- * Enrich flagged citations with full data from SQLite.
- * Falls back gracefully if SQLite is unavailable (e.g., on Vercel).
+ * Enrich flagged citations with full data from wiki-server.
+ * Falls back gracefully if the API is unavailable.
  */
-export function enrichFromSqlite(flagged: FlaggedCitation[]): EnrichedFlaggedCitation[] {
+export async function enrichFromApi(flagged: FlaggedCitation[]): Promise<EnrichedFlaggedCitation[]> {
   try {
-    return flagged.map((f) => {
-      const row = citationQuotes.get(f.pageId, f.footnote);
+    const results: EnrichedFlaggedCitation[] = [];
+    for (const f of flagged) {
+      const rowResult = await getQuote(f.pageId, f.footnote);
+      const row = rowResult.ok ? rowResult.data.quote : null;
       let sourceFullText: string | null = null;
       if (f.url) {
         const cached = citationContent.getByUrl(f.url);
@@ -715,14 +721,15 @@ export function enrichFromSqlite(flagged: FlaggedCitation[]): EnrichedFlaggedCit
           sourceFullText = cached.full_text;
         }
       }
-      return {
+      results.push({
         ...f,
-        fullClaimText: row?.claim_text ?? null,
-        sourceQuote: row?.source_quote ?? null,
-        supportingQuotes: row?.accuracy_supporting_quotes ?? null,
+        fullClaimText: row?.claimText ?? null,
+        sourceQuote: row?.sourceQuote ?? null,
+        supportingQuotes: row?.accuracySupportingQuotes ?? null,
         sourceFullText,
-      };
-    });
+      });
+    }
+    return results;
   } catch {
     // SQLite unavailable — return with null enrichments
     return flagged.map((f) => ({
@@ -916,7 +923,7 @@ export async function generateFixesForPage(
   // Enrich if not already enriched
   const enriched: EnrichedFlaggedCitation[] = 'fullClaimText' in (flagged[0] ?? {})
     ? (flagged as EnrichedFlaggedCitation[])
-    : enrichFromSqlite(flagged);
+    : await enrichFromApi(flagged);
 
   const userPrompt = buildUserPrompt(pageId, enriched, pageContent);
 
@@ -1328,7 +1335,7 @@ async function main() {
       verdict: verdictFilter,
       maxScore,
     });
-    enriched = enrichFromSqlite(flagged);
+    enriched = await enrichFromApi(flagged);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`${c.red}Error: ${msg}${c.reset}`);
@@ -1630,7 +1637,7 @@ async function main() {
     }
 
     // Re-export dashboard data with updated verdicts
-    exportDashboardData();
+    await exportDashboardData();
 
     if (!json) console.log('');
   }

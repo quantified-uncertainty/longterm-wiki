@@ -3,8 +3,7 @@
  *
  * Iterates all citation_quotes that have a URL but no resource_id,
  * looks up the matching resource via getResourceByUrl(), and updates
- * the record via the existing upsert() path (writes to both SQLite
- * and PostgreSQL).
+ * the record via the wiki-server API.
  *
  * Usage:
  *   pnpm crux citations backfill-resource-ids
@@ -12,7 +11,7 @@
  */
 
 import { fileURLToPath } from 'url';
-import { citationQuotes } from '../lib/knowledge-db.ts';
+import { getAllQuotes, upsertCitationQuote } from '../lib/wiki-server/citations.ts';
 import { getResourceByUrl } from '../lib/resource-lookup.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
@@ -26,14 +25,19 @@ async function main() {
     `\n${c.bold}${c.blue}Backfill resource_id for citation_quotes${c.reset}\n`,
   );
 
-  // Get all quotes that have a URL but no resource_id
-  const all = citationQuotes.getAll();
+  // Get all quotes (paginated, fetch all)
+  const allResult = await getAllQuotes(5000, 0);
+  if (!allResult.ok) {
+    console.error(`${c.red}Error fetching quotes: ${allResult.error}${c.reset}`);
+    process.exit(1);
+  }
+  const all = allResult.data.quotes;
   const candidates = all.filter(
-    (q) => q.url && q.url.length > 0 && !q.resource_id,
+    (q) => q.url && q.url.length > 0 && !q.resourceId,
   );
 
   console.log(`  Total quotes:      ${all.length}`);
-  console.log(`  Already have resource_id: ${all.filter((q) => q.resource_id).length}`);
+  console.log(`  Already have resource_id: ${all.filter((q) => q.resourceId).length}`);
   console.log(`  Candidates (URL, no resource_id): ${candidates.length}\n`);
 
   if (candidates.length === 0) {
@@ -50,25 +54,25 @@ async function main() {
       matched++;
       if (dryRun) {
         console.log(
-          `  ${c.green}MATCH${c.reset} [${quote.page_id}:^${quote.footnote}] → ${resource.id} (${resource.title || resource.url})`,
+          `  ${c.green}MATCH${c.reset} [${quote.pageId}:^${quote.footnote}] → ${resource.id} (${resource.title || resource.url})`,
         );
       } else {
         // Re-upsert with the resource_id populated
-        citationQuotes.upsert({
-          pageId: quote.page_id,
+        await upsertCitationQuote({
+          pageId: quote.pageId,
           footnote: quote.footnote,
           url: quote.url,
           resourceId: resource.id,
-          claimText: quote.claim_text,
-          claimContext: quote.claim_context,
-          sourceQuote: quote.source_quote,
-          sourceLocation: quote.source_location,
-          quoteVerified: quote.quote_verified === 1,
-          verificationMethod: quote.verification_method,
-          verificationScore: quote.verification_score,
-          sourceTitle: quote.source_title,
-          sourceType: quote.source_type,
-          extractionModel: quote.extraction_model,
+          claimText: quote.claimText,
+          claimContext: quote.claimContext ?? null,
+          sourceQuote: quote.sourceQuote ?? null,
+          sourceLocation: quote.sourceLocation ?? null,
+          quoteVerified: quote.quoteVerified ?? false,
+          verificationMethod: quote.verificationMethod ?? null,
+          verificationScore: quote.verificationScore ?? null,
+          sourceTitle: quote.sourceTitle ?? null,
+          sourceType: quote.sourceType ?? null,
+          extractionModel: quote.extractionModel ?? null,
         });
       }
     } else {

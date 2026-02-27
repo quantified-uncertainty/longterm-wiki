@@ -11,12 +11,15 @@
 
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import {
-  citationQuotes,
-  citationContent,
-} from '../lib/knowledge-db.ts';
+import { citationContent } from '../lib/knowledge-db.ts';
 import { fetchCitationUrl, saveFetchResultToPostgres } from '../lib/citation-archive.ts';
-import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
+import {
+  getCitationContentByUrl,
+  getQuotesByPage,
+  getPagesWithQuotes,
+  markQuoteVerified,
+  markQuoteUnverified,
+} from '../lib/wiki-server/citations.ts';
 import { verifyQuoteInSource } from '../lib/quote-verifier.ts';
 
 interface VerifyResult {
@@ -34,9 +37,13 @@ async function verifyQuotesForPage(
   const verbose = opts.verbose ?? false;
   const refetch = opts.refetch ?? false;
 
-  const quotes = citationQuotes.getByPage(pageId);
+  const quotesResult = await getQuotesByPage(pageId, 500);
+  if (!quotesResult.ok) {
+    throw new Error(`Failed to fetch quotes for ${pageId}: ${quotesResult.error}`);
+  }
+  const quotes = quotesResult.data.quotes;
   const withQuotes = quotes.filter(
-    (q) => q.source_quote && q.source_quote.length > 0,
+    (q) => q.sourceQuote && q.sourceQuote.length > 0,
   );
 
   const result: VerifyResult = {
@@ -113,12 +120,12 @@ async function verifyQuotesForPage(
     }
 
     // Verify the stored quote against the source
-    const verification = verifyQuoteInSource(q.source_quote!, sourceText);
+    const verification = verifyQuoteInSource(q.sourceQuote!, sourceText);
 
     if (verification.verified) {
       result.stillValid++;
       // Update verification status
-      citationQuotes.markVerified(
+      await markQuoteVerified(
         pageId,
         q.footnote,
         verification.method,
@@ -132,7 +139,7 @@ async function verifyQuotesForPage(
     } else {
       result.drifted++;
       // Mark as unverified
-      citationQuotes.markUnverified(
+      await markQuoteUnverified(
         pageId,
         q.footnote,
         'reverify-failed',
@@ -180,7 +187,12 @@ async function main() {
   }
 
   if (all) {
-    const pages = citationQuotes.getPagesWithQuotes();
+    const pagesResult = await getPagesWithQuotes();
+    if (!pagesResult.ok) {
+      console.error(`${c.red}Error fetching pages: ${pagesResult.error}${c.reset}`);
+      process.exit(1);
+    }
+    const pages = pagesResult.data.pages;
 
     let pagesToProcess = pages;
     if (limit > 0) {
@@ -197,10 +209,10 @@ async function main() {
     for (let i = 0; i < pagesToProcess.length; i++) {
       const page = pagesToProcess[i];
       console.log(
-        `${c.dim}[${i + 1}/${pagesToProcess.length}]${c.reset} ${c.bold}${page.page_id}${c.reset} (${page.quote_count} quotes)`,
+        `${c.dim}[${i + 1}/${pagesToProcess.length}]${c.reset} ${c.bold}${page.pageId}${c.reset} (${page.quoteCount} quotes)`,
       );
 
-      const result = await verifyQuotesForPage(page.page_id, {
+      const result = await verifyQuotesForPage(page.pageId, {
         verbose: true,
         refetch,
       });
@@ -255,9 +267,14 @@ async function main() {
   }
 
   // Single page
-  const quotes = citationQuotes.getByPage(pageId);
-  const withQuotes = quotes.filter(
-    (q) => q.source_quote && q.source_quote.length > 0,
+  const singleResult = await getQuotesByPage(pageId, 500);
+  if (!singleResult.ok) {
+    console.error(`${c.red}Error fetching quotes for ${pageId}: ${singleResult.error}${c.reset}`);
+    process.exit(1);
+  }
+  const singleQuotes = singleResult.data.quotes;
+  const withQuotes = singleQuotes.filter(
+    (q) => q.sourceQuote && q.sourceQuote.length > 0,
   );
 
   if (withQuotes.length === 0) {

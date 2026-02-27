@@ -19,11 +19,7 @@ describe('getDb', () => {
 
     expect(tableNames).toContain('articles');
     expect(tableNames).toContain('sources');
-    expect(tableNames).toContain('article_sources');
-    expect(tableNames).toContain('summaries');
-    expect(tableNames).toContain('claims');
     expect(tableNames).toContain('citation_content');
-    expect(tableNames).toContain('citation_quotes');
   });
 
   it('creates indexes for performance', () => {
@@ -36,23 +32,7 @@ describe('getDb', () => {
     const indexNames = indexes.map((i) => i.name);
 
     expect(indexNames).toContain('idx_sources_url');
-    expect(indexNames).toContain('idx_citation_quotes_page');
     expect(indexNames).toContain('idx_citation_content_page');
-  });
-
-  it('has accuracy columns on citation_quotes (migration)', () => {
-    const db = getDb();
-    const columns = db
-      .prepare(`PRAGMA table_info(citation_quotes)`)
-      .all() as Array<{ name: string }>;
-    const columnNames = columns.map((c) => c.name);
-
-    expect(columnNames).toContain('accuracy_verdict');
-    expect(columnNames).toContain('accuracy_issues');
-    expect(columnNames).toContain('accuracy_score');
-    expect(columnNames).toContain('accuracy_checked_at');
-    expect(columnNames).toContain('accuracy_supporting_quotes');
-    expect(columnNames).toContain('verification_difficulty');
   });
 
   it('enables WAL journal mode', () => {
