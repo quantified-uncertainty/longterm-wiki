@@ -9,6 +9,7 @@
     "test": "pnpm --filter longterm-next test && pnpm --filter discord-bot test && pnpm --filter wiki-server test && vitest run --config crux/vitest.config.ts",
     "test:crux": "vitest run --config crux/vitest.config.ts",
     "build-data:content": "pnpm --filter longterm-next run sync:data:content",
+    "build-data:quick": "pnpm --filter longterm-next run sync:data:content",
     "validate": "NODE_USE_ENV_PROXY=1 node --import tsx/esm crux/crux.mjs validate",
     "crux": "NODE_USE_ENV_PROXY=1 node --import tsx/esm crux/crux.mjs",
     "typecheck:tooling": "npx tsx crux/validate/validate-crux-tsc.ts",
