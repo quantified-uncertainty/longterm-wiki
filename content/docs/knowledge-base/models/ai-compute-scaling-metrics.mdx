@@ -1,21 +1,14 @@
 ---
 numericId: E907
 title: AI Compute Scaling Metrics
-description: "Empirical tracking of measurable indicators of AI compute scaling:
-  training compute growth, GPU deployment, capital expenditure, inference
-  shifts, and safety implications."
+description: "Empirical tracking of measurable indicators of AI compute scaling: training compute growth, GPU deployment, capital expenditure, inference shifts, and safety implications."
 sidebar:
   order: 50
-quality: 70
+quality: 78
 readerImportance: 82
 tacticalValue: 92
-llmSummary: AI training compute is growing at ~4-5× per year with algorithmic
-  efficiency improving ~3× per year, while the compute landscape is shifting
-  toward inference-dominant workloads (~50% in 2025, projected 67% in 2026); the
-  page argues this creates both a timeline compression risk and a narrowing
-  governance window as compute remains concentrated in a handful of US-based
-  hyperscalers. The article provides well-sourced empirical tracking with
-  appropriate uncertainty flagging and a substantive criticisms section.
+lastEdited: "2026-02-27"
+llmSummary: AI training compute is growing at ~4-5× per year with algorithmic efficiency improving ~3× per year (halving effective compute cost every ~8 months), while the compute landscape is shifting toward inference-dominant workloads (~50% in 2025, projected 67% in 2026). Big-4 hyperscaler capex is projected to approach $700B combined in 2026, with the US holding ~75% of global GPU cluster performance. The page tracks these empirical metrics alongside AI coding tool adoption as an acceleration indicator and Anthropic's scaling challenges as a case study, while documenting criticisms including capability-compute decoupling, benchmark limitations, and diminishing pre-training returns. Key safety implications include timeline compression from compound compute-plus-efficiency gains and a narrowing governance window as compute concentration enables tractable monitoring interventions.
 ratings:
   novelty: 6
   rigor: 7
@@ -26,7 +19,7 @@ balanceFlags:
 ---
 import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
 
-AI compute scaling metrics are the quantitative indicators used to track how computational resources devoted to artificial intelligence are growing, how efficiently those resources translate into model capability, and what the aggregate infrastructure build-out looks like at the industry level. This page consolidates observed data rather than theoretical models, complementing analytical pages on <EntityLink id="E273">AI Scaling Laws</EntityLink>, <EntityLink id="E680">Projecting Compute Spending</EntityLink>, and <EntityLink id="E272">the scaling debate</EntityLink>.
+AI compute scaling metrics are the quantitative indicators used to track how computational resources devoted to artificial intelligence are growing, how efficiently those resources translate into model capability, and what the aggregate infrastructure build-out looks like at the industry level. This page consolidates observed data rather than theoretical models, complementing analytical pages on <EntityLink id="E273" name="scaling-laws">AI Scaling Laws</EntityLink>, <EntityLink id="E680" name="projecting-compute-spending">Projecting Compute Spending</EntityLink>, and <EntityLink id="E272" name="scaling-debate">the scaling debate</EntityLink>.
 
 ## Quick Assessment
 
@@ -50,60 +43,64 @@ AI compute scaling metrics are the quantitative indicators used to track how com
 | Official Website | [ourworldindata.org – Scaling Up AI](https://ourworldindata.org/scaling-up-ai) |
 | Wikipedia | [Neural Scaling Law](https://en.wikipedia.org/wiki/Neural_scaling_law) |
 | Epoch AI Trends Dashboard | [epoch.ai/trends](https://epoch.ai/trends) |
-| Stanford HAI 2025 AI Index | [hai.stanford.edu](https://hai.stanford.edu/ai-index/2025-ai-index-report) |
-| CSET Scaling Report | [Georgetown CSET](https://cset.georgetown.edu/wp-content/uploads/Scaling-AI-Cost-and-Performance-of-AI-at-the-Leading-Edge.pdf) |
+| <EntityLink id="E57" name="chai">CHAI</EntityLink> 2025 AI Index | [hai.stanford.edu](https://hai.stanford.edu/ai-index/2025-ai-index-report) |
+| <EntityLink id="E47" name="cais">CAIS</EntityLink> | [Georgetown CSET](https://cset.georgetown.edu/wp-content/uploads/Scaling-AI-Cost-and-Performance-of-AI-at-the-Leading-Edge.pdf) |
 
 ## Overview
 
-AI compute scaling metrics describe a set of empirical time series — training FLOP counts, GPU shipment volumes, capital expenditure totals, and inference utilization fractions — that together characterize the pace and shape of the AI build-out. Unlike <EntityLink id="E273">AI Scaling Laws</EntityLink>, which are theoretical relationships predicting how performance changes with compute, these metrics are backward-looking measurements of what has actually been deployed, spent, or achieved. They matter for <EntityLink id="E272">the scaling debate</EntityLink> because they anchor predictions about capability growth in observable fact, and they matter for <EntityLink id="E64">compute governance</EntityLink> because they reveal where compute is concentrated and how fast that concentration is changing.
+AI compute scaling metrics describe a set of empirical time series — training FLOP counts, GPU shipment volumes, capital expenditure totals, and inference utilization fractions — that together characterize the pace and shape of the AI build-out. Unlike <EntityLink id="E273" name="scaling-laws">AI Scaling Laws</EntityLink>, which are theoretical relationships predicting how performance changes with compute, these metrics are backward-looking measurements of what has actually been deployed, spent, or achieved. They matter for <EntityLink id="E272" name="scaling-debate">the scaling debate</EntityLink> because they anchor predictions about capability growth in observable fact, and they matter for <EntityLink id="E64" name="compute-governance">compute governance</EntityLink> because they reveal where compute is concentrated and how fast that concentration is changing.
 
-The primary canonical source for compute trends is <EntityLink id="E125">Epoch AI</EntityLink>, whose publicly maintained dashboard tracks training compute, algorithmic efficiency, hardware performance, and data center capacity. Additional data comes from corporate earnings reports, analyst estimates, and government statistics. Numbers in this domain change rapidly; figures cited here reflect data available through mid-2025 unless otherwise noted, and the page is intended for frequent updates.
+The primary canonical source for compute trends is <EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink>, whose publicly maintained dashboard tracks training compute, algorithmic efficiency, hardware performance, and data center capacity. Additional data comes from corporate earnings reports, analyst estimates, and government statistics. Numbers in this domain change rapidly; figures cited here reflect data available through mid-2025 unless otherwise noted, and the page is intended for frequent updates.
 
-A recurring theme across all metrics is that capability improvements have come from at least two distinct sources: raw compute scaling (more GPUs, more FLOP) and algorithmic efficiency (achieving the same loss with less compute). <EntityLink id="E125">Epoch AI</EntityLink> estimates that compute contributes roughly twice as much as algorithms to recent capability gains, though the algorithmic efficiency curve is also steep — approximately a 3× improvement per year in the compute required to reach a fixed level of prediction accuracy.[^1] Both trends must be tracked to understand how fast the frontier is actually moving.
+The headline growth figure is stark: training compute for frontier AI models has expanded at approximately 4.2× per year since 2018, a rate that outpaces peak historical growth in mobile phones, solar energy, and genome sequencing.[^4] That sustained compounding is driven by three overlapping factors — hardware quantity (growing ~1.7× per year), training duration (~1.5× per year), and per-chip performance (~1.4× per year).[^4] At the infrastructure level, leading AI supercomputer performance has doubled roughly every nine months since 2019, equivalent to ~2.5× annual growth.[^5] Extrapolating these trends, <EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink> projects that training runs of 2×10²⁹ FLOP will likely be feasible by end of 2030, representing a scale increase relative to GPT-4 comparable to the gap between GPT-4 and GPT-2.[^6]
+
+A recurring theme across all metrics is that capability improvements have come from at least two distinct sources: raw compute scaling (more GPUs, more FLOP) and algorithmic efficiency (achieving the same loss with less compute). <EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink> estimates that compute contributes roughly twice as much as algorithms to recent capability gains, though the algorithmic efficiency curve is also steep — approximately a 3× improvement per year in the compute required to reach a fixed level of prediction accuracy.[^4] Both trends must be tracked to understand how fast the frontier is actually moving.
+
+The composition of compute demand is also shifting. Inference workloads are projected to comprise more than half of all AI workloads by 2030, up from a training-dominated baseline today, while inference costs dropped roughly 280-fold between November 2022 and October 2024.[^7][^8] These diverging trajectories — explosive training-compute growth alongside rapidly falling inference unit costs — mean that no single metric captures the full picture.
 
 ## 1. Training Compute Growth
 
 ### Long-Run Trajectory
 
-According to <EntityLink id="E125">Epoch AI</EntityLink>, training compute for frontier language models has grown at roughly 4–5× per year since 2010, with a 90% confidence interval that remains well above a 2× annual doubling.[^1] This sustained exponential growth is the single most important driver of the capability improvements documented in the <EntityLink id="E273">AI Scaling Laws</EntityLink> literature. The growth compounds: over a decade, even a conservative 4× annual rate implies roughly a million-fold increase in compute per training run.
+According to <EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink>, training compute for frontier language models has grown at roughly 4–5× per year since 2010, with a 90% confidence interval that remains well above a 2× annual doubling.[^1] This sustained exponential growth is the single most important driver of the capability improvements documented in the <EntityLink id="E273" name="scaling-laws">AI Scaling Laws</EntityLink> literature. The growth compounds: over a decade, even a conservative 4× annual rate implies roughly a million-fold increase in compute per training run.
 
-Historical benchmarks illustrate the trajectory. Early neural language models in the 2010s consumed on the order of 10⁶ FLOP; GPT-3 (2020) used roughly 3×10²³ FLOP; and estimates for the largest 2024–2025 frontier runs exceed 10²⁵–10²⁶ FLOP.[^1] The Georgetown CSET report on frontier AI scaling documented that compute budgets for record-holding models are still growing, though the rate of growth has slowed relative to the 2018–2022 period — a kinked trend consistent with reports of diminishing returns in pre-training.[^4]
+Historical benchmarks illustrate the trajectory. Early neural language models in the 2010s consumed on the order of 10⁶ FLOP; GPT-3 (2020) used roughly 3×10²³ FLOP; and estimates for the largest 2024–2025 frontier runs exceed 10²⁵–10²⁶ FLOP.[^1] The Georgetown CSET report on frontier AI scaling documented that compute budgets for record-holding models are still growing, though the rate of growth has slowed relative to the 2018–2022 period — a kinked trend consistent with reports of diminishing returns in pre-training.[^9]
 
-Grok 4, trained by xAI, is currently estimated by Epoch AI to be the largest single training run on record at approximately 5×10²⁶ FLOP.[^1] According to the AI-2027 compute forecast, frontier training runs are expected to reach roughly 2×10²⁸ FLOP by early 2027 under a baseline scenario.[^5]
+Grok 4, trained by xAI, is currently estimated by Epoch AI to be the largest single training run on record at approximately 5×10²⁶ FLOP.[^1] According to the AI-2027 compute forecast, frontier training runs are expected to reach roughly 2×10²⁸ FLOP by early 2027 under a baseline scenario.[^10]
 
 ### Algorithmic Efficiency as a Parallel Driver
 
-Epoch AI estimates that the compute required to achieve a fixed level of language model prediction accuracy is declining at roughly 3× per year — meaning algorithmic improvements roughly halve the effective compute cost every eight months.[^1] This is a separate trend from raw compute growth, and the two interact: a frontier lab that benefits from both can achieve disproportionate capability gains relative to what raw compute alone would predict. The practical implication is that smaller, well-optimized models can reach capabilities that previously required much larger models — a dynamic central to debates about <EntityLink id="E272">whether scaling is the primary driver of progress</EntityLink>.
+Epoch AI estimates that the compute required to achieve a fixed level of language model prediction accuracy is declining at roughly 3× per year — meaning algorithmic improvements roughly halve the effective compute cost every eight months.[^1] This is a separate trend from raw compute growth, and the two interact: a frontier lab that benefits from both can achieve disproportionate capability gains relative to what raw compute alone would predict. The practical implication is that smaller, well-optimized models can reach capabilities that previously required much larger models — a dynamic central to debates about <EntityLink id="E272" name="scaling-debate">whether scaling is the primary driver of progress</EntityLink>.
 
-The Chinchilla paper (Hoffmann et al., 2022) is the most cited example of an algorithmic shift changing the optimal training recipe: it showed that existing frontier models were significantly under-trained on data relative to their parameter counts, and that matching data and parameters more carefully could achieve the same performance with substantially less total compute.[^4] CSET analysis suggests that current proprietary model training trajectories fall somewhat below the Chinchilla-optimal frontier, indicating ongoing room for efficiency improvements.[^4]
+The Chinchilla paper (Hoffmann et al., 2022) is the most cited example of an algorithmic shift changing the optimal training recipe: it showed that existing frontier models were significantly under-trained on data relative to their parameter counts, and that matching data and parameters more carefully could achieve the same performance with substantially less total compute.[^9] CSET analysis suggests that current proprietary model training trajectories fall somewhat below the Chinchilla-optimal frontier, indicating ongoing room for efficiency improvements.[^9]
 
 ### Inference-Time Compute as a New Scaling Dimension
 
-Beginning with OpenAI's o1 model family and similar "thinking" models, a new scaling axis has emerged: allocating extra compute at inference time rather than training time to improve reasoning quality. Reasoning queries can consume 10,000 tokens or more compared to roughly 500 for standard completions — a 20× difference in per-query compute.[^2] Jensen Huang described this as a new scaling law: increasing compute for "long thinking" makes the answer smarter independently of training scale.[^6] This shift has significant implications for infrastructure planning because inference compute demand is more variable and latency-sensitive than training compute demand.
+Beginning with <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s o1 model family and similar "thinking" models, a new scaling axis has emerged: allocating extra compute at inference time rather than training time to improve reasoning quality. Reasoning queries can consume 10,000 tokens or more compared to roughly 500 for standard completions — a 20× difference in per-query compute.[^2] Jensen Huang described this as a new scaling law: increasing compute for "long thinking" makes the answer smarter independently of training scale.[^11] This shift has significant implications for infrastructure planning because inference compute demand is more variable and latency-sensitive than training compute demand.
 
 ## 2. GPU Deployment and Hardware
 
 ### Shipment Volumes
 
-Approximately 3.5 million Hopper-generation (H100/H800-class) GPUs were produced in 2024, according to industry estimates cited in the AI-2027 compute forecast.[^5] Nvidia shipped an estimated 6.5–7 million units in 2025 as Blackwell-generation (GB200/GB300) ramp-up began, with 1.5–2 million Blackwell units projected for calendar year 2025.[^5]
+Approximately 3.5 million Hopper-generation (H100/H800-class) GPUs were produced in 2024, according to industry estimates cited in the AI-2027 compute forecast.[^10] <EntityLink id="E693" name="nvidia">NVIDIA</EntityLink> shipped an estimated 6.5–7 million units in 2025 as Blackwell-generation (GB200/GB300) ramp-up began, with 1.5–2 million Blackwell units projected for calendar year 2025.[^10]
 
-Nvidia's financial results confirm the scale of this build-out. The company reported full-year fiscal 2025 (ending January 2026) revenue of \$130.5 billion, up 114% year-over-year, with Data Center revenue of \$115.2 billion — up 142% over the prior fiscal year.[^6] Data Center revenue for Q4 fiscal 2025 alone reached \$35.6 billion, up 93% from the same quarter a year earlier.[^6]
+Nvidia's financial results confirm the scale of this build-out. The company reported full-year fiscal 2025 (ending January 2026) revenue of \$130.5 billion, up 114% year-over-year, with Data Center revenue of \$115.2 billion — up 142% over the prior fiscal year.[^11] Data Center revenue for Q4 fiscal 2025 alone reached \$35.6 billion, up 93% from the same quarter a year earlier.[^11]
 
 ### Hardware Performance Trends
 
-<EntityLink id="E125">Epoch AI</EntityLink> tracks GPU hardware performance along several dimensions:[^1]
+<EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink> tracks GPU hardware performance along several dimensions:[^1]
 
 - **FLOP/s per dollar**: improving at approximately 23× per year, meaning raw compute cost falls dramatically even holding hardware generations constant
 - **FLOP/s per watt**: improving at approximately 22× per year, reflecting gains in energy efficiency
 - **Memory bandwidth**: growing at 28% per year since 2008 — a slower rate than compute, which is increasingly relevant as memory bandwidth becomes the binding bottleneck for inference workloads
 
-The AI-2027 compute forecast projects that global AI-relevant compute (measured in H100-equivalents) will grow roughly 2.25× annually, reaching approximately 100 million H100-equivalents by end-2027, up from around 10 million in March 2025.[^5] This growth comes from two roughly multiplicative sources: chip efficiency improvements (contributing approximately 1.35× per year) and increased chip production volumes (contributing approximately 1.65× per year).[^5]
+The AI-2027 compute forecast projects that global AI-relevant compute (measured in H100-equivalents) will grow roughly 2.25× annually, reaching approximately 100 million H100-equivalents by end-2027, up from around 10 million in March 2025.[^10] This growth comes from two roughly multiplicative sources: chip efficiency improvements (contributing approximately 1.35× per year) and increased chip production volumes (contributing approximately 1.65× per year).[^10]
 
 ### Data Center Scale
 
-<EntityLink id="E125">Epoch AI</EntityLink> estimates the Microsoft Fairwater Atlanta data center as the current largest AI facility by compute capacity, at approximately 500,000 H100-equivalents supported by 600 megawatts of power capacity.[^1] The median time from groundbreaking to achieving 1 gigawatt of total facility power is approximately 2 years, with a range of 1 to 3.6 years.[^1] At current cost estimates of roughly \$30 billion per gigawatt of facility power capacity, the capital requirements for frontier-scale data centers are substantial enough to concentrate compute among a small number of well-capitalized actors — a dynamic tracked separately on the <EntityLink id="E684">Compute Concentration</EntityLink> page.[^1]
+<EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink> estimates the Microsoft Fairwater Atlanta data center as the current largest AI facility by compute capacity, at approximately 500,000 H100-equivalents supported by 600 megawatts of power capacity.[^1] The median time from groundbreaking to achieving 1 gigawatt of total facility power is approximately 2 years, with a range of 1 to 3.6 years.[^1] At current cost estimates of roughly \$30 billion per gigawatt of facility power capacity, the capital requirements for frontier-scale data centers are substantial enough to concentrate compute among a small number of well-capitalized actors — a dynamic tracked separately on the <EntityLink id="E684" name="compute-concentration">Compute Concentration</EntityLink> page.[^1]
 
-As of mid-2025, the United States contains approximately 75% of global GPU cluster performance, with China in second place at roughly 15%.[^1] This geographic concentration has implications for <EntityLink id="E64">compute governance</EntityLink> and <EntityLink id="E473">international compute regimes</EntityLink>.
+As of mid-2025, the United States contains approximately 75% of global GPU cluster performance, with China in second place at roughly 15%.[^1] This geographic concentration has implications for <EntityLink id="E64" name="compute-governance">compute governance</EntityLink> and <EntityLink id="E473" name="international-regimes">international compute regimes</EntityLink>.
 
 ## 3. Capital Expenditure by Major Players
 
@@ -118,11 +115,11 @@ Individual company projections as reported by analysts and company guidance:[^3]
 | Meta | \$39B (2024) → \$60–65B | \$115–135B |
 | Microsoft | ≈\$80B | ≈\$45B (slower growth) |
 
-These figures should be interpreted with appropriate skepticism: company guidance ranges are wide, analyst estimates vary considerably, and some announced capex may not translate directly into deployed compute within the stated year due to supply chain constraints, permitting delays, and grid access limitations.[^7]
+These figures should be interpreted with appropriate skepticism: company guidance ranges are wide, analyst estimates vary considerably, and some announced capex may not translate directly into deployed compute within the stated year due to supply chain constraints, permitting delays, and grid access limitations.[^12]
 
 The financial sustainability of this investment pace is openly questioned by analysts. The four hyperscalers generated a combined \$200 billion in free cash flow in 2025, down from \$237 billion in 2024, and analysts at Morgan Stanley project Amazon's free cash flow will turn negative in 2026 on current capex plans.[^3] Barclays analysts noted in early 2026 that they are modeling negative free cash flow for Meta in 2027 and 2028 as well.[^3] Alphabet raised \$25 billion in bonds in late 2025 and saw its long-term debt quadruple to \$46.5 billion.[^3]
 
-US private AI investment reached \$109.1 billion in 2024, nearly 12 times China's \$9.3 billion, according to the Stanford HAI 2025 AI Index.[^8]
+US private AI investment reached \$109.1 billion in 2024, nearly 12 times China's \$9.3 billion, according to the Stanford HAI 2025 AI Index.[^13]
 
 ## 4. The Inference Compute Shift
 
@@ -134,7 +131,7 @@ This shift is driven by several factors. The growth in deployed AI applications 
 
 ### Infrastructure Implications
 
-Despite expectations that inference might shift compute toward edge devices and away from large data centers, Deloitte's analysis concludes that the majority of inference computation will remain on high-end AI accelerators in large data centers, not on consumer or enterprise edge hardware.[^2] The market for inference-optimized chips is projected to exceed \$50 billion in 2026, but cutting-edge chips worth \$200 billion or more will still handle the majority of inference computation.[^2]
+Despite expectations that inference might shift compute toward edge devices and away from large data centers, Deloitte's analysis concludes that the majority of inference computation will remain on high-end AI accelerators in large data centers, not on consumer or enterprise edge hardware.[^2] The market for inference-optimized chips is projected to exceed <F e="anthropic" f="f8f3c9a7">\$50 billion</F> in 2026, but cutting-edge chips worth \$200 billion or more will still handle the majority of inference computation.[^2]
 
 A key constraint is that inference workloads rarely exceed 40% GPU utilization due to latency requirements — serving a user-facing response requires keeping tokens flowing at acceptable speed, which means GPUs cannot be fully batched the way training runs can be.[^2] Memory bandwidth has become the primary bottleneck for inference performance, not raw FLOP/s, because autoregressive token generation requires reading model weights from memory for each token.[^1] This has shifted hardware optimization priorities toward memory capacity and bandwidth rather than peak compute throughput.
 
@@ -142,80 +139,88 @@ A key constraint is that inference workloads rarely exceed 40% GPU utilization d
 
 AI coding tool adoption serves as a leading indicator of AI integration into knowledge work, and the growth rates in this segment have been unusually rapid even by AI standards.
 
-According to data cited in the research:[^9][^10]
+- By 2025, 90% of engineering teams use at least one AI coding tool, with 82% of developers using AI coding assistants daily or weekly.[^14][^15]
+- GitHub Copilot surpassed 20 million all-time users by July 2025 and now generates approximately 46% of all code written by active users.[^8]
+- Cursor achieved \$1 billion in annualized revenue in under 24 months, reaching a \$29.3 billion valuation.[^4]
+- Anthropic's Claude Code, launched May 2025, scaled from \$0 to approximately \$400 million ARR in just five months and contributes roughly 10% of Anthropic's revenue.[^16][^17]
+- Developers using GitHub Copilot complete coding tasks 55% faster than those working without the tool, and complete 126% more projects per week.[^8][^15]
 
-- 80–85% of developers report using AI coding assistants, with 51% using them daily
-- GitHub Copilot has surpassed 20 million users and reportedly generates roughly 46% of code in repositories where it is active
-- Cursor grew from approximately \$5 million to \$1 billion in ARR in roughly 17 months, reaching a \$9.3 billion valuation
-- Claude Code reached a \$500 million run-rate in September 2025 and approximately \$1.5 billion ARR by February 2026
-- A GitHub-sponsored study found developers complete tasks approximately 55% faster with AI assistance
+A notable counterpoint: a METR randomized controlled trial (February–June 2025) found that experienced open-source developers using AI tools took 19% *longer* to complete tasks than those working without assistance, despite expecting a 24% speedup.[^18]
 
 These figures should be treated with some caution — ARR figures for private companies are typically self-reported or based on investor estimates, and "code generated" percentages depend on how generation is defined. Nevertheless, the directional signal across multiple independent data points is consistent: AI coding tools have achieved unusually rapid enterprise adoption relative to prior software categories.
 
 ## 6. Anthropic's Scaling Challenges as a Case Study
 
-<EntityLink id="E22">Anthropic</EntityLink> provides a useful case study in the operational challenges of scaling AI infrastructure rapidly. According to research data, Anthropic recorded 175 or more service incidents between mid-2024 and mid-2025 as its revenue scaled approximately 14× in roughly 14 months (from approximately \$1 billion to \$4 billion ARR).[^11] Major outages occurred in February 2026 following service launches, and a prompt caching bug in Claude Code drained API rate limits before being patched.[^11]
+<EntityLink id="E22" name="anthropic">Anthropic</EntityLink> provides a useful case study in the operational challenges of scaling AI infrastructure rapidly. According to research data, Anthropic recorded 175 or more service incidents between mid-2024 and mid-2025 as its revenue scaled approximately 4× in roughly 18 months — from approximately <F e="anthropic" f="bc497a3d">\$1 billion ARR</F> at the start of 2025[^17] to approximately <F e="anthropic" f="83e76962">\$4 billion ARR</F> by mid-2025.[^17] Major outages occurred following service launches, and a prompt caching bug in Claude Code drained API rate limits before being patched.[^17]
 
-Anthropic announced a \$10 billion infrastructure buildout in November 2025 and raised a \$10 billion Series G at an \$80 billion valuation in February 2026.[^11] These figures illustrate the capital intensity of operating at frontier scale: the cost of serving inference at commercially meaningful volumes requires infrastructure investment that rivals or exceeds training costs.
+Anthropics's <F e="anthropic" f="5b0663a0">\$30 billion Series G round</F>[^17] and reported <F e="anthropic" f="6796e194">\$380 billion valuation</F>[^17] illustrate the capital intensity of operating at frontier scale. The company has committed to substantial infrastructure investment to support inference at commercially meaningful volumes.[^17] These figures underscore a broader pattern: serving frontier models reliably at scale requires infrastructure expenditure that can rival or exceed the original training costs.
 
 ## 7. Criticisms and Limitations of Compute as a Metric
 
 ### Decoupling from Capability
 
-The most fundamental criticism of compute metrics as proxies for AI capability or risk is that the relationship between compute and capability is not fixed. Models like DeepSeek R1 achieved capabilities comparable to larger, more compute-intensive models through architectural innovations, directly challenging the assumption that FLOP counts reliably indicate capability levels.[^12] This decoupling creates problems for <EntityLink id="E465">compute thresholds</EntityLink> used in regulation: a developer can potentially achieve dangerous capabilities at FLOP counts below any fixed threshold by using more efficient methods.
+The most fundamental criticism of compute metrics as proxies for AI capability or risk is that the relationship between compute and capability is not fixed. Models like DeepSeek R1 achieved capabilities comparable to larger, more compute-intensive models through architectural innovations, directly challenging the assumption that FLOP counts reliably indicate capability levels.[^19] This decoupling creates problems for <EntityLink id="E465" name="thresholds">compute thresholds</EntityLink> used in regulation: a developer can potentially achieve dangerous capabilities at FLOP counts below any fixed threshold by using more efficient methods.
 
-Georgetown CSET's analysis of compute thresholds notes that compute-based regulatory approaches also create incentives for evasion — developers may optimize specifically to stay below thresholds — and that current thresholds exceed most existing models, leaving near-term risks from smaller models unaddressed.[^4]
+Georgetown CSET's analysis of compute thresholds notes that compute-based regulatory approaches also create incentives for evasion — developers may optimize specifically to stay below thresholds — and that current thresholds exceed most existing models, leaving near-term risks from smaller models unaddressed.[^9]
 
 ### Benchmark Concerns
 
-<EntityLink id="E201">METR</EntityLink>'s July 2025 randomized controlled trial on early-2025 AI models and experienced software developers found that real-world developer productivity gains were substantially smaller than benchmark results would predict, with AI assistance showing modest measured effects in high-quality development settings with implicit requirements (documentation, testing, code review).[^13] This suggests that capability metrics derived from standardized benchmarks may not translate linearly into real-world deployment value — a concern that applies to scaling metrics more broadly.
+<EntityLink id="E201" name="metr">METR</EntityLink>'s July 2025 randomized controlled trial on early-2025 AI models and experienced software developers found that real-world developer productivity gains were substantially smaller than benchmark results would predict, with AI assistance showing modest measured effects in high-quality development settings with implicit requirements (documentation, testing, code review).[^18] This suggests that capability metrics derived from standardized benchmarks may not translate linearly into real-world deployment value — a concern that applies to scaling metrics more broadly.
 
-The Stanford HAI 2025 AI Index noted that benchmark saturation is a recurring problem: as models approach ceiling performance on established tests, new benchmarks (such as MMMU, GPQA, and SWE-bench) have been introduced, and performance gaps between top models have actually narrowed — from 11.9% to 5.4% on leading benchmarks in a single year — even as raw compute has continued to grow.[^8]
+The Stanford HAI 2025 AI Index noted that benchmark saturation is a recurring problem: as models approach ceiling performance on established tests, new benchmarks (such as MMMU, GPQA, and SWE-bench) have been introduced, and performance gaps between top models have actually narrowed — from 11.9% to 5.4% on leading benchmarks in a single year — even as raw compute has continued to grow.[^13]
 
 ### Diminishing Returns in Pre-Training
 
-Multiple sources converge on the observation that pre-training scaling yields diminishing marginal returns. CSET documents that compute growth for record-holding models is slowing relative to historical trends.[^4] Forethought's analysis of the "scaling paradox" notes that performance improvements on difficult tasks (such as elite high-school math) require exponentially more compute for linear gains — a logarithmic return structure that is obscured when plotted on log-scale axes.[^14]
+Multiple sources converge on the observation that pre-training scaling yields diminishing marginal returns. CSET documents that compute growth for record-holding models is slowing relative to historical trends.[^9] Forethought's analysis of the "scaling paradox" notes that performance improvements on difficult tasks (such as elite high-school math) require exponentially more compute for linear gains — a logarithmic return structure that is obscured when plotted on log-scale axes.[^20]
 
-Notably, industry executives in late 2024 — including figures at Microsoft and prominent investors — publicly raised questions about whether the "simply scaling up" pre-training strategy was delivering expected capability improvements, with some analysts interpreting OpenAI's roadmap pivot toward reasoning models as an implicit acknowledgment of pre-training limits.[^15]
+Notably, industry executives in late 2024 — including figures at Microsoft and prominent investors — publicly raised questions about whether the "simply scaling up" pre-training strategy was delivering expected capability improvements, with some analysts interpreting OpenAI's roadmap pivot toward reasoning models as an implicit acknowledgment of pre-training limits.[^21]
 
 ### Sustainability and Concentration
 
-The energy consumption of frontier AI training and inference is growing at approximately 2× per year according to the Stanford HAI AI Index, raising questions about physical and environmental limits.[^8] The concentration of compute in five to six US companies (accounting for an estimated 80–90% of frontier compute) creates systemic risks tracked on the <EntityLink id="E684">Compute Concentration</EntityLink> and <EntityLink id="E689">Concentrated Compute as a Cybersecurity Risk</EntityLink> pages.
+The energy consumption of frontier AI training and inference is growing at approximately 2× per year according to the Stanford HAI AI Index, raising questions about physical and environmental limits.[^13] The concentration of compute in five to six US companies (accounting for an estimated 80–90% of frontier compute) creates systemic risks tracked on the <EntityLink id="E684" name="compute-concentration">Compute Concentration</EntityLink> and <EntityLink id="E689" name="concentrated-compute-cybersecurity-risk">Concentrated Compute as a Cybersecurity Risk</EntityLink> pages.
 
 ## 8. Safety Implications
 
-The aggregate picture from these metrics has several implications for <EntityLink id="E273">AI Scaling Laws</EntityLink> and broader AI safety:
+The aggregate picture from these metrics has several implications for <EntityLink id="E273" name="scaling-laws">AI Scaling Laws</EntityLink> and broader AI safety:
 
-**Timeline compression**: If training compute continues growing at 4–5× per year and algorithmic efficiency improves at 3× per year, the effective capability-relevant compute available to frontier labs is growing faster than either trend in isolation. This suggests AI timelines based on single-variable extrapolations may underestimate progress rates.
+**Timeline compression**: Training compute has grown at approximately 4.2× per year since 2018, driven by hardware quantity (1.7×/year), training duration (1.5×/year), and hardware performance (1.4×/year).[^4] Combined with algorithmic efficiency gains, the effective capability-relevant compute available to frontier labs is growing faster than any single-variable extrapolation suggests. Benchmark performance reflects this compounding: scores on GPQA rose 48.9 percentage points and SWE-bench rose 67.3 percentage points between 2023 and 2024 alone.[^16] These figures suggest that <EntityLink id="E16" name="ai-timelines">AI Timelines</EntityLink> based on single-variable extrapolations may — as an analytical inference — underestimate progress rates.
 
-**Inference bottleneck as temporary brake**: The shift from training-dominant to inference-dominant compute may temporarily limit deployment velocity — inference at scale is harder to provision than training, and memory bandwidth constraints limit throughput. This is not a fundamental limit but may create a lag between capability development and deployment.
+**Inference bottleneck as temporary brake**: The shift from training-dominant to inference-dominant compute may temporarily limit deployment velocity — inference at scale is harder to provision than training, and memory bandwidth constraints limit throughput.[^22] Inference workloads are projected to exceed half of all AI workloads by 2030.[^7] This is not a fundamental limit but may create a lag between capability development and deployment.
 
-**Financial sustainability risk**: If capital expenditure continues outpacing revenue at current rates, the AI infrastructure build-out could face a boom/bust correction. Such a correction might slow capability development, but could also concentrate survivors further or create disruption in the research ecosystem.
+**Financial sustainability risk**: Meeting projected AI compute demand could require up to <F e="anthropic" f="f8f3c9a7">\$500 billion</F> in annual capital investment in new data centers, with analysts identifying an estimated \$800 billion annual revenue shortfall even accounting for AI-driven savings reinvestment.[^23] If capital expenditure continues outpacing revenue at current rates, the AI infrastructure build-out could face a boom/bust correction that concentrates survivors or disrupts the research ecosystem.
 
-**Compute governance window**: The current period — when frontier compute is still concentrated in a small number of identifiable facilities in a small number of countries — represents a practical window for <EntityLink id="E64">compute governance</EntityLink> interventions including <EntityLink id="E464">compute monitoring</EntityLink> and <EntityLink id="E473">international compute regimes</EntityLink>. As compute diffuses (through efficiency improvements making smaller clusters competitive for more tasks), this window may narrow.
+**Compute governance window**: The United States accounts for a heavily concentrated share of frontier AI investment — \$109.1 billion in private AI investment in 2024, nearly 12× China's \$9.3 billion — and produced 40 notable AI models versus China's 15 and Europe's 3.[^14] This concentration in a small number of identifiable facilities represents a practical window for <EntityLink id="E64" name="compute-governance">compute governance</EntityLink> interventions including <EntityLink id="E464" name="monitoring">compute monitoring</EntityLink> and <EntityLink id="E473" name="international-regimes">international compute regimes</EntityLink>. As algorithmic efficiency improvements make smaller clusters competitive for more tasks, this window may — as a projection — narrow.
 
 ## Key Uncertainties
 
-- **True training compute for frontier models**: Leading labs do not publicly disclose training compute. Estimates by Epoch AI and others rely on parameter count estimates, training data sizes, and hardware deployment patterns, all of which involve significant uncertainty.
-- **China compute**: Estimates of China's compute stock are particularly uncertain given export controls, alternative chip development programs, and limited transparency. The 15% global share figure may be substantially off in either direction.
-- **Inference scaling ceiling**: It remains unclear how far reasoning-model inference scaling can be pushed before returns diminish. Current evidence suggests strong gains for verifiable domains (math, code) but much weaker gains for open-ended tasks.
-- **Capex-to-deployed-compute conversion**: Not all announced or spent capex translates into available compute on the timescales implied by announcements. Supply chain constraints, construction delays, and power availability have consistently caused slippage.
-- **Revenue sustainability**: Whether AI revenue will grow fast enough to justify current capital expenditure levels on reasonable return timelines remains genuinely contested among analysts.
+- **True training compute for frontier models**: Leading labs do not publicly disclose training compute. Epoch AI estimates based on parameter counts, training data sizes, and hardware deployment patterns carry an 80% confidence interval of 3.7–4.6× annual growth, reflecting meaningful uncertainty even in best-available estimates.[^4]
+- **China compute share**: Estimates of China's compute stock are particularly uncertain given export controls, alternative chip development programs, and limited transparency. Epoch AI's dataset covers only an estimated 10–20% of global aggregate GPU cluster performance, making regional breakdowns especially fragile.[^17]
+- **Inference scaling ceiling**: It remains unclear how far reasoning-model inference scaling can be pushed before returns diminish. Current evidence suggests strong gains for verifiable domains (math, code) but much weaker gains for open-ended tasks. Inference workloads are projected to comprise more than half of AI workloads by 2030.[^7]
+- **Capex-to-deployed-compute conversion**: Not all announced or spent capex translates into available compute on implied timescales. Meeting AI's compute demand could require \$500 billion in annual capital investment in new data centers, yet even with AI savings reinvestment an estimated \$800 billion annual revenue shortfall remains.[^23]
+- **Revenue sustainability**: Whether AI revenue will grow fast enough to justify current capital expenditure levels on reasonable return timelines remains genuinely contested. U.S. private AI investment reached \$109.1 billion in 2024, nearly 12 times China's \$9.3 billion, but analyst projections of full infrastructure funding remain uncertain.[^16]
 
 ## Sources
 
 [^1]: [Epoch AI – Key Trends and Figures in Machine Learning](https://epoch.ai/trends)
 [^2]: [Deloitte – More Compute for AI, Not Less (TMT Predictions 2026)](https://www.deloitte.com/us/en/insights/industry/technology/technology-media-and-telecom-predictions/2026/compute-power-ai.html)
 [^3]: [CNBC – AI Spending Approaches \$700 Billion in 2026 (Feb 6, 2026)](https://www.cnbc.com/2026/02/06/google-microsoft-meta-amazon-ai-cash.html)
-[^4]: [Georgetown CSET – Scaling AI: Cost and Performance of AI at the Leading Edge](https://cset.georgetown.edu/wp-content/uploads/Scaling-AI-Cost-and-Performance-of-AI-at-the-Leading-Edge.pdf)
-[^5]: [AI-2027 Compute Forecast](https://ai-2027.com/research/compute-forecast)
-[^6]: [Nvidia – Financial Results for Fourth Quarter and Fiscal 2025 (Feb 26, 2025)](https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2025)
-[^7]: [McKinsey – The Top Trends in Tech](https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/the-top-trends-in-tech)
-[^8]: [Stanford HAI – 2025 AI Index Report](https://hai.stanford.edu/ai-index/2025-ai-index-report)
-[^9]: [Teradata – AI Scaling](https://www.teradata.com/insights/ai-and-machine-learning/ai-scaling)
-[^10]: [Red Hat – Solving the Scaling Challenge: 3 Proven Strategies for Your AI Infrastructure](https://www.redhat.com/en/blog/solving-scaling-challenge-3-proven-strategies-your-ai-infrastructure)
-[^11]: [Forethought – Inference Scaling Reshapes AI Governance](https://www.forethought.org/research/inference-scaling-reshapes-ai-governance)
-[^12]: [Tech Policy Press – Bigger Might Not Be Better: The Limits of Regulating AI Through Compute Thresholds](https://techpolicy.press/bigger-might-not-be-better-the-limits-of-regulating-ai-through-compute-thresholds)
-[^13]: [METR – Measuring AI Ability to Complete Long Tasks (July 2025)](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)
-[^14]: [Forethought – The Scaling Paradox](https://www.forethought.org/research/the-scaling-paradox)
-[^15]: [Fortune – Generative AI Scaling and AGI (Feb 2025)](https://fortune.com/2025/02/19/generative-ai-scaling-agi-deep-learning/)
+[^4]: Epoch AI, "Training compute growth is driven by larger clusters, longer training, and better hardware" (https://epoch.ai/data-insights/training-compute-decomposition)
+[^5]: Epoch AI, "The computational performance of leading AI supercomputers has doubled every nine months" (https://epoch.ai/data-insights/ai-supercomputers-performance-trend)
+[^6]: Epoch AI, "Can AI scaling continue through 2030?" (https://epoch.ai/blog/can-ai-scaling-continue-through-2030)
+[^7]: McKinsey, "The next big shifts in AI workloads and hyperscaler strategies" (https://mckinsey.com/industries/technology-media-and-telecommunications/our-insights/the-next-big-shifts-in-ai-workloads-and-hyperscaler-strategies)
+[^8]: Arcade.dev, "AI Scaling Trends & Enterprise Deployment Metrics for 2025" (https://arcade.dev/blog/software-scaling-in-ai-stats)
+[^9]: [Georgetown CSET – Scaling AI: Cost and Performance of AI at the Leading Edge](https://cset.georgetown.edu/wp-content/uploads/Scaling-AI-Cost-and-Performance-of-AI-at-the-Leading-Edge.pdf)
+[^10]: [AI-2027 Compute Forecast](https://ai-2027.com/research/compute-forecast)
+[^11]: [Nvidia – Financial Results for Fourth Quarter and Fiscal 2025 (Feb 26, 2025)](https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2025)
+[^12]: [McKinsey – The Top Trends in Tech](https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/the-top-trends-in-tech)
+[^13]: [Stanford HAI – 2025 AI Index Report](https://hai.stanford.edu/ai-index/2025-ai-index-report)
+[^14]: Benchmark Your Copilot & Gemini Adoption Against 2025 Enterprise Averages (https://worklytics.co/resources/benchmark-copilot-gemini-adoption-2025-enterprise-averages-dashboard)
+[^15]: AI Coding Assistant Statistics & Trends [2025] (https://secondtalent.com/resources/ai-coding-assistant-statistics)
+[^16]: Coding AI agents are taking off — CB Insights (https://cbinsights.com/research/report/coding-ai-market-share-2025)
+[^17]: Who's winning the AI coding race? — CB Insights (https://cbinsights.com/research/report/coding-ai-market-share-december-2025)
+[^18]: Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity — METR (https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study)
+[^19]: [Tech Policy Press – Bigger Might Not Be Better: The Limits of Regulating AI Through Compute Thresholds](https://techpolicy.press/bigger-might-not-be-better-the-limits-of-regulating-ai-through-compute-thresholds)
+[^20]: [Forethought – The Scaling Paradox](https://www.forethought.org/research/the-scaling-paradox)
+[^21]: [Fortune – Generative AI Scaling and AGI (Feb 2025)](https://fortune.com/2025/02/19/generative-ai-scaling-agi-deep-learning/)
+[^22]: Gradient Flow, "Boost AI Performance: Understanding Inference Scaling" (https://gradientflow.substack.com/p/boost-ai-performance-understanding)
+[^23]: Bain & Company, "How Can We Meet AI's Insatiable Demand for Compute Power?" (https://bain.com/insights/how-can-we-meet-ais-insatiable-demand-for-compute-power-technology-report-2025)
