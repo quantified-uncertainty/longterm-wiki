@@ -220,6 +220,47 @@ jobs:
 
           echo "All changed pages passed paranoid review"
 
+      - name: Check for dangling footnotes in changed pages
+        if: success()
+        run: |
+          # Check that changed pages have no orphaned footnote references.
+          # The general gate runs footnote-integrity as WARNING (non-blocking) because
+          # 70+ existing pages have orphans. But auto-update should never INTRODUCE new
+          # orphans, so we block on them for changed files only.
+          CHANGED_MDX=$(git diff --name-only HEAD -- content/docs/ | grep '\.mdx$' || true)
+
+          if [ -z "$CHANGED_MDX" ]; then
+            echo "No MDX files changed — skipping footnote check"
+            exit 0
+          fi
+
+          BLOCKED=""
+          for FILE in $CHANGED_MDX; do
+            PAGE_ID=$(basename "$FILE" .mdx)
+
+            # Extract inline refs [^N] (not on definition lines) and definitions [^N]:
+            REFS=$(grep -oP '\[\^(?!SRC-)\K[^\]]+(?=\](?!:))' "$FILE" 2>/dev/null | sort -u || true)
+            DEFS=$(grep -oP '^\[\^\K[^\]]+(?=\]:)' "$FILE" 2>/dev/null | sort -u || true)
+
+            # Find refs without definitions (orphaned inline refs)
+            ORPHANS=$(comm -23 <(echo "$REFS") <(echo "$DEFS") 2>/dev/null || true)
+
+            if [ -n "$ORPHANS" ]; then
+              COUNT=$(echo "$ORPHANS" | wc -l | tr -d ' ')
+              echo "::error::$PAGE_ID has $COUNT orphaned footnote ref(s): $(echo $ORPHANS | tr '\n' ' ')"
+              BLOCKED="$BLOCKED $PAGE_ID"
+            fi
+          done
+
+          if [ -n "$BLOCKED" ]; then
+            echo "::error::Dangling footnotes blocked:$BLOCKED"
+            echo "Pages have inline [^N] references with no matching [^N]: definitions."
+            echo "This usually means content was truncated. Re-run the improve pipeline."
+            exit 1
+          fi
+
+          echo "Footnote integrity check passed for changed pages"
+
       - name: Find run report
         id: report
         if: always()
