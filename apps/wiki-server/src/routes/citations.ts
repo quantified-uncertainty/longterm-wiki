@@ -1167,7 +1167,8 @@ const citationsApp = new Hono()
       disputed: "inaccurate",
     };
 
-    let propagated = 0;
+    // Partition rows into those we can propagate vs those we skip
+    const toPropagateRows: Array<typeof linkedQuotes[number] & { mappedVerdict: string }> = [];
     let skipped = 0;
 
     for (const row of linkedQuotes) {
@@ -1186,21 +1187,29 @@ const citationsApp = new Hono()
         continue;
       }
 
-      await db
-        .update(citationQuotes)
-        .set({
-          accuracyVerdict: mappedVerdict,
-          accuracyScore: row.claimVerdictScore,
-          accuracyIssues: row.claimVerdictIssues ?? null,
-          accuracySupportingQuotes: row.claimVerdictQuotes ?? null,
-          verificationDifficulty: row.claimVerdictDifficulty ?? null,
-          accuracyCheckedAt: sql`now()`,
-          updatedAt: sql`now()`,
-        })
-        .where(eq(citationQuotes.id, row.quoteId));
-
-      propagated++;
+      toPropagateRows.push({ ...row, mappedVerdict });
     }
+
+    // Bulk-update all propagatable rows inside a single transaction
+    const propagated = await db.transaction(async (tx) => {
+      let count = 0;
+      for (const row of toPropagateRows) {
+        await tx
+          .update(citationQuotes)
+          .set({
+            accuracyVerdict: row.mappedVerdict,
+            accuracyScore: row.claimVerdictScore,
+            accuracyIssues: row.claimVerdictIssues ?? null,
+            accuracySupportingQuotes: row.claimVerdictQuotes ?? null,
+            verificationDifficulty: row.claimVerdictDifficulty ?? null,
+            accuracyCheckedAt: sql`now()`,
+            updatedAt: sql`now()`,
+          })
+          .where(eq(citationQuotes.id, row.quoteId));
+        count++;
+      }
+      return count;
+    });
 
     return c.json({ propagated, skipped });
   });
