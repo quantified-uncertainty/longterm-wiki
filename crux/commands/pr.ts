@@ -18,6 +18,97 @@ import type { CommandResult } from '../lib/cli.ts';
 
 type CommandOptions = Record<string, unknown>;
 
+// ── Test plan validation ─────────────────────────────────────────────────────
+
+export interface TestPlanValidation {
+  hasTestPlanSection: boolean;
+  totalItems: number;
+  checkedItems: number;
+  uncheckedItems: number;
+  status: 'ok' | 'warn' | 'block';
+  message: string;
+}
+
+/**
+ * Validate the test plan section in a PR body.
+ *
+ * Rules:
+ * - A "## Test plan" section must exist (blocks if missing).
+ * - Test plan must have at least one checkbox item (blocks if empty).
+ * - All checkbox items should be checked (warns if unchecked items remain).
+ *   Unchecked items mean testing was planned but not executed.
+ */
+export function validateTestPlan(body: string): TestPlanValidation {
+  // Find the test plan section (case-insensitive, allow ## or ###)
+  const testPlanMatch = body.match(/^#{2,3}\s+test\s+plan\b/im);
+
+  if (!testPlanMatch) {
+    return {
+      hasTestPlanSection: false,
+      totalItems: 0,
+      checkedItems: 0,
+      uncheckedItems: 0,
+      status: 'block',
+      message: 'PR body is missing a "## Test plan" section.',
+    };
+  }
+
+  // Extract the test plan section content (up to next ## heading or end of body)
+  const sectionStart = testPlanMatch.index! + testPlanMatch[0].length;
+  const nextHeading = body.slice(sectionStart).match(/^#{2,3}\s+/m);
+  const sectionEnd = nextHeading
+    ? sectionStart + nextHeading.index!
+    : body.length;
+  const section = body.slice(sectionStart, sectionEnd);
+
+  // Count checkbox items
+  const checked = [...section.matchAll(/^[\s]*-\s+\[x\]/gim)];
+  const unchecked = [...section.matchAll(/^[\s]*-\s+\[\s\]/gm)];
+  const totalItems = checked.length + unchecked.length;
+
+  if (totalItems === 0) {
+    return {
+      hasTestPlanSection: true,
+      totalItems: 0,
+      checkedItems: 0,
+      uncheckedItems: 0,
+      status: 'block',
+      message: 'Test plan section exists but has no checkbox items (- [ ] or - [x]).',
+    };
+  }
+
+  if (unchecked.length > 0 && checked.length === 0) {
+    return {
+      hasTestPlanSection: true,
+      totalItems,
+      checkedItems: checked.length,
+      uncheckedItems: unchecked.length,
+      status: 'block',
+      message: `Test plan has ${unchecked.length} item(s) but none are checked. Tests were listed but not executed.`,
+    };
+  }
+
+  if (unchecked.length > 0) {
+    return {
+      hasTestPlanSection: true,
+      totalItems,
+      checkedItems: checked.length,
+      uncheckedItems: unchecked.length,
+      status: 'warn',
+      message: `Test plan has ${unchecked.length} unchecked item(s) out of ${totalItems}. Consider completing or removing unexecuted items.`,
+    };
+  }
+
+  return {
+    hasTestPlanSection: true,
+    totalItems,
+    checkedItems: checked.length,
+    uncheckedItems: 0,
+    status: 'ok',
+    message: `Test plan: ${checked.length}/${totalItems} items verified.`,
+  };
+}
+
 /**
  * Bigram Jaccard similarity between two text strings.
  * Returns 0.0 (no overlap) to 1.0 (identical).
@@ -216,6 +307,25 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
     } catch {
       // Quality checks are best-effort — don't block PR creation if they fail
     }
+
+    // Check 3: Test plan validation
+    if (!(options.skipTestPlan ?? options['skip-test-plan'])) {
+      const testPlanResult = validateTestPlan(body);
+      if (testPlanResult.status === 'block') {
+        return {
+          output:
+            `${c.red}✗ Test plan validation failed:${c.reset} ${testPlanResult.message}\n` +
+            `  PRs must include a "## Test plan" section with checked items (- [x]).\n` +
+            `  Pass --skip-test-plan to bypass this check.\n`,
+          exitCode: 1,
+        };
+      }
+      if (testPlanResult.status === 'warn') {
+        log.warn(testPlanResult.message);
+      } else {
+        log.info(testPlanResult.message);
+      }
+    }
   }
 
   // Check for existing PR first
@@ -345,6 +455,52 @@ async function fixBody(args: string[], options: CommandOptions): Promise<Command
   return { output, exitCode: 0 };
 }
 
+/**
+ * Validate the test plan section of the current branch's PR.
+ *
+ * Reads the PR body from GitHub and checks that the test plan section
+ * has checkbox items and that they are checked (indicating tests were executed).
+ *
+ * Options:
+ *   --pr=N    Target a specific PR number instead of auto-detecting
+ *   --json    JSON output
+ */
+async function validateTestPlanCmd(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+  const c = log.colors;
+  const json = Boolean(options.json);
+
+  let prNum: number | null = options.pr ? parseInt(String(options.pr), 10) : null;
+
+  if (!prNum) {
+    const branch = currentBranch();
+    const prs = await githubApi<GitHubPR[]>(
+      `/repos/${REPO}/pulls?head=quantified-uncertainty:${branch}&state=open`
+    );
+    if (!prs.length) {
+      if (json) return { output: JSON.stringify({ error: 'no PR found' }) + '\n', exitCode: 1 };
+      return {
+        output: `${c.yellow}No open PR found for branch ${currentBranch()}.${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+    prNum = prs[0].number;
+  }
+
+  const pr = await githubApi<GitHubPR>(`/repos/${REPO}/pulls/${prNum}`);
+  const result = validateTestPlan(pr.body ?? '');
+
+  if (json) {
+    return { output: JSON.stringify({ pr: prNum, ...result }) + '\n', exitCode: result.status === 'block' ? 1 : 0 };
+  }
+
+  const icon = result.status === 'ok' ? `${c.green}✓` : result.status === 'warn' ? `${c.yellow}⚠` : `${c.red}✗`;
+  return {
+    output: `${icon}${c.reset} PR #${prNum}: ${result.message}\n`,
+    exitCode: result.status === 'block' ? 1 : 0,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Domain entry point (required by crux.mjs dispatch)
 // ---------------------------------------------------------------------------
@@ -353,6 +509,7 @@ export const commands = {
   create,
   detect,
   'fix-body': fixBody,
+  'validate-test-plan': validateTestPlanCmd,
 };
 
 export function getHelp(): string {
@@ -360,9 +517,10 @@ export function getHelp(): string {
 PR Domain — GitHub Pull Request utilities
 
 Commands:
-  create              Create a PR for the current branch (corruption-safe).
-  detect              Detect open PR for current branch (returns URL + number).
-  fix-body [--pr=N]   Detect and repair literal \\n in the current branch's PR body.
+  create                        Create a PR for the current branch (corruption-safe).
+  detect                        Detect open PR for current branch (returns URL + number).
+  fix-body [--pr=N]             Detect and repair literal \\n in the current branch's PR body.
+  validate-test-plan [--pr=N]   Check that the PR's test plan section is complete.
 
 Options (create):
   --title="..."       Required. PR title.
@@ -371,19 +529,24 @@ Options (create):
   --base=main         Base branch (default: main).
   --draft             Create as draft PR.
   --allow-empty-body  Allow creating PR without a description (not recommended).
+  --skip-test-plan    Skip test plan validation (not recommended).
   (stdin)             If --body and --body-file are absent and stdin is a pipe, body is read from stdin.
 
 Options (detect):
   --ci                JSON output.
 
-Options (fix-body):
+Options (fix-body / validate-test-plan):
   --pr=N              Target a specific PR number instead of auto-detecting.
+  --json              JSON output (validate-test-plan only).
 
 Examples:
   # Multi-line body via heredoc (recommended — avoids sh/dash heredoc issues):
   pnpm crux pr create --title="Add feature X" <<'EOF'
   ## Summary
   - Added X
+
+  ## Test plan
+  - [x] Ran unit tests
   EOF
 
   # Multi-line body via file (also recommended):
@@ -396,5 +559,7 @@ Examples:
   pnpm crux pr detect --ci               # JSON output for scripts
   pnpm crux pr fix-body                  # Fix PR for current branch
   pnpm crux pr fix-body --pr=42          # Fix a specific PR
+  pnpm crux pr validate-test-plan        # Check test plan on current PR
+  pnpm crux pr validate-test-plan --pr=42 --json  # Check specific PR (JSON)
 `.trim();
 }
