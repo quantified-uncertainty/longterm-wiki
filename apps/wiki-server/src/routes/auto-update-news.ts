@@ -7,6 +7,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  paginationQuery,
 } from "./utils.js";
 import {
   AutoUpdateNewsItemSchema as SharedNewsItemSchema,
@@ -21,10 +22,7 @@ const MAX_PAGE_SIZE = 1000;
 
 const CreateBatchSchema = AutoUpdateNewsBatchSchema;
 
-const PaginationQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
-  offset: z.coerce.number().int().min(0).default(0),
-});
+const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit: 100 });
 
 const DashboardQuery = z.object({
   runs: z.coerce.number().int().min(1).max(50).default(10),

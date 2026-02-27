@@ -9,16 +9,14 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  paginationQuery,
 } from "./utils.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 100;
 
-const PaginationQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(20),
-  offset: z.coerce.number().int().min(0).default(0),
-});
+const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit: 20 });
 
 const ByPageQuery = z.object({
   page_id: z.string().min(1).max(200),

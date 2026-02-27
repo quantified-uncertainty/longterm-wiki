@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq, count, sql, desc, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { autoUpdateRuns, autoUpdateResults } from "../schema.js";
-import { parseJsonBody, validationError, invalidJsonError, notFoundError, firstOrThrow } from "./utils.js";
+import { parseJsonBody, validationError, invalidJsonError, notFoundError, firstOrThrow, paginationQuery } from "./utils.js";
 
 // ---- Constants ----
 
@@ -42,10 +42,7 @@ const RecordRunSchema = z.object({
   results: z.array(ResultSchema).max(MAX_BATCH_SIZE).optional(),
 });
 
-const PaginationQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
-  offset: z.coerce.number().int().min(0).default(0),
-});
+const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit: 50 });
 
 // ---- Helpers ----
 
@@ -74,8 +71,9 @@ function formatRunEntry(
       ? (() => {
           try {
             return JSON.parse(r.newPagesCreated) as string[];
-          } catch {
+          } catch (err) {
             // Legacy format: comma-separated string from old seed script
+            console.error("[auto-update-runs] JSON parse failed for newPagesCreated, falling back to CSV:", err instanceof Error ? err.message : String(err));
             return r.newPagesCreated.split(",").map(s => s.trim()).filter(Boolean);
           }
         })()

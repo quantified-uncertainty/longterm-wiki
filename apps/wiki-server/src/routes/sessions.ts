@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq, count, sql, desc, inArray, gte } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { sessions, sessionPages } from "../schema.js";
-import { parseJsonBody, validationError, invalidJsonError, firstOrThrow } from "./utils.js";
+import { parseJsonBody, validationError, invalidJsonError, firstOrThrow, paginationQuery } from "./utils.js";
 import {
   CreateSessionSchema as SharedCreateSessionSchema,
   CreateSessionBatchSchema,
@@ -19,10 +19,7 @@ const MAX_PAGE_SIZE = 500;
 const CreateSessionSchema = SharedCreateSessionSchema;
 const CreateBatchSchema = CreateSessionBatchSchema;
 
-const PaginationQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
-  offset: z.coerce.number().int().min(0).default(0),
-});
+const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit: 100 });
 
 const PageChangesQuery = z.object({
   /** Maximum number of sessions to return. Defaults to 500. */

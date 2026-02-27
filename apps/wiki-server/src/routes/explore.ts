@@ -96,7 +96,8 @@ function parseTags(tagsStr: string | null): string[] {
   try {
     const parsed = JSON.parse(tagsStr);
     return Array.isArray(parsed) ? parsed : [];
-  } catch {
+  } catch (err) {
+    console.error("[explore] parseTags failed:", err instanceof Error ? err.message : String(err));
     return [];
   }
 }
@@ -108,7 +109,8 @@ function parseClusters(clustersVal: unknown | null): string[] {
     try {
       const parsed = JSON.parse(clustersVal);
       return Array.isArray(parsed) ? parsed : [];
-    } catch {
+    } catch (err) {
+      console.error("[explore] parseClusters failed:", err instanceof Error ? err.message : String(err));
       return [];
     }
   }
