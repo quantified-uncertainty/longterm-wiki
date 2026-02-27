@@ -139,18 +139,29 @@ export function RelationshipsTable({
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.length > 0 ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            <>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+              {/* Spacer row to maintain consistent table height across pages */}
+              {table.getRowModel().rows.length < 25 && (
+                <tr>
+                  <td
+                    colSpan={columns.length}
+                    style={{ height: `${(25 - table.getRowModel().rows.length) * 37}px` }}
+                  />
+                </tr>
+              )}
+            </>
           ) : (
             <TableRow>
               <TableCell
