@@ -278,9 +278,9 @@ export async function handleBatchCommit(
       env: {
         ...process.env,
         GIT_AUTHOR_NAME: 'longterm-wiki-bot',
-        GIT_AUTHOR_EMAIL: 'bot@longterm.wiki',
+        GIT_AUTHOR_EMAIL: 'bot@quantifieduncertainty.org',
         GIT_COMMITTER_NAME: 'longterm-wiki-bot',
-        GIT_COMMITTER_EMAIL: 'bot@longterm.wiki',
+        GIT_COMMITTER_EMAIL: 'bot@quantifieduncertainty.org',
       },
     });
 
