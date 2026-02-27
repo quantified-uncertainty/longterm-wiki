@@ -1,17 +1,15 @@
 /**
  * Export Citation Accuracy Dashboard Data
  *
- * Prefers PG (wiki-server) data when available, falls back to local SQLite.
- * Exports YAML files to data/citation-accuracy/ so they're available in
- * production (neither SQLite nor PG is available on Vercel).
+ * Exports citation accuracy data from PG (wiki-server) to YAML files
+ * so they're available in production (PG is not available on Vercel).
  *
  * Output:
  *   data/citation-accuracy/summary.yaml          — global stats, page summaries, domain analysis
  *   data/citation-accuracy/pages/<pageId>.yaml    — per-page flagged citations
  *
  * Usage:
- *   pnpm crux citations export-dashboard              # Auto-uses PG if available
- *   pnpm crux citations export-dashboard --local-only  # Force local SQLite only
+ *   pnpm crux citations export-dashboard              # Uses PG data
  *   pnpm crux citations export-dashboard --json
  */
 
@@ -305,7 +303,7 @@ function truncateClaim(text: string): string {
 
 /**
  * Export dashboard data to YAML files.
- * @param fromDbData - If provided, uses this data instead of building from SQLite
+ * @param fromDbData - If provided, uses this data instead of building from PG
  */
 export async function exportDashboardData(fromDbData?: DashboardExport | null): Promise<{ path: string; data: DashboardExport } | null> {
   const data = fromDbData ?? await buildDashboardExport();
@@ -322,7 +320,7 @@ export async function exportDashboardData(fromDbData?: DashboardExport | null): 
   }
 
   // Write per-page flagged citation files
-  // Only touch pages that are in the current SQLite DB — preserve other pages' YAML
+  // Only touch pages present in the current dataset — preserve other pages' YAML
   const pagesInDb = new Set(data.pages.map(p => p.pageId));
   const pagesWithFlagged = new Set(flaggedByPage.keys());
   try {
@@ -371,8 +369,7 @@ async function main() {
   const localOnly = args['local-only'] === true;
   const colors = getColors(json);
 
-  // Prefer PG data (4,881+ records) over SQLite (local cache, often sparse).
-  // Use --local-only to force SQLite-only mode.
+  // Fetch data from PG (wiki-server).
   let dbData: DashboardExport | null = null;
   if (!localOnly) {
     const serverUp = await isServerAvailable();
@@ -384,10 +381,10 @@ async function main() {
           console.log(`${colors.dim}Using data from wiki-server DB${colors.reset}`);
         }
       } else if (!json) {
-        console.log(`${colors.dim}Wiki server returned no data (${dashboardResult.error}), falling back to local SQLite${colors.reset}`);
+        console.log(`${colors.dim}Wiki server returned no data (${dashboardResult.error})${colors.reset}`);
       }
     } else if (!json) {
-      console.log(`${colors.dim}Wiki server not available, falling back to local SQLite${colors.reset}`);
+      console.log(`${colors.dim}Wiki server not available${colors.reset}`);
     }
   }
 

@@ -587,6 +587,7 @@ export async function fetchCitationUrl(url: string): Promise<FetchResult> {
 /**
  * Store full fetched content in the in-memory session cache.
  * This replaces the SQLite tier — PG is the durable store.
+ * Best-effort: errors are swallowed so verification isn't blocked.
  */
 function storeCitationContent(
   url: string,
@@ -594,15 +595,19 @@ function storeCitationContent(
   _footnote: number,
   result: FetchResult,
 ) {
-  setCachedContent(url, {
-    url,
-    fetchedAt: new Date().toISOString(),
-    httpStatus: result.httpStatus,
-    contentType: result.contentType,
-    pageTitle: result.pageTitle,
-    fullText: result.fullText,
-    contentLength: result.contentLength,
-  });
+  try {
+    setCachedContent(url, {
+      url,
+      fetchedAt: new Date().toISOString(),
+      httpStatus: result.httpStatus,
+      contentType: result.contentType,
+      pageTitle: result.pageTitle,
+      fullText: result.fullText,
+      contentLength: result.contentLength,
+    });
+  } catch {
+    // In-memory cache storage is best-effort — don't fail verification
+  }
 }
 
 /**
@@ -711,7 +716,7 @@ export async function verifyCitationsForPage(
             status,
             note: result.error,
           };
-          // Store full HTML + text content in SQLite + PostgreSQL
+          // Store full HTML + text content in memory cache + PostgreSQL
           if (result.fullHtml || result.fullText) {
             storeCitationContent(ext.url, pageId, ext.footnote, result);
             saveFetchResultToPostgres(ext.url, result);
