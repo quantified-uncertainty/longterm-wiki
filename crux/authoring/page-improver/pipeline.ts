@@ -22,6 +22,7 @@ import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import { createDbEntriesForRcFootnotes } from '../../claims/convert-new-footnotes.ts';
 import { isBiographicalPage } from '../../lib/page-analysis.ts';
 import { validateMdxContent } from '../../lib/validate-mdx-content.ts';
+import { ValidationEngine } from '../../lib/validation-engine.ts';
 import {
   analyzePhase, researchPhase, improvePhase, improveSectionsPhase,
   enrichPhase, reviewPhase,
@@ -393,6 +394,15 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     fs.writeFileSync(filePath, contentToApply);
     console.log(`\nChanges applied to ${filePath}`);
 
+    // Post-apply cleanup: run auto-fixers on the written file
+    const cleanupResult = await runPostApplyCleanup(filePath);
+    if (cleanupResult.fixed > 0) {
+      log('apply', `Auto-fixed ${cleanupResult.fixed} issues (${cleanupResult.rules.join(', ')})`);
+    }
+    if (cleanupResult.remaining > 0) {
+      log('apply', `⚠ ${cleanupResult.remaining} unfixable issues remain — review manually`);
+    }
+
     // Create DB citation entries for any [^rc-XXXX] footnotes in the applied content
     try {
       const rcCreated = await createDbEntriesForRcFootnotes(contentToApply, page.id);
@@ -499,6 +509,51 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   }
 
   return results;
+}
+
+/** CI-blocking + quality rules to auto-fix after apply. */
+const POST_APPLY_RULES = [
+  'dollar-signs', 'comparison-operators', 'tilde-dollar',
+  'markdown-lists', 'consecutive-bold-labels',
+];
+
+/**
+ * Run auto-fixers on a single file after apply.
+ *
+ * Runs the CI-blocking fixable rules (dollar-signs, comparison-operators)
+ * plus quality rules (markdown-lists, tilde-dollar, consecutive-bold-labels)
+ * on the applied file and auto-fixes what it can.
+ */
+async function runPostApplyCleanup(filePath: string): Promise<{ fixed: number; remaining: number; rules: string[] }> {
+  try {
+    const engine = new ValidationEngine();
+    await engine.load();
+
+    // Run targeted rules on the single file
+    const issues = await engine.validate({
+      ruleIds: POST_APPLY_RULES,
+      files: [filePath],
+    });
+
+    if (issues.length === 0) {
+      return { fixed: 0, remaining: 0, rules: [] };
+    }
+
+    // Auto-fix what we can
+    const fixableIssues = issues.filter(i => i.isFixable);
+    if (fixableIssues.length > 0) {
+      const { issuesFixed } = engine.applyFixes(fixableIssues);
+      const fixedRules = [...new Set(fixableIssues.map(i => i.rule))];
+      const remainingCount = issues.length - issuesFixed;
+      return { fixed: issuesFixed, remaining: remainingCount, rules: fixedRules };
+    }
+
+    return { fixed: 0, remaining: issues.length, rules: [] };
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('apply', `Warning: post-apply cleanup failed: ${error.message}`);
+    return { fixed: 0, remaining: 0, rules: [] };
+  }
 }
 
 /** Log biographical accuracy warnings for person/org pages. */

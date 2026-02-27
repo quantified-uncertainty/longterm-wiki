@@ -25,5 +25,6 @@ export type {
 // When run directly as a script, delegate to the index module
 import { fileURLToPath } from 'url';
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  await import('./grading/index.ts');
+  const { main } = await import('./grading/index.ts');
+  main().catch(console.error);
 }
