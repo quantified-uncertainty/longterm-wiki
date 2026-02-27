@@ -76,7 +76,7 @@ pnpm crux maintain health-snapshot       # Quantified code health metrics
 pnpm crux maintain health-snapshot --json  # JSON for trend tracking
 pnpm crux maintain detect-cruft          # Find TODOs, large files, dead code
 
-# Epic management (multi-issue tracking via GitHub Discussions)
+# Epic management (multi-issue tracking)
 pnpm crux epic                   # List open epics
 pnpm crux epic create "Title"    # Create a new epic
 pnpm crux epic link <N> --issue=M  # Link issue to epic
@@ -162,7 +162,7 @@ For non-trivial changes (>5 files or >300 lines), run `/review-pr` before shippi
 - **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts` — check existing section semantics before adding pages
 - **Internal dashboards**: For features with data/status over time, create `/internal/<name>` pages following patterns in `apps/web/src/app/internal/`
 - **GitHub API**: Use `crux issues/pr/ci/epic` commands for writes. Use MCP GitHub tools for ad-hoc reads. Never raw `curl`.
-- **Epics**: Use `crux epic` for multi-issue coordination via GitHub Discussions. Individual tasks stay as Issues.
+- **Epics**: Use `crux epic` for tracking multi-issue work. For epics needing detailed coordination (decision logs, sprint plans, status tracking), create an epic wiki page using the convention in `content/docs/internal/epic-page-conventions.mdx` and add an `<EpicTracker issues={[...]} />` component. See E897 (claims roadmap) for a working example. Individual tasks stay as Issues.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
 - **Hono RPC**: Mandatory for all new wiki-server routes; convert existing routes when modifying them. See `.claude/rules/wiki-server-rpc-migration.md`.
 - **Entity IDs**: **Never manually invent numericIds** (E42, E886, etc.). Always allocate from the wiki-server: `pnpm crux ids allocate <slug>`. The gate runs `assign-ids.mjs` automatically as a safety net, but allocating early prevents conflicts between concurrent agents. Use `pnpm crux ids check <slug>` to look up existing IDs.

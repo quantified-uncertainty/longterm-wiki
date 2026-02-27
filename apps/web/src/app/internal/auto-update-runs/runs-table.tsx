@@ -3,7 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { formatAge } from "@lib/format";
-import type { RunRow } from "./page";
+import type { RunRow } from "./auto-update-runs-content";
 
 function StatusBadge({
   updated,

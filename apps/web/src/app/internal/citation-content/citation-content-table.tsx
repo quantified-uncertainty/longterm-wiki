@@ -2,7 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
-import type { ContentEntry } from "./page";
+import type { ContentEntry } from "./citation-content-content";
 
 function StatusBadge({ httpStatus }: { httpStatus: number | null }) {
   if (httpStatus === null) {

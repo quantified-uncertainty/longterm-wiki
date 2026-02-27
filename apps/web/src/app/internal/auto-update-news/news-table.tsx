@@ -2,7 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
-import type { NewsRow } from "./page";
+import type { NewsRow } from "./auto-update-news-content";
 
 function RelevanceBadge({ score }: { score: number }) {
   const color =

@@ -211,12 +211,30 @@ describe("getInternalNav (mocked data)", () => {
     expect(factItem!.href).toBe("/wiki/E898");
   });
 
-  it("non-migrated dashboards still use /internal/ hrefs", () => {
+  it("all dashboard items use /wiki/E<id> hrefs (fully migrated)", () => {
     const sections = getInternalNav();
     const dashboards = sections.find(s => s.title === "Dashboards")!;
 
-    const suggestedPages = dashboards.items.find(i => i.label === "Suggested Pages");
-    expect(suggestedPages?.href).toBe("/internal/suggested-pages");
+    // All dashboards are now migrated to MDX stubs with entity IDs
+    for (const item of dashboards.items) {
+      if (item.label === "Internal Home") continue; // Overview link
+      expect(item.href).toMatch(/^\/wiki\//);
+    }
+  });
+
+  it("all Claims & Citations monitoring items use /wiki/ hrefs (fully migrated)", () => {
+    const sections = getInternalNav();
+    const claims = sections.find(s => s.title === "Claims & Citations")!;
+
+    const monitoringLabels = [
+      "Claims Ingestion", "Citation Accuracy", "Citation Content",
+      "Hallucination Risk", "Hallucination Evals", "Fact Dashboard",
+    ];
+    for (const label of monitoringLabels) {
+      const item = claims.items.find(i => i.label === label);
+      expect(item).toBeDefined();
+      expect(item!.href).toMatch(/^\/wiki\//);
+    }
   });
 
   it("Style Guides section contains expected entries", () => {

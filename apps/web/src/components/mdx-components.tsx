@@ -30,13 +30,27 @@ import SafetyGeneralizabilityTableView from "@/components/tables/views/SafetyGen
 // Summary components
 import { KeyTakeaways } from "@/components/wiki/KeyTakeaways";
 
-// Epic tracking
+// Epic tracking — use on multi-issue coordination pages (see content/docs/internal/epic-page-conventions.mdx)
+// Usage: <EpicTracker issues={[1043, 1065, 1074]} /> — renders live GitHub issue status table
 import { EpicTracker } from "@/components/wiki/EpicTracker";
 
 // Dashboard content components (rendered via MDX stubs at /wiki/E<id>)
 import { FactsPageContent } from "@/app/internal/facts/facts-content";
 import { PageCoverageContent } from "@/app/internal/page-coverage/page-coverage-content";
 import { UpdateScheduleContent } from "@/app/internal/updates/updates-content";
+import { EntitiesContent } from "@/app/internal/entities/entities-content";
+import { PageChangesContent } from "@/app/internal/page-changes/page-changes-content";
+import { SuggestedPagesContent } from "@/app/internal/suggested-pages/suggested-pages-content";
+import { ImproveRunsContent } from "@/app/internal/improve-runs/improve-runs-content";
+import { AgentSessionsContent } from "@/app/internal/agent-sessions/agent-sessions-content";
+import { SessionInsightsContent } from "@/app/internal/session-insights/session-insights-content";
+import { AutoUpdateRunsContent } from "@/app/internal/auto-update-runs/auto-update-runs-content";
+import { AutoUpdateNewsContent } from "@/app/internal/auto-update-news/auto-update-news-content";
+import { ClaimsIngestionContent } from "@/app/internal/claims-ingestion/claims-ingestion-content";
+import { CitationAccuracyContent } from "@/app/internal/citation-accuracy/citation-accuracy-content";
+import { CitationContentContent } from "@/app/internal/citation-content/citation-content-content";
+import { HallucinationRiskContent } from "@/app/internal/hallucination-risk/hallucination-risk-content";
+import { HallucinationEvalsContent } from "@/app/internal/hallucination-evals/hallucination-evals-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -147,6 +161,19 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   FactsPageContent,
   PageCoverageContent,
   UpdateScheduleContent,
+  EntitiesContent,
+  PageChangesContent,
+  SuggestedPagesContent,
+  ImproveRunsContent,
+  AgentSessionsContent,
+  SessionInsightsContent,
+  AutoUpdateRunsContent,
+  AutoUpdateNewsContent,
+  ClaimsIngestionContent,
+  CitationAccuracyContent,
+  CitationContentContent,
+  HallucinationRiskContent,
+  HallucinationEvalsContent,
 
   // Table view components
   SafetyApproachesTableView,

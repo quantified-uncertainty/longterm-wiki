@@ -2,7 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
-import type { SourceRow } from "./page";
+import type { SourceRow } from "./auto-update-news-content";
 
 const columns: ColumnDef<SourceRow>[] = [
   {

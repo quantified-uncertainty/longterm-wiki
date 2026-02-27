@@ -266,6 +266,23 @@ vi.mock("../db.js", async () => {
         .sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
     }
 
+    // ---- SELECT date, branch, title, learnings_json, recommendations_json FROM sessions WHERE branch LIKE ... ORDER BY ... LIMIT (insights) ----
+    // Insights query selects exactly 5 columns (no "id", no "summary") — distinguish from paginated list which selects all.
+    if (q.includes('"sessions"') && q.includes("order by") && q.includes("limit") && q.includes('"learnings_json"') && q.includes('"recommendations_json"') && !q.includes('"summary"')) {
+      let filtered = [...sessionStore];
+      // Apply LIKE filter on branch if present
+      if (q.includes("like") && params.length > 0) {
+        const pattern = String(params[0]);
+        // Convert SQL LIKE pattern to a simple prefix match (strip trailing %)
+        const prefix = pattern.replace(/%$/, "").replace(/\\%/g, "%").replace(/\\_/g, "_");
+        filtered = filtered.filter((s) => s.branch && s.branch.startsWith(prefix));
+      }
+      const sorted = filtered.sort(
+        (a, b) => b.date.localeCompare(a.date) || b.id - a.id
+      );
+      return sorted.slice(0, 500);
+    }
+
     // ---- SELECT ... FROM sessions ORDER BY ... LIMIT ... (paginated list) ----
     if (q.includes('"sessions"') && q.includes("order by") && q.includes("limit") && !q.includes("any(") && !q.includes(" in (")) {
       const limit = (params[0] as number) || 100;
@@ -616,6 +633,190 @@ describe("Sessions API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.sessions).toHaveLength(0);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Insights endpoint
+  // ---------------------------------------------------------------------------
+
+  describe("GET /api/sessions/insights", () => {
+    it("returns all insights when no branch_prefix filter", async () => {
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        branch: "claude/feature-abc",
+        title: "Feature session",
+        learningsJson: ["Learned X", "Learned Y"],
+        recommendationsJson: ["Do A"],
+      });
+
+      const res = await app.request("/api/sessions/insights");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.insights).toHaveLength(3);
+      expect(body.summary.total).toBe(3);
+      expect(body.summary.byType.learning).toBe(2);
+      expect(body.summary.byType.recommendation).toBe(1);
+    });
+
+    it("returns correct insight shape", async () => {
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        branch: "claude/test",
+        title: "Test Session",
+        learningsJson: ["Important learning"],
+      });
+
+      const res = await app.request("/api/sessions/insights");
+      const body = await res.json();
+
+      const insight = body.insights[0];
+      expect(insight).toEqual({
+        date: "2026-02-20",
+        branch: "claude/test",
+        title: "Test Session",
+        type: "learning",
+        text: "Important learning",
+      });
+    });
+
+    it("filters by branch_prefix", async () => {
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-18",
+        branch: "claude/claims-extract",
+        title: "Claims session",
+        learningsJson: ["Claims insight"],
+      });
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-19",
+        branch: "claude/bugfix-xyz",
+        title: "Bugfix session",
+        learningsJson: ["Bugfix insight"],
+      });
+
+      const res = await app.request(
+        "/api/sessions/insights?branch_prefix=claude/claims"
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.insights).toHaveLength(1);
+      expect(body.insights[0].text).toBe("Claims insight");
+      expect(body.insights[0].branch).toBe("claude/claims-extract");
+    });
+
+    it("returns empty when no insights match filter", async () => {
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        branch: "claude/feature",
+        title: "Session",
+        learningsJson: ["Something"],
+      });
+
+      const res = await app.request(
+        "/api/sessions/insights?branch_prefix=claude/nonexistent"
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.insights).toEqual([]);
+      expect(body.summary.total).toBe(0);
+      expect(body.summary.byType).toEqual({});
+    });
+
+    it("returns empty when sessions have no learnings or recommendations", async () => {
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        title: "Minimal session",
+      });
+
+      const res = await app.request("/api/sessions/insights");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.insights).toHaveLength(0);
+      expect(body.summary.total).toBe(0);
+    });
+
+    it("handles sessions with only learnings (no recommendations)", async () => {
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        title: "Learnings only",
+        learningsJson: ["Just a learning"],
+      });
+
+      const res = await app.request("/api/sessions/insights");
+      const body = await res.json();
+
+      expect(body.insights).toHaveLength(1);
+      expect(body.insights[0].type).toBe("learning");
+      expect(body.summary.byType.recommendation).toBeUndefined();
+    });
+
+    it("handles sessions with only recommendations (no learnings)", async () => {
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        title: "Recommendations only",
+        recommendationsJson: ["Do this thing"],
+      });
+
+      const res = await app.request("/api/sessions/insights");
+      const body = await res.json();
+
+      expect(body.insights).toHaveLength(1);
+      expect(body.insights[0].type).toBe("recommendation");
+      expect(body.summary.byType.learning).toBeUndefined();
+    });
+
+    it("aggregates insights across multiple sessions", async () => {
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-18",
+        branch: "claude/a",
+        title: "Session A",
+        learningsJson: ["L1"],
+        recommendationsJson: ["R1", "R2"],
+      });
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-19",
+        branch: "claude/b",
+        title: "Session B",
+        learningsJson: ["L2", "L3"],
+      });
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        branch: "claude/c",
+        title: "Session C",
+        recommendationsJson: ["R3"],
+      });
+
+      const res = await app.request("/api/sessions/insights");
+      const body = await res.json();
+
+      expect(body.insights).toHaveLength(6);
+      expect(body.summary.total).toBe(6);
+      expect(body.summary.byType.learning).toBe(3);
+      expect(body.summary.byType.recommendation).toBe(3);
+    });
+
+    it("returns insights ordered by date descending", async () => {
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-15",
+        title: "Older",
+        learningsJson: ["Old insight"],
+      });
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-25",
+        title: "Newer",
+        learningsJson: ["New insight"],
+      });
+
+      const res = await app.request("/api/sessions/insights");
+      const body = await res.json();
+
+      // Newer session's insights should come first
+      expect(body.insights[0].date).toBe("2026-02-25");
+      expect(body.insights[1].date).toBe("2026-02-15");
     });
   });
 });

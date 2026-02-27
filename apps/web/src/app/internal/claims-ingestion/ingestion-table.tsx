@@ -3,7 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { formatAge } from "@lib/format";
-import type { ResourceBreakdownRow } from "./page";
+import type { ResourceBreakdownRow } from "./claims-ingestion-content";
 
 const columns: ColumnDef<ResourceBreakdownRow>[] = [
   {

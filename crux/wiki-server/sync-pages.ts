@@ -35,6 +35,10 @@ const PAGES_JSON_PATH = join(
   PROJECT_ROOT,
   "apps/web/src/data/pages.json"
 );
+const DATABASE_JSON_PATH = join(
+  PROJECT_ROOT,
+  "apps/web/src/data/database.json"
+);
 const WIKI_DIR = join(PROJECT_ROOT, "apps/web/public/wiki");
 
 // --- Configuration ---
@@ -226,6 +230,32 @@ async function main() {
   const rawPages: PageData[] = JSON.parse(
     readFileSync(PAGES_JSON_PATH, "utf-8")
   );
+
+  // Enrich pages with numericIds from database.json's idRegistry.
+  // pages.json only stores numericId when it's explicitly set in MDX frontmatter,
+  // but the idRegistry (built by build-data.mjs from the entity_ids server table)
+  // has IDs for all pages. Without this, most pages sync with NULL numeric_id
+  // and the explore endpoint's `numeric_id IS NOT NULL` filter hides them.
+  if (existsSync(DATABASE_JSON_PATH)) {
+    try {
+      const dbJson = JSON.parse(readFileSync(DATABASE_JSON_PATH, "utf-8"));
+      const bySlug: Record<string, string> = dbJson?.idRegistry?.bySlug ?? {};
+      let enriched = 0;
+      for (const page of rawPages) {
+        if (!page.numericId && bySlug[page.id]) {
+          page.numericId = bySlug[page.id];
+          enriched++;
+        }
+      }
+      if (enriched > 0) {
+        console.log(`  Enriched ${enriched} pages with numericId from idRegistry`);
+      }
+    } catch (err) {
+      console.warn(
+        `  Warning: Could not read idRegistry from ${DATABASE_JSON_PATH}: ${err instanceof Error ? err.message : err}`
+      );
+    }
+  }
 
   // Filter out schema pages (internal pages are kept so the explore view can display them)
   const filteredPages = rawPages.filter(
