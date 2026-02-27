@@ -811,6 +811,178 @@ async function markRun(_args: string[], _options: CommandOptions): Promise<Comma
 }
 
 // ---------------------------------------------------------------------------
+// Health Snapshot — quantified metrics for trend tracking
+// ---------------------------------------------------------------------------
+
+interface HealthMetrics {
+  date: string;
+  todoCount: number;
+  fixmeCount: number;
+  anyTypeCount: number;
+  largeFiles: { path: string; lines: number }[];
+  largeFileCount: number;
+  testFileCount: number;
+  sourceFileCount: number;
+  testToSourceRatio: number;
+  totalSourceLines: number;
+  recentCommits: { total: number; fixes: number; features: number; fixRatio: number };
+  skippedTests: number;
+}
+
+async function healthSnapshot(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const isJson = options.json || options.ci;
+
+  const execOpts = { encoding: 'utf-8' as const, cwd: PROJECT_ROOT, timeout: 30_000, maxBuffer: 5 * 1024 * 1024 };
+
+  const metrics: HealthMetrics = {
+    date: new Date().toISOString().slice(0, 10),
+    todoCount: 0,
+    fixmeCount: 0,
+    anyTypeCount: 0,
+    largeFiles: [],
+    largeFileCount: 0,
+    testFileCount: 0,
+    sourceFileCount: 0,
+    testToSourceRatio: 0,
+    totalSourceLines: 0,
+    recentCommits: { total: 0, fixes: 0, features: 0, fixRatio: 0 },
+    skippedTests: 0,
+  };
+
+  // 1. TODO/FIXME counts
+  try {
+    const todoOut = execSync(
+      `grep -rc 'TODO' crux/ apps/web/src/ --include='*.ts' --include='*.tsx' 2>/dev/null | awk -F: '{s+=$2} END {print s}'`,
+      execOpts,
+    ).trim();
+    metrics.todoCount = parseInt(todoOut, 10) || 0;
+  } catch { /* empty */ }
+
+  try {
+    const fixmeOut = execSync(
+      `grep -rc 'FIXME\\|HACK\\|XXX' crux/ apps/web/src/ --include='*.ts' --include='*.tsx' 2>/dev/null | awk -F: '{s+=$2} END {print s}'`,
+      execOpts,
+    ).trim();
+    metrics.fixmeCount = parseInt(fixmeOut, 10) || 0;
+  } catch { /* empty */ }
+
+  // 2. Bare `any` type count
+  try {
+    const anyOut = execSync(
+      `grep -rc ': any\\b\\|as any\\b' crux/ apps/web/src/ --include='*.ts' --include='*.tsx' 2>/dev/null | awk -F: '{s+=$2} END {print s}'`,
+      execOpts,
+    ).trim();
+    metrics.anyTypeCount = parseInt(anyOut, 10) || 0;
+  } catch { /* empty */ }
+
+  // 3. Large files (>500 lines)
+  try {
+    const wcOut = execSync(
+      `find crux/ apps/web/src/ \\( -name '*.ts' -o -name '*.tsx' \\) ! -name '*.test.*' ! -name '*.d.ts' | xargs wc -l 2>/dev/null | sort -rn | head -30`,
+      execOpts,
+    );
+    for (const line of wcOut.split('\n').filter(Boolean)) {
+      const match = line.trim().match(/^(\d+)\s+(.+)$/);
+      if (match && match[2] !== 'total') {
+        const lineCount = parseInt(match[1], 10);
+        metrics.totalSourceLines += lineCount;
+        if (lineCount > 500) {
+          metrics.largeFiles.push({ path: match[2], lines: lineCount });
+        }
+      }
+    }
+    metrics.largeFileCount = metrics.largeFiles.length;
+  } catch { /* empty */ }
+
+  // 4. Test vs source file counts
+  try {
+    const testCount = execSync(
+      `find crux/ apps/web/src/ apps/wiki-server/src/ -name '*.test.*' -o -name '*.spec.*' 2>/dev/null | wc -l`,
+      execOpts,
+    ).trim();
+    metrics.testFileCount = parseInt(testCount, 10) || 0;
+  } catch { /* empty */ }
+
+  try {
+    const srcCount = execSync(
+      `find crux/ apps/web/src/ apps/wiki-server/src/ \\( -name '*.ts' -o -name '*.tsx' \\) ! -name '*.test.*' ! -name '*.spec.*' ! -name '*.d.ts' 2>/dev/null | wc -l`,
+      execOpts,
+    ).trim();
+    metrics.sourceFileCount = parseInt(srcCount, 10) || 0;
+  } catch { /* empty */ }
+
+  metrics.testToSourceRatio = metrics.sourceFileCount > 0
+    ? Math.round((metrics.testFileCount / metrics.sourceFileCount) * 100) / 100
+    : 0;
+
+  // 5. Recent commit analysis (last 60 commits)
+  try {
+    const logOut = execSync('git log --oneline -60', execOpts);
+    const lines = logOut.split('\n').filter(Boolean);
+    metrics.recentCommits.total = lines.length;
+    metrics.recentCommits.fixes = lines.filter(l => /\bfix[:(]/i.test(l)).length;
+    metrics.recentCommits.features = lines.filter(l => /\bfeat[:(]/i.test(l)).length;
+    metrics.recentCommits.fixRatio = metrics.recentCommits.total > 0
+      ? Math.round((metrics.recentCommits.fixes / metrics.recentCommits.total) * 100) / 100
+      : 0;
+  } catch { /* empty */ }
+
+  // 6. Skipped tests
+  try {
+    const skipOut = execSync(
+      `grep -rc 'it\\.skip\\|describe\\.skip\\|test\\.skip' crux/ apps/web/src/ apps/wiki-server/src/ --include='*.test.*' 2>/dev/null | awk -F: '{s+=$2} END {print s}'`,
+      execOpts,
+    ).trim();
+    metrics.skippedTests = parseInt(skipOut, 10) || 0;
+  } catch { /* empty */ }
+
+  // Output
+  if (isJson) {
+    return { output: JSON.stringify(metrics, null, 2), exitCode: 0 };
+  }
+
+  let output = '';
+  output += `${c.bold}${c.blue}Code Health Snapshot${c.reset}  ${c.dim}${metrics.date}${c.reset}\n\n`;
+
+  // Color helper for thresholds
+  const rated = (val: number, green: number, yellow: number, invert = false): string => {
+    const isGreen = invert ? val <= green : val >= green;
+    const isYellow = invert ? val <= yellow : val >= yellow;
+    if (isGreen) return `${c.green}${val}${c.reset}`;
+    if (isYellow) return `${c.yellow}${val}${c.reset}`;
+    return `${c.red}${val}${c.reset}`;
+  };
+
+  output += `  TODOs:             ${rated(metrics.todoCount, 20, 50, true)}\n`;
+  output += `  FIXME/HACK/XXX:    ${rated(metrics.fixmeCount, 5, 15, true)}\n`;
+  output += `  \`any\` types:       ${rated(metrics.anyTypeCount, 20, 50, true)}\n`;
+  output += `  Files >500 lines:  ${rated(metrics.largeFileCount, 5, 10, true)}\n`;
+  output += `  Test files:        ${metrics.testFileCount}\n`;
+  output += `  Source files:      ${metrics.sourceFileCount}\n`;
+  output += `  Test:source ratio: ${rated(metrics.testToSourceRatio, 0.15, 0.08)}\n`;
+  output += `  Skipped tests:     ${rated(metrics.skippedTests, 3, 8, true)}\n`;
+  output += '\n';
+  output += `  ${c.bold}Recent commits (last 60):${c.reset}\n`;
+  output += `    Total:    ${metrics.recentCommits.total}\n`;
+  output += `    Fixes:    ${metrics.recentCommits.fixes}\n`;
+  output += `    Features: ${metrics.recentCommits.features}\n`;
+  output += `    Fix ratio: ${rated(metrics.recentCommits.fixRatio, 0.3, 0.5, true)} ${c.dim}(lower is better)${c.reset}\n`;
+
+  if (metrics.largeFiles.length > 0) {
+    output += `\n  ${c.bold}Largest files:${c.reset}\n`;
+    for (const f of metrics.largeFiles.slice(0, 10)) {
+      output += `    ${c.yellow}${f.lines}${c.reset} ${c.dim}${f.path}${c.reset}\n`;
+    }
+  }
+
+  output += `\n${c.dim}Run with --json to get machine-readable output for trend tracking.${c.reset}\n`;
+
+  return { output, exitCode: 0 };
+}
+
+// ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
 
@@ -820,6 +992,7 @@ export const commands = {
   'review-prs': reviewPrs,
   'triage-issues': triageIssues,
   'detect-cruft': detectCruft,
+  'health-snapshot': healthSnapshot,
   status,
   'mark-run': markRun,
 };
@@ -832,12 +1005,13 @@ Gathers signals from PRs, session logs, GitHub issues, and codebase
 analysis. Produces prioritized reports and helps with cleanup.
 
 Commands:
-  report          Run full maintenance report (default)
-  review-prs      Review merged PRs and session logs since last run
-  triage-issues   Triage open GitHub issues for staleness/resolution
-  detect-cruft    Find dead code, TODOs, large files, commented-out code
-  status          Show last maintenance run info and recommended cadences
-  mark-run        Update the last-run timestamp without running a report
+  report           Run full maintenance report (default)
+  review-prs       Review merged PRs and session logs since last run
+  triage-issues    Triage open GitHub issues for staleness/resolution
+  detect-cruft     Find dead code, TODOs, large files, commented-out code
+  health-snapshot  Quantified code health metrics (TODOs, any types, fix ratio, etc.)
+  status           Show last maintenance run info and recommended cadences
+  mark-run         Update the last-run timestamp without running a report
 
 Options:
   --since=DATE    Override the start date (YYYY-MM-DD; default: last run or 7d ago)
@@ -864,6 +1038,8 @@ Examples:
   crux maintain review-prs               Just review PRs + session logs
   crux maintain triage-issues            Just triage GitHub issues
   crux maintain detect-cruft             Just find codebase cruft
+  crux maintain health-snapshot          Code health metrics snapshot
+  crux maintain health-snapshot --json   JSON output for trend tracking
   crux maintain review-prs --since=2026-02-10  Override start date
   crux maintain --json                   Full report as JSON
 
