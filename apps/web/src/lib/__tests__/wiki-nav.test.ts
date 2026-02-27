@@ -222,6 +222,21 @@ describe("getInternalNav (mocked data)", () => {
     }
   });
 
+  it("all Claims & Citations monitoring items use /wiki/ hrefs (fully migrated)", () => {
+    const sections = getInternalNav();
+    const claims = sections.find(s => s.title === "Claims & Citations")!;
+
+    const monitoringLabels = [
+      "Claims Ingestion", "Citation Accuracy", "Citation Content",
+      "Hallucination Risk", "Hallucination Evals", "Fact Dashboard",
+    ];
+    for (const label of monitoringLabels) {
+      const item = claims.items.find(i => i.label === label);
+      expect(item).toBeDefined();
+      expect(item!.href).toMatch(/^\/wiki\//);
+    }
+  });
+
   it("Style Guides section contains expected entries", () => {
     const sections = getInternalNav();
     const styleGuides = sections.find(s => s.title === "Style Guides")!;
