@@ -22,6 +22,7 @@ import { artifactsRoute } from "./routes/artifacts.js";
 import { exploreRoute } from "./routes/explore.js";
 import { integrityRoute } from "./routes/integrity.js";
 import { referencesRoute } from "./routes/references.js";
+import { githubIssuesRoute } from "./routes/github-issues.js";
 
 export function createApp() {
   const app = new Hono();
@@ -71,6 +72,7 @@ export function createApp() {
   app.use("/api/agent-sessions/*", requireWriteScope("project"));
   app.use("/api/auto-update-runs/*", requireWriteScope("project"));
   app.use("/api/auto-update-news/*", requireWriteScope("project"));
+  app.use("/api/github/*", requireWriteScope("project"));
 
   // Mount route handlers
   app.route("/api/ids", idsRoute);
@@ -93,6 +95,7 @@ export function createApp() {
   app.route("/api/explore", exploreRoute);
   app.route("/api/integrity", integrityRoute);
   app.route("/api/references", referencesRoute);
+  app.route("/api/github/issues", githubIssuesRoute);
 
   return app;
 }

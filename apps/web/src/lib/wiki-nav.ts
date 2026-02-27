@@ -255,6 +255,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Suggested Pages", href: "/internal/suggested-pages" },
         { label: "Improve Runs", href: "/internal/improve-runs" },
         { label: "Agent Sessions", href: "/internal/agent-sessions" },
+        { label: "Session Insights", href: "/internal/session-insights" },
         { label: "Auto-Update Runs", href: "/internal/auto-update-runs" },
         { label: "Auto-Update News", href: "/internal/auto-update-news" },
       ],
