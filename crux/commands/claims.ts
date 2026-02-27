@@ -116,6 +116,18 @@ const SCRIPTS = {
     passthrough: ['dry-run', 'model'],
     positional: true,
   },
+  cleanup: {
+    script: 'claims/cleanup.ts',
+    description: 'Automated cleanup: deduplicate claims, strip self-references',
+    passthrough: ['dry-run', 'apply', 'entity'],
+    positional: false,
+  },
+  'validate-quality': {
+    script: 'claims/validate-quality.ts',
+    description: 'Audit existing claims for quality issues (10 checks per claim)',
+    passthrough: ['json'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'status');
@@ -142,7 +154,8 @@ Options:
   --force               Re-ingest already-processed resources; clear existing claims (ingest-resource, ingest-batch)
   --batch=<file>        Process URLs from a file, one per line (from-resource)
   --no-auto-resource    Don't auto-create resource YAML for unknown URLs (from-resource)
-  --apply               Write changes to database (backfill-related-entities, migrate-footnotes; default: dry-run)
+  --apply               Write changes to database (backfill-related-entities, migrate-footnotes, cleanup; default: dry-run)
+  --entity=E            Target entity filter (cleanup)
   --entity-id=E         Filter to single entity (backfill-related-entities)
   --batch-size=N        Process N pages at a time (migrate-footnotes-batch; default: all)
   --path=P              Filter pages by relative path prefix (migrate-footnotes-batch)
@@ -194,6 +207,16 @@ Workflow:
   1. crux claims backfill-related-entities                Dry-run: scan claims for entity mentions
   2. crux claims backfill-related-entities --apply        Apply changes to database
   3. crux claims backfill-related-entities --entity-id=anthropic --apply  Single entity
+
+  Quality validation (post-hoc audit):
+  1. crux claims validate-quality anthropic             Audit claims for 10 quality checks
+  2. crux claims validate-quality anthropic --json      Machine-readable output
+
+  Data cleanup (Tier 1 quality fixes):
+  1. crux claims cleanup                             Dry-run: show duplicates and self-refs
+  2. crux claims cleanup --apply                     Execute cleanup
+  3. crux claims cleanup --entity=anthropic           Target a single entity
+  4. crux claims cleanup --entity=anthropic --apply   Apply cleanup for one entity
 
   Footnote migration (DB-driven references):
   1. crux claims migrate-footnotes <page-id>          Dry-run: show what would change

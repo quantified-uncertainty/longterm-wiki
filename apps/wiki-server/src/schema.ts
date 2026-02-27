@@ -429,6 +429,8 @@ export const claims = pgTable(
     valueUnit: text("value_unit"),                 // unit of measurement (e.g. "USD", "percent", "count")
     valueDate: date("value_date"),                 // when the value was true/measured
     qualifiers: jsonb("qualifiers").$type<Record<string, string>>(), // additional context (e.g. {"round": "Series B"})
+    // --- Reasoning traces (migration 0034) ---
+    inferenceType: text("inference_type"),  // direct_assertion | derived | aggregated | interpreted | editorial
     // --- Timestamps ---
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -452,6 +454,7 @@ export const claims = pgTable(
     index("idx_cl_subject_entity").on(table.subjectEntity),
     index("idx_cl_property").on(table.property),
     index("idx_cl_subject_property").on(table.subjectEntity, table.property),
+    index("idx_cl_inference_type").on(table.inferenceType),
     // GIN index on relatedEntities is created in migration 0028
     // (Drizzle doesn't support GIN index declarations on JSONB)
   ]

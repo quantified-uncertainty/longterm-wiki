@@ -102,6 +102,8 @@ function claimValues(d: ClaimInput) {
     valueUnit: d.valueUnit ?? null,
     valueDate: d.valueDate ?? null,
     qualifiers: d.qualifiers ?? null,
+    // Reasoning traces (migration 0034)
+    inferenceType: d.inferenceType ?? null,
   };
 }
 
@@ -179,6 +181,8 @@ function formatClaim(
     valueUnit: r.valueUnit,
     valueDate: r.valueDate,
     qualifiers: r.qualifiers as Record<string, string> | null,
+    // Reasoning traces (migration 0034)
+    inferenceType: r.inferenceType,
     sources: sourcesRows.map(formatClaimSource),
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
@@ -225,6 +229,7 @@ const PatchClaimSchema = z.object({
   valueUnit: z.string().max(100).nullable().optional(),
   valueDate: z.string().max(20).nullable().optional(),
   qualifiers: z.record(z.string()).nullable().optional(),
+  inferenceType: z.string().max(50).nullable().optional(),
 });
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
@@ -975,6 +980,7 @@ const claimsApp = new Hono()
     if (parsed.data.valueUnit !== undefined) updates.valueUnit = parsed.data.valueUnit;
     if (parsed.data.valueDate !== undefined) updates.valueDate = parsed.data.valueDate;
     if (parsed.data.qualifiers !== undefined) updates.qualifiers = parsed.data.qualifiers;
+    if (parsed.data.inferenceType !== undefined) updates.inferenceType = parsed.data.inferenceType;
 
     if (Object.keys(updates).length === 0) {
       return validationError(c, "No fields to update");

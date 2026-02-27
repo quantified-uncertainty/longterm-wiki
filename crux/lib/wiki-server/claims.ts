@@ -218,6 +218,22 @@ export async function addClaimPageReference(
   );
 }
 
+/**
+ * Delete claims by their IDs (max 1000 per call).
+ * Used by the cleanup command to remove duplicate claims.
+ */
+export async function deleteClaimsByIds(
+  ids: number[],
+): Promise<ApiResult<{ deleted: number }>> {
+  return apiRequest<{ deleted: number }>(
+    'POST',
+    '/api/claims/delete-by-ids',
+    { ids },
+    30_000, // 30s timeout for batch operations
+    'content',
+  );
+}
+
 export async function addClaimPageReferencesBatch(
   claimId: number,
   items: Array<{ pageId: string; footnote?: number | null; section?: string | null }>,

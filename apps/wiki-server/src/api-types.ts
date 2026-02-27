@@ -405,6 +405,15 @@ export const ClaimTypeSchema = z.enum([
 ]);
 export type ClaimType = z.infer<typeof ClaimTypeSchema>;
 
+export const InferenceTypeSchema = z.enum([
+  "direct_assertion",
+  "derived",
+  "aggregated",
+  "interpreted",
+  "editorial",
+]);
+export type InferenceType = z.infer<typeof InferenceTypeSchema>;
+
 export const ClaimModeSchema = z.enum(["endorsed", "attributed"]);
 export type ClaimMode = z.infer<typeof ClaimModeSchema>;
 
@@ -462,6 +471,8 @@ export const InsertClaimSchema = z.object({
   valueUnit: z.string().max(100).nullable().optional(),        // unit of measurement (USD, percent, count, etc.)
   valueDate: z.string().max(20).nullable().optional(),         // YYYY-MM-DD when the value was true/measured
   qualifiers: z.record(z.string()).nullable().optional(),      // additional context (e.g. {"round": "Series B"})
+  // Reasoning traces (migration 0034)
+  inferenceType: InferenceTypeSchema.nullable().optional(),
   // Inline sources — optional list of sources to create in claim_sources table
   sources: z.array(z.object({
     resourceId: z.string().max(300).nullable().optional(),
