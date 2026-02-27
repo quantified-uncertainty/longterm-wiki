@@ -1120,35 +1120,28 @@
 - id: autonomous-cooperative-agents
   numericId: E921
   type: concept
-  title: Autonomous Cooperative Agents
+  title: "Cooperate-Bot: Failure Modes"
   description: >-
-    AI agents that cooperate, negotiate, and make commitments on behalf of humans. Examines the
-    delegation alignment problem, multi-agent cooperation dynamics, and resource-bearing agent
-    incentives. Connects to cooperative AI research and instrumental convergence concerns.
+    Red team analysis of personal cooperative agents. Five core failure modes: transactionalization
+    (financial incentives crowd out prosocial motivation), gaming (measurable cooperation proxies
+    are exploitable), surveillance requirements, Goodhart dynamics, and wealth stratification.
   tags:
     - cooperative-ai
     - mechanism-design
-    - agent-economics
+    - failure-modes
     - game-theory
-    - delegation
+    - red-team
   clusters:
     - ai-safety
-    - governance
   relatedEntries:
-    - id: cooperative-ai
-      type: approach
-    - id: multi-agent
-      type: approach
-    - id: agentic-ai
-      type: capability
-    - id: coordination-tech
-      type: approach
-    - id: cirl
-      type: approach
     - id: cooperate-bot
       type: concept
     - id: cooperative-funding-mechanisms
       type: concept
+    - id: cooperative-ai
+      type: approach
+    - id: multi-agent
+      type: approach
   lastUpdated: 2026-02
 
 - id: cooperate-bot
