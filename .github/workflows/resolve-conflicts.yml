@@ -15,16 +15,9 @@ on:
     workflows: ["Auto-Rebase PRs"]
     types: [completed]
 
-  # Run when PRs are opened or updated — catches PRs that are created
-  # with conflicts before the next push to main triggers Auto-Rebase.
-  # The concurrency group ensures only one instance runs at a time.
-  pull_request:
-    types: [opened, synchronize]
-    branches: [main]
-
   # Catch any stragglers (e.g. PRs made conflicting by force-pushes)
   schedule:
-    - cron: "0 */2 * * *" # every 2 hours
+    - cron: "0 */6 * * *" # every 6 hours
 
   # Allow manual trigger
   workflow_dispatch:
@@ -237,6 +230,7 @@ jobs:
 
           claude -p "$PROMPT" \
             --model sonnet \
+            --max-turns 10 \
             --dangerously-skip-permissions \
             --verbose
 

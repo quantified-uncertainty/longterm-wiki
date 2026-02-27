@@ -4,13 +4,12 @@ name: Auto-Update Wiki
 # Fetches news from configured sources, routes relevant items to pages,
 # and creates PRs with improvements.
 #
-# Runs daily at 06:00 UTC by default, or manually via workflow_dispatch.
+# Schedule disabled — was failing since Feb 21. Manual dispatch only until fixed.
 # Budget and page limits are configurable per-run.
 
 on:
-  schedule:
-    # Daily at 06:00 UTC (adjust as needed)
-    - cron: '0 6 * * *'
+  # schedule:
+  #   - cron: '0 6 * * *'  # DISABLED — failing since Feb 21, re-enable when fixed
   workflow_dispatch:
     inputs:
       budget:
@@ -46,7 +45,7 @@ concurrency:
 jobs:
   auto-update:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
