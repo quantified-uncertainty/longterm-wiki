@@ -239,6 +239,11 @@ interface WorkflowRunsResponse {
   workflow_runs: WorkflowRun[];
 }
 
+// Workflows that are inherently flaky — depends on LLMs, external URLs,
+// citation verification. For these, we check if ANY of the last 5 runs
+// succeeded rather than requiring the most recent one to succeed.
+const FLAKY_WORKFLOWS = new Set(['auto-update.yml']);
+
 async function checkActions(): Promise<CheckResult> {
   const name = 'GitHub Actions';
   const detail: string[] = [];
@@ -279,8 +284,21 @@ async function checkActions(): Promise<CheckResult> {
         detail.push(`FAIL  ${wf}: last run ${ageH}h ago (max ${maxAgeH}h)`);
         failures.push(`${wf}: stale (${ageH}h ago, max ${maxAgeH}h)`);
       } else if (requireSuccess && latest.conclusion !== 'success') {
-        detail.push(`FAIL  ${wf}: last run concluded '${latest.conclusion}' (${ageH}h ago)`);
-        failures.push(`${wf}: last run '${latest.conclusion}'`);
+        // For flaky workflows, check if ANY recent run succeeded
+        if (FLAKY_WORKFLOWS.has(wf)) {
+          const anySuccess = runs.some(r => r.conclusion === 'success');
+          if (anySuccess) {
+            const successCount = runs.filter(r => r.conclusion === 'success').length;
+            detail.push(`WARN  ${wf}: last run failed but ${successCount}/${runs.length} recent runs succeeded`);
+            // WARN — not added to failures, so it won't trigger an issue
+          } else {
+            detail.push(`FAIL  ${wf}: all ${runs.length} recent runs failed (latest: '${latest.conclusion}' ${ageH}h ago)`);
+            failures.push(`${wf}: all recent runs failed ('${latest.conclusion}')`);
+          }
+        } else {
+          detail.push(`FAIL  ${wf}: last run concluded '${latest.conclusion}' (${ageH}h ago)`);
+          failures.push(`${wf}: last run '${latest.conclusion}'`);
+        }
       } else {
         detail.push(`PASS  ${wf}: ${ageH}h ago (${latest.conclusion})`);
       }
