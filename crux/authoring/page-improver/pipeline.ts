@@ -14,7 +14,7 @@ import { isServerAvailable } from '../../lib/wiki-server/client.ts';
 import type {
   PageData, AnalysisResult, ResearchResult, ReviewResult,
   PipelineOptions, PipelineResults, TriageResult, AdversarialLoopResult,
-  EnrichResult, AuditResult,
+  EnrichResult, AuditResult, PhaseContext,
 } from './types.ts';
 import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
 import { startHeartbeat } from './api.ts';
@@ -191,11 +191,22 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   console.log('='.repeat(60) + '\n');
 
   const startTime: number = Date.now();
-  let analysis: AnalysisResult | undefined, research: ResearchResult | undefined;
-  let improvedContent: string | undefined, review: ReviewResult | undefined;
-  let adversarialLoopResult: AdversarialLoopResult | undefined;
-  let enrichResult: EnrichResult | undefined;
-  let auditResult: AuditResult | undefined;
+
+  // PhaseContext: single typed accumulator for all phase outputs.
+  // Replaces scattered let variables with a structured object.
+  const ctx: PhaseContext = {
+    page,
+    options,
+    tier,
+    directions,
+    phases,
+    results: {},
+    tempDir: path.join(TEMP_DIR, page.id),
+    phaseDurations: [],
+  };
+
+  // Convenience aliases — write to ctx.results, read via these
+  const r = ctx.results;
 
   // Run phases based on tier
   for (const phase of phases) {
@@ -204,35 +215,35 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
 
     try { switch (phase) {
       case 'analyze':
-        analysis = await analyzePhase(page, directions, options);
+        r.analysis = await analyzePhase(page, directions, options);
         break;
 
       case 'research':
-        research = await researchPhase(page, analysis!, { ...options, deep: false });
+        r.research = await researchPhase(page, r.analysis!, { ...options, deep: false });
         break;
 
       case 'research-deep':
-        research = await researchPhase(page, analysis!, { ...options, deep: true });
+        r.research = await researchPhase(page, r.analysis!, { ...options, deep: true });
         break;
 
       case 'improve':
-        improvedContent = await improvePhase(page, analysis!, research || { sources: [] }, directions, options);
+        r.improvedContent = await improvePhase(page, r.analysis!, r.research || { sources: [] }, directions, options);
         // Warn about unverified citations in tiers without research
-        if (tier === 'polish' && !research?.sources?.length) {
-          const footnoteCount = new Set(improvedContent.match(FOOTNOTE_REF_RE) || []).size;
+        if (tier === 'polish' && !r.research?.sources?.length) {
+          const footnoteCount = new Set(r.improvedContent.match(FOOTNOTE_REF_RE) || []).size;
           if (footnoteCount > 0) {
             log('improve', `⚠ ${footnoteCount} footnote citations added without web research — citations are LLM-generated and should be verified`);
           }
         }
         // Extra hallucination warnings for person/org pages
         if (isBiographicalPage(page)) {
-          logBiographicalWarnings(improvedContent, page, tier);
+          logBiographicalWarnings(r.improvedContent, page, tier);
         }
         break;
 
       case 'improve-sections':
-        improvedContent = await improveSectionsPhase(
-          page, analysis!, research || { sources: [] }, directions, options,
+        r.improvedContent = await improveSectionsPhase(
+          page, r.analysis!, r.research || { sources: [] }, directions, options,
         );
         break;
 
@@ -240,9 +251,9 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
         if (options.skipEnrich) {
           log('enrich', 'Skipped (--skip-enrich)');
         } else {
-          const enrichOutput = await enrichPhase(page, improvedContent!, options);
-          improvedContent = enrichOutput.content;
-          enrichResult = enrichOutput.result;
+          const enrichOutput = await enrichPhase(page, r.improvedContent!, options);
+          r.improvedContent = enrichOutput.content;
+          r.enrichResult = enrichOutput.result;
         }
         break;
       }
@@ -252,11 +263,10 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
           log('citation-audit', 'Skipped (--skip-citation-audit)');
         } else {
           try {
-            auditResult = await citationAuditPhase(page, improvedContent!, research, options);
+            r.auditResult = await citationAuditPhase(page, r.improvedContent!, r.research, options);
           } catch (err: unknown) {
             const error = err instanceof Error ? err : new Error(String(err));
             if (options.citationGate) {
-              // In gate mode, an audit failure must block — not silently bypass
               throw new Error(`Citation audit failed with --citation-gate: ${error.message}`);
             }
             log('citation-audit', `⚠ Citation audit failed: ${error.message} — continuing without audit`);
@@ -266,8 +276,9 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       }
 
       case 'validate': {
-        const validation = await validatePhase(page, improvedContent!, options);
-        improvedContent = validation.improvedContent;
+        const validation = await validatePhase(page, r.improvedContent!, options);
+        r.improvedContent = validation.improvedContent;
+        r.validationResult = validation;
         if (validation.hasCritical) {
           log('validate', 'Critical validation issues found - may need manual fixes');
         }
@@ -275,38 +286,37 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       }
 
       case 'gap-fill':
-        improvedContent = await gapFillPhase(page, improvedContent!, review || { valid: true, issues: [] }, options);
+        r.improvedContent = await gapFillPhase(page, r.improvedContent!, r.review || { valid: true, issues: [] }, options);
         break;
 
       case 'adversarial-loop': {
         try {
           const loopResult = await adversarialLoopPhase(
             page,
-            improvedContent!,
-            analysis!,
-            research || { sources: [] },
+            r.improvedContent!,
+            r.analysis!,
+            r.research || { sources: [] },
             directions,
             options,
           );
-          adversarialLoopResult = loopResult;
-          improvedContent = loopResult.finalContent;
+          r.adversarialLoopResult = loopResult;
+          r.improvedContent = loopResult.finalContent;
           // Merge any additional research back so gap-fill has full context
           if (loopResult.additionalResearch.sources.length > 0) {
-            research = {
-              sources: [...(research?.sources || []), ...loopResult.additionalResearch.sources],
-              summary: research?.summary,
+            r.research = {
+              sources: [...(r.research?.sources || []), ...loopResult.additionalResearch.sources],
+              summary: r.research?.summary,
             };
           }
         } catch (err: unknown) {
           const error = err instanceof Error ? err : new Error(String(err));
           log('adversarial-loop', `⚠ Adversarial loop failed: ${error.message} — continuing with pre-loop content`);
-          // Don't overwrite improvedContent; continue pipeline with the last good state
         }
         break;
       }
 
       case 'review':
-        review = await reviewPhase(page, improvedContent!, options);
+        r.review = await reviewPhase(page, r.improvedContent!, options);
         break;
     }
 
@@ -314,14 +324,15 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       stopPhaseHeartbeat();
     }
 
-    const phaseDuration: string = ((Date.now() - phaseStart) / 1000).toFixed(1);
-    log(phase, `Duration: ${phaseDuration}s`);
+    const phaseDurationMs = Date.now() - phaseStart;
+    ctx.phaseDurations.push({ phase, durationMs: phaseDurationMs });
+    log(phase, `Duration: ${(phaseDurationMs / 1000).toFixed(1)}s`);
   }
 
   const totalDuration: string = ((Date.now() - startTime) / 1000).toFixed(1);
 
   // Write final output (preserves CROSS-PAGE CHECK comments for review)
-  const finalPath = writeTemp(page.id, 'final.mdx', improvedContent!);
+  const finalPath = writeTemp(page.id, 'final.mdx', r.improvedContent!);
 
   console.log('\n' + '='.repeat(60));
   console.log('Pipeline Complete');
@@ -329,20 +340,19 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   console.log(`Duration: ${totalDuration}s`);
   console.log(`Output: ${finalPath}`);
 
-  if (review) {
-    console.log(`Quality: ${review.qualityScore || 'N/A'}`);
-    if (review.issues?.length > 0) {
-      console.log(`Issues: ${review.issues.length}`);
-      review.issues.slice(0, 3).forEach(i => console.log(`  - ${i}`));
+  if (r.review) {
+    console.log(`Quality: ${r.review.qualityScore || 'N/A'}`);
+    if (r.review.issues?.length > 0) {
+      console.log(`Issues: ${r.review.issues.length}`);
+      r.review.issues.slice(0, 3).forEach(i => console.log(`  - ${i}`));
     }
   }
 
-  if (auditResult) {
-    const { total, verified, failed, unchecked } = auditResult.summary;
+  if (r.auditResult) {
+    const { total, verified, failed, unchecked } = r.auditResult.summary;
     console.log(`Citations: ${total} total — ${verified} verified, ${failed} failed, ${unchecked} unchecked`);
-    if (!auditResult.pass) {
+    if (!r.auditResult.pass) {
       if (options.citationGate && dryRun) {
-        // Gate is inactive in dry-run — make this explicit so users are not surprised
         console.log(`⚠ Citation audit FAILED (--citation-gate inactive in dry-run; would block --apply)`);
       } else if (options.citationGate && !dryRun) {
         console.log(`⚠ Citation audit FAILED — blocking apply (--citation-gate)`);
@@ -353,7 +363,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   }
 
   // Gate mode: abort --apply when citation audit fails
-  if (options.citationGate && !dryRun && auditResult && !auditResult.pass) {
+  if (options.citationGate && !dryRun && r.auditResult && !r.auditResult.pass) {
     const auditPath = path.join(TEMP_DIR, page.id, 'citation-audit.json');
     console.error('\nApply blocked: citation audit failed and --citation-gate is set.');
     console.error(`Review ${auditPath} for per-citation details.`);
@@ -367,15 +377,14 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     console.log(`  diff "${filePath}" "${finalPath}"`);
   } else {
     // Apply changes: strip pipeline review comments before writing to disk (#628)
-    // Comments are preserved in the temp file (finalPath) for review
     let contentToApply = fs.readFileSync(finalPath, 'utf-8');
     contentToApply = contentToApply.replace(/\n?{\/\*\s*CROSS-PAGE CHECK[^*]*\*\/}\n?/g, '\n');
 
-    // Validate content structure before writing (#818) — defense-in-depth against JSON blob corruption
-    const validation = validateMdxContent(contentToApply);
-    if (!validation.valid) {
+    // Validate content structure before writing (#818)
+    const contentValidation = validateMdxContent(contentToApply);
+    if (!contentValidation.valid) {
       console.error(`\n❌ MDX validation failed — refusing to write to ${filePath}`);
-      console.error(`   Error: ${validation.error}`);
+      console.error(`   Error: ${contentValidation.error}`);
       console.error(`   Content preview: ${contentToApply.slice(0, 200).replace(/\n/g, '\\n')}`);
       console.error(`   Pipeline output preserved at: ${finalPath}`);
       process.exit(1);
@@ -384,8 +393,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     fs.writeFileSync(filePath, contentToApply);
     console.log(`\nChanges applied to ${filePath}`);
 
-    // Create DB citation entries for any [^rc-XXXX] footnotes in the applied content.
-    // These were format-converted during the improve phase; now register them in the DB.
+    // Create DB citation entries for any [^rc-XXXX] footnotes in the applied content
     try {
       const rcCreated = await createDbEntriesForRcFootnotes(contentToApply, page.id);
       if (rcCreated > 0) {
@@ -396,8 +404,8 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       log('apply', `Warning: DB citation creation failed: ${error.message}`);
     }
 
-    const adversarialNote = adversarialLoopResult
-      ? ` [adversarial: ${adversarialLoopResult.iterations} iter, ${adversarialLoopResult.adversarialReview.gaps.length} gaps]`
+    const adversarialNote = r.adversarialLoopResult
+      ? ` [adversarial: ${r.adversarialLoopResult.iterations} iter, ${r.adversarialLoopResult.adversarialReview.gaps.length} gaps]`
       : '';
     appendEditLog(page.id, {
       tool: 'crux-improve',
@@ -408,7 +416,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
         : `Improved (${tier})${adversarialNote}`,
     });
 
-    // Auto-grade after applying changes (default: on; skip with grade: false)
+    // Auto-grade after applying changes
     if (options.grade !== false) {
       console.log('\nRunning grade-content.ts...');
       try {
@@ -422,9 +430,9 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       }
     }
 
-    // Auto-log session to wiki-server DB (default: on; skip with skipSessionLog: true)
+    // Auto-log session to wiki-server DB
     if (!options.skipSessionLog) {
-      await autoLogSession(page, tier, review, totalDuration, tierConfig.cost, serverAvailable);
+      await autoLogSession(page, tier, r.review, totalDuration, tierConfig.cost, serverAvailable);
     }
   }
 
@@ -435,10 +443,10 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     directions,
     duration: totalDuration,
     phases,
-    review,
-    adversarialLoopResult,
-    enrichResult,
-    auditResult,
+    review: r.review,
+    adversarialLoopResult: r.adversarialLoopResult,
+    enrichResult: r.enrichResult,
+    auditResult: r.auditResult,
     outputPath: finalPath,
   };
   writeTemp(page.id, 'pipeline-results.json', results);
@@ -447,10 +455,9 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
 
   if (options.saveArtifacts !== false) {
     const completedAt = new Date().toISOString();
-    // Trim source cache: drop full content to keep payload small
-    const trimmedSourceCache = (research?.sources || []).map(
+    const trimmedSourceCache = (r.research?.sources || []).map(
       (s) => ({
-        id: s.url, // v1 sources use URL as identifier
+        id: s.url,
         url: s.url,
         title: s.title,
         author: s.author,
@@ -469,8 +476,8 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       durationS: parseFloat(totalDuration),
       totalCost: null,
       sourceCache: trimmedSourceCache.length > 0 ? trimmedSourceCache : null,
-      researchSummary: research?.summary ?? null,
-      citationAudit: auditResult ? (auditResult as unknown as Record<string, unknown>) : null,
+      researchSummary: r.research?.summary ?? null,
+      citationAudit: r.auditResult ? (r.auditResult as unknown as Record<string, unknown>) : null,
       costEntries: null,
       costBreakdown: null,
       sectionDiffs: null,

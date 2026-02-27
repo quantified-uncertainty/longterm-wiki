@@ -229,6 +229,48 @@ export interface AdversarialLoopResult {
   finalContent: string;
 }
 
+/**
+ * PhaseContext — threaded accumulator for pipeline phase data.
+ *
+ * Replaces the scattered mutable variables in pipeline.ts with a single
+ * typed object. Phases read their inputs from ctx.results and write
+ * their outputs back. The pipeline loop passes ctx through each phase.
+ *
+ * All result fields are optional — a phase only sets the fields it produces.
+ * TypeScript narrows the type after each phase in the pipeline sequence,
+ * so downstream phases can assert that upstream outputs exist.
+ */
+export interface PhaseContext {
+  /** Page metadata (constant across the pipeline run). */
+  page: PageData;
+  /** Pipeline configuration. */
+  options: PipelineOptions;
+  /** Tier name (e.g. 'polish', 'standard', 'deep'). */
+  tier: string;
+  /** User-provided directions string. */
+  directions: string;
+  /** Phases to execute in order. */
+  phases: string[];
+
+  /** Accumulated phase outputs (mutable). */
+  results: {
+    analysis?: AnalysisResult;
+    research?: ResearchResult;
+    improvedContent?: string;
+    review?: ReviewResult;
+    adversarialLoopResult?: AdversarialLoopResult;
+    enrichResult?: EnrichResult;
+    auditResult?: AuditResult;
+    validationResult?: ValidationResult;
+  };
+
+  /** Temp directory for intermediate files. */
+  tempDir: string;
+
+  /** Per-phase timing entries. */
+  phaseDurations: Array<{ phase: string; durationMs: number }>;
+}
+
 export interface ParsedArgs {
   _positional: string[];
   [key: string]: string | boolean | string[];
