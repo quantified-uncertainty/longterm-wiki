@@ -34,6 +34,7 @@ interface IterateOptions {
   directions: string;
   apply: boolean;
   gapAnalysis: boolean;
+  timeoutMinutes: number;
 }
 
 interface RoundResult {
@@ -119,7 +120,7 @@ function runImprove(pageId: string, options: IterateOptions): void {
   // Skip session logging for intermediate rounds; the last round logs naturally
   args.push('--skip-session-log');
 
-  execFileSync('node', args, { cwd: ROOT, stdio: 'inherit', timeout: 15 * 60 * 1000 });
+  execFileSync('node', args, { cwd: ROOT, stdio: 'inherit', timeout: options.timeoutMinutes * 60 * 1000 });
 }
 
 function runFix(fixType: 'escaping' | 'markdown'): void {
@@ -294,6 +295,7 @@ Options:
   --directions=D     Initial directions for the first round
   --apply            Apply changes (default: dry-run preview)
   --gap-analysis     Run claims gap analysis on the first round
+  --timeout=M        Per-round timeout in minutes (default: 30)
   --pages=a,b,c      Multiple pages (comma-separated, run sequentially)
 
 Stop conditions:
@@ -316,6 +318,7 @@ Examples:
   const directions = (opts.directions as string) || '';
   const apply = opts.apply === true;
   const gapAnalysis = opts['gap-analysis'] === true;
+  const timeoutMinutes = Math.max(5, parseInt(opts.timeout as string, 10) || 30);
 
   // Determine page list
   let pageIds: string[] = [];
@@ -344,6 +347,7 @@ Examples:
     directions,
     apply,
     gapAnalysis,
+    timeoutMinutes,
   };
 
   console.log('Page Iterator');
@@ -351,6 +355,7 @@ Examples:
   console.log(`Pages:      ${pageIds.join(', ')}`);
   console.log(`Max rounds: ${maxRounds}`);
   console.log(`Tier:       ${tier}`);
+  console.log(`Timeout:    ${timeoutMinutes}m`);
   console.log(`Apply:      ${apply}`);
   if (directions) console.log(`Directions: ${directions}`);
   if (gapAnalysis) console.log(`Gap analysis: enabled (first round only)`);
