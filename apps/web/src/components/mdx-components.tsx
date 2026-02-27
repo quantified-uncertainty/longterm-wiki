@@ -30,6 +30,9 @@ import SafetyGeneralizabilityTableView from "@/components/tables/views/SafetyGen
 // Summary components
 import { KeyTakeaways } from "@/components/wiki/KeyTakeaways";
 
+// Epic tracking
+import { EpicTracker } from "@/components/wiki/EpicTracker";
+
 // Dashboard content components (rendered via MDX stubs at /wiki/E<id>)
 import { FactsPageContent } from "@/app/internal/facts/facts-content";
 import { PageCoverageContent } from "@/app/internal/page-coverage/page-coverage-content";
@@ -136,6 +139,9 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
 
   // Anthropic-specific table
   AnthropicStakeholdersTable,
+
+  // Epic tracking
+  EpicTracker,
 
   // Dashboard content components
   FactsPageContent,

@@ -1,0 +1,83 @@
+---
+numericId: E906
+title: "Epic Page Conventions"
+description: "Standard format for wiki pages that coordinate multi-sprint, multi-issue development work"
+sidebar:
+  order: 39
+subcategory: style-guides
+quality: 60
+readerImportance: 50
+researchImportance: 70
+lastEdited: "2026-02-27"
+createdAt: 2026-02-27
+evergreen: false
+---
+
+## Overview
+
+Epic pages are wiki pages that serve as coordination artifacts for multi-sprint, multi-issue development work. Instead of using a separate tool (like GitHub Discussions), we use wiki pages — this dogfoods the wiki itself and keeps coordination in the same place as the knowledge base.
+
+## When to Create an Epic Page
+
+Create an epic page when work:
+
+- Spans **3+ GitHub issues** or **2+ sprints**
+- Involves architectural decisions that need a persistent record
+- Benefits from a central place to track progress and decisions
+- Is complex enough that individual issue descriptions don't capture the full picture
+
+## Required Sections
+
+### Status
+
+Place an `<EpicTracker>` component at the top of the page to show live issue status:
+
+```jsx
+<EpicTracker issues={[1043, 1065, 1074]} />
+```
+
+This renders a progress bar and table showing each issue's title, state, and labels. Falls back gracefully to a list of links if the wiki-server is unavailable.
+
+### Objective
+
+One or two paragraphs describing what this epic aims to achieve. Focus on the "why" — what problem does this solve, what state do we want to reach?
+
+### Current State
+
+A snapshot of where things stand right now. Update this section each sprint or when significant progress is made. Include:
+
+- What's working
+- What's blocked
+- Key metrics or quality indicators
+
+### Decision Log
+
+A structured record of important decisions made during the epic. Use this format:
+
+| Date | Decision | Rationale | Issue |
+|------|----------|-----------|-------|
+| 2026-02-27 | Use wiki pages instead of GitHub Discussions | Dogfoods the wiki, reduces tool count from 3 to 2 | — |
+| 2026-02-25 | Separate claims extraction from verification | Each step needs independent iteration | #1065 |
+
+### Open Questions
+
+Blocking questions that need human input. Remove questions once answered (move the answer to the Decision Log).
+
+### Sprint/Phase Sections
+
+Break the work into phases or sprints. Each section should include:
+
+- **Goals**: What we're trying to accomplish this phase
+- **Issues**: Links to the specific GitHub issues
+- **Outcomes**: What was actually achieved (filled in after the phase)
+
+## Example
+
+See <EntityLink id="claims-system-development-roadmap">Claims System Development Roadmap</EntityLink> for a live example of an epic page following these conventions.
+
+## Tips
+
+- **Update regularly**: An outdated epic page is worse than no page. Update Current State and the Decision Log after each session.
+- **Keep it scannable**: Use tables and short bullet points. Avoid long prose.
+- **Link issues**: Every decision and question should reference the relevant GitHub issue when applicable.
+- **Archive completed epics**: When all issues are closed, add a "Completed" banner at the top and move the page to a lower importance tier.
