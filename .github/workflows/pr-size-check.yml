@@ -1,0 +1,77 @@
+name: PR Size Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-size:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Check PR size and comment if large
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const WARN_THRESHOLD = 500;
+            const LARGE_THRESHOLD = 1000;
+
+            // Get PR diff stats
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const totalChanges = pr.additions + pr.deletions;
+            const filesChanged = pr.changed_files;
+
+            if (totalChanges <= WARN_THRESHOLD) {
+              console.log(`PR size OK: ${totalChanges} lines changed across ${filesChanged} files`);
+              return;
+            }
+
+            // Check if we already posted a size warning (avoid duplicates on re-push)
+            const MARKER = '<!-- pr-size-check -->';
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.includes(MARKER));
+
+            const level = totalChanges > LARGE_THRESHOLD ? 'large' : 'medium';
+            const emoji = level === 'large' ? '🔴' : '🟡';
+            const body = [
+              MARKER,
+              `${emoji} **PR Size Warning**: ${totalChanges} lines changed across ${filesChanged} files.`,
+              '',
+              level === 'large'
+                ? `This PR exceeds ${LARGE_THRESHOLD} lines. Consider splitting into smaller, staged PRs (see [#1252](https://github.com/quantified-uncertainty/longterm-wiki/issues/1252)).`
+                : `This PR exceeds ${WARN_THRESHOLD} lines. If possible, consider whether it could be split into smaller PRs.`,
+              '',
+              `| Metric | Value |`,
+              `|--------|-------|`,
+              `| Additions | +${pr.additions} |`,
+              `| Deletions | -${pr.deletions} |`,
+              `| Files changed | ${filesChanged} |`,
+            ].join('\n');
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+              console.log(`Updated existing size warning (${totalChanges} lines)`);
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+              console.log(`Posted size warning (${totalChanges} lines)`);
+            }
