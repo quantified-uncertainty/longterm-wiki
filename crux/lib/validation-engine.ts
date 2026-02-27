@@ -20,7 +20,7 @@ import { parse as parseYaml } from 'yaml';
 import { findMdxFiles } from './file-utils.ts';
 import { getColors, type Colors } from './output.ts';
 import { parseFrontmatterAndBody } from './mdx-utils.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, type Frontmatter, loadIdRegistry } from './content-types.ts';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, type Frontmatter, loadIdRegistry, loadPathRegistry as loadCanonicalPathRegistry, loadEntities as loadCanonicalEntities } from './content-types.ts';
 import { logBulkFixes } from './edit-log.ts';
 
 // ---------------------------------------------------------------------------
@@ -244,8 +244,10 @@ export class ValidationEngine {
       }
     }
 
-    this.pathRegistry = (loadJSON('data/pathRegistry.json') as Record<string, string>) || {};
-    this.entities = loadYAML('data/entities.yaml') || {};
+    // Use canonical loaders from content-types.ts (with auto-build fallback)
+    // instead of raw JSON/YAML reads, ensuring consistent data across validators.
+    this.pathRegistry = loadCanonicalPathRegistry();
+    this.entities = loadCanonicalEntities();
 
     // Load id-registry for numeric ID resolution (from database.json)
     try {

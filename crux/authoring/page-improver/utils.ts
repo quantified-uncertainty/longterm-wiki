@@ -10,7 +10,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createPhaseLogger } from '../../lib/output.ts';
 import { getApiKey } from '../../lib/api-keys.ts';
-import { loadPages as loadPagesFromRegistry } from '../../lib/content-types.ts';
+import { loadPages as loadPagesFromRegistry, CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.ts';
 import type { AnalysisResult, PageData, TierConfig } from './types.ts';
 import { FRONTMATTER_RE } from '../../lib/patterns.ts';
 
@@ -26,33 +26,9 @@ export const SCRY_PUBLIC_KEY: string = getApiKey('SCRY_API_KEY') || 'exopriors_p
 
 export const log = createPhaseLogger();
 
-export const CRITICAL_RULES: string[] = [
-  'dollar-signs',
-  'comparison-operators',
-  'frontmatter-schema',
-  'entitylink-ids',
-  'prefer-entitylink',
-  'internal-links',
-  'fake-urls',
-  'component-props',
-  'citation-urls',
-];
-
-export const QUALITY_RULES: string[] = [
-  'tilde-dollar',
-  'markdown-lists',
-  'consecutive-bold-labels',
-  'placeholders',
-  'vague-citations',
-  'temporal-artifacts',
-  'evaluative-framing',
-  'tone-markers',
-  'false-certainty',
-  'prescriptive-language',
-  'unsourced-biographical-claims',
-  'evaluative-flattery',
-  'orphaned-footnotes',
-];
+// CRITICAL_RULES and QUALITY_RULES are now imported from content-types.ts
+// (canonical source of truth for rule lists)
+export { CRITICAL_RULES, QUALITY_RULES };
 
 export const TIERS: Record<string, TierConfig> = {
   polish: {

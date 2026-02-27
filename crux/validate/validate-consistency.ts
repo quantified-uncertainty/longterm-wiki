@@ -15,14 +15,12 @@
  *   1 = Significant inconsistencies found
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
-import { parse as parseYaml } from 'yaml';
+import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getContentBody } from '../lib/mdx-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
-import { CONTENT_DIR, DATA_DIR } from '../lib/content-types.ts';
+import { CONTENT_DIR, loadEntities as loadCanonicalEntities, type Entity } from '../lib/content-types.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
 // ============================================================================
@@ -85,12 +83,7 @@ interface FileContent {
   filePath: string;
 }
 
-interface Entity {
-  id: string;
-  title: string;
-  aliases?: string[];
-  relatedEntries?: RelatedEntry[];
-}
+// Entity type imported from content-types.ts
 
 interface RelatedEntry {
   id: string;
@@ -174,17 +167,10 @@ const TERM_VARIANTS: TermVariants = {
 // ============================================================================
 
 /**
- * Load entities from YAML
+ * Load entities via the canonical loader (from generated JSON, with auto-build fallback).
  */
 function loadEntities(): Entity[] {
-  const entitiesPath = join(DATA_DIR, 'entities.yaml');
-  if (!existsSync(entitiesPath)) return [];
-  try {
-    const content = readFileSync(entitiesPath, 'utf-8');
-    return parseYaml(content) || [];
-  } catch {
-    return [];
-  }
+  return loadCanonicalEntities();
 }
 
 /**

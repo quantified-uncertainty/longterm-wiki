@@ -16,7 +16,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import type { AdversarialFinding } from '../types.ts';
-import { callClaude, createClient, MODELS } from '../../lib/anthropic.ts';
+import { callLlm, createLlmClient, MODELS } from '../../lib/llm.ts';
 import { stripFrontmatter } from '../../lib/patterns.ts';
 import { parseFrontmatter } from '../../lib/mdx-utils.ts';
 
@@ -188,8 +188,12 @@ async function auditDescriptionsWithLlm(
   overview: string,
   pageId: string,
 ): Promise<AdversarialFinding[]> {
-  const client = createClient({ required: false });
-  if (!client) return [];
+  let client;
+  try {
+    client = createLlmClient();
+  } catch {
+    return [];
+  }
 
   const descriptions: string[] = [];
   if (entityYaml?.description) descriptions.push(`Entity YAML description: "${entityYaml.description}"`);
@@ -198,9 +202,8 @@ async function auditDescriptionsWithLlm(
 
   if (descriptions.length === 0) return [];
 
-  const result = await callClaude(client, {
-    model: MODELS.haiku,
-    systemPrompt: `You are a fact-checker auditing descriptions of entities on an AI safety wiki.
+  const result = await callLlm(client, {
+    system: `You are a fact-checker auditing descriptions of entities on an AI safety wiki.
 
 For each description provided, check:
 1. Internal consistency: Do the descriptions contradict each other?
@@ -220,12 +223,14 @@ Respond ONLY with findings in JSON format:
 ]
 
 Return [] if no issues found. Be conservative — only flag genuine concerns.`,
-    userPrompt: `Page: ${pageId}
+    user: `Page: ${pageId}
 Entity: ${entityYaml?.name || pageId}
 Type: ${entityYaml?.type || 'unknown'}
 
 Descriptions to audit:
 ${descriptions.join('\n\n')}`,
+  }, {
+    model: MODELS.haiku,
     maxTokens: 1500,
     temperature: 0,
   });

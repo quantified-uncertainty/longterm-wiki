@@ -67,6 +67,9 @@ const UNIFIED_CHECKS: UnifiedChecksMap = {
   'sidebar-index': ['sidebar-index'],
   'entitylink-ids': ['entitylink-ids'],
   'prefer-entitylink': ['prefer-entitylink'],
+  'broken-links': ['broken-links'],
+  'style-guide': ['style-guide'],
+  'consistency': ['probability-consistency', 'terminology-variants', 'causal-relationship-coverage'],
 };
 
 /**
@@ -90,12 +93,7 @@ const SUBPROCESS_CHECKS: SubprocessCheckDescriptor[] = [
     script: 'validate-data.ts',
     description: 'Entity references, required fields, DataInfoBox props',
   },
-  {
-    id: 'entity-links',
-    name: 'EntityLink Conversion',
-    script: 'validate-entity-links.ts',
-    description: 'Markdown links that could use EntityLink components',
-  },
+  // entity-links: now unified as 'broken-links' + 'prefer-entitylink' engine rules
   {
     id: 'orphans',
     name: 'Orphaned Files',
@@ -120,24 +118,14 @@ const SUBPROCESS_CHECKS: SubprocessCheckDescriptor[] = [
     script: 'validate-mermaid.ts',
     description: 'Diagram syntax, subgraph IDs, comparison operators',
   },
-  {
-    id: 'style',
-    name: 'Style Guide Compliance',
-    script: 'validate-style-guide.ts',
-    description: 'Section structure, magnitude assessment, diagram conventions',
-  },
+  // style: now unified as 'style-guide' engine rule
   {
     id: 'staleness',
     name: 'Content Freshness',
     script: 'check-staleness.ts',
     description: 'Review dates, dependency updates, age thresholds',
   },
-  {
-    id: 'consistency',
-    name: 'Cross-Page Consistency',
-    script: 'validate-consistency.ts',
-    description: 'Probability estimates, causal claims, terminology',
-  },
+  // consistency: now unified as 'probability-consistency', 'terminology-variants', 'causal-relationship-coverage' engine rules
   {
     id: 'sidebar',
     name: 'Sidebar Configuration',

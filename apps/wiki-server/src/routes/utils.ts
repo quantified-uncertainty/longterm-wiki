@@ -1,4 +1,20 @@
 import type { Context } from "hono";
+import { z } from "zod";
+
+/**
+ * Create a PaginationQuery schema with configurable limits.
+ * Each route can call this with its own defaults while sharing the base shape.
+ */
+export function paginationQuery(opts?: {
+  maxLimit?: number;
+  defaultLimit?: number;
+}) {
+  const { maxLimit = 200, defaultLimit = 50 } = opts ?? {};
+  return z.object({
+    limit: z.coerce.number().int().min(1).max(maxLimit).default(defaultLimit),
+    offset: z.coerce.number().int().min(0).default(0),
+  });
+}
 
 /** Standard error codes for 400 responses. */
 export const VALIDATION_ERROR = "validation_error" as const;

@@ -327,6 +327,81 @@ export async function streamLlmCall(
 }
 
 // ---------------------------------------------------------------------------
+// Non-streaming call with retry + OpenRouter support
+// ---------------------------------------------------------------------------
+
+export interface CallLlmOptions {
+  model?: string;
+  maxTokens?: number;
+  systemPrompt?: string;
+  temperature?: number;
+  retryLabel?: string;
+  /** If provided, the call's usage is automatically recorded. */
+  tracker?: CostTracker;
+  /** Label for the cost entry. */
+  label?: string;
+}
+
+export interface CallLlmResult {
+  text: string;
+  usage: { input_tokens: number; output_tokens: number };
+  model: string;
+}
+
+/**
+ * Make a non-streaming Claude API call with retry and OpenRouter support.
+ *
+ * This is the recommended replacement for `callClaude()` from anthropic.ts.
+ * Unlike callClaude, it:
+ * - Supports OpenRouter routing (via setOpenRouterMode)
+ * - Has configurable retry with exponential backoff
+ * - Can track costs via CostTracker
+ */
+export async function callLlm(
+  client: Anthropic,
+  prompt: string | { system: string; user: string },
+  options: CallLlmOptions = {},
+): Promise<CallLlmResult> {
+  const {
+    model = MODELS.sonnet,
+    maxTokens = 4000,
+    systemPrompt,
+    temperature,
+    retryLabel = 'callLlm',
+    tracker,
+    label,
+  } = options;
+
+  // Normalize prompt input
+  const system = typeof prompt === 'string'
+    ? (systemPrompt || '')
+    : prompt.system;
+  const userPrompt = typeof prompt === 'string'
+    ? prompt
+    : prompt.user;
+
+  const trackingOptions: StreamingCreateOptions | undefined =
+    tracker ? { tracker, label } : undefined;
+
+  const response = await withRetry(
+    () => streamingCreate(client, {
+      model,
+      max_tokens: maxTokens,
+      ...(system && { system }),
+      ...(temperature !== undefined && { temperature }),
+      messages: [{ role: 'user', content: userPrompt }],
+    }, trackingOptions),
+    { label: retryLabel }
+  );
+
+  return {
+    text: extractText(response),
+    usage: response.usage,
+    model: response.model,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Agent loop (with tool use)
 // ---------------------------------------------------------------------------
 

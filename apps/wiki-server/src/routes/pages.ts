@@ -9,6 +9,7 @@ import {
   invalidJsonError,
   notFoundError,
   dbError,
+  paginationQuery,
 } from "./utils.js";
 import {
   SyncPageSchema as SharedSyncPageSchema,
@@ -52,9 +53,7 @@ const SearchQuery = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-const PaginationQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
-  offset: z.coerce.number().int().min(0).default(0),
+const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
   category: z.string().max(100).optional(),
   entityType: z.string().max(100).optional(),
 });

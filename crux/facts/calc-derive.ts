@@ -22,7 +22,7 @@ import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles, findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { createClient, MODELS, callClaude } from '../lib/anthropic.ts';
+import { createLlmClient, MODELS, callLlm } from '../lib/llm.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { getColors } from '../lib/output.ts';
 import { evalCalcExpr } from '../lib/calc-evaluator.ts';
@@ -377,8 +377,10 @@ async function proposeCalcReplacements(
   factsTable: string,
   pageContent: string,
 ): Promise<CalcProposal[]> {
-  const client = createClient({ required: false });
-  if (!client) {
+  let client;
+  try {
+    client = createLlmClient();
+  } catch {
     console.warn('[calc-derive] ANTHROPIC_API_KEY not found — skipping LLM proposals');
     return [];
   }
@@ -411,10 +413,11 @@ If a pattern is NOT derivable from available facts, still include it with "expr"
 
 Return exactly ${patterns.length} proposals (one per pattern, in order).`;
 
-  const result = await callClaude(client, {
+  const result = await callLlm(client, {
+    system: SYSTEM_PROMPT,
+    user: prompt,
+  }, {
     model: MODELS.sonnet,
-    systemPrompt: SYSTEM_PROMPT,
-    userPrompt: prompt,
     maxTokens: 4000,
     temperature: 0,
   });

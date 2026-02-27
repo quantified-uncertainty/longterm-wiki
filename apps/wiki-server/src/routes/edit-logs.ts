@@ -4,7 +4,7 @@ import { eq, gte, count, sql, asc, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { editLogs, wikiPages } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
-import { parseJsonBody, validationError, invalidJsonError, firstOrThrow } from "./utils.js";
+import { parseJsonBody, validationError, invalidJsonError, firstOrThrow, paginationQuery } from "./utils.js";
 import { EditLogEntrySchema, EditLogBatchSchema } from "../api-types.js";
 
 // ---- Constants ----
@@ -16,10 +16,7 @@ const MAX_PAGE_SIZE = 1000;
 const AppendSchema = EditLogEntrySchema;
 const AppendBatchSchema = EditLogBatchSchema;
 
-const PaginationQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
-  offset: z.coerce.number().int().min(0).default(0),
-});
+const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit: 100 });
 
 const AllEntriesQuery = PaginationQuery.extend({
   since: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),

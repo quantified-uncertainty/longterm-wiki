@@ -13,7 +13,8 @@
  */
 
 import { readFileSync } from 'fs';
-import { createClient, callClaude, MODELS, parseJsonResponse } from '../lib/anthropic.ts';
+import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
+import { parseJsonResponse } from '../lib/anthropic.ts';
 import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
@@ -131,8 +132,7 @@ async function llmRoute(
     return { pageUpdates: [], newPages: [], skipped: [] };
   }
 
-  const client = createClient();
-  if (!client) throw new Error('ANTHROPIC_API_KEY required for LLM routing');
+  const client = createLlmClient();
 
   // Build a compact page index for the prompt
   // Sort by importance, take top pages
@@ -152,10 +152,8 @@ async function llmRoute(
     console.log(`  LLM routing ${items.length} items against ${topPages.length} pages...`);
   }
 
-  const result = await callClaude(client, {
-    model: MODELS.haiku,
-    maxTokens: 6000,
-    systemPrompt: `You are a routing system for an AI safety wiki. Given news items and a list of wiki pages, decide which pages should be updated based on the news.
+  const result = await callLlm(client, {
+    system: `You are a routing system for an AI safety wiki. Given news items and a list of wiki pages, decide which pages should be updated based on the news.
 
 Rules:
 - Only route items that contain genuinely new, substantive information
@@ -171,7 +169,10 @@ Output ONLY a JSON object with this structure:
   "newPages": [{ "suggestedTitle": "...", "suggestedId": "...", "reason": "...", "relevantItems": [5], "suggestedTier": "standard" }],
   "skipped": [{ "index": 2, "reason": "..." }]
 }`,
-    userPrompt: `## Wiki Pages (top ${topPages.length} by importance)\n${pageList}\n\n## News Items to Route\n${itemList}`,
+    user: `## Wiki Pages (top ${topPages.length} by importance)\n${pageList}\n\n## News Items to Route\n${itemList}`,
+  }, {
+    model: MODELS.haiku,
+    maxTokens: 6000,
   });
 
   try {

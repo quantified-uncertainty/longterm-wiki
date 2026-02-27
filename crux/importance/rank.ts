@@ -17,7 +17,7 @@ import { readFileSync } from 'fs';
 import { parseCliArgs } from '../lib/cli.ts';
 import { createLogger, createProgress } from '../lib/output.ts';
 import { loadPages, CONTENT_DIR_ABS } from '../lib/content-types.ts';
-import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
+import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import {
   loadRanking,
   saveRanking,
@@ -77,7 +77,7 @@ async function findPosition(
   pageId: string,
   ranking: string[],
   pagesMap: Map<string, PageInfo>,
-  client: ReturnType<typeof createClient>,
+  client: ReturnType<typeof createLlmClient>,
 ): Promise<number> {
   if (ranking.length === 0) return 1;
 
@@ -98,10 +98,11 @@ B: ${formatPageForComparison(midInfo)}
 
 Reply with only "A" or "B".`;
 
-    const result = await callClaude(client!, {
+    const result = await callLlm(client, {
+      system: SYSTEM_PROMPT,
+      user: prompt,
+    }, {
       model: MODELS.haiku,
-      systemPrompt: SYSTEM_PROMPT,
-      userPrompt: prompt,
       maxTokens: 10,
       temperature: 0,
     });
@@ -181,11 +182,7 @@ async function main() {
   }
 
   // Initialize Claude client
-  const client = createClient();
-  if (!client) {
-    log.error('ANTHROPIC_API_KEY required for LLM-assisted ranking');
-    process.exit(1);
-  }
+  const client = createLlmClient();
 
   log.heading(`Ranking ${toRank.length} page(s)`);
   console.log('');

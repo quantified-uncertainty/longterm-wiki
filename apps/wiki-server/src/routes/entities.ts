@@ -9,6 +9,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  paginationQuery,
 } from "./utils.js";
 import {
   SyncEntitySchema as SharedSyncEntitySchema,
@@ -24,9 +25,7 @@ const MAX_PAGE_SIZE = 200;
 const SyncEntitySchema = SharedSyncEntitySchema;
 const SyncBatchSchema = SyncEntitiesBatchSchema;
 
-const PaginationQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
-  offset: z.coerce.number().int().min(0).default(0),
+const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
   entityType: z.string().max(100).optional(),
 });
 

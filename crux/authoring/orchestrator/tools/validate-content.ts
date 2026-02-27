@@ -13,17 +13,8 @@
 
 import { ValidationEngine, ContentFile } from '../../../lib/validation-engine.ts';
 import { allRules } from '../../../lib/rules/index.ts';
-import { CRITICAL_RULES } from '../../page-improver/utils.ts';
+import { CRITICAL_RULES, QUALITY_RULES } from '../../../lib/content-types.ts';
 import type { ToolRegistration } from './types.ts';
-
-const QUALITY_RULES = [
-  'tilde-dollar',
-  'markdown-lists',
-  'consecutive-bold-labels',
-  'placeholders',
-  'vague-citations',
-  'temporal-artifacts',
-];
 
 export const tool: ToolRegistration = {
   name: 'validate_content',

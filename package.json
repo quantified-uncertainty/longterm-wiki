@@ -26,14 +26,14 @@
     "pdf-parse": "^2.4.5",
     "yaml": "^2.7.0",
     "youtube-transcript": "^1.2.1",
-    "zod": "^3.24.2"
+    "zod": "^3.25.76"
   },
   "optionalDependencies": {
     "@mendable/firecrawl-js": "^1.15.5"
   },
   "devDependencies": {
     "@mdx-js/mdx": "^3.1.0",
-    "hono": "^4.7.0",
+    "hono": "^4.12.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.0.0",

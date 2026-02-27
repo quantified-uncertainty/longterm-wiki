@@ -20,6 +20,7 @@ import {
   notFoundError,
   firstOrThrow,
   dbError,
+  paginationQuery,
 } from "./utils.js";
 import {
   UpsertResourceSchema as SharedUpsertResourceSchema,
@@ -83,7 +84,8 @@ function urlVariants(url: string): string[] {
       variants.add(withWww);
       variants.add(withWww + "/");
     }
-  } catch {
+  } catch (err) {
+    console.error("[resources] urlVariants parse failed:", err instanceof Error ? err.message : String(err));
     variants.add(url);
   }
   return Array.from(variants);
@@ -99,9 +101,7 @@ const SearchQuery = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-const PaginationQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
-  offset: z.coerce.number().int().min(0).default(0),
+const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
   type: z.string().max(50).optional(),
 });
 

@@ -111,7 +111,9 @@ export interface CallClaudeResult {
 }
 
 /**
- * Call Claude API with standardized error handling
+ * @deprecated Use `callLlm()` from `crux/lib/llm.ts` instead.
+ * `callLlm` adds retry with exponential backoff and OpenRouter routing support.
+ * This function is kept only for backward compatibility.
  */
 export async function callClaude(client: Anthropic, {
   model,

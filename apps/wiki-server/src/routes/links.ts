@@ -87,6 +87,33 @@ interface RelatedDbRow {
   score: string;
 }
 
+interface GraphEdgeDbRow {
+  source_id: string;
+  target_id: string;
+  link_type: string;
+  relationship: string | null;
+  weight: number;
+  source_type: string | null;
+  source_title: string | null;
+  target_type: string | null;
+  target_title: string | null;
+}
+
+interface LinkStatsRow {
+  link_type: string;
+  count: number;
+  avg_weight: string;
+}
+
+interface TotalRow {
+  total: number;
+}
+
+interface UniqueCountRow {
+  sources: number;
+  targets: number;
+}
+
 // ---- POST /sync ----
 
 // Advisory lock key for serializing page_links sync operations.
@@ -318,7 +345,7 @@ const linksApp = new Hono()
       weight: number;
     }> = [];
 
-    for (const r of results as any[]) {
+    for (const r of results as unknown as GraphEdgeDbRow[]) {
       if (!nodeMap.has(r.source_id)) {
         nodeMap.set(r.source_id, {
           id: r.source_id,
@@ -374,11 +401,15 @@ const linksApp = new Hono()
     FROM page_links
   `;
 
+    const total = (totalResult as unknown as TotalRow[])[0]?.total || 0;
+    const unique = (uniquePagesResult as unknown as UniqueCountRow[])[0];
+    const typedStats = stats as unknown as LinkStatsRow[];
+
     return c.json({
-      total: (totalResult[0] as any)?.total || 0,
-      uniqueSources: (uniquePagesResult[0] as any)?.sources || 0,
-      uniqueTargets: (uniquePagesResult[0] as any)?.targets || 0,
-      byType: stats.map((s: any) => ({
+      total,
+      uniqueSources: unique?.sources || 0,
+      uniqueTargets: unique?.targets || 0,
+      byType: typedStats.map((s) => ({
         linkType: s.link_type,
         count: s.count,
         avgWeight: parseFloat(s.avg_weight),
