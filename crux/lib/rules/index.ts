@@ -118,6 +118,17 @@ import { officialWebsiteLabelRule } from './official-website-label.ts';
 import { placeholderTextRule } from './placeholder-text.ts';
 import { personOrgAffiliationRule } from './person-org-affiliation.ts';
 
+// Style guide compliance
+import { styleGuideRule } from './style-guide.ts';
+
+// Broken internal links (ported from validate-entity-links.ts)
+import { brokenLinksRule } from './broken-links.ts';
+
+// Cross-page consistency rules (ported from validate-consistency.ts)
+import { probabilityConsistencyRule } from './probability-consistency.ts';
+import { terminologyVariantsRule } from './terminology-variants.ts';
+import { causalRelationshipCoverageRule } from './causal-relationship-coverage.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -178,6 +189,11 @@ export {
   personOrgAffiliationRule,
   numberedFootnotesRule,
   orphanedFootnotesRule,
+  brokenLinksRule,
+  styleGuideRule,
+  probabilityConsistencyRule,
+  terminologyVariantsRule,
+  causalRelationshipCoverageRule,
 };
 
 export const allRules: Rule[] = [
@@ -239,6 +255,11 @@ export const allRules: Rule[] = [
   personOrgAffiliationRule,
   numberedFootnotesRule,
   orphanedFootnotesRule,
+  brokenLinksRule,
+  styleGuideRule,
+  probabilityConsistencyRule,
+  terminologyVariantsRule,
+  causalRelationshipCoverageRule,
 ];
 
 export default allRules;
