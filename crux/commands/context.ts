@@ -392,6 +392,11 @@ async function forPage(
   }
 
   if (citationsResult.ok) {
+    // Note: GET /quotes?page_id=X paginates (limit param, default 100, max 500).
+    // We request limit=20 for brevity, so quotes.length may be less than the true
+    // total. The API does NOT return a separate total count, so we pass
+    // quotes.length as the total — the health block will show verified/broken
+    // counts for the fetched subset only.
     bundle += citationHealthBlock(citationsResult.data.quotes, citationsResult.data.quotes.length);
   }
 

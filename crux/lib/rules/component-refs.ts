@@ -14,18 +14,7 @@ import { join } from 'path';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { loadDatabase, loadPathRegistry, loadIdRegistry as loadIdReg, DATA_DIR_ABS, type Entity } from '../content-types.ts';
 import { NUMERIC_ID_RE, ENTITY_LINK_RE } from '../patterns.ts';
-
-/**
- * Strip fenced code blocks (```...```) from MDX content so validators
- * don't flag example code as real imports or component references.
- * Replaces block contents with blank lines to preserve line numbering.
- * NOTE: Duplicated in crux/validate/validate-component-refs.ts (independent validator).
- */
-function stripFencedCodeBlocks(content: string): string {
-  return content.replace(/^```[^\n]*\n[\s\S]*?^```/gm, (match) => {
-    return '\n'.repeat(match.split('\n').length - 1);
-  });
-}
+import { stripFencedCodeBlocks } from '../mdx-utils.ts';
 
 const DATA_DIR = DATA_DIR_ABS;
 

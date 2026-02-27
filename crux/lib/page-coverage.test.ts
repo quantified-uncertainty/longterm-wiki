@@ -40,32 +40,12 @@ function makeInput(overrides: Partial<CoverageInput> = {}): CoverageInput {
 // ---------------------------------------------------------------------------
 
 describe('ENTITY_LIKE_TYPES', () => {
-  it('includes person', () => {
-    expect(ENTITY_LIKE_TYPES.has('person')).toBe(true);
+  it.each(['person', 'organization'])('includes %s', (type) => {
+    expect(ENTITY_LIKE_TYPES.has(type)).toBe(true);
   });
 
-  it('includes organization', () => {
-    expect(ENTITY_LIKE_TYPES.has('organization')).toBe(true);
-  });
-
-  it('does not include concept', () => {
-    expect(ENTITY_LIKE_TYPES.has('concept')).toBe(false);
-  });
-
-  it('does not include model', () => {
-    expect(ENTITY_LIKE_TYPES.has('model')).toBe(false);
-  });
-
-  it('does not include risk', () => {
-    expect(ENTITY_LIKE_TYPES.has('risk')).toBe(false);
-  });
-
-  it('does not include analysis', () => {
-    expect(ENTITY_LIKE_TYPES.has('analysis')).toBe(false);
-  });
-
-  it('does not include approach', () => {
-    expect(ENTITY_LIKE_TYPES.has('approach')).toBe(false);
+  it.each(['concept', 'model', 'risk', 'analysis', 'approach'])('does not include %s', (type) => {
+    expect(ENTITY_LIKE_TYPES.has(type)).toBe(false);
   });
 });
 
@@ -84,34 +64,18 @@ describe('FACTS_GREEN_THRESHOLD', () => {
 // ---------------------------------------------------------------------------
 
 describe('getMetricStatus', () => {
-  it('returns green when actual >= target', () => {
-    expect(getMetricStatus(5, 5)).toBe('green');
-    expect(getMetricStatus(10, 5)).toBe('green');
-  });
-
-  it('returns amber when actual > 0 but below target', () => {
-    expect(getMetricStatus(2, 5)).toBe('amber');
-    expect(getMetricStatus(1, 10)).toBe('amber');
-  });
-
-  it('returns red when actual is 0 and target > 0', () => {
-    expect(getMetricStatus(0, 5)).toBe('red');
-  });
-
-  it('returns green for actual > 0 when target is 0', () => {
-    expect(getMetricStatus(1, 0)).toBe('green');
-  });
-
-  it('returns red for actual 0 when target is 0', () => {
-    expect(getMetricStatus(0, 0)).toBe('red');
-  });
-
-  it('returns green for actual > 0 when target is undefined', () => {
-    expect(getMetricStatus(3, undefined)).toBe('green');
-  });
-
-  it('returns red for actual 0 when target is undefined', () => {
-    expect(getMetricStatus(0, undefined)).toBe('red');
+  it.each([
+    [5, 5, 'green'],
+    [10, 5, 'green'],
+    [2, 5, 'amber'],
+    [1, 10, 'amber'],
+    [0, 5, 'red'],
+    [1, 0, 'green'],
+    [0, 0, 'red'],
+    [3, undefined, 'green'],
+    [0, undefined, 'red'],
+  ] as const)('getMetricStatus(%i, %s) => %s', (actual, target, expected) => {
+    expect(getMetricStatus(actual, target)).toBe(expected);
   });
 });
 
@@ -120,24 +84,17 @@ describe('getMetricStatus', () => {
 // ---------------------------------------------------------------------------
 
 describe('getRatioStatus', () => {
-  it('returns red when denominator is 0', () => {
-    expect(getRatioStatus(0, 0)).toBe('red');
-    expect(getRatioStatus(5, 0)).toBe('red');
-  });
-
-  it('returns green when ratio >= 75%', () => {
-    expect(getRatioStatus(75, 100)).toBe('green');
-    expect(getRatioStatus(10, 10)).toBe('green');
-    expect(getRatioStatus(4, 5)).toBe('green'); // 80%
-  });
-
-  it('returns amber when numerator > 0 but ratio < 75%', () => {
-    expect(getRatioStatus(1, 100)).toBe('amber');
-    expect(getRatioStatus(74, 100)).toBe('amber');
-  });
-
-  it('returns red when numerator is 0 and denominator > 0', () => {
-    expect(getRatioStatus(0, 10)).toBe('red');
+  it.each([
+    [0, 0, 'red'],
+    [5, 0, 'red'],
+    [75, 100, 'green'],
+    [10, 10, 'green'],
+    [4, 5, 'green'],    // 80%
+    [1, 100, 'amber'],
+    [74, 100, 'amber'],
+    [0, 10, 'red'],
+  ] as const)('getRatioStatus(%i, %i) => %s', (num, denom, expected) => {
+    expect(getRatioStatus(num, denom)).toBe(expected);
   });
 });
 
@@ -188,44 +145,18 @@ describe('getRecommendedTargets', () => {
 // ---------------------------------------------------------------------------
 
 describe('computePageCoverage — boolean items', () => {
-  it('llmSummary green when present', () => {
-    const result = computePageCoverage(makeInput({ llmSummary: 'Summary text' }));
-    expect(result.items.llmSummary).toBe('green');
-  });
-
-  it('llmSummary red when absent', () => {
-    const result = computePageCoverage(makeInput({ llmSummary: null }));
-    expect(result.items.llmSummary).toBe('red');
-  });
-
-  it('schedule green when updateFrequency is set', () => {
-    const result = computePageCoverage(makeInput({ updateFrequency: 14 }));
-    expect(result.items.schedule).toBe('green');
-  });
-
-  it('schedule red when updateFrequency is null', () => {
-    const result = computePageCoverage(makeInput({ updateFrequency: null }));
-    expect(result.items.schedule).toBe('red');
-  });
-
-  it('entity green when hasEntity is true', () => {
-    const result = computePageCoverage(makeInput({ hasEntity: true }));
-    expect(result.items.entity).toBe('green');
-  });
-
-  it('entity red when hasEntity is false', () => {
-    const result = computePageCoverage(makeInput({ hasEntity: false }));
-    expect(result.items.entity).toBe('red');
-  });
-
-  it('editHistory green when changeHistoryCount > 0', () => {
-    const result = computePageCoverage(makeInput({ changeHistoryCount: 3 }));
-    expect(result.items.editHistory).toBe('green');
-  });
-
-  it('editHistory red when changeHistoryCount is 0', () => {
-    const result = computePageCoverage(makeInput({ changeHistoryCount: 0 }));
-    expect(result.items.editHistory).toBe('red');
+  it.each([
+    ['llmSummary', { llmSummary: 'Summary text' }, 'green'],
+    ['llmSummary', { llmSummary: null }, 'red'],
+    ['schedule', { updateFrequency: 14 }, 'green'],
+    ['schedule', { updateFrequency: null }, 'red'],
+    ['entity', { hasEntity: true }, 'green'],
+    ['entity', { hasEntity: false }, 'red'],
+    ['editHistory', { changeHistoryCount: 3 }, 'green'],
+    ['editHistory', { changeHistoryCount: 0 }, 'red'],
+  ] as const)('%s is %s when override applied', (itemKey, overrides, expected) => {
+    const result = computePageCoverage(makeInput(overrides as Partial<CoverageInput>));
+    expect(result.items[itemKey as keyof typeof result.items]).toBe(expected);
   });
 });
 
@@ -391,30 +322,15 @@ describe('computePageCoverage — facts scoring for person/organization', () => 
 });
 
 describe('computePageCoverage — facts NOT scored for non-entity types', () => {
-  const nonEntityTypes = ['concept', 'risk', 'model', 'analysis', 'approach', 'event'];
-
-  for (const entityType of nonEntityTypes) {
-    it(`facts item NOT present for entityType="${entityType}"`, () => {
+  it.each(['concept', 'risk', 'model', 'analysis', 'approach', 'event', null, undefined])(
+    'facts item NOT present for entityType=%s',
+    (entityType) => {
       const result = computePageCoverage(
-        makeInput({ entityType, factCount: 10 }),
+        makeInput({ entityType: entityType as string | null | undefined, factCount: 10 }),
       );
       expect(result.items).not.toHaveProperty('facts');
-    });
-  }
-
-  it('facts item NOT scored when entityType is null', () => {
-    const result = computePageCoverage(
-      makeInput({ entityType: null, factCount: 10 }),
-    );
-    expect(result.items).not.toHaveProperty('facts');
-  });
-
-  it('facts item NOT scored when entityType is undefined', () => {
-    const result = computePageCoverage(
-      makeInput({ entityType: undefined, factCount: 10 }),
-    );
-    expect(result.items).not.toHaveProperty('facts');
-  });
+    },
+  );
 
   it('factCount still passed through to output when entityType is concept', () => {
     const result = computePageCoverage(

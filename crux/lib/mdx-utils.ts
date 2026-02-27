@@ -180,6 +180,17 @@ export function shouldSkipPosition(content: string, position: number): boolean {
 }
 
 /**
+ * Strip fenced code blocks (```...```) from MDX content so validators
+ * don't flag example code as real imports or component references.
+ * Replaces block contents with blank lines to preserve line numbering.
+ */
+export function stripFencedCodeBlocks(content: string): string {
+  return content.replace(/^```[^\n]*\n[\s\S]*?^```/gm, (match) => {
+    return '\n'.repeat(match.split('\n').length - 1);
+  });
+}
+
+/**
  * Strip markdown code fences from AI-generated output.
  * Handles ```lang\n...\n``` wrapping that models sometimes add.
  */
