@@ -944,16 +944,19 @@ const claimsApp = new Hono()
 
     const db = getDrizzleDb();
     const now = new Date();
-    let updated = 0;
 
-    for (const item of parsed.data.items) {
-      const result = await db
-        .update(claims)
-        .set({ relatedEntities: item.relatedEntities, updatedAt: now })
-        .where(eq(claims.id, item.id))
-        .returning({ id: claims.id });
-      if (result.length > 0) updated++;
-    }
+    const updated = await db.transaction(async (tx) => {
+      let count = 0;
+      for (const item of parsed.data.items) {
+        const result = await tx
+          .update(claims)
+          .set({ relatedEntities: item.relatedEntities, updatedAt: now })
+          .where(eq(claims.id, item.id))
+          .returning({ id: claims.id });
+        if (result.length > 0) count++;
+      }
+      return count;
+    });
 
     return c.json({ updated, total: parsed.data.items.length });
   })
@@ -969,24 +972,27 @@ const claimsApp = new Hono()
 
     const db = getDrizzleDb();
     const now = new Date();
-    let updated = 0;
 
-    for (const item of parsed.data.items) {
-      const updates: Record<string, unknown> = { updatedAt: now };
-      if (item.subjectEntity !== undefined) updates.subjectEntity = item.subjectEntity;
-      if (item.property !== undefined) updates.property = item.property;
-      if (item.structuredValue !== undefined) updates.structuredValue = item.structuredValue;
-      if (item.valueUnit !== undefined) updates.valueUnit = item.valueUnit;
-      if (item.valueDate !== undefined) updates.valueDate = item.valueDate;
-      if (item.qualifiers !== undefined) updates.qualifiers = item.qualifiers;
+    const updated = await db.transaction(async (tx) => {
+      let count = 0;
+      for (const item of parsed.data.items) {
+        const updates: Record<string, unknown> = { updatedAt: now };
+        if (item.subjectEntity !== undefined) updates.subjectEntity = item.subjectEntity;
+        if (item.property !== undefined) updates.property = item.property;
+        if (item.structuredValue !== undefined) updates.structuredValue = item.structuredValue;
+        if (item.valueUnit !== undefined) updates.valueUnit = item.valueUnit;
+        if (item.valueDate !== undefined) updates.valueDate = item.valueDate;
+        if (item.qualifiers !== undefined) updates.qualifiers = item.qualifiers;
 
-      const result = await db
-        .update(claims)
-        .set(updates)
-        .where(eq(claims.id, item.id))
-        .returning({ id: claims.id });
-      if (result.length > 0) updated++;
-    }
+        const result = await tx
+          .update(claims)
+          .set(updates)
+          .where(eq(claims.id, item.id))
+          .returning({ id: claims.id });
+        if (result.length > 0) count++;
+      }
+      return count;
+    });
 
     return c.json({ updated, total: parsed.data.items.length });
   })
