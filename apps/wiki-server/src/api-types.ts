@@ -477,8 +477,11 @@ export const InsertClaimSchema = z.object({
   sources: z.array(z.object({
     resourceId: z.string().max(300).nullable().optional(),
     url: z.string().max(2000).nullable().optional(),
-sourceQuote: z.string().max(10000).nullable().optional(),
+    sourceQuote: z.string().max(10000).nullable().optional(),
     isPrimary: z.boolean().optional(),
+    sourceTitle: z.string().max(1000).nullable().optional(),
+    sourceType: z.string().max(100).nullable().optional(),
+    sourceLocation: z.string().max(1000).nullable().optional(),
   })).nullable().optional(),
 });
 export type InsertClaim = z.infer<typeof InsertClaimSchema>;
@@ -511,6 +514,9 @@ export interface ClaimSourceRow {
   sourceVerdictScore: number | null;
   sourceVerdictIssues: string | null;
   sourceCheckedAt: string | null;
+  sourceTitle: string | null;
+  sourceType: string | null;
+  sourceLocation: string | null;
 }
 
 export interface ClaimRow {

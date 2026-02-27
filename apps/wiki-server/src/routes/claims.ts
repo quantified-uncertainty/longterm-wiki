@@ -132,6 +132,9 @@ function formatClaimSource(s: ClaimSourceRowType) {
     sourceVerdictScore: s.sourceVerdictScore,
     sourceVerdictIssues: s.sourceVerdictIssues,
     sourceCheckedAt: s.sourceCheckedAt,
+    sourceTitle: s.sourceTitle,
+    sourceType: s.sourceType,
+    sourceLocation: s.sourceLocation,
   };
 }
 
@@ -201,6 +204,9 @@ const AddClaimSourceSchema = z.object({
   url: z.string().max(2000).nullable().optional(),
   sourceQuote: z.string().max(10000).nullable().optional(),
   isPrimary: z.boolean().optional(),
+  sourceTitle: z.string().max(1000).nullable().optional(),
+  sourceType: z.string().max(100).nullable().optional(),
+  sourceLocation: z.string().max(1000).nullable().optional(),
 });
 
 const BatchUpdateRelatedEntitiesSchema = z.object({
@@ -281,6 +287,9 @@ const claimsApp = new Hono()
         url: s.url ?? null,
         sourceQuote: s.sourceQuote ?? null,
         isPrimary: s.isPrimary ?? false,
+        sourceTitle: s.sourceTitle ?? null,
+        sourceType: s.sourceType ?? null,
+        sourceLocation: s.sourceLocation ?? null,
       }));
       await db.insert(claimSources).values(sourceVals);
     }
@@ -333,6 +342,9 @@ const claimsApp = new Hono()
         url: string | null;
         sourceQuote: string | null;
         isPrimary: boolean;
+        sourceTitle: string | null;
+        sourceType: string | null;
+        sourceLocation: string | null;
       }> = [];
 
       for (const item of items) {
@@ -351,6 +363,9 @@ const claimsApp = new Hono()
               url: s.url ?? null,
               sourceQuote: s.sourceQuote ?? null,
               isPrimary: s.isPrimary ?? false,
+              sourceTitle: s.sourceTitle ?? null,
+              sourceType: s.sourceType ?? null,
+              sourceLocation: s.sourceLocation ?? null,
             });
           }
         }
@@ -934,6 +949,9 @@ const claimsApp = new Hono()
         url: parsed.data.url ?? null,
         sourceQuote: parsed.data.sourceQuote ?? null,
         isPrimary: parsed.data.isPrimary ?? false,
+        sourceTitle: parsed.data.sourceTitle ?? null,
+        sourceType: parsed.data.sourceType ?? null,
+        sourceLocation: parsed.data.sourceLocation ?? null,
       })
       .returning();
 

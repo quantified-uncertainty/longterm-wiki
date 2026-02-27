@@ -41,6 +41,14 @@ interface CitationQuote {
   accuracyVerdict: string | null;
   accuracyScore: number | null;
   claimId: number | null;
+  // Fields for claim_sources metadata (migration 0037)
+  sourceTitle: string | null;
+  sourceType: string | null;
+  sourceLocation: string | null;
+  // Fields for claim verdict enrichment
+  accuracyIssues: string | null;
+  accuracySupportingQuotes: string | null;
+  verificationDifficulty: string | null;
 }
 
 interface QuotesAllResponse {
@@ -276,6 +284,16 @@ async function main() {
         ...(representative.accuracyScore != null
           ? { claimVerdictScore: representative.accuracyScore }
           : {}),
+        // Carry over verdict detail fields from citation_quotes
+        ...(representative.accuracyIssues
+          ? { claimVerdictIssues: representative.accuracyIssues }
+          : {}),
+        ...(representative.accuracySupportingQuotes
+          ? { claimVerdictQuotes: representative.accuracySupportingQuotes }
+          : {}),
+        ...(representative.verificationDifficulty
+          ? { claimVerdictDifficulty: representative.verificationDifficulty as 'easy' | 'moderate' | 'hard' }
+          : {}),
         // Inline source if a URL or resourceId is available
         ...(representative.url || representative.resourceId
           ? {
@@ -284,6 +302,9 @@ async function main() {
                 resourceId: representative.resourceId ?? null,
                 sourceQuote: representative.sourceQuote ?? null,
                 isPrimary: true,
+                sourceTitle: representative.sourceTitle ?? null,
+                sourceType: representative.sourceType ?? null,
+                sourceLocation: representative.sourceLocation ?? null,
               }],
             }
           : {}),

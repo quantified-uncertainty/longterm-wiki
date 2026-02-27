@@ -382,5 +382,102 @@ const integrityApp = new Hono()
     });
   });
 
+  // ---- GET /claims-citations-coverage ----
+  // Coverage metrics for the citation_quotes → claims consolidation (#1194)
+
+  .get("/claims-citations-coverage", async (c) => {
+    const db = getDrizzleDb();
+
+    // 1. citation_quotes totals
+    const cqTotals = (await db.execute(
+      sql`SELECT
+            COUNT(*) AS total,
+            COUNT(claim_id) AS linked,
+            COUNT(*) - COUNT(claim_id) AS unlinked,
+            COUNT(source_title) AS with_source_title,
+            COUNT(source_type) AS with_source_type,
+            COUNT(source_location) AS with_source_location,
+            COUNT(source_quote) AS with_source_quote,
+            COUNT(accuracy_verdict) AS with_accuracy_verdict,
+            COUNT(accuracy_score) AS with_accuracy_score,
+            COUNT(accuracy_issues) AS with_accuracy_issues,
+            COUNT(resource_id) AS with_resource_id
+          FROM citation_quotes`
+    )) as Array<Record<string, string>>;
+    const cq = cqTotals[0] ?? {};
+
+    // 2. Claims system totals
+    const claimsTotals = (await db.execute(
+      sql`SELECT
+            (SELECT COUNT(*) FROM claims) AS total_claims,
+            (SELECT COUNT(*) FROM claim_sources) AS total_sources,
+            (SELECT COUNT(*) FROM claim_page_references) AS total_page_refs,
+            (SELECT COUNT(DISTINCT entity_id) FROM claims) AS distinct_entities`
+    )) as Array<Record<string, string>>;
+    const cl = claimsTotals[0] ?? {};
+
+    // 3. Page-level breakdown
+    const pageBreakdown = (await db.execute(
+      sql`SELECT
+            COUNT(*) FILTER (WHERE has_cq AND NOT has_claims) AS pages_only_citation_quotes,
+            COUNT(*) FILTER (WHERE has_claims AND NOT has_cq) AS pages_only_claims,
+            COUNT(*) FILTER (WHERE has_cq AND has_claims) AS pages_both,
+            COUNT(*) FILTER (WHERE NOT has_cq AND NOT has_claims) AS pages_neither
+          FROM (
+            SELECT
+              wp.id,
+              EXISTS (SELECT 1 FROM citation_quotes cq WHERE cq.page_id = wp.id) AS has_cq,
+              EXISTS (SELECT 1 FROM claims c WHERE c.entity_id = wp.id) AS has_claims
+            FROM wiki_pages wp
+          ) sub`
+    )) as Array<Record<string, string>>;
+    const pb = pageBreakdown[0] ?? {};
+
+    // 4. Backfill readiness: unlinked quotes that have enough data
+    const readiness = (await db.execute(
+      sql`SELECT
+            COUNT(*) FILTER (WHERE claim_text IS NOT NULL AND LENGTH(TRIM(claim_text)) > 10) AS backfill_ready,
+            COUNT(*) FILTER (WHERE claim_text IS NULL OR LENGTH(TRIM(claim_text)) <= 10) AS not_backfill_ready
+          FROM citation_quotes
+          WHERE claim_id IS NULL`
+    )) as Array<Record<string, string>>;
+    const rd = readiness[0] ?? {};
+
+    return c.json({
+      checked_at: new Date().toISOString(),
+      citation_quotes: {
+        total: parseInt(cq.total ?? "0", 10),
+        linked_to_claims: parseInt(cq.linked ?? "0", 10),
+        unlinked: parseInt(cq.unlinked ?? "0", 10),
+        field_coverage: {
+          source_title: parseInt(cq.with_source_title ?? "0", 10),
+          source_type: parseInt(cq.with_source_type ?? "0", 10),
+          source_location: parseInt(cq.with_source_location ?? "0", 10),
+          source_quote: parseInt(cq.with_source_quote ?? "0", 10),
+          accuracy_verdict: parseInt(cq.with_accuracy_verdict ?? "0", 10),
+          accuracy_score: parseInt(cq.with_accuracy_score ?? "0", 10),
+          accuracy_issues: parseInt(cq.with_accuracy_issues ?? "0", 10),
+          resource_id: parseInt(cq.with_resource_id ?? "0", 10),
+        },
+      },
+      claims_system: {
+        total_claims: parseInt(cl.total_claims ?? "0", 10),
+        total_sources: parseInt(cl.total_sources ?? "0", 10),
+        total_page_refs: parseInt(cl.total_page_refs ?? "0", 10),
+        distinct_entities: parseInt(cl.distinct_entities ?? "0", 10),
+      },
+      page_breakdown: {
+        only_citation_quotes: parseInt(pb.pages_only_citation_quotes ?? "0", 10),
+        only_claims: parseInt(pb.pages_only_claims ?? "0", 10),
+        both: parseInt(pb.pages_both ?? "0", 10),
+        neither: parseInt(pb.pages_neither ?? "0", 10),
+      },
+      backfill_readiness: {
+        ready: parseInt(rd.backfill_ready ?? "0", 10),
+        not_ready: parseInt(rd.not_backfill_ready ?? "0", 10),
+      },
+    });
+  });
+
 export const integrityRoute = integrityApp;
 export type IntegrityRoute = typeof integrityApp;

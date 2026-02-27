@@ -92,6 +92,12 @@ const SCRIPTS = {
     passthrough: ['dry-run', 'page-id', 'limit'],
     positional: false,
   },
+  'coverage-audit': {
+    script: 'claims/coverage-audit.ts',
+    description: 'Show consolidation progress: citation_quotes → claims coverage',
+    passthrough: ['json'],
+    positional: false,
+  },
   'backfill-related-entities': {
     script: 'claims/backfill-related-entities.ts',
     description: 'Scan claim text for entity names and backfill relatedEntities field',

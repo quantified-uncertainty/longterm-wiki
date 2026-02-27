@@ -288,6 +288,13 @@
       "when": 1771902900000,
       "tag": "0036_inference_type",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1771903000000,
+      "tag": "0037_claim_sources_metadata",
+      "breakpoints": true
     }
   ]
 }
