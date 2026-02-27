@@ -429,6 +429,8 @@ export const claims = pgTable(
     valueUnit: text("value_unit"),                 // unit of measurement (e.g. "USD", "percent", "count")
     valueDate: date("value_date"),                 // when the value was true/measured
     qualifiers: jsonb("qualifiers").$type<Record<string, string>>(), // additional context (e.g. {"round": "Series B"})
+    // --- Pinned claims (migration 0034) ---
+    isPinned: boolean("is_pinned").notNull().default(false), // canonical value for <F> components
     // --- Timestamps ---
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

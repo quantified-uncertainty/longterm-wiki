@@ -900,7 +900,7 @@ export type FactsFile = z.infer<typeof FactsFile>;
  */
 export const FactMeasure = z.object({
   label: z.string(),                           // Display name (e.g., "Valuation")
-  unit: z.enum(['USD', 'percent', 'count', 'score', 'ratio', 'years', 'other']),
+  unit: z.enum(['USD', 'percent', 'count', 'score', 'ratio', 'years', 'tokens', 'date', 'string', 'entity', 'other']),
   category: z.string(),                        // Grouping category (e.g., "financial", "safety")
   direction: z.enum(['higher', 'lower']).optional(), // Whether higher values are better
   description: z.string().optional(),          // What this measure tracks
@@ -916,6 +916,8 @@ export type FactMeasure = z.infer<typeof FactMeasure>;
 
 export const FactMeasuresFile = z.object({
   measures: z.record(z.string(), FactMeasure),
+  // Maps snake_case claim property IDs to kebab-case measure IDs
+  propertyAliases: z.record(z.string(), z.string()).optional(),
 });
 export type FactMeasuresFile = z.infer<typeof FactMeasuresFile>;
 

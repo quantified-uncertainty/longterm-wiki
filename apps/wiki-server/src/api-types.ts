@@ -466,7 +466,7 @@ export const InsertClaimSchema = z.object({
   sources: z.array(z.object({
     resourceId: z.string().max(300).nullable().optional(),
     url: z.string().max(2000).nullable().optional(),
-    sourceQuote: z.string().max(10000).nullable().optional(),
+sourceQuote: z.string().max(10000).nullable().optional(),
     isPrimary: z.boolean().optional(),
   })).nullable().optional(),
 });
@@ -485,6 +485,109 @@ export const ClearClaimsBySectionSchema = z.object({
   entityId: z.string().min(1).max(300),
   section: z.string().min(1).max(500),
 });
+
+// -- Claims: Response types ---------------------------------------------------
+
+export interface ClaimSourceRow {
+  id: number;
+  claimId: number;
+  resourceId: string | null;
+  url: string | null;
+  sourceQuote: string | null;
+  isPrimary: boolean;
+  addedAt: string;
+  sourceVerdict: string | null;
+  sourceVerdictScore: number | null;
+  sourceVerdictIssues: string | null;
+  sourceCheckedAt: string | null;
+}
+
+export interface ClaimRow {
+  id: number;
+  entityId: string;
+  entityType: string;
+  claimType: string;
+  claimText: string;
+  /** @deprecated Use valueNumeric/valueLow/valueHigh instead */
+  value: string | null;
+  /** @deprecated Use measure instead */
+  unit: string | null;
+  /** @deprecated Use claimVerdict instead. */
+  confidence: string | null;
+  /** @deprecated Use sources[] (from claim_sources table) instead. */
+  sourceQuote: string | null;
+  // Enhanced fields (migration 0028)
+  claimCategory: string | null;
+  relatedEntities: string[] | null;
+  factId: string | null;
+  resourceIds: string[] | null;
+  section: string | null;
+  /** @deprecated Use claim_page_references table instead. Kept for backward compat. */
+  footnoteRefs: string | null;
+  // Phase 2 fields (migration 0029)
+  claimMode: string | null;       // 'endorsed' | 'attributed'
+  attributedTo: string | null;    // entity_id of person/org making claim
+  asOf: string | null;            // YYYY-MM or YYYY-MM-DD
+  measure: string | null;         // measure ID from facts taxonomy
+  valueNumeric: number | null;    // central numeric value
+  valueLow: number | null;        // lower bound
+  valueHigh: number | null;       // upper bound
+  // Verdict fields (migration 0031)
+  claimVerdict: string | null;
+  claimVerdictScore: number | null;
+  claimVerdictIssues: string | null;
+  claimVerdictQuotes: string | null;
+  claimVerdictDifficulty: string | null;
+  claimVerifiedAt: string | null;
+  claimVerdictModel: string | null;
+  // Structured claim fields (migration 0032)
+  subjectEntity: string | null;
+  property: string | null;
+  structuredValue: string | null;
+  valueUnit: string | null;
+  valueDate: string | null;
+  qualifiers: Record<string, string> | null;
+  // Pinned claims (migration 0034)
+  isPinned: boolean;
+  sources: ClaimSourceRow[];      // populated when ?includeSources=true
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InsertClaimResult {
+  id: number;
+  entityId: string;
+  claimType: string;
+}
+
+export interface InsertClaimBatchResult {
+  inserted: number;
+  results: Array<{ id: number; entityId: string; claimType: string }>;
+}
+
+export interface ClearClaimsResult {
+  deleted: number;
+}
+
+export interface GetClaimsResult {
+  claims: ClaimRow[];
+}
+
+export interface ClaimStatsResult {
+  total: number;
+  byClaimType: Record<string, number>;
+  byEntityType: Record<string, number>;
+  byClaimCategory: Record<string, number>;
+  byClaimMode: Record<string, number>;
+  byClaimVerdict: Record<string, number>;
+  multiEntityClaims: number;
+  factLinkedClaims: number;
+  withSourcesClaims: number;
+  attributedClaims: number;
+  numericClaims?: number;
+  structuredClaims?: number;
+  byProperty?: Record<string, number>;
+}
 
 // -- Claims: Page References types -------------------------------------------
 

@@ -7,6 +7,8 @@ import {
   TRIGRAM_SIMILARITY_THRESHOLD,
 } from "../search-utils.js";
 
+type ContentFormat = 'article' | 'table' | 'diagram' | 'index' | 'dashboard';
+
 // ---- Row types returned by raw SQL queries ----
 
 /** Row shape from the main explore data query (both FTS and trigram paths). */
@@ -423,8 +425,8 @@ const exploreApp = new Hono()
         riskCategory: r.risk_category || null,
         lastUpdated: r.last_updated || null,
         dateCreated: r.date_created || null,
-        contentFormat: r.content_format || null,
-        recommendedScore: r.recommended_score ?? null,
+        contentFormat: (r.content_format as ContentFormat) || undefined,
+        recommendedScore: r.recommended_score ?? undefined,
       };
     });
 

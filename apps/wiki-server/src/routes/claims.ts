@@ -179,6 +179,8 @@ function formatClaim(
     valueUnit: r.valueUnit,
     valueDate: r.valueDate,
     qualifiers: r.qualifiers as Record<string, string> | null,
+    // Pinned claims (migration 0034)
+    isPinned: r.isPinned,
     sources: sourcesRows.map(formatClaimSource),
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
@@ -225,6 +227,7 @@ const PatchClaimSchema = z.object({
   valueUnit: z.string().max(100).nullable().optional(),
   valueDate: z.string().max(20).nullable().optional(),
   qualifiers: z.record(z.string()).nullable().optional(),
+  isPinned: z.boolean().optional(),
 });
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
@@ -769,6 +772,43 @@ const claimsApp = new Hono()
 
     return c.json({ nodes, edges });
   })
+  // ---- GET /pinned/:entityId (pinned claims for an entity) ----
+  // Returns claims where isPinned=true and subjectEntity matches.
+  // Used by <F> components to read canonical structured values.
+  .get("/pinned/:entityId", async (c) => {
+    const entityId = c.req.param("entityId");
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(claims)
+      .where(
+        and(
+          eq(claims.isPinned, true),
+          eq(claims.subjectEntity, entityId)
+        )
+      )
+      .orderBy(asc(claims.property));
+
+    // Include sources for pinned claims
+    let sourcesMap = new Map<number, typeof claimSources.$inferSelect[]>();
+    if (rows.length > 0) {
+      const claimIds = rows.map((r) => r.id);
+      const sourcesRows = await db
+        .select()
+        .from(claimSources)
+        .where(inArray(claimSources.claimId, claimIds));
+      for (const s of sourcesRows) {
+        const id = Number(s.claimId);
+        if (!sourcesMap.has(id)) sourcesMap.set(id, []);
+        sourcesMap.get(id)!.push(s);
+      }
+    }
+
+    return c.json({
+      claims: rows.map((r) => formatClaim(r, sourcesMap.get(Number(r.id)) ?? [])),
+    });
+  })
   // ---- GET /:id/similar (find similar claims via pg_trgm) ----
   .get("/:id/similar", async (c) => {
     const idStr = c.req.param("id");
@@ -975,6 +1015,31 @@ const claimsApp = new Hono()
     if (parsed.data.valueUnit !== undefined) updates.valueUnit = parsed.data.valueUnit;
     if (parsed.data.valueDate !== undefined) updates.valueDate = parsed.data.valueDate;
     if (parsed.data.qualifiers !== undefined) updates.qualifiers = parsed.data.qualifiers;
+    if (parsed.data.isPinned !== undefined) {
+      updates.isPinned = parsed.data.isPinned;
+      // When pinning, unpin any other claim with the same subject+property
+      if (parsed.data.isPinned === true) {
+        const claimRow = await db
+          .select({ subjectEntity: claims.subjectEntity, property: claims.property })
+          .from(claims)
+          .where(eq(claims.id, id))
+          .limit(1);
+        const claim = claimRow[0];
+        if (claim?.subjectEntity && claim?.property) {
+          await db
+            .update(claims)
+            .set({ isPinned: false, updatedAt: new Date() })
+            .where(
+              and(
+                eq(claims.subjectEntity, claim.subjectEntity),
+                eq(claims.property, claim.property),
+                eq(claims.isPinned, true),
+                sql`${claims.id} != ${id}`
+              )
+            );
+        }
+      }
+    }
 
     if (Object.keys(updates).length === 0) {
       return validationError(c, "No fields to update");
