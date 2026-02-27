@@ -380,7 +380,7 @@ const integrityApp = new Hono()
         total_dangling_refs: totalDangling,
       },
     });
-  });
+  })
 
   // ---- GET /claims-citations-coverage ----
   // Coverage metrics for the citation_quotes → claims consolidation (#1194)
