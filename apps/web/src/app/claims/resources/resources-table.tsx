@@ -492,18 +492,29 @@ export function ResourcesTable({ resources }: { resources: ResourceRow[] }) {
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="group">
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-1.5 text-xs">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              <>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id} className="group">
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="py-1.5 text-xs">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+                {/* Spacer row to maintain consistent table height across pages */}
+                {table.getRowModel().rows.length < pagination.pageSize && (
+                  <tr>
+                    <td
+                      colSpan={columns.length}
+                      style={{ height: `${(pagination.pageSize - table.getRowModel().rows.length) * 33}px` }}
+                    />
+                  </tr>
+                )}
+              </>
             ) : (
               <TableRow>
                 <TableCell

@@ -1849,12 +1849,16 @@ export function getExploreItems(): ExploreItem[] {
   const pageMap = new Map((db.pages || []).map((p) => [p.id, p]));
   const entityIds = new Set(typedEntities.map((e) => e.id));
 
-  // Items from typed entities (only those with actual content pages)
-  const entityItems: ExploreItem[] = typedEntities.filter((entity) => pageMap.has(entity.id)).map((entity) => {
+  // Items from typed entities (only those with actual content pages and numeric IDs)
+  const entityItems: ExploreItem[] = typedEntities.filter((entity) => {
+    if (!pageMap.has(entity.id)) return false;
+    const numId = entity.numericId || db.idRegistry?.bySlug[entity.id];
+    return !!numId;
+  }).map((entity) => {
     const page = pageMap.get(entity.id)!;
     return {
       id: entity.id,
-      numericId: entity.numericId || db.idRegistry?.bySlug[entity.id] || entity.id,
+      numericId: (entity.numericId || db.idRegistry?.bySlug[entity.id])!,
       title: entity.title,
       type: page?.contentFormat === "table" ? "table" : page?.contentFormat === "diagram" ? "diagram" : entity.entityType,
       description: page?.llmSummary || page?.description || entity.description || null,
@@ -1875,13 +1879,14 @@ export function getExploreItems(): ExploreItem[] {
     };
   });
 
-  // Items from pages that have no entity
+  // Items from pages that have no entity (only those with numeric IDs)
   const pageOnlyItems: ExploreItem[] = (db.pages || [])
     .filter((p) => !entityIds.has(p.id))
     .filter((p) => p.title && p.category !== "schema")
+    .filter((p) => db.idRegistry?.bySlug[p.id])
     .map((page) => ({
       id: page.id,
-      numericId: db.idRegistry?.bySlug[page.id] || page.id,
+      numericId: db.idRegistry!.bySlug[page.id],
       title: page.title,
       type: page.contentFormat === "table" ? "table" : page.contentFormat === "diagram" ? "diagram" : CATEGORY_TO_TYPE[page.category] || "concept",
       description: page.llmSummary || page.description || null,

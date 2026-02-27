@@ -87,6 +87,7 @@ const pagesApp = new Hono()
         ) AS snippet
       FROM wiki_pages
       WHERE search_vector @@ to_tsquery('english', $1)
+        AND numeric_id IS NOT NULL
       ORDER BY rank DESC, reader_importance DESC NULLS LAST
       LIMIT $2`,
         [prefixQuery, limit],
@@ -104,6 +105,7 @@ const pagesApp = new Hono()
         description AS snippet
       FROM wiki_pages
       WHERE word_count > 0
+        AND numeric_id IS NOT NULL
         AND similarity(title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
         AND id NOT IN (SELECT unnest($3::text[]))
       ORDER BY similarity(title, $1) DESC, reader_importance DESC NULLS LAST
