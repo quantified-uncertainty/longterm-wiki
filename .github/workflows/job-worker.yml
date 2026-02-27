@@ -82,7 +82,7 @@ jobs:
       - name: Configure git
         run: |
           git config user.name "longterm-wiki-bot"
-          git config user.email "bot@longterm.wiki"
+          git config user.email "bot@quantifieduncertainty.org"
 
       - name: Run worker
         id: worker

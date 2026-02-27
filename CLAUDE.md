@@ -4,6 +4,8 @@ AI safety wiki with ~700 MDX pages, Next.js frontend, YAML data layer, and CLI t
 
 **This is a routing document.** Detailed guides live in `content/docs/internal/` and `.claude/rules/`. Use `pnpm crux <domain> --help` for full CLI reference.
 
+**Agent memory**: Read `.claude/memory/MEMORY.md` at session start for cross-session facts and corrections. Update it when you learn stable new facts (confirmed URLs, naming conventions, recurring gotchas). This file is checked into git so all agents and worktrees share it.
+
 ## MANDATORY FIRST ACTION — Do this before anything else
 
 Before reading files, running commands, or writing any code, run:
