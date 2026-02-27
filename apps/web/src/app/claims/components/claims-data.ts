@@ -35,17 +35,21 @@ export function collectEntitySlugs(claims: ClaimRow[]): string[] {
   return [...slugs];
 }
 
-/** Fetch all claims via paginated /all endpoint. */
+/** Fetch all claims via paginated /all endpoint.
+ *  Uses a larger page size and longer timeout to avoid build timeouts
+ *  when the wiki-server is under heavy load during static generation. */
 export async function fetchAllClaims(): Promise<ClaimRow[]> {
-  const PAGE_SIZE = 200;
+  const PAGE_SIZE = 1000;
   const all: ClaimRow[] = [];
   let offset = 0;
+  const deadline = Date.now() + 90_000; // 90s total budget
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
+    if (Date.now() > deadline) break;
     const page = await fetchFromWikiServer<GetAllClaimsResult>(
       `/api/claims/all?limit=${PAGE_SIZE}&offset=${offset}&includeSources=true`,
-      { revalidate: 300 }
+      { revalidate: 300, timeoutMs: 30_000 }
     );
     if (!page || page.claims.length === 0) break;
     all.push(...page.claims);

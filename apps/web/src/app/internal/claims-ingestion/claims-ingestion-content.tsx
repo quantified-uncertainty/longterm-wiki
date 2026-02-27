@@ -83,7 +83,7 @@ export async function ClaimsIngestionContent() {
   });
   const allResult = await fetchDetailed<{ claims: ClaimRow[] }>(
     "/api/claims/all?limit=5000",
-    { revalidate: 60 },
+    { revalidate: 60, timeoutMs: 30_000 },
   );
 
   const stats = statsResult.ok ? statsResult.data : null;

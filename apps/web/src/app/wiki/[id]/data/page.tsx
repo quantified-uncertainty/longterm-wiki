@@ -35,7 +35,7 @@ export async function generateStaticParams() {
 async function fetchPageClaims(pageId: string): Promise<ClaimRow[] | null> {
   const result = await fetchFromWikiServer<GetClaimsResult>(
     `/api/claims/by-entity/${encodeURIComponent(pageId)}?includeSources=true`,
-    { revalidate: 300 }
+    { revalidate: 300, timeoutMs: 30_000 }
   );
   return result?.claims ?? null;
 }

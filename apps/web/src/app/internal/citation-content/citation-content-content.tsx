@@ -13,7 +13,7 @@ export type ContentEntry = CitationContentListEntry;
 async function loadContentFromApi(): Promise<FetchResult<{ entries: ContentEntry[]; stats: CitationContentStatsResult }>> {
   const [listResult, statsResult] = await Promise.all([
     fetchDetailed<CitationContentListResult>("/api/citations/content/list?limit=5000", {
-      revalidate: 120,
+      revalidate: 120, timeoutMs: 30_000,
     }),
     fetchDetailed<CitationContentStatsResult>("/api/citations/content/stats", {
       revalidate: 120,
