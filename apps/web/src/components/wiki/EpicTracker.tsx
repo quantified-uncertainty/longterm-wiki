@@ -16,43 +16,35 @@ interface EpicTrackerProps {
 
 const REPO_URL = "https://github.com/quantified-uncertainty/longterm-wiki";
 
-function FallbackList({ issues }: { issues: number[] }) {
-  return (
-    <div className="not-prose my-6 rounded-lg border border-border/60 p-4">
-      <h3 className="text-sm font-semibold text-muted-foreground mb-2">
-        Tracked Issues
-      </h3>
-      <ul className="space-y-1">
-        {issues.map((n) => (
-          <li key={n}>
-            <a
-              href={`${REPO_URL}/issues/${n}`}
-              className="text-sm text-blue-600 hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              #{n}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 export async function EpicTracker({ issues }: EpicTrackerProps) {
-  let result;
-  try {
-    result = await fetchDetailed<{ issues: GitHubIssueData[] }>(
-      `/api/github/issues?numbers=${issues.join(",")}`,
-      { revalidate: 300 }
-    );
-  } catch (_e) {
-    return <FallbackList issues={issues} />;
-  }
+  const result = await fetchDetailed<{ issues: GitHubIssueData[] }>(
+    `/api/github/issues?numbers=${issues.join(",")}`,
+    { revalidate: 300 }
+  );
 
+  // Graceful fallback if wiki-server unavailable
   if (!result.ok) {
-    return <FallbackList issues={issues} />;
+    return (
+      <div className="not-prose my-6 rounded-lg border border-border/60 p-4">
+        <h3 className="text-sm font-semibold text-muted-foreground mb-2">
+          Tracked Issues
+        </h3>
+        <ul className="space-y-1">
+          {issues.map((n) => (
+            <li key={n}>
+              <a
+                href={`${REPO_URL}/issues/${n}`}
+                className="text-sm text-blue-600 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                #{n}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
   }
 
   const data = result.data.issues;

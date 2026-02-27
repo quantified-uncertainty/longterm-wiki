@@ -359,12 +359,8 @@ const sessionsApp = new Hono()
     const branchPrefix = c.req.query("branch_prefix");
     const db = getDrizzleDb();
 
-    // Escape SQL LIKE wildcards in user input
     const whereClause = branchPrefix
-      ? like(
-          sessions.branch,
-          `${branchPrefix.replace(/%/g, "\\%").replace(/_/g, "\\_")}%`
-        )
+      ? like(sessions.branch, `${branchPrefix}%`)
       : undefined;
 
     const rows = await db
@@ -377,36 +373,52 @@ const sessionsApp = new Hono()
       })
       .from(sessions)
       .where(whereClause)
-      .orderBy(desc(sessions.date), desc(sessions.id))
-      .limit(500);
+      .orderBy(desc(sessions.date), desc(sessions.id));
 
-    type Insight = {
+    const insights: Array<{
       date: string;
       branch: string | null;
       title: string;
       type: "learning" | "recommendation";
       text: string;
-    };
-    const insights: Insight[] = [];
+    }> = [];
 
     for (const row of rows) {
-      const addInsights = (raw: unknown, type: Insight["type"]) => {
-        const arr = Array.isArray(raw) ? raw : [];
-        for (const item of arr) {
-          if (typeof item === "string") {
-            insights.push({
-              date: row.date,
-              branch: row.branch,
-              title: row.title,
-              type,
-              text: item,
-            });
-          }
+      if (row.learningsJson) {
+        const raw = row.learningsJson;
+        const learnings: string[] = Array.isArray(raw)
+          ? raw
+          : typeof raw === "string"
+            ? (() => { try { return JSON.parse(raw); } catch { return []; } })()
+            : [];
+        for (const text of learnings) {
+          insights.push({
+            date: row.date,
+            branch: row.branch,
+            title: row.title,
+            type: "learning",
+            text,
+          });
         }
-      };
+      }
 
-      if (row.learningsJson) addInsights(row.learningsJson, "learning");
-      if (row.recommendationsJson) addInsights(row.recommendationsJson, "recommendation");
+      if (row.recommendationsJson) {
+        const raw = row.recommendationsJson;
+        const recommendations: string[] = Array.isArray(raw)
+          ? raw
+          : typeof raw === "string"
+            ? (() => { try { return JSON.parse(raw); } catch { return []; } })()
+            : [];
+        for (const text of recommendations) {
+          insights.push({
+            date: row.date,
+            branch: row.branch,
+            title: row.title,
+            type: "recommendation",
+            text,
+          });
+        }
+      }
     }
 
     const byType: Record<string, number> = {};
