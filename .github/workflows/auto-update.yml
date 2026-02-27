@@ -242,7 +242,10 @@ jobs:
         id: citations
         if: success() && steps.report.outputs.path != ''
         run: |
-          RESULT=$(pnpm crux auto-update verify-citations --from-report="${{ steps.report.outputs.path }}" --json 2>/dev/null || echo '{}')
+          RESULT_RAW=$(pnpm --silent crux auto-update verify-citations --from-report="${{ steps.report.outputs.path }}" --json 2>/dev/null || echo '{}')
+          # Extract just the JSON object (guards against pnpm/dotenv preamble on stdout)
+          RESULT=$(echo "$RESULT_RAW" | grep -E '^\{' | tail -1)
+          RESULT="${RESULT:-{}}"
           SUMMARY=$(echo "$RESULT" | jq -r '.markdownSummary // ""')
           HAS_BROKEN=$(echo "$RESULT" | jq -r '.hasBroken // false')
 
@@ -264,7 +267,10 @@ jobs:
           cd apps/web && node --import tsx/esm scripts/build-data.mjs 2>/dev/null
           cd "$GITHUB_WORKSPACE"
 
-          RESULT=$(pnpm crux auto-update risk-scores --from-report="${{ steps.report.outputs.path }}" --json 2>/dev/null || echo '{}')
+          RESULT_RAW=$(pnpm --silent crux auto-update risk-scores --from-report="${{ steps.report.outputs.path }}" --json 2>/dev/null || echo '{}')
+          # Extract just the JSON object (guards against pnpm/dotenv preamble on stdout)
+          RESULT=$(echo "$RESULT_RAW" | grep -E '^\{' | tail -1)
+          RESULT="${RESULT:-{}}"
           SUMMARY=$(echo "$RESULT" | jq -r '.markdownSummary // ""')
           HAS_HIGH=$(echo "$RESULT" | jq -r '.hasHighRisk // false')
 

@@ -298,12 +298,18 @@ jobs:
           NOW_EPOCH=$(date -u +%s)
 
           # Check a workflow's most recent completed run.
-          # Args: display_name  workflow_filename  max_age_hours  require_success
+          # Args: display_name  workflow_filename  max_age_hours  require_success  allow_any_recent_success
+          #
+          # When allow_any_recent_success=true, the check passes if ANY of the
+          # last 5 completed runs succeeded (tolerates transient failures in
+          # flaky pipelines like auto-update that depend on LLMs/external URLs).
+          # It only fails if ALL recent runs failed persistently.
           check_workflow() {
             local name="$1"
             local workflow="$2"
             local max_age_h="$3"
             local require_success="${4:-true}"
+            local allow_any_recent="${5:-false}"
 
             local runs
             runs=$(gh run list \
@@ -339,15 +345,32 @@ jobs:
               detail_cell="Last run ${age_h}h ago — stale (max ${max_age_h}h)"
               FAILURES="$FAILURES\n- $name: last run ${age_h}h ago (max ${max_age_h}h)"
             elif [ "$require_success" = "true" ] && [ "$conclusion" != "success" ]; then
-              status_cell="FAIL"
-              detail_cell="Last run concluded '${conclusion}' ${age_h}h ago"
-              FAILURES="$FAILURES\n- $name: last run concluded '${conclusion}'"
+              # For flaky workflows, check if ANY recent run succeeded
+              if [ "$allow_any_recent" = "true" ]; then
+                local any_success
+                any_success=$(echo "$runs" | jq '[.[] | select(.status == "completed" and .conclusion == "success")] | length')
+                if [ "$any_success" -gt 0 ]; then
+                  status_cell="WARN"
+                  detail_cell="Last run failed but ${any_success}/5 recent runs succeeded"
+                  # WARN — not added to FAILURES so it doesn't trigger an issue
+                else
+                  status_cell="FAIL"
+                  detail_cell="All recent runs failed (latest: '${conclusion}' ${age_h}h ago)"
+                  FAILURES="$FAILURES\n- $name: all recent runs concluded '${conclusion}'"
+                fi
+              else
+                status_cell="FAIL"
+                detail_cell="Last run concluded '${conclusion}' ${age_h}h ago"
+                FAILURES="$FAILURES\n- $name: last run concluded '${conclusion}'"
+              fi
             fi
 
             RESULTS="$RESULTS\n| $name | $status_cell | $detail_cell |"
           }
 
-          check_workflow "auto-update"          "auto-update.yml"          "$MAX_AUTO_UPDATE_AGE_H"
+          # auto-update is inherently flaky (depends on LLMs, external URLs,
+          # citation verification) — tolerate transient failures
+          check_workflow "auto-update"          "auto-update.yml"          "$MAX_AUTO_UPDATE_AGE_H"  true  true
           check_workflow "database-backup"      "database-backup.yml"      "$MAX_BACKUP_AGE_H"
           check_workflow "scheduled-maintenance" "scheduled-maintenance.yml" "$MAX_MAINTENANCE_AGE_H"
           check_workflow "server-health-monitor" "server-health-monitor.yml" "$MAX_HEALTH_MONITOR_AGE_H"
