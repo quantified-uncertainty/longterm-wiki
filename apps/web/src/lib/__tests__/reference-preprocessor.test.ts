@@ -162,6 +162,71 @@ describe("preprocessReferences", () => {
   });
 
   // -----------------------------------------------------------------------
+  // Mixed existing + DB-driven footnotes (collision avoidance)
+  // -----------------------------------------------------------------------
+
+  it("numbers new references after existing numbered footnotes", () => {
+    const content = [
+      "Legacy footnote[^1] and a claim[^cr-aa11] and citation[^rc-bb22].",
+      "",
+      "[^1]: Existing legacy source",
+    ].join("\n");
+
+    const refData = makeReferenceData(
+      {
+        "cr-aa11": {
+          claimId: 1,
+          claimText: "Claim A",
+          sourceTitle: "Source A",
+        },
+      },
+      {
+        "rc-bb22": {
+          title: "Source B",
+          url: "https://example.com/b",
+        },
+      }
+    );
+
+    const { content: result, referenceMap } = preprocessReferences(content, refData);
+
+    // Existing [^1] should remain untouched
+    expect(result).toContain("Legacy footnote[^1]");
+    expect(result).toContain("[^1]: Existing legacy source");
+
+    // New references should start at [^2]
+    expect(result).not.toContain("[^cr-aa11]");
+    expect(result).not.toContain("[^rc-bb22]");
+
+    // cr-aa11 sorts before rc-bb22 alphabetically
+    expect(result).toContain("[^2]:");
+    expect(result).toContain("[^3]:");
+
+    expect(referenceMap.size).toBe(2);
+    expect(referenceMap.get(2)?.originalId).toBe("cr-aa11");
+    expect(referenceMap.get(3)?.originalId).toBe("rc-bb22");
+  });
+
+  it("handles existing footnotes with gaps (e.g. [^1], [^5])", () => {
+    const content = [
+      "First[^1] then fifth[^5] then new[^cr-zz99].",
+      "",
+      "[^1]: Source 1",
+      "[^5]: Source 5",
+    ].join("\n");
+
+    const refData = makeReferenceData({
+      "cr-zz99": { claimId: 99, claimText: "New claim" },
+    });
+
+    const { content: result, referenceMap } = preprocessReferences(content, refData);
+
+    // New reference should start at [^6] (highest existing is 5)
+    expect(result).toContain("new[^6]");
+    expect(referenceMap.get(6)?.originalId).toBe("cr-zz99");
+  });
+
+  // -----------------------------------------------------------------------
   // Sequential / deterministic numbering
   // -----------------------------------------------------------------------
 

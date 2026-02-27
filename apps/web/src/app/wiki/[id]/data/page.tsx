@@ -549,7 +549,7 @@ export default async function WikiInfoPage({ params }: PageProps) {
         )}
       </Section>
 
-      <Section title={`References ${claims && claims.length > 0 ? `(${buildClaimsData(claims).uniqueSources.length})` : ""}`}>
+      <Section title="References">
         {claims === null ? (
           <p className="text-sm text-gray-500">
             Claims data unavailable (wiki-server offline or not configured).

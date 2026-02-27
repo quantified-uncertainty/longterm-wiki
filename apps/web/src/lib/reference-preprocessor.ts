@@ -115,7 +115,20 @@ export function preprocessReferences(
   const referenceMap = new Map<number, RefMapEntry>();
 
   // -----------------------------------------------------------------------
-  // 1. Collect all unique DB-driven reference IDs used in the content
+  // 1. Find the highest existing numeric footnote to avoid collisions.
+  // A small number of pages may still have orphaned [^N] refs (no defs)
+  // left over from before migration. Start numbering after those to
+  // prevent duplicate footnote definitions.
+  // -----------------------------------------------------------------------
+  let maxExisting = 0;
+  const legacyUsageRe = /\[\^(\d+)\]/g;
+  for (const m of mdxContent.matchAll(legacyUsageRe)) {
+    const n = parseInt(m[1], 10);
+    if (n > maxExisting) maxExisting = n;
+  }
+
+  // -----------------------------------------------------------------------
+  // 2. Collect all unique DB-driven reference IDs used in the content
   // -----------------------------------------------------------------------
   const usedRefIds = new Set<string>();
   const dbMatches = mdxContent.matchAll(DB_REF_USAGE_RE);
@@ -129,22 +142,22 @@ export function preprocessReferences(
   }
 
   // -----------------------------------------------------------------------
-  // 2. Sort reference IDs for deterministic numbering
+  // 3. Sort reference IDs for deterministic numbering
   // -----------------------------------------------------------------------
   const sortedRefIds = Array.from(usedRefIds).sort();
 
   // -----------------------------------------------------------------------
-  // 3. Assign sequential numbers starting from 1
+  // 4. Assign sequential numbers starting after maxExisting
   // -----------------------------------------------------------------------
   const idToNumber = new Map<string, number>();
-  let nextNumber = 1;
+  let nextNumber = maxExisting + 1;
   for (const refId of sortedRefIds) {
     idToNumber.set(refId, nextNumber);
     nextNumber++;
   }
 
   // -----------------------------------------------------------------------
-  // 4. Replace [^cr-XXXX] / [^rc-XXXX] usage sites with [^N]
+  // 5. Replace [^cr-XXXX] / [^rc-XXXX] usage sites with [^N]
   // -----------------------------------------------------------------------
   let transformed = mdxContent.replace(DB_REF_USAGE_RE, (_match, refId: string) => {
     const num = idToNumber.get(refId);
@@ -152,7 +165,7 @@ export function preprocessReferences(
   });
 
   // -----------------------------------------------------------------------
-  // 5. Build footnote definitions and the referenceMap
+  // 6. Build footnote definitions and the referenceMap
   // -----------------------------------------------------------------------
   const footnoteLines: string[] = [];
 
@@ -189,7 +202,7 @@ export function preprocessReferences(
   }
 
   // -----------------------------------------------------------------------
-  // 6. Append footnote definitions at the end of the content
+  // 7. Append footnote definitions at the end of the content
   // -----------------------------------------------------------------------
   // Ensure there's a blank line before footnote definitions
   const trimmed = transformed.trimEnd();
