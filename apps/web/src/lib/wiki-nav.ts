@@ -321,6 +321,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Claims Data Quality Audit", href: internalHref("claims-data-quality-audit") },
         { label: "Claims Extraction Patterns", href: internalHref("claims-extraction-quality-patterns") },
         { label: "Citation Architecture", href: internalHref("citation-architecture") },
+        { label: "Verification Tiers", href: internalHref("content-verification-tiers") },
         { label: "Knowledge Graph Ontology", href: internalHref("knowledge-graph-ontology") },
         { label: "Structured Data Architecture", href: internalHref("structured-data-architecture") },
         { label: "Fact System Strategy", href: internalHref("fact-system-strategy") },

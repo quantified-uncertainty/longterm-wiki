@@ -1,0 +1,320 @@
+---
+numericId: E905
+title: "Content Verification Tiers"
+description: "Design proposal for tiered verification standards that vary by page type, with user-facing quality signals inspired by Wikipedia BLP, EU energy labels, and Michelin stars"
+sidebar:
+  order: 16
+  label: "Verification Tiers"
+subcategory: architecture
+pageType: documentation
+quality: 65
+readerImportance: 70
+researchImportance: 65
+lastEdited: "2026-02-27"
+createdAt: 2026-02-27
+evergreen: false
+llmSummary: "Design proposal for a tiered content verification system that applies different citation and accuracy standards based on entity type (reference vs. analytical vs. exploratory), paired with user-facing quality signals. Draws on Wikipedia's BLP/MEDRS policies, EU energy labeling research, and software maturity badges to propose a two-axis system (content standard x maturity level) with progressive disclosure."
+ratings:
+  novelty: 6
+  rigor: 6
+  actionability: 7
+  completeness: 7
+---
+import {EntityLink, Mermaid} from '@components/wiki';
+
+Running full claim verification across all ~550 pages is prohibitively expensive and, more importantly, unnecessary. A person page making specific biographical claims carries fundamentally different risk than a conceptual synthesis page connecting ideas. This document proposes **tiered verification standards** that allocate verification effort where it matters most, paired with **user-facing signals** that communicate what standard each page is held to.
+
+## The Problem
+
+The wiki currently shows a single hallucination risk banner (high/medium/low) on every page. This creates two failure modes:
+
+1. **"The whole site is unreliable"** — A user sees "High hallucination risk" on a person page and concludes the entire wiki is low quality, rather than understanding that *this specific page type* is held to strict standards it hasn't yet met.
+
+2. **Misallocated verification effort** — Verifying every claim on an exploratory research synthesis costs the same as verifying a biographical page, but the stakes are very different. Getting a person's employment history wrong is a factual error; getting a speculative causal connection wrong is a matter of analysis.
+
+The existing hallucination risk scorer already differentiates by entity type internally (+20 for biographical, -10 for structural). But this is invisible to users and isn't connected to a coherent framework of what each page type *should* achieve.
+
+---
+
+## Prior Art: How Others Handle This
+
+### Wikipedia's Subject-Type Policies
+
+Wikipedia doesn't apply one standard everywhere. It layers **subject-specific policies** on top of core rules:
+
+- **BLP (Biographies of Living Persons)** is the strictest regime. Unsourced contentious claims about living people must be removed *immediately without discussion*. Pages with zero sources get fast-track deletion (BLPPROD). A dedicated Living People Patrol monitors these pages.
+- **MEDRS (Medical Reliable Sources)** requires systematic reviews or professional guidelines for any biomedical claim on any page. Individual research studies and newspaper articles are not acceptable sources for medical claims.
+- **Organizations** face higher source quality thresholds specifically to prevent PR/marketing gaming.
+
+Meanwhile, conceptual or analytical articles (philosophy, mathematics, theoretical physics) follow the standard verifiability rules with no additional regime.
+
+Wikipedia also has an **article quality scale** (Stub → Start → C → B → GA → FA), but only the top two grades (Good Article and Featured Article) are visible to readers — as a small icon. Everything else is editor-internal.
+
+**Key insight:** Wikipedia treats subject-type standards and article quality as orthogonal axes. A person article can be high-quality (FA) or low-quality (Stub), but it's always held to BLP rules regardless.
+
+### Quality Rating Systems That Work
+
+Cross-domain research on trust signals reveals consistent design principles:
+
+| Principle | Evidence | Implication |
+|-----------|----------|-------------|
+| Named tiers beat numeric scores | EU energy label research: 70-80% comprehension for A-G vs 55-65% for A+/A++/A+++ | Use words/letters, not numbers |
+| Signal at the point of decision | Health inspection grades in restaurant windows change behavior; same data in databases doesn't | Show quality in page lists, not just on pages |
+| Scarcity creates credibility | Michelin stars are trusted because 3-star is genuinely rare | Don't give top marks to 80% of pages |
+| Progressive disclosure serves both audiences | OpenSSF Scorecard: badge → check summary → remediation guide | Simple signal upfront, breakdown on demand |
+| Criteria-based beats process-based | MDN's "Experimental" = "implemented in \<2 browser engines" — concrete, auditable | Define tiers by measurable criteria |
+| Threshold effects make signals actionable | Credit rating investment-grade boundary changes institutional behavior | Create meaningful cut-points, not a smooth gradient |
+
+### Notable Systems
+
+- **EU Energy Labels (A-G)**: Rescaled in 2021 with A/B *deliberately left empty* to prevent grade inflation. The empty top grades create aspirational space.
+- **Docker Trusted Content**: Three tiers (Official Image → Verified Publisher → Community) with clear criteria for each. Simple enough to learn immediately.
+- **PolitiFact Truth-O-Meter**: Verbal labels ("Mostly True", "Half True") do interpretive work that numbers can't. You don't need to know what 3/5 means.
+- **Rust Stability Badges**: `#[unstable]` links directly to the tracking issue. The badge is also a live status tracker — it connects the signal to its resolution path.
+- **MDN Status Macros**: "Experimental", "Deprecated" appear inline at the exact API entry. The signal is at the point of decision, not in a separate quality overview.
+
+---
+
+## Proposed Design: Two Axes
+
+### Axis 1 — Content Standard (What Should This Page Achieve?)
+
+Set by entity type. Not something a page "earns" — it's a property of what kind of content the page covers.
+
+| Standard | Entity Types | What It Means | Citation Target |
+|----------|-------------|---------------|-----------------|
+| **Reference** | person, organization, funder, event, historical, case-study | Every specific factual claim should be cited. Biographical details, dates, funding amounts, organizational facts require sources. | \>8 citations/kw |
+| **Analytical** | risk, approach, policy, project, safety-agenda, capability, model | Key claims and assessments should be cited. Evaluative claims are expected but should reference evidence. | \>4 citations/kw |
+| **Exploratory** | concept, crux, debate, argument, analysis, overview, intelligence-paradigm | Synthesis and novel connections are the primary value. Citations strengthen the page but original reasoning is the point. | \>2 citations/kw |
+
+This maps directly to the existing entity type groupings in `hallucination-risk.ts`:
+- `BIOGRAPHICAL_TYPES` + `FACTUAL_TYPES` → Reference
+- Most remaining types → Analytical
+- `STRUCTURAL_TYPES` → Exploratory
+
+### Axis 2 — Maturity Level (How Close Is This Page to Its Standard?)
+
+Earned through measurable criteria. Changes over time as pages are improved.
+
+| Level | Criteria | Visual |
+|-------|----------|--------|
+| **Draft** | Below citation density target for its standard. Minimal or no verification. | Grey, dashed border |
+| **Developing** | Approaching citation target. Some claims verified. Active improvement. | Blue, solid |
+| **Established** | Meets citation density target. Key claims sourced. Passes quality checks. | Green, solid |
+| **Verified** | Citations verified against source text. Claim accuracy \>80%. Human review or equivalent. | Green, bold + shield |
+
+<Mermaid chart={`flowchart LR
+    D[Draft] -->|"citations added"| Dev[Developing]
+    Dev -->|"meets density target"| E[Established]
+    E -->|"claims verified, >80% accurate"| V["Verified ✓"]
+    style D fill:#f5f5f5,stroke:#999,stroke-dasharray: 5 5
+    style Dev fill:#dbeafe,stroke:#3b82f6
+    style E fill:#dcfce7,stroke:#22c55e
+    style V fill:#dcfce7,stroke:#16a34a,stroke-width:3px`} />
+
+### The Two Axes Together
+
+A page is always described by both: **"Reference · Established"** or **"Exploratory · Draft"**.
+
+The critical insight: **a "Draft" on a Reference page is a problem. A "Draft" on an Exploratory page is fine.** The maturity level means different things depending on the standard.
+
+| | Draft | Developing | Established | Verified |
+|---|---|---|---|---|
+| **Reference** | Missing required citations for factual claims. Readers should verify independently. | Some citations added, gaps remain in biographical/factual claims. | Factual claims are sourced. Meets reference citation standards. | Sources checked against originals. High accuracy. |
+| **Analytical** | Early-stage analysis without supporting evidence. | Key assessments partially sourced. | Well-supported analysis with evidence for major claims. | Evidence chain verified. Strong analytical foundation. |
+| **Exploratory** | Initial brainstorm or concept sketch. | Ideas taking shape with some supporting references. | Well-developed synthesis with relevant citations. | Reasoning verified, key premises checked. |
+
+---
+
+## Maturity Level Criteria (Concrete)
+
+Each level should be **automatically computable** from existing data. No editorial judgment required for assignment.
+
+### Draft
+
+A page is **Draft** if ANY of:
+- Citation density is below 50% of target for its content standard
+- Quality score \< 30
+- Word count \< 200 (except stubs)
+
+### Developing
+
+A page is **Developing** if ALL of:
+- Citation density is between 50%-99% of target for its standard
+- Quality score \>= 30
+- Has at least 2 external source references
+
+### Established
+
+A page is **Established** if ALL of:
+- Citation density meets or exceeds target for its standard
+- Quality score \>= 50
+- Rigor rating \>= 5.0
+- No CI-blocking validation failures
+- For **Reference** pages additionally: no `unsourced-biographical-claims` warnings
+
+### Verified
+
+A page is **Verified** if ALL of:
+- Meets all Established criteria AND
+- Citation accuracy \>= 80% (of checked citations are accurate)
+- At least 50% of citations have been accuracy-checked
+- No `fabricated-citations` or `orphaned-footnotes` integrity issues
+
+---
+
+## User-Facing Communication
+
+### Option A: Title-Adjacent Pill (Recommended for MVP)
+
+A small colored pill badge next to the page title, similar to GitHub's repository badges or MDN's "Experimental" labels.
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ Anthropic                    [Reference · Established]   │
+│ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   │
+│ Anthropic is an AI safety company founded in 2021...     │
+└──────────────────────────────────────────────────────────┘
+```
+
+vs.
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ Causal Incentives                 [Exploratory · Draft]  │
+│ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   │
+│ Causal incentives analysis examines how the structure... │
+└──────────────────────────────────────────────────────────┘
+```
+
+**Colors:**
+- Draft: grey pill
+- Developing: blue pill
+- Established: green pill
+- Verified: green pill with checkmark icon
+
+Clicking the pill expands a detail card (progressive disclosure) showing:
+- Content standard explanation ("This is a Reference page — factual claims should be individually sourced")
+- Current metrics (citation density, accuracy rate, rigor score)
+- What's needed to reach the next level
+
+### Option B: Replace the Hallucination Risk Banner
+
+Instead of "High hallucination risk" (alarming), reframe as maturity language:
+
+> **Reference page · Developing**
+> This page covers a real organization and is held to strict citation standards. Some factual claims are not yet sourced — verify key details independently.
+
+vs. the current:
+
+> **High hallucination risk** (score: 65/100)
+> This AI-generated content about a real organization may contain inaccurate claims...
+
+The reframing communicates the same caution but with a constructive frame: "this page is *on a journey*" rather than "this page is *dangerous*."
+
+### Option C: Page List Indicators
+
+The most impactful placement (per health-inspection research) is in **page lists and search results** — at the point where users decide which page to read.
+
+In entity tables, search results, and sidebar navigation:
+
+```
+  Anthropic                    [■ Established]
+  OpenAI                       [■ Developing]
+  Coefficient Giving           [■ Verified ✓]
+  Causal Incentives            [□ Draft]
+```
+
+Small colored dots or squares, scannable at a glance.
+
+### Recommended: Combine A + C
+
+- Title pill on individual pages (Option A) for context while reading
+- Dot indicators in page lists (Option C) for decision-making while browsing
+- Keep the expandable detail card for users who want to understand the criteria
+- Phase out the "hallucination risk" language in favor of maturity language
+
+---
+
+## Mapping to Existing Data Model
+
+### What Already Exists
+
+| Need | Existing Data | Location |
+|------|--------------|----------|
+| Entity type classification | `BIOGRAPHICAL_TYPES`, `FACTUAL_TYPES`, `STRUCTURAL_TYPES` | `crux/lib/hallucination-risk.ts` |
+| Citation density | `citationDensity` (per 1000 words) | `crux/lib/metrics-extractor.ts` |
+| Citation accuracy | `citationHealth.accurate / citationHealth.accuracyChecked` | `database.json` via wiki-server |
+| Quality score | `quality` (0-100) | MDX frontmatter |
+| Rigor rating | `ratings.rigor` (0-10) | MDX frontmatter |
+| Content integrity | Orphaned footnotes, fabricated citations | `crux/lib/content-integrity.ts` |
+| Unsourced biographical claims | Dedicated validation rule | `crux/lib/rules/unsourced-biographical-claims.ts` |
+
+### What Needs to Be Built
+
+| Component | Effort | Description |
+|-----------|--------|-------------|
+| `getContentStandard(entityType)` | Small | Map entity type → Reference/Analytical/Exploratory. ≈10 lines. |
+| `computeMaturityLevel(page)` | Medium | Apply criteria from the section above against existing metrics. ≈50 lines. |
+| Frontmatter field or build-time computation | Small | Store `contentStandard` and `maturityLevel` in `database.json`. |
+| Title pill component | Medium | New React component. Replaces or supplements `ContentConfidenceBanner`. |
+| Page list indicators | Medium | Add maturity dot to `EntityLink`, search results, entity tables. |
+| Banner rewrite | Small | Reframe existing banner text using maturity language. |
+
+### Relationship to Hallucination Risk Score
+
+The hallucination risk score doesn't go away — it's a useful internal metric. But it stops being the primary *user-facing* signal. Instead:
+
+- **Content Standard** replaces the entity-type component of the risk score (the +20/-10 adjustments)
+- **Maturity Level** replaces the citation/rigor/quality components
+- The risk score continues to be computed for internal prioritization (which pages to improve next)
+
+---
+
+## Implementation Phases
+
+### Phase 1: Content Standard Labels (Low Cost)
+
+Add `getContentStandard()` function. Display content standard in the existing banner. No new components needed — just reframe the text.
+
+**Before:** "This AI-generated content may contain hallucinated information."
+**After:** "This is a **Reference page** about a real organization. It is held to strict citation standards."
+
+### Phase 2: Maturity Levels (Medium Cost)
+
+Add `computeMaturityLevel()`. Store in `database.json`. Add title-adjacent pill badge. Rewrite banner to show both axes.
+
+### Phase 3: List Indicators (Medium Cost)
+
+Add maturity dots to `EntityLink` hover cards, search results, entity tables, and sidebar navigation. This is where the signal becomes most useful — at the point of decision.
+
+### Phase 4: Pipeline Integration (Ongoing)
+
+- Automatically select improvement tier based on content standard (Reference pages default to `standard` or `deep`, never `polish`)
+- Citation audit becomes mandatory for Reference pages, optional for Exploratory
+- Maturity level gates: Reference pages below "Developing" get flagged in improvement queues
+- Dashboard showing maturity distribution by content standard
+
+---
+
+## Open Questions
+
+1. **Should content standard be overridable?** Some analysis pages may warrant Reference-level standards (e.g., a quantitative risk model making specific numeric claims). Should authors be able to override the entity-type default?
+
+2. **What about mixed pages?** A person page that includes significant analytical content. Does it follow Reference standard for the biographical sections and Analytical for the rest? Or is the whole page Reference?
+
+3. **Grade inflation prevention.** The EU energy label deliberately left A/B empty at launch. Should we calibrate so that "Verified" is genuinely rare at launch (like Michelin 3-star), creating aspiration?
+
+4. **Naming.** "Reference/Analytical/Exploratory" is functional but slightly academic. Alternatives: "Factual/Assessment/Synthesis", "Strict/Standard/Flexible", "Encyclopedic/Analytical/Speculative". The names should communicate the *purpose* of the standard, not just its strictness level.
+
+5. **Backward compatibility.** The hallucination risk banner is already deployed. Do we replace it (cleaner but disruptive) or layer the new system on top (messier but incremental)?
+
+---
+
+## Related Documentation
+
+- <EntityLink id="rating-system">Rating System</EntityLink> — Current quality scoring system (subscores, derived quality)
+- <EntityLink id="page-types">Page Type System</EntityLink> — Existing page classification (content/stub/documentation/overview)
+- <EntityLink id="citation-architecture">Citation Architecture</EntityLink> — How citations work today
+- <EntityLink id="claims-system-development-roadmap">Claims Development Roadmap</EntityLink> — Claims pipeline future plans
+- <EntityLink id="claim-first-architecture">Claim-First Architecture</EntityLink> — Long-term vision for claims as first-class data
