@@ -146,6 +146,12 @@ const SCRIPTS = {
     passthrough: ['json', 'entity', 'entity-id', 'top'],
     positional: false,
   },
+  'coverage-audit': {
+    script: 'claims/coverage-audit.ts',
+    description: 'Gap analysis: citation_quotes vs claims architecture coverage',
+    passthrough: ['json', 'per-page'],
+    positional: false,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'status');
@@ -179,6 +185,7 @@ Options:
   --path=P              Filter pages by relative path prefix (migrate-footnotes-batch)
   --unpin               Unpin a claim (pin command)
   --list=<entity-id>    List pinned claims for an entity (pin command)
+  --per-page            Include per-page breakdown (coverage-audit)
 
 Examples:
   crux claims pipeline kalshi                         Run full extract → link → verify pipeline
@@ -250,6 +257,11 @@ Workflow:
   4. crux claims fix dedup --entity=anthropic       Dedup single entity (dry-run)
   5. crux claims fix dedup --apply                  Dedup all entities
   6. crux claims fix normalize-entities --apply     Normalize relatedEntities slugs
+
+  Coverage audit (citation_quotes → claims migration tracking):
+  1. crux claims coverage-audit                  Summary of gaps between systems
+  2. crux claims coverage-audit --per-page       Include per-page breakdown
+  3. crux claims coverage-audit --json           Machine-readable JSON output
 
   Footnote migration (DB-driven references):
   1. crux claims migrate-footnotes <page-id>          Dry-run: show what would change
