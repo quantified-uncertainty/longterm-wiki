@@ -19,6 +19,7 @@ import { createLogger } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
+import { listSessions } from '../lib/wiki-server/sessions.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -176,10 +177,65 @@ function parseSessionLog(content: string): SessionLogEntry | null {
   return { date, branch: branch.trim(), title: title.trim(), whatWasDone, pages, issues, learnings };
 }
 
-function loadSessionLogsSince(since: string): SessionLogEntry[] {
+/**
+ * Load session logs from the wiki-server DB (primary source of truth).
+ * Falls back to local files if the server is unavailable.
+ */
+async function loadSessionLogsSince(since: string): Promise<SessionLogEntry[]> {
+  // Try DB-backed sessions first (canonical source per session-logging.md)
+  try {
+    const result = await listSessions(200);
+    if (result.ok) {
+      const entries: SessionLogEntry[] = [];
+      for (const row of result.data.sessions) {
+        const sessionDate = row.date?.slice(0, 10);
+        if (!sessionDate || sessionDate < since) continue;
+
+        // Parse issues and learnings from JSON fields
+        const issues = parseJsonArray(row.issuesJson);
+        const learnings = parseJsonArray(row.learningsJson);
+        const pages = Array.isArray(row.pages) ? row.pages : [];
+
+        entries.push({
+          date: sessionDate,
+          branch: row.branch || '',
+          title: row.title || '',
+          whatWasDone: row.summary || '',
+          pages,
+          issues,
+          learnings,
+        });
+      }
+      return entries;
+    }
+  } catch { /* fall through to local files */ }
+
+  // Fallback: read local files (both .md and .yaml)
+  return loadSessionLogsFromFiles(since);
+}
+
+/** Parse a JSON value that may be an array of strings, a JSON string, or return empty. */
+function parseJsonArray(json: unknown): string[] {
+  if (!json) return [];
+  // If already an array (from jsonb column), use directly
+  if (Array.isArray(json)) return json.filter((s: unknown) => typeof s === 'string');
+  // If a string, try parsing as JSON
+  if (typeof json === 'string') {
+    try {
+      const parsed = JSON.parse(json);
+      if (Array.isArray(parsed)) return parsed.filter((s: unknown) => typeof s === 'string');
+    } catch { /* invalid JSON */ }
+  }
+  return [];
+}
+
+/** Fallback: load session logs from local .md and .yaml files. */
+function loadSessionLogsFromFiles(since: string): SessionLogEntry[] {
   if (!existsSync(SESSIONS_DIR)) return [];
 
-  const files = readdirSync(SESSIONS_DIR).filter(f => f.endsWith('.md')).sort();
+  const files = readdirSync(SESSIONS_DIR)
+    .filter(f => f.endsWith('.md') || f.endsWith('.yaml') || f.endsWith('.yml'))
+    .sort();
   const entries: SessionLogEntry[] = [];
 
   for (const file of files) {
@@ -238,8 +294,8 @@ async function reviewPrs(_args: string[], options: CommandOptions): Promise<Comm
   }
   output += '\n';
 
-  // Load session logs for the same period
-  const sessions = loadSessionLogsSince(since);
+  // Load session logs for the same period (DB-backed with local fallback)
+  const sessions = await loadSessionLogsSince(since);
   output += `${c.bold}Session Logs: ${sessions.length}${c.reset}\n\n`;
 
   // Cross-reference: find sessions with issues
@@ -358,6 +414,33 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
     });
   }
 
+  // Fetch recently-closed issues to find what PRs resolved them
+  // (GitHub auto-closes issues when a PR with "Closes #N" is merged,
+  //  so they won't appear in the open issues list anymore)
+  const closedIssuesData = await githubApi<(GitHubIssueResponse & { closed_at: string | null })[]>(
+    `/repos/${REPO}/issues?state=closed&sort=updated&direction=desc&per_page=50`
+  );
+  const recentlyClosedIssues: Array<GitHubIssue & { closedAt: string }> = [];
+  if (!Array.isArray(closedIssuesData)) {
+    output += `${c.yellow}Warning: Could not fetch recently-closed issues. Triage may be incomplete.${c.reset}\n\n`;
+  } else {
+    const since = parseSinceOption(options);
+    for (const i of closedIssuesData) {
+      if (i.pull_request) continue; // Skip PRs
+      const closedAt = i.closed_at?.slice(0, 10);
+      if (!closedAt || closedAt < since) continue;
+      recentlyClosedIssues.push({
+        number: i.number,
+        title: i.title,
+        labels: (i.labels || []).map(l => l.name),
+        createdAt: i.created_at.slice(0, 10),
+        updatedAt: i.updated_at.slice(0, 10),
+        body: (i.body || '').slice(0, 500),
+        closedAt,
+      });
+    }
+  }
+
   // Fetch recent merged PRs to cross-reference
   const prsData = await githubApi<GitHubPullResponse[]>(
     `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=100`
@@ -385,16 +468,27 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
     'keep': [],
   };
 
+  // Check recently-closed issues — these were resolved by PRs
+  for (const issue of recentlyClosedIssues) {
+    const closingPr = explicitlyClosedByPr.get(issue.number);
+    categories['potentially-resolved'].push({
+      ...issue,
+      reason: closingPr
+        ? `Closed on ${issue.closedAt} by merged ${closingPr}`
+        : `Closed on ${issue.closedAt} (verify resolution)`,
+    });
+  }
+
+  // Check open issues that a PR claims to close but GitHub didn't auto-close
   for (const issue of openIssues) {
     const daysInactive = daysSince(issue.updatedAt);
 
-    // High-confidence signal: merged PR body explicitly closes this issue number
     const closingPr = explicitlyClosedByPr.get(issue.number);
 
     if (closingPr) {
       categories['potentially-resolved'].push({
         ...issue,
-        reason: `Explicitly closed by merged ${closingPr}`,
+        reason: `Still open but referenced by merged ${closingPr}`,
       });
     } else if (daysInactive > 30) {
       categories['stale'].push({
@@ -415,13 +509,17 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
   }
 
   // Output report
-  output += `${c.bold}Open Issues: ${openIssues.length}${c.reset}\n\n`;
+  output += `${c.bold}Open Issues: ${openIssues.length}${c.reset}`;
+  if (recentlyClosedIssues.length > 0) {
+    output += ` ${c.dim}(+ ${recentlyClosedIssues.length} recently closed)${c.reset}`;
+  }
+  output += '\n\n';
 
   const categoryMeta: Record<TriageCategory, { label: string; color: string; desc: string }> = {
     'potentially-resolved': {
-      label: 'Potentially Resolved',
+      label: 'Recently Resolved / Referenced',
       color: c.green,
-      desc: 'A merged PR explicitly closes this issue. Safe to close — verify and confirm.',
+      desc: 'Recently closed issues or open issues referenced by merged PRs. Listed for awareness / verification.',
     },
     'stale': {
       label: 'Stale',
@@ -617,7 +715,7 @@ async function status(_args: string[], options: CommandOptions): Promise<Command
 
   // Count session logs since last run
   const since = lastRun || '2000-01-01';
-  const sessions = loadSessionLogsSince(since);
+  const sessions = await loadSessionLogsSince(since);
   output += `Session logs since last run: ${sessions.length}\n`;
 
   const sessionsWithIssues = sessions.filter(s => s.issues.length > 0);
