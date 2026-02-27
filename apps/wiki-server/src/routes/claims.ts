@@ -102,6 +102,8 @@ function claimValues(d: ClaimInput) {
     valueUnit: d.valueUnit ?? null,
     valueDate: d.valueDate ?? null,
     qualifiers: d.qualifiers ?? null,
+    // Reasoning traces (migration 0034)
+    inferenceType: d.inferenceType ?? null,
   };
 }
 
@@ -179,6 +181,8 @@ function formatClaim(
     valueUnit: r.valueUnit,
     valueDate: r.valueDate,
     qualifiers: r.qualifiers as Record<string, string> | null,
+    // Reasoning traces (migration 0034)
+    inferenceType: r.inferenceType,
     // Pinned claims (migration 0034)
     isPinned: r.isPinned,
     sources: sourcesRows.map(formatClaimSource),
@@ -227,6 +231,7 @@ const PatchClaimSchema = z.object({
   valueUnit: z.string().max(100).nullable().optional(),
   valueDate: z.string().max(20).nullable().optional(),
   qualifiers: z.record(z.string()).nullable().optional(),
+  inferenceType: z.string().max(50).nullable().optional(),
   isPinned: z.boolean().optional(),
 });
 
@@ -995,7 +1000,7 @@ const claimsApp = new Hono()
 
     // Verify claim exists
     const existing = await db
-      .select({ id: claims.id })
+     .select({ id: claims.id })
       .from(claims)
       .where(eq(claims.id, id))
       .limit(1);
@@ -1015,6 +1020,7 @@ const claimsApp = new Hono()
     if (parsed.data.valueUnit !== undefined) updates.valueUnit = parsed.data.valueUnit;
     if (parsed.data.valueDate !== undefined) updates.valueDate = parsed.data.valueDate;
     if (parsed.data.qualifiers !== undefined) updates.qualifiers = parsed.data.qualifiers;
+    if (parsed.data.inferenceType !== undefined) updates.inferenceType = parsed.data.inferenceType;
     if (parsed.data.isPinned !== undefined) {
       updates.isPinned = parsed.data.isPinned;
       // When pinning, unpin any other claim with the same subject+property

@@ -281,6 +281,13 @@
       "when": 1771902800000,
       "tag": "0034_pinned_claims",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1771902900000,
+      "tag": "0034_inference_type",
+      "breakpoints": true
     }
   ]
 }

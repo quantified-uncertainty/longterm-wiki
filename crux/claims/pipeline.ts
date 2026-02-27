@@ -168,6 +168,7 @@ async function main() {
         const extracted = await extractClaimsFromSection(section, {
           model,
           systemPrompt: EXTRACT_SYSTEM_PROMPT,
+          entityName,
         });
         for (const e of extracted) {
           allExtracted.push({ ...e, section: section.heading });
