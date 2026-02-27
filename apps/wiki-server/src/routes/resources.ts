@@ -27,6 +27,36 @@ import {
   type ResourceStatsResult,
 } from "../api-types.js";
 
+// ---- Raw SQL row types ----
+
+/** Row shape returned by the resource FTS search query. */
+interface ResourceSearchRow {
+  id: string;
+  url: string;
+  title: string | null;
+  type: string | null;
+  summary: string | null;
+  review: string | null;
+  abstract: string | null;
+  key_points: string[] | null;
+  publication_id: string | null;
+  authors: string[] | null;
+  published_date: string | null;
+  tags: string[] | null;
+  local_filename: string | null;
+  credibility_override: number | null;
+  fetched_at: string | null;
+  content_hash: string | null;
+  created_at: string;
+  updated_at: string;
+  rank: number;
+}
+
+/** Row shape returned by COUNT(*) aggregate queries via db.execute(). */
+interface CountRow {
+  c: string | number;
+}
+
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
@@ -308,7 +338,7 @@ const resourcesApp = new Hono()
       : [];
 
     return c.json({
-      results: rows.map((r: any) => ({
+      results: (rows as ResourceSearchRow[]).map((r) => ({
         id: r.id,
         url: r.url,
         title: r.title,
@@ -383,9 +413,9 @@ const resourcesApp = new Hono()
       byType: Object.fromEntries(
         byType.map((r) => [r.type ?? "unknown", r.count])
       ),
-      orphanedCount: Number((orphanedResult as any)[0]?.c ?? 0),
-      withMetadata: Number((withMetadataResult as any)[0]?.c ?? 0),
-      fetched: Number((fetchedResult as any)[0]?.c ?? 0),
+      orphanedCount: Number((orphanedResult as unknown as CountRow[])[0]?.c ?? 0),
+      withMetadata: Number((withMetadataResult as unknown as CountRow[])[0]?.c ?? 0),
+      fetched: Number((fetchedResult as unknown as CountRow[])[0]?.c ?? 0),
     };
 
     return c.json(result);

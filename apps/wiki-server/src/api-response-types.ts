@@ -24,6 +24,7 @@ import type { AutoUpdateRunsRoute } from './routes/auto-update-runs.js';
 import type { AutoUpdateNewsRoute } from './routes/auto-update-news.js';
 import type { LinksRoute } from './routes/links.js';
 import type { HallucinationRiskRoute } from './routes/hallucination-risk.js';
+import type { ExploreRoute } from './routes/explore.js';
 
 // ---------------------------------------------------------------------------
 // RPC client phantom types (compile-time only)
@@ -38,6 +39,7 @@ type AutoUpdateRunsRpc = ReturnType<typeof hc<AutoUpdateRunsRoute>>;
 type AutoUpdateNewsRpc = ReturnType<typeof hc<AutoUpdateNewsRoute>>;
 type LinksRpc = ReturnType<typeof hc<LinksRoute>>;
 type HallucinationRiskRpc = ReturnType<typeof hc<HallucinationRiskRoute>>;
+type ExploreRpc = ReturnType<typeof hc<ExploreRoute>>;
 
 // ---------------------------------------------------------------------------
 // Claims
@@ -61,6 +63,24 @@ export type SimilarClaimsResult = InferResponseType<ClaimsRpc[':id']['similar'][
 /** A single similar claim item. */
 export type SimilarClaimItem = SimilarClaimsResult['claims'][number];
 
+/** Paginated claims list response from /all. */
+export type GetAllClaimsResult = InferResponseType<ClaimsRpc['all']['$get'], 200>;
+
+/** Claims network graph response. */
+export type ClaimsNetworkResult = InferResponseType<ClaimsRpc['network']['$get'], 200>;
+
+/** Claims relationships response. */
+export type ClaimsRelationshipsResult = InferResponseType<ClaimsRpc['relationships']['$get'], 200>;
+
+/** A single relationship row. */
+export type RelationshipRow = ClaimsRelationshipsResult['relationships'][number];
+
+/** Page references for a claim. */
+export type PageReferencesResult = InferResponseType<ClaimsRpc[':id']['page-references']['$get'], 200>;
+
+/** A single page reference row. */
+export type PageReferenceRow = PageReferencesResult['references'][number];
+
 // ---------------------------------------------------------------------------
 // Citations
 // ---------------------------------------------------------------------------
@@ -79,6 +99,18 @@ export type CitationContentListEntry = CitationContentListResult['entries'][numb
 
 /** Citation content stats response. */
 export type CitationContentStatsResult = InferResponseType<CitationsRpc['content']['stats']['$get'], 200>;
+
+/** Citation quotes for a page. */
+export type CitationQuotesResult = InferResponseType<CitationsRpc['quotes']['$get'], 200>;
+
+/** A single citation quote row (full DB shape). */
+export type CitationQuoteDbRow = CitationQuotesResult['quotes'][number];
+
+/** Citation quotes grouped by URL. */
+export type CitationQuotesByUrlResult = InferResponseType<CitationsRpc['quotes-by-url']['$get'], 200>;
+
+/** Single citation content record. */
+export type CitationContentResult = InferResponseType<CitationsRpc['content']['$get'], 200>;
 
 // ---------------------------------------------------------------------------
 // Sessions
@@ -145,3 +177,13 @@ type RiskLatestResult = InferResponseType<HallucinationRiskRpc['latest']['$get']
 
 /** A single risk page row. */
 export type RiskPageRow = RiskLatestResult['pages'][number];
+
+// ---------------------------------------------------------------------------
+// Explore
+// ---------------------------------------------------------------------------
+
+/** Explore page response. */
+export type ExploreResult = InferResponseType<ExploreRpc['index']['$get'], 200>;
+
+/** A single explore item. */
+export type ExploreItem = ExploreResult['items'][number];

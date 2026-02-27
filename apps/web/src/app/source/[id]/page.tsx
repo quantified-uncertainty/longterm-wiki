@@ -12,6 +12,7 @@ import {
 } from "@data";
 import { getCitationQuotesByUrl } from "@/lib/citation-data";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
+import type { CitationContentResult } from "@wiki-server/api-response-types";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getDomain } from "@/components/wiki/resource-utils";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
@@ -42,15 +43,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: resource.summary || `Citation source: ${resource.title}`,
     robots: { index: false, follow: false },
   };
-}
-
-interface CitationContentData {
-  url: string;
-  fetchedAt: string;
-  httpStatus: number | null;
-  pageTitle: string | null;
-  fullTextPreview: string | null;
-  contentLength: number | null;
 }
 
 function formatDate(iso: string): string {
@@ -93,7 +85,7 @@ export default async function SourcePage({ params }: PageProps) {
   const [quotesData, contentData] = await Promise.all([
     resource.url ? getCitationQuotesByUrl(resource.url) : null,
     resource.url
-      ? fetchFromWikiServer<CitationContentData>(
+      ? fetchFromWikiServer<CitationContentResult>(
           `/api/citations/content?url=${encodeURIComponent(resource.url)}`,
           { revalidate: 3600 }
         )

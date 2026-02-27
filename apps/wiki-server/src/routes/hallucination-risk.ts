@@ -14,6 +14,22 @@ import {
   RiskSnapshotBatchSchema,
 } from "../api-types.js";
 
+// ---- Raw SQL row types ----
+
+interface LevelDistRow {
+  level: string;
+  count: number;
+}
+
+interface RiskPageDbRow {
+  page_id: string;
+  score: number;
+  level: string;
+  factors: string[] | null;
+  integrity_issues: string[] | null;
+  computed_at: string;
+}
+
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
@@ -177,7 +193,7 @@ const hallucinationRiskApp = new Hono()
       totalSnapshots,
       uniquePages,
       levelDistribution: Object.fromEntries(
-        levelDist.map((r: any) => [r.level, r.count])
+        (levelDist as unknown as LevelDistRow[]).map((r) => [r.level, r.count])
       ),
     });
   })
@@ -216,7 +232,7 @@ const hallucinationRiskApp = new Hono()
         `;
 
     return c.json({
-      pages: rows.map((r: any) => ({
+      pages: (rows as unknown as RiskPageDbRow[]).map((r) => ({
         pageId: r.page_id,
         score: r.score,
         level: r.level,

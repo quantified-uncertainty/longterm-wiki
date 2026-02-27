@@ -11,6 +11,7 @@ import type { HallucinationRiskRoute } from '../../../apps/wiki-server/src/route
 
 type RpcClient = ReturnType<typeof hc<HallucinationRiskRoute>>;
 export type RiskBatchResult = InferResponseType<RpcClient['batch']['$post'], 201>;
+export type RiskLatestResult = InferResponseType<RpcClient['latest']['$get'], 200>;
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)

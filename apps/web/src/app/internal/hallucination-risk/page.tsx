@@ -97,7 +97,7 @@ async function loadRiskDataFromApi(): Promise<FetchResult<RiskPageData[]>> {
           entityType: meta?.entityType,
           quality: meta?.quality ?? null,
           wordCount: meta?.wordCount,
-          level: r.level,
+          level: r.level as "low" | "medium" | "high",
           score: r.score,
           factors: r.factors || [],
         };

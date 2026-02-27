@@ -107,6 +107,17 @@ function claimValues(d: ClaimInput) {
 
 type ClaimSourceRowType = typeof claimSources.$inferSelect;
 
+/** Raw row shape returned by the `/:id/similar` raw SQL query (pg_trgm similarity). */
+interface SimilarClaimDbRow {
+  id: number;
+  entity_id: string;
+  entity_type: string;
+  claim_text: string;
+  claim_category: string | null;
+  confidence: number | null;
+  similarity_score: string; // pg returns numeric as string
+}
+
 function formatClaimSource(s: ClaimSourceRowType) {
   return {
     id: Number(s.id),
@@ -826,7 +837,7 @@ const claimsApp = new Hono()
 
     // Use raw SQL for the similarity() function (same pattern as pages.ts trigram fallback)
     const rawDb = getDb();
-    const rows = await rawDb.unsafe(
+    const rows = (await rawDb.unsafe(
       `SELECT
       id, entity_id, entity_type, claim_text, claim_category, confidence,
       similarity(claim_text, $1) AS similarity_score
@@ -836,10 +847,10 @@ const claimsApp = new Hono()
     ORDER BY similarity(claim_text, $1) DESC
     LIMIT $3`,
       [targetText, id, limit],
-    );
+    )) as unknown as SimilarClaimDbRow[];
 
     return c.json({
-      claims: rows.map((r: any) => ({
+      claims: rows.map((r) => ({
         id: Number(r.id),
         entityId: r.entity_id,
         entityType: r.entity_type,
