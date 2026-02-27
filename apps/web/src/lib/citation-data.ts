@@ -1,6 +1,8 @@
 import { fetchFromWikiServer } from "./wiki-server";
 import type {
   CitationHealthResult,
+  CitationQuotesResult,
+  CitationQuotesByUrlResult,
 } from "@wiki-server/api-response-types";
 import type {
   AccuracyVerdict,
@@ -49,10 +51,6 @@ export interface CitationHealthSummary {
   unchecked: number;
 }
 
-interface QuotesApiResponse {
-  quotes: CitationQuote[];
-}
-
 /**
  * Fetch citation verification data for a specific page from the wiki-server.
  * Returns an empty array if the server is unavailable or the page has no data.
@@ -62,35 +60,24 @@ interface QuotesApiResponse {
 export async function getCitationQuotes(
   pageId: string
 ): Promise<CitationQuote[]> {
-  const result = await fetchFromWikiServer<QuotesApiResponse>(
+  const result = await fetchFromWikiServer<CitationQuotesResult>(
     `/api/citations/quotes?page_id=${encodeURIComponent(pageId)}`,
     { revalidate: 600 }
   );
 
   if (!result?.quotes) return [];
 
-  // Only include quotes that have some verification data worth showing
+  // Only include quotes that have some verification data worth showing.
+  // Cast needed: server returns accuracyVerdict as string|null (DB row),
+  // but CitationQuote narrows it to AccuracyVerdict|null.
   return result.quotes.filter(
     (q) => q.quoteVerified || q.accuracyVerdict !== null
-  );
+  ) as unknown as CitationQuote[];
 }
 
 /** Citation quote with page context — returned by quotes-by-url endpoint */
 export interface CrossPageCitationQuote extends CitationQuote {
   pageId: string;
-}
-
-interface QuotesByUrlResponse {
-  quotes: CrossPageCitationQuote[];
-  stats: {
-    totalPages: number;
-    totalQuotes: number;
-    verified: number;
-    accurate: number;
-    inaccurate: number;
-    unsupported: number;
-    minorIssues: number;
-  };
 }
 
 /**
@@ -99,8 +86,8 @@ interface QuotesByUrlResponse {
  */
 export async function getCitationQuotesByUrl(
   url: string
-): Promise<QuotesByUrlResponse | null> {
-  return fetchFromWikiServer<QuotesByUrlResponse>(
+): Promise<CitationQuotesByUrlResult | null> {
+  return fetchFromWikiServer<CitationQuotesByUrlResult>(
     `/api/citations/quotes-by-url?url=${encodeURIComponent(url)}`,
     { revalidate: 600 }
   );

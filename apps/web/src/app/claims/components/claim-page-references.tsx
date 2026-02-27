@@ -2,15 +2,9 @@
 
 import Link from "next/link";
 import { FileText } from "lucide-react";
+import type { PageReferenceRow } from "@wiki-server/api-response-types";
 
-export interface PageReference {
-  id: number;
-  claimId: number;
-  pageId: string;
-  footnote: number | null;
-  section: string | null;
-  createdAt: string;
-}
+export type PageReference = PageReferenceRow;
 
 export function ClaimPageReferences({
   references,

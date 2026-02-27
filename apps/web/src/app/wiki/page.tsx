@@ -1,25 +1,12 @@
 import { Suspense } from "react";
 import { getExploreItems } from "@/data";
-import type { ExploreItem } from "@/data";
 import { ExploreGrid } from "@/components/explore/ExploreGrid";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
-
-interface ExploreResponse {
-  items: ExploreItem[];
-  total: number;
-  limit: number;
-  offset: number;
-  facets: {
-    clusters: Record<string, number>;
-    categories: Record<string, number>;
-    entityTypes: Record<string, number>;
-    riskCategories: Record<string, number>;
-  };
-}
+import type { ExploreResult } from "@wiki-server/api-response-types";
 
 export default async function WikiIndex() {
   // Try fetching first page from wiki-server for a smaller initial payload
-  const serverData = await fetchFromWikiServer<ExploreResponse>(
+  const serverData = await fetchFromWikiServer<ExploreResult>(
     "/api/explore?limit=50&offset=0&sort=recommended",
     { revalidate: 300 }
   );
