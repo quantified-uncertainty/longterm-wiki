@@ -34,10 +34,8 @@ import {
   getBacklinks,
   getCitationQuotes,
 } from '../lib/wiki-server/pages.ts';
-import type {
-  SessionPageChangesResult,
-  RiskLatestResult,
-} from '../../apps/wiki-server/src/api-types.ts';
+import type { SessionPageChangesResult } from '../lib/wiki-server/sessions.ts';
+import type { RiskLatestResult } from '../lib/wiki-server/risk.ts';
 
 // ---------------------------------------------------------------------------
 // Shared helpers

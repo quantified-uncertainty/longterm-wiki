@@ -7,10 +7,8 @@
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
-import type {
-  InsertClaim,
-  ClaimPageReferenceRow,
-} from '../../../apps/wiki-server/src/api-types.ts';
+import type { InsertClaim } from '../../../apps/wiki-server/src/api-types.ts';
+import type { ClaimPageReferenceRow } from './references.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { ClaimsRoute } from '../../../apps/wiki-server/src/routes/claims.ts';
 
