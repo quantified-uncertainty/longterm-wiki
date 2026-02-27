@@ -1,0 +1,141 @@
+---
+numericId: E922
+title: "Cooperate-Bot"
+description: "A personal AI agent with a monthly budget that maintains cooperative relationships on your behalf — design analysis, failure modes, and the spectrum from allocation assistant to autonomous cooperator"
+subcategory: analysis-models
+quality: 50
+readerImportance: 45
+researchImportance: 55
+lastEdited: "2026-02-27"
+update_frequency: 120
+llmSummary: "Design analysis of a 'cooperate-bot' — an AI agent given a recurring personal budget to handle reciprocity, public goods contributions, and professional relationship maintenance. Maps the automation spectrum from manual giving through suggested allocation to full autonomy. Identifies five core failure modes (transactionalization, gaming, surveillance, Goodhart on cooperation metrics, wealth-as-cooperation-proxy) and argues the viable design space is narrower than it appears: automated execution of human decisions works, but automating cooperative judgment is likely intractable near-term."
+ratings:
+  novelty: 7
+  rigor: 5
+  actionability: 6
+  completeness: 6
+  concreteness: 7
+  objectivity: 6
+clusters:
+  - ai-safety
+---
+import {EntityLink, Mermaid} from '@components/wiki';
+
+## Overview
+
+A **cooperate-bot** is a proposed personal AI agent that manages a recurring budget — say a few hundred dollars per month — to maintain and strengthen its principal's cooperative relationships. It handles the logistical overhead of reciprocity, public goods contributions, and professional relationship maintenance that people intend to do but often don't.
+
+The motivation is simple: people are generally willing to cooperate, but the coordination costs of doing so often exceed the value of individual cooperative acts. Remembering who helped you, knowing what they need, timing a gesture well, and actually executing it all carry transaction costs. A cooperate-bot is essentially an attempt to eliminate cooperation's transaction costs, the way payment processors eliminated micropayment friction.
+
+The concept is explored here as a specific design exercise. For the broader AI safety implications of agents that cooperate on behalf of humans, see <EntityLink id="autonomous-cooperative-agents">Autonomous Cooperative Agents</EntityLink>. For cooperative funding systems that a cooperate-bot might interface with, see <EntityLink id="cooperative-funding-mechanisms">Cooperative Funding Mechanisms</EntityLink>.
+
+## The Automation Spectrum
+
+The cooperate-bot concept spans a spectrum. The interesting question is *where on this spectrum* there's enough value to justify the complexity:
+
+| Level | Human Role | Agent Role | Works Today? |
+|-------|-----------|-----------|-------------|
+| **Manual** | Decides everything | None | Yes (status quo) |
+| **Automated execution** | Decides what and who; agent handles when/how | Payment logistics, scheduling, reminders | Yes (Patreon, GitHub Sponsors, matching programs) |
+| **Suggested allocation** | Approves or rejects weekly recommendations | Identifies opportunities, proposes amounts, tracks relationships | Emerging |
+| **Supervised autonomy** | Sets rules and budget; reviews periodically | Allocates within constraints, learns from feedback | Not yet |
+| **Full autonomy** | Sets budget and values; reviews quarterly | All cooperative decisions | Not yet — faces severe failure modes |
+
+**Level 2 already exists and works.** Recurring donations, corporate matching, automatic dependency funding (thanks.dev) all automate execution of decisions humans have already made. The question is whether levels 3-4 add meaningful value over level 2.
+
+**Level 5 faces the full weight of every failure mode.** The interesting design space is levels 3-4: can an AI meaningfully *suggest* cooperative allocations in ways that are better than what a human would decide on their own?
+
+## What a Cooperate-Bot Actually Does
+
+At any automation level, the cooperate-bot operates across three categories with very different risk profiles:
+
+### Public Goods (Low Risk)
+
+Fund shared resources the principal depends on. Open source projects, community infrastructure, shared tools. This is the easiest category because:
+- Value received is measurable (you use the project or you don't)
+- Gaming is harder (maintaining a real project is expensive)
+- The decision is already semi-transactional (you'd pay for it if you had to)
+
+Tools like thanks.dev and GitHub Sponsors already do this. A cooperate-bot adds intelligence about *which* dependencies matter most and *when* projects need funding.
+
+### Professional Reciprocity (Medium Risk)
+
+Track professional help received and reciprocate proportionally. A colleague reviews your paper; your bot sends a thank-you and subscribes to their newsletter. A peer refers a client; your bot contributes to their fundraiser.
+
+The risk here is moderate because professional reciprocity is already partly transactional — people expect it and it doesn't violate gift-economy norms. But measuring "who helped you and how much" requires either surveillance (the bot monitors your interactions) or manual input (you tell the bot, which reduces automation value).
+
+### Personal Relationship Maintenance (High Risk)
+
+Birthday gifts, check-in messages, proactive offers of help to friends. This is where the concept is most appealing (people are worst at this) and most dangerous (automation destroys the social signal that makes these acts meaningful).
+
+**This category probably shouldn't be automated.** The value of a birthday message is that someone *remembered and cared enough to send it*. A bot-sent message carries none of that meaning. Worse, if the recipient knows a bot sent it, the gesture signals the opposite of what was intended: "I didn't care enough to do this myself."
+
+## Failure Modes
+
+### 1. Transactionalization
+
+The most fundamental problem. Genuine cooperation carries social meaning precisely because it is voluntary and non-transactional. Automating it converts gifts into exchanges.
+
+Research on motivation crowding is unambiguous: financial incentives for prosocial behavior frequently *reduce* that behavior.[^1] The mechanism is that payment changes the social frame. A daycare that introduces fines for late pickup gets *more* late pickups — the fine converts a social obligation ("I shouldn't make the teachers wait") into a purchasable service ("I can buy an extra 20 minutes").
+
+[^1]: Gneezy, U. & Rustichini, A. (2000). "A Fine is a Price." *Journal of Legal Studies*, 29(1).
+
+Applied to cooperate-bots: once your cooperation is mediated by a bot with a budget, others stop interpreting your gestures as cooperation and start interpreting them as automated spending. The cooperation signal is destroyed.
+
+**Mitigation:** Restrict the bot to domains where transactionalization is acceptable (public goods, professional contexts). Keep personal relationships manual.
+
+### 2. Gaming
+
+Any system that reciprocates "helpfulness" can be gamed by generating low-cost helpful-looking signals. The fundamental difficulty is measuring the *cost to the giver* (which correlates with genuine cooperation) rather than the *frequency or visibility of giving* (which correlates with gaming).
+
+The most valuable cooperation is often invisible: privately defending someone's work, choosing not to compete for the same opportunity, giving honest critical feedback. These are costly, high-value, and completely unmeasurable by an automated system.
+
+**Measurable proxies systematically over-reward performative cooperation.** Over time, a cooperate-bot selects for people who are good at generating visible cooperation signals, not people who genuinely help.
+
+### 3. Surveillance Requirements
+
+Effective cooperation tracking requires monitoring your social interactions. At minimum: email (to see who sends useful things), calendar (who shows up), messages (who offers help). At maximum: a complete model of your social life.
+
+Even if you consent, the people interacting with you haven't. Your collaborator sends a helpful email; your bot scores them on a cooperation metric. They didn't sign up for that.
+
+**The privacy paradox:** The less context the bot has, the worse its allocation decisions. But giving it full context creates a surveillance system your social contacts haven't consented to.
+
+### 4. Goodhart on Cooperation Metrics
+
+Whatever the bot measures, people will optimize for. Commits to your repo? Expect trivial PRs. Social media mentions? Expect engagement farming. Email helpfulness? Expect AI-generated "thoughtful" messages.
+
+This is Goodhart's Law applied to cooperation, and it's likely intractable for automated systems. Human judgment can distinguish genuine from performative cooperation (usually) because it draws on years of relational context. An automated system operating on behavioral signals cannot.
+
+### 5. Wealth as Cooperation Proxy
+
+A wealthy person's cooperate-bot has a larger budget, making them a more attractive cooperation partner and a more generous reciprocator. Their "cooperation" is really just spending power. In a network of cooperate-bots, budget size becomes the dominant factor in cooperative standing — reproducing wealth-based social dynamics under a cooperative label.
+
+## The CAUMF Connection
+
+The Contribution-Adjusted Utility Maximization Fund (CAUMF) proposal[^2] addresses a related problem: pooling donor resources to maximize each donor's individual preferences, capturing coordination gains. A cooperate-bot can be understood as a single-person CAUMF — one principal, one autonomous allocator.
+
+[^2]: Gooen, O. (2023). ["Contribution-Adjusted Utility Maximization Funds."](https://forum.effectivealtruism.org/posts/Fit37Gs7pwNau7di9/contribution-adjusted-utility-maximization-funds-an-early) Effective Altruism Forum.
+
+The interesting extension: if multiple cooperate-bots exist, they could negotiate bilateral cooperation trades — achieving the pooling efficiency of a CAUMF without a central fund manager or complex legal structure. But this introduces the multi-agent dynamics discussed in <EntityLink id="autonomous-cooperative-agents">Autonomous Cooperative Agents</EntityLink>: collusion, exclusion of non-bot-users, and strategic misrepresentation.
+
+See <EntityLink id="cooperative-funding-mechanisms">Cooperative Funding Mechanisms</EntityLink> for broader analysis of cooperative allocation systems.
+
+## The Core Tension
+
+The cooperate-bot concept contains a tension that may be irresolvable:
+
+**The cooperation judgment problem:** The things a bot can measure (visible signals, transaction frequency, public interactions) are poor proxies for cooperation. The things that matter (relationship depth, costly invisible acts, contextual appropriateness) require human judgment. But if a human must provide the cooperation judgment, the coordination cost savings of automation are small.
+
+**The meaning problem:** Cooperation's value partly comes from its voluntariness and personal nature. Automating it strips the meaning. The more autonomous the bot, the less the cooperation means to recipients.
+
+This suggests the viable design space is **narrow**: level 2-3 on the automation spectrum, focused on public goods and professional contexts, with human judgment for anything relational. This is useful — a "smart allocation assistant" that reminds you to fund your dependencies and reciprocate professional favors — but it's less transformative than the full vision of autonomous cooperative agents.
+
+Whether that narrower version is worth building depends on whether the coordination cost savings at levels 2-3 justify the implementation complexity. For many people, a recurring donation to 5-10 projects and a reminder system for professional reciprocity might be enough — and those are solvable with existing tools without building an AI agent.
+
+## Related Pages
+
+- <EntityLink id="autonomous-cooperative-agents">Autonomous Cooperative Agents</EntityLink> — Broader concept: agents that cooperate on behalf of humans
+- <EntityLink id="cooperative-funding-mechanisms">Cooperative Funding Mechanisms</EntityLink> — CAUMFs, quadratic funding, and cooperative allocation systems
+- <EntityLink id="cooperative-ai">Cooperative AI</EntityLink> — Research agenda on AI cooperation
+- <EntityLink id="multi-agent">Multi-Agent Safety</EntityLink> — Multi-agent dynamics relevant to bot-to-bot cooperation
+- <EntityLink id="coordination-tech">AI Governance Coordination Technologies</EntityLink> — Commitment devices and mechanism design

@@ -1122,15 +1122,15 @@
   type: concept
   title: Autonomous Cooperative Agents
   description: >-
-    AI agents given a recurring budget to optimize cooperation on behalf of their principal through
-    reciprocity, public goods contributions, and relationship maintenance. Analysis identifies seven
-    major failure modes and concludes viable implementations require human review and narrow scope.
+    AI agents that cooperate, negotiate, and make commitments on behalf of humans. Examines the
+    delegation alignment problem, multi-agent cooperation dynamics, and resource-bearing agent
+    incentives. Connects to cooperative AI research and instrumental convergence concerns.
   tags:
     - cooperative-ai
     - mechanism-design
     - agent-economics
     - game-theory
-    - commitment-devices
+    - delegation
   clusters:
     - ai-safety
     - governance
@@ -1144,6 +1144,65 @@
     - id: coordination-tech
       type: approach
     - id: cirl
+      type: approach
+    - id: cooperate-bot
+      type: concept
+    - id: cooperative-funding-mechanisms
+      type: concept
+  lastUpdated: 2026-02
+
+- id: cooperate-bot
+  numericId: E922
+  type: concept
+  title: Cooperate-Bot
+  description: >-
+    A personal AI agent with a recurring budget that maintains cooperative relationships on behalf of
+    its principal. Analyzes the automation spectrum from allocation assistant to autonomous cooperator,
+    with five core failure modes including transactionalization and gaming.
+  tags:
+    - cooperative-ai
+    - agent-economics
+    - mechanism-design
+    - reciprocity
+    - automation
+  clusters:
+    - ai-safety
+  relatedEntries:
+    - id: autonomous-cooperative-agents
+      type: concept
+    - id: cooperative-funding-mechanisms
+      type: concept
+    - id: cooperative-ai
+      type: approach
+    - id: multi-agent
+      type: approach
+  lastUpdated: 2026-02
+
+- id: cooperative-funding-mechanisms
+  numericId: E923
+  type: concept
+  title: Cooperative Funding Mechanisms
+  description: >-
+    Survey of mechanisms for cooperative resource allocation from traditional (ROSCAs, mutual aid)
+    through modern innovations (quadratic funding, CAUMFs, retroactive public goods funding, impact
+    certificates). Analyzes AI agent compatibility for each mechanism.
+  tags:
+    - quadratic-funding
+    - mechanism-design
+    - public-goods
+    - cooperative-finance
+    - impact-certificates
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: autonomous-cooperative-agents
+      type: concept
+    - id: cooperate-bot
+      type: concept
+    - id: cooperative-ai
+      type: approach
+    - id: coordination-tech
       type: approach
   lastUpdated: 2026-02
 

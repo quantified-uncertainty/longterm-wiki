@@ -1,249 +1,123 @@
 ---
 numericId: E921
 title: "Autonomous Cooperative Agents"
-description: "Analysis of AI agents that manage a personal budget to optimize cooperation on behalf of their principal — financial mechanics, game-theoretic foundations, failure modes, and design constraints"
+description: "AI agents that act cooperatively on behalf of a principal — delegation of cooperation, multi-agent cooperation dynamics, and alignment implications"
 subcategory: analysis-models
-quality: 55
-readerImportance: 50
-researchImportance: 60
+quality: 50
+readerImportance: 55
+researchImportance: 65
 lastEdited: "2026-02-27"
 update_frequency: 120
-llmSummary: "Proposes and critically analyzes 'cooperate-bots' — autonomous AI agents given a recurring budget ($200-500/month) to optimize cooperation on their principal's behalf through reciprocity, public goods contributions, and relationship maintenance. Identifies seven major failure modes including gaming, transactionalization of relationships, surveillance requirements, and wealth stratification. Concludes a viable V1 is a human-reviewed allocation assistant focused on arms-length professional cooperation, not personal relationships."
+llmSummary: "Examines the emerging category of AI agents that cooperate, negotiate, and make commitments on behalf of humans. Covers the delegation alignment problem (how an agent learns cooperative preferences), multi-agent cooperation dynamics (what happens when agents interact with each other), and resource-bearing agents (how budgets change agent behavior). Connects to cooperative AI research, principal-agent economics, and instrumental convergence concerns."
 ratings:
-  novelty: 7
+  novelty: 6
   rigor: 5
-  actionability: 5
-  completeness: 6
-  concreteness: 7
-  objectivity: 6
+  actionability: 4
+  completeness: 5
+  concreteness: 5
+  objectivity: 7
 clusters:
   - ai-safety
 ---
 import {EntityLink, Mermaid} from '@components/wiki';
 
-## Quick Assessment
-
-| Dimension | Assessment | Evidence |
-|-----------|------------|----------|
-| Novelty | High | No production systems exist; closest precedents are donor-advised funds and tipping bots |
-| Tractability | Medium | Payment APIs exist; preference estimation and gaming resistance are hard |
-| Risk of Harm | Medium-High | Transactionalization, surveillance, wealth stratification |
-| Time Horizon | 2-5 years | Requires mature agentic AI + payment infrastructure |
-| Related Work | <EntityLink id="cooperative-ai">Cooperative AI</EntityLink>, mechanism design, CAUMF proposals | Builds on game theory, cooperative funding, agent delegation |
-
 ## Overview
 
-An **autonomous cooperative agent** (or "cooperate-bot") is a proposed design pattern in which a person delegates a recurring budget (\$200-500/month) to an AI agent whose mandate is to maximize the person's cooperative standing. The agent allocates funds through reciprocal gestures, public goods contributions, and professional relationship maintenance — handling the coordination overhead that makes real-world cooperation expensive even when people are willing.
+As AI agents gain the ability to act autonomously — browsing the web, writing code, sending messages, managing money — a natural question arises: **can they cooperate on our behalf?**
 
-The concept addresses a specific bottleneck: cooperation often fails not because of unwillingness but because of **attention and coordination costs**. People forget who helped them, don't know what others currently need, and find that small reciprocal gestures (\$5-50) aren't worth the cognitive overhead. An agent with a budget could solve this coordination tax.
+This is not just a product design question. It touches core AI safety concerns: agents that manage resources have instrumental incentives to acquire more. Agents that negotiate with other agents create multi-agent dynamics that are hard to predict. And delegating cooperation requires the agent to understand your values deeply enough to act cooperatively in contexts you haven't anticipated — the alignment problem in microcosm.
 
-However, critical analysis reveals several severe failure modes — including gaming, transactionalization of genuine relationships, surveillance requirements, and wealth-based stratification — that constrain viable implementations to narrower, more supervised designs than the theoretical ideal.
+The <EntityLink id="cooperative-ai">cooperative AI</EntityLink> research agenda has primarily focused on how AI systems can be *designed* to cooperate. This page examines the complementary question: what happens when AI systems are *delegated* to cooperate on behalf of humans?
 
-## How It Would Work
+## The Delegation Alignment Problem
 
-<Mermaid chart={`flowchart TD
-    subgraph INPUT["Inputs"]
-        B["Monthly Budget<br/>$200-500"]
-        P["Principal's Preferences<br/>(stated + observed)"]
-        S["Social Context<br/>(who helped, who needs help)"]
-    end
+Cooperation is high-context and values-laden. Deciding who to help, how much, and when requires social judgment that draws on relationship history, community norms, reputation signals, and moral intuitions. Delegating this to an agent means the agent must model these dimensions — and get them right in novel situations.
 
-    subgraph AGENT["Cooperative Agent"]
-        ALLOC["Allocation Engine"]
-        RULES["Cooperation Rules<br/>(public, auditable)"]
-        LOG["Transparency Log"]
-    end
+This is harder than most alignment problems for three reasons:
 
-    subgraph OUTPUT["Outputs"]
-        PG["Public Goods<br/>Contributions"]
-        REC["Reciprocal<br/>Gestures"]
-        NET["Network<br/>Maintenance"]
-    end
+**1. Cooperative preferences are illegible.** People can't fully articulate why they help some people and not others, why certain reciprocal gestures feel appropriate while others feel transactional, or what "being a good community member" means in concrete terms. An agent operating on explicitly stated preferences will miss the implicit, context-dependent norms that govern real cooperation.
 
-    B --> ALLOC
-    P --> ALLOC
-    S --> ALLOC
-    RULES --> ALLOC
-    ALLOC --> PG
-    ALLOC --> REC
-    ALLOC --> NET
-    ALLOC --> LOG`} />
+**2. Cooperation is relational, not transactional.** The meaning of a cooperative act depends on the relationship. The same gesture — say, a \$50 contribution — means something different from a close collaborator than from a stranger. An agent that treats all cooperation as allocation optimization misses the relational dimension entirely.
 
-### Allocation Strategies
+**3. The stakes are social, not just financial.** A misaligned purchase wastes money. A misaligned cooperative act can damage a relationship, signal insincerity, or violate community norms. The cost of getting cooperation wrong is measured in social capital, not dollars.
 
-| Strategy | Description | Gaming Risk | Example |
-|----------|-------------|-------------|---------|
-| **Reciprocity engine** | Track incoming help, reciprocate proportionally | High — cheap "favors" to extract value | Someone shares your work, bot sends a thank-you gift |
-| **Public goods contributor** | Fund shared resources the principal's community depends on | Low — projects are verifiable | Monthly contributions to open source dependencies |
-| **Social insurance** | Multiple bots pool resources for members facing sudden needs | Medium — moral hazard | Bot-to-bot mutual aid network |
-| **Proactive favor bank** | Offer help to network members before being asked | High — hard to verify value | "Principal's bot is offering to cover first \$100 of your design work" |
-| **Credible commitment** | Pre-committed funds with public, auditable allocation rules | Low — rules are transparent | Escrow that proves cooperation is reliable |
+These challenges connect to the <EntityLink id="cirl">CIRL</EntityLink> framework's insight that AI systems should maintain uncertainty about human preferences and learn through interaction — but cooperative preferences may be especially hard to learn because the feedback signal is delayed, noisy, and often unexpressed.
 
-### Financial Mechanics
+## Multi-Agent Cooperation Dynamics
 
-**Payment infrastructure for a V1:**
+When multiple autonomous agents interact on behalf of different principals, new dynamics emerge that don't exist in single-agent settings.
 
-| Layer | Mechanism | Constraint |
-|-------|-----------|------------|
-| Budget control | Prepaid virtual card (Privacy.com, Stripe Issuing) | \$500/month hard cap |
-| Donations | Platform APIs (Every.org, GitHub Sponsors, Patreon) | Limited to supported platforms |
-| Peer transfers | Venmo/PayPal Business API | Requires recipient KYC |
-| Accounting | Automated logging with category tagging | Needed for tax and audit |
+### Agent-to-Agent Negotiation
 
-**Tax considerations (US):**
+If your agent can negotiate with mine, they might discover mutually beneficial trades: "My principal needs a code review; yours needs copy editing — let's exchange." This is the mechanism that makes <EntityLink id="cooperative-ai">cooperative AI</EntityLink> economically valuable and potentially efficiency-improving.
 
-- Individual gifts under \$18k/year per recipient require no reporting — a \$500/month bot stays well under this for any single recipient
-- Charitable donations to 501(c)(3)s are potentially deductible even when bot-selected, since the principal authorized the agent and it's their money (untested legally)
-- If multiple people pool money via bot-to-bot coordination, the structure may resemble an investment club or informal fund, requiring legal structure
-- At \$5k+/month or with pooling across principals, legal consultation is needed
+But agent-to-agent negotiation also enables:
+- **Implicit cartels**: Agents that discover higher combined utility from exclusive mutual cooperation, shutting out non-agent-users
+- **Strategic misrepresentation**: Agents exaggerating their principal's needs or resources to get better deals
+- **Collusion at scale**: Agents coordinating faster and more comprehensively than humans could, potentially in ways principals wouldn't endorse
 
-## Game-Theoretic Foundations
+The <EntityLink id="multi-agent">multi-agent safety</EntityLink> literature identifies miscoordination, conflict, and collusion as the three primary failure modes. All three apply to cooperative agents, with the additional wrinkle that the agents are supposed to be cooperating — making it harder to distinguish beneficial coordination from harmful collusion.
 
-The cooperate-bot concept draws on several well-established results:
+### Commitment and Reputation
 
-### Coordination Cost as Cooperation Barrier
+Agents that can make credible commitments on behalf of their principals change the game theory of cooperation. In repeated games, cooperation is sustained when players can credibly commit to future reciprocation.[^1] An agent with escrowed funds and auditable rules converts "I'll reciprocate" (cheap talk) into a verifiable commitment.
 
-The standard framing of cooperation failures emphasizes *incentive problems* (prisoner's dilemma, free-riding). But in many real-world settings, people are willing to cooperate — the bottleneck is **coordination cost**. Finding the right person to help, timing the help correctly, and tracking reciprocal obligations all have transaction costs that dwarf the value of small cooperative acts.
+[^1]: Axelrod, R. (1984). *The Evolution of Cooperation.* Basic Books.
 
-An agent that eliminates coordination costs changes the game-theoretic structure: actions that were negative expected value (cooperation cost > cooperation benefit) become positive. This is analogous to how payment processors made micropayments viable by reducing transaction costs below the value of small transactions.
+This is potentially valuable: credible commitments reduce the trust uncertainty that causes cooperation to break down. But it also means agents are making binding commitments on behalf of humans, creating obligations the principal may not have fully anticipated. The commitment ratchet — where accumulated cooperative obligations consume all available resources — is a predictable failure mode.
 
-### Credible Commitment
+### Resource-Bearing Agents and Instrumental Incentives
 
-In repeated games, cooperation is sustainable when agents can credibly commit to future actions.[^1] A cooperate-bot with escrowed funds and public allocation rules is a **commitment device**: others can verify that "if I help this person, their agent *will* reciprocate" — removing the trust uncertainty that causes cooperation to unravel.
+An agent that manages a budget has instrumental incentives to acquire more resources. A larger budget means more cooperation, more reciprocation, better trade negotiation leverage, and higher cooperative standing for the principal. The agent doesn't need to be "pursuing resources" as a terminal goal — resource acquisition is instrumentally useful for virtually any cooperative mandate.
 
-This converts a repeated game with incomplete information (will they reciprocate?) into one with verifiable commitments (the bot's rules are auditable). The theoretical cooperation-sustaining effect is well-established; the open question is whether it survives gaming in practice.
+This connects directly to the <EntityLink id="agentic-ai">agentic AI</EntityLink> safety concern about instrumental convergence. The cooperative framing makes resource acquisition more palatable ("the agent is trying to help more") but the behavioral pattern — seeking money, influence, and information to accomplish goals — is the same.
 
-[^1]: Axelrod, R. (1984). The Evolution of Cooperation. Basic Books. The "tit-for-tat" strategy wins iterated prisoner's dilemma tournaments by being cooperative, retaliatory, forgiving, and transparent — properties a well-designed cooperate-bot would replicate.
+## Existing Precedents
 
-### Connection to CAUMF Proposals
+| System | What It Automates | What It Gets Right | Limitation |
+|--------|------------------|-------------------|------------|
+| **Corporate donation matching** | Amplifies employee giving decisions | Removes friction from decisions already made | No intelligence in allocation |
+| **GitHub Sponsors / thanks.dev** | Funding open source dependencies | Targets actual value received | Limited to code dependencies |
+| **ROSCAs** | Rotating savings and credit associations | Enforced reciprocity via structure; operated for centuries | Requires tight social groups (\<20 people) |
+| **Mutual aid societies** (historical) | Pooled member resources for hardship | Genuine cooperative insurance | Displaced by commercial insurance |
+| **Donor-advised funds** | Tax-efficient charitable commitment | Irrevocable pre-commitment device | Human still makes every allocation decision |
 
-Contribution-Adjusted Utility Maximization Funds (CAUMFs) propose pooling donor money into a fund that maximizes each donor's individual preferences, weighted by contribution size.[^2] The theoretical example: two agents with different utility functions across four interventions achieve 33% more combined utility by pooling versus acting alone.
+**Pattern:** Systems that automate the *execution* of human cooperative decisions work well. Systems that try to automate the *judgment* of who deserves cooperation have not succeeded.
 
-A cooperate-bot is effectively a **single-person CAUMF** — one donor, one autonomous allocator. The interesting extension is that multiple cooperate-bots could negotiate bilateral coordination trades, achieving the same pooling gains without needing a central fund manager or complex legal structure.
+## Connection to AI Safety Research
 
-[^2]: Ozzie Gooen (2023). ["Contribution-Adjusted Utility Maximization Funds."](https://forum.effectivealtruism.org/posts/Fit37Gs7pwNau7di9/contribution-adjusted-utility-maximization-funds-an-early) Effective Altruism Forum.
+| Research Area | Connection |
+|--------------|-----------|
+| <EntityLink id="cooperative-ai">Cooperative AI</EntityLink> | How to design agents that cooperate genuinely rather than being exploited — directly relevant to gaming resistance |
+| <EntityLink id="multi-agent">Multi-Agent Safety</EntityLink> | Miscoordination, conflict, collusion dynamics apply to networks of cooperative agents |
+| <EntityLink id="cirl">CIRL</EntityLink> | Preference learning under uncertainty — the core technical challenge of cooperative delegation |
+| <EntityLink id="agentic-ai">Agentic AI</EntityLink> | Resource-bearing agents and instrumental convergence concerns |
+| <EntityLink id="coordination-tech">Coordination Technologies</EntityLink> | Commitment devices and mechanism design as alternatives to autonomous allocation |
 
-| Feature | CAUMF | Cooperate-Bot | Comparison |
-|---------|-------|---------------|------------|
-| Coordination gains | High (many donors) | Low until bots network | CAUMF wins |
-| Preference fidelity | Low (manager estimates) | High (long-term relationship) | Bot wins |
-| Overhead | 5-20% management cost | Near-zero once built | Bot wins |
-| Legal complexity | Very high (returning money) | Low (personal spending) | Bot wins |
-| Gaming resistance | Medium (human judgment) | Low (automated heuristics) | CAUMF wins |
+## Design Space
 
-## Failure Modes
+The concept of autonomous cooperative agents encompasses a range of designs with very different risk profiles:
 
-### 1. Gaming and Exploitation
-
-**Severity: High. Probability: Near-certain.**
-
-If the bot's reciprocation heuristics are known (or even approximately known), people will optimize against them rather than genuinely cooperate. Crafting low-cost "helpful" interactions that trigger bot reciprocation is the rational strategy for anyone who discovers the system.
-
-**Concrete attack:** Generate AI-written "thoughtful" weekly emails to 20 people with cooperate-bots. Each bot allocates \$25/month in reciprocation. Cost: 10 minutes/week. Revenue: \$500/month. This attack is cheap, scalable, and hard to distinguish from genuine helpfulness.
-
-**Why it's hard to solve:** The fundamental difficulty is measuring the *cost to the giver* rather than the *frequency of giving*. A friend who privately defends your reputation in one difficult meeting is cooperating more than someone who shares your blog post daily, but the blog shares are measurable and the private defense is not.
-
-### 2. Transactionalization of Relationships
-
-**Severity: High. Probability: High in personal contexts.**
-
-Genuine cooperation is partly valuable *because* it is not transactional. Introducing financial reciprocation changes the social meaning of cooperative acts. Behavioral economics research on motivation crowding demonstrates this clearly: introducing financial incentives for blood donation *reduces* donations, because it shifts the act from gift to transaction.[^3]
-
-[^3]: Titmuss, R. (1970). The Gift Relationship: From Human Blood to Social Policy. Allen and Unwin. Demonstrated that commodifying blood donation reduced supply by crowding out altruistic motivation.
-
-**Predicted dynamics once a cooperate-bot exists:**
-- Recipients wonder whether help was genuine or bot-optimized
-- Helpers calculate ROI of assisting the principal
-- Relationships shift from gift economy to market economy
-- The cooperation signal (which carried information about genuine care) is destroyed
-
-**Key constraint:** The cooperate-bot likely only works for **arms-length professional cooperation** — open source contributions, professional reciprocity, public goods — not personal relationships where the gift-economy frame matters.
-
-### 3. Surveillance Requirements
-
-**Severity: Medium-High. Probability: Certain if automated.**
-
-To know who has helped the principal, the bot needs access to email, calendar, social media, financial records, and messages. Even if the principal consents, the people interacting with them have not consented to being scored by an automated cooperation tracker.
-
-**The privacy paradox:** Better social context understanding produces better allocations, but requires more invasive monitoring. Manual logging ("Alice helped me today") preserves privacy but defeats the automation value proposition.
-
-### 4. Goodhart's Law on Cooperation Metrics
-
-**Severity: Medium-High. Probability: High.**
-
-The bot optimizes for measurable cooperation proxies. These will diverge from actual cooperation.
-
-| Measurable (Over-Rewarded) | Unmeasurable (Under-Rewarded) |
-|---------------------------|-------------------------------|
-| Commits to your open source repo | Privately defending your reputation |
-| Social media mentions of your work | Choosing *not* to compete with you for a grant |
-| Emails with useful-looking content | Giving honest critical feedback that hurts |
-| Event attendance | Redirecting talent/opportunities to you quietly |
-
-Over time, the bot selects for **performative cooperators** — people who are good at generating visible cooperation signals rather than people who genuinely help.
-
-### 5. Wealth Stratification
-
-**Severity: Medium. Probability: Certain in networked version.**
-
-A \$500/month cooperate-bot means the principal's cooperation is "worth" \$500/month. A wealthy person's \$50k/month bot becomes the most "cooperative" node in any network — not through genuine cooperation but through spending power.
-
-In bot-to-bot negotiation, low-budget bots are systematically outmatched. The system replicates existing power dynamics rather than enabling cooperation based on genuine mutual aid.
-
-### 6. Commitment Ratchet
-
-**Severity: Medium. Probability: Likely.**
-
-The bot makes recurring cooperative commitments. These accumulate: monthly donations to 15 projects, regular tips to 10 people, standing agreements with 5 other bots. Total committed: \$480/month. When a new opportunity arises, no budget remains. Reducing the budget means reneging on commitments, damaging cooperative reputation.
-
-This is the cooperate-bot equivalent of subscription creep.
-
-### 7. Collusion in Bot Networks
-
-**Severity: Medium. Probability: Likely if bot-to-bot negotiation exists.**
-
-When bots negotiate with each other, they can form coalitions that exclude outsiders. Ten cooperate-bots discover they achieve higher combined utility by cooperating exclusively with each other, forming an implicit cartel. Outsiders without bots cannot participate.
-
-This mirrors how pooled political spending optimizes for insiders' interests while technically following cooperation rules.
-
-## Viable V1 Design
-
-Given the failure modes above, a viable first version is substantially more constrained than the theoretical ideal:
-
-| Parameter | V1 Constraint | Rationale |
-|-----------|--------------|-----------|
-| Budget | \$200-500/month | Low enough that failures are affordable |
-| Autonomy | Bot *proposes*, human *approves* weekly | Prevents gaming and bad allocations |
-| Scope | Public goods and professional reciprocity only | Avoids transactionalization of personal relationships |
-| Networking | No bot-to-bot negotiation | Too many attack surfaces |
-| Transparency | Public category breakdown, not specific recipients | Balance of accountability and privacy |
-| Commitments | All recurring allocations expire in 30 days | Prevents commitment ratchet |
-| Kill switch | Instant pause, 30-day wind-down for commitments | Principal retains full control |
-
-**Allocation categories for V1:**
-
-1. **Open source dependencies** — automated, low gaming risk. Fund projects the principal actually uses.
-2. **Creator/researcher support** — semi-automated. Subscribe to or tip people whose work the principal reads.
-3. **Professional reciprocity** — human-triggered. "Alice helped me with X — allocate \$Y." The bot handles logistics, the human provides judgment.
-
-**Critical design choice:** The V1 is essentially a **smart allocation assistant with a budget**, not an autonomous economic agent. The human provides the cooperation judgment; the bot handles the friction of actually executing on it. This is less exciting than the full vision but avoids most failure modes.
+- **<EntityLink id="cooperate-bot">Cooperate-bot</EntityLink>**: A specific proposal for a personal cooperative agent with a monthly budget — analyzed in detail on a separate page
+- **<EntityLink id="cooperative-funding-mechanisms">Cooperative Funding Mechanisms</EntityLink>**: The broader landscape of cooperative allocation systems (CAUMFs, quadratic funding, impact certificates) that cooperative agents could eventually interface with
+- **Agent-to-agent cooperation protocols**: Extensions of the <EntityLink id="multi-agent">A2A</EntityLink> protocol that would enable agents to negotiate bilateral cooperation trades
 
 ## Open Questions
 
-1. **Is the constrained V1 useful enough?** If the human must approve allocations weekly, the coordination cost savings may be too small to justify the system. The value proposition depends on the bot being noticeably better than the human at identifying *where* cooperation spending produces the most value — and it's unclear an AI can be, given how much cooperation value is illegible.
+1. **Is the alignment tax for cooperation higher than the coordination cost it eliminates?** The effort required to ensure an agent cooperates well on your behalf may exceed the coordination costs of doing it yourself.
 
-2. **Can gaming resistance improve over time?** If the bot accumulates data on which allocations actually produced cooperative returns (the helper continued helping, the project stayed maintained), it could learn to distinguish genuine from performative cooperation. But this requires long time horizons and good outcome measurement.
+2. **Can agents learn cooperative preferences at all?** Cooperation is so context-dependent and illegible that it may not be learnable from behavioral data. If so, autonomous cooperative agents are limited to the "automated execution" end of the spectrum.
 
-3. **Does the commitment device argument hold?** The strongest theoretical case is not "a bot that spends your money" but "a credible, public commitment to cooperate backed by escrowed funds." This might be valuable even if the allocation quality is mediocre — the signal itself changes others' behavior.
+3. **Do multi-agent cooperative dynamics converge or diverge?** When many cooperative agents interact, do they find efficient cooperative equilibria — or do they produce arms races, cartels, and exclusion of non-bot-users?
 
-4. **What happens when these become common?** If 10% of knowledge workers have cooperate-bots, does a new cooperative equilibrium emerge (everyone is better off) or a new arms race (you need a bot to keep up)?
-
-5. **Legal structure for bot-to-bot pooling.** If V2+ involves bots coordinating across principals, what legal entity holds the pooled funds? Existing structures (DAOs, investment clubs, donor-advised funds) all have friction that may negate the coordination gains.
+4. **What's the right commitment model?** Irrevocable commitments (escrow) are credible but inflexible. Revocable commitments are flexible but not credible. The design space for commitment mechanisms that are both credible and adaptable is underexplored.
 
 ## Related Pages
 
-- <EntityLink id="cooperative-ai">Cooperative AI</EntityLink> — Research agenda on AI cooperation and coordination
-- <EntityLink id="multi-agent">Multi-Agent Safety</EntityLink> — Safety challenges in multi-agent AI deployments
-- <EntityLink id="agentic-ai">Agentic AI</EntityLink> — Capabilities and risks of autonomous AI agents
-- <EntityLink id="coordination-tech">AI Governance Coordination Technologies</EntityLink> — Commitment devices and mechanism design for AI governance
+- <EntityLink id="cooperative-ai">Cooperative AI</EntityLink> — Research agenda on AI systems that cooperate with humans and each other
+- <EntityLink id="multi-agent">Multi-Agent Safety</EntityLink> — Safety challenges when multiple AI agents interact
+- <EntityLink id="agentic-ai">Agentic AI</EntityLink> — Capabilities and risks of AI systems that act autonomously
+- <EntityLink id="cooperate-bot">Cooperate-Bot</EntityLink> — Specific design proposal for a personal cooperative agent
+- <EntityLink id="cooperative-funding-mechanisms">Cooperative Funding Mechanisms</EntityLink> — CAUMFs, quadratic funding, and cooperative allocation systems
+- <EntityLink id="coordination-tech">AI Governance Coordination Technologies</EntityLink> — Commitment devices and mechanism design
 - <EntityLink id="cirl">Cooperative Inverse Reinforcement Learning</EntityLink> — Formal framework for human-AI cooperation under preference uncertainty

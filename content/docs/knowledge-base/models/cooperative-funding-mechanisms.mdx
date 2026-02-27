@@ -1,0 +1,174 @@
+---
+numericId: E923
+title: "Cooperative Funding Mechanisms"
+description: "Survey of mechanisms for cooperative resource allocation — from traditional structures (ROSCAs, mutual aid) through modern innovations (quadratic funding, CAUMFs, retroactive public goods funding)"
+subcategory: economic-models
+quality: 45
+readerImportance: 40
+researchImportance: 55
+lastEdited: "2026-02-27"
+update_frequency: 180
+llmSummary: "Surveys cooperative funding mechanisms from traditional (ROSCAs, mutual aid societies, cooperative banks) through modern innovations (quadratic funding, impact certificates, retroactive public goods funding, CAUMFs). Analyzes each mechanism's cooperation properties — preference expression, gaming resistance, coordination gains — and examines how AI agents might interface with these systems. Connects to AI safety through the question of how agents with budgets participate in cooperative economic structures."
+ratings:
+  novelty: 5
+  rigor: 5
+  actionability: 4
+  completeness: 5
+  concreteness: 6
+  objectivity: 7
+clusters:
+  - ai-safety
+  - governance
+---
+import {EntityLink} from '@components/wiki';
+
+## Overview
+
+How groups of people pool and allocate resources cooperatively is one of the oldest problems in social organization. The mechanisms that solve it range from ancient (rotating savings clubs) to cutting-edge (quadratic funding, retroactive public goods funding). Understanding this design space matters for AI safety because autonomous agents will increasingly participate in cooperative economic structures — as allocators, negotiators, or principals.
+
+This page surveys the landscape of cooperative funding mechanisms, focusing on their **cooperation properties**: how well they express diverse preferences, resist gaming, and achieve coordination gains that individual action cannot.
+
+## Traditional Cooperative Structures
+
+### ROSCAs (Rotating Savings and Credit Associations)
+
+Perhaps the oldest cooperative financial mechanism, operating for centuries across Africa, Asia, and Latin America. A fixed group (typically 10-20 people) contributes a fixed amount to a pool each period; one member receives the entire pot each round.
+
+| Property | Assessment |
+|----------|-----------|
+| Preference expression | Low — all members contribute equally, allocation is by rotation or auction |
+| Gaming resistance | High — enforced by social bonds and repeated interaction |
+| Coordination gain | Members access capital they couldn't accumulate individually |
+| Scale | \<20 people; requires tight social cohesion |
+
+**Key insight:** ROSCAs work because they are embedded in existing social relationships. The enforcement mechanism is reputation and social pressure, not legal contracts. This is why they resist gaming — cheaters face social consequences that exceed the financial gain from defection.
+
+### Mutual Aid Societies
+
+Voluntary organizations where members pool resources to insure each other against hardship. Operated widely in the 18th-20th centuries across working-class communities in Europe and the US. Members paid regular dues; funds disbursed to members facing illness, unemployment, or death in the family.
+
+| Property | Assessment |
+|----------|-----------|
+| Preference expression | Low-Medium — collective rules, some societies offered tiered membership |
+| Gaming resistance | Medium — moral hazard (faking hardship) was a real problem |
+| Coordination gain | Insurance for populations excluded from commercial markets |
+| Scale | 50-5000 members; federated structures enabled larger pools |
+
+**Decline:** Commercial insurance offered better risk pooling and actuarial pricing, causing most mutual aid societies to fade by mid-20th century. The revival of interest (post-2020 mutual aid networks) tends toward informal, short-lived structures rather than the durable institutions of the earlier era.
+
+### Cooperative Banks and Credit Unions
+
+Member-owned financial institutions that pool savings and make loans to members. Unlike commercial banks, profits return to members as dividends or lower rates.
+
+| Property | Assessment |
+|----------|-----------|
+| Preference expression | Medium — one-member-one-vote governance |
+| Gaming resistance | High — regulated, audited, professional management |
+| Coordination gain | Lower rates and fees than commercial banks for underserved populations |
+| Scale | 100-10M members; some credit unions are very large |
+
+## Modern Cooperative Mechanisms
+
+### Quadratic Funding
+
+Proposed by Buterin, Hitzig, and Weyl (2019).[^1] The core insight: match individual contributions using a formula that weights the *number of contributors* more than the *amount contributed*. A project with 100 donors giving \$1 each receives far more matching funds than a project with 1 donor giving \$100.
+
+[^1]: Buterin, V., Hitzig, Z., & Weyl, E.G. (2019). "A Flexible Design for Funding Public Goods." *Management Science*, 65(11).
+
+| Property | Assessment |
+|----------|-----------|
+| Preference expression | High — each donor's contribution is a signal about what they value |
+| Gaming resistance | Low-Medium — Sybil attacks (splitting donations across fake identities) are a major problem |
+| Coordination gain | Matches fund allocation to community preferences rather than individual wealth |
+| Scale | Tested at \$1-50M pools (Gitcoin Grants) |
+
+**In practice:** Gitcoin has distributed over \$60M through quadratic funding rounds since 2019. Major challenges include Sybil resistance (identity verification), collusion among project creators, and high matching pool dependence on wealthy sponsors.
+
+**Relevance to AI agents:** An agent participating in quadratic funding would need its contributions to reflect genuine preferences, not just maximize matching — but agents are natural Sybil attack vectors (one principal, many agent identities).
+
+### Retroactive Public Goods Funding (RPGF)
+
+Instead of funding projects prospectively (guessing which will succeed), fund them retroactively based on demonstrated impact. Pioneered by Optimism's RetroPGF rounds, where a panel evaluates past contributions to a commons and distributes rewards.
+
+| Property | Assessment |
+|----------|-----------|
+| Preference expression | Medium — panelist voting, not individual donor choice |
+| Gaming resistance | Medium-High — harder to game demonstrated past impact than promised future impact |
+| Coordination gain | Reduces speculative risk; rewards proven value creation |
+| Scale | Tested at \$10-30M per round (Optimism RetroPGF) |
+
+**Key advantage:** Retrospective evaluation has better information than prospective — you can see what actually happened, not just what was promised. This shifts risk from funders to creators (who must work first, get paid later) but improves allocation accuracy.
+
+### Impact Certificates
+
+A person or team doing valuable work receives a "certificate" representing the impact they created. Others can buy the certificate retroactively, effectively rewarding past impact. Certificates can be traded, creating a market for impact.
+
+| Property | Assessment |
+|----------|-----------|
+| Preference expression | High — anyone can buy any certificate at market price |
+| Gaming resistance | Low-Medium — impact is hard to measure and verify |
+| Coordination gain | Creates a market mechanism for valuing public goods |
+| Scale | Experimental (\<\$5M; Manifund impact certificates) |
+
+**Relevance to AI agents:** Impact certificates create a natural interface for cooperative agents — an agent could buy impact certificates on behalf of its principal, effectively investing in public goods with measurable returns.
+
+### CAUMFs (Contribution-Adjusted Utility Maximization Funds)
+
+Proposed by Gooen (2023).[^2] Pool donor resources into a fund that maximizes each donor's individual utility function, weighted by their contribution. The fund manager estimates donor preferences and allocates across a portfolio of interventions.
+
+[^2]: Gooen, O. (2023). ["Contribution-Adjusted Utility Maximization Funds."](https://forum.effectivealtruism.org/posts/Fit37Gs7pwNau7di9/contribution-adjusted-utility-maximization-funds-an-early) Effective Altruism Forum.
+
+| Property | Assessment |
+|----------|-----------|
+| Preference expression | High — each donor's utility function is modeled individually |
+| Gaming resistance | Medium — human fund manager provides judgment |
+| Coordination gain | Theoretical 33%+ improvement from preference-aware pooling |
+| Scale | Untested — proposal stage |
+
+**The preference estimation challenge:** The CAUMF proposal identifies estimating donor utility functions as the largest tractability bottleneck. This is exactly the <EntityLink id="autonomous-cooperative-agents">delegation alignment problem</EntityLink> — an agent (the fund manager) must infer and optimize for diverse, partially-illegible preferences.
+
+**CAUMF-to-cooperate-bot connection:** A <EntityLink id="cooperate-bot">cooperate-bot</EntityLink> is effectively a single-person CAUMF: one principal, one autonomous allocator. Multiple cooperate-bots negotiating bilateral trades could achieve CAUMF-like coordination gains without a central fund manager — but at the cost of multi-agent dynamics problems.
+
+### Dominant Assurance Contracts
+
+Proposed by Tabarrok (1998).[^3] A mechanism for funding public goods where: (a) you pledge to contribute if enough others also pledge (assurance), and (b) the organizer pays you a bonus if the threshold isn't met (dominance). This makes contributing the dominant strategy — you either get the public good funded or you get a bonus.
+
+[^3]: Tabarrok, A. (1998). "The Private Provision of Public Goods via Dominant Assurance Contracts." *Public Choice*, 96(3-4).
+
+| Property | Assessment |
+|----------|-----------|
+| Preference expression | Medium — binary (contribute or not) at a fixed price |
+| Gaming resistance | High — the mechanism is incentive-compatible by design |
+| Coordination gain | Solves the collective action problem for threshold public goods |
+| Scale | Limited real-world testing |
+
+## Comparison
+
+| Mechanism | Preference Expression | Gaming Resistance | Coordination Gain | AI Agent Compatibility |
+|-----------|----------------------|-------------------|-------------------|-----------------------|
+| ROSCAs | Low | High | Medium | Low — requires social bonds |
+| Mutual aid | Low-Medium | Medium | Medium | Low — requires community membership |
+| Quadratic funding | High | Low-Medium | High | Medium — Sybil risk from agents |
+| Retroactive PGF | Medium | Medium-High | High | High — evaluates demonstrated impact |
+| Impact certificates | High | Low-Medium | High | High — market-based, API-friendly |
+| CAUMFs | High | Medium | Very High | High — designed for delegated allocation |
+| Dominant assurance | Medium | High | Medium | High — binary, incentive-compatible |
+
+## Implications for AI-Mediated Cooperation
+
+As <EntityLink id="autonomous-cooperative-agents">autonomous cooperative agents</EntityLink> develop, they will need to interface with cooperative funding mechanisms. Several observations:
+
+**Retroactive funding and impact certificates are most compatible with AI agents.** They evaluate demonstrated impact rather than requiring social context or relationship judgment — which agents are bad at. An agent can buy impact certificates or participate in RPGF rounds without needing to understand relational dynamics.
+
+**Quadratic funding is vulnerable to AI agents.** Sybil attacks (creating fake identities to multiply matching) are already a problem; AI agents make them cheaper and more scalable. QF systems may need stronger identity verification as agents proliferate.
+
+**CAUMFs may be replaced by agent networks.** If cooperate-bots can negotiate bilateral trades, they achieve CAUMF-like coordination gains without a central fund. But this requires solving the multi-agent cooperation problems described in <EntityLink id="multi-agent">multi-agent safety</EntityLink>.
+
+**Traditional cooperative structures are agent-resistant.** ROSCAs and mutual aid societies rely on social bonds and reputation — mechanisms that AI agents cannot credibly participate in. This may be a feature, not a bug: the social enforcement that makes these structures work is precisely what an agent cannot replicate.
+
+## Related Pages
+
+- <EntityLink id="autonomous-cooperative-agents">Autonomous Cooperative Agents</EntityLink> — Agents that cooperate on behalf of humans
+- <EntityLink id="cooperate-bot">Cooperate-Bot</EntityLink> — Personal cooperative agent design proposal
+- <EntityLink id="cooperative-ai">Cooperative AI</EntityLink> — Research on AI cooperation
+- <EntityLink id="coordination-tech">AI Governance Coordination Technologies</EntityLink> — Commitment devices and mechanism design
