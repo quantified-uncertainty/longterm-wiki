@@ -346,6 +346,25 @@ function syncLinks(app: Hono, links: unknown[], replace = false) {
   return postJson(app, "/api/links/sync", { links, replace });
 }
 
+// ---- Response types (mirrors API response shapes for type-safe assertions) ----
+
+interface BacklinkItem {
+  id: string;
+  type: string;
+  title: string;
+  relationship?: string;
+  linkType: string;
+  weight: number;
+}
+
+interface RelatedItem {
+  id: string;
+  type: string;
+  title: string;
+  score: number;
+  label?: string;
+}
+
 // ---- Tests ----
 
 describe("Links API", () => {
@@ -484,7 +503,7 @@ describe("Links API", () => {
       const body = await res.json();
       expect(body.targetId).toBe("ai-safety");
       expect(body.backlinks).toHaveLength(2);
-      expect(body.backlinks.map((b: any) => b.id).sort()).toEqual([
+      expect(body.backlinks.map((b: BacklinkItem) => b.id).sort()).toEqual([
         "anthropic",
         "openai",
       ]);
@@ -587,11 +606,11 @@ describe("Links API", () => {
       // Both A and B should see each other as related
       const resA = await app.request("/api/links/related/a");
       const bodyA = await resA.json();
-      expect(bodyA.related.some((r: any) => r.id === "b")).toBe(true);
+      expect(bodyA.related.some((r: RelatedItem) => r.id === "b")).toBe(true);
 
       const resB = await app.request("/api/links/related/b");
       const bodyB = await resB.json();
-      expect(bodyB.related.some((r: any) => r.id === "a")).toBe(true);
+      expect(bodyB.related.some((r: RelatedItem) => r.id === "a")).toBe(true);
     });
   });
 

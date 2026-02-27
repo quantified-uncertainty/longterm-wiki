@@ -321,8 +321,8 @@ const resourcesApp = new Hono()
     // Full-text search with prefix matching (same pattern as wiki_pages search)
     const prefixQuery = buildPrefixTsquery(q);
 
-    const rows = prefixQuery
-      ? await rawDb.unsafe(
+    const rows: ResourceSearchRow[] = prefixQuery
+      ? await rawDb.unsafe<ResourceSearchRow[]>(
           `SELECT
           id, url, title, type, summary, review, abstract,
           key_points, publication_id, authors, published_date,
@@ -338,7 +338,7 @@ const resourcesApp = new Hono()
       : [];
 
     return c.json({
-      results: (rows as ResourceSearchRow[]).map((r) => ({
+      results: rows.map((r) => ({
         id: r.id,
         url: r.url,
         title: r.title,
@@ -367,6 +367,7 @@ const resourcesApp = new Hono()
 
   .get("/stats", async (c) => {
     const db = getDrizzleDb();
+    const rawDb = getDb();
 
     const [totalResult, citationCountResult, citedPagesResult, byType] =
       await Promise.all([
@@ -389,20 +390,21 @@ const resourcesApp = new Hono()
     const citedPages = Number(citedPagesResult[0].count);
 
     // Extra stats: orphaned, metadata coverage, fetched count
+    // Use raw postgres client for type-parameterized queries (avoids double-cast from db.execute())
     const [orphanedResult, withMetadataResult, fetchedResult] = await Promise.all(
       [
-        db.execute(sql`
+        rawDb<CountRow[]>`
         SELECT count(*) AS c FROM resources r
         LEFT JOIN resource_citations rc ON rc.resource_id = r.id
         WHERE rc.resource_id IS NULL
-      `),
-        db.execute(sql`
+      `,
+        rawDb<CountRow[]>`
         SELECT count(*) AS c FROM resources
         WHERE summary IS NOT NULL OR review IS NOT NULL OR key_points IS NOT NULL
-      `),
-        db.execute(sql`
+      `,
+        rawDb<CountRow[]>`
         SELECT count(*) AS c FROM resources WHERE fetched_at IS NOT NULL
-      `),
+      `,
       ]
     );
 
@@ -413,9 +415,9 @@ const resourcesApp = new Hono()
       byType: Object.fromEntries(
         byType.map((r) => [r.type ?? "unknown", r.count])
       ),
-      orphanedCount: Number((orphanedResult as unknown as CountRow[])[0]?.c ?? 0),
-      withMetadata: Number((withMetadataResult as unknown as CountRow[])[0]?.c ?? 0),
-      fetched: Number((fetchedResult as unknown as CountRow[])[0]?.c ?? 0),
+      orphanedCount: Number(orphanedResult[0]?.c ?? 0),
+      withMetadata: Number(withMetadataResult[0]?.c ?? 0),
+      fetched: Number(fetchedResult[0]?.c ?? 0),
     };
 
     return c.json(result);

@@ -33,6 +33,17 @@ export interface ImproveRunRow {
   costBreakdown: Record<string, number> | null;
 }
 
+/** Narrow unknown jsonb value to Record<string, number> | null at runtime. */
+function toCostBreakdown(value: unknown): Record<string, number> | null {
+  if (value == null || typeof value !== "object" || Array.isArray(value)) return null;
+  const obj = value as Record<string, unknown>;
+  const result: Record<string, number> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (typeof v === "number") result[k] = v;
+  }
+  return Object.keys(result).length > 0 ? result : null;
+}
+
 async function loadRunsFromApi() {
   const result = await fetchDetailed<{
     entries: ArtifactRow[];
@@ -64,7 +75,7 @@ async function loadRunsFromApi() {
         hasCitationAudit: r.citationAudit != null,
         hasSectionDiffs:
           Array.isArray(r.sectionDiffs) && r.sectionDiffs.length > 0,
-        costBreakdown: r.costBreakdown as Record<string, number> | null,
+        costBreakdown: toCostBreakdown(r.costBreakdown),
       })
     ),
   };
