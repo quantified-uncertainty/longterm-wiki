@@ -273,6 +273,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Citation Content", href: "/internal/citation-content" },
         { label: "Hallucination Risk", href: "/internal/hallucination-risk" },
         { label: "Hallucination Evals", href: "/internal/hallucination-evals" },
+        { label: "Claims Quality", href: "/internal/claims-quality" },
       ],
     },
     {
