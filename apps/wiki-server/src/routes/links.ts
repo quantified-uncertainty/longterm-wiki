@@ -64,6 +64,29 @@ const RelatedQuery = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(MAX_RELATED),
 });
 
+// ---- Raw SQL row types ----
+
+interface BacklinkDbRow {
+  source_id: string;
+  relationship: string | null;
+  link_type: string;
+  weight: number;
+  source_title: string | null;
+  source_type: string | null;
+}
+
+interface RelatedDbRow {
+  id: string;
+  raw_score: number;
+  relationship: string | null;
+  relationship_is_reverse: boolean | null;
+  title: string | null;
+  entity_type: string | null;
+  quality: number | null;
+  reader_importance: number | null;
+  score: string;
+}
+
 // ---- POST /sync ----
 
 // Advisory lock key for serializing page_links sync operations.
@@ -148,7 +171,7 @@ const linksApp = new Hono()
     LIMIT ${limit}
   `;
 
-    const backlinks = results.map((r: any) => ({
+    const backlinks = (results as unknown as BacklinkDbRow[]).map((r) => ({
       id: r.source_id,
       type: r.source_type || "concept",
       title: r.source_title || r.source_id,
@@ -238,7 +261,7 @@ const linksApp = new Hono()
 
     // Type-diverse selection: guarantee MIN_PER_TYPE from each entity type,
     // then fill remaining slots with highest-scoring entries.
-    const scored = results.map((r: any) => ({
+    const scored = (results as unknown as RelatedDbRow[]).map((r) => ({
       id: r.id as string,
       type: (r.entity_type as string) || "concept",
       title: (r.title as string) || r.id,

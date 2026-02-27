@@ -21,6 +21,22 @@ import {
   TS_HEADLINE_OPTIONS,
 } from "../search-utils.js";
 
+// ---- Raw SQL row types ----
+
+/** Row shape returned by the FTS and trigram search queries. */
+interface PageSearchRow {
+  id: string;
+  numeric_id: string | null;
+  title: string;
+  description: string | null;
+  entity_type: string | null;
+  category: string | null;
+  reader_importance: number | null;
+  quality: number | null;
+  rank: number;
+  snippet: string | null;
+}
+
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
@@ -57,10 +73,10 @@ const pagesApp = new Hono()
     // Weighted ranking: title (A=1.0), description (B=0.4), llm_summary (C=0.2), tags+entityType (D=0.1).
     const prefixQuery = buildPrefixTsquery(q);
 
-    let results: any[] = [];
+    let results: PageSearchRow[] = [];
 
     if (prefixQuery) {
-      results = await rawDb.unsafe(
+      results = (await rawDb.unsafe(
         `SELECT
         id, numeric_id, title, description, entity_type, category,
         reader_importance, quality,
@@ -74,7 +90,7 @@ const pagesApp = new Hono()
       ORDER BY rank DESC, reader_importance DESC NULLS LAST
       LIMIT $2`,
         [prefixQuery, limit],
-      );
+      )) as unknown as PageSearchRow[];
     }
 
     // Phase 2: If FTS returned few results, fall back to pg_trgm similarity
@@ -92,13 +108,13 @@ const pagesApp = new Hono()
         AND id NOT IN (SELECT unnest($3::text[]))
       ORDER BY similarity(title, $1) DESC, reader_importance DESC NULLS LAST
       LIMIT $2`,
-        [q, limit - results.length, results.map((r: any) => r.id)],
+        [q, limit - results.length, results.map((r) => r.id)],
       );
-      results = [...results, ...trigramResults];
+      results = [...results, ...(trigramResults as unknown as PageSearchRow[])];
     }
 
     return c.json({
-      results: results.map((r: any) => ({
+      results: results.map((r) => ({
         id: r.id,
         numericId: r.numeric_id,
         title: r.title,
@@ -107,7 +123,7 @@ const pagesApp = new Hono()
         category: r.category,
         readerImportance: r.reader_importance,
         quality: r.quality,
-        score: parseFloat(r.rank),
+        score: parseFloat(String(r.rank)),
         snippet: r.snippet || null,
       })),
       query: q,

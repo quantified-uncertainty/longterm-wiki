@@ -19,12 +19,10 @@ import {
   MarkAccuracyBatchSchema as SharedMarkAccuracyBatchSchema,
   UpsertCitationContentSchema,
   CITATION_CONTENT_PREVIEW_MAX,
-  type CitationHealthResult,
   LinkCitationClaimSchema,
   LinkCitationsClaimsBatchSchema,
   PropagateFromClaimsSchema,
 } from "../api-types.js";
-
 // ---- Constants ----
 
 const BROKEN_SCORE_THRESHOLD = 0.5;
@@ -111,7 +109,7 @@ function computePageHealth(
     accuracyVerdict: string | null;
     accuracyScore: number | null;
   }>
-): CitationHealthResult {
+) {
   let withQuotes = 0;
   let verified = 0;
   let accuracyChecked = 0;

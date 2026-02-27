@@ -7,6 +7,40 @@ import {
   TRIGRAM_SIMILARITY_THRESHOLD,
 } from "../search-utils.js";
 
+// ---- Row types returned by raw SQL queries ----
+
+/** Row shape from the main explore data query (both FTS and trigram paths). */
+interface ExploreDataRow {
+  id: string;
+  numeric_id: string | null;
+  title: string;
+  entity_type: string | null;
+  content_format: string | null;
+  category: string | null;
+  description: string | null;
+  page_tags: string | null;
+  page_clusters: string[] | null;
+  word_count: number | null;
+  quality: number | null;
+  reader_importance: number | null;
+  research_importance: number | null;
+  tactical_value: number | null;
+  backlink_count: number | null;
+  risk_category: string | null;
+  last_updated: string | null;
+  date_created: string | null;
+  recommended_score: number | null;
+  entity_tags: string[] | null;
+  entity_clusters: string[] | null;
+  search_rank?: number;
+}
+
+/** Row shape from faceted count queries (cluster, category, entityType, riskCategory). */
+interface FacetCountRow {
+  val: string;
+  cnt: string;
+}
+
 // ---- Query Schema ----
 
 const ExploreQuery = z.object({
@@ -361,7 +395,7 @@ const exploreApp = new Hono()
     }
 
     // Transform rows to ExploreItem shape
-    const items = rows.map((r: any) => {
+    const items = (rows as unknown as ExploreDataRow[]).map((r) => {
       const entityTags = Array.isArray(r.entity_tags) ? r.entity_tags : [];
       const pageTags = parseTags(r.page_tags);
       const tags = entityTags.length > 0 ? entityTags : pageTags;
@@ -394,8 +428,10 @@ const exploreApp = new Hono()
       };
     });
 
-    const toCountMap = (rows: any[]) =>
-      Object.fromEntries(rows.map((r: any) => [r.val, parseInt(r.cnt, 10)]));
+    const toCountMap = (rows: unknown[]) =>
+      Object.fromEntries(
+        (rows as FacetCountRow[]).map((r) => [r.val, parseInt(r.cnt, 10)])
+      );
 
     return c.json({
       items,

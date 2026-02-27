@@ -22,7 +22,7 @@ export { apiOk, apiErr, unwrap } from './client.ts';
 
 export type { EditLogApiEntry } from './edit-logs.ts';
 export type { UpsertCitationQuoteItem, AccuracyVerdict, MarkAccuracyItem, AccuracyDashboardData } from './citations.ts';
-export type { SessionApiEntry, SessionEntry } from './sessions.ts';
+export type { SessionApiEntry, SessionEntry, SessionPageChangesResult } from './sessions.ts';
 export type {
   AutoUpdateRunResultEntry,
   RecordAutoUpdateRunInput,
@@ -30,7 +30,7 @@ export type {
   AutoUpdateNewsItem,
   AutoUpdateNewsItemEntry,
 } from './auto-update.ts';
-export type { RiskSnapshot } from './risk.ts';
+export type { RiskSnapshot, RiskLatestResult } from './risk.ts';
 export type { UpsertSummaryItem } from './summaries.ts';
 export type { InsertClaimItem } from './claims.ts';
 export type { PageLinkItem } from './links.ts';
@@ -132,6 +132,19 @@ export {
 
 // Resources
 export { upsertResource } from './resources.ts';
+
+// References
+export {
+  getPageReferences,
+  createClaimReference,
+  createCitation,
+  createCitationsBatch,
+} from './references.ts';
+export type {
+  GetPageReferencesResult,
+  ClaimPageReferenceRow,
+  PageCitationRow,
+} from './references.ts';
 
 
 // Entities
