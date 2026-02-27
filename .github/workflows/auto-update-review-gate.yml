@@ -142,22 +142,31 @@ jobs:
             echo "::warning::$BROKEN page(s) have broken citation URLs"
           fi
 
+      - name: Content quality checks (truncation + footnotes)
+        id: content_checks
+        run: |
+          RESULT=$(pnpm crux auto-update content-checks --diff --json 2>&1) || true
+          PASSED=$(echo "$RESULT" | jq -r '.passed // true')
+          echo "content_passed=$PASSED" >> $GITHUB_OUTPUT
+
       - name: Gate decision
         run: |
-          PASSED="${{ steps.audit.outputs.audit_passed }}"
+          AUDIT_PASSED="${{ steps.audit.outputs.audit_passed }}"
           INACCURATE="${{ steps.audit.outputs.total_inaccurate }}"
           URL_BROKEN="${{ steps.url_verify.outputs.url_broken }}"
+          CONTENT_PASSED="${{ steps.content_checks.outputs.content_passed }}"
 
           echo ""
           echo "=== Audit Gate Decision ==="
           echo "  Inaccurate: $INACCURATE"
           echo "  Unsupported: ${{ steps.audit.outputs.total_unsupported }}"
           echo "  Broken URLs: $URL_BROKEN"
+          echo "  Content checks: $CONTENT_PASSED"
           echo ""
 
           FAILED=false
 
-          if [ "$PASSED" != "true" ]; then
+          if [ "$AUDIT_PASSED" != "true" ]; then
             echo "FAIL: $INACCURATE inaccurate citation(s) remain."
             FAILED=true
           fi
@@ -167,10 +176,15 @@ jobs:
             FAILED=true
           fi
 
+          if [ "$CONTENT_PASSED" != "true" ]; then
+            echo "FAIL: Content quality issues (truncation or dangling footnotes)."
+            FAILED=true
+          fi
+
           if [ "$FAILED" = "true" ]; then
             echo ""
             echo "Audit gate FAILED."
             exit 1
           fi
 
-          echo "Audit gate PASSED — no inaccurate citations or broken URLs found."
+          echo "Audit gate PASSED."
