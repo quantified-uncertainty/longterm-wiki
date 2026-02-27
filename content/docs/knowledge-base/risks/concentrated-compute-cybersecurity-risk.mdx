@@ -33,18 +33,18 @@ import {DataInfoBox, EntityLink} from '@components/wiki';
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Infrastructure value at risk** | \$700B+ deployed in 2026 alone, \$5T cumulative by 2030 | Combined capex across Amazon, Alphabet, Microsoft, Meta, Oracle, xAI[^1] |
-| **Hardware monoculture** | NVIDIA holds 90-95% of AI accelerator market | Single supply chain vulnerability affects virtually all frontier AI[^2] |
-| **Physical concentration** | 50% of US data centers in two regions | Northern Virginia and Northern California host most AI training clusters[^3] |
-| **Software monoculture** | CUDA + PyTorch dominate AI training stack | Near-universal dependency creates correlated failure modes[^4] |
-| **Known critical vulnerability** | CVSS 9.0 bug affected all major cloud providers simultaneously | NVIDIA Container Toolkit CVE-2025-23266[^5] |
-| **Regulatory gap** | No mandatory cybersecurity standards for AI compute infrastructure | Unlike energy (NERC CIP) or finance (PCI DSS), AI infrastructure is unregulated[^6] |
+| **Infrastructure value at risk** | \$700B+ deployed in 2026 alone, \$5T cumulative by 2030 | Combined capex across Amazon, Alphabet, Microsoft, Meta, Oracle, xAI[^rc-73bb] |
+| **Hardware monoculture** | NVIDIA holds 90-95% of AI accelerator market | Single supply chain vulnerability affects virtually all frontier AI[^rc-d19c] |
+| **Physical concentration** | 50% of US data centers in two regions | Northern Virginia and Northern California host most AI training clusters[^rc-18c7] |
+| **Software monoculture** | CUDA + PyTorch dominate AI training stack | Near-universal dependency creates correlated failure modes[^rc-4dbe] |
+| **Known critical vulnerability** | CVSS 9.0 bug affected all major cloud providers simultaneously | NVIDIA Container Toolkit CVE-2025-23266[^rc-5f2c] |
+| **Regulatory gap** | No mandatory cybersecurity standards for AI compute infrastructure | Unlike energy (NERC CIP) or finance (PCI DSS), AI infrastructure is unregulated[^rc-dbba] |
 
 ## Overview
 
-As global AI infrastructure spending reaches \$700B+ in 2026 across just 5-6 US companies, a novel and underexplored risk has emerged: the cybersecurity implications of extreme compute concentration.[^1] The same dynamics that make <EntityLink id="compute-concentration">compute concentration</EntityLink> a structural risk for power and governance also create an unprecedented cybersecurity attack surface.
+As global AI infrastructure spending reaches \$700B+ in 2026 across just 5-6 US companies, a novel and underexplored risk has emerged: the cybersecurity implications of extreme compute concentration.[^rc-73bb] The same dynamics that make <EntityLink id="compute-concentration">compute concentration</EntityLink> a structural risk for power and governance also create an unprecedented cybersecurity attack surface.
 
-The core problem is threefold. First, nearly all frontier AI training runs on NVIDIA hardware using NVIDIA's proprietary CUDA software — a monoculture that means a single vulnerability can affect all major AI providers simultaneously.[^2] Second, the physical infrastructure is concentrated in a small number of facilities, making it vulnerable to targeted attacks, natural disasters, or power grid failures.[^3] Third, the enormous value concentrated in these systems — model weights worth billions in R\&D, training data of immense strategic value, and compute that could be weaponized — makes them attractive targets for nation-state actors and sophisticated criminal organizations.
+The core problem is threefold. First, nearly all frontier AI training runs on NVIDIA hardware using NVIDIA's proprietary CUDA software — a monoculture that means a single vulnerability can affect all major AI providers simultaneously.[^rc-d19c] Second, the physical infrastructure is concentrated in a small number of facilities, making it vulnerable to targeted attacks, natural disasters, or power grid failures.[^rc-18c7] Third, the enormous value concentrated in these systems — model weights worth billions in R\&D, training data of immense strategic value, and compute that could be weaponized — makes them attractive targets for nation-state actors and sophisticated criminal organizations.
 
 This page examines a risk that sits at the intersection of <EntityLink id="compute-concentration">compute concentration</EntityLink>, <EntityLink id="concentration-of-power">concentration of power</EntityLink>, and emerging threats to AI infrastructure security. The question raised in public discourse — "If a bad actor could somehow hack a decent percentage of this compute and use it for nefarious ends, that could be really catastrophic" — deserves rigorous analysis.
 
@@ -52,11 +52,11 @@ This page examines a risk that sits at the intersection of <EntityLink id="compu
 
 ## Hardware Monoculture and Correlated Vulnerability
 
-The most distinctive cybersecurity risk of concentrated AI compute is the near-total hardware monoculture. <EntityLink id="nvidia">NVIDIA</EntityLink> commands 90-95% of the AI accelerator market,[^2] and virtually all frontier AI training uses NVIDIA's proprietary CUDA software ecosystem.[^4] This creates a risk profile analogous to agricultural monoculture: extraordinary productivity under normal conditions, but catastrophic vulnerability to any pathogen — or, in this case, any zero-day exploit — that targets the dominant platform.
+The most distinctive cybersecurity risk of concentrated AI compute is the near-total hardware monoculture. <EntityLink id="nvidia">NVIDIA</EntityLink> commands 90-95% of the AI accelerator market,[^rc-d19c] and virtually all frontier AI training uses NVIDIA's proprietary CUDA software ecosystem.[^rc-4dbe] This creates a risk profile analogous to agricultural monoculture: extraordinary productivity under normal conditions, but catastrophic vulnerability to any pathogen — or, in this case, any zero-day exploit — that targets the dominant platform.
 
 ### The NVIDIA Container Toolkit Vulnerability
 
-This risk is not theoretical. In 2025, a critical vulnerability in the NVIDIA Container Toolkit (CVE-2025-23266, CVSS 9.0) was discovered that affected all major cloud providers simultaneously — AWS, Azure, Google Cloud, Meta, Oracle, and xAI all use NVIDIA GPUs in their AI training clusters.[^5] A CVSS score of 9.0 indicates a critical vulnerability that can be exploited remotely with high impact on confidentiality, integrity, and availability.
+This risk is not theoretical. In 2025, a critical vulnerability in the NVIDIA Container Toolkit (CVE-2025-23266, CVSS 9.0) was discovered that affected all major cloud providers simultaneously — AWS, Azure, Google Cloud, Meta, Oracle, and xAI all use NVIDIA GPUs in their AI training clusters.[^rc-5f2c] A CVSS score of 9.0 indicates a critical vulnerability that can be exploited remotely with high impact on confidentiality, integrity, and availability.
 
 Because every major AI provider depends on the same NVIDIA hardware and software stack, a single vulnerability in any layer — GPU firmware, CUDA drivers, container runtime, or management software — creates correlated exposure across the entire frontier AI ecosystem. There is no hardware diversity to provide resilience.
 
@@ -71,7 +71,7 @@ The monoculture extends beyond hardware. The AI training software stack has conv
 | **Training framework** | PyTorch | ≈80% of research, ~60% of production | JAX, TensorFlow — significant but minority |
 | **Container runtime** | Docker/containerd with NVIDIA toolkit | Near-universal | Limited alternatives for GPU workloads |
 
-A supply chain attack on any of these layers could compromise training runs across all major labs. The SolarWinds attack (2020) demonstrated how compromising a single widely-used software vendor can affect thousands of organizations simultaneously.[^7] The xz utils backdoor attempt (2024) showed that even open-source dependencies can be targeted by sophisticated, patient adversaries.[^8] The AI training stack presents similar — and in some ways larger — attack surfaces.
+A supply chain attack on any of these layers could compromise training runs across all major labs. The SolarWinds attack (2020) demonstrated how compromising a single widely-used software vendor can affect thousands of organizations simultaneously.[^rc-e668] The xz utils backdoor attempt (2024) showed that even open-source dependencies can be targeted by sophisticated, patient adversaries.[^rc-4062] The AI training stack presents similar — and in some ways larger — attack surfaces.
 
 ---
 
@@ -79,13 +79,13 @@ A supply chain attack on any of these layers could compromise training runs acro
 
 ### Geographic Clustering
 
-AI training infrastructure is physically concentrated in ways that amplify cybersecurity risk. An estimated 50% of US data centers are located in just two regions: Northern Virginia and Northern California.[^3] While cloud providers operate facilities in dozens of regions globally, frontier AI training clusters — which require massive power, cooling, and high-bandwidth interconnects — are concentrated in fewer locations.
+AI training infrastructure is physically concentrated in ways that amplify cybersecurity risk. An estimated 50% of US data centers are located in just two regions: Northern Virginia and Northern California.[^rc-18c7] While cloud providers operate facilities in dozens of regions globally, frontier AI training clusters — which require massive power, cooling, and high-bandwidth interconnects — are concentrated in fewer locations.
 
-The most extreme example is <EntityLink id="xai">xAI's</EntityLink> Colossus facility in Memphis, Tennessee, which houses 555,000 H200 GPUs representing approximately \$18B in hardware in a single location.[^9] A physical attack, natural disaster, or sustained power disruption at this facility would eliminate a meaningful fraction of global frontier AI training capacity.
+The most extreme example is <EntityLink id="xai">xAI's</EntityLink> Colossus facility in Memphis, Tennessee, which houses 555,000 H200 GPUs representing approximately \$18B in hardware in a single location.[^rc-94d2] A physical attack, natural disaster, or sustained power disruption at this facility would eliminate a meaningful fraction of global frontier AI training capacity.
 
 ### Power Grid Dependencies
 
-Large AI training clusters require hundreds of megawatts of power. The <EntityLink id="projecting-compute-spending">projected incremental power demand</EntityLink> of 15-20 GW in 2026 alone[^10] creates dependencies on specific power grid infrastructure. A targeted attack on power substations serving major data center clusters — a threat that has materialized in physical attacks on US power infrastructure in recent years — could disable AI training capacity without directly breaching any network security.
+Large AI training clusters require hundreds of megawatts of power. The <EntityLink id="projecting-compute-spending">projected incremental power demand</EntityLink> of 15-20 GW in 2026 alone[^rc-8d9b] creates dependencies on specific power grid infrastructure. A targeted attack on power substations serving major data center clusters — a threat that has materialized in physical attacks on US power infrastructure in recent years — could disable AI training capacity without directly breaching any network security.
 
 ---
 
@@ -104,11 +104,11 @@ An attacker gaining access to AI training clusters could pursue several objectiv
 
 The concentration of AI compute creates a unique risk: if a sophisticated actor could commandeer even a fraction of the \$700B in deployed infrastructure, the resulting compute could enable capabilities far beyond what any individual attacker could build. This includes training dangerous AI systems at scale, breaking cryptographic systems, conducting automated vulnerability discovery across the internet, or running influence operations that exploit AI capabilities.
 
-The recursive dimension is particularly concerning: as AI systems become more capable at finding and exploiting software vulnerabilities, a partially compromised AI infrastructure could theoretically be used to more effectively compromise the rest — creating a positive feedback loop between capability and access.[^11]
+The recursive dimension is particularly concerning: as AI systems become more capable at finding and exploiting software vulnerabilities, a partially compromised AI infrastructure could theoretically be used to more effectively compromise the rest — creating a positive feedback loop between capability and access.[^rc-6bff]
 
 ### Insider Threats
 
-With only 5-6 organizations controlling frontier compute, and given the extreme talent concentration in AI (the top 3 labs employ 40-50% of the top 100 AI researchers[^12]), compromising a small number of insiders could provide access to an outsized share of global AI infrastructure. Nation-state intelligence services have demonstrated sustained ability to recruit insiders at technology companies, and the concentration of AI talent creates both high-value targets and points of leverage.
+With only 5-6 organizations controlling frontier compute, and given the extreme talent concentration in AI (the top 3 labs employ 40-50% of the top 100 AI researchers[^rc-7ec0]), compromising a small number of insiders could provide access to an outsized share of global AI infrastructure. Nation-state intelligence services have demonstrated sustained ability to recruit insiders at technology companies, and the concentration of AI talent creates both high-value targets and points of leverage.
 
 ---
 
@@ -124,13 +124,13 @@ AI compute infrastructure is arguably becoming as critical as energy, financial,
 | **Nuclear facilities** | NRC regulations | Yes (with physical security) | Yes (mandatory) | IAEA oversight |
 | **AI compute infrastructure** | None specific | No | No | None |
 
-The 2016 Bangladesh Bank heist, in which attackers stole \$81M through the SWIFT system, demonstrated vulnerabilities in concentrated financial infrastructure.[^13] The 2021 Colonial Pipeline ransomware attack showed how a single cyberattack on critical infrastructure can have cascading real-world effects.[^14] AI compute infrastructure presents comparable or greater systemic risk but operates under significantly less regulatory oversight.
+The 2016 Bangladesh Bank heist, in which attackers stole \$81M through the SWIFT system, demonstrated vulnerabilities in concentrated financial infrastructure.[^rc-5126] The 2021 Colonial Pipeline ransomware attack showed how a single cyberattack on critical infrastructure can have cascading real-world effects.[^rc-5dcb] AI compute infrastructure presents comparable or greater systemic risk but operates under significantly less regulatory oversight.
 
 ---
 
 ## The CrowdStrike Precedent
 
-The July 2024 CrowdStrike incident provides a vivid demonstration of monoculture risk in technology infrastructure. A single faulty software update crashed an estimated 8.5 million Windows machines worldwide, disrupting airlines, hospitals, banks, and government agencies.[^15] The incident caused an estimated \$5.4B in losses among Fortune 500 companies alone.
+The July 2024 CrowdStrike incident provides a vivid demonstration of monoculture risk in technology infrastructure. A single faulty software update crashed an estimated 8.5 million Windows machines worldwide, disrupting airlines, hospitals, banks, and government agencies.[^rc-7432] The incident caused an estimated \$5.4B in losses among Fortune 500 companies alone.
 
 The AI compute ecosystem has analogous monoculture characteristics — NVIDIA's dominance mirrors the role of CrowdStrike in endpoint security or Windows in operating systems. A comparable failure in NVIDIA's GPU driver or CUDA runtime during a critical training run could corrupt model training across multiple labs simultaneously, waste billions in compute, and potentially produce subtly flawed models if the corruption went undetected.
 
@@ -162,7 +162,7 @@ The gap between the strategic importance of AI compute infrastructure and the re
 
 Several policy proposals have emerged to address this gap:
 
-- **Critical infrastructure designation**: Classifying frontier AI compute as critical national infrastructure, subject to mandatory security standards analogous to NERC CIP for energy[^16]
+- **Critical infrastructure designation**: Classifying frontier AI compute as critical national infrastructure, subject to mandatory security standards analogous to NERC CIP for energy[^rc-5ec6]
 - **Supply chain diversity mandates**: Requiring AI infrastructure operators to maintain some hardware/software diversity to reduce correlated failure risk
 - **Incident reporting**: Mandatory reporting of security incidents involving AI training infrastructure, similar to breach notification laws in other sectors
 - **Secure computation research**: Funding research into secure multi-party computation and federated training approaches that could reduce the security impact of compute concentration
@@ -181,35 +181,3 @@ Several policy proposals have emerged to address this gap:
 ---
 
 ## Sources
-
-[^1]: Analysis from <EntityLink id="projecting-compute-spending">Projecting Compute Spending</EntityLink> wiki page. Company figures: Amazon \$200B, Alphabet \$175-185B, Microsoft \$145-150B, Meta \$115-135B, Oracle \$50B, xAI \$30B+ for 2026.
-
-[^2]: NVIDIA earnings reports (FY2025) showing 90%+ market share in AI accelerators, with \$130.5B revenue (114% YoY growth) driven almost entirely by data center GPU sales.
-
-[^3]: Data Center Frontier, "Northern Virginia and Northern California Data Center Concentration" — market analysis showing approximately 50% of US data center capacity in these two regions.
-
-[^4]: CUDA ecosystem dominance documented across industry surveys. PyTorch annual survey (2025) showing ~80% usage in AI research.
-
-[^5]: NVIDIA Security Bulletin, CVE-2025-23266 — NVIDIA Container Toolkit vulnerability with CVSS 9.0 score affecting container escape and host access.
-
-[^6]: NERC CIP Standards for critical energy infrastructure cybersecurity; PCI DSS for payment card industry. No equivalent framework exists for AI compute infrastructure.
-
-[^7]: SolarWinds Attack Post-Mortem (2020-2021) — supply chain compromise affected ~18,000 organizations including US government agencies.
-
-[^8]: xz Utils Backdoor Analysis (March 2024) — sophisticated multi-year social engineering attack targeting open-source compression library used in SSH.
-
-[^9]: xAI Colossus facility details — 555,000 H200 GPUs deployed in Memphis, Tennessee. Hardware value estimated at approximately \$18B based on GPU pricing.
-
-[^10]: Power demand projections from <EntityLink id="projecting-compute-spending">Projecting Compute Spending</EntityLink> analysis — 15-20 GW incremental demand for 2026.
-
-[^11]: Theoretical analysis of recursive AI vulnerability discovery. See general discussion in AI safety literature on recursive self-improvement dynamics applied to cybersecurity.
-
-[^12]: Talent concentration data from <EntityLink id="winner-take-all-concentration">Winner-Take-All Concentration</EntityLink> model — top 3 labs (OpenAI, DeepMind, Anthropic) employ 40-50% of top 100 AI researchers.
-
-[^13]: Bangladesh Bank SWIFT Heist (February 2016) — attackers exploited SWIFT system to steal \$81M, demonstrating vulnerability of concentrated financial infrastructure.
-
-[^14]: Colonial Pipeline Ransomware Attack (May 2021) — single ransomware incident disrupted fuel supply across eastern United States.
-
-[^15]: CrowdStrike Incident (July 2024) — faulty Falcon sensor update crashed approximately 8.5 million Windows machines globally, causing estimated \$5.4B in Fortune 500 losses.
-
-[^16]: Various policy proposals from think tanks including the Center for a New American Security, Brookings Institution, and RAND Corporation regarding AI infrastructure security governance.

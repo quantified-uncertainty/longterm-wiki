@@ -33,17 +33,17 @@ Nanda maintains an active presence in the AI alignment research community throug
 
 ### TransformerLens Library
 
-Nanda created TransformerLens, an open-source Python library for <EntityLink id="interpretability">interpretability</EntityLink> research on transformer models.[^1] The library provides:
+Nanda created TransformerLens, an open-source Python library for <EntityLink id="interpretability">interpretability</EntityLink> research on transformer models.[^rc-8d4f] The library provides:
 - Programmatic access to model activations at each layer
 - Hook functions for intervention experiments
 - Integration with pretrained models from Hugging Face
 - Visualization utilities for attention patterns
 
-The library is hosted on GitHub and documented at transformerlensorg.github.io/TransformerLens.[^2]
+The library is hosted on GitHub and documented at transformerlensorg.github.io/TransformerLens.[^rc-d2b5]
 
 ### Transformer Circuits Research
 
-Nanda co-authored "A Mathematical Framework for Transformer Circuits" (2021), which analyzed how transformer language models implement interpretable algorithms.[^3] The research:
+Nanda co-authored "A Mathematical Framework for Transformer Circuits" (2021), which analyzed how transformer language models implement interpretable algorithms.[^rc-f19d] The research:
 - Identified "induction heads" as circuits that enable in-context learning
 - Demonstrated that attention mechanisms compose to perform multi-step reasoning
 - Provided mathematical descriptions of how models track positional and semantic information
@@ -59,7 +59,7 @@ Nanda has published work on:
 
 ## Educational Content
 
-Nanda publishes interpretability tutorials and explanations on his blog at neelnanda.io and through video content. His "200 Concrete Open Problems in Mechanistic Interpretability" post outlines research directions for the field.[^4]
+Nanda publishes interpretability tutorials and explanations on his blog at neelnanda.io and through video content. His "200 Concrete Open Problems in Mechanistic Interpretability" post outlines research directions for the field.[^rc-e79d]
 
 He has written guides for newcomers to interpretability research, including walkthroughs of TransformerLens usage and explanations of foundational papers. These materials are distributed as blog posts, Jupyter notebooks, and video tutorials.
 
@@ -71,7 +71,7 @@ Nanda's work emphasizes:
 - **Open-source tooling**: Building software infrastructure to enable interpretability experiments
 - **Reproducible examples**: Providing code and notebooks that others can run and modify
 
-His stated view is that understanding neural network internals is necessary for evaluating AI safety properties, though he acknowledges that current interpretability techniques may not directly transfer to more capable future systems.[^5]
+His stated view is that understanding neural network internals is necessary for evaluating AI safety properties, though he acknowledges that current interpretability techniques may not directly transfer to more capable future systems.[^rc-e3df]
 
 ## Perspectives on Interpretability and Alignment
 
@@ -82,7 +82,7 @@ In posts and presentations, Nanda has outlined reasons why <EntityLink id="mech-
 3. **Deception detection**: Searching for representations that indicate models are optimizing for objectives different from their training signal
 4. **Verification**: Checking whether specific safety properties hold in a model's learned algorithms
 
-He notes that these applications remain speculative and that the field is in early stages of developing techniques that scale to frontier models.[^6]
+He notes that these applications remain speculative and that the field is in early stages of developing techniques that scale to frontier models.[^rc-57af]
 
 ## Current Work
 
@@ -90,7 +90,7 @@ At <EntityLink id="deepmind">Google DeepMind</EntityLink>, Nanda works on the al
 
 ## Limitations and Open Questions
 
-Nanda has identified challenges for mechanistic interpretability research:[^7]
+Nanda has identified challenges for mechanistic interpretability research:[^rc-4642]
 - Current techniques are labor-intensive and may not scale to models with hundreds of billions of parameters
 - Many discovered circuits are descriptive rather than predictive, explaining behavior post-hoc without enabling intervention
 - It remains unclear whether interpretability of current models will provide insights applicable to future AI systems with different architectures or training methods
@@ -103,11 +103,3 @@ Critical perspectives on interpretability research more broadly include question
 - **TransformerLens documentation**: transformerlensorg.github.io/TransformerLens
 - **GitHub**: github.com/neelnanda-io (code repositories)
 - **LessWrong posts**: lesswrong.com/users/neel-nanda-1 (research updates and explanations)
-
-[^1]: [TransformerLens GitHub repository](https://github.com/neelnanda-io/TransformerLens)
-[^2]: [TransformerLens documentation homepage](https://transformerlensorg.github.io/TransformerLens/)
-[^3]: [A Mathematical Framework for Transformer Circuits (Elhage, N., Nanda, N., et al. (2021), Transformer Circuits Thread)](https://transformer-circuits.pub/2021/framework/index.html)
-[^4]: [200 Concrete Open Problems in Mechanistic Interpretability (Nanda, N. (2022), LessWrong)](https://www.lesswrong.com/posts/LbrPTJ4fmABEdEnLf/200-concrete-open-problems-in-mechanistic-interpretability)
-[^5]: Based on statements in Nanda's blog posts discussing the limitations of current interpretability work
-[^6]: Nanda's presentations on interpretability and alignment discuss these potential applications as research directions rather than demonstrated capabilities
-[^7]: Discussed in "200 Concrete Open Problems in Mechanistic Interpretability" and related posts

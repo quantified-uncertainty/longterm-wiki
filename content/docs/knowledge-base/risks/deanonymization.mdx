@@ -41,7 +41,7 @@ This page covers **deanonymization** as a specific AI risk. For the broader AI i
 
 AI-powered deanonymization represents a fundamental shift in privacy risk: the ability of AI systems to identify individuals, reveal personal attributes, and link pseudonymous identities using publicly available data that was never intended to be identifying. Unlike <EntityLink id="E292" name="surveillance">mass surveillance</EntityLink> (which requires infrastructure and state authority), deanonymization is a capability that emerges from combining publicly available data with powerful pattern recognition — and is available to anyone with access to AI tools.
 
-The core threat is the "mosaic effect" or "aggregation problem": information that is individually harmless becomes collectively identifying when AI can aggregate and analyze it at scale. Each public data point — a forum post, a purchase record, a location check-in — is a small tile, but AI assembles them into a detailed portrait. A 2019 study in Nature Communications demonstrated that 99.98% of Americans could be correctly re-identified in any dataset using just 15 demographic attributes.[^1] The concept of "practical obscurity" — that information might be technically public but effectively private because it is difficult to find — is rapidly eroding as AI search and synthesis capabilities improve.
+The core threat is the "mosaic effect" or "aggregation problem": information that is individually harmless becomes collectively identifying when AI can aggregate and analyze it at scale. Each public data point — a forum post, a purchase record, a location check-in — is a small tile, but AI assembles them into a detailed portrait. A 2019 study in Nature Communications demonstrated that 99.98% of Americans could be correctly re-identified in any dataset using just 15 demographic attributes.[^rc-813b] The concept of "practical obscurity" — that information might be technically public but effectively private because it is difficult to find — is rapidly eroding as AI search and synthesis capabilities improve.
 
 This risk is distinct from state surveillance in several important ways: it is decentralized (anyone can attempt it), it operates on data that already exists in the public domain, and it is extremely difficult to govern without restricting legitimate research and journalism. The privacy implications are profound: sustained pseudonymity on the internet may become extremely difficult for most users within the next few years.
 
@@ -67,16 +67,16 @@ Large language models can infer sensitive personal attributes from writing sampl
 | **Stylometry research** | Writing style analysis linking accounts across platforms | 80-95% cross-platform | Pseudonym separation is fragile |
 | **Demographic inference** | Vocabulary and syntax patterns revealing age, education, location | 70-90% depending on attribute | Even short writing samples are revealing |
 
-The Staab et al. study is particularly notable because it demonstrated that LLMs can perform inference attacks at scale for approximately \$0.15 per profile — making mass deanonymization economically feasible.[^2]
+The Staab et al. study is particularly notable because it demonstrated that LLMs can perform inference attacks at scale for approximately \$0.15 per profile — making mass deanonymization economically feasible.[^rc-9622]
 
 ### Behavioral Fingerprinting
 
 Online behavior creates unique signatures that can identify individuals even without explicit identifiers:
 
-- **Browsing patterns**: 99%+ of users can be uniquely identified from browsing history alone (Olejnik et al., 2012)[^3]
+- **Browsing patterns**: 99%+ of users can be uniquely identified from browsing history alone (Olejnik et al., 2012)[^rc-2341]
 - **Temporal patterns**: Posting times, interaction cadences, and activity rhythms serve as behavioral biometrics
 - **Purchase behavior**: Shopping patterns create identifiable signatures across platforms
-- **Mobility data**: Just 4 spatiotemporal data points uniquely identify 95% of individuals in a 1.5 million person dataset (de Montjoye et al., 2013)[^4]
+- **Mobility data**: Just 4 spatiotemporal data points uniquely identify 95% of individuals in a 1.5 million person dataset (de Montjoye et al., 2013)[^rc-f790]
 
 ### Cross-Platform Identity Linking
 
@@ -90,7 +90,7 @@ AI can match accounts across platforms using multiple signals:
 | **Temporal correlation** | Posting times correlated across platforms | Moderate — requires deliberate timing variation |
 | **Content overlap** | Shared interests, topics, and opinions | Very high — requires maintaining separate personas |
 
-Social graph deanonymization was demonstrated by Narayanan and Shmatikov (2009), who showed that knowing a few connections in an anonymized network can identify individuals with high confidence.[^5]
+Social graph deanonymization was demonstrated by Narayanan and Shmatikov (2009), who showed that knowing a few connections in an anonymized network can identify individuals with high confidence.[^rc-4e7d]
 
 ### Re-identification of "Anonymized" Datasets
 
@@ -101,14 +101,14 @@ Datasets released as "anonymized" have repeatedly been re-identified:
 | **Netflix Prize** (2006) | Cross-referencing with IMDb ratings | Named users identified from "anonymous" ratings (Narayanan & Shmatikov, 2008) |
 | **NYC Taxi Data** (2013) | Matching trip data with known locations | Specific drivers and passengers identified |
 | **AOL Search Queries** (2006) | Pattern analysis of search histories | Individual users identified, including one planning a crime |
-| **Medical Records** | ZIP code + birthdate + gender | 87% of US population uniquely identifiable (Sweeney, 2000)[^6] |
+| **Medical Records** | ZIP code + birthdate + gender | 87% of US population uniquely identifiable (Sweeney, 2000)[^rc-e6e8] |
 | **Genomic Data** | Partial genetic data matching | Individuals and their relatives identifiable |
 
 ## Real-World Incidents
 
 Several incidents demonstrate that AI deanonymization is not merely theoretical:
 
-- **Clearview AI** built a database of 30+ billion facial images scraped from public social media and the web, enabling identification of virtually anyone from a photograph[^7]
+- **Clearview AI** built a database of 30+ billion facial images scraped from public social media and the web, enabling identification of virtually anyone from a photograph[^rc-5025]
 - In 2021, a Catholic priest was outed when journalists purchased commercially available location data from the dating app Grindr, which linked his phone's movements to his identity
 - China's "human flesh search" (renrou sousuo) phenomenon — crowdsourced deanonymization campaigns — is being amplified by AI tools, enabling faster and more comprehensive targeting
 - Multiple cases of protesters being identified through facial recognition applied to publicly posted protest photographs
@@ -122,7 +122,7 @@ AI can infer political affiliations, protest participation, and voting behavior 
 
 ### Personal and Intimate Privacy
 
-Research by Jernigan and Mistree (2009) predicted sexual orientation from Facebook friendship networks with 78% accuracy.[^8] Kosinski et al. (2013) showed that Facebook Likes could predict sexual orientation, political views, drug use, and parental separation.[^9] AI can also infer mental health conditions from writing patterns, reveal relationship status and personal conflicts from social media activity, and identify health conditions from behavioral changes.
+Research by Jernigan and Mistree (2009) predicted sexual orientation from Facebook friendship networks with 78% accuracy.[^rc-5ebe] Kosinski et al. (2013) showed that Facebook Likes could predict sexual orientation, political views, drug use, and parental separation.[^rc-9caf] AI can also infer mental health conditions from writing patterns, reveal relationship status and personal conflicts from social media activity, and identify health conditions from behavioral changes.
 
 ### Professional Privacy
 
@@ -185,13 +185,3 @@ The governance challenge is that deanonymization relies on publicly available da
 - **Cross-border enforcement**: Can any privacy framework be effective when data flows freely across jurisdictions with different protections?
 
 ## Sources
-
-[^1]: Rocher, Hendrickx, & de Montjoye - "Estimating the success of re-identifications in incomplete datasets using generative models" (Nature Communications, 2019)
-[^2]: Staab et al. - "Beyond Memorization: Violating Privacy Via Inference with Large Language Models" (ETH Zurich, 2023)
-[^3]: Olejnik, Castelluccia, & Janc - "Why Johnny Can't Browse in Peace: On the Uniqueness of Web Browsing History Patterns" (2012)
-[^4]: de Montjoye, Hidalgo, Verleysen, & Blondel - "Unique in the Crowd: The privacy bounds of human mobility" (Nature Scientific Reports, 2013)
-[^5]: Narayanan & Shmatikov - "De-anonymizing Social Networks" (IEEE S&P, 2009)
-[^6]: Sweeney - "Simple Demographics Often Identify People Uniquely" (Carnegie Mellon, 2000)
-[^7]: Hill - "The Secretive Company That Might End Privacy as We Know It" (New York Times, 2020)
-[^8]: Jernigan & Mistree - "Gaydar: Facebook Friendships Expose Sexual Orientation" (First Monday, 2009)
-[^9]: Kosinski, Stillwell, & Graepel - "Private traits and attributes are predictable from digital records of human behavior" (PNAS, 2013)
