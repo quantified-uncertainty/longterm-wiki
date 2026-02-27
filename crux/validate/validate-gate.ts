@@ -253,6 +253,13 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'untyped-rows',
+    name: 'No untyped row casts in routes',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-untyped-rows.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'mdx-compile',
     name: 'MDX compilation smoke-test (advisory)',
     command: 'npx',

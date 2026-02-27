@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 
 /**
- * Validate that every Drizzle migration SQL file is registered in the journal.
+ * Validate Drizzle migration journal integrity:
  *
- * drizzle-kit generate creates the .sql file automatically but never updates
- * _journal.json. This causes migrations to be silently skipped on every server
- * restart/deploy. This check catches that before push.
+ * 1. Every migration SQL file must be registered in the journal.
+ *    drizzle-kit generate creates the .sql file automatically but never updates
+ *    _journal.json. This causes migrations to be silently skipped on every
+ *    server restart/deploy. This check catches that before push.
+ *
+ * 2. Migration file prefixes (the numeric part, e.g. 0032) must be unique.
+ *    Duplicate prefixes arise from branch merges and make the migration order
+ *    ambiguous. Known historical duplicates are grandfathered; new ones fail.
  *
  * The journal uses sequential `idx` values and `tag` = filename without .sql.
- * Duplicate-numbered files (e.g. two 0022_* files from branch merges) are
- * handled correctly: both must have journal entries; only missing tags fail.
  *
  * Usage: npx tsx crux/validate/validate-drizzle-journal.ts
  */
@@ -35,13 +38,25 @@ interface Journal {
   entries: JournalEntry[];
 }
 
+interface DuplicatePrefix {
+  prefix: string;
+  files: string[];
+}
+
 interface CheckResult {
   passed: boolean;
   errors: number;
   missing: string[];
+  duplicatePrefixes: DuplicatePrefix[];
   sqlFiles: string[];
   journalTags: string[];
 }
+
+// Historical duplicate prefixes that already exist in the codebase.
+// These are grandfathered — only NEW duplicates will fail the check.
+const KNOWN_DUPLICATE_PREFIXES = new Set([
+  '0020', '0022', '0024', '0026', '0032', '0034',
+]);
 
 export function runCheck(): CheckResult {
   const c = getColors();
@@ -56,7 +71,7 @@ export function runCheck(): CheckResult {
       .sort();
   } catch {
     console.log(`${c.dim}Skipping: ${DRIZZLE_DIR} not found${c.reset}`);
-    return { passed: true, errors: 0, missing: [], sqlFiles: [], journalTags: [] };
+    return { passed: true, errors: 0, missing: [], duplicatePrefixes: [], sqlFiles: [], journalTags: [] };
   }
 
   // Read journal
@@ -65,7 +80,7 @@ export function runCheck(): CheckResult {
     journal = JSON.parse(readFileSync(JOURNAL_PATH, 'utf-8')) as Journal;
   } catch (err) {
     console.log(`${c.red}Failed to read journal at ${JOURNAL_PATH}: ${err}${c.reset}`);
-    return { passed: false, errors: 1, missing: [JOURNAL_PATH], sqlFiles, journalTags: [] };
+    return { passed: false, errors: 1, missing: [JOURNAL_PATH], duplicatePrefixes: [], sqlFiles, journalTags: [] };
   }
 
   const journalTags = new Set(journal.entries.map((e) => e.tag));
@@ -96,10 +111,56 @@ export function runCheck(): CheckResult {
     );
   }
 
+  // Check for duplicate migration prefixes (the numeric part like "0032")
+  const prefixMap = new Map<string, string[]>();
+  for (const tag of sqlFiles) {
+    const match = tag.match(/^(\d+)_/);
+    if (match) {
+      const prefix = match[1];
+      if (!prefixMap.has(prefix)) prefixMap.set(prefix, []);
+      prefixMap.get(prefix)!.push(tag);
+    }
+  }
+
+  const newDuplicates: DuplicatePrefix[] = [];
+  for (const [prefix, files] of prefixMap) {
+    if (files.length > 1 && !KNOWN_DUPLICATE_PREFIXES.has(prefix)) {
+      newDuplicates.push({ prefix, files });
+    }
+  }
+
+  if (newDuplicates.length > 0) {
+    console.log(
+      `\n${c.red}Found ${newDuplicates.length} new duplicate migration prefix(es):${c.reset}\n`
+    );
+    for (const dup of newDuplicates) {
+      console.log(`  ${c.red}Prefix ${dup.prefix}:${c.reset}`);
+      for (const file of dup.files) {
+        console.log(`    ${c.red}${file}.sql${c.reset}`);
+      }
+    }
+    console.log();
+    console.log(
+      `${c.dim}Fix: renumber one of the conflicting migrations to the next available prefix.${c.reset}`
+    );
+    console.log(
+      `${c.dim}Duplicate prefixes make migration order ambiguous across environments.${c.reset}`
+    );
+  } else {
+    const knownCount = [...prefixMap.values()].filter(f => f.length > 1).length;
+    const knownNote = knownCount > 0 ? ` (${knownCount} known historical duplicates grandfathered)` : '';
+    console.log(
+      `${c.green}No new duplicate migration prefixes${c.reset}${c.dim}${knownNote}${c.reset}`
+    );
+  }
+
+  const totalErrors = missing.length + newDuplicates.length;
+
   return {
-    passed: missing.length === 0,
-    errors: missing.length,
+    passed: totalErrors === 0,
+    errors: totalErrors,
     missing,
+    duplicatePrefixes: newDuplicates,
     sqlFiles,
     journalTags: [...journalTags],
   };

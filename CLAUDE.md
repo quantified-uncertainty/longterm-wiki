@@ -167,6 +167,16 @@ For non-trivial changes (>5 files or >300 lines), run `/review-pr` before shippi
 - **Hono RPC**: Mandatory for all new wiki-server routes; convert existing routes when modifying them. See `.claude/rules/wiki-server-rpc-migration.md`.
 - **Entity IDs**: **Never manually invent numericIds** (E42, E886, etc.). Always allocate from the wiki-server: `pnpm crux ids allocate <slug>`. The gate runs `assign-ids.mjs` automatically as a safety net, but allocating early prevents conflicts between concurrent agents. Use `pnpm crux ids check <slug>` to look up existing IDs.
 
+## Code Review Guidelines
+
+Rules enforced by gate checks and PR review. See [#1246](https://github.com/quantified-uncertainty/longterm-wiki/issues/1246) for full context.
+
+- **No `(r: any)` in wiki-server routes** — define typed row interfaces for raw SQL results (enforced by gate)
+- **No `as unknown as T` double-casts** — use runtime type narrowing or proper generics
+- **Batch endpoints must use transactions or bulk SQL** — never sequential per-row updates
+- **Migration file prefixes must be unique** — no two `.sql` files with the same numeric prefix (enforced by gate)
+- **Destructive endpoints (DELETE, bulk UPDATE) must log actions** before executing
+
 ## Detailed Guides (loaded automatically by Claude Code)
 
 - `.claude/rules/agent-session-workflow.md` — Session start/end workflow
