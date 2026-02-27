@@ -211,12 +211,15 @@ describe("getInternalNav (mocked data)", () => {
     expect(factItem!.href).toBe("/wiki/E898");
   });
 
-  it("non-migrated dashboards still use /internal/ hrefs", () => {
+  it("all dashboard items use /wiki/E<id> hrefs (fully migrated)", () => {
     const sections = getInternalNav();
     const dashboards = sections.find(s => s.title === "Dashboards")!;
 
-    const suggestedPages = dashboards.items.find(i => i.label === "Suggested Pages");
-    expect(suggestedPages?.href).toBe("/internal/suggested-pages");
+    // All dashboards are now migrated to MDX stubs with entity IDs
+    for (const item of dashboards.items) {
+      if (item.label === "Internal Home") continue; // Overview link
+      expect(item.href).toMatch(/^\/wiki\//);
+    }
   });
 
   it("Style Guides section contains expected entries", () => {

@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { VERDICT_COLORS } from "./verdict-colors";
-import type { PageSummary, FlaggedCitation, DomainSummary } from "./page";
+import type { PageSummary, FlaggedCitation, DomainSummary } from "./citation-accuracy-content";
 
 // ---------------------------------------------------------------------------
 // Page Accuracy Table

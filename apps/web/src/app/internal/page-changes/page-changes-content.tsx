@@ -1,0 +1,119 @@
+import {
+  getPageChangeSessions,
+  getAllPages,
+  getIdRegistry,
+} from "@/data";
+import {
+  fetchDetailed,
+  withApiFallback,
+} from "@lib/wiki-server";
+import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { PageChangesSessions } from "./page-changes-sessions";
+import type { SessionRow } from "@wiki-server/api-response-types";
+
+// ── Data loading ─────────────────────────────────────────────────────────────
+
+/** Extract PR number from a GitHub PR URL like "https://github.com/.../pull/123" */
+function extractPrNumber(prUrl: string | null): number | undefined {
+  if (!prUrl) return undefined;
+  const match = prUrl.match(/\/pull\/(\d+)/);
+  return match ? Number(match[1]) : undefined;
+}
+
+/**
+ * Load page-changes data from the wiki-server API.
+ * Returns null if the server is unavailable.
+ */
+async function loadSessionsFromApi() {
+  const result = await fetchDetailed<{ sessions: SessionRow[] }>(
+    "/api/sessions/page-changes?limit=500",
+    { revalidate: 300 }
+  );
+  if (!result.ok) return result;
+
+  // Build a page metadata lookup from local database.json
+  const pages = getAllPages();
+  const idRegistry = getIdRegistry();
+  const pageMap = new Map(
+    pages.map((p) => [
+      p.id,
+      {
+        title: p.title,
+        path: p.path,
+        category: p.category,
+        numericId: idRegistry?.bySlug[p.id] || p.id,
+      },
+    ])
+  );
+
+  const data = result.data;
+  return {
+    ok: true as const,
+    data: data.sessions
+    .filter((s) => s.pages.length > 0)
+    .map((s) => {
+      const pr = extractPrNumber(s.prUrl);
+      return {
+        sessionKey: `${s.date}|${s.branch || "unknown"}`,
+        date: s.date,
+        branch: s.branch || "unknown",
+        sessionTitle: s.title,
+        summary: s.summary || "",
+        ...(pr !== undefined && { pr }),
+        ...(s.model && { model: s.model }),
+        ...(s.duration && { duration: s.duration }),
+        ...(s.cost && { cost: s.cost }),
+        issues: Array.isArray(s.issuesJson) ? s.issuesJson.map(String) : [],
+        learnings: Array.isArray(s.learningsJson) ? s.learningsJson.map(String) : [],
+        recommendations: Array.isArray(s.recommendationsJson) ? s.recommendationsJson.map(String) : [],
+        pages: s.pages.map((pageId) => {
+          const meta = pageMap.get(pageId);
+          return {
+            pageId,
+            pageTitle: meta?.title || pageId,
+            pagePath: meta?.path || `/wiki/${pageId}`,
+            numericId: meta?.numericId || pageId,
+            category: meta?.category || "unknown",
+          };
+        }),
+      };
+    }),
+  };
+}
+
+export async function PageChangesContent() {
+  // Try wiki-server API first, fall back to database.json
+  const { data: sessions, source, apiError } = await withApiFallback(
+    loadSessionsFromApi,
+    getPageChangeSessions
+  );
+
+  const totalPageEdits = sessions.reduce((n, s) => n + s.pages.length, 0);
+  const uniquePages = new Set(
+    sessions.flatMap((s) => s.pages.map((p) => p.pageId))
+  );
+
+  return (
+    <>
+      <p className="text-muted-foreground">
+        Timeline of wiki page edits from Claude Code sessions.{" "}
+        <span className="font-medium text-foreground">{sessions.length}</span>{" "}
+        sessions,{" "}
+        <span className="font-medium text-foreground">{totalPageEdits}</span>{" "}
+        page edits across{" "}
+        <span className="font-medium text-foreground">{uniquePages.size}</span>{" "}
+        unique pages.
+      </p>
+      {sessions.length === 0 ? (
+        <p className="text-muted-foreground italic">
+          No page changes recorded yet. Session log entries with a{" "}
+          <code>pages</code> field will appear here.
+        </p>
+      ) : (
+        <PageChangesSessions sessions={sessions} />
+      )}
+
+      <DataSourceBanner source={source} apiError={apiError} />
+    </>
+  );
+}
