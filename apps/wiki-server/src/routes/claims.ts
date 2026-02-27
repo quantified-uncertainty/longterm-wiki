@@ -409,6 +409,16 @@ const claimsApp = new Hono()
     const parsed = DeleteByIdsSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
+    // Audit log: record bulk deletion before executing it
+    console.log(
+      JSON.stringify({
+        audit: "bulk-claim-delete",
+        timestamp: new Date().toISOString(),
+        count: parsed.data.ids.length,
+        claimIds: parsed.data.ids,
+      })
+    );
+
     const db = getDrizzleDb();
     const deleted = await db
       .delete(claims)
