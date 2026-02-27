@@ -51,7 +51,8 @@ export default async function ClaimDetailPage({ params }: PageProps) {
   const similarClaims = similarResult?.claims ?? [];
   const entity = getEntityById(claim.entityId);
   const entityDisplayName = entity?.title ?? claim.entityId;
-  const allSlugs = [claim.entityId, ...(claim.relatedEntities ?? []).map(s => s.toLowerCase())];
+  // relatedEntities are already normalized (lowercased) by the server
+  const allSlugs = [claim.entityId, ...(claim.relatedEntities ?? [])];
   const entityNames = buildEntityNameMap(allSlugs);
 
   return (
@@ -340,10 +341,10 @@ export default async function ClaimDetailPage({ params }: PageProps) {
             {claim.relatedEntities.map((eid) => (
               <Link
                 key={eid}
-                href={`/claims/entity/${eid.toLowerCase()}`}
+                href={`/claims/entity/${eid}`}
                 className="inline-block px-2 py-1 rounded text-xs bg-gray-100 text-gray-700 hover:bg-gray-200"
               >
-                {entityNames[eid.toLowerCase()] ?? eid}
+                {entityNames[eid] ?? eid}
               </Link>
             ))}
           </div>
