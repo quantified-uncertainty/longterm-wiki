@@ -39,6 +39,7 @@ export const tool: ToolRegistration = {
           failed: result.summary.failed,
           misattributed: result.summary.misattributed,
           unchecked: result.summary.unchecked,
+          unsourcedTableCells: result.summary.unsourcedTableCells,
           pass: result.pass,
           failedCitations: result.citations
             .filter((c) => c.verdict === 'unsupported' || c.verdict === 'misattributed')
@@ -47,7 +48,17 @@ export const tool: ToolRegistration = {
               claim: c.claim.slice(0, 100),
               verdict: c.verdict,
               explanation: c.explanation,
+              sourceContext: c.sourceContext,
             })),
+          ...(result.unsourcedTableCells.length > 0
+            ? {
+                unsourcedTableCellDetails: result.unsourcedTableCells.map((cell) => ({
+                  line: cell.line,
+                  column: cell.column,
+                  cellText: cell.cellText.slice(0, 80),
+                })),
+              }
+            : {}),
         },
         null,
         2,

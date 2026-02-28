@@ -31,6 +31,41 @@ import { getCitationContentByUrl } from './wiki-server/citations.ts';
 /** Minimum source content length (chars) required to attempt LLM verification. */
 export const MIN_SOURCE_CONTENT_LENGTH = 50;
 
+// ---------------------------------------------------------------------------
+// Source context tracking (#1271)
+// ---------------------------------------------------------------------------
+
+/** Where in the page structure a citation (or unsourced claim) appears. */
+export type SourceContext = 'body' | 'table' | 'list';
+
+/**
+ * A table cell that contains a numeric claim but has no footnote reference
+ * in its row. Flagged as a potential unsourced factual assertion.
+ */
+export interface UnsourcedTableCell {
+  /** 1-based row index within the table (header = row 1). */
+  row: number;
+  /** Column header text (empty string if header is missing). */
+  column: string;
+  /** Raw text content of the cell. */
+  cellText: string;
+  /** 1-based line number in the original content. */
+  line: number;
+}
+
+/**
+ * Pattern matching numeric claims that should ideally have citations.
+ * Matches:
+ *   - Dollar amounts: $100, $1.5M, $2 billion
+ *   - Percentages: 50%, 3.5%
+ *   - Large comma-separated numbers: 1,000  10,000,000
+ *   - SI-suffixed numbers: 1.5B, 200M, 3K
+ *   - Years in plausible range: 2001, 2025
+ *   - Count + unit phrases: 50 employees, 200 papers
+ */
+export const NUMERIC_CLAIM_PATTERN =
+  /(?:\$[\d,.]+\s*(?:thousand|million|billion|trillion|[KMBT])?)|(?:\d+(?:[.,]\d+)*\s*%)|(?:(?<!\d)\d{1,3}(?:,\d{3})+(?:\.\d+)?)|(?:\d+(?:\.\d+)?\s*[KMBT](?:illion)?(?:\b))|(?:(?:19|20)\d{2}(?!\d))|(?:\d{2,}(?:\.\d+)?\s+(?:employees?|researchers?|staff|people|papers?|publications?|projects?|participants?|members?|users?|downloads?))/i;
+
 /**
  * Domains that commonly serve login walls, dynamic JS-rendered content,
  * or minimal snippets that cause false "unsupported" verdicts.
@@ -104,6 +139,8 @@ export interface CitationAudit {
   relevantQuote?: string;
   /** Human-readable explanation of the verdict. */
   explanation: string;
+  /** Where in the page this citation appears (#1271). */
+  sourceContext?: SourceContext;
 }
 
 /** Aggregate audit report for a page. */
@@ -121,6 +158,8 @@ export interface AuditResult {
     misattributed: number;
     /** Citations that could not be checked (url-dead, unchecked). */
     unchecked: number;
+    /** Number of table cells with numeric claims but no footnote reference (#1271). */
+    unsourcedTableCells: number;
   };
   /**
    * Placeholder for claims that make factual assertions without any citation.
@@ -128,6 +167,11 @@ export interface AuditResult {
    * Currently always returns [].
    */
   newUngroundedClaims: string[];
+  /**
+   * Table cells containing numeric claims without footnote references (#1271).
+   * These are potential unsourced factual assertions that should have citations.
+   */
+  unsourcedTableCells: UnsourcedTableCell[];
   /** True if the audit passes the passThreshold (enough citations verified). */
   pass: boolean;
 }
@@ -469,6 +513,114 @@ export async function resolveSource(
 }
 
 // ---------------------------------------------------------------------------
+// Source context & unsourced table cell detection (#1271)
+// ---------------------------------------------------------------------------
+
+/**
+ * Infer where a footnote reference appears in the page structure.
+ *
+ * Finds the line containing `[^{footnoteRef}]` (inline reference, not the
+ * definition) and checks whether that line looks like a table row or list item.
+ */
+export function inferSourceContext(body: string, footnoteRef: string): SourceContext {
+  const lines = body.split('\n');
+  // Match inline usage [^N] but not definition lines that start with [^N]:
+  const refPattern = new RegExp(`\\[\\^${footnoteRef}\\](?!:)`);
+
+  for (const line of lines) {
+    if (!refPattern.test(line)) continue;
+    const trimmed = line.trimStart();
+    // Table row: starts with | or contains | delimiters
+    if (trimmed.startsWith('|') || /\|.*\|/.test(trimmed)) {
+      return 'table';
+    }
+    // List item: unordered (- or *) or ordered (1. 2. etc.)
+    if (/^[-*]\s/.test(trimmed) || /^\d+\.\s/.test(trimmed)) {
+      return 'list';
+    }
+  }
+  return 'body';
+}
+
+/**
+ * Detect table cells that contain numeric claims but have no footnote
+ * reference anywhere in their row.
+ *
+ * Parses markdown tables (sequences of `|`-delimited lines with a separator
+ * row) and checks each data cell against NUMERIC_CLAIM_PATTERN.
+ *
+ * A cell is considered "sourced" if any cell in the same row contains a
+ * `[^N]` footnote reference — this covers the common pattern where a single
+ * footnote at the end of a row sources the entire row.
+ */
+export function detectUnsourcedTableCells(body: string): UnsourcedTableCell[] {
+  const results: UnsourcedTableCell[] = [];
+  const lines = body.split('\n');
+
+  // Find table blocks: consecutive lines starting with |
+  let i = 0;
+  while (i < lines.length) {
+    // Look for a line that starts with |
+    if (!lines[i].trimStart().startsWith('|')) {
+      i++;
+      continue;
+    }
+
+    // Collect consecutive table lines
+    const tableStart = i;
+    const tableLines: string[] = [];
+    while (i < lines.length && lines[i].trimStart().startsWith('|')) {
+      tableLines.push(lines[i]);
+      i++;
+    }
+
+    // Need at least 3 lines: header, separator, and at least one data row
+    if (tableLines.length < 3) continue;
+
+    // Validate separator row (second line should be like |---|---|)
+    const separatorCells = tableLines[1].split('|').slice(1, -1);
+    const isSeparator = separatorCells.length > 0 &&
+      separatorCells.every(cell => /^\s*:?-+:?\s*$/.test(cell));
+    if (!isSeparator) continue;
+
+    // Parse header columns
+    const headers = tableLines[0]
+      .split('|')
+      .slice(1, -1)
+      .map(h => h.trim());
+
+    // Check each data row (skip header and separator)
+    for (let rowIdx = 2; rowIdx < tableLines.length; rowIdx++) {
+      const rowLine = tableLines[rowIdx];
+      const cells = rowLine.split('|').slice(1, -1);
+
+      // Check if the entire row has any footnote reference
+      const rowHasFootnote = /\[\^\d+\]/.test(rowLine);
+
+      for (let colIdx = 0; colIdx < cells.length; colIdx++) {
+        const cellText = cells[colIdx].trim();
+        if (!cellText) continue;
+
+        // Skip if the row already has a footnote somewhere
+        if (rowHasFootnote) continue;
+
+        // Check if this cell contains a numeric claim
+        if (NUMERIC_CLAIM_PATTERN.test(cellText)) {
+          results.push({
+            row: rowIdx - 1, // 1-based data row index (header excluded, separator excluded)
+            column: headers[colIdx] ?? '',
+            cellText,
+            line: tableStart + rowIdx + 1, // 1-based line number in original content
+          });
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
+// ---------------------------------------------------------------------------
 // Core audit function
 // ---------------------------------------------------------------------------
 
@@ -655,6 +807,14 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
   const citationAudits = [...nonLlmAudits, ...llmAudits]
     .sort((a, b) => parseInt(a.footnoteRef, 10) - parseInt(b.footnoteRef, 10));
 
+  // Annotate each citation with its source context (#1271)
+  for (const audit of citationAudits) {
+    audit.sourceContext = inferSourceContext(body, audit.footnoteRef);
+  }
+
+  // Detect unsourced table cells with numeric claims (#1271)
+  const unsourcedTableCells = detectUnsourcedTableCells(body);
+
   // Build summary
   const verified = citationAudits.filter((c) => c.verdict === 'verified').length;
   const misattributed = citationAudits.filter((c) => c.verdict === 'misattributed').length;
@@ -681,8 +841,16 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
 
   return {
     citations: citationAudits,
-    summary: { total: citationAudits.length, verified, failed, misattributed, unchecked },
+    summary: {
+      total: citationAudits.length,
+      verified,
+      failed,
+      misattributed,
+      unchecked,
+      unsourcedTableCells: unsourcedTableCells.length,
+    },
     newUngroundedClaims: [],
+    unsourcedTableCells,
     pass,
   };
 }

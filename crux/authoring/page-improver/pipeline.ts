@@ -350,8 +350,11 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   }
 
   if (r.auditResult) {
-    const { total, verified, failed, unchecked } = r.auditResult.summary;
-    console.log(`Citations: ${total} total — ${verified} verified, ${failed} failed, ${unchecked} unchecked`);
+    const { total, verified, failed, unchecked, unsourcedTableCells } = r.auditResult.summary;
+    console.log(`Citations: ${total} total \u2014 ${verified} verified, ${failed} failed, ${unchecked} unchecked`);
+    if (unsourcedTableCells > 0) {
+      console.log(`Unsourced table cells: ${unsourcedTableCells} (numeric claims without citations)`);
+    }
     if (!r.auditResult.pass) {
       if (options.citationGate && dryRun) {
         console.log(`⚠ Citation audit FAILED (--citation-gate inactive in dry-run; would block --apply)`);
