@@ -44,6 +44,7 @@ import { validateClaimBatch } from './validate-claim.ts';
 import { runExtractionQualityGate } from './extraction-quality-gate.ts';
 import { parseFootnotes, type ParsedFootnote } from '../lib/footnote-parser.ts';
 import { loadEntitySlugs, buildNormalizationMap, normalizeRelatedEntities } from '../lib/normalize-entity-slugs.ts';
+import { slugToDisplayName } from '../lib/claim-text-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Footnote resolution — resolve footnoteRefs to source URLs
@@ -393,14 +394,6 @@ function extractFrontmatterTitle(raw: string): string | undefined {
   if (!fmMatch) return undefined;
   const titleMatch = fmMatch[1].match(/^title:\s*["']?(.+?)["']?\s*$/m);
   return titleMatch ? titleMatch[1] : undefined;
-}
-
-/** Convert a slug like "sam-altman" to a display name like "Sam Altman". */
-function slugToDisplayName(slug: string): string {
-  return slug
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
 }
 
 // ---------------------------------------------------------------------------

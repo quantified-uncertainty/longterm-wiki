@@ -16,6 +16,7 @@ export interface Config {
     healthCheck: TaskConfig;
     resolveConflicts: TaskConfig;
     codeReview: TaskConfig;
+    issueResponder: TaskConfig;
   };
 }
 
@@ -65,6 +66,11 @@ export function loadConfig(): Config {
       codeReview: {
         enabled: envBool("TASK_CODE_REVIEW_ENABLED", false),
         schedule: process.env["TASK_CODE_REVIEW_SCHEDULE"] ?? "0 9 * * 1",
+      },
+      issueResponder: {
+        enabled: envBool("TASK_ISSUE_RESPONDER_ENABLED", false),
+        schedule:
+          process.env["TASK_ISSUE_RESPONDER_SCHEDULE"] ?? "*/15 * * * *",
       },
     },
   };

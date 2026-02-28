@@ -29,6 +29,7 @@ import {
   deleteClaimsByIds,
   type ClaimRow,
 } from '../lib/wiki-server/claims.ts';
+import { stripMarkup, escapeRegex } from '../lib/claim-text-utils.ts';
 import { isClaimDuplicate } from '../lib/claim-utils.ts';
 import { loadEntitySlugs, buildNormalizationMap, normalizeEntitySlug } from '../lib/normalize-entity-slugs.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
@@ -105,34 +106,9 @@ async function fetchAllClaims(
 // Step 1: strip-markup — remove MDX/JSX artifacts from claim text
 // ---------------------------------------------------------------------------
 
-const MARKUP_PATTERNS: Array<{ pattern: RegExp; replacement: string; label: string }> = [
-  { pattern: /<EntityLink\s+id="[^"]*"(?:\s+[^>]*)?>([^<]*)<\/EntityLink>/g, replacement: '$1', label: 'EntityLink' },
-  { pattern: /<F\s+[^>]*\/>/g, replacement: '', label: 'F-tag' },
-  { pattern: /<R\s+id="[^"]*">[^<]*<\/R>/g, replacement: '', label: 'R-tag' },
-  { pattern: /<Calc>[^<]*<\/Calc>/g, replacement: '', label: 'Calc' },
-  { pattern: /<\w[\w.]*[^>]*\/>/g, replacement: '', label: 'JSX-self-closing' },
-  { pattern: /<(\w[\w.]*)(?:\s[^>]*)?>([^<]*)<\/\1>/g, replacement: '$2', label: 'JSX-block' },
-  { pattern: /\{[^}]+\}/g, replacement: '', label: 'curly-expr' },
-  { pattern: /^(?:import|export)\s+.*$/gm, replacement: '', label: 'import/export' },
-  { pattern: /\\\$/g, replacement: '$', label: 'escaped-dollar' },
-  { pattern: /\\</g, replacement: '<', label: 'escaped-lt' },
-];
-
 function stripMarkupFromText(text: string): { cleaned: string; strippedLabels: string[] } {
-  let cleaned = text;
-  const strippedLabels: string[] = [];
-
-  for (const { pattern, replacement, label } of MARKUP_PATTERNS) {
-    pattern.lastIndex = 0;
-    if (pattern.test(cleaned)) {
-      strippedLabels.push(label);
-      pattern.lastIndex = 0;
-      cleaned = cleaned.replace(pattern, replacement);
-    }
-  }
-
-  cleaned = cleaned.replace(/\s{2,}/g, ' ').trim();
-  return { cleaned, strippedLabels };
+  const { cleaned, labels } = stripMarkup(text);
+  return { cleaned, strippedLabels: labels };
 }
 
 async function fixStripMarkup(
@@ -250,7 +226,7 @@ function findEntityMentions(
   for (const [name, slug] of nameMap) {
     if (!textLower.includes(name)) continue;
 
-    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escaped = escapeRegex(name);
     const re = new RegExp(`\\b${escaped}\\b`, 'i');
     if (re.test(claimText)) {
       if (validIds.has(slug)) {

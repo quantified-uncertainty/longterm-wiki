@@ -292,7 +292,7 @@ async function main() {
   // Step 2: Verify claims against sources
   // ------------------------------------------------------------------
   if (steps.includes('verify')) {
-    console.log(`\n${c.bold}Step 3: Verify claims${c.reset}`);
+    console.log(`\n${c.bold}Step 2: Verify claims${c.reset}`);
 
     if (dryRun) {
       console.log(`  ${c.yellow}[DRY RUN] Would run claim verification${c.reset}`);

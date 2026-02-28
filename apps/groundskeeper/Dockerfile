@@ -7,7 +7,8 @@ RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 RUN apk add --no-cache git github-cli openssh
 
 # Install Claude Code CLI globally (needed for Phase 2+ AI tasks)
-RUN npm install -g @anthropic-ai/claude-code
+# Pin version to avoid silent breakage from upstream updates
+RUN npm install -g @anthropic-ai/claude-code@2.1.63
 
 WORKDIR /repo
 

@@ -9,7 +9,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { batchResearch, generateResearchQueries } from '../../lib/openrouter.ts';
 import type { BatchResearchResult, ResearchQuery } from '../../lib/openrouter.ts';
-import { getApiKey } from '../../lib/api-keys.ts';
+import { getApiKey, SCRY_PUBLIC_KEY } from '../../lib/api-keys.ts';
 import type { ResearchPhaseContext } from './types.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,8 +41,6 @@ interface ScryRow {
   platform?: string;
   searchQuery?: string;
 }
-
-const SCRY_PUBLIC_KEY = getApiKey('SCRY_API_KEY') || 'exopriors_public_readonly_v1_2025';
 
 export async function runPerplexityResearch(topic: string, depth: string, { log, saveResult }: ResearchContext): Promise<{ success: boolean; cost: number; queryCount: number }> {
   log('research', `Starting Perplexity research (${depth})...`);

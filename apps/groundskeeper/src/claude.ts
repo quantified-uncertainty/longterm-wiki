@@ -35,7 +35,6 @@ export async function runClaude(
     };
   }
 
-  incrementDailyAiCount(config);
   const start = Date.now();
 
   return new Promise<ClaudeResult>((resolve) => {
@@ -57,6 +56,11 @@ export async function runClaude(
         // Ensure Claude Code uses the API key from our env
         ANTHROPIC_API_KEY: process.env["ANTHROPIC_API_KEY"],
       },
+    });
+
+    // Increment daily count only after spawn succeeds (not on spawn error)
+    proc.on("spawn", () => {
+      incrementDailyAiCount(config);
     });
 
     let stdout = "";

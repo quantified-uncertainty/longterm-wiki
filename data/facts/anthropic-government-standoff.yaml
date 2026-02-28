@@ -1,0 +1,28 @@
+entity: anthropic-government-standoff
+facts:
+  # pentagon-contract-value
+  "a1b2c3d4":
+    label: "Pentagon AI contract value"
+    value: 200000000
+    asOf: 2025-07
+    note: "Up to $200M, two-year contract signed July 2025; shared with OpenAI, Google, and xAI"
+    source: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
+    measure: funding-round
+
+  # maduro-raid-deaths
+  "b2c3d4e5":
+    label: "Deaths in Venezuela Maduro operation"
+    value: 83
+    asOf: 2026-01
+    note: "83 killed including 47 Venezuelan soldiers during US special operation"
+    source: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
+    noCompute: true
+
+  # political-donation-to-pac
+  "e5f6a7b8":
+    label: "Anthropic donation to Public First Action PAC"
+    value: 20000000
+    asOf: 2026-02
+    note: "Donated to group supporting pro-AI-regulation candidates in 2026 elections"
+    source: https://www.cnbc.com/2026/02/12/anthropic-gives-20-million-to-group-pushing-for-ai-regulations-.html
+    noCompute: true

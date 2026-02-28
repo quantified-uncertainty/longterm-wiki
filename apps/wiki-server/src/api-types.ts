@@ -1222,4 +1222,3 @@ export type RecordGroundskeeperRun = z.infer<typeof RecordGroundskeeperRunSchema
 export const RecordGroundskeeperRunBatchSchema = z.object({
   items: z.array(RecordGroundskeeperRunSchema).min(1).max(100),
 });
-

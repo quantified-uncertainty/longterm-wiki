@@ -1,6 +1,59 @@
 # Misc Entities
 # Auto-generated from entities.yaml - edit this file directly
 
+- id: anthropic-government-standoff
+  numericId: E924
+  type: event
+  title: Anthropic-Pentagon Standoff (2026)
+  customFields:
+    - label: Key Question
+      value: Will the supply chain risk designation survive legal challenge?
+    - label: Status
+      value: Active — legal challenge pending
+    - label: Trigger Event
+      value: Claude AI used in Venezuela Maduro raid (Jan 2026)
+    - label: Core Dispute
+      value: Autonomous weapons and mass surveillance red lines
+  relatedEntries:
+    - id: anthropic
+      type: organization
+    - id: dario-amodei
+      type: person
+    - id: openai
+      type: organization
+    - id: david-sacks
+      type: person
+    - id: racing-dynamics
+      type: risk
+    - id: governance-policy
+      type: concept
+  sources:
+    - title: "Trump Orders US Government to Drop Anthropic After Pentagon Feud"
+      url: https://www.bloomberg.com/news/articles/2026-02-27/trump-orders-us-government-to-drop-anthropic-after-pentagon-feud
+    - title: "Anthropic vs the Pentagon: Why AI firm is taking on Trump administration"
+      url: https://www.aljazeera.com/news/2026/2/25/anthropic-vs-the-pentagon-why-ai-firm-is-taking-on-trump-administration
+    - title: "A Timeline of the Anthropic-Pentagon Dispute"
+      url: https://www.techpolicy.press/a-timeline-of-the-anthropic-pentagon-dispute/
+    - title: "Dario Amodei says he 'cannot in good conscience' bow to Pentagon demands"
+      url: https://fortune.com/2026/02/27/dario-amodei-says-he-cannot-in-good-conscience-bow-to-pentagons-demands-over-ai-use-in-military/
+    - title: "Trump admin blacklists Anthropic as AI firm refuses Pentagon demands"
+      url: https://www.cnbc.com/2026/02/27/trump-anthropic-ai-pentagon.html
+  description: >-
+    In February 2026, the Trump administration ordered all federal agencies to cease using Anthropic's technology
+    and designated the company a "supply chain risk to national security" — a category normally reserved for
+    foreign adversaries — after Anthropic refused to remove restrictions on autonomous weapons and mass
+    domestic surveillance from its Pentagon contract. The standoff, triggered by the use of Claude AI
+    in the January 2026 Venezuela raid, represents the first major confrontation between a frontier AI
+    lab and the US government over ethical red lines in military AI deployment.
+  tags:
+    - ai-policy
+    - military-ai
+    - government
+    - autonomous-weapons
+    - surveillance
+    - national-security
+  lastUpdated: 2026-02
+
 - id: effectiveness-assessment
   numericId: E113
   type: analysis

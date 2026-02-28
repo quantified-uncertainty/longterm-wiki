@@ -293,6 +293,7 @@ async function main() {
     if (!existsSync(batchFile)) {
       console.error(`${c.red}Error: batch file not found: ${batchFile}${c.reset}`);
       process.exit(1);
+      return; // unreachable, helps tsc
     }
     const content = readFileSync(batchFile, 'utf-8');
     urls = content
@@ -306,6 +307,7 @@ async function main() {
     console.error(`  Usage: pnpm crux claims from-resource <url>`);
     console.error(`         pnpm crux claims from-resource --batch urls.txt`);
     process.exit(1);
+    return; // unreachable, helps tsc
   }
 
   // Apply limit
