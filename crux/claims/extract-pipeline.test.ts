@@ -515,10 +515,11 @@ describe('buildExtractionPrompt edge cases', () => {
     const resource = {
       id: 'minimal-resource',
       url: 'https://example.com',
+      title: 'Unknown',
       type: 'article' as const,
     };
     const prompt = buildExtractionPrompt(resource, 'kalshi');
-    expect(prompt).toContain('Unknown'); // Missing title/authors
+    expect(prompt).toContain('Unknown');
     expect(prompt).toContain('kalshi');
   });
 
