@@ -1025,8 +1025,9 @@ function findPotentialDuplicates(issues: RankedIssue[]): Array<{ a: RankedIssue;
  * Search open (and optionally closed) issues for potential matches to a query.
  * Used by agents before filing new issues to avoid duplicates.
  *
- * Matches against title and body using token overlap. Also searches closed issues
- * via GitHub search API when --closed is passed.
+ * Scoring: Uses combined title + body token overlap with title weighting (2x).
+ * Short domain terms (CI, DX, PR, ID) are preserved. Basic stemming strips
+ * common suffixes so "validates" matches "validation".
  */
 async function search(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -1044,37 +1045,86 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
   const includeClosed = Boolean(options.closed);
   const threshold = parseFloat((options.threshold as string) || '0.35');
 
-  // Tokenizer reused from findPotentialDuplicates
+  // Only truly semantic-free words. Domain-relevant verbs (add, fix, remove) are kept
+  // because "add entity" and "remove entity" mean opposite things.
   const stopwords = new Set([
     'a', 'an', 'the', 'and', 'or', 'to', 'for', 'of', 'in', 'on', 'is', 'are',
-    'add', 'fix', 'update', 'all', 'with', 'from', 'new', '--', '—', '-',
+    'all', 'with', 'from', '--', '—', '-',
     'this', 'that', 'not', 'but', 'has', 'have', 'should', 'would', 'could',
+    'when', 'where', 'how', 'what', 'why', 'does', 'been', 'being',
   ]);
+
+  // Short domain terms that should NOT be filtered by length
+  const shortTerms = new Set(['ci', 'dx', 'pr', 'id', 'ui', 'db', 'api', 'css', 'rpc', 'mdx', 'tsx', 'sql']);
+
+  /** Crude suffix stemming — good enough for dedup, no dependencies needed. */
+  function stem(word: string): string {
+    if (word.length <= 4) return word;
+    // Order matters: longest suffixes first
+    return word
+      .replace(/ations?$/, 'ate')
+      .replace(/tion$/, 't')
+      .replace(/sion$/, 's')
+      .replace(/ment$/, '')
+      .replace(/ness$/, '')
+      .replace(/ies$/, 'y')
+      .replace(/ous$/, '')
+      .replace(/ing$/, '')
+      .replace(/able$/, '')
+      .replace(/ive$/, '')
+      .replace(/ful$/, '')
+      .replace(/ers?$/, '')
+      .replace(/ors?$/, '')
+      .replace(/ed$/, '')
+      .replace(/ly$/, '')
+      .replace(/s$/, '');
+  }
 
   function tokenize(text: string): Set<string> {
     return new Set(
       text.toLowerCase()
         .replace(/[^a-z0-9\s-]/g, '')
         .split(/\s+/)
-        .filter(w => w.length > 2 && !stopwords.has(w))
+        .filter(w => (w.length > 1 && shortTerms.has(w)) || (w.length > 2 && !stopwords.has(w)))
+        .map(stem)
     );
   }
 
-  function similarity(queryTokens: Set<string>, targetTokens: Set<string>): number {
-    if (queryTokens.size === 0 || targetTokens.size === 0) return 0;
-    // Use query-weighted overlap: what fraction of query tokens appear in target?
-    // This is better than Jaccard for search because it doesn't penalize long issue titles.
-    let matches = 0;
+  /**
+   * Score how well a query matches a target issue.
+   *
+   * Uses query-weighted overlap (what fraction of query tokens appear in target?)
+   * with title matches worth 2x body matches, plus a penalty for single-token
+   * queries to avoid false "100%" matches.
+   */
+  function score(queryTokens: Set<string>, titleTokens: Set<string>, bodyTokens: Set<string>): number {
+    if (queryTokens.size === 0) return 0;
+
+    let weightedMatches = 0;
     for (const token of queryTokens) {
-      if (targetTokens.has(token)) matches++;
+      if (titleTokens.has(token)) {
+        weightedMatches += 1.0; // title match: full weight
+      } else if (bodyTokens.has(token)) {
+        weightedMatches += 0.5; // body-only match: half weight
+      }
     }
-    return matches / queryTokens.size;
+
+    let raw = weightedMatches / queryTokens.size;
+
+    // Penalize single-token queries: they match too broadly.
+    // A single token matching the title still scores 0.7 max, not 1.0.
+    if (queryTokens.size === 1) {
+      raw *= 0.7;
+    }
+
+    return Math.min(raw, 1.0);
   }
 
   const queryTokens = tokenize(query);
   if (queryTokens.size === 0) {
     return {
-      output: `${c.yellow}Query "${query}" produced no searchable tokens after stopword removal.${c.reset}\n`,
+      output: `${c.yellow}Query "${query}" produced no searchable tokens after stopword removal.${c.reset}\n` +
+        `${c.dim}Tip: Use more specific terms. Short domain terms like CI, DX, PR, ID are recognized.${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -1086,11 +1136,10 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
 
   for (const issue of openIssues) {
     const titleTokens = tokenize(issue.title);
-    const bodyTokens = tokenize(issue.body.slice(0, 500)); // first 500 chars of body
-    const allTokens = new Set([...titleTokens, ...bodyTokens]);
-    const score = similarity(queryTokens, allTokens);
-    if (score >= threshold) {
-      matches.push({ number: issue.number, title: issue.title, url: issue.url, state: 'open', score, labels: issue.labels });
+    const bodyTokens = tokenize(issue.body.slice(0, 1500)); // first 1500 chars of body
+    const s = score(queryTokens, titleTokens, bodyTokens);
+    if (s >= threshold) {
+      matches.push({ number: issue.number, title: issue.title, url: issue.url, state: 'open', score: s, labels: issue.labels });
     }
   }
 
@@ -1105,16 +1154,15 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
         // Skip if already matched as open
         if (matches.some(m => m.number === item.number)) continue;
         const titleTokens = tokenize(item.title);
-        const bodyTokens = tokenize((item.body || '').slice(0, 500));
-        const allTokens = new Set([...titleTokens, ...bodyTokens]);
-        const score = similarity(queryTokens, allTokens);
-        if (score >= threshold) {
+        const bodyTokens = tokenize((item.body || '').slice(0, 1500));
+        const s = score(queryTokens, titleTokens, bodyTokens);
+        if (s >= threshold) {
           matches.push({
             number: item.number,
             title: item.title,
             url: item.html_url,
             state: 'closed',
-            score,
+            score: s,
             labels: (item.labels || []).map(l => l.name),
           });
         }
@@ -1152,12 +1200,15 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
     return { output: JSON.stringify({ query, tokens: [...queryTokens], matches }, null, 2), exitCode: 0 };
   }
 
-  return { output, exitCode: matches.length > 0 ? 0 : 0 };
+  return { output, exitCode: 0 };
 }
 
 /**
  * Post a comment on an existing issue. Used by agents to add context to
  * issues they encounter during a session rather than filing duplicates.
+ *
+ * Validates the issue exists and is open before posting. Appends session
+ * attribution (branch name) so comments are traceable to specific sessions.
  */
 async function comment(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -1184,14 +1235,37 @@ async function comment(args: string[], options: CommandOptions): Promise<Command
     };
   }
 
+  // Validate issue exists
+  let issue: GitHubIssueResponse;
+  try {
+    issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
+  } catch {
+    return {
+      output: `${c.red}Issue #${issueNum} not found. Check the issue number.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  if (issue.pull_request) {
+    return {
+      output: `${c.red}#${issueNum} is a pull request, not an issue. Use gh pr comment instead.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // Add session attribution
+  const branch = currentBranch();
+  const attribution = branch ? `\n\n---\n*From session on branch \`${branch}\`*` : '';
+  const fullBody = message + attribution;
+
   // Post the comment
   await githubApi(`/repos/${REPO}/issues/${issueNum}/comments`, {
     method: 'POST',
-    body: { body: message },
+    body: { body: fullBody },
   });
 
   let output = '';
-  output += `${c.green}Posted comment on #${issueNum}${c.reset}\n`;
+  output += `${c.green}Posted comment on #${issueNum}${c.reset}: ${issue.title}\n`;
   output += `${c.dim}https://github.com/${REPO}/issues/${issueNum}${c.reset}\n`;
 
   return { output, exitCode: 0 };

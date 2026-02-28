@@ -19,9 +19,15 @@ File a GitHub issue when you encounter any of the following during normal work:
 | **Security concern** | "API endpoint doesn't validate input length" | P0-P1 |
 
 **Do NOT file issues for:**
-- Things you can fix in under 5 minutes as part of the current session — just fix them
-- Vague wishes ("the site should be faster") — be specific or skip it
+- Things you can fix right now as part of the current task (e.g., a typo on the page you're editing) — just fix them
+- Vague observations without actionable next steps — "the site should be faster" or "the codebase could be cleaner" are not issues
 - Duplicates of existing issues (check first — see below)
+- Your own work-in-progress — don't file an issue for something you're about to do in this session
+
+**Bad issue examples** (do NOT file these):
+- "Code quality could be improved" — too vague, no specific location or fix
+- "Consider adding more tests" — every codebase could have more tests; be specific about what's untested and why it matters
+- "Documentation is incomplete" — which documentation, for what, and what's missing?
 
 ## Before Filing: Always Search First
 
@@ -96,15 +102,13 @@ pnpm crux issues create "Gate check should skip irrelevant validators for conten
 When you find an issue that's related to something you encountered, add useful context:
 
 ```bash
-# Use the crux issues command infrastructure (goes through githubApi with corruption checks)
 pnpm crux issues comment <N> "Found another instance of this in \`crux/commands/validate.ts:142\` — the same pattern causes failures when the YAML has trailing whitespace."
+
+# For longer comments, use --body-file to avoid shell expansion issues:
+pnpm crux issues comment <N> --body-file=/tmp/comment.md
 ```
 
-If `crux issues comment` doesn't exist yet, use the GitHub API through the existing `crux` infrastructure:
-
-```bash
-gh issue comment <N> --body "Additional context from session on branch \`$(git branch --show-current)\`: ..."
-```
+The command validates that the issue exists, rejects PRs, and appends session attribution (branch name) automatically.
 
 Good comments include:
 - New reproduction steps or failure modes you discovered
@@ -124,22 +128,24 @@ GitHub Discussions are better than Issues for **open-ended topics** that don't h
 | "Pattern we should adopt across the codebase" | "File Z doesn't follow the established pattern" |
 | Cross-cutting observations from multiple sessions | Single concrete bug or improvement |
 
-To create a discussion, use the epic command with a descriptive category:
+To create a discussion, use the `crux epic create` command (which creates GitHub Discussions under the hood):
 
 ```bash
 pnpm crux epic create "Should we migrate all internal dashboards to server components?" \
   --body="During sessions E912 and E913, I noticed that all dashboards use client-side data fetching..."
 ```
 
+**Note:** `crux epic create` creates GitHub Discussions, which are the right tool for open-ended topics even when they aren't traditional "epics." Use a descriptive title that frames the question rather than implying a decision has been made.
+
 ## Integration with Session Workflow
 
 ### During a session
 
-As you work, keep a mental list of issues you notice. When you encounter something worth tracking:
+**File issues immediately when you notice them** — don't defer to "later" because you will forget. The search + create flow takes under 30 seconds:
 
-1. **Quick check**: `pnpm crux issues search "topic"` (takes ~5 seconds)
-2. **If no match**: File the issue immediately while context is fresh
-3. **If match exists**: Add a comment with your new findings
+1. **Quick check**: `pnpm crux issues search "topic"`
+2. **If no match**: File the issue right now while context is fresh
+3. **If match exists**: `pnpm crux issues comment <N> "your finding"`
 4. **Continue your primary work** — don't get sidetracked fixing the newly filed issue
 
 ### At session end
