@@ -39,6 +39,7 @@ function makeConfig(): Config {
     discordWebhookUrl: "http://localhost/webhook",
     dailyRunCap: 20,
     runLogPath: "/tmp/test-run-log.json",
+    circuitBreakerCooldownMs: 60_000, // 1 minute for tests
     tasks: {
       healthCheck: { enabled: true, schedule: "*/5 * * * *" },
       resolveConflicts: { enabled: false, schedule: "0 */2 * * *" },
@@ -183,6 +184,146 @@ describe("scheduler", () => {
 
     it("returns false for unknown tasks", () => {
       expect(resetCircuitBreaker("nonexistent")).toBe(false);
+    });
+  });
+
+  describe("half-open recovery", () => {
+    it("does not retry before cooldown elapses", async () => {
+      const fn: TaskFn = vi
+        .fn()
+        .mockResolvedValue({ success: false, summary: "fail" });
+
+      registerTask(config, "no-retry-test", "*/5 * * * *", true, fn);
+      const callback = scheduledCallbacks[scheduledCallbacks.length - 1];
+
+      // Trip the breaker
+      await callback();
+      await callback();
+      await callback();
+      expect(fn).toHaveBeenCalledTimes(3);
+
+      const state = getTaskStates().get("no-retry-test")!;
+      expect(state.disabled).toBe(true);
+
+      // Advance time by less than cooldown (30s < 60s)
+      state.trippedAt = Date.now() - 30_000;
+
+      await callback();
+      // Should still be skipped — fn not called again
+      expect(fn).toHaveBeenCalledTimes(3);
+    });
+
+    it("retries after cooldown elapses (half-open probe)", async () => {
+      let callCount = 0;
+      const fn: TaskFn = vi.fn().mockImplementation(async () => {
+        callCount++;
+        return { success: false, summary: "still down" };
+      });
+
+      registerTask(config, "retry-test", "*/5 * * * *", true, fn);
+      const callback = scheduledCallbacks[scheduledCallbacks.length - 1];
+
+      // Trip the breaker
+      await callback();
+      await callback();
+      await callback();
+      expect(callCount).toBe(3);
+
+      const state = getTaskStates().get("retry-test")!;
+      expect(state.disabled).toBe(true);
+
+      // Advance time past cooldown
+      state.trippedAt = Date.now() - 61_000;
+
+      await callback();
+      // Should have made a probe attempt
+      expect(callCount).toBe(4);
+      // Probe failed — should still be disabled with refreshed trippedAt
+      expect(state.disabled).toBe(true);
+      expect(state.trippedAt).toBeGreaterThan(Date.now() - 5_000);
+    });
+
+    it("resets breaker on successful probe", async () => {
+      let callCount = 0;
+      const fn: TaskFn = vi.fn().mockImplementation(async () => {
+        callCount++;
+        if (callCount <= 3) return { success: false, summary: "down" };
+        return { success: true, summary: "recovered" };
+      });
+
+      registerTask(config, "recover-test", "*/5 * * * *", true, fn);
+      const callback = scheduledCallbacks[scheduledCallbacks.length - 1];
+
+      // Trip the breaker
+      await callback();
+      await callback();
+      await callback();
+      expect(callCount).toBe(3);
+
+      const state = getTaskStates().get("recover-test")!;
+      expect(state.disabled).toBe(true);
+
+      // Advance time past cooldown
+      state.trippedAt = Date.now() - 61_000;
+
+      // Probe succeeds
+      await callback();
+      expect(callCount).toBe(4);
+      expect(state.disabled).toBe(false);
+      expect(state.trippedAt).toBeNull();
+      expect(state.consecutiveFailures).toBe(0);
+    });
+
+    it("restarts cooldown on failed probe (error path)", async () => {
+      let callCount = 0;
+      const fn: TaskFn = vi.fn().mockImplementation(async () => {
+        callCount++;
+        if (callCount <= 3) return { success: false, summary: "down" };
+        throw new Error("probe crash");
+      });
+
+      registerTask(config, "probe-error-test", "*/5 * * * *", true, fn);
+      const callback = scheduledCallbacks[scheduledCallbacks.length - 1];
+
+      // Trip the breaker
+      await callback();
+      await callback();
+      await callback();
+
+      const state = getTaskStates().get("probe-error-test")!;
+      expect(state.disabled).toBe(true);
+      const originalFailures = state.consecutiveFailures;
+
+      // Advance time past cooldown
+      state.trippedAt = Date.now() - 61_000;
+
+      // Probe throws
+      await callback();
+      expect(callCount).toBe(4);
+      expect(state.disabled).toBe(true);
+      // Failures should not increment during half-open probe
+      expect(state.consecutiveFailures).toBe(originalFailures);
+      // trippedAt should be refreshed
+      expect(state.trippedAt).toBeGreaterThan(Date.now() - 5_000);
+    });
+
+    it("sets trippedAt when circuit breaker trips", async () => {
+      const fn: TaskFn = vi
+        .fn()
+        .mockResolvedValue({ success: false, summary: "fail" });
+
+      registerTask(config, "tripped-at-test", "*/5 * * * *", true, fn);
+      const callback = scheduledCallbacks[scheduledCallbacks.length - 1];
+
+      const beforeTrip = Date.now();
+      await callback();
+      await callback();
+      await callback();
+
+      const state = getTaskStates().get("tripped-at-test")!;
+      expect(state.disabled).toBe(true);
+      expect(state.trippedAt).toBeGreaterThanOrEqual(beforeTrip);
+      expect(state.trippedAt).toBeLessThanOrEqual(Date.now());
     });
   });
 
