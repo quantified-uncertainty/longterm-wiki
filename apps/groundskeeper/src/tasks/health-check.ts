@@ -12,6 +12,7 @@ async function findOpenHealthIssue(config: Config) {
   const { data } = await octokit.rest.search.issuesAndPullRequests({
     q: `repo:${owner}/${repo} is:issue is:open in:title "${ISSUE_TITLE}"`,
     per_page: 5,
+    advanced_search: true,
   });
 
   return data.items.find((issue) => issue.title === ISSUE_TITLE);
