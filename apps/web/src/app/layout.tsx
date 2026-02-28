@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AdminBadge } from "@/components/AdminBadge";
 import { DevModeToggle } from "@/components/DevModeToggle";
 import { SearchButton, SearchDialog } from "@/components/SearchDialog";
 import { MobileNav } from "@/components/MobileNav";
+import { isAdmin } from "@/lib/auth";
 import { SITE_URL } from "@/lib/site-config";
 import "./globals.css";
 import "katex/dist/katex.min.css";
@@ -28,11 +30,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const admin = await isAdmin();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -77,6 +81,7 @@ export default function RootLayout({
               </Link>
               <SearchButton />
               <DevModeToggle />
+              {admin && <AdminBadge />}
               <MobileNav />
             </nav>
           </div>

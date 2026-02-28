@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Duplicated from @/lib/auth to avoid pulling in next/headers in Edge runtime.
+const ADMIN_COOKIE_NAME = "admin_session";
+const ADMIN_TOKEN_VALUE = "authenticated";
+
 /**
- * Redirects old-style content URLs to the new /wiki/:slug canonical URLs.
- *
- * Old site (longtermwiki.com) used paths like:
- *   /knowledge-base/risks/deceptive-alignment
- *   /knowledge-base/organizations/anthropic
- *
- * New site serves all wiki content through /wiki/:id (numeric E42 or slug).
- * The /wiki/[id] route handles slug → numeric ID resolution internally.
+ * Middleware handles two concerns:
+ * 1. Admin auth gating for /internal/* routes
+ * 2. Redirecting old-style content URLs to /wiki/:slug
  */
 
 // Knowledge-base category directories that had index pages in the old site.
@@ -35,6 +34,33 @@ const KB_CATEGORIES = new Set([
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // --- Admin auth gate ---
+  // When ADMIN_PASSWORD is set, /internal/* requires a valid session cookie.
+  // If not set, internal pages remain open (dev mode / no-auth deployments).
+  if (pathname.startsWith("/internal")) {
+    const hasPassword = !!process.env.ADMIN_PASSWORD;
+    if (hasPassword) {
+      const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
+      if (token !== ADMIN_TOKEN_VALUE) {
+        const loginUrl = request.nextUrl.clone();
+        loginUrl.pathname = "/login";
+        loginUrl.searchParams.set("from", pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+    }
+  }
+
+  // If already logged in and visiting /login, redirect to /internal
+  if (pathname === "/login") {
+    const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
+    if (token === ADMIN_TOKEN_VALUE) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/internal";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
 
   // Normalize: strip trailing slash
   const path =
@@ -90,6 +116,9 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/internal",
+    "/internal/:path+",
+    "/login",
     "/browse",
     "/browse/:path+",
     "/knowledge-base",
