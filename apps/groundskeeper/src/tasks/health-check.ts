@@ -7,15 +7,14 @@ async function findOpenHealthIssue(config: Config) {
   const octokit = getOctokit(config);
   const { owner, repo } = parseRepo(config);
 
-  const { data: issues } = await octokit.rest.issues.listForRepo({
-    owner,
-    repo,
-    state: "open",
-    labels: "groundskeeper",
-    per_page: 100,
+  // Search by title using the search API — more reliable than filtering
+  // by labels, which can have indexing delays or permission issues.
+  const { data } = await octokit.rest.search.issuesAndPullRequests({
+    q: `repo:${owner}/${repo} is:issue is:open in:title "${ISSUE_TITLE}"`,
+    per_page: 5,
   });
 
-  return issues.find((issue) => issue.title === ISSUE_TITLE);
+  return data.items.find((issue) => issue.title === ISSUE_TITLE);
 }
 
 export async function healthCheck(
@@ -63,16 +62,9 @@ export async function healthCheck(
 
   // Server is down
   if (existingIssue) {
-    // Already tracked — add a comment with the latest check time
-    await octokit.rest.issues.createComment({
-      owner,
-      repo,
-      issue_number: existingIssue.number,
-      body: `⚠️ Wiki server still down at ${new Date().toISOString()}.`,
-    });
     return {
       success: false,
-      summary: `Server down, updated issue #${existingIssue.number}`,
+      summary: `Server down, tracked in issue #${existingIssue.number}`,
     };
   }
 
