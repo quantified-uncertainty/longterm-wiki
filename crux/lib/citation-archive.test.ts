@@ -5,7 +5,7 @@ import { extractClaimSentence, extractCitationsFromContent, verifyCitationsForPa
 // Mocks for verifyCitationsForPage tests
 // ---------------------------------------------------------------------------
 
-// Mock citation-content-cache (in-memory cache, replaces SQLite)
+// Mock citation-content-cache (in-memory cache)
 vi.mock('./citation-content-cache.ts', () => ({
   getCachedContent: vi.fn(() => null),
   setCachedContent: vi.fn(),

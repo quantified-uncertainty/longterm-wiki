@@ -239,7 +239,7 @@ export async function propagateClaimVerdictsToPage(
 }
 
 // ---------------------------------------------------------------------------
-// Citation Quotes Query API functions (replacing SQLite DAO reads)
+// Citation Quotes Query API functions
 // ---------------------------------------------------------------------------
 
 export async function getCitationStats(): Promise<ApiResult<CitationStatsResult>> {

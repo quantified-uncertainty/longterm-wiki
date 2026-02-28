@@ -5,9 +5,9 @@
  * summary for CI/PR use. Calls the citation archive library directly
  * instead of shelling out to CLI commands and parsing JSON with jq.
  *
- * SQLite note: verifyCitationsForPage stores full HTML content in SQLite
- * as a best-effort cache. Works fine when SQLite is unavailable — metadata
- * is always saved to YAML in data/citation-archive/.
+ * Note: verifyCitationsForPage stores full HTML content in the in-memory cache
+ * and PostgreSQL as a best-effort cache. Metadata is always saved to YAML
+ * in data/citation-archive/.
  *
  * Usage (via crux CLI):
  *   pnpm crux auto-update verify-citations <page-id> [page-id...]

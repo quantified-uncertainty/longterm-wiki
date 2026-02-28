@@ -78,6 +78,7 @@ export interface DomainSummary {
   accurate: number;
   inaccurate: number;
   unsupported: number;
+  minorIssues: number;
   inaccuracyRate: number | null;
 }
 
@@ -136,6 +137,7 @@ export async function buildDashboardExport(): Promise<DashboardExport | null> {
     accurate: number;
     inaccurate: number;
     unsupported: number;
+    minorIssues: number;
   }>();
 
   // Flagged citations
@@ -159,7 +161,7 @@ export async function buildDashboardExport(): Promise<DashboardExport | null> {
     // Domain aggregation
     if (domain) {
       if (!domainMap.has(domain)) {
-        domainMap.set(domain, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0 });
+        domainMap.set(domain, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0, minorIssues: 0 });
       }
       const d = domainMap.get(domain)!;
       d.total++;
@@ -200,7 +202,7 @@ export async function buildDashboardExport(): Promise<DashboardExport | null> {
       } else if (verdict === 'minor_issues') {
         minorIssueCount++;
         page.minorIssues++;
-        if (domain) domainMap.get(domain)!.accurate++;
+        if (domain) domainMap.get(domain)!.minorIssues++;
       }
 
       // Flag problematic citations
@@ -256,6 +258,7 @@ export async function buildDashboardExport(): Promise<DashboardExport | null> {
       accurate: d.accurate,
       inaccurate: d.inaccurate,
       unsupported: d.unsupported,
+      minorIssues: d.minorIssues,
       inaccuracyRate: d.checked > 0 ? (d.inaccurate + d.unsupported) / d.checked : null,
     });
   }

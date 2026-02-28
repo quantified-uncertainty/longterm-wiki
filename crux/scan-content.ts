@@ -7,7 +7,7 @@
  * - Article count, word counts
  * - Source references (URLs, DOIs) found in content
  *
- * Uses a JSON hash cache for change detection (no SQLite).
+ * Uses a JSON hash cache for change detection.
  *
  * Usage:
  *   node crux/scan-content.ts [options]
@@ -35,7 +35,7 @@ const VERBOSE = args.includes('--verbose');
 const colors = getColors();
 
 // ---------------------------------------------------------------------------
-// Hash cache for change detection (replaces SQLite articles.hasChanged)
+// Hash cache for change detection
 // ---------------------------------------------------------------------------
 
 const CACHE_DIR = join(PROJECT_ROOT, '.cache');

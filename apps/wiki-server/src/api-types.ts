@@ -169,6 +169,7 @@ export interface AccuracyDashboardData {
     accurate: number;
     inaccurate: number;
     unsupported: number;
+    minorIssues: number;
     inaccuracyRate: number | null;
   }>;
 }

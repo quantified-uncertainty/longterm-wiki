@@ -2,7 +2,6 @@
  * Hash Utilities
  *
  * Simple hash functions for generating IDs and detecting content changes.
- * Previously lived in knowledge-db.ts alongside the SQLite DAOs.
  */
 
 import { createHash } from 'crypto';

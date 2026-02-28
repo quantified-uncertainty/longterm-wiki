@@ -776,7 +776,7 @@ const citationsApp = new Hono()
     // Domain aggregation
     const domainMap = new Map<string, {
       total: number; checked: number; accurate: number;
-      inaccurate: number; unsupported: number;
+      inaccurate: number; unsupported: number; minorIssues: number;
     }>();
 
     // Flagged citations
@@ -811,7 +811,7 @@ const citationsApp = new Hono()
       // Domain aggregation
       if (domain) {
         if (!domainMap.has(domain)) {
-          domainMap.set(domain, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0 });
+          domainMap.set(domain, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0, minorIssues: 0 });
         }
         const d = domainMap.get(domain)!;
         d.total++;
@@ -846,6 +846,7 @@ const citationsApp = new Hono()
           if (domain) domainMap.get(domain)!.unsupported++;
         } else if (verdict === 'minor_issues') {
           minorIssueCount++; page.minorIssues++;
+          if (domain) domainMap.get(domain)!.minorIssues++;
         }
 
         // Flag problematic citations
@@ -893,6 +894,7 @@ const citationsApp = new Hono()
         accurate: d.accurate,
         inaccurate: d.inaccurate,
         unsupported: d.unsupported,
+        minorIssues: d.minorIssues,
         inaccuracyRate: d.checked > 0 ? Math.round(((d.inaccurate + d.unsupported) / d.checked) * 100) / 100 : null,
       }));
     domainAnalysis.sort((a, b) => {

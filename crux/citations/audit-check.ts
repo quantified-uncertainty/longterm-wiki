@@ -2,13 +2,13 @@
  * Citation Audit Check — independent post-hoc verification CLI
  *
  * Stateless citation verification for a single wiki page. Extracts citations
- * from the page content, fetches source URLs (or uses the SQLite cache via the
- * source-fetcher module), and independently verifies each claim with a cheap
+ * from the page content, fetches source URLs (or uses the in-memory cache via
+ * the source-fetcher module), and independently verifies each claim with a cheap
  * LLM call.
  *
- * Note: when --no-fetch is not set, fetched source content is cached in SQLite
- * (via source-fetcher) for cross-session reuse. Page content files are never
- * modified — this command only reads and reports.
+ * Note: when --no-fetch is not set, fetched source content is cached in memory
+ * and PostgreSQL (via source-fetcher) for cross-session reuse. Page content
+ * files are never modified — this command only reads and reports.
  *
  * Unlike `crux citations audit` (which is a full extract→check→fix pipeline),
  * this command only verifies — it does not write fixes to any wiki page.
