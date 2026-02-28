@@ -316,7 +316,10 @@ export class ValidationEngine {
         try {
           const ruleIssues = await rule.check(contentFile, this);
           if (Array.isArray(ruleIssues)) {
-            issues.push(...ruleIssues);
+            // Use loop instead of spread to avoid stack overflow with large result sets
+            for (const issue of ruleIssues) {
+              issues.push(issue);
+            }
           }
         } catch (err: unknown) {
           const message = err instanceof Error ? err.message : String(err);
@@ -337,7 +340,10 @@ export class ValidationEngine {
       try {
         const ruleIssues = await rule.check(filesToCheck, this);
         if (Array.isArray(ruleIssues)) {
-          issues.push(...ruleIssues);
+          // Use loop instead of spread to avoid stack overflow with large result sets
+          for (const issue of ruleIssues) {
+            issues.push(issue);
+          }
         }
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);

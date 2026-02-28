@@ -182,31 +182,59 @@ export const probabilityConsistencyRule = createRule({
     for (const [topic, claims] of Object.entries(byTopic)) {
       if (claims.length < 2) continue;
 
-      // Check for non-overlapping ranges
-      for (let i = 0; i < claims.length; i++) {
-        for (let j = i + 1; j < claims.length; j++) {
-          const a = claims[i];
-          const b = claims[j];
+      // Compute global range for this topic across all files
+      const globalLow = Math.min(...claims.map((c: ProbabilityClaim) => c.low));
+      const globalHigh = Math.max(...claims.map((c: ProbabilityClaim) => c.high));
 
-          // Skip if same file
-          if (a.filePath === b.filePath) continue;
+      // Group by file and emit at most one issue per (topic, file) pair
+      const byFile: Record<string, ProbabilityClaim[]> = {};
+      for (const claim of claims) {
+        if (!byFile[claim.filePath]) byFile[claim.filePath] = [];
+        byFile[claim.filePath].push(claim);
+      }
 
-          // Check for non-overlapping ranges
-          if (a.high < b.low || b.high < a.low) {
-            const gap = Math.min(Math.abs(a.high - b.low), Math.abs(b.high - a.low));
+      // For each file, check if any of its claims conflict with claims in other files
+      const fileEntries = Object.entries(byFile);
+      const flaggedFiles = new Set<string>();
 
-            // Only flag significant gaps (> 15 percentage points)
-            if (gap > GAP_THRESHOLD) {
-              // Topics with expected variance are info, not warnings
-              const severity = EXPECTED_VARIANCE_TOPICS.includes(topic)
-                ? Severity.INFO
-                : Severity.WARNING;
+      for (let i = 0; i < fileEntries.length; i++) {
+        const [fileA, claimsA] = fileEntries[i];
+        if (flaggedFiles.has(fileA)) continue;
 
+        for (let j = i + 1; j < fileEntries.length; j++) {
+          const [fileB, claimsB] = fileEntries[j];
+          if (flaggedFiles.has(fileA) && flaggedFiles.has(fileB)) continue;
+
+          // Find the worst gap between any claim pair across these two files
+          let worstGap = 0;
+          let worstA: ProbabilityClaim | null = null;
+          let worstB: ProbabilityClaim | null = null;
+
+          for (const a of claimsA) {
+            for (const b of claimsB) {
+              if (a.high < b.low || b.high < a.low) {
+                const gap = Math.min(Math.abs(a.high - b.low), Math.abs(b.high - a.low));
+                if (gap > worstGap) {
+                  worstGap = gap;
+                  worstA = a;
+                  worstB = b;
+                }
+              }
+            }
+          }
+
+          if (worstGap > GAP_THRESHOLD && worstA && worstB) {
+            const severity = EXPECTED_VARIANCE_TOPICS.includes(topic)
+              ? Severity.INFO
+              : Severity.WARNING;
+
+            if (!flaggedFiles.has(fileA)) {
+              flaggedFiles.add(fileA);
               issues.push(new Issue({
                 rule: 'probability-consistency',
-                file: a.filePath,
-                line: a.line,
-                message: `"${topic}" estimates differ significantly: ${a.value} vs ${b.value} (${gap.toFixed(0)} pp gap). Other location: ${b.filePath}:${b.line}`,
+                file: worstA.filePath,
+                line: worstA.line,
+                message: `"${topic}" estimates differ significantly: ${worstA.value} vs ${worstB.value} (${worstGap.toFixed(0)} pp gap). Other location: ${worstB.filePath}:${worstB.line}`,
                 severity,
               }));
             }
@@ -215,15 +243,7 @@ export const probabilityConsistencyRule = createRule({
       }
     }
 
-    // Deduplicate (same pair might be found multiple times)
-    const seen = new Set<string>();
-    return issues.filter((issue: Issue) => {
-      // Build a canonical key from the file+line pairs embedded in the message
-      const key = `${issue.file}:${issue.line}:${issue.message}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    return issues;
   },
 });
 
