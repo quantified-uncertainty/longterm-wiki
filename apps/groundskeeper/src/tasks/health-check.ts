@@ -24,7 +24,8 @@ export async function healthCheck(
   let serverUp = false;
 
   try {
-    const response = await fetch(config.wikiServerUrl, {
+    const healthUrl = config.wikiServerUrl.replace(/\/$/, "") + "/health";
+    const response = await fetch(healthUrl, {
       signal: AbortSignal.timeout(10_000),
     });
     serverUp = response.ok;
