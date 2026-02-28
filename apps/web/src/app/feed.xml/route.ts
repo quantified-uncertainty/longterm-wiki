@@ -10,57 +10,62 @@ function escapeXml(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
-function toRssDate(dateStr: string): string | null {
+function toAtomDate(dateStr: string): string | null {
   const d = new Date(dateStr);
-  return isNaN(d.getTime()) ? null : d.toUTCString();
+  return isNaN(d.getTime()) ? null : d.toISOString();
 }
 
 export function GET() {
   const pages = getAllPages()
-    .filter((p) => p.category !== "internal" && p.lastUpdated)
-    .sort((a, b) => b.lastUpdated!.localeCompare(a.lastUpdated!))
+    .filter((p) => p.category !== "internal")
+    .map((p) => ({
+      ...p,
+      // Prefer dateCreated, fall back to lastUpdated
+      feedDate: p.dateCreated || p.lastUpdated || null,
+    }))
+    .filter((p) => p.feedDate !== null)
+    .sort((a, b) => b.feedDate!.localeCompare(a.feedDate!))
     .slice(0, 50);
 
-  const lastBuildDate =
+  const updated =
     pages.length > 0
-      ? toRssDate(pages[0].lastUpdated!) ?? new Date().toUTCString()
-      : new Date().toUTCString();
+      ? toAtomDate(pages[0].feedDate!) ?? new Date().toISOString()
+      : new Date().toISOString();
 
-  const items = pages
+  const entries = pages
     .map((page) => {
       const url = `${SITE_URL}${getEntityHref(page.id)}`;
-      const pubDate = toRssDate(page.lastUpdated!);
-      if (!pubDate) return null;
-      const description = page.description || page.llmSummary || "";
+      const published = toAtomDate(page.feedDate!);
+      if (!published) return null;
+      const summary = page.description || page.llmSummary || "";
 
-      return `    <item>
-      <title>${escapeXml(page.title)}</title>
-      <link>${escapeXml(url)}</link>
-      <guid isPermaLink="false">${escapeXml(page.id)}</guid>
-      <pubDate>${pubDate}</pubDate>
-      <description>${escapeXml(description)}</description>
-      <category>${escapeXml(page.category)}</category>
-    </item>`;
+      return `  <entry>
+    <title>${escapeXml(page.title)}</title>
+    <link href="${escapeXml(url)}" rel="alternate"/>
+    <id>${escapeXml(url)}</id>
+    <published>${published}</published>
+    <updated>${toAtomDate(page.lastUpdated || page.feedDate!) ?? published}</updated>
+    <summary>${escapeXml(summary)}</summary>
+    <category term="${escapeXml(page.category)}"/>
+  </entry>`;
     })
     .filter(Boolean)
     .join("\n");
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Longterm Wiki — Recent Updates</title>
-    <link>${SITE_URL}</link>
-    <description>Recently updated pages on the Longterm Wiki, covering AI safety, existential risks, and related topics.</description>
-    <language>en</language>
-    <lastBuildDate>${lastBuildDate}</lastBuildDate>
-    <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml"/>
-${items}
-  </channel>
-</rss>`;
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Longterm Wiki — New Pages</title>
+  <link href="${SITE_URL}" rel="alternate"/>
+  <link href="${SITE_URL}/feed.xml" rel="self" type="application/atom+xml"/>
+  <id>${SITE_URL}/</id>
+  <subtitle>New pages on the Longterm Wiki, covering AI safety, existential risks, and related topics.</subtitle>
+  <updated>${updated}</updated>
+${entries}
+</feed>`;
 
   return new Response(xml, {
     headers: {
-      "Content-Type": "application/rss+xml; charset=utf-8",
+      "Content-Type": "application/atom+xml; charset=utf-8",
       "Cache-Control": "s-maxage=3600, stale-while-revalidate",
     },
   });
