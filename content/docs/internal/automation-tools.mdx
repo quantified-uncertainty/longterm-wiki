@@ -288,52 +288,49 @@ npm run validate:ci
 
 ---
 
-## Knowledge Base System
+## Citation & Content Tools
 
-SQLite-based system for managing content, sources, and AI summaries.
+Tools for verifying citations, fetching source content, and scanning wiki pages. Data is stored in the wiki-server PostgreSQL database and accessed via Hono RPC API.
 
-### Setup
-
-Requires `.env` file:
-```
-ANTHROPIC_API_KEY=sk-ant-...
-```
-
-### Commands
+### Citation Verification
 
 ```bash
-npm run crux -- analyze scan                   # Scan MDX files, extract sources
-npm run crux -- generate summaries             # Generate AI summaries
-node scripts/scan-content.mjs --stats          # Show database statistics
+# Verify all citations on a page (fetches URLs, checks quotes)
+pnpm crux citations verify <page-id>
+
+# Run citation audits across multiple pages
+pnpm crux citations audit
+
+# View citation archive for a page
+pnpm crux citations show <page-id>
 ```
 
-### Detailed Usage
+Citation results are stored in two places:
+- **YAML archive** (`data/citation-archive/<page-id>.yaml`) — per-page verification records, checked into git
+- **PostgreSQL** (`citation_content` table) — full fetched text for quote verification, accessed via wiki-server API
+
+### Content Scanning
 
 ```bash
-# Scan content (run after editing MDX files)
-node scripts/scan-content.mjs
-node scripts/scan-content.mjs --force    # Rescan all files
-node scripts/scan-content.mjs --verbose  # Show per-file progress
-
-# Generate summaries via crux
-npm run crux -- generate summaries --batch 50
-npm run crux -- generate summaries --model sonnet
-npm run crux -- generate summaries --id deceptive-alignment
-npm run crux -- generate summaries --dry-run
+# Scan MDX files for content analysis
+pnpm crux scan-content
 ```
 
-### Database Location
+### Source Fetching
 
-All cached data is in `.cache/` (gitignored):
-- `.cache/knowledge.db` - SQLite database
-- `.cache/sources/` - Fetched source documents
+When verifying citations, the system fetches source URLs through a multi-layer cache:
+1. **In-memory LRU cache** (500 entries, session-scoped)
+2. **PostgreSQL `citation_content`** (durable, cross-machine)
+3. **Network fetch** via Firecrawl API or built-in fallback
 
-### Cost Estimates
+Fetched content is cached in `.cache/sources/` locally and persisted to PostgreSQL for future sessions.
 
-| Task | Model | Cost |
-|------|-------|------|
-| Summarize all 311 articles | Haiku | ≈\$2-3 |
-| Summarize all 793 sources | Haiku | ≈\$10-15 |
+### Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `ANTHROPIC_API_KEY` | Claude API for summaries and grading |
+| `FIRECRAWL_KEY` | Web page fetching (optional, has built-in fallback) |
 
 ---
 

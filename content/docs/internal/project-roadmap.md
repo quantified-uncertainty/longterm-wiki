@@ -32,7 +32,7 @@ The project has mature infrastructure:
 | Validation Suite | ✅ Complete | 14 validators covering style, links, MDX, Mermaid, staleness, redundancy |
 | Quality Grading | ✅ Complete | Claude API-powered grading (0-100 quality/importance) |
 | Dashboard | ✅ Complete | `/dashboard/` with quality distribution, `/dashboard/graph/` for relationships |
-| Knowledge Base | ✅ Complete | SQLite cache with article/source extraction and AI summaries |
+| Knowledge Base | ✅ Complete | PostgreSQL-backed article/source extraction and AI summaries |
 | Resource Linking | ✅ Complete | `<R>` component with bidirectional tracking, metadata extraction |
 | Page Type System | ✅ Complete | overview/content/stub classification |
 | Freshness Tracking | ✅ Complete | `reviewBy`, `contentDependencies`, staleness validator |

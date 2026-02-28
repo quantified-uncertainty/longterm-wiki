@@ -329,48 +329,25 @@ A tag shared by 3 entities is more informative than one shared by 300. This prev
 **Key files generated**:
 - `database.json` — All entities, pages, relations, facts, search data, statistics (includes ID registry)
 
-### Knowledge Database (SQLite)
+### Wiki-Server (PostgreSQL)
 
-**Purpose**: Index content for analysis, cache external sources, and support AI-assisted workflows.
+**Purpose**: Durable storage for citation content, audit results, claims, facts, and other structured data. Provides full-text search and typed API access.
 
-**Location**: `.cache/knowledge.db` (gitignored, regenerated per machine)
+**Location**: Remote PostgreSQL database accessed via the wiki-server's Hono RPC API.
 
-<Mermaid chart={`
-erDiagram
-    articles ||--o{ article_sources : "cites"
-    sources ||--o{ article_sources : "cited_by"
-    articles ||--o| summaries : "has"
-    sources ||--o| summaries : "has"
+| Table | Purpose |
+|-------|---------|
+| `citation_content` | Full text of fetched source URLs |
+| `citation_audits` | Per-page citation verification results |
+| `claims` | Extracted atomic claims with source references |
+| `facts` | Canonical facts with values |
+| `resources` | External resource metadata |
+| `entities` | Entity metadata (synced from YAML) |
+| `agent_sessions` | Claude Code session logs |
 
-    articles {
-        text id PK
-        text path
-        text title
-        text content
-        int word_count
-        int quality
-        text content_hash
-    }
+CLI tools access the database through `apiRequest()` in `crux/lib/wiki-server/`. The frontend uses typed RPC clients with `InferResponseType<>` for compile-time type safety.
 
-    sources {
-        text id PK
-        text url
-        text title
-        text content
-        text fetch_status
-        text fetched_at
-    }
-
-    summaries {
-        text entity_id PK
-        text entity_type
-        text one_liner
-        text summary
-        text key_points
-    }
-`} />
-
-**See**: <EntityLink id="content-database">Content Database</EntityLink> for full schema and API reference.
+**See**: <EntityLink id="content-database">Content Database</EntityLink> for the full storage architecture.
 
 ### Page Creation Pipeline
 
@@ -467,18 +444,18 @@ sequenceDiagram
     participant PageCreator
     participant Perplexity
     participant Firecrawl
-    participant SQLite
+    participant WikiServer
     participant Claude
 
     User->>PageCreator: Create page "Topic"
     PageCreator->>Perplexity: Research queries
     Perplexity-->>PageCreator: Content + citation URLs
-    PageCreator->>SQLite: Register source URLs
+    PageCreator->>WikiServer: Register source URLs
     PageCreator->>Firecrawl: Fetch page content
-    Firecrawl-->>SQLite: Store fetched content
+    Firecrawl-->>WikiServer: Store fetched content
     PageCreator->>Claude: Synthesize with research
     Claude-->>PageCreator: Draft MDX
-    PageCreator->>SQLite: Load fetched content
+    PageCreator->>WikiServer: Load fetched content
     PageCreator->>PageCreator: Verify quotes against sources
     PageCreator->>Claude: Validation loop
     Claude-->>PageCreator: Fixed MDX
@@ -612,7 +589,7 @@ This architecture documentation should be updated when:
 ## Related Documentation
 
 - <EntityLink id="about-this-wiki">About This Wiki</EntityLink> — Contributor overview
-- <EntityLink id="content-database">Content Database</EntityLink> — SQLite schema and API
+- <EntityLink id="content-database">Content Database</EntityLink> — Storage architecture (PostgreSQL, caching, YAML)
 - <EntityLink id="automation-tools">Automation Tools</EntityLink> — CLI reference
 - <EntityLink id="page-creator-pipeline">Page Creator Pipeline</EntityLink> — Generation experiments
 - [Schema Overview](/internal/schema/) — Entity types and data relationships
