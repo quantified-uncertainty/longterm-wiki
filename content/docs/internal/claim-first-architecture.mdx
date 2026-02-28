@@ -1598,11 +1598,11 @@ The migration is additive — the claim layer sits on top of existing citation i
 
 The wiki-first experiment (Parts 9–10) extracted claims from the existing Kalshi wiki page, then verified them against sources. This has a fundamental flaw: we're extracting claims from prose that was already synthesized by an LLM, then checking if those synthesized claims match sources. The knowledge is filtered twice.
 
-**Source-first extraction** inverts this: extract claims directly from the 32 raw source documents cached in the SQLite `citation_content` table (379K chars total), compose a wiki page from those claims, and never reference the existing wiki page. This tests whether the claim-first architecture can build knowledge from primary sources.
+**Source-first extraction** inverts this: extract claims directly from the 32 raw source documents cached in the PostgreSQL `citation_content` table (379K chars total), compose a wiki page from those claims, and never reference the existing wiki page. This tests whether the claim-first architecture can build knowledge from primary sources.
 
 ### Method
 
-1. **Load sources** — Read full text from SQLite `citation_content` cache for all Kalshi-related URLs. Rank by importance (from citation archive YAML).
+1. **Load sources** — Read full text from PostgreSQL `citation_content` cache for all Kalshi-related URLs. Rank by importance (from citation archive YAML).
 2. **Extract claims per source** — Each source processed independently. Claims tagged with topics (founding, funding, regulatory, operations, partnerships, competition, market-data, community-reception, consumer-concerns).
 3. **Cross-source deduplication** — Jaccard similarity ≥0.65 on word sets. Lower threshold than wiki-first (0.8) because cross-source claims use different phrasing for the same fact. Track `sourceCount` and `allSources` for multi-source confidence.
 4. **Editorial direction** — Generate section structure and map topics to sections.

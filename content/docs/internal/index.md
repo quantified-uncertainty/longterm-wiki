@@ -18,7 +18,7 @@ This section contains internal documentation for maintaining and contributing to
 ## Automation and Tools
 
 - <EntityLink id="automation-tools">Automation Tools</EntityLink> - Complete reference for all scripts and CLI workflows
-- <EntityLink id="content-database">Content Database</EntityLink> - SQLite-based system for indexing and AI summaries
+- <EntityLink id="content-database">Content Database</EntityLink> - Storage architecture (PostgreSQL, caching, YAML)
 
 ## Style Guides
 

@@ -62,7 +62,7 @@ Some documentation can be auto-generated from code:
 | Content Type | Generation Method |
 |--------------|-------------------|
 | CLI help text | `npm run crux -- --help` |
-| Database schema | Extract from `knowledge-db.mjs` |
+| Database schema | Extract from wiki-server API types |
 | Validation rules | List from `scripts/validate/` |
 | Cost estimates | Pull from actual API usage |
 
@@ -215,7 +215,7 @@ When reviewing a PR that touches `/scripts/`:
 | Changed File | Update These Docs |
 |--------------|-------------------|
 | `scripts/content/page-creator.mjs` | <EntityLink id="architecture">Architecture</EntityLink>, <EntityLink id="automation-tools">Automation Tools</EntityLink> |
-| `scripts/lib/knowledge-db.mjs` | <EntityLink id="content-database">Content Database</EntityLink>, <EntityLink id="architecture">Architecture</EntityLink> |
+| `apps/wiki-server/src/routes/*` | <EntityLink id="content-database">Content Database</EntityLink>, <EntityLink id="architecture">Architecture</EntityLink> |
 | `scripts/crux.mjs` or `commands/*` | <EntityLink id="automation-tools">Automation Tools</EntityLink> |
 | `src/content.config.ts` | <EntityLink id="page-types">Page Types</EntityLink> |
 | Any validation script | <EntityLink id="automation-tools">Automation Tools</EntityLink> |
