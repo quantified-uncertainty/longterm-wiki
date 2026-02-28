@@ -514,6 +514,15 @@ describe("internal sidebar completeness (real data)", () => {
   it("every migrated dashboard MDX stub has contentFormat: dashboard", () => {
     if (!fs.existsSync(APP_INTERNAL_DIR)) return;
 
+    // Load DB once before the loop to avoid repeated JSON parses
+    const dbPath = path.join(DATA_DIR, "database.json");
+    if (!fs.existsSync(dbPath)) return;
+
+    const db = loadJson<{
+      idRegistry: { byNumericId: Record<string, string> };
+      pages: Array<{ id: string; contentFormat: string; subcategory: string }>;
+    }>(dbPath);
+
     const errors: string[] = [];
     for (const entry of fs.readdirSync(APP_INTERNAL_DIR, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
@@ -523,15 +532,6 @@ describe("internal sidebar completeness (real data)", () => {
       const source = fs.readFileSync(pagePath, "utf-8");
       const redirectMatch = source.match(/redirect\(["']\/wiki\/(E\d+)["']\)/);
       if (!redirectMatch) continue;
-
-      // This is a migrated dashboard — find its MDX stub
-      const dbPath = path.join(DATA_DIR, "database.json");
-      if (!fs.existsSync(dbPath)) continue;
-
-      const db = loadJson<{
-        idRegistry: { byNumericId: Record<string, string> };
-        pages: Array<{ id: string; contentFormat: string; subcategory: string }>;
-      }>(dbPath);
 
       const eid = redirectMatch[1];
       const slug = db.idRegistry.byNumericId[eid];

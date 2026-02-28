@@ -123,7 +123,7 @@ const SCRIPTS = {
     positional: false,
   },
   'validate-quality': {
-    script: 'claims/validate-quality.ts',
+    script: 'claims/validate-quality/index.ts',
     description: 'Audit existing claims for quality issues (10 checks per claim)',
     passthrough: ['json'],
     positional: true,
@@ -145,6 +145,12 @@ const SCRIPTS = {
     description: 'Auto-fix common quality issues: strip-markup, dedup, normalize-entities',
     passthrough: ['apply', 'entity', 'entity-id', 'limit'],
     positional: true,
+  },
+  'fix-all': {
+    script: 'claims/fix-all.ts',
+    description: 'Run all quality fixers in order: strip-markup, backfill, normalize, dedup',
+    passthrough: ['apply', 'entity', 'entity-id'],
+    positional: false,
   },
   'quality-report': {
     script: 'claims/quality-report.ts',
@@ -277,6 +283,11 @@ Workflow:
   1. crux claims integrate <page-id>                 Dry-run: show what would change
   2. crux claims integrate <page-id> --apply          Link quotes + convert rc→cr + create refs
   3. crux claims integrate <page-id> --skip-extract   Skip extraction (claims must already exist)
+
+  One-command quality remediation (all fixers in correct order):
+  1. crux claims fix-all                             Dry-run: preview all fixes
+  2. crux claims fix-all --apply                     Apply all fixes in order
+  3. crux claims fix-all --entity=anthropic --apply  Single entity
 
   Footnote migration (DB-driven references):
   1. crux claims migrate-footnotes <page-id>          Dry-run: show what would change
