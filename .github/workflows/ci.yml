@@ -62,6 +62,8 @@ jobs:
           pids+=($!)
           (cd apps/wiki-server && npx tsc --noEmit) &
           pids+=($!)
+          (cd apps/groundskeeper && npx tsc --noEmit) &
+          pids+=($!)
           failed=0
           for pid in "${pids[@]}"; do
             wait "$pid" || failed=1
