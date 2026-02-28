@@ -123,7 +123,7 @@ const SCRIPTS = {
     positional: false,
   },
   'validate-quality': {
-    script: 'claims/validate-quality.ts',
+    script: 'claims/validate-quality/index.ts',
     description: 'Audit existing claims for quality issues (10 checks per claim)',
     passthrough: ['json'],
     positional: true,
