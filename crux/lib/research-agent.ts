@@ -27,7 +27,7 @@
  * See issue #684.
  */
 
-import { getApiKey } from './api-keys.ts';
+import { getApiKey, SCRY_PUBLIC_KEY } from './api-keys.ts';
 import { fetchSources } from './source-fetcher.ts';
 import { createLlmClient, streamingCreate, extractText, MODELS } from './llm.ts';
 import type { SourceCacheEntry } from './section-writer.ts';
@@ -148,7 +148,6 @@ interface ScryApiResponse {
 // Constants
 // ---------------------------------------------------------------------------
 
-const SCRY_PUBLIC_KEY = 'exopriors_public_readonly_v1_2025';
 const DEFAULT_BUDGET_CAP = 5.0;
 const DEFAULT_MAX_RESULTS_PER_SOURCE = 8;
 const DEFAULT_MAX_URLS_TO_FETCH = 20;

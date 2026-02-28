@@ -18,3 +18,9 @@ export function getApiKey(envVar: string): string | undefined {
   const cleaned = raw.replace(/^["'\s]+|["'\s]+$/g, '');
   return cleaned || undefined;
 }
+
+/**
+ * Scry (Exopriors) public API key.
+ * Falls back to the public readonly key if SCRY_API_KEY env var is not set.
+ */
+export const SCRY_PUBLIC_KEY: string = getApiKey('SCRY_API_KEY') || 'exopriors_public_readonly_v1_2025';

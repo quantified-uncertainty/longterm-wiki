@@ -15,7 +15,7 @@
 - **Array spread overflow**: `array.push(...largeArray)` causes "Maximum call stack size exceeded" when `largeArray` has >65k elements. Use a for-of loop instead.
 
 ## Architecture Notes
-- **SCRY_PUBLIC_KEY** is duplicated in 3 files. Should be consolidated into `crux/lib/`.
+- **SCRY_PUBLIC_KEY** is defined in `crux/lib/api-keys.ts`. All consumers import from there (consolidated Feb 2026).
 - **crux/ import direction**: `lib → authoring`, never `authoring → lib`.
 - **SQLite knowledge.db retired**: All data access migrated to PostgreSQL wiki-server (completed Feb 2026).
 - **citation_quotes → claims migration**: Write pipelines redirected to claims system. citation_quotes table is read-only pending frontend migration (#1311).
