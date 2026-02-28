@@ -5,12 +5,10 @@ import { extractClaimSentence, extractCitationsFromContent, verifyCitationsForPa
 // Mocks for verifyCitationsForPage tests
 // ---------------------------------------------------------------------------
 
-// Mock knowledge-db (SQLite) — best-effort local store
-vi.mock('./knowledge-db.ts', () => ({
-  citationContent: {
-    getByUrl: vi.fn(() => null),
-    upsert: vi.fn(),
-  },
+// Mock citation-content-cache (in-memory cache, replaces SQLite)
+vi.mock('./citation-content-cache.ts', () => ({
+  getCachedContent: vi.fn(() => null),
+  setCachedContent: vi.fn(),
 }));
 
 // Mock wiki-server citations client (PostgreSQL)

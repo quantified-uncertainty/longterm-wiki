@@ -3,33 +3,29 @@
 /**
  * Content Scanning Script
  *
- * Scans all MDX files and populates the knowledge database with:
- * - Article content and metadata
- * - Source references (URLs, DOIs)
+ * Scans all MDX files and reports content statistics:
+ * - Article count, word counts
+ * - Source references (URLs, DOIs) found in content
+ *
+ * Uses a JSON hash cache for change detection (no SQLite).
  *
  * Usage:
  *   node crux/scan-content.ts [options]
  *
  * Options:
  *   --force       Rescan all files even if unchanged
- *   --stats       Show database statistics only
+ *   --stats       Show statistics only (file counts from MDX)
  *   --verbose     Show detailed progress
  */
 
-import { readFileSync } from 'fs';
-import { basename, relative } from 'path';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { basename, relative, join } from 'path';
 import { fileURLToPath } from 'url';
-import {
-  articles,
-  sources,
-  contentHash,
-  hashId,
-  getStats,
-} from './lib/knowledge-db.ts';
+import { contentHash } from './lib/hash-utils.ts';
 import { findMdxFiles } from './lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from './lib/mdx-utils.ts';
 import { getColors } from './lib/output.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from './lib/content-types.ts';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from './lib/content-types.ts';
 
 const args = process.argv.slice(2);
 const FORCE = args.includes('--force');
@@ -37,6 +33,39 @@ const STATS_ONLY = args.includes('--stats');
 const VERBOSE = args.includes('--verbose');
 
 const colors = getColors();
+
+// ---------------------------------------------------------------------------
+// Hash cache for change detection (replaces SQLite articles.hasChanged)
+// ---------------------------------------------------------------------------
+
+const CACHE_DIR = join(PROJECT_ROOT, '.cache');
+const HASH_CACHE_PATH = join(CACHE_DIR, 'content-hashes.json');
+
+type HashCache = Record<string, string>;
+
+function loadHashCache(): HashCache {
+  try {
+    if (existsSync(HASH_CACHE_PATH)) {
+      return JSON.parse(readFileSync(HASH_CACHE_PATH, 'utf-8'));
+    }
+  } catch {
+    // Corrupt cache — start fresh
+  }
+  return {};
+}
+
+function saveHashCache(cache: HashCache): void {
+  mkdirSync(CACHE_DIR, { recursive: true });
+  writeFileSync(HASH_CACHE_PATH, JSON.stringify(cache, null, 2));
+}
+
+function hasChanged(cache: HashCache, entityId: string, newHash: string): boolean {
+  return cache[entityId] !== newHash;
+}
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
 interface Frontmatter {
   title?: string;
@@ -198,45 +227,25 @@ function inferSourceType(url: string | undefined): string {
 /**
  * Process a single MDX file
  */
-function processFile(filePath: string): ProcessFileResult {
+function processFile(filePath: string, hashCache: HashCache): ProcessFileResult {
   const raw = readFileSync(filePath, 'utf-8');
   const frontmatter = parseFrontmatter(raw) as Frontmatter;
   const content = getContentBody(raw);
 
   const entityId = getEntityIdFromPath(filePath);
-  const relativePath = relative(PROJECT_ROOT, filePath);
   const text = extractTextContent(content);
   const hash = contentHash(text);
 
   // Check if we need to process (skip if unchanged and not forcing)
-  if (!FORCE && !articles.hasChanged(entityId, hash)) {
+  if (!FORCE && !hasChanged(hashCache, entityId, hash)) {
     return { entityId, skipped: true };
   }
 
-  // Extract source references
+  // Update hash cache
+  hashCache[entityId] = hash;
+
+  // Extract source references (for reporting only)
   const sourceRefs = extractSourceReferences(content, frontmatter);
-
-  // Upsert article
-  articles.upsert({
-    id: entityId,
-    path: relativePath,
-    title: frontmatter.title || entityId,
-    description: frontmatter.description || '',
-    content: text,
-    wordCount: text.split(/\s+/).length,
-    quality: frontmatter.quality || frontmatter.ratings?.completeness || null,
-    contentHash: hash
-  });
-
-  // Process source references
-  for (const ref of sourceRefs) {
-    const sourceId = hashId(ref.url || ref.doi || ref.title || '');
-    sources.upsert({
-      id: sourceId,
-      ...ref
-    });
-    sources.linkToArticle(entityId, sourceId);
-  }
 
   return {
     entityId,
@@ -252,19 +261,21 @@ function processFile(filePath: string): ProcessFileResult {
 // =============================================================================
 
 function main(): void {
-  console.log(`${colors.blue}📚 Content Scanner${colors.reset}\n`);
-
-  if (STATS_ONLY) {
-    const stats = getStats();
-    console.log('Database Statistics:');
-    console.log(`  Articles: ${stats.articles}`);
-    console.log(`  Sources: ${JSON.stringify(stats.sources)}`);
-    process.exit(0);
-  }
+  console.log(`${colors.blue}Content Scanner${colors.reset}\n`);
 
   // Find all MDX files
   const mdxFiles = findMdxFiles(CONTENT_DIR);
+
+  if (STATS_ONLY) {
+    console.log('Content Statistics:');
+    console.log(`  MDX files: ${mdxFiles.length}`);
+    process.exit(0);
+  }
+
   console.log(`Found ${mdxFiles.length} content files\n`);
+
+  // Load hash cache for change detection
+  const hashCache = loadHashCache();
 
   // Process each file
   let processed = 0;
@@ -274,40 +285,37 @@ function main(): void {
 
   for (const filePath of mdxFiles) {
     try {
-      const result = processFile(filePath);
+      const result = processFile(filePath, hashCache);
 
       if (result.skipped) {
         skipped++;
         if (VERBOSE) {
-          console.log(`${colors.dim}⊘ ${result.entityId} (unchanged)${colors.reset}`);
+          console.log(`${colors.dim}skip ${result.entityId} (unchanged)${colors.reset}`);
         }
       } else {
         processed++;
         totalSources += result.sourcesFound || 0;
         totalWords += result.wordCount || 0;
         if (VERBOSE) {
-          console.log(`${colors.green}✓${colors.reset} ${result.entityId} (${result.wordCount} words, ${result.sourcesFound} sources)`);
+          console.log(`${colors.green}ok${colors.reset} ${result.entityId} (${result.wordCount} words, ${result.sourcesFound} sources)`);
         }
       }
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
-      console.log(`${colors.red}✗ Error processing ${filePath}: ${error.message}${colors.reset}`);
+      console.log(`${colors.red}err${colors.reset} ${filePath}: ${error.message}`);
     }
   }
 
+  // Save updated hash cache
+  saveHashCache(hashCache);
+
   // Summary
   console.log(`\n${'─'.repeat(50)}`);
-  console.log(`${colors.green}✅ Scan complete${colors.reset}\n`);
+  console.log(`${colors.green}Scan complete${colors.reset}\n`);
   console.log(`  Files processed: ${processed}`);
   console.log(`  Files skipped (unchanged): ${skipped}`);
   console.log(`  Total words: ${totalWords.toLocaleString()}`);
   console.log(`  Source references found: ${totalSources}`);
-
-  // Show current stats
-  const stats = getStats();
-  console.log(`\n${colors.blue}Database totals:${colors.reset}`);
-  console.log(`  Articles: ${stats.articles}`);
-  console.log(`  Sources: ${stats.sources.total} (${stats.sources.fetched} fetched, ${stats.sources.pending} pending)`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

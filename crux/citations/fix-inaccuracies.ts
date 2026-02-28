@@ -25,7 +25,7 @@ import { stripFrontmatter } from '../lib/patterns.ts';
 import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL, checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { appendEditLog } from '../lib/edit-log.ts';
-import { citationContent } from '../lib/knowledge-db.ts';
+import { getCachedContent } from '../lib/citation-content-cache.ts';
 import { getQuote, markCitationAccuracy } from '../lib/wiki-server/citations.ts';
 import { checkAccuracyForPage } from './check-accuracy.ts';
 import { extractQuotesForPage } from './extract-quotes.ts';
@@ -233,11 +233,11 @@ async function lookupFootnoteEvidence(pageId: string, footnote: number): Promise
 
     // Fall back to cached full text
     if (row.url) {
-      const cached = citationContent.getByUrl(row.url);
-      if (cached?.full_text) {
-        const truncated = cached.full_text.length > MAX_SOURCE_PER_ESCALATION
-          ? cached.full_text.slice(0, MAX_SOURCE_PER_ESCALATION) + '\n[... truncated ...]'
-          : cached.full_text;
+      const cached = getCachedContent(row.url);
+      if (cached?.fullText) {
+        const truncated = cached.fullText.length > MAX_SOURCE_PER_ESCALATION
+          ? cached.fullText.slice(0, MAX_SOURCE_PER_ESCALATION) + '\n[... truncated ...]'
+          : cached.fullText;
         return `Full source text:\n${truncated}`;
       }
     }
@@ -525,9 +525,9 @@ export async function secondOpinionCheck(
       // Get the best source text available
       let sourceText = row.sourceQuote || '';
       if (row.url) {
-        const cached = citationContent.getByUrl(row.url);
-        if (cached?.full_text && cached.full_text.length > sourceText.length) {
-          sourceText = cached.full_text;
+        const cached = getCachedContent(row.url);
+        if (cached?.fullText && cached.fullText.length > sourceText.length) {
+          sourceText = cached.fullText;
         }
       }
       if (!sourceText || sourceText.length < 20) continue;
@@ -716,9 +716,9 @@ export async function enrichFromApi(flagged: FlaggedCitation[]): Promise<Enriche
       const row = rowResult.ok ? rowResult.data.quote : null;
       let sourceFullText: string | null = null;
       if (f.url) {
-        const cached = citationContent.getByUrl(f.url);
-        if (cached?.full_text) {
-          sourceFullText = cached.full_text;
+        const cached = getCachedContent(f.url);
+        if (cached?.fullText) {
+          sourceFullText = cached.fullText;
         }
       }
       results.push({

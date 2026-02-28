@@ -36,9 +36,10 @@ vi.mock('./source-fetcher.ts', () => ({
   fetchSource: vi.fn(),
 }));
 
-// Mock knowledge-db (pulled in transitively via citation-archive.ts).
-vi.mock('./knowledge-db.ts', () => ({
-  citationContent: { getByUrl: vi.fn(() => null), upsert: vi.fn() },
+// Mock citation-content-cache (pulled in transitively via citation-archive.ts).
+vi.mock('./citation-content-cache.ts', () => ({
+  getCachedContent: vi.fn(() => null),
+  setCachedContent: vi.fn(),
 }));
 
 import { callOpenRouter } from './quote-extractor.ts';

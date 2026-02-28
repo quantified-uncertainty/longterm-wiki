@@ -15,7 +15,7 @@
 import { fileURLToPath } from 'url';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { citationContent } from '../lib/knowledge-db.ts';
+import { getCachedContent } from '../lib/citation-content-cache.ts';
 import {
   getQuotesByPage,
   getPagesWithQuotes,
@@ -114,9 +114,9 @@ export async function checkAccuracyForPage(
       // fall back to the narrow extracted quote
       let sourceText = q.sourceQuote!;
       if (q.url) {
-        const cached = citationContent.getByUrl(q.url);
-        if (cached?.full_text && cached.full_text.length > sourceText.length) {
-          sourceText = cached.full_text;
+        const cached = getCachedContent(q.url);
+        if (cached?.fullText && cached.fullText.length > sourceText.length) {
+          sourceText = cached.fullText;
         }
       }
 

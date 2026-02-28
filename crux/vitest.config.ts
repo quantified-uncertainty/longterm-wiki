@@ -20,10 +20,9 @@ export default defineConfig({
       'evals/**/*.test.ts',
     ],
     root: __dirname,
-    // Run test files sequentially to prevent SQLite cross-file contamination.
-    // Multiple test files share a single on-disk SQLite DB (knowledge.db); parallel
-    // execution causes one worker's beforeEach/afterEach cleanup to race with
-    // another worker's seed step, producing flaky failures.
+    // Run test files sequentially to prevent cross-file test contamination.
+    // Some test files share mocked module state; parallel execution can cause
+    // flaky failures from mock setup/teardown racing.
     fileParallelism: false,
   },
 });

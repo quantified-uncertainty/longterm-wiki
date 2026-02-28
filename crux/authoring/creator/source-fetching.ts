@@ -2,11 +2,15 @@
  * Source Fetching Module
  *
  * Handles registration and fetching of source URLs from research results.
+ * Uses resource YAML files for existence checks and local cache files for
+ * fetched content (no SQLite dependency).
  */
 
 import fs from 'fs';
 import path from 'path';
-import { sources, hashId, SOURCES_DIR } from '../../lib/knowledge-db.ts';
+import { hashId } from '../../lib/hash-utils.ts';
+import { SOURCES_DIR } from '../../lib/cache-paths.ts';
+import { getResourceByUrl } from '../../lib/resource-lookup.ts';
 import { getApiKey } from '../../lib/api-keys.ts';
 import type { TopicPhaseContext, ResearchPhaseContext } from './types.ts';
 
@@ -74,7 +78,9 @@ export function extractUrls(text: string): string[] {
 }
 
 /**
- * Extract citation URLs from Perplexity research and register them in the knowledge DB
+ * Extract citation URLs from Perplexity research and register them for fetching.
+ * Checks resource YAML files for already-known URLs; new URLs are tracked
+ * in the registered-sources.json output file.
  */
 export async function registerResearchSources(topic: string, { log, saveResult, getTopicDir }: RegisterContext): Promise<{ success: boolean; error?: string; registered?: number; existing?: number; total?: number }> {
   log('register-sources', 'Extracting and registering citation URLs...');
@@ -105,37 +111,20 @@ export async function registerResearchSources(topic: string, { log, saveResult, 
 
   for (const url of allUrls) {
     try {
-      const existingSource = sources.getByUrl(url);
-      if (existingSource) {
+      const existingResource = getResourceByUrl(url);
+      if (existingResource) {
         existing.push(url);
-        continue;
+      } else {
+        registered.push(url);
       }
-
-      let sourceType = 'web';
-      if (url.includes('arxiv.org')) sourceType = 'paper';
-      else if (url.includes('scholar.google')) sourceType = 'paper';
-      else if (url.includes('lesswrong.com')) sourceType = 'blog';
-      else if (url.includes('forum.effectivealtruism.org')) sourceType = 'blog';
-      else if (url.includes('substack.com')) sourceType = 'blog';
-      else if (url.includes('medium.com')) sourceType = 'blog';
-      else if (url.includes('grokipedia.com')) sourceType = 'reference';
-
-      const id = hashId(url);
-      sources.upsert({
-        id,
-        url,
-        title: null,
-        sourceType,
-      });
-
-      registered.push(url);
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
-      log('register-sources', `  Failed to register ${url}: ${error.message}`);
+      log('register-sources', `  Failed to check ${url}: ${error.message}`);
+      registered.push(url);
     }
   }
 
-  log('register-sources', `Registered ${registered.length} new sources, ${existing.length} already existed`);
+  log('register-sources', `Found ${registered.length} new sources, ${existing.length} already in resources`);
 
   saveResult(topic, 'registered-sources.json', {
     topic,
@@ -150,7 +139,9 @@ export async function registerResearchSources(topic: string, { log, saveResult, 
 }
 
 /**
- * Fetch content from registered sources using Firecrawl
+ * Fetch content from registered sources using Firecrawl.
+ * Content is cached as local files in SOURCES_DIR; skipExisting checks
+ * whether the cache file already exists on disk.
  */
 export async function fetchRegisteredSources(topic: string, options: FetchOptions, { log, saveResult, getTopicDir }: FetchContext): Promise<{ success: boolean; error?: string; fetched: number; failed?: number; skipped?: number }> {
   const { maxSources = 10, skipExisting = true } = options;
@@ -169,18 +160,24 @@ export async function fetchRegisteredSources(topic: string, options: FetchOption
     return { success: false, error: 'No registered sources', fetched: 0 };
   }
 
+  // Ensure SOURCES_DIR exists
+  if (!fs.existsSync(SOURCES_DIR)) {
+    fs.mkdirSync(SOURCES_DIR, { recursive: true });
+  }
+
   const registration: RegistrationData = JSON.parse(fs.readFileSync(registeredPath, 'utf-8'));
   const urlsToFetch: Array<{ id: string; url: string }> = [];
 
   for (const url of registration.urls) {
-    const source = sources.getByUrl(url);
-    if (!source) continue;
+    const id = hashId(url);
+    const cachePath = path.join(SOURCES_DIR, `${id}.txt`);
 
-    if (skipExisting && source.fetch_status === 'fetched' && source.content) {
+    // Skip if content already cached on disk
+    if (skipExisting && fs.existsSync(cachePath)) {
       continue;
     }
 
-    urlsToFetch.push({ id: source.id, url });
+    urlsToFetch.push({ id, url });
     if (urlsToFetch.length >= maxSources) break;
   }
 
@@ -208,18 +205,8 @@ export async function fetchRegisteredSources(topic: string, options: FetchOption
       const result: any = await firecrawl.scrapeUrl(url, { formats: ['markdown'] });
 
       if (result.markdown) {
-        const cacheFile = `${id}.txt`;
-        sources.markFetched(id, result.markdown, cacheFile);
-
         const cachePath = path.join(SOURCES_DIR, `${id}.txt`);
         fs.writeFileSync(cachePath, result.markdown);
-
-        const metadata = result.metadata || {};
-        if (metadata.publishedTime) {
-          sources.updateMetadata(id, {
-            year: new Date(metadata.publishedTime).getFullYear(),
-          });
-        }
 
         log('fetch-sources', `     ✓ ${result.markdown.length.toLocaleString()} chars`);
         fetched++;
@@ -237,7 +224,6 @@ export async function fetchRegisteredSources(topic: string, options: FetchOption
       } else {
         log('fetch-sources', `     ✗ ${msg}`);
       }
-      sources.markFailed(id, msg);
       failed++;
     }
 
@@ -260,7 +246,8 @@ export async function fetchRegisteredSources(topic: string, options: FetchOption
 }
 
 /**
- * Get fetched content for quote verification
+ * Get fetched content for quote verification.
+ * Reads cached content from local files in SOURCES_DIR.
  */
 export function getFetchedSourceContent(topic: string, { getTopicDir }: GetTopicDirContext): FetchedSourceContent | null {
   const registeredPath = path.join(getTopicDir(topic), 'registered-sources.json');
@@ -272,9 +259,13 @@ export function getFetchedSourceContent(topic: string, { getTopicDir }: GetTopic
   const contents: Array<{ url: string; content: string }> = [];
 
   for (const url of registration.urls) {
-    const source = sources.getByUrl(url);
-    if (source?.content) {
-      contents.push({ url, content: source.content });
+    const id = hashId(url);
+    const cachePath = path.join(SOURCES_DIR, `${id}.txt`);
+    if (fs.existsSync(cachePath)) {
+      const content = fs.readFileSync(cachePath, 'utf-8');
+      if (content.length > 0) {
+        contents.push({ url, content });
+      }
     }
   }
 

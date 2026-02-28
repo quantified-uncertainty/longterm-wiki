@@ -1,7 +1,7 @@
 /**
  * Citation Content Coverage Stats
  *
- * Shows how many citation URLs have full text cached in SQLite and PostgreSQL.
+ * Shows how many citation URLs have full text cached in PostgreSQL.
  * Useful for understanding backfill coverage before running verification.
  *
  * Usage:
@@ -9,10 +9,7 @@
  *   pnpm crux citations content-coverage --json # JSON output
  */
 
-import { existsSync } from 'fs';
-import { join } from 'path';
 import { fileURLToPath } from 'url';
-import { citationContent, PROJECT_ROOT } from '../lib/knowledge-db.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { getCitationContentStats } from '../lib/wiki-server/citations.ts';
 import { getColors } from '../lib/output.ts';
@@ -23,24 +20,7 @@ async function main() {
   const json = args.json === true;
   const c = getColors(json);
 
-  // SQLite stats
-  const dbPath = join(PROJECT_ROOT, '.cache', 'knowledge.db');
-  const dbExists = existsSync(dbPath);
-
-  let sqliteStats: { totalUrls: number; totalPages: number; totalBytes: number } | null = null;
-  let sqliteWithFullText = 0;
-
-  if (dbExists) {
-    try {
-      sqliteStats = citationContent.stats();
-      const allRows = citationContent.getAll();
-      sqliteWithFullText = allRows.filter(r => r.full_text && r.full_text.length > 0).length;
-    } catch {
-      // DB may be locked or unavailable
-    }
-  }
-
-  // PostgreSQL stats
+  // PostgreSQL stats (authoritative store)
   const serverAvailable = await isServerAvailable();
   let pgStats: {
     total: number;
@@ -61,15 +41,6 @@ async function main() {
 
   if (json) {
     console.log(JSON.stringify({
-      sqlite: sqliteStats ? {
-        totalUrls: sqliteStats.totalUrls,
-        totalPages: sqliteStats.totalPages,
-        totalBytes: sqliteStats.totalBytes,
-        withFullText: sqliteWithFullText,
-        coveragePct: sqliteStats.totalUrls > 0
-          ? Math.round((sqliteWithFullText / sqliteStats.totalUrls) * 100)
-          : 0,
-      } : null,
       postgres: pgStats ? {
         total: pgStats.total,
         withFullText: pgStats.withFullText,
@@ -85,25 +56,8 @@ async function main() {
 
   console.log(`\n${c.bold}${c.blue}Citation Content Coverage${c.reset}\n`);
 
-  // SQLite section
-  console.log(`${c.bold}SQLite (local cache):${c.reset}`);
-  if (!dbExists) {
-    console.log(`  ${c.yellow}No knowledge.db found at ${dbPath}${c.reset}`);
-    console.log(`  Run 'pnpm crux citations verify' to populate the local cache.`);
-  } else if (!sqliteStats) {
-    console.log(`  ${c.red}Could not read SQLite stats (DB locked?)${c.reset}`);
-  } else {
-    const pct = sqliteStats.totalUrls > 0
-      ? Math.round((sqliteWithFullText / sqliteStats.totalUrls) * 100)
-      : 0;
-    console.log(`  Total URLs:    ${sqliteStats.totalUrls}`);
-    console.log(`  Total pages:   ${sqliteStats.totalPages}`);
-    console.log(`  With full text: ${c.green}${sqliteWithFullText}${c.reset} / ${sqliteStats.totalUrls} (${pct}%)`);
-    console.log(`  Total size:    ${(sqliteStats.totalBytes / 1024 / 1024).toFixed(1)} MB`);
-  }
-
   // PostgreSQL section
-  console.log(`\n${c.bold}PostgreSQL (server cache):${c.reset}`);
+  console.log(`${c.bold}PostgreSQL (authoritative store):${c.reset}`);
   if (!serverAvailable) {
     console.log(`  ${c.yellow}Server not available — set LONGTERMWIKI_SERVER_URL${c.reset}`);
   } else if (!pgStats) {
@@ -118,13 +72,6 @@ async function main() {
     if (pgStats.avgContentLength) {
       console.log(`  Avg length:    ${(pgStats.avgContentLength / 1024).toFixed(0)} KB`);
     }
-  }
-
-  // Backfill hint
-  if (sqliteWithFullText > 0 && pgStats && pgStats.withFullText < sqliteWithFullText) {
-    const gap = sqliteWithFullText - pgStats.withFullText;
-    console.log(`\n${c.yellow}Hint: ${gap} rows in SQLite not yet in PG.${c.reset}`);
-    console.log(`  Run: pnpm crux citations backfill-content`);
   }
 
   console.log('');

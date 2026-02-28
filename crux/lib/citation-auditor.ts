@@ -25,7 +25,7 @@ import { extractCitationsFromContent, extractClaimSentence } from './citation-ar
 import { callOpenRouter, stripCodeFences, truncateSource, DEFAULT_CITATION_MODEL } from './quote-extractor.ts';
 import { fetchSource, type FetchedSource } from './source-fetcher.ts';
 import { stripFrontmatter } from './patterns.ts';
-import { citationContent } from './knowledge-db.ts';
+import { getCachedContent } from './citation-content-cache.ts';
 import { getCitationContentByUrl } from './wiki-server/citations.ts';
 
 /** Minimum source content length (chars) required to attempt LLM verification. */
@@ -434,23 +434,19 @@ export async function resolveSource(
     }
   }
 
-  // fetchMissing=false: still try local citation_content caches (SQLite → PG)
+  // fetchMissing=false: still try local citation_content caches (memory → PG)
   // without making any network calls. This lets --no-fetch mode use previously
   // cached full text instead of falling back to the short contentSnippet.
-  try {
-    const sqliteRow = citationContent.getByUrl(url);
-    if (sqliteRow?.full_text && sqliteRow.full_text.length > MIN_SOURCE_CONTENT_LENGTH) {
-      return {
-        url,
-        title: sqliteRow.page_title ?? '',
-        fetchedAt: sqliteRow.fetched_at ?? new Date().toISOString(),
-        content: sqliteRow.full_text,
-        relevantExcerpts: [],
-        status: 'ok',
-      };
-    }
-  } catch {
-    // SQLite unavailable — continue to PG
+  const memoryCached = getCachedContent(url);
+  if (memoryCached?.fullText && memoryCached.fullText.length > MIN_SOURCE_CONTENT_LENGTH) {
+    return {
+      url,
+      title: memoryCached.pageTitle ?? '',
+      fetchedAt: memoryCached.fetchedAt ?? new Date().toISOString(),
+      content: memoryCached.fullText,
+      relevantExcerpts: [],
+      status: 'ok',
+    };
   }
 
   try {

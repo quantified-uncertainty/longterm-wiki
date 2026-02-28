@@ -3,7 +3,7 @@
  *
  * For each citation on a wiki page, extracts the specific supporting quote
  * from the cited source, verifies that the quote exists, and stores everything
- * in SQLite (.cache/knowledge.db).
+ * in PostgreSQL via the wiki-server API.
  *
  * Usage:
  *   pnpm crux citations extract-quotes <page-id>
@@ -25,7 +25,10 @@ import {
   fetchCitationUrl,
   saveFetchResultToPostgres,
 } from '../lib/citation-archive.ts';
-import { citationContent } from '../lib/knowledge-db.ts';
+import {
+  getCachedContent,
+  setCachedContent,
+} from '../lib/citation-content-cache.ts';
 import {
   getCitationContentByUrl,
   getQuote,
@@ -50,34 +53,31 @@ function isBookReference(footnoteText: string): boolean {
 
 /**
  * Get full-text content for a URL using multi-tier cache:
- *   1. SQLite (local, fast)
+ *   1. In-memory cache (session-level, fast)
  *   2. PostgreSQL (cross-environment, durable)
  *   3. Network fetch (slowest, writes back to both caches)
  */
 async function getSourceText(
   url: string,
-  pageId: string,
-  footnote: number,
+  _pageId: string,
+  _footnote: number,
 ): Promise<string | null> {
-  // Tier 1: SQLite (local cache)
-  const cached = citationContent.getByUrl(url);
-  if (cached?.full_text) {
-    return cached.full_text;
+  // Tier 1: In-memory cache (session-level)
+  const cached = getCachedContent(url);
+  if (cached?.fullText) {
+    return cached.fullText;
   }
 
   // Tier 2: PostgreSQL (cross-environment cache)
   const pgResult = await getCitationContentByUrl(url);
   if (pgResult.ok && pgResult.data.fullText && pgResult.data.fullText.length > 0) {
-    // Backfill SQLite from PG so future reads are local
-    citationContent.upsert({
+    // Store in memory cache so subsequent calls within this session are fast
+    setCachedContent(url, {
       url,
-      pageId,
-      footnote,
       fetchedAt: pgResult.data.fetchedAt,
       httpStatus: pgResult.data.httpStatus,
       contentType: pgResult.data.contentType,
       pageTitle: pgResult.data.pageTitle,
-      fullHtml: null,
       fullText: pgResult.data.fullText,
       contentLength: pgResult.data.contentLength,
     });
@@ -87,16 +87,13 @@ async function getSourceText(
   // Tier 3: Network fetch
   const result = await fetchCitationUrl(url);
   if (result.fullText) {
-    // Write to both caches
-    citationContent.upsert({
+    // Write to memory cache and PG
+    setCachedContent(url, {
       url,
-      pageId,
-      footnote,
       fetchedAt: new Date().toISOString(),
       httpStatus: result.httpStatus,
       contentType: result.contentType,
       pageTitle: result.pageTitle,
-      fullHtml: result.fullHtml,
       fullText: result.fullText,
       contentLength: result.contentLength,
     });
@@ -219,10 +216,10 @@ export async function extractQuotesForPage(
           sourceLocation = 'full document (short)';
         }
 
-        // Get page title from cache
-        const cached = citationContent.getByUrl(cit.url);
-        if (cached?.page_title) {
-          sourceTitle = cached.page_title;
+        // Get page title from memory cache
+        const titleCached = getCachedContent(cit.url);
+        if (titleCached?.pageTitle) {
+          sourceTitle = titleCached.pageTitle;
         }
       } else if (isBookReference(defText)) {
         // Book/paper reference — try to find online

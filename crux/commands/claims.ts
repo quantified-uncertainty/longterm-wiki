@@ -284,7 +284,7 @@ Workflow:
 
 Notes:
   - Extraction requires OPENROUTER_API_KEY or ANTHROPIC_API_KEY
-  - Verification reads from local SQLite (.cache/knowledge.db) first, then PG
+  - Verification reads from in-memory cache first, then PG
   - Claims are stored with entityType="wiki-page" in the claims table
   - from-resource auto-creates resource YAML entries (use --no-auto-resource to disable)
   - Deduplication runs automatically against existing claims per entity
