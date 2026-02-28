@@ -84,6 +84,56 @@ if [ -n "$ISSUE_NUM" ]; then
   CONTEXT_LINES+=("→ Remember to run: pnpm crux issues start ${ISSUE_NUM}")
 fi
 
+# ─── 6. Active agent registration/heartbeat ──────────────────────────────────────
+# Register or refresh heartbeat with the active-agents coordination system (E925).
+# Uses curl for speed (avoids pnpm/node startup overhead).
+# Runs on every session start AND resume, keeping the heartbeat fresh.
+
+if [ -n "$WIKI_SERVER_URL" ] && [ "$BRANCH" != "main" ] && [ "$BRANCH" != "detached" ]; then
+  API_KEY="${LONGTERMWIKI_PROJECT_KEY:-${LONGTERMWIKI_SERVER_API_KEY:-}}"
+  if [ -n "$API_KEY" ]; then
+    # Determine task from existing checklist, or fall back to branch name
+    AGENT_TASK=""
+    CHECKLIST_PATH=".claude/wip-checklist.md"
+    if [ -f "$CHECKLIST_PATH" ]; then
+      AGENT_TASK=$(grep -oP '> Task: \K.*' "$CHECKLIST_PATH" 2>/dev/null || true)
+      # Also extract issue number from checklist if not already detected
+      if [ -z "$ISSUE_NUM" ]; then
+        ISSUE_NUM=$(grep -oP '> Issue: #\K\d+' "$CHECKLIST_PATH" 2>/dev/null || true)
+      fi
+    fi
+    if [ -z "$AGENT_TASK" ]; then
+      AGENT_TASK="Session on ${BRANCH}"
+    fi
+
+    # Build JSON payload safely with jq
+    REGISTER_JSON=$(jq -n \
+      --arg sessionId "$BRANCH" \
+      --arg branch "$BRANCH" \
+      --arg task "$AGENT_TASK" \
+      --arg issueNumber "${ISSUE_NUM:-}" \
+      '{sessionId: $sessionId, branch: $branch, task: $task} +
+       (if $issueNumber != "" then {issueNumber: ($issueNumber | tonumber)} else {} end)' 2>/dev/null || true)
+
+    if [ -n "$REGISTER_JSON" ]; then
+      REGISTER_RESULT=$(curl -s --max-time 3 \
+        -X POST "${WIKI_SERVER_URL}/api/active-agents" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${API_KEY}" \
+        -d "$REGISTER_JSON" 2>/dev/null || true)
+
+      if echo "$REGISTER_RESULT" | grep -q '"id"' 2>/dev/null; then
+        AGENT_ID=$(echo "$REGISTER_RESULT" | grep -oE '"id":[0-9]+' | grep -oE '[0-9]+' | head -1)
+        if [ -n "$AGENT_ID" ]; then
+          echo "$AGENT_ID" > .claude/agent-id
+          touch .claude/last-heartbeat
+          CONTEXT_LINES+=("✓ Active agent: registered #${AGENT_ID} (E925 dashboard)")
+        fi
+      fi
+    fi
+  fi
+fi
+
 # ─── Output ─────────────────────────────────────────────────────────────────────
 
 if [ ${#WARNINGS[@]} -gt 0 ]; then

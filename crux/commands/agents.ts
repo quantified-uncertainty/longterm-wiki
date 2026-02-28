@@ -21,6 +21,7 @@ import {
   type ActiveAgentEntry,
 } from '../lib/wiki-server/active-agents.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
+import { sweepStaleSessions } from '../lib/wiki-server/agent-sessions.ts';
 
 interface CommandOptions {
   task?: string;
@@ -313,20 +314,38 @@ async function sweepCommand(
   if (err) return err;
 
   const timeout = Number(options.timeout || 30);
-  const result = await sweepStaleAgents(timeout);
+  let output = '';
 
-  if (!result.ok) {
-    return { exitCode: 1, output: `Error: ${result.message}` };
+  // Sweep E925 active agents (stale after timeout minutes)
+  const agentResult = await sweepStaleAgents(timeout);
+  if (agentResult.ok) {
+    if (agentResult.data.swept > 0) {
+      output += `Active agents (E925): swept ${agentResult.data.swept} stale agent(s):\n`;
+      for (const a of agentResult.data.agents) {
+        output += `  #${a.id} (${a.sessionId})\n`;
+      }
+    } else {
+      output += 'Active agents (E925): no stale agents.\n';
+    }
+  } else {
+    output += `Active agents (E925): Error: ${agentResult.message}\n`;
   }
 
-  if (result.data.swept === 0) {
-    return { exitCode: 0, output: 'No stale agents found.' };
+  // Sweep E912 agent sessions (stale after 24 hours)
+  const sessionResult = await sweepStaleSessions(24);
+  if (sessionResult.ok) {
+    if (sessionResult.data.swept > 0) {
+      output += `Agent sessions (E912): swept ${sessionResult.data.swept} stale session(s):\n`;
+      for (const s of sessionResult.data.sessions) {
+        output += `  #${s.id} (${s.branch})\n`;
+      }
+    } else {
+      output += 'Agent sessions (E912): no stale sessions.\n';
+    }
+  } else {
+    output += `Agent sessions (E912): Error: ${sessionResult.message}\n`;
   }
 
-  let output = `Swept ${result.data.swept} stale agent(s):\n`;
-  for (const a of result.data.agents) {
-    output += `  #${a.id} (${a.sessionId})\n`;
-  }
   return { exitCode: 0, output };
 }
 

@@ -11,6 +11,19 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/heartbeat.sh\"",
+            "timeout": 5,
+            "async": true
+          }
+        ]
+      }
     ]
   }
 }
