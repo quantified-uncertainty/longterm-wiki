@@ -26,11 +26,15 @@ interface CausalPattern {
 // Constants
 // ---------------------------------------------------------------------------
 
-/** Causal claim patterns to extract from prose. */
+/**
+ * Causal claim patterns to extract from prose.
+ * Use \w+(?:\s+\w+){0,5} instead of [\w\s]{2,30} to avoid catastrophic backtracking
+ * ([\w\s] overlaps with \s+, causing exponential regex engine paths on large text).
+ */
 const CAUSAL_PATTERNS: CausalPattern[] = [
-  { regex: /(\w[\w\s]{2,30}?)\s+(?:causes?|leads?\s+to|results?\s+in)\s+(\w[\w\s]{2,30})/gi, type: 'causes' },
-  { regex: /(\w[\w\s]{2,30}?)\s+(?:mitigates?|prevents?|reduces?)\s+(\w[\w\s]{2,30})/gi, type: 'mitigates' },
-  { regex: /(\w[\w\s]{2,30}?)\s+(?:enables?|allows?)\s+(\w[\w\s]{2,30})/gi, type: 'enables' },
+  { regex: /(\w+(?:\s+\w+){0,5})\s+(?:causes?|leads?\s+to|results?\s+in)\s+(\w+(?:\s+\w+){0,5})/gi, type: 'causes' },
+  { regex: /(\w+(?:\s+\w+){0,5})\s+(?:mitigates?|prevents?|reduces?)\s+(\w+(?:\s+\w+){0,5})/gi, type: 'mitigates' },
+  { regex: /(\w+(?:\s+\w+){0,5})\s+(?:enables?|allows?)\s+(\w+(?:\s+\w+){0,5})/gi, type: 'enables' },
 ];
 
 // ---------------------------------------------------------------------------

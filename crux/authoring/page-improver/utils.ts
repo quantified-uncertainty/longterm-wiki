@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createPhaseLogger } from '../../lib/output.ts';
-import { getApiKey } from '../../lib/api-keys.ts';
+import { SCRY_PUBLIC_KEY } from '../../lib/api-keys.ts';
 import { loadPages as loadPagesFromRegistry, CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.ts';
 import type { AnalysisResult, PageData, TierConfig } from './types.ts';
 import { FRONTMATTER_RE } from '../../lib/patterns.ts';
@@ -22,7 +22,7 @@ export const ROOT: string = path.join(__dirname, '../../..');
 export const NODE_TSX: string = 'node --import tsx/esm --no-warnings';
 export const TEMP_DIR: string = path.join(ROOT, '.claude/temp/page-improver');
 
-export const SCRY_PUBLIC_KEY: string = getApiKey('SCRY_API_KEY') || 'exopriors_public_readonly_v1_2025';
+export { SCRY_PUBLIC_KEY };
 
 export const log = createPhaseLogger();
 
