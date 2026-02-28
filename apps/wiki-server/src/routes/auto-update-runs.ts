@@ -4,6 +4,7 @@ import { eq, count, sql, desc, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { autoUpdateRuns, autoUpdateResults } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, notFoundError, firstOrThrow, paginationQuery } from "./utils.js";
+import { logger } from "../logger.js";
 
 // ---- Constants ----
 
@@ -73,7 +74,7 @@ function formatRunEntry(
             return JSON.parse(r.newPagesCreated) as string[];
           } catch (err) {
             // Legacy format: comma-separated string from old seed script
-            console.error("[auto-update-runs] JSON parse failed for newPagesCreated, falling back to CSV:", err instanceof Error ? err.message : String(err));
+            logger.warn({ err: err instanceof Error ? err.message : String(err) }, "JSON parse failed for newPagesCreated, falling back to CSV");
             return r.newPagesCreated.split(",").map(s => s.trim()).filter(Boolean);
           }
         })()

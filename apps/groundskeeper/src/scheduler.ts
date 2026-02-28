@@ -3,6 +3,7 @@ import type { Config } from "./config.js";
 import { sendDiscordNotification } from "./notify.js";
 import { recordRun } from "./run-tracker.js";
 import { recordRunToServer, updateActiveAgent } from "./wiki-server.js";
+import { logger as rootLogger } from "./logger.js";
 
 /** Set by index.ts after registering as an active agent. */
 let groundskeeperAgentId: number | null = null;
@@ -31,16 +32,6 @@ function getState(name: string): TaskState {
   return state;
 }
 
-function log(taskName: string, data: Record<string, unknown>): void {
-  console.log(
-    JSON.stringify({
-      timestamp: new Date().toISOString(),
-      task: taskName,
-      ...data,
-    })
-  );
-}
-
 export function registerTask(
   config: Config,
   name: string,
@@ -48,30 +39,32 @@ export function registerTask(
   enabled: boolean,
   fn: TaskFn
 ): void {
+  const logger = rootLogger.child({ task: name });
+
   if (!enabled) {
-    log(name, { event: "skipped", reason: "disabled" });
+    logger.info({ event: "skipped", reason: "disabled" }, "Task disabled");
     return;
   }
 
   if (!cron.validate(schedule)) {
-    log(name, { event: "error", reason: `Invalid cron: ${schedule}` });
+    logger.error({ event: "error", reason: `Invalid cron: ${schedule}` }, "Invalid cron schedule");
     return;
   }
 
-  log(name, { event: "registered", schedule });
+  logger.info({ event: "registered", schedule }, "Task registered");
 
   cron.schedule(schedule, async () => {
     const state = getState(name);
 
     // Guard: don't run if already running
     if (state.running) {
-      log(name, { event: "skipped", reason: "already running" });
+      logger.warn({ event: "skipped", reason: "already running" }, "Task skipped");
       return;
     }
 
     // Guard: circuit breaker
     if (state.disabled) {
-      log(name, { event: "skipped", reason: "circuit breaker tripped" });
+      logger.warn({ event: "skipped", reason: "circuit breaker tripped" }, "Task skipped");
       return;
     }
 
@@ -84,19 +77,19 @@ export function registerTask(
 
       if (result.success) {
         state.consecutiveFailures = 0;
-        log(name, {
+        logger.info({
           event: "success",
           durationMs,
           summary: result.summary,
-        });
+        }, "Task succeeded");
       } else {
         state.consecutiveFailures++;
-        log(name, {
+        logger.error({
           event: "failure",
           durationMs,
           consecutiveFailures: state.consecutiveFailures,
           summary: result.summary,
-        });
+        }, "Task failed");
 
         await sendDiscordNotification(
           config,
@@ -110,7 +103,7 @@ export function registerTask(
             config,
             `🔴 **Circuit breaker tripped** for **${name}** after 3 consecutive failures. Task disabled until pod restart or manual reset.`
           );
-          log(name, { event: "circuit_breaker_tripped" });
+          logger.fatal({ event: "circuit_breaker_tripped" }, "Circuit breaker tripped");
         }
       }
 
@@ -161,12 +154,12 @@ export function registerTask(
         error instanceof Error ? error.message : String(error);
 
       state.consecutiveFailures++;
-      log(name, {
+      logger.error({
         event: "error",
         durationMs,
         error: errorMessage,
         consecutiveFailures: state.consecutiveFailures,
-      });
+      }, "Task threw an error");
 
       await sendDiscordNotification(
         config,
@@ -179,7 +172,7 @@ export function registerTask(
           config,
           `🔴 **Circuit breaker tripped** for **${name}** after 3 consecutive failures. Task disabled until pod restart or manual reset.`
         );
-        log(name, { event: "circuit_breaker_tripped" });
+        logger.fatal({ event: "circuit_breaker_tripped" }, "Circuit breaker tripped");
       }
 
       const errorTs = new Date().toISOString();
@@ -220,7 +213,7 @@ export function resetCircuitBreaker(name: string): boolean {
   if (!state) return false;
   state.disabled = false;
   state.consecutiveFailures = 0;
-  log(name, { event: "circuit_breaker_reset" });
+  rootLogger.child({ task: name }).info({ event: "circuit_breaker_reset" }, "Circuit breaker reset");
   return true;
 }
 

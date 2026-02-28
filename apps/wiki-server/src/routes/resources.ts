@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { buildPrefixTsquery } from "../search-utils.js";
+import { logger } from "../logger.js";
 import {
   eq,
   count,
@@ -85,7 +86,7 @@ function urlVariants(url: string): string[] {
       variants.add(withWww + "/");
     }
   } catch (err) {
-    console.error("[resources] urlVariants parse failed:", err instanceof Error ? err.message : String(err));
+    logger.error({ err: err instanceof Error ? err.message : String(err) }, "urlVariants parse failed");
     variants.add(url);
   }
   return Array.from(variants);

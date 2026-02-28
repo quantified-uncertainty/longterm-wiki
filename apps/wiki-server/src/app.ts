@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
+import { logger } from "./logger.js";
 import { validateApiKey, requireWriteScope } from "./auth.js";
 import { healthRoute } from "./routes/health.js";
 import { idsRoute } from "./routes/ids.js";
@@ -26,8 +27,32 @@ import { referencesRoute } from "./routes/references.js";
 import { githubIssuesRoute } from "./routes/github-issues.js";
 import { groundskeeperRunsRoute } from "./routes/groundskeeper-runs.js";
 
+let requestCounter = 0;
+
 export function createApp() {
   const app = new Hono();
+
+  // Request logging middleware
+  app.use("*", async (c, next) => {
+    const requestId = `req-${++requestCounter}`;
+    const start = Date.now();
+    const method = c.req.method;
+    const path = c.req.path;
+
+    await next();
+
+    const durationMs = Date.now() - start;
+    const status = c.res.status;
+
+    const logData = { requestId, method, path, status, durationMs };
+    if (status >= 500) {
+      logger.error(logData, "request error");
+    } else if (status >= 400) {
+      logger.warn(logData, "request warning");
+    } else {
+      logger.info(logData, "request");
+    }
+  });
 
   // Error handler — re-throw HTTPExceptions (auth failures etc.) so Hono
   // returns the proper status code; only catch unexpected errors as 500.
@@ -37,7 +62,7 @@ export function createApp() {
     if (err instanceof HTTPException) {
       return err.getResponse();
     }
-    console.error("Unhandled error:", err);
+    logger.error({ err, path: c.req.path }, "Unhandled error");
     const message =
       c.req.path.startsWith("/api/") && err instanceof Error
         ? err.message
