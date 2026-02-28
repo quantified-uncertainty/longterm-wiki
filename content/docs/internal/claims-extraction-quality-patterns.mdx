@@ -27,7 +27,7 @@ This document catalogs the specific ways claims extraction goes wrong. Each patt
 - **Detection** — how to catch it programmatically
 - **Proposed fix** — prompt change, post-processing, or both
 
-The goal is to turn these patterns into a validation suite that runs on every extraction, rejecting or flagging bad claims before they enter the database. See <EntityLink id="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> for the aggregate statistics.
+The goal is to turn these patterns into a validation suite that runs on every extraction, rejecting or flagging bad claims before they enter the database. See <EntityLink id="E901" name="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> for the aggregate statistics.
 
 ---
 
@@ -106,7 +106,7 @@ Two-stage approach:
 **What it looks like:**
 
 ```
-"White House AI Czar <EntityLink id="E431">John Smith</EntityLink> announced new regulations"
+"White House AI Czar <EntityLink id="E431" name="david-sacks">John Smith</EntityLink> announced new regulations"
 "Anthropic's valuation reached <F id="6796e194" />"
 "The model achieved {/* NEEDS CITATION */} impressive results"
 ```
@@ -178,7 +178,7 @@ contains multiple facts (e.g., "X raised $Y at a $Z valuation with backing
 from A, B, and C"), split it into separate claims for each fact.
 ```
 
-**Trade-off:** More atomic claims = more records, more verification cost, but much better queryability and dedup. The <EntityLink id="claims-architecture-decisions">Architecture Decisions</EntityLink> document discusses this as Crux 7 (the atomicity problem).
+**Trade-off:** More atomic claims = more records, more verification cost, but much better queryability and dedup. The <EntityLink id="E896" name="claims-architecture-decisions">Architecture Decisions</EntityLink> document discusses this as Crux 7 (the atomicity problem).
 
 ---
 
@@ -449,7 +449,7 @@ This is not a post-processing fix — it requires changes to the extraction pipe
 
 2. **Post-extraction validation:** Flag claims where `inferenceType` is `derived` or `editorial` but `inferenceStep` is empty. These are the highest-risk claims for science-washing.
 
-3. **Long-term:** The <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> proposes a full trace model with tiered depth — minimal traces for direct assertions, structured traces for derived claims, full traces for editorial claims.
+3. **Long-term:** The <EntityLink id="E903" name="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> proposes a full trace model with tiered depth — minimal traces for direct assertions, structured traces for derived claims, full traces for editorial claims.
 
 ---
 
@@ -503,7 +503,7 @@ Several open questions that require empirical testing:
 
 2. **What's the actual rate of Pattern 11 (source quote mismatch)?** Running verification on all claims would reveal how many "verified" claims actually have weak source support.
 
-3. **Does two-pass extraction (extract then validate) outperform single-pass?** Sprint 2 of the <EntityLink id="claims-system-development-roadmap">Development Roadmap</EntityLink> is designed to test this.
+3. **Does two-pass extraction (extract then validate) outperform single-pass?** Sprint 2 of the <EntityLink id="E897" name="claims-system-development-roadmap">Development Roadmap</EntityLink> is designed to test this.
 
 4. **Can pg_trgm similarity (PR #1149) catch near-duplicate claims effectively?** The trigram similarity threshold needs empirical tuning — too aggressive merges distinct claims, too loose misses real duplicates.
 
@@ -513,8 +513,8 @@ Several open questions that require empirical testing:
 
 ## Related Documents
 
-- <EntityLink id="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> — Aggregate statistics and remediation priorities
-- <EntityLink id="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions and cruxes
-- <EntityLink id="claims-system-development-roadmap">Claims Development Roadmap (E897)</EntityLink> — Sprint plan including extraction experiments
-- <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> — Data model for storing claim derivation chains (addresses Pattern 13)
-- <EntityLink id="claim-first-architecture">Claim-First Architecture (E892)</EntityLink> — Long-term vision
+- <EntityLink id="E901" name="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> — Aggregate statistics and remediation priorities
+- <EntityLink id="E896" name="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions and cruxes
+- <EntityLink id="E897" name="claims-system-development-roadmap">Claims Development Roadmap (E897)</EntityLink> — Sprint plan including extraction experiments
+- <EntityLink id="E903" name="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> — Data model for storing claim derivation chains (addresses Pattern 13)
+- <EntityLink id="E892" name="claim-first-architecture">Claim-First Architecture (E892)</EntityLink> — Long-term vision

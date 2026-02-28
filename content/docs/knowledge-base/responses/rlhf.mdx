@@ -22,20 +22,20 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
 
 ## Overview
 
-Reinforcement Learning from Human Feedback (RLHF) and <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> (CAI) represent the dominant paradigm for aligning <EntityLink id="language-models">large language models</EntityLink> with human preferences. These techniques have enabled the deployment of AI assistants like ChatGPT, Claude, and Llama by training models to be helpful, harmless, and honest through systematic preference optimization.
+Reinforcement Learning from Human Feedback (RLHF) and <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> (CAI) represent the dominant paradigm for aligning <EntityLink id="E186" name="language-models">large language models</EntityLink> with human preferences. These techniques have enabled the deployment of AI assistants like ChatGPT, Claude, and Llama by training models to be helpful, harmless, and honest through systematic preference optimization.
 
-The core idea is simple: rather than relying solely on predefined objectives, use human judgments (or AI-generated judgments based on constitutional principles) to shape model behavior. This approach has proven remarkably effective for current systems. <EntityLink id="openai">OpenAI</EntityLink>'s InstructGPT demonstrated that a 1.3B parameter model trained with RLHF could outperform the 175B parameter GPT-3 in human evaluations—showing that alignment can be more data-efficient than raw scaling.
+The core idea is simple: rather than relying solely on predefined objectives, use human judgments (or AI-generated judgments based on constitutional principles) to shape model behavior. This approach has proven remarkably effective for current systems. <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s InstructGPT demonstrated that a 1.3B parameter model trained with RLHF could outperform the 175B parameter GPT-3 in human evaluations—showing that alignment can be more data-efficient than raw scaling.
 
-However, these techniques face fundamental challenges as AI systems approach and exceed human capabilities. The core problem is straightforward: RLHF relies on humans being able to evaluate model outputs, but superhuman AI systems will produce outputs too complex for reliable human assessment. This "<EntityLink id="scalable-oversight">scalable oversight</EntityLink>" problem—how to supervise AI systems smarter than their supervisors—represents one of the central open questions in <EntityLink id="alignment">AI alignment</EntityLink>.
+However, these techniques face fundamental challenges as AI systems approach and exceed human capabilities. The core problem is straightforward: RLHF relies on humans being able to evaluate model outputs, but superhuman AI systems will produce outputs too complex for reliable human assessment. This "<EntityLink id="E271" name="scalable-oversight">scalable oversight</EntityLink>" problem—how to supervise AI systems smarter than their supervisors—represents one of the central open questions in <EntityLink id="E439" name="alignment">AI alignment</EntityLink>.
 
 ### Risks Addressed
 
 | Risk | How RLHF/CAI Helps | Effectiveness |
 |------|-------------------|---------------|
 | <EntityLink id="misuse" /> | Trains refusal behaviors for dangerous requests | Moderate—can be jailbroken |
-| <EntityLink id="accident-risks" /> | Reduces toxic, biased, and deceptive content | High for current systems |
-| <EntityLink id="goal-misgeneralization" /> | Shapes outputs toward intended behavior | Low—addresses symptoms, not root cause |
-| <EntityLink id="deceptive-alignment" /> | No direct mitigation | Very Low—cannot detect deception |
+| <EntityLink id="E394" name="accident-risks" /> | Reduces toxic, biased, and deceptive content | High for current systems |
+| <EntityLink id="E151" name="goal-misgeneralization" /> | Shapes outputs toward intended behavior | Low—addresses symptoms, not root cause |
+| <EntityLink id="E93" name="deceptive-alignment" /> | No direct mitigation | Very Low—cannot detect deception |
 
 ### Quick Assessment
 
