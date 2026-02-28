@@ -1159,3 +1159,36 @@ export const UpdateAgentSessionSchema = z.object({
 });
 export type UpdateAgentSession = z.infer<typeof UpdateAgentSessionSchema>;
 
+// ---------------------------------------------------------------------------
+// Active Agents (live coordination)
+// ---------------------------------------------------------------------------
+
+export const VALID_AGENT_STATUSES = [
+  "active",
+  "completed",
+  "errored",
+  "stale",
+] as const;
+
+export const RegisterAgentSchema = z.object({
+  sessionId: z.string().min(1).max(500),
+  branch: z.string().max(500).nullable().optional(),
+  task: z.string().min(1).max(2000),
+  issueNumber: z.number().int().positive().nullable().optional(),
+  model: z.string().max(200).nullable().optional(),
+  worktree: z.string().max(1000).nullable().optional(),
+  metadata: z.record(z.unknown()).nullable().optional(),
+});
+export type RegisterAgent = z.infer<typeof RegisterAgentSchema>;
+
+export const UpdateAgentSchema = z.object({
+  status: z.enum(VALID_AGENT_STATUSES).optional(),
+  currentStep: z.string().max(2000).nullable().optional(),
+  branch: z.string().max(500).nullable().optional(),
+  issueNumber: z.number().int().positive().nullable().optional(),
+  prNumber: z.number().int().positive().nullable().optional(),
+  filesTouched: z.array(z.string().max(500)).max(200).nullable().optional(),
+  metadata: z.record(z.unknown()).nullable().optional(),
+});
+export type UpdateAgent = z.infer<typeof UpdateAgentSchema>;
+

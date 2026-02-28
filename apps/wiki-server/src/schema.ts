@@ -906,6 +906,53 @@ export const jobs = pgTable(
  * with `claim_page_references.reference_id` so the frontend can render both
  * claim-backed and regular citations in a unified footnote list.
  */
+/**
+ * Active agents — tracks currently-running Claude Code agents for coordination.
+ *
+ * Each row represents a live agent session. Agents register on start, push
+ * status updates (current step, files touched, heartbeat), and pull the list
+ * of other active agents to detect conflicts (same issue, overlapping files).
+ *
+ * Stale agents (no heartbeat for >30 min) can be auto-marked by a sweep.
+ */
+export const activeAgents = pgTable(
+  "active_agents",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    sessionId: text("session_id").notNull().unique(), // unique per invocation (branch name or UUID)
+    branch: text("branch"),
+    task: text("task").notNull(),
+    status: text("status").notNull().default("active"), // active | completed | errored | stale
+    currentStep: text("current_step"), // free-text: what the agent is doing right now
+    issueNumber: integer("issue_number"),
+    prNumber: integer("pr_number"),
+    filesTouched: jsonb("files_touched").$type<string[]>(),
+    model: text("model"),
+    worktree: text("worktree"), // worktree path if running in isolation
+    heartbeatAt: timestamp("heartbeat_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    startedAt: timestamp("started_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_aa_status").on(table.status),
+    index("idx_aa_issue").on(table.issueNumber),
+    index("idx_aa_heartbeat").on(table.heartbeatAt),
+    index("idx_aa_started_at").on(table.startedAt),
+    index("idx_aa_branch").on(table.branch),
+  ]
+);
+
 export const pageCitations = pgTable(
   "page_citations",
   {

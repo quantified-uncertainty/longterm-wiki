@@ -37,6 +37,7 @@ import {
   updateAgentSession,
   getAgentSessionByBranch,
 } from '../lib/wiki-server/agent-sessions.ts';
+import { registerAgent } from '../lib/wiki-server/active-agents.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -184,6 +185,20 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
     // DB sync is best-effort; local file is always written
   }
 
+  // Register with active-agents coordination system (best-effort)
+  let agentRegistered = false;
+  try {
+    const agentResult = await registerAgent({
+      sessionId: metadata.branch,
+      branch: metadata.branch,
+      task,
+      issueNumber: issue ?? null,
+    });
+    agentRegistered = agentResult.ok;
+  } catch {
+    // Best-effort — coordination is helpful but not blocking
+  }
+
   let output = '';
   output += `${c.green}✓${c.reset} Agent checklist created: ${c.cyan}.claude/wip-checklist.md${c.reset}\n`;
   output += `  Type: ${c.bold}${type}${c.reset}\n`;
@@ -200,6 +215,9 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   output += `  Items: ${status.totalItems}\n`;
   if (dbSynced) {
     output += `  ${c.dim}Synced to wiki-server DB${c.reset}\n`;
+  }
+  if (agentRegistered) {
+    output += `  ${c.dim}Registered with active-agents tracker${c.reset}\n`;
   }
   output += `\n${c.dim}Work through the checklist as you go. Run \`crux agent-checklist status\` to check progress.${c.reset}\n`;
 

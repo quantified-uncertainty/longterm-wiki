@@ -254,6 +254,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Update Schedule", href: internalHref("update-schedule-dashboard") },
         { label: "Suggested Pages", href: internalHref("suggested-pages-dashboard") },
         { label: "Improve Runs", href: internalHref("improve-runs-dashboard") },
+        { label: "Active Agents", href: internalHref("active-agents-dashboard") },
         { label: "Agent Sessions", href: internalHref("agent-sessions-dashboard") },
         { label: "Session Insights", href: internalHref("session-insights-dashboard") },
         { label: "Auto-Update Runs", href: internalHref("auto-update-runs-dashboard") },

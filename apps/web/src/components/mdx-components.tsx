@@ -51,6 +51,7 @@ import { CitationAccuracyContent } from "@/app/internal/citation-accuracy/citati
 import { CitationContentContent } from "@/app/internal/citation-content/citation-content-content";
 import { HallucinationRiskContent } from "@/app/internal/hallucination-risk/hallucination-risk-content";
 import { HallucinationEvalsContent } from "@/app/internal/hallucination-evals/hallucination-evals-content";
+import { ActiveAgentsContent } from "@/app/internal/active-agents/active-agents-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -174,6 +175,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   CitationContentContent,
   HallucinationRiskContent,
   HallucinationEvalsContent,
+  ActiveAgentsContent,
 
   // Table view components
   SafetyApproachesTableView,

@@ -89,6 +89,7 @@ import * as healthCommands from './commands/health.ts';
 import * as claimsCommands from './commands/claims.ts';
 import * as epicCommands from './commands/epic.ts';
 import * as idsCommands from './commands/ids.ts';
+import * as agentsCommands from './commands/agents.ts';
 
 const domains = {
   validate: validateCommands,
@@ -125,6 +126,7 @@ const domains = {
   claims: claimsCommands,
   epic: epicCommands,
   ids: idsCommands,
+  agents: agentsCommands,
 };
 
 /**
