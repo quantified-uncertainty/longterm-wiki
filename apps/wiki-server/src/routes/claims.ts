@@ -229,6 +229,9 @@ const AddClaimSourceSchema = z.object({
   sourceTitle: z.string().max(1000).nullable().optional(),
   sourceType: z.string().max(100).nullable().optional(),
   sourceLocation: z.string().max(1000).nullable().optional(),
+  sourceVerdict: z.string().max(100).nullable().optional(),
+  sourceVerdictScore: z.number().min(0).max(1).nullable().optional(),
+  sourceCheckedAt: z.string().nullable().optional(),
 });
 
 const BatchUpdateRelatedEntitiesSchema = z.object({
@@ -312,6 +315,9 @@ const claimsApp = new Hono()
         sourceTitle: s.sourceTitle ?? null,
         sourceType: s.sourceType ?? null,
         sourceLocation: s.sourceLocation ?? null,
+        sourceVerdict: s.sourceVerdict ?? null,
+        sourceVerdictScore: s.sourceVerdictScore ?? null,
+        sourceCheckedAt: s.sourceCheckedAt ? new Date(s.sourceCheckedAt) : null,
       }));
       await db.insert(claimSources).values(sourceVals);
     }
@@ -367,6 +373,9 @@ const claimsApp = new Hono()
         sourceTitle: string | null;
         sourceType: string | null;
         sourceLocation: string | null;
+        sourceVerdict: string | null;
+        sourceVerdictScore: number | null;
+        sourceCheckedAt: Date | null;
       }> = [];
 
       for (const item of items) {
@@ -388,6 +397,9 @@ const claimsApp = new Hono()
               sourceTitle: s.sourceTitle ?? null,
               sourceType: s.sourceType ?? null,
               sourceLocation: s.sourceLocation ?? null,
+              sourceVerdict: s.sourceVerdict ?? null,
+              sourceVerdictScore: s.sourceVerdictScore ?? null,
+              sourceCheckedAt: s.sourceCheckedAt ? new Date(s.sourceCheckedAt) : null,
             });
           }
         }
@@ -970,6 +982,9 @@ const claimsApp = new Hono()
         sourceTitle: parsed.data.sourceTitle ?? null,
         sourceType: parsed.data.sourceType ?? null,
         sourceLocation: parsed.data.sourceLocation ?? null,
+        sourceVerdict: parsed.data.sourceVerdict ?? null,
+        sourceVerdictScore: parsed.data.sourceVerdictScore ?? null,
+        sourceCheckedAt: parsed.data.sourceCheckedAt ? new Date(parsed.data.sourceCheckedAt) : null,
       })
       .returning();
 

@@ -45,6 +45,10 @@ interface CitationQuote {
   sourceTitle: string | null;
   sourceType: string | null;
   sourceLocation: string | null;
+  // Fields for source-level verification
+  quoteVerified: boolean;
+  verificationScore: number | null;
+  verifiedAt: string | null;
   // Fields for claim verdict enrichment
   accuracyIssues: string | null;
   accuracySupportingQuotes: string | null;
@@ -103,6 +107,25 @@ function detectClaimType(text: string): ClaimTypeValue {
 }
 
 /**
+ * Map quote verification status to a source verdict for claim_sources.
+ * quoteVerified=true → "verified" (quote exists in source).
+ * quoteVerified=false + score → "unverified".
+ * No data at all → null (don't populate).
+ */
+function mapVerificationToSourceVerdict(
+  quoteVerified: boolean,
+  verificationScore: number | null,
+): { sourceVerdict: string | null; sourceVerdictScore: number | null } {
+  if (!quoteVerified && verificationScore == null) {
+    return { sourceVerdict: null, sourceVerdictScore: null };
+  }
+  return {
+    sourceVerdict: quoteVerified ? 'verified' : 'unverified',
+    sourceVerdictScore: verificationScore,
+  };
+}
+
+/**
  * Map an accuracy verdict from citation_quotes to a claim verdict.
  */
 function mapAccuracyToClaimVerdict(
@@ -127,7 +150,7 @@ async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const dryRun = args['dry-run'] === true;
   const pageIdFilter = typeof args['page-id'] === 'string' ? args['page-id'] : null;
-  const limit = parseIntOpt(args.limit, 1000);
+  const limit = parseIntOpt(args.limit, 10000);
   const c = getColors(false);
 
   console.log(`\n${c.bold}${c.blue}Backfill claims from citation_quotes${c.reset}`);
@@ -143,7 +166,7 @@ async function main() {
     }
   }
 
-  // Step 1: Fetch citation quotes
+  // Step 1: Fetch citation quotes (paginated to handle full dataset)
   let allQuotes: CitationQuote[];
 
   if (pageIdFilter) {
@@ -155,13 +178,24 @@ async function main() {
     }
     allQuotes = result.data.quotes;
   } else {
-    const url = `/api/citations/quotes/all?limit=${limit}&offset=0`;
-    const result = await apiRequest<QuotesAllResponse>('GET', url, undefined, BATCH_TIMEOUT_MS);
-    if (!result.ok) {
-      console.error(`${c.red}Failed to fetch citation quotes: ${result.message}${c.reset}`);
-      process.exit(1);
+    // Paginate through all quotes — the API allows up to 5000 per request
+    allQuotes = [];
+    const pageSize = 5000;
+    let offset = 0;
+    let total = Infinity;
+
+    while (offset < total && allQuotes.length < limit) {
+      const url = `/api/citations/quotes/all?limit=${pageSize}&offset=${offset}`;
+      const result = await apiRequest<QuotesAllResponse>('GET', url, undefined, BATCH_TIMEOUT_MS);
+      if (!result.ok) {
+        console.error(`${c.red}Failed to fetch citation quotes (offset=${offset}): ${result.message}${c.reset}`);
+        process.exit(1);
+      }
+      allQuotes.push(...result.data.quotes);
+      total = result.data.total;
+      offset += pageSize;
+      if (result.data.quotes.length === 0) break;
     }
-    allQuotes = result.data.quotes;
   }
 
   // Filter out already-linked quotes and those without claim text
@@ -305,6 +339,11 @@ async function main() {
                 sourceTitle: representative.sourceTitle ?? null,
                 sourceType: representative.sourceType ?? null,
                 sourceLocation: representative.sourceLocation ?? null,
+                ...mapVerificationToSourceVerdict(
+                  representative.quoteVerified,
+                  representative.verificationScore,
+                ),
+                sourceCheckedAt: representative.verifiedAt ?? null,
               }],
             }
           : {}),

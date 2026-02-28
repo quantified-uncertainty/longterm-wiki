@@ -482,6 +482,9 @@ export const InsertClaimSchema = z.object({
     sourceTitle: z.string().max(1000).nullable().optional(),
     sourceType: z.string().max(100).nullable().optional(),
     sourceLocation: z.string().max(1000).nullable().optional(),
+    sourceVerdict: z.string().max(100).nullable().optional(),
+    sourceVerdictScore: z.number().min(0).max(1).nullable().optional(),
+    sourceCheckedAt: z.string().nullable().optional(),
   })).nullable().optional(),
 });
 export type InsertClaim = z.infer<typeof InsertClaimSchema>;
