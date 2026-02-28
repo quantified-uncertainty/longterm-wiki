@@ -17,13 +17,13 @@ const SCRIPTS = {
   pipeline: {
     script: 'claims/pipeline.ts',
     description: 'Run unified extract → link → verify pipeline for a page',
-    passthrough: ['dry-run', 'steps', 'model'],
+    passthrough: ['dry-run', 'steps', 'model', 'no-gate'],
     positional: true,
   },
   extract: {
     script: 'claims/extract.ts',
     description: 'Extract atomic claims from a wiki page using LLM',
-    passthrough: ['dry-run', 'model', 'variant', 'page-type'],
+    passthrough: ['dry-run', 'model', 'variant', 'page-type', 'no-gate', 'strict'],
     positional: true,
   },
   verify: {
@@ -185,6 +185,8 @@ Options:
   --batch=<file>        Process URLs from a file, one per line (from-resource)
   --no-auto-resource    Don't auto-create resource YAML for unknown URLs (from-resource)
   --apply               Write changes to database (integrate, backfill, migrate, cleanup; default: dry-run)
+  --no-gate             Disable quality gate (extract: skip auto-fix and rejection checks)
+  --strict              Strict mode (extract: reject claims that fail basic validation)
   --skip-extract        Skip claim extraction step (integrate: assumes claims already exist)
   --entity=E            Target entity filter (cleanup)
   --entity-id=E         Filter to single entity (backfill-related-entities)
@@ -200,6 +202,8 @@ Examples:
   crux claims pipeline kalshi --steps=extract,link    Run only extraction and linking steps
   crux claims extract kalshi                          Extract claims from the Kalshi page
   crux claims extract kalshi --dry-run                Preview without storing
+  crux claims extract kalshi --no-gate               Extract without quality gate
+  crux claims extract kalshi --strict                Reject claims that fail validation
   crux claims verify kalshi                           Verify claims against citation sources
   crux claims status kalshi                           Show verification breakdown
   crux claims status kalshi --json                    JSON output

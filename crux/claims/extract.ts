@@ -41,6 +41,7 @@ import { VALID_CLAIM_TYPES, claimTypeToCategory, parseNumericValue } from '../li
 import type { ClaimTypeValue } from '../lib/claim-utils.ts';
 import { getVariantPrompt, VARIANT_NAMES, type VariantName, type PageType } from './experiment-variants.ts';
 import { validateClaimBatch } from './validate-claim.ts';
+import { runExtractionQualityGate } from './extraction-quality-gate.ts';
 import { parseFootnotes, type ParsedFootnote } from '../lib/footnote-parser.ts';
 import { loadEntitySlugs, buildNormalizationMap, normalizeRelatedEntities } from '../lib/normalize-entity-slugs.ts';
 
@@ -410,6 +411,7 @@ async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const dryRun = args['dry-run'] === true;
   const strict = args['strict'] === true;
+  const noGate = args['no-gate'] === true;
   const model = typeof args.model === 'string' ? args.model : undefined;
   const variantArg = typeof args.variant === 'string' ? args.variant : 'baseline';
   const pageTypeArg = typeof args['page-type'] === 'string' ? args['page-type'] as PageType : undefined;
@@ -479,6 +481,9 @@ async function main() {
   if (strict) {
     console.log(`  ${c.yellow}STRICT MODE — claims failing validation will be rejected${c.reset}`);
   }
+  if (noGate) {
+    console.log(`  ${c.yellow}QUALITY GATE DISABLED — claims will not be quality-checked${c.reset}`);
+  }
   if (dryRun) {
     console.log(`  ${c.yellow}DRY RUN — claims will not be stored${c.reset}`);
   }
@@ -520,8 +525,43 @@ async function main() {
     }
   }
 
-  // Use validated claims going forward
-  const validatedClaims = accepted;
+  // --- Quality Gate: auto-fix and reject before insertion ---
+  const gateResult = runExtractionQualityGate(accepted, {
+    entityId: pageId,
+    entityName,
+    disabled: noGate,
+  });
+
+  if (!noGate && (gateResult.stats.autoFixedCount > 0 || gateResult.stats.rejected > 0)) {
+    console.log(`\n${c.bold}Quality Gate:${c.reset}`);
+    console.log(`  ${c.green}${gateResult.stats.accepted}${c.reset} accepted, ${c.yellow}${gateResult.stats.autoFixedCount}${c.reset} auto-fixed, ${c.red}${gateResult.stats.rejected}${c.reset} rejected`);
+
+    if (Object.keys(gateResult.stats.fixBreakdown).length > 0) {
+      console.log(`  ${c.dim}Auto-fixes:${c.reset}`);
+      for (const [fix, cnt] of Object.entries(gateResult.stats.fixBreakdown).sort((a, b) => b[1] - a[1])) {
+        console.log(`    ${fix.padEnd(24)} ${cnt}`);
+      }
+    }
+    if (Object.keys(gateResult.stats.rejectBreakdown).length > 0) {
+      console.log(`  ${c.dim}Rejections:${c.reset}`);
+      for (const [reason, cnt] of Object.entries(gateResult.stats.rejectBreakdown).sort((a, b) => b[1] - a[1])) {
+        console.log(`    ${reason.padEnd(24)} ${cnt}`);
+      }
+    }
+    if (gateResult.rejected.length > 0) {
+      console.log(`\n  ${c.yellow}Rejected claims:${c.reset}`);
+      for (const r of gateResult.rejected.slice(0, 5)) {
+        console.log(`    ${c.red}x${c.reset} ${r.claimText.slice(0, 80)}`);
+        console.log(`      ${c.dim}${r.rejectReasons.join('; ')}${c.reset}`);
+      }
+      if (gateResult.rejected.length > 5) {
+        console.log(`    ... and ${gateResult.rejected.length - 5} more`);
+      }
+    }
+  }
+
+  // Use gate-filtered claims going forward
+  const validatedClaims = gateResult.accepted;
 
   if (dryRun) {
     // Show type/category/mode breakdown
