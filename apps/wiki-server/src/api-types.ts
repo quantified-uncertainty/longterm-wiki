@@ -1192,3 +1192,33 @@ export const UpdateAgentSchema = z.object({
 });
 export type UpdateAgent = z.infer<typeof UpdateAgentSchema>;
 
+// ---------------------------------------------------------------------------
+// Groundskeeper Runs
+// ---------------------------------------------------------------------------
+
+export const VALID_GK_EVENTS = [
+  "success",
+  "failure",
+  "error",
+  "circuit_breaker_tripped",
+  "circuit_breaker_reset",
+  "skipped",
+] as const;
+
+export const RecordGroundskeeperRunSchema = z.object({
+  taskName: z.string().min(1).max(200),
+  event: z.enum(VALID_GK_EVENTS),
+  success: z.boolean(),
+  durationMs: z.number().int().min(0).nullable().optional(),
+  summary: z.string().max(5000).nullable().optional(),
+  errorMessage: z.string().max(10000).nullable().optional(),
+  consecutiveFailures: z.number().int().min(0).nullable().optional(),
+  circuitBreakerActive: z.boolean().optional().default(false),
+  metadata: z.record(z.unknown()).nullable().optional(),
+  timestamp: z.string().datetime().optional(),
+});
+export type RecordGroundskeeperRun = z.infer<typeof RecordGroundskeeperRunSchema>;
+
+export const RecordGroundskeeperRunBatchSchema = z.object({
+  items: z.array(RecordGroundskeeperRunSchema).min(1).max(100),
+});

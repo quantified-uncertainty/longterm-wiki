@@ -2,6 +2,14 @@ import cron from "node-cron";
 import type { Config } from "./config.js";
 import { sendDiscordNotification } from "./notify.js";
 import { recordRun } from "./run-tracker.js";
+import { recordRunToServer, updateActiveAgent } from "./wiki-server.js";
+
+/** Set by index.ts after registering as an active agent. */
+let groundskeeperAgentId: number | null = null;
+
+export function setGroundskeeperAgentId(id: number): void {
+  groundskeeperAgentId = id;
+}
 
 export type TaskFn = () => Promise<{ success: boolean; summary?: string }>;
 
@@ -106,13 +114,47 @@ export function registerTask(
         }
       }
 
+      const runTs = new Date().toISOString();
+      const event = result.success ? "success" : "failure";
+
       recordRun(config, {
         taskName: name,
-        timestamp: new Date().toISOString(),
+        timestamp: runTs,
         durationMs,
         success: result.success,
         summary: result.summary,
       });
+
+      // Best-effort: push to wiki-server
+      recordRunToServer(config, {
+        taskName: name,
+        event,
+        success: result.success,
+        durationMs,
+        summary: result.summary,
+        consecutiveFailures: state.consecutiveFailures,
+        circuitBreakerActive: state.disabled,
+        timestamp: runTs,
+      }).catch(() => {});
+
+      // Update active agent step + heartbeat
+      if (groundskeeperAgentId) {
+        updateActiveAgent(config, groundskeeperAgentId, {
+          currentStep: `${name}: ${result.summary ?? event} (${Math.round(durationMs / 1000)}s)`,
+        }).catch(() => {});
+      }
+
+      // Circuit breaker event
+      if (state.disabled) {
+        recordRunToServer(config, {
+          taskName: name,
+          event: "circuit_breaker_tripped",
+          success: false,
+          consecutiveFailures: state.consecutiveFailures,
+          circuitBreakerActive: true,
+          timestamp: runTs,
+        }).catch(() => {});
+      }
     } catch (error) {
       const durationMs = Date.now() - start;
       const errorMessage =
@@ -140,13 +182,33 @@ export function registerTask(
         log(name, { event: "circuit_breaker_tripped" });
       }
 
+      const errorTs = new Date().toISOString();
+
       recordRun(config, {
         taskName: name,
-        timestamp: new Date().toISOString(),
+        timestamp: errorTs,
         durationMs,
         success: false,
         error: errorMessage,
       });
+
+      // Best-effort: push to wiki-server
+      recordRunToServer(config, {
+        taskName: name,
+        event: "error",
+        success: false,
+        durationMs,
+        errorMessage,
+        consecutiveFailures: state.consecutiveFailures,
+        circuitBreakerActive: state.disabled,
+        timestamp: errorTs,
+      }).catch(() => {});
+
+      if (groundskeeperAgentId) {
+        updateActiveAgent(config, groundskeeperAgentId, {
+          currentStep: `${name}: ERROR — ${errorMessage.slice(0, 100)}`,
+        }).catch(() => {});
+      }
     } finally {
       state.running = false;
     }

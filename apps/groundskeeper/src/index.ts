@@ -1,10 +1,11 @@
 import "dotenv/config";
 import { loadConfig } from "./config.js";
-import { registerTask } from "./scheduler.js";
+import { registerTask, setGroundskeeperAgentId } from "./scheduler.js";
 import { sendDiscordNotification } from "./notify.js";
 import { healthCheck } from "./tasks/health-check.js";
 import { resolveConflicts } from "./tasks/resolve-conflicts.js";
 import { codeReview } from "./tasks/code-review.js";
+import { registerAsActiveAgent, sendHeartbeat } from "./wiki-server.js";
 import { issueResponder } from "./tasks/issue-responder.js";
 
 const config = loadConfig();
@@ -67,6 +68,24 @@ registerTask(
   config.tasks.issueResponder.enabled,
   () => issueResponder(config)
 );
+
+// Register as an active agent (best-effort)
+const agentId = await registerAsActiveAgent(config);
+if (agentId) {
+  setGroundskeeperAgentId(agentId);
+  console.log(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      event: "active_agent_registered",
+      agentId,
+    })
+  );
+
+  // Send heartbeat every 5 minutes to prove we're alive
+  setInterval(() => {
+    sendHeartbeat(config, agentId).catch(() => {});
+  }, 5 * 60 * 1000);
+}
 
 await sendDiscordNotification(
   config,

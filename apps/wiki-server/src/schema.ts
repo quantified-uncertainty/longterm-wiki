@@ -953,6 +953,41 @@ export const activeAgents = pgTable(
   ]
 );
 
+/**
+ * Groundskeeper runs — task execution history from the groundskeeper daemon.
+ *
+ * Each row is one execution of a scheduled task (health-check, resolve-conflicts,
+ * code-review, etc.). Replaces the local JSON run log with a server-side store
+ * so the dashboard can visualize task history, uptime, and circuit breaker events.
+ */
+export const groundskeeperRuns = pgTable(
+  "groundskeeper_runs",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    taskName: text("task_name").notNull(),
+    event: text("event").notNull(), // success | failure | error | circuit_breaker_tripped | skipped
+    success: boolean("success").notNull(),
+    durationMs: integer("duration_ms"),
+    summary: text("summary"),
+    errorMessage: text("error_message"),
+    consecutiveFailures: integer("consecutive_failures"),
+    circuitBreakerActive: boolean("circuit_breaker_active").notNull().default(false),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    timestamp: timestamp("timestamp", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_gkr_task_name").on(table.taskName),
+    index("idx_gkr_event").on(table.event),
+    index("idx_gkr_timestamp").on(table.timestamp),
+    index("idx_gkr_task_timestamp").on(table.taskName, table.timestamp),
+  ]
+);
+
 export const pageCitations = pgTable(
   "page_citations",
   {

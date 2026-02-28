@@ -43,6 +43,7 @@ function makeConfig(): Config {
       healthCheck: { enabled: true, schedule: "*/5 * * * *" },
       resolveConflicts: { enabled: false, schedule: "0 */2 * * *" },
       codeReview: { enabled: false, schedule: "0 9 * * 1" },
+      issueResponder: { enabled: false, schedule: "*/10 * * * *" },
     },
   };
 }
