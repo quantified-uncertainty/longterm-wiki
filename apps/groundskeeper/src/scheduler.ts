@@ -3,6 +3,7 @@ import type { Config } from "./config.js";
 import { sendDiscordNotification } from "./notify.js";
 import { recordRun } from "./run-tracker.js";
 import { recordRunToServer, updateActiveAgent } from "./wiki-server.js";
+import { logger as rootLogger } from "./logger.js";
 
 /** Set by index.ts after registering as an active agent. */
 let groundskeeperAgentId: number | null = null;
@@ -32,16 +33,6 @@ function getState(name: string): TaskState {
   return state;
 }
 
-function log(taskName: string, data: Record<string, unknown>): void {
-  console.log(
-    JSON.stringify({
-      timestamp: new Date().toISOString(),
-      task: taskName,
-      ...data,
-    })
-  );
-}
-
 export function registerTask(
   config: Config,
   name: string,
@@ -49,24 +40,26 @@ export function registerTask(
   enabled: boolean,
   fn: TaskFn
 ): void {
+  const logger = rootLogger.child({ task: name });
+
   if (!enabled) {
-    log(name, { event: "skipped", reason: "disabled" });
+    logger.info({ event: "skipped", reason: "disabled" }, "Task disabled");
     return;
   }
 
   if (!cron.validate(schedule)) {
-    log(name, { event: "error", reason: `Invalid cron: ${schedule}` });
+    logger.error({ event: "error", reason: `Invalid cron: ${schedule}` }, "Invalid cron schedule");
     return;
   }
 
-  log(name, { event: "registered", schedule });
+  logger.info({ event: "registered", schedule }, "Task registered");
 
   cron.schedule(schedule, async () => {
     const state = getState(name);
 
     // Guard: don't run if already running
     if (state.running) {
-      log(name, { event: "skipped", reason: "already running" });
+      logger.warn({ event: "skipped", reason: "already running" }, "Task skipped");
       return;
     }
 
@@ -83,13 +76,13 @@ export function registerTask(
       ) {
         // Half-open: cooldown elapsed, allow one probe attempt
         isHalfOpenProbe = true;
-        log(name, { event: "half_open_attempt" });
+        logger.info({ event: "half_open_attempt" }, "Circuit breaker half-open probe");
         await sendDiscordNotification(
           config,
           `🟡 **${name}** circuit breaker cooldown elapsed — attempting recovery probe...`
         );
       } else {
-        log(name, { event: "skipped", reason: "circuit breaker tripped" });
+        logger.warn({ event: "skipped", reason: "circuit breaker tripped" }, "Task skipped");
         state.running = false;
         return;
       }
@@ -104,41 +97,41 @@ export function registerTask(
         if (isHalfOpenProbe) {
           state.disabled = false;
           state.trippedAt = null;
-          log(name, { event: "half_open_success" });
+          logger.info({ event: "half_open_success" }, "Half-open probe succeeded");
           await sendDiscordNotification(
             config,
             `🟢 **${name}** recovery probe succeeded — circuit breaker reset automatically.`
           );
         }
         state.consecutiveFailures = 0;
-        log(name, {
+        logger.info({
           event: "success",
           durationMs,
           summary: result.summary,
-        });
+        }, "Task succeeded");
       } else {
         if (isHalfOpenProbe) {
           // Probe failed — restart cooldown, stay tripped
           state.trippedAt = Date.now();
-          log(name, {
+          logger.error({
             event: "failure",
             durationMs,
             consecutiveFailures: state.consecutiveFailures,
             summary: result.summary,
             halfOpenProbe: true,
-          });
+          }, "Half-open probe failed");
           await sendDiscordNotification(
             config,
             `🔴 **${name}** recovery probe failed — circuit breaker remains tripped. Will retry after cooldown.`
           );
         } else {
           state.consecutiveFailures++;
-          log(name, {
+          logger.error({
             event: "failure",
             durationMs,
             consecutiveFailures: state.consecutiveFailures,
             summary: result.summary,
-          });
+          }, "Task failed");
 
           await sendDiscordNotification(
             config,
@@ -153,7 +146,7 @@ export function registerTask(
               config,
               `🔴 **Circuit breaker tripped** for **${name}** after 3 consecutive failures. Will auto-retry after cooldown.`
             );
-            log(name, { event: "circuit_breaker_tripped" });
+            logger.fatal({ event: "circuit_breaker_tripped" }, "Circuit breaker tripped");
           }
         }
       }
@@ -207,25 +200,25 @@ export function registerTask(
       if (isHalfOpenProbe) {
         // Probe threw — restart cooldown, stay tripped
         state.trippedAt = Date.now();
-        log(name, {
+        logger.error({
           event: "error",
           durationMs,
           error: errorMessage,
           consecutiveFailures: state.consecutiveFailures,
           halfOpenProbe: true,
-        });
+        }, "Half-open probe threw an error");
         await sendDiscordNotification(
           config,
           `🔴 **${name}** recovery probe threw an error — circuit breaker remains tripped. Will retry after cooldown.`
         );
       } else {
         state.consecutiveFailures++;
-        log(name, {
+        logger.error({
           event: "error",
           durationMs,
           error: errorMessage,
           consecutiveFailures: state.consecutiveFailures,
-        });
+        }, "Task threw an error");
 
         await sendDiscordNotification(
           config,
@@ -239,7 +232,7 @@ export function registerTask(
             config,
             `🔴 **Circuit breaker tripped** for **${name}** after 3 consecutive failures. Will auto-retry after cooldown.`
           );
-          log(name, { event: "circuit_breaker_tripped" });
+          logger.fatal({ event: "circuit_breaker_tripped" }, "Circuit breaker tripped");
         }
       }
 
@@ -282,7 +275,7 @@ export function resetCircuitBreaker(name: string): boolean {
   state.disabled = false;
   state.trippedAt = null;
   state.consecutiveFailures = 0;
-  log(name, { event: "circuit_breaker_reset" });
+  rootLogger.child({ task: name }).info({ event: "circuit_breaker_reset" }, "Circuit breaker reset");
   return true;
 }
 

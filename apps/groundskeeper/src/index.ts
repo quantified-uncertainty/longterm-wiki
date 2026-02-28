@@ -7,34 +7,32 @@ import { resolveConflicts } from "./tasks/resolve-conflicts.js";
 import { codeReview } from "./tasks/code-review.js";
 import { registerAsActiveAgent, sendHeartbeat } from "./wiki-server.js";
 import { issueResponder } from "./tasks/issue-responder.js";
+import { logger } from "./logger.js";
 
 const config = loadConfig();
 
-console.log(
-  JSON.stringify({
-    timestamp: new Date().toISOString(),
-    event: "startup",
-    dailyRunCap: config.dailyRunCap,
-    tasks: {
-      healthCheck: {
-        enabled: config.tasks.healthCheck.enabled,
-        schedule: config.tasks.healthCheck.schedule,
-      },
-      resolveConflicts: {
-        enabled: config.tasks.resolveConflicts.enabled,
-        schedule: config.tasks.resolveConflicts.schedule,
-      },
-      codeReview: {
-        enabled: config.tasks.codeReview.enabled,
-        schedule: config.tasks.codeReview.schedule,
-      },
-      issueResponder: {
-        enabled: config.tasks.issueResponder.enabled,
-        schedule: config.tasks.issueResponder.schedule,
-      },
+logger.info({
+  event: "startup",
+  dailyRunCap: config.dailyRunCap,
+  tasks: {
+    healthCheck: {
+      enabled: config.tasks.healthCheck.enabled,
+      schedule: config.tasks.healthCheck.schedule,
     },
-  })
-);
+    resolveConflicts: {
+      enabled: config.tasks.resolveConflicts.enabled,
+      schedule: config.tasks.resolveConflicts.schedule,
+    },
+    codeReview: {
+      enabled: config.tasks.codeReview.enabled,
+      schedule: config.tasks.codeReview.schedule,
+    },
+    issueResponder: {
+      enabled: config.tasks.issueResponder.enabled,
+      schedule: config.tasks.issueResponder.schedule,
+    },
+  },
+}, "Groundskeeper starting");
 
 // Register tasks
 registerTask(
@@ -73,13 +71,7 @@ registerTask(
 const agentId = await registerAsActiveAgent(config);
 if (agentId) {
   setGroundskeeperAgentId(agentId);
-  console.log(
-    JSON.stringify({
-      timestamp: new Date().toISOString(),
-      event: "active_agent_registered",
-      agentId,
-    })
-  );
+  logger.info({ agentId }, "Active agent registered");
 
   // Send heartbeat every 5 minutes to prove we're alive
   setInterval(() => {
@@ -92,9 +84,4 @@ await sendDiscordNotification(
   "🟢 **Groundskeeper started** — health check active, monitoring wiki server."
 );
 
-console.log(
-  JSON.stringify({
-    timestamp: new Date().toISOString(),
-    event: "ready",
-  })
-);
+logger.info("Groundskeeper ready");

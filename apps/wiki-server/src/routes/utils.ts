@@ -1,5 +1,8 @@
 import type { Context } from "hono";
 import { z } from "zod";
+import { logger as rootLogger } from "../logger.js";
+
+const logger = rootLogger.child({ component: "db" });
 
 /**
  * Create a PaginationQuery schema with configurable limits.
@@ -50,10 +53,11 @@ export function dbError(
   err: unknown,
   context?: Record<string, unknown>
 ) {
-  console.error(`[db] ${operation} failed:`, {
+  logger.error({
+    operation,
     ...(context ?? {}),
-    error: err instanceof Error ? err.message : String(err),
-  });
+    err: err instanceof Error ? err.message : String(err),
+  }, `${operation} failed`);
   return c.json({ error: "database_error", message: `${operation} failed` }, 500);
 }
 
