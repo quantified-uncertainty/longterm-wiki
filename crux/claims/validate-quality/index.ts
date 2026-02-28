@@ -34,8 +34,8 @@ import {
   type ClaimQualityReport,
   type QualityAuditResult,
 } from './types.ts';
+import { slugToDisplayName } from '../../lib/claim-text-utils.ts';
 import {
-  slugToDisplayName,
   checkSelfContained,
   checkCorrectlyAttributed,
   checkCleanText,

@@ -1202,6 +1202,8 @@ export const VALID_GK_EVENTS = [
   "error",
   "circuit_breaker_tripped",
   "circuit_breaker_reset",
+  "half_open_attempt",
+  "half_open_success",
   "skipped",
 ] as const;
 
