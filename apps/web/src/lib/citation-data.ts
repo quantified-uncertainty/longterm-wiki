@@ -1,8 +1,8 @@
 import { fetchFromWikiServer } from "./wiki-server";
 import type {
   CitationHealthResult,
-  CitationQuotesResult,
-  CitationQuotesByUrlResult,
+  ClaimsByPageResult,
+  ClaimsBySourceUrlResult,
 } from "@wiki-server/api-response-types";
 import type {
   AccuracyVerdict,
@@ -78,13 +78,17 @@ function toAccuracyVerdict(value: string | null): AccuracyVerdict | null {
  * Fetch citation verification data for a specific page from the wiki-server.
  * Returns an empty array if the server is unavailable or the page has no data.
  *
+ * Reads from the claims system (claims + claim_page_references + claim_sources)
+ * via the /api/claims/by-page endpoint, which replaced the deprecated
+ * /api/citations/quotes endpoint (#1311).
+ *
  * Revalidates every 10 minutes — citation data changes infrequently.
  */
 export async function getCitationQuotes(
   pageId: string
 ): Promise<CitationQuote[]> {
-  const result = await fetchFromWikiServer<CitationQuotesResult>(
-    `/api/citations/quotes?page_id=${encodeURIComponent(pageId)}`,
+  const result = await fetchFromWikiServer<ClaimsByPageResult>(
+    `/api/claims/by-page?page_id=${encodeURIComponent(pageId)}`,
     { revalidate: 600 }
   );
 
@@ -114,20 +118,23 @@ export async function getCitationQuotes(
     }));
 }
 
-/** Citation quote with page context — returned by quotes-by-url endpoint */
+/** Citation quote with page context — returned by by-source-url endpoint */
 export interface CrossPageCitationQuote extends CitationQuote {
   pageId: string;
 }
 
 /**
- * Fetch all citation quotes across all pages for a given source URL.
+ * Fetch all claims across all pages for a given source URL.
  * Used by /source/[id] pages to show cross-page citation data.
+ *
+ * Reads from the claims system via the /api/claims/by-source-url endpoint,
+ * which replaced the deprecated /api/citations/quotes-by-url endpoint (#1311).
  */
 export async function getCitationQuotesByUrl(
   url: string
-): Promise<CitationQuotesByUrlResult | null> {
-  return fetchFromWikiServer<CitationQuotesByUrlResult>(
-    `/api/citations/quotes-by-url?url=${encodeURIComponent(url)}`,
+): Promise<ClaimsBySourceUrlResult | null> {
+  return fetchFromWikiServer<ClaimsBySourceUrlResult>(
+    `/api/claims/by-source-url?url=${encodeURIComponent(url)}`,
     { revalidate: 600 }
   );
 }
