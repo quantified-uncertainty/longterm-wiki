@@ -118,7 +118,7 @@ The key insight: **IDs are allocated atomically by the wiki server and written b
 - The server's PostgreSQL database prevents race conditions and ID reassignment
 - ID conflicts are detected at build time and fail the build
 
-Resolution at runtime supports both numeric IDs and slugs, so `<EntityLink id="coefficient-giving" >` and path-based lookups both work.
+Resolution at runtime supports both numeric IDs and slugs, so `<EntityLink id="E521" name="coefficient-giving" >` and path-based lookups both work.
 
 ### 3. Content-Derived Backlinks
 
@@ -471,7 +471,7 @@ sequenceDiagram
     participant Registry as pathRegistry.json
     participant Database as database.json
 
-    MDX->>Component: <EntityLink id="coefficient-giving">
+    MDX->>Component: <EntityLink id="E521" name="coefficient-giving">
     Component->>Registry: Lookup path for ID
     Registry-->>Component: /knowledge-base/organizations/funders/open-philanthropy
     Component->>Database: Get entity metadata
