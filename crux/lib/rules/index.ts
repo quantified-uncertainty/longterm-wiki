@@ -129,6 +129,9 @@ import { probabilityConsistencyRule } from './probability-consistency.ts';
 import { terminologyVariantsRule } from './terminology-variants.ts';
 import { causalRelationshipCoverageRule } from './causal-relationship-coverage.ts';
 
+// Fact entity attribution validation (issue #1272)
+import { factEntityMatchRule } from './fact-entity-match.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -194,6 +197,7 @@ export {
   probabilityConsistencyRule,
   terminologyVariantsRule,
   causalRelationshipCoverageRule,
+  factEntityMatchRule,
 };
 
 export const allRules: Rule[] = [
@@ -260,6 +264,7 @@ export const allRules: Rule[] = [
   probabilityConsistencyRule,
   terminologyVariantsRule,
   causalRelationshipCoverageRule,
+  factEntityMatchRule,
 ];
 
 export default allRules;

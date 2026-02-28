@@ -446,6 +446,24 @@ export async function enrichFactRefs(
   const hexRe = /^[0-9a-f]{8}$/i;
   replacements = replacements.filter(r => hexRe.test(r.factId));
 
+  // Validate entity attribution (#1272): warn about and filter out cross-entity
+  // fact refs. The LLM sometimes matches dollar amounts or numbers to facts from
+  // the wrong entity.
+  if (pageId) {
+    const crossEntityRefs = replacements.filter(r => r.entityId !== pageId);
+    if (crossEntityRefs.length > 0) {
+      replacements = replacements.filter(r => r.entityId === pageId);
+      const crossSummary = crossEntityRefs.map(
+        r => `  ${r.entityId}.${r.factId} "${r.searchText}"`
+      ).join('\n');
+      console.warn(
+        `[fact-ref-enrich] Filtered ${crossEntityRefs.length} cross-entity ` +
+        `fact ref(s) on page "${pageId}":\n${crossSummary}\n` +
+        `  These reference a different entity's facts. Add manually if intentional.`
+      );
+    }
+  }
+
   const { content: enriched, applied, appliedReplacements } = applyFactRefReplacements(content, replacements);
 
   return {
