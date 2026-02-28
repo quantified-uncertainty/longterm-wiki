@@ -1,12 +1,14 @@
 /**
  * Issues Command Handlers
  *
- * Track Claude Code work on GitHub issues: list, prioritize, signal start/done.
+ * Track Claude Code work on GitHub issues: list, prioritize, search, signal start/done.
  *
  * Usage:
  *   crux issues                      List open issues ranked by priority
  *   crux issues list                 Same as above
  *   crux issues next                 Show the single next issue to work on
+ *   crux issues search <query>       Search existing issues before filing a new one
+ *   crux issues comment <N> <msg>    Post a comment on an existing issue
  *   crux issues start <N>            Signal start: comment + add claude-working label
  *   crux issues done <N> [--pr=URL]  Signal completion: comment + remove label
  *   crux issues cleanup              Detect stale claude-working labels + potential duplicates
@@ -1020,6 +1022,182 @@ function findPotentialDuplicates(issues: RankedIssue[]): Array<{ a: RankedIssue;
 }
 
 /**
+ * Search open (and optionally closed) issues for potential matches to a query.
+ * Used by agents before filing new issues to avoid duplicates.
+ *
+ * Matches against title and body using token overlap. Also searches closed issues
+ * via GitHub search API when --closed is passed.
+ */
+async function search(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const query = args.join(' ').trim();
+  if (!query) {
+    return {
+      output: `${c.red}Usage: crux issues search <query>${c.reset}\n` +
+        `${c.dim}Example: crux issues search "dollar sign escaping in MDX"${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  const includeClosed = Boolean(options.closed);
+  const threshold = parseFloat((options.threshold as string) || '0.35');
+
+  // Tokenizer reused from findPotentialDuplicates
+  const stopwords = new Set([
+    'a', 'an', 'the', 'and', 'or', 'to', 'for', 'of', 'in', 'on', 'is', 'are',
+    'add', 'fix', 'update', 'all', 'with', 'from', 'new', '--', '—', '-',
+    'this', 'that', 'not', 'but', 'has', 'have', 'should', 'would', 'could',
+  ]);
+
+  function tokenize(text: string): Set<string> {
+    return new Set(
+      text.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .split(/\s+/)
+        .filter(w => w.length > 2 && !stopwords.has(w))
+    );
+  }
+
+  function similarity(queryTokens: Set<string>, targetTokens: Set<string>): number {
+    if (queryTokens.size === 0 || targetTokens.size === 0) return 0;
+    // Use query-weighted overlap: what fraction of query tokens appear in target?
+    // This is better than Jaccard for search because it doesn't penalize long issue titles.
+    let matches = 0;
+    for (const token of queryTokens) {
+      if (targetTokens.has(token)) matches++;
+    }
+    return matches / queryTokens.size;
+  }
+
+  const queryTokens = tokenize(query);
+  if (queryTokens.size === 0) {
+    return {
+      output: `${c.yellow}Query "${query}" produced no searchable tokens after stopword removal.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // --- Search open issues ---
+  const openIssues = await fetchOpenIssues();
+  type Match = { number: number; title: string; url: string; state: string; score: number; labels: string[] };
+  const matches: Match[] = [];
+
+  for (const issue of openIssues) {
+    const titleTokens = tokenize(issue.title);
+    const bodyTokens = tokenize(issue.body.slice(0, 500)); // first 500 chars of body
+    const allTokens = new Set([...titleTokens, ...bodyTokens]);
+    const score = similarity(queryTokens, allTokens);
+    if (score >= threshold) {
+      matches.push({ number: issue.number, title: issue.title, url: issue.url, state: 'open', score, labels: issue.labels });
+    }
+  }
+
+  // --- Optionally search closed issues via GitHub search API ---
+  if (includeClosed) {
+    try {
+      const searchQuery = encodeURIComponent(`repo:${REPO} is:issue is:closed ${query}`);
+      const searchResults = await githubApi<{ items: GitHubIssueResponse[] }>(
+        `/search/issues?q=${searchQuery}&per_page=20`
+      );
+      for (const item of searchResults.items) {
+        // Skip if already matched as open
+        if (matches.some(m => m.number === item.number)) continue;
+        const titleTokens = tokenize(item.title);
+        const bodyTokens = tokenize((item.body || '').slice(0, 500));
+        const allTokens = new Set([...titleTokens, ...bodyTokens]);
+        const score = similarity(queryTokens, allTokens);
+        if (score >= threshold) {
+          matches.push({
+            number: item.number,
+            title: item.title,
+            url: item.html_url,
+            state: 'closed',
+            score,
+            labels: (item.labels || []).map(l => l.name),
+          });
+        }
+      }
+    } catch {
+      // Search API failure is non-fatal — open issue results are still useful
+    }
+  }
+
+  matches.sort((a, b) => b.score - a.score);
+
+  // --- Format output ---
+  let output = '';
+  output += `${c.bold}Search: "${query}"${c.reset}`;
+  output += ` ${c.dim}(tokens: ${[...queryTokens].join(', ')})${c.reset}\n`;
+
+  if (matches.length === 0) {
+    output += `\n${c.green}No matching issues found.${c.reset} Safe to file a new issue.\n`;
+    if (!includeClosed) {
+      output += `${c.dim}Tip: Use --closed to also search closed issues.${c.reset}\n`;
+    }
+  } else {
+    output += `\n${c.yellow}Found ${matches.length} potential match(es):${c.reset}\n\n`;
+    for (const m of matches.slice(0, 15)) {
+      const stateTag = m.state === 'closed' ? `${c.dim}[closed]${c.reset} ` : '';
+      const pct = `${(m.score * 100).toFixed(0)}%`;
+      output += `  ${c.cyan}#${String(m.number).padEnd(5)}${c.reset} ${stateTag}${m.title}\n`;
+      output += `    ${c.dim}Match: ${pct} — ${m.url}${c.reset}\n`;
+    }
+    output += `\n${c.bold}Recommendation:${c.reset} Review matching issues before filing a new one.\n`;
+    output += `${c.dim}If your concern is covered, add a comment to the existing issue instead.${c.reset}\n`;
+  }
+
+  if (options.json) {
+    return { output: JSON.stringify({ query, tokens: [...queryTokens], matches }, null, 2), exitCode: 0 };
+  }
+
+  return { output, exitCode: matches.length > 0 ? 0 : 0 };
+}
+
+/**
+ * Post a comment on an existing issue. Used by agents to add context to
+ * issues they encounter during a session rather than filing duplicates.
+ */
+async function comment(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const issueNum = parseRequiredInt(args[0]);
+  if (!issueNum) {
+    return {
+      output: `${c.red}Usage: crux issues comment <issue-number> <message>${c.reset}\n` +
+        `${c.dim}Example: crux issues comment 42 "Found another instance in gate.ts:142"${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // Message is everything after the issue number
+  const bodyFromFile = readFileFlag(options['body-file'] as string | undefined);
+  const message = bodyFromFile || args.slice(1).join(' ').trim() || (options.body as string) || '';
+  if (!message) {
+    return {
+      output: `${c.red}No comment message provided.${c.reset}\n` +
+        `${c.dim}Usage: crux issues comment <N> "your message"${c.reset}\n` +
+        `${c.dim}   or: crux issues comment <N> --body-file=/tmp/comment.md${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // Post the comment
+  await githubApi(`/repos/${REPO}/issues/${issueNum}/comments`, {
+    method: 'POST',
+    body: { body: message },
+  });
+
+  let output = '';
+  output += `${c.green}Posted comment on #${issueNum}${c.reset}\n`;
+  output += `${c.dim}https://github.com/${REPO}/issues/${issueNum}${c.reset}\n`;
+
+  return { output, exitCode: 0 };
+}
+
+/**
  * Close an issue with an optional comment and reason.
  */
 async function close(args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -1397,7 +1575,9 @@ export const commands = {
   default: list,
   list,
   next,
+  search,
   create,
+  comment,
   'update-body': updateBody,
   'update-title': updateTitle,
   lint,
@@ -1414,7 +1594,9 @@ Issues Domain - Track Claude Code work on GitHub issues
 Commands:
   list                List open issues ranked by priority (default)
   next                Show the single next issue to pick up
+  search <query>      Search existing issues before filing a new one
   create <title>      Create a new GitHub issue (supports structured template)
+  comment <N> <msg>   Post a comment on an existing issue
   update-body <N>     Update an issue body using structured template args
   update-title <N>    Update an issue title
   lint [N]            Check issue formatting (all issues, or single by number)
@@ -1427,6 +1609,14 @@ Options (list/next):
   --limit=N           Max issues to show in list (default: 30)
   --scores            Show score breakdown + formatting warnings per issue
   --json              JSON output
+
+Options (search):
+  --closed            Also search closed issues (via GitHub search API)
+  --threshold=N       Minimum match score 0-1 (default: 0.35)
+  --json              JSON output with match details
+
+Options (comment):
+  --body-file=<path>  Comment body from file (safe — avoids shell expansion)
 
 Options (create):
   --label=X,Y         Comma-separated labels to apply
@@ -1487,6 +1677,9 @@ Examples:
   crux issues                        List all open issues
   crux issues --scores               List with score breakdowns + formatting warnings
   crux issues next                   Show next issue to pick up
+  crux issues search "MDX escaping"  Check if issue exists before filing
+  crux issues search "broken build" --closed   Also search closed issues
+  crux issues comment 42 "Found another instance in gate.ts:142"
   crux issues lint                   Check all issues for formatting problems
   crux issues lint 239               Check single issue #239
   crux issues create "Add validation rule for X" --label=tooling \\
