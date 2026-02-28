@@ -11,7 +11,7 @@ researchImportance: 85
 tacticalValue: 90
 lastEdited: "2026-02-28"
 update_frequency: 3
-llmSummary: "Comprehensive analysis of the February 2026 confrontation between Anthropic and the US government. Triggered when Claude AI was used in the January 2026 Venezuela raid via Palantir, Anthropic refused Pentagon demands to allow unrestricted military use. Defense Secretary Hegseth set a Feb 27 deadline; Dario Amodei publicly refused, stating Anthropic 'cannot in good conscience accede.' Trump ordered all agencies to cease using Anthropic and Hegseth designated it a 'supply chain risk' — a category normally reserved for foreign adversaries like Huawei. Hours later, OpenAI struck a Pentagon deal with apparently similar safeguards. Anthropic plans legal challenge. Includes valuation impact modeling (\\$150-500B range depending on designation outcome), industry solidarity analysis (hundreds of Google/OpenAI employees signed petitions), and comparison with historical precedents."
+llmSummary: "Comprehensive analysis of the February 2026 confrontation between Anthropic and the US government. Triggered when Claude AI was used in the January 2026 Venezuela raid via Palantir, Anthropic refused Pentagon demands to allow unrestricted military use. A disputed nuclear-strike hypothetical at a Feb 24 meeting deepened the rift. Defense Secretary Hegseth set a Feb 27 deadline; Dario Amodei publicly refused. Despite bipartisan Senate intervention (Wicker, Reed, McConnell, Coons urging extension), Trump ordered all agencies to cease using Anthropic and Hegseth designated it a 'supply chain risk' — a category normally reserved for foreign adversaries like Huawei. GSA removed Anthropic from USAi.gov. Hours later, OpenAI struck a Pentagon deal with apparently similar safeguards. Anthropic filed suit on Feb 28. Secondary market shares showed wide spread (\\$259-\\$417/share). Includes valuation impact modeling, revenue impact distribution, and IPO timeline estimates."
 ratings:
   focus: 9
   novelty: 9
@@ -32,7 +32,7 @@ import {F} from '@components/facts'
 <DataInfoBox entityId="E924" />
 
 :::caution[Rapidly Developing]
-This page covers events through February 28, 2026. The situation is actively evolving — Anthropic's legal challenge to the supply chain risk designation has not yet been filed, and congressional negotiations are ongoing.
+This page covers events through February 28, 2026. The situation is actively evolving — Anthropic has filed suit challenging the supply chain risk designation, bipartisan Senate leaders have urged a resolution, and the six-month phaseout period is underway.
 :::
 
 ## Quick Assessment
@@ -58,15 +58,18 @@ This page covers events through February 28, 2026. The situation is actively evo
 | **Feb 12** | Anthropic closes <F e="anthropic" f="5b0663a0">\$30B</F> Series G at <F e="anthropic" f="6796e194">\$380B</F> valuation | Largest private funding round in AI history |
 | **Feb 16** | Hegseth threatens supply chain risk designation | Pentagon pushes all AI firms to accept "all lawful purposes" |
 | **Feb 23** | xAI approved for classified networks; agrees to all terms without reservation | Pentagon secures alternative AI provider |
-| **Feb 24** | Hegseth meets Amodei at Pentagon; demands signed document for full access | References Defense Production Act, contract termination, supply chain risk |
+| **Feb 24** | Hegseth meets Amodei at Pentagon; demands signed document for full access | References Defense Production Act, contract termination, supply chain risk. Pentagon's tech chief poses ICBM hypothetical[^17] |
 | **Feb 25** | RSP v3.0 published — drops hard commitment to pause training | Conditional on having "significant lead" over competitors [TIME](https://time.com/7380854/exclusive-anthropic-drops-flagship-safety-pledge/) |
 | **Feb 26** | Amodei publishes statement: "cannot in good conscience accede" | Calls Pentagon threats "inherently contradictory" |
+| **Feb 26** | Congressional leaders call Pentagon's approach "sophomoric" | Bipartisan criticism of escalation tactics[^18] |
 | **Feb 27** | Emil Michael calls Amodei a "liar" with a "God complex" | Pentagon undersecretary escalates personal attacks [Fortune](https://fortune.com/2026/02/27/pentagon-brands-anthropic-ceo-dario-amodei-a-liar-with-a-god-complex-as-deadline-looms-over-ai-use-in-weapons-and-surveillance/) |
+| **Feb 27** | Senate Armed Services leaders send bipartisan letter urging extension | Wicker (R), Reed (D), McConnell (R), Coons (D) warn designation could impede Silicon Valley cooperation[^19] |
 | **Feb 27** | 5:01 PM deadline passes without agreement | Pentagon proceeds with designation |
 | **Feb 27** | Trump orders all agencies to "immediately cease" using Anthropic; calls company "woke" | Six-month phaseout for agencies including Pentagon |
 | **Feb 27** | Hegseth designates Anthropic a "Supply-Chain Risk to National Security" | Bars Pentagon contractors from any commercial activity with Anthropic |
+| **Feb 27** | GSA removes Anthropic from USAi.gov and Multiple Award Schedule | Federal procurement access severed[^20] |
 | **Feb 27** | OpenAI announces Pentagon deal for classified networks — with similar safeguards | Altman claims DoW agreed to same red lines Anthropic sought [NPR](https://www.npr.org/2026/02/27/nx-s1-5729118/trump-anthropic-pentagon-openai-ai-weapons-ban) |
-| **Feb 28** | Amodei calls actions "retaliatory and punitive"; announces legal challenge | "Disagreeing with the government is the most American thing in the world" [CBS News](https://www.cbsnews.com/news/anthropic-ceo-dario-amodei-calls-white-house-actions-retaliatory-and-punitive/) |
+| **Feb 28** | Anthropic files lawsuit challenging supply chain risk designation | "Disagreeing with the government is the most American thing in the world" [CBS News](https://www.cbsnews.com/news/anthropic-ceo-dario-amodei-calls-white-house-actions-retaliatory-and-punitive/) |
 
 ## The Core Dispute
 
@@ -92,6 +95,14 @@ Amodei identified a logical contradiction in the Pentagon's threats: "One labels
 - Classify Anthropic as a dangerous supply chain risk
 - Use the Defense Production Act to *force* Anthropic to provide its technology
 
+### The Nuclear Hypothetical
+
+A key flashpoint was revealed by the Washington Post: the Pentagon's technology chief posed a scenario at the February 24 meeting — if an intercontinental ballistic missile were launched at the United States, could the military use Claude to help shoot it down?[^17]
+
+The two sides gave conflicting accounts. A defense official said Amodei's response was: "You could call us and we'd work it out." Anthropic called this account "patently false" and said it had already agreed to allow Claude to be used for missile defense. The dispute illustrates the gap between the two sides — the Pentagon framed the restrictions as endangering national survival, while Anthropic maintained that its actual red lines (autonomous weapons, mass surveillance) would not prevent missile defense applications.[^17]
+
+The episode became central to the Pentagon's public case, with Hegseth citing it as evidence that Anthropic was "unserious" about national security. In war games, leading AI models including Claude, Gemini, and ChatGPT all opted to deploy nuclear weapons in the vast majority of scenarios — a finding that arguably supports Anthropic's position that AI systems should not have autonomous control over weapons of mass destruction.[^17]
+
 ## The Supply Chain Risk Designation
 
 ### What It Means
@@ -109,11 +120,17 @@ The practical effects are severe:
 
 ### Legal Challenge
 
-Anthropic announced it will challenge the designation in court, calling it "legally unsound" and an "unprecedented action — one historically reserved for US adversaries, never before publicly applied to an American company."[^6] The company's legal argument likely centers on:
+Anthropic filed suit on February 28 challenging the designation, calling it "legally unsound" and an "unprecedented action — one historically reserved for US adversaries, never before publicly applied to an American company."[^6] The company's legal argument centers on:
 
 1. The designation was retaliatory (punishment for refusing to negotiate away ethical principles)
 2. The statute was designed for foreign adversary supply chain threats, not domestic policy disputes
 3. The action violated due process (Anthropic reported receiving no direct communication from DoW or White House before the designation)
+
+### Congressional Intervention
+
+Hours before the deadline, Senate Armed Services Committee Chair Roger Wicker (R-Miss.) and Ranking Member Jack Reed (D-R.I.), along with Defense Appropriations Chair Mitch McConnell (R-Ky.) and Ranking Member Chris Coons (D-Del.), sent a bipartisan letter urging both sides to extend negotiations.[^19] The letter warned that designating Anthropic a supply chain risk "without credible evidence" could impede cooperation between the military and Silicon Valley, and that the US "cannot afford to take on any preventable risk that would give our adversaries, particularly China, an edge."
+
+Congressional leaders from both parties had separately called the Pentagon's approach "sophomoric."[^18] Despite this intervention, the administration proceeded with the designation.
 
 ## The OpenAI Paradox
 
@@ -190,6 +207,18 @@ The \$200M Pentagon contract is small relative to <F e="anthropic" f="0ed4db9e">
 3. **IPO disruption**: Anthropic is reportedly preparing for an IPO in 2026-2027. A "supply chain risk to national security" label is a material disclosure event that could suppress investor appetite.
 
 4. **Cloud partner conflict**: Amazon (\$10.75B invested) and Google (\$3.3B invested) both have major Pentagon contracts. The supply chain risk designation forces them to erect strict firewalls between their Anthropic investments and their defense work.
+
+### Secondary Market Reaction
+
+As a private company, Anthropic has no public stock price. However, secondary market platforms showed divergent signals on February 28:
+
+| Platform | Price/Share | Signal |
+|----------|-------------|--------|
+| **Hiive** | \$417.38 | 88 live orders; demand remained high |
+| **Forge Global** | \$259.14 | Lower price suggests some sellers discounting |
+| **Notice.co** | — | Buyer-to-seller demand ratio of 24.3:1 |
+
+The wide spread between platforms (\$259-\$417) reflects genuine uncertainty about the designation's long-term impact. The 24:1 demand ratio suggests most existing shareholders are holding rather than panic-selling.
 
 ### Valuation Impact Modeling
 
@@ -394,3 +423,7 @@ reversedSoon = 0.15 to 0.35  // Political deal or court injunction
 [^14]: [Anthropic gives \$20 million to group pushing for AI regulations](https://www.cnbc.com/2026/02/12/anthropic-gives-20-million-to-group-pushing-for-ai-regulations-.html), CNBC, February 12, 2026
 [^15]: [Exclusive: Anthropic Drops Flagship Safety Pledge](https://time.com/7380854/exclusive-anthropic-drops-flagship-safety-pledge/), TIME, February 2026
 [^16]: [Machines of Loving Grace](https://darioamodei.com/machines-of-loving-grace), Dario Amodei, October 2024
+[^17]: [The hypothetical nuclear attack that escalated the Pentagon's showdown with Anthropic](https://www.washingtonpost.com/technology/2026/02/27/anthropic-pentagon-lethal-military-ai/), Washington Post, February 27, 2026
+[^18]: [Congress rips Pentagon over "sophomoric" Anthropic fight](https://www.axios.com/2026/02/26/anthropic-pentagon-ultamatim-congress-deadline), Axios, February 26, 2026
+[^19]: [Scoop: Top Senate defense leaders intervene in Pentagon-Anthropic AI dispute](https://www.axios.com/2026/02/27/senate-defense-anthropic-pentagon-ai), Axios, February 27, 2026
+[^20]: [Trump directs government to cease using Anthropic's technology after Pentagon standoff](https://abcnews.com/Politics/anthropic-latest-pentagon-contract-bar-ai-autonomous-weapons/story?id=130558898), ABC News, February 27, 2026
