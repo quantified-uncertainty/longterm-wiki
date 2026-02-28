@@ -259,6 +259,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Session Insights", href: internalHref("session-insights-dashboard") },
         { label: "Auto-Update Runs", href: internalHref("auto-update-runs-dashboard") },
         { label: "Auto-Update News", href: internalHref("auto-update-news-dashboard") },
+        { label: "Groundskeeper Runs", href: internalHref("groundskeeper-runs-dashboard") },
       ],
     },
     {

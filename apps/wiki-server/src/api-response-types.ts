@@ -29,6 +29,7 @@ import type { ExploreRoute } from './routes/explore.js';
 import type { FactsRoute } from './routes/facts.js';
 import type { EntitiesRoute } from './routes/entities.js';
 import type { PagesRoute } from './routes/pages.js';
+import type { GroundskeeperRunsRoute } from './routes/groundskeeper-runs.js';
 
 // ---------------------------------------------------------------------------
 // RPC client phantom types (compile-time only)
@@ -48,6 +49,7 @@ type ExploreRpc = ReturnType<typeof hc<ExploreRoute>>;
 type FactsRpc = ReturnType<typeof hc<FactsRoute>>;
 type EntitiesRpc = ReturnType<typeof hc<EntitiesRoute>>;
 type PagesRpc = ReturnType<typeof hc<PagesRoute>>;
+type GroundskeeperRunsRpc = ReturnType<typeof hc<GroundskeeperRunsRoute>>;
 
 // ---------------------------------------------------------------------------
 // Claims
@@ -259,3 +261,16 @@ export type PageDetailResult = InferResponseType<PagesRpc[':id']['$get'], 200>;
 
 /** Page list response. */
 export type PageListResult = InferResponseType<PagesRpc['index']['$get'], 200>;
+
+// ---------------------------------------------------------------------------
+// Groundskeeper Runs
+// ---------------------------------------------------------------------------
+
+/** Groundskeeper runs list response. */
+type GroundskeeperRunsListResult = InferResponseType<GroundskeeperRunsRpc['index']['$get'], 200>;
+
+/** A single groundskeeper run row. */
+export type GroundskeeperRunRow = GroundskeeperRunsListResult['runs'][number];
+
+/** Groundskeeper stats response. */
+export type GroundskeeperStatsResult = InferResponseType<GroundskeeperRunsRpc['stats']['$get'], 200>;

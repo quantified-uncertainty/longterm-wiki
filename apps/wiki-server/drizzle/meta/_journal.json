@@ -302,6 +302,13 @@
       "when": 1772266800000,
       "tag": "0038_active_agents",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1772267000000,
+      "tag": "0039_groundskeeper_runs",
+      "breakpoints": true
     }
   ]
 }
