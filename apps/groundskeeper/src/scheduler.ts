@@ -70,11 +70,15 @@ export function registerTask(
       return;
     }
 
+    // Claim the running lock immediately, before any async work,
+    // to prevent concurrent executions during half-open Discord notifications.
+    state.running = true;
+
     // Guard: circuit breaker (with half-open recovery)
     let isHalfOpenProbe = false;
     if (state.disabled) {
       if (
-        state.trippedAt != null &&
+        state.trippedAt == null ||
         Date.now() - state.trippedAt >= config.circuitBreakerCooldownMs
       ) {
         // Half-open: cooldown elapsed, allow one probe attempt
@@ -86,11 +90,10 @@ export function registerTask(
         );
       } else {
         log(name, { event: "skipped", reason: "circuit breaker tripped" });
+        state.running = false;
         return;
       }
     }
-
-    state.running = true;
     const start = Date.now();
 
     try {
@@ -185,8 +188,8 @@ export function registerTask(
         }).catch(() => {});
       }
 
-      // Circuit breaker event
-      if (state.disabled) {
+      // Circuit breaker event — only on a fresh trip, not on failed half-open probes
+      if (state.disabled && !isHalfOpenProbe) {
         recordRunToServer(config, {
           taskName: name,
           event: "circuit_breaker_tripped",
