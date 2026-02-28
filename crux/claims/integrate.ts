@@ -27,7 +27,7 @@ import { findPageFile } from '../lib/file-utils.ts';
 import {
   getClaimsByEntity,
 } from '../lib/wiki-server/claims.ts';
-// linkCitationsToClaimsBatch removed — citation_quotes linking eliminated in #1310
+import { getQuotesByPage } from '../lib/wiki-server/citations.ts';
 import { createClaimReference } from '../lib/wiki-server/references.ts';
 import { generateReferenceId } from './migrate-footnotes.ts';
 import type { ClaimPageReferenceInsert } from '../../apps/wiki-server/src/api-types.ts';
@@ -35,19 +35,6 @@ import type { ClaimPageReferenceInsert } from '../../apps/wiki-server/src/api-ty
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-
-interface CitationQuoteRow {
-  id: number;
-  pageId: string;
-  footnote: number | null;
-  claimText: string;
-  claimContext: string | null;
-  sourceQuote: string | null;
-  url: string | null;
-  resourceId: string | null;
-  accuracyVerdict: string | null;
-  claimId: number | null;
-}
 
 interface IntegrationResult {
   pageId: string;
@@ -63,19 +50,6 @@ interface StepResult {
   name: string;
   status: 'ok' | 'skipped' | 'error';
   message: string;
-}
-
-// ---------------------------------------------------------------------------
-// Fetch citation_quotes for a page
-// ---------------------------------------------------------------------------
-
-async function fetchQuotesForPage(pageId: string): Promise<CitationQuoteRow[]> {
-  const result = await apiRequest<{ quotes: CitationQuoteRow[] }>(
-    'GET',
-    `/api/citations/quotes?page_id=${encodeURIComponent(pageId)}&limit=500`,
-  );
-  if (!result.ok) return [];
-  return result.data.quotes;
 }
 
 // ---------------------------------------------------------------------------
@@ -163,8 +137,9 @@ async function convertFootnotes(
   }
 
   // Fetch quotes with linked claims
-  const quotes = await fetchQuotesForPage(pageId);
-  const linkedQuotes = quotes.filter(q => q.claimId !== null);
+  const quotesResult = await getQuotesByPage(pageId, 500);
+  const quotes = quotesResult.ok ? quotesResult.data.quotes : [];
+  const linkedQuotes = quotes.filter((q: { claimId: number | null }) => q.claimId !== null);
 
   if (linkedQuotes.length === 0) {
     return {
@@ -309,8 +284,6 @@ export async function integrateClaims(
       steps,
       summary: {
         claimsTotal: 0,
-        quotesTotal: 0,
-        quotesLinked: 0,
         footnotesConverted: 0,
         claimRefsCreated: 0,
       },
