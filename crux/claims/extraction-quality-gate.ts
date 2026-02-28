@@ -29,7 +29,6 @@ export interface GateInput {
   claimText: string;
   claimType: string;
   section?: string;
-  [key: string]: unknown;
 }
 
 export interface GateResult<T extends GateInput> {
