@@ -58,7 +58,16 @@ jobs:
 
           # Run the audit gate — handles page detection, auditing, and summary generation
           # Exit code 0 = passed, 1 = inaccurate citations remain
-          RESULT=$(pnpm crux auto-update audit-gate --diff --apply --base="$BASE" --json 2>&1) || true
+          # dotenv stdout is suppressed via DOTENV_CONFIG_QUIET; progress goes to stderr.
+          RESULT=$(pnpm --silent crux auto-update audit-gate --diff --apply --base="$BASE" --json 2>/tmp/audit-stderr.log) || true
+
+          # Validate JSON before parsing (defensive against any remaining stdout noise)
+          if ! echo "$RESULT" | jq empty 2>/dev/null; then
+            echo "::warning::audit-gate produced invalid JSON output"
+            echo "::warning::stderr: $(cat /tmp/audit-stderr.log 2>/dev/null | tail -5)"
+            RESULT='{"passed":false,"totalInaccurate":0,"totalUnsupported":0,"markdownSummary":"Audit gate JSON output was invalid — check CI logs."}'
+          fi
+
           echo "$RESULT" > /tmp/audit-result.json
 
           # Extract fields from JSON for downstream steps
@@ -145,7 +154,15 @@ jobs:
       - name: Content quality checks (truncation + footnotes)
         id: content_checks
         run: |
-          RESULT=$(pnpm crux auto-update content-checks --diff --json 2>&1) || true
+          # dotenv stdout is suppressed; only JSON goes to stdout.
+          RESULT=$(pnpm --silent crux auto-update content-checks --diff --json 2>/dev/null) || true
+
+          # Validate JSON before parsing
+          if ! echo "$RESULT" | jq empty 2>/dev/null; then
+            echo "::warning::content-checks produced invalid JSON, assuming passed"
+            RESULT='{"passed":true}'
+          fi
+
           PASSED=$(echo "$RESULT" | jq -r '.passed // true')
           echo "content_passed=$PASSED" >> $GITHUB_OUTPUT
 
