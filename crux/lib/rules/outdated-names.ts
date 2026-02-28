@@ -39,12 +39,19 @@ const OUTDATED_NAMES: OutdatedNameConfig[] = [
     allowedContexts: [
       /formerly\s+Open Philanthropy/i,
       /\(formerly\s+Open Philanthropy\)/i,
+      /\(then\s+Open Philanthropy\)/i,
+      /then\s+Open Philanthropy/i,
       /Open Philanthropy Project/i, // Historical name from 2014-2019
       /rebranded.*Open Philanthropy/i,
       /Open Philanthropy.*rebrand/i,
       /was.*called.*Open Philanthropy/i,
       /previously.*Open Philanthropy/i,
       /known as.*Open Philanthropy/i,
+      /now.*Open Philanthropy/i,
+      /^\[.*\]:.*Open Philanthropy/i, // Footnote definitions
+      /^\[\^/i, // Footnote references
+      /linkText.*Open Philanthropy/i,
+      /pageTitle.*Open Philanthropy/i,
     ],
   },
 ];
@@ -60,6 +67,12 @@ export const outdatedNamesRule = createRule({
 
   check(content: ContentFile, engine: ValidationEngine): Issue[] {
     const issues: Issue[] = [];
+
+    // Skip pages where the old name is expected (redirect stubs, history pages, etc.)
+    const skipPaths = ['open-philanthropy.mdx', 'coefficient-giving.mdx'];
+    if (skipPaths.some(p => content.path.endsWith(p))) return issues;
+    if (content.path.includes('/history/')) return issues;
+
     const lines = content.body.split('\n');
     let position = 0;
 
@@ -97,7 +110,7 @@ export const outdatedNamesRule = createRule({
             Math.max(0, match.index - 30),
             Math.min(line.length, match.index + match[0].length + 30)
           );
-          if (/formerly|previously|was called|rebranded/i.test(surroundingText)) {
+          if (/formerly|previously|was called|rebranded|then Open/i.test(surroundingText)) {
             continue;
           }
 
