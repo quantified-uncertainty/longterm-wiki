@@ -54,8 +54,8 @@ interface CheckResult {
 
 // Historical duplicate prefixes that already exist in the codebase.
 // These are grandfathered — only NEW duplicates will fail the check.
-const KNOWN_DUPLICATE_PREFIXES = new Set([
-  '0020', '0022', '0024', '0026', '0032', '0034',
+// All historical duplicates were resolved in the migration cleanup PR.
+const KNOWN_DUPLICATE_PREFIXES = new Set<string>([
 ]);
 
 export function runCheck(): CheckResult {
@@ -154,7 +154,51 @@ export function runCheck(): CheckResult {
     );
   }
 
-  const totalErrors = missing.length + newDuplicates.length;
+  // Check for duplicate idx values and non-strictly-increasing `when` timestamps.
+  // Duplicate `when` values cause the Drizzle migrator to silently skip migrations
+  // (it compares `created_at < folderMillis`, so equal values are not applied).
+  const journalIssues: string[] = [];
+  const seenIdx = new Set<number>();
+  const seenWhen = new Set<number>();
+  let prevWhen = 0;
+  for (const entry of journal.entries) {
+    if (seenIdx.has(entry.idx)) {
+      journalIssues.push(`Duplicate idx=${entry.idx} for tag ${entry.tag}`);
+    }
+    seenIdx.add(entry.idx);
+
+    if (seenWhen.has(entry.when)) {
+      journalIssues.push(`Duplicate when=${entry.when} for tag ${entry.tag} — will cause migration to be skipped`);
+    }
+    seenWhen.add(entry.when);
+
+    if (entry.when <= prevWhen) {
+      journalIssues.push(`Non-increasing when=${entry.when} for tag ${entry.tag} (previous: ${prevWhen})`);
+    }
+    prevWhen = entry.when;
+  }
+
+  if (journalIssues.length > 0) {
+    console.log(
+      `\n${c.red}Found ${journalIssues.length} journal ordering issue(s):${c.reset}\n`
+    );
+    for (const issue of journalIssues) {
+      console.log(`  ${c.red}${issue}${c.reset}`);
+    }
+    console.log();
+    console.log(
+      `${c.dim}Fix: ensure all idx values are sequential and all when values are strictly increasing.${c.reset}`
+    );
+    console.log(
+      `${c.dim}Duplicate when values cause the Drizzle migrator to silently skip migrations.${c.reset}`
+    );
+  } else {
+    console.log(
+      `${c.green}Journal ordering is correct (sequential idx, strictly increasing when)${c.reset}`
+    );
+  }
+
+  const totalErrors = missing.length + newDuplicates.length + journalIssues.length;
 
   return {
     passed: totalErrors === 0,

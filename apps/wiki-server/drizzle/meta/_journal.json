@@ -47,14 +47,14 @@
     {
       "idx": 6,
       "version": "7",
-      "when": 1771649456311,
+      "when": 1771649895183,
       "tag": "0006_lethal_hairball",
       "breakpoints": true
     },
     {
       "idx": 7,
       "version": "7",
-      "when": 1771648111614,
+      "when": 1771649895184,
       "tag": "0007_good_marvex",
       "breakpoints": true
     },
@@ -167,7 +167,7 @@
       "idx": 23,
       "version": "7",
       "when": 1771901300000,
-      "tag": "0022_add_improve_run_artifacts",
+      "tag": "0042_add_improve_run_artifacts",
       "breakpoints": true
     },
     {
@@ -181,7 +181,7 @@
       "idx": 25,
       "version": "7",
       "when": 1771901500000,
-      "tag": "0020_auto_update_runs_dedup",
+      "tag": "0041_auto_update_runs_dedup",
       "breakpoints": true
     },
     {
@@ -195,7 +195,7 @@
       "idx": 27,
       "version": "7",
       "when": 1771901700000,
-      "tag": "0024_add_sync_audit_columns",
+      "tag": "0043_add_sync_audit_columns",
       "breakpoints": true
     },
     {
@@ -216,7 +216,7 @@
       "idx": 30,
       "version": "7",
       "when": 1771902000000,
-      "tag": "0026_citation_content_resource_id",
+      "tag": "0044_citation_content_resource_id",
       "breakpoints": true
     },
     {
@@ -227,91 +227,91 @@
       "breakpoints": true
     },
     {
-      "idx": 31,
+      "idx": 32,
       "version": "7",
-      "when": 1771902100000,
+      "when": 1771902150000,
       "tag": "0028_enhance_claims",
       "breakpoints": true
     },
     {
-      "idx": 32,
+      "idx": 33,
       "version": "7",
       "when": 1771902200000,
       "tag": "0029_claim_sources_and_modes",
       "breakpoints": true
     },
     {
-      "idx": 33,
+      "idx": 34,
       "version": "7",
       "when": 1771902300000,
       "tag": "0030_claims_precision_and_constraints",
       "breakpoints": true
     },
     {
-      "idx": 34,
+      "idx": 35,
       "version": "7",
       "when": 1771902400000,
       "tag": "0031_unify_claims_citations",
       "breakpoints": true
     },
     {
-      "idx": 35,
+      "idx": 36,
       "version": "7",
       "when": 1771902500000,
       "tag": "0032_claims_trigram_index",
       "breakpoints": true
     },
     {
-      "idx": 36,
+      "idx": 37,
       "version": "7",
       "when": 1771902600000,
       "tag": "0035_structured_claims",
       "breakpoints": true
     },
     {
-      "idx": 37,
+      "idx": 38,
       "version": "7",
       "when": 1771902700000,
       "tag": "0033_page_citations",
       "breakpoints": true
     },
     {
-      "idx": 38,
+      "idx": 39,
       "version": "7",
       "when": 1771902800000,
       "tag": "0034_pinned_claims",
       "breakpoints": true
     },
     {
-      "idx": 39,
+      "idx": 40,
       "version": "7",
       "when": 1771902900000,
       "tag": "0036_inference_type",
       "breakpoints": true
     },
     {
-      "idx": 40,
+      "idx": 41,
       "version": "7",
       "when": 1771903000000,
       "tag": "0037_claim_sources_metadata",
       "breakpoints": true
     },
     {
-      "idx": 41,
+      "idx": 42,
       "version": "7",
       "when": 1772266800000,
       "tag": "0038_active_agents",
       "breakpoints": true
     },
     {
-      "idx": 42,
+      "idx": 43,
       "version": "7",
       "when": 1772267000000,
       "tag": "0039_groundskeeper_runs",
       "breakpoints": true
     },
     {
-      "idx": 43,
+      "idx": 44,
       "version": "7",
       "when": 1772352000000,
       "tag": "0040_service_health_incidents",
