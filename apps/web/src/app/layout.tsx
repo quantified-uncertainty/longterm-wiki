@@ -28,6 +28,11 @@ export const metadata: Metadata = {
     title: "Longterm Wiki",
     description: "AI Safety Knowledge Base",
   },
+  alternates: {
+    types: {
+      "application/rss+xml": `${SITE_URL}/feed.xml`,
+    },
+  },
 };
 
 export default async function RootLayout({
