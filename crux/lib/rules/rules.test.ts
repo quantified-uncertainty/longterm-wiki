@@ -86,6 +86,107 @@ describe('dollar-signs rule', () => {
     const issues = check(dollarSignsRule, content);
     expect(issues.length).toBe(2);
   });
+
+  // --- Frontmatter dollar sign tests ---
+
+  it('detects unescaped $ in unquoted frontmatter description', () => {
+    const raw = '---\ntitle: Test\ndescription: Costs $100 per unit\n---\nBody text here.';
+    const content = mockContent('Body text here.', {
+      raw,
+      frontmatter: { title: 'Test', description: 'Costs $100 per unit' },
+    });
+    const issues = check(dollarSignsRule, content);
+    const fmIssues = issues.filter((i: any) => i.message.includes('frontmatter'));
+    expect(fmIssues.length).toBe(1);
+    expect(fmIssues[0].message).toContain('Unescaped dollar sign in frontmatter description');
+    expect(fmIssues[0].fix).not.toBeNull();
+    expect(fmIssues[0].fix!.type).toBe(FixType.REPLACE_LINE);
+    expect(fmIssues[0].fix!.content).toBe('description: Costs \\$100 per unit');
+  });
+
+  it('detects unescaped $ in double-quoted frontmatter description', () => {
+    const raw = '---\ntitle: Test\ndescription: "Costs $100 per unit"\n---\nBody text here.';
+    const content = mockContent('Body text here.', {
+      raw,
+      frontmatter: { title: 'Test', description: 'Costs $100 per unit' },
+    });
+    const issues = check(dollarSignsRule, content);
+    const fmIssues = issues.filter((i: any) => i.message.includes('frontmatter'));
+    expect(fmIssues.length).toBe(1);
+    expect(fmIssues[0].fix).not.toBeNull();
+    expect(fmIssues[0].fix!.content).toBe('description: "Costs \\\\$100 per unit"');
+  });
+
+  it('skips already-escaped $ in unquoted frontmatter', () => {
+    const raw = '---\ntitle: Test\ndescription: Costs \\$100 per unit\n---\nBody text here.';
+    const content = mockContent('Body text here.', {
+      raw,
+      frontmatter: { title: 'Test', description: 'Costs \\$100 per unit' },
+    });
+    const issues = check(dollarSignsRule, content);
+    const fmIssues = issues.filter((i: any) => i.message.includes('frontmatter'));
+    expect(fmIssues.length).toBe(0);
+  });
+
+  it('skips already-escaped $ in double-quoted frontmatter', () => {
+    const raw = '---\ntitle: Test\ndescription: "Costs \\\\$100 per unit"\n---\nBody text here.';
+    const content = mockContent('Body text here.', {
+      raw,
+      frontmatter: { title: 'Test', description: 'Costs \\$100 per unit' },
+    });
+    const issues = check(dollarSignsRule, content);
+    const fmIssues = issues.filter((i: any) => i.message.includes('frontmatter'));
+    expect(fmIssues.length).toBe(0);
+  });
+
+  it('detects unescaped $ in llmSummary field', () => {
+    const raw = '---\ntitle: Test\nllmSummary: Fund manages $3B in assets\n---\nBody text here.';
+    const content = mockContent('Body text here.', {
+      raw,
+      frontmatter: { title: 'Test', llmSummary: 'Fund manages $3B in assets' },
+    });
+    const issues = check(dollarSignsRule, content);
+    const fmIssues = issues.filter((i: any) => i.message.includes('frontmatter'));
+    expect(fmIssues.length).toBe(1);
+    expect(fmIssues[0].message).toContain('llmSummary');
+  });
+
+  it('handles multiple $ on same frontmatter field', () => {
+    const raw = '---\ntitle: Test\ndescription: Between $5 and $10 range\n---\nBody text here.';
+    const content = mockContent('Body text here.', {
+      raw,
+      frontmatter: { title: 'Test', description: 'Between $5 and $10 range' },
+    });
+    const issues = check(dollarSignsRule, content);
+    const fmIssues = issues.filter((i: any) => i.message.includes('frontmatter'));
+    expect(fmIssues.length).toBe(2);
+    // Only first issue carries the fix (REPLACE_LINE fixes all at once)
+    expect(fmIssues[0].fix).not.toBeNull();
+    expect(fmIssues[1].fix).toBeNull();
+    expect(fmIssues[0].fix!.content).toBe('description: Between \\$5 and \\$10 range');
+  });
+
+  it('ignores $ not followed by digit in frontmatter', () => {
+    const raw = '---\ntitle: Test\ndescription: Uses $PATH variable\n---\nBody text here.';
+    const content = mockContent('Body text here.', {
+      raw,
+      frontmatter: { title: 'Test', description: 'Uses $PATH variable' },
+    });
+    const issues = check(dollarSignsRule, content);
+    const fmIssues = issues.filter((i: any) => i.message.includes('frontmatter'));
+    expect(fmIssues.length).toBe(0);
+  });
+
+  it('skips single-quoted frontmatter fields', () => {
+    const raw = "---\ntitle: Test\ndescription: 'Costs $100 per unit'\n---\nBody text here.";
+    const content = mockContent('Body text here.', {
+      raw,
+      frontmatter: { title: 'Test', description: 'Costs $100 per unit' },
+    });
+    const issues = check(dollarSignsRule, content);
+    const fmIssues = issues.filter((i: any) => i.message.includes('frontmatter'));
+    expect(fmIssues.length).toBe(0);
+  });
 });
 
 describe('comparison-operators rule', () => {
