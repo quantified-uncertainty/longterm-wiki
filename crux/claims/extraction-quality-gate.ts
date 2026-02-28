@@ -20,6 +20,17 @@
  */
 
 import { isClaimDuplicate } from '../lib/claim-utils.ts';
+import {
+  MARKUP_STRIP_RULES,
+  stripMarkup,
+  hasMarkup,
+  escapeRegex,
+  containsEntityReference,
+  isTautologicalDefinition,
+} from '../lib/claim-text-utils.ts';
+
+// Re-export for consumers that imported from this file
+export { stripMarkup, containsEntityReference, isTautologicalDefinition };
 
 // ---------------------------------------------------------------------------
 // Types
@@ -49,95 +60,8 @@ export interface GateStats {
 }
 
 // ---------------------------------------------------------------------------
-// Markup stripping (reuses patterns from fix-quality.ts but operates inline)
-// ---------------------------------------------------------------------------
-
-const MARKUP_STRIP_RULES: Array<{ pattern: RegExp; replacement: string; label: string }> = [
-  // <EntityLink id="...">Text</EntityLink> → Text
-  { pattern: /<EntityLink\s+id="[^"]*"(?:\s+[^>]*)?>([^<]*)<\/EntityLink>/g, replacement: '$1', label: 'EntityLink' },
-  // <F id="..." /> or <F e="..." f="..." /> → empty
-  { pattern: /<F\s+[^>]*\/>/g, replacement: '', label: 'F-tag' },
-  // <R id="...">Text</R> → Text
-  { pattern: /<R\s+id="[^"]*">[^<]*<\/R>/g, replacement: '', label: 'R-tag' },
-  // <Calc>...</Calc> → empty
-  { pattern: /<Calc>[^<]*<\/Calc>/g, replacement: '', label: 'Calc' },
-  // Remaining self-closing JSX tags
-  { pattern: /<\w[\w.]*[^>]*\/>/g, replacement: '', label: 'JSX-self-closing' },
-  // Remaining JSX block tags (non-greedy, single-line)
-  { pattern: /<(\w[\w.]*)(?:\s[^>]*)?>([^<]*)<\/\1>/g, replacement: '$2', label: 'JSX-block' },
-  // MDX comments: {/* ... */}
-  { pattern: /\{\/\*[\s\S]*?\*\/\}/g, replacement: '', label: 'MDX-comment' },
-  // Curly brace expressions
-  { pattern: /\{[^}]+\}/g, replacement: '', label: 'curly-expr' },
-  // Escaped dollar signs: \$ → $
-  { pattern: /\\\$/g, replacement: '$', label: 'escaped-dollar' },
-  // Escaped angle brackets: \< → <
-  { pattern: /\\</g, replacement: '<', label: 'escaped-lt' },
-  // Bold markdown: **text** → text
-  { pattern: /\*\*([^*]+)\*\*/g, replacement: '$1', label: 'bold-markdown' },
-  // Markdown links: [text](url) → text
-  { pattern: /\[([^\]]+)\]\([^)]+\)/g, replacement: '$1', label: 'markdown-link' },
-];
-
-/** Has any MDX/markup content? */
-function hasMarkup(text: string): boolean {
-  for (const { pattern } of MARKUP_STRIP_RULES) {
-    pattern.lastIndex = 0;
-    if (pattern.test(text)) return true;
-  }
-  return false;
-}
-
-/** Strip markup and return cleaned text + list of what was stripped. */
-export function stripMarkup(text: string): { cleaned: string; labels: string[] } {
-  let cleaned = text;
-  const labels: string[] = [];
-
-  for (const { pattern, replacement, label } of MARKUP_STRIP_RULES) {
-    pattern.lastIndex = 0;
-    if (pattern.test(cleaned)) {
-      labels.push(label);
-      pattern.lastIndex = 0;
-      cleaned = cleaned.replace(pattern, replacement);
-    }
-  }
-
-  // Collapse multiple spaces and trim
-  cleaned = cleaned.replace(/\s{2,}/g, ' ').trim();
-  return { cleaned, labels };
-}
-
-// ---------------------------------------------------------------------------
 // Self-containment fix — prepend entity name if missing
 // ---------------------------------------------------------------------------
-
-/** Escape special regex characters. */
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-/** Check if claim text mentions the entity. */
-export function containsEntityReference(
-  text: string,
-  entityId: string,
-  entityName: string,
-): boolean {
-  const lower = text.toLowerCase();
-
-  if (entityName.length > 0 && lower.includes(entityName.toLowerCase())) {
-    return true;
-  }
-  if (entityId.length > 0 && lower.includes(entityId.toLowerCase())) {
-    return true;
-  }
-  if (entityId.includes('-')) {
-    const slugWords = entityId.split('-').join(' ');
-    if (lower.includes(slugWords.toLowerCase())) {
-      return true;
-    }
-  }
-  return false;
-}
 
 /**
  * Try to fix a non-self-contained claim by replacing generic references
@@ -231,38 +155,6 @@ export function isNonAtomic(text: string): string | null {
   }
 
   return null;
-}
-
-// ---------------------------------------------------------------------------
-// Tautological definition check
-// ---------------------------------------------------------------------------
-
-/** Check if the claim merely defines the entity (e.g., "Kalshi is a prediction market"). */
-export function isTautologicalDefinition(
-  text: string,
-  entityId: string,
-  entityName: string,
-): boolean {
-  const lower = text.toLowerCase();
-  const entityLower = entityName.toLowerCase();
-  const idLower = entityId.toLowerCase();
-
-  const startsWithEntity =
-    lower.startsWith(entityLower + ' ') || lower.startsWith(idLower + ' ');
-  if (!startsWithEntity) return false;
-
-  const tautologyPattern = new RegExp(
-    `^(?:${escapeRegex(entityLower)}|${escapeRegex(idLower)})\\s+(?:is|was)\\s+(?:a|an|the)\\s+`,
-    'i',
-  );
-  if (!tautologyPattern.test(text)) return false;
-
-  const afterEntity = text.replace(tautologyPattern, '');
-  const hasSpecifics =
-    /\d/.test(afterEntity) ||
-    /\b(?:in|from|based|founded|headquartered|located)\b/i.test(afterEntity);
-
-  return !hasSpecifics;
 }
 
 // ---------------------------------------------------------------------------

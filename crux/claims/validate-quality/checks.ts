@@ -13,86 +13,12 @@ import {
   VOLATILE_MEASURES,
   VOLATILE_TEXT_PATTERNS,
 } from './types.ts';
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Convert a slug like "sam-altman" to a display name like "Sam Altman". */
-export function slugToDisplayName(slug: string): string {
-  return slug
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
-
-/** Escape special regex characters. */
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-/**
- * Check if claim text mentions the entity by name, slug, or common variations.
- * Mirrors the pattern from validate-claim.ts.
- */
-function containsEntityReference(
-  text: string,
-  entityId: string,
-  entityName: string,
-): boolean {
-  const lower = text.toLowerCase();
-
-  if (entityName.length > 0 && lower.includes(entityName.toLowerCase())) {
-    return true;
-  }
-
-  if (entityId.length > 0 && lower.includes(entityId.toLowerCase())) {
-    return true;
-  }
-
-  // For hyphenated slugs like "sam-altman", check for "Sam Altman"
-  if (entityId.includes('-')) {
-    const slugWords = entityId.split('-').join(' ');
-    if (lower.includes(slugWords.toLowerCase())) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
- * Detect tautological definitions like "X is a/an Y".
- * Mirrors the pattern from validate-claim.ts.
- */
-function isTautologicalDefinition(
-  text: string,
-  entityId: string,
-  entityName: string,
-): boolean {
-  const lower = text.toLowerCase();
-  const entityLower = entityName.toLowerCase();
-  const idLower = entityId.toLowerCase();
-
-  const startsWithEntity =
-    lower.startsWith(entityLower + ' ') || lower.startsWith(idLower + ' ');
-
-  if (!startsWithEntity) return false;
-
-  const tautologyPattern = new RegExp(
-    `^(?:${escapeRegex(entityLower)}|${escapeRegex(idLower)})\\s+(?:is|was)\\s+(?:a|an|the)\\s+`,
-    'i',
-  );
-
-  if (!tautologyPattern.test(text)) return false;
-
-  const afterEntity = text.replace(tautologyPattern, '');
-  const hasSpecifics =
-    /\d/.test(afterEntity) ||
-    /\b(?:in|from|based|founded|headquartered|located)\b/i.test(afterEntity);
-
-  return !hasSpecifics;
-}
+import {
+  slugToDisplayName,
+  escapeRegex,
+  containsEntityReference,
+  isTautologicalDefinition,
+} from '../../lib/claim-text-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Quality check implementations
