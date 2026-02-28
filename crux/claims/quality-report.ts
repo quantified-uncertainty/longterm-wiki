@@ -23,6 +23,7 @@ import { apiRequest, isServerAvailable } from '../lib/wiki-server/client.ts';
 import type { ClaimRow } from '../lib/wiki-server/claims.ts';
 import { validateClaim, type ClaimValidationResult } from './validate-claim.ts';
 import { isClaimDuplicate } from '../lib/claim-utils.ts';
+import { hasMarkup } from '../lib/claim-text-utils.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -54,24 +55,6 @@ interface QualityReport {
   entities: EntityQuality[];
   globalIssues: Record<string, number>;
   globalQualityScore: number;
-}
-
-// ---------------------------------------------------------------------------
-// MDX markup detection (lightweight — same as fix-quality.ts)
-// ---------------------------------------------------------------------------
-
-const MARKUP_DETECTORS: Array<{ pattern: RegExp; label: string }> = [
-  { pattern: /<EntityLink\s/, label: 'EntityLink' },
-  { pattern: /<F\s+/, label: 'F-tag' },
-  { pattern: /<R\s+id="/, label: 'R-tag' },
-  { pattern: /<Calc>/, label: 'Calc' },
-  { pattern: /\\\$/, label: 'escaped-dollar' },
-  { pattern: /\\</, label: 'escaped-lt' },
-  { pattern: /\{[^}]+\}/, label: 'curly-expr' },
-];
-
-function hasMarkup(text: string): boolean {
-  return MARKUP_DETECTORS.some(({ pattern }) => pattern.test(text));
 }
 
 // ---------------------------------------------------------------------------

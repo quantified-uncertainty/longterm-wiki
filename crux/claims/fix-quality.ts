@@ -27,6 +27,7 @@ import {
   type ClaimRow,
 } from '../lib/wiki-server/claims.ts';
 import { isClaimDuplicate, normalizeClaimText } from '../lib/claim-utils.ts';
+import { stripMarkup } from '../lib/claim-text-utils.ts';
 import { loadEntitySlugs, buildNormalizationMap, normalizeEntitySlug } from '../lib/normalize-entity-slugs.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 
@@ -96,48 +97,9 @@ async function fetchAllClaims(
 // Fixer: strip-markup — remove MDX/JSX artifacts from claim text
 // ---------------------------------------------------------------------------
 
-/** Patterns that indicate MDX/JSX markup leaked into claim text. */
-const MARKUP_PATTERNS: Array<{ pattern: RegExp; replacement: string; label: string }> = [
-  // <EntityLink id="...">Text</EntityLink> → Text
-  { pattern: /<EntityLink\s+id="[^"]*"(?:\s+[^>]*)?>([^<]*)<\/EntityLink>/g, replacement: '$1', label: 'EntityLink' },
-  // <F id="..." /> or <F e="..." f="..." /> → empty (canonical fact refs)
-  { pattern: /<F\s+[^>]*\/>/g, replacement: '', label: 'F-tag' },
-  // <R id="...">Text</R> → Text (resource citation component)
-  { pattern: /<R\s+id="[^"]*">[^<]*<\/R>/g, replacement: '', label: 'R-tag' },
-  // <Calc>...</Calc> → empty
-  { pattern: /<Calc>[^<]*<\/Calc>/g, replacement: '', label: 'Calc' },
-  // Remaining self-closing JSX tags: <Foo bar="baz" />
-  { pattern: /<\w[\w.]*[^>]*\/>/g, replacement: '', label: 'JSX-self-closing' },
-  // Remaining JSX block tags: <Foo>...</Foo> (non-greedy, single-line)
-  { pattern: /<(\w[\w.]*)(?:\s[^>]*)?>([^<]*)<\/\1>/g, replacement: '$2', label: 'JSX-block' },
-  // Curly brace expressions: {expression}
-  { pattern: /\{[^}]+\}/g, replacement: '', label: 'curly-expr' },
-  // MDX import/export statements
-  { pattern: /^(?:import|export)\s+.*$/gm, replacement: '', label: 'import/export' },
-  // Escaped dollar signs from MDX: \$100 → $100
-  { pattern: /\\\$/g, replacement: '$', label: 'escaped-dollar' },
-  // Escaped angle brackets: \< → <
-  { pattern: /\\</g, replacement: '<', label: 'escaped-lt' },
-];
-
 function stripMarkupFromText(text: string): { cleaned: string; strippedLabels: string[] } {
-  let cleaned = text;
-  const strippedLabels: string[] = [];
-
-  for (const { pattern, replacement, label } of MARKUP_PATTERNS) {
-    // Reset regex lastIndex for global patterns
-    pattern.lastIndex = 0;
-    if (pattern.test(cleaned)) {
-      strippedLabels.push(label);
-      pattern.lastIndex = 0;
-      cleaned = cleaned.replace(pattern, replacement);
-    }
-  }
-
-  // Collapse multiple spaces and trim
-  cleaned = cleaned.replace(/\s{2,}/g, ' ').trim();
-
-  return { cleaned, strippedLabels };
+  const { cleaned, labels } = stripMarkup(text);
+  return { cleaned, strippedLabels: labels };
 }
 
 async function fixStripMarkup(
