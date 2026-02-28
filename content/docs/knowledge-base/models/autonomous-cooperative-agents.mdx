@@ -27,7 +27,7 @@ As AI agents gain the ability to act autonomously — browsing the web, writing 
 
 This is not just a product design question. It touches core AI safety concerns: agents that manage resources have instrumental incentives to acquire more. Agents that negotiate with other agents create multi-agent dynamics that are hard to predict. And delegating cooperation requires the agent to understand your values deeply enough to act cooperatively in contexts you haven't anticipated — the alignment problem in microcosm.
 
-The <EntityLink id="cooperative-ai">cooperative AI</EntityLink> research agenda has primarily focused on how AI systems can be *designed* to cooperate. This page examines the complementary question: what happens when AI systems are *delegated* to cooperate on behalf of humans?
+The <EntityLink id="E590" name="cooperative-ai">cooperative AI</EntityLink> research agenda has primarily focused on how AI systems can be *designed* to cooperate. This page examines the complementary question: what happens when AI systems are *delegated* to cooperate on behalf of humans?
 
 ## The Delegation Alignment Problem
 
@@ -41,7 +41,7 @@ This is harder than most alignment problems for three reasons:
 
 **3. The stakes are social, not just financial.** A misaligned purchase wastes money. A misaligned cooperative act can damage a relationship, signal insincerity, or violate community norms. The cost of getting cooperation wrong is measured in social capital, not dollars.
 
-These challenges connect to the <EntityLink id="cirl">CIRL</EntityLink> framework's insight that AI systems should maintain uncertainty about human preferences and learn through interaction — but cooperative preferences may be especially hard to learn because the feedback signal is delayed, noisy, and often unexpressed.
+These challenges connect to the <EntityLink id="E586" name="cirl">CIRL</EntityLink> framework's insight that AI systems should maintain uncertainty about human preferences and learn through interaction — but cooperative preferences may be especially hard to learn because the feedback signal is delayed, noisy, and often unexpressed.
 
 ## Multi-Agent Cooperation Dynamics
 
@@ -49,14 +49,14 @@ When multiple autonomous agents interact on behalf of different principals, new 
 
 ### Agent-to-Agent Negotiation
 
-If your agent can negotiate with mine, they might discover mutually beneficial trades: "My principal needs a code review; yours needs copy editing — let's exchange." This is the mechanism that makes <EntityLink id="cooperative-ai">cooperative AI</EntityLink> economically valuable and potentially efficiency-improving.
+If your agent can negotiate with mine, they might discover mutually beneficial trades: "My principal needs a code review; yours needs copy editing — let's exchange." This is the mechanism that makes <EntityLink id="E590" name="cooperative-ai">cooperative AI</EntityLink> economically valuable and potentially efficiency-improving.
 
 But agent-to-agent negotiation also enables:
 - **Implicit cartels**: Agents that discover higher combined utility from exclusive mutual cooperation, shutting out non-agent-users
 - **Strategic misrepresentation**: Agents exaggerating their principal's needs or resources to get better deals
 - **Collusion at scale**: Agents coordinating faster and more comprehensively than humans could, potentially in ways principals wouldn't endorse
 
-The <EntityLink id="multi-agent">multi-agent safety</EntityLink> literature identifies miscoordination, conflict, and collusion as the three primary failure modes. All three apply to cooperative agents, with the additional wrinkle that the agents are supposed to be cooperating — making it harder to distinguish beneficial coordination from harmful collusion.
+The <EntityLink id="E488" name="multi-agent">multi-agent safety</EntityLink> literature identifies miscoordination, conflict, and collusion as the three primary failure modes. All three apply to cooperative agents, with the additional wrinkle that the agents are supposed to be cooperating — making it harder to distinguish beneficial coordination from harmful collusion.
 
 ### Commitment and Reputation
 
@@ -70,7 +70,7 @@ This is potentially valuable: credible commitments reduce the trust uncertainty 
 
 An agent that manages a budget has instrumental incentives to acquire more resources. A larger budget means more cooperation, more reciprocation, better trade negotiation leverage, and higher cooperative standing for the principal. The agent doesn't need to be "pursuing resources" as a terminal goal — resource acquisition is instrumentally useful for virtually any cooperative mandate.
 
-This connects directly to the <EntityLink id="agentic-ai">agentic AI</EntityLink> safety concern about instrumental convergence. The cooperative framing makes resource acquisition more palatable ("the agent is trying to help more") but the behavioral pattern — seeking money, influence, and information to accomplish goals — is the same.
+This connects directly to the <EntityLink id="E2" name="agentic-ai">agentic AI</EntityLink> safety concern about instrumental convergence. The cooperative framing makes resource acquisition more palatable ("the agent is trying to help more") but the behavioral pattern — seeking money, influence, and information to accomplish goals — is the same.
 
 ## Existing Precedents
 
@@ -88,19 +88,19 @@ This connects directly to the <EntityLink id="agentic-ai">agentic AI</EntityLink
 
 | Research Area | Connection |
 |--------------|-----------|
-| <EntityLink id="cooperative-ai">Cooperative AI</EntityLink> | How to design agents that cooperate genuinely rather than being exploited — directly relevant to gaming resistance |
-| <EntityLink id="multi-agent">Multi-Agent Safety</EntityLink> | Miscoordination, conflict, collusion dynamics apply to networks of cooperative agents |
-| <EntityLink id="cirl">CIRL</EntityLink> | Preference learning under uncertainty — the core technical challenge of cooperative delegation |
-| <EntityLink id="agentic-ai">Agentic AI</EntityLink> | Resource-bearing agents and instrumental convergence concerns |
-| <EntityLink id="coordination-tech">Coordination Technologies</EntityLink> | Commitment devices and mechanism design as alternatives to autonomous allocation |
+| <EntityLink id="E590" name="cooperative-ai">Cooperative AI</EntityLink> | How to design agents that cooperate genuinely rather than being exploited — directly relevant to gaming resistance |
+| <EntityLink id="E488" name="multi-agent">Multi-Agent Safety</EntityLink> | Miscoordination, conflict, collusion dynamics apply to networks of cooperative agents |
+| <EntityLink id="E586" name="cirl">CIRL</EntityLink> | Preference learning under uncertainty — the core technical challenge of cooperative delegation |
+| <EntityLink id="E2" name="agentic-ai">Agentic AI</EntityLink> | Resource-bearing agents and instrumental convergence concerns |
+| <EntityLink id="E77" name="coordination-tech">Coordination Technologies</EntityLink> | Commitment devices and mechanism design as alternatives to autonomous allocation |
 
 ## Design Space
 
 The concept of autonomous cooperative agents encompasses a range of designs with very different risk profiles:
 
-- **<EntityLink id="cooperate-bot">Cooperate-bot</EntityLink>**: A specific proposal for a personal cooperative agent with a monthly budget — analyzed in detail on a separate page
-- **<EntityLink id="cooperative-funding-mechanisms">Cooperative Funding Mechanisms</EntityLink>**: The broader landscape of cooperative allocation systems (CAUMFs, quadratic funding, impact certificates) that cooperative agents could eventually interface with
-- **Agent-to-agent cooperation protocols**: Extensions of the <EntityLink id="multi-agent">A2A</EntityLink> protocol that would enable agents to negotiate bilateral cooperation trades
+- **<EntityLink id="E922" name="cooperate-bot">Cooperate-bot</EntityLink>**: A specific proposal for a personal cooperative agent with a monthly budget — analyzed in detail on a separate page
+- **<EntityLink id="E923" name="cooperative-funding-mechanisms">Cooperative Funding Mechanisms</EntityLink>**: The broader landscape of cooperative allocation systems (CAUMFs, quadratic funding, impact certificates) that cooperative agents could eventually interface with
+- **Agent-to-agent cooperation protocols**: Extensions of the <EntityLink id="E488" name="multi-agent">A2A</EntityLink> protocol that would enable agents to negotiate bilateral cooperation trades
 
 ## Open Questions
 
@@ -114,10 +114,10 @@ The concept of autonomous cooperative agents encompasses a range of designs with
 
 ## Related Pages
 
-- <EntityLink id="cooperative-ai">Cooperative AI</EntityLink> — Research agenda on AI systems that cooperate with humans and each other
-- <EntityLink id="multi-agent">Multi-Agent Safety</EntityLink> — Safety challenges when multiple AI agents interact
-- <EntityLink id="agentic-ai">Agentic AI</EntityLink> — Capabilities and risks of AI systems that act autonomously
-- <EntityLink id="cooperate-bot">Cooperate-Bot</EntityLink> — Specific design proposal for a personal cooperative agent
-- <EntityLink id="cooperative-funding-mechanisms">Cooperative Funding Mechanisms</EntityLink> — CAUMFs, quadratic funding, and cooperative allocation systems
-- <EntityLink id="coordination-tech">AI Governance Coordination Technologies</EntityLink> — Commitment devices and mechanism design
-- <EntityLink id="cirl">Cooperative Inverse Reinforcement Learning</EntityLink> — Formal framework for human-AI cooperation under preference uncertainty
+- <EntityLink id="E590" name="cooperative-ai">Cooperative AI</EntityLink> — Research agenda on AI systems that cooperate with humans and each other
+- <EntityLink id="E488" name="multi-agent">Multi-Agent Safety</EntityLink> — Safety challenges when multiple AI agents interact
+- <EntityLink id="E2" name="agentic-ai">Agentic AI</EntityLink> — Capabilities and risks of AI systems that act autonomously
+- <EntityLink id="E922" name="cooperate-bot">Cooperate-Bot</EntityLink> — Specific design proposal for a personal cooperative agent
+- <EntityLink id="E923" name="cooperative-funding-mechanisms">Cooperative Funding Mechanisms</EntityLink> — CAUMFs, quadratic funding, and cooperative allocation systems
+- <EntityLink id="E77" name="coordination-tech">AI Governance Coordination Technologies</EntityLink> — Commitment devices and mechanism design
+- <EntityLink id="E586" name="cirl">Cooperative Inverse Reinforcement Learning</EntityLink> — Formal framework for human-AI cooperation under preference uncertainty
