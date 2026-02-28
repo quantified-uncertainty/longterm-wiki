@@ -28,7 +28,7 @@ import {
   type ClaimRow,
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
-import { propagateClaimVerdictsToPage } from '../lib/wiki-server/citations.ts';
+// propagateClaimVerdictsToPage removed — backward propagation eliminated in #1310
 import { extractCitationsFromContent } from '../lib/citation-archive.ts';
 import { resolveSource, MIN_SOURCE_CONTENT_LENGTH } from '../lib/citation-auditor.ts';
 import { findPageFile } from '../lib/file-utils.ts';
@@ -351,18 +351,6 @@ async function main() {
   }
 
   console.log(`  ${c.green}Updated ${inserted} claims${c.reset}`);
-
-  // Backward-propagate verdicts to linked citation_quotes
-  console.log(`\n  Propagating verdicts to citation_quotes...`);
-  const propResult = await propagateClaimVerdictsToPage(pageId);
-  if (propResult.ok) {
-    console.log(`  ${c.green}Propagated ${propResult.data.propagated} verdicts${c.reset}`);
-    if (propResult.data.skipped > 0) {
-      console.log(`  ${c.dim}Skipped ${propResult.data.skipped} (unverified claims)${c.reset}`);
-    }
-  } else {
-    console.log(`  ${c.yellow}Propagation failed: ${propResult.message}${c.reset}`);
-  }
 
   console.log(`\n  Run 'pnpm crux claims status ${pageId}' to see the full breakdown.\n`);
 }

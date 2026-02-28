@@ -6,9 +6,10 @@
  *
  * Steps:
  *   1. Extract claims from the page (if not already done)
- *   2. Link citation_quotes to claims
- *   3. Migrate [^rc-XXXX] → [^cr-XXXX] for claim-backed footnotes
- *   4. Create claim_page_references in DB
+ *   2. Migrate [^rc-XXXX] → [^cr-XXXX] for claim-backed footnotes + create claim_page_references
+ *
+ * Note: Steps 2 (link citation_quotes) and 4 (propagate verdicts) were removed in #1310.
+ * Claims are now the single source of truth.
  *
  * Usage:
  *   pnpm crux claims integrate <page-id>           # dry-run
@@ -21,16 +22,12 @@ import { readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { isServerAvailable, apiRequest } from '../lib/wiki-server/client.ts';
+import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import {
   getClaimsByEntity,
-  addClaimPageReferencesBatch,
 } from '../lib/wiki-server/claims.ts';
-import {
-  linkCitationsToClaimsBatch,
-  propagateClaimVerdictsToPage,
-} from '../lib/wiki-server/citations.ts';
+// linkCitationsToClaimsBatch removed — citation_quotes linking eliminated in #1310
 import { createClaimReference } from '../lib/wiki-server/references.ts';
 import { generateReferenceId } from './migrate-footnotes.ts';
 import type { ClaimPageReferenceInsert } from '../../apps/wiki-server/src/api-types.ts';
@@ -57,8 +54,6 @@ interface IntegrationResult {
   steps: StepResult[];
   summary: {
     claimsTotal: number;
-    quotesTotal: number;
-    quotesLinked: number;
     footnotesConverted: number;
     claimRefsCreated: number;
   };
@@ -125,103 +120,8 @@ async function ensureClaims(
   };
 }
 
-// ---------------------------------------------------------------------------
-// Step 2: Link citation_quotes to claims
-// ---------------------------------------------------------------------------
-
-async function linkQuotesToClaims(
-  pageId: string,
-  apply: boolean,
-): Promise<StepResult & { quotesTotal: number; linked: number }> {
-  const quotes = await fetchQuotesForPage(pageId);
-  if (quotes.length === 0) {
-    return {
-      name: 'link-quotes',
-      status: 'skipped',
-      message: 'No citation_quotes found for this page',
-      quotesTotal: 0,
-      linked: 0,
-    };
-  }
-
-  const unlinked = quotes.filter(q => q.claimId === null);
-  const alreadyLinked = quotes.filter(q => q.claimId !== null);
-
-  if (unlinked.length === 0) {
-    return {
-      name: 'link-quotes',
-      status: 'ok',
-      message: `All ${quotes.length} quotes already linked to claims`,
-      quotesTotal: quotes.length,
-      linked: alreadyLinked.length,
-    };
-  }
-
-  // Get claims for this entity to find matches
-  const claimsResult = await getClaimsByEntity(pageId);
-  if (!claimsResult.ok || claimsResult.data.claims.length === 0) {
-    return {
-      name: 'link-quotes',
-      status: 'skipped',
-      message: `${unlinked.length} unlinked quotes, but no claims to link to`,
-      quotesTotal: quotes.length,
-      linked: alreadyLinked.length,
-    };
-  }
-
-  // Match unlinked quotes to claims by text similarity
-  const claims = claimsResult.data.claims;
-  const linkItems: Array<{ quoteId: number; claimId: number }> = [];
-
-  for (const quote of unlinked) {
-    const quoteLower = quote.claimText.toLowerCase().trim();
-    // Try exact match first, then substring match
-    let bestClaim = claims.find(c =>
-      c.claimText.toLowerCase().trim() === quoteLower
-    );
-    if (!bestClaim) {
-      // Try substring containment
-      bestClaim = claims.find(c =>
-        quoteLower.includes(c.claimText.toLowerCase().trim()) ||
-        c.claimText.toLowerCase().trim().includes(quoteLower)
-      );
-    }
-    if (bestClaim) {
-      linkItems.push({ quoteId: quote.id, claimId: bestClaim.id });
-    }
-  }
-
-  if (linkItems.length === 0) {
-    return {
-      name: 'link-quotes',
-      status: 'ok',
-      message: `${unlinked.length} unlinked quotes, no text matches found`,
-      quotesTotal: quotes.length,
-      linked: alreadyLinked.length,
-    };
-  }
-
-  if (apply) {
-    const result = await linkCitationsToClaimsBatch(linkItems);
-    if (result.ok) {
-      return {
-        name: 'link-quotes',
-        status: 'ok',
-        message: `Linked ${result.data.linked} quotes to claims (${alreadyLinked.length} already linked)`,
-        quotesTotal: quotes.length,
-        linked: alreadyLinked.length + result.data.linked,
-      };
-    }
-  }
-
-  return {
-    name: 'link-quotes',
-    status: 'ok',
-    message: `Would link ${linkItems.length} quotes to claims (${alreadyLinked.length} already linked)`,
-    quotesTotal: quotes.length,
-    linked: alreadyLinked.length,
-  };
-}
+// Step 2 (link citation_quotes to claims) was removed in #1310.
+// Claims are now the single source of truth — no backward linking needed.
 
 // ---------------------------------------------------------------------------
 // Step 3: Convert rc- footnotes to cr- where claims are linked
@@ -384,36 +284,8 @@ async function convertFootnotes(
   };
 }
 
-// ---------------------------------------------------------------------------
-// Step 4: Propagate claim verdicts
-// ---------------------------------------------------------------------------
-
-async function propagateVerdicts(
-  pageId: string,
-  apply: boolean,
-): Promise<StepResult> {
-  if (!apply) {
-    return {
-      name: 'propagate-verdicts',
-      status: 'skipped',
-      message: 'Skipped in dry-run',
-    };
-  }
-
-  const result = await propagateClaimVerdictsToPage(pageId);
-  if (result.ok) {
-    return {
-      name: 'propagate-verdicts',
-      status: 'ok',
-      message: `Propagated verdicts: ${result.data.updated ?? 0} quotes updated`,
-    };
-  }
-  return {
-    name: 'propagate-verdicts',
-    status: 'error',
-    message: `Failed to propagate: ${(result as { message?: string }).message ?? 'unknown error'}`,
-  };
-}
+// Step 4 (propagate claim verdicts to citation_quotes) was removed in #1310.
+// Claims are now the single source of truth — no backward propagation needed.
 
 // ---------------------------------------------------------------------------
 // Main orchestrator
@@ -445,25 +317,15 @@ export async function integrateClaims(
     };
   }
 
-  // Step 2: Link citation_quotes to claims
-  const linkResult = await linkQuotesToClaims(pageId, apply);
-  steps.push(linkResult);
-
-  // Step 3: Convert rc- footnotes to cr-
+  // Step 2: Convert rc- footnotes to cr-
   const convertResult = await convertFootnotes(pageId, apply);
   steps.push(convertResult);
-
-  // Step 4: Propagate verdicts
-  const verdictResult = await propagateVerdicts(pageId, apply);
-  steps.push(verdictResult);
 
   return {
     pageId,
     steps,
     summary: {
       claimsTotal: claimResult.claimCount,
-      quotesTotal: linkResult.quotesTotal,
-      quotesLinked: linkResult.linked,
       footnotesConverted: convertResult.converted,
       claimRefsCreated: convertResult.refsCreated,
     },
@@ -517,12 +379,10 @@ async function main() {
   console.log();
   console.log(`${c.bold}Summary${c.reset}`);
   console.log(`  Claims:             ${result.summary.claimsTotal}`);
-  console.log(`  Citation quotes:    ${result.summary.quotesTotal}`);
-  console.log(`  Quotes linked:      ${result.summary.quotesLinked}`);
   console.log(`  Footnotes converted: ${result.summary.footnotesConverted}`);
   console.log(`  Claim refs created: ${result.summary.claimRefsCreated}`);
 
-  if (!apply && (result.summary.footnotesConverted > 0 || result.summary.quotesLinked > 0)) {
+  if (!apply && result.summary.footnotesConverted > 0) {
     console.log(`\n${c.yellow}Dry run — no changes written. Use --apply to integrate.${c.reset}`);
   }
   console.log();
