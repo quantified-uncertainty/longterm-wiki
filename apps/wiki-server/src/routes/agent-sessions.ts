@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, lt } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { agentSessions } from "../schema.js";
 import {
@@ -138,6 +138,31 @@ const agentSessionsApp = new Hono()
       .limit(limit);
 
     return c.json({ sessions: rows });
+  })
+
+  // ---- POST /sweep (mark stale active sessions as completed) ----
+  .post("/sweep", async (c) => {
+    const body = await parseJsonBody(c).catch(() => ({}));
+    const raw = Number((body as Record<string, unknown>)?.timeoutHours || 24);
+    const timeoutHours = Math.max(1, Math.min(Number.isFinite(raw) ? raw : 24, 720));
+
+    const cutoff = new Date(Date.now() - timeoutHours * 60 * 60 * 1000);
+    const db = getDrizzleDb();
+
+    const stale = await db
+      .update(agentSessions)
+      .set({ status: "completed", completedAt: new Date(), updatedAt: new Date() })
+      .where(
+        and(
+          eq(agentSessions.status, "active"),
+          lt(agentSessions.updatedAt, cutoff)
+        )
+      )
+      .returning({ id: agentSessions.id, branch: agentSessions.branch });
+
+    console.log(`[agent-sessions] Sweep: marked ${stale.length} stale sessions as completed (cutoff: ${cutoff.toISOString()})`);
+
+    return c.json({ swept: stale.length, sessions: stale });
   });
 
 export const agentSessionsRoute = agentSessionsApp;

@@ -52,6 +52,8 @@ app/public/search-index.json
 .claude/plan.md
 .claude/skills/
 .claude/issue-creates.json
+.claude/agent-id
+.claude/last-heartbeat
 
 # MCP config (contains tokens)
 .mcp.json

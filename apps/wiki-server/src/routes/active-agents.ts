@@ -196,9 +196,8 @@ const activeAgentsApp = new Hono()
   // ---- POST /sweep (mark stale agents) ----
   .post("/sweep", async (c) => {
     const body = await parseJsonBody(c).catch(() => ({}));
-    const timeoutMinutes = Number(
-      (body as Record<string, unknown>)?.timeoutMinutes || STALE_TIMEOUT_MINUTES
-    );
+    const raw = Number((body as Record<string, unknown>)?.timeoutMinutes || STALE_TIMEOUT_MINUTES);
+    const timeoutMinutes = Math.max(5, Math.min(Number.isFinite(raw) ? raw : STALE_TIMEOUT_MINUTES, 43200));
 
     const cutoff = new Date(Date.now() - timeoutMinutes * 60 * 1000);
     const db = getDrizzleDb();
