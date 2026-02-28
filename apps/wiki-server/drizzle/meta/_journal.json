@@ -309,6 +309,13 @@
       "when": 1772267000000,
       "tag": "0039_groundskeeper_runs",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1772352000000,
+      "tag": "0040_service_health_incidents",
+      "breakpoints": true
     }
   ]
 }

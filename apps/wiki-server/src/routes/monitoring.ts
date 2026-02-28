@@ -248,7 +248,7 @@ const monitoringApp = new Hono()
         })
         .where(eq(serviceHealthIncidents.id, existing[0].id))
         .returning();
-      return c.json(updated[0], 200);
+      return c.json(firstOrThrow(updated, "incident dedup update"), 200);
     }
 
     const inserted = await db
