@@ -678,12 +678,9 @@ export const LinkCitationsClaimsBatchSchema = z.object({
   })).min(1).max(200),
 });
 
-// -- Claims: Backward propagation (claim verdict → citation_quotes) -----------
-
-export const PropagateFromClaimsSchema = z.object({
-  pageId: z.string().min(1).max(300),
-});
-export type PropagateFromClaims = z.infer<typeof PropagateFromClaimsSchema>;
+// -- Claims: Backward propagation — REMOVED in #1310 -----------
+// PropagateFromClaimsSchema was deleted. Claims are now the single source of truth.
+// The old endpoint POST /quotes/propagate-from-claims no longer exists.
 
 // ---------------------------------------------------------------------------
 // Page Links

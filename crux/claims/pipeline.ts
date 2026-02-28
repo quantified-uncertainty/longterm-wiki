@@ -3,15 +3,17 @@
  * linking, and verification.
  *
  * Runs in sequence:
- *   Step 1: Extract claims from page content → claims records
- *   Step 2: Link citation_quotes to claims → claim_id FK + claim_page_references
- *   Step 3: Verify claims against sources → verdict fields (delegates to crux claims verify)
+ *   Step 1: Extract claims from page content → claims records + claim_page_references
+ *   Step 2: Verify claims against sources → verdict fields (delegates to crux claims verify)
+ *
+ * Note: The 'link' step (backward-link citation_quotes to claims) was removed in #1310.
+ * Claims are now the single source of truth.
  *
  * Usage:
  *   pnpm crux claims pipeline <page-id>
  *   pnpm crux claims pipeline <page-id> --dry-run
- *   pnpm crux claims pipeline <page-id> --steps=extract,link
- *   pnpm crux claims pipeline <page-id> --steps=link,verify --model=google/gemini-2.0-flash-001
+ *   pnpm crux claims pipeline <page-id> --steps=extract
+ *   pnpm crux claims pipeline <page-id> --steps=verify --model=google/gemini-2.0-flash-001
  *
  * Requires: OPENROUTER_API_KEY or ANTHROPIC_API_KEY
  * Optional: LONGTERMWIKI_SERVER_URL (for DB writes)
@@ -23,18 +25,17 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
-import { isServerAvailable, apiRequest } from '../lib/wiki-server/client.ts';
+import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
   insertClaimBatch,
   getClaimsByEntity,
   addClaimPageReferencesBatch,
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
-import { linkCitationsToClaimsBatch, propagateClaimVerdictsToPage } from '../lib/wiki-server/citations.ts';
+// linkCitationsToClaimsBatch removed — citation_quotes linking eliminated in #1310
 import {
   isClaimDuplicate,
   claimTypeToCategory,
-  jaccardWordSimilarity,
 } from '../lib/claim-utils.ts';
 import {
   cleanMdxForExtraction,
@@ -48,25 +49,12 @@ import { validateClaimBatch } from './validate-claim.ts';
 // Step type
 // ---------------------------------------------------------------------------
 
-const ALL_STEPS = ['extract', 'link', 'verify'] as const;
+// 'link' step was removed in #1310 — claims are now the source of truth,
+// no need to backward-link citation_quotes to claims.
+const ALL_STEPS = ['extract', 'verify'] as const;
 type Step = (typeof ALL_STEPS)[number];
 
-// ---------------------------------------------------------------------------
-// Citation quote shape (from /api/citations/quotes endpoint)
-// ---------------------------------------------------------------------------
-
-interface CitationQuote {
-  id: number;
-  pageId: string;
-  footnote: number | null;
-  claimText: string;
-  claimContext: string | null;
-  sourceQuote: string | null;
-  url: string | null;
-  resourceId: string | null;
-  accuracyVerdict: string | null;
-  claimId: number | null;
-}
+// CitationQuote interface removed — citation_quotes linking eliminated in #1310
 
 // ---------------------------------------------------------------------------
 // Main
@@ -83,7 +71,7 @@ async function main() {
 
   if (!pageId) {
     console.error(`${c.red}Error: provide a page ID${c.reset}`);
-    console.error(`  Usage: pnpm crux claims pipeline <page-id> [--dry-run] [--steps=extract,link,verify] [--model=X]`);
+    console.error(`  Usage: pnpm crux claims pipeline <page-id> [--dry-run] [--steps=extract,verify] [--model=X]`);
     process.exit(1);
   }
 
@@ -296,145 +284,20 @@ async function main() {
     }
   }
 
-  // ------------------------------------------------------------------
-  // Step 2: Link citation_quotes to claims
-  // ------------------------------------------------------------------
-  if (steps.includes('link')) {
-    console.log(`\n${c.bold}Step 2: Link citation_quotes to claims${c.reset}`);
-
-    // Fetch citation quotes for this page
-    const quotesResult = await apiRequest<{ quotes: CitationQuote[] }>(
-      'GET',
-      `/api/citations/quotes?page_id=${encodeURIComponent(pageId)}&limit=500`,
-      undefined,
-      30_000,
-    );
-
-    if (!quotesResult.ok) {
-      console.error(`  ${c.red}Failed to fetch citation quotes: ${quotesResult.message}${c.reset}`);
-    } else {
-      const quotes = quotesResult.data.quotes;
-      const unlinked = quotes.filter(q => q.claimId == null);
-      console.log(`  ${quotes.length} total quotes, ${unlinked.length} unlinked`);
-
-      if (unlinked.length === 0) {
-        console.log(`  ${c.green}All quotes already linked${c.reset}`);
-      } else {
-        // Fetch claims for this entity
-        const claimsResult = await getClaimsByEntity(pageId);
-        if (!claimsResult.ok) {
-          console.error(`  ${c.red}Failed to fetch claims: ${claimsResult.message}${c.reset}`);
-        } else {
-          const existingClaims = claimsResult.data.claims.filter(cl => cl.entityId === pageId);
-          console.log(`  ${existingClaims.length} claims to match against`);
-
-          const linkItems: Array<{ quoteId: number; claimId: number }> = [];
-
-          for (const q of unlinked) {
-            // Find best matching claim by text similarity using Jaccard word similarity
-            let bestMatch: { id: number; score: number } | null = null;
-
-            for (const claim of existingClaims) {
-              if (isClaimDuplicate(q.claimText, claim.claimText, 0.5)) {
-                const score = jaccardWordSimilarity(q.claimText, claim.claimText);
-                if (!bestMatch || score > bestMatch.score) {
-                  bestMatch = { id: claim.id, score };
-                }
-              }
-            }
-
-            if (bestMatch) {
-              linkItems.push({ quoteId: q.id, claimId: bestMatch.id });
-            }
-          }
-
-          console.log(`  Matched ${linkItems.length} of ${unlinked.length} unlinked quotes`);
-
-          if (dryRun) {
-            console.log(`\n  ${c.bold}Sample links (first 3):${c.reset}`);
-            for (const item of linkItems.slice(0, 3)) {
-              const q = unlinked.find(uq => uq.id === item.quoteId);
-              console.log(`    Quote #${item.quoteId} → Claim #${item.claimId}: "${q?.claimText.slice(0, 60)}..."`);
-            }
-            if (linkItems.length > 3) {
-              console.log(`    ... and ${linkItems.length - 3} more`);
-            }
-          } else if (linkItems.length > 0) {
-            // Batch link in chunks of 200
-            const LINK_BATCH_SIZE = 200;
-            let totalLinked = 0;
-
-            for (let i = 0; i < linkItems.length; i += LINK_BATCH_SIZE) {
-              const batch = linkItems.slice(i, i + LINK_BATCH_SIZE);
-              const result = await linkCitationsToClaimsBatch(batch);
-              if (result.ok) {
-                totalLinked += result.data.linked;
-              } else {
-                console.error(`  ${c.red}Batch link failed: ${result.message}${c.reset}`);
-              }
-            }
-
-            console.log(`  ${c.green}Linked ${totalLinked} quotes to claims${c.reset}`);
-
-            // Create claim_page_references for each newly linked claim
-            const claimPageRefMap = new Map<number, Array<{ pageId: string; footnote: number | null; section: string | null }>>();
-            for (const item of linkItems) {
-              const quote = unlinked.find(q => q.id === item.quoteId);
-              if (!quote) continue;
-              if (!claimPageRefMap.has(item.claimId)) {
-                claimPageRefMap.set(item.claimId, []);
-              }
-              claimPageRefMap.get(item.claimId)!.push({
-                pageId: quote.pageId,
-                footnote: quote.footnote,
-                section: quote.claimContext ?? null,
-              });
-            }
-
-            let totalRefs = 0;
-            for (const [claimId, refs] of claimPageRefMap) {
-              const result = await addClaimPageReferencesBatch(claimId, refs);
-              if (result.ok) {
-                totalRefs += result.data.inserted;
-              }
-            }
-
-            if (totalRefs > 0) {
-              console.log(`  ${c.green}Created ${totalRefs} claim_page_references${c.reset}`);
-            }
-          }
-        }
-      }
-    }
-  }
+  // Step 2 (link citation_quotes to claims) was removed in #1310.
+  // Claims are now the single source of truth — no backward linking needed.
+  // Claim_page_references are created during extraction (Step 1).
 
   // ------------------------------------------------------------------
-  // Step 3: Verify claims against sources
+  // Step 2: Verify claims against sources
   // ------------------------------------------------------------------
   if (steps.includes('verify')) {
-    console.log(`\n${c.bold}Step 3: Verify & propagate verdicts${c.reset}`);
+    console.log(`\n${c.bold}Step 3: Verify claims${c.reset}`);
 
     if (dryRun) {
-      console.log(`  ${c.yellow}[DRY RUN] Would run claim verification and propagate to citation_quotes${c.reset}`);
+      console.log(`  ${c.yellow}[DRY RUN] Would run claim verification${c.reset}`);
     } else {
-      // Propagate any existing claim verdicts to citation_quotes
-      const propResult = await propagateClaimVerdictsToPage(pageId);
-      if (propResult.ok) {
-        const { propagated, skipped } = propResult.data;
-        if (propagated > 0) {
-          console.log(`  ${c.green}Propagated ${propagated} claim verdicts to citation_quotes${c.reset}`);
-        }
-        if (skipped > 0) {
-          console.log(`  ${c.dim}Skipped ${skipped} (unverified claims)${c.reset}`);
-        }
-        if (propagated === 0 && skipped === 0) {
-          console.log(`  ${c.dim}No linked claims found to propagate${c.reset}`);
-        }
-      } else {
-        console.log(`  ${c.yellow}Propagation failed: ${propResult.message}${c.reset}`);
-      }
-
-      console.log(`\n  For full LLM-based verification, run separately:`);
+      console.log(`  For full LLM-based verification, run separately:`);
       console.log(`    ${c.bold}pnpm crux claims verify ${pageId}${c.reset}`);
     }
   }

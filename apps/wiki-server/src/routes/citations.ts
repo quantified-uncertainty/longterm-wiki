@@ -22,12 +22,18 @@ import {
   CITATION_CONTENT_PREVIEW_MAX,
   LinkCitationClaimSchema,
   LinkCitationsClaimsBatchSchema,
-  PropagateFromClaimsSchema,
 } from "../api-types.js";
 // ---- Constants ----
 
 const BROKEN_SCORE_THRESHOLD = 0.5;
 const MAX_PAGE_SIZE = 5000;
+
+// ---- Deprecation helper (#1310) ----
+// Citation_quotes write endpoints are deprecated. Use claims + claim_sources instead.
+// These endpoints will be removed when the citation_quotes table is dropped (#1311).
+function deprecationWarning(endpoint: string): void {
+  console.warn(`[DEPRECATED] ${endpoint} — use claims API instead. Will be removed in #1311.`);
+}
 
 // ---- Schemas (from shared api-types) ----
 
@@ -174,8 +180,9 @@ const citationsApp = new Hono()
     return c.json(computePageHealth(pageId, rows));
   })
 
-  // ---- POST /quotes/upsert ----
+  // ---- POST /quotes/upsert ---- [DEPRECATED: use POST /api/claims + POST /api/claims/:id/sources]
   .post("/quotes/upsert", async (c) => {
+    deprecationWarning("POST /quotes/upsert");
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
 
@@ -210,8 +217,9 @@ const citationsApp = new Hono()
     }, 200);
   })
 
-  // ---- POST /quotes/upsert-batch ----
+  // ---- POST /quotes/upsert-batch ---- [DEPRECATED: use POST /api/claims/batch]
   .post("/quotes/upsert-batch", async (c) => {
+    deprecationWarning("POST /quotes/upsert-batch");
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
 
@@ -322,8 +330,9 @@ const citationsApp = new Hono()
     return c.json({ quotes: rows, total, limit, offset });
   })
 
-  // ---- POST /quotes/mark-verified ----
+  // ---- POST /quotes/mark-verified ---- [DEPRECATED: update claim_sources.sourceVerdict instead]
   .post("/quotes/mark-verified", async (c) => {
+    deprecationWarning("POST /quotes/mark-verified");
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
 
@@ -361,8 +370,9 @@ const citationsApp = new Hono()
     return c.json({ updated: true, pageId, footnote });
   })
 
-  // ---- POST /quotes/mark-unverified ----
+  // ---- POST /quotes/mark-unverified ---- [DEPRECATED: update claim_sources.sourceVerdict instead]
   .post("/quotes/mark-unverified", async (c) => {
+    deprecationWarning("POST /quotes/mark-unverified");
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
 
@@ -399,8 +409,9 @@ const citationsApp = new Hono()
     return c.json({ updated: true, pageId, footnote });
   })
 
-  // ---- POST /quotes/mark-accuracy ----
+  // ---- POST /quotes/mark-accuracy ---- [DEPRECATED: update claims.claimVerdict instead]
   .post("/quotes/mark-accuracy", async (c) => {
+    deprecationWarning("POST /quotes/mark-accuracy");
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
 
@@ -590,8 +601,9 @@ const citationsApp = new Hono()
     return c.json({ url: d.url });
   })
 
-  // ---- POST /quotes/mark-accuracy-batch ----
+  // ---- POST /quotes/mark-accuracy-batch ---- [DEPRECATED: batch update claims.claimVerdict instead]
   .post("/quotes/mark-accuracy-batch", async (c) => {
+    deprecationWarning("POST /quotes/mark-accuracy-batch");
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
 
@@ -1088,9 +1100,10 @@ const citationsApp = new Hono()
     });
   })
 
-  // ---- PATCH /quotes/:id/link-claim ----
+  // ---- PATCH /quotes/:id/link-claim ---- [DEPRECATED: claims are now the source of truth]
   // Links a citation_quote to a claim via the claim_id FK.
   .patch("/quotes/:id/link-claim", async (c) => {
+    deprecationWarning("PATCH /quotes/:id/link-claim");
     const idStr = c.req.param("id");
     const id = Number(idStr);
     if (!Number.isInteger(id) || id <= 0) {
@@ -1120,8 +1133,9 @@ const citationsApp = new Hono()
     return c.json({ linked: true, quoteId: Number(rows[0].id), claimId: parsed.data.claimId });
   })
 
-  // ---- POST /quotes/link-claims-batch ----
+  // ---- POST /quotes/link-claims-batch ---- [DEPRECATED: claims are now the source of truth]
   .post("/quotes/link-claims-batch", async (c) => {
+    deprecationWarning("POST /quotes/link-claims-batch");
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
 
@@ -1163,96 +1177,9 @@ const citationsApp = new Hono()
     return c.json({ linked: linkedCount });
   })
 
-  // ---- POST /quotes/propagate-from-claims ----
-  // Backward-propagate claim verdicts to linked citation_quotes.
-  // For each citation_quote with a claim_id, copies the claim's verdict fields
-  // to the citation's accuracy fields, using the mapping:
-  //   claim verified → citation accurate
-  //   claim unsupported → citation unsupported
-  //   claim disputed → citation inaccurate
-  //   claim unverified → skip (don't overwrite)
-  .post("/quotes/propagate-from-claims", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = PropagateFromClaimsSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { pageId } = parsed.data;
-    const db = getDrizzleDb();
-
-    // Find all citation_quotes for this page that have a linked claim
-    const linkedQuotes = await db
-      .select({
-        quoteId: citationQuotes.id,
-        claimVerdict: claims.claimVerdict,
-        claimVerdictScore: claims.claimVerdictScore,
-        claimVerdictIssues: claims.claimVerdictIssues,
-        claimVerdictQuotes: claims.claimVerdictQuotes,
-        claimVerdictDifficulty: claims.claimVerdictDifficulty,
-      })
-      .from(citationQuotes)
-      .innerJoin(claims, eq(citationQuotes.claimId, claims.id))
-      .where(
-        and(
-          eq(citationQuotes.pageId, pageId),
-          isNotNull(citationQuotes.claimId),
-        )
-      );
-
-    // Map claim verdict → citation accuracy verdict
-    const VERDICT_MAP: Record<string, string> = {
-      verified: "accurate",
-      unsupported: "unsupported",
-      disputed: "inaccurate",
-    };
-
-    // Partition rows into those we can propagate vs those we skip
-    const toPropagateRows: Array<typeof linkedQuotes[number] & { mappedVerdict: string }> = [];
-    let skipped = 0;
-
-    for (const row of linkedQuotes) {
-      const claimVerdict = row.claimVerdict;
-
-      // Skip if claim has no verdict or verdict is 'unverified'
-      if (!claimVerdict || claimVerdict === "unverified") {
-        skipped++;
-        continue;
-      }
-
-      const mappedVerdict = VERDICT_MAP[claimVerdict];
-      if (!mappedVerdict) {
-        // Unknown verdict value — skip
-        skipped++;
-        continue;
-      }
-
-      toPropagateRows.push({ ...row, mappedVerdict });
-    }
-
-    // Bulk-update all propagatable rows inside a single transaction
-    const propagated = await db.transaction(async (tx) => {
-      let count = 0;
-      for (const row of toPropagateRows) {
-        await tx
-          .update(citationQuotes)
-          .set({
-            accuracyVerdict: row.mappedVerdict,
-            accuracyScore: row.claimVerdictScore,
-            accuracyIssues: row.claimVerdictIssues ?? null,
-            accuracySupportingQuotes: row.claimVerdictQuotes ?? null,
-            verificationDifficulty: row.claimVerdictDifficulty ?? null,
-            accuracyCheckedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          })
-          .where(eq(citationQuotes.id, row.quoteId));
-        count++;
-      }
-      return count;
-    });
-
-    return c.json({ propagated, skipped });
-  })
+  // NOTE: POST /quotes/propagate-from-claims was removed in #1310.
+  // Backward propagation from claims → citation_quotes is no longer needed
+  // since claims is now the single source of truth for verification data.
 
   // ---- GET /source-type-stats ----
   .get("/source-type-stats", async (c) => {
