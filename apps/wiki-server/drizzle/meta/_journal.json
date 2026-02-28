@@ -295,6 +295,13 @@
       "when": 1771903000000,
       "tag": "0037_claim_sources_metadata",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1772266800000,
+      "tag": "0038_active_agents",
+      "breakpoints": true
     }
   ]
 }
