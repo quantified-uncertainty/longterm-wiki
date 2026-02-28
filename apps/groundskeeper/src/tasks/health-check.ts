@@ -1,5 +1,6 @@
 import type { Config } from "../config.js";
 import { getOctokit, parseRepo } from "../github.js";
+import { recordIncident } from "../wiki-server.js";
 
 const ISSUE_TITLE = "[Groundskeeper] Wiki server health check failure";
 
@@ -60,7 +61,15 @@ export async function healthCheck(
     return { success: true, summary: "Server up" };
   }
 
-  // Server is down
+  // Server is down — record incident (best-effort; will fail if wiki-server is what's down)
+  await recordIncident(config, {
+    service: "wiki-server",
+    severity: "critical",
+    title: "Wiki server health check failure",
+    detail: `Server at ${config.wikiServerUrl} is not responding to /health endpoint`,
+    checkSource: "groundskeeper",
+  }).catch(() => {});
+
   if (existingIssue) {
     return {
       success: false,

@@ -1224,3 +1224,53 @@ export type RecordGroundskeeperRun = z.infer<typeof RecordGroundskeeperRunSchema
 export const RecordGroundskeeperRunBatchSchema = z.object({
   items: z.array(RecordGroundskeeperRunSchema).min(1).max(100),
 });
+
+// ---------------------------------------------------------------------------
+// Monitoring / Incident Tracking
+// ---------------------------------------------------------------------------
+
+export const VALID_SERVICES = [
+  "wiki-server",
+  "groundskeeper",
+  "discord-bot",
+  "vercel-frontend",
+  "github-actions",
+] as const;
+
+export const ServiceNameSchema = z.enum(VALID_SERVICES);
+
+export const VALID_INCIDENT_SEVERITIES = [
+  "critical",
+  "warning",
+  "info",
+] as const;
+
+export const IncidentSeveritySchema = z.enum(VALID_INCIDENT_SEVERITIES);
+
+export const VALID_INCIDENT_STATUSES = [
+  "open",
+  "acknowledged",
+  "resolved",
+] as const;
+
+export const IncidentStatusSchema = z.enum(VALID_INCIDENT_STATUSES);
+
+export const RecordIncidentSchema = z.object({
+  service: ServiceNameSchema,
+  severity: IncidentSeveritySchema,
+  title: z.string().min(1).max(500),
+  detail: z.string().max(5000).optional(),
+  checkSource: z.string().max(100).optional(),
+  metadata: z.record(z.unknown()).optional(),
+  githubIssueNumber: z.number().int().positive().optional(),
+});
+
+export type RecordIncident = z.infer<typeof RecordIncidentSchema>;
+
+export const UpdateIncidentSchema = z.object({
+  status: IncidentStatusSchema.optional(),
+  resolvedBy: z.string().max(200).optional(),
+  detail: z.string().max(5000).optional(),
+  metadata: z.record(z.unknown()).optional(),
+  githubIssueNumber: z.number().int().positive().optional(),
+});

@@ -25,6 +25,7 @@ import { integrityRoute } from "./routes/integrity.js";
 import { referencesRoute } from "./routes/references.js";
 import { githubIssuesRoute } from "./routes/github-issues.js";
 import { groundskeeperRunsRoute } from "./routes/groundskeeper-runs.js";
+import { monitoringRoute } from "./routes/monitoring.js";
 
 export function createApp() {
   const app = new Hono();
@@ -77,6 +78,7 @@ export function createApp() {
   app.use("/api/auto-update-news/*", requireWriteScope("project"));
   app.use("/api/github/*", requireWriteScope("project"));
   app.use("/api/groundskeeper-runs/*", requireWriteScope("project"));
+  app.use("/api/monitoring/*", requireWriteScope("project"));
 
   // Mount route handlers
   app.route("/api/ids", idsRoute);
@@ -102,6 +104,7 @@ export function createApp() {
   app.route("/api/references", referencesRoute);
   app.route("/api/github/issues", githubIssuesRoute);
   app.route("/api/groundskeeper-runs", groundskeeperRunsRoute);
+  app.route("/api/monitoring", monitoringRoute);
 
   return app;
 }

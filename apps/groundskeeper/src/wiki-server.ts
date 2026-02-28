@@ -159,6 +159,45 @@ export async function updateActiveAgent(
   }
 }
 
+// ---------------------------------------------------------------------------
+// Incident Recording
+// ---------------------------------------------------------------------------
+
+/**
+ * Record an incident to the wiki-server monitoring system. Best-effort.
+ * If wiki-server is the thing that's down, this call will also fail — that's
+ * expected. The groundskeeper health-check task also creates GitHub issues
+ * as a fallback notification channel.
+ */
+export async function recordIncident(
+  config: Config,
+  payload: {
+    service: string;
+    severity: string;
+    title: string;
+    detail?: string;
+    checkSource?: string;
+    metadata?: Record<string, unknown>;
+  },
+): Promise<void> {
+  const result = await apiRequest(
+    config,
+    "POST",
+    "/api/monitoring/incidents",
+    payload,
+  );
+  if (!result.ok) {
+    console.log(
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        event: "incident_recording_failed",
+        endpoint: "/api/monitoring/incidents",
+        error: result.error,
+      }),
+    );
+  }
+}
+
 /**
  * Send a heartbeat for the groundskeeper. Best-effort.
  */

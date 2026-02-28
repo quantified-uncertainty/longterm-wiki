@@ -53,6 +53,7 @@ import { HallucinationRiskContent } from "@/app/internal/hallucination-risk/hall
 import { HallucinationEvalsContent } from "@/app/internal/hallucination-evals/hallucination-evals-content";
 import { ActiveAgentsContent } from "@/app/internal/active-agents/active-agents-content";
 import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/groundskeeper-runs-content";
+import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -178,6 +179,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   HallucinationEvalsContent,
   ActiveAgentsContent,
   GroundskeeperRunsContent,
+  SystemHealthContent,
 
   // Table view components
   SafetyApproachesTableView,
