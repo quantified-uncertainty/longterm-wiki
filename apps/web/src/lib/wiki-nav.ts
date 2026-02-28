@@ -248,6 +248,7 @@ export function getInternalNav(): NavSection[] {
       title: "Dashboards",
       defaultOpen: true,
       items: [
+        { label: "System Health", href: internalHref("system-health-dashboard") },
         { label: "Pages", href: internalHref("page-coverage-dashboard") },
         { label: "Entities & Pages", href: internalHref("entities-dashboard") },
         { label: "Page Changes", href: internalHref("page-changes-dashboard") },
