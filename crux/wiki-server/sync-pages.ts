@@ -201,7 +201,7 @@ export async function syncPages(
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const dryRun = args["dry-run"] === true;
-  const batchSize = Number(args["batch-size"]) || 50;
+  const batchSize = Number(args["batch-size"]) || 20;
 
   const serverUrl = getServerUrl();
   const apiKey = getApiKey();
