@@ -12,6 +12,7 @@ export interface Config {
   discordWebhookUrl: string;
   dailyRunCap: number;
   runLogPath: string;
+  circuitBreakerCooldownMs: number;
   tasks: {
     healthCheck: TaskConfig;
     resolveConflicts: TaskConfig;
@@ -53,6 +54,7 @@ export function loadConfig(): Config {
     discordWebhookUrl: envOrDie("DISCORD_WEBHOOK_URL"),
     dailyRunCap: envInt("DAILY_RUN_CAP", 20),
     runLogPath: process.env["RUN_LOG_PATH"] ?? "/data/run-log.json",
+    circuitBreakerCooldownMs: envInt("CIRCUIT_BREAKER_COOLDOWN_MS", 1_800_000),
     tasks: {
       healthCheck: {
         enabled: envBool("TASK_HEALTH_CHECK_ENABLED", true),

@@ -18,6 +18,7 @@ interface TaskState {
   name: string;
   consecutiveFailures: number;
   disabled: boolean;
+  trippedAt: number | null;
   running: boolean;
 }
 
@@ -26,7 +27,7 @@ const taskStates = new Map<string, TaskState>();
 function getState(name: string): TaskState {
   let state = taskStates.get(name);
   if (!state) {
-    state = { name, consecutiveFailures: 0, disabled: false, running: false };
+    state = { name, consecutiveFailures: 0, disabled: false, trippedAt: null, running: false };
     taskStates.set(name, state);
   }
   return state;
@@ -62,13 +63,30 @@ export function registerTask(
       return;
     }
 
-    // Guard: circuit breaker
-    if (state.disabled) {
-      logger.warn({ event: "skipped", reason: "circuit breaker tripped" }, "Task skipped");
-      return;
-    }
-
+    // Claim the running lock immediately, before any async work,
+    // to prevent concurrent executions during half-open Discord notifications.
     state.running = true;
+
+    // Guard: circuit breaker (with half-open recovery)
+    let isHalfOpenProbe = false;
+    if (state.disabled) {
+      if (
+        state.trippedAt == null ||
+        Date.now() - state.trippedAt >= config.circuitBreakerCooldownMs
+      ) {
+        // Half-open: cooldown elapsed, allow one probe attempt
+        isHalfOpenProbe = true;
+        logger.info({ event: "half_open_attempt" }, "Circuit breaker half-open probe");
+        await sendDiscordNotification(
+          config,
+          `🟡 **${name}** circuit breaker cooldown elapsed — attempting recovery probe...`
+        );
+      } else {
+        logger.warn({ event: "skipped", reason: "circuit breaker tripped" }, "Task skipped");
+        state.running = false;
+        return;
+      }
+    }
     const start = Date.now();
 
     try {
@@ -76,6 +94,15 @@ export function registerTask(
       const durationMs = Date.now() - start;
 
       if (result.success) {
+        if (isHalfOpenProbe) {
+          state.disabled = false;
+          state.trippedAt = null;
+          logger.info({ event: "half_open_success" }, "Half-open probe succeeded");
+          await sendDiscordNotification(
+            config,
+            `🟢 **${name}** recovery probe succeeded — circuit breaker reset automatically.`
+          );
+        }
         state.consecutiveFailures = 0;
         logger.info({
           event: "success",
@@ -83,27 +110,44 @@ export function registerTask(
           summary: result.summary,
         }, "Task succeeded");
       } else {
-        state.consecutiveFailures++;
-        logger.error({
-          event: "failure",
-          durationMs,
-          consecutiveFailures: state.consecutiveFailures,
-          summary: result.summary,
-        }, "Task failed");
-
-        await sendDiscordNotification(
-          config,
-          `❌ **${name}** failed (${state.consecutiveFailures}/3): ${result.summary ?? "no details"}`
-        );
-
-        // Trip circuit breaker after 3 consecutive failures
-        if (state.consecutiveFailures >= 3) {
-          state.disabled = true;
+        if (isHalfOpenProbe) {
+          // Probe failed — restart cooldown, stay tripped
+          state.trippedAt = Date.now();
+          logger.error({
+            event: "failure",
+            durationMs,
+            consecutiveFailures: state.consecutiveFailures,
+            summary: result.summary,
+            halfOpenProbe: true,
+          }, "Half-open probe failed");
           await sendDiscordNotification(
             config,
-            `🔴 **Circuit breaker tripped** for **${name}** after 3 consecutive failures. Task disabled until pod restart or manual reset.`
+            `🔴 **${name}** recovery probe failed — circuit breaker remains tripped. Will retry after cooldown.`
           );
-          logger.fatal({ event: "circuit_breaker_tripped" }, "Circuit breaker tripped");
+        } else {
+          state.consecutiveFailures++;
+          logger.error({
+            event: "failure",
+            durationMs,
+            consecutiveFailures: state.consecutiveFailures,
+            summary: result.summary,
+          }, "Task failed");
+
+          await sendDiscordNotification(
+            config,
+            `❌ **${name}** failed (${state.consecutiveFailures}/3): ${result.summary ?? "no details"}`
+          );
+
+          // Trip circuit breaker after 3 consecutive failures
+          if (state.consecutiveFailures >= 3) {
+            state.disabled = true;
+            state.trippedAt = Date.now();
+            await sendDiscordNotification(
+              config,
+              `🔴 **Circuit breaker tripped** for **${name}** after 3 consecutive failures. Will auto-retry after cooldown.`
+            );
+            logger.fatal({ event: "circuit_breaker_tripped" }, "Circuit breaker tripped");
+          }
         }
       }
 
@@ -137,8 +181,8 @@ export function registerTask(
         }).catch(() => {});
       }
 
-      // Circuit breaker event
-      if (state.disabled) {
+      // Circuit breaker event — only on a fresh trip, not on failed half-open probes
+      if (state.disabled && !isHalfOpenProbe) {
         recordRunToServer(config, {
           taskName: name,
           event: "circuit_breaker_tripped",
@@ -153,26 +197,43 @@ export function registerTask(
       const errorMessage =
         error instanceof Error ? error.message : String(error);
 
-      state.consecutiveFailures++;
-      logger.error({
-        event: "error",
-        durationMs,
-        error: errorMessage,
-        consecutiveFailures: state.consecutiveFailures,
-      }, "Task threw an error");
-
-      await sendDiscordNotification(
-        config,
-        `❌ **${name}** threw an error (${state.consecutiveFailures}/3): ${errorMessage}`
-      );
-
-      if (state.consecutiveFailures >= 3) {
-        state.disabled = true;
+      if (isHalfOpenProbe) {
+        // Probe threw — restart cooldown, stay tripped
+        state.trippedAt = Date.now();
+        logger.error({
+          event: "error",
+          durationMs,
+          error: errorMessage,
+          consecutiveFailures: state.consecutiveFailures,
+          halfOpenProbe: true,
+        }, "Half-open probe threw an error");
         await sendDiscordNotification(
           config,
-          `🔴 **Circuit breaker tripped** for **${name}** after 3 consecutive failures. Task disabled until pod restart or manual reset.`
+          `🔴 **${name}** recovery probe threw an error — circuit breaker remains tripped. Will retry after cooldown.`
         );
-        logger.fatal({ event: "circuit_breaker_tripped" }, "Circuit breaker tripped");
+      } else {
+        state.consecutiveFailures++;
+        logger.error({
+          event: "error",
+          durationMs,
+          error: errorMessage,
+          consecutiveFailures: state.consecutiveFailures,
+        }, "Task threw an error");
+
+        await sendDiscordNotification(
+          config,
+          `❌ **${name}** threw an error (${state.consecutiveFailures}/3): ${errorMessage}`
+        );
+
+        if (state.consecutiveFailures >= 3) {
+          state.disabled = true;
+          state.trippedAt = Date.now();
+          await sendDiscordNotification(
+            config,
+            `🔴 **Circuit breaker tripped** for **${name}** after 3 consecutive failures. Will auto-retry after cooldown.`
+          );
+          logger.fatal({ event: "circuit_breaker_tripped" }, "Circuit breaker tripped");
+        }
       }
 
       const errorTs = new Date().toISOString();
@@ -212,6 +273,7 @@ export function resetCircuitBreaker(name: string): boolean {
   const state = taskStates.get(name);
   if (!state) return false;
   state.disabled = false;
+  state.trippedAt = null;
   state.consecutiveFailures = 0;
   rootLogger.child({ task: name }).info({ event: "circuit_breaker_reset" }, "Circuit breaker reset");
   return true;

@@ -321,14 +321,14 @@ async function main() {
       /** @deprecated Use claimVerdictQuotes for verification quotes. Kept for backward compat. */
       sourceQuote: claim.newSourceQuote || null,
       // Enhanced fields — preserve from original claim
-      claimCategory: claim.claimCategory ?? null,
+      claimCategory: (claim.claimCategory ?? null) as InsertClaimItem['claimCategory'],
       relatedEntities: claim.relatedEntities ?? null,
       factId: claim.factId ?? null,
       resourceIds: claim.resourceIds ?? null,
       section: claim.section ?? null,
       footnoteRefs: claim.footnoteRefs ?? null,
       // Phase 2 fields — preserve from original claim
-      claimMode: claim.claimMode ?? null,
+      claimMode: (claim.claimMode ?? null) as InsertClaimItem['claimMode'],
       attributedTo: claim.attributedTo ?? null,
       asOf: claim.asOf ?? null,
       measure: claim.measure ?? null,

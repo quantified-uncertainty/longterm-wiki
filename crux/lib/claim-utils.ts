@@ -20,8 +20,10 @@ export const VALID_CLAIM_TYPES = [
 
 export type ClaimTypeValue = (typeof VALID_CLAIM_TYPES)[number];
 
+export type ClaimCategoryValue = 'factual' | 'opinion' | 'analytical' | 'speculative' | 'relational';
+
 /** Map from granular claimType → high-level claimCategory. */
-export function claimTypeToCategory(claimType: ClaimTypeValue): string {
+export function claimTypeToCategory(claimType: ClaimTypeValue): ClaimCategoryValue {
   switch (claimType) {
     case 'factual':
     case 'numeric':

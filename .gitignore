@@ -51,6 +51,7 @@ app/public/search-index.json
 .claude/wip-context.md
 .claude/plan.md
 .claude/skills/
+.claude/issue-creates.json
 
 # MCP config (contains tokens)
 .mcp.json

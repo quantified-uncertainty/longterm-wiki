@@ -1,19 +1,22 @@
 /**
  * Issues Command Handlers
  *
- * Track Claude Code work on GitHub issues: list, prioritize, signal start/done.
+ * Track Claude Code work on GitHub issues: list, prioritize, search, signal start/done.
  *
  * Usage:
  *   crux issues                      List open issues ranked by priority
  *   crux issues list                 Same as above
  *   crux issues next                 Show the single next issue to work on
+ *   crux issues search <query>       Search existing issues before filing a new one
+ *   crux issues comment <N> <msg>    Post a comment on an existing issue
  *   crux issues start <N>            Signal start: comment + add claude-working label
  *   crux issues done <N> [--pr=URL]  Signal completion: comment + remove label
  *   crux issues cleanup              Detect stale claude-working labels + potential duplicates
  *   crux issues close <N> [--reason] Close an issue with an optional comment
  */
 
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join, dirname } from 'path';
 import { createLogger, type Colors } from '../lib/output.ts';
 import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
@@ -643,11 +646,55 @@ function buildIssueBody(opts: {
   return sections.join('\n\n');
 }
 
+// ---------------------------------------------------------------------------
+// Issue creation rate limiting
+// ---------------------------------------------------------------------------
+
+const DAILY_CREATE_LIMIT = 5;
+const RATE_LIMIT_FILE = join(dirname(new URL(import.meta.url).pathname), '../../.claude/issue-creates.json');
+
+interface RateLimitRecord {
+  timestamps: string[]; // ISO date strings of issue creation times
+}
+
+/**
+ * Check how many issues have been created today (in UTC). Returns the count.
+ */
+function getCreatestoday(): number {
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    if (!existsSync(RATE_LIMIT_FILE)) return 0;
+    const data: RateLimitRecord = JSON.parse(readFileSync(RATE_LIMIT_FILE, 'utf-8'));
+    return data.timestamps.filter(t => t.startsWith(today)).length;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Record that an issue was just created.
+ */
+function recordCreate(): void {
+  const now = new Date().toISOString();
+  const today = now.slice(0, 10);
+  let data: RateLimitRecord = { timestamps: [] };
+  try {
+    if (existsSync(RATE_LIMIT_FILE)) {
+      data = JSON.parse(readFileSync(RATE_LIMIT_FILE, 'utf-8'));
+    }
+  } catch { /* start fresh */ }
+  // Keep only timestamps from the last 7 days (self-cleaning)
+  const cutoff = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+  data.timestamps = data.timestamps.filter(t => t.slice(0, 10) >= cutoff);
+  data.timestamps.push(now);
+  writeFileSync(RATE_LIMIT_FILE, JSON.stringify(data, null, 2) + '\n');
+}
+
 /**
  * Create a new GitHub issue.
  */
 async function create(args: string[], options: CommandOptions): Promise<CommandResult> {
-const log = createLogger(options.ci);
+  const log = createLogger(options.ci);
   const c = log.colors;
 
   const title = args[0];
@@ -656,6 +703,20 @@ const log = createLogger(options.ci);
       output: `${c.red}Usage: crux issues create <title> --model=haiku|sonnet|opus --criteria="item1|item2" [--label=X,Y] [--problem="..."] [--fix="..."] [--depends=N,M] [--cost="~$2-4"] [--draft]${c.reset}\n`,
       exitCode: 1,
     };
+  }
+
+  // Rate limit: max DAILY_CREATE_LIMIT issues per day (prevents tracker flood)
+  if (!options['no-limit']) {
+    const todayCount = getCreatestoday();
+    if (todayCount >= DAILY_CREATE_LIMIT) {
+      return {
+        output:
+          `${c.red}Daily issue creation limit reached (${DAILY_CREATE_LIMIT}/day).${c.reset}\n` +
+          `${c.dim}You've created ${todayCount} issues today. This limit prevents tracker flood.\n` +
+          `If this is genuinely important, use --no-limit to override.${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
   }
 
   const labels = options.label
@@ -737,14 +798,29 @@ const log = createLogger(options.ci);
     },
   });
 
+  // Record creation for rate limiting (non-fatal — don't break create if file write fails)
+  try { recordCreate(); } catch { /* ignore — rate limiting is advisory */ }
+
   // Apply model label if --model was specified
   if (options.model) {
     const modelName = (options.model as string).toLowerCase() as ModelName;
     await applyModelLabel(issue.number, modelName, labels);
   }
 
+  // Apply filed-by-agent label for tracking agent-originated issues
+  try {
+    await githubApi(`/repos/${REPO}/issues/${issue.number}/labels`, {
+      method: 'POST',
+      body: { labels: ['filed-by-agent'] },
+    });
+  } catch { /* non-fatal — label might not exist yet */ }
+
   let output = '';
+  const todayCount = getCreatestoday();
   output += `${c.green}✓${c.reset} Created issue #${issue.number}: ${issue.title}\n`;
+  if (todayCount >= DAILY_CREATE_LIMIT - 1) {
+    output += `  ${c.yellow}⚠ ${todayCount}/${DAILY_CREATE_LIMIT} daily issue limit used${c.reset}\n`;
+  }
   output += `  ${c.cyan}${issue.html_url}${c.reset}\n`;
   const appliedLabels = options.model ? [...labels, `${MODEL_LABEL_PREFIX}${(options.model as string).toLowerCase()}`] : labels;
   if (appliedLabels.length > 0) {
@@ -1017,6 +1093,282 @@ function findPotentialDuplicates(issues: RankedIssue[]): Array<{ a: RankedIssue;
   }
 
   return results.sort((a, b) => b.similarity - a.similarity);
+}
+
+/**
+ * Search open (and optionally closed) issues for potential matches to a query.
+ * Used by agents before filing new issues to avoid duplicates.
+ *
+ * Scoring: Uses combined title + body token overlap with title weighting (2x).
+ * Short domain terms (CI, DX, PR, ID) are preserved. Basic stemming strips
+ * common suffixes so "validates" matches "validation".
+ */
+async function search(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const query = args.join(' ').trim();
+  if (!query) {
+    return {
+      output: `${c.red}Usage: crux issues search <query>${c.reset}\n` +
+        `${c.dim}Example: crux issues search "dollar sign escaping in MDX"${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  const includeClosed = Boolean(options.closed);
+  const threshold = parseFloat((options.threshold as string) || '0.35');
+
+  // Only truly semantic-free words. Domain-relevant verbs (add, fix, remove) are kept
+  // because "add entity" and "remove entity" mean opposite things.
+  const stopwords = new Set([
+    'a', 'an', 'the', 'and', 'or', 'to', 'for', 'of', 'in', 'on', 'is', 'are',
+    'all', 'with', 'from', '--', '—', '-',
+    'this', 'that', 'not', 'but', 'has', 'have', 'should', 'would', 'could',
+    'when', 'where', 'how', 'what', 'why', 'does', 'been', 'being',
+  ]);
+
+  // Short domain terms that should NOT be filtered by length
+  const shortTerms = new Set(['ci', 'dx', 'pr', 'id', 'ui', 'db', 'api', 'css', 'rpc', 'mdx', 'tsx', 'sql']);
+
+  /** Crude suffix stemming — good enough for dedup, no dependencies needed. */
+  function stem(word: string): string {
+    if (word.length <= 4) return word;
+    // Order matters: longest suffixes first
+    return word
+      .replace(/ations?$/, 'ate')
+      .replace(/tion$/, 't')
+      .replace(/sion$/, 's')
+      .replace(/ment$/, '')
+      .replace(/ness$/, '')
+      .replace(/ies$/, 'y')
+      .replace(/ous$/, '')
+      .replace(/ing$/, '')
+      .replace(/able$/, '')
+      .replace(/ive$/, '')
+      .replace(/ful$/, '')
+      .replace(/ers?$/, '')
+      .replace(/ors?$/, '')
+      .replace(/ed$/, '')
+      .replace(/ly$/, '')
+      .replace(/s$/, '');
+  }
+
+  function tokenize(text: string): Set<string> {
+    return new Set(
+      text.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .split(/\s+/)
+        .filter(w => (w.length > 1 && shortTerms.has(w)) || (w.length > 2 && !stopwords.has(w)))
+        .map(stem)
+    );
+  }
+
+  /**
+   * Score how well a query matches a target issue.
+   *
+   * Uses query-weighted overlap (what fraction of query tokens appear in target?)
+   * with title matches worth 2x body matches, plus a penalty for single-token
+   * queries to avoid false "100%" matches.
+   */
+  function score(queryTokens: Set<string>, titleTokens: Set<string>, bodyTokens: Set<string>): number {
+    if (queryTokens.size === 0) return 0;
+
+    let weightedMatches = 0;
+    for (const token of queryTokens) {
+      if (titleTokens.has(token)) {
+        weightedMatches += 1.0; // title match: full weight
+      } else if (bodyTokens.has(token)) {
+        weightedMatches += 0.5; // body-only match: half weight
+      }
+    }
+
+    let raw = weightedMatches / queryTokens.size;
+
+    // Penalize single-token queries: they match too broadly.
+    // A single token matching the title still scores 0.7 max, not 1.0.
+    if (queryTokens.size === 1) {
+      raw *= 0.7;
+    }
+
+    return Math.min(raw, 1.0);
+  }
+
+  const queryTokens = tokenize(query);
+  if (queryTokens.size === 0) {
+    return {
+      output: `${c.yellow}Query "${query}" produced no searchable tokens after stopword removal.${c.reset}\n` +
+        `${c.dim}Tip: Use more specific terms. Short domain terms like CI, DX, PR, ID are recognized.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // --- Search open issues ---
+  const openIssues = await fetchOpenIssues();
+  type Match = { number: number; title: string; url: string; state: string; score: number; labels: string[] };
+  const matches: Match[] = [];
+
+  for (const issue of openIssues) {
+    const titleTokens = tokenize(issue.title);
+    const bodyTokens = tokenize(issue.body.slice(0, 1500)); // first 1500 chars of body
+    const s = score(queryTokens, titleTokens, bodyTokens);
+    if (s >= threshold) {
+      matches.push({ number: issue.number, title: issue.title, url: issue.url, state: 'open', score: s, labels: issue.labels });
+    }
+  }
+
+  // --- Optionally search closed issues via GitHub search API ---
+  if (includeClosed) {
+    try {
+      const searchQuery = encodeURIComponent(`repo:${REPO} is:issue is:closed ${query}`);
+      const searchResults = await githubApi<{ items: GitHubIssueResponse[] }>(
+        `/search/issues?q=${searchQuery}&per_page=20`
+      );
+      for (const item of searchResults.items) {
+        // Skip if already matched as open
+        if (matches.some(m => m.number === item.number)) continue;
+        const titleTokens = tokenize(item.title);
+        const bodyTokens = tokenize((item.body || '').slice(0, 1500));
+        const s = score(queryTokens, titleTokens, bodyTokens);
+        if (s >= threshold) {
+          matches.push({
+            number: item.number,
+            title: item.title,
+            url: item.html_url,
+            state: 'closed',
+            score: s,
+            labels: (item.labels || []).map(l => l.name),
+          });
+        }
+      }
+    } catch {
+      // Search API failure is non-fatal — open issue results are still useful
+    }
+  }
+
+  matches.sort((a, b) => b.score - a.score);
+
+  // --- Format output ---
+  let output = '';
+  output += `${c.bold}Search: "${query}"${c.reset}`;
+  output += ` ${c.dim}(tokens: ${[...queryTokens].join(', ')})${c.reset}\n`;
+
+  if (matches.length === 0) {
+    output += `\n${c.yellow}No keyword matches found.${c.reset}\n`;
+    output += `${c.dim}This search is keyword-based and may miss issues phrased differently.\n`;
+    output += `If your topic is specific, also browse: crux issues list${c.reset}\n`;
+    if (!includeClosed) {
+      output += `${c.dim}Tip: Use --closed to also search closed issues.${c.reset}\n`;
+    }
+  } else {
+    // Classify match quality
+    const strongMatches = matches.filter(m => m.score >= 0.6);
+    const weakMatches = matches.filter(m => m.score < 0.6);
+
+    if (strongMatches.length > 0) {
+      output += `\n${c.yellow}Found ${strongMatches.length} likely match(es):${c.reset}\n\n`;
+      for (const m of strongMatches.slice(0, 10)) {
+        const stateTag = m.state === 'closed' ? `${c.dim}[closed]${c.reset} ` : '';
+        const pct = `${(m.score * 100).toFixed(0)}%`;
+        output += `  ${c.cyan}#${String(m.number).padEnd(5)}${c.reset} ${stateTag}${m.title}\n`;
+        output += `    ${c.dim}Match: ${pct} — ${m.url}${c.reset}\n`;
+      }
+      output += `\n${c.bold}Check these before filing.${c.reset} Add a comment to an existing issue if it covers your concern.\n`;
+    }
+
+    if (weakMatches.length > 0) {
+      if (strongMatches.length > 0) {
+        output += `\n${c.dim}Also loosely related (${weakMatches.length}):${c.reset}\n`;
+      } else {
+        output += `\n${c.dim}Loosely related (low-confidence keyword overlap):${c.reset}\n`;
+      }
+      for (const m of weakMatches.slice(0, 5)) {
+        const stateTag = m.state === 'closed' ? `[closed] ` : '';
+        output += `  ${c.dim}#${String(m.number).padEnd(5)} ${stateTag}${m.title} (${(m.score * 100).toFixed(0)}%)${c.reset}\n`;
+      }
+      if (weakMatches.length > 5) {
+        output += `  ${c.dim}...and ${weakMatches.length - 5} more${c.reset}\n`;
+      }
+      if (strongMatches.length === 0) {
+        output += `\n${c.dim}These are weak keyword matches. Your issue may still be novel —\n`;
+        output += `skim the titles above, but don't skip filing just because of low-confidence matches.${c.reset}\n`;
+      }
+    }
+  }
+
+  if (options.json) {
+    return { output: JSON.stringify({ query, tokens: [...queryTokens], matches }, null, 2), exitCode: 0 };
+  }
+
+  return { output, exitCode: 0 };
+}
+
+/**
+ * Post a comment on an existing issue. Used by agents to add context to
+ * issues they encounter during a session rather than filing duplicates.
+ *
+ * Validates the issue exists and is open before posting. Appends session
+ * attribution (branch name) so comments are traceable to specific sessions.
+ */
+async function comment(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const issueNum = parseRequiredInt(args[0]);
+  if (!issueNum) {
+    return {
+      output: `${c.red}Usage: crux issues comment <issue-number> <message>${c.reset}\n` +
+        `${c.dim}Example: crux issues comment 42 "Found another instance in gate.ts:142"${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // Message is everything after the issue number
+  const bodyFromFile = readFileFlag(options['body-file'] as string | undefined);
+  const message = bodyFromFile || args.slice(1).join(' ').trim() || (options.body as string) || '';
+  if (!message) {
+    return {
+      output: `${c.red}No comment message provided.${c.reset}\n` +
+        `${c.dim}Usage: crux issues comment <N> "your message"${c.reset}\n` +
+        `${c.dim}   or: crux issues comment <N> --body-file=/tmp/comment.md${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // Validate issue exists
+  let issue: GitHubIssueResponse;
+  try {
+    issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
+  } catch {
+    return {
+      output: `${c.red}Issue #${issueNum} not found. Check the issue number.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  if (issue.pull_request) {
+    return {
+      output: `${c.red}#${issueNum} is a pull request, not an issue. Use gh pr comment instead.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // Add session attribution
+  const branch = currentBranch();
+  const attribution = branch ? `\n\n---\n*From session on branch \`${branch}\`*` : '';
+  const fullBody = message + attribution;
+
+  // Post the comment
+  await githubApi(`/repos/${REPO}/issues/${issueNum}/comments`, {
+    method: 'POST',
+    body: { body: fullBody },
+  });
+
+  let output = '';
+  output += `${c.green}Posted comment on #${issueNum}${c.reset}: ${issue.title}\n`;
+  output += `${c.dim}https://github.com/${REPO}/issues/${issueNum}${c.reset}\n`;
+
+  return { output, exitCode: 0 };
 }
 
 /**
@@ -1397,7 +1749,9 @@ export const commands = {
   default: list,
   list,
   next,
+  search,
   create,
+  comment,
   'update-body': updateBody,
   'update-title': updateTitle,
   lint,
@@ -1414,7 +1768,9 @@ Issues Domain - Track Claude Code work on GitHub issues
 Commands:
   list                List open issues ranked by priority (default)
   next                Show the single next issue to pick up
+  search <query>      Search existing issues before filing a new one
   create <title>      Create a new GitHub issue (supports structured template)
+  comment <N> <msg>   Post a comment on an existing issue
   update-body <N>     Update an issue body using structured template args
   update-title <N>    Update an issue title
   lint [N]            Check issue formatting (all issues, or single by number)
@@ -1427,6 +1783,14 @@ Options (list/next):
   --limit=N           Max issues to show in list (default: 30)
   --scores            Show score breakdown + formatting warnings per issue
   --json              JSON output
+
+Options (search):
+  --closed            Also search closed issues (via GitHub search API)
+  --threshold=N       Minimum match score 0-1 (default: 0.35)
+  --json              JSON output with match details
+
+Options (comment):
+  --body-file=<path>  Comment body from file (safe — avoids shell expansion)
 
 Options (create):
   --label=X,Y         Comma-separated labels to apply
@@ -1487,6 +1851,9 @@ Examples:
   crux issues                        List all open issues
   crux issues --scores               List with score breakdowns + formatting warnings
   crux issues next                   Show next issue to pick up
+  crux issues search "MDX escaping"  Check if issue exists before filing
+  crux issues search "broken build" --closed   Also search closed issues
+  crux issues comment 42 "Found another instance in gate.ts:142"
   crux issues lint                   Check all issues for formatting problems
   crux issues lint 239               Check single issue #239
   crux issues create "Add validation rule for X" --label=tooling \\

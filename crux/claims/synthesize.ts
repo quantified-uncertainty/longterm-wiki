@@ -105,7 +105,12 @@ async function runGapAnalysis(
 
   const raw = await callOpenRouter(GAP_ANALYSIS_SYSTEM, userPrompt, { model, maxTokens: 4000 });
   const cleaned = stripCodeFences(raw);
-  const parsed = parseJsonWithRepair(cleaned);
+  interface GapAnalysisResult {
+    gaps?: { claimId: number; importance: string; reason: string }[];
+    contradictions?: { claimId: number; pageExcerpt: string; explanation: string }[];
+    suggestions?: string[];
+  }
+  const parsed = parseJsonWithRepair<GapAnalysisResult>(cleaned);
 
   return {
     gaps: Array.isArray(parsed.gaps) ? parsed.gaps : [],

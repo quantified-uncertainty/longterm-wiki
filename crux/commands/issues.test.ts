@@ -25,6 +25,22 @@ vi.mock('child_process', () => ({
   execSync: vi.fn(() => 'claude/test-branch-ABC'),
 }));
 
+// Mock fs to prevent rate-limiting file I/O from interfering with tests
+vi.mock('fs', async () => {
+  const actual = await vi.importActual<typeof import('fs')>('fs');
+  return {
+    ...actual,
+    existsSync: vi.fn((p: string) => {
+      if (String(p).includes('issue-creates.json')) return false;
+      return actual.existsSync(p);
+    }),
+    writeFileSync: vi.fn((p: string, ...args: unknown[]) => {
+      if (String(p).includes('issue-creates.json')) return;
+      return (actual.writeFileSync as Function)(p, ...args);
+    }),
+  };
+});
+
 import { commands, scoreIssue, isBlocked, findPotentialDuplicates, extractModel, checkIssueSections, buildIssueBody } from './issues.ts';
 import * as githubLib from '../lib/github.ts';
 

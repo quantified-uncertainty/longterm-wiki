@@ -60,6 +60,13 @@ pnpm crux fix markdown           # Auto-fix list formatting, bold labels
 pnpm crux content create "Title" --tier=standard
 pnpm crux content improve <id> --tier=standard --apply
 
+# GitHub issue management (proactive filing + tracking)
+pnpm crux issues search "topic"  # Check if issue exists before filing
+pnpm crux issues create "Title" --model=haiku --criteria="a|b"
+pnpm crux issues comment <N> "Additional context..."
+pnpm crux issues start <N>      # Signal work start
+pnpm crux issues done <N> --pr=URL  # Signal completion
+
 # Querying (use instead of grepping YAML files)
 pnpm crux query search "topic"   # Full-text search
 pnpm crux query entity <id>      # Entity data
@@ -164,6 +171,7 @@ For non-trivial changes (>5 files or >300 lines), run `/review-pr` before shippi
 - **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts` — check existing section semantics before adding pages
 - **Internal dashboards**: For features with data/status over time, create `/internal/<name>` pages following patterns in `apps/web/src/app/internal/`
 - **GitHub API**: Use `crux issues/pr/ci/epic` commands for writes. Use MCP GitHub tools for ad-hoc reads. Never raw `curl`.
+- **Proactive issue filing**: When you encounter bugs, tech debt, or improvements you can't fix in the current session, file a GitHub issue. Always search first (`crux issues search "topic"`) to avoid duplicates. If a match exists, add a comment instead. See `.claude/rules/proactive-github-filing.md`.
 - **Epics**: Use `crux epic` for tracking multi-issue work. For epics needing detailed coordination (decision logs, sprint plans, status tracking), create an epic wiki page using the convention in `content/docs/internal/epic-page-conventions.mdx` and add an `<EpicTracker issues={[...]} />` component. See E897 (claims roadmap) for a working example. Individual tasks stay as Issues.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
 - **Hono RPC**: Mandatory for all new wiki-server routes; convert existing routes when modifying them. See `.claude/rules/wiki-server-rpc-migration.md`.
@@ -183,5 +191,6 @@ Rules enforced by gate checks and PR review. See [#1246](https://github.com/quan
 
 - `.claude/rules/agent-session-workflow.md` — Session start/end workflow
 - `.claude/rules/github-issue-tracking.md` — Issue tracking with `crux issues`
+- `.claude/rules/proactive-github-filing.md` — When/how to file issues, comments, and discussions
 - `.claude/rules/pr-review-guidelines.md` — PR review and ship process
 - `.claude/rules/session-logging.md` — Session log format and storage

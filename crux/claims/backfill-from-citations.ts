@@ -23,7 +23,7 @@ import {
 } from '../lib/wiki-server/claims.ts';
 import { linkCitationsToClaimsBatch } from '../lib/wiki-server/citations.ts';
 import { isClaimDuplicate, claimTypeToCategory, type ClaimTypeValue } from '../lib/claim-utils.ts';
-import type { ClaimVerdict } from '../../../apps/wiki-server/src/api-types.ts';
+type ClaimVerdict = 'verified' | 'unsupported' | 'disputed' | 'unverified';
 
 // ---------------------------------------------------------------------------
 // Types
