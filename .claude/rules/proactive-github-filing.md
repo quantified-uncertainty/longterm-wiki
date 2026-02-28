@@ -34,143 +34,34 @@ File a GitHub issue when you encounter any of the following during normal work:
 **This is mandatory.** Before creating any issue, check if it already exists:
 
 ```bash
-# Search open issues by keyword
 pnpm crux issues search "your topic here"
-
-# Also check closed issues (maybe it was already fixed)
-pnpm crux issues search "your topic here" --closed
+pnpm crux issues search "your topic here" --closed   # also check resolved issues
 ```
 
-Based on the search results:
+- **Match found (open)** → Add a comment: `pnpm crux issues comment <N> "your finding"`
+- **Match found (closed)** → Check if the fix resolved your concern. If not, file a new issue referencing it.
+- **No match** → File a new issue
 
-| Result | Action |
-|--------|--------|
-| **Exact match (open)** | Add a comment to the existing issue with your new context/findings |
-| **Similar match (open)** | Read the issue. If it covers your concern, add a comment. If it's adjacent but different, file a new issue and reference the related one with `Related: #N` |
-| **Match is closed** | Check if the fix actually resolved your concern. If not, file a new issue referencing the closed one: "Follow-up to #N — the original fix didn't address X" |
-| **No matches** | File a new issue |
-
-## How to File an Issue
-
-Always use the `crux issues create` command — never raw curl:
+## How to File
 
 ```bash
 pnpm crux issues create "Descriptive title" \
   --problem="What's wrong and why it matters" \
   --model=haiku \
   --criteria="Fix applied|Tests pass|CI green" \
-  --label=enhancement \
-  --cost="<$1"
+  --label=enhancement
 ```
 
-For longer problem descriptions, use `--problem-file` to avoid shell expansion issues:
+For longer descriptions, use `--problem-file=/tmp/problem.md`. Run `crux issues create --help` for full options.
 
-```bash
-cat >| /tmp/issue-problem.md <<'EOF'
-The `gate.ts` validation runs all validators even when only MDX files changed.
-This wastes ~4 minutes on TypeScript checks that can't be affected by content edits.
+**File issues immediately when you notice them** — don't defer. The search + create flow takes under 30 seconds. Then continue your primary work.
 
-**Current behavior:** Full gate takes ~5 min regardless of change scope.
-**Expected behavior:** Content-only changes should only run content validators (~15s).
+## Guardrails
 
-Found during session on branch `claude/fix-escaping-xyz`.
-EOF
+- **Rate limited**: `crux issues create` enforces a daily cap (5/day). This is intentional — if you're hitting the limit, you're filing too many.
+- **Agent-labeled**: All agent-filed issues are auto-labeled `filed-by-agent` for tracking.
+- **Volume target**: 0-2 issues per session is normal. If you're finding 10+ problems, file the top 2-3 and batch the rest into one umbrella issue.
 
-pnpm crux issues create "Gate check should skip irrelevant validators for content-only changes" \
-  --problem-file=/tmp/issue-problem.md \
-  --model=sonnet \
-  --criteria="Scope detection works|Content-only gate runs in <30s|Full gate still works" \
-  --label=tooling,enhancement \
-  --cost="~$3-5"
-```
+## GitHub Discussions
 
-### Required fields
-
-- **Title**: Specific and actionable ("X doesn't handle Y" not "X is broken")
-- **`--problem`**: What's wrong, with concrete details (file paths, error messages, reproduction steps)
-- **`--model`**: Which AI model should tackle this (haiku for small/simple, sonnet for moderate, opus for complex)
-- **`--criteria`**: Pipe-separated acceptance criteria — how will we know it's done?
-
-### Recommended fields
-
-- **`--label`**: Use existing labels (`bug`, `enhancement`, `tooling`, `content`, `documentation`)
-- **`--cost`**: Estimated AI cost to fix
-- **`--fix`**: If you have a proposed approach, include it
-
-## Adding Comments to Existing Issues
-
-When you find an issue that's related to something you encountered, add useful context:
-
-```bash
-pnpm crux issues comment <N> "Found another instance of this in \`crux/commands/validate.ts:142\` — the same pattern causes failures when the YAML has trailing whitespace."
-
-# For longer comments, use --body-file to avoid shell expansion issues:
-pnpm crux issues comment <N> --body-file=/tmp/comment.md
-```
-
-The command validates that the issue exists, rejects PRs, and appends session attribution (branch name) automatically.
-
-Good comments include:
-- New reproduction steps or failure modes you discovered
-- Additional affected files or code paths
-- Workarounds you used
-- Priority adjustment suggestions ("This is more urgent than P3 — it affects every content session")
-
-## When to Use GitHub Discussions Instead
-
-GitHub Discussions are better than Issues for **open-ended topics** that don't have a clear fix:
-
-| Use Discussions for | Use Issues for |
-|---------------------|----------------|
-| "Should we restructure the entity type hierarchy?" | "Entity type X is missing from the canonical list" |
-| "What's our strategy for handling deprecated pages?" | "Page Y has `evergreen: false` but is still in the update schedule" |
-| "Architectural question: should facts be stored in YAML or DB?" | "Fact X has wrong value in YAML" |
-| "Pattern we should adopt across the codebase" | "File Z doesn't follow the established pattern" |
-| Cross-cutting observations from multiple sessions | Single concrete bug or improvement |
-
-To create a discussion, use the `crux epic create` command (which creates GitHub Discussions under the hood):
-
-```bash
-pnpm crux epic create "Should we migrate all internal dashboards to server components?" \
-  --body="During sessions E912 and E913, I noticed that all dashboards use client-side data fetching..."
-```
-
-**Note:** `crux epic create` creates GitHub Discussions, which are the right tool for open-ended topics even when they aren't traditional "epics." Use a descriptive title that frames the question rather than implying a decision has been made.
-
-## Integration with Session Workflow
-
-### During a session
-
-**File issues immediately when you notice them** — don't defer to "later" because you will forget. The search + create flow takes under 30 seconds:
-
-1. **Quick check**: `pnpm crux issues search "topic"`
-2. **If no match**: File the issue right now while context is fresh
-3. **If match exists**: `pnpm crux issues comment <N> "your finding"`
-4. **Continue your primary work** — don't get sidetracked fixing the newly filed issue
-
-### At session end
-
-The `/agent-session-ready-PR` workflow asks about follow-up issues filed. List any issues you created during the session — they'll be included in the session log and PR description.
-
-### In maintenance sweeps
-
-The `/maintain` command generates a report that may surface problems. **File issues for P3+ items too large to fix in the current sweep** rather than letting them disappear. This is a key output of maintenance — converting discovered problems into tracked work items.
-
-## Labels to Use
-
-| Label | When to use |
-|-------|-------------|
-| `bug` | Something is broken |
-| `enhancement` | Improvement to existing feature |
-| `tooling` | CLI, scripts, build system, validation |
-| `content` | Wiki page content issues |
-| `documentation` | Missing or wrong docs |
-| `P0` / `P1` / `P2` / `P3` | Priority (use your judgment) |
-| `effort:low` / `effort:high` | Estimated effort |
-| `model:haiku` / `model:sonnet` / `model:opus` | Applied automatically by `--model` flag |
-
-## Volume Guidelines
-
-- **Don't flood the tracker.** 1-3 issues per session is typical. If you're finding 10+ problems, file the top 3-5 most important ones and mention the rest in a single umbrella issue.
-- **Quality over quantity.** A well-described issue with clear acceptance criteria is worth more than five vague ones.
-- **Batch related concerns.** If you find 4 similar escaping problems across different validators, file one issue covering all of them rather than four separate issues.
+Use `crux epic create` for **open-ended questions** that don't have a clear fix ("Should we restructure X?", "What's our strategy for Y?"). Issues are for concrete actionable tasks; discussions are for decisions that need human input.

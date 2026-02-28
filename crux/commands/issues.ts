@@ -15,7 +15,8 @@
  *   crux issues close <N> [--reason] Close an issue with an optional comment
  */
 
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join, dirname } from 'path';
 import { createLogger, type Colors } from '../lib/output.ts';
 import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
@@ -645,11 +646,55 @@ function buildIssueBody(opts: {
   return sections.join('\n\n');
 }
 
+// ---------------------------------------------------------------------------
+// Issue creation rate limiting
+// ---------------------------------------------------------------------------
+
+const DAILY_CREATE_LIMIT = 5;
+const RATE_LIMIT_FILE = join(dirname(new URL(import.meta.url).pathname), '../../.claude/issue-creates.json');
+
+interface RateLimitRecord {
+  timestamps: string[]; // ISO date strings of issue creation times
+}
+
+/**
+ * Check how many issues have been created today (in UTC). Returns the count.
+ */
+function getCreatestoday(): number {
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    if (!existsSync(RATE_LIMIT_FILE)) return 0;
+    const data: RateLimitRecord = JSON.parse(readFileSync(RATE_LIMIT_FILE, 'utf-8'));
+    return data.timestamps.filter(t => t.startsWith(today)).length;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Record that an issue was just created.
+ */
+function recordCreate(): void {
+  const now = new Date().toISOString();
+  const today = now.slice(0, 10);
+  let data: RateLimitRecord = { timestamps: [] };
+  try {
+    if (existsSync(RATE_LIMIT_FILE)) {
+      data = JSON.parse(readFileSync(RATE_LIMIT_FILE, 'utf-8'));
+    }
+  } catch { /* start fresh */ }
+  // Keep only timestamps from the last 7 days (self-cleaning)
+  const cutoff = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+  data.timestamps = data.timestamps.filter(t => t.slice(0, 10) >= cutoff);
+  data.timestamps.push(now);
+  writeFileSync(RATE_LIMIT_FILE, JSON.stringify(data, null, 2) + '\n');
+}
+
 /**
  * Create a new GitHub issue.
  */
 async function create(args: string[], options: CommandOptions): Promise<CommandResult> {
-const log = createLogger(options.ci);
+  const log = createLogger(options.ci);
   const c = log.colors;
 
   const title = args[0];
@@ -658,6 +703,20 @@ const log = createLogger(options.ci);
       output: `${c.red}Usage: crux issues create <title> --model=haiku|sonnet|opus --criteria="item1|item2" [--label=X,Y] [--problem="..."] [--fix="..."] [--depends=N,M] [--cost="~$2-4"] [--draft]${c.reset}\n`,
       exitCode: 1,
     };
+  }
+
+  // Rate limit: max DAILY_CREATE_LIMIT issues per day (prevents tracker flood)
+  if (!options['no-limit']) {
+    const todayCount = getCreatestoday();
+    if (todayCount >= DAILY_CREATE_LIMIT) {
+      return {
+        output:
+          `${c.red}Daily issue creation limit reached (${DAILY_CREATE_LIMIT}/day).${c.reset}\n` +
+          `${c.dim}You've created ${todayCount} issues today. This limit prevents tracker flood.\n` +
+          `If this is genuinely important, use --no-limit to override.${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
   }
 
   const labels = options.label
@@ -739,14 +798,29 @@ const log = createLogger(options.ci);
     },
   });
 
+  // Record creation for rate limiting (non-fatal — don't break create if file write fails)
+  try { recordCreate(); } catch { /* ignore — rate limiting is advisory */ }
+
   // Apply model label if --model was specified
   if (options.model) {
     const modelName = (options.model as string).toLowerCase() as ModelName;
     await applyModelLabel(issue.number, modelName, labels);
   }
 
+  // Apply filed-by-agent label for tracking agent-originated issues
+  try {
+    await githubApi(`/repos/${REPO}/issues/${issue.number}/labels`, {
+      method: 'POST',
+      body: { labels: ['filed-by-agent'] },
+    });
+  } catch { /* non-fatal — label might not exist yet */ }
+
   let output = '';
+  const todayCount = getCreatestoday();
   output += `${c.green}✓${c.reset} Created issue #${issue.number}: ${issue.title}\n`;
+  if (todayCount >= DAILY_CREATE_LIMIT - 1) {
+    output += `  ${c.yellow}⚠ ${todayCount}/${DAILY_CREATE_LIMIT} daily issue limit used${c.reset}\n`;
+  }
   output += `  ${c.cyan}${issue.html_url}${c.reset}\n`;
   const appliedLabels = options.model ? [...labels, `${MODEL_LABEL_PREFIX}${(options.model as string).toLowerCase()}`] : labels;
   if (appliedLabels.length > 0) {
@@ -1180,20 +1254,46 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
   output += ` ${c.dim}(tokens: ${[...queryTokens].join(', ')})${c.reset}\n`;
 
   if (matches.length === 0) {
-    output += `\n${c.green}No matching issues found.${c.reset} Safe to file a new issue.\n`;
+    output += `\n${c.yellow}No keyword matches found.${c.reset}\n`;
+    output += `${c.dim}This search is keyword-based and may miss issues phrased differently.\n`;
+    output += `If your topic is specific, also browse: crux issues list${c.reset}\n`;
     if (!includeClosed) {
       output += `${c.dim}Tip: Use --closed to also search closed issues.${c.reset}\n`;
     }
   } else {
-    output += `\n${c.yellow}Found ${matches.length} potential match(es):${c.reset}\n\n`;
-    for (const m of matches.slice(0, 15)) {
-      const stateTag = m.state === 'closed' ? `${c.dim}[closed]${c.reset} ` : '';
-      const pct = `${(m.score * 100).toFixed(0)}%`;
-      output += `  ${c.cyan}#${String(m.number).padEnd(5)}${c.reset} ${stateTag}${m.title}\n`;
-      output += `    ${c.dim}Match: ${pct} — ${m.url}${c.reset}\n`;
+    // Classify match quality
+    const strongMatches = matches.filter(m => m.score >= 0.6);
+    const weakMatches = matches.filter(m => m.score < 0.6);
+
+    if (strongMatches.length > 0) {
+      output += `\n${c.yellow}Found ${strongMatches.length} likely match(es):${c.reset}\n\n`;
+      for (const m of strongMatches.slice(0, 10)) {
+        const stateTag = m.state === 'closed' ? `${c.dim}[closed]${c.reset} ` : '';
+        const pct = `${(m.score * 100).toFixed(0)}%`;
+        output += `  ${c.cyan}#${String(m.number).padEnd(5)}${c.reset} ${stateTag}${m.title}\n`;
+        output += `    ${c.dim}Match: ${pct} — ${m.url}${c.reset}\n`;
+      }
+      output += `\n${c.bold}Check these before filing.${c.reset} Add a comment to an existing issue if it covers your concern.\n`;
     }
-    output += `\n${c.bold}Recommendation:${c.reset} Review matching issues before filing a new one.\n`;
-    output += `${c.dim}If your concern is covered, add a comment to the existing issue instead.${c.reset}\n`;
+
+    if (weakMatches.length > 0) {
+      if (strongMatches.length > 0) {
+        output += `\n${c.dim}Also loosely related (${weakMatches.length}):${c.reset}\n`;
+      } else {
+        output += `\n${c.dim}Loosely related (low-confidence keyword overlap):${c.reset}\n`;
+      }
+      for (const m of weakMatches.slice(0, 5)) {
+        const stateTag = m.state === 'closed' ? `[closed] ` : '';
+        output += `  ${c.dim}#${String(m.number).padEnd(5)} ${stateTag}${m.title} (${(m.score * 100).toFixed(0)}%)${c.reset}\n`;
+      }
+      if (weakMatches.length > 5) {
+        output += `  ${c.dim}...and ${weakMatches.length - 5} more${c.reset}\n`;
+      }
+      if (strongMatches.length === 0) {
+        output += `\n${c.dim}These are weak keyword matches. Your issue may still be novel —\n`;
+        output += `skim the titles above, but don't skip filing just because of low-confidence matches.${c.reset}\n`;
+      }
+    }
   }
 
   if (options.json) {
