@@ -3,6 +3,7 @@ import { count } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
 import { entityIds, wikiPages, entities, facts } from "../schema.js";
 import { resolveScopes, getKeyConfig, type ApiScope } from "../auth.js";
+import { logger } from "../logger.js";
 
 const startTime = Date.now();
 
@@ -44,7 +45,7 @@ const healthApp = new Hono()
       nextId = isCalled ? lastValue + 1 : lastValue;
     } catch (err) {
       dbStatus = "error";
-      console.error("Health check DB error:", err);
+      logger.error({ err }, "Health check DB error");
     }
 
     return c.json({

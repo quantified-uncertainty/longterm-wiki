@@ -1,6 +1,7 @@
 import { appendFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
 import { getPricing } from "./pricing.js";
+import { logger } from "./log.js";
 
 const LOGS_DIR = join(process.cwd(), "logs");
 const LOG_FILE = join(LOGS_DIR, "queries.jsonl");
@@ -43,8 +44,27 @@ export function calculateCost(
 }
 
 export function logQuery(log: QueryLog): void {
+  // Write to local JSONL file (preserves CLI log viewer)
   ensureLogsDir();
   appendFileSync(LOG_FILE, JSON.stringify(log) + "\n");
+
+  // Also emit structured log to stdout (picked up by Promtail -> Loki)
+  const level = log.success ? "info" : "error";
+  logger[level]({
+    question: log.question,
+    userId: log.userId,
+    userName: log.userName,
+    responseLength: log.responseLength,
+    durationMs: log.durationMs,
+    toolCalls: log.toolCalls.length,
+    inputTokens: log.inputTokens,
+    outputTokens: log.outputTokens,
+    cacheReadTokens: log.cacheReadTokens,
+    model: log.model,
+    estimatedCostUsd: log.estimatedCostUsd,
+    success: log.success,
+    ...(log.error ? { error: log.error } : {}),
+  }, "query");
 }
 
 export function formatCost(costUsd: number): string {

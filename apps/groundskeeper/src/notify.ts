@@ -1,4 +1,5 @@
 import type { Config } from "./config.js";
+import { logger } from "./logger.js";
 
 export async function sendDiscordNotification(
   config: Config,
@@ -14,11 +15,12 @@ export async function sendDiscordNotification(
     });
 
     if (!response.ok) {
-      console.error(
-        `Discord webhook failed: ${response.status} ${response.statusText}`
+      logger.error(
+        { status: response.status, statusText: response.statusText },
+        "Discord webhook failed"
       );
     }
   } catch (error) {
-    console.error("Failed to send Discord notification:", error);
+    logger.error({ err: error }, "Failed to send Discord notification");
   }
 }

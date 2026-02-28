@@ -988,6 +988,39 @@ export const groundskeeperRuns = pgTable(
   ]
 );
 
+export const serviceHealthIncidents = pgTable(
+  "service_health_incidents",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    service: text("service").notNull(),
+    severity: text("severity").notNull(),
+    status: text("status").notNull().default("open"),
+    title: text("title").notNull(),
+    detail: text("detail"),
+    detectedAt: timestamp("detected_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    resolvedBy: text("resolved_by"),
+    checkSource: text("check_source"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    githubIssueNumber: integer("github_issue_number"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_shi_service").on(table.service),
+    index("idx_shi_status").on(table.status),
+    index("idx_shi_severity").on(table.severity),
+    index("idx_shi_detected_at").on(table.detectedAt),
+    index("idx_shi_service_status").on(table.service, table.status),
+  ]
+);
+
 export const pageCitations = pgTable(
   "page_citations",
   {

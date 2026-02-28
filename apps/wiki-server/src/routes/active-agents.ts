@@ -12,6 +12,7 @@ import {
   RegisterAgentSchema,
   UpdateAgentSchema,
 } from "../api-types.js";
+import { logger } from "../logger.js";
 
 /** Default minutes before an agent without heartbeat is marked stale. */
 const STALE_TIMEOUT_MINUTES = 30;
@@ -196,9 +197,8 @@ const activeAgentsApp = new Hono()
   // ---- POST /sweep (mark stale agents) ----
   .post("/sweep", async (c) => {
     const body = await parseJsonBody(c).catch(() => ({}));
-    const timeoutMinutes = Number(
-      (body as Record<string, unknown>)?.timeoutMinutes || STALE_TIMEOUT_MINUTES
-    );
+    const raw = Number((body as Record<string, unknown>)?.timeoutMinutes || STALE_TIMEOUT_MINUTES);
+    const timeoutMinutes = Math.max(5, Math.min(Number.isFinite(raw) ? raw : STALE_TIMEOUT_MINUTES, 43200));
 
     const cutoff = new Date(Date.now() - timeoutMinutes * 60 * 1000);
     const db = getDrizzleDb();
@@ -214,7 +214,7 @@ const activeAgentsApp = new Hono()
       )
       .returning({ id: activeAgents.id, sessionId: activeAgents.sessionId });
 
-    console.log(`[active-agents] Sweep: marked ${stale.length} agents as stale (cutoff: ${cutoff.toISOString()})`);
+    logger.info({ swept: stale.length, cutoff: cutoff.toISOString() }, "Sweep: marked agents as stale");
 
     return c.json({ swept: stale.length, agents: stale });
   });

@@ -5,27 +5,27 @@ import {
   QueryLog,
   logQuery,
   calculateCost,
-  formatLogSummary,
   ensureLogsDir,
 } from "./logger.js";
+import { logger } from "./log.js";
 
 if (!process.env.DISCORD_TOKEN) {
-  console.error("Missing DISCORD_TOKEN in environment");
+  logger.fatal("Missing DISCORD_TOKEN in environment");
   process.exit(1);
 }
 
 if (!process.env.ANTHROPIC_API_KEY) {
-  console.error("Missing ANTHROPIC_API_KEY in environment");
+  logger.fatal("Missing ANTHROPIC_API_KEY in environment");
   process.exit(1);
 }
 
 if (!process.env.LONGTERMWIKI_SERVER_URL) {
-  console.error("Missing LONGTERMWIKI_SERVER_URL in environment");
+  logger.fatal("Missing LONGTERMWIKI_SERVER_URL in environment");
   process.exit(1);
 }
 
 if (!process.env.LONGTERMWIKI_SERVER_API_KEY) {
-  console.error("Missing LONGTERMWIKI_SERVER_API_KEY in environment");
+  logger.fatal("Missing LONGTERMWIKI_SERVER_API_KEY in environment");
   process.exit(1);
 }
 
@@ -46,7 +46,7 @@ const client = new Client({
 });
 
 client.once(Events.ClientReady, (c) => {
-  console.log(`Bot is ready! Logged in as ${c.user.tag}`);
+  logger.info({ tag: c.user.tag }, "Bot is ready!");
   ensureLogsDir();
 });
 
@@ -89,9 +89,7 @@ client.on(Events.MessageCreate, async (message) => {
     return;
   }
 
-  console.log(`\n${"=".repeat(60)}`);
-  console.log(`Question from ${message.author.tag}: ${question}`);
-  console.log("=".repeat(60));
+  logger.info({ user: message.author.tag, question }, "Received question");
 
   // Record this user's request time and increment active count
   userLastRequest.set(message.author.id, now);
@@ -102,7 +100,7 @@ client.on(Events.MessageCreate, async (message) => {
   const startTime = Date.now();
 
   try {
-    console.log("Starting Claude Agent SDK query (60s timeout)...");
+    logger.info("Starting Claude Agent SDK query (60s timeout)...");
     const queryResult = await runQuery(question);
     const durationMs = Date.now() - startTime;
 
@@ -131,7 +129,6 @@ client.on(Events.MessageCreate, async (message) => {
     };
 
     logQuery(queryLog);
-    console.log("\n" + formatLogSummary(queryLog));
 
     let result = queryResult.result;
     if (result.length > 1900) {
@@ -161,7 +158,7 @@ client.on(Events.MessageCreate, async (message) => {
       error: errorMessage,
     });
 
-    console.error("Error querying Claude:", error);
+    logger.error({ err: error }, "Error querying Claude");
     await message.reply(`Sorry, I encountered an error: ${errorMessage}`);
   } finally {
     activeRequests--;

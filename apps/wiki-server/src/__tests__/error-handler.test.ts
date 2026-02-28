@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { createApp } from "../app.js";
+import { logger } from "../logger.js";
 
 /**
  * Tests for the global error handler in app.ts.
@@ -74,14 +75,14 @@ describe("Global error handler", () => {
     expect(res.status).toBe(403);
   });
 
-  it("logs unhandled errors to console.error", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  it("logs unhandled errors via logger.error", async () => {
+    const logSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const app = createTestApp();
     await app.request("/api/test-error");
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Unhandled error:",
-      expect.any(Error)
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ err: expect.any(Error), path: "/api/test-error" }),
+      "Unhandled error"
     );
   });
 });

@@ -30,6 +30,7 @@ import type { FactsRoute } from './routes/facts.js';
 import type { EntitiesRoute } from './routes/entities.js';
 import type { PagesRoute } from './routes/pages.js';
 import type { GroundskeeperRunsRoute } from './routes/groundskeeper-runs.js';
+import type { MonitoringRoute } from './routes/monitoring.js';
 
 // ---------------------------------------------------------------------------
 // RPC client phantom types (compile-time only)
@@ -50,6 +51,7 @@ type FactsRpc = ReturnType<typeof hc<FactsRoute>>;
 type EntitiesRpc = ReturnType<typeof hc<EntitiesRoute>>;
 type PagesRpc = ReturnType<typeof hc<PagesRoute>>;
 type GroundskeeperRunsRpc = ReturnType<typeof hc<GroundskeeperRunsRoute>>;
+type MonitoringRpc = ReturnType<typeof hc<MonitoringRoute>>;
 
 // ---------------------------------------------------------------------------
 // Claims
@@ -274,3 +276,22 @@ export type GroundskeeperRunRow = GroundskeeperRunsListResult['runs'][number];
 
 /** Groundskeeper stats response. */
 export type GroundskeeperStatsResult = InferResponseType<GroundskeeperRunsRpc['stats']['$get'], 200>;
+
+// ---------------------------------------------------------------------------
+// Monitoring / System Health
+// ---------------------------------------------------------------------------
+
+/** Aggregated system health status response. */
+export type MonitoringStatusResult = InferResponseType<MonitoringRpc['status']['$get'], 200>;
+
+/** Service status entry from the status endpoint. */
+export type ServiceStatusEntry = MonitoringStatusResult['services'][number];
+
+/** Recent incident from the status endpoint. */
+export type RecentIncident = MonitoringStatusResult['recentIncidents'][number];
+
+/** Incidents list response. */
+export type MonitoringIncidentsResult = InferResponseType<MonitoringRpc['incidents']['$get'], 200>;
+
+/** A single incident row from the incidents list. */
+export type IncidentRow = MonitoringIncidentsResult['incidents'][number];

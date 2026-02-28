@@ -22,6 +22,7 @@ import {
   type ClaimPageReferenceRow,
 } from "../api-types.js";
 import { TRIGRAM_SIMILARITY_THRESHOLD } from "../search-utils.js";
+import { logger } from "../logger.js";
 
 /** Pre-computed schema for single page-reference insertion (omits claimId from URL param). */
 const PageRefInsertBodySchema = ClaimPageReferenceInsertSchema.omit({ claimId: true });
@@ -466,14 +467,11 @@ const claimsApp = new Hono()
     if (!parsed.success) return validationError(c, parsed.error.message);
 
     // Audit log: record bulk deletion before executing it
-    console.log(
-      JSON.stringify({
-        audit: "bulk-claim-delete",
-        timestamp: new Date().toISOString(),
-        count: parsed.data.ids.length,
-        claimIds: parsed.data.ids,
-      })
-    );
+    logger.info({
+      audit: "bulk-claim-delete",
+      count: parsed.data.ids.length,
+      claimIds: parsed.data.ids,
+    }, "Bulk claim delete");
 
     const db = getDrizzleDb();
     const deleted = await db

@@ -23,6 +23,8 @@ import {
   LinkCitationClaimSchema,
   LinkCitationsClaimsBatchSchema,
 } from "../api-types.js";
+import { logger } from "../logger.js";
+
 // ---- Constants ----
 
 const BROKEN_SCORE_THRESHOLD = 0.5;
@@ -32,7 +34,7 @@ const MAX_PAGE_SIZE = 5000;
 // Citation_quotes write endpoints are deprecated. Use claims + claim_sources instead.
 // These endpoints will be removed when the citation_quotes table is dropped (#1311).
 function deprecationWarning(endpoint: string): void {
-  console.warn(`[DEPRECATED] ${endpoint} — use claims API instead. Will be removed in #1311.`);
+  logger.warn({ endpoint }, "Deprecated endpoint — use claims API instead. Will be removed in #1311.");
 }
 
 // ---- Schemas (from shared api-types) ----

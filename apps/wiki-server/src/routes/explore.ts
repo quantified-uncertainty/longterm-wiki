@@ -6,6 +6,7 @@ import {
   buildPrefixTsquery,
   TRIGRAM_SIMILARITY_THRESHOLD,
 } from "../search-utils.js";
+import { logger } from "../logger.js";
 
 type ContentFormat = 'article' | 'table' | 'diagram' | 'index' | 'dashboard';
 
@@ -97,7 +98,7 @@ function parseTags(tagsStr: string | null): string[] {
     const parsed = JSON.parse(tagsStr);
     return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
-    console.error("[explore] parseTags failed:", err instanceof Error ? err.message : String(err));
+    logger.error({ err: err instanceof Error ? err.message : String(err) }, "parseTags failed");
     return [];
   }
 }
@@ -110,7 +111,7 @@ function parseClusters(clustersVal: unknown | null): string[] {
       const parsed = JSON.parse(clustersVal);
       return Array.isArray(parsed) ? parsed : [];
     } catch (err) {
-      console.error("[explore] parseClusters failed:", err instanceof Error ? err.message : String(err));
+      logger.error({ err: err instanceof Error ? err.message : String(err) }, "parseClusters failed");
       return [];
     }
   }

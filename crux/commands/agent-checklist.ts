@@ -37,7 +37,7 @@ import {
   updateAgentSession,
   getAgentSessionByBranch,
 } from '../lib/wiki-server/agent-sessions.ts';
-import { registerAgent } from '../lib/wiki-server/active-agents.ts';
+import { registerAgent, listActiveAgents, updateAgent } from '../lib/wiki-server/active-agents.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -297,6 +297,34 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
         output += `  ${c.cyan}-${c.reset} ${d}\n`;
       }
     }
+
+    // Mark E912 agent session as completed (best-effort)
+    try {
+      const branch = currentBranch();
+      const sessionResult = await getAgentSessionByBranch(branch);
+      if (sessionResult.ok && sessionResult.data.status === 'active') {
+        await updateAgentSession(sessionResult.data.id, { status: 'completed' });
+        output += `${c.dim}Agent session marked completed (E912)${c.reset}\n`;
+      }
+    } catch {
+      // Best-effort — don't block completion on API failure
+    }
+
+    // Mark E925 active agent as completed (best-effort)
+    try {
+      const branch = currentBranch();
+      const agentsResult = await listActiveAgents('active');
+      if (agentsResult.ok) {
+        const myAgent = agentsResult.data.agents.find(a => a.sessionId === branch);
+        if (myAgent) {
+          await updateAgent(myAgent.id, { status: 'completed' });
+          output += `${c.dim}Active agent marked completed (E925)${c.reset}\n`;
+        }
+      }
+    } catch {
+      // Best-effort — don't block completion on API failure
+    }
+
     output += `\n${c.dim}Ready to ship.${c.reset}\n`;
     return { output, exitCode: 0 };
   }
@@ -368,7 +396,7 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
     writeFileSync(CHECKLIST_PATH, result.markdown, 'utf-8');
 
     // Sync updated checklist to DB (best-effort; inner try-catch handles errors)
-    syncChecklistToDb(result.markdown);
+    await syncChecklistToDb(result.markdown);
   }
 
   let output = '';
@@ -456,7 +484,7 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
     writeFileSync(CHECKLIST_PATH, markdown, 'utf-8');
 
     // Sync to DB (best-effort; inner try-catch handles errors)
-    syncChecklistToDb(markdown);
+    await syncChecklistToDb(markdown);
   }
 
   output += `\n${c.green}${passed.length} passed${c.reset}`;
@@ -564,7 +592,7 @@ async function prePushCheck(_args: string[], options: CommandOptions): Promise<C
     const result = checkItems(markdown, ['gate-passes'], 'x');
     markdown = result.markdown;
     writeFileSync(CHECKLIST_PATH, markdown, 'utf-8');
-    syncChecklistToDb(markdown);
+    await syncChecklistToDb(markdown);
     output += `  ${c.green}✓${c.reset} gate-passes (auto-checked — gate passed)\n`;
   }
 

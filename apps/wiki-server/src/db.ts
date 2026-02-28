@@ -4,6 +4,9 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import * as schema from "./schema.js";
+import { logger as rootLogger } from "./logger.js";
+
+const logger = rootLogger.child({ component: "db" });
 
 export type Sql = ReturnType<typeof postgres>;
 
@@ -50,15 +53,15 @@ const __dirname = path.dirname(__filename);
 
 export async function initDb() {
   const db = getDrizzleDb();
-  console.log("[db] Running migrations...");
+  logger.info("Running migrations...");
   const startMs = Date.now();
   try {
     await migrate(db, {
       migrationsFolder: path.resolve(__dirname, "../drizzle"),
     });
-    console.log(`[db] Migrations completed in ${Date.now() - startMs}ms`);
+    logger.info({ durationMs: Date.now() - startMs }, "Migrations completed");
   } catch (err) {
-    console.error("[db] Migration failed:", err);
+    logger.error({ err }, "Migration failed");
     throw err;
   }
 }
