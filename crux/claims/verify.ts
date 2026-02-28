@@ -1,10 +1,10 @@
 /**
  * Claims Verify — verify extracted claims against citation_content full text
  *
- * Reads claims stored in PG for a page, looks up source text from SQLite
- * (local, fast) then PG (cross-machine), and verifies each claim using an LLM.
+ * Reads claims stored in PG for a page, looks up source text from the in-memory
+ * cache (fast) then PG (cross-machine), and verifies each claim using an LLM.
  * Uses the shared resolveSource() from citation-auditor for consistent
- * 3-tier source resolution (sourceCache → SQLite → PG → optional network).
+ * 3-tier source resolution (sourceCache → in-memory cache → PG → optional network).
  *
  * Usage:
  *   pnpm crux claims verify <page-id>
@@ -13,7 +13,7 @@
  *   pnpm crux claims verify <page-id> --dry-run       # report only, no DB writes
  *
  * Requires: OPENROUTER_API_KEY or ANTHROPIC_API_KEY
- * Optional: LONGTERMWIKI_SERVER_URL (for PG fallback when SQLite is empty)
+ * Optional: LONGTERMWIKI_SERVER_URL
  */
 
 import { fileURLToPath } from 'url';

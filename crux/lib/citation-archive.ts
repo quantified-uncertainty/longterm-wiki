@@ -586,13 +586,11 @@ export async function fetchCitationUrl(url: string): Promise<FetchResult> {
 
 /**
  * Store full fetched content in the in-memory session cache.
- * This replaces the SQLite tier — PG is the durable store.
+ * PG is the durable store; this avoids redundant API calls within a session.
  * Best-effort: errors are swallowed so verification isn't blocked.
  */
 function storeCitationContent(
   url: string,
-  _pageId: string,
-  _footnote: number,
   result: FetchResult,
 ) {
   try {
@@ -630,9 +628,7 @@ export function saveFetchResultToPostgres(url: string, result: FetchResult): voi
     pageTitle: result.pageTitle ?? null,
     fullText: text,
     contentLength: result.contentLength,
-  }).catch(() => {
-    // Best-effort — don't fail verification if wiki-server is unavailable
-  });
+  }).catch((e) => console.warn('[citation-archive] PG write failed:', e.message));
 }
 
 /**
@@ -694,7 +690,7 @@ export async function verifyCitationsForPage(
             note: result.error ? `Academic publisher: ${result.error}` : 'Academic publisher — URL accessible',
           };
           // Store whatever content we got from academic publishers
-          storeCitationContent(ext.url, pageId, ext.footnote, result);
+          storeCitationContent(ext.url, result);
           saveFetchResultToPostgres(ext.url, result);
         } else {
           const result = await fetchCitationUrl(ext.url);
@@ -718,7 +714,7 @@ export async function verifyCitationsForPage(
           };
           // Store full HTML + text content in memory cache + PostgreSQL
           if (result.fullHtml || result.fullText) {
-            storeCitationContent(ext.url, pageId, ext.footnote, result);
+            storeCitationContent(ext.url, result);
             saveFetchResultToPostgres(ext.url, result);
           }
         }

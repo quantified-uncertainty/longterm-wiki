@@ -3,7 +3,7 @@
  *
  * Handles registration and fetching of source URLs from research results.
  * Uses resource YAML files for existence checks and local cache files for
- * fetched content (no SQLite dependency).
+ * fetched content.
  */
 
 import fs from 'fs';

@@ -2,7 +2,7 @@
  * Citation Inaccuracy Auto-Fixer
  *
  * Reads flagged citations from the dashboard YAML (for discovery), then
- * enriches each with full source text from SQLite before generating fixes.
+ * enriches each with full source text from the wiki-server API before generating fixes.
  *
  * Usage:
  *   pnpm crux citations fix-inaccuracies                        # Dry run all
@@ -494,7 +494,7 @@ export interface SecondOpinionResult {
 /**
  * Second opinion check using Claude Haiku to reduce false positives.
  * Re-checks flagged citations with a different model; demotes false positives
- * by updating SQLite verdicts.
+ * by updating PostgreSQL verdicts.
  */
 export async function secondOpinionCheck(
   pageId: string,
@@ -694,7 +694,7 @@ export function loadFlaggedCitations(opts: {
 }
 
 // ---------------------------------------------------------------------------
-// SQLite enrichment — pull full source text for better fix generation
+// API enrichment — pull full source text for better fix generation
 // ---------------------------------------------------------------------------
 
 export interface EnrichedFlaggedCitation extends FlaggedCitation {
@@ -832,7 +832,7 @@ function buildUserPrompt(
     }
     parts.push(`Source: ${c.sourceTitle ?? 'unknown'}`);
 
-    // Use full claim text from SQLite when available (YAML version is truncated)
+    // Use full claim text from PostgreSQL when available (YAML version is truncated)
     const claimText = c.fullClaimText || c.claimText;
     parts.push(`\nClaim text: ${claimText}`);
 
@@ -1327,7 +1327,7 @@ async function main() {
 
   const c = getColors(json);
 
-  // Load flagged citations from YAML, then enrich with SQLite source data
+  // Load flagged citations from YAML, then enrich with API source data
   let enriched: EnrichedFlaggedCitation[];
   try {
     const flagged = loadFlaggedCitations({
@@ -1591,7 +1591,7 @@ async function main() {
           process.stdout.write(`  ${pageId}: re-extracting claims... `);
         }
 
-        // Re-extract claims from the updated page to update claim_text in SQLite
+        // Re-extract claims from the updated page to update claim_text in PostgreSQL
         const filePath = findPageFile(pageId);
         if (filePath) {
           const updatedRaw = readFileSync(filePath, 'utf-8');

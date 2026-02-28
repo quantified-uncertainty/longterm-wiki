@@ -103,7 +103,7 @@ function runAuditForPage(pageId: string, apply: boolean, verbose: boolean): numb
   }
 }
 
-// ── Final accuracy check (reads cached results from SQLite) ──────────────────
+// ── Final accuracy check (reads cached results from PostgreSQL) ──────────────
 
 async function getFinalAccuracy(pageId: string): Promise<AccuracyResult | null> {
   const filePath = findPageFile(pageId);
@@ -115,7 +115,7 @@ async function getFinalAccuracy(pageId: string): Promise<AccuracyResult | null> 
 
   if (citations.length === 0) return null;
 
-  // Read cached results (no LLM calls — just reads from SQLite)
+  // Read cached results (no LLM calls — just reads from PostgreSQL)
   return checkAccuracyForPage(pageId, { verbose: false, recheck: false });
 }
 
@@ -266,7 +266,7 @@ export async function runAuditGate(options: {
     // Run the full audit pipeline as a subprocess
     const exitCode = runAuditForPage(pageId, apply, verbose);
 
-    // Get the final accuracy state from SQLite (cached, no LLM calls)
+    // Get the final accuracy state from PostgreSQL (cached, no LLM calls)
     const accuracy = await getFinalAccuracy(pageId);
 
     results.push({

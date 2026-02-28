@@ -416,7 +416,7 @@ export async function resolveSource(
   const cached = sourceCache?.get(url);
   if (cached !== undefined) return cached;
 
-  // Fetch (with caches) if allowed — fetchSource checks SQLite then PG then network
+  // Fetch (with caches) if allowed — fetchSource checks in-memory cache then PG then network
   if (fetchMissing) {
     try {
       return await fetchSource({ url, extractMode: 'full' });

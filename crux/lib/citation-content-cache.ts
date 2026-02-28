@@ -1,8 +1,8 @@
 /**
- * In-Memory Citation Content Cache
+ * Session-local in-memory cache for citation content.
  *
- * Replaces the SQLite citation_content tier. PG (wiki-server) is the
- * durable store; this avoids redundant API calls within a single CLI session.
+ * PG (wiki-server) is the durable store; this avoids redundant API calls
+ * within a single CLI session.
  *
  * The cache is a simple Map keyed by URL with LRU eviction.
  */

@@ -138,13 +138,13 @@ const sessionCache = new Map<string, FetchedSource>();
 const inFlightFetches = new Map<string, Promise<FetchedSource>>();
 
 /** Cumulative eviction counter (for diagnostics). */
-let _evictionCount = 0;
+let evictionCount = 0;
 
 /** Clear the in-memory cache and in-flight map (useful in tests). */
 export function clearSessionCache(): void {
   sessionCache.clear();
   inFlightFetches.clear();
-  _evictionCount = 0;
+  evictionCount = 0;
 }
 
 /** Number of entries in the session cache (for tests and diagnostics). */
@@ -154,7 +154,7 @@ export function sessionCacheSize(): number {
 
 /** Number of LRU evictions since last cache clear (for diagnostics). */
 export function sessionCacheEvictions(): number {
-  return _evictionCount;
+  return evictionCount;
 }
 
 /**
@@ -173,7 +173,7 @@ function sessionCacheSet(url: string, value: FetchedSource): void {
     const oldest = sessionCache.keys().next().value;
     if (oldest !== undefined) {
       sessionCache.delete(oldest);
-      _evictionCount++;
+      evictionCount++;
     }
   }
 }
@@ -508,7 +508,7 @@ function mimeToContentType(mime: string | null): FetchedSourceContentType {
   return 'html';
 }
 
-/** Store fetched content in the in-memory session cache (replaces SQLite tier). */
+/** Store fetched content in the in-memory session cache. */
 function saveToMemoryCache(url: string, title: string, content: string, httpStatus: number, contentType: FetchedSourceContentType = 'html'): void {
   setCachedContent(url, {
     url,
@@ -557,9 +557,7 @@ function saveToPostgres(url: string, title: string, content: string, httpStatus:
     pageTitle: title || null,
     fullText: content,
     contentLength: content.length,
-  }).catch(() => {
-    // Best-effort — don't fail if server unavailable
-  });
+  }).catch((e) => console.warn('[source-fetcher] PG write failed:', e.message));
 }
 
 // ---------------------------------------------------------------------------
@@ -636,7 +634,7 @@ async function _fetchSourceCore(
     return result;
   }
 
-  // ---- 2. In-memory content cache (replaces SQLite tier) ----
+  // ---- 2. In-memory content cache ----
   const memoryCached = getCachedContent(url);
   if (memoryCached?.fullText && memoryCached.fullText.length > 0) {
     // Check TTL — skip stale entries so sources are periodically re-fetched.

@@ -93,7 +93,7 @@ const SCRIPTS = {
   },
   'content-coverage': {
     script: 'citations/citation-content-coverage.ts',
-    description: 'Show citation content coverage stats (SQLite vs PostgreSQL)',
+    description: 'Show citation content coverage stats (PostgreSQL)',
     passthrough: ['json'],
   },
   'register-resources': {
@@ -147,7 +147,7 @@ Examples:
   crux citations normalize-footnotes --fix          Auto-fix to [Title](URL) format
   crux citations normalize-footnotes --fix <id>     Fix one page
   crux citations export-dashboard                  Export data for web dashboard (prefers PG)
-  crux citations export-dashboard --local-only     Force local SQLite only
+  crux citations export-dashboard --local-only     Force local data only (skip wiki-server)
   crux citations backfill-resource-ids               Backfill resource_id for existing quotes
   crux citations backfill-resource-ids --dry-run    Preview matches without writing
   crux citations fix-inaccuracies                   Dry-run fix proposals for all flagged

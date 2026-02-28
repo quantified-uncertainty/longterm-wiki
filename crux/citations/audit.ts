@@ -301,7 +301,7 @@ async function main() {
   }
 
   // ── Step 4: Re-extract + Re-verify ─────────────────────────────────────
-  // After fixing the page, claim_text in SQLite is stale (from Step 1).
+  // After fixing the page, claim_text in PostgreSQL is stale (from Step 1).
   // Re-extract quotes to update claim_text before re-verifying accuracy.
   // Skip re-extract if Step 3c already did it and no further changes were made.
   console.log(`\n${c.bold}Step 4: Re-extract & Re-verify${c.reset}\n`);
