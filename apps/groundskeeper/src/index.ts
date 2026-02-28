@@ -5,6 +5,7 @@ import { sendDiscordNotification } from "./notify.js";
 import { healthCheck } from "./tasks/health-check.js";
 import { resolveConflicts } from "./tasks/resolve-conflicts.js";
 import { codeReview } from "./tasks/code-review.js";
+import { issueResponder } from "./tasks/issue-responder.js";
 
 const config = loadConfig();
 
@@ -25,6 +26,10 @@ console.log(
       codeReview: {
         enabled: config.tasks.codeReview.enabled,
         schedule: config.tasks.codeReview.schedule,
+      },
+      issueResponder: {
+        enabled: config.tasks.issueResponder.enabled,
+        schedule: config.tasks.issueResponder.schedule,
       },
     },
   })
@@ -53,6 +58,14 @@ registerTask(
   config.tasks.codeReview.schedule,
   config.tasks.codeReview.enabled,
   () => codeReview(config)
+);
+
+registerTask(
+  config,
+  "issue-responder",
+  config.tasks.issueResponder.schedule,
+  config.tasks.issueResponder.enabled,
+  () => issueResponder(config)
 );
 
 await sendDiscordNotification(
