@@ -54,9 +54,7 @@ async function main(): Promise<void> {
       console.log(JSON.stringify({ error: result.error }, null, 2));
     } else {
       console.error(`\x1b[31m✗ Failed to run claims audit: ${result.error}\x1b[0m`);
-      if (result.status) {
-        console.error(`  HTTP ${result.status}`);
-      }
+      console.error(`  ${result.message}`);
     }
     process.exit(1);
   }
