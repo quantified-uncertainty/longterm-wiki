@@ -679,7 +679,7 @@ async function main() {
       section: claim.section,
       footnoteRefs: claim.footnoteRefs.length > 0 ? claim.footnoteRefs.join(',') : null,
       // Phase 2 fields (migration 0029)
-      claimMode: claim.claimMode,
+      claimMode: claim.claimMode as InsertClaimItem['claimMode'],
       attributedTo: claim.attributedTo ?? null,
       asOf: claim.asOf ?? null,
       measure: claim.measure ?? null,
@@ -694,7 +694,7 @@ async function main() {
       valueDate: claim.valueDate ?? null,
       qualifiers: claim.qualifiers ?? null,
       // Reasoning traces (migration 0034)
-      inferenceType: claim.inferenceType ?? null,
+      inferenceType: (claim.inferenceType ?? null) as InsertClaimItem['inferenceType'],
     };
     });
 
