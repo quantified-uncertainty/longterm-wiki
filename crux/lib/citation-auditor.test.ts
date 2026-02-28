@@ -13,6 +13,9 @@ import {
   parseVerifierResponse,
   parseBatchVerifierResponse,
   auditCitations,
+  inferSourceContext,
+  detectUnsourcedTableCells,
+  NUMERIC_CLAIM_PATTERN,
   type AuditRequest,
   type SourceCache,
   type ClaimMap,
@@ -708,5 +711,363 @@ First claim.[^1] Second claim.[^2]
     expect(result.summary.verified).toBe(3);
     // All 3 LLM calls should have been made (one per distinct URL)
     expect(timestamps).toHaveLength(3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// inferSourceContext (#1271)
+// ---------------------------------------------------------------------------
+
+describe('inferSourceContext', () => {
+  it('returns "table" when footnote appears in a table row', () => {
+    const body = `Some text.
+
+| Name | Value |
+| --- | --- |
+| Org A | 500 employees[^1] |
+
+[^1]: [Source](https://example.com)`;
+    expect(inferSourceContext(body, '1')).toBe('table');
+  });
+
+  it('returns "list" when footnote appears in an unordered list item', () => {
+    const body = `Some text.
+
+- First item with a claim.[^1]
+- Second item.
+
+[^1]: [Source](https://example.com)`;
+    expect(inferSourceContext(body, '1')).toBe('list');
+  });
+
+  it('returns "list" when footnote appears in an ordered list item', () => {
+    const body = `Some text.
+
+1. First ordered item with claim.[^2]
+2. Second item.
+
+[^2]: [Source](https://example.com)`;
+    expect(inferSourceContext(body, '2')).toBe('list');
+  });
+
+  it('returns "list" for * bullet list items', () => {
+    const body = `Some text.
+
+* A bullet point claim.[^3]
+
+[^3]: [Source](https://example.com)`;
+    expect(inferSourceContext(body, '3')).toBe('list');
+  });
+
+  it('returns "body" when footnote appears in regular paragraph text', () => {
+    const body = `This is a regular paragraph with a claim.[^1]
+
+[^1]: [Source](https://example.com)`;
+    expect(inferSourceContext(body, '1')).toBe('body');
+  });
+
+  it('returns "body" when footnote reference is not found', () => {
+    const body = `This is a paragraph without footnotes.`;
+    expect(inferSourceContext(body, '99')).toBe('body');
+  });
+
+  it('does not match footnote definition lines (only inline references)', () => {
+    // The definition line [^1]: ... should not be matched
+    const body = `[^1]: [Source](https://example.com)`;
+    expect(inferSourceContext(body, '1')).toBe('body');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// detectUnsourcedTableCells (#1271)
+// ---------------------------------------------------------------------------
+
+describe('detectUnsourcedTableCells', () => {
+  it('detects a numeric dollar amount in a table cell without footnote', () => {
+    const body = `Some text.
+
+| Company | Funding |
+| --- | --- |
+| Acme | $50M |`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(1);
+    expect(results[0].cellText).toBe('$50M');
+    expect(results[0].column).toBe('Funding');
+    expect(results[0].row).toBe(1);
+  });
+
+  it('detects percentages without footnotes', () => {
+    const body = `| Metric | Value |
+| --- | --- |
+| Growth | 25% |`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(1);
+    expect(results[0].cellText).toBe('25%');
+  });
+
+  it('detects comma-separated numbers', () => {
+    const body = `| Item | Count |
+| --- | --- |
+| Users | 1,500,000 |`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(1);
+    expect(results[0].cellText).toBe('1,500,000');
+  });
+
+  it('detects years in plausible range (19xx, 20xx)', () => {
+    const body = `| Event | Year |
+| --- | --- |
+| Founded | 2015 |`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(1);
+    expect(results[0].cellText).toBe('2015');
+  });
+
+  it('detects count + unit phrases like "50 employees"', () => {
+    const body = `| Org | Size |
+| --- | --- |
+| MIRI | 50 researchers |`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(1);
+    expect(results[0].cellText).toBe('50 researchers');
+  });
+
+  it('skips rows that have a footnote reference anywhere', () => {
+    const body = `| Company | Funding | Source |
+| --- | --- | --- |
+| Acme | $50M | Per report[^1] |
+
+[^1]: [Source](https://example.com)`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(0);
+  });
+
+  it('returns empty array for tables with no numeric claims', () => {
+    const body = `| Name | Status |
+| --- | --- |
+| Alice | Active |
+| Bob | Inactive |`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(0);
+  });
+
+  it('returns empty array when content has no tables', () => {
+    const body = `Just a paragraph with $50M mentioned but not in a table.`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(0);
+  });
+
+  it('handles multiple tables in the same content', () => {
+    const body = `First table:
+
+| A | B |
+| --- | --- |
+| x | $10M |
+
+Some text.
+
+| C | D |
+| --- | --- |
+| y | 75% |`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(2);
+    expect(results[0].cellText).toBe('$10M');
+    expect(results[1].cellText).toBe('75%');
+  });
+
+  it('reports correct line numbers', () => {
+    const body = `Line 1
+Line 2
+| Col |
+| --- |
+| $5M |`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(1);
+    // Line 5 in 1-based indexing (index 4 in 0-based + offset for data row)
+    expect(results[0].line).toBe(5);
+  });
+
+  it('skips tables without a proper separator row', () => {
+    const body = `| A | B |
+| not a separator |
+| $10M | 50% |`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(0);
+  });
+
+  it('handles multiple data rows with mixed sourced/unsourced', () => {
+    const body = `| Org | Funding |
+| --- | --- |
+| Acme | $50M |
+| Beta | $20M[^1] |
+| Gamma | $30M |
+
+[^1]: [Source](https://example.com)`;
+    const results = detectUnsourcedTableCells(body);
+    expect(results).toHaveLength(2);
+    expect(results[0].cellText).toBe('$50M');
+    expect(results[1].cellText).toBe('$30M');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// NUMERIC_CLAIM_PATTERN (#1271)
+// ---------------------------------------------------------------------------
+
+describe('NUMERIC_CLAIM_PATTERN', () => {
+  const matches = (text: string) => NUMERIC_CLAIM_PATTERN.test(text);
+
+  it('matches dollar amounts', () => {
+    expect(matches('$100')).toBe(true);
+    expect(matches('$1.5M')).toBe(true);
+    expect(matches('$2 billion')).toBe(true);
+    expect(matches('$50,000')).toBe(true);
+  });
+
+  it('matches percentages', () => {
+    expect(matches('50%')).toBe(true);
+    expect(matches('3.5%')).toBe(true);
+    expect(matches('100%')).toBe(true);
+  });
+
+  it('matches comma-separated numbers', () => {
+    expect(matches('1,000')).toBe(true);
+    expect(matches('10,000,000')).toBe(true);
+  });
+
+  it('matches years', () => {
+    expect(matches('2015')).toBe(true);
+    expect(matches('1990')).toBe(true);
+    expect(matches('2025')).toBe(true);
+  });
+
+  it('matches count+unit phrases', () => {
+    expect(matches('50 employees')).toBe(true);
+    expect(matches('200 papers')).toBe(true);
+    expect(matches('10 researchers')).toBe(true);
+  });
+
+  it('does not match short plain numbers', () => {
+    // Single digits or small numbers without units should not match
+    expect(matches('5')).toBe(false);
+    expect(matches('42')).toBe(false);
+  });
+
+  it('does not match plain words', () => {
+    expect(matches('Active')).toBe(false);
+    expect(matches('hello world')).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// auditCitations — sourceContext and unsourcedTableCells integration (#1271)
+// ---------------------------------------------------------------------------
+
+describe('auditCitations sourceContext and unsourcedTableCells', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('annotates citations with sourceContext', async () => {
+    mockCallOpenRouter.mockResolvedValue(
+      JSON.stringify({ verdict: 'verified', relevantQuote: '', explanation: 'ok' }),
+    );
+
+    const contentWithTable = `---
+title: Test
+---
+
+Body claim.[^1]
+
+| Col A | Col B |
+| --- | --- |
+| Data | Value[^2] |
+
+[^1]: [Source One](https://example.com/one)
+[^2]: [Source Two](https://example.com/two)
+`;
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/one', makeFetchedSource({ url: 'https://example.com/one' })],
+      ['https://example.com/two', makeFetchedSource({ url: 'https://example.com/two' })],
+    ]);
+
+    const result = await auditCitations({
+      content: contentWithTable,
+      sourceCache,
+      fetchMissing: false,
+      delayMs: 0,
+    });
+
+    const cit1 = result.citations.find(c => c.footnoteRef === '1');
+    const cit2 = result.citations.find(c => c.footnoteRef === '2');
+    expect(cit1?.sourceContext).toBe('body');
+    expect(cit2?.sourceContext).toBe('table');
+  });
+
+  it('detects unsourced table cells in audit result', async () => {
+    const contentWithUnsourcedTable = `---
+title: Test
+---
+
+Text with citation.[^1]
+
+| Org | Funding |
+| --- | --- |
+| Acme | $50M |
+
+[^1]: [Source](https://example.com/source)
+`;
+
+    mockCallOpenRouter.mockResolvedValue(
+      JSON.stringify({ verdict: 'verified', relevantQuote: '', explanation: 'ok' }),
+    );
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/source', makeFetchedSource({ url: 'https://example.com/source' })],
+    ]);
+
+    const result = await auditCitations({
+      content: contentWithUnsourcedTable,
+      sourceCache,
+      fetchMissing: false,
+      delayMs: 0,
+    });
+
+    expect(result.unsourcedTableCells).toHaveLength(1);
+    expect(result.unsourcedTableCells[0].cellText).toBe('$50M');
+    expect(result.unsourcedTableCells[0].column).toBe('Funding');
+    expect(result.summary.unsourcedTableCells).toBe(1);
+  });
+
+  it('returns empty unsourcedTableCells when all table data is sourced', async () => {
+    const sourcedContent = `---
+title: Test
+---
+
+| Org | Funding |
+| --- | --- |
+| Acme | $50M[^1] |
+
+[^1]: [Source](https://example.com/source)
+`;
+
+    mockCallOpenRouter.mockResolvedValue(
+      JSON.stringify({ verdict: 'verified', relevantQuote: '', explanation: 'ok' }),
+    );
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/source', makeFetchedSource({ url: 'https://example.com/source' })],
+    ]);
+
+    const result = await auditCitations({
+      content: sourcedContent,
+      sourceCache,
+      fetchMissing: false,
+      delayMs: 0,
+    });
+
+    expect(result.unsourcedTableCells).toHaveLength(0);
+    expect(result.summary.unsourcedTableCells).toBe(0);
   });
 });
