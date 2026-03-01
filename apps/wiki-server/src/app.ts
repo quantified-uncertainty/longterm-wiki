@@ -72,7 +72,7 @@ export function createApp() {
     rateLimitMiddleware({
       readLimiter,
       writeLimiter,
-      skipPaths: ["/health"],
+      skipPaths: ["/health", "/api/pages/sync"],
     })
   );
 

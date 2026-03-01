@@ -23,6 +23,9 @@ export const MAX_CONSECUTIVE_FAILURES = 3;
 
 // --- Types ---
 
+/** Minimum delay between batches to avoid rate limiting (ms). */
+const BATCH_PACING_MS = 500;
+
 export interface BatchSyncOptions<T> {
   /**
    * Key to wrap items under in the request body.
@@ -117,7 +120,7 @@ export async function waitForHealthy(
 
 /**
  * Fetch with retry and exponential backoff.
- * Only retries on 5xx status codes or network errors.
+ * Retries on 5xx status codes, 429 (rate limited), or network errors.
  * Returns the Response on success, or throws on exhausted retries.
  * Exported for testing.
  */
@@ -147,7 +150,25 @@ export async function fetchWithRetry(
         signal: AbortSignal.timeout(timeoutMs),
       });
 
-      // Don't retry client errors (4xx) — they won't resolve on their own
+      // 429 Too Many Requests — retry after server-specified delay
+      if (res.status === 429) {
+        const retryAfter = parseInt(
+          res.headers.get("Retry-After") ?? "3",
+          10,
+        );
+        const delayMs = (isNaN(retryAfter) ? 3 : retryAfter) * 1000;
+        lastError = new Error(`HTTP 429: rate limited`);
+        if (attempt < maxAttempts) {
+          console.warn(
+            `    Rate limited — waiting ${delayMs / 1000}s (Retry-After)...`,
+          );
+          await sleep(delayMs);
+          continue;
+        }
+        return res;
+      }
+
+      // Don't retry other client errors (4xx) — they won't resolve on their own
       if (res.ok || (res.status >= 400 && res.status < 500)) {
         return res;
       }
@@ -255,6 +276,12 @@ export async function batchSync<T>(
       );
       totalErrors += batch.length;
       consecutiveFailures++;
+    }
+
+    // Pace batches to avoid rate limiting on endpoints that enforce it
+    if (consecutiveFailures === 0 && i + batchSize < items.length) {
+      const sleep = _sleep ?? ((ms: number) => new Promise((r) => setTimeout(r, ms)));
+      await sleep(BATCH_PACING_MS);
     }
 
     if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
