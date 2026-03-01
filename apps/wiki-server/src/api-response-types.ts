@@ -20,6 +20,7 @@ import type { CitationsRoute } from './routes/citations.js';
 import type { SessionsRoute } from './routes/sessions.js';
 import type { AgentSessionsRoute } from './routes/agent-sessions.js';
 import type { ActiveAgentsRoute } from './routes/active-agents.js';
+import type { AgentSessionEventsRoute } from './routes/agent-session-events.js';
 import type { ArtifactsRoute } from './routes/artifacts.js';
 import type { AutoUpdateRunsRoute } from './routes/auto-update-runs.js';
 import type { AutoUpdateNewsRoute } from './routes/auto-update-news.js';
@@ -42,6 +43,7 @@ type CitationsRpc = ReturnType<typeof hc<CitationsRoute>>;
 type SessionsRpc = ReturnType<typeof hc<SessionsRoute>>;
 type AgentSessionsRpc = ReturnType<typeof hc<AgentSessionsRoute>>;
 type ActiveAgentsRpc = ReturnType<typeof hc<ActiveAgentsRoute>>;
+type AgentSessionEventsRpc = ReturnType<typeof hc<AgentSessionEventsRoute>>;
 type ArtifactsRpc = ReturnType<typeof hc<ArtifactsRoute>>;
 type AutoUpdateRunsRpc = ReturnType<typeof hc<AutoUpdateRunsRoute>>;
 type AutoUpdateNewsRpc = ReturnType<typeof hc<AutoUpdateNewsRoute>>;
@@ -173,6 +175,16 @@ export type ActiveAgentRow = ActiveAgentsListResult['agents'][number];
 
 /** Conflict warning from the active agents list. */
 export type ActiveAgentConflict = ActiveAgentsListResult['conflicts'][number];
+
+// ---------------------------------------------------------------------------
+// Agent Session Events
+// ---------------------------------------------------------------------------
+
+/** Agent session events list response. */
+type AgentSessionEventsListResult = InferResponseType<AgentSessionEventsRpc['by-agent'][':agentId']['$get'], 200>;
+
+/** A single agent session event row. */
+export type AgentSessionEventRow = AgentSessionEventsListResult['events'][number];
 
 // ---------------------------------------------------------------------------
 // Artifacts

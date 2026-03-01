@@ -920,6 +920,7 @@ export const activeAgents = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     sessionId: text("session_id").notNull().unique(), // unique per invocation (branch name or UUID)
+    sessionName: text("session_name"), // human-friendly name (e.g., "bright-falcon-quiet-river")
     branch: text("branch"),
     task: text("task").notNull(),
     status: text("status").notNull().default("active"), // active | completed | errored | stale
@@ -950,6 +951,36 @@ export const activeAgents = pgTable(
     index("idx_aa_heartbeat").on(table.heartbeatAt),
     index("idx_aa_started_at").on(table.startedAt),
     index("idx_aa_branch").on(table.branch),
+  ]
+);
+
+/**
+ * Agent session events — activity timeline for agent sessions.
+ *
+ * Each row is one event in an agent's session lifecycle (checklist check,
+ * status update, error, free-form note, etc.). This provides a reconstructable
+ * audit trail of what happened during a session — complementing the
+ * `active_agents` table (which only stores the latest state) and the
+ * `agent_sessions` table (which stores the final checklist snapshot).
+ */
+export const agentSessionEvents = pgTable(
+  "agent_session_events",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    agentId: bigint("agent_id", { mode: "number" })
+      .notNull()
+      .references(() => activeAgents.id, { onDelete: "cascade" }),
+    eventType: text("event_type").notNull(), // registered | checklist_check | status_update | error | note | completed
+    message: text("message").notNull(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    timestamp: timestamp("timestamp", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_ase_agent_id").on(table.agentId),
+    index("idx_ase_event_type").on(table.eventType),
+    index("idx_ase_timestamp").on(table.timestamp),
   ]
 );
 

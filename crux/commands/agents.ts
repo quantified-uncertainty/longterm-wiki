@@ -59,8 +59,10 @@ function formatAgent(a: ActiveAgentEntry, colors: ReturnType<typeof createLogger
   const step = a.currentStep ? `\n    Step: ${a.currentStep}` : '';
   const files = a.filesTouched?.length ? `\n    Files: ${a.filesTouched.slice(0, 5).join(', ')}${a.filesTouched.length > 5 ? ` (+${a.filesTouched.length - 5} more)` : ''}` : '';
 
+  const name = a.sessionName ? ` ${colors.cyan}${a.sessionName}${colors.reset}` : '';
+
   return [
-    `  ${colors.bold}#${a.id}${colors.reset} ${statusColor}[${a.status}]${colors.reset}${issue}${pr}`,
+    `  ${colors.bold}#${a.id}${colors.reset}${name} ${statusColor}[${a.status}]${colors.reset}${issue}${pr}`,
     `    ${a.task}`,
     a.branch ? `    Branch: ${colors.dim}${a.branch}${colors.reset}` : '',
     a.model ? `    Model: ${a.model}` : '',
@@ -126,9 +128,10 @@ Options:
     return { exitCode: 0, output: JSON.stringify(result.data) };
   }
 
+  const nameTag = result.data.sessionName ? ` \x1b[36m${result.data.sessionName}\x1b[0m` : '';
   return {
     exitCode: 0,
-    output: `\x1b[32m✓\x1b[0m Registered agent #${result.data.id} (session: ${result.data.sessionId})`,
+    output: `\x1b[32m✓\x1b[0m Registered agent #${result.data.id}${nameTag} (session: ${result.data.sessionId})`,
   };
 }
 

@@ -8,6 +8,7 @@ import type { ActiveAgentRow as CanonicalRow } from "@wiki-server/api-response-t
 export interface ActiveAgentRow {
   id: number;
   sessionId: string;
+  sessionName: string | null;
   branch: string | null;
   task: string;
   status: string;
@@ -63,6 +64,7 @@ async function loadFromApi(): Promise<FetchResult<{ agents: ActiveAgentRow[]; co
   const agents: ActiveAgentRow[] = result.data.agents.map((a): ActiveAgentRow => ({
     id: a.id,
     sessionId: a.sessionId,
+    sessionName: a.sessionName,
     branch: a.branch,
     task: a.task,
     status: a.status,

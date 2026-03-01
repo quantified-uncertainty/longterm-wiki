@@ -90,6 +90,7 @@ import * as claimsCommands from './commands/claims.ts';
 import * as epicCommands from './commands/epic.ts';
 import * as idsCommands from './commands/ids.ts';
 import * as agentsCommands from './commands/agents.ts';
+import * as agentSessionEventsCommands from './commands/agent-session-events.ts';
 
 const domains = {
   validate: validateCommands,
@@ -127,6 +128,7 @@ const domains = {
   epic: epicCommands,
   ids: idsCommands,
   agents: agentsCommands,
+  'agent-session-events': agentSessionEventsCommands,
 };
 
 /**
