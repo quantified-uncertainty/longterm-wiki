@@ -36,3 +36,6 @@ export const CODE_MAX_BUDGET_USD = 0.5;
 
 /** /ask max conversation turns. */
 export const CODE_MAX_TURNS = 15;
+
+/** /ask max tool calls per query. */
+export const CODE_MAX_TOOL_CALLS = 25;

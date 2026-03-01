@@ -4,6 +4,7 @@ import {
   CODE_TIMEOUT_MS,
   CODE_MAX_BUDGET_USD,
   CODE_MAX_TURNS,
+  CODE_MAX_TOOL_CALLS,
   CLAUDE_CODE_OAUTH_TOKEN,
   WIKI_REPO_PATH,
 } from "./config.js";
@@ -46,8 +47,6 @@ You have access to:
 "${question}"`;
 }
 
-const MAX_TOOL_CALLS = 25;
-
 export async function runCodeQuery(
   question: string
 ): Promise<CodeQueryResult> {
@@ -58,11 +57,14 @@ export async function runCodeQuery(
   const startTime = Date.now();
   const elapsed = () => `[${((Date.now() - startTime) / 1000).toFixed(1)}s]`;
 
-  // Build env: inherit process.env but remove ANTHROPIC_API_KEY to force OAuth
+  // Whitelist env vars for the spawned Claude Code subprocess.
+  // Only pass what's needed — exclude DISCORD_TOKEN, API keys, etc.
   const env: Record<string, string | undefined> = {
-    ...process.env,
-    ANTHROPIC_API_KEY: undefined,
     CLAUDE_CODE_OAUTH_TOKEN,
+    HOME: process.env.HOME,
+    PATH: process.env.PATH,
+    TMPDIR: process.env.TMPDIR,
+    NODE_ENV: process.env.NODE_ENV,
   };
 
   const queryPromise = (async (): Promise<CodeQueryResult> => {
@@ -119,14 +121,14 @@ export async function runCodeQuery(
             }
           }
 
-          if (toolCalls.length >= MAX_TOOL_CALLS) {
+          if (toolCalls.length >= CODE_MAX_TOOL_CALLS) {
             logger.warn(
-              { elapsed: elapsed(), maxToolCalls: MAX_TOOL_CALLS },
+              { elapsed: elapsed(), maxToolCalls: CODE_MAX_TOOL_CALLS },
               "Code query tool call limit reached"
             );
             lastResult =
               lastResult +
-              `\n\n*(Stopped after ${MAX_TOOL_CALLS} tool calls to limit usage)*`;
+              `\n\n*(Stopped after ${CODE_MAX_TOOL_CALLS} tool calls to limit usage)*`;
             break;
           }
         }
@@ -170,7 +172,8 @@ export async function runCodeQuery(
           model,
         };
       }
-      throw new Error("Query timed out after 3 minutes");
+      const timeoutMinutes = CODE_TIMEOUT_MS / 1000 / 60;
+      throw new Error(`Query timed out after ${timeoutMinutes} minutes`);
     }
 
     // Surface auth errors clearly
