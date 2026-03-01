@@ -162,7 +162,6 @@ jobs:
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
           LONGTERMWIKI_CONTENT_KEY: ${{ secrets.LONGTERMWIKI_CONTENT_KEY }}
 
-  # Deploy job removed — production deploys are now handled by the scheduled
-  # deploy hook (scheduled-deploy.yml, every hour) instead of per-push.
-  # This caps Vercel build minutes at 24/day max vs 50-80/day previously.
+  # Deploy job removed — production deploys are handled by scheduled-deploy.yml
+  # (push-triggered with 5-min debounce + concurrency cancellation).
   # See vercel.json ignoreCommand which also blocks Git-triggered main builds.

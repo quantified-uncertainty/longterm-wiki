@@ -1,32 +1,23 @@
-name: Scheduled Production Deploy
+name: Production Deploy
 
-# Hourly production deploy via Vercel deploy hook.
+# Manual production deploy via Vercel deploy hook.
 #
-# This is the ONLY path to production — Git auto-deploy on main is blocked
-# by vercel.json ignoreCommand, and the per-push deploy hook was removed
-# from ci.yml. This caps Vercel builds at 24/day max.
-#
-# With ~55 merges/day, hourly deploys mean changes go live within ~60 min.
-# For a wiki, this latency is acceptable and keeps build minutes under
-# Vercel Pro's 6,000 min/month included allowance.
+# Git auto-deploy on main is blocked by vercel.json ignoreCommand.
+# Use the "Run workflow" button in GitHub Actions to trigger a prod build.
 #
 # Setup (one-time):
 #   1. Go to Vercel Dashboard → Project → Settings → Git → Deploy Hooks
-#   2. Create a hook: Name "Scheduled Deploy", Branch "main"
+#   2. Create a hook: Name "Production Deploy", Branch "main"
 #   3. Copy the generated URL (looks like https://api.vercel.com/v1/integrations/deploy/...)
 #   4. Add it as a GitHub secret: Settings → Secrets → Actions → New secret
 #      Name: VERCEL_DEPLOY_HOOK_URL
 #      Value: <paste URL>
 
 on:
-  schedule:
-    - cron: '0 * * * *'    # Every hour, on the hour
-  workflow_dispatch:         # Allow manual trigger from GitHub Actions UI
+  workflow_dispatch:
 
 jobs:
   trigger-production-deploy:
-    # Global circuit breaker — skip when automation is paused.
-    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
     if: vars.AUTOMATION_PAUSED != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -57,10 +48,10 @@ jobs:
       - name: Log deploy trigger
         if: always()
         run: |
-          echo "## Scheduled Production Deploy" >> $GITHUB_STEP_SUMMARY
+          echo "## Production Deploy" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Time:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
-          echo "- **Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           if [ -f /tmp/vercel_response.json ]; then
             JOB_ID=$(cat /tmp/vercel_response.json | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4 || echo "unknown")
             echo "- **Vercel job:** $JOB_ID" >> $GITHUB_STEP_SUMMARY
