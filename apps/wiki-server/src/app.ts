@@ -31,6 +31,7 @@ import { referencesRoute } from "./routes/references.js";
 import { githubIssuesRoute } from "./routes/github-issues.js";
 import { groundskeeperRunsRoute } from "./routes/groundskeeper-runs.js";
 import { monitoringRoute } from "./routes/monitoring.js";
+import { githubPullsRoute } from "./routes/github-pulls.js";
 
 let requestCounter = 0;
 
@@ -148,6 +149,7 @@ export function createApp() {
   app.route("/api/integrity", integrityRoute);
   app.route("/api/references", referencesRoute);
   app.route("/api/github/issues", githubIssuesRoute);
+  app.route("/api/github/pulls", githubPullsRoute);
   app.route("/api/groundskeeper-runs", groundskeeperRunsRoute);
   app.route("/api/monitoring", monitoringRoute);
 

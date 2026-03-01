@@ -1,4 +1,4 @@
-import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
+import { fetchDetailed, fetchFromWikiServer, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { ActiveAgentsTable } from "./active-agents-table";
 import type { ActiveAgentRow as CanonicalRow } from "@wiki-server/api-response-types";
@@ -34,12 +34,31 @@ interface ApiResponse {
   conflicts: ActiveAgentConflict[];
 }
 
+interface PullsApiResponse {
+  pulls: Array<{ number: number; branch: string }>;
+}
+
 async function loadFromApi(): Promise<FetchResult<{ agents: ActiveAgentRow[]; conflicts: ActiveAgentConflict[] }>> {
-  const result = await fetchDetailed<ApiResponse>(
-    "/api/active-agents?limit=100",
-    { revalidate: 15 } // refresh every 15s for live tracking
-  );
+  // Fetch agents and open PRs in parallel
+  const [result, pullsData] = await Promise.all([
+    fetchDetailed<ApiResponse>(
+      "/api/active-agents?limit=100",
+      { revalidate: 15 } // refresh every 15s for live tracking
+    ),
+    fetchFromWikiServer<PullsApiResponse>(
+      "/api/github/pulls",
+      { revalidate: 30 }
+    ),
+  ]);
   if (!result.ok) return result;
+
+  // Build branch → PR number map for enrichment
+  const branchToPR = new Map<string, number>();
+  if (pullsData?.pulls) {
+    for (const pr of pullsData.pulls) {
+      branchToPR.set(pr.branch, pr.number);
+    }
+  }
 
   const agents: ActiveAgentRow[] = result.data.agents.map((a): ActiveAgentRow => ({
     id: a.id,
@@ -49,7 +68,8 @@ async function loadFromApi(): Promise<FetchResult<{ agents: ActiveAgentRow[]; co
     status: a.status,
     currentStep: a.currentStep,
     issueNumber: a.issueNumber,
-    prNumber: a.prNumber,
+    // Enrich: if prNumber isn't set but branch matches an open PR, use it
+    prNumber: a.prNumber ?? (a.branch ? branchToPR.get(a.branch) ?? null : null),
     filesTouched: a.filesTouched,
     model: a.model,
     worktree: a.worktree,

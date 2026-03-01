@@ -31,6 +31,7 @@ import type { EntitiesRoute } from './routes/entities.js';
 import type { PagesRoute } from './routes/pages.js';
 import type { GroundskeeperRunsRoute } from './routes/groundskeeper-runs.js';
 import type { MonitoringRoute } from './routes/monitoring.js';
+import type { GithubPullsRoute } from './routes/github-pulls.js';
 
 // ---------------------------------------------------------------------------
 // RPC client phantom types (compile-time only)
@@ -52,6 +53,7 @@ type EntitiesRpc = ReturnType<typeof hc<EntitiesRoute>>;
 type PagesRpc = ReturnType<typeof hc<PagesRoute>>;
 type GroundskeeperRunsRpc = ReturnType<typeof hc<GroundskeeperRunsRoute>>;
 type MonitoringRpc = ReturnType<typeof hc<MonitoringRoute>>;
+type GithubPullsRpc = ReturnType<typeof hc<GithubPullsRoute>>;
 
 // ---------------------------------------------------------------------------
 // Claims
@@ -313,3 +315,13 @@ export type MonitoringIncidentsResult = InferResponseType<MonitoringRpc['inciden
 
 /** A single incident row from the incidents list. */
 export type IncidentRow = MonitoringIncidentsResult['incidents'][number];
+
+// ---------------------------------------------------------------------------
+// GitHub Pull Requests
+// ---------------------------------------------------------------------------
+
+/** Open pull requests response. */
+export type GithubPullsResult = InferResponseType<GithubPullsRpc['index']['$get'], 200>;
+
+/** A single open PR entry. */
+export type OpenPRRow = GithubPullsResult['pulls'][number];
