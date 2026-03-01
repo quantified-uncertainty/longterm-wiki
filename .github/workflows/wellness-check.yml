@@ -50,7 +50,17 @@ env:
 # ─────────────────────────────────────────
 
 jobs:
+  preflight:
+    # Global circuit breaker — skip when automation is paused.
+    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
+    # Note: the server-health-monitor (5-min cadence) is exempt and keeps running.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Automation is active"
+
   server-health:
+    needs: [preflight]
     name: Server & DB health
     runs-on: ubuntu-latest
     outputs:
@@ -273,6 +283,7 @@ jobs:
 # ─────────────────────────────────────────
 
   github-actions-health:
+    needs: [preflight]
     name: GitHub Actions workflow health
     runs-on: ubuntu-latest
     permissions:
@@ -396,6 +407,7 @@ jobs:
 # ─────────────────────────────────────────
 
   frontend-health:
+    needs: [preflight]
     name: Frontend availability
     runs-on: ubuntu-latest
     outputs:
@@ -469,6 +481,7 @@ jobs:
 # ─────────────────────────────────────────
 
   data-freshness:
+    needs: [preflight]
     name: Data freshness
     runs-on: ubuntu-latest
     outputs:
@@ -581,6 +594,7 @@ jobs:
 # ─────────────────────────────────────────
 
   job-queue-health:
+    needs: [preflight]
     name: Job queue health
     runs-on: ubuntu-latest
     outputs:
@@ -673,6 +687,7 @@ jobs:
 # ─────────────────────────────────────────
 
   pr-issue-review:
+    needs: [preflight]
     name: PR & issue quality review
     runs-on: ubuntu-latest
     permissions:
@@ -834,6 +849,7 @@ jobs:
   report:
     name: Aggregate & report
     needs:
+      - preflight
       - server-health
       - api-smoke-tests
       - github-actions-health
@@ -841,7 +857,8 @@ jobs:
       - data-freshness
       - job-queue-health
       - pr-issue-review
-    if: always()
+    # Run if preflight passed (skip entire report when automation is paused)
+    if: always() && needs.preflight.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       issues: write
