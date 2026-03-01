@@ -30,11 +30,11 @@ import {R, EntityLink, Mermaid} from '@components/wiki';
 | **Scalability** | High | RLAIF enables alignment without human feedback bottleneck |
 | **Current Maturity** | High | Production-deployed since 2023; Constitutional Classifiers++ reduce jailbreaks to 0.005/1000 queries |
 | **Time Horizon** | Immediate | Currently operational in all Claude models |
-| **Key Proponents** | <EntityLink id="anthropic">Anthropic</EntityLink> | Broader field influence claimed; competitor adoption unverified |
+| **Key Proponents** | <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> | Broader field influence claimed; competitor adoption unverified |
 
 ## Overview
 
-Constitutional AI (CAI) is <EntityLink id="anthropic">Anthropic's</EntityLink> groundbreaking methodology for training AI systems to be helpful, harmless, and honest using explicit constitutional principles rather than solely human feedback. Introduced in 2022, CAI has become one of the most influential approaches to <EntityLink id="alignment">AI alignment</EntityLink>, demonstrating 3-10x improvements in harmlessness metrics while maintaining helpfulness across Anthropic's Claude model family.
+Constitutional AI (CAI) is <EntityLink id="E22" name="anthropic">Anthropic's</EntityLink> groundbreaking methodology for training AI systems to be helpful, harmless, and honest using explicit constitutional principles rather than solely human feedback. Introduced in 2022, CAI has become one of the most influential approaches to <EntityLink id="E439" name="alignment">AI alignment</EntityLink>, demonstrating 3-10x improvements in harmlessness metrics while maintaining helpfulness across Anthropic's Claude model family.
 
 The approach fundamentally shifts AI safety training from implicit human preferences to explicit, interpretable rules that guide model behavior. CAI's two-stage process—supervised learning with AI feedback followed by reinforcement learning from AI feedback (RLAIF)—has proven scalable and effective, influencing safety practices across major AI laboratories and informing ongoing debates about governance approaches to AI development.
 
@@ -45,7 +45,7 @@ The approach fundamentally shifts AI safety training from implicit human prefere
 | **Harmlessness Improvement** | High positive impact | 3-10x reduction in harmful outputs | <R id="683aef834ac1612a">Anthropic Constitutional AI Paper</R> |
 | **Scalability** | Moderate success | Deployed across Claude 1, 2, and 3 | <R id="a2cf0d0271acb097">Anthropic Model Cards</R> |
 | **Transparency** | High | Explicit constitutional principles | <R id="8f63dfa1697f2fa8">Anthropic Constitution</R> |
-| **Generalizability** | Under evaluation | Limited third-party replication | <R id="132aaa63c43beb04">OpenAI <EntityLink id="rlhf">RLHF</EntityLink> comparisons</R> |
+| **Generalizability** | Under evaluation | Limited third-party replication | <R id="132aaa63c43beb04">OpenAI <EntityLink id="E259" name="rlhf">RLHF</EntityLink> comparisons</R> |
 
 ## Core Methodology
 
@@ -99,10 +99,10 @@ The two-stage process enables self-improvement without human labels. In Stage 1,
 
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
-| <EntityLink id="scheming">Scheming/Deceptive Alignment</EntityLink> | Medium | Explicit principles create auditable constraints; Constitutional Classifiers detect hidden intent |
+| <EntityLink id="E274" name="scheming">Scheming/Deceptive Alignment</EntityLink> | Medium | Explicit principles create auditable constraints; Constitutional Classifiers detect hidden intent |
 | AI Misuse | High | Reduces harmful outputs by 3-10x; jailbreak success rate reduced from 86% to 4.4% with classifiers |
 | Value Lock-in | Medium | Transparent, auditable constitutions enable iteration and governance oversight |
-| <EntityLink id="reward-hacking">Reward Hacking</EntityLink> | Medium | Constitutional principles provide interpretable reward signal vs. opaque human preferences |
+| <EntityLink id="E253" name="reward-hacking">Reward Hacking</EntityLink> | Medium | Constitutional principles provide interpretable reward signal vs. opaque human preferences |
 
 ## Technical Implementation
 
@@ -135,7 +135,7 @@ The CAI process involves:
 
 ### Industry Influence
 
-CAI has influenced the broader AI safety field. Similar self-critique and principle-based training ideas have appeared across the industry, though neither <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="deepmind">DeepMind</EntityLink>, nor Meta has publicly described adopting Constitutional AI specifically. Claims that these organizations incorporated CAI into GPT-4, Gemini, or Llama are unverified.
+CAI has influenced the broader AI safety field. Similar self-critique and principle-based training ideas have appeared across the industry, though neither <EntityLink id="E218" name="openai">OpenAI</EntityLink>, <EntityLink id="E98" name="deepmind">DeepMind</EntityLink>, nor Meta has publicly described adopting Constitutional AI specifically. Claims that these organizations incorporated CAI into GPT-4, Gemini, or Llama are unverified.
 
 ## Key Advantages & Limitations
 
@@ -163,17 +163,17 @@ CAI has influenced the broader AI safety field. Similar self-critique and princi
 
 | Research Area | Current Status | Expected Progress | Key Organizations |
 |---------------|----------------|------------------|-------------------|
-| **Multi-Agent Constitutions** | Early research | Prototype systems by 2025 | Anthropic, <EntityLink id="miri">MIRI</EntityLink> |
+| **Multi-Agent Constitutions** | Early research | Prototype systems by 2025 | Anthropic, <EntityLink id="E202" name="miri">MIRI</EntityLink> |
 | **Dynamic Constitutions** | Conceptual stage | Adaptive systems by 2026 | Academic collaborations |
 | **Cross-Cultural CAI** | Initial studies | Global deployment by 2027 | International AI partnerships |
-| **Constitutional Verification** | Tool development | Automated verification by 2028 | <EntityLink id="metr">METR</EntityLink>, academic labs |
+| **Constitutional Verification** | Tool development | Automated verification by 2028 | <EntityLink id="E201" name="metr">METR</EntityLink>, academic labs |
 
 ### Integration with Other Safety Approaches
 
 CAI increasingly combines with:
-- **<EntityLink id="interpretability-sufficient">Interpretability methods</EntityLink>** for constitutional reasoning transparency
+- **<EntityLink id="E176" name="interpretability-sufficient">Interpretability methods</EntityLink>** for constitutional reasoning transparency
 - **Formal verification** for mathematical constitutional compliance
-- **<EntityLink id="evaluation">Evaluation frameworks</EntityLink>** for systematic constitutional assessment
+- **<EntityLink id="E447" name="evaluation">Evaluation frameworks</EntityLink>** for systematic constitutional assessment
 
 ## Key Uncertainties & Research Cruxes
 
@@ -188,7 +188,7 @@ CAI increasingly combines with:
 
 | Debate Topic | Optimistic View | Skeptical View | Key Proponents |
 |--------------|-----------------|----------------|----------------|
-| **Sufficiency for AGI** | Constitutional training scales to AGI | Insufficient for complex value alignment | <EntityLink id="dario-amodei">Dario Amodei</EntityLink> vs. <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> |
+| **Sufficiency for AGI** | Constitutional training scales to AGI | Insufficient for complex value alignment | <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> vs. <EntityLink id="E114" name="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> |
 | **Value Learning** | Constitutions can encode human values | Missing implicit/contextual values | Anthropic team vs. MIRI researchers |
 | **Robustness** | CAI creates robust safety | Vulnerable to sophisticated attacks | Safety optimists vs. security researchers |
 
@@ -215,7 +215,7 @@ CAI increasingly combines with:
 
 | Focus Area | Key Papers | Organizations |
 |------------|------------|---------------|
-| **RLAIF Methodology** | <R id="dfde4aec10484d70">RLAIF: Scaling Reinforcement Learning from Human Feedback</R> | <EntityLink id="anthropic">Anthropic</EntityLink> |
+| **RLAIF Methodology** | <R id="dfde4aec10484d70">RLAIF: Scaling Reinforcement Learning from Human Feedback</R> | <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> |
 | **RLAIF vs RLHF** | [RLAIF vs. RLHF: Scaling Reinforcement Learning](https://arxiv.org/abs/2309.00267) (Lee et al., 2023) | Google Research |
 | **Self-Alignment** | [Principle-Driven Self-Alignment](https://arxiv.org/abs/2305.03047) (Sun et al., 2023) | CMU, IBM |
 | **Constitutional Verification** | <R id="1ffa106fee601f3a">Measuring and Improving Constitutional Adherence</R> | Academic collaborations |

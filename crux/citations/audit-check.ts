@@ -142,6 +142,16 @@ async function main() {
     console.log('');
   }
 
+  // Unsourced table cells (#1271)
+  if (result.unsourcedTableCells.length > 0) {
+    console.log(`${c.bold}Unsourced Table Cells${c.reset}`);
+    for (const cell of result.unsourcedTableCells) {
+      const colLabel = cell.column ? ` (${cell.column})` : '';
+      console.log(`  ${c.red}!${c.reset} line ${cell.line}: "${cell.cellText}"${colLabel}`);
+    }
+    console.log('');
+  }
+
   // Summary
   console.log(`${c.bold}Summary${c.reset}`);
   console.log(`  Total citations:  ${result.summary.total}`);
@@ -151,6 +161,9 @@ async function main() {
   }
   if (result.summary.unchecked > 0) {
     console.log(`  ${c.dim}Unchecked:${c.reset}        ${result.summary.unchecked}  (url-dead, paywall, or no-fetch)`);
+  }
+  if (result.summary.unsourcedTableCells > 0) {
+    console.log(`  ${c.red}Unsourced cells:${c.reset}  ${result.summary.unsourcedTableCells}  (table cells with numeric claims, no citation)`);
   }
 
   // Pass/fail verdict

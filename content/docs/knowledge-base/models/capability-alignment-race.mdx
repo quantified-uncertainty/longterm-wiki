@@ -34,7 +34,7 @@ import CauseEffectGraph from '@components/CauseEffectGraph';
 
 The <EntityLink id="E414" name="capability-alignment-race">Capability-Alignment Race Model</EntityLink> quantifies the fundamental dynamic determining AI safety: the gap between advancing capabilities and our readiness to safely deploy them. Current analysis shows capabilities ~3 years ahead of alignment readiness, with this gap widening at 0.5 years annually. 
 
-The model tracks how frontier compute (currently 10²⁶ FLOP for largest training runs) and algorithmic improvements drive capability progress at ~10-15 percentage points per year, while alignment research (<EntityLink id="E174" name="interpretability">Interpretability</EntityLink> at ~15% behavior coverage—though <EntityLink id="interpretability">less than 5%</EntityLink> of frontier model computations are mechanistically understood—and <EntityLink id="scalable-oversight">scalable oversight</EntityLink> at ~30% maturity) advances more slowly. This creates deployment pressure worth \$100B annually, racing against governance systems operating at ~25% effectiveness.
+The model tracks how frontier compute (currently 10²⁶ FLOP for largest training runs) and algorithmic improvements drive capability progress at ~10-15 percentage points per year, while alignment research (<EntityLink id="E174" name="interpretability">Interpretability</EntityLink> at ~15% behavior coverage—though <EntityLink id="E174" name="interpretability">less than 5%</EntityLink> of frontier model computations are mechanistically understood—and <EntityLink id="E271" name="scalable-oversight">scalable oversight</EntityLink> at ~30% maturity) advances more slowly. This creates deployment pressure worth \$100B annually, racing against governance systems operating at ~25% effectiveness.
 
 <div class="breakout">
 <CauseEffectGraph
@@ -417,7 +417,7 @@ The following table synthesizes key risk factors shaping the capability-alignmen
 
 | Component | Current State | Growth Rate | 2027 Projection | Source |
 |-----------|---------------|-------------|------------------|--------|
-| Training compute | 10²⁶ FLOP | 4x/year | 10²⁸ FLOP | <R id="2efa03ce0d906d78"><EntityLink id="epoch-ai">Epoch AI</EntityLink></R> |
+| Training compute | 10²⁶ FLOP | 4x/year | 10²⁸ FLOP | <R id="2efa03ce0d906d78"><EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink></R> |
 | Algorithmic efficiency | 2x 2024 baseline | 1.5x/year | 3.4x baseline | <R id="6c2f85e163e0c4a4">Erdil & Besiroglu (2023)</R> |
 | Performance (MMLU) | 89% | +8pp/year | >95% | <R id="a2cf0d0271acb097">Anthropic</R> |
 | Frontier lab lead | 6 months | Stable | 3-6 months | <R id="0532c540957038e6">RAND</R> |
@@ -441,7 +441,7 @@ Economic value drives rapid deployment, creating misalignment between safety nee
 | Military competition | 0.6/1.0 intensity | Increasing | 0.8/1.0 | Arms control treaties |
 | Lab competition | 6 month lead | Shortening | 3 month lead | Industry coordination |
 
-Quote from <R id="ebb2f8283d5a6014"><EntityLink id="paul-christiano">Paul Christiano</EntityLink></R>: "The core challenge is that capabilities are advancing faster than our ability to align them. If this gap continues to widen, we'll be in serious trouble."
+Quote from <R id="ebb2f8283d5a6014"><EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink></R>: "The core challenge is that capabilities are advancing faster than our ability to align them. If this gap continues to widen, we'll be in serious trouble."
 
 ## Current State & Trajectory
 
@@ -467,7 +467,7 @@ Self-replication evaluation success rates among frontier systems increased from 
 | Governance strength | 0.25/1.0 | 0.4/1.0 | 0.6/1.0 | Improving |
 | Warning shot probability | 15%/year | 20%/year | 25%/year | Increasing |
 
-Based on <R id="8fef0d8c902de618"><EntityLink id="metaculus">Metaculus</EntityLink> forecasts</R> and expert surveys from <R id="38eba87d0a888e2e"><EntityLink id="ai-impacts">AI Impacts</EntityLink></R>.
+Based on <R id="8fef0d8c902de618"><EntityLink id="E199" name="metaculus">Metaculus</EntityLink> forecasts</R> and expert surveys from <R id="38eba87d0a888e2e"><EntityLink id="E512" name="ai-impacts">AI Impacts</EntityLink></R>.
 
 These projections rest on several key assumptions. First, they assume compute scaling continues at roughly its current rate; Epoch AI projects that training runs will hit a practical 9-month economic ceiling around 2027, after which compute growth must come from hardware scaling or distributed clusters.[^rc-d3cf] Second, they assume algorithmic efficiency gains continue—compute required to reach a given capability level is declining roughly 3x annually—which means effective capability could grow far faster than raw compute figures suggest.[^rc-098c] Third, they assume no sudden international coordination. By late 2020s or early 2030s, effective compute accessible to leading labs could reach roughly one million times GPT-4's training compute when algorithmic progress is factored in.[^rc-d9e6] Any of these assumptions shifting substantially would alter the trajectory.
 
@@ -516,13 +516,13 @@ Core disagreements among experts on alignment difficulty reflect genuinely diffe
 The table below synthesizes projected milestones across capability development, alignment research, and governance. These projections carry substantial uncertainty: training compute for frontier models has grown approximately 4–5× per year[^rc-f5e8], and algorithmic efficiency improvements mean effective compute could reach roughly one million times GPT-4's training compute by the early 2030s.[^rc-d9e6] Benchmark performance in some domains has been doubling every eight months.[^rc-131a] Dates should be treated as rough central estimates rather than firm predictions. Metaculus community forecasts and expert surveys inform the structure of this timeline, though specific outcomes remain deeply contested.
 | Period | Capability Milestones | Alignment Progress | Governance Developments |
 |--------|----------------------|-------------------|------------------------|
-| **2025** | GPT-5 level, 80% human tasks | Basic interpretability tools | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> implementation |
+| **2025** | GPT-5 level, 80% human tasks | Basic interpretability tools | <EntityLink id="E127" name="eu-ai-act">EU AI Act</EntityLink> implementation |
 | **2026** | Multimodal AGI claims | Scalable oversight demos | US federal AI legislation |
 | **2027** | Superhuman in most domains | Alignment tax \<10% | International AI treaty |
 | **2028** | Recursive self-improvement | Deception detection tools | Compute governance regime |
 | **2030** | <EntityLink id="E357" name="transformative-ai">Transformative AI</EntityLink> deployment | Mature alignment stack | Global coordination framework |
 
-Based on <R id="8fef0d8c902de618">Metaculus community predictions</R> and <R id="9e229de82a60bdc2"><EntityLink id="fhi">Future of Humanity Institute</EntityLink> surveys</R>.
+Based on <R id="8fef0d8c902de618">Metaculus community predictions</R> and <R id="9e229de82a60bdc2"><EntityLink id="E140" name="fhi">Future of Humanity Institute</EntityLink> surveys</R>.
 
 ## Resource Requirements & Strategic Investments
 
@@ -545,10 +545,10 @@ Leading efforts to address the capability-alignment gap:
 
 | Organization | Focus | Annual Budget | Approach |
 |-------------|-------|---------------|----------|
-| <EntityLink id="anthropic">Anthropic</EntityLink> | <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> | \$500M | Constitutional training |
-| <EntityLink id="deepmind">DeepMind</EntityLink> | Alignment team | \$100M | Scalable oversight |
-| <EntityLink id="miri">MIRI</EntityLink> | <EntityLink id="agent-foundations">Agent foundations</EntityLink> | \$15M | Theoretical foundations |
-| <EntityLink id="arc">ARC</EntityLink> | Alignment research | \$20M | Empirical alignment |
+| <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> | <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> | \$500M | Constitutional training |
+| <EntityLink id="E98" name="deepmind">DeepMind</EntityLink> | Alignment team | \$100M | Scalable oversight |
+| <EntityLink id="E202" name="miri">MIRI</EntityLink> | <EntityLink id="E584" name="agent-foundations">Agent foundations</EntityLink> | \$15M | Theoretical foundations |
+| <EntityLink id="E25" name="arc">ARC</EntityLink> | Alignment research | \$20M | Empirical alignment |
 
 For historical context, total AI safety spending was estimated at roughly \$9 million in 2017 and approximately \$40 million globally in 2019, with average annual funding increases of about \$13 million per year between 2014 and 2024.[^rc-feca] The Alignment Project's first funding round received over 800 applications from 466 institutions across 42 countries, signaling rapidly growing researcher interest relative to available funding.[^rc-a877]
 
@@ -556,15 +556,15 @@ For historical context, total AI safety spending was estimated at roughly \$9 mi
 
 This model connects to several other risk analyses:
 
-- <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink>: How competition accelerates capability development
-- <EntityLink id="multipolar-trap">Multipolar Trap</EntityLink>: Coordination failures in competitive environments  
+- <EntityLink id="E239" name="racing-dynamics">Racing Dynamics</EntityLink>: How competition accelerates capability development
+- <EntityLink id="E209" name="multipolar-trap">Multipolar Trap</EntityLink>: Coordination failures in competitive environments  
 - Warning Signs: Indicators of dangerous capability-alignment gaps
 - Takeoff dynamics: Speed of AI development and adaptation time
 
 The model also informs key debates:
-- <EntityLink id="pause-debate">Pause vs. Proceed</EntityLink>: Whether to slow capability development
-- <EntityLink id="open-vs-closed">Open vs. Closed</EntityLink>: Model release policies and <EntityLink id="proliferation">proliferation</EntityLink> speed
-- <EntityLink id="regulation-debate">Regulation Approaches</EntityLink>: Government responses to the race dynamic
+- <EntityLink id="E223" name="pause-debate">Pause vs. Proceed</EntityLink>: Whether to slow capability development
+- <EntityLink id="E217" name="open-vs-closed">Open vs. Closed</EntityLink>: Model release policies and <EntityLink id="E232" name="proliferation">proliferation</EntityLink> speed
+- <EntityLink id="E248" name="regulation-debate">Regulation Approaches</EntityLink>: Government responses to the race dynamic
 
 ## Sources & Resources
 

@@ -12,6 +12,24 @@
  *    Duplicate prefixes arise from branch merges and make the migration order
  *    ambiguous. Known historical duplicates are grandfathered; new ones fail.
  *
+ * 3. Journal `idx` values must be sequential and `when` values strictly increasing.
+ *    Duplicate `when` values cause the Drizzle migrator to silently skip migrations.
+ *
+ * ## How Drizzle tracks applied migrations
+ *
+ * The `__drizzle_migrations` table stores `hash` (SHA-256 of SQL content) and
+ * `created_at` (the `when` timestamp from the journal). The migrator selects the
+ * most recent `created_at` and applies any journal entry where
+ * `lastDbMigration.created_at < migration.folderMillis`.
+ *
+ * IMPORTANT: Drizzle does NOT track by filename/tag. Renaming a migration file
+ * (and updating the journal tag) is safe as long as the `when` timestamp is
+ * preserved. The SQL content hash is stored but never used for skip/apply decisions.
+ *
+ * This was verified in issue #1392 when PR #1372 renamed four migration files
+ * (0020->0041, 0022->0042, 0024->0043, 0026->0044) without changing their
+ * `when` values. Existing databases correctly skip these already-applied migrations.
+ *
  * The journal uses sequential `idx` values and `tag` = filename without .sql.
  *
  * Usage: npx tsx crux/validate/validate-drizzle-journal.ts
@@ -54,8 +72,8 @@ interface CheckResult {
 
 // Historical duplicate prefixes that already exist in the codebase.
 // These are grandfathered — only NEW duplicates will fail the check.
-const KNOWN_DUPLICATE_PREFIXES = new Set([
-  '0020', '0022', '0024', '0026', '0032', '0034',
+// All historical duplicates were resolved in the migration cleanup PR.
+const KNOWN_DUPLICATE_PREFIXES = new Set<string>([
 ]);
 
 export function runCheck(): CheckResult {
@@ -154,7 +172,100 @@ export function runCheck(): CheckResult {
     );
   }
 
-  const totalErrors = missing.length + newDuplicates.length;
+  // Check for duplicate idx values and non-strictly-increasing `when` timestamps.
+  // Duplicate `when` values cause the Drizzle migrator to silently skip migrations
+  // (it compares `created_at < folderMillis`, so equal values are not applied).
+  const journalIssues: string[] = [];
+  const seenIdx = new Set<number>();
+  const seenWhen = new Set<number>();
+  let prevWhen = 0;
+  for (const entry of journal.entries) {
+    if (seenIdx.has(entry.idx)) {
+      journalIssues.push(`Duplicate idx=${entry.idx} for tag ${entry.tag}`);
+    }
+    seenIdx.add(entry.idx);
+
+    if (seenWhen.has(entry.when)) {
+      journalIssues.push(`Duplicate when=${entry.when} for tag ${entry.tag} — will cause migration to be skipped`);
+    }
+    seenWhen.add(entry.when);
+
+    if (entry.when <= prevWhen) {
+      journalIssues.push(`Non-increasing when=${entry.when} for tag ${entry.tag} (previous: ${prevWhen})`);
+    }
+    prevWhen = entry.when;
+  }
+
+  if (journalIssues.length > 0) {
+    console.log(
+      `\n${c.red}Found ${journalIssues.length} journal ordering issue(s):${c.reset}\n`
+    );
+    for (const issue of journalIssues) {
+      console.log(`  ${c.red}${issue}${c.reset}`);
+    }
+    console.log();
+    console.log(
+      `${c.dim}Fix: ensure all idx values are sequential and all when values are strictly increasing.${c.reset}`
+    );
+    console.log(
+      `${c.dim}Duplicate when values cause the Drizzle migrator to silently skip migrations.${c.reset}`
+    );
+  } else {
+    console.log(
+      `${c.green}Journal ordering is correct (sequential idx, strictly increasing when)${c.reset}`
+    );
+  }
+
+  // Check for non-idempotent SQL patterns in migration files.
+  // While Drizzle's timestamp-based tracking prevents accidental re-application,
+  // idempotent migrations are safer as defense-in-depth. This is a warning, not an error.
+  const idempotencyWarnings: string[] = [];
+  const NON_IDEMPOTENT_PATTERNS = [
+    { pattern: /\bCREATE\s+TABLE\b(?!\s+IF\s+NOT\s+EXISTS)/gi, fix: 'CREATE TABLE IF NOT EXISTS' },
+    { pattern: /\bCREATE\s+(?:UNIQUE\s+)?INDEX\b(?!\s+(?:IF\s+NOT\s+EXISTS|CONCURRENTLY))/gi, fix: 'CREATE INDEX IF NOT EXISTS' },
+    { pattern: /\bALTER\s+TABLE\s+\S+\s+ADD\s+COLUMN\b(?!\s+IF\s+NOT\s+EXISTS)/gi, fix: 'ADD COLUMN IF NOT EXISTS' },
+  ];
+
+  for (const tag of sqlFiles) {
+    const filePath = join(DRIZZLE_DIR, `${tag}.sql`);
+    let content: string;
+    try {
+      content = readFileSync(filePath, 'utf-8');
+    } catch {
+      continue;
+    }
+    // Strip SQL comments to avoid false positives on commented-out code
+    const stripped = content.replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    for (const { pattern, fix } of NON_IDEMPOTENT_PATTERNS) {
+      // Reset lastIndex for global regex
+      pattern.lastIndex = 0;
+      if (pattern.test(stripped)) {
+        idempotencyWarnings.push(`${tag}.sql: consider using ${fix}`);
+      }
+    }
+  }
+
+  if (idempotencyWarnings.length > 0) {
+    console.log(
+      `\n${c.yellow}Found ${idempotencyWarnings.length} non-idempotent SQL pattern(s) (warning only):${c.reset}\n`
+    );
+    for (const warn of idempotencyWarnings) {
+      console.log(`  ${c.yellow}${warn}${c.reset}`);
+    }
+    console.log();
+    console.log(
+      `${c.dim}Idempotent migrations (IF NOT EXISTS / IF EXISTS) are preferred for safety.${c.reset}`
+    );
+    console.log(
+      `${c.dim}Drizzle tracks by timestamp so re-application is unlikely, but idempotency is defense-in-depth.${c.reset}`
+    );
+  } else {
+    console.log(
+      `${c.green}All migration files use idempotent SQL patterns${c.reset}`
+    );
+  }
+
+  const totalErrors = missing.length + newDuplicates.length + journalIssues.length;
 
   return {
     passed: totalErrors === 0,

@@ -81,6 +81,15 @@ export function registerTask(
           config,
           `🟡 **${name}** circuit breaker cooldown elapsed — attempting recovery probe...`
         );
+        // Record half-open attempt to wiki-server
+        recordRunToServer(config, {
+          taskName: name,
+          event: "half_open_attempt",
+          success: false,
+          consecutiveFailures: state.consecutiveFailures,
+          circuitBreakerActive: true,
+          timestamp: new Date().toISOString(),
+        }).catch(() => {});
       } else {
         logger.warn({ event: "skipped", reason: "circuit breaker tripped" }, "Task skipped");
         state.running = false;
@@ -152,7 +161,10 @@ export function registerTask(
       }
 
       const runTs = new Date().toISOString();
-      const event = result.success ? "success" : "failure";
+      let event = result.success ? "success" : "failure";
+      if (isHalfOpenProbe && result.success) {
+        event = "half_open_success";
+      }
 
       recordRun(config, {
         taskName: name,
@@ -269,13 +281,26 @@ export function registerTask(
   });
 }
 
-export function resetCircuitBreaker(name: string): boolean {
+export function resetCircuitBreaker(name: string, config?: Config): boolean {
   const state = taskStates.get(name);
   if (!state) return false;
   state.disabled = false;
   state.trippedAt = null;
   state.consecutiveFailures = 0;
   rootLogger.child({ task: name }).info({ event: "circuit_breaker_reset" }, "Circuit breaker reset");
+
+  // Record manual reset to wiki-server if config is provided
+  if (config) {
+    recordRunToServer(config, {
+      taskName: name,
+      event: "circuit_breaker_reset",
+      success: true,
+      consecutiveFailures: 0,
+      circuitBreakerActive: false,
+      timestamp: new Date().toISOString(),
+    }).catch(() => {});
+  }
+
   return true;
 }
 

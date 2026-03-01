@@ -210,4 +210,4 @@ These principles are measured by the **objectivity** rating dimension (0-10):
 - **5-6**: Mostly neutral language; some uncertainty acknowledgment; mostly analytical
 - **7+**: Fully accessible to outsiders; all estimates properly hedged with ranges and caveats; analytical throughout; honest counter-arguments included
 
-See the <EntityLink id="rating-system">Rating System</EntityLink> for how objectivity fits into derived quality scores.
+See the <EntityLink id="E741" name="rating-system">Rating System</EntityLink> for how objectivity fits into derived quality scores.

@@ -23,7 +23,15 @@ function LoginForm() {
       });
 
       if (res.ok) {
-        const redirectTo = searchParams.get("from") || "/internal";
+        const from = searchParams.get("from") || "/internal";
+        // Validate redirect to prevent open redirect attacks:
+        // only allow relative paths, block protocol-relative and absolute URLs
+        const isSafe =
+          from.startsWith("/") &&
+          !from.startsWith("//") &&
+          !from.includes("://") &&
+          !from.includes("\\");
+        const redirectTo = isSafe ? from : "/internal";
         router.push(redirectTo);
         router.refresh();
       } else {

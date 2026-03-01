@@ -30,7 +30,7 @@ import {EntityLink, Mermaid} from '@components/wiki';
 | Research Workforce | ≈1,100 FTEs | 600 technical + 500 non-technical AI safety FTEs in 2025, up from 400 total in 2022 ([AI Safety Field Growth Analysis](https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025)). |
 | Time Horizon | Near-Long | Near-term (evaluations, control) complement long-term work (interpretability, governance). [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) emphasizes urgency. |
 | Funding Level | \$110-130M/year external | 2024 external funding. Early 2025 shows 40-50% acceleration with \$67M committed through July. Internal lab spending adds \$500-550M for ≈\$650M total ([Coefficient Giving analysis](https://coefficientgiving.org/research/ai-safety-and-security-need-more-funders/)). |
-| Funding Concentration | 85% from 5 sources | [Coefficient Giving](https://www.openphilanthropy.org/): \$63.6M (60%); <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink>: \$20M; Eric Schmidt: \$10M; [AI Safety Fund](https://www.frontiermodelforum.org/ai-safety-fund/): \$10M; FLI: \$5M |
+| Funding Concentration | 85% from 5 sources | [Coefficient Giving](https://www.openphilanthropy.org/): \$63.6M (60%); <EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink>: \$20M; Eric Schmidt: \$10M; [AI Safety Fund](https://www.frontiermodelforum.org/ai-safety-fund/): \$10M; FLI: \$5M |
 | Safety/Capabilities Ratio | ≈0.5-1.3% | \$600-650M safety vs \$50B+ capabilities spending. [FAS recommends](https://fas.org/publication/accelerating-ai-interpretability/) 30% of compute for safety research. |
 
 ## Key Links
@@ -56,12 +56,12 @@ An effective safety portfolio requires both breadth (covering diverse failure mo
 | Non-Technical AI Safety FTEs | 100 | 500 | 71%/year | Governance, policy, operations |
 | **Total AI Safety FTEs** | **400** | **1,100** | **40%/year** | Field-wide compound growth |
 | AI Safety Organizations | ≈50 | ≈120 | 24%/year | Exponential growth since 2020 |
-| Capabilities FTEs (comparison) | ≈3,000 | ≈15,000 | 30-40%/year | <EntityLink id="openai">OpenAI</EntityLink> alone: 300 → 3,000 |
+| Capabilities FTEs (comparison) | ≈3,000 | ≈15,000 | 30-40%/year | <EntityLink id="E218" name="openai">OpenAI</EntityLink> alone: 300 → 3,000 |
 
 **Critical Comparison:** While AI safety workforce has grown substantially, capabilities research is growing 30-40% per year. The ratio of capabilities to safety researchers has remained roughly constant at 10-15:1, meaning the absolute gap continues to widen.
 
 **Top Research Categories (by FTEs):**
-1. Miscellaneous <EntityLink id="technical-research">technical AI safety research</EntityLink>
+1. Miscellaneous <EntityLink id="E297" name="technical-research">technical AI safety research</EntityLink>
 2. LLM safety
 3. Interpretability
 
@@ -134,19 +134,19 @@ This matrix shows how strongly each major intervention addresses each risk categ
 
 | Intervention | Accident Risks | Misuse Risks | Structural Risks | Epistemic Risks | Primary Mechanism |
 |--------------|:--------------:|:------------:|:----------------:|:---------------:|-------------------|
-| **<EntityLink id="interpretability">Interpretability</EntityLink>** | High | Low | Low | -- | Detect deception and misalignment in model internals |
-| **<EntityLink id="ai-control">AI Control</EntityLink>** | High | Medium | -- | -- | External constraints regardless of AI intentions |
-| **<EntityLink id="evals">Evaluations</EntityLink>** | High | Medium | Low | -- | Pre-deployment testing for dangerous capabilities |
-| **<EntityLink id="rlhf">RLHF/Constitutional AI</EntityLink>** | Medium | Medium | -- | -- | Train models to follow human preferences |
-| **<EntityLink id="scalable-oversight">Scalable Oversight</EntityLink>** | Medium | Low | -- | -- | Human supervision of superhuman systems |
+| **<EntityLink id="E174" name="interpretability">Interpretability</EntityLink>** | High | Low | Low | -- | Detect deception and misalignment in model internals |
+| **<EntityLink id="E6" name="ai-control">AI Control</EntityLink>** | High | Medium | -- | -- | External constraints regardless of AI intentions |
+| **<EntityLink id="E128" name="evals">Evaluations</EntityLink>** | High | Medium | Low | -- | Pre-deployment testing for dangerous capabilities |
+| **<EntityLink id="E259" name="rlhf">RLHF/Constitutional AI</EntityLink>** | Medium | Medium | -- | -- | Train models to follow human preferences |
+| **<EntityLink id="E271" name="scalable-oversight">Scalable Oversight</EntityLink>** | Medium | Low | -- | -- | Human supervision of superhuman systems |
 | **Compute Governance** | Low | High | Medium | -- | Hardware chokepoints limit access |
-| **<EntityLink id="export-controls">Export Controls</EntityLink>** | Low | High | Medium | -- | Restrict adversary access to training compute |
-| **<EntityLink id="responsible-scaling-policies">Responsible Scaling</EntityLink>** | Medium | Medium | Low | -- | Capability thresholds trigger safety requirements |
+| **<EntityLink id="E136" name="export-controls">Export Controls</EntityLink>** | Low | High | Medium | -- | Restrict adversary access to training compute |
+| **<EntityLink id="E252" name="responsible-scaling-policies">Responsible Scaling</EntityLink>** | Medium | Medium | Low | -- | Capability thresholds trigger safety requirements |
 | **International Coordination** | Low | Medium | High | -- | Reduce racing dynamics through agreements |
-| **<EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink>** | Medium | Medium | Medium | -- | Government capacity for evaluation and oversight |
+| **<EntityLink id="E13" name="ai-safety-institutes">AI Safety Institutes</EntityLink>** | Medium | Medium | Medium | -- | Government capacity for evaluation and oversight |
 | **Field Building** | Medium | Low | Medium | Low | Grow talent pipeline and research capacity |
-| **<EntityLink id="epistemic-security">Epistemic Security</EntityLink>** | -- | Low | Low | High | Protect collective truth-finding capacity |
-| **<EntityLink id="content-authentication">Content Authentication</EntityLink>** | -- | Medium | -- | High | Verify authentic content in synthetic era |
+| **<EntityLink id="E123" name="epistemic-security">Epistemic Security</EntityLink>** | -- | Low | Low | High | Protect collective truth-finding capacity |
+| **<EntityLink id="E74" name="content-authentication">Content Authentication</EntityLink>** | -- | Medium | -- | High | Verify authentic content in synthetic era |
 
 **Legend:** High = primary focus, addresses directly; Medium = secondary impact; Low = indirect or limited; -- = minimal relevance
 
@@ -202,18 +202,18 @@ Analysis of the current intervention portfolio reveals several areas where cover
 Certain interventions work better together than in isolation:
 
 **Technical + Governance:**
-- <EntityLink id="evals" /> inform <EntityLink id="responsible-scaling-policies" /> thresholds
-- <EntityLink id="interpretability" /> enables verification for 
-- <EntityLink id="ai-control" /> provides safety margin while governance matures
+- <EntityLink id="E128" name="evals" /> inform <EntityLink id="E252" name="responsible-scaling-policies" /> thresholds
+- <EntityLink id="E174" name="interpretability" /> enables verification for 
+- <EntityLink id="E6" name="ai-control" /> provides safety margin while governance matures
 
 **Near-term + Long-term:**
-- <EntityLink id="compute-governance" /> buys time for <EntityLink id="interpretability" /> research
-- <EntityLink id="evals" /> identify near-term risks while <EntityLink id="scalable-oversight" /> develops
-- <EntityLink id="field-building" /> ensures capacity for future technical work
+- <EntityLink id="E64" name="compute-governance" /> buys time for <EntityLink id="E174" name="interpretability" /> research
+- <EntityLink id="E128" name="evals" /> identify near-term risks while <EntityLink id="E271" name="scalable-oversight" /> develops
+- <EntityLink id="E141" name="field-building" /> ensures capacity for future technical work
 
 **Prevention + Resilience:**
 - Technical safety research aims to prevent failures
-- <EntityLink id="epistemic-security" /> and economic resilience limit damage if prevention fails
+- <EntityLink id="E123" name="epistemic-security" /> and economic resilience limit damage if prevention fails
 - Both are needed for robust defense-in-depth
 
 ---
@@ -301,7 +301,7 @@ Different beliefs about AI risk lead to different portfolio recommendations:
 |-----------|------------|--------------|
 | **Alignment is very hard** | Interpretability, Control, International coordination | RLHF, Voluntary commitments |
 | **Misuse is the main risk** | Compute governance, Content authentication, Legislation | Interpretability, Agent foundations |
-| **<EntityLink id="short-timeline-policy-implications">Short timelines</EntityLink>** | AI Control, Evaluations, Responsible scaling | Long-term governance research |
+| **<EntityLink id="E415" name="short-timeline-policy-implications">Short timelines</EntityLink>** | AI Control, Evaluations, Responsible scaling | Long-term governance research |
 | **Racing dynamics dominate** | International coordination, Compute governance | Unilateral safety research |
 | **Epistemic collapse is likely** | Epistemic security, Content authentication | Technical alignment |
 

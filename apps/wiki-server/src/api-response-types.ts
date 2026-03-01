@@ -78,6 +78,12 @@ export type SimilarClaimItem = SimilarClaimsResult['claims'][number];
 /** Paginated claims list response from /all. */
 export type GetAllClaimsResult = InferResponseType<ClaimsRpc['all']['$get'], 200>;
 
+/** Claims quality metrics response from /quality. */
+export type ClaimsQualityResult = InferResponseType<ClaimsRpc['quality']['$get'], 200>;
+
+/** Per-entity quality metrics entry. */
+export type EntityQualityEntry = ClaimsQualityResult['entities'][number];
+
 /** Claims network graph response. */
 export type ClaimsNetworkResult = InferResponseType<ClaimsRpc['network']['$get'], 200>;
 
@@ -92,6 +98,18 @@ export type PageReferencesResult = InferResponseType<ClaimsRpc[':id']['page-refe
 
 /** A single page reference row. */
 export type PageReferenceRow = PageReferencesResult['references'][number];
+
+/** Claims for a specific page, with footnote-level citation data (replaces citation_quotes). */
+export type ClaimsByPageResult = InferResponseType<ClaimsRpc['by-page']['$get'], 200>;
+
+/** A single claim quote row from the by-page endpoint (CitationQuote-compatible). */
+export type ClaimQuoteRow = ClaimsByPageResult['quotes'][number];
+
+/** Claims citing a specific source URL, across all pages (replaces quotes-by-url). */
+export type ClaimsBySourceUrlResult = InferResponseType<ClaimsRpc['by-source-url']['$get'], 200>;
+
+/** A single cross-page claim quote from the by-source-url endpoint. */
+export type CrossPageClaimQuoteRow = ClaimsBySourceUrlResult['quotes'][number];
 
 // ---------------------------------------------------------------------------
 // Citations

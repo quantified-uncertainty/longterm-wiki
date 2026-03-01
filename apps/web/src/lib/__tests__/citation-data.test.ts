@@ -163,6 +163,46 @@ describe("getCitationQuotes", () => {
     expect(result[0].footnote).toBe(1);
     expect(result[1].footnote).toBe(3);
   });
+
+  it("calls the claims by-page endpoint (not deprecated citations/quotes)", async () => {
+    vi.resetModules();
+    const mockFetch = vi.fn().mockResolvedValue({ quotes: [] });
+    vi.doMock("../wiki-server", () => ({
+      fetchFromWikiServer: mockFetch,
+    }));
+    const mod = await import("../citation-data");
+    await mod.getCitationQuotes("test-page");
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/claims/by-page?page_id=test-page",
+      { revalidate: 600 }
+    );
+  });
+});
+
+describe("getCitationQuotesByUrl", () => {
+  it("calls the claims by-source-url endpoint (not deprecated citations/quotes-by-url)", async () => {
+    vi.resetModules();
+    const mockFetch = vi.fn().mockResolvedValue({ quotes: [], stats: {} });
+    vi.doMock("../wiki-server", () => ({
+      fetchFromWikiServer: mockFetch,
+    }));
+    const mod = await import("../citation-data");
+    await mod.getCitationQuotesByUrl("https://example.com/test");
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/claims/by-source-url?url=https%3A%2F%2Fexample.com%2Ftest",
+      { revalidate: 600 }
+    );
+  });
+
+  it("returns null when server is unavailable", async () => {
+    vi.resetModules();
+    vi.doMock("../wiki-server", () => ({
+      fetchFromWikiServer: vi.fn().mockResolvedValue(null),
+    }));
+    const mod = await import("../citation-data");
+    const result = await mod.getCitationQuotesByUrl("https://example.com/test");
+    expect(result).toBeNull();
+  });
 });
 
 describe("isSafeUrl", () => {
