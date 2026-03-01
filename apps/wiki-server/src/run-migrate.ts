@@ -1,5 +1,6 @@
 import { initDb, closeDb } from "./db.js";
+import { logger } from "./logger.js";
 
 await initDb();
 await closeDb();
-console.log("Migrations applied successfully.");
+logger.info("Migrations applied successfully.");
