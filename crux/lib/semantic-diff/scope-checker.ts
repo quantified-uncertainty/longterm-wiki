@@ -53,7 +53,9 @@ const ALWAYS_ALLOWED_PATTERNS = [
  */
 function isAlwaysAllowed(filePath: string): boolean {
   const normalized = filePath.replace(/\\/g, '/');
-  return ALWAYS_ALLOWED_PATTERNS.some(pattern => normalized.includes(pattern));
+  return ALWAYS_ALLOWED_PATTERNS.some(pattern =>
+    normalized === pattern || normalized.startsWith(pattern)
+  );
 }
 
 // ---------------------------------------------------------------------------

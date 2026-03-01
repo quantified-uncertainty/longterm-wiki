@@ -185,8 +185,8 @@ export interface SemanticDiffResult {
   contradictions: ContradictionResult;
   /** Path where the snapshot was stored. */
   snapshotPath?: string;
-  /** Overall assessment: 'safe', 'warn', or 'block' */
-  assessment: 'safe' | 'warn' | 'block';
+  /** Overall assessment: 'safe' or 'warn' */
+  assessment: 'safe' | 'warn';
   /** Human-readable summary of issues found. */
   issues: string[];
 }

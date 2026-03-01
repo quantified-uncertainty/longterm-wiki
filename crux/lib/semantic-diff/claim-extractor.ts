@@ -156,9 +156,11 @@ async function extractClaimsFromChunk(
 ): Promise<ExtractedClaim[]> {
   const client = createLlmClient();
 
-  const prompt = `Extract all verifiable factual claims from this wiki page content:
+  const prompt = `Extract all verifiable factual claims from this wiki page content.
 
+<content>
 ${chunk}
+</content>
 
 Return the claims as a JSON object with a "claims" array.`;
 
