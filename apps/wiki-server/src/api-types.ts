@@ -264,6 +264,8 @@ export const CreateSessionSchema = z.object({
   issuesJson: z.unknown().nullable().optional(),
   learningsJson: z.unknown().nullable().optional(),
   recommendationsJson: z.unknown().nullable().optional(),
+  /** Whether /review-pr was run during this session. NULL = unknown (pre-feature). */
+  reviewed: z.boolean().nullable().optional(),
   pages: z
     .array(z.string().min(1).max(200))
     .optional()

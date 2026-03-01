@@ -20,6 +20,48 @@ Run these before anything else — a PR that doesn't build is not worth reviewin
 
 See `.claude/rules/pre-pr-verification.md` for full details on when tests are required.
 
+## Step 2b: PR size check (MANDATORY — runs before completing checklist)
+
+Check whether this PR exceeds the review thresholds:
+
+```bash
+git diff --stat main...HEAD
+```
+
+Parse the summary line (e.g. `12 files changed, 450 insertions(+), 120 deletions(-)`):
+- **Files changed** = number before "files changed"
+- **Lines changed** = insertions + deletions
+
+**Check if `/review-pr` was run** by testing for the marker file:
+
+```bash
+test -f .claude/review-done && echo "REVIEWED" || echo "NOT_REVIEWED"
+```
+
+**If thresholds exceeded (>5 files OR >300 lines) AND `.claude/review-done` does not exist:**
+
+Print this warning prominently:
+
+```
+╔══════════════════════════════════════════════════════════════════════╗
+║  WARNING: Large PR without /review-pr                               ║
+║                                                                      ║
+║  This PR exceeds size thresholds (>5 files or >300 lines) and       ║
+║  /review-pr was not run during this session.                        ║
+║                                                                      ║
+║  Per CLAUDE.md: "For non-trivial changes (>5 files or >300 lines),  ║
+║  run /review-pr before shipping."                                   ║
+║                                                                      ║
+║  OPTIONS:                                                            ║
+║    1. Run /review-pr now (recommended)                              ║
+║    2. Proceed anyway and document the reason below                  ║
+╚══════════════════════════════════════════════════════════════════════╝
+```
+
+Then **pause and ask the user** whether to run `/review-pr` now or proceed. Do not automatically skip.
+
+If the thresholds are NOT exceeded, or if `.claude/review-done` exists, continue without interruption.
+
 ## Step 3: Complete unchecked items
 
 For each unchecked item in the checklist:
@@ -48,6 +90,15 @@ pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
 Run `pnpm crux agent-checklist snapshot` and capture the output — this is the `checks:` block for the session log.
 
 Session logs are stored in the wiki-server PostgreSQL database (not committed to git). The checklist state is automatically synced to the DB when you use the `crux agent-checklist` commands. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly in any session summaries.
+
+**Record review status**: Check for the marker file and set the `reviewed` field in the session log payload accordingly:
+
+```bash
+# Returns "true" if reviewed, "false" if not
+test -f .claude/review-done && echo "true" || echo "false"
+```
+
+Include `reviewed: true` or `reviewed: false` in the session log payload sent to the wiki-server. This enables the `/internal/agent-sessions` dashboard to show review coverage over time.
 
 ## Step 7: Validate completion
 

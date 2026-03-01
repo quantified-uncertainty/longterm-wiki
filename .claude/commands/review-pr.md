@@ -93,6 +93,16 @@ After executing all verification steps:
 2. Add any additional test items that were performed beyond the original plan
 3. Use `pnpm crux pr validate-test-plan` to confirm it passes
 
+## Phase 5: Mark review complete
+
+After completing all phases above, create the review marker file so `/agent-session-ready-PR` knows this session was reviewed:
+
+```bash
+echo "reviewed $(date -u +%Y-%m-%dT%H:%M:%SZ)" >| .claude/review-done
+```
+
+This file is gitignored. It persists for the life of the session and is read by `/agent-session-ready-PR` to populate the `reviewed` field in the session log.
+
 ## Output
 
 Summarize findings:
