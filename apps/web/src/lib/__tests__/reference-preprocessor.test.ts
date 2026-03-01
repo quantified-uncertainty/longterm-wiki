@@ -470,6 +470,25 @@ describe("preprocessReferences", () => {
     expect(matches.length).toBe(1);
   });
 
+  it("deduplicates case-insensitively with leading whitespace", () => {
+    const content = "Fact[^rc-dup2].";
+    const refData = makeReferenceData(
+      {},
+      {
+        "rc-dup2": {
+          title: "AI Safety Report",
+          url: "https://example.com/safety",
+          note: "  ai safety report — detailed findings on alignment risks",
+        },
+      }
+    );
+
+    const { content: result } = preprocessReferences(content, refData);
+    // Should deduplicate despite case and whitespace differences
+    const matches = result.match(/[Aa][Ii] [Ss]afety [Rr]eport/g) || [];
+    expect(matches.length).toBe(1);
+  });
+
   it("does not deduplicate when note does not start with title", () => {
     const content = "Fact[^rc-nodup1].";
     const refData = makeReferenceData(

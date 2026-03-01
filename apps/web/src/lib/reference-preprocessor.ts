@@ -98,9 +98,15 @@ function buildClaimFootnote(data: ClaimRefData): string {
  * issue where the LLM-generated note repeats the source title).
  */
 function buildCitationFootnote(data: CitationData): string {
-  // Deduplicate: if note already starts with the title text, use note alone
-  const noteOverlapsTitle =
-    data.title && data.note && data.note.startsWith(data.title);
+  // Deduplicate: if note already starts with the title text, use note alone.
+  // Normalize whitespace and compare case-insensitively to catch DB variations.
+  const normalizedTitle = data.title?.trim();
+  const normalizedNote = data.note?.trimStart();
+  const noteOverlapsTitle = Boolean(
+    normalizedTitle &&
+      normalizedNote &&
+      normalizedNote.toLowerCase().startsWith(normalizedTitle.toLowerCase())
+  );
 
   if (data.title && data.url && !noteOverlapsTitle) {
     const link = `[${data.title}](${data.url})`;
@@ -108,12 +114,14 @@ function buildCitationFootnote(data: CitationData): string {
   }
   if (data.url) {
     // When note overlaps title, use note as the link text instead
-    const linkText = noteOverlapsTitle ? data.note! : (data.title || data.url);
+    const linkText = noteOverlapsTitle ? normalizedNote! : (data.title || data.url);
     const link = `[${linkText}](${data.url})`;
     return sanitizeFootnoteText(link);
   }
   if (data.title) {
-    const text = noteOverlapsTitle ? data.note! : (data.note ? `${data.title} — ${data.note}` : data.title);
+    const text = noteOverlapsTitle
+      ? normalizedNote!
+      : (data.note ? `${data.title} — ${data.note}` : data.title);
     return sanitizeFootnoteText(text);
   }
   return sanitizeFootnoteText(data.note || "Citation");
