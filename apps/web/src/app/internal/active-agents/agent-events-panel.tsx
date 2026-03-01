@@ -9,7 +9,6 @@ interface AgentEvent {
   message: string;
   metadata: Record<string, unknown> | null;
   timestamp: string;
-  createdAt: string;
 }
 
 const EVENT_TYPE_STYLES: Record<string, string> = {

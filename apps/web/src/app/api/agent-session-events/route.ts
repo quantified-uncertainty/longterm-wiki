@@ -9,11 +9,20 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const agentId = searchParams.get("agentId");
-  const limit = searchParams.get("limit") || "100";
+  const rawLimit = searchParams.get("limit") || "100";
+  const limit = /^\d+$/.test(rawLimit) ? String(Math.min(Number(rawLimit), 500)) : "100";
 
   if (!agentId) {
     return NextResponse.json(
       { error: "agentId is required" },
+      { status: 400 },
+    );
+  }
+
+  // Validate agentId is a positive integer to prevent SSRF via path traversal
+  if (!/^\d+$/.test(agentId) || Number(agentId) < 1) {
+    return NextResponse.json(
+      { error: "agentId must be a positive integer" },
       { status: 400 },
     );
   }

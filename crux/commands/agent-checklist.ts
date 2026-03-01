@@ -47,6 +47,9 @@ import { appendEvent } from '../lib/wiki-server/agent-session-events.ts';
 const CHECKLIST_PATH = join(PROJECT_ROOT, '.claude/wip-checklist.md');
 const VALID_TYPES: SessionType[] = ['content', 'infrastructure', 'bugfix', 'refactor', 'commands'];
 
+/** Cached agent ID from registration — avoids re-listing agents for every logEvent call. */
+let cachedAgentId: number | null = null;
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -87,8 +90,9 @@ async function syncChecklistToDb(markdown: string): Promise<void> {
 }
 
 /**
- * Best-effort event logging. Resolves agent ID from current branch and
- * appends an event to the activity timeline.
+ * Best-effort event logging. Uses the cached agent ID from registration
+ * (single HTTP call). Falls back to listing agents if the cache is empty
+ * (e.g., when called from a subcommand that didn't run init first).
  */
 async function logEvent(
   eventType: 'registered' | 'checklist_check' | 'status_update' | 'error' | 'note' | 'completed',
@@ -96,15 +100,23 @@ async function logEvent(
   metadata?: Record<string, unknown>,
 ): Promise<void> {
   try {
-    const branch = currentBranch();
-    const agentsResult = await listActiveAgents('active');
-    if (!agentsResult.ok) return;
+    let agentId = cachedAgentId;
 
-    const agent = agentsResult.data.agents.find(a => a.sessionId === branch);
-    if (!agent) return;
+    // Fallback: resolve agent ID from branch if not cached
+    if (agentId === null) {
+      const branch = currentBranch();
+      const agentsResult = await listActiveAgents('active');
+      if (!agentsResult.ok) return;
+
+      const agent = agentsResult.data.agents.find(a => a.sessionId === branch);
+      if (!agent) return;
+
+      agentId = agent.id;
+      cachedAgentId = agentId;
+    }
 
     await appendEvent({
-      agentId: agent.id,
+      agentId,
       eventType,
       message,
       metadata: metadata ?? null,
@@ -225,8 +237,11 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
       issueNumber: issue ?? null,
     });
     agentRegistered = agentResult.ok;
-    if (agentResult.ok && agentResult.data.sessionName) {
-      sessionName = agentResult.data.sessionName;
+    if (agentResult.ok) {
+      cachedAgentId = agentResult.data.id;
+      if (agentResult.data.sessionName) {
+        sessionName = agentResult.data.sessionName;
+      }
     }
   } catch {
     // Best-effort — coordination is helpful but not blocking
@@ -357,14 +372,18 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
 
     // Mark E925 active agent as completed (best-effort)
     try {
-      const branch = currentBranch();
-      const agentsResult = await listActiveAgents('active');
-      if (agentsResult.ok) {
-        const myAgent = agentsResult.data.agents.find(a => a.sessionId === branch);
-        if (myAgent) {
-          await updateAgent(myAgent.id, { status: 'completed' });
-          output += `${c.dim}Active agent marked completed (E925)${c.reset}\n`;
+      let agentId = cachedAgentId;
+      if (agentId === null) {
+        const branch = currentBranch();
+        const agentsResult = await listActiveAgents('active');
+        if (agentsResult.ok) {
+          const myAgent = agentsResult.data.agents.find(a => a.sessionId === branch);
+          if (myAgent) agentId = myAgent.id;
         }
+      }
+      if (agentId !== null) {
+        await updateAgent(agentId, { status: 'completed' });
+        output += `${c.dim}Active agent marked completed (E925)${c.reset}\n`;
       }
     } catch {
       // Best-effort — don't block completion on API failure

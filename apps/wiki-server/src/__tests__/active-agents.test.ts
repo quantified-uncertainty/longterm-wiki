@@ -65,6 +65,8 @@ const dispatch: SqlDispatcher = (query, params) => {
       // params: [sessionId, sessionName, branch, task, issueNumber, model, worktree, metadata]
       const now = new Date();
       existing.branch = (params[2] as string | null) ?? existing.branch;
+      // Keep existing session name if set; otherwise use the newly generated one
+      existing.session_name = existing.session_name ?? (params[1] as string | null);
       existing.task = params[3] as string;
       existing.issue_number = params[4] as number | null;
       existing.model = params[5] as string | null;

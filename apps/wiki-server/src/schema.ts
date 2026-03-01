@@ -967,14 +967,13 @@ export const agentSessionEvents = pgTable(
   "agent_session_events",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    agentId: bigint("agent_id", { mode: "number" }).notNull(),
+    agentId: bigint("agent_id", { mode: "number" })
+      .notNull()
+      .references(() => activeAgents.id, { onDelete: "cascade" }),
     eventType: text("event_type").notNull(), // registered | checklist_check | status_update | error | note | completed
     message: text("message").notNull(),
     metadata: jsonb("metadata").$type<Record<string, unknown>>(),
     timestamp: timestamp("timestamp", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },

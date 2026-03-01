@@ -7,12 +7,11 @@ ALTER TABLE "active_agents" ADD COLUMN IF NOT EXISTS "session_name" text;
 -- Phase 2: Activity log — create agent_session_events table
 CREATE TABLE IF NOT EXISTS "agent_session_events" (
   "id" bigserial PRIMARY KEY NOT NULL,
-  "agent_id" bigint NOT NULL,
+  "agent_id" bigint NOT NULL REFERENCES "active_agents"("id") ON DELETE CASCADE,
   "event_type" text NOT NULL,
   "message" text NOT NULL,
   "metadata" jsonb,
-  "timestamp" timestamp with time zone DEFAULT now() NOT NULL,
-  "created_at" timestamp with time zone DEFAULT now() NOT NULL
+  "timestamp" timestamp with time zone DEFAULT now() NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS "idx_ase_agent_id" ON "agent_session_events" USING btree ("agent_id");
