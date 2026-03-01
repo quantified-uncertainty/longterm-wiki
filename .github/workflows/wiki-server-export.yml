@@ -1,4 +1,4 @@
-name: Database Backup
+name: Wiki Server Data Export
 
 # Exports session logs, edit logs, and job data from the wiki-server API.
 # Stored as GitHub Actions artifacts (90-day retention).
@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: db-backup
+  group: wiki-server-export
   cancel-in-progress: false
 
 jobs:
@@ -112,6 +112,6 @@ jobs:
       - name: Upload backup artifact
         uses: actions/upload-artifact@v4
         with:
-          name: db-backup-${{ github.run_id }}
+          name: wiki-server-export-${{ github.run_id }}
           path: /tmp/backup/
           retention-days: 90
