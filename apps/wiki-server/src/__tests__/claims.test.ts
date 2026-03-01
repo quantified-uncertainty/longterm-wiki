@@ -741,7 +741,7 @@ describe("Claims API", () => {
     });
 
     it("rejects limit exceeding max", async () => {
-      const res = await app.request("/api/claims/quality?limit=500");
+      const res = await app.request("/api/claims/quality?limit=1500");
       expect(res.status).toBe(400);
     });
 

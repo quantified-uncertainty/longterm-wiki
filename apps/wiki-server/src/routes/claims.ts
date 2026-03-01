@@ -29,7 +29,7 @@ const PageRefInsertBodySchema = ClaimPageReferenceInsertSchema.omit({ claimId: t
 
 // ---- Constants ----
 
-const MAX_PAGE_SIZE = 200;
+const MAX_PAGE_SIZE = 1000;
 
 // ---- Schemas (from shared api-types) ----
 

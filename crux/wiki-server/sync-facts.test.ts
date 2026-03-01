@@ -118,6 +118,26 @@ describe("transformFact", () => {
     expect(result.high).toBe(200);
   });
 
+  it("handles object { min } (min-only) value", () => {
+    const result = transformFact("e", "f", {
+      value: { min: 67000000000 },
+    });
+    expect(result.value).toBe("≥67000000000");
+    expect(result.numeric).toBeNull();
+    expect(result.low).toBe(67000000000);
+    expect(result.high).toBeNull();
+  });
+
+  it("handles object { max } (max-only) value", () => {
+    const result = transformFact("e", "f", {
+      value: { max: 500 },
+    });
+    expect(result.value).toBe("≤500");
+    expect(result.numeric).toBeNull();
+    expect(result.low).toBeNull();
+    expect(result.high).toBe(500);
+  });
+
   it("handles undefined value", () => {
     const result = transformFact("e", "f", {});
     expect(result.value).toBeNull();
