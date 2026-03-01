@@ -48,6 +48,7 @@ function mapSessionRow(
     issuesJson: r.issuesJson,
     learningsJson: r.learningsJson,
     recommendationsJson: r.recommendationsJson,
+    reviewed: r.reviewed,
     pages,
     createdAt: r.createdAt,
   };
@@ -67,6 +68,7 @@ function sessionValues(d: z.infer<typeof CreateSessionSchema>) {
     issuesJson: d.issuesJson ?? null,
     learningsJson: d.learningsJson ?? null,
     recommendationsJson: d.recommendationsJson ?? null,
+    reviewed: d.reviewed ?? null,
   };
 }
 
@@ -82,6 +84,7 @@ const sessionConflictSet = {
   issuesJson: sql`excluded.issues_json`,
   learningsJson: sql`excluded.learnings_json`,
   recommendationsJson: sql`excluded.recommendations_json`,
+  reviewed: sql`excluded.reviewed`,
 };
 
 // ---- Routes ----
