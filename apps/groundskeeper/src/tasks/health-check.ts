@@ -1,6 +1,17 @@
 import type { Config } from "../config.js";
 import { getOctokit, parseRepo } from "../github.js";
+import {
+  recordFailure,
+  getCurrentOutage,
+  clearOutage,
+  addToBuffer,
+  flushBuffer,
+  backfillOutageIncident,
+} from "../incident-buffer.js";
+import { logger as rootLogger } from "../logger.js";
 import { recordIncident } from "../wiki-server.js";
+
+const logger = rootLogger.child({ task: "health-check" });
 
 const ISSUE_TITLE = "[Groundskeeper] Wiki server health check failure";
 
@@ -71,6 +82,21 @@ export async function healthCheck(
   const existingIssue = await findOpenHealthIssue(config);
 
   if (serverUp) {
+    // Recovery path: if there was an active outage, backfill the incident
+    // and flush any buffered incidents now that the server is reachable.
+    const outage = getCurrentOutage();
+    if (outage) {
+      await backfillOutageIncident(config, outage);
+      clearOutage();
+      logger.info("Outage window closed — backfill incident recorded");
+    }
+
+    // Flush any incidents that were buffered while the server was down
+    const flushed = await flushBuffer(config);
+    if (flushed > 0) {
+      logger.info({ flushed }, "Flushed buffered incidents on recovery");
+    }
+
     // Server is up — close any existing issue
     if (existingIssue) {
       await octokit.rest.issues.update({
@@ -84,7 +110,7 @@ export async function healthCheck(
         owner,
         repo,
         issue_number: existingIssue.number,
-        body: `✅ Wiki server is back up at ${new Date().toISOString()}.`,
+        body: `Wiki server is back up at ${new Date().toISOString()}.`,
       });
       return {
         success: true,
@@ -94,14 +120,27 @@ export async function healthCheck(
     return { success: true, summary: "Server up" };
   }
 
-  // Server is down — record incident (best-effort; will fail if wiki-server is what's down)
-  await recordIncident(config, {
+  // Server is down — track the failure for outage window detection
+  recordFailure();
+
+  // Try to record incident to wiki-server; if it fails (expected when the
+  // wiki-server itself is down), buffer it locally for later flushing.
+  const incidentPayload = {
     service: "wiki-server",
     severity: "critical",
     title: "Wiki server health check failure",
     detail: `Server at ${config.wikiServerUrl} is not responding to /health endpoint`,
     checkSource: "groundskeeper",
-  }).catch(() => {});
+  };
+
+  const recorded = await recordIncident(config, incidentPayload);
+  if (!recorded) {
+    addToBuffer({
+      ...incidentPayload,
+      timestamp: new Date().toISOString(),
+    });
+    logger.info("Incident buffered locally (wiki-server unreachable)");
+  }
 
   // Add comment to existing open issue instead of creating duplicates
   if (existingIssue) {
