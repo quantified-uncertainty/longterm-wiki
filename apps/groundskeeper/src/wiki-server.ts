@@ -84,7 +84,11 @@ export async function recordRunToServer(
   );
   if (!result.ok) {
     logger.warn(
-      { event: "wiki_server_sync_failed", endpoint: "/api/groundskeeper-runs", error: result.error },
+      {
+        event: "wiki_server_sync_failed",
+        endpoint: "/api/groundskeeper-runs",
+        error: result.error,
+      },
       "Failed to record run to wiki-server",
     );
   }
@@ -133,14 +137,14 @@ export async function registerAsActiveAgent(
       return result.data.id;
     }
 
-    console.log(
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
+    logger.warn(
+      {
         event: "active_agent_registration_failed",
         attempt: attempt + 1,
         maxRetries: REGISTER_MAX_RETRIES,
         error: result.error,
-      }),
+      },
+      "Active agent registration failed",
     );
 
     // Don't delay after the last attempt
@@ -176,7 +180,10 @@ export async function updateActiveAgent(
   );
   if (!result.ok) {
     logger.warn(
-      { event: "active_agent_update_failed", error: result.error },
+      {
+        event: "active_agent_update_failed",
+        error: result.error,
+      },
       "Failed to update active agent",
     );
   }
@@ -213,7 +220,11 @@ export async function recordIncident(
   );
   if (!result.ok) {
     logger.warn(
-      { event: "incident_recording_failed", endpoint: "/api/monitoring/incidents", error: result.error },
+      {
+        event: "incident_recording_failed",
+        endpoint: "/api/monitoring/incidents",
+        error: result.error,
+      },
       "Failed to record incident to wiki-server",
     );
     return false;

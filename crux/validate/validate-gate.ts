@@ -261,6 +261,13 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'no-console-log',
+    name: 'No console.log in server code',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-no-console-log.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'conflict-markers',
     name: 'Conflict marker detection',
     command: 'npx',
