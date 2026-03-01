@@ -46,7 +46,7 @@ function parseNumericFromClaim(claim: ExtractedClaim): number | undefined {
  * Higher threshold means we only flag contradictions when claims are clearly
  * talking about the same thing.
  */
-function areClainsAboutSameSubject(a: ExtractedClaim, b: ExtractedClaim): boolean {
+function areClaimsAboutSameSubject(a: ExtractedClaim, b: ExtractedClaim): boolean {
   return jaccardWordSimilarity(a.text, b.text) >= 0.4;
 }
 
@@ -65,7 +65,7 @@ function detectNumericContradictions(
 
   for (const newClaim of numericNew) {
     for (const existing of numericExisting) {
-      if (!areClainsAboutSameSubject(newClaim, existing)) continue;
+      if (!areClaimsAboutSameSubject(newClaim, existing)) continue;
 
       const newVal = parseNumericFromClaim(newClaim);
       const existVal = parseNumericFromClaim(existing);
@@ -103,7 +103,7 @@ function detectTemporalContradictions(
 
   for (const newClaim of temporalNew) {
     for (const existing of temporalExisting) {
-      if (!areClainsAboutSameSubject(newClaim, existing)) continue;
+      if (!areClaimsAboutSameSubject(newClaim, existing)) continue;
       if (newClaim.keyValue === existing.keyValue) continue;
 
       // Year-based comparison for temporal claims
