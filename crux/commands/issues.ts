@@ -21,6 +21,7 @@ import { createLogger, type Colors } from '../lib/output.ts';
 import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
 import { type CommandResult, parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
+import { listActiveAgents, registerAgent } from '../lib/wiki-server/active-agents.ts';
 
 /**
  * Read a text value from a `--*-file=<path>` flag.
@@ -841,6 +842,8 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
 
 /**
  * Signal start of work: post a comment and add the claude-working label.
+ * Blocks if another active agent is already working on the same issue
+ * (use --force to override).
  */
 async function start(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -854,9 +857,34 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
     };
   }
 
+  const branch = currentBranch();
+
+  // Check for active-agent conflicts (best-effort — don't block if server is down)
+  if (!options.force) {
+    try {
+      const result = await listActiveAgents('active');
+      if (result.ok) {
+        const conflicting = result.data.agents.filter(
+          (a: { issueNumber: number | null; branch: string | null }) =>
+            a.issueNumber === issueNum && a.branch !== branch
+        );
+        if (conflicting.length > 0) {
+          let output = `${c.red}✗ Another agent is already working on issue #${issueNum}:${c.reset}\n`;
+          for (const agent of conflicting) {
+            output += `  ${c.yellow}→${c.reset} branch: ${c.cyan}${agent.branch ?? 'unknown'}${c.reset}`;
+            output += `, started: ${new Date((agent as { startedAt: string }).startedAt).toISOString().slice(0, 16)}\n`;
+          }
+          output += `\n${c.dim}Use --force to override.${c.reset}\n`;
+          return { output, exitCode: 1 };
+        }
+      }
+    } catch {
+      // Wiki-server may be unreachable — proceed without enforcement
+    }
+  }
+
   // Fetch issue details
   const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
-  const branch = currentBranch();
 
   // Ensure label exists
   await ensureLabelExists();
@@ -877,6 +905,18 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
     method: 'POST',
     body: { body },
   });
+
+  // Register as active agent (best-effort)
+  try {
+    await registerAgent({
+      sessionId: `${branch}-${Date.now()}`,
+      branch,
+      task: issue.title,
+      issueNumber: issueNum,
+    });
+  } catch {
+    // Best-effort — GitHub tracking above is the primary mechanism
+  }
 
   let output = '';
   output += `${c.green}✓${c.reset} Started tracking issue #${issueNum}: ${issue.title}\n`;
@@ -1863,7 +1903,8 @@ Examples:
   crux issues create "Title" --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
   crux issues update-body 239 --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
   crux issues update-body 239 --body-file=/tmp/full-body.md  # Set raw body (no merge)
-  crux issues start 239              Announce start on issue #239
+  crux issues start 239              Announce start (blocks if another agent is active)
+  crux issues start 239 --force      Override conflict check
   crux issues done 239 --pr=https://github.com/.../pull/42
   crux issues cleanup                Check for stale labels and duplicates
   crux issues cleanup --fix          Auto-remove stale claude-working labels
