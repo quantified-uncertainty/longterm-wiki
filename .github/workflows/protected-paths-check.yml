@@ -1,0 +1,148 @@
+name: Protected Paths Check
+
+# Flags PRs that modify agent behavioral rules, CI workflows, or validation
+# code for mandatory human review. Without the `rules-change-reviewed` label,
+# the check fails so these changes cannot merge unnoticed.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+jobs:
+  check-protected-paths:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Check for protected path changes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const PROTECTED_PATTERNS = [
+              /^CLAUDE\.md$/,
+              /^\.claude\/rules\//,
+              /^\.claude\/memory\//,
+              /^\.claude\/commands\//,
+              /^\.github\/workflows\//,
+              /^\.githooks\//,
+              /^crux\/validate\//,
+            ];
+
+            const REVIEW_LABEL = 'rules-change-reviewed';
+            const COMMENT_MARKER = '<!-- protected-paths-check -->';
+
+            // Get list of files changed in this PR
+            const files = await github.paginate(
+              github.rest.pulls.listFiles,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                per_page: 100,
+              }
+            );
+
+            const changedPaths = files.map(f => f.filename);
+            const protectedFiles = changedPaths.filter(path =>
+              PROTECTED_PATTERNS.some(pattern => pattern.test(path))
+            );
+
+            if (protectedFiles.length === 0) {
+              console.log('No protected paths modified. Check passes.');
+              return;
+            }
+
+            // Group by category for readable output
+            const categories = {
+              'Agent instructions (CLAUDE.md)': [],
+              'Agent rules (.claude/rules/)': [],
+              'Agent memory (.claude/memory/)': [],
+              'Agent commands (.claude/commands/)': [],
+              'CI workflows (.github/workflows/)': [],
+              'Git hooks (.githooks/)': [],
+              'Validation code (crux/validate/)': [],
+            };
+
+            for (const file of protectedFiles) {
+              if (/^CLAUDE\.md$/.test(file)) categories['Agent instructions (CLAUDE.md)'].push(file);
+              else if (/^\.claude\/rules\//.test(file)) categories['Agent rules (.claude/rules/)'].push(file);
+              else if (/^\.claude\/memory\//.test(file)) categories['Agent memory (.claude/memory/)'].push(file);
+              else if (/^\.claude\/commands\//.test(file)) categories['Agent commands (.claude/commands/)'].push(file);
+              else if (/^\.github\/workflows\//.test(file)) categories['CI workflows (.github/workflows/)'].push(file);
+              else if (/^\.githooks\//.test(file)) categories['Git hooks (.githooks/)'].push(file);
+              else if (/^crux\/validate\//.test(file)) categories['Validation code (crux/validate/)'].push(file);
+            }
+
+            // Check if the review label is present
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const hasReviewLabel = labels.some(l => l.name === REVIEW_LABEL);
+
+            // Build the comment body
+            const statusIcon = hasReviewLabel ? '✅' : '🛑';
+            const statusText = hasReviewLabel
+              ? `The \`${REVIEW_LABEL}\` label is present. A human has acknowledged these changes.`
+              : `**Action required**: Add the \`${REVIEW_LABEL}\` label after a human has reviewed the protected file changes.`;
+
+            const fileList = Object.entries(categories)
+              .filter(([, files]) => files.length > 0)
+              .map(([category, files]) => {
+                const items = files.map(f => `  - \`${f}\``).join('\n');
+                return `**${category}**\n${items}`;
+              })
+              .join('\n\n');
+
+            const body = [
+              COMMENT_MARKER,
+              `## ${statusIcon} Protected Paths Modified`,
+              '',
+              `This PR modifies **${protectedFiles.length} protected file(s)** that control agent behavior, CI pipelines, or validation logic. These changes require human review before merging.`,
+              '',
+              fileList,
+              '',
+              '---',
+              '',
+              statusText,
+              '',
+              `> **Why this check exists**: Agents have write access to their own behavioral rules. Without human review, a rule change buried in a large PR could weaken validation, bypass gates, or modify agent instructions. See [#1405](https://github.com/quantified-uncertainty/longterm-wiki/issues/1405).`,
+            ].join('\n');
+
+            // Post or update the comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(COMMENT_MARKER));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+              console.log('Updated existing protected-paths comment.');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+              console.log('Posted protected-paths comment.');
+            }
+
+            // Fail the check if the review label is missing
+            if (!hasReviewLabel) {
+              core.setFailed(
+                `This PR modifies ${protectedFiles.length} protected file(s) but is missing the "${REVIEW_LABEL}" label. ` +
+                `A human must review the changes to agent rules, CI workflows, or validation code and add the label before this PR can merge.`
+              );
+            } else {
+              console.log(`Protected files modified but "${REVIEW_LABEL}" label is present. Check passes.`);
+            }
