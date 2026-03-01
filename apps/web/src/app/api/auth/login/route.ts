@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   ADMIN_COOKIE_NAME,
-  generateSessionToken,
-  verifyPassword,
-} from "@/lib/auth";
+  generateAdminToken,
+  getTokenMaxAge,
+} from "@/lib/admin-token";
+import { verifyPassword } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -21,7 +22,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid password" }, { status: 401 });
   }
 
-  const token = generateSessionToken(adminPassword);
+  const token = await generateAdminToken(adminPassword);
+  const maxAge = getTokenMaxAge();
 
   const response = NextResponse.json({ ok: true });
   response.cookies.set(ADMIN_COOKIE_NAME, token, {
@@ -29,8 +31,7 @@ export async function POST(request: NextRequest) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    // 30 days
-    maxAge: 60 * 60 * 24 * 30,
+    maxAge,
   });
 
   return response;
