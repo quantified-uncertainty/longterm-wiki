@@ -831,10 +831,16 @@ async function status(args: string[], options: CommandOptions): Promise<CommandR
     return { output, exitCode: 0 };
   }
 
-  // Fetch all linked issues in parallel
+  // Fetch all linked issues in parallel.
+  // Individual fetch failures return null — the issue may have been deleted or
+  // the user may not have access. This is intentional fire-and-forget for
+  // non-critical display data.
   const issues = await Promise.all(
     linkedIssueNums.map((n) =>
-      githubApi<GitHubIssueBasic>(`/repos/${REPO}/issues/${n}`).catch(() => null)
+      githubApi<GitHubIssueBasic>(`/repos/${REPO}/issues/${n}`).catch((e: unknown) => {
+        console.warn(`Failed to fetch issue #${n}: ${e instanceof Error ? e.message : String(e)}`);
+        return null;
+      })
     )
   );
 

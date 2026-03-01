@@ -228,6 +228,7 @@ describe("fetchWithRetry", () => {
       sleepCalls.push(ms);
     };
 
+    // Intentionally swallowed: we only care about the sleep timing, not the result
     await fetchWithRetry(
       "http://localhost:3000/api/test",
       { method: "POST" },

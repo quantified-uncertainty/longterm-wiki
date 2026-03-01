@@ -229,7 +229,8 @@ export async function triageGateChecks(
 
     return { skip: validSkips, llmCalled: true, durationMs: Date.now() - start };
   } catch {
-    // Any error → fallback to running everything
+    // Fail-closed: any error in triage → run all checks (never skip on error).
+    // This is intentional — triage is an optimization, not a gate.
     return { skip: {}, llmCalled: false, durationMs: Date.now() - start };
   }
 }

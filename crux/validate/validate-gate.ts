@@ -62,6 +62,7 @@ function getHeadHash(): string {
   try {
     return execSync('git rev-parse HEAD', { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
   } catch {
+    // Fail-closed: empty hash means stamp cache won't match, so gate runs fully
     return '';
   }
 }
@@ -73,6 +74,7 @@ function readStamp(): { hash: string; mode: string } | null {
     if (hash && mode) return { hash, mode };
     return null;
   } catch {
+    // Fail-closed: no stamp means gate runs fully (no cache hit)
     return null;
   }
 }
@@ -106,6 +108,7 @@ function getChangedFiles(): string[] {
     if (!diffOutput) return [];
     return diffOutput.split('\n').filter(Boolean);
   } catch {
+    // Fail-closed: empty file list means no triage optimization, all checks run
     return [];
   }
 }
@@ -151,7 +154,11 @@ const ASSIGN_IDS_STEP: Step = {
   command: 'node',
   args: ['--import', 'tsx/esm', 'scripts/assign-ids.mjs'],
   cwd: APP_DIR,
-  advisory: true, // Don't block if server unavailable
+  // Fail-open: ID assignment depends on the wiki-server being reachable.
+  // If the server is unavailable, build-data has its own local fallback
+  // (max-id-from-YAML + 1). Blocking the gate on server availability would
+  // break offline development.
+  advisory: true,
 };
 
 // Phase 1: Must run first — everything else depends on this
@@ -237,6 +244,10 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsc', '--noEmit', '-p', '../../crux/tsconfig.json'],
     cwd: APP_DIR,
+    // Fail-open: crux has its own tsconfig with relaxed settings and
+    // a known baseline of pre-existing errors. Blocking on crux type
+    // errors would prevent shipping app-only fixes. Use validate-crux-tsc
+    // baseline check for enforcement instead.
     advisory: true,
   },
   {
@@ -280,6 +291,10 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-mdx-compile.ts', '--quick'],
     cwd: PROJECT_ROOT,
+    // Fail-open: MDX compilation catches rendering issues that aren't
+    // syntax errors. Some pages have known compilation warnings that don't
+    // affect production rendering. The full Next.js build (--full mode)
+    // is the authoritative compilation check.
     advisory: true,
   },
   {

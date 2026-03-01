@@ -73,9 +73,14 @@ if (agentId) {
   setGroundskeeperAgentId(agentId);
   logger.info({ agentId }, "Active agent registered");
 
-  // Send heartbeat every 5 minutes to prove we're alive
+  // Send heartbeat every 5 minutes to prove we're alive.
+  // Heartbeat failures are intentionally logged at debug level — they're
+  // high-frequency and the wiki-server failure counter in scheduler.ts
+  // already tracks connectivity issues at a higher level.
   setInterval(() => {
-    sendHeartbeat(config, agentId).catch(() => {});
+    sendHeartbeat(config, agentId).catch((e: unknown) =>
+      logger.debug({ error: e instanceof Error ? e.message : String(e) }, "Heartbeat failed")
+    );
   }, 5 * 60 * 1000);
 }
 

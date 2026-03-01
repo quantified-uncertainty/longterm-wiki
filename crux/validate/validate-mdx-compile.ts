@@ -35,7 +35,10 @@ try {
   remarkGfm = appRequire('remark-gfm').default ?? appRequire('remark-gfm');
   remarkDirective = appRequire('remark-directive').default ?? appRequire('remark-directive');
 } catch {
-  // Graceful fallback — run without these plugins if not available
+  // Fail-open: run without remark plugins if not available (e.g., when running
+  // from a bare crux checkout without apps/web/node_modules). The validation
+  // will still catch most MDX syntax errors; GFM and directive-specific issues
+  // are caught by the full Next.js build in --full mode.
 }
 
 // Use shared libraries
