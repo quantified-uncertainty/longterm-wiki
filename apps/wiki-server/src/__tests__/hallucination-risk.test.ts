@@ -18,10 +18,14 @@ let riskStore: Array<{
 /** Whether to simulate the materialized view existing. */
 let simulateMatView = false;
 
+/** Count how many times pg_matviews is actually queried (for caching tests). */
+let pgMatviewsQueryCount = 0;
+
 function resetStore() {
   riskStore = [];
   nextId = 1;
   simulateMatView = false;
+  pgMatviewsQueryCount = 0;
 }
 
 /** Get latest snapshot per page (shared logic for stats/latest mock queries). */
@@ -41,12 +45,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // ---- pg_matviews check (materialized view existence) ----
   if (q.includes("pg_matviews") && q.includes("hallucination_risk_latest")) {
+    pgMatviewsQueryCount++;
     return [{ exists: simulateMatView }];
   }
 
   // ---- REFRESH MATERIALIZED VIEW (no-op in tests) ----
   if (q.includes("refresh materialized view")) {
     return [];
+  }
+
+  // ---- pg_class.reltuples (approximate count for stats) ----
+  if (q.includes("reltuples") && q.includes("pg_class") && q.includes("hallucination_risk_snapshots")) {
+    return [{ reltuples: riskStore.length }];
   }
 
   // ---- entity_ids (for health check) ----
@@ -288,6 +298,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 vi.mock("../db.js", () => mockDbModule(dispatch));
 
 const { createApp } = await import("../app.js");
+const { clearMatViewCache } = await import(
+  "../routes/hallucination-risk.js"
+);
 
 // ---- Tests ----
 
@@ -296,6 +309,7 @@ describe("Hallucination Risk API", () => {
 
   beforeEach(() => {
     resetStore();
+    clearMatViewCache();
     delete process.env.LONGTERMWIKI_SERVER_API_KEY;
     app = createApp();
   });
@@ -616,6 +630,59 @@ describe("Hallucination Risk API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.keep).toBe(30);
+    });
+  });
+
+  describe("matViewExists() caching", () => {
+    it("caches pg_matviews result across multiple requests", async () => {
+      simulateMatView = true;
+
+      // First request — should query pg_matviews
+      await app.request("/api/hallucination-risk/stats");
+      const firstCount = pgMatviewsQueryCount;
+      expect(firstCount).toBe(1);
+
+      // Second request — should use cached result, no new pg_matviews query
+      await app.request("/api/hallucination-risk/stats");
+      expect(pgMatviewsQueryCount).toBe(1); // unchanged — cache hit
+
+      // Third request to a different endpoint — still uses cache
+      await app.request("/api/hallucination-risk/latest");
+      expect(pgMatviewsQueryCount).toBe(1); // still unchanged
+    });
+
+    it("re-queries pg_matviews after cache is cleared", async () => {
+      simulateMatView = false;
+
+      // First request — queries pg_matviews, caches false
+      await app.request("/api/hallucination-risk/stats");
+      expect(pgMatviewsQueryCount).toBe(1);
+
+      // Clear cache, change simulated state
+      clearMatViewCache();
+      simulateMatView = true;
+
+      // Next request — should re-query pg_matviews since cache was cleared
+      await app.request("/api/hallucination-risk/stats");
+      expect(pgMatviewsQueryCount).toBe(2);
+    });
+
+    it("re-queries pg_matviews after TTL expires", async () => {
+      simulateMatView = true;
+
+      // First request — populates cache
+      await app.request("/api/hallucination-risk/stats");
+      expect(pgMatviewsQueryCount).toBe(1);
+
+      // Advance time past TTL (5 minutes = 300000ms)
+      vi.useFakeTimers();
+      vi.setSystemTime(Date.now() + 300_001);
+
+      // Next request — TTL expired, should re-query
+      await app.request("/api/hallucination-risk/stats");
+      expect(pgMatviewsQueryCount).toBe(2);
+
+      vi.useRealTimers();
     });
   });
 });
