@@ -1,7 +1,7 @@
 -- Covering index for DISTINCT ON (page_id) queries on hallucination_risk_snapshots.
 -- Enables index-only scans by including all columns read by /latest and /stats endpoints.
 -- Replaces the basic (page_id, computed_at DESC) index from 0014_query_performance.sql.
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_hrs_page_computed_covering
+CREATE INDEX IF NOT EXISTS idx_hrs_page_computed_covering
   ON hallucination_risk_snapshots (page_id, computed_at DESC)
   INCLUDE (id, score, level, factors, integrity_issues);
 --> statement-breakpoint
