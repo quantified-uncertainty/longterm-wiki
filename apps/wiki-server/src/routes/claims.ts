@@ -121,6 +121,38 @@ function claimValues(d: ClaimInput) {
 
 type ClaimSourceRowType = typeof claimSources.$inferSelect;
 
+/** Pagination schema for the /quality endpoint. */
+const QualityPaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit: 50 });
+
+/** Row shape returned by the per-entity quality aggregation query. */
+interface PerEntityQualityRow {
+  entity_id: string;
+  total_claims: number;
+  verified_count: number;
+  avg_verdict_score: number | null;
+  min_verdict_score: number | null;
+  max_verdict_score: number | null;
+}
+
+/** Row shape returned by the systemwide aggregates query. */
+interface SystemwideRow {
+  total_claims: number;
+  total_verified: number;
+  avg_score: number | null;
+}
+
+/** Row shape returned by the verdict distribution query. */
+interface VerdictDistributionRow {
+  verdict: string | null;
+  cnt: number;
+}
+
+/** Row shape returned by the score bucket distribution query. */
+interface ScoreBucketRow {
+  bucket: string;
+  cnt: number;
+}
+
 /** Raw row shape returned by the `/:id/similar` raw SQL query (pg_trgm similarity). */
 interface SimilarClaimDbRow {
   id: number;
@@ -1211,6 +1243,369 @@ const claimsApp = new Hono()
     const row = firstOrThrow(rows, "claim update");
     return c.json(formatClaim(row, sourcesRows));
   })
+  // ---- GET /quality (aggregate quality metrics per entity and system-wide) ----
+  // Supports pagination via limit/offset query params (default: limit=50, offset=0).
+  // IMPORTANT: Must be defined before GET /:id to avoid wildcard matching.
+  .get("/quality", async (c) => {
+    const parsed = QualityPaginationQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
+    const { limit, offset } = parsed.data;
+
+    const rawDb = getDb();
+
+    // Run all queries in parallel — consolidates 5 sequential queries into 1 parallel batch.
+    const [perEntityRows, entityCountResult, systemwideResult, verdictRows, bucketRows] = await Promise.all([
+      // 1. Paginated per-entity quality metrics
+      rawDb.unsafe<PerEntityQualityRow[]>(
+        `SELECT
+           entity_id,
+           count(*)::int AS total_claims,
+           count(*) FILTER (WHERE claim_verdict IS NOT NULL)::int AS verified_count,
+           avg(claim_verdict_score) AS avg_verdict_score,
+           min(claim_verdict_score) AS min_verdict_score,
+           max(claim_verdict_score) AS max_verdict_score
+         FROM claims
+         GROUP BY entity_id
+         ORDER BY count(*) DESC
+         LIMIT $1 OFFSET $2`,
+        [limit, offset],
+      ),
+      // 2. Total number of distinct entities (for pagination metadata)
+      rawDb.unsafe<[{ cnt: string }]>(
+        `SELECT count(DISTINCT entity_id)::int AS cnt FROM claims`,
+      ),
+      // 3. Systemwide aggregates: totals, verified count, avg score
+      rawDb.unsafe<SystemwideRow[]>(
+        `SELECT
+           (SELECT count(*)::int FROM claims) AS total_claims,
+           (SELECT count(*)::int FROM claims WHERE claim_verdict IS NOT NULL) AS total_verified,
+           (SELECT avg(claim_verdict_score) FROM claims WHERE claim_verdict_score IS NOT NULL) AS avg_score`,
+      ),
+      // 4. Verdict distribution
+      rawDb.unsafe<VerdictDistributionRow[]>(
+        `SELECT claim_verdict AS verdict, count(*)::int AS cnt
+         FROM claims
+         GROUP BY claim_verdict
+         ORDER BY cnt DESC`,
+      ),
+      // 5. Score distribution buckets
+      rawDb.unsafe<ScoreBucketRow[]>(
+        `SELECT
+           CASE
+             WHEN claim_verdict_score < 0.2 THEN '0-20'
+             WHEN claim_verdict_score < 0.4 THEN '20-40'
+             WHEN claim_verdict_score < 0.6 THEN '40-60'
+             WHEN claim_verdict_score < 0.8 THEN '60-80'
+             ELSE '80-100'
+           END AS bucket,
+           count(*)::int AS cnt
+         FROM claims
+         WHERE claim_verdict_score IS NOT NULL
+         GROUP BY bucket`,
+      ),
+    ]);
+
+    const totalEntities = Number(entityCountResult[0]?.cnt ?? 0);
+
+    const entityQuality = perEntityRows.map((r) => ({
+      entityId: r.entity_id,
+      totalClaims: Number(r.total_claims),
+      verifiedCount: Number(r.verified_count),
+      verifiedPct:
+        Number(r.total_claims) > 0
+          ? Math.round(
+              (Number(r.verified_count) / Number(r.total_claims)) * 100
+            )
+          : 0,
+      avgVerdictScore:
+        r.avg_verdict_score != null
+          ? Math.round(Number(r.avg_verdict_score) * 100) / 100
+          : null,
+      minVerdictScore:
+        r.min_verdict_score != null
+          ? Math.round(Number(r.min_verdict_score) * 100) / 100
+          : null,
+      maxVerdictScore:
+        r.max_verdict_score != null
+          ? Math.round(Number(r.max_verdict_score) * 100) / 100
+          : null,
+    }));
+
+    // Parse systemwide aggregates from the consolidated query
+    const sw = systemwideResult[0];
+    const total = Number(sw?.total_claims ?? 0);
+    const totalVerified = Number(sw?.total_verified ?? 0);
+    const avgScore = sw?.avg_score != null ? Number(sw.avg_score) : null;
+
+    return c.json({
+      entities: entityQuality,
+      pagination: {
+        limit,
+        offset,
+        total: totalEntities,
+        totalPages: Math.ceil(totalEntities / limit),
+      },
+      systemwide: {
+        totalClaims: total,
+        totalVerified,
+        verifiedPct:
+          total > 0
+            ? Math.round((totalVerified / total) * 100)
+            : 0,
+        avgVerdictScore:
+          avgScore != null
+            ? Math.round(avgScore * 100) / 100
+            : null,
+        byVerdict: Object.fromEntries(
+          verdictRows.map((r) => [
+            r.verdict ?? "unverified",
+            Number(r.cnt),
+          ])
+        ),
+        scoreBuckets: Object.fromEntries(
+          bucketRows.map((r) => [r.bucket, Number(r.cnt)])
+        ),
+      },
+    });
+  })
+
+  // ---- GET /by-page — claims for a specific wiki page, grouped by footnote ----
+  // Replaces the deprecated GET /api/citations/quotes endpoint (#1311).
+  // Joins claims → claim_page_references (for footnote) → claim_sources (for source data).
+  // Returns a CitationQuote-compatible shape for the frontend CitationOverlay.
+  // IMPORTANT: Must be defined before GET /:id to avoid wildcard matching.
+  .get("/by-page", async (c) => {
+    const pageId = c.req.query("page_id");
+    if (!pageId) return validationError(c, "page_id query parameter is required");
+
+    const limitParam = c.req.query("limit");
+    const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 500, 1), 1000) : 500;
+
+    const db = getDrizzleDb();
+
+    // Wrap all reads in a transaction to ensure a consistent snapshot (#1393).
+    const quotes = await db.transaction(async (tx) => {
+      // Step 1: Get all claim_page_references for this page (with footnote info)
+      const refs = await tx
+        .select({
+          claimId: claimPageReferences.claimId,
+          footnote: claimPageReferences.footnote,
+          section: claimPageReferences.section,
+        })
+        .from(claimPageReferences)
+        .where(eq(claimPageReferences.pageId, pageId))
+        .orderBy(asc(claimPageReferences.footnote))
+        .limit(limit);
+
+      if (refs.length === 0) {
+        return [] as Array<{
+          footnote: number;
+          url: string | null;
+          resourceId: string | null;
+          claimText: string;
+          sourceQuote: string | null;
+          sourceTitle: string | null;
+          sourceType: string | null;
+          quoteVerified: boolean;
+          verificationScore: number | null;
+          verifiedAt: string | null;
+          accuracyVerdict: string | null;
+          accuracyScore: number | null;
+          accuracyIssues: string | null;
+          accuracySupportingQuotes: string | null;
+          verificationDifficulty: string | null;
+          accuracyCheckedAt: string | null;
+        }>;
+      }
+
+      const claimIds = [...new Set(refs.map((r) => r.claimId))];
+
+      // Step 2: Fetch the claims themselves
+      const claimRows = await tx
+        .select()
+        .from(claims)
+        .where(inArray(claims.id, claimIds));
+
+      const claimMap = new Map(claimRows.map((r) => [Number(r.id), r]));
+
+      // Step 3: Fetch primary sources for these claims (limit to primary or first source)
+      const sourcesRows = await tx
+        .select()
+        .from(claimSources)
+        .where(inArray(claimSources.claimId, claimIds))
+        .orderBy(desc(claimSources.isPrimary), asc(claimSources.addedAt));
+
+      // Build a map: claimId → primary source (first one, preferring isPrimary)
+      const sourceMap = new Map<number, typeof claimSources.$inferSelect>();
+      for (const s of sourcesRows) {
+        const cid = Number(s.claimId);
+        if (!sourceMap.has(cid)) {
+          sourceMap.set(cid, s);
+        }
+      }
+
+      // Step 4: Build CitationQuote-compatible output
+      return refs
+        .filter((ref) => ref.footnote !== null && claimMap.has(Number(ref.claimId)))
+        .map((ref) => {
+          const claim = claimMap.get(Number(ref.claimId))!;
+          const source = sourceMap.get(Number(ref.claimId));
+
+          // Map claim verdict fields to the CitationQuote shape
+          return {
+            footnote: ref.footnote as number,
+            url: source?.url ?? null,
+            resourceId: source?.resourceId ?? null,
+            claimText: claim.claimText,
+            sourceQuote: source?.sourceQuote ?? claim.sourceQuote ?? null,
+            sourceTitle: source?.sourceTitle ?? null,
+            sourceType: source?.sourceType ?? null,
+            quoteVerified: source?.sourceVerdict != null,
+            verificationScore: source?.sourceVerdictScore ?? null,
+            verifiedAt: source?.sourceCheckedAt?.toISOString() ?? null,
+            accuracyVerdict: claim.claimVerdict ?? null,
+            accuracyScore: claim.claimVerdictScore ?? null,
+            accuracyIssues: claim.claimVerdictIssues ?? null,
+            accuracySupportingQuotes: claim.claimVerdictQuotes ?? null,
+            verificationDifficulty: claim.claimVerdictDifficulty ?? null,
+            accuracyCheckedAt: claim.claimVerifiedAt?.toISOString() ?? null,
+          };
+        });
+    });
+
+    return c.json({ quotes });
+  })
+
+  // ---- GET /by-source-url — claims citing a specific source URL, across all pages ----
+  // Replaces the deprecated GET /api/citations/quotes-by-url endpoint (#1311).
+  // Returns cross-page citation data grouped by URL for the /source/[id] page.
+  .get("/by-source-url", async (c) => {
+    const url = c.req.query("url");
+    if (!url) return validationError(c, "url query parameter is required");
+
+    const limitParam = c.req.query("limit");
+    const limit = limitParam
+      ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500)
+      : 100;
+
+    const db = getDrizzleDb();
+
+    // Step 1: Find all claim_sources matching this URL
+    const sourcesRows = await db
+      .select()
+      .from(claimSources)
+      .where(eq(claimSources.url, url))
+      .limit(limit);
+
+    if (sourcesRows.length === 0) {
+      return c.json({
+        quotes: [] as Array<{
+          pageId: string;
+          footnote: number;
+          url: string | null;
+          resourceId: string | null;
+          claimText: string;
+          sourceQuote: string | null;
+          sourceTitle: string | null;
+          sourceType: string | null;
+          quoteVerified: boolean;
+          verificationScore: number | null;
+          verifiedAt: string | null;
+          accuracyVerdict: string | null;
+          accuracyScore: number | null;
+          accuracyIssues: string | null;
+          accuracySupportingQuotes: string | null;
+          verificationDifficulty: string | null;
+          accuracyCheckedAt: string | null;
+        }>,
+        stats: {
+          totalPages: 0 as number,
+          totalQuotes: 0 as number,
+          verified: 0 as number,
+          accurate: 0 as number,
+          inaccurate: 0 as number,
+          unsupported: 0 as number,
+          minorIssues: 0 as number,
+        },
+      });
+    }
+
+    const claimIds = [...new Set(sourcesRows.map((s) => s.claimId))];
+
+    // Step 2: Fetch claims
+    const claimRows = await db
+      .select()
+      .from(claims)
+      .where(inArray(claims.id, claimIds));
+
+    const claimMap = new Map(claimRows.map((r) => [Number(r.id), r]));
+
+    // Step 3: Fetch page references for these claims
+    const pageRefs = await db
+      .select()
+      .from(claimPageReferences)
+      .where(inArray(claimPageReferences.claimId, claimIds))
+      .orderBy(asc(claimPageReferences.pageId), asc(claimPageReferences.footnote));
+
+    // Build source map: claimId → source row that matched our URL
+    const sourceByClaimId = new Map<number, typeof claimSources.$inferSelect>();
+    for (const s of sourcesRows) {
+      sourceByClaimId.set(Number(s.claimId), s);
+    }
+
+    // Step 4: Build cross-page quotes. Each page reference generates one quote entry.
+    const quotes = pageRefs
+      .filter((pr) => claimMap.has(Number(pr.claimId)))
+      .map((pr) => {
+        const claim = claimMap.get(Number(pr.claimId))!;
+        const source = sourceByClaimId.get(Number(pr.claimId));
+
+        return {
+          pageId: pr.pageId,
+          footnote: pr.footnote ?? 0,
+          url: source?.url ?? null,
+          resourceId: source?.resourceId ?? null,
+          claimText: claim.claimText,
+          sourceQuote: source?.sourceQuote ?? claim.sourceQuote ?? null,
+          sourceTitle: source?.sourceTitle ?? null,
+          sourceType: source?.sourceType ?? null,
+          quoteVerified: source?.sourceVerdict != null,
+          verificationScore: source?.sourceVerdictScore ?? null,
+          verifiedAt: source?.sourceCheckedAt?.toISOString() ?? null,
+          accuracyVerdict: claim.claimVerdict ?? null,
+          accuracyScore: claim.claimVerdictScore ?? null,
+          accuracyIssues: claim.claimVerdictIssues ?? null,
+          accuracySupportingQuotes: claim.claimVerdictQuotes ?? null,
+          verificationDifficulty: claim.claimVerdictDifficulty ?? null,
+          accuracyCheckedAt: claim.claimVerifiedAt?.toISOString() ?? null,
+        };
+      });
+
+    // Step 5: Compute aggregate stats
+    const pageIds = new Set(quotes.map((q) => q.pageId));
+    let verified = 0, accurate = 0, inaccurate = 0, unsupported = 0, minorIssues = 0;
+    for (const q of quotes) {
+      if (q.accuracyVerdict === "accurate") accurate++;
+      else if (q.accuracyVerdict === "inaccurate") inaccurate++;
+      else if (q.accuracyVerdict === "unsupported") unsupported++;
+      else if (q.accuracyVerdict === "minor_issues") minorIssues++;
+      if (q.quoteVerified) verified++;
+    }
+
+    return c.json({
+      quotes,
+      stats: {
+        totalPages: pageIds.size,
+        totalQuotes: quotes.length,
+        verified,
+        accurate,
+        inaccurate,
+        unsupported,
+        minorIssues,
+      },
+    });
+  })
+
   // ---- GET /:id (get by ID) ----
   .get("/:id", async (c) => {
     const idStr = c.req.param("id");
@@ -1347,366 +1742,6 @@ const claimsApp = new Hono()
       .returning();
 
     return c.json({ inserted: rows.length }, 201);
-  })
-  // ---- GET /quality (aggregate quality metrics per entity and system-wide) ----
-  .get("/quality", async (c) => {
-    const db = getDrizzleDb();
-
-    // Per-entity quality metrics
-    const perEntityRows = await db
-      .select({
-        entityId: claims.entityId,
-        totalClaims: count(),
-        verifiedCount:
-          sql<number>`count(*) filter (where ${claims.claimVerdict} is not null)`,
-        avgVerdictScore:
-          sql<number>`avg(${claims.claimVerdictScore})`,
-        minVerdictScore:
-          sql<number>`min(${claims.claimVerdictScore})`,
-        maxVerdictScore:
-          sql<number>`max(${claims.claimVerdictScore})`,
-      })
-      .from(claims)
-      .groupBy(claims.entityId)
-      .orderBy(desc(count()));
-
-    const entityQuality = perEntityRows.map((r) => ({
-      entityId: r.entityId,
-      totalClaims: r.totalClaims,
-      verifiedCount: Number(r.verifiedCount),
-      verifiedPct:
-        r.totalClaims > 0
-          ? Math.round(
-              (Number(r.verifiedCount) / r.totalClaims) * 100
-            )
-          : 0,
-      avgVerdictScore:
-        r.avgVerdictScore != null
-          ? Math.round(r.avgVerdictScore * 100) / 100
-          : null,
-      minVerdictScore:
-        r.minVerdictScore != null
-          ? Math.round(r.minVerdictScore * 100) / 100
-          : null,
-      maxVerdictScore:
-        r.maxVerdictScore != null
-          ? Math.round(r.maxVerdictScore * 100) / 100
-          : null,
-    }));
-
-    // System-wide totals
-    const totalResult = await db
-      .select({ count: count() })
-      .from(claims);
-    const total = totalResult[0].count;
-
-    const verifiedResult = await db
-      .select({ count: count() })
-      .from(claims)
-      .where(sql`${claims.claimVerdict} IS NOT NULL`);
-    const totalVerified = verifiedResult[0].count;
-
-    const avgScoreResult = await db
-      .select({
-        avg: sql<number>`avg(${claims.claimVerdictScore})`,
-      })
-      .from(claims)
-      .where(sql`${claims.claimVerdictScore} IS NOT NULL`);
-    const avgScore = avgScoreResult[0].avg;
-
-    // Verdict distribution (system-wide)
-    const byVerdict = await db
-      .select({
-        verdict: claims.claimVerdict,
-        count: count(),
-      })
-      .from(claims)
-      .groupBy(claims.claimVerdict)
-      .orderBy(desc(count()));
-
-    // Score distribution buckets (0-20, 20-40, 40-60, 60-80, 80-100%)
-    const bucketExpr = sql`case
-      when ${claims.claimVerdictScore} < 0.2 then '0-20'
-      when ${claims.claimVerdictScore} < 0.4 then '20-40'
-      when ${claims.claimVerdictScore} < 0.6 then '40-60'
-      when ${claims.claimVerdictScore} < 0.8 then '60-80'
-      else '80-100'
-    end`;
-    const scoreBuckets = await db
-      .select({
-        bucket: sql<string>`${bucketExpr}`,
-        count: count(),
-      })
-      .from(claims)
-      .where(sql`${claims.claimVerdictScore} IS NOT NULL`)
-      .groupBy(bucketExpr);
-
-    return c.json({
-      entities: entityQuality,
-      systemwide: {
-        totalClaims: total,
-        totalVerified,
-        verifiedPct:
-          total > 0
-            ? Math.round((totalVerified / total) * 100)
-            : 0,
-        avgVerdictScore:
-          avgScore != null
-            ? Math.round(avgScore * 100) / 100
-            : null,
-        byVerdict: Object.fromEntries(
-          byVerdict.map((r) => [
-            r.verdict ?? "unverified",
-            r.count,
-          ])
-        ),
-        scoreBuckets: Object.fromEntries(
-          scoreBuckets.map((r) => [r.bucket, r.count])
-        ),
-      },
-    });
-  })
-
-  // ---- GET /by-page — claims for a specific wiki page, grouped by footnote ----
-  // Replaces the deprecated GET /api/citations/quotes endpoint (#1311).
-  // Joins claims → claim_page_references (for footnote) → claim_sources (for source data).
-  // Returns a CitationQuote-compatible shape for the frontend CitationOverlay.
-  .get("/by-page", async (c) => {
-    const pageId = c.req.query("page_id");
-    if (!pageId) return validationError(c, "page_id query parameter is required");
-
-    const limitParam = c.req.query("limit");
-    const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 500, 1), 1000) : 500;
-
-    const db = getDrizzleDb();
-
-    // Step 1: Get all claim_page_references for this page (with footnote info)
-    const refs = await db
-      .select({
-        claimId: claimPageReferences.claimId,
-        footnote: claimPageReferences.footnote,
-        section: claimPageReferences.section,
-      })
-      .from(claimPageReferences)
-      .where(eq(claimPageReferences.pageId, pageId))
-      .orderBy(asc(claimPageReferences.footnote))
-      .limit(limit);
-
-    if (refs.length === 0) {
-      return c.json({ quotes: [] as Array<{
-        footnote: number;
-        url: string | null;
-        resourceId: string | null;
-        claimText: string;
-        sourceQuote: string | null;
-        sourceTitle: string | null;
-        sourceType: string | null;
-        quoteVerified: boolean;
-        verificationScore: number | null;
-        verifiedAt: string | null;
-        accuracyVerdict: string | null;
-        accuracyScore: number | null;
-        accuracyIssues: string | null;
-        accuracySupportingQuotes: string | null;
-        verificationDifficulty: string | null;
-        accuracyCheckedAt: string | null;
-      }> });
-    }
-
-    const claimIds = [...new Set(refs.map((r) => r.claimId))];
-
-    // Step 2: Fetch the claims themselves
-    const claimRows = await db
-      .select()
-      .from(claims)
-      .where(inArray(claims.id, claimIds));
-
-    const claimMap = new Map(claimRows.map((r) => [Number(r.id), r]));
-
-    // Step 3: Fetch primary sources for these claims (limit to primary or first source)
-    const sourcesRows = await db
-      .select()
-      .from(claimSources)
-      .where(inArray(claimSources.claimId, claimIds))
-      .orderBy(desc(claimSources.isPrimary), asc(claimSources.addedAt));
-
-    // Build a map: claimId → primary source (first one, preferring isPrimary)
-    const sourceMap = new Map<number, typeof claimSources.$inferSelect>();
-    for (const s of sourcesRows) {
-      const cid = Number(s.claimId);
-      if (!sourceMap.has(cid)) {
-        sourceMap.set(cid, s);
-      }
-    }
-
-    // Step 4: Build CitationQuote-compatible output
-    const quotes = refs
-      .filter((ref) => ref.footnote !== null && claimMap.has(Number(ref.claimId)))
-      .map((ref) => {
-        const claim = claimMap.get(Number(ref.claimId))!;
-        const source = sourceMap.get(Number(ref.claimId));
-
-        // Map claim verdict fields to the CitationQuote shape
-        // claim_verdict → accuracyVerdict
-        // claim_verdict_score → accuracyScore
-        // claim_verdict_issues → accuracyIssues
-        // claim_verdict_quotes → accuracySupportingQuotes
-        // claim_verdict_difficulty → verificationDifficulty
-        // claim_verified_at → accuracyCheckedAt
-        // source_verdict → quoteVerified (true if source_verdict exists)
-        // source_verdict_score → verificationScore
-        // source_checked_at → verifiedAt
-        return {
-          footnote: ref.footnote as number,
-          url: source?.url ?? null,
-          resourceId: source?.resourceId ?? null,
-          claimText: claim.claimText,
-          sourceQuote: source?.sourceQuote ?? claim.sourceQuote ?? null,
-          sourceTitle: source?.sourceTitle ?? null,
-          sourceType: source?.sourceType ?? null,
-          quoteVerified: source?.sourceVerdict != null,
-          verificationScore: source?.sourceVerdictScore ?? null,
-          verifiedAt: source?.sourceCheckedAt?.toISOString() ?? null,
-          accuracyVerdict: claim.claimVerdict ?? null,
-          accuracyScore: claim.claimVerdictScore ?? null,
-          accuracyIssues: claim.claimVerdictIssues ?? null,
-          accuracySupportingQuotes: claim.claimVerdictQuotes ?? null,
-          verificationDifficulty: claim.claimVerdictDifficulty ?? null,
-          accuracyCheckedAt: claim.claimVerifiedAt?.toISOString() ?? null,
-        };
-      });
-
-    return c.json({ quotes });
-  })
-
-  // ---- GET /by-source-url — claims citing a specific source URL, across all pages ----
-  // Replaces the deprecated GET /api/citations/quotes-by-url endpoint (#1311).
-  // Returns cross-page citation data grouped by URL for the /source/[id] page.
-  .get("/by-source-url", async (c) => {
-    const url = c.req.query("url");
-    if (!url) return validationError(c, "url query parameter is required");
-
-    const limitParam = c.req.query("limit");
-    const limit = limitParam
-      ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500)
-      : 100;
-
-    const db = getDrizzleDb();
-
-    // Step 1: Find all claim_sources matching this URL
-    const sourcesRows = await db
-      .select()
-      .from(claimSources)
-      .where(eq(claimSources.url, url))
-      .limit(limit);
-
-    if (sourcesRows.length === 0) {
-      return c.json({
-        quotes: [] as Array<{
-          pageId: string;
-          footnote: number;
-          url: string | null;
-          resourceId: string | null;
-          claimText: string;
-          sourceQuote: string | null;
-          sourceTitle: string | null;
-          sourceType: string | null;
-          quoteVerified: boolean;
-          verificationScore: number | null;
-          verifiedAt: string | null;
-          accuracyVerdict: string | null;
-          accuracyScore: number | null;
-          accuracyIssues: string | null;
-          accuracySupportingQuotes: string | null;
-          verificationDifficulty: string | null;
-          accuracyCheckedAt: string | null;
-        }>,
-        stats: {
-          totalPages: 0 as number,
-          totalQuotes: 0 as number,
-          verified: 0 as number,
-          accurate: 0 as number,
-          inaccurate: 0 as number,
-          unsupported: 0 as number,
-          minorIssues: 0 as number,
-        },
-      });
-    }
-
-    const claimIds = [...new Set(sourcesRows.map((s) => s.claimId))];
-
-    // Step 2: Fetch claims
-    const claimRows = await db
-      .select()
-      .from(claims)
-      .where(inArray(claims.id, claimIds));
-
-    const claimMap = new Map(claimRows.map((r) => [Number(r.id), r]));
-
-    // Step 3: Fetch page references for these claims
-    const pageRefs = await db
-      .select()
-      .from(claimPageReferences)
-      .where(inArray(claimPageReferences.claimId, claimIds))
-      .orderBy(asc(claimPageReferences.pageId), asc(claimPageReferences.footnote));
-
-    // Build source map: claimId → source row that matched our URL
-    const sourceByClaimId = new Map<number, typeof claimSources.$inferSelect>();
-    for (const s of sourcesRows) {
-      sourceByClaimId.set(Number(s.claimId), s);
-    }
-
-    // Step 4: Build cross-page quotes. Each page reference generates one quote entry.
-    const quotes = pageRefs
-      .filter((pr) => claimMap.has(Number(pr.claimId)))
-      .map((pr) => {
-        const claim = claimMap.get(Number(pr.claimId))!;
-        const source = sourceByClaimId.get(Number(pr.claimId));
-
-        return {
-          pageId: pr.pageId,
-          footnote: pr.footnote ?? 0,
-          url: source?.url ?? null,
-          resourceId: source?.resourceId ?? null,
-          claimText: claim.claimText,
-          sourceQuote: source?.sourceQuote ?? claim.sourceQuote ?? null,
-          sourceTitle: source?.sourceTitle ?? null,
-          sourceType: source?.sourceType ?? null,
-          quoteVerified: source?.sourceVerdict != null,
-          verificationScore: source?.sourceVerdictScore ?? null,
-          verifiedAt: source?.sourceCheckedAt?.toISOString() ?? null,
-          accuracyVerdict: claim.claimVerdict ?? null,
-          accuracyScore: claim.claimVerdictScore ?? null,
-          accuracyIssues: claim.claimVerdictIssues ?? null,
-          accuracySupportingQuotes: claim.claimVerdictQuotes ?? null,
-          verificationDifficulty: claim.claimVerdictDifficulty ?? null,
-          accuracyCheckedAt: claim.claimVerifiedAt?.toISOString() ?? null,
-        };
-      });
-
-    // Step 5: Compute aggregate stats
-    const pageIds = new Set(quotes.map((q) => q.pageId));
-    let verified = 0, accurate = 0, inaccurate = 0, unsupported = 0, minorIssues = 0;
-    for (const q of quotes) {
-      if (q.accuracyVerdict === "accurate") accurate++;
-      else if (q.accuracyVerdict === "inaccurate") inaccurate++;
-      else if (q.accuracyVerdict === "unsupported") unsupported++;
-      else if (q.accuracyVerdict === "minor_issues") minorIssues++;
-      if (q.quoteVerified) verified++;
-    }
-
-    return c.json({
-      quotes,
-      stats: {
-        totalPages: pageIds.size,
-        totalQuotes: quotes.length,
-        verified,
-        accurate,
-        inaccurate,
-        unsupported,
-        minorIssues,
-      },
-    });
   });
 
 export const claimsRoute = claimsApp;
