@@ -9,7 +9,7 @@
  *
  * Checks:
  * 1. ID resolves to a known entity (via pathRegistry, entities DB, or content file)
- * 2. Slug IDs should use numeric format instead (WARNING, auto-fixable)
+ * 2. Slug IDs should use numeric format instead (ERROR, auto-fixable)
  * 3. Numeric ID + name: validates name matches the entity's slug (ERROR if mismatch)
  * 4. Numeric ID without name: advisory (WARNING, auto-fixable)
  * 5. Unknown numeric ID: warning
@@ -189,7 +189,7 @@ export const entityLinkIdsRule = createRule({
               file: content.path,
               line: lineNum,
               message: `EntityLink id="${rawId}" — use numeric format: id="${numericId}" name="${id}"`,
-              severity: Severity.WARNING,
+              severity: Severity.ERROR,
               fix: {
                 type: FixType.REPLACE_TEXT,
                 oldText: `id="${rawId}"`,

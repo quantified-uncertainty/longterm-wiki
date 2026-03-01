@@ -6,6 +6,7 @@
  */
 
 import type { Config } from "./config.js";
+import { logger } from "./logger.js";
 
 interface ApiResult<T> {
   ok: boolean;
@@ -82,13 +83,13 @@ export async function recordRunToServer(
     payload,
   );
   if (!result.ok) {
-    console.log(
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
+    logger.warn(
+      {
         event: "wiki_server_sync_failed",
         endpoint: "/api/groundskeeper-runs",
         error: result.error,
-      }),
+      },
+      "Failed to record run to wiki-server",
     );
   }
 }
@@ -102,34 +103,63 @@ interface ActiveAgentResponse {
   sessionId: string;
 }
 
+/** Maximum number of retries for agent registration. */
+const REGISTER_MAX_RETRIES = 5;
+
+/** Base delay in ms for exponential backoff (doubles each retry: 2s, 4s, 8s, 16s, 32s). */
+const REGISTER_BASE_DELAY_MS = 2_000;
+
 /**
- * Register the groundskeeper as an active agent. Best-effort.
- * Returns the agent ID if successful, null otherwise.
+ * Register the groundskeeper as an active agent with retry.
+ *
+ * Uses exponential backoff so that if wiki-server is down at groundskeeper
+ * startup, registration is retried rather than silently failing. Without
+ * retry, the groundskeeper would remain invisible for its entire lifecycle.
+ *
+ * Returns the agent ID if successful, null if all retries are exhausted.
  */
 export async function registerAsActiveAgent(
   config: Config,
 ): Promise<number | null> {
-  const result = await apiRequest<ActiveAgentResponse>(
-    config,
-    "POST",
-    "/api/active-agents",
-    {
-      sessionId: "groundskeeper",
-      task: "Scheduled maintenance daemon (health checks, conflict resolution, code review)",
-      model: "groundskeeper-daemon",
-    },
-  );
+  for (let attempt = 0; attempt <= REGISTER_MAX_RETRIES; attempt++) {
+    const result = await apiRequest<ActiveAgentResponse>(
+      config,
+      "POST",
+      "/api/active-agents",
+      {
+        sessionId: "groundskeeper",
+        task: "Scheduled maintenance daemon (health checks, conflict resolution, code review)",
+        model: "groundskeeper-daemon",
+      },
+    );
 
-  if (result.ok && result.data) {
-    return result.data.id;
+    if (result.ok && result.data) {
+      return result.data.id;
+    }
+
+    logger.warn(
+      {
+        event: "active_agent_registration_failed",
+        attempt: attempt + 1,
+        maxRetries: REGISTER_MAX_RETRIES,
+        error: result.error,
+      },
+      "Active agent registration failed",
+    );
+
+    // Don't delay after the last attempt
+    if (attempt < REGISTER_MAX_RETRIES) {
+      const delay = REGISTER_BASE_DELAY_MS * Math.pow(2, attempt);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
   }
 
-  console.log(
-    JSON.stringify({
-      timestamp: new Date().toISOString(),
-      event: "active_agent_registration_failed",
-      error: result.error,
-    }),
+  logger.warn(
+    {
+      event: "active_agent_registration_exhausted",
+      maxRetries: REGISTER_MAX_RETRIES + 1,
+    },
+    `Failed to register after ${REGISTER_MAX_RETRIES + 1} attempts. Groundskeeper will run without active-agent tracking.`,
   );
   return null;
 }
@@ -149,12 +179,12 @@ export async function updateActiveAgent(
     updates,
   );
   if (!result.ok) {
-    console.log(
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
+    logger.warn(
+      {
         event: "active_agent_update_failed",
         error: result.error,
-      }),
+      },
+      "Failed to update active agent",
     );
   }
 }
@@ -168,6 +198,8 @@ export async function updateActiveAgent(
  * If wiki-server is the thing that's down, this call will also fail — that's
  * expected. The groundskeeper health-check task also creates GitHub issues
  * as a fallback notification channel.
+ *
+ * Returns true if the incident was recorded successfully, false otherwise.
  */
 export async function recordIncident(
   config: Config,
@@ -179,7 +211,7 @@ export async function recordIncident(
     checkSource?: string;
     metadata?: Record<string, unknown>;
   },
-): Promise<void> {
+): Promise<boolean> {
   const result = await apiRequest(
     config,
     "POST",
@@ -187,15 +219,17 @@ export async function recordIncident(
     payload,
   );
   if (!result.ok) {
-    console.log(
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
+    logger.warn(
+      {
         event: "incident_recording_failed",
         endpoint: "/api/monitoring/incidents",
         error: result.error,
-      }),
+      },
+      "Failed to record incident to wiki-server",
     );
+    return false;
   }
+  return true;
 }
 
 /**

@@ -2,6 +2,10 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "./logger.js";
 import { validateApiKey, requireWriteScope } from "./auth.js";
+import {
+  rateLimitMiddleware,
+  createDefaultRateLimiters,
+} from "./rate-limit.js";
 import { healthRoute } from "./routes/health.js";
 import { idsRoute } from "./routes/ids.js";
 import { citationsRoute } from "./routes/citations.js";
@@ -55,6 +59,22 @@ export function createApp() {
       logger.info(logData, "request");
     }
   });
+
+  // Rate limiting middleware — applied before auth so that abusive traffic
+  // is rejected early without touching the database or auth layer.
+  // Health endpoint is exempt so monitoring probes are never throttled.
+  const { readLimiter, writeLimiter } = createDefaultRateLimiters();
+  readLimiter.startCleanup();
+  writeLimiter.startCleanup();
+
+  app.use(
+    "*",
+    rateLimitMiddleware({
+      readLimiter,
+      writeLimiter,
+      skipPaths: ["/health"],
+    })
+  );
 
   // Error handler — re-throw HTTPExceptions (auth failures etc.) so Hono
   // returns the proper status code; only catch unexpected errors as 500.

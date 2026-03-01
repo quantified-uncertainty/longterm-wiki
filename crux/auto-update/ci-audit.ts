@@ -222,15 +222,16 @@ export async function runAuditGate(options: {
   // Filter to pages that actually exist and have citations
   const validPages = pageIds.filter(id => findPageFile(id) !== null);
 
-  console.log(`\nAudit gate: ${validPages.length} page(s) to audit`);
-  if (apply) console.log('  Mode: audit + auto-fix');
-  console.log('');
+  // Progress messages go to stderr to keep stdout clean for JSON output
+  process.stderr.write(`\nAudit gate: ${validPages.length} page(s) to audit\n`);
+  if (apply) process.stderr.write('  Mode: audit + auto-fix\n');
+  process.stderr.write('\n');
 
   const results: PageAuditResult[] = [];
 
   for (let i = 0; i < validPages.length; i++) {
     const pageId = validPages[i];
-    console.log(`[${i + 1}/${validPages.length}] Auditing: ${pageId}`);
+    process.stderr.write(`[${i + 1}/${validPages.length}] Auditing: ${pageId}\n`);
 
     const filePath = findPageFile(pageId);
     if (!filePath) {
@@ -250,7 +251,7 @@ export async function runAuditGate(options: {
     const citations = extractCitationsFromContent(body);
 
     if (citations.length === 0) {
-      console.log(`  No citations — skipping`);
+      process.stderr.write(`  No citations — skipping\n`);
       results.push({
         pageId,
         totalCitations: 0,
@@ -261,7 +262,7 @@ export async function runAuditGate(options: {
       continue;
     }
 
-    console.log(`  ${citations.length} citations found — running audit...`);
+    process.stderr.write(`  ${citations.length} citations found — running audit...\n`);
 
     // Run the full audit pipeline as a subprocess
     const exitCode = runAuditForPage(pageId, apply, verbose);
@@ -280,12 +281,12 @@ export async function runAuditGate(options: {
     if (accuracy) {
       const issues = accuracy.inaccurate + accuracy.unsupported;
       if (issues > 0) {
-        console.log(`  Result: ${accuracy.inaccurate} inaccurate, ${accuracy.unsupported} unsupported`);
+        process.stderr.write(`  Result: ${accuracy.inaccurate} inaccurate, ${accuracy.unsupported} unsupported\n`);
       } else {
-        console.log(`  Result: all citations accurate`);
+        process.stderr.write(`  Result: all citations accurate\n`);
       }
     }
-    console.log('');
+    process.stderr.write('\n');
   }
 
   // Export dashboard data with all results

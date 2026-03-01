@@ -24,7 +24,7 @@ ratings:
 
 We want to reach a point where we can confidently spend ≈\$1,000 running the claims + improve pipeline across many high-importance pages and get reliably good results. This document plans the experimentation needed to get there.
 
-The claims system is architecturally ambitious (see <EntityLink id="claims-architecture-decisions">Architecture Decisions (E896)</EntityLink> and <EntityLink id="claim-first-architecture">Claim-First Architecture (E892)</EntityLink>). The risk isn't that it can't be built — it's that we build it before understanding what "good" looks like. A \$1,000 run on a poorly-calibrated system produces 10,000 mediocre claims that pollute the wiki. A \$1,000 run on a well-calibrated system produces a genuinely useful structured knowledge layer.
+The claims system is architecturally ambitious (see <EntityLink id="E896" name="claims-architecture-decisions">Architecture Decisions (E896)</EntityLink> and <EntityLink id="E892" name="claim-first-architecture">Claim-First Architecture (E892)</EntityLink>). The risk isn't that it can't be built — it's that we build it before understanding what "good" looks like. A \$1,000 run on a poorly-calibrated system produces 10,000 mediocre claims that pollute the wiki. A \$1,000 run on a well-calibrated system produces a genuinely useful structured knowledge layer.
 
 **This roadmap is experimentation-first.** Each sprint produces data that informs the next. We don't commit to scaling until the experiments prove the system works.
 
@@ -43,7 +43,7 @@ The claims system is architecturally ambitious (see <EntityLink id="claims-archi
 | **Deduplication** | Not started | — |
 | **Bulk orchestration** | Not started | — |
 
-**Pages with claims today:** 11 entities with 1,514 total claims. Kalshi (242) and Anthropic (325) are the most developed. See entity breakdown in <EntityLink id="claims-data-quality-audit">Quality Audit (E901)</EntityLink>.
+**Pages with claims today:** 11 entities with 1,514 total claims. Kalshi (242) and Anthropic (325) are the most developed. See entity breakdown in <EntityLink id="E901" name="claims-data-quality-audit">Quality Audit (E901)</EntityLink>.
 
 **Known quality issues (validated by Feb 2026 audit):**
 - 89.1% of claims have at least one quality issue
@@ -276,7 +276,7 @@ For each page:
 
 **Duration:** 1-2 sessions. **Cost:** ≈\$5-10.
 
-**Goal:** Fix the mechanically-fixable quality issues in existing claims before investing in extraction experiments. The <EntityLink id="claims-data-quality-audit">Quality Audit (E901)</EntityLink> found 89% of claims have issues, but many are fixable without re-extraction.
+**Goal:** Fix the mechanically-fixable quality issues in existing claims before investing in extraction experiments. The <EntityLink id="E901" name="claims-data-quality-audit">Quality Audit (E901)</EntityLink> found 89% of claims have issues, but many are fixable without re-extraction.
 
 **Tasks (ordered by impact × ease):**
 
@@ -540,7 +540,7 @@ Answer these questions:
 
 **Depends on:** Sprint 6 (need validated extraction and verification pipelines). Can start Phase 1 earlier if Sprint 2 completes.
 
-**Goal:** Add reasoning traces — structured records of how each claim was derived from source material — to the claims pipeline. This makes verification auditable and enables targeted re-verification. See <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> for the full design.
+**Goal:** Add reasoning traces — structured records of how each claim was derived from source material — to the claims pipeline. This makes verification auditable and enables targeted re-verification. See <EntityLink id="E903" name="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> for the full design.
 
 **Phase 1: Minimal traces (1 session, ≈\$5)**
 
@@ -640,7 +640,7 @@ Claims are only as trustworthy as their sources — and only as auditable as the
 1. **Resource transparency**: What sources do we have? Are they still available? Can readers access them independently?
 2. **Reasoning transparency**: How did we get from source to claim? What inference was involved? What would change our mind?
 
-See <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> for the full design of the reasoning transparency layer. The resource transparency gaps and proposals below focus on the source side.
+See <EntityLink id="E903" name="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> for the full design of the reasoning transparency layer. The resource transparency gaps and proposals below focus on the source side.
 
 ### Current Gaps
 
@@ -767,9 +767,9 @@ These are all worth doing, but they're sequenced after we know the core system w
 
 ## Related Documents
 
-- <EntityLink id="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions, cruxes, worked examples, red-team failure modes
-- <EntityLink id="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> — Empirical quality analysis of 1,514 claims
-- <EntityLink id="claims-extraction-quality-patterns">Extraction Quality Patterns (E902)</EntityLink> — Detailed failure mode catalog with detection and fixes
-- <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> — Data model and pipeline design for storing claim derivation chains
-- <EntityLink id="claim-first-architecture">Claim-First Architecture (E892)</EntityLink> — Long-term vision for claims as the primary wiki artifact
-- <EntityLink id="content-pipeline-architecture">Content Pipeline Architecture (E895)</EntityLink> — Faster page creation infrastructure (orthogonal but complementary)
+- <EntityLink id="E896" name="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions, cruxes, worked examples, red-team failure modes
+- <EntityLink id="E901" name="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> — Empirical quality analysis of 1,514 claims
+- <EntityLink id="E902" name="claims-extraction-quality-patterns">Extraction Quality Patterns (E902)</EntityLink> — Detailed failure mode catalog with detection and fixes
+- <EntityLink id="E903" name="reasoning-traces-architecture">Reasoning Traces Architecture (E903)</EntityLink> — Data model and pipeline design for storing claim derivation chains
+- <EntityLink id="E892" name="claim-first-architecture">Claim-First Architecture (E892)</EntityLink> — Long-term vision for claims as the primary wiki artifact
+- <EntityLink id="E895" name="content-pipeline-architecture">Content Pipeline Architecture (E895)</EntityLink> — Faster page creation infrastructure (orthogonal but complementary)

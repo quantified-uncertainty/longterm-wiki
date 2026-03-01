@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { eq, desc, and, lt } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
+import { logger } from "../logger.js";
 import { agentSessions } from "../schema.js";
 import {
   parseJsonBody,
@@ -160,7 +161,7 @@ const agentSessionsApp = new Hono()
       )
       .returning({ id: agentSessions.id, branch: agentSessions.branch });
 
-    console.log(`[agent-sessions] Sweep: marked ${stale.length} stale sessions as completed (cutoff: ${cutoff.toISOString()})`);
+    logger.info({ swept: stale.length, cutoff: cutoff.toISOString() }, "Sweep: marked stale sessions as completed");
 
     return c.json({ swept: stale.length, sessions: stale });
   });

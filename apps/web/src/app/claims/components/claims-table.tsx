@@ -45,13 +45,16 @@ const TABLE_ROW_HEIGHT_PX = 37;
 const STORAGE_KEY = "claims-table-column-visibility";
 
 /** Column visibility presets */
-const COLUMN_PRESETS: Record<string, { label: string; columns: VisibilityState }> = {
+const COLUMN_PRESETS: Record<
+  string,
+  { label: string; columns: VisibilityState }
+> = {
   default: {
     label: "Default",
     columns: {
       expand: true, claimId: true, entityId: true, claimText: true,
       structured: true, claimType: true, sources: true, claimCategory: true,
-      claimMode: false, confidence: true, verdict: true,
+      claimMode: false, confidence: true, verdict: true, verdictScore: false,
       sourceQuote: false, relatedEntities: false,
       hasMarkup: false, hasRelated: false, isPinned: false, inferenceType: false,
     },
@@ -61,7 +64,7 @@ const COLUMN_PRESETS: Record<string, { label: string; columns: VisibilityState }
     columns: {
       expand: true, claimId: true, entityId: true, claimText: true,
       structured: false, claimType: false, sources: true, claimCategory: false,
-      claimMode: false, confidence: true, verdict: true,
+      claimMode: false, confidence: false, verdict: true, verdictScore: true,
       sourceQuote: false, relatedEntities: true,
       hasMarkup: true, hasRelated: true, isPinned: false, inferenceType: false,
     },
@@ -71,7 +74,7 @@ const COLUMN_PRESETS: Record<string, { label: string; columns: VisibilityState }
     columns: {
       expand: true, claimId: true, entityId: true, claimText: true,
       structured: true, claimType: true, sources: false, claimCategory: true,
-      claimMode: true, confidence: false, verdict: false,
+      claimMode: true, confidence: false, verdict: false, verdictScore: false,
       sourceQuote: false, relatedEntities: false,
       hasMarkup: false, hasRelated: false, isPinned: true, inferenceType: true,
     },
@@ -81,7 +84,7 @@ const COLUMN_PRESETS: Record<string, { label: string; columns: VisibilityState }
     columns: {
       expand: true, claimId: true, entityId: true, claimText: true,
       structured: true, claimType: true, sources: true, claimCategory: true,
-      claimMode: true, confidence: true, verdict: true,
+      claimMode: true, confidence: true, verdict: true, verdictScore: true,
       sourceQuote: true, relatedEntities: true,
       hasMarkup: true, hasRelated: true, isPinned: true, inferenceType: true,
     },
@@ -101,6 +104,7 @@ const COLUMN_LABELS: Record<string, string> = {
   claimMode: "Mode",
   confidence: "Confidence",
   verdict: "Verdict",
+  verdictScore: "Score",
   sourceQuote: "Excerpt",
   relatedEntities: "Related",
   hasMarkup: "Markup",
@@ -500,6 +504,40 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
       />
     ),
     size: 100,
+  },
+  {
+    id: "verdictScore",
+    accessorFn: (row) => row.claimVerdictScore,
+    header: ({ column }) => (
+      <SortableHeader column={column}>Score</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const score = row.original.claimVerdictScore;
+      if (score == null) {
+        return (
+          <span className="text-muted-foreground/40 text-[10px]">
+            &mdash;
+          </span>
+        );
+      }
+      const pct = Math.round(score * 100);
+      const color =
+        pct >= 80
+          ? "text-emerald-700 bg-emerald-50"
+          : pct >= 60
+            ? "text-blue-700 bg-blue-50"
+            : pct >= 40
+              ? "text-amber-700 bg-amber-50"
+              : "text-red-700 bg-red-50";
+      return (
+        <span
+          className={`inline-flex items-center justify-center min-w-[2.5rem] px-1.5 py-0.5 rounded text-[10px] font-medium ${color}`}
+        >
+          {pct}%
+        </span>
+      );
+    },
+    size: 60,
   },
   {
     id: "sourceQuote",

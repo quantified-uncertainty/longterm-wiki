@@ -9,17 +9,21 @@ export interface ClaimFilters {
   multiEntity: boolean;
   numericOnly: boolean;
   structuredOnly: boolean;
+  verifiedOnly: boolean;
+  sortBy: string;
 }
 
 export function ClaimsFilterBar({
   entities,
   categories,
+  verdicts,
   filters,
   onFilterChange,
   entityNames = {},
 }: {
   entities: string[];
   categories: string[];
+  verdicts?: string[];
   filters: ClaimFilters;
   onFilterChange: (key: string, value: string | boolean) => void;
   entityNames?: Record<string, string>;
@@ -32,7 +36,15 @@ export function ClaimsFilterBar({
     filters.claimMode ||
     filters.multiEntity ||
     filters.numericOnly ||
-    filters.structuredOnly;
+    filters.structuredOnly ||
+    filters.verifiedOnly ||
+    filters.sortBy;
+
+  // Use verdicts from props if provided, otherwise fall back to known values
+  const verdictOptions =
+    verdicts && verdicts.length > 0
+      ? verdicts
+      : ["verified", "disputed", "unsupported", "not_verifiable"];
 
   return (
     <div className="flex flex-wrap gap-2 mb-4">
@@ -73,10 +85,11 @@ export function ClaimsFilterBar({
         className="text-xs border rounded px-2 py-1.5"
       >
         <option value="">All verdicts</option>
-        <option value="verified">verified</option>
-        <option value="disputed">disputed</option>
-        <option value="unsupported">unsupported</option>
-        <option value="unverified">unverified</option>
+        {verdictOptions.map((v) => (
+          <option key={v} value={v}>
+            {v.replace(/_/g, " ")}
+          </option>
+        ))}
       </select>
       <select
         value={filters.claimMode}
@@ -86,6 +99,18 @@ export function ClaimsFilterBar({
         <option value="">All modes</option>
         <option value="endorsed">endorsed</option>
         <option value="attributed">attributed</option>
+      </select>
+      <select
+        value={filters.sortBy}
+        onChange={(e) => onFilterChange("sortBy", e.target.value)}
+        className="text-xs border rounded px-2 py-1.5"
+      >
+        <option value="">Default sort</option>
+        <option value="verdict_score_desc">Score: high to low</option>
+        <option value="verdict_score_asc">Score: low to high</option>
+        <option value="verdict">Verdict</option>
+        <option value="newest">Newest first</option>
+        <option value="entity">Entity</option>
       </select>
       <label className="flex items-center gap-1.5 text-xs cursor-pointer">
         <input
@@ -109,10 +134,23 @@ export function ClaimsFilterBar({
         <input
           type="checkbox"
           checked={filters.structuredOnly}
-          onChange={(e) => onFilterChange("structuredOnly", e.target.checked)}
+          onChange={(e) =>
+            onFilterChange("structuredOnly", e.target.checked)
+          }
           className="rounded"
         />
         Structured only
+      </label>
+      <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+        <input
+          type="checkbox"
+          checked={filters.verifiedOnly}
+          onChange={(e) =>
+            onFilterChange("verifiedOnly", e.target.checked)
+          }
+          className="rounded"
+        />
+        Verified only
       </label>
       {hasFilters && (
         <button
@@ -123,9 +161,11 @@ export function ClaimsFilterBar({
             onFilterChange("category", "");
             onFilterChange("confidence", "");
             onFilterChange("claimMode", "");
+            onFilterChange("sortBy", "");
             onFilterChange("multiEntity", false);
             onFilterChange("numericOnly", false);
             onFilterChange("structuredOnly", false);
+            onFilterChange("verifiedOnly", false);
           }}
           className="text-xs text-blue-600 hover:underline cursor-pointer"
         >

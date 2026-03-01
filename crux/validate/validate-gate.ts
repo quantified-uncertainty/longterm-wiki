@@ -186,6 +186,7 @@ const FIX_STEPS: Step[] = [
 const UNIFIED_BLOCKING_RULES = [
   'comparison-operators',
   'dollar-signs',
+  'entitylink-ids',
   'footnote-integrity',
   'frontmatter-schema',
   'no-quoted-subcategory',
@@ -257,6 +258,20 @@ const PARALLEL_STEPS: Step[] = [
     name: 'No untyped row casts in routes',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-untyped-rows.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'no-console-log',
+    name: 'No console.log in server code',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-no-console-log.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'conflict-markers',
+    name: 'Conflict marker detection',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-conflict-markers.ts'],
     cwd: PROJECT_ROOT,
   },
   {

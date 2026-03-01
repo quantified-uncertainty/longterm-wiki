@@ -1,11 +1,12 @@
 import { Hono } from "hono";
-import { eq, desc, and, count, gte } from "drizzle-orm";
+import { eq, desc, and, count, gte, sql } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
 import {
   serviceHealthIncidents,
   activeAgents,
   groundskeeperRuns,
   jobs,
+  autoUpdateRuns,
 } from "../schema.js";
 import {
   parseJsonBody,
@@ -18,6 +19,7 @@ import {
   RecordIncidentSchema,
   UpdateIncidentSchema,
 } from "../api-types.js";
+import { logger } from "../logger.js";
 
 // Static service registry — no DB table needed
 const SERVICES = [
@@ -282,9 +284,9 @@ const monitoringApp = new Hono()
           maxRetries: 1,
         })
         .catch((err: unknown) => {
-          console.error(
-            "[monitoring] Failed to create monitoring-alert job:",
-            err instanceof Error ? err.message : String(err)
+          logger.error(
+            { err: err instanceof Error ? err.message : String(err) },
+            "Failed to create monitoring-alert job",
           );
         });
     }
@@ -324,7 +326,246 @@ const monitoringApp = new Hono()
 
     if (result.length === 0) return notFoundError(c, "Incident not found");
     return c.json(result[0]);
+  })
+
+  // ---- GET /extended — additional health data for the dashboard ----
+  .get("/extended", async (c) => {
+    const db = getDrizzleDb();
+    const rawDb = getDb();
+
+    // Run all queries in parallel
+    const [
+      ciResult,
+      gkStatsResult,
+      integrityResult,
+      autoUpdateResult,
+      recentSessionsResult,
+    ] = await Promise.all([
+      // 1. GitHub CI status for main branch
+      fetchCiStatus().catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch CI status");
+        return null;
+      }),
+
+      // 2. Groundskeeper task stats (last 24h)
+      fetchGroundskeeperStats(db),
+
+      // 3. Data integrity summary (dangling refs)
+      fetchIntegritySummary(rawDb),
+
+      // 4. Auto-update system stats
+      fetchAutoUpdateStats(db),
+
+      // 5. Recent agent sessions
+      fetchRecentSessions(rawDb),
+    ]);
+
+    return c.json({
+      ci: ciResult,
+      groundskeeperTasks: gkStatsResult,
+      integrity: integrityResult,
+      autoUpdate: autoUpdateResult,
+      recentSessions: recentSessionsResult,
+    });
   });
+
+// ---- Helper functions for /extended endpoint ----
+
+const GITHUB_REPO = "quantified-uncertainty/longterm-wiki";
+
+interface CiCheckRun {
+  name: string;
+  status: string;
+  conclusion: string | null;
+}
+
+async function fetchCiStatus() {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) return null;
+
+  // Get the latest commit on main
+  const branchResp = await fetch(
+    `https://api.github.com/repos/${GITHUB_REPO}/branches/main`,
+    {
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github+json",
+      },
+      signal: AbortSignal.timeout(8000),
+    }
+  );
+  if (!branchResp.ok) return null;
+
+  const branch = (await branchResp.json()) as {
+    commit: { sha: string };
+  };
+  const sha = branch.commit.sha;
+
+  // Get check runs for that commit
+  const checksResp = await fetch(
+    `https://api.github.com/repos/${GITHUB_REPO}/commits/${sha}/check-runs`,
+    {
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github+json",
+      },
+      signal: AbortSignal.timeout(8000),
+    }
+  );
+  if (!checksResp.ok) return null;
+
+  const checksData = (await checksResp.json()) as {
+    total_count: number;
+    check_runs: Array<{
+      name: string;
+      status: string;
+      conclusion: string | null;
+      completed_at: string | null;
+    }>;
+  };
+
+  const checks: CiCheckRun[] = checksData.check_runs.map((r) => ({
+    name: r.name,
+    status: r.status,
+    conclusion: r.conclusion,
+  }));
+
+  const allCompleted = checks.every((ch) => ch.status === "completed");
+  const anyFailed = checks.some((ch) => ch.conclusion === "failure");
+  const allPassed = allCompleted && !anyFailed;
+
+  return {
+    sha: sha.slice(0, 8),
+    totalChecks: checksData.total_count,
+    allCompleted,
+    allPassed,
+    anyFailed,
+    checks,
+  };
+}
+
+async function fetchGroundskeeperStats(db: ReturnType<typeof getDrizzleDb>) {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  const rows = await db
+    .select({
+      taskName: groundskeeperRuns.taskName,
+      totalRuns: sql<number>`count(*)::int`,
+      successCount: sql<number>`count(*) filter (where ${groundskeeperRuns.success} = true)::int`,
+      failureCount: sql<number>`count(*) filter (where ${groundskeeperRuns.success} = false)::int`,
+      avgDurationMs: sql<number>`avg(${groundskeeperRuns.durationMs})::int`,
+      lastRun: sql<string>`max(${groundskeeperRuns.timestamp})`,
+    })
+    .from(groundskeeperRuns)
+    .where(gte(groundskeeperRuns.timestamp, since))
+    .groupBy(groundskeeperRuns.taskName);
+
+  return rows.map((r) => ({
+    taskName: r.taskName,
+    totalRuns: r.totalRuns,
+    successCount: r.successCount,
+    failureCount: r.failureCount,
+    successRate: r.totalRuns > 0 ? Math.round((r.successCount / r.totalRuns) * 100) : null,
+    avgDurationMs: r.avgDurationMs,
+    lastRun: r.lastRun,
+  }));
+}
+
+async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
+  // Quick count of dangling refs across key tables
+  const result = await rawDb`
+    SELECT
+      (SELECT count(*) FROM facts WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_facts,
+      (SELECT count(*) FROM claims WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_claims,
+      (SELECT count(*) FROM summaries WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_summaries,
+      (SELECT count(*) FROM citation_quotes WHERE page_id NOT IN (SELECT id FROM wiki_pages))::int AS dangling_citations,
+      (SELECT count(*) FROM edit_logs WHERE page_id NOT IN (SELECT id FROM wiki_pages))::int AS dangling_edit_logs
+  `;
+
+  const row = result[0] as {
+    dangling_facts: number;
+    dangling_claims: number;
+    dangling_summaries: number;
+    dangling_citations: number;
+    dangling_edit_logs: number;
+  };
+
+  const totalDangling =
+    row.dangling_facts +
+    row.dangling_claims +
+    row.dangling_summaries +
+    row.dangling_citations +
+    row.dangling_edit_logs;
+
+  return {
+    totalDanglingRefs: totalDangling,
+    status: totalDangling === 0 ? "clean" : "issues_found",
+    breakdown: {
+      facts: row.dangling_facts,
+      claims: row.dangling_claims,
+      summaries: row.dangling_summaries,
+      citations: row.dangling_citations,
+      editLogs: row.dangling_edit_logs,
+    },
+  };
+}
+
+async function fetchAutoUpdateStats(db: ReturnType<typeof getDrizzleDb>) {
+  const [totalResult, recentRuns] = await Promise.all([
+    db.select({ count: count() }).from(autoUpdateRuns),
+    db
+      .select({
+        id: autoUpdateRuns.id,
+        date: autoUpdateRuns.date,
+        trigger: autoUpdateRuns.trigger,
+        pagesUpdated: autoUpdateRuns.pagesUpdated,
+        pagesFailed: autoUpdateRuns.pagesFailed,
+        budgetSpent: autoUpdateRuns.budgetSpent,
+        completedAt: autoUpdateRuns.completedAt,
+      })
+      .from(autoUpdateRuns)
+      .orderBy(desc(autoUpdateRuns.startedAt))
+      .limit(5),
+  ]);
+
+  return {
+    totalRuns: totalResult[0]?.count ?? 0,
+    recentRuns: recentRuns.map((r) => ({
+      id: r.id,
+      date: r.date,
+      trigger: r.trigger,
+      pagesUpdated: r.pagesUpdated ?? 0,
+      pagesFailed: r.pagesFailed ?? 0,
+      budgetSpent: r.budgetSpent ?? 0,
+      completed: r.completedAt !== null,
+    })),
+  };
+}
+
+async function fetchRecentSessions(rawDb: ReturnType<typeof getDb>) {
+  const rows = await rawDb`
+    SELECT
+      id, session_id, branch, task, status, issue_number, pr_number,
+      started_at, completed_at, model
+    FROM active_agents
+    WHERE status != 'stale'
+    ORDER BY started_at DESC NULLS LAST
+    LIMIT 10
+  `;
+
+  return rows.map((r) => ({
+    id: r.id as number,
+    sessionId: r.session_id as string,
+    branch: (r.branch as string | null) ?? null,
+    task: (r.task as string | null) ?? null,
+    status: r.status as string,
+    issueNumber: (r.issue_number as number | null) ?? null,
+    prNumber: (r.pr_number as number | null) ?? null,
+    startedAt: r.started_at ? String(r.started_at) : null,
+    completedAt: r.completed_at ? String(r.completed_at) : null,
+    model: (r.model as string | null) ?? null,
+  }));
+}
 
 export const monitoringRoute = monitoringApp;
 export type MonitoringRoute = typeof monitoringApp;

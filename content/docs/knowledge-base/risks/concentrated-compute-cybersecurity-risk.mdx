@@ -42,11 +42,11 @@ import {DataInfoBox, EntityLink} from '@components/wiki';
 
 ## Overview
 
-As global AI infrastructure spending reaches \$700B+ in 2026 across just 5-6 US companies, a novel and underexplored risk has emerged: the cybersecurity implications of extreme compute concentration.[^rc-73bb] The same dynamics that make <EntityLink id="compute-concentration">compute concentration</EntityLink> a structural risk for power and governance also create an unprecedented cybersecurity attack surface.
+As global AI infrastructure spending reaches \$700B+ in 2026 across just 5-6 US companies, a novel and underexplored risk has emerged: the cybersecurity implications of extreme compute concentration.[^rc-73bb] The same dynamics that make <EntityLink id="E684" name="compute-concentration">compute concentration</EntityLink> a structural risk for power and governance also create an unprecedented cybersecurity attack surface.
 
 The core problem is threefold. First, nearly all frontier AI training runs on NVIDIA hardware using NVIDIA's proprietary CUDA software — a monoculture that means a single vulnerability can affect all major AI providers simultaneously.[^rc-d19c] Second, the physical infrastructure is concentrated in a small number of facilities, making it vulnerable to targeted attacks, natural disasters, or power grid failures.[^rc-18c7] Third, the enormous value concentrated in these systems — model weights worth billions in R\&D, training data of immense strategic value, and compute that could be weaponized — makes them attractive targets for nation-state actors and sophisticated criminal organizations.
 
-This page examines a risk that sits at the intersection of <EntityLink id="compute-concentration">compute concentration</EntityLink>, <EntityLink id="concentration-of-power">concentration of power</EntityLink>, and emerging threats to AI infrastructure security. The question raised in public discourse — "If a bad actor could somehow hack a decent percentage of this compute and use it for nefarious ends, that could be really catastrophic" — deserves rigorous analysis.
+This page examines a risk that sits at the intersection of <EntityLink id="E684" name="compute-concentration">compute concentration</EntityLink>, <EntityLink id="E68" name="concentration-of-power">concentration of power</EntityLink>, and emerging threats to AI infrastructure security. The question raised in public discourse — "If a bad actor could somehow hack a decent percentage of this compute and use it for nefarious ends, that could be really catastrophic" — deserves rigorous analysis.
 
 ---
 
@@ -81,11 +81,11 @@ A supply chain attack on any of these layers could compromise training runs acro
 
 AI training infrastructure is physically concentrated in ways that amplify cybersecurity risk. An estimated 50% of US data centers are located in just two regions: Northern Virginia and Northern California.[^rc-18c7] While cloud providers operate facilities in dozens of regions globally, frontier AI training clusters — which require massive power, cooling, and high-bandwidth interconnects — are concentrated in fewer locations.
 
-The most extreme example is <EntityLink id="xai">xAI's</EntityLink> Colossus facility in Memphis, Tennessee, which houses 555,000 H200 GPUs representing approximately \$18B in hardware in a single location.[^rc-94d2] A physical attack, natural disaster, or sustained power disruption at this facility would eliminate a meaningful fraction of global frontier AI training capacity.
+The most extreme example is <EntityLink id="E378" name="xai">xAI's</EntityLink> Colossus facility in Memphis, Tennessee, which houses 555,000 H200 GPUs representing approximately \$18B in hardware in a single location.[^rc-94d2] A physical attack, natural disaster, or sustained power disruption at this facility would eliminate a meaningful fraction of global frontier AI training capacity.
 
 ### Power Grid Dependencies
 
-Large AI training clusters require hundreds of megawatts of power. The <EntityLink id="projecting-compute-spending">projected incremental power demand</EntityLink> of 15-20 GW in 2026 alone[^rc-8d9b] creates dependencies on specific power grid infrastructure. A targeted attack on power substations serving major data center clusters — a threat that has materialized in physical attacks on US power infrastructure in recent years — could disable AI training capacity without directly breaching any network security.
+Large AI training clusters require hundreds of megawatts of power. The <EntityLink id="E680" name="projecting-compute-spending">projected incremental power demand</EntityLink> of 15-20 GW in 2026 alone[^rc-8d9b] creates dependencies on specific power grid infrastructure. A targeted attack on power substations serving major data center clusters — a threat that has materialized in physical attacks on US power infrastructure in recent years — could disable AI training capacity without directly breaching any network security.
 
 ---
 
@@ -140,7 +140,7 @@ The AI compute ecosystem has analogous monoculture characteristics — NVIDIA's 
 
 ### What Labs Are Doing
 
-Major AI labs have invested in security teams and treat model weights as sensitive assets. <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink>, and <EntityLink id="deepmind">Google DeepMind</EntityLink> maintain dedicated security teams. Data centers employ physical security measures, and companies run bug bounty programs. Some labs have begun treating frontier model weights as assets requiring national-security-grade protection.
+Major AI labs have invested in security teams and treat model weights as sensitive assets. <EntityLink id="E218" name="openai">OpenAI</EntityLink>, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, and <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> maintain dedicated security teams. Data centers employ physical security measures, and companies run bug bounty programs. Some labs have begun treating frontier model weights as assets requiring national-security-grade protection.
 
 ### Critical Gaps
 

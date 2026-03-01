@@ -38,7 +38,7 @@ This page documents the technical side—how the wiki is built, how content is o
 
 | Section | Purpose | Examples |
 |---------|---------|----------|
-| **Knowledge Base** | Core content on risks, interventions, organizations, people | <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink>, <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> |
+| **Knowledge Base** | Core content on risks, interventions, organizations, people | <EntityLink id="E93" name="deceptive-alignment">Deceptive Alignment</EntityLink>, <EntityLink id="E13" name="ai-safety-institutes">AI Safety Institutes</EntityLink> |
 | **Models** | Analytical frameworks for understanding dynamics | Risk models, cascade models, governance models |
 | **Project** | Public-facing documentation about LongtermWiki itself | Vision, strategy, similar projects |
 | **Internal** | Contributor documentation, style guides, technical reference | This page, style guides, automation tools |
@@ -71,11 +71,11 @@ Templates determine expected structure and applicable style guide:
 
 | Template | Style Guide |
 |----------|-------------|
-| `knowledge-base-risk` | <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> |
-| `knowledge-base-response` | <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> |
-| `knowledge-base-model` | <EntityLink id="models-style-guide">Model Style Guide</EntityLink> |
+| `knowledge-base-risk` | <EntityLink id="E763" name="knowledge-base">Knowledge Base Style Guide</EntityLink> |
+| `knowledge-base-response` | <EntityLink id="E763" name="knowledge-base">Knowledge Base Style Guide</EntityLink> |
+| `knowledge-base-model` | <EntityLink id="E736" name="models-style-guide">Model Style Guide</EntityLink> |
 
-**For complete details, see <EntityLink id="page-types">Page Type System</EntityLink>.**
+**For complete details, see <EntityLink id="E739" name="page-types">Page Type System</EntityLink>.**
 
 ---
 
@@ -108,7 +108,7 @@ npm run crux -- content grade --page scheming --apply
 node scripts/content/grade-content.mjs --skip-graded --apply
 ```
 
-**For grading criteria and workflows, see <EntityLink id="rating-system">Content Quality</EntityLink>.**
+**For grading criteria and workflows, see <EntityLink id="E741" name="rating-system">Content Quality</EntityLink>.**
 
 ---
 
@@ -142,7 +142,7 @@ Running `npm run build:data` generates:
 
 Components pull from YAML databases to display structured information. For example, `EntityLink` provides stable cross-references, while `DataInfoBox` displays expert or organization profiles from YAML.
 
-**For database details and component usage, see <EntityLink id="content-database">Content Database</EntityLink>.**
+**For database details and component usage, see <EntityLink id="E759" name="content-database">Content Database</EntityLink>.**
 
 ---
 
@@ -155,8 +155,8 @@ The wiki uses stable ID-based linking that survives path reorganization:
 ```mdx
 import {EntityLink} from '@components/wiki';
 
-The <EntityLink id="scheming">scheming</EntityLink> risk relates to
-<EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>.
+The <EntityLink id="E274" name="scheming">scheming</EntityLink> risk relates to
+<EntityLink id="E93" name="deceptive-alignment">deceptive alignment</EntityLink>.
 ```
 
 Benefits:
@@ -197,7 +197,7 @@ Flowcharts, sequences, and graphs for static illustrations:
     C -->|Yes| D[Safe AI]
     C -->|No| E[Misalignment Risk]`} />
 
-**See <EntityLink id="mermaid-diagrams">Mermaid Diagrams</EntityLink> for guidelines.**
+**See <EntityLink id="E735" name="mermaid-diagrams">Mermaid Diagrams</EntityLink> for guidelines.**
 
 ### Cause-Effect Graphs
 
@@ -215,7 +215,7 @@ import {CauseEffectGraph} from '@components/CauseEffectGraph';
 
 Features: zoom, pan, minimap, node highlighting, path tracing, entity linking.
 
-**See <EntityLink id="cause-effect-diagrams">Cause-Effect Diagrams</EntityLink> for schema and examples.**
+**See <EntityLink id="E758" name="cause-effect-diagrams">Cause-Effect Diagrams</EntityLink> for schema and examples.**
 
 ---
 
@@ -260,7 +260,7 @@ The validation suite includes 20+ rules:
 | `quality-source` | Quality set by pipeline, not manually |
 | `mermaid` | Diagram syntax validation |
 
-**For complete tool reference, see <EntityLink id="automation-tools">Automation Tools</EntityLink>.**
+**For complete tool reference, see <EntityLink id="E757" name="automation-tools">Automation Tools</EntityLink>.**
 
 ---
 
@@ -343,11 +343,11 @@ npm run validate         # Full validation
 
 ### Creating New Content
 
-1. **New pages**: Follow the appropriate <EntityLink id="knowledge-base">style guide</EntityLink>
+1. **New pages**: Follow the appropriate <EntityLink id="E763" name="knowledge-base">style guide</EntityLink>
 2. **New entities**: Add to relevant YAML in `src/data/`, run `npm run build:data`
 3. **New components**: Add to `src/components/wiki/`, use path aliases
 
-**For content generation workflows, see <EntityLink id="research-reports">Research Reports</EntityLink>.**
+**For content generation workflows, see <EntityLink id="E748" name="research-reports">Research Reports</EntityLink>.**
 
 ---
 
@@ -360,16 +360,16 @@ npm run validate         # Full validation
 - [Strategy Brainstorm](/project/strategy-brainstorm/) — Failure modes and strategic options
 
 ### Style Guides
-- <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> — For risk and response pages
-- <EntityLink id="models-style-guide">Model Style Guide</EntityLink> — For analytical model pages
-- <EntityLink id="stub-style-guide">Stub Style Guide</EntityLink> — For minimal reference pages
+- <EntityLink id="E763" name="knowledge-base">Knowledge Base Style Guide</EntityLink> — For risk and response pages
+- <EntityLink id="E736" name="models-style-guide">Model Style Guide</EntityLink> — For analytical model pages
+- <EntityLink id="E753" name="stub-style-guide">Stub Style Guide</EntityLink> — For minimal reference pages
 
 ### Technical Documentation
-- <EntityLink id="architecture">System Architecture</EntityLink> — Data flow, pipelines, design decisions
-- <EntityLink id="page-types">Page Type System</EntityLink> — Complete classification reference
-- <EntityLink id="rating-system">Rating System</EntityLink> — Quality scoring system
-- <EntityLink id="content-database">Content Database</EntityLink> — Storage architecture (PostgreSQL, caching, YAML)
-- <EntityLink id="automation-tools">Automation Tools</EntityLink> — All scripts and workflows
-- <EntityLink id="cause-effect-diagrams">Cause-Effect Diagrams</EntityLink> — Graph schema and examples
-- <EntityLink id="mermaid-diagrams">Mermaid Diagrams</EntityLink> — Diagram guidelines
-- <EntityLink id="documentation-maintenance">Documentation Maintenance</EntityLink> — Keeping docs updated
+- <EntityLink id="E734" name="architecture">System Architecture</EntityLink> — Data flow, pipelines, design decisions
+- <EntityLink id="E739" name="page-types">Page Type System</EntityLink> — Complete classification reference
+- <EntityLink id="E741" name="rating-system">Rating System</EntityLink> — Quality scoring system
+- <EntityLink id="E759" name="content-database">Content Database</EntityLink> — Storage architecture (PostgreSQL, caching, YAML)
+- <EntityLink id="E757" name="automation-tools">Automation Tools</EntityLink> — All scripts and workflows
+- <EntityLink id="E758" name="cause-effect-diagrams">Cause-Effect Diagrams</EntityLink> — Graph schema and examples
+- <EntityLink id="E735" name="mermaid-diagrams">Mermaid Diagrams</EntityLink> — Diagram guidelines
+- <EntityLink id="E760" name="documentation-maintenance">Documentation Maintenance</EntityLink> — Keeping docs updated

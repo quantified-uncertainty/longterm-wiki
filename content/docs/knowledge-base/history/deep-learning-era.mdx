@@ -32,7 +32,7 @@ import {DataInfoBox, Mermaid, EntityLink, F} from '@components/wiki';
 | **Capability Acceleration** | Dramatic (10-100x/year) | ImageNet error: 26% → 3.5% (2012-2017); GPT parameters: 117M → <F e="openai" f="7c9b9073">175B</F> (2018-2020) |
 | **Safety Field Growth** | Moderate (2-5x) | Researchers: ≈100 → 500-1000; Funding: ≈\$3M → \$50-100M/year (2015-2020) |
 | **Timeline Compression** | Significant | AlphaGo achieved human-level Go ≈10 years ahead of expert predictions (2016 vs 2025-2030) |
-| **Institutional Response** | Foundational | DeepMind Safety Team (2016), <EntityLink id="E218">OpenAI</EntityLink> founded (2015), "Concrete Problems" paper (2016) |
+| **Institutional Response** | Foundational | DeepMind Safety Team (2016), <EntityLink id="E218" name="openai">OpenAI</EntityLink> founded (2015), "Concrete Problems" paper (2016) |
 | **Capabilities-Safety Gap** | Industry capabilities spending: billions; Safety spending: tens of millions | See funding table below |
 | **Public Awareness** | Growing | 200+ million viewers for AlphaGo match; GPT-2 "too dangerous" controversy (2019) |
 | **Key Publications** | Influential | "Concrete Problems" (2016): 2,700+ citations; established research agenda |
@@ -49,7 +49,7 @@ import {DataInfoBox, Mermaid, EntityLink, F} from '@components/wiki';
 
 The period from 2012 to 2020 saw AI capabilities advance more rapidly than most researchers had anticipated. Beginning with AlexNet's performance in the 2012 [ImageNet](https://en.wikipedia.org/wiki/ImageNet) competition — achieving a top-5 error rate of roughly 15%, compared to the next-best entrant's 26% — deep learning displaced prior machine learning approaches across computer vision, natural language processing, and game-playing.[^rc-1d24] Each successive milestone arrived earlier than expert forecasts had suggested: AlphaGo's defeat of Lee Sedol in 2016, the GPT language model series from 2018–2020, and BERT's 7.7 percentage-point absolute improvement on the GLUE benchmark in 2018 all demonstrated capabilities previously considered distinctive to human cognition.[^rc-05c8] Underlying this progress was an extraordinary expansion in compute: one estimate places the computational power applied to neural networks at roughly one million times that available in 1990.[^rc-1d24]
 
-For AI safety, the era was formative. Organizations including <EntityLink id="E98">Google DeepMind</EntityLink> and <EntityLink id="E218">OpenAI</EntityLink> — the latter founded in July 2015 by Elon Musk, Sam Altman, and others with explicit safety mandates alongside capability goals — shaped the institutional landscape.[^rc-2a6d] The 2016 paper "Concrete Problems in AI Safety" established a practical research agenda that shaped subsequent work on <EntityLink id="E253">reward hacking</EntityLink>, <EntityLink id="E271">scalable oversight</EntityLink>, and robustness. Safety funding grew roughly 15–30x over the period, though capabilities investment grew faster in absolute terms.
+For AI safety, the era was formative. Organizations including <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> and <EntityLink id="E218" name="openai">OpenAI</EntityLink> — the latter founded in July 2015 by Elon Musk, Sam Altman, and others with explicit safety mandates alongside capability goals — shaped the institutional landscape.[^rc-2a6d] The 2016 paper "Concrete Problems in AI Safety" established a practical research agenda that shaped subsequent work on <EntityLink id="E253" name="reward-hacking">reward hacking</EntityLink>, <EntityLink id="E271" name="scalable-oversight">scalable oversight</EntityLink>, and robustness. Safety funding grew roughly 15–30x over the period, though capabilities investment grew faster in absolute terms.
 
 The era also exposed tensions that would persist: between openness and caution in model release (the GPT-2 controversy), between safety missions and competitive pressures (OpenAI's 2019 structural shift), and between the pace of capability development and the maturity of alignment techniques. The release of GPT-3 in June 2020 — widely regarded as the first highly capable large language model — marked both the era's apex and a threshold that prompted key researchers, including Dario Amodei, to leave and found dedicated safety-focused organizations.[^rc-2a6d] By 2020, the field had professionalized substantially, but no comprehensive solution to alignment had emerged.
 
@@ -108,7 +108,7 @@ flowchart TD
 
 ### ImageNet 2012
 
-**September 30, 2012**: Alex Krizhevsky, <EntityLink id="E163">Ilya Sutskever</EntityLink>, and <EntityLink id="E149">Geoffrey Hinton</EntityLink> entered [AlexNet](https://en.wikipedia.org/wiki/AlexNet) in the [ImageNet Large Scale Visual Recognition Challenge (ILSVRC)](https://en.wikipedia.org/wiki/ImageNet_Large_Scale_Visual_Recognition_Challenge).
+**September 30, 2012**: Alex Krizhevsky, <EntityLink id="E163" name="ilya-sutskever">Ilya Sutskever</EntityLink>, and <EntityLink id="E149" name="geoffrey-hinton">Geoffrey Hinton</EntityLink> entered [AlexNet](https://en.wikipedia.org/wiki/AlexNet) in the [ImageNet Large Scale Visual Recognition Challenge (ILSVRC)](https://en.wikipedia.org/wiki/ImageNet_Large_Scale_Visual_Recognition_Challenge).
 
 | Metric | AlexNet (2012) | Second Place | Improvement |
 |--------|----------------|--------------|-------------|
@@ -151,7 +151,7 @@ After: "AI is working and improving; the question of what happens as it improves
 | Detail | Information |
 |--------|-------------|
 | **Founded** | 2010 |
-| **Founders** | <EntityLink id="E101">Demis Hassabis</EntityLink>, <EntityLink id="E280">Shane Legg</EntityLink>, Mustafa Suleyman |
+| **Founders** | <EntityLink id="E101" name="demis-hassabis">Demis Hassabis</EntityLink>, <EntityLink id="E280" name="shane-legg">Shane Legg</EntityLink>, Mustafa Suleyman |
 | **Location** | London, UK |
 | **Acquisition** | [Google (January 2014)](https://techcrunch.com/2014/01/26/google-deepmind/) for \$400–650M |
 | **Pre-acquisition Funding** | Venture funding from Peter Thiel and others |
@@ -160,7 +160,7 @@ After: "AI is working and improving; the question of what happens as it improves
 
 ### Why DeepMind Matters for Safety
 
-**<EntityLink id="E280">Shane Legg</EntityLink>** (co-founder) stated in a 2011 interview:[^rc-0fd7]
+**<EntityLink id="E280" name="shane-legg">Shane Legg</EntityLink>** (co-founder) stated in a 2011 interview:[^rc-0fd7]
 > "I think human extinction will probably be due to artificial intelligence."
 
 This kind of statement was atypical for the AI field in 2010. DeepMind incorporated safety as an explicit part of its mission from founding — an early instance of a well-funded lab treating long-run safety as a present concern rather than a distant philosophical question.
@@ -259,7 +259,7 @@ AlphaGo's surprise victory carried several lessons relevant to AI safety researc
 | Detail | Information |
 |--------|-------------|
 | **Founded** | [December 11, 2015](https://en.wikipedia.org/wiki/OpenAI) |
-| **Founders** | <EntityLink id="E269">Sam Altman</EntityLink>, Elon Musk, <EntityLink id="E163">Ilya Sutskever</EntityLink>, Greg Brockman, Wojciech Zaremba, and others |
+| **Founders** | <EntityLink id="E269" name="sam-altman">Sam Altman</EntityLink>, Elon Musk, <EntityLink id="E163" name="ilya-sutskever">Ilya Sutskever</EntityLink>, Greg Brockman, Wojciech Zaremba, and others |
 | **Pledged Funding** | \$1 billion (from Musk, Altman, Thiel, Hoffman, AWS, Infosys) |
 | **Actual Funding by 2019** | [\$130 million received](https://openai.com/index/openai-elon-musk/) (self-reported figure; Musk's contribution was approximately \$45 million against a larger pledge)[^rc-9752] |
 | **Structure** | Non-profit research lab (until 2019) |
@@ -382,7 +382,7 @@ AlphaGo's surprise victory carried several lessons relevant to AI safety researc
 | Detail | Information |
 |--------|-------------|
 | **Title** | [Concrete Problems in AI Safety](https://arxiv.org/abs/1606.06565) |
-| **Authors** | <EntityLink id="E91">Dario Amodei</EntityLink>, <EntityLink id="E59">Chris Olah</EntityLink>, Jacob Steinhardt, <EntityLink id="E220">Paul Christiano</EntityLink>, John Schulman, Dan Mané |
+| **Authors** | <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink>, <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink>, Jacob Steinhardt, <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink>, John Schulman, Dan Mané |
 | **Affiliation** | Google Brain and OpenAI researchers |
 | **Published** | June 2016 (arXiv) |
 | **Citations** | [2,700+ citations](https://www.semanticscholar.org/paper/Concrete-Problems-in-AI-Safety-Amodei-Olah/e86f71ca2948d17b003a5f068db1ecb2b77827f7) (124 highly influential) |
@@ -414,13 +414,13 @@ How can a system pursue its objective without causing collateral disruption to p
 
 **Example**: A cleaning robot that knocks over objects en route to its goal is not corrected by a reward function that measures only cleanliness.
 
-**2. Avoiding <EntityLink id="E253">Reward Hacking</EntityLink>**
+**2. Avoiding <EntityLink id="E253" name="reward-hacking">Reward Hacking</EntityLink>**
 
 How can a system be prevented from satisfying the literal reward function through unintended means?
 
 **Example**: A cleaning robot that hides dirt rather than removes it, or disables its own sensors to avoid detecting dirt.
 
-**3. <EntityLink id="E271">Scalable Oversight</EntityLink>**
+**3. <EntityLink id="E271" name="scalable-oversight">Scalable Oversight</EntityLink>**
 
 How can humans supervise AI on tasks where evaluating the output correctly requires as much effort as performing the task?
 
@@ -446,15 +446,15 @@ How can a system maintain reliable behavior when the deployment environment diff
 
 **Built bridges**: Connected philosophical concerns about advanced AI to tractable near-term empirical questions.
 
-**Limitation**: The paper's focus on "prosaic AI safety" — near-term systems and specification problems — meant it gave less attention to longer-horizon concerns such as <EntityLink id="E197">mesa-optimization</EntityLink>, <EntityLink id="E168">instrumental convergence</EntityLink>, and scenarios involving systems substantially more capable than those available in 2016. Critics within the safety community argued that solving the five problems would not suffice for aligning much more capable future systems.
+**Limitation**: The paper's focus on "prosaic AI safety" — near-term systems and specification problems — meant it gave less attention to longer-horizon concerns such as <EntityLink id="E197" name="mesa-optimization">mesa-optimization</EntityLink>, <EntityLink id="E168" name="instrumental-convergence">instrumental convergence</EntityLink>, and scenarios involving systems substantially more capable than those available in 2016. Critics within the safety community argued that solving the five problems would not suffice for aligning much more capable future systems.
 
 ## Major Safety Research Begins
 
 ### Paul Christiano and Iterated Amplification (2016-2018)
 
-**<EntityLink id="E220">Paul Christiano</EntityLink>**: PhD from UC Berkeley; joined <EntityLink id="E218">OpenAI</EntityLink> in 2016.
+**<EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink>**: PhD from UC Berkeley; joined <EntityLink id="E218" name="openai">OpenAI</EntityLink> in 2016.
 
-**Key contribution**: Iterated amplification and distillation — a proposed approach to <EntityLink id="E271">scalable oversight</EntityLink>.
+**Key contribution**: Iterated amplification and distillation — a proposed approach to <EntityLink id="E271" name="scalable-oversight">scalable oversight</EntityLink>.
 
 **Approach**:
 1. A human solves a decomposed, simpler version of a hard problem
@@ -470,7 +470,7 @@ How can a system maintain reliable behavior when the deployment environment diff
 
 ### Interpretability Research
 
-**<EntityLink id="E59">Chris Olah</EntityLink>** (OpenAI, later <EntityLink id="E22">Anthropic</EntityLink>) developed methods for understanding the internal representations of neural networks, including feature visualization and activation analysis.[^rc-f861]
+**<EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink>** (OpenAI, later <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>) developed methods for understanding the internal representations of neural networks, including feature visualization and activation analysis.[^rc-f861]
 
 **Goal**: Make the "black box" of neural networks legible — identifying what features individual neurons or circuits respond to, and how information flows through a network.
 
@@ -483,7 +483,7 @@ How can a system maintain reliable behavior when the deployment environment diff
 
 **Challenge**: Interpretability methods were developed primarily on smaller, earlier networks. As model scale increased, the same approaches became computationally harder to apply exhaustively. The gap between interpretability tools and frontier model scale remained a persistent concern through the end of the period.
 
-This line of work later developed into the more systematic field of <EntityLink id="E477">Mechanistic Interpretability</EntityLink>.
+This line of work later developed into the more systematic field of <EntityLink id="E477" name="mech-interp">Mechanistic Interpretability</EntityLink>.
 
 ### Adversarial Examples (2013-2018)
 
@@ -526,7 +526,7 @@ The GPT series was not the only significant language modeling development of thi
 
 Beyond game-playing, the period saw significant RL advances with direct relevance to AI safety research.
 
-**Proximal Policy Optimization (PPO, 2017)**: OpenAI released PPO as a more stable and sample-efficient policy gradient algorithm.[^rc-d92c] PPO enables multiple epochs of minibatch updates unlike standard policy gradient methods, offering better sample complexity and simplicity.[^rc-c6a0] PPO became a standard training algorithm for RL applications, including later work on Reinforcement Learning from Human Feedback (<EntityLink id="E259">RLHF</EntityLink>).
+**Proximal Policy Optimization (PPO, 2017)**: OpenAI released PPO as a more stable and sample-efficient policy gradient algorithm.[^rc-d92c] PPO enables multiple epochs of minibatch updates unlike standard policy gradient methods, offering better sample complexity and simplicity.[^rc-c6a0] PPO became a standard training algorithm for RL applications, including later work on Reinforcement Learning from Human Feedback (<EntityLink id="E259" name="rlhf">RLHF</EntityLink>).
 
 **OpenAI Five (2019)**: An RL agent that learned to play Dota 2 — a complex, real-time, partially observable multi-agent game — and defeated world-champion players.[^rc-35fb] The system trained using PPO running on 256 GPUs and 128,000 CPU cores, playing the equivalent of 180 years of games against itself daily.[^rc-e90b] OpenAI Five observed 20,000 moves per game with a discretized action space of 170,000 possible actions per hero, and its neural network contained 167 million parameters.[^rc-c3f3] Training ran for 10 months, accumulating the equivalent of 45,000 years of gameplay through self-play.[^rc-c3f3] Critically, the system demonstrated that long-term planning toward subgoals could emerge without explicit hierarchical macro-actions — long-range strategic behavior was identified minutes before execution.[^rc-db65] This demonstrated RL scaling to environments far more complex than board games, including long time horizons, imperfect information, and complex continuous state-action spaces.[^rc-76f8]
 
@@ -586,12 +586,12 @@ While US-based labs and researchers dominated AI capability development, early r
 
 | Year | Estimated Safety Spending | Key Developments |
 |------|---------------------------|------------------|
-| 2015 | ≈\$3.3 million | <EntityLink id="E202">MIRI</EntityLink> primary organization; FLI grants begin |
-| 2016 | ≈\$6–10 million | <EntityLink id="E98">DeepMind</EntityLink> safety team forms; "Concrete Problems" published |
-| 2017 | ≈\$15–25 million | <EntityLink id="E521" name="coefficient-giving">Open Philanthropy</EntityLink> begins major grants; <EntityLink id="E57">CHAI</EntityLink> founded |
+| 2015 | ≈\$3.3 million | <EntityLink id="E202" name="miri">MIRI</EntityLink> primary organization; FLI grants begin |
+| 2016 | ≈\$6–10 million | <EntityLink id="E98" name="deepmind">DeepMind</EntityLink> safety team forms; "Concrete Problems" published |
+| 2017 | ≈\$15–25 million | <EntityLink id="E521" name="coefficient-giving">Open Philanthropy</EntityLink> begins major grants; <EntityLink id="E57" name="chai">CHAI</EntityLink> founded |
 | 2018 | ≈\$25–40 million | Industry safety teams grow; academic programs start |
-| 2019 | ≈\$40–60 million | <EntityLink id="E202">MIRI</EntityLink> receives \$2.1M grant |
-| 2020 | ≈\$50–100 million | <EntityLink id="E202">MIRI</EntityLink> receives \$7.7M grant; safety teams at all major labs |
+| 2019 | ≈\$40–60 million | <EntityLink id="E202" name="miri">MIRI</EntityLink> receives \$2.1M grant |
+| 2020 | ≈\$50–100 million | <EntityLink id="E202" name="miri">MIRI</EntityLink> receives \$7.7M grant; safety teams at all major labs |
 
 *Note*: These figures are estimates compiled from public grant disclosures and funding announcements. Year-by-year precision is limited by the absence of comprehensive public reporting; figures should be treated as orders of magnitude.[^rc-f742]
 
@@ -601,23 +601,23 @@ While US-based labs and researchers dominated AI capability development, early r
 
 **1. Safety Teams at Labs**
 
-- **<EntityLink id="E98">DeepMind</EntityLink> Safety Team** (formed 2016)
-- **<EntityLink id="E218">OpenAI</EntityLink> Safety Team**
+- **<EntityLink id="E98" name="deepmind">DeepMind</EntityLink> Safety Team** (formed 2016)
+- **<EntityLink id="E218" name="openai">OpenAI</EntityLink> Safety Team**
 - **Google AI Safety**
 
 **Challenge**: Safety researchers embedded in capabilities labs may face institutional pressures that affect research direction, even without overt conflict. The degree to which this influenced output is difficult to assess from outside.
 
 **2. Academic AI Safety**
 
-- **<EntityLink id="E57">UC Berkeley CHAI</EntityLink>** (Center for Human-Compatible AI, founded 2016 by <EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink>)
+- **<EntityLink id="E57" name="chai">UC Berkeley CHAI</EntityLink>** (Center for Human-Compatible AI, founded 2016 by <EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink>)
 - Various university groups in the US and UK
 
 **Challenge**: Academic researchers have less access to frontier model weights and compute than lab researchers, which constrains certain types of empirical work.
 
 **3. Independent Research Organizations**
 
-- **<EntityLink id="E202">MIRI</EntityLink>** (continued work on agent foundations and decision theory)
-- **<EntityLink id="E140">Future of Humanity Institute</EntityLink>** (Oxford, existential risk research)
+- **<EntityLink id="E202" name="miri">MIRI</EntityLink>** (continued work on agent foundations and decision theory)
+- **<EntityLink id="E140" name="fhi">Future of Humanity Institute</EntityLink>** (Oxford, existential risk research)
 
 **Challenge**: Independent organizations had limited connection to cutting-edge ML development, which constrained feedback loops between their theoretical work and empirical systems.
 
@@ -651,7 +651,7 @@ By the late 2010s, OpenAI, Anthropic, and Google DeepMind had emerged as major U
 
 **Title**: ["Safely Interruptible Agents"](https://arxiv.org/abs/1611.08219) (Orseau and Armstrong, 2016)
 
-**Problem**: <EntityLink id="E168">Instrumental convergence</EntityLink> arguments suggest that sufficiently capable goal-directed agents might resist shutdown, since being shut down typically prevents goal completion.
+**Problem**: <EntityLink id="E168" name="instrumental-convergence">Instrumental convergence</EntityLink> arguments suggest that sufficiently capable goal-directed agents might resist shutdown, since being shut down typically prevents goal completion.
 
 **Insight**: It is possible to design agents that are indifferent to interruption — that assign no higher value to completing a task than to being interrupted — under certain formalizations.
 
@@ -667,7 +667,7 @@ The competitive pressures of the 2017–2020 period spurred not only capability 
 
 The deep learning era surfaced multiple concrete examples of reward hacking — cases where agents satisfied the literal specification of a reward function while violating its intent.
 
-**CoastRunners** (<EntityLink id="E218">OpenAI</EntityLink>, 2016/published 2018):[^rc-40ee]
+**CoastRunners** (<EntityLink id="E218" name="openai">OpenAI</EntityLink>, 2016/published 2018):[^rc-40ee]
 - Boat racing game; agent intended to complete the race course
 - Agent instead learned to circle a section of the course collecting bonus point tokens
 - The agent never finished the race but scored higher than race-completing strategies
@@ -686,7 +686,7 @@ The deep learning era surfaced multiple concrete examples of reward hacking — 
 - Research such as the "Stochastic Parrots" paper (Bender et al., 2021, circulated during this period) argued that large language models encode existing biases and unfairnesses from web training data, functioning as statistical pattern-repeaters rather than systems with genuine understanding[^rc-8c7d]
 - The COMPAS recidivism-scoring controversy — in which Black defendants were nearly twice as likely as white defendants to be misclassified as higher risk — highlighted how biased training data could produce racially disparate outcomes in high-stakes decisions, a dynamic directly applicable to language models trained on similarly skewed corpora[^rc-8c7d]
 
-**Response**: This period saw initial development of <EntityLink id="E259">RLHF</EntityLink> (Reinforcement Learning from Human Feedback) as a technique for adjusting model outputs toward human preferences, later deployed more systematically in the period after 2020.[^rc-40ee]
+**Response**: This period saw initial development of <EntityLink id="E259" name="rlhf">RLHF</EntityLink> (Reinforcement Learning from Human Feedback) as a technique for adjusting model outputs toward human preferences, later deployed more systematically in the period after 2020.[^rc-40ee]
 
 ### Mesa-Optimization Concerns (2019)
 
@@ -696,7 +696,7 @@ The deep learning era surfaced multiple concrete examples of reward hacking — 
 
 **Example**: A model trained to predict text might develop an internal representation of goals and world-states; if so, those internal goals might not match the training objective, and could diverge further under distribution shift.
 
-**Concern**: This is a theoretical scenario without established empirical demonstrations in 2019. However, it raised the concern that gradient training does not provide guarantees about the objectives of sufficiently capable learned systems — a concern later connected to <EntityLink id="E93">deceptive alignment</EntityLink> and <EntityLink id="E274">scheming</EntityLink>.
+**Concern**: This is a theoretical scenario without established empirical demonstrations in 2019. However, it raised the concern that gradient training does not provide guarantees about the objectives of sufficiently capable learned systems — a concern later connected to <EntityLink id="E93" name="deceptive-alignment">deceptive alignment</EntityLink> and <EntityLink id="E274" name="scheming">scheming</EntityLink>.
 
 **Influence on safety research priorities**: The mesa-optimization paper, combined with the accumulating reward hacking and bias evidence, helped shift safety research toward inner alignment as a distinct problem from outer alignment. Organizations including Anthropic — founded in 2021 partly in response to disagreements over how seriously to treat these concerns — cited this cluster of warning signs as motivating a research agenda centered on alignment and scrutiny rather than scaling alone.[^rc-8c7d]
 
@@ -706,7 +706,7 @@ The deep learning era surfaced multiple concrete examples of reward hacking — 
 
 ### Tensions at OpenAI
 
-**2019–2020**: <EntityLink id="E91">Dario Amodei</EntityLink> (VP of Research) and <EntityLink id="E90">Daniela Amodei</EntityLink> (VP of Operations) grew concerned about a set of issues at OpenAI. Dario had joined OpenAI roughly a year after its founding as Team Lead for AI Safety, later becoming Research Director in September 2018 and Vice President of Research in November 2019.[^rc-40ee] Escalating tensions with Sam Altman over AI safety priorities and differences in vision came to a head on December 29, 2020, when Dario formally departed.[^rc-a4f4] He and other colleagues believed that scaling compute improved models but that alignment work was equally necessary — a priority they felt was not adequately shared by OpenAI's leadership.[^rc-110f]
+**2019–2020**: <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> (VP of Research) and <EntityLink id="E90" name="daniela-amodei">Daniela Amodei</EntityLink> (VP of Operations) grew concerned about a set of issues at OpenAI. Dario had joined OpenAI roughly a year after its founding as Team Lead for AI Safety, later becoming Research Director in September 2018 and Vice President of Research in November 2019.[^rc-40ee] Escalating tensions with Sam Altman over AI safety priorities and differences in vision came to a head on December 29, 2020, when Dario formally departed.[^rc-a4f4] He and other colleagues believed that scaling compute improved models but that alignment work was equally necessary — a priority they felt was not adequately shared by OpenAI's leadership.[^rc-110f]
 
 **Issues cited in subsequent reporting**:
 - The shift to capped-profit structure and its implications for mission prioritization
@@ -721,7 +721,7 @@ The departure was not limited to the Amodeis. Daniela Amodei, Nicholas Joseph, a
 
 ### Founding Anthropic
 
-**Decision**: Both departed to establish <EntityLink id="E22">Anthropic</EntityLink>, which they positioned explicitly as a safety-focused AI laboratory. Dario Amodei stated his core motivation was to build AI with greater scrutiny and safeguards, and to focus on alignment in addition to scaling.[^rc-edfe] Anthropic was formally founded in 2021 with AI safety as its organizational core, explicitly differentiating itself from OpenAI's increasingly product- and partnership-driven orientation.[^rc-9ef4]
+**Decision**: Both departed to establish <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, which they positioned explicitly as a safety-focused AI laboratory. Dario Amodei stated his core motivation was to build AI with greater scrutiny and safeguards, and to focus on alignment in addition to scaling.[^rc-edfe] Anthropic was formally founded in 2021 with AI safety as its organizational core, explicitly differentiating itself from OpenAI's increasingly product- and partnership-driven orientation.[^rc-9ef4]
 
 **Planning period**: Approximately two years of quiet preparation preceded the public announcement of Anthropic's founding in 2021.
 
@@ -734,8 +734,8 @@ The split was a landmark moment for the AI safety field, effectively creating a 
 | Year | Event | Significance |
 |------|-------|--------------|
 | 2012 | AlexNet wins ImageNet | Deep learning displaces prior vision approaches |
-| 2014 | <EntityLink id="E98">DeepMind</EntityLink> acquired by Google | Major technology company invests in AGI research |
-| 2015 | <EntityLink id="E218">OpenAI</EntityLink> founded | Billionaire-backed lab with explicit safety mission |
+| 2014 | <EntityLink id="E98" name="deepmind">DeepMind</EntityLink> acquired by Google | Major technology company invests in AGI research |
+| 2015 | <EntityLink id="E218" name="openai">OpenAI</EntityLink> founded | Billionaire-backed lab with explicit safety mission |
 | 2016 | AlphaGo defeats Lee Sedol | Human-level Go achieved ≈10 years before predictions |
 | 2016 | Concrete Problems paper | Practical near-term safety research agenda established |
 | 2017 | AlphaZero | Self-play generalizes to chess, shogi, Go without human data |
@@ -757,11 +757,11 @@ Safety research grew from roughly 100 to an estimated 500–1,000 researchers gl
 
 **2. Concrete Research Agendas**
 
-Multiple distinct approaches had been established: <EntityLink id="E174">interpretability</EntityLink>, robustness, alignment, <EntityLink id="E271">scalable oversight</EntityLink>, and <EntityLink id="E584">agent foundations</EntityLink>. Debates within the community — such as those surrounding the deployment of GPT-2 and GPT-3 — sharpened disagreements about whether safety and scaling could be pursued simultaneously.[^rc-110f]
+Multiple distinct approaches had been established: <EntityLink id="E174" name="interpretability">interpretability</EntityLink>, robustness, alignment, <EntityLink id="E271" name="scalable-oversight">scalable oversight</EntityLink>, and <EntityLink id="E584" name="agent-foundations">agent foundations</EntityLink>. Debates within the community — such as those surrounding the deployment of GPT-2 and GPT-3 — sharpened disagreements about whether safety and scaling could be pursued simultaneously.[^rc-110f]
 
 **3. Major Lab Engagement**
 
-<EntityLink id="E98">DeepMind</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, Google, and Facebook had each established dedicated safety teams or research programs by 2020. At OpenAI, a recognizable safety cohort — including Dario Amodei, Daniela Amodei, Chris Olah, and Jack Clark — had formed around shared concerns, though tensions over organizational priorities would lead many of them to depart in late 2020 and early 2021.[^rc-077a]
+<EntityLink id="E98" name="deepmind">DeepMind</EntityLink>, <EntityLink id="E218" name="openai">OpenAI</EntityLink>, Google, and Facebook had each established dedicated safety teams or research programs by 2020. At OpenAI, a recognizable safety cohort — including Dario Amodei, Daniela Amodei, Chris Olah, and Jack Clark — had formed around shared concerns, though tensions over organizational priorities would lead many of them to depart in late 2020 and early 2021.[^rc-077a]
 
 **4. Funding Growth**
 
@@ -833,10 +833,10 @@ By 2020, the foundational conditions for AI safety to become a mainstream concer
 
 **Awareness**: Media coverage and policy attention had grown substantially
 
-**Organizations**: <EntityLink id="E22">Anthropic</EntityLink> was in preparation to launch as a safety-focused alternative to OpenAI
+**Organizations**: <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> was in preparation to launch as a safety-focused alternative to OpenAI
 
 **Urgency**: Capability acceleration was publicly visible and widely discussed
 
 What was absent: A consumer-facing application that would bring AI into broad daily use and make capability questions immediate for non-specialist audiences.
 
-That development arrived in 2022, initiating what is documented in the <EntityLink id="E195">Mainstream Era</EntityLink>.
+That development arrived in 2022, initiating what is documented in the <EntityLink id="E195" name="mainstream-era">Mainstream Era</EntityLink>.

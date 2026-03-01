@@ -32,7 +32,7 @@ This audit directly informs the remediation work tracked in [GitHub issue #1163]
 ## Audit Scope
 
 - **1,514 claims** across **11 entities** with claims in the database
-- Entities: <EntityLink id="anthropic">Anthropic</EntityLink> (325), <EntityLink id="kalshi">Kalshi</EntityLink> (242), <EntityLink id="dario-amodei">Dario Amodei</EntityLink> (168), <EntityLink id="superintelligence">Superintelligence</EntityLink> (72), <EntityLink id="openai">OpenAI</EntityLink> (71), <EntityLink id="ai-timelines">AI Timelines</EntityLink> (40), <EntityLink id="deepmind">DeepMind</EntityLink> (12), <EntityLink id="polymarket">Polymarket</EntityLink> (9), <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, <EntityLink id="miri">MIRI</EntityLink>, <EntityLink id="rlhf">RLHF</EntityLink>
+- Entities: <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> (325), <EntityLink id="E537" name="kalshi">Kalshi</EntityLink> (242), <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> (168), <EntityLink id="E291" name="superintelligence">Superintelligence</EntityLink> (72), <EntityLink id="E218" name="openai">OpenAI</EntityLink> (71), <EntityLink id="E16" name="ai-timelines">AI Timelines</EntityLink> (40), <EntityLink id="E98" name="deepmind">DeepMind</EntityLink> (12), <EntityLink id="E555" name="polymarket">Polymarket</EntityLink> (9), <EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink>, <EntityLink id="E202" name="miri">MIRI</EntityLink>, <EntityLink id="E259" name="rlhf">RLHF</EntityLink>
 - Automated checks run via programmatic API analysis
 - Cross-referenced with `crux claims audit` integrity checks
 
@@ -145,7 +145,7 @@ The second cause is particularly frustrating — the claims DO have footnote ref
 - "Anthropic emerged from disagreements within OpenAI about the organization's direction" appears under both `anthropic` and `openai`
 - "Claude Opus 4.5 achieved 80.9% on SWE-bench Verified" appears twice under `anthropic`
 
-**Remediation:** Deduplicate within-entity duplicates (automated). For cross-entity duplicates, decide on strategy per <EntityLink id="claims-architecture-decisions">Architecture Decisions Crux 1</EntityLink>: are claims global or per-page?
+**Remediation:** Deduplicate within-entity duplicates (automated). For cross-entity duplicates, decide on strategy per <EntityLink id="E896" name="claims-architecture-decisions">Architecture Decisions Crux 1</EntityLink>: are claims global or per-page?
 
 ### Issue 6: Wrong Entity Attribution (5.2%)
 
@@ -225,7 +225,7 @@ These worst-case claims illustrate how issues compound: a short, vague, mis-attr
 
 ## Comparison with Sprint 1 Evaluation
 
-The <EntityLink id="claims-system-development-roadmap">Development Roadmap</EntityLink> Sprint 1 evaluated 77 claims and found 100% accuracy, 84% usefulness. This audit of 1,514 claims paints a different picture — not because the claims are inaccurate, but because accuracy and usefulness aren't the only quality dimensions that matter.
+The <EntityLink id="E897" name="claims-system-development-roadmap">Development Roadmap</EntityLink> Sprint 1 evaluated 77 claims and found 100% accuracy, 84% usefulness. This audit of 1,514 claims paints a different picture — not because the claims are inaccurate, but because accuracy and usefulness aren't the only quality dimensions that matter.
 
 A claim can be:
 - **Accurate** (faithfully represents a source) but **not self-contained** (meaningless without page context)
@@ -247,7 +247,7 @@ The Sprint 1 evaluation focused on the first set of properties (accuracy, useful
 
 ## Related Documents
 
-- <EntityLink id="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions and cruxes
-- <EntityLink id="claims-system-development-roadmap">Claims Development Roadmap (E897)</EntityLink> — Sprint plan and experimentation approach
-- <EntityLink id="claims-extraction-quality-patterns">Claims Extraction Quality Patterns (E902)</EntityLink> — Detailed analysis of extraction failure modes
-- <EntityLink id="citation-architecture">Citation Architecture (E891)</EntityLink> — The citation system that claims build on
+- <EntityLink id="E896" name="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions and cruxes
+- <EntityLink id="E897" name="claims-system-development-roadmap">Claims Development Roadmap (E897)</EntityLink> — Sprint plan and experimentation approach
+- <EntityLink id="E902" name="claims-extraction-quality-patterns">Claims Extraction Quality Patterns (E902)</EntityLink> — Detailed analysis of extraction failure modes
+- <EntityLink id="E891" name="citation-architecture">Citation Architecture (E891)</EntityLink> — The citation system that claims build on

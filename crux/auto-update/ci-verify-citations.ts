@@ -163,16 +163,17 @@ export async function verifyCitationsForPages(
 
   for (let i = 0; i < pageIds.length; i++) {
     const pageId = pageIds[i];
-    console.log(`[${i + 1}/${pageIds.length}] Verifying citations: ${pageId}`);
+    // Progress messages go to stderr to keep stdout clean for JSON output
+    process.stderr.write(`[${i + 1}/${pageIds.length}] Verifying citations: ${pageId}\n`);
     const result = await verifyPage(pageId);
     pages.push(result);
 
     if (result.broken > 0) {
-      console.log(`  ${result.broken} broken citation(s)`);
+      process.stderr.write(`  ${result.broken} broken citation(s)\n`);
     } else if (result.totalCitations > 0) {
-      console.log(`  ${result.verified} verified`);
+      process.stderr.write(`  ${result.verified} verified\n`);
     } else {
-      console.log(`  No citations`);
+      process.stderr.write(`  No citations\n`);
     }
   }
 
