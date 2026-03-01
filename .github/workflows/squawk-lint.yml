@@ -38,7 +38,9 @@ jobs:
         if: steps.changed.outputs.files != ''
         # Exit code 1 means violations found — fail the check.
         # squawk exits 0 when there are no issues.
+        env:
+          CHANGED_FILES: ${{ steps.changed.outputs.files }}
         run: |
           # shellcheck disable=SC2086
-          squawk ${{ steps.changed.outputs.files }}
+          squawk $CHANGED_FILES
         # squawk reads .squawk.toml from the current directory automatically
