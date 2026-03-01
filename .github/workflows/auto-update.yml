@@ -315,8 +315,7 @@ jobs:
 
           # Security: stage only files the auto-update pipeline is expected to
           # modify, not everything in the working tree.
-          CHANGED_FILES=$(git diff --name-only)
-          for file in $CHANGED_FILES; do
+          git diff --name-only | while IFS= read -r file; do
             if echo "$file" | grep -qE '^(content/docs/.*\.mdx|data/.*\.(yaml|yml))$'; then
               git add -- "$file"
             else

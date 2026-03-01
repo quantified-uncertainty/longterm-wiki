@@ -275,7 +275,14 @@ jobs:
             if [ -n "$file" ] && ! grep -qxF "$file" "$ALLOWED_FILES" 2>/dev/null; then
               DISALLOWED="$DISALLOWED $file"
               echo "::warning::Reverting unauthorized agent change: $file"
-              git checkout HEAD -- "$file" 2>/dev/null || true
+              # For files that exist in HEAD, restore them to their original state
+              if git checkout HEAD -- "$file" 2>/dev/null; then
+                : # successfully reverted
+              else
+                # File is newly created (not in HEAD) — unstage and remove it
+                git reset HEAD -- "$file" 2>/dev/null || true
+                git clean -f -- "$file" 2>/dev/null || true
+              fi
             fi
           done < /tmp/agent-touched.txt
 
@@ -320,9 +327,8 @@ jobs:
             echo "Auto-fix produced changes — committing fixes..."
             # Security: stage only files that were part of the original merge,
             # not everything in the working tree (avoids committing unrelated files).
-            CHANGED_FILES=$(git diff --name-only)
             ALLOWED_FILES=/tmp/merge-affected-files.txt
-            for file in $CHANGED_FILES; do
+            git diff --name-only | while IFS= read -r file; do
               if grep -qxF "$file" "$ALLOWED_FILES" 2>/dev/null; then
                 git add -- "$file"
               else
