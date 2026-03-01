@@ -376,51 +376,54 @@ const claimsApp = new Hono()
         .returning({ id: claims.id, entityId: claims.entityId, claimType: claims.claimType });
       allResults.push(...rows);
     } else {
-      // Safe path: insert one at a time to guarantee ID correlation for source rows
-      const sourcesToInsert: Array<{
-        claimId: number;
-        resourceId: string | null;
-        url: string | null;
-        sourceQuote: string | null;
-        isPrimary: boolean;
-        sourceTitle: string | null;
-        sourceType: string | null;
-        sourceLocation: string | null;
-        sourceVerdict: string | null;
-        sourceVerdictScore: number | null;
-        sourceCheckedAt: Date | null;
-      }> = [];
+      // Safe path: insert one at a time to guarantee ID correlation for source rows.
+      // Wrapped in a transaction for atomicity and reduced connection hold time.
+      await db.transaction(async (tx) => {
+        const sourcesToInsert: Array<{
+          claimId: number;
+          resourceId: string | null;
+          url: string | null;
+          sourceQuote: string | null;
+          isPrimary: boolean;
+          sourceTitle: string | null;
+          sourceType: string | null;
+          sourceLocation: string | null;
+          sourceVerdict: string | null;
+          sourceVerdictScore: number | null;
+          sourceCheckedAt: Date | null;
+        }> = [];
 
-      for (const item of items) {
-        const [row] = await db
-          .insert(claims)
-          .values(claimValues(item))
-          .returning({ id: claims.id, entityId: claims.entityId, claimType: claims.claimType });
+        for (const item of items) {
+          const [row] = await tx
+            .insert(claims)
+            .values(claimValues(item))
+            .returning({ id: claims.id, entityId: claims.entityId, claimType: claims.claimType });
 
-        allResults.push(row);
+          allResults.push(row);
 
-        if (item.sources && item.sources.length > 0) {
-          for (const s of item.sources) {
-            sourcesToInsert.push({
-              claimId: row.id,
-              resourceId: s.resourceId ?? null,
-              url: s.url ?? null,
-              sourceQuote: s.sourceQuote ?? null,
-              isPrimary: s.isPrimary ?? false,
-              sourceTitle: s.sourceTitle ?? null,
-              sourceType: s.sourceType ?? null,
-              sourceLocation: s.sourceLocation ?? null,
-              sourceVerdict: s.sourceVerdict ?? null,
-              sourceVerdictScore: s.sourceVerdictScore ?? null,
-              sourceCheckedAt: s.sourceCheckedAt ? new Date(s.sourceCheckedAt) : null,
-            });
+          if (item.sources && item.sources.length > 0) {
+            for (const s of item.sources) {
+              sourcesToInsert.push({
+                claimId: row.id,
+                resourceId: s.resourceId ?? null,
+                url: s.url ?? null,
+                sourceQuote: s.sourceQuote ?? null,
+                isPrimary: s.isPrimary ?? false,
+                sourceTitle: s.sourceTitle ?? null,
+                sourceType: s.sourceType ?? null,
+                sourceLocation: s.sourceLocation ?? null,
+                sourceVerdict: s.sourceVerdict ?? null,
+                sourceVerdictScore: s.sourceVerdictScore ?? null,
+                sourceCheckedAt: s.sourceCheckedAt ? new Date(s.sourceCheckedAt) : null,
+              });
+            }
           }
         }
-      }
 
-      if (sourcesToInsert.length > 0) {
-        await db.insert(claimSources).values(sourcesToInsert);
-      }
+        if (sourcesToInsert.length > 0) {
+          await tx.insert(claimSources).values(sourcesToInsert);
+        }
+      });
     }
 
     return c.json({ inserted: allResults.length, results: allResults }, 201);

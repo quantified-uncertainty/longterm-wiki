@@ -6,7 +6,7 @@
  * stay in sync automatically when the server shape changes.
  */
 
-import { apiRequest, type ApiResult } from './client.ts';
+import { apiRequest, BATCH_TIMEOUT_MS, type ApiResult } from './client.ts';
 import type { InsertClaim } from '../../../apps/wiki-server/src/api-types.ts';
 import type { ClaimPageReferenceRow } from './references.ts';
 import type { hc, InferResponseType } from 'hono/client';
@@ -97,7 +97,7 @@ export async function insertClaimBatch(
     'POST',
     '/api/claims/batch',
     { items },
-    undefined,
+    BATCH_TIMEOUT_MS,
     'content',
   );
 }
