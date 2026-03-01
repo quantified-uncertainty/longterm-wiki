@@ -87,11 +87,25 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes from audit — nothing to commit."
           else
-            git add -A
-            git commit -m "audit: fix citation inaccuracies (automated)
+            # Security: stage only files the citation audit is expected to modify
+            # (MDX content pages and YAML data files), not everything in the tree.
+            CHANGED_FILES=$(git diff --name-only)
+            for file in $CHANGED_FILES; do
+              if echo "$file" | grep -qE '^(content/docs/.*\.mdx|data/.*\.(yaml|yml))$'; then
+                git add -- "$file"
+              else
+                echo "::warning::Skipping unexpected modified file from audit: $file"
+              fi
+            done
+
+            if ! git diff --cached --quiet; then
+              git commit -m "audit: fix citation inaccuracies (automated)
 
           Automated citation audit fixes from the review gate pipeline."
-            git push
+              git push
+            else
+              echo "No expected audit changes to commit."
+            fi
           fi
 
       - name: Post audit summary
