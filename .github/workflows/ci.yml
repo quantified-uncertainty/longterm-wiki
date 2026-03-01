@@ -162,34 +162,7 @@ jobs:
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
           LONGTERMWIKI_CONTENT_KEY: ${{ secrets.LONGTERMWIKI_CONTENT_KEY }}
 
-  deploy:
-    # Trigger a Vercel production deployment after CI passes on main.
-    # This ensures prod is rebuilt exactly once per PR merge, naturally
-    # capping deploys at ~1 per merged PR (<10/day in practice).
-    needs: [ci]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Vercel production deploy
-        run: |
-          if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}" ]; then
-            echo "::error::VERCEL_DEPLOY_HOOK_URL secret is not set — production will NOT be deployed."
-            echo ""
-            echo "Setup (one-time):"
-            echo "  1. Vercel Dashboard → Project → Settings → Git → Deploy Hooks"
-            echo "  2. Create a hook: Name 'GitHub CI Deploy', Branch 'main'"
-            echo "  3. Copy the URL"
-            echo "  4. GitHub repo → Settings → Secrets → Actions → New secret"
-            echo "     Name: VERCEL_DEPLOY_HOOK_URL  Value: <paste URL>"
-            exit 1
-          fi
-          RESPONSE=$(curl -s -o /tmp/vercel_response.json -w "%{http_code}" \
-            -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}")
-          echo "HTTP status: $RESPONSE"
-          cat /tmp/vercel_response.json
-          if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 300 ]; then
-            echo "Production deployment triggered."
-          else
-            echo "::error::Vercel deploy hook returned HTTP $RESPONSE"
-            exit 1
-          fi
+  # Deploy job removed — production deploys are now handled by the scheduled
+  # deploy hook (scheduled-deploy.yml, every hour) instead of per-push.
+  # This caps Vercel build minutes at 24/day max vs 50-80/day previously.
+  # See vercel.json ignoreCommand which also blocks Git-triggered main builds.
