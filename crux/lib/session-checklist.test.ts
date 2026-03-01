@@ -119,6 +119,55 @@ describe('getItemsForType', () => {
     expect(contentItems.some(i => i.id === 'live-data-test')).toBe(false);
   });
 
+  it('duplicate-check is included for all types', () => {
+    const types: SessionType[] = ['content', 'infrastructure', 'bugfix', 'refactor', 'commands'];
+    for (const type of types) {
+      expect(getItemsForType(type).some(i => i.id === 'duplicate-check')).toBe(true);
+    }
+  });
+
+  it('duplicate-check is in the understand phase and blocking', () => {
+    const item = CHECKLIST_ITEMS.find(i => i.id === 'duplicate-check');
+    expect(item).toBeDefined();
+    expect(item!.phase).toBe('understand');
+    expect(item!.priority).toBe('blocking');
+    expect(item!.description).toContain('gh pr list');
+  });
+
+  it('red-team is included for non-content types but not content', () => {
+    const typesWithRedTeam = ['infrastructure', 'commands', 'bugfix', 'refactor'] as const;
+    for (const type of typesWithRedTeam) {
+      expect(getItemsForType(type).some(i => i.id === 'red-team')).toBe(true);
+    }
+    expect(getItemsForType('content').some(i => i.id === 'red-team')).toBe(false);
+  });
+
+  it('red-team item has correct phase and properties', () => {
+    const item = CHECKLIST_ITEMS.find(i => i.id === 'red-team');
+    expect(item).toBeDefined();
+    expect(item!.phase).toBe('review');
+    expect(item!.priority).toBe('blocking');
+    expect(item!.description).toContain('injecting unexpected input');
+    expect(item!.description).toContain('path traversal');
+    expect(item!.description).toContain('Key Decisions');
+  });
+
+  it('scope-complete is included for all types', () => {
+    const types: SessionType[] = ['content', 'infrastructure', 'bugfix', 'refactor', 'commands'];
+    for (const type of types) {
+      expect(getItemsForType(type).some(i => i.id === 'scope-complete')).toBe(true);
+    }
+  });
+
+  it('scope-complete item has correct phase and properties', () => {
+    const item = CHECKLIST_ITEMS.find(i => i.id === 'scope-complete');
+    expect(item).toBeDefined();
+    expect(item!.phase).toBe('review');
+    expect(item!.priority).toBe('blocking');
+    expect(item!.description).toContain('acceptance criterion');
+    expect(item!.description).toContain('follow-up PR');
+  });
+
   it('paranoid-review is included for infrastructure, commands, refactor, bugfix but not content', () => {
     const typesWithParanoid = ['infrastructure', 'commands', 'refactor', 'bugfix'] as const;
     for (const type of typesWithParanoid) {
@@ -495,8 +544,8 @@ describe('checkItems', () => {
 
   it('checks off multiple items at once', () => {
     const md = buildChecklist('infrastructure', BASE_METADATA);
-    const result = checkItems(md, ['read-issue', 'explore-code', 'plan-approach']);
-    expect(result.checked).toEqual(['read-issue', 'explore-code', 'plan-approach']);
+    const result = checkItems(md, ['read-issue', 'explore-code', 'plan-approach', 'duplicate-check']);
+    expect(result.checked).toEqual(['read-issue', 'explore-code', 'plan-approach', 'duplicate-check']);
     expect(result.notFound).toEqual([]);
     const status = parseChecklist(result.markdown);
     expect(status.phases[0].items.every(i => i.status === 'checked')).toBe(true);
@@ -743,10 +792,10 @@ describe('checklist catalog integrity', () => {
     }
   });
 
-  it('catalog has exactly 53 items (update this when adding/removing items)', () => {
+  it('catalog has exactly 56 items (update this when adding/removing items)', () => {
     // This test locks in the expected catalog size. If you add or remove items,
     // update this count AND the comment on the CHECKLIST_ITEMS declaration.
-    expect(CHECKLIST_ITEMS.length).toBe(53);
+    expect(CHECKLIST_ITEMS.length).toBe(56);
   });
 
   it('all items have valid priority', () => {

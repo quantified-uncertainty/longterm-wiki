@@ -8,13 +8,13 @@
  *   2. If the diff exceeds thresholds (>5 files OR >300 lines):
  *      - Check if .claude/review-done exists
  *      - Verify it contains a commit SHA that matches the current HEAD
- *   3. Emit a WARNING (advisory, non-blocking) if no valid marker is found
+ *   3. Exit 1 (blocking) if no valid marker is found for a large PR
  *
  * The marker file format is:
  *   reviewed <commit-sha> <ISO-timestamp>
  *
- * This check is advisory for now. To make it blocking, remove `advisory: true`
- * from the gate step definition in validate-gate.ts.
+ * This check is blocking in the gate — large PRs must be reviewed via
+ * /review-pr before pushing. Small PRs pass automatically.
  *
  * Usage: npx tsx crux/validate/validate-review-marker.ts
  */

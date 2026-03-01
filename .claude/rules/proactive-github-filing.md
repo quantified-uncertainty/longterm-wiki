@@ -23,11 +23,16 @@ File a GitHub issue when you encounter any of the following during normal work:
 - Vague observations without actionable next steps — "the site should be faster" or "the codebase could be cleaner" are not issues
 - Duplicates of existing issues (check first — see below)
 - Your own work-in-progress — don't file an issue for something you're about to do in this session
+- Hypothetical problems you have not observed — "this endpoint might fail if..." without evidence that it has failed or a concrete reproduction step
+- Performance concerns without measurements — "this could be slow" without profiling data or a specific slow operation
+- Follow-up issues for work you are about to ship — if the current PR needs a follow-up to be functional, the PR is incomplete. Finish the work or split the issue before starting
 
 **Bad issue examples** (do NOT file these):
 - "Code quality could be improved" — too vague, no specific location or fix
 - "Consider adding more tests" — every codebase could have more tests; be specific about what's untested and why it matters
 - "Documentation is incomplete" — which documentation, for what, and what's missing?
+- "Cross-PR interaction testing" — speculative infrastructure wish-list, not an observed bug
+- "Deployment confidence score" — hypothetical feature, not grounded in a specific failure
 
 ## Before Filing: Always Search First
 
@@ -58,7 +63,7 @@ For longer descriptions, use `--problem-file=/tmp/problem.md`. Run `crux issues 
 
 ## Guardrails
 
-- **Rate limited**: `crux issues create` enforces a daily cap (5/day). This is intentional — if you're hitting the limit, you're filing too many.
+- **Rate limited**: `crux issues create` enforces a daily cap (2/day). This is intentional — if you're hitting the limit, you're filing too many. Quality over quantity.
 - **Agent-labeled**: All agent-filed issues are auto-labeled `filed-by-agent` for tracking.
 - **Volume target**: 0-2 issues per session is normal. If you're finding 10+ problems, file the top 2-3 and batch the rest into one umbrella issue.
 

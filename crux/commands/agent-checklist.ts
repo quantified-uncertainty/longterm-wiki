@@ -256,6 +256,32 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
     });
   }
 
+  // Check for conflicting active agents (best-effort)
+  const conflictWarnings: string[] = [];
+  try {
+    const agentsResult = await listActiveAgents('active');
+    if (agentsResult.ok) {
+      const myBranch = metadata.branch;
+      for (const agent of agentsResult.data.agents) {
+        if (agent.sessionId === myBranch) continue; // skip self
+        // Warn on same issue number
+        if (issue && agent.issueNumber === issue) {
+          conflictWarnings.push(
+            `Agent on branch \`${agent.branch}\` is also working on issue #${issue} (started ${agent.startedAt ? new Date(agent.startedAt).toISOString() : 'unknown'})`
+          );
+        }
+        // Warn on similar task description (substring match)
+        if (agent.task && task && agent.task.toLowerCase().includes(task.toLowerCase().slice(0, 30))) {
+          conflictWarnings.push(
+            `Agent on branch \`${agent.branch}\` has a similar task: "${agent.task.slice(0, 80)}"`
+          );
+        }
+      }
+    }
+  } catch {
+    // Best-effort — don't block init on conflict detection
+  }
+
   let output = '';
   output += `${c.green}✓${c.reset} Agent checklist created: ${c.cyan}.claude/wip-checklist.md${c.reset}\n`;
   output += `  Type: ${c.bold}${type}${c.reset}\n`;
@@ -279,6 +305,15 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   if (sessionName) {
     output += `  Session: ${c.bold}${sessionName}${c.reset}\n`;
   }
+  // Display conflict warnings prominently
+  if (conflictWarnings.length > 0) {
+    output += `\n${c.yellow}⚠️  DUPLICATE WORK WARNING:${c.reset}\n`;
+    for (const warning of conflictWarnings) {
+      output += `  ${c.yellow}• ${warning}${c.reset}\n`;
+    }
+    output += `  ${c.dim}Check if this work overlaps. Consider coordinating or picking a different task.${c.reset}\n`;
+  }
+
   output += `\n${c.dim}Work through the checklist as you go. Run \`crux agent-checklist status\` to check progress.${c.reset}\n`;
 
   return { output, exitCode: 0 };
@@ -647,9 +682,9 @@ async function snapshot(_args: string[], options: CommandOptions): Promise<Comma
  *      passed for the hook to reach this point.
  *
  *   2. Completion check:
- *      - < 10% complete: exit 1 (blocks push — session skipped the workflow)
- *      - < 25% complete: exit 0 with loud warning
- *      - >= 25% complete: exit 0 silently
+ *      - < 40% complete OR >5 unchecked blocking items: exit 1 (blocks push)
+ *      - < 60% complete: exit 0 with loud warning
+ *      - >= 60% complete: exit 0 silently
  */
 async function prePushCheck(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -701,10 +736,19 @@ async function prePushCheck(_args: string[], options: CommandOptions): Promise<C
     }
   }
 
-  if (pct < 10) {
-    // Hard block: checklist was initialized but barely touched — the session
-    // skipped the end-of-session workflow entirely. Exit 1 to block the push.
+  if (pct < 40 || uncheckedBlocking.length > 5) {
+    // Hard block: checklist is less than 40% complete or has >5 unchecked
+    // blocking items — the session skipped most of the workflow. Exit 1.
     output += `\n${c.red}✗ Agent checklist is only ${finalStatus.totalChecked}/${finalStatus.totalItems} items complete (${pct}%).${c.reset}\n`;
+    if (uncheckedBlocking.length > 5) {
+      output += `${c.red}  ${uncheckedBlocking.length} blocking items unchecked:${c.reset}\n`;
+      for (const id of uncheckedBlocking.slice(0, 7)) {
+        output += `  ${c.red}[ ]${c.reset} ${id}\n`;
+      }
+      if (uncheckedBlocking.length > 7) {
+        output += `  ${c.dim}...and ${uncheckedBlocking.length - 7} more${c.reset}\n`;
+      }
+    }
     output += `${c.red}  Run /agent-session-ready-PR before pushing.${c.reset}\n`;
     output += `${c.dim}  To bypass: git push --no-verify${c.reset}\n\n`;
     return { output, exitCode: 1 };
@@ -720,7 +764,7 @@ async function prePushCheck(_args: string[], options: CommandOptions): Promise<C
     }
     output += `${c.yellow}   Did you run /agent-session-ready-PR before pushing?${c.reset}\n`;
     output += `${c.dim}   To bypass: git push --no-verify${c.reset}\n\n`;
-  } else if (pct < 25) {
+  } else if (pct < 60) {
     output += `\n${c.yellow}⚠️  WARNING: Agent checklist is only ${finalStatus.totalChecked}/${finalStatus.totalItems} items complete (${pct}%).${c.reset}\n`;
     output += `${c.yellow}   Did you run /agent-session-ready-PR before pushing?${c.reset}\n`;
     output += `${c.dim}   To bypass: git push --no-verify${c.reset}\n\n`;
@@ -772,7 +816,7 @@ Commands:
   status           Show checklist progress
   complete         Validate all items checked (exit code 1 if incomplete)
   snapshot         Output checks: YAML block for session log (run before logging)
-  pre-push-check   Auto-verify + warn if completion < 25% (called by pre-push hook)
+  pre-push-check   Auto-verify + block if completion < 40% (called by pre-push hook)
 
 Options:
   --type=TYPE      Task type: content, infrastructure, bugfix, refactor, commands

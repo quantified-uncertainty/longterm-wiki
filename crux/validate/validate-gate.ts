@@ -11,10 +11,11 @@
  *   1. Build data layer (required for validation + tests) — skippable if only crux/ changed
  *   2. Auto-fix escaping + markdown (with --fix)
  *   3. [Parallel] Run vitest tests
- *      [Parallel] Unified blocking rules (MDX syntax, frontmatter, numeric IDs, EntityLink)
+ *      [Parallel] Unified blocking rules (MDX syntax, frontmatter, numeric IDs, EntityLink, security)
  *      [Parallel] YAML schema validation
- *      [Parallel] TypeScript type check — app
- *      [Parallel] TypeScript type check — crux
+ *      [Parallel] TypeScript type check — app, crux, wiki-server*, discord-bot*, groundskeeper* (* = advisory)
+ *      [Parallel] Component reference validation
+ *      [Parallel] PR review status (blocking for large PRs)
  *
  * With --full:
  *   4. Full Next.js production build
@@ -201,6 +202,11 @@ const UNIFIED_BLOCKING_RULES = [
   'pipeline-artifacts',
   'prefer-entitylink',
   'resource-ref-integrity',
+  'url-safety',
+  // 'no-exec-sync' — not yet blocking: 3 pre-existing violations in gate
+  // tooling (validate-crux-tsc.ts, validate-gate.ts, validate-review-marker.ts)
+  // use execSync with git SHA interpolation. Safe in practice but needs
+  // refactoring to execFileSync before this rule can be blocking.
 ];
 
 // Phase 3: Independent checks — run in parallel after build-data completes.
@@ -286,6 +292,40 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'component-refs',
+    name: 'Component reference validation',
+    command: 'pnpm',
+    args: ['crux', 'validate', 'refs'],
+    cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'typecheck-wiki-server',
+    name: 'TypeScript type check — wiki-server (advisory)',
+    command: 'npx',
+    args: ['tsc', '--noEmit', '-p', '../../apps/wiki-server/tsconfig.json'],
+    cwd: APP_DIR,
+    // Advisory: wiki-server deps may be missing in worktrees. CI is authoritative.
+    advisory: true,
+  },
+  {
+    id: 'typecheck-discord-bot',
+    name: 'TypeScript type check — discord-bot (advisory)',
+    command: 'npx',
+    args: ['tsc', '--noEmit', '-p', '../../apps/discord-bot/tsconfig.json'],
+    cwd: APP_DIR,
+    // Advisory: discord-bot deps may be missing in worktrees. CI is authoritative.
+    advisory: true,
+  },
+  {
+    id: 'typecheck-groundskeeper',
+    name: 'TypeScript type check — groundskeeper (advisory)',
+    command: 'npx',
+    args: ['tsc', '--noEmit', '-p', '../../apps/groundskeeper/tsconfig.json'],
+    cwd: APP_DIR,
+    // Advisory: groundskeeper deps may be missing in worktrees. CI is authoritative.
+    advisory: true,
+  },
+  {
     id: 'mdx-compile',
     name: 'MDX compilation smoke-test (advisory)',
     command: 'npx',
@@ -299,14 +339,12 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'review-marker',
-    name: 'PR review status (advisory)',
+    name: 'PR review status',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-review-marker.ts'],
     cwd: PROJECT_ROOT,
-    // Advisory for now: warns when a large PR (>5 files or >300 lines)
-    // has not been reviewed via /review-pr. Does not block the gate.
-    // To make blocking: remove `advisory: true`.
-    advisory: true,
+    // Blocking: large PRs (>5 files or >300 lines) must be reviewed via
+    // /review-pr before pushing. Small PRs pass automatically.
   },
   {
     id: 'typecheck-crux-baseline',

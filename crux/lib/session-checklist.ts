@@ -77,7 +77,7 @@ const PHASE_LABELS: Record<ChecklistPhase, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// Checklist Item Catalog (53 items total; ~32-38 per session depending on type)
+// Checklist Item Catalog (56 items total; ~35-41 per session depending on type)
 // Items marked 'blocking' must be checked or N/A'd before shipping.
 // Items marked 'advisory' are recommended but won't block the pre-push hook.
 // ---------------------------------------------------------------------------
@@ -106,6 +106,18 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     id: 'plan-approach',
     label: 'Plan approach',
     description: 'For non-trivial changes, think through the design before coding.',
+    phase: 'understand',
+    applicableTypes: 'all',
+    priority: 'blocking',
+  },
+  {
+    id: 'duplicate-check',
+    label: 'Checked for duplicates',
+    description:
+      'Before starting work: (1) Review conflict warnings from `crux agent-checklist init` output. ' +
+      '(2) Search open PRs: `gh pr list --search "topic"`. ' +
+      '(3) Search recent closed PRs: `gh pr list --state closed --search "topic" --limit 10`. ' +
+      'If overlap found, coordinate or pick a different task.',
     phase: 'understand',
     applicableTypes: 'all',
     priority: 'blocking',
@@ -316,6 +328,30 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     id: 'security',
     label: 'Security checked',
     description: 'No hardcoded secrets, no unsanitized user input, nothing that should be in .gitignore.',
+    phase: 'review',
+    applicableTypes: 'all',
+    priority: 'blocking',
+  },
+  {
+    id: 'red-team',
+    label: 'Red-team check',
+    description:
+      'For each new endpoint, CLI flag, or data path: (1) Try injecting unexpected input — empty strings, very long strings, ' +
+      'special characters ($, `, |, ;), SQL/shell metacharacters. (2) Try calling the endpoint without auth or with expired tokens. ' +
+      '(3) For any new file read/write: try path traversal (../../etc/passwd). (4) For any new config: try missing/malformed values. ' +
+      'Paste the adversarial test commands and their results into Key Decisions.',
+    phase: 'review',
+    applicableTypes: ['infrastructure', 'commands', 'bugfix', 'refactor'],
+    priority: 'blocking',
+  },
+  {
+    id: 'scope-complete',
+    label: 'Full scope delivered',
+    description:
+      'Re-read the original issue/request. Compare what was asked for vs what was implemented. ' +
+      'For each acceptance criterion: cite the specific file + line where it is satisfied OR cite the test that covers it. ' +
+      'If any criterion is not met, either implement it now or explicitly document it as "out of scope" in the PR description with a linked follow-up issue. ' +
+      'A PR that needs a follow-up PR to be functional is incomplete.',
     phase: 'review',
     applicableTypes: 'all',
     priority: 'blocking',

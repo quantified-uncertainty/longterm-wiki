@@ -650,7 +650,7 @@ function buildIssueBody(opts: {
 // Issue creation rate limiting
 // ---------------------------------------------------------------------------
 
-const DAILY_CREATE_LIMIT = 5;
+const DAILY_CREATE_LIMIT = 2;
 const RATE_LIMIT_FILE = join(dirname(new URL(import.meta.url).pathname), '../../.claude/issue-creates.json');
 
 interface RateLimitRecord {
@@ -783,6 +783,21 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
+  // Evidence validation: warn if issue body lacks concrete evidence
+  // (advisory — does not block issue creation)
+  let evidenceWarning = '';
+  if (body) {
+    const hasCodeFence = body.includes('```');
+    const hasUrl = /https?:\/\//.test(body);
+    const hasOutput = /(?:output|error|failed|exception):/i.test(body);
+    const hasFilePath = /(?:\/[a-zA-Z][\w.-]+){2,}/.test(body); // e.g. crux/validate/gate.ts
+    if (!hasCodeFence && !hasUrl && !hasOutput && !hasFilePath) {
+      evidenceWarning =
+        'Issue body lacks concrete evidence (no code fence, URL, error output, or file path). ' +
+        'Consider adding reproduction steps or a specific file/line reference.';
+    }
+  }
+
   interface CreateIssueResponse {
     number: number;
     html_url: string;
@@ -825,6 +840,9 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const appliedLabels = options.model ? [...labels, `${MODEL_LABEL_PREFIX}${(options.model as string).toLowerCase()}`] : labels;
   if (appliedLabels.length > 0) {
     output += `  Labels: ${appliedLabels.join(', ')}\n`;
+  }
+  if (evidenceWarning) {
+    output += `  ${c.yellow}⚠ ${evidenceWarning}${c.reset}\n`;
   }
   if (!body) {
     output += `  ${c.yellow}⚠ No body provided — consider adding --problem, --model, and --criteria flags${c.reset}\n`;
