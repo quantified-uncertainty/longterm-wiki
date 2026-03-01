@@ -1,6 +1,7 @@
 import { query } from "@anthropic-ai/claude-agent-sdk";
 import { WIKI_BASE_URL, TIMEOUT_MS, MAX_TOOL_CALLS } from "./config.js";
 import { wikiMcpServer } from "./wiki-tools.js";
+import { logger } from "./log.js";
 
 export interface QueryResult {
   result: string;
@@ -111,17 +112,13 @@ export async function runQuery(question: string): Promise<QueryResult> {
                 block.input?.page_id ||
                 "";
               toolCalls.push(`${block.name}: ${detail}`);
-              console.log(`${elapsed()} 🔧 Tool: ${block.name}`, detail);
+              logger.debug({ elapsed: elapsed(), tool: block.name, detail }, "Tool call");
             } else if (block.type === "text" && block.text) {
-              console.log(
-                `${elapsed()} 💬 Text: ${block.text.slice(0, 100)}...`
-              );
+              logger.debug({ elapsed: elapsed(), text: block.text.slice(0, 100) }, "Text block");
             }
           }
           if (toolCalls.length >= MAX_TOOL_CALLS) {
-            console.log(
-              `${elapsed()} ⚠️ Tool call limit reached (${MAX_TOOL_CALLS}), stopping query`
-            );
+            logger.warn({ elapsed: elapsed(), maxToolCalls: MAX_TOOL_CALLS }, "Tool call limit reached, stopping query");
             result =
               (lastResult || result) +
               `\n\n*(Stopped after ${MAX_TOOL_CALLS} tool calls to limit API usage)*`;
@@ -129,9 +126,9 @@ export async function runQuery(question: string): Promise<QueryResult> {
           }
         }
       } else if (msgType === "result") {
-        console.log(`${elapsed()} ✅ Got result`);
+        logger.debug({ elapsed: elapsed() }, "Got result");
       } else {
-        console.log(`${elapsed()} ${msgType} ${subtype}`);
+        logger.debug({ elapsed: elapsed(), msgType, subtype }, "Stream event");
       }
 
       if ("result" in msg) {

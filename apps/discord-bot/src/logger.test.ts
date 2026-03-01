@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { calculateCost, formatCost } from "./logger.js";
+import { logger } from "./log.js";
 
 describe("calculateCost", () => {
   afterEach(() => {
@@ -13,10 +14,11 @@ describe("calculateCost", () => {
   });
 
   it("uses default pricing and warns when unknown model is provided", () => {
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
     const cost = calculateCost(1_000_000, 1_000_000, "unknown-model");
     expect(cost).toBeCloseTo(18.0);
     expect(warnSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ model: "unknown-model" }),
       expect.stringContaining("Unknown model")
     );
   });

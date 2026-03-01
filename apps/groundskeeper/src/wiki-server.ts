@@ -1,3 +1,5 @@
+Looking at the conflict, the HEAD side uses `console.log` with a JSON structure to log the exhaustion message, while origin/main uses `logger.warn` but references `result.error` which is out of scope at that point (it's inside the loop). The HEAD version's approach of logging the exhaustion event makes more semantic sense, but I should use `logger.warn` (consistent with the rest of the file) while keeping the structured log content from HEAD.
+
 /**
  * Lightweight wiki-server API client for the groundskeeper.
  *
@@ -6,6 +8,7 @@
  */
 
 import type { Config } from "./config.js";
+import { logger } from "./logger.js";
 
 interface ApiResult<T> {
   ok: boolean;
@@ -82,13 +85,9 @@ export async function recordRunToServer(
     payload,
   );
   if (!result.ok) {
-    console.log(
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
-        event: "wiki_server_sync_failed",
-        endpoint: "/api/groundskeeper-runs",
-        error: result.error,
-      }),
+    logger.warn(
+      { event: "wiki_server_sync_failed", endpoint: "/api/groundskeeper-runs", error: result.error },
+      "Failed to record run to wiki-server",
     );
   }
 }
@@ -153,12 +152,12 @@ export async function registerAsActiveAgent(
     }
   }
 
-  console.log(
-    JSON.stringify({
-      timestamp: new Date().toISOString(),
+  logger.warn(
+    {
       event: "active_agent_registration_exhausted",
-      message: `Failed to register after ${REGISTER_MAX_RETRIES + 1} attempts. Groundskeeper will run without active-agent tracking.`,
-    }),
+      maxRetries: REGISTER_MAX_RETRIES + 1,
+    },
+    `Failed to register after ${REGISTER_MAX_RETRIES + 1} attempts. Groundskeeper will run without active-agent tracking.`,
   );
   return null;
 }
@@ -178,12 +177,9 @@ export async function updateActiveAgent(
     updates,
   );
   if (!result.ok) {
-    console.log(
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
-        event: "active_agent_update_failed",
-        error: result.error,
-      }),
+    logger.warn(
+      { event: "active_agent_update_failed", error: result.error },
+      "Failed to update active agent",
     );
   }
 }
@@ -216,13 +212,9 @@ export async function recordIncident(
     payload,
   );
   if (!result.ok) {
-    console.log(
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
-        event: "incident_recording_failed",
-        endpoint: "/api/monitoring/incidents",
-        error: result.error,
-      }),
+    logger.warn(
+      { event: "incident_recording_failed", endpoint: "/api/monitoring/incidents", error: result.error },
+      "Failed to record incident to wiki-server",
     );
   }
 }
