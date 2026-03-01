@@ -1,0 +1,233 @@
+name: Protected Paths Check
+
+# Flags PRs that modify agent behavioral rules, CI workflows, or validation
+# code for mandatory human review. Without the `rules-change-reviewed` label,
+# the check fails so these changes cannot merge unnoticed.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+jobs:
+  check-protected-paths:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Check for protected path changes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const PROTECTED_PATTERNS = [
+              /^CLAUDE\.md$/,
+              /^\.claude\/rules\//,
+              /^\.claude\/memory\//,
+              /^\.claude\/commands\//,
+              /^\.claude\/settings\.json$/,
+              /^\.claude\/hooks\//,
+              /^\.github\/workflows\//,
+              /^\.githooks\//,
+              /^crux\/validate\//,
+              /^crux\/commands\//,
+              /^crux\/lib\/session-checklist\.ts$/,
+              /^crux\/lib\/page-templates\.ts$/,
+              /^crux\/auto-update\//,
+            ];
+
+            const REVIEW_LABEL = 'rules-change-reviewed';
+            const COMMENT_MARKER = '<!-- protected-paths-check -->';
+
+            // Get list of files changed in this PR
+            const files = await github.paginate(
+              github.rest.pulls.listFiles,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                per_page: 100,
+              }
+            );
+
+            const changedPaths = files.map(f => f.filename);
+            const protectedFiles = changedPaths.filter(path =>
+              PROTECTED_PATTERNS.some(pattern => pattern.test(path))
+            );
+
+            if (protectedFiles.length === 0) {
+              console.log('No protected paths modified. Check passes.');
+              return;
+            }
+
+            // Group by category for readable output
+            const categories = {
+              'Agent instructions (CLAUDE.md)': [],
+              'Agent rules (.claude/rules/)': [],
+              'Agent memory (.claude/memory/)': [],
+              'Agent commands (.claude/commands/)': [],
+              'Agent settings (.claude/settings.json)': [],
+              'Agent hooks (.claude/hooks/)': [],
+              'CI workflows (.github/workflows/)': [],
+              'Git hooks (.githooks/)': [],
+              'Validation code (crux/validate/)': [],
+              'CLI commands (crux/commands/)': [],
+              'Session checklist (crux/lib/session-checklist.ts)': [],
+              'Page templates (crux/lib/page-templates.ts)': [],
+              'Auto-update system (crux/auto-update/)': [],
+            };
+
+            for (const file of protectedFiles) {
+              if (/^CLAUDE\.md$/.test(file)) categories['Agent instructions (CLAUDE.md)'].push(file);
+              else if (/^\.claude\/rules\//.test(file)) categories['Agent rules (.claude/rules/)'].push(file);
+              else if (/^\.claude\/memory\//.test(file)) categories['Agent memory (.claude/memory/)'].push(file);
+              else if (/^\.claude\/commands\//.test(file)) categories['Agent commands (.claude/commands/)'].push(file);
+              else if (/^\.claude\/settings\.json$/.test(file)) categories['Agent settings (.claude/settings.json)'].push(file);
+              else if (/^\.claude\/hooks\//.test(file)) categories['Agent hooks (.claude/hooks/)'].push(file);
+              else if (/^\.github\/workflows\//.test(file)) categories['CI workflows (.github/workflows/)'].push(file);
+              else if (/^\.githooks\//.test(file)) categories['Git hooks (.githooks/)'].push(file);
+              else if (/^crux\/validate\//.test(file)) categories['Validation code (crux/validate/)'].push(file);
+              else if (/^crux\/commands\//.test(file)) categories['CLI commands (crux/commands/)'].push(file);
+              else if (/^crux\/lib\/session-checklist\.ts$/.test(file)) categories['Session checklist (crux/lib/session-checklist.ts)'].push(file);
+              else if (/^crux\/lib\/page-templates\.ts$/.test(file)) categories['Page templates (crux/lib/page-templates.ts)'].push(file);
+              else if (/^crux\/auto-update\//.test(file)) categories['Auto-update system (crux/auto-update/)'].push(file);
+            }
+
+            // Check if the review label is present AND was added by a human
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const hasReviewLabel = labels.some(l => l.name === REVIEW_LABEL);
+
+            // If the label is present, verify it was added by a human (not a bot or agent)
+            // This prevents agents from self-applying the label to bypass review.
+            const DISALLOWED_LABEL_ACTORS = [
+              'github-actions[bot]',
+              'dependabot[bot]',
+            ];
+            const DISALLOWED_ACTOR_PATTERNS = [
+              /^claude-/i,
+            ];
+
+            function isDisallowedActor(login) {
+              if (DISALLOWED_LABEL_ACTORS.includes(login)) return true;
+              return DISALLOWED_ACTOR_PATTERNS.some(p => p.test(login));
+            }
+
+            let labelAddedByHuman = false;
+            let labelActorName = null;
+
+            if (hasReviewLabel) {
+              // Fetch timeline events to find who added the label
+              const events = await github.paginate(
+                github.rest.issues.listEvents,
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  per_page: 100,
+                }
+              );
+
+              // Find the most recent 'labeled' event for our review label
+              const labelEvents = events.filter(
+                e => e.event === 'labeled' && e.label?.name === REVIEW_LABEL
+              );
+              const mostRecent = labelEvents[labelEvents.length - 1];
+
+              if (mostRecent && mostRecent.actor) {
+                labelActorName = mostRecent.actor.login;
+                labelAddedByHuman = !isDisallowedActor(labelActorName);
+              }
+
+              if (!labelAddedByHuman) {
+                console.log(`Label "${REVIEW_LABEL}" was added by "${labelActorName || 'unknown'}" which is not an allowed reviewer.`);
+              } else {
+                console.log(`Label "${REVIEW_LABEL}" was added by "${labelActorName}" — accepted as human reviewer.`);
+              }
+            }
+
+            // The label counts only if it exists AND was added by an allowed actor
+            const reviewApproved = hasReviewLabel && labelAddedByHuman;
+
+            // Build the comment body
+            const statusIcon = reviewApproved ? '✅' : '🛑';
+            let statusText;
+            if (reviewApproved) {
+              statusText = `The \`${REVIEW_LABEL}\` label is present (added by \`${labelActorName}\`). A human has acknowledged these changes.`;
+            } else if (hasReviewLabel && !labelAddedByHuman) {
+              statusText = `**Action required**: The \`${REVIEW_LABEL}\` label was added by \`${labelActorName || 'unknown'}\`, which is not recognized as a human reviewer. A human must remove and re-add the label for it to count.`;
+            } else {
+              statusText = `**Action required**: Add the \`${REVIEW_LABEL}\` label after a human has reviewed the protected file changes.`;
+            }
+
+            const fileList = Object.entries(categories)
+              .filter(([, files]) => files.length > 0)
+              .map(([category, files]) => {
+                const items = files.map(f => `  - \`${f}\``).join('\n');
+                return `**${category}**\n${items}`;
+              })
+              .join('\n\n');
+
+            const body = [
+              COMMENT_MARKER,
+              `## ${statusIcon} Protected Paths Modified`,
+              '',
+              `This PR modifies **${protectedFiles.length} protected file(s)** that control agent behavior, CI pipelines, or validation logic. These changes require human review before merging.`,
+              '',
+              fileList,
+              '',
+              '---',
+              '',
+              statusText,
+              '',
+              `> **Why this check exists**: Agents have write access to their own behavioral rules. Without human review, a rule change buried in a large PR could weaken validation, bypass gates, or modify agent instructions. See [#1405](https://github.com/quantified-uncertainty/longterm-wiki/issues/1405).`,
+            ].join('\n');
+
+            // Post or update the comment (paginated to handle PRs with many comments)
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                per_page: 100,
+              }
+            );
+            const existing = comments.find(c => c.body && c.body.includes(COMMENT_MARKER));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+              console.log('Updated existing protected-paths comment.');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+              console.log('Posted protected-paths comment.');
+            }
+
+            // Fail the check if the review label is missing or was not added by a human
+            if (!reviewApproved) {
+              if (hasReviewLabel && !labelAddedByHuman) {
+                core.setFailed(
+                  `This PR modifies ${protectedFiles.length} protected file(s). The "${REVIEW_LABEL}" label is present but was added by "${labelActorName || 'unknown'}", ` +
+                  `which is not recognized as a human reviewer. A human must remove and re-add the label for it to count.`
+                );
+              } else {
+                core.setFailed(
+                  `This PR modifies ${protectedFiles.length} protected file(s) but is missing the "${REVIEW_LABEL}" label. ` +
+                  `A human must review the changes to agent rules, CI workflows, or validation code and add the label before this PR can merge.`
+                );
+              }
+            } else {
+              console.log(`Protected files modified but "${REVIEW_LABEL}" label is present (added by "${labelActorName}"). Check passes.`);
+            }
