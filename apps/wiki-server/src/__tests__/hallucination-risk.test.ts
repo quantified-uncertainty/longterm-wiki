@@ -15,9 +15,13 @@ let riskStore: Array<{
   computed_at: Date;
 }>;
 
+/** Whether to simulate the materialized view existing. */
+let simulateMatView = false;
+
 function resetStore() {
   riskStore = [];
   nextId = 1;
+  simulateMatView = false;
 }
 
 /** Get latest snapshot per page (shared logic for stats/latest mock queries). */
@@ -34,6 +38,16 @@ function getLatestByPage() {
 
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
+
+  // ---- pg_matviews check (materialized view existence) ----
+  if (q.includes("pg_matviews") && q.includes("hallucination_risk_latest")) {
+    return [{ exists: simulateMatView }];
+  }
+
+  // ---- REFRESH MATERIALIZED VIEW (no-op in tests) ----
+  if (q.includes("refresh materialized view")) {
+    return [];
+  }
 
   // ---- entity_ids (for health check) ----
   if (q.includes("count(*)") && q.includes("entity_ids")) {
@@ -67,6 +81,58 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       results.push(row);
     }
     return results;
+  }
+
+  // ---- Queries against hallucination_risk_latest materialized view ----
+
+  // Stats from matview: SELECT count(*)::int AS count FROM hallucination_risk_latest
+  if (
+    q.includes("count(*)") &&
+    q.includes("hallucination_risk_latest") &&
+    !q.includes("group by")
+  ) {
+    const latestByPage = getLatestByPage();
+    return [{ count: latestByPage.size }];
+  }
+
+  // Level distribution from matview: SELECT level, count(...) FROM hallucination_risk_latest GROUP BY level
+  if (
+    q.includes("hallucination_risk_latest") &&
+    q.includes("group by") &&
+    q.includes("level")
+  ) {
+    const latestByPage = getLatestByPage();
+    const counts: Record<string, number> = {};
+    for (const r of latestByPage.values()) {
+      counts[r.level] = (counts[r.level] || 0) + 1;
+    }
+    return Object.entries(counts)
+      .map(([level, count]) => ({ level, count }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  // Latest from matview: SELECT ... FROM hallucination_risk_latest WHERE/ORDER BY
+  if (
+    q.includes("hallucination_risk_latest") &&
+    q.includes("order by") &&
+    q.includes("score")
+  ) {
+    const latestByPage = getLatestByPage();
+    let results = [...latestByPage.values()];
+
+    const levelParam = params.find(
+      (p) => p === "high" || p === "medium" || p === "low"
+    );
+    if (levelParam) {
+      results = results.filter((r) => r.level === levelParam);
+    }
+
+    results.sort((a, b) => b.score - a.score);
+
+    const numParams = params.filter((p) => typeof p === "number") as number[];
+    const limit = numParams[0] || 50;
+    const offset = numParams[1] || 0;
+    return results.slice(offset, offset + limit);
   }
 
   // ---- SELECT count(distinct page_id) FROM hallucination_risk_snapshots ----
@@ -308,6 +374,40 @@ describe("Hallucination Risk API", () => {
       });
       expect(res.status).toBe(400);
     });
+
+    it("auto-refreshes materialized view when it exists", async () => {
+      simulateMatView = true;
+      const res = await postJson(app, "/api/hallucination-risk/batch", {
+        snapshots: [
+          { pageId: "page-a", score: 70, level: "high" },
+        ],
+      });
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.inserted).toBe(1);
+    });
+  });
+
+  describe("POST /api/hallucination-risk/refresh", () => {
+    it("returns refreshed:false when matview does not exist", async () => {
+      simulateMatView = false;
+      const res = await app.request("/api/hallucination-risk/refresh", {
+        method: "POST",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.refreshed).toBe(false);
+    });
+
+    it("returns refreshed:true when matview exists", async () => {
+      simulateMatView = true;
+      const res = await app.request("/api/hallucination-risk/refresh", {
+        method: "POST",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.refreshed).toBe(true);
+    });
   });
 
   describe("GET /api/hallucination-risk/history?page_id=X", () => {
@@ -355,7 +455,25 @@ describe("Hallucination Risk API", () => {
   });
 
   describe("GET /api/hallucination-risk/stats", () => {
-    it("returns aggregate statistics", async () => {
+    it("returns aggregate statistics (fallback path)", async () => {
+      simulateMatView = false;
+      for (const entry of [
+        { pageId: "page-a", score: 70, level: "high" },
+        { pageId: "page-b", score: 25, level: "low" },
+        { pageId: "page-c", score: 45, level: "medium" },
+      ]) {
+        await postJson(app, "/api/hallucination-risk", entry);
+      }
+
+      const res = await app.request("/api/hallucination-risk/stats");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.totalSnapshots).toBe(3);
+      expect(body.uniquePages).toBe(3);
+    });
+
+    it("returns aggregate statistics (matview path)", async () => {
+      simulateMatView = true;
       for (const entry of [
         { pageId: "page-a", score: 70, level: "high" },
         { pageId: "page-b", score: 25, level: "low" },
@@ -381,7 +499,8 @@ describe("Hallucination Risk API", () => {
   });
 
   describe("GET /api/hallucination-risk/latest", () => {
-    it("returns 200 with pages array", async () => {
+    it("returns 200 with pages array (fallback path)", async () => {
+      simulateMatView = false;
       for (const entry of [
         {
           pageId: "page-a",
@@ -404,6 +523,33 @@ describe("Hallucination Risk API", () => {
       const body = await res.json();
       expect(body.pages).toBeDefined();
       expect(Array.isArray(body.pages)).toBe(true);
+    });
+
+    it("returns 200 with pages array (matview path)", async () => {
+      simulateMatView = true;
+      for (const entry of [
+        {
+          pageId: "page-a",
+          score: 70,
+          level: "high",
+          factors: ["no-citations"],
+        },
+        {
+          pageId: "page-b",
+          score: 25,
+          level: "low",
+          factors: ["well-cited"],
+        },
+      ]) {
+        await postJson(app, "/api/hallucination-risk", entry);
+      }
+
+      const res = await app.request("/api/hallucination-risk/latest");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.pages).toBeDefined();
+      expect(Array.isArray(body.pages)).toBe(true);
+      expect(body.pages).toHaveLength(2);
     });
   });
 

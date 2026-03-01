@@ -316,6 +316,13 @@
       "when": 1772352000000,
       "tag": "0040_service_health_incidents",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1772438400000,
+      "tag": "0045_hallucination_risk_perf",
+      "breakpoints": true
     }
   ]
 }
