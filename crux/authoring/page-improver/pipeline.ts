@@ -29,6 +29,7 @@ import {
   validatePhase, gapFillPhase, triagePhase, adversarialLoopPhase,
   citationAuditPhase,
 } from './phases.ts';
+import { runSemanticDiff } from '../../lib/semantic-diff/index.ts';
 
 // ── Session log helpers ───────────────────────────────────────────────────────
 
@@ -138,6 +139,9 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     console.error(`File not found: ${filePath}`);
     process.exit(1);
   }
+
+  // Capture original content for semantic diff (before any modifications)
+  const originalContent = fs.readFileSync(filePath, 'utf-8');
 
   // Handle triage tier: run news check to auto-select the real tier
   let triageResult: TriageResult | undefined;
@@ -396,6 +400,28 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
 
     fs.writeFileSync(filePath, contentToApply);
     console.log(`\nChanges applied to ${filePath}`);
+
+    // Semantic diff: analyze factual claim changes for safety audit
+    // Non-blocking: runs after write, warns but never blocks on analysis failure
+    try {
+      const semanticDiff = await runSemanticDiff(
+        page.id,
+        originalContent,
+        contentToApply,
+        { agent: 'crux-improve', tier, verbose: false },
+      );
+      if (semanticDiff.assessment !== 'safe') {
+        log('semantic-diff', `Assessment: ${semanticDiff.assessment.toUpperCase()}`);
+        for (const issue of semanticDiff.issues) {
+          log('semantic-diff', `  ${issue}`);
+        }
+      } else {
+        log('semantic-diff', `Safe (${semanticDiff.diff.summary.added} added, ${semanticDiff.diff.summary.removed} removed, ${semanticDiff.diff.summary.changed} changed claims)`);
+      }
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      log('semantic-diff', `Warning: semantic diff failed (non-blocking): ${error.message}`);
+    }
 
     // Post-apply cleanup: run auto-fixers on the written file
     const cleanupResult = await runPostApplyCleanup(filePath);
