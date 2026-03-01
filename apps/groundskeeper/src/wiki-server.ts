@@ -191,6 +191,8 @@ export async function updateActiveAgent(
  * If wiki-server is the thing that's down, this call will also fail — that's
  * expected. The groundskeeper health-check task also creates GitHub issues
  * as a fallback notification channel.
+ *
+ * Returns true if the incident was recorded successfully, false otherwise.
  */
 export async function recordIncident(
   config: Config,
@@ -202,7 +204,7 @@ export async function recordIncident(
     checkSource?: string;
     metadata?: Record<string, unknown>;
   },
-): Promise<void> {
+): Promise<boolean> {
   const result = await apiRequest(
     config,
     "POST",
@@ -214,7 +216,9 @@ export async function recordIncident(
       { event: "incident_recording_failed", endpoint: "/api/monitoring/incidents", error: result.error },
       "Failed to record incident to wiki-server",
     );
+    return false;
   }
+  return true;
 }
 
 /**
