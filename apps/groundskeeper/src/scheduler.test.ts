@@ -21,6 +21,13 @@ vi.mock("./run-tracker.js", () => ({
   recordRun: vi.fn(),
 }));
 
+// Mock wiki-server to capture recordRunToServer calls
+const mockRecordRunToServer = vi.fn().mockResolvedValue(undefined);
+vi.mock("./wiki-server.js", () => ({
+  recordRunToServer: (...args: unknown[]) => mockRecordRunToServer(...args),
+  updateActiveAgent: vi.fn().mockResolvedValue(undefined),
+}));
+
 import {
   registerTask,
   resetCircuitBreaker,
@@ -57,6 +64,7 @@ describe("scheduler", () => {
     scheduledCallbacks.length = 0;
     // Clear task states between tests
     getTaskStates().clear();
+    mockRecordRunToServer.mockClear();
   });
 
   describe("registerTask", () => {
@@ -324,6 +332,140 @@ describe("scheduler", () => {
       expect(state.disabled).toBe(true);
       expect(state.trippedAt).toBeGreaterThanOrEqual(beforeTrip);
       expect(state.trippedAt).toBeLessThanOrEqual(Date.now());
+    });
+  });
+
+  describe("wiki-server event recording for half-open probes", () => {
+    it("records half_open_attempt when probe starts", async () => {
+      const fn: TaskFn = vi.fn().mockResolvedValue({ success: false, summary: "down" });
+
+      registerTask(config, "attempt-event-test", "*/5 * * * *", true, fn);
+      const callback = scheduledCallbacks[scheduledCallbacks.length - 1];
+
+      // Trip the breaker
+      await callback();
+      await callback();
+      await callback();
+      mockRecordRunToServer.mockClear();
+
+      const state = getTaskStates().get("attempt-event-test")!;
+      // Advance time past cooldown
+      state.trippedAt = Date.now() - 61_000;
+
+      // Trigger half-open probe
+      await callback();
+
+      // Should have recorded half_open_attempt event
+      const attemptCall = mockRecordRunToServer.mock.calls.find(
+        (call: unknown[]) => (call[1] as { event: string }).event === "half_open_attempt"
+      );
+      expect(attemptCall).toBeDefined();
+      expect((attemptCall![1] as { taskName: string }).taskName).toBe("attempt-event-test");
+    });
+
+    it("records half_open_success when probe succeeds", async () => {
+      let callCount = 0;
+      const fn: TaskFn = vi.fn().mockImplementation(async () => {
+        callCount++;
+        if (callCount <= 3) return { success: false, summary: "down" };
+        return { success: true, summary: "recovered" };
+      });
+
+      registerTask(config, "success-event-test", "*/5 * * * *", true, fn);
+      const callback = scheduledCallbacks[scheduledCallbacks.length - 1];
+
+      // Trip the breaker
+      await callback();
+      await callback();
+      await callback();
+      mockRecordRunToServer.mockClear();
+
+      const state = getTaskStates().get("success-event-test")!;
+      // Advance time past cooldown
+      state.trippedAt = Date.now() - 61_000;
+
+      // Probe succeeds
+      await callback();
+
+      // The main run event should be "half_open_success", not plain "success"
+      const runCalls = mockRecordRunToServer.mock.calls.filter(
+        (call: unknown[]) => {
+          const evt = (call[1] as { event: string }).event;
+          return evt === "half_open_success" || evt === "success";
+        }
+      );
+      expect(runCalls.length).toBeGreaterThanOrEqual(1);
+      const hasHalfOpenSuccess = runCalls.some(
+        (call: unknown[]) => (call[1] as { event: string }).event === "half_open_success"
+      );
+      expect(hasHalfOpenSuccess).toBe(true);
+    });
+
+    it("does not record half_open_success for normal successful runs", async () => {
+      const fn: TaskFn = vi.fn().mockResolvedValue({ success: true, summary: "ok" });
+
+      registerTask(config, "normal-success-test", "*/5 * * * *", true, fn);
+      const callback = scheduledCallbacks[scheduledCallbacks.length - 1];
+
+      await callback();
+
+      const hasHalfOpenSuccess = mockRecordRunToServer.mock.calls.some(
+        (call: unknown[]) => (call[1] as { event: string }).event === "half_open_success"
+      );
+      expect(hasHalfOpenSuccess).toBe(false);
+
+      // Should have recorded a plain "success" event
+      const hasSuccess = mockRecordRunToServer.mock.calls.some(
+        (call: unknown[]) => (call[1] as { event: string }).event === "success"
+      );
+      expect(hasSuccess).toBe(true);
+    });
+  });
+
+  describe("wiki-server event recording for manual reset", () => {
+    it("records circuit_breaker_reset when config is provided", async () => {
+      const fn: TaskFn = vi.fn().mockResolvedValue({ success: false, summary: "fail" });
+
+      registerTask(config, "manual-reset-test", "*/5 * * * *", true, fn);
+      const callback = scheduledCallbacks[scheduledCallbacks.length - 1];
+
+      // Trip the breaker
+      await callback();
+      await callback();
+      await callback();
+      mockRecordRunToServer.mockClear();
+
+      // Manual reset with config
+      resetCircuitBreaker("manual-reset-test", config);
+
+      // Should have recorded circuit_breaker_reset event
+      const resetCall = mockRecordRunToServer.mock.calls.find(
+        (call: unknown[]) => (call[1] as { event: string }).event === "circuit_breaker_reset"
+      );
+      expect(resetCall).toBeDefined();
+      expect((resetCall![1] as { taskName: string }).taskName).toBe("manual-reset-test");
+    });
+
+    it("does not record to wiki-server when config is omitted", async () => {
+      const fn: TaskFn = vi.fn().mockResolvedValue({ success: false, summary: "fail" });
+
+      registerTask(config, "no-config-reset", "*/5 * * * *", true, fn);
+      const callback = scheduledCallbacks[scheduledCallbacks.length - 1];
+
+      // Trip the breaker
+      await callback();
+      await callback();
+      await callback();
+      mockRecordRunToServer.mockClear();
+
+      // Manual reset without config
+      resetCircuitBreaker("no-config-reset");
+
+      // Should NOT have recorded circuit_breaker_reset event
+      const resetCall = mockRecordRunToServer.mock.calls.find(
+        (call: unknown[]) => (call[1] as { event: string }).event === "circuit_breaker_reset"
+      );
+      expect(resetCall).toBeUndefined();
     });
   });
 
