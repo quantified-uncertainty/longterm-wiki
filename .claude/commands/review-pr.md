@@ -98,10 +98,10 @@ After executing all verification steps:
 After completing all phases above, create the review marker file so `/agent-session-ready-PR` knows this session was reviewed:
 
 ```bash
-echo "reviewed $(date -u +%Y-%m-%dT%H:%M:%SZ)" >| .claude/review-done
+echo "reviewed $(git rev-parse HEAD) $(date -u +%Y-%m-%dT%H:%M:%SZ)" >| .claude/review-done
 ```
 
-This file is gitignored. It persists for the life of the session and is read by `/agent-session-ready-PR` to populate the `reviewed` field in the session log.
+This file is gitignored. It persists for the life of the session and is read by `/agent-session-ready-PR` to populate the `reviewed` field in the session log. The commit SHA is verified by the `review-marker` gate check — if new commits are added after review, the marker becomes stale and the gate will warn.
 
 ## Output
 

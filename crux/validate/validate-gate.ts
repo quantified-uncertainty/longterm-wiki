@@ -298,6 +298,17 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
   },
   {
+    id: 'review-marker',
+    name: 'PR review status (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-review-marker.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory for now: warns when a large PR (>5 files or >300 lines)
+    // has not been reviewed via /review-pr. Does not block the gate.
+    // To make blocking: remove `advisory: true`.
+    advisory: true,
+  },
+  {
     id: 'typecheck-crux-baseline',
     name: 'Crux TypeScript check',
     command: 'npx',
