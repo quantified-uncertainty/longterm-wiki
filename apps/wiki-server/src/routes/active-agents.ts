@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { eq, desc, and, lt, sql } from "drizzle-orm";
+import { eq, desc, and, lt, sql, or } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { activeAgents } from "../schema.js";
 import {
@@ -17,6 +17,9 @@ import { logger } from "../logger.js";
 /** Default minutes before an agent without heartbeat is marked stale. */
 const STALE_TIMEOUT_MINUTES = 30;
 
+/** Days after which completed/errored/stale agents are deleted by cleanup. */
+const CLEANUP_AGE_DAYS = 30;
+
 const activeAgentsApp = new Hono()
   // ---- POST / (register a new agent) ----
   .post("/", async (c) => {
@@ -29,48 +32,46 @@ const activeAgentsApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
-    // Upsert: if an agent with this sessionId already exists, update it
-    const { row, isUpdate } = await db.transaction(async (tx) => {
-      const existing = await tx
-        .select()
-        .from(activeAgents)
-        .where(eq(activeAgents.sessionId, d.sessionId))
-        .limit(1);
+    // Atomic upsert using INSERT ... ON CONFLICT to avoid race conditions.
+    // Two agents registering with the same sessionId simultaneously will both
+    // succeed — one inserts, the other updates via the conflict clause.
+    // This replaces the previous SELECT-then-INSERT/UPDATE transaction pattern
+    // which was vulnerable to TOCTOU races under concurrent heartbeats.
+    const rows = await db
+      .insert(activeAgents)
+      .values({
+        sessionId: d.sessionId,
+        branch: d.branch ?? null,
+        task: d.task,
+        issueNumber: d.issueNumber ?? null,
+        model: d.model ?? null,
+        worktree: d.worktree ?? null,
+        metadata: d.metadata ?? null,
+      })
+      .onConflictDoUpdate({
+        target: activeAgents.sessionId,
+        set: {
+          // For branch and metadata: prefer incoming value, fall back to existing
+          branch: sql`coalesce(excluded.branch, "active_agents"."branch")`,
+          task: sql`excluded.task`,
+          issueNumber: sql`excluded.issue_number`,
+          model: sql`excluded.model`,
+          worktree: sql`excluded.worktree`,
+          metadata: sql`coalesce(excluded.metadata, "active_agents"."metadata")`,
+          status: sql`'active'`,
+          heartbeatAt: sql`now()`,
+          completedAt: sql`null`,
+          updatedAt: sql`now()`,
+        },
+      })
+      .returning();
 
-      if (existing.length > 0) {
-        const updated = await tx
-          .update(activeAgents)
-          .set({
-            branch: d.branch ?? existing[0].branch,
-            task: d.task,
-            issueNumber: d.issueNumber ?? null,
-            model: d.model ?? null,
-            worktree: d.worktree ?? null,
-            metadata: d.metadata ?? existing[0].metadata,
-            status: "active",
-            heartbeatAt: new Date(),
-            completedAt: null,
-            updatedAt: new Date(),
-          })
-          .where(eq(activeAgents.id, existing[0].id))
-          .returning();
-        return { row: firstOrThrow(updated, "active agent update"), isUpdate: true };
-      }
+    const row = firstOrThrow(rows, "active agent upsert");
 
-      const inserted = await tx
-        .insert(activeAgents)
-        .values({
-          sessionId: d.sessionId,
-          branch: d.branch ?? null,
-          task: d.task,
-          issueNumber: d.issueNumber ?? null,
-          model: d.model ?? null,
-          worktree: d.worktree ?? null,
-          metadata: d.metadata ?? null,
-        })
-        .returning();
-      return { row: firstOrThrow(inserted, "active agent insert"), isUpdate: false };
-    });
+    // Determine if this was an insert or update by checking whether
+    // created_at and updated_at differ (update sets updated_at to now(),
+    // while insert sets both created_at and updated_at to defaultNow()).
+    const isUpdate = row.createdAt.getTime() !== row.updatedAt.getTime();
 
     return c.json(row, isUpdate ? 200 : 201);
   })
@@ -90,10 +91,12 @@ const activeAgentsApp = new Hono()
       .orderBy(desc(activeAgents.startedAt))
       .limit(limit);
 
-    // Compute conflict warnings: agents working on the same issue
+    // Compute conflict warnings: agents working on the same issue.
+    // Include both "active" and "stale" agents — a stale agent may still be
+    // running (just missed a heartbeat), so picking up its issue risks conflicts.
     const issueGroups = new Map<number, string[]>();
     for (const row of rows) {
-      if (row.issueNumber && row.status === "active") {
+      if (row.issueNumber && (row.status === "active" || row.status === "stale")) {
         const group = issueGroups.get(row.issueNumber) || [];
         group.push(row.sessionId);
         issueGroups.set(row.issueNumber, group);
@@ -217,6 +220,38 @@ const activeAgentsApp = new Hono()
     logger.info({ swept: stale.length, cutoff: cutoff.toISOString() }, "Sweep: marked agents as stale");
 
     return c.json({ swept: stale.length, agents: stale });
+  })
+
+  // ---- POST /cleanup (delete old completed/errored/stale agents) ----
+  .post("/cleanup", async (c) => {
+    const body = await parseJsonBody(c).catch(() => ({}));
+    const raw = Number((body as Record<string, unknown>)?.ageDays || CLEANUP_AGE_DAYS);
+    const ageDays = Math.max(1, Math.min(Number.isFinite(raw) ? raw : CLEANUP_AGE_DAYS, 365));
+
+    const cutoff = new Date(Date.now() - ageDays * 24 * 60 * 60 * 1000);
+    const db = getDrizzleDb();
+
+    // Only delete agents that are no longer active and are older than the cutoff
+    const deleted = await db
+      .delete(activeAgents)
+      .where(
+        and(
+          or(
+            eq(activeAgents.status, "completed"),
+            eq(activeAgents.status, "errored"),
+            eq(activeAgents.status, "stale")
+          ),
+          lt(activeAgents.updatedAt, cutoff)
+        )
+      )
+      .returning({ id: activeAgents.id, sessionId: activeAgents.sessionId });
+
+    logger.info(
+      { deleted: deleted.length, ageDays, cutoff: cutoff.toISOString() },
+      "Cleanup: deleted old agents"
+    );
+
+    return c.json({ deleted: deleted.length, agents: deleted });
   });
 
 export const activeAgentsRoute = activeAgentsApp;

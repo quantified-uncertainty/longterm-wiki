@@ -1,3 +1,5 @@
+Looking at the conflict, the HEAD side uses `console.log` with a JSON structure to log the exhaustion message, while origin/main uses `logger.warn` but references `result.error` which is out of scope at that point (it's inside the loop). The HEAD version's approach of logging the exhaustion event makes more semantic sense, but I should use `logger.warn` (consistent with the rest of the file) while keeping the structured log content from HEAD.
+
 /**
  * Lightweight wiki-server API client for the groundskeeper.
  *
@@ -99,31 +101,63 @@ interface ActiveAgentResponse {
   sessionId: string;
 }
 
+/** Maximum number of retries for agent registration. */
+const REGISTER_MAX_RETRIES = 5;
+
+/** Base delay in ms for exponential backoff (doubles each retry: 2s, 4s, 8s, 16s, 32s). */
+const REGISTER_BASE_DELAY_MS = 2_000;
+
 /**
- * Register the groundskeeper as an active agent. Best-effort.
- * Returns the agent ID if successful, null otherwise.
+ * Register the groundskeeper as an active agent with retry.
+ *
+ * Uses exponential backoff so that if wiki-server is down at groundskeeper
+ * startup, registration is retried rather than silently failing. Without
+ * retry, the groundskeeper would remain invisible for its entire lifecycle.
+ *
+ * Returns the agent ID if successful, null if all retries are exhausted.
  */
 export async function registerAsActiveAgent(
   config: Config,
 ): Promise<number | null> {
-  const result = await apiRequest<ActiveAgentResponse>(
-    config,
-    "POST",
-    "/api/active-agents",
-    {
-      sessionId: "groundskeeper",
-      task: "Scheduled maintenance daemon (health checks, conflict resolution, code review)",
-      model: "groundskeeper-daemon",
-    },
-  );
+  for (let attempt = 0; attempt <= REGISTER_MAX_RETRIES; attempt++) {
+    const result = await apiRequest<ActiveAgentResponse>(
+      config,
+      "POST",
+      "/api/active-agents",
+      {
+        sessionId: "groundskeeper",
+        task: "Scheduled maintenance daemon (health checks, conflict resolution, code review)",
+        model: "groundskeeper-daemon",
+      },
+    );
 
-  if (result.ok && result.data) {
-    return result.data.id;
+    if (result.ok && result.data) {
+      return result.data.id;
+    }
+
+    console.log(
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        event: "active_agent_registration_failed",
+        attempt: attempt + 1,
+        maxRetries: REGISTER_MAX_RETRIES,
+        error: result.error,
+      }),
+    );
+
+    // Don't delay after the last attempt
+    if (attempt < REGISTER_MAX_RETRIES) {
+      const delay = REGISTER_BASE_DELAY_MS * Math.pow(2, attempt);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
   }
 
   logger.warn(
-    { event: "active_agent_registration_failed", error: result.error },
-    "Failed to register as active agent",
+    {
+      event: "active_agent_registration_exhausted",
+      maxRetries: REGISTER_MAX_RETRIES + 1,
+    },
+    `Failed to register after ${REGISTER_MAX_RETRIES + 1} attempts. Groundskeeper will run without active-agent tracking.`,
   );
   return null;
 }
