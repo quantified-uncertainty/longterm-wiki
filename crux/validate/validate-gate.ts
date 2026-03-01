@@ -261,6 +261,13 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'conflict-markers',
+    name: 'Conflict marker detection',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-conflict-markers.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'mdx-compile',
     name: 'MDX compilation smoke-test (advisory)',
     command: 'npx',
