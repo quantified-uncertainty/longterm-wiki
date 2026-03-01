@@ -55,6 +55,70 @@ jobs:
           cache-from: type=gha,scope=wiki-server
           cache-to: type=gha,scope=wiki-server,mode=max
 
+  pre-deploy-smoke-test:
+    name: Pre-deploy smoke test
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Start container and run smoke test
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+        run: |
+          IMAGE="ghcr.io/quantified-uncertainty/longterm-wiki-server:sha-${{ github.sha }}"
+          CONTAINER_NAME="smoke-test-${{ github.run_id }}"
+          echo "Starting pre-deploy smoke test for image: $IMAGE"
+
+          # Start container with production DATABASE_URL so migrations run against
+          # the real schema. Migrations are idempotent (already-applied migrations are
+          # skipped), so this is safe. The container is isolated and torn down
+          # immediately after the test — no traffic is routed to it.
+          docker run -d \
+            --name "$CONTAINER_NAME" \
+            -p 3099:3100 \
+            -e DATABASE_URL="${DATABASE_URL}" \
+            -e WIKI_SERVER_API_KEY="${LONGTERMWIKI_SERVER_API_KEY}" \
+            "$IMAGE"
+
+          # Wait for the server to be ready (up to 30s: 10 attempts × 3s delay).
+          # The server runs migrations on startup, so allow time for that.
+          MAX_ATTEMPTS=10
+          DELAY=3
+          STATUS=""
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            HEALTH=$(curl -sf "http://localhost:3099/health" 2>&1 || true)
+            STATUS=$(echo "$HEALTH" | jq -r '.status // empty' 2>/dev/null || true)
+            if [ "$STATUS" = "healthy" ]; then
+              echo "Pre-deploy health check passed on attempt $i: $HEALTH"
+              break
+            fi
+            echo "Pre-deploy health check attempt $i/$MAX_ATTEMPTS: ${HEALTH:-no response}"
+            if [ "$i" -lt "$MAX_ATTEMPTS" ]; then
+              sleep $DELAY
+            fi
+          done
+
+          # Always clean up the container regardless of test outcome.
+          echo "Stopping and removing smoke-test container..."
+          docker stop "$CONTAINER_NAME" || true
+          docker rm "$CONTAINER_NAME" || true
+
+          if [ "$STATUS" != "healthy" ]; then
+            echo "::error::Pre-deploy smoke test failed — container did not become healthy within $((MAX_ATTEMPTS * DELAY))s. Aborting deploy to prevent serving broken traffic."
+            exit 1
+          fi
+
+          echo "Pre-deploy smoke test passed — container is healthy. Proceeding with deploy."
+
   pre-deploy-backup:
     name: Pre-deploy database backup
     needs: build-and-push
@@ -66,10 +130,11 @@ jobs:
 
   deploy:
     name: Deploy to ArgoCD
-    needs: [build-and-push, pre-deploy-backup]
+    needs: [build-and-push, pre-deploy-smoke-test, pre-deploy-backup]
     if: github.ref == 'refs/heads/main' && !cancelled()
     # Deploy proceeds even if backup fails (DATABASE_URL may not be configured yet).
     # Once DATABASE_URL is added, backup failures will be visible but non-blocking.
+    # Pre-deploy smoke test failure DOES block the deploy (job dependency enforces this).
     runs-on: ubuntu-latest
 
     steps:
@@ -149,6 +214,7 @@ jobs:
           echo "Health status: ${HEALTH_STATUS}"
 
       - name: Post-deploy smoke test
+        id: post-deploy-smoke
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
@@ -234,6 +300,39 @@ jobs:
             exit 1
           fi
           echo "Citations health smoke test passed"
+
+      - name: Rollback on post-deploy smoke test failure
+        if: failure() && steps.post-deploy-smoke.conclusion == 'failure'
+        env:
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+        run: |
+          echo "::warning::Post-deploy smoke test failed — triggering ArgoCD rollback to previous revision."
+
+          # ArgoCD CLI was already installed in the Update ArgoCD image tag step.
+          # Re-download here since each step runs in a fresh shell context.
+          ARGOCD_VERSION="v3.3.1"
+          curl -sSL -o /usr/local/bin/argocd \
+            "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64"
+          chmod +x /usr/local/bin/argocd
+
+          # Roll back to the previous deployed revision (revision 0 = previous in ArgoCD).
+          argocd app rollback longterm-wiki-server \
+            --auth-token "${ARGOCD_AUTH_TOKEN}" \
+            --server "${ARGOCD_SERVER}" \
+            --grpc-web
+
+          # Wait for rollback to complete and become healthy.
+          argocd app wait longterm-wiki-server \
+            --health \
+            --timeout 300 \
+            --auth-token "${ARGOCD_AUTH_TOKEN}" \
+            --server "${ARGOCD_SERVER}" \
+            --grpc-web
+
+          echo "::error::Rollback completed. Post-deploy smoke test failed — the bad image was NOT promoted to stable traffic. Investigate the failure in the smoke test step above."
+          # Exit non-zero so the overall job is marked failed and the team is notified.
+          exit 1
 
   security-scan:
     name: Security scan
