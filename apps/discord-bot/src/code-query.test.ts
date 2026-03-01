@@ -1,4 +1,19 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+// Mock transitive dependencies that require native packages (pino, etc.)
+vi.mock("./log.js", () => ({
+  logger: {
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+  },
+}));
+
+vi.mock("./wiki-tools.js", () => ({
+  wikiMcpServer: {},
+}));
+
 import { buildCodePrompt } from "./code-query.js";
 
 describe("buildCodePrompt", () => {
