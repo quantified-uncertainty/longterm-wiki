@@ -278,16 +278,18 @@ function getClientKey(c: Context): string {
 }
 
 export interface RateLimitMiddlewareOptions {
-  /** Rate limiter for GET requests. */
+  /** Rate limiter for GET requests (unauthenticated). */
   readLimiter: RateLimiter;
-  /** Rate limiter for non-GET (write) requests. */
+  /** Rate limiter for non-GET requests (unauthenticated). */
   writeLimiter: RateLimiter;
+  /** Higher-limit read limiter for authenticated requests. */
+  authReadLimiter?: RateLimiter;
+  /** Higher-limit write limiter for authenticated requests. */
+  authWriteLimiter?: RateLimiter;
   /** Methods treated as "read". Defaults to ["GET", "HEAD", "OPTIONS"]. */
   readMethods?: string[];
   /** Paths to skip rate limiting entirely (exact match, not prefix). */
   skipPaths?: string[];
-  /** Skip rate limiting for requests with a valid Bearer token. */
-  skipAuthenticated?: boolean;
 }
 
 /**
@@ -313,21 +315,21 @@ export function rateLimitMiddleware(
       return;
     }
 
-    // Skip rate limiting for authenticated requests — they're already
-    // gated by bearer auth and represent trusted internal traffic
-    // (CI sync, Next.js ISR, crux CLI). Rate limiting is for
-    // protecting against unauthenticated abuse.
-    if (options.skipAuthenticated) {
-      const authHeader = c.req.header("Authorization");
-      if (authHeader?.startsWith("Bearer ")) {
-        await next();
-        return;
-      }
-    }
-
     const clientKey = getClientKey(c);
     const isRead = readMethods.has(c.req.method);
-    const limiter = isRead ? options.readLimiter : options.writeLimiter;
+
+    // Use higher limits for authenticated requests (internal traffic:
+    // CI sync, Next.js ISR, crux CLI). Unauthenticated traffic gets
+    // the stricter default limits.
+    const isAuthenticated = c.req.header("Authorization")?.startsWith("Bearer ");
+    let limiter: RateLimiter;
+    if (isAuthenticated && (options.authReadLimiter || options.authWriteLimiter)) {
+      limiter = isRead
+        ? (options.authReadLimiter ?? options.readLimiter)
+        : (options.authWriteLimiter ?? options.writeLimiter);
+    } else {
+      limiter = isRead ? options.readLimiter : options.writeLimiter;
+    }
     const category = isRead ? "read" : "write";
 
     const result = limiter.check(clientKey);
@@ -368,15 +370,27 @@ export function rateLimitMiddleware(
 // Default configuration
 // ---------------------------------------------------------------------------
 
-/** Default rate limit: 100 GET requests per minute per IP. */
+/** Default rate limit: 100 GET requests per minute per IP (unauthenticated). */
 export const DEFAULT_READ_LIMIT: RateLimitConfig = {
   maxRequests: 100,
   windowMs: 60_000,
 };
 
-/** Default rate limit: 20 write requests per minute per IP. */
+/** Default rate limit: 20 write requests per minute per IP (unauthenticated). */
 export const DEFAULT_WRITE_LIMIT: RateLimitConfig = {
   maxRequests: 20,
+  windowMs: 60_000,
+};
+
+/** Authenticated rate limit: 1000 GET requests per minute per IP. */
+export const DEFAULT_AUTH_READ_LIMIT: RateLimitConfig = {
+  maxRequests: 1000,
+  windowMs: 60_000,
+};
+
+/** Authenticated rate limit: 200 write requests per minute per IP. */
+export const DEFAULT_AUTH_WRITE_LIMIT: RateLimitConfig = {
+  maxRequests: 200,
   windowMs: 60_000,
 };
 
@@ -385,11 +399,14 @@ export const DEFAULT_MAX_KEYS = 10_000;
 
 /**
  * Create preconfigured rate limiters with default settings.
+ * Returns separate limiters for unauthenticated and authenticated traffic.
  * Override individual limits via the options parameter.
  */
 export function createDefaultRateLimiters(overrides?: {
   read?: Partial<RateLimitConfig>;
   write?: Partial<RateLimitConfig>;
+  authRead?: Partial<RateLimitConfig>;
+  authWrite?: Partial<RateLimitConfig>;
   maxKeys?: number;
 }) {
   const maxKeys = overrides?.maxKeys ?? DEFAULT_MAX_KEYS;
@@ -407,6 +424,20 @@ export function createDefaultRateLimiters(overrides?: {
     },
     maxKeys
   );
+  const authReadLimiter = new RateLimiter(
+    {
+      ...DEFAULT_AUTH_READ_LIMIT,
+      ...overrides?.authRead,
+    },
+    maxKeys
+  );
+  const authWriteLimiter = new RateLimiter(
+    {
+      ...DEFAULT_AUTH_WRITE_LIMIT,
+      ...overrides?.authWrite,
+    },
+    maxKeys
+  );
 
-  return { readLimiter, writeLimiter };
+  return { readLimiter, writeLimiter, authReadLimiter, authWriteLimiter };
 }
