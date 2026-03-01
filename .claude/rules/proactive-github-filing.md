@@ -58,6 +58,7 @@ For longer descriptions, use `--problem-file=/tmp/problem.md`. Run `crux issues 
 
 ## Guardrails
 
+- **Evidence required**: `crux issues create` requires `--problem`, `--file`, or `--evidence`. You must have *observed* the problem in the current session — do not file speculative or hypothetical issues. Point to a specific file, error message, or behavior you encountered.
 - **Rate limited**: `crux issues create` enforces a daily cap (5/day). This is intentional — if you're hitting the limit, you're filing too many.
 - **Agent-labeled**: All agent-filed issues are auto-labeled `filed-by-agent` for tracking.
 - **Volume target**: 0-2 issues per session is normal. If you're finding 10+ problems, file the top 2-3 and batch the rest into one umbrella issue.

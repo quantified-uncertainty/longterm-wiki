@@ -162,6 +162,59 @@ jobs:
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
           LONGTERMWIKI_CONTENT_KEY: ${{ secrets.LONGTERMWIKI_CONTENT_KEY }}
 
+  # When CI fails on main, auto-file a GitHub issue labeled for agent pickup.
+  # The groundskeeper issue-responder picks up `groundskeeper-autofix` issues
+  # and spawns a Claude Code session to fix them automatically.
+  file-regression-issue:
+    needs: [ci]
+    if: failure() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: File regression issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Find the merge commit that likely caused the failure
+          LAST_MERGE=$(git log --merges --oneline -1 --format="%H %s")
+          LAST_SHA=$(echo "$LAST_MERGE" | cut -d' ' -f1)
+          LAST_MSG=$(echo "$LAST_MERGE" | cut -d' ' -f2-)
+
+          # Extract PR number from merge commit message if present
+          PR_NUM=$(echo "$LAST_MSG" | grep -oE '#[0-9]+' | head -1 | tr -d '#')
+          PR_REF=""
+          if [ -n "$PR_NUM" ]; then
+            PR_REF=" (from PR #${PR_NUM})"
+          fi
+
+          TITLE="CI broken on main after ${LAST_SHA:0:7}${PR_REF}"
+          read -r -d '' BODY <<ISSUEEOF || true
+## Problem
+
+CI failed on \`main\` after merging commit \`${LAST_SHA:0:10}\`: ${LAST_MSG}
+
+**Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+## Suggested Fix
+
+Check the failing CI step in the run above, identify the regression, and fix it.
+
+## Acceptance Criteria
+
+- [ ] CI passes on main
+- [ ] Root cause identified and fixed
+ISSUEEOF
+
+          # Check for an existing open issue to avoid duplicates
+          EXISTING=$(gh issue list --label "groundskeeper-autofix" --state open --limit 5 --json title --jq '.[].title' | grep -c "CI broken on main" || true)
+          if [ "$EXISTING" -gt 0 ]; then
+            echo "Existing CI-broken issue already open — skipping duplicate."
+            exit 0
+          fi
+
+          gh issue create --title "$TITLE" --body "$BODY" --label "bug,groundskeeper-autofix"
+
   # Deploy job removed — production deploys are now handled by the scheduled
   # deploy hook (scheduled-deploy.yml, every hour) instead of per-push.
   # This caps Vercel build minutes at 24/day max vs 50-80/day previously.

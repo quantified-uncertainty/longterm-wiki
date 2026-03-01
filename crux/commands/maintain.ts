@@ -811,6 +811,154 @@ async function markRun(_args: string[], _options: CommandOptions): Promise<Comma
 }
 
 // ---------------------------------------------------------------------------
+// Fix Chains — detect feature PRs followed by fix PRs touching the same files
+// ---------------------------------------------------------------------------
+
+interface FixChainPR {
+  number: number;
+  title: string;
+  mergedAt: string;
+  files: string[];
+  type: 'feat' | 'fix' | 'other';
+}
+
+async function fixChains(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const since = parseSinceOption(options);
+  const isJson = options.json || options.ci;
+
+  let output = '';
+  output += `${c.bold}${c.blue}Fix Chain Detection${c.reset}\n`;
+  output += `${c.dim}Since: ${since}${c.reset}\n\n`;
+
+  // Fetch merged PRs with files changed
+  const prsData = await githubApi<GitHubPullResponse[]>(
+    `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=100`
+  );
+
+  if (!Array.isArray(prsData)) {
+    return { output: `${c.red}GitHub API returned unexpected response. Check GITHUB_TOKEN.${c.reset}\n`, exitCode: 1 };
+  }
+
+  // Filter to merged PRs in our time range
+  const mergedPrs: FixChainPR[] = [];
+  for (const p of prsData) {
+    if (!p.merged_at || p.merged_at.slice(0, 10) < since) continue;
+
+    const type = /^fix[:(]/i.test(p.title) ? 'fix' as const
+      : /^feat[:(]/i.test(p.title) ? 'feat' as const
+      : 'other' as const;
+
+    // Fetch files changed by this PR
+    let files: string[] = [];
+    try {
+      const filesData = await githubApi<Array<{ filename: string }>>(
+        `/repos/${REPO}/pulls/${p.number}/files?per_page=100`
+      );
+      if (Array.isArray(filesData)) {
+        files = filesData.map(f => f.filename);
+      }
+    } catch {
+      // Non-fatal — continue without file info
+    }
+
+    mergedPrs.push({
+      number: p.number,
+      title: p.title,
+      mergedAt: p.merged_at,
+      files,
+      type,
+    });
+  }
+
+  // Sort by merge time ascending
+  mergedPrs.sort((a, b) => a.mergedAt.localeCompare(b.mergedAt));
+
+  // Detect chains: for each fix PR, check if it touches files from a feat PR
+  // merged within the prior 48 hours
+  const TWO_DAYS_MS = 48 * 60 * 60 * 1000;
+
+  interface Chain {
+    source: FixChainPR;
+    fixes: Array<FixChainPR & { overlap: string[] }>;
+  }
+
+  const chains: Chain[] = [];
+  const featPrs = mergedPrs.filter(p => p.type === 'feat');
+  const fixPrs = mergedPrs.filter(p => p.type === 'fix');
+
+  for (const feat of featPrs) {
+    const featTime = new Date(feat.mergedAt).getTime();
+    const fixes: Chain['fixes'] = [];
+
+    for (const fix of fixPrs) {
+      const fixTime = new Date(fix.mergedAt).getTime();
+      // Fix must come after the feature and within 48h
+      if (fixTime <= featTime || fixTime - featTime > TWO_DAYS_MS) continue;
+
+      // Check file overlap
+      const overlap = fix.files.filter(f => feat.files.includes(f));
+      if (overlap.length > 0) {
+        fixes.push({ ...fix, overlap });
+      }
+    }
+
+    if (fixes.length > 0) {
+      chains.push({ source: feat, fixes });
+    }
+  }
+
+  // Output
+  const totalFixes = chains.reduce((sum, ch) => sum + ch.fixes.length, 0);
+
+  if (isJson) {
+    return {
+      output: JSON.stringify({
+        since,
+        totalPrs: mergedPrs.length,
+        featPrs: featPrs.length,
+        fixPrs: fixPrs.length,
+        chains: chains.map(ch => ({
+          source: { number: ch.source.number, title: ch.source.title },
+          fixes: ch.fixes.map(f => ({ number: f.number, title: f.title, overlap: f.overlap })),
+        })),
+        chainCount: chains.length,
+        totalFixFollowups: totalFixes,
+        chainRate: mergedPrs.length > 0
+          ? Math.round((chains.length / mergedPrs.length) * 100) / 100
+          : 0,
+      }, null, 2),
+      exitCode: 0,
+    };
+  }
+
+  output += `${c.bold}PRs analyzed:${c.reset} ${mergedPrs.length} (${featPrs.length} feat, ${fixPrs.length} fix)\n\n`;
+
+  if (chains.length === 0) {
+    output += `${c.green}No fix chains detected.${c.reset}\n`;
+  } else {
+    output += `${c.yellow}${c.bold}Fix chains found: ${chains.length}${c.reset} ${c.dim}(${totalFixes} follow-up fix PRs)${c.reset}\n\n`;
+
+    for (const chain of chains) {
+      output += `  ${c.cyan}#${chain.source.number}${c.reset} ${chain.source.title}\n`;
+      for (const fix of chain.fixes) {
+        output += `    ${c.yellow}→${c.reset} #${fix.number} ${fix.title}\n`;
+        output += `      ${c.dim}overlapping: ${fix.overlap.slice(0, 3).join(', ')}${fix.overlap.length > 3 ? ` +${fix.overlap.length - 3} more` : ''}${c.reset}\n`;
+      }
+      output += '\n';
+    }
+
+    const rate = mergedPrs.length > 0
+      ? Math.round((chains.length / mergedPrs.length) * 100)
+      : 0;
+    output += `${c.bold}Chain rate:${c.reset} ${rate}% of PRs are part of a fix chain\n`;
+  }
+
+  return { output, exitCode: 0 };
+}
+
+// ---------------------------------------------------------------------------
 // Health Snapshot — quantified metrics for trend tracking
 // ---------------------------------------------------------------------------
 
@@ -992,6 +1140,7 @@ export const commands = {
   'review-prs': reviewPrs,
   'triage-issues': triageIssues,
   'detect-cruft': detectCruft,
+  'fix-chains': fixChains,
   'health-snapshot': healthSnapshot,
   status,
   'mark-run': markRun,
@@ -1009,6 +1158,7 @@ Commands:
   review-prs       Review merged PRs and session logs since last run
   triage-issues    Triage open GitHub issues for staleness/resolution
   detect-cruft     Find dead code, TODOs, large files, commented-out code
+  fix-chains       Detect feature PRs followed by fix PRs (quality signal)
   health-snapshot  Quantified code health metrics (TODOs, any types, fix ratio, etc.)
   status           Show last maintenance run info and recommended cadences
   mark-run         Update the last-run timestamp without running a report
@@ -1038,6 +1188,8 @@ Examples:
   crux maintain review-prs               Just review PRs + session logs
   crux maintain triage-issues            Just triage GitHub issues
   crux maintain detect-cruft             Just find codebase cruft
+  crux maintain fix-chains               Detect fix chains (feature → fix → fix)
+  crux maintain fix-chains --json        JSON output for trend tracking
   crux maintain health-snapshot          Code health metrics snapshot
   crux maintain health-snapshot --json   JSON output for trend tracking
   crux maintain review-prs --since=2026-02-10  Override start date
