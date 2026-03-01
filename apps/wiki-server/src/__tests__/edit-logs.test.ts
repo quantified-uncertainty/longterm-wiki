@@ -158,6 +158,28 @@ function createMockSql() {
         .sort((a, b) => b.count - a.count);
     }
 
+    // ---- SELECT page_id, max(date) FROM edit_logs GROUP BY page_id ----
+    if (q.includes("edit_logs") && q.includes("group by") && q.includes("page_id") && q.includes("max(")) {
+      const grouped: Record<string, string> = {};
+      for (const e of editStore) {
+        if (!grouped[e.page_id] || e.date > grouped[e.page_id]) {
+          grouped[e.page_id] = e.date;
+        }
+      }
+      return Object.entries(grouped).map(([page_id, date]) => ({ page_id, date }));
+    }
+
+    // ---- SELECT page_id, min(date) FROM edit_logs GROUP BY page_id ----
+    if (q.includes("edit_logs") && q.includes("group by") && q.includes("page_id") && q.includes("min(")) {
+      const grouped: Record<string, string> = {};
+      for (const e of editStore) {
+        if (!grouped[e.page_id] || e.date < grouped[e.page_id]) {
+          grouped[e.page_id] = e.date;
+        }
+      }
+      return Object.entries(grouped).map(([page_id, date]) => ({ page_id, date }));
+    }
+
     // ---- SELECT agency, count FROM edit_logs GROUP BY agency ----
     if (q.includes("edit_logs") && q.includes("group by") && q.includes('"agency"')) {
       const counts: Record<string, number> = {};
@@ -464,6 +486,68 @@ describe("Edit Logs API", () => {
       // Should be sorted descending
       expect(body.entries[0].date).toBe("2026-02-21");
       expect(body.entries[2].date).toBe("2026-02-18");
+    });
+  });
+
+  describe("GET /api/edit-logs/latest-dates", () => {
+    it("returns latest edit date per page", async () => {
+      for (const entry of [
+        { pageId: "page-a", date: "2026-02-10", tool: "crux-create", agency: "ai-directed" },
+        { pageId: "page-a", date: "2026-02-15", tool: "crux-improve", agency: "ai-directed" },
+        { pageId: "page-a", date: "2026-02-20", tool: "crux-fix", agency: "automated" },
+        { pageId: "page-b", date: "2026-02-12", tool: "crux-create", agency: "ai-directed" },
+        { pageId: "page-b", date: "2026-02-18", tool: "crux-fix", agency: "automated" },
+      ]) {
+        await app.request("/api/edit-logs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(entry),
+        });
+      }
+
+      const res = await app.request("/api/edit-logs/latest-dates");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.dates["page-a"]).toBe("2026-02-20");
+      expect(body.dates["page-b"]).toBe("2026-02-18");
+    });
+
+    it("returns empty object when no entries exist", async () => {
+      const res = await app.request("/api/edit-logs/latest-dates");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.dates).toEqual({});
+    });
+  });
+
+  describe("GET /api/edit-logs/earliest-dates", () => {
+    it("returns earliest edit date per page", async () => {
+      for (const entry of [
+        { pageId: "page-a", date: "2026-02-10", tool: "crux-create", agency: "ai-directed" },
+        { pageId: "page-a", date: "2026-02-15", tool: "crux-improve", agency: "ai-directed" },
+        { pageId: "page-a", date: "2026-02-20", tool: "crux-fix", agency: "automated" },
+        { pageId: "page-b", date: "2026-02-12", tool: "crux-create", agency: "ai-directed" },
+        { pageId: "page-b", date: "2026-02-18", tool: "crux-fix", agency: "automated" },
+      ]) {
+        await app.request("/api/edit-logs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(entry),
+        });
+      }
+
+      const res = await app.request("/api/edit-logs/earliest-dates");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.dates["page-a"]).toBe("2026-02-10");
+      expect(body.dates["page-b"]).toBe("2026-02-12");
+    });
+
+    it("returns empty object when no entries exist", async () => {
+      const res = await app.request("/api/edit-logs/earliest-dates");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.dates).toEqual({});
     });
   });
 });
