@@ -24,6 +24,8 @@ export interface Config {
 function envOrDie(name: string): string {
   const value = process.env[name];
   if (!value) {
+    // Use console.error here intentionally: logger may not be initialized
+    // yet since config is loaded first during startup.
     console.error(`Missing required environment variable: ${name}`);
     process.exit(1);
   }

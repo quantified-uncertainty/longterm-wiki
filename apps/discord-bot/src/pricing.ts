@@ -1,3 +1,5 @@
+import { logger } from "./log.js";
+
 // Claude pricing per 1M tokens
 export interface ModelPricing {
   input: number;
@@ -16,9 +18,7 @@ export const PRICING: Record<string, ModelPricing> = {
 
 export function getPricing(model?: string): ModelPricing {
   if (model && !PRICING[model]) {
-    console.warn(
-      `[pricing] Unknown model "${model}" — using default pricing. Update pricing.ts if this model is new.`
-    );
+    logger.warn({ model }, "Unknown model — using default pricing. Update pricing.ts if this model is new.");
   }
   return (model && PRICING[model]) || PRICING["default"]!;
 }
