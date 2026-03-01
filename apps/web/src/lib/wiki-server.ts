@@ -80,10 +80,21 @@ export async function fetchFromWikiServer<T>(
  * Useful for dashboards that need custom fetch logic (e.g. pagination).
  * Returns null if the server URL is not configured.
  */
+/**
+ * When WIKI_DATA_MODE=local, all API calls are skipped and data is read
+ * from local database.json instead. This eliminates runtime wiki-server
+ * requests from content pages, avoiding rate-limit pressure.
+ */
+export function isLocalDataMode(): boolean {
+  return process.env.WIKI_DATA_MODE === "local";
+}
+
 export function getWikiServerConfig(): {
   serverUrl: string;
   headers: Record<string, string>;
 } | null {
+  if (isLocalDataMode()) return null;
+
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
   if (!serverUrl) return null;
 

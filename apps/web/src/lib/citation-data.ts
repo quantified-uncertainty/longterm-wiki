@@ -1,4 +1,5 @@
-import { fetchFromWikiServer } from "./wiki-server";
+import { fetchFromWikiServer, isLocalDataMode } from "./wiki-server";
+import { getLocalCitationQuotes } from "@/data";
 import type {
   CitationHealthResult,
   ClaimsByPageResult,
@@ -75,24 +76,32 @@ function toAccuracyVerdict(value: string | null): AccuracyVerdict | null {
 }
 
 /**
- * Fetch citation verification data for a specific page from the wiki-server.
- * Returns an empty array if the server is unavailable or the page has no data.
+ * Fetch citation verification data for a specific page.
  *
- * Reads from the claims system (claims + claim_page_references + claim_sources)
- * via the /api/claims/by-page endpoint, which replaced the deprecated
- * /api/citations/quotes endpoint (#1311).
+ * In local data mode (WIKI_DATA_MODE=local), reads from the build-time
+ * citation bundle in database.json — zero API calls. Otherwise fetches
+ * from the claims system via /api/claims/by-page.
  *
- * Revalidates every 10 minutes — citation data changes infrequently.
+ * Returns an empty array if no data is available.
  */
 export async function getCitationQuotes(
   pageId: string
 ): Promise<CitationQuote[]> {
+  // Local-first: use build-time bundle if available and in local mode,
+  // or if the server URL is not configured.
+  if (isLocalDataMode()) {
+    return getLocalCitationQuotesForPage(pageId);
+  }
+
   const result = await fetchFromWikiServer<ClaimsByPageResult>(
     `/api/claims/by-page?page_id=${encodeURIComponent(pageId)}`,
     { revalidate: 600 }
   );
 
-  if (!result?.quotes) return [];
+  if (!result?.quotes) {
+    // API unavailable — fall back to local bundle
+    return getLocalCitationQuotesForPage(pageId);
+  }
 
   // Only include quotes that have some verification data worth showing.
   // Map server rows to CitationQuote, narrowing accuracyVerdict from string to the union type.
@@ -115,6 +124,36 @@ export async function getCitationQuotes(
       accuracySupportingQuotes: q.accuracySupportingQuotes,
       verificationDifficulty: q.verificationDifficulty,
       accuracyCheckedAt: q.accuracyCheckedAt,
+    }));
+}
+
+/**
+ * Read citation quotes for a page from the build-time database.json bundle.
+ * Returns an empty array if no data was bundled.
+ */
+function getLocalCitationQuotesForPage(pageId: string): CitationQuote[] {
+  const localQuotes = getLocalCitationQuotes(pageId);
+  if (!localQuotes) return [];
+
+  return localQuotes
+    .filter((q: Record<string, unknown>) => q.quoteVerified || q.accuracyVerdict !== null)
+    .map((q: Record<string, unknown>): CitationQuote => ({
+      footnote: q.footnote as number,
+      url: q.url as string | null,
+      resourceId: q.resourceId as string | null,
+      claimText: q.claimText as string,
+      sourceQuote: q.sourceQuote as string | null,
+      sourceTitle: q.sourceTitle as string | null,
+      sourceType: q.sourceType as string | null,
+      quoteVerified: q.quoteVerified as boolean,
+      verificationScore: q.verificationScore as number | null,
+      verifiedAt: q.verifiedAt as string | null,
+      accuracyVerdict: toAccuracyVerdict(q.accuracyVerdict as string | null),
+      accuracyScore: q.accuracyScore as number | null,
+      accuracyIssues: q.accuracyIssues as string | null,
+      accuracySupportingQuotes: q.accuracySupportingQuotes as string | null,
+      verificationDifficulty: q.verificationDifficulty as string | null,
+      accuracyCheckedAt: q.accuracyCheckedAt as string | null,
     }));
 }
 

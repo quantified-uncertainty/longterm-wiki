@@ -210,6 +210,25 @@ interface DatabaseShape {
     avgScore: number;
     topFactors: Array<{ factor: string; count: number }>;
   };
+  /** Citation quotes bundled at build time, keyed by pageId */
+  citationQuotes?: Record<string, Array<{
+    footnote: number;
+    url: string | null;
+    resourceId: string | null;
+    claimText: string;
+    sourceQuote: string | null;
+    sourceTitle: string | null;
+    sourceType: string | null;
+    quoteVerified: boolean;
+    verificationScore: number | null;
+    verifiedAt: string | null;
+    accuracyVerdict: string | null;
+    accuracyScore: number | null;
+    accuracyIssues: string | null;
+    accuracySupportingQuotes: string | null;
+    verificationDifficulty: string | null;
+    accuracyCheckedAt: string | null;
+  }>>;
 }
 
 // ============================================================================
@@ -1053,6 +1072,14 @@ export async function getRiskStats(): Promise<RiskStats | null> {
     () => getDatabase().riskStats ?? null
   );
   return result.data;
+}
+
+/**
+ * Get build-time citation quotes for a page from database.json.
+ * Returns undefined if no citation data was bundled at build time.
+ */
+export function getLocalCitationQuotes(pageId: string) {
+  return getDatabase().citationQuotes?.[pageId];
 }
 
 export function getResourceCredibility(
