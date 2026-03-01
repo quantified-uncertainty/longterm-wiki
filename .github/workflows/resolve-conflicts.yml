@@ -7,6 +7,14 @@ name: Resolve Merge Conflicts
 #   1. Sonnet API — fast, cheap text-level conflict resolution (~$0.01-0.05/file)
 #   2. Claude Code SDK — agentic escalation that can read errors and iterate
 #
+# Post-resolution safety:
+#   - Per-file syntactic validation in resolve-conflicts.mjs (prose detection,
+#     JSON parse, YAML heuristics, brace balance, content-loss detection)
+#   - Global conflict marker scan across all modified files
+#   - TypeScript compilation check (tsc --noEmit) for TS/TSX changes
+#   - Full validation gate (schema, escaping, build-data, tests)
+#   - Explicit file staging (no git add -A) to prevent unintended commits
+#
 # Requires: ANTHROPIC_API_KEY secret in the repository.
 
 on:
@@ -154,12 +162,111 @@ jobs:
           echo "Merge-affected files:"
           cat /tmp/merge-affected-files.txt
 
+      # ── Post-resolution safety checks (before heavy validation) ──
+      - name: "Safety: verify no conflict markers remain in any files"
+        if: steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
+        id: conflict_markers
+        run: |
+          echo "Scanning all modified files for residual conflict markers..."
+          MARKERS_FOUND=false
+
+          # Check all files modified in the merge commit
+          for file in $(git diff --name-only HEAD~1 HEAD 2>/dev/null); do
+            if [ -f "$file" ]; then
+              if grep -nE '^(<<<<<<<|=======|>>>>>>>)' "$file" 2>/dev/null; then
+                echo "::error::Conflict markers found in $file"
+                MARKERS_FOUND=true
+              fi
+            fi
+          done
+
+          # Also check any staged but uncommitted files
+          for file in $(git diff --name-only --cached 2>/dev/null); do
+            if [ -f "$file" ]; then
+              if grep -nE '^(<<<<<<<|=======|>>>>>>>)' "$file" 2>/dev/null; then
+                echo "::error::Conflict markers found in staged file $file"
+                MARKERS_FOUND=true
+              fi
+            fi
+          done
+
+          if [ "$MARKERS_FOUND" = "true" ]; then
+            echo "::error::Residual conflict markers detected — resolution is incomplete."
+            exit 1
+          fi
+
+          echo "No conflict markers found — clean."
+
       - uses: pnpm/action-setup@v4
         if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
 
       - name: Install dependencies
         if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
         run: pnpm install --frozen-lockfile
+
+      - name: "Tier 1: TypeScript compilation check"
+        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
+        id: typecheck
+        continue-on-error: true
+        run: |
+          echo "Running TypeScript compilation check on resolved code..."
+
+          # Check if any TS/TSX files were modified in the merge
+          TS_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -E '\.(ts|tsx)$' || true)
+
+          if [ -z "$TS_FILES" ]; then
+            echo "No TypeScript files changed — skipping tsc."
+            exit 0
+          fi
+
+          echo "TypeScript files changed:"
+          echo "$TS_FILES"
+
+          TSC_FAILED=false
+
+          # Always check apps/web (most TS files live here)
+          echo "Running tsc in apps/web..."
+          cd apps/web
+          TSC_OUTPUT=$(npx tsc --noEmit 2>&1) && TSC_EXIT=0 || TSC_EXIT=$?
+          cd "$GITHUB_WORKSPACE"
+          printf '%s\n' "$TSC_OUTPUT"
+          if [ "$TSC_EXIT" -ne 0 ]; then
+            echo "::error::TypeScript compilation failed in apps/web"
+            TSC_FAILED=true
+          fi
+
+          # Check apps/wiki-server if any files there changed
+          if echo "$TS_FILES" | grep -q '^apps/wiki-server/'; then
+            echo "Running tsc in apps/wiki-server..."
+            cd apps/wiki-server
+            TSC_OUTPUT=$(npx tsc --noEmit 2>&1) && TSC_EXIT=0 || TSC_EXIT=$?
+            cd "$GITHUB_WORKSPACE"
+            printf '%s\n' "$TSC_OUTPUT"
+            if [ "$TSC_EXIT" -ne 0 ]; then
+              echo "::error::TypeScript compilation failed in apps/wiki-server"
+              TSC_FAILED=true
+            fi
+          fi
+
+          # Check crux if any files there changed
+          if echo "$TS_FILES" | grep -q '^crux/'; then
+            echo "Running tsc in crux..."
+            cd crux
+            TSC_OUTPUT=$(npx tsc --noEmit 2>&1) && TSC_EXIT=0 || TSC_EXIT=$?
+            cd "$GITHUB_WORKSPACE"
+            printf '%s\n' "$TSC_OUTPUT"
+            if [ "$TSC_EXIT" -ne 0 ]; then
+              echo "::error::TypeScript compilation failed in crux"
+              TSC_FAILED=true
+            fi
+          fi
+
+          if [ "$TSC_FAILED" = "true" ]; then
+            echo "::error::TypeScript compilation failed after conflict resolution"
+            exit 1
+          fi
+
+          echo "TypeScript compilation passed."
 
       - name: "Tier 1: Auto-fix escaping and markdown after merge"
         if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
@@ -169,7 +276,12 @@ jobs:
           pnpm crux fix markdown || true
 
       - name: "Tier 1: Validate resolved code"
-        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
+        if: >-
+          always() &&
+          steps.fingerprint.outputs.skip != 'true' &&
+          steps.resolve.outcome == 'success' &&
+          steps.conflict_markers.outcome != 'failure' &&
+          steps.typecheck.outcome != 'failure'
         id: validate
         continue-on-error: true # Don't fail the job — Tier 2 may fix it
         run: |

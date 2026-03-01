@@ -12,6 +12,12 @@
  * surrounding context and resolves each one separately. This avoids API
  * timeouts (502 errors) on large YAML data files.
  *
+ * Post-resolution safety (added per issue #1402):
+ * - Per-file syntactic validation (JSON parse, YAML heuristics, TS prose
+ *   detection, brace balance, MDX frontmatter checks)
+ * - Content-loss detection (flags if >30% of either side's content is missing)
+ * - All validations run BEFORE writing resolved content to disk
+ *
  * Environment variables:
  *   ANTHROPIC_API_KEY — required
  *   PR_BRANCH        — the branch to resolve conflicts on
@@ -21,6 +27,7 @@
 
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync, appendFileSync } from "node:fs";
+import { extname } from "node:path";
 
 const ANTHROPIC_API_KEY = (process.env.ANTHROPIC_API_KEY || '').replace(/^["'\s]+|["'\s]+$/g, '');
 const PR_BRANCH = process.env.PR_BRANCH;
@@ -218,6 +225,252 @@ function stripCodeFences(text) {
   const fencePattern = /^```[a-zA-Z]*\s*\n([\s\S]*?)\n```\s*$/;
   const match = text.match(fencePattern);
   return match ? match[1] : text;
+}
+
+// ── Per-file syntactic validation (issue #1402) ─────────────────────────
+//
+// Validates resolved file content BEFORE writing to disk. Uses only Node.js
+// built-ins so it works before `pnpm install` in CI.
+//
+// Returns { valid: true } or { valid: false, reason: string }.
+
+/**
+ * Check that a JSON file parses correctly.
+ */
+function validateJson(content, _filePath) {
+  try {
+    JSON.parse(content);
+    return { valid: true };
+  } catch (e) {
+    return { valid: false, reason: `JSON parse error: ${e.message}` };
+  }
+}
+
+/**
+ * Basic YAML validation using heuristics (no external parser available
+ * before pnpm install). Catches the most common corruption:
+ * - Tab indentation (invalid in YAML)
+ * - Obvious non-YAML content (e.g., prose paragraphs)
+ */
+function validateYaml(content, _filePath) {
+  const lines = content.split("\n");
+
+  // Check for tab indentation (YAML forbids tabs for indentation)
+  for (let i = 0; i < lines.length; i++) {
+    if (/^\t/.test(lines[i])) {
+      return { valid: false, reason: `Tab indentation at line ${i + 1} (YAML requires spaces)` };
+    }
+  }
+
+  // Check for obviously non-YAML content: if most lines don't look like YAML,
+  // the model likely produced prose instead of data
+  const yamlLikeLines = lines.filter((l) => {
+    const trimmed = l.trim();
+    return (
+      trimmed === "" ||
+      trimmed.startsWith("#") ||
+      trimmed.startsWith("---") ||
+      trimmed.startsWith("- ") ||
+      /^[a-zA-Z_][a-zA-Z0-9_.-]*\s*:/.test(trimmed) || // key: value
+      /^\s+/.test(l) // indented continuation
+    );
+  });
+
+  const yamlRatio = lines.length > 0 ? yamlLikeLines.length / lines.length : 1;
+  if (yamlRatio < 0.5 && lines.length > 5) {
+    return {
+      valid: false,
+      reason: `Only ${Math.round(yamlRatio * 100)}% of lines look like YAML — likely prose output instead of data`,
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Basic TypeScript/JavaScript validation. We can't run `tsc` here (no
+ * node_modules yet), but we CAN detect the most dangerous failure mode:
+ * the model producing prose/commentary instead of source code.
+ *
+ * Checks:
+ * - File should contain code-like constructs (import, export, function, const, etc.)
+ * - File should NOT be mostly natural-language prose
+ * - Balanced braces (rough check)
+ */
+function validateTypeScript(content, _filePath) {
+  const lines = content.split("\n");
+  const nonEmptyLines = lines.filter((l) => l.trim().length > 0);
+
+  if (nonEmptyLines.length === 0) {
+    return { valid: false, reason: "File is empty" };
+  }
+
+  // Check for code-like constructs
+  const codePatterns = [
+    /\bimport\s/,
+    /\bexport\s/,
+    /\bfunction\s/,
+    /\bconst\s/,
+    /\blet\s/,
+    /\bvar\s/,
+    /\bclass\s/,
+    /\binterface\s/,
+    /\btype\s/,
+    /\breturn\s/,
+    /\bif\s*\(/,
+    /\bfor\s*\(/,
+    /\bwhile\s*\(/,
+    /=>/,
+    /\{$/,
+    /\}$/,
+    /\};$/,
+    /\);$/,
+  ];
+
+  const codeLikeLines = nonEmptyLines.filter((l) => codePatterns.some((p) => p.test(l)));
+  const codeRatio = codeLikeLines.length / nonEmptyLines.length;
+
+  // If less than 15% of lines look like code in a file >10 lines, it's probably prose
+  if (codeRatio < 0.15 && nonEmptyLines.length > 10) {
+    return {
+      valid: false,
+      reason: `Only ${Math.round(codeRatio * 100)}% of lines contain code constructs — likely prose output instead of source code`,
+    };
+  }
+
+  // Rough brace balance check (catches truncation and major structural issues)
+  let braceDepth = 0;
+  for (const line of lines) {
+    // Skip strings and comments (rough heuristic)
+    const stripped = line.replace(/\/\/.*$/, "").replace(/"[^"]*"/g, "").replace(/'[^']*'/g, "").replace(/`[^`]*`/g, "");
+    for (const ch of stripped) {
+      if (ch === "{") braceDepth++;
+      if (ch === "}") braceDepth--;
+    }
+  }
+
+  if (Math.abs(braceDepth) > 3) {
+    return {
+      valid: false,
+      reason: `Brace imbalance of ${braceDepth} — likely truncated or structurally broken`,
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Basic MDX validation. MDX is essentially Markdown with JSX, so we check:
+ * - Frontmatter has opening and closing `---` delimiters
+ */
+function validateMdx(content, _filePath) {
+  const lines = content.split("\n");
+
+  // Check frontmatter: must start with `---` and have a closing `---`
+  if (lines[0]?.trim() === "---") {
+    let closingIdx = -1;
+    for (let i = 1; i < lines.length; i++) {
+      if (lines[i].trim() === "---") {
+        closingIdx = i;
+        break;
+      }
+    }
+    if (closingIdx === -1) {
+      return { valid: false, reason: "Frontmatter opened with --- but never closed" };
+    }
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Dispatch validation based on file extension.
+ * Returns { valid: true } or { valid: false, reason: string }.
+ */
+function validateResolvedContent(content, filePath) {
+  const ext = extname(filePath).toLowerCase();
+
+  switch (ext) {
+    case ".json":
+      return validateJson(content, filePath);
+
+    case ".yaml":
+    case ".yml":
+      return validateYaml(content, filePath);
+
+    case ".ts":
+    case ".tsx":
+    case ".js":
+    case ".jsx":
+    case ".mjs":
+    case ".cjs":
+      return validateTypeScript(content, filePath);
+
+    case ".mdx":
+      return validateMdx(content, filePath);
+
+    default:
+      // No specific validation for other file types
+      return { valid: true };
+  }
+}
+
+/**
+ * Content-loss detection: check if the resolved content is missing a
+ * significant portion of either side's content. This catches the case
+ * where the model accidentally drops one side entirely.
+ *
+ * Compares line counts of the resolved content against both sides of the
+ * conflict. If the resolved file is significantly shorter than expected,
+ * flags the resolution as suspicious.
+ */
+function checkContentLoss(resolvedContent, originalContent, _filePath) {
+  // Extract the HEAD and MAIN sides from the original conflicted content
+  const origLines = originalContent.split("\n");
+  let headLineCount = 0;
+  let mainLineCount = 0;
+  let sharedLineCount = 0;
+  let inHead = false;
+  let inMain = false;
+
+  for (const line of origLines) {
+    if (line.startsWith("<<<<<<<")) {
+      inHead = true;
+      continue;
+    }
+    if (line.startsWith("=======") && inHead) {
+      inHead = false;
+      inMain = true;
+      continue;
+    }
+    if (line.startsWith(">>>>>>>") && inMain) {
+      inMain = false;
+      continue;
+    }
+    if (inHead) headLineCount++;
+    else if (inMain) mainLineCount++;
+    else sharedLineCount++;
+  }
+
+  const resolvedLineCount = resolvedContent.split("\n").length;
+
+  // The resolved file should have at least: shared lines + some portion of both sides.
+  // Use Math.max to catch cases where one side has zero lines (the other side was
+  // entirely dropped). Math.min alone would be 0 in that case, nullifying the check.
+  const smallerSide = Math.min(headLineCount, mainLineCount);
+  const largerSide = Math.max(headLineCount, mainLineCount);
+  const expectedFromConflict = smallerSide > 0 ? smallerSide : largerSide * 0.5;
+  const minExpectedLines = sharedLineCount + expectedFromConflict * 0.7;
+
+  if (resolvedLineCount < minExpectedLines * 0.7 && minExpectedLines > 10) {
+    const lossPercent = Math.round((1 - resolvedLineCount / minExpectedLines) * 100);
+    return {
+      suspicious: true,
+      reason: `Resolved file has ${resolvedLineCount} lines but expected ~${Math.round(minExpectedLines)} (${lossPercent}% content loss — one side may have been dropped)`,
+    };
+  }
+
+  return { suspicious: false };
 }
 
 // ── Hunk-based resolution for large files ──────────────────────────────
@@ -574,10 +827,25 @@ async function resolveFile(filePath) {
   // Try deterministic frontmatter resolution first (no API call needed)
   const frontmatterResolved = tryResolveFrontmatterOnly(filePath, content);
   if (frontmatterResolved !== null) {
+    // Validate the deterministic resolution before writing to disk
+    const fmValidation = validateResolvedContent(frontmatterResolved, filePath);
+    if (!fmValidation.valid) {
+      console.error(`  Frontmatter validation FAILED for ${filePath}: ${fmValidation.reason}`);
+      addDiagnostic(filePath, "FAILED", `frontmatter syntax validation: ${fmValidation.reason}`);
+      return false;
+    }
+
+    const fmContentLoss = checkContentLoss(frontmatterResolved, content, filePath);
+    if (fmContentLoss.suspicious) {
+      console.error(`  Frontmatter content-loss warning for ${filePath}: ${fmContentLoss.reason}`);
+      addDiagnostic(filePath, "FAILED", `frontmatter content-loss: ${fmContentLoss.reason}`);
+      return false;
+    }
+
     writeFileSync(filePath, frontmatterResolved);
     git("add", "--", filePath);
-    console.log(`  Resolved: ${filePath} (deterministic frontmatter merge — no API call)`);
-    addDiagnostic(filePath, "resolved", "deterministic frontmatter merge");
+    console.log(`  Resolved: ${filePath} (deterministic frontmatter merge — no API call, validated)`);
+    addDiagnostic(filePath, "resolved", "deterministic frontmatter merge (validated)");
     return true;
   }
 
@@ -638,10 +906,30 @@ async function resolveFile(filePath) {
     return false;
   }
 
+  // ── Post-resolution validation (issue #1402) ────────────────────────
+  // Validate the resolved content syntactically before writing to disk.
+  // This catches the case where the model produces prose commentary,
+  // broken JSON/YAML, or structurally invalid code.
+
+  const validation = validateResolvedContent(resolvedContent, filePath);
+  if (!validation.valid) {
+    console.error(`  Validation FAILED for ${filePath}: ${validation.reason}`);
+    addDiagnostic(filePath, "FAILED", `syntax validation: ${validation.reason}`);
+    return false;
+  }
+
+  // Content-loss detection: flag if resolved content drops >30% of either side
+  const contentLoss = checkContentLoss(resolvedContent, content, filePath);
+  if (contentLoss.suspicious) {
+    console.error(`  Content-loss warning for ${filePath}: ${contentLoss.reason}`);
+    addDiagnostic(filePath, "FAILED", `content-loss: ${contentLoss.reason}`);
+    return false;
+  }
+
   writeFileSync(filePath, resolvedContent);
   git("add", "--", filePath);
-  console.log(`  Resolved: ${filePath}`);
-  addDiagnostic(filePath, "resolved", "Claude API resolution");
+  console.log(`  Resolved: ${filePath} (validated)`);
+  addDiagnostic(filePath, "resolved", "Claude API resolution (validated)");
   return true;
 }
 
