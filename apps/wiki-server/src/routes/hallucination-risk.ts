@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc, sql } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
 import { hallucinationRiskSnapshots } from "../schema.js";
 import {
@@ -13,6 +13,9 @@ import {
   RiskSnapshotSchema as SharedSnapshotSchema,
   RiskSnapshotBatchSchema,
 } from "../api-types.js";
+import { logger as rootLogger } from "../logger.js";
+
+const logger = rootLogger.child({ component: "hallucination-risk" });
 
 // ---- Raw SQL row types ----
 
@@ -28,6 +31,14 @@ interface RiskPageDbRow {
   factors: string[] | null;
   integrity_issues: string[] | null;
   computed_at: string;
+}
+
+interface TotalCountRow {
+  count: number;
+}
+
+interface UniqueCountRow {
+  count: number;
 }
 
 // ---- Constants ----
@@ -60,6 +71,39 @@ const CleanupQuery = z.object({
     .transform((v) => v === "true" || v === "1")
     .default("false"),
 });
+
+// ---- Helpers ----
+
+/**
+ * Refresh the hallucination_risk_latest materialized view.
+ * Uses CONCURRENTLY so reads are not blocked during refresh.
+ * Falls back to non-concurrent refresh if the view has no unique index yet
+ * (e.g., first run before migration fully applies).
+ */
+async function refreshMaterializedView(): Promise<void> {
+  const rawDb = getDb();
+  try {
+    await rawDb`REFRESH MATERIALIZED VIEW CONCURRENTLY hallucination_risk_latest`;
+  } catch (err) {
+    // CONCURRENTLY requires a unique index; fall back if not available
+    logger.warn({ err }, "Concurrent refresh failed, trying non-concurrent");
+    await rawDb`REFRESH MATERIALIZED VIEW hallucination_risk_latest`;
+  }
+}
+
+/**
+ * Check if the materialized view exists. Returns false during tests
+ * or before the migration has been applied.
+ */
+async function matViewExists(): Promise<boolean> {
+  const rawDb = getDb();
+  const result = await rawDb<{ exists: boolean }[]>`
+    SELECT EXISTS (
+      SELECT 1 FROM pg_matviews WHERE matviewname = 'hallucination_risk_latest'
+    ) AS exists
+  `;
+  return result[0]?.exists ?? false;
+}
 
 const hallucinationRiskApp = new Hono()
 
@@ -123,7 +167,27 @@ const hallucinationRiskApp = new Hono()
         pageId: hallucinationRiskSnapshots.pageId,
       });
 
+    // Auto-refresh the materialized view after batch inserts
+    try {
+      if (await matViewExists()) {
+        await refreshMaterializedView();
+      }
+    } catch (err) {
+      // Log but don't fail the insert — stale matview data is acceptable
+      logger.warn({ err }, "Failed to refresh materialized view after batch insert");
+    }
+
     return c.json({ inserted: results.length }, 201);
+  })
+
+  // ---- POST /refresh (manually refresh materialized view) ----
+
+  .post("/refresh", async (c) => {
+    if (!(await matViewExists())) {
+      return c.json({ refreshed: false, reason: "materialized view does not exist" });
+    }
+    await refreshMaterializedView();
+    return c.json({ refreshed: true });
   })
 
   // ---- GET /history?page_id=X (history for a page) ----
@@ -161,16 +225,40 @@ const hallucinationRiskApp = new Hono()
     const parsed = StatsQuery.safeParse(c.req.query());
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const db = getDrizzleDb();
     const rawDb = getDb();
+    const useMatView = await matViewExists();
 
-    // Total snapshots
-    const totalResult = await db
-      .select({ count: count() })
-      .from(hallucinationRiskSnapshots);
-    const totalSnapshots = totalResult[0].count;
+    // Total snapshots (from base table — always accurate)
+    const totalResult = await rawDb<TotalCountRow[]>`
+      SELECT count(*)::int AS count FROM hallucination_risk_snapshots
+    `;
+    const totalSnapshots = totalResult[0]?.count ?? 0;
 
-    // Unique pages
+    if (useMatView) {
+      // Use materialized view for unique pages and level distribution — instant
+      const pagesResult = await rawDb<UniqueCountRow[]>`
+        SELECT count(*)::int AS count FROM hallucination_risk_latest
+      `;
+      const uniquePages = pagesResult[0]?.count ?? 0;
+
+      const levelDist = await rawDb<LevelDistRow[]>`
+        SELECT level, count(*)::int AS count
+        FROM hallucination_risk_latest
+        GROUP BY level
+      `;
+
+      return c.json({
+        totalSnapshots,
+        uniquePages,
+        levelDistribution: Object.fromEntries(
+          levelDist.map((r) => [r.level, r.count])
+        ),
+      });
+    }
+
+    // Fallback: use DISTINCT ON on the base table (slow but correct)
+    const db = getDrizzleDb();
+
     const pagesResult = await db
       .select({
         count: sql<number>`count(distinct ${hallucinationRiskSnapshots.pageId})`,
@@ -178,7 +266,6 @@ const hallucinationRiskApp = new Hono()
       .from(hallucinationRiskSnapshots);
     const uniquePages = Number(pagesResult[0].count);
 
-    // Level distribution (from latest snapshot per page) using DISTINCT ON
     const levelDist = await rawDb<LevelDistRow[]>`
       SELECT level, count(*)::int AS count
       FROM (
@@ -206,30 +293,51 @@ const hallucinationRiskApp = new Hono()
 
     const { limit, offset, level } = parsed.data;
     const rawDb = getDb();
+    const useMatView = await matViewExists();
 
-    // Use DISTINCT ON for efficient "latest per page" query
-    const rows = level
-      ? await rawDb<RiskPageDbRow[]>`
-          SELECT page_id, score, level, factors, integrity_issues, computed_at
-          FROM (
-            SELECT DISTINCT ON (page_id) *
-            FROM hallucination_risk_snapshots
-            ORDER BY page_id, computed_at DESC
-          ) latest
-          WHERE level = ${level}
-          ORDER BY score DESC
-          LIMIT ${limit} OFFSET ${offset}
-        `
-      : await rawDb<RiskPageDbRow[]>`
-          SELECT page_id, score, level, factors, integrity_issues, computed_at
-          FROM (
-            SELECT DISTINCT ON (page_id) *
-            FROM hallucination_risk_snapshots
-            ORDER BY page_id, computed_at DESC
-          ) latest
-          ORDER BY score DESC
-          LIMIT ${limit} OFFSET ${offset}
-        `;
+    let rows: RiskPageDbRow[];
+
+    if (useMatView) {
+      // Use materialized view — simple indexed queries, no DISTINCT ON
+      rows = level
+        ? await rawDb<RiskPageDbRow[]>`
+            SELECT page_id, score, level, factors, integrity_issues, computed_at
+            FROM hallucination_risk_latest
+            WHERE level = ${level}
+            ORDER BY score DESC
+            LIMIT ${limit} OFFSET ${offset}
+          `
+        : await rawDb<RiskPageDbRow[]>`
+            SELECT page_id, score, level, factors, integrity_issues, computed_at
+            FROM hallucination_risk_latest
+            ORDER BY score DESC
+            LIMIT ${limit} OFFSET ${offset}
+          `;
+    } else {
+      // Fallback: DISTINCT ON on base table
+      rows = level
+        ? await rawDb<RiskPageDbRow[]>`
+            SELECT page_id, score, level, factors, integrity_issues, computed_at
+            FROM (
+              SELECT DISTINCT ON (page_id) *
+              FROM hallucination_risk_snapshots
+              ORDER BY page_id, computed_at DESC
+            ) latest
+            WHERE level = ${level}
+            ORDER BY score DESC
+            LIMIT ${limit} OFFSET ${offset}
+          `
+        : await rawDb<RiskPageDbRow[]>`
+            SELECT page_id, score, level, factors, integrity_issues, computed_at
+            FROM (
+              SELECT DISTINCT ON (page_id) *
+              FROM hallucination_risk_snapshots
+              ORDER BY page_id, computed_at DESC
+            ) latest
+            ORDER BY score DESC
+            LIMIT ${limit} OFFSET ${offset}
+          `;
+    }
 
     return c.json({
       pages: rows.map((r) => ({
@@ -285,6 +393,7 @@ const hallucinationRiskApp = new Hono()
     }
 
     // Actually delete old snapshots, keeping latest `keep` per page
+    logger.info({ keep }, "Deleting old hallucination risk snapshots");
     const result = await rawDb`
       DELETE FROM hallucination_risk_snapshots
       WHERE id NOT IN (
@@ -299,6 +408,15 @@ const hallucinationRiskApp = new Hono()
     `;
 
     const deleted = result.count;
+
+    // Refresh materialized view after cleanup
+    try {
+      if (await matViewExists()) {
+        await refreshMaterializedView();
+      }
+    } catch (err) {
+      logger.warn({ err }, "Failed to refresh materialized view after cleanup");
+    }
 
     return c.json({ deleted, keep });
   });

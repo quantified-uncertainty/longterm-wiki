@@ -36,6 +36,9 @@ export function getDb() {
       max: 10,
       idle_timeout: 20,
       connect_timeout: 10,
+      connection: {
+        statement_timeout: 30000, // Kill queries after 30s to prevent pool exhaustion
+      },
     });
   }
   return sql;
