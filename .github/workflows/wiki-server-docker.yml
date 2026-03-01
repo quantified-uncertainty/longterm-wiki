@@ -205,21 +205,29 @@ jobs:
 
           # 4. Resources stats smoke test — verifies the resources endpoint is reachable
           #    and returns expected shape (catches schema/migration issues like the 0026/0027 gap)
-          RESOURCES_RESPONSE=$(curl -sf \
-            -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
-            "${LONGTERMWIKI_SERVER_URL}/api/resources/stats" 2>&1 || true)
-          TOTAL_RESOURCES=$(echo "$RESOURCES_RESPONSE" | jq -r '.totalResources // empty' 2>/dev/null || true)
+          #    Retries up to 3 times with backoff to handle transient rate limits (429).
+          TOTAL_RESOURCES=""
+          for i in 1 2 3; do
+            RESOURCES_RESPONSE=$(curl -s -w "\n%{http_code}" \
+              -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
+              "${LONGTERMWIKI_SERVER_URL}/api/resources/stats" 2>&1 || true)
+            HTTP_CODE=$(echo "$RESOURCES_RESPONSE" | tail -1)
+            BODY=$(echo "$RESOURCES_RESPONSE" | sed '$d')
+            TOTAL_RESOURCES=$(echo "$BODY" | jq -r '.totalResources // empty' 2>/dev/null || true)
+            if [ -n "$TOTAL_RESOURCES" ]; then break; fi
+            echo "Resources stats attempt $i/3 failed (HTTP $HTTP_CODE): $BODY"
+            if [ "$i" -lt 3 ]; then sleep $((i * 5)); fi
+          done
           if [ -z "$TOTAL_RESOURCES" ]; then
-            echo "::error::Resources stats smoke test failed: $RESOURCES_RESPONSE"
+            echo "::error::Resources stats smoke test failed after 3 attempts (HTTP $HTTP_CODE): $BODY"
             exit 1
           fi
           echo "Resources stats smoke test passed: totalResources=$TOTAL_RESOURCES"
 
           # 5. Citations endpoint smoke test — verifies citation_content.resource_id column exists
           #    (catches missing migration 0026 which adds that column)
-          CITATIONS_RESPONSE=$(curl -sf \
+          CITATIONS_RESPONSE=$(curl -s \
             "${LONGTERMWIKI_SERVER_URL}/api/citations/health/__smoke-test__" 2>&1 || true)
-          CITATIONS_STATUS=$(echo "$CITATIONS_RESPONSE" | jq -r '.total // empty' 2>/dev/null || true)
           # A non-existent page returns {"total":0,...} — that's fine; a 500 means column is missing
           if echo "$CITATIONS_RESPONSE" | grep -qi "column\|error\|exception" 2>/dev/null; then
             echo "::error::Citations health smoke test returned an error: $CITATIONS_RESPONSE"
