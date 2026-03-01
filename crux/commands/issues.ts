@@ -651,7 +651,7 @@ function buildIssueBody(opts: {
 // Issue creation rate limiting
 // ---------------------------------------------------------------------------
 
-const DAILY_CREATE_LIMIT = 5;
+const DAILY_CREATE_LIMIT = 2;
 const RATE_LIMIT_FILE = join(dirname(new URL(import.meta.url).pathname), '../../.claude/issue-creates.json');
 
 interface RateLimitRecord {
@@ -784,6 +784,19 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
+  // Evidence validation: advisory warning if issue body lacks concrete evidence
+  // (does not block creation — just prints a nudge)
+  let evidenceWarning = '';
+  if (body && !options.draft) {
+    const hasCodeFence = /```/.test(body);
+    const hasUrl = /https?:\/\//.test(body);
+    const hasErrorOutput = /(?:output:|error:|stack trace|exception|failed)/i.test(body);
+    const hasFilePath = /(?:\/[\w.-]+){2,}|[\w.-]+\.[a-z]{2,4}:\d+/.test(body);
+    if (!hasCodeFence && !hasUrl && !hasErrorOutput && !hasFilePath) {
+      evidenceWarning = `  ${c.yellow}⚠ Body lacks concrete evidence (no code fences, URLs, error output, or file paths)${c.reset}\n`;
+    }
+  }
+
   interface CreateIssueResponse {
     number: number;
     html_url: string;
@@ -836,6 +849,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
       output += `  ${c.dim}Fix with: crux issues update-body ${issue.number} --problem="..." --model=sonnet --criteria="item1|item2"${c.reset}\n`;
     }
   }
+  if (evidenceWarning) output += evidenceWarning;
 
   return { output, exitCode: 0 };
 }

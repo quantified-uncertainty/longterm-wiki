@@ -112,8 +112,26 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   },
   // --- Manual items (genuinely enforced or essential) ---
   {
+    id: 'duplicate-check',
+    label: 'Checked for duplicate/overlapping work',
+    applicableTypes: 'all',
+    priority: 'blocking',
+  },
+  {
     id: 'tests-written',
     label: 'Tests written for new logic',
+    applicableTypes: 'all',
+    priority: 'blocking',
+  },
+  {
+    id: 'red-team',
+    label: 'Adversarial inputs tested',
+    applicableTypes: ['infrastructure', 'commands', 'bugfix', 'refactor'],
+    priority: 'blocking',
+  },
+  {
+    id: 'scope-complete',
+    label: 'All acceptance criteria met',
     applicableTypes: 'all',
     priority: 'blocking',
   },
