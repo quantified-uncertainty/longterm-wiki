@@ -53,7 +53,19 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
   subjectEntity: z.string().max(300).optional(),
   property: z.string().max(200).optional(),
   includeSources: z.coerce.boolean().optional(),
-  sort: z.enum(["newest", "entity", "confidence", "as_of", "verdict"]).optional(),
+  sort: z
+    .enum([
+      "newest",
+      "entity",
+      "confidence",
+      "as_of",
+      "verdict",
+      "verdict_score",
+    ])
+    .optional(),
+  minVerdictScore: z.coerce.number().min(0).max(1).optional(),
+  maxVerdictScore: z.coerce.number().min(0).max(1).optional(),
+  verifiedOnly: z.coerce.boolean().optional(),
 });
 
 const DeleteByEntitySchema = ClearClaimsSchema;
@@ -670,20 +682,31 @@ const claimsApp = new Hono()
       search, confidence, claimVerdict, entityId, attributedTo, measure,
       multiEntity, hasNumericValue, hasStructuredFields,
       subjectEntity, property,
-      includeSources, sort,
+      includeSources,
+      sort,
+      minVerdictScore,
+      maxVerdictScore,
+      verifiedOnly,
     } = parsed.data;
     const db = getDrizzleDb();
 
     const conditions = [];
     if (entityType) conditions.push(eq(claims.entityType, entityType));
     if (claimType) conditions.push(eq(claims.claimType, claimType));
-    if (claimCategory) conditions.push(eq(claims.claimCategory, claimCategory));
+    if (claimCategory)
+      conditions.push(eq(claims.claimCategory, claimCategory));
     if (claimMode) conditions.push(eq(claims.claimMode, claimMode));
-    if (search) conditions.push(sql`${claims.claimText} ILIKE ${"%" + search + "%"}`);
-    if (confidence) conditions.push(eq(claims.confidence, confidence)); // @deprecated Use claimVerdict filter instead
-    if (claimVerdict) conditions.push(eq(claims.claimVerdict, claimVerdict));
+    if (search)
+      conditions.push(
+        sql`${claims.claimText} ILIKE ${"%" + search + "%"}`
+      );
+    if (confidence)
+      conditions.push(eq(claims.confidence, confidence)); // @deprecated
+    if (claimVerdict)
+      conditions.push(eq(claims.claimVerdict, claimVerdict));
     if (entityId) conditions.push(eq(claims.entityId, entityId));
-    if (attributedTo) conditions.push(eq(claims.attributedTo, attributedTo));
+    if (attributedTo)
+      conditions.push(eq(claims.attributedTo, attributedTo));
     if (measure) conditions.push(eq(claims.measure, measure));
     if (multiEntity) {
       conditions.push(
@@ -696,8 +719,22 @@ const claimsApp = new Hono()
     if (hasStructuredFields) {
       conditions.push(sql`${claims.property} IS NOT NULL`);
     }
-    if (subjectEntity) conditions.push(eq(claims.subjectEntity, subjectEntity));
+    if (subjectEntity)
+      conditions.push(eq(claims.subjectEntity, subjectEntity));
     if (property) conditions.push(eq(claims.property, property));
+    if (minVerdictScore != null) {
+      conditions.push(
+        sql`${claims.claimVerdictScore} >= ${minVerdictScore}`
+      );
+    }
+    if (maxVerdictScore != null) {
+      conditions.push(
+        sql`${claims.claimVerdictScore} <= ${maxVerdictScore}`
+      );
+    }
+    if (verifiedOnly) {
+      conditions.push(sql`${claims.claimVerdict} IS NOT NULL`);
+    }
 
     const whereClause =
       conditions.length > 0
@@ -707,12 +744,19 @@ const claimsApp = new Hono()
         : undefined;
 
     const orderBy =
-      sort === "newest" ? desc(claims.id)
-      : sort === "entity" ? asc(claims.entityId)
-      : sort === "confidence" ? asc(claims.confidence) // @deprecated Use sort=verdict instead
-      : sort === "verdict" ? asc(claims.claimVerdict)
-      : sort === "as_of" ? desc(claims.asOf)
-      : asc(claims.id);
+      sort === "newest"
+        ? desc(claims.id)
+        : sort === "entity"
+          ? asc(claims.entityId)
+          : sort === "confidence"
+            ? asc(claims.confidence)
+            : sort === "verdict"
+              ? asc(claims.claimVerdict)
+              : sort === "verdict_score"
+                ? desc(claims.claimVerdictScore)
+                : sort === "as_of"
+                  ? desc(claims.asOf)
+                  : asc(claims.id);
 
     const rows = await db
       .select()
@@ -1300,6 +1344,124 @@ const claimsApp = new Hono()
       .returning();
 
     return c.json({ inserted: rows.length }, 201);
+  })
+  // ---- GET /quality (aggregate quality metrics per entity and system-wide) ----
+  .get("/quality", async (c) => {
+    const db = getDrizzleDb();
+
+    // Per-entity quality metrics
+    const perEntityRows = await db
+      .select({
+        entityId: claims.entityId,
+        totalClaims: count(),
+        verifiedCount:
+          sql<number>`count(*) filter (where ${claims.claimVerdict} is not null)`,
+        avgVerdictScore:
+          sql<number>`avg(${claims.claimVerdictScore})`,
+        minVerdictScore:
+          sql<number>`min(${claims.claimVerdictScore})`,
+        maxVerdictScore:
+          sql<number>`max(${claims.claimVerdictScore})`,
+      })
+      .from(claims)
+      .groupBy(claims.entityId)
+      .orderBy(desc(count()));
+
+    const entityQuality = perEntityRows.map((r) => ({
+      entityId: r.entityId,
+      totalClaims: r.totalClaims,
+      verifiedCount: Number(r.verifiedCount),
+      verifiedPct:
+        r.totalClaims > 0
+          ? Math.round(
+              (Number(r.verifiedCount) / r.totalClaims) * 100
+            )
+          : 0,
+      avgVerdictScore:
+        r.avgVerdictScore != null
+          ? Math.round(r.avgVerdictScore * 100) / 100
+          : null,
+      minVerdictScore:
+        r.minVerdictScore != null
+          ? Math.round(r.minVerdictScore * 100) / 100
+          : null,
+      maxVerdictScore:
+        r.maxVerdictScore != null
+          ? Math.round(r.maxVerdictScore * 100) / 100
+          : null,
+    }));
+
+    // System-wide totals
+    const totalResult = await db
+      .select({ count: count() })
+      .from(claims);
+    const total = totalResult[0].count;
+
+    const verifiedResult = await db
+      .select({ count: count() })
+      .from(claims)
+      .where(sql`${claims.claimVerdict} IS NOT NULL`);
+    const totalVerified = verifiedResult[0].count;
+
+    const avgScoreResult = await db
+      .select({
+        avg: sql<number>`avg(${claims.claimVerdictScore})`,
+      })
+      .from(claims)
+      .where(sql`${claims.claimVerdictScore} IS NOT NULL`);
+    const avgScore = avgScoreResult[0].avg;
+
+    // Verdict distribution (system-wide)
+    const byVerdict = await db
+      .select({
+        verdict: claims.claimVerdict,
+        count: count(),
+      })
+      .from(claims)
+      .groupBy(claims.claimVerdict)
+      .orderBy(desc(count()));
+
+    // Score distribution buckets (0-20, 20-40, 40-60, 60-80, 80-100%)
+    const bucketExpr = sql`case
+      when ${claims.claimVerdictScore} < 0.2 then '0-20'
+      when ${claims.claimVerdictScore} < 0.4 then '20-40'
+      when ${claims.claimVerdictScore} < 0.6 then '40-60'
+      when ${claims.claimVerdictScore} < 0.8 then '60-80'
+      else '80-100'
+    end`;
+    const scoreBuckets = await db
+      .select({
+        bucket: sql<string>`${bucketExpr}`,
+        count: count(),
+      })
+      .from(claims)
+      .where(sql`${claims.claimVerdictScore} IS NOT NULL`)
+      .groupBy(bucketExpr);
+
+    return c.json({
+      entities: entityQuality,
+      systemwide: {
+        totalClaims: total,
+        totalVerified,
+        verifiedPct:
+          total > 0
+            ? Math.round((totalVerified / total) * 100)
+            : 0,
+        avgVerdictScore:
+          avgScore != null
+            ? Math.round(avgScore * 100) / 100
+            : null,
+        byVerdict: Object.fromEntries(
+          byVerdict.map((r) => [
+            r.verdict ?? "unverified",
+            r.count,
+          ])
+        ),
+        scoreBuckets: Object.fromEntries(
+          scoreBuckets.map((r) => [r.bucket, r.count])
+        ),
+      },
+    });
   })
 
   // ---- GET /by-page — claims for a specific wiki page, grouped by footnote ----
