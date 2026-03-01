@@ -25,6 +25,7 @@ import { parse } from 'yaml';
 import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../../crux/lib/metrics-extractor.ts';
 import { computeHallucinationRisk as computeCanonicalRisk, resolveEntityType } from '../../../crux/lib/hallucination-risk.ts';
 import { syncPageLinks } from './lib/links-client.mjs';
+import { filterBulkImportDates } from './lib/git-date-utils.mjs';
 import { computeRedundancy } from './lib/redundancy.mjs';
 import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
@@ -605,9 +606,14 @@ function maxDate(a, b) {
  *   - gitCreatedMap: path → YYYY-MM-DD of first commit (approximate, when file was added)
  *   - gitModifiedMap: path → YYYY-MM-DD of last commit
  * Falls back to empty maps if git is unavailable (e.g. shallow clones, no git installed).
+ *
+ * Bulk-import detection: uses filterBulkImportDates() to remove entries where
+ * more than 50 files share the same git-created date. This prevents mass
+ * restructures (e.g. an import that touched 650 files) from giving every page
+ * an identical, meaningless creation date.
  */
 function buildGitDateMaps() {
-  const gitCreatedMap = new Map();
+  let gitCreatedMap = new Map();
   const gitModifiedMap = new Map();
 
   try {
@@ -647,7 +653,19 @@ function buildGitDateMaps() {
       }
     }
 
-    console.log(`  gitDateMaps: ${gitModifiedMap.size} files tracked`);
+    // Filter out bulk-import dates using the extracted utility
+    const { filtered, discardedDates } = filterBulkImportDates(gitCreatedMap);
+    const removed = gitCreatedMap.size - filtered.size;
+    gitCreatedMap = filtered;
+
+    if (discardedDates.length > 0) {
+      for (const { date, fileCount } of discardedDates) {
+        console.log(`  gitDateMaps: discarded bulk-import date ${date} (${fileCount} files)`);
+      }
+      console.log(`  gitDateMaps: ${gitModifiedMap.size} files tracked, ${removed} bulk-import created dates discarded`);
+    } else {
+      console.log(`  gitDateMaps: ${gitModifiedMap.size} files tracked`);
+    }
   } catch (err) {
     console.log(`  gitDateMaps: skipped (${err.message || 'unknown error'})`);
   }
@@ -690,6 +708,47 @@ async function buildEditLogDateMap() {
     return dateMap;
   } catch (err) {
     console.log(`  editLogDates: skipped (${err.message || 'server unavailable'})`);
+    return new Map();
+  }
+}
+
+/**
+ * Fetch earliest edit dates per page from the wiki-server API.
+ * Used as a fallback for dateCreated when git dates were discarded (bulk import)
+ * and no frontmatter createdAt exists.
+ * Falls back to an empty map if the server is unavailable.
+ */
+async function buildEarliestEditLogDateMap() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  earliestEditLogDates: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return new Map();
+  }
+
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
+    const res = await fetch(`${serverUrl}/api/edit-logs/earliest-dates`, {
+      headers,
+      signal: AbortSignal.timeout(10_000),
+    });
+
+    if (!res.ok) {
+      console.log(`  earliestEditLogDates: skipped (server returned ${res.status})`);
+      return new Map();
+    }
+
+    const data = await res.json();
+    const dateMap = new Map();
+    for (const [pageId, dateStr] of Object.entries(data.dates)) {
+      dateMap.set(pageId, dateStr);
+    }
+    console.log(`  earliestEditLogDates: ${dateMap.size} pages fetched from API`);
+    return dateMap;
+  } catch (err) {
+    console.log(`  earliestEditLogDates: skipped (${err.message || 'server unavailable'})`);
     return new Map();
   }
 }
@@ -799,8 +858,9 @@ function extractFrontmatter(content) {
  * Extracts frontmatter including quality, lastUpdated, title, etc.
  * Also detects unconverted links (markdown links with matching resources)
  */
-function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps) {
+function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates) {
   const { gitCreatedMap = new Map(), gitModifiedMap = new Map() } = gitDateMaps || {};
+  const earliestDates = earliestEditLogDates || new Map();
   const pages = [];
 
   function scanDirectory(dir, urlPrefix = '') {
@@ -861,8 +921,11 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps) {
               maxDate(toDateString(fm.lastUpdated), toDateString(fm.lastEdited))
             )
           ),
-          // Derive creation date from git first-commit; fall back to frontmatter for legacy pages.
-          dateCreated: gitCreatedMap.get(relative(REPO_ROOT, fullPath)) || toDateString(fm.createdAt) || toDateString(fm.dateCreated) || null,
+          // Derive creation date: prefer explicit frontmatter, then non-bulk git
+          // first-commit, then earliest edit log from wiki-server, then legacy
+          // frontmatter. Bulk-import git dates are already filtered out of
+          // gitCreatedMap by buildGitDateMaps().
+          dateCreated: toDateString(fm.createdAt) || gitCreatedMap.get(relative(REPO_ROOT, fullPath)) || earliestDates.get(isIndexFile ? null : id) || toDateString(fm.dateCreated) || null,
           llmSummary: fm.llmSummary || null,
           description: fm.description || null,
           // Extract ratings for model pages
@@ -1133,18 +1196,19 @@ async function main() {
   const urlToResource = buildUrlToResourceMap(resources);
   console.log(`  urlToResource: ${urlToResource.size} URL variations mapped`);
 
-  // Fetch edit log dates and citation stats from wiki-server (parallel)
-  // Also build git-based date maps (synchronous, fast).
+  // Fetch edit log dates, earliest edit log dates, and citation stats from
+  // wiki-server (parallel). Also build git-based date maps (synchronous, fast).
   const gitDateMaps = CONTENT_ONLY ? { gitCreatedMap: new Map(), gitModifiedMap: new Map() } : buildGitDateMaps();
-  const [editLogDates, citationStats] = CONTENT_ONLY
-    ? [new Map(), new Map()]
+  const [editLogDates, earliestEditLogDates, citationStats] = CONTENT_ONLY
+    ? [new Map(), new Map(), new Map()]
     : await Promise.all([
         buildEditLogDateMap(),
+        buildEarliestEditLogDateMap(),
         buildCitationStatsMap(),
       ]);
 
   // Build pages registry with frontmatter data (quality, etc.)
-  const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps);
+  const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates);
 
   // =========================================================================
   // CONTENT ENTITY LINKS — scan MDX for <EntityLink> references

@@ -189,6 +189,27 @@ const editLogsApp = new Hono()
     return c.json({ dates: dateMap });
   })
 
+  // ---- GET /earliest-dates (earliest edit date per page, for dateCreated fallback) ----
+
+  .get("/earliest-dates", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        pageId: editLogs.pageId,
+        earliestDate: sql<string>`min(${editLogs.date})`,
+      })
+      .from(editLogs)
+      .groupBy(editLogs.pageId);
+
+    const dateMap: Record<string, string> = {};
+    for (const row of rows) {
+      dateMap[row.pageId] = row.earliestDate;
+    }
+
+    return c.json({ dates: dateMap });
+  })
+
   // ---- GET /stats ----
 
   .get("/stats", async (c) => {
