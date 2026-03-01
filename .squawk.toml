@@ -1,0 +1,29 @@
+pg_version = "16"
+
+# Rules excluded with justification:
+#
+# prefer-bigint-over-int: Drizzle ORM generates `integer` for serial PKs in Drizzle schema;
+#   changing to bigint requires a schema change, not just migration edits. Low risk for
+#   this app's data volumes.
+#
+# prefer-identity: Drizzle generates `bigserial` / `serial` for auto-increment columns.
+#   Switching to IDENTITY requires Drizzle schema changes. Advisory-only for now.
+#
+# prefer-text-field: Drizzle uses `varchar` for bounded-length fields. Convention is
+#   project-wide and consistent.
+#
+# require-timeout-settings: Migrations run in a controlled deployment context (not live
+#   prod traffic tool calls). Requiring lock_timeout/statement_timeout on every migration
+#   adds boilerplate without clear benefit for this project's deployment model.
+#
+# prefer-robust-stmts: Drizzle generates migrations without IF NOT EXISTS / IF EXISTS on
+#   some DDL (e.g. CREATE TABLE). False positives on generated files. The Drizzle journal
+#   integrity check (validate-drizzle-journal.ts) provides the equivalent safety guarantee
+#   by ensuring migrations only run once.
+excluded_rules = [
+  "prefer-bigint-over-int",
+  "prefer-identity",
+  "prefer-text-field",
+  "require-timeout-settings",
+  "prefer-robust-stmts",
+]
