@@ -18,6 +18,7 @@ import {
   RecordIncidentSchema,
   UpdateIncidentSchema,
 } from "../api-types.js";
+import { logger } from "../logger.js";
 
 // Static service registry — no DB table needed
 const SERVICES = [
@@ -282,9 +283,9 @@ const monitoringApp = new Hono()
           maxRetries: 1,
         })
         .catch((err: unknown) => {
-          console.error(
-            "[monitoring] Failed to create monitoring-alert job:",
-            err instanceof Error ? err.message : String(err)
+          logger.error(
+            { err: err instanceof Error ? err.message : String(err) },
+            "Failed to create monitoring-alert job",
           );
         });
     }

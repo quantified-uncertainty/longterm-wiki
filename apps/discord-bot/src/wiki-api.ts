@@ -9,6 +9,7 @@
  */
 
 import { WIKI_SERVER_URL, WIKI_SERVER_API_KEY } from "./config.js";
+import { logger } from "./log.js";
 
 // ---------------------------------------------------------------------------
 // Shared types — imported from crux/lib/wiki-server/
@@ -169,13 +170,13 @@ export async function searchWiki(
   try {
     const res = await fetch(url.toString(), { headers: headers() });
     if (!res.ok) {
-      console.error(`Wiki search failed: ${res.status} ${res.statusText}`);
+      logger.error({ status: res.status, statusText: res.statusText, fn: "searchWiki" }, "Wiki search failed");
       return [];
     }
     const data = (await res.json()) as PageSearchResult;
     return data.results;
   } catch (error) {
-    console.error("Wiki search error:", error);
+    logger.error({ err: error, fn: "searchWiki" }, "Wiki search error");
     return [];
   }
 }
@@ -187,12 +188,12 @@ export async function getPage(id: string): Promise<PageDetail | null> {
     const res = await fetch(url.toString(), { headers: headers() });
     if (res.status === 404) return null;
     if (!res.ok) {
-      console.error(`Wiki getPage failed: ${res.status} ${res.statusText}`);
+      logger.error({ status: res.status, statusText: res.statusText, fn: "getPage", id }, "Wiki getPage failed");
       return null;
     }
     return (await res.json()) as PageDetail;
   } catch (error) {
-    console.error("Wiki getPage error:", error);
+    logger.error({ err: error, fn: "getPage", id }, "Wiki getPage error");
     return null;
   }
 }
@@ -211,12 +212,12 @@ export async function getRelatedPages(
     const res = await fetch(url.toString(), { headers: headers() });
     if (res.status === 404) return null;
     if (!res.ok) {
-      console.error(`getRelatedPages failed: ${res.status} ${res.statusText}`);
+      logger.error({ status: res.status, statusText: res.statusText, fn: "getRelatedPages", id }, "getRelatedPages failed");
       return null;
     }
     return (await res.json()) as RelatedResult;
   } catch (error) {
-    console.error("getRelatedPages error:", error);
+    logger.error({ err: error, fn: "getRelatedPages", id }, "getRelatedPages error");
     return null;
   }
 }
@@ -231,12 +232,12 @@ export async function getEntity(id: string): Promise<EntityEntry | null> {
     const res = await fetch(url.toString(), { headers: headers() });
     if (res.status === 404) return null;
     if (!res.ok) {
-      console.error(`getEntity failed: ${res.status} ${res.statusText}`);
+      logger.error({ status: res.status, statusText: res.statusText, fn: "getEntity", id }, "getEntity failed");
       return null;
     }
     return (await res.json()) as EntityEntry;
   } catch (error) {
-    console.error("getEntity error:", error);
+    logger.error({ err: error, fn: "getEntity", id }, "getEntity error");
     return null;
   }
 }
@@ -252,12 +253,12 @@ export async function searchEntities(
   try {
     const res = await fetch(url.toString(), { headers: headers() });
     if (!res.ok) {
-      console.error(`searchEntities failed: ${res.status} ${res.statusText}`);
+      logger.error({ status: res.status, statusText: res.statusText, fn: "searchEntities", query }, "searchEntities failed");
       return null;
     }
     return (await res.json()) as EntitySearchResult;
   } catch (error) {
-    console.error("searchEntities error:", error);
+    logger.error({ err: error, fn: "searchEntities", query }, "searchEntities error");
     return null;
   }
 }
@@ -272,12 +273,12 @@ export async function getFacts(entityId: string): Promise<FactsByEntityResult | 
     const res = await fetch(url.toString(), { headers: headers() });
     if (res.status === 404) return null;
     if (!res.ok) {
-      console.error(`getFacts failed: ${res.status} ${res.statusText}`);
+      logger.error({ status: res.status, statusText: res.statusText, fn: "getFacts", entityId }, "getFacts failed");
       return null;
     }
     return (await res.json()) as FactsByEntityResult;
   } catch (error) {
-    console.error("getFacts error:", error);
+    logger.error({ err: error, fn: "getFacts", entityId }, "getFacts error");
     return null;
   }
 }
@@ -291,14 +292,12 @@ export async function getPageCitations(
   try {
     const res = await fetch(url.toString(), { headers: headers() });
     if (!res.ok) {
-      console.error(
-        `getPageCitations failed: ${res.status} ${res.statusText}`
-      );
+      logger.error({ status: res.status, statusText: res.statusText, fn: "getPageCitations", pageId }, "getPageCitations failed");
       return null;
     }
     return (await res.json()) as CitationQuotesResult;
   } catch (error) {
-    console.error("getPageCitations error:", error);
+    logger.error({ err: error, fn: "getPageCitations", pageId }, "getPageCitations error");
     return null;
   }
 }
@@ -314,12 +313,12 @@ export async function searchResources(
   try {
     const res = await fetch(url.toString(), { headers: headers() });
     if (!res.ok) {
-      console.error(`searchResources failed: ${res.status} ${res.statusText}`);
+      logger.error({ status: res.status, statusText: res.statusText, fn: "searchResources", query }, "searchResources failed");
       return null;
     }
     return (await res.json()) as ResourceSearchResponse;
   } catch (error) {
-    console.error("searchResources error:", error);
+    logger.error({ err: error, fn: "searchResources", query }, "searchResources error");
     return null;
   }
 }
@@ -338,12 +337,12 @@ export async function getBacklinks(
     const res = await fetch(url.toString(), { headers: headers() });
     if (res.status === 404) return null;
     if (!res.ok) {
-      console.error(`getBacklinks failed: ${res.status} ${res.statusText}`);
+      logger.error({ status: res.status, statusText: res.statusText, fn: "getBacklinks", id }, "getBacklinks failed");
       return null;
     }
     return (await res.json()) as BacklinksResult;
   } catch (error) {
-    console.error("getBacklinks error:", error);
+    logger.error({ err: error, fn: "getBacklinks", id }, "getBacklinks error");
     return null;
   }
 }
@@ -360,11 +359,11 @@ export async function getWikiStats(): Promise<WikiStats | null> {
     ]);
 
     if (!healthRes.ok) {
-      console.error(`getWikiStats /health failed: ${healthRes.status} ${healthRes.statusText}`);
+      logger.error({ status: healthRes.status, statusText: healthRes.statusText, fn: "getWikiStats", endpoint: "/health" }, "getWikiStats /health failed");
       return null;
     }
     if (!citationsRes.ok) {
-      console.error(`getWikiStats /api/citations/stats failed: ${citationsRes.status} ${citationsRes.statusText}`);
+      logger.error({ status: citationsRes.status, statusText: citationsRes.statusText, fn: "getWikiStats", endpoint: "/api/citations/stats" }, "getWikiStats /api/citations/stats failed");
       return null;
     }
 
@@ -372,7 +371,7 @@ export async function getWikiStats(): Promise<WikiStats | null> {
     const citations = (await citationsRes.json()) as CitationStats;
     return { health, citations };
   } catch (error) {
-    console.error("getWikiStats error:", error);
+    logger.error({ err: error, fn: "getWikiStats" }, "getWikiStats error");
     return null;
   }
 }
@@ -390,12 +389,12 @@ export async function getRecentChanges(
   try {
     const res = await fetch(url.toString(), { headers: headers() });
     if (!res.ok) {
-      console.error(`getRecentChanges failed: ${res.status} ${res.statusText}`);
+      logger.error({ status: res.status, statusText: res.statusText, fn: "getRecentChanges" }, "getRecentChanges failed");
       return null;
     }
     return (await res.json()) as RecentChangesResponse;
   } catch (error) {
-    console.error("getRecentChanges error:", error);
+    logger.error({ err: error, fn: "getRecentChanges" }, "getRecentChanges error");
     return null;
   }
 }
@@ -409,14 +408,12 @@ export async function getAutoUpdateStatus(
   try {
     const res = await fetch(url.toString(), { headers: headers() });
     if (!res.ok) {
-      console.error(
-        `getAutoUpdateStatus failed: ${res.status} ${res.statusText}`
-      );
+      logger.error({ status: res.status, statusText: res.statusText, fn: "getAutoUpdateStatus" }, "getAutoUpdateStatus failed");
       return null;
     }
     return (await res.json()) as AutoUpdateStatusResponse;
   } catch (error) {
-    console.error("getAutoUpdateStatus error:", error);
+    logger.error({ err: error, fn: "getAutoUpdateStatus" }, "getAutoUpdateStatus error");
     return null;
   }
 }
@@ -427,14 +424,12 @@ export async function getCitationHealth(): Promise<CitationHealthResponse | null
   try {
     const res = await fetch(url.toString(), { headers: headers() });
     if (!res.ok) {
-      console.error(
-        `getCitationHealth failed: ${res.status} ${res.statusText}`
-      );
+      logger.error({ status: res.status, statusText: res.statusText, fn: "getCitationHealth" }, "getCitationHealth failed");
       return null;
     }
     return (await res.json()) as CitationHealthResponse;
   } catch (error) {
-    console.error("getCitationHealth error:", error);
+    logger.error({ err: error, fn: "getCitationHealth" }, "getCitationHealth error");
     return null;
   }
 }
@@ -450,12 +445,12 @@ export async function getRiskReport(
   try {
     const res = await fetch(url.toString(), { headers: headers() });
     if (!res.ok) {
-      console.error(`getRiskReport failed: ${res.status} ${res.statusText}`);
+      logger.error({ status: res.status, statusText: res.statusText, fn: "getRiskReport", level }, "getRiskReport failed");
       return null;
     }
     return (await res.json()) as RiskReportResponse;
   } catch (error) {
-    console.error("getRiskReport error:", error);
+    logger.error({ err: error, fn: "getRiskReport", level }, "getRiskReport error");
     return null;
   }
 }
