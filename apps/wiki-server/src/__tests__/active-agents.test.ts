@@ -12,6 +12,7 @@ let nextId = 1;
 interface AgentRow {
   id: number;
   session_id: string;
+  session_name: string | null;
   branch: string | null;
   task: string;
   status: string;
@@ -61,13 +62,14 @@ const dispatch: SqlDispatcher = (query, params) => {
 
     if (existing) {
       // Simulate ON CONFLICT DO UPDATE
+      // params: [sessionId, sessionName, branch, task, issueNumber, model, worktree, metadata]
       const now = new Date();
-      existing.branch = (params[1] as string | null) ?? existing.branch;
-      existing.task = params[2] as string;
-      existing.issue_number = params[3] as number | null;
-      existing.model = params[4] as string | null;
-      existing.worktree = params[5] as string | null;
-      existing.metadata = (params[6] as Record<string, unknown> | null) ?? existing.metadata;
+      existing.branch = (params[2] as string | null) ?? existing.branch;
+      existing.task = params[3] as string;
+      existing.issue_number = params[4] as number | null;
+      existing.model = params[5] as string | null;
+      existing.worktree = params[6] as string | null;
+      existing.metadata = (params[7] as Record<string, unknown> | null) ?? existing.metadata;
       existing.status = "active";
       existing.heartbeat_at = now;
       existing.completed_at = null;
@@ -76,23 +78,25 @@ const dispatch: SqlDispatcher = (query, params) => {
     }
 
     // Simulate INSERT
+    // params: [sessionId, sessionName, branch, task, issueNumber, model, worktree, metadata]
     const now = new Date();
     const row: AgentRow = {
       id: nextId++,
       session_id: params[0] as string,
-      branch: params[1] as string | null,
-      task: params[2] as string,
+      session_name: params[1] as string | null,
+      branch: params[2] as string | null,
+      task: params[3] as string,
       status: "active",
       current_step: null,
-      issue_number: params[3] as number | null,
+      issue_number: params[4] as number | null,
       pr_number: null,
       files_touched: null,
-      model: params[4] as string | null,
-      worktree: params[5] as string | null,
+      model: params[5] as string | null,
+      worktree: params[6] as string | null,
       heartbeat_at: now,
       started_at: now,
       completed_at: null,
-      metadata: params[6] as Record<string, unknown> | null,
+      metadata: params[7] as Record<string, unknown> | null,
       created_at: now,
       updated_at: now,
     };

@@ -23,6 +23,7 @@ import { entitiesRoute } from "./routes/entities.js";
 import { factsRoute } from "./routes/facts.js";
 import { agentSessionsRoute } from "./routes/agent-sessions.js";
 import { activeAgentsRoute } from "./routes/active-agents.js";
+import { agentSessionEventsRoute } from "./routes/agent-session-events.js";
 import { jobsRoute } from "./routes/jobs.js";
 import { artifactsRoute } from "./routes/artifacts.js";
 import { exploreRoute } from "./routes/explore.js";
@@ -120,6 +121,7 @@ export function createApp() {
   app.use("/api/jobs/*", requireWriteScope("project"));
   app.use("/api/agent-sessions/*", requireWriteScope("project"));
   app.use("/api/active-agents/*", requireWriteScope("project"));
+  app.use("/api/agent-session-events/*", requireWriteScope("project"));
   app.use("/api/auto-update-runs/*", requireWriteScope("project"));
   app.use("/api/auto-update-news/*", requireWriteScope("project"));
   app.use("/api/github/*", requireWriteScope("project"));
@@ -143,6 +145,7 @@ export function createApp() {
   app.route("/api/facts", factsRoute);
   app.route("/api/agent-sessions", agentSessionsRoute);
   app.route("/api/active-agents", activeAgentsRoute);
+  app.route("/api/agent-session-events", agentSessionEventsRoute);
   app.route("/api/jobs", jobsRoute);
   app.route("/api/artifacts", artifactsRoute);
   app.route("/api/explore", exploreRoute);

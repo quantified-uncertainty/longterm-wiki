@@ -4,6 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { GITHUB_REPO_URL } from "@lib/site-config";
 import type { ActiveAgentRow } from "./active-agents-content";
+import { AgentEventsPanel } from "./agent-events-panel";
 
 // ── Status Badge ─────────────────────────────────────────────────────────
 
@@ -74,6 +75,19 @@ const columns: ColumnDef<ActiveAgentRow>[] = [
       <SortableHeader column={column}>Status</SortableHeader>
     ),
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
+  },
+  {
+    accessorKey: "sessionName",
+    header: "Name",
+    cell: ({ row }) => {
+      const name = row.original.sessionName;
+      if (!name) return <span className="text-xs text-muted-foreground/50">—</span>;
+      return (
+        <span className="text-xs font-medium text-cyan-600 whitespace-nowrap" title={name}>
+          {name}
+        </span>
+      );
+    },
   },
   {
     accessorKey: "task",
@@ -194,6 +208,11 @@ const columns: ColumnDef<ActiveAgentRow>[] = [
         </span>
       );
     },
+  },
+  {
+    id: "events",
+    header: "Events",
+    cell: ({ row }) => <AgentEventsPanel agentId={row.original.id} />,
   },
 ];
 

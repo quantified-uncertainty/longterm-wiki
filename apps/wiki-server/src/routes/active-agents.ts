@@ -13,6 +13,7 @@ import {
   UpdateAgentSchema,
 } from "../api-types.js";
 import { logger } from "../logger.js";
+import { generateSessionName } from "../session-name.js";
 
 /** Default minutes before an agent without heartbeat is marked stale. */
 const STALE_TIMEOUT_MINUTES = 30;
@@ -41,6 +42,7 @@ const activeAgentsApp = new Hono()
       .insert(activeAgents)
       .values({
         sessionId: d.sessionId,
+        sessionName: generateSessionName(),
         branch: d.branch ?? null,
         task: d.task,
         issueNumber: d.issueNumber ?? null,

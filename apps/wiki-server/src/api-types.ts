@@ -1193,6 +1193,27 @@ export const UpdateAgentSchema = z.object({
 export type UpdateAgent = z.infer<typeof UpdateAgentSchema>;
 
 // ---------------------------------------------------------------------------
+// Agent Session Events (activity timeline)
+// ---------------------------------------------------------------------------
+
+export const VALID_AGENT_EVENT_TYPES = [
+  "registered",
+  "checklist_check",
+  "status_update",
+  "error",
+  "note",
+  "completed",
+] as const;
+
+export const CreateAgentEventSchema = z.object({
+  agentId: z.number().int().positive(),
+  eventType: z.enum(VALID_AGENT_EVENT_TYPES),
+  message: z.string().min(1).max(5000),
+  metadata: z.record(z.unknown()).nullable().optional(),
+});
+export type CreateAgentEvent = z.infer<typeof CreateAgentEventSchema>;
+
+// ---------------------------------------------------------------------------
 // Groundskeeper Runs
 // ---------------------------------------------------------------------------
 
