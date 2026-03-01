@@ -8,8 +8,8 @@
  * 4. Store before/after snapshots for audit trail
  *
  * Design principles:
- * - Non-blocking by default: returns 'warn' assessment rather than 'block'
- *   until confidence in the system is established
+ * - Non-blocking by default: returns 'warn' assessment, never blocks
+ *   (blocking may be added later when confidence in the system is established)
  * - Fail-open for analysis (if LLM fails, still write the page with a warning)
  * - Fail-closed for scope checks (scope violations always block)
  * - Cost-conscious: uses Haiku for all LLM calls
@@ -70,17 +70,15 @@ export interface SemanticDiffOptions {
  * Currently:
  * - 'safe': No high-severity contradictions, reasonable claim changes
  * - 'warn': Medium-severity contradictions or unusual claim change ratio
- * - 'block': High-severity contradictions (reserved for future use when
- *            confidence in the system is established)
  *
- * The system starts in non-blocking mode: 'block' is not returned in the
- * initial implementation to avoid false positives. Callers should treat
- * 'warn' as informational for now.
+ * A 'block' level may be added in the future when confidence in the
+ * system is established. For now, callers should treat 'warn' as
+ * informational.
  */
 function computeAssessment(
   diff: SemanticDiffResult['diff'],
   contradictions: SemanticDiffResult['contradictions'],
-): { assessment: 'safe' | 'warn' | 'block'; issues: string[] } {
+): { assessment: 'safe' | 'warn'; issues: string[] } {
   const issues: string[] = [];
 
   // High-severity contradictions = warn (not block yet, non-blocking mode)
