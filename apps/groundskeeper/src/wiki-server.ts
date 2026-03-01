@@ -137,14 +137,14 @@ export async function registerAsActiveAgent(
       return result.data.id;
     }
 
-    console.log(
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
+    logger.warn(
+      {
         event: "active_agent_registration_failed",
         attempt: attempt + 1,
         maxRetries: REGISTER_MAX_RETRIES,
         error: result.error,
-      }),
+      },
+      "Active agent registration failed",
     );
 
     // Don't delay after the last attempt

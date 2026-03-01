@@ -13,7 +13,6 @@ import {
   CreateAgentSessionSchema,
   UpdateAgentSessionSchema,
 } from "../api-types.js";
-import { logger } from "../logger.js";
 
 const agentSessionsApp = new Hono()
   // ---- POST / (create or update agent session by branch) ----
