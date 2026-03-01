@@ -2,6 +2,8 @@ import type { Config } from "../config.js";
 import { getOctokit, parseRepo } from "../github.js";
 import { runClaude } from "../claude.js";
 import { sendDiscordNotification } from "../notify.js";
+import { logger as rootLogger } from "../logger.js";
+import { sleep } from "../sleep.js";
 
 /**
  * Issue Responder — polls GitHub for issues/PRs labeled `groundskeeper-autofix`
@@ -18,11 +20,26 @@ import { sendDiscordNotification } from "../notify.js";
  * - Only processes one item per poll cycle to stay within AI budget
  * - Respects the daily run cap (checked inside runClaude)
  * - Does NOT close issues or merge PRs — leaves that to humans
+ * - Uses optimistic claim-then-verify to prevent race conditions
  */
 
 const TRIGGER_LABEL = "groundskeeper-autofix";
 const WORKING_LABEL = "claude-working";
 const COMMENT_TRIGGER = "/groundskeeper";
+
+/** Machine-parseable markers for comment detection (not user-facing text). */
+const CLAIM_MARKER = "<!-- groundskeeper-claim -->";
+const RESPONSE_MARKER = "<!-- groundskeeper-response -->";
+
+/** Delay between sequential GitHub API calls to avoid rate limits. */
+const API_CALL_DELAY_MS = 250;
+
+/** Max retries for label removal. */
+const LABEL_REMOVE_MAX_RETRIES = 3;
+/** Base delay for exponential backoff on label removal retries. */
+const LABEL_REMOVE_BASE_DELAY_MS = 1000;
+
+const logger = rootLogger.child({ task: "issue-responder" });
 
 interface WorkItem {
   number: number;
@@ -88,6 +105,7 @@ async function findLabeledItems(config: Config): Promise<WorkItem[]> {
     let branch: string | undefined;
 
     if (isPR) {
+      await sleep(API_CALL_DELAY_MS);
       const { data: pr } = await octokit.rest.pulls.get({
         owner,
         repo,
@@ -147,6 +165,8 @@ async function findCommentTriggeredItems(
     if (seen.has(issueNumber)) continue;
     seen.add(issueNumber);
 
+    await sleep(API_CALL_DELAY_MS);
+
     // Check the issue isn't already being worked on
     const { data: issue } = await octokit.rest.issues.get({
       owner,
@@ -158,7 +178,8 @@ async function findCommentTriggeredItems(
     if (hasLabel(issue.labels, WORKING_LABEL)) continue;
 
     // Check we haven't already responded to this comment
-    // (look for a groundskeeper reply after this comment)
+    // Uses machine-parseable marker to avoid false positives from user comments
+    await sleep(API_CALL_DELAY_MS);
     const { data: issueComments } = await octokit.rest.issues.listComments({
       owner,
       repo,
@@ -168,7 +189,7 @@ async function findCommentTriggeredItems(
     });
     const alreadyResponded = issueComments.some(
       (c) =>
-        c.body?.includes("**Groundskeeper**") &&
+        c.body?.includes(RESPONSE_MARKER) &&
         c.id !== comment.id &&
         new Date(c.created_at) > new Date(comment.created_at)
     );
@@ -178,6 +199,7 @@ async function findCommentTriggeredItems(
     let branch: string | undefined;
 
     if (isPR) {
+      await sleep(API_CALL_DELAY_MS);
       const { data: pr } = await octokit.rest.pulls.get({
         owner,
         repo,
@@ -218,6 +240,118 @@ async function hasLinkedClaudePR(
       pr.head.ref.startsWith("claude/") &&
       pr.body?.includes(`#${issueNumber}`)
   );
+}
+
+/**
+ * Claim an issue by adding the working label and posting a claim comment.
+ * After claiming, verifies no other instance claimed concurrently.
+ *
+ * Returns `true` if claim succeeded, `false` if another instance won the race.
+ */
+async function claimItem(
+  config: Config,
+  item: WorkItem
+): Promise<boolean> {
+  const octokit = getOctokit(config);
+  const { owner, repo } = parseRepo(config);
+  const itemType = item.isPR ? "PR" : "issue";
+
+  // Step 1: Add the working label immediately (atomic GitHub operation)
+  await octokit.rest.issues.addLabels({
+    owner,
+    repo,
+    issue_number: item.number,
+    labels: [WORKING_LABEL],
+  });
+
+  // Step 2: Post claim comment with machine-parseable marker
+  await octokit.rest.issues.createComment({
+    owner,
+    repo,
+    issue_number: item.number,
+    body: `${CLAIM_MARKER}\n🤖 **Groundskeeper** is picking up this ${itemType}. Starting Claude Code session...`,
+  });
+
+  // Step 3: Verify no concurrent claim by checking for other claim comments
+  // A small delay to let any concurrent writes settle
+  await sleep(API_CALL_DELAY_MS);
+
+  const { data: recentComments } = await octokit.rest.issues.listComments({
+    owner,
+    repo,
+    issue_number: item.number,
+    per_page: 10,
+  });
+
+  // Look for claim markers — if there are multiple, another instance raced us
+  const claimComments = recentComments.filter((c) =>
+    c.body?.includes(CLAIM_MARKER)
+  );
+
+  if (claimComments.length > 1) {
+    // Multiple claims detected — the earliest comment wins
+    const sorted = claimComments.sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
+    const ourClaim = claimComments[claimComments.length - 1]; // We posted last (most likely)
+    const winner = sorted[0];
+
+    if (winner.id !== ourClaim.id) {
+      // We lost the race — back off
+      logger.warn(
+        { issueNumber: item.number, claimCount: claimComments.length },
+        "Race condition detected: another instance claimed this item first"
+      );
+
+      // Remove our label claim (best effort)
+      await removeLabelWithRetry(config, item.number);
+
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Remove the working label with exponential backoff retry.
+ * Prevents orphaned labels when the API call fails transiently.
+ */
+async function removeLabelWithRetry(
+  config: Config,
+  issueNumber: number
+): Promise<void> {
+  const octokit = getOctokit(config);
+  const { owner, repo } = parseRepo(config);
+
+  for (let attempt = 0; attempt < LABEL_REMOVE_MAX_RETRIES; attempt++) {
+    try {
+      await octokit.rest.issues.removeLabel({
+        owner,
+        repo,
+        issue_number: issueNumber,
+        name: WORKING_LABEL,
+      });
+      return; // Success
+    } catch (error) {
+      const isLastAttempt = attempt === LABEL_REMOVE_MAX_RETRIES - 1;
+      if (isLastAttempt) {
+        logger.error(
+          { issueNumber, attempt, error },
+          "Failed to remove working label after all retries — label may be orphaned"
+        );
+        return; // Give up, but don't throw
+      }
+
+      const delayMs = LABEL_REMOVE_BASE_DELAY_MS * Math.pow(2, attempt);
+      logger.warn(
+        { issueNumber, attempt, delayMs, error },
+        "Failed to remove working label, retrying..."
+      );
+      await sleep(delayMs);
+    }
+  }
 }
 
 /** Fetch review comments on a PR to include as context. */
@@ -295,24 +429,18 @@ export async function issueResponder(
     };
   }
 
+  // Claim the item with race-condition protection
+  const claimed = await claimItem(config, item);
+  if (!claimed) {
+    return {
+      success: true,
+      summary: `Issue #${item.number} claimed by another instance, skipping`,
+    };
+  }
+
   const octokit = getOctokit(config);
   const { owner, repo } = parseRepo(config);
-
-  // Claim the item
-  await octokit.rest.issues.addLabels({
-    owner,
-    repo,
-    issue_number: item.number,
-    labels: [WORKING_LABEL],
-  });
-
   const itemType = item.isPR ? "PR" : "issue";
-  await octokit.rest.issues.createComment({
-    owner,
-    repo,
-    issue_number: item.number,
-    body: `🤖 **Groundskeeper** is picking up this ${itemType}. Starting Claude Code session...`,
-  });
 
   await sendDiscordNotification(
     config,
@@ -334,17 +462,8 @@ export async function issueResponder(
     maxTurns: 30,
   });
 
-  // Remove the working label regardless of outcome
-  try {
-    await octokit.rest.issues.removeLabel({
-      owner,
-      repo,
-      issue_number: item.number,
-      name: WORKING_LABEL,
-    });
-  } catch {
-    // Label may already be removed
-  }
+  // Remove the working label with retry
+  await removeLabelWithRetry(config, item.number);
 
   if (result.success) {
     const outputPreview =
@@ -356,7 +475,7 @@ export async function issueResponder(
       owner,
       repo,
       issue_number: item.number,
-      body: `✅ **Groundskeeper** finished working on this ${itemType} (${Math.round(result.durationMs / 1000)}s).\n\n<details>\n<summary>Claude Code output</summary>\n\n\`\`\`\n${outputPreview}\n\`\`\`\n\n</details>`,
+      body: `${RESPONSE_MARKER}\n✅ **Groundskeeper** finished working on this ${itemType} (${Math.round(result.durationMs / 1000)}s).\n\n<details>\n<summary>Claude Code output</summary>\n\n\`\`\`\n${outputPreview}\n\`\`\`\n\n</details>`,
     });
 
     await sendDiscordNotification(
@@ -373,7 +492,7 @@ export async function issueResponder(
       owner,
       repo,
       issue_number: item.number,
-      body: `❌ **Groundskeeper** could not resolve this ${itemType} automatically.\n\nError: ${result.output.slice(0, 1000)}`,
+      body: `${RESPONSE_MARKER}\n❌ **Groundskeeper** could not resolve this ${itemType} automatically.\n\nError: ${result.output.slice(0, 1000)}`,
     });
 
     await sendDiscordNotification(
