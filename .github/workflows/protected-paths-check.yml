@@ -33,6 +33,7 @@ jobs:
               /^crux\/lib\/session-checklist\.ts$/,
               /^crux\/lib\/page-templates\.ts$/,
               /^crux\/auto-update\//,
+              /^\.squawk\.toml$/,
             ];
 
             const REVIEW_LABEL = 'rules-change-reviewed';
@@ -74,6 +75,7 @@ jobs:
               'Session checklist (crux/lib/session-checklist.ts)': [],
               'Page templates (crux/lib/page-templates.ts)': [],
               'Auto-update system (crux/auto-update/)': [],
+              'Linter config (.squawk.toml)': [],
             };
 
             for (const file of protectedFiles) {
@@ -90,6 +92,7 @@ jobs:
               else if (/^crux\/lib\/session-checklist\.ts$/.test(file)) categories['Session checklist (crux/lib/session-checklist.ts)'].push(file);
               else if (/^crux\/lib\/page-templates\.ts$/.test(file)) categories['Page templates (crux/lib/page-templates.ts)'].push(file);
               else if (/^crux\/auto-update\//.test(file)) categories['Auto-update system (crux/auto-update/)'].push(file);
+              else if (/^\.squawk\.toml$/.test(file)) categories['Linter config (.squawk.toml)'].push(file);
             }
 
             // Check if the review label is present AND was added by a human
