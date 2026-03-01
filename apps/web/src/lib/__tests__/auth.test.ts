@@ -1,83 +1,47 @@
-import { describe, it, expect } from "vitest";
-import {
-  generateSessionToken,
-  verifySessionToken,
-  verifyPassword,
-  isSafeRedirect,
-} from "../auth";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { isAllowedUser, isSafeRedirect } from "../auth";
 
 describe("auth", () => {
-  const SECRET = "test-admin-password-123";
-
-  describe("generateSessionToken", () => {
-    it("produces a token with nonce.hmac format", () => {
-      const token = generateSessionToken(SECRET);
-      const parts = token.split(".");
-      expect(parts).toHaveLength(2);
-      expect(parts[0]).toMatch(/^[0-9a-f]{64}$/); // 32 bytes = 64 hex chars
-      expect(parts[1]).toMatch(/^[0-9a-f]{64}$/); // SHA-256 HMAC = 64 hex chars
+  describe("isAllowedUser", () => {
+    beforeEach(() => {
+      process.env.ADMIN_GITHUB_USERS = "alice,bob,charlie";
     });
 
-    it("generates unique tokens each time", () => {
-      const t1 = generateSessionToken(SECRET);
-      const t2 = generateSessionToken(SECRET);
-      expect(t1).not.toBe(t2);
-    });
-  });
-
-  describe("verifySessionToken", () => {
-    it("accepts a token generated with the same secret", () => {
-      const token = generateSessionToken(SECRET);
-      expect(verifySessionToken(token, SECRET)).toBe(true);
+    afterEach(() => {
+      delete process.env.ADMIN_GITHUB_USERS;
     });
 
-    it("rejects a token generated with a different secret", () => {
-      const token = generateSessionToken(SECRET);
-      expect(verifySessionToken(token, "wrong-secret")).toBe(false);
+    it("allows a user in the allowlist", () => {
+      expect(isAllowedUser("alice")).toBe(true);
+      expect(isAllowedUser("bob")).toBe(true);
+      expect(isAllowedUser("charlie")).toBe(true);
     });
 
-    it("rejects the old hardcoded 'authenticated' value", () => {
-      expect(verifySessionToken("authenticated", SECRET)).toBe(false);
+    it("is case-insensitive", () => {
+      expect(isAllowedUser("Alice")).toBe(true);
+      expect(isAllowedUser("BOB")).toBe(true);
     });
 
-    it("rejects empty string", () => {
-      expect(verifySessionToken("", SECRET)).toBe(false);
+    it("rejects a user not in the allowlist", () => {
+      expect(isAllowedUser("mallory")).toBe(false);
+      expect(isAllowedUser("")).toBe(false);
     });
 
-    it("rejects token with tampered nonce", () => {
-      const token = generateSessionToken(SECRET);
-      const [, hmac] = token.split(".");
-      const tampered = "00".repeat(32) + "." + hmac;
-      expect(verifySessionToken(tampered, SECRET)).toBe(false);
+    it("denies all users when ADMIN_GITHUB_USERS is not set", () => {
+      delete process.env.ADMIN_GITHUB_USERS;
+      expect(isAllowedUser("alice")).toBe(false);
+      expect(isAllowedUser("admin")).toBe(false);
     });
 
-    it("rejects token with tampered HMAC", () => {
-      const token = generateSessionToken(SECRET);
-      const [nonce] = token.split(".");
-      const tampered = nonce + "." + "00".repeat(32);
-      expect(verifySessionToken(tampered, SECRET)).toBe(false);
+    it("denies all users when ADMIN_GITHUB_USERS is empty string", () => {
+      process.env.ADMIN_GITHUB_USERS = "";
+      expect(isAllowedUser("alice")).toBe(false);
     });
 
-    it("rejects token without dot separator", () => {
-      expect(verifySessionToken("abcdef1234567890", SECRET)).toBe(false);
-    });
-  });
-
-  describe("verifyPassword", () => {
-    it("accepts matching passwords", () => {
-      expect(verifyPassword("correct-password", "correct-password")).toBe(true);
-    });
-
-    it("rejects non-matching passwords of same length", () => {
-      expect(verifyPassword("password-aaa", "password-bbb")).toBe(false);
-    });
-
-    it("rejects non-matching passwords of different length", () => {
-      expect(verifyPassword("short", "a-much-longer-password")).toBe(false);
-    });
-
-    it("rejects empty password against non-empty", () => {
-      expect(verifyPassword("", "secret")).toBe(false);
+    it("handles whitespace around usernames", () => {
+      process.env.ADMIN_GITHUB_USERS = " alice , bob , charlie ";
+      expect(isAllowedUser("alice")).toBe(true);
+      expect(isAllowedUser("bob")).toBe(true);
     });
   });
 
