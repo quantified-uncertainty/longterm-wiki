@@ -1,10 +1,12 @@
 import {
   fetchDetailed,
+  fetchFromWikiServer,
   withApiFallback,
   type FetchResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { SystemHealthTable } from "./system-health-table";
+import { OpenPRsTable, type OpenPRDisplayRow } from "./open-prs-table";
 // ── Types ─────────────────────────────────────────────────────────────────
 
 // Defined locally because MonitoringStatusResult (Hono RPC inferred) degrades
@@ -200,11 +202,20 @@ function OverallBanner({ status }: { status: string }) {
 
 // ── Content Component ────────────────────────────────────────────────────
 
+interface PullsApiResponse {
+  pulls: OpenPRDisplayRow[];
+  error?: string;
+}
+
 export async function SystemHealthContent() {
-  const { data, source, apiError } = await withApiFallback(
-    loadFromApi,
-    noLocalFallback
-  );
+  const [{ data, source, apiError }, pullsData] = await Promise.all([
+    withApiFallback(loadFromApi, noLocalFallback),
+    fetchFromWikiServer<PullsApiResponse>("/api/github/pulls", {
+      revalidate: 30,
+    }),
+  ]);
+
+  const openPRs: OpenPRDisplayRow[] = pullsData?.pulls ?? [];
 
   const { overall, services, dbCounts, recentIncidents, jobsQueue, activeAgents } =
     data;
@@ -256,11 +267,21 @@ export async function SystemHealthContent() {
       )}
 
       {/* Quick stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         <StatCard
           label="Active agents"
           value={activeAgents}
           colorClass={activeAgents > 0 ? "text-blue-600" : undefined}
+        />
+        <StatCard
+          label="Open PRs"
+          value={openPRs.length}
+          subtext={
+            openPRs.filter((p) => p.mergeable === "conflicting").length > 0
+              ? `${openPRs.filter((p) => p.mergeable === "conflicting").length} with conflicts`
+              : undefined
+          }
+          colorClass={openPRs.length > 0 ? "text-purple-600" : undefined}
         />
         <StatCard
           label="Open incidents"
@@ -284,6 +305,25 @@ export async function SystemHealthContent() {
           subtext={pendingJobs > 0 ? `${pendingJobs} pending` : "idle"}
         />
       </div>
+
+      {/* Open Pull Requests */}
+      <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+        Open pull requests
+      </h3>
+      {openPRs.length === 0 ? (
+        <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground mb-6">
+          <p className="text-lg font-medium mb-2">No open pull requests</p>
+          <p className="text-sm">
+            {pullsData?.error
+              ? `Could not fetch PRs: ${pullsData.error}`
+              : "Open PRs will appear here when agents or contributors create them."}
+          </p>
+        </div>
+      ) : (
+        <div className="mb-6">
+          <OpenPRsTable data={openPRs} />
+        </div>
+      )}
 
       {/* Recent incidents */}
       <h3 className="text-sm font-semibold text-muted-foreground mb-3">
