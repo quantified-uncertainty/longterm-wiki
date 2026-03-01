@@ -78,6 +78,12 @@ export type SimilarClaimItem = SimilarClaimsResult['claims'][number];
 /** Paginated claims list response from /all. */
 export type GetAllClaimsResult = InferResponseType<ClaimsRpc['all']['$get'], 200>;
 
+/** Claims quality metrics response from /quality. */
+export type ClaimsQualityResult = InferResponseType<ClaimsRpc['quality']['$get'], 200>;
+
+/** Per-entity quality metrics entry. */
+export type EntityQualityEntry = ClaimsQualityResult['entities'][number];
+
 /** Claims network graph response. */
 export type ClaimsNetworkResult = InferResponseType<ClaimsRpc['network']['$get'], 200>;
 
