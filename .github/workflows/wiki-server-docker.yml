@@ -107,17 +107,18 @@ jobs:
             fi
           done
 
-          # Always clean up the container regardless of test outcome.
-          echo "Stopping and removing smoke-test container..."
-          docker stop "$CONTAINER_NAME" || true
-          docker rm "$CONTAINER_NAME" || true
-
           if [ "$STATUS" != "healthy" ]; then
             echo "::error::Pre-deploy smoke test failed — container did not become healthy within $((MAX_ATTEMPTS * DELAY))s. Aborting deploy to prevent serving broken traffic."
             exit 1
           fi
 
           echo "Pre-deploy smoke test passed — container is healthy. Proceeding with deploy."
+
+      - name: Clean up smoke test container
+        if: always()
+        run: |
+          docker stop "smoke-test-${{ github.run_id }}" 2>/dev/null || true
+          docker rm "smoke-test-${{ github.run_id }}" 2>/dev/null || true
 
   pre-deploy-backup:
     name: Pre-deploy database backup
@@ -131,10 +132,13 @@ jobs:
   deploy:
     name: Deploy to ArgoCD
     needs: [build-and-push, pre-deploy-smoke-test, pre-deploy-backup]
-    if: github.ref == 'refs/heads/main' && !cancelled()
+    if: >-
+      github.ref == 'refs/heads/main'
+      && !cancelled()
+      && needs.pre-deploy-smoke-test.result == 'success'
     # Deploy proceeds even if backup fails (DATABASE_URL may not be configured yet).
     # Once DATABASE_URL is added, backup failures will be visible but non-blocking.
-    # Pre-deploy smoke test failure DOES block the deploy (job dependency enforces this).
+    # Pre-deploy smoke test failure explicitly blocks the deploy (checked in the `if` condition above).
     runs-on: ubuntu-latest
 
     steps:
