@@ -1,17 +1,27 @@
 import { cookies } from "next/headers";
 
-/** Cookie name for the admin session. */
-export const ADMIN_COOKIE_NAME = "admin_session";
-/** Simple token value stored in the cookie when authenticated. */
-export const ADMIN_TOKEN_VALUE = "authenticated";
+// Re-export shared token utilities so consumers can import from one place.
+// The core crypto lives in admin-token.ts (no next/headers dependency, Edge-safe).
+export {
+  ADMIN_COOKIE_NAME,
+  generateAdminToken,
+  verifyAdminToken,
+  TOKEN_MAX_AGE_SECONDS,
+} from "./admin-token";
 
 /**
  * Check whether the current request has a valid admin session.
  * Call from Server Components or Route Handlers (uses next/headers).
  */
 export async function isAdmin(): Promise<boolean> {
-  if (!process.env.ADMIN_PASSWORD) return false;
+  const password = process.env.ADMIN_PASSWORD;
+  if (!password) return false;
 
   const cookieStore = await cookies();
-  return cookieStore.get(ADMIN_COOKIE_NAME)?.value === ADMIN_TOKEN_VALUE;
+  const token = cookieStore.get("admin_session")?.value;
+  if (!token) return false;
+
+  // Dynamic import to avoid top-level await issues in some Next.js contexts
+  const { verifyAdminToken } = await import("./admin-token");
+  return verifyAdminToken(token, password);
 }

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ADMIN_COOKIE_NAME, ADMIN_TOKEN_VALUE } from "@/lib/auth";
+import {
+  ADMIN_COOKIE_NAME,
+  generateAdminToken,
+  getTokenMaxAge,
+} from "@/lib/admin-token";
 
 export async function POST(request: NextRequest) {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -17,14 +21,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid password" }, { status: 401 });
   }
 
+  const token = await generateAdminToken(adminPassword);
+  const maxAge = getTokenMaxAge();
+
   const response = NextResponse.json({ ok: true });
-  response.cookies.set(ADMIN_COOKIE_NAME, ADMIN_TOKEN_VALUE, {
+  response.cookies.set(ADMIN_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    // 30 days
-    maxAge: 60 * 60 * 24 * 30,
+    maxAge,
   });
 
   return response;

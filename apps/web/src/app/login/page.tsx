@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { isSafeRedirect } from "@/lib/safe-redirect";
 
 function LoginForm() {
   const [password, setPassword] = useState("");
@@ -23,7 +24,8 @@ function LoginForm() {
       });
 
       if (res.ok) {
-        const redirectTo = searchParams.get("from") || "/internal";
+        const from = searchParams.get("from");
+        const redirectTo = from && isSafeRedirect(from) ? from : "/internal";
         router.push(redirectTo);
         router.refresh();
       } else {
