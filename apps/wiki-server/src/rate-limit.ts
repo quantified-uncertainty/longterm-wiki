@@ -286,6 +286,8 @@ export interface RateLimitMiddlewareOptions {
   readMethods?: string[];
   /** Paths to skip rate limiting entirely (exact match, not prefix). */
   skipPaths?: string[];
+  /** Skip rate limiting for requests with a valid Bearer token. */
+  skipAuthenticated?: boolean;
 }
 
 /**
@@ -309,6 +311,18 @@ export function rateLimitMiddleware(
     if (skipPaths.has(c.req.path)) {
       await next();
       return;
+    }
+
+    // Skip rate limiting for authenticated requests — they're already
+    // gated by bearer auth and represent trusted internal traffic
+    // (CI sync, Next.js ISR, crux CLI). Rate limiting is for
+    // protecting against unauthenticated abuse.
+    if (options.skipAuthenticated) {
+      const authHeader = c.req.header("Authorization");
+      if (authHeader?.startsWith("Bearer ")) {
+        await next();
+        return;
+      }
     }
 
     const clientKey = getClientKey(c);

@@ -64,6 +64,8 @@ export function createApp() {
   // Rate limiting middleware — applied before auth so that abusive traffic
   // is rejected early without touching the database or auth layer.
   // Health endpoint is exempt so monitoring probes are never throttled.
+  // Authenticated requests (Bearer token) are exempt since they represent
+  // trusted internal traffic (CI sync, Next.js ISR, crux CLI).
   const { readLimiter, writeLimiter } = createDefaultRateLimiters();
   readLimiter.startCleanup();
   writeLimiter.startCleanup();
@@ -73,7 +75,8 @@ export function createApp() {
     rateLimitMiddleware({
       readLimiter,
       writeLimiter,
-      skipPaths: ["/health", "/api/pages/sync"],
+      skipPaths: ["/health"],
+      skipAuthenticated: true,
     })
   );
 
