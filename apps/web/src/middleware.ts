@@ -29,17 +29,27 @@ const KB_CATEGORIES = new Set([
   "worldviews",
 ]);
 
+/**
+ * Whether GitHub OAuth is fully configured.
+ * Requires GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, and NEXTAUTH_SECRET.
+ * If any is missing, auth is disabled (open dev mode OR clear misconfiguration).
+ */
+function isOAuthConfigured(): boolean {
+  return (
+    !!process.env.GITHUB_CLIENT_ID &&
+    !!process.env.GITHUB_CLIENT_SECRET &&
+    !!process.env.NEXTAUTH_SECRET
+  );
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // --- Admin auth gate ---
-  // When GITHUB_CLIENT_ID is set, /internal/* requires a valid next-auth session.
-  // If not set, internal pages remain open (dev mode / no-auth deployments).
+  // When GitHub OAuth env vars are fully configured, /internal/* requires a valid session.
+  // If not configured, internal pages remain open (dev mode / no-auth deployments).
   if (pathname.startsWith("/internal")) {
-    const oauthConfigured =
-      !!process.env.GITHUB_CLIENT_ID && !!process.env.GITHUB_CLIENT_SECRET;
-
-    if (oauthConfigured) {
+    if (isOAuthConfigured()) {
       const token = await getToken({
         req: request,
         secret: process.env.NEXTAUTH_SECRET,
@@ -48,7 +58,9 @@ export async function middleware(request: NextRequest) {
       if (!token) {
         const loginUrl = request.nextUrl.clone();
         loginUrl.pathname = "/login";
-        // next-auth uses `callbackUrl` for post-login redirect
+        // next-auth uses `callbackUrl` for post-login redirect.
+        // request.nextUrl.href is always same-origin; next-auth also validates
+        // callbackUrl against NEXTAUTH_URL in its redirect callback.
         loginUrl.searchParams.set("callbackUrl", request.nextUrl.href);
         return NextResponse.redirect(loginUrl);
       }
@@ -57,10 +69,7 @@ export async function middleware(request: NextRequest) {
 
   // If already logged in and visiting /login, redirect to /internal
   if (pathname === "/login") {
-    const oauthConfigured =
-      !!process.env.GITHUB_CLIENT_ID && !!process.env.GITHUB_CLIENT_SECRET;
-
-    if (oauthConfigured) {
+    if (isOAuthConfigured()) {
       const token = await getToken({
         req: request,
         secret: process.env.NEXTAUTH_SECRET,

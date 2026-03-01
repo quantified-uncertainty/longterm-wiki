@@ -96,7 +96,9 @@ export const authOptions: NextAuthOptions = {
  */
 export async function isAdmin(): Promise<boolean> {
   const oauthConfigured =
-    !!process.env.GITHUB_CLIENT_ID && !!process.env.GITHUB_CLIENT_SECRET;
+    !!process.env.GITHUB_CLIENT_ID &&
+    !!process.env.GITHUB_CLIENT_SECRET &&
+    !!process.env.NEXTAUTH_SECRET;
   if (!oauthConfigured) return false;
 
   const session = await getServerSession(authOptions);
