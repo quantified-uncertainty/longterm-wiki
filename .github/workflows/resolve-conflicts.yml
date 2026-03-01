@@ -40,7 +40,16 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  preflight:
+    # Global circuit breaker — skip when automation is paused.
+    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Automation is active"
+
   find-conflicted-prs:
+    needs: [preflight]
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.find.outputs.matrix }}

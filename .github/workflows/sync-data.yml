@@ -11,7 +11,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  preflight:
+    # Global circuit breaker — skip when automation is paused or wiki-server is down.
+    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check wiki-server health
+        run: |
+          curl -sf --max-time 10 "${{ secrets.LONGTERMWIKI_SERVER_URL }}/health" || {
+            echo "::warning::Wiki-server unreachable — skipping workflow"
+            exit 1
+          }
+          echo "Wiki-server is healthy"
+
   sync-data:
+    needs: [preflight]
     runs-on: ubuntu-latest
 
     steps:
