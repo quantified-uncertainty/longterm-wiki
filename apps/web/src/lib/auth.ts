@@ -1,70 +1,106 @@
-import { cookies } from "next/headers";
-import { createHmac, randomBytes, timingSafeEqual } from "crypto";
-
-/** Cookie name for the admin session. */
-export const ADMIN_COOKIE_NAME = "admin_session";
+import type { NextAuthOptions } from "next-auth";
+import { getServerSession } from "next-auth/next";
+import GithubProvider from "next-auth/providers/github";
 
 /**
- * Generate a signed session token: `<random-hex>.<hmac-hex>`.
- * The HMAC is keyed with ADMIN_PASSWORD so tokens can't be forged
- * without knowing the password.
+ * Parse the ADMIN_GITHUB_USERS env var into a Set of lowercase usernames.
+ * Returns an empty Set if the var is not set.
  */
-export function generateSessionToken(secret: string): string {
-  const nonce = randomBytes(32).toString("hex");
-  const hmac = createHmac("sha256", secret).update(nonce).digest("hex");
-  return `${nonce}.${hmac}`;
+function parseAllowedUsers(): Set<string> {
+  const raw = process.env.ADMIN_GITHUB_USERS ?? "";
+  if (!raw.trim()) return new Set();
+  return new Set(
+    raw
+      .split(",")
+      .map((u) => u.trim().toLowerCase())
+      .filter(Boolean),
+  );
 }
 
 /**
- * Verify a session token's HMAC signature.
- * Returns true only if the token has a valid format and its HMAC
- * matches re-computation with the given secret.
+ * Check if a GitHub username is in the admin allowlist.
  */
-export function verifySessionToken(
-  token: string,
-  secret: string,
-): boolean {
-  const dotIndex = token.indexOf(".");
-  if (dotIndex === -1) return false;
-
-  const nonce = token.slice(0, dotIndex);
-  const providedHmac = token.slice(dotIndex + 1);
-
-  // Reject obviously malformed tokens
-  if (!nonce || !providedHmac) return false;
-
-  const expectedHmac = createHmac("sha256", secret)
-    .update(nonce)
-    .digest("hex");
-
-  // Timing-safe comparison to prevent timing attacks on the HMAC
-  try {
-    const a = Buffer.from(providedHmac, "hex");
-    const b = Buffer.from(expectedHmac, "hex");
-    if (a.length !== b.length) return false;
-    return timingSafeEqual(a, b);
-  } catch {
-    return false;
-  }
+export function isAllowedUser(username: string): boolean {
+  const allowed = parseAllowedUsers();
+  // If no allowlist is configured, deny all (fail-closed)
+  if (allowed.size === 0) return false;
+  return allowed.has(username.toLowerCase());
 }
 
 /**
- * Timing-safe password comparison.
- * Prevents timing attacks that could reveal password length or content.
+ * NextAuth.js configuration with GitHub OAuth provider.
+ *
+ * Required env vars:
+ *   GITHUB_CLIENT_ID      — GitHub OAuth App client ID
+ *   GITHUB_CLIENT_SECRET  — GitHub OAuth App client secret
+ *   NEXTAUTH_SECRET       — Random secret for signing JWTs (openssl rand -base64 32)
+ *   ADMIN_GITHUB_USERS    — Comma-separated list of allowed GitHub usernames
+ *
+ * If GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET are not set, the provider list
+ * is empty and the auth system is effectively disabled (open for local dev).
  */
-export function verifyPassword(
-  provided: string,
-  expected: string,
-): boolean {
-  const a = Buffer.from(provided);
-  const b = Buffer.from(expected);
-  if (a.length !== b.length) {
-    // Still do a comparison to avoid short-circuiting timing leak,
-    // but always return false for length mismatch.
-    timingSafeEqual(a, Buffer.alloc(a.length));
-    return false;
-  }
-  return timingSafeEqual(a, b);
+export const authOptions: NextAuthOptions = {
+  providers: [
+    ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+      ? [
+          GithubProvider({
+            clientId: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+          }),
+        ]
+      : []),
+  ],
+
+  callbacks: {
+    async signIn({ profile }) {
+      const username = (profile as { login?: string })?.login;
+      if (!username) return false;
+      return isAllowedUser(username);
+    },
+
+    async jwt({ token, profile }) {
+      // Persist GitHub username in the JWT so we can check it later
+      if (profile) {
+        token.githubLogin = (profile as { login?: string })?.login ?? null;
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      // Expose GitHub username in the session object
+      if (session.user) {
+        (session.user as { githubLogin?: string | null }).githubLogin =
+          (token.githubLogin as string | null) ?? null;
+      }
+      return session;
+    },
+  },
+
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+
+  session: {
+    strategy: "jwt",
+    // 30-day session lifetime
+    maxAge: 60 * 60 * 24 * 30,
+  },
+};
+
+/**
+ * Check whether the current request has a valid admin session.
+ * Call from Server Components or Route Handlers (uses next-auth getServerSession).
+ *
+ * Returns false when OAuth is not configured (dev mode / no-auth deployments).
+ */
+export async function isAdmin(): Promise<boolean> {
+  const oauthConfigured =
+    !!process.env.GITHUB_CLIENT_ID && !!process.env.GITHUB_CLIENT_SECRET;
+  if (!oauthConfigured) return false;
+
+  const session = await getServerSession(authOptions);
+  return !!session;
 }
 
 /**
@@ -82,19 +118,4 @@ export function isSafeRedirect(url: string): boolean {
   // Block backslash variants (some browsers normalize \ to /)
   if (url.includes("\\")) return false;
   return true;
-}
-
-/**
- * Check whether the current request has a valid admin session.
- * Call from Server Components or Route Handlers (uses next/headers).
- */
-export async function isAdmin(): Promise<boolean> {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) return false;
-
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
-  if (!token) return false;
-
-  return verifySessionToken(token, adminPassword);
 }

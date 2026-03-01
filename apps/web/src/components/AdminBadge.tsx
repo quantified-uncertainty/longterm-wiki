@@ -1,14 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 export function AdminBadge() {
-  const router = useRouter();
-
   async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-    router.refresh();
+    await signOut({ callbackUrl: "/" });
   }
 
   return (
