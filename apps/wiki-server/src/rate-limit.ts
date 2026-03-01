@@ -9,10 +9,94 @@
  *   - "write" (POST/PUT/DELETE/PATCH): stricter limits (default 20 req/min)
  *
  * Returns 429 Too Many Requests with a Retry-After header when limits are exceeded.
+ *
+ * SECURITY NOTE — X-Forwarded-For Trust
+ * ======================================
+ * This middleware extracts the client IP from X-Forwarded-For / X-Real-IP /
+ * CF-Connecting-IP headers. These headers are trivially spoofable by end users.
+ *
+ * **This server MUST be deployed behind a trusted reverse proxy** (e.g., Fly.io,
+ * Cloudflare, nginx) that overwrites X-Forwarded-For with the real client IP
+ * before forwarding. If the server is exposed directly to the internet without
+ * a trusted proxy, an attacker can rotate the X-Forwarded-For value on every
+ * request to bypass rate limiting entirely.
+ *
+ * As a defense-in-depth measure, the RateLimiter enforces a `maxKeys` cap
+ * (default 10,000). When the number of tracked keys exceeds this threshold,
+ * new keys are denied immediately — preventing unbounded memory growth from
+ * key-flooding attacks even if header spoofing occurs.
  */
 
 import type { Context, MiddlewareHandler } from "hono";
 import { logger } from "./logger.js";
+
+// ---------------------------------------------------------------------------
+// IPv6 normalization
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize an IPv6 address to its /64 prefix for rate limiting.
+ *
+ * IPv6 allocates /64 prefixes to end sites, so different addresses within
+ * the same /64 likely belong to the same user. Normalizing to /64 prevents
+ * an attacker from rotating through addresses within their allocation.
+ *
+ * IPv4 addresses (and IPv4-mapped IPv6 like ::ffff:1.2.3.4) are returned
+ * unchanged.
+ */
+export function normalizeIPv6(ip: string): string {
+  // IPv4 — return as-is
+  if (!ip.includes(":")) {
+    return ip;
+  }
+
+  // IPv4-mapped IPv6 (::ffff:1.2.3.4) — return the IPv4 portion
+  const v4MappedMatch = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
+  if (v4MappedMatch) {
+    return v4MappedMatch[1];
+  }
+
+  // Full IPv6 — normalize to /64 prefix (first 4 groups)
+  const expanded = expandIPv6(ip);
+  if (!expanded) {
+    // If we can't parse it, return as-is rather than silently misclassifying
+    return ip;
+  }
+
+  // Take the first 4 groups (64 bits) and zero out the rest
+  const groups = expanded.split(":");
+  const prefix = groups.slice(0, 4).join(":") + "::/64";
+  return prefix;
+}
+
+/**
+ * Expand an IPv6 address to its full 8-group representation.
+ * Returns null if the address doesn't look like valid IPv6.
+ */
+function expandIPv6(ip: string): string | null {
+  let parts: string[];
+
+  if (ip.includes("::")) {
+    const [left, right] = ip.split("::");
+    const leftParts = left ? left.split(":") : [];
+    const rightParts = right ? right.split(":") : [];
+    const missing = 8 - leftParts.length - rightParts.length;
+
+    if (missing < 0) return null;
+
+    parts = [
+      ...leftParts,
+      ...(Array(missing).fill("0000") as string[]),
+      ...rightParts,
+    ];
+  } else {
+    parts = ip.split(":");
+  }
+
+  if (parts.length !== 8) return null;
+
+  return parts.map((p) => p.padStart(4, "0")).join(":");
+}
 
 // ---------------------------------------------------------------------------
 // Rate limiter core
@@ -33,14 +117,20 @@ interface WindowEntry {
 /**
  * Sliding-window rate limiter. Tracks request timestamps per key and checks
  * whether the key has exceeded its allowed request count within the window.
+ *
+ * The `maxKeys` parameter caps the number of distinct keys tracked. Once
+ * the cap is reached, requests from unknown keys are denied. This prevents
+ * memory exhaustion from key-flooding attacks (e.g., spoofed X-Forwarded-For).
  */
 export class RateLimiter {
   private windows = new Map<string, WindowEntry>();
   private cleanupInterval: ReturnType<typeof setInterval> | null = null;
   readonly config: RateLimitConfig;
+  readonly maxKeys: number;
 
-  constructor(config: RateLimitConfig) {
+  constructor(config: RateLimitConfig, maxKeys = 10_000) {
     this.config = config;
+    this.maxKeys = maxKeys;
   }
 
   /**
@@ -73,6 +163,22 @@ export class RateLimiter {
     const windowStart = now - this.config.windowMs;
 
     let entry = this.windows.get(key);
+
+    // If this is a new key and we've hit the maxKeys cap, deny immediately.
+    // This prevents unbounded memory growth from key-flooding attacks.
+    if (!entry && this.windows.size >= this.maxKeys) {
+      logger.warn(
+        { key, maxKeys: this.maxKeys, currentKeys: this.windows.size },
+        "Rate limiter maxKeys cap reached — denying new key"
+      );
+      return {
+        allowed: false,
+        remaining: 0,
+        retryAfterMs: Math.ceil(this.config.windowMs / 2),
+        resetMs: Math.ceil(this.config.windowMs / 2),
+      };
+    }
+
     if (!entry) {
       entry = { timestamps: [] };
       this.windows.set(key, entry);
@@ -144,6 +250,9 @@ export interface RateLimitResult {
 /** Extract a client identifier from the request for rate limiting. */
 function getClientKey(c: Context): string {
   // Check standard proxy headers first (Fly.io, Cloudflare, nginx, etc.)
+  //
+  // IMPORTANT: These headers are only trustworthy when the server sits behind
+  // a reverse proxy that overwrites them. See the module-level security note.
   const forwarded =
     c.req.header("x-forwarded-for") ||
     c.req.header("x-real-ip") ||
@@ -151,11 +260,21 @@ function getClientKey(c: Context): string {
 
   if (forwarded) {
     // x-forwarded-for may contain "client, proxy1, proxy2" — use the first
-    return forwarded.split(",")[0].trim();
+    const clientIp = forwarded.split(",")[0].trim();
+    return normalizeIPv6(clientIp);
   }
 
-  // Fallback: not ideal in production but fine for dev/local
-  return "unknown";
+  // No proxy headers available. This typically means the server is running
+  // locally or is directly exposed without a reverse proxy. Log a warning
+  // because all requests will share the same rate-limit bucket, which both
+  // degrades service for legitimate users and makes rate limiting ineffective.
+  logger.warn(
+    { path: c.req.path, method: c.req.method },
+    "Rate limiter: no proxy headers found — falling back to shared 'no-proxy-ip' key. " +
+      "Ensure the server is behind a trusted reverse proxy in production."
+  );
+
+  return "no-proxy-ip";
 }
 
 export interface RateLimitMiddlewareOptions {
@@ -165,7 +284,7 @@ export interface RateLimitMiddlewareOptions {
   writeLimiter: RateLimiter;
   /** Methods treated as "read". Defaults to ["GET", "HEAD", "OPTIONS"]. */
   readMethods?: string[];
-  /** Paths to skip rate limiting entirely (exact prefix match). */
+  /** Paths to skip rate limiting entirely (exact match, not prefix). */
   skipPaths?: string[];
 }
 
@@ -181,15 +300,15 @@ export function rateLimitMiddleware(
   const readMethods = new Set(
     options.readMethods ?? ["GET", "HEAD", "OPTIONS"]
   );
-  const skipPaths = options.skipPaths ?? [];
+  const skipPaths = new Set(options.skipPaths ?? []);
 
   return async (c, next) => {
-    // Check if this path should skip rate limiting
-    for (const prefix of skipPaths) {
-      if (c.req.path.startsWith(prefix)) {
-        await next();
-        return;
-      }
+    // Check if this path should skip rate limiting (exact match only).
+    // Using exact match prevents bypass via path traversal tricks like
+    // "/health/../../api/secret" that would match a prefix check.
+    if (skipPaths.has(c.req.path)) {
+      await next();
+      return;
     }
 
     const clientKey = getClientKey(c);
@@ -247,6 +366,9 @@ export const DEFAULT_WRITE_LIMIT: RateLimitConfig = {
   windowMs: 60_000,
 };
 
+/** Default maximum number of distinct IP keys tracked per limiter. */
+export const DEFAULT_MAX_KEYS = 10_000;
+
 /**
  * Create preconfigured rate limiters with default settings.
  * Override individual limits via the options parameter.
@@ -254,15 +376,23 @@ export const DEFAULT_WRITE_LIMIT: RateLimitConfig = {
 export function createDefaultRateLimiters(overrides?: {
   read?: Partial<RateLimitConfig>;
   write?: Partial<RateLimitConfig>;
+  maxKeys?: number;
 }) {
-  const readLimiter = new RateLimiter({
-    ...DEFAULT_READ_LIMIT,
-    ...overrides?.read,
-  });
-  const writeLimiter = new RateLimiter({
-    ...DEFAULT_WRITE_LIMIT,
-    ...overrides?.write,
-  });
+  const maxKeys = overrides?.maxKeys ?? DEFAULT_MAX_KEYS;
+  const readLimiter = new RateLimiter(
+    {
+      ...DEFAULT_READ_LIMIT,
+      ...overrides?.read,
+    },
+    maxKeys
+  );
+  const writeLimiter = new RateLimiter(
+    {
+      ...DEFAULT_WRITE_LIMIT,
+      ...overrides?.write,
+    },
+    maxKeys
+  );
 
   return { readLimiter, writeLimiter };
 }
