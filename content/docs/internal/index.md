@@ -13,27 +13,27 @@ This section contains internal documentation for maintaining and contributing to
 
 ## Getting Started
 
-- <EntityLink id="about-this-wiki">About This Wiki</EntityLink> - Comprehensive overview of how the wiki works, technical architecture, and content organization
+- <EntityLink id="E755" name="about-this-wiki">About This Wiki</EntityLink> - Comprehensive overview of how the wiki works, technical architecture, and content organization
 
 ## Automation and Tools
 
-- <EntityLink id="automation-tools">Automation Tools</EntityLink> - Complete reference for all scripts and CLI workflows
-- <EntityLink id="content-database">Content Database</EntityLink> - Storage architecture (PostgreSQL, caching, YAML)
+- <EntityLink id="E757" name="automation-tools">Automation Tools</EntityLink> - Complete reference for all scripts and CLI workflows
+- <EntityLink id="E759" name="content-database">Content Database</EntityLink> - Storage architecture (PostgreSQL, caching, YAML)
 
 ## Style Guides
 
-- <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> - Guidelines for risk and response pages (kb-2.0)
-- <EntityLink id="models">Model Style Guide</EntityLink> - Guidelines for analytical model pages
-- <EntityLink id="mermaid-diagrams">Mermaid Diagrams</EntityLink> - How to create diagrams
+- <EntityLink id="E763" name="knowledge-base">Knowledge Base Style Guide</EntityLink> - Guidelines for risk and response pages (kb-2.0)
+- <EntityLink id="E737" name="models">Model Style Guide</EntityLink> - Guidelines for analytical model pages
+- <EntityLink id="E735" name="mermaid-diagrams">Mermaid Diagrams</EntityLink> - How to create diagrams
 
 ## Project Management
 
-- <EntityLink id="project-roadmap">Project Roadmap</EntityLink> - Future work, infrastructure improvements, and tracking
+- <EntityLink id="E832" name="project-roadmap">Project Roadmap</EntityLink> - Future work, infrastructure improvements, and tracking
 
 ## Technical Reports
 
 - [Internal Reports](/internal/reports/) - Technical research and design decisions
-  - <EntityLink id="causal-diagram-visualization">Causal Diagram Visualization</EntityLink> - Tools, literature, and best practices
+  - <EntityLink id="E743" name="causal-diagram-visualization">Causal Diagram Visualization</EntityLink> - Tools, literature, and best practices
 
 ---
 
@@ -55,4 +55,4 @@ npm run build:data
 npm run dev
 ```
 
-See <EntityLink id="automation-tools">Automation Tools</EntityLink> for complete command reference.
+See <EntityLink id="E757" name="automation-tools">Automation Tools</EntityLink> for complete command reference.

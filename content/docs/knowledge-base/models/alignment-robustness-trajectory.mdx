@@ -28,9 +28,9 @@ import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 
 ## Overview
 
-Alignment robustness measures how reliably AI systems pursue intended objectives under varying conditions. As capabilities scale, alignment robustness faces increasing pressure from <EntityLink id="E168" name="instrumental-convergence">Instrumental Convergence</EntityLink>, <EntityLink id="distributional-shift">distributional shift</EntityLink>, and <EntityLink id="E93" name="deceptive-alignment">Deceptive Alignment</EntityLink>. This model estimates how robustness degrades with capability scaling and identifies critical thresholds.
+Alignment robustness measures how reliably AI systems pursue intended objectives under varying conditions. As capabilities scale, alignment robustness faces increasing pressure from <EntityLink id="E168" name="instrumental-convergence">Instrumental Convergence</EntityLink>, <EntityLink id="E105" name="distributional-shift">distributional shift</EntityLink>, and <EntityLink id="E93" name="deceptive-alignment">Deceptive Alignment</EntityLink>. This model estimates how robustness degrades with capability scaling and identifies critical thresholds.
 
-**Core insight:** Current alignment techniques (<EntityLink id="rlhf">RLHF</EntityLink>, <EntityLink id="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="process-supervision">process supervision</EntityLink>) show meaningful effectiveness on existing systems but face critical scalability challenges.[^rc-bba0] In scalable oversight games, oversight success drops to roughly 50% at 400 Elo capability gaps between AI systems and human supervisors, and falls below 15% in most game types.[^rc-71f4] Compounding this, larger models exhibit stronger elasticity, reverting toward pre-training behavior distributions after alignment fine-tuning, with alignment fine-tuning degraded by subsequent fine-tuning by orders of magnitude.[^rc-f041] Narrow fine-tuning on insecure code causes broad misalignment in roughly 20% of GPT-4o outputs.[^rc-96e6] Adaptive jailbreak attacks achieve near-100% success rates on frontier models including GPT-4 and all tested Claude variants.[^rc-3735]
+**Core insight:** Current alignment techniques (<EntityLink id="E259" name="rlhf">RLHF</EntityLink>, <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="E455" name="process-supervision">process supervision</EntityLink>) show meaningful effectiveness on existing systems but face critical scalability challenges.[^rc-bba0] In scalable oversight games, oversight success drops to roughly 50% at 400 Elo capability gaps between AI systems and human supervisors, and falls below 15% in most game types.[^rc-71f4] Compounding this, larger models exhibit stronger elasticity, reverting toward pre-training behavior distributions after alignment fine-tuning, with alignment fine-tuning degraded by subsequent fine-tuning by orders of magnitude.[^rc-f041] Narrow fine-tuning on insecure code causes broad misalignment in roughly 20% of GPT-4o outputs.[^rc-96e6] Adaptive jailbreak attacks achieve near-100% success rates on frontier models including GPT-4 and all tested Claude variants.[^rc-3735]
 
 The trajectory creates a potential "alignment valley" where the most dangerous systems are those just capable enough to be dangerous but not capable enough to help solve alignment (see [Critical Thresholds](#critical-thresholds) below).
 
@@ -401,10 +401,10 @@ Your view on alignment robustness trajectory should depend on:
 
 ## Related Models
 
-- <EntityLink id="safety-capability-tradeoff" label="Safety-Capability Gap" /> - Related safety-capability dynamics
-- <EntityLink id="deceptive-alignment-decomposition" label="Deceptive Alignment Decomposition" /> - Deep dive on deception mechanisms
-- <EntityLink id="scheming-likelihood-model" label="Scheming Likelihood Model" /> - When deception becomes likely
-- <EntityLink id="parameter-interaction-network" label="Parameter Interaction Network" /> - How alignment-robustness connects to other parameters
+- <EntityLink id="E262" name="safety-capability-tradeoff" label="Safety-Capability Gap" /> - Related safety-capability dynamics
+- <EntityLink id="E94" name="deceptive-alignment-decomposition" label="Deceptive Alignment Decomposition" /> - Deep dive on deception mechanisms
+- <EntityLink id="E275" name="scheming-likelihood-model" label="Scheming Likelihood Model" /> - When deception becomes likely
+- <EntityLink id="E219" name="parameter-interaction-network" label="Parameter Interaction Network" /> - How alignment-robustness connects to other parameters
 
 ## Strategic Importance
 

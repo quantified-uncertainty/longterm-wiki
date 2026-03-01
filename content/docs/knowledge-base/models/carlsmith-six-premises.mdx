@@ -26,7 +26,7 @@ import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
 
 ## Overview
 
-Joe Carlsmith's 2022 report <R id="6e597a4dc1f6f860">"Is <EntityLink id="power-seeking">Power-Seeking AI</EntityLink> an Existential Risk?"</R> provides the most rigorous public framework for estimating AI existential risk. Rather than offering a single probability, Carlsmith decomposes the argument into **six conditional premises**, each with its own credence. This enables structured disagreement—critics can identify *which* premises they reject rather than disputing a black-box estimate.
+Joe Carlsmith's 2022 report <R id="6e597a4dc1f6f860">"Is <EntityLink id="E226" name="power-seeking">Power-Seeking AI</EntityLink> an Existential Risk?"</R> provides the most rigorous public framework for estimating AI existential risk. Rather than offering a single probability, Carlsmith decomposes the argument into **six conditional premises**, each with its own credence. This enables structured disagreement—critics can identify *which* premises they reject rather than disputing a black-box estimate.
 
 The framework focuses on **APS systems** (Advanced capabilities, agentic Planning, Strategic awareness) and asks: what's the probability that building such systems leads to existential catastrophe through power-seeking behavior?
 
@@ -130,7 +130,7 @@ The most impactful parameters for the overall estimate are P3 (alignment difficu
 
 **Why 40%?** (High uncertainty)
 - Current techniques (RLHF, Constitutional AI) show promise but unproven at scale
-- <EntityLink id="goal-misgeneralization">Goal misgeneralization</EntityLink> is a real phenomenon
+- <EntityLink id="E151" name="goal-misgeneralization">Goal misgeneralization</EntityLink> is a real phenomenon
 - Value specification is genuinely hard
 - But: we're not starting from scratch; we choose training objectives
 
@@ -143,7 +143,7 @@ The most impactful parameters for the overall estimate are P3 (alignment difficu
 **The claim**: Conditional on P1-P3, some deployed misaligned APS systems will seek to gain and maintain power in ways that significantly harm humans.
 
 **Why 65%?**
-- <EntityLink id="instrumental-convergence">Instrumental convergence</EntityLink> arguments suggest power-seeking is useful for most goals
+- <EntityLink id="E168" name="instrumental-convergence">Instrumental convergence</EntityLink> arguments suggest power-seeking is useful for most goals
 - Resource acquisition helps achieve almost any objective
 - Self-preservation is instrumentally useful
 - But: power-seeking requires sophisticated planning; some misaligned systems might be harmlessly misaligned
@@ -251,10 +251,10 @@ Different interventions target different premises:
 | Compute governance | P1, P2 | Slow capability development, reduce deployment incentives |
 | International coordination | P2 | Reduce racing pressure |
 | Alignment research | P3 | Make aligned systems easier to build |
-| <EntityLink id="interpretability">Interpretability</EntityLink> | P3, P4 | Detect misalignment before deployment |
-| <EntityLink id="evals">AI evaluations</EntityLink> | P4, P5 | Identify dangerous capabilities |
-| <EntityLink id="ai-control">AI control</EntityLink> | P5 | Contain power-seeking before full disempowerment |
-| <EntityLink id="responsible-scaling-policies">RSPs</EntityLink> | P2, P4, P5 | Gate deployment on safety |
+| <EntityLink id="E174" name="interpretability">Interpretability</EntityLink> | P3, P4 | Detect misalignment before deployment |
+| <EntityLink id="E128" name="evals">AI evaluations</EntityLink> | P4, P5 | Identify dangerous capabilities |
+| <EntityLink id="E6" name="ai-control">AI control</EntityLink> | P5 | Contain power-seeking before full disempowerment |
+| <EntityLink id="E252" name="responsible-scaling-policies">RSPs</EntityLink> | P2, P4, P5 | Gate deployment on safety |
 
 <Mermaid chart={`
 flowchart LR
@@ -303,7 +303,7 @@ flowchart LR
 |-------------------|---------------|
 | Full argument (P1-P6) | Rapid AI Takeover |
 | P3 focus | Alignment Robustness parameter |
-| P4 focus | <EntityLink id="power-seeking-conditions" label="Power-Seeking Conditions" /> model |
+| P4 focus | <EntityLink id="E227" name="power-seeking-conditions" label="Power-Seeking Conditions" /> model |
 | P2 dynamics | Racing Intensity parameter |
 
 ### Mapping to Aggregate Parameters

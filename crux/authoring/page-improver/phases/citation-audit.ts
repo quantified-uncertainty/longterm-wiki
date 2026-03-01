@@ -124,15 +124,27 @@ export async function citationAuditPhase(
     }
   }
 
+  // Unsourced table cell warnings (#1271)
+  if (result.unsourcedTableCells.length > 0) {
+    log(
+      'citation-audit',
+      `Found ${result.unsourcedTableCells.length} table cell(s) with numeric claims but no citation:`,
+    );
+    for (const cell of result.unsourcedTableCells) {
+      const colLabel = cell.column ? ` (${cell.column})` : '';
+      log('citation-audit', `  line ${cell.line}: "${cell.cellText}"${colLabel}`);
+    }
+  }
+
   if (total === 0) {
-    log('citation-audit', 'No citations found — skipping verification');
+    log('citation-audit', 'No citations found \u2014 skipping verification');
   } else if (result.pass) {
-    log('citation-audit', `✓ Citation audit passed`);
+    log('citation-audit', `\u2713 Citation audit passed`);
   } else {
     const mode = options.citationGate ? 'GATE' : 'WARNING';
     log(
       'citation-audit',
-      `⚠ [${mode}] Citation audit failed: pass rate below threshold (${verified}/${verified + failed} verified)`,
+      `\u26A0 [${mode}] Citation audit failed: pass rate below threshold (${verified}/${verified + failed} verified)`,
     );
   }
 

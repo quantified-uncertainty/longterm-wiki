@@ -99,6 +99,18 @@ export type PageReferencesResult = InferResponseType<ClaimsRpc[':id']['page-refe
 /** A single page reference row. */
 export type PageReferenceRow = PageReferencesResult['references'][number];
 
+/** Claims for a specific page, with footnote-level citation data (replaces citation_quotes). */
+export type ClaimsByPageResult = InferResponseType<ClaimsRpc['by-page']['$get'], 200>;
+
+/** A single claim quote row from the by-page endpoint (CitationQuote-compatible). */
+export type ClaimQuoteRow = ClaimsByPageResult['quotes'][number];
+
+/** Claims citing a specific source URL, across all pages (replaces quotes-by-url). */
+export type ClaimsBySourceUrlResult = InferResponseType<ClaimsRpc['by-source-url']['$get'], 200>;
+
+/** A single cross-page claim quote from the by-source-url endpoint. */
+export type CrossPageClaimQuoteRow = ClaimsBySourceUrlResult['quotes'][number];
+
 // ---------------------------------------------------------------------------
 // Citations
 // ---------------------------------------------------------------------------

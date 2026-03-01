@@ -20,7 +20,7 @@ ratings:
 
 ## Context
 
-This document synthesizes a design session exploring how to significantly expand the claims system, with an initial focus on **people and organizations** — where claims are concrete, factual, and directly verifiable — rather than high-level conceptual topics. It is a companion to <EntityLink id="claim-first-architecture">Claim-First Architecture (E893)</EntityLink>.
+This document synthesizes a design session exploring how to significantly expand the claims system, with an initial focus on **people and organizations** — where claims are concrete, factual, and directly verifiable — rather than high-level conceptual topics. It is a companion to <EntityLink id="E892" name="claim-first-architecture">Claim-First Architecture (E893)</EntityLink>.
 
 The immediate trigger: we want to spend significant effort dramatically improving wiki pages for people and organizations using Claims + Resources as the connective tissue. The Kalshi page is the current exemplar of the end state. The question is how to get there systematically across ~100+ entity pages, and what infrastructure changes are needed to support that.
 
@@ -33,12 +33,12 @@ Three overlapping layers exist today:
 | Layer | Storage | Scope | Status (Feb 2026) |
 |---|---|---|---|
 | **Facts** | YAML (`data/facts/*.yaml`) | 18 entities, numeric-only | Only quantitative; no verification; manual authoring |
-| **Claims** | PostgreSQL (`claims` table) | 11 entities, 1,514 claims | Growing but 89% have quality issues (see <EntityLink id="claims-data-quality-audit">Quality Audit E901</EntityLink>) |
+| **Claims** | PostgreSQL (`claims` table) | 11 entities, 1,514 claims | Growing but 89% have quality issues (see <EntityLink id="E901" name="claims-data-quality-audit">Quality Audit E901</EntityLink>) |
 | **Resources** | YAML (`data/resources/*.yaml`) | ≈5,000+ entries | Static; sparse metadata; passive citation targets |
 
 The core problem: **resources are treated as passive citations**, not as active knowledge sources. Claims are extracted *from* wiki pages that cite resources, but never extracted *from* the resources themselves. The information flow is one-directional, when it should be bidirectional.
 
-A secondary problem has emerged with scale: **claim quality degrades faster than claim quantity grows**. The Feb 2026 audit found 62.5% of claims missing `relatedEntities`, 58.6% unsourced, and 45.8% not self-contained (see full breakdown in the <EntityLink id="claims-data-quality-audit">Quality Audit</EntityLink>). This means the claim store is growing but the usable fraction is shrinking.
+A secondary problem has emerged with scale: **claim quality degrades faster than claim quantity grows**. The Feb 2026 audit found 62.5% of claims missing `relatedEntities`, 58.6% unsourced, and 45.8% not self-contained (see full breakdown in the <EntityLink id="E901" name="claims-data-quality-audit">Quality Audit</EntityLink>). This means the claim store is growing but the usable fraction is shrinking.
 
 ---
 
@@ -102,7 +102,7 @@ Non-negotiable constraint: every claim in the system must have at least one entr
 
 ### 6. Faceted Classification Over Tags
 
-_See also: <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture</EntityLink> for the full treatment of how reasoning traces integrate with the classification system._
+_See also: <EntityLink id="E903" name="reasoning-traces-architecture">Reasoning Traces Architecture</EntityLink> for the full treatment of how reasoning traces integrate with the classification system._
 
 Five orthogonal facets, fixed vocabulary enforced at write time:
 
@@ -134,7 +134,7 @@ What a reasoning trace includes:
 
 Why this matters more for AI verification than human verification: A human spot-checking a claim reads the source and exercises judgment. An AI verifier can do something more systematic — given a reasoning trace, it can check each step independently: Does the source quote exist in the source? Does the inference follow from the quote? Are the premises still verified? Has the staleness window expired? Full traces make exhaustive verification feasible at a cost that would be impractical for humans.
 
-The key cost tradeoff: generating reasoning traces during extraction requires additional LLM output per claim. The question is whether this cost is justified by the downstream value. See <EntityLink id="reasoning-traces-architecture">Reasoning Traces Architecture</EntityLink> for the full analysis and data model.
+The key cost tradeoff: generating reasoning traces during extraction requires additional LLM output per claim. The question is whether this cost is justified by the downstream value. See <EntityLink id="E903" name="reasoning-traces-architecture">Reasoning Traces Architecture</EntityLink> for the full analysis and data model.
 
 ---
 
@@ -542,7 +542,7 @@ The internal claims dashboard exists. The `/wiki/[id]/data` page shows claims. B
 
 ## Empirical Quality Assessment (Feb 2026)
 
-A systematic audit of 1,514 claims across 11 entities revealed that many of the failure modes theorized above are already occurring. The full analysis is in <EntityLink id="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> and <EntityLink id="claims-extraction-quality-patterns">Extraction Quality Patterns (E902)</EntityLink>. Key findings relevant to the architectural decisions above:
+A systematic audit of 1,514 claims across 11 entities revealed that many of the failure modes theorized above are already occurring. The full analysis is in <EntityLink id="E901" name="claims-data-quality-audit">Claims Data Quality Audit (E901)</EntityLink> and <EntityLink id="E902" name="claims-extraction-quality-patterns">Extraction Quality Patterns (E902)</EntityLink>. Key findings relevant to the architectural decisions above:
 
 **Red Team #1 (LLM extraction quality) is confirmed.** Concept pages produce 69% useful claims vs. 88-100% for factual org pages. The failure mode is exactly as predicted: vague, tautological, and redundant claims at high rates for non-factual content.
 

@@ -60,8 +60,9 @@ const mockPage: PageData = {
 function makeAuditResult(overrides: Partial<AuditResult> = {}): AuditResult {
   return {
     citations: [],
-    summary: { total: 0, verified: 0, failed: 0, misattributed: 0, unchecked: 0 },
+    summary: { total: 0, verified: 0, failed: 0, misattributed: 0, unchecked: 0, unsourcedTableCells: 0 },
     newUngroundedClaims: [],
+    unsourcedTableCells: [],
     pass: true,
     ...overrides,
   };
@@ -170,7 +171,7 @@ describe('citationAuditPhase', () => {
 
   it('returns the AuditResult from auditCitations', async () => {
     const expected = makeAuditResult({
-      summary: { total: 1, verified: 1, failed: 0, misattributed: 0, unchecked: 0 },
+      summary: { total: 1, verified: 1, failed: 0, misattributed: 0, unchecked: 0, unsourcedTableCells: 0 },
       pass: true,
     });
     vi.mocked(auditCitations).mockResolvedValueOnce(expected);
@@ -190,7 +191,7 @@ describe('citationAuditPhase', () => {
 
   it('logs "Citation audit passed" when audit passes with citations', async () => {
     vi.mocked(auditCitations).mockResolvedValueOnce(makeAuditResult({
-      summary: { total: 2, verified: 2, failed: 0, misattributed: 0, unchecked: 0 },
+      summary: { total: 2, verified: 2, failed: 0, misattributed: 0, unchecked: 0, unsourcedTableCells: 0 },
       pass: true,
     }));
 
@@ -201,7 +202,7 @@ describe('citationAuditPhase', () => {
 
   it('logs [WARNING] in advisory mode when audit fails', async () => {
     vi.mocked(auditCitations).mockResolvedValueOnce(makeAuditResult({
-      summary: { total: 2, verified: 1, failed: 1, misattributed: 0, unchecked: 0 },
+      summary: { total: 2, verified: 1, failed: 1, misattributed: 0, unchecked: 0, unsourcedTableCells: 0 },
       pass: false,
     }));
 
@@ -215,7 +216,7 @@ describe('citationAuditPhase', () => {
 
   it('logs [GATE] in gate mode when audit fails', async () => {
     vi.mocked(auditCitations).mockResolvedValueOnce(makeAuditResult({
-      summary: { total: 2, verified: 1, failed: 1, misattributed: 0, unchecked: 0 },
+      summary: { total: 2, verified: 1, failed: 1, misattributed: 0, unchecked: 0, unsourcedTableCells: 0 },
       pass: false,
     }));
 

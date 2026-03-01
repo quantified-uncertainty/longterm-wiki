@@ -186,6 +186,7 @@ const FIX_STEPS: Step[] = [
 const UNIFIED_BLOCKING_RULES = [
   'comparison-operators',
   'dollar-signs',
+  'entitylink-ids',
   'footnote-integrity',
   'frontmatter-schema',
   'no-quoted-subcategory',

@@ -21,7 +21,7 @@ import { Mermaid } from '@components/wiki';
 
 ## Executive Summary
 
-**See also**: <EntityLink id="claim-first-architecture">Claim-First Wiki Architecture</EntityLink> — a companion proposal that inverts the data model, making verified atomic claims (rather than prose documents) the primary artifact, with wiki pages as derived views.
+**See also**: <EntityLink id="E892" name="claim-first-architecture">Claim-First Wiki Architecture</EntityLink> — a companion proposal that inverts the data model, making verified atomic claims (rather than prose documents) the primary artifact, with wiki pages as derived views.
 
 Our current page generation pipeline (Crux content create/improve) is a **single-pipeline, single-agent** system. It works, but produces pages that are adequate rather than excellent. The best wiki pages require depth that a single LLM pass cannot achieve: dense cross-linking, verified citations, complex diagrams, embedded calculations, and knowledge graph coherence.
 
@@ -49,7 +49,7 @@ The current pipeline (`crux/authoring/page-creator.ts`) follows this flow:
 canonical-links -> research -> source-fetching -> synthesis -> verification -> validation -> grade
 ```
 
-This produces pages scoring 70-80/100 on our grading rubric. The pipeline has been iterated significantly (see the <EntityLink id="page-creator-pipeline">Page Creator Pipeline report</EntityLink>) and represents solid work. But it has structural limitations:
+This produces pages scoring 70-80/100 on our grading rubric. The pipeline has been iterated significantly (see the <EntityLink id="E747" name="page-creator-pipeline">Page Creator Pipeline report</EntityLink>) and represents solid work. But it has structural limitations:
 
 ### Limitation 1: Single-Agent Synthesis Bottleneck
 
@@ -788,7 +788,7 @@ Dependency order: #633 is the foundation. #634 and #635 depend on it. #636 is in
 
 ## Part 12: Academic Foundations for Claim-First Content
 
-Recent academic work provides strong validation for the proposition-level and claim-first approaches described in this document and the companion <EntityLink id="claim-first-architecture">Claim-First Architecture</EntityLink> proposal.
+Recent academic work provides strong validation for the proposition-level and claim-first approaches described in this document and the companion <EntityLink id="E892" name="claim-first-architecture">Claim-First Architecture</EntityLink> proposal.
 
 ### Proposition-Level Retrieval (Dense X Retrieval)
 
@@ -800,7 +800,7 @@ This is direct evidence for the claim-first thesis: atomic propositions are bett
 
 FActScore (Min et al., EMNLP 2023) formalized the **decompose-then-verify** pipeline: decompose generated text into atomic facts, retrieve evidence, verify each fact, compute the percentage supported. Applied to ChatGPT biographies, only 58% of atomic facts were supported by sources.[^rc-c9c3] Google's SAFE system extends this with multi-step search verification at 1/20th the cost of human annotators.
 
-Our pipeline applies the same decomposition *proactively* — producing atomic claims before writing rather than extracting them afterward. The Kalshi experiment (see <EntityLink id="claim-first-architecture">Claim-First Architecture</EntityLink>, Part 9b) confirmed this catches embellishments that post-hoc verification misses.
+Our pipeline applies the same decomposition *proactively* — producing atomic claims before writing rather than extracting them afterward. The Kalshi experiment (see <EntityLink id="E892" name="claim-first-architecture">Claim-First Architecture</EntityLink>, Part 9b) confirmed this catches embellishments that post-hoc verification misses.
 
 ### Nanopublications: The Formal Precedent
 

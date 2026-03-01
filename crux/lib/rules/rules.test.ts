@@ -1218,13 +1218,13 @@ describe('entitylink-ids rule', () => {
     },
   };
 
-  it('warns when slug ID used instead of numeric ID, with auto-fix to numeric+name', () => {
+  it('errors when slug ID used instead of numeric ID, with auto-fix to numeric+name', () => {
     const content = mockContent(
       '<EntityLink id="anthropic">Anthropic</EntityLink>',
     );
     const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
-    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].severity).toBe(Severity.ERROR);
     expect(issues[0].message).toContain('use numeric format');
     expect(issues[0].fix).not.toBeNull();
     expect(issues[0].fix!.oldText).toBe('id="anthropic"');
