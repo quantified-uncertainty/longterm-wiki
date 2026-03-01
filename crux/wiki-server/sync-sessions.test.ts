@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { loadSessionYamls, syncSessions } from './sync-sessions.ts';
+import { parseSessionYaml } from './sync-session.ts';
 import { mkdtempSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
@@ -21,6 +22,35 @@ function makeSession(title: string, date: string = '2026-01-15'): SessionApiEntr
     pages: ['page-a', 'page-b'],
   };
 }
+
+describe('parseSessionYaml — reviewed field', () => {
+  it('parses reviewed: true from YAML', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sessions-'));
+    const filePath = join(dir, '2026-02-28_reviewed.yaml');
+    writeFileSync(filePath, `date: "2026-02-28"\ntitle: Reviewed session\nreviewed: true\npages: []\n`);
+    const entry = parseSessionYaml(filePath);
+    expect(entry).not.toBeNull();
+    expect(entry!.reviewed).toBe(true);
+  });
+
+  it('parses reviewed: false from YAML', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sessions-'));
+    const filePath = join(dir, '2026-02-28_not-reviewed.yaml');
+    writeFileSync(filePath, `date: "2026-02-28"\ntitle: Unreviewed session\nreviewed: false\npages: []\n`);
+    const entry = parseSessionYaml(filePath);
+    expect(entry).not.toBeNull();
+    expect(entry!.reviewed).toBe(false);
+  });
+
+  it('omits reviewed when absent from YAML', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sessions-'));
+    const filePath = join(dir, '2026-02-28_no-reviewed.yaml');
+    writeFileSync(filePath, `date: "2026-02-28"\ntitle: Legacy session\npages: []\n`);
+    const entry = parseSessionYaml(filePath);
+    expect(entry).not.toBeNull();
+    expect(entry!.reviewed).toBeUndefined();
+  });
+});
 
 describe('loadSessionYamls', () => {
   it('loads sessions from YAML files', () => {

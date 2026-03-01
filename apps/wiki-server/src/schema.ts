@@ -249,6 +249,7 @@ export const sessions = pgTable(
     issuesJson: jsonb("issues_json"),
     learningsJson: jsonb("learnings_json"),
     recommendationsJson: jsonb("recommendations_json"),
+    reviewed: boolean("reviewed"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
