@@ -53,11 +53,78 @@ export interface IncidentDisplayRow {
   checkSource: string | null;
 }
 
+interface CiCheckRun {
+  name: string;
+  status: string;
+  conclusion: string | null;
+}
+
+interface ExtendedHealthData {
+  ci: {
+    sha: string;
+    totalChecks: number;
+    allCompleted: boolean;
+    allPassed: boolean;
+    anyFailed: boolean;
+    checks: CiCheckRun[];
+  } | null;
+  groundskeeperTasks: Array<{
+    taskName: string;
+    totalRuns: number;
+    successCount: number;
+    failureCount: number;
+    successRate: number | null;
+    avgDurationMs: number | null;
+    lastRun: string;
+  }>;
+  integrity: {
+    totalDanglingRefs: number;
+    status: string;
+    breakdown: {
+      facts: number;
+      claims: number;
+      summaries: number;
+      citations: number;
+      editLogs: number;
+    };
+  };
+  autoUpdate: {
+    totalRuns: number;
+    recentRuns: Array<{
+      id: number;
+      date: string;
+      trigger: string;
+      pagesUpdated: number;
+      pagesFailed: number;
+      budgetSpent: number;
+      completed: boolean;
+    }>;
+  };
+  recentSessions: Array<{
+    id: number;
+    sessionId: string;
+    branch: string | null;
+    task: string | null;
+    status: string;
+    issueNumber: number | null;
+    prNumber: number | null;
+    startedAt: string | null;
+    completedAt: string | null;
+    model: string | null;
+  }>;
+}
+
 // ── Data Loading ──────────────────────────────────────────────────────────
 
 async function loadFromApi(): Promise<FetchResult<MonitoringStatusData>> {
   return fetchDetailed<MonitoringStatusData>("/api/monitoring/status", {
     revalidate: 30,
+  });
+}
+
+async function loadExtendedData(): Promise<FetchResult<ExtendedHealthData>> {
+  return fetchDetailed<ExtendedHealthData>("/api/monitoring/extended", {
+    revalidate: 60,
   });
 }
 
@@ -198,13 +265,424 @@ function OverallBanner({ status }: { status: string }) {
   );
 }
 
+function SectionHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-sm font-semibold text-muted-foreground mb-3 mt-8">
+      {children}
+    </h3>
+  );
+}
+
+function CiStatusSection({ ci }: { ci: ExtendedHealthData["ci"] }) {
+  if (!ci) {
+    return (
+      <>
+        <SectionHeader>CI Pipeline (main branch)</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          CI status unavailable (GITHUB_TOKEN not configured on server)
+        </div>
+      </>
+    );
+  }
+
+  const statusColor = ci.allPassed
+    ? "text-green-600"
+    : ci.anyFailed
+      ? "text-red-500"
+      : "text-yellow-600";
+  const statusLabel = ci.allPassed
+    ? "All checks passed"
+    : ci.anyFailed
+      ? "Some checks failed"
+      : "Checks in progress";
+  const statusBg = ci.allPassed
+    ? "bg-green-500/15"
+    : ci.anyFailed
+      ? "bg-red-500/15"
+      : "bg-yellow-500/15";
+
+  return (
+    <>
+      <SectionHeader>CI Pipeline (main branch)</SectionHeader>
+      <div className={`rounded-lg border border-border/60 p-4 mb-4 ${statusBg}`}>
+        <div className="flex items-center justify-between mb-2">
+          <span className={`text-sm font-semibold ${statusColor}`}>
+            {statusLabel}
+          </span>
+          <span className="text-xs text-muted-foreground font-mono">
+            {ci.sha}
+          </span>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {ci.totalChecks} check{ci.totalChecks !== 1 ? "s" : ""}
+          {ci.allCompleted ? " completed" : " running"}
+        </p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
+        {ci.checks.map((check) => {
+          const isSuccess = check.conclusion === "success";
+          const isFailed = check.conclusion === "failure";
+          const isRunning = check.status !== "completed";
+          const bgClass = isFailed
+            ? "bg-red-500/10"
+            : isSuccess
+              ? ""
+              : isRunning
+                ? "bg-yellow-500/10"
+                : "";
+          return (
+            <div
+              key={check.name}
+              className={`rounded border border-border/60 px-3 py-2 flex items-center justify-between ${bgClass}`}
+            >
+              <span className="text-xs truncate mr-2">{check.name}</span>
+              <span
+                className={`text-xs font-medium shrink-0 ${
+                  isFailed
+                    ? "text-red-500"
+                    : isSuccess
+                      ? "text-green-600"
+                      : "text-yellow-600"
+                }`}
+              >
+                {isRunning
+                  ? check.status
+                  : check.conclusion ?? "unknown"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+function GroundskeeperSection({
+  tasks,
+}: {
+  tasks: ExtendedHealthData["groundskeeperTasks"];
+}) {
+  if (tasks.length === 0) {
+    return (
+      <>
+        <SectionHeader>Groundskeeper Tasks (last 24h)</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          No task runs recorded in the last 24 hours.
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <SectionHeader>Groundskeeper Tasks (last 24h)</SectionHeader>
+      <div className="overflow-x-auto mb-6">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border/60">
+              <th className="text-left text-xs text-muted-foreground font-medium py-2 pr-4">
+                Task
+              </th>
+              <th className="text-right text-xs text-muted-foreground font-medium py-2 px-3">
+                Runs
+              </th>
+              <th className="text-right text-xs text-muted-foreground font-medium py-2 px-3">
+                Success Rate
+              </th>
+              <th className="text-right text-xs text-muted-foreground font-medium py-2 px-3">
+                Avg Duration
+              </th>
+              <th className="text-right text-xs text-muted-foreground font-medium py-2 pl-3">
+                Last Run
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {tasks.map((task) => {
+              const rateColor =
+                task.successRate === null
+                  ? ""
+                  : task.successRate >= 95
+                    ? "text-green-600"
+                    : task.successRate >= 80
+                      ? "text-yellow-600"
+                      : "text-red-500";
+              return (
+                <tr
+                  key={task.taskName}
+                  className="border-b border-border/30"
+                >
+                  <td className="py-2 pr-4 font-mono text-xs">
+                    {task.taskName}
+                  </td>
+                  <td className="py-2 px-3 text-right tabular-nums">
+                    {task.totalRuns}
+                    {task.failureCount > 0 && (
+                      <span className="text-red-500 ml-1">
+                        ({task.failureCount} failed)
+                      </span>
+                    )}
+                  </td>
+                  <td
+                    className={`py-2 px-3 text-right tabular-nums ${rateColor}`}
+                  >
+                    {task.successRate !== null
+                      ? `${task.successRate}%`
+                      : "-"}
+                  </td>
+                  <td className="py-2 px-3 text-right tabular-nums text-muted-foreground">
+                    {task.avgDurationMs !== null
+                      ? task.avgDurationMs > 1000
+                        ? `${(task.avgDurationMs / 1000).toFixed(1)}s`
+                        : `${task.avgDurationMs}ms`
+                      : "-"}
+                  </td>
+                  <td className="py-2 pl-3 text-right text-xs text-muted-foreground">
+                    {formatRelativeTime(task.lastRun)}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function IntegritySection({
+  integrity,
+}: {
+  integrity: ExtendedHealthData["integrity"];
+}) {
+  const isClean = integrity.status === "clean";
+
+  return (
+    <>
+      <SectionHeader>Data Integrity</SectionHeader>
+      <div
+        className={`rounded-lg border border-border/60 p-4 mb-6 ${
+          isClean ? "bg-green-500/10" : "bg-yellow-500/10"
+        }`}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <span
+            className={`text-sm font-semibold ${
+              isClean ? "text-green-600" : "text-yellow-600"
+            }`}
+          >
+            {isClean
+              ? "No dangling references"
+              : `${integrity.totalDanglingRefs} dangling reference${integrity.totalDanglingRefs !== 1 ? "s" : ""}`}
+          </span>
+        </div>
+        {!isClean && (
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-2">
+            {Object.entries(integrity.breakdown).map(([key, count]) =>
+              count > 0 ? (
+                <div
+                  key={key}
+                  className="text-xs text-muted-foreground"
+                >
+                  <span className="font-medium text-yellow-700">
+                    {count}
+                  </span>{" "}
+                  in {key}
+                </div>
+              ) : null
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function AutoUpdateSection({
+  autoUpdate,
+}: {
+  autoUpdate: ExtendedHealthData["autoUpdate"];
+}) {
+  return (
+    <>
+      <SectionHeader>Auto-Update System</SectionHeader>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+        <StatCard label="Total runs" value={autoUpdate.totalRuns} />
+        <StatCard
+          label="Recent updates"
+          value={autoUpdate.recentRuns.reduce(
+            (sum, r) => sum + r.pagesUpdated,
+            0
+          )}
+          subtext="pages (last 5 runs)"
+        />
+        <StatCard
+          label="Recent failures"
+          value={autoUpdate.recentRuns.reduce(
+            (sum, r) => sum + r.pagesFailed,
+            0
+          )}
+          subtext="pages (last 5 runs)"
+          colorClass={
+            autoUpdate.recentRuns.some((r) => r.pagesFailed > 0)
+              ? "text-yellow-600"
+              : "text-green-600"
+          }
+        />
+      </div>
+      {autoUpdate.recentRuns.length > 0 && (
+        <div className="overflow-x-auto mb-6">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border/60">
+                <th className="text-left text-xs text-muted-foreground font-medium py-2 pr-4">
+                  Date
+                </th>
+                <th className="text-left text-xs text-muted-foreground font-medium py-2 px-3">
+                  Trigger
+                </th>
+                <th className="text-right text-xs text-muted-foreground font-medium py-2 px-3">
+                  Updated
+                </th>
+                <th className="text-right text-xs text-muted-foreground font-medium py-2 px-3">
+                  Failed
+                </th>
+                <th className="text-right text-xs text-muted-foreground font-medium py-2 pl-3">
+                  Cost
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {autoUpdate.recentRuns.map((run) => (
+                <tr
+                  key={run.id}
+                  className="border-b border-border/30"
+                >
+                  <td className="py-2 pr-4 text-xs">{run.date}</td>
+                  <td className="py-2 px-3 text-xs">{run.trigger}</td>
+                  <td className="py-2 px-3 text-right tabular-nums">
+                    {run.pagesUpdated}
+                  </td>
+                  <td
+                    className={`py-2 px-3 text-right tabular-nums ${
+                      run.pagesFailed > 0 ? "text-red-500" : ""
+                    }`}
+                  >
+                    {run.pagesFailed}
+                  </td>
+                  <td className="py-2 pl-3 text-right tabular-nums text-muted-foreground">
+                    {"$"}{run.budgetSpent.toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
+}
+
+function RecentSessionsSection({
+  sessions,
+}: {
+  sessions: ExtendedHealthData["recentSessions"];
+}) {
+  if (sessions.length === 0) return null;
+
+  const activeSessions = sessions.filter((s) => s.status === "active");
+  const completedSessions = sessions.filter((s) => s.status === "completed");
+
+  return (
+    <>
+      <SectionHeader>
+        Agent Sessions ({activeSessions.length} active, {completedSessions.length} recent)
+      </SectionHeader>
+      <div className="overflow-x-auto mb-6">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border/60">
+              <th className="text-left text-xs text-muted-foreground font-medium py-2 pr-4">
+                Status
+              </th>
+              <th className="text-left text-xs text-muted-foreground font-medium py-2 px-3">
+                Branch
+              </th>
+              <th className="text-left text-xs text-muted-foreground font-medium py-2 px-3">
+                Task
+              </th>
+              <th className="text-right text-xs text-muted-foreground font-medium py-2 px-3">
+                Issue
+              </th>
+              <th className="text-right text-xs text-muted-foreground font-medium py-2 pl-3">
+                Started
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {sessions.map((s) => (
+              <tr
+                key={s.id}
+                className="border-b border-border/30"
+              >
+                <td className="py-2 pr-4">
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                      s.status === "active"
+                        ? "bg-blue-500/15 text-blue-600"
+                        : s.status === "completed"
+                          ? "bg-green-500/15 text-green-600"
+                          : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {s.status}
+                  </span>
+                </td>
+                <td className="py-2 px-3 text-xs font-mono truncate max-w-[200px]">
+                  {s.branch ?? "-"}
+                </td>
+                <td className="py-2 px-3 text-xs truncate max-w-[250px]">
+                  {s.task ?? "-"}
+                </td>
+                <td className="py-2 px-3 text-right text-xs tabular-nums">
+                  {s.issueNumber ? `#${s.issueNumber}` : "-"}
+                </td>
+                <td className="py-2 pl-3 text-right text-xs text-muted-foreground">
+                  {s.startedAt ? formatRelativeTime(s.startedAt) : "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function formatRelativeTime(isoString: string): string {
+  const now = Date.now();
+  const then = new Date(isoString).getTime();
+  const diffMs = now - then;
+
+  if (diffMs < 0) return "just now";
+  if (diffMs < 60_000) return "just now";
+  if (diffMs < 3_600_000) return `${Math.floor(diffMs / 60_000)}m ago`;
+  if (diffMs < 86_400_000) return `${Math.floor(diffMs / 3_600_000)}h ago`;
+  return `${Math.floor(diffMs / 86_400_000)}d ago`;
+}
+
 // ── Content Component ────────────────────────────────────────────────────
 
 export async function SystemHealthContent() {
-  const { data, source, apiError } = await withApiFallback(
-    loadFromApi,
-    noLocalFallback
-  );
+  const [
+    { data, source, apiError },
+    extendedResult,
+  ] = await Promise.all([
+    withApiFallback(loadFromApi, noLocalFallback),
+    loadExtendedData(),
+  ]);
+
+  const extended = extendedResult.ok ? extendedResult.data : null;
 
   const { overall, services, dbCounts, recentIncidents, jobsQueue, activeAgents } =
     data;
@@ -285,10 +763,14 @@ export async function SystemHealthContent() {
         />
       </div>
 
+      {/* CI Pipeline Status */}
+      {extended && <CiStatusSection ci={extended.ci} />}
+
+      {/* Data Integrity */}
+      {extended && <IntegritySection integrity={extended.integrity} />}
+
       {/* Recent incidents */}
-      <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-        Recent incidents (last 24h)
-      </h3>
+      <SectionHeader>Recent incidents (last 24h)</SectionHeader>
       {incidentRows.length === 0 ? (
         <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground mb-6">
           <p className="text-lg font-medium mb-2">No recent incidents</p>
@@ -299,6 +781,19 @@ export async function SystemHealthContent() {
         </div>
       ) : (
         <SystemHealthTable data={incidentRows} />
+      )}
+
+      {/* Groundskeeper Tasks */}
+      {extended && (
+        <GroundskeeperSection tasks={extended.groundskeeperTasks} />
+      )}
+
+      {/* Auto-Update System */}
+      {extended && <AutoUpdateSection autoUpdate={extended.autoUpdate} />}
+
+      {/* Agent Sessions */}
+      {extended && (
+        <RecentSessionsSection sessions={extended.recentSessions} />
       )}
 
       <DataSourceBanner source={source} apiError={apiError} />
