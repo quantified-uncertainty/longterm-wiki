@@ -6,7 +6,9 @@
  */
 
 import type { Config } from "./config.js";
-import { logger } from "./logger.js";
+import { logger as rootLogger } from "./logger.js";
+
+const logger = rootLogger.child({ module: "wiki-server" });
 
 interface ApiResult<T> {
   ok: boolean;
@@ -70,7 +72,7 @@ export interface RecordRunPayload {
 }
 
 /**
- * Record a task run to the wiki-server. Best-effort — logs error on failure.
+ * Record a task run to the wiki-server. Best-effort — logs warning on failure.
  */
 export async function recordRunToServer(
   config: Config,
@@ -144,7 +146,7 @@ export async function registerAsActiveAgent(
         maxRetries: REGISTER_MAX_RETRIES,
         error: result.error,
       },
-      "Active agent registration failed",
+      `Registration attempt ${attempt + 1}/${REGISTER_MAX_RETRIES + 1} failed`,
     );
 
     // Don't delay after the last attempt
@@ -182,9 +184,10 @@ export async function updateActiveAgent(
     logger.warn(
       {
         event: "active_agent_update_failed",
+        agentId,
         error: result.error,
       },
-      "Failed to update active agent",
+      "Failed to update active agent status",
     );
   }
 }
@@ -246,6 +249,8 @@ export async function sendHeartbeat(
     {},
   );
   if (!result.ok) {
-    // Don't log every heartbeat failure — too noisy
+    // Heartbeat failures are intentionally quiet — they're high-frequency
+    // and connectivity issues are tracked at a higher level by the
+    // wiki-server failure counter in scheduler.ts.
   }
 }

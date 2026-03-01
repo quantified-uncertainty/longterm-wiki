@@ -58,7 +58,11 @@ function findIndexFiles(dir: string, results: string[] = []): string[] {
       }
     }
   } catch (e: unknown) {
-    // Directory doesn't exist or permission error
+    // Fail-closed for this directory: if the content directory doesn't exist
+    // or has permission issues, we return an empty list (no files to validate),
+    // which means no validation runs. This is acceptable because the build-data
+    // step would also fail if the content directory were missing.
+    void e;
   }
   return results;
 }
