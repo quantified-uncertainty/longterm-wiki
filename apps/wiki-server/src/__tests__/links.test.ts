@@ -45,6 +45,20 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
+  // --- entity_ids: INSERT (for allocateAndResolvePageIntIds in pages route) ---
+  // Must check for '"entity_ids"' (Drizzle-quoted) to avoid matching page_links
+  // INSERT which also references entity_ids in a LEFT JOIN clause.
+  if (q.includes("insert into") && q.includes('"entity_ids"')) {
+    const slug = params[0] as string;
+    return [{ numeric_id: nextId++, slug }];
+  }
+
+  // --- entity_ids: SELECT WHERE slug (for resolvePageIntIds) ---
+  // Must not match the page_links INSERT which contains entity_ids in a JOIN
+  if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)") && !q.includes("page_links")) {
+    return []; // No entity_ids in test — page_id_int will be null
+  }
+
   // --- page_links: DELETE all ---
   if (q.includes("delete from") && q.includes("page_links")) {
     linksStore.clear();
@@ -278,17 +292,17 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- wiki_pages: INSERT (for seeding) ---
   if (q.includes("insert into") && q.includes("wiki_pages")) {
-    const COLS = 17;
+    const COLS = 28; // Phase 4a: +2 for slug and integer_id
     const numRows = params.length / COLS;
     const rows: PageRow[] = [];
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
       const row: PageRow = {
         id: params[o] as string,
-        title: params[o + 2] as string,
-        entity_type: (params[o + 7] as string) || null,
-        quality: (params[o + 9] as number) || null,
-        reader_importance: (params[o + 10] as number) || null,
+        title: params[o + 4] as string, // Phase 4a: shifted by 2
+        entity_type: (params[o + 9] as string) || null, // Phase 4a: shifted by 2
+        quality: (params[o + 11] as number) || null, // Phase 4a: shifted by 2
+        reader_importance: (params[o + 12] as number) || null, // Phase 4a: shifted by 2
       };
       pagesStore.set(row.id, row);
       rows.push(row);

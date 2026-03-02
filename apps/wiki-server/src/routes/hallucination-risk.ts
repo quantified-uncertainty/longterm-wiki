@@ -14,6 +14,7 @@ import {
   RiskSnapshotBatchSchema,
 } from "../api-types.js";
 import { logger as rootLogger } from "../logger.js";
+import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
 
 const logger = rootLogger.child({ component: "hallucination-risk" });
 
@@ -146,10 +147,14 @@ const hallucinationRiskApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
+    // Phase 4a: resolve page slug to integer ID for dual-write
+    const pageIdInt = await resolvePageIntId(db, d.pageId);
+
     const rows = await db
       .insert(hallucinationRiskSnapshots)
       .values({
         pageId: d.pageId,
+        pageIdInt, // Phase 4a dual-write
         score: d.score,
         level: d.level,
         factors: d.factors ?? null,
@@ -178,8 +183,13 @@ const hallucinationRiskApp = new Hono()
     const { snapshots } = parsed.data;
     const db = getDrizzleDb();
 
+    // Phase 4a: resolve page slugs to integer IDs for dual-write
+    const pageIds = [...new Set(snapshots.map((d) => d.pageId))];
+    const intIdMap = await resolvePageIntIds(db, pageIds);
+
     const allVals = snapshots.map((d) => ({
       pageId: d.pageId,
+      pageIdInt: intIdMap.get(d.pageId) ?? null, // Phase 4a dual-write
       score: d.score,
       level: d.level,
       factors: d.factors ?? null,

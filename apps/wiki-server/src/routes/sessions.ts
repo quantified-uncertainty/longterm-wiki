@@ -9,6 +9,7 @@ import {
   CreateSessionBatchSchema,
   DateStringSchema,
 } from "../api-types.js";
+import { resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Constants ----
 
@@ -124,9 +125,15 @@ const sessionsApp = new Hono()
         .where(eq(sessionPages.sessionId, session.id));
 
       if (d.pages.length > 0) {
+        // Phase 4a: resolve page slugs to integer IDs for dual-write
+        const intIdMap = await resolvePageIntIds(tx, d.pages);
         await tx
           .insert(sessionPages)
-          .values(d.pages.map((pageId) => ({ sessionId: session.id, pageId })));
+          .values(d.pages.map((pageId) => ({
+            sessionId: session.id,
+            pageId,
+            pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
+          })));
       }
 
       return { ...session, pages: d.pages };
@@ -146,6 +153,12 @@ const sessionsApp = new Hono()
     const db = getDrizzleDb();
 
     const results = await db.transaction(async (tx) => {
+      // Phase 4a: pre-collect all page IDs and resolve in one batch query
+      const allPageIds = [...new Set(items.flatMap((d) => d.pages))];
+      const intIdMap = allPageIds.length > 0
+        ? await resolvePageIntIds(tx, allPageIds)
+        : new Map<string, number>();
+
       const created: Array<{ id: number; title: string; pageCount: number }> = [];
 
       for (const d of items) {
@@ -168,7 +181,11 @@ const sessionsApp = new Hono()
         if (d.pages.length > 0) {
           await tx
             .insert(sessionPages)
-            .values(d.pages.map((pageId) => ({ sessionId: session.id, pageId })));
+            .values(d.pages.map((pageId) => ({
+              sessionId: session.id,
+              pageId,
+              pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
+            })));
         }
 
         created.push({

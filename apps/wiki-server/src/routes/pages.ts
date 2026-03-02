@@ -21,6 +21,7 @@ import {
   TRIGRAM_FALLBACK_THRESHOLD,
   TS_HEADLINE_OPTIONS,
 } from "../search-utils.js";
+import { allocateAndResolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Raw SQL row types ----
 
@@ -282,9 +283,14 @@ const pagesApp = new Hono()
 
     try {
      await db.transaction(async (tx) => {
+      // Phase 4a: auto-allocate entity_ids for all page slugs and resolve to integer IDs
+      const intIdMap = await allocateAndResolvePageIntIds(tx, pageIds);
+
       const allVals = pages.map((page) => ({
         id: page.id,
         numericId: page.numericId ?? null,
+        slug: page.id, // Phase 4a: slug = id (the text slug)
+        integerIdCol: intIdMap.get(page.id) ?? null, // Phase 4a: integer ID from entity_ids (nullable until Phase 4b)
         title: page.title,
         description: page.description ?? null,
         llmSummary: page.llmSummary ?? null,
@@ -318,6 +324,8 @@ const pagesApp = new Hono()
           target: wikiPages.id,
           set: {
             numericId: sql`excluded.numeric_id`,
+            slug: sql`excluded.slug`,
+            integerIdCol: sql`excluded.integer_id`,
             title: sql`excluded.title`,
             description: sql`excluded.description`,
             llmSummary: sql`excluded.llm_summary`,

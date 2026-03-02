@@ -28,6 +28,7 @@ import {
   UpsertResourceBatchSchema,
   type ResourceStatsResult,
 } from "../api-types.js";
+import { resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Raw SQL row types ----
 
@@ -135,7 +136,7 @@ function resourceValues(d: ResourceInput) {
 async function upsertResource(
   db: DbClient,
   d: ResourceInput,
-  options?: { skipSearchVector?: boolean }
+  options?: { skipSearchVector?: boolean; intIdMap?: Map<string, number> }
 ) {
   const vals = resourceValues(d);
 
@@ -189,9 +190,15 @@ async function upsertResource(
     await db
       .delete(resourceCitations)
       .where(eq(resourceCitations.resourceId, d.id));
+    // Phase 4a: use pre-resolved map if provided (batch path), else resolve per-resource (single path)
+    const citedByIntIdMap = options?.intIdMap ?? await resolvePageIntIds(db, d.citedBy);
     await db
       .insert(resourceCitations)
-      .values(d.citedBy.map((pageId) => ({ resourceId: d.id, pageId })))
+      .values(d.citedBy.map((pageId) => ({
+        resourceId: d.id,
+        pageId,
+        pageIdInt: citedByIntIdMap.get(pageId) ?? null, // Phase 4a dual-write
+      })))
       .onConflictDoNothing();
   }
 
@@ -281,10 +288,17 @@ const resourcesApp = new Hono()
     const results: Array<{ id: string; url: string }> = [];
     try {
       await db.transaction(async (tx) => {
+        // Phase 4a: pre-resolve all citedBy page IDs in one batch query
+        const allCitedByIds = [...new Set(items.flatMap((item) => item.citedBy ?? []))];
+        const intIdMap = allCitedByIds.length > 0
+          ? await resolvePageIntIds(tx, allCitedByIds)
+          : new Map<string, number>();
+
         for (const item of items) {
           // Skip per-row search_vector update; handled in bulk below
-          const result = await upsertResource(tx as unknown as DbClient, item, {
+          const result = await upsertResource(tx, item, {
             skipSearchVector: true,
+            intIdMap,
           });
           results.push({ id: result.id, url: result.url });
         }

@@ -24,6 +24,7 @@ import {
   LinkCitationsClaimsBatchSchema,
 } from "../api-types.js";
 import { logger } from "../logger.js";
+import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Constants ----
 
@@ -61,9 +62,10 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 // ---- Helpers ----
 
 /** Build the values object for a citation quote upsert. */
-function quoteValues(d: UpsertQuoteData) {
+function quoteValues(d: UpsertQuoteData, pageIdInt?: number | null) {
   return {
     pageId: d.pageId,
+    pageIdInt: pageIdInt ?? null, // Phase 4a dual-write
     footnote: d.footnote,
     url: d.url ?? null,
     resourceId: d.resourceId ?? null,
@@ -83,9 +85,10 @@ function quoteValues(d: UpsertQuoteData) {
 /** Shared upsert for single and batch quote operations. */
 function upsertQuote(
   db: ReturnType<typeof getDrizzleDb> | Parameters<Parameters<ReturnType<typeof getDrizzleDb>["transaction"]>[0]>[0],
-  d: UpsertQuoteData
+  d: UpsertQuoteData,
+  pageIdInt?: number | null
 ) {
-  const vals = quoteValues(d);
+  const vals = quoteValues(d, pageIdInt);
   return db
     .insert(citationQuotes)
     .values(vals)
@@ -207,7 +210,9 @@ const citationsApp = new Hono()
       }
     }
 
-    const rows = await upsertQuote(db, parsed.data);
+    // Phase 4a: resolve page slug to integer ID for dual-write
+    const singlePageIdInt = await resolvePageIntId(db, parsed.data.pageId);
+    const rows = await upsertQuote(db, parsed.data, singlePageIdInt);
 
     const row = firstOrThrow(rows, "citation quote upsert");
     return c.json({
@@ -258,12 +263,15 @@ const citationsApp = new Hono()
     let results;
     try {
       results = await db.transaction(async (tx) => {
+        // Phase 4a: resolve page slugs to integer IDs for dual-write (inside tx for consistency)
+        const batchIntIdMap = await resolvePageIntIds(tx, pageIds);
         return await tx
           .insert(citationQuotes)
-          .values(items.map((d) => quoteValues(d)))
+          .values(items.map((d) => quoteValues(d, batchIntIdMap.get(d.pageId) ?? null)))
           .onConflictDoUpdate({
             target: [citationQuotes.pageId, citationQuotes.footnote],
             set: {
+              pageIdInt: sql`excluded.page_id_int`,
               url: sql`excluded.url`,
               resourceId: sql`excluded.resource_id`,
               claimText: sql`excluded.claim_text`,
@@ -676,11 +684,16 @@ const citationsApp = new Hono()
     // Insert snapshots for all pages with accuracy data
     let inserted: Array<{ id: number; pageId: string }> = [];
     if (pageStats.length > 0) {
+      // Phase 4a: resolve page slugs to integer IDs for dual-write
+      const snapPageIds = pageStats.map((ps) => ps.pageId);
+      const snapIntIdMap = await resolvePageIntIds(db, snapPageIds);
+
       inserted = await db
         .insert(citationAccuracySnapshots)
         .values(
           pageStats.map((ps) => ({
             pageId: ps.pageId,
+            pageIdInt: snapIntIdMap.get(ps.pageId) ?? null, // Phase 4a dual-write
             totalCitations: ps.totalCitations,
             checkedCitations: Number(ps.checkedCitations),
             accurateCount: Number(ps.accurateCount),

@@ -6,6 +6,7 @@ import { editLogs, wikiPages } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow, paginationQuery } from "./utils.js";
 import { EditLogEntrySchema, EditLogBatchSchema } from "../api-types.js";
+import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Constants ----
 
@@ -42,10 +43,14 @@ const editLogsApp = new Hono()
       return validationError(c, `Referenced page not found: ${missing.join(", ")}`);
     }
 
+    // Phase 4a: resolve page slug to integer ID for dual-write
+    const pageIdInt = await resolvePageIntId(db, d.pageId);
+
     const rows = await db
       .insert(editLogs)
       .values({
         pageId: d.pageId,
+        pageIdInt, // Phase 4a dual-write
         date: d.date,
         tool: d.tool,
         agency: d.agency,
@@ -82,11 +87,14 @@ const editLogsApp = new Hono()
     }
 
     const results = await db.transaction(async (tx) => {
+      // Phase 4a: resolve page slugs to integer IDs for dual-write (inside tx for consistency)
+      const intIdMap = await resolvePageIntIds(tx, pageIds);
       return await tx
         .insert(editLogs)
         .values(
           items.map((d) => ({
             pageId: d.pageId,
+            pageIdInt: intIdMap.get(d.pageId) ?? null, // Phase 4a dual-write
             date: d.date,
             tool: d.tool,
             agency: d.agency,
