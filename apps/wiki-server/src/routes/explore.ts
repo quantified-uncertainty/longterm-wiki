@@ -288,7 +288,7 @@ const exploreApp = new Hono()
         e.tags AS entity_tags, e.clusters AS entity_clusters
         ${searchRankSelect}
       FROM wiki_pages wp
-      LEFT JOIN entities e ON wp.id = e.id
+      LEFT JOIN entities e ON wp.slug = e.id
       ${mainWhere}
       ORDER BY ${orderBy}
       LIMIT $${limitParamIdx} OFFSET $${offsetParamIdx}
@@ -386,7 +386,7 @@ const exploreApp = new Hono()
           e.tags AS entity_tags, e.clusters AS entity_clusters,
           similarity(wp.title, $${trigramParamIdx}) AS search_rank
         FROM wiki_pages wp
-        LEFT JOIN entities e ON wp.id = e.id
+        LEFT JOIN entities e ON wp.slug = e.id
         ${trigramWhere}
         ORDER BY similarity(wp.title, $${trigramParamIdx}) DESC
         LIMIT $${trigramParamIdx + 1} OFFSET $${trigramParamIdx + 2}
