@@ -10,12 +10,24 @@ let quotesStore: Map<string, Record<string, unknown>>; // key: `${page_id}:${foo
 let contentStore: Map<string, Record<string, unknown>>; // key: url
 let snapshotStore: Array<Record<string, unknown>>;
 
+let nextSlugIntId = 1000;
+const slugIntIdMap = new Map<string, number>();
+
+function getIntIdForSlug(slug: string): number {
+  if (!slugIntIdMap.has(slug)) {
+    slugIntIdMap.set(slug, nextSlugIntId++);
+  }
+  return slugIntIdMap.get(slug)!;
+}
+
 function resetStores() {
   nextQuoteId = 1;
   nextSnapshotId = 1;
   quotesStore = new Map();
   contentStore = new Map();
   snapshotStore = [];
+  nextSlugIntId = 1000;
+  slugIntIdMap.clear();
 }
 
 function quoteKey(pageId: string, footnote: number) {
@@ -73,7 +85,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       } else {
         const row: Record<string, unknown> = {
           id: nextQuoteId++,
-          page_id: pageId, footnote, url, resource_id: resourceId,
+          page_id: pageId, page_id_int: getIntIdForSlug(pageId), footnote, url, resource_id: resourceId,
           claim_text: claimText, claim_context: claimContext,
           source_quote: sourceQuote, source_location: sourceLocation,
           quote_verified: quoteVerified, verification_method: verificationMethod,
@@ -152,11 +164,12 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: SELECT WHERE (no ORDER BY, no COUNT, no GROUP BY) ---
+  // Phase 4b: health endpoint queries by page_id_int (integer), params[0] is intId.
   if (q.includes("citation_quotes") && q.includes("where") && !q.includes("count(*)") && !q.includes("group by") && !q.includes("order by") && !q.includes("limit")) {
     if (params.length === 1) {
-      const pageId = params[0] as string;
+      const intId = params[0] as number;
       return Array.from(quotesStore.values())
-        .filter((r) => r.page_id === pageId)
+        .filter((r) => r.page_id_int === intId)
         .sort((a, b) => (a.footnote as number) - (b.footnote as number));
     }
     return [];
@@ -403,8 +416,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ---
+  // Allocating on first use mirrors production where all page slugs have entity_ids.
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)")) {
-    return []; // No entity_ids in test — page_id_int will be null
+    return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
   }
 
   // --- entity_ids fallbacks (for health check count) ---

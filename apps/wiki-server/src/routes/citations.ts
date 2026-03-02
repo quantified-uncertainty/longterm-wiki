@@ -171,6 +171,10 @@ const citationsApp = new Hono()
     const pageId = c.req.param("pageId");
     const db = getDrizzleDb();
 
+    // Phase 4b: resolve slug to integer and query by page_id_int
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return c.json(computePageHealth(pageId, []));
+
     const rows = await db
       .select({
         sourceQuote: citationQuotes.sourceQuote,
@@ -180,7 +184,7 @@ const citationsApp = new Hono()
         accuracyScore: citationQuotes.accuracyScore,
       })
       .from(citationQuotes)
-      .where(eq(citationQuotes.pageId, pageId));
+      .where(eq(citationQuotes.pageIdInt, intId));
 
     return c.json(computePageHealth(pageId, rows));
   })
