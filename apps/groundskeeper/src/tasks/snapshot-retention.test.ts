@@ -111,6 +111,25 @@ describe("snapshotRetention", () => {
     expect(result.summary).toContain("FAILED");
   });
 
+  it("still runs second cleanup when first throws", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn()
+        .mockRejectedValueOnce(new Error("Connection refused"))
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ deleted: 10, keep: 100 }),
+        })
+    );
+
+    const result = await snapshotRetention(config);
+
+    expect(result.success).toBe(false);
+    expect(result.summary).toContain("hallucination_risk: FAILED");
+    expect(result.summary).toContain("citation_accuracy: deleted 10");
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
   it("uses DELETE method for cleanup requests", async () => {
     vi.stubGlobal(
       "fetch",

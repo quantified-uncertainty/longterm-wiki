@@ -3,9 +3,6 @@ import { logger as rootLogger } from "../logger.js";
 
 const logger = rootLogger.child({ task: "snapshot-retention" });
 
-/** Default number of snapshots to keep per page. */
-const DEFAULT_KEEP = 100;
-
 interface CleanupResult {
   deleted: number;
   keep: number;
@@ -28,21 +25,29 @@ async function callCleanupEndpoint(
     return null;
   }
 
-  const res = await fetch(url, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-    },
-    signal: AbortSignal.timeout(120_000), // 2 minute timeout for large deletes
-  });
+  try {
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+      signal: AbortSignal.timeout(120_000), // 2 minute timeout for large deletes
+    });
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    logger.error({ status: res.status, body: text.slice(0, 200), path }, "Cleanup endpoint failed");
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      logger.error({ status: res.status, body: text.slice(0, 200), path }, "Cleanup endpoint failed");
+      return null;
+    }
+
+    return (await res.json()) as CleanupResult;
+  } catch (err) {
+    logger.error(
+      { error: err instanceof Error ? err.message : String(err), path },
+      "Cleanup request failed",
+    );
     return null;
   }
-
-  return (await res.json()) as CleanupResult;
 }
 
 /**
@@ -54,7 +59,7 @@ async function callCleanupEndpoint(
 export async function snapshotRetention(
   config: Config,
 ): Promise<{ success: boolean; summary?: string }> {
-  const keep = config.tasks.snapshotRetention.keep ?? DEFAULT_KEEP;
+  const keep = config.tasks.snapshotRetention.keep;
 
   const results: string[] = [];
   let anyFailed = false;
