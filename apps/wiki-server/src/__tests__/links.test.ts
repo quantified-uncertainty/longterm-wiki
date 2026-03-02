@@ -131,10 +131,14 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const now = new Date();
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
+      const src = params[o] as string;
+      const tgt = params[o + 1] as string;
       const row: LinkRow = {
         id: nextId++,
-        source_id: params[o] as string,
-        target_id: params[o + 1] as string,
+        source_id: src,
+        source_id_int: getIntIdForSlug(src),
+        target_id: tgt,
+        target_id_int: getIntIdForSlug(tgt),
         link_type: params[o + 2] as string,
         relationship: (params[o + 3] as string) || null,
         weight: params[o + 4] as number,
