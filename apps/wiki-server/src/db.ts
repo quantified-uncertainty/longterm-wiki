@@ -66,10 +66,12 @@ export async function initDb() {
   // Prefer DATABASE_MIGRATION_URL if set — allows a separate PG role with
   // elevated privileges or no server-side statement_timeout, bypassing
   // pgbouncer, or using a direct connection. Falls back to DATABASE_URL.
-  const migrationUrl = process.env.DATABASE_MIGRATION_URL || appUrl;
+  const migrationEnvUrl = process.env.DATABASE_MIGRATION_URL;
+  const migrationUrl = migrationEnvUrl || appUrl;
+  const usingSeparateUrl = Boolean(migrationEnvUrl && migrationEnvUrl !== appUrl);
 
   logger.info(
-    { usingSeparateUrl: !!process.env.DATABASE_MIGRATION_URL },
+    { usingSeparateUrl },
     "Running migrations..."
   );
   const startMs = Date.now();
