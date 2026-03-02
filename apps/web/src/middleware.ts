@@ -22,7 +22,7 @@ const KB_CATEGORIES = new Set([
   "worldviews",
 ]);
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Normalize: strip trailing slash
