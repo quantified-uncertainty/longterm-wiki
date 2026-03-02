@@ -18,6 +18,15 @@ These drift silently. The facts migration caught 2 real bugs: `entity` vs `entit
 
 With Hono RPC, the route handler is the single source of truth and client types are inferred at compile-time via `InferResponseType<>`.
 
+## What `api-types.ts` is still used for
+
+`apps/wiki-server/src/api-types.ts` remains at ~1,300 lines after the migration. This is correct — Hono RPC only replaces **response type** duplication. `api-types.ts` still serves:
+- **Zod request validation schemas** (input bodies, query params) — still needed for runtime validation
+- **Shared enums** (VALID_TOOLS, VALID_AGENCIES) — cross-route constants
+- **Request body schemas** — these are not inferred by RPC (only response shapes are)
+
+Do not delete `api-types.ts` or assume the migration is incomplete because it still exists. The migration is complete for response types.
+
 ## How to migrate a route
 
 Follow the pattern in `apps/wiki-server/src/routes/facts.ts`:
