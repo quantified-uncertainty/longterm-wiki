@@ -5,6 +5,7 @@ import { sendDiscordNotification } from "./notify.js";
 import { healthCheck } from "./tasks/health-check.js";
 import { registerAsActiveAgent, sendHeartbeat } from "./wiki-server.js";
 import { issueResponder } from "./tasks/issue-responder.js";
+import { githubShadowbanCheck } from "./tasks/github-shadowban-check.js";
 import { logger } from "./logger.js";
 
 const config = loadConfig();
@@ -20,6 +21,11 @@ logger.info({
     issueResponder: {
       enabled: config.tasks.issueResponder.enabled,
       schedule: config.tasks.issueResponder.schedule,
+    },
+    githubShadowbanCheck: {
+      enabled: config.tasks.githubShadowbanCheck.enabled,
+      schedule: config.tasks.githubShadowbanCheck.schedule,
+      usernames: config.tasks.githubShadowbanCheck.usernames,
     },
   },
 }, "Groundskeeper starting");
@@ -39,6 +45,14 @@ registerTask(
   config.tasks.issueResponder.schedule,
   config.tasks.issueResponder.enabled,
   () => issueResponder(config)
+);
+
+registerTask(
+  config,
+  "github-shadowban-check",
+  config.tasks.githubShadowbanCheck.schedule,
+  config.tasks.githubShadowbanCheck.enabled,
+  () => githubShadowbanCheck(config)
 );
 
 // Register as an active agent (best-effort)

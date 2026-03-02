@@ -3,6 +3,10 @@ export interface TaskConfig {
   schedule: string; // cron expression
 }
 
+export interface ShadowbanCheckConfig extends TaskConfig {
+  usernames: string[];
+}
+
 export interface Config {
   githubAppId: string;
   githubInstallationId: string;
@@ -16,6 +20,7 @@ export interface Config {
   tasks: {
     healthCheck: TaskConfig;
     issueResponder: TaskConfig;
+    githubShadowbanCheck: ShadowbanCheckConfig;
   };
 }
 
@@ -64,6 +69,12 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_ISSUE_RESPONDER_ENABLED", false),
         schedule:
           process.env["TASK_ISSUE_RESPONDER_SCHEDULE"] ?? "*/15 * * * *",
+      },
+      githubShadowbanCheck: {
+        enabled: envBool("TASK_GITHUB_SHADOWBAN_CHECK_ENABLED", true),
+        schedule:
+          process.env["TASK_GITHUB_SHADOWBAN_CHECK_SCHEDULE"] ?? "*/30 * * * *",
+        usernames: ["quri-bot"],
       },
     },
   };
