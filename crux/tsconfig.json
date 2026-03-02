@@ -12,5 +12,6 @@
     "allowJs": true,
     "checkJs": false
   },
-  "include": ["lib/**/*.ts", "validate/**/*.ts", "commands/**/*.ts", "analyze/**/*.ts", "fix/**/*.ts", "generate/**/*.ts", "authoring/**/*.ts", "citations/**/*.ts", "claims/**/*.ts", "evals/**/*.ts", "enrich/**/*.ts", "*.ts", "*.d.ts"]
+  "include": ["lib/**/*.ts", "validate/**/*.ts", "commands/**/*.ts", "analyze/**/*.ts", "fix/**/*.ts", "generate/**/*.ts", "authoring/**/*.ts", "citations/**/*.ts", "claims/**/*.ts", "evals/**/*.ts", "enrich/**/*.ts", "*.ts", "*.d.ts"],
+  "exclude": ["claims/archive/**"]
 }

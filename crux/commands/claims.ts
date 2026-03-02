@@ -44,12 +44,6 @@ const SCRIPTS = {
     passthrough: ['dry-run', 'model', 'entity', 'force'],
     positional: true,
   },
-  'ingest-batch': {
-    script: 'claims/ingest-batch.ts',
-    description: 'Bulk-ingest claims from all resources with cited_by entries',
-    passthrough: ['dry-run', 'model', 'entity', 'limit', 'force'],
-    positional: false,
-  },
   'from-resource': {
     script: 'claims/from-resource.ts',
     description: 'Extract claims from a URL — fetch, route to entities, deduplicate',
@@ -60,12 +54,6 @@ const SCRIPTS = {
     script: 'claims/evaluate-baseline.ts',
     description: 'Evaluate extraction quality baseline across test pages',
     passthrough: ['from-logs', 'sample', 'variant', 'openrouter'],
-    positional: false,
-  },
-  'run-experiments': {
-    script: 'claims/run-experiments.ts',
-    description: 'Run Sprint 2 extraction experiments across all variants and pages',
-    passthrough: ['variant', 'evaluate-only', 'sample'],
     positional: false,
   },
   audit: {
@@ -85,42 +73,6 @@ const SCRIPTS = {
     description: 'Fast text-based gap analysis: find missing verified facts for a page',
     passthrough: ['json'],
     positional: true,
-  },
-  'backfill-from-citations': {
-    script: 'claims/backfill-from-citations.ts',
-    description: 'Backfill claims from citation_quotes by grouping on text similarity',
-    passthrough: ['dry-run', 'page-id', 'limit'],
-    positional: false,
-  },
-  'backfill-related-entities': {
-    script: 'claims/backfill-related-entities.ts',
-    description: 'Scan claim text for entity names and backfill relatedEntities field',
-    passthrough: ['apply', 'limit', 'entity-id'],
-    positional: false,
-  },
-  'migrate-footnotes': {
-    script: 'claims/migrate-footnotes.ts',
-    description: 'Migrate numbered footnotes to DB-driven references (claim refs + citations)',
-    passthrough: ['apply'],
-    positional: true,
-  },
-  'migrate-footnotes-batch': {
-    script: 'claims/migrate-footnotes-batch.ts',
-    description: 'Batch-migrate numbered footnotes across all pages to DB-driven references',
-    passthrough: ['apply', 'batch-size', 'entity', 'path'],
-    positional: false,
-  },
-  'retrofit-refs': {
-    script: 'claims/retrofit-refs.ts',
-    description: 'Insert [^rc-XXXX] footnote markers at claim assertion points (LLM-guided)',
-    passthrough: ['apply', 'model', 'max-claims'],
-    positional: true,
-  },
-  'retrofit-refs-batch': {
-    script: 'claims/retrofit-refs-batch.ts',
-    description: 'Batch-retrofit footnote markers across pages with extracted claims',
-    passthrough: ['apply', 'limit', 'entity', 'path', 'model', 'max-claims'],
-    positional: false,
   },
   'enrich-structured': {
     script: 'claims/enrich-structured.ts',
@@ -196,20 +148,16 @@ Options:
   --model=M             LLM model override (default: google/gemini-2.0-flash-001)
   --steps=S             Comma-separated steps to run: extract,link,verify (pipeline only)
   --json                JSON output (status, synthesize)
-  --entity=E            Target entity filter (ingest-resource, from-resource)
-  --limit=N             Max resources/URLs to process (backfill-from-citations: max quotes to load)
-  --page-id=P           Restrict to a single wiki page (backfill-from-citations)
-  --force               Re-ingest already-processed resources; clear existing claims (ingest-resource, ingest-batch)
+  --entity=E            Target entity filter (ingest-resource, from-resource, cleanup)
+  --entity-id=E         Filter to single entity (fix commands)
+  --limit=N             Max resources/URLs to process
+  --force               Re-ingest already-processed resources; clear existing claims (ingest-resource)
   --batch=<file>        Process URLs from a file, one per line (from-resource)
   --no-auto-resource    Don't auto-create resource YAML for unknown URLs (from-resource)
-  --apply               Write changes to database (integrate, backfill, migrate, cleanup; default: dry-run)
+  --apply               Write changes to database (integrate, cleanup; default: dry-run)
   --no-gate             Disable quality gate (extract: skip auto-fix and rejection checks)
   --strict              Strict mode (extract: reject claims that fail basic validation)
   --skip-extract        Skip claim extraction step (integrate: assumes claims already exist)
-  --entity=E            Target entity filter (cleanup)
-  --entity-id=E         Filter to single entity (backfill-related-entities)
-  --batch-size=N        Process N pages at a time (migrate-footnotes-batch; default: all)
-  --path=P              Filter pages by relative path prefix (migrate-footnotes-batch)
   --unpin               Unpin a claim (pin command)
   --list=<entity-id>    List pinned claims for an entity (pin command)
   --per-page            Include per-page breakdown (coverage-audit)
@@ -227,7 +175,6 @@ Examples:
   crux claims status kalshi --json                    JSON output
   crux claims ingest-resource a039c6ec78c7a344        Ingest resource into its cited entities
   crux claims ingest-resource a039c6ec78c7a344 --entity=kalshi  Target specific entity
-  crux claims ingest-batch --limit=10                 Ingest 10 un-ingested resources
   crux claims from-resource https://example.com/article  Extract from a URL
   crux claims from-resource https://example.com/article --entity=kalshi  Target specific entity
   crux claims from-resource https://example.com/article --dry-run  Preview extraction
@@ -245,24 +192,13 @@ Workflow:
 
   Resource-centric (Phase 3):
   1. crux claims ingest-resource <resource-id>   Extract from a known resource
-  2. crux claims ingest-batch                    Bulk-process all cited resources
-  3. crux claims from-resource <url>             Extract from any URL (auto-routes)
+  2. crux claims from-resource <url>             Extract from any URL (auto-routes)
 
   Claims synthesis (gap analysis):
   1. crux claims gap-analysis <page-id>            Fast text-based gap analysis (no LLM cost)
   2. crux claims gap-analysis <page-id> --json     Machine-readable output
   3. crux claims synthesize <page-id>              LLM-based semantic gap analysis
   4. crux content improve <page-id> --gap-analysis --apply   Inject missing verified facts into page
-
-  Citation backfill (Wave 2b):
-  1. crux claims backfill-from-citations --dry-run        Preview what would be created
-  2. crux claims backfill-from-citations                  Run against all unlinked quotes
-  3. crux claims backfill-from-citations --page-id=kalshi Run for a single page
-
-  Entity backfill (relatedEntities):
-  1. crux claims backfill-related-entities                Dry-run: scan claims for entity mentions
-  2. crux claims backfill-related-entities --apply        Apply changes to database
-  3. crux claims backfill-related-entities --entity-id=anthropic --apply  Single entity
 
   Quality validation (post-hoc audit):
   1. crux claims validate-quality anthropic             Audit claims for 10 quality checks
@@ -300,22 +236,6 @@ Workflow:
   1. crux claims fix-all                             Dry-run: preview all fixes
   2. crux claims fix-all --apply                     Apply all fixes in order
   3. crux claims fix-all --entity=anthropic --apply  Single entity
-
-  Footnote migration (DB-driven references):
-  1. crux claims migrate-footnotes <page-id>          Dry-run: show what would change
-  2. crux claims migrate-footnotes <page-id> --apply   Rewrite MDX + create DB entries
-  3. crux claims migrate-footnotes-batch               Dry-run all pages with numbered footnotes
-  4. crux claims migrate-footnotes-batch --batch-size=50 --apply   Process 50 pages
-  5. crux claims migrate-footnotes-batch --entity=kalshi           Single entity
-  6. crux claims migrate-footnotes-batch --path=knowledge-base/    Directory filter
-
-  Retrofit references (insert inline [^rc-XXXX] markers for existing claims):
-  1. crux claims retrofit-refs <page-id>               Dry-run: show where refs would be inserted
-  2. crux claims retrofit-refs <page-id> --apply        Insert refs + create page_citations
-  3. crux claims retrofit-refs-batch                    Dry-run all pages with claims but no refs
-  4. crux claims retrofit-refs-batch --limit=10 --apply Process 10 pages
-  5. crux claims retrofit-refs-batch --entity=metr      Single entity
-  6. crux claims retrofit-refs-batch --path=knowledge-base/organizations/  Directory filter
 
 Notes:
   - Extraction requires OPENROUTER_API_KEY or ANTHROPIC_API_KEY

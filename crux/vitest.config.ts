@@ -19,6 +19,9 @@ export default defineConfig({
       'wiki-server/**/*.test.ts',
       'evals/**/*.test.ts',
     ],
+    exclude: [
+      'claims/archive/**',
+    ],
     root: __dirname,
     // Run test files sequentially to prevent cross-file test contamination.
     // Some test files share mocked module state; parallel execution can cause
