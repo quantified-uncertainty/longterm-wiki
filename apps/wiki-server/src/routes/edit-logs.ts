@@ -115,10 +115,15 @@ const editLogsApp = new Hono()
     if (!pageId) return validationError(c, "page_id query parameter is required");
 
     const db = getDrizzleDb();
+
+    // Phase 4b: resolve slug to integer and query by page_id_int
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return c.json({ entries: [] });
+
     const rows = await db
       .select()
       .from(editLogs)
-      .where(eq(editLogs.pageId, pageId))
+      .where(eq(editLogs.pageIdInt, intId))
       .orderBy(asc(editLogs.date), asc(editLogs.id));
 
     return c.json({

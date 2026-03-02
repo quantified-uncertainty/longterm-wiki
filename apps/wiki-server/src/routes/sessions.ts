@@ -9,7 +9,7 @@ import {
   CreateSessionBatchSchema,
   DateStringSchema,
 } from "../api-types.js";
-import { resolvePageIntIds } from "./page-id-helpers.js";
+import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Constants ----
 
@@ -249,11 +249,15 @@ const sessionsApp = new Hono()
 
     const db = getDrizzleDb();
 
+    // Phase 4b: resolve slug to integer and query by page_id_int
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return c.json({ sessions: [] });
+
     // Find session IDs that include this page
     const spRows = await db
       .select({ sessionId: sessionPages.sessionId })
       .from(sessionPages)
-      .where(eq(sessionPages.pageId, pageId));
+      .where(eq(sessionPages.pageIdInt, intId));
 
     if (spRows.length === 0) {
       return c.json({ sessions: [] });

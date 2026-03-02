@@ -1384,6 +1384,10 @@ const claimsApp = new Hono()
 
     const db = getDrizzleDb();
 
+    // Phase 4b: resolve slug to integer and query by page_id_int
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return c.json({ quotes: [] });
+
     // Wrap all reads in a transaction to ensure a consistent snapshot (#1393).
     const quotes = await db.transaction(async (tx) => {
       // Step 1: Get all claim_page_references for this page (with footnote info)
@@ -1394,7 +1398,7 @@ const claimsApp = new Hono()
           section: claimPageReferences.section,
         })
         .from(claimPageReferences)
-        .where(eq(claimPageReferences.pageId, pageId))
+        .where(eq(claimPageReferences.pageIdInt, intId))
         .orderBy(asc(claimPageReferences.footnote))
         .limit(limit);
 

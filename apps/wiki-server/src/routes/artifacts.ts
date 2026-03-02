@@ -112,10 +112,14 @@ const artifactsApp = new Hono()
     const { page_id, limit } = parsed.data;
     const db = getDrizzleDb();
 
+    // Phase 4b: resolve slug to integer and query by page_id_int
+    const intId = await resolvePageIntId(db, page_id);
+    if (intId === null) return c.json({ entries: [] });
+
     const rows = await db
       .select()
       .from(pageImproveRuns)
-      .where(eq(pageImproveRuns.pageId, page_id))
+      .where(eq(pageImproveRuns.pageIdInt, intId))
       .orderBy(desc(pageImproveRuns.startedAt))
       .limit(limit);
 

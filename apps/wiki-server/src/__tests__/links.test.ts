@@ -7,7 +7,9 @@ import { mockDbModule, postJson } from "./test-utils.js";
 interface LinkRow {
   id: number;
   source_id: string;
+  source_id_int: number | null;
   target_id: string;
+  target_id_int: number | null;
   link_type: string;
   relationship: string | null;
   weight: number;
@@ -26,11 +28,34 @@ interface PageRow {
 let linksStore: Map<string, LinkRow>;
 let pagesStore: Map<string, PageRow>;
 let nextId: number;
+let nextSlugIntId = 1000;
+const slugIntIdMap = new Map<string, number>();
+
+function getIntIdForSlug(slug: string): number {
+  if (!slugIntIdMap.has(slug)) {
+    slugIntIdMap.set(slug, nextSlugIntId++);
+  }
+  return slugIntIdMap.get(slug)!;
+}
+
+/** Non-allocating lookup — returns undefined for slugs not yet in the map. */
+function lookupIntIdForSlug(slug: string): number | undefined {
+  return slugIntIdMap.get(slug);
+}
+
+function getSlugForIntId(intId: number): string | undefined {
+  for (const [slug, id] of slugIntIdMap) {
+    if (id === intId) return slug;
+  }
+  return undefined;
+}
 
 function resetStores() {
   linksStore = new Map();
   pagesStore = new Map();
   nextId = 1;
+  nextSlugIntId = 1000;
+  slugIntIdMap.clear();
 }
 
 function linkKey(sourceId: string, targetId: string, linkType: string) {
@@ -50,13 +75,19 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // INSERT which also references entity_ids in a LEFT JOIN clause.
   if (q.includes("insert into") && q.includes('"entity_ids"')) {
     const slug = params[0] as string;
-    return [{ numeric_id: nextId++, slug }];
+    return [{ numeric_id: getIntIdForSlug(slug), slug }];
   }
 
-  // --- entity_ids: SELECT WHERE slug (for resolvePageIntIds) ---
+  // --- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ---
   // Must not match the page_links INSERT which contains entity_ids in a JOIN
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)") && !q.includes("page_links")) {
-    return []; // No entity_ids in test — page_id_int will be null
+    return params
+      .map((p) => {
+        const slug = String(p);
+        const numeric_id = lookupIntIdForSlug(slug);
+        return numeric_id === undefined ? null : { numeric_id, slug };
+      })
+      .filter((r): r is { numeric_id: number; slug: string } => r !== null);
   }
 
   // --- page_links: DELETE all ---
@@ -81,7 +112,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const row: LinkRow = {
         id: nextId++,
         source_id: link.sourceId,
+        source_id_int: getIntIdForSlug(link.sourceId),
         target_id: link.targetId,
+        target_id_int: getIntIdForSlug(link.targetId),
         link_type: link.linkType,
         relationship: link.relationship || null,
         weight: link.weight,
@@ -109,10 +142,14 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const now = new Date();
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
+      const src = params[o] as string;
+      const tgt = params[o + 1] as string;
       const row: LinkRow = {
         id: nextId++,
-        source_id: params[o] as string,
-        target_id: params[o + 1] as string,
+        source_id: src,
+        source_id_int: getIntIdForSlug(src),
+        target_id: tgt,
+        target_id_int: getIntIdForSlug(tgt),
         link_type: params[o + 2] as string,
         relationship: (params[o + 3] as string) || null,
         weight: params[o + 4] as number,
@@ -133,19 +170,19 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
-  // --- page_links: DISTINCT ON backlinks query ---
+  // --- page_links: DISTINCT ON backlinks query (Phase 4b: filter by target_id_int) ---
   if (
     q.includes("page_links") &&
     q.includes("distinct on") &&
     q.includes("target_id")
   ) {
-    const targetId = params[0] as string;
+    const targetIntId = params[0] as number;
     const limit = (params[1] as number) || 50;
     const results: Record<string, unknown>[] = [];
     const seen = new Set<string>();
 
     for (const row of linksStore.values()) {
-      if (row.target_id === targetId && !seen.has(row.source_id)) {
+      if (row.target_id_int === targetIntId && !seen.has(row.source_id)) {
         seen.add(row.source_id);
         const page = pagesStore.get(row.source_id);
         results.push({
@@ -163,9 +200,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- page_links: bidirectional links CTE (related endpoint) ---
   if (q.includes("bidirectional_links") || q.includes("aggregated")) {
-    const entityId = params[0] as string;
-    const minScore = params[2] as number;
-    const limit = (params[3] as number) || 75;
+    // Phase 4b: params are [entityIntId, entityIntId, entityId(text), MIN_SCORE, limit*3]
+    const entityIntId = params[0] as number;
+    const entitySlug = getSlugForIntId(entityIntId);
+    const minScore = params[3] as number;
+    const limit = (params[4] as number) || 75;
 
     // Gather bidirectional links
     const neighborScores = new Map<string, number>();
@@ -173,9 +212,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
     for (const row of linksStore.values()) {
       let neighborId: string | null = null;
-      if (row.source_id === entityId) neighborId = row.target_id;
-      else if (row.target_id === entityId) neighborId = row.source_id;
-      if (!neighborId || neighborId === entityId) continue;
+      if (row.source_id_int === entityIntId) neighborId = row.target_id;
+      else if (row.target_id_int === entityIntId) neighborId = row.source_id;
+      if (!neighborId || neighborId === entitySlug) continue;
 
       neighborScores.set(
         neighborId,
@@ -224,11 +263,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     !q.includes("distinct on") &&
     !q.includes("bidirectional")
   ) {
-    const entityId = params[0] as string;
+    // Phase 4b: params are [graphEntityIntId, graphEntityIntId, MAX_GRAPH_EDGES]
+    const entityIntId = params[0] as number;
+    const maxEdges = (params[2] as number) || 500;
     const results: Record<string, unknown>[] = [];
 
     for (const row of linksStore.values()) {
-      if (row.source_id === entityId || row.target_id === entityId) {
+      if (row.source_id_int === entityIntId || row.target_id_int === entityIntId) {
         const sourcePage = pagesStore.get(row.source_id);
         const targetPage = pagesStore.get(row.target_id);
         results.push({
@@ -248,7 +289,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     results.sort(
       (a, b) => (b.weight as number) - (a.weight as number)
     );
-    return results;
+    return results.slice(0, maxEdges);
   }
 
   // --- page_links: stats (count by type) ---

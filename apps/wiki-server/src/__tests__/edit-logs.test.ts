@@ -4,9 +4,12 @@ import { Hono } from "hono";
 // ---- In-memory store simulating the edit_logs table ----
 
 let nextId = 1;
+let nextSlugIntId = 1000;
+const slugIntIdMap = new Map<string, number>();
 let editStore: Array<{
   id: number;
   page_id: string;
+  page_id_int: number | null;
   date: string;
   tool: string;
   agency: string;
@@ -15,9 +18,23 @@ let editStore: Array<{
   created_at: Date;
 }>;
 
+function getIntIdForSlug(slug: string): number {
+  if (!slugIntIdMap.has(slug)) {
+    slugIntIdMap.set(slug, nextSlugIntId++);
+  }
+  return slugIntIdMap.get(slug)!;
+}
+
+/** Non-allocating lookup — returns undefined for slugs not yet in the map. */
+function lookupIntIdForSlug(slug: string): number | undefined {
+  return slugIntIdMap.get(slug);
+}
+
 function resetStore() {
   editStore = [];
   nextId = 1;
+  nextSlugIntId = 1000;
+  slugIntIdMap.clear();
 }
 
 /**
@@ -95,7 +112,9 @@ function createMockSql() {
 
     // ---- entity_ids: SELECT for page-id-helpers resolvePageIntId(s) ----
     if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
-      return params.map((p) => ({ numeric_id: 1, slug: p }));
+      // Allocating on first use mirrors production where all page slugs have entity_ids.
+      // Phase C verified zero NULLs, so every slug encountered here will have an ID.
+      return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
     }
 
     // ---- ref-check: SELECT id FROM wiki_pages WHERE id IN (...) ----
@@ -197,12 +216,13 @@ function createMockSql() {
         .sort((a, b) => b.count - a.count);
     }
 
-    // ---- SELECT ... WHERE page_id = $1 ORDER BY date, id ----
+    // ---- SELECT ... WHERE page_id_int = $1 ORDER BY date, id ----
+    // Phase 4b: reads use page_id_int integer column
     // Exclude queries with LIMIT (those are the paginated /all endpoint)
-    if (q.includes("edit_logs") && q.includes("where") && q.includes("page_id") && !q.includes("limit")) {
-      const pageId = params[0] as string;
+    if (q.includes("edit_logs") && q.includes("where") && q.includes("page_id_int") && !q.includes("limit")) {
+      const intId = params[0] as number;
       return editStore
-        .filter((e) => e.page_id === pageId)
+        .filter((e) => e.page_id_int === intId)
         .sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
     }
 

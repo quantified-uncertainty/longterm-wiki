@@ -236,10 +236,14 @@ const hallucinationRiskApp = new Hono()
     const { page_id, limit } = parsed.data;
     const db = getDrizzleDb();
 
+    // Phase 4b: resolve slug to integer and query by page_id_int
+    const intId = await resolvePageIntId(db, page_id);
+    if (intId === null) return c.json({ pageId: page_id, snapshots: [] });
+
     const rows = await db
       .select()
       .from(hallucinationRiskSnapshots)
-      .where(eq(hallucinationRiskSnapshots.pageId, page_id))
+      .where(eq(hallucinationRiskSnapshots.pageIdInt, intId))
       .orderBy(desc(hallucinationRiskSnapshots.computedAt))
       .limit(limit);
 

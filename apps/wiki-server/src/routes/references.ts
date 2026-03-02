@@ -58,6 +58,12 @@ const app = new Hono()
     const pageId = c.req.param("pageId");
     const db = getDrizzleDb();
 
+    // Phase 4b: resolve slug to integer and query by page_id_int
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) {
+      return c.json({ references: [], totalClaim: 0, totalCitation: 0 });
+    }
+
     // 1. Query claim_page_references JOIN claims for claim data
     const claimRefRows = await db
       .select({
@@ -74,7 +80,7 @@ const app = new Hono()
       })
       .from(claimPageReferences)
       .innerJoin(claims, eq(claimPageReferences.claimId, claims.id))
-      .where(eq(claimPageReferences.pageId, pageId));
+      .where(eq(claimPageReferences.pageIdInt, intId));
 
     const claimRefs: ClaimReferenceItem[] = claimRefRows.map((r) => ({
       type: "claim" as const,
@@ -94,7 +100,7 @@ const app = new Hono()
     const citationRows = await db
       .select()
       .from(pageCitations)
-      .where(eq(pageCitations.pageId, pageId));
+      .where(eq(pageCitations.pageIdInt, intId));
 
     const citations: CitationItem[] = citationRows.map((r) => ({
       type: "citation" as const,

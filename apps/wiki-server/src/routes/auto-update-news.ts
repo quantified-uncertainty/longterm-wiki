@@ -13,7 +13,7 @@ import {
   AutoUpdateNewsItemSchema as SharedNewsItemSchema,
   AutoUpdateNewsBatchSchema,
 } from "../api-types.js";
-import { resolvePageIntIds } from "./page-id-helpers.js";
+import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Constants ----
 
@@ -154,6 +154,10 @@ const autoUpdateNewsApp = new Hono()
     const pageId = c.req.param("pageId");
     const db = getDrizzleDb();
 
+    // Phase 4b: resolve slug to integer and query by routed_to_page_id_int
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return c.json({ items: [] });
+
     const rows = await db
       .select({
         item: autoUpdateNewsItems,
@@ -161,7 +165,7 @@ const autoUpdateNewsApp = new Hono()
       })
       .from(autoUpdateNewsItems)
       .innerJoin(autoUpdateRuns, eq(autoUpdateNewsItems.runId, autoUpdateRuns.id))
-      .where(eq(autoUpdateNewsItems.routedToPageId, pageId))
+      .where(eq(autoUpdateNewsItems.routedToPageIdInt, intId))
       .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore));
 
     return c.json({

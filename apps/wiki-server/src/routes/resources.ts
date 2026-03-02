@@ -28,7 +28,7 @@ import {
   UpsertResourceBatchSchema,
   type ResourceStatsResult,
 } from "../api-types.js";
-import { resolvePageIntIds } from "./page-id-helpers.js";
+import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Raw SQL row types ----
 
@@ -444,6 +444,10 @@ const resourcesApp = new Hono()
     const pageId = c.req.param("pageId");
     const db = getDrizzleDb();
 
+    // Phase 4b: resolve slug to integer and query by page_id_int
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return c.json({ resources: [] });
+
     const rows = await db
       .select({
         id: resources.id,
@@ -456,7 +460,7 @@ const resourcesApp = new Hono()
       })
       .from(resourceCitations)
       .innerJoin(resources, eq(resourceCitations.resourceId, resources.id))
-      .where(eq(resourceCitations.pageId, pageId));
+      .where(eq(resourceCitations.pageIdInt, intId));
 
     return c.json({ resources: rows });
   })
