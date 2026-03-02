@@ -74,10 +74,7 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_GITHUB_SHADOWBAN_CHECK_ENABLED", true),
         schedule:
           process.env["TASK_GITHUB_SHADOWBAN_CHECK_SCHEDULE"] ?? "*/30 * * * *",
-        usernames: (process.env["GITHUB_SHADOWBAN_CHECK_USERNAMES"] ?? "")
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
+        usernames: ["quri-bot"],
       },
     },
   };
