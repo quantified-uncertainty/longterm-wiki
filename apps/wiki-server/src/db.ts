@@ -96,6 +96,14 @@ export async function initDb() {
   const migrationDb = drizzle(migrationSql, { schema });
 
   try {
+    // Log actual session settings to verify connection params are applied
+    const settings = await migrationSql`
+      SELECT current_setting('statement_timeout') AS statement_timeout,
+             current_setting('lock_timeout') AS lock_timeout,
+             current_setting('idle_in_transaction_session_timeout') AS idle_in_txn_timeout
+    `;
+    logger.info({ settings: settings[0] }, "Migration client session settings");
+
     await migrate(migrationDb, {
       migrationsFolder: path.resolve(__dirname, "../drizzle"),
     });
