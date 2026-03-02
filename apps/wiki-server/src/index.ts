@@ -6,8 +6,12 @@ import { logger } from "./logger.js";
 const PORT = parseInt(process.env.PORT || "3100", 10);
 
 async function main() {
-  logger.info("Initializing database...");
-  await initDb();
+  if (process.env.SKIP_MIGRATIONS === "true") {
+    logger.info("SKIP_MIGRATIONS=true — skipping database migrations");
+  } else {
+    logger.info("Initializing database...");
+    await initDb();
+  }
 
   const app = createApp();
 
