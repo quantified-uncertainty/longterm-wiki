@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { BlockIndex, PageBlockIR, SectionIR } from '../block-ir.ts';
-import { ValidationEngine, Severity } from '../validation-engine.ts';
+import type { BlockIndex, PageBlockIR, SectionIR } from '../content/block-ir.ts';
+import { ValidationEngine, Severity } from '../validation/validation-engine.ts';
 
 // ---------------------------------------------------------------------------
 // Mock loadBlockIndex

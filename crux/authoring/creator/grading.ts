@@ -7,7 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient, MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
-import { appendEditLog } from '../../lib/edit-log.ts';
+import { appendEditLog } from '../../lib/session/edit-log.ts';
 import { reorderFrontmatterObject } from '../../lib/frontmatter-order.ts';
 import { extractText } from '../../lib/llm.ts';
 import { READER_IMPORTANCE_GUIDELINES, TACTICAL_VALUE_GUIDELINES } from '../../lib/grading-shared.ts';

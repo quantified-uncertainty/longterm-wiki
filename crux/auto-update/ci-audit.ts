@@ -28,7 +28,7 @@ import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
-import { extractCitationsFromContent } from '../lib/citation-archive.ts';
+import { extractCitationsFromContent } from '../lib/citation/citation-archive.ts';
 import { checkAccuracyForPage } from '../citations/check-accuracy.ts';
 import { exportDashboardData } from '../citations/export-dashboard.ts';
 import type { AccuracyResult } from '../citations/check-accuracy.ts';

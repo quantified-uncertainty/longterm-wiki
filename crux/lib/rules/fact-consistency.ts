@@ -14,7 +14,7 @@
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
-import { createRule, Issue, Severity, ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 import { PROJECT_ROOT, loadDatabase } from '../content-types.ts';
 
 // ---------------------------------------------------------------------------

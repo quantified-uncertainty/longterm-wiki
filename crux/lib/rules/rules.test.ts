@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { Issue, Severity, FixType, createRule, type Rule } from '../validation-engine.ts';
+import { Issue, Severity, FixType, createRule, type Rule } from '../validation/validation-engine.ts';
 import { dollarSignsRule } from './dollar-signs.ts';
 import { comparisonOperatorsRule } from './comparison-operators.ts';
 import { tildeDollarRule } from './tilde-dollar.ts';

@@ -727,7 +727,7 @@ export async function stats(_args: string[], options: Record<string, unknown>): 
 // ---------------------------------------------------------------------------
 
 import { loadBlockIndex } from '../lib/content-types.ts';
-import type { SectionIR } from '../lib/block-ir.ts';
+import type { SectionIR } from '../lib/content/block-ir.ts';
 
 export async function blocks(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);

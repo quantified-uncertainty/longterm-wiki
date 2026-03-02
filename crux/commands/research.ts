@@ -16,8 +16,8 @@
 
 import { type CommandResult } from '../lib/cli.ts';
 import { createLogger } from '../lib/output.ts';
-import { runResearch } from '../lib/research-agent.ts';
-import type { ResearchRequest } from '../lib/research-agent.ts';
+import { runResearch } from '../lib/search/research-agent.ts';
+import type { ResearchRequest } from '../lib/search/research-agent.ts';
 
 // ---------------------------------------------------------------------------
 // run — default command: research a topic and print structured results

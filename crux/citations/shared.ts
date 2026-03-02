@@ -10,7 +10,7 @@ import { basename } from 'path';
 import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
-import { extractCitationsFromContent } from '../lib/citation-archive.ts';
+import { extractCitationsFromContent } from '../lib/citation/citation-archive.ts';
 import type { Colors } from '../lib/output.ts';
 
 // ---------------------------------------------------------------------------

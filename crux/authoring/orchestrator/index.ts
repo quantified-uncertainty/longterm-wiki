@@ -19,7 +19,7 @@ import { execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 import { createPhaseLogger } from '../../lib/output.ts';
-import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
+import { appendEditLog, getDefaultRequestedBy } from '../../lib/session/edit-log.ts';
 import { createSession } from '../../lib/wiki-server/sessions.ts';
 import { loadPages as loadPagesFromRegistry } from '../../lib/content-types.ts';
 import { repairFrontmatter, stripRelatedPagesSections } from '../page-improver/utils.ts';

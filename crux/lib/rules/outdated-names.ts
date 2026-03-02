@@ -8,7 +8,7 @@
  * - "Open Philanthropy" → "Coefficient Giving" (rebranded November 2025)
  */
 
-import { createRule, Issue, Severity, ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 import { isInCodeBlock } from '../mdx-utils.ts';
 
 // ---------------------------------------------------------------------------

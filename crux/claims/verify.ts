@@ -29,11 +29,11 @@ import {
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
 // propagateClaimVerdictsToPage removed — backward propagation eliminated in #1310
-import { extractCitationsFromContent } from '../lib/citation-archive.ts';
-import { resolveSource, MIN_SOURCE_CONTENT_LENGTH } from '../lib/citation-auditor.ts';
+import { extractCitationsFromContent } from '../lib/citation/citation-archive.ts';
+import { resolveSource, MIN_SOURCE_CONTENT_LENGTH } from '../lib/citation/citation-auditor.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
-import { getResourceById } from '../lib/resource-lookup.ts';
+import { getResourceById } from '../lib/search/resource-lookup.ts';
 import { readFileSync } from 'fs';
 
 const MAX_SOURCE_CHARS = 80_000;

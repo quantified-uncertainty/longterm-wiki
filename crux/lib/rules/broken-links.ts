@@ -10,7 +10,7 @@
 
 import { existsSync } from 'fs';
 import { join } from 'path';
-import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
 import { MARKDOWN_LINK_RE } from '../patterns.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../content-types.ts';

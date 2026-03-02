@@ -37,7 +37,7 @@ import {
   createRule,
   Severity,
   FixType,
-} from './validation-engine.ts';
+} from './validation/validation-engine.ts';
 
 // =============================================================================
 // cli.ts — parseIntOpt

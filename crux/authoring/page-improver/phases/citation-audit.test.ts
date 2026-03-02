@@ -11,9 +11,9 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { buildAuditorSourceCache, citationAuditPhase } from './citation-audit.ts';
-import { MIN_SOURCE_CONTENT_LENGTH } from '../../../lib/citation-auditor.ts';
-import type { AuditResult } from '../../../lib/citation-auditor.ts';
-import type { SourceCacheEntry } from '../../../lib/section-writer.ts';
+import { MIN_SOURCE_CONTENT_LENGTH } from '../../../lib/citation/citation-auditor.ts';
+import type { AuditResult } from '../../../lib/citation/citation-auditor.ts';
+import type { SourceCacheEntry } from '../../../lib/content/section-writer.ts';
 import type { ResearchResult, PipelineOptions, PageData } from '../types.ts';
 
 // ---------------------------------------------------------------------------
@@ -22,8 +22,8 @@ import type { ResearchResult, PipelineOptions, PageData } from '../types.ts';
 
 // Mock auditCitations to avoid LLM/network calls; preserve MIN_SOURCE_CONTENT_LENGTH
 // and other non-function exports so buildAuditorSourceCache tests continue to work.
-vi.mock('../../../lib/citation-auditor.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../../lib/citation-auditor.ts')>();
+vi.mock('../../../lib/citation/citation-auditor.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../lib/citation/citation-auditor.ts')>();
   return { ...actual, auditCitations: vi.fn() };
 });
 
@@ -34,7 +34,7 @@ vi.mock('../utils.ts', () => ({
 }));
 
 // Pull the mocked references after vi.mock declarations so vitest hoisting works.
-import { auditCitations } from '../../../lib/citation-auditor.ts';
+import { auditCitations } from '../../../lib/citation/citation-auditor.ts';
 import { log, writeTemp } from '../utils.ts';
 
 // ---------------------------------------------------------------------------

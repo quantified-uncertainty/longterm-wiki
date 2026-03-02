@@ -12,7 +12,7 @@
  * maintainability for internal cross-references.
  */
 
-import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
 import { MARKDOWN_LINK_RE } from '../patterns.ts';
 import { loadPathRegistry } from '../content-types.ts';

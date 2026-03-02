@@ -24,7 +24,7 @@ import { PROJECT_ROOT } from '../lib/content-types.ts';
 import {
   verifyCitationsForPage,
   extractCitationsFromContent,
-} from '../lib/citation-archive.ts';
+} from '../lib/citation/citation-archive.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

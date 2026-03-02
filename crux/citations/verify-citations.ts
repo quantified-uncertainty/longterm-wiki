@@ -24,10 +24,10 @@ import {
   extractCitationsFromContent,
   readCitationArchive,
   type CitationArchiveFile,
-} from '../lib/citation-archive.ts';
-import { fetchAndVerifyClaim } from '../lib/source-fetcher.ts';
+} from '../lib/citation/citation-archive.ts';
+import { fetchAndVerifyClaim } from '../lib/search/source-fetcher.ts';
 import { findPagesWithCitations } from './shared.ts';
-import { getResourceByUrl } from '../lib/resource-lookup.ts';
+import { getResourceByUrl } from '../lib/search/resource-lookup.ts';
 
 // ---------------------------------------------------------------------------
 // Main

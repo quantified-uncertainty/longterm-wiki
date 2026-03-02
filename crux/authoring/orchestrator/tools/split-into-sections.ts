@@ -5,7 +5,7 @@
  * Cost: $0 (no external calls).
  */
 
-import { splitIntoSections } from '../../../lib/section-splitter.ts';
+import { splitIntoSections } from '../../../lib/content/section-splitter.ts';
 import type { ToolRegistration } from './types.ts';
 
 export const tool: ToolRegistration = {

@@ -12,7 +12,7 @@ import { callLlm } from '../../lib/llm.ts';
 import { parseJsonResponse } from '../../lib/anthropic.ts';
 import { readFileSync } from 'fs';
 import { stripFrontmatter } from '../../lib/patterns.ts';
-import { ValidationEngine, ContentFile } from '../../lib/validation-engine.ts';
+import { ValidationEngine, ContentFile } from '../../lib/validation/validation-engine.ts';
 import { countFootnoteRefs } from '../../lib/metrics-extractor.ts';
 import {
   insiderJargonRule,

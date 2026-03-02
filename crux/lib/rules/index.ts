@@ -5,7 +5,7 @@
  * Add new rules here to make them available to the validation engine.
  */
 
-import type { Rule } from '../validation-engine.ts';
+import type { Rule } from '../validation/validation-engine.ts';
 
 // Content validation rules
 import { entityLinkIdsRule } from './entitylink-ids.ts';

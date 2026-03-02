@@ -15,7 +15,7 @@
  * - Description missing conclusion
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 
 // ============================================================================
 // TYPES

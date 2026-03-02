@@ -15,7 +15,7 @@
  * Part of the hallucination risk reduction initiative (issue #200).
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 import { countProseWords } from '../page-analysis.ts';
 

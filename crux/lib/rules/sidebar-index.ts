@@ -8,7 +8,7 @@
  * This ensures index pages appear first in their section with a consistent label.
  */
 
-import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 
 export const sidebarIndexRule = createRule({
   id: 'sidebar-index',

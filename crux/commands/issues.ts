@@ -19,7 +19,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { createLogger, type Colors } from '../lib/output.ts';
 import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
-import { currentBranch } from '../lib/session-checklist.ts';
+import { currentBranch } from '../lib/session/session-checklist.ts';
 import { type CommandResult, parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
 import { listActiveAgents, registerAgent } from '../lib/wiki-server/active-agents.ts';
 

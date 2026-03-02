@@ -22,7 +22,7 @@ import {
   formatSnapshotAsYaml,
   type SessionType,
   type ChecklistMetadata,
-} from '../lib/session-checklist.ts';
+} from '../lib/session/session-checklist.ts';
 import type { CommandResult } from '../lib/cli.ts';
 import { upsertAgentSession, updateAgentSession, getAgentSessionByBranch } from '../lib/wiki-server/agent-sessions.ts';
 

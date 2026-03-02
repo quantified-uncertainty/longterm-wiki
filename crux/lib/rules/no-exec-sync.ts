@@ -11,8 +11,8 @@
  * not wiki content. It prevents shell injection regressions.
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 import { readFileSync } from 'fs';
 import { join, relative } from 'path';
 import { PROJECT_ROOT } from '../content-types.ts';

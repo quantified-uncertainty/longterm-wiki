@@ -7,7 +7,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { buildSourceCache } from './research.ts';
-import type { FetchedSource } from '../../../lib/source-fetcher.ts';
+import type { FetchedSource } from '../../../lib/search/source-fetcher.ts';
 
 function makeFetchedSource(overrides: Partial<FetchedSource> = {}): FetchedSource {
   return {

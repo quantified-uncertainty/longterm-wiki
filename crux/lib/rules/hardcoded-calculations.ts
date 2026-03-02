@@ -8,7 +8,7 @@
  * reduction", "3.8:1 ratio" and suggests using <Calc> instead.
  */
 
-import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { isInCodeBlock } from '../mdx-utils.ts';
 
 // Patterns that suggest a hardcoded calculated/derived value.

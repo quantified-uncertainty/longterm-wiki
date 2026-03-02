@@ -14,8 +14,8 @@ import { parseCliArgs } from '../lib/cli.ts';
 import {
   getCachedContent,
   setCachedContent,
-} from '../lib/citation-content-cache.ts';
-import { fetchCitationUrl, saveFetchResultToPostgres } from '../lib/citation-archive.ts';
+} from '../lib/citation/citation-content-cache.ts';
+import { fetchCitationUrl, saveFetchResultToPostgres } from '../lib/citation/citation-archive.ts';
 import {
   getCitationContentByUrl,
   getQuotesByPage,

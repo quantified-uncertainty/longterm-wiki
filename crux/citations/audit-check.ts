@@ -31,8 +31,8 @@ import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
-import { auditCitations } from '../lib/citation-auditor.ts';
-import type { CitationAudit } from '../lib/citation-auditor.ts';
+import { auditCitations } from '../lib/citation/citation-auditor.ts';
+import type { CitationAudit } from '../lib/citation/citation-auditor.ts';
 
 const DEFAULT_THRESHOLD = 0.8;
 const DEFAULT_DELAY_MS = 300;

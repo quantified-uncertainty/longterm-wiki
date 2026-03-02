@@ -25,7 +25,7 @@ import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { CONTENT_DIR } from '../lib/content-types.ts';
 import { countWords, countTables, countDiagrams, countInternalLinks } from '../lib/metrics-extractor.ts';
-import { PAGE_TEMPLATES, type PageTemplate, type FrontmatterField, type SectionDef, type QualityCriterion } from '../lib/page-templates.ts';
+import { PAGE_TEMPLATES, type PageTemplate, type FrontmatterField, type SectionDef, type QualityCriterion } from '../lib/content/page-templates.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 
 interface ScoreDetail {

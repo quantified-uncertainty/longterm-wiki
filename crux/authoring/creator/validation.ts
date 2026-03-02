@@ -9,7 +9,7 @@ import path from 'path';
 import { spawn } from 'child_process';
 import { CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.ts';
 import { componentImportsRule } from '../../lib/rules/component-imports.ts';
-import { ContentFile } from '../../lib/validation-engine.ts';
+import { ContentFile } from '../../lib/validation/validation-engine.ts';
 import type { ValidationPhaseContext, CreatorContext } from './types.ts';
 
 type ValidationLoopContext = ValidationPhaseContext;

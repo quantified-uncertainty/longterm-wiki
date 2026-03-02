@@ -19,7 +19,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
-import { extractCitationsFromContent } from '../lib/citation-archive.ts';
+import { extractCitationsFromContent } from '../lib/citation/citation-archive.ts';
 import { DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { extractQuotesForPage } from './extract-quotes.ts';
 import { checkAccuracyForPage } from './check-accuracy.ts';
@@ -37,7 +37,7 @@ import {
   secondOpinionCheck,
 } from './fix-inaccuracies.ts';
 import type { ApplyResult } from './fix-inaccuracies.ts';
-import { appendEditLog } from '../lib/edit-log.ts';
+import { appendEditLog } from '../lib/session/edit-log.ts';
 
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));

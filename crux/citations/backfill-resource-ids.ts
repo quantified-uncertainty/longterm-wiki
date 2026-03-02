@@ -12,7 +12,7 @@
 
 import { fileURLToPath } from 'url';
 import { getAllQuotes, upsertCitationQuote } from '../lib/wiki-server/citations.ts';
-import { getResourceByUrl } from '../lib/resource-lookup.ts';
+import { getResourceByUrl } from '../lib/search/resource-lookup.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 

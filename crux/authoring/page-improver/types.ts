@@ -2,8 +2,8 @@
  * Types for the page-improver pipeline.
  */
 
-import type { SourceCacheEntry } from '../../lib/section-writer.ts';
-import type { AuditResult } from '../../lib/citation-auditor.ts';
+import type { SourceCacheEntry } from '../../lib/content/section-writer.ts';
+import type { AuditResult } from '../../lib/citation/citation-auditor.ts';
 
 export interface TierConfig {
   name: string;

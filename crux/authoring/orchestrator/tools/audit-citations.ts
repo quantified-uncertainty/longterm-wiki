@@ -5,7 +5,7 @@
  * Cost: ~$0.20.
  */
 
-import { auditCitations, type AuditRequest } from '../../../lib/citation-auditor.ts';
+import { auditCitations, type AuditRequest } from '../../../lib/citation/citation-auditor.ts';
 import type { ToolRegistration } from './types.ts';
 
 export const tool: ToolRegistration = {

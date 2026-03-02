@@ -26,23 +26,23 @@
  * See issue #633.
  */
 
-import { getApiKey } from './api-keys.ts';
+import { getApiKey } from '../api-keys.ts';
 import {
   getCachedContent,
   setCachedContent,
   type CachedCitationContent,
-} from './citation-content-cache.ts';
+} from '../citation/citation-content-cache.ts';
 import {
   upsertCitationContent,
   getCitationContentByUrl,
-} from './wiki-server/citations.ts';
+} from '../wiki-server/citations.ts';
 import {
   getResourceById,
   getResourceByUrl,
   updateResourceFetchStatus,
   type ResourceEntry,
 } from './resource-lookup.ts';
-import { isYoutubeUrl } from '../resource-utils.ts';
+import { isYoutubeUrl } from '../../resource-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Public interfaces (spec from issue #633)
@@ -355,7 +355,7 @@ function rewriteArxivUrl(url: string): string | null {
  * Returns null on failure. Delegates to shared pdf-extractor utility.
  */
 async function extractPdfWithPdfParse(buffer: ArrayBuffer): Promise<string | null> {
-  const { extractPdfText } = await import('./pdf-extractor.ts');
+  const { extractPdfText } = await import('../pdf-extractor.ts');
   return extractPdfText(buffer, MAX_CONTENT_CHARS);
 }
 

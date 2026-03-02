@@ -15,7 +15,7 @@
  * 5. Unknown numeric ID: warning
  */
 
-import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../content-types.ts';
 import { ENTITY_LINK_RE, NUMERIC_ID_RE, extractEntityLinkName } from '../patterns.ts';
 import { existsSync } from 'fs';

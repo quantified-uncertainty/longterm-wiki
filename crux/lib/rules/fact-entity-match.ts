@@ -17,8 +17,8 @@
 
 import { existsSync, readdirSync } from 'fs';
 import { join, basename } from 'path';
-import { createRule, Issue, Severity } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 import { PROJECT_ROOT } from '../content-types.ts';
 
 const FACTS_DIR = join(PROJECT_ROOT, 'data/facts');

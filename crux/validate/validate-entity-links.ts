@@ -27,7 +27,7 @@ import { CONTENT_DIR, PROJECT_ROOT, loadPathRegistry } from '../lib/content-type
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import type { Colors } from '../lib/output.ts';
 import type { PathRegistry } from '../lib/content-types.ts';
-import { logBulkFixes } from '../lib/edit-log.ts';
+import { logBulkFixes } from '../lib/session/edit-log.ts';
 
 // ---------------------------------------------------------------------------
 // Types

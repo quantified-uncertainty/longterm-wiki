@@ -17,8 +17,8 @@
  * Root cause reference: claude/fix-footer-rendering-ttIYJ
  */
 
-import { Severity, Issue } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 
 /** Lines after a standalone `{` to search for the JSON field signature. */
 const LOOKAHEAD_LINES = 8;

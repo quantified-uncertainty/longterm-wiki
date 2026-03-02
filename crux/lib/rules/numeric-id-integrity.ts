@@ -7,7 +7,7 @@
  * 3. Entity conflict: page numericId must not collide with a YAML entity's numericId
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { NUMERIC_ID_RE } from '../patterns.ts';
 
 export const numericIdIntegrityRule = {

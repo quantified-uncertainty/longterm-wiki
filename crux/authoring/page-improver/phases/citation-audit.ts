@@ -18,9 +18,9 @@
  * See issue #670.
  */
 
-import { auditCitations, MIN_SOURCE_CONTENT_LENGTH, type AuditResult, type SourceCache } from '../../../lib/citation-auditor.ts';
-import type { SourceCacheEntry } from '../../../lib/section-writer.ts';
-import type { FetchedSource } from '../../../lib/source-fetcher.ts';
+import { auditCitations, MIN_SOURCE_CONTENT_LENGTH, type AuditResult, type SourceCache } from '../../../lib/citation/citation-auditor.ts';
+import type { SourceCacheEntry } from '../../../lib/content/section-writer.ts';
+import type { FetchedSource } from '../../../lib/search/source-fetcher.ts';
 import type { PageData, ResearchResult, PipelineOptions } from '../types.ts';
 import { log, writeTemp } from '../utils.ts';
 

@@ -12,7 +12,7 @@
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { createLogger } from '../lib/output.ts';
-import { currentBranch } from '../lib/session-checklist.ts';
+import { currentBranch } from '../lib/session/session-checklist.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { syncSessionFile } from '../wiki-server/sync-session.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';

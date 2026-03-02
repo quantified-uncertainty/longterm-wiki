@@ -14,7 +14,7 @@
  * documentation pages, and short pages.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 import { countProseWords } from '../page-analysis.ts';
 import { findFootnoteRefs } from '../content-integrity.ts';

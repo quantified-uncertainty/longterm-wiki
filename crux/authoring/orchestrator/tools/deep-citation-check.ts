@@ -8,7 +8,7 @@
  * Cost: $0 (local parsing).
  */
 
-import { extractCitationsFromContent } from '../../../lib/citation-archive.ts';
+import { extractCitationsFromContent } from '../../../lib/citation/citation-archive.ts';
 import { stripFrontmatter } from '../../../lib/patterns.ts';
 import type { ToolRegistration } from './types.ts';
 

@@ -9,8 +9,8 @@
  * Ported from crux/validate/validate-consistency.ts (lines ~347-423).
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 import type { Entity } from '../content-types.ts';
 
 // ---------------------------------------------------------------------------

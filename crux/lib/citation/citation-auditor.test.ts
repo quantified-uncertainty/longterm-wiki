@@ -20,14 +20,14 @@ import {
   type SourceCache,
   type ClaimMap,
 } from './citation-auditor.ts';
-import type { FetchedSource } from './source-fetcher.ts';
+import type { FetchedSource } from '../search/source-fetcher.ts';
 
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
 
 // Mock the LLM layer so tests don't need API keys.
-vi.mock('./quote-extractor.ts', () => ({
+vi.mock('../quote-extractor.ts', () => ({
   callOpenRouter: vi.fn(),
   stripCodeFences: (s: string) => s.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim(),
   truncateSource: (s: string) => s,
@@ -35,7 +35,7 @@ vi.mock('./quote-extractor.ts', () => ({
 }));
 
 // Mock the source-fetcher so network calls don't happen.
-vi.mock('./source-fetcher.ts', () => ({
+vi.mock('../search/source-fetcher.ts', () => ({
   fetchSource: vi.fn(),
 }));
 
@@ -45,8 +45,8 @@ vi.mock('./citation-content-cache.ts', () => ({
   setCachedContent: vi.fn(),
 }));
 
-import { callOpenRouter } from './quote-extractor.ts';
-import { fetchSource } from './source-fetcher.ts';
+import { callOpenRouter } from '../quote-extractor.ts';
+import { fetchSource } from '../search/source-fetcher.ts';
 
 const mockCallOpenRouter = vi.mocked(callOpenRouter);
 const mockFetchSource = vi.mocked(fetchSource);

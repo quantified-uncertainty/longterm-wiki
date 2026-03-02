@@ -16,7 +16,7 @@
  * Only applies to pages under /people/ or /organizations/ paths.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 
 function isBiographicalPage(relativePath: string): boolean {
   return relativePath.includes('/people/') || relativePath.includes('/organizations/');

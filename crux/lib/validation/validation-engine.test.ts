@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { join } from 'path';
 import { Issue, Severity, FixType, ContentFile, ValidationEngine } from './validation-engine.ts';
-import { CONTENT_DIR_ABS } from './content-types.ts';
+import { CONTENT_DIR_ABS } from '../content-types.ts';
 
 // ---------------------------------------------------------------------------
 // Issue class basics

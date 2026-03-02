@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock resource-io.ts loadResources to return test data
-vi.mock('../resource-io.ts', () => ({
+vi.mock('../../resource-io.ts', () => ({
   loadResources: vi.fn(() => [
     {
       id: 'abc123def456',

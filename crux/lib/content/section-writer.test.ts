@@ -26,8 +26,8 @@ import {
 // Mock the LLM layer so no network calls are made
 // ---------------------------------------------------------------------------
 
-vi.mock('./llm.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./llm.ts')>();
+vi.mock('../llm.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../llm.ts')>();
   return {
     ...actual,
     createLlmClient: vi.fn(() => ({})),
@@ -558,14 +558,14 @@ describe('rewriteSection', () => {
   });
 
   it('passes directions through to the prompt', async () => {
-    const { streamLlmCall } = await import('./llm.ts');
+    const { streamLlmCall } = await import('../llm.ts');
     await rewriteSection(makeRequest({ directions: 'Focus on funding history.' }));
     const promptArg = vi.mocked(streamLlmCall).mock.calls[0][1] as string;
     expect(promptArg).toContain('Focus on funding history.');
   });
 
   it('includes strict-mode language when allowTrainingKnowledge is false', async () => {
-    const { streamLlmCall } = await import('./llm.ts');
+    const { streamLlmCall } = await import('../llm.ts');
     await rewriteSection(makeRequest({
       constraints: { allowTrainingKnowledge: false, requireClaimMap: true },
     }));
@@ -581,14 +581,14 @@ describe('rewriteSection', () => {
   });
 
   it('propagates model option to streamLlmCall', async () => {
-    const { streamLlmCall } = await import('./llm.ts');
+    const { streamLlmCall } = await import('../llm.ts');
     await rewriteSection(makeRequest(), { model: 'claude-haiku-4-5' });
     const opts = vi.mocked(streamLlmCall).mock.calls[0][2];
     expect(opts?.model).toBe('claude-haiku-4-5');
   });
 
   it('multiple sources — formats all of them in the prompt', async () => {
-    const { streamLlmCall } = await import('./llm.ts');
+    const { streamLlmCall } = await import('../llm.ts');
     const src1 = makeSrc({ id: 'SRC-1', title: 'Source One' });
     const src2 = makeSrc({ id: 'SRC-2', url: 'https://b.com', title: 'Source Two' });
     await rewriteSection(makeRequest({ sourceCache: [src1, src2] }));

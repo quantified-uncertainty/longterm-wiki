@@ -8,9 +8,9 @@
 
 import { z } from 'zod';
 import { MODELS } from '../../../lib/anthropic.ts';
-import { fetchSources, type FetchRequest, type FetchedSource } from '../../../lib/source-fetcher.ts';
-import { MIN_SOURCE_CONTENT_LENGTH } from '../../../lib/citation-auditor.ts';
-import type { SourceCacheEntry } from '../../../lib/section-writer.ts';
+import { fetchSources, type FetchRequest, type FetchedSource } from '../../../lib/search/source-fetcher.ts';
+import { MIN_SOURCE_CONTENT_LENGTH } from '../../../lib/citation/citation-auditor.ts';
+import type { SourceCacheEntry } from '../../../lib/content/section-writer.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
 import { log, writeTemp } from '../utils.ts';
 import { runAgent } from '../api.ts';

@@ -12,9 +12,9 @@
 import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import type { Resource } from '../resource-types.ts';
-import { RESOURCES_DIR } from '../resource-types.ts';
-import { loadResources } from '../resource-io.ts';
+import type { Resource } from '../../resource-types.ts';
+import { RESOURCES_DIR } from '../../resource-types.ts';
+import { loadResources } from '../../resource-io.ts';
 
 // Re-export Resource as ResourceEntry for consumers
 export type ResourceEntry = Resource;

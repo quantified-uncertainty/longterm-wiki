@@ -11,7 +11,7 @@ import {
   reorderFrontmatterObject,
 } from './frontmatter-order.ts';
 import { frontmatterOrderRule } from './rules/frontmatter-order.ts';
-import { Severity } from './validation-engine.ts';
+import { Severity } from './validation/validation-engine.ts';
 
 // Helper to create a mock content file (cast to any to match existing test patterns)
 function mockContent(raw: string): any {

@@ -18,7 +18,7 @@ import fs from 'fs';
 import path from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { setCachedContent } from './citation-content-cache.ts';
-import { upsertCitationContent } from './wiki-server/citations.ts';
+import { upsertCitationContent } from '../wiki-server/citations.ts';
 
 // ---------------------------------------------------------------------------
 // Types

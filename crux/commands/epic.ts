@@ -32,7 +32,7 @@
 import { readFileSync } from 'fs';
 import { createLogger } from '../lib/output.ts';
 import { githubGraphQL, githubApi, REPO, getRepoNodeId } from '../lib/github.ts';
-import { currentBranch } from '../lib/session-checklist.ts';
+import { currentBranch } from '../lib/session/session-checklist.ts';
 import type { CommandResult } from '../lib/cli.ts';
 import { parseRequiredInt } from '../lib/cli.ts';
 

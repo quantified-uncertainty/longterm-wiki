@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import path from 'path';
 
 // Mock wiki-server/edit-logs.ts to prevent real HTTP requests in tests
-vi.mock('./wiki-server/edit-logs.ts', () => ({
+vi.mock('../wiki-server/edit-logs.ts', () => ({
   appendEditLogToServer: vi.fn().mockResolvedValue({
     ok: true,
     data: { id: 1, pageId: 'test', date: '2026-02-13', createdAt: '2026-02-13T00:00:00Z' },
@@ -11,7 +11,7 @@ vi.mock('./wiki-server/edit-logs.ts', () => ({
 }));
 
 import { appendEditLog, readEditLog, pageIdFromPath, logBulkFixes, getDefaultRequestedBy } from './edit-log.ts';
-import { appendEditLogToServer, getEditLogsForPage } from './wiki-server/edit-logs.ts';
+import { appendEditLogToServer, getEditLogsForPage } from '../wiki-server/edit-logs.ts';
 
 const TEST_PAGE_ID = '__test-edit-log-page__';
 
