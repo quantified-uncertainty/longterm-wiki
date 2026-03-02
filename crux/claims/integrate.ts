@@ -19,6 +19,7 @@
  */
 
 import { readFileSync, writeFileSync } from 'fs';
+import { createHash } from 'crypto';
 import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
@@ -29,8 +30,22 @@ import {
 } from '../lib/wiki-server/claims.ts';
 import { getQuotesByPage } from '../lib/wiki-server/citations.ts';
 import { createClaimReference } from '../lib/wiki-server/references.ts';
-import { generateReferenceId } from './migrate-footnotes.ts';
 import type { ClaimPageReferenceInsert } from '../../apps/wiki-server/src/api-types.ts';
+
+/** Generate a short, stable reference ID (cr- or rc- prefix) from a hash of the input data. */
+function generateReferenceId(prefix: 'cr' | 'rc', data: string, existingIds: Set<string>): string {
+  const hash = createHash('sha256').update(data).digest('hex');
+  for (let offset = 0; offset < hash.length - 4; offset++) {
+    const candidate = `${prefix}-${hash.slice(offset, offset + 4)}`;
+    if (!existingIds.has(candidate)) {
+      existingIds.add(candidate);
+      return candidate;
+    }
+  }
+  const fallback = `${prefix}-${hash.slice(0, 8)}`;
+  existingIds.add(fallback);
+  return fallback;
+}
 
 // ---------------------------------------------------------------------------
 // Types

@@ -53,10 +53,6 @@ const CLAIMS_SCRIPTS: Record<string, Pick<ScriptConfig, 'passthrough' | 'positio
     passthrough: ['dry-run', 'model', 'entity', 'force'],
     positional: true,
   },
-  'ingest-batch': {
-    passthrough: ['dry-run', 'model', 'entity', 'limit', 'force'],
-    positional: false,
-  },
   'from-resource': {
     passthrough: ['dry-run', 'model', 'entity', 'no-auto-resource', 'batch', 'limit'],
     positional: true,
@@ -153,29 +149,6 @@ describe('claims ingest-resource — flag forwarding', () => {
     expect(args).toContain('--force');
     expect(args).not.toContain('--limit=5');
     expect(args).not.toContain('--json');
-  });
-});
-
-describe('claims ingest-batch — flag forwarding', () => {
-  const config = CLAIMS_SCRIPTS['ingest-batch'];
-
-  it('forwards --dry-run, --model, --entity, --limit, --force', () => {
-    const args = filterArgs(
-      { dryRun: true, model: 'haiku', entity: 'kalshi', limit: 10, force: true },
-      config,
-    );
-    expect(args).toContain('--dry-run');
-    expect(args).toContain('--model=haiku');
-    expect(args).toContain('--entity=kalshi');
-    expect(args).toContain('--limit=10');
-    expect(args).toContain('--force');
-  });
-
-  it('drops non-passthrough flags', () => {
-    const args = filterArgs({ limit: 10, json: true, fetch: true }, config);
-    expect(args).toContain('--limit=10');
-    expect(args).not.toContain('--json');
-    expect(args).not.toContain('--fetch');
   });
 });
 
@@ -344,12 +317,6 @@ describe('end-to-end flag round-trip', () => {
     const forwarded = filterArgs({ force: true }, CLAIMS_SCRIPTS['ingest-resource']);
     const parsed = parseCliArgs(forwarded);
     expect(parsed.force).toBe(true);
-  });
-
-  it('--limit=10 survives the full pipeline for ingest-batch', () => {
-    const forwarded = filterArgs({ limit: 10 }, CLAIMS_SCRIPTS['ingest-batch']);
-    const parsed = parseCliArgs(forwarded);
-    expect(parsed.limit).toBe('10');
   });
 
   it('--no-auto-resource survives the full pipeline for from-resource', () => {
@@ -697,7 +664,7 @@ describe('structural guard — test configs stay in sync with source', () => {
     expect(tested).toEqual(
       expect.arrayContaining([
         'extract', 'verify', 'status', 'ingest-resource',
-        'ingest-batch', 'from-resource', 'evaluate-baseline', 'audit',
+        'from-resource', 'evaluate-baseline', 'audit',
       ]),
     );
   });
