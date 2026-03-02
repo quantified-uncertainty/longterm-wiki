@@ -313,10 +313,13 @@ const citationsApp = new Hono()
     const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500) : 100;
 
     const db = getDrizzleDb();
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return c.json({ quotes: [] });
+
     const rows = await db
       .select()
       .from(citationQuotes)
-      .where(eq(citationQuotes.pageId, pageId))
+      .where(eq(citationQuotes.pageIdInt, intId))
       .orderBy(asc(citationQuotes.footnote))
       .limit(limit);
 
@@ -355,6 +358,8 @@ const citationsApp = new Hono()
 
     const { pageId, footnote, method, score } = parsed.data;
     const db = getDrizzleDb();
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
 
     const rows = await db
       .update(citationQuotes)
@@ -367,7 +372,7 @@ const citationsApp = new Hono()
       })
       .where(
         and(
-          eq(citationQuotes.pageId, pageId),
+          eq(citationQuotes.pageIdInt, intId),
           eq(citationQuotes.footnote, footnote)
         )
       )
@@ -395,6 +400,8 @@ const citationsApp = new Hono()
 
     const { pageId, footnote, method, score } = parsed.data;
     const db = getDrizzleDb();
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
 
     const rows = await db
       .update(citationQuotes)
@@ -406,7 +413,7 @@ const citationsApp = new Hono()
       })
       .where(
         and(
-          eq(citationQuotes.pageId, pageId),
+          eq(citationQuotes.pageIdInt, intId),
           eq(citationQuotes.footnote, footnote)
         )
       )
@@ -434,6 +441,8 @@ const citationsApp = new Hono()
 
     const { pageId, footnote, verdict, score, issues, supportingQuotes, verificationDifficulty } = parsed.data;
     const db = getDrizzleDb();
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
 
     const rows = await db
       .update(citationQuotes)
@@ -448,7 +457,7 @@ const citationsApp = new Hono()
       })
       .where(
         and(
-          eq(citationQuotes.pageId, pageId),
+          eq(citationQuotes.pageIdInt, intId),
           eq(citationQuotes.footnote, footnote)
         )
       )
@@ -626,11 +635,16 @@ const citationsApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+    // Phase 4b: resolve all page slugs to integer IDs upfront
+    const uniquePageIds = [...new Set(items.map((d) => d.pageId))];
+    const intIdMap = await resolvePageIntIds(db, uniquePageIds);
     const results: Array<{ pageId: string; footnote: number; verdict: string }> = [];
 
     try {
       await db.transaction(async (tx) => {
         for (const d of items) {
+          const intId = intIdMap.get(d.pageId);
+          if (intId == null) continue; // page absent from entity_ids, row cannot exist
           const rows = await tx
             .update(citationQuotes)
             .set({
@@ -644,7 +658,7 @@ const citationsApp = new Hono()
             })
             .where(
               and(
-                eq(citationQuotes.pageId, d.pageId),
+                eq(citationQuotes.pageIdInt, intId),
                 eq(citationQuotes.footnote, d.footnote)
               )
             )
@@ -730,10 +744,13 @@ const citationsApp = new Hono()
 
     if (pageId) {
       // Trends for a specific page
+      const intId = await resolvePageIntId(db, pageId);
+      if (intId === null) return c.json({ pageId, snapshots: [] });
+
       const rows = await db
         .select()
         .from(citationAccuracySnapshots)
-        .where(eq(citationAccuracySnapshots.pageId, pageId))
+        .where(eq(citationAccuracySnapshots.pageIdInt, intId))
         .orderBy(desc(citationAccuracySnapshots.snapshotAt))
         .limit(limit);
 
@@ -1281,13 +1298,15 @@ const citationsApp = new Hono()
     if (isNaN(footnote)) return validationError(c, "footnote must be a number");
 
     const db = getDrizzleDb();
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
 
     const rows = await db
       .select()
       .from(citationQuotes)
       .where(
         and(
-          eq(citationQuotes.pageId, pageId),
+          eq(citationQuotes.pageIdInt, intId),
           eq(citationQuotes.footnote, footnote)
         )
       )
