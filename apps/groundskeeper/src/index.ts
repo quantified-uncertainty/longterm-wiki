@@ -6,6 +6,7 @@ import { healthCheck } from "./tasks/health-check.js";
 import { registerAsActiveAgent, sendHeartbeat } from "./wiki-server.js";
 import { issueResponder } from "./tasks/issue-responder.js";
 import { githubShadowbanCheck } from "./tasks/github-shadowban-check.js";
+import { snapshotRetention } from "./tasks/snapshot-retention.js";
 import { logger } from "./logger.js";
 
 const config = loadConfig();
@@ -26,6 +27,11 @@ logger.info({
       enabled: config.tasks.githubShadowbanCheck.enabled,
       schedule: config.tasks.githubShadowbanCheck.schedule,
       usernames: config.tasks.githubShadowbanCheck.usernames,
+    },
+    snapshotRetention: {
+      enabled: config.tasks.snapshotRetention.enabled,
+      schedule: config.tasks.snapshotRetention.schedule,
+      keep: config.tasks.snapshotRetention.keep,
     },
   },
 }, "Groundskeeper starting");
@@ -53,6 +59,14 @@ registerTask(
   config.tasks.githubShadowbanCheck.schedule,
   config.tasks.githubShadowbanCheck.enabled,
   () => githubShadowbanCheck(config)
+);
+
+registerTask(
+  config,
+  "snapshot-retention",
+  config.tasks.snapshotRetention.schedule,
+  config.tasks.snapshotRetention.enabled,
+  () => snapshotRetention(config)
 );
 
 // Register as an active agent (best-effort)

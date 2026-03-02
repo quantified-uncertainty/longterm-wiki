@@ -267,6 +267,69 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
+  // --- citation_accuracy_snapshots: Cleanup dry-run total count ---
+  if (
+    q.includes("count(*)") &&
+    q.includes("as total") &&
+    q.includes("citation_accuracy_snapshots")
+  ) {
+    return [{ total: snapshotStore.length }];
+  }
+
+  // --- citation_accuracy_snapshots: Cleanup dry-run count of rows to delete ---
+  if (
+    q.includes("count(*)") &&
+    q.includes("not in") &&
+    q.includes("row_number") &&
+    q.includes("citation_accuracy_snapshots")
+  ) {
+    const keep = params[0] as number;
+    const byPage = new Map<string, typeof snapshotStore>();
+    for (const r of snapshotStore) {
+      const arr = byPage.get(r.page_id as string) || [];
+      arr.push(r);
+      byPage.set(r.page_id as string, arr);
+    }
+    let wouldDelete = 0;
+    for (const rows of byPage.values()) {
+      rows.sort(
+        (a, b) => new Date(b.snapshot_at as string).getTime() - new Date(a.snapshot_at as string).getTime()
+      );
+      if (rows.length > keep) {
+        wouldDelete += rows.length - keep;
+      }
+    }
+    return [{ count: wouldDelete }];
+  }
+
+  // --- citation_accuracy_snapshots: Cleanup actual delete ---
+  if (
+    q.includes("delete") &&
+    q.includes("citation_accuracy_snapshots") &&
+    q.includes("not in") &&
+    q.includes("row_number")
+  ) {
+    const keep = params[0] as number;
+    const byPage = new Map<string, typeof snapshotStore>();
+    for (const r of snapshotStore) {
+      const arr = byPage.get(r.page_id as string) || [];
+      arr.push(r);
+      byPage.set(r.page_id as string, arr);
+    }
+    const toDelete = new Set<number>();
+    for (const rows of byPage.values()) {
+      rows.sort(
+        (a, b) => new Date(b.snapshot_at as string).getTime() - new Date(a.snapshot_at as string).getTime()
+      );
+      for (let i = keep; i < rows.length; i++) {
+        toDelete.add(rows[i].id as number);
+      }
+    }
+    const deletedCount = toDelete.size;
+    snapshotStore = snapshotStore.filter((r) => !toDelete.has(r.id as number));
+    return new Array(deletedCount).fill({});
+  }
+
   // --- citation_accuracy_snapshots: SELECT with WHERE ---
   if (q.includes("citation_accuracy_snapshots") && q.includes("where") && !q.includes("group by")) {
     const pageId = params[0] as string;
@@ -874,6 +937,73 @@ describe("Citation Server API", () => {
       expect(body.accurate).toBe(1);
       expect(body.inaccurate).toBe(1);
       expect(body.verified).toBe(1);
+    });
+  });
+
+  // ---- Accuracy Snapshot Cleanup ----
+
+  describe("DELETE /api/citations/accuracy-snapshots/cleanup", () => {
+    /** Seed the in-memory snapshot store directly for cleanup testing. */
+    function seedSnapshotStore(pageId: string, count: number) {
+      for (let i = 0; i < count; i++) {
+        snapshotStore.push({
+          id: nextSnapshotId++,
+          page_id: pageId,
+          page_id_int: null,
+          total_citations: 10,
+          checked_citations: 5,
+          accurate_count: 4,
+          minor_issues_count: 1,
+          inaccurate_count: 0,
+          unsupported_count: 0,
+          not_verifiable_count: 0,
+          average_score: 0.9,
+          snapshot_at: new Date(Date.now() - (count - i) * 1000),
+        });
+      }
+    }
+
+    it("dry run reports what would be deleted", async () => {
+      seedSnapshotStore("page-a", 5);
+
+      const res = await app.request(
+        "/api/citations/accuracy-snapshots/cleanup?keep=2&dry_run=true",
+        { method: "DELETE" }
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.dryRun).toBe(true);
+      expect(body.keep).toBe(2);
+      expect(body.totalSnapshots).toBe(5);
+      expect(body.wouldDelete).toBe(3);
+      expect(body.wouldRetain).toBe(2);
+    });
+
+    it("actually deletes old snapshots", async () => {
+      seedSnapshotStore("page-a", 4);
+      seedSnapshotStore("page-b", 2);
+
+      const res = await app.request(
+        "/api/citations/accuracy-snapshots/cleanup?keep=2",
+        { method: "DELETE" }
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      // page-a: 4 snapshots, keep 2 → delete 2
+      // page-b: 2 snapshots, keep 2 → delete 0
+      expect(body.deleted).toBe(2);
+      expect(body.keep).toBe(2);
+      expect(snapshotStore).toHaveLength(4);
+    });
+
+    it("defaults to keeping 30 snapshots per page", async () => {
+      const res = await app.request(
+        "/api/citations/accuracy-snapshots/cleanup?dry_run=true",
+        { method: "DELETE" }
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.keep).toBe(30);
     });
   });
 

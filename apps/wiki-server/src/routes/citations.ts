@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
-import { getDrizzleDb } from "../db.js";
+import { getDrizzleDb, getDb } from "../db.js";
 import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources, claims } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
 import {
@@ -1294,6 +1294,63 @@ const citationsApp = new Hono()
     }
 
     return c.json({ quote: rows[0] });
+  })
+
+  // ---- DELETE /accuracy-snapshots/cleanup (retention: keep latest N snapshots per page) ----
+  .delete("/accuracy-snapshots/cleanup", async (c) => {
+    const keepStr = c.req.query("keep");
+    const dryRunStr = c.req.query("dry_run");
+
+    const keep = keepStr ? Math.min(Math.max(parseInt(keepStr, 10) || 30, 1), 1000) : 30;
+    const dryRun = dryRunStr === "true" || dryRunStr === "1";
+
+    const rawDb = getDb();
+
+    if (dryRun) {
+      const result = await rawDb`
+        SELECT count(*)::int AS count
+        FROM citation_accuracy_snapshots cas
+        WHERE id NOT IN (
+          SELECT id FROM (
+            SELECT id, ROW_NUMBER() OVER (
+              PARTITION BY page_id ORDER BY snapshot_at DESC
+            ) AS rn
+            FROM citation_accuracy_snapshots
+          ) ranked
+          WHERE rn <= ${keep}
+        )
+      `;
+      const wouldDelete = result[0]?.count ?? 0;
+
+      const totalResult = await rawDb`
+        SELECT count(*)::int AS total FROM citation_accuracy_snapshots
+      `;
+      const total = totalResult[0]?.total ?? 0;
+
+      return c.json({
+        dryRun: true,
+        keep,
+        totalSnapshots: total,
+        wouldDelete,
+        wouldRetain: total - wouldDelete,
+      });
+    }
+
+    logger.info({ keep }, "Deleting old citation accuracy snapshots");
+    const result = await rawDb`
+      DELETE FROM citation_accuracy_snapshots
+      WHERE id NOT IN (
+        SELECT id FROM (
+          SELECT id, ROW_NUMBER() OVER (
+            PARTITION BY page_id ORDER BY snapshot_at DESC
+          ) AS rn
+          FROM citation_accuracy_snapshots
+        ) ranked
+        WHERE rn <= ${keep}
+      )
+    `;
+
+    return c.json({ deleted: result.count, keep });
   });
 
 export const citationsRoute = citationsApp;

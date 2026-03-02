@@ -26,6 +26,8 @@ function makeConfig(runLogPath: string): Config {
     tasks: {
       healthCheck: { enabled: true, schedule: "*/5 * * * *" },
       issueResponder: { enabled: false, schedule: "*/10 * * * *" },
+      githubShadowbanCheck: { enabled: false, schedule: "0 9 * * *", usernames: [] },
+      snapshotRetention: { enabled: false, schedule: "0 3 * * *", keep: 100 },
     },
   };
 }
