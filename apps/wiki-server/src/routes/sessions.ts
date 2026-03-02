@@ -9,6 +9,7 @@ import {
   CreateSessionBatchSchema,
   DateStringSchema,
 } from "../api-types.js";
+import { resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Constants ----
 
@@ -124,9 +125,15 @@ const sessionsApp = new Hono()
         .where(eq(sessionPages.sessionId, session.id));
 
       if (d.pages.length > 0) {
+        // Phase 4a: resolve page slugs to integer IDs for dual-write
+        const intIdMap = await resolvePageIntIds(tx, d.pages);
         await tx
           .insert(sessionPages)
-          .values(d.pages.map((pageId) => ({ sessionId: session.id, pageId })));
+          .values(d.pages.map((pageId) => ({
+            sessionId: session.id,
+            pageId,
+            pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
+          })));
       }
 
       return { ...session, pages: d.pages };
@@ -166,9 +173,15 @@ const sessionsApp = new Hono()
           .where(eq(sessionPages.sessionId, session.id));
 
         if (d.pages.length > 0) {
+          // Phase 4a: resolve page slugs to integer IDs for dual-write
+          const intIdMap = await resolvePageIntIds(tx, d.pages);
           await tx
             .insert(sessionPages)
-            .values(d.pages.map((pageId) => ({ sessionId: session.id, pageId })));
+            .values(d.pages.map((pageId) => ({
+              sessionId: session.id,
+              pageId,
+              pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
+            })));
         }
 
         created.push({

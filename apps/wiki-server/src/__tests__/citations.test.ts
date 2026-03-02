@@ -32,26 +32,27 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- citation_quotes: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("citation_quotes") && q.includes("do update")) {
-    const COLS = 14;
+    const COLS = 15; // Phase 4a: +1 for page_id_int
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
       const pageId = params[o] as string;
-      const footnote = params[o + 1] as number;
-      const url = params[o + 2];
-      const resourceId = params[o + 3];
-      const claimText = params[o + 4] as string;
-      const claimContext = params[o + 5];
-      const sourceQuote = params[o + 6];
-      const sourceLocation = params[o + 7];
-      const quoteVerified = params[o + 8] ?? false;
-      const verificationMethod = params[o + 9];
-      const verificationScore = params[o + 10];
-      const sourceTitle = params[o + 11];
-      const sourceType = params[o + 12];
-      const extractionModel = params[o + 13];
+      const _pageIdInt = params[o + 1]; // Phase 4a: page_id_int (not used in mock)
+      const footnote = params[o + 2] as number;
+      const url = params[o + 3];
+      const resourceId = params[o + 4];
+      const claimText = params[o + 5] as string;
+      const claimContext = params[o + 6];
+      const sourceQuote = params[o + 7];
+      const sourceLocation = params[o + 8];
+      const quoteVerified = params[o + 9] ?? false;
+      const verificationMethod = params[o + 10];
+      const verificationScore = params[o + 11];
+      const sourceTitle = params[o + 12];
+      const sourceType = params[o + 13];
+      const extractionModel = params[o + 14];
 
       const key = quoteKey(pageId, footnote);
       const existing = quotesStore.get(key);
@@ -240,7 +241,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- citation_accuracy_snapshots: INSERT (supports multi-row) ---
   if (q.includes("insert into") && q.includes("citation_accuracy_snapshots")) {
-    const COLS = 9;
+    const COLS = 10; // Phase 4a: +1 for page_id_int
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
@@ -249,14 +250,15 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const row = {
         id: nextSnapshotId++,
         page_id: params[o] as string,
-        total_citations: params[o + 1] as number,
-        checked_citations: params[o + 2] as number,
-        accurate_count: params[o + 3] as number,
-        minor_issues_count: params[o + 4] as number,
-        inaccurate_count: params[o + 5] as number,
-        unsupported_count: params[o + 6] as number,
-        not_verifiable_count: params[o + 7] as number,
-        average_score: params[o + 8],
+        page_id_int: params[o + 1] as number | null, // Phase 4a
+        total_citations: params[o + 2] as number,
+        checked_citations: params[o + 3] as number,
+        accurate_count: params[o + 4] as number,
+        minor_issues_count: params[o + 5] as number,
+        inaccurate_count: params[o + 6] as number,
+        unsupported_count: params[o + 7] as number,
+        not_verifiable_count: params[o + 8] as number,
+        average_score: params[o + 9],
         snapshot_at: now,
       };
       snapshotStore.push(row);
@@ -335,6 +337,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const url = params[0] as string;
     const row = contentStore.get(url);
     return row ? [row] : [];
+  }
+
+  // --- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ---
+  if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)")) {
+    return []; // No entity_ids in test — page_id_int will be null
   }
 
   // --- entity_ids fallbacks (for health check count) ---

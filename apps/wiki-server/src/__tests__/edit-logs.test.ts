@@ -93,6 +93,11 @@ function createMockSql() {
       return [{ last_value: 0, is_called: false }];
     }
 
+    // ---- entity_ids: SELECT for page-id-helpers resolvePageIntId(s) ----
+    if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
+      return params.map((p) => ({ numeric_id: 1, slug: p }));
+    }
+
     // ---- ref-check: SELECT id FROM wiki_pages WHERE id IN (...) ----
     if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
       return params.map((p) => ({ id: p }));
@@ -107,8 +112,8 @@ function createMockSql() {
 
     // ---- INSERT INTO edit_logs (supports multi-row) ----
     if (q.includes("insert into") && q.includes("edit_logs")) {
-      // Drizzle sends positional params: page_id, date, tool, agency, requested_by, note per row
-      const COLS = 6;
+      // Drizzle sends positional params: page_id, page_id_int, date, tool, agency, requested_by, note per row
+      const COLS = 7; // Phase 4a: +1 for page_id_int
       const numRows = params.length / COLS;
       const rows = [];
       for (let i = 0; i < numRows; i++) {
@@ -116,11 +121,12 @@ function createMockSql() {
         const row = {
           id: nextId++,
           page_id: params[o] as string,
-          date: String(params[o + 1]),
-          tool: params[o + 2] as string,
-          agency: params[o + 3] as string,
-          requested_by: (params[o + 4] as string) ?? null,
-          note: (params[o + 5] as string) ?? null,
+          page_id_int: params[o + 1] as number | null,
+          date: String(params[o + 2]),
+          tool: params[o + 3] as string,
+          agency: params[o + 4] as string,
+          requested_by: (params[o + 5] as string) ?? null,
+          note: (params[o + 6] as string) ?? null,
           created_at: new Date(),
         };
         editStore.push(row);

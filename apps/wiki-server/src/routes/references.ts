@@ -30,6 +30,7 @@ import {
   type ClaimPageReferenceRow,
   type PageCitationRow,
 } from "../api-types.js";
+import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -148,11 +149,15 @@ const app = new Hono()
       return validationError(c, `Page not found: ${parsed.data.pageId}`);
     }
 
+    // Phase 4a: resolve page slug to integer ID for dual-write
+    const pageIdInt = await resolvePageIntId(db, parsed.data.pageId);
+
     const rows = await db
       .insert(claimPageReferences)
       .values({
         claimId: parsed.data.claimId,
         pageId: parsed.data.pageId,
+        pageIdInt, // Phase 4a dual-write
         footnote: parsed.data.footnote ?? null,
         section: parsed.data.section ?? null,
         quoteText: parsed.data.quoteText ?? null,
@@ -214,11 +219,15 @@ const app = new Hono()
       }
     }
 
+    // Phase 4a: resolve page slug to integer ID for dual-write
+    const citPageIdInt = await resolvePageIntId(db, parsed.data.pageId);
+
     const rows = await db
       .insert(pageCitations)
       .values({
         referenceId: parsed.data.referenceId,
         pageId: parsed.data.pageId,
+        pageIdInt: citPageIdInt, // Phase 4a dual-write
         title: parsed.data.title ?? null,
         url: parsed.data.url ?? null,
         note: parsed.data.note ?? null,
@@ -273,9 +282,13 @@ const app = new Hono()
       }
     }
 
+    // Phase 4a: resolve page slugs to integer IDs for dual-write
+    const batchIntIdMap = await resolvePageIntIds(db, pageIds);
+
     const values = parsed.data.items.map((item) => ({
       referenceId: item.referenceId,
       pageId: item.pageId,
+      pageIdInt: batchIntIdMap.get(item.pageId) ?? null, // Phase 4a dual-write
       title: item.title ?? null,
       url: item.url ?? null,
       note: item.note ?? null,

@@ -25,9 +25,35 @@ function simpleTextMatch(row: Record<string, unknown>, query: string): boolean {
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
+  // --- entity_ids: INSERT (auto-allocation from page-id-helpers) ---
+  if (q.includes("insert into") && q.includes("entity_ids")) {
+    // allocateAndResolvePageIntIds inserts new entity_ids; simulate with auto-increment
+    const slug = params[0] as string;
+    // Check if already exists
+    for (const [numId, entry] of entityIdsStore.entries()) {
+      if (entry.slug === slug) {
+        return [{ numeric_id: numId, slug: entry.slug }];
+      }
+    }
+    const newId = entityIdsStore.size + 1;
+    entityIdsStore.set(newId, { slug, description: null, created_at: new Date() });
+    return [{ numeric_id: newId, slug }];
+  }
+
+  // --- entity_ids: SELECT WHERE slug IN (...) (batch resolve from page-id-helpers) ---
+  if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)") && !q.includes("numeric_id")) {
+    const results: Record<string, unknown>[] = [];
+    for (const [numId, entry] of entityIdsStore.entries()) {
+      if (params.includes(entry.slug)) {
+        results.push({ numeric_id: numId, slug: entry.slug });
+      }
+    }
+    return results;
+  }
+
   // --- wiki_pages: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("wiki_pages")) {
-    const COLS = 26;
+    const COLS = 28; // Phase 4a: +2 for slug and integer_id
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
@@ -39,30 +65,32 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const row: Record<string, unknown> = {
         id,
         numeric_id: params[o + 1],
-        title: params[o + 2],
-        description: params[o + 3],
-        llm_summary: params[o + 4],
-        category: params[o + 5],
-        subcategory: params[o + 6],
-        entity_type: params[o + 7],
-        tags: params[o + 8],
-        quality: params[o + 9],
-        reader_importance: params[o + 10],
-        research_importance: params[o + 11],
-        tactical_value: params[o + 12],
-        backlink_count: params[o + 13],
-        risk_category: params[o + 14],
-        date_created: params[o + 15],
-        recommended_score: params[o + 16],
-        clusters: params[o + 17],
-        hallucination_risk_level: params[o + 18],
-        hallucination_risk_score: params[o + 19],
-        content_plaintext: params[o + 20],
-        word_count: params[o + 21],
-        last_updated: params[o + 22],
-        content_format: params[o + 23],
-        synced_from_branch: params[o + 24],
-        synced_from_commit: params[o + 25],
+        slug: params[o + 2],
+        integer_id: params[o + 3],
+        title: params[o + 4],
+        description: params[o + 5],
+        llm_summary: params[o + 6],
+        category: params[o + 7],
+        subcategory: params[o + 8],
+        entity_type: params[o + 9],
+        tags: params[o + 10],
+        quality: params[o + 11],
+        reader_importance: params[o + 12],
+        research_importance: params[o + 13],
+        tactical_value: params[o + 14],
+        backlink_count: params[o + 15],
+        risk_category: params[o + 16],
+        date_created: params[o + 17],
+        recommended_score: params[o + 18],
+        clusters: params[o + 19],
+        hallucination_risk_level: params[o + 20],
+        hallucination_risk_score: params[o + 21],
+        content_plaintext: params[o + 22],
+        word_count: params[o + 23],
+        last_updated: params[o + 24],
+        content_format: params[o + 25],
+        synced_from_branch: params[o + 26],
+        synced_from_commit: params[o + 27],
         synced_at: now,
         created_at: existing?.created_at ?? now,
         updated_at: now,

@@ -11,6 +11,7 @@ import {
   notFoundError,
   paginationQuery,
 } from "./utils.js";
+import { resolvePageIntId } from "./page-id-helpers.js";
 
 // ---- Constants ----
 
@@ -64,10 +65,14 @@ const artifactsApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
+    // Phase 4a: resolve page slug to integer ID for dual-write
+    const pageIdInt = await resolvePageIntId(db, d.pageId);
+
     const rows = await db
       .insert(pageImproveRuns)
       .values({
         pageId: d.pageId,
+        pageIdInt, // Phase 4a dual-write
         engine: d.engine,
         tier: d.tier,
         directions: d.directions ?? null,
