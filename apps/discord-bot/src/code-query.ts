@@ -67,26 +67,34 @@ export async function runCodeQuery(
     NODE_ENV: process.env.NODE_ENV,
   };
 
-  const queryPromise = (async (): Promise<CodeQueryResult> => {
-    for await (const msg of query({
-      prompt: buildCodePrompt(question),
-      options: {
-        tools: ["Read", "Glob", "Grep"],
-        mcpServers: { "wiki-server": wikiMcpServer },
-        cwd: WIKI_REPO_PATH,
-        env,
-        maxTurns: CODE_MAX_TURNS,
-        maxBudgetUsd: CODE_MAX_BUDGET_USD,
-        persistSession: false,
-        permissionMode: "bypassPermissions",
-        allowDangerouslySkipPermissions: true,
-        systemPrompt: {
-          type: "preset" as const,
-          preset: "claude_code" as const,
-          append: `You are answering a question from a Discord user. Be concise (2-4 paragraphs). Link to wiki pages using ${WIKI_BASE_URL}/wiki/{id} format.`,
-        },
+  const stream = query({
+    prompt: buildCodePrompt(question),
+    options: {
+      tools: ["Read", "Glob", "Grep"],
+      mcpServers: { "wiki-server": wikiMcpServer },
+      cwd: WIKI_REPO_PATH,
+      env,
+      maxTurns: CODE_MAX_TURNS,
+      maxBudgetUsd: CODE_MAX_BUDGET_USD,
+      persistSession: false,
+      permissionMode: "bypassPermissions",
+      allowDangerouslySkipPermissions: true,
+      systemPrompt: {
+        type: "preset" as const,
+        preset: "claude_code" as const,
+        append: `You are answering a question from a Discord user. Be concise (2-4 paragraphs). Link to wiki pages using ${WIKI_BASE_URL}/wiki/{id} format.`,
       },
-    })) {
+    },
+  });
+  const iterator = stream[Symbol.asyncIterator]();
+  const cancelStream = () => {
+    void iterator.return?.(undefined);
+  };
+
+  const queryPromise = (async (): Promise<CodeQueryResult> => {
+    for (;;) {
+      const { value: msg, done } = await iterator.next();
+      if (done) break;
       if (msg.type === "assistant" && "message" in msg) {
         const message = (msg as Record<string, unknown>).message as
           | {
@@ -156,8 +164,12 @@ export async function runCodeQuery(
     };
   })();
 
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
   const timeoutPromise = new Promise<CodeQueryResult>((_, reject) => {
-    setTimeout(() => reject(new Error("TIMEOUT")), CODE_TIMEOUT_MS);
+    timeoutHandle = setTimeout(() => {
+      cancelStream();
+      reject(new Error("TIMEOUT"));
+    }, CODE_TIMEOUT_MS);
   });
 
   try {
@@ -191,5 +203,7 @@ export async function runCodeQuery(
     }
 
     throw error;
+  } finally {
+    if (timeoutHandle) clearTimeout(timeoutHandle);
   }
 }

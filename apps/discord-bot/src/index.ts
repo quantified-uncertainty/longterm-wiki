@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { existsSync } from "node:fs";
 import { Client, GatewayIntentBits, Events } from "discord.js";
 import { runQuery } from "./query.js";
 import { runCodeQuery } from "./code-query.js";
@@ -36,7 +37,7 @@ if (!process.env.LONGTERMWIKI_SERVER_API_KEY) {
 
 const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
 const hasOauthToken = !!CLAUDE_CODE_OAUTH_TOKEN;
-const hasRepoPath = !!WIKI_REPO_PATH;
+const hasRepoPath = !!WIKI_REPO_PATH && existsSync(WIKI_REPO_PATH);
 
 if (!hasApiKey && !hasOauthToken) {
   logger.fatal(
@@ -52,7 +53,7 @@ if (!hasApiKey) {
 const askCommandEnabled = hasOauthToken && hasRepoPath;
 if (hasOauthToken && !hasRepoPath) {
   logger.warn(
-    "CLAUDE_CODE_OAUTH_TOKEN set but WIKI_REPO_PATH missing — /ask command disabled"
+    "CLAUDE_CODE_OAUTH_TOKEN set but WIKI_REPO_PATH is missing or invalid — /ask command disabled"
   );
 }
 if (!hasOauthToken) {
@@ -231,6 +232,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   // Per-user rate limiting (120s cooldown)
   const now = Date.now();
+
+  // Prune stale entries to prevent unbounded growth
+  for (const [uid, ts] of askUserLastRequest) {
+    if (now - ts > CODE_RATE_LIMIT_MS) askUserLastRequest.delete(uid);
+  }
+
   const lastReq = askUserLastRequest.get(userId);
   if (lastReq !== undefined) {
     const elapsed = now - lastReq;
@@ -299,9 +306,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
       success: true,
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    logger.error({ err: error }, "/ask query error");
+    const errorDetail =
+      error instanceof Error ? error.message : String(error);
+    logger.error({ err: error, question }, "/ask query error");
+
+    // Determine a safe user-facing message (never expose raw internals)
+    const isAuthError =
+      errorDetail.includes("auth") ||
+      errorDetail.includes("token") ||
+      errorDetail.includes("401") ||
+      errorDetail.includes("403");
+    const userMessage = isAuthError
+      ? "Sorry, the /ask command is temporarily unavailable due to an authentication issue. Please try again later."
+      : "Sorry, I encountered an internal error while processing your /ask query. Please try again.";
 
     logQuery({
       timestamp: new Date().toISOString(),
@@ -315,13 +332,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
       outputTokens: 0,
       estimatedCostUsd: 0,
       success: false,
-      error: errorMessage,
+      error: errorDetail,
     });
 
     try {
-      await interaction.editReply(
-        `Sorry, I encountered an error: ${errorMessage}`
-      );
+      await interaction.editReply(userMessage);
     } catch {
       // Interaction may have expired (15-minute window)
       logger.warn("Failed to edit reply — interaction may have expired");
