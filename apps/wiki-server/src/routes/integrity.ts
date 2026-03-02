@@ -427,7 +427,7 @@ const integrityApp = new Hono()
             SELECT
               wp.id,
               EXISTS (SELECT 1 FROM citation_quotes cq WHERE cq.page_id = wp.id) AS has_cq,
-              EXISTS (SELECT 1 FROM claims c WHERE c.entity_id = wp.id) AS has_claims
+              EXISTS (SELECT 1 FROM claims c WHERE c.entity_id = wp.slug) AS has_claims
             FROM wiki_pages wp
           ) sub`
     )) as Array<Record<string, string>>;
