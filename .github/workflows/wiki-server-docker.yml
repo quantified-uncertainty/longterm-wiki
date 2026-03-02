@@ -9,6 +9,15 @@ on:
       - ".github/workflows/wiki-server-docker.yml"
       - ".github/workflows/database-backup.yml"
   workflow_dispatch:
+    inputs:
+      skip_smoke_test:
+        description: >
+          Skip the pre-deploy smoke test. Use for DDL migrations that require
+          ACCESS EXCLUSIVE locks — the smoke test runs against the production DB
+          while old pods hold connections, causing lock contention deadlocks.
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: wiki-server-docker-${{ github.ref }}
@@ -58,7 +67,9 @@ jobs:
   pre-deploy-smoke-test:
     name: Pre-deploy smoke test
     needs: build-and-push
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      github.ref == 'refs/heads/main'
+      && inputs.skip_smoke_test != true
     runs-on: ubuntu-latest
 
     steps:
@@ -78,23 +89,22 @@ jobs:
           CONTAINER_NAME="smoke-test-${{ github.run_id }}"
           echo "Starting pre-deploy smoke test for image: $IMAGE"
 
-          # Start container with production DATABASE_URL so migrations run against
-          # the real schema. Migrations are idempotent (already-applied migrations are
-          # skipped), so this is safe. The container is isolated and torn down
-          # immediately after the test — no traffic is routed to it.
+          # SKIP_MIGRATIONS=true: the smoke test verifies the server binary
+          # boots and serves HTTP. Migrations are skipped because they may
+          # need ACCESS EXCLUSIVE locks that deadlock with the production
+          # server's connections (which are still active during the test).
+          # Migrations run during the actual ArgoCD deploy instead.
           docker run -d \
             --name "$CONTAINER_NAME" \
             -p 3099:3100 \
             -e DATABASE_URL="${DATABASE_URL}" \
             -e WIKI_SERVER_API_KEY="${LONGTERMWIKI_SERVER_API_KEY}" \
+            -e SKIP_MIGRATIONS=true \
             "$IMAGE"
 
-          # Wait for the server to be ready (up to 150s: 50 attempts × 3s delay).
-          # The server runs migrations on startup, which may need to wait for
-          # ACCESS EXCLUSIVE locks on wiki_pages while the production server's
-          # connections drain (lock_timeout=60s in db.ts). Allow enough headroom
-          # for lock wait + DDL execution + server startup.
-          MAX_ATTEMPTS=50
+          # Wait for the server to be ready (up to 60s: 20 attempts × 3s delay).
+          # With SKIP_MIGRATIONS=true, the server should start in a few seconds.
+          MAX_ATTEMPTS=20
           DELAY=3
           STATUS=""
           for i in $(seq 1 $MAX_ATTEMPTS); do
@@ -144,10 +154,10 @@ jobs:
     if: >-
       github.ref == 'refs/heads/main'
       && !cancelled()
-      && needs.pre-deploy-smoke-test.result == 'success'
+      && (needs.pre-deploy-smoke-test.result == 'success' || needs.pre-deploy-smoke-test.result == 'skipped')
+    # Deploy proceeds if smoke test passed OR was skipped (DDL migration deploys).
     # Deploy proceeds even if backup fails (DATABASE_URL may not be configured yet).
-    # Once DATABASE_URL is added, backup failures will be visible but non-blocking.
-    # Pre-deploy smoke test failure explicitly blocks the deploy (checked in the `if` condition above).
+    # Pre-deploy smoke test failure explicitly blocks the deploy.
     runs-on: ubuntu-latest
 
     steps:
