@@ -9,6 +9,7 @@ const slugIntIdMap = new Map<string, number>();
 let editStore: Array<{
   id: number;
   page_id: string;
+  page_id_old: string;
   page_id_int: number | null;
   date: string;
   tool: string;
@@ -140,6 +141,7 @@ function createMockSql() {
         const row = {
           id: nextId++,
           page_id: params[o] as string,
+          page_id_old: params[o] as string,
           page_id_int: params[o + 1] as number | null,
           date: String(params[o + 2]),
           tool: params[o + 3] as string,
@@ -160,7 +162,7 @@ function createMockSql() {
     // inside `count(distinct "edit_logs"."page_id")` as "page_id".
     if (q.includes("count(distinct") && q.includes("page_id") && q.includes("edit_logs")) {
       const uniquePages = new Set(editStore.map((e) => e.page_id));
-      return [{ page_id: uniquePages.size }];
+      return [{ page_id: uniquePages.size, page_id_old: uniquePages.size }];
     }
 
     // ---- SELECT count(*) FROM edit_logs (not GROUP BY) ----
@@ -191,7 +193,7 @@ function createMockSql() {
           grouped[e.page_id] = e.date;
         }
       }
-      return Object.entries(grouped).map(([page_id, date]) => ({ page_id, date }));
+      return Object.entries(grouped).map(([page_id, date]) => ({ page_id, page_id_old: page_id, date }));
     }
 
     // ---- SELECT page_id, min(date) FROM edit_logs GROUP BY page_id ----
@@ -202,7 +204,7 @@ function createMockSql() {
           grouped[e.page_id] = e.date;
         }
       }
-      return Object.entries(grouped).map(([page_id, date]) => ({ page_id, date }));
+      return Object.entries(grouped).map(([page_id, date]) => ({ page_id, page_id_old: page_id, date }));
     }
 
     // ---- SELECT agency, count FROM edit_logs GROUP BY agency ----

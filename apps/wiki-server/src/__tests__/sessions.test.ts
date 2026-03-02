@@ -25,6 +25,7 @@ let sessionStore: Array<{
 let sessionPageStore: Array<{
   session_id: number;
   page_id: string;
+  page_id_old: string;
   page_id_int: number | null;
 }> = [];
 
@@ -215,6 +216,7 @@ vi.mock("../db.js", async () => {
         const row = {
           session_id: params[o] as number,
           page_id: params[o + 1] as string,
+          page_id_old: params[o + 1] as string,
           page_id_int: params[o + 2] as number | null,
         };
         sessionPageStore.push(row);

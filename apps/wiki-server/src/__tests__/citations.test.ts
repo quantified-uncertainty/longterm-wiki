@@ -72,7 +72,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       if (existing) {
         const updated = {
           ...existing,
-          page_id: pageId, page_id_int: pageIdInt, footnote, url, resource_id: resourceId,
+          page_id: pageId, page_id_old: pageId, page_id_int: pageIdInt, footnote, url, resource_id: resourceId,
           claim_text: claimText, claim_context: claimContext,
           source_quote: sourceQuote, source_location: sourceLocation,
           quote_verified: quoteVerified, verification_method: verificationMethod,
@@ -85,7 +85,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       } else {
         const row: Record<string, unknown> = {
           id: nextQuoteId++,
-          page_id: pageId, page_id_int: pageIdInt, footnote, url, resource_id: resourceId,
+          page_id: pageId, page_id_old: pageId, page_id_int: pageIdInt, footnote, url, resource_id: resourceId,
           claim_text: claimText, claim_context: claimContext,
           source_quote: sourceQuote, source_location: sourceLocation,
           quote_verified: quoteVerified, verification_method: verificationMethod,
@@ -155,7 +155,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .filter((r) => r.quote_verified === true && r.verification_score != null && (r.verification_score as number) < threshold)
       .sort((a, b) => (a.verification_score as number) - (b.verification_score as number))
       .map((r) => ({
-        page_id: r.page_id, footnote: r.footnote, url: r.url,
+        page_id: r.page_id, page_id_old: r.page_id, footnote: r.footnote, url: r.url,
         claim_text: r.claim_text, verification_score: r.verification_score,
       }));
   }
@@ -240,13 +240,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     }
     return Array.from(byPage.entries())
       .map(([pageId, rows]) => ({
-        page_id: pageId,
+        page_id_old: pageId,
         checked: rows.length,
         accurate: rows.filter((r) => r.accuracy_verdict === "accurate").length,
         inaccurate: rows.filter((r) => r.accuracy_verdict === "inaccurate").length,
         unsupported: rows.filter((r) => r.accuracy_verdict === "unsupported").length,
       }))
-      .sort((a, b) => a.page_id.localeCompare(b.page_id));
+      .sort((a, b) => a.page_id_old.localeCompare(b.page_id_old));
   }
 
   // --- citation_quotes: Page stats (GROUP BY without HAVING) ---
@@ -259,7 +259,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     }
     return Array.from(byPage.entries())
       .map(([pageId, rows]) => ({
-        page_id: pageId,
+        page_id_old: pageId,
         count: rows.length,
         with_quotes: rows.filter((r) => r.source_quote != null).length,
         verified: rows.filter((r) => r.quote_verified === true).length,
@@ -268,7 +268,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         accurate: rows.filter((r) => r.accuracy_verdict === "accurate").length,
         inaccurate: rows.filter((r) => r.accuracy_verdict === "inaccurate").length,
       }))
-      .sort((a, b) => a.page_id.localeCompare(b.page_id));
+      .sort((a, b) => a.page_id_old.localeCompare(b.page_id_old));
   }
 
   // --- citation_accuracy_snapshots: INSERT (supports multi-row) ---
@@ -282,6 +282,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const row = {
         id: nextSnapshotId++,
         page_id: params[o] as string,
+        page_id_old: params[o] as string,
         page_id_int: params[o + 1] as number | null, // Phase 4a
         total_citations: params[o + 2] as number,
         checked_citations: params[o + 3] as number,

@@ -151,14 +151,14 @@ const linksApp = new Hono()
         const batch = links.slice(i, i + 500);
 
         await tx`
-        INSERT INTO page_links (source_id, target_id, link_type, relationship, weight, source_id_int, target_id_int)
+        INSERT INTO page_links (source_id_old, target_id_old, link_type, relationship, weight, source_id_int, target_id_int)
         SELECT t."sourceId", t."targetId", t."linkType", t.relationship, t.weight,
                ei_src.numeric_id, ei_tgt.numeric_id
         FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb)
         AS t("sourceId" text, "targetId" text, "linkType" text, relationship text, weight real)
         LEFT JOIN entity_ids ei_src ON ei_src.slug = t."sourceId"
         LEFT JOIN entity_ids ei_tgt ON ei_tgt.slug = t."targetId"
-        ON CONFLICT (source_id, target_id, link_type)
+        ON CONFLICT (source_id_old, target_id_old, link_type)
         DO UPDATE SET weight = EXCLUDED.weight, relationship = EXCLUDED.relationship,
                       source_id_int = EXCLUDED.source_id_int, target_id_int = EXCLUDED.target_id_int
       `;
@@ -195,17 +195,17 @@ const linksApp = new Hono()
     // then order by weight descending (most relevant first).
     const results = await rawDb<BacklinkDbRow[]>`
     SELECT * FROM (
-      SELECT DISTINCT ON (pl.source_id)
-        pl.source_id,
+      SELECT DISTINCT ON (pl.source_id_old)
+        pl.source_id_old AS source_id,
         pl.link_type,
         pl.relationship,
         pl.weight,
         wp.title AS source_title,
         wp.entity_type AS source_type
       FROM page_links pl
-      LEFT JOIN wiki_pages wp ON wp.id = pl.source_id
+      LEFT JOIN wiki_pages wp ON wp.id = pl.source_id_old
       WHERE pl.target_id_int = ${targetIntId}
-      ORDER BY pl.source_id, pl.weight DESC
+      ORDER BY pl.source_id_old, pl.weight DESC
     ) sub
     ORDER BY sub.weight DESC
     LIMIT ${limit}
@@ -253,12 +253,12 @@ const linksApp = new Hono()
     const results = await rawDb<RelatedDbRow[]>`
     WITH bidirectional_links AS (
       -- Forward links: entityId is source (is_reverse = false)
-      SELECT target_id AS neighbor_id, link_type, relationship, weight, false AS is_reverse
+      SELECT target_id_old AS neighbor_id, link_type, relationship, weight, false AS is_reverse
       FROM page_links
       WHERE source_id_int = ${entityIntId}
       UNION ALL
       -- Reverse links: entityId is target (is_reverse = true)
-      SELECT source_id AS neighbor_id, link_type, relationship, weight, true AS is_reverse
+      SELECT source_id_old AS neighbor_id, link_type, relationship, weight, true AS is_reverse
       FROM page_links
       WHERE target_id_int = ${entityIntId}
     ),
@@ -345,8 +345,8 @@ const linksApp = new Hono()
     // This provides the raw graph data for visualization.
     const results = await rawDb<GraphEdgeDbRow[]>`
     SELECT
-      pl.source_id,
-      pl.target_id,
+      pl.source_id_old AS source_id,
+      pl.target_id_old AS target_id,
       pl.link_type,
       pl.relationship,
       pl.weight,
@@ -355,8 +355,8 @@ const linksApp = new Hono()
       wt.title AS target_title,
       wt.entity_type AS target_type
     FROM page_links pl
-    LEFT JOIN wiki_pages ws ON ws.id = pl.source_id
-    LEFT JOIN wiki_pages wt ON wt.id = pl.target_id
+    LEFT JOIN wiki_pages ws ON ws.id = pl.source_id_old
+    LEFT JOIN wiki_pages wt ON wt.id = pl.target_id_old
     WHERE pl.source_id_int = ${graphEntityIntId} OR pl.target_id_int = ${graphEntityIntId}
     ORDER BY pl.weight DESC
     LIMIT ${MAX_GRAPH_EDGES}
@@ -423,8 +423,8 @@ const linksApp = new Hono()
   `;
 
     const uniquePagesResult = await rawDb<UniqueCountRow[]>`
-    SELECT COUNT(DISTINCT source_id)::int AS sources,
-           COUNT(DISTINCT target_id)::int AS targets
+    SELECT COUNT(DISTINCT source_id_old)::int AS sources,
+           COUNT(DISTINCT target_id_old)::int AS targets
     FROM page_links
   `;
 

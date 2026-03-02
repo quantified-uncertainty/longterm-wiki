@@ -351,6 +351,13 @@
       "when": 1772784000000,
       "tag": "0049_add_slug_and_integer_id_safe",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1772870400000,
+      "tag": "0050_rename_page_id_to_page_id_old",
+      "breakpoints": true
     }
   ]
 }

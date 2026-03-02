@@ -33,7 +33,7 @@ export const citationQuotes = pgTable(
   "citation_quotes",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id")
+    pageId: text("page_id_old")
       .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
@@ -171,7 +171,7 @@ export const citationAccuracySnapshots = pgTable(
   "citation_accuracy_snapshots",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id")
+    pageId: text("page_id_old")
       .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
@@ -197,7 +197,7 @@ export const editLogs = pgTable(
   "edit_logs",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id")
+    pageId: text("page_id_old")
       .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
@@ -221,7 +221,7 @@ export const hallucinationRiskSnapshots = pgTable(
   "hallucination_risk_snapshots",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id")
+    pageId: text("page_id_old")
       .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
@@ -274,7 +274,7 @@ export const sessionPages = pgTable(
     sessionId: bigint("session_id", { mode: "number" })
       .notNull()
       .references(() => sessions.id, { onDelete: "cascade" }),
-    pageId: text("page_id")
+    pageId: text("page_id_old")
       .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
@@ -323,7 +323,7 @@ export const autoUpdateResults = pgTable(
     runId: bigint("run_id", { mode: "number" })
       .notNull()
       .references(() => autoUpdateRuns.id, { onDelete: "cascade" }),
-    pageId: text("page_id")
+    pageId: text("page_id_old")
       .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
@@ -524,7 +524,7 @@ export const claimPageReferences = pgTable(
     claimId: bigint("claim_id", { mode: "number" })
       .notNull()
       .references(() => claims.id, { onDelete: "cascade" }),
-    pageId: text("page_id")
+    pageId: text("page_id_old")
       .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
@@ -597,7 +597,7 @@ export const resourceCitations = pgTable(
     resourceId: text("resource_id")
       .notNull()
       .references(() => resources.id, { onDelete: "cascade" }),
-    pageId: text("page_id")
+    pageId: text("page_id_old")
       .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
@@ -722,8 +722,8 @@ export const pageLinks = pgTable(
   "page_links",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    sourceId: text("source_id").notNull(),
-    targetId: text("target_id").notNull(),
+    sourceId: text("source_id_old").notNull(),
+    targetId: text("target_id_old").notNull(),
     sourceIdInt: integer("source_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     targetIdInt: integer("target_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     linkType: text("link_type").notNull(), // 'yaml_related' | 'entity_link' | 'name_prefix' | 'similarity' | 'shared_tag'
@@ -802,7 +802,7 @@ export const autoUpdateNewsItems = pgTable(
     relevanceScore: integer("relevance_score"),
     topicsJson: jsonb("topics_json").$type<string[]>(),
     entitiesJson: jsonb("entities_json").$type<string[]>(),
-    routedToPageId: text("routed_to_page_id").references(() => wikiPages.id, {
+    routedToPageId: text("routed_to_page_id_old").references(() => wikiPages.id, {
       onDelete: "set null",
     }),
     routedToPageIdInt: integer("routed_to_page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
@@ -839,7 +839,7 @@ export const pageImproveRuns = pgTable(
   "page_improve_runs",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id")
+    pageId: text("page_id_old")
       .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
@@ -1073,7 +1073,7 @@ export const pageCitations = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     referenceId: varchar("reference_id").notNull().unique(),
-    pageId: text("page_id")
+    pageId: text("page_id_old")
       .notNull()
       .references(() => wikiPages.id),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
