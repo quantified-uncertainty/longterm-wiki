@@ -10,6 +10,7 @@ const slugIntIdMap = new Map<string, number>();
 let riskStore: Array<{
   id: number;
   page_id: string;
+  page_id_old: string;
   page_id_int: number | null;
   score: number;
   level: string;
@@ -105,6 +106,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const row = {
         id: nextId++,
         page_id: params[off] as string,
+        page_id_old: params[off] as string,
         page_id_int: params[off + 1] as number | null,
         score: params[off + 2] as number,
         level: params[off + 3] as string,

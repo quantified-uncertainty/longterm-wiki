@@ -312,9 +312,9 @@ const hallucinationRiskApp = new Hono()
     const levelDist = await rawDb<LevelDistRow[]>`
       SELECT level, count(*)::int AS count
       FROM (
-        SELECT DISTINCT ON (page_id) level
+        SELECT DISTINCT ON (page_id_old) level
         FROM hallucination_risk_snapshots
-        ORDER BY page_id, computed_at DESC
+        ORDER BY page_id_old, computed_at DESC
       ) latest
       GROUP BY level
     `;
@@ -360,22 +360,22 @@ const hallucinationRiskApp = new Hono()
       // Fallback: DISTINCT ON on base table
       rows = level
         ? await rawDb<RiskPageDbRow[]>`
-            SELECT page_id, score, level, factors, integrity_issues, computed_at
+            SELECT page_id_old AS page_id, score, level, factors, integrity_issues, computed_at
             FROM (
-              SELECT DISTINCT ON (page_id) *
+              SELECT DISTINCT ON (page_id_old) *
               FROM hallucination_risk_snapshots
-              ORDER BY page_id, computed_at DESC
+              ORDER BY page_id_old, computed_at DESC
             ) latest
             WHERE level = ${level}
             ORDER BY score DESC
             LIMIT ${limit} OFFSET ${offset}
           `
         : await rawDb<RiskPageDbRow[]>`
-            SELECT page_id, score, level, factors, integrity_issues, computed_at
+            SELECT page_id_old AS page_id, score, level, factors, integrity_issues, computed_at
             FROM (
-              SELECT DISTINCT ON (page_id) *
+              SELECT DISTINCT ON (page_id_old) *
               FROM hallucination_risk_snapshots
-              ORDER BY page_id, computed_at DESC
+              ORDER BY page_id_old, computed_at DESC
             ) latest
             ORDER BY score DESC
             LIMIT ${limit} OFFSET ${offset}
@@ -411,7 +411,7 @@ const hallucinationRiskApp = new Hono()
         WHERE id NOT IN (
           SELECT id FROM (
             SELECT id, ROW_NUMBER() OVER (
-              PARTITION BY page_id ORDER BY computed_at DESC
+              PARTITION BY page_id_old ORDER BY computed_at DESC
             ) AS rn
             FROM hallucination_risk_snapshots
           ) ranked
@@ -442,7 +442,7 @@ const hallucinationRiskApp = new Hono()
       WHERE id NOT IN (
         SELECT id FROM (
           SELECT id, ROW_NUMBER() OVER (
-            PARTITION BY page_id ORDER BY computed_at DESC
+            PARTITION BY page_id_old ORDER BY computed_at DESC
           ) AS rn
           FROM hallucination_risk_snapshots
         ) ranked

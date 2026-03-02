@@ -35,6 +35,7 @@ let resultStore: Array<{
   id: number;
   run_id: number;
   page_id: string;
+  page_id_old: string;
   status: string;
   tier: string | null;
   duration_ms: number | null;
@@ -119,6 +120,7 @@ const dispatch: SqlDispatcher = (query, params) => {
         id: nextResultId++,
         run_id: params[o] as number,
         page_id: params[o + 1] as string,
+        page_id_old: params[o + 1] as string,
         // params[o + 2] is page_id_int (Phase 4a, not used in mock)
         status: params[o + 3] as string,
         tier: params[o + 4] as string | null,

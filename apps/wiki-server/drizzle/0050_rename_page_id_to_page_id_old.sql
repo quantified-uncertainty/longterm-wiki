@@ -1,0 +1,13 @@
+-- Phase 4c: Rename text page_id columns to page_id_old across FK tables
+-- Epic: #1497 (Convert wiki_pages.id from text slug to integer PK)
+-- Issue: #1498
+--
+-- Replaced with no-op because ALTER TABLE ... RENAME COLUMN requires
+-- ACCESS EXCLUSIVE locks which deadlock with the pre-deploy smoke test
+-- (it runs migrations against the production DB while old pods still hold
+-- connections).
+--
+-- The actual schema changes must be applied directly via psql or a one-off
+-- job while no other connections hold locks. See:
+--   apps/wiki-server/scripts/phase4c-manual-migration.sql
+SELECT 1;

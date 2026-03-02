@@ -45,6 +45,7 @@ type NewsRow = {
   topics_json: string[] | null;
   entities_json: string[] | null;
   routed_to_page_id: string | null;
+  routed_to_page_id_old: string | null;
   routed_to_page_id_int: number | null;
   routed_to_page_title: string | null;
   routed_tier: string | null;
@@ -125,15 +126,21 @@ function makeNews(runId: number, overrides: Partial<NewsRow> = {}): NewsRow {
     topics_json: null,
     entities_json: null,
     routed_to_page_id: null,
+    routed_to_page_id_old: null,
     routed_to_page_id_int: null,
     routed_to_page_title: null,
     routed_tier: null,
     created_at: new Date(),
     ...overrides,
   };
-  // Auto-populate routed_to_page_id_int from routed_to_page_id if not explicitly set
-  if (base.routed_to_page_id && base.routed_to_page_id_int === null) {
-    base.routed_to_page_id_int = getIntIdForSlug(base.routed_to_page_id);
+  // Auto-populate routed_to_page_id_old and routed_to_page_id_int from routed_to_page_id if not explicitly set
+  if (base.routed_to_page_id) {
+    if (base.routed_to_page_id_old === null) {
+      base.routed_to_page_id_old = base.routed_to_page_id;
+    }
+    if (base.routed_to_page_id_int === null) {
+      base.routed_to_page_id_int = getIntIdForSlug(base.routed_to_page_id);
+    }
   }
   return base;
 }
@@ -157,6 +164,7 @@ function joinNewsWithRun(news: NewsRow, run: RunRow) {
     topics_json: news.topics_json,
     entities_json: news.entities_json,
     routed_to_page_id: news.routed_to_page_id,
+    routed_to_page_id_old: news.routed_to_page_id_old,
     routed_to_page_title: news.routed_to_page_title,
     routed_tier: news.routed_tier,
     created_at: news.created_at,
@@ -217,6 +225,7 @@ const dispatch: SqlDispatcher = (query, params) => {
         topics_json: params[o + 7] as string[] | null,
         entities_json: params[o + 8] as string[] | null,
         routed_to_page_id: params[o + 9] as string | null,
+        routed_to_page_id_old: params[o + 9] as string | null,
         routed_to_page_id_int: params[o + 10] as number | null,
         routed_to_page_title: params[o + 11] as string | null,
         routed_tier: params[o + 12] as string | null,

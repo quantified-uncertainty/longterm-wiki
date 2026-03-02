@@ -5,7 +5,7 @@ import { mockDbModule, postJson } from "./test-utils.js";
 // ---- In-memory stores ----
 
 let resourceStore: Map<string, Record<string, unknown>>;
-let citationStore: Array<{ resource_id: string; page_id: string; page_id_int: number | null; created_at: Date }>;
+let citationStore: Array<{ resource_id: string; page_id: string; page_id_old: string; page_id_int: number | null; created_at: Date }>;
 
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
@@ -122,6 +122,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         citationStore.push({
           resource_id: resourceId,
           page_id: pageId,
+          page_id_old: pageId,
           page_id_int: pageIdInt,
           created_at: new Date(),
         });
@@ -193,7 +194,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const resourceId = params[0] as string;
     return citationStore
       .filter((c) => c.resource_id === resourceId)
-      .map((c) => ({ page_id: c.page_id }));
+      .map((c) => ({ page_id: c.page_id, page_id_old: c.page_id }));
   }
 
   // ---- Full-text search (raw SQL with to_tsquery or plainto_tsquery) ----
