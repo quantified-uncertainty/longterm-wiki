@@ -13,8 +13,8 @@
  * - Single-quoted YAML:  not fixable (single-quoted strings have no escape mechanism)
  */
 
-import { createRule, Issue, Severity, FixType } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, FixType } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 import { matchLinesOutsideCode, isInMermaid, isInJsxAttribute } from '../mdx-utils.ts';
 import { UNESCAPED_DOLLAR_RE, DOUBLE_ESCAPED_DOLLAR_RE } from '../patterns.ts';
 

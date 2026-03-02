@@ -8,7 +8,7 @@
  * - Empty or near-empty files
  */
 
-import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { basename } from 'path';
 
 // Patterns that indicate cruft files

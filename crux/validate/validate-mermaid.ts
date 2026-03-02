@@ -33,7 +33,7 @@ import {
   extractMermaidCharts,
   validateChart,
   type ChartIssue,
-} from '../lib/mermaid-checks.ts';
+} from '../lib/validation/mermaid-checks.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
 const TEMP_DIR = join(PROJECT_ROOT, '.mermaid-validate-temp');

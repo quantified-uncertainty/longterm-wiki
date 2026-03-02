@@ -17,8 +17,8 @@
  * - `≈86%` renders correctly as `≈86%`
  */
 
-import { createRule, Issue, Severity, FixType } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, FixType } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 import { matchLinesOutsideCode } from '../mdx-utils.ts';
 
 // Pattern: tilde followed by escaped dollar sign (problematic LaTeX interaction)

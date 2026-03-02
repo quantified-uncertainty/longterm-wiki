@@ -23,7 +23,7 @@
 import { spawn, type ChildProcess } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { ValidationEngine, Severity, type Issue } from '../lib/validation-engine.ts';
+import { ValidationEngine, Severity, type Issue } from '../lib/validation/validation-engine.ts';
 import { allRules } from '../lib/rules/index.ts';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';

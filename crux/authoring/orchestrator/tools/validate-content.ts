@@ -11,7 +11,7 @@
  * page-improver/phases/validate.ts).
  */
 
-import { ValidationEngine, ContentFile } from '../../../lib/validation-engine.ts';
+import { ValidationEngine, ContentFile } from '../../../lib/validation/validation-engine.ts';
 import { allRules } from '../../../lib/rules/index.ts';
 import { CRITICAL_RULES, QUALITY_RULES } from '../../../lib/content-types.ts';
 import type { ToolRegistration } from './types.ts';

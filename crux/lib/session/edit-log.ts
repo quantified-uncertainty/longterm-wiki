@@ -5,7 +5,7 @@
  * YAML files in data/edit-logs/ are no longer written (removed in #485).
  *
  * Usage:
- *   import { appendEditLog } from '../lib/edit-log.ts';
+ *   import { appendEditLog } from '../lib/session/edit-log.ts';
  *   const result = await appendEditLog('open-philanthropy', {
  *     tool: 'crux-improve',
  *     agency: 'ai-directed',
@@ -16,8 +16,8 @@
  */
 
 import path from 'path';
-import { appendEditLogToServer, getEditLogsForPage, type AppendResult } from './wiki-server/edit-logs.ts';
-import type { ApiResult } from './wiki-server/client.ts';
+import { appendEditLogToServer, getEditLogsForPage, type AppendResult } from '../wiki-server/edit-logs.ts';
+import type { ApiResult } from '../wiki-server/client.ts';
 
 // ---------------------------------------------------------------------------
 // Types

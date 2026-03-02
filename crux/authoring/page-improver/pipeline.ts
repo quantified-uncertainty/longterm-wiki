@@ -7,7 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { execFileSync } from 'child_process';
-import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
+import { appendEditLog, getDefaultRequestedBy } from '../../lib/session/edit-log.ts';
 import { createSession } from '../../lib/wiki-server/sessions.ts';
 import { saveArtifacts } from '../../lib/wiki-server/artifacts.ts';
 import { isServerAvailable } from '../../lib/wiki-server/client.ts';
@@ -21,8 +21,8 @@ import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import { createDbEntriesForRcFootnotes } from '../../claims/convert-new-footnotes.ts';
 import { isBiographicalPage } from '../../lib/page-analysis.ts';
-import { validateMdxContent } from '../../lib/validate-mdx-content.ts';
-import { ValidationEngine } from '../../lib/validation-engine.ts';
+import { validateMdxContent } from '../../lib/validation/validate-mdx-content.ts';
+import { ValidationEngine } from '../../lib/validation/validation-engine.ts';
 import {
   analyzePhase, researchPhase, improvePhase, improveSectionsPhase,
   enrichPhase, reviewPhase,

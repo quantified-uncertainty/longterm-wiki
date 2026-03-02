@@ -7,7 +7,7 @@
  * Cost: $0 (API read).
  */
 
-import { readEditLog } from '../../../lib/edit-log.ts';
+import { readEditLog } from '../../../lib/session/edit-log.ts';
 import type { ToolRegistration } from './types.ts';
 
 export const tool: ToolRegistration = {

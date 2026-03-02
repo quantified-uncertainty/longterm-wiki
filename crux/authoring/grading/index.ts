@@ -32,7 +32,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../../lib/cli.ts';
 import { getApiKey } from '../../lib/api-keys.ts';
-import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
+import { appendEditLog, getDefaultRequestedBy } from '../../lib/session/edit-log.ts';
 
 import type {
   PageInfo, Warning, ChecklistWarning,

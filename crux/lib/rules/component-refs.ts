@@ -11,7 +11,7 @@
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { loadDatabase, loadPathRegistry, loadIdRegistry as loadIdReg, DATA_DIR_ABS, type Entity } from '../content-types.ts';
 import { NUMERIC_ID_RE, ENTITY_LINK_RE } from '../patterns.ts';
 import { stripFencedCodeBlocks } from '../mdx-utils.ts';

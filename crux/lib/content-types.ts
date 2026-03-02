@@ -378,10 +378,10 @@ export function loadExperts(): ExpertEntry[] {
   return loadGeneratedJson<ExpertEntry[]>('experts.json', []);
 }
 
-export type { BlockIndex, SectionIR, SectionBlock } from './block-ir.ts';
+export type { BlockIndex, SectionIR, SectionBlock } from './content/block-ir.ts';
 
-export function loadBlockIndex(): import('./block-ir.ts').BlockIndex {
-  return loadGeneratedJson<import('./block-ir.ts').BlockIndex>('block-index.json', {});
+export function loadBlockIndex(): import('./content/block-ir.ts').BlockIndex {
+  return loadGeneratedJson<import('./content/block-ir.ts').BlockIndex>('block-index.json', {});
 }
 
 /**

@@ -14,7 +14,7 @@ import { compile } from '@mdx-js/mdx';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
 import remarkMath from 'remark-math';
-import { ValidationEngine, ContentFile } from '../../../lib/validation-engine.ts';
+import { ValidationEngine, ContentFile } from '../../../lib/validation/validation-engine.ts';
 import { allRules } from '../../../lib/rules/index.ts';
 import type { PageData, ValidationResult, PipelineOptions } from '../types.ts';
 import { CRITICAL_RULES, QUALITY_RULES, log, getFilePath, writeTemp } from '../utils.ts';

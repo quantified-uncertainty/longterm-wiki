@@ -38,8 +38,8 @@ vi.mock('./source-fetcher.ts', () => ({
 // Mock LLM layer — avoid real API calls
 // ---------------------------------------------------------------------------
 
-vi.mock('./llm.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./llm.ts')>();
+vi.mock('../llm.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../llm.ts')>();
   return {
     ...actual,
     createLlmClient: vi.fn(() => ({})),

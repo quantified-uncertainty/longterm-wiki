@@ -27,7 +27,7 @@ import { findMdxFiles } from './lib/file-utils.ts';
 import { getColors } from './lib/output.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities } from './lib/content-types.ts';
 import type { PathRegistry } from './lib/content-types.ts';
-import { logBulkFixes } from './lib/edit-log.ts';
+import { logBulkFixes } from './lib/session/edit-log.ts';
 
 // Load path registry for EntityLink conversion
 const pathRegistry: PathRegistry = loadPathRegistry();

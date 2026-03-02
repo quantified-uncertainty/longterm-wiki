@@ -13,8 +13,8 @@
  * Resolves: https://github.com/quantified-uncertainty/longterm-wiki/issues/920
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 
 // Entity types that are abstract and cannot have an "Official Website"
 const ABSTRACT_ENTITY_TYPES = new Set([

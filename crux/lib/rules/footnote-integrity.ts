@@ -11,8 +11,8 @@
  * See issue #820.
  */
 
-import { Severity, Issue } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 
 /** Matches inline footnote refs [^MARKER] (not inside definition lines). */
 const INLINE_REF_RE = /\[\^([^\]]+)\](?!:)/g;

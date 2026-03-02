@@ -24,11 +24,11 @@ import {
   extractClaimSentence,
   fetchCitationUrl,
   saveFetchResultToPostgres,
-} from '../lib/citation-archive.ts';
+} from '../lib/citation/citation-archive.ts';
 import {
   getCachedContent,
   setCachedContent,
-} from '../lib/citation-content-cache.ts';
+} from '../lib/citation/citation-content-cache.ts';
 import {
   getCitationContentByUrl,
   getQuote,
@@ -40,8 +40,8 @@ import { verifyQuoteInSource } from '../lib/quote-verifier.ts';
 import {
   parseBookReference,
   findSourceOnline,
-} from '../lib/source-lookup.ts';
-import { getResourceByUrl } from '../lib/resource-lookup.ts';
+} from '../lib/search/source-lookup.ts';
+import { getResourceByUrl } from '../lib/search/resource-lookup.ts';
 import { findPagesWithCitations, logBatchProgress } from './shared.ts';
 
 /** Detect if a footnote is a book/paper reference (no URL). */

@@ -11,7 +11,7 @@
  * These patterns target insider shorthand, not legitimate descriptive uses.
  */
 
-import { Severity, Issue, ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 
 // ---------------------------------------------------------------------------
 // Interfaces

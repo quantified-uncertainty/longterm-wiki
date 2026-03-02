@@ -12,8 +12,8 @@
  * Auto-fixable: replaces non-standard headers with the canonical form.
  */
 
-import { createRule, Issue, Severity, FixType } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, FixType } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 
 /** Canonical table header for each section type */
 const CANONICAL = {

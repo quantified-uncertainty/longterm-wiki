@@ -15,8 +15,8 @@
  * See issue #1162.
  */
 
-import { Severity, Issue } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 
 /** Matches inline numbered footnote references: [^1], [^23], etc. */
 const NUMBERED_FOOTNOTE_REF_RE = /\[\^(\d+)\](?!:)/g;

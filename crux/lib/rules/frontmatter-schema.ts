@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { ALL_ENTITY_TYPE_NAMES } from '../../../apps/web/src/data/entity-type-names.ts';
 import { VALID_SUBCATEGORIES } from '../valid-subcategories.ts';
 

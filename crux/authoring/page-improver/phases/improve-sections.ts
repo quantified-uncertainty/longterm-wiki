@@ -15,7 +15,7 @@
 
 import fs from 'fs';
 import { MODELS } from '../../../lib/anthropic.ts';
-import { rewriteSection } from '../../../lib/section-writer.ts';
+import { rewriteSection } from '../../../lib/content/section-writer.ts';
 import {
   splitIntoSections,
   reassembleSections,
@@ -23,7 +23,7 @@ import {
   deduplicateSectionMarkers,
   filterSourcesForSection,
   type ParsedSection,
-} from '../../../lib/section-splitter.ts';
+} from '../../../lib/content/section-splitter.ts';
 import type {
   PageData,
   AnalysisResult,

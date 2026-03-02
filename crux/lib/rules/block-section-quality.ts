@@ -14,9 +14,9 @@
  * pages that failed block-IR parsing, and non-KB pages.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { loadBlockIndex } from '../content-types.ts';
-import type { BlockIndex } from '../block-ir.ts';
+import type { BlockIndex } from '../content/block-ir.ts';
 
 /** Minimum word count to flag an uncited section */
 const UNCITED_MIN_WORDS = 200;

@@ -16,8 +16,8 @@
  * See: https://github.com/quantified-uncertainty/longterm-wiki/issues/351
  */
 
-import { createRule, Issue, Severity, FixType } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, FixType } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 
 // Matches quoted subcategory values in YAML frontmatter
 // e.g. subcategory: "labs" or subcategory: 'labs'

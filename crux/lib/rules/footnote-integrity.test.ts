@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { footnoteIntegrityRule } from './footnote-integrity.ts';
-import { ValidationEngine, Severity } from '../validation-engine.ts';
+import { ValidationEngine, Severity } from '../validation/validation-engine.ts';
 
 // Minimal mock of ContentFile and ValidationEngine for rule testing
 function makeContentFile(body: string, path = 'content/docs/knowledge-base/test.mdx') {

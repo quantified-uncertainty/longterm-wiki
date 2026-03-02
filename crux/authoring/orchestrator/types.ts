@@ -6,9 +6,9 @@
  * actually needs. See issue #692 and E766 Part 11.
  */
 
-import type { SourceCacheEntry } from '../../lib/section-writer.ts';
-import type { ParsedSection, SplitPage } from '../../lib/section-splitter.ts';
-import type { CitationAudit } from '../../lib/citation-auditor.ts';
+import type { SourceCacheEntry } from '../../lib/content/section-writer.ts';
+import type { ParsedSection, SplitPage } from '../../lib/content/section-splitter.ts';
+import type { CitationAudit } from '../../lib/citation/citation-auditor.ts';
 import type { CostTracker } from '../../lib/cost-tracker.ts';
 
 // ---------------------------------------------------------------------------

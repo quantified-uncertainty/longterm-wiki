@@ -9,7 +9,7 @@
 
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { readCitationArchive, listArchivedPages } from '../lib/citation-archive.ts';
+import { readCitationArchive, listArchivedPages } from '../lib/citation/citation-archive.ts';
 
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));

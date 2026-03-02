@@ -152,7 +152,7 @@ export function citationAuditorDetector(): DetectorAdapter {
     requiresNetwork: true,
     requiresLlm: true,
     async detect(content: string, _pageId: string): Promise<DetectorFinding[]> {
-      const { auditCitations } = await import('../lib/citation-auditor.ts');
+      const { auditCitations } = await import('../lib/citation/citation-auditor.ts');
 
       try {
         const result = await auditCitations({

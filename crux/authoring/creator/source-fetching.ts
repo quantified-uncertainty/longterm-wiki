@@ -10,7 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import { hashId } from '../../lib/hash-utils.ts';
 import { SOURCES_DIR } from '../../lib/cache-paths.ts';
-import { getResourceByUrl } from '../../lib/resource-lookup.ts';
+import { getResourceByUrl } from '../../lib/search/resource-lookup.ts';
 import { getApiKey } from '../../lib/api-keys.ts';
 import type { TopicPhaseContext, ResearchPhaseContext } from './types.ts';
 

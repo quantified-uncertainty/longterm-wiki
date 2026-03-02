@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { Issue, Severity, type Rule } from '../validation-engine.ts';
+import { Issue, Severity, type Rule } from '../validation/validation-engine.ts';
 import { styleGuideRule } from './style-guide.ts';
 
 function mockContent(body: string, opts: Record<string, unknown> = {}): any {

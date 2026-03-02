@@ -19,7 +19,7 @@ import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
-import { logBulkFixes } from '../lib/edit-log.ts';
+import { logBulkFixes } from '../lib/session/edit-log.ts';
 import { COMPONENT_USAGE_RE, WIKI_IMPORT_RE } from '../lib/patterns.ts';
 
 const args: string[] = process.argv.slice(2);

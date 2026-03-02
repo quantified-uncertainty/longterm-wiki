@@ -38,7 +38,7 @@ vi.mock('../lib/wiki-server/agent-sessions.ts', () => ({
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { commands } from './agent-checklist.ts';
 import * as githubLib from '../lib/github.ts';
-import { buildChecklist, type ChecklistMetadata } from '../lib/session-checklist.ts';
+import { buildChecklist, type ChecklistMetadata } from '../lib/session/session-checklist.ts';
 
 const mockGithubApi = vi.mocked(githubLib.githubApi);
 const mockReadFileSync = vi.mocked(readFileSync);

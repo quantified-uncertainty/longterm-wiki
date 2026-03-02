@@ -16,8 +16,8 @@
  * Resolves: https://github.com/quantified-uncertainty/longterm-wiki/issues/916
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 
 /** Filler strings used as source/evidence citations in table cells */
 const FILLER_CITATION_STRINGS = [

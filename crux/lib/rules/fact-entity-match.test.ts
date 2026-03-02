@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { Issue, type Rule } from '../validation-engine.ts';
+import { Issue, type Rule } from '../validation/validation-engine.ts';
 import { factEntityMatchRule } from './fact-entity-match.ts';
 
 /**

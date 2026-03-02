@@ -15,7 +15,7 @@
  * See issue #673.
  */
 
-import { splitIntoSections } from './section-splitter.ts';
+import { splitIntoSections } from './content/section-splitter.ts';
 
 /** Maximum content size (chars) sent to the LLM per call. Larger content is split. */
 export const MAX_CHUNK_SIZE = 5000;

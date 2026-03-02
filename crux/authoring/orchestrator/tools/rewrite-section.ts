@@ -11,8 +11,8 @@ import {
   reassembleSections,
   renumberFootnotes,
   filterSourcesForSection,
-} from '../../../lib/section-splitter.ts';
-import { rewriteSection } from '../../../lib/section-writer.ts';
+} from '../../../lib/content/section-splitter.ts';
+import { rewriteSection } from '../../../lib/content/section-writer.ts';
 import { normalizeDollarEscaping } from '../orchestrator.ts';
 import type { ToolRegistration } from './types.ts';
 

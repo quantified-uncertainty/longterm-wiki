@@ -19,8 +19,8 @@
  * Resolves: https://github.com/quantified-uncertainty/longterm-wiki/issues/922
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 import { loadPathRegistry } from '../content-types.ts';
 
 /** Convert display name to likely entity slug: "Paul Christiano" → "paul-christiano" */

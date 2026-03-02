@@ -13,8 +13,8 @@
  * See issue #1216.
  */
 
-import { createRule, Issue, Severity, FixType } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, FixType } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 
 /** Matches a footnote definition line: [^MARKER]: text */
 const DEF_RE = /^\[\^([^\]]+)\]:\s?/;

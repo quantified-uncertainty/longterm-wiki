@@ -30,7 +30,7 @@ import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPathRegistry, loadOrganizations, loadExperts, loadIdRegistry } from '../lib/content-types.ts';
-import { logBulkFixes } from '../lib/edit-log.ts';
+import { logBulkFixes } from '../lib/session/edit-log.ts';
 import { ENTITY_LINK_RE, NUMERIC_ID_RE } from '../lib/patterns.ts';
 
 // Cached numeric-ID → slug mapping for deduplication

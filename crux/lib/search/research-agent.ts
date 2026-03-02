@@ -27,12 +27,12 @@
  * See issue #684.
  */
 
-import { getApiKey, SCRY_PUBLIC_KEY } from './api-keys.ts';
+import { getApiKey, SCRY_PUBLIC_KEY } from '../api-keys.ts';
 import { fetchSources } from './source-fetcher.ts';
-import { createLlmClient, streamingCreate, extractText, MODELS } from './llm.ts';
-import type { SourceCacheEntry } from './section-writer.ts';
-import type { CostTracker } from './cost-tracker.ts';
-import { MODEL_PRICING } from './pricing.ts';
+import { createLlmClient, streamingCreate, extractText, MODELS } from '../llm.ts';
+import type { SourceCacheEntry } from '../content/section-writer.ts';
+import type { CostTracker } from '../cost-tracker.ts';
+import { MODEL_PRICING } from '../pricing.ts';
 
 // ---------------------------------------------------------------------------
 // Public interfaces

@@ -19,7 +19,7 @@
  * Only applies to pages under /people/ or /organizations/ paths.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 
 // Check if a page is a person or organization page based on its path
 function isBiographicalPage(relativePath: string): boolean {

@@ -19,7 +19,7 @@
  * Only applies to knowledge-base pages with 300+ words of prose.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 import { countProseWords, getEntityTypeFromPath } from '../page-analysis.ts';
 import { findFootnoteRefs } from '../content-integrity.ts';

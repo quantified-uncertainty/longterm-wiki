@@ -6,10 +6,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
+import { appendEditLog, getDefaultRequestedBy } from '../../lib/session/edit-log.ts';
 import type { DeployPhaseContext, ValidationPhaseContext } from './types.ts';
 import { ENTITY_LINK_RE, NUMERIC_ID_RE, FOOTNOTE_REF_RE, FOOTNOTE_DEF_RE } from '../../lib/patterns.ts';
-import { validateMdxContent } from '../../lib/validate-mdx-content.ts';
+import { validateMdxContent } from '../../lib/validation/validate-mdx-content.ts';
 
 let _slugToNumeric: Record<string, string> | null = null;
 

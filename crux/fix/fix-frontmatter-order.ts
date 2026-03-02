@@ -23,7 +23,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
-import { logBulkFixes } from '../lib/edit-log.ts';
+import { logBulkFixes } from '../lib/session/edit-log.ts';
 import { getFieldSortIndex } from '../lib/frontmatter-order.ts';
 
 const args: string[] = process.argv.slice(2);

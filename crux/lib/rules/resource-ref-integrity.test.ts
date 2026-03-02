@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { Severity } from '../validation-engine.ts';
+import { Severity } from '../validation/validation-engine.ts';
 
 // vi.mock is hoisted before all imports by vitest — fs is mocked before
 // resource-ref-integrity.ts initialises its module-level resourceIdCache.

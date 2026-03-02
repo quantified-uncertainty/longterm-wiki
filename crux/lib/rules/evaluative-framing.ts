@@ -15,7 +15,7 @@
  * Good: Assessment table with data: "25 departures from 3,000 staff (0.8%)"
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 
 const EVALUATIVE_PATTERNS: { pattern: RegExp; message: string }[] = [
   // Dramatic adjectives before nouns — editorial emphasis disguised as description

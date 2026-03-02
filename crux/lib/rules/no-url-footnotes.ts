@@ -24,7 +24,7 @@
  * that genuinely have no URL.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 
 /** Matches a footnote definition line: `[^N]: <rest>` */
 const FOOTNOTE_DEF_RE = /^\[\^(\d+)\]:\s*(.+)/;

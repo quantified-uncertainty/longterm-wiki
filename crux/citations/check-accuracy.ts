@@ -15,7 +15,7 @@
 import { fileURLToPath } from 'url';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { getCachedContent } from '../lib/citation-content-cache.ts';
+import { getCachedContent } from '../lib/citation/citation-content-cache.ts';
 import {
   getQuotesByPage,
   getPagesWithQuotes,

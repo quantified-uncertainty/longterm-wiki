@@ -21,7 +21,7 @@
  */
 
 import { fileURLToPath } from 'url';
-import { ValidationEngine, Severity, type Issue } from '../lib/validation-engine.ts';
+import { ValidationEngine, Severity, type Issue } from '../lib/validation/validation-engine.ts';
 import { allRules } from '../lib/rules/index.ts';
 import { getColors } from '../lib/output.ts';
 

@@ -9,7 +9,7 @@
  * but attributed to the wrong journal in the link text.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 
 // Map from DOI prefixes to expected journal/publisher names
 // DOI prefixes: https://www.doi.org/the-identifier/resources/factsheets/doi-resolution-documentation

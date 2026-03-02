@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { BlockIndex, PageBlockIR, SectionIR } from '../lib/block-ir.ts';
+import type { BlockIndex, PageBlockIR, SectionIR } from '../lib/content/block-ir.ts';
 
 // ---------------------------------------------------------------------------
 // Mock loadBlockIndex before importing the module under test

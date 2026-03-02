@@ -10,8 +10,8 @@
  *   <1 year timeframe      -> parsed as JSX
  */
 
-import { createRule, Issue, Severity, FixType } from '../validation-engine.ts';
-import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, FixType } from '../validation/validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation/validation-engine.ts';
 import { matchLinesOutsideCode, isInJsxAttribute } from '../mdx-utils.ts';
 import { LESS_THAN_BEFORE_NUM_RE } from '../patterns.ts';
 

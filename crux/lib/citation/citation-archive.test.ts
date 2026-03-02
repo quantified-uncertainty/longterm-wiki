@@ -13,7 +13,7 @@ vi.mock('./citation-content-cache.ts', () => ({
 
 // Mock wiki-server citations client (PostgreSQL)
 const mockUpsertCitationContent = vi.fn().mockResolvedValue({ ok: true, data: { url: 'mock' } });
-vi.mock('./wiki-server/citations.ts', () => ({
+vi.mock('../wiki-server/citations.ts', () => ({
   upsertCitationContent: (...args: unknown[]) => mockUpsertCitationContent(...args),
 }));
 

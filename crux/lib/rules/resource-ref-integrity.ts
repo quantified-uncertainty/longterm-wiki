@@ -8,7 +8,7 @@
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
-import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { DATA_DIR_ABS } from '../content-types.ts';
 
 const RESOURCES_DIR = join(DATA_DIR_ABS, 'resources');

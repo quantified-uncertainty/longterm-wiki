@@ -6,7 +6,7 @@
  * Cost: ~$1.50 per call.
  */
 
-import { runResearch, type ResearchRequest } from '../../../lib/research-agent.ts';
+import { runResearch, type ResearchRequest } from '../../../lib/search/research-agent.ts';
 import type { ToolRegistration } from './types.ts';
 
 export const tool: ToolRegistration = {

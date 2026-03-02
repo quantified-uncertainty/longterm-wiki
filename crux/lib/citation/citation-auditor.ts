@@ -22,11 +22,11 @@
  */
 
 import { extractCitationsFromContent, extractClaimSentence } from './citation-archive.ts';
-import { callOpenRouter, stripCodeFences, truncateSource, DEFAULT_CITATION_MODEL } from './quote-extractor.ts';
-import { fetchSource, type FetchedSource } from './source-fetcher.ts';
-import { stripFrontmatter } from './patterns.ts';
+import { callOpenRouter, stripCodeFences, truncateSource, DEFAULT_CITATION_MODEL } from '../quote-extractor.ts';
+import { fetchSource, type FetchedSource } from '../search/source-fetcher.ts';
+import { stripFrontmatter } from '../patterns.ts';
 import { getCachedContent } from './citation-content-cache.ts';
-import { getCitationContentByUrl } from './wiki-server/citations.ts';
+import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 
 /** Minimum source content length (chars) required to attempt LLM verification. */
 export const MIN_SOURCE_CONTENT_LENGTH = 50;

@@ -15,7 +15,7 @@
  * See content-quality.md "The Editorial Artifacts Trap" for full guidance.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 
 const EDITORIAL_ARTIFACT_PATTERNS: { pattern: RegExp; message: string }[] = [
   // Self-referencing revision history — "this analysis", "this page", etc.

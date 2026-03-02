@@ -27,7 +27,7 @@ import {
   countWords,
   getJsxAttr,
   isJsxElement,
-} from './mdx-ast-helpers.ts';
+} from '../mdx-ast-helpers.ts';
 
 // ---------------------------------------------------------------------------
 // Types
