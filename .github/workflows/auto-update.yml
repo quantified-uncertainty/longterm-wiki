@@ -19,7 +19,7 @@ on:
       count:
         description: 'Max pages to update'
         required: false
-        default: '5'
+        default: '3'
         type: string
       dry_run:
         description: 'Dry run (no page improvements)'
