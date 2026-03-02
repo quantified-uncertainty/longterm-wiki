@@ -72,7 +72,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       if (existing) {
         const updated = {
           ...existing,
-          page_id: pageId, footnote, url, resource_id: resourceId,
+          page_id: pageId, page_id_int: pageIdInt, footnote, url, resource_id: resourceId,
           claim_text: claimText, claim_context: claimContext,
           source_quote: sourceQuote, source_location: sourceLocation,
           quote_verified: quoteVerified, verification_method: verificationMethod,
@@ -184,7 +184,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: SELECT WHERE LIMIT (no ORDER BY) — GET /quotes/:pageId/:footnote ---
-  // Phase 4b: params[0]=intId, params[1]=footnote, params[2]=limit.
+  // Phase 4b: params[0]=intId, params[1]=footnote. LIMIT 1 is always used; params[2] is not read.
   if (q.includes("citation_quotes") && q.includes("where") && q.includes("limit") && !q.includes("order by") && !q.includes("count(*)") && !q.includes("group by")) {
     const intId = params[0] as number;
     const footnote = params[1] as number;
@@ -627,6 +627,17 @@ describe("Citation Server API", () => {
       const res = await postJson(app, "/api/citations/quotes/mark-verified", {
         pageId: "nonexistent",
         footnote: 99,
+        method: "text-match",
+        score: 0.5,
+      });
+      expect(res.status).toBe(404);
+    });
+
+    it("returns 404 for page absent from entity_ids (null-intId early-return)", async () => {
+      // "no-entity-id" sentinel: entity_ids mock returns no row → resolvePageIntId → null
+      const res = await postJson(app, "/api/citations/quotes/mark-verified", {
+        pageId: "no-entity-id",
+        footnote: 1,
         method: "text-match",
         score: 0.5,
       });
