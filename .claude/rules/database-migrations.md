@@ -44,8 +44,8 @@ For UPDATE operations on large tables, process in batches to avoid statement_tim
 
 ```sql
 -- Backfill in batches of 10,000 rows
--- NOTE: Run this outside a transaction (e.g. via psql, not inside BEGIN/COMMIT).
--- Each iteration commits independently to release locks between batches.
+-- NOTE: This DO block runs as a single transaction.
+-- For inter-batch commits on very large datasets, see the note below about shell loops.
 DO $$
 DECLARE
   rows_updated INT;
