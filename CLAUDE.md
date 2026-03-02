@@ -95,6 +95,7 @@ longterm-wiki/
 - `.claude/rules/pre-pr-verification.md` — Build/test/gate checks before PRs
 - `.claude/rules/session-logging.md` — Session log format and storage
 - `.claude/rules/error-handling.md` — Error handling strategy and `.catch()` patterns
+- `.claude/rules/database-migrations.md` — Migration patterns and deploy flow
 - `.claude/rules/wiki-server-rpc-migration.md` — Hono RPC migration guide
 - `.claude/rules/internal-dashboards.md` — Dashboard creation pattern
 - `.claude/rules/auto-update-system.md` — Auto-update system
