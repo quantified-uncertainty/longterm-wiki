@@ -29,6 +29,7 @@ function makeQuote(overrides: {
   return {
     id: Math.floor(Math.random() * 100000),
     pageId: overrides.pageId,
+    pageIdInt: null,
     footnote: overrides.footnote,
     url: overrides.url ?? null,
     resourceId: null,
