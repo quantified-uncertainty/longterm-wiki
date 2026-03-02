@@ -25,6 +25,7 @@ apps/web/next-env.d.ts
 apps/web/tsconfig.tsbuildinfo
 
 # Generated data (all rebuilt by prebuild script / build-data.mjs)
+src/data/
 apps/web/src/data/*.json
 apps/web/src/data/schema.ts
 public/search-docs.json
