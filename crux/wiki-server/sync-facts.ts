@@ -126,6 +126,24 @@ function parseFactValue(
         high: obj.max,
       };
     }
+    // min-only: "≥N"
+    if (obj.min !== undefined) {
+      return {
+        value: `≥${obj.min}`,
+        numeric: null,
+        low: obj.min,
+        high: null,
+      };
+    }
+    // max-only: "≤N"
+    if (obj.max !== undefined) {
+      return {
+        value: `≤${obj.max}`,
+        numeric: null,
+        low: null,
+        high: obj.max,
+      };
+    }
   }
 
   return { value: String(val), numeric: null, low: null, high: null };

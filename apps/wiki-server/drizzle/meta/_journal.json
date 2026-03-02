@@ -323,6 +323,20 @@
       "when": 1772438400000,
       "tag": "0045_hallucination_risk_perf",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1772524800000,
+      "tag": "0046_agent_session_names_and_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1772611200000,
+      "tag": "0047_sessions_reviewed",
+      "breakpoints": true
     }
   ]
 }

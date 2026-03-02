@@ -12,6 +12,73 @@ export function setGroundskeeperAgentId(id: number): void {
   groundskeeperAgentId = id;
 }
 
+// ---------------------------------------------------------------------------
+// Wiki-server failure tracking
+// ---------------------------------------------------------------------------
+// Tracks consecutive wiki-server recording failures across all tasks.
+// When the threshold is reached, a single summary warning is logged instead
+// of per-call warnings, to avoid flooding logs during extended outages.
+const WIKI_SERVER_FAILURE_THRESHOLD = 5;
+let wikiServerConsecutiveFailures = 0;
+let wikiServerDroppedCalls = 0;
+/** Dropped calls in the current outage — resets on recovery. */
+let wikiServerCurrentOutageDropped = 0;
+
+/**
+ * Handle a wiki-server recording error. Logs a warning on each failure and
+ * emits a summary warning when consecutive failures hit the threshold.
+ */
+function onWikiServerError(err: unknown, context: string): void {
+  wikiServerConsecutiveFailures++;
+  wikiServerDroppedCalls++;
+  wikiServerCurrentOutageDropped++;
+  const errorMsg = err instanceof Error ? err.message : String(err);
+
+  if (wikiServerConsecutiveFailures === WIKI_SERVER_FAILURE_THRESHOLD) {
+    rootLogger.warn({
+      event: "wiki_server_unreachable",
+      consecutiveFailures: wikiServerConsecutiveFailures,
+      outageDropped: wikiServerCurrentOutageDropped,
+      totalDropped: wikiServerDroppedCalls,
+    }, `Wiki-server appears unreachable — ${wikiServerCurrentOutageDropped} recording call(s) silently dropped`);
+  } else if (wikiServerConsecutiveFailures < WIKI_SERVER_FAILURE_THRESHOLD) {
+    rootLogger.warn({
+      error: errorMsg,
+      event: "wiki_server_call_failed",
+      context,
+      consecutiveFailures: wikiServerConsecutiveFailures,
+    }, `Wiki-server call failed: ${context}`);
+  }
+  // Above threshold: stay quiet to avoid log flooding during extended outages
+}
+
+/**
+ * Reset the wiki-server failure counter after a successful call.
+ */
+function onWikiServerSuccess(): void {
+  if (wikiServerConsecutiveFailures > 0) {
+    rootLogger.info({
+      event: "wiki_server_recovered",
+      outageDropped: wikiServerCurrentOutageDropped,
+    }, `Wiki-server connectivity restored (${wikiServerCurrentOutageDropped} call(s) were dropped during outage)`);
+    wikiServerCurrentOutageDropped = 0;
+  }
+  wikiServerConsecutiveFailures = 0;
+}
+
+/** Exported for testing */
+export function getWikiServerFailureStats(): {
+  consecutiveFailures: number;
+  droppedCalls: number;
+  currentOutageDropped: number;
+} {
+  return {
+    consecutiveFailures: wikiServerConsecutiveFailures,
+    droppedCalls: wikiServerDroppedCalls,
+    currentOutageDropped: wikiServerCurrentOutageDropped,
+  };
+}
+
 export type TaskFn = () => Promise<{ success: boolean; summary?: string }>;
 
 interface TaskState {
@@ -81,7 +148,7 @@ export function registerTask(
           config,
           `🟡 **${name}** circuit breaker cooldown elapsed — attempting recovery probe...`
         );
-        // Record half-open attempt to wiki-server
+        // Record half-open attempt to wiki-server (fire-and-forget with error tracking)
         recordRunToServer(config, {
           taskName: name,
           event: "half_open_attempt",
@@ -89,7 +156,7 @@ export function registerTask(
           consecutiveFailures: state.consecutiveFailures,
           circuitBreakerActive: true,
           timestamp: new Date().toISOString(),
-        }).catch(() => {});
+        }).then(onWikiServerSuccess, (e) => onWikiServerError(e, `halfOpenAttempt:${name}`));
       } else {
         logger.warn({ event: "skipped", reason: "circuit breaker tripped" }, "Task skipped");
         state.running = false;
@@ -174,7 +241,7 @@ export function registerTask(
         summary: result.summary,
       });
 
-      // Best-effort: push to wiki-server
+      // Best-effort: push to wiki-server (fire-and-forget with error tracking)
       recordRunToServer(config, {
         taskName: name,
         event,
@@ -184,13 +251,13 @@ export function registerTask(
         consecutiveFailures: state.consecutiveFailures,
         circuitBreakerActive: state.disabled,
         timestamp: runTs,
-      }).catch(() => {});
+      }).then(onWikiServerSuccess, (e) => onWikiServerError(e, `recordRun:${name}`));
 
       // Update active agent step + heartbeat
       if (groundskeeperAgentId) {
         updateActiveAgent(config, groundskeeperAgentId, {
           currentStep: `${name}: ${result.summary ?? event} (${Math.round(durationMs / 1000)}s)`,
-        }).catch(() => {});
+        }).catch((e: unknown) => logger.warn({ error: e instanceof Error ? e.message : String(e), event: "agent_update_failed" }, "Failed to update active agent step"));
       }
 
       // Circuit breaker event — only on a fresh trip, not on failed half-open probes
@@ -202,7 +269,7 @@ export function registerTask(
           consecutiveFailures: state.consecutiveFailures,
           circuitBreakerActive: true,
           timestamp: runTs,
-        }).catch(() => {});
+        }).then(onWikiServerSuccess, (e) => onWikiServerError(e, `circuitBreaker:${name}`));
       }
     } catch (error) {
       const durationMs = Date.now() - start;
@@ -258,7 +325,7 @@ export function registerTask(
         error: errorMessage,
       });
 
-      // Best-effort: push to wiki-server
+      // Best-effort: push to wiki-server (fire-and-forget with error tracking)
       recordRunToServer(config, {
         taskName: name,
         event: "error",
@@ -268,12 +335,12 @@ export function registerTask(
         consecutiveFailures: state.consecutiveFailures,
         circuitBreakerActive: state.disabled,
         timestamp: errorTs,
-      }).catch(() => {});
+      }).then(onWikiServerSuccess, (e) => onWikiServerError(e, `recordError:${name}`));
 
       if (groundskeeperAgentId) {
         updateActiveAgent(config, groundskeeperAgentId, {
           currentStep: `${name}: ERROR — ${errorMessage.slice(0, 100)}`,
-        }).catch(() => {});
+        }).catch((e: unknown) => logger.warn({ error: e instanceof Error ? e.message : String(e), event: "agent_update_failed" }, "Failed to update active agent step"));
       }
     } finally {
       state.running = false;
@@ -289,7 +356,7 @@ export function resetCircuitBreaker(name: string, config?: Config): boolean {
   state.consecutiveFailures = 0;
   rootLogger.child({ task: name }).info({ event: "circuit_breaker_reset" }, "Circuit breaker reset");
 
-  // Record manual reset to wiki-server if config is provided
+  // Record manual reset to wiki-server if config is provided (fire-and-forget with error tracking)
   if (config) {
     recordRunToServer(config, {
       taskName: name,
@@ -298,7 +365,7 @@ export function resetCircuitBreaker(name: string, config?: Config): boolean {
       consecutiveFailures: 0,
       circuitBreakerActive: false,
       timestamp: new Date().toISOString(),
-    }).catch(() => {});
+    }).then(onWikiServerSuccess, (e) => onWikiServerError(e, `circuitBreakerReset:${name}`));
   }
 
   return true;

@@ -26,7 +26,16 @@ concurrency:
   cancel-in-progress: true # newer run supersedes an in-progress rebase
 
 jobs:
+  preflight:
+    # Global circuit breaker — skip when automation is paused.
+    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Automation is active"
+
   rebase-open-prs:
+    needs: [preflight]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

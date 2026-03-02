@@ -54,6 +54,7 @@ app/public/search-index.json
 .claude/issue-creates.json
 .claude/agent-id
 .claude/last-heartbeat
+.claude/review-done
 
 # MCP config (contains tokens)
 .mcp.json
@@ -82,3 +83,6 @@ scripts/fact-id-mapping.json
 
 # Eval results (ephemeral — regenerated on each run)
 crux/evals/results/
+
+# Semantic diff snapshots (audit trail — not source code, stored locally)
+.claude/snapshots/

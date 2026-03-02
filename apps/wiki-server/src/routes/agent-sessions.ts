@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { eq, desc, and, lt } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
+import { logger } from "../logger.js";
 import { agentSessions } from "../schema.js";
 import {
   parseJsonBody,
@@ -12,7 +13,6 @@ import {
   CreateAgentSessionSchema,
   UpdateAgentSessionSchema,
 } from "../api-types.js";
-import { logger } from "../logger.js";
 
 const agentSessionsApp = new Hono()
   // ---- POST / (create or update agent session by branch) ----

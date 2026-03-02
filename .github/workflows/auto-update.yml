@@ -42,7 +42,22 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  preflight:
+    # Global circuit breaker — skip when automation is paused or wiki-server is down.
+    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check wiki-server health
+        run: |
+          curl -sf --max-time 10 "${{ secrets.LONGTERMWIKI_SERVER_URL }}/health" || {
+            echo "::warning::Wiki-server unreachable — skipping workflow"
+            exit 1
+          }
+          echo "Wiki-server is healthy"
+
   auto-update:
+    needs: [preflight]
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -312,12 +327,33 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "auto-update: ${DATE} daily wiki refresh
+
+          # Security: stage only files the auto-update pipeline is expected to
+          # modify, not everything in the working tree.
+          git diff --name-only | while IFS= read -r file; do
+            if echo "$file" | grep -qE '^(content/docs/.*\.mdx|data/.*\.(yaml|yml))$'; then
+              git add -- "$file"
+            else
+              echo "::warning::Skipping unexpected modified file from auto-update: $file"
+            fi
+          done
+
+          # Also stage any new (untracked) files in expected directories
+          git ls-files --others --exclude-standard -- 'content/docs/' 'data/' | while IFS= read -r file; do
+            if echo "$file" | grep -qE '^(content/docs/.*\.mdx|data/.*\.(yaml|yml))$'; then
+              git add -- "$file"
+            fi
+          done
+
+          if ! git diff --cached --quiet; then
+            git commit -m "auto-update: ${DATE} daily wiki refresh
 
           Automated news-driven wiki update.
           Run report: ${{ steps.report.outputs.path }}"
-          git push -u origin "$BRANCH"
+            git push -u origin "$BRANCH"
+          else
+            echo "No expected auto-update changes to commit."
+          fi
 
       - name: Create or update PR
         if: steps.changes.outputs.has_changes == 'true'

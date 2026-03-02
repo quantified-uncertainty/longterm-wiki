@@ -1,0 +1,46 @@
+name: SQL Migration Lint (squawk)
+
+on:
+  pull_request:
+    paths:
+      - "apps/wiki-server/drizzle/**.sql"
+
+jobs:
+  squawk:
+    name: Lint changed migration files
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Fetch enough history to diff against the base branch
+          fetch-depth: 0
+
+      - name: Find changed migration files
+        id: changed
+        run: |
+          # Get SQL files changed in this PR relative to the base branch
+          CHANGED=$(git diff --name-only --diff-filter=ACM \
+            "origin/${{ github.base_ref }}...HEAD" -- 'apps/wiki-server/drizzle/*.sql' \
+            | tr '\n' ' ' | xargs)
+          echo "files=$CHANGED" >> "$GITHUB_OUTPUT"
+          if [ -z "$CHANGED" ]; then
+            echo "No migration files changed — skipping lint"
+          else
+            echo "Linting: $CHANGED"
+          fi
+
+      - name: Install squawk-cli
+        if: steps.changed.outputs.files != ''
+        run: npm install -g squawk-cli
+
+      - name: Run squawk on changed migrations
+        if: steps.changed.outputs.files != ''
+        # Exit code 1 means violations found — fail the check.
+        # squawk exits 0 when there are no issues.
+        env:
+          CHANGED_FILES: ${{ steps.changed.outputs.files }}
+        run: |
+          # shellcheck disable=SC2086
+          squawk $CHANGED_FILES
+        # squawk reads .squawk.toml from the current directory automatically

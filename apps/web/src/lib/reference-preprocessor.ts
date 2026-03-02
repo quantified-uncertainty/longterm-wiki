@@ -56,6 +56,16 @@ export interface RefMapEntry {
 const DB_REF_USAGE_RE = /\[\^(cr-[a-zA-Z0-9]+|rc-[a-zA-Z0-9]+)\]/g;
 
 /**
+ * Escape `<` characters that could trigger JSX/HTML parsing in MDX footnote
+ * definitions. Database-sourced citation text may contain raw angle brackets
+ * (e.g. `<U.S.C.`, `<EntityLink>`) that break MDX compilation.
+ */
+function sanitizeFootnoteText(text: string): string {
+  // Escape `<` followed by a letter (tag start) or `/` (closing tag)
+  return text.replace(/<(?=[a-zA-Z/])/g, "\\<");
+}
+
+/**
  * Build the footnote definition string for a claim reference.
  */
 function buildClaimFootnote(data: ClaimRefData): string {
@@ -78,25 +88,43 @@ function buildClaimFootnote(data: ClaimRefData): string {
   if (data.verdict) {
     parts.push(`(${data.verdict})`);
   }
-  return parts.join(" — ") || "Claim reference";
+  return sanitizeFootnoteText(parts.join(" — ") || "Claim reference");
 }
 
 /**
  * Build the footnote definition string for a citation reference.
+ *
+ * Deduplicates when `note` already starts with `title` text (a common data
+ * issue where the LLM-generated note repeats the source title).
  */
 function buildCitationFootnote(data: CitationData): string {
-  if (data.title && data.url) {
+  // Deduplicate: if note already starts with the title text, use note alone.
+  // Normalize whitespace and compare case-insensitively to catch DB variations.
+  const normalizedTitle = data.title?.trim();
+  const normalizedNote = data.note?.trimStart();
+  const noteOverlapsTitle = Boolean(
+    normalizedTitle &&
+      normalizedNote &&
+      normalizedNote.toLowerCase().startsWith(normalizedTitle.toLowerCase())
+  );
+
+  if (data.title && data.url && !noteOverlapsTitle) {
     const link = `[${data.title}](${data.url})`;
-    return data.note ? `${link} — ${data.note}` : link;
+    return sanitizeFootnoteText(data.note ? `${link} — ${data.note}` : link);
   }
   if (data.url) {
-    const link = `[${data.url}](${data.url})`;
-    return data.note ? `${link} — ${data.note}` : link;
+    // When note overlaps title, use note as the link text instead
+    const linkText = noteOverlapsTitle ? normalizedNote! : (data.title || data.url);
+    const link = `[${linkText}](${data.url})`;
+    return sanitizeFootnoteText(link);
   }
   if (data.title) {
-    return data.note ? `${data.title} — ${data.note}` : data.title;
+    const text = noteOverlapsTitle
+      ? normalizedNote!
+      : (data.note ? `${data.title} — ${data.note}` : data.title);
+    return sanitizeFootnoteText(text);
   }
-  return data.note || "Citation";
+  return sanitizeFootnoteText(data.note || "Citation");
 }
 
 /**

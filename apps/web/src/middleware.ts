@@ -68,7 +68,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // /ai-transition-model* → /wiki (ATM section removed; redirect old URLs)
-  if (segments[0] === "ai-transition-model" || segments[0] === "ai-transition-model-views") {
+  if (
+    segments[0] === "ai-transition-model" ||
+    segments[0] === "ai-transition-model-views"
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/wiki";
     return NextResponse.redirect(url, 308);

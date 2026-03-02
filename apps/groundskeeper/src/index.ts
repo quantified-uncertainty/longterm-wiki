@@ -3,8 +3,6 @@ import { loadConfig } from "./config.js";
 import { registerTask, setGroundskeeperAgentId } from "./scheduler.js";
 import { sendDiscordNotification } from "./notify.js";
 import { healthCheck } from "./tasks/health-check.js";
-import { resolveConflicts } from "./tasks/resolve-conflicts.js";
-import { codeReview } from "./tasks/code-review.js";
 import { registerAsActiveAgent, sendHeartbeat } from "./wiki-server.js";
 import { issueResponder } from "./tasks/issue-responder.js";
 import { logger } from "./logger.js";
@@ -18,14 +16,6 @@ logger.info({
     healthCheck: {
       enabled: config.tasks.healthCheck.enabled,
       schedule: config.tasks.healthCheck.schedule,
-    },
-    resolveConflicts: {
-      enabled: config.tasks.resolveConflicts.enabled,
-      schedule: config.tasks.resolveConflicts.schedule,
-    },
-    codeReview: {
-      enabled: config.tasks.codeReview.enabled,
-      schedule: config.tasks.codeReview.schedule,
     },
     issueResponder: {
       enabled: config.tasks.issueResponder.enabled,
@@ -45,22 +35,6 @@ registerTask(
 
 registerTask(
   config,
-  "resolve-conflicts",
-  config.tasks.resolveConflicts.schedule,
-  config.tasks.resolveConflicts.enabled,
-  () => resolveConflicts(config)
-);
-
-registerTask(
-  config,
-  "code-review",
-  config.tasks.codeReview.schedule,
-  config.tasks.codeReview.enabled,
-  () => codeReview(config)
-);
-
-registerTask(
-  config,
   "issue-responder",
   config.tasks.issueResponder.schedule,
   config.tasks.issueResponder.enabled,
@@ -73,9 +47,14 @@ if (agentId) {
   setGroundskeeperAgentId(agentId);
   logger.info({ agentId }, "Active agent registered");
 
-  // Send heartbeat every 5 minutes to prove we're alive
+  // Send heartbeat every 5 minutes to prove we're alive.
+  // Heartbeat failures are intentionally logged at debug level — they're
+  // high-frequency and the wiki-server failure counter in scheduler.ts
+  // already tracks connectivity issues at a higher level.
   setInterval(() => {
-    sendHeartbeat(config, agentId).catch(() => {});
+    sendHeartbeat(config, agentId).catch((e: unknown) =>
+      logger.debug({ error: e instanceof Error ? e.message : String(e) }, "Heartbeat failed")
+    );
   }, 5 * 60 * 1000);
 }
 

@@ -1,14 +1,14 @@
 /**
- * Tests for crux/commands/agent-checklist.ts
+ * Tests for crux/commands/agent-checklist.ts (simplified)
  *
  * Focus areas:
  * - init: generates checklist for each type, handles --issue, validates args
  * - status: parses checklist file, handles missing file
  * - complete: validates all items checked, returns correct exit codes
+ * - check: marks items, handles --na
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { join } from 'path';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock fs operations
 vi.mock('fs', () => ({
@@ -26,6 +26,13 @@ vi.mock('../lib/github.ts', () => ({
 // Mock child_process for currentBranch
 vi.mock('child_process', () => ({
   execSync: vi.fn(() => 'claude/test-branch-ABC'),
+}));
+
+// Mock wiki-server agent-sessions (best-effort DB sync)
+vi.mock('../lib/wiki-server/agent-sessions.ts', () => ({
+  upsertAgentSession: vi.fn(async () => ({ ok: true, data: { id: 'test-id' } })),
+  updateAgentSession: vi.fn(async () => ({ ok: true })),
+  getAgentSessionByBranch: vi.fn(async () => ({ ok: false })),
 }));
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
@@ -60,7 +67,6 @@ describe('agent-checklist init', () => {
     expect(result.output).toContain('infrastructure');
     expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
 
-    // Verify written markdown contains correct type
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
     expect(writtenContent).toContain('Type: **infrastructure**');
     expect(writtenContent).toContain('Build new feature');
@@ -72,8 +78,6 @@ describe('agent-checklist init', () => {
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
     expect(writtenContent).toContain('Type: **bugfix**');
-    expect(writtenContent).toContain('Root cause identified');
-    expect(writtenContent).toContain('Regression test');
   });
 
   it('creates checklist with --type=content', async () => {
@@ -83,7 +87,7 @@ describe('agent-checklist init', () => {
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
     expect(writtenContent).toContain('Type: **content**');
     expect(writtenContent).toContain('EntityLinks resolve');
-    expect(writtenContent).toContain('Content accuracy');
+    expect(writtenContent).toContain('MDX escaping');
   });
 
   it('creates checklist with --type=commands', async () => {
@@ -92,7 +96,7 @@ describe('agent-checklist init', () => {
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
     expect(writtenContent).toContain('Type: **commands**');
-    expect(writtenContent).toContain('Command registered');
+    expect(writtenContent).toContain('crux-typescript');
   });
 
   it('creates checklist with --type=refactor', async () => {
@@ -101,26 +105,7 @@ describe('agent-checklist init', () => {
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
     expect(writtenContent).toContain('Type: **refactor**');
-    expect(writtenContent).toContain('Behavior unchanged');
-  });
-
-  it.each(['infrastructure', 'commands', 'refactor', 'bugfix'] as const)(
-    'includes paranoid-review for %s type',
-    async (type) => {
-      const result = await commands.init([`Test ${type}`], { type });
-      expect(result.exitCode).toBe(0);
-      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
-      const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
-      expect(writtenContent).toContain('paranoid-review');
-    }
-  );
-
-  it('excludes paranoid-review for content type', async () => {
-    const result = await commands.init(['Write wiki page'], { type: 'content' });
-    expect(result.exitCode).toBe(0);
-    expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
-    const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
-    expect(writtenContent).not.toContain('paranoid-review');
+    expect(writtenContent).toContain('crux-typescript');
   });
 
   it('rejects invalid --type', async () => {
@@ -201,7 +186,6 @@ describe('agent-checklist init', () => {
     expect(result.output).not.toContain('issue-tracking auto-marked N/A');
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
-    // issue-tracking should still be unchecked [ ], not [~]
     expect(writtenContent).toMatch(/\[ \] `issue-tracking`/);
   });
 
@@ -250,20 +234,15 @@ describe('agent-checklist status', () => {
 
     const result = await commands.status([], {});
     expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('Session Checklist Progress');
+    expect(result.output).toContain('Session Checklist');
     expect(result.output).toContain('0%');
   });
 
   it('shows progress for a partially completed checklist', async () => {
-    const md = `## Phase 1: Understand
-
-- [x] **Read the issue/request**: Done.
-- [x] **Explore relevant code**: Done.
-- [ ] **Plan approach**: Not yet.
-
-## Phase 2: Implement
-
-- [ ] **Tests written**: Not yet.
+    const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)
+2. [x] \`lockfile-fresh\` Lockfile up to date (auto-verify)
+3. [ ] \`gate-passes\` Gate passes (auto-verify)
+4. [ ] \`tests-written\` Tests written for new logic
 `;
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(md);
@@ -275,10 +254,8 @@ describe('agent-checklist status', () => {
   });
 
   it('returns JSON when --ci flag set', async () => {
-    const md = `## Phase 1: Understand
-
-- [x] **Read the issue/request**: Done.
-- [ ] **Explore relevant code**: Not yet.
+    const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)
+2. [ ] \`gate-passes\` Gate passes (auto-verify)
 `;
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(md);
@@ -309,10 +286,8 @@ describe('agent-checklist complete', () => {
   });
 
   it('exits 1 when unchecked items remain', async () => {
-    const md = `## Phase 1: Understand
-
-- [x] **Read the issue/request**: Done.
-- [ ] **Explore relevant code**: Not yet.
+    const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)
+2. [ ] \`gate-passes\` Gate passes (auto-verify)
 `;
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(md);
@@ -320,18 +295,12 @@ describe('agent-checklist complete', () => {
     const result = await commands.complete([], {});
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('1 unchecked item');
-    expect(result.output).toContain('Explore relevant code');
   });
 
   it('exits 0 when all items checked', async () => {
-    const md = `## Phase 1: Understand
-
-- [x] **Read the issue/request**: Done.
-- [x] **Explore relevant code**: Done.
-
-## Phase 4: Ship
-
-- [x] **Gate passes**: Done.
+    const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)
+2. [x] \`gate-passes\` Gate passes (auto-verify)
+3. [x] \`tests-written\` Tests written for new logic
 `;
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(md);
@@ -342,10 +311,8 @@ describe('agent-checklist complete', () => {
   });
 
   it('treats N/A items as passing', async () => {
-    const md = `## Phase 3: Review
-
-- [x] **Correctness verified**: Done.
-- [~] **No shell injection**: N/A.
+    const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)
+2. [~] \`security\` No secrets, no unsanitized input
 `;
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(md);
@@ -354,55 +321,13 @@ describe('agent-checklist complete', () => {
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('All 2 checklist items complete');
   });
-
-  it('shows key decisions in completion output', async () => {
-    const md = `## Phase 1: Understand
-
-- [x] **Read the issue/request**: Done.
-
-## Key Decisions
-
-- **Used TypeScript**: Better type safety.
-- **Chose catalog pattern**: More testable.
-`;
-    mockExistsSync.mockReturnValue(true);
-    mockReadFileSync.mockReturnValue(md);
-
-    const result = await commands.complete([], {});
-    expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('Key Decisions (2)');
-    expect(result.output).toContain('Used TypeScript');
-    expect(result.output).toContain('Chose catalog pattern');
-  });
-
-  it('lists all unchecked items with their phases', async () => {
-    const md = `## Phase 2: Implement
-
-- [ ] **Tests written**: Not yet.
-- [x] **No hardcoded constants**: Done.
-
-## Phase 3: Review
-
-- [ ] **Correctness verified**: Not yet.
-`;
-    mockExistsSync.mockReturnValue(true);
-    mockReadFileSync.mockReturnValue(md);
-
-    const result = await commands.complete([], {});
-    expect(result.exitCode).toBe(1);
-    expect(result.output).toContain('2 unchecked items');
-    expect(result.output).toContain('Tests written');
-    expect(result.output).toContain('Correctness verified');
-    expect(result.output).toContain('implement');
-    expect(result.output).toContain('review');
-  });
 });
 
 // ---------------------------------------------------------------------------
 // check command
 // ---------------------------------------------------------------------------
 
-describe('agent-checklist check --na', () => {
+describe('agent-checklist check', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -421,7 +346,6 @@ describe('agent-checklist check --na', () => {
     const result = await commands.check(['fix-escaping'], { na: true });
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('--reason is required');
-    expect(result.output).toContain('--na');
     expect(mockWriteFileSync).not.toHaveBeenCalled();
   });
 
@@ -457,88 +381,42 @@ describe('agent-checklist check --na', () => {
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(md);
 
-    const result = await commands.check(['read-issue'], {});
+    const result = await commands.check(['fix-escaping'], {});
     expect(result.exitCode).toBe(0);
     expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
   });
 });
 
 // ---------------------------------------------------------------------------
-// pre-push-check: tooling-gaps-found + empty Key Decisions warning
+// pre-push-check
 // ---------------------------------------------------------------------------
 
-describe('agent-checklist pre-push-check tooling-gaps warning', () => {
+describe('agent-checklist pre-push-check', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('warns when tooling-gaps-found is checked but Key Decisions is empty', async () => {
-    const md = `## Phase 3: Review
-
-1. [x] \`tooling-gaps-found\` **Tooling gaps identified**: List gaps.
-
-## Key Decisions
-
-<!-- Log important decisions as you go. -->
-`;
-    mockExistsSync.mockReturnValue(true);
-    mockReadFileSync.mockReturnValue(md);
-
+  it('exits 0 when no checklist file exists', async () => {
+    mockExistsSync.mockReturnValue(false);
     const result = await commands['pre-push-check']([], {});
     expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('tooling-gaps-found');
-    expect(result.output).toContain('Key Decisions section is empty');
+    expect(result.output).toBe('');
   });
 
-  it('warns when tooling-gaps-found is N/A but Key Decisions is empty', async () => {
-    const md = `## Phase 3: Review
-
-1. [~] \`tooling-gaps-found\` **Tooling gaps identified**: List gaps. <!-- N/A: none -->
-
-## Key Decisions
-
-<!-- template comment -->
+  it('blocks push when checklist is less than 10% complete', async () => {
+    const md = `1. [ ] \`fix-escaping\` Fix escaping (auto-verify)
+2. [ ] \`lockfile-fresh\` Lockfile up to date (auto-verify)
+3. [ ] \`gate-passes\` Gate passes (auto-verify)
+4. [ ] \`tests-written\` Tests written for new logic
+5. [ ] \`security\` No secrets, no unsanitized input
+6. [ ] \`push-ci-green\` Pushed and CI green
 `;
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(md);
 
     const result = await commands['pre-push-check']([], {});
-    expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('Key Decisions section is empty');
-  });
-
-  it('does not warn when tooling-gaps-found is checked and Key Decisions has entries', async () => {
-    const md = `## Phase 3: Review
-
-1. [x] \`tooling-gaps-found\` **Tooling gaps identified**: List gaps.
-
-## Key Decisions
-
-- **No tooling gaps found**: Everything was covered by existing validators.
-`;
-    mockExistsSync.mockReturnValue(true);
-    mockReadFileSync.mockReturnValue(md);
-
-    const result = await commands['pre-push-check']([], {});
-    expect(result.exitCode).toBe(0);
-    expect(result.output).not.toContain('Key Decisions section is empty');
-  });
-
-  it('does not warn when tooling-gaps-found is unchecked', async () => {
-    const md = `## Phase 3: Review
-
-1. [ ] \`tooling-gaps-found\` **Tooling gaps identified**: List gaps.
-
-## Key Decisions
-
-<!-- empty -->
-`;
-    mockExistsSync.mockReturnValue(true);
-    mockReadFileSync.mockReturnValue(md);
-
-    const result = await commands['pre-push-check']([], {});
-    // exitCode 1 because 0% complete (< 10% threshold blocks push)
     expect(result.exitCode).toBe(1);
-    expect(result.output).not.toContain('Key Decisions section is empty');
+    expect(result.output).toContain('Checklist only');
+    expect(result.output).toContain('complete');
   });
 });

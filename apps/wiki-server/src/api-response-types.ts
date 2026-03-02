@@ -20,6 +20,7 @@ import type { CitationsRoute } from './routes/citations.js';
 import type { SessionsRoute } from './routes/sessions.js';
 import type { AgentSessionsRoute } from './routes/agent-sessions.js';
 import type { ActiveAgentsRoute } from './routes/active-agents.js';
+import type { AgentSessionEventsRoute } from './routes/agent-session-events.js';
 import type { ArtifactsRoute } from './routes/artifacts.js';
 import type { AutoUpdateRunsRoute } from './routes/auto-update-runs.js';
 import type { AutoUpdateNewsRoute } from './routes/auto-update-news.js';
@@ -31,6 +32,7 @@ import type { EntitiesRoute } from './routes/entities.js';
 import type { PagesRoute } from './routes/pages.js';
 import type { GroundskeeperRunsRoute } from './routes/groundskeeper-runs.js';
 import type { MonitoringRoute } from './routes/monitoring.js';
+import type { GithubPullsRoute } from './routes/github-pulls.js';
 
 // ---------------------------------------------------------------------------
 // RPC client phantom types (compile-time only)
@@ -41,6 +43,7 @@ type CitationsRpc = ReturnType<typeof hc<CitationsRoute>>;
 type SessionsRpc = ReturnType<typeof hc<SessionsRoute>>;
 type AgentSessionsRpc = ReturnType<typeof hc<AgentSessionsRoute>>;
 type ActiveAgentsRpc = ReturnType<typeof hc<ActiveAgentsRoute>>;
+type AgentSessionEventsRpc = ReturnType<typeof hc<AgentSessionEventsRoute>>;
 type ArtifactsRpc = ReturnType<typeof hc<ArtifactsRoute>>;
 type AutoUpdateRunsRpc = ReturnType<typeof hc<AutoUpdateRunsRoute>>;
 type AutoUpdateNewsRpc = ReturnType<typeof hc<AutoUpdateNewsRoute>>;
@@ -52,6 +55,7 @@ type EntitiesRpc = ReturnType<typeof hc<EntitiesRoute>>;
 type PagesRpc = ReturnType<typeof hc<PagesRoute>>;
 type GroundskeeperRunsRpc = ReturnType<typeof hc<GroundskeeperRunsRoute>>;
 type MonitoringRpc = ReturnType<typeof hc<MonitoringRoute>>;
+type GithubPullsRpc = ReturnType<typeof hc<GithubPullsRoute>>;
 
 // ---------------------------------------------------------------------------
 // Claims
@@ -171,6 +175,16 @@ export type ActiveAgentRow = ActiveAgentsListResult['agents'][number];
 
 /** Conflict warning from the active agents list. */
 export type ActiveAgentConflict = ActiveAgentsListResult['conflicts'][number];
+
+// ---------------------------------------------------------------------------
+// Agent Session Events
+// ---------------------------------------------------------------------------
+
+/** Agent session events list response. */
+type AgentSessionEventsListResult = InferResponseType<AgentSessionEventsRpc['by-agent'][':agentId']['$get'], 200>;
+
+/** A single agent session event row. */
+export type AgentSessionEventRow = AgentSessionEventsListResult['events'][number];
 
 // ---------------------------------------------------------------------------
 // Artifacts
@@ -313,3 +327,13 @@ export type MonitoringIncidentsResult = InferResponseType<MonitoringRpc['inciden
 
 /** A single incident row from the incidents list. */
 export type IncidentRow = MonitoringIncidentsResult['incidents'][number];
+
+// ---------------------------------------------------------------------------
+// GitHub Pull Requests
+// ---------------------------------------------------------------------------
+
+/** Open pull requests response. */
+export type GithubPullsResult = InferResponseType<GithubPullsRpc['index']['$get'], 200>;
+
+/** A single open PR entry. */
+export type OpenPRRow = GithubPullsResult['pulls'][number];

@@ -20,6 +20,56 @@ Run these before anything else — a PR that doesn't build is not worth reviewin
 
 See `.claude/rules/pre-pr-verification.md` for full details on when tests are required.
 
+## Step 2b: PR size check (MANDATORY — runs before completing checklist)
+
+Check whether this PR exceeds the review thresholds:
+
+```bash
+git diff --stat main...HEAD
+```
+
+Parse the summary line (e.g. `12 files changed, 450 insertions(+), 120 deletions(-)`):
+- **Files changed** = number before "files changed"
+- **Lines changed** = insertions + deletions
+
+**Check if `/review-pr` was run** by testing for the marker file and validating the commit SHA:
+
+```bash
+if [ -f .claude/review-done ]; then
+  MARKER_SHA=$(awk '{print $2}' .claude/review-done)
+  HEAD_SHA=$(git rev-parse HEAD)
+  if [ "$MARKER_SHA" = "$HEAD_SHA" ]; then
+    echo "REVIEWED (SHA matches HEAD)"
+  else
+    echo "STALE (marker SHA ${MARKER_SHA:0:8} != HEAD ${HEAD_SHA:0:8})"
+  fi
+else
+  echo "NOT_REVIEWED"
+fi
+```
+
+**If thresholds exceeded (>5 files OR >300 lines) AND review marker is missing or stale:**
+
+Print this warning prominently:
+
+```
+╔══════════════════════════════════════════════════════════════════════╗
+║  REQUIRED: Large PR must be reviewed via /review-pr                 ║
+║                                                                      ║
+║  This PR exceeds size thresholds (>5 files or >300 lines) and       ║
+║  /review-pr was not run (or was run before additional commits).     ║
+║                                                                      ║
+║  Per CLAUDE.md: "For non-trivial changes (>5 files or >300 lines),  ║
+║  run /review-pr before shipping."                                   ║
+║                                                                      ║
+║  Running /review-pr now...                                           ║
+╚══════════════════════════════════════════════════════════════════════╝
+```
+
+Then **run `/review-pr` automatically**. Do not offer an option to skip. The review is mandatory for PRs that exceed the thresholds.
+
+If the thresholds are NOT exceeded, or if the review marker is valid (SHA matches HEAD), continue without interruption.
+
 ## Step 3: Complete unchecked items
 
 For each unchecked item in the checklist:
@@ -48,6 +98,21 @@ pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
 Run `pnpm crux agent-checklist snapshot` and capture the output — this is the `checks:` block for the session log.
 
 Session logs are stored in the wiki-server PostgreSQL database (not committed to git). The checklist state is automatically synced to the DB when you use the `crux agent-checklist` commands. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly in any session summaries.
+
+**Record review status**: Check for the marker file, verify the SHA matches HEAD, and set the `reviewed` field in the session log payload accordingly:
+
+```bash
+# Returns "true" if reviewed with matching SHA, "false" otherwise
+if [ -f .claude/review-done ]; then
+  MARKER_SHA=$(awk '{print $2}' .claude/review-done)
+  HEAD_SHA=$(git rev-parse HEAD)
+  [ "$MARKER_SHA" = "$HEAD_SHA" ] && echo "true" || echo "false"
+else
+  echo "false"
+fi
+```
+
+Include `reviewed: true` or `reviewed: false` in the session log payload sent to the wiki-server. This enables the `/internal/agent-sessions` dashboard to show review coverage over time.
 
 ## Step 7: Validate completion
 

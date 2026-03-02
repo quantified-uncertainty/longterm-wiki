@@ -33,12 +33,12 @@ interface RiskPageDbRow {
   computed_at: string;
 }
 
-interface TotalCountRow {
+interface UniqueCountRow {
   count: number;
 }
 
-interface UniqueCountRow {
-  count: number;
+interface ReltuplesRow {
+  reltuples: number;
 }
 
 // ---- Constants ----
@@ -72,6 +72,22 @@ const CleanupQuery = z.object({
     .default("false"),
 });
 
+// ---- Materialized view existence cache ----
+
+/** Cache TTL in milliseconds (5 minutes). */
+const MAT_VIEW_CACHE_TTL_MS = 5 * 60 * 1000;
+
+let matViewCachedResult: boolean | null = null;
+let matViewCachedAt = 0;
+
+/**
+ * Clear the matViewExists cache. Exported for testing.
+ */
+export function clearMatViewCache(): void {
+  matViewCachedResult = null;
+  matViewCachedAt = 0;
+}
+
 // ---- Helpers ----
 
 /**
@@ -94,15 +110,26 @@ async function refreshMaterializedView(): Promise<void> {
 /**
  * Check if the materialized view exists. Returns false during tests
  * or before the migration has been applied.
+ *
+ * Results are cached for MAT_VIEW_CACHE_TTL_MS (5 minutes) to avoid
+ * querying pg_matviews on every request. The view existence only changes
+ * during migrations, not between requests.
  */
 async function matViewExists(): Promise<boolean> {
+  const now = Date.now();
+  if (matViewCachedResult !== null && now - matViewCachedAt < MAT_VIEW_CACHE_TTL_MS) {
+    return matViewCachedResult;
+  }
+
   const rawDb = getDb();
   const result = await rawDb<{ exists: boolean }[]>`
     SELECT EXISTS (
       SELECT 1 FROM pg_matviews WHERE matviewname = 'hallucination_risk_latest'
     ) AS exists
   `;
-  return result[0]?.exists ?? false;
+  matViewCachedResult = result[0]?.exists ?? false;
+  matViewCachedAt = now;
+  return matViewCachedResult;
 }
 
 const hallucinationRiskApp = new Hono()
@@ -228,11 +255,13 @@ const hallucinationRiskApp = new Hono()
     const rawDb = getDb();
     const useMatView = await matViewExists();
 
-    // Total snapshots (from base table — always accurate)
-    const totalResult = await rawDb<TotalCountRow[]>`
-      SELECT count(*)::int AS count FROM hallucination_risk_snapshots
+    // Total snapshots — use pg_class.reltuples for a fast approximate count
+    // instead of a full count(*) sequential scan on the base table.
+    // reltuples is updated by VACUUM/ANALYZE and is accurate enough for stats display.
+    const totalResult = await rawDb<ReltuplesRow[]>`
+      SELECT reltuples::int AS reltuples FROM pg_class WHERE relname = 'hallucination_risk_snapshots'
     `;
-    const totalSnapshots = totalResult[0]?.count ?? 0;
+    const totalSnapshots = Math.max(0, totalResult[0]?.reltuples ?? 0);
 
     if (useMatView) {
       // Use materialized view for unique pages and level distribution — instant

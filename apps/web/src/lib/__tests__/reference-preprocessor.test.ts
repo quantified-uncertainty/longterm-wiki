@@ -389,6 +389,125 @@ describe("preprocessReferences", () => {
     expect(referenceMap.size).toBe(0);
   });
 
+  // -----------------------------------------------------------------------
+  // Sanitization — escape angle brackets that break MDX
+  // -----------------------------------------------------------------------
+
+  it("escapes < in citation note that could be parsed as JSX", () => {
+    const content = "Fact[^rc-legal1].";
+    const refData = makeReferenceData(
+      {},
+      {
+        "rc-legal1": {
+          title: "Legal Code",
+          url: "https://example.com/law",
+          note: "50 U.S.C. <U.S.C. sections 4501-4568",
+        },
+      }
+    );
+
+    const { content: result } = preprocessReferences(content, refData);
+    // The `<U` should be escaped to prevent MDX parsing as JSX tag
+    expect(result).toContain("\\<U.S.C.");
+    // Every `<U` in the output should be preceded by backslash
+    expect(result).not.toMatch(/[^\\]<U\.S\.C\./);
+  });
+
+  it("escapes <EntityLink> in citation note text", () => {
+    const content = "Fact[^rc-el1].";
+    const refData = makeReferenceData(
+      {},
+      {
+        "rc-el1": {
+          title: "Source",
+          url: "https://example.com",
+          note: 'See <EntityLink id="foo">Foo</EntityLink> for details',
+        },
+      }
+    );
+
+    const { content: result } = preprocessReferences(content, refData);
+    expect(result).toContain("\\<EntityLink");
+    expect(result).toContain("\\</EntityLink");
+  });
+
+  it("escapes < in claim footnote text", () => {
+    const content = "Claim[^cr-esc1].";
+    const refData = makeReferenceData({
+      "cr-esc1": {
+        claimId: 1,
+        claimText: "Investment was <DPA-authorized",
+        sourceTitle: "Report",
+      },
+    });
+
+    const { content: result } = preprocessReferences(content, refData);
+    expect(result).toContain("\\<DPA-authorized");
+  });
+
+  // -----------------------------------------------------------------------
+  // Deduplication — note overlapping with title
+  // -----------------------------------------------------------------------
+
+  it("deduplicates when note starts with title text", () => {
+    const content = "Fact[^rc-dup1].";
+    const refData = makeReferenceData(
+      {},
+      {
+        "rc-dup1": {
+          title: "Enterprise AI ROI data",
+          url: "https://example.com/roi",
+          note: "Enterprise AI ROI data — MIT Media Lab finding 95% zero ROI",
+        },
+      }
+    );
+
+    const { content: result } = preprocessReferences(content, refData);
+    // Should NOT contain the title text twice
+    const matches = result.match(/Enterprise AI ROI data/g) || [];
+    // The deduplication should result in just the note (which starts with title)
+    // used as the link text, appearing once in the link
+    expect(matches.length).toBe(1);
+  });
+
+  it("deduplicates case-insensitively with leading whitespace", () => {
+    const content = "Fact[^rc-dup2].";
+    const refData = makeReferenceData(
+      {},
+      {
+        "rc-dup2": {
+          title: "AI Safety Report",
+          url: "https://example.com/safety",
+          note: "  ai safety report — detailed findings on alignment risks",
+        },
+      }
+    );
+
+    const { content: result } = preprocessReferences(content, refData);
+    // Should deduplicate despite case and whitespace differences
+    const matches = result.match(/[Aa][Ii] [Ss]afety [Rr]eport/g) || [];
+    expect(matches.length).toBe(1);
+  });
+
+  it("does not deduplicate when note does not start with title", () => {
+    const content = "Fact[^rc-nodup1].";
+    const refData = makeReferenceData(
+      {},
+      {
+        "rc-nodup1": {
+          title: "Paper Title",
+          url: "https://example.com/paper",
+          note: "Different summary of the paper contents",
+        },
+      }
+    );
+
+    const { content: result } = preprocessReferences(content, refData);
+    // Both title (in link) and note should appear
+    expect(result).toContain("[Paper Title](https://example.com/paper)");
+    expect(result).toContain("Different summary of the paper contents");
+  });
+
   it("handles content with only whitespace", () => {
     const { content, referenceMap } = preprocessReferences(
       "   \n\n  ",

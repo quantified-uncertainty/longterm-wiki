@@ -2,6 +2,8 @@
 
 AI safety wiki with ~700 MDX pages, Next.js frontend, YAML data layer, and CLI tooling.
 
+**Production URL**: `https://www.longtermwiki.com` — do NOT use `longterm.wiki`, `longtermwiki.org`, or any other domain.
+
 **This is a routing document.** Detailed guides live in `content/docs/internal/` and `.claude/rules/`. Use `pnpm crux <domain> --help` for full CLI reference.
 
 **Agent memory**: Read `.claude/memory/MEMORY.md` at session start for cross-session facts and corrections. Update it when you learn stable new facts (confirmed URLs, naming conventions, recurring gotchas). This file is checked into git so all agents and worktrees share it.
@@ -85,6 +87,12 @@ pnpm crux maintain health-snapshot       # Quantified code health metrics
 pnpm crux maintain health-snapshot --json  # JSON for trend tracking
 pnpm crux maintain detect-cruft          # Find TODOs, large files, dead code
 
+# Agent session tracking
+pnpm crux agents register        # Register active agent with wiki-server
+pnpm crux agents status          # Show current agent status
+pnpm crux agent-session-events log "message"  # Log an event to the session timeline
+pnpm crux agent-session-events list           # List events for current agent
+
 # Epic management (multi-issue tracking)
 pnpm crux epic                   # List open epics
 pnpm crux epic create "Title"    # Create a new epic
@@ -132,6 +140,8 @@ pnpm crux content improve <page-id> --tier=standard --apply  # polish | standard
 
 Session logs are written automatically after `--apply` runs. Do not also run `/agent-session-ready-PR` for improve-only sessions.
 
+The improve pipeline includes a **semantic diff safety check** (`crux/lib/semantic-diff/`) that automatically runs after `--apply`. It extracts factual claims before and after modification, diffs them, and checks for contradictions. Warnings are logged but writes are never blocked. Snapshots are stored in `.claude/snapshots/` (gitignored) for post-hoc auditing.
+
 ### After any page edit
 
 Run `pnpm crux fix escaping` and `pnpm crux fix markdown`, then verify with `pnpm crux validate gate --fix`.
@@ -174,6 +184,8 @@ For non-trivial changes (>5 files or >300 lines), run `/review-pr` before shippi
 - **Proactive issue filing**: When you encounter bugs, tech debt, or improvements you can't fix in the current session, file a GitHub issue. Always search first (`crux issues search "topic"`) to avoid duplicates. If a match exists, add a comment instead. See `.claude/rules/proactive-github-filing.md`.
 - **Epics**: Use `crux epic` for tracking multi-issue work. For epics needing detailed coordination (decision logs, sprint plans, status tracking), create an epic wiki page using the convention in `content/docs/internal/epic-page-conventions.mdx` and add an `<EpicTracker issues={[...]} />` component. See E897 (claims roadmap) for a working example. Individual tasks stay as Issues.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
+- **Local data mode**: Set `WIKI_DATA_MODE=local` in the Next.js environment to eliminate all runtime wiki-server API calls from content pages. Data comes from `database.json` built at deploy time. Dashboards still call the wiki-server for live data.
+- **Wiki-server rate limits**: Authenticated requests (with `LONGTERMWIKI_SERVER_API_KEY` bearer token) get 1000 read/200 write per minute. Unauthenticated get 100 read/20 write per minute. Health endpoint (`/healthz`) is exempt.
 - **Hono RPC**: Mandatory for all new wiki-server routes; convert existing routes when modifying them. See `.claude/rules/wiki-server-rpc-migration.md`.
 - **Entity IDs**: **Never manually invent numericIds** (E42, E886, etc.). Always allocate from the wiki-server: `pnpm crux ids allocate <slug>`. The gate runs `assign-ids.mjs` automatically as a safety net, but allocating early prevents conflicts between concurrent agents. Use `pnpm crux ids check <slug>` to look up existing IDs.
 
@@ -194,3 +206,4 @@ Rules enforced by gate checks and PR review. See [#1246](https://github.com/quan
 - `.claude/rules/proactive-github-filing.md` — When/how to file issues, comments, and discussions
 - `.claude/rules/pr-review-guidelines.md` — PR review and ship process
 - `.claude/rules/session-logging.md` — Session log format and storage
+- `.claude/rules/error-handling.md` — Error handling strategy and `.catch()` patterns

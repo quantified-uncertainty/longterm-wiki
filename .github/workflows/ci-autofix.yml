@@ -24,8 +24,10 @@ concurrency:
 
 jobs:
   autofix:
-    # Only run when CI failed on a claude/* branch (not main, not human branches)
+    # Only run when CI failed on a claude/* branch (not main, not human branches).
+    # Global circuit breaker — also skip when automation is paused.
     if: |
+      vars.AUTOMATION_PAUSED != 'true' &&
       github.event.workflow_run.conclusion == 'failure' &&
       startsWith(github.event.workflow_run.head_branch, 'claude/')
     runs-on: ubuntu-latest

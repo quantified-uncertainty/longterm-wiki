@@ -716,6 +716,60 @@ describe("Claims API", () => {
     });
   });
 
+  describe("GET /api/claims/quality", () => {
+    it("returns pagination metadata with defaults", async () => {
+      const res = await app.request("/api/claims/quality");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body).toHaveProperty("entities");
+      expect(body).toHaveProperty("pagination");
+      expect(body).toHaveProperty("systemwide");
+      expect(body.pagination).toHaveProperty("limit", 50);
+      expect(body.pagination).toHaveProperty("offset", 0);
+      expect(body.pagination).toHaveProperty("total");
+      expect(body.pagination).toHaveProperty("totalPages");
+      expect(typeof body.pagination.total).toBe("number");
+      expect(typeof body.pagination.totalPages).toBe("number");
+    });
+
+    it("accepts custom limit and offset params", async () => {
+      const res = await app.request("/api/claims/quality?limit=10&offset=5");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.pagination.limit).toBe(10);
+      expect(body.pagination.offset).toBe(5);
+    });
+
+    it("rejects limit exceeding max", async () => {
+      const res = await app.request("/api/claims/quality?limit=1500");
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects negative offset", async () => {
+      const res = await app.request("/api/claims/quality?offset=-1");
+      expect(res.status).toBe(400);
+    });
+
+    it("returns systemwide aggregates", async () => {
+      const res = await app.request("/api/claims/quality");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.systemwide).toHaveProperty("totalClaims");
+      expect(body.systemwide).toHaveProperty("totalVerified");
+      expect(body.systemwide).toHaveProperty("verifiedPct");
+      expect(body.systemwide).toHaveProperty("avgVerdictScore");
+      expect(body.systemwide).toHaveProperty("byVerdict");
+      expect(body.systemwide).toHaveProperty("scoreBuckets");
+    });
+
+    it("entities array is present in response", async () => {
+      const res = await app.request("/api/claims/quality");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(Array.isArray(body.entities)).toBe(true);
+    });
+  });
+
   describe("Bearer auth", () => {
     it("rejects unauthenticated requests when API key is set", async () => {
       process.env.LONGTERMWIKI_SERVER_API_KEY = "test-key";

@@ -1,34 +1,67 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// --- Mocks ---
+// ---------------------------------------------------------------------------
+// Mocks — must be declared before importing the module under test
+// ---------------------------------------------------------------------------
 
-const mockSearch = vi.fn();
-const mockIssuesCreate = vi.fn();
-const mockIssuesUpdate = vi.fn();
-const mockIssuesCreateComment = vi.fn();
+const mockOctokit = {
+  rest: {
+    search: {
+      issuesAndPullRequests: vi.fn(),
+    },
+    issues: {
+      create: vi.fn(),
+      update: vi.fn(),
+      createComment: vi.fn(),
+      listComments: vi.fn(),
+    },
+  },
+};
 
 vi.mock("../github.js", () => ({
-  getOctokit: () => ({
-    rest: {
-      search: { issuesAndPullRequests: mockSearch },
-      issues: {
-        create: mockIssuesCreate,
-        update: mockIssuesUpdate,
-        createComment: mockIssuesCreateComment,
-      },
-    },
-  }),
+  getOctokit: () => mockOctokit,
   parseRepo: () => ({ owner: "test-owner", repo: "test-repo" }),
 }));
 
-// Mock global fetch
-const mockFetch = vi.fn();
-vi.stubGlobal("fetch", mockFetch);
+vi.mock("../wiki-server.js", () => ({
+  recordIncident: vi.fn().mockResolvedValue(true),
+}));
 
-import { healthCheck } from "./health-check.js";
+vi.mock("../incident-buffer.js", () => ({
+  recordFailure: vi.fn(),
+  getCurrentOutage: vi.fn().mockReturnValue(null),
+  clearOutage: vi.fn(),
+  addToBuffer: vi.fn(),
+  flushBuffer: vi.fn().mockResolvedValue(0),
+  backfillOutageIncident: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock("../logger.js", () => ({
+  logger: {
+    child: () => ({
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    }),
+  },
+}));
+
+// ---------------------------------------------------------------------------
+// Import after mocks
+// ---------------------------------------------------------------------------
+
+import {
+  healthCheck,
+  COMMENT_COOLDOWN_MS,
+  _resetIssueCreationLock,
+} from "./health-check.js";
 import type { Config } from "../config.js";
 
-function makeConfig(): Config {
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function makeConfig(overrides?: Partial<Config>): Config {
   return {
     githubAppId: "test",
     githubInstallationId: "test",
@@ -38,17 +71,49 @@ function makeConfig(): Config {
     discordWebhookUrl: "http://localhost/webhook",
     dailyRunCap: 20,
     runLogPath: "/tmp/test-run-log.json",
-    circuitBreakerCooldownMs: 60_000,
+    circuitBreakerCooldownMs: 1_800_000,
     tasks: {
       healthCheck: { enabled: true, schedule: "*/5 * * * *" },
-      resolveConflicts: { enabled: false, schedule: "0 */2 * * *" },
-      codeReview: { enabled: false, schedule: "0 9 * * 1" },
       issueResponder: { enabled: false, schedule: "*/10 * * * *" },
     },
+    ...overrides,
   };
 }
 
-const ISSUE_TITLE = "[Groundskeeper] Wiki server health check failure";
+const EXISTING_ISSUE = {
+  number: 42,
+  title: "[Groundskeeper] Wiki server health check failure",
+};
+
+function mockServerDown() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockRejectedValue(new Error("Connection refused"))
+  );
+}
+
+function mockServerUp() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({ ok: true })
+  );
+}
+
+function mockNoOpenIssue() {
+  mockOctokit.rest.search.issuesAndPullRequests.mockResolvedValue({
+    data: { items: [] },
+  });
+}
+
+function mockExistingOpenIssue() {
+  mockOctokit.rest.search.issuesAndPullRequests.mockResolvedValue({
+    data: { items: [EXISTING_ISSUE] },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
 
 describe("healthCheck", () => {
   let config: Config;
@@ -56,195 +121,266 @@ describe("healthCheck", () => {
   beforeEach(() => {
     config = makeConfig();
     vi.clearAllMocks();
+    _resetIssueCreationLock();
+    // Default: issues.create returns a valid response
+    mockOctokit.rest.issues.create.mockResolvedValue({
+      data: { number: 99 },
+    });
+    mockOctokit.rest.issues.update.mockResolvedValue({});
+    mockOctokit.rest.issues.createComment.mockResolvedValue({});
+    mockOctokit.rest.issues.listComments.mockResolvedValue({
+      data: [],
+    });
   });
 
-  describe("server is up", () => {
-    beforeEach(() => {
-      mockFetch.mockResolvedValue({ ok: true });
-    });
+  // -----------------------------------------------------------------------
+  // Server up
+  // -----------------------------------------------------------------------
 
-    it("returns success when server is up and no open issue", async () => {
-      mockSearch.mockResolvedValue({ data: { items: [] } });
+  describe("when server is up", () => {
+    beforeEach(() => mockServerUp());
 
+    it("returns success when server is healthy and no open issue", async () => {
+      mockNoOpenIssue();
       const result = await healthCheck(config);
-
       expect(result.success).toBe(true);
       expect(result.summary).toBe("Server up");
-      expect(mockIssuesCreate).not.toHaveBeenCalled();
-      expect(mockIssuesUpdate).not.toHaveBeenCalled();
     });
 
-    it("closes existing open issue when server recovers", async () => {
-      mockSearch.mockResolvedValue({
-        data: {
-          items: [{ number: 100, title: ISSUE_TITLE }],
-        },
-      });
-
+    it("closes an existing open issue when server recovers", async () => {
+      mockExistingOpenIssue();
       const result = await healthCheck(config);
 
       expect(result.success).toBe(true);
-      expect(result.summary).toContain("closed issue #100");
-      expect(mockIssuesUpdate).toHaveBeenCalledWith(
+      expect(result.summary).toContain("closed issue #42");
+
+      expect(mockOctokit.rest.issues.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          issue_number: 100,
+          issue_number: 42,
           state: "closed",
           state_reason: "completed",
         })
       );
-      expect(mockIssuesCreateComment).toHaveBeenCalledWith(
+
+      expect(mockOctokit.rest.issues.createComment).toHaveBeenCalledWith(
         expect.objectContaining({
-          issue_number: 100,
+          issue_number: 42,
           body: expect.stringContaining("back up"),
         })
       );
     });
+
+    it("handles failure to close issue gracefully", async () => {
+      mockExistingOpenIssue();
+      mockOctokit.rest.issues.update.mockRejectedValue(
+        new Error("GitHub 500")
+      );
+
+      const result = await healthCheck(config);
+      // Should still succeed — the server IS up
+      expect(result.success).toBe(true);
+    });
+
+    it("handles failure to post recovery comment gracefully", async () => {
+      mockExistingOpenIssue();
+      mockOctokit.rest.issues.createComment.mockRejectedValue(
+        new Error("GitHub 500")
+      );
+
+      const result = await healthCheck(config);
+      expect(result.success).toBe(true);
+    });
   });
 
-  describe("server is down", () => {
+  // -----------------------------------------------------------------------
+  // Server down — new issue creation
+  // -----------------------------------------------------------------------
+
+  describe("when server is down and no existing issue", () => {
     beforeEach(() => {
-      mockFetch.mockRejectedValue(new Error("connection refused"));
+      mockServerDown();
+      mockNoOpenIssue();
     });
 
-    it("adds comment to existing open issue instead of creating new one", async () => {
-      // First search: open issues — finds one
-      mockSearch.mockResolvedValueOnce({
-        data: {
-          items: [{ number: 200, title: ISSUE_TITLE }],
-        },
-      });
-
+    it("creates a new issue", async () => {
       const result = await healthCheck(config);
 
       expect(result.success).toBe(false);
-      expect(result.summary).toContain("updated issue #200");
-      expect(mockIssuesCreate).not.toHaveBeenCalled();
-      expect(mockIssuesCreateComment).toHaveBeenCalledWith(
+      expect(result.summary).toContain("created issue #99");
+      expect(mockOctokit.rest.issues.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          issue_number: 200,
-          body: expect.stringContaining("still down"),
-        })
-      );
-    });
-
-    it("reopens recently-closed issue instead of creating new one", async () => {
-      const closedAt = new Date(Date.now() - 10 * 60 * 1000).toISOString(); // 10 min ago
-
-      // First search: open issues — none
-      mockSearch.mockResolvedValueOnce({ data: { items: [] } });
-      // Second search: closed issues — finds recently closed
-      mockSearch.mockResolvedValueOnce({
-        data: {
-          items: [
-            { number: 300, title: ISSUE_TITLE, closed_at: closedAt },
-          ],
-        },
-      });
-
-      const result = await healthCheck(config);
-
-      expect(result.success).toBe(false);
-      expect(result.summary).toContain("reopened issue #300");
-      expect(mockIssuesUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          issue_number: 300,
-          state: "open",
-        })
-      );
-      expect(mockIssuesCreateComment).toHaveBeenCalledWith(
-        expect.objectContaining({
-          issue_number: 300,
-          body: expect.stringContaining("down again"),
-        })
-      );
-      expect(mockIssuesCreate).not.toHaveBeenCalled();
-    });
-
-    it("creates new issue when no open or recently-closed issue exists", async () => {
-      // First search: open issues — none
-      mockSearch.mockResolvedValueOnce({ data: { items: [] } });
-      // Second search: closed issues — none matching
-      mockSearch.mockResolvedValueOnce({ data: { items: [] } });
-
-      mockIssuesCreate.mockResolvedValue({
-        data: { number: 400 },
-      });
-
-      const result = await healthCheck(config);
-
-      expect(result.success).toBe(false);
-      expect(result.summary).toContain("created issue #400");
-      expect(mockIssuesCreate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: ISSUE_TITLE,
+          title: "[Groundskeeper] Wiki server health check failure",
           labels: ["groundskeeper"],
         })
       );
     });
 
-    it("creates new issue when closed issue is older than 30 minutes", async () => {
-      const closedAt = new Date(Date.now() - 60 * 60 * 1000).toISOString(); // 1 hour ago
-
-      // First search: open issues — none
-      mockSearch.mockResolvedValueOnce({ data: { items: [] } });
-      // Second search: closed issues — found but too old
-      mockSearch.mockResolvedValueOnce({
-        data: {
-          items: [
-            { number: 500, title: ISSUE_TITLE, closed_at: closedAt },
-          ],
-        },
-      });
-
-      mockIssuesCreate.mockResolvedValue({
-        data: { number: 501 },
-      });
+    it("handles issue creation failure gracefully", async () => {
+      mockOctokit.rest.issues.create.mockRejectedValue(
+        new Error("GitHub 500")
+      );
 
       const result = await healthCheck(config);
-
       expect(result.success).toBe(false);
-      expect(result.summary).toContain("created issue #501");
-      // Should NOT reopen the old issue
-      expect(mockIssuesUpdate).not.toHaveBeenCalled();
+      expect(result.summary).toContain("failed to create issue");
     });
   });
 
-  describe("edge cases", () => {
-    it("ignores issues with non-matching title in search results", async () => {
-      mockFetch.mockRejectedValue(new Error("connection refused"));
+  // -----------------------------------------------------------------------
+  // Server down — existing issue, comment rate-limiting
+  // -----------------------------------------------------------------------
 
-      // Search returns issues that don't exactly match the title
-      mockSearch.mockResolvedValueOnce({
-        data: {
-          items: [
-            { number: 600, title: "[Groundskeeper] Some other issue" },
-          ],
-        },
-      });
-      mockSearch.mockResolvedValueOnce({ data: { items: [] } });
-
-      mockIssuesCreate.mockResolvedValue({
-        data: { number: 601 },
-      });
-
-      const result = await healthCheck(config);
-
-      // Should create a new issue since none matched the exact title
-      expect(result.success).toBe(false);
-      expect(result.summary).toContain("created issue #601");
+  describe("when server is down and issue already exists", () => {
+    beforeEach(() => {
+      mockServerDown();
+      mockExistingOpenIssue();
     });
 
-    it("handles fetch timeout gracefully", async () => {
-      mockFetch.mockRejectedValue(new DOMException("signal timed out", "AbortError"));
-
-      mockSearch.mockResolvedValueOnce({ data: { items: [] } });
-      mockSearch.mockResolvedValueOnce({ data: { items: [] } });
-      mockIssuesCreate.mockResolvedValue({ data: { number: 700 } });
+    it("posts a 'still down' comment when no previous comments exist", async () => {
+      mockOctokit.rest.issues.listComments.mockResolvedValue({
+        data: [],
+      });
 
       const result = await healthCheck(config);
 
       expect(result.success).toBe(false);
-      expect(result.summary).toContain("created issue #700");
+      expect(result.summary).toContain("comment posted");
+      expect(mockOctokit.rest.issues.createComment).toHaveBeenCalledWith(
+        expect.objectContaining({
+          issue_number: 42,
+          body: expect.stringContaining("still down"),
+        })
+      );
+    });
+
+    it("rate-limits comments when a recent comment exists within cooldown window", async () => {
+      // The `since` param filters server-side; a non-empty response means
+      // a comment exists within the cooldown window.
+      mockOctokit.rest.issues.listComments.mockResolvedValue({
+        data: [{ created_at: new Date().toISOString() }],
+      });
+
+      const result = await healthCheck(config);
+
+      expect(result.success).toBe(false);
+      expect(result.summary).toContain("comment rate-limited");
+      expect(mockOctokit.rest.issues.createComment).not.toHaveBeenCalled();
+
+      // Verify the `since` parameter is passed to listComments
+      expect(mockOctokit.rest.issues.listComments).toHaveBeenCalledWith(
+        expect.objectContaining({
+          issue_number: 42,
+          since: expect.any(String),
+          per_page: 1,
+        })
+      );
+    });
+
+    it("posts a comment when no comments exist within cooldown window", async () => {
+      // The `since` param filters server-side; an empty response means
+      // no comment was posted within the cooldown window.
+      mockOctokit.rest.issues.listComments.mockResolvedValue({
+        data: [],
+      });
+
+      const result = await healthCheck(config);
+
+      expect(result.success).toBe(false);
+      expect(result.summary).toContain("comment posted");
+      expect(mockOctokit.rest.issues.createComment).toHaveBeenCalledWith(
+        expect.objectContaining({
+          issue_number: 42,
+          body: expect.stringContaining("still down"),
+        })
+      );
+    });
+
+    it("handles 'still down' comment failure gracefully", async () => {
+      mockOctokit.rest.issues.listComments.mockResolvedValue({
+        data: [],
+      });
+      mockOctokit.rest.issues.createComment.mockRejectedValue(
+        new Error("GitHub 500")
+      );
+
+      const result = await healthCheck(config);
+      // Should not throw — failure is caught
+      expect(result.success).toBe(false);
+      expect(result.summary).toContain("issue #42");
+    });
+
+    it("handles listComments failure gracefully and allows commenting", async () => {
+      mockOctokit.rest.issues.listComments.mockRejectedValue(
+        new Error("GitHub 500")
+      );
+
+      const result = await healthCheck(config);
+      // When we can't check last comment time, allow the comment
+      expect(result.success).toBe(false);
+      expect(result.summary).toContain("comment posted");
+      expect(mockOctokit.rest.issues.createComment).toHaveBeenCalled();
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Race condition prevention
+  // -----------------------------------------------------------------------
+
+  describe("parallel issue creation guard", () => {
+    it("prevents duplicate issue creation from concurrent runs", async () => {
+      mockServerDown();
+      mockNoOpenIssue();
+
+      // Slow down the first issue creation so both runs overlap
+      let resolveCreate:
+        | ((val: { data: { number: number } }) => void)
+        | undefined;
+      let createCallCount = 0;
+
+      mockOctokit.rest.issues.create.mockImplementation(() => {
+        createCallCount++;
+        if (createCallCount === 1) {
+          return new Promise((resolve) => {
+            resolveCreate = resolve;
+          });
+        }
+        return Promise.resolve({ data: { number: 100 } });
+      });
+
+      // Start two health checks concurrently
+      const run1 = healthCheck(config);
+      const run2 = healthCheck(config);
+
+      // Wait for the second to complete (it should see the lock and bail)
+      const result2 = await run2;
+      expect(result2.success).toBe(false);
+      expect(result2.summary).toContain("issue creation in progress");
+
+      // Now let the first complete
+      resolveCreate?.({ data: { number: 99 } });
+      const result1 = await run1;
+      expect(result1.success).toBe(false);
+      expect(result1.summary).toContain("created issue #99");
+
+      // Only one issue.create call should have been made
+      expect(createCallCount).toBe(1);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // GitHub search failure
+  // -----------------------------------------------------------------------
+
+  describe("findOpenHealthIssue failure", () => {
+    it("handles search API failure gracefully", async () => {
+      mockServerDown();
+      mockOctokit.rest.search.issuesAndPullRequests.mockRejectedValue(
+        new Error("GitHub search down")
+      );
+
+      const result = await healthCheck(config);
+      expect(result.success).toBe(false);
+      expect(result.summary).toContain("failed to check for existing issue");
     });
   });
 });

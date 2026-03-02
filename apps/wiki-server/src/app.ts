@@ -2,6 +2,10 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "./logger.js";
 import { validateApiKey, requireWriteScope } from "./auth.js";
+import {
+  rateLimitMiddleware,
+  createDefaultRateLimiters,
+} from "./rate-limit.js";
 import { healthRoute } from "./routes/health.js";
 import { idsRoute } from "./routes/ids.js";
 import { citationsRoute } from "./routes/citations.js";
@@ -19,6 +23,7 @@ import { entitiesRoute } from "./routes/entities.js";
 import { factsRoute } from "./routes/facts.js";
 import { agentSessionsRoute } from "./routes/agent-sessions.js";
 import { activeAgentsRoute } from "./routes/active-agents.js";
+import { agentSessionEventsRoute } from "./routes/agent-session-events.js";
 import { jobsRoute } from "./routes/jobs.js";
 import { artifactsRoute } from "./routes/artifacts.js";
 import { exploreRoute } from "./routes/explore.js";
@@ -27,6 +32,7 @@ import { referencesRoute } from "./routes/references.js";
 import { githubIssuesRoute } from "./routes/github-issues.js";
 import { groundskeeperRunsRoute } from "./routes/groundskeeper-runs.js";
 import { monitoringRoute } from "./routes/monitoring.js";
+import { githubPullsRoute } from "./routes/github-pulls.js";
 
 let requestCounter = 0;
 
@@ -54,6 +60,31 @@ export function createApp() {
       logger.info(logData, "request");
     }
   });
+
+  // Rate limiting middleware — applied before auth so that abusive traffic
+  // is rejected early without touching the database or auth layer.
+  // Health endpoint is exempt so monitoring probes are never throttled.
+  // Authenticated traffic gets higher limits (1000 read/200 write per min)
+  // vs unauthenticated (100 read/20 write) to avoid blocking internal
+  // infrastructure (CI sync, Next.js ISR, crux CLI) while still providing
+  // a circuit breaker against runaway scripts.
+  const { readLimiter, writeLimiter, authReadLimiter, authWriteLimiter } =
+    createDefaultRateLimiters();
+  readLimiter.startCleanup();
+  writeLimiter.startCleanup();
+  authReadLimiter.startCleanup();
+  authWriteLimiter.startCleanup();
+
+  app.use(
+    "*",
+    rateLimitMiddleware({
+      readLimiter,
+      writeLimiter,
+      authReadLimiter,
+      authWriteLimiter,
+      skipPaths: ["/health"],
+    })
+  );
 
   // Error handler — re-throw HTTPExceptions (auth failures etc.) so Hono
   // returns the proper status code; only catch unexpected errors as 500.
@@ -99,6 +130,7 @@ export function createApp() {
   app.use("/api/jobs/*", requireWriteScope("project"));
   app.use("/api/agent-sessions/*", requireWriteScope("project"));
   app.use("/api/active-agents/*", requireWriteScope("project"));
+  app.use("/api/agent-session-events/*", requireWriteScope("project"));
   app.use("/api/auto-update-runs/*", requireWriteScope("project"));
   app.use("/api/auto-update-news/*", requireWriteScope("project"));
   app.use("/api/github/*", requireWriteScope("project"));
@@ -122,12 +154,14 @@ export function createApp() {
   app.route("/api/facts", factsRoute);
   app.route("/api/agent-sessions", agentSessionsRoute);
   app.route("/api/active-agents", activeAgentsRoute);
+  app.route("/api/agent-session-events", agentSessionEventsRoute);
   app.route("/api/jobs", jobsRoute);
   app.route("/api/artifacts", artifactsRoute);
   app.route("/api/explore", exploreRoute);
   app.route("/api/integrity", integrityRoute);
   app.route("/api/references", referencesRoute);
   app.route("/api/github/issues", githubIssuesRoute);
+  app.route("/api/github/pulls", githubPullsRoute);
   app.route("/api/groundskeeper-runs", groundskeeperRunsRoute);
   app.route("/api/monitoring", monitoringRoute);
 

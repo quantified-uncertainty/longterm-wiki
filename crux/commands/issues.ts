@@ -21,6 +21,7 @@ import { createLogger, type Colors } from '../lib/output.ts';
 import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
 import { type CommandResult, parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
+import { listActiveAgents, registerAgent } from '../lib/wiki-server/active-agents.ts';
 
 /**
  * Read a text value from a `--*-file=<path>` flag.
@@ -650,7 +651,7 @@ function buildIssueBody(opts: {
 // Issue creation rate limiting
 // ---------------------------------------------------------------------------
 
-const DAILY_CREATE_LIMIT = 5;
+const DAILY_CREATE_LIMIT = 2;
 const RATE_LIMIT_FILE = join(dirname(new URL(import.meta.url).pathname), '../../.claude/issue-creates.json');
 
 interface RateLimitRecord {
@@ -783,6 +784,19 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
+  // Evidence validation: advisory warning if issue body lacks concrete evidence
+  // (does not block creation — just prints a nudge)
+  let evidenceWarning = '';
+  if (body && !options.draft) {
+    const hasCodeFence = /```/.test(body);
+    const hasUrl = /https?:\/\//.test(body);
+    const hasErrorOutput = /(?:output:|error:|stack trace|exception|failed)/i.test(body);
+    const hasFilePath = /(?:\/[\w.-]+){2,}|[\w.-]+\.[a-z]{2,4}:\d+/.test(body);
+    if (!hasCodeFence && !hasUrl && !hasErrorOutput && !hasFilePath) {
+      evidenceWarning = `  ${c.yellow}⚠ Body lacks concrete evidence (no code fences, URLs, error output, or file paths)${c.reset}\n`;
+    }
+  }
+
   interface CreateIssueResponse {
     number: number;
     html_url: string;
@@ -835,12 +849,15 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
       output += `  ${c.dim}Fix with: crux issues update-body ${issue.number} --problem="..." --model=sonnet --criteria="item1|item2"${c.reset}\n`;
     }
   }
+  if (evidenceWarning) output += evidenceWarning;
 
   return { output, exitCode: 0 };
 }
 
 /**
  * Signal start of work: post a comment and add the claude-working label.
+ * Blocks if another active agent is already working on the same issue
+ * (use --force to override).
  */
 async function start(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -854,9 +871,34 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
     };
   }
 
+  const branch = currentBranch();
+
+  // Check for active-agent conflicts (best-effort — don't block if server is down)
+  if (!options.force) {
+    try {
+      const result = await listActiveAgents('active');
+      if (result.ok) {
+        const conflicting = result.data.agents.filter(
+          (a: { issueNumber: number | null; branch: string | null }) =>
+            a.issueNumber === issueNum && a.branch !== branch
+        );
+        if (conflicting.length > 0) {
+          let output = `${c.red}✗ Another agent is already working on issue #${issueNum}:${c.reset}\n`;
+          for (const agent of conflicting) {
+            output += `  ${c.yellow}→${c.reset} branch: ${c.cyan}${agent.branch ?? 'unknown'}${c.reset}`;
+            output += `, started: ${new Date((agent as { startedAt: string }).startedAt).toISOString().slice(0, 16)}\n`;
+          }
+          output += `\n${c.dim}Use --force to override.${c.reset}\n`;
+          return { output, exitCode: 1 };
+        }
+      }
+    } catch {
+      // Wiki-server may be unreachable — proceed without enforcement
+    }
+  }
+
   // Fetch issue details
   const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
-  const branch = currentBranch();
 
   // Ensure label exists
   await ensureLabelExists();
@@ -877,6 +919,18 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
     method: 'POST',
     body: { body },
   });
+
+  // Register as active agent (best-effort)
+  try {
+    await registerAgent({
+      sessionId: `${branch}-${Date.now()}`,
+      branch,
+      task: issue.title,
+      issueNumber: issueNum,
+    });
+  } catch {
+    // Best-effort — GitHub tracking above is the primary mechanism
+  }
 
   let output = '';
   output += `${c.green}✓${c.reset} Started tracking issue #${issueNum}: ${issue.title}\n`;
@@ -1863,7 +1917,8 @@ Examples:
   crux issues create "Title" --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
   crux issues update-body 239 --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
   crux issues update-body 239 --body-file=/tmp/full-body.md  # Set raw body (no merge)
-  crux issues start 239              Announce start on issue #239
+  crux issues start 239              Announce start (blocks if another agent is active)
+  crux issues start 239 --force      Override conflict check
   crux issues done 239 --pr=https://github.com/.../pull/42
   crux issues cleanup                Check for stale labels and duplicates
   crux issues cleanup --fix          Auto-remove stale claude-working labels

@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { eq, desc, and, lt, sql, or } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { activeAgents } from "../schema.js";
+import { activeAgents, agentSessionEvents } from "../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -13,6 +13,7 @@ import {
   UpdateAgentSchema,
 } from "../api-types.js";
 import { logger } from "../logger.js";
+import { generateSessionName } from "../session-name.js";
 
 /** Default minutes before an agent without heartbeat is marked stale. */
 const STALE_TIMEOUT_MINUTES = 30;
@@ -41,6 +42,7 @@ const activeAgentsApp = new Hono()
       .insert(activeAgents)
       .values({
         sessionId: d.sessionId,
+        sessionName: generateSessionName(),
         branch: d.branch ?? null,
         task: d.task,
         issueNumber: d.issueNumber ?? null,
@@ -53,6 +55,8 @@ const activeAgentsApp = new Hono()
         set: {
           // For branch and metadata: prefer incoming value, fall back to existing
           branch: sql`coalesce(excluded.branch, "active_agents"."branch")`,
+          // Keep existing session name if set; otherwise use the newly generated one
+          sessionName: sql`coalesce("active_agents"."session_name", excluded.session_name)`,
           task: sql`excluded.task`,
           issueNumber: sql`excluded.issue_number`,
           model: sql`excluded.model`,
@@ -231,6 +235,14 @@ const activeAgentsApp = new Hono()
     const cutoff = new Date(Date.now() - ageDays * 24 * 60 * 60 * 1000);
     const db = getDrizzleDb();
 
+    // Clean up old events first (events older than the cutoff, regardless of agent status).
+    // Note: events belonging to deleted agents are also cascade-deleted via FK,
+    // but this catches old events on still-active agents too.
+    const deletedEvents = await db
+      .delete(agentSessionEvents)
+      .where(lt(agentSessionEvents.timestamp, cutoff))
+      .returning({ id: agentSessionEvents.id });
+
     // Only delete agents that are no longer active and are older than the cutoff
     const deleted = await db
       .delete(activeAgents)
@@ -247,11 +259,11 @@ const activeAgentsApp = new Hono()
       .returning({ id: activeAgents.id, sessionId: activeAgents.sessionId });
 
     logger.info(
-      { deleted: deleted.length, ageDays, cutoff: cutoff.toISOString() },
-      "Cleanup: deleted old agents"
+      { deleted: deleted.length, deletedEvents: deletedEvents.length, ageDays, cutoff: cutoff.toISOString() },
+      "Cleanup: deleted old agents and events"
     );
 
-    return c.json({ deleted: deleted.length, agents: deleted });
+    return c.json({ deleted: deleted.length, deletedEvents: deletedEvents.length, agents: deleted });
   });
 
 export const activeAgentsRoute = activeAgentsApp;

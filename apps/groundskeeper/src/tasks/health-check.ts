@@ -1,22 +1,37 @@
 import type { Config } from "../config.js";
 import { getOctokit, parseRepo } from "../github.js";
+import {
+  recordFailure,
+  getCurrentOutage,
+  clearOutage,
+  addToBuffer,
+  flushBuffer,
+  backfillOutageIncident,
+} from "../incident-buffer.js";
+import { logger as rootLogger } from "../logger.js";
 import { recordIncident } from "../wiki-server.js";
+
+const logger = rootLogger.child({ task: "health-check" });
 
 const ISSUE_TITLE = "[Groundskeeper] Wiki server health check failure";
 
-/**
- * Minimum time (ms) after an issue is closed before we create a new one.
- * If the server flaps (recovers briefly then fails again), we reopen the
- * recently-closed issue instead of creating a brand new one.
- */
-const REOPEN_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
+/** Minimum interval between "still down" comments on the same issue (ms). */
+const COMMENT_COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
 
+/**
+ * Simple in-memory lock to prevent parallel health check runs from both
+ * creating a new issue when they simultaneously see "no open issue."
+ */
+let issueCreationInProgress = false;
+
+/**
+ * Search for an existing open health-check issue by title.
+ * Returns the issue if found, or undefined.
+ */
 async function findOpenHealthIssue(config: Config) {
   const octokit = getOctokit(config);
   const { owner, repo } = parseRepo(config);
 
-  // Search by title using the search API — more reliable than filtering
-  // by labels, which can have indexing delays or permission issues.
   const { data } = await octokit.rest.search.issuesAndPullRequests({
     q: `repo:${owner}/${repo} is:issue is:open in:title "${ISSUE_TITLE}"`,
     per_page: 5,
@@ -26,29 +41,68 @@ async function findOpenHealthIssue(config: Config) {
 }
 
 /**
- * Find the most recently closed health check issue.
- * Returns it only if it was closed within the reopen window.
+ * Check whether any comment was posted on the issue within the cooldown window.
+ *
+ * Uses the `since` parameter to ask GitHub for only comments created after
+ * the cooldown threshold. If any are returned, we're still in cooldown.
+ *
+ * NOTE: The GitHub Issues listComments API does NOT support `sort` or
+ * `direction` parameters (those are silently ignored). Using `per_page: 1`
+ * without them returns the OLDEST comment, not the newest. The `since`
+ * approach avoids this pitfall entirely.
  */
-async function findRecentlyClosedHealthIssue(config: Config) {
-  const octokit = getOctokit(config);
-  const { owner, repo } = parseRepo(config);
+async function hasRecentComment(
+  config: Config,
+  issueNumber: number
+): Promise<boolean> {
+  try {
+    const octokit = getOctokit(config);
+    const { owner, repo } = parseRepo(config);
 
-  const { data } = await octokit.rest.search.issuesAndPullRequests({
-    q: `repo:${owner}/${repo} is:issue is:closed in:title "${ISSUE_TITLE}"`,
-    sort: "updated",
-    order: "desc",
-    per_page: 1,
-  });
+    const since = new Date(Date.now() - COMMENT_COOLDOWN_MS).toISOString();
 
-  const issue = data.items.find((i) => i.title === ISSUE_TITLE);
-  if (!issue?.closed_at) return undefined;
+    const { data: comments } = await octokit.rest.issues.listComments({
+      owner,
+      repo,
+      issue_number: issueNumber,
+      since,
+      per_page: 1,
+    });
 
-  const closedAt = new Date(issue.closed_at).getTime();
-  if (Date.now() - closedAt < REOPEN_WINDOW_MS) {
-    return issue;
+    return comments.length > 0;
+  } catch (error) {
+    logger.warn(
+      { err: error, issueNumber },
+      "Failed to check for recent comments"
+    );
+    // On failure, allow commenting (same as before — fail-open)
+    return false;
+  }
+}
+
+/**
+ * Check whether enough time has elapsed since the last comment on an issue
+ * to allow posting a new "still down" comment.
+ */
+async function shouldPostStillDownComment(
+  config: Config,
+  issueNumber: number
+): Promise<boolean> {
+  const recent = await hasRecentComment(config, issueNumber);
+
+  if (recent) {
+    logger.info(
+      {
+        issueNumber,
+        cooldownMs: COMMENT_COOLDOWN_MS,
+      },
+      "Skipping 'still down' comment — recent comment exists within cooldown window"
+    );
+    return false;
   }
 
-  return undefined;
+  // No recent comments (or failed to fetch) — allow commenting
+  return true;
 }
 
 export async function healthCheck(
@@ -68,24 +122,67 @@ export async function healthCheck(
 
   const octokit = getOctokit(config);
   const { owner, repo } = parseRepo(config);
-  const existingIssue = await findOpenHealthIssue(config);
+
+  let existingIssue: Awaited<ReturnType<typeof findOpenHealthIssue>>;
+  try {
+    existingIssue = await findOpenHealthIssue(config);
+  } catch (error) {
+    logger.error({ err: error }, "Failed to search for existing health issue");
+    return {
+      success: serverUp,
+      summary: serverUp
+        ? "Server up, but failed to check for existing issue"
+        : "Server down, but failed to check for existing issue",
+    };
+  }
 
   if (serverUp) {
+    // Recovery path: if there was an active outage, backfill the incident
+    // and flush any buffered incidents now that the server is reachable.
+    const outage = getCurrentOutage();
+    if (outage) {
+      await backfillOutageIncident(config, outage);
+      clearOutage();
+      logger.info("Outage window closed — backfill incident recorded");
+    }
+
+    // Flush any incidents that were buffered while the server was down
+    const flushed = await flushBuffer(config);
+    if (flushed > 0) {
+      logger.info({ flushed }, "Flushed buffered incidents on recovery");
+    }
+
     // Server is up — close any existing issue
     if (existingIssue) {
-      await octokit.rest.issues.update({
-        owner,
-        repo,
-        issue_number: existingIssue.number,
-        state: "closed",
-        state_reason: "completed",
-      });
-      await octokit.rest.issues.createComment({
-        owner,
-        repo,
-        issue_number: existingIssue.number,
-        body: `✅ Wiki server is back up at ${new Date().toISOString()}.`,
-      });
+      try {
+        await octokit.rest.issues.update({
+          owner,
+          repo,
+          issue_number: existingIssue.number,
+          state: "closed",
+          state_reason: "completed",
+        });
+      } catch (error) {
+        logger.error(
+          { err: error, issueNumber: existingIssue.number },
+          "Failed to close health issue"
+        );
+      }
+
+      try {
+        await octokit.rest.issues.createComment({
+          owner,
+          repo,
+          issue_number: existingIssue.number,
+          body: `Server is back up at ${new Date().toISOString()}.`,
+        });
+      } catch (error) {
+        logger.error(
+          { err: error, issueNumber: existingIssue.number },
+          "Failed to post recovery comment"
+        );
+      }
+
       return {
         success: true,
         summary: `Server up, closed issue #${existingIssue.number}`,
@@ -94,61 +191,103 @@ export async function healthCheck(
     return { success: true, summary: "Server up" };
   }
 
-  // Server is down — record incident (best-effort; will fail if wiki-server is what's down)
-  await recordIncident(config, {
+  // Server is down — track the failure for outage window detection
+  recordFailure();
+
+  // Try to record incident to wiki-server; if it fails (expected when the
+  // wiki-server itself is down), buffer it locally for later flushing.
+  const incidentPayload = {
     service: "wiki-server",
     severity: "critical",
     title: "Wiki server health check failure",
     detail: `Server at ${config.wikiServerUrl} is not responding to /health endpoint`,
     checkSource: "groundskeeper",
-  }).catch(() => {});
+  };
+
+  const recorded = await recordIncident(config, incidentPayload);
+  if (!recorded) {
+    addToBuffer({
+      ...incidentPayload,
+      timestamp: new Date().toISOString(),
+    });
+    logger.info("Incident buffered locally (wiki-server unreachable)");
+  }
 
   // Add comment to existing open issue instead of creating duplicates
   if (existingIssue) {
-    await octokit.rest.issues.createComment({
-      owner,
-      repo,
-      issue_number: existingIssue.number,
-      body: `⚠️ Server still down at ${new Date().toISOString()}.`,
-    });
+    // Rate-limit "still down" comments: only post if >30 min since last comment
+    const shouldComment = await shouldPostStillDownComment(
+      config,
+      existingIssue.number
+    );
+
+    if (shouldComment) {
+      try {
+        await octokit.rest.issues.createComment({
+          owner,
+          repo,
+          issue_number: existingIssue.number,
+          body: `Server is still down at ${new Date().toISOString()}. Checked \`${config.wikiServerUrl}/health\`.`,
+        });
+      } catch (error) {
+        logger.error(
+          { err: error, issueNumber: existingIssue.number },
+          "Failed to post 'still down' comment"
+        );
+      }
+    }
+
     return {
       success: false,
-      summary: `Server down, updated issue #${existingIssue.number}`,
+      summary: `Server down, tracked in issue #${existingIssue.number}${shouldComment ? " (comment posted)" : " (comment rate-limited)"}`,
     };
   }
 
-  // No open issue — check if one was closed recently (server flapping)
-  const recentlyClosed = await findRecentlyClosedHealthIssue(config);
-  if (recentlyClosed) {
-    await octokit.rest.issues.update({
-      owner,
-      repo,
-      issue_number: recentlyClosed.number,
-      state: "open",
-    });
-    await octokit.rest.issues.createComment({
-      owner,
-      repo,
-      issue_number: recentlyClosed.number,
-      body: `⚠️ Server is down again at ${new Date().toISOString()}. Reopening — last recovery was less than 30 minutes ago.`,
-    });
+  // Guard against parallel issue creation
+  if (issueCreationInProgress) {
+    logger.warn(
+      "Issue creation already in progress — skipping to avoid duplicates"
+    );
     return {
       success: false,
-      summary: `Server down, reopened issue #${recentlyClosed.number}`,
+      summary: "Server down, issue creation in progress by another run",
     };
   }
 
-  // No open or recently-closed issue — create a new one
-  const { data: newIssue } = await octokit.rest.issues.create({
-    owner,
-    repo,
-    title: ISSUE_TITLE,
-    body: `The wiki server at \`${config.wikiServerUrl}\` is not responding.\n\nDetected at: ${new Date().toISOString()}\n\nThis issue will be closed automatically when the server recovers.`,
-    labels: ["groundskeeper"],
-  });
+  issueCreationInProgress = true;
+  try {
+    const { data: newIssue } = await octokit.rest.issues.create({
+      owner,
+      repo,
+      title: ISSUE_TITLE,
+      body: `The wiki server at \`${config.wikiServerUrl}\` is not responding.\n\nDetected at: ${new Date().toISOString()}\n\nThis issue will be closed automatically when the server recovers.`,
+      labels: ["groundskeeper"],
+    });
 
-  return {
-    success: false,
-    summary: `Server down, created issue #${newIssue.number}`,
-  };
+    return {
+      success: false,
+      summary: `Server down, created issue #${newIssue.number}`,
+    };
+  } catch (error) {
+    logger.error({ err: error }, "Failed to create health check issue");
+    return {
+      success: false,
+      summary: "Server down, failed to create issue",
+    };
+  } finally {
+    issueCreationInProgress = false;
+  }
+}
+
+// Exported for testing
+export {
+  COMMENT_COOLDOWN_MS,
+  findOpenHealthIssue,
+  hasRecentComment,
+  shouldPostStillDownComment,
+};
+
+// Exported for testing — reset the in-memory lock
+export function _resetIssueCreationLock(): void {
+  issueCreationInProgress = false;
 }

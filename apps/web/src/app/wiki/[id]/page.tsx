@@ -459,6 +459,8 @@ export default async function WikiPage({ params }: PageProps) {
     const slug = numericIdToSlug(id.toUpperCase());
     if (!slug) notFound();
 
+    const entityPath = getEntityPath(slug) || "";
+
     const [result, citationQuotes] = await Promise.all([
       renderMdxPage(slug),
       getCitationQuotes(slug),
@@ -466,7 +468,6 @@ export default async function WikiPage({ params }: PageProps) {
     if (!result) notFound();
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
-    const entityPath = getEntityPath(slug) || "";
     const pageData = getPageById(slug);
     const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
     const fullWidth = isFullWidth(contentFormat, result.frontmatter);
@@ -493,6 +494,8 @@ export default async function WikiPage({ params }: PageProps) {
     }
 
     // No numeric ID — render directly by slug (page-only content without entity)
+    const entityPath = getEntityPath(id) || "";
+
     const [result, citationQuotes] = await Promise.all([
       renderMdxPage(id),
       getCitationQuotes(id),
@@ -500,7 +503,6 @@ export default async function WikiPage({ params }: PageProps) {
     if (!result) notFound();
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
-    const entityPath = getEntityPath(id) || "";
     const pageData = getPageById(id);
     const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
     const fullWidth = isFullWidth(contentFormat, result.frontmatter);

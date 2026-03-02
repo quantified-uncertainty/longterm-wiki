@@ -110,6 +110,18 @@ const SCRIPTS = {
     passthrough: ['apply', 'batch-size', 'entity', 'path'],
     positional: false,
   },
+  'retrofit-refs': {
+    script: 'claims/retrofit-refs.ts',
+    description: 'Insert [^rc-XXXX] footnote markers at claim assertion points (LLM-guided)',
+    passthrough: ['apply', 'model', 'max-claims'],
+    positional: true,
+  },
+  'retrofit-refs-batch': {
+    script: 'claims/retrofit-refs-batch.ts',
+    description: 'Batch-retrofit footnote markers across pages with extracted claims',
+    passthrough: ['apply', 'limit', 'entity', 'path', 'model', 'max-claims'],
+    positional: false,
+  },
   'enrich-structured': {
     script: 'claims/enrich-structured.ts',
     description: 'Add structured fields (subject/property/value) to existing claims via LLM',
@@ -296,6 +308,14 @@ Workflow:
   4. crux claims migrate-footnotes-batch --batch-size=50 --apply   Process 50 pages
   5. crux claims migrate-footnotes-batch --entity=kalshi           Single entity
   6. crux claims migrate-footnotes-batch --path=knowledge-base/    Directory filter
+
+  Retrofit references (insert inline [^rc-XXXX] markers for existing claims):
+  1. crux claims retrofit-refs <page-id>               Dry-run: show where refs would be inserted
+  2. crux claims retrofit-refs <page-id> --apply        Insert refs + create page_citations
+  3. crux claims retrofit-refs-batch                    Dry-run all pages with claims but no refs
+  4. crux claims retrofit-refs-batch --limit=10 --apply Process 10 pages
+  5. crux claims retrofit-refs-batch --entity=metr      Single entity
+  6. crux claims retrofit-refs-batch --path=knowledge-base/organizations/  Directory filter
 
 Notes:
   - Extraction requires OPENROUTER_API_KEY or ANTHROPIC_API_KEY

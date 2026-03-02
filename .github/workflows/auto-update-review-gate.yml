@@ -16,9 +16,24 @@ permissions:
   pull-requests: write
 
 jobs:
+  preflight:
+    # Global circuit breaker — skip when automation is paused or wiki-server is down.
+    if: >-
+      vars.AUTOMATION_PAUSED != 'true' &&
+      github.event.pull_request.draft == false &&
+      contains(github.event.pull_request.labels.*.name, 'auto-update')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check wiki-server health
+        run: |
+          curl -sf --max-time 10 "${{ secrets.LONGTERMWIKI_SERVER_URL }}/health" || {
+            echo "::warning::Wiki-server unreachable — skipping workflow"
+            exit 1
+          }
+          echo "Wiki-server is healthy"
+
   audit-gate:
-    # Only run on non-draft auto-update PRs
-    if: github.event.pull_request.draft == false && contains(github.event.pull_request.labels.*.name, 'auto-update')
+    needs: [preflight]
     runs-on: ubuntu-latest
     timeout-minutes: 120
 
@@ -96,11 +111,24 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes from audit — nothing to commit."
           else
-            git add -A
-            git commit -m "audit: fix citation inaccuracies (automated)
+            # Security: stage only files the citation audit is expected to modify
+            # (MDX content pages and YAML data files), not everything in the tree.
+            git diff --name-only | while IFS= read -r file; do
+              if echo "$file" | grep -qE '^(content/docs/.*\.mdx|data/.*\.(yaml|yml))$'; then
+                git add -- "$file"
+              else
+                echo "::warning::Skipping unexpected modified file from audit: $file"
+              fi
+            done
+
+            if ! git diff --cached --quiet; then
+              git commit -m "audit: fix citation inaccuracies (automated)
 
           Automated citation audit fixes from the review gate pipeline."
-            git push
+              git push
+            else
+              echo "No expected audit changes to commit."
+            fi
           fi
 
       - name: Post audit summary

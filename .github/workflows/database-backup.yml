@@ -20,6 +20,9 @@ on:
 
 jobs:
   backup:
+    # Global circuit breaker — skip when automation is paused.
+    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
+    if: vars.AUTOMATION_PAUSED != 'true'
     name: Backup database
     runs-on: ubuntu-latest
     outputs:

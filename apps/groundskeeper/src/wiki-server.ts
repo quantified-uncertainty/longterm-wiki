@@ -6,7 +6,9 @@
  */
 
 import type { Config } from "./config.js";
-import { logger } from "./logger.js";
+import { logger as rootLogger } from "./logger.js";
+
+const logger = rootLogger.child({ module: "wiki-server" });
 
 interface ApiResult<T> {
   ok: boolean;
@@ -70,7 +72,7 @@ export interface RecordRunPayload {
 }
 
 /**
- * Record a task run to the wiki-server. Best-effort — logs error on failure.
+ * Record a task run to the wiki-server. Best-effort — logs warning on failure.
  */
 export async function recordRunToServer(
   config: Config,
@@ -84,7 +86,11 @@ export async function recordRunToServer(
   );
   if (!result.ok) {
     logger.warn(
-      { event: "wiki_server_sync_failed", endpoint: "/api/groundskeeper-runs", error: result.error },
+      {
+        event: "wiki_server_sync_failed",
+        endpoint: "/api/groundskeeper-runs",
+        error: result.error,
+      },
       "Failed to record run to wiki-server",
     );
   }
@@ -133,14 +139,14 @@ export async function registerAsActiveAgent(
       return result.data.id;
     }
 
-    console.log(
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
+    logger.warn(
+      {
         event: "active_agent_registration_failed",
         attempt: attempt + 1,
         maxRetries: REGISTER_MAX_RETRIES,
         error: result.error,
-      }),
+      },
+      `Registration attempt ${attempt + 1}/${REGISTER_MAX_RETRIES + 1} failed`,
     );
 
     // Don't delay after the last attempt
@@ -176,8 +182,12 @@ export async function updateActiveAgent(
   );
   if (!result.ok) {
     logger.warn(
-      { event: "active_agent_update_failed", error: result.error },
-      "Failed to update active agent",
+      {
+        event: "active_agent_update_failed",
+        agentId,
+        error: result.error,
+      },
+      "Failed to update active agent status",
     );
   }
 }
@@ -191,6 +201,8 @@ export async function updateActiveAgent(
  * If wiki-server is the thing that's down, this call will also fail — that's
  * expected. The groundskeeper health-check task also creates GitHub issues
  * as a fallback notification channel.
+ *
+ * Returns true if the incident was recorded successfully, false otherwise.
  */
 export async function recordIncident(
   config: Config,
@@ -202,7 +214,7 @@ export async function recordIncident(
     checkSource?: string;
     metadata?: Record<string, unknown>;
   },
-): Promise<void> {
+): Promise<boolean> {
   const result = await apiRequest(
     config,
     "POST",
@@ -211,10 +223,16 @@ export async function recordIncident(
   );
   if (!result.ok) {
     logger.warn(
-      { event: "incident_recording_failed", endpoint: "/api/monitoring/incidents", error: result.error },
+      {
+        event: "incident_recording_failed",
+        endpoint: "/api/monitoring/incidents",
+        error: result.error,
+      },
       "Failed to record incident to wiki-server",
     );
+    return false;
   }
+  return true;
 }
 
 /**
@@ -231,6 +249,8 @@ export async function sendHeartbeat(
     {},
   );
   if (!result.ok) {
-    // Don't log every heartbeat failure — too noisy
+    // Heartbeat failures are intentionally quiet — they're high-frequency
+    // and connectivity issues are tracked at a higher level by the
+    // wiki-server failure counter in scheduler.ts.
   }
 }

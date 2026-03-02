@@ -49,8 +49,6 @@ function makeConfig(): Config {
     circuitBreakerCooldownMs: 60_000, // 1 minute for tests
     tasks: {
       healthCheck: { enabled: true, schedule: "*/5 * * * *" },
-      resolveConflicts: { enabled: false, schedule: "0 */2 * * *" },
-      codeReview: { enabled: false, schedule: "0 9 * * 1" },
       issueResponder: { enabled: false, schedule: "*/10 * * * *" },
     },
   };

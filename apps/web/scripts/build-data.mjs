@@ -802,6 +802,76 @@ async function buildCitationStatsMap() {
 }
 
 /**
+ * Fetch all citation quotes from wiki-server, grouped by pageId.
+ * Used by the frontend to render citation health banners and footnote tooltips
+ * without making per-page API calls at runtime.
+ * Returns { [pageId]: CitationQuote[] } or empty object if unavailable.
+ */
+async function buildCitationQuotesBundle() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  citationQuotes: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return {};
+  }
+
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
+    // Paginate through all quotes (max 5000 per page)
+    const allQuotes = [];
+    let offset = 0;
+    const limit = 5000;
+
+    while (true) {
+      const res = await fetch(
+        `${serverUrl}/api/citations/quotes/all?limit=${limit}&offset=${offset}`,
+        { headers, signal: AbortSignal.timeout(30_000) }
+      );
+      if (!res.ok) {
+        console.log(`  citationQuotes: skipped (server returned ${res.status})`);
+        return {};
+      }
+      const data = await res.json();
+      allQuotes.push(...(data.quotes || []));
+      if (data.quotes.length < limit) break;
+      offset += limit;
+    }
+
+    // Group by pageId
+    const byPage = {};
+    for (const q of allQuotes) {
+      if (!byPage[q.pageId]) byPage[q.pageId] = [];
+      byPage[q.pageId].push({
+        footnote: q.footnote,
+        url: q.url,
+        resourceId: q.resourceId,
+        claimText: q.claimText,
+        sourceQuote: q.sourceQuote,
+        sourceTitle: q.sourceTitle,
+        sourceType: q.sourceType,
+        quoteVerified: q.quoteVerified,
+        verificationScore: q.verificationScore,
+        verifiedAt: q.verifiedAt,
+        accuracyVerdict: q.accuracyVerdict,
+        accuracyScore: q.accuracyScore,
+        accuracyIssues: q.accuracyIssues,
+        accuracySupportingQuotes: q.accuracySupportingQuotes,
+        verificationDifficulty: q.verificationDifficulty,
+        accuracyCheckedAt: q.accuracyCheckedAt,
+      });
+    }
+
+    console.log(`  citationQuotes: ${allQuotes.length} quotes across ${Object.keys(byPage).length} pages`);
+    return byPage;
+  } catch (err) {
+    console.log(`  citationQuotes: skipped (${err.message || 'server unavailable'})`);
+    return {};
+  }
+}
+
+/**
  * Fetch all page references (claim refs + citations) from the wiki-server.
  * Returns a map of pageId → { claimReferences, citations } for the reference preprocessor.
  * Falls back to an empty object if the server is unavailable.
@@ -1199,13 +1269,15 @@ async function main() {
   // Fetch edit log dates, earliest edit log dates, and citation stats from
   // wiki-server (parallel). Also build git-based date maps (synchronous, fast).
   const gitDateMaps = CONTENT_ONLY ? { gitCreatedMap: new Map(), gitModifiedMap: new Map() } : buildGitDateMaps();
-  const [editLogDates, earliestEditLogDates, citationStats] = CONTENT_ONLY
-    ? [new Map(), new Map(), new Map()]
+  const [editLogDates, earliestEditLogDates, citationStats, citationQuotesBundle] = CONTENT_ONLY
+    ? [new Map(), new Map(), new Map(), {}]
     : await Promise.all([
         buildEditLogDateMap(),
         buildEarliestEditLogDateMap(),
         buildCitationStatsMap(),
+        buildCitationQuotesBundle(),
       ]);
+  database.citationQuotes = citationQuotesBundle;
 
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates);

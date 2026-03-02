@@ -1,11 +1,14 @@
 name: Scheduled Production Deploy
 
-# Daily fallback to ensure production stays fresh even in quiet periods
-# (no PR merges for a day or more).
+# Hourly production deploy via Vercel deploy hook.
 #
-# Primary deploys are triggered by the CI workflow (deploy job) whenever
-# a PR is merged to main and CI passes — that handles the common case.
-# This workflow is the safety net.
+# This is the ONLY path to production — Git auto-deploy on main is blocked
+# by vercel.json ignoreCommand, and the per-push deploy hook was removed
+# from ci.yml. This caps Vercel builds at 24/day max.
+#
+# With ~55 merges/day, hourly deploys mean changes go live within ~60 min.
+# For a wiki, this latency is acceptable and keeps build minutes under
+# Vercel Pro's 6,000 min/month included allowance.
 #
 # Setup (one-time):
 #   1. Go to Vercel Dashboard → Project → Settings → Git → Deploy Hooks
@@ -17,11 +20,14 @@ name: Scheduled Production Deploy
 
 on:
   schedule:
-    - cron: '0 4 * * *'    # Daily at 04:00 UTC (fallback only)
+    - cron: '0 * * * *'    # Every hour, on the hour
   workflow_dispatch:         # Allow manual trigger from GitHub Actions UI
 
 jobs:
   trigger-production-deploy:
+    # Global circuit breaker — skip when automation is paused.
+    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
+    if: vars.AUTOMATION_PAUSED != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 

@@ -37,6 +37,7 @@ interface YamlSession {
   learnings?: unknown[];
   recommendations?: unknown[];
   checks?: Record<string, unknown>;
+  reviewed?: boolean;
 }
 
 function normalizeDate(d: string | Date): string {
@@ -103,6 +104,7 @@ export function parseSessionYaml(filePath: string): SessionApiEntry | null {
     recommendationsJson: parsed.recommendations && Array.isArray(parsed.recommendations)
       ? parsed.recommendations
       : undefined,
+    reviewed: typeof parsed.reviewed === 'boolean' ? parsed.reviewed : undefined,
     pages,
   };
 }

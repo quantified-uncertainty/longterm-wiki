@@ -264,6 +264,8 @@ export const CreateSessionSchema = z.object({
   issuesJson: z.unknown().nullable().optional(),
   learningsJson: z.unknown().nullable().optional(),
   recommendationsJson: z.unknown().nullable().optional(),
+  /** Whether /review-pr was run during this session. NULL = unknown (pre-feature). */
+  reviewed: z.boolean().nullable().optional(),
   pages: z
     .array(z.string().min(1).max(200))
     .optional()
@@ -1191,6 +1193,27 @@ export const UpdateAgentSchema = z.object({
   metadata: z.record(z.unknown()).nullable().optional(),
 });
 export type UpdateAgent = z.infer<typeof UpdateAgentSchema>;
+
+// ---------------------------------------------------------------------------
+// Agent Session Events (activity timeline)
+// ---------------------------------------------------------------------------
+
+export const VALID_AGENT_EVENT_TYPES = [
+  "registered",
+  "checklist_check",
+  "status_update",
+  "error",
+  "note",
+  "completed",
+] as const;
+
+export const CreateAgentEventSchema = z.object({
+  agentId: z.number().int().positive(),
+  eventType: z.enum(VALID_AGENT_EVENT_TYPES),
+  message: z.string().min(1).max(5000),
+  metadata: z.record(z.unknown()).nullable().optional(),
+});
+export type CreateAgentEvent = z.infer<typeof CreateAgentEventSchema>;
 
 // ---------------------------------------------------------------------------
 // Groundskeeper Runs
