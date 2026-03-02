@@ -38,6 +38,11 @@ function getIntIdForSlug(slug: string): number {
   return slugIntIdMap.get(slug)!;
 }
 
+/** Non-allocating lookup — returns undefined for slugs not yet in the map. */
+function lookupIntIdForSlug(slug: string): number | undefined {
+  return slugIntIdMap.get(slug);
+}
+
 function getSlugForIntId(intId: number): string | undefined {
   for (const [slug, id] of slugIntIdMap) {
     if (id === intId) return slug;
@@ -70,13 +75,19 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // INSERT which also references entity_ids in a LEFT JOIN clause.
   if (q.includes("insert into") && q.includes('"entity_ids"')) {
     const slug = params[0] as string;
-    return [{ numeric_id: nextId++, slug }];
+    return [{ numeric_id: getIntIdForSlug(slug), slug }];
   }
 
   // --- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ---
   // Must not match the page_links INSERT which contains entity_ids in a JOIN
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)") && !q.includes("page_links")) {
-    return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
+    return params
+      .map((p) => {
+        const slug = String(p);
+        const numeric_id = lookupIntIdForSlug(slug);
+        return numeric_id === undefined ? null : { numeric_id, slug };
+      })
+      .filter((r): r is { numeric_id: number; slug: string } => r !== null);
   }
 
   // --- page_links: DELETE all ---
@@ -254,6 +265,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   ) {
     // Phase 4b: params are [graphEntityIntId, graphEntityIntId, MAX_GRAPH_EDGES]
     const entityIntId = params[0] as number;
+    const maxEdges = (params[2] as number) || 500;
     const results: Record<string, unknown>[] = [];
 
     for (const row of linksStore.values()) {
@@ -277,7 +289,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     results.sort(
       (a, b) => (b.weight as number) - (a.weight as number)
     );
-    return results;
+    return results.slice(0, maxEdges);
   }
 
   // --- page_links: stats (count by type) ---

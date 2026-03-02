@@ -38,6 +38,11 @@ function getIntIdForSlug(slug: string): number {
   return slugIntIdMap.get(slug)!;
 }
 
+/** Non-allocating lookup — returns undefined for slugs not yet in the map. */
+function lookupIntIdForSlug(slug: string): number | undefined {
+  return slugIntIdMap.get(slug);
+}
+
 function resetStore() {
   sessionStore = [];
   sessionPageStore = [];
@@ -130,6 +135,8 @@ vi.mock("../db.js", async () => {
 
     // ---- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ----
     if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
+      // Allocating on first use mirrors production where all page slugs have entity_ids.
+      // Phase C verified zero NULLs, so every slug encountered here will have an ID.
       return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
     }
 
