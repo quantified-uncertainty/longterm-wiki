@@ -151,6 +151,11 @@ const dispatch: SqlDispatcher = (query, params) => {
     return [{ last_value: 0, is_called: false }];
   }
 
+  // ---- entity_ids: SELECT WHERE slug (for resolvePageIntIds) ----
+  if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
+    return []; // No entity_ids in test — routed_to_page_id_int will be null
+  }
+
   // ---- TRUNCATE ----
   if (q.includes("truncate")) {
     if (q.includes("auto_update_news_items")) {
@@ -168,8 +173,8 @@ const dispatch: SqlDispatcher = (query, params) => {
   if (q.includes("insert into") && q.includes("auto_update_news_items")) {
     // Drizzle inserts: run_id, title, url, source_id, published_at, summary,
     //   relevance_score, topics_json, entities_json, routed_to_page_id,
-    //   routed_to_page_title, routed_tier  (12 columns)
-    const COLS = 12;
+    //   routed_to_page_id_int, routed_to_page_title, routed_tier  (13 columns)
+    const COLS = 13; // Phase 4a: +1 for routed_to_page_id_int
     const numRows = params.length / COLS;
     const rows: NewsRow[] = [];
     for (let i = 0; i < numRows; i++) {
@@ -186,8 +191,9 @@ const dispatch: SqlDispatcher = (query, params) => {
         topics_json: params[o + 7] as string[] | null,
         entities_json: params[o + 8] as string[] | null,
         routed_to_page_id: params[o + 9] as string | null,
-        routed_to_page_title: params[o + 10] as string | null,
-        routed_tier: params[o + 11] as string | null,
+        // params[o + 10] is routed_to_page_id_int (Phase 4a, not used in mock)
+        routed_to_page_title: params[o + 11] as string | null,
+        routed_tier: params[o + 12] as string | null,
         created_at: new Date(),
       };
       newsStore.push(row);

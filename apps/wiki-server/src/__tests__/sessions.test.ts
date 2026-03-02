@@ -115,6 +115,11 @@ vi.mock("../db.js", async () => {
       return [{ last_value: 0, is_called: false }];
     }
 
+    // ---- entity_ids: SELECT WHERE slug (for resolvePageIntIds) ----
+    if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
+      return []; // No entity_ids in test — page_id_int will be null
+    }
+
     // ---- TRUNCATE ----
     if (q.includes("truncate")) {
       sessionStore = [];
@@ -182,7 +187,7 @@ vi.mock("../db.js", async () => {
 
     // ---- INSERT INTO session_pages (supports multi-row) ----
     if (q.includes("insert into") && q.includes("session_pages")) {
-      const COLS = 2;
+      const COLS = 3; // Phase 4a: +1 for page_id_int
       const numRows = params.length / COLS;
       const rows = [];
       for (let i = 0; i < numRows; i++) {
@@ -190,6 +195,7 @@ vi.mock("../db.js", async () => {
         const row = {
           session_id: params[o] as number,
           page_id: params[o + 1] as string,
+          // params[o + 2] is page_id_int (Phase 4a, not used in mock)
         };
         sessionPageStore.push(row);
         rows.push(row);

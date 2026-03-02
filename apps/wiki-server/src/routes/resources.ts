@@ -28,6 +28,7 @@ import {
   UpsertResourceBatchSchema,
   type ResourceStatsResult,
 } from "../api-types.js";
+import { resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Raw SQL row types ----
 
@@ -189,9 +190,15 @@ async function upsertResource(
     await db
       .delete(resourceCitations)
       .where(eq(resourceCitations.resourceId, d.id));
+    // Phase 4a: resolve page slugs to integer IDs for dual-write
+    const citedByIntIdMap = await resolvePageIntIds(db, d.citedBy);
     await db
       .insert(resourceCitations)
-      .values(d.citedBy.map((pageId) => ({ resourceId: d.id, pageId })))
+      .values(d.citedBy.map((pageId) => ({
+        resourceId: d.id,
+        pageId,
+        pageIdInt: citedByIntIdMap.get(pageId) ?? null, // Phase 4a dual-write
+      })))
       .onConflictDoNothing();
   }
 

@@ -23,6 +23,7 @@ import {
 } from "../api-types.js";
 import { TRIGRAM_SIMILARITY_THRESHOLD } from "../search-utils.js";
 import { logger } from "../logger.js";
+import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
 
 /** Pre-computed schema for single page-reference insertion (omits claimId from URL param). */
 const PageRefInsertBodySchema = ClaimPageReferenceInsertSchema.omit({ claimId: true });
@@ -1680,11 +1681,15 @@ const claimsApp = new Hono()
     const claimRows = await db.select({ id: claims.id }).from(claims).where(eq(claims.id, id)).limit(1);
     if (claimRows.length === 0) return notFoundError(c, `Claim not found: ${id}`);
 
+    // Phase 4a: resolve page slug to integer ID for dual-write
+    const refPageIdInt = await resolvePageIntId(db, parsed.data.pageId);
+
     const rows = await db
       .insert(claimPageReferences)
       .values({
         claimId: id,
         pageId: parsed.data.pageId,
+        pageIdInt: refPageIdInt, // Phase 4a dual-write
         footnote: parsed.data.footnote ?? null,
         section: parsed.data.section ?? null,
         quoteText: parsed.data.quoteText ?? null,
@@ -1728,9 +1733,14 @@ const claimsApp = new Hono()
     const claimRows = await db.select({ id: claims.id }).from(claims).where(eq(claims.id, id)).limit(1);
     if (claimRows.length === 0) return notFoundError(c, `Claim not found: ${id}`);
 
+    // Phase 4a: resolve page slugs to integer IDs for dual-write
+    const batchRefPageIds = [...new Set(parsed.data.items.map((item) => item.pageId))];
+    const batchRefIntIdMap = await resolvePageIntIds(db, batchRefPageIds);
+
     const values = parsed.data.items.map((item) => ({
       claimId: id,
       pageId: item.pageId,
+      pageIdInt: batchRefIntIdMap.get(item.pageId) ?? null, // Phase 4a dual-write
       footnote: item.footnote ?? null,
       section: item.section ?? null,
     }));

@@ -59,6 +59,11 @@ const dispatch: SqlDispatcher = (query, params) => {
     return [{ last_value: 0, is_called: false }];
   }
 
+  // ---- entity_ids: SELECT WHERE slug (for resolvePageIntIds) ----
+  if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
+    return []; // No entity_ids in test — page_id_int will be null
+  }
+
   // ---- TRUNCATE ----
   if (q.includes("truncate")) {
     if (q.includes("auto_update_results")) {
@@ -105,7 +110,7 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO auto_update_results (supports multi-row) ----
   if (q.includes("insert into") && q.includes("auto_update_results")) {
-    const COLS = 6;
+    const COLS = 7; // Phase 4a: +1 for page_id_int
     const numRows = params.length / COLS;
     const rows = [];
     for (let i = 0; i < numRows; i++) {
@@ -114,10 +119,11 @@ const dispatch: SqlDispatcher = (query, params) => {
         id: nextResultId++,
         run_id: params[o] as number,
         page_id: params[o + 1] as string,
-        status: params[o + 2] as string,
-        tier: params[o + 3] as string | null,
-        duration_ms: params[o + 4] as number | null,
-        error_message: params[o + 5] as string | null,
+        // params[o + 2] is page_id_int (Phase 4a, not used in mock)
+        status: params[o + 3] as string,
+        tier: params[o + 4] as string | null,
+        duration_ms: params[o + 5] as number | null,
+        error_message: params[o + 6] as string | null,
       };
       resultStore.push(row);
       rows.push(row);

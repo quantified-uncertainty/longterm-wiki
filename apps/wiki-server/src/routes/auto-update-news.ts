@@ -13,6 +13,7 @@ import {
   AutoUpdateNewsItemSchema as SharedNewsItemSchema,
   AutoUpdateNewsBatchSchema,
 } from "../api-types.js";
+import { resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Constants ----
 
@@ -63,6 +64,14 @@ const autoUpdateNewsApp = new Hono()
     const { runId, items } = parsed.data;
     const db = getDrizzleDb();
 
+    // Phase 4a: resolve routed page slugs to integer IDs for dual-write
+    const routedPageIds = items
+      .map((d) => d.routedToPageId)
+      .filter((id): id is string => id != null);
+    const intIdMap = routedPageIds.length > 0
+      ? await resolvePageIntIds(db, routedPageIds)
+      : new Map<string, number>();
+
     const results = await db.transaction(async (tx) => {
       return await tx
         .insert(autoUpdateNewsItems)
@@ -78,6 +87,7 @@ const autoUpdateNewsApp = new Hono()
             topicsJson: d.topics.length > 0 ? d.topics : null,
             entitiesJson: d.entities.length > 0 ? d.entities : null,
             routedToPageId: d.routedToPageId ?? null,
+            routedToPageIdInt: d.routedToPageId ? (intIdMap.get(d.routedToPageId) ?? null) : null, // Phase 4a dual-write
             routedToPageTitle: d.routedToPageTitle ?? null,
             routedTier: d.routedTier ?? null,
           }))

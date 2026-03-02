@@ -5,6 +5,7 @@ import { getDrizzleDb } from "../db.js";
 import { autoUpdateRuns, autoUpdateResults } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, notFoundError, firstOrThrow, paginationQuery } from "./utils.js";
 import { logger } from "../logger.js";
+import { resolvePageIntIds } from "./page-id-helpers.js";
 
 // ---- Constants ----
 
@@ -157,10 +158,15 @@ const autoUpdateRunsApp = new Hono()
       let resultsInserted = 0;
 
       if (d.results && d.results.length > 0) {
+        // Phase 4a: resolve page slugs to integer IDs for dual-write
+        const resultPageIds = [...new Set(d.results.map((r) => r.pageId))];
+        const intIdMap = await resolvePageIntIds(tx, resultPageIds);
+
         await tx.insert(autoUpdateResults).values(
           d.results.map((r) => ({
             runId: run.id,
             pageId: r.pageId,
+            pageIdInt: intIdMap.get(r.pageId) ?? null, // Phase 4a dual-write
             status: r.status,
             tier: r.tier ?? null,
             durationMs: r.durationMs ?? null,

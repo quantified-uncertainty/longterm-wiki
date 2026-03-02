@@ -67,12 +67,17 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ last_value: 0, is_called: false }];
   }
 
+  // ---- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ----
+  if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
+    return []; // No entity_ids in test — page_id_int will be null
+  }
+
   // ---- INSERT INTO hallucination_risk_snapshots ----
   if (
     q.includes("insert into") &&
     q.includes("hallucination_risk_snapshots")
   ) {
-    const PARAMS_PER_ROW = 5; // pageId, score, level, factors, integrityIssues
+    const PARAMS_PER_ROW = 6; // Phase 4a: +1 for page_id_int
     const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
     const results: (typeof riskStore)[number][] = [];
 
@@ -81,10 +86,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const row = {
         id: nextId++,
         page_id: params[off] as string,
-        score: params[off + 1] as number,
-        level: params[off + 2] as string,
-        factors: params[off + 3] as string[] | null,
-        integrity_issues: params[off + 4] as string[] | null,
+        // params[off + 1] is page_id_int (Phase 4a, not used in mock)
+        score: params[off + 2] as number,
+        level: params[off + 3] as string,
+        factors: params[off + 4] as string[] | null,
+        integrity_issues: params[off + 5] as string[] | null,
         computed_at: new Date(),
       };
       riskStore.push(row);
