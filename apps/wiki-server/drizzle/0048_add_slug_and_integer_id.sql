@@ -46,25 +46,20 @@ WHERE ei.slug = wp.id;
 --> statement-breakpoint
 
 -- ============================================================
--- Step 4: Apply NOT NULL + UNIQUE constraints (online-safe)
+-- Step 4: Apply NOT NULL + UNIQUE constraints
 -- slug is NOT NULL (always equals id). integer_id is nullable in Phase 4a
 -- (will become NOT NULL in Phase 4b once all rows are guaranteed populated).
 --
--- Uses NOT VALID + VALIDATE CONSTRAINT for NOT NULL (avoids full table scan lock).
--- Uses CREATE UNIQUE INDEX CONCURRENTLY + USING INDEX for UNIQUE (avoids ACCESS EXCLUSIVE lock).
+-- NOTE: Drizzle's migrator runs all statements in a single transaction, so
+-- CONCURRENTLY is not possible. These tables are small (~700 rows), so
+-- brief locking during constraint/index creation is acceptable.
 -- ============================================================
 
-ALTER TABLE wiki_pages ADD CONSTRAINT wiki_pages_slug_not_null CHECK (slug IS NOT NULL) NOT VALID;
+ALTER TABLE wiki_pages ALTER COLUMN slug SET NOT NULL;
 --> statement-breakpoint
-ALTER TABLE wiki_pages VALIDATE CONSTRAINT wiki_pages_slug_not_null;
+ALTER TABLE wiki_pages ADD CONSTRAINT wiki_pages_slug_unique UNIQUE (slug);
 --> statement-breakpoint
-CREATE UNIQUE INDEX CONCURRENTLY wiki_pages_slug_unique ON wiki_pages (slug);
---> statement-breakpoint
-ALTER TABLE wiki_pages ADD CONSTRAINT wiki_pages_slug_unique UNIQUE USING INDEX wiki_pages_slug_unique;
---> statement-breakpoint
-CREATE UNIQUE INDEX CONCURRENTLY wiki_pages_integer_id_unique ON wiki_pages (integer_id);
---> statement-breakpoint
-ALTER TABLE wiki_pages ADD CONSTRAINT wiki_pages_integer_id_unique UNIQUE USING INDEX wiki_pages_integer_id_unique;
+ALTER TABLE wiki_pages ADD CONSTRAINT wiki_pages_integer_id_unique UNIQUE (integer_id);
 --> statement-breakpoint
 
 -- ============================================================
@@ -190,28 +185,28 @@ WHERE ei.slug = pl.target_id;
 -- (slug and integer_id already have implicit indexes from UNIQUE constraints)
 -- ============================================================
 
-CREATE INDEX CONCURRENTLY idx_cq_page_id_int ON citation_quotes (page_id_int);
+CREATE INDEX idx_cq_page_id_int ON citation_quotes (page_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_cas_page_id_int ON citation_accuracy_snapshots (page_id_int);
+CREATE INDEX idx_cas_page_id_int ON citation_accuracy_snapshots (page_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_el_page_id_int ON edit_logs (page_id_int);
+CREATE INDEX idx_el_page_id_int ON edit_logs (page_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_hrs_page_id_int ON hallucination_risk_snapshots (page_id_int);
+CREATE INDEX idx_hrs_page_id_int ON hallucination_risk_snapshots (page_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_sp_page_id_int ON session_pages (page_id_int);
+CREATE INDEX idx_sp_page_id_int ON session_pages (page_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_aures_page_id_int ON auto_update_results (page_id_int);
+CREATE INDEX idx_aures_page_id_int ON auto_update_results (page_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_cpr_page_id_int ON claim_page_references (page_id_int);
+CREATE INDEX idx_cpr_page_id_int ON claim_page_references (page_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_rc_page_id_int ON resource_citations (page_id_int);
+CREATE INDEX idx_rc_page_id_int ON resource_citations (page_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_auni_routed_page_int ON auto_update_news_items (routed_to_page_id_int);
+CREATE INDEX idx_auni_routed_page_int ON auto_update_news_items (routed_to_page_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_pir_page_id_int ON page_improve_runs (page_id_int);
+CREATE INDEX idx_pir_page_id_int ON page_improve_runs (page_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_pc_page_id_int ON page_citations (page_id_int);
+CREATE INDEX idx_pc_page_id_int ON page_citations (page_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_pl_source_id_int ON page_links (source_id_int);
+CREATE INDEX idx_pl_source_id_int ON page_links (source_id_int);
 --> statement-breakpoint
-CREATE INDEX CONCURRENTLY idx_pl_target_id_int ON page_links (target_id_int);
+CREATE INDEX idx_pl_target_id_int ON page_links (target_id_int);
