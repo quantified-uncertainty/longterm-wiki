@@ -354,19 +354,27 @@ async function prePushCheck(_args: string[], options: CommandOptions): Promise<C
   const finalStatus = parseChecklist(markdown);
   const pct = finalStatus.totalItems > 0 ? Math.round((finalStatus.totalChecked / finalStatus.totalItems) * 100) : 0;
 
-  if (pct < 10) {
-    output += `\n${c.red}✗ Checklist only ${pct}% complete. Run /agent-session-ready-PR before pushing.${c.reset}\n`;
-    output += `${c.dim}  To bypass: git push --no-verify${c.reset}\n\n`;
-    return { output, exitCode: 1 };
-  }
-
   const uncheckedBlocking = finalStatus.items.filter(i => {
     if (i.status !== 'unchecked') return false;
     const cat = CHECKLIST_ITEMS.find(ci => ci.id === i.id);
     return cat?.priority !== 'advisory';
   });
 
-  if (uncheckedBlocking.length > 0 && pct < 75) {
+  if (pct < 40) {
+    output += `\n${c.red}✗ Checklist only ${pct}% complete (minimum 40%). Run /agent-session-ready-PR before pushing.${c.reset}\n`;
+    output += `${c.dim}  To bypass: git push --no-verify${c.reset}\n\n`;
+    return { output, exitCode: 1 };
+  }
+
+  if (uncheckedBlocking.length > 5) {
+    output += `\n${c.red}✗ ${uncheckedBlocking.length} blocking items unchecked. Run /agent-session-ready-PR before pushing.${c.reset}\n`;
+    for (const item of uncheckedBlocking.slice(0, 5)) output += `  ${c.red}[ ]${c.reset} ${item.id}\n`;
+    if (uncheckedBlocking.length > 5) output += `  ${c.dim}... and ${uncheckedBlocking.length - 5} more${c.reset}\n`;
+    output += `${c.dim}  To bypass: git push --no-verify${c.reset}\n\n`;
+    return { output, exitCode: 1 };
+  }
+
+  if (uncheckedBlocking.length > 0 && pct < 60) {
     output += `\n${c.yellow}⚠️  ${uncheckedBlocking.length} blocking item(s) unchecked:${c.reset}\n`;
     for (const item of uncheckedBlocking.slice(0, 5)) output += `  ${c.red}[ ]${c.reset} ${item.id}\n`;
     output += `${c.yellow}   Did you run /agent-session-ready-PR?${c.reset}\n\n`;
