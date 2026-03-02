@@ -34,6 +34,25 @@ Without these, `crux` won't have `GITHUB_TOKEN` and the gate check will fail wit
 
 See `## Agent Session Workflow — MANDATORY` below and `.claude/rules/agent-session-workflow.md` for full details.
 
+### LSP support (recommended)
+
+Enable LSP in Claude Code for IDE-quality code navigation — go-to-definition, find-references, and type-aware search instead of grep. This makes a big difference in a TypeScript monorepo like this one.
+
+```bash
+# Install the TypeScript language server (once, globally)
+npm i -g typescript-language-server typescript
+```
+
+Then add `"enableLsp": true` to your **user** settings (`~/.claude/settings.json`):
+
+```json
+{
+  "enableLsp": true
+}
+```
+
+Restart Claude Code. Reference: [blog post](https://karanbansal.in/blog/claude-code-lsp/).
+
 At session end, run `/agent-session-ready-PR`. Always open a PR — never push directly to `main`.
 
 ## Quick Reference
