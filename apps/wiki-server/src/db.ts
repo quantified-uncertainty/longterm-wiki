@@ -37,7 +37,10 @@ export function getDb() {
       idle_timeout: 20,
       connect_timeout: 10,
       connection: {
-        statement_timeout: 30000, // Kill queries after 30s to prevent pool exhaustion
+        // Kill queries after 30s to prevent pool exhaustion.
+        // Note: use a non-zero number here. postgres.js filters out falsy values
+        // (including 0), so `statement_timeout: 0` would silently not be sent.
+        statement_timeout: 30000,
       },
     });
   }
@@ -63,10 +66,32 @@ export async function initDb() {
   logger.info("Running migrations...");
   const startMs = Date.now();
 
-  // Use a dedicated single-connection client for migrations — no statement_timeout.
-  // DDL (ALTER TABLE, CREATE INDEX) can be blocked by concurrent transactions and
-  // needs more than the 30s timeout configured on the main pool.
-  const migrationSql = postgres(url, { max: 1, connect_timeout: 10 });
+  // Dedicated single-connection client for migrations with relaxed timeouts.
+  //
+  // Why: DDL (ALTER TABLE) requires ACCESS EXCLUSIVE locks. During deploys, old
+  // pods hold connections with active queries, so lock acquisition can take 30s+.
+  // The PostgreSQL *role* also has statement_timeout=30s server-side, which applies
+  // regardless of JS client config — we must explicitly override it here.
+  //
+  // Gotcha: postgres.js filters falsy values (`.filter(([, v]) => v)` in
+  // connection.js:1004), so `statement_timeout: 0` (number) is silently dropped.
+  // We use string values and a Record<string, string> type to work around both
+  // the falsy-filtering and the TS types (which declare these as `number`).
+  //
+  // Settings:
+  //   statement_timeout: '0'       — No per-statement limit; DDL must complete once locked
+  //   lock_timeout: '120000'       — 2min cap on lock wait; fail fast, let pod retry
+  //   idle_in_transaction_session_timeout: '600000' — 10min bound on total migration txn
+  const migrationConnection: Record<string, string> = {
+    statement_timeout: '0',
+    lock_timeout: '120000',
+    idle_in_transaction_session_timeout: '600000',
+  };
+  const migrationSql = postgres(url, {
+    max: 1,
+    connect_timeout: 10,
+    connection: migrationConnection,
+  });
   const migrationDb = drizzle(migrationSql, { schema });
 
   try {
