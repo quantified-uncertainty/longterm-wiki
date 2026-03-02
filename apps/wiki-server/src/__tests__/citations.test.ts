@@ -105,16 +105,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: UPDATE ... accuracy_verdict ---
+  // Phase 4b: WHERE now uses page_id_int (params[5]) instead of page_id (text).
   if (q.startsWith("update") && q.includes("citation_quotes") && q.includes("accuracy_verdict")) {
     const verdict = params[0];
     const score = params[1];
     const issues = params[2];
     const supportingQuotes = params[3];
     const difficulty = params[4];
-    const pageId = params[5] as string;
+    const intId = params[5] as number;
     const footnote = params[6] as number;
-    const key = quoteKey(pageId, footnote);
-    const existing = quotesStore.get(key);
+    const existing = Array.from(quotesStore.values()).find(
+      (r) => r.page_id_int === intId && r.footnote === footnote
+    );
     if (!existing) return [];
     existing.accuracy_verdict = verdict;
     existing.accuracy_score = score;
@@ -127,15 +129,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: UPDATE ... quote_verified ---
+  // Phase 4b: WHERE now uses page_id_int (params[3]) instead of page_id (text).
   if (q.startsWith("update") && q.includes("citation_quotes") && q.includes("quote_verified")) {
+    const quoteVerified = params[0] as boolean;
     const method = params[1];
     const score = params[2];
-    const pageId = params[3] as string;
+    const intId = params[3] as number;
     const footnote = params[4] as number;
-    const key = quoteKey(pageId, footnote);
-    const existing = quotesStore.get(key);
+    const existing = Array.from(quotesStore.values()).find(
+      (r) => r.page_id_int === intId && r.footnote === footnote
+    );
     if (!existing) return [];
-    existing.quote_verified = true;
+    existing.quote_verified = quoteVerified;
     existing.verification_method = method;
     existing.verification_score = score;
     existing.verified_at = new Date();
@@ -155,15 +160,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       }));
   }
 
-  // --- citation_quotes: SELECT * ... WHERE ... ORDER BY footnote ---
+  // --- citation_quotes: SELECT * ... WHERE page_id_int ORDER BY footnote [LIMIT] ---
+  // Phase 4b: params[0] is intId (number), params[1] is limit (if present).
   if (q.includes("citation_quotes") && q.includes("where") && q.includes("order by") && !q.includes("group by")) {
-    const pageId = params[0] as string;
+    const intId = params[0] as number;
+    const limit = (params[1] as number) || 1000;
     return Array.from(quotesStore.values())
-      .filter((r) => r.page_id === pageId)
-      .sort((a, b) => (a.footnote as number) - (b.footnote as number));
+      .filter((r) => r.page_id_int === intId)
+      .sort((a, b) => (a.footnote as number) - (b.footnote as number))
+      .slice(0, limit);
   }
 
-  // --- citation_quotes: SELECT WHERE (no ORDER BY, no COUNT, no GROUP BY) ---
+  // --- citation_quotes: SELECT WHERE (no ORDER BY, no COUNT, no GROUP BY, no LIMIT) ---
   // Phase 4b: health endpoint queries by page_id_int (integer), params[0] is intId.
   if (q.includes("citation_quotes") && q.includes("where") && !q.includes("count(*)") && !q.includes("group by") && !q.includes("order by") && !q.includes("limit")) {
     if (params.length === 1) {
@@ -173,6 +181,17 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         .sort((a, b) => (a.footnote as number) - (b.footnote as number));
     }
     return [];
+  }
+
+  // --- citation_quotes: SELECT WHERE LIMIT (no ORDER BY) — GET /quotes/:pageId/:footnote ---
+  // Phase 4b: params[0]=intId, params[1]=footnote, params[2]=limit.
+  if (q.includes("citation_quotes") && q.includes("where") && q.includes("limit") && !q.includes("order by") && !q.includes("count(*)") && !q.includes("group by")) {
+    const intId = params[0] as number;
+    const footnote = params[1] as number;
+    const found = Array.from(quotesStore.values()).find(
+      (r) => r.page_id_int === intId && r.footnote === footnote
+    );
+    return found ? [found] : [];
   }
 
   // --- citation_quotes: SELECT * ORDER BY ... LIMIT (paginated all) ---
@@ -344,11 +363,14 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_accuracy_snapshots: SELECT with WHERE ---
+  // Phase 4b: params[0] is intId (number), params[1] is limit (if present).
   if (q.includes("citation_accuracy_snapshots") && q.includes("where") && !q.includes("group by")) {
-    const pageId = params[0] as string;
+    const intId = params[0] as number;
+    const limit = (params[1] as number) || 1000;
     return snapshotStore
-      .filter((r) => r.page_id === pageId)
-      .sort((a, b) => new Date(b.snapshot_at as string).getTime() - new Date(a.snapshot_at as string).getTime());
+      .filter((r) => r.page_id_int === intId)
+      .sort((a, b) => new Date(b.snapshot_at as string).getTime() - new Date(a.snapshot_at as string).getTime())
+      .slice(0, limit);
   }
 
   // --- citation_accuracy_snapshots: SELECT with GROUP BY (global trends) ---
