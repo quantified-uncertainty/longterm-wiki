@@ -9,6 +9,15 @@ on:
       - ".github/workflows/wiki-server-docker.yml"
       - ".github/workflows/database-backup.yml"
   workflow_dispatch:
+    inputs:
+      skip_smoke_test:
+        description: >
+          Skip the pre-deploy smoke test. Use for DDL migrations that require
+          ACCESS EXCLUSIVE locks — the smoke test runs against the production DB
+          while old pods hold connections, causing lock contention deadlocks.
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: wiki-server-docker-${{ github.ref }}
@@ -58,7 +67,9 @@ jobs:
   pre-deploy-smoke-test:
     name: Pre-deploy smoke test
     needs: build-and-push
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      github.ref == 'refs/heads/main'
+      && inputs.skip_smoke_test != true
     runs-on: ubuntu-latest
 
     steps:
@@ -144,10 +155,10 @@ jobs:
     if: >-
       github.ref == 'refs/heads/main'
       && !cancelled()
-      && needs.pre-deploy-smoke-test.result == 'success'
+      && (needs.pre-deploy-smoke-test.result == 'success' || needs.pre-deploy-smoke-test.result == 'skipped')
+    # Deploy proceeds if smoke test passed OR was skipped (DDL migration deploys).
     # Deploy proceeds even if backup fails (DATABASE_URL may not be configured yet).
-    # Once DATABASE_URL is added, backup failures will be visible but non-blocking.
-    # Pre-deploy smoke test failure explicitly blocks the deploy (checked in the `if` condition above).
+    # Pre-deploy smoke test failure explicitly blocks the deploy.
     runs-on: ubuntu-latest
 
     steps:
