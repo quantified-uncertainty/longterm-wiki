@@ -5,11 +5,23 @@ import { mockDbModule, postJson } from "./test-utils.js";
 // ---- In-memory stores ----
 
 let resourceStore: Map<string, Record<string, unknown>>;
-let citationStore: Array<{ resource_id: string; page_id: string; created_at: Date }>;
+let citationStore: Array<{ resource_id: string; page_id: string; page_id_int: number | null; created_at: Date }>;
+
+let nextSlugIntId = 1000;
+const slugIntIdMap = new Map<string, number>();
+
+function getIntIdForSlug(slug: string): number {
+  if (!slugIntIdMap.has(slug)) {
+    slugIntIdMap.set(slug, nextSlugIntId++);
+  }
+  return slugIntIdMap.get(slug)!;
+}
 
 function resetStores() {
   resourceStore = new Map();
   citationStore = [];
+  nextSlugIntId = 1000;
+  slugIntIdMap.clear();
 }
 
 function dispatch(query: string, params: unknown[]): unknown[] {
@@ -23,9 +35,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ last_value: 0, is_called: false }];
   }
 
-  // ---- entity_ids: SELECT WHERE slug (for resolvePageIntIds) ----
+  // ---- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ----
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
-    return []; // No entity_ids in test — page_id_int will be null
+    return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
   }
 
   // ---- ref-check: SELECT id FROM wiki_pages WHERE id IN (...) ----
@@ -89,13 +101,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // ---- INSERT INTO resource_citations (supports multi-row) ----
   if (q.includes("insert into") && q.includes("resource_citations")) {
-    const COLS = 3; // Phase 4a: +1 for page_id_int
+    const COLS = 3; // Phase 4a: resource_id, page_id, page_id_int
     const numRows = params.length / COLS;
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
       const resourceId = params[o] as string;
       const pageId = params[o + 1] as string;
-      // params[o + 2] is page_id_int (Phase 4a, not used in mock)
+      const pageIdInt = params[o + 2] as number | null;
       const exists = citationStore.some(
         (c) => c.resource_id === resourceId && c.page_id === pageId
       );
@@ -103,6 +115,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         citationStore.push({
           resource_id: resourceId,
           page_id: pageId,
+          page_id_int: pageIdInt,
           created_at: new Date(),
         });
       }
@@ -145,12 +158,12 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ count: resourceStore.size }];
   }
 
-  // ---- SELECT ... FROM resource_citations INNER JOIN resources (by-page) ----
+  // ---- SELECT ... FROM resource_citations INNER JOIN resources (by-page, Phase 4b) ----
   if (q.includes("resource_citations") && q.includes("inner join") && q.includes('"resources"')) {
-    const pageId = params[0] as string;
+    const intId = params[0] as number;
     const results: Record<string, unknown>[] = [];
     for (const c of citationStore) {
-      if (c.page_id === pageId) {
+      if (c.page_id_int === intId) {
         const r = resourceStore.get(c.resource_id);
         if (r) {
           results.push({

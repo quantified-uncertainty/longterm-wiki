@@ -45,6 +45,7 @@ type NewsRow = {
   topics_json: string[] | null;
   entities_json: string[] | null;
   routed_to_page_id: string | null;
+  routed_to_page_id_int: number | null;
   routed_to_page_title: string | null;
   routed_tier: string | null;
   created_at: Date;
@@ -53,11 +54,23 @@ type NewsRow = {
 let runStore: RunRow[];
 let newsStore: NewsRow[];
 
+let nextSlugIntId = 1000;
+const slugIntIdMap = new Map<string, number>();
+
+function getIntIdForSlug(slug: string): number {
+  if (!slugIntIdMap.has(slug)) {
+    slugIntIdMap.set(slug, nextSlugIntId++);
+  }
+  return slugIntIdMap.get(slug)!;
+}
+
 function resetStores() {
   runStore = [];
   newsStore = [];
   nextRunId = 1;
   nextNewsId = 1;
+  nextSlugIntId = 1000;
+  slugIntIdMap.clear();
 }
 
 function resetNewsStore() {
@@ -95,7 +108,7 @@ function makeRun(overrides: Partial<RunRow> = {}): RunRow {
 }
 
 function makeNews(runId: number, overrides: Partial<NewsRow> = {}): NewsRow {
-  return {
+  const base: NewsRow = {
     id: nextNewsId++,
     run_id: runId,
     title: "Test News Item",
@@ -107,11 +120,17 @@ function makeNews(runId: number, overrides: Partial<NewsRow> = {}): NewsRow {
     topics_json: null,
     entities_json: null,
     routed_to_page_id: null,
+    routed_to_page_id_int: null,
     routed_to_page_title: null,
     routed_tier: null,
     created_at: new Date(),
     ...overrides,
   };
+  // Auto-populate routed_to_page_id_int from routed_to_page_id if not explicitly set
+  if (base.routed_to_page_id && base.routed_to_page_id_int === null) {
+    base.routed_to_page_id_int = getIntIdForSlug(base.routed_to_page_id);
+  }
+  return base;
 }
 
 /**
@@ -151,9 +170,9 @@ const dispatch: SqlDispatcher = (query, params) => {
     return [{ last_value: 0, is_called: false }];
   }
 
-  // ---- entity_ids: SELECT WHERE slug (for resolvePageIntIds) ----
+  // ---- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ----
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
-    return []; // No entity_ids in test — routed_to_page_id_int will be null
+    return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
   }
 
   // ---- TRUNCATE ----
@@ -191,7 +210,7 @@ const dispatch: SqlDispatcher = (query, params) => {
         topics_json: params[o + 7] as string[] | null,
         entities_json: params[o + 8] as string[] | null,
         routed_to_page_id: params[o + 9] as string | null,
-        // params[o + 10] is routed_to_page_id_int (Phase 4a, not used in mock)
+        routed_to_page_id_int: params[o + 10] as number | null,
         routed_to_page_title: params[o + 11] as string | null,
         routed_tier: params[o + 12] as string | null,
         created_at: new Date(),
@@ -223,16 +242,16 @@ const dispatch: SqlDispatcher = (query, params) => {
   }
 
   // ---- SELECT FROM auto_update_news_items INNER JOIN auto_update_runs
-  //      WHERE routed_to_page_id = $1  (GET /by-page)  ----
+  //      WHERE routed_to_page_id_int = $1  (GET /by-page, Phase 4b)  ----
   // The WHERE clause distinguishes this from /recent, which has no WHERE.
   if (
     q.includes("auto_update_news_items") &&
     q.includes("inner join") &&
     q.includes("where")
   ) {
-    const pageId = params[0] as string;
+    const intId = params[0] as number;
     return newsStore
-      .filter((r) => r.routed_to_page_id === pageId)
+      .filter((r) => r.routed_to_page_id_int === intId)
       .map((r) => {
         const run = runStore.find((run) => run.id === r.run_id);
         return run ? joinNewsWithRun(r, run) : null;

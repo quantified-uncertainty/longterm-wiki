@@ -5,9 +5,12 @@ import { mockDbModule, postJson } from "./test-utils.js";
 // ---- In-memory store simulating the hallucination_risk_snapshots table ----
 
 let nextId = 1;
+let nextSlugIntId = 1000;
+const slugIntIdMap = new Map<string, number>();
 let riskStore: Array<{
   id: number;
   page_id: string;
+  page_id_int: number | null;
   score: number;
   level: string;
   factors: string[] | null;
@@ -21,9 +24,18 @@ let simulateMatView = false;
 /** Count how many times pg_matviews is actually queried (for caching tests). */
 let pgMatviewsQueryCount = 0;
 
+function getIntIdForSlug(slug: string): number {
+  if (!slugIntIdMap.has(slug)) {
+    slugIntIdMap.set(slug, nextSlugIntId++);
+  }
+  return slugIntIdMap.get(slug)!;
+}
+
 function resetStore() {
   riskStore = [];
   nextId = 1;
+  nextSlugIntId = 1000;
+  slugIntIdMap.clear();
   simulateMatView = false;
   pgMatviewsQueryCount = 0;
 }
@@ -69,7 +81,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // ---- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ----
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
-    return []; // No entity_ids in test — page_id_int will be null
+    return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
   }
 
   // ---- INSERT INTO hallucination_risk_snapshots ----
@@ -86,7 +98,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const row = {
         id: nextId++,
         page_id: params[off] as string,
-        // params[off + 1] is page_id_int (Phase 4a, not used in mock)
+        page_id_int: params[off + 1] as number | null,
         score: params[off + 2] as number,
         level: params[off + 3] as string,
         factors: params[off + 4] as string[] | null,
@@ -225,18 +237,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results.slice(offset, offset + limit);
   }
 
-  // ---- SELECT ... WHERE page_id = $1 ORDER BY computed_at DESC LIMIT ----
+  // ---- SELECT ... WHERE page_id_int = $1 ORDER BY computed_at DESC LIMIT (Phase 4b) ----
   if (
     q.includes("hallucination_risk_snapshots") &&
     q.includes("where") &&
-    q.includes("page_id") &&
+    q.includes("page_id_int") &&
     !q.includes("distinct on") &&
     !q.includes("not in")
   ) {
-    const pageId = params[0] as string;
+    const intId = params[0] as number;
     const limit = (params[1] as number) || 50;
     return riskStore
-      .filter((e) => e.page_id === pageId)
+      .filter((e) => e.page_id_int === intId)
       .sort((a, b) => b.computed_at.getTime() - a.computed_at.getTime())
       .slice(0, limit);
   }

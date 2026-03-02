@@ -25,12 +25,25 @@ let sessionStore: Array<{
 let sessionPageStore: Array<{
   session_id: number;
   page_id: string;
+  page_id_int: number | null;
 }> = [];
+
+let nextSlugIntId = 1000;
+const slugIntIdMap = new Map<string, number>();
+
+function getIntIdForSlug(slug: string): number {
+  if (!slugIntIdMap.has(slug)) {
+    slugIntIdMap.set(slug, nextSlugIntId++);
+  }
+  return slugIntIdMap.get(slug)!;
+}
 
 function resetStore() {
   sessionStore = [];
   sessionPageStore = [];
   nextSessionId = 1;
+  nextSlugIntId = 1000;
+  slugIntIdMap.clear();
 }
 
 // ---- Shared extractColumns / createQueryResult (inline to avoid hoisting issues) ----
@@ -115,9 +128,9 @@ vi.mock("../db.js", async () => {
       return [{ last_value: 0, is_called: false }];
     }
 
-    // ---- entity_ids: SELECT WHERE slug (for resolvePageIntIds) ----
+    // ---- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ----
     if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
-      return []; // No entity_ids in test — page_id_int will be null
+      return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
     }
 
     // ---- TRUNCATE ----
@@ -187,7 +200,7 @@ vi.mock("../db.js", async () => {
 
     // ---- INSERT INTO session_pages (supports multi-row) ----
     if (q.includes("insert into") && q.includes("session_pages")) {
-      const COLS = 3; // Phase 4a: +1 for page_id_int
+      const COLS = 3; // Phase 4a: session_id, page_id, page_id_int
       const numRows = params.length / COLS;
       const rows = [];
       for (let i = 0; i < numRows; i++) {
@@ -195,7 +208,7 @@ vi.mock("../db.js", async () => {
         const row = {
           session_id: params[o] as number,
           page_id: params[o + 1] as string,
-          // params[o + 2] is page_id_int (Phase 4a, not used in mock)
+          page_id_int: params[o + 2] as number | null,
         };
         sessionPageStore.push(row);
         rows.push(row);
@@ -257,10 +270,10 @@ vi.mock("../db.js", async () => {
       return sessionPageStore.filter((r) => ids.includes(r.session_id));
     }
 
-    // ---- SELECT FROM session_pages WHERE page_id = $1 ----
-    if (q.includes("session_pages") && q.includes("where") && q.includes("page_id") && !q.includes("any(") && !q.includes(" in (")) {
-      const pageId = params[0] as string;
-      return sessionPageStore.filter((r) => r.page_id === pageId);
+    // ---- SELECT FROM session_pages WHERE page_id_int = $1 (Phase 4b) ----
+    if (q.includes("session_pages") && q.includes("where") && q.includes("page_id_int") && !q.includes("any(") && !q.includes(" in (")) {
+      const intId = params[0] as number;
+      return sessionPageStore.filter((r) => r.page_id_int === intId);
     }
 
     // ---- SELECT FROM sessions WHERE id IN ($1, $2, ...) ORDER BY ... ----

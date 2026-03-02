@@ -1,12 +1,13 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { getDb, type SqlQuery } from "../db.js";
+import { getDb, getDrizzleDb, type SqlQuery } from "../db.js";
 import {
   parseJsonBody,
   validationError,
   invalidJsonError,
 } from "./utils.js";
 import { SyncLinksBatchSchema } from "../api-types.js";
+import { resolvePageIntId } from "./page-id-helpers.js";
 
 // ---- Constants ----
 
@@ -181,6 +182,13 @@ const linksApp = new Hono()
     const { limit } = parsed.data;
     const rawDb = getDb();
 
+    // Phase 4b: resolve slug to integer and query by target_id_int
+    const db = getDrizzleDb();
+    const targetIntId = await resolvePageIntId(db, targetId);
+    if (targetIntId === null) {
+      return c.json({ targetId, backlinks: [], total: 0 });
+    }
+
     // Find all pages/entities that link TO this target.
     // Join with wiki_pages to get title and entity_type for the source.
     // Deduplicate by source_id (a source may link via multiple link_types),
@@ -196,7 +204,7 @@ const linksApp = new Hono()
         wp.entity_type AS source_type
       FROM page_links pl
       LEFT JOIN wiki_pages wp ON wp.id = pl.source_id
-      WHERE pl.target_id = ${targetId}
+      WHERE pl.target_id_int = ${targetIntId}
       ORDER BY pl.source_id, pl.weight DESC
     ) sub
     ORDER BY sub.weight DESC
@@ -231,6 +239,13 @@ const linksApp = new Hono()
     const { limit } = parsed.data;
     const rawDb = getDb();
 
+    // Phase 4b: resolve slug to integer and query by source_id_int / target_id_int
+    const db = getDrizzleDb();
+    const entityIntId = await resolvePageIntId(db, entityId);
+    if (entityIntId === null) {
+      return c.json({ entityId, related: [], total: 0 });
+    }
+
     // Compute related pages by aggregating all link signals bidirectionally.
     // For each neighbor, sum the weights of all link types connecting them.
     // Apply quality boost: 1 + quality/40 + reader_importance/400 (max ~1.45x).
@@ -240,12 +255,12 @@ const linksApp = new Hono()
       -- Forward links: entityId is source (is_reverse = false)
       SELECT target_id AS neighbor_id, link_type, relationship, weight, false AS is_reverse
       FROM page_links
-      WHERE source_id = ${entityId}
+      WHERE source_id_int = ${entityIntId}
       UNION ALL
       -- Reverse links: entityId is target (is_reverse = true)
       SELECT source_id AS neighbor_id, link_type, relationship, weight, true AS is_reverse
       FROM page_links
-      WHERE target_id = ${entityId}
+      WHERE target_id_int = ${entityIntId}
     ),
     aggregated AS (
       SELECT
@@ -319,6 +334,13 @@ const linksApp = new Hono()
     const rawDb = getDb();
     const MAX_GRAPH_EDGES = 500;
 
+    // Phase 4b: resolve slug to integer and query by source_id_int / target_id_int
+    const graphDb = getDrizzleDb();
+    const graphEntityIntId = await resolvePageIntId(graphDb, entityId);
+    if (graphEntityIntId === null) {
+      return c.json({ entityId, nodes: [], edges: [] });
+    }
+
     // Get all direct links (both directions) for the entity.
     // This provides the raw graph data for visualization.
     const results = await rawDb<GraphEdgeDbRow[]>`
@@ -335,7 +357,7 @@ const linksApp = new Hono()
     FROM page_links pl
     LEFT JOIN wiki_pages ws ON ws.id = pl.source_id
     LEFT JOIN wiki_pages wt ON wt.id = pl.target_id
-    WHERE pl.source_id = ${entityId} OR pl.target_id = ${entityId}
+    WHERE pl.source_id_int = ${graphEntityIntId} OR pl.target_id_int = ${graphEntityIntId}
     ORDER BY pl.weight DESC
     LIMIT ${MAX_GRAPH_EDGES}
   `;
