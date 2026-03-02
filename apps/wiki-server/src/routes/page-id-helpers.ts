@@ -101,5 +101,13 @@ export async function allocateAndResolvePageIntIds(
     }
   }
 
+  // Fail-fast if any slugs remain unresolved after allocation + re-fetch.
+  const unresolved = uniqueSlugs.filter((s) => !existing.has(s));
+  if (unresolved.length > 0) {
+    throw new Error(
+      `Failed to resolve integer IDs for ${unresolved.length} slug(s): ${unresolved.slice(0, 5).join(", ")}`
+    );
+  }
+
   return existing;
 }

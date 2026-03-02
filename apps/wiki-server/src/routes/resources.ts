@@ -291,12 +291,12 @@ const resourcesApp = new Hono()
         // Phase 4a: pre-resolve all citedBy page IDs in one batch query
         const allCitedByIds = [...new Set(items.flatMap((item) => item.citedBy ?? []))];
         const intIdMap = allCitedByIds.length > 0
-          ? await resolvePageIntIds(tx as unknown as DbClient, allCitedByIds)
+          ? await resolvePageIntIds(tx, allCitedByIds)
           : new Map<string, number>();
 
         for (const item of items) {
           // Skip per-row search_vector update; handled in bulk below
-          const result = await upsertResource(tx as unknown as DbClient, item, {
+          const result = await upsertResource(tx, item, {
             skipSearchVector: true,
             intIdMap,
           });

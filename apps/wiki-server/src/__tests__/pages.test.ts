@@ -25,23 +25,42 @@ function simpleTextMatch(row: Record<string, unknown>, query: string): boolean {
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
-  // --- entity_ids: INSERT (auto-allocation from page-id-helpers) ---
+  // --- entity_ids: INSERT (auto-allocation from page-id-helpers, supports bulk) ---
   if (q.includes("insert into") && q.includes("entity_ids")) {
-    // allocateAndResolvePageIntIds inserts new entity_ids; simulate with auto-increment
-    const slug = params[0] as string;
-    // Check if already exists
-    for (const [numId, entry] of entityIdsStore.entries()) {
-      if (entry.slug === slug) {
-        return [{ numeric_id: numId, slug: entry.slug }];
+    const rows: Array<{ numeric_id: number; slug: string }> = [];
+    for (const p of params) {
+      const slug = p as string;
+      // Check if already exists (ON CONFLICT DO NOTHING)
+      let found = false;
+      for (const [numId, entry] of entityIdsStore.entries()) {
+        if (entry.slug === slug) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        const newId = entityIdsStore.size + 1;
+        entityIdsStore.set(newId, { slug, description: null, created_at: new Date() });
+        rows.push({ numeric_id: newId, slug });
       }
     }
-    const newId = entityIdsStore.size + 1;
-    entityIdsStore.set(newId, { slug, description: null, created_at: new Date() });
-    return [{ numeric_id: newId, slug }];
+    return rows;
+  }
+
+  // --- entity_ids: SELECT slug WHERE numeric_id = ? (resolve E-id → slug) ---
+  // Must check for "numeric_id" in the WHERE clause specifically (not just SELECT list).
+  // Drizzle generates: WHERE "entity_ids"."numeric_id" = $1
+  if (q.includes("entity_ids") && q.includes("where") && q.includes('"numeric_id" =') && !q.includes("insert into")) {
+    const numericId = params[0] as number;
+    const entry = entityIdsStore.get(numericId);
+    if (entry) {
+      return [{ slug: entry.slug }];
+    }
+    return [];
   }
 
   // --- entity_ids: SELECT WHERE slug IN (...) (batch resolve from page-id-helpers) ---
-  if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)") && !q.includes("numeric_id")) {
+  if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)") && !q.includes("insert into")) {
     const results: Record<string, unknown>[] = [];
     for (const [numId, entry] of entityIdsStore.entries()) {
       if (params.includes(entry.slug)) {

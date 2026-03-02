@@ -31,6 +31,17 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
+  // --- entity_ids: SELECT single slug (for resolvePageIntId with LIMIT) ---
+  // Must come before the batch matcher below, since LIMIT queries also contain "where" and "slug".
+  if (q.includes('"entity_ids"') && q.includes("limit")) {
+    const slug = params[0] as string;
+    const numericId = entityIdsStore.get(slug);
+    if (numericId !== undefined) {
+      return [{ numeric_id: numericId }];
+    }
+    return [];
+  }
+
   // --- entity_ids: SELECT WHERE slug IN (...) ---
   if (q.includes('"entity_ids"') && q.includes("where") && q.includes('"slug"')) {
     const results: Array<{ slug: string; numeric_id: number }> = [];
@@ -42,16 +53,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       }
     }
     return results;
-  }
-
-  // --- entity_ids: SELECT single slug (for resolvePageIntId with LIMIT) ---
-  if (q.includes('"entity_ids"') && q.includes("limit")) {
-    const slug = params[0] as string;
-    const numericId = entityIdsStore.get(slug);
-    if (numericId !== undefined) {
-      return [{ numeric_id: numericId }];
-    }
-    return [];
   }
 
   return [];
