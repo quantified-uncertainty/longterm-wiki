@@ -15,8 +15,6 @@ export interface Config {
   circuitBreakerCooldownMs: number;
   tasks: {
     healthCheck: TaskConfig;
-    resolveConflicts: TaskConfig;
-    codeReview: TaskConfig;
     issueResponder: TaskConfig;
   };
 }
@@ -61,15 +59,6 @@ export function loadConfig(): Config {
       healthCheck: {
         enabled: envBool("TASK_HEALTH_CHECK_ENABLED", true),
         schedule: process.env["TASK_HEALTH_CHECK_SCHEDULE"] ?? "*/5 * * * *",
-      },
-      resolveConflicts: {
-        enabled: envBool("TASK_RESOLVE_CONFLICTS_ENABLED", false),
-        schedule:
-          process.env["TASK_RESOLVE_CONFLICTS_SCHEDULE"] ?? "0 */2 * * *",
-      },
-      codeReview: {
-        enabled: envBool("TASK_CODE_REVIEW_ENABLED", false),
-        schedule: process.env["TASK_CODE_REVIEW_SCHEDULE"] ?? "0 9 * * 1",
       },
       issueResponder: {
         enabled: envBool("TASK_ISSUE_RESPONDER_ENABLED", false),

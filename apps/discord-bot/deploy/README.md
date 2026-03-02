@@ -15,7 +15,18 @@ which:
 4. Waits for the rollout to go healthy
 
 The bot reads wiki content from the wiki-server API at runtime (not baked into
-the image), so wiki content updates do not trigger Docker rebuilds.
+the image), so wiki content updates do not trigger Docker rebuilds. The `/ask`
+command also has a baked-in copy of `content/docs/` and `data/` for file-based
+research via Claude Code — this snapshot updates on each image rebuild.
+
+## Features
+
+| Feature | Trigger | Auth | Description |
+|---------|---------|------|-------------|
+| Wiki Q&A | @mention | `ANTHROPIC_API_KEY` | Fast wiki search via API tools |
+| Deep research | `/ask` command | `CLAUDE_CODE_OAUTH_TOKEN` | Claude Code with file + API tools |
+
+Both features are independently optional — the bot needs at least one auth key.
 
 ## First-time setup (ops repo)
 
@@ -40,10 +51,12 @@ image:
 
 env:
   DISCORD_TOKEN: ""                    # injected from k8s secret
-  ANTHROPIC_API_KEY: ""                # injected from k8s secret
+  ANTHROPIC_API_KEY: ""                # injected from k8s secret (optional if using OAuth)
+  CLAUDE_CODE_OAUTH_TOKEN: ""          # injected from k8s secret (enables /ask command)
   LONGTERMWIKI_SERVER_URL: ""          # injected from k8s secret
   LONGTERMWIKI_SERVER_API_KEY: ""      # injected from k8s secret
   WIKI_BASE_URL: "https://www.longtermwiki.com"
+  # WIKI_REPO_PATH is set in Dockerfile to /wiki-content
 ```
 
 ### `templates/deployment.yaml` (sketch)
@@ -94,7 +107,19 @@ Create a secret `longterm-wiki-discord-bot-secrets` in the bot's namespace:
 kubectl create secret generic longterm-wiki-discord-bot-secrets \
   --from-literal=DISCORD_TOKEN=<token> \
   --from-literal=ANTHROPIC_API_KEY=<key> \
+  --from-literal=CLAUDE_CODE_OAUTH_TOKEN=<oauth-token> \
   --from-literal=LONGTERMWIKI_SERVER_URL=<wiki-server-url> \
   --from-literal=LONGTERMWIKI_SERVER_API_KEY=<api-key> \
   -n <namespace>
 ```
+
+### Setting up the OAuth token
+
+The `/ask` command requires a Claude Max subscription OAuth token:
+
+1. SSH into the server with port forwarding: `ssh -L 8080:localhost:8080 server`
+2. Run `claude setup-token` on the server (opens browser for authentication)
+3. Copy the generated token (`sk-ant-oat01-...`)
+4. Add it to the K8s secret as `CLAUDE_CODE_OAUTH_TOKEN`
+
+The token lasts ~1 year. If queries start failing with auth errors, refresh it.

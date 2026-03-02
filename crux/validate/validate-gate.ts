@@ -201,6 +201,7 @@ const UNIFIED_BLOCKING_RULES = [
   'pipeline-artifacts',
   'prefer-entitylink',
   'resource-ref-integrity',
+  'url-safety',
 ];
 
 // Phase 3: Independent checks — run in parallel after build-data completes.
@@ -298,15 +299,20 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
   },
   {
+    id: 'component-refs',
+    name: 'Component reference validation',
+    command: 'pnpm',
+    args: ['crux', 'validate', 'refs'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'review-marker',
-    name: 'PR review status (advisory)',
+    name: 'PR review status',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-review-marker.ts'],
     cwd: PROJECT_ROOT,
-    // Advisory for now: warns when a large PR (>5 files or >300 lines)
-    // has not been reviewed via /review-pr. Does not block the gate.
-    // To make blocking: remove `advisory: true`.
-    advisory: true,
+    // Blocking: large PRs (>5 files or >300 lines) must be reviewed via
+    // /review-pr. The check passes immediately for small PRs.
   },
   {
     id: 'typecheck-crux-baseline',
