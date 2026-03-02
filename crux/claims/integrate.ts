@@ -35,7 +35,7 @@ import type { ClaimPageReferenceInsert } from '../../apps/wiki-server/src/api-ty
 /** Generate a short, stable reference ID (cr- or rc- prefix) from a hash of the input data. */
 function generateReferenceId(prefix: 'cr' | 'rc', data: string, existingIds: Set<string>): string {
   const hash = createHash('sha256').update(data).digest('hex');
-  for (let offset = 0; offset < hash.length - 4; offset++) {
+  for (let offset = 0; offset <= hash.length - 4; offset++) {
     const candidate = `${prefix}-${hash.slice(offset, offset + 4)}`;
     if (!existingIds.has(candidate)) {
       existingIds.add(candidate);

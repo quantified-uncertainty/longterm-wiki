@@ -148,7 +148,8 @@ Options:
   --model=M             LLM model override (default: google/gemini-2.0-flash-001)
   --steps=S             Comma-separated steps to run: extract,link,verify (pipeline only)
   --json                JSON output (status, synthesize)
-  --entity=E            Target entity filter (ingest-resource, from-resource)
+  --entity=E            Target entity filter (ingest-resource, from-resource, cleanup)
+  --entity-id=E         Filter to single entity (fix commands)
   --limit=N             Max resources/URLs to process
   --force               Re-ingest already-processed resources; clear existing claims (ingest-resource)
   --batch=<file>        Process URLs from a file, one per line (from-resource)
@@ -157,8 +158,6 @@ Options:
   --no-gate             Disable quality gate (extract: skip auto-fix and rejection checks)
   --strict              Strict mode (extract: reject claims that fail basic validation)
   --skip-extract        Skip claim extraction step (integrate: assumes claims already exist)
-  --entity=E            Target entity filter (ingest-resource, from-resource, cleanup)
-  --entity-id=E         Filter to single entity (fix commands)
   --unpin               Unpin a claim (pin command)
   --list=<entity-id>    List pinned claims for an entity (pin command)
   --per-page            Include per-page breakdown (coverage-audit)
