@@ -118,6 +118,32 @@ export async function initDb() {
   }
 }
 
+/**
+ * Verify that columns created by manual migration scripts actually exist.
+ * Migrations 0048/0049 are no-ops (SELECT 1) because ALTER TABLE deadlocks
+ * during rolling deploys. The actual DDL must be applied via psql. This check
+ * catches the case where someone sets up a fresh environment and forgets to
+ * run the manual script.
+ */
+export async function verifySchema() {
+  const db = getDb();
+  interface ColumnRow { column_name: string }
+  const result = await db<ColumnRow[]>`
+    SELECT column_name FROM information_schema.columns
+    WHERE table_name = 'wiki_pages' AND column_name IN ('slug', 'integer_id')
+    ORDER BY column_name
+  `;
+  const columns = result.map((r) => r.column_name);
+  if (!columns.includes('slug') || !columns.includes('integer_id')) {
+    const missing = ['slug', 'integer_id'].filter(c => !columns.includes(c));
+    throw new Error(
+      `Missing columns in wiki_pages: ${missing.join(', ')}. ` +
+      `Migrations 0048/0049 are no-ops — run the manual migration:\n` +
+      `  psql "$DATABASE_URL" -f apps/wiki-server/scripts/phase4a-manual-migration.sql`
+    );
+  }
+}
+
 export async function closeDb() {
   if (sql) {
     await sql.end();

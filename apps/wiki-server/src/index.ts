@@ -1,6 +1,6 @@
 import { serve } from "@hono/node-server";
 import { createApp } from "./app.js";
-import { initDb, closeDb } from "./db.js";
+import { initDb, closeDb, verifySchema } from "./db.js";
 import { logger } from "./logger.js";
 
 const PORT = parseInt(process.env.PORT || "3100", 10);
@@ -12,6 +12,11 @@ async function main() {
     logger.info("Initializing database...");
     await initDb();
   }
+
+  // Verify required columns exist. Migrations 0048/0049 are no-ops due to
+  // ACCESS EXCLUSIVE lock issues — the actual DDL must be applied via psql.
+  // This catches fresh environments where the manual migration wasn't run.
+  await verifySchema();
 
   const app = createApp();
 
