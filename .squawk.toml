@@ -20,10 +20,22 @@ pg_version = "16"
 #   some DDL (e.g. CREATE TABLE). False positives on generated files. The Drizzle journal
 #   integrity check (validate-drizzle-journal.ts) provides the equivalent safety guarantee
 #   by ensuring migrations only run once.
+#
+# require-concurrent-index-creation, disallowed-unique-constraint, constraint-missing-not-valid,
+# adding-not-nullable-field:
+#   Drizzle's migrator runs ALL statements in a single transaction (see pg-core/dialect.js
+#   line 60). CREATE INDEX CONCURRENTLY cannot run inside a transaction, so these online-safe
+#   patterns are impossible with Drizzle. Tables are small (~700 rows) so brief locking is
+#   acceptable. If large-table migrations are needed in the future, use a separate raw SQL
+#   runner outside Drizzle.
 excluded_rules = [
   "prefer-bigint-over-int",
   "prefer-identity",
   "prefer-text-field",
   "require-timeout-settings",
   "prefer-robust-stmts",
+  "require-concurrent-index-creation",
+  "disallowed-unique-constraint",
+  "constraint-missing-not-valid",
+  "adding-not-nullable-field",
 ]
