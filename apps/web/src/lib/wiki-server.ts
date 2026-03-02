@@ -77,24 +77,17 @@ export async function fetchFromWikiServer<T>(
 
 /**
  * Returns the wiki-server URL and auth headers.
- * Useful for dashboards that need custom fetch logic (e.g. pagination).
+ * Used by internal dashboards and claims pages that need live data.
  * Returns null if the server URL is not configured.
+ *
+ * Content pages (wiki articles) always read from local database.json
+ * and never call this function. Only dashboards and claims pages
+ * make runtime API calls.
  */
-/**
- * When WIKI_DATA_MODE=local, all API calls are skipped and data is read
- * from local database.json instead. This eliminates runtime wiki-server
- * requests from content pages, avoiding rate-limit pressure.
- */
-export function isLocalDataMode(): boolean {
-  return process.env.WIKI_DATA_MODE === "local";
-}
-
 export function getWikiServerConfig(): {
   serverUrl: string;
   headers: Record<string, string>;
 } | null {
-  if (isLocalDataMode()) return null;
-
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
   if (!serverUrl) return null;
 
