@@ -1,8 +1,6 @@
-import { fetchFromWikiServer, isLocalDataMode } from "./wiki-server";
+import { fetchFromWikiServer } from "./wiki-server";
 import { getLocalCitationQuotes } from "@/data";
 import type {
-  CitationHealthResult,
-  ClaimsByPageResult,
   ClaimsBySourceUrlResult,
 } from "@wiki-server/api-response-types";
 import type {
@@ -22,8 +20,6 @@ const ACCURACY_VERDICTS: readonly string[] = [
   "not_verifiable",
 ];
 
-// Re-export the server type for consumers
-export type { CitationHealthResult } from "@wiki-server/api-response-types";
 
 /**
  * Citation quote data from the wiki-server API.
@@ -76,55 +72,18 @@ function toAccuracyVerdict(value: string | null): AccuracyVerdict | null {
 }
 
 /**
- * Fetch citation verification data for a specific page.
+ * Get citation verification data for a specific page.
  *
- * In local data mode (WIKI_DATA_MODE=local), reads from the build-time
- * citation bundle in database.json — zero API calls. Otherwise fetches
- * from the claims system via /api/claims/by-page.
+ * Content pages always read from the build-time citation bundle in
+ * database.json — zero runtime API calls. This avoids rate-limit
+ * pressure on the wiki-server.
  *
  * Returns an empty array if no data is available.
  */
-export async function getCitationQuotes(
+export function getCitationQuotes(
   pageId: string
-): Promise<CitationQuote[]> {
-  // Local-first: use build-time bundle if available and in local mode,
-  // or if the server URL is not configured.
-  if (isLocalDataMode()) {
-    return getLocalCitationQuotesForPage(pageId);
-  }
-
-  const result = await fetchFromWikiServer<ClaimsByPageResult>(
-    `/api/claims/by-page?page_id=${encodeURIComponent(pageId)}`,
-    { revalidate: 600 }
-  );
-
-  if (!result?.quotes) {
-    // API unavailable — fall back to local bundle
-    return getLocalCitationQuotesForPage(pageId);
-  }
-
-  // Only include quotes that have some verification data worth showing.
-  // Map server rows to CitationQuote, narrowing accuracyVerdict from string to the union type.
-  return result.quotes
-    .filter((q) => q.quoteVerified || q.accuracyVerdict !== null)
-    .map((q): CitationQuote => ({
-      footnote: q.footnote,
-      url: q.url,
-      resourceId: q.resourceId,
-      claimText: q.claimText,
-      sourceQuote: q.sourceQuote,
-      sourceTitle: q.sourceTitle,
-      sourceType: q.sourceType,
-      quoteVerified: q.quoteVerified,
-      verificationScore: q.verificationScore,
-      verifiedAt: q.verifiedAt,
-      accuracyVerdict: toAccuracyVerdict(q.accuracyVerdict),
-      accuracyScore: q.accuracyScore,
-      accuracyIssues: q.accuracyIssues,
-      accuracySupportingQuotes: q.accuracySupportingQuotes,
-      verificationDifficulty: q.verificationDifficulty,
-      accuracyCheckedAt: q.accuracyCheckedAt,
-    }));
+): CitationQuote[] {
+  return getLocalCitationQuotesForPage(pageId);
 }
 
 /**

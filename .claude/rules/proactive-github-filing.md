@@ -23,11 +23,16 @@ File a GitHub issue when you encounter any of the following during normal work:
 - Vague observations without actionable next steps — "the site should be faster" or "the codebase could be cleaner" are not issues
 - Duplicates of existing issues (check first — see below)
 - Your own work-in-progress — don't file an issue for something you're about to do in this session
+- Hypothetical problems you have not observed — "this might fail if..." without evidence that it actually fails
+- Performance concerns without measurements — "this could be slow" without profiling data or benchmarks
+- Follow-up issues for work you are about to ship — if the PR needs a follow-up to be functional, the PR is incomplete
 
 **Bad issue examples** (do NOT file these):
 - "Code quality could be improved" — too vague, no specific location or fix
 - "Consider adding more tests" — every codebase could have more tests; be specific about what's untested and why it matters
 - "Documentation is incomplete" — which documentation, for what, and what's missing?
+- "This might cause race conditions under high load" — speculation without observed evidence
+- "Part 2: finish implementing X" — if X doesn't work without Part 2, don't ship Part 1 separately
 
 ## Before Filing: Always Search First
 

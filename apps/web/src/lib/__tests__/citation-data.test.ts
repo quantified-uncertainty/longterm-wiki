@@ -126,15 +126,13 @@ describe("computeCitationHealth", () => {
   });
 });
 
-/** Shared mock setup for getCitationQuotes tests */
+/** Shared mock setup for getCitationQuotes and getCitationQuotesByUrl tests */
 function mockCitationDeps(overrides: {
   fetchFromWikiServer?: ReturnType<typeof vi.fn>;
-  isLocalDataMode?: () => boolean;
   getLocalCitationQuotes?: () => unknown;
 }) {
   vi.doMock("../wiki-server", () => ({
     fetchFromWikiServer: overrides.fetchFromWikiServer ?? vi.fn().mockResolvedValue(null),
-    isLocalDataMode: overrides.isLocalDataMode ?? (() => false),
   }));
   vi.doMock("@/data", () => ({
     getLocalCitationQuotes: overrides.getLocalCitationQuotes ?? (() => undefined),
@@ -142,50 +140,30 @@ function mockCitationDeps(overrides: {
 }
 
 describe("getCitationQuotes", () => {
-  it("returns empty array when server returns null", async () => {
+  it("returns empty array when no local data exists", async () => {
     vi.resetModules();
-    mockCitationDeps({ fetchFromWikiServer: vi.fn().mockResolvedValue(null) });
+    mockCitationDeps({});
     const mod = await import("../citation-data");
-    const result = await mod.getCitationQuotes("test-page");
-    expect(result).toEqual([]);
-  });
-
-  it("returns empty array when quotes field is missing", async () => {
-    vi.resetModules();
-    mockCitationDeps({ fetchFromWikiServer: vi.fn().mockResolvedValue({}) });
-    const mod = await import("../citation-data");
-    const result = await mod.getCitationQuotes("test-page");
+    const result = mod.getCitationQuotes("test-page");
     expect(result).toEqual([]);
   });
 
   it("filters out quotes without verification data", async () => {
     vi.resetModules();
-    const mockQuotes = [
+    const localQuotes = [
       makeQuote({ footnote: 1, quoteVerified: true }), // has verification
       makeQuote({ footnote: 2 }), // no verification data — should be filtered
       makeQuote({ footnote: 3, accuracyVerdict: "accurate" }), // has accuracy
     ];
-    mockCitationDeps({ fetchFromWikiServer: vi.fn().mockResolvedValue({ quotes: mockQuotes }) });
+    mockCitationDeps({ getLocalCitationQuotes: () => localQuotes });
     const mod = await import("../citation-data");
-    const result = await mod.getCitationQuotes("test-page");
+    const result = mod.getCitationQuotes("test-page");
     expect(result).toHaveLength(2);
     expect(result[0].footnote).toBe(1);
     expect(result[1].footnote).toBe(3);
   });
 
-  it("calls the claims by-page endpoint (not deprecated citations/quotes)", async () => {
-    vi.resetModules();
-    const mockFetch = vi.fn().mockResolvedValue({ quotes: [] });
-    mockCitationDeps({ fetchFromWikiServer: mockFetch });
-    const mod = await import("../citation-data");
-    await mod.getCitationQuotes("test-page");
-    expect(mockFetch).toHaveBeenCalledWith(
-      "/api/claims/by-page?page_id=test-page",
-      { revalidate: 600 }
-    );
-  });
-
-  it("uses local data in local mode", async () => {
+  it("always uses local data (no API calls)", async () => {
     vi.resetModules();
     const localQuotes = [
       makeQuote({ footnote: 1, quoteVerified: true }),
@@ -194,11 +172,10 @@ describe("getCitationQuotes", () => {
     const mockFetch = vi.fn();
     mockCitationDeps({
       fetchFromWikiServer: mockFetch,
-      isLocalDataMode: () => true,
       getLocalCitationQuotes: () => localQuotes,
     });
     const mod = await import("../citation-data");
-    const result = await mod.getCitationQuotes("test-page");
+    const result = mod.getCitationQuotes("test-page");
     expect(result).toHaveLength(2);
     expect(mockFetch).not.toHaveBeenCalled();
   });

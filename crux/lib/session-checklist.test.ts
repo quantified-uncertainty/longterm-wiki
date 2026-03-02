@@ -75,7 +75,8 @@ describe('getItemsForType', () => {
     const types: SessionType[] = ['content', 'infrastructure', 'bugfix', 'refactor', 'commands'];
     const universalIds = [
       'fix-escaping', 'lockfile-fresh', 'gate-passes', 'pr-description',
-      'ids-server-allocated', 'tests-written', 'security', 'issue-tracking', 'push-ci-green',
+      'ids-server-allocated', 'duplicate-check', 'tests-written', 'scope-complete',
+      'security', 'issue-tracking', 'push-ci-green',
     ];
 
     for (const type of types) {
@@ -84,6 +85,14 @@ describe('getItemsForType', () => {
         expect(items.some(i => i.id === id), `${id} should be in ${type}`).toBe(true);
       }
     }
+  });
+
+  it('includes red-team for infrastructure, commands, bugfix, refactor but not content', () => {
+    expect(getItemsForType('infrastructure').some(i => i.id === 'red-team')).toBe(true);
+    expect(getItemsForType('commands').some(i => i.id === 'red-team')).toBe(true);
+    expect(getItemsForType('bugfix').some(i => i.id === 'red-team')).toBe(true);
+    expect(getItemsForType('refactor').some(i => i.id === 'red-team')).toBe(true);
+    expect(getItemsForType('content').some(i => i.id === 'red-team')).toBe(false);
   });
 });
 
@@ -405,8 +414,8 @@ describe('checklist catalog integrity', () => {
     }
   });
 
-  it('catalog has exactly 12 items', () => {
-    expect(CHECKLIST_ITEMS.length).toBe(12);
+  it('catalog has exactly 15 items', () => {
+    expect(CHECKLIST_ITEMS.length).toBe(15);
   });
 
   it('all items have valid priority', () => {

@@ -33,7 +33,17 @@ Run `pnpm test` and confirm existing tests still pass. If you added new logic (h
 
 Run `pnpm crux validate gate --fix` to catch CI-blocking issues.
 
-## 4. What to do when verification fails
+## 4. Completeness check
+
+Before opening a PR, verify that **all acceptance criteria** from the issue or task description are met:
+
+- Re-read the original issue and compare what was asked vs what was implemented
+- For each acceptance criterion, cite a specific file+line or test that satisfies it
+- A PR that needs a follow-up PR to be functional is **incomplete** — do not ship it
+- If the scope is too large to complete in one session, split the issue into independently-shippable pieces **before** starting work, not after
+- No "Part 1 of 3" PRs that break without Part 2
+
+## 5. What to do when verification fails
 
 Fix the issue before opening the PR. If you can't fix it:
 - Note the failure in the PR description
