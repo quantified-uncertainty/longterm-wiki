@@ -612,11 +612,21 @@ function buildIssueBody(opts: {
   criteria?: string;
   model?: string;
   cost?: string;
+  file?: string;
+  evidence?: string;
 }): string {
   const sections: string[] = [];
 
   if (opts.problem) {
     sections.push(`## Problem\n\n${opts.problem}`);
+  }
+
+  // Evidence section — file path and/or concrete observation
+  const evidenceParts: string[] = [];
+  if (opts.file) evidenceParts.push(`**File:** \`${opts.file}\``);
+  if (opts.evidence) evidenceParts.push(opts.evidence);
+  if (evidenceParts.length > 0) {
+    sections.push(`## Evidence\n\n${evidenceParts.join('\n\n')}`);
   }
 
   if (opts.fix) {
@@ -701,7 +711,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const title = args[0];
   if (!title) {
     return {
-      output: `${c.red}Usage: crux issues create <title> --model=haiku|sonnet|opus --criteria="item1|item2" [--label=X,Y] [--problem="..."] [--fix="..."] [--depends=N,M] [--cost="~$2-4"] [--draft]${c.reset}\n`,
+      output: `${c.red}Usage: crux issues create <title> --model=haiku|sonnet|opus --criteria="item1|item2" [--label=X,Y] [--problem="..."] [--file=<path>] [--evidence="..."] [--fix="..."] [--depends=N,M] [--cost="~$2-4"] [--draft]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -762,6 +772,24 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
+  // Require evidence of an observed problem (prevents speculative issue filing).
+  // Must reference a specific file or describe a concrete observation.
+  if (!options.draft && !effectiveBody) {
+    const hasEvidence = effectiveProblem || options.file || options.evidence;
+    if (!hasEvidence) {
+      return {
+        output:
+          `${c.red}Evidence required: agent-filed issues must reference a specific observation.${c.reset}\n` +
+          `${c.dim}Use one of:\n` +
+          `  --problem="Description of the observed issue"\n` +
+          `  --file=<path>       File where the problem was observed\n` +
+          `  --evidence="..."    Concrete error message or observation\n` +
+          `Use --draft to skip this for WIP issues.${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+  }
+
   // --body-file / --body provides the raw body and takes precedence.
   // Structured args (--problem, --model, --criteria, etc.) build a template body only
   // when no raw body is provided.  --model still applies the label even with --body-file.
@@ -778,6 +806,8 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
         criteria: options.criteria as string | undefined,
         model: options.model as string | undefined,
         cost: options.cost as string | undefined,
+        file: options.file as string | undefined,
+        evidence: options.evidence as string | undefined,
       });
     } else {
       body = '';
