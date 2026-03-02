@@ -41,7 +41,7 @@ const MAX_AGE: Record<string, number> = {
   'auto-update.yml': 36,
   'database-backup.yml': 36,
   'scheduled-maintenance.yml': 216, // 9 days
-  'server-health-monitor.yml': 1,
+  'server-health-monitor.yml': 192, // weekly dead-man-switch (8 days)
   'scheduled-deploy.yml': 36,
   'ci.yml': 168, // 7 days
 };
