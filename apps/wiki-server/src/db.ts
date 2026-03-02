@@ -55,17 +55,30 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export async function initDb() {
-  const db = getDrizzleDb();
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error("DATABASE_URL environment variable is required");
+  }
+
   logger.info("Running migrations...");
   const startMs = Date.now();
+
+  // Use a dedicated single-connection client for migrations — no statement_timeout.
+  // DDL (ALTER TABLE, CREATE INDEX) can be blocked by concurrent transactions and
+  // needs more than the 30s timeout configured on the main pool.
+  const migrationSql = postgres(url, { max: 1, connect_timeout: 10 });
+  const migrationDb = drizzle(migrationSql, { schema });
+
   try {
-    await migrate(db, {
+    await migrate(migrationDb, {
       migrationsFolder: path.resolve(__dirname, "../drizzle"),
     });
     logger.info({ durationMs: Date.now() - startMs }, "Migrations completed");
   } catch (err) {
     logger.error({ err }, "Migration failed");
     throw err;
+  } finally {
+    await migrationSql.end();
   }
 }
 
