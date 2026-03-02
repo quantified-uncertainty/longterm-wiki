@@ -18,14 +18,18 @@ name: Resolve Merge Conflicts
 # Requires: ANTHROPIC_API_KEY secret in the repository.
 
 on:
+  # Automatic triggers (schedule + workflow_run) are disabled to control
+  # Anthropic API spending. Re-enable them only if you want automated
+  # conflict resolution to run. Use workflow_dispatch for on-demand runs.
+
   # Run after auto-rebase finishes (proper sequencing, no sleep hack)
-  workflow_run:
-    workflows: ["Auto-Rebase PRs"]
-    types: [completed]
+  # workflow_run:
+  #   workflows: ["Auto-Rebase PRs"]
+  #   types: [completed]
 
   # Catch any stragglers (e.g. PRs made conflicting by force-pushes)
-  schedule:
-    - cron: "0 */6 * * *" # every 6 hours
+  # schedule:
+  #   - cron: "0 */6 * * *" # every 6 hours
 
   # Allow manual trigger
   workflow_dispatch:
