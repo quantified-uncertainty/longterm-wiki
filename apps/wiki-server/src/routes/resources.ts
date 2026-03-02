@@ -136,7 +136,7 @@ function resourceValues(d: ResourceInput) {
 async function upsertResource(
   db: DbClient,
   d: ResourceInput,
-  options?: { skipSearchVector?: boolean }
+  options?: { skipSearchVector?: boolean; intIdMap?: Map<string, number> }
 ) {
   const vals = resourceValues(d);
 
@@ -190,8 +190,8 @@ async function upsertResource(
     await db
       .delete(resourceCitations)
       .where(eq(resourceCitations.resourceId, d.id));
-    // Phase 4a: resolve page slugs to integer IDs for dual-write
-    const citedByIntIdMap = await resolvePageIntIds(db, d.citedBy);
+    // Phase 4a: use pre-resolved map if provided (batch path), else resolve per-resource (single path)
+    const citedByIntIdMap = options?.intIdMap ?? await resolvePageIntIds(db, d.citedBy);
     await db
       .insert(resourceCitations)
       .values(d.citedBy.map((pageId) => ({
@@ -288,10 +288,17 @@ const resourcesApp = new Hono()
     const results: Array<{ id: string; url: string }> = [];
     try {
       await db.transaction(async (tx) => {
+        // Phase 4a: pre-resolve all citedBy page IDs in one batch query
+        const allCitedByIds = [...new Set(items.flatMap((item) => item.citedBy ?? []))];
+        const intIdMap = allCitedByIds.length > 0
+          ? await resolvePageIntIds(tx as unknown as DbClient, allCitedByIds)
+          : new Map<string, number>();
+
         for (const item of items) {
           // Skip per-row search_vector update; handled in bulk below
           const result = await upsertResource(tx as unknown as DbClient, item, {
             skipSearchVector: true,
+            intIdMap,
           });
           results.push({ id: result.id, url: result.url });
         }

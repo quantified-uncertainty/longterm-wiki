@@ -91,8 +91,8 @@ export const wikiPages = pgTable(
     id: text("id").primaryKey(),
     numericId: text("numeric_id"),
     // Phase 4a: new columns for integer PK migration (#1498)
-    slug: text("slug").notNull(),
-    integerIdCol: integer("integer_id").notNull(),
+    slug: text("slug").notNull().unique(),
+    integerIdCol: integer("integer_id").unique(),
     title: text("title").notNull(),
     description: text("description"),
     llmSummary: text("llm_summary"),

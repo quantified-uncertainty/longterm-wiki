@@ -290,7 +290,7 @@ const pagesApp = new Hono()
         id: page.id,
         numericId: page.numericId ?? null,
         slug: page.id, // Phase 4a: slug = id (the text slug)
-        integerIdCol: intIdMap.get(page.id) ?? 0, // Phase 4a: integer ID from entity_ids
+        integerIdCol: intIdMap.get(page.id) ?? null, // Phase 4a: integer ID from entity_ids (nullable until Phase 4b)
         title: page.title,
         description: page.description ?? null,
         llmSummary: page.llmSummary ?? null,

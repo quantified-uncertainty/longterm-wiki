@@ -64,15 +64,15 @@ const autoUpdateNewsApp = new Hono()
     const { runId, items } = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase 4a: resolve routed page slugs to integer IDs for dual-write
-    const routedPageIds = items
-      .map((d) => d.routedToPageId)
-      .filter((id): id is string => id != null);
-    const intIdMap = routedPageIds.length > 0
-      ? await resolvePageIntIds(db, routedPageIds)
-      : new Map<string, number>();
-
     const results = await db.transaction(async (tx) => {
+      // Phase 4a: resolve routed page slugs to integer IDs for dual-write (inside tx for consistency)
+      const routedPageIds = items
+        .map((d) => d.routedToPageId)
+        .filter((id): id is string => id != null);
+      const intIdMap = routedPageIds.length > 0
+        ? await resolvePageIntIds(tx, routedPageIds)
+        : new Map<string, number>();
+
       return await tx
         .insert(autoUpdateNewsItems)
         .values(

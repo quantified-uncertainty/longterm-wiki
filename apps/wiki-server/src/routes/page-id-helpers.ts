@@ -70,29 +70,33 @@ export async function allocateAndResolvePageIntIds(
   const missing = uniqueSlugs.filter((s) => !existing.has(s));
 
   if (missing.length > 0) {
-    // Auto-allocate using raw SQL for nextval
-    for (const slug of missing) {
-      const rows = await db
-        .insert(entityIds)
-        .values({
+    // Bulk-allocate all missing slugs in one INSERT.
+    // ON CONFLICT DO NOTHING handles concurrent inserts; RETURNING gives us the new rows.
+    const inserted = await db
+      .insert(entityIds)
+      .values(
+        missing.map((slug) => ({
           numericId: sql`nextval('entity_id_seq')`.mapWith(Number),
           slug,
-        })
-        .onConflictDoNothing({ target: entityIds.slug })
-        .returning({ numericId: entityIds.numericId, slug: entityIds.slug });
+        }))
+      )
+      .onConflictDoNothing({ target: entityIds.slug })
+      .returning({ numericId: entityIds.numericId, slug: entityIds.slug });
 
-      if (rows.length > 0) {
-        existing.set(rows[0].slug, rows[0].numericId);
-      } else {
-        // Conflict means it was inserted concurrently — re-fetch
-        const refetch = await db
-          .select({ numericId: entityIds.numericId })
-          .from(entityIds)
-          .where(eq(entityIds.slug, slug))
-          .limit(1);
-        if (refetch.length > 0) {
-          existing.set(slug, refetch[0].numericId);
-        }
+    for (const row of inserted) {
+      existing.set(row.slug, row.numericId);
+    }
+
+    // Re-fetch any slugs that hit a conflict (inserted concurrently).
+    // These won't be in `inserted` because ON CONFLICT DO NOTHING skips RETURNING.
+    const stillMissing = missing.filter((s) => !existing.has(s));
+    if (stillMissing.length > 0) {
+      const refetched = await db
+        .select({ slug: entityIds.slug, numericId: entityIds.numericId })
+        .from(entityIds)
+        .where(inArray(entityIds.slug, stillMissing));
+      for (const row of refetched) {
+        existing.set(row.slug, row.numericId);
       }
     }
   }

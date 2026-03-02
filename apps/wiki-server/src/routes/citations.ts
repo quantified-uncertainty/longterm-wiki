@@ -260,12 +260,11 @@ const citationsApp = new Hono()
       }
     }
 
-    // Phase 4a: resolve page slugs to integer IDs for dual-write
-    const batchIntIdMap = await resolvePageIntIds(db, pageIds);
-
     let results;
     try {
       results = await db.transaction(async (tx) => {
+        // Phase 4a: resolve page slugs to integer IDs for dual-write (inside tx for consistency)
+        const batchIntIdMap = await resolvePageIntIds(tx, pageIds);
         return await tx
           .insert(citationQuotes)
           .values(items.map((d) => quoteValues(d, batchIntIdMap.get(d.pageId) ?? null)))

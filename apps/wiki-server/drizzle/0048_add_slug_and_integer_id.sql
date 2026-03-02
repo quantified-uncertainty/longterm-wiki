@@ -47,13 +47,13 @@ WHERE ei.slug = wp.id;
 
 -- ============================================================
 -- Step 4: Apply NOT NULL + UNIQUE constraints
+-- slug is NOT NULL (always equals id). integer_id is nullable in Phase 4a
+-- (will become NOT NULL in Phase 4b once all rows are guaranteed populated).
 -- ============================================================
 
 ALTER TABLE wiki_pages ALTER COLUMN slug SET NOT NULL;
 --> statement-breakpoint
 ALTER TABLE wiki_pages ADD CONSTRAINT wiki_pages_slug_unique UNIQUE (slug);
---> statement-breakpoint
-ALTER TABLE wiki_pages ALTER COLUMN integer_id SET NOT NULL;
 --> statement-breakpoint
 ALTER TABLE wiki_pages ADD CONSTRAINT wiki_pages_integer_id_unique UNIQUE (integer_id);
 --> statement-breakpoint
@@ -178,12 +178,9 @@ WHERE ei.slug = pl.target_id;
 
 -- ============================================================
 -- Step 8: Create indexes on new columns for query performance
+-- (slug and integer_id already have implicit indexes from UNIQUE constraints)
 -- ============================================================
 
-CREATE INDEX idx_wp_slug ON wiki_pages (slug);
---> statement-breakpoint
-CREATE INDEX idx_wp_integer_id ON wiki_pages (integer_id);
---> statement-breakpoint
 CREATE INDEX idx_cq_page_id_int ON citation_quotes (page_id_int);
 --> statement-breakpoint
 CREATE INDEX idx_cas_page_id_int ON citation_accuracy_snapshots (page_id_int);

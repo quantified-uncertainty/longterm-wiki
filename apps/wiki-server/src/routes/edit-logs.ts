@@ -86,10 +86,9 @@ const editLogsApp = new Hono()
       return validationError(c, `Referenced pages not found: ${missing.join(", ")}`);
     }
 
-    // Phase 4a: resolve page slugs to integer IDs for dual-write
-    const intIdMap = await resolvePageIntIds(db, pageIds);
-
     const results = await db.transaction(async (tx) => {
+      // Phase 4a: resolve page slugs to integer IDs for dual-write (inside tx for consistency)
+      const intIdMap = await resolvePageIntIds(tx, pageIds);
       return await tx
         .insert(editLogs)
         .values(
