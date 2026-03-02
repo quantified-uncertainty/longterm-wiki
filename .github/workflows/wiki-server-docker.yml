@@ -89,9 +89,12 @@ jobs:
             -e WIKI_SERVER_API_KEY="${LONGTERMWIKI_SERVER_API_KEY}" \
             "$IMAGE"
 
-          # Wait for the server to be ready (up to 60s: 20 attempts × 3s delay).
-          # The server runs migrations on startup, so allow time for that.
-          MAX_ATTEMPTS=20
+          # Wait for the server to be ready (up to 150s: 50 attempts × 3s delay).
+          # The server runs migrations on startup, which may need to wait for
+          # ACCESS EXCLUSIVE locks on wiki_pages while the production server's
+          # connections drain (lock_timeout=60s in db.ts). Allow enough headroom
+          # for lock wait + DDL execution + server startup.
+          MAX_ATTEMPTS=50
           DELAY=3
           STATUS=""
           for i in $(seq 1 $MAX_ATTEMPTS); do
