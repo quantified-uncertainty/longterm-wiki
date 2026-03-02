@@ -2,7 +2,7 @@ name: Wellness Check
 
 # Comprehensive twice-daily health audit of the entire system.
 #
-# Runs more checks than the 5-minute server-health-monitor:
+# Runs more checks than the weekly server-health dead-man-switch:
 #   - Server & DB sanity (counts in expected ranges, uptime)
 #   - API smoke tests (search, page fetch, entity list)
 #   - GitHub Actions workflow health (scheduled jobs running?)
@@ -11,8 +11,9 @@ name: Wellness Check
 #   - Backup health (last DB backup succeeded?)
 #
 # Issues are created/updated/closed automatically under the "wellness" label.
-# The 5-minute server-health-monitor handles the immediate "server is down" case;
-# this workflow handles deeper, slower-moving health signals.
+# The groundskeeper daemon handles the immediate "server is down" case (every 5 min);
+# the server-health-monitor.yml is a weekly dead-man-switch for the groundskeeper.
+# This workflow handles deeper, slower-moving health signals.
 
 on:
   schedule:
@@ -43,7 +44,7 @@ env:
   MAX_AUTO_UPDATE_AGE_H: 36
   MAX_BACKUP_AGE_H: 36
   MAX_MAINTENANCE_AGE_H: 216  # 9 days (weekly + buffer)
-  MAX_HEALTH_MONITOR_AGE_H: 1
+  MAX_HEALTH_MONITOR_AGE_H: 192  # weekly dead-man-switch (8 days)
 
 # ─────────────────────────────────────────
 # Job 1 — Server & DB health
@@ -53,7 +54,7 @@ jobs:
   preflight:
     # Global circuit breaker — skip when automation is paused.
     # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
-    # Note: the server-health-monitor (5-min cadence) is exempt and keeps running.
+    # Note: the server-health dead-man-switch (weekly cadence) is exempt and keeps running.
     if: vars.AUTOMATION_PAUSED != 'true'
     runs-on: ubuntu-latest
     steps:

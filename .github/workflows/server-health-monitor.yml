@@ -1,187 +1,151 @@
-name: Wiki Server — Health Monitor
+name: Wiki Server — Dead-Man-Switch
+
+# Weekly dead-man-switch: verifies the groundskeeper daemon is alive and
+# actively monitoring wiki-server health. Day-to-day health monitoring is
+# handled by the groundskeeper (every 5 min, with incident buffering,
+# cooldowns, and auto-close). This workflow exists only to catch the case
+# where the groundskeeper itself goes down.
+#
+# Consolidation: github.com/quantified-uncertainty/longterm-wiki/issues/1477
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # every 5 minutes
+    - cron: "0 6 * * 1" # every Monday at 06:00 UTC
   workflow_dispatch:
 
-# Prevent overlapping runs (avoids race conditions with issue create/close)
 concurrency:
   group: server-health-monitor
   cancel-in-progress: false
 
 jobs:
-  health-check:
-    name: Check wiki-server health
+  dead-man-switch:
+    name: Verify monitoring is active
     runs-on: ubuntu-latest
     permissions:
       issues: write
 
     steps:
-      - name: Check health endpoint (with retry)
-        id: health
+      - name: Check wiki-server and groundskeeper status
+        id: check
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
         run: |
           if [ -z "$LONGTERMWIKI_SERVER_URL" ]; then
-            echo "healthy=false" >> "$GITHUB_OUTPUT"
+            echo "status=error" >> "$GITHUB_OUTPUT"
             echo "error=LONGTERMWIKI_SERVER_URL secret is not set" >> "$GITHUB_OUTPUT"
-            echo "response=" >> "$GITHUB_OUTPUT"
-            echo "http_code=000" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # Retry up to 3 times with 10s delay to avoid false positives
-          # from transient network issues or brief pod restarts.
-          MAX_ATTEMPTS=3
-          DELAY=10
-          HEALTHY=""
-          LAST_HTTP_CODE=""
-          LAST_ERROR=""
-          LAST_RESPONSE=""
+          # 1. Check if wiki-server is reachable
+          HTTP_CODE=$(curl -s -o /tmp/health.json -w "%{http_code}" \
+            --max-time 15 "${LONGTERMWIKI_SERVER_URL}/health" 2>/dev/null) || HTTP_CODE="000"
 
-          for i in $(seq 1 $MAX_ATTEMPTS); do
-            HTTP_CODE=$(curl -s -o /tmp/health_response.json -w "%{http_code}" \
-              --max-time 10 "${LONGTERMWIKI_SERVER_URL}/health" 2>/dev/null) || HTTP_CODE="000"
-
-            RESPONSE=$(cat /tmp/health_response.json 2>/dev/null || echo "")
-            LAST_HTTP_CODE="$HTTP_CODE"
-            LAST_RESPONSE="$RESPONSE"
-
-            if [ "$HTTP_CODE" = "000" ]; then
-              LAST_ERROR="Connection failed or timed out (no HTTP response)"
-            elif [ "$HTTP_CODE" != "200" ]; then
-              LAST_ERROR="HTTP $HTTP_CODE"
-            else
-              STATUS=$(echo "$RESPONSE" | jq -r '.status // "unknown"')
-              DB_STATUS=$(echo "$RESPONSE" | jq -r '.database // "unknown"')
-
-              if [ "$STATUS" = "healthy" ] && [ "$DB_STATUS" = "ok" ]; then
-                HEALTHY="true"
-                break
-              else
-                LAST_ERROR="status=$STATUS, database=$DB_STATUS"
-              fi
-            fi
-
-            echo "Health check attempt $i/$MAX_ATTEMPTS failed: $LAST_ERROR"
-            if [ "$i" -lt "$MAX_ATTEMPTS" ]; then
-              sleep $DELAY
-            fi
-          done
-
-          echo "http_code=$LAST_HTTP_CODE" >> "$GITHUB_OUTPUT"
-          echo "response<<__HEALTH_EOF__" >> "$GITHUB_OUTPUT"
-          echo "$LAST_RESPONSE" >> "$GITHUB_OUTPUT"
-          echo "__HEALTH_EOF__" >> "$GITHUB_OUTPUT"
-
-          if [ "$HEALTHY" = "true" ]; then
-            echo "healthy=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "healthy=false" >> "$GITHUB_OUTPUT"
-            echo "error=$LAST_ERROR" >> "$GITHUB_OUTPUT"
+          if [ "$HTTP_CODE" = "000" ] || [ "$HTTP_CODE" != "200" ]; then
+            echo "status=server-down" >> "$GITHUB_OUTPUT"
+            echo "error=Wiki-server unreachable (HTTP ${HTTP_CODE}). Groundskeeper may also be unable to monitor." >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
-      - name: Check for existing open issue
-        if: steps.health.outputs.healthy == 'false'
-        id: existing
+          SERVER_STATUS=$(cat /tmp/health.json | jq -r '.status // "unknown"')
+          DB_STATUS=$(cat /tmp/health.json | jq -r '.database // "unknown"')
+
+          if [ "$SERVER_STATUS" != "healthy" ] || [ "$DB_STATUS" != "ok" ]; then
+            echo "status=server-unhealthy" >> "$GITHUB_OUTPUT"
+            echo "error=Wiki-server is up but unhealthy (status=${SERVER_STATUS}, db=${DB_STATUS}). Groundskeeper should have caught this." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # 2. Check groundskeeper liveness via monitoring/status
+          AUTH_HEADER=""
+          if [ -n "$LONGTERMWIKI_SERVER_API_KEY" ]; then
+            AUTH_HEADER="Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}"
+          fi
+
+          MON_CODE=$(curl -s -o /tmp/monitoring.json -w "%{http_code}" \
+            --max-time 15 \
+            ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+            "${LONGTERMWIKI_SERVER_URL}/api/monitoring/status" 2>/dev/null) || MON_CODE="000"
+
+          if [ "$MON_CODE" != "200" ]; then
+            echo "status=monitoring-unavailable" >> "$GITHUB_OUTPUT"
+            echo "error=Monitoring status endpoint unreachable (HTTP ${MON_CODE}). Cannot verify groundskeeper liveness." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          GK_STATUS=$(cat /tmp/monitoring.json | jq -r '.services.groundskeeper.status // "unknown"')
+
+          if [ "$GK_STATUS" = "healthy" ]; then
+            echo "status=ok" >> "$GITHUB_OUTPUT"
+            echo "groundskeeper_status=${GK_STATUS}" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=groundskeeper-down" >> "$GITHUB_OUTPUT"
+            echo "groundskeeper_status=${GK_STATUS}" >> "$GITHUB_OUTPUT"
+            echo "error=Groundskeeper status is '${GK_STATUS}'. Health monitoring may be inactive." >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create or update issue (monitoring gap detected)
+        if: steps.check.outputs.status != 'ok'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECK_STATUS: ${{ steps.check.outputs.status }}
+          CHECK_ERROR: ${{ steps.check.outputs.error }}
         run: |
-          ISSUE=$(gh issue list \
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
+          EXISTING=$(gh issue list \
             --repo "${{ github.repository }}" \
             --label "server-health" \
             --state open \
             --json number \
             --jq '.[0].number // empty')
-          echo "issue=${ISSUE}" >> "$GITHUB_OUTPUT"
 
-      - name: Create or update issue
-        if: steps.health.outputs.healthy == 'false'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HEALTH_ERROR: ${{ steps.health.outputs.error }}
-          HEALTH_HTTP_CODE: ${{ steps.health.outputs.http_code }}
-          HEALTH_RESPONSE: ${{ steps.health.outputs.response }}
-          EXISTING_ISSUE: ${{ steps.existing.outputs.issue }}
-        run: |
-          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
-
-          # Build the issue body with a quoted heredoc to prevent shell injection
-          # from untrusted HEALTH_RESPONSE content. Variables are inserted via sed.
-          cat > /tmp/issue_body.md <<'ISSUE_BODY'
-          ## Wiki server health check failed
-
-          | Field | Value |
-          |-------|-------|
-          | **Status** | :red_circle: Unhealthy |
-          | **Detected at** | __TIMESTAMP__ |
-          | **Error** | __HEALTH_ERROR__ |
-          | **HTTP status** | __HEALTH_HTTP_CODE__ |
-
-          ### Health endpoint response
-
-          ```json
-          __HEALTH_RESPONSE__
-          ```
-
-          ### Possible causes
-
-          - **HTTP 503 / connection refused** — Pod is crashing or not running
-          - **`database: "error"`** — Database connection or query failure (bad migration, permissions, DB down)
-          - **`status: "degraded"`** — Server is running but some queries are failing
-          - **Connection timeout** — DNS, ingress, or networking issue
-
-          ### Useful commands
-
-          ```bash
-          # Pod status
-          kubectl get pods -n longtermwiki
-
-          # Current logs
-          kubectl logs -n longtermwiki -l app=longterm-wiki-server-wiki-server --tail=50
-
-          # Previous crash logs (if pod restarted)
-          kubectl logs -n longtermwiki -l app=longterm-wiki-server-wiki-server --previous
-
-          # Restart the deployment
-          kubectl rollout restart deployment -n longtermwiki longterm-wiki-server-wiki-server
-          ```
-
-          ---
-          *Created automatically by the [health monitor workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/server-health-monitor.yml). Will be closed automatically when the server recovers.*
-          ISSUE_BODY
-
-          # Strip leading whitespace from heredoc (YAML indentation)
-          sed -i 's/^          //' /tmp/issue_body.md
-
-          # Safely substitute values (escape sed special chars in values first)
-          escape_sed() { printf '%s\n' "$1" | sed 's/[&/\]/\\&/g'; }
-          sed -i "s|__TIMESTAMP__|$(escape_sed "$TIMESTAMP")|g" /tmp/issue_body.md
-          sed -i "s|__HEALTH_ERROR__|$(escape_sed "$HEALTH_ERROR")|g" /tmp/issue_body.md
-          sed -i "s|__HEALTH_HTTP_CODE__|$(escape_sed "$HEALTH_HTTP_CODE")|g" /tmp/issue_body.md
-          sed -i "s|__HEALTH_RESPONSE__|$(escape_sed "$HEALTH_RESPONSE")|g" /tmp/issue_body.md
-
-          if [ -n "$EXISTING_ISSUE" ]; then
-            # Reopen and comment on existing issue instead of creating a new one
-            gh issue reopen "$EXISTING_ISSUE" --repo "${{ github.repository }}" 2>/dev/null || true
-            gh issue comment "$EXISTING_ISSUE" \
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" \
               --repo "${{ github.repository }}" \
-              --body "Server is still unhealthy at ${TIMESTAMP}. Error: ${HEALTH_ERROR} (HTTP ${HEALTH_HTTP_CODE})"
+              --body "[Dead-man-switch] ${TIMESTAMP}: ${CHECK_ERROR}"
           else
-            # Ensure labels exist before creating issue
             gh label create "server-health" --repo "${{ github.repository }}" \
               --color "d73a4a" --description "Wiki server health monitoring" 2>/dev/null || true
 
+            cat > /tmp/issue_body.md <<ISSUE_BODY
+## Dead-man-switch: monitoring gap detected
+
+| Field | Value |
+|-------|-------|
+| **Check** | ${CHECK_STATUS} |
+| **Detected at** | ${TIMESTAMP} |
+| **Detail** | ${CHECK_ERROR} |
+
+### What this means
+
+The weekly dead-man-switch detected a potential gap in health monitoring:
+
+- **\`server-down\`** — Wiki-server is unreachable. The groundskeeper should be creating issues for this, but if both are down, this is the fallback alert.
+- **\`server-unhealthy\`** — Wiki-server is up but degraded. The groundskeeper should have caught this already — if it didn't, the groundskeeper may be down too.
+- **\`groundskeeper-down\`** — Wiki-server is healthy but the groundskeeper daemon hasn't sent a heartbeat recently. Health monitoring is not running.
+- **\`monitoring-unavailable\`** — The monitoring status endpoint is not reachable. Cannot verify groundskeeper liveness.
+- **\`error\`** — Configuration issue (missing secrets).
+
+### Actions
+
+1. Check groundskeeper pod: \`kubectl get pods -n longtermwiki -l app=groundskeeper\`
+2. Check groundskeeper logs: \`kubectl logs -n longtermwiki -l app=groundskeeper --tail=50\`
+3. Check wiki-server pod: \`kubectl get pods -n longtermwiki -l app=longterm-wiki-server-wiki-server\`
+
+---
+*Created by the [dead-man-switch workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/server-health-monitor.yml). Runs weekly to verify the groundskeeper health monitor is active.*
+ISSUE_BODY
+
             gh issue create \
               --repo "${{ github.repository }}" \
-              --title "Wiki server is unhealthy (${HEALTH_ERROR})" \
+              --title "[Dead-man-switch] Monitoring gap: ${CHECK_STATUS}" \
               --label "server-health,bug" \
               --body-file /tmp/issue_body.md
           fi
 
       - name: Close resolved issue
-        if: steps.health.outputs.healthy == 'true'
+        if: steps.check.outputs.status == 'ok'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -196,7 +160,7 @@ jobs:
             TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
             gh issue comment "$ISSUE" \
               --repo "${{ github.repository }}" \
-              --body "Server is healthy again at ${TIMESTAMP}. Auto-closing."
+              --body "[Dead-man-switch] ${TIMESTAMP}: All clear — wiki-server healthy, groundskeeper active. Auto-closing."
             gh issue close "$ISSUE" \
               --repo "${{ github.repository }}"
           fi
