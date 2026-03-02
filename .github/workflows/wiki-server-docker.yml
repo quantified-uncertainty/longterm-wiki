@@ -89,9 +89,9 @@ jobs:
             -e WIKI_SERVER_API_KEY="${LONGTERMWIKI_SERVER_API_KEY}" \
             "$IMAGE"
 
-          # Wait for the server to be ready (up to 30s: 10 attempts × 3s delay).
+          # Wait for the server to be ready (up to 60s: 20 attempts × 3s delay).
           # The server runs migrations on startup, so allow time for that.
-          MAX_ATTEMPTS=10
+          MAX_ATTEMPTS=20
           DELAY=3
           STATUS=""
           for i in $(seq 1 $MAX_ATTEMPTS); do
@@ -108,6 +108,12 @@ jobs:
           done
 
           if [ "$STATUS" != "healthy" ]; then
+            echo "::group::Container logs (last 200 lines)"
+            docker logs --tail 200 "$CONTAINER_NAME" 2>&1 || echo "(no logs available)"
+            echo "::endgroup::"
+            echo "::group::Container inspect"
+            docker inspect "$CONTAINER_NAME" --format '{{.State.Status}} exit={{.State.ExitCode}} error={{.State.Error}}' 2>/dev/null || true
+            echo "::endgroup::"
             echo "::error::Pre-deploy smoke test failed — container did not become healthy within $((MAX_ATTEMPTS * DELAY))s. Aborting deploy to prevent serving broken traffic."
             exit 1
           fi
