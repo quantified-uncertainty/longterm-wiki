@@ -80,11 +80,12 @@ export async function initDb() {
   //
   // Settings:
   //   statement_timeout: '0'       — No per-statement limit; DDL must complete once locked
-  //   lock_timeout: '120000'       — 2min cap on lock wait; fail fast, let pod retry
+  //   lock_timeout: '60000'        — 60s cap on lock wait; must be < smoke test timeout
+  //                                  so we get a clear error rather than silent hang
   //   idle_in_transaction_session_timeout: '600000' — 10min bound on total migration txn
   const migrationConnection: Record<string, string> = {
     statement_timeout: '0',
-    lock_timeout: '120000',
+    lock_timeout: '60000',
     idle_in_transaction_session_timeout: '600000',
   };
   const migrationSql = postgres(url, {
