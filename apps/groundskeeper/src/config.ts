@@ -7,6 +7,11 @@ export interface ShadowbanCheckConfig extends TaskConfig {
   usernames: string[];
 }
 
+export interface SnapshotRetentionConfig extends TaskConfig {
+  /** Number of snapshots to keep per page (default: 100). */
+  keep: number;
+}
+
 export interface Config {
   githubAppId: string;
   githubInstallationId: string;
@@ -21,6 +26,7 @@ export interface Config {
     healthCheck: TaskConfig;
     issueResponder: TaskConfig;
     githubShadowbanCheck: ShadowbanCheckConfig;
+    snapshotRetention: SnapshotRetentionConfig;
   };
 }
 
@@ -75,6 +81,12 @@ export function loadConfig(): Config {
         schedule:
           process.env["TASK_GITHUB_SHADOWBAN_CHECK_SCHEDULE"] ?? "0 9 * * *",
         usernames: ["quri-bot"],
+      },
+      snapshotRetention: {
+        enabled: envBool("TASK_SNAPSHOT_RETENTION_ENABLED", true),
+        schedule:
+          process.env["TASK_SNAPSHOT_RETENTION_SCHEDULE"] ?? "0 3 * * *", // daily at 3am UTC
+        keep: envInt("TASK_SNAPSHOT_RETENTION_KEEP", 100),
       },
     },
   };
