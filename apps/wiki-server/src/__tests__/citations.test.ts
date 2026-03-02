@@ -51,7 +51,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
       const pageId = params[o] as string;
-      const _pageIdInt = params[o + 1]; // Phase 4a: page_id_int (not used in mock)
+      const pageIdInt = params[o + 1] as number | null; // Phase 4a: page_id_int
       const footnote = params[o + 2] as number;
       const url = params[o + 3];
       const resourceId = params[o + 4];
@@ -85,7 +85,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       } else {
         const row: Record<string, unknown> = {
           id: nextQuoteId++,
-          page_id: pageId, page_id_int: getIntIdForSlug(pageId), footnote, url, resource_id: resourceId,
+          page_id: pageId, page_id_int: pageIdInt, footnote, url, resource_id: resourceId,
           claim_text: claimText, claim_context: claimContext,
           source_quote: sourceQuote, source_location: sourceLocation,
           quote_verified: quoteVerified, verification_method: verificationMethod,
@@ -417,8 +417,12 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ---
   // Allocating on first use mirrors production where all page slugs have entity_ids.
+  // Exception: "no-entity-id" slug returns no row, simulating a page absent from entity_ids
+  // (used to test the null-intId early-return path in routes).
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)")) {
-    return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
+    return params
+      .filter((p) => String(p) !== "no-entity-id")
+      .map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
   }
 
   // --- entity_ids fallbacks (for health check count) ---
@@ -925,6 +929,16 @@ describe("Citation Server API", () => {
       expect(body.accurate).toBe(0);
       expect(body.inaccurate).toBe(0);
       expect(body.avgScore).toBeNull();
+    });
+
+    it("returns empty health for page absent from entity_ids (null-intId early-return)", async () => {
+      // "no-entity-id" is a sentinel slug that the mock entity_ids handler returns no row for,
+      // exercising the resolvePageIntId → null → early-return path.
+      const res = await app.request("/api/citations/health/no-entity-id");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.pageId).toBe("no-entity-id");
+      expect(body.total).toBe(0);
     });
 
     it("returns health summary for a page with mixed statuses", async () => {
