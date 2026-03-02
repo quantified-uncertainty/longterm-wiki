@@ -1336,7 +1336,7 @@ const citationsApp = new Hono()
         WHERE id NOT IN (
           SELECT id FROM (
             SELECT id, ROW_NUMBER() OVER (
-              PARTITION BY page_id_old ORDER BY snapshot_at DESC
+              PARTITION BY page_id_int ORDER BY snapshot_at DESC
             ) AS rn
             FROM citation_accuracy_snapshots
           ) ranked
@@ -1365,7 +1365,7 @@ const citationsApp = new Hono()
       WHERE id NOT IN (
         SELECT id FROM (
           SELECT id, ROW_NUMBER() OVER (
-            PARTITION BY page_id_old ORDER BY snapshot_at DESC
+            PARTITION BY page_id_int ORDER BY snapshot_at DESC
           ) AS rn
           FROM citation_accuracy_snapshots
         ) ranked

@@ -195,17 +195,17 @@ const linksApp = new Hono()
     // then order by weight descending (most relevant first).
     const results = await rawDb<BacklinkDbRow[]>`
     SELECT * FROM (
-      SELECT DISTINCT ON (pl.source_id_old)
-        pl.source_id_old AS source_id,
+      SELECT DISTINCT ON (pl.source_id_int)
+        wp.id AS source_id,
         pl.link_type,
         pl.relationship,
         pl.weight,
         wp.title AS source_title,
         wp.entity_type AS source_type
       FROM page_links pl
-      LEFT JOIN wiki_pages wp ON wp.id = pl.source_id_old
+      LEFT JOIN wiki_pages wp ON wp.integer_id = pl.source_id_int
       WHERE pl.target_id_int = ${targetIntId}
-      ORDER BY pl.source_id_old, pl.weight DESC
+      ORDER BY pl.source_id_int, pl.weight DESC
     ) sub
     ORDER BY sub.weight DESC
     LIMIT ${limit}
@@ -253,23 +253,23 @@ const linksApp = new Hono()
     const results = await rawDb<RelatedDbRow[]>`
     WITH bidirectional_links AS (
       -- Forward links: entityId is source (is_reverse = false)
-      SELECT target_id_old AS neighbor_id, link_type, relationship, weight, false AS is_reverse
+      SELECT target_id_int AS neighbor_int_id, link_type, relationship, weight, false AS is_reverse
       FROM page_links
       WHERE source_id_int = ${entityIntId}
       UNION ALL
       -- Reverse links: entityId is target (is_reverse = true)
-      SELECT source_id_old AS neighbor_id, link_type, relationship, weight, true AS is_reverse
+      SELECT source_id_int AS neighbor_int_id, link_type, relationship, weight, true AS is_reverse
       FROM page_links
       WHERE target_id_int = ${entityIntId}
     ),
     aggregated AS (
       SELECT
-        bl.neighbor_id,
+        bl.neighbor_int_id,
         SUM(bl.weight) AS raw_score,
         -- Pick the first non-null relationship label (from yaml_related)
         (SELECT bl2.relationship
          FROM bidirectional_links bl2
-         WHERE bl2.neighbor_id = bl.neighbor_id
+         WHERE bl2.neighbor_int_id = bl.neighbor_int_id
            AND bl2.relationship IS NOT NULL
            AND bl2.link_type = 'yaml_related'
          LIMIT 1
@@ -277,17 +277,17 @@ const linksApp = new Hono()
         -- Track direction of the yaml_related link for label inversion
         (SELECT bl2.is_reverse
          FROM bidirectional_links bl2
-         WHERE bl2.neighbor_id = bl.neighbor_id
+         WHERE bl2.neighbor_int_id = bl.neighbor_int_id
            AND bl2.relationship IS NOT NULL
            AND bl2.link_type = 'yaml_related'
          LIMIT 1
         ) AS relationship_is_reverse
       FROM bidirectional_links bl
-      WHERE bl.neighbor_id != ${entityId}
-      GROUP BY bl.neighbor_id
+      WHERE bl.neighbor_int_id != ${entityIntId}
+      GROUP BY bl.neighbor_int_id
     )
     SELECT
-      a.neighbor_id AS id,
+      wp.id AS id,
       a.raw_score,
       a.relationship,
       a.relationship_is_reverse,
@@ -299,7 +299,7 @@ const linksApp = new Hono()
       a.raw_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
                          + COALESCE(wp.reader_importance, 50)::real / 400.0) AS score
     FROM aggregated a
-    LEFT JOIN wiki_pages wp ON wp.id = a.neighbor_id
+    LEFT JOIN wiki_pages wp ON wp.integer_id = a.neighbor_int_id
     WHERE a.raw_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
                              + COALESCE(wp.reader_importance, 50)::real / 400.0) >= ${MIN_SCORE}
     ORDER BY score DESC
@@ -345,8 +345,8 @@ const linksApp = new Hono()
     // This provides the raw graph data for visualization.
     const results = await rawDb<GraphEdgeDbRow[]>`
     SELECT
-      pl.source_id_old AS source_id,
-      pl.target_id_old AS target_id,
+      ws.id AS source_id,
+      wt.id AS target_id,
       pl.link_type,
       pl.relationship,
       pl.weight,
@@ -355,8 +355,8 @@ const linksApp = new Hono()
       wt.title AS target_title,
       wt.entity_type AS target_type
     FROM page_links pl
-    LEFT JOIN wiki_pages ws ON ws.id = pl.source_id_old
-    LEFT JOIN wiki_pages wt ON wt.id = pl.target_id_old
+    LEFT JOIN wiki_pages ws ON ws.integer_id = pl.source_id_int
+    LEFT JOIN wiki_pages wt ON wt.integer_id = pl.target_id_int
     WHERE pl.source_id_int = ${graphEntityIntId} OR pl.target_id_int = ${graphEntityIntId}
     ORDER BY pl.weight DESC
     LIMIT ${MAX_GRAPH_EDGES}
@@ -423,8 +423,8 @@ const linksApp = new Hono()
   `;
 
     const uniquePagesResult = await rawDb<UniqueCountRow[]>`
-    SELECT COUNT(DISTINCT source_id_old)::int AS sources,
-           COUNT(DISTINCT target_id_old)::int AS targets
+    SELECT COUNT(DISTINCT source_id_int)::int AS sources,
+           COUNT(DISTINCT target_id_int)::int AS targets
     FROM page_links
   `;
 

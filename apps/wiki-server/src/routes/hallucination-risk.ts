@@ -312,9 +312,9 @@ const hallucinationRiskApp = new Hono()
     const levelDist = await rawDb<LevelDistRow[]>`
       SELECT level, count(*)::int AS count
       FROM (
-        SELECT DISTINCT ON (page_id_old) level
+        SELECT DISTINCT ON (page_id_int) level
         FROM hallucination_risk_snapshots
-        ORDER BY page_id_old, computed_at DESC
+        ORDER BY page_id_int, computed_at DESC
       ) latest
       GROUP BY level
     `;
@@ -360,24 +360,26 @@ const hallucinationRiskApp = new Hono()
       // Fallback: DISTINCT ON on base table
       rows = level
         ? await rawDb<RiskPageDbRow[]>`
-            SELECT page_id_old AS page_id, score, level, factors, integrity_issues, computed_at
+            SELECT wp.id AS page_id, hrs.score, hrs.level, hrs.factors, hrs.integrity_issues, hrs.computed_at
             FROM (
-              SELECT DISTINCT ON (page_id_old) *
+              SELECT DISTINCT ON (page_id_int) *
               FROM hallucination_risk_snapshots
-              ORDER BY page_id_old, computed_at DESC
-            ) latest
-            WHERE level = ${level}
-            ORDER BY score DESC
+              ORDER BY page_id_int, computed_at DESC
+            ) hrs
+            JOIN wiki_pages wp ON wp.integer_id = hrs.page_id_int
+            WHERE hrs.level = ${level}
+            ORDER BY hrs.score DESC
             LIMIT ${limit} OFFSET ${offset}
           `
         : await rawDb<RiskPageDbRow[]>`
-            SELECT page_id_old AS page_id, score, level, factors, integrity_issues, computed_at
+            SELECT wp.id AS page_id, hrs.score, hrs.level, hrs.factors, hrs.integrity_issues, hrs.computed_at
             FROM (
-              SELECT DISTINCT ON (page_id_old) *
+              SELECT DISTINCT ON (page_id_int) *
               FROM hallucination_risk_snapshots
-              ORDER BY page_id_old, computed_at DESC
-            ) latest
-            ORDER BY score DESC
+              ORDER BY page_id_int, computed_at DESC
+            ) hrs
+            JOIN wiki_pages wp ON wp.integer_id = hrs.page_id_int
+            ORDER BY hrs.score DESC
             LIMIT ${limit} OFFSET ${offset}
           `;
     }
@@ -411,7 +413,7 @@ const hallucinationRiskApp = new Hono()
         WHERE id NOT IN (
           SELECT id FROM (
             SELECT id, ROW_NUMBER() OVER (
-              PARTITION BY page_id_old ORDER BY computed_at DESC
+              PARTITION BY page_id_int ORDER BY computed_at DESC
             ) AS rn
             FROM hallucination_risk_snapshots
           ) ranked
@@ -442,7 +444,7 @@ const hallucinationRiskApp = new Hono()
       WHERE id NOT IN (
         SELECT id FROM (
           SELECT id, ROW_NUMBER() OVER (
-            PARTITION BY page_id_old ORDER BY computed_at DESC
+            PARTITION BY page_id_int ORDER BY computed_at DESC
           ) AS rn
           FROM hallucination_risk_snapshots
         ) ranked
