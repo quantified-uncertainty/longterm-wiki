@@ -1,12 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
-
-/**
- * Middleware handles two concerns:
- * 1. Admin auth gating for /internal/* routes (via GitHub OAuth / next-auth)
- * 2. Redirecting old-style content URLs to /wiki/:slug
- */
 
 // Knowledge-base category directories that had index pages in the old site.
 // These don't map to individual wiki pages, so we redirect them to /wiki.
@@ -29,53 +22,8 @@ const KB_CATEGORIES = new Set([
   "worldviews",
 ]);
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // --- Admin auth gate ---
-  // When GITHUB_CLIENT_ID is set, /internal/* requires a valid next-auth session.
-  // If not set, internal pages remain open (dev mode / no-auth deployments).
-  if (pathname.startsWith("/internal")) {
-    const oauthConfigured =
-      !!process.env.GITHUB_CLIENT_ID && !!process.env.GITHUB_CLIENT_SECRET;
-
-    if (oauthConfigured) {
-      const token = await getToken({
-        req: request,
-        secret: process.env.NEXTAUTH_SECRET,
-      });
-
-      if (!token) {
-        const loginUrl = request.nextUrl.clone();
-        loginUrl.pathname = "/login";
-        // next-auth uses `callbackUrl` for post-login redirect
-        loginUrl.searchParams.set("callbackUrl", request.nextUrl.href);
-        return NextResponse.redirect(loginUrl);
-      }
-    }
-  }
-
-  // If already logged in and visiting /login, redirect to /internal
-  if (pathname === "/login") {
-    const oauthConfigured =
-      !!process.env.GITHUB_CLIENT_ID && !!process.env.GITHUB_CLIENT_SECRET;
-
-    if (oauthConfigured) {
-      const token = await getToken({
-        req: request,
-        secret: process.env.NEXTAUTH_SECRET,
-      });
-
-      if (token) {
-        const url = request.nextUrl.clone();
-        url.pathname = "/internal";
-        url.search = "";
-        return NextResponse.redirect(url);
-      }
-    }
-
-    return NextResponse.next();
-  }
 
   // Normalize: strip trailing slash
   const path =
@@ -134,9 +82,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/internal",
-    "/internal/:path+",
-    "/login",
     "/browse",
     "/browse/:path+",
     "/knowledge-base",

@@ -37,7 +37,6 @@ import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 import type { CitationQuote } from "@/lib/citation-data";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
-import { isAdmin } from "@/lib/auth";
 
 /**
  * Build a reference map from citation quotes and footnote index data.
@@ -452,26 +451,6 @@ function WithSidebar({
   );
 }
 
-/**
- * Auth gate for internal dashboard pages accessed via /wiki/E{id}.
- *
- * The middleware protects /internal/* but internal dashboards redirect to
- * /wiki/E{id} which bypasses that check. This function enforces the same
- * auth requirement at render time by checking the entity's canonical path.
- */
-async function requireAuthForInternal(entityPath: string): Promise<void> {
-  if (!entityPath.startsWith("/internal")) return;
-
-  const oauthConfigured =
-    !!process.env.GITHUB_CLIENT_ID && !!process.env.GITHUB_CLIENT_SECRET;
-  if (!oauthConfigured) return; // Dev mode — no auth enforcement
-
-  const admin = await isAdmin();
-  if (!admin) {
-    redirect(`/login?callbackUrl=${encodeURIComponent(`/wiki/`)}`);
-  }
-}
-
 export default async function WikiPage({ params }: PageProps) {
   const { id } = await params;
 
@@ -481,7 +460,6 @@ export default async function WikiPage({ params }: PageProps) {
     if (!slug) notFound();
 
     const entityPath = getEntityPath(slug) || "";
-    await requireAuthForInternal(entityPath);
 
     const [result, citationQuotes] = await Promise.all([
       renderMdxPage(slug),
@@ -517,7 +495,6 @@ export default async function WikiPage({ params }: PageProps) {
 
     // No numeric ID — render directly by slug (page-only content without entity)
     const entityPath = getEntityPath(id) || "";
-    await requireAuthForInternal(entityPath);
 
     const [result, citationQuotes] = await Promise.all([
       renderMdxPage(id),
