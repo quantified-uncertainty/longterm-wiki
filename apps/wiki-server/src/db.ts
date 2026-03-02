@@ -58,12 +58,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export async function initDb() {
-  const url = process.env.DATABASE_URL;
-  if (!url) {
+  const appUrl = process.env.DATABASE_URL;
+  if (!appUrl) {
     throw new Error("DATABASE_URL environment variable is required");
   }
 
-  logger.info("Running migrations...");
+  // Prefer DATABASE_MIGRATION_URL if set — allows a separate PG role with
+  // elevated privileges or no server-side statement_timeout, bypassing
+  // pgbouncer, or using a direct connection. Falls back to DATABASE_URL.
+  const migrationEnvUrl = process.env.DATABASE_MIGRATION_URL;
+  const migrationUrl = migrationEnvUrl || appUrl;
+  const usingSeparateUrl = Boolean(migrationEnvUrl && migrationEnvUrl !== appUrl);
+
+  logger.info(
+    { usingSeparateUrl },
+    "Running migrations..."
+  );
   const startMs = Date.now();
 
   // Dedicated single-connection client for migrations with relaxed timeouts.
@@ -88,7 +98,7 @@ export async function initDb() {
     lock_timeout: '60000',
     idle_in_transaction_session_timeout: '600000',
   };
-  const migrationSql = postgres(url, {
+  const migrationSql = postgres(migrationUrl, {
     max: 1,
     connect_timeout: 10,
     connection: migrationConnection,
