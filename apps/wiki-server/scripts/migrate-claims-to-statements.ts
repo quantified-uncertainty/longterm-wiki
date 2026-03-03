@@ -482,7 +482,7 @@ if (isMain) {
 
   // Parse --entity flag
   const entityArg = process.argv.find((a) => a.startsWith("--entity="));
-  const entityFilter = entityArg ? entityArg.split("=")[1] : "anthropic";
+  const entityFilter = entityArg ? entityArg.slice("--entity=".length) : "anthropic";
 
   const sqlConn = postgres(databaseUrl, { max: 3 });
   const db = drizzle(sqlConn, { schema });

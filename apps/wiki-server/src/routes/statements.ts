@@ -252,45 +252,53 @@ const statementsApp = new Hono()
     const data = parsed.data;
     const db = getDrizzleDb();
 
-    // Insert statement
-    const result = await db
-      .insert(statements)
-      .values({
-        variety: data.variety,
-        statementText: data.statementText ?? null,
-        subjectEntityId: data.subjectEntityId,
-        propertyId: data.propertyId ?? null,
-        qualifierKey: data.qualifierKey ?? null,
-        valueNumeric: data.valueNumeric ?? null,
-        valueUnit: data.valueUnit ?? null,
-        valueText: data.valueText ?? null,
-        valueEntityId: data.valueEntityId ?? null,
-        valueDate: data.valueDate ?? null,
-        valueSeries: (data.valueSeries as Record<string, unknown>) ?? null,
-        validStart: data.validStart ?? null,
-        validEnd: data.validEnd ?? null,
-        temporalGranularity: data.temporalGranularity ?? null,
-        attributedTo: data.attributedTo ?? null,
-        note: data.note ?? null,
-        status: "active",
-      })
-      .returning({ id: statements.id });
+    // Wrap in transaction for atomicity (statement + citations)
+    const statementId = await db.transaction(async (tx) => {
+      const result = await tx
+        .insert(statements)
+        .values({
+          variety: data.variety,
+          statementText: data.statementText ?? null,
+          subjectEntityId: data.subjectEntityId,
+          propertyId: data.propertyId ?? null,
+          qualifierKey: data.qualifierKey ?? null,
+          valueNumeric: data.valueNumeric ?? null,
+          valueUnit: data.valueUnit ?? null,
+          valueText: data.valueText ?? null,
+          valueEntityId: data.valueEntityId ?? null,
+          valueDate: data.valueDate ?? null,
+          valueSeries: (data.valueSeries as Record<string, unknown>) ?? null,
+          validStart: data.validStart ?? null,
+          validEnd: data.validEnd ?? null,
+          temporalGranularity: data.temporalGranularity ?? null,
+          attributedTo: data.attributedTo ?? null,
+          note: data.note ?? null,
+          status: "active",
+        })
+        .returning({ id: statements.id });
 
-    const statementId = result[0].id;
+      if (result.length === 0) {
+        throw new Error("Statement insert returned no rows");
+      }
 
-    // Insert citations if provided
-    if (data.citations.length > 0) {
-      await db.insert(statementCitations).values(
-        data.citations.map((cit) => ({
-          statementId,
-          resourceId: cit.resourceId ?? null,
-          url: cit.url ?? null,
-          sourceQuote: cit.sourceQuote ?? null,
-          locationNote: cit.locationNote ?? null,
-          isPrimary: cit.isPrimary,
-        }))
-      );
-    }
+      const id = result[0].id;
+
+      // Insert citations if provided
+      if (data.citations.length > 0) {
+        await tx.insert(statementCitations).values(
+          data.citations.map((cit) => ({
+            statementId: id,
+            resourceId: cit.resourceId ?? null,
+            url: cit.url ?? null,
+            sourceQuote: cit.sourceQuote ?? null,
+            locationNote: cit.locationNote ?? null,
+            isPrimary: cit.isPrimary,
+          }))
+        );
+      }
+
+      return id;
+    });
 
     return c.json({ id: statementId, ok: true }, 201);
   });
