@@ -51,7 +51,7 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 /** Result row shape after JOIN with wiki_pages to recover slug. */
 type ResultWithSlug = {
   runId: number | bigint;
-  pageSlug: string | null; // COALESCE(page_id_old, wiki_pages.id) — non-null for all Phase B+ rows
+  pageSlug: string | null; // wiki_pages.id from LEFT JOIN on page_id_int
   status: string;
   tier: string | null;
   durationMs: number | null;
@@ -171,7 +171,7 @@ const autoUpdateRunsApp = new Hono()
       let resultsInserted = 0;
 
       if (d.results && d.results.length > 0) {
-        // Phase D2a: resolve slugs to integer IDs (no longer dual-writing page_id_old)
+        // Resolve slugs to integer IDs for page_id_int FK
         const resultPageIds = [...new Set(d.results.map((r) => r.pageId))];
         const intIdMap = await resolvePageIntIds(tx, resultPageIds);
 
@@ -214,9 +214,7 @@ const autoUpdateRunsApp = new Hono()
       .from(autoUpdateRuns);
     const total = countResult[0].count;
 
-    // Fetch all results for the page of runs in a single query.
-    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
-    // (page_id_old no longer written; fall back to wiki_pages.id via page_id_int).
+    // Phase D2b: page_id_old dropped; join wiki_pages to get slug via page_id_int.
     const runIds = rows.map((r) => r.id);
     const resultsByRun = new Map<number, ResultWithSlug[]>();
 
@@ -224,7 +222,7 @@ const autoUpdateRunsApp = new Hono()
       const allResults = await db
         .select({
           runId: autoUpdateResults.runId,
-          pageSlug: sql<string | null>`coalesce(${autoUpdateResults.pageId}, ${wikiPages.id})`,
+          pageSlug: wikiPages.id,
           status: autoUpdateResults.status,
           tier: autoUpdateResults.tier,
           durationMs: autoUpdateResults.durationMs,
@@ -315,11 +313,11 @@ const autoUpdateRunsApp = new Hono()
     }
 
     const r = rows[0];
-    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
+    // Phase D2b: page_id_old dropped; join wiki_pages to get slug via page_id_int
     const results = await db
       .select({
         runId: autoUpdateResults.runId,
-        pageSlug: sql<string | null>`coalesce(${autoUpdateResults.pageId}, ${wikiPages.id})`,
+        pageSlug: wikiPages.id,
         status: autoUpdateResults.status,
         tier: autoUpdateResults.tier,
         durationMs: autoUpdateResults.durationMs,

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, count, and, sql } from "drizzle-orm";
+import { eq, desc, count, and } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { pageImproveRuns, wikiPages } from "../schema.js";
 import { SaveArtifactsSchema } from "../api-types.js";
@@ -29,7 +29,7 @@ const ByPageQuery = z.object({
 function formatArtifactEntry(r: typeof pageImproveRuns.$inferSelect, pageSlug?: string | null) {
   return {
     id: r.id,
-    pageId: pageSlug ?? r.pageId ?? "", // Phase D2a: page_id_old nullable; use joined slug or input slug
+    pageId: pageSlug ?? "", // Phase D2b: page_id_old dropped; slug comes from wiki_pages JOIN
     engine: r.engine,
     tier: r.tier,
     directions: r.directions,
@@ -65,7 +65,7 @@ const artifactsApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
+    // Resolve slug to integer ID for page_id_int FK
     const pageIdInt = await resolvePageIntId(db, d.pageId);
 
     const rows = await db
@@ -100,7 +100,7 @@ const artifactsApp = new Hono()
       });
 
     const row = rows[0];
-    // pageId derived from input (page_id_old column no longer written)
+    // pageId derived from input (page_id_old column dropped in D2b)
     return c.json({ ...row, pageId: d.pageId }, 201);
   })
 
@@ -135,11 +135,11 @@ const artifactsApp = new Hono()
     const { limit, offset } = parsed.data;
     const db = getDrizzleDb();
 
-    // SELECT with wiki_pages JOIN to recover slug for rows written after Phase D2a
+    // Phase D2b: page_id_old dropped; join wiki_pages to get slug via page_id_int
     const rows = await db
       .select({
         run: pageImproveRuns,
-        pageSlug: sql<string | null>`coalesce(${pageImproveRuns.pageId}, ${wikiPages.id})`,
+        pageSlug: wikiPages.id,
       })
       .from(pageImproveRuns)
       .leftJoin(wikiPages, eq(pageImproveRuns.pageIdInt, wikiPages.integerIdCol))
@@ -199,11 +199,11 @@ const artifactsApp = new Hono()
 
     const db = getDrizzleDb();
 
-    // SELECT with wiki_pages JOIN to recover slug for rows written after Phase D2a
+    // Phase D2b: page_id_old dropped; join wiki_pages to get slug via page_id_int
     const rows = await db
       .select({
         run: pageImproveRuns,
-        pageSlug: sql<string | null>`coalesce(${pageImproveRuns.pageId}, ${wikiPages.id})`,
+        pageSlug: wikiPages.id,
       })
       .from(pageImproveRuns)
       .leftJoin(wikiPages, eq(pageImproveRuns.pageIdInt, wikiPages.integerIdCol))

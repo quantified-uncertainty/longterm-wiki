@@ -7,7 +7,7 @@
  */
 
 import { Hono } from "hono";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import {
   claimPageReferences,
@@ -69,7 +69,6 @@ const app = new Hono()
       .select({
         id: claimPageReferences.id,
         claimId: claimPageReferences.claimId,
-        pageId: claimPageReferences.pageId,
         footnote: claimPageReferences.footnote,
         section: claimPageReferences.section,
         quoteText: claimPageReferences.quoteText,
@@ -86,7 +85,7 @@ const app = new Hono()
       type: "claim" as const,
       id: Number(r.id),
       claimId: Number(r.claimId),
-      pageId, // use URL parameter — page_id_old no longer written for new rows (Phase D2a)
+      pageId, // derived from URL parameter (page_id_old dropped in D2b)
       footnote: r.footnote,
       section: r.section,
       quoteText: r.quoteText,
@@ -106,7 +105,7 @@ const app = new Hono()
       type: "citation" as const,
       id: Number(r.id),
       referenceId: r.referenceId,
-      pageId, // use URL parameter — page_id_old no longer written for new rows (Phase D2a)
+      pageId, // derived from URL parameter (page_id_old dropped in D2b)
       title: r.title,
       url: r.url,
       note: r.note,
@@ -312,13 +311,12 @@ const app = new Hono()
     const db = getDrizzleDb();
 
     // 1. Fetch all claim page references with joined claim data.
-    //    LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
-    //    (page_id_old is no longer written; fall back to wiki_pages.id via page_id_int).
+    //    Phase D2b: page_id_old dropped; join wiki_pages to get slug via page_id_int.
     const claimRefRows = await db
       .select({
         id: claimPageReferences.id,
         claimId: claimPageReferences.claimId,
-        pageSlug: sql<string | null>`coalesce(${claimPageReferences.pageId}, ${wikiPages.id})`,
+        pageSlug: wikiPages.id,
         footnote: claimPageReferences.footnote,
         section: claimPageReferences.section,
         quoteText: claimPageReferences.quoteText,
@@ -331,7 +329,8 @@ const app = new Hono()
       .innerJoin(claims, eq(claimPageReferences.claimId, claims.id))
       .leftJoin(wikiPages, eq(claimPageReferences.pageIdInt, wikiPages.integerIdCol));
 
-    // 2. Fetch all page citations with wiki_pages JOIN for slug recovery
+    // 2. Fetch all page citations with wiki_pages JOIN for slug recovery.
+    //    Phase D2b: page_id_old dropped; use wiki_pages.id directly.
     const citationRows = await db
       .select({
         referenceId: pageCitations.referenceId,
@@ -339,7 +338,7 @@ const app = new Hono()
         url: pageCitations.url,
         note: pageCitations.note,
         resourceId: pageCitations.resourceId,
-        pageSlug: sql<string | null>`coalesce(${pageCitations.pageId}, ${wikiPages.id})`,
+        pageSlug: wikiPages.id,
       })
       .from(pageCitations)
       .leftJoin(wikiPages, eq(pageCitations.pageIdInt, wikiPages.integerIdCol));

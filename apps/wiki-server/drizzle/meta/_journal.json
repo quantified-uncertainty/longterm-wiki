@@ -372,6 +372,13 @@
       "when": 1773043200000,
       "tag": "0052_add_statement_verdicts",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1773129600000,
+      "tag": "0053_drop_old_page_id_columns",
+      "breakpoints": true
     }
   ]
 }

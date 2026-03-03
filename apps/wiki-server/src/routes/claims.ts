@@ -687,13 +687,12 @@ const claimsApp = new Hono()
     let pageRefsMap = new Map<number, PageRefWithSlug[]>();
     if (includePageReferences && rows.length > 0) {
       const claimIds = rows.map((r) => r.id);
-      // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
-      // (page_id_old no longer written; fall back to wiki_pages.id via page_id_int)
+      // Phase D2b: page_id_old dropped; join wiki_pages to get slug via page_id_int
       const pageRefRows = await db
         .select({
           id: claimPageReferences.id,
           claimId: claimPageReferences.claimId,
-          pageSlug: sql<string | null>`coalesce(${claimPageReferences.pageId}, ${wikiPages.id})`,
+          pageSlug: wikiPages.id,
           footnote: claimPageReferences.footnote,
           section: claimPageReferences.section,
           quoteText: claimPageReferences.quoteText,
@@ -1570,13 +1569,12 @@ const claimsApp = new Hono()
     const claimMap = new Map(claimRows.map((r) => [Number(r.id), r]));
 
     // Step 3: Fetch page references for these claims.
-    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
-    // (page_id_old no longer written; fall back to wiki_pages.id via page_id_int).
+    // Phase D2b: page_id_old dropped; join wiki_pages to get slug via page_id_int.
     const pageRefs = await db
       .select({
         id: claimPageReferences.id,
         claimId: claimPageReferences.claimId,
-        pageSlug: sql<string | null>`coalesce(${claimPageReferences.pageId}, ${wikiPages.id})`,
+        pageSlug: wikiPages.id,
         footnote: claimPageReferences.footnote,
       })
       .from(claimPageReferences)
@@ -1681,12 +1679,12 @@ const claimsApp = new Hono()
     }
 
     const db = getDrizzleDb();
-    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
+    // Phase D2b: page_id_old dropped; join wiki_pages to get slug via page_id_int
     const rows = await db
       .select({
         id: claimPageReferences.id,
         claimId: claimPageReferences.claimId,
-        pageSlug: sql<string | null>`coalesce(${claimPageReferences.pageId}, ${wikiPages.id})`,
+        pageSlug: wikiPages.id,
         footnote: claimPageReferences.footnote,
         section: claimPageReferences.section,
         createdAt: claimPageReferences.createdAt,
