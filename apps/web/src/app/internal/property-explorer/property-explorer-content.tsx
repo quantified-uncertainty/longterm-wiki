@@ -5,6 +5,7 @@ import {
   type FetchResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { StatCard } from "@components/internal/StatCard";
 import { PropertyExplorerTable } from "./property-explorer-table";
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -207,35 +208,5 @@ export async function PropertyExplorerContent() {
 
       <DataSourceBanner source={source} apiError={apiError} />
     </>
-  );
-}
-
-// ── Stat Card ─────────────────────────────────────────────────────────────
-
-function StatCard({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: number;
-  color?: "emerald" | "blue" | "amber";
-}) {
-  const colorClass =
-    color === "emerald"
-      ? "text-emerald-600"
-      : color === "blue"
-        ? "text-blue-600"
-        : color === "amber"
-          ? "text-amber-600"
-          : "text-foreground";
-
-  return (
-    <div className="rounded-lg border border-border/60 px-3 py-2">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={`text-lg font-semibold tabular-nums ${colorClass}`}>
-        {value.toLocaleString("en-US")}
-      </p>
-    </div>
   );
 }

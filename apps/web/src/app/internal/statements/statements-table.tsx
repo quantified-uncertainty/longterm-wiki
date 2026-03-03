@@ -68,6 +68,21 @@ export function StatementsTable({ data, properties }: StatementsTableProps) {
     return map;
   }, [properties]);
 
+  const [varietyFilter, setVarietyFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  // Apply variety/status filters before passing to table
+  const filteredData = useMemo(() => {
+    let result = data;
+    if (varietyFilter !== "all") {
+      result = result.filter((s) => s.variety === varietyFilter);
+    }
+    if (statusFilter !== "all") {
+      result = result.filter((s) => s.status === statusFilter);
+    }
+    return result;
+  }, [data, varietyFilter, statusFilter]);
+
   const columns: ColumnDef<StatementRow>[] = useMemo(
     () => [
       {
@@ -147,6 +162,25 @@ export function StatementsTable({ data, properties }: StatementsTableProps) {
         size: 80,
       },
       {
+        id: "citationCount",
+        header: ({ column }) => (
+          <SortableHeader column={column}>Citations</SortableHeader>
+        ),
+        accessorFn: (row) => row.citationCount ?? 0,
+        cell: ({ row }) => {
+          const count = row.original.citationCount ?? 0;
+          if (count === 0) {
+            return <span className="text-muted-foreground text-xs">0</span>;
+          }
+          return (
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 text-[11px] font-medium">
+              {count}
+            </span>
+          );
+        },
+        size: 80,
+      },
+      {
         accessorKey: "validStart",
         header: ({ column }) => (
           <SortableHeader column={column}>Valid From</SortableHeader>
@@ -209,7 +243,7 @@ export function StatementsTable({ data, properties }: StatementsTableProps) {
   );
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     state: { sorting, globalFilter, columnVisibility },
     onSortingChange: setSorting,
@@ -222,9 +256,9 @@ export function StatementsTable({ data, properties }: StatementsTableProps) {
 
   return (
     <div className="space-y-3">
-      {/* Search bar */}
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1 max-w-sm">
+      {/* Search bar + filters */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
@@ -234,6 +268,25 @@ export function StatementsTable({ data, properties }: StatementsTableProps) {
             className="w-full rounded-md border border-input bg-background py-2 pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
           />
         </div>
+        <select
+          value={varietyFilter}
+          onChange={(e) => setVarietyFilter(e.target.value)}
+          className="rounded-md border border-input bg-background px-2 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+        >
+          <option value="all">All varieties</option>
+          <option value="structured">Structured</option>
+          <option value="attributed">Attributed</option>
+        </select>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="rounded-md border border-input bg-background px-2 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+        >
+          <option value="all">All statuses</option>
+          <option value="active">Active</option>
+          <option value="superseded">Superseded</option>
+          <option value="retracted">Retracted</option>
+        </select>
         <span className="text-xs text-muted-foreground tabular-nums">
           {table.getFilteredRowModel().rows.length} of {data.length}
         </span>

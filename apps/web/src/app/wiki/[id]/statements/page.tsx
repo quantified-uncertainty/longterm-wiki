@@ -9,6 +9,8 @@ import {
   getVarietyBadge,
   getStatusBadge,
 } from "@lib/statement-display";
+import { StatCard } from "@components/internal/StatCard";
+import { CitationDetail, AttributedCitationDetail } from "./citation-detail";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -173,7 +175,15 @@ export default async function EntityStatementsPage({ params }: PageProps) {
           {/* Structured statements by category */}
           {byCategory.size > 0 && (
             <div className="mb-8">
-              <h2 className="text-lg font-semibold mb-4">Structured Statements</h2>
+              <h2 className="text-lg font-semibold mb-1">Structured Statements</h2>
+              <p className="text-xs text-muted-foreground mb-4">
+                Structured statements record specific data points with typed values, dates, and units.
+                See the{" "}
+                <Link href="/wiki/E1004" className="text-blue-600 hover:underline">
+                  Property Explorer
+                </Link>{" "}
+                for all available properties.
+              </p>
               {[...byCategory.entries()]
                 .sort((a, b) => b[1].length - a[1].length)
                 .map(([category, stmts]) => (
@@ -185,7 +195,10 @@ export default async function EntityStatementsPage({ params }: PageProps) {
           {/* Attributed statements */}
           {attributed.length > 0 && (
             <div className="mb-8">
-              <h2 className="text-lg font-semibold mb-4">Attributed Statements</h2>
+              <h2 className="text-lg font-semibold mb-1">Attributed Statements</h2>
+              <p className="text-xs text-muted-foreground mb-4">
+                Attributed statements capture notable claims attributed to specific people or organizations.
+              </p>
               <div className="space-y-2">
                 {attributed.map((s) => (
                   <AttributedRow key={s.id} statement={s} />
@@ -199,35 +212,16 @@ export default async function EntityStatementsPage({ params }: PageProps) {
   );
 }
 
-// ---- Sub-components ----
+// ---- Helpers ----
 
-function StatCard({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: number;
-  color?: "blue" | "amber" | "emerald";
-}) {
-  const colorClass =
-    color === "blue"
-      ? "text-blue-600"
-      : color === "amber"
-        ? "text-amber-600"
-        : color === "emerald"
-          ? "text-emerald-600"
-          : "text-foreground";
-
-  return (
-    <div className="rounded-lg border border-border/60 px-3 py-2">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={`text-lg font-semibold tabular-nums ${colorClass}`}>
-        {value.toLocaleString("en-US")}
-      </p>
-    </div>
-  );
+function formatPeriod(start: string | null, end: string | null): string {
+  if (!start && !end) return "—";
+  if (start && !end) return `since ${start}`;
+  if (!start && end) return `until ${end}`;
+  return `${start} → ${end}`;
 }
+
+// ---- Sub-components ----
 
 function PropertyGroup({
   category,
@@ -275,9 +269,10 @@ function PropertyGroup({
 function StructuredRow({ statement: s }: { statement: StatementWithDetails }) {
   const value = formatStatementValue(s, s.property);
   const statusBadge = getStatusBadge(s.status);
+  const isSuperseded = s.status !== "active";
 
   return (
-    <tr className="border-b border-border/30 last:border-0">
+    <tr className={`border-b border-border/30 last:border-0 ${isSuperseded ? "opacity-60" : ""}`}>
       <td className="px-3 py-2 text-xs font-medium">
         {s.property?.label ?? s.propertyId ?? "—"}
       </td>
@@ -294,17 +289,10 @@ function StructuredRow({ statement: s }: { statement: StatementWithDetails }) {
         )}
       </td>
       <td className="px-3 py-2 text-xs text-muted-foreground">
-        {s.validStart ?? "—"}
-        {s.validEnd ? ` → ${s.validEnd}` : ""}
+        {formatPeriod(s.validStart, s.validEnd)}
       </td>
-      <td className="px-3 py-2 text-xs text-right tabular-nums">
-        {s.citations.length > 0 ? (
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 text-[11px] font-medium">
-            {s.citations.length}
-          </span>
-        ) : (
-          <span className="text-muted-foreground">0</span>
-        )}
+      <td className="px-3 py-2 text-xs text-right relative">
+        <CitationDetail citations={s.citations} />
       </td>
       <td className="px-3 py-2">
         <span
@@ -320,9 +308,10 @@ function StructuredRow({ statement: s }: { statement: StatementWithDetails }) {
 function AttributedRow({ statement: s }: { statement: StatementWithDetails }) {
   const varietyBadge = getVarietyBadge(s.variety);
   const statusBadge = getStatusBadge(s.status);
+  const isSuperseded = s.status !== "active";
 
   return (
-    <div className="rounded-lg border border-border/60 p-3">
+    <div className={`rounded-lg border border-border/60 p-3 ${isSuperseded ? "opacity-60" : ""}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           {s.statementText && (
@@ -356,11 +345,7 @@ function AttributedRow({ statement: s }: { statement: StatementWithDetails }) {
           >
             {statusBadge.label}
           </span>
-          {s.citations.length > 0 && (
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 text-[11px] font-medium">
-              {s.citations.length} cite{s.citations.length !== 1 ? "s" : ""}
-            </span>
-          )}
+          <AttributedCitationDetail citations={s.citations} />
         </div>
       </div>
     </div>
