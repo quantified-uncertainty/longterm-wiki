@@ -16,7 +16,7 @@ import { RelatedPages } from "@/components/RelatedPages";
 import { WikiSidebar, MobileSidebarTrigger } from "@/components/wiki/WikiSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { detectSidebarType, getWikiNav, isAboutPage } from "@/lib/wiki-nav";
-import { AlertTriangle, Database, Github, FileCheck } from "lucide-react";
+import { AlertTriangle, Database, Github, FileCheck, BarChart3 } from "lucide-react";
 import { PageFeedback } from "@/components/wiki/PageFeedback";
 import type { Metadata } from "next";
 import {
@@ -249,7 +249,7 @@ function ContentMeta({
         )}
         {numId && (
           <a href={`/wiki/${numId}/statements`} className="page-meta-github">
-            <FileCheck size={14} />
+            <BarChart3 size={14} />
             Statements
           </a>
         )}

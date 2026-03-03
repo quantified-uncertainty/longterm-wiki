@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   fetchDetailed,
   withApiFallback,
@@ -170,8 +171,13 @@ export async function PropertyExplorerContent() {
                     key={row.entityId}
                     className="border-b border-border/30 last:border-0"
                   >
-                    <td className="px-3 py-1.5 font-medium text-blue-600">
-                      {row.entityId}
+                    <td className="px-3 py-1.5 font-medium">
+                      <Link
+                        href={`/wiki/${row.entityId}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {row.entityId}
+                      </Link>
                     </td>
                     <td className="px-3 py-1.5 text-right tabular-nums font-semibold">
                       {row.propertyCount}
