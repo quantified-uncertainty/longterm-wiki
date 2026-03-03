@@ -478,8 +478,9 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
       (SELECT count(*) FROM facts WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_facts,
       (SELECT count(*) FROM claims WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_claims,
       (SELECT count(*) FROM summaries WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_summaries,
-      (SELECT count(*) FROM citation_quotes WHERE page_id_old NOT IN (SELECT id FROM wiki_pages))::int AS dangling_citations,
-      (SELECT count(*) FROM edit_logs WHERE page_id_old NOT IN (SELECT id FROM wiki_pages))::int AS dangling_edit_logs
+      -- NULL-safe: NULL NOT IN (...) = NULL in SQL, so treat NULL page_id_int as dangling
+      (SELECT count(*) FROM citation_quotes WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages)))::int AS dangling_citations,
+      (SELECT count(*) FROM edit_logs WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages)))::int AS dangling_edit_logs
   `;
 
   const row = result[0] as {

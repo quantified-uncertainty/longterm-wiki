@@ -320,12 +320,13 @@ const integrityApp = new Hono()
         "entity_id",
         "entities"
       ),
-      // 5. citation_quotes.page_id_old → wiki_pages
+      // 5. citation_quotes.page_id_int → wiki_pages
+      // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id_old AS ref FROM citation_quotes WHERE page_id_old NOT IN (SELECT id FROM wiki_pages)`,
+        sql`SELECT DISTINCT page_id_int::text AS ref FROM citation_quotes WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages))`,
         "citation_quotes",
-        "page_id_old",
+        "page_id_int",
         "wiki_pages"
       ),
       // 6. citation_quotes.resource_id → resources
@@ -336,12 +337,13 @@ const integrityApp = new Hono()
         "resource_id",
         "resources"
       ),
-      // 7. edit_logs.page_id_old → wiki_pages
+      // 7. edit_logs.page_id_int → wiki_pages
+      // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id_old AS ref FROM edit_logs WHERE page_id_old NOT IN (SELECT id FROM wiki_pages)`,
+        sql`SELECT DISTINCT page_id_int::text AS ref FROM edit_logs WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages))`,
         "edit_logs",
-        "page_id_old",
+        "page_id_int",
         "wiki_pages"
       ),
       // 8. entities.relatedEntries JSONB → entities
@@ -352,12 +354,13 @@ const integrityApp = new Hono()
         "related_entries[].id",
         "entities"
       ),
-      // 9. resource_citations.page_id_old → wiki_pages
+      // 9. resource_citations.page_id_int → wiki_pages
+      // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id_old AS ref FROM resource_citations WHERE page_id_old NOT IN (SELECT id FROM wiki_pages)`,
+        sql`SELECT DISTINCT page_id_int::text AS ref FROM resource_citations WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages))`,
         "resource_citations",
-        "page_id_old",
+        "page_id_int",
         "wiki_pages"
       ),
     ];
@@ -426,7 +429,7 @@ const integrityApp = new Hono()
           FROM (
             SELECT
               wp.id,
-              EXISTS (SELECT 1 FROM citation_quotes cq WHERE cq.page_id_old = wp.id) AS has_cq,
+              EXISTS (SELECT 1 FROM citation_quotes cq WHERE cq.page_id_int = wp.integer_id) AS has_cq,
               EXISTS (SELECT 1 FROM claims c WHERE c.entity_id = wp.slug) AS has_claims
             FROM wiki_pages wp
           ) sub`
