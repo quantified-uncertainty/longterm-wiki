@@ -14,6 +14,7 @@ import {
   AutoUpdateNewsBatchSchema,
 } from "../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
+import { logger } from "../logger.js";
 
 // ---- Constants ----
 
@@ -66,13 +67,19 @@ const autoUpdateNewsApp = new Hono()
     const db = getDrizzleDb();
 
     const results = await db.transaction(async (tx) => {
-      // Phase 4a: resolve routed page slugs to integer IDs for dual-write (inside tx for consistency)
+      // Phase D2a: resolve routed page slugs to integer IDs (inside tx for consistency)
       const routedPageIds = items
         .map((d) => d.routedToPageId)
         .filter((id): id is string => id != null);
       const intIdMap = routedPageIds.length > 0
         ? await resolvePageIntIds(tx, routedPageIds)
         : new Map<string, number>();
+
+      // Warn on unresolvable slugs — with no _old column fallback, routing is lost silently
+      const unresolved = routedPageIds.filter((id) => !intIdMap.has(id));
+      if (unresolved.length > 0) {
+        logger.warn({ unresolved }, "auto-update-news: routedToPageId slugs not found in wiki_pages; routing will be null");
+      }
 
       return await tx
         .insert(autoUpdateNewsItems)
@@ -176,9 +183,10 @@ const autoUpdateNewsApp = new Hono()
       .where(eq(autoUpdateNewsItems.routedToPageIdInt, intId))
       .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore));
 
+    // All results are routed to pageId (the URL param) — pass it directly as the slug override
     return c.json({
       items: rows.map((r) => ({
-        ...mapNewsRow(r.item),
+        ...mapNewsRow(r.item, pageId),
         runDate: r.runDate,
       })),
     });
