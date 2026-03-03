@@ -28,13 +28,6 @@ pg_version = "16"
 #   patterns are impossible with Drizzle. Tables are small (~700 rows) so brief locking is
 #   acceptable. If large-table migrations are needed in the future, use a separate raw SQL
 #   runner outside Drizzle.
-#
-# ban-drop-column:
-#   Migration 0053 drops the _old text FK columns that were renamed in Phase D2a of the
-#   wiki_pages integer PK migration (#1497). Those columns were made nullable in D2a and
-#   all write paths already use the integer FK columns exclusively. The predeploy script
-#   (scripts/phase-d2b-predeploy.sql) verifies 100% integer coverage before dropping,
-#   so no data is lost and no client code reads these deprecated columns.
 excluded_rules = [
   "prefer-bigint-over-int",
   "prefer-identity",
@@ -45,5 +38,4 @@ excluded_rules = [
   "disallowed-unique-constraint",
   "constraint-missing-not-valid",
   "adding-not-nullable-field",
-  "ban-drop-column",
 ]
