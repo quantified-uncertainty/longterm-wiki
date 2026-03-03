@@ -189,3 +189,48 @@ export type RpcFactsByEntityResult = InferResponseType<FactsClient['by-entity'][
 
 /** Inferred response type for GET /api/facts/timeseries/:entityId */
 export type RpcTimeseriesResult = InferResponseType<FactsClient['timeseries'][':entityId']['$get'], 200>;
+
+// ============================================================================
+// Hono RPC client — typed statements API
+// ============================================================================
+
+import type { StatementsRoute } from "@wiki-server/statements-route";
+
+/**
+ * Create a typed Hono RPC client for the statements API.
+ * Returns null if the server URL is not configured.
+ */
+export function getStatementsRpcClient(options?: { revalidate?: number }) {
+  const config = getWikiServerConfig();
+  if (!config) return null;
+
+  const revalidate = options?.revalidate ?? 300;
+
+  const isrFetch: typeof globalThis.fetch = (input, init) => {
+    return globalThis.fetch(input, {
+      ...init,
+      next: { revalidate },
+      signal: init?.signal ?? AbortSignal.timeout(10_000),
+    } as RequestInit);
+  };
+
+  return hc<StatementsRoute>(`${config.serverUrl}/api/statements`, {
+    headers: config.headers,
+    fetch: isrFetch,
+  });
+}
+
+// Typed response types for the statements API (inferred from server route)
+type StatementsClient = NonNullable<ReturnType<typeof getStatementsRpcClient>>;
+
+/** Inferred response type for GET /api/statements/by-entity */
+export type RpcStatementsByEntityResult = InferResponseType<StatementsClient['by-entity']['$get'], 200>;
+
+/** Inferred response type for GET /api/statements/properties */
+export type RpcStatementsPropertiesResult = InferResponseType<StatementsClient['properties']['$get'], 200>;
+
+/** Inferred response type for GET /api/statements/stats */
+export type RpcStatementsStatsResult = InferResponseType<StatementsClient['stats']['$get'], 200>;
+
+/** Inferred response type for GET /api/statements/ (list) */
+export type RpcStatementsListResult = InferResponseType<StatementsClient['index']['$get'], 200>;
