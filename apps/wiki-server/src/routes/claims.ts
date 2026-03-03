@@ -1681,21 +1681,32 @@ const claimsApp = new Hono()
     }
 
     const db = getDrizzleDb();
+    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
     const rows = await db
-      .select()
+      .select({
+        id: claimPageReferences.id,
+        claimId: claimPageReferences.claimId,
+        pageSlug: sql<string | null>`coalesce(${claimPageReferences.pageId}, ${wikiPages.id})`,
+        footnote: claimPageReferences.footnote,
+        section: claimPageReferences.section,
+        createdAt: claimPageReferences.createdAt,
+      })
       .from(claimPageReferences)
+      .leftJoin(wikiPages, eq(claimPageReferences.pageIdInt, wikiPages.integerIdCol))
       .where(eq(claimPageReferences.claimId, id))
-      .orderBy(asc(claimPageReferences.pageId), asc(claimPageReferences.footnote));
+      .orderBy(asc(claimPageReferences.footnote));
 
     return c.json({
-      references: rows.map((r) => ({
-        id: Number(r.id),
-        claimId: Number(r.claimId),
-        pageId: r.pageId,
-        footnote: r.footnote,
-        section: r.section,
-        createdAt: r.createdAt?.toISOString() ?? new Date().toISOString(),
-      })),
+      references: rows
+        .filter((r) => r.pageSlug != null)
+        .map((r) => ({
+          id: Number(r.id),
+          claimId: Number(r.claimId),
+          pageId: r.pageSlug!,
+          footnote: r.footnote,
+          section: r.section,
+          createdAt: r.createdAt?.toISOString() ?? new Date().toISOString(),
+        })),
     });
   })
   // ---- POST /:id/page-references ----

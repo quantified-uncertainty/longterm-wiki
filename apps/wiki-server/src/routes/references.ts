@@ -393,11 +393,15 @@ const app = new Hono()
       });
     }
 
+    // Derive totals from filtered byPage (rows with no recoverable slug are excluded)
+    const totalClaimRefs = Object.values(byPage).reduce((n, p) => n + p.claimReferences.length, 0);
+    const totalCitations = Object.values(byPage).reduce((n, p) => n + p.citations.length, 0);
+
     return c.json({
       pages: byPage,
       totalPages: Object.keys(byPage).length,
-      totalClaimRefs: claimRefRows.length,
-      totalCitations: citationRows.length,
+      totalClaimRefs,
+      totalCitations,
     });
   });
 
