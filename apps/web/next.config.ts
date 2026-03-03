@@ -6,6 +6,17 @@ import { resolve } from "path";
 loadEnv({ path: resolve(import.meta.dirname, "../../.env") });
 
 const nextConfig: NextConfig = {
+  env: {
+    // Vercel provides these at build time — expose to the client so the
+    // System Health dashboard can show which commit is currently deployed.
+    NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA:
+      process.env.VERCEL_GIT_COMMIT_SHA ?? "",
+    NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF:
+      process.env.VERCEL_GIT_COMMIT_REF ?? "",
+    NEXT_PUBLIC_VERCEL_GIT_COMMIT_MESSAGE:
+      process.env.VERCEL_GIT_COMMIT_MESSAGE ?? "",
+    NEXT_PUBLIC_BUILD_TIMESTAMP: new Date().toISOString(),
+  },
   transpilePackages: [
     "@quri/squiggle-components",
     "@quri/squiggle-lang",
