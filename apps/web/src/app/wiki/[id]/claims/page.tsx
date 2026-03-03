@@ -68,14 +68,14 @@ export default async function WikiClaimsPage({ params }: PageProps) {
 
   const claims = result?.claims ?? [];
 
-  const verified = claims.filter((c) => (c.claimVerdict ?? c.confidence) === "verified").length;
+  const verified = claims.filter((c: ClaimRow) => (c.claimVerdict ?? c.confidence) === "verified").length;
   const multiEntity = claims.filter(
-    (c) => c.relatedEntities && c.relatedEntities.length > 0
+    (c: ClaimRow) => c.relatedEntities && c.relatedEntities.length > 0
   ).length;
 
-  const verdictVerified = claims.filter((c) => c.claimVerdict === "verified").length;
-  const verdictDisputed = claims.filter((c) => c.claimVerdict === "disputed").length;
-  const verdictUnsupported = claims.filter((c) => c.claimVerdict === "unsupported").length;
+  const verdictVerified = claims.filter((c: ClaimRow) => c.claimVerdict === "verified").length;
+  const verdictDisputed = claims.filter((c: ClaimRow) => c.claimVerdict === "disputed").length;
+  const verdictUnsupported = claims.filter((c: ClaimRow) => c.claimVerdict === "unsupported").length;
   const hasVerdicts = verdictVerified + verdictDisputed + verdictUnsupported > 0;
 
   const byCategory: Record<string, number> = {};

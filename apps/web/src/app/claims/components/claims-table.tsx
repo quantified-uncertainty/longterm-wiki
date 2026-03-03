@@ -31,6 +31,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { ClaimRow } from "@wiki-server/api-response-types";
+
+type ClaimSource = NonNullable<ClaimRow['sources']>[number];
+
 import { CategoryBadge } from "./category-badge";
 import { ConfidenceBadge } from "./confidence-badge";
 import { ClaimModeBadge } from "./claim-mode-badge";
@@ -218,7 +221,7 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
                 <span className="text-muted-foreground">Qualifiers:</span>{" "}
                 {Object.entries(claim.qualifiers).map(([k, v]) => (
                   <span key={k} className="font-mono ml-1">
-                    {k}={v}
+                    {k}={String(v)}
                   </span>
                 ))}
               </span>
@@ -234,7 +237,7 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
             Sources ({claim.sources.length}):
           </span>
           <div className="space-y-1">
-            {claim.sources.map((s) => (
+            {claim.sources.map((s: ClaimSource) => (
               <div key={s.id} className="text-xs flex items-start gap-2">
                 {s.isPrimary && (
                   <span className="bg-blue-100 text-blue-700 px-1 py-0.5 rounded text-[9px] shrink-0">
@@ -285,7 +288,7 @@ function ExpandedClaimDetail({ claim, entityNames = {} }: { claim: ClaimRow; ent
         {claim.relatedEntities && claim.relatedEntities.length > 0 && (
           <span>
             <span className="text-muted-foreground">Related:</span>{" "}
-            {claim.relatedEntities.map((eid) => (
+            {claim.relatedEntities.map((eid: string) => (
               <Link
                 key={eid}
                 href={`/claims/entity/${eid}`}
@@ -544,7 +547,7 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
     accessorFn: (row) => {
       // Prefer quote from claim_sources, fall back to legacy sourceQuote (wiki page excerpt)
       if (row.sources && row.sources.length > 0) {
-        const primary = row.sources.find(s => s.isPrimary);
+        const primary = row.sources.find((s: ClaimSource) => s.isPrimary);
         return (primary || row.sources[0]).sourceQuote || row.sourceQuote || null;
       }
       return row.sourceQuote || null;
@@ -555,7 +558,7 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
       let quote: string | null = null;
       let isFromSource = false;
       if (row.original.sources && row.original.sources.length > 0) {
-        const primary = row.original.sources.find(s => s.isPrimary);
+        const primary = row.original.sources.find((s: ClaimSource) => s.isPrimary);
         const sourceQuote = (primary || row.original.sources[0]).sourceQuote;
         if (sourceQuote) {
           quote = sourceQuote;
@@ -589,7 +592,7 @@ function getColumns(entityNames: Record<string, string>): ColumnDef<ClaimRow>[] 
         return <span className="text-muted-foreground text-[10px]">-</span>;
       return (
         <div className="flex flex-wrap gap-0.5">
-          {entities.slice(0, 3).map((eid) => (
+          {entities.slice(0, 3).map((eid: string) => (
             <Link
               key={eid}
               href={`/claims/entity/${eid}`}

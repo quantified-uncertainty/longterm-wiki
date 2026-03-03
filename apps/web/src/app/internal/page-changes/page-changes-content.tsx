@@ -66,7 +66,7 @@ async function loadSessionsFromApi() {
         issues: Array.isArray(s.issuesJson) ? s.issuesJson.map(String) : [],
         learnings: Array.isArray(s.learningsJson) ? s.learningsJson.map(String) : [],
         recommendations: Array.isArray(s.recommendationsJson) ? s.recommendationsJson.map(String) : [],
-        pages: s.pages.map((pageId) => {
+        pages: s.pages.map((pageId: string) => {
           const meta = pageMap.get(pageId);
           return {
             pageId,
@@ -90,7 +90,7 @@ export async function PageChangesContent() {
 
   const totalPageEdits = sessions.reduce((n, s) => n + s.pages.length, 0);
   const uniquePages = new Set(
-    sessions.flatMap((s) => s.pages.map((p) => p.pageId))
+    sessions.flatMap((s) => s.pages.map((p: { pageId: string }) => p.pageId))
   );
 
   return (

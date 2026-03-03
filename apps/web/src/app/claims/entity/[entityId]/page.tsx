@@ -8,7 +8,7 @@ import {
   getResourceById,
   getResourceCredibility,
 } from "@data";
-import type { GetClaimsResult } from "@wiki-server/api-response-types";
+import type { GetClaimsResult, ClaimRow } from "@wiki-server/api-response-types";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { parse } from "yaml";
@@ -159,20 +159,20 @@ export default async function EntityClaimsPage({ params }: PageProps) {
   }
 
   // Compute stats
-  const verified = claims.filter((c) => c.confidence === "verified").length;
+  const verified = claims.filter((c: ClaimRow) => c.confidence === "verified").length;
   const multiEntity = claims.filter(
-    (c) => c.relatedEntities && c.relatedEntities.length > 0
+    (c: ClaimRow) => c.relatedEntities && c.relatedEntities.length > 0
   ).length;
-  const attributed = claims.filter((c) => c.claimMode === "attributed").length;
+  const attributed = claims.filter((c: ClaimRow) => c.claimMode === "attributed").length;
   const withSources = claims.filter(
-    (c) => c.sources && c.sources.length > 0
+    (c: ClaimRow) => c.sources && c.sources.length > 0
   ).length;
   const withNumeric = claims.filter(
-    (c) => c.valueNumeric != null || c.valueLow != null || c.valueHigh != null
+    (c: ClaimRow) => c.valueNumeric != null || c.valueLow != null || c.valueHigh != null
   ).length;
-  const verdictVerified = claims.filter((c) => c.claimVerdict === "verified").length;
-  const verdictDisputed = claims.filter((c) => c.claimVerdict === "disputed").length;
-  const verdictUnsupported = claims.filter((c) => c.claimVerdict === "unsupported").length;
+  const verdictVerified = claims.filter((c: ClaimRow) => c.claimVerdict === "verified").length;
+  const verdictDisputed = claims.filter((c: ClaimRow) => c.claimVerdict === "disputed").length;
+  const verdictUnsupported = claims.filter((c: ClaimRow) => c.claimVerdict === "unsupported").length;
 
   const byCategory: Record<string, number> = {};
   for (const c of claims) {
@@ -202,7 +202,7 @@ export default async function EntityClaimsPage({ params }: PageProps) {
           {claims.length === 0
             ? "No claims found for this entity yet."
             : (() => {
-                const primary = claims.filter((c) => c.entityId === entityId).length;
+                const primary = claims.filter((c: ClaimRow) => c.entityId === entityId).length;
                 const mentioned = claims.length - primary;
                 if (mentioned === 0) return `${claims.length} claims extracted from this entity's wiki page.`;
                 if (primary === 0) return `${mentioned} claims mentioning this entity from other pages.`;

@@ -12,7 +12,7 @@ import {
 } from "@data";
 import { getCitationQuotesByUrl } from "@/lib/citation-data";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
-import type { CitationContentResult } from "@wiki-server/api-response-types";
+import type { CitationContentResult, CrossPageClaimQuoteRow } from "@wiki-server/api-response-types";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getDomain } from "@/components/wiki/resource-utils";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
@@ -107,7 +107,7 @@ export default async function SourcePage({ params }: PageProps) {
     pageId,
     pageTitle: getPageTitle(pageId),
     pageHref: `/wiki/${pageId}`,
-    quotes: pageQuotes.map((q) => ({
+    quotes: pageQuotes.map((q: CrossPageClaimQuoteRow) => ({
       pageId: q.pageId,
       claimText: q.claimText,
       sourceQuote: q.sourceQuote ?? null,

@@ -69,6 +69,12 @@ export default function RootLayout({
                 About
               </Link>
               <Link
+                href="/statements"
+                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+              >
+                Statements
+              </Link>
+              <Link
                 href="/claims"
                 className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
               >

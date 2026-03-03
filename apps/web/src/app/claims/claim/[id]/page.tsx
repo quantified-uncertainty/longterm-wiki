@@ -239,7 +239,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(claim.qualifiers).map(([k, v]) => (
                     <span key={k} className="font-mono text-xs px-1.5 py-0.5 rounded bg-violet-100 text-violet-700">
-                      {k}={v}
+                      {k}={String(v)}
                     </span>
                   ))}
                 </div>
@@ -338,7 +338,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
             Related Entities
           </span>
           <div className="flex flex-wrap gap-2">
-            {claim.relatedEntities.map((eid) => (
+            {claim.relatedEntities.map((eid: string) => (
               <Link
                 key={eid}
                 href={`/claims/entity/${eid}`}
@@ -368,7 +368,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
             Wiki Page Citations
           </span>
           <div className="flex flex-wrap gap-1">
-            {claim.footnoteRefs.split(",").map((ref) => {
+            {claim.footnoteRefs.split(",").map((ref: string) => {
               const num = ref.trim();
               return (
                 <Link

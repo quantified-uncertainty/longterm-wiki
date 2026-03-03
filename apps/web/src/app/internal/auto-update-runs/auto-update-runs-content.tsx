@@ -9,6 +9,8 @@ import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { RunsTable } from "./runs-table";
 import type { AutoUpdateRunRow } from "@wiki-server/api-response-types";
 
+type RunResult = AutoUpdateRunRow['results'][number];
+
 interface RunReport {
   date: string;
   startedAt: string;
@@ -86,7 +88,7 @@ async function loadRunsFromApi() {
       budgetLimit: r.budgetLimit ?? 0,
       budgetSpent: r.budgetSpent ?? 0,
       durationMinutes: Math.round((endMs - startMs) / 60000),
-      results: r.results.map((res) => ({
+      results: r.results.map((res: RunResult) => ({
         pageId: res.pageId,
         status: res.status as "success" | "failed" | "skipped",
         tier: res.tier || "",
