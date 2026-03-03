@@ -7,7 +7,7 @@
  */
 
 import { Hono } from "hono";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import {
   claimPageReferences,
@@ -86,7 +86,7 @@ const app = new Hono()
       type: "claim" as const,
       id: Number(r.id),
       claimId: Number(r.claimId),
-      pageId: r.pageId,
+      pageId, // use URL parameter — page_id_old no longer written for new rows (Phase D2a)
       footnote: r.footnote,
       section: r.section,
       quoteText: r.quoteText,
@@ -106,7 +106,7 @@ const app = new Hono()
       type: "citation" as const,
       id: Number(r.id),
       referenceId: r.referenceId,
-      pageId: r.pageId,
+      pageId, // use URL parameter — page_id_old no longer written for new rows (Phase D2a)
       title: r.title,
       url: r.url,
       note: r.note,
@@ -155,15 +155,14 @@ const app = new Hono()
       return validationError(c, `Page not found: ${parsed.data.pageId}`);
     }
 
-    // Phase 4a: resolve page slug to integer ID for dual-write
+    // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
     const pageIdInt = await resolvePageIntId(db, parsed.data.pageId);
 
     const rows = await db
       .insert(claimPageReferences)
       .values({
         claimId: parsed.data.claimId,
-        pageId: parsed.data.pageId,
-        pageIdInt, // Phase 4a dual-write
+        pageIdInt,
         footnote: parsed.data.footnote ?? null,
         section: parsed.data.section ?? null,
         quoteText: parsed.data.quoteText ?? null,
@@ -180,7 +179,7 @@ const app = new Hono()
     const result: ClaimPageReferenceRow = {
       id: Number(row.id),
       claimId: Number(row.claimId),
-      pageId: row.pageId,
+      pageId: parsed.data.pageId, // derived from input (page_id_old no longer written)
       footnote: row.footnote,
       section: row.section,
       quoteText: row.quoteText,
@@ -225,15 +224,14 @@ const app = new Hono()
       }
     }
 
-    // Phase 4a: resolve page slug to integer ID for dual-write
+    // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
     const citPageIdInt = await resolvePageIntId(db, parsed.data.pageId);
 
     const rows = await db
       .insert(pageCitations)
       .values({
         referenceId: parsed.data.referenceId,
-        pageId: parsed.data.pageId,
-        pageIdInt: citPageIdInt, // Phase 4a dual-write
+        pageIdInt: citPageIdInt,
         title: parsed.data.title ?? null,
         url: parsed.data.url ?? null,
         note: parsed.data.note ?? null,
@@ -245,7 +243,7 @@ const app = new Hono()
     const result: PageCitationRow = {
       id: Number(row.id),
       referenceId: row.referenceId,
-      pageId: row.pageId,
+      pageId: parsed.data.pageId, // derived from input — page_id_old no longer written (Phase D2a)
       title: row.title,
       url: row.url,
       note: row.note,
@@ -314,12 +312,14 @@ const app = new Hono()
   .get("/all", async (c) => {
     const db = getDrizzleDb();
 
-    // 1. Fetch all claim page references with joined claim data
+    // 1. Fetch all claim page references with joined claim data.
+    //    LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
+    //    (page_id_old is no longer written; fall back to wiki_pages.id via page_id_int).
     const claimRefRows = await db
       .select({
         id: claimPageReferences.id,
         claimId: claimPageReferences.claimId,
-        pageId: claimPageReferences.pageId,
+        pageSlug: sql<string | null>`coalesce(${claimPageReferences.pageId}, ${wikiPages.id})`,
         footnote: claimPageReferences.footnote,
         section: claimPageReferences.section,
         quoteText: claimPageReferences.quoteText,
@@ -329,12 +329,23 @@ const app = new Hono()
         claimVerdict: claims.claimVerdict,
       })
       .from(claimPageReferences)
-      .innerJoin(claims, eq(claimPageReferences.claimId, claims.id));
+      .innerJoin(claims, eq(claimPageReferences.claimId, claims.id))
+      .leftJoin(wikiPages, eq(claimPageReferences.pageIdInt, wikiPages.integerIdCol));
 
-    // 2. Fetch all page citations
-    const citationRows = await db.select().from(pageCitations);
+    // 2. Fetch all page citations with wiki_pages JOIN for slug recovery
+    const citationRows = await db
+      .select({
+        referenceId: pageCitations.referenceId,
+        title: pageCitations.title,
+        url: pageCitations.url,
+        note: pageCitations.note,
+        resourceId: pageCitations.resourceId,
+        pageSlug: sql<string | null>`coalesce(${pageCitations.pageId}, ${wikiPages.id})`,
+      })
+      .from(pageCitations)
+      .leftJoin(wikiPages, eq(pageCitations.pageIdInt, wikiPages.integerIdCol));
 
-    // 3. Group by pageId
+    // 3. Group by pageId (skip rows with no recoverable slug)
     const byPage: Record<
       string,
       {
@@ -355,7 +366,8 @@ const app = new Hono()
     > = {};
 
     for (const row of claimRefRows) {
-      const pageId = row.pageId;
+      const pageId = row.pageSlug;
+      if (!pageId) continue; // skip rows with no recoverable page slug
       if (!byPage[pageId]) {
         byPage[pageId] = { claimReferences: [], citations: [] };
       }
@@ -368,7 +380,8 @@ const app = new Hono()
     }
 
     for (const row of citationRows) {
-      const pageId = row.pageId;
+      const pageId = row.pageSlug;
+      if (!pageId) continue; // skip rows with no recoverable page slug
       if (!byPage[pageId]) {
         byPage[pageId] = { claimReferences: [], citations: [] };
       }

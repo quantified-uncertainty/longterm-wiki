@@ -146,21 +146,21 @@ const linksApp = new Hono()
       }
 
       // Batch upsert — on conflict (source, target, type) update weight + relationship
-      // Phase 4a: also write source_id_int and target_id_int via entity_ids lookup
+      // Phase D2a: write only integer columns (source_id_old / target_id_old dropped)
       for (let i = 0; i < links.length; i += 500) {
         const batch = links.slice(i, i + 500);
 
         await tx`
-        INSERT INTO page_links (source_id_old, target_id_old, link_type, relationship, weight, source_id_int, target_id_int)
-        SELECT t."sourceId", t."targetId", t."linkType", t.relationship, t.weight,
+        INSERT INTO page_links (link_type, relationship, weight, source_id_int, target_id_int)
+        SELECT t."linkType", t.relationship, t.weight,
                ei_src.numeric_id, ei_tgt.numeric_id
         FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb)
         AS t("sourceId" text, "targetId" text, "linkType" text, relationship text, weight real)
         LEFT JOIN entity_ids ei_src ON ei_src.slug = t."sourceId"
         LEFT JOIN entity_ids ei_tgt ON ei_tgt.slug = t."targetId"
-        ON CONFLICT (source_id_old, target_id_old, link_type)
-        DO UPDATE SET weight = EXCLUDED.weight, relationship = EXCLUDED.relationship,
-                      source_id_int = EXCLUDED.source_id_int, target_id_int = EXCLUDED.target_id_int
+        -- Requires page_links_source_target_int_unique index (created in phase-d2a-predeploy.sql)
+        ON CONFLICT (source_id_int, target_id_int, link_type)
+        DO UPDATE SET weight = EXCLUDED.weight, relationship = EXCLUDED.relationship
       `;
 
         upserted += batch.length;

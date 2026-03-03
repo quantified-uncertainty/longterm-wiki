@@ -147,14 +147,13 @@ const hallucinationRiskApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase 4a: resolve page slug to integer ID for dual-write
+    // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
     const pageIdInt = await resolvePageIntId(db, d.pageId);
 
     const rows = await db
       .insert(hallucinationRiskSnapshots)
       .values({
-        pageId: d.pageId,
-        pageIdInt, // Phase 4a dual-write
+        pageIdInt,
         score: d.score,
         level: d.level,
         factors: d.factors ?? null,
@@ -162,13 +161,14 @@ const hallucinationRiskApp = new Hono()
       })
       .returning({
         id: hallucinationRiskSnapshots.id,
-        pageId: hallucinationRiskSnapshots.pageId,
         score: hallucinationRiskSnapshots.score,
         level: hallucinationRiskSnapshots.level,
         computedAt: hallucinationRiskSnapshots.computedAt,
       });
 
-    return c.json(firstOrThrow(rows, "hallucination risk snapshot insert"), 201);
+    const row = firstOrThrow(rows, "hallucination risk snapshot insert");
+    // pageId derived from input (page_id_old column no longer written)
+    return c.json({ ...row, pageId: d.pageId }, 201);
   })
 
   // ---- POST /batch (record multiple snapshots) ----
@@ -183,13 +183,12 @@ const hallucinationRiskApp = new Hono()
     const { snapshots } = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase 4a: resolve page slugs to integer IDs for dual-write
+    // Phase D2a: resolve slugs to integer IDs (no longer dual-writing page_id_old)
     const pageIds = [...new Set(snapshots.map((d) => d.pageId))];
     const intIdMap = await resolvePageIntIds(db, pageIds);
 
     const allVals = snapshots.map((d) => ({
-      pageId: d.pageId,
-      pageIdInt: intIdMap.get(d.pageId) ?? null, // Phase 4a dual-write
+      pageIdInt: intIdMap.get(d.pageId) ?? null,
       score: d.score,
       level: d.level,
       factors: d.factors ?? null,
@@ -201,7 +200,6 @@ const hallucinationRiskApp = new Hono()
       .values(allVals)
       .returning({
         id: hallucinationRiskSnapshots.id,
-        pageId: hallucinationRiskSnapshots.pageId,
       });
 
     // Auto-refresh the materialized view after batch inserts

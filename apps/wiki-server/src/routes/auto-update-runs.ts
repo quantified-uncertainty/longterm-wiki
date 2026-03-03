@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { autoUpdateRuns, autoUpdateResults } from "../schema.js";
+import { autoUpdateRuns, autoUpdateResults, wikiPages } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, notFoundError, firstOrThrow, paginationQuery } from "./utils.js";
 import { logger } from "../logger.js";
 import { resolvePageIntIds } from "./page-id-helpers.js";
@@ -48,10 +48,20 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 
 // ---- Helpers ----
 
+/** Result row shape after JOIN with wiki_pages to recover slug. */
+type ResultWithSlug = {
+  runId: number | bigint;
+  pageSlug: string | null; // COALESCE(page_id_old, wiki_pages.id) — non-null for all Phase B+ rows
+  status: string;
+  tier: string | null;
+  durationMs: number | null;
+  errorMessage: string | null;
+};
+
 /** Map a run row + its result rows to the API response shape. */
 function formatRunEntry(
   r: typeof autoUpdateRuns.$inferSelect,
-  results: (typeof autoUpdateResults.$inferSelect)[]
+  results: ResultWithSlug[]
 ) {
   return {
     id: r.id,
@@ -80,16 +90,19 @@ function formatRunEntry(
           }
         })()
       : [],
-    results: results.map((entry) => ({
-      pageId: entry.pageId,
-      status: entry.status,
-      tier: entry.tier,
-      durationMs: entry.durationMs,
-      errorMessage: entry.errorMessage,
-    })),
+    results: results
+      .filter((entry) => entry.pageSlug != null) // skip rows with no recoverable slug
+      .map((entry) => ({
+        pageId: entry.pageSlug!,
+        status: entry.status,
+        tier: entry.tier,
+        durationMs: entry.durationMs,
+        errorMessage: entry.errorMessage,
+      })),
     createdAt: r.createdAt,
   };
 }
+
 
 // ---- Route ----
 
@@ -158,15 +171,14 @@ const autoUpdateRunsApp = new Hono()
       let resultsInserted = 0;
 
       if (d.results && d.results.length > 0) {
-        // Phase 4a: resolve page slugs to integer IDs for dual-write
+        // Phase D2a: resolve slugs to integer IDs (no longer dual-writing page_id_old)
         const resultPageIds = [...new Set(d.results.map((r) => r.pageId))];
         const intIdMap = await resolvePageIntIds(tx, resultPageIds);
 
         await tx.insert(autoUpdateResults).values(
           d.results.map((r) => ({
             runId: run.id,
-            pageId: r.pageId,
-            pageIdInt: intIdMap.get(r.pageId) ?? null, // Phase 4a dual-write
+            pageIdInt: intIdMap.get(r.pageId) ?? null,
             status: r.status,
             tier: r.tier ?? null,
             durationMs: r.durationMs ?? null,
@@ -202,20 +214,31 @@ const autoUpdateRunsApp = new Hono()
       .from(autoUpdateRuns);
     const total = countResult[0].count;
 
-    // Fetch all results for the page of runs in a single query
+    // Fetch all results for the page of runs in a single query.
+    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
+    // (page_id_old no longer written; fall back to wiki_pages.id via page_id_int).
     const runIds = rows.map((r) => r.id);
-    const resultsByRun = new Map<number, (typeof autoUpdateResults.$inferSelect)[]>();
+    const resultsByRun = new Map<number, ResultWithSlug[]>();
 
     if (runIds.length > 0) {
       const allResults = await db
-        .select()
+        .select({
+          runId: autoUpdateResults.runId,
+          pageSlug: sql<string | null>`coalesce(${autoUpdateResults.pageId}, ${wikiPages.id})`,
+          status: autoUpdateResults.status,
+          tier: autoUpdateResults.tier,
+          durationMs: autoUpdateResults.durationMs,
+          errorMessage: autoUpdateResults.errorMessage,
+        })
         .from(autoUpdateResults)
+        .leftJoin(wikiPages, eq(autoUpdateResults.pageIdInt, wikiPages.integerIdCol))
         .where(inArray(autoUpdateResults.runId, runIds));
 
       for (const result of allResults) {
-        const existing = resultsByRun.get(result.runId) || [];
+        const rid = Number(result.runId);
+        const existing = resultsByRun.get(rid) || [];
         existing.push(result);
-        resultsByRun.set(result.runId, existing);
+        resultsByRun.set(rid, existing);
       }
     }
 
@@ -292,9 +315,18 @@ const autoUpdateRunsApp = new Hono()
     }
 
     const r = rows[0];
+    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
     const results = await db
-      .select()
+      .select({
+        runId: autoUpdateResults.runId,
+        pageSlug: sql<string | null>`coalesce(${autoUpdateResults.pageId}, ${wikiPages.id})`,
+        status: autoUpdateResults.status,
+        tier: autoUpdateResults.tier,
+        durationMs: autoUpdateResults.durationMs,
+        errorMessage: autoUpdateResults.errorMessage,
+      })
       .from(autoUpdateResults)
+      .leftJoin(wikiPages, eq(autoUpdateResults.pageIdInt, wikiPages.integerIdCol))
       .where(eq(autoUpdateResults.runId, r.id));
 
     return c.json(formatRunEntry(r, results));

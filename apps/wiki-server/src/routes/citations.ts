@@ -700,9 +700,9 @@ const citationsApp = new Hono()
       .having(sql`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end) > 0`);
 
     // Insert snapshots for all pages with accuracy data
-    let inserted: Array<{ id: number; pageId: string }> = [];
+    let inserted: Array<{ id: number }> = [];
     if (pageStats.length > 0) {
-      // Phase 4a: resolve page slugs to integer IDs for dual-write
+      // Phase D2a: resolve slugs to integer IDs (no longer dual-writing page_id_old)
       const snapPageIds = pageStats.map((ps) => ps.pageId);
       const snapIntIdMap = await resolvePageIntIds(db, snapPageIds);
 
@@ -710,8 +710,7 @@ const citationsApp = new Hono()
         .insert(citationAccuracySnapshots)
         .values(
           pageStats.map((ps) => ({
-            pageId: ps.pageId,
-            pageIdInt: snapIntIdMap.get(ps.pageId) ?? null, // Phase 4a dual-write
+            pageIdInt: snapIntIdMap.get(ps.pageId) ?? null,
             totalCitations: ps.totalCitations,
             checkedCitations: Number(ps.checkedCitations),
             accurateCount: Number(ps.accurateCount),
@@ -724,13 +723,13 @@ const citationsApp = new Hono()
         )
         .returning({
           id: citationAccuracySnapshots.id,
-          pageId: citationAccuracySnapshots.pageId,
         });
     }
 
     return c.json({
       snapshotCount: inserted.length,
-      pages: inserted.map((r) => r.pageId),
+      // slugs from pageStats (page_id_old no longer written; can't read back from DB)
+      pages: pageStats.map((ps) => ps.pageId),
     }, 201);
   })
 
