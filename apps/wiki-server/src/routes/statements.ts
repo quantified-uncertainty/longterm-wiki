@@ -142,7 +142,17 @@ function formatProperty(p: typeof properties.$inferSelect) {
   };
 }
 
-// ---- Create body schema ----
+// ---- Body schemas ----
+
+const PatchStatementBody = z.object({
+  status: z.enum(["active", "superseded", "retracted"]).optional(),
+  archiveReason: z.string().max(2000).nullish(),
+  verdict: z.string().max(50).nullish(),
+  verdictScore: z.number().min(0).max(1).nullish(),
+  verdictQuotes: z.string().max(10000).nullish(),
+  verdictModel: z.string().max(200).nullish(),
+  note: z.string().max(2000).nullish(),
+});
 
 const CreateStatementBody = z.object({
   variety: z.enum(["structured", "attributed"]),
@@ -472,16 +482,6 @@ const statementsApp = new Hono()
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
 
-    const PatchStatementBody = z.object({
-      status: z.enum(["active", "superseded", "retracted"]).optional(),
-      archiveReason: z.string().max(2000).nullish(),
-      verdict: z.string().max(50).nullish(),
-      verdictScore: z.number().min(0).max(1).nullish(),
-      verdictQuotes: z.string().max(10000).nullish(),
-      verdictModel: z.string().max(200).nullish(),
-      note: z.string().max(2000).nullish(),
-    });
-
     const parsed = PatchStatementBody.safeParse(body);
     if (!parsed.success) {
       return validationError(c, parsed.error.message);
@@ -490,21 +490,19 @@ const statementsApp = new Hono()
     const data = parsed.data;
     const db = getDrizzleDb();
 
-    // Build update object with only provided fields
-    const updates: Record<string, unknown> = {
-      updatedAt: sql`now()`,
-    };
-    if (data.status !== undefined) updates.status = data.status;
-    if (data.archiveReason !== undefined) updates.archiveReason = data.archiveReason ?? null;
-    if (data.verdict !== undefined) updates.verdict = data.verdict ?? null;
-    if (data.verdictScore !== undefined) updates.verdictScore = data.verdictScore ?? null;
-    if (data.verdictQuotes !== undefined) updates.verdictQuotes = data.verdictQuotes ?? null;
-    if (data.verdictModel !== undefined) updates.verdictModel = data.verdictModel ?? null;
-    if (data.note !== undefined) updates.note = data.note ?? null;
-
+    // Build update set — inline to match codebase pattern (sql`now()` accepted at runtime)
     const rows = await db
       .update(statements)
-      .set(updates)
+      .set({
+        ...(data.status !== undefined && { status: data.status }),
+        ...(data.archiveReason !== undefined && { archiveReason: data.archiveReason ?? null }),
+        ...(data.verdict !== undefined && { verdict: data.verdict ?? null }),
+        ...(data.verdictScore !== undefined && { verdictScore: data.verdictScore ?? null }),
+        ...(data.verdictQuotes !== undefined && { verdictQuotes: data.verdictQuotes ?? null }),
+        ...(data.verdictModel !== undefined && { verdictModel: data.verdictModel ?? null }),
+        ...(data.note !== undefined && { note: data.note ?? null }),
+        updatedAt: sql`now()`,
+      })
       .where(eq(statements.id, id))
       .returning();
 
