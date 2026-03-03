@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, gte, count, sql, asc, desc } from "drizzle-orm";
-import { getDrizzleDb } from "../db.js";
+import { getDrizzleDb, getDb } from "../db.js";
 import { editLogs, wikiPages } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow, paginationQuery } from "./utils.js";
@@ -43,14 +43,13 @@ const editLogsApp = new Hono()
       return validationError(c, `Referenced page not found: ${missing.join(", ")}`);
     }
 
-    // Phase 4a: resolve page slug to integer ID for dual-write
+    // Phase D2a: resolve page slug to integer ID (no longer dual-writing page_id_old)
     const pageIdInt = await resolvePageIntId(db, d.pageId);
 
     const rows = await db
       .insert(editLogs)
       .values({
-        pageId: d.pageId,
-        pageIdInt, // Phase 4a dual-write
+        pageIdInt,
         date: d.date,
         tool: d.tool,
         agency: d.agency,
@@ -59,12 +58,13 @@ const editLogsApp = new Hono()
       })
       .returning({
         id: editLogs.id,
-        pageId: editLogs.pageId,
         date: editLogs.date,
         createdAt: editLogs.createdAt,
       });
 
-    return c.json(firstOrThrow(rows, "edit log insert"), 201);
+    const row = firstOrThrow(rows, "edit log insert");
+    // pageId derived from input (page_id_old column no longer written)
+    return c.json({ ...row, pageId: d.pageId }, 201);
   })
 
   // ---- POST /batch (append multiple entries) ----
@@ -87,14 +87,13 @@ const editLogsApp = new Hono()
     }
 
     const results = await db.transaction(async (tx) => {
-      // Phase 4a: resolve page slugs to integer IDs for dual-write (inside tx for consistency)
+      // Phase D2a: resolve slugs to integer IDs (no longer dual-writing page_id_old)
       const intIdMap = await resolvePageIntIds(tx, pageIds);
       return await tx
         .insert(editLogs)
         .values(
           items.map((d) => ({
-            pageId: d.pageId,
-            pageIdInt: intIdMap.get(d.pageId) ?? null, // Phase 4a dual-write
+            pageIdInt: intIdMap.get(d.pageId) ?? null,
             date: d.date,
             tool: d.tool,
             agency: d.agency,
@@ -102,10 +101,12 @@ const editLogsApp = new Hono()
             note: d.note ?? null,
           }))
         )
-        .returning({ id: editLogs.id, pageId: editLogs.pageId });
+        .returning({ id: editLogs.id });
     });
 
-    return c.json({ inserted: results.length, results }, 201);
+    // pageId derived from input items (page_id_old column no longer written)
+    const resultWithPageId = results.map((r, i) => ({ ...r, pageId: items[i].pageId }));
+    return c.json({ inserted: results.length, results: resultWithPageId }, 201);
   })
 
   // ---- GET /?page_id=X (entries for a page) ----
@@ -127,9 +128,10 @@ const editLogsApp = new Hono()
       .orderBy(asc(editLogs.date), asc(editLogs.id));
 
     return c.json({
+      // pageId from query param (page_id_old no longer written for new rows)
       entries: rows.map((r) => ({
         id: r.id,
-        pageId: r.pageId,
+        pageId,
         date: r.date,
         tool: r.tool,
         agency: r.agency,
@@ -151,10 +153,21 @@ const editLogsApp = new Hono()
 
     const whereClause = since ? gte(editLogs.date, since) : undefined;
 
+    // JOIN with wiki_pages to recover slug from integer ID (page_id_old no longer written)
     const [rows, countResult] = await Promise.all([
       db
-        .select()
+        .select({
+          id: editLogs.id,
+          pageId: wikiPages.id,
+          date: editLogs.date,
+          tool: editLogs.tool,
+          agency: editLogs.agency,
+          requestedBy: editLogs.requestedBy,
+          note: editLogs.note,
+          createdAt: editLogs.createdAt,
+        })
         .from(editLogs)
+        .leftJoin(wikiPages, eq(wikiPages.integerIdCol, editLogs.pageIdInt))
         .where(whereClause)
         .orderBy(desc(editLogs.date), desc(editLogs.id))
         .limit(limit)
@@ -165,16 +178,7 @@ const editLogsApp = new Hono()
     const total = countResult[0].count;
 
     return c.json({
-      entries: rows.map((r) => ({
-        id: r.id,
-        pageId: r.pageId,
-        date: r.date,
-        tool: r.tool,
-        agency: r.agency,
-        requestedBy: r.requestedBy,
-        note: r.note,
-        createdAt: r.createdAt,
-      })),
+      entries: rows,
       total,
       limit,
       offset,
@@ -184,19 +188,18 @@ const editLogsApp = new Hono()
   // ---- GET /latest-dates (latest edit date per page, for build-data) ----
 
   .get("/latest-dates", async (c) => {
-    const db = getDrizzleDb();
-
-    const rows = await db
-      .select({
-        pageId: editLogs.pageId,
-        latestDate: sql<string>`max(${editLogs.date})`,
-      })
-      .from(editLogs)
-      .groupBy(editLogs.pageId);
+    // JOIN wiki_pages to recover slug from page_id_int (page_id_old no longer written)
+    const rawDb = getDb();
+    const rows = await rawDb<{ page_id: string; latest_date: string }[]>`
+      SELECT wp.id AS page_id, max(el.date) AS latest_date
+      FROM edit_logs el
+      JOIN wiki_pages wp ON wp.integer_id = el.page_id_int
+      GROUP BY wp.id
+    `;
 
     const dateMap: Record<string, string> = {};
     for (const row of rows) {
-      dateMap[row.pageId] = row.latestDate;
+      dateMap[row.page_id] = row.latest_date;
     }
 
     return c.json({ dates: dateMap });
@@ -205,19 +208,18 @@ const editLogsApp = new Hono()
   // ---- GET /earliest-dates (earliest edit date per page, for dateCreated fallback) ----
 
   .get("/earliest-dates", async (c) => {
-    const db = getDrizzleDb();
-
-    const rows = await db
-      .select({
-        pageId: editLogs.pageId,
-        earliestDate: sql<string>`min(${editLogs.date})`,
-      })
-      .from(editLogs)
-      .groupBy(editLogs.pageId);
+    // JOIN wiki_pages to recover slug from page_id_int (page_id_old no longer written)
+    const rawDb = getDb();
+    const rows = await rawDb<{ page_id: string; earliest_date: string }[]>`
+      SELECT wp.id AS page_id, min(el.date) AS earliest_date
+      FROM edit_logs el
+      JOIN wiki_pages wp ON wp.integer_id = el.page_id_int
+      GROUP BY wp.id
+    `;
 
     const dateMap: Record<string, string> = {};
     for (const row of rows) {
-      dateMap[row.pageId] = row.earliestDate;
+      dateMap[row.page_id] = row.earliest_date;
     }
 
     return c.json({ dates: dateMap });
@@ -231,9 +233,10 @@ const editLogsApp = new Hono()
     const totalResult = await db.select({ count: count() }).from(editLogs);
     const totalEntries = totalResult[0].count;
 
+    // Use pageIdInt for count (page_id_old no longer written for new rows)
     const pagesResult = await db
       .select({
-        count: sql<number>`count(distinct ${editLogs.pageId})`,
+        count: sql<number>`count(distinct ${editLogs.pageIdInt})`,
       })
       .from(editLogs);
     const pagesWithLogs = Number(pagesResult[0].count);

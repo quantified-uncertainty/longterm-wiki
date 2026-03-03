@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, count, inArray } from "drizzle-orm";
+import { eq, desc, count, inArray, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { autoUpdateNewsItems, autoUpdateRuns } from "../schema.js";
+import { autoUpdateNewsItems, autoUpdateRuns, wikiPages } from "../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -14,6 +14,7 @@ import {
   AutoUpdateNewsBatchSchema,
 } from "../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
+import { logger } from "../logger.js";
 
 // ---- Constants ----
 
@@ -31,7 +32,7 @@ const DashboardQuery = z.object({
 
 // ---- Helpers ----
 
-function mapNewsRow(r: typeof autoUpdateNewsItems.$inferSelect) {
+function mapNewsRow(r: typeof autoUpdateNewsItems.$inferSelect, routedToPageSlug?: string | null) {
   return {
     id: r.id,
     runId: r.runId,
@@ -43,7 +44,8 @@ function mapNewsRow(r: typeof autoUpdateNewsItems.$inferSelect) {
     relevanceScore: r.relevanceScore,
     topics: r.topicsJson ?? [],
     entities: r.entitiesJson ?? [],
-    routedToPageId: r.routedToPageId,
+    // Phase D2a: use COALESCE slug from wiki_pages JOIN; new rows have page_id_old = null
+    routedToPageId: routedToPageSlug ?? r.routedToPageId ?? null,
     routedToPageTitle: r.routedToPageTitle,
     routedTier: r.routedTier,
     createdAt: r.createdAt,
@@ -65,13 +67,19 @@ const autoUpdateNewsApp = new Hono()
     const db = getDrizzleDb();
 
     const results = await db.transaction(async (tx) => {
-      // Phase 4a: resolve routed page slugs to integer IDs for dual-write (inside tx for consistency)
+      // Phase D2a: resolve routed page slugs to integer IDs (inside tx for consistency)
       const routedPageIds = items
         .map((d) => d.routedToPageId)
         .filter((id): id is string => id != null);
       const intIdMap = routedPageIds.length > 0
         ? await resolvePageIntIds(tx, routedPageIds)
         : new Map<string, number>();
+
+      // Warn on unresolvable slugs — with no _old column fallback, routing is lost silently
+      const unresolved = routedPageIds.filter((id) => !intIdMap.has(id));
+      if (unresolved.length > 0) {
+        logger.warn({ unresolved }, "auto-update-news: routedToPageId slugs not found in wiki_pages; routing will be null");
+      }
 
       return await tx
         .insert(autoUpdateNewsItems)
@@ -86,8 +94,8 @@ const autoUpdateNewsApp = new Hono()
             relevanceScore: d.relevanceScore ?? null,
             topicsJson: d.topics.length > 0 ? d.topics : null,
             entitiesJson: d.entities.length > 0 ? d.entities : null,
-            routedToPageId: d.routedToPageId ?? null,
-            routedToPageIdInt: d.routedToPageId ? (intIdMap.get(d.routedToPageId) ?? null) : null, // Phase 4a dual-write
+            // Phase D2a: no longer writing routedToPageId (page_id_old); integer only
+            routedToPageIdInt: d.routedToPageId ? (intIdMap.get(d.routedToPageId) ?? null) : null,
             routedToPageTitle: d.routedToPageTitle ?? null,
             routedTier: d.routedTier ?? null,
           }))
@@ -104,13 +112,18 @@ const autoUpdateNewsApp = new Hono()
     if (isNaN(runId)) return validationError(c, "runId must be an integer");
 
     const db = getDrizzleDb();
+    // LEFT JOIN wiki_pages to recover routedToPageId slug for rows written after Phase D2a
     const rows = await db
-      .select()
+      .select({
+        item: autoUpdateNewsItems,
+        routedToPageSlug: sql<string | null>`coalesce(${autoUpdateNewsItems.routedToPageId}, ${wikiPages.id})`,
+      })
       .from(autoUpdateNewsItems)
+      .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
       .where(eq(autoUpdateNewsItems.runId, runId))
       .orderBy(desc(autoUpdateNewsItems.relevanceScore));
 
-    return c.json({ items: rows.map(mapNewsRow) });
+    return c.json({ items: rows.map((r) => mapNewsRow(r.item, r.routedToPageSlug)) });
   })
 
   // ---- GET /recent (recent news items across all runs) ----
@@ -121,14 +134,16 @@ const autoUpdateNewsApp = new Hono()
     const { limit, offset } = parsed.data;
     const db = getDrizzleDb();
 
-    // Join with runs to get the run date
+    // Join with runs to get the run date; LEFT JOIN wiki_pages to recover slug after Phase D2a
     const rows = await db
       .select({
         item: autoUpdateNewsItems,
         runDate: autoUpdateRuns.date,
+        routedToPageSlug: sql<string | null>`coalesce(${autoUpdateNewsItems.routedToPageId}, ${wikiPages.id})`,
       })
       .from(autoUpdateNewsItems)
       .innerJoin(autoUpdateRuns, eq(autoUpdateNewsItems.runId, autoUpdateRuns.id))
+      .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
       .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore))
       .limit(limit)
       .offset(offset);
@@ -140,7 +155,7 @@ const autoUpdateNewsApp = new Hono()
 
     return c.json({
       items: rows.map((r) => ({
-        ...mapNewsRow(r.item),
+        ...mapNewsRow(r.item, r.routedToPageSlug),
         runDate: r.runDate,
       })),
       total,
@@ -168,9 +183,10 @@ const autoUpdateNewsApp = new Hono()
       .where(eq(autoUpdateNewsItems.routedToPageIdInt, intId))
       .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore));
 
+    // All results are routed to pageId (the URL param) — pass it directly as the slug override
     return c.json({
       items: rows.map((r) => ({
-        ...mapNewsRow(r.item),
+        ...mapNewsRow(r.item, pageId),
         runDate: r.runDate,
       })),
     });
@@ -198,17 +214,21 @@ const autoUpdateNewsApp = new Hono()
     const runIds = recentRuns.map((r) => r.id);
     const runDateMap = new Map(recentRuns.map((r) => [r.id, r.date]));
 
-    // Fetch all news items for these runs
+    // Fetch all news items for these runs; LEFT JOIN wiki_pages to recover slug after Phase D2a
     const rows = await db
-      .select()
+      .select({
+        item: autoUpdateNewsItems,
+        routedToPageSlug: sql<string | null>`coalesce(${autoUpdateNewsItems.routedToPageId}, ${wikiPages.id})`,
+      })
       .from(autoUpdateNewsItems)
+      .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
       .where(inArray(autoUpdateNewsItems.runId, runIds))
       .orderBy(desc(autoUpdateNewsItems.relevanceScore));
 
     return c.json({
       items: rows.map((r) => ({
-        ...mapNewsRow(r),
-        runDate: runDateMap.get(r.runId) ?? null,
+        ...mapNewsRow(r.item, r.routedToPageSlug),
+        runDate: runDateMap.get(r.item.runId) ?? null,
       })),
       runDates: [...new Set(recentRuns.map((r) => r.date))],
     });

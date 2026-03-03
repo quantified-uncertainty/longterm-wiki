@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, count, and } from "drizzle-orm";
+import { eq, desc, count, and, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { pageImproveRuns } from "../schema.js";
+import { pageImproveRuns, wikiPages } from "../schema.js";
 import { SaveArtifactsSchema } from "../api-types.js";
 import {
   parseJsonBody,
@@ -26,10 +26,10 @@ const ByPageQuery = z.object({
 
 // ---- Helpers ----
 
-function formatArtifactEntry(r: typeof pageImproveRuns.$inferSelect) {
+function formatArtifactEntry(r: typeof pageImproveRuns.$inferSelect, pageSlug?: string | null) {
   return {
     id: r.id,
-    pageId: r.pageId,
+    pageId: pageSlug ?? r.pageId ?? "", // Phase D2a: page_id_old nullable; use joined slug or input slug
     engine: r.engine,
     tier: r.tier,
     directions: r.directions,
@@ -65,14 +65,13 @@ const artifactsApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase 4a: resolve page slug to integer ID for dual-write
+    // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
     const pageIdInt = await resolvePageIntId(db, d.pageId);
 
     const rows = await db
       .insert(pageImproveRuns)
       .values({
-        pageId: d.pageId,
-        pageIdInt, // Phase 4a dual-write
+        pageIdInt,
         engine: d.engine,
         tier: d.tier,
         directions: d.directions ?? null,
@@ -95,13 +94,14 @@ const artifactsApp = new Hono()
       })
       .returning({
         id: pageImproveRuns.id,
-        pageId: pageImproveRuns.pageId,
         engine: pageImproveRuns.engine,
         startedAt: pageImproveRuns.startedAt,
         createdAt: pageImproveRuns.createdAt,
       });
 
-    return c.json(rows[0], 201);
+    const row = rows[0];
+    // pageId derived from input (page_id_old column no longer written)
+    return c.json({ ...row, pageId: d.pageId }, 201);
   })
 
   // ---- GET /by-page?page_id=X&limit=N (artifacts for a specific page) ----
@@ -123,7 +123,8 @@ const artifactsApp = new Hono()
       .orderBy(desc(pageImproveRuns.startedAt))
       .limit(limit);
 
-    return c.json({ entries: rows.map(formatArtifactEntry) });
+    // page_id is the URL param (slug) — pass directly as the pageSlug override
+    return c.json({ entries: rows.map((r) => formatArtifactEntry(r, page_id)) });
   })
 
   // ---- GET /all (paginated list of all artifacts) ----
@@ -134,9 +135,14 @@ const artifactsApp = new Hono()
     const { limit, offset } = parsed.data;
     const db = getDrizzleDb();
 
+    // SELECT with wiki_pages JOIN to recover slug for rows written after Phase D2a
     const rows = await db
-      .select()
+      .select({
+        run: pageImproveRuns,
+        pageSlug: sql<string | null>`coalesce(${pageImproveRuns.pageId}, ${wikiPages.id})`,
+      })
       .from(pageImproveRuns)
+      .leftJoin(wikiPages, eq(pageImproveRuns.pageIdInt, wikiPages.integerIdCol))
       .orderBy(desc(pageImproveRuns.startedAt))
       .limit(limit)
       .offset(offset);
@@ -147,7 +153,7 @@ const artifactsApp = new Hono()
     const total = countResult[0].count;
 
     return c.json({
-      entries: rows.map(formatArtifactEntry),
+      entries: rows.map((r) => formatArtifactEntry(r.run, r.pageSlug)),
       total,
       limit,
       offset,
@@ -193,16 +199,21 @@ const artifactsApp = new Hono()
 
     const db = getDrizzleDb();
 
+    // SELECT with wiki_pages JOIN to recover slug for rows written after Phase D2a
     const rows = await db
-      .select()
+      .select({
+        run: pageImproveRuns,
+        pageSlug: sql<string | null>`coalesce(${pageImproveRuns.pageId}, ${wikiPages.id})`,
+      })
       .from(pageImproveRuns)
+      .leftJoin(wikiPages, eq(pageImproveRuns.pageIdInt, wikiPages.integerIdCol))
       .where(eq(pageImproveRuns.id, id));
 
     if (rows.length === 0) {
       return notFoundError(c, "Artifact not found");
     }
 
-    return c.json(formatArtifactEntry(rows[0]));
+    return c.json(formatArtifactEntry(rows[0].run, rows[0].pageSlug));
   });
 
 export const artifactsRoute = artifactsApp;

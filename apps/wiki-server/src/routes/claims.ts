@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, or, count, desc, asc, sql, inArray } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
-import { claims, claimSources, claimPageReferences, entities } from "../schema.js";
+import { claims, claimSources, claimPageReferences, entities, wikiPages } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
@@ -674,12 +674,34 @@ const claimsApp = new Hono()
 
     const includePageReferences = c.req.query("includePageReferences") === "true";
 
-    let pageRefsMap = new Map<number, typeof claimPageReferences.$inferSelect[]>();
+    type PageRefWithSlug = {
+      id: typeof claimPageReferences.$inferSelect["id"];
+      claimId: typeof claimPageReferences.$inferSelect["claimId"];
+      pageSlug: string | null;
+      footnote: typeof claimPageReferences.$inferSelect["footnote"];
+      section: typeof claimPageReferences.$inferSelect["section"];
+      quoteText: typeof claimPageReferences.$inferSelect["quoteText"];
+      referenceId: typeof claimPageReferences.$inferSelect["referenceId"];
+      createdAt: typeof claimPageReferences.$inferSelect["createdAt"];
+    };
+    let pageRefsMap = new Map<number, PageRefWithSlug[]>();
     if (includePageReferences && rows.length > 0) {
       const claimIds = rows.map((r) => r.id);
+      // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
+      // (page_id_old no longer written; fall back to wiki_pages.id via page_id_int)
       const pageRefRows = await db
-        .select()
+        .select({
+          id: claimPageReferences.id,
+          claimId: claimPageReferences.claimId,
+          pageSlug: sql<string | null>`coalesce(${claimPageReferences.pageId}, ${wikiPages.id})`,
+          footnote: claimPageReferences.footnote,
+          section: claimPageReferences.section,
+          quoteText: claimPageReferences.quoteText,
+          referenceId: claimPageReferences.referenceId,
+          createdAt: claimPageReferences.createdAt,
+        })
         .from(claimPageReferences)
+        .leftJoin(wikiPages, eq(claimPageReferences.pageIdInt, wikiPages.integerIdCol))
         .where(inArray(claimPageReferences.claimId, claimIds));
       for (const pr of pageRefRows) {
         const cid = Number(pr.claimId);
@@ -693,16 +715,18 @@ const claimsApp = new Hono()
         const claim: ReturnType<typeof formatClaim> & { pageReferences?: ClaimPageReferenceRow[] } =
           formatClaim(r, sourcesMap.get(Number(r.id)) ?? []);
         if (includePageReferences) {
-          claim.pageReferences = (pageRefsMap.get(Number(r.id)) ?? []).map((pr) => ({
-            id: Number(pr.id),
-            claimId: Number(pr.claimId),
-            pageId: pr.pageId,
-            footnote: pr.footnote,
-            section: pr.section,
-            quoteText: pr.quoteText,
-            referenceId: pr.referenceId,
-            createdAt: pr.createdAt?.toISOString() ?? new Date().toISOString(),
-          }));
+          claim.pageReferences = (pageRefsMap.get(Number(r.id)) ?? [])
+            .filter((pr) => pr.pageSlug != null)
+            .map((pr) => ({
+              id: Number(pr.id),
+              claimId: Number(pr.claimId),
+              pageId: pr.pageSlug!,
+              footnote: pr.footnote,
+              section: pr.section,
+              quoteText: pr.quoteText,
+              referenceId: pr.referenceId,
+              createdAt: pr.createdAt?.toISOString() ?? new Date().toISOString(),
+            }));
         }
         return claim;
       }),
@@ -1545,12 +1569,20 @@ const claimsApp = new Hono()
 
     const claimMap = new Map(claimRows.map((r) => [Number(r.id), r]));
 
-    // Step 3: Fetch page references for these claims
+    // Step 3: Fetch page references for these claims.
+    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
+    // (page_id_old no longer written; fall back to wiki_pages.id via page_id_int).
     const pageRefs = await db
-      .select()
+      .select({
+        id: claimPageReferences.id,
+        claimId: claimPageReferences.claimId,
+        pageSlug: sql<string | null>`coalesce(${claimPageReferences.pageId}, ${wikiPages.id})`,
+        footnote: claimPageReferences.footnote,
+      })
       .from(claimPageReferences)
+      .leftJoin(wikiPages, eq(claimPageReferences.pageIdInt, wikiPages.integerIdCol))
       .where(inArray(claimPageReferences.claimId, claimIds))
-      .orderBy(asc(claimPageReferences.pageId), asc(claimPageReferences.footnote));
+      .orderBy(asc(claimPageReferences.footnote));
 
     // Build source map: claimId → source row that matched our URL
     const sourceByClaimId = new Map<number, typeof claimSources.$inferSelect>();
@@ -1559,14 +1591,15 @@ const claimsApp = new Hono()
     }
 
     // Step 4: Build cross-page quotes. Each page reference generates one quote entry.
+    // Skip refs with no recoverable page slug (shouldn't happen after Phase B dual-write).
     const quotes = pageRefs
-      .filter((pr) => claimMap.has(Number(pr.claimId)))
+      .filter((pr) => claimMap.has(Number(pr.claimId)) && pr.pageSlug != null)
       .map((pr) => {
         const claim = claimMap.get(Number(pr.claimId))!;
         const source = sourceByClaimId.get(Number(pr.claimId));
 
         return {
-          pageId: pr.pageId,
+          pageId: pr.pageSlug!,
           footnote: pr.footnote ?? 0,
           url: source?.url ?? null,
           resourceId: source?.resourceId ?? null,
@@ -1648,21 +1681,32 @@ const claimsApp = new Hono()
     }
 
     const db = getDrizzleDb();
+    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
     const rows = await db
-      .select()
+      .select({
+        id: claimPageReferences.id,
+        claimId: claimPageReferences.claimId,
+        pageSlug: sql<string | null>`coalesce(${claimPageReferences.pageId}, ${wikiPages.id})`,
+        footnote: claimPageReferences.footnote,
+        section: claimPageReferences.section,
+        createdAt: claimPageReferences.createdAt,
+      })
       .from(claimPageReferences)
+      .leftJoin(wikiPages, eq(claimPageReferences.pageIdInt, wikiPages.integerIdCol))
       .where(eq(claimPageReferences.claimId, id))
-      .orderBy(asc(claimPageReferences.pageId), asc(claimPageReferences.footnote));
+      .orderBy(asc(claimPageReferences.footnote));
 
     return c.json({
-      references: rows.map((r) => ({
-        id: Number(r.id),
-        claimId: Number(r.claimId),
-        pageId: r.pageId,
-        footnote: r.footnote,
-        section: r.section,
-        createdAt: r.createdAt?.toISOString() ?? new Date().toISOString(),
-      })),
+      references: rows
+        .filter((r) => r.pageSlug != null)
+        .map((r) => ({
+          id: Number(r.id),
+          claimId: Number(r.claimId),
+          pageId: r.pageSlug!,
+          footnote: r.footnote,
+          section: r.section,
+          createdAt: r.createdAt?.toISOString() ?? new Date().toISOString(),
+        })),
     });
   })
   // ---- POST /:id/page-references ----
@@ -1685,15 +1729,14 @@ const claimsApp = new Hono()
     const claimRows = await db.select({ id: claims.id }).from(claims).where(eq(claims.id, id)).limit(1);
     if (claimRows.length === 0) return notFoundError(c, `Claim not found: ${id}`);
 
-    // Phase 4a: resolve page slug to integer ID for dual-write
+    // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
     const refPageIdInt = await resolvePageIntId(db, parsed.data.pageId);
 
     const rows = await db
       .insert(claimPageReferences)
       .values({
         claimId: id,
-        pageId: parsed.data.pageId,
-        pageIdInt: refPageIdInt, // Phase 4a dual-write
+        pageIdInt: refPageIdInt,
         footnote: parsed.data.footnote ?? null,
         section: parsed.data.section ?? null,
         quoteText: parsed.data.quoteText ?? null,
