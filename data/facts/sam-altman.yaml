@@ -41,9 +41,6 @@ facts:
     note: 738 of 770 employees signed letter threatening to quit
     sourceResource: ddced8916d043aa2
 
-  # Worldcoin user metrics moved to data/facts/worldcoin.yaml
-  # (Worldcoin is a separate entity from Sam Altman as an individual)
-
   # helion-personal-investment
   "0872e650":
     value: "$375 million"
