@@ -60,6 +60,10 @@ async function main() {
           `  ${c.green}MATCH${c.reset} [${quote.pageId}:^${quote.footnote}] → ${resource.id} (${resource.title || resource.url})`,
         );
       } else {
+        if (!quote.pageId) {
+          console.warn(`  Skipping quote ^${quote.footnote}: no page slug (orphaned citation)`);
+          continue;
+        }
         // Re-upsert with the resource_id populated
         await upsertCitationQuote({
           pageId: quote.pageId,

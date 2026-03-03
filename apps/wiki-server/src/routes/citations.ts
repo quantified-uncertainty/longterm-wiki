@@ -544,16 +544,18 @@ const citationsApp = new Hono()
       .orderBy(asc(citationQuotes.pageIdInt));
 
     return c.json({
-      pages: rows.map((r) => ({
-        pageId: r.pageId,
-        total: r.total,
-        withQuotes: Number(r.withQuotes),
-        verified: Number(r.verified),
-        avgScore: r.avgScore != null ? Number(r.avgScore) : null,
-        accuracyChecked: Number(r.accuracyChecked),
-        accurate: Number(r.accurate),
-        inaccurate: Number(r.inaccurate),
-      })),
+      pages: rows
+        .filter((r): r is typeof r & { pageId: string } => r.pageId !== null)
+        .map((r) => ({
+          pageId: r.pageId,
+          total: r.total,
+          withQuotes: Number(r.withQuotes),
+          verified: Number(r.verified),
+          avgScore: r.avgScore != null ? Number(r.avgScore) : null,
+          accuracyChecked: Number(r.accuracyChecked),
+          accurate: Number(r.accurate),
+          inaccurate: Number(r.inaccurate),
+        })),
     });
   })
 
@@ -576,13 +578,15 @@ const citationsApp = new Hono()
       .orderBy(asc(citationQuotes.pageIdInt));
 
     return c.json({
-      pages: rows.map((r) => ({
-        pageId: r.pageId,
-        checked: Number(r.checked),
-        accurate: Number(r.accurate),
-        inaccurate: Number(r.inaccurate),
-        unsupported: Number(r.unsupported),
-      })),
+      pages: rows
+        .filter((r): r is typeof r & { pageId: string } => r.pageId !== null)
+        .map((r) => ({
+          pageId: r.pageId,
+          checked: Number(r.checked),
+          accurate: Number(r.accurate),
+          inaccurate: Number(r.inaccurate),
+          unsupported: Number(r.unsupported),
+        })),
     });
   })
 
@@ -1303,10 +1307,12 @@ const citationsApp = new Hono()
       .orderBy(desc(count()));
 
     return c.json({
-      pages: rows.map((r) => ({
-        pageId: r.pageId,
-        quoteCount: r.quoteCount,
-      })),
+      pages: rows
+        .filter((r): r is typeof r & { pageId: string } => r.pageId !== null)
+        .map((r) => ({
+          pageId: r.pageId,
+          quoteCount: r.quoteCount,
+        })),
     });
   })
 

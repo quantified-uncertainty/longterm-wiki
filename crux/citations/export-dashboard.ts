@@ -145,6 +145,7 @@ export async function buildDashboardExport(): Promise<DashboardExport | null> {
 
   for (const q of allQuotes) {
     const pageId = q.pageId;
+    if (!pageId) continue; // skip orphaned citations with no resolvable page slug
     const verdict = q.accuracyVerdict;
     const score = q.accuracyScore != null ? Number(q.accuracyScore) : null;
     const difficulty = q.verificationDifficulty;
