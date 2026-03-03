@@ -149,11 +149,18 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
       console.warn(`Active agent registration failed: ${e instanceof Error ? e.message : String(e)}`);
     });
 
-    // Check for directory collisions with other active agents
-    const agentsResult = await listActiveAgents('active', 100).catch(() => null);
+    // Check for directory collisions with other active/stale agents.
+    // Include stale agents — they may still be running (just missed a heartbeat).
+    const agentsResult = await listActiveAgents(undefined, 100).catch((e: unknown) => {
+      // Best-effort — collision detection is non-critical
+      console.warn(`Directory collision check failed: ${e instanceof Error ? e.message : String(e)}`);
+      return null;
+    });
     if (agentsResult?.ok) {
       const sameDir = agentsResult.data.agents.filter(
-        (a) => a.worktree && a.worktree === worktree && a.sessionId !== branch
+        (a) => a.worktree && a.worktree === worktree
+          && a.sessionId !== branch
+          && (a.status === 'active' || a.status === 'stale')
       );
       if (sameDir.length > 0) {
         directoryWarning = `\n${c.red}⚠ Directory collision: ${sameDir.length} other agent(s) in the same directory:${c.reset}\n`;

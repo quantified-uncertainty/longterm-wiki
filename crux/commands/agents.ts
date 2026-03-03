@@ -19,6 +19,7 @@ import {
   heartbeat,
   sweepStaleAgents,
   type ActiveAgentEntry,
+  type ActiveAgentListResponse,
 } from '../lib/wiki-server/active-agents.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { sweepStaleSessions } from '../lib/wiki-server/agent-sessions.ts';
@@ -162,11 +163,7 @@ async function statusCommand(
     return { exitCode: 0, output: JSON.stringify(result.data, null, 2) };
   }
 
-  const { agents, conflicts, directoryConflicts } = result.data as {
-    agents: ActiveAgentEntry[];
-    conflicts: Array<{ issueNumber: number; sessionIds: string[] }>;
-    directoryConflicts?: Array<{ directory: string; sessionIds: string[] }>;
-  };
+  const { agents, conflicts, directoryConflicts } = result.data;
 
   if (agents.length === 0) {
     return { exitCode: 0, output: `No ${statusFilter} agents found.` };
