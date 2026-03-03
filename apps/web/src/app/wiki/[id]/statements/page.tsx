@@ -64,7 +64,6 @@ interface StatementWithDetails {
   valueText: string | null;
   valueEntityId: string | null;
   valueDate: string | null;
-  valueUnit: string | null;
   valueSeries: Record<string, unknown> | null;
   validStart: string | null;
   validEnd: string | null;
