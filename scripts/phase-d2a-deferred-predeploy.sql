@@ -70,8 +70,9 @@ CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS citation_quotes_page_id_int_footn
 BEGIN;
 
 -- session_pages — swap PK to (session_id, page_id_int)
--- Drop the old text-based PK
-ALTER TABLE session_pages DROP CONSTRAINT session_pages_pkey;
+-- Drop the old text-based PK (named session_pages_session_id_page_id_pk in production)
+ALTER TABLE session_pages DROP CONSTRAINT IF EXISTS session_pages_pkey;
+ALTER TABLE session_pages DROP CONSTRAINT IF EXISTS session_pages_session_id_page_id_pk;
 
 -- Add new integer-based PK
 ALTER TABLE session_pages ADD PRIMARY KEY (session_id, page_id_int);
@@ -80,8 +81,9 @@ ALTER TABLE session_pages ADD PRIMARY KEY (session_id, page_id_int);
 ALTER TABLE session_pages ALTER COLUMN page_id_old DROP NOT NULL;
 
 -- resource_citations — swap PK to (resource_id, page_id_int)
--- Drop the old text-based PK
-ALTER TABLE resource_citations DROP CONSTRAINT resource_citations_pkey;
+-- Drop the old text-based PK (named resource_citations_resource_id_page_id_pk in production)
+ALTER TABLE resource_citations DROP CONSTRAINT IF EXISTS resource_citations_pkey;
+ALTER TABLE resource_citations DROP CONSTRAINT IF EXISTS resource_citations_resource_id_page_id_pk;
 
 -- Add new integer-based PK
 ALTER TABLE resource_citations ADD PRIMARY KEY (resource_id, page_id_int);
