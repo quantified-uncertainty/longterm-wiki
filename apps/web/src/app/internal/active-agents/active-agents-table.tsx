@@ -3,6 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { GITHUB_REPO_URL } from "@lib/site-config";
+import { shortenDirectory } from "@lib/format";
 import type { ActiveAgentRow } from "./active-agents-content";
 import { AgentEventsPanel } from "./agent-events-panel";
 
@@ -199,18 +200,12 @@ const columns: ColumnDef<ActiveAgentRow>[] = [
     cell: ({ row }) => {
       const worktree = row.original.worktree;
       if (!worktree) return <span className="text-xs text-muted-foreground/50">—</span>;
-      // Show short label, e.g. "agent1/thirsty-feistel"
-      const match = worktree.match(/longterm-wiki[^/]*/);
-      const worktreeMatch = worktree.match(/worktrees\/([^/]+)/);
-      const short = match
-        ? worktreeMatch ? `${match[0]}/${worktreeMatch[1]}` : match[0]
-        : worktree.split("/").pop() ?? worktree;
       return (
         <span
           className="text-xs text-muted-foreground font-mono max-w-[200px] block truncate"
           title={worktree}
         >
-          {short}
+          {shortenDirectory(worktree)}
         </span>
       );
     },

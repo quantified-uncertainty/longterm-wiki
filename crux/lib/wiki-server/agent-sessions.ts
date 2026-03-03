@@ -85,7 +85,7 @@ export async function listAgentSessions(
  * Mark stale active sessions as completed (no updates for timeoutHours).
  */
 export async function sweepStaleSessions(
-  timeoutHours = 24,
+  timeoutHours = 2,
 ): Promise<ApiResult<{ swept: number; sessions: Array<{ id: number; branch: string }> }>> {
   return apiRequest('POST', '/api/agent-sessions/sweep', { timeoutHours }, undefined, 'project');
 }

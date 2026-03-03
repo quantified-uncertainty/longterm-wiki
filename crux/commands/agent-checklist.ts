@@ -143,8 +143,10 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
       task,
       issueNumber: issue ?? null,
       worktree,
-    }).catch(() => {
-      // Best-effort — active agent registration is non-critical
+    }).catch((e: unknown) => {
+      // Best-effort — active agent registration is non-critical.
+      // Wiki-server may be unreachable; agent-checklist still works locally.
+      console.warn(`Active agent registration failed: ${e instanceof Error ? e.message : String(e)}`);
     });
 
     // Check for directory collisions with other active agents

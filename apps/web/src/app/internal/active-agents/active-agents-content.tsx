@@ -1,5 +1,6 @@
 import { fetchDetailed, fetchFromWikiServer, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { shortenDirectory } from "@lib/format";
 import { ActiveAgentsTable } from "./active-agents-table";
 import type { ActiveAgentRow as CanonicalRow } from "@wiki-server/api-response-types";
 
@@ -98,21 +99,6 @@ async function loadFromApi(): Promise<FetchResult<{ agents: ActiveAgentRow[]; co
 
 function noLocalFallback(): { agents: ActiveAgentRow[]; conflicts: ActiveAgentConflict[]; directoryConflicts: DirectoryConflict[] } {
   return { agents: [], conflicts: [], directoryConflicts: [] };
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────
-
-/** Extract a short directory label from a full worktree path. */
-function shortenDirectory(dir: string): string {
-  // e.g. "/Users/oz/Documents/GitHub.nosync/longterm-wiki-agent1/.claude/worktrees/thirsty-feistel"
-  //   → "agent1/thirsty-feistel"
-  // e.g. "/Users/oz/Documents/GitHub.nosync/longterm-wiki-agent3"
-  //   → "agent3"
-  const match = dir.match(/longterm-wiki[^/]*/);
-  if (!match) return dir.split("/").pop() ?? dir;
-  const base = match[0];
-  const worktreeMatch = dir.match(/worktrees\/([^/]+)/);
-  return worktreeMatch ? `${base}/${worktreeMatch[1]}` : base;
 }
 
 // ── Content Component ────────────────────────────────────────────────────
