@@ -3,6 +3,7 @@
  *
  * - GET /          — list with filters (by entity, property, variety, status)
  * - GET /current   — current value for entity+property (valid_end IS NULL)
+ * - GET /properties — list all properties with statement counts
  * - GET /stats     — basic statistics
  * - PATCH /:id     — update statement status, verdict, or note
  * - POST /         — create statement + optional citations
@@ -50,6 +51,10 @@ const ListQuery = z.object({
 const CurrentQuery = z.object({
   entityId: z.string().min(1).max(200),
   propertyId: z.string().min(1).max(200),
+});
+
+const ByEntityQuery = z.object({
+  entityId: z.string().min(1).max(200),
 });
 
 // ---- Zod validator helper (uses Hono's built-in validator for RPC type inference) ----
@@ -220,6 +225,113 @@ const statementsApp = new Hono()
         sourceQuote: cit.sourceQuote,
         locationNote: cit.locationNote,
         isPrimary: cit.isPrimary,
+      })),
+    });
+  })
+
+  // ---- GET /by-entity — all statements for an entity, with citations and property info ----
+  .get("/by-entity", zv("query", ByEntityQuery), async (c) => {
+    const { entityId } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Fetch statements, citations, and properties in parallel
+    const [rows, allCitations, propertyRows] = await Promise.all([
+      db
+        .select()
+        .from(statements)
+        .where(eq(statements.subjectEntityId, entityId))
+        .orderBy(desc(statements.validStart)),
+      db
+        .select()
+        .from(statementCitations)
+        .where(
+          sql`${statementCitations.statementId} IN (
+            SELECT ${statements.id} FROM ${statements}
+            WHERE ${statements.subjectEntityId} = ${entityId}
+          )`
+        ),
+      db.select().from(properties),
+    ]);
+
+    // Build citation map: statementId -> citations[]
+    const citationMap = new Map<number, typeof allCitations>();
+    for (const cit of allCitations) {
+      const list = citationMap.get(cit.statementId) ?? [];
+      list.push(cit);
+      citationMap.set(cit.statementId, list);
+    }
+
+    // Build property map: propertyId -> property
+    const propertyMap = new Map(propertyRows.map((p) => [p.id, p]));
+
+    // Format statements with joined citations and property info
+    const formatted = rows.map((s) => {
+      const prop = s.propertyId ? propertyMap.get(s.propertyId) : null;
+      const cits = citationMap.get(s.id) ?? [];
+      return {
+        ...formatStatement(s),
+        property: prop
+          ? {
+              id: prop.id,
+              label: prop.label,
+              category: prop.category,
+              valueType: prop.valueType,
+              unitFormatId: prop.unitFormatId,
+            }
+          : null,
+        citations: cits.map((cit) => ({
+          id: cit.id,
+          resourceId: cit.resourceId,
+          url: cit.url,
+          sourceQuote: cit.sourceQuote,
+          locationNote: cit.locationNote,
+          isPrimary: cit.isPrimary,
+        })),
+      };
+    });
+
+    // Split by variety
+    const structured = formatted.filter((s) => s.variety === "structured");
+    const attributed = formatted.filter((s) => s.variety === "attributed");
+
+    return c.json({ structured, attributed, total: rows.length });
+  })
+
+  // ---- GET /properties — list all properties with statement counts ----
+  .get("/properties", async (c) => {
+    const db = getDrizzleDb();
+
+    // Fetch all properties and count statements per property in parallel
+    const [propertyRows, stmtCounts] = await Promise.all([
+      db.select().from(properties),
+      db
+        .select({
+          propertyId: statements.propertyId,
+          count: count(),
+        })
+        .from(statements)
+        .where(eq(statements.status, "active"))
+        .groupBy(statements.propertyId),
+    ]);
+
+    const countMap = new Map(
+      stmtCounts
+        .filter((r) => r.propertyId !== null)
+        .map((r) => [r.propertyId!, r.count])
+    );
+
+    return c.json({
+      properties: propertyRows.map((p) => ({
+        id: p.id,
+        label: p.label,
+        category: p.category,
+        description: p.description,
+        entityTypes: p.entityTypes,
+        valueType: p.valueType,
+        defaultUnit: p.defaultUnit,
+        stalenessCadence: p.stalenessCadence,
+        unitFormatId: p.unitFormatId,
+        statementCount: countMap.get(p.id) ?? 0,
       })),
     });
   })

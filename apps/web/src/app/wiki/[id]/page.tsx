@@ -35,6 +35,7 @@ import type { RefMapEntry as PreprocessorRefMapEntry } from "@/lib/reference-pre
 import { References } from "@/components/wiki/References";
 import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 import type { CitationQuote } from "@/lib/citation-data";
+import { EntityStatementsCard } from "@/components/wiki/EntityStatementsCard";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
@@ -247,6 +248,12 @@ function ContentMeta({
           </a>
         )}
         {numId && (
+          <a href={`/wiki/${numId}/statements`} className="page-meta-github">
+            <FileCheck size={14} />
+            Statements
+          </a>
+        )}
+        {numId && (
           <a href={`/claims/entity/${slug}`} className="page-meta-github">
             <FileCheck size={14} />
             Claims
@@ -391,6 +398,7 @@ async function ContentView({
         <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
           {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
           {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
+          {isArticle && !isInternal && entity && <EntityStatementsCard entityId={slug} />}
           {showToc && <TableOfContents headings={tocHeadings} />}
           {page.content}
           {!isInternal && <References pageId={slug} />}
