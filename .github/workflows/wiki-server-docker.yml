@@ -12,9 +12,9 @@ on:
     inputs:
       skip_smoke_test:
         description: >
-          Skip the pre-deploy smoke test. Use for DDL migrations that require
-          ACCESS EXCLUSIVE locks — the smoke test runs against the production DB
-          while old pods hold connections, causing lock contention deadlocks.
+          Skip the pre-deploy smoke test. The smoke test now uses an ephemeral
+          PostgreSQL container (not production), so this is rarely needed. Use
+          only if the smoke test itself is broken and blocking an urgent deploy.
         required: false
         type: boolean
         default: false
@@ -72,6 +72,21 @@ jobs:
       && inputs.skip_smoke_test != true
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: wiki_smoke_test
+          POSTGRES_USER: wiki
+          POSTGRES_PASSWORD: smoke_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -82,29 +97,28 @@ jobs:
 
       - name: Start container and run smoke test
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
         run: |
           IMAGE="ghcr.io/quantified-uncertainty/longterm-wiki-server:sha-${{ github.sha }}"
           CONTAINER_NAME="smoke-test-${{ github.run_id }}"
           echo "Starting pre-deploy smoke test for image: $IMAGE"
 
-          # SKIP_MIGRATIONS=true: the smoke test verifies the server binary
-          # boots and serves HTTP. Migrations are skipped because they may
-          # need ACCESS EXCLUSIVE locks that deadlock with the production
-          # server's connections (which are still active during the test).
-          # Migrations run during the actual ArgoCD deploy instead.
+          # Use an ephemeral PostgreSQL database instead of production.
+          # The server runs all Drizzle migrations against the empty DB at
+          # startup, catching invalid SQL, schema mismatches, and migration
+          # ordering issues before the image reaches production.
+          # --network host lets the container reach the PG service on localhost.
           docker run -d \
             --name "$CONTAINER_NAME" \
-            -p 3099:3100 \
-            -e DATABASE_URL="${DATABASE_URL}" \
+            --network host \
+            -e DATABASE_URL="postgresql://wiki:smoke_test_password@localhost:5432/wiki_smoke_test" \
             -e WIKI_SERVER_API_KEY="${LONGTERMWIKI_SERVER_API_KEY}" \
-            -e SKIP_MIGRATIONS=true \
+            -e PORT=3099 \
             "$IMAGE"
 
-          # Wait for the server to be ready (up to 60s: 20 attempts × 3s delay).
-          # With SKIP_MIGRATIONS=true, the server should start in a few seconds.
-          MAX_ATTEMPTS=20
+          # Wait for the server to be ready (up to 90s: 30 attempts × 3s delay).
+          # Migrations against an empty DB typically complete in 10-30s.
+          MAX_ATTEMPTS=30
           DELAY=3
           STATUS=""
           for i in $(seq 1 $MAX_ATTEMPTS); do
