@@ -321,9 +321,10 @@ const integrityApp = new Hono()
         "entities"
       ),
       // 5. citation_quotes.page_id_int → wiki_pages
+      // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id_int::text AS ref FROM citation_quotes WHERE page_id_int NOT IN (SELECT integer_id FROM wiki_pages)`,
+        sql`SELECT DISTINCT page_id_int::text AS ref FROM citation_quotes WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages))`,
         "citation_quotes",
         "page_id_int",
         "wiki_pages"
@@ -337,9 +338,10 @@ const integrityApp = new Hono()
         "resources"
       ),
       // 7. edit_logs.page_id_int → wiki_pages
+      // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id_int::text AS ref FROM edit_logs WHERE page_id_int NOT IN (SELECT integer_id FROM wiki_pages)`,
+        sql`SELECT DISTINCT page_id_int::text AS ref FROM edit_logs WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages))`,
         "edit_logs",
         "page_id_int",
         "wiki_pages"
@@ -353,9 +355,10 @@ const integrityApp = new Hono()
         "entities"
       ),
       // 9. resource_citations.page_id_int → wiki_pages
+      // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id_int::text AS ref FROM resource_citations WHERE page_id_int NOT IN (SELECT integer_id FROM wiki_pages)`,
+        sql`SELECT DISTINCT page_id_int::text AS ref FROM resource_citations WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages))`,
         "resource_citations",
         "page_id_int",
         "wiki_pages"

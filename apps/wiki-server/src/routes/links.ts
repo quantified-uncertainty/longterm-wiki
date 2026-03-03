@@ -204,7 +204,8 @@ const linksApp = new Hono()
         wp.entity_type AS source_type
       FROM page_links pl
       LEFT JOIN wiki_pages wp ON wp.integer_id = pl.source_id_int
-      WHERE pl.target_id_int = ${targetIntId}
+      -- Filter NULL source_id_int: DISTINCT ON NULLs would collapse into one group with a NULL id
+      WHERE pl.target_id_int = ${targetIntId} AND pl.source_id_int IS NOT NULL
       ORDER BY pl.source_id_int, pl.weight DESC
     ) sub
     ORDER BY sub.weight DESC
@@ -357,7 +358,9 @@ const linksApp = new Hono()
     FROM page_links pl
     LEFT JOIN wiki_pages ws ON ws.integer_id = pl.source_id_int
     LEFT JOIN wiki_pages wt ON wt.integer_id = pl.target_id_int
-    WHERE pl.source_id_int = ${graphEntityIntId} OR pl.target_id_int = ${graphEntityIntId}
+    -- Exclude rows where either endpoint lacks an integer ID (would produce NULL node ids)
+    WHERE pl.source_id_int IS NOT NULL AND pl.target_id_int IS NOT NULL
+      AND (pl.source_id_int = ${graphEntityIntId} OR pl.target_id_int = ${graphEntityIntId})
     ORDER BY pl.weight DESC
     LIMIT ${MAX_GRAPH_EDGES}
   `;

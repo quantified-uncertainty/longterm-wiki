@@ -302,9 +302,10 @@ const hallucinationRiskApp = new Hono()
     // Fallback: use DISTINCT ON on the base table (slow but correct)
     const db = getDrizzleDb();
 
+    // Use pageIdInt (integer column) for consistency with the DISTINCT ON below
     const pagesResult = await db
       .select({
-        count: sql<number>`count(distinct ${hallucinationRiskSnapshots.pageId})`,
+        count: sql<number>`count(distinct ${hallucinationRiskSnapshots.pageIdInt})`,
       })
       .from(hallucinationRiskSnapshots);
     const uniquePages = Number(pagesResult[0].count);
@@ -312,8 +313,10 @@ const hallucinationRiskApp = new Hono()
     const levelDist = await rawDb<LevelDistRow[]>`
       SELECT level, count(*)::int AS count
       FROM (
+        -- Exclude NULL page_id_int rows; DISTINCT ON NULLs would collapse all into one group
         SELECT DISTINCT ON (page_id_int) level
         FROM hallucination_risk_snapshots
+        WHERE page_id_int IS NOT NULL
         ORDER BY page_id_int, computed_at DESC
       ) latest
       GROUP BY level
@@ -413,7 +416,8 @@ const hallucinationRiskApp = new Hono()
         WHERE id NOT IN (
           SELECT id FROM (
             SELECT id, ROW_NUMBER() OVER (
-              PARTITION BY page_id_int ORDER BY computed_at DESC
+              -- COALESCE to -1 so NULL page_id_int rows don't all collapse into one partition
+              PARTITION BY COALESCE(page_id_int, -1) ORDER BY computed_at DESC
             ) AS rn
             FROM hallucination_risk_snapshots
           ) ranked
@@ -444,7 +448,8 @@ const hallucinationRiskApp = new Hono()
       WHERE id NOT IN (
         SELECT id FROM (
           SELECT id, ROW_NUMBER() OVER (
-            PARTITION BY page_id_int ORDER BY computed_at DESC
+            -- COALESCE to -1 so NULL page_id_int rows don't all collapse into one partition
+            PARTITION BY COALESCE(page_id_int, -1) ORDER BY computed_at DESC
           ) AS rn
           FROM hallucination_risk_snapshots
         ) ranked
