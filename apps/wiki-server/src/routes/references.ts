@@ -286,13 +286,12 @@ const app = new Hono()
       }
     }
 
-    // Phase 4a: resolve page slugs to integer IDs for dual-write
+    // Phase D2a: resolve page slugs to integer IDs (no longer dual-writing page_id_old)
     const batchIntIdMap = await resolvePageIntIds(db, pageIds);
 
     const values = parsed.data.items.map((item) => ({
       referenceId: item.referenceId,
-      pageId: item.pageId,
-      pageIdInt: batchIntIdMap.get(item.pageId) ?? null, // Phase 4a dual-write
+      pageIdInt: batchIntIdMap.get(item.pageId) ?? null,
       title: item.title ?? null,
       url: item.url ?? null,
       note: item.note ?? null,

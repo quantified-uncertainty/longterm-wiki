@@ -156,8 +156,9 @@ const linksApp = new Hono()
                ei_src.numeric_id, ei_tgt.numeric_id
         FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb)
         AS t("sourceId" text, "targetId" text, "linkType" text, relationship text, weight real)
-        LEFT JOIN entity_ids ei_src ON ei_src.slug = t."sourceId"
-        LEFT JOIN entity_ids ei_tgt ON ei_tgt.slug = t."targetId"
+        JOIN entity_ids ei_src ON ei_src.slug = t."sourceId"
+        JOIN entity_ids ei_tgt ON ei_tgt.slug = t."targetId"
+        -- INNER JOIN: skip rows with unresolved slugs (prevents NULL-ID orphans bypassing conflict)
         -- Requires page_links_source_target_int_unique index (created in phase-d2a-predeploy.sql)
         ON CONFLICT (source_id_int, target_id_int, link_type)
         DO UPDATE SET weight = EXCLUDED.weight, relationship = EXCLUDED.relationship
