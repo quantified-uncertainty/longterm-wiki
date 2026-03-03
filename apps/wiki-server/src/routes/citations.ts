@@ -760,7 +760,7 @@ const citationsApp = new Hono()
     const rows = await db
       .select({
         snapshotAt: citationAccuracySnapshots.snapshotAt,
-        totalPages: sql<number>`count(distinct ${citationAccuracySnapshots.pageId})`,
+        totalPages: sql<number>`count(distinct ${citationAccuracySnapshots.pageIdInt})`,
         totalCitations: sql<number>`sum(${citationAccuracySnapshots.totalCitations})`,
         checkedCitations: sql<number>`sum(${citationAccuracySnapshots.checkedCitations})`,
         accurateCount: sql<number>`sum(${citationAccuracySnapshots.accurateCount})`,
