@@ -271,6 +271,7 @@ export function StatementsTable({ data, properties }: StatementsTableProps) {
         <select
           value={varietyFilter}
           onChange={(e) => setVarietyFilter(e.target.value)}
+          aria-label="Filter by statement variety"
           className="rounded-md border border-input bg-background px-2 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
         >
           <option value="all">All varieties</option>
@@ -280,6 +281,7 @@ export function StatementsTable({ data, properties }: StatementsTableProps) {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
+          aria-label="Filter by statement status"
           className="rounded-md border border-input bg-background px-2 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
         >
           <option value="all">All statuses</option>

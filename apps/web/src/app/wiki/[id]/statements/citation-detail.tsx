@@ -43,6 +43,7 @@ export function CitationDetail({ citations }: { citations: Citation[] }) {
   return (
     <div className="inline-flex flex-col items-end">
       <button
+        type="button"
         onClick={() => setOpen(!open)}
         className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 text-[11px] font-medium hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors cursor-pointer"
         aria-expanded={open}
@@ -138,9 +139,11 @@ export function AttributedCitationDetail({
   return (
     <div className="relative">
       <button
+        type="button"
         onClick={() => setOpen(!open)}
         className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 text-[11px] font-medium hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors cursor-pointer"
         aria-expanded={open}
+        aria-label={`${citations.length} citation${citations.length !== 1 ? "s" : ""}`}
       >
         {citations.length} cite{citations.length !== 1 ? "s" : ""}
         {open ? (

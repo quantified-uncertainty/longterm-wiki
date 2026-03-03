@@ -231,7 +231,7 @@ function PropertyGroup({
   statements: StatementWithDetails[];
 }) {
   const active = statements.filter((s) => s.status === "active");
-  const superseded = statements.filter((s) => s.status !== "active");
+  const superseded = statements.filter((s) => s.status === "superseded");
 
   return (
     <div className="mb-4">
@@ -269,7 +269,7 @@ function PropertyGroup({
 function StructuredRow({ statement: s }: { statement: StatementWithDetails }) {
   const value = formatStatementValue(s, s.property);
   const statusBadge = getStatusBadge(s.status);
-  const isSuperseded = s.status !== "active";
+  const isSuperseded = s.status === "superseded";
 
   return (
     <tr className={`border-b border-border/30 last:border-0 ${isSuperseded ? "opacity-60" : ""}`}>
@@ -308,7 +308,7 @@ function StructuredRow({ statement: s }: { statement: StatementWithDetails }) {
 function AttributedRow({ statement: s }: { statement: StatementWithDetails }) {
   const varietyBadge = getVarietyBadge(s.variety);
   const statusBadge = getStatusBadge(s.status);
-  const isSuperseded = s.status !== "active";
+  const isSuperseded = s.status === "superseded";
 
   return (
     <div className={`rounded-lg border border-border/60 p-3 ${isSuperseded ? "opacity-60" : ""}`}>
