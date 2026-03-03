@@ -171,8 +171,7 @@ export const citationAccuracySnapshots = pgTable(
   "citation_accuracy_snapshots",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old")
-      .notNull()
+    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     totalCitations: integer("total_citations").notNull(),
@@ -197,8 +196,7 @@ export const editLogs = pgTable(
   "edit_logs",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old")
-      .notNull()
+    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     date: date("date").notNull(),
@@ -221,8 +219,7 @@ export const hallucinationRiskSnapshots = pgTable(
   "hallucination_risk_snapshots",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old")
-      .notNull()
+    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     score: integer("score").notNull(),
@@ -323,8 +320,7 @@ export const autoUpdateResults = pgTable(
     runId: bigint("run_id", { mode: "number" })
       .notNull()
       .references(() => autoUpdateRuns.id, { onDelete: "cascade" }),
-    pageId: text("page_id_old")
-      .notNull()
+    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     status: text("status").notNull(),
@@ -524,8 +520,7 @@ export const claimPageReferences = pgTable(
     claimId: bigint("claim_id", { mode: "number" })
       .notNull()
       .references(() => claims.id, { onDelete: "cascade" }),
-    pageId: text("page_id_old")
-      .notNull()
+    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     footnote: integer("footnote"),
@@ -722,8 +717,8 @@ export const pageLinks = pgTable(
   "page_links",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    sourceId: text("source_id_old").notNull(),
-    targetId: text("target_id_old").notNull(),
+    sourceId: text("source_id_old"), // Phase D2a: no longer written; nullable pending D2b DROP
+    targetId: text("target_id_old"), // Phase D2a: no longer written; nullable pending D2b DROP
     sourceIdInt: integer("source_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     targetIdInt: integer("target_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     linkType: text("link_type").notNull(), // 'yaml_related' | 'entity_link' | 'name_prefix' | 'similarity' | 'shared_tag'
@@ -839,8 +834,7 @@ export const pageImproveRuns = pgTable(
   "page_improve_runs",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old")
-      .notNull()
+    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     engine: text("engine").notNull(), // 'v1' | 'v2'
@@ -1218,8 +1212,7 @@ export const pageCitations = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     referenceId: varchar("reference_id").notNull().unique(),
-    pageId: text("page_id_old")
-      .notNull()
+    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
       .references(() => wikiPages.id),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     title: varchar("title"),

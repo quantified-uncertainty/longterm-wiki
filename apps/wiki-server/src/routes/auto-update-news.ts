@@ -86,8 +86,8 @@ const autoUpdateNewsApp = new Hono()
             relevanceScore: d.relevanceScore ?? null,
             topicsJson: d.topics.length > 0 ? d.topics : null,
             entitiesJson: d.entities.length > 0 ? d.entities : null,
-            routedToPageId: d.routedToPageId ?? null,
-            routedToPageIdInt: d.routedToPageId ? (intIdMap.get(d.routedToPageId) ?? null) : null, // Phase 4a dual-write
+            // Phase D2a: no longer writing routedToPageId (page_id_old); integer only
+            routedToPageIdInt: d.routedToPageId ? (intIdMap.get(d.routedToPageId) ?? null) : null,
             routedToPageTitle: d.routedToPageTitle ?? null,
             routedTier: d.routedTier ?? null,
           }))
