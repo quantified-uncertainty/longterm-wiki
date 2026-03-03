@@ -1068,6 +1068,151 @@ export const serviceHealthIncidents = pgTable(
   ]
 );
 
+// ============================================================================
+// STATEMENTS SYSTEM — Phase 1 (#1540)
+// ============================================================================
+
+/**
+ * Properties — controlled vocabulary for structured data.
+ *
+ * Each property defines a named attribute (e.g., "valuation", "headcount",
+ * "ceo") that can be used in statements. Seeded from data/fact-measures.yaml.
+ *
+ * `unit_format_id` references a hardcoded TypeScript constant UNIT_FORMATS
+ * in apps/web/src/lib/unit-formats.ts — not a DB table.
+ */
+export const properties = pgTable(
+  "properties",
+  {
+    id: text("id").primaryKey(), // kebab-case: "valuation", "funding-round", "ceo"
+    label: text("label").notNull(),
+    category: text("category").notNull(), // financial, organizational, safety, performance, milestone, relation
+    description: text("description"), // human-readable description of this property
+    entityTypes: text("entity_types")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`), // ["organization"], ["person"], etc.
+    valueType: text("value_type").notNull(), // "number", "string", "entity", "date"
+    defaultUnit: text("default_unit"), // "USD", "percent", "count", "tokens", null
+    stalenessCadence: text("staleness_cadence"), // "quarterly", "annually", null
+    unitFormatId: text("unit_format_id"), // references UNIT_FORMATS TS constant
+    rangeEntityTypes: text("range_entity_types").array(), // for entity-valued properties
+    inversePropertyId: text("inverse_property_id"), // e.g., "parent-org" <-> "subsidiary"
+    isSymmetric: boolean("is_symmetric").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_prop_category").on(table.category),
+    index("idx_prop_value_type").on(table.valueType),
+  ]
+);
+
+/**
+ * Statements — all facts, structured + attributed varieties.
+ *
+ * Replaces the organic claims + facts YAML system with a clean, typed store
+ * for discrete factual information about entities.
+ *
+ * Two varieties:
+ * - **structured**: wiki-authored with a property from the controlled vocabulary,
+ *   a typed value, and a subject entity. `valid_end IS NULL` = currently believed true.
+ * - **attributed**: reports what a specific person/publication said.
+ *   `attributed_to` is required. No structured value fields.
+ *
+ * `valid_start` / `valid_end` are text (not date) to support partial dates
+ * like "2025", "2025-07", "2026-02" from YAML facts.
+ */
+export const statements = pgTable(
+  "statements",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    variety: text("variety").notNull(), // "structured" | "attributed"
+    statementText: text("statement_text"), // free-text version of the statement (attributed variety)
+    subjectEntityId: text("subject_entity_id")
+      .notNull()
+      .references(() => entities.id, { onDelete: "cascade" }),
+    propertyId: text("property_id").references(() => properties.id, {
+      onDelete: "set null",
+    }),
+    // --- Typed value columns (structured variety) ---
+    valueNumeric: doublePrecision("value_numeric"),
+    valueUnit: text("value_unit"), // e.g., "USD", "percent" — display hint
+    valueText: text("value_text"),
+    valueEntityId: text("value_entity_id").references(() => entities.id, {
+      onDelete: "set null",
+    }),
+    valueDate: date("value_date"),
+    valueSeries: jsonb("value_series"), // { low, high } for ranges
+    qualifierKey: text("qualifier_key"), // e.g., "round:series-g"
+    validStart: text("valid_start"), // "2026-02", "2025", ISO date
+    validEnd: text("valid_end"), // null = currently believed true
+    temporalGranularity: text("temporal_granularity"), // "year", "quarter", "month", "day"
+    // --- Attribution (attributed variety) ---
+    attributedTo: text("attributed_to").references(() => entities.id, {
+      onDelete: "set null",
+    }),
+    // --- Metadata ---
+    status: text("status").notNull().default("active"), // "active", "superseded", "retracted"
+    archiveReason: text("archive_reason"), // why this statement was superseded/retracted
+    sourceFactKey: text("source_fact_key"), // "anthropic.6796e194" — YAML migration traceability
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_stmt_subject").on(table.subjectEntityId),
+    index("idx_stmt_property").on(table.propertyId),
+    index("idx_stmt_variety").on(table.variety),
+    index("idx_stmt_status").on(table.status),
+    index("idx_stmt_valid_start").on(table.validStart),
+    index("idx_stmt_subject_property").on(
+      table.subjectEntityId,
+      table.propertyId
+    ),
+    index("idx_stmt_source_fact_key").on(table.sourceFactKey),
+  ]
+);
+
+/**
+ * Statement citations — links statements to source resources.
+ *
+ * Each row represents one resource backing a statement. Supports both
+ * resource_id (linked to data/resources/) and raw URL fallback.
+ */
+export const statementCitations = pgTable(
+  "statement_citations",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    statementId: bigint("statement_id", { mode: "number" })
+      .notNull()
+      .references(() => statements.id, { onDelete: "cascade" }),
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
+    url: text("url"), // fallback if no resource
+    sourceQuote: text("source_quote"),
+    locationNote: text("location_note"),
+    isPrimary: boolean("is_primary").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_sc_statement_id").on(table.statementId),
+    index("idx_sc_resource_id").on(table.resourceId),
+    index("idx_sc_is_primary").on(table.isPrimary),
+  ]
+);
+
 export const pageCitations = pgTable(
   "page_citations",
   {
