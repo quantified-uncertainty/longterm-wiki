@@ -189,3 +189,38 @@ export type RpcFactsByEntityResult = InferResponseType<FactsClient['by-entity'][
 
 /** Inferred response type for GET /api/facts/timeseries/:entityId */
 export type RpcTimeseriesResult = InferResponseType<FactsClient['timeseries'][':entityId']['$get'], 200>;
+
+// ============================================================================
+// Hono RPC client — typed statements API
+// ============================================================================
+
+import type { StatementsRoute } from "@wiki-server/statements-route";
+
+/**
+ * Create a typed Hono RPC client for the statements API.
+ * Returns null if the server URL is not configured.
+ */
+export function getStatementsRpcClient(options?: { revalidate?: number }) {
+  const config = getWikiServerConfig();
+  if (!config) return null;
+
+  const revalidate = options?.revalidate ?? 300;
+
+  const isrFetch: typeof globalThis.fetch = (input, init) => {
+    return globalThis.fetch(input, {
+      ...init,
+      next: { revalidate },
+      signal: init?.signal ?? AbortSignal.timeout(10_000),
+    } as RequestInit);
+  };
+
+  return hc<StatementsRoute>(`${config.serverUrl}/api/statements`, {
+    headers: config.headers,
+    fetch: isrFetch,
+  });
+}
+
+// Note: InferResponseType for individual statements paths is deferred until
+// the /:id param route is split into a separate Hono sub-app (the param route
+// collapses all sibling path types in Hono's RPC inference). The dashboard
+// currently uses fetchDetailed() with manual types, which works fine.
