@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 import yaml from "js-yaml";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { sql, eq } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import * as schema from "../src/schema.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -135,7 +135,7 @@ function parseFactValue(value: FactDef["value"]): {
  * Normalize asOf to a text string suitable for valid_start.
  * YAML may parse dates like 2026-02 as Date objects; we need text.
  */
-function normalizeAsOf(asOf: string | number | undefined): string | null {
+function normalizeAsOf(asOf: string | number | Date | undefined): string | null {
   if (asOf === undefined || asOf === null) return null;
 
   // If YAML parsed it as a Date object (e.g., 2025-02-01)
@@ -203,99 +203,133 @@ export async function migrateFacts(
     .from(schema.resources);
   const validResourceIds = new Set(resourceRows.map((r) => r.id));
 
+  // Pre-load valid property IDs for FK validation
+  const propertyRows = await db
+    .select({ id: schema.properties.id })
+    .from(schema.properties);
+  const validPropertyIds = new Set(propertyRows.map((r) => r.id));
+
+  // Pre-load existing source_fact_keys for idempotency
+  const existingKeys = await db
+    .select({ key: schema.statements.sourceFactKey })
+    .from(schema.statements);
+  const existingFactKeys = new Set(
+    existingKeys.map((r) => r.key).filter(Boolean)
+  );
+
   let inserted = 0;
   let skipped = 0;
   let citationsCreated = 0;
   const warnings: string[] = [];
 
-  for (const factFile of factFiles) {
-    const entityId = factFile.entity;
+  // Wrap in a transaction for atomicity
+  await db.transaction(async (tx) => {
+    for (const factFile of factFiles) {
+      const entityId = factFile.entity;
 
-    for (const [factId, fact] of Object.entries(factFile.facts)) {
-      // Determine the subject entity
-      const subjectEntityId = fact.subject || entityId;
+      for (const [factId, fact] of Object.entries(factFile.facts)) {
+        const sourceFactKey = `${entityId}.${factId}`;
 
-      // Validate subject entity exists
-      if (!validEntityIds.has(subjectEntityId)) {
-        warnings.push(
-          `Skipped ${entityId}.${factId}: subject entity '${subjectEntityId}' not found in entities table`
+        // Idempotency: skip if already migrated
+        if (existingFactKeys.has(sourceFactKey)) {
+          skipped++;
+          continue;
+        }
+
+        // Determine the subject entity
+        const subjectEntityId = fact.subject || entityId;
+
+        // Validate subject entity exists
+        if (!validEntityIds.has(subjectEntityId)) {
+          warnings.push(
+            `Skipped ${sourceFactKey}: subject entity '${subjectEntityId}' not found in entities table`
+          );
+          skipped++;
+          continue;
+        }
+
+        // Parse the value
+        const { valueNumeric, valueText, valueSeries } = parseFactValue(
+          fact.value
         );
-        skipped++;
-        continue;
-      }
 
-      // Parse the value
-      const { valueNumeric, valueText, valueSeries } = parseFactValue(
-        fact.value
-      );
+        // Normalize measure (YAML null `~` becomes JS null)
+        const propertyId = fact.measure || null;
 
-      // Normalize measure (YAML null `~` becomes JS null)
-      const propertyId = fact.measure || null;
+        // Validate property exists if non-null
+        if (propertyId && !validPropertyIds.has(propertyId)) {
+          warnings.push(
+            `Skipped ${sourceFactKey}: property '${propertyId}' not found in properties table (run seed-properties first)`
+          );
+          skipped++;
+          continue;
+        }
 
-      // Build the statement row
-      const statementRow = {
-        variety: "structured" as const,
-        subjectEntityId,
-        propertyId,
-        valueNumeric,
-        valueText,
-        valueEntityId: null as string | null,
-        valueDate: null as string | null,
-        valueSeries: valueSeries as Record<string, unknown> | null,
-        qualifierKey: null as string | null,
-        validStart: normalizeAsOf(fact.asOf),
-        validEnd: null as string | null,
-        attributedTo: null as string | null,
-        status: "active" as const,
-        sourceFactKey: `${entityId}.${factId}`,
-        note: fact.note || null,
-      };
-
-      // Insert statement
-      const result = await db
-        .insert(schema.statements)
-        .values(statementRow)
-        .returning({ id: schema.statements.id });
-
-      if (result.length === 0) {
-        warnings.push(
-          `Failed to insert statement for ${entityId}.${factId}`
-        );
-        skipped++;
-        continue;
-      }
-
-      inserted++;
-      const statementId = result[0].id;
-
-      // Create citation if source or sourceResource is present
-      if (fact.sourceResource || fact.source) {
-        const resourceId =
-          fact.sourceResource && validResourceIds.has(fact.sourceResource)
-            ? fact.sourceResource
-            : null;
-
-        const citationRow = {
-          statementId,
-          resourceId,
-          url: fact.source || null,
-          sourceQuote: null as string | null,
-          locationNote: null as string | null,
-          isPrimary: true,
+        // Build the statement row
+        const statementRow = {
+          variety: "structured" as const,
+          subjectEntityId,
+          propertyId,
+          valueNumeric,
+          valueText,
+          valueEntityId: null as string | null,
+          valueDate: null as string | null,
+          valueSeries: valueSeries as Record<string, unknown> | null,
+          qualifierKey: null as string | null,
+          validStart: normalizeAsOf(fact.asOf),
+          validEnd: null as string | null,
+          attributedTo: null as string | null,
+          status: "active" as const,
+          sourceFactKey,
+          note: fact.note || null,
         };
 
-        await db.insert(schema.statementCitations).values(citationRow);
-        citationsCreated++;
+        // Insert statement
+        const result = await tx
+          .insert(schema.statements)
+          .values(statementRow)
+          .returning({ id: schema.statements.id });
 
-        // Warn if sourceResource was provided but not found
-        if (fact.sourceResource && !validResourceIds.has(fact.sourceResource)) {
+        if (result.length === 0) {
           warnings.push(
-            `${entityId}.${factId}: sourceResource '${fact.sourceResource}' not found in resources table; citation created without resource_id`
+            `Failed to insert statement for ${sourceFactKey}`
           );
+          skipped++;
+          continue;
+        }
+
+        inserted++;
+        const statementId = result[0].id;
+
+        // Create citation if source or sourceResource is present
+        if (fact.sourceResource || fact.source) {
+          const resourceId =
+            fact.sourceResource && validResourceIds.has(fact.sourceResource)
+              ? fact.sourceResource
+              : null;
+
+          const citationRow = {
+            statementId,
+            resourceId,
+            url: fact.source || null,
+            sourceQuote: null as string | null,
+            locationNote: null as string | null,
+            isPrimary: true,
+          };
+
+          await tx.insert(schema.statementCitations).values(citationRow);
+          citationsCreated++;
+
+          // Warn if sourceResource was provided but not found
+          if (fact.sourceResource && !validResourceIds.has(fact.sourceResource)) {
+            warnings.push(
+              `${sourceFactKey}: sourceResource '${fact.sourceResource}' not found in resources table; citation created without resource_id`
+            );
+          }
         }
       }
     }
-  }
+  });
 
   return { inserted, skipped, citationsCreated, warnings };
 }
