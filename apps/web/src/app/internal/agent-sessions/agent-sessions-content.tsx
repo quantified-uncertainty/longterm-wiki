@@ -14,6 +14,7 @@ export interface AgentSessionRow {
   task: string;
   sessionType: string;
   issueNumber: number | null;
+  worktree: string | null;
   status: string;
   startedAt: string;
   completedAt: string | null;
@@ -58,6 +59,7 @@ async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
       task: s.task,
       sessionType: s.sessionType,
       issueNumber: s.issueNumber,
+      worktree: s.worktree ?? null,
       status: s.status,
       startedAt: s.startedAt,
       completedAt: s.completedAt,

@@ -113,7 +113,23 @@ const activeAgentsApp = new Hono()
       }
     }
 
-    return c.json({ agents: rows, conflicts });
+    // Compute directory collision warnings: agents in the same working directory.
+    const dirGroups = new Map<string, string[]>();
+    for (const row of rows) {
+      if (row.worktree && (row.status === "active" || row.status === "stale")) {
+        const group = dirGroups.get(row.worktree) || [];
+        group.push(row.sessionId);
+        dirGroups.set(row.worktree, group);
+      }
+    }
+    const directoryConflicts: Array<{ directory: string; sessionIds: string[] }> = [];
+    for (const [directory, sessionIds] of dirGroups) {
+      if (sessionIds.length > 1) {
+        directoryConflicts.push({ directory, sessionIds });
+      }
+    }
+
+    return c.json({ agents: rows, conflicts, directoryConflicts });
   })
 
   // ---- GET /:id (get a specific agent) ----

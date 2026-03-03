@@ -44,3 +44,20 @@ export function formatFrequencyShort(days: number): string {
   if (days <= 90) return "Quarterly";
   return `${Math.round(days / 30)}mo`;
 }
+
+/**
+ * Extract a short directory label from a full worktree path.
+ *
+ * Examples:
+ *   "/Users/oz/Documents/GitHub.nosync/longterm-wiki-agent1/.claude/worktrees/thirsty-feistel"
+ *     → "longterm-wiki-agent1/thirsty-feistel"
+ *   "/Users/oz/Documents/GitHub.nosync/longterm-wiki-agent3"
+ *     → "longterm-wiki-agent3"
+ */
+export function shortenDirectory(dir: string): string {
+  const match = dir.match(/longterm-wiki[^/]*/);
+  if (!match) return dir.split("/").pop() ?? dir;
+  const base = match[0];
+  const worktreeMatch = dir.match(/worktrees\/([^/]+)/);
+  return worktreeMatch ? `${base}/${worktreeMatch[1]}` : base;
+}
