@@ -46,7 +46,7 @@ jobs:
           cd apps/wiki-server && npx tsx scripts/seed-properties.ts
 
       - name: Migrate YAML facts to statements
-        if: inputs.dry_run != true
+        if: ${{ inputs.dry_run != true }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
@@ -54,7 +54,7 @@ jobs:
           cd apps/wiki-server && npx tsx scripts/migrate-facts-to-statements.ts
 
       - name: Migrate claims to statements
-        if: inputs.dry_run != true
+        if: ${{ inputs.dry_run != true }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
