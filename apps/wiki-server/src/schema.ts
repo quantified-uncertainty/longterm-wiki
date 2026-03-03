@@ -756,6 +756,7 @@ export const agentSessions = pgTable(
     sessionType: text("session_type").notNull(),
     issueNumber: integer("issue_number"),
     checklistMd: text("checklist_md").notNull(),
+    worktree: text("worktree"), // working directory path for collision detection
     status: text("status").notNull().default("active"),
     startedAt: timestamp("started_at", { withTimezone: true })
       .notNull()

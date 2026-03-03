@@ -3,6 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { GITHUB_REPO_URL } from "@lib/site-config";
+import { shortenDirectory } from "@lib/format";
 import type { AgentSessionRow } from "./agent-sessions-content";
 
 // ── Status Badge ─────────────────────────────────────────────────────────
@@ -177,6 +178,22 @@ const columns: ColumnDef<AgentSessionRow>[] = [
         </span>
       ) : (
         <span className="text-xs text-muted-foreground/50">—</span>
+      );
+    },
+  },
+  {
+    accessorKey: "worktree",
+    header: "Directory",
+    cell: ({ row }) => {
+      const worktree = row.original.worktree;
+      if (!worktree) return <span className="text-xs text-muted-foreground/50">—</span>;
+      return (
+        <span
+          className="text-xs text-muted-foreground font-mono max-w-[200px] block truncate"
+          title={worktree}
+        >
+          {shortenDirectory(worktree)}
+        </span>
       );
     },
   },

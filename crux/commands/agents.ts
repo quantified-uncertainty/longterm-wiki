@@ -19,6 +19,7 @@ import {
   heartbeat,
   sweepStaleAgents,
   type ActiveAgentEntry,
+  type ActiveAgentListResponse,
 } from '../lib/wiki-server/active-agents.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { sweepStaleSessions } from '../lib/wiki-server/agent-sessions.ts';
@@ -60,11 +61,13 @@ function formatAgent(a: ActiveAgentEntry, colors: ReturnType<typeof createLogger
   const files = a.filesTouched?.length ? `\n    Files: ${a.filesTouched.slice(0, 5).join(', ')}${a.filesTouched.length > 5 ? ` (+${a.filesTouched.length - 5} more)` : ''}` : '';
 
   const name = a.sessionName ? ` ${colors.cyan}${a.sessionName}${colors.reset}` : '';
+  const worktreeInfo = a.worktree ? `    Dir: ${colors.dim}${a.worktree}${colors.reset}` : '';
 
   return [
     `  ${colors.bold}#${a.id}${colors.reset}${name} ${statusColor}[${a.status}]${colors.reset}${issue}${pr}`,
     `    ${a.task}`,
     a.branch ? `    Branch: ${colors.dim}${a.branch}${colors.reset}` : '',
+    worktreeInfo,
     a.model ? `    Model: ${a.model}` : '',
     `    Started: ${started}  Heartbeat: ${heartbeat}`,
     step,
@@ -160,7 +163,7 @@ async function statusCommand(
     return { exitCode: 0, output: JSON.stringify(result.data, null, 2) };
   }
 
-  const { agents, conflicts } = result.data;
+  const { agents, conflicts, directoryConflicts } = result.data;
 
   if (agents.length === 0) {
     return { exitCode: 0, output: `No ${statusFilter} agents found.` };
@@ -172,10 +175,20 @@ async function statusCommand(
   }
 
   if (conflicts.length > 0) {
-    output += `${log.colors.red}${log.colors.bold}⚠ Conflicts detected:${log.colors.reset}\n`;
+    output += `${log.colors.red}${log.colors.bold}⚠ Issue conflicts:${log.colors.reset}\n`;
     for (const c of conflicts) {
       output += `  Issue #${c.issueNumber}: ${c.sessionIds.length} agents working on it\n`;
       for (const sid of c.sessionIds) {
+        output += `    - ${sid}\n`;
+      }
+    }
+  }
+
+  if (directoryConflicts && directoryConflicts.length > 0) {
+    output += `${log.colors.yellow}${log.colors.bold}⚠ Directory conflicts:${log.colors.reset}\n`;
+    for (const dc of directoryConflicts) {
+      output += `  ${dc.directory}: ${dc.sessionIds.length} agents in same directory\n`;
+      for (const sid of dc.sessionIds) {
         output += `    - ${sid}\n`;
       }
     }
@@ -334,8 +347,8 @@ async function sweepCommand(
     output += `Active agents (E925): Error: ${agentResult.message}\n`;
   }
 
-  // Sweep E912 agent sessions (stale after 24 hours)
-  const sessionResult = await sweepStaleSessions(24);
+  // Sweep E912 agent sessions (stale after 2 hours)
+  const sessionResult = await sweepStaleSessions(2);
   if (sessionResult.ok) {
     if (sessionResult.data.swept > 0) {
       output += `Agent sessions (E912): swept ${sessionResult.data.swept} stale session(s):\n`;

@@ -25,6 +25,7 @@ import {
 } from '../lib/session/session-checklist.ts';
 import type { CommandResult } from '../lib/cli.ts';
 import { upsertAgentSession, updateAgentSession, getAgentSessionByBranch } from '../lib/wiki-server/agent-sessions.ts';
+import { registerAgent, listActiveAgents } from '../lib/wiki-server/active-agents.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -109,7 +110,9 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
     return { output: `${c.red}Usage: crux agent-checklist init "Task" --type=X | --issue=N${c.reset}\n`, exitCode: 1 };
   }
 
-  const metadata: ChecklistMetadata = { task, branch: currentBranch(), timestamp: new Date().toISOString(), issue };
+  const branch = currentBranch();
+  const worktree = PROJECT_ROOT;
+  const metadata: ChecklistMetadata = { task, branch, timestamp: new Date().toISOString(), issue };
   let markdown = buildChecklist(type, metadata);
 
   if (!issue) {
@@ -121,15 +124,52 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
 
   // DB sync (best-effort)
   let dbSynced = false;
+  let directoryWarning = '';
   try {
     const result = await upsertAgentSession({
-      branch: metadata.branch,
+      branch,
       task,
       sessionType: type,
       issueNumber: issue ?? null,
       checklistMd: markdown,
+      worktree,
     });
     dbSynced = result.ok;
+
+    // Auto-register as active agent for live tracking + collision detection
+    await registerAgent({
+      sessionId: branch,
+      branch,
+      task,
+      issueNumber: issue ?? null,
+      worktree,
+    }).catch((e: unknown) => {
+      // Best-effort — active agent registration is non-critical.
+      // Wiki-server may be unreachable; agent-checklist still works locally.
+      console.warn(`Active agent registration failed: ${e instanceof Error ? e.message : String(e)}`);
+    });
+
+    // Check for directory collisions with other active/stale agents.
+    // Include stale agents — they may still be running (just missed a heartbeat).
+    const agentsResult = await listActiveAgents(undefined, 100).catch((e: unknown) => {
+      // Best-effort — collision detection is non-critical
+      console.warn(`Directory collision check failed: ${e instanceof Error ? e.message : String(e)}`);
+      return null;
+    });
+    if (agentsResult?.ok) {
+      const sameDir = agentsResult.data.agents.filter(
+        (a) => a.worktree && a.worktree === worktree
+          && a.sessionId !== branch
+          && (a.status === 'active' || a.status === 'stale')
+      );
+      if (sameDir.length > 0) {
+        directoryWarning = `\n${c.red}⚠ Directory collision: ${sameDir.length} other agent(s) in the same directory:${c.reset}\n`;
+        for (const a of sameDir) {
+          directoryWarning += `  ${c.red}-${c.reset} ${a.sessionId} (${a.task.slice(0, 60)})\n`;
+        }
+        directoryWarning += `  ${c.dim}This can cause file conflicts. Consider using a separate worktree.${c.reset}\n`;
+      }
+    }
   } catch {
     // Best-effort
   }
@@ -138,11 +178,13 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   let output = `${c.green}✓${c.reset} Agent checklist created: ${c.cyan}.claude/wip-checklist.md${c.reset}\n`;
   output += `  Type: ${c.bold}${type}${c.reset}\n`;
   output += `  Task: ${task}\n`;
-  output += `  Branch: ${c.cyan}${metadata.branch}${c.reset}\n`;
+  output += `  Branch: ${c.cyan}${branch}${c.reset}\n`;
+  output += `  Directory: ${c.dim}${worktree}${c.reset}\n`;
   if (issue) output += `  Issue: ${c.cyan}#${issue}${c.reset}\n`;
   else output += `  ${c.dim}issue-tracking auto-marked N/A (no GitHub issue)${c.reset}\n`;
   output += `  Items: ${status.totalItems}\n`;
   if (dbSynced) output += `  ${c.dim}Synced to wiki-server DB${c.reset}\n`;
+  if (directoryWarning) output += directoryWarning;
   output += `\n${c.dim}Run \`crux agent-checklist status\` to check progress.${c.reset}\n`;
 
   return { output, exitCode: 0 };

@@ -1152,6 +1152,7 @@ export const CreateAgentSessionSchema = z.object({
   sessionType: z.enum(VALID_SESSION_TYPES),
   issueNumber: z.number().int().positive().nullable().optional(),
   checklistMd: z.string().min(1).max(50000),
+  worktree: z.string().max(1000).nullable().optional(),
 });
 export type CreateAgentSession = z.infer<typeof CreateAgentSessionSchema>;
 

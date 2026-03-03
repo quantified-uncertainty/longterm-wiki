@@ -34,10 +34,14 @@ export function StatementsFilter({
 
     if (!showSuperseded) {
       result = result.filter((s) => s.status === "active");
+    } else {
+      result = result.filter(
+        (s) => s.status === "active" || s.status === "superseded"
+      );
     }
 
     if (query.trim()) {
-      const q = query.toLowerCase();
+      const q = query.trim().toLowerCase();
       result = result.filter((s) => {
         const text = [
           s.property?.label,

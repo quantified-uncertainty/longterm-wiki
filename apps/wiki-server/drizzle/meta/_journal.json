@@ -377,7 +377,14 @@
       "idx": 53,
       "version": "7",
       "when": 1773129600000,
-      "tag": "0053_reapply_statement_verdicts",
+      "tag": "0053_add_worktree_to_agent_sessions",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1773216000000,
+      "tag": "0054_reapply_statement_verdicts",
       "breakpoints": true
     }
   ]

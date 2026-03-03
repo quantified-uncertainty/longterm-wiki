@@ -45,6 +45,7 @@ const agentSessionsApp = new Hono()
             sessionType: d.sessionType,
             issueNumber: d.issueNumber ?? null,
             checklistMd: d.checklistMd,
+            worktree: d.worktree ?? existing[0].worktree ?? null,
             updatedAt: new Date(),
           })
           .where(eq(agentSessions.id, existing[0].id))
@@ -60,6 +61,7 @@ const agentSessionsApp = new Hono()
           sessionType: d.sessionType,
           issueNumber: d.issueNumber ?? null,
           checklistMd: d.checklistMd,
+          worktree: d.worktree ?? null,
         })
         .returning();
       return { row: firstOrThrow(inserted, "agent session insert"), isUpdate: false };
@@ -144,8 +146,8 @@ const agentSessionsApp = new Hono()
   // ---- POST /sweep (mark stale active sessions as completed) ----
   .post("/sweep", async (c) => {
     const body = await parseJsonBody(c).catch(() => ({}));
-    const raw = Number((body as Record<string, unknown>)?.timeoutHours || 24);
-    const timeoutHours = Math.max(1, Math.min(Number.isFinite(raw) ? raw : 24, 720));
+    const raw = Number((body as Record<string, unknown>)?.timeoutHours || 2);
+    const timeoutHours = Math.max(1, Math.min(Number.isFinite(raw) ? raw : 2, 720));
 
     const cutoff = new Date(Date.now() - timeoutHours * 60 * 60 * 1000);
     const db = getDrizzleDb();
