@@ -225,7 +225,7 @@ export interface ClaimsMigrationResult {
  */
 export async function migrateClaims(
   db: ReturnType<typeof drizzle<typeof schema>>,
-  entityFilter: string = "anthropic"
+  entityFilter?: string
 ): Promise<ClaimsMigrationResult> {
   const aliases = loadPropertyAliases();
 
@@ -255,41 +255,47 @@ export async function migrateClaims(
     existingKeys.map((r) => r.key).filter(Boolean)
   );
 
-  // Load claims for the target entity
-  const claimRows = await db
-    .select({
-      id: schema.claims.id,
-      entityId: schema.claims.entityId,
-      claimMode: schema.claims.claimMode,
-      claimText: schema.claims.claimText,
-      subjectEntity: schema.claims.subjectEntity,
-      property: schema.claims.property,
-      measure: schema.claims.measure,
-      structuredValue: schema.claims.structuredValue,
-      valueNumeric: schema.claims.valueNumeric,
-      valueLow: schema.claims.valueLow,
-      valueHigh: schema.claims.valueHigh,
-      valueUnit: schema.claims.valueUnit,
-      valueDate: schema.claims.valueDate,
-      asOf: schema.claims.asOf,
-      qualifiers: schema.claims.qualifiers,
-      attributedTo: schema.claims.attributedTo,
-      section: schema.claims.section,
-      factId: schema.claims.factId,
-      claimVerdict: schema.claims.claimVerdict,
-      claimVerdictScore: schema.claims.claimVerdictScore,
-      claimVerdictQuotes: schema.claims.claimVerdictQuotes,
-      claimVerdictModel: schema.claims.claimVerdictModel,
-      claimVerifiedAt: schema.claims.claimVerifiedAt,
-      claimCategory: schema.claims.claimCategory,
-    })
-    .from(schema.claims)
-    .where(
-      or(
-        eq(schema.claims.entityId, entityFilter),
-        eq(schema.claims.subjectEntity, entityFilter)
-      )
-    );
+  // Load claims — filtered by entity or all
+  const claimSelect = {
+    id: schema.claims.id,
+    entityId: schema.claims.entityId,
+    claimMode: schema.claims.claimMode,
+    claimText: schema.claims.claimText,
+    subjectEntity: schema.claims.subjectEntity,
+    property: schema.claims.property,
+    measure: schema.claims.measure,
+    structuredValue: schema.claims.structuredValue,
+    valueNumeric: schema.claims.valueNumeric,
+    valueLow: schema.claims.valueLow,
+    valueHigh: schema.claims.valueHigh,
+    valueUnit: schema.claims.valueUnit,
+    valueDate: schema.claims.valueDate,
+    asOf: schema.claims.asOf,
+    qualifiers: schema.claims.qualifiers,
+    attributedTo: schema.claims.attributedTo,
+    section: schema.claims.section,
+    factId: schema.claims.factId,
+    claimVerdict: schema.claims.claimVerdict,
+    claimVerdictScore: schema.claims.claimVerdictScore,
+    claimVerdictQuotes: schema.claims.claimVerdictQuotes,
+    claimVerdictModel: schema.claims.claimVerdictModel,
+    claimVerifiedAt: schema.claims.claimVerifiedAt,
+    claimCategory: schema.claims.claimCategory,
+  };
+
+  const claimRows = entityFilter
+    ? await db
+        .select(claimSelect)
+        .from(schema.claims)
+        .where(
+          or(
+            eq(schema.claims.entityId, entityFilter),
+            eq(schema.claims.subjectEntity, entityFilter)
+          )
+        )
+    : await db
+        .select(claimSelect)
+        .from(schema.claims);
 
   // Load all claim sources for the matched claims
   const claimIds = claimRows.map((c) => c.id);
@@ -499,9 +505,10 @@ if (isMain) {
     process.exit(1);
   }
 
-  // Parse --entity flag
+  // Parse --entity flag; --all migrates every entity
   const entityArg = process.argv.find((a) => a.startsWith("--entity="));
-  const entityFilter = entityArg ? entityArg.slice("--entity=".length) : "anthropic";
+  const allFlag = process.argv.includes("--all");
+  const entityFilter = allFlag ? null : (entityArg ? entityArg.slice("--entity=".length) : "anthropic");
 
   const sqlConn = postgres(databaseUrl, { max: 3 });
   const db = drizzle(sqlConn, { schema });
@@ -511,8 +518,12 @@ if (isMain) {
     const seedResult = await seedProperties(db);
     console.log(`  Properties seeded: ${seedResult.inserted} inserted, ${seedResult.updated} updated`);
 
-    console.log(`\nMigrating claims for entity: ${entityFilter}`);
-    const result = await migrateClaims(db, entityFilter);
+    if (entityFilter) {
+      console.log(`\nMigrating claims for entity: ${entityFilter}`);
+    } else {
+      console.log(`\nMigrating claims for ALL entities`);
+    }
+    const result = await migrateClaims(db, entityFilter ?? undefined);
 
     console.log(`\n--- Migration Summary ---`);
     console.log(`  Inserted:     ${result.inserted}`);
