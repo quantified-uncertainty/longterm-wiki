@@ -2317,6 +2317,60 @@
     - digital-rights
     - governance
   lastUpdated: 2025-12
+- id: us-ai-surveillance-democratic-erosion
+  numericId: E1003
+  type: risk
+  summaryPage: misuse-overview
+  title: AI Surveillance and US Democratic Erosion
+  severity: high
+  likelihood:
+    level: high
+    status: emerging
+  timeframe:
+    median: 2026
+    earliest: 2025
+    latest: 2028
+  maturity: Emerging
+  customFields:
+    - label: Focus
+      value: US domestic surveillance and election integrity
+    - label: Key Trigger
+      value: Anthropic-Pentagon standoff (Feb 2026)
+  relatedEntries:
+    - id: surveillance
+      type: risk
+    - id: authoritarian-takeover
+      type: risk
+    - id: authoritarian-tools
+      type: risk
+    - id: anthropic-government-standoff
+      type: event
+  sources:
+    - title: "Center for American Progress: Digital Watchtower"
+      url: https://www.americanprogress.org/article/digital-watchtower-government-data-centralization/
+      date: '2026'
+    - title: "NPR: National Citizenship Data System"
+      url: https://www.npr.org/2025/03/25/nx-s1-5339800/dhs-doge-citizenship-database
+      date: '2025'
+    - title: "Reuters: DOGE AI Surveillance of Federal Workers"
+      url: https://www.reuters.com/technology/artificial-intelligence/doge-uses-ai-monitor-federal-workers-communications-2026-02-01/
+      date: '2026'
+    - title: "Brennan Center: Data Broker Loophole"
+      url: https://www.brennancenter.org/our-work/research-reports/data-brokers-and-government-surveillance
+  description: >-
+    The convergence of data centralization, oversight dismantlement, and AI capability acquisition by the US government
+    creates near-term risks to democratic processes. The Anthropic-Pentagon standoff crystallized what the government
+    sought: AI analysis of bulk commercial data on Americans including location, browsing, and financial records.
+    Infrastructure being assembled includes a national citizenship database, Palantir data-mining contracts, and AI
+    monitoring of federal workers. Whether deployed for electoral manipulation remains uncertain, but the risk is
+    significant and historically grounded in COINTELPRO, Nixon-era abuses, and post-9/11 bulk collection.
+  tags:
+    - surveillance
+    - democracy
+    - governance
+    - elections
+    - us-policy
+  lastUpdated: 2026-03
 - id: sycophancy
   numericId: E295
   type: risk
