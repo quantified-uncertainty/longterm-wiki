@@ -358,6 +358,13 @@
       "when": 1772870400000,
       "tag": "0050_rename_page_id_to_page_id_old",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1772956800000,
+      "tag": "0051_create_statements_system",
+      "breakpoints": true
     }
   ]
 }
