@@ -50,9 +50,9 @@ export async function EntityStatementsCard({
 
   if (!result || result.total === 0) return null;
 
-  // Show only active structured statements with current values
+  // Show only active structured statements with a property and current values
   const current = result.structured.filter(
-    (s) => s.status === "active" && !s.validEnd
+    (s) => s.status === "active" && !s.validEnd && s.property
   );
 
   if (current.length === 0) return null;
