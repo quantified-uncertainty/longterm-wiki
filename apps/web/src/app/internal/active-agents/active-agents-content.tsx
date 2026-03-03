@@ -28,18 +28,24 @@ export interface ActiveAgentConflict {
   sessionIds: string[];
 }
 
+export interface DirectoryConflict {
+  directory: string;
+  sessionIds: string[];
+}
+
 // ── Data Loading ──────────────────────────────────────────────────────────
 
 interface ApiResponse {
   agents: CanonicalRow[];
   conflicts: ActiveAgentConflict[];
+  directoryConflicts: DirectoryConflict[];
 }
 
 interface PullsApiResponse {
   pulls: Array<{ number: number; branch: string }>;
 }
 
-async function loadFromApi(): Promise<FetchResult<{ agents: ActiveAgentRow[]; conflicts: ActiveAgentConflict[] }>> {
+async function loadFromApi(): Promise<FetchResult<{ agents: ActiveAgentRow[]; conflicts: ActiveAgentConflict[]; directoryConflicts: DirectoryConflict[] }>> {
   // Fetch agents and open PRs in parallel
   const [result, pullsData] = await Promise.all([
     fetchDetailed<ApiResponse>(
@@ -80,11 +86,33 @@ async function loadFromApi(): Promise<FetchResult<{ agents: ActiveAgentRow[]; co
     completedAt: a.completedAt,
   }));
 
-  return { ok: true, data: { agents, conflicts: result.data.conflicts } };
+  return {
+    ok: true,
+    data: {
+      agents,
+      conflicts: result.data.conflicts,
+      directoryConflicts: result.data.directoryConflicts ?? [],
+    },
+  };
 }
 
-function noLocalFallback(): { agents: ActiveAgentRow[]; conflicts: ActiveAgentConflict[] } {
-  return { agents: [], conflicts: [] };
+function noLocalFallback(): { agents: ActiveAgentRow[]; conflicts: ActiveAgentConflict[]; directoryConflicts: DirectoryConflict[] } {
+  return { agents: [], conflicts: [], directoryConflicts: [] };
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────
+
+/** Extract a short directory label from a full worktree path. */
+function shortenDirectory(dir: string): string {
+  // e.g. "/Users/oz/Documents/GitHub.nosync/longterm-wiki-agent1/.claude/worktrees/thirsty-feistel"
+  //   → "agent1/thirsty-feistel"
+  // e.g. "/Users/oz/Documents/GitHub.nosync/longterm-wiki-agent3"
+  //   → "agent3"
+  const match = dir.match(/longterm-wiki[^/]*/);
+  if (!match) return dir.split("/").pop() ?? dir;
+  const base = match[0];
+  const worktreeMatch = dir.match(/worktrees\/([^/]+)/);
+  return worktreeMatch ? `${base}/${worktreeMatch[1]}` : base;
 }
 
 // ── Content Component ────────────────────────────────────────────────────
@@ -95,7 +123,7 @@ export async function ActiveAgentsContent() {
     noLocalFallback
   );
 
-  const { agents, conflicts } = data;
+  const { agents, conflicts, directoryConflicts } = data;
   const activeCount = agents.filter((a) => a.status === "active").length;
   const completedCount = agents.filter((a) => a.status === "completed").length;
   const staleCount = agents.filter((a) => a.status === "stale").length;
@@ -128,11 +156,24 @@ export async function ActiveAgentsContent() {
       {conflicts.length > 0 && (
         <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-4 mb-4">
           <p className="text-sm font-semibold text-red-600 mb-2">
-            Conflict Warning: Multiple agents on same issue
+            Issue Conflict: Multiple agents on same issue
           </p>
           {conflicts.map((c) => (
             <p key={c.issueNumber} className="text-sm text-red-600/80">
               Issue #{c.issueNumber}: {c.sessionIds.length} agents ({c.sessionIds.join(", ")})
+            </p>
+          ))}
+        </div>
+      )}
+
+      {directoryConflicts.length > 0 && (
+        <div className="rounded-lg border border-orange-500/30 bg-orange-500/5 p-4 mb-4">
+          <p className="text-sm font-semibold text-orange-600 mb-2">
+            Directory Conflict: Multiple agents in same working directory
+          </p>
+          {directoryConflicts.map((dc) => (
+            <p key={dc.directory} className="text-sm text-orange-600/80">
+              {shortenDirectory(dc.directory)}: {dc.sessionIds.length} agents ({dc.sessionIds.join(", ")})
             </p>
           ))}
         </div>
