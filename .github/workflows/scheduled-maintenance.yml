@@ -115,7 +115,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_args: "--max-turns 15"
+          claude_args: '--max-turns 15 --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Task,TodoWrite,WebFetch"'
           additional_permissions: |
             actions: read
           prompt: |
