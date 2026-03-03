@@ -84,12 +84,10 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
   if (!statementsResult.ok) return statementsResult;
   if (!propertiesResult.ok) return propertiesResult;
 
-  // Statements from the list endpoint don't have citations — fetch them via by-entity for each unique entity
-  // For the dashboard, we skip per-row citations and just show counts
-  // To get citation counts, we'll need a second pass. For now, map with empty citations.
+  // The list endpoint doesn't include citations — set empty arrays for the dashboard table
   const stmts: StatementRow[] = statementsResult.data.statements.map((s) => ({
     ...s,
-    citations: (s as StatementRow).citations ?? [],
+    citations: [],
   }));
 
   return {
