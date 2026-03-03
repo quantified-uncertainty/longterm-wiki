@@ -1087,6 +1087,7 @@ export const properties = pgTable(
     id: text("id").primaryKey(), // kebab-case: "valuation", "funding-round", "ceo"
     label: text("label").notNull(),
     category: text("category").notNull(), // financial, organizational, safety, performance, milestone, relation
+    description: text("description"), // human-readable description of this property
     entityTypes: text("entity_types")
       .array()
       .notNull()
@@ -1131,6 +1132,7 @@ export const statements = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     variety: text("variety").notNull(), // "structured" | "attributed"
+    statementText: text("statement_text"), // free-text version of the statement (attributed variety)
     subjectEntityId: text("subject_entity_id")
       .notNull()
       .references(() => entities.id, { onDelete: "cascade" }),
@@ -1139,6 +1141,7 @@ export const statements = pgTable(
     }),
     // --- Typed value columns (structured variety) ---
     valueNumeric: doublePrecision("value_numeric"),
+    valueUnit: text("value_unit"), // e.g., "USD", "percent" — display hint
     valueText: text("value_text"),
     valueEntityId: text("value_entity_id").references(() => entities.id, {
       onDelete: "set null",
@@ -1148,12 +1151,14 @@ export const statements = pgTable(
     qualifierKey: text("qualifier_key"), // e.g., "round:series-g"
     validStart: text("valid_start"), // "2026-02", "2025", ISO date
     validEnd: text("valid_end"), // null = currently believed true
+    temporalGranularity: text("temporal_granularity"), // "year", "quarter", "month", "day"
     // --- Attribution (attributed variety) ---
     attributedTo: text("attributed_to").references(() => entities.id, {
       onDelete: "set null",
     }),
     // --- Metadata ---
     status: text("status").notNull().default("active"), // "active", "superseded", "retracted"
+    archiveReason: text("archive_reason"), // why this statement was superseded/retracted
     sourceFactKey: text("source_fact_key"), // "anthropic.6796e194" — YAML migration traceability
     note: text("note"),
     createdAt: timestamp("created_at", { withTimezone: true })
