@@ -15,7 +15,7 @@ import { fileURLToPath } from "node:url";
 import yaml from "js-yaml";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { sql, eq, or } from "drizzle-orm";
+import { sql, eq, or, inArray } from "drizzle-orm";
 import * as schema from "../src/schema.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -280,7 +280,7 @@ export async function migrateClaims(
 
   // Load all claim sources for the matched claims
   const claimIds = claimRows.map((c) => c.id);
-  let claimSourcesByClaimId: Map<number, ClaimSourceRow[]> = new Map();
+  const claimSourcesByClaimId: Map<number, ClaimSourceRow[]> = new Map();
 
   if (claimIds.length > 0) {
     // Query in batches to avoid parameter limits
@@ -298,9 +298,7 @@ export async function migrateClaims(
           sourceLocation: schema.claimSources.sourceLocation,
         })
         .from(schema.claimSources)
-        .where(
-          sql`${schema.claimSources.claimId} = ANY(${batch}::bigint[])`
-        );
+        .where(inArray(schema.claimSources.claimId, batch));
 
       for (const row of sourceRows) {
         const existing = claimSourcesByClaimId.get(row.claimId) ?? [];
@@ -367,7 +365,6 @@ export async function migrateClaims(
 
       // Map variety
       const variety = mapVariety(claim.claimMode);
-      byVariety[variety] = (byVariety[variety] ?? 0) + 1;
 
       // Process qualifiers
       const { qualifierKey, qualifierNote } = processQualifiers(claim.qualifiers);
@@ -424,6 +421,7 @@ export async function migrateClaims(
       }
 
       inserted++;
+      byVariety[variety] = (byVariety[variety] ?? 0) + 1;
       const statementId = result[0].id;
 
       // Migrate claim sources → statement citations
