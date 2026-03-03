@@ -162,6 +162,11 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
     resources.map((r: YamlItemWithSource) => (r as Record<string, unknown>).id as string).filter(Boolean)
   );
 
+  // Build set of valid entity IDs (slugs) for fact entity cross-referencing
+  const validEntityIds = new Set<string>(
+    entities.map((e: YamlItemWithSource) => (e as Record<string, unknown>).id as string).filter(Boolean)
+  );
+
   // 6. Validate facts/*.yaml against FactsFile schema and check measure references
   if (!ciMode) console.log(`${colors.dim}Checking facts...${colors.reset}`);
   const factsDir = join(DATA_DIR, 'facts');
@@ -230,6 +235,15 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
               issues: [`Unknown sourceResource "${fact.sourceResource}" — not found in data/resources/`],
             });
           }
+        }
+        // Cross-reference: check that entity references a valid entity ID
+        if (!validEntityIds.has(result.data.entity)) {
+          allErrors.push({
+            file: filepath,
+            id: result.data.entity,
+            type: 'FactsFile',
+            issues: [`Unknown entity "${result.data.entity}" — not found in data/entities/*.yaml`],
+          });
         }
       }
     }
