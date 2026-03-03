@@ -220,17 +220,7 @@ export function getStatementsRpcClient(options?: { revalidate?: number }) {
   });
 }
 
-// Typed response types for the statements API (inferred from server route)
-type StatementsClient = NonNullable<ReturnType<typeof getStatementsRpcClient>>;
-
-/** Inferred response type for GET /api/statements/by-entity */
-export type RpcStatementsByEntityResult = InferResponseType<StatementsClient['by-entity']['$get'], 200>;
-
-/** Inferred response type for GET /api/statements/properties */
-export type RpcStatementsPropertiesResult = InferResponseType<StatementsClient['properties']['$get'], 200>;
-
-/** Inferred response type for GET /api/statements/stats */
-export type RpcStatementsStatsResult = InferResponseType<StatementsClient['stats']['$get'], 200>;
-
-/** Inferred response type for GET /api/statements/ (list) */
-export type RpcStatementsListResult = InferResponseType<StatementsClient['index']['$get'], 200>;
+// Note: InferResponseType for individual statements paths is deferred until
+// the /:id param route is split into a separate Hono sub-app (the param route
+// collapses all sibling path types in Hono's RPC inference). The dashboard
+// currently uses fetchDetailed() with manual types, which works fine.
