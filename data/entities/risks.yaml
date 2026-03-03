@@ -3138,3 +3138,37 @@
     - governance
     - cyber
   lastUpdated: 2026-02
+
+- id: near-term-risks
+  numericId: E1005
+  type: risk
+  title: Key Near-Term AI Risks
+  description: >
+    Curated overview of the most urgent AI risks that are actively manifesting
+    or expected to emerge by 2027, organized by urgency rather than category.
+    Covers governance, misuse, epistemic, and technical risks that are no longer
+    theoretical but producing observable real-world harms.
+  relatedEntries:
+    - id: racing-dynamics
+      type: risk
+    - id: authoritarian-tools
+      type: risk
+    - id: surveillance
+      type: risk
+    - id: disinformation
+      type: risk
+    - id: authentication-collapse
+      type: risk
+    - id: goal-misgeneralization
+      type: risk
+    - id: us-ai-surveillance-democratic-erosion
+      type: risk
+  tags:
+    - near-term
+    - overview
+    - governance
+    - misuse
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-03
