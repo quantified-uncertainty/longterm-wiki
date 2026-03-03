@@ -1,10 +1,15 @@
 /**
  * Statements route — Hono RPC method-chained route for the Statements system.
  *
- * Phase 1c: Minimal CRUD for statements + citations.
- * - GET /          — list with filters (by entity, property, variety, status)
- * - GET /current   — current value for entity+property (valid_end IS NULL)
- * - POST /         — create statement + citations
+ * - GET /               — list with filters (by entity, property, variety, status)
+ * - GET /current        — current value for entity+property (valid_end IS NULL)
+ * - GET /stats          — basic statistics
+ * - GET /by-entity      — all statements for an entity, grouped by property category
+ * - GET /properties     — full properties list with statement counts
+ * - GET /history        — all values for entity+property over time
+ * - GET /:id            — single statement with full citations
+ * - PATCH /:id          — update statement status, verdict, or note
+ * - POST /              — create statement + optional citations
  */
 
 import { Hono } from "hono";
@@ -15,8 +20,10 @@ import {
   and,
   count,
   desc,
+  asc,
   isNull,
   sql,
+  inArray,
 } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import {
@@ -47,6 +54,15 @@ const ListQuery = z.object({
 });
 
 const CurrentQuery = z.object({
+  entityId: z.string().min(1).max(200),
+  propertyId: z.string().min(1).max(200),
+});
+
+const ByEntityQuery = z.object({
+  entityId: z.string().min(1).max(200),
+});
+
+const HistoryQuery = z.object({
   entityId: z.string().min(1).max(200),
   propertyId: z.string().min(1).max(200),
 });
@@ -88,10 +104,41 @@ function formatStatement(s: typeof statements.$inferSelect) {
     validEnd: s.validEnd,
     temporalGranularity: s.temporalGranularity,
     attributedTo: s.attributedTo,
+    verdict: s.verdict,
+    verdictScore: s.verdictScore,
+    verdictQuotes: s.verdictQuotes,
+    verdictModel: s.verdictModel,
+    verifiedAt: s.verifiedAt,
+    claimCategory: s.claimCategory,
     sourceFactKey: s.sourceFactKey,
     note: s.note,
     createdAt: s.createdAt,
     updatedAt: s.updatedAt,
+  };
+}
+
+function formatCitation(cit: typeof statementCitations.$inferSelect) {
+  return {
+    id: cit.id,
+    resourceId: cit.resourceId,
+    url: cit.url,
+    sourceQuote: cit.sourceQuote,
+    locationNote: cit.locationNote,
+    isPrimary: cit.isPrimary,
+  };
+}
+
+function formatProperty(p: typeof properties.$inferSelect) {
+  return {
+    id: p.id,
+    label: p.label,
+    category: p.category,
+    description: p.description,
+    entityTypes: p.entityTypes,
+    valueType: p.valueType,
+    defaultUnit: p.defaultUnit,
+    stalenessCadence: p.stalenessCadence,
+    unitFormatId: p.unitFormatId,
   };
 }
 
@@ -196,14 +243,7 @@ const statementsApp = new Hono()
 
     return c.json({
       statement: formatStatement(rows[0]),
-      citations: citationRows.map((cit) => ({
-        id: cit.id,
-        resourceId: cit.resourceId,
-        url: cit.url,
-        sourceQuote: cit.sourceQuote,
-        locationNote: cit.locationNote,
-        isPrimary: cit.isPrimary,
-      })),
+      citations: citationRows.map(formatCitation),
     });
   })
 
@@ -237,6 +277,242 @@ const statementsApp = new Hono()
       byStatus: Object.fromEntries(byStatus.map((r) => [r.status, r.count])),
       propertiesCount: propertiesCount[0].count,
     });
+  })
+
+  // ---- GET /by-entity — all statements for an entity, grouped by property category ----
+  .get("/by-entity", zv("query", ByEntityQuery), async (c) => {
+    const { entityId } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Fetch all active statements for this entity
+    const rows = await db
+      .select()
+      .from(statements)
+      .where(
+        and(
+          eq(statements.subjectEntityId, entityId),
+          eq(statements.status, "active")
+        )
+      )
+      .orderBy(asc(statements.propertyId), desc(statements.validStart));
+
+    // Fetch citations for all returned statements in one query
+    const stmtIds = rows.map((r) => r.id);
+    const citations =
+      stmtIds.length > 0
+        ? await db
+            .select()
+            .from(statementCitations)
+            .where(inArray(statementCitations.statementId, stmtIds))
+        : [];
+
+    // Group citations by statement ID
+    const citationsByStmt = new Map<number, typeof citations>();
+    for (const cit of citations) {
+      const existing = citationsByStmt.get(cit.statementId) ?? [];
+      existing.push(cit);
+      citationsByStmt.set(cit.statementId, existing);
+    }
+
+    // Fetch properties referenced by these statements
+    const propertyIds = [...new Set(rows.map((r) => r.propertyId).filter(Boolean))] as string[];
+    const props =
+      propertyIds.length > 0
+        ? await db
+            .select()
+            .from(properties)
+            .where(inArray(properties.id, propertyIds))
+        : [];
+
+    // Split by variety
+    const structured = rows
+      .filter((r) => r.variety === "structured")
+      .map((r) => ({
+        ...formatStatement(r),
+        citations: (citationsByStmt.get(r.id) ?? []).map(formatCitation),
+      }));
+
+    const attributed = rows
+      .filter((r) => r.variety === "attributed")
+      .map((r) => ({
+        ...formatStatement(r),
+        citations: (citationsByStmt.get(r.id) ?? []).map(formatCitation),
+      }));
+
+    return c.json({
+      structured,
+      attributed,
+      properties: props.map(formatProperty),
+    });
+  })
+
+  // ---- GET /properties — full properties list with statement counts ----
+  .get("/properties", async (c) => {
+    const db = getDrizzleDb();
+
+    const props = await db.select().from(properties).orderBy(asc(properties.category), asc(properties.label));
+
+    // Count statements per property
+    const stmtCounts = await db
+      .select({
+        propertyId: statements.propertyId,
+        count: count(),
+      })
+      .from(statements)
+      .where(eq(statements.status, "active"))
+      .groupBy(statements.propertyId);
+
+    const countMap = new Map(
+      stmtCounts.map((r) => [r.propertyId, r.count])
+    );
+
+    return c.json({
+      properties: props.map((p) => ({
+        ...formatProperty(p),
+        statementCount: countMap.get(p.id) ?? 0,
+      })),
+    });
+  })
+
+  // ---- GET /history — all values for entity+property over time ----
+  .get("/history", zv("query", HistoryQuery), async (c) => {
+    const { entityId, propertyId } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(statements)
+      .where(
+        and(
+          eq(statements.subjectEntityId, entityId),
+          eq(statements.propertyId, propertyId)
+        )
+      )
+      .orderBy(desc(statements.validStart));
+
+    // Fetch citations for all returned statements
+    const stmtIds = rows.map((r) => r.id);
+    const citations =
+      stmtIds.length > 0
+        ? await db
+            .select()
+            .from(statementCitations)
+            .where(inArray(statementCitations.statementId, stmtIds))
+        : [];
+
+    const citationsByStmt = new Map<number, typeof citations>();
+    for (const cit of citations) {
+      const existing = citationsByStmt.get(cit.statementId) ?? [];
+      existing.push(cit);
+      citationsByStmt.set(cit.statementId, existing);
+    }
+
+    return c.json({
+      statements: rows.map((r) => ({
+        ...formatStatement(r),
+        citations: (citationsByStmt.get(r.id) ?? []).map(formatCitation),
+      })),
+    });
+  })
+
+  // ---- GET /:id — single statement with full citations ----
+  .get("/:id", async (c) => {
+    const idParam = c.req.param("id");
+    const id = parseInt(idParam, 10);
+    if (isNaN(id)) {
+      return c.json({ error: VALIDATION_ERROR, message: "Invalid statement ID" }, 400);
+    }
+
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(statements)
+      .where(eq(statements.id, id))
+      .limit(1);
+
+    if (rows.length === 0) {
+      return c.json({ error: "not_found", message: "Statement not found" }, 404);
+    }
+
+    const citationRows = await db
+      .select()
+      .from(statementCitations)
+      .where(eq(statementCitations.statementId, id));
+
+    // Fetch the property if the statement has one
+    const stmt = rows[0];
+    let property = null;
+    if (stmt.propertyId) {
+      const propRows = await db
+        .select()
+        .from(properties)
+        .where(eq(properties.id, stmt.propertyId))
+        .limit(1);
+      if (propRows.length > 0) {
+        property = formatProperty(propRows[0]);
+      }
+    }
+
+    return c.json({
+      statement: formatStatement(stmt),
+      citations: citationRows.map(formatCitation),
+      property,
+    });
+  })
+
+  // ---- PATCH /:id — update statement status, verdict, or note ----
+  .patch("/:id", async (c) => {
+    const idParam = c.req.param("id");
+    const id = parseInt(idParam, 10);
+    if (isNaN(id)) {
+      return c.json({ error: VALIDATION_ERROR, message: "Invalid statement ID" }, 400);
+    }
+
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const PatchStatementBody = z.object({
+      status: z.enum(["active", "superseded", "retracted"]).optional(),
+      archiveReason: z.string().max(2000).nullish(),
+      verdict: z.string().max(50).nullish(),
+      verdictScore: z.number().min(0).max(1).nullish(),
+      verdictQuotes: z.string().max(10000).nullish(),
+      verdictModel: z.string().max(200).nullish(),
+      note: z.string().max(2000).nullish(),
+    });
+
+    const parsed = PatchStatementBody.safeParse(body);
+    if (!parsed.success) {
+      return validationError(c, parsed.error.message);
+    }
+
+    const data = parsed.data;
+    const db = getDrizzleDb();
+
+    // Build update object with only provided fields
+    const updates: Record<string, unknown> = {
+      updatedAt: sql`now()`,
+    };
+    if (data.status !== undefined) updates.status = data.status;
+    if (data.archiveReason !== undefined) updates.archiveReason = data.archiveReason ?? null;
+    if (data.verdict !== undefined) updates.verdict = data.verdict ?? null;
+    if (data.verdictScore !== undefined) updates.verdictScore = data.verdictScore ?? null;
+    if (data.verdictQuotes !== undefined) updates.verdictQuotes = data.verdictQuotes ?? null;
+    if (data.verdictModel !== undefined) updates.verdictModel = data.verdictModel ?? null;
+    if (data.note !== undefined) updates.note = data.note ?? null;
+
+    const rows = await db
+      .update(statements)
+      .set(updates)
+      .where(eq(statements.id, id))
+      .returning();
+
+    if (rows.length === 0) {
+      return c.json({ error: "not_found", message: "Statement not found" }, 404);
+    }
+
+    return c.json({ statement: formatStatement(rows[0]), ok: true });
   })
 
   // ---- POST / — create statement + optional citations ----
