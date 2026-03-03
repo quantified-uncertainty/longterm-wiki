@@ -4,6 +4,7 @@ import {
   type FetchResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { StatCard } from "@components/internal/StatCard";
 import { StatementsTable } from "./statements-table";
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -38,6 +39,7 @@ export interface StatementRow {
   note: string | null;
   createdAt: string;
   citations: Citation[];
+  citationCount?: number;
 }
 
 export interface PropertyRow {
@@ -72,9 +74,9 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
       revalidate: 300,
     }),
     fetchDetailed<{
-      statements: StatementRow[];
+      statements: (StatementRow & { citationCount?: number })[];
       total: number;
-    }>("/api/statements?limit=200", { revalidate: 300 }),
+    }>("/api/statements?limit=500", { revalidate: 300 }),
     fetchDetailed<{
       properties: PropertyRow[];
     }>("/api/statements/properties", { revalidate: 300 }),
@@ -84,7 +86,7 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
   if (!statementsResult.ok) return statementsResult;
   if (!propertiesResult.ok) return propertiesResult;
 
-  // The list endpoint doesn't include citations — set empty arrays for the dashboard table
+  // The list endpoint now includes citationCount — set empty citations array for the table
   const stmts: StatementRow[] = statementsResult.data.statements.map((s) => ({
     ...s,
     citations: [],
@@ -171,32 +173,3 @@ export async function StatementsContent() {
   );
 }
 
-// ── Stat Card ─────────────────────────────────────────────────────────────
-
-function StatCard({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: number;
-  color?: "emerald" | "blue" | "amber";
-}) {
-  const colorClass =
-    color === "emerald"
-      ? "text-emerald-600"
-      : color === "blue"
-        ? "text-blue-600"
-        : color === "amber"
-          ? "text-amber-600"
-          : "text-foreground";
-
-  return (
-    <div className="rounded-lg border border-border/60 px-3 py-2">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={`text-lg font-semibold tabular-nums ${colorClass}`}>
-        {value.toLocaleString("en-US")}
-      </p>
-    </div>
-  );
-}

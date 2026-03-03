@@ -25,7 +25,7 @@ interface StatementWithProperty {
   validStart: string | null;
   validEnd: string | null;
   property: PropertyInfo | null;
-  citations: unknown[];
+  citations: { id: number }[];
 }
 
 interface ByEntityResult {
@@ -70,25 +70,39 @@ export async function EntityStatementsCard({
   const numericId = slugToNumericId(entityId);
   const pageRef = numericId ?? entityId;
 
+  // Group by category for display when 2+ categories present
+  const categories = new Map<string, typeof displayed>();
+  for (const s of displayed) {
+    const cat = s.property?.category ?? "other";
+    const list = categories.get(cat) ?? [];
+    list.push(s);
+    categories.set(cat, list);
+  }
+  const showCategoryHeaders = categories.size >= 2;
+
   return (
     <div className="not-prose rounded-lg border border-border/60 bg-muted/10 p-3 my-4">
-      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">
         Key Statements
       </h3>
+      <p className="text-[10px] text-muted-foreground/50 mb-2">
+        From statements database
+      </p>
       <div className="space-y-1.5">
-        {displayed.map((s) => {
-          const value = formatStatementValue(s, s.property);
-          return (
-            <div key={s.id} className="flex items-baseline justify-between gap-2 text-xs">
-              <span className="text-muted-foreground truncate">
-                {s.property?.label ?? s.propertyId ?? "—"}
-              </span>
-              <span className="font-semibold tabular-nums shrink-0">
-                {value}
-              </span>
-            </div>
-          );
-        })}
+        {showCategoryHeaders
+          ? [...categories.entries()]
+              .sort((a, b) => b[1].length - a[1].length)
+              .map(([cat, stmts]) => (
+                <div key={cat}>
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground/60 font-medium mt-1.5 mb-0.5">
+                    {cat}
+                  </p>
+                  {stmts.map((s) => (
+                    <StatementRow key={s.id} statement={s} />
+                  ))}
+                </div>
+              ))
+          : displayed.map((s) => <StatementRow key={s.id} statement={s} />)}
       </div>
       <div className="mt-2 pt-2 border-t border-border/40">
         <Link
@@ -98,6 +112,33 @@ export async function EntityStatementsCard({
           View all {result.total} statements &rarr;
         </Link>
       </div>
+    </div>
+  );
+}
+
+function StatementRow({ statement: s }: { statement: StatementWithProperty }) {
+  const value = formatStatementValue(s, s.property);
+  const hasCitations = s.citations.length > 0;
+
+  return (
+    <div className="flex items-baseline justify-between gap-2 text-xs">
+      <span className="text-muted-foreground truncate flex items-center gap-1">
+        {hasCitations && (
+          <span
+            className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"
+            title={`${s.citations.length} citation${s.citations.length !== 1 ? "s" : ""}`}
+          />
+        )}
+        {s.property?.label ?? s.propertyId ?? "—"}
+      </span>
+      <span className="font-semibold tabular-nums shrink-0 flex items-baseline gap-1">
+        {value}
+        {s.validStart && (
+          <span className="text-[10px] text-muted-foreground/60 font-normal">
+            ({s.validStart})
+          </span>
+        )}
+      </span>
     </div>
   );
 }

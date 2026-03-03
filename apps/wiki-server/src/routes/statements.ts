@@ -35,7 +35,7 @@ import {
 
 // ---- Constants ----
 
-const MAX_PAGE_SIZE = 200;
+const MAX_PAGE_SIZE = 500;
 
 // ---- Query schemas ----
 
@@ -179,8 +179,34 @@ const statementsApp = new Hono()
       db.select({ count: count() }).from(statements).where(whereClause),
     ]);
 
+    // Fetch citation counts for the returned statements
+    const statementIds = rows.map((r) => r.id);
+    const citationCounts =
+      statementIds.length > 0
+        ? await db
+            .select({
+              statementId: statementCitations.statementId,
+              count: count(),
+            })
+            .from(statementCitations)
+            .where(
+              sql`${statementCitations.statementId} IN (${sql.join(
+                statementIds.map((id) => sql`${id}`),
+                sql`, `
+              )})`
+            )
+            .groupBy(statementCitations.statementId)
+        : [];
+
+    const citCountMap = new Map(
+      citationCounts.map((r) => [r.statementId, r.count])
+    );
+
     return c.json({
-      statements: rows.map(formatStatement),
+      statements: rows.map((r) => ({
+        ...formatStatement(r),
+        citationCount: citCountMap.get(r.id) ?? 0,
+      })),
       total: countResult[0].count,
       limit,
       offset,
