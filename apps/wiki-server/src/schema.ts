@@ -33,8 +33,8 @@ export const citationQuotes = pgTable(
   "citation_quotes",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
+    // Phase D2a-deferred: page_id_old nullable; UNIQUE migrated to integer
     pageId: text("page_id_old")
-      .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     footnote: integer("footnote").notNull(),
@@ -72,8 +72,8 @@ export const citationQuotes = pgTable(
       .defaultNow(),
   },
   (table) => [
-    uniqueIndex("citation_quotes_page_id_footnote_unique").on(
-      table.pageId,
+    uniqueIndex("citation_quotes_page_id_int_footnote_unique").on(
+      table.pageIdInt,
       table.footnote
     ),
     index("idx_cq_page_id").on(table.pageId),
@@ -271,13 +271,13 @@ export const sessionPages = pgTable(
     sessionId: bigint("session_id", { mode: "number" })
       .notNull()
       .references(() => sessions.id, { onDelete: "cascade" }),
+    // Phase D2a-deferred: page_id_old nullable; PK migrated to integer
     pageId: text("page_id_old")
-      .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
   },
   (table) => [
-    primaryKey({ columns: [table.sessionId, table.pageId] }),
+    primaryKey({ columns: [table.sessionId, table.pageIdInt] }),
     index("idx_sp_page_id").on(table.pageId),
   ]
 );
@@ -592,8 +592,8 @@ export const resourceCitations = pgTable(
     resourceId: text("resource_id")
       .notNull()
       .references(() => resources.id, { onDelete: "cascade" }),
+    // Phase D2a-deferred: page_id_old nullable; PK migrated to integer
     pageId: text("page_id_old")
-      .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -601,7 +601,7 @@ export const resourceCitations = pgTable(
       .defaultNow(),
   },
   (table) => [
-    primaryKey({ columns: [table.resourceId, table.pageId] }),
+    primaryKey({ columns: [table.resourceId, table.pageIdInt] }),
     index("idx_rc_page_id").on(table.pageId),
   ]
 );

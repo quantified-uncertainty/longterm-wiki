@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc, inArray, gte, like } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { sessions, sessionPages } from "../schema.js";
+import { sessions, sessionPages, wikiPages } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow, paginationQuery } from "./utils.js";
 import {
   CreateSessionSchema as SharedCreateSessionSchema,
@@ -125,14 +125,13 @@ const sessionsApp = new Hono()
         .where(eq(sessionPages.sessionId, session.id));
 
       if (d.pages.length > 0) {
-        // Phase 4a: resolve page slugs to integer IDs for dual-write
+        // Phase D2a-deferred: resolve page slugs to integer IDs; no longer writing page_id_old
         const intIdMap = await resolvePageIntIds(tx, d.pages);
         await tx
           .insert(sessionPages)
           .values(d.pages.map((pageId) => ({
             sessionId: session.id,
-            pageId,
-            pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
+            pageIdInt: intIdMap.get(pageId) ?? null,
           })));
       }
 
@@ -183,8 +182,8 @@ const sessionsApp = new Hono()
             .insert(sessionPages)
             .values(d.pages.map((pageId) => ({
               sessionId: session.id,
-              pageId,
-              pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
+              // Phase D2a-deferred: no longer writing page_id_old
+              pageIdInt: intIdMap.get(pageId) ?? null,
             })));
         }
 
@@ -223,14 +222,20 @@ const sessionsApp = new Hono()
     let pageMap = new Map<number, string[]>();
 
     if (sessionIds.length > 0) {
+      // Phase D2a-deferred: JOIN wikiPages to recover slug for rows where page_id_old is null
       const pageRows = await db
-        .select()
+        .select({
+          sessionId: sessionPages.sessionId,
+          pageSlug: sql<string | null>`coalesce(${sessionPages.pageId}, ${wikiPages.slug})`,
+        })
         .from(sessionPages)
+        .leftJoin(wikiPages, eq(sessionPages.pageIdInt, wikiPages.integerIdCol))
         .where(inArray(sessionPages.sessionId, sessionIds));
 
       for (const row of pageRows) {
+        if (row.pageSlug === null) continue;
         const existing = pageMap.get(row.sessionId) || [];
-        existing.push(row.pageId);
+        existing.push(row.pageSlug);
         pageMap.set(row.sessionId, existing);
       }
     }
@@ -272,15 +277,21 @@ const sessionsApp = new Hono()
       .orderBy(desc(sessions.date), desc(sessions.id));
 
     // Also fetch all pages for these sessions
+    // Phase D2a-deferred: JOIN wikiPages to recover slug for rows where page_id_old is null
     const allPageRows = await db
-      .select()
+      .select({
+        sessionId: sessionPages.sessionId,
+        pageSlug: sql<string | null>`coalesce(${sessionPages.pageId}, ${wikiPages.slug})`,
+      })
       .from(sessionPages)
+      .leftJoin(wikiPages, eq(sessionPages.pageIdInt, wikiPages.integerIdCol))
       .where(inArray(sessionPages.sessionId, sessionIds));
 
     const pageMap = new Map<number, string[]>();
     for (const row of allPageRows) {
+      if (row.pageSlug === null) continue;
       const existing = pageMap.get(row.sessionId) || [];
-      existing.push(row.pageId);
+      existing.push(row.pageSlug);
       pageMap.set(row.sessionId, existing);
     }
 
@@ -297,7 +308,8 @@ const sessionsApp = new Hono()
 
     const pagesResult = await db
       .select({
-        count: sql<number>`count(distinct ${sessionPages.pageId})`,
+        // Phase D2a-deferred: count by integer ID (page_id_old no longer written for new rows)
+        count: sql<number>`count(distinct ${sessionPages.pageIdInt})`,
       })
       .from(sessionPages);
     const uniquePages = Number(pagesResult[0].count);
@@ -355,6 +367,7 @@ const sessionsApp = new Hono()
     // Step 2: Fetch full session data and their page associations
     const sessionIds = sessionIdRows.map((r) => r.id);
 
+    // Phase D2a-deferred: JOIN wikiPages to recover slug for rows where page_id_old is null
     const [rows, pageRows] = await Promise.all([
       db
         .select()
@@ -362,15 +375,20 @@ const sessionsApp = new Hono()
         .where(inArray(sessions.id, sessionIds))
         .orderBy(desc(sessions.date), desc(sessions.id)),
       db
-        .select()
+        .select({
+          sessionId: sessionPages.sessionId,
+          pageSlug: sql<string | null>`coalesce(${sessionPages.pageId}, ${wikiPages.slug})`,
+        })
         .from(sessionPages)
+        .leftJoin(wikiPages, eq(sessionPages.pageIdInt, wikiPages.integerIdCol))
         .where(inArray(sessionPages.sessionId, sessionIds)),
     ]);
 
     const pageMap = new Map<number, string[]>();
     for (const row of pageRows) {
+      if (row.pageSlug === null) continue;
       const existing = pageMap.get(row.sessionId) || [];
-      existing.push(row.pageId);
+      existing.push(row.pageSlug);
       pageMap.set(row.sessionId, existing);
     }
 

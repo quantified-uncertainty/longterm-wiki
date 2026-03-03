@@ -190,14 +190,13 @@ async function upsertResource(
     await db
       .delete(resourceCitations)
       .where(eq(resourceCitations.resourceId, d.id));
-    // Phase 4a: use pre-resolved map if provided (batch path), else resolve per-resource (single path)
+    // Phase D2a-deferred: no longer writing page_id_old
     const citedByIntIdMap = options?.intIdMap ?? await resolvePageIntIds(db, d.citedBy);
     await db
       .insert(resourceCitations)
       .values(d.citedBy.map((pageId) => ({
         resourceId: d.id,
-        pageId,
-        pageIdInt: citedByIntIdMap.get(pageId) ?? null, // Phase 4a dual-write
+        pageIdInt: citedByIntIdMap.get(pageId) ?? null,
       })))
       .onConflictDoNothing();
   }
@@ -390,7 +389,8 @@ const resourcesApp = new Hono()
         db.select({ count: count() }).from(resourceCitations),
         db
           .select({
-            count: sql<number>`count(distinct ${resourceCitations.pageId})`,
+            // Phase D2a-deferred: count by integer ID (page_id_old no longer written for new rows)
+            count: sql<number>`count(distinct ${resourceCitations.pageIdInt})`,
           })
           .from(resourceCitations),
         db
@@ -595,14 +595,18 @@ const resourcesApp = new Hono()
     }
 
     // Also fetch citations
+    // Phase D2a-deferred: JOIN wikiPages to recover slug for rows where page_id_old is null
     const citations = await db
-      .select({ pageId: resourceCitations.pageId })
+      .select({
+        pageSlug: sql<string | null>`coalesce(${resourceCitations.pageId}, ${wikiPages.slug})`,
+      })
       .from(resourceCitations)
+      .leftJoin(wikiPages, eq(resourceCitations.pageIdInt, wikiPages.integerIdCol))
       .where(eq(resourceCitations.resourceId, id));
 
     return c.json({
       ...formatResource(rows[0]),
-      citedBy: citations.map((row) => row.pageId),
+      citedBy: citations.map((row) => row.pageSlug).filter((s): s is string => s !== null),
     });
   });
 
