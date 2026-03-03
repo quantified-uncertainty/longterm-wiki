@@ -1150,6 +1150,13 @@ export const statements = pgTable(
     attributedTo: text("attributed_to").references(() => entities.id, {
       onDelete: "set null",
     }),
+    // --- Verdict / verification ---
+    verdict: text("verdict"), // "verified", "unsupported", "disputed", "unverified"
+    verdictScore: real("verdict_score"), // 0–1 confidence
+    verdictQuotes: text("verdict_quotes"), // external source quotes supporting verdict
+    verdictModel: text("verdict_model"), // LLM model used for verification
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    claimCategory: text("claim_category"), // factual, opinion, analytical, speculative, relational
     // --- Metadata ---
     status: text("status").notNull().default("active"), // "active", "superseded", "retracted"
     archiveReason: text("archive_reason"), // why this statement was superseded/retracted

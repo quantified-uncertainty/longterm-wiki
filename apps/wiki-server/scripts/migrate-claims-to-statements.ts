@@ -17,6 +17,7 @@ import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { sql, eq, or, inArray } from "drizzle-orm";
 import * as schema from "../src/schema.js";
+import { seedProperties } from "./seed-properties.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,6 +45,12 @@ interface ClaimRow {
   attributedTo: string | null;
   section: string | null;
   factId: string | null;
+  claimVerdict: string | null;
+  claimVerdictScore: number | null;
+  claimVerdictQuotes: string | null;
+  claimVerdictModel: string | null;
+  claimVerifiedAt: Date | null;
+  claimCategory: string | null;
 }
 
 interface ClaimSourceRow {
@@ -269,6 +276,12 @@ export async function migrateClaims(
       attributedTo: schema.claims.attributedTo,
       section: schema.claims.section,
       factId: schema.claims.factId,
+      claimVerdict: schema.claims.claimVerdict,
+      claimVerdictScore: schema.claims.claimVerdictScore,
+      claimVerdictQuotes: schema.claims.claimVerdictQuotes,
+      claimVerdictModel: schema.claims.claimVerdictModel,
+      claimVerifiedAt: schema.claims.claimVerifiedAt,
+      claimCategory: schema.claims.claimCategory,
     })
     .from(schema.claims)
     .where(
@@ -403,6 +416,12 @@ export async function migrateClaims(
         validStart: claim.asOf ?? null,
         validEnd: null as string | null,
         attributedTo,
+        verdict: claim.claimVerdict ?? null,
+        verdictScore: claim.claimVerdictScore ?? null,
+        verdictQuotes: claim.claimVerdictQuotes ?? null,
+        verdictModel: claim.claimVerdictModel ?? null,
+        verifiedAt: claim.claimVerifiedAt ?? null,
+        claimCategory: claim.claimCategory ?? null,
         status: "active" as const,
         sourceFactKey,
         note,
@@ -488,7 +507,11 @@ if (isMain) {
   const db = drizzle(sqlConn, { schema });
 
   try {
-    console.log(`Migrating claims for entity: ${entityFilter}`);
+    console.log("Seeding properties from fact-measures.yaml...");
+    const seedResult = await seedProperties(db);
+    console.log(`  Properties seeded: ${seedResult.inserted} inserted, ${seedResult.updated} updated`);
+
+    console.log(`\nMigrating claims for entity: ${entityFilter}`);
     const result = await migrateClaims(db, entityFilter);
 
     console.log(`\n--- Migration Summary ---`);

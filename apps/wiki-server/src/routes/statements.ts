@@ -1,10 +1,11 @@
 /**
  * Statements route — Hono RPC method-chained route for the Statements system.
  *
- * Phase 1c: Minimal CRUD for statements + citations.
  * - GET /          — list with filters (by entity, property, variety, status)
  * - GET /current   — current value for entity+property (valid_end IS NULL)
- * - POST /         — create statement + citations
+ * - GET /stats     — basic statistics
+ * - PATCH /:id     — update statement status, verdict, or note
+ * - POST /         — create statement + optional citations
  */
 
 import { Hono } from "hono";
@@ -88,6 +89,12 @@ function formatStatement(s: typeof statements.$inferSelect) {
     validEnd: s.validEnd,
     temporalGranularity: s.temporalGranularity,
     attributedTo: s.attributedTo,
+    verdict: s.verdict,
+    verdictScore: s.verdictScore,
+    verdictQuotes: s.verdictQuotes,
+    verdictModel: s.verdictModel,
+    verifiedAt: s.verifiedAt,
+    claimCategory: s.claimCategory,
     sourceFactKey: s.sourceFactKey,
     note: s.note,
     createdAt: s.createdAt,
@@ -95,7 +102,17 @@ function formatStatement(s: typeof statements.$inferSelect) {
   };
 }
 
-// ---- Create body schema ----
+// ---- Body schemas ----
+
+const PatchStatementBody = z.object({
+  status: z.enum(["active", "superseded", "retracted"]).optional(),
+  archiveReason: z.string().max(2000).nullish(),
+  verdict: z.string().max(50).nullish(),
+  verdictScore: z.number().min(0).max(1).nullish(),
+  verdictQuotes: z.string().max(10000).nullish(),
+  verdictModel: z.string().max(200).nullish(),
+  note: z.string().max(2000).nullish(),
+});
 
 const CreateStatementBody = z.object({
   variety: z.enum(["structured", "attributed"]),
@@ -237,6 +254,48 @@ const statementsApp = new Hono()
       byStatus: Object.fromEntries(byStatus.map((r) => [r.status, r.count])),
       propertiesCount: propertiesCount[0].count,
     });
+  })
+
+  // ---- PATCH /:id — update statement status, verdict, or note ----
+  .patch("/:id", async (c) => {
+    const idParam = c.req.param("id");
+    const id = parseInt(idParam, 10);
+    if (isNaN(id)) {
+      return c.json({ error: VALIDATION_ERROR, message: "Invalid statement ID" }, 400);
+    }
+
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = PatchStatementBody.safeParse(body);
+    if (!parsed.success) {
+      return validationError(c, parsed.error.message);
+    }
+
+    const data = parsed.data;
+    const db = getDrizzleDb();
+
+    // Build update set — inline to match codebase pattern (sql`now()` accepted at runtime)
+    const rows = await db
+      .update(statements)
+      .set({
+        ...(data.status !== undefined && { status: data.status }),
+        ...(data.archiveReason !== undefined && { archiveReason: data.archiveReason ?? null }),
+        ...(data.verdict !== undefined && { verdict: data.verdict ?? null }),
+        ...(data.verdictScore !== undefined && { verdictScore: data.verdictScore ?? null }),
+        ...(data.verdictQuotes !== undefined && { verdictQuotes: data.verdictQuotes ?? null }),
+        ...(data.verdictModel !== undefined && { verdictModel: data.verdictModel ?? null }),
+        ...(data.note !== undefined && { note: data.note ?? null }),
+        updatedAt: sql`now()`,
+      })
+      .where(eq(statements.id, id))
+      .returning();
+
+    if (rows.length === 0) {
+      return c.json({ error: "not_found", message: "Statement not found" }, 404);
+    }
+
+    return c.json({ statement: formatStatement(rows[0]), ok: true });
   })
 
   // ---- POST / — create statement + optional citations ----
