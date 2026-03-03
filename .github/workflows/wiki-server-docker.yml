@@ -267,16 +267,29 @@ jobs:
             exit 1
           fi
 
-          # 2. Sync smoke test — send a single dummy page to verify the sync endpoint works end-to-end
+          # 2. Sync smoke test — send a single dummy page to verify the sync endpoint works end-to-end.
+          #    Retries up to 3 times with backoff to handle transient errors during rolling deploys
+          #    (e.g., a request hitting a pod mid-rollout). Uses -s without -f so the response body
+          #    is always captured for debugging — -f suppresses the body on HTTP errors.
           SYNC_BODY='{"pages":[{"id":"__smoke-test__","numericId":null,"title":"Smoke Test","description":null,"llmSummary":null,"category":null,"subcategory":null,"entityType":null,"tags":null,"quality":null,"readerImportance":null,"researchImportance":null,"tacticalValue":null,"backlinkCount":null,"riskCategory":null,"dateCreated":null,"recommendedScore":null,"clusters":null,"hallucinationRiskLevel":null,"hallucinationRiskScore":null,"contentPlaintext":null,"wordCount":null,"lastUpdated":null,"contentFormat":null}]}'
-          SYNC_RESPONSE=$(curl -sf -X POST \
-            -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
-            -H "Content-Type: application/json" \
-            -d "$SYNC_BODY" \
-            "${LONGTERMWIKI_SERVER_URL}/api/pages/sync")
-          UPSERTED=$(echo "$SYNC_RESPONSE" | jq -r '.upserted')
+          UPSERTED=""
+          SYNC_HTTP_CODE=""
+          SYNC_RESPONSE=""
+          for i in 1 2 3; do
+            SYNC_RAW=$(curl -s -w "\n%{http_code}" -X POST \
+              -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
+              -H "Content-Type: application/json" \
+              -d "$SYNC_BODY" \
+              "${LONGTERMWIKI_SERVER_URL}/api/pages/sync" 2>&1 || true)
+            SYNC_HTTP_CODE=$(echo "$SYNC_RAW" | tail -1)
+            SYNC_RESPONSE=$(echo "$SYNC_RAW" | sed '$d')
+            UPSERTED=$(echo "$SYNC_RESPONSE" | jq -r '.upserted // empty' 2>/dev/null || true)
+            if [ "$UPSERTED" = "1" ]; then break; fi
+            echo "Sync smoke test attempt $i/3 failed (HTTP $SYNC_HTTP_CODE): $SYNC_RESPONSE"
+            if [ "$i" -lt 3 ]; then sleep $((i * 5)); fi
+          done
           if [ "$UPSERTED" != "1" ]; then
-            echo "::error::Sync smoke test failed: $SYNC_RESPONSE"
+            echo "::error::Sync smoke test failed after 3 attempts (HTTP $SYNC_HTTP_CODE): $SYNC_RESPONSE"
             exit 1
           fi
           echo "Sync smoke test passed: upserted=$UPSERTED"
@@ -339,6 +352,14 @@ jobs:
             "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64"
           chmod +x /usr/local/bin/argocd
 
+          # Disable auto-sync before rolling back — `argocd app rollback` fails with
+          # "rollback cannot be initiated when auto-sync is enabled" if auto-sync is on.
+          argocd app set longterm-wiki-server \
+            --sync-policy none \
+            --auth-token "${ARGOCD_AUTH_TOKEN}" \
+            --server "${ARGOCD_SERVER}" \
+            --grpc-web
+
           # Roll back to the previous deployed revision (revision 0 = previous in ArgoCD).
           argocd app rollback longterm-wiki-server \
             --auth-token "${ARGOCD_AUTH_TOKEN}" \
@@ -349,6 +370,13 @@ jobs:
           argocd app wait longterm-wiki-server \
             --health \
             --timeout 300 \
+            --auth-token "${ARGOCD_AUTH_TOKEN}" \
+            --server "${ARGOCD_SERVER}" \
+            --grpc-web
+
+          # Re-enable auto-sync so future deploys are not blocked.
+          argocd app set longterm-wiki-server \
+            --sync-policy automated \
             --auth-token "${ARGOCD_AUTH_TOKEN}" \
             --server "${ARGOCD_SERVER}" \
             --grpc-web
