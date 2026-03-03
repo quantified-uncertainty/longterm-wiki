@@ -16,7 +16,7 @@ import { eq, count, sql } from "drizzle-orm";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import * as schema from "../schema.js";
-import { entityIds, citationQuotes, citationContent, entityIdSeq } from "../schema.js";
+import { entityIds, citationQuotes, citationContent, entityIdSeq, wikiPages } from "../schema.js";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
@@ -252,12 +252,33 @@ describeWithDb("Integration: Entity IDs CRUD", () => {
 describeWithDb("Integration: Citation Quotes CRUD", () => {
   let sqlConn: ReturnType<typeof postgres>;
   let db: ReturnType<typeof drizzle<typeof schema>>;
+  // Integer IDs for wiki pages created in beforeAll, used across tests
+  let testPageIntId: number;
+  let upsertPageIntId: number;
+  let dupPageIntId: number;
+  let verifyPageIntId: number;
 
   beforeAll(async () => {
     sqlConn = postgres(DATABASE_URL!, { max: 3 });
     db = drizzle(sqlConn, { schema });
     await dropAllTables(sqlConn);
     await migrate(db, { migrationsFolder });
+
+    // Create wiki pages needed by citation quote tests (pageIdInt is NOT NULL)
+    const pageRows = await db
+      .insert(wikiPages)
+      .values([
+        { id: "test-page", slug: "test-page", title: "Test Page", integerIdCol: 1001 },
+        { id: "upsert-page", slug: "upsert-page", title: "Upsert Page", integerIdCol: 1002 },
+        { id: "dup-page", slug: "dup-page", title: "Dup Page", integerIdCol: 1003 },
+        { id: "verify-page", slug: "verify-page", title: "Verify Page", integerIdCol: 1004 },
+      ])
+      .returning({ id: wikiPages.id, integerIdCol: wikiPages.integerIdCol });
+
+    testPageIntId = pageRows.find((r) => r.id === "test-page")!.integerIdCol!;
+    upsertPageIntId = pageRows.find((r) => r.id === "upsert-page")!.integerIdCol!;
+    dupPageIntId = pageRows.find((r) => r.id === "dup-page")!.integerIdCol!;
+    verifyPageIntId = pageRows.find((r) => r.id === "verify-page")!.integerIdCol!;
   });
 
   afterAll(async () => {
@@ -274,7 +295,7 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
     const rows = await db
       .insert(citationQuotes)
       .values({
-        pageId: "test-page",
+        pageIdInt: testPageIntId,
         footnote: 1,
         claimText: "Test claim",
         url: "https://example.com",
@@ -282,24 +303,24 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
       .returning();
 
     expect(rows).toHaveLength(1);
-    expect(rows[0].pageId).toBe("test-page");
+    expect(rows[0].pageIdInt).toBe(testPageIntId);
     expect(rows[0].footnote).toBe(1);
     expect(rows[0].claimText).toBe("Test claim");
     expect(rows[0].quoteVerified).toBe(false);
     expect(rows[0].id).toBeGreaterThan(0);
   });
 
-  it("upserts on (page_id, footnote) conflict", async () => {
+  it("upserts on (page_id_int, footnote) conflict", async () => {
     // First insert
     await db.insert(citationQuotes).values({
-      pageId: "upsert-page",
+      pageIdInt: upsertPageIntId,
       footnote: 1,
       claimText: "Original",
     });
 
     // Upsert with updated claim
     const vals = {
-      pageId: "upsert-page",
+      pageIdInt: upsertPageIntId,
       footnote: 1,
       claimText: "Updated",
       url: null,
@@ -319,7 +340,7 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
       .insert(citationQuotes)
       .values(vals)
       .onConflictDoUpdate({
-        target: [citationQuotes.pageId, citationQuotes.footnote],
+        target: [citationQuotes.pageIdInt, citationQuotes.footnote],
         set: { ...vals, updatedAt: sql`now()` },
       })
       .returning();
@@ -331,13 +352,13 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
     const all = await db
       .select()
       .from(citationQuotes)
-      .where(eq(citationQuotes.pageId, "upsert-page"));
+      .where(eq(citationQuotes.pageIdInt, upsertPageIntId));
     expect(all).toHaveLength(1);
   });
 
-  it("enforces unique (page_id, footnote) constraint", async () => {
+  it("enforces unique (page_id_int, footnote) constraint", async () => {
     await db.insert(citationQuotes).values({
-      pageId: "dup-page",
+      pageIdInt: dupPageIntId,
       footnote: 1,
       claimText: "First",
     });
@@ -345,7 +366,7 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
     // Raw insert without ON CONFLICT should fail
     await expect(
       db.insert(citationQuotes).values({
-        pageId: "dup-page",
+        pageIdInt: dupPageIntId,
         footnote: 1,
         claimText: "Second",
       })
@@ -354,7 +375,7 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
 
   it("updates verification status", async () => {
     await db.insert(citationQuotes).values({
-      pageId: "verify-page",
+      pageIdInt: verifyPageIntId,
       footnote: 1,
       claimText: "Claim",
     });
@@ -369,7 +390,7 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
         updatedAt: sql`now()`,
       })
       .where(
-        eq(citationQuotes.pageId, "verify-page")
+        eq(citationQuotes.pageIdInt, verifyPageIntId)
       )
       .returning();
 

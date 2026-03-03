@@ -14,6 +14,7 @@ BEGIN;
 DO $$
 DECLARE
   null_count integer;
+  dup_count integer;
 BEGIN
   SELECT COUNT(*) INTO null_count
   FROM page_links
@@ -23,6 +24,20 @@ BEGIN
     RAISE EXCEPTION 'ABORT: % page_links rows have NULL source_id_int or target_id_int. Verify Phase B dual-write is complete.', null_count;
   END IF;
   RAISE NOTICE 'OK: All page_links rows have integer IDs populated.';
+
+  -- Check for duplicate (source_id_int, target_id_int, link_type) groups that would
+  -- prevent the CONCURRENTLY unique index from being created after COMMIT.
+  SELECT COUNT(*) INTO dup_count
+  FROM (
+    SELECT source_id_int, target_id_int, link_type
+    FROM page_links
+    GROUP BY source_id_int, target_id_int, link_type
+    HAVING COUNT(*) > 1
+  ) dupes;
+  IF dup_count > 0 THEN
+    RAISE EXCEPTION 'ABORT: % duplicate (source_id_int, target_id_int, link_type) groups in page_links. Resolve duplicates before creating the unique index.', dup_count;
+  END IF;
+  RAISE NOTICE 'OK: No duplicate (source_id_int, target_id_int, link_type) groups in page_links.';
 END $$;
 
 -- Drop NOT NULL from page_id_old columns whose write paths are being removed.

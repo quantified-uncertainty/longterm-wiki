@@ -8,13 +8,16 @@
 --   2. session_pages:   PK(session_id, page_id_old)  → PK(session_id, page_id_int)
 --   3. resource_citations: PK(resource_id, page_id_old) → PK(resource_id, page_id_int)
 --
+-- ORDERING: The new citation_quotes integer UNIQUE index is created CONCURRENTLY
+-- (outside any transaction) BEFORE the old text-based index is dropped, so there
+-- is never a window with no uniqueness guard on citation_quotes.
+--
 -- Usage:
 --   psql $DATABASE_URL -f scripts/phase-d2a-deferred-predeploy.sql
 
-BEGIN;
-
 -- ============================================================
 -- Step 1: Verify 0 NULL rows in page_id_int for all 3 tables
+-- (Run outside transaction so we can abort cleanly before any changes)
 -- ============================================================
 
 DO $$
@@ -52,9 +55,21 @@ BEGIN
 END $$;
 
 -- ============================================================
--- Step 2: session_pages — swap PK to (session_id, page_id_int)
+-- Step 2: citation_quotes — create new integer-based UNIQUE index FIRST
+-- MUST run OUTSIDE transaction (CONCURRENTLY requires no transaction)
+-- Creating this BEFORE dropping the old index ensures no uniqueness gap.
 -- ============================================================
 
+CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS citation_quotes_page_id_int_footnote_unique
+  ON citation_quotes (page_id_int, footnote);
+
+-- ============================================================
+-- Step 3: Swap constraints inside a transaction (old index/PKs dropped here)
+-- ============================================================
+
+BEGIN;
+
+-- session_pages — swap PK to (session_id, page_id_int)
 -- Drop the old text-based PK
 ALTER TABLE session_pages DROP CONSTRAINT session_pages_pkey;
 
@@ -64,10 +79,7 @@ ALTER TABLE session_pages ADD PRIMARY KEY (session_id, page_id_int);
 -- Drop NOT NULL from old text column (now optional)
 ALTER TABLE session_pages ALTER COLUMN page_id_old DROP NOT NULL;
 
--- ============================================================
--- Step 3: resource_citations — swap PK to (resource_id, page_id_int)
--- ============================================================
-
+-- resource_citations — swap PK to (resource_id, page_id_int)
 -- Drop the old text-based PK
 ALTER TABLE resource_citations DROP CONSTRAINT resource_citations_pkey;
 
@@ -77,12 +89,8 @@ ALTER TABLE resource_citations ADD PRIMARY KEY (resource_id, page_id_int);
 -- Drop NOT NULL from old text column (now optional)
 ALTER TABLE resource_citations ALTER COLUMN page_id_old DROP NOT NULL;
 
--- ============================================================
--- Step 4: citation_quotes — drop old UNIQUE, drop NOT NULL
--- ============================================================
--- (New UNIQUE index is created CONCURRENTLY after COMMIT, see below)
-
--- Drop the old text-based unique constraint
+-- citation_quotes — drop old UNIQUE index (new one already created above) and drop NOT NULL
+-- The new integer-based UNIQUE index already exists from Step 2.
 DROP INDEX IF EXISTS citation_quotes_page_id_footnote_unique;
 
 -- Drop NOT NULL from old text column (now optional)
@@ -91,15 +99,7 @@ ALTER TABLE citation_quotes ALTER COLUMN page_id_old DROP NOT NULL;
 COMMIT;
 
 -- ============================================================
--- Step 5: citation_quotes — create new integer-based UNIQUE index
--- MUST run OUTSIDE transaction (CONCURRENTLY requires no transaction)
--- ============================================================
-
-CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS citation_quotes_page_id_int_footnote_unique
-  ON citation_quotes (page_id_int, footnote);
-
--- ============================================================
--- Step 6: Verify indexes/constraints were created successfully
+-- Step 4: Verify indexes/constraints were created successfully
 -- ============================================================
 
 SELECT

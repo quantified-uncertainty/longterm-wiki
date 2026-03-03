@@ -102,41 +102,56 @@ const sessionsApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
-    const result = await db.transaction(async (tx) => {
-      const rows = await tx
-        .insert(sessions)
-        .values(sessionValues(d))
-        .onConflictDoUpdate({
-          target: [sessions.date, sessions.title],
-          set: sessionConflictSet,
-        })
-        .returning({
-          id: sessions.id,
-          date: sessions.date,
-          title: sessions.title,
-          createdAt: sessions.createdAt,
-        });
+    let result;
+    try {
+      result = await db.transaction(async (tx) => {
+        const rows = await tx
+          .insert(sessions)
+          .values(sessionValues(d))
+          .onConflictDoUpdate({
+            target: [sessions.date, sessions.title],
+            set: sessionConflictSet,
+          })
+          .returning({
+            id: sessions.id,
+            date: sessions.date,
+            title: sessions.title,
+            createdAt: sessions.createdAt,
+          });
 
-      const session = firstOrThrow(rows, "session upsert");
+        const session = firstOrThrow(rows, "session upsert");
 
-      // Replace page associations: delete old, insert new
-      await tx
-        .delete(sessionPages)
-        .where(eq(sessionPages.sessionId, session.id));
-
-      if (d.pages.length > 0) {
-        // Phase D2a-deferred: resolve page slugs to integer IDs; no longer writing page_id_old
-        const intIdMap = await resolvePageIntIds(tx, d.pages);
+        // Replace page associations: delete old, insert new
         await tx
-          .insert(sessionPages)
-          .values(d.pages.map((pageId) => ({
-            sessionId: session.id,
-            pageIdInt: intIdMap.get(pageId) ?? null,
-          })));
-      }
+          .delete(sessionPages)
+          .where(eq(sessionPages.sessionId, session.id));
 
-      return { ...session, pages: d.pages };
-    });
+        if (d.pages.length > 0) {
+          // Phase D2a-deferred: resolve page slugs to integer IDs; no longer writing page_id_old
+          const intIdMap = await resolvePageIntIds(tx, d.pages);
+
+          // Fail-fast: validate all page slugs resolved to integer IDs
+          const unresolvedPages = d.pages.filter((pageId) => !intIdMap.has(pageId));
+          if (unresolvedPages.length > 0) {
+            throw new Error(`Pages not found: ${unresolvedPages.join(", ")}`);
+          }
+
+          await tx
+            .insert(sessionPages)
+            .values(d.pages.map((pageId) => ({
+              sessionId: session.id,
+              pageIdInt: intIdMap.get(pageId)!, // validated above — all slugs resolved
+            })));
+        }
+
+        return { ...session, pages: d.pages };
+      });
+    } catch (err) {
+      if (err instanceof Error && err.message.startsWith("Pages not found:")) {
+        return validationError(c, err.message);
+      }
+      throw err;
+    }
 
     return c.json(result, 201);
   })
@@ -151,51 +166,65 @@ const sessionsApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    const results = await db.transaction(async (tx) => {
-      // Phase 4a: pre-collect all page IDs and resolve in one batch query
-      const allPageIds = [...new Set(items.flatMap((d) => d.pages))];
-      const intIdMap = allPageIds.length > 0
-        ? await resolvePageIntIds(tx, allPageIds)
-        : new Map<string, number>();
+    let results;
+    try {
+      results = await db.transaction(async (tx) => {
+        // Phase 4a: pre-collect all page IDs and resolve in one batch query
+        const allPageIds = [...new Set(items.flatMap((d) => d.pages))];
+        const intIdMap = allPageIds.length > 0
+          ? await resolvePageIntIds(tx, allPageIds)
+          : new Map<string, number>();
 
-      const created: Array<{ id: number; title: string; pageCount: number }> = [];
-
-      for (const d of items) {
-        const rows = await tx
-          .insert(sessions)
-          .values(sessionValues(d))
-          .onConflictDoUpdate({
-            target: [sessions.date, sessions.title],
-            set: sessionConflictSet,
-          })
-          .returning({ id: sessions.id, title: sessions.title });
-
-        const session = firstOrThrow(rows, `session batch upsert "${d.title}"`);
-
-        // Replace page associations: delete old, insert new
-        await tx
-          .delete(sessionPages)
-          .where(eq(sessionPages.sessionId, session.id));
-
-        if (d.pages.length > 0) {
-          await tx
-            .insert(sessionPages)
-            .values(d.pages.map((pageId) => ({
-              sessionId: session.id,
-              // Phase D2a-deferred: no longer writing page_id_old
-              pageIdInt: intIdMap.get(pageId) ?? null,
-            })));
+        // Fail-fast: validate all page slugs resolved to integer IDs
+        const unresolvedPages = allPageIds.filter((pageId) => !intIdMap.has(pageId));
+        if (unresolvedPages.length > 0) {
+          throw new Error(`Pages not found: ${unresolvedPages.join(", ")}`);
         }
 
-        created.push({
-          id: session.id,
-          title: session.title,
-          pageCount: d.pages.length,
-        });
-      }
+        const created: Array<{ id: number; title: string; pageCount: number }> = [];
 
-      return created;
-    });
+        for (const d of items) {
+          const rows = await tx
+            .insert(sessions)
+            .values(sessionValues(d))
+            .onConflictDoUpdate({
+              target: [sessions.date, sessions.title],
+              set: sessionConflictSet,
+            })
+            .returning({ id: sessions.id, title: sessions.title });
+
+          const session = firstOrThrow(rows, `session batch upsert "${d.title}"`);
+
+          // Replace page associations: delete old, insert new
+          await tx
+            .delete(sessionPages)
+            .where(eq(sessionPages.sessionId, session.id));
+
+          if (d.pages.length > 0) {
+            await tx
+              .insert(sessionPages)
+              .values(d.pages.map((pageId) => ({
+                sessionId: session.id,
+                // Phase D2a-deferred: no longer writing page_id_old
+                pageIdInt: intIdMap.get(pageId)!, // validated above — all slugs resolved
+              })));
+          }
+
+          created.push({
+            id: session.id,
+            title: session.title,
+            pageCount: d.pages.length,
+          });
+        }
+
+        return created;
+      });
+    } catch (err) {
+      if (err instanceof Error && err.message.startsWith("Pages not found:")) {
+        return validationError(c, err.message);
+      }
+      throw err;
+    }
 
     return c.json({ upserted: results.length, results }, 201);
   })

@@ -45,6 +45,9 @@ const editLogsApp = new Hono()
 
     // Phase D2a: resolve page slug to integer ID (no longer dual-writing page_id_old)
     const pageIdInt = await resolvePageIntId(db, d.pageId);
+    if (pageIdInt === null) {
+      return validationError(c, `Page integer ID not found for: ${d.pageId}`);
+    }
 
     const rows = await db
       .insert(editLogs)
@@ -93,7 +96,7 @@ const editLogsApp = new Hono()
         .insert(editLogs)
         .values(
           items.map((d) => ({
-            pageIdInt: intIdMap.get(d.pageId) ?? null,
+            pageIdInt: intIdMap.get(d.pageId)!, // validated above via checkRefsExist
             date: d.date,
             tool: d.tool,
             agency: d.agency,
@@ -158,7 +161,7 @@ const editLogsApp = new Hono()
       db
         .select({
           id: editLogs.id,
-          pageId: wikiPages.id,
+          pageId: sql<string | null>`coalesce(${editLogs.pageId}, ${wikiPages.id})`,
           date: editLogs.date,
           tool: editLogs.tool,
           agency: editLogs.agency,

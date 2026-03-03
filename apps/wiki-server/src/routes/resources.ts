@@ -192,11 +192,18 @@ async function upsertResource(
       .where(eq(resourceCitations.resourceId, d.id));
     // Phase D2a-deferred: no longer writing page_id_old
     const citedByIntIdMap = options?.intIdMap ?? await resolvePageIntIds(db, d.citedBy);
+
+    // Fail-fast: validate all citedBy page slugs resolved to integer IDs
+    const unresolvedCitedBy = d.citedBy.filter((pageId) => !citedByIntIdMap.has(pageId));
+    if (unresolvedCitedBy.length > 0) {
+      throw new Error(`Referenced pages not found in citedBy: ${unresolvedCitedBy.join(", ")}`);
+    }
+
     await db
       .insert(resourceCitations)
       .values(d.citedBy.map((pageId) => ({
         resourceId: d.id,
-        pageIdInt: citedByIntIdMap.get(pageId) ?? null,
+        pageIdInt: citedByIntIdMap.get(pageId)!, // validated above — all slugs resolved
       })))
       .onConflictDoNothing();
   }
@@ -317,6 +324,9 @@ const resourcesApp = new Hono()
         `);
       });
     } catch (err) {
+      if (err instanceof Error && err.message.startsWith("Referenced pages not found in citedBy:")) {
+        return validationError(c, err.message);
+      }
       return dbError(c, "resources batch upsert", err, { itemCount: items.length });
     }
 

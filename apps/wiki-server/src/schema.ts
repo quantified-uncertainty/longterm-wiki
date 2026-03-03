@@ -36,7 +36,7 @@ export const citationQuotes = pgTable(
     // Phase D2a-deferred: page_id_old nullable; UNIQUE migrated to integer
     pageId: text("page_id_old")
       .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").notNull().references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498); NOT NULL enforced after D2a-deferred predeploy
     footnote: integer("footnote").notNull(),
     url: text("url"),
     resourceId: text("resource_id").references(() => resources.id, {

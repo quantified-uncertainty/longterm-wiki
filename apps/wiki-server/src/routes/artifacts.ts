@@ -10,6 +10,7 @@ import {
   invalidJsonError,
   notFoundError,
   paginationQuery,
+  firstOrThrow,
 } from "./utils.js";
 import { resolvePageIntId } from "./page-id-helpers.js";
 
@@ -67,6 +68,9 @@ const artifactsApp = new Hono()
 
     // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
     const pageIdInt = await resolvePageIntId(db, d.pageId);
+    if (pageIdInt === null) {
+      return validationError(c, `Page not found: ${d.pageId}`);
+    }
 
     const rows = await db
       .insert(pageImproveRuns)
@@ -99,7 +103,7 @@ const artifactsApp = new Hono()
         createdAt: pageImproveRuns.createdAt,
       });
 
-    const row = rows[0];
+    const row = firstOrThrow(rows, "artifact insert");
     // pageId derived from input (page_id_old column no longer written)
     return c.json({ ...row, pageId: d.pageId }, 201);
   })

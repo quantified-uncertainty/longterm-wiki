@@ -20,9 +20,19 @@ DROP INDEX IF EXISTS citation_quotes_page_id_footnote_unique;
 ALTER TABLE citation_quotes ALTER COLUMN page_id_old DROP NOT NULL;
 
 --> statement-breakpoint
--- citation_quotes: add new integer-based unique index (if not already created by predeploy script)
-CREATE UNIQUE INDEX IF NOT EXISTS citation_quotes_page_id_int_footnote_unique
-  ON citation_quotes (page_id_int, footnote);
+-- citation_quotes: fail fast if predeploy index is missing (avoids taking a non-concurrent lock
+-- on citation_quotes which could block writes on large tables).
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_indexes
+    WHERE schemaname = current_schema()
+      AND tablename = 'citation_quotes'
+      AND indexname = 'citation_quotes_page_id_int_footnote_unique'
+  ) THEN
+    RAISE EXCEPTION 'Missing predeploy index citation_quotes_page_id_int_footnote_unique. Run scripts/phase-d2a-deferred-predeploy.sql first.';
+  END IF;
+END $$;
 
 --> statement-breakpoint
 -- session_pages: swap PK to (session_id, page_id_int), make page_id_old nullable
@@ -35,3 +45,8 @@ ALTER TABLE session_pages ALTER COLUMN page_id_old DROP NOT NULL;
 ALTER TABLE resource_citations DROP CONSTRAINT resource_citations_pkey;
 ALTER TABLE resource_citations ADD PRIMARY KEY (resource_id, page_id_int);
 ALTER TABLE resource_citations ALTER COLUMN page_id_old DROP NOT NULL;
+
+--> statement-breakpoint
+-- citation_quotes: enforce NOT NULL on page_id_int now that predeploy script has verified 0 NULLs
+-- (predeploy script checks for 0 NULL page_id_int rows before reaching this point)
+ALTER TABLE citation_quotes ALTER COLUMN page_id_int SET NOT NULL;

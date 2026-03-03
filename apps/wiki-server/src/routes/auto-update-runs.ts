@@ -175,6 +175,14 @@ const autoUpdateRunsApp = new Hono()
         const resultPageIds = [...new Set(d.results.map((r) => r.pageId))];
         const intIdMap = await resolvePageIntIds(tx, resultPageIds);
 
+        const unresolved = resultPageIds.filter((id) => !intIdMap.has(id));
+        if (unresolved.length > 0) {
+          logger.warn(
+            { unresolved, runStartedAt: d.startedAt },
+            "auto-update-runs: pageIds missing integer mapping; storing null pageIdInt"
+          );
+        }
+
         await tx.insert(autoUpdateResults).values(
           d.results.map((r) => ({
             runId: run.id,

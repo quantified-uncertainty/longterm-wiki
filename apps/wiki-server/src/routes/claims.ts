@@ -1731,6 +1731,9 @@ const claimsApp = new Hono()
 
     // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
     const refPageIdInt = await resolvePageIntId(db, parsed.data.pageId);
+    if (refPageIdInt === null) {
+      return validationError(c, `Page not found: ${parsed.data.pageId}`);
+    }
 
     const rows = await db
       .insert(claimPageReferences)
@@ -1752,7 +1755,8 @@ const claimsApp = new Hono()
     return c.json({
       id: Number(rows[0].id),
       claimId: Number(rows[0].claimId),
-      pageId: rows[0].pageId,
+      // Phase D2a: page_id_old is no longer written; use input pageId
+      pageId: parsed.data.pageId,
       footnote: rows[0].footnote,
       section: rows[0].section,
       quoteText: rows[0].quoteText,

@@ -62,10 +62,10 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 // ---- Helpers ----
 
 /** Build the values object for a citation quote upsert. */
-function quoteValues(d: UpsertQuoteData, pageIdInt?: number | null) {
+function quoteValues(d: UpsertQuoteData, pageIdInt: number) {
   return {
-    // Phase D2a-deferred: no longer writing pageId (page_id_old)
-    pageIdInt: pageIdInt ?? null,
+    // Phase D2a-deferred: no longer writing pageId (page_id_old). pageIdInt is NOT NULL.
+    pageIdInt,
     footnote: d.footnote,
     url: d.url ?? null,
     resourceId: d.resourceId ?? null,
@@ -86,7 +86,7 @@ function quoteValues(d: UpsertQuoteData, pageIdInt?: number | null) {
 function upsertQuote(
   db: ReturnType<typeof getDrizzleDb> | Parameters<Parameters<ReturnType<typeof getDrizzleDb>["transaction"]>[0]>[0],
   d: UpsertQuoteData,
-  pageIdInt?: number | null
+  pageIdInt: number
 ) {
   const vals = quoteValues(d, pageIdInt);
   return db
@@ -99,7 +99,7 @@ function upsertQuote(
     })
     .returning({
       id: citationQuotes.id,
-      pageId: citationQuotes.pageId,
+      // Phase D2a-deferred: page_id_old is no longer written; pageId must come from input
       footnote: citationQuotes.footnote,
       createdAt: citationQuotes.createdAt,
       updatedAt: citationQuotes.updatedAt,
@@ -215,14 +215,18 @@ const citationsApp = new Hono()
       }
     }
 
-    // Phase 4a: resolve page slug to integer ID for dual-write
+    // Phase D2a-deferred: resolve page slug to integer ID (required; page_id_int is NOT NULL)
     const singlePageIdInt = await resolvePageIntId(db, parsed.data.pageId);
+    if (singlePageIdInt === null) {
+      return validationError(c, `Page integer ID not found for: ${parsed.data.pageId}`);
+    }
     const rows = await upsertQuote(db, parsed.data, singlePageIdInt);
 
     const row = firstOrThrow(rows, "citation quote upsert");
     return c.json({
       id: row.id,
-      pageId: row.pageId,
+      // Phase D2a-deferred: page_id_old is no longer written; use input pageId
+      pageId: parsed.data.pageId,
       footnote: row.footnote,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -270,9 +274,17 @@ const citationsApp = new Hono()
       results = await db.transaction(async (tx) => {
         // Phase D2a-deferred: resolve page slugs to integer IDs (no longer writing page_id_old)
         const batchIntIdMap = await resolvePageIntIds(tx, pageIds);
-        return await tx
+
+        // Fail-fast: validate all page slugs resolved to integer IDs
+        const unresolved = pageIds.filter((id) => !batchIntIdMap.has(id));
+        if (unresolved.length > 0) {
+          throw new Error(`Referenced pages not found: ${unresolved.join(", ")}`);
+        }
+
+        const dbRows = await tx
           .insert(citationQuotes)
-          .values(items.map((d) => quoteValues(d, batchIntIdMap.get(d.pageId) ?? null)))
+          // All pageIds validated above; batchIntIdMap.get() is guaranteed non-null here
+          .values(items.map((d) => quoteValues(d, batchIntIdMap.get(d.pageId)!)))
           .onConflictDoUpdate({
             // Phase D2a-deferred: conflict target migrated to (page_id_int, footnote)
             target: [citationQuotes.pageIdInt, citationQuotes.footnote],
@@ -294,11 +306,22 @@ const citationsApp = new Hono()
           })
           .returning({
             id: citationQuotes.id,
-            pageId: citationQuotes.pageId,
+            // Phase D2a-deferred: page_id_old is no longer written; pageId comes from input
             footnote: citationQuotes.footnote,
           });
+
+        // Re-attach pageId from input by matching on footnote position
+        return dbRows.map((row, i) => ({
+          id: row.id,
+          pageId: items[i]?.pageId ?? null,
+          footnote: row.footnote,
+        }));
       });
     } catch (err) {
+      // Surface unresolved-page errors as validation responses
+      if (err instanceof Error && err.message.startsWith("Referenced pages not found:")) {
+        return validationError(c, err.message);
+      }
       return dbError(c, "citation quotes upsert-batch", err, { itemCount: items.length });
     }
 

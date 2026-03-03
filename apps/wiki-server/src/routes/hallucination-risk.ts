@@ -149,6 +149,9 @@ const hallucinationRiskApp = new Hono()
 
     // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
     const pageIdInt = await resolvePageIntId(db, d.pageId);
+    if (pageIdInt === null) {
+      return validationError(c, `Page not found: ${d.pageId}`);
+    }
 
     const rows = await db
       .insert(hallucinationRiskSnapshots)
@@ -187,8 +190,14 @@ const hallucinationRiskApp = new Hono()
     const pageIds = [...new Set(snapshots.map((d) => d.pageId))];
     const intIdMap = await resolvePageIntIds(db, pageIds);
 
+    // Fail-fast: reject batch if any page slug cannot be resolved to an integer ID
+    const unresolved = pageIds.filter((id) => !intIdMap.has(id));
+    if (unresolved.length > 0) {
+      return validationError(c, `Pages not found: ${unresolved.join(", ")}`);
+    }
+
     const allVals = snapshots.map((d) => ({
-      pageIdInt: intIdMap.get(d.pageId) ?? null,
+      pageIdInt: intIdMap.get(d.pageId)!, // validated above
       score: d.score,
       level: d.level,
       factors: d.factors ?? null,

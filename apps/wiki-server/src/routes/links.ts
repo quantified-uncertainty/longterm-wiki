@@ -150,7 +150,9 @@ const linksApp = new Hono()
       for (let i = 0; i < links.length; i += 500) {
         const batch = links.slice(i, i + 500);
 
-        await tx`
+        // Use RETURNING to count actual rows written — INNER JOINs drop unresolved slugs,
+        // so batch.length would over-count and mask data loss (especially with replace=true).
+        const affected = await tx<{ one: number }[]>`
         INSERT INTO page_links (link_type, relationship, weight, source_id_int, target_id_int)
         SELECT t."linkType", t.relationship, t.weight,
                ei_src.numeric_id, ei_tgt.numeric_id
@@ -162,9 +164,10 @@ const linksApp = new Hono()
         -- Requires page_links_source_target_int_unique index (created in phase-d2a-predeploy.sql)
         ON CONFLICT (source_id_int, target_id_int, link_type)
         DO UPDATE SET weight = EXCLUDED.weight, relationship = EXCLUDED.relationship
+        RETURNING 1 AS one
       `;
 
-        upserted += batch.length;
+        upserted += affected.length;
       }
     });
 

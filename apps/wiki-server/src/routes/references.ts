@@ -157,6 +157,9 @@ const app = new Hono()
 
     // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
     const pageIdInt = await resolvePageIntId(db, parsed.data.pageId);
+    if (pageIdInt === null) {
+      return validationError(c, `Page integer ID not found for: ${parsed.data.pageId}`);
+    }
 
     const rows = await db
       .insert(claimPageReferences)
@@ -226,6 +229,9 @@ const app = new Hono()
 
     // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
     const citPageIdInt = await resolvePageIntId(db, parsed.data.pageId);
+    if (citPageIdInt === null) {
+      return validationError(c, `Page integer ID not found for: ${parsed.data.pageId}`);
+    }
 
     const rows = await db
       .insert(pageCitations)
