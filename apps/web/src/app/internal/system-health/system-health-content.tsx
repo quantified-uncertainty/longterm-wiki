@@ -661,6 +661,105 @@ function RecentSessionsSection({
   );
 }
 
+const GITHUB_REPO = "quantified-uncertainty/longterm-wiki";
+
+function CurrentDeploymentSection() {
+  const commitSha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ?? "";
+  const commitRef = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF ?? "";
+  const commitMessage =
+    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_MESSAGE ?? "";
+  const buildTimestamp = process.env.NEXT_PUBLIC_BUILD_TIMESTAMP ?? "";
+
+  if (!commitSha && !buildTimestamp) {
+    return (
+      <>
+        <SectionHeader>Current Deployment</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          Build metadata unavailable (not deployed via Vercel)
+        </div>
+      </>
+    );
+  }
+
+  const shortSha = commitSha.slice(0, 8);
+  const commitUrl = commitSha
+    ? `https://github.com/${GITHUB_REPO}/commit/${commitSha}`
+    : null;
+
+  // If the branch looks like a PR branch (e.g. "claude/foo"), link to the
+  // repo's PR list filtered by head ref. For "main", link to the commit.
+  const isPrBranch = commitRef && commitRef !== "main";
+  const prSearchUrl = isPrBranch
+    ? `https://github.com/${GITHUB_REPO}/pulls?q=is%3Apr+head%3A${encodeURIComponent(commitRef)}`
+    : null;
+
+  const buildAge = buildTimestamp ? formatRelativeTime(buildTimestamp) : null;
+
+  return (
+    <>
+      <SectionHeader>Current Deployment</SectionHeader>
+      <div className="rounded-lg border border-border/60 p-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+          {/* Commit */}
+          <div>
+            <span className="text-muted-foreground text-xs">Commit</span>
+            <div className="font-mono text-xs mt-0.5">
+              {commitUrl ? (
+                <a
+                  href={commitUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  {shortSha}
+                </a>
+              ) : (
+                shortSha || "—"
+              )}
+              {commitMessage && (
+                <span className="ml-2 text-muted-foreground truncate inline-block max-w-[300px] align-bottom">
+                  {commitMessage}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Branch / PR */}
+          <div>
+            <span className="text-muted-foreground text-xs">Branch</span>
+            <div className="text-xs mt-0.5">
+              <span className="font-mono">{commitRef || "—"}</span>
+              {prSearchUrl && (
+                <a
+                  href={prSearchUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-2 text-blue-600 hover:underline"
+                >
+                  View PR
+                </a>
+              )}
+            </div>
+          </div>
+
+          {/* Build time */}
+          <div>
+            <span className="text-muted-foreground text-xs">Built</span>
+            <div className="text-xs mt-0.5">
+              {buildAge && <span>{buildAge}</span>}
+              {buildTimestamp && (
+                <span className="ml-2 text-muted-foreground">
+                  {new Date(buildTimestamp).toLocaleString()}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 function formatRelativeTime(isoString: string): string {
   const now = Date.now();
   const then = new Date(isoString).getTime();
@@ -744,6 +843,9 @@ export async function SystemHealthContent() {
           ))}
         </div>
       )}
+
+      {/* Current deployment */}
+      <CurrentDeploymentSection />
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
