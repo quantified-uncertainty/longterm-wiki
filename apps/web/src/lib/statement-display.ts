@@ -79,6 +79,9 @@ function formatQualifier(key: string | null): string {
     case "exactly":
       return "";
     default:
+      // Suppress context-style qualifiers (e.g. "round:series-a") that aren't
+      // meaningful value prefixes — they're metadata, not display modifiers
+      if (key.includes(":")) return "";
       return `${key} `;
   }
 }

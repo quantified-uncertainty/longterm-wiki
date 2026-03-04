@@ -2,36 +2,42 @@ import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
 import { formatStatementValue } from "@lib/statement-display";
 import { slugToNumericId } from "@/lib/mdx";
+import type { ByEntityResult, StatementWithDetails } from "@lib/statement-types";
 
-interface PropertyInfo {
-  id: string;
-  label: string;
-  category: string;
-  valueType: string;
-  unitFormatId: string | null;
+/**
+ * Score a statement for ranking — higher = more useful to show.
+ */
+function rankScore(s: StatementWithDetails): number {
+  let score = 0;
+  if (s.citations.length > 0) score += 40;
+  if (s.verdict && s.verdict !== "not_verifiable") score += 30;
+  if (s.validStart || s.validEnd) score += 20;
+  if (s.verdictScore != null) score += 10;
+  // Prefer numeric values over text (more structured = more useful in summary)
+  if (s.valueNumeric != null) score += 15;
+  // Tiebreak: higher ID = more recent
+  score += s.id / 1_000_000;
+  return score;
 }
 
-interface StatementWithProperty {
-  id: number;
-  variety: string;
-  status: string;
-  propertyId: string | null;
-  qualifierKey: string | null;
-  valueNumeric: number | null;
-  valueText: string | null;
-  valueDate: string | null;
-  valueEntityId: string | null;
-  valueSeries: Record<string, unknown> | null;
-  validStart: string | null;
-  validEnd: string | null;
-  property: PropertyInfo | null;
-  citations: { id: number }[];
-}
+/**
+ * Deduplicate by property label — keep the best one per property.
+ */
+function pickBestPerProperty(statements: StatementWithDetails[]): StatementWithDetails[] {
+  const groups = new Map<string, StatementWithDetails[]>();
+  for (const s of statements) {
+    const label = s.property?.label ?? s.propertyId ?? "—";
+    const list = groups.get(label) ?? [];
+    list.push(s);
+    groups.set(label, list);
+  }
 
-interface ByEntityResult {
-  structured: StatementWithProperty[];
-  attributed: StatementWithProperty[];
-  total: number;
+  const result: StatementWithDetails[] = [];
+  for (const group of groups.values()) {
+    group.sort((a, b) => rankScore(b) - rankScore(a));
+    result.push(group[0]);
+  }
+  return result;
 }
 
 /**
@@ -50,35 +56,28 @@ export async function EntityStatementsCard({
 
   if (!result || result.total === 0) return null;
 
-  // Show only active structured statements with a property and current values
-  const current = result.structured.filter(
-    (s) => s.status === "active" && !s.validEnd && s.property
+  // Active structured statements with a property
+  const withProperty = result.structured.filter(
+    (s) => s.status === "active" && s.property && s.propertyId
   );
 
-  if (current.length === 0) return null;
+  // Require at least SOME signal: a source, a real verdict, or a date
+  const quality = withProperty.filter(
+    (s) => s.citations.length > 0 || (s.verdict && s.verdict !== "not_verifiable") || s.validStart || s.validEnd
+  );
 
-  // Take top 8 statements, sorted by property category then label
-  const displayed = current
-    .sort((a, b) => {
-      const catA = a.property?.category ?? "";
-      const catB = b.property?.category ?? "";
-      if (catA !== catB) return catA.localeCompare(catB);
-      return (a.property?.label ?? "").localeCompare(b.property?.label ?? "");
-    })
+  // Deduplicate — one best row per property label
+  const deduped = pickBestPerProperty(quality);
+
+  if (deduped.length === 0) return null;
+
+  // Take top 8 by rank score
+  const displayed = deduped
+    .sort((a, b) => rankScore(b) - rankScore(a))
     .slice(0, 8);
 
   const numericId = slugToNumericId(entityId);
   const pageRef = numericId ?? entityId;
-
-  // Group by category for display when 2+ categories present
-  const categories = new Map<string, typeof displayed>();
-  for (const s of displayed) {
-    const cat = s.property?.category ?? "other";
-    const list = categories.get(cat) ?? [];
-    list.push(s);
-    categories.set(cat, list);
-  }
-  const showCategoryHeaders = categories.size >= 2;
 
   return (
     <div className="not-prose rounded-lg border border-border/60 bg-muted/10 p-3 my-4">
@@ -88,21 +87,10 @@ export async function EntityStatementsCard({
       <p className="text-[10px] text-muted-foreground/50 mb-2">
         From statements database
       </p>
-      <div className="space-y-1.5">
-        {showCategoryHeaders
-          ? [...categories.entries()]
-              .sort((a, b) => b[1].length - a[1].length)
-              .map(([cat, stmts]) => (
-                <div key={cat}>
-                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground/60 font-medium mt-1.5 mb-0.5">
-                    {cat}
-                  </p>
-                  {stmts.map((s) => (
-                    <StatementRow key={s.id} statement={s} />
-                  ))}
-                </div>
-              ))
-          : displayed.map((s) => <StatementRow key={s.id} statement={s} />)}
+      <div className="space-y-0.5">
+        {displayed.map((s) => (
+          <StatementRow key={s.id} statement={s} />
+        ))}
       </div>
       <div className="mt-2 pt-2 border-t border-border/40">
         <Link
@@ -116,7 +104,7 @@ export async function EntityStatementsCard({
   );
 }
 
-function StatementRow({ statement: s }: { statement: StatementWithProperty }) {
+function StatementRow({ statement: s }: { statement: StatementWithDetails }) {
   const value = formatStatementValue(s, s.property);
   const hasCitations = s.citations.length > 0;
 

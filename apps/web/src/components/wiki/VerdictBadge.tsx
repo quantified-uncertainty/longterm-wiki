@@ -145,7 +145,7 @@ export function VerdictBadge({
         )}
       />
       {style.label}
-      {score != null && (
+      {score != null && verdict && VERDICT_STYLES[verdict] && (
         <span className="opacity-60 ml-0.5 tabular-nums">
           {Math.round(score * 100)}%
         </span>

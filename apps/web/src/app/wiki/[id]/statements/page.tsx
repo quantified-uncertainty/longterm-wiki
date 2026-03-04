@@ -11,6 +11,7 @@ import {
 } from "@lib/statement-display";
 import { StatCard } from "@components/internal/StatCard";
 import { CitationDetail, AttributedCitationDetail } from "./citation-detail";
+import type { StatementWithDetails, ByEntityResult } from "@lib/statement-types";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -32,56 +33,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `${title} Statements | Longterm Wiki`,
     description: `Structured and attributed statements about ${title}.`,
   };
-}
-
-// ---- Types for the API response ----
-
-interface Citation {
-  id: number;
-  resourceId: string | null;
-  url: string | null;
-  sourceQuote: string | null;
-  locationNote: string | null;
-  isPrimary: boolean;
-}
-
-interface PropertyInfo {
-  id: string;
-  label: string;
-  category: string;
-  valueType: string;
-  unitFormatId: string | null;
-}
-
-interface StatementWithDetails {
-  id: number;
-  variety: string;
-  statementText: string | null;
-  status: string;
-  subjectEntityId: string;
-  propertyId: string | null;
-  qualifierKey: string | null;
-  valueNumeric: number | null;
-  valueUnit: string | null;
-  valueText: string | null;
-  valueEntityId: string | null;
-  valueDate: string | null;
-  valueSeries: Record<string, unknown> | null;
-  validStart: string | null;
-  validEnd: string | null;
-  attributedTo: string | null;
-  sourceFactKey: string | null;
-  note: string | null;
-  verdict: string | null;
-  verdictScore: number | null;
-  property: PropertyInfo | null;
-  citations: Citation[];
-}
-
-interface ByEntityResult {
-  structured: StatementWithDetails[];
-  attributed: StatementWithDetails[];
-  total: number;
 }
 
 export default async function EntityStatementsPage({ params }: PageProps) {

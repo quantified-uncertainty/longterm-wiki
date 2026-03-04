@@ -2,15 +2,7 @@
 
 import { useState } from "react";
 import { ExternalLink, ChevronDown, ChevronUp, Star } from "lucide-react";
-
-interface Citation {
-  id: number;
-  resourceId: string | null;
-  url: string | null;
-  sourceQuote: string | null;
-  locationNote: string | null;
-  isPrimary: boolean;
-}
+import type { Citation } from "@lib/statement-types";
 
 function getDomain(url: string): string | null {
   try {
