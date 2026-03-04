@@ -86,6 +86,15 @@ Pay special attention to:
 
 Check if a PR exists using `pnpm crux pr detect` and update it with: summary, key changes, test plan, issue references. If no PR exists yet, `/push-and-ensure-green` will create one using `crux pr create`.
 
+## Step 4b: Consider post-merge verification
+
+If this PR changes CI, Vercel config, GitHub Actions, scheduled workflows, or other infrastructure whose effect **cannot be verified by build + test alone**, add an entry to `.claude/audits.yaml`:
+
+- Add a `post_merge` item with the PR number, what to verify, how to verify it, and a deadline (typically 1-2 weeks after merge)
+- If the property should be checked permanently, add it as an ongoing audit item in the `audits` section instead
+
+Skip this step if the PR only changes code, content, or styling that is fully verified by CI.
+
 ## Step 5: Update GitHub issue
 
 If working on a GitHub issue:
