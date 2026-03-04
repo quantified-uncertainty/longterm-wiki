@@ -61,6 +61,13 @@ export interface QualityDimensions {
   crossEntityUtility: number;
 }
 
+/** Canonical list of dimension names, type-constrained to match QualityDimensions keys. */
+export const DIMENSION_NAMES = [
+  'structure', 'precision', 'clarity', 'resolvability',
+  'uniqueness', 'atomicity', 'importance', 'neglectedness',
+  'recency', 'crossEntityUtility',
+] as const satisfies readonly (keyof QualityDimensions)[];
+
 /** Result of scoring a single statement. */
 export interface ScoringResult {
   statementId: number;

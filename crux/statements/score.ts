@@ -24,6 +24,7 @@ import {
 import { slugToDisplayName } from '../lib/claim-text-utils.ts';
 import {
   scoreAllStatements,
+  DIMENSION_NAMES,
   type ScoringStatement,
   type ScoringResult,
 } from './scoring.ts';
@@ -156,12 +157,7 @@ async function main() {
 
   // Top issues — dimensions with lowest average
   const dimensionAvgs: Record<string, number> = {};
-  const dimensionNames = [
-    'structure', 'precision', 'clarity', 'resolvability',
-    'uniqueness', 'atomicity', 'importance', 'neglectedness',
-    'recency', 'crossEntityUtility',
-  ] as const;
-  for (const dim of dimensionNames) {
+  for (const dim of DIMENSION_NAMES) {
     const dimScores = results.map((r) => r.dimensions[dim]);
     dimensionAvgs[dim] = dimScores.reduce((a, b) => a + b, 0) / dimScores.length;
   }
@@ -232,7 +228,7 @@ async function main() {
     const scoreInputs: BatchScoreInput[] = results.map((r) => ({
       statementId: r.statementId,
       qualityScore: r.qualityScore,
-      qualityDimensions: r.dimensions as unknown as Record<string, number>,
+      qualityDimensions: r.dimensions as Record<string, number>,
     }));
 
     // Batch in chunks of 100

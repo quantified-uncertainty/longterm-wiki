@@ -305,29 +305,18 @@ async function main() {
     }
   }
 
-  // Quality scores (if available from statement scoring)
-  const scoredStatements = allStatements.filter(
-    (s) => s.qualityScore != null && s.qualityScore !== undefined,
-  );
-  if (scoredStatements.length > 0) {
-    const scores = scoredStatements.map((s) => s.qualityScore as number);
-    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-    const sorted = [...scores].sort((a, b) => a - b);
-    const median = sorted[Math.floor(sorted.length / 2)];
-
+  // Quality scores (reuse precomputed stats from report)
+  if (report.scoredCount && report.scoredCount > 0) {
     console.log(`\n${c.bold}Quality Scores (from statement scoring):${c.reset}`);
-    console.log(`  Scored:           ${scoredStatements.length}/${total}`);
-    const avgColor = avg >= 0.7 ? c.green : avg >= 0.4 ? c.yellow : c.red;
-    console.log(`  Average:          ${avgColor}${avg.toFixed(3)}${c.reset}`);
-    console.log(`  Median:           ${median.toFixed(3)}`);
-    console.log(`  Excellent (≥0.8): ${scores.filter((s) => s >= 0.8).length}`);
-    console.log(`  Good (0.6–0.8):   ${scores.filter((s) => s >= 0.6 && s < 0.8).length}`);
-    console.log(`  Fair (0.4–0.6):   ${scores.filter((s) => s >= 0.4 && s < 0.6).length}`);
-    console.log(`  Poor (<0.4):      ${scores.filter((s) => s < 0.4).length}`);
-
-    if (!jsonOutput) {
-      console.log(`\n  ${c.dim}Run 'crux statements score ${pageId}' to refresh scores.${c.reset}`);
-    }
+    console.log(`  Scored:           ${report.scoredCount}/${total}`);
+    const avgColor = report.qualityScoreAvg! >= 0.7 ? c.green : report.qualityScoreAvg! >= 0.4 ? c.yellow : c.red;
+    console.log(`  Average:          ${avgColor}${report.qualityScoreAvg!.toFixed(3)}${c.reset}`);
+    console.log(`  Median:           ${report.qualityScoreMedian!.toFixed(3)}`);
+    console.log(`  Excellent (≥0.8): ${qualityScores.filter((s) => s >= 0.8).length}`);
+    console.log(`  Good (0.6–0.8):   ${qualityScores.filter((s) => s >= 0.6 && s < 0.8).length}`);
+    console.log(`  Fair (0.4–0.6):   ${qualityScores.filter((s) => s >= 0.4 && s < 0.6).length}`);
+    console.log(`  Poor (<0.4):      ${qualityScores.filter((s) => s < 0.4).length}`);
+    console.log(`\n  ${c.dim}Run 'crux statements score ${pageId}' to refresh scores.${c.reset}`);
   } else {
     console.log(`\n${c.dim}No quality scores found. Run 'crux statements score ${pageId}' to score.${c.reset}`);
   }
@@ -336,10 +325,8 @@ async function main() {
   console.log(`\n${c.bold}Grade:${c.reset}`);
   // Use quality scores if available, otherwise fall back to coverage-based grade
   let score: number;
-  if (scoredStatements.length > 0) {
-    const avg = scoredStatements.map((s) => s.qualityScore as number)
-      .reduce((a, b) => a + b, 0) / scoredStatements.length;
-    score = avg * 100; // Convert 0-1 to 0-100
+  if (report.qualityScoreAvg != null) {
+    score = report.qualityScoreAvg * 100; // Convert 0-1 to 0-100
   } else {
     score =
       (report.withPropertyPercent * 0.3) +

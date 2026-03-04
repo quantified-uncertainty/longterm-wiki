@@ -899,23 +899,31 @@ const statementsApp = new Hono()
 
     const { scores } = parsed.data;
     const db = getDrizzleDb();
-    let updated = 0;
 
-    await db.transaction(async (tx) => {
-      for (const item of scores) {
-        const rows = await tx
-          .update(statements)
-          .set({
-            qualityScore: item.qualityScore,
-            qualityDimensions: item.qualityDimensions,
-            scoredAt: sql`now()`,
-            updatedAt: sql`now()`,
-          })
-          .where(eq(statements.id, item.statementId))
-          .returning({ id: statements.id });
-        updated += rows.length;
-      }
-    });
+    // Bulk UPDATE using CASE/WHEN — single query instead of N+1
+    const ids = scores.map((s) => s.statementId);
+    const scoreCases = sql.join(
+      scores.map((s) => sql`WHEN id = ${s.statementId} THEN ${s.qualityScore}`),
+      sql` `,
+    );
+    const dimCases = sql.join(
+      scores.map((s) => sql`WHEN id = ${s.statementId} THEN ${JSON.stringify(s.qualityDimensions)}::jsonb`),
+      sql` `,
+    );
+    const idList = sql.join(ids.map((id) => sql`${id}`), sql`, `);
+
+    const result = await db.execute(sql`
+      UPDATE statements SET
+        quality_score = CASE ${scoreCases} ELSE quality_score END,
+        quality_dimensions = CASE ${dimCases} ELSE quality_dimensions END,
+        scored_at = now(),
+        updated_at = now()
+      WHERE id IN (${idList})
+    `);
+
+    const updated = typeof result === 'object' && result !== null && 'rowCount' in result
+      ? (result as { rowCount: number }).rowCount
+      : scores.length;
 
     return c.json({ updated, ok: true });
   })
