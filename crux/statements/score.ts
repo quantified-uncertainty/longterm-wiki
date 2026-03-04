@@ -127,7 +127,10 @@ async function main() {
   const scores = results.map((r) => r.qualityScore);
   const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
   const sorted = [...scores].sort((a, b) => a - b);
-  const median = sorted[Math.floor(sorted.length / 2)];
+  const mid = Math.floor(sorted.length / 2);
+  const median = sorted.length % 2 === 0
+    ? (sorted[mid - 1] + sorted[mid]) / 2
+    : sorted[mid];
   const min = sorted[0];
   const max = sorted[sorted.length - 1];
 
@@ -211,12 +214,13 @@ async function main() {
     }
 
     // Lowest-scoring statements
+    const stmtMap = new Map(scoringStmts.map((s) => [s.id, s]));
     const bottomN = results
       .sort((a, b) => a.qualityScore - b.qualityScore)
       .slice(0, 5);
     console.log(`\n${c.bold}Lowest-scoring statements:${c.reset}`);
     for (const r of bottomN) {
-      const stmt = scoringStmts.find((s) => s.id === r.statementId);
+      const stmt = stmtMap.get(r.statementId);
       const text = (stmt?.statementText ?? '').slice(0, 60);
       console.log(`  [${r.qualityScore.toFixed(3)}] #${r.statementId}: ${text}...`);
     }
@@ -240,7 +244,8 @@ async function main() {
       if (updateResult.ok) {
         totalUpdated += updateResult.data.updated;
       } else {
-        console.error(`${c.red}Failed to store scores for batch ${i / CHUNK_SIZE + 1}.${c.reset}`);
+        console.error(`${c.red}Failed to store scores for batch ${i / CHUNK_SIZE + 1}. Aborting.${c.reset}`);
+        process.exit(1);
       }
     }
 

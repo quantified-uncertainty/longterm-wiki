@@ -375,13 +375,15 @@ export function scoreCrossEntityUtility(stmt: ScoringStatement): number {
   // Simple heuristic: property category is 'relation'
   if (stmt.property?.category === 'relation') return 0.8;
 
-  // Check for entity-like references in text (e.g., "OpenAI", "Google DeepMind")
-  // This is a rough heuristic — named entities with capital letters
-  const namedEntityPattern = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b/g;
+  // Check for entity-like references in text (e.g., "OpenAI", "Google DeepMind", "GPT-4")
+  // Matches: multi-word Title Case ("Google DeepMind"), single capitalized words that look
+  // like org names ("OpenAI"), and acronyms with optional suffixes ("GPT-4", "RLHF")
+  const namedEntityPattern = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b|\b[A-Z][a-z]*[A-Z]\w*\b|\b[A-Z]{2,}(?:-\w+)?\b/g;
   const matches = text.match(namedEntityPattern) ?? [];
-  // Filter out the subject entity name
+  // Filter out the subject entity name and common false positives
   const entityName = slugToDisplayName(stmt.subjectEntityId);
-  const otherEntities = matches.filter(m => m !== entityName);
+  const falsePositives = new Set(['The', 'This', 'That', 'These', 'Those', 'It', 'In', 'On', 'At', 'By', 'For', 'USD', 'CEO', 'CTO', 'CFO', 'COO']);
+  const otherEntities = matches.filter(m => m !== entityName && !falsePositives.has(m));
 
   if (otherEntities.length > 0) return 0.5;
   return 0.0;

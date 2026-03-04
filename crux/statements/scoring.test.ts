@@ -349,6 +349,30 @@ describe('scoreCrossEntityUtility', () => {
       property: { id: 'revenue', label: 'Revenue', category: 'financial' },
     }))).toBe(0.0);
   });
+
+  it('detects single-word camelCase org names like OpenAI', () => {
+    expect(scoreCrossEntityUtility(makeStmt({
+      valueEntityId: null,
+      statementText: 'Anthropic competes with OpenAI in the AI safety space.',
+      property: { id: 'competitor', label: 'Competitor', category: 'organizational' },
+    }))).toBe(0.5);
+  });
+
+  it('detects acronyms like GPT-4', () => {
+    expect(scoreCrossEntityUtility(makeStmt({
+      valueEntityId: null,
+      statementText: 'Anthropic released Claude to compete with GPT-4.',
+      property: { id: 'product', label: 'Product', category: 'technical' },
+    }))).toBe(0.5);
+  });
+
+  it('does not count common false positives', () => {
+    expect(scoreCrossEntityUtility(makeStmt({
+      valueEntityId: null,
+      statementText: 'The CEO announced that revenue was $100M.',
+      property: { id: 'revenue', label: 'Revenue', category: 'financial' },
+    }))).toBe(0.0);
+  });
 });
 
 // ---------------------------------------------------------------------------
