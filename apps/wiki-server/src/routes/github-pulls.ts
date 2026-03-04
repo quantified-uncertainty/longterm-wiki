@@ -151,6 +151,7 @@ const githubPullsApp = new Hono().get("/", async (c) => {
         query: OPEN_PRS_QUERY,
         variables: { owner: REPO_OWNER, name: REPO_NAME },
       }),
+      signal: AbortSignal.timeout(10_000),
     });
 
     if (!resp.ok) {

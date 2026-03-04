@@ -83,7 +83,7 @@ export function createApp() {
       writeLimiter,
       authReadLimiter,
       authWriteLimiter,
-      skipPaths: ["/health"],
+      skipPaths: ["/health", "/healthz"],
     })
   );
 
@@ -103,7 +103,13 @@ export function createApp() {
     return c.json({ error: "internal_error", message }, 500);
   });
 
-  // Health endpoint — unauthenticated
+  // Lightweight liveness probe — no DB queries, no auth, no rate limiting.
+  // Use this for K8s probes and groundskeeper health checks.
+  app.get("/healthz", (c) => {
+    return c.json({ status: "ok" });
+  });
+
+  // Detailed health endpoint — unauthenticated, includes DB stats
   app.route("/health", healthRoute);
 
   // API routes — all require a valid API key (any scope)

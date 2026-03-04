@@ -280,6 +280,7 @@ function SectionUnavailable({ title, error }: { title: string; error?: ApiErrorR
   );
 }
 
+
 /** Deduplicate CI check runs by name, keeping the most informative conclusion. */
 function deduplicateChecks(checks: CiCheckRun[]): CiCheckRun[] {
   const byName = new Map<string, CiCheckRun>();
