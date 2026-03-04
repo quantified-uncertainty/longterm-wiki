@@ -199,7 +199,9 @@ try {
   const statementsToFill = await db
     .select()
     .from(schema.statements)
-    .where(isNull(schema.statements.statementText));
+    .where(
+      sql`${schema.statements.statementText} IS NULL OR btrim(${schema.statements.statementText}) = ''`
+    );
 
   console.log(`  Found ${statementsToFill.length} statements needing text`);
 

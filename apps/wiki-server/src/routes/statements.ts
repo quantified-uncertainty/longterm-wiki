@@ -143,6 +143,11 @@ const CreateStatementBody = z.object({
   temporalGranularity: z.string().max(20).nullish(),
   attributedTo: z.string().max(200).nullish(),
   note: z.string().max(2000).nullish(),
+  sourceFactKey: z.string().max(200).nullish(),
+  claimCategory: z.string().max(50).nullish(),
+  verdict: z.string().max(50).nullish(),
+  verdictScore: z.number().min(0).max(1).nullish(),
+  verdictModel: z.string().max(200).nullish(),
   citations: z
     .array(
       z.object({
@@ -155,6 +160,24 @@ const CreateStatementBody = z.object({
     )
     .optional()
     .default([]),
+  pageReferences: z
+    .array(
+      z.object({
+        pageIdInt: z.number().int().positive(),
+        footnoteResourceId: z.string().max(200).nullish(),
+        section: z.string().max(500).nullish(),
+      })
+    )
+    .optional()
+    .default([]),
+});
+
+const BatchCreateBody = z.object({
+  statements: z.array(CreateStatementBody).min(1).max(100),
+});
+
+const ClearByEntityQuery = z.object({
+  entityId: z.string().min(1).max(200),
 });
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
@@ -594,7 +617,7 @@ const statementsApp = new Hono()
     return c.json({ statement: formatStatement(rows[0]), ok: true });
   })
 
-  // ---- POST / — create statement + optional citations ----
+  // ---- POST / — create statement + optional citations + page references ----
   .post("/", async (c) => {
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
@@ -607,7 +630,6 @@ const statementsApp = new Hono()
     const data = parsed.data;
     const db = getDrizzleDb();
 
-    // Wrap in transaction for atomicity (statement + citations)
     const statementId = await db.transaction(async (tx) => {
       const result = await tx
         .insert(statements)
@@ -628,6 +650,11 @@ const statementsApp = new Hono()
           temporalGranularity: data.temporalGranularity ?? null,
           attributedTo: data.attributedTo ?? null,
           note: data.note ?? null,
+          sourceFactKey: data.sourceFactKey ?? null,
+          claimCategory: data.claimCategory ?? null,
+          verdict: data.verdict ?? null,
+          verdictScore: data.verdictScore ?? null,
+          verdictModel: data.verdictModel ?? null,
           status: "active",
         })
         .returning({ id: statements.id });
@@ -638,7 +665,6 @@ const statementsApp = new Hono()
 
       const id = result[0].id;
 
-      // Insert citations if provided
       if (data.citations.length > 0) {
         await tx.insert(statementCitations).values(
           data.citations.map((cit) => ({
@@ -652,10 +678,127 @@ const statementsApp = new Hono()
         );
       }
 
+      if (data.pageReferences.length > 0) {
+        await tx.insert(statementPageReferences).values(
+          data.pageReferences.map((ref) => ({
+            statementId: id,
+            pageIdInt: ref.pageIdInt,
+            footnoteResourceId: ref.footnoteResourceId ?? null,
+            section: ref.section ?? null,
+          }))
+        );
+      }
+
       return id;
     });
 
     return c.json({ id: statementId, ok: true }, 201);
+  })
+
+  // ---- POST /batch — bulk create statements ----
+  .post("/batch", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = BatchCreateBody.safeParse(body);
+    if (!parsed.success) {
+      return validationError(c, parsed.error.message);
+    }
+
+    const items = parsed.data.statements;
+    const db = getDrizzleDb();
+
+    const results: Array<{ id: number; sourceFactKey: string | null }> = [];
+
+    await db.transaction(async (tx) => {
+      for (const data of items) {
+        const result = await tx
+          .insert(statements)
+          .values({
+            variety: data.variety,
+            statementText: data.statementText,
+            subjectEntityId: data.subjectEntityId,
+            propertyId: data.propertyId ?? null,
+            qualifierKey: data.qualifierKey ?? null,
+            valueNumeric: data.valueNumeric ?? null,
+            valueUnit: data.valueUnit ?? null,
+            valueText: data.valueText ?? null,
+            valueEntityId: data.valueEntityId ?? null,
+            valueDate: data.valueDate ?? null,
+            valueSeries:
+              (data.valueSeries as Record<string, unknown>) ?? null,
+            validStart: data.validStart ?? null,
+            validEnd: data.validEnd ?? null,
+            temporalGranularity: data.temporalGranularity ?? null,
+            attributedTo: data.attributedTo ?? null,
+            note: data.note ?? null,
+            sourceFactKey: data.sourceFactKey ?? null,
+            claimCategory: data.claimCategory ?? null,
+            verdict: data.verdict ?? null,
+            verdictScore: data.verdictScore ?? null,
+            verdictModel: data.verdictModel ?? null,
+            status: "active",
+          })
+          .returning({ id: statements.id });
+
+        if (result.length === 0) {
+          throw new Error(`Statement insert returned no rows for item at index ${results.length}`);
+        }
+        const id = result[0].id;
+
+        if (data.citations.length > 0) {
+          await tx.insert(statementCitations).values(
+            data.citations.map((cit) => ({
+              statementId: id,
+              resourceId: cit.resourceId ?? null,
+              url: cit.url ?? null,
+              sourceQuote: cit.sourceQuote ?? null,
+              locationNote: cit.locationNote ?? null,
+              isPrimary: cit.isPrimary,
+            }))
+          );
+        }
+
+        if (data.pageReferences.length > 0) {
+          await tx.insert(statementPageReferences).values(
+            data.pageReferences.map((ref) => ({
+              statementId: id,
+              pageIdInt: ref.pageIdInt,
+              footnoteResourceId: ref.footnoteResourceId ?? null,
+              section: ref.section ?? null,
+            }))
+          );
+        }
+
+        results.push({
+          id,
+          sourceFactKey: data.sourceFactKey ?? null,
+        });
+      }
+    });
+
+    return c.json({ inserted: results.length, results, ok: true }, 201);
+  })
+
+  // ---- POST /clear-by-entity — delete all statements for an entity ----
+  .post("/clear-by-entity", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = ClearByEntityQuery.safeParse(body);
+    if (!parsed.success) {
+      return validationError(c, parsed.error.message);
+    }
+
+    const { entityId } = parsed.data;
+    const db = getDrizzleDb();
+
+    const deleted = await db
+      .delete(statements)
+      .where(eq(statements.subjectEntityId, entityId))
+      .returning({ id: statements.id });
+
+    return c.json({ deleted: deleted.length, ok: true });
   });
 
 export const statementsRoute = statementsApp;
