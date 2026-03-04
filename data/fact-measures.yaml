@@ -358,6 +358,70 @@ measures:
     description: "Entity that acquired this one"
     applicableTo: [organization]
 
+  # === Research / Impact ===
+  citation-count:
+    label: "Citation Count"
+    unit: count
+    category: research
+    direction: higher
+    description: "Number of academic or scholarly citations"
+    applicableTo: [organization, person]
+
+  github-stars:
+    label: "GitHub Stars"
+    unit: count
+    category: research
+    direction: higher
+    description: "Number of GitHub stars on a repository or project"
+    applicableTo: [organization]
+
+  # === Risk / Safety Estimates ===
+  doom-probability:
+    label: "Doom Probability"
+    unit: percent
+    category: safety
+    direction: lower
+    description: "Estimated probability of existential catastrophe from AI"
+    applicableTo: [organization, person]
+
+  risk-probability:
+    label: "Risk Probability"
+    unit: percent
+    category: safety
+    direction: lower
+    description: "Estimated probability of a specific risk scenario materializing"
+    applicableTo: [organization, person]
+
+  risk-assessment:
+    label: "Risk Assessment"
+    unit: string
+    category: safety
+    description: "Qualitative assessment of risk level (e.g., low, medium, high)"
+    applicableTo: [organization, person]
+
+  alignment-faking-rate:
+    label: "Alignment Faking Rate"
+    unit: percent
+    category: safety
+    direction: lower
+    description: "Observed or estimated rate of alignment faking behavior in AI systems"
+    applicableTo: [organization]
+
+  # === Generic Fallback ===
+  generic-count:
+    label: "Count"
+    unit: count
+    category: organizational
+    description: "Generic count measure (fallback for unclassified numeric counts)"
+    applicableTo: [organization, person]
+
+  generic-percent:
+    label: "Percentage"
+    unit: percent
+    category: organizational
+    description: "Generic percentage measure (fallback for unclassified percentages)"
+    applicableTo: [organization, person]
+
   # === Market ===
   market-volume:
     label: "Market/Transaction Volume"
@@ -394,3 +458,12 @@ propertyAliases:
   parameter_count: model-parameters
   benchmark_score: benchmark-score
   context_window: context-window
+  doom_probability: doom-probability
+  risk_probability: risk-probability
+  risk_assessment: risk-assessment
+  alignment_faking_rate: alignment-faking-rate
+  citations: citation-count
+  citation_count: citation-count
+  github_stars: github-stars
+  count: generic-count
+  percent: generic-percent
