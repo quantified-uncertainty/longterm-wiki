@@ -1,46 +1,148 @@
 "use client";
 
-import { ExternalLink } from "lucide-react";
-import { getDomain, isSafeUrl } from "@components/wiki/resource-utils";
+import { useState } from "react";
+import { ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import { getDomain, isSafeUrl, VERDICT_COLORS } from "@components/wiki/resource-utils";
 import type { StatementWithDetails } from "@lib/statement-types";
+
+const INITIAL_SHOW = 6;
+
+interface UrlEntry {
+  url: string;
+  count: number;
+  verdicts: Record<string, number>;
+}
 
 interface SourceGroup {
   domain: string;
-  urls: Map<string, { url: string; count: number; verdicts: Record<string, number> }>;
+  urls: Map<string, UrlEntry>;
   totalStatements: number;
   verdicts: Record<string, number>;
 }
 
-function VerdictSummary({ verdicts }: { verdicts: Record<string, number> }) {
-  const parts: { label: string; count: number; color: string }[] = [];
-  if (verdicts.accurate) parts.push({ label: "verified", count: verdicts.accurate, color: "text-emerald-600" });
-  if (verdicts.minor_issues) parts.push({ label: "minor issues", count: verdicts.minor_issues, color: "text-amber-600" });
-  if (verdicts.inaccurate) parts.push({ label: "disputed", count: verdicts.inaccurate, color: "text-red-600" });
-  if (verdicts.unsupported) parts.push({ label: "unsupported", count: verdicts.unsupported, color: "text-red-500" });
+/** Colored dots summarizing verdict distribution */
+function VerdictDots({ verdicts }: { verdicts: Record<string, number> }) {
+  const entries = Object.entries(verdicts)
+    .filter(([key]) => key in VERDICT_COLORS)
+    .sort(([a], [b]) => {
+      const order = ["accurate", "minor_issues", "inaccurate", "unsupported", "not_verifiable"];
+      return order.indexOf(a) - order.indexOf(b);
+    });
 
-  if (parts.length === 0) return <span className="text-muted-foreground/50">—</span>;
+  if (entries.length === 0) return null;
 
   return (
-    <span className="text-[11px]">
-      {parts.map((p, i) => (
-        <span key={p.label}>
-          {i > 0 && ", "}
-          <span className={p.color}>{p.count} {p.label}</span>
-        </span>
-      ))}
+    <span className="inline-flex items-center gap-0.5">
+      {entries.map(([key, count]) => {
+        const style = VERDICT_COLORS[key];
+        if (!style) return null;
+        return (
+          <span
+            key={key}
+            title={`${count} ${style.title.toLowerCase()}`}
+            className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground"
+          >
+            <span className={`inline-block w-2 h-2 rounded-full ${style.bg}`} />
+            {count}
+          </span>
+        );
+      })}
     </span>
   );
 }
 
+/** Expandable source card */
+function SourceCard({ group }: { group: SourceGroup }) {
+  const [open, setOpen] = useState(false);
+  const firstUrl = group.urls.values().next().value?.url;
+  const urlEntries = [...group.urls.values()];
+  const hasMultiple = urlEntries.length > 1;
+
+  return (
+    <div className="rounded-lg border border-border/60 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between gap-2 px-2.5 py-1.5 hover:bg-muted/20 transition-colors cursor-pointer text-left"
+      >
+        <div className="flex items-center gap-1.5 min-w-0">
+          {firstUrl && isSafeUrl(firstUrl) ? (
+            <span className="inline-flex items-center gap-0.5 text-xs text-blue-600 truncate">
+              {group.domain}
+              <ExternalLink className="w-3 h-3 shrink-0" />
+            </span>
+          ) : (
+            <span className="text-xs text-muted-foreground truncate">{group.domain}</span>
+          )}
+          {hasMultiple && (
+            <span className="text-[10px] text-muted-foreground/60 shrink-0">
+              ({urlEntries.length} pages)
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[11px] tabular-nums text-muted-foreground">
+            {group.totalStatements} cite{group.totalStatements !== 1 ? "s" : ""}
+          </span>
+          <VerdictDots verdicts={group.verdicts} />
+          {open ? (
+            <ChevronUp className="w-3 h-3 text-muted-foreground/50" />
+          ) : (
+            <ChevronDown className="w-3 h-3 text-muted-foreground/50" />
+          )}
+        </div>
+      </button>
+
+      {open && (
+        <div className="border-t border-border/30 px-2.5 py-1.5 bg-muted/10 space-y-1">
+          {urlEntries.map((entry) => {
+            const path = (() => {
+              try {
+                const u = new URL(entry.url);
+                const p = u.pathname + u.search;
+                return p.length > 60 ? p.slice(0, 57) + "..." : p;
+              } catch {
+                return entry.url;
+              }
+            })();
+
+            return (
+              <div key={entry.url} className="flex items-center justify-between gap-2">
+                <a
+                  href={entry.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-0.5 text-[11px] text-blue-600 hover:underline truncate min-w-0"
+                >
+                  {path}
+                  <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                </a>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="text-[10px] tabular-nums text-muted-foreground">
+                    {entry.count}
+                  </span>
+                  <VerdictDots verdicts={entry.verdicts} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /**
- * Table showing unique citation sources grouped by domain,
- * with statement counts and aggregate verdict summaries.
+ * Expandable card grid showing citation sources grouped by domain.
+ * Shows top 6 initially, expandable to show all.
  */
 export function StatementSourcesTable({
   statements,
 }: {
   statements: StatementWithDetails[];
 }) {
+  const [showAll, setShowAll] = useState(false);
+
   // Build source groups from citation URLs
   const domainGroups = new Map<string, SourceGroup>();
 
@@ -77,52 +179,26 @@ export function StatementSourcesTable({
 
   if (groups.length === 0) return null;
 
+  const visible = showAll ? groups : groups.slice(0, INITIAL_SHOW);
+  const hiddenCount = groups.length - INITIAL_SHOW;
+
   return (
-    <div className="rounded-lg border border-border/60 overflow-hidden">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-border/60 bg-muted/30">
-            <th className="text-left px-3 py-1.5 text-[11px] font-medium">Source</th>
-            <th className="text-right px-3 py-1.5 text-[11px] font-medium">Citations</th>
-            <th className="text-left px-3 py-1.5 text-[11px] font-medium">Verdicts</th>
-          </tr>
-        </thead>
-        <tbody>
-          {groups.map((group) => {
-            const firstUrl = group.urls.values().next().value?.url;
-            return (
-              <tr key={group.domain} className="border-b border-border/30 last:border-0">
-                <td className="px-3 py-1.5 text-xs">
-                  {firstUrl && isSafeUrl(firstUrl) ? (
-                    <a
-                      href={firstUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-blue-600 hover:underline"
-                    >
-                      {group.domain}
-                      <ExternalLink className="w-3 h-3 shrink-0" />
-                    </a>
-                  ) : (
-                    <span className="text-muted-foreground">{group.domain}</span>
-                  )}
-                  {group.urls.size > 1 && (
-                    <span className="text-muted-foreground/60 text-[10px] ml-1">
-                      ({group.urls.size} pages)
-                    </span>
-                  )}
-                </td>
-                <td className="px-3 py-1.5 text-xs text-right tabular-nums">
-                  {group.totalStatements}
-                </td>
-                <td className="px-3 py-1.5">
-                  <VerdictSummary verdicts={group.verdicts} />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+        {visible.map((group) => (
+          <SourceCard key={group.domain} group={group} />
+        ))}
+      </div>
+      {!showAll && hiddenCount > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowAll(true)}
+          className="mt-1.5 text-xs text-blue-600 hover:underline inline-flex items-center gap-0.5 cursor-pointer"
+        >
+          Show {hiddenCount} more sources
+          <ChevronDown className="w-3 h-3" />
+        </button>
+      )}
     </div>
   );
 }

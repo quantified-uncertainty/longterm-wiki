@@ -399,7 +399,6 @@ async function ContentView({
         <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
           {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
           {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
-          {isArticle && !isInternal && entity && <EntityStatementsCard entityId={slug} />}
           {showToc && <TableOfContents headings={tocHeadings} />}
           {page.content}
           {isArticle && !isInternal && entity && (

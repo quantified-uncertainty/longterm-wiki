@@ -43,6 +43,10 @@ export interface StatementWithDetails {
   note: string | null;
   verdict: string | null;
   verdictScore: number | null;
+  verdictQuotes: string | null;
+  verdictModel: string | null;
+  verifiedAt: string | null;
+  claimCategory: string | null;
   property: PropertyInfo | null;
   citations: Citation[];
 }

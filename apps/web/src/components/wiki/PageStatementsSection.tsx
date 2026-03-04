@@ -53,8 +53,15 @@ export async function PageStatementsSection({
   if (!result || result.total === 0) return null;
 
   const { structured, attributed } = result;
-  const activeStructured = structured.filter((s) => s.status === "active");
-  const activeAttributed = attributed.filter((s) => s.status === "active");
+  // Split structured into real property-based rows vs text-only claims
+  const activeStructuredAll = structured.filter((s) => s.status === "active");
+  const activeStructured = activeStructuredAll.filter((s) => s.propertyId);
+  const textClaims = activeStructuredAll.filter((s) => !s.propertyId);
+  // Merge text-only claims into attributed since they don't fit the Property/Value table
+  const activeAttributed = [
+    ...attributed.filter((s) => s.status === "active"),
+    ...textClaims,
+  ];
   const activeAll = [...activeStructured, ...activeAttributed];
   const { verified, minorIssues, disputed, unsupported, unchecked } = countVerdicts(activeAll);
   const numericId = slugToNumericId(entityId);
@@ -69,7 +76,7 @@ export async function PageStatementsSection({
   if (unchecked > 0) summaryParts.push(`${unchecked} unchecked`);
 
   return (
-    <div className="not-prose mt-10 mb-6">
+    <div className="not-prose mt-8 mb-4">
       <div className="flex items-baseline justify-between gap-3 mb-3">
         <h2 className="text-lg font-semibold">Statements</h2>
         <Link
@@ -86,7 +93,7 @@ export async function PageStatementsSection({
 
       {/* Structured statements */}
       {activeStructured.length > 0 && (
-        <div className="mb-6">
+        <div className="mb-4">
           <h3 className="text-sm font-semibold text-muted-foreground mb-2">
             Structured
             <span className="ml-1.5 text-xs font-normal">({activeStructured.length})</span>
@@ -97,7 +104,7 @@ export async function PageStatementsSection({
 
       {/* Attributed statements */}
       {activeAttributed.length > 0 && (
-        <div className="mb-6">
+        <div className="mb-4">
           <h3 className="text-sm font-semibold text-muted-foreground mb-2">
             Attributed
             <span className="ml-1.5 text-xs font-normal">({activeAttributed.length})</span>
@@ -109,7 +116,7 @@ export async function PageStatementsSection({
       {/* Sources */}
       {activeAll.some((s) => s.citations.some((c) => c.url)) && (
         <div>
-          <h3 className="text-sm font-semibold text-muted-foreground mb-2">Sources</h3>
+          <h3 className="text-sm font-semibold text-muted-foreground mb-2">Citation Sources</h3>
           <StatementSourcesTable statements={activeAll} />
         </div>
       )}
