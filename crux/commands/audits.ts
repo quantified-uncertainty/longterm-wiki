@@ -121,7 +121,7 @@ function saveAudits(data: AuditsFile): void {
     const notesPattern = new RegExp(
       `(- id: ${escapeRegex(pm.id)}[\\s\\S]*?notes:)\\s*(?:"[^"]*"|null)`,
     );
-    raw = raw.replace(notesPattern, `$1 ${pm.notes ? `"${pm.notes}"` : 'null'}`);
+    raw = raw.replace(notesPattern, `$1 ${pm.notes ? `"${escapeYamlString(pm.notes)}"` : 'null'}`);
   }
 
   writeFileSync(AUDITS_PATH, raw, 'utf-8');
@@ -129,6 +129,10 @@ function saveAudits(data: AuditsFile): void {
 
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function escapeYamlString(s: string): string {
+  return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
 // ---------------------------------------------------------------------------
@@ -300,8 +304,15 @@ Examples:
   // Check post-merge items
   const pmIdx = data.post_merge.findIndex(pm => pm.id === id);
   if (pmIdx >= 0) {
-    const newStatus = options.status as PostMergeItem['status'] ??
-      (options.pass ? 'verified' : options.fail ? 'failed' : null);
+    const VALID_PM_STATUSES = ['pending', 'verified', 'failed', 'wontfix'] as const;
+    const rawStatus = options.status ?? (options.pass ? 'verified' : options.fail ? 'failed' : null);
+    if (rawStatus && !VALID_PM_STATUSES.includes(rawStatus as typeof VALID_PM_STATUSES[number])) {
+      return {
+        exitCode: 1,
+        output: `Invalid status: ${rawStatus}. Valid values: ${VALID_PM_STATUSES.join(', ')}`,
+      };
+    }
+    const newStatus = rawStatus as PostMergeItem['status'] | null;
     if (!newStatus) {
       return {
         exitCode: 1,
