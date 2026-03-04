@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ExternalLink, ChevronDown, ChevronUp, Star } from "lucide-react";
 import type { Citation } from "@lib/statement-types";
 import { getDomain, isSafeUrl } from "@components/wiki/resource-utils";
+import { SafeExternalLink } from "@components/ui/safe-external-link";
 
 /**
  * Expandable citation detail panel. Clicking the citation count badge
@@ -60,15 +61,13 @@ function CitationItem({ citation: cit }: { citation: Citation }) {
           </span>
         )}
         {cit.url && isSafeUrl(cit.url) ? (
-          <a
+          <SafeExternalLink
             href={cit.url}
-            target="_blank"
-            rel="noopener noreferrer"
             className="inline-flex items-center gap-0.5 text-blue-600 hover:underline truncate ml-auto"
           >
             <span className="truncate">{domain ?? cit.url}</span>
             <ExternalLink className="w-3 h-3 shrink-0" />
-          </a>
+          </SafeExternalLink>
         ) : cit.resourceId ? (
           <span className="text-muted-foreground text-[10px] ml-auto font-mono">
             {cit.resourceId}
