@@ -202,7 +202,7 @@ async function main() {
     : undefined;
   const sortedQuality = [...qualityScores].sort((a, b) => a - b);
   const qualityScoreMedian = sortedQuality.length > 0
-    ? Math.round(sortedQuality[Math.floor(sortedQuality.length / 2)] * 1000) / 1000
+    ? Math.round(computeMedian(sortedQuality) * 1000) / 1000
     : undefined;
 
   const report: QualityReport = {
@@ -341,6 +341,15 @@ async function main() {
   console.log(`    Verification: ${report.verifiedPercent}% (target: 50%+)`);
 
   console.log('');
+}
+
+/** Compute median of a sorted array, averaging middle two elements for even lengths. */
+function computeMedian(sorted: number[]): number {
+  const mid = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 0) {
+    return (sorted[mid - 1] + sorted[mid]) / 2;
+  }
+  return sorted[mid];
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

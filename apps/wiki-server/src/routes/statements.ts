@@ -122,11 +122,24 @@ function formatStatement(s: typeof statements.$inferSelect) {
 
 // ---- Body schemas ----
 
+const EXPECTED_DIMENSIONS = [
+  'structure', 'precision', 'clarity', 'resolvability',
+  'uniqueness', 'atomicity', 'importance', 'neglectedness',
+  'recency', 'crossEntityUtility',
+] as const;
+
 const BatchScoreBody = z.object({
   scores: z.array(z.object({
     statementId: z.number().int().positive(),
     qualityScore: z.number().min(0).max(1),
-    qualityDimensions: z.record(z.number()),
+    qualityDimensions: z.record(z.number()).refine(
+      (dims) => {
+        const keys = Object.keys(dims);
+        return keys.length === EXPECTED_DIMENSIONS.length &&
+          EXPECTED_DIMENSIONS.every((d) => d in dims);
+      },
+      { message: `qualityDimensions must contain exactly these keys: ${EXPECTED_DIMENSIONS.join(', ')}` },
+    ),
   })).min(1).max(500),
 });
 
@@ -938,11 +951,16 @@ const statementsApp = new Hono()
       WHERE id IN (${idList})
     `);
 
-    const updated = typeof result === 'object' && result !== null && 'rowCount' in result
+    const rowCount = typeof result === 'object' && result !== null && 'rowCount' in result
       ? (result as { rowCount: number }).rowCount
       : scores.length;
 
-    return c.json({ updated, ok: true });
+    const missing = scores.length - rowCount;
+    if (missing > 0) {
+      console.warn(`[statements/score] ${missing} of ${scores.length} statementIds not found in DB`);
+    }
+
+    return c.json({ updated: rowCount, missing, ok: true });
   })
 
   // ---- POST /coverage-score — store entity coverage score ----
