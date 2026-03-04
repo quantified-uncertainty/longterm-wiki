@@ -486,10 +486,17 @@ function ExpandedDetails({
         <div>
           <span className="text-muted-foreground">Entity: </span>
           <Link
-            href={`/statements/entity/${s.subjectEntityId}`}
+            href={`/wiki/${s.subjectEntityId}`}
             className="text-blue-600 hover:underline"
           >
             {entityName}
+          </Link>
+          <span className="text-muted-foreground mx-1">·</span>
+          <Link
+            href={`/statements/entity/${s.subjectEntityId}`}
+            className="text-muted-foreground hover:underline text-[11px]"
+          >
+            all statements
           </Link>
         </div>
         {prop && (
@@ -561,10 +568,14 @@ function ExpandedDetails({
         )}
       </div>
 
-      {/* Statement text for attributed */}
+      {/* Statement text */}
       {s.statementText && (
-        <div className="border-l-2 border-amber-300 pl-3 py-1 italic text-muted-foreground">
-          &ldquo;{s.statementText}&rdquo;
+        <div className={`border-l-2 ${s.variety === "attributed" ? "border-amber-300" : "border-blue-300"} pl-3 py-1 text-muted-foreground`}>
+          {s.variety === "attributed" ? (
+            <span className="italic">&ldquo;{s.statementText}&rdquo;</span>
+          ) : (
+            <span className="text-xs">{s.statementText}</span>
+          )}
         </div>
       )}
 

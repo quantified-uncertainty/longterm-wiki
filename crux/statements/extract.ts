@@ -39,6 +39,7 @@ import {
 } from '../lib/wiki-server/statements.ts';
 import { cleanMdxForExtraction, splitIntoSections, type Section } from '../claims/extract.ts';
 import { slugToDisplayName } from '../lib/claim-text-utils.ts';
+import { getResourceById } from '../lib/search/resource-lookup.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -533,10 +534,14 @@ async function main() {
         note: stmt.inferenceType ? `inference: ${stmt.inferenceType}` : null,
         sourceFactKey: sfk,
         claimCategory: stmt.claimCategory,
-        citations: stmt.footnoteRefs.map((ref, idx) => ({
-          resourceId: ref, // The rc-XXXX is the resource reference ID
-          isPrimary: idx === 0,
-        })),
+        citations: stmt.footnoteRefs.map((ref, idx) => {
+          const resource = getResourceById(ref);
+          return {
+            resourceId: ref,
+            url: resource?.url ?? null,
+            isPrimary: idx === 0,
+          };
+        }),
         pageReferences: pageIdInt
           ? stmt.footnoteRefs.map(ref => ({
               pageIdInt,
