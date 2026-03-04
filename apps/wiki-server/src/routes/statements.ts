@@ -120,6 +120,10 @@ function formatStatement(s: typeof statements.$inferSelect) {
 const PatchStatementBody = z.object({
   status: z.enum(["active", "superseded", "retracted"]).optional(),
   variety: z.enum(["structured", "attributed"]).optional(),
+  statementText: z.string().min(1).max(2000).optional(),
+  validStart: z.string().max(20).nullish(),
+  validEnd: z.string().max(20).nullish(),
+  attributedTo: z.string().max(200).nullish(),
   archiveReason: z.string().max(2000).nullish(),
   verdict: z.string().max(50).nullish(),
   verdictScore: z.number().min(0).max(1).nullish(),
@@ -670,6 +674,10 @@ const statementsApp = new Hono()
       .set({
         ...(data.status !== undefined && { status: data.status }),
         ...(data.variety !== undefined && { variety: data.variety }),
+        ...(data.statementText !== undefined && { statementText: data.statementText }),
+        ...(data.validStart !== undefined && { validStart: data.validStart ?? null }),
+        ...(data.validEnd !== undefined && { validEnd: data.validEnd ?? null }),
+        ...(data.attributedTo !== undefined && { attributedTo: data.attributedTo ?? null }),
         ...(data.archiveReason !== undefined && { archiveReason: data.archiveReason ?? null }),
         ...(data.verdict !== undefined && { verdict: data.verdict ?? null }),
         ...(data.verdictScore !== undefined && { verdictScore: data.verdictScore ?? null }),
