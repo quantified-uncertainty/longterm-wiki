@@ -600,6 +600,81 @@ const statementsApp = new Hono()
     });
   })
 
+  // ---- GET /quality-summary — aggregate quality scores and entity coverage ----
+  .get("/quality-summary", async (c) => {
+    const db = getDrizzleDb();
+
+    // Typed row shapes for raw SQL results
+    type QualityDistRow = {
+      total: string;
+      unscored: string;
+      excellent: string;
+      good: string;
+      fair: string;
+      poor: string;
+      avg_score: string | null;
+      [key: string]: unknown;
+    };
+
+    type EntityCoverageRow = {
+      entityId: string;
+      coverageScore: unknown;
+      categoryScores: Record<string, number>;
+      statementCount: unknown;
+      qualityAvg: unknown;
+      scoredAt: string;
+      [key: string]: unknown;
+    };
+
+    const [qualityResult, coverageResult] = await Promise.all([
+      db.execute<QualityDistRow>(sql`
+        SELECT
+          COUNT(*)::text AS total,
+          COUNT(*) FILTER (WHERE quality_score IS NULL)::text AS unscored,
+          COUNT(*) FILTER (WHERE quality_score >= 0.8)::text AS excellent,
+          COUNT(*) FILTER (WHERE quality_score >= 0.6 AND quality_score < 0.8)::text AS good,
+          COUNT(*) FILTER (WHERE quality_score >= 0.4 AND quality_score < 0.6)::text AS fair,
+          COUNT(*) FILTER (WHERE quality_score < 0.4 AND quality_score IS NOT NULL)::text AS poor,
+          AVG(quality_score)::text AS avg_score
+        FROM statements
+        WHERE status = 'active'
+      `),
+      db.execute<EntityCoverageRow>(sql`
+        SELECT DISTINCT ON (entity_id)
+          entity_id AS "entityId",
+          coverage_score AS "coverageScore",
+          category_scores AS "categoryScores",
+          statement_count AS "statementCount",
+          quality_avg AS "qualityAvg",
+          scored_at AS "scoredAt"
+        FROM entity_coverage_scores
+        ORDER BY entity_id, scored_at DESC
+      `),
+    ]);
+
+    const dist = qualityResult[0];
+
+    return c.json({
+      quality: {
+        total: Number(dist?.total ?? 0),
+        unscored: Number(dist?.unscored ?? 0),
+        excellent: Number(dist?.excellent ?? 0),
+        good: Number(dist?.good ?? 0),
+        fair: Number(dist?.fair ?? 0),
+        poor: Number(dist?.poor ?? 0),
+        avgScore: dist?.avg_score != null ? parseFloat(dist.avg_score) : null,
+      },
+      entityCoverage: [...coverageResult].map((r) => ({
+        entityId: r.entityId,
+        coverageScore: Number(r.coverageScore),
+        categoryScores: r.categoryScores,
+        statementCount: Number(r.statementCount),
+        qualityAvg: r.qualityAvg != null ? Number(r.qualityAvg) : null,
+        scoredAt: r.scoredAt,
+      })),
+    });
+  })
+
   // ---- GET /stats — basic statistics ----
   .get("/stats", async (c) => {
     const db = getDrizzleDb();
