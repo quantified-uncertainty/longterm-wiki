@@ -2,6 +2,7 @@ import {
   fetchDetailed,
   fetchFromWikiServer,
   withApiFallback,
+  type ApiErrorReason,
   type FetchResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
@@ -36,24 +37,12 @@ interface MonitoringStatusData {
   checkedAt: string;
   services: ServiceStatusEntry[];
   dbCounts: { pages: number; entities: number; facts: number };
-  lastHealthCheck: unknown;
   recentIncidents: IncidentEntry[];
   jobsQueue: Record<string, number>;
   activeAgents: number;
 }
 
-export interface IncidentDisplayRow {
-  id: number;
-  service: string;
-  severity: string;
-  status: string;
-  title: string;
-  detail: string | null;
-  detectedAt: string;
-  resolvedAt: string | null;
-  resolvedBy: string | null;
-  checkSource: string | null;
-}
+export type IncidentDisplayRow = IncidentEntry;
 
 interface CiCheckRun {
   name: string;
@@ -136,7 +125,6 @@ function noLocalFallback(): MonitoringStatusData {
     checkedAt: new Date().toISOString(),
     services: [],
     dbCounts: { pages: 0, entities: 0, facts: 0 },
-    lastHealthCheck: null,
     recentIncidents: [],
     jobsQueue: {},
     activeAgents: 0,
@@ -152,19 +140,20 @@ function StatCard({
   colorClass,
 }: {
   label: string;
-  value: string | number;
+  value: string | number | null;
   subtext?: string;
   colorClass?: string;
 }) {
+  const isUnavailable = value === null;
   return (
     <div className="rounded-lg border border-border/60 p-4">
       <p className="text-xs text-muted-foreground mb-1">{label}</p>
       <p
-        className={`text-2xl font-semibold tabular-nums ${colorClass ?? ""}`}
+        className={`text-2xl font-semibold tabular-nums ${isUnavailable ? "text-muted-foreground/50" : (colorClass ?? "")}`}
       >
-        {value}
+        {isUnavailable ? "—" : value}
       </p>
-      {subtext && (
+      {subtext && !isUnavailable && (
         <p className="text-xs text-muted-foreground mt-0.5">{subtext}</p>
       )}
     </div>
@@ -189,7 +178,7 @@ const STATUS_STYLES: Record<
   unknown: {
     bg: "bg-muted",
     text: "text-muted-foreground",
-    label: "Unknown",
+    label: "Not monitored",
   },
 };
 
@@ -236,8 +225,10 @@ function ServiceCard({
   );
 }
 
-function OverallBanner({ status }: { status: string }) {
+function OverallBanner({ status, checkedAt }: { status: string; checkedAt: string }) {
   const style = STATUS_STYLES[status] ?? STATUS_STYLES.unknown;
+  const checkedDate = new Date(checkedAt);
+  const checkedTimeStr = checkedDate.toISOString().slice(11, 16); // HH:MM UTC
   return (
     <div
       className={`rounded-lg border-2 p-4 mb-6 flex items-center gap-3 ${style.bg}`}
@@ -256,11 +247,7 @@ function OverallBanner({ status }: { status: string }) {
           System {style.label}
         </p>
         <p className="text-xs text-muted-foreground">
-          Last checked:{" "}
-          {new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          Last checked: {checkedTimeStr} UTC
         </p>
       </div>
     </div>
@@ -273,6 +260,39 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
       {children}
     </h3>
   );
+}
+
+function SectionUnavailable({ title, error }: { title: string; error?: ApiErrorReason | null }) {
+  const detail = error
+    ? error.type === "server-error"
+      ? `HTTP ${error.status} ${error.statusText}`
+      : error.type === "connection-error"
+        ? error.message
+        : error.type
+    : "unknown error";
+  return (
+    <>
+      <SectionHeader>{title}</SectionHeader>
+      <div className="rounded-lg border border-red-200 bg-red-500/5 p-4 text-sm text-muted-foreground mb-6">
+        Failed to load ({detail})
+      </div>
+    </>
+  );
+}
+
+/** Deduplicate CI check runs by name, keeping the most informative conclusion. */
+function deduplicateChecks(checks: CiCheckRun[]): CiCheckRun[] {
+  const byName = new Map<string, CiCheckRun>();
+  // Priority: failure > success > other > skipped
+  const priority = (c: string | null) =>
+    c === "failure" ? 3 : c === "success" ? 2 : c === "skipped" ? 0 : 1;
+  for (const check of checks) {
+    const existing = byName.get(check.name);
+    if (!existing || priority(check.conclusion) > priority(existing.conclusion)) {
+      byName.set(check.name, check);
+    }
+  }
+  return Array.from(byName.values());
 }
 
 function CiStatusSection({ ci }: { ci: ExtendedHealthData["ci"] }) {
@@ -316,12 +336,13 @@ function CiStatusSection({ ci }: { ci: ExtendedHealthData["ci"] }) {
           </span>
         </div>
         <p className="text-xs text-muted-foreground">
-          {ci.totalChecks} check{ci.totalChecks !== 1 ? "s" : ""}
+          {ci.checks.length} check{ci.checks.length !== 1 ? "s" : ""}
           {ci.allCompleted ? " completed" : " running"}
+          {ci.totalChecks > ci.checks.length && ` (${ci.totalChecks} total)`}
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
-        {ci.checks.map((check) => {
+        {deduplicateChecks(ci.checks).map((check) => {
           const isSuccess = check.conclusion === "success";
           const isFailed = check.conclusion === "failure";
           const isRunning = check.status !== "completed";
@@ -439,7 +460,7 @@ function GroundskeeperSection({
                         : `${task.avgDurationMs}ms`
                       : "-"}
                   </td>
-                  <td className="py-2 pl-3 text-right text-xs text-muted-foreground">
+                  <td className="py-2 pl-3 text-right text-xs text-muted-foreground" suppressHydrationWarning>
                     {formatRelativeTime(task.lastRun)}
                   </td>
                 </tr>
@@ -649,7 +670,7 @@ function RecentSessionsSection({
                 <td className="py-2 px-3 text-right text-xs tabular-nums">
                   {s.issueNumber ? `#${s.issueNumber}` : "-"}
                 </td>
-                <td className="py-2 pl-3 text-right text-xs text-muted-foreground">
+                <td className="py-2 pl-3 text-right text-xs text-muted-foreground" suppressHydrationWarning>
                   {s.startedAt ? formatRelativeTime(s.startedAt) : "-"}
                 </td>
               </tr>
@@ -745,11 +766,11 @@ function CurrentDeploymentSection() {
           {/* Build time */}
           <div>
             <span className="text-muted-foreground text-xs">Built</span>
-            <div className="text-xs mt-0.5">
+            <div className="text-xs mt-0.5" suppressHydrationWarning>
               {buildAge && <span>{buildAge}</span>}
               {buildTimestamp && (
                 <span className="ml-2 text-muted-foreground">
-                  {new Date(buildTimestamp).toLocaleString()}
+                  {new Date(buildTimestamp).toISOString().replace("T", " ").slice(0, 19)} UTC
                 </span>
               )}
             </div>
@@ -793,10 +814,27 @@ export async function SystemHealthContent() {
   ]);
 
   const extended = extendedResult.ok ? extendedResult.data : null;
+  const extendedError = !extendedResult.ok ? extendedResult.error : null;
   const openPRs: OpenPRDisplayRow[] = pullsData?.pulls ?? [];
 
-  const { overall, services, dbCounts, recentIncidents, jobsQueue, activeAgents } =
+  // When using fallback data (API down), stat values should show as unavailable
+  const isApiFallback = source === "local";
+
+  const { overall, checkedAt, services: rawServices, dbCounts, recentIncidents, jobsQueue, activeAgents } =
     data;
+
+  // Augment github-actions service status with CI data when available
+  const services = rawServices.map((svc) => {
+    if (svc.name === "github-actions" && svc.status === "unknown" && extended?.ci) {
+      const ciStatus = extended.ci.anyFailed
+        ? "degraded" as const
+        : extended.ci.allPassed
+          ? "healthy" as const
+          : "unknown" as const;
+      return { ...svc, status: ciStatus };
+    }
+    return svc;
+  });
   const openIncidentCount = recentIncidents.filter(
     (i) => i.status === "open"
   ).length;
@@ -804,19 +842,7 @@ export async function SystemHealthContent() {
     (i) => i.severity === "critical" && i.status === "open"
   ).length;
 
-  // Map incidents to the shape the table expects
-  const incidentRows: IncidentDisplayRow[] = recentIncidents.map((i) => ({
-    id: i.id,
-    service: i.service,
-    severity: i.severity,
-    status: i.status,
-    title: i.title,
-    detail: i.detail,
-    detectedAt: i.detectedAt,
-    resolvedAt: i.resolvedAt,
-    resolvedBy: i.resolvedBy,
-    checkSource: i.checkSource,
-  }));
+  const incidentRows: IncidentDisplayRow[] = recentIncidents;
 
   const totalJobs = Object.values(jobsQueue).reduce(
     (sum, n) => sum + n,
@@ -833,7 +859,7 @@ export async function SystemHealthContent() {
       </p>
 
       {/* Overall status banner */}
-      <OverallBanner status={overall} />
+      <OverallBanner status={overall} checkedAt={checkedAt} />
 
       {/* Service status cards */}
       {services.length > 0 && (
@@ -851,7 +877,7 @@ export async function SystemHealthContent() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         <StatCard
           label="Active agents"
-          value={activeAgents}
+          value={isApiFallback ? null : activeAgents}
           colorClass={activeAgents > 0 ? "text-blue-600" : undefined}
         />
         <StatCard
@@ -866,32 +892,40 @@ export async function SystemHealthContent() {
         />
         <StatCard
           label="Open incidents"
-          value={openIncidentCount}
+          value={isApiFallback ? null : openIncidentCount}
           subtext="last 24h"
           colorClass={openIncidentCount > 0 ? "text-yellow-600" : undefined}
         />
         <StatCard
           label="Critical"
-          value={criticalCount}
+          value={isApiFallback ? null : criticalCount}
           colorClass={criticalCount > 0 ? "text-red-500" : "text-green-600"}
         />
         <StatCard
           label="Wiki pages"
-          value={dbCounts.pages.toLocaleString()}
-          subtext={`${dbCounts.entities} entities`}
+          value={isApiFallback ? null : dbCounts.pages.toLocaleString()}
+          subtext={isApiFallback ? undefined : `${dbCounts.entities} entities`}
         />
         <StatCard
           label="Jobs queue"
-          value={totalJobs}
-          subtext={pendingJobs > 0 ? `${pendingJobs} pending` : "idle"}
+          value={isApiFallback ? null : totalJobs}
+          subtext={isApiFallback ? undefined : pendingJobs > 0 ? `${pendingJobs} pending` : "idle"}
         />
       </div>
 
       {/* CI Pipeline Status */}
-      {extended && <CiStatusSection ci={extended.ci} />}
+      {extended ? (
+        <CiStatusSection ci={extended.ci} />
+      ) : extendedError ? (
+        <SectionUnavailable title="CI Pipeline (main branch)" error={extendedError} />
+      ) : null}
 
       {/* Data Integrity */}
-      {extended && <IntegritySection integrity={extended.integrity} />}
+      {extended ? (
+        <IntegritySection integrity={extended.integrity} />
+      ) : extendedError ? (
+        <SectionUnavailable title="Data Integrity" error={extendedError} />
+      ) : null}
 
       {/* Open Pull Requests */}
       <h3 className="text-sm font-semibold text-muted-foreground mb-3">
@@ -927,17 +961,25 @@ export async function SystemHealthContent() {
       )}
 
       {/* Groundskeeper Tasks */}
-      {extended && (
+      {extended ? (
         <GroundskeeperSection tasks={extended.groundskeeperTasks} />
-      )}
+      ) : extendedError ? (
+        <SectionUnavailable title="Groundskeeper Tasks (last 24h)" error={extendedError} />
+      ) : null}
 
       {/* Auto-Update System */}
-      {extended && <AutoUpdateSection autoUpdate={extended.autoUpdate} />}
+      {extended ? (
+        <AutoUpdateSection autoUpdate={extended.autoUpdate} />
+      ) : extendedError ? (
+        <SectionUnavailable title="Auto-Update System" error={extendedError} />
+      ) : null}
 
       {/* Agent Sessions */}
-      {extended && (
+      {extended ? (
         <RecentSessionsSection sessions={extended.recentSessions} />
-      )}
+      ) : extendedError ? (
+        <SectionUnavailable title="Agent Sessions" error={extendedError} />
+      ) : null}
 
       <DataSourceBanner source={source} apiError={apiError} />
     </>
