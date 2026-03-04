@@ -3,5 +3,5 @@
   "framework": "nextjs",
   "installCommand": "cd .. && npx pnpm@9 install",
   "buildCommand": "node scripts/build-data.mjs && next build",
-  "ignoreCommand": "bash -c '[[ $VERCEL_GIT_COMMIT_REF == production || $VERCEL_GIT_COMMIT_REF == main || $VERCEL_GIT_COMMIT_REF == claude/* ]] && exit 0; exit 1'"
+  "ignoreCommand": "bash -c '[[ $VERCEL_GIT_COMMIT_REF == production || $VERCEL_GIT_COMMIT_REF == main || $VERCEL_GIT_COMMIT_REF == claude/* ]] && exit 1; exit 0'"
 }
