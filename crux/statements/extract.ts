@@ -619,6 +619,14 @@ async function main() {
             }))
           : [],
       };
+    }).filter(item => {
+      // Drop structured statements with no property and no values — these render as blank rows
+      if (item.variety === 'structured' && !item.propertyId
+        && item.valueNumeric == null && !item.valueText
+        && !item.valueEntityId && !item.valueDate) {
+        return false;
+      }
+      return true;
     });
 
     const result = await createStatementBatch(items);
