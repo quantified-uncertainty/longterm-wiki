@@ -44,6 +44,9 @@ interface QualityReport {
   byProperty: Record<string, number>;
   byCategory: Record<string, number>;
   issues: QualityIssue[];
+  qualityScoreAvg?: number;
+  qualityScoreMedian?: number;
+  scoredCount?: number;
 }
 
 interface QualityIssue {
@@ -189,6 +192,19 @@ async function main() {
   const structured = result.data.structured.length;
   const attributed = result.data.attributed.length;
 
+  // Compute quality score stats if available
+  const scored = allStatements.filter(
+    (s) => s.qualityScore != null && s.qualityScore !== undefined,
+  );
+  const qualityScores = scored.map((s) => s.qualityScore as number);
+  const qualityScoreAvg = qualityScores.length > 0
+    ? Math.round((qualityScores.reduce((a, b) => a + b, 0) / qualityScores.length) * 1000) / 1000
+    : undefined;
+  const sortedQuality = [...qualityScores].sort((a, b) => a - b);
+  const qualityScoreMedian = sortedQuality.length > 0
+    ? Math.round(computeMedian(sortedQuality) * 1000) / 1000
+    : undefined;
+
   const report: QualityReport = {
     entityId: pageId,
     total,
@@ -208,6 +224,9 @@ async function main() {
     byProperty: Object.fromEntries(byProperty),
     byCategory: Object.fromEntries(byCategory),
     issues,
+    qualityScoreAvg,
+    qualityScoreMedian,
+    scoredCount: scored.length,
   };
 
   if (jsonOutput) {
@@ -286,12 +305,34 @@ async function main() {
     }
   }
 
+  // Quality scores (reuse precomputed stats from report)
+  if (report.scoredCount && report.scoredCount > 0) {
+    console.log(`\n${c.bold}Quality Scores (from statement scoring):${c.reset}`);
+    console.log(`  Scored:           ${report.scoredCount}/${total}`);
+    const avgColor = report.qualityScoreAvg! >= 0.7 ? c.green : report.qualityScoreAvg! >= 0.4 ? c.yellow : c.red;
+    console.log(`  Average:          ${avgColor}${report.qualityScoreAvg!.toFixed(3)}${c.reset}`);
+    console.log(`  Median:           ${report.qualityScoreMedian!.toFixed(3)}`);
+    console.log(`  Excellent (≥0.8): ${qualityScores.filter((s) => s >= 0.8).length}`);
+    console.log(`  Good (0.6–0.8):   ${qualityScores.filter((s) => s >= 0.6 && s < 0.8).length}`);
+    console.log(`  Fair (0.4–0.6):   ${qualityScores.filter((s) => s >= 0.4 && s < 0.6).length}`);
+    console.log(`  Poor (<0.4):      ${qualityScores.filter((s) => s < 0.4).length}`);
+    console.log(`\n  ${c.dim}Run 'crux statements score ${pageId}' to refresh scores.${c.reset}`);
+  } else {
+    console.log(`\n${c.dim}No quality scores found. Run 'crux statements score ${pageId}' to score.${c.reset}`);
+  }
+
   // Grade
   console.log(`\n${c.bold}Grade:${c.reset}`);
-  const score =
-    (report.withPropertyPercent * 0.3) +
-    (report.withCitationsPercent * 0.3) +
-    (report.verifiedPercent * 0.4);
+  // Use quality scores if available, otherwise fall back to coverage-based grade
+  let score: number;
+  if (report.qualityScoreAvg != null) {
+    score = report.qualityScoreAvg * 100; // Convert 0-1 to 0-100
+  } else {
+    score =
+      (report.withPropertyPercent * 0.3) +
+      (report.withCitationsPercent * 0.3) +
+      (report.verifiedPercent * 0.4);
+  }
   const grade = score >= 70 ? 'A' : score >= 50 ? 'B' : score >= 30 ? 'C' : 'D';
   const gradeColor = grade === 'A' ? c.green : grade === 'B' ? c.yellow : c.red;
   console.log(`  ${gradeColor}${grade}${c.reset} (score: ${Math.round(score)})`);
@@ -300,6 +341,15 @@ async function main() {
   console.log(`    Verification: ${report.verifiedPercent}% (target: 50%+)`);
 
   console.log('');
+}
+
+/** Compute median of a sorted array, averaging middle two elements for even lengths. */
+function computeMedian(sorted: number[]): number {
+  const mid = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 0) {
+    return (sorted[mid - 1] + sorted[mid]) / 2;
+  }
+  return sorted[mid];
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
