@@ -201,6 +201,7 @@ function createMockSql() {
     if (q.includes("edit_logs") && q.includes("group by") && q.includes("page_id") && q.includes("max(")) {
       const grouped: Record<string, string> = {};
       for (const e of editStore) {
+        if (e.page_id === null) continue;
         if (!grouped[e.page_id] || e.date > grouped[e.page_id]) {
           grouped[e.page_id] = e.date;
         }
@@ -213,6 +214,7 @@ function createMockSql() {
     if (q.includes("edit_logs") && q.includes("group by") && q.includes("page_id") && q.includes("min(")) {
       const grouped: Record<string, string> = {};
       for (const e of editStore) {
+        if (e.page_id === null) continue;
         if (!grouped[e.page_id] || e.date < grouped[e.page_id]) {
           grouped[e.page_id] = e.date;
         }
