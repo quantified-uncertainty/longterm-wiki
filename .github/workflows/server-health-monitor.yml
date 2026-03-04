@@ -108,34 +108,34 @@ jobs:
             gh label create "server-health" --repo "${{ github.repository }}" \
               --color "d73a4a" --description "Wiki server health monitoring" 2>/dev/null || true
 
-            cat > /tmp/issue_body.md <<ISSUE_BODY
-## Dead-man-switch: monitoring gap detected
-
-| Field | Value |
-|-------|-------|
-| **Check** | ${CHECK_STATUS} |
-| **Detected at** | ${TIMESTAMP} |
-| **Detail** | ${CHECK_ERROR} |
-
-### What this means
-
-The weekly dead-man-switch detected a potential gap in health monitoring:
-
-- **\`server-down\`** — Wiki-server is unreachable. The groundskeeper should be creating issues for this, but if both are down, this is the fallback alert.
-- **\`server-unhealthy\`** — Wiki-server is up but degraded. The groundskeeper should have caught this already — if it didn't, the groundskeeper may be down too.
-- **\`groundskeeper-down\`** — Wiki-server is healthy but the groundskeeper daemon hasn't sent a heartbeat recently. Health monitoring is not running.
-- **\`monitoring-unavailable\`** — The monitoring status endpoint is not reachable. Cannot verify groundskeeper liveness.
-- **\`error\`** — Configuration issue (missing secrets).
-
-### Actions
-
-1. Check groundskeeper pod: \`kubectl get pods -n longtermwiki -l app=groundskeeper\`
-2. Check groundskeeper logs: \`kubectl logs -n longtermwiki -l app=groundskeeper --tail=50\`
-3. Check wiki-server pod: \`kubectl get pods -n longtermwiki -l app=longterm-wiki-server-wiki-server\`
-
----
-*Created by the [dead-man-switch workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/server-health-monitor.yml). Runs weekly to verify the groundskeeper health monitor is active.*
-ISSUE_BODY
+            {
+              echo "## Dead-man-switch: monitoring gap detected"
+              echo ""
+              echo "| Field | Value |"
+              echo "|-------|-------|"
+              echo "| **Check** | ${CHECK_STATUS} |"
+              echo "| **Detected at** | ${TIMESTAMP} |"
+              echo "| **Detail** | ${CHECK_ERROR} |"
+              echo ""
+              echo "### What this means"
+              echo ""
+              echo "The weekly dead-man-switch detected a potential gap in health monitoring:"
+              echo ""
+              echo "- **\`server-down\`** — Wiki-server is unreachable. The groundskeeper should be creating issues for this, but if both are down, this is the fallback alert."
+              echo "- **\`server-unhealthy\`** — Wiki-server is up but degraded. The groundskeeper should have caught this already — if it didn't, the groundskeeper may be down too."
+              echo "- **\`groundskeeper-down\`** — Wiki-server is healthy but the groundskeeper daemon hasn't sent a heartbeat recently. Health monitoring is not running."
+              echo "- **\`monitoring-unavailable\`** — The monitoring status endpoint is not reachable. Cannot verify groundskeeper liveness."
+              echo "- **\`error\`** — Configuration issue (missing secrets)."
+              echo ""
+              echo "### Actions"
+              echo ""
+              echo "1. Check groundskeeper pod: \`kubectl get pods -n longtermwiki -l app=groundskeeper\`"
+              echo "2. Check groundskeeper logs: \`kubectl logs -n longtermwiki -l app=groundskeeper --tail=50\`"
+              echo "3. Check wiki-server pod: \`kubectl get pods -n longtermwiki -l app=longterm-wiki-server-wiki-server\`"
+              echo ""
+              echo "---"
+              echo "*Created by the [dead-man-switch workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/server-health-monitor.yml). Runs weekly to verify the groundskeeper health monitor is active.*"
+            } > /tmp/issue_body.md
 
             gh issue create \
               --repo "${{ github.repository }}" \

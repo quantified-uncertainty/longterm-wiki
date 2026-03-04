@@ -48,11 +48,13 @@ function resetStore() {
 
 /** Get latest snapshot per page (shared logic for stats/latest mock queries). */
 function getLatestByPage() {
-  const latestByPage = new Map<string, (typeof riskStore)[0]>();
+  // Phase D2a: group by page_id_int (integer) since page_id_old is no longer written
+  const latestByPage = new Map<number, (typeof riskStore)[0]>();
   for (const r of riskStore) {
-    const existing = latestByPage.get(r.page_id);
+    if (r.page_id_int == null) continue;
+    const existing = latestByPage.get(r.page_id_int);
     if (!existing || r.computed_at > existing.computed_at) {
-      latestByPage.set(r.page_id, r);
+      latestByPage.set(r.page_id_int, r);
     }
   }
   return latestByPage;
@@ -97,21 +99,22 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("insert into") &&
     q.includes("hallucination_risk_snapshots")
   ) {
-    const PARAMS_PER_ROW = 6; // Phase 4a: +1 for page_id_int
+    const PARAMS_PER_ROW = 5; // Phase D2a: page_id_int, score, level, factors, integrity_issues (no page_id_old)
     const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
     const results: (typeof riskStore)[number][] = [];
 
     for (let i = 0; i < rowCount; i++) {
       const off = i * PARAMS_PER_ROW;
+      const pageIdInt = params[off] as number | null;
       const row = {
         id: nextId++,
-        page_id: params[off] as string,
-        page_id_old: params[off] as string,
-        page_id_int: params[off + 1] as number | null,
-        score: params[off + 2] as number,
-        level: params[off + 3] as string,
-        factors: params[off + 4] as string[] | null,
-        integrity_issues: params[off + 5] as string[] | null,
+        page_id: "", // no longer written; derived from page_id_int
+        page_id_old: "", // no longer written
+        page_id_int: pageIdInt,
+        score: params[off + 1] as number,
+        level: params[off + 2] as string,
+        factors: params[off + 3] as string[] | null,
+        integrity_issues: params[off + 4] as string[] | null,
         computed_at: new Date(),
       };
       riskStore.push(row);
@@ -172,14 +175,14 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results.slice(offset, offset + limit);
   }
 
-  // ---- SELECT count(distinct page_id) FROM hallucination_risk_snapshots ----
+  // ---- SELECT count(distinct page_id_int) FROM hallucination_risk_snapshots ----
   if (
     q.includes("count(distinct") &&
-    q.includes("page_id") &&
+    q.includes("page_id_int") &&
     q.includes("hallucination_risk_snapshots")
   ) {
-    const uniquePages = new Set(riskStore.map((e) => e.page_id));
-    return [{ page_id: uniquePages.size }];
+    const uniquePages = new Set(riskStore.filter((e) => e.page_id_int != null).map((e) => e.page_id_int));
+    return [{ count: uniquePages.size }];
   }
 
   // ---- Cleanup dry-run: total count (SELECT count(*)::int AS total) ----
@@ -269,12 +272,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("row_number")
   ) {
     const keep = params[0] as number;
-    // Group by page_id, count rows beyond the keep threshold
-    const byPage = new Map<string, typeof riskStore>();
+    // Group by page_id_int (Phase D2a: partition key is now COALESCE(page_id_int, -1))
+    const byPage = new Map<number, typeof riskStore>();
     for (const r of riskStore) {
-      const arr = byPage.get(r.page_id) || [];
+      const key = r.page_id_int ?? -1;
+      const arr = byPage.get(key) || [];
       arr.push(r);
-      byPage.set(r.page_id, arr);
+      byPage.set(key, arr);
     }
     let wouldDelete = 0;
     for (const rows of byPage.values()) {
@@ -296,11 +300,12 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("row_number")
   ) {
     const keep = params[0] as number;
-    const byPage = new Map<string, typeof riskStore>();
+    const byPage = new Map<number, typeof riskStore>();
     for (const r of riskStore) {
-      const arr = byPage.get(r.page_id) || [];
+      const key = r.page_id_int ?? -1;
+      const arr = byPage.get(key) || [];
       arr.push(r);
-      byPage.set(r.page_id, arr);
+      byPage.set(key, arr);
     }
     const toDelete = new Set<number>();
     for (const rows of byPage.values()) {
