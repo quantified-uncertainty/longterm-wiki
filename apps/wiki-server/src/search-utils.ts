@@ -22,6 +22,34 @@ export function buildPrefixTsquery(q: string): string {
   return words.map((w) => `${w}:*`).join(" & ");
 }
 
+/**
+ * Build a SQL expression that boosts the FTS rank for exact or prefix title matches.
+ * - Exact match (case-insensitive): +1000 bonus (guarantees top result)
+ * - Title starts with query: +100 bonus
+ * - Query found at a word boundary in title: +10 bonus
+ *
+ * This ensures that a page titled "Anthropic" ranks above "Anthropic IPO"
+ * when the user searches for "Anthropic".
+ *
+ * @param titleColumn - SQL column reference for the title (e.g. "title" or "wp.title")
+ * @param queryParamRef - SQL parameter reference (e.g. "$1")
+ */
+export function titleMatchBoostExpr(
+  titleColumn: string,
+  queryParamRef: string,
+): string {
+  // Uses starts_with() and position() instead of LIKE to avoid
+  // LIKE special characters (%, _) in user input affecting results.
+  return `(
+    CASE
+      WHEN lower(${titleColumn}) = lower(${queryParamRef}) THEN 1000
+      WHEN starts_with(lower(${titleColumn}), lower(${queryParamRef}) || ' ') THEN 100
+      WHEN position(' ' || lower(${queryParamRef}) in lower(${titleColumn})) > 0 THEN 10
+      ELSE 0
+    END
+  )`;
+}
+
 /** Minimum pg_trgm similarity score to include in trigram fallback results. */
 export const TRIGRAM_SIMILARITY_THRESHOLD = 0.15;
 

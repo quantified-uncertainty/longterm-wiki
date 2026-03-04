@@ -17,6 +17,7 @@ import {
 } from "../api-types.js";
 import {
   buildPrefixTsquery,
+  titleMatchBoostExpr,
   TRIGRAM_SIMILARITY_THRESHOLD,
   TRIGRAM_FALLBACK_THRESHOLD,
   TS_HEADLINE_OPTIONS,
@@ -76,11 +77,12 @@ const pagesApp = new Hono()
     let results: PageSearchRow[] = [];
 
     if (prefixQuery) {
+      const titleBoost = titleMatchBoostExpr("title", "$3");
       results = await rawDb.unsafe<PageSearchRow[]>(
         `SELECT
         id, numeric_id, title, description, entity_type, category,
         reader_importance, quality,
-        ts_rank_cd(search_vector, to_tsquery('english', $1), 1) AS rank,
+        ts_rank_cd(search_vector, to_tsquery('english', $1), 1) + ${titleBoost} AS rank,
         ts_headline('english', coalesce(description, ''),
           to_tsquery('english', $1),
           '${TS_HEADLINE_OPTIONS}'
@@ -90,7 +92,7 @@ const pagesApp = new Hono()
         AND numeric_id IS NOT NULL
       ORDER BY rank DESC, reader_importance DESC NULLS LAST
       LIMIT $2`,
-        [prefixQuery, limit],
+        [prefixQuery, limit, q],
       );
     }
 
