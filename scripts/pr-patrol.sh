@@ -184,81 +184,67 @@ build_prompt() {
   local title=$3
   local branch=$4
 
-  cat <<PROMPT
-You are a PR maintenance agent for the longterm-wiki repository (quantified-uncertainty/longterm-wiki).
+  local prompt=""
+  prompt+="You are a PR maintenance agent for the longterm-wiki repository (quantified-uncertainty/longterm-wiki)."
+  prompt+=$'\n\n## Target'
+  prompt+=$'\nPR #'"${pr_num}"': "'"${title}"'" (branch: '"${branch}"')'
+  prompt+=$'\n\n## Issues Detected'
+  prompt+=$'\n'"${issues}"
+  prompt+=$'\n\n## Instructions'
+  prompt+=$'\n\n1. First, fetch PR details to understand context:'
+  prompt+=$'\n   gh pr view '"${pr_num}"' --json headRefName,body,statusCheckRollup,reviews'
+  prompt+=$'\n\n2. Check out the PR branch:'
+  prompt+=$'\n   git fetch origin '"${branch}"
+  prompt+=$'\n   git checkout '"${branch}"
+  prompt+=$'\n\n3. Fix each detected issue:'
 
-## Target
-PR #${pr_num}: "${title}" (branch: ${branch})
+  if [[ "$issues" == *conflict* ]]; then
+    prompt+=$'\n\n### Merge Conflict'
+    prompt+=$'\n- Rebase onto main: git rebase origin/main'
+    prompt+=$'\n- Resolve any conflicts (prefer keeping PR changes where intent is clear)'
+    prompt+=$'\n- If conflicts are in generated files (database.json, lock files), regenerate them'
+    prompt+=$'\n- After resolving: git rebase --continue, then git push --force-with-lease'
+  fi
 
-## Issues Detected
-${issues}
+  if [[ "$issues" == *ci-failure* ]]; then
+    prompt+=$'\n\n### CI Failure'
+    prompt+=$'\n- Check CI status: gh pr checks '"${pr_num}"' --repo quantified-uncertainty/longterm-wiki'
+    prompt+=$'\n- Read the failing check logs to understand the failure'
+    prompt+=$'\n- Fix the issue (build error, test failure, lint error)'
+    prompt+=$'\n- Run locally to verify: pnpm build and/or pnpm test'
+    prompt+=$'\n- Commit and push the fix'
+  fi
 
-## Instructions
+  if [[ "$issues" == *missing-testplan* ]]; then
+    prompt+=$'\n\n### Missing Test Plan'
+    prompt+=$'\n- Read the PR diff to understand what changed'
+    prompt+=$'\n- Update the PR body to add a "## Test plan" section with relevant verification steps'
+    prompt+=$'\n- Use gh pr edit to update the body'
+  fi
 
-1. First, fetch PR details to understand context:
-   \`\`\`
-   gh pr view ${pr_num} --json headRefName,body,statusCheckRollup,reviews
-   \`\`\`
+  if [[ "$issues" == *missing-issue-ref* ]]; then
+    prompt+=$'\n\n### Missing Issue Reference'
+    prompt+=$'\n- Search for related issues: gh issue list --search "keywords from PR title" --repo quantified-uncertainty/longterm-wiki'
+    prompt+=$'\n- If a matching issue exists, add "Closes #N" to the PR body'
+    prompt+=$'\n- If no matching issue exists, this may be fine — skip this fix'
+  fi
 
-2. Check out the PR branch:
-   \`\`\`
-   git fetch origin ${branch}
-   git checkout ${branch}
-   \`\`\`
+  if [[ "$issues" == *review-changes-requested* ]]; then
+    prompt+=$'\n\n### Review Changes Requested'
+    prompt+=$'\n- Read the review comments: gh pr view '"${pr_num}"' --comments'
+    prompt+=$'\n- Address each comment by making the requested changes'
+    prompt+=$'\n- Commit and push the fixes'
+    prompt+=$'\n- Do NOT dismiss the review — let the reviewer re-approve'
+  fi
 
-3. Fix each detected issue:
+  prompt+=$'\n\n## Guardrails'
+  prompt+=$'\n- Only fix the detected issues — do not refactor or improve unrelated code'
+  prompt+=$'\n- If a conflict is too complex to resolve confidently, skip it and note why'
+  prompt+=$'\n- After any code changes, run: pnpm crux validate gate --fix'
+  prompt+=$'\n- Use git push --force-with-lease (never --force) when pushing rebased branches'
+  prompt+=$'\n- Do not modify files unrelated to the fix'
 
-$(if [[ "$issues" == *conflict* ]]; then cat <<'FIX'
-### Merge Conflict
-- Rebase onto main: `git rebase origin/main`
-- Resolve any conflicts (prefer keeping PR changes where intent is clear)
-- If conflicts are in generated files (database.json, lock files), regenerate them
-- After resolving: `git rebase --continue` then `git push --force-with-lease`
-FIX
-fi)
-
-$(if [[ "$issues" == *ci-failure* ]]; then cat <<'FIX'
-### CI Failure
-- Check CI status: `gh pr checks ${pr_num} --repo quantified-uncertainty/longterm-wiki`
-- Read the failing check logs to understand the failure
-- Fix the issue (build error, test failure, lint error)
-- Run locally to verify: `pnpm build` and/or `pnpm test`
-- Commit and push the fix
-FIX
-fi)
-
-$(if [[ "$issues" == *missing-testplan* ]]; then cat <<'FIX'
-### Missing Test Plan
-- Read the PR diff to understand what changed
-- Update the PR body to add a "## Test plan" section with relevant verification steps
-- Use: `gh pr edit ${pr_num} --body "$(gh pr view ${pr_num} --json body -q .body)\n\n## Test plan\n- [ ] Verify ..."
-FIX
-fi)
-
-$(if [[ "$issues" == *missing-issue-ref* ]]; then cat <<'FIX'
-### Missing Issue Reference
-- Search for related issues: `gh issue list --search "keywords from PR title" --repo quantified-uncertainty/longterm-wiki`
-- If a matching issue exists, add "Closes #N" to the PR body
-- If no matching issue exists, this may be fine — skip this fix
-FIX
-fi)
-
-$(if [[ "$issues" == *review-changes-requested* ]]; then cat <<'FIX'
-### Review Changes Requested
-- Read the review comments: `gh pr view ${pr_num} --comments`
-- Address each comment by making the requested changes
-- Commit and push the fixes
-- Do NOT dismiss the review — let the reviewer re-approve
-FIX
-fi)
-
-## Guardrails
-- Only fix the detected issues — do not refactor or improve unrelated code
-- If a conflict is too complex to resolve confidently, skip it and note why
-- After any code changes, run: \`pnpm crux validate gate --fix\`
-- Use \`git push --force-with-lease\` (never \`--force\`) when pushing rebased branches
-- Do not modify files unrelated to the fix
-PROMPT
+  echo "$prompt"
 }
 
 fix_pr() {
@@ -277,11 +263,17 @@ fix_pr() {
     return 0
   fi
 
-  local prompt
-  prompt=$(build_prompt "$pr_num" "$issues" "$title" "$branch")
+  # Save current branch to restore after fix
+  local original_branch
+  original_branch=$(git branch --show-current 2>/dev/null || echo "")
+
+  # Write prompt to temp file to avoid arg-length limits
+  local prompt_file
+  prompt_file=$(mktemp "$STATE_DIR/prompt-XXXXXX.txt")
+  build_prompt "$pr_num" "$issues" "$title" "$branch" > "$prompt_file"
 
   # Build claude command
-  local claude_args=(-p "$prompt" --model "$MODEL" --max-turns "$MAX_TURNS" --verbose)
+  local claude_args=(--print --model "$MODEL" --max-turns "$MAX_TURNS" --verbose)
   if [[ "$SKIP_PERMS" == "1" ]]; then
     claude_args+=(--dangerously-skip-permissions)
   fi
@@ -289,13 +281,28 @@ fix_pr() {
   local start_time
   start_time=$(date +%s)
 
-  # Run Claude Code
-  if claude "${claude_args[@]}" 2>&1 | tee -a "$LOG_FILE"; then
-    local elapsed=$(( $(date +%s) - start_time ))
+  # Run Claude Code, piping the prompt via stdin
+  # Unset CLAUDECODE to allow spawning from within a Claude Code session
+  local exit_code=0
+  env -u CLAUDECODE claude "${claude_args[@]}" < "$prompt_file" 2>&1 | tee -a "$LOG_FILE" || exit_code=$?
+
+  local elapsed=$(( $(date +%s) - start_time ))
+  if [[ $exit_code -eq 0 ]]; then
     log "✓ PR #$pr_num processed successfully (${elapsed}s)"
   else
-    local elapsed=$(( $(date +%s) - start_time ))
-    log "✗ PR #$pr_num processing failed (${elapsed}s)"
+    log "✗ PR #$pr_num processing failed (exit: $exit_code, ${elapsed}s)"
+  fi
+
+  rm -f "$prompt_file"
+
+  # Clean up any in-progress rebase/merge left by the spawned session
+  git rebase --abort 2>/dev/null || true
+  git merge --abort 2>/dev/null || true
+  git checkout -- . 2>/dev/null || true
+
+  # Restore original branch
+  if [[ -n "$original_branch" ]]; then
+    git checkout "$original_branch" 2>/dev/null || log "  Warning: could not restore branch $original_branch"
   fi
 
   mark_processed "$pr_num"
