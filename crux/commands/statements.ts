@@ -32,6 +32,12 @@ const SCRIPTS = {
     passthrough: ['json'],
     positional: true,
   },
+  score: {
+    script: 'statements/score.ts',
+    description: 'Score statements for quality across 10 dimensions',
+    passthrough: ['json', 'dry-run'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'quality');
@@ -51,7 +57,8 @@ Options:
   --apply               Write results to database (default: dry-run preview)
   --model=M             LLM model override (default: google/gemini-2.0-flash-001)
   --fetch               Fetch missing sources from web (verify only)
-  --json                JSON output (quality only)
+  --json                JSON output (quality/score)
+  --dry-run             Preview scores without storing (score only)
 
 Examples:
   crux statements extract anthropic                Extract statements (dry run)
@@ -59,10 +66,13 @@ Examples:
   crux statements verify anthropic --apply         Verify against sources
   crux statements quality anthropic                Coverage report
   crux statements quality anthropic --json         Machine-readable output
+  crux statements score anthropic                  Score all statements (10 dimensions)
+  crux statements score anthropic --dry-run        Preview scores without storing
 
 Workflow:
   1. crux statements extract <page-id> --apply     Extract statements from page
   2. crux statements verify <page-id> --apply      Verify against cited sources
-  3. crux statements quality <page-id>             Review coverage and quality
+  3. crux statements score <page-id>               Score statement quality
+  4. crux statements quality <page-id>             Review coverage and quality
 `;
 }

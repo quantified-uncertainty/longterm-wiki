@@ -28,6 +28,7 @@ import {
   statementCitations,
   statementPageReferences,
   properties,
+  entityCoverageScores,
 } from "../schema.js";
 import {
   parseJsonBody,
@@ -110,12 +111,36 @@ function formatStatement(s: typeof statements.$inferSelect) {
     claimCategory: s.claimCategory,
     sourceFactKey: s.sourceFactKey,
     note: s.note,
+    qualityScore: s.qualityScore,
+    qualityDimensions: s.qualityDimensions,
+    scoredAt: s.scoredAt,
     createdAt: s.createdAt,
     updatedAt: s.updatedAt,
   };
 }
 
 // ---- Body schemas ----
+
+const BatchScoreBody = z.object({
+  scores: z.array(z.object({
+    statementId: z.number().int().positive(),
+    qualityScore: z.number().min(0).max(1),
+    qualityDimensions: z.record(z.number()),
+  })).min(1).max(500),
+});
+
+const CoverageScoreBody = z.object({
+  entityId: z.string().min(1).max(200),
+  coverageScore: z.number().min(0).max(1),
+  categoryScores: z.record(z.number()),
+  statementCount: z.number().int().min(0),
+  qualityAvg: z.number().min(0).max(1).nullish(),
+});
+
+const CoverageScoreQuery = z.object({
+  entityId: z.string().min(1).max(200),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
 
 const PatchStatementBody = z.object({
   status: z.enum(["active", "superseded", "retracted"]).optional(),
@@ -860,6 +885,91 @@ const statementsApp = new Hono()
     });
 
     return c.json({ inserted: results.length, results, ok: true }, 201);
+  })
+
+  // ---- POST /score — batch update quality scores ----
+  .post("/score", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = BatchScoreBody.safeParse(body);
+    if (!parsed.success) {
+      return validationError(c, parsed.error.message);
+    }
+
+    const { scores } = parsed.data;
+    const db = getDrizzleDb();
+    let updated = 0;
+
+    await db.transaction(async (tx) => {
+      for (const item of scores) {
+        const rows = await tx
+          .update(statements)
+          .set({
+            qualityScore: item.qualityScore,
+            qualityDimensions: item.qualityDimensions,
+            scoredAt: sql`now()`,
+            updatedAt: sql`now()`,
+          })
+          .where(eq(statements.id, item.statementId))
+          .returning({ id: statements.id });
+        updated += rows.length;
+      }
+    });
+
+    return c.json({ updated, ok: true });
+  })
+
+  // ---- POST /coverage-score — store entity coverage score ----
+  .post("/coverage-score", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = CoverageScoreBody.safeParse(body);
+    if (!parsed.success) {
+      return validationError(c, parsed.error.message);
+    }
+
+    const data = parsed.data;
+    const db = getDrizzleDb();
+
+    const result = await db
+      .insert(entityCoverageScores)
+      .values({
+        entityId: data.entityId,
+        coverageScore: data.coverageScore,
+        categoryScores: data.categoryScores,
+        statementCount: data.statementCount,
+        qualityAvg: data.qualityAvg ?? null,
+      })
+      .returning({ id: entityCoverageScores.id });
+
+    return c.json({ id: result[0].id, ok: true }, 201);
+  })
+
+  // ---- GET /coverage-scores — coverage score history for an entity ----
+  .get("/coverage-scores", zv("query", CoverageScoreQuery), async (c) => {
+    const { entityId, limit } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(entityCoverageScores)
+      .where(eq(entityCoverageScores.entityId, entityId))
+      .orderBy(desc(entityCoverageScores.scoredAt))
+      .limit(limit);
+
+    return c.json({
+      scores: rows.map((r) => ({
+        id: r.id,
+        entityId: r.entityId,
+        coverageScore: r.coverageScore,
+        categoryScores: r.categoryScores,
+        statementCount: r.statementCount,
+        qualityAvg: r.qualityAvg,
+        scoredAt: r.scoredAt,
+      })),
+    });
   })
 
   // ---- POST /clear-by-entity — delete all statements for an entity ----
