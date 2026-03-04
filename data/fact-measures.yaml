@@ -380,6 +380,7 @@ measures:
     label: "Doom Probability"
     unit: percent
     category: safety
+    direction: lower
     description: "Estimated probability of existential catastrophe from AI"
     applicableTo: [organization, person]
 
@@ -387,6 +388,7 @@ measures:
     label: "Risk Probability"
     unit: percent
     category: safety
+    direction: lower
     description: "Estimated probability of a specific risk scenario materializing"
     applicableTo: [organization, person]
 
@@ -401,6 +403,7 @@ measures:
     label: "Alignment Faking Rate"
     unit: percent
     category: safety
+    direction: lower
     description: "Observed or estimated rate of alignment faking behavior in AI systems"
     applicableTo: [organization]
 
