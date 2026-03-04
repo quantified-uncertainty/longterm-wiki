@@ -1220,12 +1220,13 @@ export const statementPageReferences = pgTable(
   "statement_page_references",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    statementId: bigint("statement_id", { mode: "number" }).references(
+    statementId: bigint("statement_id", { mode: "number" }).notNull().references(
       () => statements.id,
       { onDelete: "cascade" }
     ),
     pageIdInt: integer("page_id_int").references(
-      () => wikiPages.integerIdCol
+      () => wikiPages.integerIdCol,
+      { onDelete: "cascade" }
     ),
     footnoteResourceId: varchar("footnote_resource_id"),
     section: text("section"),
@@ -1234,6 +1235,7 @@ export const statementPageReferences = pgTable(
   (t) => [
     index("idx_spr_page").on(t.pageIdInt),
     index("idx_spr_statement").on(t.statementId),
+    uniqueIndex("idx_spr_stmt_page_footnote").on(t.statementId, t.pageIdInt, t.footnoteResourceId),
   ]
 );
 

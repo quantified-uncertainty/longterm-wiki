@@ -345,13 +345,7 @@ const statementsApp = new Hono()
       return c.json({ statements: [] });
     }
 
-    const statementIds = [
-      ...new Set(
-        refs
-          .map((r) => r.statementId)
-          .filter((id): id is number => id !== null)
-      ),
-    ];
+    const statementIds = [...new Set(refs.map((r) => r.statementId))];
 
     if (statementIds.length === 0) {
       return c.json({ statements: [] });
@@ -619,7 +613,7 @@ const statementsApp = new Hono()
         .insert(statements)
         .values({
           variety: data.variety,
-          statementText: data.statementText ?? null,
+          statementText: data.statementText,
           subjectEntityId: data.subjectEntityId,
           propertyId: data.propertyId ?? null,
           qualifierKey: data.qualifierKey ?? null,
