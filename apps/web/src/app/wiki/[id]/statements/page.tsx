@@ -112,10 +112,11 @@ export default async function EntityStatementsPage({ params }: PageProps) {
 
   const { structured, attributed, total } = data;
 
-  // Group structured statements by property category
+  // Group structured statements by property category;
+  // null-property text claims land in "text claims"
   const byCategory = new Map<string, StatementWithDetails[]>();
   for (const s of structured) {
-    const cat = s.property?.category ?? "uncategorized";
+    const cat = s.property?.category ?? (s.statementText ? "text claims" : "uncategorized");
     const list = byCategory.get(cat) ?? [];
     list.push(s);
     byCategory.set(cat, list);
@@ -268,24 +269,26 @@ function PropertyGroup({
 
 function StructuredRow({ statement: s }: { statement: StatementWithDetails }) {
   const value = formatStatementValue(s, s.property);
+  const isTextOnly = !s.propertyId && !!s.statementText;
+  const displayValue = value !== "—" ? value : (s.statementText ?? "—");
   const statusBadge = getStatusBadge(s.status);
   const isSuperseded = s.status === "superseded";
 
   return (
     <tr className={`border-b border-border/30 last:border-0 ${isSuperseded ? "opacity-60" : ""}`}>
-      <td className="px-3 py-2 text-xs font-medium">
+      <td className="px-3 py-2 text-xs font-medium text-muted-foreground">
         {s.property?.label ?? s.propertyId ?? "—"}
       </td>
-      <td className="px-3 py-2 text-xs font-semibold tabular-nums">
+      <td className={`px-3 py-2 text-xs ${isTextOnly ? "italic text-muted-foreground" : "font-semibold tabular-nums"}`}>
         {s.valueEntityId ? (
           <Link
             href={`/wiki/${s.valueEntityId}`}
             className="text-blue-600 hover:underline"
           >
-            {value}
+            {displayValue}
           </Link>
         ) : (
-          value
+          displayValue
         )}
       </td>
       <td className="px-3 py-2 text-xs text-muted-foreground">
