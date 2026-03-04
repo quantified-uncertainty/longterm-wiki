@@ -108,30 +108,24 @@ export default async function StatementDetailPage({ params }: PageProps) {
   const numericId = parseInt(id, 10);
   if (isNaN(numericId)) notFound();
 
-  // Paginate through the list endpoint to find the statement by ID.
-  // The API doesn't support a direct /:id GET, so we page through results.
-  const PAGE_SIZE = 500;
-  let statement: StatementDetail | undefined;
-  let offset = 0;
-  let total = Infinity;
+  // Fetch the statement directly by ID
+  const { data: detail } = await withApiFallback(
+    () =>
+      fetchDetailed<{
+        statement: StatementDetail;
+        citations: Citation[];
+        property: PropertyInfo | null;
+      }>(`/api/statements/${numericId}`, { revalidate: 300 }),
+    () => null
+  );
 
-  while (offset < total && !statement) {
-    const { data: page } = await withApiFallback(
-      () =>
-        fetchDetailed<{ statements: StatementDetail[]; total: number }>(
-          `/api/statements?limit=${PAGE_SIZE}&offset=${offset}`,
-          { revalidate: 300 }
-        ),
-      () => ({ statements: [], total: 0 })
-    );
-    total = page.total;
-    statement = page.statements.find((s) => s.id === numericId);
-    offset += PAGE_SIZE;
-  }
+  if (!detail) notFound();
 
-  if (!statement) notFound();
+  const statement = detail.statement;
+  const citations = detail.citations;
+  const propertyInfo = detail.property;
 
-  // Fetch the full entity data (citations, property info) via the by-entity endpoint
+  // Fetch related statements (same entity + property) via the by-entity endpoint
   const { data: entityData } = await withApiFallback(
     () =>
       fetchDetailed<{
@@ -145,25 +139,7 @@ export default async function StatementDetailPage({ params }: PageProps) {
     () => ({ structured: [], attributed: [], total: 0 })
   );
 
-  // Find the full statement with citations from the by-entity response
   const allEntityStatements = [...entityData.structured, ...entityData.attributed];
-  const fullStatement = allEntityStatements.find((s) => s.id === numericId);
-  const citations = fullStatement?.citations ?? [];
-  const property = fullStatement?.property ?? null;
-
-  // Fetch property details if we have a propertyId but no property from by-entity
-  let propertyInfo = property;
-  if (!propertyInfo && statement.propertyId) {
-    const { data: propsData } = await withApiFallback(
-      () =>
-        fetchDetailed<{ properties: PropertyInfo[] }>(
-          "/api/statements/properties",
-          { revalidate: 300 }
-        ),
-      () => ({ properties: [] })
-    );
-    propertyInfo = propsData.properties.find((p) => p.id === statement.propertyId) ?? null;
-  }
 
   const entityName =
     getEntityById(statement.subjectEntityId)?.title ??

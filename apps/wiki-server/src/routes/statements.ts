@@ -33,6 +33,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  notFoundError,
   VALIDATION_ERROR,
 } from "./utils.js";
 
@@ -572,6 +573,74 @@ const statementsApp = new Hono()
       byVariety: Object.fromEntries(byVariety.map((r) => [r.variety, r.count])),
       byStatus: Object.fromEntries(byStatus.map((r) => [r.status, r.count])),
       propertiesCount: propertiesCount[0].count,
+    });
+  })
+
+  // ---- GET /:id — fetch a single statement with citations and property ----
+  .get("/:id", async (c) => {
+    const idParam = c.req.param("id");
+    const id = parseInt(idParam, 10);
+    if (isNaN(id) || id <= 0) {
+      return c.json(
+        { error: VALIDATION_ERROR, message: "Statement ID must be a positive integer" },
+        400
+      );
+    }
+
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(statements)
+      .where(eq(statements.id, id))
+      .limit(1);
+
+    if (rows.length === 0) {
+      return notFoundError(c, `Statement not found: ${id}`);
+    }
+
+    const stmt = rows[0];
+
+    // Fetch citations and property in parallel
+    const [citationRows, propertyRows] = await Promise.all([
+      db
+        .select()
+        .from(statementCitations)
+        .where(eq(statementCitations.statementId, id)),
+      stmt.propertyId
+        ? db
+            .select()
+            .from(properties)
+            .where(eq(properties.id, stmt.propertyId))
+            .limit(1)
+        : Promise.resolve([]),
+    ]);
+
+    const prop = propertyRows[0] ?? null;
+
+    return c.json({
+      statement: {
+        ...formatStatement(stmt),
+        citationCount: citationRows.length,
+      },
+      citations: citationRows.map((cit) => ({
+        id: cit.id,
+        resourceId: cit.resourceId,
+        url: cit.url,
+        sourceQuote: cit.sourceQuote,
+        locationNote: cit.locationNote,
+        isPrimary: cit.isPrimary,
+      })),
+      property: prop
+        ? {
+            id: prop.id,
+            label: prop.label,
+            category: prop.category,
+            description: prop.description,
+            valueType: prop.valueType,
+            unitFormatId: prop.unitFormatId,
+          }
+        : null,
     });
   })
 
