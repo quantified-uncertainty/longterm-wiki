@@ -46,8 +46,8 @@ const SCRIPTS = {
   },
   improve: {
     script: 'statements/improve.ts',
-    description: 'Generate new statements to fill coverage gaps',
-    passthrough: ['json', 'dry-run', 'org-type', 'category', 'no-research', 'min-score', 'budget'],
+    description: 'Generate new statements or rewrite low-quality ones',
+    passthrough: ['json', 'dry-run', 'org-type', 'category', 'no-research', 'min-score', 'budget', 'mode'],
     positional: true,
   },
 };
@@ -75,7 +75,8 @@ Options:
   --org-type=TYPE       Organization subtype (e.g., frontier-lab, safety-org)
   --category=CAT        Target a single category (improve only)
   --no-research         Skip web research (improve only)
-  --min-score=N         Quality gate threshold (default: 0.5, improve only)
+  --mode=MODE           "gaps" (default) or "quality" (improve only)
+  --min-score=N         Quality gate threshold (default: 0.5 for gaps, 0.4 for quality)
   --budget=N            Cost cap in USD (default: 5, improve only)
 
 Examples:
@@ -93,6 +94,8 @@ Examples:
   crux statements improve anthropic --dry-run      Preview generated statements
   crux statements improve anthropic --category=safety  Target one category
   crux statements improve anthropic --no-research  Skip web search
+  crux statements improve anthropic --mode=quality  Rewrite low-quality statements
+  crux statements improve anthropic --mode=quality --min-score=0.3  Lower threshold
 
 Workflow:
   1. crux statements extract <page-id> --apply     Extract statements from page
