@@ -212,6 +212,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   claims      Extract and verify atomic factual claims from wiki pages
   epic        Multi-issue epic management (via GitHub Discussions)
   ids         Entity ID allocation and lookup (allocate, check, list)
+  statements  Extract and verify structured statements from wiki pages
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

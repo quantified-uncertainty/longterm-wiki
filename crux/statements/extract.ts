@@ -498,20 +498,7 @@ async function main() {
     return;
   }
 
-  // Check for existing statements and handle idempotency
-  const existingResult = await getStatementsByEntity(pageId);
-  const existingKeys = new Set<string>();
-  if (existingResult.ok) {
-    const allExisting = [
-      ...existingResult.data.structured,
-      ...existingResult.data.attributed,
-    ];
-    for (const s of allExisting) {
-      if (s.sourceFactKey) existingKeys.add(s.sourceFactKey);
-    }
-  }
-
-  // Clear existing extracted statements (those with sourceFactKey patterns matching this entity)
+  // Clear existing extracted statements and re-insert (idempotent re-extraction)
   console.log(`\n  Clearing existing extracted statements for ${pageId}...`);
   const clearResult = await clearStatementsByEntity(pageId);
   if (clearResult.ok) {

@@ -741,7 +741,9 @@ const statementsApp = new Hono()
           })
           .returning({ id: statements.id });
 
-        if (result.length === 0) continue;
+        if (result.length === 0) {
+          throw new Error(`Statement insert returned no rows for item at index ${results.length}`);
+        }
         const id = result[0].id;
 
         if (data.citations.length > 0) {

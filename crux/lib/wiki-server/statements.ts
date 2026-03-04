@@ -127,6 +127,27 @@ export async function clearStatementsByEntity(
   );
 }
 
+export interface PatchStatementInput {
+  status?: 'active' | 'superseded' | 'retracted';
+  archiveReason?: string | null;
+  verdict?: string | null;
+  verdictScore?: number | null;
+  verdictQuotes?: string | null;
+  verdictModel?: string | null;
+  note?: string | null;
+}
+
+export async function patchStatement(
+  id: number,
+  input: PatchStatementInput,
+): Promise<ApiResult<{ statement: StatementRow; ok: boolean }>> {
+  return apiRequest<{ statement: StatementRow; ok: boolean }>(
+    'PATCH',
+    `/api/statements/${id}`,
+    input,
+  );
+}
+
 export async function listStatements(
   opts: { entityId?: string; propertyId?: string; limit?: number; offset?: number } = {},
 ): Promise<ApiResult<ListStatementsResult>> {

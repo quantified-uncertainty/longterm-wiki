@@ -24,7 +24,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { callOpenRouter, stripCodeFences, parseJsonWithRepair, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
-import { apiRequest } from '../lib/wiki-server/client.ts';
+import { patchStatement } from '../lib/wiki-server/statements.ts';
 import {
   getStatementsByEntity,
 } from '../lib/wiki-server/statements.ts';
@@ -186,12 +186,13 @@ async function main() {
   let disputed = 0;
   let noSource = 0;
   let noCitation = 0;
+  let noText = 0;
   let errors = 0;
 
   for (const stmt of allStatements) {
     const text = stmt.statementText;
     if (!text) {
-      noCitation++;
+      noText++;
       continue;
     }
 
@@ -246,16 +247,16 @@ async function main() {
 
     // Update statement with verdict (via PATCH)
     if (!dryRun) {
-      await apiRequest(
-        'PATCH',
-        `/api/statements/${stmt.id}`,
-        {
-          verdict: verificationResult.verdict,
-          verdictScore: verificationResult.confidence,
-          verdictQuotes: verificationResult.quote || null,
-          verdictModel: model ?? DEFAULT_CITATION_MODEL,
-        },
-      );
+      const patchResult = await patchStatement(stmt.id, {
+        verdict: verificationResult.verdict,
+        verdictScore: verificationResult.confidence,
+        verdictQuotes: verificationResult.quote || null,
+        verdictModel: model ?? DEFAULT_CITATION_MODEL,
+      });
+      if (!patchResult.ok) {
+        console.warn(`  ${c.yellow}Failed to update statement ${stmt.id}: ${patchResult.message}${c.reset}`);
+        errors++;
+      }
     }
   }
 
@@ -265,6 +266,7 @@ async function main() {
   console.log(`  ${c.yellow}Unsupported:${c.reset}  ${unsupported}`);
   console.log(`  ${c.dim}No source:${c.reset}    ${noSource}`);
   console.log(`  ${c.dim}No citations:${c.reset} ${noCitation}`);
+  if (noText > 0) console.log(`  ${c.dim}No text:${c.reset}      ${noText}`);
   if (errors > 0) console.log(`  ${c.red}Errors:${c.reset}       ${errors}`);
 
   // Suggest fetching source content if many are missing

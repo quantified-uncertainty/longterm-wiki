@@ -1224,13 +1224,13 @@ export const statementPageReferences = pgTable(
       () => statements.id,
       { onDelete: "cascade" }
     ),
-    pageIdInt: integer("page_id_int").references(
+    pageIdInt: integer("page_id_int").notNull().references(
       () => wikiPages.integerIdCol,
       { onDelete: "cascade" }
     ),
     footnoteResourceId: varchar("footnote_resource_id"),
     section: text("section"),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     index("idx_spr_page").on(t.pageIdInt),
