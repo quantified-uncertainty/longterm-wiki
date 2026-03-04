@@ -32,16 +32,22 @@ Parse the summary line (e.g. `12 files changed, 450 insertions(+), 120 deletions
 - **Files changed** = number before "files changed"
 - **Lines changed** = insertions + deletions
 
-**Check if `/review-pr` was run** by testing for the marker file and validating the commit SHA:
+**Check if `/review-pr` was run** by testing for the marker file, validating the commit SHA, and verifying the diff hash:
 
 ```bash
 if [ -f .claude/review-done ]; then
   MARKER_SHA=$(awk '{print $2}' .claude/review-done)
+  MARKER_HASH=$(awk '{print $4}' .claude/review-done)
   HEAD_SHA=$(git rev-parse HEAD)
-  if [ "$MARKER_SHA" = "$HEAD_SHA" ]; then
-    echo "REVIEWED (SHA matches HEAD)"
-  else
+  CURRENT_HASH=$(git diff $(git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main)...HEAD | shasum -a 256 | cut -c1-12)
+  if [ "$MARKER_SHA" = "$HEAD_SHA" ] && [ -n "$MARKER_HASH" ] && [ "$MARKER_HASH" = "$CURRENT_HASH" ]; then
+    echo "REVIEWED (SHA + diff hash match)"
+  elif [ "$MARKER_SHA" = "$HEAD_SHA" ] && [ -z "$MARKER_HASH" ]; then
+    echo "STALE_FORMAT (missing diff hash — re-run /review-pr)"
+  elif [ "$MARKER_SHA" != "$HEAD_SHA" ]; then
     echo "STALE (marker SHA ${MARKER_SHA:0:8} != HEAD ${HEAD_SHA:0:8})"
+  else
+    echo "STALE (diff hash mismatch)"
   fi
 else
   echo "NOT_REVIEWED"
@@ -108,20 +114,26 @@ Run `pnpm crux agent-checklist snapshot` and capture the output — this is the 
 
 Session logs are stored in the wiki-server PostgreSQL database (not committed to git). The checklist state is automatically synced to the DB when you use the `crux agent-checklist` commands. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly in any session summaries.
 
-**Record review status**: Check for the marker file, verify the SHA matches HEAD, and set the `reviewed` field in the session log payload accordingly:
+**Record review status**: Check for the marker file, verify both the SHA and diff hash match, and set the `reviewed` field in the session log payload accordingly:
 
 ```bash
-# Returns "true" if reviewed with matching SHA, "false" otherwise
+# Returns "true" only if SHA matches HEAD AND diff hash matches current diff
 if [ -f .claude/review-done ]; then
   MARKER_SHA=$(awk '{print $2}' .claude/review-done)
+  MARKER_HASH=$(awk '{print $4}' .claude/review-done)
   HEAD_SHA=$(git rev-parse HEAD)
-  [ "$MARKER_SHA" = "$HEAD_SHA" ] && echo "true" || echo "false"
+  CURRENT_HASH=$(git diff $(git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main)...HEAD | shasum -a 256 | cut -c1-12)
+  if [ "$MARKER_SHA" = "$HEAD_SHA" ] && [ -n "$MARKER_HASH" ] && [ "$MARKER_HASH" = "$CURRENT_HASH" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
 else
   echo "false"
 fi
 ```
 
-Include `reviewed: true` or `reviewed: false` in the session log payload sent to the wiki-server. This enables the `/internal/agent-sessions` dashboard to show review coverage over time.
+Include `reviewed: true` or `reviewed: false` in the session log payload sent to the wiki-server. This enables the `/internal/agent-sessions` dashboard to show review coverage over time. A marker without a diff hash (legacy format) is treated as `reviewed: false`.
 
 ## Step 7: Validate completion
 
