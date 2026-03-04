@@ -1215,6 +1215,30 @@ export const statementCitations = pgTable(
   ]
 );
 
+/** Statement-to-page references — links a statement to every wiki page it appears on. */
+export const statementPageReferences = pgTable(
+  "statement_page_references",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    statementId: bigint("statement_id", { mode: "number" }).notNull().references(
+      () => statements.id,
+      { onDelete: "cascade" }
+    ),
+    pageIdInt: integer("page_id_int").notNull().references(
+      () => wikiPages.integerIdCol,
+      { onDelete: "cascade" }
+    ),
+    footnoteResourceId: varchar("footnote_resource_id"),
+    section: text("section"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("idx_spr_page").on(t.pageIdInt),
+    index("idx_spr_statement").on(t.statementId),
+    uniqueIndex("idx_spr_stmt_page_footnote").on(t.statementId, t.pageIdInt, t.footnoteResourceId),
+  ]
+);
+
 export const pageCitations = pgTable(
   "page_citations",
   {

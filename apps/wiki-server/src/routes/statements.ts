@@ -3,6 +3,8 @@
  *
  * - GET /          — list with filters (by entity, property, variety, status)
  * - GET /current   — current value for entity+property (valid_end IS NULL)
+ * - GET /by-page   — all statements for a page with citations and footnote links
+ * - GET /by-page/summary — per-footnote verification summary for citation dots
  * - GET /properties — list all properties with statement counts
  * - GET /stats     — basic statistics
  * - PATCH /:id     — update statement status, verdict, or note
@@ -24,6 +26,7 @@ import { getDrizzleDb } from "../db.js";
 import {
   statements,
   statementCitations,
+  statementPageReferences,
   properties,
 } from "../schema.js";
 import {
@@ -56,6 +59,10 @@ const CurrentQuery = z.object({
 
 const ByEntityQuery = z.object({
   entityId: z.string().min(1).max(200),
+});
+
+const ByPageQuery = z.object({
+  pageId: z.coerce.number().int().positive(),
 });
 
 // ---- Zod validator helper (uses Hono's built-in validator for RPC type inference) ----
@@ -122,7 +129,7 @@ const PatchStatementBody = z.object({
 
 const CreateStatementBody = z.object({
   variety: z.enum(["structured", "attributed"]),
-  statementText: z.string().max(2000).nullish(),
+  statementText: z.string().min(1).max(2000), // Required: every statement needs human-readable text
   subjectEntityId: z.string().min(1).max(200),
   propertyId: z.string().max(200).nullish(),
   qualifierKey: z.string().max(200).nullish(),
@@ -137,6 +144,11 @@ const CreateStatementBody = z.object({
   temporalGranularity: z.string().max(20).nullish(),
   attributedTo: z.string().max(200).nullish(),
   note: z.string().max(2000).nullish(),
+  sourceFactKey: z.string().max(200).nullish(),
+  claimCategory: z.string().max(50).nullish(),
+  verdict: z.string().max(50).nullish(),
+  verdictScore: z.number().min(0).max(1).nullish(),
+  verdictModel: z.string().max(200).nullish(),
   citations: z
     .array(
       z.object({
@@ -149,6 +161,24 @@ const CreateStatementBody = z.object({
     )
     .optional()
     .default([]),
+  pageReferences: z
+    .array(
+      z.object({
+        pageIdInt: z.number().int().positive(),
+        footnoteResourceId: z.string().max(200).nullish(),
+        section: z.string().max(500).nullish(),
+      })
+    )
+    .optional()
+    .default([]),
+});
+
+const BatchCreateBody = z.object({
+  statements: z.array(CreateStatementBody).min(1).max(100),
+});
+
+const ClearByEntityQuery = z.object({
+  entityId: z.string().min(1).max(200),
 });
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
@@ -322,6 +352,157 @@ const statementsApp = new Hono()
     const attributed = formatted.filter((s) => s.variety === "attributed");
 
     return c.json({ structured, attributed, total: rows.length });
+  })
+
+  // ---- GET /by-page — all statements for a page with citations and footnote links ----
+  .get("/by-page", zv("query", ByPageQuery), async (c) => {
+    const { pageId } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Get all page references for this page
+    const refs = await db
+      .select()
+      .from(statementPageReferences)
+      .where(eq(statementPageReferences.pageIdInt, pageId));
+
+    if (refs.length === 0) {
+      return c.json({ statements: [] });
+    }
+
+    const statementIds = [...new Set(refs.map((r) => r.statementId))];
+
+    if (statementIds.length === 0) {
+      return c.json({ statements: [] });
+    }
+
+    // Fetch statements and citations in parallel
+    const [stmtRows, citRows] = await Promise.all([
+      db
+        .select()
+        .from(statements)
+        .where(
+          sql`${statements.id} IN (${sql.join(
+            statementIds.map((id) => sql`${id}`),
+            sql`, `
+          )})`
+        ),
+      db
+        .select()
+        .from(statementCitations)
+        .where(
+          sql`${statementCitations.statementId} IN (${sql.join(
+            statementIds.map((id) => sql`${id}`),
+            sql`, `
+          )})`
+        ),
+    ]);
+
+    // Build citation map: statementId -> citations[]
+    const citationMap = new Map<number, (typeof citRows)[number][]>();
+    for (const cit of citRows) {
+      const list = citationMap.get(cit.statementId) ?? [];
+      list.push(cit);
+      citationMap.set(cit.statementId, list);
+    }
+
+    // Build statement map: id -> statement
+    const stmtMap = new Map(stmtRows.map((s) => [s.id, s]));
+
+    // Build ref map: statementId -> page reference info[] (a statement can appear multiple times on a page)
+    const refMap = new Map<
+      number,
+      Array<{ footnoteResourceId: string | null; section: string | null }>
+    >();
+    for (const ref of refs) {
+      if (ref.statementId !== null) {
+        const list = refMap.get(ref.statementId) ?? [];
+        list.push({
+          footnoteResourceId: ref.footnoteResourceId,
+          section: ref.section,
+        });
+        refMap.set(ref.statementId, list);
+      }
+    }
+
+    // Combine: for each statement, attach citations and page reference info
+    const result = statementIds
+      .map((id) => {
+        const stmt = stmtMap.get(id);
+        if (!stmt) return null;
+        const cits = citationMap.get(id) ?? [];
+        const pageRefs = refMap.get(id) ?? [];
+        return {
+          ...formatStatement(stmt),
+          pageReferences: pageRefs,
+          citations: cits.map((cit) => ({
+            id: cit.id,
+            resourceId: cit.resourceId,
+            url: cit.url,
+            sourceQuote: cit.sourceQuote,
+            locationNote: cit.locationNote,
+            isPrimary: cit.isPrimary,
+          })),
+        };
+      })
+      .filter((s): s is NonNullable<typeof s> => s !== null);
+
+    return c.json({ statements: result });
+  })
+
+  // ---- GET /by-page/summary — per-footnote verification summary for citation dots ----
+  .get("/by-page/summary", zv("query", ByPageQuery), async (c) => {
+    const { pageId } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Get all page references for this page, joined with statement verdicts
+    const rows = await db
+      .select({
+        footnoteResourceId: statementPageReferences.footnoteResourceId,
+        verdict: statements.verdict,
+      })
+      .from(statementPageReferences)
+      .innerJoin(
+        statements,
+        eq(statementPageReferences.statementId, statements.id)
+      )
+      .where(eq(statementPageReferences.pageIdInt, pageId));
+
+    // Group by footnoteResourceId and aggregate verdicts
+    const footnoteMap = new Map<
+      string,
+      {
+        statementCount: number;
+        verdicts: { verified: number; disputed: number; unchecked: number };
+      }
+    >();
+
+    for (const row of rows) {
+      const key = row.footnoteResourceId ?? "__none__";
+      const entry = footnoteMap.get(key) ?? {
+        statementCount: 0,
+        verdicts: { verified: 0, disputed: 0, unchecked: 0 },
+      };
+      entry.statementCount++;
+      if (row.verdict === "verified") {
+        entry.verdicts.verified++;
+      } else if (
+        row.verdict === "disputed" ||
+        row.verdict === "unsupported"
+      ) {
+        entry.verdicts.disputed++;
+      } else {
+        entry.verdicts.unchecked++;
+      }
+      footnoteMap.set(key, entry);
+    }
+
+    const footnotes = [...footnoteMap.entries()].map(([key, val]) => ({
+      footnoteResourceId: key === "__none__" ? null : key,
+      statementCount: val.statementCount,
+      verdicts: val.verdicts,
+    }));
+
+    return c.json({ footnotes });
   })
 
   // ---- GET /properties — list all properties with statement counts ----
@@ -505,7 +686,7 @@ const statementsApp = new Hono()
     return c.json({ statement: formatStatement(rows[0]), ok: true });
   })
 
-  // ---- POST / — create statement + optional citations ----
+  // ---- POST / — create statement + optional citations + page references ----
   .post("/", async (c) => {
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
@@ -518,13 +699,12 @@ const statementsApp = new Hono()
     const data = parsed.data;
     const db = getDrizzleDb();
 
-    // Wrap in transaction for atomicity (statement + citations)
     const statementId = await db.transaction(async (tx) => {
       const result = await tx
         .insert(statements)
         .values({
           variety: data.variety,
-          statementText: data.statementText ?? null,
+          statementText: data.statementText,
           subjectEntityId: data.subjectEntityId,
           propertyId: data.propertyId ?? null,
           qualifierKey: data.qualifierKey ?? null,
@@ -539,6 +719,11 @@ const statementsApp = new Hono()
           temporalGranularity: data.temporalGranularity ?? null,
           attributedTo: data.attributedTo ?? null,
           note: data.note ?? null,
+          sourceFactKey: data.sourceFactKey ?? null,
+          claimCategory: data.claimCategory ?? null,
+          verdict: data.verdict ?? null,
+          verdictScore: data.verdictScore ?? null,
+          verdictModel: data.verdictModel ?? null,
           status: "active",
         })
         .returning({ id: statements.id });
@@ -549,7 +734,6 @@ const statementsApp = new Hono()
 
       const id = result[0].id;
 
-      // Insert citations if provided
       if (data.citations.length > 0) {
         await tx.insert(statementCitations).values(
           data.citations.map((cit) => ({
@@ -563,10 +747,137 @@ const statementsApp = new Hono()
         );
       }
 
+      if (data.pageReferences.length > 0) {
+        await tx.insert(statementPageReferences).values(
+          data.pageReferences.map((ref) => ({
+            statementId: id,
+            pageIdInt: ref.pageIdInt,
+            footnoteResourceId: ref.footnoteResourceId ?? null,
+            section: ref.section ?? null,
+          }))
+        );
+      }
+
       return id;
     });
 
     return c.json({ id: statementId, ok: true }, 201);
+  })
+
+  // ---- POST /batch — bulk create statements ----
+  .post("/batch", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = BatchCreateBody.safeParse(body);
+    if (!parsed.success) {
+      return validationError(c, parsed.error.message);
+    }
+
+    const items = parsed.data.statements;
+    const db = getDrizzleDb();
+
+    const results: Array<{ id: number; sourceFactKey: string | null }> = [];
+
+    await db.transaction(async (tx) => {
+      for (let idx = 0; idx < items.length; idx++) {
+        const data = items[idx];
+        const result = await tx
+          .insert(statements)
+          .values({
+            variety: data.variety,
+            statementText: data.statementText,
+            subjectEntityId: data.subjectEntityId,
+            propertyId: data.propertyId ?? null,
+            qualifierKey: data.qualifierKey ?? null,
+            valueNumeric: data.valueNumeric ?? null,
+            valueUnit: data.valueUnit ?? null,
+            valueText: data.valueText ?? null,
+            valueEntityId: data.valueEntityId ?? null,
+            valueDate: data.valueDate ?? null,
+            valueSeries:
+              (data.valueSeries as Record<string, unknown>) ?? null,
+            validStart: data.validStart ?? null,
+            validEnd: data.validEnd ?? null,
+            temporalGranularity: data.temporalGranularity ?? null,
+            attributedTo: data.attributedTo ?? null,
+            note: data.note ?? null,
+            sourceFactKey: data.sourceFactKey ?? null,
+            claimCategory: data.claimCategory ?? null,
+            verdict: data.verdict ?? null,
+            verdictScore: data.verdictScore ?? null,
+            verdictModel: data.verdictModel ?? null,
+            status: "active",
+          })
+          .returning({ id: statements.id });
+
+        if (result.length === 0) {
+          throw new Error(`Statement insert returned no rows for item at index ${results.length}`);
+        }
+        const id = result[0].id;
+
+        if (data.citations.length > 0) {
+          await tx.insert(statementCitations).values(
+            data.citations.map((cit) => ({
+              statementId: id,
+              resourceId: cit.resourceId ?? null,
+              url: cit.url ?? null,
+              sourceQuote: cit.sourceQuote ?? null,
+              locationNote: cit.locationNote ?? null,
+              isPrimary: cit.isPrimary,
+            }))
+          );
+        }
+
+        if (data.pageReferences.length > 0) {
+          await tx.insert(statementPageReferences).values(
+            data.pageReferences.map((ref) => ({
+              statementId: id,
+              pageIdInt: ref.pageIdInt,
+              footnoteResourceId: ref.footnoteResourceId ?? null,
+              section: ref.section ?? null,
+            }))
+          );
+        }
+
+        results.push({
+          id,
+          sourceFactKey: data.sourceFactKey ?? null,
+        });
+      }
+    }).catch((err) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      // Log the full error including Postgres detail/hint/constraint
+      const pgErr = err as { detail?: string; constraint?: string; code?: string; hint?: string };
+      console.error(`[statements/batch] Transaction failed at item ${results.length}: ${msg}`);
+      if (pgErr.detail) console.error(`  PG detail: ${pgErr.detail}`);
+      if (pgErr.constraint) console.error(`  PG constraint: ${pgErr.constraint}`);
+      if (pgErr.code) console.error(`  PG code: ${pgErr.code}`);
+      throw err;
+    });
+
+    return c.json({ inserted: results.length, results, ok: true }, 201);
+  })
+
+  // ---- POST /clear-by-entity — delete all statements for an entity ----
+  .post("/clear-by-entity", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = ClearByEntityQuery.safeParse(body);
+    if (!parsed.success) {
+      return validationError(c, parsed.error.message);
+    }
+
+    const { entityId } = parsed.data;
+    const db = getDrizzleDb();
+
+    const deleted = await db
+      .delete(statements)
+      .where(eq(statements.subjectEntityId, entityId))
+      .returning({ id: statements.id });
+
+    return c.json({ deleted: deleted.length, ok: true });
   });
 
 export const statementsRoute = statementsApp;
