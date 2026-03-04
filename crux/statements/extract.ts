@@ -545,8 +545,13 @@ async function main() {
         citations: stmt.footnoteRefs.map((ref, idx) => {
           const resource = getResourceById(ref);
           return {
-            resourceId: ref,
+            // Don't set resourceId — rc-XXXX IDs are local YAML identifiers,
+            // not entries in the wiki-server resources table (FK constraint).
+            // Store the URL instead for display and verification.
+            resourceId: null,
             url: resource?.url ?? null,
+            sourceQuote: null,
+            locationNote: `footnote: ${ref}`,
             isPrimary: idx === 0,
           };
         }),
