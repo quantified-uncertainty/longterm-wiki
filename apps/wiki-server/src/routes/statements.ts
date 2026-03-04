@@ -851,6 +851,7 @@ const statementsApp = new Hono()
       const pgErr = err as { detail?: string; constraint?: string; code?: string; hint?: string };
       console.error(`[statements/batch] Transaction failed at item ${results.length}: ${msg}`);
       if (pgErr.detail) console.error(`  PG detail: ${pgErr.detail}`);
+      if (pgErr.hint) console.error(`  PG hint: ${pgErr.hint}`);
       if (pgErr.constraint) console.error(`  PG constraint: ${pgErr.constraint}`);
       if (pgErr.code) console.error(`  PG code: ${pgErr.code}`);
       throw err;

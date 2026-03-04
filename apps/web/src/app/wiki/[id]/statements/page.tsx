@@ -270,14 +270,16 @@ function PropertyGroup({
   );
 }
 
+const VERDICT_COLORS: Record<string, string> = {
+  verified: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  disputed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  unsupported: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+};
+const VERDICT_DEFAULT = "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
+
 function VerdictBadge({ verdict, score }: { verdict: string | null; score: number | null }) {
   if (!verdict) return <span className="text-muted-foreground/40">—</span>;
-  const config =
-    verdict === "verified"
-      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-      : verdict === "disputed"
-        ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
+  const config = VERDICT_COLORS[verdict] ?? VERDICT_DEFAULT;
   return (
     <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-medium ${config}`}>
       {verdict}
