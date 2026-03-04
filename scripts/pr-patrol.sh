@@ -22,7 +22,7 @@ set -euo pipefail
 
 REPO="${PR_PATROL_REPO:-quantified-uncertainty/longterm-wiki}"
 INTERVAL="${PR_PATROL_INTERVAL:-300}"
-MAX_TURNS="${PR_PATROL_MAX_TURNS:-20}"
+MAX_TURNS="${PR_PATROL_MAX_TURNS:-40}"
 COOLDOWN="${PR_PATROL_COOLDOWN:-1800}"
 STALE_HOURS="${PR_PATROL_STALE_HOURS:-48}"
 MODEL="${PR_PATROL_MODEL:-sonnet}"
@@ -103,13 +103,39 @@ mark_processed() {
   date +%s >| "$STATE_DIR/processed-$pr_num"
 }
 
+# Track max-turns failures per PR
+record_max_turns_failure() {
+  local pr_num=$1
+  local fail_file="$STATE_DIR/max-turns-$pr_num"
+  local count=0
+  if [[ -f "$fail_file" ]]; then
+    count=$(cat "$fail_file")
+  fi
+  count=$((count + 1))
+  echo "$count" >| "$fail_file"
+  echo "$count"
+}
+
+is_abandoned() {
+  local pr_num=$1
+  local fail_file="$STATE_DIR/max-turns-$pr_num"
+  if [[ -f "$fail_file" ]]; then
+    local count
+    count=$(cat "$fail_file")
+    if (( count >= 2 )); then
+      return 0
+    fi
+  fi
+  return 1
+}
+
 # ─── PR Detection ────────────────────────────────────────────────────
 
 detect_all_pr_issues() {
   # Fetch all open PRs with relevant fields
   local prs
   prs=$(gh pr list --repo "$REPO" --state open --limit 50 \
-    --json number,title,headRefName,mergeable,mergedAt,statusCheckRollup,updatedAt,body,labels 2>/dev/null) || {
+    --json number,title,headRefName,mergeable,mergedAt,createdAt,statusCheckRollup,updatedAt,body,labels 2>/dev/null) || {
     log "ERROR: Failed to fetch PR list"
     return 1
   }
@@ -146,7 +172,7 @@ detect_all_pr_issues() {
     select($actionable | length > 0) |
     # Skip PRs currently being worked on
     select($issues | any(. == "in-progress") | not) |
-    "\(.number)\t\($actionable | join(","))\t\(.title)\t\(.headRefName)"
+    "\(.number)\t\($actionable | join(","))\t\(.title)\t\(.headRefName)\t\(.createdAt)"
   ' 2>/dev/null || true
 }
 
@@ -168,6 +194,7 @@ check_review_comments() {
 
 priority_score() {
   local issues=$1
+  local created_at=$2
   local score=0
   [[ "$issues" == *conflict* ]]                   && score=$((score + 100))
   [[ "$issues" == *ci-failure* ]]                  && score=$((score + 80))
@@ -175,6 +202,21 @@ priority_score() {
   [[ "$issues" == *missing-issue-ref* ]]           && score=$((score + 40))
   [[ "$issues" == *stale* ]]                       && score=$((score + 30))
   [[ "$issues" == *missing-testplan* ]]            && score=$((score + 20))
+
+  # Age bonus: older PRs get up to +50 points (1 point per hour, capped at 50)
+  if [[ -n "$created_at" ]]; then
+    local created_epoch
+    # macOS: -u treats input as UTC (the Z suffix). Linux: -d handles ISO 8601 natively.
+    created_epoch=$(date -u -jf "%Y-%m-%dT%H:%M:%SZ" "$created_at" +%s 2>/dev/null || date -d "$created_at" +%s 2>/dev/null || echo 0)
+    if [[ "$created_epoch" -gt 0 ]]; then
+      local now
+      now=$(date -u +%s)
+      local age_hours=$(( (now - created_epoch) / 3600 ))
+      local age_bonus=$(( age_hours > 50 ? 50 : (age_hours < 0 ? 0 : age_hours) ))
+      score=$((score + age_bonus))
+    fi
+  fi
+
   echo "$score"
 }
 
@@ -291,17 +333,59 @@ fix_pr() {
 
   # Run Claude Code, piping the prompt via stdin
   # Unset CLAUDECODE to allow spawning from within a Claude Code session
+  local output_file
+  output_file=$(mktemp "$STATE_DIR/output-XXXXXX.txt")
   local exit_code=0
-  env -u CLAUDECODE claude "${claude_args[@]}" < "$prompt_file" 2>&1 | tee -a "$LOG_FILE" || exit_code=$?
+  env -u CLAUDECODE claude "${claude_args[@]}" < "$prompt_file" 2>&1 | tee -a "$LOG_FILE" "$output_file" || exit_code=$?
 
   local elapsed=$(( $(date +%s) - start_time ))
-  if [[ $exit_code -eq 0 ]]; then
+  local claude_output
+  claude_output=$(cat "$output_file")
+  local hit_max_turns=false
+
+  if echo "$claude_output" | grep -q "Reached max turns"; then
+    hit_max_turns=true
+  fi
+
+  if [[ $exit_code -eq 0 ]] && ! $hit_max_turns; then
     log "✓ PR #$pr_num processed successfully (${elapsed}s)"
+  elif $hit_max_turns; then
+    log "⚠ PR #$pr_num hit max turns ($MAX_TURNS) after ${elapsed}s"
+    local fail_count
+    fail_count=$(record_max_turns_failure "$pr_num")
+    if (( fail_count >= 2 )); then
+      log "✗ PR #$pr_num abandoned after $fail_count max-turns failures — needs human intervention"
+      gh pr comment "$pr_num" --repo "$REPO" --body "$(cat <<GHEOF
+🤖 **PR Patrol**: Abandoning automatic fix after $fail_count failed attempts (hit max turns each time).
+
+**Issues detected**: $issues
+**Last attempt**: ${elapsed}s, $MAX_TURNS turns
+
+This PR likely needs human intervention to resolve. The conflict or issue is too complex for automated resolution.
+GHEOF
+)" 2>/dev/null || log "  Warning: could not post abandonment comment"
+    fi
   else
     log "✗ PR #$pr_num processing failed (exit: $exit_code, ${elapsed}s)"
   fi
 
-  rm -f "$prompt_file"
+  # Post a summary comment on the PR with what was done
+  # Truncate output to last 500 chars to keep comment concise
+  local summary
+  summary=$(echo "$claude_output" | tail -c 1500 | head -c 500)
+  if [[ -n "$summary" ]] && ! $hit_max_turns; then
+    gh pr comment "$pr_num" --repo "$REPO" --body "$(cat <<GHEOF
+🤖 **PR Patrol** ran for ${elapsed}s (${MAX_TURNS} max turns, model: ${MODEL}).
+
+**Issues detected**: $issues
+
+**Result**:
+$summary
+GHEOF
+)" 2>/dev/null || log "  Warning: could not post summary comment"
+  fi
+
+  rm -f "$prompt_file" "$output_file"
 
   # Release the PR by removing claude-working label
   gh pr edit "$pr_num" --repo "$REPO" --remove-label "claude-working" 2>/dev/null || log "  Warning: could not remove claude-working label"
@@ -339,7 +423,7 @@ run_check_cycle() {
   # 2. Enrich with review comments for top candidates (limited to avoid API rate limits)
   local enriched=""
   local count=0
-  while IFS=$'\t' read -r pr_num issues title branch; do
+  while IFS=$'\t' read -r pr_num issues title branch created_at; do
     if (( count < 5 )); then
       local review_issues
       review_issues=$(check_review_comments "$pr_num" 2>/dev/null || true)
@@ -347,20 +431,24 @@ run_check_cycle() {
         issues="${issues},${review_issues}"
       fi
     fi
-    enriched+="${pr_num}\t${issues}\t${title}\t${branch}\n"
+    enriched+="${pr_num}\t${issues}\t${title}\t${branch}\t${created_at}\n"
     count=$((count + 1))
   done <<< "$work_items"
 
-  # 3. Score and sort by priority, filtering out recently processed
+  # 3. Score and sort by priority, filtering out recently processed and abandoned
   local sorted=""
-  while IFS=$'\t' read -r pr_num issues title branch; do
+  while IFS=$'\t' read -r pr_num issues title branch created_at; do
     [[ -z "$pr_num" ]] && continue
+    if is_abandoned "$pr_num"; then
+      log "  Skipping PR #$pr_num (abandoned — needs human intervention)"
+      continue
+    fi
     if was_recently_processed "$pr_num"; then
       log "  Skipping PR #$pr_num (recently processed)"
       continue
     fi
     local score
-    score=$(priority_score "$issues")
+    score=$(priority_score "$issues" "$created_at")
     sorted+="${score}\t${pr_num}\t${issues}\t${title}\t${branch}\n"
   done < <(echo -e "$enriched")
 
