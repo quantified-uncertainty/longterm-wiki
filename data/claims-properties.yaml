@@ -191,6 +191,76 @@ properties:
     value_unit: percent
     category: safety
 
+  # ── Person-specific ──────────────────────────────────────────────────
+  - id: position
+    label: "Position / Role"
+    description: "Job title or role held by a person at an organization"
+    value_type: string
+    category: organizational
+
+  - id: employer
+    label: "Employer"
+    description: "Organization where a person is employed"
+    value_type: entity
+    category: relation
+
+  - id: publication_count
+    label: "Publications Count"
+    description: "Number of academic or technical publications authored"
+    value_type: number
+    value_unit: count
+    category: research
+
+  - id: h_index
+    label: "h-index"
+    description: "h-index measuring research impact"
+    value_type: number
+    category: research
+
+  # ── Additional Safety ───────────────────────────────────────────────
+  - id: safety_team_size
+    label: "Safety Team Size"
+    description: "Number of people on the safety/alignment team"
+    value_type: number
+    value_unit: count
+    category: safety
+    staleness_cadence: annually
+
+  - id: policy_commitment
+    label: "Policy Commitment"
+    description: "Public policy commitment or voluntary agreement related to AI safety"
+    value_type: string
+    category: safety
+
+  # ── Additional Organizational ───────────────────────────────────────
+  - id: board_composition
+    label: "Board Composition"
+    description: "Description of board structure and key members"
+    value_type: string
+    category: organizational
+
+  # ── Additional Financial ────────────────────────────────────────────
+  - id: compute_budget
+    label: "Compute Budget"
+    description: "Estimated or reported compute expenditure"
+    value_type: number
+    value_unit: USD
+    category: financial
+
+  # ── Additional Technical ────────────────────────────────────────────
+  - id: product_name
+    label: "Product Name"
+    description: "Name of a product or service offered by the entity"
+    value_type: string
+    category: technical
+
+  # ── Additional Milestones ───────────────────────────────────────────
+  - id: release_date
+    label: "Release Date"
+    description: "Date a product, model, or version was released"
+    value_type: date
+    category: milestone
+
   # ── Generic Fallback ───────────────────────────────────────────────────
   - id: count
     label: "Count"

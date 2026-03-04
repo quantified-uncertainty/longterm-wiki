@@ -8,6 +8,8 @@
  *   pnpm crux statements score <entity-id>
  *   pnpm crux statements score <entity-id> --json
  *   pnpm crux statements score <entity-id> --dry-run
+ *   pnpm crux statements score <entity-id> --llm          # LLM-based importance + clarity
+ *   pnpm crux statements score <entity-id> --org-type=frontier-lab
  */
 
 import { fileURLToPath } from 'url';
@@ -21,13 +23,22 @@ import {
   storeCoverageScore,
   type BatchScoreInput,
 } from '../lib/wiki-server/statements.ts';
+import { getEntity } from '../lib/wiki-server/entities.ts';
 import { slugToDisplayName } from '../lib/claim-text-utils.ts';
+import { createLlmClient, MODELS } from '../lib/llm.ts';
+import { CostTracker } from '../lib/cost-tracker.ts';
 import {
   scoreAllStatements,
+  scoreAllStatementsAsync,
   DIMENSION_NAMES,
   type ScoringStatement,
   type ScoringResult,
+  type LlmScoringContext,
 } from './scoring.ts';
+import {
+  resolveCoverageTargets,
+  computeCoverageScore,
+} from './coverage-targets.ts';
 
 // ---------------------------------------------------------------------------
 // Main
@@ -37,13 +48,15 @@ async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const jsonOutput = args.json === true;
   const dryRun = args['dry-run'] === true;
+  const useLlm = args.llm === true;
+  const orgType = (args['org-type'] as string) ?? null;
   const c = getColors(false);
   const positional = (args._positional as string[]) || [];
   const entityId = positional[0];
 
   if (!entityId) {
     console.error(`${c.red}Error: provide an entity ID${c.reset}`);
-    console.error(`  Usage: pnpm crux statements score <entity-id> [--json] [--dry-run]`);
+    console.error(`  Usage: pnpm crux statements score <entity-id> [--json] [--dry-run] [--llm] [--org-type=TYPE]`);
     process.exit(1);
   }
 
@@ -54,9 +67,10 @@ async function main() {
   }
 
   // Fetch data in parallel
-  const [stmtResult, propResult] = await Promise.all([
+  const [stmtResult, propResult, entityResult] = await Promise.all([
     getStatementsByEntity(entityId),
     getProperties(),
+    getEntity(entityId),
   ]);
 
   if (!stmtResult.ok) {
@@ -121,7 +135,26 @@ async function main() {
   });
 
   const entityName = slugToDisplayName(entityId);
-  const results = scoreAllStatements(scoringStmts, entityId, entityName);
+  const entityType = entityResult.ok ? (entityResult.data.entityType ?? 'organization') : 'organization';
+
+  // Build LLM context if requested
+  let llmCtx: LlmScoringContext | undefined;
+  let costTracker: CostTracker | undefined;
+  if (useLlm) {
+    costTracker = new CostTracker();
+    llmCtx = {
+      client: createLlmClient(),
+      entityName,
+      entityType,
+      tracker: costTracker,
+    };
+    if (!jsonOutput) {
+      console.log(`${c.dim}LLM scoring enabled (importance + clarity via ${MODELS.haiku})${c.reset}\n`);
+    }
+  }
+
+  // Score statements (sync or async with LLM)
+  const results = await scoreAllStatementsAsync(scoringStmts, entityId, entityName, undefined, llmCtx);
 
   // Compute summary stats
   const scores = results.map((r) => r.qualityScore);
@@ -144,10 +177,12 @@ async function main() {
   }
 
   const categoryAvgs: Record<string, number> = {};
+  const categoryCounts: Record<string, number> = {};
   for (const [cat, catScores] of categoryScores) {
     categoryAvgs[cat] = Math.round(
       (catScores.reduce((a, b) => a + b, 0) / catScores.length) * 1000,
     ) / 1000;
+    categoryCounts[cat] = catScores.length;
   }
 
   // Quality distribution
@@ -249,10 +284,17 @@ async function main() {
       }
     }
 
-    // Store entity coverage score
+    // Compute formula-based coverage score if targets are available
+    const targets = resolveCoverageTargets(entityType, orgType);
+    let formulaCoverage: number | null = null;
+    if (targets) {
+      formulaCoverage = computeCoverageScore(categoryCounts, targets);
+    }
+
+    // Store entity coverage score (prefer formula, fallback to avg quality)
     const coverageResult = await storeCoverageScore({
       entityId,
-      coverageScore: avg,
+      coverageScore: formulaCoverage ?? avg,
       categoryScores: categoryAvgs,
       statementCount: results.length,
       qualityAvg: Math.round(avg * 1000) / 1000,
@@ -260,13 +302,23 @@ async function main() {
 
     if (!jsonOutput) {
       if (coverageResult.ok) {
-        console.log(`${c.green}Stored ${totalUpdated} statement scores + entity coverage score.${c.reset}`);
+        const coverageLabel = formulaCoverage != null
+          ? `formula-based coverage: ${formulaCoverage.toFixed(3)}`
+          : `avg quality as coverage proxy: ${avg.toFixed(3)}`;
+        console.log(`${c.green}Stored ${totalUpdated} statement scores + entity coverage (${coverageLabel}).${c.reset}`);
       } else {
         console.log(`${c.yellow}Stored ${totalUpdated} statement scores (coverage score failed).${c.reset}`);
+      }
+
+      if (costTracker && costTracker.entries.length > 0) {
+        console.log(`${c.dim}LLM cost: $${costTracker.totalCost.toFixed(4)} (${costTracker.entries.length} calls)${c.reset}`);
       }
     }
   } else if (!jsonOutput) {
     console.log(`${c.dim}Dry run — scores not stored.${c.reset}`);
+    if (costTracker && costTracker.entries.length > 0) {
+      console.log(`${c.dim}LLM cost: $${costTracker.totalCost.toFixed(4)} (${costTracker.entries.length} calls)${c.reset}`);
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   scoreStructure,
   scorePrecision,
@@ -12,7 +12,13 @@ import {
   scoreImportance,
   scoreStatement,
   scoreAllStatements,
+  computeComposite,
+  scoreImportanceLlm,
+  scoreClarityLlm,
+  scoreAllStatementsAsync,
   type ScoringStatement,
+  type QualityDimensions,
+  type LlmScoringContext,
 } from './scoring.ts';
 
 // ---------------------------------------------------------------------------
@@ -486,5 +492,152 @@ describe('scoreAllStatements', () => {
   it('handles empty array', () => {
     const results = scoreAllStatements([], 'test', 'Test');
     expect(results).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// computeComposite
+// ---------------------------------------------------------------------------
+
+describe('computeComposite', () => {
+  it('returns a value between 0 and 1', () => {
+    const dims: QualityDimensions = {
+      structure: 0.5, precision: 0.5, clarity: 0.5, resolvability: 0.5,
+      uniqueness: 0.5, atomicity: 0.5, importance: 0.5, neglectedness: 0.5,
+      recency: 0.5, crossEntityUtility: 0.5,
+    };
+    const score = computeComposite(dims);
+    expect(score).toBeGreaterThanOrEqual(0);
+    expect(score).toBeLessThanOrEqual(1);
+  });
+
+  it('returns 1.0 for all-perfect dimensions', () => {
+    const dims: QualityDimensions = {
+      structure: 1, precision: 1, clarity: 1, resolvability: 1,
+      uniqueness: 1, atomicity: 1, importance: 1, neglectedness: 1,
+      recency: 1, crossEntityUtility: 1,
+    };
+    expect(computeComposite(dims)).toBe(1);
+  });
+
+  it('returns 0 for all-zero dimensions', () => {
+    const dims: QualityDimensions = {
+      structure: 0, precision: 0, clarity: 0, resolvability: 0,
+      uniqueness: 0, atomicity: 0, importance: 0, neglectedness: 0,
+      recency: 0, crossEntityUtility: 0,
+    };
+    expect(computeComposite(dims)).toBe(0);
+  });
+
+  it('produces same result as scoreStatement for same dimensions', () => {
+    const stmt = makeStmt({
+      citations: [{
+        resourceId: 'tc-2024',
+        url: 'https://techcrunch.com',
+        sourceQuote: 'Quote here',
+      }],
+    });
+    const result = scoreStatement(stmt, {
+      siblings: [stmt],
+      entityId: 'anthropic',
+      entityName: 'Anthropic',
+    });
+    expect(result.qualityScore).toBe(computeComposite(result.dimensions));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// LLM scoring fallback tests
+// ---------------------------------------------------------------------------
+
+describe('scoreImportanceLlm', () => {
+  it('falls back to heuristic when LLM client throws', async () => {
+    const fakeClient = {
+      messages: {
+        create: vi.fn().mockRejectedValue(new Error('API key invalid')),
+        stream: vi.fn().mockRejectedValue(new Error('API key invalid')),
+      },
+    } as unknown as import('@anthropic-ai/sdk').default;
+
+    const llmCtx: LlmScoringContext = {
+      client: fakeClient,
+      entityName: 'Anthropic',
+      entityType: 'organization',
+    };
+
+    const stmt = makeStmt({
+      property: { id: 'safety-policy', label: 'Safety Policy', category: 'safety' },
+    });
+
+    const score = await scoreImportanceLlm(stmt, llmCtx);
+    // Should fall back to heuristic (0.95 for safety)
+    expect(score).toBe(0.95);
+  });
+
+  it('returns default importance for empty statement text', async () => {
+    const fakeClient = {} as import('@anthropic-ai/sdk').default;
+    const llmCtx: LlmScoringContext = {
+      client: fakeClient,
+      entityName: 'Test',
+      entityType: 'organization',
+    };
+
+    const score = await scoreImportanceLlm(makeStmt({ statementText: '' }), llmCtx);
+    expect(score).toBe(0.5); // DEFAULT_CATEGORY_IMPORTANCE
+  });
+});
+
+describe('scoreClarityLlm', () => {
+  it('falls back to heuristic when LLM client throws', async () => {
+    const fakeClient = {
+      messages: {
+        create: vi.fn().mockRejectedValue(new Error('API key invalid')),
+        stream: vi.fn().mockRejectedValue(new Error('API key invalid')),
+      },
+    } as unknown as import('@anthropic-ai/sdk').default;
+
+    const llmCtx: LlmScoringContext = {
+      client: fakeClient,
+      entityName: 'Anthropic',
+      entityType: 'organization',
+    };
+
+    const stmt = makeStmt({
+      statementText: 'Anthropic raised $7.3 billion in a Series E funding round.',
+    });
+
+    const score = await scoreClarityLlm(stmt, 'anthropic', 'Anthropic', llmCtx);
+    // Should fall back to heuristic clarity score
+    const heuristicScore = scoreClarity(stmt, 'anthropic', 'Anthropic');
+    expect(score).toBe(heuristicScore);
+  });
+
+  it('returns 0 for empty statement text', async () => {
+    const fakeClient = {} as import('@anthropic-ai/sdk').default;
+    const llmCtx: LlmScoringContext = {
+      client: fakeClient,
+      entityName: 'Test',
+      entityType: 'organization',
+    };
+
+    const score = await scoreClarityLlm(makeStmt({ statementText: '' }), 'test', 'Test', llmCtx);
+    expect(score).toBe(0);
+  });
+});
+
+describe('scoreAllStatementsAsync', () => {
+  it('returns same results as sync version when no LLM context', async () => {
+    const stmts = [
+      makeStmt({ id: 1 }),
+      makeStmt({ id: 2, statementText: 'DeepMind published AlphaFold in 2020.' }),
+    ];
+    const syncResults = scoreAllStatements(stmts, 'anthropic', 'Anthropic');
+    const asyncResults = await scoreAllStatementsAsync(stmts, 'anthropic', 'Anthropic');
+
+    expect(asyncResults).toHaveLength(syncResults.length);
+    for (let i = 0; i < syncResults.length; i++) {
+      expect(asyncResults[i].statementId).toBe(syncResults[i].statementId);
+      expect(asyncResults[i].qualityScore).toBe(syncResults[i].qualityScore);
+    }
   });
 });
