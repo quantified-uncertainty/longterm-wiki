@@ -2,37 +2,7 @@ import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
 import { formatStatementValue } from "@lib/statement-display";
 import { slugToNumericId } from "@/lib/mdx";
-
-interface PropertyInfo {
-  id: string;
-  label: string;
-  category: string;
-  valueType: string;
-  unitFormatId: string | null;
-}
-
-interface StatementWithProperty {
-  id: number;
-  variety: string;
-  status: string;
-  propertyId: string | null;
-  qualifierKey: string | null;
-  valueNumeric: number | null;
-  valueText: string | null;
-  valueDate: string | null;
-  valueEntityId: string | null;
-  valueSeries: Record<string, unknown> | null;
-  validStart: string | null;
-  validEnd: string | null;
-  property: PropertyInfo | null;
-  citations: { id: number }[];
-}
-
-interface ByEntityResult {
-  structured: StatementWithProperty[];
-  attributed: StatementWithProperty[];
-  total: number;
-}
+import type { ByEntityResult, StatementWithDetails } from "@lib/statement-types";
 
 /**
  * Compact sidebar card showing key structured statements for an entity.
@@ -116,7 +86,7 @@ export async function EntityStatementsCard({
   );
 }
 
-function StatementRow({ statement: s }: { statement: StatementWithProperty }) {
+function StatementRow({ statement: s }: { statement: StatementWithDetails }) {
   const value = formatStatementValue(s, s.property);
   const hasCitations = s.citations.length > 0;
 
