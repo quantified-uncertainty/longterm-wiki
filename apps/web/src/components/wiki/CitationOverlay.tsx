@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import type { CitationQuote } from "@/lib/citation-data";
 import { SafeExternalLink } from "@components/ui/safe-external-link";
-export { isSafeUrl } from "@lib/url-utils";
 
 interface VerdictConfig {
   icon: typeof CheckCircle2;

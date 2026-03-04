@@ -5,7 +5,6 @@ import { ExternalLink, ChevronDown, ChevronUp, Star } from "lucide-react";
 import type { Citation } from "@lib/statement-types";
 import { getDomain, isSafeUrl } from "@components/wiki/resource-utils";
 import { SafeExternalLink } from "@components/ui/safe-external-link";
-
 /**
  * Expandable citation detail panel. Clicking the citation count badge
  * toggles a list of citations with URLs, source quotes, and resource links.
