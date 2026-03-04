@@ -8,15 +8,18 @@ import { StatementSourcesTable } from "./StatementSourcesTable";
 
 function countVerdicts(statements: StatementWithDetails[]) {
   let verified = 0;
+  let minorIssues = 0;
   let disputed = 0;
   let unsupported = 0;
   let unchecked = 0;
 
   for (const s of statements) {
-    if (s.status !== "active") continue;
     switch (s.verdict) {
       case "accurate":
         verified++;
+        break;
+      case "minor_issues":
+        minorIssues++;
         break;
       case "inaccurate":
         disputed++;
@@ -30,7 +33,7 @@ function countVerdicts(statements: StatementWithDetails[]) {
     }
   }
 
-  return { verified, disputed, unsupported, unchecked };
+  return { verified, minorIssues, disputed, unsupported, unchecked };
 }
 
 /**
@@ -50,16 +53,17 @@ export async function PageStatementsSection({
   if (!result || result.total === 0) return null;
 
   const { structured, attributed } = result;
-  const allStatements = [...structured, ...attributed];
   const activeStructured = structured.filter((s) => s.status === "active");
   const activeAttributed = attributed.filter((s) => s.status === "active");
-  const { verified, disputed, unsupported, unchecked } = countVerdicts(allStatements);
+  const activeAll = [...activeStructured, ...activeAttributed];
+  const { verified, minorIssues, disputed, unsupported, unchecked } = countVerdicts(activeAll);
   const numericId = slugToNumericId(entityId);
   const pageRef = numericId ?? entityId;
 
   // Build summary parts
   const summaryParts: string[] = [];
   if (verified > 0) summaryParts.push(`${verified} verified`);
+  if (minorIssues > 0) summaryParts.push(`${minorIssues} minor issues`);
   if (disputed > 0) summaryParts.push(`${disputed} disputed`);
   if (unsupported > 0) summaryParts.push(`${unsupported} unsupported`);
   if (unchecked > 0) summaryParts.push(`${unchecked} unchecked`);
@@ -77,7 +81,7 @@ export async function PageStatementsSection({
       </div>
 
       <p className="text-xs text-muted-foreground mb-4">
-        {result.total} statements ({summaryParts.join(", ")})
+        {activeAll.length} active statements ({summaryParts.join(", ")})
       </p>
 
       {/* Structured statements */}
@@ -103,10 +107,10 @@ export async function PageStatementsSection({
       )}
 
       {/* Sources */}
-      {allStatements.some((s) => s.citations.some((c) => c.url)) && (
+      {activeAll.some((s) => s.citations.some((c) => c.url)) && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-2">Sources</h3>
-          <StatementSourcesTable statements={allStatements} />
+          <StatementSourcesTable statements={activeAll} />
         </div>
       )}
     </div>

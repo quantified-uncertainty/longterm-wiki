@@ -83,7 +83,7 @@ export function StatementSourcesTable({
         <thead>
           <tr className="border-b border-border/60 bg-muted/30">
             <th className="text-left px-3 py-1.5 text-[11px] font-medium">Source</th>
-            <th className="text-right px-3 py-1.5 text-[11px] font-medium">Statements</th>
+            <th className="text-right px-3 py-1.5 text-[11px] font-medium">Citations</th>
             <th className="text-left px-3 py-1.5 text-[11px] font-medium">Verdicts</th>
           </tr>
         </thead>

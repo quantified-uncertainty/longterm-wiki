@@ -94,9 +94,7 @@ export function StructuredStatementsTable({
     <div className="space-y-3">
       {[...byCategory.entries()]
         .sort((a, b) => b[1].length - a[1].length)
-        .map(([category, stmts]) => {
-          if (stmts.length === 0) return null;
-          return (
+        .map(([category, stmts]) => (
             <div key={category}>
               <h4 className="text-xs font-semibold capitalize text-muted-foreground mb-1">
                 {category}
@@ -148,8 +146,7 @@ export function StructuredStatementsTable({
                 </table>
               </div>
             </div>
-          );
-        })}
+        ))}
     </div>
   );
 }
