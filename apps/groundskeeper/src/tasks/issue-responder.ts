@@ -320,7 +320,8 @@ async function claimItem(
  */
 async function removeLabelWithRetry(
   config: Config,
-  issueNumber: number
+  issueNumber: number,
+  labelName: string = WORKING_LABEL
 ): Promise<void> {
   const octokit = getOctokit(config);
   const { owner, repo } = parseRepo(config);
@@ -331,23 +332,23 @@ async function removeLabelWithRetry(
         owner,
         repo,
         issue_number: issueNumber,
-        name: WORKING_LABEL,
+        name: labelName,
       });
       return; // Success
     } catch (error) {
       const isLastAttempt = attempt === LABEL_REMOVE_MAX_RETRIES - 1;
       if (isLastAttempt) {
         logger.error(
-          { issueNumber, attempt, error },
-          "Failed to remove working label after all retries — label may be orphaned"
+          { issueNumber, labelName, attempt, error },
+          `Failed to remove label "${labelName}" after all retries — label may be orphaned`
         );
         return; // Give up, but don't throw
       }
 
       const delayMs = LABEL_REMOVE_BASE_DELAY_MS * Math.pow(2, attempt);
       logger.warn(
-        { issueNumber, attempt, delayMs, error },
-        "Failed to remove working label, retrying..."
+        { issueNumber, labelName, attempt, delayMs, error },
+        `Failed to remove label "${labelName}", retrying...`
       );
       await sleep(delayMs);
     }
@@ -462,8 +463,11 @@ export async function issueResponder(
     maxTurns: 30,
   });
 
-  // Remove the working label with retry
+  // Remove both the working label and the trigger label to prevent re-processing loops.
+  // The trigger label is removed regardless of success/failure — on failure, the human
+  // can re-add it to retry. Without this, the issue gets picked up every poll cycle.
   await removeLabelWithRetry(config, item.number);
+  await removeLabelWithRetry(config, item.number, TRIGGER_LABEL);
 
   if (result.success) {
     const outputPreview =
