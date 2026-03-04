@@ -74,18 +74,20 @@ audits:
     last_checked: null
     last_result: null
 
-  - id: vercel-deploy-branches
+  - id: vercel-production-only
     category: infrastructure
-    description: "Vercel only builds on production, main, and claude/* branches — no PR preview deploys for other branches"
+    description: "Vercel ONLY builds the production branch — no builds for main, claude/*, issue branches, or PR previews"
     check_type: manual
     how_to_verify: |
       Check Vercel dashboard → Deployments tab.
-      Filter/scan for deploys triggered by branches that are NOT production,
-      main, or claude/*. There should be zero such deploys.
-      Also verify that vercel.json ignoreCommand matches expectations.
-    frequency: monthly
+      There should be ZERO deploys for any branch other than production.
+      This keeps getting reverted — verify both:
+      1. vercel.json ignoreCommand exits 0 for non-production branches
+      2. Vercel project settings don't override the ignoreCommand
+      3. No recent deploys exist for main, claude/*, or any other branch
+    frequency: weekly
     added: "2026-03-04"
-    added_by_pr: 1611
+    added_by_pr: 1630
     last_checked: null
     last_result: null
 
@@ -141,13 +143,13 @@ audits:
 # Status: pending | verified | failed | wontfix
 
 post_merge:
-  - id: vercel-ignore-command-v2
-    pr: 1611
-    merged: "2026-03-01"
-    claim: "Vercel ignoreCommand correctly restricts builds to production/main/claude/* branches"
-    how_to_verify: "Check Vercel deployments list for any non-matching branch deploys since merge date"
+  - id: vercel-production-only-post-merge
+    pr: 1630
+    merged: "2026-03-04"
+    claim: "Vercel ignoreCommand restricts builds to ONLY the production branch (not main, not claude/*)"
+    how_to_verify: "Check Vercel deployments for any non-production deploys since PR #1630 merged"
     status: pending
-    deadline: "2026-03-15"
+    deadline: "2026-03-18"
     checked_date: null
     notes: null
 
