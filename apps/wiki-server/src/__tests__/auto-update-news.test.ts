@@ -236,8 +236,8 @@ const dispatch: SqlDispatcher = (query, params) => {
         relevance_score: params[o + 6] as number | null,
         topics_json: params[o + 7] as string[] | null,
         entities_json: params[o + 8] as string[] | null,
-        routed_to_page_id: routedSlug,
-        routed_to_page_id_old: routedSlug,
+        routed_to_page_id: routedSlug, // synthetic convenience field for tests
+        routed_to_page_id_old: null, // D2a: not written on insert
         routed_to_page_id_int: routedIntId,
         routed_to_page_title: params[o + 10] as string | null,
         routed_tier: params[o + 11] as string | null,
@@ -309,9 +309,9 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- SELECT FROM auto_update_news_items WHERE run_id = $1  (GET /by-run) ----
   // Phase D2a: query now uses LEFT JOIN wiki_pages + COALESCE for routedToPageSlug.
-  // extractColumns finds "id" for the COALESCE expr (last quoted ident in
-  // coalesce("auto_update_news_items"."routed_to_page_id", "wiki_pages"."id")).
-  // We override "id" in the returned row to be the page slug so positional mapping works.
+  // The SELECT expands all 15 schema columns + 1 COALESCE at position 15.
+  // extractColumns returns null for the COALESCE (identifiers inside parens),
+  // so .values() uses Object.values(row)[15] for that position.
   if (
     q.includes("auto_update_news_items") &&
     !q.includes("inner join") &&
@@ -325,15 +325,16 @@ const dispatch: SqlDispatcher = (query, params) => {
       .filter((r) => r.run_id === runId)
       .sort((a, b) => (b.relevance_score ?? -1) - (a.relevance_score ?? -1))
       .map((r) => {
-        // The SELECT expands all 15 schema columns + 1 COALESCE at position 15.
-        // extractColumns returns null for the COALESCE (identifiers inside parens),
-        // so .values() uses Object.values(row)[15] for that position.
         // Strip routed_to_page_id (not a real SQL column — schema uses routed_to_page_id_old)
         // then append the COALESCE result so it lands at position 15.
+        // D2a COALESCE: routed_to_page_id_old ?? wiki_pages.id (via int lookup)
         const { routed_to_page_id: _slug, ...rest } = r;
         return {
           ...rest,
-          _coalesce_result: r.routed_to_page_id ?? null,
+          _coalesce_result:
+            r.routed_to_page_id_old ??
+            slugFromIntId(r.routed_to_page_id_int) ??
+            null,
         };
       });
   }

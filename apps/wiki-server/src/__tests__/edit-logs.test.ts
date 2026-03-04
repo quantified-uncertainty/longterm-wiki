@@ -8,8 +8,8 @@ let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
 let editStore: Array<{
   id: number;
-  page_id: string;
-  page_id_old: string;
+  page_id: string | null;
+  page_id_old: string | null;
   page_id_int: number | null;
   date: string;
   tool: string;
@@ -148,11 +148,11 @@ function createMockSql() {
       for (let i = 0; i < numRows; i++) {
         const o = i * COLS;
         const pageIdInt = params[o] as number | null;
-        const pageSlug = slugFromIntId(pageIdInt) ?? `unknown-${pageIdInt}`;
+        const pageSlug = slugFromIntId(pageIdInt);
         const row = {
           id: nextId++,
           page_id: pageSlug,
-          page_id_old: pageSlug,
+          page_id_old: null, // D2a: not written on insert
           page_id_int: pageIdInt,
           date: String(params[o + 1]),
           tool: params[o + 2] as string,

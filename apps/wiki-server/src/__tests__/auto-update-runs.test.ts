@@ -52,8 +52,8 @@ let runStore: Array<{
 let resultStore: Array<{
   id: number;
   run_id: number;
-  page_id: string;
-  page_id_old: string;
+  page_id: string | null;
+  page_id_old: string | null;
   page_id_int: number | null;
   status: string;
   tier: string | null;
@@ -139,12 +139,12 @@ const dispatch: SqlDispatcher = (query, params) => {
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
       const pageIdInt = params[o + 1] as number | null;
-      const pageSlug = slugFromIntId(pageIdInt) ?? `unknown-${pageIdInt}`;
+      const pageSlug = slugFromIntId(pageIdInt);
       const row = {
         id: nextResultId++,
         run_id: params[o] as number,
         page_id: pageSlug,
-        page_id_old: pageSlug,
+        page_id_old: null, // D2a: not written on insert
         page_id_int: pageIdInt,
         status: params[o + 2] as string,
         tier: params[o + 3] as string | null,
@@ -171,7 +171,8 @@ const dispatch: SqlDispatcher = (query, params) => {
       .map((r) => ({
         run_id: r.run_id,
         // "id" is what extractColumns finds for coalesce(..., "wiki_pages"."id")
-        id: r.page_id,
+        // D2a COALESCE: page_id_old ?? wiki_pages.id (via int lookup)
+        id: r.page_id_old ?? slugFromIntId(r.page_id_int) ?? null,
         status: r.status,
         tier: r.tier,
         duration_ms: r.duration_ms,

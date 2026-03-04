@@ -9,8 +9,8 @@ let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
 let riskStore: Array<{
   id: number;
-  page_id: string;
-  page_id_old: string;
+  page_id: string | null;
+  page_id_old: string | null;
   page_id_int: number | null;
   score: number;
   level: string;
@@ -116,11 +116,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     for (let i = 0; i < rowCount; i++) {
       const off = i * PARAMS_PER_ROW;
       const pageIdInt = params[off] as number | null;
-      const pageSlug = slugFromIntId(pageIdInt) ?? `unknown-${pageIdInt}`;
+      const pageSlug = slugFromIntId(pageIdInt);
       const row = {
         id: nextId++,
         page_id: pageSlug,
-        page_id_old: pageSlug,
+        page_id_old: null, // D2a: not written on insert
         page_id_int: pageIdInt,
         score: params[off + 1] as number,
         level: params[off + 2] as string,
