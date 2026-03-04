@@ -108,7 +108,7 @@ export async function StatementQualityContent() {
           <StatCard
             label="Avg Score"
             value={avgScoreDisplay}
-            color={avgScoreDisplay >= 60 ? "emerald" : "amber"}
+            color={avgScoreDisplay >= 80 ? "emerald" : avgScoreDisplay >= 60 ? "blue" : "amber"}
           />
         ) : (
           <div className="rounded-lg border border-border/60 px-3 py-2">

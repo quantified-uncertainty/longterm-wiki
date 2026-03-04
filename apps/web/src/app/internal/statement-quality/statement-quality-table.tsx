@@ -198,10 +198,13 @@ export function StatementQualityTable({ data }: Props) {
           <SortableHeader column={column}>Last Scored</SortableHeader>
         ),
         cell: ({ row }) => {
-          const d = new Date(row.original.scoredAt);
+          const raw = row.original.scoredAt;
+          if (!raw) return <span className="text-xs text-muted-foreground/50">—</span>;
+          const d = new Date(raw);
+          const label = isNaN(d.getTime()) ? raw : d.toLocaleDateString();
           return (
             <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
-              {d.toLocaleDateString()}
+              {label}
             </span>
           );
         },

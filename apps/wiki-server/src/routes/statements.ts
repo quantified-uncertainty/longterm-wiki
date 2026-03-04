@@ -7,6 +7,7 @@
  * - GET /by-page/summary — per-footnote verification summary for citation dots
  * - GET /properties — list all properties with statement counts
  * - GET /stats     — basic statistics
+ * - GET /quality-summary — aggregate quality distribution + per-entity coverage scores
  * - PATCH /:id     — update statement status, verdict, or note
  * - POST /         — create statement + optional citations
  */
@@ -648,6 +649,7 @@ const statementsApp = new Hono()
           quality_avg AS "qualityAvg",
           scored_at AS "scoredAt"
         FROM entity_coverage_scores
+        -- DISTINCT ON requires entity_id first in ORDER BY to select the most-recent row per entity
         ORDER BY entity_id, scored_at DESC
       `),
     ]);
@@ -667,10 +669,14 @@ const statementsApp = new Hono()
       entityCoverage: [...coverageResult].map((r) => ({
         entityId: r.entityId,
         coverageScore: Number(r.coverageScore),
-        categoryScores: r.categoryScores,
+        // Defensive: JSONB may theoretically be non-object in degenerate cases
+        categoryScores:
+          r.categoryScores != null && typeof r.categoryScores === "object" && !Array.isArray(r.categoryScores)
+            ? (r.categoryScores as Record<string, number>)
+            : {},
         statementCount: Number(r.statementCount),
         qualityAvg: r.qualityAvg != null ? Number(r.qualityAvg) : null,
-        scoredAt: r.scoredAt,
+        scoredAt: typeof r.scoredAt === "string" ? r.scoredAt : String(r.scoredAt),
       })),
     });
   })
