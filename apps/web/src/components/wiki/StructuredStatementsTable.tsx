@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { VerdictBadge } from "@components/wiki/VerdictBadge";
+import { getDomain, isSafeUrl } from "@components/wiki/resource-utils";
 import { formatStatementValue } from "@lib/statement-display";
 import type { StatementWithDetails } from "@lib/statement-types";
 
@@ -12,23 +13,6 @@ function formatPeriod(start: string | null, end: string | null): string {
   if (start && !end) return start;
   if (!start && end) return `until ${end}`;
   return `${start}–${end}`;
-}
-
-function getDomain(url: string): string | null {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return null;
-  }
-}
-
-function isSafeUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
 }
 
 function InlineCitations({ citations }: { citations: StatementWithDetails["citations"] }) {
@@ -111,8 +95,7 @@ export function StructuredStatementsTable({
       {[...byCategory.entries()]
         .sort((a, b) => b[1].length - a[1].length)
         .map(([category, stmts]) => {
-          const active = stmts.filter((s) => s.status === "active");
-          if (active.length === 0) return null;
+          if (stmts.length === 0) return null;
           return (
             <div key={category}>
               <h4 className="text-xs font-semibold capitalize text-muted-foreground mb-1">
@@ -130,7 +113,7 @@ export function StructuredStatementsTable({
                     </tr>
                   </thead>
                   <tbody>
-                    {active.map((s) => {
+                    {stmts.map((s) => {
                       const value = formatStatementValue(s, s.property);
                       const isTextOnly = !s.propertyId && !!s.statementText;
                       const displayValue = value !== "—" ? value : (s.statementText ?? "—");

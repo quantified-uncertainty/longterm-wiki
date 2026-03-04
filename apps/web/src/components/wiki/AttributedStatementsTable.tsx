@@ -13,12 +13,11 @@ export function AttributedStatementsTable({
 }: {
   statements: StatementWithDetails[];
 }) {
-  const active = statements.filter((s) => s.status === "active");
-  if (active.length === 0) return null;
+  if (statements.length === 0) return null;
 
   return (
     <div className="space-y-2">
-      {active.map((s) => (
+      {statements.map((s) => (
         <div
           key={s.id}
           className="rounded-lg border border-border/60 p-3"

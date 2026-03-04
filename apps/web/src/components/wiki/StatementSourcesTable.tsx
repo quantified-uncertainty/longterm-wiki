@@ -1,7 +1,7 @@
 "use client";
 
 import { ExternalLink } from "lucide-react";
-import { getDomain } from "@components/wiki/resource-utils";
+import { getDomain, isSafeUrl } from "@components/wiki/resource-utils";
 import type { StatementWithDetails } from "@lib/statement-types";
 
 interface SourceGroup {
@@ -9,15 +9,6 @@ interface SourceGroup {
   urls: Map<string, { url: string; count: number; verdicts: Record<string, number> }>;
   totalStatements: number;
   verdicts: Record<string, number>;
-}
-
-function isSafeUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
 }
 
 function VerdictSummary({ verdicts }: { verdicts: Record<string, number> }) {
@@ -98,7 +89,7 @@ export function StatementSourcesTable({
         </thead>
         <tbody>
           {groups.map((group) => {
-            const firstUrl = [...group.urls.values()][0]?.url;
+            const firstUrl = group.urls.values().next().value?.url;
             return (
               <tr key={group.domain} className="border-b border-border/30 last:border-0">
                 <td className="px-3 py-1.5 text-xs">

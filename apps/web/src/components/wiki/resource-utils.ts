@@ -83,6 +83,16 @@ export function getDomain(url: string): string | null {
   }
 }
 
+/** Check if a URL uses a safe protocol (http or https) */
+export function isSafeUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export const typeIcons: Record<string, string> = {
   paper: "\ud83d\udcc4",
   book: "\ud83d\udcda",
