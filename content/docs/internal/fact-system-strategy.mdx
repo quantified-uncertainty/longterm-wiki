@@ -8,7 +8,7 @@ subcategory: architecture
 quality: 55
 readerImportance: 10
 researchImportance: 30
-lastEdited: "2026-02-23"
+lastEdited: "2026-03-03"
 update_frequency: 90
 ratings:
   novelty: 6
@@ -67,6 +67,19 @@ Data journalism organizations keep data lifecycle completely separate from conte
 Academic temporal knowledge graphs attach explicit timestamps to every fact: `(Anthropic, valuation, 2026-02, $61.5B)`. This enables historical queries and staleness detection.
 
 **Lesson for us:** Our `asOf` field on facts is the right idea. We should add `expectedUpdateFrequency` to measures so we can detect staleness automatically ("this valuation is 6 months old but should update quarterly").
+
+## Relationship to Statements
+
+Facts and Statements are **complementary, not competing** systems:
+
+- **Facts** (YAML) are the volatile numeric data layer — rendered via `\<F>` and `\<Calc>` components at build time, optimized for "update one YAML entry, correct 9 pages."
+- **Statements** (PostgreSQL) are the broader structured assertion layer — covering all assertion types (numeric, text, entity-valued, attributed) with property taxonomy, citations, and temporal validity.
+
+Statements link to Facts via `source_fact_key` (e.g., "anthropic.6796e194"), providing traceability without requiring migration of the YAML build-time pipeline. The property taxonomy in `data/fact-measures.yaml` is shared — it seeds the `properties` table that Statements use.
+
+**Long-term convergence**: Facts may eventually become a subset of Statements (numeric statements with canonical status), but the YAML → `\<F>` → build pipeline works well and doesn't need immediate migration.
+
+See <EntityLink id="E1006" name="statements-system-architecture">Statements System Architecture (E1006)</EntityLink> for the full Statements system reference.
 
 ## What Facts Are Actually Good For
 
