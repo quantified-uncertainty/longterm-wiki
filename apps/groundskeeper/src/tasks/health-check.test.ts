@@ -98,9 +98,24 @@ function mockServerDown() {
 }
 
 function mockServerUp() {
+  // Both /healthz and /health respond OK
   vi.stubGlobal(
     "fetch",
     vi.fn().mockResolvedValue({ ok: true })
+  );
+}
+
+/** Server process is reachable (/healthz OK) but DB queries are failing (/health errors). */
+function mockServerDegraded() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/healthz")) {
+        return Promise.resolve({ ok: true });
+      }
+      // /health returns error
+      return Promise.resolve({ ok: false, status: 500 });
+    })
   );
 }
 
@@ -223,7 +238,7 @@ describe("healthCheck", () => {
       expect(mockOctokit.rest.issues.create).not.toHaveBeenCalled();
     });
 
-    it("creates a new issue after reaching the consecutive failure threshold", async () => {
+    it("creates a new issue with diagnosis after reaching the consecutive failure threshold", async () => {
       // First N-1 calls build up the counter
       await exceedFailureThreshold(config);
       // The Nth call should trigger issue creation
@@ -235,6 +250,7 @@ describe("healthCheck", () => {
         expect.objectContaining({
           title: "[Groundskeeper] Wiki server health check failure",
           labels: ["groundskeeper"],
+          body: expect.stringContaining("**Diagnosis:**"),
         })
       );
     });
@@ -417,6 +433,27 @@ describe("healthCheck", () => {
         await healthCheck(config);
         expect(_getConsecutiveFailures()).toBe(i);
       }
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Degraded server (healthz OK, health failing)
+  // -----------------------------------------------------------------------
+
+  describe("when server is degraded (healthz OK, health failing)", () => {
+    it("reports server as up even when /health fails", async () => {
+      mockServerDegraded();
+      mockNoOpenIssue();
+      const result = await healthCheck(config);
+      expect(result.success).toBe(true);
+    });
+
+    it("closes existing issue when healthz is OK", async () => {
+      mockServerDegraded();
+      mockExistingOpenIssue();
+      const result = await healthCheck(config);
+      expect(result.success).toBe(true);
+      expect(result.summary).toContain("closed issue");
     });
   });
 

@@ -115,22 +115,93 @@ async function shouldPostStillDownComment(
   return true;
 }
 
-export async function healthCheck(
-  config: Config
-): Promise<{ success: boolean; summary?: string }> {
-  let serverUp = false;
+/** Timeout for lightweight /healthz probe (ms). */
+const HEALTHZ_TIMEOUT_MS = 10_000;
 
+/** Timeout for detailed /health probe (ms) — longer since it queries the DB. */
+const HEALTH_DETAIL_TIMEOUT_MS = 30_000;
+
+interface ProbeResult {
+  /** Whether /healthz responded OK — the primary up/down signal. */
+  serverUp: boolean;
+  /** Whether /health (detailed, with DB queries) responded OK. */
+  detailedOk: boolean | null; // null = not checked (server unreachable)
+  /** How long /health took to respond, in ms. null if it timed out or wasn't checked. */
+  detailedLatencyMs: number | null;
+  /** Human-readable diagnosis for use in issue bodies. */
+  diagnosis: string;
+}
+
+/**
+ * Probe both /healthz (lightweight) and /health (detailed with DB queries).
+ * /healthz determines the up/down decision. /health provides diagnostics.
+ */
+async function probeServer(config: Config): Promise<ProbeResult> {
+  const baseUrl = config.wikiServerUrl.replace(/\/$/, "");
+
+  // 1. Check /healthz first — this is the up/down signal
+  let serverUp = false;
   try {
-    // Use /healthz — lightweight endpoint with no DB queries, so timeouts
-    // reflect actual server unreachability rather than slow DB responses.
-    const healthUrl = config.wikiServerUrl.replace(/\/$/, "") + "/healthz";
-    const response = await fetch(healthUrl, {
-      signal: AbortSignal.timeout(10_000),
+    const response = await fetch(`${baseUrl}/healthz`, {
+      signal: AbortSignal.timeout(HEALTHZ_TIMEOUT_MS),
     });
     serverUp = response.ok;
   } catch {
     serverUp = false;
   }
+
+  // 2. If server is unreachable, skip the detailed probe
+  if (!serverUp) {
+    return {
+      serverUp: false,
+      detailedOk: null,
+      detailedLatencyMs: null,
+      diagnosis: "Server is unreachable (`/healthz` did not respond within 10s)",
+    };
+  }
+
+  // 3. Server is reachable — also probe /health for DB diagnostics
+  let detailedOk: boolean | null = null;
+  let detailedLatencyMs: number | null = null;
+  try {
+    const start = Date.now();
+    const response = await fetch(`${baseUrl}/health`, {
+      signal: AbortSignal.timeout(HEALTH_DETAIL_TIMEOUT_MS),
+    });
+    detailedLatencyMs = Date.now() - start;
+    detailedOk = response.ok;
+  } catch {
+    detailedOk = false;
+    detailedLatencyMs = null;
+  }
+
+  if (detailedOk) {
+    const latencyNote =
+      detailedLatencyMs && detailedLatencyMs > 5000
+        ? ` (but /health took ${(detailedLatencyMs / 1000).toFixed(1)}s — DB may be slow)`
+        : "";
+    return {
+      serverUp: true,
+      detailedOk: true,
+      detailedLatencyMs,
+      diagnosis: `Server is healthy${latencyNote}`,
+    };
+  }
+
+  return {
+    serverUp: true,
+    detailedOk: false,
+    detailedLatencyMs,
+    diagnosis: detailedLatencyMs === null
+      ? "Server is reachable (`/healthz` OK) but `/health` timed out after 30s — DB queries are likely stalled"
+      : `Server is reachable (\`/healthz\` OK) but \`/health\` returned an error after ${(detailedLatencyMs / 1000).toFixed(1)}s — DB may be degraded`,
+  };
+}
+
+export async function healthCheck(
+  config: Config
+): Promise<{ success: boolean; summary?: string }> {
+  const probe = await probeServer(config);
 
   const octokit = getOctokit(config);
   const { owner, repo } = parseRepo(config);
@@ -141,14 +212,14 @@ export async function healthCheck(
   } catch (error) {
     logger.error({ err: error }, "Failed to search for existing health issue");
     return {
-      success: serverUp,
-      summary: serverUp
+      success: probe.serverUp,
+      summary: probe.serverUp
         ? "Server up, but failed to check for existing issue"
         : "Server down, but failed to check for existing issue",
     };
   }
 
-  if (serverUp) {
+  if (probe.serverUp) {
     if (consecutiveFailures > 0) {
       logger.info(
         { previousFailures: consecutiveFailures },
@@ -237,7 +308,7 @@ export async function healthCheck(
     service: "wiki-server",
     severity: "critical",
     title: "Wiki server health check failure",
-    detail: `Server at ${config.wikiServerUrl} is not responding to /health endpoint`,
+    detail: probe.diagnosis,
     checkSource: "groundskeeper",
   };
 
@@ -264,7 +335,7 @@ export async function healthCheck(
           owner,
           repo,
           issue_number: existingIssue.number,
-          body: `Server is still down at ${new Date().toISOString()}. Checked \`${config.wikiServerUrl}/health\`.`,
+          body: `Server is still down at ${new Date().toISOString()}.\n\n**Diagnosis:** ${probe.diagnosis}`,
         });
       } catch (error) {
         logger.error(
@@ -297,7 +368,7 @@ export async function healthCheck(
       owner,
       repo,
       title: ISSUE_TITLE,
-      body: `The wiki server at \`${config.wikiServerUrl}\` is not responding.\n\nDetected at: ${new Date().toISOString()}\n\nThis issue will be closed automatically when the server recovers.`,
+      body: `The wiki server at \`${config.wikiServerUrl}\` is not responding.\n\nDetected at: ${new Date().toISOString()}\n\n**Diagnosis:** ${probe.diagnosis}\n\nThis issue will be closed automatically when the server recovers.`,
       labels: ["groundskeeper"],
     });
 
@@ -323,6 +394,8 @@ export {
   findOpenHealthIssue,
   hasRecentComment,
   shouldPostStillDownComment,
+  probeServer,
+  type ProbeResult,
 };
 
 // Exported for testing — reset in-memory state
