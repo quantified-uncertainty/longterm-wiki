@@ -4,8 +4,8 @@ import {
   fetchAllStatements,
   fetchAllProperties,
   buildEntityNameMap,
-} from "../components/statements-data";
-import { StatementsExplorer } from "./statements-explorer";
+} from "@/app/statements/components/statements-data";
+import { StatementsExplorer } from "@/app/statements/browse/statements-explorer";
 
 export const dynamic = "force-dynamic";
 

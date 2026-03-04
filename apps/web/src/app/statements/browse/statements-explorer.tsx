@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -8,7 +8,7 @@ import {
   getVarietyBadge,
   getStatusBadge,
 } from "@lib/statement-display";
-import type { StatementRow, PropertyRow } from "../components/statements-data";
+import type { StatementRow, PropertyRow } from "@/app/statements/components/statements-data";
 
 // ---- Filter bar ----
 
@@ -104,6 +104,12 @@ export function StatementsExplorer({
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [page, setPage] = useState(0);
   const pageSize = 50;
+
+  // Reset to first page when any filter changes
+  const filterKey = JSON.stringify(filters);
+  useEffect(() => {
+    setPage(0);
+  }, [filterKey]);
 
   // Build property map for value formatting
   const propertyMap = useMemo(

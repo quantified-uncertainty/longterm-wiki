@@ -81,18 +81,31 @@ export async function getStatementCategories(): Promise<
  * Returns entities with statement counts, sorted by count descending.
  */
 export async function getStatementEntities(): Promise<StatementEntityItem[]> {
-  const result = await fetchFromWikiServer<{
-    statements: {
-      subjectEntityId: string;
-    }[];
-    total: number;
-  }>("/api/statements?limit=500&status=active", { revalidate: 300 });
+  // Paginate through all active statements (API max page size is 500)
+  const PAGE_SIZE = 500;
+  const allStatements: { subjectEntityId: string }[] = [];
+  let offset = 0;
+  let total = Infinity;
 
-  if (!result) return [];
+  while (offset < total) {
+    const result = await fetchFromWikiServer<{
+      statements: { subjectEntityId: string }[];
+      total: number;
+    }>(`/api/statements?limit=${PAGE_SIZE}&offset=${offset}&status=active`, {
+      revalidate: 300,
+    });
+
+    if (!result) break;
+    total = result.total;
+    allStatements.push(...result.statements);
+    offset += PAGE_SIZE;
+  }
+
+  if (allStatements.length === 0) return [];
 
   // Count statements per entity
   const entityCounts = new Map<string, number>();
-  for (const s of result.statements) {
+  for (const s of allStatements) {
     entityCounts.set(
       s.subjectEntityId,
       (entityCounts.get(s.subjectEntityId) ?? 0) + 1

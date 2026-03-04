@@ -108,32 +108,30 @@ export default async function StatementDetailPage({ params }: PageProps) {
   const numericId = parseInt(id, 10);
   if (isNaN(numericId)) notFound();
 
-  // Fetch the statement from the list endpoint (single-item filter by checking the full list)
-  // We fetch the statement + its citations via the by-entity endpoint workaround,
-  // or directly from the list endpoint
-  const { data: listData } = await withApiFallback(
-    () =>
-      fetchDetailed<{ statements: StatementDetail[]; total: number }>(
-        `/api/statements?limit=1&offset=${numericId - 1}`,
-        { revalidate: 300 }
-      ),
-    () => ({ statements: [], total: 0 })
-  );
+  // Paginate through the list endpoint to find the statement by ID.
+  // The API doesn't support a direct /:id GET, so we page through results.
+  const PAGE_SIZE = 500;
+  let statement: StatementDetail | undefined;
+  let offset = 0;
+  let total = Infinity;
 
-  // The list endpoint doesn't support filtering by ID directly, so fetch all and find
-  const { data: allData } = await withApiFallback(
-    () =>
-      fetchDetailed<{ statements: StatementDetail[]; total: number }>(
-        `/api/statements?limit=500`,
-        { revalidate: 300 }
-      ),
-    () => ({ statements: [], total: 0 })
-  );
+  while (offset < total && !statement) {
+    const { data: page } = await withApiFallback(
+      () =>
+        fetchDetailed<{ statements: StatementDetail[]; total: number }>(
+          `/api/statements?limit=${PAGE_SIZE}&offset=${offset}`,
+          { revalidate: 300 }
+        ),
+      () => ({ statements: [], total: 0 })
+    );
+    total = page.total;
+    statement = page.statements.find((s) => s.id === numericId);
+    offset += PAGE_SIZE;
+  }
 
-  const statement = allData.statements.find((s) => s.id === numericId);
   if (!statement) notFound();
 
-  // Fetch citations via the by-entity endpoint
+  // Fetch the full entity data (citations, property info) via the by-entity endpoint
   const { data: entityData } = await withApiFallback(
     () =>
       fetchDetailed<{

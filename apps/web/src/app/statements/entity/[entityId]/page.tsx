@@ -139,6 +139,7 @@ export default async function EntityStatementsPage({ params }: PageProps) {
     .filter((s) => s.validEnd == null && s.property)
     .slice(0, 5)
     .map((s) => ({
+      id: s.id,
       label: s.property!.label,
       value: formatStatementValue(s, s.property),
     }));
@@ -175,7 +176,7 @@ export default async function EntityStatementsPage({ params }: PageProps) {
         <div className="flex flex-wrap gap-3 mb-6">
           {summaryValues.map((sv) => (
             <div
-              key={sv.label}
+              key={sv.id}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted/50 text-sm"
             >
               <span className="text-muted-foreground">{sv.label}:</span>
@@ -297,7 +298,7 @@ function PropertyGroup({
   statements: StatementWithDetails[];
 }) {
   const active = statements.filter((s) => s.status === "active");
-  const superseded = statements.filter((s) => s.status !== "active");
+  const inactive = statements.filter((s) => s.status !== "active");
 
   return (
     <div className="mb-4">
@@ -307,7 +308,7 @@ function PropertyGroup({
         {category}
         <span className="ml-2 text-xs font-normal text-muted-foreground">
           ({active.length} active
-          {superseded.length > 0 ? `, ${superseded.length} superseded` : ""})
+          {inactive.length > 0 ? `, ${inactive.length} inactive` : ""})
         </span>
       </h3>
       <div className="rounded-lg border border-border/60 overflow-hidden">
@@ -336,7 +337,7 @@ function PropertyGroup({
             {active.map((s) => (
               <StructuredRow key={s.id} statement={s} />
             ))}
-            {superseded.map((s) => (
+            {inactive.map((s) => (
               <StructuredRow key={s.id} statement={s} />
             ))}
           </tbody>

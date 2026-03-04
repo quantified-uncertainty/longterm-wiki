@@ -8,7 +8,7 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { StatCard } from "@components/internal/StatCard";
 import { getEntityById } from "@data";
-import { PropertiesTable } from "./properties-table";
+import { PropertiesTable } from "@/app/statements/properties/properties-table";
 
 export const dynamic = "force-dynamic";
 
@@ -45,16 +45,48 @@ interface DashboardData {
   statements: StatementRow[];
 }
 
+/**
+ * Paginate through all statements (API max page size 500).
+ */
+async function fetchAllStatementsForProperties(): Promise<
+  FetchResult<{ statements: StatementRow[]; total: number }>
+> {
+  const PAGE_SIZE = 500;
+  const first = await fetchDetailed<{ statements: StatementRow[]; total: number }>(
+    `/api/statements?limit=${PAGE_SIZE}&offset=0`,
+    { revalidate: 300 }
+  );
+  if (!first.ok) return first;
+
+  const all: StatementRow[] = [...first.data.statements];
+  const total = first.data.total;
+
+  // Fetch remaining pages in parallel
+  const remaining: Promise<FetchResult<{ statements: StatementRow[]; total: number }>>[] = [];
+  for (let offset = PAGE_SIZE; offset < total; offset += PAGE_SIZE) {
+    remaining.push(
+      fetchDetailed<{ statements: StatementRow[]; total: number }>(
+        `/api/statements?limit=${PAGE_SIZE}&offset=${offset}`,
+        { revalidate: 300 }
+      )
+    );
+  }
+
+  const pages = await Promise.all(remaining);
+  for (const page of pages) {
+    if (page.ok) all.push(...page.data.statements);
+  }
+
+  return { ok: true, data: { statements: all, total } };
+}
+
 async function loadFromApi(): Promise<FetchResult<DashboardData>> {
   const [propertiesResult, statementsResult] = await Promise.all([
     fetchDetailed<{ properties: PropertyRow[] }>(
       "/api/statements/properties",
       { revalidate: 300 }
     ),
-    fetchDetailed<{ statements: StatementRow[]; total: number }>(
-      "/api/statements?limit=500",
-      { revalidate: 300 }
-    ),
+    fetchAllStatementsForProperties(),
   ]);
 
   if (!propertiesResult.ok) return propertiesResult;

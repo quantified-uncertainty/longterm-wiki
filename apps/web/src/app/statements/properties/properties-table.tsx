@@ -12,7 +12,7 @@ import {
 import { Search } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
-import type { PropertyRow } from "./page";
+import type { PropertyRow } from "@/app/statements/components/statements-data";
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 

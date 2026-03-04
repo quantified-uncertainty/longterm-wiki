@@ -2,12 +2,12 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import {
   StatementsSidebar,
   MobileSidebarTrigger,
-} from "./components/statements-sidebar";
+} from "@/app/statements/components/statements-sidebar";
 import {
   getStatementsNav,
   getStatementCategories,
   getStatementEntities,
-} from "./components/statements-nav";
+} from "@/app/statements/components/statements-nav";
 
 export default async function StatementsLayout({
   children,

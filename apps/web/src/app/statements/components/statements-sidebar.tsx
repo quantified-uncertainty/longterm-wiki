@@ -28,7 +28,7 @@ import type { NavSection } from "@/lib/internal-nav";
 import type {
   StatementEntityItem,
   PropertyCategoryItem,
-} from "./statements-nav";
+} from "@/app/statements/components/statements-nav";
 
 export { MobileSidebarTrigger };
 
@@ -104,7 +104,7 @@ function CategoriesList({
                   <SidebarMenuItem key={cat.category}>
                     <SidebarMenuButton
                       asChild
-                      isActive={pathname === "/statements/browse" && false}
+                      isActive={pathname === "/statements/browse"}
                       size="sm"
                     >
                       <Link

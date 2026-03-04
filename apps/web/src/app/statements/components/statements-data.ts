@@ -50,16 +50,28 @@ export interface PropertyRow {
 // ---- Fetchers ----
 
 /**
- * Fetch all statements from wiki-server, paginated.
+ * Fetch all statements from wiki-server, paginating through all pages.
+ * The API has a MAX_PAGE_SIZE of 500, so we fetch in chunks until we have all rows.
  */
 export async function fetchAllStatements(): Promise<StatementRow[]> {
-  const result = await fetchFromWikiServer<{
-    statements: StatementRow[];
-    total: number;
-  }>("/api/statements?limit=500", { revalidate: 300 });
+  const PAGE_SIZE = 500;
+  const all: StatementRow[] = [];
+  let offset = 0;
+  let total = Infinity;
 
-  if (!result) return [];
-  return result.statements;
+  while (offset < total) {
+    const result = await fetchFromWikiServer<{
+      statements: StatementRow[];
+      total: number;
+    }>(`/api/statements?limit=${PAGE_SIZE}&offset=${offset}`, { revalidate: 300 });
+
+    if (!result) break;
+    total = result.total;
+    all.push(...result.statements);
+    offset += PAGE_SIZE;
+  }
+
+  return all;
 }
 
 /**

@@ -55,16 +55,54 @@ interface OverviewData {
   recentStatements: StatementSummary[];
 }
 
+/**
+ * Paginate through all statements from the API (max page size 500).
+ */
+async function fetchAllStatementsDetailed(): Promise<
+  FetchResult<{ statements: StatementSummary[]; total: number }>
+> {
+  const PAGE_SIZE = 500;
+  const all: StatementSummary[] = [];
+  let offset = 0;
+  let total = 0;
+
+  // Fetch first page
+  const first = await fetchDetailed<{ statements: StatementSummary[]; total: number }>(
+    `/api/statements?limit=${PAGE_SIZE}&offset=0`,
+    { revalidate: 300 }
+  );
+  if (!first.ok) return first;
+  total = first.data.total;
+  all.push(...first.data.statements);
+  offset += PAGE_SIZE;
+
+  // Fetch remaining pages in parallel
+  const remaining: Promise<FetchResult<{ statements: StatementSummary[]; total: number }>>[] = [];
+  while (offset < total) {
+    remaining.push(
+      fetchDetailed<{ statements: StatementSummary[]; total: number }>(
+        `/api/statements?limit=${PAGE_SIZE}&offset=${offset}`,
+        { revalidate: 300 }
+      )
+    );
+    offset += PAGE_SIZE;
+  }
+
+  const pages = await Promise.all(remaining);
+  for (const page of pages) {
+    if (page.ok) all.push(...page.data.statements);
+  }
+
+  return { ok: true, data: { statements: all, total } };
+}
+
 async function loadFromApi(): Promise<FetchResult<OverviewData>> {
   const [statsResult, propertiesResult, recentResult] = await Promise.all([
     fetchDetailed<StatsResponse>("/api/statements/stats", { revalidate: 300 }),
     fetchDetailed<{ properties: PropertyRow[] }>("/api/statements/properties", {
       revalidate: 300,
     }),
-    fetchDetailed<{ statements: StatementSummary[]; total: number }>(
-      "/api/statements?limit=500",
-      { revalidate: 300 }
-    ),
+    fetchAllStatementsDetailed(),
   ]);
 
   if (!statsResult.ok) return statsResult;
@@ -155,7 +193,7 @@ export default async function StatementsOverviewPage() {
         </span>{" "}
         total statements across{" "}
         <span className="font-medium text-foreground">
-          {topEntities.length}
+          {entityCounts.size}
         </span>{" "}
         entities.
       </p>
@@ -167,7 +205,7 @@ export default async function StatementsOverviewPage() {
         <StatCard label="Structured" value={structured} color="blue" />
         <StatCard label="Attributed" value={attributed} color="amber" />
         <StatCard label="Properties" value={stats.propertiesCount} />
-        <StatCard label="Entities" value={topEntities.length} />
+        <StatCard label="Entities" value={entityCounts.size} />
         {superseded > 0 && (
           <StatCard label="Superseded" value={superseded} />
         )}
