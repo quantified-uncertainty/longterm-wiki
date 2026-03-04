@@ -140,3 +140,68 @@ properties:
     value_type: number
     value_unit: tokens
     category: technical
+
+  # ── Research / Impact ──────────────────────────────────────────────────
+  - id: citation_count
+    label: "Citation Count"
+    description: "Number of academic or scholarly citations"
+    value_type: number
+    value_unit: count
+    category: research
+
+  - id: citations
+    label: "Citations"
+    description: "Number of academic or scholarly citations (alias for citation_count)"
+    value_type: number
+    value_unit: count
+    category: research
+
+  - id: github_stars
+    label: "GitHub Stars"
+    description: "Number of GitHub stars on a repository or project"
+    value_type: number
+    value_unit: count
+    category: research
+
+  # ── Risk / Safety Estimates ────────────────────────────────────────────
+  - id: doom_probability
+    label: "Doom Probability"
+    description: "Estimated probability of existential catastrophe from AI"
+    value_type: number
+    value_unit: percent
+    category: safety
+
+  - id: risk_probability
+    label: "Risk Probability"
+    description: "Estimated probability of a specific risk scenario materializing"
+    value_type: number
+    value_unit: percent
+    category: safety
+
+  - id: risk_assessment
+    label: "Risk Assessment"
+    description: "Qualitative assessment of risk level"
+    value_type: string
+    category: safety
+
+  - id: alignment_faking_rate
+    label: "Alignment Faking Rate"
+    description: "Observed or estimated rate of alignment faking behavior in AI systems"
+    value_type: number
+    value_unit: percent
+    category: safety
+
+  # ── Generic Fallback ───────────────────────────────────────────────────
+  - id: count
+    label: "Count"
+    description: "Generic count measure (fallback for unclassified numeric counts)"
+    value_type: number
+    value_unit: count
+    category: organizational
+
+  - id: percent
+    label: "Percentage"
+    description: "Generic percentage measure (fallback for unclassified percentages)"
+    value_type: number
+    value_unit: percent
+    category: organizational

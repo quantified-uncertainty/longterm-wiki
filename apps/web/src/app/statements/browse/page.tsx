@@ -32,7 +32,13 @@ export default async function BrowseStatementsPage() {
     .sort((a, b) => a.label.localeCompare(b.label))
     .map((p) => ({ id: p.id, label: p.label }));
 
-  const entityNames = buildEntityNameMap(entities);
+  // Collect all entity IDs that need name resolution
+  const allEntityIds = new Set(entities);
+  for (const s of statements) {
+    if (s.attributedTo) allEntityIds.add(s.attributedTo);
+    if (s.valueEntityId) allEntityIds.add(s.valueEntityId);
+  }
+  const entityNames = buildEntityNameMap([...allEntityIds]);
 
   return (
     <div>

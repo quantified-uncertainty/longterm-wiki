@@ -72,6 +72,8 @@ interface StatementWithDetails {
   attributedTo: string | null;
   sourceFactKey: string | null;
   note: string | null;
+  verdict: string | null;
+  verdictScore: number | null;
   property: PropertyInfo | null;
   citations: Citation[];
 }
@@ -250,6 +252,7 @@ function PropertyGroup({
               <th className="text-left px-3 py-2 text-xs font-medium">Value</th>
               <th className="text-left px-3 py-2 text-xs font-medium">Period</th>
               <th className="text-right px-3 py-2 text-xs font-medium">Citations</th>
+              <th className="text-left px-3 py-2 text-xs font-medium">Verdict</th>
               <th className="text-left px-3 py-2 text-xs font-medium">Status</th>
             </tr>
           </thead>
@@ -264,6 +267,24 @@ function PropertyGroup({
         </table>
       </div>
     </div>
+  );
+}
+
+const VERDICT_COLORS: Record<string, string> = {
+  verified: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  disputed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  unsupported: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+};
+const VERDICT_DEFAULT = "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
+
+function VerdictBadge({ verdict, score }: { verdict: string | null; score: number | null }) {
+  if (!verdict) return <span className="text-muted-foreground/40">—</span>;
+  const config = VERDICT_COLORS[verdict] ?? VERDICT_DEFAULT;
+  return (
+    <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-medium ${config}`}>
+      {verdict}
+      {score != null && <span className="opacity-60">({Math.round(score * 100)}%)</span>}
+    </span>
   );
 }
 
@@ -296,6 +317,9 @@ function StructuredRow({ statement: s }: { statement: StatementWithDetails }) {
       </td>
       <td className="px-3 py-2 text-xs text-right relative">
         <CitationDetail citations={s.citations} />
+      </td>
+      <td className="px-3 py-2 text-xs">
+        <VerdictBadge verdict={s.verdict} score={s.verdictScore} />
       </td>
       <td className="px-3 py-2">
         <span

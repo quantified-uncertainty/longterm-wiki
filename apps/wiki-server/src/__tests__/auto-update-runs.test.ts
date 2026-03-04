@@ -9,6 +9,24 @@ import {
 
 // ---- In-memory stores simulating the tables ----
 
+let nextSlugIntId = 1000;
+const slugIntIdMap = new Map<string, number>();
+
+function getIntIdForSlug(slug: string): number {
+  if (!slugIntIdMap.has(slug)) {
+    slugIntIdMap.set(slug, nextSlugIntId++);
+  }
+  return slugIntIdMap.get(slug)!;
+}
+
+function slugFromIntId(intId: number | null): string | null {
+  if (intId === null) return null;
+  for (const [slug, id] of slugIntIdMap.entries()) {
+    if (id === intId) return slug;
+  }
+  return null;
+}
+
 let nextRunId = 1;
 let nextResultId = 1;
 let runStore: Array<{
@@ -34,8 +52,9 @@ let runStore: Array<{
 let resultStore: Array<{
   id: number;
   run_id: number;
-  page_id: string;
-  page_id_old: string;
+  page_id: string | null;
+  page_id_old: string | null;
+  page_id_int: number | null;
   status: string;
   tier: string | null;
   duration_ms: number | null;
@@ -47,6 +66,8 @@ function resetStores() {
   resultStore = [];
   nextRunId = 1;
   nextResultId = 1;
+  nextSlugIntId = 1000;
+  slugIntIdMap.clear();
 }
 
 const dispatch: SqlDispatcher = (query, params) => {
@@ -62,7 +83,7 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- entity_ids: SELECT WHERE slug (for resolvePageIntIds) ----
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
-    return []; // No entity_ids in test — page_id_int will be null
+    return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
   }
 
   // ---- TRUNCATE ----
@@ -111,21 +132,24 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO auto_update_results (supports multi-row) ----
   if (q.includes("insert into") && q.includes("auto_update_results")) {
-    const COLS = 7; // Phase 4a: +1 for page_id_int
+    // Phase D2a: removed page_id_old — params: run_id, page_id_int, status, tier, duration_ms, error_message
+    const COLS = 6;
     const numRows = params.length / COLS;
     const rows = [];
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
+      const pageIdInt = params[o + 1] as number | null;
+      const pageSlug = slugFromIntId(pageIdInt);
       const row = {
         id: nextResultId++,
         run_id: params[o] as number,
-        page_id: params[o + 1] as string,
-        page_id_old: params[o + 1] as string,
-        // params[o + 2] is page_id_int (Phase 4a, not used in mock)
-        status: params[o + 3] as string,
-        tier: params[o + 4] as string | null,
-        duration_ms: params[o + 5] as number | null,
-        error_message: params[o + 6] as string | null,
+        page_id: pageSlug,
+        page_id_old: null, // D2a: not written on insert
+        page_id_int: pageIdInt,
+        status: params[o + 2] as string,
+        tier: params[o + 3] as string | null,
+        duration_ms: params[o + 4] as number | null,
+        error_message: params[o + 5] as string | null,
       };
       resultStore.push(row);
       rows.push(row);
@@ -134,13 +158,26 @@ const dispatch: SqlDispatcher = (query, params) => {
   }
 
   // ---- SELECT ... FROM auto_update_results WHERE run_id IN (...) ----
+  // Phase D2a: query uses COALESCE + LEFT JOIN wiki_pages. extractColumns finds
+  // "id" for the COALESCE expression, so we remap "id" to the page slug.
   if (
     q.includes("auto_update_results") &&
     q.includes("where") &&
     q.includes("run_id")
   ) {
     const runIds = params.map(Number);
-    return resultStore.filter((r) => runIds.includes(r.run_id));
+    return resultStore
+      .filter((r) => runIds.includes(r.run_id))
+      .map((r) => ({
+        run_id: r.run_id,
+        // "id" is what extractColumns finds for coalesce(..., "wiki_pages"."id")
+        // D2a COALESCE: page_id_old ?? wiki_pages.id (via int lookup)
+        id: r.page_id_old ?? slugFromIntId(r.page_id_int) ?? null,
+        status: r.status,
+        tier: r.tier,
+        duration_ms: r.duration_ms,
+        error_message: r.error_message,
+      }));
   }
 
   // ---- SELECT count(*) FROM auto_update_runs (not GROUP BY) ----

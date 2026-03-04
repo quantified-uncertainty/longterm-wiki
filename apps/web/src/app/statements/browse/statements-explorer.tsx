@@ -21,12 +21,15 @@ interface FilterState {
   entity: string;
   hasCitations: string;
   hasVerdict: string;
+  hasProperty: string;
 }
 
 function useFilters(): [FilterState, (key: keyof FilterState, val: string) => void] {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  // Default hasProperty=true on first load (no URL params set)
+  const hasAnyParams = searchParams.toString().length > 0;
   const filters: FilterState = {
     search: searchParams.get("search") ?? "",
     variety: searchParams.get("variety") ?? "",
@@ -36,6 +39,7 @@ function useFilters(): [FilterState, (key: keyof FilterState, val: string) => vo
     entity: searchParams.get("entity") ?? "",
     hasCitations: searchParams.get("hasCitations") ?? "",
     hasVerdict: searchParams.get("hasVerdict") ?? "",
+    hasProperty: searchParams.get("hasProperty") ?? (hasAnyParams ? "" : "true"),
   };
 
   const setFilter = (key: keyof FilterState, val: string) => {
@@ -100,7 +104,7 @@ export function StatementsExplorer({
   propertyOptions,
 }: StatementsExplorerProps) {
   const [filters, setFilter] = useFilters();
-  const [sortKey, setSortKey] = useState<SortKey>("newest");
+  const [sortKey, setSortKey] = useState<SortKey>("entity");
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [page, setPage] = useState(0);
   const pageSize = 50;
@@ -159,6 +163,9 @@ export function StatementsExplorer({
     }
     if (filters.hasVerdict === "true") {
       result = result.filter((s) => s.verdict != null);
+    }
+    if (filters.hasProperty === "true") {
+      result = result.filter((s) => s.propertyId != null);
     }
 
     return result;
@@ -263,6 +270,17 @@ export function StatementsExplorer({
         <label className="flex items-center gap-1.5 cursor-pointer">
           <input
             type="checkbox"
+            checked={filters.hasProperty === "true"}
+            onChange={(e) =>
+              setFilter("hasProperty", e.target.checked ? "true" : "")
+            }
+            className="rounded border-border"
+          />
+          <span className="text-muted-foreground">Has property</span>
+        </label>
+        <label className="flex items-center gap-1.5 cursor-pointer">
+          <input
+            type="checkbox"
             checked={filters.hasCitations === "true"}
             onChange={(e) =>
               setFilter("hasCitations", e.target.checked ? "true" : "")
@@ -316,6 +334,7 @@ export function StatementsExplorer({
                   statement={s}
                   property={prop ?? null}
                   entityName={entityNames[s.subjectEntityId] ?? s.subjectEntityId}
+                  entityNames={entityNames}
                   isExpanded={isExpanded}
                   onToggle={() => setExpandedId(isExpanded ? null : s.id)}
                 />
@@ -357,12 +376,14 @@ function StatementTableRow({
   statement: s,
   property: prop,
   entityName,
+  entityNames,
   isExpanded,
   onToggle,
 }: {
   statement: StatementRow;
   property: PropertyRow | null;
   entityName: string;
+  entityNames: Record<string, string>;
   isExpanded: boolean;
   onToggle: () => void;
 }) {
@@ -394,7 +415,13 @@ function StatementTableRow({
         </td>
         <td className="px-3 py-2 text-xs max-w-[300px]">
           {s.variety === "structured" ? (
-            <span className="font-medium">{prop?.label ?? s.propertyId ?? "—"}</span>
+            <span className="font-medium">
+              {prop?.label ?? s.propertyId ?? (s.statementText ? (
+                <span className="italic text-muted-foreground font-normal line-clamp-1">
+                  {s.statementText}
+                </span>
+              ) : "—")}
+            </span>
           ) : (
             <span className="italic text-muted-foreground line-clamp-1">
               {s.statementText ? `"${s.statementText}"` : "—"}
@@ -444,7 +471,7 @@ function StatementTableRow({
       {isExpanded && (
         <tr className="bg-muted/20">
           <td colSpan={8} className="px-6 py-4">
-            <ExpandedDetails statement={s} property={prop} entityName={entityName} />
+            <ExpandedDetails statement={s} property={prop} entityName={entityName} entityNames={entityNames} />
           </td>
         </tr>
       )}
@@ -458,10 +485,12 @@ function ExpandedDetails({
   statement: s,
   property: prop,
   entityName,
+  entityNames,
 }: {
   statement: StatementRow;
   property: PropertyRow | null;
   entityName: string;
+  entityNames: Record<string, string>;
 }) {
   const value = formatStatementValue(
     s,
@@ -486,10 +515,17 @@ function ExpandedDetails({
         <div>
           <span className="text-muted-foreground">Entity: </span>
           <Link
-            href={`/statements/entity/${s.subjectEntityId}`}
+            href={`/wiki/${s.subjectEntityId}`}
             className="text-blue-600 hover:underline"
           >
             {entityName}
+          </Link>
+          <span className="text-muted-foreground mx-1">·</span>
+          <Link
+            href={`/statements/entity/${s.subjectEntityId}`}
+            className="text-muted-foreground hover:underline text-[11px]"
+          >
+            all statements
           </Link>
         </div>
         {prop && (
@@ -532,7 +568,7 @@ function ExpandedDetails({
               href={`/wiki/${s.attributedTo}`}
               className="text-blue-600 hover:underline"
             >
-              {s.attributedTo}
+              {entityNames[s.attributedTo] ?? s.attributedTo}
             </Link>
           </div>
         )}
@@ -561,10 +597,14 @@ function ExpandedDetails({
         )}
       </div>
 
-      {/* Statement text for attributed */}
+      {/* Statement text */}
       {s.statementText && (
-        <div className="border-l-2 border-amber-300 pl-3 py-1 italic text-muted-foreground">
-          &ldquo;{s.statementText}&rdquo;
+        <div className={`border-l-2 ${s.variety === "attributed" ? "border-amber-300" : "border-blue-300"} pl-3 py-1 text-muted-foreground`}>
+          {s.variety === "attributed" ? (
+            <span className="italic">&ldquo;{s.statementText}&rdquo;</span>
+          ) : (
+            <span className="text-xs">{s.statementText}</span>
+          )}
         </div>
       )}
 

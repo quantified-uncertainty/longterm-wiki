@@ -2,7 +2,7 @@ name: Sync Entities & Facts
 
 on:
   push:
-    branches: [main]
+    branches: [production]
     paths:
       - "data/entities/**"
       - "data/facts/**"

@@ -358,6 +358,119 @@ measures:
     description: "Entity that acquired this one"
     applicableTo: [organization]
 
+  key-person:
+    label: "Key Person"
+    unit: entity
+    category: relation
+    description: "Notable individual at the organization (e.g., chief scientist, key executive)"
+    applicableTo: [organization]
+
+  investor:
+    label: "Investor"
+    unit: entity
+    category: relation
+    description: "Investor in the organization"
+    applicableTo: [organization]
+
+  competitor:
+    label: "Competitor"
+    unit: entity
+    category: relation
+    description: "Organization with a competitive relationship"
+    applicableTo: [organization]
+
+  partner:
+    label: "Partner"
+    unit: entity
+    category: relation
+    description: "Organization in a partnership or collaboration"
+    applicableTo: [organization]
+
+  subsidiary:
+    label: "Subsidiary"
+    unit: entity
+    category: relation
+    description: "Child or subsidiary organization"
+    applicableTo: [organization]
+
+  prior-affiliation:
+    label: "Prior Affiliation"
+    unit: entity
+    category: relation
+    description: "Former employer or organization affiliation"
+    applicableTo: [person]
+
+  board-member:
+    label: "Board Member"
+    unit: entity
+    category: relation
+    description: "Member of the board of directors"
+    applicableTo: [organization]
+
+  # === Research / Impact ===
+  citation-count:
+    label: "Citation Count"
+    unit: count
+    category: research
+    direction: higher
+    description: "Number of academic or scholarly citations"
+    applicableTo: [organization, person]
+
+  github-stars:
+    label: "GitHub Stars"
+    unit: count
+    category: research
+    direction: higher
+    description: "Number of GitHub stars on a repository or project"
+    applicableTo: [organization]
+
+  # === Risk / Safety Estimates ===
+  doom-probability:
+    label: "Doom Probability"
+    unit: percent
+    category: safety
+    direction: lower
+    description: "Estimated probability of existential catastrophe from AI"
+    applicableTo: [organization, person]
+
+  risk-probability:
+    label: "Risk Probability"
+    unit: percent
+    category: safety
+    direction: lower
+    description: "Estimated probability of a specific risk scenario materializing"
+    applicableTo: [organization, person]
+
+  risk-assessment:
+    label: "Risk Assessment"
+    unit: string
+    category: safety
+    description: "Qualitative assessment of risk level (e.g., low, medium, high)"
+    applicableTo: [organization, person]
+
+  alignment-faking-rate:
+    label: "Alignment Faking Rate"
+    unit: percent
+    category: safety
+    direction: lower
+    description: "Observed or estimated rate of alignment faking behavior in AI systems"
+    applicableTo: [organization]
+
+  # === Generic Fallback ===
+  generic-count:
+    label: "Count"
+    unit: count
+    category: organizational
+    description: "Generic count measure (fallback for unclassified numeric counts)"
+    applicableTo: [organization, person]
+
+  generic-percent:
+    label: "Percentage"
+    unit: percent
+    category: organizational
+    description: "Generic percentage measure (fallback for unclassified percentages)"
+    applicableTo: [organization, person]
+
   # === Market ===
   market-volume:
     label: "Market/Transaction Volume"
@@ -369,6 +482,192 @@ measures:
       divisor: 1000000000
       prefix: "$"
       suffix: "B"
+    applicableTo: [organization]
+
+  # === Product ===
+  product-release:
+    label: "Product Release"
+    unit: string
+    category: product
+    description: "Product or model release event"
+    applicableTo: [organization]
+
+  model-capability:
+    label: "Model Capability"
+    unit: string
+    category: product
+    description: "Qualitative capability description of a model or product"
+    applicableTo: [organization]
+
+  safety-level:
+    label: "Safety Level"
+    unit: string
+    category: product
+    description: "AI Safety Level (ASL) or safety classification tier"
+    applicableTo: [organization]
+
+  # === Policy ===
+  policy-position:
+    label: "Policy Position"
+    unit: string
+    category: policy
+    description: "Stated stance or position on a policy issue"
+    applicableTo: [organization, person]
+
+  regulatory-event:
+    label: "Regulatory Event"
+    unit: string
+    category: policy
+    description: "Regulatory action, investigation, or compliance event"
+    applicableTo: [organization]
+
+  governance-structure:
+    label: "Governance Structure"
+    unit: string
+    category: policy
+    description: "Governance mechanism or board structure"
+    applicableTo: [organization]
+
+  lobbying-action:
+    label: "Lobbying Action"
+    unit: string
+    category: policy
+    description: "Lobbying effort, advocacy action, or political engagement"
+    applicableTo: [organization]
+
+  # === Research ===
+  research-finding:
+    label: "Research Finding"
+    unit: string
+    category: research
+    description: "Empirical research result or discovery"
+    applicableTo: [organization, person]
+
+  research-methodology:
+    label: "Research Methodology"
+    unit: string
+    category: research
+    description: "Research method, approach, or experimental technique"
+    applicableTo: [organization]
+
+  publication:
+    label: "Publication"
+    unit: string
+    category: research
+    description: "Published paper, report, or technical document"
+    applicableTo: [organization, person]
+
+  interpretable-features:
+    label: "Interpretable Features"
+    unit: count
+    category: research
+    direction: higher
+    description: "Number of ML interpretability features identified"
+    relatedMeasures: [interpretability-team-size]
+    applicableTo: [organization]
+
+  # === Qualitative ===
+  focus-area:
+    label: "Focus Area"
+    unit: string
+    category: qualitative
+    description: "Primary domain, mission, or area of focus"
+    applicableTo: [organization]
+
+  company-culture:
+    label: "Company Culture"
+    unit: string
+    category: qualitative
+    description: "Description of organizational culture"
+    applicableTo: [organization]
+
+  reputation:
+    label: "Reputation"
+    unit: string
+    category: qualitative
+    description: "Public perception or industry reputation"
+    applicableTo: [organization, person]
+
+  criticism:
+    label: "Criticism"
+    unit: string
+    category: qualitative
+    description: "Notable criticism, concern, or controversy"
+    applicableTo: [organization, person]
+
+  revenue-source:
+    label: "Revenue Source"
+    unit: string
+    category: qualitative
+    description: "Description of a revenue stream or business model"
+    applicableTo: [organization]
+
+  # === People / Organizational (extended) ===
+  employee-salary:
+    label: "Employee Salary"
+    unit: USD
+    category: organizational
+    direction: higher
+    description: "Base salary range for employees"
+    display:
+      divisor: 1000
+      prefix: "$"
+      suffix: "K"
+    applicableTo: [organization]
+
+  parental-leave:
+    label: "Parental Leave"
+    unit: string
+    category: organizational
+    description: "Parental leave policy description"
+    applicableTo: [organization]
+
+  glassdoor-rating:
+    label: "Glassdoor Rating"
+    unit: score
+    category: organizational
+    direction: higher
+    description: "Glassdoor overall company rating (out of 5)"
+    applicableTo: [organization]
+
+  work-life-balance:
+    label: "Work-Life Balance"
+    unit: score
+    category: organizational
+    direction: higher
+    description: "Work-life balance score or rating"
+    applicableTo: [organization]
+
+  enterprise-customers:
+    label: "Enterprise Customers"
+    unit: count
+    category: organizational
+    direction: higher
+    description: "Number of enterprise-tier customers"
+    relatedMeasures: [customer-count, revenue]
+    applicableTo: [organization]
+
+  # === Event / Milestone (extended) ===
+  ipo-date:
+    label: "IPO Date"
+    unit: date
+    category: milestone
+    description: "Initial public offering date or projected IPO date"
+    applicableTo: [organization]
+
+  acquisition:
+    label: "Acquisition"
+    unit: string
+    category: milestone
+    description: "Acquisition event (acquiring another entity)"
+    relatedMeasures: [acquired-by]
+    applicableTo: [organization]
+
+  partnership-announcement:
+    label: "Partnership Announcement"
+    unit: string
+    category: milestone
+    description: "Strategic partnership announcement"
     applicableTo: [organization]
 
 # Mapping from structured claims property IDs (snake_case) to measure IDs (kebab-case).
@@ -394,3 +693,39 @@ propertyAliases:
   parameter_count: model-parameters
   benchmark_score: benchmark-score
   context_window: context-window
+  doom_probability: doom-probability
+  risk_probability: risk-probability
+  risk_assessment: risk-assessment
+  alignment_faking_rate: alignment-faking-rate
+  citations: citation-count
+  citation_count: citation-count
+  github_stars: github-stars
+  count: generic-count
+  percent: generic-percent
+  # New aliases added for expanded properties
+  key_person: key-person
+  prior_affiliation: prior-affiliation
+  board_member: board-member
+  product_release: product-release
+  model_capability: model-capability
+  safety_level: safety-level
+  product_revenue: product-revenue
+  policy_position: policy-position
+  regulatory_event: regulatory-event
+  governance_structure: governance-structure
+  lobbying_action: lobbying-action
+  research_finding: research-finding
+  research_methodology: research-methodology
+  interpretable_features: interpretable-features
+  focus_area: focus-area
+  company_culture: company-culture
+  revenue_source: revenue-source
+  employee_salary: employee-salary
+  parental_leave: parental-leave
+  glassdoor_rating: glassdoor-rating
+  work_life_balance: work-life-balance
+  customer_count: customer-count
+  enterprise_customers: enterprise-customers
+  customer_concentration: customer-concentration
+  ipo_date: ipo-date
+  partnership_announcement: partnership-announcement
