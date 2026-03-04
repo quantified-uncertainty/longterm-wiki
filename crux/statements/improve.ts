@@ -5,6 +5,10 @@
  * web search, then generates high-quality statements via LLM. Each candidate
  * passes through a quality gate (scoring + uniqueness) before insertion.
  *
+ * Architecture: runSinglePass() is the composable core. main() is a thin CLI
+ * wrapper. Future features (quality mode, iterative loops) add new pass
+ * functions alongside runSinglePass() without modifying it.
+ *
  * Usage:
  *   pnpm crux statements improve <entity-id> --org-type=frontier-lab
  *   pnpm crux statements improve <entity-id> --dry-run
@@ -14,6 +18,7 @@
  */
 
 import { fileURLToPath } from 'url';
+import Anthropic from '@anthropic-ai/sdk';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
@@ -36,10 +41,10 @@ import {
 import { resolveCoverageTargets } from './coverage-targets.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types (exported for use by future pass functions)
 // ---------------------------------------------------------------------------
 
-interface GeneratedStatement {
+export interface GeneratedStatement {
   statementText: string;
   propertyId: string;
   variety: 'structured' | 'attributed';
@@ -54,7 +59,7 @@ interface GeneratedStatement {
   }>;
 }
 
-interface GateResult {
+export interface GateResult {
   accepted: CreateStatementInput[];
   rejected: Array<{
     statement: GeneratedStatement;
@@ -63,7 +68,21 @@ interface GateResult {
   }>;
 }
 
-interface ImproveSummary {
+/** Options for a single improvement pass. */
+export interface ImproveOptions {
+  entityId: string;
+  orgType?: string | null;
+  categoryFilter?: string | null;
+  minScore: number;
+  budget: number;
+  noResearch: boolean;
+  dryRun: boolean;
+  client: Anthropic;
+  tracker: CostTracker;
+}
+
+/** Result of a single improvement pass. */
+export interface PassResult {
   entityId: string;
   entityType: string;
   categoriesProcessed: string[];
@@ -79,7 +98,7 @@ interface ImproveSummary {
 // Statement generation
 // ---------------------------------------------------------------------------
 
-async function generateStatements(
+export async function generateStatements(
   entityId: string,
   entityName: string,
   entityType: string,
@@ -88,7 +107,7 @@ async function generateStatements(
   properties: Array<{ id: string; label: string; description: string | null }>,
   existingTexts: string[],
   sources: string | null,
-  client: ReturnType<typeof createLlmClient>,
+  client: Anthropic,
   tracker: CostTracker,
 ): Promise<GeneratedStatement[]> {
   const propertyList = properties
@@ -262,7 +281,7 @@ export function qualityGate(
 // Research helper
 // ---------------------------------------------------------------------------
 
-async function runResearchForCategory(
+export async function runResearchForCategory(
   entityName: string,
   entityType: string,
   entityId: string,
@@ -296,95 +315,16 @@ async function runResearchForCategory(
 }
 
 // ---------------------------------------------------------------------------
-// Main
+// Helpers: convert analysis data to scoring format
 // ---------------------------------------------------------------------------
 
-async function main() {
-  const args = parseCliArgs(process.argv.slice(2));
-  const jsonOutput = args.json === true;
-  const dryRun = args['dry-run'] === true;
-  const noResearch = args['no-research'] === true;
-  const orgType = (args['org-type'] as string) ?? null;
-  const categoryFilter = (args.category as string) ?? null;
-  const minScore = typeof args['min-score'] === 'number' ? args['min-score'] : 0.5;
-  const budget = typeof args.budget === 'number' ? args.budget : 5;
-  const c = getColors(false);
-  const positional = (args._positional as string[]) || [];
-  const entityId = positional[0];
-
-  if (!entityId) {
-    console.error(`${c.red}Error: provide an entity ID${c.reset}`);
-    console.error(`  Usage: pnpm crux statements improve <entity-id> [options]`);
-    console.error(`  Options: --org-type=TYPE --dry-run --category=CAT --no-research --min-score=N --budget=N --json`);
-    process.exit(1);
-  }
-
-  const tracker = new CostTracker();
-  const client = createLlmClient();
-  const entityName = slugToDisplayName(entityId);
-
-  // 1. Analyze gaps
-  if (!jsonOutput) console.log(`${c.dim}Analyzing coverage gaps for ${entityId}...${c.reset}`);
-
-  let analysis: GapAnalysis;
-  try {
-    analysis = await analyzeGaps(entityId, orgType);
-  } catch (err) {
-    console.error(`${c.red}${err instanceof Error ? err.message : String(err)}${c.reset}`);
-    process.exit(1);
-  }
-
-  const coverageBefore = analysis.coverageScore;
-
-  // Filter to gaps with deficit > 0
-  let targetGaps = analysis.gaps.filter((g) => g.deficit > 0);
-  if (categoryFilter) {
-    targetGaps = targetGaps.filter((g) => g.category === categoryFilter);
-    if (targetGaps.length === 0) {
-      if (jsonOutput) {
-        console.log(JSON.stringify({ entityId, message: `No deficit for category "${categoryFilter}"` }));
-      } else {
-        console.log(`${c.green}No deficit for category "${categoryFilter}".${c.reset}`);
-      }
-      process.exit(0);
-    }
-  }
-
-  if (targetGaps.length === 0) {
-    if (jsonOutput) {
-      console.log(JSON.stringify({ entityId, message: 'All categories at or above target' }));
-    } else {
-      console.log(`${c.green}All categories at or above target — nothing to improve.${c.reset}`);
-    }
-    process.exit(0);
-  }
-
-  // Cap to top 5 gaps by priority
-  targetGaps = targetGaps.slice(0, 5);
-
-  if (!jsonOutput) {
-    console.log(`${c.bold}Targeting ${targetGaps.length} gap categories:${c.reset}`);
-    for (const g of targetGaps) {
-      console.log(`  ${g.category}: ${g.actual}/${g.target} (deficit: ${g.deficit})`);
-    }
-    console.log('');
-  }
-
-  // 2. Fetch properties for category filtering + quality gate scoring
-  const propResult = await getProperties();
-  const allProperties = propResult.ok ? propResult.data.properties : [];
-  const fullPropertyMap = new Map(
-    allProperties.map((p) => [p.id, {
-      id: p.id,
-      label: p.label,
-      category: p.category,
-      stalenessCadence: p.stalenessCadence,
-    }]),
-  );
-
-  // 3. Build existing statement texts per category for dedup
+export function buildScoringContext(
+  analysis: GapAnalysis,
+  entityId: string,
+): { existingByCategory: Map<string, string[]>; existingScoringStmts: ScoringStatement[] } {
   const existingByCategory = new Map<string, string[]>();
   const existingScoringStmts: ScoringStatement[] = [];
+
   for (const stmt of analysis.allStatements) {
     const prop = stmt.propertyId ? analysis.propertyMap.get(stmt.propertyId) : null;
     const cat = prop?.category ?? 'uncategorized';
@@ -410,28 +350,88 @@ async function main() {
     });
   }
 
+  return { existingByCategory, existingScoringStmts };
+}
+
+export function buildPropertyMap(
+  allProperties: Array<{ id: string; label: string; category: string; stalenessCadence: string | null }>,
+): Map<string, { id: string; label: string; category: string; stalenessCadence?: string | null }> {
+  return new Map(
+    allProperties.map((p) => [p.id, {
+      id: p.id,
+      label: p.label,
+      category: p.category,
+      stalenessCadence: p.stalenessCadence,
+    }]),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Core: single improvement pass (composable)
+// ---------------------------------------------------------------------------
+
+/**
+ * Run one pass of gap-filling statement generation.
+ *
+ * This is the composable core — it takes explicit options and returns a result
+ * object. No CLI parsing, no process.exit(), no console output.
+ * The caller (main() or an iteration wrapper) handles those concerns.
+ */
+export async function runSinglePass(opts: ImproveOptions): Promise<PassResult> {
+  const { entityId, orgType, categoryFilter, minScore, budget, noResearch, dryRun, client, tracker } = opts;
+  const entityName = slugToDisplayName(entityId);
+
+  // 1. Analyze gaps
+  const analysis = await analyzeGaps(entityId, orgType);
+  const coverageBefore = analysis.coverageScore;
+
+  // Filter to gaps with deficit > 0
+  let targetGaps = analysis.gaps.filter((g) => g.deficit > 0);
+  if (categoryFilter) {
+    targetGaps = targetGaps.filter((g) => g.category === categoryFilter);
+  }
+
+  if (targetGaps.length === 0) {
+    return {
+      entityId,
+      entityType: analysis.entityType,
+      categoriesProcessed: [],
+      coverageBefore,
+      coverageAfter: coverageBefore,
+      created: 0,
+      rejected: 0,
+      totalCost: tracker.totalCost,
+      rejections: [],
+    };
+  }
+
+  // Cap to top 5 gaps by priority
+  targetGaps = targetGaps.slice(0, 5);
+
+  // 2. Fetch properties
+  const propResult = await getProperties();
+  const allProperties = propResult.ok ? propResult.data.properties : [];
+  const fullPropertyMap = buildPropertyMap(allProperties);
+
+  // 3. Build existing statement context
+  const { existingByCategory, existingScoringStmts } = buildScoringContext(analysis, entityId);
+
   // 4. Process each gap category
   let totalCreated = 0;
   let totalRejected = 0;
-  const allRejections: ImproveSummary['rejections'] = [];
+  const allRejections: PassResult['rejections'] = [];
   const categoriesProcessed: string[] = [];
   const allAccepted: CreateStatementInput[] = [];
-
   const budgetPerCategory = budget / targetGaps.length;
 
   for (const gap of targetGaps) {
-    if (tracker.totalCost >= budget) {
-      if (!jsonOutput) console.log(`${c.yellow}Budget cap ($${budget}) reached. Stopping.${c.reset}`);
-      break;
-    }
+    if (tracker.totalCost >= budget) break;
 
     categoriesProcessed.push(gap.category);
-    if (!jsonOutput) console.log(`${c.blue}Processing: ${gap.category} (deficit: ${gap.deficit})${c.reset}`);
 
     // Research (optional)
     let sources: string | null = null;
     if (!noResearch) {
-      if (!jsonOutput) console.log(`  ${c.dim}Researching...${c.reset}`);
       sources = await runResearchForCategory(
         entityName,
         analysis.entityType,
@@ -446,7 +446,6 @@ async function main() {
     const categoryProps = allProperties.filter((p) => p.category === gap.category);
 
     // Generate
-    if (!jsonOutput) console.log(`  ${c.dim}Generating ${gap.deficit} statements...${c.reset}`);
     const generated = await generateStatements(
       entityId,
       entityName,
@@ -459,8 +458,6 @@ async function main() {
       client,
       tracker,
     );
-
-    if (!jsonOutput) console.log(`  ${c.dim}Generated ${generated.length} candidates${c.reset}`);
 
     // Quality gate
     const gateResult = qualityGate(generated, entityId, entityName, existingScoringStmts, minScore, fullPropertyMap);
@@ -476,25 +473,15 @@ async function main() {
         score: r.score,
       });
     }
-
-    if (!jsonOutput) {
-      console.log(`  ${c.green}Accepted: ${gateResult.accepted.length}${c.reset}, ${c.red}Rejected: ${gateResult.rejected.length}${c.reset}`);
-      for (const r of gateResult.rejected) {
-        console.log(`    ${c.dim}✗ ${r.statement.statementText.slice(0, 60)}... — ${r.reason}${c.reset}`);
-      }
-    }
   }
 
   // 5. Insert (unless dry-run)
   let coverageAfter: number | null = null;
 
   if (!dryRun && allAccepted.length > 0) {
-    if (!jsonOutput) console.log(`\n${c.dim}Inserting ${allAccepted.length} statements...${c.reset}`);
-
     const batchResult = await createStatementBatch(allAccepted);
     if (!batchResult.ok) {
-      console.error(`${c.red}Failed to insert statements.${c.reset}`);
-      process.exit(1);
+      throw new Error('Failed to insert statements');
     }
 
     // Re-analyze to get updated coverage
@@ -502,7 +489,6 @@ async function main() {
       const updated = await analyzeGaps(entityId, orgType);
       coverageAfter = updated.coverageScore;
 
-      // Store updated coverage score
       const targets = resolveCoverageTargets(updated.entityType, orgType);
       if (targets) {
         await storeCoverageScore({
@@ -523,8 +509,7 @@ async function main() {
     }
   }
 
-  // 6. Print summary
-  const summary: ImproveSummary = {
+  return {
     entityId,
     entityType: analysis.entityType,
     categoriesProcessed,
@@ -535,17 +520,61 @@ async function main() {
     totalCost: tracker.totalCost,
     rejections: allRejections,
   };
+}
+
+// ---------------------------------------------------------------------------
+// CLI: main (thin wrapper)
+// ---------------------------------------------------------------------------
+
+async function main() {
+  const args = parseCliArgs(process.argv.slice(2));
+  const jsonOutput = args.json === true;
+  const c = getColors(false);
+  const positional = (args._positional as string[]) || [];
+  const entityId = positional[0];
+
+  if (!entityId) {
+    console.error(`${c.red}Error: provide an entity ID${c.reset}`);
+    console.error(`  Usage: pnpm crux statements improve <entity-id> [options]`);
+    console.error(`  Options: --org-type=TYPE --dry-run --category=CAT --no-research --min-score=N --budget=N --json`);
+    process.exit(1);
+  }
+
+  const tracker = new CostTracker();
+  const client = createLlmClient();
+
+  const opts: ImproveOptions = {
+    entityId,
+    orgType: (args['org-type'] as string) ?? null,
+    categoryFilter: (args.category as string) ?? null,
+    minScore: typeof args['min-score'] === 'number' ? args['min-score'] : 0.5,
+    budget: typeof args.budget === 'number' ? args.budget : 5,
+    noResearch: args['no-research'] === true,
+    dryRun: args['dry-run'] === true,
+    client,
+    tracker,
+  };
+
+  if (!jsonOutput) console.log(`${c.dim}Analyzing coverage gaps for ${entityId}...${c.reset}`);
+
+  let result: PassResult;
+  try {
+    result = await runSinglePass(opts);
+  } catch (err) {
+    console.error(`${c.red}${err instanceof Error ? err.message : String(err)}${c.reset}`);
+    process.exit(1);
+  }
 
   if (jsonOutput) {
-    console.log(JSON.stringify(summary, null, 2));
+    console.log(JSON.stringify(result, null, 2));
   } else {
     console.log(`\n${c.bold}${c.blue}Improvement Summary: ${entityId}${c.reset}`);
-    console.log(`  Categories:  ${categoriesProcessed.join(', ')}`);
-    console.log(`  Created:     ${c.green}${totalCreated}${c.reset}`);
-    console.log(`  Rejected:    ${c.red}${totalRejected}${c.reset}`);
-    console.log(`  Coverage:    ${coverageBefore.toFixed(3)}${coverageAfter != null ? ` → ${coverageAfter.toFixed(3)}` : ''}`);
-    console.log(`  Cost:        $${tracker.totalCost.toFixed(4)}`);
-    if (dryRun) {
+    console.log(`  Categories:  ${result.categoriesProcessed.join(', ') || '(none — no gaps)'}`);
+    console.log(`  Created:     ${c.green}${result.created}${c.reset}`);
+    console.log(`  Rejected:    ${c.red}${result.rejected}${c.reset}`);
+    console.log(`  Coverage:    ${result.coverageBefore.toFixed(3)}${result.coverageAfter != null ? ` → ${result.coverageAfter.toFixed(3)}` : ''}`);
+    console.log(`  Cost:        $${result.totalCost.toFixed(4)}`);
+    if (opts.dryRun) {
       console.log(`  ${c.dim}(dry run — no statements were inserted)${c.reset}`);
     }
     console.log('');
