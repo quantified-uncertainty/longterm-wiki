@@ -60,6 +60,7 @@ const CurrentQuery = z.object({
 
 const ByEntityQuery = z.object({
   entityId: z.string().min(1).max(200),
+  includeRetracted: z.coerce.boolean().default(false),
 });
 
 const ByPageQuery = z.object({
@@ -145,6 +146,10 @@ const CoverageScoreQuery = z.object({
 const PatchStatementBody = z.object({
   status: z.enum(["active", "superseded", "retracted"]).optional(),
   variety: z.enum(["structured", "attributed"]).optional(),
+  statementText: z.string().min(1).max(2000).optional(),
+  validStart: z.string().max(20).nullish(),
+  validEnd: z.string().max(20).nullish(),
+  attributedTo: z.string().max(200).nullish(),
   archiveReason: z.string().max(2000).nullish(),
   verdict: z.string().max(50).nullish(),
   verdictScore: z.number().min(0).max(1).nullish(),
@@ -314,15 +319,22 @@ const statementsApp = new Hono()
 
   // ---- GET /by-entity — all statements for an entity, with citations and property info ----
   .get("/by-entity", zv("query", ByEntityQuery), async (c) => {
-    const { entityId } = c.req.valid("query");
+    const { entityId, includeRetracted } = c.req.valid("query");
     const db = getDrizzleDb();
+
+    // Build where clause — exclude retracted by default
+    const entityConditions = [eq(statements.subjectEntityId, entityId)];
+    if (!includeRetracted) {
+      entityConditions.push(sql`${statements.status} != 'retracted'`);
+    }
+    const entityWhere = and(...entityConditions);
 
     // Fetch statements, citations, and properties in parallel
     const [rows, allCitations, propertyRows] = await Promise.all([
       db
         .select()
         .from(statements)
-        .where(eq(statements.subjectEntityId, entityId))
+        .where(entityWhere)
         .orderBy(desc(statements.validStart)),
       db
         .select()
@@ -331,6 +343,7 @@ const statementsApp = new Hono()
           sql`${statementCitations.statementId} IN (
             SELECT ${statements.id} FROM ${statements}
             WHERE ${statements.subjectEntityId} = ${entityId}
+            ${includeRetracted ? sql`` : sql`AND ${statements.status} != 'retracted'`}
           )`
         ),
       db.select().from(properties),
@@ -695,6 +708,10 @@ const statementsApp = new Hono()
       .set({
         ...(data.status !== undefined && { status: data.status }),
         ...(data.variety !== undefined && { variety: data.variety }),
+        ...(data.statementText !== undefined && { statementText: data.statementText }),
+        ...(data.validStart !== undefined && { validStart: data.validStart ?? null }),
+        ...(data.validEnd !== undefined && { validEnd: data.validEnd ?? null }),
+        ...(data.attributedTo !== undefined && { attributedTo: data.attributedTo ?? null }),
         ...(data.archiveReason !== undefined && { archiveReason: data.archiveReason ?? null }),
         ...(data.verdict !== undefined && { verdict: data.verdict ?? null }),
         ...(data.verdictScore !== undefined && { verdictScore: data.verdictScore ?? null }),
@@ -977,6 +994,98 @@ const statementsApp = new Hono()
         qualityAvg: r.qualityAvg,
         scoredAt: r.scoredAt,
       })),
+    });
+  })
+
+  // ---- POST /cleanup — delete retracted and empty statements ----
+  .post("/cleanup", async (c) => {
+    const body = await parseJsonBody(c);
+    const parsed = z
+      .object({
+        entityId: z.string().max(200).optional(),
+        dryRun: z.boolean().default(true),
+      })
+      .safeParse(body ?? {});
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { entityId, dryRun } = parsed.data;
+    const db = getDrizzleDb();
+
+    // Find retracted statements
+    const retractedConditions = [eq(statements.status, "retracted")];
+    if (entityId) retractedConditions.push(eq(statements.subjectEntityId, entityId));
+
+    const retractedRows = await db
+      .select({ id: statements.id, subjectEntityId: statements.subjectEntityId })
+      .from(statements)
+      .where(and(...retractedConditions));
+
+    // Find empty structured statements (no property and no values)
+    const emptyConditions = [
+      eq(statements.variety, "structured"),
+      isNull(statements.propertyId),
+      isNull(statements.valueNumeric),
+      isNull(statements.valueText),
+      isNull(statements.valueEntityId),
+      isNull(statements.valueDate),
+      isNull(statements.valueSeries),
+    ];
+    if (entityId) emptyConditions.push(eq(statements.subjectEntityId, entityId));
+
+    const emptyRows = await db
+      .select({ id: statements.id, subjectEntityId: statements.subjectEntityId })
+      .from(statements)
+      .where(and(...emptyConditions));
+
+    const allIds = [...new Set([...retractedRows.map((r) => r.id), ...emptyRows.map((r) => r.id)])];
+
+    if (dryRun || allIds.length === 0) {
+      return c.json({
+        dryRun: true,
+        retracted: retractedRows.length,
+        empty: emptyRows.length,
+        totalToDelete: allIds.length,
+        ok: true,
+      });
+    }
+
+    // Delete citations first (FK constraint), then statements
+    console.warn(`[statements/cleanup] Deleting ${allIds.length} statements (${retractedRows.length} retracted, ${emptyRows.length} empty)`);
+
+    await db
+      .delete(statementCitations)
+      .where(
+        sql`${statementCitations.statementId} IN (${sql.join(
+          allIds.map((id) => sql`${id}`),
+          sql`, `
+        )})`
+      );
+
+    await db
+      .delete(statementPageReferences)
+      .where(
+        sql`${statementPageReferences.statementId} IN (${sql.join(
+          allIds.map((id) => sql`${id}`),
+          sql`, `
+        )})`
+      );
+
+    const deleted = await db
+      .delete(statements)
+      .where(
+        sql`${statements.id} IN (${sql.join(
+          allIds.map((id) => sql`${id}`),
+          sql`, `
+        )})`
+      )
+      .returning({ id: statements.id });
+
+    return c.json({
+      dryRun: false,
+      retracted: retractedRows.length,
+      empty: emptyRows.length,
+      deleted: deleted.length,
+      ok: true,
     });
   })
 
