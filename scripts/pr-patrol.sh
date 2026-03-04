@@ -13,7 +13,7 @@ set -euo pipefail
 #
 # Environment variables (all optional):
 #   PR_PATROL_INTERVAL     Seconds between checks (default: 300)
-#   PR_PATROL_MAX_TURNS    Max Claude turns per fix (default: 20)
+#   PR_PATROL_MAX_TURNS    Max Claude turns per fix (default: 40)
 #   PR_PATROL_COOLDOWN     Don't re-process same PR within N seconds (default: 1800)
 #   PR_PATROL_STALE_HOURS  Hours before a PR is considered stale (default: 48)
 #   PR_PATROL_MODEL        Claude model to use (default: sonnet)
@@ -51,7 +51,7 @@ for arg in "$@"; do
       echo "  --once            Single pass, then exit"
       echo "  --dry-run         Show what would be done, don't fix"
       echo "  --interval=N      Seconds between checks (default: 300)"
-      echo "  --max-turns=N     Max Claude turns per fix (default: 20)"
+      echo "  --max-turns=N     Max Claude turns per fix (default: 40)"
       echo "  --cooldown=N      Skip recently-processed PRs for N seconds (default: 1800)"
       echo "  --model=MODEL     Claude model (default: sonnet)"
       echo "  -h, --help        Show this help"
@@ -164,6 +164,8 @@ detect_all_pr_issues() {
        then "ci-failure" else empty end),
       (if (.body // "" | test("## Test [Pp]lan") | not) then "missing-testplan" else empty end),
       (if (.body // "" | test("(Closes|Fixes|Resolves) #[0-9]") | not) then "missing-issue-ref" else empty end),
+      (if ((((.updatedAt // .createdAt // "") | fromdateiso8601?) // 0) < ($stale | tonumber))
+       then "stale" else empty end),
       (if (.labels // [] | map(.name) | any(. == "claude-working"))
        then "in-progress" else empty end)
     ] as $issues |
@@ -229,14 +231,14 @@ build_prompt() {
   local branch=$4
 
   local prompt=""
-  prompt+="You are a PR maintenance agent for the longterm-wiki repository (quantified-uncertainty/longterm-wiki)."
+  prompt+="You are a PR maintenance agent for the ${REPO} repository."
   prompt+=$'\n\n## Target'
   prompt+=$'\nPR #'"${pr_num}"': "'"${title}"'" (branch: '"${branch}"')'
   prompt+=$'\n\n## Issues Detected'
   prompt+=$'\n'"${issues}"
   prompt+=$'\n\n## Instructions'
   prompt+=$'\n\n1. First, fetch PR details to understand context:'
-  prompt+=$'\n   gh pr view '"${pr_num}"' --json headRefName,body,statusCheckRollup,reviews'
+  prompt+=$'\n   gh pr view '"${pr_num}"' --repo '"${REPO}"' --json headRefName,body,statusCheckRollup,reviews'
   prompt+=$'\n\n2. Check out the PR branch:'
   prompt+=$'\n   git fetch origin '"${branch}"
   prompt+=$'\n   git checkout '"${branch}"
@@ -252,7 +254,7 @@ build_prompt() {
 
   if [[ "$issues" == *ci-failure* ]]; then
     prompt+=$'\n\n### CI Failure'
-    prompt+=$'\n- Check CI status: gh pr checks '"${pr_num}"' --repo quantified-uncertainty/longterm-wiki'
+    prompt+=$'\n- Check CI status: gh pr checks '"${pr_num}"' --repo '"${REPO}"
     prompt+=$'\n- Read the failing check logs to understand the failure'
     prompt+=$'\n- Fix the issue (build error, test failure, lint error)'
     prompt+=$'\n- Run locally to verify: pnpm build and/or pnpm test'
@@ -268,7 +270,7 @@ build_prompt() {
 
   if [[ "$issues" == *missing-issue-ref* ]]; then
     prompt+=$'\n\n### Missing Issue Reference'
-    prompt+=$'\n- Search for related issues: gh issue list --search "keywords from PR title" --repo quantified-uncertainty/longterm-wiki'
+    prompt+=$'\n- Search for related issues: gh issue list --search "keywords from PR title" --repo '"${REPO}"
     prompt+=$'\n- If a matching issue exists, add "Closes #N" to the PR body'
     prompt+=$'\n- If no matching issue exists, this may be fine — skip this fix'
   fi
@@ -287,6 +289,8 @@ build_prompt() {
   prompt+=$'\n- After any code changes, run: pnpm crux validate gate --fix'
   prompt+=$'\n- Use git push --force-with-lease (never --force) when pushing rebased branches'
   prompt+=$'\n- Do not modify files unrelated to the fix'
+  prompt+=$'\n- Do NOT run /agent-session-start or /agent-session-ready-PR — this is a targeted fix, not a full session'
+  prompt+=$'\n- Do NOT create new branches — work on the existing PR branch'
 
   echo "$prompt"
 }
@@ -312,10 +316,23 @@ fix_pr() {
   original_branch=$(git branch --show-current 2>/dev/null || echo "")
 
   # Claim the PR by adding claude-working label (prevents other patrol instances from grabbing it)
-  gh pr edit "$pr_num" --repo "$REPO" --add-label "claude-working" 2>/dev/null || log "  Warning: could not add claude-working label"
+  local claimed_label=false
+  cleanup_claim() {
+    if $claimed_label; then
+      gh pr edit "$pr_num" --repo "$REPO" --remove-label "claude-working" 2>/dev/null || true
+      claimed_label=false
+    fi
+  }
 
-  # Ensure label is removed even if the script is killed mid-fix
-  trap 'gh pr edit '"$pr_num"' --repo '"$REPO"' --remove-label "claude-working" 2>/dev/null; exit 1' INT TERM
+  if gh pr edit "$pr_num" --repo "$REPO" --add-label "claude-working" 2>/dev/null; then
+    claimed_label=true
+  else
+    log "  Warning: could not add claude-working label"
+  fi
+
+  # Ensure label is removed on any exit (signals, errors, normal return)
+  trap 'cleanup_claim; exit 1' INT TERM
+  trap 'cleanup_claim' EXIT
 
   # Write prompt to temp file to avoid arg-length limits
   local prompt_file
@@ -387,16 +404,16 @@ GHEOF
 
   rm -f "$prompt_file" "$output_file"
 
-  # Release the PR by removing claude-working label
-  gh pr edit "$pr_num" --repo "$REPO" --remove-label "claude-working" 2>/dev/null || log "  Warning: could not remove claude-working label"
+  # Release the PR label via cleanup function
+  cleanup_claim
 
-  # Restore default trap (the per-PR cleanup trap is no longer needed)
+  # Restore default traps
+  trap - EXIT
   trap 'log "Shutting down..."; exit 0' INT TERM
 
   # Clean up any in-progress rebase/merge left by the spawned session
   git rebase --abort 2>/dev/null || true
   git merge --abort 2>/dev/null || true
-  git checkout -- . 2>/dev/null || true
 
   # Restore original branch
   if [[ -n "$original_branch" ]]; then
@@ -478,6 +495,17 @@ run_check_cycle() {
 }
 
 main() {
+  # Preflight: must be in a git repo with clean working tree
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "ERROR: Must run inside a git worktree" >&2
+    exit 1
+  fi
+  if [[ -n "$(git status --porcelain)" ]]; then
+    echo "ERROR: Working tree must be clean before starting PR Patrol" >&2
+    echo "  Commit or stash your changes first." >&2
+    exit 1
+  fi
+
   log_header "PR Patrol starting"
   log "Config: interval=${INTERVAL}s, max-turns=${MAX_TURNS}, cooldown=${COOLDOWN}s, model=${MODEL}"
   log "Repo: $REPO"

@@ -2,7 +2,7 @@
 
 Scan all open PRs for issues and fix them in priority order. One-shot version of the `scripts/pr-patrol.sh` daemon.
 
-**When to use:** Periodically, or when you want to clean up the PR backlog. Can also be run as a daemon via `scripts/pr-patrol.sh`.
+**When to use:** Periodically, or when you want to clean up the PR backlog. It can also be run as a daemon via `scripts/pr-patrol.sh`.
 
 ## Phase 1: Scan all open PRs
 
@@ -30,7 +30,7 @@ For each PR, check:
 
 Score each PR by summing the scores of its detected issues. Sort descending. Display the full queue:
 
-```
+```text
 Priority queue (N items):
   [score=180] PR #123: conflict,ci-failure — Fix authentication flow
   [score=40]  PR #456: missing-issue-ref — Update entity types
