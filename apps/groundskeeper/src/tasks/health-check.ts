@@ -19,6 +19,16 @@ const ISSUE_TITLE = "[Groundskeeper] Wiki server health check failure";
 const COMMENT_COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
 
 /**
+ * Number of consecutive health check failures required before creating an
+ * issue or escalating. Filters out transient blips (e.g. slow DB responses
+ * that exceed the timeout but recover on the next check cycle).
+ */
+const CONSECUTIVE_FAILURES_THRESHOLD = 3;
+
+/** Tracks consecutive health check failures across invocations. */
+let consecutiveFailures = 0;
+
+/**
  * Simple in-memory lock to prevent parallel health check runs from both
  * creating a new issue when they simultaneously see "no open issue."
  */
@@ -111,7 +121,9 @@ export async function healthCheck(
   let serverUp = false;
 
   try {
-    const healthUrl = config.wikiServerUrl.replace(/\/$/, "") + "/health";
+    // Use /healthz — lightweight endpoint with no DB queries, so timeouts
+    // reflect actual server unreachability rather than slow DB responses.
+    const healthUrl = config.wikiServerUrl.replace(/\/$/, "") + "/healthz";
     const response = await fetch(healthUrl, {
       signal: AbortSignal.timeout(10_000),
     });
@@ -137,6 +149,14 @@ export async function healthCheck(
   }
 
   if (serverUp) {
+    if (consecutiveFailures > 0) {
+      logger.info(
+        { previousFailures: consecutiveFailures },
+        "Server recovered after consecutive failures"
+      );
+    }
+    consecutiveFailures = 0;
+
     // Recovery path: if there was an active outage, backfill the incident
     // and flush any buffered incidents now that the server is reachable.
     const outage = getCurrentOutage();
@@ -192,7 +212,24 @@ export async function healthCheck(
   }
 
   // Server is down — track the failure for outage window detection
+  consecutiveFailures++;
   recordFailure();
+
+  // Don't escalate until we've seen enough consecutive failures to rule out
+  // transient blips (e.g. a single slow response exceeding the timeout).
+  if (consecutiveFailures < CONSECUTIVE_FAILURES_THRESHOLD) {
+    logger.info(
+      {
+        consecutiveFailures,
+        threshold: CONSECUTIVE_FAILURES_THRESHOLD,
+      },
+      "Health check failed but below threshold — not escalating yet"
+    );
+    return {
+      success: false,
+      summary: `Server down (${consecutiveFailures}/${CONSECUTIVE_FAILURES_THRESHOLD} failures, waiting before escalating)`,
+    };
+  }
 
   // Try to record incident to wiki-server; if it fails (expected when the
   // wiki-server itself is down), buffer it locally for later flushing.
@@ -282,12 +319,21 @@ export async function healthCheck(
 // Exported for testing
 export {
   COMMENT_COOLDOWN_MS,
+  CONSECUTIVE_FAILURES_THRESHOLD,
   findOpenHealthIssue,
   hasRecentComment,
   shouldPostStillDownComment,
 };
 
-// Exported for testing — reset the in-memory lock
+// Exported for testing — reset in-memory state
 export function _resetIssueCreationLock(): void {
   issueCreationInProgress = false;
+}
+
+export function _resetConsecutiveFailures(): void {
+  consecutiveFailures = 0;
+}
+
+export function _getConsecutiveFailures(): number {
+  return consecutiveFailures;
 }
