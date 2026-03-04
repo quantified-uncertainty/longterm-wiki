@@ -1,0 +1,164 @@
+# System Audits — Behavioral expectations we periodically verify.
+#
+# Unlike CI tests (which run automatically on every push), these are
+# higher-level properties about how the system behaves in production
+# that require periodic human or agent review.
+#
+# Categories:
+#   infrastructure — CI, deploys, scheduled workflows, server health
+#   data-pipeline  — build-data, sync, DB consistency
+#   feature-health — feature adoption, usage patterns
+#   process        — agent workflows, session logging, issue tracking
+#
+# check_type:
+#   manual     — requires human/agent judgment (read logs, check dashboard)
+#   automated  — has a check_command that produces verifiable output
+#   hybrid     — has a check_command but output needs interpretation
+#
+# frequency: how often to check (daily | weekly | biweekly | monthly)
+#
+# Workflow:
+#   pnpm crux audits list              # See what needs checking
+#   pnpm crux audits check <id>        # Record a check result
+#   pnpm crux audits run-auto          # Run automated checks
+#   pnpm crux audits report            # Full report for maintenance sweep
+
+audits:
+  - id: groundskeeper-health
+    category: infrastructure
+    description: "Groundskeeper produces substantive monitoring messages (not just heartbeats) over a 2-week window"
+    check_type: manual
+    how_to_verify: |
+      Check the System Health dashboard (E927) or wiki-server /api/monitoring/status.
+      Look at groundskeeper run history. Verify messages include actual incident
+      detection, recovery notices, or meaningful status updates — not just
+      "heartbeat OK" messages.
+    frequency: weekly
+    added: "2026-03-04"
+    last_checked: null
+    last_result: null
+
+  - id: agent-sessions-logged
+    category: process
+    description: "Most agent sessions (>80%) produce a session log entry in the DB"
+    check_type: hybrid
+    check_command: |
+      git branch -r --list 'origin/claude/*' 2>/dev/null | wc -l | tr -d ' '
+    how_to_verify: |
+      Compare the number of recent claude/* branches (from check_command output)
+      with session count in the Agent Sessions dashboard (E912).
+      A large gap means agents are completing work without logging sessions.
+    frequency: weekly
+    added: "2026-03-04"
+    last_checked: null
+    last_result: null
+
+  - id: scheduled-workflows-running
+    category: infrastructure
+    description: "All scheduled GitHub Actions (wellness-check, maintenance, auto-update, server-health-monitor) ran within expected windows"
+    check_type: hybrid
+    check_command: |
+      for wf in wellness-check.yml scheduled-maintenance.yml auto-update.yml server-health-monitor.yml; do
+        echo "=== $wf ==="
+        gh api "repos/quantified-uncertainty/longterm-wiki/actions/workflows/$wf/runs?per_page=3" \
+          --jq '.workflow_runs[:3] | .[] | "\(.created_at) \(.conclusion)"' 2>/dev/null || echo "failed to fetch"
+      done
+    how_to_verify: |
+      Review the check_command output. Each workflow should have recent successful runs:
+      - wellness-check: twice daily (within 24h)
+      - scheduled-maintenance: daily on weekdays (within 48h)
+      - auto-update: daily (within 48h)
+      - server-health-monitor: weekly (within 9 days)
+    frequency: weekly
+    added: "2026-03-04"
+    last_checked: null
+    last_result: null
+
+  - id: vercel-production-only
+    category: infrastructure
+    description: "Vercel ONLY builds the production branch — no builds for main, claude/*, issue branches, or PR previews"
+    check_type: manual
+    how_to_verify: |
+      Check Vercel dashboard → Deployments tab.
+      There should be ZERO deploys for any branch other than production.
+      This keeps getting reverted — verify both:
+      1. vercel.json ignoreCommand exits 0 for non-production branches
+      2. Vercel project settings don't override the ignoreCommand
+      3. No recent deploys exist for main, claude/*, or any other branch
+    frequency: weekly
+    added: "2026-03-04"
+    added_by_pr: 1630
+    last_checked: null
+    last_result: null
+
+  - id: active-agents-dashboard-adoption
+    category: feature-health
+    description: "Active Agents dashboard (E925) is populated with data and referenced by maintenance or agent sessions"
+    check_type: manual
+    how_to_verify: |
+      1. Visit the Active Agents dashboard to confirm it shows recent data.
+      2. Search session logs and maintenance reports for references to
+         "active-agents" or "E925".
+      3. If the dashboard shows no data or is never referenced, consider
+         whether to promote its use, simplify it, or remove it.
+    frequency: monthly
+    added: "2026-03-04"
+    last_checked: null
+    last_result: null
+
+  - id: ci-gate-catches-regressions
+    category: infrastructure
+    description: "CI gate (pnpm crux validate gate) catches real issues — not just passing silently"
+    check_type: manual
+    how_to_verify: |
+      Review recent CI runs on main. Check if any had gate failures that were
+      caught and fixed. If the gate has passed 100% of the time for weeks,
+      verify it's still running all validators (not silently skipping).
+      Run `pnpm crux validate gate` locally and confirm it exercises all checks.
+    frequency: monthly
+    added: "2026-03-04"
+    last_checked: null
+    last_result: null
+
+  - id: audits-system-adoption
+    category: process
+    description: "This audits system itself is being used — items are checked on schedule, not abandoned"
+    check_type: manual
+    how_to_verify: |
+      Run `pnpm crux audits list`. If most items show "never checked" or are
+      overdue, the system is not being used. Consider integrating more tightly
+      into the maintenance sweep or simplifying the workflow.
+    frequency: biweekly
+    added: "2026-03-04"
+    last_checked: null
+    last_result: null
+
+# ---------------------------------------------------------------------------
+# One-time post-merge verifications
+# ---------------------------------------------------------------------------
+# Items tied to specific PRs. After verification, either:
+#   - Promote to a permanent audit (if ongoing monitoring is valuable)
+#   - Archive (mark status: verified and leave as record)
+#
+# Status: pending | verified | failed | wontfix
+
+post_merge:
+  - id: vercel-production-only-post-merge
+    pr: 1630
+    merged: "2026-03-04"
+    claim: "Vercel ignoreCommand restricts builds to ONLY the production branch (not main, not claude/*)"
+    how_to_verify: "Check Vercel deployments for any non-production deploys since PR #1630 merged"
+    status: pending
+    deadline: "2026-03-18"
+    checked_date: null
+    notes: null
+
+  - id: audits-system-post-merge
+    pr: 1637
+    merged: "2026-03-04"
+    claim: "The crux audits system works end-to-end after merge"
+    how_to_verify: "Run each crux audits subcommand on main branch and verify output is correct"
+    status: pending
+    deadline: "2026-03-18"
+    checked_date: null
+    notes: null

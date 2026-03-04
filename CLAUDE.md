@@ -47,6 +47,10 @@ pnpm crux issues start <N>      # Signal work start on issue
 pnpm crux issues done <N> --pr=URL  # Signal completion
 pnpm crux ci status --wait       # Poll CI until green
 
+pnpm crux audits list            # Show audit items, highlight overdue
+pnpm crux audits check <id> --pass  # Record a check result
+pnpm crux audits run-auto        # Run automated checks
+
 pnpm crux --help                 # Full CLI reference
 ```
 

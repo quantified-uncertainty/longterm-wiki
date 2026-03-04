@@ -782,6 +782,19 @@ async function report(args: string[], options: CommandOptions): Promise<CommandR
   output += `${c.dim}${'─'.repeat(60)}${c.reset}\n\n`;
   output += cruftResult.output;
 
+  // Audits section
+  try {
+    const { commands: auditsCmds } = await import('./audits.ts');
+    const auditsResult = await auditsCmds.report(args, options);
+    if (auditsResult.exitCode === 0 && auditsResult.output.trim()) {
+      output += `${c.dim}${'─'.repeat(60)}${c.reset}\n\n`;
+      output += auditsResult.output;
+      output += '\n';
+    }
+  } catch {
+    // Audits module not available — skip silently
+  }
+
   // Priority summary
   output += `${c.bold}${c.blue}${'═'.repeat(60)}${c.reset}\n`;
   output += `${c.bold}Suggested Action Plan:${c.reset}\n\n`;
