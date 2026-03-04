@@ -61,7 +61,7 @@ const ByEntityQuery = z.object({
 });
 
 const ByPageQuery = z.object({
-  pageId: z.coerce.number().int(),
+  pageId: z.coerce.number().int().positive(),
 });
 
 // ---- Zod validator helper (uses Hono's built-in validator for RPC type inference) ----
@@ -390,17 +390,19 @@ const statementsApp = new Hono()
     // Build statement map: id -> statement
     const stmtMap = new Map(stmtRows.map((s) => [s.id, s]));
 
-    // Build ref map: statementId -> page reference info (footnoteResourceId, section)
+    // Build ref map: statementId -> page reference info[] (a statement can appear multiple times on a page)
     const refMap = new Map<
       number,
-      { footnoteResourceId: string | null; section: string | null }
+      Array<{ footnoteResourceId: string | null; section: string | null }>
     >();
     for (const ref of refs) {
       if (ref.statementId !== null) {
-        refMap.set(ref.statementId, {
+        const list = refMap.get(ref.statementId) ?? [];
+        list.push({
           footnoteResourceId: ref.footnoteResourceId,
           section: ref.section,
         });
+        refMap.set(ref.statementId, list);
       }
     }
 
@@ -410,11 +412,10 @@ const statementsApp = new Hono()
         const stmt = stmtMap.get(id);
         if (!stmt) return null;
         const cits = citationMap.get(id) ?? [];
-        const ref = refMap.get(id);
+        const pageRefs = refMap.get(id) ?? [];
         return {
           ...formatStatement(stmt),
-          footnoteResourceId: ref?.footnoteResourceId ?? null,
-          section: ref?.section ?? null,
+          pageReferences: pageRefs,
           citations: cits.map((cit) => ({
             id: cit.id,
             resourceId: cit.resourceId,
@@ -425,7 +426,7 @@ const statementsApp = new Hono()
           })),
         };
       })
-      .filter((s) => s !== null);
+      .filter((s): s is NonNullable<typeof s> => s !== null);
 
     return c.json({ statements: result });
   })

@@ -17,24 +17,7 @@ import * as schema from "../src/schema.js";
 
 const dryRun = process.argv.includes("--dry-run");
 
-interface StatementRow {
-  id: number;
-  variety: string;
-  statementText: string | null;
-  subjectEntityId: string;
-  propertyId: string | null;
-  valueNumeric: number | null;
-  valueUnit: string | null;
-  valueText: string | null;
-  valueEntityId: string | null;
-  valueDate: string | null;
-  valueSeries: unknown;
-  qualifierKey: string | null;
-  validStart: string | null;
-  validEnd: string | null;
-  attributedTo: string | null;
-  note: string | null;
-}
+type StatementRow = typeof schema.statements.$inferSelect;
 
 interface PropertyRow {
   id: string;
@@ -96,8 +79,11 @@ function formatPeriod(validStart: string | null, validEnd: string | null): strin
     if (/^\d{4}$/.test(validStart)) return ` (${validStart})`;
     if (/^\d{4}-\d{2}$/.test(validStart)) {
       const [year, month] = validStart.split("-");
-      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return ` (${monthNames[parseInt(month, 10) - 1]} ${year})`;
+      const monthIdx = parseInt(month, 10) - 1;
+      if (monthIdx >= 0 && monthIdx <= 11) {
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return ` (${monthNames[monthIdx]} ${year})`;
+      }
     }
     return ` (${validStart})`;
   }
@@ -232,9 +218,9 @@ try {
     try {
       let text: string;
       if (stmt.variety === "attributed") {
-        text = generateAttributedText(stmt as unknown as StatementRow, entityMap);
+        text = generateAttributedText(stmt, entityMap);
       } else {
-        text = generateStructuredText(stmt as unknown as StatementRow, propertyMap, entityMap);
+        text = generateStructuredText(stmt, propertyMap, entityMap);
       }
 
       // Clean up: remove double periods, trim

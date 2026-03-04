@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS statement_page_references (
   id BIGSERIAL PRIMARY KEY,
   statement_id BIGINT REFERENCES statements(id) ON DELETE CASCADE,
-  page_id_int INTEGER REFERENCES wiki_pages(integer_id_col),
+  page_id_int INTEGER REFERENCES wiki_pages(integer_id),
   footnote_resource_id VARCHAR,
   section TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
