@@ -20,6 +20,15 @@ function getIntIdForSlug(slug: string): number {
   return slugIntIdMap.get(slug)!;
 }
 
+/** Reverse-lookup: recover slug from integer ID. */
+function slugFromIntId(intId: number | null): string | null {
+  if (intId === null) return null;
+  for (const [slug, id] of slugIntIdMap.entries()) {
+    if (id === intId) return slug;
+  }
+  return null;
+}
+
 function resetStores() {
   nextQuoteId = 1;
   nextSnapshotId = 1;
@@ -273,25 +282,26 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- citation_accuracy_snapshots: INSERT (supports multi-row) ---
   if (q.includes("insert into") && q.includes("citation_accuracy_snapshots")) {
-    const COLS = 10; // Phase 4a: +1 for page_id_int
+    // Phase D2a: removed page_id_old — params: page_id_int, total_citations, ...
+    const COLS = 9;
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
+      const pageIdInt = params[o] as number | null;
       const row = {
         id: nextSnapshotId++,
-        page_id: params[o] as string,
-        page_id_old: params[o] as string,
-        page_id_int: params[o + 1] as number | null, // Phase 4a
-        total_citations: params[o + 2] as number,
-        checked_citations: params[o + 3] as number,
-        accurate_count: params[o + 4] as number,
-        minor_issues_count: params[o + 5] as number,
-        inaccurate_count: params[o + 6] as number,
-        unsupported_count: params[o + 7] as number,
-        not_verifiable_count: params[o + 8] as number,
-        average_score: params[o + 9],
+        page_id: slugFromIntId(pageIdInt),
+        page_id_int: pageIdInt,
+        total_citations: params[o + 1] as number,
+        checked_citations: params[o + 2] as number,
+        accurate_count: params[o + 3] as number,
+        minor_issues_count: params[o + 4] as number,
+        inaccurate_count: params[o + 5] as number,
+        unsupported_count: params[o + 6] as number,
+        not_verifiable_count: params[o + 7] as number,
+        average_score: params[o + 8],
         snapshot_at: now,
       };
       snapshotStore.push(row);

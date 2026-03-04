@@ -70,6 +70,15 @@ function lookupIntIdForSlug(slug: string): number | undefined {
   return slugIntIdMap.get(slug);
 }
 
+/** Reverse-lookup: recover slug from integer ID. */
+function slugFromIntId(intId: number | null): string | null {
+  if (intId === null) return null;
+  for (const [slug, id] of slugIntIdMap.entries()) {
+    if (id === intId) return slug;
+  }
+  return null;
+}
+
 function resetStores() {
   runStore = [];
   newsStore = [];
@@ -205,14 +214,17 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO auto_update_news_items ----
   if (q.includes("insert into") && q.includes("auto_update_news_items")) {
-    // Drizzle inserts: run_id, title, url, source_id, published_at, summary,
-    //   relevance_score, topics_json, entities_json, routed_to_page_id,
-    //   routed_to_page_id_int, routed_to_page_title, routed_tier  (13 columns)
-    const COLS = 13; // Phase 4a: +1 for routed_to_page_id_int
+    // Phase D2a: removed routed_to_page_id (page_id_old) — 12 columns:
+    //   run_id, title, url, source_id, published_at, summary,
+    //   relevance_score, topics_json, entities_json, routed_to_page_id_int,
+    //   routed_to_page_title, routed_tier
+    const COLS = 12;
     const numRows = params.length / COLS;
     const rows: NewsRow[] = [];
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
+      const routedIntId = params[o + 9] as number | null;
+      const routedSlug = slugFromIntId(routedIntId);
       const row: NewsRow = {
         id: nextNewsId++,
         run_id: params[o] as number,
@@ -224,11 +236,11 @@ const dispatch: SqlDispatcher = (query, params) => {
         relevance_score: params[o + 6] as number | null,
         topics_json: params[o + 7] as string[] | null,
         entities_json: params[o + 8] as string[] | null,
-        routed_to_page_id: params[o + 9] as string | null,
-        routed_to_page_id_old: params[o + 9] as string | null,
-        routed_to_page_id_int: params[o + 10] as number | null,
-        routed_to_page_title: params[o + 11] as string | null,
-        routed_tier: params[o + 12] as string | null,
+        routed_to_page_id: routedSlug, // synthetic convenience field for tests
+        routed_to_page_id_old: null, // D2a: not written on insert
+        routed_to_page_id_int: routedIntId,
+        routed_to_page_title: params[o + 10] as string | null,
+        routed_tier: params[o + 11] as string | null,
         created_at: new Date(),
       };
       newsStore.push(row);
@@ -296,9 +308,10 @@ const dispatch: SqlDispatcher = (query, params) => {
   }
 
   // ---- SELECT FROM auto_update_news_items WHERE run_id = $1  (GET /by-run) ----
-  // Note: the SELECT clause also contains routed_to_page_id as a column, so we
-  // cannot use that string to distinguish this query – we rely on the absence
-  // of `inner join` and `in (` instead.
+  // Phase D2a: query now uses LEFT JOIN wiki_pages + COALESCE for routedToPageSlug.
+  // The SELECT expands all 15 schema columns + 1 COALESCE at position 15.
+  // extractColumns returns null for the COALESCE (identifiers inside parens),
+  // so .values() uses Object.values(row)[15] for that position.
   if (
     q.includes("auto_update_news_items") &&
     !q.includes("inner join") &&
@@ -310,7 +323,20 @@ const dispatch: SqlDispatcher = (query, params) => {
     const runId = params[0] as number;
     return newsStore
       .filter((r) => r.run_id === runId)
-      .sort((a, b) => (b.relevance_score ?? -1) - (a.relevance_score ?? -1));
+      .sort((a, b) => (b.relevance_score ?? -1) - (a.relevance_score ?? -1))
+      .map((r) => {
+        // Strip routed_to_page_id (not a real SQL column — schema uses routed_to_page_id_old)
+        // then append the COALESCE result so it lands at position 15.
+        // D2a COALESCE: routed_to_page_id_old ?? wiki_pages.id (via int lookup)
+        const { routed_to_page_id: _slug, ...rest } = r;
+        return {
+          ...rest,
+          _coalesce_result:
+            r.routed_to_page_id_old ??
+            slugFromIntId(r.routed_to_page_id_int) ??
+            null,
+        };
+      });
   }
 
   // ---- SELECT FROM auto_update_runs ORDER BY started_at LIMIT N

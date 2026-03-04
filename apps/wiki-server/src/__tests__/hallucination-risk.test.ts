@@ -9,8 +9,8 @@ let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
 let riskStore: Array<{
   id: number;
-  page_id: string;
-  page_id_old: string;
+  page_id: string | null;
+  page_id_old: string | null;
   page_id_int: number | null;
   score: number;
   level: string;
@@ -35,6 +35,15 @@ function getIntIdForSlug(slug: string): number {
 /** Non-allocating lookup — returns undefined for slugs not yet in the map. */
 function lookupIntIdForSlug(slug: string): number | undefined {
   return slugIntIdMap.get(slug);
+}
+
+/** Reverse-lookup: recover slug from integer ID. */
+function slugFromIntId(intId: number | null): string | null {
+  if (intId === null) return null;
+  for (const [slug, id] of slugIntIdMap.entries()) {
+    if (id === intId) return slug;
+  }
+  return null;
 }
 
 function resetStore() {
@@ -99,17 +108,19 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("insert into") &&
     q.includes("hallucination_risk_snapshots")
   ) {
-    const PARAMS_PER_ROW = 5; // Phase D2a: page_id_int, score, level, factors, integrity_issues (no page_id_old)
+    // Phase D2a: removed page_id_old — params: page_id_int, score, level, factors, integrity_issues
+    const PARAMS_PER_ROW = 5;
     const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
     const results: (typeof riskStore)[number][] = [];
 
     for (let i = 0; i < rowCount; i++) {
       const off = i * PARAMS_PER_ROW;
       const pageIdInt = params[off] as number | null;
+      const pageSlug = slugFromIntId(pageIdInt);
       const row = {
         id: nextId++,
-        page_id: "", // no longer written; derived from page_id_int
-        page_id_old: "", // no longer written
+        page_id: pageSlug,
+        page_id_old: null, // D2a: not written on insert
         page_id_int: pageIdInt,
         score: params[off + 1] as number,
         level: params[off + 2] as string,
