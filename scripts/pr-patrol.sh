@@ -109,7 +109,7 @@ detect_all_pr_issues() {
   # Fetch all open PRs with relevant fields
   local prs
   prs=$(gh pr list --repo "$REPO" --state open --limit 50 \
-    --json number,title,headRefName,mergeable,statusCheckRollup,updatedAt,body,labels 2>/dev/null) || {
+    --json number,title,headRefName,mergeable,mergedAt,statusCheckRollup,updatedAt,body,labels 2>/dev/null) || {
     log "ERROR: Failed to fetch PR list"
     return 1
   }
@@ -129,6 +129,8 @@ detect_all_pr_issues() {
   # Process each PR and detect issues
   echo "$prs" | jq -r --arg stale "$stale_threshold" '
     .[] |
+    # Skip already-merged PRs (GitHub API can lag on state updates)
+    select(.mergedAt == null) |
     # Detect issues
     [
       (if .mergeable == "CONFLICTING" then "conflict" else empty end),
