@@ -28,7 +28,7 @@ STALE_HOURS="${PR_PATROL_STALE_HOURS:-48}"
 MODEL="${PR_PATROL_MODEL:-sonnet}"
 SKIP_PERMS="${PR_PATROL_SKIP_PERMS:-0}"
 
-STATE_DIR="/tmp/pr-patrol-$$"
+STATE_DIR="/tmp/pr-patrol-shared"
 LOG_FILE="${STATE_DIR}/patrol.log"
 ONCE=false
 DRY_RUN=false
@@ -267,6 +267,12 @@ fix_pr() {
   local original_branch
   original_branch=$(git branch --show-current 2>/dev/null || echo "")
 
+  # Claim the PR by adding claude-working label (prevents other patrol instances from grabbing it)
+  gh pr edit "$pr_num" --repo "$REPO" --add-label "claude-working" 2>/dev/null || log "  Warning: could not add claude-working label"
+
+  # Ensure label is removed even if the script is killed mid-fix
+  trap 'gh pr edit '"$pr_num"' --repo '"$REPO"' --remove-label "claude-working" 2>/dev/null; exit 1' INT TERM
+
   # Write prompt to temp file to avoid arg-length limits
   local prompt_file
   prompt_file=$(mktemp "$STATE_DIR/prompt-XXXXXX.txt")
@@ -294,6 +300,12 @@ fix_pr() {
   fi
 
   rm -f "$prompt_file"
+
+  # Release the PR by removing claude-working label
+  gh pr edit "$pr_num" --repo "$REPO" --remove-label "claude-working" 2>/dev/null || log "  Warning: could not remove claude-working label"
+
+  # Restore default trap (the per-PR cleanup trap is no longer needed)
+  trap 'log "Shutting down..."; exit 0' INT TERM
 
   # Clean up any in-progress rebase/merge left by the spawned session
   git rebase --abort 2>/dev/null || true
