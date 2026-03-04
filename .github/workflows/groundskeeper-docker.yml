@@ -2,7 +2,7 @@ name: Groundskeeper — Build & Push Image
 
 on:
   push:
-    branches: [main]
+    branches: [production]
     paths:
       - "apps/groundskeeper/**"
       - "pnpm-lock.yaml"

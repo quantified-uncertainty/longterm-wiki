@@ -2,7 +2,7 @@ name: Wiki Server — Build, Deploy & Scan
 
 on:
   push:
-    branches: [main]
+    branches: [production]
     paths:
       - "apps/wiki-server/**"
       - "pnpm-lock.yaml"

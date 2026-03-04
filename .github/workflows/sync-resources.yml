@@ -2,7 +2,7 @@ name: Sync Resources
 
 on:
   push:
-    branches: [main]
+    branches: [production]
     paths:
       - "data/resources/**"
 
