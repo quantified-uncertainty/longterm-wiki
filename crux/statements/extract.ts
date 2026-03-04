@@ -39,8 +39,8 @@ import {
 } from '../lib/wiki-server/statements.ts';
 import { cleanMdxForExtraction, splitIntoSections, type Section } from '../claims/extract.ts';
 import { slugToDisplayName } from '../lib/claim-text-utils.ts';
-import { getResourceById } from '../lib/search/resource-lookup.ts';
 import { loadIdRegistry } from '../lib/content-types.ts';
+import { apiRequest } from '../lib/wiki-server/client.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -144,6 +144,34 @@ export function buildSectionFootnoteMap(
   }
 
   return result;
+}
+
+// ---------------------------------------------------------------------------
+// Page citation lookup — fetch rc-XXXX → URL from wiki-server page_citations
+// ---------------------------------------------------------------------------
+
+interface PageCitation {
+  referenceId: string;
+  url: string | null;
+  title: string | null;
+  resourceId: string | null;
+}
+
+async function fetchPageCitations(pageId: string): Promise<Map<string, PageCitation>> {
+  try {
+    const result = await apiRequest<{
+      pages: Record<string, { citations: PageCitation[] }>;
+    }>('GET', '/api/references/all');
+    if (!result.ok) return new Map();
+    const pageCitations = result.data?.pages?.[pageId]?.citations ?? [];
+    const map = new Map<string, PageCitation>();
+    for (const cit of pageCitations) {
+      map.set(cit.referenceId, cit);
+    }
+    return map;
+  } catch {
+    return new Map();
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -416,11 +444,15 @@ async function main() {
   // Build footnote map: section heading -> [^rc-XXXX] references
   const sectionFootnoteMap = buildSectionFootnoteMap(cleanBody, body, sections);
 
+  // Fetch rc-XXXX → URL mapping from wiki-server page_citations table
+  const citationUrlMap = await fetchPageCitations(pageId);
+
   console.log(`\n${c.bold}${c.blue}Statement Extraction: ${pageId}${c.reset}\n`);
   console.log(`  Page: ${entityName}`);
   console.log(`  Sections: ${sections.length}`);
   console.log(`  Page ID (int): ${pageIdInt ?? 'unknown'}`);
   console.log(`  Properties loaded: ${propertyIds.size}`);
+  console.log(`  Citation URLs available: ${citationUrlMap.size}`);
   if (model) console.log(`  Model: ${model}`);
   if (dryRun) console.log(`  ${c.yellow}DRY RUN — use --apply to store${c.reset}`);
   console.log('');
@@ -563,13 +595,11 @@ async function main() {
         sourceFactKey: sfk,
         claimCategory: stmt.claimCategory,
         citations: stmt.footnoteRefs.map((ref, idx) => {
-          const resource = getResourceById(ref);
+          // Look up URL from wiki-server page_citations table (rc-XXXX → URL)
+          const pageCit = citationUrlMap.get(ref);
           return {
-            // Don't set resourceId — rc-XXXX IDs are local YAML identifiers,
-            // not entries in the wiki-server resources table (FK constraint).
-            // Store the URL instead for display and verification.
             resourceId: null,
-            url: resource?.url ?? null,
+            url: pageCit?.url ?? null,
             sourceQuote: null,
             locationNote: `footnote: ${ref}`,
             isPrimary: idx === 0,
