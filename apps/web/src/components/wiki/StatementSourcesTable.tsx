@@ -108,15 +108,19 @@ function SourceCard({ group }: { group: SourceGroup }) {
 
             return (
               <div key={entry.url} className="flex items-center justify-between gap-2">
-                <a
-                  href={entry.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-0.5 text-[11px] text-blue-600 hover:underline truncate min-w-0"
-                >
-                  {path}
-                  <ExternalLink className="w-2.5 h-2.5 shrink-0" />
-                </a>
+                {isSafeUrl(entry.url) ? (
+                  <a
+                    href={entry.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-0.5 text-[11px] text-blue-600 hover:underline truncate min-w-0"
+                  >
+                    {path}
+                    <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                  </a>
+                ) : (
+                  <span className="text-[11px] text-muted-foreground truncate">{path}</span>
+                )}
                 <div className="flex items-center gap-1.5 shrink-0">
                   <span className="text-[10px] tabular-nums text-muted-foreground">
                     {entry.count}
