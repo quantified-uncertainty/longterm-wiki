@@ -31,6 +31,15 @@ function lookupIntIdForSlug(slug: string): number | undefined {
   return slugIntIdMap.get(slug);
 }
 
+/** Reverse-lookup: recover slug from integer ID. */
+function slugFromIntId(intId: number | null): string | null {
+  if (intId === null) return null;
+  for (const [slug, id] of slugIntIdMap.entries()) {
+    if (id === intId) return slug;
+  }
+  return null;
+}
+
 function resetStore() {
   editStore = [];
   nextId = 1;
@@ -132,22 +141,24 @@ function createMockSql() {
 
     // ---- INSERT INTO edit_logs (supports multi-row) ----
     if (q.includes("insert into") && q.includes("edit_logs")) {
-      // Drizzle sends positional params: page_id, page_id_int, date, tool, agency, requested_by, note per row
-      const COLS = 7; // Phase 4a: +1 for page_id_int
+      // Phase D2a: Drizzle sends positional params: page_id_int, date, tool, agency, requested_by, note per row
+      const COLS = 6;
       const numRows = params.length / COLS;
       const rows = [];
       for (let i = 0; i < numRows; i++) {
         const o = i * COLS;
+        const pageIdInt = params[o] as number | null;
+        const pageSlug = slugFromIntId(pageIdInt) ?? `unknown-${pageIdInt}`;
         const row = {
           id: nextId++,
-          page_id: params[o] as string,
-          page_id_old: params[o] as string,
-          page_id_int: params[o + 1] as number | null,
-          date: String(params[o + 2]),
-          tool: params[o + 3] as string,
-          agency: params[o + 4] as string,
-          requested_by: (params[o + 5] as string) ?? null,
-          note: (params[o + 6] as string) ?? null,
+          page_id: pageSlug,
+          page_id_old: pageSlug,
+          page_id_int: pageIdInt,
+          date: String(params[o + 1]),
+          tool: params[o + 2] as string,
+          agency: params[o + 3] as string,
+          requested_by: (params[o + 4] as string) ?? null,
+          note: (params[o + 5] as string) ?? null,
           created_at: new Date(),
         };
         editStore.push(row);
@@ -161,8 +172,9 @@ function createMockSql() {
     // Key is "page_id" because extractColumns finds the last quoted identifier
     // inside `count(distinct "edit_logs"."page_id")` as "page_id".
     if (q.includes("count(distinct") && q.includes("page_id") && q.includes("edit_logs")) {
-      const uniquePages = new Set(editStore.map((e) => e.page_id));
-      return [{ page_id: uniquePages.size, page_id_old: uniquePages.size }];
+      const uniquePages = new Set(editStore.map((e) => e.page_id_int).filter((v) => v !== null));
+      // Phase D2a: count(distinct page_id_int) — extractColumns finds "page_id_int"
+      return [{ page_id_int: uniquePages.size }];
     }
 
     // ---- SELECT count(*) FROM edit_logs (not GROUP BY) ----
@@ -193,7 +205,8 @@ function createMockSql() {
           grouped[e.page_id] = e.date;
         }
       }
-      return Object.entries(grouped).map(([page_id, date]) => ({ page_id, page_id_old: page_id, date }));
+      // Phase D2a: route returns { page_id, latest_date } via JOIN wiki_pages
+      return Object.entries(grouped).map(([page_id, date]) => ({ page_id, latest_date: date }));
     }
 
     // ---- SELECT page_id, min(date) FROM edit_logs GROUP BY page_id ----
@@ -204,7 +217,8 @@ function createMockSql() {
           grouped[e.page_id] = e.date;
         }
       }
-      return Object.entries(grouped).map(([page_id, date]) => ({ page_id, page_id_old: page_id, date }));
+      // Phase D2a: route returns { page_id, earliest_date } via JOIN wiki_pages
+      return Object.entries(grouped).map(([page_id, date]) => ({ page_id, earliest_date: date }));
     }
 
     // ---- SELECT agency, count FROM edit_logs GROUP BY agency ----
