@@ -3,6 +3,8 @@
  *
  * - GET /          — list with filters (by entity, property, variety, status)
  * - GET /current   — current value for entity+property (valid_end IS NULL)
+ * - GET /by-page   — all statements for a page with citations and footnote links
+ * - GET /by-page/summary — per-footnote verification summary for citation dots
  * - GET /properties — list all properties with statement counts
  * - GET /stats     — basic statistics
  * - PATCH /:id     — update statement status, verdict, or note
@@ -24,6 +26,7 @@ import { getDrizzleDb } from "../db.js";
 import {
   statements,
   statementCitations,
+  statementPageReferences,
   properties,
 } from "../schema.js";
 import {
@@ -55,6 +58,10 @@ const CurrentQuery = z.object({
 
 const ByEntityQuery = z.object({
   entityId: z.string().min(1).max(200),
+});
+
+const ByPageQuery = z.object({
+  pageId: z.coerce.number().int().positive(),
 });
 
 // ---- Zod validator helper (uses Hono's built-in validator for RPC type inference) ----
@@ -121,7 +128,7 @@ const PatchStatementBody = z.object({
 
 const CreateStatementBody = z.object({
   variety: z.enum(["structured", "attributed"]),
-  statementText: z.string().max(2000).nullish(),
+  statementText: z.string().min(1).max(2000), // Required: every statement needs human-readable text
   subjectEntityId: z.string().min(1).max(200),
   propertyId: z.string().max(200).nullish(),
   qualifierKey: z.string().max(200).nullish(),
@@ -323,6 +330,157 @@ const statementsApp = new Hono()
     return c.json({ structured, attributed, total: rows.length });
   })
 
+  // ---- GET /by-page — all statements for a page with citations and footnote links ----
+  .get("/by-page", zv("query", ByPageQuery), async (c) => {
+    const { pageId } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Get all page references for this page
+    const refs = await db
+      .select()
+      .from(statementPageReferences)
+      .where(eq(statementPageReferences.pageIdInt, pageId));
+
+    if (refs.length === 0) {
+      return c.json({ statements: [] });
+    }
+
+    const statementIds = [...new Set(refs.map((r) => r.statementId))];
+
+    if (statementIds.length === 0) {
+      return c.json({ statements: [] });
+    }
+
+    // Fetch statements and citations in parallel
+    const [stmtRows, citRows] = await Promise.all([
+      db
+        .select()
+        .from(statements)
+        .where(
+          sql`${statements.id} IN (${sql.join(
+            statementIds.map((id) => sql`${id}`),
+            sql`, `
+          )})`
+        ),
+      db
+        .select()
+        .from(statementCitations)
+        .where(
+          sql`${statementCitations.statementId} IN (${sql.join(
+            statementIds.map((id) => sql`${id}`),
+            sql`, `
+          )})`
+        ),
+    ]);
+
+    // Build citation map: statementId -> citations[]
+    const citationMap = new Map<number, (typeof citRows)[number][]>();
+    for (const cit of citRows) {
+      const list = citationMap.get(cit.statementId) ?? [];
+      list.push(cit);
+      citationMap.set(cit.statementId, list);
+    }
+
+    // Build statement map: id -> statement
+    const stmtMap = new Map(stmtRows.map((s) => [s.id, s]));
+
+    // Build ref map: statementId -> page reference info[] (a statement can appear multiple times on a page)
+    const refMap = new Map<
+      number,
+      Array<{ footnoteResourceId: string | null; section: string | null }>
+    >();
+    for (const ref of refs) {
+      if (ref.statementId !== null) {
+        const list = refMap.get(ref.statementId) ?? [];
+        list.push({
+          footnoteResourceId: ref.footnoteResourceId,
+          section: ref.section,
+        });
+        refMap.set(ref.statementId, list);
+      }
+    }
+
+    // Combine: for each statement, attach citations and page reference info
+    const result = statementIds
+      .map((id) => {
+        const stmt = stmtMap.get(id);
+        if (!stmt) return null;
+        const cits = citationMap.get(id) ?? [];
+        const pageRefs = refMap.get(id) ?? [];
+        return {
+          ...formatStatement(stmt),
+          pageReferences: pageRefs,
+          citations: cits.map((cit) => ({
+            id: cit.id,
+            resourceId: cit.resourceId,
+            url: cit.url,
+            sourceQuote: cit.sourceQuote,
+            locationNote: cit.locationNote,
+            isPrimary: cit.isPrimary,
+          })),
+        };
+      })
+      .filter((s): s is NonNullable<typeof s> => s !== null);
+
+    return c.json({ statements: result });
+  })
+
+  // ---- GET /by-page/summary — per-footnote verification summary for citation dots ----
+  .get("/by-page/summary", zv("query", ByPageQuery), async (c) => {
+    const { pageId } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Get all page references for this page, joined with statement verdicts
+    const rows = await db
+      .select({
+        footnoteResourceId: statementPageReferences.footnoteResourceId,
+        verdict: statements.verdict,
+      })
+      .from(statementPageReferences)
+      .innerJoin(
+        statements,
+        eq(statementPageReferences.statementId, statements.id)
+      )
+      .where(eq(statementPageReferences.pageIdInt, pageId));
+
+    // Group by footnoteResourceId and aggregate verdicts
+    const footnoteMap = new Map<
+      string,
+      {
+        statementCount: number;
+        verdicts: { verified: number; disputed: number; unchecked: number };
+      }
+    >();
+
+    for (const row of rows) {
+      const key = row.footnoteResourceId ?? "__none__";
+      const entry = footnoteMap.get(key) ?? {
+        statementCount: 0,
+        verdicts: { verified: 0, disputed: 0, unchecked: 0 },
+      };
+      entry.statementCount++;
+      if (row.verdict === "verified") {
+        entry.verdicts.verified++;
+      } else if (
+        row.verdict === "disputed" ||
+        row.verdict === "unsupported"
+      ) {
+        entry.verdicts.disputed++;
+      } else {
+        entry.verdicts.unchecked++;
+      }
+      footnoteMap.set(key, entry);
+    }
+
+    const footnotes = [...footnoteMap.entries()].map(([key, val]) => ({
+      footnoteResourceId: key === "__none__" ? null : key,
+      statementCount: val.statementCount,
+      verdicts: val.verdicts,
+    }));
+
+    return c.json({ footnotes });
+  })
+
   // ---- GET /properties — list all properties with statement counts ----
   .get("/properties", async (c) => {
     const db = getDrizzleDb();
@@ -455,7 +613,7 @@ const statementsApp = new Hono()
         .insert(statements)
         .values({
           variety: data.variety,
-          statementText: data.statementText ?? null,
+          statementText: data.statementText,
           subjectEntityId: data.subjectEntityId,
           propertyId: data.propertyId ?? null,
           qualifierKey: data.qualifierKey ?? null,
