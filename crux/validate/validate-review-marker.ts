@@ -8,10 +8,14 @@
  *   2. If the diff exceeds thresholds (>5 files OR >300 lines):
  *      - Check if .claude/review-done exists
  *      - Verify it contains a commit SHA that matches the current HEAD
+ *      - Verify it contains a diff hash matching the current diff content
  *   3. Fail (exit 1) if no valid marker is found — this blocks the gate
  *
  * The marker file format is:
- *   reviewed <commit-sha> <ISO-timestamp>
+ *   reviewed <commit-sha> <ISO-timestamp> <diff-hash>
+ *
+ * The diff-hash is the first 12 hex chars of SHA-256(git diff main...HEAD).
+ * It proves the marker was generated for this specific set of changes.
  *
  * This check is blocking for large PRs. Small PRs (within thresholds) pass
  * automatically. See the gate step in validate-gate.ts.
@@ -25,6 +29,7 @@ import { createHash } from 'crypto';
 import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
+import { getDiffStats, getMergeBase } from './diff-utils.ts';
 
 const FILES_THRESHOLD = 5;
 const LINES_THRESHOLD = 300;
@@ -43,25 +48,6 @@ export interface ReviewCheckResult {
 }
 
 /**
- * Parse the summary line from `git diff --stat`.
- * Example: " 12 files changed, 450 insertions(+), 120 deletions(-)"
- */
-function parseDiffStat(output: string): { files: number; lines: number } {
-  const lines = output.trim().split('\n');
-  const summaryLine = lines[lines.length - 1] || '';
-
-  const filesMatch = summaryLine.match(/(\d+)\s+files?\s+changed/);
-  const insertionsMatch = summaryLine.match(/(\d+)\s+insertions?\(\+\)/);
-  const deletionsMatch = summaryLine.match(/(\d+)\s+deletions?\(-\)/);
-
-  const files = filesMatch ? parseInt(filesMatch[1], 10) : 0;
-  const insertions = insertionsMatch ? parseInt(insertionsMatch[1], 10) : 0;
-  const deletions = deletionsMatch ? parseInt(deletionsMatch[1], 10) : 0;
-
-  return { files, lines: insertions + deletions };
-}
-
-/**
  * Get the current HEAD commit SHA.
  */
 function getHeadSha(): string {
@@ -76,52 +62,27 @@ function getHeadSha(): string {
 }
 
 /**
- * Get diff stats against main branch.
- */
-function getDiffStats(): { files: number; lines: number } {
-  try {
-    // Try origin/main first, fall back to main
-    const base = execSync(
-      'git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null',
-      { cwd: PROJECT_ROOT, encoding: 'utf-8' }
-    ).trim();
-
-    if (!base) return { files: 0, lines: 0 };
-
-    const stat = execSync(`git diff --stat ${base}...HEAD`, {
-      cwd: PROJECT_ROOT,
-      encoding: 'utf-8',
-    });
-
-    return parseDiffStat(stat);
-  } catch {
-    // Fail-closed: if we can't determine diff size, report 0
-    // (don't warn about missing review for unknown diffs)
-    return { files: 0, lines: 0 };
-  }
-}
-
-/**
  * Compute a SHA-256 hash of the diff content (first 12 hex chars).
  * This "proof-of-work" ties the marker to the specific diff at review time,
  * preventing trivial forgery (writing the marker without running /review-pr).
+ *
+ * Uses raw Buffer (not UTF-8 string) to match the shell `shasum` behavior,
+ * ensuring the hash is identical whether computed here or via the shell
+ * command in review-pr.md.
  */
 export function computeDiffHash(): string {
   try {
-    const base = execSync(
-      'git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null',
-      { cwd: PROJECT_ROOT, encoding: 'utf-8' }
-    ).trim();
-
+    const base = getMergeBase();
     if (!base) return '';
 
-    const diff = execSync(`git diff ${base}...HEAD`, {
+    // No `encoding` option → returns Buffer with raw bytes, matching
+    // what `shasum -a 256` receives when piped from `git diff`.
+    const diffBuffer: Buffer = execSync(`git diff ${base}...HEAD`, {
       cwd: PROJECT_ROOT,
-      encoding: 'utf-8',
       maxBuffer: 50 * 1024 * 1024, // 50MB for large diffs
     });
 
-    return createHash('sha256').update(diff).digest('hex').slice(0, 12);
+    return createHash('sha256').update(diffBuffer).digest('hex').slice(0, 12);
   } catch {
     return '';
   }
@@ -238,7 +199,24 @@ export function runCheck(): ReviewCheckResult {
   }
 
   const currentDiffHash = computeDiffHash();
-  if (currentDiffHash && marker.diffHash !== currentDiffHash) {
+  if (!currentDiffHash) {
+    // Fail-closed: if we can't compute the diff hash, we can't verify
+    // the marker's proof-of-work. Don't silently pass.
+    const reason = 'Could not compute diff hash to verify review marker — run /review-pr again';
+    console.log(`\n${c.yellow}WARNING: ${reason}${c.reset}`);
+    return {
+      passed: false,
+      warnings: 1,
+      filesChanged: files,
+      linesChanged: lines,
+      thresholdExceeded: true,
+      markerFound: true,
+      markerValid: false,
+      reason,
+    };
+  }
+
+  if (marker.diffHash !== currentDiffHash) {
     const reason = `Review marker diff hash (${marker.diffHash}) does not match current diff (${currentDiffHash}) — diff changed since review`;
     console.log(`\n${c.yellow}WARNING: ${reason}${c.reset}`);
     console.log(`${c.dim}  Fix: run /review-pr again to review the latest changes${c.reset}`);

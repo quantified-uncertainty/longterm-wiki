@@ -13,10 +13,10 @@
  */
 
 import { existsSync } from 'fs';
-import { execSync } from 'child_process';
 import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
+import { getDiffStats } from './diff-utils.ts';
 
 const FILES_THRESHOLD = 3;
 const LINES_THRESHOLD = 200;
@@ -30,41 +30,6 @@ export interface ChecklistRequiredResult {
   thresholdExceeded: boolean;
   checklistExists: boolean;
   reason?: string;
-}
-
-function parseDiffStat(output: string): { files: number; lines: number } {
-  const lines = output.trim().split('\n');
-  const summaryLine = lines[lines.length - 1] || '';
-
-  const filesMatch = summaryLine.match(/(\d+)\s+files?\s+changed/);
-  const insertionsMatch = summaryLine.match(/(\d+)\s+insertions?\(\+\)/);
-  const deletionsMatch = summaryLine.match(/(\d+)\s+deletions?\(-\)/);
-
-  const files = filesMatch ? parseInt(filesMatch[1], 10) : 0;
-  const insertions = insertionsMatch ? parseInt(insertionsMatch[1], 10) : 0;
-  const deletions = deletionsMatch ? parseInt(deletionsMatch[1], 10) : 0;
-
-  return { files, lines: insertions + deletions };
-}
-
-function getDiffStats(): { files: number; lines: number } {
-  try {
-    const base = execSync(
-      'git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null',
-      { cwd: PROJECT_ROOT, encoding: 'utf-8' }
-    ).trim();
-
-    if (!base) return { files: 0, lines: 0 };
-
-    const stat = execSync(`git diff --stat ${base}...HEAD`, {
-      cwd: PROJECT_ROOT,
-      encoding: 'utf-8',
-    });
-
-    return parseDiffStat(stat);
-  } catch {
-    return { files: 0, lines: 0 };
-  }
 }
 
 export function runCheck(): ChecklistRequiredResult {

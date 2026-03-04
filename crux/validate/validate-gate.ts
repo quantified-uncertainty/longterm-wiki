@@ -327,9 +327,12 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-checklist-required.ts'],
     cwd: PROJECT_ROOT,
-    // Blocking: large diffs (>3 files or >200 lines) must have an
-    // agent checklist. Prevents "quick fix" sessions shipping major
-    // changes without any self-review workflow.
+    // Advisory: warns when large diffs (>3 files or >200 lines) lack an
+    // agent checklist. Advisory rather than blocking because human devs,
+    // Dependabot, and non-agent automation don't use the checklist workflow.
+    // The pre-push-check in agent-checklist.ts handles the hard block for
+    // agent sessions that have a checklist.
+    advisory: true,
   },
 ];
 
