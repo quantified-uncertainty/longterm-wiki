@@ -122,7 +122,10 @@ export default async function PropertiesPage() {
     noLocalFallback
   );
 
-  const { properties, statements } = data;
+  const { properties: allProperties, statements } = data;
+
+  // Filter out properties with no statements
+  const properties = allProperties.filter((p) => p.statementCount > 0);
 
   // Summary stats
   const totalProperties = properties.length;

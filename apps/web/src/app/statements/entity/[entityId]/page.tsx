@@ -435,7 +435,7 @@ function AttributedRow({
                   href={`/wiki/${s.attributedTo}`}
                   className="text-blue-600 hover:underline"
                 >
-                  {s.attributedTo}
+                  {getEntityById(s.attributedTo)?.title ?? s.attributedTo}
                 </Link>
               </span>
             )}
