@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   buildPrefixTsquery,
+  titleMatchBoostExpr,
   TRIGRAM_SIMILARITY_THRESHOLD,
   TRIGRAM_FALLBACK_THRESHOLD,
   TS_HEADLINE_OPTIONS,
@@ -40,6 +41,25 @@ describe("buildPrefixTsquery", () => {
 
   it("handles numbers", () => {
     expect(buildPrefixTsquery("gpt 4")).toBe("gpt:* & 4:*");
+  });
+});
+
+describe("titleMatchBoostExpr", () => {
+  it("returns valid SQL CASE expression with starts_with instead of LIKE", () => {
+    const expr = titleMatchBoostExpr("title", "$1");
+    expect(expr).toContain("CASE");
+    expect(expr).toContain("lower(title)");
+    expect(expr).toContain("lower($1)");
+    expect(expr).toContain("1000");  // exact match bonus
+    expect(expr).toContain("100");   // prefix match bonus
+    expect(expr).toContain("starts_with");  // safe: no LIKE special chars
+    expect(expr).not.toContain("LIKE");     // no LIKE = no %, _ issues
+  });
+
+  it("uses the provided column and param references", () => {
+    const expr = titleMatchBoostExpr("wp.title", "$3");
+    expect(expr).toContain("lower(wp.title)");
+    expect(expr).toContain("lower($3)");
   });
 });
 
