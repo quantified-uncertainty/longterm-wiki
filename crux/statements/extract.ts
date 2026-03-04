@@ -162,14 +162,19 @@ async function fetchPageCitations(pageId: string): Promise<Map<string, PageCitat
     const result = await apiRequest<{
       pages: Record<string, { citations: PageCitation[] }>;
     }>('GET', '/api/references/all');
-    if (!result.ok) return new Map();
+    if (!result.ok) {
+      console.warn(`[statements/extract] Failed to fetch page citations for "${pageId}": ${result.message}`);
+      return new Map();
+    }
     const pageCitations = result.data?.pages?.[pageId]?.citations ?? [];
     const map = new Map<string, PageCitation>();
     for (const cit of pageCitations) {
       map.set(cit.referenceId, cit);
     }
     return map;
-  } catch {
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[statements/extract] Citation lookup error for "${pageId}": ${msg}`);
     return new Map();
   }
 }
@@ -420,12 +425,14 @@ async function main() {
   const cleanBody = cleanMdxForExtraction(body);
   const sections = splitIntoSections(cleanBody);
 
+  // Load ID registry once for page ID resolution and FK validation
+  const registry = loadIdRegistry();
+
   // Parse page integer ID for page references — try frontmatter first, then ID registry
   let pageIdInt = numericId
     ? parseInt(numericId.replace(/^E/, ''), 10)
     : null;
   if (!pageIdInt) {
-    const registry = loadIdRegistry();
     const eId = registry.bySlug[pageId]; // e.g. "E42"
     if (eId) {
       pageIdInt = parseInt(eId.replace(/^E/, ''), 10);
@@ -437,8 +444,7 @@ async function main() {
   // Load property vocabulary
   const { list: propertyList, ids: propertyIds } = await loadPropertyVocabulary();
 
-  // Load valid entity IDs from the ID registry (for FK validation)
-  const registry = loadIdRegistry();
+  // Valid entity IDs for FK validation
   const validEntityIds = new Set(Object.keys(registry.bySlug));
 
   // Build footnote map: section heading -> [^rc-XXXX] references

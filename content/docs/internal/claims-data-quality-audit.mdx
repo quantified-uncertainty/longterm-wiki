@@ -1,14 +1,14 @@
 ---
 numericId: E901
-title: "Claims Data Quality Audit (Feb 2026)"
-description: "Empirical analysis of 1,514 claims across 11 entities — documenting the actual quality issues, per-entity breakdowns, worst-case examples, and remediation priorities"
+title: "Data Quality Audit — Claims Era (Feb 2026)"
+description: "Empirical analysis of 1,514 legacy claims across 11 entities — documenting quality issues, per-entity breakdowns, worst-case examples, and remediation priorities. Findings inform the Statements system's extraction validation."
 sidebar:
   order: 39
 subcategory: architecture
 quality: 65
 readerImportance: 90
 researchImportance: 85
-lastEdited: "2026-02-26"
+lastEdited: "2026-03-03"
 createdAt: 2026-02-26
 evergreen: false
 llmSummary: "Empirical quality audit of the claims database, analyzing 1,514 claims across 11 entities. Finds that 89% of claims have at least one quality issue. The three dominant problems are: missing relatedEntities (62.5%), unsourced/unsupported confidence (58.6%), and claims lacking entity names for standalone readability (45.8%). Includes per-entity breakdowns, specific examples of each issue type, and a prioritized remediation plan."
@@ -18,6 +18,8 @@ ratings:
   actionability: 9
   completeness: 7
 ---
+
+> **Note**: This audit covers the legacy **Claims** system. The findings directly inform extraction validation for the successor **Statements** system. See <EntityLink id="E1006" name="statements-system-architecture">Statements System Architecture (E1006)</EntityLink> for the current system.
 
 ## Purpose
 
