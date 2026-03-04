@@ -152,7 +152,7 @@ post_merge:
     notes: null
 
   - id: audits-system-post-merge
-    pr: 0
+    pr: 1637
     merged: "2026-03-04"
     claim: "The crux audits system works end-to-end after merge"
     how_to_verify: "Run each crux audits subcommand on main branch and verify output is correct"
