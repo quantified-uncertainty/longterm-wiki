@@ -59,7 +59,10 @@ const CurrentQuery = z.object({
 
 const ByEntityQuery = z.object({
   entityId: z.string().min(1).max(200),
-  includeRetracted: z.coerce.boolean().default(false),
+  includeRetracted: z.preprocess(
+    (v) => typeof v === "string" ? v.toLowerCase() === "true" : v,
+    z.coerce.boolean()
+  ).default(false),
 });
 
 const ByPageQuery = z.object({
@@ -884,7 +887,7 @@ const statementsApp = new Hono()
     const body = await parseJsonBody(c);
     const parsed = z
       .object({
-        entityId: z.string().max(200).optional(),
+        entityId: z.string().min(1).max(200).optional(),
         dryRun: z.boolean().default(true),
       })
       .safeParse(body ?? {});
@@ -923,7 +926,7 @@ const statementsApp = new Hono()
 
     if (dryRun || allIds.length === 0) {
       return c.json({
-        dryRun: true,
+        dryRun,
         retracted: retractedRows.length,
         empty: emptyRows.length,
         totalToDelete: allIds.length,
@@ -931,36 +934,38 @@ const statementsApp = new Hono()
       });
     }
 
-    // Delete citations first (FK constraint), then statements
+    // Delete citations first (FK constraint), then statements — all in one transaction
     console.warn(`[statements/cleanup] Deleting ${allIds.length} statements (${retractedRows.length} retracted, ${emptyRows.length} empty)`);
 
-    await db
-      .delete(statementCitations)
-      .where(
-        sql`${statementCitations.statementId} IN (${sql.join(
-          allIds.map((id) => sql`${id}`),
-          sql`, `
-        )})`
-      );
+    const deleted = await db.transaction(async (tx) => {
+      await tx
+        .delete(statementCitations)
+        .where(
+          sql`${statementCitations.statementId} IN (${sql.join(
+            allIds.map((id) => sql`${id}`),
+            sql`, `
+          )})`
+        );
 
-    await db
-      .delete(statementPageReferences)
-      .where(
-        sql`${statementPageReferences.statementId} IN (${sql.join(
-          allIds.map((id) => sql`${id}`),
-          sql`, `
-        )})`
-      );
+      await tx
+        .delete(statementPageReferences)
+        .where(
+          sql`${statementPageReferences.statementId} IN (${sql.join(
+            allIds.map((id) => sql`${id}`),
+            sql`, `
+          )})`
+        );
 
-    const deleted = await db
-      .delete(statements)
-      .where(
-        sql`${statements.id} IN (${sql.join(
-          allIds.map((id) => sql`${id}`),
-          sql`, `
-        )})`
-      )
-      .returning({ id: statements.id });
+      return tx
+        .delete(statements)
+        .where(
+          sql`${statements.id} IN (${sql.join(
+            allIds.map((id) => sql`${id}`),
+            sql`, `
+          )})`
+        )
+        .returning({ id: statements.id });
+    });
 
     return c.json({
       dryRun: false,
