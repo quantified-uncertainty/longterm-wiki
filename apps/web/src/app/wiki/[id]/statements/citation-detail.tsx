@@ -83,7 +83,7 @@ function CitationItem({ citation: cit }: { citation: Citation }) {
             <span className="text-[10px] font-medium">Primary</span>
           </span>
         )}
-        {cit.url && isSafeUrl(cit.url) && (
+        {cit.url && isSafeUrl(cit.url) ? (
           <a
             href={cit.url}
             target="_blank"
@@ -93,7 +93,11 @@ function CitationItem({ citation: cit }: { citation: Citation }) {
             <span className="truncate">{domain ?? cit.url}</span>
             <ExternalLink className="w-3 h-3 shrink-0" />
           </a>
-        )}
+        ) : cit.resourceId ? (
+          <span className="text-muted-foreground text-[10px] ml-auto font-mono">
+            {cit.resourceId}
+          </span>
+        ) : null}
       </div>
 
       {/* Source quote */}

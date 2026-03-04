@@ -711,7 +711,8 @@ const statementsApp = new Hono()
     const results: Array<{ id: number; sourceFactKey: string | null }> = [];
 
     await db.transaction(async (tx) => {
-      for (const data of items) {
+      for (let idx = 0; idx < items.length; idx++) {
+        const data = items[idx];
         const result = await tx
           .insert(statements)
           .values({
@@ -775,6 +776,15 @@ const statementsApp = new Hono()
           sourceFactKey: data.sourceFactKey ?? null,
         });
       }
+    }).catch((err) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      // Log the full error including Postgres detail/hint/constraint
+      const pgErr = err as { detail?: string; constraint?: string; code?: string; hint?: string };
+      console.error(`[statements/batch] Transaction failed at item ${results.length}: ${msg}`);
+      if (pgErr.detail) console.error(`  PG detail: ${pgErr.detail}`);
+      if (pgErr.constraint) console.error(`  PG constraint: ${pgErr.constraint}`);
+      if (pgErr.code) console.error(`  PG code: ${pgErr.code}`);
+      throw err;
     });
 
     return c.json({ inserted: results.length, results, ok: true }, 201);
