@@ -10,9 +10,13 @@
  * heuristics as placeholders for future LLM scoring.
  */
 
+import Anthropic from '@anthropic-ai/sdk';
 import { jaccardWordSimilarity } from '../lib/claim-utils.ts';
 import { containsEntityReference, slugToDisplayName } from '../lib/claim-text-utils.ts';
 import { VAGUE_PATTERNS } from '../claims/validate-quality/types.ts';
+import { callLlm, MODELS } from '../lib/llm.ts';
+import { parseJsonFromLlm } from '../lib/json-parsing.ts';
+import type { CostTracker } from '../lib/cost-tracker.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -85,6 +89,14 @@ export interface ScoringContext {
   entityName: string;
   /** Current date for recency calculations. */
   now?: Date;
+}
+
+/** Context for opt-in LLM-based scoring of importance + clarity. */
+export interface LlmScoringContext {
+  client: Anthropic;
+  entityName: string;
+  entityType: string;
+  tracker?: CostTracker;
 }
 
 // ---------------------------------------------------------------------------
@@ -403,6 +415,27 @@ export function scoreImportance(stmt: ScoringStatement): number {
 // Composite scoring
 // ---------------------------------------------------------------------------
 
+/** Compute the weighted composite score from a dimensions object. */
+export function computeComposite(dimensions: QualityDimensions): number {
+  const intrinsic =
+    INTRINSIC_WEIGHTS.structure * dimensions.structure +
+    INTRINSIC_WEIGHTS.precision * dimensions.precision +
+    INTRINSIC_WEIGHTS.clarity * dimensions.clarity +
+    INTRINSIC_WEIGHTS.resolvability * dimensions.resolvability +
+    INTRINSIC_WEIGHTS.uniqueness * dimensions.uniqueness +
+    INTRINSIC_WEIGHTS.atomicity * dimensions.atomicity;
+
+  const extrinsic =
+    EXTRINSIC_WEIGHTS.importance * dimensions.importance +
+    EXTRINSIC_WEIGHTS.neglectedness * dimensions.neglectedness +
+    EXTRINSIC_WEIGHTS.recency * dimensions.recency +
+    EXTRINSIC_WEIGHTS.crossEntityUtility * dimensions.crossEntityUtility;
+
+  return Math.round(
+    (INTRINSIC_EXTRINSIC_SPLIT * intrinsic + (1 - INTRINSIC_EXTRINSIC_SPLIT) * extrinsic) * 1000,
+  ) / 1000;
+}
+
 /** Score a single statement across all 10 dimensions and compute composite. */
 export function scoreStatement(stmt: ScoringStatement, ctx: ScoringContext): ScoringResult {
   const dimensions: QualityDimensions = {
@@ -418,25 +451,9 @@ export function scoreStatement(stmt: ScoringStatement, ctx: ScoringContext): Sco
     crossEntityUtility: scoreCrossEntityUtility(stmt),
   };
 
-  const intrinsic =
-    INTRINSIC_WEIGHTS.structure * dimensions.structure +
-    INTRINSIC_WEIGHTS.precision * dimensions.precision +
-    INTRINSIC_WEIGHTS.clarity * dimensions.clarity +
-    INTRINSIC_WEIGHTS.resolvability * dimensions.resolvability +
-    INTRINSIC_WEIGHTS.uniqueness * dimensions.uniqueness +
-    INTRINSIC_WEIGHTS.atomicity * dimensions.atomicity;
-
-  const extrinsic =
-    EXTRINSIC_WEIGHTS.importance * dimensions.importance +
-    EXTRINSIC_WEIGHTS.neglectedness * dimensions.neglectedness +
-    EXTRINSIC_WEIGHTS.recency * dimensions.recency +
-    EXTRINSIC_WEIGHTS.crossEntityUtility * dimensions.crossEntityUtility;
-
-  const qualityScore = INTRINSIC_EXTRINSIC_SPLIT * intrinsic + (1 - INTRINSIC_EXTRINSIC_SPLIT) * extrinsic;
-
   return {
     statementId: stmt.id,
-    qualityScore: Math.round(qualityScore * 1000) / 1000,
+    qualityScore: computeComposite(dimensions),
     dimensions,
   };
 }
@@ -456,6 +473,172 @@ export function scoreAllStatements(
   };
 
   return stmts.map((stmt) => scoreStatement(stmt, ctx));
+}
+
+// ---------------------------------------------------------------------------
+// LLM-based scoring (opt-in, behind --llm flag)
+// ---------------------------------------------------------------------------
+
+const LLM_CONCURRENCY = 5;
+
+/** LLM-based importance scoring. Falls back to heuristic on error. */
+export async function scoreImportanceLlm(
+  stmt: ScoringStatement,
+  llmCtx: LlmScoringContext,
+): Promise<number> {
+  const text = stmt.statementText ?? '';
+  if (text.length === 0) return DEFAULT_CATEGORY_IMPORTANCE;
+
+  try {
+    const result = await callLlm(llmCtx.client, {
+      system: 'You are an AI safety research analyst scoring statement importance. Respond ONLY with a JSON object.',
+      user: `Rate the importance of this statement about ${llmCtx.entityName} (${llmCtx.entityType}) on a scale from 0.0 to 1.0, where 1.0 is critically important for understanding the entity and 0.0 is trivial.
+
+Statement: "${text}"
+Category: ${stmt.property?.category ?? 'unknown'}
+
+Respond with: {"score": <number>, "reason": "<brief reason>"}`,
+    }, {
+      model: MODELS.haiku,
+      maxTokens: 200,
+      temperature: 0,
+      retryLabel: 'importance-llm',
+      tracker: llmCtx.tracker,
+      label: 'importance',
+    });
+
+    const parsed = parseJsonFromLlm<{ score?: number }>(
+      result.text,
+      'importance-llm',
+      () => ({ score: undefined }),
+    );
+
+    if (typeof parsed.score === 'number' && parsed.score >= 0 && parsed.score <= 1) {
+      return Math.round(parsed.score * 1000) / 1000;
+    }
+  } catch (e: unknown) {
+    // Intentional fallback: LLM failure → heuristic score
+    console.warn(`[scoring] LLM importance scoring failed, using heuristic: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  return scoreImportance(stmt);
+}
+
+/** LLM-based clarity scoring. Falls back to heuristic on error. */
+export async function scoreClarityLlm(
+  stmt: ScoringStatement,
+  entityId: string,
+  entityName: string,
+  llmCtx: LlmScoringContext,
+): Promise<number> {
+  const text = stmt.statementText ?? '';
+  if (text.length === 0) return 0.0;
+
+  try {
+    const result = await callLlm(llmCtx.client, {
+      system: 'You are a technical writing analyst scoring statement clarity. Respond ONLY with a JSON object.',
+      user: `Rate the clarity of this statement about ${entityName} on a scale from 0.0 to 1.0, where 1.0 is perfectly clear and self-contained and 0.0 is incomprehensible without context.
+
+Consider:
+- Is the subject (entity name) mentioned or clearly implied?
+- Is the statement grammatically complete?
+- Would a reader understand this without additional context?
+
+Statement: "${text}"
+
+Respond with: {"score": <number>, "reason": "<brief reason>"}`,
+    }, {
+      model: MODELS.haiku,
+      maxTokens: 200,
+      temperature: 0,
+      retryLabel: 'clarity-llm',
+      tracker: llmCtx.tracker,
+      label: 'clarity',
+    });
+
+    const parsed = parseJsonFromLlm<{ score?: number }>(
+      result.text,
+      'clarity-llm',
+      () => ({ score: undefined }),
+    );
+
+    if (typeof parsed.score === 'number' && parsed.score >= 0 && parsed.score <= 1) {
+      return Math.round(parsed.score * 1000) / 1000;
+    }
+  } catch (e: unknown) {
+    // Intentional fallback: LLM failure → heuristic score
+    console.warn(`[scoring] LLM clarity scoring failed, using heuristic: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  return scoreClarity(stmt, entityId, entityName);
+}
+
+/** Score a single statement with optional LLM-based dimensions. */
+export async function scoreStatementAsync(
+  stmt: ScoringStatement,
+  ctx: ScoringContext,
+  llmCtx?: LlmScoringContext,
+): Promise<ScoringResult> {
+  const [importance, clarity] = llmCtx
+    ? await Promise.all([
+        scoreImportanceLlm(stmt, llmCtx),
+        scoreClarityLlm(stmt, ctx.entityId, ctx.entityName, llmCtx),
+      ])
+    : [scoreImportance(stmt), scoreClarity(stmt, ctx.entityId, ctx.entityName)];
+
+  const dimensions: QualityDimensions = {
+    structure: scoreStructure(stmt),
+    precision: scorePrecision(stmt),
+    clarity,
+    resolvability: scoreResolvability(stmt),
+    uniqueness: scoreUniqueness(stmt, ctx.siblings),
+    atomicity: scoreAtomicity(stmt),
+    importance,
+    neglectedness: scoreNeglectedness(stmt, ctx.siblings),
+    recency: scoreRecency(stmt, ctx.now),
+    crossEntityUtility: scoreCrossEntityUtility(stmt),
+  };
+
+  return {
+    statementId: stmt.id,
+    qualityScore: computeComposite(dimensions),
+    dimensions,
+  };
+}
+
+/**
+ * Score all statements with optional LLM-based dimensions.
+ * Uses concurrency-limited parallelism for LLM calls.
+ */
+export async function scoreAllStatementsAsync(
+  stmts: ScoringStatement[],
+  entityId: string,
+  entityName: string,
+  now?: Date,
+  llmCtx?: LlmScoringContext,
+): Promise<ScoringResult[]> {
+  const ctx: ScoringContext = {
+    siblings: stmts,
+    entityId,
+    entityName,
+    now,
+  };
+
+  if (!llmCtx) {
+    return stmts.map((stmt) => scoreStatement(stmt, ctx));
+  }
+
+  // Process in batches for concurrency control
+  const results: ScoringResult[] = [];
+  for (let i = 0; i < stmts.length; i += LLM_CONCURRENCY) {
+    const batch = stmts.slice(i, i + LLM_CONCURRENCY);
+    const batchResults = await Promise.all(
+      batch.map((stmt) => scoreStatementAsync(stmt, ctx, llmCtx)),
+    );
+    results.push(...batchResults);
+  }
+
+  return results;
 }
 
 // ---------------------------------------------------------------------------
