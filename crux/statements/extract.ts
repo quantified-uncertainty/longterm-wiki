@@ -409,6 +409,10 @@ async function main() {
   // Load property vocabulary
   const { list: propertyList, ids: propertyIds } = await loadPropertyVocabulary();
 
+  // Load valid entity IDs from the ID registry (for FK validation)
+  const registry = loadIdRegistry();
+  const validEntityIds = new Set(Object.keys(registry.bySlug));
+
   // Build footnote map: section heading -> [^rc-XXXX] references
   const sectionFootnoteMap = buildSectionFootnoteMap(cleanBody, body, sections);
 
@@ -478,6 +482,15 @@ async function main() {
     console.log(`    Unknown IDs: ${[...unknownProperties].join(', ')}`);
   }
 
+  // Count how many entity FK fields will be sanitized
+  const invalidValueEntities = allStatements.filter(s => s.valueEntityId && !validEntityIds.has(s.valueEntityId)).length;
+  const invalidAttributedTo = allStatements.filter(s => s.attributedTo && !validEntityIds.has(s.attributedTo)).length;
+  if (invalidValueEntities > 0 || invalidAttributedTo > 0) {
+    console.log(`  ${c.yellow}FK sanitization:${c.reset}`);
+    if (invalidValueEntities > 0) console.log(`    valueEntityId cleared: ${invalidValueEntities}`);
+    if (invalidAttributedTo > 0) console.log(`    attributedTo cleared: ${invalidAttributedTo}`);
+  }
+
   if (dryRun) {
     // Show sample statements
     console.log(`\n${c.bold}Sample statements:${c.reset}`);
@@ -525,20 +538,27 @@ async function main() {
     const batch = allStatements.slice(i, i + BATCH_SIZE);
     const items: CreateStatementInput[] = batch.map(stmt => {
       const sfk = generateSourceFactKey(pageId, stmt.statementText);
+      // Only set propertyId if it exists in the DB (FK constraint)
+      const validPropertyId = stmt.propertyId && propertyIds.has(stmt.propertyId) ? stmt.propertyId : null;
+      // Validate entity FK fields — LLM may generate slugs that don't exist in entities table
+      const validValueEntityId = stmt.valueEntityId && validEntityIds.has(stmt.valueEntityId) ? stmt.valueEntityId : null;
+      const validAttributedTo = stmt.attributedTo && validEntityIds.has(stmt.attributedTo) ? stmt.attributedTo : null;
+      // Sanitize numeric values — NaN/Infinity cause Postgres errors
+      const safeNumeric = stmt.valueNumeric != null && Number.isFinite(stmt.valueNumeric) ? stmt.valueNumeric : null;
       return {
         variety: stmt.variety,
         statementText: stmt.statementText,
         subjectEntityId: pageId,
-        propertyId: stmt.propertyId,
+        propertyId: validPropertyId,
         qualifierKey: stmt.qualifierKey,
-        valueNumeric: stmt.valueNumeric,
+        valueNumeric: safeNumeric,
         valueUnit: stmt.valueUnit,
         valueText: stmt.valueText,
-        valueEntityId: stmt.valueEntityId,
+        valueEntityId: validValueEntityId,
         valueDate: stmt.valueDate,
         validStart: stmt.validStart,
         temporalGranularity: stmt.temporalGranularity,
-        attributedTo: stmt.attributedTo,
+        attributedTo: validAttributedTo,
         note: stmt.inferenceType ? `inference: ${stmt.inferenceType}` : null,
         sourceFactKey: sfk,
         claimCategory: stmt.claimCategory,
@@ -571,6 +591,11 @@ async function main() {
     } else {
       failed += batch.length;
       console.error(`  ${c.red}Batch insert failed: ${result.message}${c.reset}`);
+      // Log first item for debugging
+      if (items.length > 0) {
+        const sample = items[0];
+        console.error(`  ${c.dim}Sample item: variety=${sample.variety}, text="${(sample.statementText ?? '').slice(0, 60)}...", prop=${sample.propertyId}, valueNum=${sample.valueNumeric}, valueEntity=${sample.valueEntityId}, attributedTo=${sample.attributedTo}${c.reset}`);
+      }
     }
   }
 
