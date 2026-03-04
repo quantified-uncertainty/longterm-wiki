@@ -2,6 +2,8 @@
 numericId: E1006
 title: "Statements System Architecture"
 description: "Canonical reference for the Statements system — the wiki's structured assertion layer. Covers the data model, design decisions, relationship to Facts and legacy Claims, extraction quality patterns, and roadmap."
+sidebar:
+  order: 35
 subcategory: architecture
 quality: 60
 readerImportance: 90
@@ -258,7 +260,7 @@ Should the same fact appear as one global record (with page references) or one r
 
 ### 3. Verification Economics
 
-Full verification costs \≈\$0.01-0.05 per statement. At 700 pages \* 100 statements/page = 70,000 statements, a full pass costs \$700-3,500. The system must decide: verify everything lazily? Selectively? On insertion only?
+Full verification costs ≈\$0.01-0.05 per statement. At 700 pages \* 100 statements/page = 70,000 statements, a full pass costs \$700-3,500. The system must decide: verify everything lazily? Selectively? On insertion only?
 
 ### 4. Endorsed vs Attributed Boundary
 
