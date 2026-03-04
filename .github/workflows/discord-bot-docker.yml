@@ -2,7 +2,7 @@ name: Discord Bot — Build & Push Image
 
 on:
   push:
-    branches: [main]
+    branches: [production]
     paths:
       - "apps/discord-bot/**"
       - "pnpm-lock.yaml"
