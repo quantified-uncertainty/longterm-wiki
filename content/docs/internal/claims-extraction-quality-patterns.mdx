@@ -1,14 +1,14 @@
 ---
 numericId: E902
-title: "Claims Extraction Quality Patterns"
-description: "Detailed analysis of extraction failure modes — with concrete examples, root cause analysis, and proposed fixes for each pattern"
+title: "Statement Extraction Quality Patterns"
+description: "Detailed analysis of extraction failure modes — with concrete examples, root cause analysis, and proposed fixes for each pattern. Applicable to both legacy Claims and current Statements extraction."
 sidebar:
   order: 40
 subcategory: architecture
 quality: 60
 readerImportance: 85
 researchImportance: 80
-lastEdited: "2026-02-26"
+lastEdited: "2026-03-03"
 createdAt: 2026-02-26
 evergreen: false
 llmSummary: "Technical deep-dive into 15 specific failure patterns observed in claims extraction. Each pattern includes real examples from the database, root cause analysis, detection heuristics, and proposed fixes. Covers self-containedness failures, markup leakage, entity routing errors, atomicity violations, relative phrase dependencies, missing reasoning trails, and the fundamental tension between extraction cost and quality. Designed to guide extraction prompt improvements and post-processing validation."
@@ -19,9 +19,11 @@ ratings:
   completeness: 7
 ---
 
+> **Note**: These patterns were documented during the Claims era but apply equally to Statement extraction. See <EntityLink id="E1006" name="statements-system-architecture">Statements System Architecture (E1006)</EntityLink> for the current system.
+
 ## Purpose
 
-This document catalogs the specific ways claims extraction goes wrong. Each pattern is documented with:
+This document catalogs the specific ways statement extraction goes wrong. Each pattern is documented with:
 - **Real examples** from the database (not hypotheticals)
 - **Root cause** — why the extraction LLM produces this
 - **Detection** — how to catch it programmatically
