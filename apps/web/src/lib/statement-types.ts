@@ -47,8 +47,15 @@ export interface StatementWithDetails {
   verdictModel: string | null;
   verifiedAt: string | null;
   claimCategory: string | null;
+  archiveReason: string | null;
   property: PropertyInfo | null;
   citations: Citation[];
+}
+
+/** Statement with resolved display names (computed server-side). */
+export interface ResolvedStatement extends StatementWithDetails {
+  valueEntityTitle: string | null;
+  attributedToTitle: string | null;
 }
 
 export interface ByEntityResult {
