@@ -189,22 +189,23 @@ jobs:
           fi
 
           TITLE="CI broken on main after ${LAST_SHA:0:7}${PR_REF}"
-          read -r -d '' BODY <<ISSUEEOF || true
-## Problem
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          BODY="## Problem
 
-CI failed on \`main\` after merging commit \`${LAST_SHA:0:10}\`: ${LAST_MSG}
+          CI failed on \`main\` after merging commit \`${LAST_SHA:0:10}\`: ${LAST_MSG}
 
-**Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Run: ${RUN_URL}
 
-## Suggested Fix
+          ## Suggested Fix
 
-Check the failing CI step in the run above, identify the regression, and fix it.
+          Check the failing CI step in the run above, identify the regression, and fix it.
 
-## Acceptance Criteria
+          ## Acceptance Criteria
 
-- [ ] CI passes on main
-- [ ] Root cause identified and fixed
-ISSUEEOF
+          - [ ] CI passes on main
+          - [ ] Root cause identified and fixed"
+          # Strip leading whitespace from each line (heredoc-style dedent)
+          BODY=$(echo "$BODY" | sed 's/^          //')
 
           # Check for an existing open issue to avoid duplicates
           EXISTING=$(gh issue list --label "groundskeeper-autofix" --state open --limit 5 --json title --jq '.[].title' | grep -c "CI broken on main" || true)
