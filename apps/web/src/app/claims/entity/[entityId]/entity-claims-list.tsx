@@ -14,6 +14,9 @@ import {
 import { cn } from "@lib/utils";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import type { ClaimRow } from "@wiki-server/api-response-types";
+
+type ClaimSource = NonNullable<ClaimRow['sources']>[number];
+
 import { VerdictBadge } from "../../components/verdict-badge";
 import { CategoryBadge } from "../../components/category-badge";
 import { CLAIM_VERDICT_CONFIG } from "../../components/verdict-config";
@@ -60,7 +63,7 @@ function ClaimCard({ claim }: { claim: ClaimRow }) {
   // Get the best available source quote
   let sourceQuote: string | null = null;
   if (claim.sources && claim.sources.length > 0) {
-    const primary = claim.sources.find((s) => s.isPrimary);
+    const primary = claim.sources.find((s: ClaimSource) => s.isPrimary);
     sourceQuote =
       (primary || claim.sources[0]).sourceQuote || claim.sourceQuote || null;
   } else {

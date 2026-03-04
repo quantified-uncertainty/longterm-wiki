@@ -19,6 +19,8 @@ import { fetchFromWikiServer } from "@lib/wiki-server";
 import { getDomain } from "@/components/wiki/resource-utils";
 import type { ClaimRow, GetClaimsResult } from "@wiki-server/api-response-types";
 
+type ClaimSource = NonNullable<ClaimRow['sources']>[number];
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }
@@ -308,7 +310,7 @@ function ClaimsTable({ claims }: { claims: ClaimRow[] }) {
                 <td className="p-2 text-[10px]">
                   {claim.sources && claim.sources.length > 0 ? (
                     <div className="space-y-0.5">
-                      {claim.sources.slice(0, 2).map(s => (
+                      {claim.sources.slice(0, 2).map((s: ClaimSource) => (
                         <div key={s.id} className="flex items-center gap-1">
                           {s.isPrimary && (
                             <span className="bg-blue-100 text-blue-700 px-0.5 rounded text-[9px]">P</span>

@@ -20,6 +20,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { ClaimRow } from "@wiki-server/api-response-types";
+
+type ClaimSource = NonNullable<ClaimRow['sources']>[number];
+
 import { formatStructuredValue } from "@lib/format-value";
 
 interface Props {
@@ -133,7 +136,7 @@ function getColumns(propertyLabels: Record<string, string>): ColumnDef<ClaimRow>
                 key={k}
                 className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] bg-amber-50 text-amber-700 border border-amber-200"
               >
-                <span className="text-amber-500">{k}:</span> {v}
+                <span className="text-amber-500">{k}:</span> {String(v)}
               </span>
             ))}
           </div>
@@ -149,7 +152,7 @@ function getColumns(propertyLabels: Record<string, string>): ColumnDef<ClaimRow>
         if (!sources || sources.length === 0) {
           return <span className="text-muted-foreground/40 text-xs">&mdash;</span>;
         }
-        const primary = sources.find((s) => s.isPrimary) ?? sources[0];
+        const primary = sources.find((s: ClaimSource) => s.isPrimary) ?? sources[0];
         if (primary.resourceId) {
           return (
             <Link
@@ -270,7 +273,7 @@ export function StructuredClaimsTable({ claims, propertyLabels }: Props) {
                               Sources ({row.original.sources.length}):
                             </span>
                             <div className="space-y-1">
-                              {row.original.sources.map((s) => (
+                              {row.original.sources.map((s: ClaimSource) => (
                                 <div key={s.id} className="text-xs flex items-start gap-2">
                                   {s.isPrimary && (
                                     <span className="bg-blue-100 text-blue-700 px-1 py-0.5 rounded text-[9px] shrink-0">primary</span>
