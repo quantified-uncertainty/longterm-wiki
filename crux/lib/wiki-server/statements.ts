@@ -23,6 +23,9 @@ export type BatchCreateResult = InferResponseType<RpcClient['batch']['$post'], 2
 export type ClearByEntityResult = InferResponseType<RpcClient['clear-by-entity']['$post'], 200>;
 export type StatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 export type PropertiesResult = InferResponseType<RpcClient['properties']['$get'], 200>;
+export type BatchScoreResult = InferResponseType<RpcClient['score']['$post'], 200>;
+export type CoverageScoreResult = InferResponseType<RpcClient['coverage-score']['$post'], 201>;
+export type CoverageScoresResult = InferResponseType<RpcClient['coverage-scores']['$get'], 200>;
 
 export type StatementRow = ListStatementsResult['statements'][number];
 
@@ -160,5 +163,50 @@ export async function listStatements(
   return apiRequest<ListStatementsResult>(
     'GET',
     `/api/statements${qs ? `?${qs}` : ''}`,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Quality scoring API functions
+// ---------------------------------------------------------------------------
+
+export interface BatchScoreInput {
+  statementId: number;
+  qualityScore: number;
+  qualityDimensions: Record<string, number>;
+}
+
+export async function batchUpdateScores(
+  scores: BatchScoreInput[],
+): Promise<ApiResult<BatchScoreResult>> {
+  return apiRequest<BatchScoreResult>(
+    'POST',
+    '/api/statements/score',
+    { scores },
+    BATCH_TIMEOUT_MS,
+  );
+}
+
+export async function storeCoverageScore(input: {
+  entityId: string;
+  coverageScore: number;
+  categoryScores: Record<string, number>;
+  statementCount: number;
+  qualityAvg?: number | null;
+}): Promise<ApiResult<CoverageScoreResult>> {
+  return apiRequest<CoverageScoreResult>(
+    'POST',
+    '/api/statements/coverage-score',
+    input,
+  );
+}
+
+export async function getCoverageScores(
+  entityId: string,
+  limit = 20,
+): Promise<ApiResult<CoverageScoresResult>> {
+  return apiRequest<CoverageScoresResult>(
+    'GET',
+    `/api/statements/coverage-scores?entityId=${encodeURIComponent(entityId)}&limit=${limit}`,
   );
 }
