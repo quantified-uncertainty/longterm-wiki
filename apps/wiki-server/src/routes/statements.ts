@@ -35,6 +35,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  firstOrThrow,
   VALIDATION_ERROR,
 } from "./utils.js";
 
@@ -987,7 +988,8 @@ const statementsApp = new Hono()
       })
       .returning({ id: entityCoverageScores.id });
 
-    return c.json({ id: result[0].id, ok: true }, 201);
+    const row = firstOrThrow(result, "coverage score insert");
+    return c.json({ id: row.id, ok: true }, 201);
   })
 
   // ---- GET /coverage-scores — coverage score history for an entity ----
