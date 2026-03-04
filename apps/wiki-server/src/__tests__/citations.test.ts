@@ -292,7 +292,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const pageIdInt = params[o] as number | null;
       const row = {
         id: nextSnapshotId++,
-        page_id: slugFromIntId(pageIdInt) ?? `unknown-${pageIdInt}`,
+        page_id: slugFromIntId(pageIdInt),
         page_id_int: pageIdInt,
         total_citations: params[o + 1] as number,
         checked_citations: params[o + 2] as number,
