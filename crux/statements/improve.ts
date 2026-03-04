@@ -16,20 +16,16 @@
 import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { createLlmClient, MODELS } from '../lib/llm.ts';
-import { callLlm } from '../lib/llm.ts';
+import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { slugToDisplayName } from '../lib/claim-text-utils.ts';
 import {
   createStatementBatch,
-  batchUpdateScores,
   storeCoverageScore,
   getProperties,
   type CreateStatementInput,
-  type BatchScoreInput,
 } from '../lib/wiki-server/statements.ts';
-import { getEntity } from '../lib/wiki-server/entities.ts';
 import { analyzeGaps, type GapAnalysis } from './gaps.ts';
 import {
   scoreStatement,
@@ -37,11 +33,7 @@ import {
   type ScoringStatement,
   type ScoringContext,
 } from './scoring.ts';
-import {
-  resolveCoverageTargets,
-  computeCoverageScore,
-  type CategoryGap,
-} from './coverage-targets.ts';
+import { resolveCoverageTargets } from './coverage-targets.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -172,6 +164,7 @@ export function qualityGate(
   entityName: string,
   existingSiblings: ScoringStatement[],
   minScore: number,
+  propertyMap?: Map<string, { id: string; label: string; category: string; stalenessCadence?: string | null }>,
 ): GateResult {
   const accepted: CreateStatementInput[] = [];
   const rejected: GateResult['rejected'] = [];
@@ -181,6 +174,9 @@ export function qualityGate(
   let nextId = -1; // temporary negative IDs for scoring
 
   for (const gen of generated) {
+    // Resolve property metadata for scoring (importance depends on category)
+    const propMeta = gen.propertyId && propertyMap ? propertyMap.get(gen.propertyId) : null;
+
     // Build a temporary ScoringStatement for scoring
     const tempStmt: ScoringStatement = {
       id: nextId--,
@@ -202,6 +198,12 @@ export function qualityGate(
         url: c.url ?? null,
         sourceQuote: c.sourceQuote ?? null,
       })),
+      property: propMeta ? {
+        id: propMeta.id,
+        label: propMeta.label,
+        category: propMeta.category,
+        stalenessCadence: propMeta.stalenessCadence,
+      } : null,
     };
 
     // Check uniqueness against all siblings (existing + already-accepted)
@@ -368,9 +370,17 @@ async function main() {
     console.log('');
   }
 
-  // 2. Fetch properties for category filtering
+  // 2. Fetch properties for category filtering + quality gate scoring
   const propResult = await getProperties();
   const allProperties = propResult.ok ? propResult.data.properties : [];
+  const fullPropertyMap = new Map(
+    allProperties.map((p) => [p.id, {
+      id: p.id,
+      label: p.label,
+      category: p.category,
+      stalenessCadence: p.stalenessCadence,
+    }]),
+  );
 
   // 3. Build existing statement texts per category for dedup
   const existingByCategory = new Map<string, string[]>();
@@ -453,7 +463,7 @@ async function main() {
     if (!jsonOutput) console.log(`  ${c.dim}Generated ${generated.length} candidates${c.reset}`);
 
     // Quality gate
-    const gateResult = qualityGate(generated, entityId, entityName, existingScoringStmts, minScore);
+    const gateResult = qualityGate(generated, entityId, entityName, existingScoringStmts, minScore, fullPropertyMap);
 
     totalCreated += gateResult.accepted.length;
     totalRejected += gateResult.rejected.length;
@@ -507,8 +517,9 @@ async function main() {
           statementCount: updated.totalStatements,
         });
       }
-    } catch {
-      // Non-critical — coverage re-score is best-effort
+    } catch (e: unknown) {
+      // Best-effort: coverage re-score is not critical to the improve pipeline
+      console.warn(`[improve] Coverage re-score failed: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 
