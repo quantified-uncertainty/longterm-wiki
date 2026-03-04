@@ -13,6 +13,7 @@
 - **pdf-parse v2 API change**: v2 uses `new PDFParse({data})` class-based API. v1's `.default()` no longer exists.
 - **Regex backtracking**: `[\w\s]{2,30}` combined with `\s+` causes catastrophic backtracking. Use `\w+(?:\s+\w+){0,5}` instead.
 - **Array spread overflow**: `array.push(...largeArray)` causes "Maximum call stack size exceeded" when `largeArray` has >65k elements. Use a for-of loop instead.
+- **Vercel ignoreCommand exit codes are counterintuitive**: Exit 0 = **skip** build, exit 1 = **proceed** with build. The command answers "should I ignore?", so 0 (success/yes) means skip. This has been incorrectly inverted multiple times. See `apps/web/vercel.json`.
 
 ## Architecture Notes
 - **SCRY_PUBLIC_KEY** is defined in `crux/lib/api-keys.ts`. All consumers import from there (consolidated Feb 2026).
