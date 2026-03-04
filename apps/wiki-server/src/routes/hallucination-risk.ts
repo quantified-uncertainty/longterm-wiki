@@ -108,6 +108,50 @@ async function refreshMaterializedView(): Promise<void> {
   }
 }
 
+// ---- Debounced materialized view refresh ----
+// The refresh is expensive (can take 30-60s on the small DB instance) and
+// blocks other queries via lock contention. Instead of refreshing on every
+// batch insert, we debounce: schedule a refresh after a cooldown, and skip
+// if one is already running or was completed recently.
+
+const REFRESH_COOLDOWN_MS = 60_000; // minimum 60s between refreshes
+let lastRefreshAt = 0;
+let refreshRunning = false;
+let refreshScheduled = false;
+
+function scheduleMatViewRefresh(): void {
+  if (refreshRunning || refreshScheduled) return;
+
+  const elapsed = Date.now() - lastRefreshAt;
+  if (elapsed < REFRESH_COOLDOWN_MS) {
+    // Too soon — schedule for later
+    refreshScheduled = true;
+    setTimeout(() => {
+      refreshScheduled = false;
+      runDebouncedRefresh();
+    }, REFRESH_COOLDOWN_MS - elapsed);
+    return;
+  }
+
+  runDebouncedRefresh();
+}
+
+async function runDebouncedRefresh(): Promise<void> {
+  if (refreshRunning) return;
+  refreshRunning = true;
+  try {
+    const exists = await matViewExists();
+    if (exists) {
+      await refreshMaterializedView();
+      lastRefreshAt = Date.now();
+    }
+  } catch (err) {
+    logger.warn({ err }, "Background materialized view refresh failed");
+  } finally {
+    refreshRunning = false;
+  }
+}
+
 /**
  * Check if the materialized view exists. Returns false during tests
  * or before the migration has been applied.
@@ -202,15 +246,10 @@ const hallucinationRiskApp = new Hono()
         id: hallucinationRiskSnapshots.id,
       });
 
-    // Auto-refresh the materialized view after batch inserts
-    try {
-      if (await matViewExists()) {
-        await refreshMaterializedView();
-      }
-    } catch (err) {
-      // Log but don't fail the insert — stale matview data is acceptable
-      logger.warn({ err }, "Failed to refresh materialized view after batch insert");
-    }
+    // Schedule a debounced, non-blocking materialized view refresh.
+    // The refresh is expensive and can block other DB queries for 30-60s,
+    // so we fire-and-forget with throttling instead of awaiting inline.
+    scheduleMatViewRefresh();
 
     return c.json({ inserted: results.length }, 201);
   })
