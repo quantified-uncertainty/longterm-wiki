@@ -4,15 +4,11 @@ import { VerdictBadge } from "@components/wiki/VerdictBadge";
 import { formatStatementValue } from "@lib/statement-display";
 import { getDomain, isSafeUrl } from "@components/wiki/resource-utils";
 import type { ResolvedStatement } from "@lib/statement-types";
+import { snapshotKey } from "./statement-processing";
 
 interface CurrentSnapshotProps {
   snapshot: ResolvedStatement[];
   conflicts: [string, ResolvedStatement[]][];
-}
-
-/** Must match the key used in statement-processing.ts */
-function compositeKey(s: ResolvedStatement): string {
-  return `${s.propertyId ?? ""}::${s.qualifierKey ?? ""}`;
 }
 
 /**
@@ -60,7 +56,7 @@ export function CurrentSnapshot({ snapshot, conflicts }: CurrentSnapshotProps) {
           </thead>
           <tbody>
             {snapshot.map((s) => {
-              const key = compositeKey(s);
+              const key = snapshotKey(s);
               const hasConflict = conflictSet.has(key);
               const conflictingStmts = conflictMap.get(key);
 

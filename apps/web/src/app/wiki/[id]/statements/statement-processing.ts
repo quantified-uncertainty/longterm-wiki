@@ -34,7 +34,7 @@ export function resolveEntityNames(
 // ---- Composite Key ----
 
 /** Composite key that distinguishes qualified variants of the same property. */
-function snapshotKey(s: { propertyId: string | null; qualifierKey: string | null }): string {
+export function snapshotKey(s: { propertyId: string | null; qualifierKey: string | null }): string {
   return `${s.propertyId ?? ""}::${s.qualifierKey ?? ""}`;
 }
 
