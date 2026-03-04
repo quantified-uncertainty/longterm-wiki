@@ -3,23 +3,7 @@
 import { useState } from "react";
 import { ExternalLink, ChevronDown, ChevronUp, Star } from "lucide-react";
 import type { Citation } from "@lib/statement-types";
-
-function getDomain(url: string): string | null {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return null;
-  }
-}
-
-function isSafeUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
+import { getDomain, isSafeUrl } from "@components/wiki/resource-utils";
 
 /**
  * Expandable citation detail panel. Clicking the citation count badge
