@@ -40,6 +40,7 @@ import {
 import { cleanMdxForExtraction, splitIntoSections, type Section } from '../claims/extract.ts';
 import { slugToDisplayName } from '../lib/claim-text-utils.ts';
 import { getResourceById } from '../lib/search/resource-lookup.ts';
+import { loadIdRegistry } from '../lib/content-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -391,10 +392,17 @@ async function main() {
   const cleanBody = cleanMdxForExtraction(body);
   const sections = splitIntoSections(cleanBody);
 
-  // Parse page integer ID for page references
-  const pageIdInt = numericId
+  // Parse page integer ID for page references — try frontmatter first, then ID registry
+  let pageIdInt = numericId
     ? parseInt(numericId.replace(/^E/, ''), 10)
     : null;
+  if (!pageIdInt) {
+    const registry = loadIdRegistry();
+    const eId = registry.bySlug[pageId]; // e.g. "E42"
+    if (eId) {
+      pageIdInt = parseInt(eId.replace(/^E/, ''), 10);
+    }
+  }
 
   const entityName = title ?? slugToDisplayName(pageId);
 
