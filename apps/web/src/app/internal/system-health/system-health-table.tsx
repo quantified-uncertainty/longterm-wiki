@@ -48,8 +48,8 @@ const SERVICE_LABELS: Record<string, string> = {
   "wiki-server": "Wiki Server",
   groundskeeper: "Groundskeeper",
   "discord-bot": "Discord Bot",
-  "vercel-frontend": "Vercel",
-  "github-actions": "GH Actions",
+  "vercel-frontend": "Vercel Frontend",
+  "github-actions": "GitHub Actions",
 };
 
 // ── Columns ─────────────────────────────────────────────────────────────
