@@ -72,10 +72,6 @@ const ByPageQuery = z.object({
   pageId: z.coerce.number().int().positive(),
 });
 
-const ByPageQuery = z.object({
-  pageId: z.coerce.number().int().positive(),
-});
-
 // ---- Zod validator helper (uses Hono's built-in validator for RPC type inference) ----
 
 function zv<T extends z.ZodType>(target: "query", schema: T) {
