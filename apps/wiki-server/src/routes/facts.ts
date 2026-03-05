@@ -233,17 +233,26 @@ const factsApp = new Hono()
       );
     }
 
-    // Validate subject references (optional field, also points to entities)
+    // Validate subject references (optional field, also points to entities).
+    // Missing subjects are nulled out rather than rejecting the entire batch,
+    // since sentinel values like "industry-average" are used in YAML but
+    // aren't real entities in the DB.
     const subjectIds = [
       ...new Set(items.map((f) => f.subject).filter((s): s is string => s != null)),
     ];
+    let missingSubjects: string[] = [];
     if (subjectIds.length > 0) {
-      const missingSubjects = await checkRefsExist(db, entities, entities.id, subjectIds);
+      missingSubjects = await checkRefsExist(db, entities, entities.id, subjectIds);
       if (missingSubjects.length > 0) {
-        return validationError(
-          c,
-          `Referenced subject entities not found: ${missingSubjects.join(", ")}`
+        console.warn(
+          `Facts sync: nulling out ${missingSubjects.length} unresolved subject(s): ${missingSubjects.join(", ")}`
         );
+        const missingSet = new Set(missingSubjects);
+        for (const item of items) {
+          if (item.subject && missingSet.has(item.subject)) {
+            item.subject = null;
+          }
+        }
       }
     }
 
