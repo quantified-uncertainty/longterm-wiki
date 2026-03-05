@@ -134,6 +134,8 @@ jobs:
             2. Read the report. Focus on recurring issues (marked with `!!`).
             3. If recurring issues exist, add them to `.claude/common-issues.md`.
             4. Check for issues flagged as "potentially-resolved" — but DO NOT auto-close them (see rules below).
+            5. Run `pnpm crux audits run-auto` — check automated audit items (e.g., agent session logging, scheduled workflow health). If any check fails, file or comment on a GitHub issue.
+            6. Run `pnpm crux maintain fix-chains` — check for recent fix chains (feature PRs followed by 2+ fix PRs). If the fix-to-feature ratio exceeds 40%, note it in the report summary.
 
             ### If cadence = weekly
             1. Run `pnpm crux maintain` (full sweep).
@@ -144,6 +146,12 @@ jobs:
                - P2: Propagate recurring learnings to `.claude/common-issues.md` or `.claude/rules/`.
             4. For P3+ items that are too large to fix now, file GitHub issues so they're tracked.
             5. Run `pnpm crux validate` and fix any blocking errors.
+            6. Run `pnpm crux audits run-auto` and `pnpm crux audits list --pending` — check all audit items and flag any that are overdue.
+            7. Run a **retrospective analysis** (as described in `.claude/commands/retrospective.md`):
+               a. Run `pnpm crux maintain fix-chains` to identify fix chains from the past 7 days.
+               b. Calculate the fix-to-feature ratio from merged PRs. If >35%, flag it prominently.
+               c. Check for PRs over 500 lines — were they split? Did they generate fix chains?
+               d. Summarize findings in the PR body. If process improvements are needed, update `.claude/rules/` files or file issues.
 
             ### If cadence = monthly
             1. Do everything from the weekly cadence.
