@@ -201,6 +201,29 @@ export function validateCreateStatementBatch(
     });
   }
 
+  // Duplicate (subjectEntityId, propertyId, valueDate) tuples — only checked
+  // when all three key fields are non-null so null-valued items don't false-positive.
+  const tuplesSeen = new Map<string, number>();
+  let duplicateCount = 0;
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (item.subjectEntityId && item.propertyId && item.valueDate) {
+      const key = `${item.subjectEntityId}|${item.propertyId}|${item.valueDate}`;
+      if (tuplesSeen.has(key)) {
+        duplicateCount++;
+        const firstIndex = tuplesSeen.get(key)!;
+        violations.push({
+          code: 'DUPLICATE_TUPLE',
+          message: `Item at index ${i} is a duplicate of item at index ${firstIndex} (same subjectEntityId/propertyId/valueDate).`,
+          statementIndex: i,
+          excerpt: (item.statementText ?? '').slice(0, 60),
+        });
+      } else {
+        tuplesSeen.set(key, i);
+      }
+    }
+  }
+
   const stats = {
     total: items.length,
     emptyText: emptyTextCount,

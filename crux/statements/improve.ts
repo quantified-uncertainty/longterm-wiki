@@ -710,6 +710,19 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
         })),
       };
 
+      const qualityReport = validateCreateStatementBatch([newStmt]);
+      if (!qualityReport.passed) {
+        const codes = qualityReport.violations.map(v => v.code).join(', ');
+        const details = qualityReport.violations.map(v => v.message).join('; ');
+        rejected++;
+        rejections.push({
+          text: rewrite.statementText.slice(0, 80),
+          reason: `Data quality gate failed (${codes}): ${details}`,
+          score: gate.newScore,
+        });
+        continue;
+      }
+
       const insertResult = await createStatementBatch([newStmt]);
       if (insertResult.ok) {
         // Only supersede original after successful insert

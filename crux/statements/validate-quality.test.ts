@@ -2,10 +2,11 @@
  * Tests for data quality assertions in the statements extraction pipeline.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   validateExtractedStatements,
   validateCreateStatementBatch,
+  printQualityReport,
 } from './validate-quality.ts';
 import type { ExtractedStatement } from './extract.ts';
 
@@ -199,5 +200,75 @@ describe('validateCreateStatementBatch', () => {
     expect(report.passed).toBe(true);
     expect(report.stats.zeroStatements).toBe(true);
     // improve pipeline may have 0 accepted statements if quality gate rejects all
+  });
+
+  it('detects duplicate (subjectEntityId, propertyId, valueDate) tuples', () => {
+    const items = [
+      { variety: 'structured' as const, statementText: 'Anthropic founded in 2021.', subjectEntityId: 'anthropic', propertyId: 'founded', valueDate: '2021', valueNumeric: null },
+      { variety: 'structured' as const, statementText: 'Anthropic founded 2021 (duplicate).', subjectEntityId: 'anthropic', propertyId: 'founded', valueDate: '2021', valueNumeric: null },
+    ];
+    const report = validateCreateStatementBatch(items);
+    expect(report.passed).toBe(false);
+    expect(report.violations.some(v => v.code === 'DUPLICATE_TUPLE')).toBe(true);
+    expect(report.violations.find(v => v.code === 'DUPLICATE_TUPLE')?.statementIndex).toBe(1);
+  });
+
+  it('does not flag distinct tuples as duplicates', () => {
+    const items = [
+      { variety: 'structured' as const, statementText: 'Anthropic founded in 2021.', subjectEntityId: 'anthropic', propertyId: 'founded', valueDate: '2021', valueNumeric: null },
+      { variety: 'structured' as const, statementText: 'Anthropic employees in 2023.', subjectEntityId: 'anthropic', propertyId: 'employees', valueDate: '2023', valueNumeric: null },
+    ];
+    const report = validateCreateStatementBatch(items);
+    expect(report.violations.some(v => v.code === 'DUPLICATE_TUPLE')).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// printQualityReport
+// ---------------------------------------------------------------------------
+
+const mockColors = {
+  red: '',
+  yellow: '',
+  green: '',
+  bold: '',
+  dim: '',
+  reset: '',
+};
+
+describe('printQualityReport', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('logs green pass message when report passed', () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const report = validateCreateStatementBatch([
+      { variety: 'structured' as const, statementText: 'Valid statement.', subjectEntityId: 'anthropic', valueNumeric: null },
+    ]);
+    printQualityReport(report, mockColors, false);
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('all assertions passed'));
+  });
+
+  it('logs WARNING in dry-run mode when violations exist', () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const report = validateCreateStatementBatch([
+      { variety: 'structured' as const, statementText: '', subjectEntityId: 'anthropic', valueNumeric: null },
+    ]);
+    printQualityReport(report, mockColors, true);
+    const output = consoleSpy.mock.calls.map(c => c[0]).join('\n');
+    expect(output).toContain('WARNING');
+    expect(output).toContain('dry-run');
+  });
+
+  it('logs ERROR and abort message in apply mode when violations exist', () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const report = validateCreateStatementBatch([
+      { variety: 'structured' as const, statementText: '', subjectEntityId: 'anthropic', valueNumeric: null },
+    ]);
+    printQualityReport(report, mockColors, false);
+    const output = consoleSpy.mock.calls.map(c => c[0]).join('\n');
+    expect(output).toContain('ERROR');
+    expect(output).toContain('Pipeline aborted');
   });
 });
