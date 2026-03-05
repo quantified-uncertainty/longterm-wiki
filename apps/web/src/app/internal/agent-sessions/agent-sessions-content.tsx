@@ -63,7 +63,9 @@ async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
       status: s.status,
       startedAt: s.startedAt,
       completedAt: s.completedAt,
-      prUrl: log?.prUrl ?? null,
+      // Prefer prUrl from agent_sessions (set by `crux issues done --pr=URL`),
+      // fall back to session log join on branch for older records.
+      prUrl: s.prUrl ?? log?.prUrl ?? null,
       model: log?.model ?? null,
       cost: log?.cost ?? null,
       title: log?.title ?? null,

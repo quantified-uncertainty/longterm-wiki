@@ -101,9 +101,9 @@ const agentSessionsApp = new Hono()
     const parsed = UpdateAgentSessionSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const { checklistMd, status } = parsed.data;
-    if (checklistMd === undefined && status === undefined) {
-      return validationError(c, "At least one of checklistMd or status must be provided");
+    const { checklistMd, status, prUrl } = parsed.data;
+    if (checklistMd === undefined && status === undefined && prUrl === undefined) {
+      return validationError(c, "At least one of checklistMd, status, or prUrl must be provided");
     }
 
     const updates: Record<string, unknown> = { updatedAt: new Date() };
@@ -114,6 +114,7 @@ const agentSessionsApp = new Hono()
         updates.completedAt = new Date();
       }
     }
+    if (prUrl !== undefined) updates.prUrl = prUrl;
 
     const db = getDrizzleDb();
     const result = await db
@@ -161,7 +162,7 @@ const agentSessionsApp = new Hono()
           lt(agentSessions.updatedAt, cutoff)
         )
       )
-      .returning({ id: agentSessions.id, branch: agentSessions.branch });
+      .returning({ id: agentSessions.id, branch: agentSessions.branch, issueNumber: agentSessions.issueNumber });
 
     logger.info({ swept: stale.length, cutoff: cutoff.toISOString() }, "Sweep: marked stale sessions as completed");
 

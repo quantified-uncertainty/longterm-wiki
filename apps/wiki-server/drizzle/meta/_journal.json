@@ -414,6 +414,13 @@
       "when": 1773561600000,
       "tag": "0058_expand_statement_properties",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1773648000000,
+      "tag": "0059_add_pr_url_to_agent_sessions",
+      "breakpoints": true
     }
   ]
 }

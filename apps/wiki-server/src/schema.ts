@@ -757,6 +757,7 @@ export const agentSessions = pgTable(
     issueNumber: integer("issue_number"),
     checklistMd: text("checklist_md").notNull(),
     worktree: text("worktree"), // working directory path for collision detection
+    prUrl: text("pr_url"), // PR URL recorded when crux issues done --pr=URL is called
     status: text("status").notNull().default("active"),
     startedAt: timestamp("started_at", { withTimezone: true })
       .notNull()

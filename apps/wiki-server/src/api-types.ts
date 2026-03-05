@@ -1159,6 +1159,7 @@ export type CreateAgentSession = z.infer<typeof CreateAgentSessionSchema>;
 export const UpdateAgentSessionSchema = z.object({
   checklistMd: z.string().min(1).max(50000).optional(),
   status: z.enum(["active", "completed"]).optional(),
+  prUrl: z.string().url().max(1000).nullable().optional(),
 });
 export type UpdateAgentSession = z.infer<typeof UpdateAgentSessionSchema>;
 
