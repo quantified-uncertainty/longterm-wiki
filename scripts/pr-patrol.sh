@@ -201,6 +201,277 @@ is_abandoned() {
   return 1
 }
 
+# ─── Main Branch Health ───────────────────────────────────────────────
+
+check_main_branch() {
+  # Check if the latest CI run on main failed
+  local runs
+  runs=$(gh run list --repo "$REPO" --branch main --workflow ci.yml --limit 3 \
+    --json conclusion,status,createdAt,headSha,databaseId 2>/dev/null) || {
+    log "WARNING: Could not fetch main branch CI runs"
+    return 1
+  }
+
+  local run_count
+  run_count=$(echo "$runs" | jq 'length')
+  if [[ "$run_count" == "0" ]]; then
+    log "WARNING: No CI runs found on main branch"
+    return 1
+  fi
+
+  # Check the latest completed run
+  local latest
+  latest=$(echo "$runs" | jq '[.[] | select(.status == "completed")] | first // empty')
+  if [[ -z "$latest" || "$latest" == "null" ]]; then
+    # All runs are in-progress — not a failure
+    log "Main branch CI: in progress"
+    return 1
+  fi
+
+  local conclusion
+  conclusion=$(echo "$latest" | jq -r '.conclusion')
+  local sha
+  sha=$(echo "$latest" | jq -r '.headSha')
+  local run_id
+  run_id=$(echo "$latest" | jq -r '.databaseId')
+
+  if [[ "$conclusion" == "success" ]]; then
+    log "Main branch CI: ✓ green (${sha:0:7})"
+    # Clear any previous main-branch failure state
+    rm -f "$STATE_DIR/main-branch-red"
+    return 1  # No issue — return 1 to signal "nothing to fix"
+  fi
+
+  log "Main branch CI: ✗ $conclusion (${sha:0:7}, run $run_id)"
+
+  # Check cooldown — don't re-process the same failure
+  if was_recently_processed "main-branch"; then
+    log "  Main branch failure already processed recently — skipping"
+    return 1
+  fi
+
+  # Check if abandoned (2+ max-turns failures on main)
+  if is_abandoned "main-branch"; then
+    log "  Main branch fix abandoned — needs human intervention"
+    return 1
+  fi
+
+  # Signal that main is red
+  echo "$run_id" >| "$STATE_DIR/main-branch-red"
+  return 0  # Issue found
+}
+
+build_main_branch_prompt() {
+  local run_id=$1
+
+  local prompt=""
+  prompt+="You are a CI maintenance agent for the ${REPO} repository."
+  prompt+=$'\n\n## Problem'
+  prompt+=$'\nThe latest CI run on the **main** branch has FAILED (run ID: '"${run_id}"').'
+  prompt+=$'\nThis is the highest-priority issue — main must be green.'
+  prompt+=$'\n\n## Instructions'
+  prompt+=$'\n\n1. Check what failed:'
+  prompt+=$'\n   gh run view '"${run_id}"' --repo '"${REPO}"' --log-failed 2>/dev/null || gh run view '"${run_id}"' --repo '"${REPO}"
+  prompt+=$'\n\n2. Check out main:'
+  prompt+=$'\n   git fetch origin main && git checkout main && git pull origin main'
+  prompt+=$'\n\n3. Diagnose the failure:'
+  prompt+=$'\n   - Read the failing check logs'
+  prompt+=$'\n   - Identify whether this is a build error, test failure, lint error, or flaky test'
+  prompt+=$'\n   - If it is a flaky test or transient infrastructure issue (network timeout, rate limit), re-run the workflow:'
+  prompt+=$'\n     gh run rerun '"${run_id}"' --repo '"${REPO}"' --failed'
+  prompt+=$'\n     Then exit — no code change needed.'
+  prompt+=$'\n\n4. If it is a real code issue, fix it:'
+  prompt+=$'\n   - Create a fix branch: git checkout -b fix/main-ci-$(date +%Y%m%d-%H%M%S)'
+  prompt+=$'\n   - Make the minimal fix'
+  prompt+=$'\n   - Run locally to verify: pnpm build && pnpm test'
+  prompt+=$'\n   - Commit, push, and open a PR targeting main'
+  prompt+=$'\n   - Use: gh pr create --title "fix(ci): repair main branch CI" --body "Automated fix for CI failure in run '"${run_id}"'"'
+  prompt+=$'\n\n## Guardrails'
+  prompt+=$'\n- Only fix the CI failure — do not refactor or improve unrelated code'
+  prompt+=$'\n- Prefer re-running flaky tests over code changes'
+  prompt+=$'\n- If the failure is in content (MDX pages), run: pnpm crux validate gate --fix'
+  prompt+=$'\n- Do NOT run /agent-session-start or /agent-session-ready-PR'
+  prompt+=$'\n- Do NOT push directly to main — always use a PR'
+
+  echo "$prompt"
+}
+
+fix_main_branch() {
+  local run_id=$1
+
+  log "→ Fixing main branch CI (run $run_id)"
+
+  if $DRY_RUN; then
+    log "  [DRY RUN] Would invoke Claude to fix main branch"
+    log_pr_result "0" "main-branch-ci" "main" "main-ci-failure" "dry-run" 0 ""
+    mark_processed "main-branch"
+    return 0
+  fi
+
+  local original_branch
+  original_branch=$(git branch --show-current 2>/dev/null || echo "")
+
+  local prompt_file
+  prompt_file=$(mktemp "$STATE_DIR/prompt-main-XXXXXX.txt")
+  build_main_branch_prompt "$run_id" > "$prompt_file"
+
+  local claude_args=(--print --model "$MODEL" --max-turns "$MAX_TURNS" --verbose)
+  if [[ "$SKIP_PERMS" == "1" ]]; then
+    claude_args+=(--dangerously-skip-permissions)
+  fi
+
+  local start_time
+  start_time=$(date +%s)
+
+  local output_file
+  output_file=$(mktemp "$STATE_DIR/output-main-XXXXXX.txt")
+  local exit_code=0
+  env -u CLAUDECODE claude "${claude_args[@]}" < "$prompt_file" 2>&1 | tee -a "$LOG_FILE" "$output_file" || exit_code=$?
+
+  local elapsed=$(( $(date +%s) - start_time ))
+  local claude_output
+  claude_output=$(cat "$output_file")
+  local hit_max_turns=false
+
+  if echo "$claude_output" | grep -q "Reached max turns"; then
+    hit_max_turns=true
+  fi
+
+  if [[ $exit_code -eq 0 ]] && ! $hit_max_turns; then
+    log "✓ Main branch CI fix processed (${elapsed}s)"
+    log_pr_result "0" "main-branch-ci" "main" "main-ci-failure" "fixed" "$elapsed" ""
+  elif $hit_max_turns; then
+    log "⚠ Main branch fix hit max turns after ${elapsed}s"
+    local fail_count
+    fail_count=$(record_max_turns_failure "main-branch")
+    log_pr_result "0" "main-branch-ci" "main" "main-ci-failure" "max-turns" "$elapsed" "Hit max turns — attempt $fail_count"
+  else
+    log "✗ Main branch fix failed (exit: $exit_code, ${elapsed}s)"
+    log_pr_result "0" "main-branch-ci" "main" "main-ci-failure" "error" "$elapsed" "Exit code: $exit_code"
+  fi
+
+  rm -f "$prompt_file" "$output_file"
+
+  # Clean up any in-progress rebase/merge
+  git rebase --abort 2>/dev/null || true
+  git merge --abort 2>/dev/null || true
+
+  if [[ -n "$original_branch" ]]; then
+    git checkout "$original_branch" 2>/dev/null || log "  Warning: could not restore branch $original_branch"
+  fi
+
+  mark_processed "main-branch"
+}
+
+# ─── PR Overlap Detection ────────────────────────────────────────────
+
+detect_pr_overlaps() {
+  # Fetch changed files for all open PRs and detect overlaps
+  local prs
+  prs=$(gh pr list --repo "$REPO" --state open --limit 50 \
+    --json number,title,headRefName,files 2>/dev/null) || {
+    log "WARNING: Could not fetch PR file lists for overlap detection"
+    return
+  }
+
+  local pr_count
+  pr_count=$(echo "$prs" | jq 'length')
+  if (( pr_count < 2 )); then
+    return  # Need at least 2 PRs to detect overlaps
+  fi
+
+  # Build overlap pairs: for each file, collect which PRs touch it, then find pairs
+  local overlaps
+  overlaps=$(echo "$prs" | jq -r '
+    # Build a map of file -> [PR numbers]
+    [.[] | {pr: .number, title: .title, files: [(.files // [])[] | .path]}] as $entries |
+    # For each pair of PRs, find shared files
+    [range(0; $entries | length) as $i |
+     range($i+1; $entries | length) as $j |
+     ($entries[$i].files - ($entries[$i].files - $entries[$j].files)) as $shared |
+     select($shared | length > 0) |
+     {
+       pr_a: $entries[$i].pr,
+       title_a: $entries[$i].title,
+       pr_b: $entries[$j].pr,
+       title_b: $entries[$j].title,
+       shared_files: $shared,
+       count: ($shared | length)
+     }
+    ] | sort_by(-.count)
+  ' 2>/dev/null) || {
+    log "WARNING: jq overlap detection failed"
+    return
+  }
+
+  local overlap_count
+  overlap_count=$(echo "$overlaps" | jq 'length')
+
+  if [[ "$overlap_count" == "0" || -z "$overlap_count" ]]; then
+    log "No PR overlaps detected"
+    return
+  fi
+
+  log "Found $overlap_count PR overlap(s):"
+
+  # Log and optionally comment on overlapping PRs
+  echo "$overlaps" | jq -r '.[] | "\(.pr_a)\t\(.pr_b)\t\(.count)\t\(.title_a)\t\(.title_b)\t\(.shared_files | join(", "))"' | \
+  while IFS=$'\t' read -r pr_a pr_b file_count title_a title_b shared_files; do
+    log "  PR #$pr_a ↔ PR #$pr_b: $file_count shared file(s)"
+
+    # Only comment if we haven't already warned about this pair recently
+    local pair_key="overlap-${pr_a}-${pr_b}"
+    if was_recently_processed "$pair_key"; then
+      log "    (already warned recently)"
+      continue
+    fi
+
+    if ! $DRY_RUN; then
+      # Truncate file list for readability
+      local display_files="$shared_files"
+      if (( ${#display_files} > 300 )); then
+        display_files="${display_files:0:300}..."
+      fi
+
+      local comment_body
+      comment_body=$(cat <<OVERLAP_EOF
+⚠️ **PR Patrol — Overlap Warning**
+
+This PR modifies **$file_count file(s)** also changed by PR #$pr_b ("$title_b"):
+
+\`\`\`
+$display_files
+\`\`\`
+
+Consider coordinating to avoid merge conflicts.
+OVERLAP_EOF
+)
+      gh pr comment "$pr_a" --repo "$REPO" --body "$comment_body" 2>/dev/null || \
+        log "    Warning: could not post overlap comment on PR #$pr_a"
+
+      local comment_body_b
+      comment_body_b=$(cat <<OVERLAP_EOF
+⚠️ **PR Patrol — Overlap Warning**
+
+This PR modifies **$file_count file(s)** also changed by PR #$pr_a ("$title_a"):
+
+\`\`\`
+$display_files
+\`\`\`
+
+Consider coordinating to avoid merge conflicts.
+OVERLAP_EOF
+)
+      gh pr comment "$pr_b" --repo "$REPO" --body "$comment_body_b" 2>/dev/null || \
+        log "    Warning: could not post overlap comment on PR #$pr_b"
+    else
+      log "    [DRY RUN] Would post overlap warning on PRs #$pr_a and #$pr_b"
+    fi
+
+    mark_processed "$pair_key"
+  done
+}
+
 # ─── PR Detection ────────────────────────────────────────────────────
 
 detect_all_pr_issues() {
@@ -511,6 +782,19 @@ run_check_cycle() {
   local cycle_queue_size=0
   local pr_processed="null"
 
+  # 0. HIGHEST PRIORITY: Check main branch CI health
+  if check_main_branch; then
+    local run_id
+    run_id=$(cat "$STATE_DIR/main-branch-red" 2>/dev/null || echo "")
+    if [[ -n "$run_id" ]]; then
+      log "⚠ Main branch CI is RED — fixing before processing PRs"
+      fix_main_branch "$run_id"
+      pr_processed="main"
+      log_cycle_summary 0 1 "$pr_processed"
+      return 0  # Main branch takes the entire cycle — PRs wait
+    fi
+  fi
+
   # 1. Detect issues on all PRs
   local work_items
   work_items=$(detect_all_pr_issues) || {
@@ -519,6 +803,9 @@ run_check_cycle() {
   }
 
   prs_scanned=$(cat "$STATE_DIR/last-scan-count" 2>/dev/null || echo 0)
+
+  # 1b. Detect overlapping PRs (informational — posts warnings but doesn't block)
+  detect_pr_overlaps
 
   if [[ -z "$work_items" ]]; then
     log "All PRs clean — nothing to do"
