@@ -1,6 +1,6 @@
-import { fetchFromWikiServer } from "@lib/wiki-server";
+import { fetchAllPaginated } from "@lib/fetch-paginated";
 import { getEntityById } from "@data";
-import type { ClaimRow, GetAllClaimsResult } from "@wiki-server/api-response-types";
+import type { ClaimRow } from "@wiki-server/api-response-types";
 
 /** Convert a slug like "open-philanthropy" to "Open Philanthropy" as fallback */
 function formatSlugAsTitle(slug: string): string {
@@ -36,25 +36,23 @@ export function collectEntitySlugs(claims: ClaimRow[]): string[] {
 }
 
 /** Fetch all claims via paginated /all endpoint.
- *  Uses a larger page size and longer timeout to avoid build timeouts
- *  when the wiki-server is under heavy load during static generation. */
+ *  Uses the shared pagination helper with a 90s deadline and 30s per-page timeout
+ *  to handle heavy load during static generation. */
 export async function fetchAllClaims(): Promise<ClaimRow[]> {
-  const PAGE_SIZE = 1000;
-  const all: ClaimRow[] = [];
-  let offset = 0;
-  const deadline = Date.now() + 90_000; // 90s total budget
-
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    if (Date.now() > deadline) break;
-    const page = await fetchFromWikiServer<GetAllClaimsResult>(
-      `/api/claims/all?limit=${PAGE_SIZE}&offset=${offset}&includeSources=true`,
-      { revalidate: 300, timeoutMs: 30_000 }
+  const result = await fetchAllPaginated<ClaimRow>({
+    path: "/api/claims/all",
+    itemsKey: "claims",
+    pageSize: 1000,
+    extraParams: "includeSources=true",
+    revalidate: 300,
+    timeoutMs: 30_000,
+    deadlineMs: 90_000,
+  });
+  if (!result.ok) {
+    console.warn(
+      `[fetchAllClaims] Failed: ${result.error.type === "connection-error" ? result.error.message : result.error.type}`
     );
-    if (!page || page.claims.length === 0) break;
-    all.push(...page.claims);
-    if (all.length >= page.total) break;
-    offset += PAGE_SIZE;
+    return [];
   }
-  return all;
+  return result.data.items;
 }
