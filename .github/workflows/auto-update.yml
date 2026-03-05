@@ -1,10 +1,8 @@
 name: Auto-Update Wiki
 
 # News-driven automatic wiki update system.
-# Fetches news from configured sources, routes relevant items to pages,
-# and creates PRs with improvements.
-#
-# Budget and page limits are configurable per-run.
+# All pipeline logic lives in `crux/auto-update/ci-orchestrate.ts`.
+# This workflow handles only: trigger, permissions, setup, and the single crux call.
 
 on:
   schedule:
@@ -44,7 +42,6 @@ concurrency:
 jobs:
   preflight:
     # Global circuit breaker — skip when automation is paused or wiki-server is down.
-    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
     if: vars.AUTOMATION_PAUSED != 'true'
     runs-on: ubuntu-latest
     steps:
@@ -65,7 +62,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          # Use a token that can create PRs
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: pnpm/action-setup@v4
@@ -87,37 +83,24 @@ jobs:
           LONGTERMWIKI_PROJECT_KEY: ${{ secrets.LONGTERMWIKI_PROJECT_KEY }}
           LONGTERMWIKI_CONTENT_KEY: ${{ secrets.LONGTERMWIKI_CONTENT_KEY }}
 
-      - name: Create auto-update branch
-        run: |
-          DATE=$(date +%Y-%m-%d)
-          BRANCH="auto-update/${DATE}"
-          git checkout -b "$BRANCH"
-          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
-          echo "DATE=$DATE" >> $GITHUB_ENV
-
       - name: Restore auto-update state
         uses: actions/cache/restore@v4
         with:
           path: data/auto-update/state.yaml
-          # Unique key per run so we always save; restore-keys picks up latest
           key: auto-update-state-${{ github.run_id }}
           restore-keys: |
             auto-update-state-
 
-      - name: Run auto-update pipeline
+      - name: Run auto-update CI pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           SCRY_API_KEY: ${{ secrets.SCRY_API_KEY }}
           FIRECRAWL_KEY: ${{ secrets.FIRECRAWL_KEY }}
           EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ARGS="--trigger=scheduled --verbose"
-
-          # Use workflow_dispatch inputs or defaults
-          BUDGET="${{ inputs.budget || '30' }}"
-          COUNT="${{ inputs.count || '5' }}"
-          ARGS="$ARGS --budget=$BUDGET --count=$COUNT"
+          ARGS="--budget=${{ inputs.budget || '30' }} --count=${{ inputs.count || '5' }} --verbose"
 
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             ARGS="$ARGS --dry-run"
@@ -127,8 +110,8 @@ jobs:
             ARGS="$ARGS --sources=${{ inputs.sources }}"
           fi
 
-          echo "Running: pnpm crux auto-update run $ARGS"
-          pnpm crux auto-update run $ARGS
+          echo "Running: pnpm crux auto-update run-ci $ARGS"
+          pnpm crux auto-update run-ci $ARGS
 
       - name: Save auto-update state
         if: always()
@@ -136,264 +119,3 @@ jobs:
         with:
           path: data/auto-update/state.yaml
           key: auto-update-state-${{ github.run_id }}
-
-      - name: Run validation
-        if: success()
-        run: |
-          pnpm crux fix escaping
-          pnpm crux fix markdown
-          pnpm crux validate gate --fix || echo "::warning::Validation issues found"
-
-      - name: Review AI-generated content
-        if: success()
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: |
-          # Find changed MDX files that contain NEEDS CITATION markers
-          FLAGGED=$(grep -rl "NEEDS CITATION" content/docs/ 2>/dev/null || true)
-          if [ -z "$FLAGGED" ]; then
-            echo "No NEEDS CITATION markers found — content review passed."
-            exit 0
-          fi
-
-          echo "::warning::Found NEEDS CITATION markers in: $FLAGGED"
-          echo "Running targeted improvement pass to remove uncited claims..."
-
-          for FILE in $FLAGGED; do
-            # Extract page ID from filename (strip path and .mdx extension)
-            PAGE_ID=$(basename "$FILE" .mdx)
-            echo "Fixing: $PAGE_ID ($FILE)"
-            pnpm crux content improve "$PAGE_ID" --tier=polish --apply \
-              --directions "Remove all {/* NEEDS CITATION */} markers and the content they flag. If a claim cannot be verified from your knowledge, remove it entirely rather than leaving uncited speculation. Do not add speculative content as a replacement." \
-              || echo "::warning::Could not auto-fix $PAGE_ID — marker left in place"
-          done
-
-          # Final check: fail if markers still present after fix attempt
-          STILL_FLAGGED=$(grep -rl "NEEDS CITATION" content/docs/ 2>/dev/null || true)
-          if [ -n "$STILL_FLAGGED" ]; then
-            echo "::error::NEEDS CITATION markers remain after fix attempt: $STILL_FLAGGED"
-            echo "Manual review required before merging."
-            exit 1
-          fi
-          echo "All NEEDS CITATION markers resolved."
-
-      - name: Paranoid review of changed pages
-        if: success()
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: |
-          # Find MDX files modified by the auto-update pipeline (not yet committed)
-          CHANGED_MDX=$(git diff --name-only HEAD -- content/docs/ | grep '\.mdx$' || true)
-
-          if [ -z "$CHANGED_MDX" ]; then
-            echo "No MDX files changed — skipping paranoid review"
-            exit 0
-          fi
-
-          COUNT=$(echo "$CHANGED_MDX" | wc -l | tr -d ' ')
-          echo "Running paranoid review on $COUNT changed page(s)..."
-
-          BLOCKED=""
-          for FILE in $CHANGED_MDX; do
-            PAGE_ID=$(basename "$FILE" .mdx)
-            echo "Reviewing: $PAGE_ID ($FILE)"
-
-            RESULT_RAW=$(pnpm --silent crux content review "$PAGE_ID" \
-              --model=claude-haiku-4-5-20251001 --json 2>/dev/null \
-              || true)
-
-            # Extract just the JSON object line (guards against any pnpm/dotenv preamble)
-            JSON_LINE=$(echo "$RESULT_RAW" | grep -E '^\{' | tail -1)
-            RESULT="${JSON_LINE:-{\"error\":\"review failed\",\"gapCount\":0,\"needsReResearch\":false}}"
-
-            NEEDS_RESEARCH=$(echo "$RESULT" | jq -r '.needsReResearch // false' 2>/dev/null || echo "false")
-            GAP_COUNT=$(echo "$RESULT" | jq -r '.gapCount // 0' 2>/dev/null || echo "0")
-            ASSESSMENT=$(echo "$RESULT" | jq -r '.overallAssessment // "No assessment"' 2>/dev/null || echo "No assessment")
-            ERROR=$(echo "$RESULT" | jq -r '.error // ""' 2>/dev/null || echo "parse-error")
-
-            if [ -n "$ERROR" ] && [ "$ERROR" != "null" ]; then
-              echo "::warning::$PAGE_ID — review failed: $ERROR"
-            elif [ "$NEEDS_RESEARCH" = "true" ]; then
-              echo "::error::$PAGE_ID — needs re-research ($GAP_COUNT gap(s)): $ASSESSMENT"
-              BLOCKED="$BLOCKED $PAGE_ID"
-            elif [ "$GAP_COUNT" -gt 0 ]; then
-              echo "::warning::$PAGE_ID — $GAP_COUNT gap(s) (editorial): $ASSESSMENT"
-            else
-              echo "  $PAGE_ID: clean"
-            fi
-          done
-
-          if [ -n "$BLOCKED" ]; then
-            echo "::error::Paranoid review blocked commit for:$BLOCKED"
-            echo "Re-run the improve pipeline on these pages or fix the issues manually."
-            exit 1
-          fi
-
-          echo "All changed pages passed paranoid review"
-
-      - name: Content quality checks (truncation + footnotes)
-        if: success()
-        run: pnpm crux auto-update content-checks --diff
-
-      - name: Find run report
-        id: report
-        if: always()
-        run: |
-          # Run reports use timestamp filenames (e.g., 2026-02-17T06-00-00.yaml)
-          REPORT=$(ls -t data/auto-update/runs/${DATE}*.yaml 2>/dev/null | grep -v '\-details\.yaml$' | head -1)
-          if [ -n "$REPORT" ]; then
-            echo "path=$REPORT" >> $GITHUB_OUTPUT
-            echo "Found report: $REPORT"
-          else
-            echo "path=" >> $GITHUB_OUTPUT
-            echo "No report found"
-          fi
-
-      - name: Verify citations on updated pages
-        id: citations
-        if: success() && steps.report.outputs.path != ''
-        run: |
-          # dotenv stdout is suppressed via DOTENV_CONFIG_QUIET in the crux script.
-          # Progress messages go to stderr; only JSON goes to stdout.
-          RESULT=$(pnpm --silent crux auto-update verify-citations --from-report="${{ steps.report.outputs.path }}" --json 2>/dev/null || echo '{}')
-
-          # Validate JSON before parsing (defensive against any remaining stdout noise)
-          if ! echo "$RESULT" | jq empty 2>/dev/null; then
-            echo "::warning::verify-citations produced invalid JSON, falling back to empty result"
-            RESULT='{}'
-          fi
-
-          SUMMARY=$(echo "$RESULT" | jq -r '.markdownSummary // ""')
-          HAS_BROKEN=$(echo "$RESULT" | jq -r '.hasBroken // false')
-
-          {
-            echo "CITATION_SUMMARY<<CITATION_EOF"
-            echo "$SUMMARY"
-            echo "CITATION_EOF"
-          } >> "$GITHUB_ENV"
-
-          if [ "$HAS_BROKEN" = "true" ]; then
-            echo "::warning::Broken citations detected"
-          fi
-
-      - name: Compute hallucination risk scores
-        id: risk
-        if: success() && steps.report.outputs.path != ''
-        run: |
-          # Rebuild data layer so risk scoring sees the updated content
-          cd apps/web && node --import tsx/esm scripts/build-data.mjs 2>/dev/null
-          cd "$GITHUB_WORKSPACE"
-
-          # dotenv stdout is suppressed via DOTENV_CONFIG_QUIET in the crux script.
-          # Progress messages go to stderr; only JSON goes to stdout.
-          RESULT=$(pnpm --silent crux auto-update risk-scores --from-report="${{ steps.report.outputs.path }}" --json 2>/dev/null || echo '{}')
-
-          # Validate JSON before parsing
-          if ! echo "$RESULT" | jq empty 2>/dev/null; then
-            echo "::warning::risk-scores produced invalid JSON, falling back to empty result"
-            RESULT='{}'
-          fi
-
-          SUMMARY=$(echo "$RESULT" | jq -r '.markdownSummary // ""')
-          HAS_HIGH=$(echo "$RESULT" | jq -r '.hasHighRisk // false')
-
-          {
-            echo "RISK_SUMMARY<<RISK_EOF"
-            echo "$SUMMARY"
-            echo "RISK_EOF"
-          } >> "$GITHUB_ENV"
-
-          if [ "$HAS_HIGH" = "true" ]; then
-            echo "::warning::High-risk pages detected"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check for changes
-        id: changes
-        run: |
-          if git diff --quiet && git diff --staged --quiet; then
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "No changes to commit"
-          else
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "Changes detected"
-          fi
-
-      - name: Commit and push
-        if: steps.changes.outputs.has_changes == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Security: stage only files the auto-update pipeline is expected to
-          # modify, not everything in the working tree.
-          git diff --name-only | while IFS= read -r file; do
-            if echo "$file" | grep -qE '^(content/docs/.*\.mdx|data/.*\.(yaml|yml))$'; then
-              git add -- "$file"
-            else
-              echo "::warning::Skipping unexpected modified file from auto-update: $file"
-            fi
-          done
-
-          # Also stage any new (untracked) files in expected directories
-          git ls-files --others --exclude-standard -- 'content/docs/' 'data/' | while IFS= read -r file; do
-            if echo "$file" | grep -qE '^(content/docs/.*\.mdx|data/.*\.(yaml|yml))$'; then
-              git add -- "$file"
-            fi
-          done
-
-          if ! git diff --cached --quiet; then
-            git commit -m "auto-update: ${DATE} daily wiki refresh
-
-          Automated news-driven wiki update.
-          Run report: ${{ steps.report.outputs.path }}"
-            git push -u origin "$BRANCH"
-          else
-            echo "No expected auto-update changes to commit."
-          fi
-
-      - name: Create or update PR
-        if: steps.changes.outputs.has_changes == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Check if PR already exists for this branch
-          EXISTING_PR=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number' 2>/dev/null || echo "")
-
-          if [ -n "$EXISTING_PR" ]; then
-            echo "PR #$EXISTING_PR already exists, changes pushed to branch"
-          else
-            # Build PR body via TS script, with citation/risk summaries
-            BODY=$(pnpm crux auto-update pr-body \
-              --report="${{ steps.report.outputs.path }}" \
-              --date="$DATE" \
-              --citations="$CITATION_SUMMARY" \
-              --risk="$RISK_SUMMARY" 2>/dev/null || echo "## Auto-Update Run — ${DATE}")
-
-            BODY_FILE=$(mktemp)
-            echo "$BODY" > "$BODY_FILE"
-
-            gh pr create \
-              --title "Auto-update: ${DATE} daily wiki refresh" \
-              --body-file "$BODY_FILE" \
-              --label "auto-update" || echo "PR creation failed (label may not exist)"
-
-            rm -f "$BODY_FILE"
-          fi
-
-      - name: Summary
-        if: always()
-        run: |
-          REPORT="${{ steps.report.outputs.path }}"
-          if [ -n "$REPORT" ] && [ -f "$REPORT" ]; then
-            echo "## Auto-Update Summary" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo '```yaml' >> $GITHUB_STEP_SUMMARY
-            head -30 "$REPORT" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No run report generated" >> $GITHUB_STEP_SUMMARY
-          fi

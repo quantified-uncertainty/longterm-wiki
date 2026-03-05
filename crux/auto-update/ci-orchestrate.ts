@@ -1,0 +1,577 @@
+/**
+ * CI Orchestration for Auto-Update
+ *
+ * Full CI pipeline that replaces the shell logic in .github/workflows/auto-update.yml.
+ * Runs as a single TypeScript entry point: `pnpm crux auto-update run-ci`.
+ *
+ * Steps:
+ *   1. Create date-stamped branch (auto-update/YYYY-MM-DD)
+ *   2. Run auto-update pipeline (fetch -> digest -> route -> improve)
+ *   3. Auto-fix: fix escaping, fix markdown, validate gate --fix
+ *   4. NEEDS CITATION cleanup (find markers, run improve, verify gone)
+ *   5. Paranoid content review on each changed page
+ *   6. Content quality checks (truncation + footnotes)
+ *   7. Find run report
+ *   8. Verify citations
+ *   9. Compute hallucination risk scores
+ *  10. Selective staging (only content/docs/*.mdx and data/*.yaml)
+ *  11. Commit and push
+ *  12. Create or update PR
+ */
+
+import { execFileSync } from 'child_process';
+import { basename, join } from 'path';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { githubApi, REPO } from '../lib/github.ts';
+import { runPipeline } from './orchestrator.ts';
+import {
+  verifyCitationsForPages,
+  extractPageIdsFromReport,
+  findRunReport,
+} from './ci-verify-citations.ts';
+import { computeRiskScores } from './ci-risk-scores.ts';
+import { runContentChecks } from './ci-content-checks.ts';
+import { buildPrBody } from './ci-pr-body.ts';
+
+// ── Types ────────────────────────────────────────────────────────────────────
+
+export interface CiOrchestrateOptions {
+  budget: number;
+  count: number;
+  dryRun: boolean;
+  sources?: string;
+  verbose: boolean;
+}
+
+export interface CiOrchestrateResult {
+  branch: string;
+  hasChanges: boolean;
+  pagesUpdated: number;
+  prUrl: string | null;
+  exitCode: number;
+}
+
+// ── File allow-list ──────────────────────────────────────────────────────────
+
+/**
+ * Match only allowed file patterns for auto-update staging.
+ * Security-critical: prevents staging unexpected files (code, config, secrets).
+ */
+export function isAutoUpdateAllowedFile(path: string): boolean {
+  return /^(content\/docs\/.*\.mdx|data\/.*\.(yaml|yml))$/.test(path);
+}
+
+// ── Git helpers ──────────────────────────────────────────────────────────────
+
+function git(args: string[]): string {
+  return execFileSync('git', args, {
+    cwd: PROJECT_ROOT,
+    encoding: 'utf-8',
+    stdio: ['pipe', 'pipe', 'pipe'],
+  }).trim();
+}
+
+function configBotUser(): void {
+  git(['config', 'user.name', 'github-actions[bot]']);
+  git(['config', 'user.email', 'github-actions[bot]@users.noreply.github.com']);
+}
+
+function hasUnstagedOrUntracked(): boolean {
+  try {
+    const diffOutput = git(['diff', '--name-only']);
+    const untrackedOutput = git(['ls-files', '--others', '--exclude-standard']);
+    return diffOutput.length > 0 || untrackedOutput.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+function hasStagedChanges(): boolean {
+  try {
+    git(['diff', '--cached', '--quiet']);
+    return false;
+  } catch {
+    return true;
+  }
+}
+
+// ── Selective staging ────────────────────────────────────────────────────────
+
+interface StagingResult {
+  staged: string[];
+  skipped: string[];
+}
+
+function stageAllowedFiles(): StagingResult {
+  const staged: string[] = [];
+  const skipped: string[] = [];
+
+  // Stage modified tracked files
+  const modified = git(['diff', '--name-only']);
+  if (modified) {
+    for (const file of modified.split('\n').filter(Boolean)) {
+      if (isAutoUpdateAllowedFile(file)) {
+        git(['add', '--', file]);
+        staged.push(file);
+      } else {
+        skipped.push(file);
+      }
+    }
+  }
+
+  // Stage new untracked files in expected directories
+  const untracked = git(['ls-files', '--others', '--exclude-standard', '--', 'content/docs/', 'data/']);
+  if (untracked) {
+    for (const file of untracked.split('\n').filter(Boolean)) {
+      if (isAutoUpdateAllowedFile(file)) {
+        git(['add', '--', file]);
+        staged.push(file);
+      } else {
+        skipped.push(file);
+      }
+    }
+  }
+
+  return { staged, skipped };
+}
+
+// ── NEEDS CITATION cleanup ───────────────────────────────────────────────────
+
+function findNeedsCitationFiles(): string[] {
+  try {
+    const output = execFileSync('grep', ['-rl', 'NEEDS CITATION', 'content/docs/'], {
+      cwd: PROJECT_ROOT,
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
+    return output ? output.split('\n').filter(Boolean) : [];
+  } catch {
+    // grep returns exit code 1 when no matches found
+    return [];
+  }
+}
+
+async function cleanupNeedsCitation(verbose: boolean): Promise<{ fixed: string[]; remaining: string[] }> {
+  const flagged = findNeedsCitationFiles();
+  if (flagged.length === 0) {
+    console.log('No NEEDS CITATION markers found -- content review passed.');
+    return { fixed: [], remaining: [] };
+  }
+
+  console.warn(`::warning::Found NEEDS CITATION markers in: ${flagged.join(', ')}`);
+  console.log('Running targeted improvement pass to remove uncited claims...');
+
+  const fixed: string[] = [];
+  for (const file of flagged) {
+    const pageId = basename(file, '.mdx');
+    console.log(`Fixing: ${pageId} (${file})`);
+
+    try {
+      execFileSync('pnpm', [
+        'crux', 'content', 'improve', pageId,
+        '--tier=polish', '--apply',
+        '--directions', 'Remove all {/* NEEDS CITATION */} markers and the content they flag. If a claim cannot be verified from your knowledge, remove it entirely rather than leaving uncited speculation. Do not add speculative content as a replacement.',
+      ], {
+        cwd: PROJECT_ROOT,
+        stdio: verbose ? 'inherit' : ['pipe', 'pipe', 'pipe'],
+        timeout: 300_000, // 5 minutes per page
+      });
+      fixed.push(pageId);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`::warning::Could not auto-fix ${pageId} -- marker left in place: ${msg}`);
+    }
+  }
+
+  // Final check
+  const remaining = findNeedsCitationFiles();
+  if (remaining.length > 0) {
+    console.error(`::error::NEEDS CITATION markers remain after fix attempt: ${remaining.join(', ')}`);
+  } else {
+    console.log('All NEEDS CITATION markers resolved.');
+  }
+
+  return { fixed, remaining };
+}
+
+// ── Paranoid content review ──────────────────────────────────────────────────
+
+interface ReviewAlert {
+  pageId: string;
+  reason: string;
+}
+
+async function runParanoidReview(verbose: boolean): Promise<{ alerts: ReviewAlert[]; blocked: string[] }> {
+  // Find MDX files modified (not yet committed)
+  let changedMdx: string[];
+  try {
+    const diff = git(['diff', '--name-only', 'HEAD', '--', 'content/docs/']);
+    changedMdx = diff
+      ? diff.split('\n').filter(f => f.endsWith('.mdx'))
+      : [];
+  } catch {
+    changedMdx = [];
+  }
+
+  if (changedMdx.length === 0) {
+    console.log('No MDX files changed -- skipping paranoid review');
+    return { alerts: [], blocked: [] };
+  }
+
+  console.log(`Running paranoid review on ${changedMdx.length} changed page(s)...`);
+
+  const alerts: ReviewAlert[] = [];
+  const blocked: string[] = [];
+
+  for (const file of changedMdx) {
+    const pageId = basename(file, '.mdx');
+    console.log(`Reviewing: ${pageId} (${file})`);
+
+    let resultRaw: string;
+    try {
+      resultRaw = execFileSync('pnpm', [
+        '--silent', 'crux', 'content', 'review', pageId,
+        '--model=claude-haiku-4-5-20251001', '--json',
+      ], {
+        cwd: PROJECT_ROOT,
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+        timeout: 120_000, // 2 minutes per page
+      });
+    } catch {
+      console.warn(`::warning::${pageId} -- review failed`);
+      continue;
+    }
+
+    // Extract JSON line (guards against pnpm/dotenv preamble)
+    const jsonLine = resultRaw
+      .split('\n')
+      .filter(line => line.trim().startsWith('{'))
+      .pop();
+
+    if (!jsonLine) {
+      console.warn(`::warning::${pageId} -- review produced no JSON output`);
+      continue;
+    }
+
+    let result: {
+      needsReResearch?: boolean;
+      gapCount?: number;
+      overallAssessment?: string;
+      error?: string;
+    };
+    try {
+      result = JSON.parse(jsonLine);
+    } catch {
+      console.warn(`::warning::${pageId} -- review JSON parse failed`);
+      continue;
+    }
+
+    if (result.error) {
+      console.warn(`::warning::${pageId} -- review error: ${result.error}`);
+    } else if (result.needsReResearch) {
+      const reason = `needs re-research (${result.gapCount ?? 0} gap(s)): ${result.overallAssessment ?? 'unknown'}`;
+      console.error(`::error::${pageId} -- ${reason}`);
+      blocked.push(pageId);
+      alerts.push({ pageId, reason });
+    } else if ((result.gapCount ?? 0) > 0) {
+      const reason = `${result.gapCount} gap(s) (editorial): ${result.overallAssessment ?? 'unknown'}`;
+      console.warn(`::warning::${pageId} -- ${reason}`);
+      alerts.push({ pageId, reason });
+    } else {
+      console.log(`  ${pageId}: clean`);
+    }
+  }
+
+  if (blocked.length > 0) {
+    console.error(`::error::Paranoid review blocked commit for: ${blocked.join(', ')}`);
+  } else {
+    console.log('All changed pages passed paranoid review');
+  }
+
+  return { alerts, blocked };
+}
+
+// ── Main orchestrator ────────────────────────────────────────────────────────
+
+export async function orchestrateCiAutoUpdate(
+  options: CiOrchestrateOptions,
+): Promise<CiOrchestrateResult> {
+  const date = new Date().toISOString().slice(0, 10);
+  const branch = `auto-update/${date}`;
+  let reportPath: string | null = null;
+
+  console.log(`=== Auto-Update CI Orchestration (${date}) ===`);
+  console.log(`Budget: $${options.budget}, Count: ${options.count}, Dry run: ${options.dryRun}`);
+
+  // ── Step 1: Create date-stamped branch ──
+  console.log('\n--- Step 1: Create branch ---');
+  try {
+    git(['checkout', '-b', branch]);
+    console.log(`Created branch: ${branch}`);
+  } catch {
+    // Branch may already exist if re-running on the same day
+    try {
+      git(['checkout', branch]);
+      console.log(`Switched to existing branch: ${branch}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`Failed to create or switch to branch ${branch}: ${msg}`);
+      return { branch, hasChanges: false, pagesUpdated: 0, prUrl: null, exitCode: 1 };
+    }
+  }
+
+  // ── Step 2: Run auto-update pipeline ──
+  console.log('\n--- Step 2: Run auto-update pipeline ---');
+  let pagesUpdated = 0;
+  try {
+    const { report, reportPath: rp } = await runPipeline({
+      budget: String(options.budget),
+      count: String(options.count),
+      dryRun: options.dryRun,
+      sources: options.sources,
+      verbose: options.verbose,
+      trigger: 'scheduled',
+    });
+    reportPath = rp;
+    pagesUpdated = report.execution.pagesUpdated;
+    console.log(`Pipeline complete: ${pagesUpdated} page(s) updated, report at ${reportPath}`);
+
+    if (report.execution.pagesFailed > 0) {
+      console.warn(`::warning::${report.execution.pagesFailed} page(s) failed during pipeline`);
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`Pipeline failed: ${msg}`);
+    return { branch, hasChanges: false, pagesUpdated: 0, prUrl: null, exitCode: 1 };
+  }
+
+  // ── Step 3: Auto-fix (escaping, markdown, gate) ──
+  console.log('\n--- Step 3: Run validation fixes ---');
+  try {
+    execFileSync('pnpm', ['crux', 'fix', 'escaping'], {
+      cwd: PROJECT_ROOT,
+      stdio: 'inherit',
+    });
+  } catch (err) {
+    console.warn(`::warning::fix escaping failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  try {
+    execFileSync('pnpm', ['crux', 'fix', 'markdown'], {
+      cwd: PROJECT_ROOT,
+      stdio: 'inherit',
+    });
+  } catch (err) {
+    console.warn(`::warning::fix markdown failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  try {
+    execFileSync('pnpm', ['crux', 'validate', 'gate', '--fix'], {
+      cwd: PROJECT_ROOT,
+      stdio: 'inherit',
+    });
+  } catch {
+    console.warn('::warning::Validation issues found (gate --fix)');
+  }
+
+  // ── Step 4: NEEDS CITATION cleanup ──
+  console.log('\n--- Step 4: NEEDS CITATION cleanup ---');
+  const citationCleanup = await cleanupNeedsCitation(options.verbose);
+  if (citationCleanup.remaining.length > 0) {
+    console.error('NEEDS CITATION markers remain -- manual review required before merging.');
+    return { branch, hasChanges: false, pagesUpdated, prUrl: null, exitCode: 1 };
+  }
+
+  // ── Step 5: Paranoid content review ──
+  console.log('\n--- Step 5: Paranoid content review ---');
+  const review = await runParanoidReview(options.verbose);
+  if (review.blocked.length > 0) {
+    console.error('Paranoid review blocked commit. Re-run the improve pipeline on blocked pages.');
+    return { branch, hasChanges: false, pagesUpdated, prUrl: null, exitCode: 1 };
+  }
+
+  // ── Step 6: Content quality checks ──
+  console.log('\n--- Step 6: Content quality checks ---');
+  const contentChecks = runContentChecks({ baseBranch: 'HEAD' });
+  if (!contentChecks.passed) {
+    console.error(`Content quality checks failed: ${contentChecks.markdownSummary}`);
+    return { branch, hasChanges: false, pagesUpdated, prUrl: null, exitCode: 1 };
+  }
+  console.log('Content quality checks passed.');
+
+  // ── Step 7: Find run report ──
+  console.log('\n--- Step 7: Find run report ---');
+  if (!reportPath) {
+    reportPath = findRunReport(date);
+  }
+  if (reportPath) {
+    console.log(`Found report: ${reportPath}`);
+  } else {
+    console.log('No report found');
+  }
+
+  // ── Step 8: Verify citations ──
+  let citationSummary: string | undefined;
+  if (reportPath) {
+    console.log('\n--- Step 8: Verify citations ---');
+    const pageIds = extractPageIdsFromReport(reportPath);
+    if (pageIds.length > 0) {
+      try {
+        const citationResult = await verifyCitationsForPages(pageIds);
+        citationSummary = citationResult.markdownSummary;
+        if (citationResult.hasBroken) {
+          console.warn('::warning::Broken citations detected');
+        }
+        console.log(`Citation verification complete: ${citationResult.totalVerified} verified, ${citationResult.totalBroken} broken`);
+      } catch (err) {
+        console.warn(`::warning::Citation verification failed: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    } else {
+      console.log('No successful pages in report -- skipping citation verification');
+    }
+  }
+
+  // ── Step 9: Compute hallucination risk scores ──
+  let riskSummary: string | undefined;
+  if (reportPath) {
+    console.log('\n--- Step 9: Compute hallucination risk scores ---');
+
+    // Rebuild data layer so risk scoring sees updated content
+    try {
+      execFileSync('node', ['--import', 'tsx/esm', 'scripts/build-data.mjs'], {
+        cwd: join(PROJECT_ROOT, 'apps/web'),
+        stdio: ['pipe', 'pipe', 'pipe'],
+        env: { ...process.env },
+      });
+    } catch (err) {
+      console.warn(`::warning::Data rebuild for risk scoring failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+
+    const pageIds = extractPageIdsFromReport(reportPath);
+    if (pageIds.length > 0) {
+      try {
+        const riskResult = await computeRiskScores(pageIds);
+        riskSummary = riskResult.markdownSummary;
+        if (riskResult.hasHighRisk) {
+          console.warn('::warning::High-risk pages detected');
+        }
+        console.log(`Risk scoring complete: ${riskResult.pages.length} page(s) assessed`);
+      } catch (err) {
+        console.warn(`::warning::Risk scoring failed: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    } else {
+      console.log('No successful pages in report -- skipping risk scoring');
+    }
+  }
+
+  // ── Step 10: Check for changes ──
+  console.log('\n--- Step 10: Check for changes ---');
+  if (!hasUnstagedOrUntracked()) {
+    console.log('No changes to commit');
+    return { branch, hasChanges: false, pagesUpdated, prUrl: null, exitCode: 0 };
+  }
+
+  // ── Step 11: Selective staging, commit, and push ──
+  console.log('\n--- Step 11: Commit and push ---');
+  configBotUser();
+
+  const { staged, skipped } = stageAllowedFiles();
+  if (skipped.length > 0) {
+    for (const file of skipped) {
+      console.warn(`::warning::Skipping unexpected modified file from auto-update: ${file}`);
+    }
+  }
+
+  if (!hasStagedChanges()) {
+    console.log('No expected auto-update changes to commit.');
+    return { branch, hasChanges: false, pagesUpdated, prUrl: null, exitCode: 0 };
+  }
+
+  console.log(`Staged ${staged.length} file(s)`);
+
+  const commitMsg = `auto-update: ${date} daily wiki refresh\n\nAutomated news-driven wiki update.\nRun report: ${reportPath || 'N/A'}`;
+  git(['commit', '-m', commitMsg]);
+  git(['push', '-u', 'origin', branch]);
+  console.log(`Pushed to origin/${branch}`);
+
+  // ── Step 12: Create or update PR ──
+  console.log('\n--- Step 12: Create or update PR ---');
+  let prUrl: string | null = null;
+
+  try {
+    // Check for existing PR
+    interface PrListItem {
+      number: number;
+      html_url: string;
+    }
+    const existingPrs = await githubApi<PrListItem[]>(
+      `/repos/${REPO}/pulls?head=quantified-uncertainty:${branch}&state=open`,
+    );
+
+    if (existingPrs && existingPrs.length > 0) {
+      prUrl = existingPrs[0].html_url;
+      console.log(`PR #${existingPrs[0].number} already exists, changes pushed to branch`);
+      console.log(`  URL: ${prUrl}`);
+    } else {
+      // Build PR body
+      const body = buildPrBody({
+        reportPath,
+        date,
+        citationSummary,
+        riskSummary,
+      });
+
+      interface PrCreateResult {
+        number: number;
+        html_url: string;
+      }
+      const pr = await githubApi<PrCreateResult>(
+        `/repos/${REPO}/pulls`,
+        {
+          method: 'POST',
+          body: {
+            title: `Auto-update: ${date} daily wiki refresh`,
+            body,
+            head: branch,
+            base: 'main',
+          },
+        },
+      );
+      prUrl = pr.html_url;
+      console.log(`Created PR #${pr.number}: ${prUrl}`);
+
+      // Try to add auto-update label (non-fatal if label doesn't exist)
+      try {
+        await githubApi(
+          `/repos/${REPO}/issues/${pr.number}/labels`,
+          {
+            method: 'POST',
+            body: { labels: ['auto-update'] },
+          },
+        );
+      } catch (err) {
+        console.warn(`::warning::Could not add label: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`PR creation failed: ${msg}`);
+    // Non-fatal -- the branch is pushed, PR can be created manually
+  }
+
+  // ── Summary ──
+  console.log('\n=== Auto-Update CI Complete ===');
+  console.log(`Branch: ${branch}`);
+  console.log(`Pages updated: ${pagesUpdated}`);
+  console.log(`Staged files: ${staged.length}`);
+  if (prUrl) console.log(`PR: ${prUrl}`);
+
+  return {
+    branch,
+    hasChanges: true,
+    pagesUpdated,
+    prUrl,
+    exitCode: 0,
+  };
+}
