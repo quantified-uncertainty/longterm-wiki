@@ -1,0 +1,216 @@
+name: CodeRabbit Security Gate
+
+# Blocks merges when CodeRabbit has unresolved Critical or Major review threads.
+# A human can override by adding the `coderabbit-security-ok` label.
+#
+# Why this gate exists: CodeRabbit flagged 3 security issues across PRs #1613,
+# #1623, and #1634 that were self-merged without human review. See issue #1649.
+#
+# How to override:
+#   1. Review the CodeRabbit findings (resolve each thread or acknowledge it)
+#   2. Add the `coderabbit-security-ok` label to the PR
+#   3. The check will re-run and pass
+#
+# Note: The label must be added by a human — bots and claude-* actors are
+# disallowed to prevent self-bypass.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+jobs:
+  coderabbit-security-gate:
+    # Only re-run on label events when relevant label changes
+    if: >-
+      github.event.action != 'labeled' && github.event.action != 'unlabeled' ||
+      github.event.label.name == 'coderabbit-security-ok'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: read
+    steps:
+      - name: Check for unresolved CodeRabbit critical/major findings
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const OVERRIDE_LABEL = 'coderabbit-security-ok';
+            const COMMENT_MARKER = '<!-- coderabbit-security-gate -->';
+            const CODERABBIT_LOGIN = 'coderabbitai';
+
+            // Severity patterns that require dismissal
+            const BLOCKING_SEVERITY_RE = /🔴 Critical|🟠 Major/;
+
+            // Actors not allowed to apply the override label
+            const DISALLOWED_LABEL_ACTORS = [
+              'github-actions[bot]',
+              'dependabot[bot]',
+            ];
+            const DISALLOWED_ACTOR_PATTERNS = [
+              /^claude-/i,
+            ];
+
+            function isDisallowedActor(login) {
+              if (DISALLOWED_LABEL_ACTORS.includes(login)) return true;
+              return DISALLOWED_ACTOR_PATTERNS.some(p => p.test(login));
+            }
+
+            // --- 1. Fetch review threads via GraphQL ---
+            const query = `query($owner: String!, $name: String!, $number: Int!) {
+              repository(owner: $owner, name: $name) {
+                pullRequest(number: $number) {
+                  reviewThreads(first: 100) {
+                    nodes {
+                      isResolved
+                      isOutdated
+                      path
+                      line
+                      comments(first: 3) {
+                        nodes {
+                          author { login }
+                          body
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }`;
+
+            const gqlResult = await github.graphql(query, {
+              owner: context.repo.owner,
+              name: context.repo.repo,
+              number: context.issue.number,
+            });
+
+            const threads = gqlResult.repository.pullRequest.reviewThreads.nodes;
+
+            // Find unresolved, non-outdated CodeRabbit threads with blocking severity
+            const blockingThreads = threads.filter(thread => {
+              if (thread.isResolved || thread.isOutdated) return false;
+              const firstComment = thread.comments.nodes[0];
+              if (!firstComment?.author?.login) return false;
+              if (firstComment.author.login !== CODERABBIT_LOGIN) return false;
+              return BLOCKING_SEVERITY_RE.test(firstComment.body);
+            });
+
+            console.log(`Found ${threads.length} review threads total`);
+            console.log(`Blocking unresolved CodeRabbit threads: ${blockingThreads.length}`);
+
+            // --- 2. Check override label ---
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const hasOverrideLabel = labels.some(l => l.name === OVERRIDE_LABEL);
+
+            let labelAddedByHuman = false;
+            let labelActorName = null;
+
+            if (hasOverrideLabel) {
+              const events = await github.paginate(
+                github.rest.issues.listEvents,
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  per_page: 100,
+                }
+              );
+
+              const labelEvents = events.filter(
+                e => e.event === 'labeled' && e.label?.name === OVERRIDE_LABEL
+              );
+              const mostRecent = labelEvents[labelEvents.length - 1];
+
+              if (mostRecent && mostRecent.actor) {
+                labelActorName = mostRecent.actor.login;
+                labelAddedByHuman = !isDisallowedActor(labelActorName);
+              }
+            }
+
+            const overrideApproved = hasOverrideLabel && labelAddedByHuman;
+
+            // --- 3. Decide pass/fail ---
+            const shouldBlock = blockingThreads.length > 0 && !overrideApproved;
+
+            // --- 4. Build thread summary ---
+            const threadDetails = blockingThreads.slice(0, 10).map(thread => {
+              const comment = thread.comments.nodes[0];
+              // Extract severity from first line
+              const firstLine = comment.body.split('\n')[0] ?? '';
+              const excerpt = comment.body.slice(0, 300).replace(/\n+/g, ' ');
+              return `- **${thread.path}**${thread.line ? ` (line ${thread.line})` : ''}: ${firstLine}\n  > ${excerpt}${comment.body.length > 300 ? '…' : ''}`;
+            }).join('\n');
+
+            // --- 5. Build comment ---
+            const statusIcon = shouldBlock ? '🛑' : (overrideApproved ? '✅' : '✅');
+            let statusText;
+
+            if (blockingThreads.length === 0) {
+              statusText = 'No unresolved Critical or Major CodeRabbit findings. Check passes.';
+            } else if (overrideApproved) {
+              statusText = `**Override accepted**: The \`${OVERRIDE_LABEL}\` label was added by \`${labelActorName}\`. A human has acknowledged the ${blockingThreads.length} finding(s) below.`;
+            } else if (hasOverrideLabel && !labelAddedByHuman) {
+              statusText = `**Action required**: The \`${OVERRIDE_LABEL}\` label was added by \`${labelActorName || 'unknown'}\`, which is not recognized as a human reviewer. A human must remove and re-add the label.`;
+            } else {
+              statusText = `**Action required**: This PR has ${blockingThreads.length} unresolved Critical/Major CodeRabbit finding(s). Either resolve each thread in the GitHub review interface, or add the \`${OVERRIDE_LABEL}\` label after reviewing and acknowledging each finding.`;
+            }
+
+            const body = [
+              COMMENT_MARKER,
+              `## ${statusIcon} CodeRabbit Security Gate`,
+              '',
+              statusText,
+              '',
+              blockingThreads.length > 0 ? [
+                `### Unresolved Critical/Major Findings (${blockingThreads.length})`,
+                '',
+                threadDetails,
+                '',
+                blockingThreads.length > 10 ? `_...and ${blockingThreads.length - 10} more_\n` : '',
+              ].join('\n') : '',
+              '---',
+              '',
+              `> **How to resolve**: Mark each CodeRabbit thread as resolved in the "Files changed" tab, or add the \`${OVERRIDE_LABEL}\` label if the findings are false positives. See [#1649](https://github.com/quantified-uncertainty/longterm-wiki/issues/1649).`,
+            ].filter(s => s !== '').join('\n');
+
+            // Post or update the gate comment
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                per_page: 100,
+              }
+            );
+            const existing = comments.find(c => c.body && c.body.includes(COMMENT_MARKER));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else if (blockingThreads.length > 0) {
+              // Only create the comment if there are findings (don't clutter clean PRs)
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+            // Fail the check if blocking
+            if (shouldBlock) {
+              core.setFailed(
+                `${blockingThreads.length} unresolved Critical/Major CodeRabbit finding(s) must be resolved or acknowledged before merging. ` +
+                `Add the "${OVERRIDE_LABEL}" label after a human reviews each finding.`
+              );
+            } else {
+              console.log('CodeRabbit security gate passed.');
+            }
