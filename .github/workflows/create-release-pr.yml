@@ -1,0 +1,48 @@
+name: Create Release PR
+
+# Creates (or updates) a PR from main → production with a standardized title
+# and auto-generated changelog. Merging the resulting PR triggers production
+# deploys (Vercel frontend + wiki-server via wiki-server-docker.yml).
+#
+# All logic lives in crux/commands/release.ts — this workflow just calls it.
+#
+# Usage:
+#   - Manual trigger from GitHub Actions UI (recommended)
+#   - Title format: "release: YYYY-MM-DD" (or "release: YYYY-MM-DD #2" for same-day)
+#   - Idempotent: if an open release PR already exists, updates its body
+#   - Does NOT auto-merge — a human must click merge to deploy
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write # needed for label creation
+
+jobs:
+  create-release-pr:
+    # Global circuit breaker — skip when automation is paused.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create or update release PR
+        run: pnpm crux release create
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
