@@ -12,7 +12,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { CitationQuote } from "@/lib/citation-data";
-import { getDomain } from "./resource-utils";
+import { getDomain, isSafeUrl } from "./resource-utils";
 
 interface VerdictConfig {
   icon: typeof CheckCircle2;
@@ -83,15 +83,6 @@ function getVerdictConfig(quote: CitationQuote): VerdictConfig | null {
     return VERIFIED_ONLY_CONFIG;
   }
   return null;
-}
-
-function isSafeUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
 }
 
 function formatDate(iso: string): string {
