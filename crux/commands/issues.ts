@@ -20,7 +20,8 @@ import { join, dirname } from 'path';
 import { createLogger, type Colors } from '../lib/output.ts';
 import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
-import { type CommandResult, parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
+import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
+import { parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
 import { listActiveAgents, registerAgent } from '../lib/wiki-server/active-agents.ts';
 import { getAgentSessionByBranch, updateAgentSession, PR_OUTCOMES, type PrOutcome } from '../lib/wiki-server/agent-sessions.ts';
 
@@ -84,7 +85,7 @@ interface RankedIssue {
   missingSections: string[]; // empty = well-formatted
 }
 
-interface CommandOptions {
+interface CommandOptions extends BaseOptions {
   ci?: boolean;
   json?: boolean;
   pr?: string;
@@ -98,7 +99,6 @@ interface CommandOptions {
   depends?: string;
   criteria?: string;
   cost?: string;
-  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------
@@ -718,7 +718,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   }
 
   // Rate limit: max DAILY_CREATE_LIMIT issues per day (prevents tracker flood)
-  if (!options['no-limit']) {
+  if (!options['no-limit'] && !options.noLimit) {
     const todayCount = getCreatestoday();
     if (todayCount >= DAILY_CREATE_LIMIT) {
       return {

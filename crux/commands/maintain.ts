@@ -18,7 +18,8 @@ import { execSync } from 'child_process';
 import { createLogger } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { githubApi, REPO } from '../lib/github.ts';
-import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
+import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
+import { parseIntOpt } from '../lib/cli.ts';
 import { listSessions } from '../lib/wiki-server/sessions.ts';
 
 // ---------------------------------------------------------------------------
@@ -61,12 +62,11 @@ interface CruftItem {
 
 type TriageCategory = 'potentially-resolved' | 'stale' | 'actionable' | 'keep';
 
-interface CommandOptions {
+interface CommandOptions extends BaseOptions {
   ci?: boolean;
   json?: boolean;
   since?: string;
   limit?: string;
-  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------

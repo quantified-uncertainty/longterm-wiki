@@ -9,7 +9,7 @@
  *   crux ids list [--limit=50] [--offset=0]          List all allocated IDs
  */
 
-import type { CommandResult } from '../lib/cli.ts';
+import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import {
   allocateId,
   getIdBySlug,
@@ -18,12 +18,11 @@ import {
 } from '../lib/wiki-server/ids.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 
-interface CommandOptions {
+interface CommandOptions extends BaseOptions {
   description?: string;
   limit?: string;
   offset?: string;
   ci?: boolean;
-  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------

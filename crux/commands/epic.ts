@@ -33,10 +33,8 @@ import { readFileSync } from 'fs';
 import { createLogger } from '../lib/output.ts';
 import { githubGraphQL, githubApi, REPO, getRepoNodeId } from '../lib/github.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
-import type { CommandResult } from '../lib/cli.ts';
+import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 import { parseRequiredInt } from '../lib/cli.ts';
-
-type CommandOptions = Record<string, unknown>;
 
 const [OWNER, REPO_NAME] = REPO.split('/');
 

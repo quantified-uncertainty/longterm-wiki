@@ -18,9 +18,7 @@ import { githubApi, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
 import { rebaseAllPrs } from '../lib/pr-rebase.ts';
 import { resolveAllConflicts } from '../lib/conflict-resolution.ts';
-import type { CommandResult } from '../lib/cli.ts';
-
-type CommandOptions = Record<string, unknown>;
+import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 
 // ── Test plan validation ─────────────────────────────────────────────────────
 

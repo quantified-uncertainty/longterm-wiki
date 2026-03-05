@@ -16,7 +16,8 @@ import { createLogger } from '../lib/output.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
-import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
+import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
+import { parseIntOpt } from '../lib/cli.ts';
 import { triagePhase, loadPages as loadPagesFromImprover, findPage as findPageFromImprover } from '../authoring/page-improver.ts';
 import type { TriageResult } from '../authoring/page-improver.ts';
 
@@ -53,7 +54,7 @@ interface CategoryStats {
   avgPriority: number;
 }
 
-interface CommandOptions {
+interface CommandOptions extends BaseOptions {
   ci?: boolean;
   json?: boolean;
   limit?: string;
@@ -63,7 +64,6 @@ interface CommandOptions {
   dryRun?: boolean;
   triage?: boolean;
   noTriage?: boolean;
-  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------

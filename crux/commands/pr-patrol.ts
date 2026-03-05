@@ -11,10 +11,8 @@
  *   crux pr-patrol status           Show recent patrol activity
  */
 
-import type { CommandResult } from '../lib/cli.ts';
+import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 import { buildConfig, runDaemon, readRecentLogs } from '../pr-patrol/index.ts';
-
-type CommandOptions = Record<string, unknown>;
 
 async function run(
   args: string[],
