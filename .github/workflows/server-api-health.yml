@@ -1,0 +1,56 @@
+name: Server & API Health
+
+# Checks wiki-server availability, DB record counts, and API smoke tests.
+# Runs twice daily — same schedule as the unified wellness check it replaced.
+#
+# Checks performed:
+#   - Server & DB sanity (counts in expected ranges, uptime)
+#   - API smoke tests (search, page fetch, entity list)
+#
+# Issues are created/updated/closed automatically under the "wellness" label.
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # 8 AM UTC daily
+    - cron: "0 20 * * *" # 8 PM UTC daily
+  workflow_dispatch:
+
+concurrency:
+  group: server-api-health
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    # Global circuit breaker — skip when automation is paused.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Automation is active"
+
+  check:
+    needs: [preflight]
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Server health
+        run: pnpm crux health check --check=server --report --auto-issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+      - name: API smoke tests
+        run: pnpm crux health check --check=api --report --auto-issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}

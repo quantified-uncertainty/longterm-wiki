@@ -5,8 +5,9 @@
  * - GET /current   — current value for entity+property (valid_end IS NULL)
  * - GET /by-page   — all statements for a page with citations and footnote links
  * - GET /by-page/summary — per-footnote verification summary for citation dots
- * - GET /properties — list all properties with statement counts
- * - GET /stats     — basic statistics
+ * - GET /properties       — list all properties with statement counts
+ * - POST /properties/upsert — batch upsert properties
+ * - GET /stats             — basic statistics
  * - GET /quality-summary — aggregate quality distribution + per-entity coverage scores
  * - PATCH /:id     — update statement status, verdict, or note
  * - POST /         — create statement + optional citations
@@ -21,6 +22,7 @@ import {
   count,
   desc,
   isNull,
+  isNotNull,
   sql,
 } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
@@ -30,6 +32,8 @@ import {
   statementPageReferences,
   properties,
   entityCoverageScores,
+  wikiPages,
+  resources,
 } from "../schema.js";
 import {
   parseJsonBody,
@@ -49,8 +53,8 @@ const MAX_PAGE_SIZE = 500;
 const ListQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
   offset: z.coerce.number().int().min(0).default(0),
-  entityId: z.string().max(200).optional(),
-  propertyId: z.string().max(200).optional(),
+  entityId: z.string().min(1).max(200).optional(),
+  propertyId: z.string().min(1).max(200).optional(),
   variety: z.enum(["structured", "attributed"]).optional(),
   status: z.enum(["active", "superseded", "retracted"]).optional(),
 });
@@ -129,26 +133,27 @@ function formatStatement(s: typeof statements.$inferSelect) {
 
 // Strict schema for quality dimensions — enforces exactly the 10 known keys
 // and rejects unknown ones. Using z.object().strict() means extra keys cause a
-// 400 error rather than being silently stored in the DB. Values must be in [0, 1].
+// 400 error rather than being silently stored in the DB. Values must be finite
+// numbers in [0, 1] — rejects NaN, Infinity, null, and out-of-range values.
 // Exported for unit testing.
 export const QualityDimensionsSchema = z.object({
-  structure:          z.number().min(0).max(1),
-  precision:          z.number().min(0).max(1),
-  clarity:            z.number().min(0).max(1),
-  resolvability:      z.number().min(0).max(1),
-  uniqueness:         z.number().min(0).max(1),
-  atomicity:          z.number().min(0).max(1),
-  importance:         z.number().min(0).max(1),
-  neglectedness:      z.number().min(0).max(1),
-  recency:            z.number().min(0).max(1),
-  crossEntityUtility: z.number().min(0).max(1),
+  structure:          z.number().min(0).max(1).finite(),
+  precision:          z.number().min(0).max(1).finite(),
+  clarity:            z.number().min(0).max(1).finite(),
+  resolvability:      z.number().min(0).max(1).finite(),
+  uniqueness:         z.number().min(0).max(1).finite(),
+  atomicity:          z.number().min(0).max(1).finite(),
+  importance:         z.number().min(0).max(1).finite(),
+  neglectedness:      z.number().min(0).max(1).finite(),
+  recency:            z.number().min(0).max(1).finite(),
+  crossEntityUtility: z.number().min(0).max(1).finite(),
 }).strict();
 
 // Exported for unit testing.
 export const BatchScoreBody = z.object({
   scores: z.array(z.object({
     statementId: z.number().int().positive(),
-    qualityScore: z.number().min(0).max(1),
+    qualityScore: z.number().min(0).max(1).finite(),
     qualityDimensions: QualityDimensionsSchema,
   })).min(1).max(500),
 });
@@ -156,12 +161,12 @@ export const BatchScoreBody = z.object({
 // Exported for unit testing.
 export const CoverageScoreBody = z.object({
   entityId: z.string().min(1).max(200),
-  coverageScore: z.number().min(0).max(1),
+  coverageScore: z.number().min(0).max(1).finite(),
   // Category keys are dynamic (derived from property.category at runtime),
-  // so we can't enumerate them statically. We do enforce values are in [0, 1].
-  categoryScores: z.record(z.number().min(0).max(1)),
+  // so we can't enumerate them statically. We do enforce values are finite and in [0, 1].
+  categoryScores: z.record(z.number().min(0).max(1).finite()),
   statementCount: z.number().int().min(0),
-  qualityAvg: z.number().min(0).max(1).nullish(),
+  qualityAvg: z.number().min(0).max(1).finite().nullish(),
 });
 
 const CoverageScoreQuery = z.object({
@@ -169,43 +174,46 @@ const CoverageScoreQuery = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-const PatchStatementBody = z.object({
+// Exported for unit testing.
+export const PatchStatementBody = z.object({
   status: z.enum(["active", "superseded", "retracted"]).optional(),
   variety: z.enum(["structured", "attributed"]).optional(),
   statementText: z.string().min(1).max(2000).optional(),
-  validStart: z.string().max(20).nullish(),
-  validEnd: z.string().max(20).nullish(),
-  attributedTo: z.string().max(200).nullish(),
-  archiveReason: z.string().max(2000).nullish(),
-  verdict: z.string().max(50).nullish(),
-  verdictScore: z.number().min(0).max(1).nullish(),
-  verdictQuotes: z.string().max(10000).nullish(),
-  verdictModel: z.string().max(200).nullish(),
-  note: z.string().max(2000).nullish(),
+  propertyId: z.string().min(1).max(200).nullish(),
+  validStart: z.string().min(1).max(20).nullish(),
+  validEnd: z.string().min(1).max(20).nullish(),
+  attributedTo: z.string().min(1).max(200).nullish(),
+  archiveReason: z.string().min(1).max(2000).nullish(),
+  verdict: z.string().min(1).max(50).nullish(),
+  verdictScore: z.number().min(0).max(1).finite().nullish(),
+  verdictQuotes: z.string().min(1).max(10000).nullish(),
+  verdictModel: z.string().min(1).max(200).nullish(),
+  note: z.string().min(1).max(2000).nullish(),
 });
 
-const CreateStatementBody = z.object({
+// Exported for unit testing.
+export const CreateStatementBody = z.object({
   variety: z.enum(["structured", "attributed"]),
   statementText: z.string().min(1).max(2000), // Required: every statement needs human-readable text
   subjectEntityId: z.string().min(1).max(200),
-  propertyId: z.string().max(200).nullish(),
-  qualifierKey: z.string().max(200).nullish(),
-  valueNumeric: z.number().nullish(),
-  valueUnit: z.string().max(100).nullish(),
-  valueText: z.string().max(2000).nullish(),
-  valueEntityId: z.string().max(200).nullish(),
-  valueDate: z.string().max(20).nullish(),
+  propertyId: z.string().min(1).max(200).nullish(),
+  qualifierKey: z.string().min(1).max(200).nullish(),
+  valueNumeric: z.number().finite().nullish(),
+  valueUnit: z.string().min(1).max(100).nullish(),
+  valueText: z.string().min(1).max(2000).nullish(),
+  valueEntityId: z.string().min(1).max(200).nullish(),
+  valueDate: z.string().min(1).max(20).nullish(),
   valueSeries: z.record(z.unknown()).nullish(),
-  validStart: z.string().max(20).nullish(),
-  validEnd: z.string().max(20).nullish(),
-  temporalGranularity: z.string().max(20).nullish(),
-  attributedTo: z.string().max(200).nullish(),
-  note: z.string().max(2000).nullish(),
-  sourceFactKey: z.string().max(200).nullish(),
-  claimCategory: z.string().max(50).nullish(),
-  verdict: z.string().max(50).nullish(),
-  verdictScore: z.number().min(0).max(1).nullish(),
-  verdictModel: z.string().max(200).nullish(),
+  validStart: z.string().min(1).max(20).nullish(),
+  validEnd: z.string().min(1).max(20).nullish(),
+  temporalGranularity: z.string().min(1).max(20).nullish(),
+  attributedTo: z.string().min(1).max(200).nullish(),
+  note: z.string().min(1).max(2000).nullish(),
+  sourceFactKey: z.string().min(1).max(200).nullish(),
+  claimCategory: z.string().min(1).max(50).nullish(),
+  verdict: z.string().min(1).max(50).nullish(),
+  verdictScore: z.number().min(0).max(1).finite().nullish(),
+  verdictModel: z.string().min(1).max(200).nullish(),
   citations: z
     .array(
       z.object({
@@ -609,6 +617,76 @@ const statementsApp = new Hono()
     });
   })
 
+  // ---- POST /properties/upsert — batch upsert properties ----
+  .post("/properties/upsert", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const schema = z.object({
+      properties: z.array(
+        z.object({
+          id: z.string().min(1),
+          label: z.string().min(1),
+          category: z.string().min(1),
+          description: z.string().nullable().optional(),
+          entityTypes: z.array(z.string()).default(["organization"]),
+          valueType: z.enum(["number", "string", "entity", "date"]).default("string"),
+          defaultUnit: z.string().nullable().optional(),
+          stalenessCadence: z.string().nullable().optional(),
+          unitFormatId: z.string().nullable().optional(),
+        })
+      ).min(1).max(100),
+    });
+
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const db = getDrizzleDb();
+    let created = 0;
+    let updated = 0;
+
+    for (const prop of parsed.data.properties) {
+      const existing = await db
+        .select({ id: properties.id })
+        .from(properties)
+        .where(eq(properties.id, prop.id))
+        .limit(1);
+
+      if (existing.length > 0) {
+        await db
+          .update(properties)
+          .set({
+            label: prop.label,
+            category: prop.category,
+            description: prop.description ?? null,
+            entityTypes: prop.entityTypes,
+            valueType: prop.valueType,
+            defaultUnit: prop.defaultUnit ?? null,
+            stalenessCadence: prop.stalenessCadence ?? null,
+            unitFormatId: prop.unitFormatId ?? null,
+            updatedAt: new Date(),
+          })
+          .where(eq(properties.id, prop.id));
+        updated++;
+      } else {
+        await db.insert(properties).values({
+          id: prop.id,
+          label: prop.label,
+          category: prop.category,
+          description: prop.description ?? null,
+          entityTypes: prop.entityTypes,
+          valueType: prop.valueType,
+          defaultUnit: prop.defaultUnit ?? null,
+          stalenessCadence: prop.stalenessCadence ?? null,
+          unitFormatId: prop.unitFormatId ?? null,
+        });
+        created++;
+      }
+    }
+
+    return c.json({ created, updated });
+  })
+
   // ---- GET /quality-summary — aggregate quality scores and entity coverage ----
   .get("/quality-summary", async (c) => {
     const db = getDrizzleDb();
@@ -721,6 +799,73 @@ const statementsApp = new Hono()
     });
   })
 
+  // ---- GET /coverage-scores — coverage score history for an entity ----
+  // NOTE: Must be defined BEFORE /:id to prevent wildcard from matching "coverage-scores"
+  .get("/coverage-scores", zv("query", CoverageScoreQuery), async (c) => {
+    const { entityId, limit } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(entityCoverageScores)
+      .where(eq(entityCoverageScores.entityId, entityId))
+      .orderBy(desc(entityCoverageScores.scoredAt))
+      .limit(limit);
+
+    return c.json({
+      scores: rows.map((r) => ({
+        id: r.id,
+        entityId: r.entityId,
+        coverageScore: r.coverageScore,
+        categoryScores: r.categoryScores,
+        statementCount: r.statementCount,
+        qualityAvg: r.qualityAvg,
+        scoredAt: r.scoredAt,
+      })),
+    });
+  })
+
+  // ---- GET /coverage-scores/all — latest coverage score for every entity ----
+  // NOTE: Must be defined BEFORE /:id to prevent wildcard from matching
+  .get("/coverage-scores/all", async (c) => {
+    const db = getDrizzleDb();
+
+    const latestIds = db
+      .select({
+        maxId: sql<number>`MAX(${entityCoverageScores.id})`.as("max_id"),
+      })
+      .from(entityCoverageScores)
+      .groupBy(entityCoverageScores.entityId)
+      .as("latest");
+
+    const rows = await db
+      .select({
+        id: entityCoverageScores.id,
+        entityId: entityCoverageScores.entityId,
+        coverageScore: entityCoverageScores.coverageScore,
+        categoryScores: entityCoverageScores.categoryScores,
+        statementCount: entityCoverageScores.statementCount,
+        qualityAvg: entityCoverageScores.qualityAvg,
+        scoredAt: entityCoverageScores.scoredAt,
+      })
+      .from(entityCoverageScores)
+      .innerJoin(latestIds, eq(entityCoverageScores.id, latestIds.maxId))
+      .orderBy(desc(entityCoverageScores.coverageScore));
+
+    return c.json({
+      scores: rows.map((r) => ({
+        id: r.id,
+        entityId: r.entityId,
+        coverageScore: r.coverageScore,
+        categoryScores: r.categoryScores,
+        statementCount: r.statementCount,
+        qualityAvg: r.qualityAvg,
+        scoredAt: r.scoredAt,
+      })),
+      total: rows.length,
+    });
+  })
+
   // ---- GET /:id — fetch a single statement with citations and property ----
   .get("/:id", async (c) => {
     const idParam = c.req.param("id");
@@ -815,6 +960,7 @@ const statementsApp = new Hono()
         ...(data.status !== undefined && { status: data.status }),
         ...(data.variety !== undefined && { variety: data.variety }),
         ...(data.statementText !== undefined && { statementText: data.statementText }),
+        ...(data.propertyId !== undefined && { propertyId: data.propertyId ?? null }),
         ...(data.validStart !== undefined && { validStart: data.validStart ?? null }),
         ...(data.validEnd !== undefined && { validEnd: data.validEnd ?? null }),
         ...(data.attributedTo !== undefined && { attributedTo: data.attributedTo ?? null }),
@@ -1084,72 +1230,6 @@ const statementsApp = new Hono()
     return c.json({ id: row.id, ok: true }, 201);
   })
 
-  // ---- GET /coverage-scores — coverage score history for an entity ----
-  .get("/coverage-scores", zv("query", CoverageScoreQuery), async (c) => {
-    const { entityId, limit } = c.req.valid("query");
-    const db = getDrizzleDb();
-
-    const rows = await db
-      .select()
-      .from(entityCoverageScores)
-      .where(eq(entityCoverageScores.entityId, entityId))
-      .orderBy(desc(entityCoverageScores.scoredAt))
-      .limit(limit);
-
-    return c.json({
-      scores: rows.map((r) => ({
-        id: r.id,
-        entityId: r.entityId,
-        coverageScore: r.coverageScore,
-        categoryScores: r.categoryScores,
-        statementCount: r.statementCount,
-        qualityAvg: r.qualityAvg,
-        scoredAt: r.scoredAt,
-      })),
-    });
-  })
-
-  // ---- GET /coverage-scores/all — latest coverage score for every entity ----
-  .get("/coverage-scores/all", async (c) => {
-    const db = getDrizzleDb();
-
-    // Use a subquery to get the latest score per entity (MAX id = most recent)
-    const latestIds = db
-      .select({
-        maxId: sql<number>`MAX(${entityCoverageScores.id})`.as("max_id"),
-      })
-      .from(entityCoverageScores)
-      .groupBy(entityCoverageScores.entityId)
-      .as("latest");
-
-    const rows = await db
-      .select({
-        id: entityCoverageScores.id,
-        entityId: entityCoverageScores.entityId,
-        coverageScore: entityCoverageScores.coverageScore,
-        categoryScores: entityCoverageScores.categoryScores,
-        statementCount: entityCoverageScores.statementCount,
-        qualityAvg: entityCoverageScores.qualityAvg,
-        scoredAt: entityCoverageScores.scoredAt,
-      })
-      .from(entityCoverageScores)
-      .innerJoin(latestIds, eq(entityCoverageScores.id, latestIds.maxId))
-      .orderBy(desc(entityCoverageScores.coverageScore));
-
-    return c.json({
-      scores: rows.map((r) => ({
-        id: r.id,
-        entityId: r.entityId,
-        coverageScore: r.coverageScore,
-        categoryScores: r.categoryScores,
-        statementCount: r.statementCount,
-        qualityAvg: r.qualityAvg,
-        scoredAt: r.scoredAt,
-      })),
-      total: rows.length,
-    });
-  })
-
   // ---- GET /scores/distribution — quality score distribution for statements ----
   .get("/scores/distribution", async (c) => {
     const db = getDrizzleDb();
@@ -1355,6 +1435,113 @@ const statementsApp = new Hono()
     });
 
     return c.json({ deleted: deleted.length, ok: true });
+  })
+
+  // ---- GET /citation-dots/all — build-time bundle for citation dot overlays ----
+  /**
+   * Returns all statement-backed citation dot data grouped by page slug.
+   * Called once at build time by buildStatementCitationDots() in build-data.mjs.
+   * Joins statementPageReferences → statements → statementCitations (primary) →
+   * wikiPages → resources to produce the minimal data the CitationOverlay needs.
+   *
+   * Only includes rows where:
+   *  - footnoteResourceId IS NOT NULL (statement appears as a footnote on the page)
+   *  - statement.status = 'active'
+   */
+  .get("/citation-dots/all", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        pageSlug: wikiPages.slug,
+        footnoteResourceId: statementPageReferences.footnoteResourceId,
+        statementText: statements.statementText,
+        verdict: statements.verdict,
+        verdictScore: statements.verdictScore,
+        verdictQuotes: statements.verdictQuotes,
+        verifiedAt: statements.verifiedAt,
+        citUrl: statementCitations.url,
+        citResourceId: statementCitations.resourceId,
+        citSourceQuote: statementCitations.sourceQuote,
+        resourceTitle: resources.title,
+        resourceUrl: resources.url,
+        resourceType: resources.type,
+      })
+      .from(statementPageReferences)
+      .innerJoin(statements, eq(statementPageReferences.statementId, statements.id))
+      .innerJoin(wikiPages, eq(statementPageReferences.pageIdInt, wikiPages.integerIdCol))
+      .leftJoin(
+        statementCitations,
+        and(
+          eq(statementCitations.statementId, statements.id),
+          eq(statementCitations.isPrimary, true)
+        )
+      )
+      .leftJoin(resources, eq(statementCitations.resourceId, resources.id))
+      .where(
+        and(
+          isNotNull(statementPageReferences.footnoteResourceId),
+          eq(statements.status, "active")
+        )
+      );
+
+    // Map statement verdicts to legacy AccuracyVerdict values expected by CitationOverlay
+    function verdictToAccuracy(verdict: string | null): string | null {
+      if (!verdict) return null;
+      switch (verdict) {
+        case "verified": return "accurate";
+        case "disputed": return "inaccurate";
+        case "unsupported": return "unsupported";
+        case "unverified": return "not_verifiable";
+        default: return null;
+      }
+    }
+
+    // Group by page slug
+    const pages: Record<string, Array<{
+      footnoteResourceId: string;
+      claimText: string;
+      url: string | null;
+      resourceId: string | null;
+      sourceQuote: string | null;
+      sourceTitle: string | null;
+      sourceType: string | null;
+      quoteVerified: boolean;
+      accuracyVerdict: string | null;
+      accuracyScore: number | null;
+      accuracyIssues: string | null;
+      accuracyCheckedAt: string | null;
+    }>> = {};
+
+    for (const row of rows) {
+      if (!row.pageSlug || !row.footnoteResourceId) continue;
+
+      const accuracyVerdict = verdictToAccuracy(row.verdict);
+      // Only include rows that have something to show (verified or has verdict)
+      const quoteVerified = row.verdict === "verified";
+      if (!quoteVerified && !accuracyVerdict) continue;
+
+      if (!pages[row.pageSlug]) pages[row.pageSlug] = [];
+      pages[row.pageSlug].push({
+        footnoteResourceId: row.footnoteResourceId,
+        claimText: row.statementText ?? "",
+        url: row.citUrl ?? row.resourceUrl ?? null,
+        resourceId: row.citResourceId ?? null,
+        sourceQuote: row.citSourceQuote ?? null,
+        sourceTitle: row.resourceTitle ?? null,
+        sourceType: row.resourceType ?? null,
+        quoteVerified,
+        accuracyVerdict,
+        accuracyScore: row.verdictScore ?? null,
+        accuracyIssues: null,
+        accuracyCheckedAt: row.verifiedAt ? row.verifiedAt.toISOString() : null,
+      });
+    }
+
+    const totalPages = Object.keys(pages).length;
+    const totalEntries = Object.values(pages).reduce((sum, arr) => sum + arr.length, 0);
+
+    return c.json({ pages, totalPages, totalEntries });
   });
 
 export const statementsRoute = statementsApp;

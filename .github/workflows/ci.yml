@@ -18,6 +18,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Block PRs to production from non-main branches
+        if: github.event_name == 'pull_request' && github.base_ref == 'production'
+        run: |
+          if [[ "${{ github.head_ref }}" != "main" ]]; then
+            echo "::error::PRs to production must come from 'main'. Got: '${{ github.head_ref }}'"
+            echo "Merge your changes to main first, then the release workflow will open a PR from main → production."
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4

@@ -3,6 +3,7 @@ import {
   withApiFallback,
   type FetchResult,
 } from "@lib/wiki-server";
+import { fetchAllPaginated } from "@lib/fetch-paginated";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { StatCard } from "@components/internal/StatCard";
 import { StatementsTable } from "./statements-table";
@@ -73,10 +74,12 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
     fetchDetailed<StatsResponse>("/api/statements/stats", {
       revalidate: 300,
     }),
-    fetchDetailed<{
-      statements: (StatementRow & { citationCount?: number })[];
-      total: number;
-    }>("/api/statements?limit=500", { revalidate: 300 }),
+    fetchAllPaginated<StatementRow & { citationCount?: number }>({
+      path: "/api/statements",
+      itemsKey: "statements",
+      pageSize: 500,
+      revalidate: 300,
+    }),
     fetchDetailed<{
       properties: PropertyRow[];
     }>("/api/statements/properties", { revalidate: 300 }),
@@ -87,7 +90,7 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
   if (!propertiesResult.ok) return propertiesResult;
 
   // The list endpoint now includes citationCount — set empty citations array for the table
-  const stmts: StatementRow[] = statementsResult.data.statements.map((s) => ({
+  const stmts: StatementRow[] = statementsResult.data.items.map((s) => ({
     ...s,
     citations: [],
   }));

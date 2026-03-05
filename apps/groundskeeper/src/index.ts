@@ -4,9 +4,10 @@ import { registerTask, setGroundskeeperAgentId } from "./scheduler.js";
 import { sendDiscordNotification } from "./notify.js";
 import { healthCheck } from "./tasks/health-check.js";
 import { registerAsActiveAgent, sendHeartbeat } from "./wiki-server.js";
-import { issueResponder } from "./tasks/issue-responder.js";
+// import { issueResponder } from "./tasks/issue-responder.js"; // disabled
 import { githubShadowbanCheck } from "./tasks/github-shadowban-check.js";
 import { snapshotRetention } from "./tasks/snapshot-retention.js";
+import { sessionSweep } from "./tasks/session-sweep.js";
 import { logger } from "./logger.js";
 
 const config = loadConfig();
@@ -20,7 +21,7 @@ logger.info({
       schedule: config.tasks.healthCheck.schedule,
     },
     issueResponder: {
-      enabled: config.tasks.issueResponder.enabled,
+      enabled: false, // hard-disabled in code
       schedule: config.tasks.issueResponder.schedule,
     },
     githubShadowbanCheck: {
@@ -32,6 +33,10 @@ logger.info({
       enabled: config.tasks.snapshotRetention.enabled,
       schedule: config.tasks.snapshotRetention.schedule,
       keep: config.tasks.snapshotRetention.keep,
+    },
+    sessionSweep: {
+      enabled: config.tasks.sessionSweep.enabled,
+      schedule: config.tasks.sessionSweep.schedule,
     },
   },
 }, "Groundskeeper starting");
@@ -45,13 +50,16 @@ registerTask(
   () => healthCheck(config)
 );
 
-registerTask(
-  config,
-  "issue-responder",
-  config.tasks.issueResponder.schedule,
-  config.tasks.issueResponder.enabled,
-  () => issueResponder(config)
-);
+// Issue responder disabled — was broken and repeatedly failing on issues.
+// See: https://github.com/quantified-uncertainty/longterm-wiki/issues/TBD
+// To re-enable, uncomment and fix the underlying issue-responder task.
+// registerTask(
+//   config,
+//   "issue-responder",
+//   config.tasks.issueResponder.schedule,
+//   config.tasks.issueResponder.enabled,
+//   () => issueResponder(config)
+// );
 
 registerTask(
   config,
@@ -67,6 +75,14 @@ registerTask(
   config.tasks.snapshotRetention.schedule,
   config.tasks.snapshotRetention.enabled,
   () => snapshotRetention(config)
+);
+
+registerTask(
+  config,
+  "session-sweep",
+  config.tasks.sessionSweep.schedule,
+  config.tasks.sessionSweep.enabled,
+  () => sessionSweep(config)
 );
 
 // Register as an active agent (best-effort)

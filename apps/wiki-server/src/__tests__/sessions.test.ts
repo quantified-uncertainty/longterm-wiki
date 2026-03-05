@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { postJson } from "./test-utils.js";
+import { parseCostCents, parseDurationMinutes } from "../routes/sessions.js";
 
 // ---- In-memory stores simulating the sessions + session_pages tables ----
 
@@ -14,11 +15,14 @@ let sessionStore: Array<{
   model: string | null;
   duration: string | null;
   cost: string | null;
+  cost_cents: number | null;
+  duration_minutes: number | null;
   pr_url: string | null;
   checks_yaml: string | null;
   issues_json: unknown;
   learnings_json: unknown;
   recommendations_json: unknown;
+  reviewed: boolean | null;
   created_at: Date;
 }> = [];
 
@@ -159,11 +163,14 @@ vi.mock("../db.js", async () => {
         model: params[4] as string | null,
         duration: params[5] as string | null,
         cost: params[6] as string | null,
-        pr_url: params[7] as string | null,
-        checks_yaml: params[8] as string | null,
-        issues_json: params[9] ?? null,
-        learnings_json: params[10] ?? null,
-        recommendations_json: params[11] ?? null,
+        cost_cents: params[7] as number | null,
+        duration_minutes: params[8] as number | null,
+        pr_url: params[9] as string | null,
+        checks_yaml: params[10] as string | null,
+        issues_json: params[11] ?? null,
+        learnings_json: params[12] ?? null,
+        recommendations_json: params[13] ?? null,
+        reviewed: params[14] as boolean | null,
       };
 
       // Check for conflict on (date, title)
@@ -179,11 +186,14 @@ vi.mock("../db.js", async () => {
           model: incoming.model,
           duration: incoming.duration,
           cost: incoming.cost,
+          cost_cents: incoming.cost_cents,
+          duration_minutes: incoming.duration_minutes,
           pr_url: incoming.pr_url,
           checks_yaml: incoming.checks_yaml,
           issues_json: incoming.issues_json,
           learnings_json: incoming.learnings_json,
           recommendations_json: incoming.recommendations_json,
+          reviewed: incoming.reviewed,
         });
         return [existing];
       }
@@ -661,6 +671,105 @@ describe("Sessions API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.sessions).toHaveLength(0);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Parser unit tests
+  // ---------------------------------------------------------------------------
+
+  describe("parseCostCents", () => {
+    it("parses simple dollar amounts", () => {
+      expect(parseCostCents("$1.23")).toBe(123);
+      expect(parseCostCents("$0.50")).toBe(50);
+      expect(parseCostCents("$10")).toBe(1000);
+    });
+
+    it("parses tilde-prefixed amounts", () => {
+      expect(parseCostCents("~$0.50")).toBe(50);
+      expect(parseCostCents("~$5.00")).toBe(500);
+    });
+
+    it("returns null for non-parseable strings", () => {
+      expect(parseCostCents("free")).toBeNull();
+      expect(parseCostCents("1.23")).toBeNull();
+      expect(parseCostCents("")).toBeNull();
+    });
+
+    it("returns null for null/undefined", () => {
+      expect(parseCostCents(null)).toBeNull();
+      expect(parseCostCents(undefined)).toBeNull();
+    });
+  });
+
+  describe("parseDurationMinutes", () => {
+    it("parses minute strings", () => {
+      expect(parseDurationMinutes("30 minutes")).toBe(30);
+      expect(parseDurationMinutes("30min")).toBe(30);
+      expect(parseDurationMinutes("~20 minutes")).toBe(20);
+    });
+
+    it("parses hour strings", () => {
+      expect(parseDurationMinutes("1 hour")).toBe(60);
+      expect(parseDurationMinutes("1.5 hours")).toBe(90);
+      expect(parseDurationMinutes("2h")).toBe(120);
+    });
+
+    it("parses combined hours and minutes", () => {
+      expect(parseDurationMinutes("1h 15m")).toBe(75);
+      expect(parseDurationMinutes("1 hour 30 minutes")).toBe(90);
+    });
+
+    it("returns null for non-parseable strings", () => {
+      expect(parseDurationMinutes("a long time")).toBeNull();
+      expect(parseDurationMinutes("")).toBeNull();
+    });
+
+    it("returns null for null/undefined", () => {
+      expect(parseDurationMinutes(null)).toBeNull();
+      expect(parseDurationMinutes(undefined)).toBeNull();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Auto-parsing integration tests
+  // ---------------------------------------------------------------------------
+
+  describe("Auto-parsing of cost and duration", () => {
+    it("auto-parses costCents from cost string", async () => {
+      const res = await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        title: "Session with cost",
+        cost: "~$2.50",
+        pages: [],
+      });
+      expect(res.status).toBe(201);
+      const stored = sessionStore.find((s) => s.title === "Session with cost");
+      expect(stored?.cost_cents).toBe(250);
+    });
+
+    it("auto-parses durationMinutes from duration string", async () => {
+      const res = await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        title: "Session with duration",
+        duration: "~45 minutes",
+        pages: [],
+      });
+      expect(res.status).toBe(201);
+      const stored = sessionStore.find((s) => s.title === "Session with duration");
+      expect(stored?.duration_minutes).toBe(45);
+    });
+
+    it("stores null costCents when cost string has no dollar amount", async () => {
+      const res = await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        title: "Session free",
+        cost: "free",
+        pages: [],
+      });
+      expect(res.status).toBe(201);
+      const stored = sessionStore.find((s) => s.title === "Session free");
+      expect(stored?.cost_cents).toBeNull();
     });
   });
 

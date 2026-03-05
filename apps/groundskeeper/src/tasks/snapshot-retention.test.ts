@@ -29,6 +29,7 @@ function makeConfig(keep = 100): Config {
       issueResponder: { enabled: false, schedule: "*/10 * * * *" },
       githubShadowbanCheck: { enabled: false, schedule: "0 9 * * *", usernames: [] },
       snapshotRetention: { enabled: true, schedule: "0 3 * * *", keep },
+      sessionSweep: { enabled: false, schedule: "0 */4 * * *" },
     },
   };
 }
@@ -38,12 +39,16 @@ describe("snapshotRetention", () => {
 
   beforeEach(() => {
     config = makeConfig();
-    process.env["WIKI_SERVER_API_KEY"] = "test-key";
+    // Use LONGTERMWIKI_CONTENT_KEY — the content-scoped key required for
+    // cleanup endpoints (DELETE /api/hallucination-risk/cleanup and
+    // DELETE /api/citations/accuracy-snapshots/cleanup).
+    process.env["LONGTERMWIKI_CONTENT_KEY"] = "test-content-key";
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-    delete process.env["WIKI_SERVER_API_KEY"];
+    delete process.env["LONGTERMWIKI_CONTENT_KEY"];
+    delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
   });
 
   it("returns success when both cleanups succeed", async () => {
@@ -102,13 +107,37 @@ describe("snapshotRetention", () => {
     expect(result.summary).toContain("citation_accuracy: FAILED");
   });
 
-  it("returns failure when API key is not set", async () => {
-    delete process.env["WIKI_SERVER_API_KEY"];
+  it("returns failure when no API key is set", async () => {
+    // Clear both content key and legacy superkey — neither is available
+    delete process.env["LONGTERMWIKI_CONTENT_KEY"];
+    delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
 
     const result = await snapshotRetention(config);
 
     expect(result.success).toBe(false);
     expect(result.summary).toContain("FAILED");
+  });
+
+  it("uses LONGTERMWIKI_SERVER_API_KEY as fallback when content key is absent", async () => {
+    delete process.env["LONGTERMWIKI_CONTENT_KEY"];
+    process.env["LONGTERMWIKI_SERVER_API_KEY"] = "legacy-superkey";
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ deleted: 5, keep: 100 }),
+      })
+    );
+
+    const result = await snapshotRetention(config);
+
+    expect(result.success).toBe(true);
+    // Verify the legacy Bearer token was sent
+    const calls = vi.mocked(fetch).mock.calls;
+    expect((calls[0][1] as RequestInit).headers).toMatchObject({
+      Authorization: "Bearer legacy-superkey",
+    });
   });
 
   it("still runs second cleanup when first throws", async () => {

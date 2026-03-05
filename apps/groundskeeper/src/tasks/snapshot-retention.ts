@@ -11,6 +11,14 @@ interface CleanupResult {
 /**
  * Call the wiki-server cleanup endpoint for a snapshot table.
  * Returns the number of rows deleted, or null on failure.
+ *
+ * The cleanup endpoints (/api/hallucination-risk/cleanup and
+ * /api/citations/accuracy-snapshots/cleanup) require `content` scope.
+ * Use LONGTERMWIKI_CONTENT_KEY for the content-scoped key, or fall back
+ * to LONGTERMWIKI_SERVER_API_KEY (legacy superkey that grants all scopes).
+ *
+ * Do NOT use WIKI_SERVER_API_KEY here — that key has `project` scope only
+ * and will be rejected with 403 on content-scope DELETE endpoints.
  */
 async function callCleanupEndpoint(
   config: Config,
@@ -18,10 +26,18 @@ async function callCleanupEndpoint(
   keep: number,
 ): Promise<CleanupResult | null> {
   const url = `${config.wikiServerUrl}${path}?keep=${keep}`;
-  const apiKey = process.env["WIKI_SERVER_API_KEY"];
+  // Use content-scoped key for cleanup endpoints (require `content` scope).
+  // Fall back to legacy superkey which grants all scopes.
+  const apiKey =
+    process.env["LONGTERMWIKI_CONTENT_KEY"] ??
+    process.env["LONGTERMWIKI_SERVER_API_KEY"];
 
   if (!apiKey) {
-    logger.warn("WIKI_SERVER_API_KEY not set, skipping cleanup");
+    logger.warn(
+      "Neither LONGTERMWIKI_CONTENT_KEY nor LONGTERMWIKI_SERVER_API_KEY is set — skipping cleanup. " +
+        "Set LONGTERMWIKI_CONTENT_KEY (content-scoped) or LONGTERMWIKI_SERVER_API_KEY (legacy superkey) " +
+        "in the groundskeeper environment.",
+    );
     return null;
   }
 

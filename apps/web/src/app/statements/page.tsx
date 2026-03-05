@@ -5,6 +5,7 @@ import {
   withApiFallback,
   type FetchResult,
 } from "@lib/wiki-server";
+import { fetchAllPaginated } from "@lib/fetch-paginated";
 import { StatCard } from "@components/internal/StatCard";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { getEntityById } from "@data";
@@ -56,44 +57,19 @@ interface OverviewData {
 }
 
 /**
- * Paginate through all statements from the API (max page size 500).
+ * Paginate through all statements from the API using the shared helper.
  */
 async function fetchAllStatementsDetailed(): Promise<
   FetchResult<{ statements: StatementSummary[]; total: number }>
 > {
-  const PAGE_SIZE = 500;
-  const all: StatementSummary[] = [];
-  let offset = 0;
-  let total = 0;
-
-  // Fetch first page
-  const first = await fetchDetailed<{ statements: StatementSummary[]; total: number }>(
-    `/api/statements?limit=${PAGE_SIZE}&offset=0`,
-    { revalidate: 300 }
-  );
-  if (!first.ok) return first;
-  total = first.data.total;
-  all.push(...first.data.statements);
-  offset += PAGE_SIZE;
-
-  // Fetch remaining pages in parallel
-  const remaining: Promise<FetchResult<{ statements: StatementSummary[]; total: number }>>[] = [];
-  while (offset < total) {
-    remaining.push(
-      fetchDetailed<{ statements: StatementSummary[]; total: number }>(
-        `/api/statements?limit=${PAGE_SIZE}&offset=${offset}`,
-        { revalidate: 300 }
-      )
-    );
-    offset += PAGE_SIZE;
-  }
-
-  const pages = await Promise.all(remaining);
-  for (const page of pages) {
-    if (page.ok) all.push(...page.data.statements);
-  }
-
-  return { ok: true, data: { statements: all, total } };
+  const result = await fetchAllPaginated<StatementSummary>({
+    path: "/api/statements",
+    itemsKey: "statements",
+    pageSize: 500,
+    revalidate: 300,
+  });
+  if (!result.ok) return result;
+  return { ok: true, data: { statements: result.data.items, total: result.data.total } };
 }
 
 async function loadFromApi(): Promise<FetchResult<OverviewData>> {

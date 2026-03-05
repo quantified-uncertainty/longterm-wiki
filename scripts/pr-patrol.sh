@@ -19,6 +19,7 @@ set -euo pipefail
 #   PR_PATROL_MODEL        Claude model to use (default: sonnet)
 #   PR_PATROL_REPO         GitHub repo (default: quantified-uncertainty/longterm-wiki)
 #   PR_PATROL_SKIP_PERMS   Set to "1" to add --dangerously-skip-permissions
+#   PR_PATROL_REFLECTION_INTERVAL  Reflect every N cycles (default: 10)
 
 REPO="${PR_PATROL_REPO:-quantified-uncertainty/longterm-wiki}"
 INTERVAL="${PR_PATROL_INTERVAL:-300}"
@@ -30,6 +31,18 @@ SKIP_PERMS="${PR_PATROL_SKIP_PERMS:-0}"
 
 STATE_DIR="/tmp/pr-patrol-shared"
 LOG_FILE="${STATE_DIR}/patrol.log"
+CACHE_DIR="$HOME/.cache/pr-patrol"
+JSONL_FILE="${CACHE_DIR}/runs.jsonl"
+REFLECTION_FILE="${CACHE_DIR}/reflections.jsonl"
+CYCLE_COUNT=0
+REFLECTION_INTERVAL="${PR_PATROL_REFLECTION_INTERVAL:-10}"
+
+# Must be a positive integer (prevents modulo arithmetic errors in the reflection loop)
+if ! [[ "$REFLECTION_INTERVAL" =~ ^[1-9][0-9]*$ ]]; then
+  echo "ERROR: PR_PATROL_REFLECTION_INTERVAL must be a positive integer (got: $REFLECTION_INTERVAL)" >&2
+  exit 1
+fi
+
 ONCE=false
 DRY_RUN=false
 
@@ -64,7 +77,7 @@ for arg in "$@"; do
   esac
 done
 
-mkdir -p "$STATE_DIR"
+mkdir -p "$STATE_DIR" "$CACHE_DIR"
 
 # ─── Logging ───────────────────────────────────────────────────────────
 
@@ -79,6 +92,65 @@ log_header() {
   log "═══════════════════════════════════════════════════════"
   log "$1"
   log "═══════════════════════════════════════════════════════"
+}
+
+# ─── Structured JSONL logging ────────────────────────────────────────
+
+log_pr_result() {
+  local pr_num=$1
+  local title=$2
+  local branch=$3
+  local issues_csv=$4   # comma-separated: "conflict,ci-failure"
+  local result=$5       # fixed | max-turns | error | dry-run
+  local elapsed_s=$6
+  local reason=${7:-}
+
+  local issues_json
+  issues_json=$(echo "$issues_csv" | jq -R 'split(",") | map(select(length > 0))')
+
+  jq -nc \
+    --arg ts "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
+    --argjson pr_num "$pr_num" \
+    --arg title "$title" \
+    --arg branch "$branch" \
+    --argjson issues "$issues_json" \
+    --arg result "$result" \
+    --argjson elapsed_s "$elapsed_s" \
+    --arg reason "$reason" \
+    --argjson cycle "$CYCLE_COUNT" \
+    '{
+      type: "pr_result",
+      timestamp: $ts,
+      pr_num: $pr_num,
+      title: $title,
+      branch: $branch,
+      issues_detected: $issues,
+      result: $result,
+      elapsed_s: $elapsed_s,
+      reason: (if $reason == "" then null else $reason end),
+      cycle_number: $cycle
+    }' >> "$JSONL_FILE"
+}
+
+log_cycle_summary() {
+  local prs_scanned=$1
+  local queue_size=$2
+  local pr_processed=${3:-null}  # PR number or "null"
+
+  jq -nc \
+    --arg ts "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
+    --argjson cycle "$CYCLE_COUNT" \
+    --argjson scanned "$prs_scanned" \
+    --argjson queue "$queue_size" \
+    --arg processed "$pr_processed" \
+    '{
+      type: "cycle_summary",
+      timestamp: $ts,
+      cycle_number: $cycle,
+      prs_scanned: $scanned,
+      queue_size: $queue,
+      pr_processed: (if $processed == "null" then null else ($processed | tonumber) end)
+    }' >> "$JSONL_FILE"
 }
 
 # ─── Cooldown tracking ────────────────────────────────────────────────
@@ -142,6 +214,7 @@ detect_all_pr_issues() {
 
   local pr_count
   pr_count=$(echo "$prs" | jq 'length')
+  echo "$pr_count" >| "$STATE_DIR/last-scan-count"
   log "Found $pr_count open PRs"
 
   if [[ "$pr_count" == "0" ]]; then
@@ -307,6 +380,7 @@ fix_pr() {
 
   if $DRY_RUN; then
     log "  [DRY RUN] Would invoke Claude to fix"
+    log_pr_result "$pr_num" "$title" "$branch" "$issues" "dry-run" 0 ""
     mark_processed "$pr_num"
     return 0
   fi
@@ -366,11 +440,14 @@ fix_pr() {
 
   if [[ $exit_code -eq 0 ]] && ! $hit_max_turns; then
     log "✓ PR #$pr_num processed successfully (${elapsed}s)"
+    log_pr_result "$pr_num" "$title" "$branch" "$issues" "fixed" "$elapsed" ""
   elif $hit_max_turns; then
     log "⚠ PR #$pr_num hit max turns ($MAX_TURNS) after ${elapsed}s"
     local fail_count
     fail_count=$(record_max_turns_failure "$pr_num")
+    local max_reason="Hit max turns ($MAX_TURNS) — attempt $fail_count"
     if (( fail_count >= 2 )); then
+      max_reason="Abandoned after $fail_count max-turns failures"
       log "✗ PR #$pr_num abandoned after $fail_count max-turns failures — needs human intervention"
       gh pr comment "$pr_num" --repo "$REPO" --body "$(cat <<GHEOF
 🤖 **PR Patrol**: Abandoning automatic fix after $fail_count failed attempts (hit max turns each time).
@@ -382,14 +459,16 @@ This PR likely needs human intervention to resolve. The conflict or issue is too
 GHEOF
 )" 2>/dev/null || log "  Warning: could not post abandonment comment"
     fi
+    log_pr_result "$pr_num" "$title" "$branch" "$issues" "max-turns" "$elapsed" "$max_reason"
   else
     log "✗ PR #$pr_num processing failed (exit: $exit_code, ${elapsed}s)"
+    log_pr_result "$pr_num" "$title" "$branch" "$issues" "error" "$elapsed" "Exit code: $exit_code"
   fi
 
   # Post a summary comment on the PR with what was done
   # Truncate output to last 500 chars to keep comment concise
   local summary
-  summary=$(echo "$claude_output" | tail -c 1500 | head -c 500)
+  summary=$(echo "$claude_output" | tail -c 500)
   if [[ -n "$summary" ]] && ! $hit_max_turns; then
     gh pr comment "$pr_num" --repo "$REPO" --body "$(cat <<GHEOF
 🤖 **PR Patrol** ran for ${elapsed}s (${MAX_TURNS} max turns, model: ${MODEL}).
@@ -426,14 +505,24 @@ GHEOF
 # ─── Main Loop ───────────────────────────────────────────────────────
 
 run_check_cycle() {
-  log_header "Check cycle"
+  log_header "Check cycle #${CYCLE_COUNT}"
+
+  local prs_scanned=0
+  local cycle_queue_size=0
+  local pr_processed="null"
 
   # 1. Detect issues on all PRs
   local work_items
-  work_items=$(detect_all_pr_issues) || return 1
+  work_items=$(detect_all_pr_issues) || {
+    log_cycle_summary 0 0 "null"
+    return 1
+  }
+
+  prs_scanned=$(cat "$STATE_DIR/last-scan-count" 2>/dev/null || echo 0)
 
   if [[ -z "$work_items" ]]; then
     log "All PRs clean — nothing to do"
+    log_cycle_summary "$prs_scanned" 0 "null"
     return 0
   fi
 
@@ -473,12 +562,14 @@ run_check_cycle() {
 
   if [[ -z "$sorted" ]]; then
     log "All issues recently processed — nothing to do"
+    log_cycle_summary "$prs_scanned" 0 "null"
     return 0
   fi
 
   # 4. Display priority queue
   local queue_size
   queue_size=$(echo "$sorted" | wc -l | tr -d ' ')
+  cycle_queue_size=$queue_size
   log ""
   log "Priority queue ($queue_size items):"
   while IFS=$'\t' read -r score pr_num issues title branch; do
@@ -492,6 +583,116 @@ run_check_cycle() {
   IFS=$'\t' read -r score pr_num issues title branch <<< "$top"
 
   fix_pr "$pr_num" "$issues" "$title" "$branch"
+  pr_processed="$pr_num"
+
+  log_cycle_summary "$prs_scanned" "$cycle_queue_size" "$pr_processed"
+}
+
+# ─── Periodic Reflection ─────────────────────────────────────────────
+
+run_reflection() {
+  log_header "Reflection (cycle #${CYCLE_COUNT})"
+
+  # Need enough data for meaningful analysis
+  local entry_count=0
+  if [[ -f "$JSONL_FILE" ]]; then
+    entry_count=$(wc -l < "$JSONL_FILE" | tr -d ' ')
+  fi
+  if (( entry_count < 10 )); then
+    log "Skipping reflection — only $entry_count log entries (need ≥10)"
+    return 0
+  fi
+
+  local recent_entries
+  recent_entries=$(tail -100 "$JSONL_FILE")
+
+  local prompt_file
+  prompt_file=$(mktemp "$STATE_DIR/reflection-XXXXXX.txt")
+
+  cat >| "$prompt_file" <<'REFLEOF'
+You are a PR Patrol operations analyst for the quantified-uncertainty/longterm-wiki repository.
+Your job is to review recent automated PR fix logs and identify actionable patterns that warrant filing a GitHub issue.
+
+## Recent JSONL Log Entries
+
+REFLEOF
+  echo "$recent_entries" >> "$prompt_file"
+  cat >> "$prompt_file" <<'REFLEOF'
+
+## Your Task
+
+1. Analyze the logs for patterns:
+   - PRs that repeatedly hit max-turns or error out (wasted compute)
+   - Issue types that are never successfully fixed (e.g. "ci-failure" where the only failure is check-protected-paths)
+   - PRs being re-processed for the same unfixable issues (cooldown not preventing waste)
+   - High elapsed times suggesting the prompt needs improvement
+   - Any other actionable operational pattern
+
+2. If you find something actionable:
+   a. First, search for an existing issue: pnpm crux issues search "your topic"
+   b. If no duplicate exists, file exactly ONE issue:
+      pnpm crux issues create "Title" --problem="Specific description with data from logs" --model=haiku --criteria="Fix applied|Tests pass" --label=pr-patrol
+   c. If a duplicate exists, add a comment with your new data: pnpm crux issues comment <N> "new evidence"
+
+3. If nothing actionable is found, just output: "No actionable patterns found"
+
+## Constraints
+- File AT MOST 1 issue. If you see multiple problems, pick the most impactful one.
+- Issues must be specific and reference concrete data from the logs (PR numbers, counts, cycle numbers).
+- Do NOT file speculative issues — only patterns you can demonstrate from the log data.
+- Do NOT file issues about problems that occurred only once — look for recurring patterns (3+ occurrences).
+- Do NOT run any git commands or modify any files. This is analysis only + optional issue filing.
+- Do NOT run /agent-session-start or /agent-session-ready-PR.
+REFLEOF
+
+  local claude_args=(--print --model "$MODEL" --max-turns 10 --verbose)
+  if [[ "$SKIP_PERMS" == "1" ]]; then
+    claude_args+=(--dangerously-skip-permissions)
+  fi
+
+  local start_time
+  start_time=$(date +%s)
+
+  local output_file
+  output_file=$(mktemp "$STATE_DIR/reflection-out-XXXXXX.txt")
+  local exit_code=0
+  env -u CLAUDECODE claude "${claude_args[@]}" < "$prompt_file" 2>&1 | tee -a "$LOG_FILE" "$output_file" || exit_code=$?
+
+  local elapsed=$(( $(date +%s) - start_time ))
+
+  # Detect whether an issue was filed
+  local filed_issue="false"
+  if grep -qE "(Created issue #|created.*#[0-9])" "$output_file" 2>/dev/null; then
+    filed_issue="true"
+  fi
+
+  local reflection_summary
+  reflection_summary=$(tail -5 "$output_file" | head -c 500)
+
+  # Log reflection result
+  jq -nc \
+    --arg ts "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
+    --argjson cycle "$CYCLE_COUNT" \
+    --argjson elapsed "$elapsed" \
+    --argjson filed "$filed_issue" \
+    --argjson exit_code "$exit_code" \
+    --arg summary "$reflection_summary" \
+    '{
+      timestamp: $ts,
+      cycle_number: $cycle,
+      elapsed_s: $elapsed,
+      filed_issue: $filed,
+      exit_code: $exit_code,
+      summary: $summary
+    }' >> "$REFLECTION_FILE"
+
+  if [[ $exit_code -eq 0 ]]; then
+    log "✓ Reflection complete (${elapsed}s, filed_issue=$filed_issue)"
+  else
+    log "✗ Reflection failed (exit: $exit_code, ${elapsed}s)"
+  fi
+
+  rm -f "$prompt_file" "$output_file"
 }
 
 main() {
@@ -510,18 +711,27 @@ main() {
   log "Config: interval=${INTERVAL}s, max-turns=${MAX_TURNS}, cooldown=${COOLDOWN}s, model=${MODEL}"
   log "Repo: $REPO"
   log "State: $STATE_DIR"
+  log "JSONL: $JSONL_FILE"
+  log "Reflection: every $REFLECTION_INTERVAL cycles"
   log "Mode: $(if $ONCE; then echo "single pass"; elif $DRY_RUN; then echo "dry run"; else echo "continuous"; fi)"
 
   trap 'log "Shutting down..."; exit 0' INT TERM
 
   if $ONCE; then
+    CYCLE_COUNT=$((CYCLE_COUNT + 1))
     run_check_cycle
     log "Single pass complete."
     return
   fi
 
   while true; do
+    CYCLE_COUNT=$((CYCLE_COUNT + 1))
     run_check_cycle || log "Check cycle failed — will retry next interval"
+
+    # Periodic reflection: analyze logs and optionally file issues
+    if (( CYCLE_COUNT % REFLECTION_INTERVAL == 0 )); then
+      run_reflection || log "Reflection failed — continuing"
+    fi
 
     log "Sleeping ${INTERVAL}s until next check..."
     sleep "$INTERVAL"
