@@ -28,6 +28,7 @@
  *   citations   Citation verification and archival
  *   issues      Track Claude Code work on GitHub issues
  *   pr          GitHub PR utilities (fix-body: repair literal \n in PR descriptions)
+ *   pr-patrol   Continuous PR maintenance daemon (scan, prioritize, fix)
  *   agent-checklist  Manage agent checklists (init, check, verify, status, complete)
  *   facts       Propose new canonical facts from wiki page content
  *   entity      Entity ID management (rename with safe word-boundary matching)
@@ -96,6 +97,7 @@ import * as agentSessionEventsCommands from './commands/agent-session-events.ts'
 import * as statementsCommands from './commands/statements.ts';
 import * as auditsCommands from './commands/audits.ts';
 import * as releaseCommands from './commands/release.ts';
+import * as prPatrolCommands from './commands/pr-patrol.ts';
 
 const domains = {
   validate: validateCommands,
@@ -137,6 +139,7 @@ const domains = {
   statements: statementsCommands,
   audits: auditsCommands,
   release: releaseCommands,
+  'pr-patrol': prPatrolCommands,
 };
 
 /**
