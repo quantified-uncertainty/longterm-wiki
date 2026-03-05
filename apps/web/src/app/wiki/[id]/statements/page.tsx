@@ -142,6 +142,7 @@ export default async function EntityStatementsPage({ params }: PageProps) {
             structured={resolvedStructured}
             attributed={resolvedAttributed}
             categories={categories}
+            entitySlug={slug}
           />
         </>
       )}
