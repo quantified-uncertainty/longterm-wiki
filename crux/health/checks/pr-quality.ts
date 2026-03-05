@@ -17,16 +17,16 @@ interface PullRequest {
   number: number;
   title: string;
   body: string | null;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
   state: string;
 }
 
 interface Issue {
   number: number;
   title: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
   labels: Array<{ name: string }>;
 }
 
@@ -94,7 +94,7 @@ export async function checkPrQuality(options?: {
 
   const now = Date.now();
   const stalePrs = openPrs.filter((pr) => {
-    const lastActivity = pr.updatedAt || pr.createdAt;
+    const lastActivity = pr.updated_at || pr.created_at;
     return hoursAgoFromNow(lastActivity, now) > STALE_PR_THRESHOLD_H;
   });
 
@@ -120,7 +120,7 @@ export async function checkPrQuality(options?: {
   }
 
   const stuckOnes = stuckIssues.filter((issue) => {
-    const lastActivity = issue.updatedAt || issue.createdAt;
+    const lastActivity = issue.updated_at || issue.created_at;
     return hoursAgoFromNow(lastActivity, now) > STUCK_LABEL_THRESHOLD_H;
   });
 
@@ -157,7 +157,7 @@ export async function checkPrQuality(options?: {
   // Count open bugs (informational)
   try {
     const bugs = await githubApi<Issue[]>(
-      `/repos/${REPO}/issues?labels=bug&state=open&per_page=1`,
+      `/repos/${REPO}/issues?labels=bug&state=open&per_page=100`,
     );
     detail.push(`INFO  ${bugs.length} open bug(s)`);
   } catch (err) {
