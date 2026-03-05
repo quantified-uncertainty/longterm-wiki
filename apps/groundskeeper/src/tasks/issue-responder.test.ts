@@ -97,6 +97,7 @@ function makeConfig(): Config {
       issueResponder: { enabled: true, schedule: "*/10 * * * *" },
       githubShadowbanCheck: { enabled: false, schedule: "0 9 * * *", usernames: [] },
       snapshotRetention: { enabled: false, schedule: "0 3 * * *", keep: 100 },
+      sessionSweep: { enabled: false, schedule: "0 */4 * * *" },
     },
   };
 }
