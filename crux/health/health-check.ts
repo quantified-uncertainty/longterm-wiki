@@ -3,8 +3,11 @@
 /**
  * System Wellness Check
  *
- * Mirrors the checks in .github/workflows/wellness-check.yml so the same
+ * Mirrors the checks in the focused health workflows so the same
  * health signals can be monitored locally or in ad-hoc debugging sessions.
+ *   .github/workflows/server-api-health.yml
+ *   .github/workflows/frontend-data-health.yml
+ *   .github/workflows/ci-pr-health.yml
  *
  * Usage:
  *   crux health                      Run all checks
