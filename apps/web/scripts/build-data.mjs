@@ -1391,7 +1391,7 @@ async function main() {
     let blockIRSections = 0;
     const blockIRErrorPages = [];
     try {
-      const { extractBlockIR } = await import('../../../crux/lib/block-ir.ts');
+      const { extractBlockIR } = await import('../../../crux/lib/content/block-ir.ts');
       for (const page of pages) {
         if (!page.rawContent) continue;
         try {
