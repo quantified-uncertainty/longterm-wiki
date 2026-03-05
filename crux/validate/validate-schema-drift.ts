@@ -59,15 +59,17 @@ interface CheckResult {
   details: string[];
 }
 
-function getChangedFiles(baseSha: string, headSha: string): string[] {
+function getChangedFiles(baseSha: string, headSha: string): string[] | null {
   try {
     const output = execSync(`git diff --name-only ${baseSha}...${headSha}`, {
       cwd: PROJECT_ROOT,
       encoding: 'utf-8',
     });
     return output.trim().split('\n').filter(Boolean);
-  } catch {
-    return [];
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`git diff failed (shallow clone or missing commits?): ${msg}`);
+    return null; // null = git failure, distinguish from [] = no files changed
   }
 }
 
@@ -91,6 +93,14 @@ function runPrDriftCheck(baseSha: string, headSha: string, c: ReturnType<typeof 
   console.log(`${c.blue}Checking Drizzle schema drift (PR mode: ${baseSha.slice(0, 8)}...${headSha.slice(0, 8)})...${c.reset}\n`);
 
   const changedFiles = getChangedFiles(baseSha, headSha);
+  if (changedFiles === null) {
+    const msg = `Could not determine changed files via git diff (shallow clone without sufficient history?). ` +
+      `Skipping schema drift check — check CI logs and ensure the checkout has enough history.`;
+    console.log(`${c.yellow}Warning: ${msg}${c.reset}`);
+    console.log(`::warning::${msg}`);
+    return { passed: true, warnings: 1, errors: 0, details: [msg] };
+  }
+
   const addedFiles = getAddedFiles(baseSha, headSha);
 
   const schemaChanged = changedFiles.includes(SCHEMA_PATH);

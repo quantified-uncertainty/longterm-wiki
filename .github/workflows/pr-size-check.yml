@@ -80,13 +80,6 @@ jobs:
               return;
             }
 
-            // Get PR metadata for the comment
-            const { data: pr } = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-            });
-
             // Check if we already posted a size warning (avoid duplicates on re-push)
             const MARKER = '<!-- pr-size-check -->';
             const { data: comments } = await github.rest.issues.listComments({
