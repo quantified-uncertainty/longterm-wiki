@@ -1156,10 +1156,19 @@ export const CreateAgentSessionSchema = z.object({
 });
 export type CreateAgentSession = z.infer<typeof CreateAgentSessionSchema>;
 
+export const PR_OUTCOMES = [
+  "merged",
+  "merged_with_revisions",
+  "reverted",
+  "closed_without_merge",
+] as const;
+export type PrOutcome = (typeof PR_OUTCOMES)[number];
+
 export const UpdateAgentSessionSchema = z.object({
   checklistMd: z.string().min(1).max(50000).optional(),
   status: z.enum(["active", "completed"]).optional(),
   prUrl: z.string().url().max(1000).nullable().optional(),
+  prOutcome: z.enum(PR_OUTCOMES).nullable().optional(),
 });
 export type UpdateAgentSession = z.infer<typeof UpdateAgentSessionSchema>;
 

@@ -18,8 +18,10 @@ export interface AgentSessionRow {
   status: string;
   startedAt: string;
   completedAt: string | null;
-  // From joined sessions table (via branch)
+  // From agent_sessions table
   prUrl: string | null;
+  prOutcome: string | null;
+  // From joined sessions table (via branch)
   model: string | null;
   cost: string | null;
   title: string | null;
@@ -66,6 +68,7 @@ async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
       // Prefer prUrl from agent_sessions (set by `crux issues done --pr=URL`),
       // fall back to session log join on branch for older records.
       prUrl: s.prUrl ?? log?.prUrl ?? null,
+      prOutcome: s.prOutcome ?? null,
       model: log?.model ?? null,
       cost: log?.cost ?? null,
       title: log?.title ?? null,

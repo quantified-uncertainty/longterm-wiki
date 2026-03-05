@@ -50,6 +50,36 @@ function ModelBadge({ model }: { model: string | null }) {
   );
 }
 
+// ── Outcome Badge ─────────────────────────────────────────────────────────
+
+const OUTCOME_STYLES: Record<string, string> = {
+  merged: "bg-emerald-500/15 text-emerald-600",
+  merged_with_revisions: "bg-blue-500/15 text-blue-600",
+  reverted: "bg-red-500/15 text-red-600",
+  closed_without_merge: "bg-slate-500/15 text-slate-500",
+};
+
+const OUTCOME_LABELS: Record<string, string> = {
+  merged: "merged",
+  merged_with_revisions: "revised",
+  reverted: "reverted",
+  closed_without_merge: "closed",
+};
+
+function OutcomeBadge({ outcome }: { outcome: string | null }) {
+  if (!outcome) return <span className="text-xs text-muted-foreground/50">—</span>;
+  const style = OUTCOME_STYLES[outcome] ?? "bg-muted text-muted-foreground";
+  const label = OUTCOME_LABELS[outcome] ?? outcome;
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${style}`}
+      title={outcome}
+    >
+      {label}
+    </span>
+  );
+}
+
 // ── Session Type Badge ────────────────────────────────────────────────────
 
 const TYPE_STYLES: Record<string, string> = {
@@ -157,6 +187,13 @@ const columns: ColumnDef<AgentSessionRow>[] = [
         </a>
       );
     },
+  },
+  {
+    accessorKey: "prOutcome",
+    header: ({ column }) => (
+      <SortableHeader column={column}>Outcome</SortableHeader>
+    ),
+    cell: ({ row }) => <OutcomeBadge outcome={row.original.prOutcome} />,
   },
   {
     accessorKey: "model",

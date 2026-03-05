@@ -10,7 +10,7 @@
  *   crux issues search <query>       Search existing issues before filing a new one
  *   crux issues comment <N> <msg>    Post a comment on an existing issue
  *   crux issues start <N>            Signal start: comment + add claude-working label
- *   crux issues done <N> [--pr=URL]  Signal completion: comment + remove label
+ *   crux issues done <N> [--pr=URL] [--outcome=X]  Signal completion: comment + remove label
  *   crux issues cleanup              Detect stale claude-working labels + potential duplicates
  *   crux issues close <N> [--reason] Close an issue with an optional comment
  */
@@ -22,7 +22,8 @@ import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
 import { type CommandResult, parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
 import { listActiveAgents, registerAgent } from '../lib/wiki-server/active-agents.ts';
-import { getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
+import { getAgentSessionByBranch, updateAgentSession, PR_OUTCOMES } from '../lib/wiki-server/agent-sessions.ts';
+import type { PrOutcome } from '../lib/wiki-server/agent-sessions.ts';
 
 /**
  * Read a text value from a `--*-file=<path>` flag.
@@ -88,6 +89,7 @@ interface CommandOptions {
   ci?: boolean;
   json?: boolean;
   pr?: string;
+  outcome?: string;
   limit?: string;
   scores?: boolean;
   draft?: boolean;
@@ -982,12 +984,27 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
   const issueNum = parseRequiredInt(args[0]);
   if (!issueNum) {
     return {
-      output: `${c.red}Usage: crux issues done <issue-number> [--pr=URL]${c.reset}\n`,
+      output: `${c.red}Usage: crux issues done <issue-number> [--pr=URL] [--outcome=merged|merged_with_revisions|reverted|closed_without_merge]${c.reset}\n`,
       exitCode: 1,
     };
   }
 
   const prUrl = options.pr as string | undefined;
+
+  // Validate --outcome if provided
+  let prOutcome: PrOutcome | undefined;
+  if (options.outcome !== undefined) {
+    const outcomeRaw = options.outcome as string;
+    if (!(PR_OUTCOMES as readonly string[]).includes(outcomeRaw)) {
+      return {
+        output:
+          `${c.red}Invalid --outcome value: "${outcomeRaw}"\n` +
+          `Valid values: ${PR_OUTCOMES.join(', ')}${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+    prOutcome = outcomeRaw as PrOutcome;
+  }
 
   // Fetch issue details
   const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
@@ -1012,24 +1029,29 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
     if (!(err instanceof Error && err.message.includes('returned 404'))) throw err;
   }
 
-  // Record PR URL in the agent session (best-effort — don't fail if wiki-server is down)
+  // Record PR URL and/or outcome in the agent session (best-effort — don't fail if wiki-server is down)
   let sessionUpdated = false;
-  if (prUrl) {
+  if (prUrl || prOutcome !== undefined) {
     const branch = currentBranch();
     if (branch) {
       try {
         const sessionResult = await getAgentSessionByBranch(branch);
         if (sessionResult.ok) {
-          const updateResult = await updateAgentSession(sessionResult.data.id, {
-            prUrl,
-            status: 'completed',
-          });
+          const sessionUpdate: Parameters<typeof updateAgentSession>[1] = {};
+          if (prUrl) {
+            sessionUpdate.prUrl = prUrl;
+            sessionUpdate.status = 'completed';
+          }
+          if (prOutcome !== undefined) {
+            sessionUpdate.prOutcome = prOutcome;
+          }
+          const updateResult = await updateAgentSession(sessionResult.data.id, sessionUpdate);
           sessionUpdated = updateResult.ok;
         }
       } catch (err) {
         // Best-effort: wiki-server may be unavailable. Log and continue.
         const msg = err instanceof Error ? err.message : String(err);
-        log.warn(`Could not update agent session with PR URL: ${msg}`);
+        log.warn(`Could not update agent session: ${msg}`);
       }
     }
   }
@@ -1037,9 +1059,10 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
   let output = '';
   output += `${c.green}✓${c.reset} Marked issue #${issueNum} as done: ${issue.title}\n`;
   if (prUrl) output += `  PR: ${prUrl}\n`;
+  if (prOutcome) output += `  Outcome: ${prOutcome}\n`;
   output += `  Label \`${CLAUDE_WORKING_LABEL}\` removed.\n`;
   output += `  Comment posted on ${issue.html_url}\n`;
-  if (prUrl && sessionUpdated) output += `  ${c.dim}Agent session updated with PR URL.${c.reset}\n`;
+  if ((prUrl || prOutcome) && sessionUpdated) output += `  ${c.dim}Agent session updated.${c.reset}\n`;
 
   return { output, exitCode: 0 };
 }

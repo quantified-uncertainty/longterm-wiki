@@ -13,6 +13,8 @@ import type {
   CreateAgentSession,
   UpdateAgentSession,
 } from '../../../apps/wiki-server/src/api-types.ts';
+export { PR_OUTCOMES } from '../../../apps/wiki-server/src/api-types.ts';
+export type { PrOutcome } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — response (inferred from Hono RPC route)
