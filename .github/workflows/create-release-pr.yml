@@ -67,8 +67,8 @@ jobs:
         shell: bash
         run: |
           DATE=$(date -u +%Y-%m-%d)
-          AHEAD=${{ steps.diff.outputs.ahead }}
-          BEHIND=${{ steps.diff.outputs.behind }}
+          AHEAD="${{ steps.diff.outputs.ahead }}"
+          BEHIND="${{ steps.diff.outputs.behind }}"
 
           # --- Categorize commits by conventional-commit prefix ---
 
@@ -136,7 +136,7 @@ jobs:
             COMPARE_URL="https://github.com/${{ github.repository }}/compare/production...main"
             echo "---"
             echo "[Full diff](${COMPARE_URL})"
-          } > /tmp/pr-body.md
+          } > "${RUNNER_TEMP}/pr-body.md"
 
           echo "date=$DATE" >> "$GITHUB_OUTPUT"
 
@@ -169,15 +169,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          DATE=${{ steps.changelog.outputs.date }}
+          DATE="${{ steps.changelog.outputs.date }}"
           BASE_TITLE="release: ${DATE}"
 
-          # Check for already-merged release PRs from today
+          # Check for already-merged release PRs from today.
+          # DATE is always YYYY-MM-DD from date(1), safe for inline interpolation.
           MERGED_TODAY=$(gh pr list \
             --base production \
             --state merged \
-            --json title \
-            --jq "[.[] | select(.title | startswith(\"release: ${DATE}\"))] | length")
+            --json title | jq --arg prefix "release: ${DATE}" \
+            '[.[] | select(.title | startswith($prefix))] | length')
 
           if [ "$MERGED_TODAY" -gt 0 ]; then
             # Increment: if 1 already merged, this is #2
@@ -195,18 +196,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_NUM=${{ steps.existing.outputs.number }}
+          PR_NUM="${{ steps.existing.outputs.number }}"
           TITLE="${{ steps.title.outputs.title }}"
 
           gh pr edit "$PR_NUM" \
             --title "$TITLE" \
-            --body-file /tmp/pr-body.md
+            --body-file "${RUNNER_TEMP}/pr-body.md"
 
           echo "## Updated Release PR" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Updated [PR #${PR_NUM}](https://github.com/${{ github.repository }}/pull/${PR_NUM})" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          cat /tmp/pr-body.md >> "$GITHUB_STEP_SUMMARY"
+          cat "${RUNNER_TEMP}/pr-body.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create release PR
         if: steps.diff.outputs.ahead != '0' && steps.existing.outputs.found == 'false'
@@ -219,11 +220,11 @@ jobs:
             --base production \
             --head main \
             --title "$TITLE" \
-            --body-file /tmp/pr-body.md \
+            --body-file "${RUNNER_TEMP}/pr-body.md" \
             --label "release")
 
           echo "## Created Release PR" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Created [${TITLE}](${PR_URL})" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          cat /tmp/pr-body.md >> "$GITHUB_STEP_SUMMARY"
+          cat "${RUNNER_TEMP}/pr-body.md" >> "$GITHUB_STEP_SUMMARY"
