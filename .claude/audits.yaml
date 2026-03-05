@@ -50,8 +50,8 @@ audits:
       A large gap means agents are completing work without logging sessions.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: null
-    last_result: null
+    last_checked: "2026-03-05"
+    last_result: pass
 
   - id: scheduled-workflows-running
     category: infrastructure
@@ -73,8 +73,8 @@ audits:
       - server-health-monitor: weekly (within 9 days)
     frequency: weekly
     added: "2026-03-04"
-    last_checked: null
-    last_result: null
+    last_checked: "2026-03-05"
+    last_result: fail
 
   - id: vercel-production-only
     category: infrastructure
@@ -119,8 +119,8 @@ audits:
       Run `pnpm crux validate gate` locally and confirm it exercises all checks.
     frequency: monthly
     added: "2026-03-04"
-    last_checked: null
-    last_result: null
+    last_checked: "2026-03-05"
+    last_result: pass
 
   - id: audits-system-adoption
     category: process
@@ -132,8 +132,8 @@ audits:
       into the maintenance sweep or simplifying the workflow.
     frequency: biweekly
     added: "2026-03-04"
-    last_checked: null
-    last_result: null
+    last_checked: "2026-03-05"
+    last_result: pass
 
 # ---------------------------------------------------------------------------
 # One-time post-merge verifications
@@ -160,7 +160,7 @@ post_merge:
     merged: "2026-03-04"
     claim: "The crux audits system works end-to-end after merge"
     how_to_verify: "Run each crux audits subcommand on main branch and verify output is correct"
-    status: pending
+    status: verified
     deadline: "2026-03-18"
-    checked_date: null
-    notes: null
+    checked_date: "2026-03-05"
+    notes: "All subcommands (list, run-auto, check, report) work. run-auto executes check_commands and produces output. Scheduled-workflows check failed due to no GITHUB_TOKEN in this env, but that's expected."
