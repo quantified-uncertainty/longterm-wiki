@@ -47,6 +47,10 @@ pnpm crux issues start <N>      # Signal work start on issue
 pnpm crux issues done <N> --pr=URL  # Signal completion
 pnpm crux ci status --wait       # Poll CI until green
 
+pnpm crux audits list            # Show audit items, highlight overdue
+pnpm crux audits check <id> --pass  # Record a check result
+pnpm crux audits run-auto        # Run automated checks
+
 pnpm crux --help                 # Full CLI reference
 ```
 
@@ -82,6 +86,7 @@ longterm-wiki/
 - **Hono RPC**: Mandatory for new wiki-server routes. See `.claude/rules/wiki-server-rpc-migration.md`
 - **Content pages use local data**: Wiki pages read `database.json` — zero runtime API calls. Only internal dashboards make live wiki-server requests.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
+- **Wiki-server env switching**: Set `WIKI_SERVER_ENV=prod` to target the production wiki-server instead of localhost. This makes all `LONGTERMWIKI_*` env var lookups use the `PROD_` prefix (e.g., `PROD_LONGTERMWIKI_SERVER_URL`). Usage: `WIKI_SERVER_ENV=prod pnpm crux statements improve anthropic --dry-run`
 
 ## Detailed Guides (loaded automatically by Claude Code)
 

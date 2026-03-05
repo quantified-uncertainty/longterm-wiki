@@ -30,6 +30,34 @@ const SERVICES = [
   "github-actions",
 ] as const;
 
+// ── Typed row interfaces for raw SQL results ────────────────────────────
+interface DbCountsRow {
+  pages: number;
+  entities: number;
+  facts: number;
+}
+
+interface IntegritySummaryRow {
+  dangling_facts: number;
+  dangling_claims: number;
+  dangling_summaries: number;
+  dangling_citations: number;
+  dangling_edit_logs: number;
+}
+
+interface ActiveAgentRow {
+  id: number;
+  session_id: string;
+  branch: string | null;
+  task: string | null;
+  status: string;
+  issue_number: number | null;
+  pr_number: number | null;
+  started_at: string | null;
+  completed_at: string | null;
+  model: string | null;
+}
+
 const monitoringApp = new Hono()
   // ---- GET /status — aggregated system health ----
   .get("/status", async (c) => {
@@ -46,11 +74,7 @@ const monitoringApp = new Hono()
           (SELECT count(*) FROM entities)::int as entities,
           (SELECT count(*) FROM facts)::int as facts
       `;
-      const row = countsResult[0] as {
-        pages: number;
-        entities: number;
-        facts: number;
-      };
+      const row = countsResult[0] as DbCountsRow;
       dbCounts = {
         pages: row.pages,
         entities: row.entities,
@@ -84,15 +108,7 @@ const monitoringApp = new Hono()
             : "down";
     }
 
-    // 3. Last groundskeeper health-check run
-    const lastHealthCheckRows = await db
-      .select()
-      .from(groundskeeperRuns)
-      .where(eq(groundskeeperRuns.taskName, "health-check"))
-      .orderBy(desc(groundskeeperRuns.timestamp))
-      .limit(1);
-
-    // 4. Open incidents per service
+    // 3. Open incidents per service
     const openIncidents = await db
       .select({
         service: serviceHealthIncidents.service,
@@ -124,11 +140,17 @@ const monitoringApp = new Hono()
       .from(jobs)
       .groupBy(jobs.status);
 
-    // 7. Active agents count
+    // 7. Active agents count (exclude stale — no heartbeat in 15 min)
+    const staleThreshold = new Date(Date.now() - 15 * 60 * 1000);
     const agentCountResult = await db
       .select({ count: count() })
       .from(activeAgents)
-      .where(eq(activeAgents.status, "active"));
+      .where(
+        and(
+          eq(activeAgents.status, "active"),
+          gte(activeAgents.heartbeatAt, staleThreshold)
+        )
+      );
 
     // Build service statuses
     const services = SERVICES.map((name) => {
@@ -160,20 +182,24 @@ const monitoringApp = new Hono()
       };
     });
 
+    const knownServices = services.filter(
+      (s) => s.status === "healthy" || s.status === "degraded" || s.status === "down"
+    );
     const overallStatus = services.some((s) => s.status === "down")
       ? "down"
       : services.some((s) => s.status === "degraded")
         ? "degraded"
-        : "healthy";
+        : knownServices.length === 0
+          ? "unknown"
+          : knownServices.every((s) => s.status === "healthy")
+            ? "healthy"
+            : "unknown";
 
     return c.json({
       overall: overallStatus as string,
       checkedAt: new Date().toISOString(),
       services,
       dbCounts,
-      lastHealthCheck: (lastHealthCheckRows[0] ?? null) as
-        | (typeof lastHealthCheckRows)[number]
-        | null,
       recentIncidents,
       jobsQueue: Object.fromEntries(
         jobStats.map((r) => [r.status, r.count])
@@ -432,7 +458,10 @@ async function fetchCiStatus() {
 
   const allCompleted = checks.every((ch) => ch.status === "completed");
   const anyFailed = checks.some((ch) => ch.conclusion === "failure");
-  const allPassed = allCompleted && !anyFailed;
+  // Only count as "all passed" if every non-skipped check succeeded
+  const nonSkipped = checks.filter((ch) => ch.conclusion !== "skipped");
+  const allPassed =
+    allCompleted && nonSkipped.length > 0 && nonSkipped.every((ch) => ch.conclusion === "success");
 
   return {
     sha: sha.slice(0, 8),
@@ -483,13 +512,7 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
       (SELECT count(*) FROM edit_logs WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages)))::int AS dangling_edit_logs
   `;
 
-  const row = result[0] as {
-    dangling_facts: number;
-    dangling_claims: number;
-    dangling_summaries: number;
-    dangling_citations: number;
-    dangling_edit_logs: number;
-  };
+  const row = result[0] as IntegritySummaryRow;
 
   const totalDangling =
     row.dangling_facts +
@@ -555,16 +578,16 @@ async function fetchRecentSessions(rawDb: ReturnType<typeof getDb>) {
   `;
 
   return rows.map((r) => ({
-    id: r.id as number,
-    sessionId: r.session_id as string,
-    branch: (r.branch as string | null) ?? null,
-    task: (r.task as string | null) ?? null,
-    status: r.status as string,
-    issueNumber: (r.issue_number as number | null) ?? null,
-    prNumber: (r.pr_number as number | null) ?? null,
+    id: r.id as ActiveAgentRow["id"],
+    sessionId: r.session_id as ActiveAgentRow["session_id"],
+    branch: (r.branch as ActiveAgentRow["branch"]) ?? null,
+    task: (r.task as ActiveAgentRow["task"]) ?? null,
+    status: r.status as ActiveAgentRow["status"],
+    issueNumber: (r.issue_number as ActiveAgentRow["issue_number"]) ?? null,
+    prNumber: (r.pr_number as ActiveAgentRow["pr_number"]) ?? null,
     startedAt: r.started_at ? String(r.started_at) : null,
     completedAt: r.completed_at ? String(r.completed_at) : null,
-    model: (r.model as string | null) ?? null,
+    model: (r.model as ActiveAgentRow["model"]) ?? null,
   }));
 }
 

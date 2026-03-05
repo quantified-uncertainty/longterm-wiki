@@ -4,6 +4,7 @@ import { getDb } from "../db.js";
 import { validationError } from "./utils.js";
 import {
   buildPrefixTsquery,
+  titleMatchBoostExpr,
   TRIGRAM_SIMILARITY_THRESHOLD,
 } from "../search-utils.js";
 import { logger } from "../logger.js";
@@ -261,11 +262,19 @@ const exploreApp = new Hono()
 
     let searchRankSelect = "";
     let orderBy = `${col} ${dir} ${nullsLast}`;
+    let nextParamIdx = main.paramIdx;
+    const extraParams: SqlParam[] = [];
 
     if (search) {
       const prefixQuery = buildPrefixTsquery(search);
       if (prefixQuery) {
-        searchRankSelect = `, ts_rank_cd(wp.search_vector, to_tsquery('english', $1), 1) AS search_rank`;
+        // Add raw search text as a parameter for exact-title-match boosting
+        const searchTextIdx = nextParamIdx;
+        extraParams.push(search);
+        nextParamIdx++;
+
+        const titleBoost = titleMatchBoostExpr("wp.title", `$${searchTextIdx}`);
+        searchRankSelect = `, ts_rank_cd(wp.search_vector, to_tsquery('english', $1), 1) + ${titleBoost} AS search_rank`;
         if (sort === "recommended") {
           orderBy = `search_rank DESC, ${col} ${dir} ${nullsLast}`;
         }
@@ -273,9 +282,9 @@ const exploreApp = new Hono()
     }
 
     // Main data query
-    const limitParamIdx = main.paramIdx;
-    const offsetParamIdx = main.paramIdx + 1;
-    const dataParams = [...main.params, limit, offset];
+    const limitParamIdx = nextParamIdx;
+    const offsetParamIdx = nextParamIdx + 1;
+    const dataParams = [...main.params, ...extraParams, limit, offset];
 
     const dataQuery = `
       SELECT

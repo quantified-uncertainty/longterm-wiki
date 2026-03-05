@@ -36,6 +36,7 @@ import { References } from "@/components/wiki/References";
 import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 import type { CitationQuote } from "@/lib/citation-data";
 import { EntityStatementsCard } from "@/components/wiki/EntityStatementsCard";
+import { PageStatementsSection } from "@/components/wiki/PageStatementsSection";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
@@ -398,9 +399,11 @@ async function ContentView({
         <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
           {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
           {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
-          {isArticle && !isInternal && entity && <EntityStatementsCard entityId={slug} />}
           {showToc && <TableOfContents headings={tocHeadings} />}
           {page.content}
+          {isArticle && !isInternal && entity && (
+            <PageStatementsSection entityId={slug} />
+          )}
           {!isInternal && <References pageId={slug} />}
         </article>
         </ReferenceProvider>

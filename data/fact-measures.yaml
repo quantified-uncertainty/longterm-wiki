@@ -488,21 +488,21 @@ measures:
   product-release:
     label: "Product Release"
     unit: string
-    category: product
+    category: products
     description: "Product or model release event"
     applicableTo: [organization]
 
   model-capability:
     label: "Model Capability"
     unit: string
-    category: product
+    category: products
     description: "Qualitative capability description of a model or product"
     applicableTo: [organization]
 
   safety-level:
     label: "Safety Level"
     unit: string
-    category: product
+    category: products
     description: "AI Safety Level (ASL) or safety classification tier"
     applicableTo: [organization]
 
@@ -670,6 +670,243 @@ measures:
     description: "Strategic partnership announcement"
     applicableTo: [organization]
 
+  # === People & Leadership ===
+  team-size:
+    label: "Team Size"
+    unit: count
+    category: organizational
+    description: "Size of a specific team or division within an organization"
+    relatedMeasures: [headcount]
+    applicableTo: [organization]
+
+  chief-scientist:
+    label: "Chief Scientist"
+    unit: entity
+    category: relation
+    description: "Chief scientist or head of research at an organization"
+    applicableTo: [organization]
+
+  education:
+    label: "Education"
+    unit: string
+    category: people
+    description: "Educational background, degrees, or institutional affiliations"
+    applicableTo: [person]
+
+  research-group-lead:
+    label: "Research Group Lead"
+    unit: entity
+    category: relation
+    description: "Leader of a specific research group or team"
+    applicableTo: [organization]
+
+  employer:
+    label: "Employer"
+    unit: entity
+    category: relation
+    description: "Organization where a person is currently employed"
+    applicableTo: [person]
+
+  position:
+    label: "Position / Role"
+    unit: string
+    category: people
+    description: "Job title or role held by a person at an organization"
+    applicableTo: [person]
+
+  h-index:
+    label: "h-index"
+    unit: count
+    category: research
+    direction: higher
+    description: "h-index measuring research impact"
+    applicableTo: [person]
+
+  publication-count:
+    label: "Publication Count"
+    unit: count
+    category: research
+    direction: higher
+    description: "Number of academic or technical publications authored"
+    relatedMeasures: [citation-count, h-index]
+    applicableTo: [person]
+
+  # === Products ===
+  pricing:
+    label: "Pricing"
+    unit: string
+    category: products
+    description: "Pricing model, tier structure, or specific price point"
+    applicableTo: [organization]
+
+  api-volume:
+    label: "API Volume"
+    unit: count
+    category: products
+    direction: higher
+    description: "Number of API calls, requests, or tokens processed"
+    applicableTo: [organization]
+
+  product-name:
+    label: "Product Name"
+    unit: string
+    category: products
+    description: "Name of a product or service offered by the entity"
+    applicableTo: [organization]
+
+  # === Safety & Research (expanded) ===
+  interpretability-finding:
+    label: "Interpretability Finding"
+    unit: string
+    category: safety
+    description: "Specific finding from interpretability or mechanistic interpretability research"
+    relatedMeasures: [interpretability-team-size, interpretable-features]
+    applicableTo: [organization]
+
+  safety-incident:
+    label: "Safety Incident"
+    unit: string
+    category: safety
+    description: "AI safety incident, failure, or concerning behavior observed in deployment"
+    applicableTo: [organization]
+
+  red-team-result:
+    label: "Red Team Result"
+    unit: string
+    category: safety
+    description: "Finding from red-teaming or adversarial testing of AI systems"
+    applicableTo: [organization]
+
+  alignment-technique:
+    label: "Alignment Technique"
+    unit: string
+    category: safety
+    description: "AI alignment method, approach, or training technique (e.g., RLHF, constitutional AI)"
+    applicableTo: [organization]
+
+  safety-evaluation:
+    label: "Safety Evaluation"
+    unit: string
+    category: safety
+    description: "Formal safety evaluation result or assessment (e.g., model card findings)"
+    applicableTo: [organization]
+
+  responsible-scaling-level:
+    label: "Responsible Scaling Level"
+    unit: string
+    category: safety
+    description: "ASL or RSP tier classification for AI system capabilities"
+    relatedMeasures: [safety-level]
+    applicableTo: [organization]
+
+  biosecurity-finding:
+    label: "Biosecurity Finding"
+    unit: string
+    category: safety
+    description: "Finding related to biosecurity risks from AI systems"
+    applicableTo: [organization]
+
+  safety-team-size:
+    label: "Safety Team Size"
+    unit: count
+    category: safety
+    direction: higher
+    description: "Number of people on the safety or alignment team"
+    relatedMeasures: [safety-researcher-count, headcount]
+    applicableTo: [organization]
+    expectedUpdateFrequency: annually
+
+  # === Governance & Policy (expanded) ===
+  compliance-standard:
+    label: "Compliance Standard"
+    unit: string
+    category: governance
+    description: "Regulatory or industry compliance standard adopted (e.g., ISO 42001, NIST AI RMF)"
+    applicableTo: [organization]
+
+  transparency-report:
+    label: "Transparency Report"
+    unit: string
+    category: governance
+    description: "Published transparency report or disclosure document"
+    applicableTo: [organization]
+
+  voluntary-commitment:
+    label: "Voluntary Commitment"
+    unit: string
+    category: governance
+    description: "Voluntary commitment or pledge related to AI safety or ethics"
+    applicableTo: [organization]
+
+  international-agreement:
+    label: "International Agreement"
+    unit: string
+    category: governance
+    description: "International agreement, treaty, or multi-party commitment"
+    applicableTo: [organization]
+
+  board-composition:
+    label: "Board Composition"
+    unit: string
+    category: governance
+    description: "Description of board structure and key members"
+    applicableTo: [organization]
+
+  policy-commitment:
+    label: "Policy Commitment"
+    unit: string
+    category: governance
+    description: "Public policy commitment or voluntary agreement related to AI safety"
+    applicableTo: [organization]
+
+  # === Attribution ===
+  prediction:
+    label: "Prediction"
+    unit: string
+    category: attribution
+    description: "Forward-looking prediction or forecast attributed to a person"
+    applicableTo: [person, organization]
+
+  public-statement:
+    label: "Public Statement"
+    unit: string
+    category: attribution
+    description: "Notable public statement, quote, or position expressed publicly"
+    applicableTo: [person, organization]
+
+  interview-quote:
+    label: "Interview Quote"
+    unit: string
+    category: attribution
+    description: "Notable quote from an interview, podcast, or testimony"
+    applicableTo: [person]
+
+  # === Additional Technical ===
+  compute-budget:
+    label: "Compute Budget"
+    unit: USD
+    category: financial
+    description: "Estimated or reported compute expenditure"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    applicableTo: [organization]
+
+  release-date:
+    label: "Release Date"
+    unit: date
+    category: milestone
+    description: "Date a product, model, or version was released"
+    applicableTo: [organization]
+
+  announced-date:
+    label: "Announced Date"
+    unit: date
+    category: milestone
+    description: "Date an announcement was made"
+    applicableTo: [organization]
+
 # Mapping from structured claims property IDs (snake_case) to measure IDs (kebab-case).
 # Used by the enrichment pipeline and display layer to unify both naming conventions.
 propertyAliases:
@@ -684,7 +921,7 @@ propertyAliases:
   legal_structure: legal-structure
   founded_date: founded-date
   launched_date: launched-date
-  announced_date: launched-date  # maps to closest equivalent
+  announced_date: announced-date
   shutdown_date: shutdown-date
   founder: founder
   ceo: ceo
@@ -729,3 +966,34 @@ propertyAliases:
   customer_concentration: customer-concentration
   ipo_date: ipo-date
   partnership_announcement: partnership-announcement
+  # Phase 1 expansion aliases
+  team_size: team-size
+  chief_scientist: chief-scientist
+  education: education
+  research_group_lead: research-group-lead
+  employer: employer
+  position: position
+  h_index: h-index
+  publication_count: publication-count
+  pricing: pricing
+  api_volume: api-volume
+  product_name: product-name
+  interpretability_finding: interpretability-finding
+  safety_incident: safety-incident
+  red_team_result: red-team-result
+  alignment_technique: alignment-technique
+  safety_evaluation: safety-evaluation
+  responsible_scaling_level: responsible-scaling-level
+  biosecurity_finding: biosecurity-finding
+  safety_team_size: safety-team-size
+  compliance_standard: compliance-standard
+  transparency_report: transparency-report
+  voluntary_commitment: voluntary-commitment
+  international_agreement: international-agreement
+  board_composition: board-composition
+  policy_commitment: policy-commitment
+  prediction: prediction
+  public_statement: public-statement
+  interview_quote: interview-quote
+  compute_budget: compute-budget
+  release_date: release-date

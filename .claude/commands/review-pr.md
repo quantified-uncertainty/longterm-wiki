@@ -95,13 +95,17 @@ After executing all verification steps:
 
 ## Phase 5: Mark review complete
 
-After completing all phases above, create the review marker file so `/agent-session-ready-PR` knows this session was reviewed:
+After completing all phases above, create the review marker file so `/agent-session-ready-PR` knows this session was reviewed.
+
+The marker must include a **diff hash** (proof-of-work) that ties the review to the specific changes. This prevents trivial forgery — the gate check verifies the hash matches the current diff.
 
 ```bash
-echo "reviewed $(git rev-parse HEAD) $(date -u +%Y-%m-%dT%H:%M:%SZ)" >| .claude/review-done
+# Compute diff hash (proof-of-work tied to the actual changes)
+DIFF_HASH=$(git diff $(git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main)...HEAD | shasum -a 256 | cut -c1-12)
+echo "reviewed $(git rev-parse HEAD) $(date -u +%Y-%m-%dT%H:%M:%SZ) ${DIFF_HASH}" >| .claude/review-done
 ```
 
-This file is gitignored. It persists for the life of the session and is read by `/agent-session-ready-PR` to populate the `reviewed` field in the session log. The commit SHA is verified by the `review-marker` gate check — if new commits are added after review, the marker becomes stale and the gate will warn.
+This file is gitignored. It persists for the life of the session and is read by `/agent-session-ready-PR` to populate the `reviewed` field in the session log. Both the commit SHA and diff hash are verified by the `review-marker` gate check — if new commits are added after review or the diff changes, the marker becomes stale and the gate will fail.
 
 ## Output
 

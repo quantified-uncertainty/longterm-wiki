@@ -2,7 +2,7 @@ import React from "react";
 import { getResourceById, getResourceCredibility, getResourcePublication } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
 import { ResourceTags } from "./ResourceTags";
-import { getResourceTypeIcon } from "./resource-utils";
+import { getResourceTypeIcon, isSafeUrl } from "./resource-utils";
 import { cn } from "@lib/utils";
 import styles from "./tooltip.module.css";
 
@@ -44,24 +44,37 @@ export function ResourceLink({
   const icon = showType ? getResourceTypeIcon(resource.type) : null;
   const credibility = getResourceCredibility(resource);
   const publication = getResourcePublication(resource);
+  const safeUrl = resource.url && isSafeUrl(resource.url) ? resource.url : null;
 
   return (
     <span className={styles.wrapper}>
-      <a
-        href={resource.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={cn("text-accent-foreground no-underline font-medium hover:underline", className)}
-      >
-        {icon && <span className="mr-1">{icon}</span>}
-        <span>{displayLabel}</span>
-        {showCredibility && credibility && (
-          <span className="ml-1">
-            <CredibilityBadge level={credibility} size="sm" />
-          </span>
-        )}
-        <span className="text-xs ml-0.5 opacity-70">{"\u2197"}</span>
-      </a>
+      {safeUrl ? (
+        <a
+          href={safeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn("text-accent-foreground no-underline font-medium hover:underline", className)}
+        >
+          {icon && <span className="mr-1">{icon}</span>}
+          <span>{displayLabel}</span>
+          {showCredibility && credibility && (
+            <span className="ml-1">
+              <CredibilityBadge level={credibility} size="sm" />
+            </span>
+          )}
+          <span className="text-xs ml-0.5 opacity-70">{"\u2197"}</span>
+        </a>
+      ) : (
+        <span className={cn("text-accent-foreground font-medium", className)}>
+          {icon && <span className="mr-1">{icon}</span>}
+          <span>{displayLabel}</span>
+          {showCredibility && credibility && (
+            <span className="ml-1">
+              <CredibilityBadge level={credibility} size="sm" />
+            </span>
+          )}
+        </span>
+      )}
       {n != null && n >= 1 && (
         <a
           id={`cite-${n}`}
@@ -126,16 +139,18 @@ export function ResourceLink({
           </span>
         )}
 
-        <span className="flex gap-2 mt-2 pointer-events-auto">
-          <a
-            href={resource.url}
-            className="flex-1 px-2.5 py-1.5 text-xs font-medium text-center no-underline rounded transition-colors bg-muted text-foreground hover:bg-muted/80 border border-border"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Source {"\u2197"}
-          </a>
-        </span>
+        {safeUrl && (
+          <span className="flex gap-2 mt-2 pointer-events-auto">
+            <a
+              href={safeUrl}
+              className="flex-1 px-2.5 py-1.5 text-xs font-medium text-center no-underline rounded transition-colors bg-muted text-foreground hover:bg-muted/80 border border-border"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Source {"\u2197"}
+            </a>
+          </span>
+        )}
       </span>
     </span>
   );

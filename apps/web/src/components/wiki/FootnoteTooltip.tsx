@@ -7,6 +7,7 @@ import { cn } from "@lib/utils";
 import { useReferenceData } from "./ReferenceContext";
 import { VerdictBadge } from "./VerdictBadge";
 import type { RefMapEntry } from "./ReferenceContext";
+import { getDomain, isSafeUrl } from "./resource-utils";
 
 /**
  * Format an ISO date string for compact display.
@@ -20,25 +21,6 @@ function formatDate(iso: string): string {
     });
   } catch {
     return iso;
-  }
-}
-
-/** Only allow safe URL schemes in links */
-function isSafeUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-/** Extract domain from URL for display */
-function getDomain(url: string): string | null {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return null;
   }
 }
 

@@ -12,6 +12,9 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { CitationQuote } from "@/lib/citation-data";
+import { isSafeUrl } from "./resource-utils";
+// Re-export for backwards compatibility — tests import isSafeUrl from this module.
+export { isSafeUrl } from "./resource-utils";
 
 interface VerdictConfig {
   icon: typeof CheckCircle2;
@@ -90,16 +93,6 @@ function getVerdictConfig(quote: CitationQuote): VerdictConfig | null {
     return VERIFIED_ONLY_CONFIG;
   }
   return null;
-}
-
-/** Only allow safe URL schemes in citation links */
-export function isSafeUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
 }
 
 function formatDate(iso: string): string {

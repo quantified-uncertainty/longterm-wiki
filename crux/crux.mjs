@@ -40,6 +40,8 @@
  *   epic        Multi-issue epic management via GitHub Discussions
  *   health      System wellness checks (server, DB, GitHub Actions, frontend, data freshness)
  *   ids         Entity ID allocation and lookup (allocate, check, list)
+ *   audits      System-level behavioral verification (ongoing + post-merge)
+ *   release     Production release management (create release PRs from main → production)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -92,6 +94,8 @@ import * as idsCommands from './commands/ids.ts';
 import * as agentsCommands from './commands/agents.ts';
 import * as agentSessionEventsCommands from './commands/agent-session-events.ts';
 import * as statementsCommands from './commands/statements.ts';
+import * as auditsCommands from './commands/audits.ts';
+import * as releaseCommands from './commands/release.ts';
 
 const domains = {
   validate: validateCommands,
@@ -131,6 +135,8 @@ const domains = {
   agents: agentsCommands,
   'agent-session-events': agentSessionEventsCommands,
   statements: statementsCommands,
+  audits: auditsCommands,
+  release: releaseCommands,
 };
 
 /**
@@ -213,6 +219,8 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   epic        Multi-issue epic management (via GitHub Discussions)
   ids         Entity ID allocation and lookup (allocate, check, list)
   statements  Extract and verify structured statements from wiki pages
+  audits      System-level behavioral verification (ongoing + post-merge)
+  release     Production release management (main → production)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

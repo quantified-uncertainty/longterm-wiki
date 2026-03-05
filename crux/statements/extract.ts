@@ -619,13 +619,21 @@ async function main() {
             }))
           : [],
       };
+    }).filter(item => {
+      // Drop structured statements with no property and no values — these render as blank rows
+      if (item.variety === 'structured' && !item.propertyId
+        && item.valueNumeric == null && !item.valueText
+        && !item.valueEntityId && !item.valueDate) {
+        return false;
+      }
+      return true;
     });
 
     const result = await createStatementBatch(items);
     if (result.ok) {
       inserted += result.data.inserted;
     } else {
-      failed += batch.length;
+      failed += items.length;
       console.error(`  ${c.red}Batch insert failed: ${result.message}${c.reset}`);
       // Log first item for debugging
       if (items.length > 0) {

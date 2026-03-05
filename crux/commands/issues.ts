@@ -22,6 +22,7 @@ import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
 import { type CommandResult, parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
 import { listActiveAgents, registerAgent } from '../lib/wiki-server/active-agents.ts';
+import { getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
 
 /**
  * Read a text value from a `--*-file=<path>` flag.
@@ -1011,11 +1012,34 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
     if (!(err instanceof Error && err.message.includes('returned 404'))) throw err;
   }
 
+  // Record PR URL in the agent session (best-effort — don't fail if wiki-server is down)
+  let sessionUpdated = false;
+  if (prUrl) {
+    const branch = currentBranch();
+    if (branch) {
+      try {
+        const sessionResult = await getAgentSessionByBranch(branch);
+        if (sessionResult.ok) {
+          const updateResult = await updateAgentSession(sessionResult.data.id, {
+            prUrl,
+            status: 'completed',
+          });
+          sessionUpdated = updateResult.ok;
+        }
+      } catch (err) {
+        // Best-effort: wiki-server may be unavailable. Log and continue.
+        const msg = err instanceof Error ? err.message : String(err);
+        log.warn(`Could not update agent session with PR URL: ${msg}`);
+      }
+    }
+  }
+
   let output = '';
   output += `${c.green}✓${c.reset} Marked issue #${issueNum} as done: ${issue.title}\n`;
   if (prUrl) output += `  PR: ${prUrl}\n`;
   output += `  Label \`${CLAUDE_WORKING_LABEL}\` removed.\n`;
   output += `  Comment posted on ${issue.html_url}\n`;
+  if (prUrl && sessionUpdated) output += `  ${c.dim}Agent session updated with PR URL.${c.reset}\n`;
 
   return { output, exitCode: 0 };
 }

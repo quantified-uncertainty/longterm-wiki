@@ -757,6 +757,7 @@ export const agentSessions = pgTable(
     issueNumber: integer("issue_number"),
     checklistMd: text("checklist_md").notNull(),
     worktree: text("worktree"), // working directory path for collision detection
+    prUrl: text("pr_url"), // PR URL recorded when crux issues done --pr=URL is called
     status: text("status").notNull().default("active"),
     startedAt: timestamp("started_at", { withTimezone: true })
       .notNull()
@@ -1163,6 +1164,11 @@ export const statements = pgTable(
     archiveReason: text("archive_reason"), // why this statement was superseded/retracted
     sourceFactKey: text("source_fact_key"), // "anthropic.6796e194" — YAML migration traceability
     note: text("note"),
+    // --- Quality scoring ---
+    qualityScore: real("quality_score"), // 0–1 composite quality score
+    qualityDimensions: jsonb("quality_dimensions"), // per-dimension scores { structure, precision, ... }
+    scoredAt: timestamp("scored_at", { withTimezone: true }),
+    // --- Timestamps ---
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1181,6 +1187,7 @@ export const statements = pgTable(
       table.propertyId
     ),
     index("idx_stmt_source_fact_key").on(table.sourceFactKey),
+    index("idx_stmt_quality_score").on(table.qualityScore),
   ]
 );
 
@@ -1236,6 +1243,28 @@ export const statementPageReferences = pgTable(
     index("idx_spr_page").on(t.pageIdInt),
     index("idx_spr_statement").on(t.statementId),
     uniqueIndex("idx_spr_stmt_page_footnote").on(t.statementId, t.pageIdInt, t.footnoteResourceId),
+  ]
+);
+
+/**
+ * Entity coverage scores — tracks entity-level quality scoring history.
+ *
+ * Each row is a snapshot of an entity's overall statement quality at a point in time.
+ */
+export const entityCoverageScores = pgTable(
+  "entity_coverage_scores",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    entityId: text("entity_id").notNull(),
+    coverageScore: real("coverage_score").notNull(),
+    categoryScores: jsonb("category_scores").notNull(), // { financial: 0.8, safety: 0.6, ... }
+    statementCount: integer("statement_count").notNull(),
+    qualityAvg: real("quality_avg"),
+    scoredAt: timestamp("scored_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_ecs_entity_id").on(table.entityId),
+    index("idx_ecs_scored_at").on(table.scoredAt),
   ]
 );
 

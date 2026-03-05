@@ -2,32 +2,8 @@
 
 import { useState } from "react";
 import { ExternalLink, ChevronDown, ChevronUp, Star } from "lucide-react";
-
-interface Citation {
-  id: number;
-  resourceId: string | null;
-  url: string | null;
-  sourceQuote: string | null;
-  locationNote: string | null;
-  isPrimary: boolean;
-}
-
-function getDomain(url: string): string | null {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return null;
-  }
-}
-
-function isSafeUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
+import type { Citation } from "@lib/statement-types";
+import { getDomain, isSafeUrl } from "@components/wiki/resource-utils";
 
 /**
  * Expandable citation detail panel. Clicking the citation count badge

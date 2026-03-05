@@ -32,6 +32,24 @@ const SCRIPTS = {
     passthrough: ['json'],
     positional: true,
   },
+  score: {
+    script: 'statements/score.ts',
+    description: 'Score statements for quality across 10 dimensions',
+    passthrough: ['json', 'dry-run', 'llm', 'org-type'],
+    positional: true,
+  },
+  gaps: {
+    script: 'statements/gaps.ts',
+    description: 'Coverage gap analysis — which categories need more statements',
+    passthrough: ['json', 'org-type'],
+    positional: true,
+  },
+  improve: {
+    script: 'statements/improve.ts',
+    description: 'Generate new statements to fill coverage gaps',
+    passthrough: ['json', 'dry-run', 'org-type', 'category', 'no-research', 'min-score', 'budget', 'target-coverage', 'max-iterations', 'mode'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'quality');
@@ -51,7 +69,17 @@ Options:
   --apply               Write results to database (default: dry-run preview)
   --model=M             LLM model override (default: google/gemini-2.0-flash-001)
   --fetch               Fetch missing sources from web (verify only)
-  --json                JSON output (quality only)
+  --json                JSON output (quality/score/gaps)
+  --dry-run             Preview scores without storing (score only)
+  --llm                 Use LLM for importance + clarity scoring (score only)
+  --org-type=TYPE       Organization subtype (e.g., frontier-lab, safety-org)
+  --category=CAT        Target a single category (improve only)
+  --no-research         Skip web research (improve only)
+  --min-score=N         Quality gate threshold (default: 0.5, improve only)
+  --budget=N            Cost cap in USD (default: 5, improve only)
+  --target-coverage=N   Target coverage score for iterative loop (improve only)
+  --max-iterations=N    Max iterations for iterative loop (default: 5, improve only)
+  --mode=quality        Rewrite low-scoring statements instead of generating new ones
 
 Examples:
   crux statements extract anthropic                Extract statements (dry run)
@@ -59,10 +87,23 @@ Examples:
   crux statements verify anthropic --apply         Verify against sources
   crux statements quality anthropic                Coverage report
   crux statements quality anthropic --json         Machine-readable output
+  crux statements score anthropic                  Score all statements (10 dimensions)
+  crux statements score anthropic --dry-run        Preview scores without storing
+  crux statements score anthropic --llm            Score with LLM-based importance + clarity
+  crux statements gaps anthropic                   Show coverage gaps
+  crux statements gaps anthropic --org-type=frontier-lab  Gaps with specific org type
+  crux statements improve anthropic --org-type=frontier-lab  Generate + insert
+  crux statements improve anthropic --dry-run      Preview generated statements
+  crux statements improve anthropic --category=safety  Target one category
+  crux statements improve anthropic --no-research  Skip web search
+  crux statements improve anthropic --target-coverage=0.8 --max-iterations=3  Iterate until 80%
+  crux statements improve anthropic --mode=quality          Rewrite low-scoring statements
 
 Workflow:
   1. crux statements extract <page-id> --apply     Extract statements from page
   2. crux statements verify <page-id> --apply      Verify against cited sources
-  3. crux statements quality <page-id>             Review coverage and quality
+  3. crux statements score <page-id>               Score statement quality
+  4. crux statements gaps <page-id>                Identify coverage gaps
+  5. crux statements quality <page-id>             Review coverage and quality
 `;
 }
