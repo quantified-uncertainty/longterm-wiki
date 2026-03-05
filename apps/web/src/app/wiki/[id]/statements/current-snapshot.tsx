@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, AlertTriangle } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { VerdictBadge } from "@components/wiki/VerdictBadge";
 import { formatStatementValue } from "@lib/statement-display";
 import { getDomain, isSafeUrl } from "@components/wiki/resource-utils";
@@ -28,8 +28,11 @@ export function CurrentSnapshot({ snapshot, conflicts }: CurrentSnapshotProps) {
         Latest active value for each property.
         {conflicts.length > 0 && (
           <span className="ml-1 text-amber-600 dark:text-amber-400">
-            {conflicts.length} conflicting{" "}
-            {conflicts.length === 1 ? "property" : "properties"} detected.
+            {conflicts.length}{" "}
+            {conflicts.length === 1
+              ? "property has multiple open values"
+              : "properties have multiple open values"}
+            .
           </span>
         )}
       </p>
@@ -89,27 +92,19 @@ function SnapshotRow({
   const displayValue =
     s.valueEntityTitle ?? (value !== "—" ? value : (s.statementText ?? "—"));
 
-  // Show qualifier context if present
-  const qualifierLabel = s.qualifierKey && !s.qualifierKey.includes(":")
-    ? s.qualifierKey
-    : s.qualifierKey?.split(":")[1] ?? null;
+  // Show qualifier context if present — format "category:value" as just "value"
+  const qualifierLabel = s.qualifierKey
+    ? (s.qualifierKey.includes(":") ? s.qualifierKey.split(":")[1] : s.qualifierKey)
+        ?.replace(/-/g, " ")
+    : null;
 
   // First citation URL for inline source
   const firstUrl = s.citations.find((c) => c.url && isSafeUrl(c.url))?.url;
   const domain = firstUrl ? getDomain(firstUrl) : null;
 
   return (
-    <tr
-      className={
-        hasConflict
-          ? "border-b border-border/30 bg-amber-50/50 dark:bg-amber-950/20"
-          : "border-b border-border/30 last:border-0"
-      }
-    >
+    <tr className="border-b border-border/30 last:border-0">
       <td className="px-3 py-2 text-xs font-medium text-muted-foreground">
-        {hasConflict && (
-          <AlertTriangle className="w-3 h-3 text-amber-500 inline mr-1" />
-        )}
         {s.property?.label ?? s.propertyId ?? "—"}
         {qualifierLabel && (
           <span className="ml-1 text-[10px] text-muted-foreground/60">
@@ -173,22 +168,28 @@ function ConflictValues({
   statements: ResolvedStatement[];
   currentId: number;
 }) {
-  const others = statements.filter((s) => s.id !== currentId);
+  const others = statements
+    .filter((s) => s.id !== currentId)
+    .sort((a, b) => (b.validStart ?? "").localeCompare(a.validStart ?? ""));
   if (others.length === 0) return null;
 
   const shown = others.slice(0, MAX_CONFLICT_DISPLAY);
   const remaining = others.length - shown.length;
 
   return (
-    <span className="ml-2 text-amber-600 dark:text-amber-400 font-normal text-[11px]">
-      (also:{" "}
+    <span className="ml-2 text-muted-foreground font-normal text-[11px]">
+      (prev:{" "}
       {shown.map((s, i) => {
         const val =
           s.valueEntityTitle ?? formatStatementValue(s, s.property);
+        const date = s.validStart ? ` [${s.validStart}]` : "";
         return (
           <span key={s.id}>
             {i > 0 && ", "}
             {val}
+            {date && (
+              <span className="text-muted-foreground/60">{date}</span>
+            )}
           </span>
         );
       })}
