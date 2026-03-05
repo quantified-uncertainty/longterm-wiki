@@ -211,14 +211,20 @@ describe("getInternalNav (mocked data)", () => {
     expect(factItem!.href).toBe("/wiki/E898");
   });
 
-  it("all dashboard items use /wiki/E<id> hrefs (fully migrated)", () => {
+  it("all dashboard items use /wiki/E<id> hrefs or link to public pages", () => {
     const sections = getInternalNav();
     const dashboards = sections.find(s => s.title === "Dashboards")!;
 
-    // All dashboards are now migrated to MDX stubs with entity IDs
+    // Items that link to public pages instead of internal MDX dashboards
+    const publicPageLabels = new Set(["Statements", "Properties"]);
+
     for (const item of dashboards.items) {
       if (item.label === "Internal Home") continue; // Overview link
-      expect(item.href).toMatch(/^\/wiki\//);
+      if (publicPageLabels.has(item.label)) {
+        expect(item.href).toMatch(/^\/statements/);
+      } else {
+        expect(item.href).toMatch(/^\/wiki\//);
+      }
     }
   });
 

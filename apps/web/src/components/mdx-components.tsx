@@ -54,8 +54,6 @@ import { HallucinationEvalsContent } from "@/app/internal/hallucination-evals/ha
 import { ActiveAgentsContent } from "@/app/internal/active-agents/active-agents-content";
 import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/groundskeeper-runs-content";
 import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
-import { StatementsContent } from "@/app/internal/statements/statements-content";
-import { PropertyExplorerContent } from "@/app/internal/property-explorer/property-explorer-content";
 import { StatementQualityContent } from "@/app/internal/statement-quality/statement-quality-content";
 import { StatementScoresContent } from "@/app/internal/statement-scores/statement-scores-content";
 
@@ -184,8 +182,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   ActiveAgentsContent,
   GroundskeeperRunsContent,
   SystemHealthContent,
-  StatementsContent,
-  PropertyExplorerContent,
   StatementQualityContent,
   StatementScoresContent,
 
