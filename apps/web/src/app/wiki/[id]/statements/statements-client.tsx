@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Search, Download } from "lucide-react";
 import {
   formatStatementValue,
+  formatPeriod,
   getStatusBadge,
 } from "@lib/statement-display";
 import { VerdictBadge } from "@components/wiki/VerdictBadge";
@@ -216,6 +217,16 @@ export function StatementsClient({
 
   const allFiltersOff = statusFilters.size === 0;
 
+  // Hide verdict column when >90% of active statements have no real verdict
+  const showVerdict = useMemo(() => {
+    const activeStmts = structured.filter((s) => s.status === "active");
+    if (activeStmts.length === 0) return false;
+    const withVerdict = activeStmts.filter(
+      (s) => s.verdict != null && s.verdict !== "not_verifiable"
+    ).length;
+    return withVerdict / activeStmts.length > 0.1;
+  }, [structured]);
+
   return (
     <div>
       {/* Filter bar */}
@@ -302,6 +313,7 @@ export function StatementsClient({
           category={category}
           statements={stmts}
           defaultOpen={idx === 0}
+          showVerdict={showVerdict}
         />
       ))}
 
@@ -355,10 +367,12 @@ function CategorySection({
   category,
   statements,
   defaultOpen,
+  showVerdict,
 }: {
   category: string;
   statements: ResolvedStatement[];
   defaultOpen: boolean;
+  showVerdict: boolean;
 }) {
   const active = statements.filter((s) => s.status === "active");
   const nonActive = statements.filter((s) => s.status !== "active");
@@ -387,9 +401,11 @@ function CategorySection({
               <th className="text-right px-3 py-2 text-xs font-medium">
                 Citations
               </th>
-              <th className="text-left px-3 py-2 text-xs font-medium">
-                Verdict
-              </th>
+              {showVerdict && (
+                <th className="text-left px-3 py-2 text-xs font-medium">
+                  Verdict
+                </th>
+              )}
               <th className="text-left px-3 py-2 text-xs font-medium">
                 Status
               </th>
@@ -397,10 +413,10 @@ function CategorySection({
           </thead>
           <tbody>
             {active.map((s) => (
-              <StructuredRow key={s.id} statement={s} />
+              <StructuredRow key={s.id} statement={s} showVerdict={showVerdict} />
             ))}
             {nonActive.map((s) => (
-              <StructuredRow key={s.id} statement={s} />
+              <StructuredRow key={s.id} statement={s} showVerdict={showVerdict} />
             ))}
           </tbody>
         </table>
@@ -411,14 +427,9 @@ function CategorySection({
 
 // ---- Structured Row ----
 
-function formatPeriod(start: string | null, end: string | null): string {
-  if (!start && !end) return "—";
-  if (start && !end) return `since ${start}`;
-  if (!start && end) return `until ${end}`;
-  return `${start} → ${end}`;
-}
+// formatPeriod imported from @lib/statement-display
 
-function StructuredRow({ statement: s }: { statement: ResolvedStatement }) {
+function StructuredRow({ statement: s, showVerdict }: { statement: ResolvedStatement; showVerdict: boolean }) {
   const value = formatStatementValue(s, s.property);
   const isTextOnly = !s.propertyId && !!s.statementText;
   const displayValue =
@@ -454,9 +465,11 @@ function StructuredRow({ statement: s }: { statement: ResolvedStatement }) {
       <td className="px-3 py-2 text-xs text-right relative">
         <CitationDetail citations={s.citations} />
       </td>
-      <td className="px-3 py-2 text-xs">
-        <VerdictBadge verdict={s.verdict} score={s.verdictScore} size="sm" />
-      </td>
+      {showVerdict && (
+        <td className="px-3 py-2 text-xs">
+          <VerdictBadge verdict={s.verdict} score={s.verdictScore} size="sm" />
+        </td>
+      )}
       <td className="px-3 py-2">
         <span
           className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${statusBadge.className}`}
