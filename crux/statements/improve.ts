@@ -1243,7 +1243,7 @@ async function main() {
       console.log(`\n${c.bold}${c.blue}Classify Summary: ${entityId}${c.reset}`);
       console.log(`  Classified:  ${c.green}${result.created}${c.reset}`);
       console.log(`  Rejected:    ${c.red}${result.rejected}${c.reset}`);
-      console.log(`  Remaining:   ${result.coverageAfter ?? '?'} uncategorized`);
+      console.log(`  Remaining:   ${result.coverageAfter ?? 0} uncategorized`);
       console.log(`  Cost:        $${result.totalCost.toFixed(4)}`);
       if (opts.dryRun) {
         console.log(`  ${c.dim}(dry run — no statements were modified)${c.reset}`);
