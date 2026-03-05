@@ -86,7 +86,7 @@ async function main() {
   const allStatements = [
     ...stmtResult.data.structured,
     ...stmtResult.data.attributed,
-  ];
+  ].filter((s) => s.status === 'active' && s.statementText && s.statementText.trim().length > 0);
 
   if (allStatements.length === 0) {
     if (jsonOutput) {
