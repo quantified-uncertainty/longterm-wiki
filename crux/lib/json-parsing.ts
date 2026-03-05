@@ -87,8 +87,21 @@ export function parseJsonFromLlm<T>(
   // Strip markdown code fences if present
   const stripped = raw.replace(/```(?:json)?\s*/g, '').replace(/```\s*$/g, '').trim();
 
-  // Strategy 1: standard parse of the outermost {} block
+  // Strategy 1a: try array first — if the outer structure is `[...]`, parse that
+  const firstBracket = stripped.indexOf('[');
   const firstBrace = stripped.indexOf('{');
+  if (firstBracket !== -1 && (firstBrace === -1 || firstBracket < firstBrace)) {
+    const arrayComplete = extractLongestCompleteJson(stripped, firstBracket);
+    if (arrayComplete) {
+      try {
+        return JSON.parse(arrayComplete);
+      } catch {
+        // fall through to object strategy
+      }
+    }
+  }
+
+  // Strategy 1b: standard parse of the outermost {} block
   if (firstBrace !== -1) {
     const complete = extractLongestCompleteJson(stripped, firstBrace);
     if (complete) {

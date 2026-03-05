@@ -858,7 +858,7 @@ export async function runSinglePass(opts: ImproveOptions): Promise<PassResult> {
   if (!dryRun && allAccepted.length > 0) {
     const batchResult = await createStatementBatch(allAccepted);
     if (!batchResult.ok) {
-      throw new Error('Failed to insert statements');
+      throw new Error(`Failed to insert statements: ${batchResult.message}`);
     }
 
     // Re-analyze to get updated coverage
