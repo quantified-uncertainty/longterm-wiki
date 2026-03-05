@@ -957,8 +957,19 @@ export async function runSinglePass(opts: ImproveOptions): Promise<PassResult> {
   const { entityId, orgType, categoryFilter, minScore, budget, noResearch, dryRun, client, tracker } = opts;
   const entityName = slugToDisplayName(entityId);
 
-  // 1. Analyze gaps
-  const analysis = await analyzeGaps(entityId, orgType);
+  // 0. Auto-classify uncategorized statements (cheap Haiku call) to get accurate gap numbers
+  const preAnalysis = await analyzeGaps(entityId, orgType);
+  const uncategorizedCount = preAnalysis.allStatements.filter(
+    (s) => s.status === 'active' && !s.propertyId,
+  ).length;
+  if (uncategorizedCount > 0 && !dryRun) {
+    await runClassifyPass(opts);
+  }
+
+  // 1. Analyze gaps (re-analyze after classify for accurate numbers)
+  const analysis = uncategorizedCount > 0 && !dryRun
+    ? await analyzeGaps(entityId, orgType)
+    : preAnalysis;
   const coverageBefore = analysis.coverageScore;
 
   // Filter to gaps with deficit > 0
