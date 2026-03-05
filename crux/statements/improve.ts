@@ -780,6 +780,169 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
 }
 
 // ---------------------------------------------------------------------------
+// Classify mode: assign properties to uncategorized statements
+// ---------------------------------------------------------------------------
+
+/**
+ * Classify uncategorized statements by assigning appropriate property IDs.
+ * Uses LLM to batch-classify statements, then PATCHes the propertyId.
+ */
+export async function runClassifyPass(opts: ImproveOptions): Promise<PassResult> {
+  const { entityId, dryRun, budget, client, tracker } = opts;
+
+  const [stmtsResult, propResult, entityResult] = await Promise.all([
+    getStatementsByEntity(entityId),
+    getProperties(),
+    getEntity(entityId),
+  ]);
+
+  const entityName = entityResult.ok
+    ? (entityResult.data as { name?: string }).name ?? slugToDisplayName(entityId)
+    : slugToDisplayName(entityId);
+  const entityType = entityResult.ok
+    ? (entityResult.data as { entityType?: string }).entityType ?? 'organization'
+    : 'organization';
+
+  if (!stmtsResult.ok) {
+    throw new Error(`Failed to fetch statements: ${stmtsResult.message}`);
+  }
+
+  const allStatements = [
+    ...stmtsResult.data.structured,
+    ...stmtsResult.data.attributed,
+  ];
+
+  const allProperties = propResult.ok ? propResult.data.properties : [];
+  const fullPropertyMap = buildPropertyMap(allProperties);
+
+  // Find uncategorized statements (no propertyId)
+  const uncategorized = allStatements.filter(
+    (s) => s.status === 'active' && !s.propertyId,
+  );
+
+  if (uncategorized.length === 0) {
+    return {
+      entityId,
+      entityType,
+      categoriesProcessed: ['classify'],
+      coverageBefore: 0,
+      coverageAfter: null,
+      created: 0,
+      rejected: 0,
+      totalCost: tracker.totalCost,
+      rejections: [],
+    };
+  }
+
+  // Build property list for the prompt
+  const propertyList = allProperties
+    .map((p) => `  - ${p.id} (${p.category}): ${p.label}${p.description ? ` — ${p.description}` : ''}`)
+    .join('\n');
+
+  // Batch classify in groups of 20
+  const batchSize = 20;
+  let classified = 0;
+  let rejected = 0;
+  const rejections: PassResult['rejections'] = [];
+
+  for (let i = 0; i < uncategorized.length; i += batchSize) {
+    if (tracker.totalCost >= budget) break;
+
+    const batch = uncategorized.slice(i, i + batchSize);
+    const statementsForPrompt = batch
+      .map((s, idx) => `  ${idx + 1}. [id=${s.id}] "${(s.statementText ?? '').slice(0, 200)}"`)
+      .join('\n');
+
+    const prompt = {
+      system: `You are a data classification expert. Assign the most appropriate property ID to each statement from the provided vocabulary. Respond ONLY with a JSON array.`,
+      user: `Classify these statements about ${entityName} (${entityType}) by assigning property IDs.
+
+Available properties:
+${propertyList}
+
+Statements to classify:
+${statementsForPrompt}
+
+Return a JSON array where each element has:
+- "id": number — the statement ID
+- "propertyId": string — the best-matching property ID from the list above
+
+Choose the most specific matching property. If no property fits well, use null.`,
+    };
+
+    const result = await callLlm(client, prompt, {
+      model: MODELS.haiku,
+      maxTokens: 2000,
+      temperature: 0.1,
+      retryLabel: 'improve-classify',
+      tracker,
+      label: `classify-batch-${i}`,
+    });
+
+    const parsed = parseJsonFromLlm<Array<{ id: number; propertyId: string | null }>>(
+      result.text,
+      'improve-classify',
+      () => [],
+    );
+
+    if (!Array.isArray(parsed)) continue;
+
+    for (const assignment of parsed) {
+      if (!assignment || typeof assignment.id !== 'number') continue;
+      if (!assignment.propertyId) {
+        rejected++;
+        rejections.push({
+          text: `#${assignment.id}`,
+          reason: 'No matching property found',
+          score: 0,
+        });
+        continue;
+      }
+
+      // Validate propertyId exists
+      if (!fullPropertyMap.has(assignment.propertyId)) {
+        rejected++;
+        rejections.push({
+          text: `#${assignment.id} → ${assignment.propertyId}`,
+          reason: 'Property ID not in vocabulary',
+          score: 0,
+        });
+        continue;
+      }
+
+      if (!dryRun) {
+        const patchResult = await patchStatement(assignment.id, {
+          propertyId: assignment.propertyId,
+        });
+        if (!patchResult.ok) {
+          rejected++;
+          rejections.push({
+            text: `#${assignment.id} → ${assignment.propertyId}`,
+            reason: `PATCH failed: ${patchResult.message}`,
+            score: 0,
+          });
+          continue;
+        }
+      }
+
+      classified++;
+    }
+  }
+
+  return {
+    entityId,
+    entityType,
+    categoriesProcessed: ['classify'],
+    coverageBefore: uncategorized.length,
+    coverageAfter: uncategorized.length - classified,
+    created: classified,
+    rejected,
+    totalCost: tracker.totalCost,
+    rejections,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Core: single improvement pass (composable)
 // ---------------------------------------------------------------------------
 
@@ -1021,7 +1184,7 @@ async function main() {
     console.error(`${c.red}Error: provide an entity ID${c.reset}`);
     console.error(`  Usage: pnpm crux statements improve <entity-id> [options]`);
     console.error(`  Options: --org-type=TYPE --dry-run --category=CAT --no-research --min-score=N --budget=N --json`);
-    console.error(`           --target-coverage=N --max-iterations=N --mode=quality`);
+    console.error(`           --target-coverage=N --max-iterations=N --mode=quality|classify`);
     process.exit(1);
   }
 
@@ -1063,8 +1226,37 @@ async function main() {
 
   if (!jsonOutput) console.log(`${c.dim}Analyzing coverage gaps for ${entityId}...${c.reset}`);
 
-  // Dispatch: quality mode → iterative loop → single pass
-  if (mode === 'quality') {
+  // Dispatch: classify → quality → iterative loop → single pass
+  if (mode === 'classify') {
+    let result: PassResult;
+    try {
+      if (!jsonOutput) console.log(`${c.dim}Classify mode: assigning properties to uncategorized statements...${c.reset}`);
+      result = await runClassifyPass(opts);
+    } catch (err) {
+      console.error(`${c.red}${err instanceof Error ? err.message : String(err)}${c.reset}`);
+      process.exit(1);
+    }
+
+    if (jsonOutput) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(`\n${c.bold}${c.blue}Classify Summary: ${entityId}${c.reset}`);
+      console.log(`  Classified:  ${c.green}${result.created}${c.reset}`);
+      console.log(`  Rejected:    ${c.red}${result.rejected}${c.reset}`);
+      console.log(`  Remaining:   ${result.coverageAfter ?? '?'} uncategorized`);
+      console.log(`  Cost:        $${result.totalCost.toFixed(4)}`);
+      if (opts.dryRun) {
+        console.log(`  ${c.dim}(dry run — no statements were modified)${c.reset}`);
+      }
+      if (result.rejections.length > 0) {
+        console.log(`\n  ${c.dim}Rejections:${c.reset}`);
+        for (const r of result.rejections) {
+          console.log(`    ${c.red}✗${c.reset} ${r.text} — ${r.reason}`);
+        }
+      }
+      console.log('');
+    }
+  } else if (mode === 'quality') {
     let result: PassResult;
     try {
       if (!jsonOutput) console.log(`${c.dim}Quality mode: rewriting low-scoring statements...${c.reset}`);
