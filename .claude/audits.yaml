@@ -153,7 +153,7 @@ post_merge:
     status: verified
     deadline: "2026-03-18"
     checked_date: "2026-03-05"
-    notes: null
+    notes: "Verified: ignoreCommand in apps/web/vercel.json correctly builds only production branch. Site is live at longtermwiki.com (671 pages). Config: [[  == production ]] && exit 1; exit 0"
 
   - id: audits-system-post-merge
     pr: 1637
@@ -163,4 +163,4 @@ post_merge:
     status: verified
     deadline: "2026-03-18"
     checked_date: "2026-03-05"
-    notes: null
+    notes: "Verified: all audits subcommands work (list, report, run-auto, check). YAML schema valid. 7 audits + 2 post-merge items tracked correctly. run-auto executes hybrid check_commands."
