@@ -5,8 +5,9 @@
  * - GET /current   — current value for entity+property (valid_end IS NULL)
  * - GET /by-page   — all statements for a page with citations and footnote links
  * - GET /by-page/summary — per-footnote verification summary for citation dots
- * - GET /properties — list all properties with statement counts
- * - GET /stats     — basic statistics
+ * - GET /properties       — list all properties with statement counts
+ * - POST /properties/upsert — batch upsert properties
+ * - GET /stats             — basic statistics
  * - GET /quality-summary — aggregate quality distribution + per-entity coverage scores
  * - PATCH /:id     — update statement status, verdict, or note
  * - POST /         — create statement + optional citations
@@ -613,6 +614,76 @@ const statementsApp = new Hono()
         statementCount: countMap.get(p.id) ?? 0,
       })),
     });
+  })
+
+  // ---- POST /properties/upsert — batch upsert properties ----
+  .post("/properties/upsert", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const schema = z.object({
+      properties: z.array(
+        z.object({
+          id: z.string().min(1),
+          label: z.string().min(1),
+          category: z.string().min(1),
+          description: z.string().nullable().optional(),
+          entityTypes: z.array(z.string()).default(["organization"]),
+          valueType: z.enum(["number", "string", "entity", "date"]).default("string"),
+          defaultUnit: z.string().nullable().optional(),
+          stalenessCadence: z.string().nullable().optional(),
+          unitFormatId: z.string().nullable().optional(),
+        })
+      ).min(1).max(100),
+    });
+
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const db = getDrizzleDb();
+    let created = 0;
+    let updated = 0;
+
+    for (const prop of parsed.data.properties) {
+      const existing = await db
+        .select({ id: properties.id })
+        .from(properties)
+        .where(eq(properties.id, prop.id))
+        .limit(1);
+
+      if (existing.length > 0) {
+        await db
+          .update(properties)
+          .set({
+            label: prop.label,
+            category: prop.category,
+            description: prop.description ?? null,
+            entityTypes: prop.entityTypes,
+            valueType: prop.valueType,
+            defaultUnit: prop.defaultUnit ?? null,
+            stalenessCadence: prop.stalenessCadence ?? null,
+            unitFormatId: prop.unitFormatId ?? null,
+            updatedAt: new Date(),
+          })
+          .where(eq(properties.id, prop.id));
+        updated++;
+      } else {
+        await db.insert(properties).values({
+          id: prop.id,
+          label: prop.label,
+          category: prop.category,
+          description: prop.description ?? null,
+          entityTypes: prop.entityTypes,
+          valueType: prop.valueType,
+          defaultUnit: prop.defaultUnit ?? null,
+          stalenessCadence: prop.stalenessCadence ?? null,
+          unitFormatId: prop.unitFormatId ?? null,
+        });
+        created++;
+      }
+    }
+
+    return c.json({ created, updated });
   })
 
   // ---- GET /quality-summary — aggregate quality scores and entity coverage ----
