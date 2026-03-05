@@ -21,6 +21,7 @@ import {
   count,
   desc,
   isNull,
+  isNotNull,
   sql,
 } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
@@ -30,6 +31,8 @@ import {
   statementPageReferences,
   properties,
   entityCoverageScores,
+  wikiPages,
+  resources,
 } from "../schema.js";
 import {
   parseJsonBody,
@@ -1355,6 +1358,113 @@ const statementsApp = new Hono()
     });
 
     return c.json({ deleted: deleted.length, ok: true });
+  })
+
+  // ---- GET /citation-dots/all — build-time bundle for citation dot overlays ----
+  /**
+   * Returns all statement-backed citation dot data grouped by page slug.
+   * Called once at build time by buildStatementCitationDots() in build-data.mjs.
+   * Joins statementPageReferences → statements → statementCitations (primary) →
+   * wikiPages → resources to produce the minimal data the CitationOverlay needs.
+   *
+   * Only includes rows where:
+   *  - footnoteResourceId IS NOT NULL (statement appears as a footnote on the page)
+   *  - statement.status = 'active'
+   */
+  .get("/citation-dots/all", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        pageSlug: wikiPages.slug,
+        footnoteResourceId: statementPageReferences.footnoteResourceId,
+        statementText: statements.statementText,
+        verdict: statements.verdict,
+        verdictScore: statements.verdictScore,
+        verdictQuotes: statements.verdictQuotes,
+        verifiedAt: statements.verifiedAt,
+        citUrl: statementCitations.url,
+        citResourceId: statementCitations.resourceId,
+        citSourceQuote: statementCitations.sourceQuote,
+        resourceTitle: resources.title,
+        resourceUrl: resources.url,
+        resourceType: resources.type,
+      })
+      .from(statementPageReferences)
+      .innerJoin(statements, eq(statementPageReferences.statementId, statements.id))
+      .innerJoin(wikiPages, eq(statementPageReferences.pageIdInt, wikiPages.integerIdCol))
+      .leftJoin(
+        statementCitations,
+        and(
+          eq(statementCitations.statementId, statements.id),
+          eq(statementCitations.isPrimary, true)
+        )
+      )
+      .leftJoin(resources, eq(statementCitations.resourceId, resources.id))
+      .where(
+        and(
+          isNotNull(statementPageReferences.footnoteResourceId),
+          eq(statements.status, "active")
+        )
+      );
+
+    // Map statement verdicts to legacy AccuracyVerdict values expected by CitationOverlay
+    function verdictToAccuracy(verdict: string | null): string | null {
+      if (!verdict) return null;
+      switch (verdict) {
+        case "verified": return "accurate";
+        case "disputed": return "inaccurate";
+        case "unsupported": return "unsupported";
+        case "unverified": return "not_verifiable";
+        default: return null;
+      }
+    }
+
+    // Group by page slug
+    const pages: Record<string, Array<{
+      footnoteResourceId: string;
+      claimText: string;
+      url: string | null;
+      resourceId: string | null;
+      sourceQuote: string | null;
+      sourceTitle: string | null;
+      sourceType: string | null;
+      quoteVerified: boolean;
+      accuracyVerdict: string | null;
+      accuracyScore: number | null;
+      accuracyIssues: string | null;
+      accuracyCheckedAt: string | null;
+    }>> = {};
+
+    for (const row of rows) {
+      if (!row.pageSlug || !row.footnoteResourceId) continue;
+
+      const accuracyVerdict = verdictToAccuracy(row.verdict);
+      // Only include rows that have something to show (verified or has verdict)
+      const quoteVerified = row.verdict === "verified";
+      if (!quoteVerified && !accuracyVerdict) continue;
+
+      if (!pages[row.pageSlug]) pages[row.pageSlug] = [];
+      pages[row.pageSlug].push({
+        footnoteResourceId: row.footnoteResourceId,
+        claimText: row.statementText ?? "",
+        url: row.citUrl ?? row.resourceUrl ?? null,
+        resourceId: row.citResourceId ?? null,
+        sourceQuote: row.citSourceQuote ?? null,
+        sourceTitle: row.resourceTitle ?? null,
+        sourceType: row.resourceType ?? null,
+        quoteVerified,
+        accuracyVerdict,
+        accuracyScore: row.verdictScore ?? null,
+        accuracyIssues: null,
+        accuracyCheckedAt: row.verifiedAt ? row.verifiedAt.toISOString() : null,
+      });
+    }
+
+    const totalPages = Object.keys(pages).length;
+    const totalEntries = Object.values(pages).reduce((sum, arr) => sum + arr.length, 0);
+
+    return c.json({ pages, totalPages, totalEntries });
   });
 
 export const statementsRoute = statementsApp;
