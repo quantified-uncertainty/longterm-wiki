@@ -191,7 +191,6 @@ export const PatchStatementBody = z.object({
   validStart: z.string().min(1).max(20).nullish(),
   validEnd: z.string().min(1).max(20).nullish(),
   attributedTo: z.string().min(1).max(200).nullish(),
-  qualifierKey: z.string().min(1).max(200).nullish(),
   archiveReason: z.string().min(1).max(2000).nullish(),
   verdict: z.string().min(1).max(50).nullish(),
   verdictScore: z.number().min(0).max(1).finite().nullish(),
