@@ -1,4 +1,5 @@
 name: Job Worker
+run-name: "Job Worker${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # Processes background jobs from the job queue using the Node.js worker runner.
 #
@@ -49,6 +50,9 @@ env:
   LONGTERMWIKI_CONTENT_KEY: ${{ secrets.LONGTERMWIKI_CONTENT_KEY }}
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   preflight:
     # Global circuit breaker — skip when automation is paused or wiki-server is down.
     # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.

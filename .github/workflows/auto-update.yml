@@ -1,4 +1,5 @@
 name: Auto-Update Wiki
+run-name: "Auto-Update Wiki${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # News-driven automatic wiki update system.
 # All pipeline logic lives in `crux/auto-update/ci-orchestrate.ts`.
@@ -40,6 +41,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   preflight:
     # Global circuit breaker — skip when automation is paused or wiki-server is down.
     if: vars.AUTOMATION_PAUSED != 'true'

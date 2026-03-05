@@ -1,4 +1,5 @@
 name: Sync Data to Wiki Server
+run-name: "Sync Data to Wiki Server${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 on:
   # Session logs and auto-update runs are gitignored (stored in DB),
@@ -11,6 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   preflight:
     # Global circuit breaker — skip when automation is paused or wiki-server is down.
     # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.

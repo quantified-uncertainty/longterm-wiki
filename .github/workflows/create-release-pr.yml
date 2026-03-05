@@ -1,4 +1,5 @@
 name: Create Release PR
+run-name: "Create Release PR${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # Creates (or updates) a PR from main → production with a standardized title
 # and auto-generated changelog. Merging the resulting PR triggers production
@@ -21,6 +22,9 @@ permissions:
   issues: write # needed for label creation
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   create-release-pr:
     # Global circuit breaker — skip when automation is paused.
     if: vars.AUTOMATION_PAUSED != 'true'
