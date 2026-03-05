@@ -86,6 +86,7 @@ Options:
   --target-coverage=N   Target coverage score for iterative loop (improve only)
   --max-iterations=N    Max iterations for iterative loop (default: 5, improve only)
   --mode=quality        Rewrite low-scoring statements instead of generating new ones
+  --mode=classify       Assign properties to uncategorized statements via LLM
 
 Examples:
   crux statements extract anthropic                Extract statements (dry run)
@@ -104,6 +105,7 @@ Examples:
   crux statements improve anthropic --no-research  Skip web search
   crux statements improve anthropic --target-coverage=0.8 --max-iterations=3  Iterate until 80%
   crux statements improve anthropic --mode=quality          Rewrite low-scoring statements
+  crux statements improve anthropic --mode=classify         Assign properties to uncategorized
 
 Workflow:
   1. crux statements extract <page-id> --apply     Extract statements from page
