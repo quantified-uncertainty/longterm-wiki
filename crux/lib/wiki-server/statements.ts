@@ -75,11 +75,11 @@ export interface CreateStatementInput {
 
 export async function getStatementsByEntity(
   entityId: string,
+  opts?: { includeChildren?: boolean },
 ): Promise<ApiResult<ByEntityResult>> {
-  return apiRequest<ByEntityResult>(
-    'GET',
-    `/api/statements/by-entity?entityId=${encodeURIComponent(entityId)}`,
-  );
+  let path = `/api/statements/by-entity?entityId=${encodeURIComponent(entityId)}`;
+  if (opts?.includeChildren) path += '&includeChildren=true';
+  return apiRequest<ByEntityResult>('GET', path);
 }
 
 export async function getStatementsByPage(
@@ -156,6 +156,7 @@ export async function clearStatementsByEntity(
 
 export interface PatchStatementInput {
   status?: 'active' | 'superseded' | 'retracted';
+  subjectEntityId?: string;
   propertyId?: string | null;
   archiveReason?: string | null;
   verdict?: string | null;

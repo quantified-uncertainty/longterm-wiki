@@ -69,6 +69,28 @@ function normalizeValueDate(d: string | null | undefined): string | null {
 }
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize a date string from LLM output to a valid ISO date (YYYY-MM-DD) or null.
+ * LLMs often produce partial dates like "2024" or "2024-06" which fail PostgreSQL date columns.
+ */
+function normalizeValueDate(d: string | null | undefined): string | null {
+  if (!d) return null;
+  // Full ISO date: YYYY-MM-DD → keep as-is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  // Year-month: YYYY-MM → append -01
+  if (/^\d{4}-\d{2}$/.test(d)) return `${d}-01`;
+  // Year only: YYYY → append -01-01
+  if (/^\d{4}$/.test(d)) return `${d}-01-01`;
+  // Anything else (ISO datetime, etc.) — try to parse
+  const parsed = new Date(d);
+  if (!isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
+  return null; // Unparseable — drop it
+}
+
+// ---------------------------------------------------------------------------
 // Types (exported for use by future pass functions)
 // ---------------------------------------------------------------------------
 
