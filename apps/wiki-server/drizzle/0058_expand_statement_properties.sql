@@ -25,9 +25,9 @@ ON CONFLICT ("id") DO UPDATE SET
 -- === Products ===
 INSERT INTO "properties" ("id", "label", "category", "description", "entity_types", "value_type", "default_unit", "staleness_cadence")
 VALUES
-  ('pricing', 'Pricing', 'product', 'Pricing model, tier structure, or specific price point', '{organization}', 'string', NULL, NULL),
-  ('api-volume', 'API Volume', 'product', 'Number of API calls, requests, or tokens processed', '{organization}', 'number', 'count', NULL),
-  ('product-name', 'Product Name', 'product', 'Name of a product or service offered by the entity', '{organization}', 'string', NULL, NULL)
+  ('pricing', 'Pricing', 'products', 'Pricing model, tier structure, or specific price point', '{organization}', 'string', NULL, NULL),
+  ('api-volume', 'API Volume', 'products', 'Number of API calls, requests, or tokens processed', '{organization}', 'number', 'count', NULL),
+  ('product-name', 'Product Name', 'products', 'Name of a product or service offered by the entity', '{organization}', 'string', NULL, NULL)
 ON CONFLICT ("id") DO UPDATE SET
   "label" = EXCLUDED."label",
   "category" = EXCLUDED."category",

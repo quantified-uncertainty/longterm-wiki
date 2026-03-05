@@ -469,21 +469,21 @@ properties:
     label: "Prediction"
     description: "Forward-looking prediction or forecast attributed to a person"
     value_type: string
-    category: research
+    category: attribution
     entity_types: [person, organization]
 
   - id: public_statement
     label: "Public Statement"
     description: "Notable public statement, quote, or position expressed publicly"
     value_type: string
-    category: organizational
+    category: attribution
     entity_types: [person, organization]
 
   - id: interview_quote
     label: "Interview Quote"
     description: "Notable quote from an interview, podcast, or testimony"
     value_type: string
-    category: organizational
+    category: attribution
     entity_types: [person]
 
   # ── Competitive & Market ───────────────────────────────────────────────

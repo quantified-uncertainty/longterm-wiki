@@ -488,21 +488,21 @@ measures:
   product-release:
     label: "Product Release"
     unit: string
-    category: product
+    category: products
     description: "Product or model release event"
     applicableTo: [organization]
 
   model-capability:
     label: "Model Capability"
     unit: string
-    category: product
+    category: products
     description: "Qualitative capability description of a model or product"
     applicableTo: [organization]
 
   safety-level:
     label: "Safety Level"
     unit: string
-    category: product
+    category: products
     description: "AI Safety Level (ASL) or safety classification tier"
     applicableTo: [organization]
 
@@ -735,14 +735,14 @@ measures:
   pricing:
     label: "Pricing"
     unit: string
-    category: product
+    category: products
     description: "Pricing model, tier structure, or specific price point"
     applicableTo: [organization]
 
   api-volume:
     label: "API Volume"
     unit: count
-    category: product
+    category: products
     direction: higher
     description: "Number of API calls, requests, or tokens processed"
     applicableTo: [organization]
@@ -750,7 +750,7 @@ measures:
   product-name:
     label: "Product Name"
     unit: string
-    category: product
+    category: products
     description: "Name of a product or service offered by the entity"
     applicableTo: [organization]
 
