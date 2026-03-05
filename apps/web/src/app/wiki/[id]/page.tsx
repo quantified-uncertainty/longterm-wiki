@@ -33,7 +33,7 @@ import { ReferenceProvider } from "@/components/wiki/ReferenceContext";
 import type { RefMapEntry } from "@/components/wiki/ReferenceContext";
 import type { RefMapEntry as PreprocessorRefMapEntry } from "@/lib/reference-preprocessor";
 import { References } from "@/components/wiki/References";
-import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
+import { getCitationQuotes, getStatementCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 import type { CitationQuote } from "@/lib/citation-data";
 import { EntityStatementsCard } from "@/components/wiki/EntityStatementsCard";
 import { PageStatementsSection } from "@/components/wiki/PageStatementsSection";
@@ -472,12 +472,23 @@ export default async function WikiPage({ params }: PageProps) {
 
     const entityPath = getEntityPath(slug) || "";
 
-    const [result, citationQuotes] = await Promise.all([
+    const [result, legacyCitationQuotes] = await Promise.all([
       renderMdxPage(slug),
       getCitationQuotes(slug),
     ]);
     if (!result) notFound();
     if (isMdxError(result)) return <MdxErrorView error={result} />;
+
+    // Merge statement-pipeline quotes (Statements V2) with legacy quotes.
+    // Statement quotes take precedence for any footnote they cover.
+    const stmtCitationQuotes = result.referenceMap
+      ? getStatementCitationQuotes(slug, result.referenceMap)
+      : [];
+    const stmtFootnotes = new Set(stmtCitationQuotes.map((q) => q.footnote));
+    const citationQuotes: CitationQuote[] = [
+      ...stmtCitationQuotes,
+      ...legacyCitationQuotes.filter((q) => !stmtFootnotes.has(q.footnote)),
+    ];
 
     const pageData = getPageById(slug);
     const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
@@ -507,12 +518,23 @@ export default async function WikiPage({ params }: PageProps) {
     // No numeric ID — render directly by slug (page-only content without entity)
     const entityPath = getEntityPath(id) || "";
 
-    const [result, citationQuotes] = await Promise.all([
+    const [result, legacyCitationQuotes] = await Promise.all([
       renderMdxPage(id),
       getCitationQuotes(id),
     ]);
     if (!result) notFound();
     if (isMdxError(result)) return <MdxErrorView error={result} />;
+
+    // Merge statement-pipeline quotes (Statements V2) with legacy quotes.
+    // Statement quotes take precedence for any footnote they cover.
+    const stmtCitationQuotes = result.referenceMap
+      ? getStatementCitationQuotes(id, result.referenceMap)
+      : [];
+    const stmtFootnotes = new Set(stmtCitationQuotes.map((q) => q.footnote));
+    const citationQuotes: CitationQuote[] = [
+      ...stmtCitationQuotes,
+      ...legacyCitationQuotes.filter((q) => !stmtFootnotes.has(q.footnote)),
+    ];
 
     const pageData = getPageById(id);
     const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
