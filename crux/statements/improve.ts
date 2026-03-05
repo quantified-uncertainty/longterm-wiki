@@ -734,11 +734,20 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
   const { entityId, categoryFilter, minScore, budget, dryRun, client, tracker } = opts;
   const entityName = slugToDisplayName(entityId);
 
-  // 1. Fetch all statements for the entity
-  const stmtResult = await getStatementsByEntity(entityId);
+  // 1. Fetch all statements + entity metadata in parallel
+  const [stmtResult, entityResult, propResult] = await Promise.all([
+    getStatementsByEntity(entityId),
+    import('../lib/wiki-server/entities.ts').then((m) => m.getEntity(entityId)),
+    getProperties(),
+  ]);
+
   if (!stmtResult.ok) {
     throw new Error(`Could not fetch statements for ${entityId}`);
   }
+
+  const entityType = entityResult.ok && entityResult.data.entityType
+    ? entityResult.data.entityType
+    : 'organization';
 
   const allRawStatements = [
     ...stmtResult.data.structured,
@@ -752,7 +761,6 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
 
   // 2. Score all statements
   const scores = scoreAllStatements(scoringStmts, entityId, entityName);
-  const scoreMap = new Map<number, ScoringResult>(scores.map((s) => [s.statementId, s]));
 
   // 3. Filter to low-quality statements
   let lowQuality = scores.filter((s) => s.qualityScore < minScore);
@@ -766,13 +774,6 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
   }
 
   if (lowQuality.length === 0) {
-    const entityResult = await import('../lib/wiki-server/entities.ts').then(
-      (m) => m.getEntity(entityId),
-    );
-    const entityType = entityResult.ok && entityResult.data.entityType
-      ? entityResult.data.entityType
-      : 'organization';
-
     return {
       entityId,
       entityType,
@@ -786,18 +787,9 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
     };
   }
 
-  // 4. Fetch properties for rewrite generation
-  const propResult = await getProperties();
+  // 4. Build property map for rewrite generation
   const allProperties = propResult.ok ? propResult.data.properties : [];
   const fullPropertyMap = buildPropertyMap(allProperties);
-
-  // Determine entity type
-  const entityResult = await import('../lib/wiki-server/entities.ts').then(
-    (m) => m.getEntity(entityId),
-  );
-  const entityType = entityResult.ok && entityResult.data.entityType
-    ? entityResult.data.entityType
-    : 'organization';
 
   // 5. Process each low-quality statement
   let totalCreated = 0;
@@ -880,8 +872,16 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
   }
 
   // 6. Apply rewrites (unless dry-run)
+  // Create new statements first, then supersede originals — if batch create
+  // fails, originals are still active (no data loss).
   if (!dryRun && rewrites.length > 0) {
-    // Supersede originals
+    // Create new statements first
+    const batchResult = await createStatementBatch(rewrites.map((r) => r.input));
+    if (!batchResult.ok) {
+      throw new Error('Failed to insert rewritten statements');
+    }
+
+    // Only supersede originals after new ones are safely created
     for (const { originalId } of rewrites) {
       const patchResult = await patchStatement(originalId, {
         status: 'superseded',
@@ -890,12 +890,6 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
       if (!patchResult.ok) {
         console.warn(`[improve] Failed to supersede statement ${originalId}`);
       }
-    }
-
-    // Create new statements
-    const batchResult = await createStatementBatch(rewrites.map((r) => r.input));
-    if (!batchResult.ok) {
-      throw new Error('Failed to insert rewritten statements');
     }
   }
 
