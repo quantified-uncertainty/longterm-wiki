@@ -44,6 +44,7 @@ import {
   type ScoringResult,
 } from './scoring.ts';
 import { resolveCoverageTargets } from './coverage-targets.ts';
+import { validateCreateStatementBatch } from './validate-quality.ts';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -744,6 +745,19 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
         })),
       };
 
+      const qualityReport = validateCreateStatementBatch([newStmt]);
+      if (!qualityReport.passed) {
+        const codes = qualityReport.violations.map(v => v.code).join(', ');
+        const details = qualityReport.violations.map(v => v.message).join('; ');
+        rejected++;
+        rejections.push({
+          text: rewrite.statementText.slice(0, 80),
+          reason: `Data quality gate failed (${codes}): ${details}`,
+          score: gate.newScore,
+        });
+        continue;
+      }
+
       const insertResult = await createStatementBatch([newStmt]);
       if (insertResult.ok) {
         // Only supersede original after successful insert
@@ -1066,6 +1080,18 @@ export async function runSinglePass(opts: ImproveOptions): Promise<PassResult> {
   let coverageAfter: number | null = null;
 
   if (!dryRun && allAccepted.length > 0) {
+    // Data quality gate — validate before writing to DB.
+    // Throws if critical assertions fail so the caller can surface the error.
+    const qualityReport = validateCreateStatementBatch(allAccepted);
+    if (!qualityReport.passed) {
+      const codes = qualityReport.violations.map(v => v.code).join(', ');
+      const details = qualityReport.violations.map(v => v.message).join('; ');
+      throw new Error(
+        `Data quality assertions failed (${codes}): ${details}. ` +
+        'Use --dry-run to inspect the generated statements without writing.',
+      );
+    }
+
     const batchResult = await createStatementBatch(allAccepted);
     if (!batchResult.ok) {
       throw new Error(`Failed to insert statements: ${batchResult.message}`);
