@@ -253,6 +253,69 @@ const ClearByEntityQuery = z.object({
   entityId: z.string().min(1).max(200),
 });
 
+// ---- Pipeline quality gate validation ----
+
+/** Property IDs that represent financial values where $0 is almost always a data error. */
+const FINANCIAL_PROPERTY_IDS = new Set([
+  "revenue",
+  "valuation",
+  "funding-round",
+  "operating-expenses",
+]);
+
+/** Maximum plausible benchmark score. ELO caps ~2000, percentages at 100, raw scores rarely exceed 10000. */
+const MAX_BENCHMARK_SCORE = 10000;
+
+/**
+ * Validate a parsed statement for semantic correctness beyond Zod schema checks.
+ * Returns null if valid, or a descriptive error message if invalid.
+ *
+ * Exported for unit testing.
+ */
+export function validateStatementQuality(
+  data: z.infer<typeof CreateStatementBody>
+): string | null {
+  // 1. Block empty structured statements: require at least one value field
+  if (data.variety === "structured") {
+    const hasValue =
+      data.valueNumeric != null ||
+      data.valueText != null ||
+      data.valueDate != null ||
+      data.valueEntityId != null ||
+      data.valueSeries != null;
+    if (!hasValue) {
+      return "Structured statements must have at least one value field (valueNumeric, valueText, valueDate, valueEntityId, or valueSeries)";
+    }
+  }
+
+  // 2. Validate benchmark score magnitudes
+  if (
+    data.propertyId === "benchmark-score" &&
+    data.valueNumeric != null &&
+    Math.abs(data.valueNumeric) > MAX_BENCHMARK_SCORE
+  ) {
+    return `Benchmark score ${data.valueNumeric} exceeds maximum plausible value of ${MAX_BENCHMARK_SCORE}. ELO scores cap around 2000, percentages at 100. Check if a raw score was stored with percentage format.`;
+  }
+
+  // 3. Block $0 for financial properties
+  if (
+    data.propertyId != null &&
+    FINANCIAL_PROPERTY_IDS.has(data.propertyId) &&
+    data.valueNumeric === 0
+  ) {
+    return `Financial property "${data.propertyId}" cannot have a value of $0. If the entity has no known value, omit the statement instead of recording zero.`;
+  }
+
+  // 4. Require statementText for attributed statements
+  if (data.variety === "attributed") {
+    if (!data.statementText || data.statementText.trim().length === 0) {
+      return "Attributed statements must have non-empty statementText";
+    }
+  }
+
+  return null;
+}
+
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
 const statementsApp = new Hono()
@@ -1034,6 +1097,13 @@ const statementsApp = new Hono()
     }
 
     const data = parsed.data;
+
+    // Pipeline quality gate — reject semantically invalid statements
+    const qualityError = validateStatementQuality(data);
+    if (qualityError) {
+      return c.json({ error: "validation_failed", message: qualityError }, 400);
+    }
+
     const db = getDrizzleDb();
 
     const statementId = await db.transaction(async (tx) => {
@@ -1112,6 +1182,21 @@ const statementsApp = new Hono()
     }
 
     const items = parsed.data.statements;
+
+    // Pipeline quality gate — validate all items before inserting any
+    for (let idx = 0; idx < items.length; idx++) {
+      const qualityError = validateStatementQuality(items[idx]);
+      if (qualityError) {
+        return c.json(
+          {
+            error: "validation_failed",
+            message: `Statement at index ${idx}: ${qualityError}`,
+          },
+          400
+        );
+      }
+    }
+
     const db = getDrizzleDb();
 
     const results: Array<{ id: number; sourceFactKey: string | null }> = [];
