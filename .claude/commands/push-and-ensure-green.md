@@ -55,7 +55,8 @@ Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all
      PRBODY
 
      # Option B: write body to file first, then use --body-file:
-     cat > /tmp/pr-body.md <<'PRBODY'
+     # IMPORTANT: use >| (force-overwrite) not > — zsh noclobber silently blocks > if the file exists
+     cat >| /tmp/pr-body.md <<'PRBODY'
      ## Summary
      ...
      PRBODY
