@@ -6,7 +6,7 @@
  * the full range of API response shapes it handles.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // ── Mock dependencies ────────────────────────────────────────────────────────
 
@@ -145,6 +145,15 @@ describe("SystemHealthContent", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Default: no Vercel env vars
+    delete process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
+    delete process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF;
+    delete process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_MESSAGE;
+    delete process.env.NEXT_PUBLIC_BUILD_TIMESTAMP;
+  });
+
+  afterEach(() => {
+    // Clean up any Vercel env vars set during tests so they don't leak into
+    // other test suites running in the same process.
     delete process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
     delete process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF;
     delete process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_MESSAGE;
