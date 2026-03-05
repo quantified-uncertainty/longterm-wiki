@@ -50,6 +50,12 @@ const SCRIPTS = {
     passthrough: ['json', 'dry-run', 'org-type', 'category', 'no-research', 'min-score', 'budget', 'target-coverage', 'max-iterations', 'mode'],
     positional: true,
   },
+  'seed-properties': {
+    script: 'statements/seed-properties.ts',
+    description: 'Seed missing property definitions for coverage target categories',
+    passthrough: ['dry-run'],
+    positional: false,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'quality');
