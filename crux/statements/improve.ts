@@ -29,14 +29,19 @@ import {
   createStatementBatch,
   storeCoverageScore,
   getProperties,
+  getStatementsByEntity,
+  patchStatement,
   type CreateStatementInput,
 } from '../lib/wiki-server/statements.ts';
+import { getEntity } from '../lib/wiki-server/entities.ts';
 import { analyzeGaps, type GapAnalysis } from './gaps.ts';
 import {
   scoreStatement,
   scoreUniqueness,
+  scoreAllStatements,
   type ScoringStatement,
   type ScoringContext,
+  type ScoringResult,
 } from './scoring.ts';
 import { resolveCoverageTargets } from './coverage-targets.ts';
 
@@ -384,6 +389,361 @@ export function buildPropertyMap(
 }
 
 // ---------------------------------------------------------------------------
+// Quality mode: rewrite low-scoring statements
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a rewritten version of a low-scoring statement via LLM.
+ */
+export async function generateRewrite(
+  original: ScoringStatement,
+  entityName: string,
+  entityType: string,
+  properties: Array<{ id: string; label: string; description: string | null }>,
+  client: Anthropic,
+  tracker: CostTracker,
+): Promise<GeneratedStatement | null> {
+  const propertyList = properties
+    .map((p) => `  - ${p.id}: ${p.label}${p.description ? ` — ${p.description}` : ''}`)
+    .join('\n');
+
+  const prompt = {
+    system: `You are a structured data expert improving low-quality factual statements for a knowledge base. Your rewrite must:
+- Be atomic: exactly one fact per statement
+- Be self-contained: mention the entity by name
+- Be precise: use specific numbers, dates, or named entities when possible
+- Be verifiable: could be checked against public sources
+- Preserve the core factual claim while improving clarity and structure
+
+Respond ONLY with a JSON object (not an array).`,
+    user: `Rewrite this statement about ${entityName} (${entityType}) to improve its quality:
+
+Original: "${original.statementText}"
+Property: ${original.propertyId ?? 'none'}
+Variety: ${original.variety}
+
+Available properties:
+${propertyList}
+
+Return a JSON object with:
+- "statementText": string — improved, self-contained sentence mentioning "${entityName}"
+- "propertyId": string — best-matching property ID from the list above
+- "variety": "structured" or "attributed"
+- "valueText": string | null
+- "valueNumeric": number | null
+- "valueUnit": string | null
+- "valueDate": string | null
+- "validStart": string | null — when this fact became true (YYYY or YYYY-MM-DD)
+- "citations": [{"url": string | null, "sourceQuote": string | null}]
+
+Preserve the original fact. Improve structure, clarity, and completeness.`,
+  };
+
+  const result = await callLlm(client, prompt, {
+    model: MODELS.sonnet,
+    maxTokens: 2000,
+    temperature: 0.2,
+    retryLabel: 'improve-rewrite',
+    tracker,
+    label: `rewrite-${original.id}`,
+  });
+
+  const parsed = parseJsonFromLlm<GeneratedStatement>(
+    result.text,
+    'improve-rewrite',
+    () => null,
+  );
+
+  if (!parsed || typeof parsed.statementText !== 'string' || parsed.statementText.length < 10) {
+    return null;
+  }
+
+  return parsed;
+}
+
+/**
+ * Convert a raw statement row from the API to a ScoringStatement.
+ */
+export function toScoringStatement(stmt: {
+  id: number;
+  variety: string;
+  statementText: string | null;
+  subjectEntityId: string | null;
+  propertyId: string | null;
+  valueNumeric?: number | string | null;
+  valueUnit?: string | null;
+  valueText?: string | null;
+  valueEntityId?: string | null;
+  valueDate?: string | null;
+  validStart?: string | null;
+  validEnd?: string | null;
+  status?: string | null;
+  claimCategory?: string | null;
+  citations?: Array<{
+    resourceId?: string | null;
+    url?: string | null;
+    sourceQuote?: string | null;
+  }>;
+  property?: {
+    id: string;
+    label: string;
+    category: string;
+    stalenessCadence?: string | null;
+  } | null;
+}): ScoringStatement {
+  return {
+    id: stmt.id,
+    variety: stmt.variety ?? 'structured',
+    statementText: stmt.statementText ?? '',
+    subjectEntityId: stmt.subjectEntityId ?? '',
+    propertyId: stmt.propertyId ?? null,
+    valueNumeric: typeof stmt.valueNumeric === 'string'
+      ? parseFloat(stmt.valueNumeric) || null
+      : (stmt.valueNumeric ?? null),
+    valueUnit: stmt.valueUnit ?? null,
+    valueText: stmt.valueText ?? null,
+    valueEntityId: stmt.valueEntityId ?? null,
+    valueDate: stmt.valueDate ?? null,
+    validStart: stmt.validStart ?? null,
+    validEnd: stmt.validEnd ?? null,
+    status: (stmt.status as string) ?? 'active',
+    claimCategory: stmt.claimCategory ?? null,
+    citations: stmt.citations?.map((c) => ({
+      resourceId: c.resourceId ?? null,
+      url: c.url ?? null,
+      sourceQuote: c.sourceQuote ?? null,
+    })),
+    property: stmt.property ?? null,
+  };
+}
+
+/**
+ * Quality gate for a rewritten statement: must score higher than the original.
+ */
+export function qualityGateRewrite(
+  rewrite: GeneratedStatement,
+  originalScore: number,
+  entityId: string,
+  entityName: string,
+  siblings: ScoringStatement[],
+  propertyMap: Map<string, { id: string; label: string; category: string; stalenessCadence?: string | null }>,
+): { accepted: boolean; newScore: number; reason: string } {
+  const propMeta = rewrite.propertyId ? propertyMap.get(rewrite.propertyId) : null;
+
+  const tempStmt: ScoringStatement = {
+    id: -1,
+    variety: rewrite.variety ?? 'structured',
+    statementText: rewrite.statementText,
+    subjectEntityId: entityId,
+    propertyId: rewrite.propertyId ?? null,
+    valueNumeric: rewrite.valueNumeric ?? null,
+    valueUnit: rewrite.valueUnit ?? null,
+    valueText: rewrite.valueText ?? null,
+    valueEntityId: null,
+    valueDate: rewrite.valueDate ?? null,
+    validStart: rewrite.validStart ?? null,
+    validEnd: null,
+    status: 'active',
+    claimCategory: null,
+    citations: rewrite.citations?.map((c) => ({
+      resourceId: null,
+      url: c.url ?? null,
+      sourceQuote: c.sourceQuote ?? null,
+    })),
+    property: propMeta ? {
+      id: propMeta.id,
+      label: propMeta.label,
+      category: propMeta.category,
+      stalenessCadence: propMeta.stalenessCadence,
+    } : null,
+  };
+
+  // Check uniqueness against siblings (excluding the original)
+  const uniqueness = scoreUniqueness(tempStmt, siblings);
+  if (uniqueness < 0.2) {
+    return { accepted: false, newScore: 0, reason: `Near-duplicate of another statement (uniqueness=${uniqueness.toFixed(3)})` };
+  }
+
+  const ctx: ScoringContext = { siblings, entityId, entityName };
+  const result = scoreStatement(tempStmt, ctx);
+
+  if (result.qualityScore <= originalScore) {
+    return {
+      accepted: false,
+      newScore: result.qualityScore,
+      reason: `Rewrite not better (${result.qualityScore.toFixed(3)} <= original ${originalScore.toFixed(3)})`,
+    };
+  }
+
+  return { accepted: true, newScore: result.qualityScore, reason: 'Improved' };
+}
+
+/**
+ * Quality mode: find low-scoring statements and rewrite them.
+ *
+ * Scores all statements for an entity, picks the bottom N by quality,
+ * generates rewrites via LLM, quality-gates them (must score higher),
+ * then supersedes originals and inserts new versions.
+ */
+export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> {
+  const { entityId, minScore, budget, dryRun, client, tracker } = opts;
+
+  // Fetch entity info and statements in parallel
+  const [entityResult, stmtsResult, propResult] = await Promise.all([
+    getEntity(entityId),
+    getStatementsByEntity(entityId),
+    getProperties(),
+  ]);
+
+  const entityName = entityResult.ok
+    ? (entityResult.data as { name?: string }).name ?? slugToDisplayName(entityId)
+    : slugToDisplayName(entityId);
+  const entityType = entityResult.ok
+    ? (entityResult.data as { entityType?: string }).entityType ?? 'organization'
+    : 'organization';
+
+  if (!stmtsResult.ok) {
+    throw new Error(`Failed to fetch statements for ${entityId}: ${stmtsResult.error}`);
+  }
+
+  const rawStatements = stmtsResult.data.statements;
+  const allProperties = propResult.ok ? propResult.data.properties : [];
+  const fullPropertyMap = buildPropertyMap(allProperties);
+
+  // Convert to scoring format and score all
+  const scoringStmts = rawStatements
+    .filter((s) => s.status === 'active')
+    .map(toScoringStatement);
+
+  const scores = scoreAllStatements(scoringStmts, entityId, entityName);
+
+  // Find low-scoring statements (below minScore or bottom 20%, whichever is more)
+  const scoredPairs = scoringStmts.map((stmt, i) => ({
+    stmt,
+    score: scores[i].qualityScore,
+  }));
+  scoredPairs.sort((a, b) => a.score - b.score);
+
+  const threshold = Math.max(minScore, 0.4);
+  const candidates = scoredPairs
+    .filter((p) => p.score < threshold)
+    .slice(0, 10); // cap at 10 per pass
+
+  if (candidates.length === 0) {
+    return {
+      entityId,
+      entityType,
+      categoriesProcessed: ['quality-rewrite'],
+      coverageBefore: scores.length > 0
+        ? scores.reduce((s, r) => s + r.qualityScore, 0) / scores.length
+        : 0,
+      coverageAfter: null,
+      created: 0,
+      rejected: 0,
+      totalCost: tracker.totalCost,
+      rejections: [],
+    };
+  }
+
+  let created = 0;
+  let rejected = 0;
+  const rejections: PassResult['rejections'] = [];
+  const avgScoreBefore = scores.reduce((s, r) => s + r.qualityScore, 0) / scores.length;
+
+  for (const { stmt, score: originalScore } of candidates) {
+    if (tracker.totalCost >= budget) break;
+
+    // Find properties for this statement's category
+    const category = stmt.property?.category;
+    const categoryProps = category
+      ? allProperties.filter((p) => p.category === category)
+      : allProperties.slice(0, 20);
+
+    const rewrite = await generateRewrite(
+      stmt, entityName, entityType, categoryProps, client, tracker,
+    );
+
+    if (!rewrite) {
+      rejected++;
+      rejections.push({
+        text: (stmt.statementText ?? '').slice(0, 80),
+        reason: 'LLM returned no valid rewrite',
+        score: originalScore,
+      });
+      continue;
+    }
+
+    // Quality gate: must score higher than original
+    // Exclude the original from siblings for uniqueness check
+    const siblingsWithoutOriginal = scoringStmts.filter((s) => s.id !== stmt.id);
+    const gate = qualityGateRewrite(
+      rewrite, originalScore, entityId, entityName,
+      siblingsWithoutOriginal, fullPropertyMap,
+    );
+
+    if (!gate.accepted) {
+      rejected++;
+      rejections.push({
+        text: rewrite.statementText.slice(0, 80),
+        reason: gate.reason,
+        score: gate.newScore,
+      });
+      continue;
+    }
+
+    // Insert new statement, then supersede original (safe ordering)
+    if (!dryRun) {
+      const newStmt: CreateStatementInput = {
+        variety: rewrite.variety ?? 'structured',
+        statementText: rewrite.statementText,
+        subjectEntityId: entityId,
+        propertyId: rewrite.propertyId ?? undefined,
+        valueText: rewrite.valueText,
+        valueNumeric: rewrite.valueNumeric,
+        valueUnit: rewrite.valueUnit,
+        valueDate: rewrite.valueDate,
+        validStart: rewrite.validStart,
+        citations: rewrite.citations?.map((c) => ({
+          url: c.url,
+          sourceQuote: c.sourceQuote,
+        })),
+      };
+
+      const insertResult = await createStatementBatch([newStmt]);
+      if (insertResult.ok) {
+        // Only supersede original after successful insert
+        await patchStatement(stmt.id, {
+          status: 'superseded',
+          archiveReason: `Rewritten by quality mode (${originalScore.toFixed(3)} → ${gate.newScore.toFixed(3)})`,
+        });
+      } else {
+        rejected++;
+        rejections.push({
+          text: rewrite.statementText.slice(0, 80),
+          reason: 'Failed to insert rewritten statement',
+          score: gate.newScore,
+        });
+        continue;
+      }
+    }
+
+    created++;
+  }
+
+  return {
+    entityId,
+    entityType,
+    categoriesProcessed: ['quality-rewrite'],
+    coverageBefore: avgScoreBefore,
+    coverageAfter: null, // quality mode doesn't re-analyze coverage
+    created,
+    rejected,
+    totalCost: tracker.totalCost,
+    rejections,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Core: single improvement pass (composable)
 // ---------------------------------------------------------------------------
 
@@ -625,7 +985,7 @@ async function main() {
     console.error(`${c.red}Error: provide an entity ID${c.reset}`);
     console.error(`  Usage: pnpm crux statements improve <entity-id> [options]`);
     console.error(`  Options: --org-type=TYPE --dry-run --category=CAT --no-research --min-score=N --budget=N --json`);
-    console.error(`           --target-coverage=N --max-iterations=N`);
+    console.error(`           --target-coverage=N --max-iterations=N --mode=quality`);
     process.exit(1);
   }
 
@@ -662,10 +1022,42 @@ async function main() {
     ? maxIterationsRaw
     : typeof maxIterationsRaw === 'string' ? parseInt(maxIterationsRaw, 10) : 5;
 
+  // Parse mode flag
+  const mode = (args.mode as string) ?? null;
+
   if (!jsonOutput) console.log(`${c.dim}Analyzing coverage gaps for ${entityId}...${c.reset}`);
 
-  // Dispatch: iterative loop or single pass
-  if (targetCoverage != null && !isNaN(targetCoverage)) {
+  // Dispatch: quality mode → iterative loop → single pass
+  if (mode === 'quality') {
+    let result: PassResult;
+    try {
+      if (!jsonOutput) console.log(`${c.dim}Quality mode: rewriting low-scoring statements...${c.reset}`);
+      result = await runQualityPass(opts);
+    } catch (err) {
+      console.error(`${c.red}${err instanceof Error ? err.message : String(err)}${c.reset}`);
+      process.exit(1);
+    }
+
+    if (jsonOutput) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(`\n${c.bold}${c.blue}Quality Rewrite Summary: ${entityId}${c.reset}`);
+      console.log(`  Rewritten:   ${c.green}${result.created}${c.reset}`);
+      console.log(`  Rejected:    ${c.red}${result.rejected}${c.reset}`);
+      console.log(`  Avg score:   ${result.coverageBefore.toFixed(3)}${result.coverageAfter != null ? ` → ${result.coverageAfter.toFixed(3)}` : ''}`);
+      console.log(`  Cost:        $${result.totalCost.toFixed(4)}`);
+      if (opts.dryRun) {
+        console.log(`  ${c.dim}(dry run — no statements were modified)${c.reset}`);
+      }
+      if (result.rejections.length > 0) {
+        console.log(`\n  ${c.dim}Rejections:${c.reset}`);
+        for (const r of result.rejections) {
+          console.log(`    ${c.red}✗${c.reset} ${r.text}… — ${r.reason}`);
+        }
+      }
+      console.log('');
+    }
+  } else if (targetCoverage != null && !isNaN(targetCoverage)) {
     const iterOpts: IterativeOptions = {
       ...opts,
       targetCoverage,

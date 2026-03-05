@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { qualityGate, runIterativeLoop } from './improve.ts';
-import type { PassResult, IterativeOptions, PassFn } from './improve.ts';
+import { qualityGate, runIterativeLoop, toScoringStatement, qualityGateRewrite } from './improve.ts';
+import type { PassResult, IterativeOptions, PassFn, GeneratedStatement } from './improve.ts';
 import type { ScoringStatement } from './scoring.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 
@@ -341,5 +341,150 @@ describe('runIterativeLoop', () => {
     // created is 0, so stalled = true
     expect(result.stalled).toBe(true);
     expect(result.finalCoverage).toBe(0.3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// toScoringStatement
+// ---------------------------------------------------------------------------
+
+describe('toScoringStatement', () => {
+  it('converts a raw statement row to ScoringStatement', () => {
+    const raw = {
+      id: 42,
+      variety: 'structured',
+      statementText: 'Anthropic was founded in 2021.',
+      subjectEntityId: 'anthropic',
+      propertyId: 'founded_date',
+      valueNumeric: null,
+      valueUnit: null,
+      valueText: null,
+      valueEntityId: null,
+      valueDate: '2021-01-01',
+      validStart: '2021',
+      validEnd: null,
+      status: 'active',
+      claimCategory: 'factual',
+      citations: [{ url: 'https://example.com', sourceQuote: 'Founded in 2021' }],
+      property: { id: 'founded_date', label: 'Founded Date', category: 'milestone', stalenessCadence: null },
+    };
+
+    const result = toScoringStatement(raw);
+    expect(result.id).toBe(42);
+    expect(result.statementText).toBe('Anthropic was founded in 2021.');
+    expect(result.propertyId).toBe('founded_date');
+    expect(result.valueDate).toBe('2021-01-01');
+    expect(result.property?.category).toBe('milestone');
+    expect(result.citations).toHaveLength(1);
+  });
+
+  it('handles missing optional fields', () => {
+    const raw = {
+      id: 1,
+      variety: 'structured',
+      statementText: 'Test statement.',
+      subjectEntityId: 'test',
+      propertyId: null,
+    };
+
+    const result = toScoringStatement(raw);
+    expect(result.id).toBe(1);
+    expect(result.valueNumeric).toBeNull();
+    expect(result.property).toBeNull();
+    expect(result.citations).toBeUndefined();
+  });
+
+  it('converts string valueNumeric to number', () => {
+    const raw = {
+      id: 1,
+      variety: 'structured',
+      statementText: 'Revenue is $1B.',
+      subjectEntityId: 'test',
+      propertyId: 'revenue',
+      valueNumeric: '1000000000',
+    };
+
+    const result = toScoringStatement(raw);
+    expect(result.valueNumeric).toBe(1000000000);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// qualityGateRewrite
+// ---------------------------------------------------------------------------
+
+describe('qualityGateRewrite', () => {
+  const entityId = 'anthropic';
+  const entityName = 'Anthropic';
+  const propertyMap = new Map([
+    ['founded_date', { id: 'founded_date', label: 'Founded Date', category: 'milestone' }],
+    ['employee_count', { id: 'employee_count', label: 'Employee Count', category: 'organizational' }],
+  ]);
+
+  it('accepts a rewrite that scores higher than original', () => {
+    const rewrite: GeneratedStatement = {
+      statementText: 'Anthropic was founded in 2021 by Dario Amodei and Daniela Amodei in San Francisco.',
+      propertyId: 'founded_date',
+      variety: 'structured',
+      validStart: '2021',
+    };
+
+    const siblings = [
+      makeStmt({ id: 2, statementText: 'Anthropic has over 1000 employees.', propertyId: 'employee_count' }),
+    ];
+
+    const result = qualityGateRewrite(rewrite, 0.1, entityId, entityName, siblings, propertyMap);
+    expect(result.accepted).toBe(true);
+    expect(result.newScore).toBeGreaterThan(0.1);
+    expect(result.reason).toBe('Improved');
+  });
+
+  it('rejects a rewrite that is a near-duplicate of a sibling', () => {
+    const rewrite: GeneratedStatement = {
+      statementText: 'Anthropic raised $7.3 billion in a Series E funding round in 2024.',
+      propertyId: 'funding-round-amount',
+      variety: 'structured',
+    };
+
+    const siblings = [
+      makeStmt({
+        id: 2,
+        statementText: 'Anthropic raised $7.3 billion in a Series E funding round in 2024.',
+      }),
+    ];
+
+    const result = qualityGateRewrite(rewrite, 0.3, entityId, entityName, siblings, propertyMap);
+    expect(result.accepted).toBe(false);
+    expect(result.reason).toContain('Near-duplicate');
+  });
+
+  it('rejects a rewrite that does not improve score', () => {
+    const rewrite: GeneratedStatement = {
+      statementText: 'Bad.',
+      propertyId: 'founded_date',
+      variety: 'structured',
+    };
+
+    const siblings: ScoringStatement[] = [];
+
+    // originalScore is high, rewrite is terrible
+    const result = qualityGateRewrite(rewrite, 0.9, entityId, entityName, siblings, propertyMap);
+    expect(result.accepted).toBe(false);
+    expect(result.reason).toContain('not better');
+  });
+
+  it('handles unknown propertyId gracefully', () => {
+    const rewrite: GeneratedStatement = {
+      statementText: 'Anthropic focuses on AI safety research and develops the Claude AI assistant.',
+      propertyId: 'nonexistent-prop',
+      variety: 'structured',
+    };
+
+    const siblings: ScoringStatement[] = [];
+
+    // Should still work, just without property metadata
+    const result = qualityGateRewrite(rewrite, 0.1, entityId, entityName, siblings, propertyMap);
+    expect(typeof result.accepted).toBe('boolean');
+    expect(typeof result.newScore).toBe('number');
   });
 });
