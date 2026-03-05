@@ -30,6 +30,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # --- Security: dependency audit (advisory, non-blocking) ---
+
+      - name: Dependency security audit
+        continue-on-error: true
+        run: pnpm audit --audit-level=high 2>/dev/null || echo "::warning::Dependency audit found high-severity vulnerabilities — run 'pnpm audit' locally for details"
+
       # --- Build data (once, shared by all subsequent steps) ---
 
       - name: Build data
