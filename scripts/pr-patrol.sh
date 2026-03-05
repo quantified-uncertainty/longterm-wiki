@@ -36,6 +36,13 @@ JSONL_FILE="${CACHE_DIR}/runs.jsonl"
 REFLECTION_FILE="${CACHE_DIR}/reflections.jsonl"
 CYCLE_COUNT=0
 REFLECTION_INTERVAL="${PR_PATROL_REFLECTION_INTERVAL:-10}"
+
+# Must be a positive integer (prevents modulo arithmetic errors in the reflection loop)
+if ! [[ "$REFLECTION_INTERVAL" =~ ^[1-9][0-9]*$ ]]; then
+  echo "ERROR: PR_PATROL_REFLECTION_INTERVAL must be a positive integer (got: $REFLECTION_INTERVAL)" >&2
+  exit 1
+fi
+
 ONCE=false
 DRY_RUN=false
 
@@ -99,7 +106,7 @@ log_pr_result() {
   local reason=${7:-}
 
   local issues_json
-  issues_json=$(echo "$issues_csv" | jq -R 'split(",")')
+  issues_json=$(echo "$issues_csv" | jq -R 'split(",") | map(select(length > 0))')
 
   jq -nc \
     --arg ts "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
