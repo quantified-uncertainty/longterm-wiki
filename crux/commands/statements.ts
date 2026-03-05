@@ -44,12 +44,6 @@ const SCRIPTS = {
     passthrough: ['json', 'org-type'],
     positional: true,
   },
-  improve: {
-    script: 'statements/improve.ts',
-    description: 'Generate new statements to fill coverage gaps',
-    passthrough: ['json', 'dry-run', 'org-type', 'category', 'no-research', 'min-score', 'budget'],
-    positional: true,
-  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'quality');
@@ -69,14 +63,10 @@ Options:
   --apply               Write results to database (default: dry-run preview)
   --model=M             LLM model override (default: google/gemini-2.0-flash-001)
   --fetch               Fetch missing sources from web (verify only)
-  --json                JSON output (quality/score/gaps/improve)
-  --dry-run             Preview without storing (score/improve)
+  --json                JSON output (quality/score/gaps)
+  --dry-run             Preview scores without storing (score only)
   --llm                 Use LLM for importance + clarity scoring (score only)
   --org-type=TYPE       Organization subtype (e.g., frontier-lab, safety-org)
-  --category=CAT        Target a single category (improve only)
-  --no-research         Skip web research (improve only)
-  --min-score=N         Quality gate threshold (default: 0.5, improve only)
-  --budget=N            Cost cap in USD (default: 5, improve only)
 
 Examples:
   crux statements extract anthropic                Extract statements (dry run)
@@ -89,17 +79,12 @@ Examples:
   crux statements score anthropic --llm            Score with LLM-based importance + clarity
   crux statements gaps anthropic                   Show coverage gaps
   crux statements gaps anthropic --org-type=frontier-lab  Gaps with specific org type
-  crux statements improve anthropic --org-type=frontier-lab  Generate + insert
-  crux statements improve anthropic --dry-run      Preview generated statements
-  crux statements improve anthropic --category=safety  Target one category
-  crux statements improve anthropic --no-research  Skip web search
 
 Workflow:
   1. crux statements extract <page-id> --apply     Extract statements from page
   2. crux statements verify <page-id> --apply      Verify against cited sources
   3. crux statements score <page-id>               Score statement quality
   4. crux statements gaps <page-id>                Identify coverage gaps
-  5. crux statements improve <page-id>             Generate statements to fill gaps
-  6. crux statements quality <page-id>             Review coverage and quality
+  5. crux statements quality <page-id>             Review coverage and quality
 `;
 }
