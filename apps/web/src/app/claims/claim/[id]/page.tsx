@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { fetchFromWikiServer } from "@lib/wiki-server";
 import { getEntityById, getEntityHref } from "@data";
-import type { ClaimRow, SimilarClaimsResult, PageReferencesResult } from "@wiki-server/api-response-types";
+import type { ClaimRow, SimilarClaimsResult, SimilarClaimItem, PageReferencesResult } from "@wiki-server/api-response-types";
 import { buildEntityNameMap } from "../../components/claims-data";
 import { CategoryBadge } from "../../components/category-badge";
 import { ConfidenceBadge } from "../../components/confidence-badge";
@@ -394,7 +394,7 @@ export default async function ClaimDetailPage({ params }: PageProps) {
             Similar Claims
           </span>
           <div className="space-y-2">
-            {similarClaims.map((sc) => (
+            {similarClaims.map((sc: SimilarClaimItem) => (
               <Link
                 key={sc.id}
                 href={`/claims/claim/${sc.id}`}

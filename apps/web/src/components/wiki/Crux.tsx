@@ -2,6 +2,7 @@ import React from "react";
 import { cn } from "@lib/utils";
 import { getCruxById } from "@data";
 import type { CruxPosition } from "@data";
+import { isSafeUrl } from "./resource-utils";
 
 interface CruxProps {
   id?: string;
@@ -147,7 +148,7 @@ export function Crux(props: CruxProps) {
       {relevantResearch && relevantResearch.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {relevantResearch.map((research, i) => (
-            research.url ? (
+            research.url && isSafeUrl(research.url) ? (
               <a
                 key={i}
                 href={research.url}

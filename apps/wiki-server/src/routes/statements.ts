@@ -62,10 +62,10 @@ const CurrentQuery = z.object({
 
 const ByEntityQuery = z.object({
   entityId: z.string().min(1).max(200),
-  includeRetracted: z.preprocess(
-    (v) => typeof v === "string" ? v.toLowerCase() === "true" : v,
-    z.coerce.boolean()
-  ).default(false),
+  includeRetracted: z
+    .string()
+    .optional()
+    .transform((v) => v === "true"),
 });
 
 const ByPageQuery = z.object({
@@ -127,31 +127,39 @@ function formatStatement(s: typeof statements.$inferSelect) {
 
 // ---- Body schemas ----
 
-const EXPECTED_DIMENSIONS = [
-  'structure', 'precision', 'clarity', 'resolvability',
-  'uniqueness', 'atomicity', 'importance', 'neglectedness',
-  'recency', 'crossEntityUtility',
-] as const;
+// Strict schema for quality dimensions — enforces exactly the 10 known keys
+// and rejects unknown ones. Using z.object().strict() means extra keys cause a
+// 400 error rather than being silently stored in the DB. Values must be in [0, 1].
+// Exported for unit testing.
+export const QualityDimensionsSchema = z.object({
+  structure:          z.number().min(0).max(1),
+  precision:          z.number().min(0).max(1),
+  clarity:            z.number().min(0).max(1),
+  resolvability:      z.number().min(0).max(1),
+  uniqueness:         z.number().min(0).max(1),
+  atomicity:          z.number().min(0).max(1),
+  importance:         z.number().min(0).max(1),
+  neglectedness:      z.number().min(0).max(1),
+  recency:            z.number().min(0).max(1),
+  crossEntityUtility: z.number().min(0).max(1),
+}).strict();
 
-const BatchScoreBody = z.object({
+// Exported for unit testing.
+export const BatchScoreBody = z.object({
   scores: z.array(z.object({
     statementId: z.number().int().positive(),
     qualityScore: z.number().min(0).max(1),
-    qualityDimensions: z.record(z.number()).refine(
-      (dims) => {
-        const keys = Object.keys(dims);
-        return keys.length === EXPECTED_DIMENSIONS.length &&
-          EXPECTED_DIMENSIONS.every((d) => d in dims);
-      },
-      { message: `qualityDimensions must contain exactly these keys: ${EXPECTED_DIMENSIONS.join(', ')}` },
-    ),
+    qualityDimensions: QualityDimensionsSchema,
   })).min(1).max(500),
 });
 
-const CoverageScoreBody = z.object({
+// Exported for unit testing.
+export const CoverageScoreBody = z.object({
   entityId: z.string().min(1).max(200),
   coverageScore: z.number().min(0).max(1),
-  categoryScores: z.record(z.number()),
+  // Category keys are dynamic (derived from property.category at runtime),
+  // so we can't enumerate them statically. We do enforce values are in [0, 1].
+  categoryScores: z.record(z.number().min(0).max(1)),
   statementCount: z.number().int().min(0),
   qualityAvg: z.number().min(0).max(1).nullish(),
 });
@@ -1101,12 +1109,119 @@ const statementsApp = new Hono()
     });
   })
 
+  // ---- GET /coverage-scores/all — latest coverage score for every entity ----
+  .get("/coverage-scores/all", async (c) => {
+    const db = getDrizzleDb();
+
+    // Use a subquery to get the latest score per entity (MAX id = most recent)
+    const latestIds = db
+      .select({
+        maxId: sql<number>`MAX(${entityCoverageScores.id})`.as("max_id"),
+      })
+      .from(entityCoverageScores)
+      .groupBy(entityCoverageScores.entityId)
+      .as("latest");
+
+    const rows = await db
+      .select({
+        id: entityCoverageScores.id,
+        entityId: entityCoverageScores.entityId,
+        coverageScore: entityCoverageScores.coverageScore,
+        categoryScores: entityCoverageScores.categoryScores,
+        statementCount: entityCoverageScores.statementCount,
+        qualityAvg: entityCoverageScores.qualityAvg,
+        scoredAt: entityCoverageScores.scoredAt,
+      })
+      .from(entityCoverageScores)
+      .innerJoin(latestIds, eq(entityCoverageScores.id, latestIds.maxId))
+      .orderBy(desc(entityCoverageScores.coverageScore));
+
+    return c.json({
+      scores: rows.map((r) => ({
+        id: r.id,
+        entityId: r.entityId,
+        coverageScore: r.coverageScore,
+        categoryScores: r.categoryScores,
+        statementCount: r.statementCount,
+        qualityAvg: r.qualityAvg,
+        scoredAt: r.scoredAt,
+      })),
+      total: rows.length,
+    });
+  })
+
+  // ---- GET /scores/distribution — quality score distribution for statements ----
+  .get("/scores/distribution", async (c) => {
+    const db = getDrizzleDb();
+
+    // Aggregate distribution and category breakdown in SQL (no full table scan)
+    const [summaryResult, categoryResult] = await Promise.all([
+      db.execute(sql`
+        SELECT
+          COUNT(*) FILTER (WHERE quality_score IS NULL) AS unscored,
+          COUNT(*) FILTER (WHERE quality_score < 0.2) AS b0_2,
+          COUNT(*) FILTER (WHERE quality_score >= 0.2 AND quality_score < 0.4) AS b2_4,
+          COUNT(*) FILTER (WHERE quality_score >= 0.4 AND quality_score < 0.6) AS b4_6,
+          COUNT(*) FILTER (WHERE quality_score >= 0.6 AND quality_score < 0.8) AS b6_8,
+          COUNT(*) FILTER (WHERE quality_score >= 0.8) AS b8_10,
+          AVG(quality_score) FILTER (WHERE quality_score IS NOT NULL) AS average_quality,
+          COUNT(quality_score) AS scored_count
+        FROM statements
+        WHERE status = 'active'
+      `),
+      db.execute(sql`
+        SELECT
+          COALESCE(p.category, 'uncategorized') AS category,
+          COUNT(*)::text AS count,
+          AVG(s.quality_score) FILTER (WHERE s.quality_score IS NOT NULL) AS avg_quality
+        FROM statements s
+        LEFT JOIN properties p ON s.property_id = p.id
+        WHERE s.status = 'active'
+        GROUP BY COALESCE(p.category, 'uncategorized')
+        ORDER BY COUNT(*) DESC
+      `),
+    ]);
+
+    const summary = summaryResult[0];
+    const bucketCounts: Record<string, number> = {
+      "unscored": Number(summary?.unscored ?? 0),
+      "0.0-0.2": Number(summary?.b0_2 ?? 0),
+      "0.2-0.4": Number(summary?.b2_4 ?? 0),
+      "0.4-0.6": Number(summary?.b4_6 ?? 0),
+      "0.6-0.8": Number(summary?.b6_8 ?? 0),
+      "0.8-1.0": Number(summary?.b8_10 ?? 0),
+    };
+    const scoredCount = Number(summary?.scored_count ?? 0);
+    const averageQuality = summary?.average_quality != null
+      ? Number(summary.average_quality)
+      : null;
+
+    const categoryBreakdown = categoryResult.map((row) => ({
+      category: String(row.category ?? "uncategorized"),
+      count: Number(row.count ?? 0),
+      avgQuality: row.avg_quality != null ? Number(row.avg_quality) : null,
+    }));
+
+    const bucketOrder = ["0.0-0.2", "0.2-0.4", "0.4-0.6", "0.6-0.8", "0.8-1.0", "unscored"];
+
+    return c.json({
+      buckets: bucketOrder.map((range) => ({
+        range,
+        count: bucketCounts[range] ?? 0,
+      })),
+      averageQuality: averageQuality,
+      scoredCount,
+      categoryBreakdown,
+    });
+  })
+
   // ---- POST /cleanup — delete retracted and empty statements ----
+  // entityId is required to prevent accidental global cleanup.
   .post("/cleanup", async (c) => {
     const body = await parseJsonBody(c);
     const parsed = z
       .object({
-        entityId: z.string().min(1).max(200).optional(),
+        entityId: z.string().min(1).max(200),
         dryRun: z.boolean().default(true),
       })
       .safeParse(body ?? {});
@@ -1115,18 +1230,21 @@ const statementsApp = new Hono()
     const { entityId, dryRun } = parsed.data;
     const db = getDrizzleDb();
 
-    // Find retracted statements
-    const retractedConditions = [eq(statements.status, "retracted")];
-    if (entityId) retractedConditions.push(eq(statements.subjectEntityId, entityId));
+    // Find retracted statements scoped to the required entityId
+    const retractedConditions = [
+      eq(statements.status, "retracted"),
+      eq(statements.subjectEntityId, entityId),
+    ];
 
     const retractedRows = await db
       .select({ id: statements.id, subjectEntityId: statements.subjectEntityId })
       .from(statements)
       .where(and(...retractedConditions));
 
-    // Find empty structured statements (no property and no values)
+    // Find empty structured statements (no property and no values) scoped to entityId
     const emptyConditions = [
       eq(statements.variety, "structured"),
+      eq(statements.subjectEntityId, entityId),
       isNull(statements.propertyId),
       isNull(statements.valueNumeric),
       isNull(statements.valueText),
@@ -1134,7 +1252,6 @@ const statementsApp = new Hono()
       isNull(statements.valueDate),
       isNull(statements.valueSeries),
     ];
-    if (entityId) emptyConditions.push(eq(statements.subjectEntityId, entityId));
 
     const emptyRows = await db
       .select({ id: statements.id, subjectEntityId: statements.subjectEntityId })
@@ -1208,10 +1325,34 @@ const statementsApp = new Hono()
     const { entityId } = parsed.data;
     const db = getDrizzleDb();
 
-    const deleted = await db
-      .delete(statements)
-      .where(eq(statements.subjectEntityId, entityId))
-      .returning({ id: statements.id });
+    console.warn(`[statements/clear-by-entity] Deleting all statements for entity: ${entityId}`);
+
+    // Delete dependent rows first, then statements — all in one transaction
+    const deleted = await db.transaction(async (tx) => {
+      // Get statement IDs for this entity first
+      const toDelete = await tx
+        .select({ id: statements.id })
+        .from(statements)
+        .where(eq(statements.subjectEntityId, entityId));
+
+      if (toDelete.length === 0) return [];
+
+      const ids = toDelete.map((r) => r.id);
+      const idList = sql.join(ids.map((id) => sql`${id}`), sql`, `);
+
+      await tx
+        .delete(statementCitations)
+        .where(sql`${statementCitations.statementId} IN (${idList})`);
+
+      await tx
+        .delete(statementPageReferences)
+        .where(sql`${statementPageReferences.statementId} IN (${idList})`);
+
+      return tx
+        .delete(statements)
+        .where(eq(statements.subjectEntityId, entityId))
+        .returning({ id: statements.id });
+    });
 
     return c.json({ deleted: deleted.length, ok: true });
   });

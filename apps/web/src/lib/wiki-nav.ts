@@ -264,6 +264,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Statements", href: internalHref("statements-dashboard") },
         { label: "Statement Quality", href: internalHref("statement-quality-dashboard") },
         { label: "Property Explorer", href: internalHref("property-explorer-dashboard") },
+        { label: "Statement Scores", href: internalHref("statement-scores-dashboard") },
       ],
     },
     {
