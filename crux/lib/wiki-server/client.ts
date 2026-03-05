@@ -22,14 +22,14 @@ export type ApiKeyScope = 'project' | 'content';
 /**
  * Environment prefix for wiki-server env vars.
  *
- * Set `WIKI_SERVER=prod` to read from `PROD_LONGTERMWIKI_*` env vars
+ * Set `WIKI_SERVER_ENV=prod` to read from `PROD_LONGTERMWIKI_*` env vars
  * instead of the default `LONGTERMWIKI_*`. This lets you have both a
  * local dev server and prod configured in `.env` and switch with one var.
  *
- *   WIKI_SERVER=prod pnpm crux statements improve anthropic --dry-run
+ *   WIKI_SERVER_ENV=prod pnpm crux statements improve anthropic --dry-run
  */
 function getEnvPrefix(): string {
-  const env = process.env.WIKI_SERVER;
+  const env = process.env.WIKI_SERVER_ENV;
   if (env === 'prod' || env === 'production') return 'PROD_';
   return '';
 }
@@ -47,7 +47,7 @@ export function getServerUrl(): string {
  *   - 'content' → LONGTERMWIKI_CONTENT_KEY, then LONGTERMWIKI_SERVER_API_KEY
  *   - undefined  → LONGTERMWIKI_SERVER_API_KEY (backward compatible)
  *
- * All keys respect the WIKI_SERVER=prod prefix.
+ * All keys respect the WIKI_SERVER_ENV=prod prefix.
  */
 export function getApiKey(scope?: ApiKeyScope): string {
   const prefix = getEnvPrefix();

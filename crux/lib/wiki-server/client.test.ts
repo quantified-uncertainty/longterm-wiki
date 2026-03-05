@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Save original env
 const origUrl = process.env.LONGTERMWIKI_SERVER_URL;
 const origKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-const origWikiServer = process.env.WIKI_SERVER;
+const origWikiServer = process.env.WIKI_SERVER_ENV;
 const origProdUrl = process.env.PROD_LONGTERMWIKI_SERVER_URL;
 const origProdKey = process.env.PROD_LONGTERMWIKI_SERVER_API_KEY;
 
@@ -20,8 +20,8 @@ describe('wiki-server/client', () => {
     else delete process.env.LONGTERMWIKI_SERVER_URL;
     if (origKey !== undefined) process.env.LONGTERMWIKI_SERVER_API_KEY = origKey;
     else delete process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (origWikiServer !== undefined) process.env.WIKI_SERVER = origWikiServer;
-    else delete process.env.WIKI_SERVER;
+    if (origWikiServer !== undefined) process.env.WIKI_SERVER_ENV = origWikiServer;
+    else delete process.env.WIKI_SERVER_ENV;
     if (origProdUrl !== undefined) process.env.PROD_LONGTERMWIKI_SERVER_URL = origProdUrl;
     else delete process.env.PROD_LONGTERMWIKI_SERVER_URL;
     if (origProdKey !== undefined) process.env.PROD_LONGTERMWIKI_SERVER_API_KEY = origProdKey;
@@ -59,38 +59,38 @@ describe('wiki-server/client', () => {
     });
   });
 
-  describe('WIKI_SERVER=prod prefix', () => {
-    it('getServerUrl uses PROD_ prefix when WIKI_SERVER=prod', () => {
+  describe('WIKI_SERVER_ENV=prod prefix', () => {
+    it('getServerUrl uses PROD_ prefix when WIKI_SERVER_ENV=prod', () => {
       delete process.env.LONGTERMWIKI_SERVER_URL;
-      process.env.WIKI_SERVER = 'prod';
+      process.env.WIKI_SERVER_ENV = 'prod';
       process.env.PROD_LONGTERMWIKI_SERVER_URL = 'https://prod.example.com';
       expect(client.getServerUrl()).toBe('https://prod.example.com');
     });
 
-    it('getServerUrl uses PROD_ prefix when WIKI_SERVER=production', () => {
+    it('getServerUrl uses PROD_ prefix when WIKI_SERVER_ENV=production', () => {
       delete process.env.LONGTERMWIKI_SERVER_URL;
-      process.env.WIKI_SERVER = 'production';
+      process.env.WIKI_SERVER_ENV = 'production';
       process.env.PROD_LONGTERMWIKI_SERVER_URL = 'https://prod.example.com';
       expect(client.getServerUrl()).toBe('https://prod.example.com');
     });
 
-    it('getServerUrl ignores PROD_ vars without WIKI_SERVER flag', () => {
+    it('getServerUrl ignores PROD_ vars without WIKI_SERVER_ENV flag', () => {
       process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:3000';
       process.env.PROD_LONGTERMWIKI_SERVER_URL = 'https://prod.example.com';
-      delete process.env.WIKI_SERVER;
+      delete process.env.WIKI_SERVER_ENV;
       expect(client.getServerUrl()).toBe('http://localhost:3000');
     });
 
-    it('getApiKey uses PROD_ prefix when WIKI_SERVER=prod', () => {
+    it('getApiKey uses PROD_ prefix when WIKI_SERVER_ENV=prod', () => {
       delete process.env.LONGTERMWIKI_SERVER_API_KEY;
-      process.env.WIKI_SERVER = 'prod';
+      process.env.WIKI_SERVER_ENV = 'prod';
       process.env.PROD_LONGTERMWIKI_SERVER_API_KEY = 'prod-key';
       expect(client.getApiKey()).toBe('prod-key');
     });
 
-    it('buildHeaders uses prod API key when WIKI_SERVER=prod', () => {
+    it('buildHeaders uses prod API key when WIKI_SERVER_ENV=prod', () => {
       delete process.env.LONGTERMWIKI_SERVER_API_KEY;
-      process.env.WIKI_SERVER = 'prod';
+      process.env.WIKI_SERVER_ENV = 'prod';
       process.env.PROD_LONGTERMWIKI_SERVER_API_KEY = 'prod-key';
       const headers = client.buildHeaders();
       expect(headers['Authorization']).toBe('Bearer prod-key');

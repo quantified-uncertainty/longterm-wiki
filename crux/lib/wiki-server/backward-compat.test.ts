@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 const origUrl = process.env.LONGTERMWIKI_SERVER_URL;
 const origKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-const origWikiServer = process.env.WIKI_SERVER;
+const origWikiServer = process.env.WIKI_SERVER_ENV;
 
 describe('wiki-server-client barrel exports', () => {
   let client: typeof import('../wiki-server-client.ts');
@@ -23,8 +23,8 @@ describe('wiki-server-client barrel exports', () => {
     else delete process.env.LONGTERMWIKI_SERVER_URL;
     if (origKey !== undefined) process.env.LONGTERMWIKI_SERVER_API_KEY = origKey;
     else delete process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (origWikiServer !== undefined) process.env.WIKI_SERVER = origWikiServer;
-    else delete process.env.WIKI_SERVER;
+    if (origWikiServer !== undefined) process.env.WIKI_SERVER_ENV = origWikiServer;
+    else delete process.env.WIKI_SERVER_ENV;
   });
 
   it('exports all config functions', () => {
