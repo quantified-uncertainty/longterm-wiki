@@ -435,6 +435,13 @@
       "when": 1773907200000,
       "tag": "0061_add_fixes_pr_url_to_agent_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1773734400000,
+      "tag": "0062_add_numeric_cost_duration_to_sessions",
+      "breakpoints": true
     }
   ]
 }
