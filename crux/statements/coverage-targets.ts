@@ -105,6 +105,42 @@ const TARGETS: Record<string, CoverageTargets> = {
     milestone: 4,
     financial: 3,
   },
+  approach: {
+    technical: 8,
+    safety: 6,
+    research: 6,
+    relation: 4,
+    milestone: 3,
+  },
+  concept: {
+    technical: 8,
+    research: 6,
+    safety: 5,
+    relation: 4,
+    milestone: 3,
+  },
+  policy: {
+    governance: 8,
+    safety: 6,
+    organizational: 4,
+    relation: 4,
+    milestone: 3,
+  },
+  risk: {
+    safety: 10,
+    technical: 6,
+    research: 6,
+    relation: 4,
+    milestone: 3,
+  },
+  project: {
+    technical: 8,
+    products: 6,
+    safety: 5,
+    research: 4,
+    milestone: 4,
+    financial: 3,
+  },
 };
 
 // ---------------------------------------------------------------------------
