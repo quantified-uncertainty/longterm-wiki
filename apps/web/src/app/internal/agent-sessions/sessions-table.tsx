@@ -69,6 +69,33 @@ function TypeBadge({ type }: { type: string }) {
   );
 }
 
+// ── Outcome Badge ────────────────────────────────────────────────────────
+
+const OUTCOME_STYLES: Record<string, string> = {
+  merged: "bg-emerald-500/15 text-emerald-600",
+  merged_with_revisions: "bg-blue-500/15 text-blue-600",
+  reverted: "bg-red-500/15 text-red-600",
+  closed_without_merge: "bg-gray-500/15 text-gray-600",
+};
+
+const OUTCOME_LABELS: Record<string, string> = {
+  merged: "merged",
+  merged_with_revisions: "merged+",
+  reverted: "reverted",
+  closed_without_merge: "closed",
+};
+
+function OutcomeBadge({ outcome }: { outcome: string | null }) {
+  if (!outcome) return <span className="text-xs text-muted-foreground/50">—</span>;
+  const style = OUTCOME_STYLES[outcome] ?? "bg-muted text-muted-foreground";
+  const label = OUTCOME_LABELS[outcome] ?? outcome;
+  return (
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${style}`}>
+      {label}
+    </span>
+  );
+}
+
 // ── Columns ───────────────────────────────────────────────────────────────
 
 const columns: ColumnDef<AgentSessionRow>[] = [
@@ -157,6 +184,34 @@ const columns: ColumnDef<AgentSessionRow>[] = [
         </a>
       );
     },
+  },
+  {
+    accessorKey: "fixesPrUrl",
+    header: "Fixes",
+    cell: ({ row }) => {
+      const url = row.original.fixesPrUrl;
+      if (!url)
+        return <span className="text-xs text-muted-foreground/50">—</span>;
+      const prNum = url.match(/\/pull\/(\d+)/)?.[1];
+      return (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-orange-600 hover:underline tabular-nums"
+          title="This session fixed issues from this PR"
+        >
+          {prNum ? `#${prNum}` : "PR"}
+        </a>
+      );
+    },
+  },
+  {
+    accessorKey: "prOutcome",
+    header: ({ column }) => (
+      <SortableHeader column={column}>Outcome</SortableHeader>
+    ),
+    cell: ({ row }) => <OutcomeBadge outcome={row.original.prOutcome} />,
   },
   {
     accessorKey: "model",

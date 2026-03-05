@@ -421,6 +421,20 @@
       "when": 1773648000000,
       "tag": "0059_add_pr_url_to_agent_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1773820800000,
+      "tag": "0060_add_pr_outcome_to_agent_sessions",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1773907200000,
+      "tag": "0061_add_fixes_pr_url_to_agent_sessions",
+      "breakpoints": true
     }
   ]
 }

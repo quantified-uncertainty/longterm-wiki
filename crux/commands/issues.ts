@@ -22,7 +22,7 @@ import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
 import { type CommandResult, parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
 import { listActiveAgents, registerAgent } from '../lib/wiki-server/active-agents.ts';
-import { getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
+import { getAgentSessionByBranch, updateAgentSession, PR_OUTCOMES, type PrOutcome } from '../lib/wiki-server/agent-sessions.ts';
 
 /**
  * Read a text value from a `--*-file=<path>` flag.
@@ -988,18 +988,35 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
   }
 
   const prUrl = options.pr as string | undefined;
+  const outcomeRaw = options.outcome as string | undefined;
+  const fixesPrUrl = options['fixes-pr'] as string | undefined;
+
+  // Validate outcome if provided
+  let prOutcome: PrOutcome | undefined;
+  if (outcomeRaw !== undefined) {
+    if (!(PR_OUTCOMES as readonly string[]).includes(outcomeRaw)) {
+      return {
+        output: `${c.red}Invalid --outcome value: "${outcomeRaw}"\nValid values: ${PR_OUTCOMES.join(', ')}${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+    prOutcome = outcomeRaw as PrOutcome;
+  }
 
   // Fetch issue details
   const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
 
-  // Post completion comment
-  const body = prUrl
+  // Post completion comment on the issue
+  let completionBody = prUrl
     ? `🤖 Claude Code has finished work on this issue.\n\n**PR ready for review:** ${prUrl}`
     : `🤖 Claude Code has finished work on this issue. A PR will be opened shortly.`;
+  if (fixesPrUrl) {
+    completionBody += `\n\n**Fix chain:** This PR fixes regressions introduced in ${fixesPrUrl}`;
+  }
 
   await githubApi(`/repos/${REPO}/issues/${issueNum}/comments`, {
     method: 'POST',
-    body: { body },
+    body: { body: completionBody },
   });
 
   // Remove the claude-working label (404 = label wasn't applied — that's fine)
@@ -1012,34 +1029,60 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
     if (!(err instanceof Error && err.message.includes('returned 404'))) throw err;
   }
 
-  // Record PR URL in the agent session (best-effort — don't fail if wiki-server is down)
-  let sessionUpdated = false;
-  if (prUrl) {
-    const branch = currentBranch();
-    if (branch) {
+  // If this PR is fixing a previous PR, post a comment on that PR too
+  if (fixesPrUrl && prUrl) {
+    const prNumMatch = fixesPrUrl.match(/\/pull\/(\d+)/);
+    if (prNumMatch) {
+      const originalPrNum = prNumMatch[1];
+      const fixComment = `🤖 The regressions introduced in this PR have been fixed in ${prUrl}`;
       try {
-        const sessionResult = await getAgentSessionByBranch(branch);
-        if (sessionResult.ok) {
-          const updateResult = await updateAgentSession(sessionResult.data.id, {
-            prUrl,
-            status: 'completed',
-          });
-          sessionUpdated = updateResult.ok;
-        }
+        await githubApi(`/repos/${REPO}/issues/${originalPrNum}/comments`, {
+          method: 'POST',
+          body: { body: fixComment },
+        });
       } catch (err) {
-        // Best-effort: wiki-server may be unavailable. Log and continue.
+        // Best-effort: the original PR may be closed or inaccessible
         const msg = err instanceof Error ? err.message : String(err);
-        log.warn(`Could not update agent session with PR URL: ${msg}`);
+        log.warn(`Could not post fix comment on original PR: ${msg}`);
       }
+    }
+  }
+
+  // Record PR URL, outcome, and fix-chain in the agent session (best-effort — don't fail if wiki-server is down)
+  let sessionUpdated = false;
+  const branch = currentBranch();
+  if (branch && (prUrl || prOutcome !== undefined || fixesPrUrl)) {
+    try {
+      const sessionResult = await getAgentSessionByBranch(branch);
+      if (sessionResult.ok) {
+        const sessionUpdates: Record<string, unknown> = { status: 'completed' };
+        if (prUrl) sessionUpdates.prUrl = prUrl;
+        if (prOutcome !== undefined) sessionUpdates.prOutcome = prOutcome;
+        if (fixesPrUrl) sessionUpdates.fixesPrUrl = fixesPrUrl;
+        const updateResult = await updateAgentSession(sessionResult.data.id, sessionUpdates as Parameters<typeof updateAgentSession>[1]);
+        sessionUpdated = updateResult.ok;
+      }
+    } catch (err) {
+      // Best-effort: wiki-server may be unavailable. Log and continue.
+      const msg = err instanceof Error ? err.message : String(err);
+      log.warn(`Could not update agent session: ${msg}`);
     }
   }
 
   let output = '';
   output += `${c.green}✓${c.reset} Marked issue #${issueNum} as done: ${issue.title}\n`;
   if (prUrl) output += `  PR: ${prUrl}\n`;
+  if (fixesPrUrl) output += `  Fixes PR: ${fixesPrUrl}\n`;
+  if (prOutcome) output += `  Outcome: ${prOutcome}\n`;
   output += `  Label \`${CLAUDE_WORKING_LABEL}\` removed.\n`;
   output += `  Comment posted on ${issue.html_url}\n`;
-  if (prUrl && sessionUpdated) output += `  ${c.dim}Agent session updated with PR URL.${c.reset}\n`;
+  if (sessionUpdated) {
+    const parts: string[] = [];
+    if (prUrl) parts.push('PR URL');
+    if (fixesPrUrl) parts.push('fix-chain');
+    if (prOutcome) parts.push('outcome');
+    output += `  ${c.dim}Agent session updated with ${parts.join(', ')}.${c.reset}\n`;
+  }
 
   return { output, exitCode: 0 };
 }

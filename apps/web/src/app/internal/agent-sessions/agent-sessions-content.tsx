@@ -18,6 +18,9 @@ export interface AgentSessionRow {
   status: string;
   startedAt: string;
   completedAt: string | null;
+  // Fix-chain tracking
+  prOutcome: string | null;
+  fixesPrUrl: string | null;
   // From joined sessions table (via branch)
   prUrl: string | null;
   model: string | null;
@@ -66,6 +69,8 @@ async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
       // Prefer prUrl from agent_sessions (set by `crux issues done --pr=URL`),
       // fall back to session log join on branch for older records.
       prUrl: s.prUrl ?? log?.prUrl ?? null,
+      prOutcome: s.prOutcome ?? null,
+      fixesPrUrl: s.fixesPrUrl ?? null,
       model: log?.model ?? null,
       cost: log?.cost ?? null,
       title: log?.title ?? null,
@@ -91,6 +96,8 @@ export async function AgentSessionsContent() {
   const activeSessions = sessions.filter((s) => s.status === "active").length;
   const completedSessions = sessions.filter((s) => s.status === "completed").length;
   const withPr = sessions.filter((s) => s.prUrl).length;
+  const fixSessions = sessions.filter((s) => s.fixesPrUrl).length;
+  const fixRate = completedSessions > 0 ? Math.round((fixSessions / completedSessions) * 100) : 0;
 
   return (
     <>
@@ -112,6 +119,12 @@ export async function AgentSessionsContent() {
           <>No sessions recorded yet.</>
         )}
       </p>
+      {fixSessions > 0 && (
+        <p className="text-sm text-muted-foreground">
+          <span className="text-orange-600 font-medium">{fixSessions}</span> fix session{fixSessions !== 1 ? 's' : ''}{" "}
+          ({fixRate}% fix rate) — sessions that fixed regressions from a previous PR.
+        </p>
+      )}
       <p className="text-sm text-muted-foreground">
         Each session tracks what Claude Code worked on, which issue it addressed,
         and the resulting PR. Sessions are initialized with{" "}

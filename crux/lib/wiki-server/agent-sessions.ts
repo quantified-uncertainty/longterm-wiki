@@ -14,6 +14,10 @@ import type {
   UpdateAgentSession,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
+// Re-export PR outcome types so CLI commands don't need to reach into wiki-server internals
+export type { PrOutcome } from '../../../apps/wiki-server/src/api-types.ts';
+export { PR_OUTCOMES } from '../../../apps/wiki-server/src/api-types.ts';
+
 // ---------------------------------------------------------------------------
 // Types — response (inferred from Hono RPC route)
 // ---------------------------------------------------------------------------
