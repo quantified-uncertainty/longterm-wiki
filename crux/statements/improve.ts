@@ -46,6 +46,28 @@ import {
 import { resolveCoverageTargets } from './coverage-targets.ts';
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize a date string from LLM output to a valid ISO date (YYYY-MM-DD) or null.
+ * LLMs often produce partial dates like "2024" or "2024-06" which fail PostgreSQL date columns.
+ */
+function normalizeValueDate(d: string | null | undefined): string | null {
+  if (!d) return null;
+  // Full ISO date: YYYY-MM-DD → keep as-is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  // Year-month: YYYY-MM → append -01
+  if (/^\d{4}-\d{2}$/.test(d)) return `${d}-01`;
+  // Year only: YYYY → append -01-01
+  if (/^\d{4}$/.test(d)) return `${d}-01-01`;
+  // Anything else (ISO datetime, etc.) — try to parse
+  const parsed = new Date(d);
+  if (!isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
+  return null; // Unparseable — drop it
+}
+
+// ---------------------------------------------------------------------------
 // Types (exported for use by future pass functions)
 // ---------------------------------------------------------------------------
 
@@ -276,15 +298,20 @@ export function qualityGate(
     }
 
     // Accept — convert to CreateStatementInput
+    // Validate propertyId exists in the vocabulary — FK constraint
+    const validPropId = gen.propertyId && propertyMap?.has(gen.propertyId)
+      ? gen.propertyId
+      : undefined;
+
     const input: CreateStatementInput = {
       variety: gen.variety ?? 'structured',
       statementText: gen.statementText,
       subjectEntityId: entityId,
-      propertyId: gen.propertyId ?? undefined,
+      propertyId: validPropId,
       valueText: gen.valueText,
       valueNumeric: gen.valueNumeric,
       valueUnit: gen.valueUnit,
-      valueDate: gen.valueDate,
+      valueDate: normalizeValueDate(gen.valueDate),
       validStart: gen.validStart,
       citations: gen.citations?.map((c) => ({
         url: c.url,
@@ -603,10 +630,13 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
     : 'organization';
 
   if (!stmtsResult.ok) {
-    throw new Error(`Failed to fetch statements for ${entityId}: ${stmtsResult.error}`);
+    throw new Error(`Failed to fetch statements for ${entityId}: ${stmtsResult.message}`);
   }
 
-  const rawStatements = stmtsResult.data.statements;
+  const rawStatements = [
+    ...stmtsResult.data.structured,
+    ...stmtsResult.data.attributed,
+  ];
   const allProperties = propResult.ok ? propResult.data.properties : [];
   const fullPropertyMap = buildPropertyMap(allProperties);
 
@@ -693,15 +723,20 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
 
     // Insert new statement, then supersede original (safe ordering)
     if (!dryRun) {
+      // Validate propertyId exists in the vocabulary — FK constraint
+      const validPropertyId = rewrite.propertyId && fullPropertyMap.has(rewrite.propertyId)
+        ? rewrite.propertyId
+        : undefined;
+
       const newStmt: CreateStatementInput = {
         variety: rewrite.variety ?? 'structured',
         statementText: rewrite.statementText,
         subjectEntityId: entityId,
-        propertyId: rewrite.propertyId ?? undefined,
+        propertyId: validPropertyId,
         valueText: rewrite.valueText,
         valueNumeric: rewrite.valueNumeric,
         valueUnit: rewrite.valueUnit,
-        valueDate: rewrite.valueDate,
+        valueDate: normalizeValueDate(rewrite.valueDate),
         validStart: rewrite.validStart,
         citations: rewrite.citations?.map((c) => ({
           url: c.url,
@@ -718,9 +753,10 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
         });
       } else {
         rejected++;
+        const errMsg = insertResult.message ?? 'unknown error';
         rejections.push({
           text: rewrite.statementText.slice(0, 80),
-          reason: 'Failed to insert rewritten statement',
+          reason: `Insert failed: ${errMsg}`,
           score: gate.newScore,
         });
         continue;
