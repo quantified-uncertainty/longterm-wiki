@@ -20,9 +20,11 @@ jobs:
     steps:
       - name: Block PRs to production from non-main branches
         if: github.event_name == 'pull_request' && github.base_ref == 'production'
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
-          if [[ "${{ github.head_ref }}" != "main" ]]; then
-            echo "::error::PRs to production must come from 'main'. Got: '${{ github.head_ref }}'"
+          if [[ "$HEAD_REF" != "main" ]]; then
+            echo "::error::PRs to production must come from 'main'. Got: '$HEAD_REF'"
             echo "Merge your changes to main first, then the release workflow will open a PR from main → production."
             exit 1
           fi
@@ -56,6 +58,14 @@ jobs:
           LONGTERMWIKI_PROJECT_KEY: ${{ secrets.LONGTERMWIKI_PROJECT_KEY }}
 
       # --- Validation (fail fast before expensive Next.js build) ---
+
+      - name: Install actionlint
+        run: |
+          curl -sL https://github.com/rhysd/actionlint/releases/latest/download/actionlint_linux_arm64.tar.gz | tar -xz -C /usr/local/bin actionlint || \
+          curl -sL https://github.com/rhysd/actionlint/releases/latest/download/actionlint_linux_amd64.tar.gz | tar -xz -C /usr/local/bin actionlint
+
+      - name: GitHub Actions YAML validation — actionlint (blocking)
+        run: npx tsx crux/validate/validate-actions-yaml.ts
 
       - name: MDX syntax check (blocking)
         run: pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
