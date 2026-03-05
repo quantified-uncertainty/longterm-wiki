@@ -61,10 +61,10 @@ const CurrentQuery = z.object({
 
 const ByEntityQuery = z.object({
   entityId: z.string().min(1).max(200),
-  includeRetracted: z.preprocess(
-    (v) => typeof v === "string" ? v.toLowerCase() === "true" : v,
-    z.coerce.boolean()
-  ).default(false),
+  includeRetracted: z
+    .string()
+    .optional()
+    .transform((v) => v === "true"),
 });
 
 const ByPageQuery = z.object({
@@ -1021,11 +1021,12 @@ const statementsApp = new Hono()
   })
 
   // ---- POST /cleanup — delete retracted and empty statements ----
+  // entityId is required to prevent accidental global cleanup.
   .post("/cleanup", async (c) => {
     const body = await parseJsonBody(c);
     const parsed = z
       .object({
-        entityId: z.string().min(1).max(200).optional(),
+        entityId: z.string().min(1).max(200),
         dryRun: z.boolean().default(true),
       })
       .safeParse(body ?? {});
@@ -1034,18 +1035,21 @@ const statementsApp = new Hono()
     const { entityId, dryRun } = parsed.data;
     const db = getDrizzleDb();
 
-    // Find retracted statements
-    const retractedConditions = [eq(statements.status, "retracted")];
-    if (entityId) retractedConditions.push(eq(statements.subjectEntityId, entityId));
+    // Find retracted statements scoped to the required entityId
+    const retractedConditions = [
+      eq(statements.status, "retracted"),
+      eq(statements.subjectEntityId, entityId),
+    ];
 
     const retractedRows = await db
       .select({ id: statements.id, subjectEntityId: statements.subjectEntityId })
       .from(statements)
       .where(and(...retractedConditions));
 
-    // Find empty structured statements (no property and no values)
+    // Find empty structured statements (no property and no values) scoped to entityId
     const emptyConditions = [
       eq(statements.variety, "structured"),
+      eq(statements.subjectEntityId, entityId),
       isNull(statements.propertyId),
       isNull(statements.valueNumeric),
       isNull(statements.valueText),
@@ -1053,7 +1057,6 @@ const statementsApp = new Hono()
       isNull(statements.valueDate),
       isNull(statements.valueSeries),
     ];
-    if (entityId) emptyConditions.push(eq(statements.subjectEntityId, entityId));
 
     const emptyRows = await db
       .select({ id: statements.id, subjectEntityId: statements.subjectEntityId })
@@ -1127,10 +1130,34 @@ const statementsApp = new Hono()
     const { entityId } = parsed.data;
     const db = getDrizzleDb();
 
-    const deleted = await db
-      .delete(statements)
-      .where(eq(statements.subjectEntityId, entityId))
-      .returning({ id: statements.id });
+    console.warn(`[statements/clear-by-entity] Deleting all statements for entity: ${entityId}`);
+
+    // Delete dependent rows first, then statements — all in one transaction
+    const deleted = await db.transaction(async (tx) => {
+      // Get statement IDs for this entity first
+      const toDelete = await tx
+        .select({ id: statements.id })
+        .from(statements)
+        .where(eq(statements.subjectEntityId, entityId));
+
+      if (toDelete.length === 0) return [];
+
+      const ids = toDelete.map((r) => r.id);
+      const idList = sql.join(ids.map((id) => sql`${id}`), sql`, `);
+
+      await tx
+        .delete(statementCitations)
+        .where(sql`${statementCitations.statementId} IN (${idList})`);
+
+      await tx
+        .delete(statementPageReferences)
+        .where(sql`${statementPageReferences.statementId} IN (${idList})`);
+
+      return tx
+        .delete(statements)
+        .where(eq(statements.subjectEntityId, entityId))
+        .returning({ id: statements.id });
+    });
 
     return c.json({ deleted: deleted.length, ok: true });
   });
