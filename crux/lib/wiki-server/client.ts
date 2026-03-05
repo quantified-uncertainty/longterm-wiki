@@ -19,8 +19,24 @@ export const BATCH_TIMEOUT_MS = 30_000;
 /** API key scope — determines which env var to prefer for authentication. */
 export type ApiKeyScope = 'project' | 'content';
 
+/**
+ * Environment prefix for wiki-server env vars.
+ *
+ * Set `WIKI_SERVER=prod` to read from `PROD_LONGTERMWIKI_*` env vars
+ * instead of the default `LONGTERMWIKI_*`. This lets you have both a
+ * local dev server and prod configured in `.env` and switch with one var.
+ *
+ *   WIKI_SERVER=prod pnpm crux statements improve anthropic --dry-run
+ */
+function getEnvPrefix(): string {
+  const env = process.env.WIKI_SERVER;
+  if (env === 'prod' || env === 'production') return 'PROD_';
+  return '';
+}
+
 export function getServerUrl(): string {
-  return process.env.LONGTERMWIKI_SERVER_URL || '';
+  const prefix = getEnvPrefix();
+  return process.env[`${prefix}LONGTERMWIKI_SERVER_URL`] || '';
 }
 
 /**
@@ -30,20 +46,22 @@ export function getServerUrl(): string {
  *   - 'project' → LONGTERMWIKI_PROJECT_KEY, then LONGTERMWIKI_SERVER_API_KEY
  *   - 'content' → LONGTERMWIKI_CONTENT_KEY, then LONGTERMWIKI_SERVER_API_KEY
  *   - undefined  → LONGTERMWIKI_SERVER_API_KEY (backward compatible)
+ *
+ * All keys respect the WIKI_SERVER=prod prefix.
  */
 export function getApiKey(scope?: ApiKeyScope): string {
+  const prefix = getEnvPrefix();
   if (scope === 'project') {
-    return process.env.LONGTERMWIKI_PROJECT_KEY
-      || process.env.LONGTERMWIKI_SERVER_API_KEY
+    return process.env[`${prefix}LONGTERMWIKI_PROJECT_KEY`]
+      || process.env[`${prefix}LONGTERMWIKI_SERVER_API_KEY`]
       || '';
   }
   if (scope === 'content') {
-    return process.env.LONGTERMWIKI_CONTENT_KEY
-      || process.env.LONGTERMWIKI_SERVER_API_KEY
+    return process.env[`${prefix}LONGTERMWIKI_CONTENT_KEY`]
+      || process.env[`${prefix}LONGTERMWIKI_SERVER_API_KEY`]
       || '';
   }
-  // No scope specified — use legacy key (backward compatible)
-  return process.env.LONGTERMWIKI_SERVER_API_KEY || '';
+  return process.env[`${prefix}LONGTERMWIKI_SERVER_API_KEY`] || '';
 }
 
 /**
@@ -107,7 +125,10 @@ export async function apiRequest<T>(
   scope?: ApiKeyScope,
 ): Promise<ApiResult<T>> {
   const serverUrl = getServerUrl();
-  if (!serverUrl) return apiErr('unavailable', 'LONGTERMWIKI_SERVER_URL not set');
+  if (!serverUrl) {
+    const prefix = getEnvPrefix();
+    return apiErr('unavailable', `${prefix}LONGTERMWIKI_SERVER_URL not set`);
+  }
 
   try {
     const controller = new AbortController();
