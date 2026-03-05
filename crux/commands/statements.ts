@@ -47,7 +47,7 @@ const SCRIPTS = {
   improve: {
     script: 'statements/improve.ts',
     description: 'Generate new statements to fill coverage gaps',
-    passthrough: ['json', 'dry-run', 'org-type', 'category', 'no-research', 'min-score', 'budget', 'target-coverage', 'max-iterations'],
+    passthrough: ['json', 'dry-run', 'org-type', 'category', 'no-research', 'min-score', 'budget', 'target-coverage', 'max-iterations', 'mode'],
     positional: true,
   },
 };
@@ -79,6 +79,7 @@ Options:
   --budget=N            Cost cap in USD (default: 5, improve only)
   --target-coverage=N   Target coverage score for iterative loop (improve only)
   --max-iterations=N    Max iterations for iterative loop (default: 5, improve only)
+  --mode=quality        Rewrite low-scoring statements instead of generating new ones
 
 Examples:
   crux statements extract anthropic                Extract statements (dry run)
@@ -96,6 +97,7 @@ Examples:
   crux statements improve anthropic --category=safety  Target one category
   crux statements improve anthropic --no-research  Skip web search
   crux statements improve anthropic --target-coverage=0.8 --max-iterations=3  Iterate until 80%
+  crux statements improve anthropic --mode=quality          Rewrite low-scoring statements
 
 Workflow:
   1. crux statements extract <page-id> --apply     Extract statements from page
