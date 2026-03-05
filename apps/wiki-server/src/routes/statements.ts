@@ -9,6 +9,7 @@
  * - POST /properties/upsert — batch upsert properties
  * - GET /stats             — basic statistics
  * - GET /quality-summary — aggregate quality distribution + per-entity coverage scores
+ * - GET /export    — export entity statements as JSON or CSV download
  * - PATCH /:id     — update statement status, verdict, or note
  * - POST /         — create statement + optional citations
  */
@@ -903,6 +904,122 @@ const statementsApp = new Hono()
       })),
       total: rows.length,
     });
+  })
+
+  // ---- GET /export — export statements for an entity as JSON or CSV ----
+  .get("/export", zv("query", z.object({
+    entityId: z.string().min(1).max(200),
+    format: z.enum(["json", "csv"]).default("json"),
+  })), async (c) => {
+    const { entityId, format } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Reuse by-entity query logic: fetch statements, citations, properties
+    const [rows, allCitations, propertyRows] = await Promise.all([
+      db
+        .select()
+        .from(statements)
+        .where(
+          and(
+            eq(statements.subjectEntityId, entityId),
+            sql`${statements.status} != 'retracted'`
+          )
+        )
+        .orderBy(desc(statements.validStart)),
+      db
+        .select()
+        .from(statementCitations)
+        .where(
+          sql`${statementCitations.statementId} IN (
+            SELECT ${statements.id} FROM ${statements}
+            WHERE ${statements.subjectEntityId} = ${entityId}
+            AND ${statements.status} != 'retracted'
+          )`
+        ),
+      db.select().from(properties),
+    ]);
+
+    // Build citation count map
+    const citationCountMap = new Map<number, number>();
+    for (const cit of allCitations) {
+      citationCountMap.set(cit.statementId, (citationCountMap.get(cit.statementId) ?? 0) + 1);
+    }
+
+    // Build property map
+    const propertyMap = new Map(propertyRows.map((p) => [p.id, p]));
+
+    // Format each statement with property info and citation count
+    const formatted = rows.map((s) => {
+      const prop = s.propertyId ? propertyMap.get(s.propertyId) : null;
+      return {
+        ...formatStatement(s),
+        property: prop
+          ? { id: prop.id, label: prop.label, category: prop.category, valueType: prop.valueType, unitFormatId: prop.unitFormatId }
+          : null,
+        citationsCount: citationCountMap.get(s.id) ?? 0,
+      };
+    });
+
+    const structured = formatted.filter((s) => s.variety === "structured");
+    const attributed = formatted.filter((s) => s.variety === "attributed");
+
+    if (format === "json") {
+      c.header("Content-Type", "application/json");
+      c.header("Content-Disposition", `attachment; filename="${entityId}-statements.json"`);
+      return c.json({ entityId, structured, attributed, total: rows.length });
+    }
+
+    // CSV format — flatten to rows
+    const csvHeaders = [
+      "id", "variety", "property", "propertyCategory", "value", "statementText",
+      "validStart", "validEnd", "status", "citationsCount",
+      "attributedTo", "verdict", "verdictScore", "claimCategory",
+    ];
+
+    function csvEscape(val: string | number | null | undefined): string {
+      if (val == null) return "";
+      const str = String(val);
+      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    }
+
+    function formatValue(s: typeof formatted[number]): string {
+      if (s.valueNumeric != null) return String(s.valueNumeric) + (s.valueUnit ? ` ${s.valueUnit}` : "");
+      if (s.valueText != null) return s.valueText;
+      if (s.valueDate != null) return s.valueDate;
+      if (s.valueEntityId != null) return s.valueEntityId;
+      return "";
+    }
+
+    const csvRows = formatted.map((s) =>
+      csvHeaders.map((h) => {
+        switch (h) {
+          case "id": return csvEscape(s.id);
+          case "variety": return csvEscape(s.variety);
+          case "property": return csvEscape(s.property?.label ?? s.propertyId);
+          case "propertyCategory": return csvEscape(s.property?.category);
+          case "value": return csvEscape(formatValue(s));
+          case "statementText": return csvEscape(s.statementText);
+          case "validStart": return csvEscape(s.validStart);
+          case "validEnd": return csvEscape(s.validEnd);
+          case "status": return csvEscape(s.status);
+          case "citationsCount": return csvEscape(s.citationsCount);
+          case "attributedTo": return csvEscape(s.attributedTo);
+          case "verdict": return csvEscape(s.verdict);
+          case "verdictScore": return csvEscape(s.verdictScore);
+          case "claimCategory": return csvEscape(s.claimCategory);
+          default: return "";
+        }
+      }).join(",")
+    );
+
+    const csvContent = [csvHeaders.join(","), ...csvRows].join("\n");
+
+    c.header("Content-Type", "text/csv");
+    c.header("Content-Disposition", `attachment; filename="${entityId}-statements.csv"`);
+    return c.text(csvContent);
   })
 
   // ---- GET /:id — fetch a single statement with citations and property ----
