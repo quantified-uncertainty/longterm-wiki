@@ -128,11 +128,15 @@ const INTRINSIC_EXTRINSIC_SPLIT = 0.50;
 const CATEGORY_IMPORTANCE: Record<string, number> = {
   safety: 0.95,
   financial: 0.85,
+  governance: 0.85,
   technical: 0.80,
   research: 0.80,
+  products: 0.75,
+  people: 0.75,
   organizational: 0.70,
   milestone: 0.65,
   relation: 0.60,
+  attribution: 0.55,
 };
 
 const DEFAULT_CATEGORY_IMPORTANCE = 0.50;

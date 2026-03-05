@@ -261,6 +261,260 @@ properties:
     value_type: date
     category: milestone
 
+  # ── People & Leadership ────────────────────────────────────────────────
+  - id: team_size
+    label: "Team Size"
+    description: "Size of a specific team or division within an organization"
+    value_type: number
+    value_unit: count
+    category: people
+    entity_types: [organization]
+
+  - id: chief_scientist
+    label: "Chief Scientist"
+    description: "Chief scientist or head of research at an organization"
+    value_type: entity
+    category: relation
+    entity_types: [organization]
+
+  - id: education
+    label: "Education"
+    description: "Educational background, degrees, or institutional affiliations"
+    value_type: string
+    category: people
+    entity_types: [person]
+
+  - id: research_group_lead
+    label: "Research Group Lead"
+    description: "Leader of a specific research group or team"
+    value_type: entity
+    category: relation
+    entity_types: [organization]
+
+  # ── Products ─────────────────────────────────────────────────────────
+  - id: product_release
+    label: "Product Release"
+    description: "Product or model release event"
+    value_type: string
+    category: products
+    entity_types: [organization]
+
+  - id: model_capability
+    label: "Model Capability"
+    description: "Qualitative capability description of a model or product"
+    value_type: string
+    category: products
+    entity_types: [organization]
+
+  - id: safety_level
+    label: "Safety Level"
+    description: "AI Safety Level (ASL) or safety classification tier"
+    value_type: string
+    category: products
+    entity_types: [organization]
+
+  - id: pricing
+    label: "Pricing"
+    description: "Pricing model, tier structure, or specific price point"
+    value_type: string
+    category: products
+    entity_types: [organization]
+
+  - id: user_count
+    label: "User Count"
+    description: "Number of users of a product or platform"
+    value_type: number
+    value_unit: count
+    category: products
+    entity_types: [organization]
+
+  - id: api_volume
+    label: "API Volume"
+    description: "Number of API calls, requests, or tokens processed"
+    value_type: number
+    value_unit: count
+    category: products
+    entity_types: [organization]
+
+  # ── Safety & Research (expanded) ──────────────────────────────────────
+  - id: research_finding
+    label: "Research Finding"
+    description: "Empirical research result or discovery"
+    value_type: string
+    category: research
+    entity_types: [organization, person]
+
+  - id: research_methodology
+    label: "Research Methodology"
+    description: "Research method, approach, or experimental technique"
+    value_type: string
+    category: research
+    entity_types: [organization]
+
+  - id: publication
+    label: "Publication"
+    description: "Published paper, report, or technical document"
+    value_type: string
+    category: research
+    entity_types: [organization, person]
+
+  - id: interpretability_finding
+    label: "Interpretability Finding"
+    description: "Specific finding from interpretability or mechanistic interpretability research"
+    value_type: string
+    category: safety
+    entity_types: [organization]
+
+  - id: safety_incident
+    label: "Safety Incident"
+    description: "AI safety incident, failure, or concerning behavior observed in deployment"
+    value_type: string
+    category: safety
+    entity_types: [organization]
+
+  - id: red_team_result
+    label: "Red Team Result"
+    description: "Finding from red-teaming or adversarial testing of AI systems"
+    value_type: string
+    category: safety
+    entity_types: [organization]
+
+  - id: alignment_technique
+    label: "Alignment Technique"
+    description: "AI alignment method, approach, or training technique"
+    value_type: string
+    category: safety
+    entity_types: [organization]
+
+  - id: safety_evaluation
+    label: "Safety Evaluation"
+    description: "Formal safety evaluation result or assessment"
+    value_type: string
+    category: safety
+    entity_types: [organization]
+
+  - id: responsible_scaling_level
+    label: "Responsible Scaling Level"
+    description: "ASL or RSP tier classification for AI system capabilities"
+    value_type: string
+    category: safety
+    entity_types: [organization]
+
+  - id: biosecurity_finding
+    label: "Biosecurity Finding"
+    description: "Finding related to biosecurity risks from AI systems"
+    value_type: string
+    category: safety
+    entity_types: [organization]
+
+  # ── Governance & Policy (expanded) ────────────────────────────────────
+  - id: governance_structure
+    label: "Governance Structure"
+    description: "Governance mechanism or board structure"
+    value_type: string
+    category: governance
+    entity_types: [organization]
+
+  - id: policy_position
+    label: "Policy Position"
+    description: "Stated stance or position on a policy issue"
+    value_type: string
+    category: governance
+    entity_types: [organization, person]
+
+  - id: regulatory_event
+    label: "Regulatory Event"
+    description: "Regulatory action, investigation, or compliance event"
+    value_type: string
+    category: governance
+    entity_types: [organization]
+
+  - id: lobbying_action
+    label: "Lobbying Action"
+    description: "Lobbying effort, advocacy action, or political engagement"
+    value_type: string
+    category: governance
+    entity_types: [organization]
+
+  - id: compliance_standard
+    label: "Compliance Standard"
+    description: "Regulatory or industry compliance standard adopted"
+    value_type: string
+    category: governance
+    entity_types: [organization]
+
+  - id: transparency_report
+    label: "Transparency Report"
+    description: "Published transparency report or disclosure document"
+    value_type: string
+    category: governance
+    entity_types: [organization]
+
+  - id: voluntary_commitment
+    label: "Voluntary Commitment"
+    description: "Voluntary commitment or pledge related to AI safety or ethics"
+    value_type: string
+    category: governance
+    entity_types: [organization]
+
+  - id: international_agreement
+    label: "International Agreement"
+    description: "International agreement, treaty, or multi-party commitment"
+    value_type: string
+    category: governance
+    entity_types: [organization]
+
+  # ── Attribution ────────────────────────────────────────────────────────
+  - id: prediction
+    label: "Prediction"
+    description: "Forward-looking prediction or forecast attributed to a person"
+    value_type: string
+    category: attribution
+    entity_types: [person, organization]
+
+  - id: public_statement
+    label: "Public Statement"
+    description: "Notable public statement, quote, or position expressed publicly"
+    value_type: string
+    category: attribution
+    entity_types: [person, organization]
+
+  - id: interview_quote
+    label: "Interview Quote"
+    description: "Notable quote from an interview, podcast, or testimony"
+    value_type: string
+    category: attribution
+    entity_types: [person]
+
+  # ── Competitive & Market ───────────────────────────────────────────────
+  - id: competitor
+    label: "Competitor"
+    description: "Organization with a competitive relationship"
+    value_type: entity
+    category: relation
+    entity_types: [organization]
+
+  - id: partner
+    label: "Partner"
+    description: "Organization in a partnership or collaboration"
+    value_type: entity
+    category: relation
+    entity_types: [organization]
+
+  - id: investor
+    label: "Investor"
+    description: "Investor in the organization"
+    value_type: entity
+    category: relation
+    entity_types: [organization]
+
+  - id: subsidiary
+    label: "Subsidiary"
+    description: "Child or subsidiary organization"
+    value_type: entity
+    category: relation
+    entity_types: [organization]
+
   # ── Generic Fallback ───────────────────────────────────────────────────
   - id: count
     label: "Count"
