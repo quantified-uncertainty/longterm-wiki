@@ -66,6 +66,9 @@ export function formatStatementValue(
 
 /**
  * Format a qualifier key (e.g. "at-least" → "≥ ", "around" → "~").
+ * Only known prefix-style qualifiers produce output. All others (context
+ * qualifiers like "per-share-tender", "round:series-a") are suppressed
+ * since they're shown as parenthetical labels in the Property column.
  */
 function formatQualifier(key: string | null): string {
   if (!key) return "";
@@ -76,13 +79,10 @@ function formatQualifier(key: string | null): string {
       return "≤ ";
     case "around":
       return "~ ";
-    case "exactly":
-      return "";
     default:
-      // Suppress context-style qualifiers (e.g. "round:series-a") that aren't
-      // meaningful value prefixes — they're metadata, not display modifiers
-      if (key.includes(":")) return "";
-      return `${key} `;
+      // All other qualifiers are context metadata, not value prefixes.
+      // They're displayed in the Property column as "(qualifier)" instead.
+      return "";
   }
 }
 
@@ -134,6 +134,37 @@ export function getVarietyBadge(variety: string): VarietyBadge {
           "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
       };
   }
+}
+
+// ---- Period formatting ----
+
+const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/**
+ * Format a YYYY-MM or YYYY-MM-DD date string as human-readable (e.g. "Mar 2026").
+ * Falls back to the raw string if parsing fails.
+ */
+function formatDateHuman(date: string): string {
+  const match = date.match(/^(\d{4})-(\d{2})(?:-\d{2})?$/);
+  if (!match) return date;
+  const year = match[1];
+  const monthIdx = parseInt(match[2], 10) - 1;
+  if (monthIdx < 0 || monthIdx > 11) return date;
+  return `${MONTH_NAMES[monthIdx]} ${year}`;
+}
+
+/**
+ * Format a statement's validity period for display.
+ * Uses human-readable dates like "Mar 2026" instead of "2026-03".
+ */
+export function formatPeriod(start: string | null, end: string | null): string {
+  if (!start && !end) return "—";
+  if (start && !end) return `since ${formatDateHuman(start)}`;
+  if (!start && end) return `until ${formatDateHuman(end)}`;
+  return `${formatDateHuman(start!)} → ${formatDateHuman(end!)}`;
 }
 
 // ---- Status badges ----

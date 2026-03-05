@@ -1192,6 +1192,7 @@ const statementsApp = new Hono()
         ...(data.validStart !== undefined && { validStart: data.validStart ?? null }),
         ...(data.validEnd !== undefined && { validEnd: data.validEnd ?? null }),
         ...(data.attributedTo !== undefined && { attributedTo: data.attributedTo ?? null }),
+        ...(data.qualifierKey !== undefined && { qualifierKey: data.qualifierKey ?? null }),
         ...(data.archiveReason !== undefined && { archiveReason: data.archiveReason ?? null }),
         ...(data.verdict !== undefined && { verdict: data.verdict ?? null }),
         ...(data.verdictScore !== undefined && { verdictScore: data.verdictScore ?? null }),

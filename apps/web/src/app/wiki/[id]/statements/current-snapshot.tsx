@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { VerdictBadge } from "@components/wiki/VerdictBadge";
-import { formatStatementValue } from "@lib/statement-display";
+import { formatStatementValue, formatPeriod } from "@lib/statement-display";
 import { getDomain, isSafeUrl } from "@components/wiki/resource-utils";
 import type { ResolvedStatement } from "@lib/statement-types";
 import { snapshotKey } from "./statement-processing";
@@ -21,13 +21,19 @@ export function CurrentSnapshot({ snapshot, conflicts }: CurrentSnapshotProps) {
   const conflictSet = new Set(conflicts.map(([key]) => key));
   const conflictMap = new Map(conflicts);
 
+  // Determine if verdict column is useful (>10% have actual verdicts)
+  const withVerdict = snapshot.filter(
+    (s) => s.verdict != null && s.verdict !== "not_verifiable"
+  ).length;
+  const showVerdict = withVerdict / snapshot.length > 0.1;
+
   return (
     <div className="mb-8">
       <h2 className="text-lg font-semibold mb-1">Current Snapshot</h2>
       <p className="text-xs text-muted-foreground mb-3">
         Latest active value for each property.
         {conflicts.length > 0 && (
-          <span className="ml-1 text-amber-600 dark:text-amber-400">
+          <span className="ml-1 text-muted-foreground">
             {conflicts.length}{" "}
             {conflicts.length === 1
               ? "property has multiple open values"
@@ -52,9 +58,11 @@ export function CurrentSnapshot({ snapshot, conflicts }: CurrentSnapshotProps) {
               <th className="text-left px-3 py-2 text-xs font-medium">
                 Source
               </th>
-              <th className="text-left px-3 py-2 text-xs font-medium">
-                Verdict
-              </th>
+              {showVerdict && (
+                <th className="text-left px-3 py-2 text-xs font-medium">
+                  Verdict
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -69,6 +77,7 @@ export function CurrentSnapshot({ snapshot, conflicts }: CurrentSnapshotProps) {
                   statement={s}
                   hasConflict={hasConflict}
                   conflictingStatements={conflictingStmts}
+                  showVerdict={showVerdict}
                 />
               );
             })}
@@ -83,10 +92,12 @@ function SnapshotRow({
   statement: s,
   hasConflict,
   conflictingStatements,
+  showVerdict,
 }: {
   statement: ResolvedStatement;
   hasConflict: boolean;
   conflictingStatements?: ResolvedStatement[];
+  showVerdict: boolean;
 }) {
   const value = formatStatementValue(s, s.property);
   const displayValue =
@@ -131,7 +142,7 @@ function SnapshotRow({
         )}
       </td>
       <td className="px-3 py-2 text-xs text-muted-foreground">
-        {s.validStart ?? "—"}
+        {s.validStart ? formatPeriod(s.validStart, null).replace(/^since /, "") : "—"}
       </td>
       <td className="px-3 py-2 text-xs">
         {firstUrl && domain ? (
@@ -152,9 +163,11 @@ function SnapshotRow({
           <span className="text-muted-foreground/40">—</span>
         )}
       </td>
-      <td className="px-3 py-2 text-xs">
-        <VerdictBadge verdict={s.verdict} score={s.verdictScore} size="sm" />
-      </td>
+      {showVerdict && (
+        <td className="px-3 py-2 text-xs">
+          <VerdictBadge verdict={s.verdict} score={s.verdictScore} size="sm" />
+        </td>
+      )}
     </tr>
   );
 }
