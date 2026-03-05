@@ -1,4 +1,5 @@
 name: Auto-Rebase PRs
+run-name: "Auto-Rebase PRs${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # Rebase all open PRs onto main to surface conflicts early.
 # Logic lives in crux/lib/pr-rebase.ts; this workflow is a thin orchestrator.
@@ -24,6 +25,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  paused-notice:
+    if: vars.AUTOMATION_PAUSED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "::warning::AUTOMATION_PAUSED is set — this workflow was skipped. To resume, run: pnpm crux ci unpause-automation"
+
   preflight:
     if: vars.AUTOMATION_PAUSED != 'true'
     runs-on: ubuntu-latest
