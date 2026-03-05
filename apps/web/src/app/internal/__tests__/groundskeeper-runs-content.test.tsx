@@ -7,6 +7,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type React from "react";
 
 // ── Mock dependencies ────────────────────────────────────────────────────────
 
@@ -15,7 +16,7 @@ vi.mock("@lib/wiki-server", () => ({
   withApiFallback: vi.fn(),
 }));
 
-vi.mock("../groundskeeper-runs/groundskeeper-runs-table", () => ({
+vi.mock("@/app/internal/groundskeeper-runs/groundskeeper-runs-table", () => ({
   GroundskeeperRunsTable: () => null,
 }));
 
@@ -26,7 +27,8 @@ vi.mock("@components/internal/DataSourceBanner", () => ({
 // ── Imports (after mocks) ────────────────────────────────────────────────────
 
 import { withApiFallback } from "@lib/wiki-server";
-import { GroundskeeperRunsContent } from "../groundskeeper-runs/groundskeeper-runs-content";
+import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/groundskeeper-runs-content";
+import { renderToStaticMarkup } from "react-dom/server";
 
 // ── Mock data ────────────────────────────────────────────────────────────────
 
@@ -119,6 +121,10 @@ describe("GroundskeeperRunsContent", () => {
 
     const element = await GroundskeeperRunsContent();
     expect(element).toBeTruthy();
+    if (element) {
+      const markup = renderToStaticMarkup(element as React.ReactElement);
+      expect(markup).not.toMatch(/undefined|NaN/);
+    }
   });
 
   it("renders without throwing with no runs (empty state)", async () => {
@@ -129,6 +135,10 @@ describe("GroundskeeperRunsContent", () => {
 
     const element = await GroundskeeperRunsContent();
     expect(element).toBeTruthy();
+    if (element) {
+      const markup = renderToStaticMarkup(element as React.ReactElement);
+      expect(markup).not.toMatch(/undefined|NaN/);
+    }
   });
 
   it("renders without throwing when API is not configured", async () => {
@@ -140,6 +150,10 @@ describe("GroundskeeperRunsContent", () => {
 
     const element = await GroundskeeperRunsContent();
     expect(element).toBeTruthy();
+    if (element) {
+      const markup = renderToStaticMarkup(element as React.ReactElement);
+      expect(markup).not.toMatch(/undefined|NaN/);
+    }
   });
 
   it("renders without throwing when circuit breaker is active", async () => {
@@ -192,5 +206,9 @@ describe("GroundskeeperRunsContent", () => {
 
     const element = await GroundskeeperRunsContent();
     expect(element).toBeTruthy();
+    if (element) {
+      const markup = renderToStaticMarkup(element as React.ReactElement);
+      expect(markup).not.toMatch(/undefined|NaN/);
+    }
   });
 });

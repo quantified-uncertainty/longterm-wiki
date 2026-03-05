@@ -15,7 +15,7 @@ vi.mock("@lib/wiki-server", () => ({
   withApiFallback: vi.fn(),
 }));
 
-vi.mock("../statement-scores/statement-scores-table", () => ({
+vi.mock("@/app/internal/statement-scores/statement-scores-table", () => ({
   StatementScoresTable: () => null,
 }));
 
@@ -30,7 +30,7 @@ vi.mock("@components/internal/StatCard", () => ({
 // ── Imports (after mocks) ────────────────────────────────────────────────────
 
 import { withApiFallback } from "@lib/wiki-server";
-import { StatementScoresContent } from "../statement-scores/statement-scores-content";
+import { StatementScoresContent } from "@/app/internal/statement-scores/statement-scores-content";
 
 // ── Mock data ────────────────────────────────────────────────────────────────
 

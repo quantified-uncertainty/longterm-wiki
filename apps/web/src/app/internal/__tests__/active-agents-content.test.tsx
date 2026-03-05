@@ -16,11 +16,11 @@ vi.mock("@lib/wiki-server", () => ({
   withApiFallback: vi.fn(),
 }));
 
-vi.mock("../active-agents/active-agents-table", () => ({
+vi.mock("@/app/internal/active-agents/active-agents-table", () => ({
   ActiveAgentsTable: () => null,
 }));
 
-vi.mock("../active-agents/agent-events-panel", () => ({
+vi.mock("@/app/internal/active-agents/agent-events-panel", () => ({
   AgentEventsPanel: () => null,
 }));
 
@@ -31,7 +31,7 @@ vi.mock("@components/internal/DataSourceBanner", () => ({
 // ── Imports (after mocks) ────────────────────────────────────────────────────
 
 import { withApiFallback } from "@lib/wiki-server";
-import { ActiveAgentsContent } from "../active-agents/active-agents-content";
+import { ActiveAgentsContent } from "@/app/internal/active-agents/active-agents-content";
 
 // ── Mock data ────────────────────────────────────────────────────────────────
 

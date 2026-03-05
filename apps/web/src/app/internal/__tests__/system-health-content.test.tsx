@@ -16,11 +16,11 @@ vi.mock("@lib/wiki-server", () => ({
   withApiFallback: vi.fn(),
 }));
 
-vi.mock("../system-health/system-health-table", () => ({
+vi.mock("@/app/internal/system-health/system-health-table", () => ({
   SystemHealthTable: () => null,
 }));
 
-vi.mock("../system-health/open-prs-table", () => ({
+vi.mock("@/app/internal/system-health/open-prs-table", () => ({
   OpenPRsTable: () => null,
 }));
 
@@ -35,7 +35,7 @@ import {
   fetchDetailed,
   fetchFromWikiServer,
 } from "@lib/wiki-server";
-import { SystemHealthContent } from "../system-health/system-health-content";
+import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
 
 // ── Mock data ────────────────────────────────────────────────────────────────
 
@@ -372,7 +372,7 @@ describe("SystemHealthContent", () => {
     expect(element).toBeTruthy();
   });
 
-  it("augments github-actions status from CI data when service is unknown", async () => {
+  it("renders without throwing when github-actions is unknown and CI data is present (augmentation smoke test)", async () => {
     const statusWithUnknownCI = {
       ...mockMonitoringStatus,
       services: [

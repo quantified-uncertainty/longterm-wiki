@@ -17,7 +17,7 @@ vi.mock("@lib/wiki-server", () => ({
 }));
 
 // Table is a "use client" component — stub it so the node env can import it.
-vi.mock("../agent-sessions/sessions-table", () => ({
+vi.mock("@/app/internal/agent-sessions/sessions-table", () => ({
   AgentSessionsTable: () => null,
 }));
 
@@ -31,7 +31,7 @@ import {
   withApiFallback,
   fetchDetailed,
 } from "@lib/wiki-server";
-import { AgentSessionsContent } from "../agent-sessions/agent-sessions-content";
+import { AgentSessionsContent } from "@/app/internal/agent-sessions/agent-sessions-content";
 
 // ── Mock data ────────────────────────────────────────────────────────────────
 
@@ -138,7 +138,7 @@ describe("AgentSessionsContent", () => {
     expect(element).toBeTruthy();
   });
 
-  it("enriches sessions with cost and PR data from session logs", async () => {
+  it("renders enrichment scenario without throwing (smoke test with session log data)", async () => {
     vi.mocked(fetchDetailed)
       .mockResolvedValueOnce({ ok: true, data: { sessions: mockAgentSessions } })
       .mockResolvedValueOnce({ ok: true, data: { sessions: mockSessionLogs } });
@@ -149,7 +149,12 @@ describe("AgentSessionsContent", () => {
     >("@lib/wiki-server");
     vi.mocked(withApiFallback).mockImplementation(realWithApiFallback);
 
-    // Verify the component doesn't crash with enriched data
+    // Verify the component doesn't crash with enriched data.
+    // The actual enrichment logic (merging cost/durationMinutes/prUrl from session
+    // logs into agent sessions) is exercised by the real withApiFallback path here,
+    // but since AgentSessionsTable is mocked to () => null we cannot assert on the
+    // props it receives. This test guards against crashes; data-shape assertions
+    // belong in a unit test of the enrichment helper directly.
     const element = await AgentSessionsContent();
     expect(element).toBeTruthy();
   });
