@@ -64,7 +64,7 @@ type DraftAction = RetractAction | ClassifyAction | NewPropertyAction | CreateAc
 // Parser
 // ---------------------------------------------------------------------------
 
-function parseDraft(content: string, entityId: string): DraftAction[] {
+function parseDraft(content: string, _entityId: string): DraftAction[] {
   const actions: DraftAction[] = [];
   const lines = content.split('\n');
 
