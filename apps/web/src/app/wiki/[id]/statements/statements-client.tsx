@@ -25,13 +25,20 @@ type StatusFilter = "active" | "superseded" | "retracted";
 function csvEscape(val: string | number | null | undefined): string {
   if (val == null) return "";
   const str = String(val);
-  if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+  // Defend against CSV injection: prefix dangerous leading characters
+  const needsQuoting =
+    str.includes(",") || str.includes('"') || str.includes("\n") ||
+    /^[=+\-@\t\r]/.test(str);
+  if (needsQuoting) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;
 }
 
 function statementToFlatValue(s: ResolvedStatement): string {
+  if (s.valueNumeric != null) {
+    return String(s.valueNumeric) + (s.valueUnit ? ` ${s.valueUnit}` : "");
+  }
   if (s.valueEntityTitle) return s.valueEntityTitle;
   if (s.valueText != null) return s.valueText;
   if (s.valueDate != null) return s.valueDate;
