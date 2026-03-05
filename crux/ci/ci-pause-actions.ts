@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * Pause Automation — Set AUTOMATION_PAUSED repository variable to 'true'.
+ * Pause Actions — Set AUTOMATION_PAUSED repository variable to 'true'.
  *
  * When set, all 15 automated/scheduled workflows will skip their main jobs
  * and show a [PAUSED] indicator in the GitHub Actions run name.
  *
  * Usage:
- *   crux ci pause-automation
+ *   crux ci pause-actions
  *
  * Requires GITHUB_TOKEN environment variable.
  */
@@ -47,13 +47,13 @@ async function main() {
     `${c.green}AUTOMATION_PAUSED set to 'true'.${c.reset} All automated workflows are now paused.`
   );
   console.log(
-    `Run ${c.cyan}pnpm crux ci unpause-automation${c.reset} to resume.`
+    `Run ${c.cyan}pnpm crux ci resume-actions${c.reset} to resume.`
   );
 }
 
 main().catch((err) => {
   console.error(
-    `${c.red}Failed to pause automation:${c.reset}`,
+    `${c.red}Failed to pause actions:${c.reset}`,
     err instanceof Error ? err.message : String(err)
   );
   process.exit(1);

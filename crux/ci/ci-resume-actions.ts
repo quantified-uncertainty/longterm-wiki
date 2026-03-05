@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * Unpause Automation — Delete the AUTOMATION_PAUSED repository variable.
+ * Resume Actions — Delete the AUTOMATION_PAUSED repository variable.
  *
  * Removes the pause, allowing all 15 automated/scheduled workflows to run
  * normally again.
  *
  * Usage:
- *   crux ci unpause-automation
+ *   crux ci resume-actions
  *
  * Requires GITHUB_TOKEN environment variable.
  */
@@ -30,7 +30,7 @@ async function main() {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes('404') || msg.includes('Not Found')) {
       console.log(
-        `${c.yellow}AUTOMATION_PAUSED was not set — automation is already active.${c.reset}`
+        `${c.yellow}AUTOMATION_PAUSED was not set — actions are already active.${c.reset}`
       );
     } else {
       throw err;
@@ -40,7 +40,7 @@ async function main() {
 
 main().catch((err) => {
   console.error(
-    `${c.red}Failed to unpause automation:${c.reset}`,
+    `${c.red}Failed to resume actions:${c.reset}`,
     err instanceof Error ? err.message : String(err)
   );
   process.exit(1);
