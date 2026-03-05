@@ -287,6 +287,15 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'actions-yaml',
+    name: 'GitHub Actions workflow YAML (actionlint)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-actions-yaml.ts'],
+    cwd: PROJECT_ROOT,
+    // Fail-open if actionlint is not installed (local dev without the tool).
+    // CI installs actionlint explicitly so it always runs there.
+  },
+  {
     id: 'mdx-compile',
     name: 'MDX compilation smoke-test (advisory)',
     command: 'npx',
