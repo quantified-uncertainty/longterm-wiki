@@ -1028,6 +1028,112 @@ const statementsApp = new Hono()
     });
   })
 
+  // ---- GET /coverage-scores/all — latest coverage score for every entity ----
+  .get("/coverage-scores/all", async (c) => {
+    const db = getDrizzleDb();
+
+    // Use a subquery to get the latest score per entity (MAX id = most recent)
+    const latestIds = db
+      .select({
+        maxId: sql<number>`MAX(${entityCoverageScores.id})`.as("max_id"),
+      })
+      .from(entityCoverageScores)
+      .groupBy(entityCoverageScores.entityId)
+      .as("latest");
+
+    const rows = await db
+      .select({
+        id: entityCoverageScores.id,
+        entityId: entityCoverageScores.entityId,
+        coverageScore: entityCoverageScores.coverageScore,
+        categoryScores: entityCoverageScores.categoryScores,
+        statementCount: entityCoverageScores.statementCount,
+        qualityAvg: entityCoverageScores.qualityAvg,
+        scoredAt: entityCoverageScores.scoredAt,
+      })
+      .from(entityCoverageScores)
+      .innerJoin(latestIds, eq(entityCoverageScores.id, latestIds.maxId))
+      .orderBy(desc(entityCoverageScores.coverageScore));
+
+    return c.json({
+      scores: rows.map((r) => ({
+        id: r.id,
+        entityId: r.entityId,
+        coverageScore: r.coverageScore,
+        categoryScores: r.categoryScores,
+        statementCount: r.statementCount,
+        qualityAvg: r.qualityAvg,
+        scoredAt: r.scoredAt,
+      })),
+      total: rows.length,
+    });
+  })
+
+  // ---- GET /scores/distribution — quality score distribution for statements ----
+  .get("/scores/distribution", async (c) => {
+    const db = getDrizzleDb();
+
+    // Aggregate distribution and category breakdown in SQL (no full table scan)
+    const [summaryResult, categoryResult] = await Promise.all([
+      db.execute(sql`
+        SELECT
+          COUNT(*) FILTER (WHERE quality_score IS NULL) AS unscored,
+          COUNT(*) FILTER (WHERE quality_score < 0.2) AS b0_2,
+          COUNT(*) FILTER (WHERE quality_score >= 0.2 AND quality_score < 0.4) AS b2_4,
+          COUNT(*) FILTER (WHERE quality_score >= 0.4 AND quality_score < 0.6) AS b4_6,
+          COUNT(*) FILTER (WHERE quality_score >= 0.6 AND quality_score < 0.8) AS b6_8,
+          COUNT(*) FILTER (WHERE quality_score >= 0.8) AS b8_10,
+          AVG(quality_score) FILTER (WHERE quality_score IS NOT NULL) AS average_quality,
+          COUNT(quality_score) AS scored_count
+        FROM statements
+        WHERE status = 'active'
+      `),
+      db.execute(sql`
+        SELECT
+          COALESCE(p.category, 'uncategorized') AS category,
+          COUNT(*)::text AS count,
+          AVG(s.quality_score) FILTER (WHERE s.quality_score IS NOT NULL) AS avg_quality
+        FROM statements s
+        LEFT JOIN properties p ON s.property_id = p.id
+        WHERE s.status = 'active'
+        GROUP BY COALESCE(p.category, 'uncategorized')
+        ORDER BY COUNT(*) DESC
+      `),
+    ]);
+
+    const summary = summaryResult[0];
+    const bucketCounts: Record<string, number> = {
+      "unscored": Number(summary?.unscored ?? 0),
+      "0.0-0.2": Number(summary?.b0_2 ?? 0),
+      "0.2-0.4": Number(summary?.b2_4 ?? 0),
+      "0.4-0.6": Number(summary?.b4_6 ?? 0),
+      "0.6-0.8": Number(summary?.b6_8 ?? 0),
+      "0.8-1.0": Number(summary?.b8_10 ?? 0),
+    };
+    const scoredCount = Number(summary?.scored_count ?? 0);
+    const averageQuality = summary?.average_quality != null
+      ? Number(summary.average_quality)
+      : null;
+
+    const categoryBreakdown = categoryResult.map((row) => ({
+      category: String(row.category ?? "uncategorized"),
+      count: Number(row.count ?? 0),
+      avgQuality: row.avg_quality != null ? Number(row.avg_quality) : null,
+    }));
+
+    const bucketOrder = ["0.0-0.2", "0.2-0.4", "0.4-0.6", "0.6-0.8", "0.8-1.0", "unscored"];
+
+    return c.json({
+      buckets: bucketOrder.map((range) => ({
+        range,
+        count: bucketCounts[range] ?? 0,
+      })),
+      averageQuality: averageQuality,
+      scoredCount,
+      categoryBreakdown,
+    });
+  })
+
   // ---- POST /cleanup — delete retracted and empty statements ----
   // entityId is required to prevent accidental global cleanup.
   .post("/cleanup", async (c) => {
