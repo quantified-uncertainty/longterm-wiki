@@ -94,6 +94,23 @@ export interface PassResult {
   rejections: Array<{ text: string; reason: string; score: number }>;
 }
 
+/** Options for an iterative improvement loop. */
+export interface IterativeOptions extends ImproveOptions {
+  targetCoverage: number;
+  maxIterations: number;
+}
+
+/** Result of an iterative improvement loop. */
+export interface IterativeResult {
+  passes: PassResult[];
+  finalCoverage: number;
+  converged: boolean;  // true if target reached
+  stalled: boolean;    // true if no improvement in last pass
+  totalCreated: number;
+  totalRejected: number;
+  totalCost: number;
+}
+
 // ---------------------------------------------------------------------------
 // Statement generation
 // ---------------------------------------------------------------------------
@@ -523,6 +540,77 @@ export async function runSinglePass(opts: ImproveOptions): Promise<PassResult> {
 }
 
 // ---------------------------------------------------------------------------
+// Iterative improvement loop
+// ---------------------------------------------------------------------------
+
+/** Function signature for a single improvement pass (injectable for testing). */
+export type PassFn = (opts: ImproveOptions) => Promise<PassResult>;
+
+/**
+ * Run multiple improvement passes until coverage target is reached, budget is
+ * exhausted, max iterations hit, or no progress is made (convergence).
+ *
+ * Calls `passFn()` (defaults to `runSinglePass`) in a loop, checking
+ * `passResult.coverageAfter` against the target after each pass.
+ * Reports per-iteration progression.
+ */
+export async function runIterativeLoop(
+  opts: IterativeOptions,
+  passFn: PassFn = runSinglePass,
+): Promise<IterativeResult> {
+  const { targetCoverage, maxIterations, budget, tracker } = opts;
+  const passes: PassResult[] = [];
+  let finalCoverage = 0;
+  let converged = false;
+  let stalled = false;
+
+  for (let i = 0; i < maxIterations; i++) {
+    // Check budget before starting a new pass
+    if (tracker.totalCost >= budget) break;
+
+    const passResult = await passFn(opts);
+    passes.push(passResult);
+
+    // Determine the latest coverage value
+    const currentCoverage = passResult.coverageAfter ?? passResult.coverageBefore;
+    finalCoverage = currentCoverage;
+
+    // Check if target reached
+    if (currentCoverage >= targetCoverage) {
+      converged = true;
+      break;
+    }
+
+    // Convergence detection: stop if no statements were created and coverage
+    // didn't improve (all gaps filled or all candidates rejected)
+    if (passResult.created === 0) {
+      stalled = true;
+      break;
+    }
+
+    // Also stall if coverage didn't improve compared to prior pass
+    if (passes.length >= 2) {
+      const prevCoverage = passes[passes.length - 2].coverageAfter
+        ?? passes[passes.length - 2].coverageBefore;
+      if (currentCoverage <= prevCoverage) {
+        stalled = true;
+        break;
+      }
+    }
+  }
+
+  return {
+    passes,
+    finalCoverage,
+    converged,
+    stalled,
+    totalCreated: passes.reduce((sum, p) => sum + p.created, 0),
+    totalRejected: passes.reduce((sum, p) => sum + p.rejected, 0),
+    totalCost: tracker.totalCost,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // CLI: main (thin wrapper)
 // ---------------------------------------------------------------------------
 
@@ -537,47 +625,119 @@ async function main() {
     console.error(`${c.red}Error: provide an entity ID${c.reset}`);
     console.error(`  Usage: pnpm crux statements improve <entity-id> [options]`);
     console.error(`  Options: --org-type=TYPE --dry-run --category=CAT --no-research --min-score=N --budget=N --json`);
+    console.error(`           --target-coverage=N --max-iterations=N`);
     process.exit(1);
   }
 
   const tracker = new CostTracker();
   const client = createLlmClient();
 
+  const budgetVal = typeof args.budget === 'number'
+    ? args.budget
+    : typeof args.budget === 'string' ? parseFloat(args.budget) : 5;
+  const minScoreVal = typeof args['min-score'] === 'number'
+    ? args['min-score']
+    : typeof args['min-score'] === 'string' ? parseFloat(args['min-score']) : 0.5;
+
   const opts: ImproveOptions = {
     entityId,
     orgType: (args['org-type'] as string) ?? null,
     categoryFilter: (args.category as string) ?? null,
-    minScore: typeof args['min-score'] === 'number' ? args['min-score'] : 0.5,
-    budget: typeof args.budget === 'number' ? args.budget : 5,
+    minScore: minScoreVal,
+    budget: budgetVal,
     noResearch: args['no-research'] === true,
     dryRun: args['dry-run'] === true,
     client,
     tracker,
   };
 
+  // Parse iterative loop flags
+  const targetCoverageRaw = args['target-coverage'];
+  const targetCoverage = typeof targetCoverageRaw === 'number'
+    ? targetCoverageRaw
+    : typeof targetCoverageRaw === 'string' ? parseFloat(targetCoverageRaw) : null;
+
+  const maxIterationsRaw = args['max-iterations'];
+  const maxIterations = typeof maxIterationsRaw === 'number'
+    ? maxIterationsRaw
+    : typeof maxIterationsRaw === 'string' ? parseInt(maxIterationsRaw, 10) : 5;
+
   if (!jsonOutput) console.log(`${c.dim}Analyzing coverage gaps for ${entityId}...${c.reset}`);
 
-  let result: PassResult;
-  try {
-    result = await runSinglePass(opts);
-  } catch (err) {
-    console.error(`${c.red}${err instanceof Error ? err.message : String(err)}${c.reset}`);
-    process.exit(1);
-  }
+  // Dispatch: iterative loop or single pass
+  if (targetCoverage != null && !isNaN(targetCoverage)) {
+    const iterOpts: IterativeOptions = {
+      ...opts,
+      targetCoverage,
+      maxIterations,
+    };
 
-  if (jsonOutput) {
-    console.log(JSON.stringify(result, null, 2));
-  } else {
-    console.log(`\n${c.bold}${c.blue}Improvement Summary: ${entityId}${c.reset}`);
-    console.log(`  Categories:  ${result.categoriesProcessed.join(', ') || '(none — no gaps)'}`);
-    console.log(`  Created:     ${c.green}${result.created}${c.reset}`);
-    console.log(`  Rejected:    ${c.red}${result.rejected}${c.reset}`);
-    console.log(`  Coverage:    ${result.coverageBefore.toFixed(3)}${result.coverageAfter != null ? ` → ${result.coverageAfter.toFixed(3)}` : ''}`);
-    console.log(`  Cost:        $${result.totalCost.toFixed(4)}`);
-    if (opts.dryRun) {
-      console.log(`  ${c.dim}(dry run — no statements were inserted)${c.reset}`);
+    let iterResult: IterativeResult;
+    try {
+      if (!jsonOutput) {
+        console.log(`${c.dim}Target coverage: ${targetCoverage.toFixed(3)}, max iterations: ${maxIterations}${c.reset}`);
+      }
+
+      iterResult = await runIterativeLoop({
+        ...iterOpts,
+        // Wrap runSinglePass progress reporting for non-JSON mode
+      });
+    } catch (err) {
+      console.error(`${c.red}${err instanceof Error ? err.message : String(err)}${c.reset}`);
+      process.exit(1);
     }
-    console.log('');
+
+    if (jsonOutput) {
+      console.log(JSON.stringify(iterResult, null, 2));
+    } else {
+      console.log(`\n${c.bold}${c.blue}Iterative Improvement Summary: ${entityId}${c.reset}`);
+      console.log(`  Iterations:  ${iterResult.passes.length}`);
+      for (let i = 0; i < iterResult.passes.length; i++) {
+        const pass = iterResult.passes[i];
+        const coverageAfterStr = pass.coverageAfter != null ? pass.coverageAfter.toFixed(3) : 'N/A';
+        const delta = pass.coverageAfter != null
+          ? (pass.coverageAfter - pass.coverageBefore)
+          : 0;
+        const deltaStr = delta > 0 ? `${c.green}+${delta.toFixed(3)}${c.reset}` : delta.toFixed(3);
+        console.log(`    Pass ${i + 1}:  coverage ${pass.coverageBefore.toFixed(3)} → ${coverageAfterStr} (${deltaStr}), created ${pass.created}`);
+      }
+      console.log(`  Created:     ${c.green}${iterResult.totalCreated}${c.reset}`);
+      console.log(`  Rejected:    ${c.red}${iterResult.totalRejected}${c.reset}`);
+      console.log(`  Coverage:    ${iterResult.passes.length > 0 ? iterResult.passes[0].coverageBefore.toFixed(3) : 'N/A'} → ${iterResult.finalCoverage.toFixed(3)}`);
+      console.log(`  Converged:   ${iterResult.converged ? `${c.green}yes${c.reset}` : 'no'}`);
+      if (iterResult.stalled) {
+        console.log(`  ${c.dim}(stalled — no improvement in last pass)${c.reset}`);
+      }
+      console.log(`  Cost:        $${iterResult.totalCost.toFixed(4)}`);
+      if (opts.dryRun) {
+        console.log(`  ${c.dim}(dry run — no statements were inserted)${c.reset}`);
+      }
+      console.log('');
+    }
+  } else {
+    // Single-pass mode (original behavior)
+    let result: PassResult;
+    try {
+      result = await runSinglePass(opts);
+    } catch (err) {
+      console.error(`${c.red}${err instanceof Error ? err.message : String(err)}${c.reset}`);
+      process.exit(1);
+    }
+
+    if (jsonOutput) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(`\n${c.bold}${c.blue}Improvement Summary: ${entityId}${c.reset}`);
+      console.log(`  Categories:  ${result.categoriesProcessed.join(', ') || '(none — no gaps)'}`);
+      console.log(`  Created:     ${c.green}${result.created}${c.reset}`);
+      console.log(`  Rejected:    ${c.red}${result.rejected}${c.reset}`);
+      console.log(`  Coverage:    ${result.coverageBefore.toFixed(3)}${result.coverageAfter != null ? ` → ${result.coverageAfter.toFixed(3)}` : ''}`);
+      console.log(`  Cost:        $${result.totalCost.toFixed(4)}`);
+      if (opts.dryRun) {
+        console.log(`  ${c.dim}(dry run — no statements were inserted)${c.reset}`);
+      }
+      console.log('');
+    }
   }
 }
 
