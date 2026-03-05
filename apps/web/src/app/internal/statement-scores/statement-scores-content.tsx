@@ -5,7 +5,7 @@ import {
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { StatCard } from "@components/internal/StatCard";
-import { StatementScoresTable } from "./statement-scores-table";
+import { StatementScoresTable } from "@/app/internal/statement-scores/statement-scores-table";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -157,12 +157,13 @@ function CategoryBreakdownTable({ categories }: { categories: CategoryBreakdown[
     );
   }
 
+  const maxCount = Math.max(...categories.map((c) => c.count), 1);
+
   return (
     <div className="rounded-lg border border-border/60 p-4">
       <h3 className="text-sm font-medium mb-3">Category Breakdown</h3>
       <div className="space-y-2">
         {categories.map((cat) => {
-          const maxCount = Math.max(...categories.map((c) => c.count), 1);
           const widthPct = (cat.count / maxCount) * 100;
           return (
             <div key={cat.category} className="flex items-center gap-2">
@@ -205,8 +206,9 @@ export async function StatementScoresContent() {
   const unscored = distribution.buckets.find((b) => b.range === "unscored");
   const unscoredCount = unscored?.count ?? 0;
   const scoredCount = distribution.scoredCount;
-  const scorePct = stats.total > 0
-    ? Math.round((scoredCount / stats.total) * 100)
+  const totalActive = scoredCount + unscoredCount;
+  const scorePct = totalActive > 0
+    ? Math.round((scoredCount / totalActive) * 100)
     : 0;
 
   return (
@@ -218,7 +220,7 @@ export async function StatementScoresContent() {
       </p>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
-        <StatCard label="Total Statements" value={stats.total} />
+        <StatCard label="Active Statements" value={totalActive} />
         <StatCard label="Scored" value={scoredCount} color="emerald" />
         <StatCard label="Unscored" value={unscoredCount} color="amber" />
         <StatCard label="Entities Scored" value={coverageScores.length} color="blue" />

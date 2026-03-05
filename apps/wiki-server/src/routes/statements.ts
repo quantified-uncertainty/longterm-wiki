@@ -1065,72 +1065,53 @@ const statementsApp = new Hono()
   .get("/scores/distribution", async (c) => {
     const db = getDrizzleDb();
 
-    // Get all active statements with their quality scores and properties
-    const [allScores, categoryData] = await Promise.all([
-      db
-        .select({
-          qualityScore: statements.qualityScore,
-        })
-        .from(statements)
-        .where(eq(statements.status, "active")),
-      db
-        .select({
-          category: properties.category,
-          qualityScore: statements.qualityScore,
-        })
-        .from(statements)
-        .leftJoin(properties, eq(statements.propertyId, properties.id))
-        .where(eq(statements.status, "active")),
+    // Aggregate distribution and category breakdown in SQL (no full table scan)
+    const [summaryResult, categoryResult] = await Promise.all([
+      db.execute(sql`
+        SELECT
+          COUNT(*) FILTER (WHERE quality_score IS NULL) AS unscored,
+          COUNT(*) FILTER (WHERE quality_score < 0.2) AS b0_2,
+          COUNT(*) FILTER (WHERE quality_score >= 0.2 AND quality_score < 0.4) AS b2_4,
+          COUNT(*) FILTER (WHERE quality_score >= 0.4 AND quality_score < 0.6) AS b4_6,
+          COUNT(*) FILTER (WHERE quality_score >= 0.6 AND quality_score < 0.8) AS b6_8,
+          COUNT(*) FILTER (WHERE quality_score >= 0.8) AS b8_10,
+          AVG(quality_score) FILTER (WHERE quality_score IS NOT NULL) AS average_quality,
+          COUNT(quality_score) AS scored_count
+        FROM statements
+        WHERE status = 'active'
+      `),
+      db.execute(sql`
+        SELECT
+          COALESCE(p.category, 'uncategorized') AS category,
+          COUNT(*)::text AS count,
+          AVG(s.quality_score) FILTER (WHERE s.quality_score IS NOT NULL) AS avg_quality
+        FROM statements s
+        LEFT JOIN properties p ON s.property_id = p.id
+        WHERE s.status = 'active'
+        GROUP BY COALESCE(p.category, 'uncategorized')
+        ORDER BY COUNT(*) DESC
+      `),
     ]);
 
-    // Build bucket distribution
+    const summary = summaryResult[0];
     const bucketCounts: Record<string, number> = {
-      "unscored": 0,
-      "0.0-0.2": 0,
-      "0.2-0.4": 0,
-      "0.4-0.6": 0,
-      "0.6-0.8": 0,
-      "0.8-1.0": 0,
+      "unscored": Number(summary?.unscored ?? 0),
+      "0.0-0.2": Number(summary?.b0_2 ?? 0),
+      "0.2-0.4": Number(summary?.b2_4 ?? 0),
+      "0.4-0.6": Number(summary?.b4_6 ?? 0),
+      "0.6-0.8": Number(summary?.b6_8 ?? 0),
+      "0.8-1.0": Number(summary?.b8_10 ?? 0),
     };
+    const scoredCount = Number(summary?.scored_count ?? 0);
+    const averageQuality = summary?.average_quality != null
+      ? Number(summary.average_quality)
+      : null;
 
-    let scoredSum = 0;
-    let scoredCount = 0;
-
-    for (const row of allScores) {
-      const qs = row.qualityScore;
-      if (qs == null) {
-        bucketCounts["unscored"]++;
-      } else {
-        scoredSum += qs;
-        scoredCount++;
-        if (qs < 0.2) bucketCounts["0.0-0.2"]++;
-        else if (qs < 0.4) bucketCounts["0.2-0.4"]++;
-        else if (qs < 0.6) bucketCounts["0.4-0.6"]++;
-        else if (qs < 0.8) bucketCounts["0.6-0.8"]++;
-        else bucketCounts["0.8-1.0"]++;
-      }
-    }
-
-    // Build category breakdown
-    const catMap = new Map<string, { count: number; sumQuality: number; scoredCount: number }>();
-    for (const row of categoryData) {
-      const cat = row.category ?? "uncategorized";
-      const entry = catMap.get(cat) ?? { count: 0, sumQuality: 0, scoredCount: 0 };
-      entry.count++;
-      if (row.qualityScore != null) {
-        entry.sumQuality += row.qualityScore;
-        entry.scoredCount++;
-      }
-      catMap.set(cat, entry);
-    }
-
-    const categoryBreakdown = [...catMap.entries()]
-      .sort((a, b) => b[1].count - a[1].count)
-      .map(([category, data]) => ({
-        category,
-        count: data.count,
-        avgQuality: data.scoredCount > 0 ? data.sumQuality / data.scoredCount : null,
-      }));
+    const categoryBreakdown = categoryResult.map((row) => ({
+      category: String(row.category ?? "uncategorized"),
+      count: Number(row.count ?? 0),
+      avgQuality: row.avg_quality != null ? Number(row.avg_quality) : null,
+    }));
 
     const bucketOrder = ["0.0-0.2", "0.2-0.4", "0.4-0.6", "0.6-0.8", "0.8-1.0", "unscored"];
 
@@ -1139,7 +1120,7 @@ const statementsApp = new Hono()
         range,
         count: bucketCounts[range] ?? 0,
       })),
-      averageQuality: scoredCount > 0 ? scoredSum / scoredCount : null,
+      averageQuality: averageQuality,
       scoredCount,
       categoryBreakdown,
     });

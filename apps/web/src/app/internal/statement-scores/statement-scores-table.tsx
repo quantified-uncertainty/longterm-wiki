@@ -15,7 +15,7 @@ import {
 import { Search } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
-import type { CoverageScoreRow } from "./statement-scores-content";
+import type { CoverageScoreRow } from "@/app/internal/statement-scores/statement-scores-content";
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
