@@ -963,9 +963,12 @@ const statementsApp = new Hono()
     const structured = formatted.filter((s) => s.variety === "structured");
     const attributed = formatted.filter((s) => s.variety === "attributed");
 
+    // Sanitize entityId for use in Content-Disposition filename
+    const safeFilename = entityId.replace(/[^a-zA-Z0-9_-]/g, "_");
+
     if (format === "json") {
       c.header("Content-Type", "application/json");
-      c.header("Content-Disposition", `attachment; filename="${entityId}-statements.json"`);
+      c.header("Content-Disposition", `attachment; filename="${safeFilename}-statements.json"`);
       return c.json({ entityId, structured, attributed, total: rows.length });
     }
 
@@ -979,7 +982,11 @@ const statementsApp = new Hono()
     function csvEscape(val: string | number | null | undefined): string {
       if (val == null) return "";
       const str = String(val);
-      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+      // Defend against CSV injection: quote cells with dangerous leading characters
+      const needsQuoting =
+        str.includes(",") || str.includes('"') || str.includes("\n") ||
+        /^[=+\-@\t\r]/.test(str);
+      if (needsQuoting) {
         return `"${str.replace(/"/g, '""')}"`;
       }
       return str;
@@ -1018,7 +1025,7 @@ const statementsApp = new Hono()
     const csvContent = [csvHeaders.join(","), ...csvRows].join("\n");
 
     c.header("Content-Type", "text/csv");
-    c.header("Content-Disposition", `attachment; filename="${entityId}-statements.csv"`);
+    c.header("Content-Disposition", `attachment; filename="${safeFilename}-statements.csv"`);
     return c.text(csvContent);
   })
 
