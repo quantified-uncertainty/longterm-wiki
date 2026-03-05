@@ -1020,6 +1020,131 @@ const statementsApp = new Hono()
     });
   })
 
+  // ---- GET /coverage-scores/all — latest coverage score for every entity ----
+  .get("/coverage-scores/all", async (c) => {
+    const db = getDrizzleDb();
+
+    // Use a subquery to get the latest score per entity (MAX id = most recent)
+    const latestIds = db
+      .select({
+        maxId: sql<number>`MAX(${entityCoverageScores.id})`.as("max_id"),
+      })
+      .from(entityCoverageScores)
+      .groupBy(entityCoverageScores.entityId)
+      .as("latest");
+
+    const rows = await db
+      .select({
+        id: entityCoverageScores.id,
+        entityId: entityCoverageScores.entityId,
+        coverageScore: entityCoverageScores.coverageScore,
+        categoryScores: entityCoverageScores.categoryScores,
+        statementCount: entityCoverageScores.statementCount,
+        qualityAvg: entityCoverageScores.qualityAvg,
+        scoredAt: entityCoverageScores.scoredAt,
+      })
+      .from(entityCoverageScores)
+      .innerJoin(latestIds, eq(entityCoverageScores.id, latestIds.maxId))
+      .orderBy(desc(entityCoverageScores.coverageScore));
+
+    return c.json({
+      scores: rows.map((r) => ({
+        id: r.id,
+        entityId: r.entityId,
+        coverageScore: r.coverageScore,
+        categoryScores: r.categoryScores,
+        statementCount: r.statementCount,
+        qualityAvg: r.qualityAvg,
+        scoredAt: r.scoredAt,
+      })),
+      total: rows.length,
+    });
+  })
+
+  // ---- GET /scores/distribution — quality score distribution for statements ----
+  .get("/scores/distribution", async (c) => {
+    const db = getDrizzleDb();
+
+    // Get all active statements with their quality scores and properties
+    const [allScores, categoryData] = await Promise.all([
+      db
+        .select({
+          qualityScore: statements.qualityScore,
+        })
+        .from(statements)
+        .where(eq(statements.status, "active")),
+      db
+        .select({
+          category: properties.category,
+          qualityScore: statements.qualityScore,
+        })
+        .from(statements)
+        .leftJoin(properties, eq(statements.propertyId, properties.id))
+        .where(eq(statements.status, "active")),
+    ]);
+
+    // Build bucket distribution
+    const bucketCounts: Record<string, number> = {
+      "unscored": 0,
+      "0.0-0.2": 0,
+      "0.2-0.4": 0,
+      "0.4-0.6": 0,
+      "0.6-0.8": 0,
+      "0.8-1.0": 0,
+    };
+
+    let scoredSum = 0;
+    let scoredCount = 0;
+
+    for (const row of allScores) {
+      const qs = row.qualityScore;
+      if (qs == null) {
+        bucketCounts["unscored"]++;
+      } else {
+        scoredSum += qs;
+        scoredCount++;
+        if (qs < 0.2) bucketCounts["0.0-0.2"]++;
+        else if (qs < 0.4) bucketCounts["0.2-0.4"]++;
+        else if (qs < 0.6) bucketCounts["0.4-0.6"]++;
+        else if (qs < 0.8) bucketCounts["0.6-0.8"]++;
+        else bucketCounts["0.8-1.0"]++;
+      }
+    }
+
+    // Build category breakdown
+    const catMap = new Map<string, { count: number; sumQuality: number; scoredCount: number }>();
+    for (const row of categoryData) {
+      const cat = row.category ?? "uncategorized";
+      const entry = catMap.get(cat) ?? { count: 0, sumQuality: 0, scoredCount: 0 };
+      entry.count++;
+      if (row.qualityScore != null) {
+        entry.sumQuality += row.qualityScore;
+        entry.scoredCount++;
+      }
+      catMap.set(cat, entry);
+    }
+
+    const categoryBreakdown = [...catMap.entries()]
+      .sort((a, b) => b[1].count - a[1].count)
+      .map(([category, data]) => ({
+        category,
+        count: data.count,
+        avgQuality: data.scoredCount > 0 ? data.sumQuality / data.scoredCount : null,
+      }));
+
+    const bucketOrder = ["0.0-0.2", "0.2-0.4", "0.4-0.6", "0.6-0.8", "0.8-1.0", "unscored"];
+
+    return c.json({
+      buckets: bucketOrder.map((range) => ({
+        range,
+        count: bucketCounts[range] ?? 0,
+      })),
+      averageQuality: scoredCount > 0 ? scoredSum / scoredCount : null,
+      scoredCount,
+      categoryBreakdown,
+    });
+  })
+
   // ---- POST /cleanup — delete retracted and empty statements ----
   .post("/cleanup", async (c) => {
     const body = await parseJsonBody(c);
