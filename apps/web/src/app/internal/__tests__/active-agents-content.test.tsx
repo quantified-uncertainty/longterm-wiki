@@ -16,19 +16,13 @@ vi.mock("@lib/wiki-server", () => ({
   withApiFallback: vi.fn(),
 }));
 
-vi.mock(
-  "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/src/app/internal/active-agents/active-agents-table",
-  () => ({
-    ActiveAgentsTable: () => null,
-  })
-);
+vi.mock("../active-agents/active-agents-table", () => ({
+  ActiveAgentsTable: () => null,
+}));
 
-vi.mock(
-  "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/src/app/internal/active-agents/agent-events-panel",
-  () => ({
-    AgentEventsPanel: () => null,
-  })
-);
+vi.mock("../active-agents/agent-events-panel", () => ({
+  AgentEventsPanel: () => null,
+}));
 
 vi.mock("@components/internal/DataSourceBanner", () => ({
   DataSourceBanner: () => null,

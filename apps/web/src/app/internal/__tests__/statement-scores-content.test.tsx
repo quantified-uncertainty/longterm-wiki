@@ -15,12 +15,9 @@ vi.mock("@lib/wiki-server", () => ({
   withApiFallback: vi.fn(),
 }));
 
-vi.mock(
-  "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/src/app/internal/statement-scores/statement-scores-table",
-  () => ({
-    StatementScoresTable: () => null,
-  })
-);
+vi.mock("../statement-scores/statement-scores-table", () => ({
+  StatementScoresTable: () => null,
+}));
 
 vi.mock("@components/internal/DataSourceBanner", () => ({
   DataSourceBanner: () => null,

@@ -16,19 +16,13 @@ vi.mock("@lib/wiki-server", () => ({
   withApiFallback: vi.fn(),
 }));
 
-vi.mock(
-  "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/src/app/internal/system-health/system-health-table",
-  () => ({
-    SystemHealthTable: () => null,
-  })
-);
+vi.mock("../system-health/system-health-table", () => ({
+  SystemHealthTable: () => null,
+}));
 
-vi.mock(
-  "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/src/app/internal/system-health/open-prs-table",
-  () => ({
-    OpenPRsTable: () => null,
-  })
-);
+vi.mock("../system-health/open-prs-table", () => ({
+  OpenPRsTable: () => null,
+}));
 
 vi.mock("@components/internal/DataSourceBanner", () => ({
   DataSourceBanner: () => null,

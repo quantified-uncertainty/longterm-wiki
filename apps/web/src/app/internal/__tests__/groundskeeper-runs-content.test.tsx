@@ -15,12 +15,9 @@ vi.mock("@lib/wiki-server", () => ({
   withApiFallback: vi.fn(),
 }));
 
-vi.mock(
-  "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/src/app/internal/groundskeeper-runs/groundskeeper-runs-table",
-  () => ({
-    GroundskeeperRunsTable: () => null,
-  })
-);
+vi.mock("../groundskeeper-runs/groundskeeper-runs-table", () => ({
+  GroundskeeperRunsTable: () => null,
+}));
 
 vi.mock("@components/internal/DataSourceBanner", () => ({
   DataSourceBanner: () => null,

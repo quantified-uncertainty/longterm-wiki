@@ -17,12 +17,9 @@ vi.mock("@lib/wiki-server", () => ({
 }));
 
 // Table is a "use client" component — stub it so the node env can import it.
-vi.mock(
-  "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/src/app/internal/agent-sessions/sessions-table",
-  () => ({
-    AgentSessionsTable: () => null,
-  })
-);
+vi.mock("../agent-sessions/sessions-table", () => ({
+  AgentSessionsTable: () => null,
+}));
 
 vi.mock("@components/internal/DataSourceBanner", () => ({
   DataSourceBanner: () => null,
