@@ -80,7 +80,15 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_GITHUB_SHADOWBAN_CHECK_ENABLED", true),
         schedule:
           process.env["TASK_GITHUB_SHADOWBAN_CHECK_SCHEDULE"] ?? "0 9 * * *",
-        usernames: ["quri-bot"],
+        // Default to empty — no dedicated bot account exists for this project.
+        // Populate TASK_GITHUB_SHADOWBAN_CHECK_USERNAMES (comma-separated) if
+        // a custom GitHub automation account is created and needs monitoring.
+        // Previously hardcoded "quri-bot" which does not exist on GitHub,
+        // causing every run to return 404 -> "banned" -> success: false.
+        usernames: (process.env["TASK_GITHUB_SHADOWBAN_CHECK_USERNAMES"] ?? "")
+          .split(",")
+          .map((u) => u.trim())
+          .filter(Boolean),
       },
       snapshotRetention: {
         enabled: envBool("TASK_SNAPSHOT_RETENTION_ENABLED", true),

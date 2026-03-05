@@ -13,11 +13,19 @@
  *   crux health --check=actions      GitHub Actions workflow health
  *   crux health --check=frontend     Public frontend availability
  *   crux health --check=freshness    Data freshness
+ *   crux health --check=job-queue    Job queue health
+ *   crux health --check=pr-quality   PR & issue quality
  *   crux health --json               JSON output
+ *   crux health --report             Aggregate markdown report to stdout
+ *   crux health --auto-issue         Manage GitHub wellness issue
+ *   crux health --cleanup-labels     Auto-remove stale claude-working labels
  */
 
 import { getColors } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
+import { checkJobQueue } from './checks/job-queue.ts';
+import { checkPrQuality } from './checks/pr-quality.ts';
+import { buildWellnessReport, manageWellnessIssue } from './wellness-report.ts';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Config & types
@@ -26,6 +34,9 @@ import { githubApi, REPO } from '../lib/github.ts';
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json') || args.includes('--ci');
 const CHECK_ARG = args.find((a) => a.startsWith('--check='))?.split('=')[1];
+const REPORT_MODE = args.includes('--report');
+const AUTO_ISSUE = args.includes('--auto-issue');
+const CLEANUP_LABELS = args.includes('--cleanup-labels');
 
 const SERVER_URL = process.env.LONGTERMWIKI_SERVER_URL ?? '';
 const API_KEY = process.env.LONGTERMWIKI_SERVER_API_KEY ?? '';
@@ -52,7 +63,7 @@ const c = getColors(JSON_MODE);
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface CheckResult {
+export interface CheckResult {
   name: string;
   ok: boolean;
   summary: string;
@@ -86,7 +97,7 @@ function hoursAgo(isoString: string): number {
 // Check 1: Server & DB health
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function checkServer(): Promise<CheckResult> {
+export async function checkServer(): Promise<CheckResult> {
   const name = 'Server & DB';
   const detail: string[] = [];
   const failures: string[] = [];
@@ -121,9 +132,9 @@ async function checkServer(): Promise<CheckResult> {
 
   if (serverStatus !== 'healthy') failures.push(`status is '${serverStatus}' (expected 'healthy')`);
   if (dbStatus !== 'ok') failures.push(`database is '${dbStatus}' (expected 'ok')`);
-  if (totalPages < MIN_PAGES) failures.push(`only ${totalPages} pages (expected ≥ ${MIN_PAGES})`);
-  if (totalEntities < MIN_ENTITIES) failures.push(`only ${totalEntities} entities (expected ≥ ${MIN_ENTITIES})`);
-  if (totalFacts < MIN_FACTS) failures.push(`only ${totalFacts} facts (expected ≥ ${MIN_FACTS})`);
+  if (totalPages < MIN_PAGES) failures.push(`only ${totalPages} pages (expected >= ${MIN_PAGES})`);
+  if (totalEntities < MIN_ENTITIES) failures.push(`only ${totalEntities} entities (expected >= ${MIN_ENTITIES})`);
+  if (totalFacts < MIN_FACTS) failures.push(`only ${totalFacts} facts (expected >= ${MIN_FACTS})`);
 
   if (failures.length > 0) {
     return { name, ok: false, summary: failures.join('; '), detail };
@@ -140,7 +151,7 @@ async function checkServer(): Promise<CheckResult> {
 // Check 2: API smoke tests
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function checkApi(): Promise<CheckResult> {
+export async function checkApi(): Promise<CheckResult> {
   const name = 'API smoke tests';
   const detail: string[] = [];
   const failures: string[] = [];
@@ -158,10 +169,10 @@ async function checkApi(): Promise<CheckResult> {
   }
 
   // Response shapes verified against live server:
-  //   search  → { results: [...], query, total }
-  //   pages   → { pages: [...], total, limit, offset }
-  //   entities → { entities: [...], total, limit, offset }
-  //   sessions → { sessions: [...], total, limit, offset }
+  //   search  -> { results: [...], query, total }
+  //   pages   -> { pages: [...], total, limit, offset }
+  //   entities -> { entities: [...], total, limit, offset }
+  //   sessions -> { sessions: [...], total, limit, offset }
   const tests: Smoke[] = [
     {
       label: 'Search (existential risk)',
@@ -244,7 +255,7 @@ interface WorkflowRunsResponse {
 // succeeded rather than requiring the most recent one to succeed.
 const FLAKY_WORKFLOWS = new Set(['auto-update.yml']);
 
-async function checkActions(): Promise<CheckResult> {
+export async function checkActions(): Promise<CheckResult> {
   const name = 'GitHub Actions';
   const detail: string[] = [];
   const failures: string[] = [];
@@ -318,7 +329,7 @@ async function checkActions(): Promise<CheckResult> {
 // Check 4: Frontend availability
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function checkFrontend(): Promise<CheckResult> {
+export async function checkFrontend(): Promise<CheckResult> {
   const name = 'Frontend';
   const detail: string[] = [];
   const failures: string[] = [];
@@ -353,7 +364,7 @@ async function checkFrontend(): Promise<CheckResult> {
 // Check 5: Data freshness
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function checkFreshness(): Promise<CheckResult> {
+export async function checkFreshness(): Promise<CheckResult> {
   const name = 'Data freshness';
   const detail: string[] = [];
   const failures: string[] = [];
@@ -434,37 +445,94 @@ const ALL_CHECKS: Record<string, () => Promise<CheckResult>> = {
   actions: checkActions,
   frontend: checkFrontend,
   freshness: checkFreshness,
+  'job-queue': checkJobQueue,
+  'pr-quality': () => checkPrQuality({ cleanupStaleLabels: CLEANUP_LABELS }),
 };
 
 async function main(): Promise<void> {
-  const toRun = CHECK_ARG
-    ? [CHECK_ARG]
-    : Object.keys(ALL_CHECKS);
+  let results: CheckResult[];
 
-  const results: CheckResult[] = [];
-
-  for (const key of toRun) {
-    const fn = ALL_CHECKS[key];
+  if (CHECK_ARG) {
+    // Single check mode
+    const fn = ALL_CHECKS[CHECK_ARG];
     if (!fn) {
-      console.error(`Unknown check: ${key}. Available: ${Object.keys(ALL_CHECKS).join(', ')}`);
+      console.error(`Unknown check: ${CHECK_ARG}. Available: ${Object.keys(ALL_CHECKS).join(', ')}`);
       process.exit(1);
     }
-    if (!JSON_MODE) process.stdout.write(`  Running ${key}...`);
+    if (!JSON_MODE && !REPORT_MODE) process.stdout.write(`  Running ${CHECK_ARG}...`);
     const result = await fn();
-    results.push(result);
-    if (!JSON_MODE) {
-      const icon = result.ok ? `${c.green}PASS${c.reset}` : `${c.red}FAIL${c.reset}`;
-      console.log(`\r  ${icon}  ${result.name.padEnd(24)} ${c.dim}${result.summary}${c.reset}`);
-      if (result.detail && !result.ok) {
-        for (const line of result.detail) {
+    results = [result];
+  } else {
+    // Run all checks. Independent checks run in parallel; API smoke tests
+    // depend on server health so they run after.
+    const independentChecks = ['server', 'actions', 'frontend', 'freshness', 'job-queue', 'pr-quality'] as const;
+
+    if (!JSON_MODE && !REPORT_MODE) {
+      console.log('  Running independent checks in parallel...');
+    }
+
+    const independentResults = await Promise.all(
+      independentChecks.map(async (key) => {
+        const fn = ALL_CHECKS[key];
+        const result = await fn();
+        if (!JSON_MODE && !REPORT_MODE) {
+          const icon = result.ok ? `${c.green}PASS${c.reset}` : `${c.red}FAIL${c.reset}`;
+          console.log(`  ${icon}  ${result.name.padEnd(24)} ${c.dim}${result.summary}${c.reset}`);
+          if (result.detail && !result.ok) {
+            for (const line of result.detail) {
+              console.log(`        ${c.dim}${line}${c.reset}`);
+            }
+          }
+        }
+        return result;
+      }),
+    );
+
+    // Run API smoke tests — skip if server check failed (avoids double-reporting)
+    const serverResult = independentResults.find((r) => r.name === 'Server & DB');
+    let apiResult: CheckResult;
+
+    if (serverResult && !serverResult.ok) {
+      apiResult = {
+        name: 'API smoke tests',
+        ok: true,
+        summary: 'Skipped (server health check failed)',
+        detail: ['API smoke tests skipped because server health check failed.'],
+      };
+    } else {
+      if (!JSON_MODE && !REPORT_MODE) process.stdout.write(`  Running api...`);
+      apiResult = await checkApi();
+    }
+
+    if (!JSON_MODE && !REPORT_MODE) {
+      const icon = apiResult.ok ? `${c.green}PASS${c.reset}` : `${c.red}FAIL${c.reset}`;
+      console.log(`  ${icon}  ${apiResult.name.padEnd(24)} ${c.dim}${apiResult.summary}${c.reset}`);
+      if (apiResult.detail && !apiResult.ok) {
+        for (const line of apiResult.detail) {
           console.log(`        ${c.dim}${line}${c.reset}`);
         }
       }
     }
+
+    results = [...independentResults, apiResult];
   }
+
+  // ── Output modes ───────────────────────────────────────────────────────
 
   if (JSON_MODE) {
     console.log(JSON.stringify({ ok: results.every((r) => r.ok), checks: results }, null, 2));
+  } else if (REPORT_MODE) {
+    const report = buildWellnessReport(results);
+    console.log(report.markdownSummary);
+
+    if (AUTO_ISSUE) {
+      const runUrl = process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY && process.env.GITHUB_RUN_ID
+        ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+        : undefined;
+
+      const issueResult = await manageWellnessIssue(report, { runUrl });
+      console.log(`\nIssue management: ${issueResult.action}${issueResult.issueNumber ? ` (#${issueResult.issueNumber})` : ''}`);
+    }
   } else {
     const allOk = results.every((r) => r.ok);
     const failCount = results.filter((r) => !r.ok).length;

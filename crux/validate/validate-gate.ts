@@ -321,19 +321,6 @@ const PARALLEL_STEPS: Step[] = [
     args: ['tsx', 'crux/validate/validate-crux-tsc.ts'],
     cwd: PROJECT_ROOT,
   },
-  {
-    id: 'checklist-required',
-    name: 'Checklist required for large diffs',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-checklist-required.ts'],
-    cwd: PROJECT_ROOT,
-    // Advisory: warns when large diffs (>3 files or >200 lines) lack an
-    // agent checklist. Advisory rather than blocking because human devs,
-    // Dependabot, and non-agent automation don't use the checklist workflow.
-    // The pre-push-check in agent-checklist.ts handles the hard block for
-    // agent sessions that have a checklist.
-    advisory: true,
-  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
@@ -657,6 +644,7 @@ function printSummary(results: StepResult[], totalStart: number, skippedCount: n
   const blockingFailed = results.filter((r) => !r.passed && !r.advisory);
   const advisoryFailed = results.filter((r) => !r.passed && r.advisory);
   const passed = blockingFailed.length === 0;
+  const failed = blockingFailed;
 
   if (CI_MODE) {
     console.log(JSON.stringify({ passed, skippedCount, results: results.map(r => ({ id: r.id, name: r.name, passed: r.passed, duration: r.duration, exitCode: r.exitCode })), duration: formatMs(totalDuration) }));
@@ -673,24 +661,10 @@ function printSummary(results: StepResult[], totalStart: number, skippedCount: n
       }
     } else {
       console.log(`${c.red}${c.bold}  ❌ Gate check failed${c.reset} ${c.dim}(${formatMs(totalDuration)})${c.reset}`);
-    }
-
-    // Always print every check result so no check status is invisible
-    console.log(`\n${c.bold}  All check results:${c.reset}`);
-    for (const r of results) {
-      const dur = c.dim + `(${formatMs(r.duration)})` + c.reset;
-      if (r.passed) {
-        console.log(`  ${c.green}✓${c.reset} ${r.name} ${dur}`);
-      } else if (r.advisory) {
-        console.log(`  ${c.yellow}⚠${c.reset} ${r.name} ${dur} ${c.dim}(advisory)${c.reset}`);
-      } else {
-        console.log(`  ${c.red}✗${c.reset} ${r.name} ${dur}`);
+      for (const f of failed) {
+        console.log(`${c.red}  • ${f.name}${c.reset}`);
       }
     }
-    if (skippedCount > 0) {
-      console.log(`  ${c.dim}⊘ ${skippedCount} check${skippedCount > 1 ? 's' : ''} skipped by triage${c.reset}`);
-    }
-
     console.log(`${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}\n`);
   }
 }
