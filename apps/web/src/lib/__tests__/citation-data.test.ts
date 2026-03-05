@@ -3,7 +3,7 @@ import {
   computeCitationHealth,
   type CitationQuote,
 } from "../citation-data";
-import { isSafeUrl } from "../../components/wiki/CitationOverlay";
+import { isSafeUrl } from "../../components/wiki/resource-utils";
 
 function makeQuote(overrides: Partial<CitationQuote> = {}): CitationQuote {
   return {

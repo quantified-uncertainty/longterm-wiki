@@ -11,7 +11,7 @@ import type { Resource } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
 import { ReferenceCitationDetails } from "./ReferenceCitationDetails";
 import { ReferenceCitationDot } from "./ReferenceCitationDot";
-import { formatAuthors, getDomain } from "./resource-utils";
+import { formatAuthors, getDomain, isSafeUrl } from "./resource-utils";
 import { cn } from "@lib/utils";
 import { ExternalLink } from "lucide-react";
 
@@ -129,7 +129,7 @@ function ReferenceEntry({ entry, pageId }: { entry: ResolvedRef; pageId?: string
           >
             {resource.title}
           </a>
-        ) : (
+        ) : resource.url && isSafeUrl(resource.url) ? (
           <a
             href={resource.url}
             target="_blank"
@@ -138,6 +138,10 @@ function ReferenceEntry({ entry, pageId }: { entry: ResolvedRef; pageId?: string
           >
             {resource.title}
           </a>
+        ) : (
+          <span className="text-[13px] text-foreground/80 font-medium leading-relaxed">
+            {resource.title}
+          </span>
         )}
         {resource.url && <ReferenceCitationDot url={resource.url} />}
         {metaParts.length > 0 && (
@@ -193,7 +197,7 @@ function ReferenceEntry({ entry, pageId }: { entry: ResolvedRef; pageId?: string
               <CredibilityBadge level={credibility} size="sm" />
             </div>
           )}
-          {resource.url && (
+          {resource.url && isSafeUrl(resource.url) && (
             <div className="mt-1.5 flex items-center gap-2">
               <a
                 href={resource.url}
