@@ -4,7 +4,10 @@
  * Run comprehensive system wellness checks against the wiki-server,
  * GitHub Actions, and optionally the public frontend.
  *
- * Mirrors the checks performed by .github/workflows/wellness-check.yml
+ * Mirrors the checks performed by the focused health workflows:
+ *   .github/workflows/server-api-health.yml
+ *   .github/workflows/frontend-data-health.yml
+ *   .github/workflows/ci-pr-health.yml
  * so the same checks can be run locally during development or debugging.
  */
 

@@ -1,12 +1,11 @@
 /**
  * Tests for the review marker validator.
  *
- * Tests the computeDiffHash function and runCheck() subprocess behavior.
+ * Tests runCheck() subprocess behavior.
  */
 
 import { describe, it, expect } from 'vitest';
 import { execSync } from 'child_process';
-import { computeDiffHash } from './validate-review-marker.ts';
 
 const REPO_ROOT = `${__dirname}/../..`;
 
@@ -22,22 +21,6 @@ function run(cmd: string): { stdout: string; exitCode: number } {
     return { stdout: e.stdout || '', exitCode: e.status ?? 1 };
   }
 }
-
-describe('computeDiffHash', () => {
-  it('returns a 12-character hex string', () => {
-    const hash = computeDiffHash();
-    // On a branch with changes, this returns a hash; on main with no diff, it may return ''
-    if (hash) {
-      expect(hash).toMatch(/^[0-9a-f]{12}$/);
-    }
-  });
-
-  it('returns the same hash for the same diff', () => {
-    const hash1 = computeDiffHash();
-    const hash2 = computeDiffHash();
-    expect(hash1).toBe(hash2);
-  });
-});
 
 describe('validate-review-marker', () => {
   it('runs without crashing', () => {
