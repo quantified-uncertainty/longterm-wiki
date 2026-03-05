@@ -7,10 +7,12 @@ If running in a git worktree (check: `git worktree list`), symlink the env file 
 ```bash
 # From the worktree root:
 ln -sf ../../../.env .env                                                 # env vars (GITHUB_TOKEN etc.)
-ln -sf /Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/node_modules apps/web/node_modules  # app packages
+ln -sf ../../../node_modules node_modules                                 # root packages (tsx, etc.)
+ln -sf /Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/node_modules apps/web/node_modules          # app packages (tsc, next, etc.)
+ln -sf /Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/wiki-server/node_modules apps/wiki-server/node_modules  # wiki-server packages (drizzle-orm, etc.)
 ```
 
-Without these, `crux` won't have `GITHUB_TOKEN` and the gate check will fail with missing package errors.
+Without these, `crux` won't have `GITHUB_TOKEN` and the gate check will fail with missing package errors. The root `node_modules` is needed for `tsx`. The wiki-server `node_modules` is needed because `apps/web/tsconfig.json` has `@wiki-server/*` path aliases that pull in wiki-server routes, and TypeScript resolves their dependencies (like `drizzle-orm`) from the wiki-server's `node_modules`.
 
 ## LSP support (recommended)
 

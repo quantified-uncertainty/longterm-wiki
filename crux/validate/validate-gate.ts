@@ -35,11 +35,23 @@
  */
 
 import { execSync, spawn, type ChildProcess } from 'child_process';
-import { readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
 import { categorizeFiles, canSkipBuildData, triageGateChecks, type TriageResult } from './gate-triage.ts';
+
+/**
+ * Find the tsc binary. Prefers the local copy in apps/web/node_modules
+ * (where TypeScript is installed as a dependency) over npx, which fails
+ * in worktrees without a local node_modules.
+ */
+function findTsc(): { command: string; args: string[] } {
+  const localTsc = join(PROJECT_ROOT, 'apps/web/node_modules/.bin/tsc');
+  if (existsSync(localTsc)) return { command: localTsc, args: [] };
+  // Fallback: npx (works when node_modules is present or tsc is global)
+  return { command: 'npx', args: ['tsc'] };
+}
 
 const args: string[] = process.argv.slice(2);
 const FIX_MODE: boolean = args.includes('--fix');
@@ -146,6 +158,7 @@ interface Step {
 }
 
 const APP_DIR = `${PROJECT_ROOT}/apps/web`;
+const tsc = findTsc();
 
 // Phase 0.5: Assign IDs from wiki-server before build-data
 const ASSIGN_IDS_STEP: Step = {
@@ -235,15 +248,15 @@ const PARALLEL_STEPS: Step[] = [
   {
     id: 'typecheck',
     name: 'TypeScript type check — app',
-    command: 'npx',
-    args: ['tsc', '--noEmit'],
+    command: tsc.command,
+    args: [...tsc.args, '--noEmit'],
     cwd: APP_DIR,
   },
   {
     id: 'typecheck-crux',
     name: 'TypeScript type check — crux (advisory)',
-    command: 'npx',
-    args: ['tsc', '--noEmit', '-p', '../../crux/tsconfig.json'],
+    command: tsc.command,
+    args: [...tsc.args, '--noEmit', '-p', '../../crux/tsconfig.json'],
     cwd: APP_DIR,
     // Fail-open: crux has its own tsconfig with relaxed settings and
     // a known baseline of pre-existing errors. Blocking on crux type
@@ -285,6 +298,15 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-conflict-markers.ts'],
     cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'actions-yaml',
+    name: 'GitHub Actions workflow YAML (actionlint)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-actions-yaml.ts'],
+    cwd: PROJECT_ROOT,
+    // Fail-open if actionlint is not installed (local dev without the tool).
+    // CI installs actionlint explicitly so it always runs there.
   },
   {
     id: 'mdx-compile',

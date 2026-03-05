@@ -13,9 +13,7 @@
 import { execFileSync } from 'child_process';
 import { createLogger } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
-import type { CommandResult } from '../lib/cli.ts';
-
-type CommandOptions = Record<string, unknown>;
+import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

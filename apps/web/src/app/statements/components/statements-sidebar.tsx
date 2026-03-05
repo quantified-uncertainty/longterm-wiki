@@ -91,7 +91,7 @@ function CategoriesList({
       <SidebarGroup>
         <SidebarGroupLabel asChild>
           <CollapsibleTrigger className="flex w-full items-center justify-between hover:bg-accent hover:text-accent-foreground rounded-md transition-colors">
-            <span>Categories</span>
+            <span>Categories <span className="text-[10px] font-normal text-muted-foreground/60">(all entities)</span></span>
             <ChevronRight className="h-3.5 w-3.5 transition-transform group-data-[state=open]/collapsible:rotate-90" />
           </CollapsibleTrigger>
         </SidebarGroupLabel>

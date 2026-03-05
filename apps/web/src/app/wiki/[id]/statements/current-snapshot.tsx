@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ExternalLink, AlertTriangle } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { VerdictBadge } from "@components/wiki/VerdictBadge";
-import { formatStatementValue } from "@lib/statement-display";
+import { formatStatementValue, formatPeriod } from "@lib/statement-display";
 import { getDomain, isSafeUrl } from "@components/wiki/resource-utils";
 import type { ResolvedStatement } from "@lib/statement-types";
 import { snapshotKey } from "./statement-processing";
@@ -21,15 +21,24 @@ export function CurrentSnapshot({ snapshot, conflicts }: CurrentSnapshotProps) {
   const conflictSet = new Set(conflicts.map(([key]) => key));
   const conflictMap = new Map(conflicts);
 
+  // Determine if verdict column is useful (>10% have actual verdicts)
+  const withVerdict = snapshot.filter(
+    (s) => s.verdict != null && s.verdict !== "not_verifiable"
+  ).length;
+  const showVerdict = withVerdict / snapshot.length > 0.1;
+
   return (
     <div className="mb-8">
       <h2 className="text-lg font-semibold mb-1">Current Snapshot</h2>
       <p className="text-xs text-muted-foreground mb-3">
         Latest active value for each property.
         {conflicts.length > 0 && (
-          <span className="ml-1 text-amber-600 dark:text-amber-400">
-            {conflicts.length} conflicting{" "}
-            {conflicts.length === 1 ? "property" : "properties"} detected.
+          <span className="ml-1 text-muted-foreground">
+            {conflicts.length}{" "}
+            {conflicts.length === 1
+              ? "property has multiple open values"
+              : "properties have multiple open values"}
+            .
           </span>
         )}
       </p>
@@ -49,9 +58,11 @@ export function CurrentSnapshot({ snapshot, conflicts }: CurrentSnapshotProps) {
               <th className="text-left px-3 py-2 text-xs font-medium">
                 Source
               </th>
-              <th className="text-left px-3 py-2 text-xs font-medium">
-                Verdict
-              </th>
+              {showVerdict && (
+                <th className="text-left px-3 py-2 text-xs font-medium">
+                  Verdict
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -66,6 +77,7 @@ export function CurrentSnapshot({ snapshot, conflicts }: CurrentSnapshotProps) {
                   statement={s}
                   hasConflict={hasConflict}
                   conflictingStatements={conflictingStmts}
+                  showVerdict={showVerdict}
                 />
               );
             })}
@@ -80,36 +92,30 @@ function SnapshotRow({
   statement: s,
   hasConflict,
   conflictingStatements,
+  showVerdict,
 }: {
   statement: ResolvedStatement;
   hasConflict: boolean;
   conflictingStatements?: ResolvedStatement[];
+  showVerdict: boolean;
 }) {
   const value = formatStatementValue(s, s.property);
   const displayValue =
     s.valueEntityTitle ?? (value !== "—" ? value : (s.statementText ?? "—"));
 
-  // Show qualifier context if present
-  const qualifierLabel = s.qualifierKey && !s.qualifierKey.includes(":")
-    ? s.qualifierKey
-    : s.qualifierKey?.split(":")[1] ?? null;
+  // Show qualifier context if present — format "category:value" as just "value"
+  const qualifierLabel = s.qualifierKey
+    ? (s.qualifierKey.includes(":") ? s.qualifierKey.split(":")[1] : s.qualifierKey)
+        ?.replace(/-/g, " ")
+    : null;
 
   // First citation URL for inline source
   const firstUrl = s.citations.find((c) => c.url && isSafeUrl(c.url))?.url;
   const domain = firstUrl ? getDomain(firstUrl) : null;
 
   return (
-    <tr
-      className={
-        hasConflict
-          ? "border-b border-border/30 bg-amber-50/50 dark:bg-amber-950/20"
-          : "border-b border-border/30 last:border-0"
-      }
-    >
+    <tr className="border-b border-border/30 last:border-0">
       <td className="px-3 py-2 text-xs font-medium text-muted-foreground">
-        {hasConflict && (
-          <AlertTriangle className="w-3 h-3 text-amber-500 inline mr-1" />
-        )}
         {s.property?.label ?? s.propertyId ?? "—"}
         {qualifierLabel && (
           <span className="ml-1 text-[10px] text-muted-foreground/60">
@@ -136,7 +142,7 @@ function SnapshotRow({
         )}
       </td>
       <td className="px-3 py-2 text-xs text-muted-foreground">
-        {s.validStart ?? "—"}
+        {s.validStart ? formatPeriod(s.validStart, null).replace(/^since /, "") : "—"}
       </td>
       <td className="px-3 py-2 text-xs">
         {firstUrl && domain ? (
@@ -157,9 +163,11 @@ function SnapshotRow({
           <span className="text-muted-foreground/40">—</span>
         )}
       </td>
-      <td className="px-3 py-2 text-xs">
-        <VerdictBadge verdict={s.verdict} score={s.verdictScore} size="sm" />
-      </td>
+      {showVerdict && (
+        <td className="px-3 py-2 text-xs">
+          <VerdictBadge verdict={s.verdict} score={s.verdictScore} size="sm" />
+        </td>
+      )}
     </tr>
   );
 }
@@ -173,22 +181,28 @@ function ConflictValues({
   statements: ResolvedStatement[];
   currentId: number;
 }) {
-  const others = statements.filter((s) => s.id !== currentId);
+  const others = statements
+    .filter((s) => s.id !== currentId)
+    .sort((a, b) => (b.validStart ?? "").localeCompare(a.validStart ?? ""));
   if (others.length === 0) return null;
 
   const shown = others.slice(0, MAX_CONFLICT_DISPLAY);
   const remaining = others.length - shown.length;
 
   return (
-    <span className="ml-2 text-amber-600 dark:text-amber-400 font-normal text-[11px]">
-      (also:{" "}
+    <span className="ml-2 text-muted-foreground font-normal text-[11px]">
+      (prev:{" "}
       {shown.map((s, i) => {
         const val =
           s.valueEntityTitle ?? formatStatementValue(s, s.property);
+        const date = s.validStart ? ` [${s.validStart}]` : "";
         return (
           <span key={s.id}>
             {i > 0 && ", "}
             {val}
+            {date && (
+              <span className="text-muted-foreground/60">{date}</span>
+            )}
           </span>
         );
       })}

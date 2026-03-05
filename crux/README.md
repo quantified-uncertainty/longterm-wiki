@@ -1,6 +1,6 @@
 # Crux — Longterm Wiki CLI Tooling
 
-Crux is the unified CLI for the Longterm Wiki project. It handles validation, content authoring, analysis, code generation, and automated fixes across ~625 MDX wiki pages and their YAML data layer.
+Crux is the unified CLI for the Longterm Wiki project. It handles validation, content authoring, analysis, code generation, and automated fixes across ~660 MDX wiki pages and their YAML data layer.
 
 ## Quick Start
 
@@ -36,7 +36,8 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 │   ├── edit-log.ts       Per-page edit history
 │   ├── importance.ts     Ranking-based importance scoring
 │   ├── ci.ts             GitHub CI status and monitoring
-│   └── maintain.ts       Periodic maintenance and housekeeping
+│   ├── maintain.ts       Periodic maintenance and housekeeping
+│   └── ... (+26 more)    issues, pr, agents, context, facts, etc.
 │
 ├── authoring/            Page authoring scripts (invoked by content domain)
 │   ├── page-creator.ts   Create new pages with research pipeline
@@ -80,7 +81,6 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 | **updates** | `content/docs/` frontmatter | invokes `content improve` |
 | **visual** | `content/docs/` | `content/docs/` (diagrams, charts) |
 | **check-links** | `data/resources/`, URLs | stdout (health reports) |
-| **edit-log** | PostgreSQL (wiki-server) | stdout (history) |
 | **edit-log** | wiki-server PostgreSQL DB | stdout (history) |
 | **importance** | `content/docs/`, `data/` | `content/docs/` frontmatter |
 | **ci** | GitHub API | stdout (check-run status) |
@@ -97,11 +97,37 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 - **updates** — Schedule-aware update queue using `update_frequency` frontmatter
 - **visual** — Create, review, audit, and improve diagrams/charts/models
 - **check-links** — Check external URL health and find broken links
-- **edit-log** — View and query per-page edit history from the wiki-server PostgreSQL database
 - **edit-log** — View and query per-page edit history from PostgreSQL (via wiki-server API)
 - **importance** — Ranking-based importance scoring for pages
 - **ci** — GitHub CI check-run status monitoring with optional polling
 - **maintain** — Periodic maintenance: PR review, issue triage, cruft detection
+- **auto-update** — News-driven automatic wiki updates from RSS feeds and web searches
+- **issues** — GitHub issue tracking: create, search, start/done lifecycle, lint
+- **pr** — Pull request management: create, detect, fix-body, validate test plans
+- **pr-patrol** — Automated PR review and quality checks
+- **agents** — Agent session lifecycle management
+- **agent-checklist** — Session start/end checklists for Claude Code agents
+- **agent-session-events** — Query agent session event history
+- **sessions** — Session log management (DB-backed)
+- **context** — Assemble research context for pages, issues, entities, or topics
+- **query** — Full-text search across wiki content
+- **ids** — Entity ID allocation and registry management
+- **entity** — Entity YAML management and ontology tools
+- **facts** — Canonical fact extraction and management
+- **claims** — Claims ingestion and exploration
+- **statements** — Entity statement extraction, improvement, and scoring
+- **citations** — Citation accuracy checking and fix pipeline
+- **wiki-server** — Direct wiki-server API operations
+- **jobs** — Background job queue management
+- **health** — System health checks and monitoring
+- **audits** — Audit item tracking and verification
+- **evals** — Evaluation and benchmarking tools
+- **enrich** — Content enrichment pipeline
+- **research** — Research tools for source discovery
+- **epic** — GitHub Discussions for open-ended planning
+- **review** — Code review utilities
+- **grokipedia** — Cross-reference with Grokipedia content
+- **release** — Release management
 
 ## How to Add a Validation Rule
 

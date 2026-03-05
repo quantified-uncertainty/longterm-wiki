@@ -27,13 +27,14 @@ import {
 } from '../lib/wiki-server/jobs.ts';
 import { apiRequest, type ApiResult } from '../lib/wiki-server/client.ts';
 import { getRegisteredTypes } from '../lib/job-handlers/index.ts';
-import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
+import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
+import { parseIntOpt } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-interface CommandOptions {
+interface CommandOptions extends BaseOptions {
   ci?: boolean;
   json?: boolean;
   status?: string;
@@ -42,7 +43,6 @@ interface CommandOptions {
   priority?: string;
   maxRetries?: string;
   limit?: string;
-  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------

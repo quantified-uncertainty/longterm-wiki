@@ -9,6 +9,7 @@
  * - POST /properties/upsert — batch upsert properties
  * - GET /stats             — basic statistics
  * - GET /quality-summary — aggregate quality distribution + per-entity coverage scores
+ * - GET /export    — export entity statements as JSON or CSV download
  * - PATCH /:id     — update statement status, verdict, or note
  * - POST /         — create statement + optional citations
  */
@@ -186,6 +187,7 @@ export const PatchStatementBody = z.object({
   statementText: z.string().min(1).max(2000).optional(),
   subjectEntityId: z.string().min(1).max(200).optional(),
   propertyId: z.string().min(1).max(200).nullish(),
+  qualifierKey: z.string().min(1).max(200).nullish(),
   validStart: z.string().min(1).max(20).nullish(),
   validEnd: z.string().min(1).max(20).nullish(),
   attributedTo: z.string().min(1).max(200).nullish(),
@@ -251,6 +253,69 @@ const BatchCreateBody = z.object({
 const ClearByEntityQuery = z.object({
   entityId: z.string().min(1).max(200),
 });
+
+// ---- Pipeline quality gate validation ----
+
+/** Property IDs that represent financial values where $0 is almost always a data error. */
+const FINANCIAL_PROPERTY_IDS = new Set([
+  "revenue",
+  "valuation",
+  "funding-round",
+  "operating-expenses",
+]);
+
+/** Maximum plausible benchmark score. ELO caps ~2000, percentages at 100, raw scores rarely exceed 10000. */
+const MAX_BENCHMARK_SCORE = 10000;
+
+/**
+ * Validate a parsed statement for semantic correctness beyond Zod schema checks.
+ * Returns null if valid, or a descriptive error message if invalid.
+ *
+ * Exported for unit testing.
+ */
+export function validateStatementQuality(
+  data: z.infer<typeof CreateStatementBody>
+): string | null {
+  // 1. Block empty structured statements: require at least one value field
+  if (data.variety === "structured") {
+    const hasValue =
+      data.valueNumeric != null ||
+      data.valueText != null ||
+      data.valueDate != null ||
+      data.valueEntityId != null ||
+      data.valueSeries != null;
+    if (!hasValue) {
+      return "Structured statements must have at least one value field (valueNumeric, valueText, valueDate, valueEntityId, or valueSeries)";
+    }
+  }
+
+  // 2. Validate benchmark score magnitudes
+  if (
+    data.propertyId === "benchmark-score" &&
+    data.valueNumeric != null &&
+    Math.abs(data.valueNumeric) > MAX_BENCHMARK_SCORE
+  ) {
+    return `Benchmark score ${data.valueNumeric} exceeds maximum plausible value of ${MAX_BENCHMARK_SCORE}. ELO scores cap around 2000, percentages at 100. Check if a raw score was stored with percentage format.`;
+  }
+
+  // 3. Block $0 for financial properties
+  if (
+    data.propertyId != null &&
+    FINANCIAL_PROPERTY_IDS.has(data.propertyId) &&
+    data.valueNumeric === 0
+  ) {
+    return `Financial property "${data.propertyId}" cannot have a value of $0. If the entity has no known value, omit the statement instead of recording zero.`;
+  }
+
+  // 4. Require statementText for attributed statements
+  if (data.variety === "attributed") {
+    if (!data.statementText || data.statementText.trim().length === 0) {
+      return "Attributed statements must have non-empty statementText";
+    }
+  }
+
+  return null;
+}
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
@@ -904,6 +969,129 @@ const statementsApp = new Hono()
     });
   })
 
+  // ---- GET /export — export statements for an entity as JSON or CSV ----
+  .get("/export", zv("query", z.object({
+    entityId: z.string().min(1).max(200),
+    format: z.enum(["json", "csv"]).default("json"),
+  })), async (c) => {
+    const { entityId, format } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Reuse by-entity query logic: fetch statements, citations, properties
+    const [rows, allCitations, propertyRows] = await Promise.all([
+      db
+        .select()
+        .from(statements)
+        .where(
+          and(
+            eq(statements.subjectEntityId, entityId),
+            sql`${statements.status} != 'retracted'`
+          )
+        )
+        .orderBy(desc(statements.validStart)),
+      db
+        .select()
+        .from(statementCitations)
+        .where(
+          sql`${statementCitations.statementId} IN (
+            SELECT ${statements.id} FROM ${statements}
+            WHERE ${statements.subjectEntityId} = ${entityId}
+            AND ${statements.status} != 'retracted'
+          )`
+        ),
+      db.select().from(properties),
+    ]);
+
+    // Build citation count map
+    const citationCountMap = new Map<number, number>();
+    for (const cit of allCitations) {
+      citationCountMap.set(cit.statementId, (citationCountMap.get(cit.statementId) ?? 0) + 1);
+    }
+
+    // Build property map
+    const propertyMap = new Map(propertyRows.map((p) => [p.id, p]));
+
+    // Format each statement with property info and citation count
+    const formatted = rows.map((s) => {
+      const prop = s.propertyId ? propertyMap.get(s.propertyId) : null;
+      return {
+        ...formatStatement(s),
+        property: prop
+          ? { id: prop.id, label: prop.label, category: prop.category, valueType: prop.valueType, unitFormatId: prop.unitFormatId }
+          : null,
+        citationsCount: citationCountMap.get(s.id) ?? 0,
+      };
+    });
+
+    const structured = formatted.filter((s) => s.variety === "structured");
+    const attributed = formatted.filter((s) => s.variety === "attributed");
+
+    // Sanitize entityId for use in Content-Disposition filename
+    const safeFilename = entityId.replace(/[^a-zA-Z0-9_-]/g, "_");
+
+    if (format === "json") {
+      c.header("Content-Type", "application/json");
+      c.header("Content-Disposition", `attachment; filename="${safeFilename}-statements.json"`);
+      return c.json({ entityId, structured, attributed, total: rows.length });
+    }
+
+    // CSV format — flatten to rows
+    const csvHeaders = [
+      "id", "variety", "property", "propertyCategory", "value", "statementText",
+      "validStart", "validEnd", "status", "citationsCount",
+      "attributedTo", "verdict", "verdictScore", "claimCategory",
+    ];
+
+    function csvEscape(val: string | number | null | undefined): string {
+      if (val == null) return "";
+      const str = String(val);
+      // Defend against CSV injection: quote cells with dangerous leading characters
+      const needsQuoting =
+        str.includes(",") || str.includes('"') || str.includes("\n") ||
+        /^[=+\-@\t\r]/.test(str);
+      if (needsQuoting) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    }
+
+    function formatValue(s: typeof formatted[number]): string {
+      if (s.valueNumeric != null) return String(s.valueNumeric) + (s.valueUnit ? ` ${s.valueUnit}` : "");
+      if (s.valueText != null) return s.valueText;
+      if (s.valueDate != null) return s.valueDate;
+      if (s.valueEntityId != null) return s.valueEntityId;
+      return "";
+    }
+
+    const csvRows = formatted.map((s) =>
+      csvHeaders.map((h) => {
+        switch (h) {
+          case "id": return csvEscape(s.id);
+          case "variety": return csvEscape(s.variety);
+          case "property": return csvEscape(s.property?.label ?? s.propertyId);
+          case "propertyCategory": return csvEscape(s.property?.category);
+          case "value": return csvEscape(formatValue(s));
+          case "statementText": return csvEscape(s.statementText);
+          case "validStart": return csvEscape(s.validStart);
+          case "validEnd": return csvEscape(s.validEnd);
+          case "status": return csvEscape(s.status);
+          case "citationsCount": return csvEscape(s.citationsCount);
+          case "attributedTo": return csvEscape(s.attributedTo);
+          case "verdict": return csvEscape(s.verdict);
+          case "verdictScore": return csvEscape(s.verdictScore);
+          case "claimCategory": return csvEscape(s.claimCategory);
+          default: return "";
+        }
+      }).join(",")
+    );
+
+    const csvContent = [csvHeaders.join(","), ...csvRows].join("\n");
+
+    c.header("Content-Type", "text/csv");
+    c.header("Content-Disposition", `attachment; filename="${safeFilename}-statements.csv"`);
+    return c.text(csvContent);
+  })
+
   // ---- GET /:id — fetch a single statement with citations and property ----
   .get("/:id", async (c) => {
     const idParam = c.req.param("id");
@@ -1000,6 +1188,7 @@ const statementsApp = new Hono()
         ...(data.statementText !== undefined && { statementText: data.statementText }),
         ...(data.subjectEntityId !== undefined && { subjectEntityId: data.subjectEntityId }),
         ...(data.propertyId !== undefined && { propertyId: data.propertyId ?? null }),
+        ...(data.qualifierKey !== undefined && { qualifierKey: data.qualifierKey ?? null }),
         ...(data.validStart !== undefined && { validStart: data.validStart ?? null }),
         ...(data.validEnd !== undefined && { validEnd: data.validEnd ?? null }),
         ...(data.attributedTo !== undefined && { attributedTo: data.attributedTo ?? null }),
@@ -1032,6 +1221,13 @@ const statementsApp = new Hono()
     }
 
     const data = parsed.data;
+
+    // Pipeline quality gate — reject semantically invalid statements
+    const qualityError = validateStatementQuality(data);
+    if (qualityError) {
+      return c.json({ error: "validation_failed", message: qualityError }, 400);
+    }
+
     const db = getDrizzleDb();
 
     const statementId = await db.transaction(async (tx) => {
@@ -1110,6 +1306,21 @@ const statementsApp = new Hono()
     }
 
     const items = parsed.data.statements;
+
+    // Pipeline quality gate — validate all items before inserting any
+    for (let idx = 0; idx < items.length; idx++) {
+      const qualityError = validateStatementQuality(items[idx]);
+      if (qualityError) {
+        return c.json(
+          {
+            error: "validation_failed",
+            message: `Statement at index ${idx}: ${qualityError}`,
+          },
+          400
+        );
+      }
+    }
+
     const db = getDrizzleDb();
 
     const results: Array<{ id: number; sourceFactKey: string | null }> = [];

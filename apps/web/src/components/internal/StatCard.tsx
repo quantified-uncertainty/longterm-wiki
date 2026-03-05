@@ -9,7 +9,7 @@ export function StatCard({
 }: {
   label: string;
   value: number;
-  color?: "emerald" | "blue" | "amber";
+  color?: "emerald" | "blue" | "amber" | "rose";
 }) {
   const colorClass =
     color === "emerald"
@@ -18,7 +18,9 @@ export function StatCard({
         ? "text-blue-600"
         : color === "amber"
           ? "text-amber-600"
-          : "text-foreground";
+          : color === "rose"
+            ? "text-rose-600"
+            : "text-foreground";
 
   return (
     <div className="rounded-lg border border-border/60 px-3 py-2">

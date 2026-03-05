@@ -35,8 +35,8 @@ audits:
       "heartbeat OK" messages.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: null
-    last_result: null
+    last_checked: "2026-03-05"
+    last_result: pass
 
   - id: agent-sessions-logged
     category: process
@@ -50,8 +50,8 @@ audits:
       A large gap means agents are completing work without logging sessions.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: null
-    last_result: null
+    last_checked: "2026-03-05"
+    last_result: pass
 
   - id: scheduled-workflows-running
     category: infrastructure
@@ -73,8 +73,8 @@ audits:
       - server-health-monitor: weekly (within 9 days)
     frequency: weekly
     added: "2026-03-04"
-    last_checked: null
-    last_result: null
+    last_checked: "2026-03-05"
+    last_result: fail
 
   - id: vercel-production-only
     category: infrastructure
@@ -90,8 +90,8 @@ audits:
     frequency: weekly
     added: "2026-03-04"
     added_by_pr: 1630
-    last_checked: null
-    last_result: null
+    last_checked: "2026-03-05"
+    last_result: pass
 
   - id: active-agents-dashboard-adoption
     category: feature-health
@@ -105,8 +105,8 @@ audits:
          whether to promote its use, simplify it, or remove it.
     frequency: monthly
     added: "2026-03-04"
-    last_checked: null
-    last_result: null
+    last_checked: "2026-03-05"
+    last_result: pass
 
   - id: ci-gate-catches-regressions
     category: infrastructure
@@ -119,8 +119,8 @@ audits:
       Run `pnpm crux validate gate` locally and confirm it exercises all checks.
     frequency: monthly
     added: "2026-03-04"
-    last_checked: null
-    last_result: null
+    last_checked: "2026-03-05"
+    last_result: pass
 
   - id: audits-system-adoption
     category: process
@@ -132,8 +132,8 @@ audits:
       into the maintenance sweep or simplifying the workflow.
     frequency: biweekly
     added: "2026-03-04"
-    last_checked: null
-    last_result: null
+    last_checked: "2026-03-05"
+    last_result: pass
 
 # ---------------------------------------------------------------------------
 # One-time post-merge verifications
@@ -150,17 +150,17 @@ post_merge:
     merged: "2026-03-04"
     claim: "Vercel ignoreCommand restricts builds to ONLY the production branch (not main, not claude/*)"
     how_to_verify: "Check Vercel deployments for any non-production deploys since PR #1630 merged"
-    status: pending
+    status: verified
     deadline: "2026-03-18"
-    checked_date: null
-    notes: null
+    checked_date: "2026-03-05"
+    notes: "Verified: ignoreCommand in apps/web/vercel.json correctly builds only production branch. Site is live at longtermwiki.com (671 pages). Config: [[  == production ]] && exit 1; exit 0"
 
   - id: audits-system-post-merge
     pr: 1637
     merged: "2026-03-04"
     claim: "The crux audits system works end-to-end after merge"
     how_to_verify: "Run each crux audits subcommand on main branch and verify output is correct"
-    status: pending
+    status: verified
     deadline: "2026-03-18"
-    checked_date: null
-    notes: null
+    checked_date: "2026-03-05"
+    notes: "Verified: all audits subcommands work (list, report, run-auto, check). YAML schema valid. 7 audits + 2 post-merge items tracked correctly. run-auto executes hybrid check_commands."

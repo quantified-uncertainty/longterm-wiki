@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Search, Download } from "lucide-react";
 import {
   formatStatementValue,
+  formatPeriod,
   getStatusBadge,
 } from "@lib/statement-display";
 import { VerdictBadge } from "@components/wiki/VerdictBadge";
@@ -15,20 +16,142 @@ interface StatementsClientProps {
   structured: ResolvedStatement[];
   attributed: ResolvedStatement[];
   categories: [string, ResolvedStatement[]][];
+  entitySlug: string;
 }
 
 type StatusFilter = "active" | "superseded" | "retracted";
+
+// ---- Export helpers ----
+
+function csvEscape(val: string | number | null | undefined): string {
+  if (val == null) return "";
+  const str = String(val);
+  // Defend against CSV injection: prefix dangerous leading characters
+  const needsQuoting =
+    str.includes(",") || str.includes('"') || str.includes("\n") ||
+    /^[=+\-@\t\r]/.test(str);
+  if (needsQuoting) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+function statementToFlatValue(s: ResolvedStatement): string {
+  if (s.valueNumeric != null) {
+    return String(s.valueNumeric) + (s.valueUnit ? ` ${s.valueUnit}` : "");
+  }
+  if (s.valueEntityTitle) return s.valueEntityTitle;
+  if (s.valueText != null) return s.valueText;
+  if (s.valueDate != null) return s.valueDate;
+  if (s.valueEntityId != null) return s.valueEntityId;
+  return "";
+}
+
+function triggerDownload(content: string, filename: string, mimeType: string) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 export function StatementsClient({
   structured,
   attributed,
   categories,
+  entitySlug,
 }: StatementsClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [statusFilters, setStatusFilters] = useState<Set<StatusFilter>>(
     new Set(["active", "superseded"])
   );
+
+  const exportAsJson = useCallback(() => {
+    const allStatements = [...structured, ...attributed];
+    const data = {
+      entityId: entitySlug,
+      structured: structured.map((s) => ({
+        id: s.id,
+        variety: s.variety,
+        property: s.property?.label ?? s.propertyId,
+        propertyCategory: s.property?.category ?? null,
+        value: statementToFlatValue(s),
+        statementText: s.statementText,
+        validStart: s.validStart,
+        validEnd: s.validEnd,
+        status: s.status,
+        citationsCount: s.citations.length,
+        attributedTo: s.attributedTo,
+        verdict: s.verdict,
+        verdictScore: s.verdictScore,
+        claimCategory: s.claimCategory,
+      })),
+      attributed: attributed.map((s) => ({
+        id: s.id,
+        variety: s.variety,
+        property: s.property?.label ?? s.propertyId,
+        propertyCategory: s.property?.category ?? null,
+        value: statementToFlatValue(s),
+        statementText: s.statementText,
+        validStart: s.validStart,
+        validEnd: s.validEnd,
+        status: s.status,
+        citationsCount: s.citations.length,
+        attributedTo: s.attributedTo,
+        attributedToTitle: s.attributedToTitle,
+        verdict: s.verdict,
+        verdictScore: s.verdictScore,
+        claimCategory: s.claimCategory,
+      })),
+      total: allStatements.length,
+      exportedAt: new Date().toISOString(),
+    };
+    triggerDownload(
+      JSON.stringify(data, null, 2),
+      `${entitySlug}-statements.json`,
+      "application/json"
+    );
+  }, [structured, attributed, entitySlug]);
+
+  const exportAsCsv = useCallback(() => {
+    const allStatements = [...structured, ...attributed];
+    const headers = [
+      "id", "variety", "property", "propertyCategory", "value", "statementText",
+      "validStart", "validEnd", "status", "citationsCount",
+      "attributedTo", "verdict", "verdictScore", "claimCategory",
+    ];
+    const rows = allStatements.map((s) =>
+      headers.map((h) => {
+        switch (h) {
+          case "id": return csvEscape(s.id);
+          case "variety": return csvEscape(s.variety);
+          case "property": return csvEscape(s.property?.label ?? s.propertyId);
+          case "propertyCategory": return csvEscape(s.property?.category);
+          case "value": return csvEscape(statementToFlatValue(s));
+          case "statementText": return csvEscape(s.statementText);
+          case "validStart": return csvEscape(s.validStart);
+          case "validEnd": return csvEscape(s.validEnd);
+          case "status": return csvEscape(s.status);
+          case "citationsCount": return csvEscape(s.citations.length);
+          case "attributedTo": return csvEscape(s.attributedTo);
+          case "verdict": return csvEscape(s.verdict);
+          case "verdictScore": return csvEscape(s.verdictScore);
+          case "claimCategory": return csvEscape(s.claimCategory);
+          default: return "";
+        }
+      }).join(",")
+    );
+    triggerDownload(
+      [headers.join(","), ...rows].join("\n"),
+      `${entitySlug}-statements.csv`,
+      "text/csv"
+    );
+  }, [structured, attributed, entitySlug]);
 
   const allCategories = useMemo(
     () => categories.map(([name]) => name),
@@ -94,6 +217,16 @@ export function StatementsClient({
 
   const allFiltersOff = statusFilters.size === 0;
 
+  // Hide verdict column when >90% of active statements have no real verdict
+  const showVerdict = useMemo(() => {
+    const activeStmts = structured.filter((s) => s.status === "active");
+    if (activeStmts.length === 0) return false;
+    const withVerdict = activeStmts.filter(
+      (s) => s.verdict != null && s.verdict !== "not_verifiable"
+    ).length;
+    return withVerdict / activeStmts.length > 0.1;
+  }, [structured]);
+
   return (
     <div>
       {/* Filter bar */}
@@ -144,6 +277,25 @@ export function StatementsClient({
         <span className="text-xs text-muted-foreground">
           {totalVisible} of {totalAll}
         </span>
+
+        <div className="flex gap-1">
+          <button
+            onClick={exportAsJson}
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-border bg-background hover:bg-muted/50 text-muted-foreground"
+            title="Download as JSON"
+          >
+            <Download className="w-3 h-3" />
+            JSON
+          </button>
+          <button
+            onClick={exportAsCsv}
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-border bg-background hover:bg-muted/50 text-muted-foreground"
+            title="Download as CSV"
+          >
+            <Download className="w-3 h-3" />
+            CSV
+          </button>
+        </div>
       </div>
 
       {/* All-filters-off warning */}
@@ -161,6 +313,7 @@ export function StatementsClient({
           category={category}
           statements={stmts}
           defaultOpen={idx === 0}
+          showVerdict={showVerdict}
         />
       ))}
 
@@ -214,10 +367,12 @@ function CategorySection({
   category,
   statements,
   defaultOpen,
+  showVerdict,
 }: {
   category: string;
   statements: ResolvedStatement[];
   defaultOpen: boolean;
+  showVerdict: boolean;
 }) {
   const active = statements.filter((s) => s.status === "active");
   const nonActive = statements.filter((s) => s.status !== "active");
@@ -246,9 +401,11 @@ function CategorySection({
               <th className="text-right px-3 py-2 text-xs font-medium">
                 Citations
               </th>
-              <th className="text-left px-3 py-2 text-xs font-medium">
-                Verdict
-              </th>
+              {showVerdict && (
+                <th className="text-left px-3 py-2 text-xs font-medium">
+                  Verdict
+                </th>
+              )}
               <th className="text-left px-3 py-2 text-xs font-medium">
                 Status
               </th>
@@ -256,10 +413,10 @@ function CategorySection({
           </thead>
           <tbody>
             {active.map((s) => (
-              <StructuredRow key={s.id} statement={s} />
+              <StructuredRow key={s.id} statement={s} showVerdict={showVerdict} />
             ))}
             {nonActive.map((s) => (
-              <StructuredRow key={s.id} statement={s} />
+              <StructuredRow key={s.id} statement={s} showVerdict={showVerdict} />
             ))}
           </tbody>
         </table>
@@ -270,14 +427,9 @@ function CategorySection({
 
 // ---- Structured Row ----
 
-function formatPeriod(start: string | null, end: string | null): string {
-  if (!start && !end) return "—";
-  if (start && !end) return `since ${start}`;
-  if (!start && end) return `until ${end}`;
-  return `${start} → ${end}`;
-}
+// formatPeriod imported from @lib/statement-display
 
-function StructuredRow({ statement: s }: { statement: ResolvedStatement }) {
+function StructuredRow({ statement: s, showVerdict }: { statement: ResolvedStatement; showVerdict: boolean }) {
   const value = formatStatementValue(s, s.property);
   const isTextOnly = !s.propertyId && !!s.statementText;
   const displayValue =
@@ -313,9 +465,11 @@ function StructuredRow({ statement: s }: { statement: ResolvedStatement }) {
       <td className="px-3 py-2 text-xs text-right relative">
         <CitationDetail citations={s.citations} />
       </td>
-      <td className="px-3 py-2 text-xs">
-        <VerdictBadge verdict={s.verdict} score={s.verdictScore} size="sm" />
-      </td>
+      {showVerdict && (
+        <td className="px-3 py-2 text-xs">
+          <VerdictBadge verdict={s.verdict} score={s.verdictScore} size="sm" />
+        </td>
+      )}
       <td className="px-3 py-2">
         <span
           className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${statusBadge.className}`}

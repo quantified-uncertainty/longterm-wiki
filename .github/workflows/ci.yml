@@ -20,9 +20,11 @@ jobs:
     steps:
       - name: Block PRs to production from non-main branches
         if: github.event_name == 'pull_request' && github.base_ref == 'production'
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
-          if [[ "${{ github.head_ref }}" != "main" ]]; then
-            echo "::error::PRs to production must come from 'main'. Got: '${{ github.head_ref }}'"
+          if [[ "$HEAD_REF" != "main" ]]; then
+            echo "::error::PRs to production must come from 'main'. Got: '$HEAD_REF'"
             echo "Merge your changes to main first, then the release workflow will open a PR from main → production."
             exit 1
           fi
@@ -56,6 +58,16 @@ jobs:
           LONGTERMWIKI_PROJECT_KEY: ${{ secrets.LONGTERMWIKI_PROJECT_KEY }}
 
       # --- Validation (fail fast before expensive Next.js build) ---
+
+      - name: Install actionlint
+        run: |
+          gh release download --repo rhysd/actionlint --pattern 'actionlint_*_linux_amd64.tar.gz' -O /tmp/actionlint.tar.gz
+          tar -xzf /tmp/actionlint.tar.gz -C /usr/local/bin actionlint
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: GitHub Actions YAML validation — actionlint (blocking)
+        run: npx tsx crux/validate/validate-actions-yaml.ts
 
       - name: MDX syntax check (blocking)
         run: pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
@@ -234,4 +246,5 @@ jobs:
   # Deploy job removed — production deploys are now handled by the scheduled
   # deploy hook (scheduled-deploy.yml, every hour) instead of per-push.
   # This caps Vercel build minutes at 24/day max vs 50-80/day previously.
-  # See vercel.json ignoreCommand which also blocks Git-triggered main builds.
+  # vercel.json sets github.enabled=false to prevent Vercel from posting
+  # PR failure statuses (deploy hooks bypass the GitHub integration).
