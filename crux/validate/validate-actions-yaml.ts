@@ -20,6 +20,7 @@
 import { execSync, spawnSync } from 'child_process';
 import { readdirSync } from 'fs';
 import { join } from 'path';
+import { fileURLToPath } from 'url';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 
@@ -112,7 +113,7 @@ export function runCheck(): { passed: boolean; errors: number; output: string } 
   return { passed: false, errors: errorCount, output };
 }
 
-if (process.argv[1]?.includes('validate-actions-yaml')) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const result = runCheck();
   process.exit(result.passed ? 0 : 1);
 }
