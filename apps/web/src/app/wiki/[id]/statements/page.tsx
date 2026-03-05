@@ -86,9 +86,10 @@ export default async function EntityStatementsPage({ params }: PageProps) {
   // Stats
   const activeStructured = resolvedStructured.filter((s) => s.status === "active");
   const activeAttributed = resolvedAttributed.filter((s) => s.status === "active");
-  const activeCited =
-    activeStructured.filter((s) => s.citations.length > 0).length +
-    activeAttributed.filter((s) => s.citations.length > 0).length;
+  const activeTotal = activeStructured.length + activeAttributed.length;
+  const retractedCount =
+    resolvedStructured.filter((s) => s.status === "retracted").length +
+    resolvedAttributed.filter((s) => s.status === "retracted").length;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
@@ -119,11 +120,18 @@ export default async function EntityStatementsPage({ params }: PageProps) {
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <StatCard label="Active" value={activeStructured.length + activeAttributed.length} />
-        <StatCard label="Active Structured" value={activeStructured.length} color="blue" />
-        <StatCard label="Active Attributed" value={activeAttributed.length} color="amber" />
-        <StatCard label="Active Cited" value={activeCited} color="emerald" />
+        <StatCard label="Active" value={activeTotal} />
+        <StatCard label="Structured" value={activeStructured.length} color="blue" />
+        <StatCard label="Attributed" value={activeAttributed.length} color="amber" />
+        <StatCard label="Retracted" value={retractedCount} color={retractedCount > 0 ? "rose" : undefined} />
       </div>
+
+      {/* Brief intro */}
+      <p className="text-xs text-muted-foreground mb-6">
+        Structured statements are specific data points (revenue, headcount,
+        dates) with typed values. Attributed statements are notable claims
+        attributed to people or organizations.
+      </p>
 
       {total === 0 ? (
         <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground">
