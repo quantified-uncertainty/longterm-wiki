@@ -44,6 +44,7 @@ import {
   type ScoringResult,
 } from './scoring.ts';
 import { resolveCoverageTargets } from './coverage-targets.ts';
+import { validateCreateStatementBatch } from './validate-quality.ts';
 
 // ---------------------------------------------------------------------------
 // Types (exported for use by future pass functions)
@@ -856,6 +857,18 @@ export async function runSinglePass(opts: ImproveOptions): Promise<PassResult> {
   let coverageAfter: number | null = null;
 
   if (!dryRun && allAccepted.length > 0) {
+    // Data quality gate — validate before writing to DB.
+    // Throws if critical assertions fail so the caller can surface the error.
+    const qualityReport = validateCreateStatementBatch(allAccepted);
+    if (!qualityReport.passed) {
+      const codes = qualityReport.violations.map(v => v.code).join(', ');
+      const details = qualityReport.violations.map(v => v.message).join('; ');
+      throw new Error(
+        `Data quality assertions failed (${codes}): ${details}. ` +
+        'Use --dry-run to inspect the generated statements without writing.',
+      );
+    }
+
     const batchResult = await createStatementBatch(allAccepted);
     if (!batchResult.ok) {
       throw new Error('Failed to insert statements');
