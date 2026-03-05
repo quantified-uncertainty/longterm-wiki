@@ -893,7 +893,7 @@ Choose the most specific matching property. If no property fits well, use null.`
         rejected++;
         rejections.push({
           text: `#${assignment.id}`,
-          reason: 'No matching property found',
+          reason: 'LLM found no matching property (null)',
           score: 0,
         });
         continue;
@@ -904,7 +904,7 @@ Choose the most specific matching property. If no property fits well, use null.`
         rejected++;
         rejections.push({
           text: `#${assignment.id} → ${assignment.propertyId}`,
-          reason: 'Property ID not in vocabulary',
+          reason: `Property "${assignment.propertyId}" not in vocabulary — consider adding it`,
           score: 0,
         });
         continue;
@@ -1185,6 +1185,18 @@ async function main() {
     console.error(`  Usage: pnpm crux statements improve <entity-id> [options]`);
     console.error(`  Options: --org-type=TYPE --dry-run --category=CAT --no-research --min-score=N --budget=N --json`);
     console.error(`           --target-coverage=N --max-iterations=N --mode=quality|classify`);
+    process.exit(1);
+  }
+
+  // Validate entity exists before spending LLM budget
+  const entityCheck = await getEntity(entityId);
+  if (!entityCheck.ok) {
+    const msg = `Entity "${entityId}" not found in wiki-server`;
+    if (jsonOutput) {
+      console.log(JSON.stringify({ entityId, error: msg }));
+    } else {
+      console.error(`${c.red}${msg}${c.reset}`);
+    }
     process.exit(1);
   }
 

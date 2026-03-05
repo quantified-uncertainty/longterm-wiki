@@ -237,6 +237,64 @@ const PROPERTY_SEEDS: UpsertPropertyInput[] = [
     entityTypes: ['person'],
     valueType: 'entity',
   },
+
+  // ---- financial (supplements) ----
+  {
+    id: 'executive-compensation',
+    label: 'Executive Compensation',
+    category: 'financial',
+    description: 'Compensation figures for executives and key personnel',
+    entityTypes: ['organization'],
+    valueType: 'number',
+    defaultUnit: 'USD',
+  },
+  {
+    id: 'operating-expenses',
+    label: 'Operating Expenses',
+    category: 'financial',
+    description: 'Total or itemized operating expenses',
+    entityTypes: ['organization'],
+    valueType: 'number',
+    defaultUnit: 'USD',
+  },
+  {
+    id: 'net-income',
+    label: 'Net Income / Loss',
+    category: 'financial',
+    description: 'Net income or net loss for a period',
+    entityTypes: ['organization'],
+    valueType: 'number',
+    defaultUnit: 'USD',
+  },
+  {
+    id: 'net-assets',
+    label: 'Net Assets',
+    category: 'financial',
+    description: 'Total net assets or equity',
+    entityTypes: ['organization'],
+    valueType: 'number',
+    defaultUnit: 'USD',
+  },
+
+  // ---- safety (supplements) ----
+  {
+    id: 'risk-assessment',
+    label: 'Risk Assessment',
+    category: 'safety',
+    description: 'Assessed risk level or risk category for an entity or activity',
+    entityTypes: ['organization'],
+    valueType: 'string',
+  },
+
+  // ---- milestone (supplements) ----
+  {
+    id: 'award',
+    label: 'Award / Recognition',
+    category: 'milestone',
+    description: 'Awards, prizes, or notable recognition received',
+    entityTypes: ['organization', 'person'],
+    valueType: 'string',
+  },
 ];
 
 // ---------------------------------------------------------------------------
