@@ -99,6 +99,30 @@ export async function getProperties(): Promise<ApiResult<PropertiesResult>> {
   return apiRequest<PropertiesResult>('GET', '/api/statements/properties');
 }
 
+export interface UpsertPropertyInput {
+  id: string;
+  label: string;
+  category: string;
+  description?: string | null;
+  entityTypes?: string[];
+  valueType?: 'number' | 'string' | 'entity' | 'date';
+  defaultUnit?: string | null;
+  stalenessCadence?: string | null;
+  unitFormatId?: string | null;
+}
+
+type UpsertPropertiesResult = InferResponseType<RpcClient['properties']['upsert']['$post'], 200>;
+
+export async function upsertProperties(
+  props: UpsertPropertyInput[],
+): Promise<ApiResult<UpsertPropertiesResult>> {
+  return apiRequest<UpsertPropertiesResult>(
+    'POST',
+    '/api/statements/properties/upsert',
+    { properties: props },
+  );
+}
+
 export async function createStatement(
   input: CreateStatementInput,
 ): Promise<ApiResult<CreateStatementResult>> {
