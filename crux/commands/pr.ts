@@ -8,12 +8,16 @@
  *   crux pr detect             Detect open PR for current branch (returns PR URL + number)
  *   crux pr fix-body           Detect and repair literal \n in the current branch's PR body
  *   crux pr fix-body --pr=N    Target a specific PR number instead of auto-detecting
+ *   crux pr rebase-all         Rebase all open non-draft PRs onto main (CI usage)
+ *   crux pr resolve-conflicts  Find and resolve all conflicted PRs
  */
 
 import { readFileSync } from 'fs';
 import { createLogger } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
+import { rebaseAllPrs } from '../lib/pr-rebase.ts';
+import { resolveAllConflicts } from '../lib/conflict-resolution.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
 type CommandOptions = Record<string, unknown>;
@@ -501,6 +505,105 @@ async function validateTestPlanCmd(_args: string[], options: CommandOptions): Pr
   };
 }
 
+/**
+ * Rebase all open non-draft PRs onto main.
+ *
+ * Fetches open PRs targeting main, applies 4 safeguards to skip active work,
+ * then rebases and force-pushes each eligible PR.
+ *
+ * Options:
+ *   --verbose   Print detailed progress for each PR
+ */
+async function rebaseAll(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+  const c = log.colors;
+  const verbose = Boolean(options.verbose);
+
+  const { results, failed } = await rebaseAllPrs({ verbose });
+
+  if (results.length === 0) {
+    return {
+      output: `${c.dim}No open non-draft PRs to rebase.${c.reset}\n`,
+      exitCode: 0,
+    };
+  }
+
+  let output = '';
+  for (const r of results) {
+    const icon =
+      r.status === 'rebased'
+        ? `${c.green}✓${c.reset}`
+        : r.status === 'up-to-date'
+          ? `${c.dim}=${c.reset}`
+          : r.status === 'skipped'
+            ? `${c.yellow}-${c.reset}`
+            : r.status === 'conflict'
+              ? `${c.yellow}!${c.reset}`
+              : `${c.red}✗${c.reset}`;
+
+    output += `  ${icon} PR #${r.number} (${r.branch}): ${r.status}`;
+    if (r.reason) {
+      output += ` — ${r.reason}`;
+    }
+    output += '\n';
+  }
+
+  const rebased = results.filter((r) => r.status === 'rebased').length;
+  const upToDate = results.filter((r) => r.status === 'up-to-date').length;
+  const skipped = results.filter((r) => r.status === 'skipped').length;
+  const conflicts = results.filter((r) => r.status === 'conflict').length;
+  const pushFailed = results.filter((r) => r.status === 'push-failed').length;
+
+  output += `\n${c.bold}Summary:${c.reset} ${rebased} rebased, ${upToDate} up-to-date, ${skipped} skipped, ${conflicts} conflicts, ${pushFailed} push-failed\n`;
+
+  if (failed > 0) {
+    output += `${c.red}${failed} PR(s) failed to push — they may need manual attention or will be retried on next run.${c.reset}\n`;
+  }
+
+  return { output, exitCode: failed > 0 ? 1 : 0 };
+}
+
+/**
+ * Find and resolve all open PRs with merge conflicts.
+ *
+ * Two-tier resolution:
+ *   1. Sonnet API — fast text-level conflict resolution
+ *   2. Claude Code CLI — agentic escalation for validation failures
+ *
+ * Options:
+ *   --verbose    Show detailed output
+ */
+async function resolveConflictsCmd(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const verbose = Boolean(options.verbose);
+  const { results, failed } = await resolveAllConflicts({ verbose });
+
+  if (results.length === 0) {
+    return { output: 'No conflicted PRs found.\n', exitCode: 0 };
+  }
+
+  let output = '';
+  for (const r of results) {
+    let icon: string;
+    switch (r.status) {
+      case 'resolved':
+        icon = '\u2713'; // checkmark
+        break;
+      case 'skipped-fingerprint':
+        icon = '\u2298'; // circled dash
+        break;
+      default:
+        icon = '\u2717'; // X mark
+    }
+    output += `${icon} PR #${r.number} (${r.branch}): ${r.status}`;
+    if (r.tier) output += ` [Tier ${r.tier}]`;
+    output += '\n';
+  }
+
+  output += `\n${results.length} PR(s) processed, ${failed} failed.\n`;
+
+  return { output, exitCode: failed > 0 ? 1 : 0 };
+}
+
 // ---------------------------------------------------------------------------
 // Domain entry point (required by crux.mjs dispatch)
 // ---------------------------------------------------------------------------
@@ -509,7 +612,9 @@ export const commands = {
   create,
   detect,
   'fix-body': fixBody,
+  'rebase-all': rebaseAll,
   'validate-test-plan': validateTestPlanCmd,
+  'resolve-conflicts': resolveConflictsCmd,
 };
 
 export function getHelp(): string {
@@ -520,7 +625,9 @@ Commands:
   create                        Create a PR for the current branch (corruption-safe).
   detect                        Detect open PR for current branch (returns URL + number).
   fix-body [--pr=N]             Detect and repair literal \\n in the current branch's PR body.
+  rebase-all                    Rebase all open non-draft PRs onto main (used by CI).
   validate-test-plan [--pr=N]   Check that the PR's test plan section is complete.
+  resolve-conflicts             Find and resolve all open PRs with merge conflicts.
 
 Options (create):
   --title="..."       Required. PR title.
@@ -538,6 +645,12 @@ Options (detect):
 Options (fix-body / validate-test-plan):
   --pr=N              Target a specific PR number instead of auto-detecting.
   --json              JSON output (validate-test-plan only).
+
+Options (rebase-all):
+  --verbose           Show detailed progress for each PR.
+
+Options (resolve-conflicts):
+  --verbose           Show detailed output.
 
 Examples:
   # Multi-line body via heredoc (recommended — avoids sh/dash heredoc issues):
@@ -561,5 +674,9 @@ Examples:
   pnpm crux pr fix-body --pr=42          # Fix a specific PR
   pnpm crux pr validate-test-plan        # Check test plan on current PR
   pnpm crux pr validate-test-plan --pr=42 --json  # Check specific PR (JSON)
+  pnpm crux pr rebase-all                 # Rebase all open PRs onto main
+  pnpm crux pr rebase-all --verbose       # With detailed output
+  pnpm crux pr resolve-conflicts         # Resolve all conflicted PRs
+  pnpm crux pr resolve-conflicts --verbose  # With detailed output
 `.trim();
 }
