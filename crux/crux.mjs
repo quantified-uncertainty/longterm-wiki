@@ -224,6 +224,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   statements  Extract and verify structured statements from wiki pages
   audits      System-level behavioral verification (ongoing + post-merge)
   release     Production release management (main → production)
+  pr-patrol   Continuous PR maintenance daemon (scan, prioritize, fix)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
