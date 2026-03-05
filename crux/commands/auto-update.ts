@@ -36,6 +36,7 @@ import {
 import { computeRiskScores } from '../auto-update/ci-risk-scores.ts';
 import { runContentChecks } from '../auto-update/ci-content-checks.ts';
 import { buildPrBody } from '../auto-update/ci-pr-body.ts';
+import { orchestrateCiAutoUpdate } from '../auto-update/ci-orchestrate.ts';
 import { createJob } from '../lib/wiki-server/jobs.ts';
 import type { AutoUpdateOptions, RunReport } from '../auto-update/types.ts';
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
@@ -628,11 +629,28 @@ async function contentChecks(args: string[], options: AutoUpdateOptions): Promis
   return { output, exitCode: result.passed ? 0 : 1 };
 }
 
+/**
+ * Full CI orchestration: branch, pipeline, validation, review, commit, PR.
+ * Replaces the shell logic in .github/workflows/auto-update.yml.
+ */
+async function runCi(args: string[], options: AutoUpdateOptions): Promise<CommandResult> {
+  const result = await orchestrateCiAutoUpdate({
+    budget: parseFloat(options.budget || '30'),
+    count: parseIntOpt(options.count, 5),
+    dryRun: Boolean(options.dryRun || options['dry-run']),
+    sources: options.sources || undefined,
+    verbose: Boolean(options.verbose),
+  });
+
+  return { output: '', exitCode: result.exitCode };
+}
+
 // ── Command Registry ────────────────────────────────────────────────────────
 
 export const commands = {
   default: plan,
   run,
+  'run-ci': runCi,
   digest,
   plan,
   sources,
@@ -657,6 +675,7 @@ Pipeline: fetch sources → build digest → route to pages → execute updates
 Commands:
   plan                 Show what would be updated (default)
   run                  Execute the full auto-update pipeline
+  run-ci               Full CI orchestration: branch, pipeline, validate, review, commit, PR
   submit               Submit as background jobs (parallel via job queue)
   digest               Fetch sources and show news digest only
   sources              List configured news sources
@@ -716,6 +735,7 @@ Examples:
   crux auto-update audit-gate existential-risk   Audit a specific page
   crux auto-update submit --budget=30            Submit as parallel background jobs
   crux auto-update submit --dry-run              Preview job plan without creating jobs
+  crux auto-update run-ci --budget=30 --count=5  Full CI pipeline (used by GitHub Actions)
 `;
 
 }
