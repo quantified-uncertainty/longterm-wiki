@@ -126,31 +126,39 @@ function formatStatement(s: typeof statements.$inferSelect) {
 
 // ---- Body schemas ----
 
-const EXPECTED_DIMENSIONS = [
-  'structure', 'precision', 'clarity', 'resolvability',
-  'uniqueness', 'atomicity', 'importance', 'neglectedness',
-  'recency', 'crossEntityUtility',
-] as const;
+// Strict schema for quality dimensions — enforces exactly the 10 known keys
+// and rejects unknown ones. Using z.object().strict() means extra keys cause a
+// 400 error rather than being silently stored in the DB. Values must be in [0, 1].
+// Exported for unit testing.
+export const QualityDimensionsSchema = z.object({
+  structure:          z.number().min(0).max(1),
+  precision:          z.number().min(0).max(1),
+  clarity:            z.number().min(0).max(1),
+  resolvability:      z.number().min(0).max(1),
+  uniqueness:         z.number().min(0).max(1),
+  atomicity:          z.number().min(0).max(1),
+  importance:         z.number().min(0).max(1),
+  neglectedness:      z.number().min(0).max(1),
+  recency:            z.number().min(0).max(1),
+  crossEntityUtility: z.number().min(0).max(1),
+}).strict();
 
-const BatchScoreBody = z.object({
+// Exported for unit testing.
+export const BatchScoreBody = z.object({
   scores: z.array(z.object({
     statementId: z.number().int().positive(),
     qualityScore: z.number().min(0).max(1),
-    qualityDimensions: z.record(z.number()).refine(
-      (dims) => {
-        const keys = Object.keys(dims);
-        return keys.length === EXPECTED_DIMENSIONS.length &&
-          EXPECTED_DIMENSIONS.every((d) => d in dims);
-      },
-      { message: `qualityDimensions must contain exactly these keys: ${EXPECTED_DIMENSIONS.join(', ')}` },
-    ),
+    qualityDimensions: QualityDimensionsSchema,
   })).min(1).max(500),
 });
 
-const CoverageScoreBody = z.object({
+// Exported for unit testing.
+export const CoverageScoreBody = z.object({
   entityId: z.string().min(1).max(200),
   coverageScore: z.number().min(0).max(1),
-  categoryScores: z.record(z.number()),
+  // Category keys are dynamic (derived from property.category at runtime),
+  // so we can't enumerate them statically. We do enforce values are in [0, 1].
+  categoryScores: z.record(z.number().min(0).max(1)),
   statementCount: z.number().int().min(0),
   qualityAvg: z.number().min(0).max(1).nullish(),
 });
