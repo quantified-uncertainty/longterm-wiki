@@ -113,6 +113,20 @@ describe('issues done — input validation', () => {
     const result = await commands.done(['abc'], {});
     expect(result.exitCode).toBe(1);
   });
+
+  it('returns error for invalid --outcome value', async () => {
+    const result = await commands.done(['123'], { outcome: 'invalid-value' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Invalid --outcome value');
+    expect(result.output).toContain('invalid-value');
+    expect(result.output).toContain('merged');
+  });
+
+  it('returns error for --outcome=partially_merged (not a valid value)', async () => {
+    const result = await commands.done(['123'], { outcome: 'partially_merged' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Invalid --outcome value');
+  });
 });
 
 // ---------------------------------------------------------------------------

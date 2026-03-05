@@ -16,6 +16,9 @@ let store: Array<{
   session_type: string;
   issue_number: number | null;
   checklist_md: string;
+  worktree: string | null;
+  pr_url: string | null;
+  pr_outcome: string | null;
   status: string;
   started_at: Date;
   completed_at: Date | null;
@@ -48,6 +51,9 @@ const dispatch: SqlDispatcher = (query, params) => {
       session_type: params[2] as string,
       issue_number: params[3] as number | null,
       checklist_md: params[4] as string,
+      worktree: null,
+      pr_url: null,
+      pr_outcome: null,
       status: "active",
       started_at: new Date(),
       completed_at: null,
@@ -96,6 +102,15 @@ const dispatch: SqlDispatcher = (query, params) => {
             break;
           case "updated_at":
             store[idx].updated_at = params[pIdx] as Date ?? new Date();
+            break;
+          case "pr_url":
+            store[idx].pr_url = params[pIdx] as string | null;
+            break;
+          case "pr_outcome":
+            store[idx].pr_outcome = params[pIdx] as string | null;
+            break;
+          case "worktree":
+            store[idx].worktree = params[pIdx] as string | null;
             break;
         }
         pIdx++;
@@ -485,6 +500,71 @@ describe("Agent Sessions API", () => {
         body: "not-json",
       });
       expect(res.status).toBe(400);
+    });
+
+    it("updates prOutcome to merged", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        prOutcome: "merged",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.prOutcome).toBe("merged");
+    });
+
+    it("updates prOutcome to merged_with_revisions", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        prOutcome: "merged_with_revisions",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.prOutcome).toBe("merged_with_revisions");
+    });
+
+    it("clears prOutcome with null", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+      await patchJson(app, "/api/agent-sessions/1", { prOutcome: "merged" });
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        prOutcome: null,
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.prOutcome).toBeNull();
+    });
+
+    it("rejects invalid prOutcome value", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        prOutcome: "invalid-outcome",
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("accepts all valid prOutcome values", async () => {
+      const validOutcomes = [
+        "merged",
+        "merged_with_revisions",
+        "reverted",
+        "closed_without_merge",
+      ];
+      for (const outcome of validOutcomes) {
+        await postJson(app, "/api/agent-sessions", {
+          ...sampleSession,
+          branch: `claude/test-outcome-${outcome}`,
+        });
+        const id = store[store.length - 1].id;
+        const res = await patchJson(app, `/api/agent-sessions/${id}`, {
+          prOutcome: outcome,
+        });
+        expect(res.status).toBe(200);
+        const body = await res.json();
+        expect(body.prOutcome).toBe(outcome);
+      }
     });
   });
 
