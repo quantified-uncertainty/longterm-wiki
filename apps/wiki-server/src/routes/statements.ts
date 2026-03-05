@@ -7,6 +7,7 @@
  * - GET /by-page/summary — per-footnote verification summary for citation dots
  * - GET /properties — list all properties with statement counts
  * - GET /stats     — basic statistics
+ * - GET /quality-summary — aggregate quality distribution + per-entity coverage scores
  * - PATCH /:id     — update statement status, verdict, or note
  * - POST /         — create statement + optional citations
  */
@@ -604,6 +605,86 @@ const statementsApp = new Hono()
         stalenessCadence: p.stalenessCadence,
         unitFormatId: p.unitFormatId,
         statementCount: countMap.get(p.id) ?? 0,
+      })),
+    });
+  })
+
+  // ---- GET /quality-summary — aggregate quality scores and entity coverage ----
+  .get("/quality-summary", async (c) => {
+    const db = getDrizzleDb();
+
+    // Typed row shapes for raw SQL results
+    type QualityDistRow = {
+      total: string;
+      unscored: string;
+      excellent: string;
+      good: string;
+      fair: string;
+      poor: string;
+      avg_score: string | null;
+      [key: string]: unknown;
+    };
+
+    type EntityCoverageRow = {
+      entityId: string;
+      coverageScore: unknown;
+      categoryScores: Record<string, number>;
+      statementCount: unknown;
+      qualityAvg: unknown;
+      scoredAt: string;
+      [key: string]: unknown;
+    };
+
+    const [qualityResult, coverageResult] = await Promise.all([
+      db.execute<QualityDistRow>(sql`
+        SELECT
+          COUNT(*)::text AS total,
+          COUNT(*) FILTER (WHERE quality_score IS NULL)::text AS unscored,
+          COUNT(*) FILTER (WHERE quality_score >= 0.8)::text AS excellent,
+          COUNT(*) FILTER (WHERE quality_score >= 0.6 AND quality_score < 0.8)::text AS good,
+          COUNT(*) FILTER (WHERE quality_score >= 0.4 AND quality_score < 0.6)::text AS fair,
+          COUNT(*) FILTER (WHERE quality_score < 0.4 AND quality_score IS NOT NULL)::text AS poor,
+          AVG(quality_score)::text AS avg_score
+        FROM statements
+        WHERE status = 'active'
+      `),
+      db.execute<EntityCoverageRow>(sql`
+        SELECT DISTINCT ON (entity_id)
+          entity_id AS "entityId",
+          coverage_score AS "coverageScore",
+          category_scores AS "categoryScores",
+          statement_count AS "statementCount",
+          quality_avg AS "qualityAvg",
+          scored_at AS "scoredAt"
+        FROM entity_coverage_scores
+        -- DISTINCT ON requires entity_id first in ORDER BY to select the most-recent row per entity
+        ORDER BY entity_id, scored_at DESC
+      `),
+    ]);
+
+    const dist = qualityResult[0];
+
+    return c.json({
+      quality: {
+        total: Number(dist?.total ?? 0),
+        unscored: Number(dist?.unscored ?? 0),
+        excellent: Number(dist?.excellent ?? 0),
+        good: Number(dist?.good ?? 0),
+        fair: Number(dist?.fair ?? 0),
+        poor: Number(dist?.poor ?? 0),
+        avgScore: dist?.avg_score != null ? parseFloat(dist.avg_score) : null,
+      },
+      entityCoverage: [...coverageResult].map((r) => ({
+        entityId: r.entityId,
+        coverageScore: Number(r.coverageScore),
+        // Defensive: JSONB may theoretically be non-object in degenerate cases
+        categoryScores:
+          r.categoryScores != null && typeof r.categoryScores === "object" && !Array.isArray(r.categoryScores)
+            ? (r.categoryScores as Record<string, number>)
+            : {},
+        statementCount: Number(r.statementCount),
+        qualityAvg: r.qualityAvg != null ? Number(r.qualityAvg) : null,
+        scoredAt: typeof r.scoredAt === "string" ? r.scoredAt : String(r.scoredAt),
       })),
     });
   })
