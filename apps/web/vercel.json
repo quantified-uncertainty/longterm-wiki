@@ -4,5 +4,8 @@
   "installCommand": "cd .. && npx pnpm@9 install",
   "buildCommand": "node scripts/build-data.mjs && next build",
   "_ignoreCommandNote": "Vercel ignoreCommand uses INVERTED exit codes: exit 1 = BUILD (do not skip), exit 0 = SKIP. This is the opposite of Unix convention. The command below builds only the 'production' branch.",
-  "ignoreCommand": "bash -c '# Vercel exit code convention: exit 1=BUILD (do not skip), exit 0=SKIP (ignore). Opposite of normal Unix convention.\n[[ $VERCEL_GIT_COMMIT_REF == production ]] && exit 1; exit 0'"
+  "ignoreCommand": "bash -c '# Vercel exit code convention: exit 1=BUILD (do not skip), exit 0=SKIP (ignore). Opposite of normal Unix convention.\n[[ $VERCEL_GIT_COMMIT_REF == production ]] && exit 1; exit 0'",
+  "github": {
+    "enabled": false
+  }
 }
