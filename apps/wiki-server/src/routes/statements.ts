@@ -799,6 +799,73 @@ const statementsApp = new Hono()
     });
   })
 
+  // ---- GET /coverage-scores — coverage score history for an entity ----
+  // NOTE: Must be defined BEFORE /:id to prevent wildcard from matching "coverage-scores"
+  .get("/coverage-scores", zv("query", CoverageScoreQuery), async (c) => {
+    const { entityId, limit } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(entityCoverageScores)
+      .where(eq(entityCoverageScores.entityId, entityId))
+      .orderBy(desc(entityCoverageScores.scoredAt))
+      .limit(limit);
+
+    return c.json({
+      scores: rows.map((r) => ({
+        id: r.id,
+        entityId: r.entityId,
+        coverageScore: r.coverageScore,
+        categoryScores: r.categoryScores,
+        statementCount: r.statementCount,
+        qualityAvg: r.qualityAvg,
+        scoredAt: r.scoredAt,
+      })),
+    });
+  })
+
+  // ---- GET /coverage-scores/all — latest coverage score for every entity ----
+  // NOTE: Must be defined BEFORE /:id to prevent wildcard from matching
+  .get("/coverage-scores/all", async (c) => {
+    const db = getDrizzleDb();
+
+    const latestIds = db
+      .select({
+        maxId: sql<number>`MAX(${entityCoverageScores.id})`.as("max_id"),
+      })
+      .from(entityCoverageScores)
+      .groupBy(entityCoverageScores.entityId)
+      .as("latest");
+
+    const rows = await db
+      .select({
+        id: entityCoverageScores.id,
+        entityId: entityCoverageScores.entityId,
+        coverageScore: entityCoverageScores.coverageScore,
+        categoryScores: entityCoverageScores.categoryScores,
+        statementCount: entityCoverageScores.statementCount,
+        qualityAvg: entityCoverageScores.qualityAvg,
+        scoredAt: entityCoverageScores.scoredAt,
+      })
+      .from(entityCoverageScores)
+      .innerJoin(latestIds, eq(entityCoverageScores.id, latestIds.maxId))
+      .orderBy(desc(entityCoverageScores.coverageScore));
+
+    return c.json({
+      scores: rows.map((r) => ({
+        id: r.id,
+        entityId: r.entityId,
+        coverageScore: r.coverageScore,
+        categoryScores: r.categoryScores,
+        statementCount: r.statementCount,
+        qualityAvg: r.qualityAvg,
+        scoredAt: r.scoredAt,
+      })),
+      total: rows.length,
+    });
+  })
+
   // ---- GET /:id — fetch a single statement with citations and property ----
   .get("/:id", async (c) => {
     const idParam = c.req.param("id");
@@ -1161,72 +1228,6 @@ const statementsApp = new Hono()
 
     const row = firstOrThrow(result, "coverage score insert");
     return c.json({ id: row.id, ok: true }, 201);
-  })
-
-  // ---- GET /coverage-scores — coverage score history for an entity ----
-  .get("/coverage-scores", zv("query", CoverageScoreQuery), async (c) => {
-    const { entityId, limit } = c.req.valid("query");
-    const db = getDrizzleDb();
-
-    const rows = await db
-      .select()
-      .from(entityCoverageScores)
-      .where(eq(entityCoverageScores.entityId, entityId))
-      .orderBy(desc(entityCoverageScores.scoredAt))
-      .limit(limit);
-
-    return c.json({
-      scores: rows.map((r) => ({
-        id: r.id,
-        entityId: r.entityId,
-        coverageScore: r.coverageScore,
-        categoryScores: r.categoryScores,
-        statementCount: r.statementCount,
-        qualityAvg: r.qualityAvg,
-        scoredAt: r.scoredAt,
-      })),
-    });
-  })
-
-  // ---- GET /coverage-scores/all — latest coverage score for every entity ----
-  .get("/coverage-scores/all", async (c) => {
-    const db = getDrizzleDb();
-
-    // Use a subquery to get the latest score per entity (MAX id = most recent)
-    const latestIds = db
-      .select({
-        maxId: sql<number>`MAX(${entityCoverageScores.id})`.as("max_id"),
-      })
-      .from(entityCoverageScores)
-      .groupBy(entityCoverageScores.entityId)
-      .as("latest");
-
-    const rows = await db
-      .select({
-        id: entityCoverageScores.id,
-        entityId: entityCoverageScores.entityId,
-        coverageScore: entityCoverageScores.coverageScore,
-        categoryScores: entityCoverageScores.categoryScores,
-        statementCount: entityCoverageScores.statementCount,
-        qualityAvg: entityCoverageScores.qualityAvg,
-        scoredAt: entityCoverageScores.scoredAt,
-      })
-      .from(entityCoverageScores)
-      .innerJoin(latestIds, eq(entityCoverageScores.id, latestIds.maxId))
-      .orderBy(desc(entityCoverageScores.coverageScore));
-
-    return c.json({
-      scores: rows.map((r) => ({
-        id: r.id,
-        entityId: r.entityId,
-        coverageScore: r.coverageScore,
-        categoryScores: r.categoryScores,
-        statementCount: r.statementCount,
-        qualityAvg: r.qualityAvg,
-        scoredAt: r.scoredAt,
-      })),
-      total: rows.length,
-    });
   })
 
   // ---- GET /scores/distribution — quality score distribution for statements ----
