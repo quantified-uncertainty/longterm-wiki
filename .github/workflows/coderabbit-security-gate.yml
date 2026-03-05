@@ -41,25 +41,38 @@ jobs:
             // Severity patterns that require dismissal
             const BLOCKING_SEVERITY_RE = /🔴 Critical|🟠 Major/;
 
-            // Actors not allowed to apply the override label
-            const DISALLOWED_LABEL_ACTORS = [
+            // Actors not allowed to apply the override label.
+            // Belt-and-suspenders: check actor.type === 'Bot' (covers ALL GitHub bots/apps),
+            // plus a [bot] suffix check for safety, plus explicit logins and name patterns.
+            const DISALLOWED_LABEL_ACTORS = new Set([
               'github-actions[bot]',
               'dependabot[bot]',
-            ];
+            ]);
             const DISALLOWED_ACTOR_PATTERNS = [
               /^claude-/i,
             ];
 
-            function isDisallowedActor(login) {
-              if (DISALLOWED_LABEL_ACTORS.includes(login)) return true;
+            function isDisallowedActor(actor) {
+              const login = actor?.login ?? '';
+              const type = (actor?.type ?? '').toLowerCase();
+              // GitHub sets type='Bot' for all bot accounts and GitHub Apps
+              if (type === 'bot') return true;
+              // Belt-and-suspenders: [bot] suffix catches any bot the type check misses
+              if (/\[bot\]$/i.test(login)) return true;
+              if (DISALLOWED_LABEL_ACTORS.has(login)) return true;
               return DISALLOWED_ACTOR_PATTERNS.some(p => p.test(login));
             }
 
-            // --- 1. Fetch review threads via GraphQL ---
-            const query = `query($owner: String!, $name: String!, $number: Int!) {
+            // --- 1. Fetch review threads via GraphQL (paginated) ---
+            // Pagination prevents false negatives on PRs with >100 review threads.
+            const query = `query($owner: String!, $name: String!, $number: Int!, $after: String) {
               repository(owner: $owner, name: $name) {
                 pullRequest(number: $number) {
-                  reviewThreads(first: 100) {
+                  reviewThreads(first: 100, after: $after) {
+                    pageInfo {
+                      hasNextPage
+                      endCursor
+                    }
                     nodes {
                       isResolved
                       isOutdated
@@ -77,13 +90,21 @@ jobs:
               }
             }`;
 
-            const gqlResult = await github.graphql(query, {
-              owner: context.repo.owner,
-              name: context.repo.repo,
-              number: context.issue.number,
-            });
-
-            const threads = gqlResult.repository.pullRequest.reviewThreads.nodes;
+            const threads = [];
+            let hasNextPage = true;
+            let afterCursor = null;
+            while (hasNextPage) {
+              const gqlResult = await github.graphql(query, {
+                owner: context.repo.owner,
+                name: context.repo.repo,
+                number: context.issue.number,
+                after: afterCursor,
+              });
+              const reviewThreads = gqlResult.repository.pullRequest.reviewThreads;
+              threads.push(...reviewThreads.nodes);
+              hasNextPage = reviewThreads.pageInfo.hasNextPage;
+              afterCursor = reviewThreads.pageInfo.endCursor;
+            }
 
             // Find unresolved, non-outdated CodeRabbit threads with blocking severity
             const blockingThreads = threads.filter(thread => {
@@ -124,9 +145,10 @@ jobs:
               );
               const mostRecent = labelEvents[labelEvents.length - 1];
 
-              if (mostRecent && mostRecent.actor) {
+              if (mostRecent?.actor) {
                 labelActorName = mostRecent.actor.login;
-                labelAddedByHuman = !isDisallowedActor(labelActorName);
+                // Pass the full actor object so isDisallowedActor can check actor.type
+                labelAddedByHuman = !isDisallowedActor(mostRecent.actor);
               }
             }
 
