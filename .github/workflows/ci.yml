@@ -61,8 +61,10 @@ jobs:
 
       - name: Install actionlint
         run: |
-          curl -sL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint | bash
-          sudo mv ./actionlint /usr/local/bin/ || true
+          gh release download --repo rhysd/actionlint --pattern 'actionlint_*_linux_amd64.tar.gz' -O /tmp/actionlint.tar.gz
+          tar -xzf /tmp/actionlint.tar.gz -C /usr/local/bin actionlint
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: GitHub Actions YAML validation — actionlint (blocking)
         run: npx tsx crux/validate/validate-actions-yaml.ts
