@@ -55,17 +55,19 @@ audits:
 
   - id: scheduled-workflows-running
     category: infrastructure
-    description: "All scheduled GitHub Actions (wellness-check, maintenance, auto-update, server-health-monitor) ran within expected windows"
+    description: "All scheduled GitHub Actions (server-api-health, frontend-data-health, ci-pr-health, maintenance, auto-update, server-health-monitor) ran within expected windows"
     check_type: hybrid
     check_command: |
-      for wf in wellness-check.yml scheduled-maintenance.yml auto-update.yml server-health-monitor.yml; do
+      for wf in server-api-health.yml frontend-data-health.yml ci-pr-health.yml scheduled-maintenance.yml auto-update.yml server-health-monitor.yml; do
         echo "=== $wf ==="
         gh api "repos/quantified-uncertainty/longterm-wiki/actions/workflows/$wf/runs?per_page=3" \
           --jq '.workflow_runs[:3] | .[] | "\(.created_at) \(.conclusion)"' 2>/dev/null || echo "failed to fetch"
       done
     how_to_verify: |
       Review the check_command output. Each workflow should have recent successful runs:
-      - wellness-check: twice daily (within 24h)
+      - server-api-health: twice daily (within 24h)
+      - frontend-data-health: twice daily (within 24h)
+      - ci-pr-health: twice daily (within 24h)
       - scheduled-maintenance: daily on weekdays (within 48h)
       - auto-update: daily (within 48h)
       - server-health-monitor: weekly (within 9 days)

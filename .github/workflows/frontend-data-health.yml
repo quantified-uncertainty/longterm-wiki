@@ -1,0 +1,55 @@
+name: Frontend & Data Health
+
+# Checks public-facing frontend availability and data freshness.
+# Runs twice daily — same schedule as the unified wellness check it replaced.
+#
+# Checks performed:
+#   - Frontend availability (Vercel URL returns content)
+#   - Data freshness (last sync time, recent edits)
+#
+# Issues are created/updated/closed automatically under the "wellness" label.
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # 8 AM UTC daily
+    - cron: "0 20 * * *" # 8 PM UTC daily
+  workflow_dispatch:
+
+concurrency:
+  group: frontend-data-health
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    # Global circuit breaker — skip when automation is paused.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Automation is active"
+
+  check:
+    needs: [preflight]
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Frontend availability
+        run: pnpm crux health check --check=frontend --report --auto-issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WIKI_PUBLIC_URL: ${{ secrets.WIKI_PUBLIC_URL }}
+      - name: Data freshness
+        run: pnpm crux health check --check=freshness --report --auto-issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
