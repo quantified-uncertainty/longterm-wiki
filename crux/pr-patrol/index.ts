@@ -22,7 +22,17 @@ export type PrIssueType =
   | 'ci-failure'
   | 'missing-testplan'
   | 'missing-issue-ref'
-  | 'stale';
+  | 'stale'
+  | 'bot-review-major'
+  | 'bot-review-nitpick';
+
+interface BotComment {
+  path: string;
+  line: number | null;
+  startLine: number | null;
+  body: string;
+  author: string;
+}
 
 interface DetectedPr {
   number: number;
@@ -30,6 +40,7 @@ interface DetectedPr {
   branch: string;
   createdAt: string;
   issues: PrIssueType[];
+  botComments: BotComment[];
 }
 
 interface ScoredPr extends DetectedPr {
@@ -168,10 +179,31 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
             ... on StatusContext { state }
           }}
         }}}}
+        reviewThreads(first: 50) { nodes {
+          isResolved isOutdated path line startLine
+          comments(first: 3) { nodes {
+            author { login }
+            body
+          }}
+        }}
       }
     }
   }
 }`;
+
+interface GqlReviewThread {
+  isResolved: boolean;
+  isOutdated: boolean;
+  path: string;
+  line: number | null;
+  startLine: number | null;
+  comments: {
+    nodes: Array<{
+      author: { login: string } | null;
+      body: string;
+    }>;
+  };
+}
 
 interface GqlPrNode {
   number: number;
@@ -193,13 +225,46 @@ interface GqlPrNode {
       };
     }>;
   };
+  reviewThreads?: { nodes: GqlReviewThread[] };
+}
+
+const KNOWN_BOT_LOGINS = new Set([
+  'coderabbitai',
+  'github-actions',
+  'dependabot',
+  'renovate',
+]);
+
+const ACTIONABLE_SEVERITY_RE = /🔴 Critical|🟠 Major|🟡 Minor|⚠️ Potential issue/;
+
+/** Extract unresolved, non-outdated bot review comments from a PR node. */
+function extractBotComments(pr: GqlPrNode): BotComment[] {
+  const threads = pr.reviewThreads?.nodes ?? [];
+  const comments: BotComment[] = [];
+
+  for (const thread of threads) {
+    if (thread.isResolved || thread.isOutdated) continue;
+    const firstComment = thread.comments.nodes[0];
+    if (!firstComment?.author?.login) continue;
+    if (!KNOWN_BOT_LOGINS.has(firstComment.author.login)) continue;
+
+    comments.push({
+      path: thread.path,
+      line: thread.line,
+      startLine: thread.startLine,
+      body: firstComment.body,
+      author: firstComment.author.login,
+    });
+  }
+
+  return comments;
 }
 
 /** Pure function — detects issues on a single PR node. */
 export function detectIssues(
   pr: GqlPrNode,
   staleThresholdMs: number,
-): PrIssueType[] {
+): { issues: PrIssueType[]; botComments: BotComment[] } {
   const issues: PrIssueType[] = [];
 
   if (pr.mergeable === 'CONFLICTING') issues.push('conflict');
@@ -225,7 +290,14 @@ export function detectIssues(
   const updatedMs = new Date(pr.updatedAt || pr.createdAt).getTime();
   if (updatedMs < staleThresholdMs) issues.push('stale');
 
-  return issues;
+  // Bot review comment detection
+  const botComments = extractBotComments(pr);
+  if (botComments.length > 0) {
+    const hasActionable = botComments.some((c) => ACTIONABLE_SEVERITY_RE.test(c.body));
+    issues.push(hasActionable ? 'bot-review-major' : 'bot-review-nitpick');
+  }
+
+  return { issues, botComments };
 }
 
 async function detectAllPrIssues(config: PatrolConfig): Promise<DetectedPr[]> {
@@ -245,13 +317,17 @@ async function detectAllPrIssues(config: PatrolConfig): Promise<DetectedPr[]> {
       if (labels.includes('claude-working')) return false;
       return true;
     })
-    .map((pr) => ({
-      number: pr.number,
-      title: pr.title,
-      branch: pr.headRefName,
-      createdAt: pr.createdAt,
-      issues: detectIssues(pr, staleThresholdMs),
-    }))
+    .map((pr) => {
+      const { issues, botComments } = detectIssues(pr, staleThresholdMs);
+      return {
+        number: pr.number,
+        title: pr.title,
+        branch: pr.headRefName,
+        createdAt: pr.createdAt,
+        issues,
+        botComments,
+      };
+    })
     .filter((pr) => pr.issues.length > 0);
 }
 
@@ -260,9 +336,11 @@ async function detectAllPrIssues(config: PatrolConfig): Promise<DetectedPr[]> {
 const ISSUE_SCORES: Record<PrIssueType, number> = {
   conflict: 100,
   'ci-failure': 80,
+  'bot-review-major': 55,
   'missing-issue-ref': 40,
   stale: 30,
   'missing-testplan': 20,
+  'bot-review-nitpick': 15,
 };
 
 /** Pure function — computes priority score for a detected PR. */
@@ -341,6 +419,30 @@ ${issues.join(', ')}
 - Search for related issues: gh issue list --search "keywords from PR title" --repo ${repo}
 - If a matching issue exists, add "Closes #N" to the PR body
 - If no matching issue exists, this may be fine — skip this fix`);
+  }
+
+  if (issues.includes('bot-review-major') || issues.includes('bot-review-nitpick')) {
+    const isActionable = issues.includes('bot-review-major');
+    sections.push(`
+### Bot Review Comments${isActionable ? ' (Actionable)' : ' (Nitpick only)'}
+- Automated code review bots (e.g., CodeRabbit) left unresolved comments on this PR
+- Comments marked with 🔴 Critical, 🟠 Major, or 🟡 Minor should be addressed if the concern is valid
+- Comments marked 🧹 Nitpick are optional — fix only if trivial and clearly correct
+- Look for "Prompt for AI Agents" sections in the comments — these contain ready-made fix instructions
+- VERIFY each suggestion against the current code before applying — bots can be wrong
+- After addressing comments, commit and push the fixes`);
+
+    if (pr.botComments.length > 0) {
+      sections.push('\n#### Bot Comment Details\n');
+      for (const c of pr.botComments) {
+        const lineRange = c.startLine && c.startLine !== c.line
+          ? `lines ${c.startLine}-${c.line}`
+          : `line ${c.line}`;
+        // Truncate very long comment bodies to keep prompt manageable
+        const body = c.body.length > 2000 ? c.body.slice(0, 2000) + '\n...(truncated)' : c.body;
+        sections.push(`**${c.path}** (${lineRange}) — ${c.author}:\n${body}\n`);
+      }
+    }
   }
 
   sections.push(`

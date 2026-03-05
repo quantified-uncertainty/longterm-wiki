@@ -19,10 +19,11 @@ For each PR, check:
 |-------|-----------|----------|
 | **Merge conflict** | `mergeable == "CONFLICTING"` | P0 (score: 100) |
 | **CI failure** | `statusCheckRollup` has `FAILURE` conclusion | P1 (score: 80) |
-| **Review changes requested** | `gh pr view N --json reviews` has `CHANGES_REQUESTED` | P1 (score: 70) |
+| **Bot review (major)** | Unresolved Major/Minor/Critical bot comment (CodeRabbit etc.) | P2 (score: 55) |
 | **Missing issue reference** | PR body lacks `Closes #N` / `Fixes #N` | P2 (score: 40) |
 | **Stale** (>48h no update) | `updatedAt` comparison | P3 (score: 30) |
 | **Missing test plan** | PR body lacks `## Test plan` section | P3 (score: 20) |
+| **Bot review (nitpick)** | Unresolved nitpick-only bot comments | P3 (score: 15) |
 
 **Skip PRs with the `claude-working` label** — another session is already on them.
 
@@ -53,10 +54,12 @@ Work through the queue starting with the highest-priority PR:
 3. Fix the issue locally, verify with `pnpm build` / `pnpm test`
 4. Commit and push
 
-### Review changes requested
-1. Read review comments: `gh pr view <N> --comments`
-2. Address each comment with targeted fixes
-3. Commit and push (do NOT dismiss the review)
+### Bot review comments (CodeRabbit etc.)
+1. Bot comment details are included directly in the fix prompt (fetched via GraphQL `reviewThreads`)
+2. For Major/Minor/Critical issues: verify the concern is valid, then fix
+3. For Nitpick issues: fix only if trivial and clearly correct
+4. Look for "Prompt for AI Agents" sections — they contain ready-made fix instructions
+5. Commit and push
 
 ### Missing test plan
 1. Read the PR diff to understand what changed
@@ -89,11 +92,12 @@ After processing, summarize:
 
 ## Daemon mode
 
-For continuous monitoring, use the bash script:
+For continuous monitoring, use the crux command:
 
 ```bash
-./scripts/pr-patrol.sh                    # 5-min interval, continuous
-./scripts/pr-patrol.sh --once             # Single pass
-./scripts/pr-patrol.sh --dry-run          # Preview only
-./scripts/pr-patrol.sh --interval=120     # Custom interval
+pnpm crux pr-patrol run                   # 5-min interval, continuous
+pnpm crux pr-patrol once                  # Single pass
+pnpm crux pr-patrol once --dry-run        # Preview only
+pnpm crux pr-patrol run --interval=120    # Custom interval
+pnpm crux pr-patrol status                # Show recent activity
 ```
