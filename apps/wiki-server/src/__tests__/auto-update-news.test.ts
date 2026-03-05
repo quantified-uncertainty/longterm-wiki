@@ -319,12 +319,10 @@ const dispatch: SqlDispatcher = (query, params) => {
       .filter((r) => r.runId === runId)
       .sort((a, b) => (b.relevanceScore ?? -1) - (a.relevanceScore ?? -1))
       .map((r) => {
-        // Strip routedToPageSlug (synthetic field — not a real SQL column)
-        // then append the COALESCE result so it lands at position 15.
+        // Append the COALESCE result so it lands at position 15 (after the 15 schema columns).
         // D2a COALESCE: routed_to_page_id_old ?? wiki_pages.id (via int lookup)
-        const { routedToPageSlug: _slug, ...rest } = r;
         return {
-          ...newsToSqlRow({ ...r }),
+          ...newsToSqlRow(r),
           _coalesce_result:
             r.routedToPageId ??
             slugFromIntId(r.routedToPageIdInt) ??
