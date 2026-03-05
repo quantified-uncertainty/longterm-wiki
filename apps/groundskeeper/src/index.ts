@@ -4,7 +4,7 @@ import { registerTask, setGroundskeeperAgentId } from "./scheduler.js";
 import { sendDiscordNotification } from "./notify.js";
 import { healthCheck } from "./tasks/health-check.js";
 import { registerAsActiveAgent, sendHeartbeat } from "./wiki-server.js";
-import { issueResponder } from "./tasks/issue-responder.js";
+// import { issueResponder } from "./tasks/issue-responder.js"; // disabled
 import { githubShadowbanCheck } from "./tasks/github-shadowban-check.js";
 import { snapshotRetention } from "./tasks/snapshot-retention.js";
 import { logger } from "./logger.js";
@@ -20,7 +20,7 @@ logger.info({
       schedule: config.tasks.healthCheck.schedule,
     },
     issueResponder: {
-      enabled: config.tasks.issueResponder.enabled,
+      enabled: false, // hard-disabled in code
       schedule: config.tasks.issueResponder.schedule,
     },
     githubShadowbanCheck: {
@@ -45,13 +45,16 @@ registerTask(
   () => healthCheck(config)
 );
 
-registerTask(
-  config,
-  "issue-responder",
-  config.tasks.issueResponder.schedule,
-  config.tasks.issueResponder.enabled,
-  () => issueResponder(config)
-);
+// Issue responder disabled — was broken and repeatedly failing on issues.
+// See: https://github.com/quantified-uncertainty/longterm-wiki/issues/TBD
+// To re-enable, uncomment and fix the underlying issue-responder task.
+// registerTask(
+//   config,
+//   "issue-responder",
+//   config.tasks.issueResponder.schedule,
+//   config.tasks.issueResponder.enabled,
+//   () => issueResponder(config)
+// );
 
 registerTask(
   config,
