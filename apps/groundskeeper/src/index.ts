@@ -7,6 +7,7 @@ import { registerAsActiveAgent, sendHeartbeat } from "./wiki-server.js";
 import { issueResponder } from "./tasks/issue-responder.js";
 import { githubShadowbanCheck } from "./tasks/github-shadowban-check.js";
 import { snapshotRetention } from "./tasks/snapshot-retention.js";
+import { sessionSweep } from "./tasks/session-sweep.js";
 import { logger } from "./logger.js";
 
 const config = loadConfig();
@@ -32,6 +33,10 @@ logger.info({
       enabled: config.tasks.snapshotRetention.enabled,
       schedule: config.tasks.snapshotRetention.schedule,
       keep: config.tasks.snapshotRetention.keep,
+    },
+    sessionSweep: {
+      enabled: config.tasks.sessionSweep.enabled,
+      schedule: config.tasks.sessionSweep.schedule,
     },
   },
 }, "Groundskeeper starting");
@@ -67,6 +72,14 @@ registerTask(
   config.tasks.snapshotRetention.schedule,
   config.tasks.snapshotRetention.enabled,
   () => snapshotRetention(config)
+);
+
+registerTask(
+  config,
+  "session-sweep",
+  config.tasks.sessionSweep.schedule,
+  config.tasks.sessionSweep.enabled,
+  () => sessionSweep(config)
 );
 
 // Register as an active agent (best-effort)

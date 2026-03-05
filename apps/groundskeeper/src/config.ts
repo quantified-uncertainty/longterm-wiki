@@ -27,6 +27,7 @@ export interface Config {
     issueResponder: TaskConfig;
     githubShadowbanCheck: ShadowbanCheckConfig;
     snapshotRetention: SnapshotRetentionConfig;
+    sessionSweep: TaskConfig;
   };
 }
 
@@ -87,6 +88,11 @@ export function loadConfig(): Config {
         schedule:
           process.env["TASK_SNAPSHOT_RETENTION_SCHEDULE"] ?? "0 3 * * *", // daily at 3am UTC
         keep: envInt("TASK_SNAPSHOT_RETENTION_KEEP", 100),
+      },
+      sessionSweep: {
+        enabled: envBool("TASK_SESSION_SWEEP_ENABLED", true),
+        schedule:
+          process.env["TASK_SESSION_SWEEP_SCHEDULE"] ?? "0 */4 * * *", // every 4 hours
       },
     },
   };
