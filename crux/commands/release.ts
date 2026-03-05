@@ -251,8 +251,9 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
   await ensureLabel();
 
   // Check for existing open release PR
+  const [repoOwner] = REPO.split('/');
   const existingPRs = await githubApi<GitHubPR[]>(
-    `/repos/${REPO}/pulls?base=production&head=quantified-uncertainty:main&state=open`
+    `/repos/${REPO}/pulls?base=production&head=${repoOwner}:main&state=open`
   );
 
   if (existingPRs.length > 0) {
