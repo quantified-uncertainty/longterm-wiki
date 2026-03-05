@@ -21,90 +21,6 @@ import {
 } from './coverage-targets.ts';
 
 // ---------------------------------------------------------------------------
-// Reusable gap analysis (imported by improve.ts)
-// ---------------------------------------------------------------------------
-
-export interface GapAnalysis {
-  entityType: string;
-  totalStatements: number;
-  coverageScore: number;
-  gaps: CategoryGap[];
-  categoryCounts: Record<string, number>;
-  allStatements: Array<{
-    id: number;
-    variety: string;
-    statementText: string | null;
-    subjectEntityId: string;
-    propertyId: string | null;
-    [key: string]: unknown;
-  }>;
-  propertyMap: Map<string, { category: string }>;
-}
-
-/**
- * Fetch entity data and compute coverage gaps.
- * Throws if the server is unreachable or statements can't be fetched.
- */
-export async function analyzeGaps(entityId: string, orgType?: string | null): Promise<GapAnalysis> {
-  const serverAvailable = await isServerAvailable();
-  if (!serverAvailable) {
-    throw new Error('Wiki server not available');
-  }
-
-  const [entityResult, stmtResult, propResult] = await Promise.all([
-    getEntity(entityId),
-    getStatementsByEntity(entityId),
-    getProperties(),
-  ]);
-
-  let entityType = 'organization';
-  if (entityResult.ok && entityResult.data.entityType) {
-    entityType = entityResult.data.entityType;
-  }
-
-  const targets = resolveCoverageTargets(entityType, orgType);
-  if (!targets) {
-    throw new Error(`No coverage targets defined for entity type "${entityType}"`);
-  }
-
-  if (!stmtResult.ok) {
-    throw new Error(`Could not fetch statements for ${entityId}`);
-  }
-
-  const propertyMap = new Map<string, { category: string }>();
-  if (propResult.ok) {
-    for (const p of propResult.data.properties) {
-      propertyMap.set(p.id, { category: p.category });
-    }
-  }
-
-  const allStatements = [
-    ...stmtResult.data.structured,
-    ...stmtResult.data.attributed,
-  ];
-
-  const categoryCounts: Record<string, number> = {};
-  for (const stmt of allStatements) {
-    const prop = stmt.propertyId ? propertyMap.get(stmt.propertyId) : null;
-    const category = prop?.category ?? 'uncategorized';
-    categoryCounts[category] = (categoryCounts[category] ?? 0) + 1;
-  }
-
-  const coverageScore = computeCoverageScore(categoryCounts, targets);
-  const gaps = computeGaps(categoryCounts, targets);
-
-  return {
-    entityType,
-    totalStatements: allStatements.length,
-    coverageScore,
-    gaps,
-    categoryCounts,
-    allStatements,
-    propertyMap,
-  };
-}
-
-// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
@@ -122,30 +38,83 @@ async function main() {
     process.exit(1);
   }
 
-  let analysis: GapAnalysis;
-  try {
-    analysis = await analyzeGaps(entityId, orgType);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
+  const serverAvailable = await isServerAvailable();
+  if (!serverAvailable) {
+    console.error(`${c.red}Wiki server not available.${c.reset}`);
+    process.exit(1);
+  }
+
+  // Fetch entity + statements + properties in parallel
+  const [entityResult, stmtResult, propResult] = await Promise.all([
+    getEntity(entityId),
+    getStatementsByEntity(entityId),
+    getProperties(),
+  ]);
+
+  // Resolve entity type
+  let entityType = 'organization'; // default
+  if (entityResult.ok && entityResult.data.entityType) {
+    entityType = entityResult.data.entityType;
+  }
+
+  // Resolve coverage targets
+  const targets = resolveCoverageTargets(entityType, orgType);
+  if (!targets) {
     if (jsonOutput) {
-      console.log(JSON.stringify({ entityId, orgType, error: msg }));
+      console.log(JSON.stringify({
+        entityId,
+        entityType,
+        orgType,
+        error: `No coverage targets defined for entity type "${entityType}"`,
+      }));
     } else {
-      console.error(`${c.red}${msg}${c.reset}`);
+      console.error(`${c.yellow}No coverage targets defined for entity type "${entityType}".${c.reset}`);
+      console.error(`Available types: organization, person, model`);
     }
     process.exit(1);
   }
 
+  if (!stmtResult.ok) {
+    console.error(`${c.red}Could not fetch statements for ${entityId}.${c.reset}`);
+    process.exit(1);
+  }
+
+  // Build property map
+  const propertyMap = new Map<string, { category: string }>();
+  if (propResult.ok) {
+    for (const p of propResult.data.properties) {
+      propertyMap.set(p.id, { category: p.category });
+    }
+  }
+
+  // Count statements per category
+  const allStatements = [
+    ...stmtResult.data.structured,
+    ...stmtResult.data.attributed,
+  ];
+
+  const categoryCounts: Record<string, number> = {};
+  for (const stmt of allStatements) {
+    const prop = stmt.propertyId ? propertyMap.get(stmt.propertyId) : null;
+    const category = prop?.category ?? 'uncategorized';
+    categoryCounts[category] = (categoryCounts[category] ?? 0) + 1;
+  }
+
+  // Compute coverage score and gaps
+  const coverageScore = computeCoverageScore(categoryCounts, targets);
+  const gaps = computeGaps(categoryCounts, targets);
+
   if (jsonOutput) {
     console.log(JSON.stringify({
       entityId,
-      entityType: analysis.entityType,
+      entityType,
       orgType,
-      totalStatements: analysis.totalStatements,
-      coverageScore: analysis.coverageScore,
-      gaps: analysis.gaps,
+      totalStatements: allStatements.length,
+      coverageScore,
+      gaps,
     }, null, 2));
   } else {
-    printGaps(entityId, analysis.entityType, orgType, analysis.totalStatements, analysis.coverageScore, analysis.gaps, c);
+    printGaps(entityId, entityType, orgType, allStatements.length, coverageScore, gaps, c);
   }
 }
 

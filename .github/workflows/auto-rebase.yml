@@ -1,15 +1,13 @@
 name: Auto-Rebase PRs
 
-# When main is updated, rebase all open PRs to surface conflicts early.
-# PRs with no real conflicts get silently rebased; PRs with conflicts
-# are left alone for the conflict-resolver workflow to handle.
+# Rebase all open PRs onto main to surface conflicts early.
+# Logic lives in crux/lib/pr-rebase.ts; this workflow is a thin orchestrator.
 #
-# Safeguards to avoid disrupting active agent work:
+# Safeguards (implemented in TypeScript):
 #   1. Skip PRs with the `claude-working` label (agent actively working)
-#   2. Skip branches with commits pushed in the last 30 minutes
-#   3. Skip branches with recent ci-autofix commits (feedback loop risk)
-#   4. Runs on schedule (every 4 hours) instead of every push to main,
-#      reducing churn when many PRs are open.
+#   2. Skip PRs updated within 30 minutes (active work)
+#   3. Skip branches with commits pushed within 30 minutes (active work)
+#   4. Skip branches where last commit contains [ci-autofix] (feedback loop)
 
 on:
   schedule:
@@ -23,18 +21,16 @@ permissions:
 
 concurrency:
   group: auto-rebase
-  cancel-in-progress: true # newer run supersedes an in-progress rebase
+  cancel-in-progress: true
 
 jobs:
   preflight:
-    # Global circuit breaker — skip when automation is paused.
-    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
     if: vars.AUTOMATION_PAUSED != 'true'
     runs-on: ubuntu-latest
     steps:
       - run: echo "Automation is active"
 
-  rebase-open-prs:
+  rebase:
     needs: [preflight]
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -43,109 +39,12 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Rebase open PRs onto main
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm crux pr rebase-all --verbose
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          NOW=$(date +%s)
-          RECENT_WINDOW=1800  # 30 minutes in seconds
-
-          # List open PR branches targeting main (skip drafts), include labels and updatedAt
-          prs=$(gh pr list --base main --state open \
-            --json number,headRefName,isDraft,labels,updatedAt \
-            --jq '.[] | select(.isDraft == false) | "\(.number) \(.headRefName) \(.updatedAt) \(.labels | map(.name) | join(","))"')
-
-          if [ -z "$prs" ]; then
-            echo "No open PRs to rebase."
-            exit 0
-          fi
-
-          failed=0
-
-          # Use here-string to avoid subshell from pipe (errors propagate correctly)
-          while IFS=' ' read -r pr_number branch updated_at labels; do
-            echo "::group::PR #${pr_number} (${branch})"
-
-            # --- Safeguard 1: skip if claude-working label is present ---
-            if echo "$labels" | grep -q "claude-working"; then
-              echo "Skipping — branch has 'claude-working' label (agent actively working)."
-              echo "::endgroup::"
-              continue
-            fi
-
-            # --- Safeguard 2: skip branches with very recent activity (last 30 min) ---
-            # updatedAt from gh pr list is the PR updated timestamp; also check the
-            # actual branch tip timestamp after fetching.
-            pr_updated_epoch=$(date -d "$updated_at" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$updated_at" +%s 2>/dev/null || echo 0)
-            age=$(( NOW - pr_updated_epoch ))
-            if [ "$age" -lt "$RECENT_WINDOW" ]; then
-              echo "Skipping — PR updated ${age}s ago (within 30-minute window)."
-              echo "::endgroup::"
-              continue
-            fi
-
-            # Validate branch name
-            if ! echo "$branch" | grep -qE '^[a-zA-Z0-9._/-]+$'; then
-              echo "::warning::PR #${pr_number} has invalid branch name — skipping."
-              echo "::endgroup::"
-              continue
-            fi
-
-            if ! git fetch origin "$branch" 2>/dev/null; then
-              echo "::warning::PR #${pr_number} — could not fetch branch ${branch} (may be from a fork)."
-              echo "::endgroup::"
-              continue
-            fi
-
-            # --- Safeguard 3: skip if branch tip was pushed very recently ---
-            branch_tip_time=$(git log -1 --format='%ct' "origin/$branch" 2>/dev/null || echo 0)
-            branch_age=$(( NOW - branch_tip_time ))
-            if [ "$branch_age" -lt "$RECENT_WINDOW" ]; then
-              echo "Skipping — branch tip is ${branch_age}s old (within 30-minute window)."
-              echo "::endgroup::"
-              continue
-            fi
-
-            # --- Safeguard 4: skip if most recent commit is from ci-autofix ---
-            # ci-autofix commits are prefixed "[ci-autofix]" in the subject line (see ci-autofix.yml)
-            last_msg=$(git log -1 --format='%s' "origin/$branch" 2>/dev/null || echo "")
-            if echo "$last_msg" | grep -qi "\[ci-autofix\]"; then
-              echo "Skipping — most recent commit is a ci-autofix commit (feedback-loop risk)."
-              echo "::endgroup::"
-              continue
-            fi
-
-            git checkout --detach origin/main 2>/dev/null
-            git checkout -B "$branch" "origin/$branch"
-
-            if git rebase origin/main; then
-              # Check if rebase actually changed anything
-              if [ "$(git rev-parse HEAD)" != "$(git rev-parse "origin/$branch")" ]; then
-                push_output=""
-                if push_output=$(git push --force-with-lease origin "$branch" 2>&1); then
-                  echo "Rebased and pushed successfully."
-                else
-                  echo "::error::PR #${pr_number} — push failed: ${push_output}"
-                  failed=$((failed + 1))
-                fi
-              else
-                echo "Already up to date."
-              fi
-            else
-              echo "::warning::PR #${pr_number} (${branch}) has merge conflicts — leaving for conflict resolver."
-              git rebase --abort
-            fi
-
-            echo "::endgroup::"
-          done <<< "$prs"
-
-          if [ "$failed" -gt 0 ]; then
-            echo "::error::${failed} PR(s) failed to push — they may need manual attention or will be retried on next run."
-            exit 1
-          fi
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

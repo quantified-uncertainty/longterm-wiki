@@ -1,37 +1,26 @@
 name: Resolve Merge Conflicts
 
-# Runs after auto-rebase completes to resolve PRs that still have
-# actual merge conflicts using the Claude API.
+# Finds all open PRs with merge conflicts and resolves them using a two-tier
+# approach: Tier 1 (Sonnet API) for fast text-level resolution, Tier 2 (Claude
+# Code CLI) for agentic escalation when validation fails.
 #
-# Two-tier resolution:
-#   1. Sonnet API — fast, cheap text-level conflict resolution (~$0.01-0.05/file)
-#   2. Claude Code SDK — agentic escalation that can read errors and iterate
-#
-# Post-resolution safety:
-#   - Per-file syntactic validation in resolve-conflicts.mjs (prose detection,
-#     JSON parse, YAML heuristics, brace balance, content-loss detection)
-#   - Global conflict marker scan across all modified files
-#   - TypeScript compilation check (tsc --noEmit) for TS/TSX changes
-#   - Full validation gate (schema, escaping, build-data, tests)
-#   - Explicit file staging (no git add -A) to prevent unintended commits
+# Orchestration logic lives in crux/lib/conflict-resolution.ts.
+# The Sonnet conflict resolver script (.github/scripts/resolve-conflicts.mjs)
+# handles per-file resolution and is called by the TypeScript orchestrator.
 #
 # Requires: ANTHROPIC_API_KEY secret in the repository.
 
 on:
-  # Automatic triggers (schedule + workflow_run) are disabled to control
-  # Anthropic API spending. Re-enable them only if you want automated
-  # conflict resolution to run. Use workflow_dispatch for on-demand runs.
+  # Automatic triggers are disabled to control Anthropic API spending.
+  # Re-enable schedule or workflow_run if you want automated resolution.
 
-  # Run after auto-rebase finishes (proper sequencing, no sleep hack)
   # workflow_run:
   #   workflows: ["Auto-Rebase PRs"]
   #   types: [completed]
 
-  # Catch any stragglers (e.g. PRs made conflicting by force-pushes)
   # schedule:
-  #   - cron: "0 */6 * * *" # every 6 hours
+  #   - cron: "0 */6 * * *"
 
-  # Allow manual trigger
   workflow_dispatch:
 
 permissions:
@@ -46,501 +35,34 @@ concurrency:
 jobs:
   preflight:
     # Global circuit breaker — skip when automation is paused.
-    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
     if: vars.AUTOMATION_PAUSED != 'true'
     runs-on: ubuntu-latest
     steps:
       - run: echo "Automation is active"
 
-  find-conflicted-prs:
+  resolve:
     needs: [preflight]
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.find.outputs.matrix }}
-      has_conflicts: ${{ steps.find.outputs.has_conflicts }}
-    steps:
-      - name: Find PRs with merge conflicts
-        id: find
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          # GitHub lazily computes mergeable state — newly opened PRs may
-          # show "UNKNOWN" for a few seconds. Retry up to 3 times with a
-          # short delay so we don't miss freshly-conflicted PRs.
-          for attempt in 1 2 3; do
-            all_prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --base main --state open \
-              --json number,headRefName,mergeable,isDraft)
-
-            unknown_count=$(echo "$all_prs" | jq '[.[] | select(.isDraft == false) | select(.mergeable == "UNKNOWN")] | length')
-
-            if [ "$unknown_count" -eq 0 ] || [ "$attempt" -eq 3 ]; then
-              break
-            fi
-
-            echo "Attempt $attempt: $unknown_count PR(s) have UNKNOWN mergeable state — waiting 10s for GitHub to compute..."
-            sleep 10
-          done
-
-          prs=$(echo "$all_prs" | jq -c '[.[] | select(.isDraft == false) | select(.mergeable == "CONFLICTING") | {number: .number, branch: .headRefName}]')
-
-          echo "Conflicted PRs: $prs"
-
-          if [ "$prs" = "[]" ] || [ -z "$prs" ]; then
-            echo "has_conflicts=false" >> "$GITHUB_OUTPUT"
-            echo "matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_conflicts=true" >> "$GITHUB_OUTPUT"
-            echo "matrix={\"include\":$prs}" >> "$GITHUB_OUTPUT"
-          fi
-
-  resolve:
-    needs: find-conflicted-prs
-    if: needs.find-conflicted-prs.outputs.has_conflicts == 'true'
-    runs-on: ubuntu-latest
     timeout-minutes: 45
-    strategy:
-      matrix: ${{ fromJson(needs.find-conflicted-prs.outputs.matrix) }}
-      max-parallel: 1 # Resolve one at a time to avoid push races
-      fail-fast: false
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: pnpm
 
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - run: pnpm install --frozen-lockfile
 
-      # ── Fingerprint check: skip if we already tried this exact SHA combination ──
-      - name: Check if already attempted
-        id: fingerprint
+      - run: npm install -g @anthropic-ai/claude-code@latest
+
+      - name: Resolve conflicted PRs
+        run: pnpm crux pr resolve-conflicts --verbose
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_BRANCH: ${{ matrix.branch }}
-          PR_NUMBER: ${{ matrix.number }}
-        run: |
-          set -euo pipefail
-
-          git fetch origin main
-          git fetch origin "$PR_BRANCH"
-
-          MAIN_SHA=$(git rev-parse origin/main)
-          PR_SHA=$(git rev-parse "origin/$PR_BRANCH")
-          FINGERPRINT="${PR_SHA:0:8}+${MAIN_SHA:0:8}"
-
-          echo "fingerprint=$FINGERPRINT" >> "$GITHUB_OUTPUT"
-          echo "Fingerprint: $FINGERPRINT (PR ${PR_SHA:0:8}, main ${MAIN_SHA:0:8})"
-
-          # Check if there's already a failure comment with this exact fingerprint.
-          # If so, skip — nothing has changed since the last attempt.
-          EXISTING=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" \
-            --jq "[.[] | select(.body | test(\"fingerprint: \`${FINGERPRINT}\`\"))] | length" 2>/dev/null || echo "0")
-
-          if [ "$EXISTING" -gt 0 ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::Skipping PR #$PR_NUMBER — already attempted for fingerprint $FINGERPRINT (same branch+main SHAs). Will retry when either branch is updated."
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      # ── Tier 1: Sonnet API — fast text-level conflict resolution ──
-      - name: "Tier 1: Resolve conflicts with Sonnet (merge + commit, no push)"
-        if: steps.fingerprint.outputs.skip != 'true'
-        id: resolve
-        continue-on-error: true # Don't fail the job — Tier 2 may fix it
-        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          PR_BRANCH: ${{ matrix.branch }}
-          PR_NUMBER: ${{ matrix.number }}
-        run: node .github/scripts/resolve-conflicts.mjs --no-push
-
-      # Capture the set of files touched by the merge commit so we can
-      # restrict what gets staged later (security: prevents `git add -A`
-      # from picking up unrelated modifications).
-      - name: Record merge-affected files
-        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
-        id: merge_files
-        run: |
-          # The resolve script committed the merge — list files in that commit
-          MERGE_FILES=$(git diff --name-only HEAD~1 HEAD)
-          echo "$MERGE_FILES" > /tmp/merge-affected-files.txt
-          echo "Merge-affected files:"
-          cat /tmp/merge-affected-files.txt
-
-      # ── Post-resolution safety checks (before heavy validation) ──
-      - name: "Safety: verify no conflict markers remain in any files"
-        if: steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
-        id: conflict_markers
-        run: |
-          echo "Scanning all modified files for residual conflict markers..."
-          MARKERS_FOUND=false
-
-          # Check all files modified in the merge commit
-          for file in $(git diff --name-only HEAD~1 HEAD 2>/dev/null); do
-            if [ -f "$file" ]; then
-              if grep -nE '^(<<<<<<<|=======|>>>>>>>)' "$file" 2>/dev/null; then
-                echo "::error::Conflict markers found in $file"
-                MARKERS_FOUND=true
-              fi
-            fi
-          done
-
-          # Also check any staged but uncommitted files
-          for file in $(git diff --name-only --cached 2>/dev/null); do
-            if [ -f "$file" ]; then
-              if grep -nE '^(<<<<<<<|=======|>>>>>>>)' "$file" 2>/dev/null; then
-                echo "::error::Conflict markers found in staged file $file"
-                MARKERS_FOUND=true
-              fi
-            fi
-          done
-
-          if [ "$MARKERS_FOUND" = "true" ]; then
-            echo "::error::Residual conflict markers detected — resolution is incomplete."
-            exit 1
-          fi
-
-          echo "No conflict markers found — clean."
-
-      - uses: pnpm/action-setup@v4
-        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
-
-      - name: Install dependencies
-        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
-        run: pnpm install --frozen-lockfile
-
-      - name: "Tier 1: TypeScript compilation check"
-        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
-        id: typecheck
-        continue-on-error: true
-        run: |
-          echo "Running TypeScript compilation check on resolved code..."
-
-          # Check if any TS/TSX files were modified in the merge
-          TS_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -E '\.(ts|tsx)$' || true)
-
-          if [ -z "$TS_FILES" ]; then
-            echo "No TypeScript files changed — skipping tsc."
-            exit 0
-          fi
-
-          echo "TypeScript files changed:"
-          echo "$TS_FILES"
-
-          TSC_FAILED=false
-
-          # Always check apps/web (most TS files live here)
-          echo "Running tsc in apps/web..."
-          cd apps/web
-          TSC_OUTPUT=$(npx tsc --noEmit 2>&1) && TSC_EXIT=0 || TSC_EXIT=$?
-          cd "$GITHUB_WORKSPACE"
-          printf '%s\n' "$TSC_OUTPUT"
-          if [ "$TSC_EXIT" -ne 0 ]; then
-            echo "::error::TypeScript compilation failed in apps/web"
-            TSC_FAILED=true
-          fi
-
-          # Check apps/wiki-server if any files there changed
-          if echo "$TS_FILES" | grep -q '^apps/wiki-server/'; then
-            echo "Running tsc in apps/wiki-server..."
-            cd apps/wiki-server
-            TSC_OUTPUT=$(npx tsc --noEmit 2>&1) && TSC_EXIT=0 || TSC_EXIT=$?
-            cd "$GITHUB_WORKSPACE"
-            printf '%s\n' "$TSC_OUTPUT"
-            if [ "$TSC_EXIT" -ne 0 ]; then
-              echo "::error::TypeScript compilation failed in apps/wiki-server"
-              TSC_FAILED=true
-            fi
-          fi
-
-          # Check crux if any files there changed
-          if echo "$TS_FILES" | grep -q '^crux/'; then
-            echo "Running tsc in crux..."
-            cd crux
-            TSC_OUTPUT=$(npx tsc --noEmit 2>&1) && TSC_EXIT=0 || TSC_EXIT=$?
-            cd "$GITHUB_WORKSPACE"
-            printf '%s\n' "$TSC_OUTPUT"
-            if [ "$TSC_EXIT" -ne 0 ]; then
-              echo "::error::TypeScript compilation failed in crux"
-              TSC_FAILED=true
-            fi
-          fi
-
-          if [ "$TSC_FAILED" = "true" ]; then
-            echo "::error::TypeScript compilation failed after conflict resolution"
-            exit 1
-          fi
-
-          echo "TypeScript compilation passed."
-
-      - name: "Tier 1: Auto-fix escaping and markdown after merge"
-        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
-        run: |
-          echo "Running auto-fix for MDX escaping and markdown formatting..."
-          pnpm crux fix escaping || true
-          pnpm crux fix markdown || true
-
-      - name: "Tier 1: Validate resolved code"
-        if: >-
-          always() &&
-          steps.fingerprint.outputs.skip != 'true' &&
-          steps.resolve.outcome == 'success' &&
-          steps.conflict_markers.outcome != 'failure' &&
-          steps.typecheck.outcome != 'failure'
-        id: validate
-        continue-on-error: true # Don't fail the job — Tier 2 may fix it
-        run: |
-          echo "Running post-resolution validation gate (with auto-fix)..."
-
-          GATE_OUTPUT=$(pnpm crux validate gate --fix 2>&1) && GATE_EXIT=0 || GATE_EXIT=$?
-
-          # Always print to workflow logs (printf avoids echo misinterpreting leading -)
-          printf '%s\n' "$GATE_OUTPUT"
-
-          # Save last 80 lines for diagnostics
-          GATE_TAIL=$(echo "$GATE_OUTPUT" | tail -80)
-          {
-            echo "gate_output<<GATEEOF"
-            echo "$GATE_TAIL"
-            echo "GATEEOF"
-          } >> "$GITHUB_OUTPUT"
-
-          if [ "$GATE_EXIT" -eq 0 ]; then
-            echo "Tier 1 validation passed — safe to push."
-          else
-            echo "::warning::Tier 1 validation failed — will escalate to Tier 2 (Claude Code)."
-            exit 1
-          fi
-
-      # ── Tier 2: Claude Code SDK — agentic escalation ──
-      # Only runs if Tier 1 resolved conflicts (merge committed) but validation
-      # failed. If the resolve script itself failed, the merge was aborted and
-      # there's nothing for Tier 2 to fix — the failure comment handles that.
-      - name: "Tier 2: Install Claude Code CLI"
-        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.validate.outcome == 'failure'
-        run: npm install -g @anthropic-ai/claude-code@latest
-
-      - name: "Tier 2: Snapshot files before agent run"
-        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.validate.outcome == 'failure'
-        run: |
-          # Record all tracked file states before the agent runs so we can
-          # detect exactly what it changed and reject unrelated modifications.
-          git diff --name-only > /tmp/pre-agent-unstaged.txt
-          git diff --name-only --cached > /tmp/pre-agent-staged.txt
-
-      - name: "Tier 2: Agentic fix with Claude Code"
-        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.validate.outcome == 'failure'
-        id: agentic
-        timeout-minutes: 10
-        continue-on-error: true
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GATE_OUTPUT: ${{ steps.validate.outputs.gate_output }}
-        run: |
-          echo "Escalating to Claude Code for agentic conflict resolution..."
-
-          # Build prompt with validation error context
-          PROMPT="$(cat <<PROMPT_EOF
-          The automated conflict resolution system merged main into this PR branch and
-          resolved all git conflict markers using Sonnet, but the post-merge validation
-          failed. Your job is to fix the files so validation passes.
-
-          Validation error output:
-          $GATE_OUTPUT
-
-          Instructions:
-          1. Read the failing files to understand what went wrong
-          2. Fix the issues — common causes after conflict resolution include:
-             - YAML files with inconsistent ID formats (mixing slug IDs with hex-hash IDs)
-             - TypeScript/JS files with type errors from combining incompatible changes
-             - Build-data failures from mismatched entity/fact references between files
-             - MDX files with broken EntityLink references
-             - Numeric ID conflicts: if two entities/pages claim the same numericId, fix by
-               giving one of them a unique ID. IDs are allocated by the wiki server.
-             - Unescaped dollar signs in MDX files (e.g. "$100" should be "\\$100")
-             - Deprecated frontmatter fields (e.g. "importance" should be "readerImportance")
-          3. Run auto-fixers first: pnpm crux fix escaping && pnpm crux fix markdown
-          4. After fixing, verify by running: pnpm crux validate gate --fix
-          5. Only fix what's needed to pass validation — do not make unrelated changes
-          6. Stage your changes with git add but do NOT commit or push
-          PROMPT_EOF
-          )"
-
-          claude -p "$PROMPT" \
-            --model sonnet \
-            --max-turns 10 \
-            --dangerously-skip-permissions \
-            --verbose
-
-      - name: "Tier 2: Restrict agent changes to merge-affected files"
-        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.validate.outcome == 'failure' && steps.agentic.outcome == 'success'
-        run: |
-          # Security: the agent runs with --dangerously-skip-permissions and could
-          # modify anything. Only allow changes to files from the original merge.
-          ALLOWED_FILES=/tmp/merge-affected-files.txt
-
-          # Find every file the agent touched (new unstaged + new staged, minus pre-agent state)
-          git diff --name-only > /tmp/post-agent-unstaged.txt
-          git diff --name-only --cached > /tmp/post-agent-staged.txt
-          sort -u /tmp/post-agent-unstaged.txt /tmp/post-agent-staged.txt > /tmp/post-agent-all.txt
-          sort -u /tmp/pre-agent-unstaged.txt /tmp/pre-agent-staged.txt > /tmp/pre-agent-all.txt
-          comm -23 /tmp/post-agent-all.txt /tmp/pre-agent-all.txt > /tmp/agent-touched.txt
-
-          # Unstage and revert any file the agent modified that is NOT in the merge set
-          DISALLOWED=""
-          while IFS= read -r file; do
-            if [ -n "$file" ] && ! grep -qxF "$file" "$ALLOWED_FILES" 2>/dev/null; then
-              DISALLOWED="$DISALLOWED $file"
-              echo "::warning::Reverting unauthorized agent change: $file"
-              # For files that exist in HEAD, restore them to their original state
-              if git checkout HEAD -- "$file" 2>/dev/null; then
-                : # successfully reverted
-              else
-                # File is newly created (not in HEAD) — unstage and remove it
-                git reset HEAD -- "$file" 2>/dev/null || true
-                git clean -f -- "$file" 2>/dev/null || true
-              fi
-            fi
-          done < /tmp/agent-touched.txt
-
-          if [ -n "$DISALLOWED" ]; then
-            echo "Reverted unauthorized changes to:$DISALLOWED"
-          else
-            echo "All agent changes are within the merge-affected file set."
-          fi
-
-      - name: "Tier 2: Validate after agentic fix"
-        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.validate.outcome == 'failure' && steps.agentic.outcome == 'success'
-        id: revalidate
-        run: |
-          echo "Running validation after Claude Code fix..."
-
-          GATE_OUTPUT=$(pnpm crux validate gate --fix 2>&1) && GATE_EXIT=0 || GATE_EXIT=$?
-
-          printf '%s\n' "$GATE_OUTPUT"
-
-          GATE_TAIL=$(echo "$GATE_OUTPUT" | tail -80)
-          {
-            echo "gate_output<<GATEEOF"
-            echo "$GATE_TAIL"
-            echo "GATEEOF"
-          } >> "$GITHUB_OUTPUT"
-
-          if [ "$GATE_EXIT" -eq 0 ]; then
-            echo "Tier 2 validation passed — safe to push."
-          else
-            echo "::error::Tier 2 validation also failed — manual resolution needed."
-            exit 1
-          fi
-
-      # ── Commit, push, and comment (runs after whichever tier succeeded) ──
-      - name: Commit auto-fix changes (if any)
-        if: >-
-          always() &&
-          steps.fingerprint.outputs.skip != 'true' &&
-          (steps.validate.outcome == 'success' || steps.revalidate.outcome == 'success')
-        run: |
-          if ! git diff --quiet || ! git diff --cached --quiet; then
-            echo "Auto-fix produced changes — committing fixes..."
-            # Security: stage only files that were part of the original merge,
-            # not everything in the working tree (avoids committing unrelated files).
-            ALLOWED_FILES=/tmp/merge-affected-files.txt
-            git diff --name-only | while IFS= read -r file; do
-              if grep -qxF "$file" "$ALLOWED_FILES" 2>/dev/null; then
-                git add -- "$file"
-              else
-                echo "::warning::Skipping unexpected modified file: $file"
-              fi
-            done
-            # Also re-stage any already-staged files (from agent or fixers)
-            STAGED_FILES=$(git diff --name-only --cached)
-            if [ -n "$STAGED_FILES" ] || [ -n "$(git diff --cached --quiet 2>&1 || echo 'has staged')" ]; then
-              TIER="${{ steps.validate.outcome == 'success' && 'Sonnet' || 'Claude Code' }}"
-              git commit -m "Auto-fix after conflict resolution ($TIER)" || echo "Nothing to commit."
-            fi
-          else
-            echo "No auto-fix changes — merge commit is clean."
-          fi
-
-      - name: Push resolved merge
-        if: >-
-          always() &&
-          steps.fingerprint.outputs.skip != 'true' &&
-          (steps.validate.outcome == 'success' || steps.revalidate.outcome == 'success')
-        env:
-          PR_BRANCH: ${{ matrix.branch }}
-        run: |
-          for attempt in 1 2 3; do
-            if git push origin "$PR_BRANCH"; then
-              echo "Pushed successfully."
-              exit 0
-            fi
-            echo "Push attempt $attempt failed — retrying in $((attempt * 2))s..."
-            sleep $((attempt * 2))
-          done
-          echo "::error::Push failed after 3 attempts"
-          exit 1
-
-      - name: Post success comment
-        if: >-
-          always() &&
-          steps.fingerprint.outputs.skip != 'true' &&
-          (steps.validate.outcome == 'success' || steps.revalidate.outcome == 'success')
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TIER: ${{ steps.validate.outcome == 'success' && 'Tier 1 (Sonnet)' || 'Tier 2 (Claude Code)' }}
-        run: |
-          gh pr comment "${{ matrix.number }}" --repo "$GITHUB_REPOSITORY" \
-            --body "Merge conflicts with \`main\` were automatically resolved by the conflict resolver ($TIER). Please review the merge commit to ensure correctness."
-
-      - name: Post failure comment
-        if: >-
-          always() &&
-          steps.fingerprint.outputs.skip != 'true' &&
-          (steps.resolve.outcome == 'failure' || steps.validate.outcome == 'failure') &&
-          steps.revalidate.outcome != 'success'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DIAG: ${{ steps.resolve.outputs.diagnostic_summary }}
-          RESOLVE_OUTCOME: ${{ steps.resolve.outcome }}
-          GATE_OUTPUT_T1: ${{ steps.validate.outputs.gate_output }}
-          GATE_OUTPUT_T2: ${{ steps.revalidate.outputs.gate_output }}
-          FINGERPRINT: ${{ steps.fingerprint.outputs.fingerprint }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          PR_NUMBER: ${{ matrix.number }}
-          AGENTIC_OUTCOME: ${{ steps.agentic.outcome }}
-        run: |
-          if [ "$RESOLVE_OUTCOME" = "failure" ]; then
-            BODY="Automatic conflict resolution failed for this PR. The Sonnet conflict resolver could not merge the files."
-          else
-            BODY="Automatic conflict resolution failed for this PR (both Tier 1 Sonnet and Tier 2 Claude Code)."
-          fi
-          BODY="$BODY Manual resolution is needed."
-
-          if [ -n "$DIAG" ]; then
-            BODY="$(printf '%s\n\n**Resolution diagnostics:**\n%s' "$BODY" "$DIAG")"
-          fi
-
-          # Show Tier 1 validation output
-          if [ -n "$GATE_OUTPUT_T1" ]; then
-            BODY="$(printf '%s\n\n<details>\n<summary>Tier 1 (Sonnet) validation output</summary>\n\n```\n%s\n```\n\n</details>' "$BODY" "$GATE_OUTPUT_T1")"
-          fi
-
-          # Show Tier 2 info
-          if [ "$AGENTIC_OUTCOME" = "success" ] && [ -n "$GATE_OUTPUT_T2" ]; then
-            BODY="$(printf '%s\n\n<details>\n<summary>Tier 2 (Claude Code) validation output</summary>\n\n```\n%s\n```\n\n</details>' "$BODY" "$GATE_OUTPUT_T2")"
-          elif [ "$AGENTIC_OUTCOME" = "failure" ]; then
-            BODY="$(printf '%s\n\n**Tier 2 (Claude Code):** Agent failed to produce a fix.' "$BODY")"
-          fi
-
-          BODY="$(printf '%s\n\n[View workflow logs](%s)\n\n<!-- fingerprint: `%s` -->' "$BODY" "$RUN_URL" "$FINGERPRINT")"
-
-          gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "$BODY"

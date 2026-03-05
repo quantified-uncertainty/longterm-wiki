@@ -14,7 +14,7 @@ const SCRIPTS = {
   check: {
     script: 'health/health-check.ts',
     description: 'Run all wellness checks',
-    passthrough: ['ci', 'json', 'check'],
+    passthrough: ['ci', 'json', 'check', 'report', 'auto-issue', 'cleanup-labels'],
   },
 };
 
@@ -29,23 +29,31 @@ Commands:
 
 Options:
   --check=<name>  Run only a specific check:
-                    server    Server & DB health
-                    api       API smoke tests
-                    actions   GitHub Actions workflow health
-                    frontend  Public frontend availability
-                    freshness Data freshness
+                    server       Server & DB health
+                    api          API smoke tests
+                    actions      GitHub Actions workflow health
+                    frontend     Public frontend availability
+                    freshness    Data freshness
+                    job-queue    Job queue health
+                    pr-quality   PR & issue quality
   --json          JSON output (all results as structured data)
+  --report        Aggregate markdown report to stdout
+  --auto-issue    Manage GitHub wellness issue (create/update/close)
+  --cleanup-labels Auto-remove stale claude-working labels (>8 hours)
 
 Environment:
   LONGTERMWIKI_SERVER_URL        Wiki-server URL (required for most checks)
   LONGTERMWIKI_SERVER_API_KEY    API key for authenticated endpoints
-  GITHUB_TOKEN                   GitHub token (required for actions check)
+  GITHUB_TOKEN                   GitHub token (required for actions, pr-quality checks)
   WIKI_PUBLIC_URL                Public wiki URL (optional, enables frontend check)
 
 Examples:
   crux health                    Run all wellness checks
   crux health --check=server     Check server & DB only
   crux health --check=actions    Check GitHub Actions workflows only
+  crux health --check=job-queue  Check job queue health
   crux health --json             JSON output for scripting
+  crux health --report           Full markdown report
+  crux health --report --auto-issue --cleanup-labels   CI mode (full report + issue management)
 `;
 }
