@@ -9,6 +9,7 @@ import { execSync } from 'child_process';
 import { mkdirSync, writeFileSync, rmSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
+import { onlyMergeCommitsSince } from './validate-review-marker.ts';
 
 const REPO_ROOT = `${__dirname}/../..`;
 
@@ -65,9 +66,6 @@ function createTempRepo(): string {
 // ---------------------------------------------------------------------------
 
 describe('onlyMergeCommitsSince', () => {
-  // We test the logic indirectly by verifying that the git commands used
-  // by the function produce the expected results in controlled scenarios.
-
   let tmpDir: string;
 
   beforeAll(() => {
@@ -78,15 +76,15 @@ describe('onlyMergeCommitsSince', () => {
     rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('returns true when markerSha equals headSha', () => {
-    // The logic `if (markerSha === headSha) return true` is early-exit.
-    // Verify we get the same SHA back from the single commit.
+  it('returns true when markerSha equals headSha (same-SHA early-exit)', () => {
+    // Verify the early-exit path: when marker and HEAD are the same commit,
+    // no new commits exist, so the review is still valid.
     const sha = makeCommit(tmpDir, 'a.txt', 'hello');
-    expect(sha).toBe(sha); // trivially true — guards the early-exit path
+    expect(onlyMergeCommitsSince(sha, sha, tmpDir)).toBe(true);
   });
 
   it('returns true when all intervening commits are merge commits', () => {
-    // Set up: main → feature branch with one commit → merge back to feature
+    // Set up: main → feature branch with one commit → merge main back into feature
     // Simulates: developer reviews at SHA A, then merges main into branch
     // (producing a merge commit M). Only M is between A and HEAD.
     makeCommit(tmpDir, 'base.txt', 'base');
@@ -104,22 +102,8 @@ describe('onlyMergeCommitsSince', () => {
     gitExec(tmpDir, 'merge main --no-edit -m "Merge main into feature"');
     const headAfterMerge = gitExec(tmpDir, 'rev-parse HEAD');
 
-    // Verify using --first-parent (the same flag used by onlyMergeCommitsSince):
-    // only the merge commit itself appears on the feature branch lineage, not
-    // the upstream commit that was merged in.
-    const allFirstParent = execSync(
-      `git log --first-parent --format=%H ${reviewedSha}..${headAfterMerge}`,
-      { cwd: tmpDir, encoding: 'utf-8' }
-    ).trim().split('\n').filter(Boolean);
-
-    const mergeFirstParent = execSync(
-      `git log --first-parent --merges --format=%H ${reviewedSha}..${headAfterMerge}`,
-      { cwd: tmpDir, encoding: 'utf-8' }
-    ).trim().split('\n').filter(Boolean);
-
-    expect(allFirstParent.length).toBeGreaterThan(0);
-    // All first-parent commits should be merge commits
-    expect(allFirstParent.length).toBe(mergeFirstParent.length);
+    // The function should return true: only a merge commit was added since review
+    expect(onlyMergeCommitsSince(reviewedSha, headAfterMerge, tmpDir)).toBe(true);
 
     // Clean up branch for next test
     gitExec(tmpDir, 'checkout main');
@@ -132,20 +116,7 @@ describe('onlyMergeCommitsSince', () => {
     const reviewedSha = makeCommit(tmpDir, 'reviewed-base.txt', 'reviewed state');
     const newCodeSha = makeCommit(tmpDir, 'new-code.txt', 'new code after review');
 
-    const allFirstParent = execSync(
-      `git log --first-parent --format=%H ${reviewedSha}..${newCodeSha}`,
-      { cwd: tmpDir, encoding: 'utf-8' }
-    ).trim().split('\n').filter(Boolean);
-
-    const mergeFirstParent = execSync(
-      `git log --first-parent --merges --format=%H ${reviewedSha}..${newCodeSha}`,
-      { cwd: tmpDir, encoding: 'utf-8' }
-    ).trim().split('\n').filter(Boolean);
-
-    // There should be 1 non-merge first-parent commit (newCodeSha itself)
-    expect(allFirstParent.length).toBe(1);
-    expect(mergeFirstParent.length).toBe(0);
-    expect(allFirstParent.length).not.toBe(mergeFirstParent.length);
+    expect(onlyMergeCommitsSince(reviewedSha, newCodeSha, tmpDir)).toBe(false);
   });
 
   it('returns false when merge commit follows a non-merge commit after review', () => {
@@ -165,22 +136,29 @@ describe('onlyMergeCommitsSince', () => {
     gitExec(tmpDir, 'merge main --no-edit -m "Merge main into feature2"');
     const headAfterMerge = gitExec(tmpDir, 'rev-parse HEAD');
 
-    const allFirstParent = execSync(
-      `git log --first-parent --format=%H ${reviewedSha}..${headAfterMerge}`,
-      { cwd: tmpDir, encoding: 'utf-8' }
-    ).trim().split('\n').filter(Boolean);
-
-    const mergeFirstParent = execSync(
-      `git log --first-parent --merges --format=%H ${reviewedSha}..${headAfterMerge}`,
-      { cwd: tmpDir, encoding: 'utf-8' }
-    ).trim().split('\n').filter(Boolean);
-
-    // Should have at least 1 non-merge first-parent commit (the code change)
-    expect(allFirstParent.length).toBeGreaterThan(mergeFirstParent.length);
+    // Should return false: a non-merge commit (unreviewed code) was added
+    expect(onlyMergeCommitsSince(reviewedSha, headAfterMerge, tmpDir)).toBe(false);
 
     // Cleanup
     gitExec(tmpDir, 'checkout main');
     gitExec(tmpDir, 'branch -D feature2');
+  });
+
+  it('returns false when markerSha is not an ancestor of headSha', () => {
+    // Simulates a rebase/force-push where the marker SHA no longer exists
+    // in the history of HEAD — should be treated as invalid.
+    const sha1 = makeCommit(tmpDir, 'orphan1.txt', 'first commit');
+    // Create a divergent branch to get a non-ancestor SHA
+    gitExec(tmpDir, 'checkout -b orphan-branch');
+    const orphanSha = makeCommit(tmpDir, 'orphan2.txt', 'divergent commit');
+    gitExec(tmpDir, 'checkout main');
+    const mainHeadSha = makeCommit(tmpDir, 'mainonly.txt', 'main commit');
+    gitExec(tmpDir, 'branch -D orphan-branch');
+
+    // orphanSha is not an ancestor of mainHeadSha → should return false
+    expect(onlyMergeCommitsSince(orphanSha, mainHeadSha, tmpDir)).toBe(false);
+
+    void sha1; // used to set up repo state
   });
 });
 

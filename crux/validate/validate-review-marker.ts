@@ -91,14 +91,16 @@ function getHeadSha(): string {
  *   - markerSha is not an ancestor of headSha (rebase / force-push situation)
  *   - Any first-parent commit in the range is a non-merge commit (new code)
  *   - git commands fail for any reason (fail-closed)
+ *
+ * @param cwd - directory to run git commands in; defaults to PROJECT_ROOT
  */
-export function onlyMergeCommitsSince(markerSha: string, headSha: string): boolean {
+export function onlyMergeCommitsSince(markerSha: string, headSha: string, cwd: string = PROJECT_ROOT): boolean {
   if (markerSha === headSha) return true;
   try {
     // Verify that markerSha is an ancestor of headSha — if not, something
     // unusual happened (rebase, force-push) and we should require re-review.
     execSync(`git merge-base --is-ancestor ${markerSha} ${headSha}`, {
-      cwd: PROJECT_ROOT,
+      cwd,
       encoding: 'utf-8',
     });
   } catch {
@@ -111,7 +113,7 @@ export function onlyMergeCommitsSince(markerSha: string, headSha: string): boole
     // commits that were brought in transitively from the merged branch.
     const allFirstParent = execSync(
       `git log --first-parent --format=%H ${markerSha}..${headSha}`,
-      { cwd: PROJECT_ROOT, encoding: 'utf-8' }
+      { cwd, encoding: 'utf-8' }
     )
       .trim()
       .split('\n')
@@ -122,7 +124,7 @@ export function onlyMergeCommitsSince(markerSha: string, headSha: string): boole
     // Among those first-parent commits, count the merge commits.
     const mergeFirstParent = execSync(
       `git log --first-parent --merges --format=%H ${markerSha}..${headSha}`,
-      { cwd: PROJECT_ROOT, encoding: 'utf-8' }
+      { cwd, encoding: 'utf-8' }
     )
       .trim()
       .split('\n')
