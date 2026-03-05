@@ -6,7 +6,7 @@
  *   crux agent-session-events list [--agent=ID] [--limit=50]             Show event timeline
  */
 
-import type { CommandResult } from '../lib/cli.ts';
+import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { createLogger } from '../lib/output.ts';
 import {
   appendEvent,
@@ -17,13 +17,12 @@ import { listActiveAgents } from '../lib/wiki-server/active-agents.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { execSync } from 'child_process';
 
-interface CommandOptions {
+interface CommandOptions extends BaseOptions {
   type?: string;
   agent?: string;
   limit?: string;
   json?: boolean;
   ci?: boolean;
-  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------

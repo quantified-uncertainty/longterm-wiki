@@ -19,7 +19,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
 import { parse as parseYaml } from 'yaml';
-import type { CommandResult } from '../lib/cli.ts';
+import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -57,7 +57,7 @@ interface AuditsFile {
   post_merge: PostMergeItem[];
 }
 
-interface CommandOptions {
+interface CommandOptions extends BaseOptions {
   pending?: boolean;
   category?: string;
   json?: boolean;
@@ -66,7 +66,6 @@ interface CommandOptions {
   fail?: boolean;
   notes?: string;
   status?: string;
-  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------

@@ -11,14 +11,16 @@
  */
 
 import { buildHeaders, type ApiKeyScope } from "../lib/wiki-server/client.ts";
+import {
+  WIKI_SERVER_BATCH_TIMEOUT_MS as BATCH_TIMEOUT_MS,
+  WIKI_SERVER_HEALTH_CHECK_TIMEOUT_MS as HEALTH_CHECK_TIMEOUT_MS,
+  WIKI_SERVER_HEALTH_CHECK_DELAY_MS as HEALTH_CHECK_DELAY_MS,
+} from "../lib/config.ts";
 
 // --- Configuration ---
 const HEALTH_CHECK_RETRIES = 5;
-const HEALTH_CHECK_DELAY_MS = 10_000;
-const HEALTH_CHECK_TIMEOUT_MS = 5_000;
 const BATCH_RETRY_ATTEMPTS = 3;
 const BATCH_RETRY_BASE_DELAY_MS = 2_000;
-const BATCH_TIMEOUT_MS = 30_000;
 export const MAX_CONSECUTIVE_FAILURES = 3;
 
 // --- Types ---

@@ -10,7 +10,7 @@
  *   crux agents sweep [--timeout=30]                             Mark stale agents
  */
 
-import type { CommandResult } from '../lib/cli.ts';
+import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { createLogger } from '../lib/output.ts';
 import {
   registerAgent,
@@ -24,7 +24,7 @@ import {
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { sweepStaleSessions } from '../lib/wiki-server/agent-sessions.ts';
 
-interface CommandOptions {
+interface CommandOptions extends BaseOptions {
   task?: string;
   branch?: string;
   issue?: string;
@@ -38,7 +38,6 @@ interface CommandOptions {
   limit?: string;
   json?: boolean;
   ci?: boolean;
-  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------

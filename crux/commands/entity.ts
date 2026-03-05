@@ -8,15 +8,14 @@
  *   crux entity rename <old-id> <new-id> --apply   # Apply rename
  */
 
-import type { CommandResult } from '../lib/cli.ts';
+import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { runRename } from '../entity/entity-rename.ts';
 
-interface CommandOptions {
+interface CommandOptions extends BaseOptions {
   apply?: boolean;
   verbose?: boolean;
   dryRun?: boolean;
   ci?: boolean;
-  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------

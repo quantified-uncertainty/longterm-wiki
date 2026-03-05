@@ -23,7 +23,7 @@ import {
   type SessionType,
   type ChecklistMetadata,
 } from '../lib/session/session-checklist.ts';
-import type { CommandResult } from '../lib/cli.ts';
+import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { upsertAgentSession, updateAgentSession, getAgentSessionByBranch } from '../lib/wiki-server/agent-sessions.ts';
 import { registerAgent, listActiveAgents } from '../lib/wiki-server/active-agents.ts';
 
@@ -38,12 +38,11 @@ const VALID_TYPES: SessionType[] = ['content', 'infrastructure', 'bugfix', 'refa
 // Types
 // ---------------------------------------------------------------------------
 
-interface CommandOptions {
+interface CommandOptions extends BaseOptions {
   ci?: boolean;
   type?: string;
   issue?: string;
   reason?: string;
-  [key: string]: unknown;
 }
 
 interface GitHubIssueResponse {

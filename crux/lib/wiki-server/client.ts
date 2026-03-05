@@ -13,8 +13,11 @@
 // Configuration
 // ---------------------------------------------------------------------------
 
-const TIMEOUT_MS = 5_000;
-export const BATCH_TIMEOUT_MS = 30_000;
+import {
+  WIKI_SERVER_TIMEOUT_MS as TIMEOUT_MS,
+  WIKI_SERVER_BATCH_TIMEOUT_MS as BATCH_TIMEOUT_MS,
+} from '../config.ts';
+export { BATCH_TIMEOUT_MS };
 
 /** API key scope — determines which env var to prefer for authentication. */
 export type ApiKeyScope = 'project' | 'content';
