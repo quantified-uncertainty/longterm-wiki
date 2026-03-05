@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function StatementQualityPage() {
-  redirect("/wiki/E1007");
+  redirect("/wiki/E1008");
 }

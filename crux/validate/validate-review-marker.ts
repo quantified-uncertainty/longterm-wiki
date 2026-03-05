@@ -20,6 +20,7 @@
  */
 
 import { readFileSync } from 'fs';
+import { createHash } from 'crypto';
 import { execSync } from 'child_process';
 import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
@@ -114,6 +115,28 @@ function readMarker(): { found: boolean; sha: string; timestamp: string } {
     return { found: true, sha: '', timestamp: '' };
   } catch {
     return { found: false, sha: '', timestamp: '' };
+  }
+}
+
+/**
+ * Compute a 12-character hex hash of the current diff against main.
+ * Returns '' if the diff cannot be computed or is empty.
+ */
+export function computeDiffHash(): string {
+  try {
+    const base = execSync(
+      'git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null',
+      { cwd: PROJECT_ROOT, encoding: 'utf-8' }
+    ).trim();
+    if (!base) return '';
+    const diff = execSync(`git diff ${base}...HEAD`, {
+      cwd: PROJECT_ROOT,
+      encoding: 'utf-8',
+    });
+    if (!diff) return '';
+    return createHash('sha256').update(diff).digest('hex').slice(0, 12);
+  } catch {
+    return '';
   }
 }
 
