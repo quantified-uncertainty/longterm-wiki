@@ -316,6 +316,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Consistency Audit (Feb 2026)", href: internalHref("website-consistency-audit-2026-02") },
         { label: "Importance Ranking", href: internalHref("importance-ranking") },
         { label: "Page Length Research", href: internalHref("page-length-research") },
+        { label: "Statements Review", href: internalHref("statements-review") },
       ],
     },
     {
