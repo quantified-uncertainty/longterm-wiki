@@ -259,6 +259,10 @@ export const CreateSessionSchema = z.object({
   model: z.string().max(100).nullable().optional(),
   duration: z.string().max(100).nullable().optional(),
   cost: z.string().max(100).nullable().optional(),
+  /** Numeric cost in integer cents, auto-parsed from `cost` string if not provided. Enables aggregation and alerting. */
+  costCents: z.number().int().min(0).nullable().optional(),
+  /** Numeric duration in minutes (float), auto-parsed from `duration` string if not provided. Enables aggregation. */
+  durationMinutes: z.number().min(0).nullable().optional(),
   prUrl: z.string().max(1000).nullable().optional(),
   checksYaml: z.string().max(10000).nullable().optional(),
   issuesJson: z.unknown().nullable().optional(),

@@ -248,6 +248,8 @@ export const sessions = pgTable(
     model: text("model"),
     duration: text("duration"),
     cost: text("cost"),
+    costCents: integer("cost_cents"),
+    durationMinutes: real("duration_minutes"),
     prUrl: text("pr_url"),
     checksYaml: text("checks_yaml"),
     issuesJson: jsonb("issues_json"),
