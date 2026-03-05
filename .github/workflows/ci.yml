@@ -246,4 +246,5 @@ jobs:
   # Deploy job removed — production deploys are now handled by the scheduled
   # deploy hook (scheduled-deploy.yml, every hour) instead of per-push.
   # This caps Vercel build minutes at 24/day max vs 50-80/day previously.
-  # See vercel.json ignoreCommand which also blocks Git-triggered main builds.
+  # vercel.json sets github.enabled=false to prevent Vercel from posting
+  # PR failure statuses (deploy hooks bypass the GitHub integration).
