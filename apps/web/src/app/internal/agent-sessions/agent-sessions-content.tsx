@@ -25,6 +25,8 @@ export interface AgentSessionRow {
   prUrl: string | null;
   model: string | null;
   cost: string | null;
+  costCents: number | null;
+  durationMinutes: number | null;
   title: string | null;
 }
 
@@ -73,6 +75,8 @@ async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
       fixesPrUrl: s.fixesPrUrl ?? null,
       model: log?.model ?? null,
       cost: log?.cost ?? null,
+      costCents: log?.costCents ?? null,
+      durationMinutes: log?.durationMinutes ?? null,
       title: log?.title ?? null,
     };
   });
@@ -98,6 +102,9 @@ export async function AgentSessionsContent() {
   const withPr = sessions.filter((s) => s.prUrl).length;
   const fixSessions = sessions.filter((s) => s.fixesPrUrl).length;
   const fixRate = completedSessions > 0 ? Math.round((fixSessions / completedSessions) * 100) : 0;
+  const totalCostCents = sessions.reduce((sum, s) => sum + (s.costCents ?? 0), 0);
+  const sessionsWithCost = sessions.filter((s) => s.costCents != null).length;
+  const totalCostDollars = (totalCostCents / 100).toFixed(2);
 
   return (
     <>
@@ -112,6 +119,9 @@ export async function AgentSessionsContent() {
             <span className="text-emerald-600 font-medium">{completedSessions} completed</span>
             {withPr > 0 && (
               <span className="text-muted-foreground">, {withPr} with PR</span>
+            )}
+            {sessionsWithCost > 0 && (
+              <span className="text-muted-foreground">, total cost: ${totalCostDollars} ({sessionsWithCost} sessions with cost data)</span>
             )}
             .
           </>
