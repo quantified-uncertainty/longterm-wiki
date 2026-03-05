@@ -11,6 +11,7 @@
  *   crux health --check=server       Server & DB only
  *   crux health --check=api          API smoke tests only
  *   crux health --check=actions      GitHub Actions workflow health
+ *   crux health --check=ci-main      CI runs on main branch (0 runs in 24h = alert)
  *   crux health --check=frontend     Public frontend availability
  *   crux health --check=freshness    Data freshness
  *   crux health --check=job-queue    Job queue health
@@ -25,6 +26,7 @@ import { getColors } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { checkJobQueue } from './checks/job-queue.ts';
 import { checkPrQuality } from './checks/pr-quality.ts';
+import { checkCiMainHealth } from './checks/ci-main-health.ts';
 import { buildWellnessReport, manageWellnessIssue } from './wellness-report.ts';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -443,6 +445,7 @@ const ALL_CHECKS: Record<string, () => Promise<CheckResult>> = {
   server: checkServer,
   api: checkApi,
   actions: checkActions,
+  'ci-main': checkCiMainHealth,
   frontend: checkFrontend,
   freshness: checkFreshness,
   'job-queue': checkJobQueue,
@@ -465,7 +468,7 @@ async function main(): Promise<void> {
   } else {
     // Run all checks. Independent checks run in parallel; API smoke tests
     // depend on server health so they run after.
-    const independentChecks = ['server', 'actions', 'frontend', 'freshness', 'job-queue', 'pr-quality'] as const;
+    const independentChecks = ['server', 'actions', 'ci-main', 'frontend', 'freshness', 'job-queue', 'pr-quality'] as const;
 
     if (!JSON_MODE && !REPORT_MODE) {
       console.log('  Running independent checks in parallel...');

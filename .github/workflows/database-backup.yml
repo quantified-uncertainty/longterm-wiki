@@ -1,4 +1,5 @@
 name: Database Backup
+run-name: "Database Backup${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 on:
   workflow_call:
@@ -19,6 +20,9 @@ on:
   workflow_dispatch:
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   backup:
     # Global circuit breaker — skip when automation is paused.
     # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.

@@ -27,6 +27,7 @@ export interface Config {
     issueResponder: TaskConfig;
     githubShadowbanCheck: ShadowbanCheckConfig;
     snapshotRetention: SnapshotRetentionConfig;
+    sessionSweep: TaskConfig;
   };
 }
 
@@ -80,13 +81,26 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_GITHUB_SHADOWBAN_CHECK_ENABLED", true),
         schedule:
           process.env["TASK_GITHUB_SHADOWBAN_CHECK_SCHEDULE"] ?? "0 9 * * *",
-        usernames: ["quri-bot"],
+        // Default to empty — no dedicated bot account exists for this project.
+        // Populate TASK_GITHUB_SHADOWBAN_CHECK_USERNAMES (comma-separated) if
+        // a custom GitHub automation account is created and needs monitoring.
+        // Previously hardcoded "quri-bot" which does not exist on GitHub,
+        // causing every run to return 404 -> "banned" -> success: false.
+        usernames: (process.env["TASK_GITHUB_SHADOWBAN_CHECK_USERNAMES"] ?? "")
+          .split(",")
+          .map((u) => u.trim())
+          .filter(Boolean),
       },
       snapshotRetention: {
         enabled: envBool("TASK_SNAPSHOT_RETENTION_ENABLED", true),
         schedule:
           process.env["TASK_SNAPSHOT_RETENTION_SCHEDULE"] ?? "0 3 * * *", // daily at 3am UTC
         keep: envInt("TASK_SNAPSHOT_RETENTION_KEEP", 100),
+      },
+      sessionSweep: {
+        enabled: envBool("TASK_SESSION_SWEEP_ENABLED", true),
+        schedule:
+          process.env["TASK_SESSION_SWEEP_SCHEDULE"] ?? "0 */4 * * *", // every 4 hours
       },
     },
   };

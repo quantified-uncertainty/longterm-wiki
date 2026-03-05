@@ -1,4 +1,5 @@
 name: Auto-Fix CI Failures
+run-name: "Auto-Fix CI Failures${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # When CI fails on a claude/* branch, Claude diagnoses the failure
 # from the workflow logs and pushes a fix commit.
@@ -23,6 +24,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   autofix:
     # Only run when CI failed on a claude/* branch (not main, not human branches).
     # Global circuit breaker — also skip when automation is paused.

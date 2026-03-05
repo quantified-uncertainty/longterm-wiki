@@ -15,6 +15,55 @@ import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
 
 const MAX_PAGE_SIZE = 500;
 
+
+// ---- Parsers ----
+
+/**
+ * Parse a cost string like "~$0.50", "$1.23", "~$10" into integer cents.
+ * Returns null if the string cannot be parsed.
+ */
+export function parseCostCents(cost: string | null | undefined): number | null {
+  if (!cost) return null;
+  const match = cost.match(/\$\s*([\d.]+)/);
+  if (!match) return null;
+  const dollars = parseFloat(match[1]);
+  if (isNaN(dollars)) return null;
+  return Math.round(dollars * 100);
+}
+
+/**
+ * Parse a duration string like "~20 minutes", "~1.5 hours", "30min", "1h 15m" into minutes (float).
+ * Returns null if the string cannot be parsed.
+ */
+export function parseDurationMinutes(duration: string | null | undefined): number | null {
+  if (!duration) return null;
+  const lower = duration.toLowerCase();
+
+  // Match "Xh Ym" or "X hours Y minutes" patterns first
+  const hoursAndMinutes = lower.match(/([\d.]+)\s*h(?:ours?)?\s+([\d.]+)\s*m(?:in(?:utes?)?)?/);
+  if (hoursAndMinutes) {
+    const hours = parseFloat(hoursAndMinutes[1]);
+    const minutes = parseFloat(hoursAndMinutes[2]);
+    if (!isNaN(hours) && !isNaN(minutes)) return hours * 60 + minutes;
+  }
+
+  // Match hours: "X hours", "Xh", "X hr"
+  const hoursMatch = lower.match(/([\d.]+)\s*h(?:ours?|r)?(?!\s*[\d.])/);
+  if (hoursMatch) {
+    const hours = parseFloat(hoursMatch[1]);
+    if (!isNaN(hours)) return hours * 60;
+  }
+
+  // Match minutes: "X minutes", "Xmin", "Xm"
+  const minutesMatch = lower.match(/([\d.]+)\s*m(?:in(?:utes?)?)?/);
+  if (minutesMatch) {
+    const minutes = parseFloat(minutesMatch[1]);
+    if (!isNaN(minutes)) return minutes;
+  }
+
+  return null;
+}
+
 // ---- Schemas (from shared api-types) ----
 
 const CreateSessionSchema = SharedCreateSessionSchema;
@@ -44,6 +93,8 @@ function mapSessionRow(
     model: r.model,
     duration: r.duration,
     cost: r.cost,
+    costCents: r.costCents,
+    durationMinutes: r.durationMinutes,
     prUrl: r.prUrl,
     checksYaml: r.checksYaml,
     issuesJson: r.issuesJson,
@@ -56,6 +107,14 @@ function mapSessionRow(
 }
 
 function sessionValues(d: z.infer<typeof CreateSessionSchema>) {
+  // Use explicitly provided numeric values if present; otherwise auto-parse from text fields.
+  const costCents = d.costCents !== undefined && d.costCents !== null
+    ? d.costCents
+    : parseCostCents(d.cost ?? null);
+  const durationMinutes = d.durationMinutes !== undefined && d.durationMinutes !== null
+    ? d.durationMinutes
+    : parseDurationMinutes(d.duration ?? null);
+
   return {
     date: d.date,
     branch: d.branch ?? null,
@@ -64,6 +123,8 @@ function sessionValues(d: z.infer<typeof CreateSessionSchema>) {
     model: d.model ?? null,
     duration: d.duration ?? null,
     cost: d.cost ?? null,
+    costCents,
+    durationMinutes,
     prUrl: d.prUrl ?? null,
     checksYaml: d.checksYaml ?? null,
     issuesJson: d.issuesJson ?? null,
@@ -80,6 +141,8 @@ const sessionConflictSet = {
   model: sql`excluded.model`,
   duration: sql`excluded.duration`,
   cost: sql`excluded.cost`,
+  costCents: sql`excluded.cost_cents`,
+  durationMinutes: sql`excluded.duration_minutes`,
   prUrl: sql`excluded.pr_url`,
   checksYaml: sql`excluded.checks_yaml`,
   issuesJson: sql`excluded.issues_json`,

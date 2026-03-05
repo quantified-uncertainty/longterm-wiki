@@ -101,7 +101,7 @@ export function buildWellnessReport(checks: CheckResult[]): WellnessReport {
 
   issueLines.push('---');
   issueLines.push(
-    '*Created by the [wellness check workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/wellness-check.yml). Closes automatically when all checks pass.*',
+    '*Created by the wellness check workflows ([server-api-health](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/server-api-health.yml), [frontend-data-health](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/frontend-data-health.yml), [ci-pr-health](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/ci-pr-health.yml)). Closes automatically when all checks pass.*',
   );
 
   const issueBody = issueLines.join('\n');

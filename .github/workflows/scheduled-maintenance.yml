@@ -1,4 +1,5 @@
 name: Scheduled Maintenance
+run-name: "Scheduled Maintenance${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # Runs periodic maintenance sweeps using Claude Code.
 # Daily: review merged PRs, propagate learnings
@@ -37,6 +38,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   preflight:
     # Global circuit breaker — skip when automation is paused or wiki-server is down.
     # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.

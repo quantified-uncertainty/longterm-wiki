@@ -75,11 +75,11 @@ export interface CreateStatementInput {
 
 export async function getStatementsByEntity(
   entityId: string,
+  opts?: { includeChildren?: boolean },
 ): Promise<ApiResult<ByEntityResult>> {
-  return apiRequest<ByEntityResult>(
-    'GET',
-    `/api/statements/by-entity?entityId=${encodeURIComponent(entityId)}`,
-  );
+  let path = `/api/statements/by-entity?entityId=${encodeURIComponent(entityId)}`;
+  if (opts?.includeChildren) path += '&includeChildren=true';
+  return apiRequest<ByEntityResult>('GET', path);
 }
 
 export async function getStatementsByPage(
@@ -97,6 +97,30 @@ export async function getStatementsStats(): Promise<ApiResult<StatsResult>> {
 
 export async function getProperties(): Promise<ApiResult<PropertiesResult>> {
   return apiRequest<PropertiesResult>('GET', '/api/statements/properties');
+}
+
+export interface UpsertPropertyInput {
+  id: string;
+  label: string;
+  category: string;
+  description?: string | null;
+  entityTypes?: string[];
+  valueType?: 'number' | 'string' | 'entity' | 'date';
+  defaultUnit?: string | null;
+  stalenessCadence?: string | null;
+  unitFormatId?: string | null;
+}
+
+type UpsertPropertiesResult = InferResponseType<RpcClient['properties']['upsert']['$post'], 200>;
+
+export async function upsertProperties(
+  props: UpsertPropertyInput[],
+): Promise<ApiResult<UpsertPropertiesResult>> {
+  return apiRequest<UpsertPropertiesResult>(
+    'POST',
+    '/api/statements/properties/upsert',
+    { properties: props },
+  );
 }
 
 export async function createStatement(
@@ -132,6 +156,8 @@ export async function clearStatementsByEntity(
 
 export interface PatchStatementInput {
   status?: 'active' | 'superseded' | 'retracted';
+  subjectEntityId?: string;
+  propertyId?: string | null;
   archiveReason?: string | null;
   verdict?: string | null;
   verdictScore?: number | null;

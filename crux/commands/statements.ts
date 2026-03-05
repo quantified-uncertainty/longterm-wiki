@@ -50,6 +50,18 @@ const SCRIPTS = {
     passthrough: ['json', 'dry-run', 'org-type', 'category', 'no-research', 'min-score', 'budget', 'target-coverage', 'max-iterations', 'mode'],
     positional: true,
   },
+  ideate: {
+    script: 'statements/ideate.ts',
+    description: 'Analyze statements and suggest sub-entity splits',
+    passthrough: ['json', 'apply', 'min-cluster', 'budget'],
+    positional: true,
+  },
+  'seed-properties': {
+    script: 'statements/seed-properties.ts',
+    description: 'Seed missing property definitions for coverage target categories',
+    passthrough: ['dry-run'],
+    positional: false,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'quality');
@@ -80,6 +92,8 @@ Options:
   --target-coverage=N   Target coverage score for iterative loop (improve only)
   --max-iterations=N    Max iterations for iterative loop (default: 5, improve only)
   --mode=quality        Rewrite low-scoring statements instead of generating new ones
+  --mode=classify       Assign properties to uncategorized statements via LLM
+  --min-cluster=N       Minimum statements for a cluster suggestion (default: 5, ideate only)
 
 Examples:
   crux statements extract anthropic                Extract statements (dry run)
@@ -98,6 +112,11 @@ Examples:
   crux statements improve anthropic --no-research  Skip web search
   crux statements improve anthropic --target-coverage=0.8 --max-iterations=3  Iterate until 80%
   crux statements improve anthropic --mode=quality          Rewrite low-scoring statements
+  crux statements improve anthropic --mode=classify         Assign properties to uncategorized
+  crux statements ideate anthropic                          Suggest sub-entity splits
+  crux statements ideate anthropic --json                   Machine-readable output
+  crux statements ideate anthropic --apply                  Create entities + move statements
+  crux statements ideate anthropic --min-cluster=3          Lower cluster threshold
 
 Workflow:
   1. crux statements extract <page-id> --apply     Extract statements from page
@@ -105,5 +124,11 @@ Workflow:
   3. crux statements score <page-id>               Score statement quality
   4. crux statements gaps <page-id>                Identify coverage gaps
   5. crux statements quality <page-id>             Review coverage and quality
+  6. crux statements ideate <entity-id>            Suggest sub-entity splits
+
+Claude Code Skills (for deeper analysis — use these as slash commands):
+  /ontology-review <entity>    Deep ontological reasoning about entity structure
+  /entity-deep-dive <entity>   Comprehensive entity quality review + fixes
+  /knowledge-gap [area]        Identify missing topics and thin coverage areas
 `;
 }

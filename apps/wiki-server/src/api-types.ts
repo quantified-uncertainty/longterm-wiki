@@ -259,6 +259,10 @@ export const CreateSessionSchema = z.object({
   model: z.string().max(100).nullable().optional(),
   duration: z.string().max(100).nullable().optional(),
   cost: z.string().max(100).nullable().optional(),
+  /** Numeric cost in integer cents, auto-parsed from `cost` string if not provided. Enables aggregation and alerting. */
+  costCents: z.number().int().min(0).nullable().optional(),
+  /** Numeric duration in minutes (float), auto-parsed from `duration` string if not provided. Enables aggregation. */
+  durationMinutes: z.number().min(0).nullable().optional(),
   prUrl: z.string().max(1000).nullable().optional(),
   checksYaml: z.string().max(10000).nullable().optional(),
   issuesJson: z.unknown().nullable().optional(),
@@ -1156,10 +1160,20 @@ export const CreateAgentSessionSchema = z.object({
 });
 export type CreateAgentSession = z.infer<typeof CreateAgentSessionSchema>;
 
+export const PR_OUTCOMES = [
+  "merged",
+  "merged_with_revisions",
+  "reverted",
+  "closed_without_merge",
+] as const;
+export type PrOutcome = typeof PR_OUTCOMES[number];
+
 export const UpdateAgentSessionSchema = z.object({
   checklistMd: z.string().min(1).max(50000).optional(),
   status: z.enum(["active", "completed"]).optional(),
   prUrl: z.string().url().max(1000).nullable().optional(),
+  prOutcome: z.enum(PR_OUTCOMES).nullable().optional(),
+  fixesPrUrl: z.string().url().max(1000).nullable().optional(),
 });
 export type UpdateAgentSession = z.infer<typeof UpdateAgentSessionSchema>;
 

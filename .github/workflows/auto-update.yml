@@ -1,4 +1,5 @@
 name: Auto-Update Wiki
+run-name: "Auto-Update Wiki${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # News-driven automatic wiki update system.
 # All pipeline logic lives in `crux/auto-update/ci-orchestrate.ts`.
@@ -40,6 +41,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   preflight:
     # Global circuit breaker — skip when automation is paused or wiki-server is down.
     if: vars.AUTOMATION_PAUSED != 'true'
@@ -56,7 +60,7 @@ jobs:
   auto-update:
     needs: [preflight]
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
 
     steps:
       - uses: actions/checkout@v4
@@ -100,7 +104,7 @@ jobs:
           EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ARGS="--budget=${{ inputs.budget || '30' }} --count=${{ inputs.count || '5' }} --verbose"
+          ARGS="--budget=${{ inputs.budget || '30' }} --count=${{ inputs.count || '3' }} --verbose"
 
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             ARGS="$ARGS --dry-run"

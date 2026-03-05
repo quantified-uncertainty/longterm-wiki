@@ -248,6 +248,8 @@ export const sessions = pgTable(
     model: text("model"),
     duration: text("duration"),
     cost: text("cost"),
+    costCents: integer("cost_cents"),
+    durationMinutes: real("duration_minutes"),
     prUrl: text("pr_url"),
     checksYaml: text("checks_yaml"),
     issuesJson: jsonb("issues_json"),
@@ -758,6 +760,8 @@ export const agentSessions = pgTable(
     checklistMd: text("checklist_md").notNull(),
     worktree: text("worktree"), // working directory path for collision detection
     prUrl: text("pr_url"), // PR URL recorded when crux issues done --pr=URL is called
+    prOutcome: text("pr_outcome"), // Outcome: merged | merged_with_revisions | reverted | closed_without_merge
+    fixesPrUrl: text("fixes_pr_url"), // URL of the PR this session is fixing (enables fix-chain tracking)
     status: text("status").notNull().default("active"),
     startedAt: timestamp("started_at", { withTimezone: true })
       .notNull()

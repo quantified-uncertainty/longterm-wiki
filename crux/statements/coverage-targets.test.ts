@@ -51,11 +51,11 @@ describe('resolveCoverageTargets', () => {
   });
 
   it('returns null for unknown entity type', () => {
-    expect(resolveCoverageTargets('concept')).toBeNull();
+    expect(resolveCoverageTargets('widget')).toBeNull();
   });
 
   it('returns null for unknown entity type even with orgType', () => {
-    expect(resolveCoverageTargets('concept', 'frontier-lab')).toBeNull();
+    expect(resolveCoverageTargets('widget', 'frontier-lab')).toBeNull();
   });
 });
 

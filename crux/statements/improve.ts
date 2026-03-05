@@ -44,6 +44,29 @@ import {
   type ScoringResult,
 } from './scoring.ts';
 import { resolveCoverageTargets } from './coverage-targets.ts';
+import { validateCreateStatementBatch } from './validate-quality.ts';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize a date string from LLM output to a valid ISO date (YYYY-MM-DD) or null.
+ * LLMs often produce partial dates like "2024" or "2024-06" which fail PostgreSQL date columns.
+ */
+function normalizeValueDate(d: string | null | undefined): string | null {
+  if (!d) return null;
+  // Full ISO date: YYYY-MM-DD → keep as-is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  // Year-month: YYYY-MM → append -01
+  if (/^\d{4}-\d{2}$/.test(d)) return `${d}-01`;
+  // Year only: YYYY → append -01-01
+  if (/^\d{4}$/.test(d)) return `${d}-01-01`;
+  // Anything else (ISO datetime, etc.) — try to parse
+  const parsed = new Date(d);
+  if (!isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
+  return null; // Unparseable — drop it
+}
 
 // ---------------------------------------------------------------------------
 // Types (exported for use by future pass functions)
@@ -276,15 +299,20 @@ export function qualityGate(
     }
 
     // Accept — convert to CreateStatementInput
+    // Validate propertyId exists in the vocabulary — FK constraint
+    const validPropId = gen.propertyId && propertyMap?.has(gen.propertyId)
+      ? gen.propertyId
+      : undefined;
+
     const input: CreateStatementInput = {
       variety: gen.variety ?? 'structured',
       statementText: gen.statementText,
       subjectEntityId: entityId,
-      propertyId: gen.propertyId ?? undefined,
+      propertyId: validPropId,
       valueText: gen.valueText,
       valueNumeric: gen.valueNumeric,
       valueUnit: gen.valueUnit,
-      valueDate: gen.valueDate,
+      valueDate: normalizeValueDate(gen.valueDate),
       validStart: gen.validStart,
       citations: gen.citations?.map((c) => ({
         url: c.url,
@@ -603,10 +631,13 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
     : 'organization';
 
   if (!stmtsResult.ok) {
-    throw new Error(`Failed to fetch statements for ${entityId}: ${stmtsResult.error}`);
+    throw new Error(`Failed to fetch statements for ${entityId}: ${stmtsResult.message}`);
   }
 
-  const rawStatements = stmtsResult.data.statements;
+  const rawStatements = [
+    ...stmtsResult.data.structured,
+    ...stmtsResult.data.attributed,
+  ];
   const allProperties = propResult.ok ? propResult.data.properties : [];
   const fullPropertyMap = buildPropertyMap(allProperties);
 
@@ -693,21 +724,39 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
 
     // Insert new statement, then supersede original (safe ordering)
     if (!dryRun) {
+      // Validate propertyId exists in the vocabulary — FK constraint
+      const validPropertyId = rewrite.propertyId && fullPropertyMap.has(rewrite.propertyId)
+        ? rewrite.propertyId
+        : undefined;
+
       const newStmt: CreateStatementInput = {
         variety: rewrite.variety ?? 'structured',
         statementText: rewrite.statementText,
         subjectEntityId: entityId,
-        propertyId: rewrite.propertyId ?? undefined,
+        propertyId: validPropertyId,
         valueText: rewrite.valueText,
         valueNumeric: rewrite.valueNumeric,
         valueUnit: rewrite.valueUnit,
-        valueDate: rewrite.valueDate,
+        valueDate: normalizeValueDate(rewrite.valueDate),
         validStart: rewrite.validStart,
         citations: rewrite.citations?.map((c) => ({
           url: c.url,
           sourceQuote: c.sourceQuote,
         })),
       };
+
+      const qualityReport = validateCreateStatementBatch([newStmt]);
+      if (!qualityReport.passed) {
+        const codes = qualityReport.violations.map(v => v.code).join(', ');
+        const details = qualityReport.violations.map(v => v.message).join('; ');
+        rejected++;
+        rejections.push({
+          text: rewrite.statementText.slice(0, 80),
+          reason: `Data quality gate failed (${codes}): ${details}`,
+          score: gate.newScore,
+        });
+        continue;
+      }
 
       const insertResult = await createStatementBatch([newStmt]);
       if (insertResult.ok) {
@@ -718,9 +767,10 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
         });
       } else {
         rejected++;
+        const errMsg = insertResult.message ?? 'unknown error';
         rejections.push({
           text: rewrite.statementText.slice(0, 80),
-          reason: 'Failed to insert rewritten statement',
+          reason: `Insert failed: ${errMsg}`,
           score: gate.newScore,
         });
         continue;
@@ -744,6 +794,169 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
 }
 
 // ---------------------------------------------------------------------------
+// Classify mode: assign properties to uncategorized statements
+// ---------------------------------------------------------------------------
+
+/**
+ * Classify uncategorized statements by assigning appropriate property IDs.
+ * Uses LLM to batch-classify statements, then PATCHes the propertyId.
+ */
+export async function runClassifyPass(opts: ImproveOptions): Promise<PassResult> {
+  const { entityId, dryRun, budget, client, tracker } = opts;
+
+  const [stmtsResult, propResult, entityResult] = await Promise.all([
+    getStatementsByEntity(entityId),
+    getProperties(),
+    getEntity(entityId),
+  ]);
+
+  const entityName = entityResult.ok
+    ? (entityResult.data as { name?: string }).name ?? slugToDisplayName(entityId)
+    : slugToDisplayName(entityId);
+  const entityType = entityResult.ok
+    ? (entityResult.data as { entityType?: string }).entityType ?? 'organization'
+    : 'organization';
+
+  if (!stmtsResult.ok) {
+    throw new Error(`Failed to fetch statements: ${stmtsResult.message}`);
+  }
+
+  const allStatements = [
+    ...stmtsResult.data.structured,
+    ...stmtsResult.data.attributed,
+  ];
+
+  const allProperties = propResult.ok ? propResult.data.properties : [];
+  const fullPropertyMap = buildPropertyMap(allProperties);
+
+  // Find uncategorized statements (no propertyId)
+  const uncategorized = allStatements.filter(
+    (s) => s.status === 'active' && !s.propertyId,
+  );
+
+  if (uncategorized.length === 0) {
+    return {
+      entityId,
+      entityType,
+      categoriesProcessed: ['classify'],
+      coverageBefore: 0,
+      coverageAfter: null,
+      created: 0,
+      rejected: 0,
+      totalCost: tracker.totalCost,
+      rejections: [],
+    };
+  }
+
+  // Build property list for the prompt
+  const propertyList = allProperties
+    .map((p) => `  - ${p.id} (${p.category}): ${p.label}${p.description ? ` — ${p.description}` : ''}`)
+    .join('\n');
+
+  // Batch classify in groups of 20
+  const batchSize = 20;
+  let classified = 0;
+  let rejected = 0;
+  const rejections: PassResult['rejections'] = [];
+
+  for (let i = 0; i < uncategorized.length; i += batchSize) {
+    if (tracker.totalCost >= budget) break;
+
+    const batch = uncategorized.slice(i, i + batchSize);
+    const statementsForPrompt = batch
+      .map((s, idx) => `  ${idx + 1}. [id=${s.id}] "${(s.statementText ?? '').slice(0, 200)}"`)
+      .join('\n');
+
+    const prompt = {
+      system: `You are a data classification expert. Assign the most appropriate property ID to each statement from the provided vocabulary. Respond ONLY with a JSON array.`,
+      user: `Classify these statements about ${entityName} (${entityType}) by assigning property IDs.
+
+Available properties:
+${propertyList}
+
+Statements to classify:
+${statementsForPrompt}
+
+Return a JSON array where each element has:
+- "id": number — the statement ID
+- "propertyId": string — the best-matching property ID from the list above
+
+Choose the most specific matching property. If no property fits well, use null.`,
+    };
+
+    const result = await callLlm(client, prompt, {
+      model: MODELS.haiku,
+      maxTokens: 2000,
+      temperature: 0.1,
+      retryLabel: 'improve-classify',
+      tracker,
+      label: `classify-batch-${i}`,
+    });
+
+    const parsed = parseJsonFromLlm<Array<{ id: number; propertyId: string | null }>>(
+      result.text,
+      'improve-classify',
+      () => [],
+    );
+
+    if (!Array.isArray(parsed)) continue;
+
+    for (const assignment of parsed) {
+      if (!assignment || typeof assignment.id !== 'number') continue;
+      if (!assignment.propertyId) {
+        rejected++;
+        rejections.push({
+          text: `#${assignment.id}`,
+          reason: 'LLM found no matching property (null)',
+          score: 0,
+        });
+        continue;
+      }
+
+      // Validate propertyId exists
+      if (!fullPropertyMap.has(assignment.propertyId)) {
+        rejected++;
+        rejections.push({
+          text: `#${assignment.id} → ${assignment.propertyId}`,
+          reason: `Property "${assignment.propertyId}" not in vocabulary — consider adding it`,
+          score: 0,
+        });
+        continue;
+      }
+
+      if (!dryRun) {
+        const patchResult = await patchStatement(assignment.id, {
+          propertyId: assignment.propertyId,
+        });
+        if (!patchResult.ok) {
+          rejected++;
+          rejections.push({
+            text: `#${assignment.id} → ${assignment.propertyId}`,
+            reason: `PATCH failed: ${patchResult.message}`,
+            score: 0,
+          });
+          continue;
+        }
+      }
+
+      classified++;
+    }
+  }
+
+  return {
+    entityId,
+    entityType,
+    categoriesProcessed: ['classify'],
+    coverageBefore: uncategorized.length,
+    coverageAfter: uncategorized.length - classified,
+    created: classified,
+    rejected,
+    totalCost: tracker.totalCost,
+    rejections,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Core: single improvement pass (composable)
 // ---------------------------------------------------------------------------
 
@@ -758,8 +971,19 @@ export async function runSinglePass(opts: ImproveOptions): Promise<PassResult> {
   const { entityId, orgType, categoryFilter, minScore, budget, noResearch, dryRun, client, tracker } = opts;
   const entityName = slugToDisplayName(entityId);
 
-  // 1. Analyze gaps
-  const analysis = await analyzeGaps(entityId, orgType);
+  // 0. Auto-classify uncategorized statements (cheap Haiku call) to get accurate gap numbers
+  const preAnalysis = await analyzeGaps(entityId, orgType);
+  const uncategorizedCount = preAnalysis.allStatements.filter(
+    (s) => s.status === 'active' && !s.propertyId,
+  ).length;
+  if (uncategorizedCount > 0 && !dryRun) {
+    await runClassifyPass(opts);
+  }
+
+  // 1. Analyze gaps (re-analyze after classify for accurate numbers)
+  const analysis = uncategorizedCount > 0 && !dryRun
+    ? await analyzeGaps(entityId, orgType)
+    : preAnalysis;
   const coverageBefore = analysis.coverageScore;
 
   // Filter to gaps with deficit > 0
@@ -856,9 +1080,21 @@ export async function runSinglePass(opts: ImproveOptions): Promise<PassResult> {
   let coverageAfter: number | null = null;
 
   if (!dryRun && allAccepted.length > 0) {
+    // Data quality gate — validate before writing to DB.
+    // Throws if critical assertions fail so the caller can surface the error.
+    const qualityReport = validateCreateStatementBatch(allAccepted);
+    if (!qualityReport.passed) {
+      const codes = qualityReport.violations.map(v => v.code).join(', ');
+      const details = qualityReport.violations.map(v => v.message).join('; ');
+      throw new Error(
+        `Data quality assertions failed (${codes}): ${details}. ` +
+        'Use --dry-run to inspect the generated statements without writing.',
+      );
+    }
+
     const batchResult = await createStatementBatch(allAccepted);
     if (!batchResult.ok) {
-      throw new Error('Failed to insert statements');
+      throw new Error(`Failed to insert statements: ${batchResult.message}`);
     }
 
     // Re-analyze to get updated coverage
@@ -985,7 +1221,19 @@ async function main() {
     console.error(`${c.red}Error: provide an entity ID${c.reset}`);
     console.error(`  Usage: pnpm crux statements improve <entity-id> [options]`);
     console.error(`  Options: --org-type=TYPE --dry-run --category=CAT --no-research --min-score=N --budget=N --json`);
-    console.error(`           --target-coverage=N --max-iterations=N --mode=quality`);
+    console.error(`           --target-coverage=N --max-iterations=N --mode=quality|classify`);
+    process.exit(1);
+  }
+
+  // Validate entity exists before spending LLM budget
+  const entityCheck = await getEntity(entityId);
+  if (!entityCheck.ok) {
+    const msg = `Entity "${entityId}" not found in wiki-server`;
+    if (jsonOutput) {
+      console.log(JSON.stringify({ entityId, error: msg }));
+    } else {
+      console.error(`${c.red}${msg}${c.reset}`);
+    }
     process.exit(1);
   }
 
@@ -1027,8 +1275,37 @@ async function main() {
 
   if (!jsonOutput) console.log(`${c.dim}Analyzing coverage gaps for ${entityId}...${c.reset}`);
 
-  // Dispatch: quality mode → iterative loop → single pass
-  if (mode === 'quality') {
+  // Dispatch: classify → quality → iterative loop → single pass
+  if (mode === 'classify') {
+    let result: PassResult;
+    try {
+      if (!jsonOutput) console.log(`${c.dim}Classify mode: assigning properties to uncategorized statements...${c.reset}`);
+      result = await runClassifyPass(opts);
+    } catch (err) {
+      console.error(`${c.red}${err instanceof Error ? err.message : String(err)}${c.reset}`);
+      process.exit(1);
+    }
+
+    if (jsonOutput) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(`\n${c.bold}${c.blue}Classify Summary: ${entityId}${c.reset}`);
+      console.log(`  Classified:  ${c.green}${result.created}${c.reset}`);
+      console.log(`  Rejected:    ${c.red}${result.rejected}${c.reset}`);
+      console.log(`  Remaining:   ${result.coverageAfter ?? 0} uncategorized`);
+      console.log(`  Cost:        $${result.totalCost.toFixed(4)}`);
+      if (opts.dryRun) {
+        console.log(`  ${c.dim}(dry run — no statements were modified)${c.reset}`);
+      }
+      if (result.rejections.length > 0) {
+        console.log(`\n  ${c.dim}Rejections:${c.reset}`);
+        for (const r of result.rejections) {
+          console.log(`    ${c.red}✗${c.reset} ${r.text} — ${r.reason}`);
+        }
+      }
+      console.log('');
+    }
+  } else if (mode === 'quality') {
     let result: PassResult;
     try {
       if (!jsonOutput) console.log(`${c.dim}Quality mode: rewriting low-scoring statements...${c.reset}`);

@@ -7,7 +7,9 @@
  *   1. Count files changed and lines changed (insertions + deletions) vs main
  *   2. If the diff exceeds thresholds (>5 files OR >300 lines):
  *      - Check if .claude/review-done exists
- *      - Verify it contains a commit SHA that matches the current HEAD
+ *      - Verify it contains a commit SHA that matches the current HEAD,
+ *        OR that all commits between the marker SHA and HEAD are merge commits
+ *        (e.g., "Merge branch 'main' into feature") — these are transparent.
  *   3. Fail (exit 1) if no valid marker is found — this blocks the gate
  *
  * The marker file format is:
@@ -72,6 +74,66 @@ function getHeadSha(): string {
     }).trim();
   } catch {
     return '';
+  }
+}
+
+/**
+ * Check whether all first-parent commits between markerSha and headSha are
+ * merge commits (i.e., commits with 2+ parents). Returns true when the review
+ * is still valid because only merge commits (e.g., "Merge branch 'main' into
+ * feature") have been added since the review — no new code by the PR author.
+ *
+ * Uses --first-parent so that commits brought in transitively from the merged
+ * branch are not counted. Only commits that directly appear on the feature
+ * branch's own lineage are examined.
+ *
+ * Returns false when:
+ *   - markerSha is not an ancestor of headSha (rebase / force-push situation)
+ *   - Any first-parent commit in the range is a non-merge commit (new code)
+ *   - git commands fail for any reason (fail-closed)
+ *
+ * @param cwd - directory to run git commands in; defaults to PROJECT_ROOT
+ */
+export function onlyMergeCommitsSince(markerSha: string, headSha: string, cwd: string = PROJECT_ROOT): boolean {
+  if (markerSha === headSha) return true;
+  try {
+    // Verify that markerSha is an ancestor of headSha — if not, something
+    // unusual happened (rebase, force-push) and we should require re-review.
+    execSync(`git merge-base --is-ancestor ${markerSha} ${headSha}`, {
+      cwd,
+      encoding: 'utf-8',
+    });
+  } catch {
+    // Not an ancestor → not a simple merge-commit situation
+    return false;
+  }
+
+  try {
+    // Walk only the branch's own first-parent history so we don't count
+    // commits that were brought in transitively from the merged branch.
+    const allFirstParent = execSync(
+      `git log --first-parent --format=%H ${markerSha}..${headSha}`,
+      { cwd, encoding: 'utf-8' }
+    )
+      .trim()
+      .split('\n')
+      .filter(Boolean);
+
+    if (allFirstParent.length === 0) return true; // No new first-parent commits
+
+    // Among those first-parent commits, count the merge commits.
+    const mergeFirstParent = execSync(
+      `git log --first-parent --merges --format=%H ${markerSha}..${headSha}`,
+      { cwd, encoding: 'utf-8' }
+    )
+      .trim()
+      .split('\n')
+      .filter(Boolean);
+
+    // All first-parent commits are merge commits iff the counts match.
+    return allFirstParent.length === mergeFirstParent.length;
+  } catch {
+    return false;
   }
 }
 
@@ -167,7 +229,8 @@ export function runCheck(): ReviewCheckResult {
 
   const marker = readMarker();
   if (!marker.found) {
-    const reason = 'Large PR (>' + FILES_THRESHOLD + ' files or >' + LINES_THRESHOLD + ' lines) has not been reviewed via /review-pr';
+    const reason =
+      'Large PR (>' + FILES_THRESHOLD + ' files or >' + LINES_THRESHOLD + ' lines) has not been reviewed via /review-pr';
     console.log(`\n${c.yellow}WARNING: ${reason}${c.reset}`);
     console.log(`${c.dim}  Fix: run /review-pr before shipping${c.reset}`);
     return {
@@ -182,7 +245,7 @@ export function runCheck(): ReviewCheckResult {
     };
   }
 
-  // Marker exists — verify SHA matches HEAD
+  // Marker exists — verify SHA matches HEAD (or only merge commits added since)
   const headSha = getHeadSha();
   if (!headSha) {
     console.log(`\n${c.yellow}WARNING: Could not determine HEAD SHA to validate review marker${c.reset}`);
@@ -199,22 +262,31 @@ export function runCheck(): ReviewCheckResult {
   }
 
   if (marker.sha !== headSha) {
-    const reason = `Review marker SHA (${marker.sha.slice(0, 8)}) does not match HEAD (${headSha.slice(0, 8)}) — new commits added after review`;
-    console.log(`\n${c.yellow}WARNING: ${reason}${c.reset}`);
-    console.log(`${c.dim}  Fix: run /review-pr again to review the latest changes${c.reset}`);
-    return {
-      passed: false,
-      warnings: 1,
-      filesChanged: files,
-      linesChanged: lines,
-      thresholdExceeded: true,
-      markerFound: true,
-      markerValid: false,
-      reason,
-    };
+    // Allow the marker to be behind HEAD if the only intervening first-parent
+    // commits are merge commits (e.g., "Merge branch 'main' into feature").
+    // Those commits add no new code by the PR author and do not require a
+    // re-review. Non-merge commits (code changes) still require re-review.
+    if (!onlyMergeCommitsSince(marker.sha, headSha)) {
+      const reason = `Review marker SHA (${marker.sha.slice(0, 8)}) does not match HEAD (${headSha.slice(0, 8)}) — new commits added after review`;
+      console.log(`\n${c.yellow}WARNING: ${reason}${c.reset}`);
+      console.log(`${c.dim}  Fix: run /review-pr again to review the latest changes${c.reset}`);
+      return {
+        passed: false,
+        warnings: 1,
+        filesChanged: files,
+        linesChanged: lines,
+        thresholdExceeded: true,
+        markerFound: true,
+        markerValid: false,
+        reason,
+      };
+    }
+    console.log(`${c.dim}  Note: merge commits added since review — marker still valid${c.reset}`);
   }
 
-  console.log(`\n${c.green}Review marker valid — reviewed at ${marker.timestamp || 'unknown time'} (SHA: ${marker.sha.slice(0, 8)})${c.reset}`);
+  console.log(
+    `\n${c.green}Review marker valid — reviewed at ${marker.timestamp || 'unknown time'} (SHA: ${marker.sha.slice(0, 8)})${c.reset}`
+  );
   return {
     passed: true,
     warnings: 0,
