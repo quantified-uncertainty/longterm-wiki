@@ -36,7 +36,7 @@ interface ScoredPr extends DetectedPr {
   score: number;
 }
 
-type FixOutcome = 'fixed' | 'max-turns' | 'error' | 'dry-run';
+type FixOutcome = 'fixed' | 'max-turns' | 'timeout' | 'error' | 'dry-run';
 
 // ── Config ───────────────────────────────────────────────────────────────────
 
@@ -52,6 +52,7 @@ export interface PatrolConfig {
   dryRun: boolean;
   verbose: boolean;
   reflectionInterval: number;
+  timeoutMinutes: number;
 }
 
 const STATE_DIR = '/tmp/pr-patrol-shared';
@@ -92,6 +93,10 @@ export function buildConfig(
     reflectionInterval: Math.max(
       1,
       parseIntOpt(process.env.PR_PATROL_REFLECTION_INTERVAL, 10),
+    ),
+    timeoutMinutes: parseIntOpt(
+      options.timeout ?? process.env.PR_PATROL_TIMEOUT_MINUTES,
+      30,
     ),
   };
 }
@@ -201,7 +206,15 @@ export function detectIssues(
 
   const contexts =
     pr.commits?.nodes?.[0]?.commit?.statusCheckRollup?.contexts?.nodes ?? [];
-  if (contexts.some((c) => c.conclusion === 'FAILURE')) {
+  // CheckRun nodes use `conclusion`, StatusContext nodes use `state`
+  if (
+    contexts.some(
+      (c) =>
+        c.conclusion === 'FAILURE' ||
+        c.state === 'FAILURE' ||
+        c.state === 'ERROR',
+    )
+  ) {
     issues.push('ci-failure');
   }
 
@@ -379,7 +392,7 @@ async function releaseCurrentClaim(repo: string): Promise<void> {
 function spawnClaude(
   prompt: string,
   config: PatrolConfig,
-): Promise<{ exitCode: number; output: string; hitMaxTurns: boolean }> {
+): Promise<{ exitCode: number; output: string; hitMaxTurns: boolean; timedOut: boolean }> {
   return new Promise((resolve, reject) => {
     const args = [
       '--print',
@@ -401,6 +414,20 @@ function spawnClaude(
     });
 
     let output = '';
+    let timedOut = false;
+
+    // Hard timeout — kill subprocess if it runs too long
+    const timeoutMs = config.timeoutMinutes * 60 * 1000;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      log(`  ⚠ Claude subprocess timed out after ${config.timeoutMinutes}m — killing`);
+      child.kill('SIGTERM');
+      // Force kill if SIGTERM doesn't work within 10s
+      setTimeout(() => {
+        if (!child.killed) child.kill('SIGKILL');
+      }, 10_000);
+    }, timeoutMs);
+
     child.stdout.on('data', (chunk: Buffer) => {
       const text = chunk.toString();
       output += text;
@@ -414,13 +441,18 @@ function spawnClaude(
     child.stdin.end();
 
     child.on('close', (code) => {
+      clearTimeout(timer);
       resolve({
         exitCode: code ?? 1,
         output,
         hitMaxTurns: output.includes('Reached max turns'),
+        timedOut,
       });
     });
-    child.on('error', reject);
+    child.on('error', (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
   });
 }
 
@@ -458,7 +490,11 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
     const result = await spawnClaude(prompt, config);
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
-    if (result.exitCode === 0 && !result.hitMaxTurns) {
+    if (result.timedOut) {
+      outcome = 'timeout';
+      reason = `Killed after ${config.timeoutMinutes}m timeout`;
+      log(`✗ PR #${pr.number} timed out after ${config.timeoutMinutes}m`);
+    } else if (result.exitCode === 0 && !result.hitMaxTurns) {
       log(`✓ PR #${pr.number} processed successfully (${elapsedS}s)`);
       outcome = 'fixed';
 
@@ -614,15 +650,25 @@ function preflightChecks(config: PatrolConfig): string[] {
 
   // Only enforce clean tree when actually fixing (not for dry-run or status)
   if (!config.dryRun) {
-    const status = gitSafe('diff', '--stat');
-    const staged = gitSafe('diff', '--staged', '--stat');
-    if (
-      (status.ok && status.output.trim()) ||
-      (staged.ok && staged.output.trim())
-    ) {
-      errors.push(
-        'Working tree must be clean before starting PR Patrol. Commit or stash your changes first.',
-      );
+    // Use git status --porcelain to catch both modified and untracked files
+    // that could interfere with branch switching during fixes.
+    // Filter out known noise directories that are always untracked.
+    const IGNORED_PREFIXES = ['.claude/worktrees/', '.claude/wip-'];
+    const status = gitSafe('status', '--porcelain');
+    if (status.ok && status.output.trim()) {
+      const significant = status.output
+        .trim()
+        .split('\n')
+        .filter((line) => {
+          const filePath = line.slice(3); // strip status prefix "?? " / " M " etc.
+          return !IGNORED_PREFIXES.some((p) => filePath.startsWith(p));
+        });
+      if (significant.length > 0) {
+        errors.push(
+          'Working tree must be clean before starting PR Patrol. Commit or stash your changes first.\n' +
+            `  Dirty files: ${significant.slice(0, 5).map((l) => l.trim()).join(', ')}${significant.length > 5 ? ` (+${significant.length - 5} more)` : ''}`,
+        );
+      }
     }
   }
 
