@@ -454,6 +454,9 @@ const sessionsApp = new Hono()
         )
       : undefined;
 
+    // Use a high limit and warn on truncation; insights are internal-only and grow slowly.
+    // If the session count ever approaches this limit, switch to pagination.
+    const INSIGHTS_LIMIT = 5000;
     const rows = await db
       .select({
         date: sessions.date,
@@ -465,7 +468,13 @@ const sessionsApp = new Hono()
       .from(sessions)
       .where(whereClause)
       .orderBy(desc(sessions.date), desc(sessions.id))
-      .limit(500);
+      .limit(INSIGHTS_LIMIT);
+
+    if (rows.length === INSIGHTS_LIMIT) {
+      console.warn(
+        `[sessions/insights] Result count hit limit (${INSIGHTS_LIMIT}); insights may be truncated. Consider adding pagination.`
+      );
+    }
 
     type Insight = {
       date: string;
