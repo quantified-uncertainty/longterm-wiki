@@ -1,19 +1,11 @@
-name: Wellness Check
+name: Frontend & Data Health
 
-# Comprehensive twice-daily health audit of the entire system.
-#
-# All check logic lives in TypeScript (crux/health/). This workflow
-# is a thin orchestration layer that runs the checks and manages
-# GitHub issues automatically.
+# Checks public-facing frontend availability and data freshness.
+# Runs twice daily — same schedule as the unified wellness check it replaced.
 #
 # Checks performed:
-#   - Server & DB sanity (counts in expected ranges, uptime)
-#   - API smoke tests (search, page fetch, entity list)
-#   - GitHub Actions workflow health (scheduled jobs running?)
 #   - Frontend availability (Vercel URL returns content)
 #   - Data freshness (last sync time, recent edits)
-#   - Job queue health (failure rates, pending backlogs)
-#   - PR & issue quality (empty bodies, stale PRs, stuck labels)
 #
 # Issues are created/updated/closed automatically under the "wellness" label.
 
@@ -24,7 +16,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: wellness-check
+  group: frontend-data-health
   cancel-in-progress: false
 
 jobs:
@@ -40,8 +32,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
-      actions: read
-      pull-requests: read
     timeout-minutes: 10
 
     steps:
@@ -52,9 +42,14 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm crux health check --report --auto-issue --cleanup-labels
+      - name: Frontend availability
+        run: pnpm crux health check --check=frontend --report --auto-issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WIKI_PUBLIC_URL: ${{ secrets.WIKI_PUBLIC_URL }}
+      - name: Data freshness
+        run: pnpm crux health check --check=freshness --report --auto-issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
-          WIKI_PUBLIC_URL: ${{ secrets.WIKI_PUBLIC_URL }}

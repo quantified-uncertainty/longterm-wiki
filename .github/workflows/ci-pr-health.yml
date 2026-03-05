@@ -1,0 +1,66 @@
+name: CI & PR Health
+run-name: "CI & PR Health${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+
+# Checks GitHub Actions workflow health, job queue status, and PR/issue quality.
+# Also cleans up stale claude-working labels.
+# Runs twice daily — same schedule as the unified wellness check it replaced.
+#
+# Checks performed:
+#   - GitHub Actions workflow health (scheduled jobs running?)
+#   - Job queue health (failure rates, pending backlogs)
+#   - PR & issue quality (empty bodies, stale PRs, stuck labels)
+#
+# Issues are created/updated/closed automatically under the "wellness" label.
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # 8 AM UTC daily
+    - cron: "0 20 * * *" # 8 PM UTC daily
+  workflow_dispatch:
+
+concurrency:
+  group: ci-pr-health
+  cancel-in-progress: false
+
+jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
+  preflight:
+    # Global circuit breaker — skip when automation is paused.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Automation is active"
+
+  check:
+    needs: [preflight]
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      actions: read
+      pull-requests: read
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: GitHub Actions health
+        run: pnpm crux health check --check=actions --report --auto-issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Job queue health
+        run: pnpm crux health check --check=job-queue --report --auto-issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+      - name: PR & issue quality
+        run: pnpm crux health check --check=pr-quality --report --auto-issue --cleanup-labels
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

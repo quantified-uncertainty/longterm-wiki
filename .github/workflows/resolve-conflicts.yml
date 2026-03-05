@@ -1,4 +1,5 @@
 name: Resolve Merge Conflicts
+run-name: "Resolve Merge Conflicts${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # Finds all open PRs with merge conflicts and resolves them using a two-tier
 # approach: Tier 1 (Sonnet API) for fast text-level resolution, Tier 2 (Claude
@@ -33,6 +34,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   preflight:
     # Global circuit breaker — skip when automation is paused.
     if: vars.AUTOMATION_PAUSED != 'true'

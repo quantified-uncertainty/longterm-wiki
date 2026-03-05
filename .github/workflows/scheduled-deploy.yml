@@ -1,4 +1,5 @@
 name: Scheduled Production Deploy
+run-name: "Scheduled Production Deploy${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # Hourly production deploy via Vercel deploy hook.
 #
@@ -24,6 +25,9 @@ on:
   workflow_dispatch:         # Allow manual trigger from GitHub Actions UI
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   trigger-production-deploy:
     # Global circuit breaker — skip when automation is paused.
     # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.

@@ -238,6 +238,7 @@ const PROPERTY_SEEDS: UpsertPropertyInput[] = [
     valueType: 'entity',
   },
 
+
   // ---- financial (supplements) ----
   {
     id: 'executive-compensation',

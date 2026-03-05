@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { eq, desc, and, lt } from "drizzle-orm";
+import { eq, desc, and, lt, count, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { logger } from "../logger.js";
 import { agentSessions } from "../schema.js";
@@ -26,9 +26,6 @@ const agentSessionsApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
-    // Atomic upsert: wrap select+insert/update in a transaction.
-    // Note: this uses READ COMMITTED (Drizzle default), not serializable.
-    // Concurrent requests are unlikely in practice (one agent per branch).
     const { row, isUpdate } = await db.transaction(async (tx) => {
       const existing = await tx
         .select()
@@ -89,6 +86,23 @@ const agentSessionsApp = new Hono()
     return c.json(rows[0]);
   })
 
+  // ---- GET /stats (fix rate and summary statistics) ----
+  .get("/stats", async (c) => {
+    const db = getDrizzleDb();
+    const [row] = await db
+      .select({
+        total: count(),
+        fixSessions: count(
+          sql`CASE WHEN ${agentSessions.fixesPrUrl} IS NOT NULL THEN 1 END`
+        ),
+      })
+      .from(agentSessions);
+    const total = row?.total ?? 0;
+    const fixSessions = row?.fixSessions ?? 0;
+    const fixRate = total > 0 ? fixSessions / total : 0;
+    return c.json({ total, fixSessions, fixRate });
+  })
+
   // ---- PATCH /:id (update checklist or status) ----
   .patch("/:id", async (c) => {
     const raw = c.req.param("id");
@@ -101,9 +115,15 @@ const agentSessionsApp = new Hono()
     const parsed = UpdateAgentSessionSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const { checklistMd, status, prUrl } = parsed.data;
-    if (checklistMd === undefined && status === undefined && prUrl === undefined) {
-      return validationError(c, "At least one of checklistMd, status, or prUrl must be provided");
+    const { checklistMd, status, prUrl, prOutcome, fixesPrUrl } = parsed.data;
+    if (
+      checklistMd === undefined &&
+      status === undefined &&
+      prUrl === undefined &&
+      prOutcome === undefined &&
+      fixesPrUrl === undefined
+    ) {
+      return validationError(c, "At least one of checklistMd, status, prUrl, prOutcome, or fixesPrUrl must be provided");
     }
 
     const updates: Record<string, unknown> = { updatedAt: new Date() };
@@ -115,6 +135,8 @@ const agentSessionsApp = new Hono()
       }
     }
     if (prUrl !== undefined) updates.prUrl = prUrl;
+    if (prOutcome !== undefined) updates.prOutcome = prOutcome;
+    if (fixesPrUrl !== undefined) updates.fixesPrUrl = fixesPrUrl;
 
     const db = getDrizzleDb();
     const result = await db

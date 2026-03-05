@@ -1,4 +1,5 @@
 name: Wiki Server Data Export
+run-name: "Wiki Server Data Export${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # Exports session logs, edit logs, and job data from the wiki-server API.
 # Stored as GitHub Actions artifacts (90-day retention).
@@ -20,6 +21,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   preflight:
     # Global circuit breaker — skip when automation is paused or wiki-server is down.
     # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.

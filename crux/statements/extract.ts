@@ -41,6 +41,7 @@ import { cleanMdxForExtraction, splitIntoSections, type Section } from '../claim
 import { slugToDisplayName } from '../lib/claim-text-utils.ts';
 import { loadIdRegistry } from '../lib/content-types.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
+import { validateExtractedStatements, printQualityReport } from './validate-quality.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -527,6 +528,15 @@ async function main() {
     console.log(`  ${c.yellow}FK sanitization:${c.reset}`);
     if (invalidValueEntities > 0) console.log(`    valueEntityId cleared: ${invalidValueEntities}`);
     if (invalidAttributedTo > 0) console.log(`    attributedTo cleared: ${invalidAttributedTo}`);
+  }
+
+  // Data quality assertions — run in both dry-run and apply mode.
+  // In dry-run: violations are warnings (logged but not blocking).
+  // In apply mode: violations abort before any DB writes.
+  const qualityReport = validateExtractedStatements(allStatements, sections.length);
+  printQualityReport(qualityReport, c, dryRun);
+  if (!dryRun && !qualityReport.passed) {
+    process.exit(1);
   }
 
   if (dryRun) {

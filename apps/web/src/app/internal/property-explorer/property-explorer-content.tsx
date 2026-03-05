@@ -4,6 +4,7 @@ import {
   withApiFallback,
   type FetchResult,
 } from "@lib/wiki-server";
+import { fetchAllPaginated } from "@lib/fetch-paginated";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { StatCard } from "@components/internal/StatCard";
 import { PropertyExplorerTable } from "./property-explorer-table";
@@ -47,10 +48,12 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
     fetchDetailed<{
       properties: PropertyRow[];
     }>("/api/statements/properties", { revalidate: 300 }),
-    fetchDetailed<{
-      statements: StatementRow[];
-      total: number;
-    }>("/api/statements?limit=200", { revalidate: 300 }),
+    fetchAllPaginated<StatementRow>({
+      path: "/api/statements",
+      itemsKey: "statements",
+      pageSize: 500,
+      revalidate: 300,
+    }),
   ]);
 
   if (!propertiesResult.ok) return propertiesResult;
@@ -60,7 +63,7 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
     ok: true,
     data: {
       properties: propertiesResult.data.properties,
-      statements: statementsResult.data.statements,
+      statements: statementsResult.data.items,
     },
   };
 }

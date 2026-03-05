@@ -19,6 +19,7 @@ export default defineConfig({
       'validate/**/*.test.ts',
       'wiki-server/**/*.test.ts',
       'evals/**/*.test.ts',
+      'health/**/*.test.ts',
     ],
     exclude: [
       'claims/archive/**',

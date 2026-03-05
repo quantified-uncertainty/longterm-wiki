@@ -44,6 +44,29 @@ import {
   type ScoringResult,
 } from './scoring.ts';
 import { resolveCoverageTargets } from './coverage-targets.ts';
+import { validateCreateStatementBatch } from './validate-quality.ts';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize a date string from LLM output to a valid ISO date (YYYY-MM-DD) or null.
+ * LLMs often produce partial dates like "2024" or "2024-06" which fail PostgreSQL date columns.
+ */
+function normalizeValueDate(d: string | null | undefined): string | null {
+  if (!d) return null;
+  // Full ISO date: YYYY-MM-DD → keep as-is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  // Year-month: YYYY-MM → append -01
+  if (/^\d{4}-\d{2}$/.test(d)) return `${d}-01`;
+  // Year only: YYYY → append -01-01
+  if (/^\d{4}$/.test(d)) return `${d}-01-01`;
+  // Anything else (ISO datetime, etc.) — try to parse
+  const parsed = new Date(d);
+  if (!isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
+  return null; // Unparseable — drop it
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -744,6 +767,19 @@ export async function runQualityPass(opts: ImproveOptions): Promise<PassResult> 
         })),
       };
 
+      const qualityReport = validateCreateStatementBatch([newStmt]);
+      if (!qualityReport.passed) {
+        const codes = qualityReport.violations.map(v => v.code).join(', ');
+        const details = qualityReport.violations.map(v => v.message).join('; ');
+        rejected++;
+        rejections.push({
+          text: rewrite.statementText.slice(0, 80),
+          reason: `Data quality gate failed (${codes}): ${details}`,
+          score: gate.newScore,
+        });
+        continue;
+      }
+
       const insertResult = await createStatementBatch([newStmt]);
       if (insertResult.ok) {
         // Only supersede original after successful insert
@@ -1066,6 +1102,18 @@ export async function runSinglePass(opts: ImproveOptions): Promise<PassResult> {
   let coverageAfter: number | null = null;
 
   if (!dryRun && allAccepted.length > 0) {
+    // Data quality gate — validate before writing to DB.
+    // Throws if critical assertions fail so the caller can surface the error.
+    const qualityReport = validateCreateStatementBatch(allAccepted);
+    if (!qualityReport.passed) {
+      const codes = qualityReport.violations.map(v => v.code).join(', ');
+      const details = qualityReport.violations.map(v => v.message).join('; ');
+      throw new Error(
+        `Data quality assertions failed (${codes}): ${details}. ` +
+        'Use --dry-run to inspect the generated statements without writing.',
+      );
+    }
+
     const batchResult = await createStatementBatch(allAccepted);
     if (!batchResult.ok) {
       throw new Error(`Failed to insert statements: ${batchResult.message}`);

@@ -12,7 +12,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { CitationQuote } from "@/lib/citation-data";
-import { getDomain, isSafeUrl } from "./resource-utils";
+import { getDomain } from "./resource-utils";
+import { SafeExternalLink } from "@components/ui/safe-external-link";
 
 interface VerdictConfig {
   icon: typeof CheckCircle2;
@@ -180,16 +181,12 @@ function FootnoteCard({
                 Checked {formatDate(checkedAt)}
               </span>
             )}
-            {quote.url && isSafeUrl(quote.url) && (
-              <a
-                href={quote.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] text-blue-500 hover:underline flex items-center gap-0.5 ml-auto"
-              >
-                Source <ExternalLink className="w-2.5 h-2.5" />
-              </a>
-            )}
+            <SafeExternalLink
+              href={quote.url}
+              className="text-[11px] text-blue-500 hover:underline flex items-center gap-0.5 ml-auto"
+            >
+              Source <ExternalLink className="w-2.5 h-2.5" />
+            </SafeExternalLink>
             {/* Link to unified references section */}
             <a
               href="#references"

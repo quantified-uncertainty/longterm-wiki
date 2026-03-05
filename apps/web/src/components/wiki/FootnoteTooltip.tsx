@@ -4,10 +4,12 @@ import React from "react";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import { ExternalLink, Clock } from "lucide-react";
 import { cn } from "@lib/utils";
+import { isSafeUrl } from "@lib/url-utils";
+import { SafeExternalLink } from "@components/ui/safe-external-link";
 import { useReferenceData } from "./ReferenceContext";
 import { VerdictBadge } from "./VerdictBadge";
+import { getDomain } from "./resource-utils";
 import type { RefMapEntry } from "./ReferenceContext";
-import { getDomain, isSafeUrl } from "./resource-utils";
 
 /**
  * Format an ISO date string for compact display.
@@ -107,16 +109,12 @@ function ClaimContent({ entry }: { entry: RefMapEntry }) {
           </span>
         )}
         <span className="flex-1" />
-        {sourceUrl && isSafeUrl(sourceUrl) && (
-          <a
-            href={sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[11px] text-blue-500 hover:underline flex items-center gap-0.5 !no-underline hover:!underline"
-          >
-            Source <ExternalLink className="w-2.5 h-2.5" />
-          </a>
-        )}
+        <SafeExternalLink
+          href={sourceUrl}
+          className="text-[11px] text-blue-500 hover:underline flex items-center gap-0.5 !no-underline hover:!underline"
+        >
+          Source <ExternalLink className="w-2.5 h-2.5" />
+        </SafeExternalLink>
       </div>
 
       {/* Link to source detail page if resource is known */}
@@ -166,14 +164,12 @@ function CitationContent({ entry }: { entry: RefMapEntry }) {
       {/* Source link */}
       {url && isSafeUrl(url) && (
         <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/50">
-          <a
+          <SafeExternalLink
             href={url}
-            target="_blank"
-            rel="noopener noreferrer"
             className="text-[11px] text-blue-500 hover:underline flex items-center gap-0.5 !no-underline hover:!underline"
           >
             Open source <ExternalLink className="w-2.5 h-2.5" />
-          </a>
+          </SafeExternalLink>
           <span className="flex-1" />
           <a
             href="#references"

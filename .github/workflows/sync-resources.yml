@@ -1,4 +1,5 @@
 name: Sync Resources
+run-name: "Sync Resources${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 on:
   push:
@@ -15,6 +16,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
   preflight:
     # Global circuit breaker — skip when automation is paused or wiki-server is down.
     # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
