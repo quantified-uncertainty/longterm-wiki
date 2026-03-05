@@ -48,8 +48,8 @@ const MAX_PAGE_SIZE = 500;
 const ListQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
   offset: z.coerce.number().int().min(0).default(0),
-  entityId: z.string().max(200).optional(),
-  propertyId: z.string().max(200).optional(),
+  entityId: z.string().min(1).max(200).optional(),
+  propertyId: z.string().min(1).max(200).optional(),
   variety: z.enum(["structured", "attributed"]).optional(),
   status: z.enum(["active", "superseded", "retracted"]).optional(),
 });
@@ -128,26 +128,27 @@ function formatStatement(s: typeof statements.$inferSelect) {
 
 // Strict schema for quality dimensions — enforces exactly the 10 known keys
 // and rejects unknown ones. Using z.object().strict() means extra keys cause a
-// 400 error rather than being silently stored in the DB. Values must be in [0, 1].
+// 400 error rather than being silently stored in the DB. Values must be finite
+// numbers in [0, 1] — rejects NaN, Infinity, null, and out-of-range values.
 // Exported for unit testing.
 export const QualityDimensionsSchema = z.object({
-  structure:          z.number().min(0).max(1),
-  precision:          z.number().min(0).max(1),
-  clarity:            z.number().min(0).max(1),
-  resolvability:      z.number().min(0).max(1),
-  uniqueness:         z.number().min(0).max(1),
-  atomicity:          z.number().min(0).max(1),
-  importance:         z.number().min(0).max(1),
-  neglectedness:      z.number().min(0).max(1),
-  recency:            z.number().min(0).max(1),
-  crossEntityUtility: z.number().min(0).max(1),
+  structure:          z.number().min(0).max(1).finite(),
+  precision:          z.number().min(0).max(1).finite(),
+  clarity:            z.number().min(0).max(1).finite(),
+  resolvability:      z.number().min(0).max(1).finite(),
+  uniqueness:         z.number().min(0).max(1).finite(),
+  atomicity:          z.number().min(0).max(1).finite(),
+  importance:         z.number().min(0).max(1).finite(),
+  neglectedness:      z.number().min(0).max(1).finite(),
+  recency:            z.number().min(0).max(1).finite(),
+  crossEntityUtility: z.number().min(0).max(1).finite(),
 }).strict();
 
 // Exported for unit testing.
 export const BatchScoreBody = z.object({
   scores: z.array(z.object({
     statementId: z.number().int().positive(),
-    qualityScore: z.number().min(0).max(1),
+    qualityScore: z.number().min(0).max(1).finite(),
     qualityDimensions: QualityDimensionsSchema,
   })).min(1).max(500),
 });
@@ -155,12 +156,12 @@ export const BatchScoreBody = z.object({
 // Exported for unit testing.
 export const CoverageScoreBody = z.object({
   entityId: z.string().min(1).max(200),
-  coverageScore: z.number().min(0).max(1),
+  coverageScore: z.number().min(0).max(1).finite(),
   // Category keys are dynamic (derived from property.category at runtime),
-  // so we can't enumerate them statically. We do enforce values are in [0, 1].
-  categoryScores: z.record(z.number().min(0).max(1)),
+  // so we can't enumerate them statically. We do enforce values are finite and in [0, 1].
+  categoryScores: z.record(z.number().min(0).max(1).finite()),
   statementCount: z.number().int().min(0),
-  qualityAvg: z.number().min(0).max(1).nullish(),
+  qualityAvg: z.number().min(0).max(1).finite().nullish(),
 });
 
 const CoverageScoreQuery = z.object({
@@ -168,43 +169,45 @@ const CoverageScoreQuery = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-const PatchStatementBody = z.object({
+// Exported for unit testing.
+export const PatchStatementBody = z.object({
   status: z.enum(["active", "superseded", "retracted"]).optional(),
   variety: z.enum(["structured", "attributed"]).optional(),
   statementText: z.string().min(1).max(2000).optional(),
-  validStart: z.string().max(20).nullish(),
-  validEnd: z.string().max(20).nullish(),
-  attributedTo: z.string().max(200).nullish(),
-  archiveReason: z.string().max(2000).nullish(),
-  verdict: z.string().max(50).nullish(),
-  verdictScore: z.number().min(0).max(1).nullish(),
-  verdictQuotes: z.string().max(10000).nullish(),
-  verdictModel: z.string().max(200).nullish(),
-  note: z.string().max(2000).nullish(),
+  validStart: z.string().min(1).max(20).nullish(),
+  validEnd: z.string().min(1).max(20).nullish(),
+  attributedTo: z.string().min(1).max(200).nullish(),
+  archiveReason: z.string().min(1).max(2000).nullish(),
+  verdict: z.string().min(1).max(50).nullish(),
+  verdictScore: z.number().min(0).max(1).finite().nullish(),
+  verdictQuotes: z.string().min(1).max(10000).nullish(),
+  verdictModel: z.string().min(1).max(200).nullish(),
+  note: z.string().min(1).max(2000).nullish(),
 });
 
-const CreateStatementBody = z.object({
+// Exported for unit testing.
+export const CreateStatementBody = z.object({
   variety: z.enum(["structured", "attributed"]),
   statementText: z.string().min(1).max(2000), // Required: every statement needs human-readable text
   subjectEntityId: z.string().min(1).max(200),
-  propertyId: z.string().max(200).nullish(),
-  qualifierKey: z.string().max(200).nullish(),
-  valueNumeric: z.number().nullish(),
-  valueUnit: z.string().max(100).nullish(),
-  valueText: z.string().max(2000).nullish(),
-  valueEntityId: z.string().max(200).nullish(),
-  valueDate: z.string().max(20).nullish(),
+  propertyId: z.string().min(1).max(200).nullish(),
+  qualifierKey: z.string().min(1).max(200).nullish(),
+  valueNumeric: z.number().finite().nullish(),
+  valueUnit: z.string().min(1).max(100).nullish(),
+  valueText: z.string().min(1).max(2000).nullish(),
+  valueEntityId: z.string().min(1).max(200).nullish(),
+  valueDate: z.string().min(1).max(20).nullish(),
   valueSeries: z.record(z.unknown()).nullish(),
-  validStart: z.string().max(20).nullish(),
-  validEnd: z.string().max(20).nullish(),
-  temporalGranularity: z.string().max(20).nullish(),
-  attributedTo: z.string().max(200).nullish(),
-  note: z.string().max(2000).nullish(),
-  sourceFactKey: z.string().max(200).nullish(),
-  claimCategory: z.string().max(50).nullish(),
-  verdict: z.string().max(50).nullish(),
-  verdictScore: z.number().min(0).max(1).nullish(),
-  verdictModel: z.string().max(200).nullish(),
+  validStart: z.string().min(1).max(20).nullish(),
+  validEnd: z.string().min(1).max(20).nullish(),
+  temporalGranularity: z.string().min(1).max(20).nullish(),
+  attributedTo: z.string().min(1).max(200).nullish(),
+  note: z.string().min(1).max(2000).nullish(),
+  sourceFactKey: z.string().min(1).max(200).nullish(),
+  claimCategory: z.string().min(1).max(50).nullish(),
+  verdict: z.string().min(1).max(50).nullish(),
+  verdictScore: z.number().min(0).max(1).finite().nullish(),
+  verdictModel: z.string().min(1).max(200).nullish(),
   citations: z
     .array(
       z.object({
