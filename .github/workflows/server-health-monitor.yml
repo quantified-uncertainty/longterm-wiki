@@ -1,4 +1,5 @@
 name: Wiki Server — Dead-Man-Switch
+run-name: "Wiki Server — Dead-Man-Switch${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # Weekly dead-man-switch: verifies the groundskeeper daemon is alive and
 # actively monitoring wiki-server health. Day-to-day health monitoring is
@@ -18,7 +19,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
+  preflight:
+    # Global circuit breaker — skip when automation is paused.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Automation is active"
+
   dead-man-switch:
+    needs: [preflight]
     name: Verify monitoring is active
     runs-on: ubuntu-latest
     permissions:
