@@ -4,6 +4,8 @@ name: Create Release PR
 # and auto-generated changelog. Merging the resulting PR triggers production
 # deploys (Vercel frontend + wiki-server via wiki-server-docker.yml).
 #
+# All logic lives in crux/commands/release.ts — this workflow just calls it.
+#
 # Usage:
 #   - Manual trigger from GitHub Actions UI (recommended)
 #   - Title format: "release: YYYY-MM-DD" (or "release: YYYY-MM-DD #2" for same-day)
@@ -16,7 +18,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
-  issues: write  # needed for label creation
+  issues: write # needed for label creation
 
 jobs:
   create-release-pr:
@@ -30,201 +32,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch branches
-        run: git fetch origin main production
+      - uses: pnpm/action-setup@v4
 
-      - name: Check for changes
-        id: diff
-        run: |
-          AHEAD=$(git rev-list --count origin/production..origin/main)
-          BEHIND=$(git rev-list --count origin/main..origin/production)
-          echo "ahead=$AHEAD" >> "$GITHUB_OUTPUT"
-          echo "behind=$BEHIND" >> "$GITHUB_OUTPUT"
-          echo "Main is $AHEAD commits ahead, $BEHIND commits behind production"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
 
-      - name: Exit if nothing to release
-        if: steps.diff.outputs.ahead == '0'
-        run: |
-          echo "No new commits on main since last release. Nothing to do."
-          echo "## No Release Needed" >> "$GITHUB_STEP_SUMMARY"
-          echo "main and production are in sync." >> "$GITHUB_STEP_SUMMARY"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Ensure release label exists
-        if: steps.diff.outputs.ahead != '0'
+      - name: Create or update release PR
+        run: pnpm crux release create
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Create the label if it doesn't exist (idempotent).
-          # Must run before gh pr create --label "release".
-          gh label create "release" \
-            --description "Production release PR" \
-            --color "0E8A16" \
-            --force 2>/dev/null || true
-
-      - name: Generate changelog
-        if: steps.diff.outputs.ahead != '0'
-        id: changelog
-        shell: bash
-        run: |
-          DATE=$(date -u +%Y-%m-%d)
-          AHEAD="${{ steps.diff.outputs.ahead }}"
-          BEHIND="${{ steps.diff.outputs.behind }}"
-
-          # --- Categorize commits by conventional-commit prefix ---
-
-          FEATURES=""
-          FIXES=""
-          REFACTORS=""
-          DOCS=""
-          INFRA=""
-          OTHER=""
-
-          while IFS= read -r line; do
-            [ -z "$line" ] && continue
-
-            case "$line" in
-              feat*)    FEATURES+="- ${line}"$'\n' ;;
-              fix*)     FIXES+="- ${line}"$'\n' ;;
-              refactor*) REFACTORS+="- ${line}"$'\n' ;;
-              docs*)    DOCS+="- ${line}"$'\n' ;;
-              chore*|ci*|build*|perf*) INFRA+="- ${line}"$'\n' ;;
-              *)        OTHER+="- ${line}"$'\n' ;;
-            esac
-          done < <(git log origin/production..origin/main --format="%s" --no-merges)
-
-          # --- Build PR body ---
-
-          {
-            echo "## Release ${DATE}"
-            echo ""
-            echo "**${AHEAD} commits** since last release."
-            echo ""
-
-            # Divergence warning
-            if [ "$BEHIND" -gt 0 ]; then
-              echo "> [!WARNING]"
-              echo "> Production has **${BEHIND} commits** not on main (hotfixes or merge commits)."
-              echo "> Review carefully to ensure these won't be overwritten."
-              echo ""
-            fi
-
-            if [ -n "$FEATURES" ]; then
-              echo "### Features"
-              echo "$FEATURES"
-            fi
-            if [ -n "$FIXES" ]; then
-              echo "### Fixes"
-              echo "$FIXES"
-            fi
-            if [ -n "$REFACTORS" ]; then
-              echo "### Refactoring"
-              echo "$REFACTORS"
-            fi
-            if [ -n "$DOCS" ]; then
-              echo "### Documentation"
-              echo "$DOCS"
-            fi
-            if [ -n "$INFRA" ]; then
-              echo "### Infrastructure"
-              echo "$INFRA"
-            fi
-            if [ -n "$OTHER" ]; then
-              echo "### Other"
-              echo "$OTHER"
-            fi
-
-            COMPARE_URL="https://github.com/${{ github.repository }}/compare/production...main"
-            echo "---"
-            echo "[Full diff](${COMPARE_URL})"
-          } > "${RUNNER_TEMP}/pr-body.md"
-
-          echo "date=$DATE" >> "$GITHUB_OUTPUT"
-
-      - name: Check for existing release PR
-        if: steps.diff.outputs.ahead != '0'
-        id: existing
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Look for an open PR from main → production
-          EXISTING=$(gh pr list \
-            --base production \
-            --head main \
-            --state open \
-            --json number \
-            --jq '.[0].number // empty')
-
-          if [ -n "$EXISTING" ]; then
-            echo "number=$EXISTING" >> "$GITHUB_OUTPUT"
-            echo "found=true" >> "$GITHUB_OUTPUT"
-            echo "Found existing release PR #${EXISTING}"
-          else
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            echo "No existing release PR found"
-          fi
-
-      - name: Determine title
-        if: steps.diff.outputs.ahead != '0'
-        id: title
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          DATE="${{ steps.changelog.outputs.date }}"
-          BASE_TITLE="release: ${DATE}"
-
-          # Check for already-merged release PRs from today.
-          # DATE is always YYYY-MM-DD from date(1), safe for inline interpolation.
-          MERGED_TODAY=$(gh pr list \
-            --base production \
-            --state merged \
-            --json title | jq --arg prefix "release: ${DATE}" \
-            '[.[] | select(.title | startswith($prefix))] | length')
-
-          if [ "$MERGED_TODAY" -gt 0 ]; then
-            # Increment: if 1 already merged, this is #2
-            NEXT=$((MERGED_TODAY + 1))
-            TITLE="${BASE_TITLE} #${NEXT}"
-          else
-            TITLE="${BASE_TITLE}"
-          fi
-
-          echo "title=$TITLE" >> "$GITHUB_OUTPUT"
-          echo "Title: $TITLE"
-
-      - name: Update existing release PR
-        if: steps.diff.outputs.ahead != '0' && steps.existing.outputs.found == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_NUM="${{ steps.existing.outputs.number }}"
-          TITLE="${{ steps.title.outputs.title }}"
-
-          gh pr edit "$PR_NUM" \
-            --title "$TITLE" \
-            --body-file "${RUNNER_TEMP}/pr-body.md"
-
-          echo "## Updated Release PR" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Updated [PR #${PR_NUM}](https://github.com/${{ github.repository }}/pull/${PR_NUM})" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          cat "${RUNNER_TEMP}/pr-body.md" >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Create release PR
-        if: steps.diff.outputs.ahead != '0' && steps.existing.outputs.found == 'false'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TITLE="${{ steps.title.outputs.title }}"
-
-          PR_URL=$(gh pr create \
-            --base production \
-            --head main \
-            --title "$TITLE" \
-            --body-file "${RUNNER_TEMP}/pr-body.md" \
-            --label "release")
-
-          echo "## Created Release PR" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Created [${TITLE}](${PR_URL})" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          cat "${RUNNER_TEMP}/pr-body.md" >> "$GITHUB_STEP_SUMMARY"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

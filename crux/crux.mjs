@@ -94,6 +94,7 @@ import * as agentsCommands from './commands/agents.ts';
 import * as agentSessionEventsCommands from './commands/agent-session-events.ts';
 import * as statementsCommands from './commands/statements.ts';
 import * as auditsCommands from './commands/audits.ts';
+import * as releaseCommands from './commands/release.ts';
 
 const domains = {
   validate: validateCommands,
@@ -134,6 +135,7 @@ const domains = {
   'agent-session-events': agentSessionEventsCommands,
   statements: statementsCommands,
   audits: auditsCommands,
+  release: releaseCommands,
 };
 
 /**
