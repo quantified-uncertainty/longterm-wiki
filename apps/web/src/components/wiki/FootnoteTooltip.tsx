@@ -10,7 +10,6 @@ import { useReferenceData } from "./ReferenceContext";
 import { VerdictBadge } from "./VerdictBadge";
 import { getDomain } from "./resource-utils";
 import type { RefMapEntry } from "./ReferenceContext";
-import { getDomain, isSafeUrl } from "./resource-utils";
 
 /**
  * Format an ISO date string for compact display.
