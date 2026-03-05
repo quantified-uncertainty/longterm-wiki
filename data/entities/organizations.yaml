@@ -32,6 +32,27 @@
     - id: racing-dynamics
       type: risk
       relationship: affects
+    - id: daniela-amodei
+      type: person
+      relationship: leads-to
+    - id: claude
+      type: project
+      relationship: product-of
+    - id: constitutional-ai
+      type: concept
+      relationship: research
+    - id: responsible-scaling-policies
+      type: policy
+      relationship: policy-of
+    - id: sleeper-agents
+      type: concept
+      relationship: research
+    - id: anthropic-core-views
+      type: concept
+      relationship: policy-of
+    - id: long-term-benefit-trust
+      type: concept
+      relationship: governance
   sources:
     - title: Anthropic Company Website
       url: https://anthropic.com

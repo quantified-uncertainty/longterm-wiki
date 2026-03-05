@@ -34,6 +34,7 @@ import {
   entityCoverageScores,
   wikiPages,
   resources,
+  entities,
 } from "../schema.js";
 import {
   parseJsonBody,
@@ -67,6 +68,10 @@ const CurrentQuery = z.object({
 const ByEntityQuery = z.object({
   entityId: z.string().min(1).max(200),
   includeRetracted: z
+    .string()
+    .optional()
+    .transform((v) => v === "true"),
+  includeChildren: z
     .string()
     .optional()
     .transform((v) => v === "true"),
@@ -179,6 +184,7 @@ export const PatchStatementBody = z.object({
   status: z.enum(["active", "superseded", "retracted"]).optional(),
   variety: z.enum(["structured", "attributed"]).optional(),
   statementText: z.string().min(1).max(2000).optional(),
+  subjectEntityId: z.string().min(1).max(200).optional(),
   propertyId: z.string().min(1).max(200).nullish(),
   validStart: z.string().min(1).max(20).nullish(),
   validEnd: z.string().min(1).max(20).nullish(),
@@ -353,15 +359,47 @@ const statementsApp = new Hono()
 
   // ---- GET /by-entity — all statements for an entity, with citations and property info ----
   .get("/by-entity", zv("query", ByEntityQuery), async (c) => {
-    const { entityId, includeRetracted } = c.req.valid("query");
+    const { entityId, includeRetracted, includeChildren } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    // Build where clause — exclude retracted by default
-    const entityConditions = [eq(statements.subjectEntityId, entityId)];
+    // Determine which entity IDs to include
+    let entityIds = [entityId];
+    if (includeChildren) {
+      const entityRow = await db
+        .select({ relatedEntries: entities.relatedEntries })
+        .from(entities)
+        .where(eq(entities.id, entityId))
+        .limit(1);
+      if (entityRow.length > 0 && entityRow[0].relatedEntries) {
+        const childIds = (
+          entityRow[0].relatedEntries as Array<{ id: string }>
+        ).map((re) => re.id);
+        entityIds = [entityId, ...childIds];
+      }
+    }
+
+    // Build where clause — single entity or multiple
+    const entityMatch =
+      entityIds.length === 1
+        ? eq(statements.subjectEntityId, entityId)
+        : sql`${statements.subjectEntityId} IN (${sql.join(
+            entityIds.map((id) => sql`${id}`),
+            sql`, `,
+          )})`;
+    const entityConditions = [entityMatch];
     if (!includeRetracted) {
       entityConditions.push(sql`${statements.status} != 'retracted'`);
     }
     const entityWhere = and(...entityConditions);
+
+    // Build the same entity match for the citations subquery
+    const citationsSubquery =
+      entityIds.length === 1
+        ? sql`${statements.subjectEntityId} = ${entityId}`
+        : sql`${statements.subjectEntityId} IN (${sql.join(
+            entityIds.map((id) => sql`${id}`),
+            sql`, `,
+          )})`;
 
     // Fetch statements, citations, and properties in parallel
     const [rows, allCitations, propertyRows] = await Promise.all([
@@ -376,7 +414,7 @@ const statementsApp = new Hono()
         .where(
           sql`${statementCitations.statementId} IN (
             SELECT ${statements.id} FROM ${statements}
-            WHERE ${statements.subjectEntityId} = ${entityId}
+            WHERE ${citationsSubquery}
             ${includeRetracted ? sql`` : sql`AND ${statements.status} != 'retracted'`}
           )`
         ),
@@ -960,6 +998,7 @@ const statementsApp = new Hono()
         ...(data.status !== undefined && { status: data.status }),
         ...(data.variety !== undefined && { variety: data.variety }),
         ...(data.statementText !== undefined && { statementText: data.statementText }),
+        ...(data.subjectEntityId !== undefined && { subjectEntityId: data.subjectEntityId }),
         ...(data.propertyId !== undefined && { propertyId: data.propertyId ?? null }),
         ...(data.validStart !== undefined && { validStart: data.validStart ?? null }),
         ...(data.validEnd !== undefined && { validEnd: data.validEnd ?? null }),
