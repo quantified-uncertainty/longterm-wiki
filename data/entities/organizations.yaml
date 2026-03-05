@@ -37,22 +37,22 @@
       relationship: leads-to
     - id: claude
       type: project
-      relationship: product-of
+      relationship: composed-of
     - id: constitutional-ai
       type: concept
       relationship: research
     - id: responsible-scaling-policies
       type: policy
-      relationship: policy-of
+      relationship: related
     - id: sleeper-agents
       type: concept
       relationship: research
     - id: anthropic-core-views
       type: concept
-      relationship: policy-of
+      relationship: related
     - id: long-term-benefit-trust
       type: concept
-      relationship: governance
+      relationship: related
   sources:
     - title: Anthropic Company Website
       url: https://anthropic.com
