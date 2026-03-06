@@ -100,7 +100,7 @@ Check for important recent developments (last 6 months) that aren't reflected:
 
 ## Phase 3: Write the Report
 
-```
+```md
 ## Knowledge Gap Analysis — [DATE]
 
 ### Coverage Summary

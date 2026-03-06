@@ -94,8 +94,11 @@ function SnapshotRow({
 
   // Show qualifier context if present — format "category:value" as just "value"
   const qualifierLabel = s.qualifierKey
-    ? (s.qualifierKey.includes(":") ? s.qualifierKey.split(":")[1] : s.qualifierKey)
-        ?.replace(/-/g, " ")
+    ? (
+        s.qualifierKey.includes(":")
+          ? s.qualifierKey.split(":").slice(1).join(":")
+          : s.qualifierKey
+      ).replace(/-/g, " ")
     : null;
 
   // First citation URL for inline source

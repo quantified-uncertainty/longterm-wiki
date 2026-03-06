@@ -84,7 +84,7 @@ Produce a structured report. Be specific — reference statement IDs, entity slu
 
 ### Report Format
 
-```
+```md
 ## Ontology Review: [Entity Name] ([entity-type])
 
 ### Summary
