@@ -37,9 +37,9 @@ describe("loader", () => {
   });
 
   describe("properties", () => {
-    it("loads 18 properties", () => {
+    it("loads 28 properties", () => {
       const properties = graph.getAllProperties();
-      expect(properties).toHaveLength(18);
+      expect(properties).toHaveLength(28);
     });
 
     it("loads property details correctly", () => {
@@ -112,11 +112,14 @@ describe("loader", () => {
   });
 
   describe("facts", () => {
-    it("loads correct number of facts for Anthropic (11)", () => {
+    it("loads correct number of facts for Anthropic (36)", () => {
       const facts = graph.getFacts("anthropic");
-      // 5 revenue + 1 valuation + 1 founded-date + 1 headquarters + 1 headcount
-      // + 1 legal-structure + 1 total-funding + 1 gross-margin + 2 market-share = 14
-      expect(facts).toHaveLength(14);
+      // 9 revenue + 4 valuation + 3 total-funding + 3 headcount + 1 founded-date
+      // + 1 headquarters + 1 legal-structure + 2 gross-margin + 2 cash-burn
+      // + 2 enterprise-market-share + 1 coding-market-share + 1 monthly-active-users
+      // + 1 business-customers + 1 api-calls-monthly + 1 product-revenue
+      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size = 36
+      expect(facts).toHaveLength(36);
     });
 
     it("loads correct number of facts for Dario Amodei (3)", () => {
@@ -207,12 +210,12 @@ describe("loader", () => {
   describe("item collections", () => {
     it("loads funding-rounds collection for Anthropic", () => {
       const rounds = graph.getItems("anthropic", "funding-rounds");
-      expect(rounds).toHaveLength(9);
+      expect(rounds).toHaveLength(13);
     });
 
     it("loads key-people collection for Anthropic", () => {
       const people = graph.getItems("anthropic", "key-people");
-      expect(people).toHaveLength(7);
+      expect(people).toHaveLength(15);
     });
 
     it("item entries have correct keys and field values", () => {

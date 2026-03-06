@@ -175,3 +175,104 @@ properties:
     dataType: text
     category: organization
     appliesTo: [organization]
+
+  # ── Product & Usage ─────────────────────────────────────────────
+
+  monthly-active-users:
+    name: Monthly Active Users
+    description: "Monthly active users (MAU)"
+    dataType: number
+    category: product
+    appliesTo: [organization]
+    display:
+      divisor: 1e6
+      suffix: "M"
+
+  business-customers:
+    name: Business Customers
+    description: "Number of business/enterprise customers"
+    dataType: number
+    category: product
+    appliesTo: [organization]
+    display:
+      divisor: 1000
+      suffix: "K"
+
+  api-calls-monthly:
+    name: Monthly API Calls
+    description: "Monthly API request volume"
+    dataType: number
+    category: product
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      suffix: "B"
+
+  product-revenue:
+    name: Product Revenue
+    description: "Annualized revenue from a specific product line"
+    dataType: number
+    unit: USD
+    category: financial
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  # ── Financial Detail ─────────────────────────────────────────────
+
+  cash-burn:
+    name: Annual Cash Burn
+    description: "Annual net cash burn (negative free cash flow)"
+    dataType: number
+    unit: USD
+    category: financial
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  enterprise-market-share:
+    name: Enterprise Market Share
+    description: "Enterprise LLM market share by usage"
+    dataType: number
+    unit: percent
+    category: financial
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  coding-market-share:
+    name: Coding Market Share
+    description: "Enterprise coding assistant market share"
+    dataType: number
+    unit: percent
+    category: financial
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  # ── Safety ──────────────────────────────────────────────────────
+
+  safety-level:
+    name: AI Safety Level
+    description: "Current AI Safety Level designation under RSP (e.g. ASL-2, ASL-3)"
+    dataType: text
+    category: safety
+    appliesTo: [organization]
+
+  safety-researcher-count:
+    name: Safety Researchers
+    description: "Number of employees working on safety-related research"
+    dataType: number
+    category: safety
+    appliesTo: [organization]
+
+  interpretability-team-size:
+    name: Interpretability Team Size
+    description: "Number of researchers focused on mechanistic interpretability"
+    dataType: number
+    category: safety
+    appliesTo: [organization]
