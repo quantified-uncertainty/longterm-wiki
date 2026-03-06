@@ -14,6 +14,7 @@ function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
     title: 'Test PR',
     headRefName: 'claude/test',
     mergeable: 'MERGEABLE',
+    isDraft: false,
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-03-05T00:00:00Z',
     body: '## Summary\n\n- [x] Task done\n\n## Test plan\n\n- [x] Tests pass\n\nCloses #1',
@@ -283,6 +284,20 @@ describe('checkMergeEligibility', () => {
     expect(result.blockReasons).toContain('claude-working');
   });
 
+  it('blocks when PR is a draft', () => {
+    const result = checkMergeEligibility(
+      makePrNode({ isDraft: true }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('is-draft');
+  });
+
+  it('does NOT block when PR is not a draft', () => {
+    const result = checkMergeEligibility(makePrNode({ isDraft: false }));
+    expect(result.eligible).toBe(true);
+    expect(result.blockReasons).not.toContain('is-draft');
+  });
+
   it('returns multiple block reasons when several checks fail', () => {
     const result = checkMergeEligibility(
       makePrNode({
@@ -348,6 +363,23 @@ describe('findMergeCandidates', () => {
     expect(result).toHaveLength(2);
     expect(result.find((c) => c.number === 1)?.eligible).toBe(true);
     expect(result.find((c) => c.number === 2)?.eligible).toBe(false);
+  });
+
+  it('marks draft PRs as blocked with is-draft reason', () => {
+    const draftPr = makePrNode({ number: 1, isDraft: true });
+    const result = findMergeCandidates([draftPr]);
+    expect(result).toHaveLength(1);
+    expect(result[0].eligible).toBe(false);
+    expect(result[0].blockReasons).toContain('is-draft');
+  });
+
+  it('draft PR with only is-draft block is undraft-eligible', () => {
+    const draftPr = makePrNode({ number: 1, isDraft: true });
+    const result = findMergeCandidates([draftPr]);
+    const undraftEligible = result.filter(
+      (c) => !c.eligible && c.blockReasons.length === 1 && c.blockReasons[0] === 'is-draft',
+    );
+    expect(undraftEligible).toHaveLength(1);
   });
 });
 
