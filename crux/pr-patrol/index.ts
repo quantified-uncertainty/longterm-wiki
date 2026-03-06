@@ -5,7 +5,7 @@
  * missing issue refs, staleness), scores them by priority, and spawns
  * `claude` CLI to fix the highest-priority one per cycle.
  *
- * TypeScript rewrite of scripts/pr-patrol.sh.
+ * Canonical implementation (replaces the former scripts/pr-patrol.sh).
  */
 
 import { spawn } from 'child_process';
@@ -135,34 +135,327 @@ function appendJsonl(file: string, entry: Record<string, unknown>): void {
 
 // ── Cooldown tracking ────────────────────────────────────────────────────────
 
-function isRecentlyProcessed(pr: number, cooldownSeconds: number): boolean {
-  const file = join(STATE_DIR, `processed-${pr}`);
+function isRecentlyProcessed(key: number | string, cooldownSeconds: number): boolean {
+  const file = join(STATE_DIR, `processed-${key}`);
   if (!existsSync(file)) return false;
   const last = Number(readFileSync(file, 'utf-8').trim());
   return Date.now() / 1000 - last < cooldownSeconds;
 }
 
-function markProcessed(pr: number): void {
+function markProcessed(key: number | string): void {
   writeFileSync(
-    join(STATE_DIR, `processed-${pr}`),
+    join(STATE_DIR, `processed-${key}`),
     String(Math.floor(Date.now() / 1000)),
   );
 }
 
-function getMaxTurnsFailCount(pr: number): number {
-  const file = join(STATE_DIR, `max-turns-${pr}`);
+function getMaxTurnsFailCount(key: number | string): number {
+  const file = join(STATE_DIR, `max-turns-${key}`);
   if (!existsSync(file)) return 0;
   return parseInt(readFileSync(file, 'utf-8').trim(), 10) || 0;
 }
 
-function recordMaxTurnsFailure(pr: number): number {
-  const count = getMaxTurnsFailCount(pr) + 1;
-  writeFileSync(join(STATE_DIR, `max-turns-${pr}`), String(count));
+function recordMaxTurnsFailure(key: number | string): number {
+  const count = getMaxTurnsFailCount(key) + 1;
+  writeFileSync(join(STATE_DIR, `max-turns-${key}`), String(count));
   return count;
 }
 
-function isAbandoned(pr: number): boolean {
-  return getMaxTurnsFailCount(pr) >= 2;
+function isAbandoned(key: number | string): boolean {
+  return getMaxTurnsFailCount(key) >= 2;
+}
+
+// ── Main Branch CI Check ────────────────────────────────────────────────────
+
+interface WorkflowRun {
+  id: number;
+  status: string;
+  conclusion: string | null;
+  created_at: string;
+  head_sha: string;
+  html_url: string;
+}
+
+interface WorkflowRunsResponse {
+  workflow_runs: WorkflowRun[];
+  total_count: number;
+}
+
+interface MainBranchStatus {
+  isRed: boolean;
+  runId: number | null;
+  sha: string;
+  htmlUrl: string;
+}
+
+const CI_WORKFLOW = 'ci.yml';
+const MAIN_BRANCH_KEY = 'main-branch';
+
+async function checkMainBranch(config: PatrolConfig): Promise<MainBranchStatus> {
+  const notRed: MainBranchStatus = { isRed: false, runId: null, sha: '', htmlUrl: '' };
+
+  // Check cooldown and abandoned status first
+  if (isAbandoned(MAIN_BRANCH_KEY)) {
+    log('  Main branch fix abandoned — needs human intervention');
+    return notRed;
+  }
+  if (isRecentlyProcessed(MAIN_BRANCH_KEY, config.cooldownSeconds)) {
+    log('  Main branch recently processed — skipping');
+    return notRed;
+  }
+
+  try {
+    // Fetch the latest completed CI runs on main
+    const resp = await githubApi<WorkflowRunsResponse>(
+      `/repos/${config.repo}/actions/workflows/${CI_WORKFLOW}/runs?branch=main&status=completed&per_page=5`,
+    );
+
+    const runs = resp.workflow_runs ?? [];
+    if (runs.length === 0) {
+      log('  No completed CI runs on main found');
+      return notRed;
+    }
+
+    const latest = runs[0];
+    if (latest.conclusion === 'failure') {
+      log(`  🔴 Main branch CI is RED (run #${latest.id}, sha ${latest.head_sha.slice(0, 8)})`);
+      return {
+        isRed: true,
+        runId: latest.id,
+        sha: latest.head_sha,
+        htmlUrl: latest.html_url,
+      };
+    }
+
+    log(`  Main branch CI is green (latest run #${latest.id}: ${latest.conclusion})`);
+    return notRed;
+  } catch (e) {
+    log(`  Warning: could not check main branch CI: ${e instanceof Error ? e.message : String(e)}`);
+    return notRed;
+  }
+}
+
+function buildMainBranchPrompt(runId: number, repo: string): string {
+  return `You are a CI repair agent for the ${repo} repository.
+
+## Situation
+
+The CI workflow on the \`main\` branch is failing. Run ID: ${runId}
+
+## Instructions
+
+1. First, examine the CI failure logs:
+   gh run view ${runId} --repo ${repo} --log-failed 2>/dev/null || gh run view ${runId} --repo ${repo} --log
+
+2. Diagnose the root cause:
+   - Is it a flaky test? (Check if re-running would fix it)
+   - Is it a real build/test failure introduced by a recent commit?
+   - Is it an infrastructure issue (network, package registry, etc.)?
+
+3. If the failure looks flaky or transient:
+   - Re-run the workflow: gh run rerun ${runId} --repo ${repo} --failed
+   - That's it — no code changes needed
+
+4. If it's a real failure that needs a code fix:
+   - Create a fix branch: git checkout -b claude/fix-main-ci-$(date +%s) origin/main
+   - Read the relevant source files and fix the issue
+   - Run locally to verify: pnpm crux validate gate
+   - Commit and push the fix branch
+   - Open a PR: gh pr create --repo ${repo} --title "Fix main branch CI failure" --body "Fixes CI failure from run #${runId}"
+
+## Guardrails
+- Only fix the CI failure — do not refactor or improve unrelated code
+- If the failure is in test expectations that need updating (not a real bug), update the tests
+- If you cannot diagnose or fix the issue, output a clear summary of what you found
+- Do NOT run /agent-session-start or /agent-session-ready-PR
+- Run pnpm crux validate gate --fix before committing`;
+}
+
+async function fixMainBranch(status: MainBranchStatus, config: PatrolConfig): Promise<void> {
+  log(`→ Fixing main branch CI (run #${status.runId})`);
+
+  if (config.dryRun) {
+    log('  [DRY RUN] Would invoke Claude to fix main branch CI');
+    appendJsonl(JSONL_FILE, {
+      type: 'main_branch_result',
+      run_id: status.runId,
+      sha: status.sha,
+      outcome: 'dry-run' as FixOutcome,
+      elapsed_s: 0,
+    });
+    markProcessed(MAIN_BRANCH_KEY);
+    return;
+  }
+
+  const prompt = buildMainBranchPrompt(status.runId!, config.repo);
+  const startTime = Date.now();
+
+  let outcome: FixOutcome = 'fixed';
+  let reason = '';
+
+  try {
+    const result = await spawnClaude(prompt, config);
+    const elapsedS = Math.floor((Date.now() - startTime) / 1000);
+
+    if (result.timedOut) {
+      outcome = 'timeout';
+      reason = `Killed after ${config.timeoutMinutes}m timeout`;
+      log(`✗ Main branch fix timed out after ${config.timeoutMinutes}m`);
+    } else if (result.exitCode === 0 && !result.hitMaxTurns) {
+      outcome = 'fixed';
+      log(`✓ Main branch CI fix processed (${elapsedS}s)`);
+    } else if (result.hitMaxTurns) {
+      const failCount = recordMaxTurnsFailure(MAIN_BRANCH_KEY);
+      outcome = 'max-turns';
+      reason = `Hit max turns (${config.maxTurns}) — attempt ${failCount}`;
+      log(`⚠ Main branch fix hit max turns after ${elapsedS}s`);
+
+      if (failCount >= 2) {
+        reason = `Abandoned after ${failCount} max-turns failures`;
+        log(`✗ Main branch fix abandoned after ${failCount} max-turns failures`);
+      }
+    } else {
+      outcome = 'error';
+      reason = `Exit code: ${result.exitCode}`;
+      log(`✗ Main branch fix failed (exit: ${result.exitCode}, ${elapsedS}s)`);
+    }
+
+    appendJsonl(JSONL_FILE, {
+      type: 'main_branch_result',
+      run_id: status.runId,
+      sha: status.sha,
+      outcome,
+      elapsed_s: elapsedS,
+      reason: reason || undefined,
+    });
+  } finally {
+    // Clean up any in-progress rebase/merge
+    gitSafe('rebase', '--abort');
+    gitSafe('merge', '--abort');
+
+    // Restore to main branch
+    gitSafe('checkout', 'main');
+
+    markProcessed(MAIN_BRANCH_KEY);
+  }
+}
+
+// ── PR Overlap Detection ────────────────────────────────────────────────────
+
+interface PrFiles {
+  prNumber: number;
+  title: string;
+  files: string[];
+}
+
+interface PrFileEntry {
+  filename: string;
+}
+
+async function detectPrOverlaps(config: PatrolConfig, prs: DetectedPr[]): Promise<void> {
+  // Limit to first 20 PRs to avoid rate limits
+  const prSubset = prs.slice(0, 20);
+  if (prSubset.length < 2) return;
+
+  log(`Checking ${prSubset.length} PRs for file overlaps...`);
+
+  // Fetch changed files for each PR
+  const prFiles: PrFiles[] = [];
+  for (const pr of prSubset) {
+    try {
+      const files = await githubApi<PrFileEntry[]>(
+        `/repos/${config.repo}/pulls/${pr.number}/files?per_page=100`,
+      );
+      prFiles.push({
+        prNumber: pr.number,
+        title: pr.title,
+        files: files.map((f) => f.filename),
+      });
+    } catch (e) {
+      log(`  Warning: could not fetch files for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  // Build file → PR map
+  const fileMap = new Map<string, number[]>();
+  for (const pf of prFiles) {
+    for (const file of pf.files) {
+      const existing = fileMap.get(file) ?? [];
+      existing.push(pf.prNumber);
+      fileMap.set(file, existing);
+    }
+  }
+
+  // Find overlapping pairs
+  const overlaps = new Map<string, string[]>(); // "A-B" → shared files
+  for (const [file, prNums] of fileMap) {
+    if (prNums.length < 2) continue;
+    // Generate all pairs
+    for (let i = 0; i < prNums.length; i++) {
+      for (let j = i + 1; j < prNums.length; j++) {
+        const key = `${Math.min(prNums[i], prNums[j])}-${Math.max(prNums[i], prNums[j])}`;
+        const existing = overlaps.get(key) ?? [];
+        existing.push(file);
+        overlaps.set(key, existing);
+      }
+    }
+  }
+
+  if (overlaps.size === 0) {
+    log('  No file overlaps detected');
+    return;
+  }
+
+  log(`  Found ${overlaps.size} PR pair(s) with shared files`);
+
+  // Post warning comments (respecting cooldown)
+  for (const [pairKey, sharedFiles] of overlaps) {
+    const overlapKey = `overlap-${pairKey}`;
+    if (isRecentlyProcessed(overlapKey, config.cooldownSeconds * 4)) {
+      // Use 4× the normal cooldown since overlap warnings are informational
+      continue;
+    }
+
+    const [aStr, bStr] = pairKey.split('-');
+    const prA = parseInt(aStr, 10);
+    const prB = parseInt(bStr, 10);
+    const uniqueFiles = [...new Set(sharedFiles)];
+    const fileList = uniqueFiles.slice(0, 10).join('\n- ');
+    const moreCount = uniqueFiles.length > 10 ? ` (+${uniqueFiles.length - 10} more)` : '';
+
+    const body = `⚠️ **PR Overlap Warning**
+
+This PR shares ${uniqueFiles.length} file(s) with PR #${prB}:
+- ${fileList}${moreCount}
+
+Coordinate to avoid merge conflicts.
+
+_Posted by PR Patrol — informational only._`;
+
+    if (config.dryRun) {
+      log(`  [DRY RUN] Would warn PR #${prA} and #${prB} about ${uniqueFiles.length} shared files`);
+    } else {
+      // Post on both PRs
+      for (const prNum of [prA, prB]) {
+        const otherPr = prNum === prA ? prB : prA;
+        const commentBody = body.replace(`PR #${prB}`, `PR #${otherPr}`);
+        await githubApi(`/repos/${config.repo}/issues/${prNum}/comments`, {
+          method: 'POST',
+          body: { body: commentBody },
+        }).catch((e) =>
+          log(`  Warning: could not post overlap comment on PR #${prNum}: ${e instanceof Error ? e.message : String(e)}`),
+        );
+      }
+    }
+
+    markProcessed(overlapKey);
+    appendJsonl(JSONL_FILE, {
+      type: 'overlap_warning',
+      pr_a: prA,
+      pr_b: prB,
+      shared_files: uniqueFiles.length,
+    });
+  }
 }
 
 // ── PR Detection (GraphQL) ──────────────────────────────────────────────────
@@ -786,8 +1079,30 @@ async function runCheckCycle(
 ): Promise<void> {
   logHeader(`Check cycle #${cycleCount}`);
 
-  // 1. Detect issues
+  // 0. Check main branch CI first — highest priority
+  const mainStatus = await checkMainBranch(config);
+  if (mainStatus.isRed) {
+    log('Main branch CI is red — prioritizing fix over PR queue');
+    await fixMainBranch(mainStatus, config);
+    appendJsonl(JSONL_FILE, {
+      type: 'cycle_summary',
+      cycle_number: cycleCount,
+      prs_scanned: 0,
+      queue_size: 0,
+      pr_processed: null,
+      main_branch_fix: true,
+    });
+    return; // Main takes the whole cycle; PRs wait
+  }
+
+  // 1. Detect PR issues
   const detected = await detectAllPrIssues(config);
+
+  // 1b. Check for PR file overlaps (informational — posts warnings)
+  if (detected.length >= 2) {
+    await detectPrOverlaps(config, detected);
+  }
+
   if (detected.length === 0) {
     log('All PRs clean — nothing to do');
     appendJsonl(JSONL_FILE, {
@@ -928,9 +1243,18 @@ export function readRecentLogs(count: number): string {
         output.push(
           `  PR #${entry.pr_num}: ${entry.outcome} (${entry.elapsed_s}s) — ${entry.issues?.join(', ') ?? ''}`,
         );
-      } else if (entry.type === 'cycle_summary') {
+      } else if (entry.type === 'main_branch_result') {
         output.push(
-          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}`,
+          `  Main branch: ${entry.outcome} (${entry.elapsed_s}s) — run #${entry.run_id}`,
+        );
+      } else if (entry.type === 'overlap_warning') {
+        output.push(
+          `  Overlap: PR #${entry.pr_a} ↔ PR #${entry.pr_b} (${entry.shared_files} shared files)`,
+        );
+      } else if (entry.type === 'cycle_summary') {
+        const mainFix = entry.main_branch_fix ? ', main_branch_fix=true' : '';
+        output.push(
+          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}${mainFix}`,
         );
       }
     } catch {
