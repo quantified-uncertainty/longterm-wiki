@@ -80,6 +80,25 @@ facts:
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
     notes: "Total funding raised including $30B Series G"
 
+  - id: f_gM7xR4nW2b
+    property: gross-margin
+    value: 40
+    asOf: 2025-12
+    source: https://www.theinformation.com/articles/anthropics-finances
+    notes: "Approximate gross margin; hardware costs are the primary expense"
+
+  - id: f_kT3vN8wJ5c
+    property: market-share
+    value: 25
+    asOf: 2025-12
+    notes: "Enterprise LLM API market share (estimated); OpenAI ~55%, Anthropic ~25%, Google ~15%"
+
+  - id: f_pL6yK2mD9f
+    property: market-share
+    value: 30
+    asOf: 2026-02
+    notes: "Enterprise LLM API market share (estimated); growing from ~25% following Opus 4 launch"
+
 items:
   funding-rounds:
     type: funding-round
@@ -201,3 +220,56 @@ items:
         title: "Member of Technical Staff"
         start: 2025-01
         notes: "Works on responsible scaling policy; co-founder of GiveWell / Coefficient Giving"
+
+  products:
+    type: product
+    entries:
+      claude-ai:
+        name: Claude.ai
+        launched: 2023-07
+        description: "Consumer-facing AI assistant web application"
+        source: https://claude.ai
+      claude-for-enterprise:
+        name: Claude for Enterprise
+        launched: 2024-03
+        description: "Enterprise tier with team management, SSO, and longer context"
+        source: https://www.anthropic.com/news/claude-for-enterprise
+      claude-code:
+        name: Claude Code
+        launched: 2025-02
+        description: "Agentic CLI coding tool for software development"
+        source: https://docs.anthropic.com/en/docs/claude-code
+      api:
+        name: Claude API
+        launched: 2023-03
+        description: "Developer API for programmatic access to Claude models"
+        source: https://console.anthropic.com
+
+  research-areas:
+    type: research-area
+    entries:
+      mechanistic-interpretability:
+        name: Mechanistic Interpretability
+        description: "Understanding neural network internals through reverse-engineering"
+        team-size: 30
+        started: 2021-01
+        key-publication: https://transformer-circuits.pub/2024/scaling-monosemanticity/
+        notes: "Led by Chris Olah; pioneer of feature visualization and circuit-level analysis"
+      constitutional-ai:
+        name: Constitutional AI
+        description: "Training AI systems to follow principles through self-critique"
+        started: 2022-12
+        key-publication: https://arxiv.org/abs/2212.08073
+        notes: "Core alignment technique used in all Claude models"
+      responsible-scaling:
+        name: Responsible Scaling Policy
+        description: "Framework for evaluating and mitigating risks at each capability level"
+        started: 2023-09
+        key-publication: https://www.anthropic.com/index/anthropics-responsible-scaling-policy
+        notes: "ASL-2 to ASL-3 framework; influenced industry RSP adoption"
+      sleeper-agents:
+        name: Sleeper Agents Research
+        description: "Investigating whether AI systems can maintain hidden behaviors through training"
+        started: 2024-01
+        key-publication: https://arxiv.org/abs/2401.05566
+        notes: "Seminal paper on deceptive alignment; showed backdoors can survive safety training"

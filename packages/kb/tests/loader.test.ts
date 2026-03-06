@@ -22,12 +22,12 @@ describe("loader", () => {
       expect(anthropic!.numericId).toBe(3);
     });
 
-    it("loads all 3 things (anthropic, dario-amodei, jan-leike)", () => {
+    it("loads all 5 things", () => {
       const things = graph.getAllThings();
-      expect(things).toHaveLength(3);
+      expect(things).toHaveLength(5);
 
       const ids = things.map((t) => t.id).sort();
-      expect(ids).toEqual(["anthropic", "dario-amodei", "jan-leike"]);
+      expect(ids).toEqual(["anthropic", "dario-amodei", "jan-leike", "openai", "sam-altman"]);
     });
 
     it("loads thing aliases", () => {
@@ -37,9 +37,9 @@ describe("loader", () => {
   });
 
   describe("properties", () => {
-    it("loads 15 properties", () => {
+    it("loads 18 properties", () => {
       const properties = graph.getAllProperties();
-      expect(properties).toHaveLength(15);
+      expect(properties).toHaveLength(18);
     });
 
     it("loads property details correctly", () => {
@@ -115,8 +115,8 @@ describe("loader", () => {
     it("loads correct number of facts for Anthropic (11)", () => {
       const facts = graph.getFacts("anthropic");
       // 5 revenue + 1 valuation + 1 founded-date + 1 headquarters + 1 headcount
-      // + 1 legal-structure + 1 total-funding = 11
-      expect(facts).toHaveLength(11);
+      // + 1 legal-structure + 1 total-funding + 1 gross-margin + 2 market-share = 14
+      expect(facts).toHaveLength(14);
     });
 
     it("loads correct number of facts for Dario Amodei (3)", () => {

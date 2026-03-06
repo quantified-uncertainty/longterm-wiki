@@ -68,6 +68,10 @@ export function computeInverses(graph: Graph): void {
     const { inverseId } = property;
     if (!inverseId) continue;
 
+    // Skip computed properties — they are filled by the inverse of their
+    // counterpart.  Processing them would create duplicates.
+    if (property.computed) continue;
+
     // Collect all facts across every thing that use this property.
     const allThings = graph.getAllThings();
 
@@ -75,6 +79,8 @@ export function computeInverses(graph: Graph): void {
       const facts = graph.getFacts(thing.id, { property: property.id });
 
       for (const fact of facts) {
+        // Skip facts that are already derived (from a previous inverse pass).
+        if (fact.derivedFrom) continue;
         _processFactInverse(graph, fact, inverseId);
       }
     }
