@@ -36,7 +36,9 @@ jobs:
           script: |
             const OVERRIDE_LABEL = 'coderabbit-security-ok';
             const COMMENT_MARKER = '<!-- coderabbit-security-gate -->';
-            const CODERABBIT_LOGIN = 'coderabbitai';
+            // CodeRabbit appears as 'coderabbitai' in GraphQL but 'coderabbitai[bot]' in REST.
+            // Accept both to be resilient to API differences.
+            const CODERABBIT_LOGINS = new Set(['coderabbitai', 'coderabbitai[bot]']);
 
             // Severity patterns that require dismissal
             const BLOCKING_SEVERITY_RE = /🔴 Critical|🟠 Major/;
@@ -111,7 +113,7 @@ jobs:
               if (thread.isResolved || thread.isOutdated) return false;
               const firstComment = thread.comments.nodes[0];
               if (!firstComment?.author?.login) return false;
-              if (firstComment.author.login !== CODERABBIT_LOGIN) return false;
+              if (!CODERABBIT_LOGINS.has(firstComment.author.login)) return false;
               return BLOCKING_SEVERITY_RE.test(firstComment.body);
             });
 
