@@ -291,16 +291,32 @@ export async function checkActions(): Promise<CheckResult> {
 
   for (const wf of workflowFiles) {
     try {
-      // Fetch more runs for scheduled-only workflows so we have enough after filtering
-      const perPage = SCHEDULED_ONLY_WORKFLOWS.has(wf) ? 10 : 5;
-      const resp = await githubApi<WorkflowRunsResponse>(
-        `/repos/${REPO}/actions/workflows/${wf}/runs?per_page=${perPage}&status=completed`
-      );
-      // For scheduled-only workflows, exclude push-triggered runs — those are
-      // workflow file validation failures from branch pushes and not real health signals.
-      let runs = resp.workflow_runs ?? [];
+      let runs: WorkflowRun[];
+
       if (SCHEDULED_ONLY_WORKFLOWS.has(wf)) {
-        runs = runs.filter(r => r.event === 'schedule' || r.event === 'workflow_dispatch');
+        // For scheduled-only workflows, query by event type to avoid push-triggered
+        // workflow file validation failures from branch pushes polluting the list.
+        // These "push" failures occur when GitHub validates the workflow YAML on a branch
+        // and have nothing to do with the actual scheduled workflow health.
+        const [schedResp, dispatchResp] = await Promise.all([
+          githubApi<WorkflowRunsResponse>(
+            `/repos/${REPO}/actions/workflows/${wf}/runs?per_page=3&status=completed&event=schedule`
+          ),
+          githubApi<WorkflowRunsResponse>(
+            `/repos/${REPO}/actions/workflows/${wf}/runs?per_page=3&status=completed&event=workflow_dispatch`
+          ),
+        ]);
+        const combined = [
+          ...(schedResp.workflow_runs ?? []),
+          ...(dispatchResp.workflow_runs ?? []),
+        ];
+        // Sort combined results by most recent first
+        runs = combined.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      } else {
+        const resp = await githubApi<WorkflowRunsResponse>(
+          `/repos/${REPO}/actions/workflows/${wf}/runs?per_page=5&status=completed`
+        );
+        runs = resp.workflow_runs ?? [];
       }
       const latest = runs[0];
       const maxAgeH = MAX_AGE[wf] ?? 48;
