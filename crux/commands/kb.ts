@@ -16,9 +16,10 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 
 import { loadKB } from '../../packages/kb/src/loader.ts';
 import { computeInverses } from '../../packages/kb/src/inverse.ts';
+import { validate, validateEntity } from '../../packages/kb/src/validate.ts';
 import { formatFactValue, formatItemEntry } from '../../packages/kb/src/format.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
-import type { Entity, Fact, ItemEntry } from '../../packages/kb/src/types.ts';
+import type { Entity, Fact, ItemEntry, ValidationResult } from '../../packages/kb/src/types.ts';
 
 const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
 
@@ -26,6 +27,8 @@ interface KBCommandOptions extends BaseOptions {
   type?: string;
   limit?: string;
   ci?: boolean;
+  errorsOnly?: boolean;
+  rule?: string;
 }
 
 // ── KB loading helper ───────────────────────────────────────────────────
@@ -284,12 +287,69 @@ Examples:
   };
 }
 
+// ── validate command ─────────────────────────────────────────────────────
+
+async function validateCommand(
+  args: string[],
+  options: KBCommandOptions,
+): Promise<CommandResult> {
+  const entityId = args.find((a) => !a.startsWith('--'));
+  const graph = await loadGraph();
+
+  let results: ValidationResult[];
+  if (entityId) {
+    results = validateEntity(graph, entityId);
+  } else {
+    results = validate(graph);
+  }
+
+  // Filter by severity
+  if (options.errorsOnly) {
+    results = results.filter((r) => r.severity === 'error');
+  }
+
+  // Filter by rule
+  if (options.rule) {
+    results = results.filter((r) => r.rule === options.rule);
+  }
+
+  if (options.ci) {
+    return { exitCode: 0, output: JSON.stringify(results) };
+  }
+
+  if (results.length === 0) {
+    const scope = entityId ? `"${entityId}"` : 'all entities';
+    return { exitCode: 0, output: `No issues found for ${scope}.` };
+  }
+
+  const lines: string[] = [];
+  const errors = results.filter((r) => r.severity === 'error');
+  const warnings = results.filter((r) => r.severity === 'warning');
+  const infos = results.filter((r) => r.severity === 'info');
+
+  const scope = entityId ? `"${entityId}"` : `${graph.getAllEntities().length} entities`;
+  lines.push(`\x1b[1mKB Validation: ${scope}\x1b[0m`);
+  lines.push(`  ${errors.length} errors, ${warnings.length} warnings, ${infos.length} info`);
+  lines.push('');
+
+  const severityIcon: Record<string, string> = { error: '\x1b[31mERR\x1b[0m', warning: '\x1b[33mWRN\x1b[0m', info: '\x1b[36mINF\x1b[0m' };
+
+  for (const result of results) {
+    const icon = severityIcon[result.severity] ?? result.severity;
+    const entity = result.entityId ? ` [${result.entityId}]` : '';
+    lines.push(`  ${icon}${entity} ${result.message}`);
+  }
+
+  return { exitCode: errors.length > 0 ? 1 : 0, output: lines.join('\n') };
+}
+
 // ── Exports ─────────────────────────────────────────────────────────────
 
 export const commands = {
   show: showCommand,
   list: listCommand,
   lookup: lookupCommand,
+  validate: validateCommand,
 };
 
 export function getHelp(): string {
@@ -300,10 +360,13 @@ Commands:
   show <entity-id>      Show a single entity with all data, resolving stableIds
   list [--type=X]       List all entities with name, type, stableId, and fact count
   lookup <stableId>     Look up an entity by its stableId
+  validate [entity-id]  Validate all entities or a single entity
 
 Options:
   --type=X              Filter list by entity type (e.g. organization, person)
   --limit=N             Limit number of results (list only)
+  --errors-only         Show only errors (validate only)
+  --rule=X              Filter by rule name (validate only)
   --ci                  JSON output
 
 Examples:
@@ -312,5 +375,9 @@ Examples:
   crux kb list                        List all entities
   crux kb list --type=person          List only person entities
   crux kb lookup mK9pX3rQ7n           Look up entity by stableId
+  crux kb validate                    Validate all entities
+  crux kb validate anthropic          Validate a single entity
+  crux kb validate --errors-only      Show only errors
+  crux kb validate --rule=ref-integrity  Filter by rule
 `;
 }
