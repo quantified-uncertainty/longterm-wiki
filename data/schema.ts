@@ -492,6 +492,8 @@ export const RelationshipType = z.enum([
   'child-of',     // A is a child/sub-item of B
   'composed-of',  // A is composed of B
   'component',    // A is a component of B
+  'part-of',      // A is part of B (inverse of composed-of)
+  'created-by',   // A was created by B
   // Causal/influence relationships
   'addresses',    // A addresses/deals with B
   'affects',      // A affects B

@@ -1,0 +1,408 @@
+# AI Model Entities
+# Individual AI model versions (distinct from analytical "model" entities in models.yaml)
+
+- id: claude
+  numericId: E1041
+  type: project
+  title: Claude
+  description: >-
+    Claude is Anthropic's family of AI assistants, first released in March 2023. The product line spans
+    three tiers — Haiku (fast/cheap), Sonnet (balanced), and Opus (most capable) — with major generations
+    including Claude 1, Claude 2, Claude 3, and Claude 4. Claude is available via API, the claude.ai
+    web interface, and Claude Code (a CLI tool for software engineering).
+  relatedEntries:
+    - id: anthropic
+      type: organization
+      relationship: created-by
+    - id: claude-3-opus
+      type: project
+      relationship: composed-of
+    - id: claude-3-sonnet
+      type: project
+      relationship: composed-of
+    - id: claude-3-haiku
+      type: project
+      relationship: composed-of
+    - id: claude-3-5-sonnet
+      type: project
+      relationship: composed-of
+    - id: claude-3-5-haiku
+      type: project
+      relationship: composed-of
+    - id: claude-3-7-sonnet
+      type: project
+      relationship: composed-of
+    - id: claude-sonnet-4
+      type: project
+      relationship: composed-of
+    - id: claude-opus-4
+      type: project
+      relationship: composed-of
+    - id: claude-opus-4-1
+      type: project
+      relationship: composed-of
+    - id: claude-sonnet-4-5
+      type: project
+      relationship: composed-of
+    - id: claude-haiku-4-5
+      type: project
+      relationship: composed-of
+    - id: claude-opus-4-5
+      type: project
+      relationship: composed-of
+    - id: claude-opus-4-6
+      type: project
+      relationship: composed-of
+    - id: claude-sonnet-4-6
+      type: project
+      relationship: composed-of
+    - id: constitutional-ai
+      type: concept
+      relationship: related
+  sources:
+    - title: Anthropic Claude Product Page
+      url: https://anthropic.com/claude
+    - title: Claude API Documentation
+      url: https://docs.anthropic.com
+  tags:
+    - claude
+    - anthropic
+    - ai-assistant
+    - frontier-ai
+  lastUpdated: 2026-02
+
+- id: claude-3-opus
+  numericId: E1027
+  type: project
+  title: Claude 3 Opus
+  description: >-
+    Claude 3 Opus was Anthropic's most capable model at launch on March 4, 2024. It outperformed
+    GPT-4 on MMLU (86.8%), GPQA, GSM8K, and HumanEval benchmarks. Priced at $15/$75 per million
+    tokens (input/output) with a 200K token context window.
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing the Claude 3 Model Family
+      url: https://www.anthropic.com/news/claude-3-family
+  tags:
+    - claude
+    - claude-3
+    - frontier-ai
+  lastUpdated: 2024-03
+
+- id: claude-3-sonnet
+  numericId: E1028
+  type: project
+  title: Claude 3 Sonnet
+  description: >-
+    Claude 3 Sonnet was the mid-tier model in the Claude 3 family, released March 4, 2024. It offered
+    2x the speed of Claude 2 at higher intelligence levels. Priced at $3/$15 per million tokens with a
+    200K token context window.
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing the Claude 3 Model Family
+      url: https://www.anthropic.com/news/claude-3-family
+  tags:
+    - claude
+    - claude-3
+  lastUpdated: 2024-03
+
+- id: claude-3-haiku
+  numericId: E1029
+  type: project
+  title: Claude 3 Haiku
+  description: >-
+    Claude 3 Haiku was the fastest and most cost-effective model in the Claude 3 family, released
+    March 4, 2024. It could process a 10K-token research paper in under 3 seconds. Priced at $0.25/$1.25
+    per million tokens with a 200K token context window.
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing the Claude 3 Model Family
+      url: https://www.anthropic.com/news/claude-3-family
+  tags:
+    - claude
+    - claude-3
+  lastUpdated: 2024-03
+
+- id: claude-3-5-sonnet
+  numericId: E1030
+  type: project
+  title: Claude 3.5 Sonnet
+  description: >-
+    Claude 3.5 Sonnet was released June 20, 2024, and updated October 22, 2024. The initial release
+    outperformed Claude 3 Opus across the board at half the price ($3/$15 per MTok). The October update
+    introduced computer use capability in public beta. Scored 92.0% on HumanEval and 88.7% on MMLU.
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Claude 3.5 Sonnet
+      url: https://www.anthropic.com/news/claude-3-5-sonnet
+    - title: Updated Claude 3.5 Sonnet and Computer Use
+      url: https://www.anthropic.com/news/3-5-models-and-computer-use
+  tags:
+    - claude
+    - claude-3-5
+    - computer-use
+  lastUpdated: 2024-10
+
+- id: claude-3-5-haiku
+  numericId: E1031
+  type: project
+  title: Claude 3.5 Haiku
+  description: >-
+    Claude 3.5 Haiku was released November 4, 2024. It matched Claude 3 Opus performance on many
+    evaluations while maintaining Haiku-class speed. Priced at $0.80/$4 per million tokens (reduced
+    from initial $1/$5 in December 2024) with a 200K token context window.
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Updated Claude 3.5 Sonnet and Claude 3.5 Haiku
+      url: https://www.anthropic.com/news/3-5-models-and-computer-use
+  tags:
+    - claude
+    - claude-3-5
+  lastUpdated: 2024-11
+
+- id: claude-3-7-sonnet
+  numericId: E1032
+  type: project
+  title: Claude 3.7 Sonnet
+  description: >-
+    Claude 3.7 Sonnet was released February 24, 2025 as the first hybrid reasoning model. Users could
+    toggle extended thinking mode on or off, allowing the model to self-reflect before answering.
+    Priced at $3/$15 per million tokens with a 200K token context window.
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Claude 3.7 Sonnet
+      url: https://www.anthropic.com/news/claude-3-7-sonnet
+    - title: Visible Extended Thinking
+      url: https://www.anthropic.com/news/visible-extended-thinking
+  tags:
+    - claude
+    - reasoning
+    - extended-thinking
+  lastUpdated: 2025-02
+
+- id: claude-sonnet-4
+  numericId: E1033
+  type: project
+  title: Claude Sonnet 4
+  description: >-
+    Claude Sonnet 4 was released May 22, 2025, marking the transition to the Claude 4 generation with
+    a new naming convention. Scored 72.7% on SWE-bench Verified. Priced at $3/$15 per million tokens
+    with a 200K token context window (1M beta added later).
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Claude 4
+      url: https://www.anthropic.com/news/claude-4
+  tags:
+    - claude
+    - claude-4
+  lastUpdated: 2025-05
+
+- id: claude-opus-4
+  numericId: E1034
+  type: project
+  title: Claude Opus 4
+  description: >-
+    Claude Opus 4 was released May 22, 2025 alongside Sonnet 4. Described as the world's best coding
+    model at launch, capable of autonomous coding for up to 7 hours. Scored 72.5% on SWE-bench Verified.
+    Priced at $15/$75 per million tokens with a 200K token context window.
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Claude 4
+      url: https://www.anthropic.com/news/claude-4
+  tags:
+    - claude
+    - claude-4
+    - agentic-coding
+  lastUpdated: 2025-05
+
+- id: claude-opus-4-1
+  numericId: E1035
+  type: project
+  title: Claude Opus 4.1
+  description: >-
+    Claude Opus 4.1 was released August 5, 2025 as an incremental improvement over Opus 4 with gains
+    in software engineering, agentic reasoning, and research-level tasks. Priced at $15/$75 per million
+    tokens with a 200K token context window.
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Claude Opus 4.1
+      url: https://www.anthropic.com/news/claude-opus-4-1
+  tags:
+    - claude
+    - claude-4
+  lastUpdated: 2025-08
+
+- id: claude-sonnet-4-5
+  numericId: E1036
+  type: project
+  title: Claude Sonnet 4.5
+  description: >-
+    Claude Sonnet 4.5 was released September 29, 2025. Scored 77.2% on SWE-bench Verified (82.0% with
+    parallel compute) and 61.4% on OSWorld. Maintained focus for 30+ hours on multi-step tasks. Launched
+    alongside Claude Code 2.0. Priced at $3/$15 per million tokens with 200K context (1M beta).
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Claude Sonnet 4.5
+      url: https://www.anthropic.com/news/claude-sonnet-4-5
+  tags:
+    - claude
+    - claude-4
+    - agentic-coding
+  lastUpdated: 2025-09
+
+- id: claude-haiku-4-5
+  numericId: E1037
+  type: project
+  title: Claude Haiku 4.5
+  description: >-
+    Claude Haiku 4.5 was released October 15, 2025. Delivered performance comparable to Sonnet 4 at a
+    fraction of the cost, making near-frontier intelligence accessible for scaled deployments. Priced at
+    $1/$5 per million tokens with a 200K token context window.
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Claude Haiku 4.5
+      url: https://www.anthropic.com/news/claude-haiku-4-5
+  tags:
+    - claude
+    - claude-4
+  lastUpdated: 2025-10
+
+- id: claude-opus-4-5
+  numericId: E1038
+  type: project
+  title: Claude Opus 4.5
+  description: >-
+    Claude Opus 4.5 was released November 24, 2025. First model to break 80% on SWE-bench Verified
+    (80.9%). Featured a 67% price reduction from Opus 4 ($5/$25 vs $15/$75 per MTok). Scored 44% on
+    Terminal-Bench Hard and 70 on Artificial Analysis Intelligence Index.
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Claude Opus 4.5
+      url: https://www.anthropic.com/news/claude-opus-4-5
+  tags:
+    - claude
+    - claude-4
+    - agentic-coding
+  lastUpdated: 2025-11
+
+- id: claude-opus-4-6
+  numericId: E1039
+  type: project
+  title: Claude Opus 4.6
+  description: >-
+    Claude Opus 4.6 was released February 5, 2026. Introduced adaptive thinking with four effort levels,
+    agent teams for splitting tasks, and 1M-token context window (beta). Scored 68.8% on ARC-AGI-2
+    (83% improvement over Opus 4.5), 65.4% on Terminal-Bench 2.0, and 72.7% on OSWorld.
+    Priced at $5/$25 per million tokens.
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Claude Opus 4.6
+      url: https://www.anthropic.com/news/claude-opus-4-6
+  tags:
+    - claude
+    - claude-4
+    - adaptive-thinking
+    - agent-teams
+  lastUpdated: 2026-02
+
+- id: claude-sonnet-4-6
+  numericId: E1040
+  type: project
+  title: Claude Sonnet 4.6
+  description: >-
+    Claude Sonnet 4.6 was released February 17, 2026. Scored 79.6% on SWE-bench Verified and ranked
+    No. 1 on GDPval-AA leaderboard. Matches Opus-class performance on many benchmarks at one-fifth the
+    cost. Default model for free and Pro Claude users. Priced at $3/$15 per million tokens with
+    200K context (1M beta).
+  relatedEntries:
+    - id: claude
+      type: project
+      relationship: part-of
+    - id: anthropic
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Claude Sonnet 4.6
+      url: https://www.anthropic.com/news/claude-sonnet-4-6
+  tags:
+    - claude
+    - claude-4
+  lastUpdated: 2026-02
