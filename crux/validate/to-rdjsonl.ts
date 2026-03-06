@@ -83,7 +83,7 @@ function convertIssue(issue: CruxIssue): RdjsonlDiagnostic {
     },
   };
 
-  if (issue.line) {
+  if (issue.line != null) {
     diagnostic.location.range = {
       start: { line: issue.line },
     };
