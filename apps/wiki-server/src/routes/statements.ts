@@ -437,9 +437,11 @@ const statementsApp = new Hono()
         .limit(1);
       if (entityRow.length > 0 && entityRow[0].relatedEntries) {
         const childIds = (
-          entityRow[0].relatedEntries as Array<{ id: string }>
-        ).map((re) => re.id);
-        entityIds = [entityId, ...childIds];
+          entityRow[0].relatedEntries as Array<{ id: string; relationship?: string }>
+        )
+          .filter((re) => re.relationship === "composed-of")
+          .map((re) => re.id);
+        entityIds = [...new Set([entityId, ...childIds])];
       }
     }
 
