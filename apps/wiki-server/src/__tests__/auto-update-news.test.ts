@@ -6,51 +6,19 @@ import {
   createQueryResult,
   postJson,
 } from "./test-utils";
+import type { autoUpdateRuns, autoUpdateNewsItems } from "../schema.js";
 
 // ---- In-memory stores ----
+// Store types are derived from the Drizzle schema so TypeScript catches column renames.
 
 let nextRunId = 1;
 let nextNewsId = 1;
 
-type RunRow = {
-  id: number;
-  date: string;
-  started_at: Date;
-  completed_at: Date | null;
-  trigger: string;
-  budget_limit: number | null;
-  budget_spent: number | null;
-  sources_checked: number | null;
-  sources_failed: number | null;
-  items_fetched: number | null;
-  items_relevant: number | null;
-  pages_planned: number | null;
-  pages_updated: number | null;
-  pages_failed: number | null;
-  pages_skipped: number | null;
-  new_pages_created: string | null;
-  details_json: unknown;
-  created_at: Date;
-};
-
-type NewsRow = {
-  id: number;
-  run_id: number;
-  title: string;
-  url: string;
-  source_id: string;
-  published_at: string | null;
-  summary: string | null;
-  relevance_score: number | null;
-  topics_json: string[] | null;
-  entities_json: string[] | null;
-  routed_to_page_id: string | null;
-  routed_to_page_id_old: string | null;
-  routed_to_page_id_int: number | null;
-  routed_to_page_title: string | null;
-  routed_tier: string | null;
-  created_at: Date;
-};
+// Types derived from Drizzle schema — TypeScript will catch column renames.
+// pageSlug/routedToPageSlug are synthetic convenience fields (not real DB columns).
+type RunRow = typeof autoUpdateRuns.$inferSelect;
+// routedToPageSlug is synthetic — not a real DB column, derived from routed_to_page_id_int JOIN
+type NewsRow = typeof autoUpdateNewsItems.$inferSelect & { routedToPageSlug: string | null };
 
 let runStore: RunRow[];
 let newsStore: NewsRow[];
@@ -63,11 +31,6 @@ function getIntIdForSlug(slug: string): number {
     slugIntIdMap.set(slug, nextSlugIntId++);
   }
   return slugIntIdMap.get(slug)!;
-}
-
-/** Non-allocating lookup — returns undefined for slugs not yet in the map. */
-function lookupIntIdForSlug(slug: string): number | undefined {
-  return slugIntIdMap.get(slug);
 }
 
 /** Reverse-lookup: recover slug from integer ID. */
@@ -93,6 +56,30 @@ function resetNewsStore() {
   nextNewsId = 1;
 }
 
+/** Convert a RunRow (camelCase) to a raw SQL row (snake_case). */
+function runToSqlRow(r: RunRow): Record<string, unknown> {
+  return {
+    id: r.id,
+    date: r.date,
+    started_at: r.startedAt,
+    completed_at: r.completedAt,
+    trigger: r.trigger,
+    budget_limit: r.budgetLimit,
+    budget_spent: r.budgetSpent,
+    sources_checked: r.sourcesChecked,
+    sources_failed: r.sourcesFailed,
+    items_fetched: r.itemsFetched,
+    items_relevant: r.itemsRelevant,
+    pages_planned: r.pagesPlanned,
+    pages_updated: r.pagesUpdated,
+    pages_failed: r.pagesFailed,
+    pages_skipped: r.pagesSkipped,
+    new_pages_created: r.newPagesCreated,
+    details_json: r.detailsJson,
+    created_at: r.createdAt,
+  };
+}
+
 function makeRun(overrides: Partial<RunRow> = {}): RunRow {
   const { id: overrideId, ...rest } = overrides;
   const id = overrideId ?? nextRunId++;
@@ -102,22 +89,22 @@ function makeRun(overrides: Partial<RunRow> = {}): RunRow {
   return {
     id,
     date: "2026-02-21",
-    started_at: new Date("2026-02-21T06:00:00Z"),
-    completed_at: new Date("2026-02-21T07:00:00Z"),
+    startedAt: new Date("2026-02-21T06:00:00Z"),
+    completedAt: new Date("2026-02-21T07:00:00Z"),
     trigger: "scheduled",
-    budget_limit: null,
-    budget_spent: null,
-    sources_checked: null,
-    sources_failed: null,
-    items_fetched: null,
-    items_relevant: null,
-    pages_planned: null,
-    pages_updated: null,
-    pages_failed: null,
-    pages_skipped: null,
-    new_pages_created: null,
-    details_json: null,
-    created_at: new Date(),
+    budgetLimit: null,
+    budgetSpent: null,
+    sourcesChecked: null,
+    sourcesFailed: null,
+    itemsFetched: null,
+    itemsRelevant: null,
+    pagesPlanned: null,
+    pagesUpdated: null,
+    pagesFailed: null,
+    pagesSkipped: null,
+    newPagesCreated: null,
+    detailsJson: null,
+    createdAt: new Date(),
     ...rest,
   };
 }
@@ -125,33 +112,53 @@ function makeRun(overrides: Partial<RunRow> = {}): RunRow {
 function makeNews(runId: number, overrides: Partial<NewsRow> = {}): NewsRow {
   const base: NewsRow = {
     id: nextNewsId++,
-    run_id: runId,
+    runId: runId,
     title: "Test News Item",
     url: "https://example.com/news",
-    source_id: "test-source",
-    published_at: null,
+    sourceId: "test-source",
+    publishedAt: null,
     summary: null,
-    relevance_score: 50,
-    topics_json: null,
-    entities_json: null,
-    routed_to_page_id: null,
-    routed_to_page_id_old: null,
-    routed_to_page_id_int: null,
-    routed_to_page_title: null,
-    routed_tier: null,
-    created_at: new Date(),
+    relevanceScore: 50,
+    topicsJson: null,
+    entitiesJson: null,
+    routedToPageId: null,   // page_id_old column — null in D2a
+    routedToPageIdInt: null,
+    routedToPageSlug: null, // synthetic convenience field
+    routedToPageTitle: null,
+    routedTier: null,
+    createdAt: new Date(),
     ...overrides,
   };
-  // Auto-populate routed_to_page_id_old and routed_to_page_id_int from routed_to_page_id if not explicitly set
-  if (base.routed_to_page_id) {
-    if (base.routed_to_page_id_old === null) {
-      base.routed_to_page_id_old = base.routed_to_page_id;
+  // Auto-populate routedToPageIdInt and routedToPageSlug from routedToPageSlug if not explicitly set
+  if (base.routedToPageSlug) {
+    if (base.routedToPageIdInt === null) {
+      base.routedToPageIdInt = getIntIdForSlug(base.routedToPageSlug);
     }
-    if (base.routed_to_page_id_int === null) {
-      base.routed_to_page_id_int = getIntIdForSlug(base.routed_to_page_id);
-    }
+  } else if (base.routedToPageIdInt !== null) {
+    base.routedToPageSlug = slugFromIntId(base.routedToPageIdInt);
   }
   return base;
+}
+
+/** Convert a NewsRow (camelCase) to a raw SQL row (snake_case) for dispatch returns. */
+function newsToSqlRow(r: NewsRow): Record<string, unknown> {
+  return {
+    id: r.id,
+    run_id: r.runId,
+    title: r.title,
+    url: r.url,
+    source_id: r.sourceId,
+    published_at: r.publishedAt,
+    summary: r.summary,
+    relevance_score: r.relevanceScore,
+    topics_json: r.topicsJson,
+    entities_json: r.entitiesJson,
+    routed_to_page_id_old: r.routedToPageId,
+    routed_to_page_id_int: r.routedToPageIdInt,
+    routed_to_page_title: r.routedToPageTitle,
+    routed_tier: r.routedTier,
+    created_at: r.createdAt,
+  };
 }
 
 /**
@@ -162,21 +169,7 @@ function makeNews(runId: number, overrides: Partial<NewsRow> = {}): NewsRow {
  */
 function joinNewsWithRun(news: NewsRow, run: RunRow) {
   return {
-    id: news.id,
-    run_id: news.run_id,
-    title: news.title,
-    url: news.url,
-    source_id: news.source_id,
-    published_at: news.published_at,
-    summary: news.summary,
-    relevance_score: news.relevance_score,
-    topics_json: news.topics_json,
-    entities_json: news.entities_json,
-    routed_to_page_id: news.routed_to_page_id,
-    routed_to_page_id_old: news.routed_to_page_id_old,
-    routed_to_page_title: news.routed_to_page_title,
-    routed_tier: news.routed_tier,
-    created_at: news.created_at,
+    ...newsToSqlRow(news),
     date: run.date,
   };
 }
@@ -227,26 +220,26 @@ const dispatch: SqlDispatcher = (query, params) => {
       const routedSlug = slugFromIntId(routedIntId);
       const row: NewsRow = {
         id: nextNewsId++,
-        run_id: params[o] as number,
+        runId: params[o] as number,
         title: params[o + 1] as string,
         url: params[o + 2] as string,
-        source_id: params[o + 3] as string,
-        published_at: params[o + 4] as string | null,
+        sourceId: params[o + 3] as string,
+        publishedAt: params[o + 4] as string | null,
         summary: params[o + 5] as string | null,
-        relevance_score: params[o + 6] as number | null,
-        topics_json: params[o + 7] as string[] | null,
-        entities_json: params[o + 8] as string[] | null,
-        routed_to_page_id: routedSlug, // synthetic convenience field for tests
-        routed_to_page_id_old: null, // D2a: not written on insert
-        routed_to_page_id_int: routedIntId,
-        routed_to_page_title: params[o + 10] as string | null,
-        routed_tier: params[o + 11] as string | null,
-        created_at: new Date(),
+        relevanceScore: params[o + 6] as number | null,
+        topicsJson: params[o + 7] as string[] | null,
+        entitiesJson: params[o + 8] as string[] | null,
+        routedToPageId: null, // D2a: not written on insert (page_id_old column)
+        routedToPageIdInt: routedIntId,
+        routedToPageSlug: routedSlug, // synthetic convenience field for tests
+        routedToPageTitle: params[o + 10] as string | null,
+        routedTier: params[o + 11] as string | null,
+        createdAt: new Date(),
       };
       newsStore.push(row);
       rows.push(row);
     }
-    return rows;
+    return rows.map(newsToSqlRow);
   }
 
   // ---- SELECT count(*) FROM auto_update_news_items ----
@@ -265,8 +258,9 @@ const dispatch: SqlDispatcher = (query, params) => {
   ) {
     const ids = params.map(Number);
     return newsStore
-      .filter((r) => ids.includes(r.run_id))
-      .sort((a, b) => (b.relevance_score ?? -1) - (a.relevance_score ?? -1));
+      .filter((r) => ids.includes(r.runId))
+      .sort((a, b) => (b.relevanceScore ?? -1) - (a.relevanceScore ?? -1))
+      .map(newsToSqlRow);
   }
 
   // ---- SELECT FROM auto_update_news_items INNER JOIN auto_update_runs
@@ -279,9 +273,9 @@ const dispatch: SqlDispatcher = (query, params) => {
   ) {
     const intId = params[0] as number;
     return newsStore
-      .filter((r) => r.routed_to_page_id_int === intId)
+      .filter((r) => r.routedToPageIdInt === intId)
       .map((r) => {
-        const run = runStore.find((run) => run.id === r.run_id);
+        const run = runStore.find((run) => run.id === r.runId);
         return run ? joinNewsWithRun(r, run) : null;
       })
       .filter(Boolean) as ReturnType<typeof joinNewsWithRun>[];
@@ -300,7 +294,7 @@ const dispatch: SqlDispatcher = (query, params) => {
     const offset = (params[1] as number) || 0;
     const joined = newsStore
       .map((r) => {
-        const run = runStore.find((run) => run.id === r.run_id);
+        const run = runStore.find((run) => run.id === r.runId);
         return run ? joinNewsWithRun(r, run) : null;
       })
       .filter(Boolean) as ReturnType<typeof joinNewsWithRun>[];
@@ -322,18 +316,16 @@ const dispatch: SqlDispatcher = (query, params) => {
   ) {
     const runId = params[0] as number;
     return newsStore
-      .filter((r) => r.run_id === runId)
-      .sort((a, b) => (b.relevance_score ?? -1) - (a.relevance_score ?? -1))
+      .filter((r) => r.runId === runId)
+      .sort((a, b) => (b.relevanceScore ?? -1) - (a.relevanceScore ?? -1))
       .map((r) => {
-        // Strip routed_to_page_id (not a real SQL column — schema uses routed_to_page_id_old)
-        // then append the COALESCE result so it lands at position 15.
+        // Append the COALESCE result so it lands at position 15 (after the 15 schema columns).
         // D2a COALESCE: routed_to_page_id_old ?? wiki_pages.id (via int lookup)
-        const { routed_to_page_id: _slug, ...rest } = r;
         return {
-          ...rest,
+          ...newsToSqlRow(r),
           _coalesce_result:
-            r.routed_to_page_id_old ??
-            slugFromIntId(r.routed_to_page_id_int) ??
+            r.routedToPageId ??
+            slugFromIntId(r.routedToPageIdInt) ??
             null,
         };
       });
@@ -349,8 +341,9 @@ const dispatch: SqlDispatcher = (query, params) => {
   ) {
     const limit = (params[0] as number) || 10;
     return [...runStore]
-      .sort((a, b) => b.started_at.getTime() - a.started_at.getTime())
-      .slice(0, limit);
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
+      .slice(0, limit)
+      .map(runToSqlRow);
   }
 
   return [];
@@ -458,8 +451,8 @@ describe("Auto-Update News API", () => {
     beforeEach(() => {
       runStore.push(makeRun({ id: 1 }));
       runStore.push(makeRun({ id: 2 }));
-      newsStore.push(makeNews(1, { title: "Item A", relevance_score: 90 }));
-      newsStore.push(makeNews(1, { title: "Item B", relevance_score: 70 }));
+      newsStore.push(makeNews(1, { title: "Item A", relevanceScore: 90 }));
+      newsStore.push(makeNews(1, { title: "Item B", relevanceScore: 70 }));
       newsStore.push(makeNews(2, { title: "Other Run Item" }));
     });
 
@@ -494,9 +487,9 @@ describe("Auto-Update News API", () => {
       resetNewsStore();
       newsStore.push(
         makeNews(1, {
-          topics_json: ["alignment", "safety"],
-          entities_json: ["anthropic"],
-          routed_to_page_id: "alignment",
+          topicsJson: ["alignment", "safety"],
+          entitiesJson: ["anthropic"],
+          routedToPageSlug: "alignment",
         })
       );
       const res = await app.request("/api/auto-update-news/by-run/1");
@@ -510,7 +503,7 @@ describe("Auto-Update News API", () => {
 
     it("returns empty arrays for null topics/entities", async () => {
       resetNewsStore();
-      newsStore.push(makeNews(1, { topics_json: null, entities_json: null }));
+      newsStore.push(makeNews(1, { topicsJson: null, entitiesJson: null }));
       const res = await app.request("/api/auto-update-news/by-run/1");
       const body = await res.json();
       expect(body.items[0].topics).toEqual([]);
@@ -524,8 +517,8 @@ describe("Auto-Update News API", () => {
     beforeEach(() => {
       runStore.push(makeRun({ id: 1, date: "2026-02-21" }));
       runStore.push(makeRun({ id: 2, date: "2026-02-20" }));
-      newsStore.push(makeNews(1, { title: "Recent", relevance_score: 80 }));
-      newsStore.push(makeNews(2, { title: "Older", relevance_score: 60 }));
+      newsStore.push(makeNews(1, { title: "Recent", relevanceScore: 80 }));
+      newsStore.push(makeNews(2, { title: "Older", relevanceScore: 60 }));
     });
 
     it("returns items with total, limit, and offset", async () => {
@@ -574,10 +567,10 @@ describe("Auto-Update News API", () => {
     beforeEach(() => {
       runStore.push(makeRun({ id: 1, date: "2026-02-21" }));
       newsStore.push(
-        makeNews(1, { title: "Routed", routed_to_page_id: "alignment" })
+        makeNews(1, { title: "Routed", routedToPageSlug: "alignment" })
       );
       newsStore.push(
-        makeNews(1, { title: "Other Page", routed_to_page_id: "interpretability" })
+        makeNews(1, { title: "Other Page", routedToPageSlug: "interpretability" })
       );
     });
 
@@ -611,18 +604,18 @@ describe("Auto-Update News API", () => {
         makeRun({
           id: 1,
           date: "2026-02-21",
-          started_at: new Date("2026-02-21T06:00:00Z"),
+          startedAt: new Date("2026-02-21T06:00:00Z"),
         })
       );
       runStore.push(
         makeRun({
           id: 2,
           date: "2026-02-20",
-          started_at: new Date("2026-02-20T06:00:00Z"),
+          startedAt: new Date("2026-02-20T06:00:00Z"),
         })
       );
-      newsStore.push(makeNews(1, { title: "Latest Run Item", relevance_score: 90 }));
-      newsStore.push(makeNews(2, { title: "Older Run Item", relevance_score: 70 }));
+      newsStore.push(makeNews(1, { title: "Latest Run Item", relevanceScore: 90 }));
+      newsStore.push(makeNews(2, { title: "Older Run Item", relevanceScore: 70 }));
     });
 
     it("returns items and runDates for the default last 10 runs", async () => {
@@ -685,7 +678,7 @@ describe("Auto-Update News API", () => {
         makeRun({
           id: 3,
           date: "2026-02-21",
-          started_at: new Date("2026-02-21T08:00:00Z"),
+          startedAt: new Date("2026-02-21T08:00:00Z"),
         })
       );
       newsStore.push(makeNews(3, { title: "Same Date" }));

@@ -6,8 +6,10 @@ import {
   createQueryResult,
   postJson,
 } from "./test-utils";
+import type { autoUpdateRuns, autoUpdateResults } from "../schema.js";
 
 // ---- In-memory stores simulating the tables ----
+// Store types are derived from the Drizzle schema so TypeScript catches column renames.
 
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
@@ -29,37 +31,12 @@ function slugFromIntId(intId: number | null): string | null {
 
 let nextRunId = 1;
 let nextResultId = 1;
-let runStore: Array<{
-  id: number;
-  date: string;
-  started_at: Date;
-  completed_at: Date | null;
-  trigger: string;
-  budget_limit: number | null;
-  budget_spent: number | null;
-  sources_checked: number | null;
-  sources_failed: number | null;
-  items_fetched: number | null;
-  items_relevant: number | null;
-  pages_planned: number | null;
-  pages_updated: number | null;
-  pages_failed: number | null;
-  pages_skipped: number | null;
-  new_pages_created: string | null;
-  details_json: unknown;
-  created_at: Date;
-}>;
-let resultStore: Array<{
-  id: number;
-  run_id: number;
-  page_id: string | null;
-  page_id_old: string | null;
-  page_id_int: number | null;
-  status: string;
-  tier: string | null;
-  duration_ms: number | null;
-  error_message: string | null;
-}>;
+// Types derived from Drizzle schema — TypeScript will catch column renames.
+// pageSlug is a synthetic convenience field (not a real DB column).
+type RunRow = typeof autoUpdateRuns.$inferSelect;
+type ResultRow = typeof autoUpdateResults.$inferSelect & { pageSlug: string | null };
+let runStore: Array<RunRow>;
+let resultStore: Array<ResultRow>;
 
 function resetStores() {
   runStore = [];
@@ -68,6 +45,44 @@ function resetStores() {
   nextResultId = 1;
   nextSlugIntId = 1000;
   slugIntIdMap.clear();
+}
+
+/** Convert a RunRow (camelCase) to a raw SQL row (snake_case). */
+function runToSqlRow(r: RunRow): Record<string, unknown> {
+  return {
+    id: r.id,
+    date: r.date,
+    started_at: r.startedAt,
+    completed_at: r.completedAt,
+    trigger: r.trigger,
+    budget_limit: r.budgetLimit,
+    budget_spent: r.budgetSpent,
+    sources_checked: r.sourcesChecked,
+    sources_failed: r.sourcesFailed,
+    items_fetched: r.itemsFetched,
+    items_relevant: r.itemsRelevant,
+    pages_planned: r.pagesPlanned,
+    pages_updated: r.pagesUpdated,
+    pages_failed: r.pagesFailed,
+    pages_skipped: r.pagesSkipped,
+    new_pages_created: r.newPagesCreated,
+    details_json: r.detailsJson,
+    created_at: r.createdAt,
+  };
+}
+
+/** Convert a ResultRow (camelCase) to a raw SQL row (snake_case). */
+function resultToSqlRow(r: ResultRow): Record<string, unknown> {
+  return {
+    id: r.id,
+    run_id: r.runId,
+    page_id_old: r.pageId,
+    page_id_int: r.pageIdInt,
+    status: r.status,
+    tier: r.tier,
+    duration_ms: r.durationMs,
+    error_message: r.errorMessage,
+  };
 }
 
 const dispatch: SqlDispatcher = (query, params) => {
@@ -103,31 +118,31 @@ const dispatch: SqlDispatcher = (query, params) => {
   if (q.includes("insert into") && q.includes("auto_update_runs")) {
     const startedAt = new Date(params[1] as string);
     // Simulate ON CONFLICT (started_at) DO NOTHING
-    if (q.includes("on conflict") && runStore.some((r) => r.started_at.getTime() === startedAt.getTime())) {
+    if (q.includes("on conflict") && runStore.some((r) => r.startedAt.getTime() === startedAt.getTime())) {
       return [];
     }
-    const row = {
+    const row: RunRow = {
       id: nextRunId++,
       date: String(params[0]),
-      started_at: startedAt,
-      completed_at: params[2] ? new Date(params[2] as string) : null,
+      startedAt: startedAt,
+      completedAt: params[2] ? new Date(params[2] as string) : null,
       trigger: params[3] as string,
-      budget_limit: params[4] as number | null,
-      budget_spent: params[5] as number | null,
-      sources_checked: params[6] as number | null,
-      sources_failed: params[7] as number | null,
-      items_fetched: params[8] as number | null,
-      items_relevant: params[9] as number | null,
-      pages_planned: params[10] as number | null,
-      pages_updated: params[11] as number | null,
-      pages_failed: params[12] as number | null,
-      pages_skipped: params[13] as number | null,
-      new_pages_created: params[14] as string | null,
-      details_json: null,
-      created_at: new Date(),
+      budgetLimit: params[4] as number | null,
+      budgetSpent: params[5] as number | null,
+      sourcesChecked: params[6] as number | null,
+      sourcesFailed: params[7] as number | null,
+      itemsFetched: params[8] as number | null,
+      itemsRelevant: params[9] as number | null,
+      pagesPlanned: params[10] as number | null,
+      pagesUpdated: params[11] as number | null,
+      pagesFailed: params[12] as number | null,
+      pagesSkipped: params[13] as number | null,
+      newPagesCreated: params[14] as string | null,
+      detailsJson: null,
+      createdAt: new Date(),
     };
     runStore.push(row);
-    return [row];
+    return [runToSqlRow(row)];
   }
 
   // ---- INSERT INTO auto_update_results (supports multi-row) ----
@@ -135,26 +150,26 @@ const dispatch: SqlDispatcher = (query, params) => {
     // Phase D2a: removed page_id_old — params: run_id, page_id_int, status, tier, duration_ms, error_message
     const COLS = 6;
     const numRows = params.length / COLS;
-    const rows = [];
+    const rows: ResultRow[] = [];
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
       const pageIdInt = params[o + 1] as number | null;
       const pageSlug = slugFromIntId(pageIdInt);
-      const row = {
+      const row: ResultRow = {
         id: nextResultId++,
-        run_id: params[o] as number,
-        page_id: pageSlug,
-        page_id_old: null, // D2a: not written on insert
-        page_id_int: pageIdInt,
+        runId: params[o] as number,
+        pageId: null, // D2a: not written on insert (maps to page_id_old column)
+        pageIdInt: pageIdInt,
+        pageSlug: pageSlug,
         status: params[o + 2] as string,
         tier: params[o + 3] as string | null,
-        duration_ms: params[o + 4] as number | null,
-        error_message: params[o + 5] as string | null,
+        durationMs: params[o + 4] as number | null,
+        errorMessage: params[o + 5] as string | null,
       };
       resultStore.push(row);
       rows.push(row);
     }
-    return rows;
+    return rows.map(resultToSqlRow);
   }
 
   // ---- SELECT ... FROM auto_update_results WHERE run_id IN (...) ----
@@ -167,16 +182,16 @@ const dispatch: SqlDispatcher = (query, params) => {
   ) {
     const runIds = params.map(Number);
     return resultStore
-      .filter((r) => runIds.includes(r.run_id))
+      .filter((r) => runIds.includes(r.runId))
       .map((r) => ({
-        run_id: r.run_id,
+        run_id: r.runId,
         // "id" is what extractColumns finds for coalesce(..., "wiki_pages"."id")
         // D2a COALESCE: page_id_old ?? wiki_pages.id (via int lookup)
-        id: r.page_id_old ?? slugFromIntId(r.page_id_int) ?? null,
+        id: r.pageId ?? slugFromIntId(r.pageIdInt) ?? null,
         status: r.status,
         tier: r.tier,
-        duration_ms: r.duration_ms,
-        error_message: r.error_message,
+        duration_ms: r.durationMs,
+        error_message: r.errorMessage,
       }));
   }
 
@@ -192,13 +207,13 @@ const dispatch: SqlDispatcher = (query, params) => {
   // ---- SUM queries on auto_update_runs ----
   if (q.includes("coalesce(sum(") && q.includes("auto_update_runs")) {
     if (q.includes("budget_spent")) {
-      return [{ total: runStore.reduce((s, r) => s + (r.budget_spent ?? 0), 0) }];
+      return [{ total: runStore.reduce((s, r) => s + (r.budgetSpent ?? 0), 0) }];
     }
     if (q.includes("pages_updated")) {
-      return [{ total: runStore.reduce((s, r) => s + (r.pages_updated ?? 0), 0) }];
+      return [{ total: runStore.reduce((s, r) => s + (r.pagesUpdated ?? 0), 0) }];
     }
     if (q.includes("pages_failed")) {
-      return [{ total: runStore.reduce((s, r) => s + (r.pages_failed ?? 0), 0) }];
+      return [{ total: runStore.reduce((s, r) => s + (r.pagesFailed ?? 0), 0) }];
     }
     return [{ total: 0 }];
   }
@@ -226,7 +241,9 @@ const dispatch: SqlDispatcher = (query, params) => {
     q.includes('"started_at" =')
   ) {
     const startedAt = new Date(params[0] as string);
-    return runStore.filter((r) => r.started_at.getTime() === startedAt.getTime());
+    return runStore
+      .filter((r) => r.startedAt.getTime() === startedAt.getTime())
+      .map(runToSqlRow);
   }
 
   // ---- SELECT ... WHERE id = $1 (single run) ----
@@ -236,7 +253,7 @@ const dispatch: SqlDispatcher = (query, params) => {
     q.includes('"id"')
   ) {
     const id = params[0] as number;
-    return runStore.filter((r) => r.id === id);
+    return runStore.filter((r) => r.id === id).map(runToSqlRow);
   }
 
   // ---- SELECT ... ORDER BY ... LIMIT ... (paginated runs) ----
@@ -248,9 +265,9 @@ const dispatch: SqlDispatcher = (query, params) => {
     const limit = (params[0] as number) || 50;
     const offset = (params[1] as number) || 0;
     const sorted = [...runStore].sort(
-      (a, b) => b.started_at.getTime() - a.started_at.getTime()
+      (a, b) => b.startedAt.getTime() - a.startedAt.getTime()
     );
-    return sorted.slice(offset, offset + limit);
+    return sorted.slice(offset, offset + limit).map(runToSqlRow);
   }
 
   return [];
@@ -371,7 +388,7 @@ describe("Auto-Update Runs API", () => {
       expect(res.status).toBe(201);
 
       // Verify stored as JSON string internally
-      expect(runStore[0].new_pages_created).toBe(
+      expect(runStore[0].newPagesCreated).toBe(
         '["new-page-1","new-page-2"]'
       );
 
@@ -390,7 +407,7 @@ describe("Auto-Update Runs API", () => {
       expect(res.status).toBe(201);
 
       // Empty array should be stored as null in the DB
-      expect(runStore[0].new_pages_created).toBeNull();
+      expect(runStore[0].newPagesCreated).toBeNull();
 
       const getRes = await app.request("/api/auto-update-runs/1");
       const body = await getRes.json();
@@ -402,22 +419,22 @@ describe("Auto-Update Runs API", () => {
       runStore.push({
         id: nextRunId++,
         date: "2026-02-19",
-        started_at: new Date("2026-02-19T06:00:00Z"),
-        completed_at: new Date("2026-02-19T07:00:00Z"),
+        startedAt: new Date("2026-02-19T06:00:00Z"),
+        completedAt: new Date("2026-02-19T07:00:00Z"),
         trigger: "manual",
-        budget_limit: null,
-        budget_spent: null,
-        sources_checked: null,
-        sources_failed: null,
-        items_fetched: null,
-        items_relevant: null,
-        pages_planned: null,
-        pages_updated: null,
-        pages_failed: null,
-        pages_skipped: null,
-        new_pages_created: "page-a,page-b,page-c",
-        details_json: null,
-        created_at: new Date(),
+        budgetLimit: null,
+        budgetSpent: null,
+        sourcesChecked: null,
+        sourcesFailed: null,
+        itemsFetched: null,
+        itemsRelevant: null,
+        pagesPlanned: null,
+        pagesUpdated: null,
+        pagesFailed: null,
+        pagesSkipped: null,
+        newPagesCreated: "page-a,page-b,page-c",
+        detailsJson: null,
+        createdAt: new Date(),
       });
 
       const res = await app.request("/api/auto-update-runs/1");
