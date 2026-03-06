@@ -141,7 +141,7 @@ function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): Co
         } else {
           lines.push(`  ${propName.padEnd(28)} ${parts[0]}`);
           for (let i = 1; i < parts.length; i++) {
-            const arrow = i < parts.length ? '  ->  ' : '';
+            const arrow = i < parts.length - 1 ? '  ->  ' : '      ';
             lines.push(`  ${''.padEnd(28)} ${arrow}${parts[i]}`);
           }
         }
@@ -168,33 +168,19 @@ function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): Co
 }
 
 /**
- * Get all item collections for an entity by inspecting the graph internally.
+ * Get all item collections for an entity by querying the graph directly.
  */
 function getEntityItemCollections(
   entityId: string,
   graph: Graph,
 ): Array<{ name: string; items: ItemEntry[] }> {
-  // Access the graph's getItems method for known collection names.
-  // We try the common collection names from schemas.
-  const knownCollections = [
-    'funding-rounds',
-    'key-people',
-    'products',
-    'model-releases',
-    'board-members',
-    'strategic-partnerships',
-    'safety-milestones',
-    'research-areas',
-  ];
-
   const results: Array<{ name: string; items: ItemEntry[] }> = [];
-  for (const collName of knownCollections) {
+  for (const collName of graph.getItemCollectionNames(entityId)) {
     const items = graph.getItems(entityId, collName);
     if (items.length > 0) {
       results.push({ name: collName, items });
     }
   }
-
   return results;
 }
 

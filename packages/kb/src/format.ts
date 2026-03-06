@@ -12,15 +12,16 @@ import type { Graph } from "./graph";
 
 /**
  * Format a monetary amount in a compact human-readable form.
- * e.g. 1_500_000_000 → "$1.5B"
+ * e.g. 1_500_000_000 → "$1.5B", -5_000_000_000 → "-$5.0B"
  */
 export function formatMoney(value: number): string {
   const abs = Math.abs(value);
-  if (abs >= 1e12) return `$${(value / 1e12).toFixed(1)}T`;
-  if (abs >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
-  if (abs >= 1e6) return `$${(value / 1e6).toFixed(0)}M`;
-  if (abs >= 1e3) return `$${(value / 1e3).toFixed(0)}K`;
-  return `$${value}`;
+  const sign = value < 0 ? "-" : "";
+  if (abs >= 1e12) return `${sign}$${(abs / 1e12).toFixed(1)}T`;
+  if (abs >= 1e9) return `${sign}$${(abs / 1e9).toFixed(1)}B`;
+  if (abs >= 1e6) return `${sign}$${(abs / 1e6).toFixed(0)}M`;
+  if (abs >= 1e3) return `${sign}$${(abs / 1e3).toFixed(0)}K`;
+  return `${sign}$${abs}`;
 }
 
 // ── Value formatting ────────────────────────────────────────────────
@@ -35,7 +36,7 @@ export function formatValue(value: unknown, property?: Property): string {
   if (typeof value === "number" && property?.display) {
     const { divisor, prefix, suffix } = property.display;
     let formatted: string;
-    if (divisor && divisor !== 0) {
+    if (divisor && Number.isFinite(divisor)) {
       const divided = value / divisor;
       if (divided >= 100) {
         formatted = divided.toLocaleString("en-US", {
