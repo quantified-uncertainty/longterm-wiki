@@ -58,7 +58,9 @@ function makeAnalysis(overrides: Partial<AnalysisResult> = {}): AnalysisResult {
 describe('getFilePath', () => {
   it('converts a page path to a .mdx filesystem path', () => {
     const result = getFilePath('knowledge-base/people/eliezer-yudkowsky');
-    expect(result).toMatch(/content\/docs\/knowledge-base\/people\/eliezer-yudkowsky\.mdx$/);
+    expect(result.replace(/\\/g, '/')).toMatch(
+      /content\/docs\/knowledge-base\/people\/eliezer-yudkowsky\.mdx$/
+    );
   });
 
   it('strips leading slashes before joining', () => {
@@ -75,7 +77,7 @@ describe('getFilePath', () => {
 
   it('handles a simple single-segment path', () => {
     const result = getFilePath('simple-page');
-    expect(result).toMatch(/content\/docs\/simple-page\.mdx$/);
+    expect(result.replace(/\\/g, '/')).toMatch(/content\/docs\/simple-page\.mdx$/);
   });
 });
 

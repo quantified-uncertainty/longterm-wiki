@@ -90,6 +90,42 @@ Some content without any entity links.
     const result = convertSlugsToNumericIds(content, '/fake/root');
     expect(result.converted).toBe(0);
   });
+
+  it('rewrites slug EntityLinks and DataInfoBox entityId to E## when registry is seeded', async () => {
+    // Use vi.resetModules() + dynamic import to get a fresh module instance
+    // where _slugToNumeric is null (not yet cached as empty by earlier tests).
+    const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = require('fs');
+    const { join } = require('path');
+
+    const tmpRoot = mkdtempSync('/tmp/test-slug-convert-');
+    const dataDir = join(tmpRoot, 'apps', 'web', 'src', 'data');
+    mkdirSync(dataDir, { recursive: true });
+    writeFileSync(
+      join(dataDir, 'database.json'),
+      JSON.stringify({ idRegistry: { byNumericId: { E123: 'open-philanthropy' } } })
+    );
+
+    try {
+      vi.resetModules();
+      const { convertSlugsToNumericIds: convert } = await import('./deployment.ts');
+
+      // EntityLink id rewrite
+      const r1 = convert(
+        '<EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>',
+        tmpRoot
+      );
+      expect(r1.content).toBe('<EntityLink id="E123">Open Philanthropy</EntityLink>');
+      expect(r1.converted).toBe(1);
+
+      // DataInfoBox entityId rewrite
+      const r2 = convert('<DataInfoBox entityId="open-philanthropy" />', tmpRoot);
+      expect(r2.content).toBe('<DataInfoBox entityId="E123" />');
+      expect(r2.converted).toBe(1);
+    } finally {
+      rmSync(tmpRoot, { recursive: true });
+      vi.resetModules();
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------
