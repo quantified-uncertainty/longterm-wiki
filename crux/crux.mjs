@@ -227,7 +227,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   audits      System-level behavioral verification (ongoing + post-merge)
   release     Production release management (main → production)
   pr-patrol   Continuous PR maintenance daemon (scan, prioritize, fix)
-  kb          Knowledge base readability tools (show, list, resolve)
+  kb          Knowledge base readability tools (show, list, lookup)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

@@ -9,7 +9,7 @@ import { describe, it, expect } from 'vitest';
 import { commands } from './kb.ts';
 
 // The tests load real data from packages/kb/data/ — no mocking needed.
-// They are integration-style tests that exercise the full show/list/resolve flow.
+// They are integration-style tests that exercise the full show/list/lookup flow.
 
 describe('crux kb list', () => {
   it('lists all entities in table format', async () => {
@@ -95,22 +95,22 @@ describe('crux kb show', () => {
   });
 });
 
-describe('crux kb resolve', () => {
-  it('resolves a known stableId', async () => {
-    const result = await commands.resolve(['mK9pX3rQ7n'], {});
+describe('crux kb lookup', () => {
+  it('looks up a known stableId', async () => {
+    const result = await commands.lookup(['mK9pX3rQ7n'], {});
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('Anthropic');
     expect(result.output).toContain('anthropic');
   });
 
   it('returns error for unknown stableId', async () => {
-    const result = await commands.resolve(['XXXXXXXXXX'], {});
+    const result = await commands.lookup(['XXXXXXXXXX'], {});
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('No entity found');
   });
 
   it('returns JSON in ci mode', async () => {
-    const result = await commands.resolve(['zR4nW8xB2f'], { ci: true });
+    const result = await commands.lookup(['zR4nW8xB2f'], { ci: true });
     expect(result.exitCode).toBe(0);
     const data = JSON.parse(result.output);
     expect(data.slug).toBe('dario-amodei');
@@ -118,7 +118,7 @@ describe('crux kb resolve', () => {
   });
 
   it('shows usage when no stableId specified', async () => {
-    const result = await commands.resolve([], {});
+    const result = await commands.lookup([], {});
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Usage');
   });
