@@ -1,0 +1,31 @@
+thing:
+  id: jan-leike
+  stableId: hQ7mR2kN5p
+  type: person
+  name: "Jan Leike"
+  numericId: 67
+  aliases:
+    - "Jan Leike"
+
+facts:
+  - id: f_dF5bX8wC3g
+    property: employed-by
+    value: openai
+    asOf: 2021-01
+    validEnd: 2024-05
+    source: https://openai.com/blog/introducing-superalignment
+    notes: "Joined OpenAI circa 2021; co-led the Superalignment team from its founding in July 2023"
+
+  - id: f_eH9jV6nK4t
+    property: employed-by
+    value: anthropic
+    asOf: 2024-05
+    source: https://anthropic.com/news/jan-leike-joins-anthropic
+    notes: "Resigned from OpenAI in May 2024, citing safety concerns; joined Anthropic same month to lead Alignment Science team"
+
+  - id: f_gW2pL8rA7m
+    property: role
+    value: "Head of Alignment Science"
+    asOf: 2024-05
+    source: https://anthropic.com/news/jan-leike-joins-anthropic
+    notes: "Leads alignment science at Anthropic; focuses on scalable oversight, weak-to-strong generalization, and robustness to jailbreaks"

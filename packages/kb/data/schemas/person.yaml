@@ -1,0 +1,10 @@
+type: person
+name: Person
+
+required: []
+# People often lack publicly available birth years; no hard requirements.
+
+recommended:
+  - employed-by
+  - role
+  - born-year

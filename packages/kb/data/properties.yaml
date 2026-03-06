@@ -1,0 +1,149 @@
+properties:
+
+  # ── Financial ────────────────────────────────────────────────
+
+  revenue:
+    name: Revenue
+    description: "Annualized run-rate revenue (ARR) or trailing twelve-month revenue"
+    dataType: number
+    unit: USD
+    category: financial
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  valuation:
+    name: Valuation
+    description: "Post-money valuation at most recent funding round or mark-to-market"
+    dataType: number
+    unit: USD
+    category: financial
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  headcount:
+    name: Headcount
+    description: "Total full-time employee count"
+    dataType: number
+    unit: employees
+    category: financial
+    appliesTo: [organization]
+    display:
+      suffix: " employees"
+
+  total-funding:
+    name: Total Funding Raised
+    description: "Cumulative capital raised across all funding rounds"
+    dataType: number
+    unit: USD
+    category: financial
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  funding-round-amount:
+    name: Funding Round Amount
+    description: "Capital raised in a specific funding round"
+    dataType: number
+    unit: USD
+    category: financial
+    appliesTo: [organization]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  # ── People & Relationships ────────────────────────────────────
+
+  employed-by:
+    name: Employed By
+    description: "Organization this person currently or historically works for"
+    dataType: ref
+    category: people
+    appliesTo: [person]
+    inverseId: employer-of
+    inverseName: Employs
+
+  employer-of:
+    name: Employs
+    description: "People employed by this organization (computed from employed-by facts)"
+    dataType: refs
+    category: people
+    appliesTo: [organization]
+    inverseId: employed-by
+    inverseName: Employed By
+    computed: true
+
+  role:
+    name: Role / Title
+    description: "Job title or role at primary employer"
+    dataType: text
+    category: people
+    appliesTo: [person]
+
+  founded-by:
+    name: Founded By
+    description: "Person(s) who founded this organization"
+    dataType: refs
+    category: people
+    appliesTo: [organization]
+    inverseId: founder-of
+    inverseName: Founded
+
+  founder-of:
+    name: Founder Of
+    description: "Organization(s) this person founded (computed from founded-by facts)"
+    dataType: refs
+    category: people
+    appliesTo: [person]
+    inverseId: founded-by
+    inverseName: Founded By
+    computed: true
+
+  # ── Dates ─────────────────────────────────────────────────────
+
+  founded-date:
+    name: Founded Date
+    description: "Date the organization was incorporated or officially founded"
+    dataType: date
+    category: organization
+    appliesTo: [organization]
+
+  born-year:
+    name: Birth Year
+    description: "Year the person was born"
+    dataType: number
+    category: biographical
+    appliesTo: [person]
+    display:
+      suffix: ""
+
+  launched-date:
+    name: Launch Date
+    description: "Date a product or project was publicly launched"
+    dataType: date
+    category: product
+    appliesTo: [product, project]
+
+  # ── Structure ─────────────────────────────────────────────────
+
+  headquarters:
+    name: Headquarters
+    description: "Primary office location (city, state/country)"
+    dataType: text
+    category: organization
+    appliesTo: [organization]
+
+  legal-structure:
+    name: Legal Structure
+    description: "Corporate form (e.g. Public benefit corporation, LLC, 501(c)(3))"
+    dataType: text
+    category: organization
+    appliesTo: [organization]
