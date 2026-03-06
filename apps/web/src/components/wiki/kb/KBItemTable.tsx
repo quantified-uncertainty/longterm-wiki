@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EntityLink } from "@/components/wiki/EntityLink";
-import { getKBItems, getKBThing, getKBSchema } from "@data/kb";
+import { getKBItems, getKBEntity, getKBSchema } from "@data/kb";
 import type { ItemEntry, FieldDef, ItemCollectionSchema } from "@longterm-wiki/kb";
 import {
   formatKBCellValue,
@@ -174,8 +174,8 @@ export function KBItemTable({
   }
 
   // Look up schema for type-aware rendering
-  const thing = getKBThing(entity);
-  const collectionSchema = getCollectionSchema(thing?.type, collection);
+  const kbEntity = getKBEntity(entity);
+  const collectionSchema = getCollectionSchema(kbEntity?.type, collection);
   const fieldDefs = collectionSchema?.fields;
 
   const cols = resolveColumns(items, columns);

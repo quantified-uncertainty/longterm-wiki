@@ -7,7 +7,7 @@
  */
 
 import { getDatabase } from "@data";
-import type { Fact, Property, Thing, TypeSchema, ItemEntry } from "@longterm-wiki/kb";
+import type { Fact, Property, Entity, TypeSchema, ItemEntry } from "@longterm-wiki/kb";
 import type { SerializedKB } from "@longterm-wiki/kb";
 
 function getKB(): SerializedKB | undefined {
@@ -71,14 +71,37 @@ export function getKBProperty(propertyId: string): Property | undefined {
 }
 
 /**
- * Get a thing definition by ID.
+ * Get an entity definition by ID.
  */
-export function getKBThing(thingId: string): Thing | undefined {
+export function getKBEntity(entityId: string): Entity | undefined {
   const kb = getKB();
   if (!kb) return undefined;
 
-  return kb.things.find((t) => t.id === thingId);
+  return kb.entities.find((t: Entity) => t.id === entityId);
 }
+
+/**
+ * Get all KB entities.
+ */
+export function getKBEntities(): Entity[] {
+  const kb = getKB();
+  if (!kb) return [];
+
+  return kb.entities;
+}
+
+/**
+ * Get all KB properties.
+ */
+export function getKBProperties(): Property[] {
+  const kb = getKB();
+  if (!kb) return [];
+
+  return kb.properties;
+}
+
+/** @deprecated Use getKBEntity instead */
+export const getKBThing = getKBEntity;
 
 /**
  * Get a type schema by type name.
@@ -118,7 +141,7 @@ export function getKBItemsMentioning(
   for (const [ownerThingId, collections] of Object.entries(kb.items)) {
     if (ownerThingId === thingId) continue; // Skip self
 
-    const ownerThing = kb.things.find((t) => t.id === ownerThingId);
+    const ownerThing = kb.entities.find((t: Entity) => t.id === ownerThingId);
     const schema = ownerThing
       ? kb.schemas.find((s) => s.type === ownerThing.type)
       : undefined;

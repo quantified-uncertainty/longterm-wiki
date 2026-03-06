@@ -1303,9 +1303,9 @@ async function main() {
     const graph = await loadKB(kbDataDir);
     const serializedKB = serialize(graph);
     database.kb = serializedKB;
-    const thingCount = serializedKB.things?.length ?? 0;
+    const entityCount = serializedKB.entities?.length ?? 0;
     const factCount = Object.keys(serializedKB.facts ?? {}).length;
-    console.log(`  kb: ${thingCount} things, ${factCount} fact groups`);
+    console.log(`  kb: ${entityCount} entities, ${factCount} fact groups`);
   } else {
     console.warn('  kb: skipped (data directory not found at packages/kb/data)');
   }
