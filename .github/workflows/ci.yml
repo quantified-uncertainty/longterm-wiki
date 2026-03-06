@@ -85,6 +85,7 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -o pipefail
           actionlint -shellcheck= -oneline .github/workflows/*.yml 2>&1 \
             | reviewdog -efm="%f:%l:%c: %m" -name="actionlint" \
               -reporter=github-pr-check \
@@ -146,7 +147,8 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx tsx crux/validate/validate-unified.ts --ci 2>/dev/null \
+          set -o pipefail
+          npx tsx crux/validate/validate-unified.ts --ci \
             | npx tsx crux/validate/to-rdjsonl.ts \
             | reviewdog -f=rdjsonl -name="crux-validate" \
               -reporter=github-pr-check \
