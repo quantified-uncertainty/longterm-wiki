@@ -10,6 +10,7 @@
  *   <KBRefLink id="mK9pX3rQ7n" />
  */
 
+import { cn } from "@lib/utils";
 import { getKBEntity } from "@data/kb";
 import { getEntityById } from "@data";
 import { EntityLink } from "@/components/wiki/EntityLink";
@@ -23,26 +24,13 @@ interface KBRefLinkProps {
 }
 
 export function KBRefLink({ id, label, className }: KBRefLinkProps) {
-  // Try to find the KB entity by slug
   const kbEntity = getKBEntity(id);
 
-  // If KB entity has a numericId, it maps to a wiki page
-  if (kbEntity?.numericId) {
-    const wikiEntity = getEntityById(kbEntity.id);
-    if (wikiEntity) {
-      return (
-        <EntityLink id={kbEntity.id} className={className}>
-          {label ?? kbEntity.name}
-        </EntityLink>
-      );
-    }
-  }
-
-  // Try direct lookup in the wiki entity registry
-  const wikiEntity = getEntityById(id);
+  // Try wiki entity lookup (KB slug or direct id)
+  const wikiEntity = getEntityById(kbEntity?.id ?? id);
   if (wikiEntity) {
     return (
-      <EntityLink id={id} className={className}>
+      <EntityLink id={wikiEntity.id} className={className}>
         {label ?? kbEntity?.name ?? wikiEntity.title}
       </EntityLink>
     );
@@ -52,7 +40,7 @@ export function KBRefLink({ id, label, className }: KBRefLinkProps) {
   const displayName = label ?? kbEntity?.name ?? id;
   return (
     <span
-      className={className ?? "text-muted-foreground"}
+      className={cn("text-muted-foreground", className)}
       title={`KB entity: ${id}`}
     >
       {displayName}

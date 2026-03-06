@@ -14,8 +14,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getKBFacts, getKBEntity, getKBProperties } from "@data/kb";
 import type { Fact, Property } from "@longterm-wiki/kb";
-import { formatKBFactValue, formatKBDate, isUrl, shortDomain, titleCase } from "./format";
-import { KBRefLink } from "./KBRefLink";
+import { formatKBDate, isUrl, shortDomain, titleCase } from "./format";
+import { KBFactValueDisplay } from "./KBFactValueDisplay";
 
 interface KBEntityFactsProps {
   /** KB entity ID (e.g., "anthropic") */
@@ -62,45 +62,6 @@ function groupByProperty(
   return groups;
 }
 
-/** Render a single fact value, with special handling for refs. */
-function FactValueDisplay({
-  fact,
-  property,
-}: {
-  fact: Fact;
-  property: Property | undefined;
-}) {
-  const v = fact.value;
-
-  // Ref values link to the entity page
-  if (v.type === "ref") {
-    return <KBRefLink id={v.value} />;
-  }
-
-  // Refs (plural) render as a comma-separated list of links
-  if (v.type === "refs") {
-    return (
-      <span className="inline-flex flex-wrap gap-1">
-        {v.value.map((refId, i) => (
-          <span key={refId}>
-            <KBRefLink id={refId} />
-            {i < v.value.length - 1 && (
-              <span className="text-muted-foreground">,</span>
-            )}
-          </span>
-        ))}
-      </span>
-    );
-  }
-
-  // Everything else uses the standard formatter
-  return (
-    <span className="font-medium tabular-nums">
-      {formatKBFactValue(fact, property?.unit, property?.display)}
-    </span>
-  );
-}
-
 /** Render a time-series property (multiple facts with asOf dates). */
 function TimeSeriesProperty({
   propertyId,
@@ -135,12 +96,12 @@ function TimeSeriesProperty({
               {formatKBDate(item.fact.asOf)}
             </span>
             <span className="text-sm text-right">
-              <FactValueDisplay fact={item.fact} property={prop} />
+              <KBFactValueDisplay fact={item.fact} property={prop} />
             </span>
             {item.fact.source && isUrl(item.fact.source) && (
               <a
                 href={item.fact.source}
-                className="text-[10px] text-primary/60 hover:text-primary hover:underline whitespace-nowrap"
+                className="text-xs text-primary/60 hover:text-primary hover:underline whitespace-nowrap"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -174,9 +135,9 @@ function SingleValueProperty({
         {label}
       </span>
       <div className="text-sm text-right flex items-center gap-2">
-        <FactValueDisplay fact={fact} property={prop} />
+        <KBFactValueDisplay fact={fact} property={prop} />
         {fact.asOf && (
-          <span className="text-[10px] text-muted-foreground/60">
+          <span className="text-xs text-muted-foreground/60">
             ({formatKBDate(fact.asOf)})
           </span>
         )}
@@ -197,7 +158,7 @@ const CATEGORY_ORDER: Record<string, number> = {
 };
 
 function sortCategories(categories: string[]): string[] {
-  return categories.sort((a, b) => {
+  return [...categories].sort((a, b) => {
     const orderA = CATEGORY_ORDER[a] ?? 50;
     const orderB = CATEGORY_ORDER[b] ?? 50;
     return orderA - orderB;
@@ -265,7 +226,7 @@ export function KBEntityFacts({
 
           return (
             <div key={category} className="mb-4 last:mb-0">
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70 mb-2 pb-1 border-b border-border">
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/70 mb-2 pb-1 border-b border-border">
                 {titleCase(category)}
               </div>
               {propertyIds.map((propId) => {

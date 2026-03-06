@@ -20,17 +20,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { EntityLink } from "@/components/wiki/EntityLink";
 import { getKBItems, getKBEntity, getKBSchema } from "@data/kb";
-import type { ItemEntry, FieldDef, ItemCollectionSchema } from "@longterm-wiki/kb";
-import {
-  formatKBCellValue,
-  formatKBDate,
-  formatKBNumber,
-  isUrl,
-  titleCase,
-  shortDomain,
-} from "./format";
+import type { ItemEntry, ItemCollectionSchema } from "@longterm-wiki/kb";
+import { titleCase } from "./format";
+import { KBCellValue } from "./KBCellValue";
 
 interface KBItemTableProps {
   /** KB thing ID (e.g., "anthropic") */
@@ -65,90 +58,6 @@ function getCollectionSchema(
   if (!entityType) return undefined;
   const schema = getKBSchema(entityType);
   return schema?.items?.[collection];
-}
-
-/** Render a single cell value with type-aware formatting. */
-function CellValue({
-  value,
-  fieldName,
-  fieldDef,
-}: {
-  value: unknown;
-  fieldName: string;
-  fieldDef?: FieldDef;
-}) {
-  if (value === null || value === undefined) {
-    return <span className="text-muted-foreground">{"\u2014"}</span>;
-  }
-
-  const fieldType = fieldDef?.type;
-
-  // Entity references → EntityLink
-  if (fieldType === "ref" && typeof value === "string") {
-    return <EntityLink id={value} />;
-  }
-
-  // Source URLs → clickable domain link
-  if (fieldName === "source" && typeof value === "string" && isUrl(value)) {
-    return (
-      <a
-        href={value}
-        className="text-primary hover:underline text-sm"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {shortDomain(value)}
-      </a>
-    );
-  }
-
-  // Key publication URLs → clickable link
-  if (
-    (fieldName === "key-publication" || fieldName === "key_publication") &&
-    typeof value === "string" &&
-    isUrl(value)
-  ) {
-    return (
-      <a
-        href={value}
-        className="text-primary hover:underline text-sm"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {shortDomain(value)}
-      </a>
-    );
-  }
-
-  // Numbers with unit from schema
-  if (fieldType === "number" && typeof value === "number") {
-    return (
-      <span className="font-mono text-sm tabular-nums">
-        {formatKBNumber(value, fieldDef?.unit)}
-      </span>
-    );
-  }
-
-  // Dates → formatted
-  if (fieldType === "date" && typeof value === "string") {
-    return (
-      <span className="whitespace-nowrap text-muted-foreground">
-        {formatKBDate(value)}
-      </span>
-    );
-  }
-
-  // Booleans → checkmark/dash
-  if (fieldType === "boolean" || typeof value === "boolean") {
-    return (
-      <span className="text-muted-foreground">
-        {value ? "\u2713" : "\u2014"}
-      </span>
-    );
-  }
-
-  // Fallback
-  return <>{formatKBCellValue(value, fieldDef)}</>;
 }
 
 export function KBItemTable({
@@ -193,7 +102,7 @@ export function KBItemTable({
           <TableHeader>
             <TableRow>
               {cols.map((col) => (
-                <TableHead key={col}>{titleCase(col)}</TableHead>
+                <TableHead key={col} scope="col">{titleCase(col)}</TableHead>
               ))}
             </TableRow>
           </TableHeader>
@@ -202,7 +111,7 @@ export function KBItemTable({
               <TableRow key={item.key}>
                 {cols.map((col) => (
                   <TableCell key={col} className="whitespace-normal">
-                    <CellValue
+                    <KBCellValue
                       value={item.fields[col]}
                       fieldName={col}
                       fieldDef={fieldDefs?.[col]}

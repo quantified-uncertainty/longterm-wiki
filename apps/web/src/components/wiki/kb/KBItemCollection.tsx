@@ -25,18 +25,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { EntityLink } from "@/components/wiki/EntityLink";
 import { getKBItems, getKBEntity, getKBSchema } from "@data/kb";
-import type { ItemEntry, FieldDef, ItemCollectionSchema } from "@longterm-wiki/kb";
-import {
-  formatKBCellValue,
-  formatKBDate,
-  formatKBNumber,
-  isUrl,
-  titleCase,
-  shortDomain,
-} from "./format";
-import { KBRefLink } from "./KBRefLink";
+import type { ItemEntry, ItemCollectionSchema } from "@longterm-wiki/kb";
+import { titleCase, sortKBItems } from "./format";
+import { KBCellValue } from "./KBCellValue";
 
 interface KBItemCollectionProps {
   /** KB entity ID (e.g., "anthropic") */
@@ -75,15 +67,7 @@ function resolveColumns(
   // Use schema field order if available, otherwise collect from entries
   const allFields: string[] = schema
     ? Object.keys(schema.fields)
-    : (() => {
-        const seen = new Set<string>();
-        for (const item of items) {
-          for (const key of Object.keys(item.fields)) {
-            seen.add(key);
-          }
-        }
-        return Array.from(seen);
-      })();
+    : [...new Set(items.flatMap((item) => Object.keys(item.fields)))];
 
   // Filter hidden fields unless explicitly shown
   return allFields.filter((f) => {
@@ -109,113 +93,6 @@ function findDateField(
   return columns.find((c) => dateNames.includes(c));
 }
 
-/** Sort items by a field value. */
-function sortItems(
-  items: ItemEntry[],
-  sortBy: string,
-  ascending: boolean,
-): ItemEntry[] {
-  return [...items].sort((a, b) => {
-    const va = a.fields[sortBy];
-    const vb = b.fields[sortBy];
-
-    if (va == null && vb == null) return 0;
-    if (va == null) return 1;
-    if (vb == null) return -1;
-
-    let cmp = 0;
-    if (typeof va === "number" && typeof vb === "number") {
-      cmp = va - vb;
-    } else {
-      cmp = String(va).localeCompare(String(vb));
-    }
-    return ascending ? cmp : -cmp;
-  });
-}
-
-/** Render a single cell value with type-aware formatting. */
-function CellValue({
-  value,
-  fieldName,
-  fieldDef,
-}: {
-  value: unknown;
-  fieldName: string;
-  fieldDef?: FieldDef;
-}) {
-  if (value === null || value === undefined) {
-    return <span className="text-muted-foreground">{"\u2014"}</span>;
-  }
-
-  const fieldType = fieldDef?.type;
-
-  // Entity references
-  if (fieldType === "ref" && typeof value === "string") {
-    return <KBRefLink id={value} />;
-  }
-
-  // Source URLs
-  if (fieldName === "source" && typeof value === "string" && isUrl(value)) {
-    return (
-      <a
-        href={value}
-        className="text-primary hover:underline text-xs"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {shortDomain(value)}
-      </a>
-    );
-  }
-
-  // Key publication URLs
-  if (
-    (fieldName === "key-publication" || fieldName === "key_publication") &&
-    typeof value === "string" &&
-    isUrl(value)
-  ) {
-    return (
-      <a
-        href={value}
-        className="text-primary hover:underline text-xs"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {shortDomain(value)}
-      </a>
-    );
-  }
-
-  // Numbers with unit
-  if (fieldType === "number" && typeof value === "number") {
-    return (
-      <span className="font-mono text-sm tabular-nums">
-        {formatKBNumber(value, fieldDef?.unit)}
-      </span>
-    );
-  }
-
-  // Dates
-  if (fieldType === "date" && typeof value === "string") {
-    return (
-      <span className="whitespace-nowrap text-muted-foreground">
-        {formatKBDate(value)}
-      </span>
-    );
-  }
-
-  // Booleans
-  if (fieldType === "boolean" || typeof value === "boolean") {
-    return (
-      <span className="text-muted-foreground">
-        {value ? "\u2713" : "\u2014"}
-      </span>
-    );
-  }
-
-  // Fallback
-  return <>{formatKBCellValue(value, fieldDef)}</>;
-}
 
 export function KBItemCollection({
   entity,
@@ -255,7 +132,7 @@ export function KBItemCollection({
   // Sort items
   const effectiveSortBy = sortBy ?? findDateField(schema, cols);
   let sorted = effectiveSortBy
-    ? sortItems(items, effectiveSortBy, sortAsc)
+    ? sortKBItems(items, effectiveSortBy, sortAsc)
     : items;
 
   // Limit rows
@@ -281,7 +158,7 @@ export function KBItemCollection({
           <TableHeader>
             <TableRow>
               {cols.map((col) => (
-                <TableHead key={col} className="text-xs">
+                <TableHead key={col} scope="col" className="text-xs">
                   {titleCase(col)}
                 </TableHead>
               ))}
@@ -292,7 +169,7 @@ export function KBItemCollection({
               <TableRow key={item.key}>
                 {cols.map((col) => (
                   <TableCell key={col} className="whitespace-normal py-2">
-                    <CellValue
+                    <KBCellValue
                       value={item.fields[col]}
                       fieldName={col}
                       fieldDef={fieldDefs?.[col]}

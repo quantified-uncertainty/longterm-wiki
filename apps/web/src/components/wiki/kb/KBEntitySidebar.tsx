@@ -14,11 +14,12 @@
  *   <KBEntitySidebar entity="anthropic" properties={["revenue", "valuation", "headcount"]} />
  */
 
+import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { getKBEntity, getKBLatest, getKBProperties } from "@data/kb";
 import type { Fact, Property } from "@longterm-wiki/kb";
-import { formatKBFactValue, formatKBDate, titleCase } from "./format";
-import { KBRefLink } from "./KBRefLink";
+import { formatKBDate, titleCase } from "./format";
+import { KBFactValueDisplay } from "./KBFactValueDisplay";
 
 interface KBEntitySidebarProps {
   /** KB entity ID (e.g., "anthropic") */
@@ -56,42 +57,6 @@ const DEFAULT_PROPERTIES: Record<string, string[]> = {
   ],
 };
 
-/** Render a fact value inline, with special handling for refs. */
-function SidebarFactValue({
-  fact,
-  property,
-}: {
-  fact: Fact;
-  property: Property | undefined;
-}) {
-  const v = fact.value;
-
-  if (v.type === "ref") {
-    return <KBRefLink id={v.value} />;
-  }
-
-  if (v.type === "refs") {
-    return (
-      <span className="flex flex-wrap gap-1">
-        {v.value.map((refId, i) => (
-          <span key={refId}>
-            <KBRefLink id={refId} />
-            {i < v.value.length - 1 && (
-              <span className="text-muted-foreground">,</span>
-            )}
-          </span>
-        ))}
-      </span>
-    );
-  }
-
-  return (
-    <span className="font-semibold text-foreground">
-      {formatKBFactValue(fact, property?.unit, property?.display)}
-    </span>
-  );
-}
-
 export function KBEntitySidebar({
   entity,
   properties,
@@ -100,7 +65,10 @@ export function KBEntitySidebar({
 }: KBEntitySidebarProps) {
   const kbEntity = getKBEntity(entity);
   if (!kbEntity) {
-    return null; // Silently skip if entity not found
+    if (process.env.NODE_ENV === "development") {
+      console.warn(`[KBEntitySidebar] Unknown KB entity: "${entity}"`);
+    }
+    return null;
   }
 
   const allProperties = getKBProperties();
@@ -136,21 +104,21 @@ export function KBEntitySidebar({
 
   return (
     <Card
-      className={
-        className ??
-        "float-right w-[280px] mb-4 ml-6 overflow-visible text-sm max-md:float-none max-md:w-full max-md:ml-0 max-md:mb-6"
-      }
+      className={cn(
+        "float-right w-[280px] mb-4 ml-6 overflow-visible text-sm max-md:float-none max-md:w-full max-md:ml-0 max-md:mb-6",
+        className,
+      )}
     >
       {/* Header */}
       <div className="px-3 py-2.5 bg-primary/10 rounded-t-lg">
-        <span className="block text-[10px] uppercase tracking-wide text-muted-foreground/70 mb-0.5">
+        <span className="block text-xs uppercase tracking-wide text-muted-foreground/70 mb-0.5">
           {entityType}
         </span>
         <h3 className="m-0 text-sm font-semibold leading-tight text-foreground">
           {heading}
         </h3>
         {kbEntity.aliases && kbEntity.aliases.length > 0 && (
-          <span className="block text-[10px] text-muted-foreground/60 mt-0.5">
+          <span className="block text-xs text-muted-foreground/60 mt-0.5">
             Also: {kbEntity.aliases.join(", ")}
           </span>
         )}
@@ -167,9 +135,9 @@ export function KBEntitySidebar({
               {property?.name ?? titleCase(propertyId)}
             </span>
             <div className="flex-1 text-xs break-words">
-              <SidebarFactValue fact={fact} property={property} />
+              <KBFactValueDisplay fact={fact} property={property} className="font-semibold text-foreground" />
               {fact.asOf && (
-                <span className="block text-[10px] text-muted-foreground/60 mt-0.5">
+                <span className="block text-xs text-muted-foreground/60 mt-0.5">
                   as of {formatKBDate(fact.asOf)}
                 </span>
               )}
@@ -180,7 +148,7 @@ export function KBEntitySidebar({
 
       {/* Footer */}
       <div className="px-4 py-2 border-t border-border">
-        <span className="text-[10px] text-muted-foreground/60 font-mono">
+        <span className="text-xs text-muted-foreground/60 font-mono">
           kb:{entity}
         </span>
       </div>

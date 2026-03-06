@@ -87,7 +87,7 @@ export function KBFactValue({
         className="absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible group-hover/kb-fact:opacity-100 group-hover/kb-fact:visible group-focus-within/kb-fact:opacity-100 group-focus-within/kb-fact:visible transition-opacity text-xs"
         role="tooltip"
       >
-        <span className="block text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">
+        <span className="block text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">
           {propertyName}
         </span>
         <span className="block font-semibold text-foreground mb-1">
@@ -122,7 +122,7 @@ export function KBFactValue({
             )}
           </span>
         )}
-        <span className="block text-muted-foreground/60 mt-1.5 font-mono text-[10px]">
+        <span className="block text-muted-foreground/60 mt-1.5 font-mono text-xs">
           {entity}.{property}
         </span>
       </span>
