@@ -178,7 +178,7 @@ describe("Q7: Anthropic funding rounds", () => {
     }
 
     // Check a specific round with full data
-    const seriesG = rounds.find((r) => r.key === "series-g");
+    const seriesG = rounds.find((r) => r.key === "i_OVNz9C3XUA");
     expect(seriesG).toBeDefined();
     expect(seriesG!.fields.amount).toBe(30e9);
     expect(seriesG!.fields.valuation).toBe(380e9);
@@ -335,7 +335,7 @@ describe("Q15: Anthropic safety research", () => {
     expect(areas.length).toBeGreaterThanOrEqual(3);
 
     // Find specific research areas
-    const mechInterp = areas.find((a) => a.key === "mechanistic-interpretability");
+    const mechInterp = areas.find((a) => a.key === "i_X3GMmkZdIQ");
     expect(mechInterp).toBeDefined();
     expect(mechInterp!.fields.name).toBe("Mechanistic Interpretability");
     expect(mechInterp!.fields["team-size"]).toBe(50);
@@ -362,7 +362,7 @@ describe("Q16: Anthropic products launched", () => {
     expect(products.length).toBeGreaterThanOrEqual(3);
 
     // Check specific products
-    const claudeCode = products.find((p) => p.key === "claude-code");
+    const claudeCode = products.find((p) => p.key === "i_5ZyixnNTeg");
     expect(claudeCode).toBeDefined();
     expect(claudeCode!.fields.name).toBe("Claude Code");
     expect(claudeCode!.fields.launched).toBe("2025-02");

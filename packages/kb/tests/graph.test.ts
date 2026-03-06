@@ -215,7 +215,7 @@ describe("graph", () => {
 
     it("returns correct data for a specific entry", () => {
       const people = graph.getItems("anthropic", "key-people");
-      const darioCeo = people.find((p) => p.key === "dario-ceo");
+      const darioCeo = people.find((p) => p.key === "i_Xp9vKZzBsg");
       expect(darioCeo).toBeDefined();
       expect(darioCeo!.fields.person).toBe("dario-amodei");
       expect(darioCeo!.fields.title).toBe("CEO");

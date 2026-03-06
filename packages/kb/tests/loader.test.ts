@@ -225,7 +225,7 @@ describe("loader", () => {
 
     it("item entries have correct keys and field values", () => {
       const rounds = graph.getItems("anthropic", "funding-rounds");
-      const seed = rounds.find((r) => r.key === "seed");
+      const seed = rounds.find((r) => r.key === "i_VImpFJfKiQ");
       expect(seed).toBeDefined();
       expect(seed!.fields.date).toBe("2021-04");
       expect(seed!.fields.amount).toBe(124e6);

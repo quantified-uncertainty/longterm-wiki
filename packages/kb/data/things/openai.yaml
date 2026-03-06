@@ -109,27 +109,27 @@ items:
   funding-rounds:
     type: funding-round
     entries:
-      initial-commitment:
+      i_r5HaOs6mXg:
         date: 2015-12
         amount: 1e9
         notes: "Initial $1B commitment from founders and backers including Elon Musk, Sam Altman, Peter Thiel, Reid Hoffman, Jessica Livingston"
         source: https://openai.com/blog/introducing-openai
 
-      microsoft-round-1:
+      i_RHwgHUtkcw:
         date: 2019-07
         amount: 1e9
         lead_investor: microsoft
         source: https://openai.com/blog/microsoft
         notes: "Microsoft's initial $1B investment; coincided with creation of capped-profit entity OpenAI LP"
 
-      microsoft-round-2:
+      i_Jghs4gXSnw:
         date: 2023-01
         amount: 10e9
         lead_investor: microsoft
         source: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
         notes: "Microsoft's multi-year, multi-billion dollar investment reported at ~$10B; brought total Microsoft commitment to ~$13B"
 
-      series-a-2024:
+      i_eTZe3xfv0w:
         date: 2024-10
         amount: 6.6e9
         valuation: 157e9
@@ -140,7 +140,7 @@ items:
   key-people:
     type: key-person
     entries:
-      sam-altman-ceo:
+      i_ehqVPXPsgg:
         person: sam-altman
         title: CEO
         start: 2019-03
@@ -148,7 +148,7 @@ items:
         source: https://openai.com/about
         notes: "Co-chairman from founding (2015); became CEO when OpenAI LP was created in 2019. Briefly fired and reinstated in November 2023."
 
-      ilya-sutskever-cofounder:
+      i_g3658QZeaA:
         person: ilya-sutskever
         title: "Co-founder & Chief Scientist"
         start: 2015-12
@@ -157,7 +157,7 @@ items:
         source: https://openai.com/blog/introducing-openai
         notes: "Left OpenAI in June 2024 to found Safe Superintelligence Inc (SSI)"
 
-      greg-brockman-president:
+      i_zhIYVQlAcQ:
         person: greg-brockman
         title: President
         start: 2015-12
@@ -165,7 +165,7 @@ items:
         is_founder: true
         notes: "Co-founder and president; took leave of absence in August 2024"
 
-      mira-murati-cto:
+      i_G3hMEl1Smg:
         person: mira-murati
         title: CTO
         start: "2018"
@@ -173,7 +173,7 @@ items:
         source: https://openai.com/about
         notes: "Served as interim CEO during Sam Altman's brief ousting in November 2023; departed September 2024"
 
-      jan-leike-alignment:
+      i_dfRtbbZ86w:
         person: jan-leike
         title: "Co-lead, Superalignment"
         start: 2023-07
@@ -181,7 +181,7 @@ items:
         source: https://openai.com/blog/introducing-superalignment
         notes: "Co-led Superalignment team from its founding in July 2023; resigned May 2024 citing safety concerns, joined Anthropic"
 
-      elon-musk-cofounder:
+      i_n2EXWPmoaw:
         person: elon-musk
         title: "Co-chairman (board)"
         start: 2015-12
@@ -189,7 +189,7 @@ items:
         is_founder: true
         notes: "Left the board in February 2018; later sued OpenAI alleging breach of founding agreement"
 
-      john-schulman-cofounder:
+      i_G6F08BW94g:
         person: john-schulman
         title: "Co-founder, Research"
         start: 2015-12
@@ -197,7 +197,7 @@ items:
         is_founder: true
         notes: "Key contributor to RLHF and PPO; departed August 2024 to join Anthropic"
 
-      wojciech-zaremba-cofounder:
+      i_eGGLFokWkw:
         person: wojciech-zaremba
         title: "Co-founder, VP of Research"
         start: 2015-12
