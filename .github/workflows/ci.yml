@@ -32,6 +32,7 @@ jobs:
             echo "Merge your changes to main first, then the release workflow will open a PR from main → production."
             exit 1
           fi
+          echo "::notice::Release PR: use 'Create a merge commit' — never squash. Squash merges cause conflicts on the next release."
 
       - uses: actions/checkout@v4
 
