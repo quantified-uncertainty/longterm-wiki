@@ -649,8 +649,11 @@ async function ready(_args: string[], options: CommandOptions): Promise<CommandR
   // Check eligibility (unless --force)
   if (!force) {
     const eligibility = checkMergeEligibility(prNode);
-    // Filter out ci-pending — it's normal for a newly-pushed PR
-    const blockReasons = eligibility.blockReasons.filter((r: string) => r !== 'ci-pending');
+    // Filter out ci-pending (normal for newly-pushed PRs) and is-draft
+    // (the whole point of this command is to undraft — it's not a block reason here)
+    const blockReasons = eligibility.blockReasons.filter(
+      (r: string) => r !== 'ci-pending' && r !== 'is-draft',
+    );
 
     if (blockReasons.length > 0) {
       let output = `${c.red}✗ PR #${prNum} is not eligible to be marked ready:${c.reset}\n`;
@@ -662,30 +665,21 @@ async function ready(_args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
-  // Convert from draft to ready via GitHub API
+  // Convert from draft to ready via GraphQL mutation
+  // (GitHub REST API doesn't support undrafting — only GraphQL works)
   try {
-    await githubApi(`/repos/${REPO}/pulls/${prNum}`, {
-      method: 'PATCH',
-      body: { draft: false },
-    });
+    const { githubGraphQL } = await import('../lib/github.ts');
+    const prData = await githubApi<{ node_id: string }>(`/repos/${REPO}/pulls/${prNum}`);
+    await githubGraphQL(
+      `mutation($id: ID!) { markPullRequestReadyForReview(input: { pullRequestId: $id }) { pullRequest { isDraft } } }`,
+      { id: prData.node_id },
+    );
   } catch (e: unknown) {
-    // REST API can't undraft — need GraphQL mutation
     const msg = e instanceof Error ? e.message : String(e);
-    if (msg.includes('draft') || msg.includes('422')) {
-      // Use GraphQL mutation to undraft (REST doesn't support it)
-      const { githubGraphQL } = await import('../lib/github.ts');
-      // First get the PR's node ID
-      const prData = await githubApi<{ node_id: string }>(`/repos/${REPO}/pulls/${prNum}`);
-      await githubGraphQL(
-        `mutation($id: ID!) { markPullRequestReadyForReview(input: { pullRequestId: $id }) { pullRequest { isDraft } } }`,
-        { id: prData.node_id }
-      );
-    } else {
-      return {
-        output: `${c.red}Failed to mark PR #${prNum} as ready: ${msg}${c.reset}\n`,
-        exitCode: 1,
-      };
-    }
+    return {
+      output: `${c.red}Failed to mark PR #${prNum} as ready: ${msg}${c.reset}\n`,
+      exitCode: 1,
+    };
   }
 
   let output = `${c.green}✓${c.reset} PR #${prNum} marked as ready for review.\n`;

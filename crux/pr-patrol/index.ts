@@ -1385,19 +1385,20 @@ async function runCheckCycle(
     (c) => !c.eligible && c.blockReasons.length === 1 && c.blockReasons[0] === 'is-draft',
   );
 
+  const undraftedNumbers = new Set<number>();
   for (const candidate of draftCandidates) {
     if (config.dryRun) {
       log(`  [DRY RUN] Would undraft PR #${candidate.number} (all other checks pass)`);
     } else {
-      await undraftPr(candidate.number, config);
+      const success = await undraftPr(candidate.number, config);
+      if (success) undraftedNumbers.add(candidate.number);
     }
   }
 
   // ── Merge phase ────────────────────────────────────────────────────
-  // Re-evaluate after undrafting (undrafted PRs are now eligible)
+  // Re-evaluate after undrafting (only successfully undrafted PRs become eligible)
   const mergeCandidates = findMergeCandidates(allPrs).map((c) => {
-    // If we just undrafted this PR, remove is-draft from block reasons
-    if (draftCandidates.some((d) => d.number === c.number)) {
+    if (undraftedNumbers.has(c.number)) {
       const updated = { ...c, blockReasons: c.blockReasons.filter((r) => r !== 'is-draft') };
       return { ...updated, eligible: updated.blockReasons.length === 0 };
     }
