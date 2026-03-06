@@ -105,6 +105,28 @@ describe('checkMergeEligibility', () => {
     expect(result.blockReasons).toContain('ci-failing');
   });
 
+  it('blocks when CI has CANCELLED conclusion', () => {
+    const result = checkMergeEligibility(
+      makePrNode({
+        commits: {
+          nodes: [
+            {
+              commit: {
+                statusCheckRollup: {
+                  contexts: {
+                    nodes: [{ conclusion: 'CANCELLED' }],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('ci-failing');
+  });
+
   it('blocks when CI checks have null conclusion (pending)', () => {
     const result = checkMergeEligibility(
       makePrNode({

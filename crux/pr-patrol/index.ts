@@ -409,6 +409,7 @@ export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
   const hasFailure = contexts.some(
     (c) =>
       c.conclusion === 'FAILURE' ||
+      c.conclusion === 'CANCELLED' ||
       c.state === 'FAILURE' ||
       c.state === 'ERROR',
   );
