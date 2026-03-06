@@ -121,14 +121,15 @@ describe("loader", () => {
   });
 
   describe("facts", () => {
-    it("loads correct number of facts for Anthropic (36)", () => {
+    it("loads correct number of facts for Anthropic (37)", () => {
       const facts = graph.getFacts("anthropic");
       // 9 revenue + 4 valuation + 3 total-funding + 3 headcount + 1 founded-date
       // + 1 headquarters + 1 legal-structure + 2 gross-margin + 2 cash-burn
       // + 2 enterprise-market-share + 1 coding-market-share + 1 monthly-active-users
       // + 1 business-customers + 1 api-calls-monthly + 1 product-revenue
-      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size = 36
-      expect(facts).toHaveLength(36);
+      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size
+      // + 1 founded-by = 37
+      expect(facts).toHaveLength(37);
     });
 
     it("loads correct number of facts for Dario Amodei (3)", () => {

@@ -151,6 +151,19 @@ facts:
     source: https://anthropic.com/company
     notes: "Founded by seven former OpenAI researchers in January 2021"
 
+  - id: f_anthropic_founded_by
+    property: founded-by
+    value:
+      - !ref c4bV91sTy6  # dario-amodei
+      - daniela-amodei
+      - tom-brown
+      - chris-olah
+      - jared-kaplan
+      - sam-mccandlish
+      - jack-clark
+    source: https://anthropic.com/company
+    notes: "Seven former OpenAI researchers"
+
   - id: f_vB2hE7oA5k
     property: headquarters
     value: "San Francisco, CA"

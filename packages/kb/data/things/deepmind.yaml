@@ -28,6 +28,14 @@ facts:
     source: https://en.wikipedia.org/wiki/Google_DeepMind
     notes: "Acquired by Google in January 2014 for approximately $500M; merged with Google Brain in April 2023 to form Google DeepMind"
 
+  - id: f_deepmind_founded_by
+    property: founded-by
+    value:
+      - !ref Aqcyu3onCA  # demis-hassabis
+      - shane-legg
+      - mustafa-suleyman
+    source: https://en.wikipedia.org/wiki/Google_DeepMind
+
   - id: f_KtTrbGQynQ
     property: headcount
     value: 2700

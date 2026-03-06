@@ -44,6 +44,17 @@ facts:
     source: https://openai.com/blog/openai-lp
     notes: "Announced conversion to PBC in 2025"
 
+  - id: f_openai_founded_by
+    property: founded-by
+    value:
+      - !ref JKsVHQ5stQ  # sam-altman
+      - !ref eYrBgMLJDw  # ilya-sutskever
+      - !ref Yq4s2cI7ng  # greg-brockman
+      - !ref 69vftmr1jg  # elon-musk
+      - wojciech-zaremba
+      - john-schulman
+    source: https://openai.com/blog/introducing-openai
+
   - id: f_HfB3WmNDFQ
     property: total-funding
     value: 13e9

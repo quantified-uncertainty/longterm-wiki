@@ -13,7 +13,7 @@ facts:
     property: founded-date
     value: 2021-10
     source: https://alignment.org/
-    notes: "Founded by Paul Christiano after leaving OpenAI; focused on alignment research and evals"
+    notes: "Focused on alignment research and evals"
 
   - id: f_QaQmHPiYXu
     property: headquarters
@@ -23,6 +23,12 @@ facts:
   - id: f_BNGTSP3p6l
     property: legal-structure
     value: "501(c)(3) nonprofit"
+    source: https://alignment.org/
+
+  - id: f_arc_founded_by
+    property: founded-by
+    value:
+      - !ref vzxfzxBITd  # paul-christiano
     source: https://alignment.org/
 
 items:
@@ -35,7 +41,7 @@ items:
         start: 2021-10
         is_founder: true
         source: https://alignment.org/
-        notes: "Founded ARC after leaving OpenAI; stepped back from day-to-day role in 2023 due to injury"
+        notes: "Founded ARC after leaving OpenAI; stepped back from day-to-day role in 2023"
 
   research-areas:
     type: research-area
@@ -47,9 +53,4 @@ items:
         key-publication: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
         notes: "Seminal ELK report posed as a prize problem; attracted significant community engagement"
 
-      i_xGxhzKvvH3:
-        name: ARC Evals
-        description: "Evaluating frontier AI models for dangerous capabilities, particularly autonomous replication and adaptation"
-        started: 2023-03
-        source: https://evals.alignment.org/
-        notes: "Evaluated GPT-4 and Claude for autonomous capabilities pre-release; now spun out as METR"
+

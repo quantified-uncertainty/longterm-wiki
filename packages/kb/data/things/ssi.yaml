@@ -26,6 +26,14 @@ facts:
     value: "Private company"
     source: https://ssi.inc
 
+  - id: f_ssi_founded_by
+    property: founded-by
+    value:
+      - !ref eYrBgMLJDw  # ilya-sutskever
+      - daniel-gross
+      - daniel-levy
+    source: https://ssi.inc
+
   - id: f_Oa0nwGGdna
     property: total-funding
     value: 1e9

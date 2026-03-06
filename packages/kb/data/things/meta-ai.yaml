@@ -23,6 +23,12 @@ facts:
     source: https://ai.meta.com/
     notes: "Part of Meta Platforms; labs also in New York, Paris, Montreal, London, and Tel Aviv"
 
+  - id: f_meta_ai_founded_by
+    property: founded-by
+    value:
+      - !ref cMbVUVK29Q  # yann-lecun
+    source: https://ai.meta.com/research/
+
   - id: f_Hh20Dvc90g
     property: legal-structure
     value: "Division of Meta Platforms, Inc."

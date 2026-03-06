@@ -28,6 +28,12 @@ facts:
     value: "501(c)(3) nonprofit"
     source: https://intelligence.org/about/
 
+  - id: f_miri_founded_by
+    property: founded-by
+    value:
+      - !ref fS1tEGKuNq  # eliezer-yudkowsky
+    source: https://intelligence.org/about/
+
   - id: f_EUnXQGwIzd
     property: headcount
     value: 18

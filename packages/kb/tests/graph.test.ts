@@ -41,8 +41,9 @@ describe("graph", () => {
       // + 1 headquarters + 1 legal-structure + 2 gross-margin + 2 cash-burn
       // + 2 enterprise-market-share + 1 coding-market-share + 1 monthly-active-users
       // + 1 business-customers + 1 api-calls-monthly + 1 product-revenue
-      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size = 36
-      expect(facts).toHaveLength(36);
+      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size
+      // + 1 founded-by = 37
+      expect(facts).toHaveLength(37);
     });
 
     it("returns empty array for an entity with no facts", () => {

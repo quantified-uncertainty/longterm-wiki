@@ -31,6 +31,14 @@ facts:
     source: https://techcrunch.com/2022/07/20/conjecture-raises-25m-seed-round/
     notes: "Raised $25M seed round in 2022; investors included Nat Friedman and Daniel Gross"
 
+  - id: f_conjecture_founded_by
+    property: founded-by
+    value:
+      - !ref CrXoCsIucX  # connor-leahy
+      - sid-black
+      - gabriel-alfour
+    source: https://www.conjecture.dev/
+
 items:
   key-people:
     type: key-person
@@ -58,9 +66,3 @@ items:
         description: "Approach to building AI systems that emulate human cognitive processes rather than optimizing black-box objectives"
         started: 2022-03
         notes: "Core research thesis; aims to build interpretable AI by design rather than post-hoc"
-
-      i_gDMJIXIMhI:
-        name: AI Policy Advocacy
-        description: "Public advocacy for AI regulation and safety measures"
-        started: 2023-01
-        notes: "Connor Leahy became prominent public advocate; testified before UK Parliament and EU"

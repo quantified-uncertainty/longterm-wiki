@@ -12,7 +12,7 @@ facts:
     property: founded-date
     value: 2021-06
     source: https://www.redwoodresearch.org/
-    notes: "Founded in 2021 by Buck Shlegeris and Nate Thomas"
+    notes: "Founded in 2021 by Nate Thomas and Buck Shlegeris"
 
   - id: f_gnQEBSrD2L
     property: headquarters
@@ -22,6 +22,13 @@ facts:
   - id: f_72UoXSEqwe
     property: legal-structure
     value: "Nonprofit research lab"
+    source: https://www.redwoodresearch.org/
+
+  - id: f_redwood_founded_by
+    property: founded-by
+    value:
+      - nate-thomas
+      - buck-shlegeris
     source: https://www.redwoodresearch.org/
 
 items:
