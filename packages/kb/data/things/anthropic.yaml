@@ -1,0 +1,203 @@
+thing:
+  id: anthropic
+  stableId: mK9pX3rQ7n
+  type: organization
+  name: Anthropic
+  numericId: 3
+  aliases:
+    - Anthropic PBC
+    - Anthropic AI
+
+facts:
+  - id: f_8kX2pQ7mNr
+    property: founded-date
+    value: 2021-01
+    source: https://anthropic.com/company
+    notes: "Founded by seven former OpenAI researchers in January 2021"
+
+  - id: f_mN3pQ7kX2r
+    property: valuation
+    value: 380e9
+    asOf: 2026-02
+    source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
+    notes: "Series G post-money valuation"
+
+  - id: f_qR5tY9wE1a
+    property: revenue
+    value: 100e6
+    asOf: 2023-12
+    notes: "Approximate ARR at end of 2023, pre-growth acceleration"
+
+  - id: f_xZ7bD2nM4c
+    property: revenue
+    value: 900e6
+    asOf: 2024-06
+    notes: "ARR mid-2024 estimate"
+
+  - id: f_pL4wK8vF2j
+    property: revenue
+    value: 2e9
+    asOf: 2025-03
+    source: https://www.reuters.com/technology/anthropic-on-track-raise-money-2-billion-run-rate-revenue-sources-2025-03-15/
+    notes: "Run-rate revenue March 2025"
+
+  - id: f_tG6nH1yS3b
+    property: revenue
+    value: 8.5e9
+    asOf: 2025-12
+    source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
+    notes: "Annualized run rate at end of 2025, per Series G announcement context"
+
+  - id: f_dW5cR9mJ8q
+    property: revenue
+    value: 19e9
+    asOf: 2026-03
+    source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
+    notes: "Projected 2026 guidance midpoint (company guidance $20-26B annualized, run-rate ~$14B as of Feb 2026)"
+
+  - id: f_vB2hE7oA5k
+    property: headquarters
+    value: "San Francisco, CA"
+    source: https://anthropic.com/company
+
+  - id: f_cN4fT3rM6p
+    property: headcount
+    value: 1035
+    asOf: 2024-09
+    notes: "Approximate headcount mid-late 2024; various sources report 870-2847 depending on method"
+    source: https://www.anthropic.com/news
+
+  - id: f_jY8uL5xV1w
+    property: legal-structure
+    value: "Public benefit corporation"
+    source: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
+    notes: "Incorporated as Delaware PBC with Long-Term Benefit Trust holding Class T stock"
+
+  - id: f_sQ2kP9nZ4r
+    property: total-funding
+    value: 67e9
+    asOf: 2026-02
+    source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
+    notes: "Total funding raised including $30B Series G"
+
+items:
+  funding-rounds:
+    type: funding-round
+    entries:
+      seed:
+        date: 2021-04
+        amount: 124e6
+        valuation: 550e6
+        lead_investor: jaan-tallinn
+        source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
+        notes: "Seed/Series A combined round; Jaan Tallinn led, Dustin Moskovitz participated"
+
+      series-a:
+        date: 2022-04
+        amount: 580e6
+        valuation: 4e9
+        lead_investor: ftx
+        source: https://fortune.com/2022/04/29/ai-startup-anthropic-raises-580-million/
+        notes: "FTX reportedly invested ~$500M; estate later sold stake for ~$1.4B"
+
+      series-b:
+        date: 2023-05
+        amount: 450e6
+        valuation: 4.1e9
+        source: https://fortune.com/2023/05/25/anthropic-raises-450-million/
+        notes: "Bridge round as company sought larger strategic investment"
+
+      series-c-amazon:
+        date: 2023-09
+        amount: 1.25e9
+        lead_investor: amazon
+        source: https://press.aboutamazon.com/2023/9/amazon-and-anthropic-announce-strategic-collaboration
+        notes: "First tranche of Amazon's up-to-$4B commitment; AWS becomes primary cloud partner"
+
+      series-c-google:
+        date: 2023-10
+        amount: 2e9
+        lead_investor: google
+        source: https://blog.google/technology/ai/google-anthropic-investment/
+        notes: "Part of Google's up-to-$2B commitment; Google Cloud partnership"
+
+      series-d:
+        date: 2024-05
+        amount: 2.75e9
+        lead_investor: amazon
+        source: https://www.anthropic.com/news/anthropic-2024-funding
+        notes: "Amazon second tranche; brings Amazon total to ~$6.75B"
+
+      series-e:
+        date: 2024-11
+        amount: 4e9
+        valuation: 18e9
+        source: https://www.anthropic.com/news/series-e
+        notes: "Led by multiple investors; valuation reached $18B post-money"
+
+      series-f:
+        date: 2025-07
+        amount: 3.5e9
+        valuation: 61.5e9
+        source: https://www.anthropic.com/news/series-f
+        notes: "Series F; ARR had reached $4B by announcement time"
+
+      series-g:
+        date: 2026-02
+        amount: 30e9
+        valuation: 380e9
+        lead_investor: gic
+        source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
+        notes: "Led by GIC and Coatue; co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, MGX"
+
+  key-people:
+    type: key-person
+    entries:
+      dario-ceo:
+        person: dario-amodei
+        title: CEO
+        start: 2021-01
+        is_founder: true
+        source: https://anthropic.com/company
+
+      daniela-president:
+        person: daniela-amodei
+        title: President
+        start: 2021-01
+        is_founder: true
+        source: https://anthropic.com/company
+
+      chris-olah:
+        person: chris-olah
+        title: "Research Lead, Mechanistic Interpretability"
+        start: 2021-01
+        is_founder: true
+        source: https://transformer-circuits.pub/
+
+      tom-brown:
+        person: tom-brown
+        title: "Co-founder"
+        start: 2021-01
+        is_founder: true
+        notes: "GPT-3 lead author; founder, transitioned to other roles over time"
+
+      jan-leike:
+        person: jan-leike
+        title: "Head of Alignment Science"
+        start: 2024-05
+        source: https://anthropic.com/news/jan-leike-joins-anthropic
+        notes: "Joined after resigning from OpenAI where he co-led Superalignment team"
+
+      mike-krieger-cpo:
+        person: mike-krieger
+        title: "Chief Product Officer"
+        start: 2024-05
+        end: 2025-08
+        source: https://www.theverge.com/2024/5/14/24157180/anthropic-mike-krieger-chief-product-officer
+        notes: "Co-founder of Instagram; departed CPO role in 2025-08 to lead Anthropic Labs"
+
+      holden-karnofsky:
+        person: holden-karnofsky
+        title: "Member of Technical Staff"
+        start: 2025-01
+        notes: "Works on responsible scaling policy; co-founder of GiveWell / Coefficient Giving"

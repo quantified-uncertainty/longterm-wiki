@@ -1,0 +1,35 @@
+type: organization
+name: Organization
+
+required:
+  - founded-date
+  - headquarters
+
+recommended:
+  - revenue
+  - valuation
+  - headcount
+  - legal-structure
+  - total-funding
+
+items:
+  funding-rounds:
+    description: "Equity and strategic investment rounds, in chronological order"
+    fields:
+      date: { type: date, required: true, description: "Close date (YYYY-MM)" }
+      amount: { type: number, unit: USD, description: "Capital raised in this round" }
+      valuation: { type: number, unit: USD, description: "Post-money valuation" }
+      lead_investor: { type: ref, description: "Lead investor (Thing ID slug)" }
+      source: { type: text, description: "URL to announcement or news article" }
+      notes: { type: text, description: "Context, caveats, or important details" }
+
+  key-people:
+    description: "Current and former key personnel including founders, executives, and notable researchers"
+    fields:
+      person: { type: ref, required: true, description: "Thing ID of the person" }
+      title: { type: text, required: true, description: "Job title or role description" }
+      start: { type: date, description: "Start date at this organization (YYYY-MM)" }
+      end: { type: date, description: "End date if no longer in role (YYYY-MM); omit if current" }
+      is_founder: { type: boolean, description: "True if this person co-founded the organization" }
+      source: { type: text, description: "URL confirming the role" }
+      notes: { type: text, description: "Context about the role or transition" }
