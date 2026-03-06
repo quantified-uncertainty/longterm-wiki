@@ -18,6 +18,15 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, labeled, unlabeled]
+  # Manual re-run: use when threads have been resolved but the gate
+  # check is stale. GitHub has no event for thread resolution, so a
+  # re-run is needed after resolving all CodeRabbit threads.
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to re-check
+        required: true
+        type: number
 
 jobs:
   coderabbit-security-gate:
