@@ -18,6 +18,16 @@ cd "$REPO_ROOT"
 CONTEXT_LINES=()
 WARNINGS=()
 
+# ─── 0. Clear stale checklist from previous session ─────────────────────────────
+# This hook only fires on fresh "startup" (not resume), so removing the checklist
+# forces the new session to run `crux agent-checklist init` before editing code.
+# The PreToolUse hook in require-checklist.sh enforces this.
+
+if [ -f ".claude/wip-checklist.md" ]; then
+  rm -f ".claude/wip-checklist.md"
+  CONTEXT_LINES+=("⚠ Cleared stale checklist from previous session. Run \`pnpm crux agent-checklist init\` before editing code.")
+fi
+
 # ─── 1. Verify environment (fast checks only) ──────────────────────────────────
 
 if [ ! -d "node_modules" ] || [ ! -d "apps/web/node_modules" ]; then
