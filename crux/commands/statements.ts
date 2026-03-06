@@ -6,14 +6,66 @@
  * properties from the controlled vocabulary, typed values, and citations.
  *
  * Usage:
- *   crux statements extract <page-id> [--apply]    Extract statements from a page (LLM)
- *   crux statements verify <page-id> [--apply]     Verify statements against cited sources
- *   crux statements quality <page-id>              Coverage and quality report
+ *   crux statements list <entity-id>               List statements for an entity
+ *   crux statements create <entity-id> --property=X Create a statement
+ *   crux statements update <id> --property=X        Update a statement
+ *   crux statements retract <id>                    Retract a statement
+ *   crux statements properties                      List all properties
+ *   crux statements draft <entity-id>               Generate ontology review draft
+ *   crux statements apply-draft <entity-id>         Execute approved draft changes
+ *   crux statements extract <page-id> [--apply]     Extract statements from a page (LLM)
+ *   crux statements verify <page-id> [--apply]      Verify statements against cited sources
+ *   crux statements quality <page-id>               Coverage and quality report
  */
 
 import { buildCommands } from '../lib/cli.ts';
 
 const SCRIPTS = {
+  // --- CRUD commands ---
+  list: {
+    script: 'statements/list.ts',
+    description: 'List statements for an entity',
+    passthrough: ['property', 'active-only', 'json'],
+    positional: true,
+  },
+  create: {
+    script: 'statements/create-stmt.ts',
+    description: 'Create a new statement',
+    passthrough: ['property', 'value', 'value-text', 'value-entity', 'value-date', 'date', 'unit', 'text', 'variety', 'citation-url', 'note', 'json'],
+    positional: true,
+  },
+  update: {
+    script: 'statements/update-stmt.ts',
+    description: 'Update an existing statement',
+    passthrough: ['property', 'status', 'text', 'variety', 'date', 'note', 'reason', 'json'],
+    positional: true,
+  },
+  retract: {
+    script: 'statements/retract.ts',
+    description: 'Retract one or all statements',
+    passthrough: ['all', 'property', 'reason', 'confirm', 'json'],
+    positional: true,
+  },
+  properties: {
+    script: 'statements/properties-list.ts',
+    description: 'List all property definitions with usage counts',
+    passthrough: ['category', 'unused', 'json'],
+    positional: false,
+  },
+  // --- Ontology workflow ---
+  draft: {
+    script: 'statements/draft.ts',
+    description: 'Generate an ontology review draft (markdown) for an entity',
+    passthrough: ['org-type', 'output'],
+    positional: true,
+  },
+  'apply-draft': {
+    script: 'statements/apply-draft.ts',
+    description: 'Execute approved actions from an ontology draft',
+    passthrough: ['dry-run', 'input'],
+    positional: true,
+  },
+  // --- Analysis commands ---
   extract: {
     script: 'statements/extract.ts',
     description: 'Extract structured statements from a wiki page using LLM',
@@ -72,61 +124,46 @@ export function getHelp(): string {
     .join('\n');
 
   return `
-Statements Domain — Extract and verify structured statements from wiki pages
+Statements Domain — CRUD, ontology review, and analysis for structured statements
 
-Commands:
-${commandList}
+CRUD Commands:
+${commandList.split('\n').filter(l => /^\s+(list|create|update|retract|properties)\s/.test(l)).join('\n')}
 
-Options:
-  --apply               Write results to database (default: dry-run preview)
-  --model=M             LLM model override (default: google/gemini-2.0-flash-001)
-  --fetch               Fetch missing sources from web (verify only)
-  --json                JSON output (quality/score/gaps)
-  --dry-run             Preview scores without storing (score only)
-  --llm                 Use LLM for importance + clarity scoring (score only)
-  --org-type=TYPE       Organization subtype (e.g., frontier-lab, safety-org)
-  --category=CAT        Target a single category (improve only)
-  --no-research         Skip web research (improve only)
-  --min-score=N         Quality gate threshold (default: 0.5, improve only)
-  --budget=N            Cost cap in USD (default: 5, improve only)
-  --target-coverage=N   Target coverage score for iterative loop (improve only)
-  --max-iterations=N    Max iterations for iterative loop (default: 5, improve only)
-  --mode=quality        Rewrite low-scoring statements instead of generating new ones
-  --mode=classify       Assign properties to uncategorized statements via LLM
-  --min-cluster=N       Minimum statements for a cluster suggestion (default: 5, ideate only)
+Ontology Workflow:
+${commandList.split('\n').filter(l => /^\s+(draft|apply-draft)\s/.test(l)).join('\n')}
 
-Examples:
-  crux statements extract anthropic                Extract statements (dry run)
-  crux statements extract anthropic --apply        Extract + store in DB
-  crux statements verify anthropic --apply         Verify against sources
-  crux statements quality anthropic                Coverage report
-  crux statements quality anthropic --json         Machine-readable output
-  crux statements score anthropic                  Score all statements (10 dimensions)
-  crux statements score anthropic --dry-run        Preview scores without storing
-  crux statements score anthropic --llm            Score with LLM-based importance + clarity
-  crux statements gaps anthropic                   Show coverage gaps
-  crux statements gaps anthropic --org-type=frontier-lab  Gaps with specific org type
-  crux statements improve anthropic --org-type=frontier-lab  Generate + insert
-  crux statements improve anthropic --dry-run      Preview generated statements
-  crux statements improve anthropic --category=safety  Target one category
-  crux statements improve anthropic --no-research  Skip web search
-  crux statements improve anthropic --target-coverage=0.8 --max-iterations=3  Iterate until 80%
-  crux statements improve anthropic --mode=quality          Rewrite low-scoring statements
-  crux statements improve anthropic --mode=classify         Assign properties to uncategorized
-  crux statements ideate anthropic                          Suggest sub-entity splits
-  crux statements ideate anthropic --json                   Machine-readable output
-  crux statements ideate anthropic --apply                  Create entities + move statements
-  crux statements ideate anthropic --min-cluster=3          Lower cluster threshold
+Analysis Commands:
+${commandList.split('\n').filter(l => /^\s+(extract|verify|quality|score|gaps|improve|ideate|seed-properties)\s/.test(l)).join('\n')}
 
-Workflow:
+CRUD Examples:
+  crux statements list anthropic                   List all statements
+  crux statements list anthropic --property=revenue --active-only
+  crux statements create anthropic --property=revenue --value=19000000000 --date=2026-03
+  crux statements create anthropic --text="Quote text" --variety=attributed
+  crux statements update 12345 --property=revenue   Assign/change property
+  crux statements update 12345 --status=retracted --reason="duplicate"
+  crux statements retract 12345 --reason="duplicate of #123"
+  crux statements retract anthropic --all --confirm  Retract all for entity
+  crux statements properties                        List all properties
+  crux statements properties --category=financial    Filter by category
+  crux statements properties --unused                Show unused properties
+
+Ontology Workflow:
+  crux statements draft anthropic                   Generate review draft
+  crux statements draft anthropic --org-type=frontier-lab
+  crux statements apply-draft anthropic             Execute approved changes
+  crux statements apply-draft anthropic --dry-run   Preview without executing
+
+Analysis Workflow:
   1. crux statements extract <page-id> --apply     Extract statements from page
   2. crux statements verify <page-id> --apply      Verify against cited sources
   3. crux statements score <page-id>               Score statement quality
   4. crux statements gaps <page-id>                Identify coverage gaps
   5. crux statements quality <page-id>             Review coverage and quality
-  6. crux statements ideate <entity-id>            Suggest sub-entity splits
+  6. crux statements draft <entity-id>             Generate ontology review draft
+  7. crux statements apply-draft <entity-id>       Execute approved changes
 
-Claude Code Skills (for deeper analysis — use these as slash commands):
+Claude Code Skills:
   /ontology-review <entity>    Deep ontological reasoning about entity structure
   /entity-deep-dive <entity>   Comprehensive entity quality review + fixes
   /knowledge-gap [area]        Identify missing topics and thin coverage areas
