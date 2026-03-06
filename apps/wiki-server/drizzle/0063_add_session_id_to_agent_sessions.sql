@@ -9,6 +9,11 @@
 -- 1. Older records predate this migration and won't have a session_id
 -- 2. Some agent sessions may never produce a session log (e.g., abandoned sessions)
 -- 3. Session logs can be created after agent sessions (at PR time)
+--
+-- Note: adding-foreign-key-constraint is excluded in .squawk.toml because Drizzle's
+-- migrator runs in a single transaction, making the two-step NOT VALID / VALIDATE
+-- pattern impossible. agent_sessions is a small table (hundreds of rows), so the
+-- brief SHARE ROW EXCLUSIVE lock is acceptable.
 
 ALTER TABLE "agent_sessions" ADD COLUMN IF NOT EXISTS "session_id" integer REFERENCES "sessions"("id") ON DELETE SET NULL;
 
