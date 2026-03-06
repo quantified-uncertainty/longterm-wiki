@@ -1,23 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { mockDbModule, postJson } from "./test-utils.js";
+import type { hallucinationRiskSnapshots } from "../schema.js";
 
 // ---- In-memory store simulating the hallucination_risk_snapshots table ----
+// Store type is derived from the Drizzle schema so TypeScript catches column renames.
 
 let nextId = 1;
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
-let riskStore: Array<{
-  id: number;
-  page_id: string | null;
-  page_id_old: string | null;
-  page_id_int: number | null;
-  score: number;
-  level: string;
-  factors: string[] | null;
-  integrity_issues: string[] | null;
-  computed_at: Date;
-}>;
+// pageSlug is a synthetic convenience field (not a real DB column) to support
+// slug-based lookups in the dispatcher without a JOIN to wiki_pages.
+type HrsRow = typeof hallucinationRiskSnapshots.$inferSelect & { pageSlug: string | null };
+let riskStore: Array<HrsRow>;
 
 /** Whether to simulate the materialized view existing. */
 let simulateMatView = false;
@@ -30,11 +25,6 @@ function getIntIdForSlug(slug: string): number {
     slugIntIdMap.set(slug, nextSlugIntId++);
   }
   return slugIntIdMap.get(slug)!;
-}
-
-/** Non-allocating lookup — returns undefined for slugs not yet in the map. */
-function lookupIntIdForSlug(slug: string): number | undefined {
-  return slugIntIdMap.get(slug);
 }
 
 /** Reverse-lookup: recover slug from integer ID. */
@@ -57,13 +47,13 @@ function resetStore() {
 
 /** Get latest snapshot per page (shared logic for stats/latest mock queries). */
 function getLatestByPage() {
-  // Phase D2a: group by page_id_int (integer) since page_id_old is no longer written
-  const latestByPage = new Map<number, (typeof riskStore)[0]>();
+  // Phase D2a: group by pageIdInt (integer) since pageId (page_id_old) is no longer written
+  const latestByPage = new Map<number, HrsRow>();
   for (const r of riskStore) {
-    if (r.page_id_int == null) continue;
-    const existing = latestByPage.get(r.page_id_int);
-    if (!existing || r.computed_at > existing.computed_at) {
-      latestByPage.set(r.page_id_int, r);
+    if (r.pageIdInt == null) continue;
+    const existing = latestByPage.get(r.pageIdInt);
+    if (!existing || r.computedAt > existing.computedAt) {
+      latestByPage.set(r.pageIdInt, r);
     }
   }
   return latestByPage;
@@ -111,27 +101,37 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     // Phase D2a: removed page_id_old — params: page_id_int, score, level, factors, integrity_issues
     const PARAMS_PER_ROW = 5;
     const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
-    const results: (typeof riskStore)[number][] = [];
+    const results: HrsRow[] = [];
 
     for (let i = 0; i < rowCount; i++) {
       const off = i * PARAMS_PER_ROW;
       const pageIdInt = params[off] as number | null;
       const pageSlug = slugFromIntId(pageIdInt);
-      const row = {
+      const row: HrsRow = {
         id: nextId++,
-        page_id: pageSlug,
-        page_id_old: null, // D2a: not written on insert
-        page_id_int: pageIdInt,
+        pageId: null, // D2a: not written on insert (maps to page_id_old column)
+        pageIdInt: pageIdInt,
+        pageSlug: pageSlug,
         score: params[off + 1] as number,
         level: params[off + 2] as string,
         factors: params[off + 3] as string[] | null,
-        integrity_issues: params[off + 4] as string[] | null,
-        computed_at: new Date(),
+        integrityIssues: params[off + 4] as string[] | null,
+        computedAt: new Date(),
       };
       riskStore.push(row);
       results.push(row);
     }
-    return results;
+    // Return snake_case row objects so extractColumns() in test-utils maps correctly
+    return results.map((r) => ({
+      id: r.id,
+      page_id_old: r.pageId,
+      page_id_int: r.pageIdInt,
+      score: r.score,
+      level: r.level,
+      factors: r.factors,
+      integrity_issues: r.integrityIssues,
+      computed_at: r.computedAt,
+    }));
   }
 
   // ---- Queries against hallucination_risk_latest materialized view ----
@@ -183,7 +183,16 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const numParams = params.filter((p) => typeof p === "number") as number[];
     const limit = numParams[0] || 50;
     const offset = numParams[1] || 0;
-    return results.slice(offset, offset + limit);
+    return results.slice(offset, offset + limit).map((r) => ({
+      id: r.id,
+      page_id_old: r.pageId,
+      page_id_int: r.pageIdInt,
+      score: r.score,
+      level: r.level,
+      factors: r.factors,
+      integrity_issues: r.integrityIssues,
+      computed_at: r.computedAt,
+    }));
   }
 
   // ---- SELECT count(distinct page_id_int) FROM hallucination_risk_snapshots ----
@@ -192,7 +201,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("page_id_int") &&
     q.includes("hallucination_risk_snapshots")
   ) {
-    const uniquePages = new Set(riskStore.filter((e) => e.page_id_int != null).map((e) => e.page_id_int));
+    const uniquePages = new Set(riskStore.filter((e) => e.pageIdInt != null).map((e) => e.pageIdInt));
     return [{ count: uniquePages.size }];
   }
 
@@ -257,7 +266,16 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const numParams = params.filter((p) => typeof p === "number") as number[];
     const limit = numParams[0] || 50;
     const offset = numParams[1] || 0;
-    return results.slice(offset, offset + limit);
+    return results.slice(offset, offset + limit).map((r) => ({
+      id: r.id,
+      page_id_old: r.pageId,
+      page_id_int: r.pageIdInt,
+      score: r.score,
+      level: r.level,
+      factors: r.factors,
+      integrity_issues: r.integrityIssues,
+      computed_at: r.computedAt,
+    }));
   }
 
   // ---- SELECT ... WHERE page_id_int = $1 ORDER BY computed_at DESC LIMIT (Phase 4b) ----
@@ -271,9 +289,19 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const intId = params[0] as number;
     const limit = (params[1] as number) || 50;
     return riskStore
-      .filter((e) => e.page_id_int === intId)
-      .sort((a, b) => b.computed_at.getTime() - a.computed_at.getTime())
-      .slice(0, limit);
+      .filter((e) => e.pageIdInt === intId)
+      .sort((a, b) => b.computedAt.getTime() - a.computedAt.getTime())
+      .slice(0, limit)
+      .map((r) => ({
+        id: r.id,
+        page_id_old: r.pageId,
+        page_id_int: r.pageIdInt,
+        score: r.score,
+        level: r.level,
+        factors: r.factors,
+        integrity_issues: r.integrityIssues,
+        computed_at: r.computedAt,
+      }));
   }
 
   // ---- Cleanup dry-run: count rows that would be deleted ----
@@ -283,10 +311,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("row_number")
   ) {
     const keep = params[0] as number;
-    // Group by page_id_int (Phase D2a: partition key is now COALESCE(page_id_int, -1))
+    // Group by pageIdInt (Phase D2a: partition key is now COALESCE(page_id_int, -1))
     const byPage = new Map<number, typeof riskStore>();
     for (const r of riskStore) {
-      const key = r.page_id_int ?? -1;
+      const key = r.pageIdInt ?? -1;
       const arr = byPage.get(key) || [];
       arr.push(r);
       byPage.set(key, arr);
@@ -294,7 +322,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     let wouldDelete = 0;
     for (const rows of byPage.values()) {
       rows.sort(
-        (a, b) => b.computed_at.getTime() - a.computed_at.getTime()
+        (a, b) => b.computedAt.getTime() - a.computedAt.getTime()
       );
       if (rows.length > keep) {
         wouldDelete += rows.length - keep;
@@ -313,7 +341,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const keep = params[0] as number;
     const byPage = new Map<number, typeof riskStore>();
     for (const r of riskStore) {
-      const key = r.page_id_int ?? -1;
+      const key = r.pageIdInt ?? -1;
       const arr = byPage.get(key) || [];
       arr.push(r);
       byPage.set(key, arr);
@@ -321,7 +349,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const toDelete = new Set<number>();
     for (const rows of byPage.values()) {
       rows.sort(
-        (a, b) => b.computed_at.getTime() - a.computed_at.getTime()
+        (a, b) => b.computedAt.getTime() - a.computedAt.getTime()
       );
       for (let i = keep; i < rows.length; i++) {
         toDelete.add(rows[i].id);
