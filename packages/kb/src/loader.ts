@@ -13,11 +13,11 @@ import { Graph } from "./graph";
 import type {
   PropertiesFile,
   SchemaFile,
-  ThingFile,
+  EntityFile,
   RawFact,
   Property,
   TypeSchema,
-  Thing,
+  Entity,
   Fact,
   FactValue,
   ItemCollection,
@@ -175,7 +175,7 @@ function parseSchema(raw: unknown): TypeSchema {
   };
 }
 
-function parseThing(raw: ThingFile["thing"]): Thing {
+function parseEntity(raw: EntityFile["thing"]): Entity {
   return {
     id: raw.id,
     stableId: raw.stableId,
@@ -190,7 +190,7 @@ function parseThing(raw: ThingFile["thing"]): Thing {
 
 function parseFact(
   rawFact: RawFact,
-  thingId: string,
+  entityId: string,
   properties: Map<string, Property>
 ): Fact | null {
   const prop = properties.get(rawFact.property);
@@ -198,7 +198,7 @@ function parseFact(
   // Computed properties are populated by inverse computation, not stored directly.
   if (prop?.computed) {
     console.warn(
-      `[kb/loader] Skipping fact "${rawFact.id}" on "${thingId}": ` +
+      `[kb/loader] Skipping fact "${rawFact.id}" on "${entityId}": ` +
         `property "${rawFact.property}" is computed (populated by inverse computation).`
     );
     return null;
@@ -208,7 +208,7 @@ function parseFact(
 
   return {
     id: rawFact.id,
-    subjectId: thingId,
+    subjectId: entityId,
     propertyId: rawFact.property,
     value,
     ...(rawFact.asOf !== undefined && { asOf: String(rawFact.asOf) }),
@@ -222,7 +222,7 @@ function parseFact(
 }
 
 function parseItemCollection(
-  raw: ThingFile["items"],
+  raw: EntityFile["items"],
   collectionName: string
 ): ItemCollection | undefined {
   if (!raw) return undefined;
@@ -271,8 +271,8 @@ async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unkno
  *   <dataDir>/schemas/*.yaml
  *   <dataDir>/things/*.yaml
  *
- * Uses a two-pass approach for things:
- *   Pass 1: Load all thing headers (builds stableId → slug index)
+ * Uses a two-pass approach for entities:
+ *   Pass 1: Load all entity headers (builds stableId → slug index)
  *   Pass 2: Load facts and items (resolves !ref tags using the index)
  */
 export async function loadKB(dataDir: string): Promise<Graph> {
@@ -304,25 +304,25 @@ export async function loadKB(dataDir: string): Promise<Graph> {
     graph.addSchema(schema);
   }
 
-  // 3. Load things (two passes)
-  const thingFiles = await readYamlFiles(join(dataDir, "things"));
+  // 3. Load entities (two passes)
+  const entityFiles = await readYamlFiles(join(dataDir, "things"));
 
-  // Pass 1: Load all thing headers to build stableId index
-  const parsedFiles: { thing: Thing; file: ThingFile }[] = [];
-  for (const { parsed } of thingFiles) {
-    const file = parsed as ThingFile;
-    const thing = parseThing(file.thing);
-    graph.addThing(thing);
-    parsedFiles.push({ thing, file });
+  // Pass 1: Load all entity headers to build stableId index
+  const parsedEntityFiles: { entity: Entity; file: EntityFile }[] = [];
+  for (const { parsed } of entityFiles) {
+    const file = parsed as EntityFile;
+    const entity = parseEntity(file.thing);
+    graph.addEntity(entity);
+    parsedEntityFiles.push({ entity, file });
   }
 
   // Pass 2: Load facts and items with !ref resolution
-  for (const { thing, file } of parsedFiles) {
+  for (const { entity, file } of parsedEntityFiles) {
     // Resolve !ref markers in facts
     for (const rawFact of file.facts ?? []) {
-      const resolvedValue = resolveRefs(rawFact.value, graph, `${thing.id}/facts`);
+      const resolvedValue = resolveRefs(rawFact.value, graph, `${entity.id}/facts`);
       const resolvedFact = { ...rawFact, value: resolvedValue };
-      const fact = parseFact(resolvedFact as RawFact, thing.id, properties);
+      const fact = parseFact(resolvedFact as RawFact, entity.id, properties);
       if (fact) graph.addFact(fact);
     }
 
@@ -331,13 +331,13 @@ export async function loadKB(dataDir: string): Promise<Graph> {
       const resolvedItems = resolveRefs(
         file.items,
         graph,
-        `${thing.id}/items`
-      ) as ThingFile["items"];
+        `${entity.id}/items`
+      ) as EntityFile["items"];
 
       for (const collectionName of Object.keys(resolvedItems!)) {
         const collection = parseItemCollection(resolvedItems, collectionName);
         if (collection) {
-          graph.addItemCollection(thing.id, collectionName, collection);
+          graph.addItemCollection(entity.id, collectionName, collection);
         }
       }
     }

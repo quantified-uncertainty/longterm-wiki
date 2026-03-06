@@ -4,7 +4,7 @@
  *
  * For every property that declares an `inverseId`, this module scans all
  * existing facts that use that property and — for each ref/refs value —
- * synthesises a mirror fact on the referenced thing using the inverse
+ * synthesises a mirror fact on the referenced entity using the inverse
  * property ID.  The derived fact carries the same temporal bounds (asOf,
  * validEnd) as its source and records the source fact's ID in `derivedFrom`.
  *
@@ -54,13 +54,13 @@ function derivedId(
 /**
  * Scans the graph for facts that belong to properties with an `inverseId`,
  * then synthesises and adds the corresponding mirror facts on the referenced
- * things.
+ * entities.
  *
  * Only `ref` and `refs` value types participate in inverse computation.
  * All other value types are silently skipped.
  *
  * Edge cases:
- * - If the referenced thing does not exist in the graph, a console warning is
+ * - If the referenced entity does not exist in the graph, a console warning is
  *   emitted and the inverse is skipped (no crash).
  * - Temporal bounds (`asOf`, `validEnd`) are preserved from the source fact.
  * - Running this function more than once on the same graph will result in
@@ -77,11 +77,11 @@ export function computeInverses(graph: Graph): void {
     // counterpart.  Processing them would create duplicates.
     if (property.computed) continue;
 
-    // Collect all facts across every thing that use this property.
-    const allThings = graph.getAllThings();
+    // Collect all facts across every entity that use this property.
+    const allEntities = graph.getAllEntities();
 
-    for (const thing of allThings) {
-      const facts = graph.getFacts(thing.id, { property: property.id });
+    for (const entity of allEntities) {
+      const facts = graph.getFacts(entity.id, { property: property.id });
 
       for (const fact of facts) {
         // Skip facts that are already derived (from a previous inverse pass).
@@ -116,25 +116,25 @@ function _processFactInverse(
 
 /**
  * Constructs and adds one derived inverse fact.
- * Skips silently (with a warning) if the referenced thing is not in the graph.
+ * Skips silently (with a warning) if the referenced entity is not in the graph.
  */
 function _addSingleInverse(
   graph: Graph,
   sourceFact: Fact,
   inversePropertyId: string,
-  referencedThingId: string
+  referencedEntityId: string
 ): void {
-  // Guard: the referenced thing must exist.
-  if (!graph.getThing(referencedThingId)) {
+  // Guard: the referenced entity must exist.
+  if (!graph.getEntity(referencedEntityId)) {
     console.warn(
       `[kb/inverse] Skipping inverse for fact "${sourceFact.id}": ` +
-        `referenced thing "${referencedThingId}" not found in graph.`
+        `referenced entity "${referencedEntityId}" not found in graph.`
     );
     return;
   }
 
   const id = derivedId(
-    referencedThingId,
+    referencedEntityId,
     inversePropertyId,
     sourceFact.subjectId,
     sourceFact.asOf,
@@ -143,7 +143,7 @@ function _addSingleInverse(
 
   const derived: Fact = {
     id,
-    subjectId: referencedThingId,
+    subjectId: referencedEntityId,
     propertyId: inversePropertyId,
     value: { type: "ref", value: sourceFact.subjectId },
     asOf: sourceFact.asOf,

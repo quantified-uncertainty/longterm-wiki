@@ -201,13 +201,13 @@ describe("Q8: OpenAI current valuation (was IMPOSSIBLE)", () => {
     // The API call is clean regardless of whether OpenAI data exists
     const fact = graph.getLatest("openai", "valuation");
 
-    const openaiThing = graph.getThing("openai");
-    if (openaiThing) {
+    const openaiEntity = graph.getEntity("openai");
+    if (openaiEntity) {
       // If OpenAI data has been added, we should get a valuation
       expect(fact).toBeDefined();
       expect(fact!.value.type).toBe("number");
     } else {
-      // OpenAI thing not yet in KB -- the query pattern works, just no data
+      // OpenAI entity not yet in KB -- the query pattern works, just no data
       expect(fact).toBeUndefined();
     }
   });
@@ -544,8 +544,8 @@ describe("Q20: Bidirectional person-org lookup", () => {
     expect(role).toBeDefined();
     expect((role!.value as { type: "text"; value: string }).value).toBe("CEO");
 
-    // Verify the thing exists and is a person
-    const dario = graph.getThing("dario-amodei");
+    // Verify the entity exists and is a person
+    const dario = graph.getEntity("dario-amodei");
     expect(dario).toBeDefined();
     expect(dario!.type).toBe("person");
   });
@@ -558,7 +558,7 @@ describe("Q20: Bidirectional person-org lookup", () => {
     expect(ceo!.fields.person).toBe("dario-amodei");
 
     // Verify the referenced person exists
-    const person = graph.getThing(ceo!.fields.person as string);
+    const person = graph.getEntity(ceo!.fields.person as string);
     expect(person).toBeDefined();
     expect(person!.name).toBe("Dario Amodei");
   });

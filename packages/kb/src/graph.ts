@@ -4,7 +4,7 @@
  */
 
 import type {
-  Thing,
+  Entity,
   Fact,
   Property,
   TypeSchema,
@@ -15,21 +15,21 @@ import type {
 } from "./types";
 
 export class Graph {
-  private things: Map<string, Thing> = new Map();
+  private entities: Map<string, Entity> = new Map();
   private facts: Map<string, Fact[]> = new Map(); // keyed by subjectId
   private factIds: Set<string> = new Set(); // dedup guard
   private properties: Map<string, Property> = new Map();
   private schemas: Map<string, TypeSchema> = new Map();
-  // thingId → collectionName → collection
+  // entityId → collectionName → collection
   private items: Map<string, Map<string, ItemCollection>> = new Map();
   // stableId → slug reverse index
   private stableIdIndex: Map<string, string> = new Map();
 
   // ── Mutation (used by loader and inverse computation) ──────────────
 
-  addThing(thing: Thing): void {
-    this.things.set(thing.id, thing);
-    this.stableIdIndex.set(thing.stableId, thing.id);
+  addEntity(entity: Entity): void {
+    this.entities.set(entity.id, entity);
+    this.stableIdIndex.set(entity.stableId, entity.id);
   }
 
   /**
@@ -57,28 +57,28 @@ export class Graph {
   }
 
   addItemCollection(
-    thingId: string,
+    entityId: string,
     collectionName: string,
     collection: ItemCollection
   ): void {
-    let thingCollections = this.items.get(thingId);
-    if (!thingCollections) {
-      thingCollections = new Map();
-      this.items.set(thingId, thingCollections);
+    let entityCollections = this.items.get(entityId);
+    if (!entityCollections) {
+      entityCollections = new Map();
+      this.items.set(entityId, entityCollections);
     }
-    thingCollections.set(collectionName, collection);
+    entityCollections.set(collectionName, collection);
   }
 
-  // ── Thing queries ──────────────────────────────────────────────────
+  // ── Entity queries ─────────────────────────────────────────────────
 
-  getThing(id: string): Thing | undefined {
-    return this.things.get(id);
+  getEntity(id: string): Entity | undefined {
+    return this.entities.get(id);
   }
 
-  /** Resolve a stableId to its Thing. */
-  getThingByStableId(stableId: string): Thing | undefined {
+  /** Resolve a stableId to its Entity. */
+  getEntityByStableId(stableId: string): Entity | undefined {
     const slug = this.stableIdIndex.get(stableId);
-    return slug ? this.things.get(slug) : undefined;
+    return slug ? this.entities.get(slug) : undefined;
   }
 
   /** Resolve a stableId to a slug. Returns undefined if not found. */
@@ -86,18 +86,18 @@ export class Graph {
     return this.stableIdIndex.get(stableId);
   }
 
-  getAllThings(): Thing[] {
-    return Array.from(this.things.values());
+  getAllEntities(): Entity[] {
+    return Array.from(this.entities.values());
   }
 
-  getByType(type: string): Thing[] {
-    return Array.from(this.things.values()).filter((t) => t.type === type);
+  getByType(type: string): Entity[] {
+    return Array.from(this.entities.values()).filter((t) => t.type === type);
   }
 
   // ── Fact queries ───────────────────────────────────────────────────
 
-  getFacts(thingId: string, query?: FactQuery): Fact[] {
-    const all = this.facts.get(thingId) ?? [];
+  getFacts(entityId: string, query?: FactQuery): Fact[] {
+    const all = this.facts.get(entityId) ?? [];
     let result = all;
 
     if (query?.property !== undefined) {
@@ -112,11 +112,11 @@ export class Graph {
   }
 
   /**
-   * Returns the most recent fact for a given (thingId, propertyId) pair,
+   * Returns the most recent fact for a given (entityId, propertyId) pair,
    * ordering by asOf descending. Facts without asOf come last.
    */
-  getLatest(thingId: string, propertyId: string): Fact | undefined {
-    const facts = this.getFacts(thingId, { property: propertyId });
+  getLatest(entityId: string, propertyId: string): Fact | undefined {
+    const facts = this.getFacts(entityId, { property: propertyId });
     if (facts.length === 0) return undefined;
 
     return facts.slice().sort((a, b) => {
@@ -137,10 +137,10 @@ export class Graph {
   ): Map<string, Fact> {
     const result = new Map<string, Fact>();
 
-    for (const thingId of this.things.keys()) {
-      const latest = this.getLatest(thingId, propertyId);
+    for (const entityId of this.entities.keys()) {
+      const latest = this.getLatest(entityId, propertyId);
       if (latest !== undefined) {
-        result.set(thingId, latest);
+        result.set(entityId, latest);
       }
     }
 
@@ -154,10 +154,10 @@ export class Graph {
   getAllByProperty(propertyId: string): Map<string, Fact[]> {
     const result = new Map<string, Fact[]>();
 
-    for (const thingId of this.things.keys()) {
-      const facts = this.getFacts(thingId, { property: propertyId });
+    for (const entityId of this.entities.keys()) {
+      const facts = this.getFacts(entityId, { property: propertyId });
       if (facts.length > 0) {
-        result.set(thingId, facts);
+        result.set(entityId, facts);
       }
     }
 
@@ -165,10 +165,10 @@ export class Graph {
   }
 
   /**
-   * Returns the IDs of things referenced by ref/refs facts on this thing.
+   * Returns the IDs of entities referenced by ref/refs facts on this entity.
    */
-  getRelated(thingId: string, propertyId: string): string[] {
-    const facts = this.getFacts(thingId, { property: propertyId });
+  getRelated(entityId: string, propertyId: string): string[] {
+    const facts = this.getFacts(entityId, { property: propertyId });
     const ids: string[] = [];
 
     for (const fact of facts) {
@@ -184,11 +184,11 @@ export class Graph {
 
   // ── Item queries ───────────────────────────────────────────────────
 
-  getItems(thingId: string, collectionName: string): ItemEntry[] {
-    const thingCollections = this.items.get(thingId);
-    if (!thingCollections) return [];
+  getItems(entityId: string, collectionName: string): ItemEntry[] {
+    const entityCollections = this.items.get(entityId);
+    if (!entityCollections) return [];
 
-    const collection = thingCollections.get(collectionName);
+    const collection = entityCollections.get(collectionName);
     if (!collection) return [];
 
     return Object.entries(collection.entries).map(([key, fields]) => ({
@@ -199,36 +199,36 @@ export class Graph {
 
   /**
    * Scans all items across all entities for fields that reference the
-   * given thingId. Returns matches with context about where they appear.
+   * given entityId. Returns matches with context about where they appear.
    *
    * Uses schema field definitions to identify `ref` type fields. Falls
    * back to string-matching if no schema is available.
    */
   getItemsMentioning(
-    thingId: string
+    entityId: string
   ): Array<{
-    ownerThingId: string;
+    ownerEntityId: string;
     collection: string;
     entry: ItemEntry;
     /** Which field(s) contain the reference */
     matchingFields: string[];
   }> {
     const results: Array<{
-      ownerThingId: string;
+      ownerEntityId: string;
       collection: string;
       entry: ItemEntry;
       matchingFields: string[];
     }> = [];
 
-    for (const [ownerThingId, thingCollections] of this.items.entries()) {
-      if (ownerThingId === thingId) continue; // Skip self-references
+    for (const [ownerEntityId, entityCollections] of this.items.entries()) {
+      if (ownerEntityId === entityId) continue; // Skip self-references
 
-      const ownerThing = this.things.get(ownerThingId);
-      const schema = ownerThing
-        ? this.schemas.get(ownerThing.type)
+      const ownerEntity = this.entities.get(ownerEntityId);
+      const schema = ownerEntity
+        ? this.schemas.get(ownerEntity.type)
         : undefined;
 
-      for (const [collectionName, collection] of thingCollections.entries()) {
+      for (const [collectionName, collection] of entityCollections.entries()) {
         const collectionSchema = schema?.items?.[collectionName];
         const fieldDefs = collectionSchema?.fields;
 
@@ -239,14 +239,14 @@ export class Graph {
             const fieldDef = fieldDefs?.[fieldName];
 
             // Check ref fields explicitly
-            if (fieldDef?.type === "ref" && fieldValue === thingId) {
+            if (fieldDef?.type === "ref" && fieldValue === entityId) {
               matchingFields.push(fieldName);
             }
             // Also check string values that match (covers untyped fields)
             else if (
               !fieldDef &&
               typeof fieldValue === "string" &&
-              fieldValue === thingId
+              fieldValue === entityId
             ) {
               matchingFields.push(fieldName);
             }
@@ -254,7 +254,7 @@ export class Graph {
 
           if (matchingFields.length > 0) {
             results.push({
-              ownerThingId,
+              ownerEntityId,
               collection: collectionName,
               entry: { key: entryKey, fields },
               matchingFields,

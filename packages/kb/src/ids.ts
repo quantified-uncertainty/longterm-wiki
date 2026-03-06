@@ -1,7 +1,7 @@
 /**
  * Stable ID generation for the Knowledge Base library.
  *
- * - generateStableId()         — random 10-char alphanumeric (for Thing.stableId)
+ * - generateStableId()         — random 10-char alphanumeric (for Entity.stableId)
  * - generateFactId()           — "f_" + 10-char alphanumeric (random)
  * - contentHash(parts)         — deterministic SHA-256-based 10-char token
  * - generateContentFactId(...) — "f_" + contentHash (idempotent sync helper)
@@ -36,7 +36,7 @@ function randomAlphanumeric10(): string {
 
 /**
  * Returns a random 10-character alphanumeric string suitable for use as a
- * Thing's `stableId`.  Survives renames because it is purely random.
+ * Entity's `stableId`.  Survives renames because it is purely random.
  *
  * @example
  * generateStableId() // "a3Kf2rZ9mQ"
@@ -91,7 +91,7 @@ export function contentHash(parts: string[]): string {
  * Use this when syncing facts from an external source so that re-running the
  * sync does not create duplicates.
  *
- * @param subjectId  - Thing slug the fact is about
+ * @param subjectId  - Entity slug the fact is about
  * @param propertyId - Property ID from the registry
  * @param value      - The fact value (any JSON-serialisable type)
  * @param asOf       - Optional temporal anchor (ISO date or YYYY-MM string)

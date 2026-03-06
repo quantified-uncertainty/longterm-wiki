@@ -12,9 +12,9 @@ describe("loader", () => {
     graph = await loadKB(DATA_DIR);
   });
 
-  describe("things", () => {
+  describe("entities", () => {
     it("loads Anthropic from disk", () => {
-      const anthropic = graph.getThing("anthropic");
+      const anthropic = graph.getEntity("anthropic");
       expect(anthropic).toBeDefined();
       expect(anthropic!.name).toBe("Anthropic");
       expect(anthropic!.stableId).toBe("mK9pX3rQ7n");
@@ -22,11 +22,11 @@ describe("loader", () => {
       expect(anthropic!.numericId).toBe(3);
     });
 
-    it("loads all 16 things", () => {
-      const things = graph.getAllThings();
-      expect(things).toHaveLength(16);
+    it("loads all 16 entities", () => {
+      const entities = graph.getAllEntities();
+      expect(entities).toHaveLength(16);
 
-      const ids = things.map((t) => t.id).sort();
+      const ids = entities.map((t) => t.id).sort();
       expect(ids).toEqual([
         "anthropic", "chris-olah", "daniela-amodei", "dario-amodei",
         "deepmind", "demis-hassabis", "elon-musk", "geoffrey-hinton",
@@ -35,8 +35,8 @@ describe("loader", () => {
       ].sort());
     });
 
-    it("loads thing aliases", () => {
-      const anthropic = graph.getThing("anthropic");
+    it("loads entity aliases", () => {
+      const anthropic = graph.getEntity("anthropic");
       expect(anthropic!.aliases).toEqual(["Anthropic PBC", "Anthropic AI"]);
     });
   });
@@ -238,7 +238,7 @@ describe("loader", () => {
       expect(items).toEqual([]);
     });
 
-    it("returns empty array for non-existent thing", () => {
+    it("returns empty array for non-existent entity", () => {
       const items = graph.getItems("nonexistent", "funding-rounds");
       expect(items).toEqual([]);
     });
