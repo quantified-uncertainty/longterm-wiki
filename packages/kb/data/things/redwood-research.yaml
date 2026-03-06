@@ -1,0 +1,59 @@
+thing:
+  id: redwood-research
+  stableId: dwMzc9WzPa
+  type: organization
+  name: "Redwood Research"
+  numericId: 557
+  aliases:
+    - Redwood
+
+facts:
+  - id: f_GXvWNFPV7M
+    property: founded-date
+    value: 2021-06
+    source: https://www.redwoodresearch.org/
+    notes: "Founded in 2021 by Buck Shlegeris and Nate Thomas"
+
+  - id: f_gnQEBSrD2L
+    property: headquarters
+    value: "San Francisco, CA"
+    source: https://www.redwoodresearch.org/
+
+  - id: f_72UoXSEqwe
+    property: legal-structure
+    value: "Nonprofit research lab"
+    source: https://www.redwoodresearch.org/
+
+items:
+  key-people:
+    type: key-person
+    entries:
+      i_kWW8MALtes:
+        person: buck-shlegeris
+        title: "CEO & Co-founder"
+        start: 2021-06
+        is_founder: true
+        source: https://www.redwoodresearch.org/
+        notes: "Previously researcher at MIRI; leads Redwood's research agenda on AI control"
+
+      i_tAoC59MQQm:
+        person: nate-thomas
+        title: "Co-founder"
+        start: 2021-06
+        is_founder: true
+
+  research-areas:
+    type: research-area
+    entries:
+      i_zrcx3YA1du:
+        name: AI Control
+        description: "Developing techniques to safely deploy AI systems even if they are not fully aligned"
+        started: 2023-01
+        key-publication: https://arxiv.org/abs/2312.06942
+        notes: "Key paper on AI control; argues control is a complementary approach to alignment"
+
+      i_tvVCFqoWUv:
+        name: Adversarial Robustness
+        description: "Testing and improving robustness of AI safety techniques against adversarial inputs"
+        started: 2021-06
+        notes: "Early work on adversarial training for harmlessness classifiers"

@@ -22,16 +22,20 @@ describe("loader", () => {
       expect(anthropic!.numericId).toBe(3);
     });
 
-    it("loads all 16 entities", () => {
+    it("loads all 30 entities", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(16);
+      expect(entities).toHaveLength(30);
 
       const ids = entities.map((t) => t.id).sort();
       expect(ids).toEqual([
-        "anthropic", "chris-olah", "daniela-amodei", "dario-amodei",
-        "deepmind", "demis-hassabis", "elon-musk", "geoffrey-hinton",
-        "greg-brockman", "ilya-sutskever", "jan-leike", "meta-ai",
-        "openai", "sam-altman", "xai", "yann-lecun",
+        "anthropic", "arc", "chris-olah", "conjecture", "connor-leahy",
+        "daniela-amodei", "dario-amodei", "deepmind", "demis-hassabis",
+        "dustin-moskovitz", "eliezer-yudkowsky", "elon-musk",
+        "geoffrey-hinton", "greg-brockman", "holden-karnofsky",
+        "ilya-sutskever", "jan-leike", "meta-ai", "miri", "neel-nanda",
+        "nick-bostrom", "openai", "paul-christiano", "redwood-research",
+        "sam-altman", "ssi", "stuart-russell", "xai", "yann-lecun",
+        "yoshua-bengio",
       ].sort());
     });
 

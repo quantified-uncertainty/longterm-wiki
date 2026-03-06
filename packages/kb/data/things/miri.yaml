@@ -1,0 +1,70 @@
+thing:
+  id: miri
+  stableId: puAffUjWSS
+  type: organization
+  name: "Machine Intelligence Research Institute"
+  numericId: 202
+  aliases:
+    - MIRI
+    - Singularity Institute
+    - Singularity Institute for Artificial Intelligence
+    - SIAI
+
+facts:
+  - id: f_0YMlj7An1L
+    property: founded-date
+    value: 2000-01
+    source: https://intelligence.org/about/
+    notes: "Founded in 2000 as the Singularity Institute for Artificial Intelligence; renamed to MIRI in 2013"
+
+  - id: f_fiWGIkqBqf
+    property: headquarters
+    value: "Berkeley, CA"
+    source: https://intelligence.org/about/
+    notes: "Based in Berkeley, California"
+
+  - id: f_XPZa86Jco0
+    property: legal-structure
+    value: "501(c)(3) nonprofit"
+    source: https://intelligence.org/about/
+
+  - id: f_EUnXQGwIzd
+    property: headcount
+    value: 18
+    asOf: 2023-12
+    source: https://intelligence.org/2024/04/02/2023-review/
+    notes: "Approximate staff count in 2023; MIRI significantly reduced staff in 2023-2024 as it shifted focus"
+
+items:
+  key-people:
+    type: key-person
+    entries:
+      i_XVLjPAQXky:
+        person: !ref fS1tEGKuNq  # eliezer-yudkowsky
+        title: "Founder & Senior Research Fellow"
+        start: 2000-01
+        is_founder: true
+        source: https://intelligence.org/about/
+        notes: "Founded MIRI (as SIAI) in 2000; transitioned to Senior Research Fellow role"
+
+      i_ZJ54jX7Ppq:
+        person: nate-soares
+        title: "Executive Director"
+        start: 2015-05
+        source: https://intelligence.org/2015/05/18/nate-soares-is-miris-new-executive-director/
+        notes: "Led MIRI's operations and research agenda"
+
+  research-areas:
+    type: research-area
+    entries:
+      i_w1EXpcMmLN:
+        name: Agent Foundations
+        description: "Mathematical foundations of goal-directed AI systems"
+        started: 2014-01
+        notes: "Core research program focused on logical uncertainty, decision theory, and Vingean reflection"
+
+      i_6z7IpVMRRT:
+        name: Alignment Theory
+        description: "Theoretical approaches to ensuring advanced AI systems are aligned with human values"
+        started: 2000-01
+        notes: "MIRI's founding research focus; published extensively on corrigibility and value alignment"

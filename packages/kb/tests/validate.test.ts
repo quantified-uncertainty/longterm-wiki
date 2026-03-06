@@ -150,7 +150,7 @@ describe("validate", () => {
     it("includes completeness info for every entity", () => {
       const results = validate(graph);
       const completeness = results.filter((r) => r.rule === "completeness");
-      expect(completeness).toHaveLength(16); // one per entity
+      expect(completeness).toHaveLength(30); // one per entity
     });
 
     it("properly categorizes severity levels", () => {
@@ -161,8 +161,8 @@ describe("validate", () => {
 
       // There should be at least some warnings (recommended properties, or item ref warnings)
       expect(warnings.length).toBeGreaterThan(0);
-      // There should be info messages (completeness for all 16 entities)
-      expect(infos.length).toBe(16);
+      // There should be info messages (completeness for all 30 entities)
+      expect(infos.length).toBe(30);
     });
   });
 
