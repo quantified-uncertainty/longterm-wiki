@@ -52,3 +52,45 @@ items:
       started: { type: date, description: "When this research area began" }
       key-publication: { type: text, description: "Most notable publication URL" }
       notes: { type: text, description: "Current status or significance" }
+
+  model-releases:
+    description: "AI model releases in chronological order"
+    fields:
+      name: { type: text, required: true, description: "Model name (e.g. Claude 3 Opus)" }
+      released: { type: date, required: true, description: "Public release date (YYYY-MM)" }
+      description: { type: text, description: "Brief description of the model" }
+      safety_level: { type: text, description: "Safety classification (e.g. ASL-2, ASL-3)" }
+      source: { type: text, description: "URL to announcement" }
+      notes: { type: text, description: "Key capabilities or benchmark results" }
+
+  board-members:
+    description: "Board of directors, current and former"
+    fields:
+      name: { type: text, required: true, description: "Full name" }
+      role: { type: text, description: "Board role (e.g. Director, Observer)" }
+      appointed: { type: date, description: "Date appointed (YYYY-MM)" }
+      departed: { type: date, description: "Date departed (omit if current)" }
+      background: { type: text, description: "Prior role or affiliation" }
+      appointed_by: { type: text, description: "Who appointed (e.g. LTBT, investors, founders)" }
+      source: { type: text, description: "URL confirming appointment" }
+
+  strategic-partnerships:
+    description: "Major strategic partnerships and cloud/compute deals"
+    fields:
+      partner: { type: text, required: true, description: "Partner organization name" }
+      type: { type: text, required: true, description: "Partnership type (investment, cloud, distribution)" }
+      date: { type: date, required: true, description: "Announcement date" }
+      investment_amount: { type: number, description: "Investment amount in USD (if applicable)" }
+      compute_commitment: { type: number, description: "Compute commitment in USD (if applicable)" }
+      source: { type: text, description: "URL to announcement" }
+      notes: { type: text, description: "Key terms and significance" }
+
+  safety-milestones:
+    description: "Significant safety research publications and policy milestones"
+    fields:
+      name: { type: text, required: true, description: "Milestone name" }
+      date: { type: date, required: true, description: "Date of publication or announcement" }
+      type: { type: text, description: "Type: research-paper, policy-update, safety-eval, red-team" }
+      description: { type: text, description: "Brief description" }
+      source: { type: text, description: "URL to paper or announcement" }
+      notes: { type: text, description: "Impact or significance" }

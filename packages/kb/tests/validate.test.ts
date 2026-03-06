@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeAll, vi } from "vitest";
 import path from "node:path";
-import { loadKB } from "../src/loader.ts";
-import { validate, validateThing } from "../src/validate.ts";
-import { Graph } from "../src/graph.ts";
-import type { ValidationResult } from "../src/types.ts";
+import { loadKB } from "../src/loader";
+import { validate, validateThing } from "../src/validate";
+import { Graph } from "../src/graph";
+import type { ValidationResult } from "../src/types";
 
 const DATA_DIR = path.resolve(__dirname, "../data");
 
@@ -140,7 +140,7 @@ describe("validate", () => {
     it("returns results for all things", () => {
       const results = validate(graph);
 
-      // Should have results for anthropic, dario-amodei, and jan-leike
+      // Should have results for all 16 entities
       const thingIds = new Set(results.map((r) => r.thingId).filter(Boolean));
       expect(thingIds.has("anthropic")).toBe(true);
       expect(thingIds.has("dario-amodei")).toBe(true);
@@ -150,7 +150,7 @@ describe("validate", () => {
     it("includes completeness info for every thing", () => {
       const results = validate(graph);
       const completeness = results.filter((r) => r.rule === "completeness");
-      expect(completeness).toHaveLength(5); // one per thing
+      expect(completeness).toHaveLength(16); // one per thing
     });
 
     it("properly categorizes severity levels", () => {
@@ -161,8 +161,8 @@ describe("validate", () => {
 
       // There should be at least some warnings (recommended properties, or item ref warnings)
       expect(warnings.length).toBeGreaterThan(0);
-      // There should be info messages (completeness for all 5 things)
-      expect(infos.length).toBe(5);
+      // There should be info messages (completeness for all 16 things)
+      expect(infos.length).toBe(16);
     });
   });
 

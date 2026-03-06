@@ -12,9 +12,9 @@
 
 import { describe, it, expect, beforeAll } from "vitest";
 import { resolve } from "path";
-import { loadKB } from "../src/loader.ts";
-import { computeInverses } from "../src/inverse.ts";
-import type { Graph } from "../src/graph.ts";
+import { loadKB } from "../src/loader";
+import { computeInverses } from "../src/inverse";
+import type { Graph } from "../src/graph";
 
 const dataDir = resolve(import.meta.dirname, "../data");
 let graph: Graph;
@@ -178,7 +178,7 @@ describe("Q7: Anthropic funding rounds", () => {
     }
 
     // Check a specific round with full data
-    const seriesG = rounds.find((r) => r.key === "series-g");
+    const seriesG = rounds.find((r) => r.key === "i_OVNz9C3XUA");
     expect(seriesG).toBeDefined();
     expect(seriesG!.fields.amount).toBe(30e9);
     expect(seriesG!.fields.valuation).toBe(380e9);
@@ -254,7 +254,7 @@ describe("Q10: Anthropic gross margin", () => {
     const fact = graph.getLatest("anthropic", "gross-margin");
     expect(fact).toBeDefined();
     expect(fact!.value.type).toBe("number");
-    expect((fact!.value as { type: "number"; value: number }).value).toBe(40);
+    expect((fact!.value as { type: "number"; value: number }).value).toBe(63);
   });
 });
 
@@ -335,10 +335,10 @@ describe("Q15: Anthropic safety research", () => {
     expect(areas.length).toBeGreaterThanOrEqual(3);
 
     // Find specific research areas
-    const mechInterp = areas.find((a) => a.key === "mechanistic-interpretability");
+    const mechInterp = areas.find((a) => a.key === "i_X3GMmkZdIQ");
     expect(mechInterp).toBeDefined();
     expect(mechInterp!.fields.name).toBe("Mechanistic Interpretability");
-    expect(mechInterp!.fields["team-size"]).toBe(30);
+    expect(mechInterp!.fields["team-size"]).toBe(50);
 
     // Safety-related people from key-people
     const people = graph.getItems("anthropic", "key-people");
@@ -362,7 +362,7 @@ describe("Q16: Anthropic products launched", () => {
     expect(products.length).toBeGreaterThanOrEqual(3);
 
     // Check specific products
-    const claudeCode = products.find((p) => p.key === "claude-code");
+    const claudeCode = products.find((p) => p.key === "i_5ZyixnNTeg");
     expect(claudeCode).toBeDefined();
     expect(claudeCode!.fields.name).toBe("Claude Code");
     expect(claudeCode!.fields.launched).toBe("2025-02");
@@ -376,10 +376,13 @@ describe("Q16: Anthropic products launched", () => {
 });
 
 // ── Query 17: Anthropic vs OpenAI market share ──────────────────────
-// Rating: CLEAN — market-share property and data now exist for both.
+// Rating: AWKWARD — Anthropic uses enterprise-market-share and
+// coding-market-share properties while OpenAI uses the generic
+// market-share property. Cross-entity comparison requires knowing
+// which property each entity uses.
 describe("Q17: Anthropic vs OpenAI market share", () => {
-  it("compares market share across both entities", () => {
-    const anthropicShare = graph.getLatest("anthropic", "market-share");
+  it("compares enterprise market share for Anthropic and general market share for OpenAI", () => {
+    const anthropicShare = graph.getLatest("anthropic", "enterprise-market-share");
     const openaiShare = graph.getLatest("openai", "market-share");
     expect(anthropicShare).toBeDefined();
     expect(openaiShare).toBeDefined();
@@ -387,14 +390,30 @@ describe("Q17: Anthropic vs OpenAI market share", () => {
     const anthVal = (anthropicShare!.value as { type: "number"; value: number }).value;
     const oaiVal = (openaiShare!.value as { type: "number"; value: number }).value;
 
-    // OpenAI should have larger market share
-    expect(oaiVal).toBeGreaterThan(anthVal);
+    // Both should be reasonable percentage values
+    expect(anthVal).toBeGreaterThan(0);
+    expect(anthVal).toBeLessThan(100);
+    expect(oaiVal).toBeGreaterThan(0);
+    expect(oaiVal).toBeLessThan(100);
+  });
 
-    // Cross-entity comparison via getByProperty
+  it("Anthropic also has coding-market-share data", () => {
+    const codingShare = graph.getLatest("anthropic", "coding-market-share");
+    expect(codingShare).toBeDefined();
+    const val = (codingShare!.value as { type: "number"; value: number }).value;
+    expect(val).toBe(42);
+  });
+
+  it("cross-entity lookup works for market-share (OpenAI only)", () => {
     const shareMap = graph.getByProperty("market-share", { latest: true });
-    expect(shareMap.size).toBe(2);
-    expect(shareMap.has("anthropic")).toBe(true);
+    expect(shareMap.size).toBe(1);
     expect(shareMap.has("openai")).toBe(true);
+  });
+
+  it("cross-entity lookup works for enterprise-market-share (Anthropic only)", () => {
+    const shareMap = graph.getByProperty("enterprise-market-share", { latest: true });
+    expect(shareMap.size).toBe(1);
+    expect(shareMap.has("anthropic")).toBe(true);
   });
 });
 

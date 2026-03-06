@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_dF5bX8wC3g
     property: employed-by
-    value: openai
+    value: !ref 1LcLlMGLbw  # openai
     asOf: 2021-01
     validEnd: 2024-05
     source: https://openai.com/blog/introducing-superalignment
@@ -18,7 +18,7 @@ facts:
 
   - id: f_eH9jV6nK4t
     property: employed-by
-    value: anthropic
+    value: !ref mK9pX3rQ7n  # anthropic
     asOf: 2024-05
     source: https://anthropic.com/news/jan-leike-joins-anthropic
     notes: "Resigned from OpenAI in May 2024, citing safety concerns; joined Anthropic same month to lead Alignment Science team"

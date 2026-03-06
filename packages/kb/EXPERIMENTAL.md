@@ -1,10 +1,9 @@
-# EXPERIMENTAL: Knowledge Base Library
+# Knowledge Base Library — Status
 
-This package is an **experiment**. It may be promoted to production or killed after evaluation.
+This package is integrated into the production build pipeline but is still under active development.
 
-- **Different code quality standards** — iteration speed over polish
-- **Not depended on by production code** — no imports from apps/web or apps/wiki-server yet
-- **Scoped to Anthropic** — one test entity, not the full wiki
-- **Kill/promote deadline**: 2 weeks from first code (target: 2026-03-20)
+- **Production integration**: Imported by `apps/web` — KB data appears in `database.json` and renders on wiki pages
+- **5 entities**: Anthropic, OpenAI, Dario Amodei, Jan Leike, Sam Altman
+- **~10 more PRs planned**: Expanding to cover all major organizations and people, then replacing the old YAML facts system
 
-See `.claude/design/kb-library.md` for the full design doc.
+See `.claude/design/kb-library.md` for the design doc.

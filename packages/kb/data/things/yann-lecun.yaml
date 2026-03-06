@@ -1,0 +1,28 @@
+thing:
+  id: yann-lecun
+  stableId: cMbVUVK29Q
+  type: person
+  name: "Yann LeCun"
+  numericId: 582
+  aliases:
+    - "LeCun"
+
+facts:
+  - id: f_y9K773heIw
+    property: employed-by
+    value: !ref tt0f5PYDCw  # meta-ai
+    asOf: 2013-12
+    source: https://ai.meta.com/people/yann-lecun/
+    notes: "Joined Facebook AI Research (FAIR) as founding director in December 2013; became Chief AI Scientist at Meta"
+
+  - id: f_DQUCjz4rhQ
+    property: role
+    value: "Chief AI Scientist"
+    asOf: "2018"
+    source: https://ai.meta.com/people/yann-lecun/
+    notes: "Turing Award 2018 (shared with Yoshua Bengio and Geoffrey Hinton) for work on deep learning"
+
+  - id: f_A9r9tPNCOQ
+    property: born-year
+    value: 1960
+    notes: "Born July 8, 1960 in Soisy-sous-Montmorency, France"

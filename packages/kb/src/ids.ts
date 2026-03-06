@@ -71,10 +71,16 @@ export function generateFactId(): string {
  */
 export function contentHash(parts: string[]): string {
   const combined = parts.join("\x00");
-  return createHash("sha256")
+  const raw = createHash("sha256")
     .update(combined, "utf8")
     .digest("base64url")
     .slice(0, 10);
+  // Normalize to same alphanumeric alphabet as randomAlphanumeric10()
+  return raw.replace(/[-_]/g, (ch) => {
+    // Deterministic replacement from char code
+    const code = ch.charCodeAt(0);
+    return REPLACEMENT_CHARS[code % REPLACEMENT_CHARS.length];
+  });
 }
 
 /**

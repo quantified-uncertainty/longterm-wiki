@@ -1,8 +1,8 @@
 # Knowledge Base Library — Design Doc
 
-> **Status**: Session 2 complete. Library built, tested (127 tests), evaluated (90% Clean stress test).
+> **Status**: Session 3 complete. Library promoted — rendering components built, 5 entities, 133 tests passing.
 > **Goal**: Standalone TypeScript package for structured knowledge — entities, facts, schemas, relationships — decoupled from the wiki rendering, wiki-server, and crux CLI.
-> **Scope**: Anthropic as the first (and only) test entity. Kill or promote after 2 weeks.
+> **Scope**: Currently 5 test entities (Anthropic, OpenAI, Dario Amodei, Jan Leike, Sam Altman). Expanding to ~20+ entities over ~10 PRs.
 > **Related**: `statements-strategy.md` (broader data architecture context), `anthropic-ontology.md` (Anthropic data audit)
 
 ## Why
@@ -299,7 +299,8 @@ kb.getItems("anthropic", "funding-rounds");       // → ItemEntry[]
 kb.getLatest("anthropic", "valuation");           // → Fact (most recent by asOf)
 
 // Cross-entity
-kb.getByProperty("valuation", { latest: true });  // → Map<thingId, Fact>
+kb.getByProperty("valuation");                      // → Map<thingId, Fact> (latest per entity)
+kb.getAllByProperty("valuation");                    // → Map<thingId, Fact[]> (full history)
 kb.getByType("organization");                     // → Thing[]
 
 // Relationships (including computed inverses)
@@ -385,10 +386,22 @@ packages/kb/
 - [x] Run validation on real data — catches ref integrity, missing properties, completeness
 - [x] Write evaluation report (see below)
 
-### Session 3: Promote decision
-- [ ] Present evaluation to user
-- [ ] If promoting: plan migration path for existing entities/facts
-- [ ] If promoting: build wiki rendering components (<FactTable>, <ItemTable>)
+### Session 3: Rendering + Data Expansion (COMPLETE — PR #1801, #1802)
+- [x] Build rendering components: KBFactTable, KBItemTable, KBFactValue
+- [x] Shared formatting utility (format.ts) with smart currency, date, domain display
+- [x] Cross-entity item queries (getItemsMentioning)
+- [x] Expand Anthropic data to 36 facts, 9 item collections, 71 resources
+- [x] Integrate into build-data.mjs → database.json.kb
+- [x] Fix all review comments: addFact dedup, getByProperty no-op, inverse ID collisions,
+      normalizeValue authority, ENOENT-only catches, computed property rejection, asOf coercion
+- [x] 133 tests passing across 6 test files
+
+### Next: Expansion (~10 PRs planned)
+- [ ] PR 5: 3-5 more org entities (DeepMind, Meta AI, xAI, etc.)
+- [ ] PR 6: Person entity blueprint (5-10 people)
+- [ ] PR 7: `<F>` compatibility shim (KB facts replace YAML facts)
+- [ ] PR 8: Migrate YAML facts → KB
+- [ ] PR 9: Statement integration
 
 ## Evaluation results (Session 2)
 

@@ -1,0 +1,42 @@
+thing:
+  id: ilya-sutskever
+  stableId: eYrBgMLJDw
+  type: person
+  name: "Ilya Sutskever"
+  numericId: 163
+  aliases:
+    - "Ilya"
+
+facts:
+  - id: f_qfd3qL21HQ
+    property: employed-by
+    value: !ref 1LcLlMGLbw  # openai
+    asOf: 2015-12
+    validEnd: 2024-06
+    source: https://openai.com/blog/introducing-openai
+    notes: "Co-founded OpenAI in December 2015; served as Chief Scientist until departing June 2024"
+
+  - id: f_58HUz4jCeA
+    property: role
+    value: "Co-founder & Chief Scientist"
+    asOf: 2015-12
+    validEnd: 2024-06
+    source: https://openai.com/blog/introducing-openai
+
+  - id: f_QtqNoKoBgw
+    property: employed-by
+    value: ssi
+    asOf: 2024-06
+    source: https://ssi.inc
+    notes: "Co-founded Safe Superintelligence Inc (SSI) in June 2024 with Daniel Gross and Daniel Levy"
+
+  - id: f_rDk51er7Jw
+    property: role
+    value: "Co-founder & Chief Scientist"
+    asOf: 2024-06
+    source: https://ssi.inc
+
+  - id: f_D7v4CpKtMw
+    property: born-year
+    value: 1985
+    notes: "Born 1985 (approximate); originally from Russia, studied under Geoffrey Hinton at University of Toronto"

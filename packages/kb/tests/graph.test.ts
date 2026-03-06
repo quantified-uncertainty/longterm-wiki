@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import path from "node:path";
-import { loadKB } from "../src/loader.ts";
-import type { Graph } from "../src/graph.ts";
+import { loadKB } from "../src/loader";
+import type { Graph } from "../src/graph";
 
 const DATA_DIR = path.resolve(__dirname, "../data");
 
@@ -30,16 +30,19 @@ describe("graph", () => {
   describe("getAllThings", () => {
     it("returns all things in the graph", () => {
       const things = graph.getAllThings();
-      expect(things).toHaveLength(5);
+      expect(things).toHaveLength(16);
     });
   });
 
   describe("getFacts", () => {
     it("returns all facts for a thing", () => {
       const facts = graph.getFacts("anthropic");
-      // 5 revenue + 1 valuation + 1 founded-date + 1 headquarters + 1 headcount
-      // + 1 legal-structure + 1 total-funding + 1 gross-margin + 2 market-share = 14
-      expect(facts).toHaveLength(14);
+      // 9 revenue + 4 valuation + 3 total-funding + 3 headcount + 1 founded-date
+      // + 1 headquarters + 1 legal-structure + 2 gross-margin + 2 cash-burn
+      // + 2 enterprise-market-share + 1 coding-market-share + 1 monthly-active-users
+      // + 1 business-customers + 1 api-calls-monthly + 1 product-revenue
+      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size = 36
+      expect(facts).toHaveLength(36);
     });
 
     it("returns empty array for a thing with no facts", () => {
@@ -51,7 +54,7 @@ describe("graph", () => {
       const revenueFacts = graph.getFacts("anthropic", {
         property: "revenue",
       });
-      expect(revenueFacts).toHaveLength(5);
+      expect(revenueFacts).toHaveLength(9);
       for (const fact of revenueFacts) {
         expect(fact.propertyId).toBe("revenue");
       }
@@ -128,8 +131,8 @@ describe("graph", () => {
 
     it("returns facts from multiple entities", () => {
       const roleMap = graph.getByProperty("role");
-      // Dario, Jan, and Sam all have role facts
-      expect(roleMap.size).toBe(3);
+      // All 11 people have role facts
+      expect(roleMap.size).toBe(11);
       expect(roleMap.has("dario-amodei")).toBe(true);
       expect(roleMap.has("jan-leike")).toBe(true);
       expect(roleMap.has("sam-altman")).toBe(true);
@@ -152,16 +155,20 @@ describe("graph", () => {
   describe("getByType", () => {
     it("returns things of a given type", () => {
       const orgs = graph.getByType("organization");
-      expect(orgs).toHaveLength(2);
+      expect(orgs).toHaveLength(5);
       const orgIds = orgs.map((o) => o.id).sort();
-      expect(orgIds).toEqual(["anthropic", "openai"]);
+      expect(orgIds).toEqual(["anthropic", "deepmind", "meta-ai", "openai", "xai"]);
     });
 
     it("returns multiple things of the same type", () => {
       const people = graph.getByType("person");
-      expect(people).toHaveLength(3);
+      expect(people).toHaveLength(11);
       const ids = people.map((p) => p.id).sort();
-      expect(ids).toEqual(["dario-amodei", "jan-leike", "sam-altman"]);
+      expect(ids).toEqual([
+        "chris-olah", "daniela-amodei", "dario-amodei", "demis-hassabis",
+        "elon-musk", "geoffrey-hinton", "greg-brockman", "ilya-sutskever",
+        "jan-leike", "sam-altman", "yann-lecun",
+      ].sort());
     });
 
     it("returns empty array for unknown type", () => {
@@ -208,7 +215,7 @@ describe("graph", () => {
 
     it("returns correct data for a specific entry", () => {
       const people = graph.getItems("anthropic", "key-people");
-      const darioCeo = people.find((p) => p.key === "dario-ceo");
+      const darioCeo = people.find((p) => p.key === "i_Xp9vKZzBsg");
       expect(darioCeo).toBeDefined();
       expect(darioCeo!.fields.person).toBe("dario-amodei");
       expect(darioCeo!.fields.title).toBe("CEO");
@@ -224,6 +231,35 @@ describe("graph", () => {
     it("returns empty array for thing without items", () => {
       const items = graph.getItems("jan-leike", "key-people");
       expect(items).toEqual([]);
+    });
+  });
+
+  describe("getItemsMentioning", () => {
+    it("finds items referencing a thing via ref fields", () => {
+      // Anthropic's key-people collection has person fields referencing
+      // dario-amodei, jan-leike, etc. (typed as ref in schema)
+      const mentions = graph.getItemsMentioning("dario-amodei");
+      expect(mentions.length).toBeGreaterThan(0);
+
+      // Should find the key-people entry on Anthropic
+      const anthropicMention = mentions.find(
+        (m) => m.ownerThingId === "anthropic" && m.collection === "key-people"
+      );
+      expect(anthropicMention).toBeDefined();
+      expect(anthropicMention!.matchingFields).toContain("person");
+      expect(anthropicMention!.entry.fields.person).toBe("dario-amodei");
+    });
+
+    it("does not include self-references", () => {
+      const mentions = graph.getItemsMentioning("anthropic");
+      // Should not find items from Anthropic's own collections
+      const selfRefs = mentions.filter((m) => m.ownerThingId === "anthropic");
+      expect(selfRefs).toHaveLength(0);
+    });
+
+    it("returns empty array for thing with no mentions", () => {
+      const mentions = graph.getItemsMentioning("nonexistent-thing");
+      expect(mentions).toHaveLength(0);
     });
   });
 

@@ -4,7 +4,7 @@ import {
   generateFactId,
   contentHash,
   generateContentFactId,
-} from "../src/ids.ts";
+} from "../src/ids";
 
 describe("ids", () => {
   describe("generateStableId", () => {
