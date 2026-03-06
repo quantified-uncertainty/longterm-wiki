@@ -6,7 +6,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import { join, extname } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { Graph } from "./graph.ts";
+import { Graph } from "./graph";
 import type {
   PropertiesFile,
   SchemaFile,
@@ -18,7 +18,7 @@ import type {
   Fact,
   FactValue,
   ItemCollection,
-} from "./types.ts";
+} from "./types";
 
 // ── Value normalization ────────────────────────────────────────────────
 

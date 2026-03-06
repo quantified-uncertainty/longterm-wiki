@@ -13,7 +13,7 @@
  *                    database.json for local dev but omits dashboard data.
  *   --quick          Alias for --scope=content
  *   --phase=<name>   Run only a specific phase (for debugging). Valid names:
- *                    yaml, ids, mdx, derived, facts, pages, links, blocks,
+ *                    yaml, ids, mdx, derived, facts, kb, pages, links, blocks,
  *                    risk, resources, footnotes, refs, redundancy, graph,
  *                    history, coverage, rankings, schedule, transform, write
 */
@@ -1295,6 +1295,24 @@ async function main() {
   // Build timeseries index
   const factTimeseries = buildFactTimeseries(facts);
   database.factTimeseries = factTimeseries;
+
+  // Load KB (knowledge base graph) from packages/kb
+  try {
+    const kbDataDir = join(REPO_ROOT, 'packages', 'kb', 'data');
+    if (existsSync(kbDataDir)) {
+      const { loadKB, serialize } = await import('../../../packages/kb/src/index.ts');
+      const graph = await loadKB(kbDataDir);
+      const serializedKB = serialize(graph);
+      database.kb = serializedKB;
+      const thingCount = serializedKB.things?.length ?? 0;
+      const factCount = Object.keys(serializedKB.facts ?? {}).length;
+      console.log(`  kb: ${thingCount} things, ${factCount} fact groups`);
+    } else {
+      console.warn('  kb: skipped (data directory not found at packages/kb/data)');
+    }
+  } catch (e) {
+    console.warn(`  kb: skipped (${e instanceof Error ? e.message : String(e)})`);
+  }
 
   // Build URL → resource map for unconverted link detection
   const resources = database.resources || [];

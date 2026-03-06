@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import path from "node:path";
-import { loadKB } from "../src/loader.ts";
-import type { Graph } from "../src/graph.ts";
+import { loadKB } from "../src/loader";
+import type { Graph } from "../src/graph";
 
 const DATA_DIR = path.resolve(__dirname, "../data");
 

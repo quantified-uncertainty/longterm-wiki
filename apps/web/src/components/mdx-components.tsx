@@ -19,6 +19,11 @@ import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 import { OverviewBanner } from "@/components/wiki/OverviewBanner";
 import { AnthropicStakeholdersTable } from "@/components/wiki/AnthropicStakeholdersTable";
 
+// KB (Knowledge Base) components — typed facts, properties, items
+import { KBFactTable } from "@/components/wiki/kb/KBFactTable";
+import { KBItemTable } from "@/components/wiki/kb/KBItemTable";
+import { KBFactValue } from "@/components/wiki/kb/KBFactValue";
+
 // Table view components
 import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
 import AccidentRisksTableView from "@/components/tables/views/AccidentRisksTableView";
@@ -158,6 +163,11 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
 
   // Anthropic-specific table
   AnthropicStakeholdersTable,
+
+  // KB (Knowledge Base) — typed facts and item collections
+  KBFactTable,
+  KBItemTable,
+  KBFactValue,
 
   // Epic tracking
   EpicTracker,

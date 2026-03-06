@@ -16,7 +16,7 @@
  *                                       properties that have at least one fact
  */
 
-import type { Graph } from "./graph.ts";
+import type { Graph } from "./graph";
 import type {
   Fact,
   FactValue,
@@ -24,7 +24,7 @@ import type {
   ItemCollectionSchema,
   TypeSchema,
   ValidationResult,
-} from "./types.ts";
+} from "./types";
 
 // ── Utility helpers ───────────────────────────────────────────────────────────
 

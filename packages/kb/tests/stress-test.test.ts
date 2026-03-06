@@ -12,9 +12,9 @@
 
 import { describe, it, expect, beforeAll } from "vitest";
 import { resolve } from "path";
-import { loadKB } from "../src/loader.ts";
-import { computeInverses } from "../src/inverse.ts";
-import type { Graph } from "../src/graph.ts";
+import { loadKB } from "../src/loader";
+import { computeInverses } from "../src/inverse";
+import type { Graph } from "../src/graph";
 
 const dataDir = resolve(import.meta.dirname, "../data");
 let graph: Graph;

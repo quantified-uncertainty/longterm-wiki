@@ -12,7 +12,7 @@ import type {
   ItemEntry,
   FactQuery,
   PropertyQuery,
-} from "./types.ts";
+} from "./types";
 
 export class Graph {
   private things: Map<string, Thing> = new Map();

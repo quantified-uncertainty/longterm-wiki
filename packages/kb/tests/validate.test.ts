@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeAll, vi } from "vitest";
 import path from "node:path";
-import { loadKB } from "../src/loader.ts";
-import { validate, validateThing } from "../src/validate.ts";
-import { Graph } from "../src/graph.ts";
-import type { ValidationResult } from "../src/types.ts";
+import { loadKB } from "../src/loader";
+import { validate, validateThing } from "../src/validate";
+import { Graph } from "../src/graph";
+import type { ValidationResult } from "../src/types";
 
 const DATA_DIR = path.resolve(__dirname, "../data");
 

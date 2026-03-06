@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, vi } from "vitest";
 import path from "node:path";
-import { loadKB } from "../src/loader.ts";
-import { computeInverses } from "../src/inverse.ts";
-import type { Graph } from "../src/graph.ts";
+import { loadKB } from "../src/loader";
+import { computeInverses } from "../src/inverse";
+import type { Graph } from "../src/graph";
 
 const DATA_DIR = path.resolve(__dirname, "../data");
 

@@ -16,8 +16,8 @@
  */
 
 import { createHash } from "node:crypto";
-import type { Fact } from "./types.ts";
-import type { Graph } from "./graph.ts";
+import type { Fact } from "./types";
+import type { Graph } from "./graph";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
