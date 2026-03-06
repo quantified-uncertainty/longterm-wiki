@@ -184,6 +184,12 @@ export class Graph {
 
   // ── Item queries ───────────────────────────────────────────────────
 
+  getItemCollectionNames(entityId: string): string[] {
+    const entityCollections = this.items.get(entityId);
+    if (!entityCollections) return [];
+    return Array.from(entityCollections.keys());
+  }
+
   getItems(entityId: string, collectionName: string): ItemEntry[] {
     const entityCollections = this.items.get(entityId);
     if (!entityCollections) return [];
