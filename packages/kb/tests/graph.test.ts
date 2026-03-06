@@ -12,30 +12,30 @@ describe("graph", () => {
     graph = await loadKB(DATA_DIR);
   });
 
-  describe("getThing", () => {
-    it("returns the correct thing for a valid ID", () => {
-      const thing = graph.getThing("anthropic");
-      expect(thing).toBeDefined();
-      expect(thing!.id).toBe("anthropic");
-      expect(thing!.name).toBe("Anthropic");
-      expect(thing!.type).toBe("organization");
+  describe("getEntity", () => {
+    it("returns the correct entity for a valid ID", () => {
+      const entity = graph.getEntity("anthropic");
+      expect(entity).toBeDefined();
+      expect(entity!.id).toBe("anthropic");
+      expect(entity!.name).toBe("Anthropic");
+      expect(entity!.type).toBe("organization");
     });
 
-    it("returns undefined for a missing thing", () => {
-      const thing = graph.getThing("nonexistent-org");
-      expect(thing).toBeUndefined();
+    it("returns undefined for a missing entity", () => {
+      const entity = graph.getEntity("nonexistent-org");
+      expect(entity).toBeUndefined();
     });
   });
 
-  describe("getAllThings", () => {
-    it("returns all things in the graph", () => {
-      const things = graph.getAllThings();
-      expect(things).toHaveLength(16);
+  describe("getAllEntities", () => {
+    it("returns all entities in the graph", () => {
+      const entities = graph.getAllEntities();
+      expect(entities).toHaveLength(16);
     });
   });
 
   describe("getFacts", () => {
-    it("returns all facts for a thing", () => {
+    it("returns all facts for an entity", () => {
       const facts = graph.getFacts("anthropic");
       // 9 revenue + 4 valuation + 3 total-funding + 3 headcount + 1 founded-date
       // + 1 headquarters + 1 legal-structure + 2 gross-margin + 2 cash-burn
@@ -45,7 +45,7 @@ describe("graph", () => {
       expect(facts).toHaveLength(36);
     });
 
-    it("returns empty array for a thing with no facts", () => {
+    it("returns empty array for an entity with no facts", () => {
       const facts = graph.getFacts("nonexistent");
       expect(facts).toEqual([]);
     });
@@ -105,7 +105,7 @@ describe("graph", () => {
       expect(latest).toBeUndefined();
     });
 
-    it("returns undefined for a missing thing", () => {
+    it("returns undefined for a missing entity", () => {
       const latest = graph.getLatest("nonexistent", "revenue");
       expect(latest).toBeUndefined();
     });
@@ -153,14 +153,14 @@ describe("graph", () => {
   });
 
   describe("getByType", () => {
-    it("returns things of a given type", () => {
+    it("returns entities of a given type", () => {
       const orgs = graph.getByType("organization");
       expect(orgs).toHaveLength(5);
       const orgIds = orgs.map((o) => o.id).sort();
       expect(orgIds).toEqual(["anthropic", "deepmind", "meta-ai", "openai", "xai"]);
     });
 
-    it("returns multiple things of the same type", () => {
+    it("returns multiple entities of the same type", () => {
       const people = graph.getByType("person");
       expect(people).toHaveLength(11);
       const ids = people.map((p) => p.id).sort();
@@ -172,20 +172,20 @@ describe("graph", () => {
     });
 
     it("returns empty array for unknown type", () => {
-      const things = graph.getByType("product");
-      expect(things).toHaveLength(0);
+      const entities = graph.getByType("product");
+      expect(entities).toHaveLength(0);
     });
   });
 
   describe("getRelated", () => {
-    it("returns referenced thing IDs from ref facts", () => {
+    it("returns referenced entity IDs from ref facts", () => {
       const related = graph.getRelated("jan-leike", "employed-by");
       expect(related).toContain("openai");
       expect(related).toContain("anthropic");
       expect(related).toHaveLength(2);
     });
 
-    it("returns referenced thing IDs from a single ref fact", () => {
+    it("returns referenced entity IDs from a single ref fact", () => {
       const related = graph.getRelated("dario-amodei", "employed-by");
       expect(related).toEqual(["anthropic"]);
     });
@@ -195,7 +195,7 @@ describe("graph", () => {
       expect(related).toEqual([]);
     });
 
-    it("returns empty array for nonexistent thing", () => {
+    it("returns empty array for nonexistent entity", () => {
       const related = graph.getRelated("nonexistent", "employed-by");
       expect(related).toEqual([]);
     });
@@ -228,14 +228,14 @@ describe("graph", () => {
       expect(items).toEqual([]);
     });
 
-    it("returns empty array for thing without items", () => {
+    it("returns empty array for entity without items", () => {
       const items = graph.getItems("jan-leike", "key-people");
       expect(items).toEqual([]);
     });
   });
 
   describe("getItemsMentioning", () => {
-    it("finds items referencing a thing via ref fields", () => {
+    it("finds items referencing an entity via ref fields", () => {
       // Anthropic's key-people collection has person fields referencing
       // dario-amodei, jan-leike, etc. (typed as ref in schema)
       const mentions = graph.getItemsMentioning("dario-amodei");
@@ -243,7 +243,7 @@ describe("graph", () => {
 
       // Should find the key-people entry on Anthropic
       const anthropicMention = mentions.find(
-        (m) => m.ownerThingId === "anthropic" && m.collection === "key-people"
+        (m) => m.ownerEntityId === "anthropic" && m.collection === "key-people"
       );
       expect(anthropicMention).toBeDefined();
       expect(anthropicMention!.matchingFields).toContain("person");
@@ -253,12 +253,12 @@ describe("graph", () => {
     it("does not include self-references", () => {
       const mentions = graph.getItemsMentioning("anthropic");
       // Should not find items from Anthropic's own collections
-      const selfRefs = mentions.filter((m) => m.ownerThingId === "anthropic");
+      const selfRefs = mentions.filter((m) => m.ownerEntityId === "anthropic");
       expect(selfRefs).toHaveLength(0);
     });
 
-    it("returns empty array for thing with no mentions", () => {
-      const mentions = graph.getItemsMentioning("nonexistent-thing");
+    it("returns empty array for entity with no mentions", () => {
+      const mentions = graph.getItemsMentioning("nonexistent-entity");
       expect(mentions).toHaveLength(0);
     });
   });

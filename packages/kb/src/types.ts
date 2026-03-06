@@ -14,9 +14,9 @@ export type FactValue =
   | { type: "refs"; value: string[] }
   | { type: "json"; value: unknown };
 
-// ── Thing ───────────────────────────────────────────────────────────
+// ── Entity ──────────────────────────────────────────────────────────
 
-export interface Thing {
+export interface Entity {
   /** Human-readable slug: "anthropic", "claude-3-5-sonnet" */
   id: string;
   /** Random 10-char ID that survives renames */
@@ -25,7 +25,7 @@ export interface Thing {
   type: string;
   /** Display name */
   name: string;
-  /** Parent thing ID (e.g., funding round → org) */
+  /** Parent entity ID (e.g., funding round → org) */
   parent?: string;
   /** Alternative names for search */
   aliases?: string[];
@@ -40,7 +40,7 @@ export interface Thing {
 export interface Fact {
   /** Random 10-char "f_xxxxxxxx" or content-hash */
   id: string;
-  /** Thing ID (slug) this fact is about */
+  /** Entity ID (slug) this fact is about */
   subjectId: string;
   /** Property ID from the registry */
   propertyId: string;
@@ -84,7 +84,7 @@ export interface Property {
   inverseId?: string;
   /** Inverse display name: "Employed By" → "Employs" */
   inverseName?: string;
-  /** Thing types this property is valid for */
+  /** Entity types this property is valid for */
   appliesTo?: string[];
   /** Display formatting */
   display?: PropertyDisplay;
@@ -107,7 +107,7 @@ export interface ItemCollectionSchema {
 }
 
 export interface TypeSchema {
-  /** Thing type this schema applies to: "organization", "person" */
+  /** Entity type this schema applies to: "organization", "person" */
   type: string;
   /** Display name: "Organization" */
   name: string;
@@ -137,8 +137,8 @@ export interface ItemCollection {
 
 // ── YAML file shapes ────────────────────────────────────────────────
 
-/** Shape of a thing's YAML file (data/things/anthropic.yaml) */
-export interface ThingFile {
+/** Shape of an entity's YAML file (data/things/anthropic.yaml) */
+export interface EntityFile {
   thing: {
     id: string;
     stableId: string;
@@ -194,7 +194,7 @@ export type ValidationSeverity = "error" | "warning" | "info";
 
 export interface ValidationResult {
   severity: ValidationSeverity;
-  thingId?: string;
+  entityId?: string;
   propertyId?: string;
   message: string;
   /** Which check produced this */

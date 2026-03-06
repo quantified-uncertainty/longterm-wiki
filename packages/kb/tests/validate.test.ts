@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, vi } from "vitest";
 import path from "node:path";
 import { loadKB } from "../src/loader";
-import { validate, validateThing } from "../src/validate";
+import { validate, validateEntity } from "../src/validate";
 import { Graph } from "../src/graph";
 import type { ValidationResult } from "../src/types";
 
@@ -14,11 +14,11 @@ describe("validate", () => {
     graph = await loadKB(DATA_DIR);
   });
 
-  describe("validateThing — anthropic (organization)", () => {
+  describe("validateEntity — anthropic (organization)", () => {
     let results: ValidationResult[];
 
     beforeAll(() => {
-      results = validateThing(graph, "anthropic");
+      results = validateEntity(graph, "anthropic");
     });
 
     it("has no required-property errors (founded-date and headquarters present)", () => {
@@ -53,10 +53,10 @@ describe("validate", () => {
     });
   });
 
-  describe("validateThing — person schemas", () => {
+  describe("validateEntity — person schemas", () => {
     it("person with all recommended properties has no warnings", () => {
       // Dario has employed-by, role, and born-year
-      const results = validateThing(graph, "dario-amodei");
+      const results = validateEntity(graph, "dario-amodei");
       const recommendedWarnings = results.filter(
         (r) => r.rule === "recommended-properties"
       );
@@ -65,7 +65,7 @@ describe("validate", () => {
 
     it("person missing recommended properties gets warnings", () => {
       // Jan Leike has employed-by and role but NO born-year
-      const results = validateThing(graph, "jan-leike");
+      const results = validateEntity(graph, "jan-leike");
       const recommendedWarnings = results.filter(
         (r) => r.rule === "recommended-properties"
       );
@@ -75,17 +75,17 @@ describe("validate", () => {
   });
 
   describe("ref-integrity", () => {
-    it("catches refs to non-existent things", () => {
+    it("catches refs to non-existent entities", () => {
       // OpenAI key-people reference persons not in our test data (e.g., ilya-sutskever)
-      const results = validateThing(graph, "openai");
+      const results = validateEntity(graph, "openai");
       const refErrors = results.filter((r) => r.rule === "ref-integrity" || r.rule === "item-collection-schema");
       // There should be warnings for referenced persons not in the graph
       expect(refErrors.length).toBeGreaterThan(0);
     });
 
-    it("does not flag refs to existing things", () => {
+    it("does not flag refs to existing entities", () => {
       // Dario references "anthropic" which exists
-      const results = validateThing(graph, "dario-amodei");
+      const results = validateEntity(graph, "dario-amodei");
       const refErrors = results.filter((r) => r.rule === "ref-integrity");
       expect(refErrors).toHaveLength(0);
     });
@@ -93,16 +93,16 @@ describe("validate", () => {
 
   describe("item-collection-schema validation", () => {
     it("validates item entries against schema", () => {
-      const results = validateThing(graph, "anthropic");
+      const results = validateEntity(graph, "anthropic");
       const itemResults = results.filter(
         (r) => r.rule === "item-collection-schema"
       );
       // The anthropic data has funding-round entries with lead_investor referencing
-      // things not in our test graph (ftx, amazon, google, gic, jaan-tallinn).
-      // These should produce type warnings since they reference non-existent things.
+      // entities not in our test graph (ftx, amazon, google, gic, jaan-tallinn).
+      // These should produce type warnings since they reference non-existent entities.
       const refWarnings = itemResults.filter(
         (r) =>
-          r.severity === "warning" && r.message.includes("unknown thing")
+          r.severity === "warning" && r.message.includes("unknown entity")
       );
       expect(refWarnings.length).toBeGreaterThan(0);
     });
@@ -110,7 +110,7 @@ describe("validate", () => {
     it("does not report errors for required fields that are present", () => {
       // funding-rounds schema requires 'date', key-people requires 'person' and 'title'
       // All entries in our test data provide these fields
-      const results = validateThing(graph, "anthropic");
+      const results = validateEntity(graph, "anthropic");
       const requiredFieldErrors = results.filter(
         (r) =>
           r.rule === "item-collection-schema" &&
@@ -121,7 +121,7 @@ describe("validate", () => {
     });
 
     it("validates key-people person refs against the graph", () => {
-      const results = validateThing(graph, "anthropic");
+      const results = validateEntity(graph, "anthropic");
       const itemResults = results.filter(
         (r) =>
           r.rule === "item-collection-schema" &&
@@ -130,27 +130,27 @@ describe("validate", () => {
       // Some key-people reference persons not in the graph
       // (daniela-amodei, chris-olah, tom-brown, mike-krieger, holden-karnofsky)
       const unknownPeople = itemResults.filter(
-        (r) => r.message.includes("unknown thing")
+        (r) => r.message.includes("unknown entity")
       );
       expect(unknownPeople.length).toBeGreaterThan(0);
     });
   });
 
   describe("validate (full graph)", () => {
-    it("returns results for all things", () => {
+    it("returns results for all entities", () => {
       const results = validate(graph);
 
       // Should have results for all 16 entities
-      const thingIds = new Set(results.map((r) => r.thingId).filter(Boolean));
-      expect(thingIds.has("anthropic")).toBe(true);
-      expect(thingIds.has("dario-amodei")).toBe(true);
-      expect(thingIds.has("jan-leike")).toBe(true);
+      const entityIds = new Set(results.map((r) => r.entityId).filter(Boolean));
+      expect(entityIds.has("anthropic")).toBe(true);
+      expect(entityIds.has("dario-amodei")).toBe(true);
+      expect(entityIds.has("jan-leike")).toBe(true);
     });
 
-    it("includes completeness info for every thing", () => {
+    it("includes completeness info for every entity", () => {
       const results = validate(graph);
       const completeness = results.filter((r) => r.rule === "completeness");
-      expect(completeness).toHaveLength(16); // one per thing
+      expect(completeness).toHaveLength(16); // one per entity
     });
 
     it("properly categorizes severity levels", () => {
@@ -161,30 +161,30 @@ describe("validate", () => {
 
       // There should be at least some warnings (recommended properties, or item ref warnings)
       expect(warnings.length).toBeGreaterThan(0);
-      // There should be info messages (completeness for all 16 things)
+      // There should be info messages (completeness for all 16 entities)
       expect(infos.length).toBe(16);
     });
   });
 
-  describe("validateThing — edge cases", () => {
-    it("returns error for non-existent thing", () => {
-      const results = validateThing(graph, "nonexistent");
+  describe("validateEntity — edge cases", () => {
+    it("returns error for non-existent entity", () => {
+      const results = validateEntity(graph, "nonexistent");
       expect(results).toHaveLength(1);
       expect(results[0].severity).toBe("error");
-      expect(results[0].rule).toBe("thing-exists");
+      expect(results[0].rule).toBe("entity-exists");
     });
 
-    it("returns warning for thing with no registered schema", () => {
-      // Create a minimal graph with a thing of unknown type
+    it("returns warning for entity with no registered schema", () => {
+      // Create a minimal graph with an entity of unknown type
       const minGraph = new Graph();
-      minGraph.addThing({
+      minGraph.addEntity({
         id: "test-product",
         stableId: "abc123def0",
         type: "product",
         name: "Test Product",
       });
 
-      const results = validateThing(minGraph, "test-product");
+      const results = validateEntity(minGraph, "test-product");
       expect(results).toHaveLength(1);
       expect(results[0].severity).toBe("warning");
       expect(results[0].rule).toBe("schema-exists");
@@ -200,14 +200,14 @@ describe("validate", () => {
         required: ["founded-date", "headquarters"],
         recommended: ["revenue"],
       });
-      minGraph.addThing({
+      minGraph.addEntity({
         id: "empty-org",
         stableId: "xyz456abc0",
         type: "organization",
         name: "Empty Org",
       });
 
-      const results = validateThing(minGraph, "empty-org");
+      const results = validateEntity(minGraph, "empty-org");
       const requiredErrors = results.filter(
         (r) => r.rule === "required-properties"
       );
@@ -220,7 +220,7 @@ describe("validate", () => {
   });
 
   describe("property-applies-to check", () => {
-    it("warns when property is used on wrong thing type", () => {
+    it("warns when property is used on wrong entity type", () => {
       // Create a scenario where a "revenue" fact is on a person (wrong type)
       const testGraph = new Graph();
       testGraph.addSchema({
@@ -235,7 +235,7 @@ describe("validate", () => {
         dataType: "number",
         appliesTo: ["organization"],
       });
-      testGraph.addThing({
+      testGraph.addEntity({
         id: "wrong-type",
         stableId: "abc123def0",
         type: "person",
@@ -248,7 +248,7 @@ describe("validate", () => {
         value: { type: "number", value: 1000 },
       });
 
-      const results = validateThing(testGraph, "wrong-type");
+      const results = validateEntity(testGraph, "wrong-type");
       const appliesToWarnings = results.filter(
         (r) => r.rule === "property-applies-to"
       );

@@ -87,11 +87,11 @@ describe("inverse", () => {
       expect(related).toContain("jan-leike");
     });
 
-    it("skips inverse when referenced thing does not exist in graph", () => {
+    it("skips inverse when referenced entity does not exist in graph", () => {
       // Anthropic has founded-by refs including persons not in the graph
       // (e.g., "daniela-amodei" is referenced in key-people but not as a
-      // founded-by fact). Verify that nonexistent things don't get created.
-      const nonexistent = graph.getThing("nonexistent-entity");
+      // founded-by fact). Verify that nonexistent entities don't get created.
+      const nonexistent = graph.getEntity("nonexistent-entity");
       expect(nonexistent).toBeUndefined();
 
       const facts = graph.getFacts("nonexistent-entity", {
@@ -100,7 +100,7 @@ describe("inverse", () => {
       expect(facts).toEqual([]);
     });
 
-    it("logs a warning when referenced thing does not exist", async () => {
+    it("logs a warning when referenced entity does not exist", async () => {
       // Create a minimal graph with a dangling ref to test the warning
       const { Graph } = await import("../src/graph.ts");
       const freshGraph = new Graph();
@@ -119,7 +119,7 @@ describe("inverse", () => {
         inverseName: "Employed By",
         computed: true,
       });
-      freshGraph.addThing({
+      freshGraph.addEntity({
         id: "test-person",
         stableId: "test123456",
         type: "person",

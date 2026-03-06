@@ -6,7 +6,7 @@ import type { Graph } from "./graph";
 import type { ItemEntry } from "./types";
 
 export interface SerializedKB {
-  things: ReturnType<Graph["getAllThings"]>;
+  entities: ReturnType<Graph["getAllEntities"]>;
   facts: Record<string, ReturnType<Graph["getFacts"]>>;
   properties: ReturnType<Graph["getAllProperties"]>;
   schemas: ReturnType<Graph["getAllSchemas"]>;
@@ -18,34 +18,34 @@ export interface SerializedKB {
  * Useful for writing to database.json or sending over the wire.
  */
 export function serialize(graph: Graph): SerializedKB {
-  const things = graph.getAllThings();
+  const entities = graph.getAllEntities();
   const properties = graph.getAllProperties();
   const schemas = graph.getAllSchemas();
 
   const facts: SerializedKB["facts"] = {};
   const items: SerializedKB["items"] = {};
 
-  for (const thing of things) {
-    const thingFacts = graph.getFacts(thing.id);
-    if (thingFacts.length > 0) {
-      facts[thing.id] = thingFacts;
+  for (const entity of entities) {
+    const entityFacts = graph.getFacts(entity.id);
+    if (entityFacts.length > 0) {
+      facts[entity.id] = entityFacts;
     }
 
-    // Serialize item collections for this thing
-    const schema = graph.getSchema(thing.type);
+    // Serialize item collections for this entity
+    const schema = graph.getSchema(entity.type);
     if (schema?.items) {
-      const thingItems: Record<string, ItemEntry[]> = {};
+      const entityItems: Record<string, ItemEntry[]> = {};
       for (const collectionName of Object.keys(schema.items)) {
-        const entries = graph.getItems(thing.id, collectionName);
+        const entries = graph.getItems(entity.id, collectionName);
         if (entries.length > 0) {
-          thingItems[collectionName] = entries;
+          entityItems[collectionName] = entries;
         }
       }
-      if (Object.keys(thingItems).length > 0) {
-        items[thing.id] = thingItems;
+      if (Object.keys(entityItems).length > 0) {
+        items[entity.id] = entityItems;
       }
     }
   }
 
-  return { things, facts, properties, schemas, items };
+  return { entities, facts, properties, schemas, items };
 }

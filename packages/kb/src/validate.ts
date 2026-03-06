@@ -2,16 +2,16 @@
  * Schema validation for the Knowledge Base graph.
  *
  * Checks performed:
- *  1. required-properties  (error)   — each thing must have a fact for every
+ *  1. required-properties  (error)   — each entity must have a fact for every
  *                                      property listed in its TypeSchema.required
  *  2. recommended-properties (warning) — same check for TypeSchema.recommended
  *  3. property-applies-to  (warning)  — if a property lists appliesTo, ensure
- *                                       the thing's type is in that list
+ *                                       the entity's type is in that list
  *  4. ref-integrity        (error)    — ref/refs values must point to existing
- *                                       things in the graph
+ *                                       entities in the graph
  *  5. item-collection-schema (error/warning) — validate item entries against
  *                                       the ItemCollectionSchema defined in the
- *                                       thing's TypeSchema (if one exists)
+ *                                       entity's TypeSchema (if one exists)
  *  6. completeness         (info)     — percentage of required+recommended
  *                                       properties that have at least one fact
  */
@@ -28,9 +28,9 @@ import type {
 
 // ── Utility helpers ───────────────────────────────────────────────────────────
 
-/** Returns true if the thing has at least one fact for the given propertyId. */
-function hasFact(graph: Graph, thingId: string, propertyId: string): boolean {
-  return graph.getFacts(thingId, { property: propertyId }).length > 0;
+/** Returns true if the entity has at least one fact for the given propertyId. */
+function hasFact(graph: Graph, entityId: string, propertyId: string): boolean {
+  return graph.getFacts(entityId, { property: propertyId }).length > 0;
 }
 
 /**
@@ -42,23 +42,23 @@ function looksLikeDate(value: unknown): boolean {
   return /^\d{4}(-\d{2}(-\d{2})?)?$/.test(value);
 }
 
-// ── Per-thing check implementations ───────────────────────────────────────────
+// ── Per-entity check implementations ──────────────────────────────────────────
 
 /** Check 1: required properties. */
 function checkRequired(
   graph: Graph,
-  thingId: string,
+  entityId: string,
   schema: TypeSchema
 ): ValidationResult[] {
   const results: ValidationResult[] = [];
 
   for (const propertyId of schema.required) {
-    if (!hasFact(graph, thingId, propertyId)) {
+    if (!hasFact(graph, entityId, propertyId)) {
       results.push({
         severity: "error",
-        thingId,
+        entityId,
         propertyId,
-        message: `Missing required property "${propertyId}" on thing "${thingId}" (type: ${schema.type}).`,
+        message: `Missing required property "${propertyId}" on entity "${entityId}" (type: ${schema.type}).`,
         rule: "required-properties",
       });
     }
@@ -70,18 +70,18 @@ function checkRequired(
 /** Check 2: recommended properties. */
 function checkRecommended(
   graph: Graph,
-  thingId: string,
+  entityId: string,
   schema: TypeSchema
 ): ValidationResult[] {
   const results: ValidationResult[] = [];
 
   for (const propertyId of schema.recommended) {
-    if (!hasFact(graph, thingId, propertyId)) {
+    if (!hasFact(graph, entityId, propertyId)) {
       results.push({
         severity: "warning",
-        thingId,
+        entityId,
         propertyId,
-        message: `Missing recommended property "${propertyId}" on thing "${thingId}" (type: ${schema.type}).`,
+        message: `Missing recommended property "${propertyId}" on entity "${entityId}" (type: ${schema.type}).`,
         rule: "recommended-properties",
       });
     }
@@ -93,25 +93,25 @@ function checkRecommended(
 /** Check 3: property appliesTo type constraint. */
 function checkPropertyAppliesTo(
   graph: Graph,
-  thingId: string,
-  thingType: string
+  entityId: string,
+  entityType: string
 ): ValidationResult[] {
   const results: ValidationResult[] = [];
-  const facts = graph.getFacts(thingId);
+  const facts = graph.getFacts(entityId);
 
   for (const fact of facts) {
     const property = graph.getProperty(fact.propertyId);
     if (!property) continue; // Unknown properties are caught by other checks if needed.
     if (!property.appliesTo || property.appliesTo.length === 0) continue;
 
-    if (!property.appliesTo.includes(thingType)) {
+    if (!property.appliesTo.includes(entityType)) {
       results.push({
         severity: "warning",
-        thingId,
+        entityId,
         propertyId: fact.propertyId,
         message:
           `Property "${fact.propertyId}" applies to [${property.appliesTo.join(", ")}] ` +
-          `but thing "${thingId}" is of type "${thingType}".`,
+          `but entity "${entityId}" is of type "${entityType}".`,
         rule: "property-applies-to",
       });
     }
@@ -120,10 +120,10 @@ function checkPropertyAppliesTo(
   return results;
 }
 
-/** Check 4: ref/refs integrity — referenced things must exist. */
-function checkRefIntegrity(graph: Graph, thingId: string): ValidationResult[] {
+/** Check 4: ref/refs integrity — referenced entities must exist. */
+function checkRefIntegrity(graph: Graph, entityId: string): ValidationResult[] {
   const results: ValidationResult[] = [];
-  const facts = graph.getFacts(thingId);
+  const facts = graph.getFacts(entityId);
 
   for (const fact of facts) {
     const missingRefs = _findMissingRefs(graph, fact.value);
@@ -131,10 +131,10 @@ function checkRefIntegrity(graph: Graph, thingId: string): ValidationResult[] {
     for (const missingId of missingRefs) {
       results.push({
         severity: "error",
-        thingId,
+        entityId,
         propertyId: fact.propertyId,
         message:
-          `Fact "${fact.id}" on "${thingId}" references unknown thing "${missingId}" ` +
+          `Fact "${fact.id}" on "${entityId}" references unknown entity "${missingId}" ` +
           `(property: "${fact.propertyId}").`,
         rule: "ref-integrity",
       });
@@ -145,16 +145,16 @@ function checkRefIntegrity(graph: Graph, thingId: string): ValidationResult[] {
 }
 
 /**
- * Returns the list of referenced thing IDs that do not exist in the graph.
+ * Returns the list of referenced entity IDs that do not exist in the graph.
  * Only inspects ref/refs value types.
  */
 function _findMissingRefs(graph: Graph, value: FactValue): string[] {
   if (value.type === "ref") {
-    return graph.getThing(value.value) ? [] : [value.value];
+    return graph.getEntity(value.value) ? [] : [value.value];
   }
 
   if (value.type === "refs") {
-    return value.value.filter((id) => !graph.getThing(id));
+    return value.value.filter((id) => !graph.getEntity(id));
   }
 
   return [];
@@ -163,7 +163,7 @@ function _findMissingRefs(graph: Graph, value: FactValue): string[] {
 /** Check 5: item collection schema validation. */
 function checkItemCollections(
   graph: Graph,
-  thingId: string,
+  entityId: string,
   schema: TypeSchema
 ): ValidationResult[] {
   const results: ValidationResult[] = [];
@@ -173,12 +173,12 @@ function checkItemCollections(
   for (const [collectionName, collectionSchema] of Object.entries(
     schema.items
   )) {
-    const entries = graph.getItems(thingId, collectionName);
+    const entries = graph.getItems(entityId, collectionName);
 
     for (const entry of entries) {
       const entryResults = _validateItemEntry(
         graph,
-        thingId,
+        entityId,
         collectionName,
         entry.key,
         entry.fields,
@@ -197,14 +197,14 @@ function checkItemCollections(
  */
 function _validateItemEntry(
   graph: Graph,
-  thingId: string,
+  entityId: string,
   collectionName: string,
   entryKey: string,
   fields: Record<string, unknown>,
   schema: ItemCollectionSchema
 ): ValidationResult[] {
   const results: ValidationResult[] = [];
-  const prefix = `Item "${collectionName}/${entryKey}" on thing "${thingId}"`;
+  const prefix = `Item "${collectionName}/${entryKey}" on entity "${entityId}"`;
 
   for (const [fieldName, fieldDef] of Object.entries(schema.fields)) {
     const value = fields[fieldName];
@@ -213,7 +213,7 @@ function _validateItemEntry(
     if (fieldDef.required && (value === undefined || value === null)) {
       results.push({
         severity: "error",
-        thingId,
+        entityId,
         message: `${prefix}: missing required field "${fieldName}".`,
         rule: "item-collection-schema",
       });
@@ -226,7 +226,7 @@ function _validateItemEntry(
       if (typeError) {
         results.push({
           severity: "warning",
-          thingId,
+          entityId,
           message: typeError,
           rule: "item-collection-schema",
         });
@@ -272,12 +272,12 @@ function _checkFieldType(
 
     case "ref":
       if (typeof value !== "string") {
-        return `${prefix}: field "${fieldName}" expected a thing ID string (ref), got ${typeof value}.`;
+        return `${prefix}: field "${fieldName}" expected an entity ID string (ref), got ${typeof value}.`;
       }
-      // Verify the referenced thing exists.
-      if (!graph.getThing(value)) {
+      // Verify the referenced entity exists.
+      if (!graph.getEntity(value)) {
         return (
-          `${prefix}: field "${fieldName}" references unknown thing "${value}".`
+          `${prefix}: field "${fieldName}" references unknown entity "${value}".`
         );
       }
       break;
@@ -299,21 +299,21 @@ function _checkFieldType(
 /** Check 6: completeness report. */
 function checkCompleteness(
   graph: Graph,
-  thingId: string,
+  entityId: string,
   schema: TypeSchema
 ): ValidationResult[] {
   const tracked = [...schema.required, ...schema.recommended];
   if (tracked.length === 0) return [];
 
-  const present = tracked.filter((p) => hasFact(graph, thingId, p)).length;
+  const present = tracked.filter((p) => hasFact(graph, entityId, p)).length;
   const pct = Math.round((present / tracked.length) * 100);
 
   return [
     {
       severity: "info",
-      thingId,
+      entityId,
       message:
-        `Completeness for "${thingId}" (type: ${schema.type}): ` +
+        `Completeness for "${entityId}" (type: ${schema.type}): ` +
         `${present}/${tracked.length} required+recommended properties present (${pct}%).`,
       rule: "completeness",
     },
@@ -323,59 +323,59 @@ function checkCompleteness(
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
- * Validates a single thing against its TypeSchema.
+ * Validates a single entity against its TypeSchema.
  * Returns an array of ValidationResult objects.
  *
- * If no TypeSchema is registered for the thing's type, a warning is returned
- * and no further checks are run for that thing.
+ * If no TypeSchema is registered for the entity's type, a warning is returned
+ * and no further checks are run for that entity.
  */
-export function validateThing(
+export function validateEntity(
   graph: Graph,
-  thingId: string
+  entityId: string
 ): ValidationResult[] {
-  const thing = graph.getThing(thingId);
-  if (!thing) {
+  const entity = graph.getEntity(entityId);
+  if (!entity) {
     return [
       {
         severity: "error",
-        thingId,
-        message: `Thing "${thingId}" not found in graph.`,
-        rule: "thing-exists",
+        entityId,
+        message: `Entity "${entityId}" not found in graph.`,
+        rule: "entity-exists",
       },
     ];
   }
 
-  const schema = graph.getSchema(thing.type);
+  const schema = graph.getSchema(entity.type);
   if (!schema) {
     return [
       {
         severity: "warning",
-        thingId,
-        message: `No TypeSchema registered for type "${thing.type}" (thing: "${thingId}"). Skipping schema checks.`,
+        entityId,
+        message: `No TypeSchema registered for type "${entity.type}" (entity: "${entityId}"). Skipping schema checks.`,
         rule: "schema-exists",
       },
     ];
   }
 
   return [
-    ...checkRequired(graph, thingId, schema),
-    ...checkRecommended(graph, thingId, schema),
-    ...checkPropertyAppliesTo(graph, thingId, thing.type),
-    ...checkRefIntegrity(graph, thingId),
-    ...checkItemCollections(graph, thingId, schema),
-    ...checkCompleteness(graph, thingId, schema),
+    ...checkRequired(graph, entityId, schema),
+    ...checkRecommended(graph, entityId, schema),
+    ...checkPropertyAppliesTo(graph, entityId, entity.type),
+    ...checkRefIntegrity(graph, entityId),
+    ...checkItemCollections(graph, entityId, schema),
+    ...checkCompleteness(graph, entityId, schema),
   ];
 }
 
 /**
- * Validates the entire graph — runs validateThing() on every thing.
- * Returns an array of all ValidationResult objects across all things.
+ * Validates the entire graph — runs validateEntity() on every entity.
+ * Returns an array of all ValidationResult objects across all entities.
  */
 export function validate(graph: Graph): ValidationResult[] {
   const results: ValidationResult[] = [];
 
-  for (const thing of graph.getAllThings()) {
-    results.push(...validateThing(graph, thing.id));
+  for (const entity of graph.getAllEntities()) {
+    results.push(...validateEntity(graph, entity.id));
   }
 
   return results;
