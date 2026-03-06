@@ -89,5 +89,4 @@ crux/evals/results/
 # Semantic diff snapshots (audit trail — not source code, stored locally)
 .claude/snapshots/
 
-# Design docs (working documents for human review, not source code)
-.claude/design/
+# Design docs — committed for review. Gitignore removed intentionally.
