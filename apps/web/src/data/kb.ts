@@ -89,3 +89,72 @@ export function getKBSchema(type: string): TypeSchema | undefined {
 
   return kb.schemas.find((s) => s.type === type);
 }
+
+/**
+ * Find all item entries across all entities that reference the given thingId.
+ * Scans item fields for string matches against the thingId.
+ * Uses schema field definitions when available to identify ref-type fields.
+ */
+export function getKBItemsMentioning(
+  thingId: string
+): Array<{
+  ownerThingId: string;
+  ownerName: string;
+  collection: string;
+  entry: ItemEntry;
+  matchingFields: string[];
+}> {
+  const kb = getKB();
+  if (!kb) return [];
+
+  const results: Array<{
+    ownerThingId: string;
+    ownerName: string;
+    collection: string;
+    entry: ItemEntry;
+    matchingFields: string[];
+  }> = [];
+
+  for (const [ownerThingId, collections] of Object.entries(kb.items)) {
+    if (ownerThingId === thingId) continue; // Skip self
+
+    const ownerThing = kb.things.find((t) => t.id === ownerThingId);
+    const schema = ownerThing
+      ? kb.schemas.find((s) => s.type === ownerThing.type)
+      : undefined;
+
+    for (const [collectionName, entries] of Object.entries(collections)) {
+      const fieldDefs = schema?.items?.[collectionName]?.fields;
+
+      for (const entry of entries) {
+        const matchingFields: string[] = [];
+
+        for (const [fieldName, fieldValue] of Object.entries(entry.fields)) {
+          const fieldDef = fieldDefs?.[fieldName];
+
+          if (fieldDef?.type === "ref" && fieldValue === thingId) {
+            matchingFields.push(fieldName);
+          } else if (
+            !fieldDef &&
+            typeof fieldValue === "string" &&
+            fieldValue === thingId
+          ) {
+            matchingFields.push(fieldName);
+          }
+        }
+
+        if (matchingFields.length > 0) {
+          results.push({
+            ownerThingId,
+            ownerName: ownerThing?.name ?? ownerThingId,
+            collection: collectionName,
+            entry,
+            matchingFields,
+          });
+        }
+      }
+    }
+  }
+
+  return results;
+}

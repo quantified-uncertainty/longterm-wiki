@@ -230,6 +230,35 @@ describe("graph", () => {
     });
   });
 
+  describe("getItemsMentioning", () => {
+    it("finds items referencing a thing via ref fields", () => {
+      // Anthropic's key-people collection has person fields referencing
+      // dario-amodei, jan-leike, etc. (typed as ref in schema)
+      const mentions = graph.getItemsMentioning("dario-amodei");
+      expect(mentions.length).toBeGreaterThan(0);
+
+      // Should find the key-people entry on Anthropic
+      const anthropicMention = mentions.find(
+        (m) => m.ownerThingId === "anthropic" && m.collection === "key-people"
+      );
+      expect(anthropicMention).toBeDefined();
+      expect(anthropicMention!.matchingFields).toContain("person");
+      expect(anthropicMention!.entry.fields.person).toBe("dario-amodei");
+    });
+
+    it("does not include self-references", () => {
+      const mentions = graph.getItemsMentioning("anthropic");
+      // Should not find items from Anthropic's own collections
+      const selfRefs = mentions.filter((m) => m.ownerThingId === "anthropic");
+      expect(selfRefs).toHaveLength(0);
+    });
+
+    it("returns empty array for thing with no mentions", () => {
+      const mentions = graph.getItemsMentioning("nonexistent-thing");
+      expect(mentions).toHaveLength(0);
+    });
+  });
+
   describe("property and schema queries", () => {
     it("getProperty returns correct property", () => {
       const prop = graph.getProperty("headquarters");

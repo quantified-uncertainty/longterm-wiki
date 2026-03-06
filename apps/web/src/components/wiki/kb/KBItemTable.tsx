@@ -2,11 +2,13 @@
  * KBItemTable — Item collection table for KB data.
  *
  * Server component that renders an item collection for a given entity
- * (e.g., funding rounds, key people).
+ * (e.g., funding rounds, key people). Uses the schema to determine field
+ * types and renders EntityLinks for ref fields, smart currency formatting
+ * for USD amounts, and formatted dates.
  *
  * Usage in MDX:
  *   <KBItemTable entity="anthropic" collection="funding-rounds" />
- *   <KBItemTable entity="anthropic" collection="key-people" columns={["person", "role"]} />
+ *   <KBItemTable entity="anthropic" collection="key-people" columns={["person", "title", "start", "is_founder"]} />
  */
 
 import {
@@ -18,8 +20,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBItems } from "@data/kb";
-import type { ItemEntry } from "@longterm-wiki/kb";
+import { EntityLink } from "@/components/wiki/EntityLink";
+import { getKBItems, getKBThing, getKBSchema } from "@data/kb";
+import type { ItemEntry, FieldDef, ItemCollectionSchema } from "@longterm-wiki/kb";
+import {
+  formatKBCellValue,
+  formatKBDate,
+  formatKBNumber,
+  isUrl,
+  titleCase,
+  shortDomain,
+} from "./format";
 
 interface KBItemTableProps {
   /** KB thing ID (e.g., "anthropic") */
@@ -28,25 +39,8 @@ interface KBItemTableProps {
   collection: string;
   /** Optional heading (defaults to collection name, title-cased) */
   title?: string;
-  /** Which fields to show (defaults to all) */
+  /** Which fields to show (defaults to all non-source/notes fields) */
   columns?: string[];
-}
-
-/** Convert a kebab/snake-case field name to a title-case header. */
-function titleCase(s: string): string {
-  return s
-    .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-/** Format a cell value for display. */
-function formatCellValue(value: unknown): string {
-  if (value === null || value === undefined) return "\u2014";
-  if (typeof value === "number") return value.toLocaleString();
-  if (typeof value === "boolean") return value ? "Yes" : "No";
-  if (Array.isArray(value)) return value.join(", ");
-  if (typeof value === "object") return JSON.stringify(value);
-  return String(value);
 }
 
 /** Determine columns: use provided columns, or derive from all entries. */
@@ -63,7 +57,106 @@ function resolveColumns(items: ItemEntry[], columns?: string[]): string[] {
   return Array.from(seen);
 }
 
-export function KBItemTable({ entity, collection, title, columns }: KBItemTableProps) {
+/** Get the schema-defined field definitions for a collection. */
+function getCollectionSchema(
+  entityType: string | undefined,
+  collection: string,
+): ItemCollectionSchema | undefined {
+  if (!entityType) return undefined;
+  const schema = getKBSchema(entityType);
+  return schema?.items?.[collection];
+}
+
+/** Render a single cell value with type-aware formatting. */
+function CellValue({
+  value,
+  fieldName,
+  fieldDef,
+}: {
+  value: unknown;
+  fieldName: string;
+  fieldDef?: FieldDef;
+}) {
+  if (value === null || value === undefined) {
+    return <span className="text-muted-foreground">{"\u2014"}</span>;
+  }
+
+  const fieldType = fieldDef?.type;
+
+  // Entity references → EntityLink
+  if (fieldType === "ref" && typeof value === "string") {
+    return <EntityLink id={value} />;
+  }
+
+  // Source URLs → clickable domain link
+  if (fieldName === "source" && typeof value === "string" && isUrl(value)) {
+    return (
+      <a
+        href={value}
+        className="text-primary hover:underline text-sm"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {shortDomain(value)}
+      </a>
+    );
+  }
+
+  // Key publication URLs → clickable link
+  if (
+    (fieldName === "key-publication" || fieldName === "key_publication") &&
+    typeof value === "string" &&
+    isUrl(value)
+  ) {
+    return (
+      <a
+        href={value}
+        className="text-primary hover:underline text-sm"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {shortDomain(value)}
+      </a>
+    );
+  }
+
+  // Numbers with unit from schema
+  if (fieldType === "number" && typeof value === "number") {
+    return (
+      <span className="font-mono text-sm tabular-nums">
+        {formatKBNumber(value, fieldDef?.unit)}
+      </span>
+    );
+  }
+
+  // Dates → formatted
+  if (fieldType === "date" && typeof value === "string") {
+    return (
+      <span className="whitespace-nowrap text-muted-foreground">
+        {formatKBDate(value)}
+      </span>
+    );
+  }
+
+  // Booleans → checkmark/dash
+  if (fieldType === "boolean" || typeof value === "boolean") {
+    return (
+      <span className="text-muted-foreground">
+        {value ? "\u2713" : "\u2014"}
+      </span>
+    );
+  }
+
+  // Fallback
+  return <>{formatKBCellValue(value, fieldDef)}</>;
+}
+
+export function KBItemTable({
+  entity,
+  collection,
+  title,
+  columns,
+}: KBItemTableProps) {
   const items = getKBItems(entity, collection);
   const heading = title ?? titleCase(collection);
 
@@ -80,12 +173,20 @@ export function KBItemTable({ entity, collection, title, columns }: KBItemTableP
     );
   }
 
+  // Look up schema for type-aware rendering
+  const thing = getKBThing(entity);
+  const collectionSchema = getCollectionSchema(thing?.type, collection);
+  const fieldDefs = collectionSchema?.fields;
+
   const cols = resolveColumns(items, columns);
 
   return (
     <Card className="my-6">
       <CardHeader className="flex-row items-center gap-2 space-y-0 pb-4">
         <CardTitle className="text-base">{heading}</CardTitle>
+        <span className="text-xs text-muted-foreground">
+          {items.length} {items.length === 1 ? "entry" : "entries"}
+        </span>
       </CardHeader>
       <CardContent className="px-0 pt-0">
         <Table>
@@ -101,7 +202,11 @@ export function KBItemTable({ entity, collection, title, columns }: KBItemTableP
               <TableRow key={item.key}>
                 {cols.map((col) => (
                   <TableCell key={col} className="whitespace-normal">
-                    {formatCellValue(item.fields[col])}
+                    <CellValue
+                      value={item.fields[col]}
+                      fieldName={col}
+                      fieldDef={fieldDefs?.[col]}
+                    />
                   </TableCell>
                 ))}
               </TableRow>

@@ -12,7 +12,8 @@
 
 import { cn } from "@/lib/utils";
 import { getKBFacts, getKBLatest, getKBProperty } from "@data/kb";
-import type { Fact, PropertyDisplay } from "@longterm-wiki/kb";
+import type { Fact } from "@longterm-wiki/kb";
+import { formatKBFactValue, formatKBDate, isUrl } from "./format";
 
 interface KBFactValueProps {
   /** KB thing ID (e.g., "anthropic") */
@@ -24,46 +25,12 @@ interface KBFactValueProps {
   className?: string;
 }
 
-/** Format a fact value using the property's display config. */
-function formatValue(fact: Fact, display?: PropertyDisplay): string {
-  const v = fact.value;
-
-  switch (v.type) {
-    case "number": {
-      let num = v.value;
-      if (display?.divisor && display.divisor !== 0) {
-        num = num / display.divisor;
-      }
-      const formatted = Number.isInteger(num)
-        ? num.toLocaleString()
-        : num.toLocaleString(undefined, { maximumFractionDigits: 2 });
-      const prefix = display?.prefix ?? "";
-      const suffix = display?.suffix ?? (v.unit ? ` ${v.unit}` : "");
-      return `${prefix}${formatted}${suffix}`;
-    }
-    case "boolean":
-      return v.value ? "Yes" : "No";
-    case "date":
-      return v.value;
-    case "text":
-      return v.value;
-    case "ref":
-      return v.value;
-    case "refs":
-      return v.value.join(", ");
-    case "json":
-      return JSON.stringify(v.value);
-    default:
-      return String((v as { value: unknown }).value);
-  }
-}
-
-/** Check if a string looks like a URL. */
-function isUrl(s: string): boolean {
-  return s.startsWith("http://") || s.startsWith("https://");
-}
-
-export function KBFactValue({ entity, property, asOf, className }: KBFactValueProps) {
+export function KBFactValue({
+  entity,
+  property,
+  asOf,
+  className,
+}: KBFactValueProps) {
   const prop = getKBProperty(property);
 
   // Find the right fact: specific asOf or latest
@@ -80,7 +47,7 @@ export function KBFactValue({ entity, property, asOf, className }: KBFactValuePr
       <span
         className={cn(
           "inline px-1 py-0.5 bg-destructive/10 text-destructive text-sm rounded",
-          className
+          className,
         )}
         title={`Missing KB fact: ${entity}.${property}${asOf ? ` (${asOf})` : ""}`}
       >
@@ -89,7 +56,7 @@ export function KBFactValue({ entity, property, asOf, className }: KBFactValuePr
     );
   }
 
-  const displayValue = formatValue(fact, prop?.display);
+  const displayValue = formatKBFactValue(fact, prop?.unit, prop?.display);
   const propertyName = prop?.name ?? property;
   const hasMetadata = propertyName || fact.asOf || fact.source;
 
@@ -109,7 +76,7 @@ export function KBFactValue({ entity, property, asOf, className }: KBFactValuePr
       <span
         className={cn(
           "inline border-b border-dotted border-muted-foreground/40 cursor-help font-medium",
-          className
+          className,
         )}
         data-kb-fact={`${entity}.${property}`}
         tabIndex={0}
@@ -128,7 +95,7 @@ export function KBFactValue({ entity, property, asOf, className }: KBFactValuePr
         </span>
         {fact.asOf && (
           <span className="block text-muted-foreground">
-            As of: {fact.asOf}
+            As of: {formatKBDate(fact.asOf)}
           </span>
         )}
         {fact.notes && (
@@ -139,7 +106,17 @@ export function KBFactValue({ entity, property, asOf, className }: KBFactValuePr
         {fact.source && (
           <span className="block text-muted-foreground mt-1 truncate">
             {isUrl(fact.source) ? (
-              <>Source: <a href={fact.source} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Link</a></>
+              <>
+                Source:{" "}
+                <a
+                  href={fact.source}
+                  className="text-primary hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Link
+                </a>
+              </>
             ) : (
               <>Source: {fact.source}</>
             )}

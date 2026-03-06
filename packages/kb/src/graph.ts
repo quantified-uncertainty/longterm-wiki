@@ -168,6 +168,76 @@ export class Graph {
     }));
   }
 
+  /**
+   * Scans all items across all entities for fields that reference the
+   * given thingId. Returns matches with context about where they appear.
+   *
+   * Uses schema field definitions to identify `ref` type fields. Falls
+   * back to string-matching if no schema is available.
+   */
+  getItemsMentioning(
+    thingId: string
+  ): Array<{
+    ownerThingId: string;
+    collection: string;
+    entry: ItemEntry;
+    /** Which field(s) contain the reference */
+    matchingFields: string[];
+  }> {
+    const results: Array<{
+      ownerThingId: string;
+      collection: string;
+      entry: ItemEntry;
+      matchingFields: string[];
+    }> = [];
+
+    for (const [ownerThingId, thingCollections] of this.items.entries()) {
+      if (ownerThingId === thingId) continue; // Skip self-references
+
+      const ownerThing = this.things.get(ownerThingId);
+      const schema = ownerThing
+        ? this.schemas.get(ownerThing.type)
+        : undefined;
+
+      for (const [collectionName, collection] of thingCollections.entries()) {
+        const collectionSchema = schema?.items?.[collectionName];
+        const fieldDefs = collectionSchema?.fields;
+
+        for (const [entryKey, fields] of Object.entries(collection.entries)) {
+          const matchingFields: string[] = [];
+
+          for (const [fieldName, fieldValue] of Object.entries(fields)) {
+            const fieldDef = fieldDefs?.[fieldName];
+
+            // Check ref fields explicitly
+            if (fieldDef?.type === "ref" && fieldValue === thingId) {
+              matchingFields.push(fieldName);
+            }
+            // Also check string values that match (covers untyped fields)
+            else if (
+              !fieldDef &&
+              typeof fieldValue === "string" &&
+              fieldValue === thingId
+            ) {
+              matchingFields.push(fieldName);
+            }
+          }
+
+          if (matchingFields.length > 0) {
+            results.push({
+              ownerThingId,
+              collection: collectionName,
+              entry: { key: entryKey, fields },
+              matchingFields,
+            });
+          }
+        }
+      }
+    }
+
+    return results;
+  }
+
   // ── Property & schema queries ──────────────────────────────────────
 
   getProperty(id: string): Property | undefined {
