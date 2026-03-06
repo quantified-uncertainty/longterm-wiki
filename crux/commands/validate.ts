@@ -131,6 +131,11 @@ const SCRIPTS = {
     description: 'Hallucination risk assessment report',
     passthrough: ['ci', 'json', 'top'],
   },
+  'to-rdjsonl': {
+    script: 'validate/to-rdjsonl.ts',
+    description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
+    passthrough: [],
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'all');

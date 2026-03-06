@@ -2,17 +2,25 @@
  * PR Patrol Command Handlers
  *
  * Continuous PR maintenance daemon — scans open PRs for issues,
- * scores them by priority, and spawns Claude CLI to fix the top one.
+ * scores them by priority, spawns Claude CLI to fix the top one,
+ * and auto-merges PRs labeled `ready-to-merge` when clean.
  *
  * Usage:
  *   crux pr-patrol run              Run the daemon (continuous)
  *   crux pr-patrol once             Single check cycle
  *   crux pr-patrol once --dry-run   Show what would be done
  *   crux pr-patrol status           Show recent patrol activity
+ *   crux pr-patrol merge-status     Show merge-eligible PRs
  */
 
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
-import { buildConfig, runDaemon, readRecentLogs } from '../pr-patrol/index.ts';
+import {
+  buildConfig,
+  runDaemon,
+  readRecentLogs,
+  fetchOpenPrs,
+  findMergeCandidates,
+} from '../pr-patrol/index.ts';
 
 async function run(
   args: string[],
@@ -37,10 +45,34 @@ async function status(
   return { output: readRecentLogs(20), exitCode: 0 };
 }
 
+async function mergeStatus(
+  _args: string[],
+  options: CommandOptions,
+): Promise<CommandResult> {
+  const config = buildConfig([], options);
+  const prs = await fetchOpenPrs(config);
+  const candidates = findMergeCandidates(prs);
+
+  if (candidates.length === 0) {
+    return { output: 'No PRs with `ready-to-merge` label found.\n', exitCode: 0 };
+  }
+
+  const lines: string[] = ['PRs labeled `ready-to-merge`:\n'];
+  for (const c of candidates) {
+    const status = c.eligible
+      ? '✓ ELIGIBLE'
+      : `✗ BLOCKED (${c.blockReasons.join(', ')})`;
+    lines.push(`  PR #${c.number}: ${status} — ${c.title}`);
+  }
+
+  return { output: lines.join('\n') + '\n', exitCode: 0 };
+}
+
 export const commands = {
   run,
   once,
   status,
+  'merge-status': mergeStatus,
   default: run,
 };
 
@@ -52,9 +84,15 @@ Commands:
   run (default)    Run the PR patrol daemon (continuous)
   once             Single check cycle, then exit
   status           Show recent patrol activity
+  merge-status     Show PRs labeled ready-to-merge and their eligibility
+
+Auto-Merge:
+  PRs labeled \`ready-to-merge\` are automatically squash-merged when clean.
+  Eligibility: CI green, no conflicts, no unresolved threads, no unchecked items.
+  At most 1 PR is merged per cycle to allow CI to re-run on the updated main.
 
 Options:
-  --dry-run         Show what would be done, don't fix
+  --dry-run         Show what would be done, don't fix or merge
   --interval=N      Seconds between checks (default: 300)
   --max-turns=N     Max Claude turns per fix (default: 40)
   --timeout=N       Hard timeout in minutes per fix (default: 30)
@@ -75,8 +113,9 @@ Environment:
   PR_PATROL_REFLECTION_INTERVAL   Reflect every N cycles (default: 10)
 
 Examples:
-  crux pr-patrol once --dry-run          Preview what would be fixed
+  crux pr-patrol once --dry-run          Preview what would be fixed/merged
   crux pr-patrol run --interval=120      Run with 2-minute cycles
   crux pr-patrol status                  Show recent activity
+  crux pr-patrol merge-status            Show merge-eligible PRs
 `.trim();
 }

@@ -16,6 +16,10 @@ concurrency:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: read
 
     steps:
       - name: Block PRs to production from non-main branches
@@ -40,6 +44,12 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Setup reviewdog
+        if: github.event_name == 'pull_request'
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
 
       # --- Security: dependency audit (advisory, non-blocking) ---
 
@@ -68,6 +78,19 @@ jobs:
 
       - name: GitHub Actions YAML validation — actionlint (blocking)
         run: npx tsx crux/validate/validate-actions-yaml.ts
+
+      - name: Actionlint — reviewdog annotations
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          actionlint -shellcheck= -oneline .github/workflows/*.yml 2>&1 \
+            | reviewdog -efm="%f:%l:%c: %m" -name="actionlint" \
+              -reporter=github-pr-check \
+              -filter-mode=added \
+              -fail-level=none
 
       - name: MDX syntax check (blocking)
         run: pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
@@ -108,6 +131,21 @@ jobs:
       - name: Drizzle migration journal integrity (blocking)
         run: npx tsx crux/validate/validate-drizzle-journal.ts
 
+      - name: Drizzle schema drift detection (advisory)
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # The default checkout is shallow (depth=1). The drift check uses
+          # `git diff BASE...HEAD` (3-dot), which requires the merge-base of both
+          # SHAs. Fetch enough history so the merge-base is available; without
+          # this, getChangedFiles() silently returns [] → false-negative.
+          git fetch --unshallow 2>/dev/null || git fetch --depth=100 origin 2>/dev/null || true
+          npx tsx crux/validate/validate-schema-drift.ts \
+            || echo "::warning::Schema drift check failed unexpectedly — review validator output above"
+
       - name: Auto-update orchestrator smoke test (dry-run)
         if: "!cancelled()"
         continue-on-error: true
@@ -117,6 +155,20 @@ jobs:
 
       - name: Component reference validation (blocking)
         run: pnpm crux validate refs
+
+      - name: Crux validation — reviewdog annotations
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          npx tsx crux/validate/validate-unified.ts --ci \
+            | npx tsx crux/validate/to-rdjsonl.ts \
+            | reviewdog -f=rdjsonl -name="crux-validate" \
+              -reporter=github-pr-check \
+              -filter-mode=added \
+              -fail-level=none
 
       - name: Run validation suite (advisory)
         if: "!cancelled()"
@@ -155,6 +207,41 @@ jobs:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
           LONGTERMWIKI_PROJECT_KEY: ${{ secrets.LONGTERMWIKI_PROJECT_KEY }}
+
+  migrate-test:
+    name: Test DB migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: longterm_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Drizzle migrations
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/longterm_test
+        run: pnpm --filter wiki-server db:migrate
 
   sync-content:
     # Sync wiki page content to wiki-server after build succeeds on main.
