@@ -8,6 +8,7 @@ properties:
     dataType: number
     unit: USD
     category: financial
+    temporal: true
     appliesTo: [organization]
     display:
       divisor: 1e9
@@ -20,6 +21,7 @@ properties:
     dataType: number
     unit: USD
     category: financial
+    temporal: true
     appliesTo: [organization]
     display:
       divisor: 1e9
@@ -32,6 +34,7 @@ properties:
     dataType: number
     unit: employees
     category: financial
+    temporal: true
     appliesTo: [organization]
     display:
       suffix: " employees"
@@ -42,6 +45,7 @@ properties:
     dataType: number
     unit: USD
     category: financial
+    temporal: true
     appliesTo: [organization]
     display:
       divisor: 1e9
@@ -67,6 +71,7 @@ properties:
     description: "Organization this person currently or historically works for"
     dataType: ref
     category: people
+    temporal: true
     appliesTo: [person]
     inverseId: employer-of
     inverseName: Employs
@@ -86,6 +91,7 @@ properties:
     description: "Job title or role at primary employer"
     dataType: text
     category: people
+    temporal: true
     appliesTo: [person]
 
   founded-by:
@@ -113,6 +119,7 @@ properties:
     dataType: number
     unit: percent
     category: financial
+    temporal: true
     appliesTo: [organization]
     display:
       suffix: "%"
@@ -123,6 +130,7 @@ properties:
     dataType: number
     unit: percent
     category: financial
+    temporal: true
     appliesTo: [organization]
     display:
       suffix: "%"
@@ -133,6 +141,7 @@ properties:
     dataType: number
     unit: users
     category: product
+    temporal: true
     appliesTo: [organization]
 
   # ── Dates ─────────────────────────────────────────────────────
@@ -183,6 +192,7 @@ properties:
     description: "Monthly active users (MAU)"
     dataType: number
     category: product
+    temporal: true
     appliesTo: [organization]
     display:
       divisor: 1e6
@@ -193,6 +203,7 @@ properties:
     description: "Number of business/enterprise customers"
     dataType: number
     category: product
+    temporal: true
     appliesTo: [organization]
     display:
       divisor: 1000
@@ -203,6 +214,7 @@ properties:
     description: "Monthly API request volume"
     dataType: number
     category: product
+    temporal: true
     appliesTo: [organization]
     display:
       divisor: 1e9
@@ -214,6 +226,7 @@ properties:
     dataType: number
     unit: USD
     category: financial
+    temporal: true
     appliesTo: [organization]
     display:
       divisor: 1e9
@@ -228,6 +241,7 @@ properties:
     dataType: number
     unit: USD
     category: financial
+    temporal: true
     appliesTo: [organization]
     display:
       divisor: 1e9
@@ -240,6 +254,7 @@ properties:
     dataType: number
     unit: percent
     category: financial
+    temporal: true
     appliesTo: [organization]
     display:
       suffix: "%"
@@ -250,6 +265,7 @@ properties:
     dataType: number
     unit: percent
     category: financial
+    temporal: true
     appliesTo: [organization]
     display:
       suffix: "%"
@@ -261,6 +277,7 @@ properties:
     description: "Current AI Safety Level designation under RSP (e.g. ASL-2, ASL-3)"
     dataType: text
     category: safety
+    temporal: true
     appliesTo: [organization]
 
   safety-researcher-count:
@@ -268,6 +285,7 @@ properties:
     description: "Number of employees working on safety-related research"
     dataType: number
     category: safety
+    temporal: true
     appliesTo: [organization]
 
   interpretability-team-size:
@@ -275,4 +293,5 @@ properties:
     description: "Number of researchers focused on mechanistic interpretability"
     dataType: number
     category: safety
+    temporal: true
     appliesTo: [organization]

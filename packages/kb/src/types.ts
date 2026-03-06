@@ -90,6 +90,8 @@ export interface Property {
   display?: PropertyDisplay;
   /** If true, this property is computed (never stored directly) */
   computed?: boolean;
+  /** If true, values change over time (revenue, headcount). asOf = "measured at". */
+  temporal?: boolean;
 }
 
 // ── Type Schemas ────────────────────────────────────────────────────
