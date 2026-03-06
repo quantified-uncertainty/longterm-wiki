@@ -249,6 +249,7 @@ interface WorkflowRun {
   conclusion: string | null;
   created_at: string;
   id: number;
+  event: string;
 }
 
 interface WorkflowRunsResponse {
@@ -259,6 +260,16 @@ interface WorkflowRunsResponse {
 // citation verification. For these, we check if ANY of the last 5 runs
 // succeeded rather than requiring the most recent one to succeed.
 const FLAKY_WORKFLOWS = new Set(['auto-update.yml']);
+
+// Workflows that only run on schedule or workflow_dispatch (not push).
+// For these, we filter out push-triggered runs which can be spurious
+// workflow file validation failures from branch pushes.
+const SCHEDULED_ONLY_WORKFLOWS = new Set([
+  'database-backup.yml',
+  'scheduled-maintenance.yml',
+  'server-health-monitor.yml',
+  'scheduled-deploy.yml',
+]);
 
 export async function checkActions(): Promise<CheckResult> {
   const name = 'GitHub Actions';
@@ -280,10 +291,17 @@ export async function checkActions(): Promise<CheckResult> {
 
   for (const wf of workflowFiles) {
     try {
+      // Fetch more runs for scheduled-only workflows so we have enough after filtering
+      const perPage = SCHEDULED_ONLY_WORKFLOWS.has(wf) ? 10 : 5;
       const resp = await githubApi<WorkflowRunsResponse>(
-        `/repos/${REPO}/actions/workflows/${wf}/runs?per_page=5&status=completed`
+        `/repos/${REPO}/actions/workflows/${wf}/runs?per_page=${perPage}&status=completed`
       );
-      const runs = resp.workflow_runs ?? [];
+      // For scheduled-only workflows, exclude push-triggered runs — those are
+      // workflow file validation failures from branch pushes and not real health signals.
+      let runs = resp.workflow_runs ?? [];
+      if (SCHEDULED_ONLY_WORKFLOWS.has(wf)) {
+        runs = runs.filter(r => r.event === 'schedule' || r.event === 'workflow_dispatch');
+      }
       const latest = runs[0];
       const maxAgeH = MAX_AGE[wf] ?? 48;
 
