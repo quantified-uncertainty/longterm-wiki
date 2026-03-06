@@ -22,12 +22,17 @@ describe("loader", () => {
       expect(anthropic!.numericId).toBe(3);
     });
 
-    it("loads all 5 things", () => {
+    it("loads all 16 things", () => {
       const things = graph.getAllThings();
-      expect(things).toHaveLength(5);
+      expect(things).toHaveLength(16);
 
       const ids = things.map((t) => t.id).sort();
-      expect(ids).toEqual(["anthropic", "dario-amodei", "jan-leike", "openai", "sam-altman"]);
+      expect(ids).toEqual([
+        "anthropic", "chris-olah", "daniela-amodei", "dario-amodei",
+        "deepmind", "demis-hassabis", "elon-musk", "geoffrey-hinton",
+        "greg-brockman", "ilya-sutskever", "jan-leike", "meta-ai",
+        "openai", "sam-altman", "xai", "yann-lecun",
+      ].sort());
     });
 
     it("loads thing aliases", () => {

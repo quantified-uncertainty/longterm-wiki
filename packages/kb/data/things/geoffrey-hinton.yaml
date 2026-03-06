@@ -1,0 +1,36 @@
+thing:
+  id: geoffrey-hinton
+  stableId: 5N5UqXNkkg
+  type: person
+  name: "Geoffrey Hinton"
+  numericId: 149
+  aliases:
+    - "Geoff Hinton"
+    - "Godfather of Deep Learning"
+
+facts:
+  - id: f_CQptGEFesw
+    property: employed-by
+    value: deepmind
+    asOf: 2013-03
+    validEnd: 2023-05
+    source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
+    notes: "VP and Engineering Fellow at Google; resigned May 2023 to speak freely about AI risks"
+
+  - id: f_dIsk3jBSrg
+    property: role
+    value: "VP and Engineering Fellow"
+    asOf: 2013-03
+    validEnd: 2023-05
+    source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
+
+  - id: f_l7LgM4CmFg
+    property: role
+    value: "Professor Emeritus"
+    asOf: "2023"
+    notes: "University of Toronto; professor emeritus of computer science"
+
+  - id: f_xrorsSWSXw
+    property: born-year
+    value: 1947
+    notes: "Born 1947 in London; Nobel Prize in Physics 2024 for foundational work on artificial neural networks"

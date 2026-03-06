@@ -1,0 +1,27 @@
+thing:
+  id: demis-hassabis
+  stableId: Aqcyu3onCA
+  type: person
+  name: "Demis Hassabis"
+  numericId: 101
+  aliases:
+    - "Demis"
+
+facts:
+  - id: f_86Rr7EPOYw
+    property: employed-by
+    value: deepmind
+    asOf: 2010-09
+    source: https://deepmind.google/about/
+    notes: "Co-founded DeepMind in September 2010; became CEO of Google DeepMind after the 2023 merger with Google Brain"
+
+  - id: f_Z0rg1G6BZw
+    property: role
+    value: "CEO"
+    asOf: 2010-09
+    source: https://deepmind.google/about/
+
+  - id: f_Kw56YLSHSQ
+    property: born-year
+    value: 1976
+    notes: "Born 1976 in London; awarded Nobel Prize in Chemistry 2024 for AlphaFold protein structure prediction"

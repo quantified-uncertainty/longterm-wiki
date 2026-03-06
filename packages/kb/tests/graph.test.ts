@@ -30,7 +30,7 @@ describe("graph", () => {
   describe("getAllThings", () => {
     it("returns all things in the graph", () => {
       const things = graph.getAllThings();
-      expect(things).toHaveLength(5);
+      expect(things).toHaveLength(16);
     });
   });
 
@@ -131,8 +131,8 @@ describe("graph", () => {
 
     it("returns facts from multiple entities", () => {
       const roleMap = graph.getByProperty("role");
-      // Dario, Jan, and Sam all have role facts
-      expect(roleMap.size).toBe(3);
+      // All 11 people have role facts
+      expect(roleMap.size).toBe(11);
       expect(roleMap.has("dario-amodei")).toBe(true);
       expect(roleMap.has("jan-leike")).toBe(true);
       expect(roleMap.has("sam-altman")).toBe(true);
@@ -155,16 +155,20 @@ describe("graph", () => {
   describe("getByType", () => {
     it("returns things of a given type", () => {
       const orgs = graph.getByType("organization");
-      expect(orgs).toHaveLength(2);
+      expect(orgs).toHaveLength(5);
       const orgIds = orgs.map((o) => o.id).sort();
-      expect(orgIds).toEqual(["anthropic", "openai"]);
+      expect(orgIds).toEqual(["anthropic", "deepmind", "meta-ai", "openai", "xai"]);
     });
 
     it("returns multiple things of the same type", () => {
       const people = graph.getByType("person");
-      expect(people).toHaveLength(3);
+      expect(people).toHaveLength(11);
       const ids = people.map((p) => p.id).sort();
-      expect(ids).toEqual(["dario-amodei", "jan-leike", "sam-altman"]);
+      expect(ids).toEqual([
+        "chris-olah", "daniela-amodei", "dario-amodei", "demis-hassabis",
+        "elon-musk", "geoffrey-hinton", "greg-brockman", "ilya-sutskever",
+        "jan-leike", "sam-altman", "yann-lecun",
+      ].sort());
     });
 
     it("returns empty array for unknown type", () => {

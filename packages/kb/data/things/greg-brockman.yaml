@@ -1,0 +1,28 @@
+thing:
+  id: greg-brockman
+  stableId: Yq4s2cI7ng
+  type: person
+  name: "Greg Brockman"
+  aliases:
+    - "Brockman"
+
+facts:
+  - id: f_tZxixtemow
+    property: employed-by
+    value: openai
+    asOf: 2015-12
+    validEnd: 2024-08
+    source: https://openai.com/blog/introducing-openai
+    notes: "Co-founded OpenAI December 2015; served as President until taking leave of absence August 2024"
+
+  - id: f_NqlyTekRKg
+    property: role
+    value: "Co-founder & President"
+    asOf: 2015-12
+    validEnd: 2024-08
+    source: https://openai.com/blog/introducing-openai
+
+  - id: f_qVoWltsFvw
+    property: born-year
+    value: 1988
+    notes: "Born 1988 (approximate); previously CTO of Stripe before co-founding OpenAI"

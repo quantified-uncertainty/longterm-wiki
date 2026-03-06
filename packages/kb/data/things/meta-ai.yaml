@@ -1,0 +1,172 @@
+thing:
+  id: meta-ai
+  stableId: tt0f5PYDCw
+  type: organization
+  name: Meta AI (FAIR)
+  numericId: 549
+  aliases:
+    - Meta AI
+    - FAIR
+    - Facebook AI Research
+    - Meta Fundamental AI Research
+
+facts:
+  - id: f_S2gCtemHdA
+    property: founded-date
+    value: 2013-12
+    source: https://ai.meta.com/research/
+    notes: "Founded December 2013 as Facebook AI Research (FAIR) by Yann LeCun; rebranded to Meta AI after Meta rebrand in 2021"
+
+  - id: f_S0d9WF0E8g
+    property: headquarters
+    value: "Menlo Park, CA"
+    source: https://ai.meta.com/
+    notes: "Part of Meta Platforms; labs also in New York, Paris, Montreal, London, and Tel Aviv"
+
+  - id: f_Hh20Dvc90g
+    property: legal-structure
+    value: "Division of Meta Platforms, Inc."
+    source: https://ai.meta.com/
+    notes: "Not a separate legal entity; research division within Meta Platforms (formerly Facebook)"
+
+  - id: f_adIN3DEEYw
+    property: headcount
+    value: 1500
+    asOf: 2024-12
+    notes: "Estimated 1,000-2,000 AI researchers across FAIR and Meta GenAI teams; exact figure not publicly disclosed"
+
+items:
+  key-people:
+    type: key-person
+    entries:
+      yann-lecun-chief-scientist:
+        person: yann-lecun
+        title: "Chief AI Scientist"
+        start: 2013-12
+        is_founder: true
+        source: https://ai.meta.com/people/yann-lecun/
+        notes: "Founded FAIR in 2013; 2018 Turing Award laureate for deep learning; vocal critic of AI x-risk concerns"
+
+      joelle-pineau-vp:
+        person: joelle-pineau
+        title: "VP of AI Research"
+        start: 2017-01
+        source: https://ai.meta.com/people/joelle-pineau/
+        notes: "Leads FAIR; McGill professor; advocates for reproducible research and open science"
+
+      ahmad-al-dahle-genai:
+        person: ahmad-al-dahle
+        title: "VP of Generative AI"
+        start: 2023-01
+        source: https://ai.meta.com/
+        notes: "Leads Meta's Generative AI group responsible for Llama models"
+
+      mark-zuckerberg:
+        person: mark-zuckerberg
+        title: "CEO of Meta Platforms"
+        start: 2004-02
+        notes: "Drives overall AI strategy for Meta; committed to open-source AI approach"
+
+  model-releases:
+    type: model-release
+    entries:
+      llama-1:
+        name: LLaMA
+        released: 2023-02
+        description: "First LLaMA model family (7B-65B params); initially restricted release, later leaked"
+        source: https://ai.meta.com/blog/large-language-model-llama-meta-ai/
+        notes: "Catalyzed open-source LLM ecosystem; 65B model competitive with GPT-3.5"
+
+      llama-2:
+        name: LLaMA 2
+        released: 2023-07
+        description: "Open-weight release (7B-70B params) with commercial license"
+        source: https://ai.meta.com/llama/
+        notes: "Trained on 2T tokens; partnership with Microsoft for Azure distribution"
+
+      llama-3:
+        name: LLaMA 3
+        released: 2024-04
+        description: "Major upgrade (8B, 70B params); 405B released July 2024"
+        source: https://ai.meta.com/blog/meta-llama-3/
+        notes: "405B was largest open-weight model at release; trained on 15T+ tokens"
+
+      llama-4:
+        name: Llama 4
+        released: 2025-04
+        description: "Next-generation open-weight models with mixture-of-experts architecture"
+        source: https://ai.meta.com/blog/llama-4/
+        notes: "Scout (17B active/109B total) and Maverick (17B active/400B total) variants; 10M token context"
+
+  research-areas:
+    type: research-area
+    entries:
+      self-supervised-learning:
+        name: Self-Supervised Learning
+        description: "Learning representations from unlabeled data; foundation of modern LLM training"
+        started: 2014-01
+        notes: "Core research philosophy under Yann LeCun; underpins Meta's approach to foundation models"
+
+      computer-vision:
+        name: Computer Vision
+        description: "Image recognition, object detection, and visual understanding"
+        started: 2013-12
+        key-publication: https://arxiv.org/abs/2304.07193
+        notes: "Segment Anything Model (SAM) released 2023; DINOv2 self-supervised vision transformer"
+
+      open-source-ai:
+        name: Open-Source AI
+        description: "Developing and releasing AI models and tools under open licenses"
+        started: 2015-01
+        key-publication: https://ai.meta.com/llama/
+        notes: "Meta's flagship open-source strategy; PyTorch (2016), Llama series, SAM, and numerous research tools"
+
+      natural-language-processing:
+        name: Natural Language Processing
+        description: "Language understanding, generation, and translation"
+        started: 2013-12
+        notes: "NLLB (No Language Left Behind) translation for 200+ languages; contributed to multilingual AI research"
+
+  products:
+    type: product
+    entries:
+      pytorch:
+        name: PyTorch
+        launched: 2016-09
+        description: "Open-source deep learning framework; became de facto standard for AI research"
+        source: https://pytorch.org/
+        notes: "Moved to Linux Foundation in 2022; used by majority of ML researchers globally"
+
+      meta-ai-assistant:
+        name: Meta AI Assistant
+        launched: 2023-09
+        description: "AI assistant integrated across Meta apps (WhatsApp, Instagram, Messenger, Facebook)"
+        source: https://ai.meta.com/
+        notes: "Powered by Llama models; available across Meta's 3B+ user platform"
+
+  safety-milestones:
+    type: safety-milestone
+    entries:
+      llama-guard:
+        name: Llama Guard
+        date: 2023-12
+        type: safety-eval
+        description: "Open-source LLM-based safeguard model for content moderation"
+        source: https://ai.meta.com/research/publications/llama-guard-llm-based-input-output-safeguard-for-human-ai-conversations/
+        notes: "Released with Llama model family; classifies prompt and response safety"
+
+      responsible-use-guide:
+        name: "Responsible Use Guide"
+        date: 2023-07
+        type: policy-update
+        description: "Guidelines for responsible deployment of Llama models"
+        source: https://ai.meta.com/llama/use-policy/
+        notes: "Acceptable use policy accompanying Llama 2 open-weight release"
+
+      purple-llama:
+        name: Purple Llama
+        date: 2023-12
+        type: safety-eval
+        description: "Open-source tools for evaluating and improving LLM safety including CyberSecEval"
+        source: https://ai.meta.com/blog/purple-llama-open-trust-safety-generative-ai/
+        notes: "Collaborative project for AI safety evaluations; includes Llama Guard and CyberSecEval benchmarks"

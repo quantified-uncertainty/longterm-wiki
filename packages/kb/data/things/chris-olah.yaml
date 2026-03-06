@@ -1,0 +1,37 @@
+thing:
+  id: chris-olah
+  stableId: Tz48rTriBg
+  type: person
+  name: "Chris Olah"
+  numericId: 59
+  aliases:
+    - "Christopher Olah"
+
+facts:
+  - id: f_PbzJNYhoQQ
+    property: employed-by
+    value: anthropic
+    asOf: 2021-01
+    source: https://anthropic.com/company
+    notes: "Co-founded Anthropic in January 2021; leads interpretability research"
+
+  - id: f_ITucptJN5g
+    property: role
+    value: "Co-founder, Interpretability"
+    asOf: 2021-01
+    source: https://anthropic.com/company
+    notes: "Pioneer of neural network interpretability; created Distill.pub and the Circuits research thread"
+
+  - id: f_RewqjBXgsA
+    property: employed-by
+    value: openai
+    asOf: "2018"
+    validEnd: 2021-01
+    notes: "Researcher at OpenAI before co-founding Anthropic"
+
+  - id: f_fUPJ9kzk8w
+    property: employed-by
+    value: deepmind
+    asOf: "2015"
+    validEnd: "2018"
+    notes: "Research scientist at Google Brain (prior to DeepMind merger); published influential work on neural network visualization"

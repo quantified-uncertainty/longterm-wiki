@@ -1,0 +1,42 @@
+thing:
+  id: elon-musk
+  stableId: 69vftmr1jg
+  type: person
+  name: "Elon Musk"
+  numericId: 116
+  aliases:
+    - "Musk"
+
+facts:
+  - id: f_N2rrW9c6JA
+    property: employed-by
+    value: openai
+    asOf: 2015-12
+    validEnd: 2018-02
+    source: https://openai.com/blog/introducing-openai
+    notes: "Co-founded OpenAI December 2015; left board February 2018, later sued OpenAI alleging breach of founding mission"
+
+  - id: f_Xd4JyJmh7A
+    property: role
+    value: "Co-chairman"
+    asOf: 2015-12
+    validEnd: 2018-02
+    source: https://openai.com/blog/introducing-openai
+
+  - id: f_7FJCjl4c9Q
+    property: employed-by
+    value: xai
+    asOf: 2023-03
+    source: https://x.ai
+    notes: "Founded xAI in March 2023 to develop AI; also CEO of Tesla and SpaceX"
+
+  - id: f_AJGGu7rpAw
+    property: role
+    value: "Founder & CEO"
+    asOf: 2023-03
+    source: https://x.ai
+
+  - id: f_CwDWKGq7Ig
+    property: born-year
+    value: 1971
+    notes: "Born June 28, 1971 in Pretoria, South Africa"

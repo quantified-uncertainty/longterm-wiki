@@ -1,0 +1,36 @@
+thing:
+  id: daniela-amodei
+  stableId: tKMznr07QA
+  type: person
+  name: "Daniela Amodei"
+  numericId: 90
+  aliases:
+    - "Daniela"
+
+facts:
+  - id: f_R5GtlfjvmA
+    property: employed-by
+    value: openai
+    asOf: "2018"
+    validEnd: 2021-01
+    source: https://anthropic.com/company
+    notes: "VP of Operations at OpenAI before co-founding Anthropic"
+
+  - id: f_dtZnvHxrtw
+    property: role
+    value: "VP of Operations"
+    asOf: "2018"
+    validEnd: 2021-01
+
+  - id: f_9N4b6WjtiA
+    property: employed-by
+    value: anthropic
+    asOf: 2021-01
+    source: https://anthropic.com/company
+    notes: "Co-founded Anthropic in January 2021 with Dario Amodei and others; serves as President"
+
+  - id: f_oo5LmrgGtw
+    property: role
+    value: "President"
+    asOf: 2021-01
+    source: https://anthropic.com/company
