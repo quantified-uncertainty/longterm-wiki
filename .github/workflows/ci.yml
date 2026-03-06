@@ -331,8 +331,35 @@ jobs:
 
           gh issue create --title "$TITLE" --body "$BODY" --label "bug,groundskeeper-autofix"
 
-  # Deploy job removed — production deploys are now handled by the scheduled
-  # deploy hook (scheduled-deploy.yml, every hour) instead of per-push.
-  # This caps Vercel build minutes at 24/day max vs 50-80/day previously.
-  # vercel.json sets github.enabled=false to prevent Vercel from posting
-  # PR failure statuses (deploy hooks bypass the GitHub integration).
+  deploy:
+    # Trigger Vercel production deployment after CI passes on the production branch.
+    # Vercel GitHub integration is disabled (vercel.json github.enabled=false) to
+    # prevent PR failure statuses — deploy hooks bypass the GitHub integration.
+    # The VERCEL_DEPLOY_HOOK_URL secret must be a hook configured for the "production" branch.
+    needs: [ci]
+    if: github.ref == 'refs/heads/production' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Trigger Vercel production deployment
+        run: |
+          if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}" ]; then
+            echo "::error::VERCEL_DEPLOY_HOOK_URL secret is not set."
+            echo "Go to Vercel Dashboard → Project → Settings → Git → Deploy Hooks"
+            echo "Create a hook for Branch 'production', then add the URL as a GitHub secret."
+            exit 1
+          fi
+
+          RESPONSE=$(curl -s -o /tmp/vercel_response.json -w "%{http_code}" \
+            -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}")
+
+          echo "HTTP status: $RESPONSE"
+          cat /tmp/vercel_response.json
+
+          if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 300 ]; then
+            echo "Production deployment triggered."
+          else
+            echo "::error::Vercel deploy hook returned HTTP $RESPONSE"
+            exit 1
+          fi
