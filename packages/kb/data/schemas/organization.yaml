@@ -33,3 +33,22 @@ items:
       is_founder: { type: boolean, description: "True if this person co-founded the organization" }
       source: { type: text, description: "URL confirming the role" }
       notes: { type: text, description: "Context about the role or transition" }
+
+  products:
+    description: "Major products and services launched by this organization"
+    fields:
+      name: { type: text, required: true, description: "Product name" }
+      launched: { type: date, required: true, description: "Launch date (YYYY-MM)" }
+      description: { type: text, description: "Brief description of the product" }
+      source: { type: text, description: "URL to announcement" }
+      notes: { type: text, description: "Context or current status" }
+
+  research-areas:
+    description: "Major research initiatives and focus areas"
+    fields:
+      name: { type: text, required: true, description: "Research area name" }
+      description: { type: text, description: "Brief description of the research" }
+      team-size: { type: number, description: "Approximate team size" }
+      started: { type: date, description: "When this research area began" }
+      key-publication: { type: text, description: "Most notable publication URL" }
+      notes: { type: text, description: "Current status or significance" }

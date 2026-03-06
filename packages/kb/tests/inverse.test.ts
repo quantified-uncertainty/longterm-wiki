@@ -88,31 +88,58 @@ describe("inverse", () => {
     });
 
     it("skips inverse when referenced thing does not exist in graph", () => {
-      // Jan Leike has employed-by: openai, but openai is not in the graph.
-      // The inverse should NOT have been created on a nonexistent "openai" thing.
-      const openaiThing = graph.getThing("openai");
-      expect(openaiThing).toBeUndefined();
+      // Anthropic has founded-by refs including persons not in the graph
+      // (e.g., "daniela-amodei" is referenced in key-people but not as a
+      // founded-by fact). Verify that nonexistent things don't get created.
+      const nonexistent = graph.getThing("nonexistent-entity");
+      expect(nonexistent).toBeUndefined();
 
-      // Even if somehow facts were added, there should be no openai employer-of facts
-      const openaiFacts = graph.getFacts("openai", {
+      const facts = graph.getFacts("nonexistent-entity", {
         property: "employer-of",
       });
-      expect(openaiFacts).toEqual([]);
+      expect(facts).toEqual([]);
     });
 
     it("logs a warning when referenced thing does not exist", async () => {
-      // Load a fresh graph and capture warnings
-      const freshGraph = await loadKB(DATA_DIR);
-      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      // Create a minimal graph with a dangling ref to test the warning
+      const { Graph } = await import("../src/graph.ts");
+      const freshGraph = new Graph();
+      freshGraph.addProperty({
+        id: "employed-by",
+        name: "Employed By",
+        dataType: "ref",
+        inverseId: "employer-of",
+        inverseName: "Employs",
+      });
+      freshGraph.addProperty({
+        id: "employer-of",
+        name: "Employs",
+        dataType: "refs",
+        inverseId: "employed-by",
+        inverseName: "Employed By",
+        computed: true,
+      });
+      freshGraph.addThing({
+        id: "test-person",
+        stableId: "test123456",
+        type: "person",
+        name: "Test Person",
+      });
+      freshGraph.addFact({
+        id: "f_test1",
+        subjectId: "test-person",
+        propertyId: "employed-by",
+        value: { type: "ref", value: "nonexistent-org" },
+      });
 
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       computeInverses(freshGraph);
 
-      // Should have warned about openai not being in the graph
       const warnings = warnSpy.mock.calls.map((call) => call[0]);
-      const openaiWarning = warnings.find(
-        (w) => typeof w === "string" && w.includes("openai")
+      const warning = warnings.find(
+        (w) => typeof w === "string" && w.includes("nonexistent-org")
       );
-      expect(openaiWarning).toBeDefined();
+      expect(warning).toBeDefined();
 
       warnSpy.mockRestore();
     });

@@ -107,6 +107,34 @@ properties:
     inverseName: Founded By
     computed: true
 
+  gross-margin:
+    name: Gross Margin
+    description: "Gross margin percentage"
+    dataType: number
+    unit: percent
+    category: financial
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  market-share:
+    name: Market Share
+    description: "Estimated market share in the relevant segment"
+    dataType: number
+    unit: percent
+    category: financial
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  user-count:
+    name: User Count
+    description: "Total number of active users"
+    dataType: number
+    unit: users
+    category: product
+    appliesTo: [organization]
+
   # ── Dates ─────────────────────────────────────────────────────
 
   founded-date:

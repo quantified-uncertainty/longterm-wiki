@@ -30,7 +30,7 @@ describe("graph", () => {
   describe("getAllThings", () => {
     it("returns all things in the graph", () => {
       const things = graph.getAllThings();
-      expect(things).toHaveLength(3);
+      expect(things).toHaveLength(5);
     });
   });
 
@@ -38,8 +38,8 @@ describe("graph", () => {
     it("returns all facts for a thing", () => {
       const facts = graph.getFacts("anthropic");
       // 5 revenue + 1 valuation + 1 founded-date + 1 headquarters + 1 headcount
-      // + 1 legal-structure + 1 total-funding = 11
-      expect(facts).toHaveLength(11);
+      // + 1 legal-structure + 1 total-funding + 1 gross-margin + 2 market-share = 14
+      expect(facts).toHaveLength(14);
     });
 
     it("returns empty array for a thing with no facts", () => {
@@ -120,22 +120,24 @@ describe("graph", () => {
   describe("getByProperty", () => {
     it("returns facts across entities for a given property", () => {
       const revMap = graph.getByProperty("revenue");
-      // Only Anthropic has revenue facts
-      expect(revMap.size).toBe(1);
+      // Anthropic and OpenAI both have revenue facts
+      expect(revMap.size).toBe(2);
       expect(revMap.has("anthropic")).toBe(true);
+      expect(revMap.has("openai")).toBe(true);
     });
 
     it("returns facts from multiple entities", () => {
       const roleMap = graph.getByProperty("role");
-      // Both Dario and Jan have role facts
-      expect(roleMap.size).toBe(2);
+      // Dario, Jan, and Sam all have role facts
+      expect(roleMap.size).toBe(3);
       expect(roleMap.has("dario-amodei")).toBe(true);
       expect(roleMap.has("jan-leike")).toBe(true);
+      expect(roleMap.has("sam-altman")).toBe(true);
     });
 
     it("returns latest fact per entity with latest:true", () => {
       const revMap = graph.getByProperty("revenue", { latest: true });
-      expect(revMap.size).toBe(1);
+      expect(revMap.size).toBe(2);
       const anthropicRev = revMap.get("anthropic");
       expect(anthropicRev).toBeDefined();
       expect(anthropicRev!.asOf).toBe("2026-03");
@@ -150,15 +152,16 @@ describe("graph", () => {
   describe("getByType", () => {
     it("returns things of a given type", () => {
       const orgs = graph.getByType("organization");
-      expect(orgs).toHaveLength(1);
-      expect(orgs[0].id).toBe("anthropic");
+      expect(orgs).toHaveLength(2);
+      const orgIds = orgs.map((o) => o.id).sort();
+      expect(orgIds).toEqual(["anthropic", "openai"]);
     });
 
     it("returns multiple things of the same type", () => {
       const people = graph.getByType("person");
-      expect(people).toHaveLength(2);
+      expect(people).toHaveLength(3);
       const ids = people.map((p) => p.id).sort();
-      expect(ids).toEqual(["dario-amodei", "jan-leike"]);
+      expect(ids).toEqual(["dario-amodei", "jan-leike", "sam-altman"]);
     });
 
     it("returns empty array for unknown type", () => {
