@@ -23,9 +23,26 @@ facts:
 
   - id: f_78GQ07iiCQ
     property: legal-structure
-    value: "Nonprofit (2015-2019), capped-profit LLC (2019-2025), converting to PBC (2025)"
+    value: "Nonprofit 501(c)(3)"
+    asOf: 2015-12
+    validEnd: "2019-03"
+    source: https://openai.com/blog/introducing-openai
+    notes: "Originally incorporated as nonprofit OpenAI Inc."
+
+  - id: f_legalStruct2
+    property: legal-structure
+    value: "Capped-profit LLC"
+    asOf: 2019-03
+    validEnd: "2025"
     source: https://openai.com/blog/openai-lp
-    notes: "Originally incorporated as nonprofit OpenAI Inc. Created capped-profit subsidiary OpenAI LP in 2019. Announced conversion to public benefit corporation in 2025."
+    notes: "Created capped-profit subsidiary OpenAI LP"
+
+  - id: f_legalStruct3
+    property: legal-structure
+    value: "Public Benefit Corporation (converting)"
+    asOf: "2025"
+    source: https://openai.com/blog/openai-lp
+    notes: "Announced conversion to PBC in 2025"
 
   - id: f_HfB3WmNDFQ
     property: total-funding
@@ -55,7 +72,7 @@ facts:
   - id: f_w3pWgejwIA
     property: revenue
     value: 20e9
-    asOf: 2025
+    asOf: "2025"
     notes: "ARR per CFO Sarah Friar disclosure"
 
   - id: f_5VcbvP89LA
@@ -67,7 +84,7 @@ facts:
   - id: f_o1tcwe2T0w
     property: headcount
     value: 3500
-    asOf: 2025
+    asOf: "2025"
     notes: "Approximate headcount estimate as of 2025"
 
   - id: f_xW3cN7mP4q
@@ -151,7 +168,7 @@ items:
       mira-murati-cto:
         person: mira-murati
         title: CTO
-        start: 2018
+        start: "2018"
         end: 2024-09
         source: https://openai.com/about
         notes: "Served as interim CEO during Sam Altman's brief ousting in November 2023; departed September 2024"
@@ -159,7 +176,7 @@ items:
       jan-leike-alignment:
         person: jan-leike
         title: "Co-lead, Superalignment"
-        start: 2021
+        start: 2023-07
         end: 2024-05
         source: https://openai.com/blog/introducing-superalignment
         notes: "Co-led Superalignment team from its founding in July 2023; resigned May 2024 citing safety concerns, joined Anthropic"

@@ -34,14 +34,29 @@ const DATE_RE = /^\d{4}-\d{2}(-\d{2})?$/;
  * a string value is wrapped as {type: "ref"} rather than {type: "text"}.
  */
 function normalizeValue(raw: unknown, dataType?: string): FactValue {
-  // Explicit dataType hint takes priority for ref/refs disambiguation.
-  if (dataType === "ref" && typeof raw === "string") {
-    return { type: "ref", value: raw };
-  }
-  if (dataType === "refs" && Array.isArray(raw)) {
-    return { type: "refs", value: raw.map(String) };
+  // When an explicit dataType is declared, it is authoritative.
+  if (dataType) {
+    switch (dataType) {
+      case "ref":
+        return { type: "ref", value: String(raw) };
+      case "refs":
+        if (Array.isArray(raw)) {
+          return { type: "refs", value: raw.map(String) };
+        }
+        return { type: "refs", value: [String(raw)] };
+      case "number":
+        return { type: "number", value: Number(raw) };
+      case "text":
+        return { type: "text", value: String(raw) };
+      case "date":
+        return { type: "date", value: String(raw) };
+      case "boolean":
+        return { type: "boolean", value: Boolean(raw) };
+      // dataType declared but not one of the simple types — fall through
+    }
   }
 
+  // Heuristic detection when no dataType is declared
   if (typeof raw === "boolean") {
     return { type: "boolean", value: raw };
   }
@@ -58,14 +73,12 @@ function normalizeValue(raw: unknown, dataType?: string): FactValue {
   }
 
   if (Array.isArray(raw)) {
-    // Treat as refs if all elements are strings
     if (raw.every((v) => typeof v === "string")) {
       return { type: "refs", value: raw as string[] };
     }
     return { type: "json", value: raw };
   }
 
-  // Fall back to json for objects and anything else
   return { type: "json", value: raw };
 }
 
@@ -110,8 +123,18 @@ function parseFact(
   rawFact: RawFact,
   thingId: string,
   properties: Map<string, Property>
-): Fact {
+): Fact | null {
   const prop = properties.get(rawFact.property);
+
+  // Computed properties are populated by inverse computation, not stored directly.
+  if (prop?.computed) {
+    console.warn(
+      `[kb/loader] Skipping fact "${rawFact.id}" on "${thingId}": ` +
+        `property "${rawFact.property}" is computed (populated by inverse computation).`
+    );
+    return null;
+  }
+
   const value = normalizeValue(rawFact.value, prop?.dataType);
 
   return {
@@ -119,8 +142,8 @@ function parseFact(
     subjectId: thingId,
     propertyId: rawFact.property,
     value,
-    ...(rawFact.asOf !== undefined && { asOf: rawFact.asOf }),
-    ...(rawFact.validEnd !== undefined && { validEnd: rawFact.validEnd }),
+    ...(rawFact.asOf !== undefined && { asOf: String(rawFact.asOf) }),
+    ...(rawFact.validEnd !== undefined && { validEnd: String(rawFact.validEnd) }),
     ...(rawFact.source !== undefined && { source: rawFact.source }),
     ...(rawFact.sourceQuote !== undefined && {
       sourceQuote: rawFact.sourceQuote,
@@ -148,9 +171,11 @@ async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unkno
   let entries: string[];
   try {
     entries = await readdir(dir);
-  } catch {
-    // Directory doesn't exist — return empty array
-    return [];
+  } catch (error: unknown) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return []; // Directory doesn't exist — optional
+    }
+    throw error; // Permission errors, broken paths, etc. should surface
   }
 
   const yamlFiles = entries.filter(
@@ -188,7 +213,10 @@ export async function loadKB(dataDir: string): Promise<Graph> {
       "utf-8"
     );
     properties = parseProperties(parseYaml(propertiesContent));
-  } catch {
+  } catch (error: unknown) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+      throw error; // Malformed YAML or permission errors should surface
+    }
     // properties.yaml is optional for minimal setups
   }
 
@@ -215,7 +243,7 @@ export async function loadKB(dataDir: string): Promise<Graph> {
     // 3b. Parse facts
     for (const rawFact of file.facts ?? []) {
       const fact = parseFact(rawFact, thing.id, properties);
-      graph.addFact(fact);
+      if (fact) graph.addFact(fact);
     }
 
     // 3c. Parse items

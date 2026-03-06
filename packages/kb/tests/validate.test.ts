@@ -140,7 +140,7 @@ describe("validate", () => {
     it("returns results for all things", () => {
       const results = validate(graph);
 
-      // Should have results for anthropic, dario-amodei, and jan-leike
+      // Should have results for all 5 entities (anthropic, openai, dario-amodei, jan-leike, sam-altman)
       const thingIds = new Set(results.map((r) => r.thingId).filter(Boolean));
       expect(thingIds.has("anthropic")).toBe(true);
       expect(thingIds.has("dario-amodei")).toBe(true);

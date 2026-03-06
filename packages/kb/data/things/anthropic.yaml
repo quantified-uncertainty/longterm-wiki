@@ -120,7 +120,7 @@ facts:
     value: 67e9
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    notes: "Total funding raised including $30B Series G"
+    notes: "Total funding raised including $30B Series G. Exceeds equity round sum because it includes Amazon cloud credit commitments and multi-tranche strategic investments not listed as individual rounds."
 
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_hc_2022

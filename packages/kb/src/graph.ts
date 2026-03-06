@@ -17,6 +17,7 @@ import type {
 export class Graph {
   private things: Map<string, Thing> = new Map();
   private facts: Map<string, Fact[]> = new Map(); // keyed by subjectId
+  private factIds: Set<string> = new Set(); // dedup guard
   private properties: Map<string, Property> = new Map();
   private schemas: Map<string, TypeSchema> = new Map();
   // thingId → collectionName → collection
@@ -28,7 +29,14 @@ export class Graph {
     this.things.set(thing.id, thing);
   }
 
+  /**
+   * Adds a fact to the graph. Silently skips if a fact with the same ID
+   * already exists (deduplication for inverse computation re-runs).
+   */
   addFact(fact: Fact): void {
+    if (this.factIds.has(fact.id)) return; // dedup
+    this.factIds.add(fact.id);
+
     const existing = this.facts.get(fact.subjectId);
     if (existing) {
       existing.push(fact);
@@ -106,9 +114,8 @@ export class Graph {
   }
 
   /**
-   * Returns a map of thingId → Fact for all things that have a fact with
-   * the given propertyId. When `latest: true` is passed, only the most
-   * recent fact per thing is returned.
+   * Returns the latest fact per entity for a given property.
+   * Only entities that have at least one fact with this property are included.
    */
   getByProperty(
     propertyId: string,
@@ -117,18 +124,26 @@ export class Graph {
     const result = new Map<string, Fact>();
 
     for (const thingId of this.things.keys()) {
-      if (query?.latest) {
-        const latest = this.getLatest(thingId, propertyId);
-        if (latest !== undefined) {
-          result.set(thingId, latest);
-        }
-      } else {
-        // Without latest, return the most recent fact if multiple exist,
-        // to keep the return type consistent (Map<string, Fact>).
-        const latest = this.getLatest(thingId, propertyId);
-        if (latest !== undefined) {
-          result.set(thingId, latest);
-        }
+      const latest = this.getLatest(thingId, propertyId);
+      if (latest !== undefined) {
+        result.set(thingId, latest);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns all facts per entity for a given property (full history).
+   * Unlike getByProperty(), this returns arrays of facts, not just the latest.
+   */
+  getAllByProperty(propertyId: string): Map<string, Fact[]> {
+    const result = new Map<string, Fact[]>();
+
+    for (const thingId of this.things.keys()) {
+      const facts = this.getFacts(thingId, { property: propertyId });
+      if (facts.length > 0) {
+        result.set(thingId, facts);
       }
     }
 

@@ -68,7 +68,7 @@ describe("inverse", () => {
 
     it("inverse facts preserve validEnd temporal bound", () => {
       // Jan Leike's OpenAI employment has validEnd: 2024-05
-      // But openai is not in the graph, so that inverse is skipped.
+      // OpenAI is in the graph, so it gets an employer-of inverse with validEnd.
       // Jan Leike's Anthropic employment has no validEnd.
       const janInverse = graph
         .getFacts("anthropic", { property: "employer-of" })

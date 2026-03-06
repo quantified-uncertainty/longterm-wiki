@@ -29,19 +29,24 @@ function inverseHash(parts: string[]): string {
   return createHash("sha256")
     .update(parts.join("\x00"), "utf8")
     .digest("hex")
-    .slice(0, 8);
+    .slice(0, 12);
 }
 
 /**
  * Builds the ID for a single derived inverse fact.
- * Format: `inv_` + 8-char content hash.
+ * Format: `inv_` + 12-char content hash.
+ *
+ * Includes asOf and validEnd in the hash so that distinct temporal
+ * relationships (e.g., someone leaves and rejoins an org) get different IDs.
  */
 function derivedId(
   subjectId: string,
   propertyId: string,
-  refValue: string
+  refValue: string,
+  asOf?: string,
+  validEnd?: string,
 ): string {
-  return `inv_${inverseHash([subjectId, propertyId, refValue])}`;
+  return `inv_${inverseHash([subjectId, propertyId, refValue, asOf ?? "", validEnd ?? ""])}`;
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -131,7 +136,9 @@ function _addSingleInverse(
   const id = derivedId(
     referencedThingId,
     inversePropertyId,
-    sourceFact.subjectId
+    sourceFact.subjectId,
+    sourceFact.asOf,
+    sourceFact.validEnd,
   );
 
   const derived: Fact = {

@@ -84,7 +84,7 @@ export function KBFactValue({
         {displayValue}
       </span>
       <span
-        className="absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible group-hover/kb-fact:opacity-100 group-hover/kb-fact:visible transition-opacity text-xs"
+        className="absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible group-hover/kb-fact:opacity-100 group-hover/kb-fact:visible group-focus-within/kb-fact:opacity-100 group-focus-within/kb-fact:visible transition-opacity text-xs"
         role="tooltip"
       >
         <span className="block text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">

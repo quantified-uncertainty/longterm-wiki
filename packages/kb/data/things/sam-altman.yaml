@@ -28,9 +28,9 @@ facts:
     notes: "Born April 22, 1985 in Chicago, Illinois"
 
   - id: f_Zu4CcuDsTw
-    property: previous-role
+    property: role
     value: "President, Y Combinator"
-    asOf: 2014
-    validEnd: 2019
+    asOf: "2014"
+    validEnd: "2019"
     source: https://www.ycombinator.com/blog/sam-altman-is-the-new-president-of-y-combinator
     notes: "Succeeded Paul Graham as YC president in 2014; stepped down in 2019 to focus on OpenAI full-time"
