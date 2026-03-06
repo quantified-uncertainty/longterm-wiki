@@ -379,6 +379,15 @@ export async function orchestrateCiAutoUpdate(
   }
 
   try {
+    execFileSync('pnpm', ['crux', 'fix', 'orphaned-footnotes', '--apply'], {
+      cwd: PROJECT_ROOT,
+      stdio: 'inherit',
+    });
+  } catch (err) {
+    console.warn(`::warning::fix orphaned-footnotes failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  try {
     execFileSync('pnpm', ['crux', 'validate', 'gate', '--fix'], {
       cwd: PROJECT_ROOT,
       stdio: 'inherit',
