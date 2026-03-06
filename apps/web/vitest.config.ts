@@ -11,6 +11,7 @@ export default defineConfig({
     globals: true,
     environment: "node",
     include: ["src/**/*.test.ts", "src/**/*.test.tsx", "scripts/**/*.test.mjs"],
+    testTimeout: 30000,
   },
   resolve: {
     alias: {

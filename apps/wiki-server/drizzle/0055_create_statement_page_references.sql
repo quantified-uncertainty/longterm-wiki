@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS statement_page_references (
   id BIGSERIAL PRIMARY KEY,
   statement_id BIGINT NOT NULL REFERENCES statements(id) ON DELETE CASCADE,
-  page_id_int INTEGER NOT NULL REFERENCES wiki_pages(integer_id) ON DELETE CASCADE,
+  page_id_int INTEGER NOT NULL,  -- wiki_pages.integer_id; no FK because integer_id was added via manual migration (phase4a), not Drizzle
   footnote_resource_id VARCHAR,
   section TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

@@ -533,20 +533,32 @@ async function main() {
     console.log(`\n${c.bold}Ontology Analysis: ${entityId}${c.reset}\n`);
   }
 
-  // Check budget
-  if (tracker.totalCost > budget) {
-    console.error(`Budget exceeded: $${tracker.totalCost.toFixed(4)} > $${budget}`);
-    process.exit(1);
-  }
-
   const result = await analyzeEntityClusters(entityId, {
     client,
     tracker,
     minCluster,
   });
 
+  // Check budget after analysis
+  if (tracker.totalCost > budget) {
+    console.error(`Budget exceeded: $${tracker.totalCost.toFixed(4)} > $${budget}`);
+    process.exit(1);
+  }
+
+  // Apply if requested
+  let applyResult: Awaited<ReturnType<typeof applyIdeation>> | undefined;
+  if (apply && result.clusters.length > 0) {
+    if (!jsonOutput) {
+      console.log(`\n${c.bold}Applying ideation results...${c.reset}\n`);
+    }
+    applyResult = await applyIdeation(result, { dryRun: false });
+  }
+
   if (jsonOutput) {
-    console.log(JSON.stringify(result, null, 2));
+    const output = applyResult
+      ? { ...result, applied: applyResult, cost: tracker.totalCost }
+      : { ...result, cost: tracker.totalCost };
+    console.log(JSON.stringify(output, null, 2));
   } else {
     // Pretty-print results
     console.log(`  Entity type: ${result.parentEntityType}`);
@@ -577,26 +589,9 @@ async function main() {
     console.log(`  ${c.dim}Analysis: ${result.analysis}${c.reset}`);
     console.log(`  Cost: $${tracker.totalCost.toFixed(4)}`);
 
-    if (result.clusters.length > 0 && !apply) {
-      console.log(
-        `\n  Run with ${c.bold}--apply${c.reset} to create these entities and reassign statements.`,
-      );
-    }
-  }
-
-  // Apply if requested
-  if (apply && result.clusters.length > 0) {
-    if (!jsonOutput) {
-      console.log(`\n${c.bold}Applying ideation results...${c.reset}\n`);
-    }
-
-    const applyResult = await applyIdeation(result, { dryRun: false });
-
-    if (jsonOutput) {
-      console.log(JSON.stringify(applyResult, null, 2));
-    } else {
+    if (applyResult) {
       if (applyResult.created.length > 0) {
-        console.log(`  Created ${applyResult.created.length} entities:`);
+        console.log(`\n  Created ${applyResult.created.length} entities:`);
         for (const e of applyResult.created) {
           console.log(`    - ${e.numericId} ${e.slug} ("${e.title}")`);
         }
@@ -608,6 +603,10 @@ async function main() {
           console.log(`    - ${err}`);
         }
       }
+    } else if (result.clusters.length > 0) {
+      console.log(
+        `\n  Run with ${c.bold}--apply${c.reset} to create these entities and reassign statements.`,
+      );
     }
   }
 }

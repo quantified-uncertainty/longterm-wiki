@@ -156,8 +156,14 @@ export async function clearStatementsByEntity(
 
 export interface PatchStatementInput {
   status?: 'active' | 'superseded' | 'retracted';
+  variety?: 'structured' | 'attributed';
+  statementText?: string;
   subjectEntityId?: string;
   propertyId?: string | null;
+  qualifierKey?: string | null;
+  validStart?: string | null;
+  validEnd?: string | null;
+  attributedTo?: string | null;
   archiveReason?: string | null;
   verdict?: string | null;
   verdictScore?: number | null;

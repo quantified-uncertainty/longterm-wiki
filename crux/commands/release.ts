@@ -266,7 +266,8 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
       output:
         `${c.green}✓${c.reset} Updated release PR #${pr.number}\n` +
         `  Title: ${title}\n` +
-        `  ${pr.html_url}\n`,
+        `  ${pr.html_url}\n` +
+        `  ${c.yellow}Merge with "Create a merge commit" — never squash.${c.reset}\n`,
       exitCode: 0,
     };
   }
@@ -298,7 +299,8 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
     output:
       `${c.green}✓${c.reset} Created release PR #${pr.number}\n` +
       `  Title: ${title}\n` +
-      `  ${pr.html_url}\n`,
+      `  ${pr.html_url}\n` +
+      `  ${c.yellow}Merge with "Create a merge commit" — never squash.${c.reset}\n`,
     exitCode: 0,
   };
 }

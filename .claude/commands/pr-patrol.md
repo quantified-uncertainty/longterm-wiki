@@ -1,8 +1,8 @@
 # PR Patrol
 
-Scan all open PRs for issues and fix them in priority order. One-shot version of the `scripts/pr-patrol.sh` daemon.
+Scan all open PRs for issues and fix them in priority order. One-shot version of the `pnpm crux pr-patrol` daemon.
 
-**When to use:** Periodically, or when you want to clean up the PR backlog. It can also be run as a daemon via `scripts/pr-patrol.sh`.
+**When to use:** Periodically, or when you want to clean up the PR backlog. It can also be run as a daemon via `pnpm crux pr-patrol`.
 
 ## Phase 1: Scan all open PRs
 
@@ -92,11 +92,11 @@ After processing, summarize:
 
 ## Daemon mode
 
-For continuous monitoring, use the bash script:
+For continuous monitoring, use the crux command:
 
 ```bash
-./scripts/pr-patrol.sh                    # 5-min interval, continuous
-./scripts/pr-patrol.sh --once             # Single pass
-./scripts/pr-patrol.sh --dry-run          # Preview only
-./scripts/pr-patrol.sh --interval=120     # Custom interval
+pnpm crux pr-patrol                       # 5-min interval, continuous
+pnpm crux pr-patrol once                  # Single pass
+pnpm crux pr-patrol once --dry-run        # Preview only
+pnpm crux pr-patrol --interval=120        # Custom interval
 ```

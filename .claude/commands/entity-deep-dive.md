@@ -72,7 +72,7 @@ Based on your assessment, take action in priority order:
 
 Summarize what you found and what you changed:
 
-```
+```md
 ## Entity Deep Dive: [Entity Name]
 
 ### Quality Assessment

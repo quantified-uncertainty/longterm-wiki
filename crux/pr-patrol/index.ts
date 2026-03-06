@@ -5,7 +5,7 @@
  * missing issue refs, staleness), scores them by priority, and spawns
  * `claude` CLI to fix the highest-priority one per cycle.
  *
- * TypeScript rewrite of scripts/pr-patrol.sh.
+ * Canonical implementation (replaces the former scripts/pr-patrol.sh).
  */
 
 import { spawn } from 'child_process';
@@ -48,6 +48,29 @@ interface ScoredPr extends DetectedPr {
 }
 
 type FixOutcome = 'fixed' | 'max-turns' | 'timeout' | 'error' | 'dry-run';
+
+type MergeOutcome = 'merged' | 'dry-run' | 'error';
+
+/** Reason a PR with ready-to-merge label is NOT eligible for merge. */
+export type MergeBlockReason =
+  | 'not-mergeable'
+  | 'ci-failing'
+  | 'ci-pending'
+  | 'unresolved-threads'
+  | 'unchecked-items'
+  | 'claude-working'
+  | 'is-draft';
+
+export interface MergeCandidate {
+  number: number;
+  title: string;
+  branch: string;
+  createdAt: string;
+  eligible: boolean;
+  blockReasons: MergeBlockReason[];
+}
+
+const READY_TO_MERGE_LABEL = 'ready-to-merge';
 
 // ── Config ───────────────────────────────────────────────────────────────────
 
@@ -135,34 +158,327 @@ function appendJsonl(file: string, entry: Record<string, unknown>): void {
 
 // ── Cooldown tracking ────────────────────────────────────────────────────────
 
-function isRecentlyProcessed(pr: number, cooldownSeconds: number): boolean {
-  const file = join(STATE_DIR, `processed-${pr}`);
+function isRecentlyProcessed(key: number | string, cooldownSeconds: number): boolean {
+  const file = join(STATE_DIR, `processed-${key}`);
   if (!existsSync(file)) return false;
   const last = Number(readFileSync(file, 'utf-8').trim());
   return Date.now() / 1000 - last < cooldownSeconds;
 }
 
-function markProcessed(pr: number): void {
+function markProcessed(key: number | string): void {
   writeFileSync(
-    join(STATE_DIR, `processed-${pr}`),
+    join(STATE_DIR, `processed-${key}`),
     String(Math.floor(Date.now() / 1000)),
   );
 }
 
-function getMaxTurnsFailCount(pr: number): number {
-  const file = join(STATE_DIR, `max-turns-${pr}`);
+function getMaxTurnsFailCount(key: number | string): number {
+  const file = join(STATE_DIR, `max-turns-${key}`);
   if (!existsSync(file)) return 0;
   return parseInt(readFileSync(file, 'utf-8').trim(), 10) || 0;
 }
 
-function recordMaxTurnsFailure(pr: number): number {
-  const count = getMaxTurnsFailCount(pr) + 1;
-  writeFileSync(join(STATE_DIR, `max-turns-${pr}`), String(count));
+function recordMaxTurnsFailure(key: number | string): number {
+  const count = getMaxTurnsFailCount(key) + 1;
+  writeFileSync(join(STATE_DIR, `max-turns-${key}`), String(count));
   return count;
 }
 
-function isAbandoned(pr: number): boolean {
-  return getMaxTurnsFailCount(pr) >= 2;
+function isAbandoned(key: number | string): boolean {
+  return getMaxTurnsFailCount(key) >= 2;
+}
+
+// ── Main Branch CI Check ────────────────────────────────────────────────────
+
+interface WorkflowRun {
+  id: number;
+  status: string;
+  conclusion: string | null;
+  created_at: string;
+  head_sha: string;
+  html_url: string;
+}
+
+interface WorkflowRunsResponse {
+  workflow_runs: WorkflowRun[];
+  total_count: number;
+}
+
+interface MainBranchStatus {
+  isRed: boolean;
+  runId: number | null;
+  sha: string;
+  htmlUrl: string;
+}
+
+const CI_WORKFLOW = 'ci.yml';
+const MAIN_BRANCH_KEY = 'main-branch';
+
+async function checkMainBranch(config: PatrolConfig): Promise<MainBranchStatus> {
+  const notRed: MainBranchStatus = { isRed: false, runId: null, sha: '', htmlUrl: '' };
+
+  // Check cooldown and abandoned status first
+  if (isAbandoned(MAIN_BRANCH_KEY)) {
+    log('  Main branch fix abandoned — needs human intervention');
+    return notRed;
+  }
+  if (isRecentlyProcessed(MAIN_BRANCH_KEY, config.cooldownSeconds)) {
+    log('  Main branch recently processed — skipping');
+    return notRed;
+  }
+
+  try {
+    // Fetch the latest completed CI runs on main
+    const resp = await githubApi<WorkflowRunsResponse>(
+      `/repos/${config.repo}/actions/workflows/${CI_WORKFLOW}/runs?branch=main&status=completed&per_page=5`,
+    );
+
+    const runs = resp.workflow_runs ?? [];
+    if (runs.length === 0) {
+      log('  No completed CI runs on main found');
+      return notRed;
+    }
+
+    const latest = runs[0];
+    if (latest.conclusion === 'failure') {
+      log(`  🔴 Main branch CI is RED (run #${latest.id}, sha ${latest.head_sha.slice(0, 8)})`);
+      return {
+        isRed: true,
+        runId: latest.id,
+        sha: latest.head_sha,
+        htmlUrl: latest.html_url,
+      };
+    }
+
+    log(`  Main branch CI is green (latest run #${latest.id}: ${latest.conclusion})`);
+    return notRed;
+  } catch (e) {
+    log(`  Warning: could not check main branch CI: ${e instanceof Error ? e.message : String(e)}`);
+    return notRed;
+  }
+}
+
+function buildMainBranchPrompt(runId: number, repo: string): string {
+  return `You are a CI repair agent for the ${repo} repository.
+
+## Situation
+
+The CI workflow on the \`main\` branch is failing. Run ID: ${runId}
+
+## Instructions
+
+1. First, examine the CI failure logs:
+   gh run view ${runId} --repo ${repo} --log-failed 2>/dev/null || gh run view ${runId} --repo ${repo} --log
+
+2. Diagnose the root cause:
+   - Is it a flaky test? (Check if re-running would fix it)
+   - Is it a real build/test failure introduced by a recent commit?
+   - Is it an infrastructure issue (network, package registry, etc.)?
+
+3. If the failure looks flaky or transient:
+   - Re-run the workflow: gh run rerun ${runId} --repo ${repo} --failed
+   - That's it — no code changes needed
+
+4. If it's a real failure that needs a code fix:
+   - Create a fix branch: git checkout -b claude/fix-main-ci-$(date +%s) origin/main
+   - Read the relevant source files and fix the issue
+   - Run locally to verify: pnpm crux validate gate
+   - Commit and push the fix branch
+   - Open a PR: gh pr create --repo ${repo} --title "Fix main branch CI failure" --body "Fixes CI failure from run #${runId}"
+
+## Guardrails
+- Only fix the CI failure — do not refactor or improve unrelated code
+- If the failure is in test expectations that need updating (not a real bug), update the tests
+- If you cannot diagnose or fix the issue, output a clear summary of what you found
+- Do NOT run /agent-session-start or /agent-session-ready-PR
+- Run pnpm crux validate gate --fix before committing`;
+}
+
+async function fixMainBranch(status: MainBranchStatus, config: PatrolConfig): Promise<void> {
+  log(`→ Fixing main branch CI (run #${status.runId})`);
+
+  if (config.dryRun) {
+    log('  [DRY RUN] Would invoke Claude to fix main branch CI');
+    appendJsonl(JSONL_FILE, {
+      type: 'main_branch_result',
+      run_id: status.runId,
+      sha: status.sha,
+      outcome: 'dry-run' as FixOutcome,
+      elapsed_s: 0,
+    });
+    markProcessed(MAIN_BRANCH_KEY);
+    return;
+  }
+
+  const prompt = buildMainBranchPrompt(status.runId!, config.repo);
+  const startTime = Date.now();
+
+  let outcome: FixOutcome = 'fixed';
+  let reason = '';
+
+  try {
+    const result = await spawnClaude(prompt, config);
+    const elapsedS = Math.floor((Date.now() - startTime) / 1000);
+
+    if (result.timedOut) {
+      outcome = 'timeout';
+      reason = `Killed after ${config.timeoutMinutes}m timeout`;
+      log(`✗ Main branch fix timed out after ${config.timeoutMinutes}m`);
+    } else if (result.exitCode === 0 && !result.hitMaxTurns) {
+      outcome = 'fixed';
+      log(`✓ Main branch CI fix processed (${elapsedS}s)`);
+    } else if (result.hitMaxTurns) {
+      const failCount = recordMaxTurnsFailure(MAIN_BRANCH_KEY);
+      outcome = 'max-turns';
+      reason = `Hit max turns (${config.maxTurns}) — attempt ${failCount}`;
+      log(`⚠ Main branch fix hit max turns after ${elapsedS}s`);
+
+      if (failCount >= 2) {
+        reason = `Abandoned after ${failCount} max-turns failures`;
+        log(`✗ Main branch fix abandoned after ${failCount} max-turns failures`);
+      }
+    } else {
+      outcome = 'error';
+      reason = `Exit code: ${result.exitCode}`;
+      log(`✗ Main branch fix failed (exit: ${result.exitCode}, ${elapsedS}s)`);
+    }
+
+    appendJsonl(JSONL_FILE, {
+      type: 'main_branch_result',
+      run_id: status.runId,
+      sha: status.sha,
+      outcome,
+      elapsed_s: elapsedS,
+      reason: reason || undefined,
+    });
+  } finally {
+    // Clean up any in-progress rebase/merge
+    gitSafe('rebase', '--abort');
+    gitSafe('merge', '--abort');
+
+    // Restore to main branch
+    gitSafe('checkout', 'main');
+
+    markProcessed(MAIN_BRANCH_KEY);
+  }
+}
+
+// ── PR Overlap Detection ────────────────────────────────────────────────────
+
+interface PrFiles {
+  prNumber: number;
+  title: string;
+  files: string[];
+}
+
+interface PrFileEntry {
+  filename: string;
+}
+
+async function detectPrOverlaps(config: PatrolConfig, prs: DetectedPr[]): Promise<void> {
+  // Limit to first 20 PRs to avoid rate limits
+  const prSubset = prs.slice(0, 20);
+  if (prSubset.length < 2) return;
+
+  log(`Checking ${prSubset.length} PRs for file overlaps...`);
+
+  // Fetch changed files for each PR
+  const prFiles: PrFiles[] = [];
+  for (const pr of prSubset) {
+    try {
+      const files = await githubApi<PrFileEntry[]>(
+        `/repos/${config.repo}/pulls/${pr.number}/files?per_page=100`,
+      );
+      prFiles.push({
+        prNumber: pr.number,
+        title: pr.title,
+        files: files.map((f) => f.filename),
+      });
+    } catch (e) {
+      log(`  Warning: could not fetch files for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  // Build file → PR map
+  const fileMap = new Map<string, number[]>();
+  for (const pf of prFiles) {
+    for (const file of pf.files) {
+      const existing = fileMap.get(file) ?? [];
+      existing.push(pf.prNumber);
+      fileMap.set(file, existing);
+    }
+  }
+
+  // Find overlapping pairs
+  const overlaps = new Map<string, string[]>(); // "A-B" → shared files
+  for (const [file, prNums] of fileMap) {
+    if (prNums.length < 2) continue;
+    // Generate all pairs
+    for (let i = 0; i < prNums.length; i++) {
+      for (let j = i + 1; j < prNums.length; j++) {
+        const key = `${Math.min(prNums[i], prNums[j])}-${Math.max(prNums[i], prNums[j])}`;
+        const existing = overlaps.get(key) ?? [];
+        existing.push(file);
+        overlaps.set(key, existing);
+      }
+    }
+  }
+
+  if (overlaps.size === 0) {
+    log('  No file overlaps detected');
+    return;
+  }
+
+  log(`  Found ${overlaps.size} PR pair(s) with shared files`);
+
+  // Post warning comments (respecting cooldown)
+  for (const [pairKey, sharedFiles] of overlaps) {
+    const overlapKey = `overlap-${pairKey}`;
+    if (isRecentlyProcessed(overlapKey, config.cooldownSeconds * 4)) {
+      // Use 4× the normal cooldown since overlap warnings are informational
+      continue;
+    }
+
+    const [aStr, bStr] = pairKey.split('-');
+    const prA = parseInt(aStr, 10);
+    const prB = parseInt(bStr, 10);
+    const uniqueFiles = [...new Set(sharedFiles)];
+    const fileList = uniqueFiles.slice(0, 10).join('\n- ');
+    const moreCount = uniqueFiles.length > 10 ? ` (+${uniqueFiles.length - 10} more)` : '';
+
+    const body = `⚠️ **PR Overlap Warning**
+
+This PR shares ${uniqueFiles.length} file(s) with PR #${prB}:
+- ${fileList}${moreCount}
+
+Coordinate to avoid merge conflicts.
+
+_Posted by PR Patrol — informational only._`;
+
+    if (config.dryRun) {
+      log(`  [DRY RUN] Would warn PR #${prA} and #${prB} about ${uniqueFiles.length} shared files`);
+    } else {
+      // Post on both PRs
+      for (const prNum of [prA, prB]) {
+        const otherPr = prNum === prA ? prB : prA;
+        const commentBody = body.replace(`PR #${prB}`, `PR #${otherPr}`);
+        await githubApi(`/repos/${config.repo}/issues/${prNum}/comments`, {
+          method: 'POST',
+          body: { body: commentBody },
+        }).catch((e) =>
+          log(`  Warning: could not post overlap comment on PR #${prNum}: ${e instanceof Error ? e.message : String(e)}`),
+        );
+      }
+    }
+
+    markProcessed(overlapKey);
+    appendJsonl(JSONL_FILE, {
+      type: 'overlap_warning',
+      pr_a: prA,
+      pr_b: prB,
+      shared_files: uniqueFiles.length,
+    });
+  }
 }
 
 // ── PR Detection (GraphQL) ──────────────────────────────────────────────────
@@ -171,7 +487,7 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
   repository(owner: $owner, name: $name) {
     pullRequests(first: 50, states: [OPEN], orderBy: {field: UPDATED_AT, direction: DESC}) {
       nodes {
-        number title headRefName mergeable createdAt updatedAt body
+        number title headRefName mergeable isDraft createdAt updatedAt body
         labels(first: 20) { nodes { name } }
         commits(last: 1) { nodes { commit { statusCheckRollup {
           contexts(first: 50) { nodes {
@@ -205,11 +521,12 @@ interface GqlReviewThread {
   };
 }
 
-interface GqlPrNode {
+export interface GqlPrNode {
   number: number;
   title: string;
   headRefName: string;
   mergeable: string;
+  isDraft: boolean;
   createdAt: string;
   updatedAt: string;
   body: string | null;
@@ -300,21 +617,64 @@ export function detectIssues(
   return { issues, botComments };
 }
 
-async function detectAllPrIssues(config: PatrolConfig): Promise<DetectedPr[]> {
+export async function fetchOpenPrs(config: PatrolConfig): Promise<GqlPrNode[]> {
   const [owner, name] = config.repo.split('/');
   const data = await githubGraphQL<{
     repository: { pullRequests: { nodes: GqlPrNode[] } };
   }>(PR_QUERY, { owner, name });
-
   const prs = data.repository.pullRequests.nodes;
-  const staleThresholdMs = Date.now() - config.staleHours * 3600 * 1000;
-
   log(`Found ${prs.length} open PRs`);
+  return prs;
+}
+
+const SINGLE_PR_QUERY = `query($owner: String!, $name: String!, $number: Int!) {
+  repository(owner: $owner, name: $name) {
+    pullRequest(number: $number) {
+      number title headRefName mergeable isDraft createdAt updatedAt body
+      labels(first: 20) { nodes { name } }
+      commits(last: 1) { nodes { commit { statusCheckRollup {
+        contexts(first: 50) { nodes {
+          ... on CheckRun { conclusion }
+          ... on StatusContext { state }
+        }}
+      }}}}
+      reviewThreads(first: 50) { nodes {
+        isResolved isOutdated path line startLine
+        comments(first: 3) { nodes {
+          author { login }
+          body
+        }}
+      }}
+    }
+  }
+}`;
+
+/** Fetch a single PR by number. Used by `crux pr ready` for eligibility checks. */
+export async function fetchSinglePr(prNumber: number): Promise<GqlPrNode | null> {
+  const [owner, name] = REPO.split('/');
+  try {
+    const data = await githubGraphQL<{
+      repository: { pullRequest: GqlPrNode | null };
+    }>(SINGLE_PR_QUERY, { owner, name, number: prNumber });
+    return data.repository.pullRequest;
+  } catch (e) {
+    log(`Warning: could not fetch PR #${prNumber}: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  }
+}
+
+function detectAllPrIssuesFromNodes(
+  prs: GqlPrNode[],
+  config: PatrolConfig,
+): DetectedPr[] {
+  const staleThresholdMs = Date.now() - config.staleHours * 3600 * 1000;
 
   return prs
     .filter((pr) => {
       const labels = pr.labels.nodes.map((l) => l.name);
       if (labels.includes('claude-working')) return false;
+      // Skip draft PRs — they're not ready for automated fixes
+      if (pr.isDraft) return false;
       return true;
     })
     .map((pr) => {
@@ -359,6 +719,173 @@ function rankPrs(prs: DetectedPr[]): ScoredPr[] {
   return prs
     .map((pr) => ({ ...pr, score: computeScore(pr) }))
     .sort((a, b) => b.score - a.score);
+}
+
+// ── Merge eligibility ────────────────────────────────────────────────────────
+
+/** Pure function — checks whether a PR with ready-to-merge label is eligible for auto-merge. */
+export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
+  const blockReasons: MergeBlockReason[] = [];
+  const labels = pr.labels.nodes.map((l) => l.name);
+
+  if (pr.isDraft) {
+    blockReasons.push('is-draft');
+  }
+
+  if (labels.includes('claude-working')) {
+    blockReasons.push('claude-working');
+  }
+
+  if (pr.mergeable !== 'MERGEABLE') {
+    blockReasons.push('not-mergeable');
+  }
+
+  const contexts =
+    pr.commits?.nodes?.[0]?.commit?.statusCheckRollup?.contexts?.nodes ?? [];
+
+  const hasFailure = contexts.some(
+    (c) =>
+      c.conclusion === 'FAILURE' ||
+      c.conclusion === 'CANCELLED' ||
+      c.state === 'FAILURE' ||
+      c.state === 'ERROR',
+  );
+  if (hasFailure) {
+    blockReasons.push('ci-failing');
+  }
+
+  if (contexts.length > 0 && !hasFailure) {
+    const hasPending = contexts.some(
+      (c) =>
+        (c.conclusion === null || c.conclusion === undefined) &&
+        c.state !== 'SUCCESS',
+    );
+    if (hasPending) {
+      blockReasons.push('ci-pending');
+    }
+  }
+
+  const threads = pr.reviewThreads?.nodes ?? [];
+  const unresolvedThreads = threads.filter(
+    (t) => !t.isResolved && !t.isOutdated,
+  );
+  if (unresolvedThreads.length > 0) {
+    blockReasons.push('unresolved-threads');
+  }
+
+  const body = pr.body ?? '';
+  const uncheckedCheckboxes = [...body.matchAll(/^[\s]*-\s+\[ \]/gm)];
+  if (uncheckedCheckboxes.length > 0) {
+    blockReasons.push('unchecked-items');
+  }
+
+  return {
+    number: pr.number,
+    title: pr.title,
+    branch: pr.headRefName,
+    createdAt: pr.createdAt,
+    eligible: blockReasons.length === 0,
+    blockReasons,
+  };
+}
+
+/** Find all PRs labeled ready-to-merge and check their merge eligibility. Sorted oldest first. */
+export function findMergeCandidates(prs: GqlPrNode[]): MergeCandidate[] {
+  return prs
+    .filter((pr) => {
+      const labels = pr.labels.nodes.map((l) => l.name);
+      return labels.includes(READY_TO_MERGE_LABEL);
+    })
+    .map(checkMergeEligibility)
+    .sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    );
+}
+
+// ── Undraft execution ────────────────────────────────────────────────────────
+
+async function undraftPr(prNum: number, config: PatrolConfig): Promise<boolean> {
+  log(`→ Undrafting PR #${prNum} (all eligibility checks pass)`);
+
+  try {
+    // GitHub REST API doesn't support undrafting — must use GraphQL mutation
+    const prData = await githubApi<{ node_id: string }>(
+      `/repos/${config.repo}/pulls/${prNum}`,
+    );
+    await githubGraphQL(
+      `mutation($id: ID!) { markPullRequestReadyForReview(input: { pullRequestId: $id }) { pullRequest { isDraft } } }`,
+      { id: prData.node_id },
+    );
+
+    log(`✓ PR #${prNum} marked as ready for review`);
+    appendJsonl(JSONL_FILE, {
+      type: 'undraft_result',
+      pr_num: prNum,
+      outcome: 'undrafted',
+    });
+    return true;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    log(`✗ Failed to undraft PR #${prNum}: ${msg}`);
+    appendJsonl(JSONL_FILE, {
+      type: 'undraft_result',
+      pr_num: prNum,
+      outcome: 'error',
+      reason: msg,
+    });
+    return false;
+  }
+}
+
+// ── Merge execution ─────────────────────────────────────────────────────────
+
+async function mergePr(
+  candidate: MergeCandidate,
+  config: PatrolConfig,
+): Promise<void> {
+  log(`→ Merging PR #${candidate.number} (${candidate.title})`);
+  log(`  Branch: ${candidate.branch}`);
+
+  if (config.dryRun) {
+    log('  [DRY RUN] Would squash-merge this PR');
+    appendJsonl(JSONL_FILE, {
+      type: 'merge_result',
+      pr_num: candidate.number,
+      outcome: 'dry-run' as MergeOutcome,
+    });
+    return;
+  }
+
+  try {
+    await githubApi(
+      `/repos/${config.repo}/pulls/${candidate.number}/merge`,
+      {
+        method: 'PUT',
+        body: {
+          merge_method: 'squash',
+        },
+      },
+    );
+
+    log(`✓ PR #${candidate.number} merged successfully`);
+
+    appendJsonl(JSONL_FILE, {
+      type: 'merge_result',
+      pr_num: candidate.number,
+      outcome: 'merged' as MergeOutcome,
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    log(`✗ Failed to merge PR #${candidate.number}: ${msg}`);
+
+    appendJsonl(JSONL_FILE, {
+      type: 'merge_result',
+      pr_num: candidate.number,
+      outcome: 'error' as MergeOutcome,
+      reason: msg,
+    });
+  }
 }
 
 // ── Prompt builder ──────────────────────────────────────────────────────────
@@ -786,67 +1313,134 @@ async function runCheckCycle(
 ): Promise<void> {
   logHeader(`Check cycle #${cycleCount}`);
 
-  // 1. Detect issues
-  const detected = await detectAllPrIssues(config);
-  if (detected.length === 0) {
-    log('All PRs clean — nothing to do');
+  // 0. Check main branch CI first — highest priority
+  const mainStatus = await checkMainBranch(config);
+  if (mainStatus.isRed) {
+    log('Main branch CI is red — prioritizing fix over PR queue');
+    await fixMainBranch(mainStatus, config);
     appendJsonl(JSONL_FILE, {
       type: 'cycle_summary',
       cycle_number: cycleCount,
       prs_scanned: 0,
       queue_size: 0,
       pr_processed: null,
+      main_branch_fix: true,
     });
-    return;
+    return; // Main takes the whole cycle; PRs wait
   }
 
-  // 2. Filter cooldowns and abandoned
-  const eligible = detected.filter((pr) => {
-    if (isAbandoned(pr.number)) {
-      log(`  Skipping PR #${pr.number} (abandoned — needs human intervention)`);
-      return false;
+  // 1. Fetch all open PRs (shared between fix and merge phases)
+  const allPrs = await fetchOpenPrs(config);
+
+  // ── Fix phase ──────────────────────────────────────────────────────
+
+  const detected = detectAllPrIssuesFromNodes(allPrs, config);
+  let fixedPr: number | null = null;
+
+  // 1b. Check for PR file overlaps (informational — posts warnings)
+  if (detected.length >= 2) {
+    await detectPrOverlaps(config, detected);
+  }
+
+  if (detected.length === 0) {
+    log('All PRs clean — nothing to fix');
+  } else {
+    // Filter cooldowns and abandoned
+    const eligible = detected.filter((pr) => {
+      if (isAbandoned(pr.number)) {
+        log(`  Skipping PR #${pr.number} (abandoned — needs human intervention)`);
+        return false;
+      }
+      if (isRecentlyProcessed(pr.number, config.cooldownSeconds)) {
+        log(`  Skipping PR #${pr.number} (recently processed)`);
+        return false;
+      }
+      return true;
+    });
+
+    const ranked = rankPrs(eligible);
+    if (ranked.length > 0) {
+      log('');
+      log(`Fix queue (${ranked.length} items):`);
+      for (const pr of ranked) {
+        log(
+          `  [score=${pr.score}] PR #${pr.number}: ${pr.issues.join(',')} — ${pr.title}`,
+        );
+      }
+      log('');
+
+      const top = ranked[0];
+      await fixPr(top, config);
+      fixedPr = top.number;
+    } else {
+      log('All issues recently processed — nothing to fix');
     }
-    if (isRecentlyProcessed(pr.number, config.cooldownSeconds)) {
-      log(`  Skipping PR #${pr.number} (recently processed)`);
-      return false;
+  }
+
+  // ── Undraft phase ──────────────────────────────────────────────────
+  // Auto-undraft draft PRs that are otherwise eligible for merge.
+  // A PR is auto-undrafted when its only block reason is 'is-draft'.
+
+  const draftCandidates = findMergeCandidates(allPrs).filter(
+    (c) => !c.eligible && c.blockReasons.length === 1 && c.blockReasons[0] === 'is-draft',
+  );
+
+  const undraftedNumbers = new Set<number>();
+  for (const candidate of draftCandidates) {
+    if (config.dryRun) {
+      log(`  [DRY RUN] Would undraft PR #${candidate.number} (all other checks pass)`);
+      undraftedNumbers.add(candidate.number);
+    } else {
+      const success = await undraftPr(candidate.number, config);
+      if (success) undraftedNumbers.add(candidate.number);
     }
-    return true;
+  }
+
+  // ── Merge phase ────────────────────────────────────────────────────
+  // Re-evaluate after undrafting (only successfully undrafted PRs become eligible)
+  const mergeCandidates = findMergeCandidates(allPrs).map((c) => {
+    if (undraftedNumbers.has(c.number)) {
+      const updated = { ...c, blockReasons: c.blockReasons.filter((r) => r !== 'is-draft') };
+      return { ...updated, eligible: updated.blockReasons.length === 0 };
+    }
+    return c;
   });
+  const eligibleForMerge = mergeCandidates.filter((c) => c.eligible);
+  const blockedForMerge = mergeCandidates.filter((c) => !c.eligible);
+  let mergedPr: number | null = null;
 
-  // 3. Score and sort
-  const ranked = rankPrs(eligible);
-  if (ranked.length === 0) {
-    log('All issues recently processed — nothing to do');
-    appendJsonl(JSONL_FILE, {
-      type: 'cycle_summary',
-      cycle_number: cycleCount,
-      prs_scanned: detected.length,
-      queue_size: 0,
-      pr_processed: null,
-    });
-    return;
+  if (mergeCandidates.length > 0) {
+    log('');
+    log(`Merge candidates (${mergeCandidates.length} with ${READY_TO_MERGE_LABEL}):`);
+    for (const c of eligibleForMerge) {
+      log(`  ✓ PR #${c.number}: eligible — ${c.title}`);
+    }
+    for (const c of blockedForMerge) {
+      log(`  ✗ PR #${c.number}: blocked (${c.blockReasons.join(', ')}) — ${c.title}`);
+    }
   }
 
-  // 4. Display queue
-  log('');
-  log(`Priority queue (${ranked.length} items):`);
-  for (const pr of ranked) {
-    log(
-      `  [score=${pr.score}] PR #${pr.number}: ${pr.issues.join(',')} — ${pr.title}`,
-    );
+  if (eligibleForMerge.length > 0) {
+    const toMerge = eligibleForMerge[0];
+    await mergePr(toMerge, config);
+    mergedPr = toMerge.number;
   }
-  log('');
 
-  // 5. Process highest priority
-  const top = ranked[0];
-  await fixPr(top, config);
+  // ── Cycle summary ──────────────────────────────────────────────────
 
   appendJsonl(JSONL_FILE, {
     type: 'cycle_summary',
     cycle_number: cycleCount,
-    prs_scanned: detected.length,
-    queue_size: ranked.length,
-    pr_processed: top.number,
+    prs_scanned: allPrs.length,
+    queue_size: detected.filter(
+      (pr) =>
+        !isAbandoned(pr.number) &&
+        !isRecentlyProcessed(pr.number, config.cooldownSeconds),
+    ).length,
+    pr_processed: fixedPr,
+    pr_merged: mergedPr,
+    merge_candidates: mergeCandidates.length,
+    merge_eligible: eligibleForMerge.length,
   });
 }
 
@@ -928,9 +1522,27 @@ export function readRecentLogs(count: number): string {
         output.push(
           `  PR #${entry.pr_num}: ${entry.outcome} (${entry.elapsed_s}s) — ${entry.issues?.join(', ') ?? ''}`,
         );
-      } else if (entry.type === 'cycle_summary') {
+      } else if (entry.type === 'merge_result') {
         output.push(
-          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}`,
+          `  PR #${entry.pr_num}: merge-${entry.outcome}${entry.reason ? ` (${entry.reason})` : ''}`,
+        );
+      } else if (entry.type === 'main_branch_result') {
+        output.push(
+          `  Main branch: ${entry.outcome} (${entry.elapsed_s}s) — run #${entry.run_id}`,
+        );
+      } else if (entry.type === 'overlap_warning') {
+        output.push(
+          `  Overlap: PR #${entry.pr_a} ↔ PR #${entry.pr_b} (${entry.shared_files} shared files)`,
+        );
+      } else if (entry.type === 'cycle_summary') {
+        const mainFix = entry.main_branch_fix ? ', main_branch_fix=true' : '';
+        const mergeInfo = entry.pr_merged
+          ? `, merged=#${entry.pr_merged}`
+          : entry.merge_candidates > 0
+            ? `, merge-blocked=${entry.merge_candidates}`
+            : '';
+        output.push(
+          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}${mainFix}${mergeInfo}`,
         );
       }
     } catch {

@@ -197,7 +197,8 @@ async function detect(_args: string[], options: CommandOptions): Promise<Command
  *   --body="PR body"        Body as inline string (vulnerable to shell expansion).
  *   --body-file=<path>      Body from a file (safe for markdown with backticks).
  *   --base=main             Base branch (default: main).
- *   --draft                 Create as draft PR.
+ *   --draft                 Create as draft PR (default: true).
+ *   --no-draft              Create as ready PR (not draft).
  *
  * If a PR already exists for this branch, reports it instead of creating a duplicate.
  */
@@ -210,7 +211,8 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
   const bodyFile = (options.bodyFile ?? options['body-file']) as string | undefined;
   let body = options.body as string | undefined;
   const base = (options.base as string) || 'main';
-  const draft = Boolean(options.draft);
+  // Default to draft unless --no-draft is explicitly passed
+  const draft = options.noDraft === true || options['no-draft'] === true ? false : true;
 
   // --body-file takes precedence (avoids shell expansion of backticks in markdown)
   if (bodyFile) {
@@ -602,12 +604,108 @@ async function resolveConflictsCmd(_args: string[], options: CommandOptions): Pr
   return { output, exitCode: failed > 0 ? 1 : 0 };
 }
 
+/**
+ * Mark the current branch's PR as ready for review.
+ *
+ * Validates eligibility (CI green, no conflicts, no unresolved threads,
+ * no unchecked checkboxes) before converting from draft to ready.
+ *
+ * Options:
+ *   --pr=N    Target a specific PR number instead of auto-detecting.
+ *   --force   Skip eligibility checks and mark as ready anyway.
+ */
+async function ready(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+  const c = log.colors;
+  const force = Boolean(options.force);
+
+  let prNum: number | null = null;
+  if (options.pr !== undefined) {
+    const rawPr = String(options.pr);
+    const parsed = parseInt(rawPr, 10);
+    if (!Number.isInteger(parsed) || parsed <= 0) {
+      return {
+        output: `${c.red}Invalid --pr value: ${rawPr}${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+    prNum = parsed;
+  }
+
+  if (!prNum) {
+    const branch = currentBranch();
+    const prs = await githubApi<GitHubPR[]>(
+      `/repos/${REPO}/pulls?head=quantified-uncertainty:${branch}&state=open`
+    );
+    if (!prs.length) {
+      return {
+        output: `${c.red}No open PR found for branch ${currentBranch()}.${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+    prNum = prs[0].number;
+  }
+
+  // Fetch full PR details via GraphQL for eligibility checks
+  const { checkMergeEligibility, fetchSinglePr } = await import('../pr-patrol/index.ts');
+  const prNode = await fetchSinglePr(prNum);
+
+  if (!prNode) {
+    return {
+      output: `${c.red}Could not fetch PR #${prNum} details.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // Check eligibility (unless --force)
+  if (!force) {
+    const eligibility = checkMergeEligibility(prNode);
+    // Ignore only is-draft: this command exists to remove that block.
+    // CI must still be green — matching PR Patrol auto-undraft behavior.
+    const blockReasons = eligibility.blockReasons.filter(
+      (r: string) => r !== 'is-draft',
+    );
+
+    if (blockReasons.length > 0) {
+      let output = `${c.red}✗ PR #${prNum} is not eligible to be marked ready:${c.reset}\n`;
+      for (const reason of blockReasons) {
+        output += `  - ${reason}\n`;
+      }
+      output += `\n  Use --force to mark ready anyway.\n`;
+      return { output, exitCode: 1 };
+    }
+  }
+
+  // Convert from draft to ready via GraphQL mutation
+  // (GitHub REST API doesn't support undrafting — only GraphQL works)
+  try {
+    const { githubGraphQL } = await import('../lib/github.ts');
+    const prData = await githubApi<{ node_id: string }>(`/repos/${REPO}/pulls/${prNum}`);
+    await githubGraphQL(
+      `mutation($id: ID!) { markPullRequestReadyForReview(input: { pullRequestId: $id }) { pullRequest { isDraft } } }`,
+      { id: prData.node_id },
+    );
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return {
+      output: `${c.red}Failed to mark PR #${prNum} as ready: ${msg}${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  let output = `${c.green}✓${c.reset} PR #${prNum} marked as ready for review.\n`;
+  if (force) output += `  ${c.yellow}(eligibility checks skipped with --force)${c.reset}\n`;
+
+  return { output, exitCode: 0 };
+}
+
 // ---------------------------------------------------------------------------
 // Domain entry point (required by crux.mjs dispatch)
 // ---------------------------------------------------------------------------
 
 export const commands = {
   create,
+  ready,
   detect,
   'fix-body': fixBody,
   'rebase-all': rebaseAll,
@@ -620,7 +718,8 @@ export function getHelp(): string {
 PR Domain — GitHub Pull Request utilities
 
 Commands:
-  create                        Create a PR for the current branch (corruption-safe).
+  create                        Create a draft PR for the current branch (corruption-safe).
+  ready [--pr=N]                Mark PR as ready (validates eligibility, removes draft status).
   detect                        Detect open PR for current branch (returns URL + number).
   fix-body [--pr=N]             Detect and repair literal \\n in the current branch's PR body.
   rebase-all                    Rebase all open non-draft PRs onto main (used by CI).
@@ -632,10 +731,14 @@ Options (create):
   --body="..."        PR body (inline — avoid for multi-line bodies; use --body-file or stdin).
   --body-file=<path>  PR body from file (safe for markdown with backticks).
   --base=main         Base branch (default: main).
-  --draft             Create as draft PR.
+  --no-draft          Create as ready PR (default: draft).
   --allow-empty-body  Allow creating PR without a description (not recommended).
   --skip-test-plan    Skip test plan validation (not recommended).
   (stdin)             If --body and --body-file are absent and stdin is a pipe, body is read from stdin.
+
+Options (ready):
+  --pr=N              Target a specific PR number instead of auto-detecting.
+  --force             Skip eligibility checks and mark as ready anyway.
 
 Options (detect):
   --ci                JSON output.

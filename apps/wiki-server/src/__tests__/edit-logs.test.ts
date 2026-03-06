@@ -1,23 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
+import type { editLogs } from "../schema.js";
 
 // ---- In-memory store simulating the edit_logs table ----
+// Store type is derived from the Drizzle schema so TypeScript catches column renames.
 
 let nextId = 1;
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
-let editStore: Array<{
-  id: number;
-  page_id: string | null;
-  page_id_old: string | null;
-  page_id_int: number | null;
-  date: string;
-  tool: string;
-  agency: string;
-  requested_by: string | null;
-  note: string | null;
-  created_at: Date;
-}>;
+// pageSlug is a synthetic convenience field (not a real DB column) to support
+// slug-based lookups in the dispatcher without a JOIN to wiki_pages.
+type EditLogRow = typeof editLogs.$inferSelect & { pageSlug: string | null };
+let editStore: Array<EditLogRow>;
 
 function getIntIdForSlug(slug: string): number {
   if (!slugIntIdMap.has(slug)) {
@@ -108,6 +102,21 @@ function createQueryResult(rows: unknown[], query: string): any {
   };
 }
 
+/** Convert a store row (camelCase Drizzle) to a raw SQL row (snake_case). */
+function toSqlRow(r: EditLogRow): Record<string, unknown> {
+  return {
+    id: r.id,
+    page_id_old: r.pageId,
+    page_id_int: r.pageIdInt,
+    date: r.date,
+    tool: r.tool,
+    agency: r.agency,
+    requested_by: r.requestedBy,
+    note: r.note,
+    created_at: r.createdAt,
+  };
+}
+
 function createMockSql() {
   function dispatch(query: string, params: unknown[]): unknown[] {
     const q = query.toLowerCase();
@@ -144,27 +153,27 @@ function createMockSql() {
       // Phase D2a: Drizzle sends positional params: page_id_int, date, tool, agency, requested_by, note per row
       const COLS = 6;
       const numRows = params.length / COLS;
-      const rows = [];
+      const rows: EditLogRow[] = [];
       for (let i = 0; i < numRows; i++) {
         const o = i * COLS;
         const pageIdInt = params[o] as number | null;
         const pageSlug = slugFromIntId(pageIdInt);
-        const row = {
+        const row: EditLogRow = {
           id: nextId++,
-          page_id: pageSlug,
-          page_id_old: null, // D2a: not written on insert
-          page_id_int: pageIdInt,
+          pageId: null, // D2a: not written on insert (maps to page_id_old column)
+          pageIdInt: pageIdInt,
+          pageSlug: pageSlug,
           date: String(params[o + 1]),
           tool: params[o + 2] as string,
           agency: params[o + 3] as string,
-          requested_by: (params[o + 4] as string) ?? null,
+          requestedBy: (params[o + 4] as string) ?? null,
           note: (params[o + 5] as string) ?? null,
-          created_at: new Date(),
+          createdAt: new Date(),
         };
         editStore.push(row);
         rows.push(row);
       }
-      return rows;
+      return rows.map(toSqlRow);
     }
 
     // ---- SELECT count(distinct page_id) FROM edit_logs ----
@@ -172,7 +181,7 @@ function createMockSql() {
     // Key is "page_id" because extractColumns finds the last quoted identifier
     // inside `count(distinct "edit_logs"."page_id")` as "page_id".
     if (q.includes("count(distinct") && q.includes("page_id") && q.includes("edit_logs")) {
-      const uniquePages = new Set(editStore.map((e) => e.page_id_int).filter((v) => v !== null));
+      const uniquePages = new Set(editStore.map((e) => e.pageIdInt).filter((v) => v !== null));
       // Phase D2a: count(distinct page_id_int) — extractColumns finds "page_id_int"
       return [{ page_id_int: uniquePages.size }];
     }
@@ -201,9 +210,9 @@ function createMockSql() {
     if (q.includes("edit_logs") && q.includes("group by") && q.includes("page_id") && q.includes("max(")) {
       const grouped: Record<string, string> = {};
       for (const e of editStore) {
-        if (e.page_id === null) continue;
-        if (!grouped[e.page_id] || e.date > grouped[e.page_id]) {
-          grouped[e.page_id] = e.date;
+        if (e.pageSlug === null) continue;
+        if (!grouped[e.pageSlug] || e.date > grouped[e.pageSlug]) {
+          grouped[e.pageSlug] = e.date;
         }
       }
       // Phase D2a: route returns { page_id, latest_date } via JOIN wiki_pages
@@ -214,9 +223,9 @@ function createMockSql() {
     if (q.includes("edit_logs") && q.includes("group by") && q.includes("page_id") && q.includes("min(")) {
       const grouped: Record<string, string> = {};
       for (const e of editStore) {
-        if (e.page_id === null) continue;
-        if (!grouped[e.page_id] || e.date < grouped[e.page_id]) {
-          grouped[e.page_id] = e.date;
+        if (e.pageSlug === null) continue;
+        if (!grouped[e.pageSlug] || e.date < grouped[e.pageSlug]) {
+          grouped[e.pageSlug] = e.date;
         }
       }
       // Phase D2a: route returns { page_id, earliest_date } via JOIN wiki_pages
@@ -240,8 +249,9 @@ function createMockSql() {
     if (q.includes("edit_logs") && q.includes("where") && q.includes("page_id_int") && !q.includes("limit")) {
       const intId = params[0] as number;
       return editStore
-        .filter((e) => e.page_id_int === intId)
-        .sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
+        .filter((e) => e.pageIdInt === intId)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id)
+        .map(toSqlRow);
     }
 
     // ---- SELECT ... ORDER BY ... LIMIT ... (all entries, paginated) ----
@@ -260,7 +270,7 @@ function createMockSql() {
 
       const limit = (params[paramIdx] as number) || 100;
       const offset = (params[paramIdx + 1] as number) || 0;
-      return filtered.slice(offset, offset + limit);
+      return filtered.slice(offset, offset + limit).map(toSqlRow);
     }
 
     return [];
