@@ -49,6 +49,28 @@ interface ScoredPr extends DetectedPr {
 
 type FixOutcome = 'fixed' | 'max-turns' | 'timeout' | 'error' | 'dry-run';
 
+type MergeOutcome = 'merged' | 'dry-run' | 'error';
+
+/** Reason a PR with ready-to-merge label is NOT eligible for merge. */
+export type MergeBlockReason =
+  | 'not-mergeable'
+  | 'ci-failing'
+  | 'ci-pending'
+  | 'unresolved-threads'
+  | 'unchecked-items'
+  | 'claude-working';
+
+export interface MergeCandidate {
+  number: number;
+  title: string;
+  branch: string;
+  createdAt: string;
+  eligible: boolean;
+  blockReasons: MergeBlockReason[];
+}
+
+const READY_TO_MERGE_LABEL = 'ready-to-merge';
+
 // ── Config ───────────────────────────────────────────────────────────────────
 
 export interface PatrolConfig {
@@ -498,7 +520,7 @@ interface GqlReviewThread {
   };
 }
 
-interface GqlPrNode {
+export interface GqlPrNode {
   number: number;
   title: string;
   headRefName: string;
@@ -593,16 +615,21 @@ export function detectIssues(
   return { issues, botComments };
 }
 
-async function detectAllPrIssues(config: PatrolConfig): Promise<DetectedPr[]> {
+export async function fetchOpenPrs(config: PatrolConfig): Promise<GqlPrNode[]> {
   const [owner, name] = config.repo.split('/');
   const data = await githubGraphQL<{
     repository: { pullRequests: { nodes: GqlPrNode[] } };
   }>(PR_QUERY, { owner, name });
-
   const prs = data.repository.pullRequests.nodes;
-  const staleThresholdMs = Date.now() - config.staleHours * 3600 * 1000;
-
   log(`Found ${prs.length} open PRs`);
+  return prs;
+}
+
+function detectAllPrIssuesFromNodes(
+  prs: GqlPrNode[],
+  config: PatrolConfig,
+): DetectedPr[] {
+  const staleThresholdMs = Date.now() - config.staleHours * 3600 * 1000;
 
   return prs
     .filter((pr) => {
@@ -652,6 +679,134 @@ function rankPrs(prs: DetectedPr[]): ScoredPr[] {
   return prs
     .map((pr) => ({ ...pr, score: computeScore(pr) }))
     .sort((a, b) => b.score - a.score);
+}
+
+// ── Merge eligibility ────────────────────────────────────────────────────────
+
+/** Pure function — checks whether a PR with ready-to-merge label is eligible for auto-merge. */
+export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
+  const blockReasons: MergeBlockReason[] = [];
+  const labels = pr.labels.nodes.map((l) => l.name);
+
+  if (labels.includes('claude-working')) {
+    blockReasons.push('claude-working');
+  }
+
+  if (pr.mergeable !== 'MERGEABLE') {
+    blockReasons.push('not-mergeable');
+  }
+
+  const contexts =
+    pr.commits?.nodes?.[0]?.commit?.statusCheckRollup?.contexts?.nodes ?? [];
+
+  const hasFailure = contexts.some(
+    (c) =>
+      c.conclusion === 'FAILURE' ||
+      c.conclusion === 'CANCELLED' ||
+      c.state === 'FAILURE' ||
+      c.state === 'ERROR',
+  );
+  if (hasFailure) {
+    blockReasons.push('ci-failing');
+  }
+
+  if (contexts.length > 0 && !hasFailure) {
+    const hasPending = contexts.some(
+      (c) =>
+        (c.conclusion === null || c.conclusion === undefined) &&
+        c.state !== 'SUCCESS',
+    );
+    if (hasPending) {
+      blockReasons.push('ci-pending');
+    }
+  }
+
+  const threads = pr.reviewThreads?.nodes ?? [];
+  const unresolvedThreads = threads.filter(
+    (t) => !t.isResolved && !t.isOutdated,
+  );
+  if (unresolvedThreads.length > 0) {
+    blockReasons.push('unresolved-threads');
+  }
+
+  const body = pr.body ?? '';
+  const uncheckedCheckboxes = [...body.matchAll(/^[\s]*-\s+\[ \]/gm)];
+  if (uncheckedCheckboxes.length > 0) {
+    blockReasons.push('unchecked-items');
+  }
+
+  return {
+    number: pr.number,
+    title: pr.title,
+    branch: pr.headRefName,
+    createdAt: pr.createdAt,
+    eligible: blockReasons.length === 0,
+    blockReasons,
+  };
+}
+
+/** Find all PRs labeled ready-to-merge and check their merge eligibility. Sorted oldest first. */
+export function findMergeCandidates(prs: GqlPrNode[]): MergeCandidate[] {
+  return prs
+    .filter((pr) => {
+      const labels = pr.labels.nodes.map((l) => l.name);
+      return labels.includes(READY_TO_MERGE_LABEL);
+    })
+    .map(checkMergeEligibility)
+    .sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    );
+}
+
+// ── Merge execution ─────────────────────────────────────────────────────────
+
+async function mergePr(
+  candidate: MergeCandidate,
+  config: PatrolConfig,
+): Promise<void> {
+  log(`→ Merging PR #${candidate.number} (${candidate.title})`);
+  log(`  Branch: ${candidate.branch}`);
+
+  if (config.dryRun) {
+    log('  [DRY RUN] Would squash-merge this PR');
+    appendJsonl(JSONL_FILE, {
+      type: 'merge_result',
+      pr_num: candidate.number,
+      outcome: 'dry-run' as MergeOutcome,
+    });
+    return;
+  }
+
+  try {
+    await githubApi(
+      `/repos/${config.repo}/pulls/${candidate.number}/merge`,
+      {
+        method: 'PUT',
+        body: {
+          merge_method: 'squash',
+        },
+      },
+    );
+
+    log(`✓ PR #${candidate.number} merged successfully`);
+
+    appendJsonl(JSONL_FILE, {
+      type: 'merge_result',
+      pr_num: candidate.number,
+      outcome: 'merged' as MergeOutcome,
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    log(`✗ Failed to merge PR #${candidate.number}: ${msg}`);
+
+    appendJsonl(JSONL_FILE, {
+      type: 'merge_result',
+      pr_num: candidate.number,
+      outcome: 'error' as MergeOutcome,
+      reason: msg,
+    });
+  }
 }
 
 // ── Prompt builder ──────────────────────────────────────────────────────────
@@ -1095,8 +1250,13 @@ async function runCheckCycle(
     return; // Main takes the whole cycle; PRs wait
   }
 
-  // 1. Detect PR issues
-  const detected = await detectAllPrIssues(config);
+  // 1. Fetch all open PRs (shared between fix and merge phases)
+  const allPrs = await fetchOpenPrs(config);
+
+  // ── Fix phase ──────────────────────────────────────────────────────
+
+  const detected = detectAllPrIssuesFromNodes(allPrs, config);
+  let fixedPr: number | null = null;
 
   // 1b. Check for PR file overlaps (informational — posts warnings)
   if (detected.length >= 2) {
@@ -1104,64 +1264,79 @@ async function runCheckCycle(
   }
 
   if (detected.length === 0) {
-    log('All PRs clean — nothing to do');
-    appendJsonl(JSONL_FILE, {
-      type: 'cycle_summary',
-      cycle_number: cycleCount,
-      prs_scanned: 0,
-      queue_size: 0,
-      pr_processed: null,
+    log('All PRs clean — nothing to fix');
+  } else {
+    // Filter cooldowns and abandoned
+    const eligible = detected.filter((pr) => {
+      if (isAbandoned(pr.number)) {
+        log(`  Skipping PR #${pr.number} (abandoned — needs human intervention)`);
+        return false;
+      }
+      if (isRecentlyProcessed(pr.number, config.cooldownSeconds)) {
+        log(`  Skipping PR #${pr.number} (recently processed)`);
+        return false;
+      }
+      return true;
     });
-    return;
-  }
 
-  // 2. Filter cooldowns and abandoned
-  const eligible = detected.filter((pr) => {
-    if (isAbandoned(pr.number)) {
-      log(`  Skipping PR #${pr.number} (abandoned — needs human intervention)`);
-      return false;
+    const ranked = rankPrs(eligible);
+    if (ranked.length > 0) {
+      log('');
+      log(`Fix queue (${ranked.length} items):`);
+      for (const pr of ranked) {
+        log(
+          `  [score=${pr.score}] PR #${pr.number}: ${pr.issues.join(',')} — ${pr.title}`,
+        );
+      }
+      log('');
+
+      const top = ranked[0];
+      await fixPr(top, config);
+      fixedPr = top.number;
+    } else {
+      log('All issues recently processed — nothing to fix');
     }
-    if (isRecentlyProcessed(pr.number, config.cooldownSeconds)) {
-      log(`  Skipping PR #${pr.number} (recently processed)`);
-      return false;
+  }
+
+  // ── Merge phase ────────────────────────────────────────────────────
+
+  const mergeCandidates = findMergeCandidates(allPrs);
+  const eligibleForMerge = mergeCandidates.filter((c) => c.eligible);
+  const blockedForMerge = mergeCandidates.filter((c) => !c.eligible);
+  let mergedPr: number | null = null;
+
+  if (mergeCandidates.length > 0) {
+    log('');
+    log(`Merge candidates (${mergeCandidates.length} with ${READY_TO_MERGE_LABEL}):`);
+    for (const c of eligibleForMerge) {
+      log(`  ✓ PR #${c.number}: eligible — ${c.title}`);
     }
-    return true;
-  });
-
-  // 3. Score and sort
-  const ranked = rankPrs(eligible);
-  if (ranked.length === 0) {
-    log('All issues recently processed — nothing to do');
-    appendJsonl(JSONL_FILE, {
-      type: 'cycle_summary',
-      cycle_number: cycleCount,
-      prs_scanned: detected.length,
-      queue_size: 0,
-      pr_processed: null,
-    });
-    return;
+    for (const c of blockedForMerge) {
+      log(`  ✗ PR #${c.number}: blocked (${c.blockReasons.join(', ')}) — ${c.title}`);
+    }
   }
 
-  // 4. Display queue
-  log('');
-  log(`Priority queue (${ranked.length} items):`);
-  for (const pr of ranked) {
-    log(
-      `  [score=${pr.score}] PR #${pr.number}: ${pr.issues.join(',')} — ${pr.title}`,
-    );
+  if (eligibleForMerge.length > 0) {
+    const toMerge = eligibleForMerge[0];
+    await mergePr(toMerge, config);
+    mergedPr = toMerge.number;
   }
-  log('');
 
-  // 5. Process highest priority
-  const top = ranked[0];
-  await fixPr(top, config);
+  // ── Cycle summary ──────────────────────────────────────────────────
 
   appendJsonl(JSONL_FILE, {
     type: 'cycle_summary',
     cycle_number: cycleCount,
-    prs_scanned: detected.length,
-    queue_size: ranked.length,
-    pr_processed: top.number,
+    prs_scanned: allPrs.length,
+    queue_size: detected.filter(
+      (pr) =>
+        !isAbandoned(pr.number) &&
+        !isRecentlyProcessed(pr.number, config.cooldownSeconds),
+    ).length,
+    pr_processed: fixedPr,
+    pr_merged: mergedPr,
+    merge_candidates: mergeCandidates.length,
+    merge_eligible: eligibleForMerge.length,
   });
 }
 
@@ -1243,6 +1418,10 @@ export function readRecentLogs(count: number): string {
         output.push(
           `  PR #${entry.pr_num}: ${entry.outcome} (${entry.elapsed_s}s) — ${entry.issues?.join(', ') ?? ''}`,
         );
+      } else if (entry.type === 'merge_result') {
+        output.push(
+          `  PR #${entry.pr_num}: merge-${entry.outcome}${entry.reason ? ` (${entry.reason})` : ''}`,
+        );
       } else if (entry.type === 'main_branch_result') {
         output.push(
           `  Main branch: ${entry.outcome} (${entry.elapsed_s}s) — run #${entry.run_id}`,
@@ -1253,8 +1432,13 @@ export function readRecentLogs(count: number): string {
         );
       } else if (entry.type === 'cycle_summary') {
         const mainFix = entry.main_branch_fix ? ', main_branch_fix=true' : '';
+        const mergeInfo = entry.pr_merged
+          ? `, merged=#${entry.pr_merged}`
+          : entry.merge_candidates > 0
+            ? `, merge-blocked=${entry.merge_candidates}`
+            : '';
         output.push(
-          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}${mainFix}`,
+          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}${mainFix}${mergeInfo}`,
         );
       }
     } catch {
