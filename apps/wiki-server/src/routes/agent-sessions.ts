@@ -115,15 +115,16 @@ const agentSessionsApp = new Hono()
     const parsed = UpdateAgentSessionSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const { checklistMd, status, prUrl, prOutcome, fixesPrUrl } = parsed.data;
+    const { checklistMd, status, prUrl, prOutcome, fixesPrUrl, sessionId } = parsed.data;
     if (
       checklistMd === undefined &&
       status === undefined &&
       prUrl === undefined &&
       prOutcome === undefined &&
-      fixesPrUrl === undefined
+      fixesPrUrl === undefined &&
+      sessionId === undefined
     ) {
-      return validationError(c, "At least one of checklistMd, status, prUrl, prOutcome, or fixesPrUrl must be provided");
+      return validationError(c, "At least one of checklistMd, status, prUrl, prOutcome, fixesPrUrl, or sessionId must be provided");
     }
 
     const updates: Record<string, unknown> = { updatedAt: new Date() };
@@ -137,6 +138,7 @@ const agentSessionsApp = new Hono()
     if (prUrl !== undefined) updates.prUrl = prUrl;
     if (prOutcome !== undefined) updates.prOutcome = prOutcome;
     if (fixesPrUrl !== undefined) updates.fixesPrUrl = fixesPrUrl;
+    if (sessionId !== undefined) updates.sessionId = sessionId;
 
     const db = getDrizzleDb();
     const result = await db

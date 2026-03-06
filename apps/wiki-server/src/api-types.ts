@@ -1174,6 +1174,8 @@ export const UpdateAgentSessionSchema = z.object({
   prUrl: z.string().url().max(1000).nullable().optional(),
   prOutcome: z.enum(PR_OUTCOMES).nullable().optional(),
   fixesPrUrl: z.string().url().max(1000).nullable().optional(),
+  /** FK to the sessions table — set when the session log is synced to the DB */
+  sessionId: z.number().int().positive().nullable().optional(),
 });
 export type UpdateAgentSession = z.infer<typeof UpdateAgentSessionSchema>;
 

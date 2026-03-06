@@ -49,10 +49,14 @@ async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
     revalidate: 60,
   });
 
-  // Build a branch → session log map for enrichment
+  // Build lookup maps for enrichment:
+  // 1. session_id → session log (direct FK, preferred for newer records)
+  // 2. branch → session log (fallback heuristic for older records without session_id)
+  const logsById = new Map<number, SessionRow>();
   const logsByBranch = new Map<string, SessionRow>();
   if (logsResult.ok) {
     for (const log of logsResult.data.items) {
+      logsById.set(log.id, log);
       if (log.branch) {
         logsByBranch.set(log.branch, log);
       }
@@ -60,7 +64,9 @@ async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
   }
 
   const rows: AgentSessionRow[] = agentResult.data.sessions.map((s): AgentSessionRow => {
-    const log = logsByBranch.get(s.branch);
+    // Prefer FK-linked session log; fall back to branch-name heuristic for older records
+    const log = (s.sessionId != null ? logsById.get(s.sessionId) : undefined)
+      ?? logsByBranch.get(s.branch);
     return {
       id: s.id,
       branch: s.branch,
@@ -72,7 +78,7 @@ async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
       startedAt: s.startedAt,
       completedAt: s.completedAt,
       // Prefer prUrl from agent_sessions (set by `crux issues done --pr=URL`),
-      // fall back to session log join on branch for older records.
+      // fall back to session log for older records.
       prUrl: s.prUrl ?? log?.prUrl ?? null,
       prOutcome: s.prOutcome ?? null,
       fixesPrUrl: s.fixesPrUrl ?? null,

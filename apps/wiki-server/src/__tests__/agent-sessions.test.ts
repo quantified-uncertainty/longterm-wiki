@@ -16,6 +16,7 @@ let store: Array<{
   session_type: string;
   issue_number: number | null;
   checklist_md: string;
+  session_id: number | null;
   status: string;
   started_at: Date;
   completed_at: Date | null;
@@ -48,6 +49,7 @@ const dispatch: SqlDispatcher = (query, params) => {
       session_type: params[2] as string,
       issue_number: params[3] as number | null,
       checklist_md: params[4] as string,
+      session_id: null,
       status: "active",
       started_at: new Date(),
       completed_at: null,
@@ -87,6 +89,9 @@ const dispatch: SqlDispatcher = (query, params) => {
             break;
           case "checklist_md":
             store[idx].checklist_md = params[pIdx] as string;
+            break;
+          case "session_id":
+            store[idx].session_id = params[pIdx] as number | null;
             break;
           case "status":
             store[idx].status = params[pIdx] as string;
@@ -483,6 +488,50 @@ describe("Agent Sessions API", () => {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: "not-json",
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("sets sessionId FK link to session log", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        sessionId: 42,
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.sessionId).toBe(42);
+    });
+
+    it("clears sessionId with null", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      // Set it first
+      await patchJson(app, "/api/agent-sessions/1", { sessionId: 42 });
+
+      // Now clear it
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        sessionId: null,
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.sessionId).toBeNull();
+    });
+
+    it("rejects non-integer sessionId", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        sessionId: 1.5,
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects zero sessionId", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        sessionId: 0,
       });
       expect(res.status).toBe(400);
     });
