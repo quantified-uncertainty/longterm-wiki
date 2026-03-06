@@ -1389,6 +1389,7 @@ async function runCheckCycle(
   for (const candidate of draftCandidates) {
     if (config.dryRun) {
       log(`  [DRY RUN] Would undraft PR #${candidate.number} (all other checks pass)`);
+      undraftedNumbers.add(candidate.number);
     } else {
       const success = await undraftPr(candidate.number, config);
       if (success) undraftedNumbers.add(candidate.number);

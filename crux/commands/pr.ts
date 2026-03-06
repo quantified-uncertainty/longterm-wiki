@@ -619,7 +619,18 @@ async function ready(_args: string[], options: CommandOptions): Promise<CommandR
   const c = log.colors;
   const force = Boolean(options.force);
 
-  let prNum: number | null = options.pr ? parseInt(String(options.pr), 10) : null;
+  let prNum: number | null = null;
+  if (options.pr !== undefined) {
+    const rawPr = String(options.pr);
+    const parsed = parseInt(rawPr, 10);
+    if (!Number.isInteger(parsed) || parsed <= 0) {
+      return {
+        output: `${c.red}Invalid --pr value: ${rawPr}${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+    prNum = parsed;
+  }
 
   if (!prNum) {
     const branch = currentBranch();
@@ -649,10 +660,10 @@ async function ready(_args: string[], options: CommandOptions): Promise<CommandR
   // Check eligibility (unless --force)
   if (!force) {
     const eligibility = checkMergeEligibility(prNode);
-    // Filter out ci-pending (normal for newly-pushed PRs) and is-draft
-    // (the whole point of this command is to undraft — it's not a block reason here)
+    // Ignore only is-draft: this command exists to remove that block.
+    // CI must still be green — matching PR Patrol auto-undraft behavior.
     const blockReasons = eligibility.blockReasons.filter(
-      (r: string) => r !== 'ci-pending' && r !== 'is-draft',
+      (r: string) => r !== 'is-draft',
     );
 
     if (blockReasons.length > 0) {
