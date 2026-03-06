@@ -9,6 +9,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import { join, extname } from "node:path";
 import { parse as parseYaml } from "yaml";
+import type { ScalarTag } from "yaml";
 import { Graph } from "./graph";
 import type {
   PropertiesFile,
@@ -34,7 +35,7 @@ export class RefMarker {
 }
 
 /** Custom YAML tag: !ref <stableId> */
-const refTag = {
+const refTag: ScalarTag = {
   tag: "!ref",
   resolve(str: string): RefMarker {
     return new RefMarker(str);
@@ -42,13 +43,8 @@ const refTag = {
   identify(value: unknown): value is RefMarker {
     return value instanceof RefMarker;
   },
-  stringify(
-    item: { value: RefMarker },
-    _ctx: unknown,
-    _onComment: unknown,
-    _onChompKeep: unknown
-  ): string {
-    return `!ref ${item.value.stableId}`;
+  stringify(item): string {
+    return `!ref ${(item.value as RefMarker).stableId}`;
   },
 };
 
