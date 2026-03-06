@@ -40,7 +40,7 @@ items:
     type: key-person
     entries:
       i_cJk7Lzvb8A:
-        person: yann-lecun
+        person: !ref cMbVUVK29Q  # yann-lecun
         title: "Chief AI Scientist"
         start: 2013-12
         is_founder: true

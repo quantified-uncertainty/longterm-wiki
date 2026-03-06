@@ -22,11 +22,14 @@ export class Graph {
   private schemas: Map<string, TypeSchema> = new Map();
   // thingId → collectionName → collection
   private items: Map<string, Map<string, ItemCollection>> = new Map();
+  // stableId → slug reverse index
+  private stableIdIndex: Map<string, string> = new Map();
 
   // ── Mutation (used by loader and inverse computation) ──────────────
 
   addThing(thing: Thing): void {
     this.things.set(thing.id, thing);
+    this.stableIdIndex.set(thing.stableId, thing.id);
   }
 
   /**
@@ -70,6 +73,17 @@ export class Graph {
 
   getThing(id: string): Thing | undefined {
     return this.things.get(id);
+  }
+
+  /** Resolve a stableId to its Thing. */
+  getThingByStableId(stableId: string): Thing | undefined {
+    const slug = this.stableIdIndex.get(stableId);
+    return slug ? this.things.get(slug) : undefined;
+  }
+
+  /** Resolve a stableId to a slug. Returns undefined if not found. */
+  resolveStableId(stableId: string): string | undefined {
+    return this.stableIdIndex.get(stableId);
   }
 
   getAllThings(): Thing[] {

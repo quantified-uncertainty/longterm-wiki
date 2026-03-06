@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_qfd3qL21HQ
     property: employed-by
-    value: openai
+    value: !ref 1LcLlMGLbw  # openai
     asOf: 2015-12
     validEnd: 2024-06
     source: https://openai.com/blog/introducing-openai

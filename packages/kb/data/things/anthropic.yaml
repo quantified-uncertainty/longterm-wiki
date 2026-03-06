@@ -368,21 +368,21 @@ items:
     type: key-person
     entries:
       i_Xp9vKZzBsg:
-        person: dario-amodei
+        person: !ref zR4nW8xB2f  # dario-amodei
         title: CEO
         start: 2021-01
         is_founder: true
         source: https://anthropic.com/company
 
       i_tvfFyLStkg:
-        person: daniela-amodei
+        person: !ref tKMznr07QA  # daniela-amodei
         title: President
         start: 2021-01
         is_founder: true
         source: https://anthropic.com/company
 
       i_eKbtDictxQ:
-        person: chris-olah
+        person: !ref Tz48rTriBg  # chris-olah
         title: "Research Lead, Mechanistic Interpretability"
         start: 2021-01
         is_founder: true
@@ -417,7 +417,7 @@ items:
         notes: "Originally CTO, transitioned to Chief Architect Oct 2025"
 
       i_XJb55cQ6zg:
-        person: jan-leike
+        person: !ref hQ7mR2kN5p  # jan-leike
         title: "Head of Alignment Science"
         start: 2024-05
         source: https://anthropic.com/news/jan-leike-joins-anthropic

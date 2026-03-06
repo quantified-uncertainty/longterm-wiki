@@ -46,7 +46,7 @@ items:
     type: key-person
     entries:
       i_cqQKO0KpfQ:
-        person: demis-hassabis
+        person: !ref Aqcyu3onCA  # demis-hassabis
         title: "Co-founder & CEO"
         start: 2010-09
         is_founder: true

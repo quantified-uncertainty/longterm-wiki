@@ -1,6 +1,9 @@
 /**
  * YAML → Graph loader.
  * Reads properties.yaml, schemas/*.yaml, and things/*.yaml from a data directory.
+ *
+ * Supports !ref YAML tags for stable references between entities:
+ *   value: !ref mK9pX3rQ7n   → resolves stableId to the entity's slug
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -19,6 +22,72 @@ import type {
   FactValue,
   ItemCollection,
 } from "./types";
+
+// ── !ref YAML tag ──────────────────────────────────────────────────
+
+/**
+ * Marker class for !ref YAML tags. Created during YAML parsing,
+ * resolved to slugs after all things are loaded.
+ */
+export class RefMarker {
+  constructor(public readonly stableId: string) {}
+}
+
+/** Custom YAML tag: !ref <stableId> */
+const refTag = {
+  tag: "!ref",
+  resolve(str: string): RefMarker {
+    return new RefMarker(str);
+  },
+  identify(value: unknown): value is RefMarker {
+    return value instanceof RefMarker;
+  },
+  stringify(
+    item: { value: RefMarker },
+    _ctx: unknown,
+    _onComment: unknown,
+    _onChompKeep: unknown
+  ): string {
+    return `!ref ${item.value.stableId}`;
+  },
+};
+
+const CUSTOM_TAGS = [refTag];
+
+/**
+ * Recursively resolves RefMarker instances in a parsed YAML structure.
+ * Returns the value with all RefMarkers replaced by their slug strings.
+ */
+function resolveRefs(
+  value: unknown,
+  graph: Graph,
+  context: string
+): unknown {
+  if (value instanceof RefMarker) {
+    const slug = graph.resolveStableId(value.stableId);
+    if (!slug) {
+      console.warn(
+        `[kb/loader] Unresolved !ref "${value.stableId}" in ${context}`
+      );
+      return value.stableId; // fallback: use raw stableId
+    }
+    return slug;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((v) => resolveRefs(v, graph, context));
+  }
+
+  if (value !== null && typeof value === "object") {
+    const resolved: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      resolved[k] = resolveRefs(v, graph, context);
+    }
+    return resolved;
+  }
+
+  return value;
+}
 
 // ── Value normalization ────────────────────────────────────────────────
 
@@ -185,7 +254,7 @@ async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unkno
   const results = await Promise.all(
     yamlFiles.map(async (filename) => {
       const content = await readFile(join(dir, filename), "utf-8");
-      return { name: filename, parsed: parseYaml(content) };
+      return { name: filename, parsed: parseYaml(content, { customTags: CUSTOM_TAGS }) };
     })
   );
 
@@ -201,6 +270,10 @@ async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unkno
  *   <dataDir>/properties.yaml
  *   <dataDir>/schemas/*.yaml
  *   <dataDir>/things/*.yaml
+ *
+ * Uses a two-pass approach for things:
+ *   Pass 1: Load all thing headers (builds stableId → slug index)
+ *   Pass 2: Load facts and items (resolves !ref tags using the index)
  */
 export async function loadKB(dataDir: string): Promise<Graph> {
   const graph = new Graph();
@@ -231,25 +304,38 @@ export async function loadKB(dataDir: string): Promise<Graph> {
     graph.addSchema(schema);
   }
 
-  // 3. Load things
+  // 3. Load things (two passes)
   const thingFiles = await readYamlFiles(join(dataDir, "things"));
+
+  // Pass 1: Load all thing headers to build stableId index
+  const parsedFiles: { thing: Thing; file: ThingFile }[] = [];
   for (const { parsed } of thingFiles) {
     const file = parsed as ThingFile;
-
-    // 3a. Parse thing
     const thing = parseThing(file.thing);
     graph.addThing(thing);
+    parsedFiles.push({ thing, file });
+  }
 
-    // 3b. Parse facts
+  // Pass 2: Load facts and items with !ref resolution
+  for (const { thing, file } of parsedFiles) {
+    // Resolve !ref markers in facts
     for (const rawFact of file.facts ?? []) {
-      const fact = parseFact(rawFact, thing.id, properties);
+      const resolvedValue = resolveRefs(rawFact.value, graph, `${thing.id}/facts`);
+      const resolvedFact = { ...rawFact, value: resolvedValue };
+      const fact = parseFact(resolvedFact as RawFact, thing.id, properties);
       if (fact) graph.addFact(fact);
     }
 
-    // 3c. Parse items
+    // Resolve !ref markers in items and add collections
     if (file.items) {
-      for (const collectionName of Object.keys(file.items)) {
-        const collection = parseItemCollection(file.items, collectionName);
+      const resolvedItems = resolveRefs(
+        file.items,
+        graph,
+        `${thing.id}/items`
+      ) as ThingFile["items"];
+
+      for (const collectionName of Object.keys(resolvedItems!)) {
+        const collection = parseItemCollection(resolvedItems, collectionName);
         if (collection) {
           graph.addItemCollection(thing.id, collectionName, collection);
         }

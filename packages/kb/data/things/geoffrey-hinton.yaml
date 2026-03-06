@@ -11,7 +11,7 @@ thing:
 facts:
   - id: f_CQptGEFesw
     property: employed-by
-    value: deepmind
+    value: !ref A4XoubikkQ  # deepmind
     asOf: 2013-03
     validEnd: 2023-05
     source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
