@@ -62,12 +62,13 @@ describe("sessionSweep", () => {
 
   beforeEach(() => {
     config = makeConfig();
-    process.env["WIKI_SERVER_API_KEY"] = "test-key";
+    process.env["LONGTERMWIKI_PROJECT_KEY"] = "test-key";
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-    delete process.env["WIKI_SERVER_API_KEY"];
+    delete process.env["LONGTERMWIKI_PROJECT_KEY"];
+    delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
   });
 
   it("returns success with no stale sessions message when swept=0", async () => {
@@ -101,13 +102,34 @@ describe("sessionSweep", () => {
     expect((calls[0][1] as RequestInit).method).toBe("POST");
   });
 
-  it("returns failure when API key is not set", async () => {
-    delete process.env["WIKI_SERVER_API_KEY"];
+  it("returns failure when no API key is set", async () => {
+    delete process.env["LONGTERMWIKI_PROJECT_KEY"];
+    delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
 
     const result = await sessionSweep(config);
 
     expect(result.success).toBe(false);
     expect(result.summary).toContain("failed");
+  });
+
+  it("uses LONGTERMWIKI_SERVER_API_KEY as fallback when project key is absent", async () => {
+    delete process.env["LONGTERMWIKI_PROJECT_KEY"];
+    process.env["LONGTERMWIKI_SERVER_API_KEY"] = "legacy-superkey";
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ swept: 0, sessions: [] }),
+      })
+    );
+
+    const result = await sessionSweep(config);
+
+    expect(result.success).toBe(true);
+    const calls = vi.mocked(fetch).mock.calls;
+    const headers = (calls[0][1] as RequestInit).headers as Record<string, string>;
+    expect(headers.Authorization).toBe("Bearer legacy-superkey");
   });
 
   it("returns failure when sweep endpoint fails", async () => {

@@ -32,6 +32,7 @@ import {
 import { computeRiskScores } from './ci-risk-scores.ts';
 import { runContentChecks } from './ci-content-checks.ts';
 import { buildPrBody } from './ci-pr-body.ts';
+import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -255,27 +256,18 @@ async function runParanoidReview(verbose: boolean): Promise<{ alerts: ReviewAler
       continue;
     }
 
-    // Extract JSON line (guards against pnpm/dotenv preamble)
-    const jsonLine = resultRaw
-      .split('\n')
-      .filter(line => line.trim().startsWith('{'))
-      .pop();
-
-    if (!jsonLine) {
-      console.warn(`::warning::${pageId} -- review produced no JSON output`);
-      continue;
-    }
-
-    let result: {
+    // Parse JSON from LLM output (handles code fences, preamble, truncation)
+    const result = parseJsonFromLlm<{
       needsReResearch?: boolean;
       gapCount?: number;
       overallAssessment?: string;
       error?: string;
-    };
-    try {
-      result = JSON.parse(jsonLine);
-    } catch {
-      console.warn(`::warning::${pageId} -- review JSON parse failed`);
+    }>(resultRaw, `paranoid-review:${pageId}`, () => {
+      console.warn(`::warning::${pageId} -- review JSON could not be parsed, skipping`);
+      return { error: 'unparseable' };
+    });
+
+    if (result.error === 'unparseable') {
       continue;
     }
 

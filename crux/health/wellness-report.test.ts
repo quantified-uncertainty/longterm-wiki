@@ -10,7 +10,7 @@
 
 import { describe, it, expect } from 'vitest';
 import type { CheckResult } from './health-check.ts';
-import { buildWellnessReport } from './wellness-report.ts';
+import { buildWellnessReport, WELLNESS_ISSUE_TITLE } from './wellness-report.ts';
 
 function makeCheck(overrides: Partial<CheckResult> = {}): CheckResult {
   return {
@@ -137,5 +137,14 @@ describe('buildWellnessReport', () => {
 
     // Should not crash and should skip the collapsible section
     expect(report.markdownSummary).not.toContain('<details>');
+  });
+});
+
+describe('WELLNESS_ISSUE_TITLE', () => {
+  it('is a stable string without a timestamp', () => {
+    // The title must be stable (no timestamp) so that concurrent workflow
+    // runs can find each other's issues and avoid duplicates.
+    expect(WELLNESS_ISSUE_TITLE).toBe('System wellness check failing');
+    expect(WELLNESS_ISSUE_TITLE).not.toMatch(/\d{4}-\d{2}-\d{2}/);
   });
 });
