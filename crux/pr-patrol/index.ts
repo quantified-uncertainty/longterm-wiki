@@ -58,7 +58,8 @@ export type MergeBlockReason =
   | 'ci-pending'
   | 'unresolved-threads'
   | 'unchecked-items'
-  | 'claude-working';
+  | 'claude-working'
+  | 'is-draft';
 
 export interface MergeCandidate {
   number: number;
@@ -486,7 +487,7 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
   repository(owner: $owner, name: $name) {
     pullRequests(first: 50, states: [OPEN], orderBy: {field: UPDATED_AT, direction: DESC}) {
       nodes {
-        number title headRefName mergeable createdAt updatedAt body
+        number title headRefName mergeable isDraft createdAt updatedAt body
         labels(first: 20) { nodes { name } }
         commits(last: 1) { nodes { commit { statusCheckRollup {
           contexts(first: 50) { nodes {
@@ -525,6 +526,7 @@ export interface GqlPrNode {
   title: string;
   headRefName: string;
   mergeable: string;
+  isDraft: boolean;
   createdAt: string;
   updatedAt: string;
   body: string | null;
@@ -625,6 +627,42 @@ export async function fetchOpenPrs(config: PatrolConfig): Promise<GqlPrNode[]> {
   return prs;
 }
 
+const SINGLE_PR_QUERY = `query($owner: String!, $name: String!, $number: Int!) {
+  repository(owner: $owner, name: $name) {
+    pullRequest(number: $number) {
+      number title headRefName mergeable isDraft createdAt updatedAt body
+      labels(first: 20) { nodes { name } }
+      commits(last: 1) { nodes { commit { statusCheckRollup {
+        contexts(first: 50) { nodes {
+          ... on CheckRun { conclusion }
+          ... on StatusContext { state }
+        }}
+      }}}}
+      reviewThreads(first: 50) { nodes {
+        isResolved isOutdated path line startLine
+        comments(first: 3) { nodes {
+          author { login }
+          body
+        }}
+      }}
+    }
+  }
+}`;
+
+/** Fetch a single PR by number. Used by `crux pr ready` for eligibility checks. */
+export async function fetchSinglePr(prNumber: number): Promise<GqlPrNode | null> {
+  const [owner, name] = REPO.split('/');
+  try {
+    const data = await githubGraphQL<{
+      repository: { pullRequest: GqlPrNode | null };
+    }>(SINGLE_PR_QUERY, { owner, name, number: prNumber });
+    return data.repository.pullRequest;
+  } catch (e) {
+    log(`Warning: could not fetch PR #${prNumber}: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  }
+}
+
 function detectAllPrIssuesFromNodes(
   prs: GqlPrNode[],
   config: PatrolConfig,
@@ -635,6 +673,8 @@ function detectAllPrIssuesFromNodes(
     .filter((pr) => {
       const labels = pr.labels.nodes.map((l) => l.name);
       if (labels.includes('claude-working')) return false;
+      // Skip draft PRs — they're not ready for automated fixes
+      if (pr.isDraft) return false;
       return true;
     })
     .map((pr) => {
@@ -687,6 +727,10 @@ function rankPrs(prs: DetectedPr[]): ScoredPr[] {
 export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
   const blockReasons: MergeBlockReason[] = [];
   const labels = pr.labels.nodes.map((l) => l.name);
+
+  if (pr.isDraft) {
+    blockReasons.push('is-draft');
+  }
 
   if (labels.includes('claude-working')) {
     blockReasons.push('claude-working');
@@ -757,6 +801,41 @@ export function findMergeCandidates(prs: GqlPrNode[]): MergeCandidate[] {
       (a, b) =>
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     );
+}
+
+// ── Undraft execution ────────────────────────────────────────────────────────
+
+async function undraftPr(prNum: number, config: PatrolConfig): Promise<boolean> {
+  log(`→ Undrafting PR #${prNum} (all eligibility checks pass)`);
+
+  try {
+    // GitHub REST API doesn't support undrafting — must use GraphQL mutation
+    const prData = await githubApi<{ node_id: string }>(
+      `/repos/${config.repo}/pulls/${prNum}`,
+    );
+    await githubGraphQL(
+      `mutation($id: ID!) { markPullRequestReadyForReview(input: { pullRequestId: $id }) { pullRequest { isDraft } } }`,
+      { id: prData.node_id },
+    );
+
+    log(`✓ PR #${prNum} marked as ready for review`);
+    appendJsonl(JSONL_FILE, {
+      type: 'undraft_result',
+      pr_num: prNum,
+      outcome: 'undrafted',
+    });
+    return true;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    log(`✗ Failed to undraft PR #${prNum}: ${msg}`);
+    appendJsonl(JSONL_FILE, {
+      type: 'undraft_result',
+      pr_num: prNum,
+      outcome: 'error',
+      reason: msg,
+    });
+    return false;
+  }
 }
 
 // ── Merge execution ─────────────────────────────────────────────────────────
@@ -1298,9 +1377,34 @@ async function runCheckCycle(
     }
   }
 
-  // ── Merge phase ────────────────────────────────────────────────────
+  // ── Undraft phase ──────────────────────────────────────────────────
+  // Auto-undraft draft PRs that are otherwise eligible for merge.
+  // A PR is auto-undrafted when its only block reason is 'is-draft'.
 
-  const mergeCandidates = findMergeCandidates(allPrs);
+  const draftCandidates = findMergeCandidates(allPrs).filter(
+    (c) => !c.eligible && c.blockReasons.length === 1 && c.blockReasons[0] === 'is-draft',
+  );
+
+  const undraftedNumbers = new Set<number>();
+  for (const candidate of draftCandidates) {
+    if (config.dryRun) {
+      log(`  [DRY RUN] Would undraft PR #${candidate.number} (all other checks pass)`);
+      undraftedNumbers.add(candidate.number);
+    } else {
+      const success = await undraftPr(candidate.number, config);
+      if (success) undraftedNumbers.add(candidate.number);
+    }
+  }
+
+  // ── Merge phase ────────────────────────────────────────────────────
+  // Re-evaluate after undrafting (only successfully undrafted PRs become eligible)
+  const mergeCandidates = findMergeCandidates(allPrs).map((c) => {
+    if (undraftedNumbers.has(c.number)) {
+      const updated = { ...c, blockReasons: c.blockReasons.filter((r) => r !== 'is-draft') };
+      return { ...updated, eligible: updated.blockReasons.length === 0 };
+    }
+    return c;
+  });
   const eligibleForMerge = mergeCandidates.filter((c) => c.eligible);
   const blockedForMerge = mergeCandidates.filter((c) => !c.eligible);
   let mergedPr: number | null = null;
