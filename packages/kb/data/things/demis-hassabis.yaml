@@ -24,4 +24,89 @@ facts:
   - id: f_Kw56YLSHSQ
     property: born-year
     value: 1976
-    notes: "Born 1976 in London; awarded Nobel Prize in Chemistry 2024 for AlphaFold protein structure prediction"
+    notes: "Born July 27, 1976 in London; awarded Nobel Prize in Chemistry 2024 for AlphaFold protein structure prediction"
+
+  - id: f_dH1aB2cD3e
+    property: education
+    value: "PhD in Cognitive Neuroscience, University College London; BA in Computer Science, University of Cambridge"
+    source: https://en.wikipedia.org/wiki/Demis_Hassabis
+    notes: "Double first in Computer Science from Queens' College, Cambridge"
+
+  - id: f_dH4fG5hI6j
+    property: notable-for
+    value: "CEO of Google DeepMind; creator of AlphaGo, AlphaFold, and Gemini; Nobel Prize in Chemistry 2024; chess prodigy and game designer"
+    source: https://en.wikipedia.org/wiki/Demis_Hassabis
+
+  - id: f_dH7kL8mN9o
+    property: social-media
+    value: "@demaborns"
+    source: https://x.com/demishassabis
+
+  - id: f_dHpQ1rS2t
+    property: role
+    value: "CEO, Google DeepMind"
+    asOf: 2023-04
+    source: https://deepmind.google/about/
+    notes: "Title changed after DeepMind merged with Google Brain in April 2023; also VP at Google/Alphabet"
+
+items:
+  career-history:
+    type: career-entry
+    entries:
+      i_dH1zA2bC3d:
+        organization: "Bullfrog Productions"
+        title: "Game Designer"
+        start: "1994"
+        end: "1997"
+        source: https://en.wikipedia.org/wiki/Demis_Hassabis
+        notes: "Joined Peter Molyneux's studio at age 17; co-designed Theme Park; led AI design for Black & White"
+
+      i_dH4eF5gH6i:
+        organization: "Elixir Studios"
+        title: "Founder & CEO"
+        start: "1998"
+        end: "2005"
+        source: https://en.wikipedia.org/wiki/Demis_Hassabis
+        notes: "Founded game studio; developed Republic: The Revolution and Evil Genius"
+
+      i_dH7jK8lM9n:
+        organization: "University College London"
+        title: "PhD Student & Research Fellow"
+        start: "2005"
+        end: "2009"
+        source: https://en.wikipedia.org/wiki/Demis_Hassabis
+        notes: "PhD in cognitive neuroscience; research on imagination and memory in the hippocampus"
+
+      i_dHoP1qR2s:
+        organization: !ref A4XoubikkQ  # deepmind
+        title: "Co-founder & CEO"
+        start: 2010-09
+        source: https://deepmind.google/about/
+        notes: "Co-founded DeepMind with Shane Legg and Mustafa Suleyman; acquired by Google for ~$500M in 2014; became CEO of Google DeepMind after 2023 merger with Google Brain"
+
+  notable-publications:
+    type: publication
+    entries:
+      i_dHtU3vW4x:
+        title: "Mastering the game of Go with deep neural networks and tree search (AlphaGo)"
+        year: 2016
+        url: https://www.nature.com/articles/nature16961
+        notes: "AlphaGo defeated world champion Lee Sedol; landmark achievement in AI"
+
+      i_dHyZ5aB6c:
+        title: "Mastering the game of Go without human knowledge (AlphaGo Zero)"
+        year: 2017
+        url: https://www.nature.com/articles/nature24270
+        notes: "Achieved superhuman play with zero human games as training data"
+
+      i_dHdE7fG8h:
+        title: "Highly accurate protein structure prediction with AlphaFold (AlphaFold 2)"
+        year: 2021
+        url: https://www.nature.com/articles/s41586-021-03819-2
+        notes: "Solved the 50-year-old protein folding problem; predicted structures for 200M+ proteins; led to 2024 Nobel Prize in Chemistry"
+
+      i_dHiJ9kL1m:
+        title: "A generalist agent (Gato)"
+        year: 2022
+        url: https://arxiv.org/abs/2205.06175
+        notes: "Single model performing 600+ tasks across robotics, games, language, and vision"

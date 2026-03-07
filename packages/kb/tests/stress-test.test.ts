@@ -428,21 +428,27 @@ describe("Q18: Jan Leike career history (was IMPOSSIBLE)", () => {
     // After computeInverses, there are both original and derived facts.
     // Filter to non-derived facts for the canonical career history.
     const original = careerFacts.filter((f) => f.derivedFrom === undefined);
-    expect(original).toHaveLength(2);
+    expect(original).toHaveLength(3);
 
     // Sort by start date
     const sorted = original
       .filter((f) => f.asOf !== undefined)
       .sort((a, b) => a.asOf!.localeCompare(b.asOf!));
 
-    // First position: OpenAI (2021-01 to 2024-05)
-    const openai = sorted[0];
+    // First position: DeepMind (2017 to 2021)
+    const deepmind = sorted[0];
+    expect(deepmind.value).toEqual({ type: "ref", value: "deepmind" });
+    expect(deepmind.asOf).toBe("2017");
+    expect(deepmind.validEnd).toBe("2021");
+
+    // Second position: OpenAI (2021-01 to 2024-05)
+    const openai = sorted[1];
     expect(openai.value).toEqual({ type: "ref", value: "openai" });
     expect(openai.asOf).toBe("2021-01");
     expect(openai.validEnd).toBe("2024-05");
 
-    // Second position: Anthropic (2024-05, ongoing)
-    const anthropic = sorted[1];
+    // Third position: Anthropic (2024-05, ongoing)
+    const anthropic = sorted[2];
     expect(anthropic.value).toEqual({ type: "ref", value: "anthropic" });
     expect(anthropic.asOf).toBe("2024-05");
     expect(anthropic.validEnd).toBeUndefined(); // Still there
