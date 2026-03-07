@@ -2,8 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "cd .. && npx pnpm@9 install",
-  "buildCommand": "node --import tsx/esm scripts/build-data.mjs && next build",
-  "github": {
-    "enabled": false
-  }
+  "buildCommand": "node --import tsx/esm scripts/build-data.mjs && next build"
 }
