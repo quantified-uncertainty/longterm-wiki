@@ -48,9 +48,9 @@ interface ScoredPr extends DetectedPr {
   score: number;
 }
 
-type FixOutcome = 'fixed' | 'max-turns' | 'timeout' | 'error' | 'dry-run';
+export type FixOutcome = 'fixed' | 'max-turns' | 'timeout' | 'error' | 'dry-run';
 
-type MergeOutcome = 'merged' | 'dry-run' | 'error';
+export type MergeOutcome = 'merged' | 'dry-run' | 'error';
 
 /** Reason a PR with ready-to-merge label is NOT eligible for merge. */
 export type MergeBlockReason =
@@ -92,8 +92,8 @@ export interface PatrolConfig {
 
 const STATE_DIR = '/tmp/pr-patrol-shared';
 const CACHE_DIR = join(process.env.HOME ?? '/tmp', '.cache', 'pr-patrol');
-const JSONL_FILE = join(CACHE_DIR, 'runs.jsonl');
-const REFLECTION_FILE = join(CACHE_DIR, 'reflections.jsonl');
+export const JSONL_FILE = join(CACHE_DIR, 'runs.jsonl');
+export const REFLECTION_FILE = join(CACHE_DIR, 'reflections.jsonl');
 
 export function buildConfig(
   _args: string[],
@@ -1519,49 +1519,4 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
   }
 }
 
-// ── Status command ──────────────────────────────────────────────────────────
-
-export function readRecentLogs(count: number): string {
-  if (!existsSync(JSONL_FILE)) return 'No PR Patrol logs found.\n';
-
-  const lines = readFileSync(JSONL_FILE, 'utf-8').trim().split('\n');
-  const recent = lines.slice(-count);
-  const output: string[] = ['Recent PR Patrol activity:\n'];
-
-  for (const line of recent) {
-    try {
-      const entry = JSON.parse(line);
-      if (entry.type === 'pr_result') {
-        output.push(
-          `  PR #${entry.pr_num}: ${entry.outcome} (${entry.elapsed_s}s) — ${entry.issues?.join(', ') ?? ''}`,
-        );
-      } else if (entry.type === 'merge_result') {
-        output.push(
-          `  PR #${entry.pr_num}: merge-${entry.outcome}${entry.reason ? ` (${entry.reason})` : ''}`,
-        );
-      } else if (entry.type === 'main_branch_result') {
-        output.push(
-          `  Main branch: ${entry.outcome} (${entry.elapsed_s}s) — run #${entry.run_id}`,
-        );
-      } else if (entry.type === 'overlap_warning') {
-        output.push(
-          `  Overlap: PR #${entry.pr_a} ↔ PR #${entry.pr_b} (${entry.shared_files} shared files)`,
-        );
-      } else if (entry.type === 'cycle_summary') {
-        const mainFix = entry.main_branch_fix ? ', main_branch_fix=true' : '';
-        const mergeInfo = entry.pr_merged
-          ? `, merged=#${entry.pr_merged}`
-          : entry.merge_candidates > 0
-            ? `, merge-blocked=${entry.merge_candidates}`
-            : '';
-        output.push(
-          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}${mainFix}${mergeInfo}`,
-        );
-      }
-    } catch {
-      // Skip malformed lines
-    }
-  }
-
-  return output.join('\n') + '\n';
-}
+// ── Status command (moved to log-reader.ts + format.ts) ─────────────────────
