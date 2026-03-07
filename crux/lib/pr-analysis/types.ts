@@ -50,7 +50,8 @@ export type MergeBlockReason =
   | 'unresolved-threads'
   | 'unchecked-items'
   | 'agent-working'
-  | 'is-draft';
+  | 'is-draft'
+  | 'in-merge-queue';
 
 export interface MergeCandidate {
   number: number;
@@ -58,6 +59,7 @@ export interface MergeCandidate {
   branch: string;
   createdAt: string;
   headOid: string;
+  nodeId: string; // GraphQL node ID for enqueuePullRequestForMerge
   eligible: boolean;
   blockReasons: MergeBlockReason[];
 }
@@ -89,6 +91,7 @@ export interface GqlReviewThread {
 }
 
 export interface GqlPrNode {
+  id: string; // GraphQL node ID (e.g. "PR_kwDON..."), needed for enqueuePullRequestForMerge
   number: number;
   title: string;
   headRefName: string;

@@ -90,6 +90,7 @@ export async function detectPrOverlaps(config: PatrolConfig, prs: DetectedPr[]):
 
   // Use GqlPrNode-shaped objects for the lib function
   const prNodes: GqlPrNode[] = prs.map((pr) => ({
+    id: '',
     number: pr.number,
     title: pr.title,
     headRefName: pr.branch,

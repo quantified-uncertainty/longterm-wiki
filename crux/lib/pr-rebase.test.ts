@@ -104,4 +104,12 @@ describe('shouldSkipPr', () => {
     expect(result.skip).toBe(true);
     expect(result.reason).toContain(LABELS.AGENT_WORKING);
   });
+
+  it('skips PR with stage:merging label (in merge queue)', () => {
+    const pr = makeCandidate({ labels: [LABELS.STAGE_MERGING] });
+    const result = shouldSkipPr(pr, NOW, OLD_BRANCH_TIP, 'feat: add feature', RECENT_WINDOW);
+    expect(result.skip).toBe(true);
+    expect(result.reason).toContain(LABELS.STAGE_MERGING);
+    expect(result.reason).toContain('merge queue');
+  });
 });

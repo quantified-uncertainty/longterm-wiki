@@ -19,7 +19,7 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
   repository(owner: $owner, name: $name) {
     pullRequests(first: 50, states: [OPEN], orderBy: {field: UPDATED_AT, direction: DESC}) {
       nodes {
-        number title headRefName headRefOid mergeable isDraft createdAt updatedAt body
+        id number title headRefName headRefOid mergeable isDraft createdAt updatedAt body
         labels(first: 20) { nodes { name } }
         commits(last: 1) { nodes { commit { statusCheckRollup {
           contexts(first: 50) { nodes {

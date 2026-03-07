@@ -149,6 +149,9 @@ function computeStage(blockReasons: MergeBlockReason[]): string {
   }
 
   // Map block reasons to human-readable stage descriptions
+  if (blockReasons.includes('in-merge-queue')) {
+    return 'In merge queue';
+  }
   if (blockReasons.includes('agent-working')) {
     return 'Claude is working on this PR';
   }
@@ -270,12 +273,12 @@ export async function postEventComment(
 
 // ── Event comment builders ───────────────────────────────────────────────────
 
-export function buildMergeComment(): string {
-  return '\u{1F916} **PR Patrol** \u{2014} Merged to main via squash merge.';
+export function buildEnqueuedComment(): string {
+  return '\u{1F916} **PR Patrol** \u{2014} Added to the merge queue. GitHub will run CI and merge automatically.';
 }
 
-export function buildMergeFailedComment(reason: string): string {
-  return `\u{1F916} **PR Patrol** \u{2014} Merge failed: ${reason}`;
+export function buildEnqueueFailedComment(reason: string): string {
+  return `\u{1F916} **PR Patrol** \u{2014} Failed to add to merge queue: ${reason}`;
 }
 
 export function buildFixAttemptComment(issues: string[]): string {

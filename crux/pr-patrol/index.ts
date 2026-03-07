@@ -91,7 +91,7 @@ import {
 import { rankPrs as daemonRankPrs } from './scoring.ts';
 import {
   findMergeCandidates as daemonFindMergeCandidates,
-  mergePr,
+  enqueuePr,
   undraftPr,
 } from './merge.ts';
 import {
@@ -290,7 +290,7 @@ async function runCheckCycle(
   });
   const eligibleForMerge = mergeCandidates.filter((c) => c.eligible);
   const blockedForMerge = mergeCandidates.filter((c) => !c.eligible);
-  let mergedPr: number | null = null;
+  const enqueuedPrs: number[] = [];
 
   if (mergeCandidates.length > 0) {
     log('');
@@ -314,10 +314,12 @@ async function runCheckCycle(
     }
   }
 
-  if (eligibleForMerge.length > 0) {
-    const toMerge = eligibleForMerge[0];
-    await mergePr(toMerge, config);
-    mergedPr = toMerge.number;
+  // Enqueue ALL eligible PRs — the merge queue handles serialization
+  for (const candidate of eligibleForMerge) {
+    const outcome = await enqueuePr(candidate, config);
+    if (outcome === 'enqueued' || outcome === 'dry-run') {
+      enqueuedPrs.push(candidate.number);
+    }
   }
 
   // ── Cycle summary ──────────────────────────────────────────────────
@@ -332,7 +334,7 @@ async function runCheckCycle(
         !isRecentlyProcessed(pr.number, config.cooldownSeconds),
     ).length,
     pr_processed: fixedPr,
-    pr_merged: mergedPr,
+    prs_enqueued: enqueuedPrs.length > 0 ? enqueuedPrs : undefined,
     merge_candidates: mergeCandidates.length,
     merge_eligible: eligibleForMerge.length,
   });
@@ -431,13 +433,16 @@ export function readRecentLogs(count: number): string {
         );
       } else if (entry.type === 'cycle_summary') {
         const mainFix = entry.main_branch_fix ? ', main_branch_fix=true' : '';
+        const enqueueInfo = entry.prs_enqueued?.length
+          ? `, enqueued=[${entry.prs_enqueued.map((n: number) => `#${n}`).join(', ')}]`
+          : '';
         const mergeInfo = entry.pr_merged
           ? `, merged=#${entry.pr_merged}`
-          : entry.merge_candidates > 0
+          : !enqueueInfo && entry.merge_candidates > 0
             ? `, merge-blocked=${entry.merge_candidates}`
             : '';
         output.push(
-          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}${mainFix}${mergeInfo}`,
+          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}${mainFix}${enqueueInfo}${mergeInfo}`,
         );
       }
     } catch {
