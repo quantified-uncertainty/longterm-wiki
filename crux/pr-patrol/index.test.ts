@@ -3,6 +3,8 @@ import {
   checkMergeEligibility,
   findMergeCandidates,
   detectIssues,
+  computeBudget,
+  looksLikeNoOp,
   type GqlPrNode,
 } from './index.ts';
 
@@ -383,6 +385,46 @@ describe('findMergeCandidates', () => {
   });
 });
 
+// ── computeBudget ────────────────────────────────────────────────────────────
+
+describe('computeBudget', () => {
+  it('gives small budget for missing-issue-ref only', () => {
+    const budget = computeBudget(['missing-issue-ref']);
+    expect(budget.maxTurns).toBe(5);
+    expect(budget.timeoutMinutes).toBe(3);
+  });
+
+  it('gives small budget for missing-testplan only', () => {
+    const budget = computeBudget(['missing-testplan']);
+    expect(budget.maxTurns).toBe(8);
+    expect(budget.timeoutMinutes).toBe(5);
+  });
+
+  it('gives medium budget for ci-failure', () => {
+    const budget = computeBudget(['ci-failure']);
+    expect(budget.maxTurns).toBe(25);
+    expect(budget.timeoutMinutes).toBe(15);
+  });
+
+  it('gives full budget for conflict', () => {
+    const budget = computeBudget(['conflict']);
+    expect(budget.maxTurns).toBe(40);
+    expect(budget.timeoutMinutes).toBe(30);
+  });
+
+  it('uses highest budget when multiple issues present', () => {
+    const budget = computeBudget(['missing-issue-ref', 'ci-failure']);
+    expect(budget.maxTurns).toBe(25);
+    expect(budget.timeoutMinutes).toBe(15);
+  });
+
+  it('conflict dominates when mixed with smaller issues', () => {
+    const budget = computeBudget(['missing-testplan', 'conflict', 'missing-issue-ref']);
+    expect(budget.maxTurns).toBe(40);
+    expect(budget.timeoutMinutes).toBe(30);
+  });
+});
+
 // ── detectIssues (regression test after refactor) ────────────────────────────
 
 describe('detectIssues', () => {
@@ -429,5 +471,45 @@ describe('detectIssues', () => {
     // Set stale threshold to far in the past so this PR is not stale
     const result = detectIssues(pr, 0);
     expect(result.issues).toEqual([]);
+  });
+});
+
+// ── looksLikeNoOp ───────────────────────────────────────────────────────────
+
+describe('looksLikeNoOp', () => {
+  it('detects "no action needed" in output tail', () => {
+    expect(looksLikeNoOp('Analyzed the issue. No action needed for this PR.')).toBe(true);
+  });
+
+  it('detects "requires human intervention"', () => {
+    expect(looksLikeNoOp('The check-protected-paths check requires human intervention to add the label.')).toBe(true);
+  });
+
+  it('detects "pre-existing failure"', () => {
+    expect(looksLikeNoOp('This is a pre-existing failure also present on main.')).toBe(true);
+  });
+
+  it('detects "also failing on main"', () => {
+    expect(looksLikeNoOp('The CI check is also failing on main, so this is not introduced by this PR.')).toBe(true);
+  });
+
+  it('detects "stopping early"', () => {
+    expect(looksLikeNoOp('Stopping early because the issue cannot be resolved automatically.')).toBe(true);
+  });
+
+  it('does NOT flag normal fix output', () => {
+    expect(looksLikeNoOp('Fixed the TypeScript error in src/index.ts. All tests passing now.')).toBe(false);
+  });
+
+  it('does NOT flag output with "no" in unrelated context', () => {
+    expect(looksLikeNoOp('Added the missing test. No regressions found after running the suite.')).toBe(false);
+  });
+
+  it('only checks last 1000 chars of output', () => {
+    const longOutput = 'x'.repeat(2000) + 'No action needed.';
+    expect(looksLikeNoOp(longOutput)).toBe(true);
+    // Pattern in the first 1000 chars but not the last 1000
+    const earlyMatch = 'No action needed.' + 'x'.repeat(2000);
+    expect(looksLikeNoOp(earlyMatch)).toBe(false);
   });
 });

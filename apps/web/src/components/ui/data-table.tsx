@@ -12,10 +12,11 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { Search } from "lucide-react"
+import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -43,6 +44,8 @@ interface DataTableWithDataProps<TData, TValue> {
   defaultSorting?: SortingState
   renderExpandedRow?: (row: Row<TData>) => React.ReactNode
   getRowClassName?: (row: Row<TData>) => string
+  /** Number of rows per page. Defaults to 100. Set to 0 to disable pagination. */
+  pageSize?: number
 }
 
 type DataTableProps<TData, TValue = unknown> =
@@ -170,11 +173,23 @@ function DataTableWithData<TData, TValue>({
   defaultSorting = [],
   renderExpandedRow,
   getRowClassName,
+  pageSize = 100,
 }: DataTableWithDataProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>(defaultSorting)
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = React.useState("")
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: pageSize > 0 ? pageSize : data.length,
+  })
+
+  // Reset to page 1 when filter changes
+  React.useEffect(() => {
+    setPagination((p) => ({ ...p, pageIndex: 0 }))
+  }, [globalFilter])
+
+  const paginationEnabled = pageSize > 0
 
   const table = useReactTable({
     data,
@@ -184,18 +199,36 @@ function DataTableWithData<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    ...(paginationEnabled
+      ? {
+          getPaginationRowModel: getPaginationRowModel(),
+          onPaginationChange: setPagination,
+        }
+      : {}),
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: "includesString",
     state: {
       sorting,
       columnFilters,
       globalFilter,
+      ...(paginationEnabled ? { pagination } : {}),
     },
   })
 
+  const filteredCount = table.getFilteredRowModel().rows.length
+  const pageCount = table.getPageCount()
+  const currentPage = table.getState().pagination.pageIndex + 1
+  const canPrev = table.getCanPreviousPage()
+  const canNext = table.getCanNextPage()
+
+  // Page range info: "Showing 1-100 of 500"
+  const { pageIndex, pageSize: ps } = table.getState().pagination
+  const rangeStart = pageIndex * ps + 1
+  const rangeEnd = Math.min((pageIndex + 1) * ps, filteredCount)
+
   return (
     <div className="space-y-4">
-      {/* Search */}
+      {/* Search + row count */}
       <div className="flex items-center gap-4 pb-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -207,7 +240,9 @@ function DataTableWithData<TData, TValue>({
           />
         </div>
         <span className="text-sm text-muted-foreground whitespace-nowrap">
-          {table.getFilteredRowModel().rows.length} of {data.length} results
+          {filteredCount === data.length
+            ? `${data.length} results`
+            : `${filteredCount} of ${data.length} results`}
         </span>
       </div>
 
@@ -217,6 +252,38 @@ function DataTableWithData<TData, TValue>({
         renderExpandedRow={renderExpandedRow}
         getRowClassName={getRowClassName}
       />
+
+      {/* Pagination controls (only shown when pagination is enabled and there are multiple pages) */}
+      {paginationEnabled && pageCount > 1 && (
+        <div className="flex items-center justify-between px-1">
+          <span className="text-sm text-muted-foreground">
+            Showing {rangeStart}–{rangeEnd} of {filteredCount}
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => table.previousPage()}
+              disabled={!canPrev}
+              className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Prev
+            </button>
+            <span className="px-2 text-xs text-muted-foreground tabular-nums">
+              {currentPage} / {pageCount}
+            </span>
+            <button
+              onClick={() => table.nextPage()}
+              disabled={!canNext}
+              className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              aria-label="Next page"
+            >
+              Next
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

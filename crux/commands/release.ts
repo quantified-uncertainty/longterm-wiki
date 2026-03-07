@@ -177,7 +177,7 @@ export async function determineTitle(date: string): Promise<string> {
 
 // ── Label management ─────────────────────────────────────────────────────────
 
-const RELEASE_LABEL = 'release';
+const RELEASE_LABEL = '0-release';
 
 async function ensureLabel(): Promise<void> {
   try {

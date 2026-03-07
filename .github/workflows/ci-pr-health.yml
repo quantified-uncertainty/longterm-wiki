@@ -14,8 +14,8 @@ run-name: "CI & PR Health${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || 
 
 on:
   schedule:
-    - cron: "0 8 * * *" # 8 AM UTC daily
-    - cron: "0 20 * * *" # 8 PM UTC daily
+    - cron: "10 8 * * *" # 8:10 AM UTC daily (staggered +10min from server-api-health to avoid duplicate issue creation)
+    - cron: "10 20 * * *" # 8:10 PM UTC daily
   workflow_dispatch:
 
 concurrency:
