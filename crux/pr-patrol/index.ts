@@ -28,6 +28,7 @@ export type PrIssueType =
   | 'bot-review-nitpick';
 
 interface BotComment {
+  threadId: string;
   path: string;
   line: number | null;
   startLine: number | null;
@@ -614,7 +615,7 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
           }}
         }}}}
         reviewThreads(first: 50) { nodes {
-          isResolved isOutdated path line startLine
+          id isResolved isOutdated path line startLine
           comments(first: 3) { nodes {
             author { login }
             body
@@ -626,6 +627,7 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
 }`;
 
 interface GqlReviewThread {
+  id: string;
   isResolved: boolean;
   isOutdated: boolean;
   path: string;
@@ -684,6 +686,7 @@ function extractBotComments(pr: GqlPrNode): BotComment[] {
     if (!KNOWN_BOT_LOGINS.has(firstComment.author.login)) continue;
 
     comments.push({
+      threadId: thread.id,
       path: thread.path,
       line: thread.line,
       startLine: thread.startLine,
@@ -757,7 +760,7 @@ const SINGLE_PR_QUERY = `query($owner: String!, $name: String!, $number: Int!) {
         }}
       }}}}
       reviewThreads(first: 50) { nodes {
-        isResolved isOutdated path line startLine
+        id isResolved isOutdated path line startLine
         comments(first: 3) { nodes {
           author { login }
           body
@@ -1202,6 +1205,27 @@ function spawnClaude(
   });
 }
 
+/** Best-effort: resolve CodeRabbit review threads that were addressed by the fix. */
+async function resolveBotReviewThreads(botComments: BotComment[]): Promise<void> {
+  if (botComments.length === 0) return;
+
+  let resolved = 0;
+  for (const comment of botComments) {
+    try {
+      await githubGraphQL(
+        `mutation($id: ID!) { resolveReviewThread(input: {threadId: $id}) { thread { isResolved } } }`,
+        { id: comment.threadId },
+      );
+      resolved++;
+    } catch (e) {
+      log(`  ${cl.dim}Warning: could not resolve thread on ${comment.path}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+    }
+  }
+  if (resolved > 0) {
+    log(`  Resolved ${resolved}/${botComments.length} bot review thread(s)`);
+  }
+}
+
 async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
   log(`${cl.bold}→${cl.reset} Fixing PR ${cl.cyan}#${pr.number}${cl.reset} (${pr.title})`);
   log(`  Issues: ${cl.yellow}${pr.issues.join(', ')}${cl.reset}`);
@@ -1253,6 +1277,11 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
             body: `🤖 **PR Patrol** ran for ${elapsedS}s (${config.maxTurns} max turns, model: ${config.model}).\n\n**Issues detected**: ${pr.issues.join(', ')}\n\n**Result**:\n${summary}`,
           },
         }).catch(() => log('  Warning: could not post summary comment'));
+      }
+
+      // Resolve bot review threads that were addressed by this fix
+      if (pr.botComments.length > 0) {
+        await resolveBotReviewThreads(pr.botComments);
       }
     } else if (result.hitMaxTurns) {
       const failCount = recordMaxTurnsFailure(pr.number);
