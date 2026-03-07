@@ -107,15 +107,17 @@ describe("snapshotRetention", () => {
     expect(result.summary).toContain("citation_accuracy: FAILED");
   });
 
-  it("returns failure when no API key is set", async () => {
-    // Clear both content key and legacy superkey — neither is available
+  it("returns success (skipped) when no API key is set", async () => {
+    // Clear both content key and legacy superkey — neither is available.
+    // Missing config is a graceful skip, not a failure, so the circuit
+    // breaker doesn't trip on every run.
     delete process.env["LONGTERMWIKI_CONTENT_KEY"];
     delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
 
     const result = await snapshotRetention(config);
 
-    expect(result.success).toBe(false);
-    expect(result.summary).toContain("FAILED");
+    expect(result.success).toBe(true);
+    expect(result.summary).toContain("Skipped");
   });
 
   it("uses LONGTERMWIKI_SERVER_API_KEY as fallback when content key is absent", async () => {
