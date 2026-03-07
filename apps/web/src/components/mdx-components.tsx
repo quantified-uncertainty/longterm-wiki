@@ -23,6 +23,10 @@ import { AnthropicStakeholdersTable } from "@/components/wiki/AnthropicStakehold
 import { KBFactTable } from "@/components/wiki/kb/KBFactTable";
 import { KBItemTable } from "@/components/wiki/kb/KBItemTable";
 import { KBFactValue } from "@/components/wiki/kb/KBFactValue";
+import { KBEntityFacts } from "@/components/wiki/kb/KBEntityFacts";
+import { KBItemCollection } from "@/components/wiki/kb/KBItemCollection";
+import { KBEntitySidebar } from "@/components/wiki/kb/KBEntitySidebar";
+import { KBRefLink } from "@/components/wiki/kb/KBRefLink";
 
 // Table view components
 import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
@@ -164,10 +168,14 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   // Anthropic-specific table
   AnthropicStakeholdersTable,
 
-  // KB (Knowledge Base) — typed facts and item collections
+  // KB (Knowledge Base) — typed facts, item collections, entity data
   KBFactTable,
   KBItemTable,
   KBFactValue,
+  KBEntityFacts,
+  KBItemCollection,
+  KBEntitySidebar,
+  KBRefLink,
 
   // Epic tracking
   EpicTracker,

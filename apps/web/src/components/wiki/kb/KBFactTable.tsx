@@ -61,10 +61,10 @@ export function KBFactTable({ entity, property, title }: KBFactTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Value</TableHead>
-              <TableHead>Source</TableHead>
-              <TableHead>Notes</TableHead>
+              <TableHead scope="col">Date</TableHead>
+              <TableHead scope="col">Value</TableHead>
+              <TableHead scope="col">Source</TableHead>
+              <TableHead scope="col">Notes</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

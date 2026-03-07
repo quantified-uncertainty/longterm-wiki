@@ -7,7 +7,7 @@
  */
 
 import { getDatabase } from "@data";
-import type { Fact, Property, Thing, TypeSchema, ItemEntry } from "@longterm-wiki/kb";
+import type { Fact, Property, Entity, TypeSchema, ItemEntry } from "@longterm-wiki/kb";
 import type { SerializedKB } from "@longterm-wiki/kb";
 
 function getKB(): SerializedKB | undefined {
@@ -71,14 +71,37 @@ export function getKBProperty(propertyId: string): Property | undefined {
 }
 
 /**
- * Get a thing definition by ID.
+ * Get an entity definition by ID.
  */
-export function getKBThing(thingId: string): Thing | undefined {
+export function getKBEntity(entityId: string): Entity | undefined {
   const kb = getKB();
   if (!kb) return undefined;
 
-  return kb.things.find((t) => t.id === thingId);
+  return kb.entities.find((t: Entity) => t.id === entityId);
 }
+
+/**
+ * Get all KB entities.
+ */
+export function getKBEntities(): Entity[] {
+  const kb = getKB();
+  if (!kb) return [];
+
+  return kb.entities;
+}
+
+/**
+ * Get all KB properties.
+ */
+export function getKBProperties(): Property[] {
+  const kb = getKB();
+  if (!kb) return [];
+
+  return kb.properties;
+}
+
+/** @deprecated Use getKBEntity instead */
+export const getKBThing = getKBEntity;
 
 /**
  * Get a type schema by type name.
@@ -91,14 +114,14 @@ export function getKBSchema(type: string): TypeSchema | undefined {
 }
 
 /**
- * Find all item entries across all entities that reference the given thingId.
- * Scans item fields for string matches against the thingId.
+ * Find all item entries across all entities that reference the given entityId.
+ * Scans item fields for string matches against the entityId.
  * Uses schema field definitions when available to identify ref-type fields.
  */
 export function getKBItemsMentioning(
-  thingId: string
+  entityId: string
 ): Array<{
-  ownerThingId: string;
+  ownerEntityId: string;
   ownerName: string;
   collection: string;
   entry: ItemEntry;
@@ -108,19 +131,19 @@ export function getKBItemsMentioning(
   if (!kb) return [];
 
   const results: Array<{
-    ownerThingId: string;
+    ownerEntityId: string;
     ownerName: string;
     collection: string;
     entry: ItemEntry;
     matchingFields: string[];
   }> = [];
 
-  for (const [ownerThingId, collections] of Object.entries(kb.items)) {
-    if (ownerThingId === thingId) continue; // Skip self
+  for (const [ownerEntityId, collections] of Object.entries(kb.items)) {
+    if (ownerEntityId === entityId) continue; // Skip self
 
-    const ownerThing = kb.things.find((t) => t.id === ownerThingId);
-    const schema = ownerThing
-      ? kb.schemas.find((s) => s.type === ownerThing.type)
+    const ownerEntity = kb.entities.find((t: Entity) => t.id === ownerEntityId);
+    const schema = ownerEntity
+      ? kb.schemas.find((s) => s.type === ownerEntity.type)
       : undefined;
 
     for (const [collectionName, entries] of Object.entries(collections)) {
@@ -132,12 +155,12 @@ export function getKBItemsMentioning(
         for (const [fieldName, fieldValue] of Object.entries(entry.fields)) {
           const fieldDef = fieldDefs?.[fieldName];
 
-          if (fieldDef?.type === "ref" && fieldValue === thingId) {
+          if (fieldDef?.type === "ref" && fieldValue === entityId) {
             matchingFields.push(fieldName);
           } else if (
             !fieldDef &&
             typeof fieldValue === "string" &&
-            fieldValue === thingId
+            fieldValue === entityId
           ) {
             matchingFields.push(fieldName);
           }
@@ -145,8 +168,8 @@ export function getKBItemsMentioning(
 
         if (matchingFields.length > 0) {
           results.push({
-            ownerThingId,
-            ownerName: ownerThing?.name ?? ownerThingId,
+            ownerEntityId,
+            ownerName: ownerEntity?.name ?? ownerEntityId,
             collection: collectionName,
             entry,
             matchingFields,
