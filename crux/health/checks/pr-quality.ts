@@ -4,14 +4,15 @@
  * Checks:
  *   - Recent PRs with empty/missing body (<20 chars)
  *   - Stale open PRs (>7 days since last update)
- *   - Issues stuck with claude-working label (>8 hours)
+ *   - Issues stuck with agent:working label (>8 hours)
  *   - Open bug count (informational)
  *
- * Optionally auto-removes stale claude-working labels (self-healing).
+ * Optionally auto-removes stale agent:working labels (self-healing).
  */
 
 import type { CheckResult } from '../health-check.ts';
 import { githubApi, REPO } from '../../lib/github.ts';
+import { LABELS } from '../../lib/labels.ts';
 
 interface PullRequest {
   number: number;
@@ -109,14 +110,14 @@ export async function checkPrQuality(options?: {
 
   // ── Issue quality checks ─────────────────────────────────────────────
 
-  // Check for claude-working label issues stuck >8 hours
+  // Check for agent:working label issues stuck >8 hours
   let stuckIssues: Issue[] = [];
   try {
     stuckIssues = await githubApi<Issue[]>(
-      `/repos/${REPO}/issues?labels=claude-working&state=open&per_page=20`,
+      `/repos/${REPO}/issues?labels=${encodeURIComponent(LABELS.AGENT_WORKING)}&state=open&per_page=20`,
     );
   } catch (err) {
-    detail.push(`SKIP  claude-working issues: ${err instanceof Error ? err.message : String(err)}`);
+    detail.push(`SKIP  ${LABELS.AGENT_WORKING} issues: ${err instanceof Error ? err.message : String(err)}`);
   }
 
   const stuckOnes = stuckIssues.filter((issue) => {
@@ -125,16 +126,16 @@ export async function checkPrQuality(options?: {
   });
 
   if (stuckOnes.length > 0) {
-    failures.push(`${stuckOnes.length} issue(s) stuck with claude-working label for 8+ hours`);
+    failures.push(`${stuckOnes.length} issue(s) stuck with ${LABELS.AGENT_WORKING} label for 8+ hours`);
 
     if (cleanupStaleLabels) {
       for (const issue of stuckOnes) {
         try {
           await githubApi(
-            `/repos/${REPO}/issues/${issue.number}/labels/${encodeURIComponent('claude-working')}`,
+            `/repos/${REPO}/issues/${issue.number}/labels/${encodeURIComponent(LABELS.AGENT_WORKING)}`,
             { method: 'DELETE' },
           );
-          detail.push(`WARN  #${issue.number} ${issue.title.slice(0, 50)} — auto-removed stale claude-working label`);
+          detail.push(`WARN  #${issue.number} ${issue.title.slice(0, 50)} — auto-removed stale ${LABELS.AGENT_WORKING} label`);
         } catch (err) {
           // 404 means label was already removed — that's fine
           const msg = err instanceof Error ? err.message : String(err);
@@ -147,11 +148,11 @@ export async function checkPrQuality(options?: {
       }
     } else {
       for (const issue of stuckOnes) {
-        detail.push(`WARN  #${issue.number} ${issue.title.slice(0, 50)} — stuck with claude-working`);
+        detail.push(`WARN  #${issue.number} ${issue.title.slice(0, 50)} — stuck with ${LABELS.AGENT_WORKING}`);
       }
     }
   } else {
-    detail.push('PASS  No stuck claude-working sessions');
+    detail.push(`PASS  No stuck ${LABELS.AGENT_WORKING} sessions`);
   }
 
   // Count open bugs (informational)

@@ -281,14 +281,14 @@ describe('issues list — priority ranking', () => {
     expect(pos3).toBeLessThan(pos5);
   });
 
-  it('separates claude-working issues into In Progress section', async () => {
+  it('separates agent:working issues into In Progress section', async () => {
     mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 10, title: 'Normal issue', labels: [] }),
-      makeIssue({ number: 20, title: 'Active issue', labels: ['claude-working'] }),
+      makeIssue({ number: 20, title: 'Active issue', labels: ['agent:working'] }),
     ]);
     const result = await commands.list([], {});
     expect(result.output).toContain('In Progress');
-    // claude-working issue should appear before the queue section
+    // agent:working issue should appear before the queue section
     const progressSection = result.output.slice(0, result.output.indexOf('Queue:'));
     expect(progressSection).toContain('#20');
   });
@@ -402,13 +402,13 @@ describe('issues next', () => {
     expect(result.output).toContain('No open issues');
   });
 
-  it('returns message when all issues are claude-working', async () => {
+  it('returns message when all issues are agent:working', async () => {
     mockGithubApiPaginated.mockResolvedValueOnce([
-      makeIssue({ number: 1, labels: ['claude-working'] }),
+      makeIssue({ number: 1, labels: ['agent:working'] }),
     ]);
     const result = await commands.next([], {});
     expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('claude-working');
+    expect(result.output).toContain('agent:working');
   });
 
   it('shows the highest-priority issue with start command hint', async () => {
@@ -448,7 +448,7 @@ describe('issues next', () => {
   it('reports when all issues are blocked or in-progress', async () => {
     mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 1, labels: ['blocked'] }),
-      makeIssue({ number: 2, labels: ['claude-working'] }),
+      makeIssue({ number: 2, labels: ['agent:working'] }),
     ]);
     const result = await commands.next([], {});
     expect(result.exitCode).toBe(0);
@@ -554,21 +554,21 @@ describe('issues cleanup', () => {
     vi.clearAllMocks();
   });
 
-  it('reports all clean when no claude-working issues and no duplicates', async () => {
+  it('reports all clean when no agent:working issues and no duplicates', async () => {
     mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 1, title: 'Unique issue A' }),
       makeIssue({ number: 2, title: 'Completely different B' }),
     ]);
     const result = await commands.cleanup([], {});
     expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('No claude-working issues');
+    expect(result.output).toContain('No agent:working issues');
     expect(result.output).toContain('No potential duplicates');
   });
 
-  it('detects stale claude-working when branch does not exist', async () => {
+  it('detects stale agent:working when branch does not exist', async () => {
     // First call: fetchOpenIssues
     mockGithubApiPaginated.mockResolvedValueOnce([
-      makeIssue({ number: 10, title: 'WIP issue', labels: ['claude-working'] }),
+      makeIssue({ number: 10, title: 'WIP issue', labels: ['agent:working'] }),
     ]);
     // Second call: fetch comments for issue #10
     mockGithubApi.mockResolvedValueOnce([

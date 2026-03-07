@@ -149,7 +149,7 @@ function computeStage(blockReasons: MergeBlockReason[]): string {
   }
 
   // Map block reasons to human-readable stage descriptions
-  if (blockReasons.includes('claude-working')) {
+  if (blockReasons.includes('agent-working')) {
     return 'Claude is working on this PR';
   }
   if (blockReasons.includes('ci-pending')) {

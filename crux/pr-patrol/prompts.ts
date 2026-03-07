@@ -51,7 +51,7 @@ ${issues.join(', ')}
 - Check CI status: gh pr checks ${num} --repo ${repo}
 - Read the failing check logs to understand the failure
 - **STOP IMMEDIATELY and report** if ANY of these apply:
-  - The check requires a human action (adding a label like \`rules-change-reviewed\`, manual approval, etc.)
+  - The check requires a human action (adding a label like \`gate:rules-ok\`, manual approval, etc.)
   - The failure is in a Vercel deployment or external service (not a code issue)
   - The same check is also failing on the \`main\` branch (pre-existing, not caused by this PR)
   - The failure is a permissions or authentication issue

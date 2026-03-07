@@ -263,7 +263,7 @@ async function runCheckCycle(
 
   if (mergeCandidates.length > 0) {
     log('');
-    log(`${cl.bold}Merge candidates${cl.reset} (${mergeCandidates.length} with ready-to-merge):`);
+    log(`${cl.bold}Merge candidates${cl.reset} (${mergeCandidates.length} with stage:approved):`);
     for (const mc of eligibleForMerge) {
       log(`  ${cl.green}✓${cl.reset} PR ${cl.cyan}#${mc.number}${cl.reset}: eligible ${cl.dim}—${cl.reset} ${mc.title}`);
     }

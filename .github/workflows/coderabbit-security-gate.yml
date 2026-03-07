@@ -1,14 +1,14 @@
 name: CodeRabbit Security Gate
 
 # Blocks merges when CodeRabbit has unresolved Critical or Major review threads.
-# A human can override by adding the `coderabbit-security-ok` label.
+# A human can override by adding the `gate:security-ok` label.
 #
 # Why this gate exists: CodeRabbit flagged 3 security issues across PRs #1613,
 # #1623, and #1634 that were self-merged without human review. See issue #1649.
 #
 # How to override:
 #   1. Review the CodeRabbit findings (resolve each thread or acknowledge it)
-#   2. Add the `coderabbit-security-ok` label to the PR
+#   2. Add the `gate:security-ok` label to the PR
 #   3. The check will re-run and pass
 #
 # Note: The label must be added by a human — bots and claude-* actors are
@@ -24,7 +24,7 @@ jobs:
     # Only re-run on label events when relevant label changes
     if: >-
       github.event.action != 'labeled' && github.event.action != 'unlabeled' ||
-      github.event.label.name == 'coderabbit-security-ok'
+      github.event.label.name == 'gate:security-ok'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -34,7 +34,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const OVERRIDE_LABEL = 'coderabbit-security-ok';
+            const OVERRIDE_LABEL = 'gate:security-ok';
             const COMMENT_MARKER = '<!-- coderabbit-security-gate -->';
             // CodeRabbit appears as 'coderabbitai' in GraphQL but 'coderabbitai[bot]' in REST.
             // Accept both to be resilient to API differences.

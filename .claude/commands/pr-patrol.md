@@ -25,7 +25,7 @@ For each PR, check:
 | **Missing test plan** | PR body lacks `## Test plan` section | P3 (score: 20) |
 | **Bot review (nitpick)** | Unresolved nitpick-only bot comments | P3 (score: 15) |
 
-**Skip PRs with the `claude-working` label** — another session is already on them.
+**Skip PRs with the `agent:working` label** — another session is already on them.
 
 ## Phase 2: Prioritize
 

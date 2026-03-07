@@ -26,7 +26,7 @@ function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-03-05T00:00:00Z',
     body: '## Summary\n\n- [x] Task done\n\n## Test plan\n\n- [x] Tests pass\n\nCloses #1',
-    labels: { nodes: [{ name: 'ready-to-merge' }] },
+    labels: { nodes: [{ name: 'stage:approved' }] },
     commits: {
       nodes: [
         {
@@ -163,8 +163,8 @@ describe('buildStatusCommentBody', () => {
     expect(body).toContain('`ci-failing`');
   });
 
-  it('shows stage for claude-working', () => {
-    const body = buildStatusCommentBody(makePrNode(), ['claude-working']);
+  it('shows stage for agent-working', () => {
+    const body = buildStatusCommentBody(makePrNode(), ['agent-working']);
     expect(body).toContain('Claude is working on this PR');
   });
 
@@ -196,20 +196,20 @@ describe('buildStatusCommentBody', () => {
   });
 
   it('uses first matching block reason for stage when multiple overlap', () => {
-    // 'claude-working' takes precedence over 'ci-failing' because it appears first
+    // 'agent-working' takes precedence over 'ci-failing' because it appears first
     // in the computeStage priority chain
     const body = buildStatusCommentBody(makePrNode(), [
       'ci-failing',
-      'claude-working',
+      'agent-working',
     ]);
     expect(body).toContain('Claude is working on this PR');
     // Both block reasons should still appear in the Blocks line
     expect(body).toContain('`ci-failing`');
-    expect(body).toContain('`claude-working`');
+    expect(body).toContain('`agent-working`');
   });
 
   it('picks ci-pending stage over ci-failing when both present', () => {
-    // 'claude-working' is checked first, then 'ci-pending', then 'ci-failing'
+    // 'agent-working' is checked first, then 'ci-pending', then 'ci-failing'
     const body = buildStatusCommentBody(makePrNode(), [
       'ci-failing',
       'ci-pending',

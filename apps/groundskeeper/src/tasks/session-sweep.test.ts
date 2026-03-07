@@ -170,7 +170,7 @@ describe("sessionSweep", () => {
     expect(result.summary).toContain("no linked issues");
   });
 
-  it("removes claude-working label from closed issues", async () => {
+  it("removes agent:working label from closed issues", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
@@ -185,7 +185,7 @@ describe("sessionSweep", () => {
       })
     );
 
-    const mockOctokit = makeMockOctokit("closed", ["claude-working", "bug"]);
+    const mockOctokit = makeMockOctokit("closed", ["agent:working", "bug"]);
     vi.mocked(getOctokit).mockReturnValue(mockOctokit as never);
 
     const result = await sessionSweep(config);
@@ -197,7 +197,7 @@ describe("sessionSweep", () => {
       owner: "test-owner",
       repo: "test-repo",
       issue_number: 100,
-      name: "claude-working",
+      name: "agent:working",
     });
   });
 
@@ -213,7 +213,7 @@ describe("sessionSweep", () => {
       })
     );
 
-    const mockOctokit = makeMockOctokit("open", ["claude-working"]);
+    const mockOctokit = makeMockOctokit("open", ["agent:working"]);
     vi.mocked(getOctokit).mockReturnValue(mockOctokit as never);
 
     const result = await sessionSweep(config);
@@ -222,7 +222,7 @@ describe("sessionSweep", () => {
     expect(mockOctokit.rest.issues.removeLabel).not.toHaveBeenCalled();
   });
 
-  it("skips label removal when issue lacks claude-working label", async () => {
+  it("skips label removal when issue lacks agent:working label", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
@@ -259,7 +259,7 @@ describe("sessionSweep", () => {
       })
     );
 
-    const mockOctokit = makeMockOctokit("closed", ["claude-working"]);
+    const mockOctokit = makeMockOctokit("closed", ["agent:working"]);
     vi.mocked(getOctokit).mockReturnValue(mockOctokit as never);
 
     const result = await sessionSweep(config);

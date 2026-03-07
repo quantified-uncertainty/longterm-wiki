@@ -10,7 +10,7 @@ When the task description references a GitHub issue number (e.g., "resolve issue
 pnpm crux issues start <ISSUE_NUM>
 ```
 
-This posts a start comment on the issue and adds the `claude-working` label. The label is created automatically if it doesn't exist yet.
+This posts a start comment on the issue and adds the `agent:working` label. The label is created automatically if it doesn't exist yet.
 
 **Do NOT use raw curl/GitHub API calls for issue tracking.** Always use `crux issues` commands — they route through `githubApi()` which validates request bodies for shell-expansion corruption before sending to GitHub.
 
@@ -22,7 +22,7 @@ After the work is committed and pushed (via `/push-and-ensure-green`), signal co
 pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
 ```
 
-This posts a completion comment and removes the `claude-working` label.
+This posts a completion comment and removes the `agent:working` label.
 
 ## PR Management
 
@@ -45,7 +45,7 @@ PRBODY
 
 - Humans can see at a glance which issues are being handled
 - Prevents multiple sessions picking up the same issue simultaneously
-- The `claude-working` label enables filtering in the GitHub issues list
+- The `agent:working` label enables filtering in the GitHub issues list
 - Creates a paper trail connecting branches/PRs to the originating issue
 - `crux` commands validate for corruption — raw curl/jq commands are vulnerable to shell-expansion bugs
 

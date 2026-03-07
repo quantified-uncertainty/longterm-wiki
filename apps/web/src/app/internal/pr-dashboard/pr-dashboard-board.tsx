@@ -118,9 +118,8 @@ function PRCard({ pr }: { pr: PullData }) {
   const displayLabels = pr.labels.filter(
     (l) =>
       l !== "stage:approved" &&
-      l !== "ready-to-merge" &&
-      l !== "claude-working" &&
-      l !== "filed-by-agent"
+      l !== "agent:working" &&
+      l !== "agent:filed"
   );
 
   return (
