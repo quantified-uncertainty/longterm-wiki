@@ -40,10 +40,19 @@ export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
   const contexts =
     pr.commits?.nodes?.[0]?.commit?.statusCheckRollup?.contexts?.nodes ?? [];
 
+  // GitHub CheckRun conclusions that indicate a non-passing state.
+  // See: https://docs.github.com/en/graphql/reference/enums#checkconclusionstate
+  const FAILING_CONCLUSIONS = new Set([
+    'FAILURE',
+    'CANCELLED',
+    'TIMED_OUT',
+    'ACTION_REQUIRED',
+    'STARTUP_FAILURE',
+    'STALE',
+  ]);
   const hasFailure = contexts.some(
     (c) =>
-      c.conclusion === 'FAILURE' ||
-      c.conclusion === 'CANCELLED' ||
+      (c.conclusion != null && FAILING_CONCLUSIONS.has(c.conclusion)) ||
       c.state === 'FAILURE' ||
       c.state === 'ERROR',
   );
@@ -81,6 +90,7 @@ export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
     title: pr.title,
     branch: pr.headRefName,
     createdAt: pr.createdAt,
+    headOid: pr.headRefOid,
     eligible: blockReasons.length === 0,
     blockReasons,
   };
@@ -155,12 +165,15 @@ export async function mergePr(
   }
 
   try {
+    // Pass head SHA for optimistic concurrency — GitHub returns 409 if
+    // the PR head changed between our check and the merge request.
     await githubApi(
       `/repos/${config.repo}/pulls/${candidate.number}/merge`,
       {
         method: 'PUT',
         body: {
           merge_method: 'squash',
+          sha: candidate.headOid,
         },
       },
     );

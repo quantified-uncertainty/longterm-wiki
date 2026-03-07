@@ -4,6 +4,13 @@
 
 import type { DetectedPr } from './types.ts';
 
+// ── Shell safety ────────────────────────────────────────────────────────────
+
+/** Shell-quote a value to prevent injection via attacker-controlled inputs (e.g., branch names). */
+function shQuote(value: string): string {
+  return `'${value.replaceAll("'", "'\\''")}'`;
+}
+
 // ── PR fix prompt ────────────────────────────────────────────────────────────
 
 export function buildPrompt(pr: DetectedPr, repo: string): string {
@@ -24,8 +31,8 @@ ${issues.join(', ')}
    gh pr view ${num} --repo ${repo} --json headRefName,body,statusCheckRollup,reviews
 
 2. Check out the PR branch:
-   git fetch origin ${branch}
-   git checkout ${branch}
+   git fetch origin ${shQuote(branch)}
+   git checkout ${shQuote(branch)}
 
 3. Fix each detected issue:`);
 

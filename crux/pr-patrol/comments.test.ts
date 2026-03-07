@@ -20,6 +20,7 @@ function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
     number: 1,
     title: 'Test PR',
     headRefName: 'claude/test',
+    headRefOid: 'abc123def456',
     mergeable: 'MERGEABLE',
     isDraft: false,
     createdAt: '2026-01-01T00:00:00Z',

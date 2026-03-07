@@ -97,6 +97,9 @@ export function recordFailure(key: number | string): number {
 export function resetFailCount(key: number | string): void {
   const file = join(STATE_DIR, `failures-${key}`);
   if (existsSync(file)) writeFileSync(file, '0');
+  // Also clear legacy file so getFailCount() doesn't return stale values
+  const legacyFile = join(STATE_DIR, `max-turns-${key}`);
+  if (existsSync(legacyFile)) writeFileSync(legacyFile, '0');
 }
 
 export function isAbandoned(key: number | string): boolean {

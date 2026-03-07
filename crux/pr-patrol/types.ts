@@ -54,6 +54,7 @@ export interface MergeCandidate {
   title: string;
   branch: string;
   createdAt: string;
+  headOid: string;
   eligible: boolean;
   blockReasons: MergeBlockReason[];
 }
@@ -98,6 +99,7 @@ export interface GqlPrNode {
   number: number;
   title: string;
   headRefName: string;
+  headRefOid: string;
   mergeable: string;
   isDraft: boolean;
   createdAt: string;

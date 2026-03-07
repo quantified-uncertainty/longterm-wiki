@@ -81,6 +81,20 @@ ${recentEntries}
       log(
         `⚠ Reflection incomplete (${elapsedS}s, ${reason})`,
       );
+    } else if (result.exitCode !== 0) {
+      // Non-zero exit without timeout/max-turns — subprocess crashed or errored
+      appendJsonl(REFLECTION_FILE, {
+        cycle_number: cycleCount,
+        elapsed_s: elapsedS,
+        filed_issue: false,
+        exit_code: result.exitCode,
+        outcome: 'incomplete',
+        reason: 'non-zero-exit',
+        summary: result.output.slice(-500),
+      });
+      log(
+        `⚠ Reflection failed with exit code ${result.exitCode} (${elapsedS}s)`,
+      );
     } else {
       const filedIssue = /Created issue #|created.*#\d/.test(result.output);
       appendJsonl(REFLECTION_FILE, {

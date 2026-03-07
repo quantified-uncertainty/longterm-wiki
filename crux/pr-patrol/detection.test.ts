@@ -7,6 +7,7 @@ function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
     number: 1,
     title: 'Test PR',
     headRefName: 'claude/test',
+    headRefOid: 'abc123def456',
     mergeable: 'MERGEABLE',
     isDraft: false,
     createdAt: '2026-01-01T00:00:00Z',
@@ -239,6 +240,14 @@ describe('detectIssues', () => {
 
   it('accepts Fixes and Resolves as issue refs', () => {
     for (const keyword of ['Closes #1', 'Fixes #2', 'Resolves #3']) {
+      const pr = makePrNode({ body: `## Test plan\n\n${keyword}` });
+      const result = detectIssues(pr, 0);
+      expect(result.issues).not.toContain('missing-issue-ref');
+    }
+  });
+
+  it('accepts lowercase closing keywords (case-insensitive)', () => {
+    for (const keyword of ['closes #1', 'fixes #2', 'resolves #3', 'CLOSES #4']) {
       const pr = makePrNode({ body: `## Test plan\n\n${keyword}` });
       const result = detectIssues(pr, 0);
       expect(result.issues).not.toContain('missing-issue-ref');

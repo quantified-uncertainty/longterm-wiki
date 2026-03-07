@@ -232,6 +232,15 @@ export function spawnClaude(
 
     let output = '';
     let timedOut = false;
+    let forceKillTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const clearTimers = () => {
+      clearTimeout(timer);
+      if (forceKillTimer) {
+        clearTimeout(forceKillTimer);
+        forceKillTimer = null;
+      }
+    };
 
     // Hard timeout — kill subprocess if it runs too long
     const timeoutMs = config.timeoutMinutes * 60 * 1000;
@@ -239,9 +248,13 @@ export function spawnClaude(
       timedOut = true;
       log(`  ⚠ Claude subprocess timed out after ${config.timeoutMinutes}m — killing`);
       child.kill('SIGTERM');
-      // Force kill if SIGTERM doesn't work within 10s
-      setTimeout(() => {
-        if (!child.killed) child.kill('SIGKILL');
+      // Force kill if SIGTERM doesn't exit within 10s.
+      // Note: child.killed is true as soon as kill() is called, so we check
+      // exitCode/signalCode instead to know if the process actually exited.
+      forceKillTimer = setTimeout(() => {
+        if (child.exitCode === null && child.signalCode === null) {
+          child.kill('SIGKILL');
+        }
       }, 10_000);
     }, timeoutMs);
 
@@ -258,7 +271,7 @@ export function spawnClaude(
     child.stdin.end();
 
     child.on('close', (code) => {
-      clearTimeout(timer);
+      clearTimers();
       resolve({
         exitCode: code ?? 1,
         output,
@@ -267,7 +280,7 @@ export function spawnClaude(
       });
     });
     child.on('error', (err) => {
-      clearTimeout(timer);
+      clearTimers();
       reject(err);
     });
   });
@@ -299,8 +312,13 @@ async function releasePr(prNum: number, repo: string): Promise<void> {
       method: 'DELETE',
     });
   } catch (e) {
-    // Label may not exist or already removed — not actionable
-    void e;
+    // 404 is expected (label already absent) — swallow silently.
+    // Any other error (network, 500, auth) needs visibility since a stale
+    // claude-working label makes detectAllPrIssuesFromNodes skip the PR.
+    const msg = e instanceof Error ? e.message : String(e);
+    if (!msg.includes('404') && !msg.includes('Not Found')) {
+      log(`  Warning: could not remove claude-working label from PR #${prNum}: ${msg}`);
+    }
   }
   if (claimedPr === prNum) claimedPr = null;
 }

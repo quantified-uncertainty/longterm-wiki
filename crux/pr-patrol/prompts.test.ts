@@ -60,10 +60,31 @@ describe('buildPrompt', () => {
     expect(prompt).toContain('git rebase origin/main');
   });
 
+  it('shell-escapes branch names to prevent injection', () => {
+    const pr = makeDetectedPr({
+      branch: "test; rm -rf /",
+      issues: ['conflict'],
+    });
+    const prompt = buildPrompt(pr, REPO);
+    // Branch name should be shell-quoted, not raw
+    expect(prompt).toContain("'test; rm -rf /'");
+    expect(prompt).not.toContain('git fetch origin test; rm -rf /');
+  });
+
+  it('shell-escapes branch names with single quotes', () => {
+    const pr = makeDetectedPr({
+      branch: "it's-a-branch",
+      issues: ['conflict'],
+    });
+    const prompt = buildPrompt(pr, REPO);
+    expect(prompt).toContain("'it'\\''s-a-branch'");
+  });
+
   it('includes bot-review-major section with actionable label', () => {
     const pr = makeDetectedPr({
       issues: ['bot-review-major'],
       botComments: [{
+        threadId: 'thread-1',
         path: 'src/foo.ts',
         line: 10,
         startLine: null,
@@ -81,6 +102,7 @@ describe('buildPrompt', () => {
     const pr = makeDetectedPr({
       issues: ['bot-review-nitpick'],
       botComments: [{
+        threadId: 'thread-2',
         path: 'src/bar.ts',
         line: 5,
         startLine: null,
@@ -122,6 +144,7 @@ describe('buildPrompt', () => {
     const pr = makeDetectedPr({
       issues: ['bot-review-major'],
       botComments: [{
+        threadId: 'thread-3',
         path: 'src/foo.ts',
         line: 10,
         startLine: null,
@@ -139,6 +162,7 @@ describe('buildPrompt', () => {
     const pr = makeDetectedPr({
       issues: ['bot-review-major'],
       botComments: [{
+        threadId: 'thread-4',
         path: 'src/foo.ts',
         line: 20,
         startLine: 15,

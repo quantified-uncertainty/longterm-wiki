@@ -15,6 +15,7 @@ function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
     number: 1,
     title: 'Test PR',
     headRefName: 'claude/test',
+    headRefOid: 'abc123def456',
     mergeable: 'MERGEABLE',
     isDraft: false,
     createdAt: '2026-01-01T00:00:00Z',
@@ -108,6 +109,94 @@ describe('checkMergeEligibility', () => {
     expect(result.blockReasons).toContain('ci-failing');
   });
 
+  it('blocks when CI has TIMED_OUT conclusion', () => {
+    const result = checkMergeEligibility(
+      makePrNode({
+        commits: {
+          nodes: [
+            {
+              commit: {
+                statusCheckRollup: {
+                  contexts: {
+                    nodes: [{ conclusion: 'TIMED_OUT' }],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('ci-failing');
+  });
+
+  it('blocks when CI has ACTION_REQUIRED conclusion', () => {
+    const result = checkMergeEligibility(
+      makePrNode({
+        commits: {
+          nodes: [
+            {
+              commit: {
+                statusCheckRollup: {
+                  contexts: {
+                    nodes: [{ conclusion: 'ACTION_REQUIRED' }],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('ci-failing');
+  });
+
+  it('blocks when CI has STARTUP_FAILURE conclusion', () => {
+    const result = checkMergeEligibility(
+      makePrNode({
+        commits: {
+          nodes: [
+            {
+              commit: {
+                statusCheckRollup: {
+                  contexts: {
+                    nodes: [{ conclusion: 'STARTUP_FAILURE' }],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('ci-failing');
+  });
+
+  it('blocks when CI has STALE conclusion', () => {
+    const result = checkMergeEligibility(
+      makePrNode({
+        commits: {
+          nodes: [
+            {
+              commit: {
+                statusCheckRollup: {
+                  contexts: {
+                    nodes: [{ conclusion: 'STALE' }],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('ci-failing');
+  });
+
   it('blocks when CI has CANCELLED conclusion', () => {
     const result = checkMergeEligibility(
       makePrNode({
@@ -179,6 +268,7 @@ describe('checkMergeEligibility', () => {
         reviewThreads: {
           nodes: [
             {
+              id: 'thread-1',
               isResolved: false,
               isOutdated: false,
               path: 'src/foo.ts',
@@ -204,6 +294,7 @@ describe('checkMergeEligibility', () => {
         reviewThreads: {
           nodes: [
             {
+              id: 'thread-2',
               isResolved: false,
               isOutdated: true,
               path: 'src/foo.ts',
@@ -229,6 +320,7 @@ describe('checkMergeEligibility', () => {
         reviewThreads: {
           nodes: [
             {
+              id: 'thread-3',
               isResolved: true,
               isOutdated: false,
               path: 'src/foo.ts',
