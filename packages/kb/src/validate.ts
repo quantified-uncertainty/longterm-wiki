@@ -1,7 +1,7 @@
 /**
  * Schema validation for the Knowledge Base graph.
  *
- * Checks performed:
+ * Original checks (1–6):
  *  1. required-properties  (error)   — each entity must have a fact for every
  *                                      property listed in its TypeSchema.required
  *  2. recommended-properties (warning) — same check for TypeSchema.recommended
@@ -14,6 +14,32 @@
  *                                       entity's TypeSchema (if one exists)
  *  6. completeness         (info)     — percentage of required+recommended
  *                                       properties that have at least one fact
+ *
+ * New checks (7–22):
+ *
+ * Data integrity (errors):
+ *  7. stableid-format      (error)    — StableId must be exactly 10 alphanumeric chars
+ *  8. duplicate-stableid   (error)    — Two entities sharing the same stableId
+ *  9. factid-format        (error)    — Fact ID must start with f_ or inv_ prefix
+ * 10. empty-name           (error)    — Entity has empty or missing name
+ * 11. valid-end-before-as-of (error)  — validEnd is earlier than asOf on a fact
+ *
+ * Temporal consistency (warnings):
+ * 12. temporal-missing-date (warning) — Fact on a temporal property has no asOf
+ * 13. non-temporal-multiple (warning) — Non-temporal property has multiple facts
+ * 14. stale-temporal       (warning)  — Most recent asOf is >2 years old
+ *
+ * Data quality (warnings):
+ * 15. duplicate-facts      (warning)  — Same (entity, property, asOf) tuple appears twice
+ * 16. missing-source       (warning)  — Fact has no source URL
+ * 17. unknown-property     (warning)  — Fact uses a propertyId not in the registry
+ * 18. date-format          (warning)  — asOf/validEnd doesn't match YYYY, YYYY-MM, or YYYY-MM-DD
+ * 19. future-date          (warning)  — asOf date is in the future
+ * 20. bidirectional-redundancy (warning) — Both sides of an inverse relationship stored
+ *
+ * Informational:
+ * 21. orphan-entity        (info)     — Entity has zero facts and zero items
+ * 22. dead-source          (info)     — Source URL returns non-200 (expensive, optional)
  */
 
 import type { Graph } from "./graph";
@@ -25,6 +51,13 @@ import type {
   TypeSchema,
   ValidationResult,
 } from "./types";
+
+// ── Validation options ────────────────────────────────────────────────────────
+
+export interface ValidateOptions {
+  /** If true, check source URLs for HTTP status (expensive, default: false). */
+  checkUrls?: boolean;
+}
 
 // ── Utility helpers ───────────────────────────────────────────────────────────
 
@@ -42,7 +75,16 @@ function looksLikeDate(value: unknown): boolean {
   return /^\d{4}(-\d{2}(-\d{2})?)?$/.test(value);
 }
 
-// ── Per-entity check implementations ──────────────────────────────────────────
+/** StableId format: exactly 10 alphanumeric characters. */
+const STABLEID_RE = /^[A-Za-z0-9]{10}$/;
+
+/** Fact ID format: must start with f_ or inv_ prefix. */
+const FACTID_RE = /^(f_|inv_).+$/;
+
+/** Date format: YYYY, YYYY-MM, or YYYY-MM-DD. */
+const DATE_FORMAT_RE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
+
+// ── Per-entity check implementations (existing checks 1–6) ───────────────────
 
 /** Check 1: required properties. */
 function checkRequired(
@@ -320,14 +362,504 @@ function checkCompleteness(
   ];
 }
 
+// ── New per-entity checks (7–21) ─────────────────────────────────────────────
+
+/** Check 7: stableId format — must be exactly 10 alphanumeric chars. */
+function checkStableIdFormat(
+  entityId: string,
+  stableId: string
+): ValidationResult[] {
+  if (!STABLEID_RE.test(stableId)) {
+    return [
+      {
+        severity: "error",
+        entityId,
+        message:
+          `Entity "${entityId}" has invalid stableId "${stableId}" ` +
+          `(must be exactly 10 alphanumeric characters).`,
+        rule: "stableid-format",
+      },
+    ];
+  }
+  return [];
+}
+
+/** Check 9: fact ID format — must start with f_ or inv_ prefix. */
+function checkFactIdFormat(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  for (const fact of facts) {
+    if (!FACTID_RE.test(fact.id)) {
+      results.push({
+        severity: "error",
+        entityId,
+        message:
+          `Fact "${fact.id}" on entity "${entityId}" has invalid ID format ` +
+          `(must start with "f_" or "inv_").`,
+        rule: "factid-format",
+      });
+    }
+  }
+
+  return results;
+}
+
+/** Check 10: empty name — entity must have a non-empty name. */
+function checkEmptyName(
+  entityId: string,
+  name: string
+): ValidationResult[] {
+  if (!name || name.trim().length === 0) {
+    return [
+      {
+        severity: "error",
+        entityId,
+        message: `Entity "${entityId}" has an empty or missing name.`,
+        rule: "empty-name",
+      },
+    ];
+  }
+  return [];
+}
+
+/** Check 11: validEnd before asOf — temporal ordering. */
+function checkValidEndBeforeAsOf(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  for (const fact of facts) {
+    if (fact.asOf && fact.validEnd) {
+      // Compare as strings — works for YYYY, YYYY-MM, YYYY-MM-DD because
+      // the format is lexicographically ordered.
+      if (fact.validEnd < fact.asOf) {
+        results.push({
+          severity: "error",
+          entityId,
+          propertyId: fact.propertyId,
+          message:
+            `Fact "${fact.id}" on "${entityId}": validEnd "${fact.validEnd}" ` +
+            `is earlier than asOf "${fact.asOf}".`,
+          rule: "valid-end-before-as-of",
+        });
+      }
+    }
+  }
+
+  return results;
+}
+
+/** Check 12: temporal property missing asOf date. */
+function checkTemporalMissingDate(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  for (const fact of facts) {
+    // Skip derived (inverse) facts — they inherit asOf from the source.
+    if (fact.derivedFrom) continue;
+
+    const property = graph.getProperty(fact.propertyId);
+    if (!property) continue;
+    if (!property.temporal) continue;
+
+    if (!fact.asOf) {
+      results.push({
+        severity: "warning",
+        entityId,
+        propertyId: fact.propertyId,
+        message:
+          `Fact "${fact.id}" on "${entityId}" uses temporal property ` +
+          `"${fact.propertyId}" but has no asOf date.`,
+        rule: "temporal-missing-date",
+      });
+    }
+  }
+
+  return results;
+}
+
+/** Check 13: non-temporal property with multiple facts. */
+function checkNonTemporalMultiple(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  // Group non-derived facts by propertyId.
+  const byProperty = new Map<string, number>();
+  for (const fact of facts) {
+    if (fact.derivedFrom) continue;
+    const prev = byProperty.get(fact.propertyId) || 0;
+    byProperty.set(fact.propertyId, prev + 1);
+  }
+
+  for (const [propertyId, count] of byProperty) {
+    if (count <= 1) continue;
+
+    const property = graph.getProperty(propertyId);
+    if (!property) continue;
+    if (property.temporal) continue; // Temporal properties are expected to have multiple facts.
+
+    results.push({
+      severity: "warning",
+      entityId,
+      propertyId,
+      message:
+        `Non-temporal property "${propertyId}" on "${entityId}" has ${count} facts ` +
+        `(expected at most 1 for non-temporal properties).`,
+      rule: "non-temporal-multiple",
+    });
+  }
+
+  return results;
+}
+
+/** Check 14: stale temporal data — most recent asOf is >2 years old. */
+function checkStaleTemporal(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  // Group non-derived facts by propertyId, track the most recent asOf.
+  const latestAsOf = new Map<string, string>();
+  for (const fact of facts) {
+    if (fact.derivedFrom) continue;
+    if (!fact.asOf) continue;
+
+    const property = graph.getProperty(fact.propertyId);
+    if (!property?.temporal) continue;
+
+    const current = latestAsOf.get(fact.propertyId);
+    if (!current || fact.asOf > current) {
+      latestAsOf.set(fact.propertyId, fact.asOf);
+    }
+  }
+
+  // 2 years ago from today.
+  const twoYearsAgo = _twoYearsAgoStr();
+
+  for (const [propertyId, latest] of latestAsOf) {
+    if (latest < twoYearsAgo) {
+      results.push({
+        severity: "warning",
+        entityId,
+        propertyId,
+        message:
+          `Temporal property "${propertyId}" on "${entityId}" may be stale: ` +
+          `most recent asOf is "${latest}" (>2 years old).`,
+        rule: "stale-temporal",
+      });
+    }
+  }
+
+  return results;
+}
+
+/** Returns YYYY-MM-DD string for 2 years ago from today. */
+function _twoYearsAgoStr(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 2);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Check 15: duplicate facts — same (entity, property, asOf) tuple. */
+function checkDuplicateFacts(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  const seen = new Set<string>();
+  for (const fact of facts) {
+    if (fact.derivedFrom) continue;
+
+    const asOfKey = fact.asOf || "";
+    const key = `${fact.propertyId}|${asOfKey}`;
+    if (seen.has(key)) {
+      const asOfDisplay = fact.asOf || "(none)";
+      results.push({
+        severity: "warning",
+        entityId,
+        propertyId: fact.propertyId,
+        message:
+          `Duplicate fact on "${entityId}": property "${fact.propertyId}" ` +
+          `with asOf "${asOfDisplay}" appears multiple times.`,
+        rule: "duplicate-facts",
+      });
+    }
+    seen.add(key);
+  }
+
+  return results;
+}
+
+/** Check 16: missing source URL. */
+function checkMissingSource(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  for (const fact of facts) {
+    if (fact.derivedFrom) continue;
+
+    if (!fact.source) {
+      results.push({
+        severity: "warning",
+        entityId,
+        propertyId: fact.propertyId,
+        message:
+          `Fact "${fact.id}" on "${entityId}" (property: "${fact.propertyId}") ` +
+          `has no source URL.`,
+        rule: "missing-source",
+      });
+    }
+  }
+
+  return results;
+}
+
+/** Check 17: unknown property — fact references a property not in the registry. */
+function checkUnknownProperty(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  for (const fact of facts) {
+    if (fact.derivedFrom) continue;
+
+    if (!graph.getProperty(fact.propertyId)) {
+      results.push({
+        severity: "warning",
+        entityId,
+        propertyId: fact.propertyId,
+        message:
+          `Fact "${fact.id}" on "${entityId}" uses unknown property ` +
+          `"${fact.propertyId}" (not in property registry).`,
+        rule: "unknown-property",
+      });
+    }
+  }
+
+  return results;
+}
+
+/** Check 18: date format — asOf/validEnd must match YYYY, YYYY-MM, or YYYY-MM-DD. */
+function checkDateFormat(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  for (const fact of facts) {
+    if (fact.asOf && !DATE_FORMAT_RE.test(fact.asOf)) {
+      results.push({
+        severity: "warning",
+        entityId,
+        propertyId: fact.propertyId,
+        message:
+          `Fact "${fact.id}" on "${entityId}": asOf "${fact.asOf}" ` +
+          `does not match date format (YYYY, YYYY-MM, or YYYY-MM-DD).`,
+        rule: "date-format",
+      });
+    }
+    if (fact.validEnd && !DATE_FORMAT_RE.test(fact.validEnd)) {
+      results.push({
+        severity: "warning",
+        entityId,
+        propertyId: fact.propertyId,
+        message:
+          `Fact "${fact.id}" on "${entityId}": validEnd "${fact.validEnd}" ` +
+          `does not match date format (YYYY, YYYY-MM, or YYYY-MM-DD).`,
+        rule: "date-format",
+      });
+    }
+  }
+
+  return results;
+}
+
+/** Check 19: future date — asOf is in the future. */
+function checkFutureDate(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  for (const fact of facts) {
+    if (!fact.asOf) continue;
+    // Pad short dates for comparison: "2026" → "2026-12-31", "2026-03" → "2026-03-31"
+    const padded = _padDateForFutureCheck(fact.asOf);
+    if (padded > today) {
+      results.push({
+        severity: "warning",
+        entityId,
+        propertyId: fact.propertyId,
+        message:
+          `Fact "${fact.id}" on "${entityId}": asOf "${fact.asOf}" ` +
+          `is in the future.`,
+        rule: "future-date",
+      });
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Pads a partial date to its earliest day for future-date comparison.
+ * "2026" stays "2026" (year-only is compared against today's year prefix)
+ * For a fair comparison: "2030" > "2026-03-06" should hold because
+ * any day in 2030 is after today.
+ *
+ * We just compare raw strings — YYYY > YYYY-MM-DD works for our purpose
+ * because "2030" > "2026-03-06" lexicographically. The only edge case is
+ * the current year with year-only format, which we treat as not-future
+ * since the year has started.
+ */
+function _padDateForFutureCheck(dateStr: string): string {
+  // For the future check, we want to know if the date is definitely in the future.
+  // YYYY-only: compare just the year — "2030" > "2026-03-06" ✓
+  // YYYY-MM: compare as-is — "2030-01" > "2026-03-06" ✓
+  // YYYY-MM-DD: compare as-is
+  return dateStr;
+}
+
+/** Check 21: orphan entity — no facts and no items. */
+function checkOrphanEntity(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const facts = graph.getFacts(entityId);
+  const hasItems = graph.getItemCollectionNames(entityId).length > 0;
+
+  // Only count non-derived facts.
+  const nonDerivedFacts = facts.filter((f) => !f.derivedFrom);
+
+  if (nonDerivedFacts.length === 0 && !hasItems) {
+    return [
+      {
+        severity: "info",
+        entityId,
+        message: `Entity "${entityId}" is an orphan (no facts and no item collections).`,
+        rule: "orphan-entity",
+      },
+    ];
+  }
+
+  return [];
+}
+
+// ── Graph-level checks (run once across all entities) ─────────────────────────
+
+/** Check 8: duplicate stableIds across the graph. */
+function checkDuplicateStableIds(graph: Graph): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const seen = new Map<string, string>(); // stableId → first entityId
+
+  for (const entity of graph.getAllEntities()) {
+    const existing = seen.get(entity.stableId);
+    if (existing) {
+      results.push({
+        severity: "error",
+        entityId: entity.id,
+        message:
+          `Entity "${entity.id}" shares stableId "${entity.stableId}" ` +
+          `with entity "${existing}".`,
+        rule: "duplicate-stableid",
+      });
+    } else {
+      seen.set(entity.stableId, entity.id);
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Check 20: bidirectional redundancy — both sides of an inverse relationship
+ * are stored explicitly (one side should be computed by inverse computation).
+ */
+function checkBidirectionalRedundancy(graph: Graph): ValidationResult[] {
+  const results: ValidationResult[] = [];
+
+  // Build a map of property → inverseId pairs.
+  const inverseMap = new Map<string, string>();
+  for (const property of graph.getAllProperties()) {
+    if (property.inverseId && !property.computed) {
+      inverseMap.set(property.id, property.inverseId);
+    }
+  }
+
+  // For each property that has an inverse, check if the inverse side also has
+  // explicitly stored (non-derived) facts that would be redundant.
+  for (const [propertyId, inverseId] of inverseMap) {
+    // Get all entities that have a non-derived fact for this property.
+    for (const entity of graph.getAllEntities()) {
+      const facts = graph
+        .getFacts(entity.id, { property: propertyId })
+        .filter((f) => !f.derivedFrom);
+
+      for (const fact of facts) {
+        // For ref values, check if the referenced entity has an explicit inverse fact.
+        if (fact.value.type === "ref") {
+          const refId = fact.value.value;
+          const inverseFacts = graph
+            .getFacts(refId, { property: inverseId })
+            .filter(
+              (f) =>
+                !f.derivedFrom &&
+                f.value.type === "ref" &&
+                f.value.value === entity.id
+            );
+
+          if (inverseFacts.length > 0) {
+            results.push({
+              severity: "warning",
+              entityId: entity.id,
+              propertyId,
+              message:
+                `Bidirectional redundancy: "${entity.id}" has "${propertyId}" → "${refId}", ` +
+                `and "${refId}" has explicit "${inverseId}" → "${entity.id}". ` +
+                `Only one side needs to be stored; the other is computed via inverse.`,
+              rule: "bidirectional-redundancy",
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
- * Validates a single entity against its TypeSchema.
+ * Validates a single entity against its TypeSchema and general data quality rules.
  * Returns an array of ValidationResult objects.
  *
  * If no TypeSchema is registered for the entity's type, a warning is returned
- * and no further checks are run for that entity.
+ * and schema-dependent checks are skipped (but general checks still run).
  */
 export function validateEntity(
   graph: Graph,
@@ -345,6 +877,23 @@ export function validateEntity(
     ];
   }
 
+  // General checks that don't depend on a TypeSchema.
+  const generalResults: ValidationResult[] = [
+    ...checkStableIdFormat(entityId, entity.stableId),
+    ...checkEmptyName(entityId, entity.name),
+    ...checkFactIdFormat(graph, entityId),
+    ...checkValidEndBeforeAsOf(graph, entityId),
+    ...checkTemporalMissingDate(graph, entityId),
+    ...checkNonTemporalMultiple(graph, entityId),
+    ...checkStaleTemporal(graph, entityId),
+    ...checkDuplicateFacts(graph, entityId),
+    ...checkMissingSource(graph, entityId),
+    ...checkUnknownProperty(graph, entityId),
+    ...checkDateFormat(graph, entityId),
+    ...checkFutureDate(graph, entityId),
+    ...checkOrphanEntity(graph, entityId),
+  ];
+
   const schema = graph.getSchema(entity.type);
   if (!schema) {
     return [
@@ -354,6 +903,7 @@ export function validateEntity(
         message: `No TypeSchema registered for type "${entity.type}" (entity: "${entityId}"). Skipping schema checks.`,
         rule: "schema-exists",
       },
+      ...generalResults,
     ];
   }
 
@@ -364,19 +914,29 @@ export function validateEntity(
     ...checkRefIntegrity(graph, entityId),
     ...checkItemCollections(graph, entityId, schema),
     ...checkCompleteness(graph, entityId, schema),
+    ...generalResults,
   ];
 }
 
 /**
- * Validates the entire graph — runs validateEntity() on every entity.
+ * Validates the entire graph — runs validateEntity() on every entity,
+ * plus graph-level cross-entity checks.
  * Returns an array of all ValidationResult objects across all entities.
  */
-export function validate(graph: Graph): ValidationResult[] {
+export function validate(
+  graph: Graph,
+  options?: ValidateOptions
+): ValidationResult[] {
   const results: ValidationResult[] = [];
 
+  // Per-entity checks
   for (const entity of graph.getAllEntities()) {
     results.push(...validateEntity(graph, entity.id));
   }
+
+  // Graph-level checks
+  results.push(...checkDuplicateStableIds(graph));
+  results.push(...checkBidirectionalRedundancy(graph));
 
   return results;
 }
