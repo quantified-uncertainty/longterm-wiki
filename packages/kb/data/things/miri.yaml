@@ -55,10 +55,17 @@ items:
 
       i_ZJ54jX7Ppq:
         person: nate-soares
-        title: "Executive Director"
+        title: "President"
         start: 2015-05
-        source: https://intelligence.org/2015/05/18/nate-soares-is-miris-new-executive-director/
-        notes: "Led MIRI's operations and research agenda"
+        source: https://intelligence.org/about/
+        notes: "Initially Executive Director (2015-2023); transitioned to President role"
+
+      i_mBceo2024:
+        person: malo-bourgon
+        title: "CEO"
+        start: 2023-01
+        source: https://intelligence.org/about/
+        notes: "Became CEO as MIRI restructured leadership"
 
   research-areas:
     type: research-area

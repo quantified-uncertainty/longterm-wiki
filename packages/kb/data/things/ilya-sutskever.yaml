@@ -59,11 +59,11 @@ facts:
 
   - id: f_iSpQ1rS2t
     property: employed-by
-    value: !ref A4XoubikkQ:deepmind
+    value: "Google Brain"
     asOf: 2012-11
     validEnd: 2015-12
     source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-    notes: "Research scientist at Google Brain; worked with Geoffrey Hinton after the DNNresearch acquisition"
+    notes: "Research scientist at Google Brain (predates 2023 merger into Google DeepMind); worked with Geoffrey Hinton after the DNNresearch acquisition"
 
   - id: f_iSuV3wX4y
     property: role

@@ -11,16 +11,23 @@ facts:
     property: employed-by
     value: !ref 1LcLlMGLbw:openai
     asOf: 2015-12
-    validEnd: 2024-08
     source: https://openai.com/blog/introducing-openai
-    notes: "Co-founded OpenAI December 2015; served as President until taking leave of absence August 2024"
+    notes: "Co-founded OpenAI December 2015; took leave of absence August 2024 but still listed as President"
 
   - id: f_NqlyTekRKg
     property: role
-    value: "Co-founder & President"
+    value: "Co-founder & CTO"
     asOf: 2015-12
-    validEnd: 2024-08
+    validEnd: 2017-05
     source: https://openai.com/blog/introducing-openai
+    notes: "Initially served as CTO at OpenAI's founding"
+
+  - id: f_gBpresRole
+    property: role
+    value: "Co-founder & President"
+    asOf: 2017-05
+    source: https://openai.com/
+    notes: "Transitioned from CTO to President; took leave of absence August 2024 but still listed as President"
 
   - id: f_qVoWltsFvw
     property: born-year

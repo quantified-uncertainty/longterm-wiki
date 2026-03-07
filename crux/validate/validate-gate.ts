@@ -343,6 +343,13 @@ const PARALLEL_STEPS: Step[] = [
     args: ['tsx', 'crux/validate/validate-crux-tsc.ts'],
     cwd: PROJECT_ROOT,
   },
+  {
+    id: 'kb-schema',
+    name: 'KB schema validation (required properties, ref integrity, data quality)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-kb-schema.ts'],
+    cwd: PROJECT_ROOT,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass

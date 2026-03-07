@@ -47,22 +47,22 @@ facts:
 
   - id: f_pC7kL8mN9o
     property: social-media
-    value: "@paabornamore"
+    value: "@paulfchristiano"
     source: https://x.com/paulfchristiano
 
   - id: f_pCpQ1rS2t
     property: role
-    value: "Head of AI Safety, UK AISI"
+    value: "Head of AI Safety, US AI Safety Institute"
     asOf: 2024-02
-    source: https://en.wikipedia.org/wiki/Paul_Christiano
-    notes: "Joined UK AI Safety Institute in 2024 as Head of AI Safety"
+    source: https://www.nist.gov/people/paul-christiano
+    notes: "Joined the U.S. AI Safety Institute (under NIST) in 2024 as Head of AI Safety"
 
   - id: f_pCuV3wX4y
     property: employed-by
-    value: "UK AI Safety Institute"
+    value: us-aisi
     asOf: 2024-02
-    source: https://en.wikipedia.org/wiki/Paul_Christiano
-    notes: "Stepped back from day-to-day ARC operations in 2023 after a brain injury; joined UK AISI in 2024"
+    source: https://www.nist.gov/people/paul-christiano
+    notes: "Stepped back from day-to-day ARC operations in 2023 after a brain injury; joined US AISI in 2024"
 
 items:
   career-history:
@@ -84,11 +84,11 @@ items:
         notes: "Founded ARC to work on alignment theory and evals; stepped back from daily operations in 2023 due to brain injury sustained in an accident"
 
       i_pC7jK8lM9n:
-        organization: "UK AI Safety Institute"
+        organization: us-aisi
         title: "Head of AI Safety"
         start: 2024-02
-        source: https://en.wikipedia.org/wiki/Paul_Christiano
-        notes: "Joined UK AISI to lead safety research and evaluation efforts"
+        source: https://www.nist.gov/people/paul-christiano
+        notes: "Joined the U.S. AI Safety Institute (under NIST) to lead safety research"
 
   notable-publications:
     type: publication

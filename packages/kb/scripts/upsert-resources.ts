@@ -40,12 +40,33 @@ interface UpsertItem {
   citedBy: string[];
 }
 
+/** Merge-aware URL collector — later citations add to existing entries. */
+function addUrl(
+  itemsByUrl: Map<string, UpsertItem>,
+  url: string,
+  entityId: string
+): void {
+  const existing = itemsByUrl.get(url);
+  if (existing) {
+    existing.tags = [...new Set([...existing.tags, entityId, "kb-source"])];
+    existing.citedBy = [...new Set([...existing.citedBy, entityId])];
+    return;
+  }
+
+  itemsByUrl.set(url, {
+    id: urlToId(url),
+    url,
+    type: guessType(url),
+    tags: [entityId, "kb-source"],
+    citedBy: [entityId],
+  });
+}
+
 async function main() {
   const thingsDir = join(KB_DATA_DIR, "things");
   const files = readdirSync(thingsDir).filter((f) => f.endsWith(".yaml"));
 
-  const allItems: UpsertItem[] = [];
-  const seenUrls = new Set<string>();
+  const itemsByUrl = new Map<string, UpsertItem>();
 
   for (const file of files) {
     const data = yaml.parse(readFileSync(join(thingsDir, file), "utf8"));
@@ -53,15 +74,8 @@ async function main() {
 
     // Collect URLs from facts
     for (const fact of data.facts ?? []) {
-      if (fact.source && fact.source.startsWith("http") && !seenUrls.has(fact.source)) {
-        seenUrls.add(fact.source);
-        allItems.push({
-          id: urlToId(fact.source),
-          url: fact.source,
-          type: guessType(fact.source),
-          tags: [entityId, "kb-source"],
-          citedBy: [entityId],
-        });
+      if (fact.source && fact.source.startsWith("http")) {
+        addUrl(itemsByUrl, fact.source, entityId);
       }
     }
 
@@ -69,28 +83,23 @@ async function main() {
     for (const coll of Object.values(data.items ?? {})) {
       const entries = (coll as { entries?: Record<string, Record<string, unknown>> }).entries ?? {};
       for (const entry of Object.values(entries)) {
-        for (const field of ["source", "key-publication"]) {
+        for (const field of ["source", "key-publication", "url"]) {
           const url = entry[field] as string | undefined;
-          if (url && url.startsWith("http") && !seenUrls.has(url)) {
-            seenUrls.add(url);
-            allItems.push({
-              id: urlToId(url),
-              url,
-              type: guessType(url),
-              tags: [entityId, "kb-source"],
-              citedBy: [entityId],
-            });
+          if (url && url.startsWith("http")) {
+            addUrl(itemsByUrl, url, entityId);
           }
         }
       }
     }
   }
 
+  const allItems = [...itemsByUrl.values()];
   console.log(`Found ${allItems.length} unique source URLs across ${files.length} entity files`);
 
   // Batch upsert in groups of 50
   const batchSize = 50;
   let totalUpserted = 0;
+  let hadFailure = false;
 
   for (let i = 0; i < allItems.length; i += batchSize) {
     const batch = allItems.slice(i, i + batchSize);
@@ -101,6 +110,7 @@ async function main() {
         `  Batch ${Math.floor(i / batchSize) + 1}: ${result.data.upserted} upserted`
       );
     } else {
+      hadFailure = true;
       console.error(
         `  Batch ${Math.floor(i / batchSize) + 1} failed:`,
         result.error
@@ -108,7 +118,16 @@ async function main() {
     }
   }
 
+  if (hadFailure) {
+    console.error(`Finished with errors. Total upserted: ${totalUpserted}`);
+    process.exitCode = 1;
+    return;
+  }
+
   console.log(`Done! Total upserted: ${totalUpserted}`);
 }
 
-main().catch(console.error);
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
