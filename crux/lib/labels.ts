@@ -45,8 +45,10 @@ export const BLOCK_LABELS = Object.values(LABELS).filter((l) =>
   l.startsWith('block:'),
 );
 
+type LabelMeta = { color: string; description: string };
+
 /** Colors and descriptions for label creation/ensure. */
-export const LABEL_META: Record<string, { color: string; description: string }> = {
+export const LABEL_META = {
   [LABELS.AGENT_WORKING]: {
     color: '0075ca',
     description: 'Agent actively working on this',
@@ -67,4 +69,4 @@ export const LABEL_META: Record<string, { color: string; description: string }> 
     color: 'bfdadc',
     description: 'Human has reviewed protected path changes',
   },
-};
+} satisfies Partial<Record<LabelName, LabelMeta>>;

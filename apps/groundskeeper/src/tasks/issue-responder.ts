@@ -24,7 +24,8 @@ import { sleep } from "../sleep.js";
  */
 
 const TRIGGER_LABEL = "groundskeeper-autofix";
-const WORKING_LABEL = "claude-working";
+/** Must match LABELS.AGENT_WORKING in crux/lib/labels.ts */
+const WORKING_LABEL = "agent:working";
 const COMMENT_TRIGGER = "/groundskeeper";
 
 /** Machine-parseable markers for comment detection (not user-facing text). */

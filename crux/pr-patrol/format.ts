@@ -5,6 +5,7 @@
  * and returns colorized strings using the shared output.ts color system.
  */
 
+import { LABELS } from '../lib/labels.ts';
 import type { Colors } from '../lib/output.ts';
 import type {
   AggregatedStats,
@@ -306,12 +307,12 @@ ${c.bold}Scoring${c.reset}
   The highest-scoring PR is fixed each cycle.
 
 ${c.bold}Auto-Merge${c.reset}
-  PRs labeled \`stage:approved\` are squash-merged when:
+  PRs labeled \`${LABELS.STAGE_APPROVED}\` are squash-merged when:
   ${c.green}\u2713${c.reset} CI is green (no failures or pending checks)
   ${c.green}\u2713${c.reset} No merge conflicts
   ${c.green}\u2713${c.reset} No unresolved review threads
   ${c.green}\u2713${c.reset} No unchecked checkboxes in PR body
-  ${c.green}\u2713${c.reset} No \`agent:working\` label
+  ${c.green}\u2713${c.reset} No \`${LABELS.AGENT_WORKING}\` label
   ${c.green}\u2713${c.reset} Not a draft (drafts are auto-undrafted first if eligible)
 
 ${c.bold}Safety${c.reset}

@@ -17,6 +17,7 @@
  */
 
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
+import { LABELS } from '../lib/labels.ts';
 import { getColors } from '../lib/output.ts';
 import {
   buildConfig,
@@ -141,10 +142,10 @@ async function mergeStatus(
   const candidates = findMergeCandidates(prs);
 
   if (candidates.length === 0) {
-    return { output: 'No PRs with `stage:approved` label found.\n', exitCode: 0 };
+    return { output: `No PRs with \`${LABELS.STAGE_APPROVED}\` label found.\n`, exitCode: 0 };
   }
 
-  const lines: string[] = ['PRs labeled `stage:approved`:\n'];
+  const lines: string[] = [`PRs labeled \`${LABELS.STAGE_APPROVED}\`:\n`];
   for (const c of candidates) {
     const s = c.eligible
       ? '\u2713 ELIGIBLE'
@@ -177,7 +178,7 @@ Commands:
   history          Browse full log with time ranges and filters
   stats            Aggregated metrics and success rates
   explain          Detailed explanation of what PR Patrol does
-  merge-status     Show PRs labeled stage:approved and their eligibility
+  merge-status     Show PRs labeled ${LABELS.STAGE_APPROVED} and their eligibility
 
 Status/History Options:
   --count=N        Number of entries to show (default: 20 for status, 100 for history)
