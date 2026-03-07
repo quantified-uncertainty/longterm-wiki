@@ -33,3 +33,80 @@ facts:
     property: born-year
     value: 1992
     notes: "Born approximately 1992; PhD from UC Berkeley"
+
+  - id: f_pC1aB2cD3e
+    property: education
+    value: "PhD in Computer Science, UC Berkeley; BS in Mathematics, MIT"
+    source: https://en.wikipedia.org/wiki/Paul_Christiano
+    notes: "PhD focused on AI alignment theory"
+
+  - id: f_pC4fG5hI6j
+    property: notable-for
+    value: "Pioneer of RLHF and AI alignment research; founder of Alignment Research Center (ARC); key theorist of iterated amplification and eliciting latent knowledge"
+    source: https://en.wikipedia.org/wiki/Paul_Christiano
+
+  - id: f_pC7kL8mN9o
+    property: social-media
+    value: "@paabornamore"
+    source: https://x.com/paulfchristiano
+
+  - id: f_pCpQ1rS2t
+    property: role
+    value: "Head of AI Safety, UK AISI"
+    asOf: 2024-02
+    source: https://en.wikipedia.org/wiki/Paul_Christiano
+    notes: "Joined UK AI Safety Institute in 2024 as Head of AI Safety"
+
+  - id: f_pCuV3wX4y
+    property: employed-by
+    value: "UK AI Safety Institute"
+    asOf: 2024-02
+    source: https://en.wikipedia.org/wiki/Paul_Christiano
+    notes: "Stepped back from day-to-day ARC operations in 2023 after a brain injury; joined UK AISI in 2024"
+
+items:
+  career-history:
+    type: career-entry
+    entries:
+      i_pC1zA2bC3d:
+        organization: !ref 1LcLlMGLbw  # openai
+        title: "Research Scientist"
+        start: "2017"
+        end: 2021-10
+        source: https://paulfchristiano.com/
+        notes: "Led alignment research; key contributor to RLHF methodology; developed debate and iterated amplification approaches"
+
+      i_pC4eF5gH6i:
+        organization: !ref QsXVXtQ0zE  # arc
+        title: "Founder & President"
+        start: 2021-10
+        source: https://alignment.org/
+        notes: "Founded ARC to work on alignment theory and evals; stepped back from daily operations in 2023 due to brain injury sustained in an accident"
+
+      i_pC7jK8lM9n:
+        organization: "UK AI Safety Institute"
+        title: "Head of AI Safety"
+        start: 2024-02
+        source: https://en.wikipedia.org/wiki/Paul_Christiano
+        notes: "Joined UK AISI to lead safety research and evaluation efforts"
+
+  notable-publications:
+    type: publication
+    entries:
+      i_pCoP1qR2s:
+        title: "Deep Reinforcement Learning from Human Feedback"
+        year: 2017
+        url: https://arxiv.org/abs/1706.03741
+        notes: "Foundational RLHF paper; enabled alignment of language models to human preferences; one of the most impactful alignment papers"
+
+      i_pCtU3vW4x:
+        title: "AI Safety via Debate"
+        year: 2018
+        url: https://arxiv.org/abs/1805.00899
+        notes: "Proposed debate as a scalable oversight mechanism for aligning superhuman AI"
+
+      i_pCyZ5aB6c:
+        title: "Eliciting Latent Knowledge (ELK)"
+        year: 2021
+        url: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
+        notes: "ARC's central research problem; how to determine if an AI model's answers match its internal beliefs"

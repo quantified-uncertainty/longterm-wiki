@@ -56,3 +56,69 @@ facts:
     value: 1981
     source: https://en.wikipedia.org/wiki/Holden_Karnofsky
     notes: "Born approximately 1981"
+
+  - id: f_hK1aB2cD3e
+    property: education
+    value: "BA in Social Studies, Harvard University"
+    source: https://en.wikipedia.org/wiki/Holden_Karnofsky
+    notes: "Worked at Bridgewater Associates hedge fund before founding GiveWell"
+
+  - id: f_hK4fG5hI6j
+    property: notable-for
+    value: "Co-founder of GiveWell and Open Philanthropy; influential figure in effective altruism; author of 'Most Important Century' blog series on transformative AI"
+    source: https://en.wikipedia.org/wiki/Holden_Karnofsky
+
+  - id: f_hK7kL8mN9o
+    property: social-media
+    value: "@HoldenKarnofsky"
+    source: https://x.com/HoldenKarnofsky
+
+items:
+  career-history:
+    type: career-entry
+    entries:
+      i_hK1zA2bC3d:
+        organization: "Bridgewater Associates"
+        title: "Analyst"
+        start: "2003"
+        end: "2007"
+        source: https://en.wikipedia.org/wiki/Holden_Karnofsky
+        notes: "Worked at Ray Dalio's hedge fund before founding GiveWell"
+
+      i_hK4eF5gH6i:
+        organization: "GiveWell"
+        title: "Co-founder & Co-Executive Director"
+        start: "2007"
+        end: "2014"
+        source: https://www.givewell.org/about/people
+        notes: "Co-founded with Elie Hassenfeld to evaluate charity effectiveness; remains on board"
+
+      i_hK7jK8lM9n:
+        organization: "Open Philanthropy"
+        title: "Co-founder & Co-CEO"
+        start: "2014"
+        end: "2024"
+        source: https://www.openphilanthropy.org/about/team/
+        notes: "Spun out from GiveWell; directed billions in grantmaking; authored influential 'Most Important Century' series; stepped back from operational role in 2024"
+
+      i_hKoP1qR2s:
+        organization: !ref mK9pX3rQ7n  # anthropic
+        title: "Member of Technical Staff"
+        start: 2025-01
+        source: https://www.anthropic.com/
+        notes: "Works on responsible scaling policy; also serves as Anthropic board observer"
+
+  notable-publications:
+    type: publication
+    entries:
+      i_hKtU3vW4x:
+        title: "Most Important Century (blog series)"
+        year: 2021
+        url: https://www.cold-takes.com/most-important-century/
+        notes: "Influential series arguing we may live in the most pivotal century in human history due to transformative AI; widely read in EA/AI safety communities"
+
+      i_hKyZ5aB6c:
+        title: "AI Could Defeat All Of Us Combined"
+        year: 2022
+        url: https://www.cold-takes.com/ai-could-defeat-all-of-us-combined/
+        notes: "Essay on AI takeover scenarios and why they deserve serious attention"

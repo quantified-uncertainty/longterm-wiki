@@ -46,9 +46,9 @@ describe("loader", () => {
   });
 
   describe("properties", () => {
-    it("loads 28 properties", () => {
+    it("loads 32 properties", () => {
       const properties = graph.getAllProperties();
-      expect(properties).toHaveLength(28);
+      expect(properties).toHaveLength(32);
     });
 
     it("loads property details correctly", () => {
@@ -132,14 +132,14 @@ describe("loader", () => {
       expect(facts).toHaveLength(37);
     });
 
-    it("loads correct number of facts for Dario Amodei (3)", () => {
+    it("loads correct number of facts for Dario Amodei (9)", () => {
       const facts = graph.getFacts("dario-amodei");
-      expect(facts).toHaveLength(3);
+      expect(facts).toHaveLength(9);
     });
 
-    it("loads correct number of facts for Jan Leike (3)", () => {
+    it("loads correct number of facts for Jan Leike (9)", () => {
       const facts = graph.getFacts("jan-leike");
-      expect(facts).toHaveLength(3);
+      expect(facts).toHaveLength(9);
     });
 
     it("normalizes number values as {type: 'number'}", () => {
@@ -157,7 +157,7 @@ describe("loader", () => {
       const employedByFacts = graph.getFacts("jan-leike", {
         property: "employed-by",
       });
-      expect(employedByFacts).toHaveLength(2);
+      expect(employedByFacts).toHaveLength(3);
       for (const fact of employedByFacts) {
         expect(fact.value.type).toBe("ref");
       }

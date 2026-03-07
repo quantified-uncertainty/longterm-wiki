@@ -94,6 +94,40 @@ properties:
     temporal: true
     appliesTo: [person]
 
+  education:
+    name: Education
+    description: "University degree or highest educational attainment"
+    dataType: text
+    category: biographical
+    appliesTo: [person]
+
+  notable-for:
+    name: Notable For
+    description: "What this person is primarily known for (one-line summary)"
+    dataType: text
+    category: biographical
+    appliesTo: [person]
+
+  net-worth:
+    name: Net Worth
+    description: "Estimated net worth (for public figures with reliable estimates)"
+    dataType: number
+    unit: USD
+    category: biographical
+    temporal: true
+    appliesTo: [person]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  social-media:
+    name: Social Media
+    description: "Primary social media handle (e.g., Twitter/X @handle)"
+    dataType: text
+    category: biographical
+    appliesTo: [person]
+
   founded-by:
     name: Founded By
     description: "Person(s) who founded this organization"
