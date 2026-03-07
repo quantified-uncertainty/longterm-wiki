@@ -31,7 +31,7 @@ facts:
   - id: f_deepmind_founded_by
     property: founded-by
     value:
-      - !ref Aqcyu3onCA  # demis-hassabis
+      - !ref Aqcyu3onCA:demis-hassabis
       - shane-legg
       - mustafa-suleyman
     source: https://en.wikipedia.org/wiki/Google_DeepMind
@@ -54,7 +54,7 @@ items:
     type: key-person
     entries:
       i_cqQKO0KpfQ:
-        person: !ref Aqcyu3onCA  # demis-hassabis
+        person: !ref Aqcyu3onCA:demis-hassabis
         title: "Co-founder & CEO"
         start: 2010-09
         is_founder: true

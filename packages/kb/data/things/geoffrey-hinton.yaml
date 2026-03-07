@@ -11,7 +11,7 @@ thing:
 facts:
   - id: f_CQptGEFesw
     property: employed-by
-    value: !ref A4XoubikkQ  # deepmind
+    value: !ref A4XoubikkQ:deepmind
     asOf: 2013-03
     validEnd: 2023-05
     source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
@@ -101,7 +101,7 @@ items:
         notes: "CIFAR funding was critical to sustaining deep learning research during the AI winter"
 
       i_gHtU3vW4x:
-        organization: !ref A4XoubikkQ  # deepmind (Google)
+        organization: !ref A4XoubikkQ:deepmind
         title: "VP and Engineering Fellow"
         start: 2013-03
         end: 2023-05

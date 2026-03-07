@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_rPQmiVa1LH
     property: employed-by
-    value: !ref 1LcLlMGLbw  # openai
+    value: !ref 1LcLlMGLbw:openai
     asOf: 2017-01
     validEnd: 2021-10
     source: https://paulfchristiano.com/
@@ -18,7 +18,7 @@ facts:
 
   - id: f_qPXcXJF3Uv
     property: employed-by
-    value: !ref QsXVXtQ0zE  # arc
+    value: !ref QsXVXtQ0zE:arc
     asOf: 2021-10
     source: https://alignment.org/
     notes: "Founded Alignment Research Center (ARC) in 2021; stepped back from day-to-day operations in 2023 due to a brain injury"
@@ -69,7 +69,7 @@ items:
     type: career-entry
     entries:
       i_pC1zA2bC3d:
-        organization: !ref 1LcLlMGLbw  # openai
+        organization: !ref 1LcLlMGLbw:openai
         title: "Research Scientist"
         start: "2017"
         end: 2021-10
@@ -77,7 +77,7 @@ items:
         notes: "Led alignment research; key contributor to RLHF methodology; developed debate and iterated amplification approaches"
 
       i_pC4eF5gH6i:
-        organization: !ref QsXVXtQ0zE  # arc
+        organization: !ref QsXVXtQ0zE:arc
         title: "Founder & President"
         start: 2021-10
         source: https://alignment.org/

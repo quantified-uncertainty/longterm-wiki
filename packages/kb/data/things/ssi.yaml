@@ -29,7 +29,7 @@ facts:
   - id: f_ssi_founded_by
     property: founded-by
     value:
-      - !ref eYrBgMLJDw  # ilya-sutskever
+      - !ref eYrBgMLJDw:ilya-sutskever
       - daniel-gross
       - daniel-levy
     source: https://ssi.inc
@@ -53,7 +53,7 @@ items:
     type: key-person
     entries:
       i_b9oci1WvqG:
-        person: !ref eYrBgMLJDw  # ilya-sutskever
+        person: !ref eYrBgMLJDw:ilya-sutskever
         title: "Chief Scientist & Co-founder"
         start: 2024-06
         is_founder: true

@@ -3,7 +3,8 @@
  * Reads properties.yaml, schemas/*.yaml, and things/*.yaml from a data directory.
  *
  * Supports !ref YAML tags for stable references between entities:
- *   value: !ref mK9pX3rQ7n   → resolves stableId to the entity's slug
+ *   value: !ref mK9pX3rQ7n:dario-amodei   → resolves stableId, cross-validates slug
+ *   value: !ref mK9pX3rQ7n                 → bare stableId (deprecated, still works)
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -29,22 +30,38 @@ import type {
 /**
  * Marker class for !ref YAML tags. Created during YAML parsing,
  * resolved to slugs after all things are loaded.
+ *
+ * Format: !ref <stableId>:<slug>  (preferred — enables cross-validation)
+ *         !ref <stableId>         (bare — still works but triggers validation warning)
  */
 export class RefMarker {
-  constructor(public readonly stableId: string) {}
+  constructor(
+    public readonly stableId: string,
+    public readonly expectedSlug?: string,
+  ) {}
 }
 
-/** Custom YAML tag: !ref <stableId> */
+/** Custom YAML tag: !ref <stableId> or !ref <stableId>:<slug> */
 const refTag: ScalarTag = {
   tag: "!ref",
   resolve(str: string): RefMarker {
+    const colonIdx = str.indexOf(":");
+    if (colonIdx > 0) {
+      const stableId = str.slice(0, colonIdx);
+      const slug = str.slice(colonIdx + 1);
+      return new RefMarker(stableId, slug);
+    }
     return new RefMarker(str);
   },
   identify(value: unknown): value is RefMarker {
     return value instanceof RefMarker;
   },
   stringify(item: Scalar): string {
-    return `!ref ${(item.value as RefMarker).stableId}`;
+    const marker = item.value as RefMarker;
+    if (marker.expectedSlug) {
+      return `!ref ${marker.stableId}:${marker.expectedSlug}`;
+    }
+    return `!ref ${marker.stableId}`;
   },
 };
 
@@ -66,6 +83,14 @@ function resolveRefs(
         `[kb/loader] Unresolved !ref "${value.stableId}" in ${context}`
       );
       return value.stableId; // fallback: use raw stableId
+    }
+    // Cross-validate: if expectedSlug was provided, verify it matches
+    if (value.expectedSlug && value.expectedSlug !== slug) {
+      throw new Error(
+        `[kb/loader] !ref mismatch in ${context}: stableId "${value.stableId}" ` +
+          `resolves to "${slug}" but expected slug "${value.expectedSlug}". ` +
+          `Either the stableId or the slug is wrong.`
+      );
     }
     return slug;
   }

@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_MC1O0jwEcB
     property: employed-by
-    value: !ref A4XoubikkQ  # deepmind
+    value: !ref A4XoubikkQ:deepmind
     asOf: 2023-01
     source: https://www.neelnanda.io/
     notes: "Research Scientist at Google DeepMind working on mechanistic interpretability"

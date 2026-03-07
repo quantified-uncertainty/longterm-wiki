@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_dF5bX8wC3g
     property: employed-by
-    value: !ref 1LcLlMGLbw  # openai
+    value: !ref 1LcLlMGLbw:openai
     asOf: 2021-01
     validEnd: 2024-05
     source: https://openai.com/blog/introducing-superalignment
@@ -18,7 +18,7 @@ facts:
 
   - id: f_eH9jV6nK4t
     property: employed-by
-    value: !ref mK9pX3rQ7n  # anthropic
+    value: !ref mK9pX3rQ7n:anthropic
     asOf: 2024-05
     source: https://anthropic.com/news/jan-leike-joins-anthropic
     notes: "Resigned from OpenAI in May 2024, citing safety concerns; joined Anthropic same month to lead Alignment Science team"
@@ -48,7 +48,7 @@ facts:
 
   - id: f_jLpQ1rS2t
     property: employed-by
-    value: !ref A4XoubikkQ  # deepmind
+    value: !ref A4XoubikkQ:deepmind
     asOf: "2017"
     validEnd: "2021"
     source: https://jan.leike.name/
@@ -75,7 +75,7 @@ items:
     type: career-entry
     entries:
       i_jL1zA2bC3d:
-        organization: !ref A4XoubikkQ  # deepmind
+        organization: !ref A4XoubikkQ:deepmind
         title: "Research Scientist"
         start: "2017"
         end: "2021"
@@ -83,7 +83,7 @@ items:
         notes: "Worked on reinforcement learning theory and agent alignment"
 
       i_jL4eF5gH6i:
-        organization: !ref 1LcLlMGLbw  # openai
+        organization: !ref 1LcLlMGLbw:openai
         title: "Alignment Team Lead; then Co-lead of Superalignment"
         start: "2021"
         end: 2024-05
@@ -91,7 +91,7 @@ items:
         notes: "Led alignment research; co-led Superalignment team from July 2023; resigned publicly citing safety concerns and insufficient compute allocation"
 
       i_jL7jK8lM9n:
-        organization: !ref mK9pX3rQ7n  # anthropic
+        organization: !ref mK9pX3rQ7n:anthropic
         title: "Head of Alignment Science"
         start: 2024-05
         source: https://anthropic.com/news/jan-leike-joins-anthropic

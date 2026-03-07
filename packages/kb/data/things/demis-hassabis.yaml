@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_86Rr7EPOYw
     property: employed-by
-    value: !ref A4XoubikkQ  # deepmind
+    value: !ref A4XoubikkQ:deepmind
     asOf: 2010-09
     source: https://deepmind.google/about/
     notes: "Co-founded DeepMind in September 2010; became CEO of Google DeepMind after the 2023 merger with Google Brain"
@@ -78,7 +78,7 @@ items:
         notes: "PhD in cognitive neuroscience; research on imagination and memory in the hippocampus"
 
       i_dHoP1qR2s:
-        organization: !ref A4XoubikkQ  # deepmind
+        organization: !ref A4XoubikkQ:deepmind
         title: "Co-founder & CEO"
         start: 2010-09
         source: https://deepmind.google/about/

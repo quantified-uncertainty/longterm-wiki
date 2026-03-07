@@ -154,10 +154,10 @@ facts:
   - id: f_anthropic_founded_by
     property: founded-by
     value:
-      - !ref zR4nW8xB2f  # dario-amodei
-      - !ref tKMznr07QA  # daniela-amodei
+      - !ref zR4nW8xB2f:dario-amodei
+      - !ref tKMznr07QA:daniela-amodei
       - tom-brown
-      - !ref Tz48rTriBg  # chris-olah
+      - !ref Tz48rTriBg:chris-olah
       - jared-kaplan
       - sam-mccandlish
       - jack-clark
@@ -381,21 +381,21 @@ items:
     type: key-person
     entries:
       i_Xp9vKZzBsg:
-        person: !ref zR4nW8xB2f  # dario-amodei
+        person: !ref zR4nW8xB2f:dario-amodei
         title: CEO
         start: 2021-01
         is_founder: true
         source: https://anthropic.com/company
 
       i_tvfFyLStkg:
-        person: !ref tKMznr07QA  # daniela-amodei
+        person: !ref tKMznr07QA:daniela-amodei
         title: President
         start: 2021-01
         is_founder: true
         source: https://anthropic.com/company
 
       i_eKbtDictxQ:
-        person: !ref Tz48rTriBg  # chris-olah
+        person: !ref Tz48rTriBg:chris-olah
         title: "Research Lead, Mechanistic Interpretability"
         start: 2021-01
         is_founder: true
@@ -430,7 +430,7 @@ items:
         notes: "Originally CTO, transitioned to Chief Architect Oct 2025"
 
       i_XJb55cQ6zg:
-        person: !ref hQ7mR2kN5p  # jan-leike
+        person: !ref hQ7mR2kN5p:jan-leike
         title: "Head of Alignment Science"
         start: 2024-05
         source: https://anthropic.com/news/jan-leike-joins-anthropic

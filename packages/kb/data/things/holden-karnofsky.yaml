@@ -26,7 +26,7 @@ facts:
 
   - id: f_vAidx4lhTo
     property: employed-by
-    value: !ref mK9pX3rQ7n  # anthropic
+    value: !ref mK9pX3rQ7n:anthropic
     asOf: 2025-01
     source: https://www.anthropic.com/
     notes: "Joined Anthropic as Member of Technical Staff in early 2025; works on responsible scaling policy"
@@ -102,7 +102,7 @@ items:
         notes: "Spun out from GiveWell; directed billions in grantmaking; authored influential 'Most Important Century' series; stepped back from operational role in 2024"
 
       i_hKoP1qR2s:
-        organization: !ref mK9pX3rQ7n  # anthropic
+        organization: !ref mK9pX3rQ7n:anthropic
         title: "Member of Technical Staff"
         start: 2025-01
         source: https://www.anthropic.com/

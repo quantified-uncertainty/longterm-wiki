@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_N2rrW9c6JA
     property: employed-by
-    value: !ref 1LcLlMGLbw  # openai
+    value: !ref 1LcLlMGLbw:openai
     asOf: 2015-12
     validEnd: 2018-02
     source: https://openai.com/blog/introducing-openai
@@ -25,7 +25,7 @@ facts:
 
   - id: f_7FJCjl4c9Q
     property: employed-by
-    value: !ref GLXKjYAEKw  # xai
+    value: !ref GLXKjYAEKw:xai
     asOf: 2023-03
     source: https://x.ai
     notes: "Founded xAI in March 2023 to develop AI; also CEO of Tesla and SpaceX"
@@ -98,7 +98,7 @@ items:
         notes: "Joined as chairman in 2004, became CEO in 2008; led Tesla to become most valuable automaker"
 
       i_eMtU3vW4x:
-        organization: !ref 1LcLlMGLbw  # openai
+        organization: !ref 1LcLlMGLbw:openai
         title: "Co-founder & Co-chairman"
         start: 2015-12
         end: 2018-02
@@ -113,7 +113,7 @@ items:
         notes: "Acquired Twitter for $44B in October 2022; rebranded to X; appointed Linda Yaccarino as CEO in June 2023"
 
       i_eMdE7fG8h:
-        organization: !ref GLXKjYAEKw  # xai
+        organization: !ref GLXKjYAEKw:xai
         title: "Founder & CEO"
         start: 2023-03
         source: https://x.ai

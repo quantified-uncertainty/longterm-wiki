@@ -28,7 +28,7 @@ facts:
   - id: f_arc_founded_by
     property: founded-by
     value:
-      - !ref vzxfzxBITd  # paul-christiano
+      - !ref vzxfzxBITd:paul-christiano
     source: https://alignment.org/
 
 items:
@@ -36,7 +36,7 @@ items:
     type: key-person
     entries:
       i_6mcYQLF7nq:
-        person: !ref vzxfzxBITd  # paul-christiano
+        person: !ref vzxfzxBITd:paul-christiano
         title: "Founder & Head of Research"
         start: 2021-10
         is_founder: true

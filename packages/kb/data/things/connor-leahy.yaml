@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_6RTYYOtNHd
     property: employed-by
-    value: !ref 0u4J70VqFY  # conjecture
+    value: !ref 0u4J70VqFY:conjecture
     asOf: 2022-03
     source: https://www.conjecture.dev/
     notes: "Co-founded Conjecture in 2022; previously co-founded EleutherAI"
@@ -58,7 +58,7 @@ items:
         notes: "Co-founded open-source AI research collective; developed GPT-NeoX-20B and GPT-J-6B; started as a Discord community replicating GPT-3"
 
       i_cL4eF5gH6i:
-        organization: !ref 0u4J70VqFY  # conjecture
+        organization: !ref 0u4J70VqFY:conjecture
         title: "CEO & Co-founder"
         start: 2022-03
         source: https://www.conjecture.dev/

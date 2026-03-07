@@ -31,7 +31,7 @@ facts:
   - id: f_miri_founded_by
     property: founded-by
     value:
-      - !ref fS1tEGKuNq  # eliezer-yudkowsky
+      - !ref fS1tEGKuNq:eliezer-yudkowsky
     source: https://intelligence.org/about/
 
   - id: f_EUnXQGwIzd
@@ -46,7 +46,7 @@ items:
     type: key-person
     entries:
       i_XVLjPAQXky:
-        person: !ref fS1tEGKuNq  # eliezer-yudkowsky
+        person: !ref fS1tEGKuNq:eliezer-yudkowsky
         title: "Founder & Senior Research Fellow"
         start: 2000-01
         is_founder: true
