@@ -375,6 +375,80 @@ interface PrFileEntry {
   filename: string;
 }
 
+interface CommitEntry {
+  sha: string;
+}
+
+interface CommitDetail {
+  files?: { filename: string }[];
+}
+
+/** Fetch commit SHAs for a PR. Cached per-call to avoid duplicate fetches. */
+async function fetchPrCommitShas(
+  config: PatrolConfig,
+  prNumber: number,
+  cache: Map<number, string[]>,
+): Promise<string[]> {
+  const cached = cache.get(prNumber);
+  if (cached) return cached;
+  try {
+    const commits = await githubApi<CommitEntry[]>(
+      `/repos/${config.repo}/pulls/${prNumber}/commits?per_page=100`,
+    );
+    const shas = commits.map((c) => c.sha);
+    cache.set(prNumber, shas);
+    return shas;
+  } catch (e) {
+    log(`  Warning: could not fetch commits for PR #${prNumber}: ${e instanceof Error ? e.message : String(e)}`);
+    cache.set(prNumber, []);
+    return [];
+  }
+}
+
+/** Fetch files changed in a single commit. */
+async function fetchCommitFiles(config: PatrolConfig, sha: string): Promise<string[]> {
+  try {
+    const detail = await githubApi<CommitDetail>(`/repos/${config.repo}/commits/${sha}`);
+    return (detail.files ?? []).map((f) => f.filename);
+  } catch (e) {
+    log(`  Warning: could not fetch files for commit ${sha.slice(0, 8)}: ${e instanceof Error ? e.message : String(e)}`);
+    return [];
+  }
+}
+
+/**
+ * For an overlapping PR pair, determine which overlapping files are fully
+ * explained by shared commits (stacked branches). Returns the set of files
+ * that are NOT from shared commits (i.e., genuine independent overlap).
+ */
+async function filterSharedCommitFiles(
+  config: PatrolConfig,
+  prA: number,
+  prB: number,
+  overlappingFiles: string[],
+  commitCache: Map<number, string[]>,
+): Promise<{ genuineOverlap: string[]; sharedCommitCount: number }> {
+  const shaA = await fetchPrCommitShas(config, prA, commitCache);
+  const shaB = await fetchPrCommitShas(config, prB, commitCache);
+
+  const setA = new Set(shaA);
+  const sharedShas = shaB.filter((sha) => setA.has(sha));
+
+  if (sharedShas.length === 0) {
+    return { genuineOverlap: overlappingFiles, sharedCommitCount: 0 };
+  }
+
+  // Fetch files for each shared commit and build a set
+  const sharedCommitFiles = new Set<string>();
+  for (const sha of sharedShas) {
+    const files = await fetchCommitFiles(config, sha);
+    for (const f of files) sharedCommitFiles.add(f);
+  }
+
+  const genuineOverlap = overlappingFiles.filter((f) => !sharedCommitFiles.has(f));
+  return { genuineOverlap, sharedCommitCount: sharedShas.length };
+}
+
 async function detectPrOverlaps(config: PatrolConfig, prs: DetectedPr[]): Promise<void> {
   // Limit to first 20 PRs to avoid rate limits
   const prSubset = prs.slice(0, 20);
@@ -431,6 +505,9 @@ async function detectPrOverlaps(config: PatrolConfig, prs: DetectedPr[]): Promis
 
   log(`  Found ${overlaps.size} PR pair(s) with shared files`);
 
+  // Cache commit SHAs across pairs to avoid duplicate fetches
+  const commitCache = new Map<number, string[]>();
+
   // Post warning comments (respecting cooldown)
   for (const [pairKey, sharedFiles] of overlaps) {
     const overlapKey = `overlap-${pairKey}`;
@@ -442,16 +519,43 @@ async function detectPrOverlaps(config: PatrolConfig, prs: DetectedPr[]): Promis
     const [aStr, bStr] = pairKey.split('-');
     const prA = parseInt(aStr, 10);
     const prB = parseInt(bStr, 10);
-    const uniqueFiles = [...new Set(sharedFiles)];
+    let uniqueFiles = [...new Set(sharedFiles)];
+
+    // Check if the overlap is explained by shared commits (stacked branches)
+    const { genuineOverlap, sharedCommitCount } = await filterSharedCommitFiles(
+      config, prA, prB, uniqueFiles, commitCache,
+    );
+
+    if (sharedCommitCount > 0 && genuineOverlap.length === 0) {
+      log(`  PRs #${prA} and #${prB}: all ${uniqueFiles.length} overlapping file(s) from ${sharedCommitCount} shared commit(s) (stacked branches) — skipping warning`);
+      markProcessed(overlapKey);
+      appendJsonl(JSONL_FILE, {
+        type: 'overlap_skipped_stacked',
+        pr_a: prA,
+        pr_b: prB,
+        shared_files: uniqueFiles.length,
+        shared_commits: sharedCommitCount,
+      });
+      continue;
+    }
+
+    if (sharedCommitCount > 0) {
+      log(`  PRs #${prA} and #${prB}: ${uniqueFiles.length - genuineOverlap.length} file(s) from shared commits, ${genuineOverlap.length} genuine overlap(s)`);
+      uniqueFiles = genuineOverlap;
+    }
+
     const fileList = uniqueFiles.slice(0, 10).join('\n- ');
     const moreCount = uniqueFiles.length > 10 ? ` (+${uniqueFiles.length - 10} more)` : '';
+    const stackedNote = sharedCommitCount > 0
+      ? `\n\n_Note: These PRs share ${sharedCommitCount} commit(s) (stacked branches). Only independently-modified files are listed above._`
+      : '';
 
     const body = `⚠️ **PR Overlap Warning**
 
 This PR shares ${uniqueFiles.length} file(s) with PR #${prB}:
 - ${fileList}${moreCount}
 
-Coordinate to avoid merge conflicts.
+Coordinate to avoid merge conflicts.${stackedNote}
 
 _Posted by PR Patrol — informational only._`;
 
@@ -477,6 +581,7 @@ _Posted by PR Patrol — informational only._`;
       pr_a: prA,
       pr_b: prB,
       shared_files: uniqueFiles.length,
+      shared_commits: sharedCommitCount,
     });
   }
 }
