@@ -123,8 +123,12 @@ function SingleValueProperty({
   propertyId: string;
   items: FactWithProperty[];
 }) {
-  // Sort by asOf descending to pick the most recent value
-  const sorted = [...items].sort((a, b) => {
+  // Prefer currently-active facts (no validEnd), then sort by asOf descending
+  const candidates = items.some((item) => !item.fact.validEnd)
+    ? items.filter((item) => !item.fact.validEnd)
+    : items;
+
+  const sorted = [...candidates].sort((a, b) => {
     if (!a.fact.asOf && !b.fact.asOf) return 0;
     if (!a.fact.asOf) return 1;
     if (!b.fact.asOf) return -1;
