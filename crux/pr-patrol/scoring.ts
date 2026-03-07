@@ -1,40 +1,22 @@
 /**
- * PR Patrol — Scoring and budget computation
+ * PR Patrol — Scoring re-exports and budget computation (daemon-specific)
+ *
+ * Pure scoring functions (computeScore, rankPrs, ISSUE_SCORES) live in
+ * crux/lib/pr-analysis/scoring.ts. This module re-exports them and adds
+ * the daemon-specific budget computation (max-turns + timeout per issue type).
  */
 
-import type { DetectedPr, PrIssueType, ScoredPr } from './types.ts';
+import type { PrIssueType } from './types.ts';
 
-// ── Issue scores ─────────────────────────────────────────────────────────────
+// ── Re-exports from lib ──────────────────────────────────────────────────────
 
-export const ISSUE_SCORES: Record<PrIssueType, number> = {
-  conflict: 100,
-  'ci-failure': 80,
-  'bot-review-major': 55,
-  'missing-issue-ref': 40,
-  stale: 30,
-  'missing-testplan': 20,
-  'bot-review-nitpick': 15,
-};
+export {
+  ISSUE_SCORES,
+  computeScore,
+  rankPrs,
+} from '../lib/pr-analysis/index.ts';
 
-/** Pure function — computes priority score for a detected PR. */
-export function computeScore(pr: DetectedPr): number {
-  let score = 0;
-  for (const issue of pr.issues) score += ISSUE_SCORES[issue] ?? 0;
-
-  // Age bonus: 1 point per hour, capped at 50
-  const ageHours = (Date.now() - new Date(pr.createdAt).getTime()) / 3_600_000;
-  score += Math.min(50, Math.max(0, Math.floor(ageHours)));
-
-  return score;
-}
-
-export function rankPrs(prs: DetectedPr[]): ScoredPr[] {
-  return prs
-    .map((pr) => ({ ...pr, score: computeScore(pr) }))
-    .sort((a, b) => b.score - a.score);
-}
-
-// ── Issue-type-specific resource limits ──────────────────────────────────────
+// ── Issue-type-specific resource limits (daemon-specific) ────────────────────
 // Scale max-turns and timeout based on the hardest issue in a PR.
 // This prevents trivial issues from consuming the full 40-turn / 30-min budget.
 

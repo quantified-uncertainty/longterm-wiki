@@ -12,6 +12,7 @@
  */
 
 import { join } from "path";
+import type { ValidationResult } from "../../packages/kb/src/types.ts";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 
 const verbose = process.argv.includes("--verbose");
@@ -34,16 +35,16 @@ async function main(): Promise<void> {
 
   const dataDir = join(PROJECT_ROOT, "packages/kb/data");
   const graph = await loadKB(dataDir);
-  const results = validate(graph);
+  const results: ValidationResult[] = validate(graph);
 
   // Separate blocking errors from demoted/warning-level issues
   const blockingErrors = results.filter(
-    (r) => r.severity === "error" && !DEMOTED_RULES.has(r.rule)
+    (r: { severity: string; rule: string }) => r.severity === "error" && !DEMOTED_RULES.has(r.rule)
   );
   const demotedErrors = results.filter(
-    (r) => r.severity === "error" && DEMOTED_RULES.has(r.rule)
+    (r: { severity: string; rule: string }) => r.severity === "error" && DEMOTED_RULES.has(r.rule)
   );
-  const warnings = results.filter((r) => r.severity === "warning");
+  const warnings = results.filter((r: { severity: string }) => r.severity === "warning");
 
   if (verbose) {
     for (const w of warnings) {

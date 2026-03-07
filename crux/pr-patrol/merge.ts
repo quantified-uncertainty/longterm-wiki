@@ -1,16 +1,24 @@
 /**
- * PR Patrol — Merge eligibility checking and execution
+ * PR Patrol — Merge execution (daemon-specific)
+ *
+ * Pure merge eligibility checking lives in crux/lib/pr-analysis/merge-check.ts.
+ * This module handles the actual merge and undraft execution with:
+ *   - GitHub API calls (squash merge, undraft mutation)
+ *   - JSONL logging
+ *   - Comment posting
  */
 
 import { githubApi, githubGraphQL } from '../lib/github.ts';
+import {
+  checkMergeEligibility as libCheckMergeEligibility,
+  findMergeCandidates as libFindMergeCandidates,
+} from '../lib/pr-analysis/index.ts';
 import type {
   GqlPrNode,
-  MergeBlockReason,
   MergeCandidate,
   MergeOutcome,
   PatrolConfig,
 } from './types.ts';
-import { LABELS } from './types.ts';
 import { appendJsonl, JSONL_FILE, log } from './state.ts';
 import {
   buildMergeComment,
@@ -18,97 +26,10 @@ import {
   postEventComment,
 } from './comments.ts';
 
-// ── Merge eligibility ────────────────────────────────────────────────────────
+// ── Re-exports for backward compatibility ────────────────────────────────────
 
-/** Pure function — checks whether a PR with stage:approved label is eligible for auto-merge. */
-export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
-  const blockReasons: MergeBlockReason[] = [];
-  const labels = pr.labels.nodes.map((l) => l.name);
-
-  if (pr.isDraft) {
-    blockReasons.push('is-draft');
-  }
-
-  if (labels.includes(LABELS.AGENT_WORKING)) {
-    blockReasons.push('agent-working');
-  }
-
-  if (pr.mergeable !== 'MERGEABLE') {
-    blockReasons.push('not-mergeable');
-  }
-
-  const contexts =
-    pr.commits?.nodes?.[0]?.commit?.statusCheckRollup?.contexts?.nodes ?? [];
-
-  // GitHub CheckRun conclusions that indicate a non-passing state.
-  // See: https://docs.github.com/en/graphql/reference/enums#checkconclusionstate
-  const FAILING_CONCLUSIONS = new Set([
-    'FAILURE',
-    'CANCELLED',
-    'TIMED_OUT',
-    'ACTION_REQUIRED',
-    'STARTUP_FAILURE',
-    'STALE',
-  ]);
-  const hasFailure = contexts.some(
-    (c) =>
-      (c.conclusion != null && FAILING_CONCLUSIONS.has(c.conclusion)) ||
-      c.state === 'FAILURE' ||
-      c.state === 'ERROR',
-  );
-  if (hasFailure) {
-    blockReasons.push('ci-failing');
-  }
-
-  if (contexts.length > 0 && !hasFailure) {
-    const hasPending = contexts.some(
-      (c) =>
-        (c.conclusion === null || c.conclusion === undefined) &&
-        c.state !== 'SUCCESS',
-    );
-    if (hasPending) {
-      blockReasons.push('ci-pending');
-    }
-  }
-
-  const threads = pr.reviewThreads?.nodes ?? [];
-  const unresolvedThreads = threads.filter(
-    (t) => !t.isResolved && !t.isOutdated,
-  );
-  if (unresolvedThreads.length > 0) {
-    blockReasons.push('unresolved-threads');
-  }
-
-  const body = pr.body ?? '';
-  const uncheckedCheckboxes = [...body.matchAll(/^[\s]*-\s+\[ \]/gm)];
-  if (uncheckedCheckboxes.length > 0) {
-    blockReasons.push('unchecked-items');
-  }
-
-  return {
-    number: pr.number,
-    title: pr.title,
-    branch: pr.headRefName,
-    createdAt: pr.createdAt,
-    headOid: pr.headRefOid,
-    eligible: blockReasons.length === 0,
-    blockReasons,
-  };
-}
-
-/** Find all PRs labeled stage:approved and check their merge eligibility. Sorted oldest first. */
-export function findMergeCandidates(prs: GqlPrNode[]): MergeCandidate[] {
-  return prs
-    .filter((pr) => {
-      const labels = pr.labels.nodes.map((l) => l.name);
-      return labels.includes(LABELS.STAGE_APPROVED);
-    })
-    .map(checkMergeEligibility)
-    .sort(
-      (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    );
-}
+export { libCheckMergeEligibility as checkMergeEligibility };
+export { libFindMergeCandidates as findMergeCandidates };
 
 // ── Undraft execution ────────────────────────────────────────────────────────
 
