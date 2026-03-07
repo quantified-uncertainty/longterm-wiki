@@ -442,6 +442,13 @@
       "when": 1773993600000,
       "tag": "0062_add_numeric_cost_duration_to_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1774080000000,
+      "tag": "0063_add_session_id_to_agent_sessions",
+      "breakpoints": true
     }
   ]
 }

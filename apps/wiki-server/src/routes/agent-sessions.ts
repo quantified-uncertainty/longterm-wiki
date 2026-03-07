@@ -115,15 +115,16 @@ const agentSessionsApp = new Hono()
     const parsed = UpdateAgentSessionSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const { checklistMd, status, prUrl, prOutcome, fixesPrUrl } = parsed.data;
+    const { checklistMd, status, prUrl, prOutcome, fixesPrUrl, sessionId } = parsed.data;
     if (
       checklistMd === undefined &&
       status === undefined &&
       prUrl === undefined &&
       prOutcome === undefined &&
-      fixesPrUrl === undefined
+      fixesPrUrl === undefined &&
+      sessionId === undefined
     ) {
-      return validationError(c, "At least one of checklistMd, status, prUrl, prOutcome, or fixesPrUrl must be provided");
+      return validationError(c, "At least one of checklistMd, status, prUrl, prOutcome, fixesPrUrl, or sessionId must be provided");
     }
 
     const updates: Record<string, unknown> = { updatedAt: new Date() };
@@ -137,13 +138,34 @@ const agentSessionsApp = new Hono()
     if (prUrl !== undefined) updates.prUrl = prUrl;
     if (prOutcome !== undefined) updates.prOutcome = prOutcome;
     if (fixesPrUrl !== undefined) updates.fixesPrUrl = fixesPrUrl;
+    if (sessionId !== undefined) updates.sessionId = sessionId;
 
     const db = getDrizzleDb();
-    const result = await db
-      .update(agentSessions)
-      .set(updates)
-      .where(eq(agentSessions.id, id))
-      .returning();
+    let result;
+    try {
+      result = await db
+        .update(agentSessions)
+        .set(updates)
+        .where(eq(agentSessions.id, id))
+        .returning();
+    } catch (e: unknown) {
+      // Drizzle wraps DB errors in DrizzleQueryError; the FK message lives in e.cause.
+      const msg = e instanceof Error ? e.message : String(e);
+      const causeMsg =
+        e instanceof Error && e.cause instanceof Error ? e.cause.message : "";
+      const isFkViolation =
+        msg.includes("foreign key") ||
+        msg.includes("violates foreign key") ||
+        causeMsg.includes("foreign key") ||
+        causeMsg.includes("violates foreign key");
+      if (isFkViolation) {
+        return c.json(
+          { error: "invalid_reference", message: "sessionId references a non-existent session" },
+          400,
+        );
+      }
+      throw e;
+    }
 
     if (result.length === 0) {
       return c.json({ error: "not_found", message: `No session with id: ${id}` }, 404);
