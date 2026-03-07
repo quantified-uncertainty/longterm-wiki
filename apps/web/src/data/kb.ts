@@ -102,6 +102,73 @@ export function getKBProperties(): Property[] {
 export const getKBThing = getKBEntity;
 
 /**
+ * Get the latest fact for a given property across all entities.
+ * Returns a map of entityId → latest Fact for entities that have the property.
+ * Optionally filtered to a subset of entity IDs.
+ */
+export function getKBFactsByProperty(
+  propertyId: string,
+  entityIds?: string[],
+): Map<string, Fact> {
+  const kb = getKB();
+  if (!kb) return new Map();
+
+  const ids = entityIds ?? kb.entities.map((e) => e.id);
+  const result = new Map<string, Fact>();
+
+  for (const entityId of ids) {
+    const facts = (kb.facts[entityId] ?? []).filter(
+      (f) => f.propertyId === propertyId,
+    );
+    if (facts.length === 0) continue;
+
+    // Pick the latest by asOf
+    const sorted = facts.slice().sort((a, b) => {
+      if (a.asOf === undefined && b.asOf === undefined) return 0;
+      if (a.asOf === undefined) return 1;
+      if (b.asOf === undefined) return -1;
+      return b.asOf.localeCompare(a.asOf);
+    });
+    result.set(entityId, sorted[0]!);
+  }
+
+  return result;
+}
+
+/**
+ * Get all facts for a given property across all entities (full history).
+ * Returns a map of entityId → Fact[] (sorted most-recent-first).
+ * Optionally filtered to a subset of entity IDs.
+ */
+export function getKBAllFactsByProperty(
+  propertyId: string,
+  entityIds?: string[],
+): Map<string, Fact[]> {
+  const kb = getKB();
+  if (!kb) return new Map();
+
+  const ids = entityIds ?? kb.entities.map((e) => e.id);
+  const result = new Map<string, Fact[]>();
+
+  for (const entityId of ids) {
+    const facts = (kb.facts[entityId] ?? [])
+      .filter((f) => f.propertyId === propertyId)
+      .slice()
+      .sort((a, b) => {
+        if (a.asOf === undefined && b.asOf === undefined) return 0;
+        if (a.asOf === undefined) return 1;
+        if (b.asOf === undefined) return -1;
+        return b.asOf.localeCompare(a.asOf);
+      });
+    if (facts.length > 0) {
+      result.set(entityId, facts);
+    }
+  }
+
+  return result;
+}
+
+/**
  * Get a type schema by type name.
  */
 export function getKBSchema(type: string): TypeSchema | undefined {
