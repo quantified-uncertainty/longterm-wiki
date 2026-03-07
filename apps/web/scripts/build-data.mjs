@@ -72,7 +72,6 @@ const DATA_FILES = [
   { key: 'funders', file: 'funders.yaml' },
   { key: 'resources', dir: 'resources' }, // Split into multiple files
   { key: 'publications', file: 'publications.yaml' },
-  { key: 'parameterGraph', file: 'parameter-graph.yaml', isObject: true }, // Graph structure (not array)
 ];
 
 function loadYaml(filename) {
@@ -1588,10 +1587,10 @@ async function main() {
     const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex);
     console.log(`  linkSignals: ${linkSignals.length} link signals collected for server sync`);
     const linkResult = await syncPageLinks(linkSignals);
-    if (linkResult) {
-      console.log(`  linkSync: synced ${linkResult.upserted} links to wiki server`);
+    if (linkResult.ok) {
+      console.log(`  linkSync: synced ${linkResult.data.upserted} links to wiki server`);
     } else {
-      console.log('  linkSync: skipped (server unavailable or error)');
+      console.log(`  linkSync: skipped (${linkResult.message || 'server unavailable or error'})`);
     }
   }
 

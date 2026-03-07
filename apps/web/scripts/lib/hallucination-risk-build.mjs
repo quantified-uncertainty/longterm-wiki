@@ -95,9 +95,9 @@ export async function syncRiskSnapshots(pages, contentOnly) {
     }));
 
   const result = await recordRiskSnapshots(snapshots);
-  if (result) {
-    console.log(`  riskSnapshots: recorded ${result.inserted} snapshots to wiki server`);
+  if (result.ok) {
+    console.log(`  riskSnapshots: recorded ${result.data.inserted} snapshots to wiki server`);
   } else {
-    console.log('  riskSnapshots: skipped (server unavailable or error)');
+    console.log(`  riskSnapshots: skipped (${result.message || 'server unavailable or error'})`);
   }
 }
