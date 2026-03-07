@@ -1,7 +1,7 @@
 name: Protected Paths Check
 
 # Flags PRs that modify agent behavioral rules, CI workflows, or validation
-# code for mandatory human review. Without the `rules-change-reviewed` label,
+# code for mandatory human review. Without the `0-rules-reviewed` label,
 # the check fails so these changes cannot merge unnoticed.
 
 on:
@@ -11,11 +11,11 @@ on:
 
 jobs:
   check-protected-paths:
-    # Only run on label events if the label is rules-change-reviewed.
+    # Only run on label events if the label is 0-rules-reviewed.
     # Other label changes (e.g. claude-working heartbeat) are irrelevant.
     if: >-
       github.event.action != 'labeled' && github.event.action != 'unlabeled' ||
-      github.event.label.name == 'rules-change-reviewed'
+      github.event.label.name == '0-rules-reviewed'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -41,7 +41,7 @@ jobs:
               /^\.squawk\.toml$/,
             ];
 
-            const REVIEW_LABEL = 'rules-change-reviewed';
+            const REVIEW_LABEL = '0-rules-reviewed';
             const COMMENT_MARKER = '<!-- protected-paths-check -->';
 
             // Get list of files changed in this PR
