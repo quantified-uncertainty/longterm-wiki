@@ -335,7 +335,8 @@ jobs:
     # Trigger Vercel production deployment after CI passes on the production branch.
     # Vercel GitHub integration is disabled (vercel.json github.enabled=false) to
     # prevent PR failure statuses — deploy hooks bypass the GitHub integration.
-    # The VERCEL_DEPLOY_HOOK_URL secret must be a hook configured for the "production" branch.
+    # The VERCEL_PRODUCTION_DEPLOY_HOOK_URL secret must be a hook configured for the "production" branch.
+    # VERCEL_DEPLOY_HOOK_URL is a separate hook for the "main" branch (used by scheduled-deploy.yml).
     needs: [ci, migrate-test]
     if: vars.AUTOMATION_PAUSED != 'true' && github.ref == 'refs/heads/production' && github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -344,15 +345,15 @@ jobs:
     steps:
       - name: Trigger Vercel production deployment
         run: |
-          if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}" ]; then
-            echo "::error::VERCEL_DEPLOY_HOOK_URL secret is not set."
+          if [ -z "${{ secrets.VERCEL_PRODUCTION_DEPLOY_HOOK_URL }}" ]; then
+            echo "::error::VERCEL_PRODUCTION_DEPLOY_HOOK_URL secret is not set."
             echo "Go to Vercel Dashboard → Project → Settings → Git → Deploy Hooks"
             echo "Create a hook for Branch 'production', then add the URL as a GitHub secret."
             exit 1
           fi
 
           RESPONSE=$(curl -s -o /tmp/vercel_response.json -w "%{http_code}" \
-            -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}")
+            -X POST "${{ secrets.VERCEL_PRODUCTION_DEPLOY_HOOK_URL }}")
 
           echo "HTTP status: $RESPONSE"
           cat /tmp/vercel_response.json
