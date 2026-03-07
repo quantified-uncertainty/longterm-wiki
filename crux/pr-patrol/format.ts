@@ -40,7 +40,7 @@ function shortDateTime(timestamp: string): string {
 
 /** Simple horizontal bar chart using block characters. */
 export function barChart(value: number, maxValue: number, maxWidth: number = 20): string {
-  if (maxValue === 0) return '';
+  if (maxValue === 0 || value === 0) return '';
   const width = Math.round((value / maxValue) * maxWidth);
   return '\u2588'.repeat(Math.max(1, width));
 }

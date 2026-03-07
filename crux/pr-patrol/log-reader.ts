@@ -237,10 +237,11 @@ export function computeStats(entries: LogEntry[]): AggregatedStats {
     }
   }
 
-  // Performance metrics (only for non-dry-run fixes)
-  const fixTimes = fixes.filter((f) => f.outcome !== 'dry-run' && f.elapsed_s > 0).map((f) => f.elapsed_s);
+  // Performance metrics (only for non-dry-run fixes with elapsed time)
+  const realFixes = fixes.filter((f) => f.outcome !== 'dry-run' && f.elapsed_s > 0);
+  const fixTimes = realFixes.map((f) => f.elapsed_s);
   const sortedTimes = [...fixTimes].sort((a, b) => a - b);
-  const maxEntry = fixes.reduce(
+  const maxEntry = realFixes.reduce(
     (max, f) => (f.elapsed_s > (max?.elapsed_s ?? 0) ? f : max),
     null as PrResultEntry | null,
   );
