@@ -15,6 +15,6 @@
 -- pattern impossible. agent_sessions is a small table (hundreds of rows), so the
 -- brief SHARE ROW EXCLUSIVE lock is acceptable.
 
-ALTER TABLE "agent_sessions" ADD COLUMN IF NOT EXISTS "session_id" integer REFERENCES "sessions"("id") ON DELETE SET NULL;
+ALTER TABLE "agent_sessions" ADD COLUMN IF NOT EXISTS "session_id" bigint REFERENCES "sessions"("id") ON DELETE SET NULL;
 
 CREATE INDEX IF NOT EXISTS "idx_as_session_id" ON "agent_sessions" ("session_id");

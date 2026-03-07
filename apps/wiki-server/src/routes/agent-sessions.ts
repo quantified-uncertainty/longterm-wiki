@@ -141,11 +141,21 @@ const agentSessionsApp = new Hono()
     if (sessionId !== undefined) updates.sessionId = sessionId;
 
     const db = getDrizzleDb();
-    const result = await db
-      .update(agentSessions)
-      .set(updates)
-      .where(eq(agentSessions.id, id))
-      .returning();
+    let result;
+    try {
+      result = await db
+        .update(agentSessions)
+        .set(updates)
+        .where(eq(agentSessions.id, id))
+        .returning();
+    } catch (e: unknown) {
+      // Translate FK violation into a 400 response
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("foreign key") || msg.includes("violates foreign key")) {
+        return c.json({ error: "invalid_reference", message: "sessionId references a non-existent session" }, 400);
+      }
+      throw e;
+    }
 
     if (result.length === 0) {
       return c.json({ error: "not_found", message: `No session with id: ${id}` }, 404);

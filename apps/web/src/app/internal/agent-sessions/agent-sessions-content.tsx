@@ -64,9 +64,10 @@ async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
   }
 
   const rows: AgentSessionRow[] = agentResult.data.sessions.map((s): AgentSessionRow => {
-    // Prefer FK-linked session log; fall back to branch-name heuristic for older records
-    const log = (s.sessionId != null ? logsById.get(s.sessionId) : undefined)
-      ?? logsByBranch.get(s.branch);
+    // Prefer FK-linked session log; only fall back to branch heuristic when sessionId is absent
+    const log = s.sessionId != null
+      ? logsById.get(s.sessionId)
+      : logsByBranch.get(s.branch);
     return {
       id: s.id,
       branch: s.branch,

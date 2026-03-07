@@ -130,7 +130,7 @@ export async function syncSessionFile(filePath: string): Promise<boolean> {
   if (entry.branch) {
     try {
       const agentSessionResult = await getAgentSessionByBranch(entry.branch);
-      if (agentSessionResult.ok) {
+      if (agentSessionResult.ok && agentSessionResult.data.sessionId == null) {
         await updateAgentSession(agentSessionResult.data.id, {
           sessionId: result.data.id,
         });
@@ -175,9 +175,9 @@ async function main() {
   console.log(`  Branch: ${entry.branch || '(none)'}`);
   console.log(`  Pages: ${entry.pages?.length || 0}`);
 
-  const result = await createSession(entry);
-  if (result.ok) {
-    console.log(`\u2713 Session synced to wiki-server (id: ${result.data.id})`);
+  const ok = await syncSessionFile(resolved);
+  if (ok) {
+    console.log(`\u2713 Session synced to wiki-server`);
   } else {
     console.log('Warning: could not sync session to wiki-server (server unavailable or error)');
     // Not a hard failure — YAML is authoritative
