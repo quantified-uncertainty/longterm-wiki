@@ -64,6 +64,9 @@ interface StatementDetail {
   createdAt: string;
   updatedAt: string | null;
   citationCount: number;
+  qualityScore: number | null;
+  qualityDimensions: Record<string, number> | null;
+  scoredAt: string | null;
 }
 
 interface PropertyInfo {
@@ -153,7 +156,7 @@ export default async function StatementDetailPage({ params }: PageProps) {
       : null
   );
 
-  // Related statements: same entity + property, different ID
+  // Related statements: same entity + property, different ID, sorted newest first
   const relatedStatements = allEntityStatements
     .filter(
       (s) =>
@@ -161,6 +164,12 @@ export default async function StatementDetailPage({ params }: PageProps) {
         s.propertyId === statement.propertyId &&
         statement.propertyId != null
     )
+    .sort((a, b) => {
+      if (!a.validStart && !b.validStart) return 0;
+      if (!a.validStart) return 1;
+      if (!b.validStart) return -1;
+      return b.validStart.localeCompare(a.validStart);
+    })
     .slice(0, 10);
 
   return (
@@ -351,6 +360,33 @@ export default async function StatementDetailPage({ params }: PageProps) {
           </Section>
         )}
 
+        {/* Quality Score */}
+        <Section title="Quality Score">
+          {statement.qualityScore == null ? (
+            <p className="text-sm text-muted-foreground">Not yet scored</p>
+          ) : (
+            <div className="space-y-3">
+              <QualityBar score={statement.qualityScore} label="Overall" />
+              {statement.qualityDimensions && (
+                <div className="space-y-1.5 pt-2 border-t border-border/40">
+                  {QUALITY_DIMENSIONS.map(({ key, label }) => {
+                    const dims = statement.qualityDimensions as Record<string, number | undefined>;
+                    const val = dims[key];
+                    return val != null ? (
+                      <QualityBar key={key} score={val} label={label} />
+                    ) : null;
+                  })}
+                </div>
+              )}
+              {statement.scoredAt && (
+                <p className="text-xs text-muted-foreground pt-1">
+                  Scored: {statement.scoredAt}
+                </p>
+              )}
+            </div>
+          )}
+        </Section>
+
         {/* Citations */}
         {citations.length > 0 && (
           <Section title={`Citations (${citations.length})`}>
@@ -434,7 +470,8 @@ export default async function StatementDetailPage({ params }: PageProps) {
             title={`Related Statements (${relatedStatements.length})`}
           >
             <p className="text-xs text-muted-foreground mb-2">
-              Other statements for {entityName} with the same property.
+              Other statements for {entityName} with the same property, sorted
+              newest first.
             </p>
             <div className="rounded-lg border border-border/60 overflow-hidden">
               <table className="w-full text-sm">
@@ -504,7 +541,55 @@ export default async function StatementDetailPage({ params }: PageProps) {
             )}
           </div>
         </Section>
+
+        {/* Raw Data */}
+        <details className="rounded-lg border border-border/60">
+          <summary className="px-4 py-3 text-sm font-semibold text-muted-foreground cursor-pointer hover:bg-muted/20 select-none">
+            Raw Data
+          </summary>
+          <div className="px-4 pb-4 pt-2">
+            <pre className="text-xs bg-muted/30 rounded p-3 overflow-auto max-h-96 whitespace-pre-wrap break-all">
+              {JSON.stringify({ statement, citations }, null, 2)}
+            </pre>
+          </div>
+        </details>
       </div>
+    </div>
+  );
+}
+
+// ---- Quality score helpers ----
+
+const QUALITY_DIMENSIONS = [
+  { key: "structure", label: "Structure" },
+  { key: "precision", label: "Precision" },
+  { key: "clarity", label: "Clarity" },
+  { key: "resolvability", label: "Resolvability" },
+  { key: "uniqueness", label: "Uniqueness" },
+  { key: "atomicity", label: "Atomicity" },
+  { key: "importance", label: "Importance" },
+  { key: "neglectedness", label: "Neglectedness" },
+  { key: "recency", label: "Recency" },
+  { key: "crossEntityUtility", label: "Cross-Entity Utility" },
+];
+
+function QualityBar({ score, label }: { score: number; label: string }) {
+  const pct = Math.round(score * 100);
+  const color =
+    score >= 0.7
+      ? "bg-green-500"
+      : score >= 0.4
+        ? "bg-amber-500"
+        : "bg-red-500";
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-xs text-muted-foreground w-36 shrink-0 truncate">
+        {label}
+      </span>
+      <div className="flex-1 bg-muted/40 rounded-full h-2 overflow-hidden">
+        <div className={`h-2 rounded-full ${color}`} style={{ width: `${pct}%` }} />
+      </div>
+      <span className="text-xs tabular-nums w-8 text-right">{pct}%</span>
     </div>
   );
 }
