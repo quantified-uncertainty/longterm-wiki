@@ -17,8 +17,9 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 import { loadKB } from '../../packages/kb/src/loader.ts';
 import { computeInverses } from '../../packages/kb/src/inverse.ts';
 import { formatFactValue, formatItemEntry } from '../../packages/kb/src/format.ts';
+import { validate } from '../../packages/kb/src/validate.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
-import type { Entity, Fact, ItemEntry } from '../../packages/kb/src/types.ts';
+import type { Entity, Fact, ItemEntry, ValidationResult } from '../../packages/kb/src/types.ts';
 
 const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
 
@@ -26,6 +27,9 @@ interface KBCommandOptions extends BaseOptions {
   type?: string;
   limit?: string;
   ci?: boolean;
+  errorsOnly?: boolean;
+  'errors-only'?: boolean;
+  rule?: string;
 }
 
 // ── KB loading helper ───────────────────────────────────────────────────
@@ -284,12 +288,108 @@ Examples:
   };
 }
 
+// ── Validate command ────────────────────────────────────────────────────
+
+async function validateCommand(
+  args: string[],
+  options: KBCommandOptions,
+): Promise<CommandResult> {
+  const graph = await loadGraph();
+  const allResults = validate(graph);
+
+  const errorsOnly = options.errorsOnly || options['errors-only'];
+  let results = allResults;
+  if (errorsOnly) {
+    results = results.filter((r: ValidationResult) => r.severity === 'error');
+  }
+  if (options.rule) {
+    results = results.filter((r: ValidationResult) => r.rule === options.rule);
+  }
+
+  if (options.ci) {
+    return {
+      exitCode: results.some((r: ValidationResult) => r.severity === 'error') ? 1 : 0,
+      output: JSON.stringify(results),
+    };
+  }
+
+  const errors = results.filter((r: ValidationResult) => r.severity === 'error');
+  const warnings = results.filter((r: ValidationResult) => r.severity === 'warning');
+  const infos = results.filter((r: ValidationResult) => r.severity === 'info');
+
+  const lines: string[] = [];
+  const totalEntities = graph.getAllEntities().length;
+  lines.push(`\x1b[1mKB Validation Report\x1b[0m`);
+  lines.push(`Entities: ${totalEntities} | Errors: ${errors.length} | Warnings: ${warnings.length} | Info: ${infos.length}`);
+  lines.push('');
+
+  if (errors.length > 0) {
+    lines.push(`\x1b[31m\x1b[1mErrors (${errors.length}):\x1b[0m`);
+    for (const r of errors) {
+      lines.push(`  \x1b[31m[${r.rule}]\x1b[0m ${r.message}`);
+    }
+    lines.push('');
+  }
+
+  if (warnings.length > 0 && !errorsOnly) {
+    lines.push(`\x1b[33m\x1b[1mWarnings (${warnings.length}):\x1b[0m`);
+    const warningsByRule = new Map<string, ValidationResult[]>();
+    for (const r of warnings) {
+      const existing = warningsByRule.get(r.rule);
+      if (existing) existing.push(r);
+      else warningsByRule.set(r.rule, [r]);
+    }
+    for (const [rule, ruleWarnings] of warningsByRule) {
+      lines.push(`  \x1b[33m[${rule}]\x1b[0m (${ruleWarnings.length})`);
+      for (const r of ruleWarnings.slice(0, 5)) {
+        lines.push(`    ${r.message}`);
+      }
+      if (ruleWarnings.length > 5) {
+        lines.push(`    ... and ${ruleWarnings.length - 5} more`);
+      }
+    }
+    lines.push('');
+  }
+
+  if (infos.length > 0 && !errorsOnly) {
+    lines.push(`\x1b[36m\x1b[1mInfo (${infos.length}):\x1b[0m`);
+    const infosByRule = new Map<string, ValidationResult[]>();
+    for (const r of infos) {
+      const existing = infosByRule.get(r.rule);
+      if (existing) existing.push(r);
+      else infosByRule.set(r.rule, [r]);
+    }
+    for (const [rule, ruleInfos] of infosByRule) {
+      lines.push(`  \x1b[36m[${rule}]\x1b[0m (${ruleInfos.length})`);
+      for (const r of ruleInfos.slice(0, 3)) {
+        lines.push(`    ${r.message}`);
+      }
+      if (ruleInfos.length > 3) {
+        lines.push(`    ... and ${ruleInfos.length - 3} more`);
+      }
+    }
+    lines.push('');
+  }
+
+  if (errors.length === 0) {
+    lines.push('\x1b[32mNo errors found.\x1b[0m');
+  } else {
+    lines.push(`\x1b[31m${errors.length} error(s) found. Fix these before proceeding.\x1b[0m`);
+  }
+
+  return {
+    exitCode: errors.length > 0 ? 1 : 0,
+    output: lines.join('\n'),
+  };
+}
+
 // ── Exports ─────────────────────────────────────────────────────────────
 
 export const commands = {
   show: showCommand,
   list: listCommand,
   lookup: lookupCommand,
+  validate: validateCommand,
 };
 
 export function getHelp(): string {
@@ -300,11 +400,14 @@ Commands:
   show <entity-id>      Show a single entity with all data, resolving stableIds
   list [--type=X]       List all entities with name, type, stableId, and fact count
   lookup <stableId>     Look up an entity by its stableId
+  validate              Run all KB validation checks
 
 Options:
   --type=X              Filter list by entity type (e.g. organization, person)
   --limit=N             Limit number of results (list only)
   --ci                  JSON output
+  --errors-only         Show only errors (validate)
+  --rule=X              Filter by rule name (validate)
 
 Examples:
   crux kb show anthropic              Show Anthropic with all facts and items
