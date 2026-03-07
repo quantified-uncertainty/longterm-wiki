@@ -248,6 +248,8 @@ interface DatabaseShape {
     accuracyIssues: string | null;
     accuracyCheckedAt: string | null;
   }>>;
+  /** KB (Knowledge Base) structured entity data from packages/kb */
+  kb?: import("@longterm-wiki/kb").SerializedKB;
 }
 
 // ============================================================================
@@ -260,7 +262,7 @@ type AnyEntity = TypedEntity | GenericEntity;
 let _database: DatabaseShape | null = null;
 let _typedEntities: AnyEntity[] | null = null;
 
-function getDatabase(): DatabaseShape {
+export function getDatabase(): DatabaseShape {
   if (_database) return _database;
 
   const dbPath = path.join(LOCAL_DATA_DIR, "database.json");

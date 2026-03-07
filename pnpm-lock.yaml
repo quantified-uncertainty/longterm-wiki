@@ -150,6 +150,9 @@ importers:
       '@dagrejs/dagre':
         specifier: ^1.1.8
         version: 1.1.8
+      '@longterm-wiki/kb':
+        specifier: workspace:*
+        version: link:../../packages/kb
       '@quri/squiggle-components':
         specifier: ^0.10.0
         version: 0.10.0(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.1.18)
@@ -331,6 +334,19 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^4.0.18
+        version: 4.0.18(@types/node@22.19.10)(@vitest/ui@4.0.18)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
+
+  packages/kb:
+    dependencies:
+      yaml:
+        specifier: ^2.7.0
+        version: 2.8.2
+    devDependencies:
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.0
         version: 4.0.18(@types/node@22.19.10)(@vitest/ui@4.0.18)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
 
 packages:

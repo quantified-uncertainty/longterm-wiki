@@ -1,0 +1,110 @@
+thing:
+  id: sam-altman
+  stableId: JKsVHQ5stQ
+  type: person
+  name: "Sam Altman"
+  numericId: 16
+  aliases:
+    - "Samuel H. Altman"
+
+facts:
+  - id: f_StIAxD850A
+    property: employed-by
+    value: !ref 1LcLlMGLbw:openai
+    asOf: 2015-12
+    source: https://openai.com/about
+    notes: "Co-founded OpenAI in December 2015; co-chairman initially, became CEO in 2019 when capped-profit entity was created"
+
+  - id: f_WLIAavRzUQ
+    property: role
+    value: "CEO"
+    asOf: 2019-03
+    source: https://openai.com/about
+    notes: "Briefly fired by the board on November 17, 2023; reinstated November 22, 2023 after employee revolt and Microsoft intervention"
+
+  - id: f_ZfbfHkh9Uw
+    property: born-year
+    value: 1985
+    notes: "Born April 22, 1985 in Chicago, Illinois"
+
+  - id: f_Zu4CcuDsTw
+    property: role
+    value: "President, Y Combinator"
+    asOf: "2014"
+    validEnd: "2019"
+    source: https://www.ycombinator.com/blog/sam-altman-is-the-new-president-of-y-combinator
+    notes: "Succeeded Paul Graham as YC president in 2014; stepped down in 2019 to focus on OpenAI full-time"
+
+  - id: f_aR3kT8mW5q
+    property: education
+    value: "Studied computer science at Stanford University (dropped out after sophomore year)"
+    source: https://en.wikipedia.org/wiki/Sam_Altman
+    notes: "Dropped out to work on Loopt, his first startup"
+
+  - id: f_bN7vQ2xJ4p
+    property: notable-for
+    value: "CEO of OpenAI; previously president of Y Combinator; central figure in the commercialization of large language models"
+    source: https://en.wikipedia.org/wiki/Sam_Altman
+
+  - id: f_cM6wP9rK3s
+    property: social-media
+    value: "@sama"
+    source: https://x.com/sama
+
+  - id: f_dL5uH8tF2n
+    property: role
+    value: "CEO & Co-founder, Loopt"
+    asOf: "2005"
+    validEnd: "2012"
+    source: https://en.wikipedia.org/wiki/Loopt
+    notes: "Location-based social networking app; acquired by Green Dot Corporation for $43.4M in 2012"
+
+items:
+  career-history:
+    type: career-entry
+    entries:
+      i_sA1bC2dE3f:
+        organization: Loopt
+        title: "CEO & Co-founder"
+        start: "2005"
+        end: "2012"
+        source: https://en.wikipedia.org/wiki/Loopt
+        notes: "Location-based social networking startup; funded by Y Combinator S05 batch; acquired by Green Dot Corporation for $43.4M"
+
+      i_sA4gH5iJ6k:
+        organization: "Hydrazine Capital"
+        title: "Managing Partner"
+        start: "2012"
+        end: "2014"
+        source: https://en.wikipedia.org/wiki/Sam_Altman
+        notes: "Venture fund investing in YC companies"
+
+      i_sA7lM8nO9p:
+        organization: "Y Combinator"
+        title: "President"
+        start: "2014"
+        end: "2019"
+        source: https://www.ycombinator.com/blog/sam-altman-is-the-new-president-of-y-combinator
+        notes: "Succeeded Paul Graham; oversaw YC's growth and expansion into growth-stage investing"
+
+      i_sAqR1sT2u:
+        organization: !ref 1LcLlMGLbw:openai
+        title: "Co-chairman → CEO"
+        start: 2015-12
+        source: https://openai.com/about
+        notes: "Co-founded OpenAI Dec 2015; became CEO in 2019; briefly fired Nov 17 2023, reinstated Nov 22 2023"
+
+  notable-publications:
+    type: publication
+    entries:
+      i_sAvW3xY4z:
+        title: "Moore's Law for Everything"
+        year: 2021
+        url: https://moores.samaltman.com/
+        notes: "Influential essay arguing AI-driven productivity gains should fund universal basic income via wealth taxes"
+
+      i_sA5aB6cD7:
+        title: "The Intelligence Age"
+        year: 2024
+        url: https://ia.samaltman.com/
+        notes: "Essay outlining vision for AI's transformative impact on society and economics"

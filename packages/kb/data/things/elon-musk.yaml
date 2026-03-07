@@ -1,0 +1,127 @@
+thing:
+  id: elon-musk
+  stableId: 69vftmr1jg
+  type: person
+  name: "Elon Musk"
+  numericId: 116
+  aliases:
+    - "Musk"
+
+facts:
+  - id: f_N2rrW9c6JA
+    property: employed-by
+    value: !ref 1LcLlMGLbw:openai
+    asOf: 2015-12
+    validEnd: 2018-02
+    source: https://openai.com/blog/introducing-openai
+    notes: "Co-founded OpenAI December 2015; left board February 2018, later sued OpenAI alleging breach of founding mission"
+
+  - id: f_Xd4JyJmh7A
+    property: role
+    value: "Co-chairman"
+    asOf: 2015-12
+    validEnd: 2018-02
+    source: https://openai.com/blog/introducing-openai
+
+  - id: f_7FJCjl4c9Q
+    property: employed-by
+    value: !ref GLXKjYAEKw:xai
+    asOf: 2023-03
+    source: https://x.ai
+    notes: "Founded xAI in March 2023 to develop AI; also CEO of Tesla and SpaceX"
+
+  - id: f_AJGGu7rpAw
+    property: role
+    value: "Founder & CEO"
+    asOf: 2023-03
+    source: https://x.ai
+
+  - id: f_CwDWKGq7Ig
+    property: born-year
+    value: 1971
+    notes: "Born June 28, 1971 in Pretoria, South Africa"
+
+  - id: f_eM1aB2cD3e
+    property: education
+    value: "BS in Economics and BS in Physics, University of Pennsylvania; briefly attended Stanford PhD program (dropped out after 2 days)"
+    source: https://en.wikipedia.org/wiki/Elon_Musk
+
+  - id: f_eM4fG5hI6j
+    property: notable-for
+    value: "CEO of Tesla and SpaceX; founder of xAI; co-founder of OpenAI; owner of X/Twitter; one of the wealthiest people in history"
+    source: https://en.wikipedia.org/wiki/Elon_Musk
+
+  - id: f_eM7kL8mN9o
+    property: net-worth
+    value: 330e9
+    asOf: 2025-03
+    source: https://www.bloomberg.com/billionaires/
+    notes: "Fluctuates significantly with Tesla stock price; Bloomberg Billionaires Index estimate"
+
+  - id: f_eMpQ1rS2t
+    property: social-media
+    value: "@elonmusk"
+    source: https://x.com/elonmusk
+
+items:
+  career-history:
+    type: career-entry
+    entries:
+      i_eM1zA2bC3d:
+        organization: "Zip2"
+        title: "Co-founder & CTO"
+        start: "1995"
+        end: "1999"
+        source: https://en.wikipedia.org/wiki/Elon_Musk
+        notes: "Online city guide software; acquired by Compaq for ~$307M in 1999"
+
+      i_eM4eF5gH6i:
+        organization: "X.com / PayPal"
+        title: "Co-founder & CEO"
+        start: "1999"
+        end: "2002"
+        source: https://en.wikipedia.org/wiki/Elon_Musk
+        notes: "Founded X.com which merged with Confinity to form PayPal; ousted as CEO; PayPal acquired by eBay for $1.5B in 2002"
+
+      i_eM7jK8lM9n:
+        organization: "SpaceX"
+        title: "Founder, CEO & Chief Engineer"
+        start: "2002"
+        source: https://en.wikipedia.org/wiki/SpaceX
+        notes: "Founded Space Exploration Technologies Corp; developed Falcon 9 and Starship reusable rockets"
+
+      i_eMoP1qR2s:
+        organization: "Tesla"
+        title: "CEO"
+        start: "2008"
+        source: https://en.wikipedia.org/wiki/Tesla,_Inc.
+        notes: "Joined as chairman in 2004, became CEO in 2008; led Tesla to become most valuable automaker"
+
+      i_eMtU3vW4x:
+        organization: !ref 1LcLlMGLbw:openai
+        title: "Co-founder & Co-chairman"
+        start: 2015-12
+        end: 2018-02
+        source: https://openai.com/blog/introducing-openai
+        notes: "Co-founded OpenAI; left board Feb 2018; later sued OpenAI multiple times alleging breach of founding mission"
+
+      i_eMyZ5aB6c:
+        organization: "Twitter / X Corp"
+        title: "Owner & (briefly) CEO"
+        start: 2022-10
+        source: https://en.wikipedia.org/wiki/Acquisition_of_Twitter_by_Elon_Musk
+        notes: "Acquired Twitter for $44B in October 2022; rebranded to X; appointed Linda Yaccarino as CEO in June 2023"
+
+      i_eMdE7fG8h:
+        organization: !ref GLXKjYAEKw:xai
+        title: "Founder & CEO"
+        start: 2023-03
+        source: https://x.ai
+        notes: "Founded xAI in March 2023; developed Grok AI model; built Colossus 100K GPU cluster"
+
+      i_eMiJ9kL1m:
+        organization: "Department of Government Efficiency (DOGE)"
+        title: "Senior Advisor"
+        start: 2025-01
+        source: https://en.wikipedia.org/wiki/Department_of_Government_Efficiency
+        notes: "Appointed by President Trump to lead government efficiency efforts"

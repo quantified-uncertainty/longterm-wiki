@@ -1,0 +1,29 @@
+thing:
+  id: yoshua-bengio
+  stableId: nGFBXZeM3d
+  type: person
+  name: "Yoshua Bengio"
+  numericId: 380
+  aliases:
+    - Bengio
+
+facts:
+  - id: f_ymkhC4xtr2
+    property: employed-by
+    value: "Mila - Quebec AI Institute"
+    asOf: 2017-01
+    source: https://mila.quebec/en/person/bengio-yoshua
+    notes: "Scientific Director of Mila (formerly Montreal Institute for Learning Algorithms); professor at Universit\u00E9 de Montr\u00E9al"
+
+  - id: f_s9wbJl2EO3
+    property: role
+    value: "Scientific Director, Mila; Professor, Universit\u00E9 de Montr\u00E9al"
+    asOf: 2017-01
+    source: https://mila.quebec/en/person/bengio-yoshua
+    notes: "One of the 'Godfathers of Deep Learning'; 2018 Turing Award recipient with Hinton and LeCun"
+
+  - id: f_HXYs4QC0Kq
+    property: born-year
+    value: 1964
+    source: https://en.wikipedia.org/wiki/Yoshua_Bengio
+    notes: "Born March 5, 1964 in Paris, France"

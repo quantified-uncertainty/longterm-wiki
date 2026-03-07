@@ -1,0 +1,29 @@
+thing:
+  id: dustin-moskovitz
+  stableId: Jtj6jHbuQ7
+  type: person
+  name: "Dustin Moskovitz"
+  numericId: 436
+  aliases:
+    - Dustin
+
+facts:
+  - id: f_KHaU3bGPmQ
+    property: employed-by
+    value: "Asana"
+    asOf: 2008-01
+    source: https://asana.com/company
+    notes: "Co-founded Asana in 2008 with Justin Rosenstein; serves as CEO"
+
+  - id: f_EUADNVkvmr
+    property: role
+    value: "CEO, Asana; Co-founder, Good Ventures / Open Philanthropy"
+    asOf: 2008-01
+    source: https://www.openphilanthropy.org/
+    notes: "Co-founded Facebook in 2004; youngest self-made billionaire at age 23; with wife Cari Tuna, funds Open Philanthropy and Good Ventures"
+
+  - id: f_8PBld3Shsv
+    property: born-year
+    value: 1984
+    source: https://en.wikipedia.org/wiki/Dustin_Moskovitz
+    notes: "Born May 22, 1984 in Gainesville, Florida"

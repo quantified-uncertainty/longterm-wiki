@@ -1,0 +1,84 @@
+thing:
+  id: eliezer-yudkowsky
+  stableId: fS1tEGKuNq
+  type: person
+  name: "Eliezer Yudkowsky"
+  numericId: 114
+  aliases:
+    - Eliezer
+    - EY
+
+facts:
+  - id: f_pMYY3GyUXY
+    property: employed-by
+    value: !ref puAffUjWSS:miri
+    asOf: 2000-01
+    source: https://intelligence.org/about/
+    notes: "Founded MIRI (originally Singularity Institute) in 2000; has been its primary researcher and intellectual leader"
+
+  - id: f_zu6WSAbDAq
+    property: role
+    value: "Founder & Senior Research Fellow"
+    asOf: 2000-01
+    source: https://intelligence.org/about/
+    notes: "Pioneered the field of AI alignment research; author of the Sequences and HPMOR"
+
+  - id: f_NYrlVTqJXm
+    property: born-year
+    value: 1979
+    source: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
+    notes: "Born September 11, 1979 in Chicago, Illinois"
+
+  - id: f_eY1aB2cD3e
+    property: education
+    value: "Self-taught; no formal university education"
+    source: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
+    notes: "Autodidact; dropped out of school at age 12; taught himself AI and mathematics"
+
+  - id: f_eY4fG5hI6j
+    property: notable-for
+    value: "Founder of MIRI; pioneer of AI alignment as a field; author of 'The Sequences' on rationality; author of Harry Potter and the Methods of Rationality; prominent AI doomer"
+    source: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
+
+  - id: f_eY7kL8mN9o
+    property: social-media
+    value: "@ESYudkowsky"
+    source: https://x.com/ESYudkowsky
+
+items:
+  career-history:
+    type: career-entry
+    entries:
+      i_eY1zA2bC3d:
+        organization: !ref puAffUjWSS:miri
+        title: "Founder & Senior Research Fellow"
+        start: "2000"
+        source: https://intelligence.org/about/
+        notes: "Founded MIRI (originally Singularity Institute for Artificial Intelligence) in 2000; has been its primary intellectual leader for 25+ years"
+
+  notable-publications:
+    type: publication
+    entries:
+      i_eY4eF5gH6i:
+        title: "The Sequences (Rationality: A-Z)"
+        year: 2009
+        url: https://www.readthesequences.com/
+        notes: "Series of blog posts on LessWrong covering epistemology, cognitive biases, and AI alignment; later compiled into 'Rationality: From AI to Zombies'"
+
+      i_eY7jK8lM9n:
+        title: "Harry Potter and the Methods of Rationality (HPMOR)"
+        year: 2015
+        url: https://hpmor.com/
+        notes: "Popular Harry Potter fanfiction exploring rationalist thinking; widely read (millions of readers); served as an entry point to rationalism for many"
+
+      i_eYoP1qR2s:
+        title: "Intelligence Explosion Microeconomics"
+        year: 2013
+        url: https://intelligence.org/files/IEM.pdf
+        notes: "Technical analysis of recursive self-improvement and intelligence explosion dynamics"
+
+      i_eYtU3vW4x:
+        title: "AGI Ruin: A List of Lethalities"
+        year: 2022
+        url: https://www.lesswrong.com/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities
+        notes: "Influential post arguing that alignment is likely unsolvable in time and AI will likely kill everyone; catalyzed major debate in AI safety"

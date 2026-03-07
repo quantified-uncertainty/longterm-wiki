@@ -1,0 +1,136 @@
+thing:
+  id: geoffrey-hinton
+  stableId: 5N5UqXNkkg
+  type: person
+  name: "Geoffrey Hinton"
+  numericId: 149
+  aliases:
+    - "Geoff Hinton"
+    - "Godfather of Deep Learning"
+
+facts:
+  - id: f_CQptGEFesw
+    property: employed-by
+    value: !ref A4XoubikkQ:deepmind
+    asOf: 2013-03
+    validEnd: 2023-05
+    source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
+    notes: "VP and Engineering Fellow at Google; resigned May 2023 to speak freely about AI risks"
+
+  - id: f_dIsk3jBSrg
+    property: role
+    value: "VP and Engineering Fellow"
+    asOf: 2013-03
+    validEnd: 2023-05
+    source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
+
+  - id: f_l7LgM4CmFg
+    property: role
+    value: "Professor Emeritus"
+    asOf: "2023"
+    notes: "University of Toronto; professor emeritus of computer science"
+
+  - id: f_xrorsSWSXw
+    property: born-year
+    value: 1947
+    notes: "Born December 6, 1947 in London; Nobel Prize in Physics 2024 for foundational work on artificial neural networks"
+
+  - id: f_gH1aB2cD3e
+    property: education
+    value: "PhD in Artificial Intelligence, University of Edinburgh (1978); BA in Experimental Psychology, Cambridge University"
+    source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
+    notes: "Also held postdoctoral positions at Sussex and UCSD"
+
+  - id: f_gH4fG5hI6j
+    property: notable-for
+    value: "Godfather of deep learning; pioneer of backpropagation, Boltzmann machines, and deep neural networks; Nobel Prize in Physics 2024; Turing Award 2018"
+    source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
+
+  - id: f_gH7kL8mN9o
+    property: social-media
+    value: "@geoffreyhinton"
+    source: https://x.com/geoffreyhinton
+
+  - id: f_gHpQ1rS2t
+    property: role
+    value: "Professor of Computer Science"
+    asOf: "1987"
+    source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
+    notes: "University of Toronto; University Professor (highest rank); professor emeritus since retirement in 2023"
+
+  - id: f_gHuV3wX4y
+    property: employed-by
+    value: "University of Toronto"
+    asOf: "1987"
+    source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
+    notes: "Joined University of Toronto in 1987; held joint position with Google from 2013"
+
+items:
+  career-history:
+    type: career-entry
+    entries:
+      i_gH1zA2bC3d:
+        organization: "University of Edinburgh"
+        title: "PhD Student"
+        start: "1972"
+        end: "1978"
+        source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
+        notes: "PhD in AI under Christopher Longuet-Higgins"
+
+      i_gH4eF5gH6i:
+        organization: "Carnegie Mellon University"
+        title: "Assistant Professor, Computer Science"
+        start: "1982"
+        end: "1987"
+        source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
+        notes: "Developed Boltzmann machines with Terry Sejnowski; pioneered backpropagation applications"
+
+      i_gH7jK8lM9n:
+        organization: "University of Toronto"
+        title: "Professor of Computer Science"
+        start: "1987"
+        source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
+        notes: "University Professor (highest academic rank at U of T); professor emeritus since 2023"
+
+      i_gHoP1qR2s:
+        organization: "Canadian Institute for Advanced Research (CIFAR)"
+        title: "Program Director, Neural Computation and Adaptive Perception"
+        start: "2004"
+        end: "2023"
+        source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
+        notes: "CIFAR funding was critical to sustaining deep learning research during the AI winter"
+
+      i_gHtU3vW4x:
+        organization: !ref A4XoubikkQ:deepmind
+        title: "VP and Engineering Fellow"
+        start: 2013-03
+        end: 2023-05
+        source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
+        notes: "Joined after Google acquired DNNresearch (his startup with Alex Krizhevsky and Ilya Sutskever); resigned May 2023 to speak freely about AI risks"
+
+  notable-publications:
+    type: publication
+    entries:
+      i_gHyZ5aB6c:
+        title: "Learning representations by back-propagating errors"
+        year: 1986
+        url: https://www.nature.com/articles/323533a0
+        notes: "Co-authored with David Rumelhart and Ronald Williams; popularized backpropagation for training neural networks"
+
+      i_gHdE7fG8h:
+        title: "A fast learning algorithm for deep belief nets"
+        year: 2006
+        url: https://www.cs.toronto.edu/~hinton/absps/fastnc.pdf
+        notes: "Demonstrated greedy layer-wise pretraining; reignited interest in deep learning"
+
+      i_gHiJ9kL1m:
+        title: "ImageNet Classification with Deep Convolutional Neural Networks (AlexNet)"
+        year: 2012
+        url: https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html
+        notes: "Co-authored with Alex Krizhevsky and Ilya Sutskever; won ImageNet 2012 by a large margin, triggering the deep learning revolution"
+
+      i_gHnO2pQ3r:
+        title: "Distilling the Knowledge in a Neural Network"
+        year: 2015
+        url: https://arxiv.org/abs/1503.02531
+        notes: "Introduced knowledge distillation; foundational technique for model compression"

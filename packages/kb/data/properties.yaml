@@ -1,0 +1,331 @@
+properties:
+
+  # ── Financial ────────────────────────────────────────────────
+
+  revenue:
+    name: Revenue
+    description: "Annualized run-rate revenue (ARR) or trailing twelve-month revenue"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  valuation:
+    name: Valuation
+    description: "Post-money valuation at most recent funding round or mark-to-market"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  headcount:
+    name: Headcount
+    description: "Total full-time employee count"
+    dataType: number
+    unit: employees
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: " employees"
+
+  total-funding:
+    name: Total Funding Raised
+    description: "Cumulative capital raised across all funding rounds"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  funding-round-amount:
+    name: Funding Round Amount
+    description: "Capital raised in a specific funding round"
+    dataType: number
+    unit: USD
+    category: financial
+    appliesTo: [organization]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  # ── People & Relationships ────────────────────────────────────
+
+  employed-by:
+    name: Employed By
+    description: "Organization this person currently or historically works for"
+    dataType: ref
+    category: people
+    temporal: true
+    appliesTo: [person]
+    inverseId: employer-of
+    inverseName: Employs
+
+  employer-of:
+    name: Employs
+    description: "People employed by this organization (computed from employed-by facts)"
+    dataType: refs
+    category: people
+    appliesTo: [organization]
+    inverseId: employed-by
+    inverseName: Employed By
+    computed: true
+
+  role:
+    name: Role / Title
+    description: "Job title or role at primary employer"
+    dataType: text
+    category: people
+    temporal: true
+    appliesTo: [person]
+
+  education:
+    name: Education
+    description: "University degree or highest educational attainment"
+    dataType: text
+    category: biographical
+    appliesTo: [person]
+
+  notable-for:
+    name: Notable For
+    description: "What this person is primarily known for (one-line summary)"
+    dataType: text
+    category: biographical
+    appliesTo: [person]
+
+  net-worth:
+    name: Net Worth
+    description: "Estimated net worth (for public figures with reliable estimates)"
+    dataType: number
+    unit: USD
+    category: biographical
+    temporal: true
+    appliesTo: [person]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  social-media:
+    name: Social Media
+    description: "Primary social media handle (e.g., Twitter/X @handle)"
+    dataType: text
+    category: biographical
+    appliesTo: [person]
+
+  founded-by:
+    name: Founded By
+    description: "Person(s) who founded this organization"
+    dataType: refs
+    category: people
+    appliesTo: [organization]
+    inverseId: founder-of
+    inverseName: Founded
+
+  founder-of:
+    name: Founder Of
+    description: "Organization(s) this person founded (computed from founded-by facts)"
+    dataType: refs
+    category: people
+    appliesTo: [person]
+    inverseId: founded-by
+    inverseName: Founded By
+    computed: true
+
+  gross-margin:
+    name: Gross Margin
+    description: "Gross margin percentage"
+    dataType: number
+    unit: percent
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  market-share:
+    name: Market Share
+    description: "Estimated market share in the relevant segment"
+    dataType: number
+    unit: percent
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  user-count:
+    name: User Count
+    description: "Total number of active users"
+    dataType: number
+    unit: users
+    category: product
+    temporal: true
+    appliesTo: [organization]
+
+  # ── Dates ─────────────────────────────────────────────────────
+
+  founded-date:
+    name: Founded Date
+    description: "Date the organization was incorporated or officially founded"
+    dataType: date
+    category: organization
+    appliesTo: [organization]
+
+  born-year:
+    name: Birth Year
+    description: "Year the person was born"
+    dataType: number
+    category: biographical
+    appliesTo: [person]
+    display:
+      suffix: ""
+
+  launched-date:
+    name: Launch Date
+    description: "Date a product or project was publicly launched"
+    dataType: date
+    category: product
+    appliesTo: [product, project]
+
+  # ── Structure ─────────────────────────────────────────────────
+
+  headquarters:
+    name: Headquarters
+    description: "Primary office location (city, state/country)"
+    dataType: text
+    category: organization
+    appliesTo: [organization]
+
+  legal-structure:
+    name: Legal Structure
+    description: "Corporate form (e.g. Public benefit corporation, LLC, 501(c)(3))"
+    dataType: text
+    category: organization
+    appliesTo: [organization]
+
+  # ── Product & Usage ─────────────────────────────────────────────
+
+  monthly-active-users:
+    name: Monthly Active Users
+    description: "Monthly active users (MAU)"
+    dataType: number
+    category: product
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e6
+      suffix: "M"
+
+  business-customers:
+    name: Business Customers
+    description: "Number of business/enterprise customers"
+    dataType: number
+    category: product
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1000
+      suffix: "K"
+
+  api-calls-monthly:
+    name: Monthly API Calls
+    description: "Monthly API request volume"
+    dataType: number
+    category: product
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      suffix: "B"
+
+  product-revenue:
+    name: Product Revenue
+    description: "Annualized revenue from a specific product line"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  # ── Financial Detail ─────────────────────────────────────────────
+
+  cash-burn:
+    name: Annual Cash Burn
+    description: "Annual net cash burn (negative free cash flow)"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  enterprise-market-share:
+    name: Enterprise Market Share
+    description: "Enterprise LLM market share by usage"
+    dataType: number
+    unit: percent
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  coding-market-share:
+    name: Coding Market Share
+    description: "Enterprise coding assistant market share"
+    dataType: number
+    unit: percent
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  # ── Safety ──────────────────────────────────────────────────────
+
+  safety-level:
+    name: AI Safety Level
+    description: "Current AI Safety Level designation under RSP (e.g. ASL-2, ASL-3)"
+    dataType: text
+    category: safety
+    temporal: true
+    appliesTo: [organization]
+
+  safety-researcher-count:
+    name: Safety Researchers
+    description: "Number of employees working on safety-related research"
+    dataType: number
+    category: safety
+    temporal: true
+    appliesTo: [organization]
+
+  interpretability-team-size:
+    name: Interpretability Team Size
+    description: "Number of researchers focused on mechanistic interpretability"
+    dataType: number
+    category: safety
+    temporal: true
+    appliesTo: [organization]
