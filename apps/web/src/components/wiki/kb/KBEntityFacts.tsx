@@ -123,9 +123,16 @@ function SingleValueProperty({
   propertyId: string;
   items: FactWithProperty[];
 }) {
-  const prop = items[0]?.property;
+  // Sort by asOf descending to pick the most recent value
+  const sorted = [...items].sort((a, b) => {
+    if (!a.fact.asOf && !b.fact.asOf) return 0;
+    if (!a.fact.asOf) return 1;
+    if (!b.fact.asOf) return -1;
+    return b.fact.asOf.localeCompare(a.fact.asOf);
+  });
+  const prop = sorted[0]?.property;
   const label = prop?.name ?? titleCase(propertyId);
-  const fact = items[0]?.fact;
+  const fact = sorted[0]?.fact;
 
   if (!fact) return null;
 
