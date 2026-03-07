@@ -197,6 +197,7 @@ Daemon Options:
   --max-turns=N     Max Claude turns per fix (default: 40)
   --timeout=N       Hard timeout in minutes per fix (default: 30)
   --cooldown=N      Skip recently-processed PRs for N seconds (default: 1800)
+  --stale-hours=N   Hours before a PR is considered stale (default: 48)
   --model=MODEL     Claude model (default: sonnet)
   --skip-perms      Add --dangerously-skip-permissions to Claude CLI
   --verbose         Detailed output
