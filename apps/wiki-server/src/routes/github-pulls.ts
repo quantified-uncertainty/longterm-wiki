@@ -18,6 +18,8 @@ export interface OpenPR {
   deletions: number;
   ciStatus: "success" | "failure" | "pending" | "error" | "unknown";
   mergeable: "mergeable" | "conflicting" | "unknown";
+  labels: string[];
+  unresolvedThreads: number;
 }
 
 // ── GraphQL query ──────────────────────────────────────────────────────────
@@ -37,6 +39,12 @@ query($owner: String!, $name: String!) {
         isDraft
         additions
         deletions
+        labels(first: 20) {
+          nodes { name }
+        }
+        reviewThreads(first: 50) {
+          nodes { isResolved isOutdated }
+        }
         commits(last: 1) {
           nodes {
             commit {
@@ -63,6 +71,12 @@ interface GQLPRNode {
   isDraft: boolean;
   additions: number;
   deletions: number;
+  labels: {
+    nodes: Array<{ name: string }>;
+  };
+  reviewThreads: {
+    nodes: Array<{ isResolved: boolean; isOutdated: boolean }>;
+  };
   commits: {
     nodes: Array<{
       commit: {
@@ -113,6 +127,9 @@ function mapMergeable(m: GQLPRNode["mergeable"]): OpenPR["mergeable"] {
 
 function mapNode(node: GQLPRNode): OpenPR {
   const lastCommit = node.commits.nodes[0]?.commit;
+  const unresolvedThreads = node.reviewThreads.nodes.filter(
+    (t) => !t.isResolved && !t.isOutdated
+  ).length;
   return {
     number: node.number,
     title: node.title,
@@ -125,6 +142,8 @@ function mapNode(node: GQLPRNode): OpenPR {
     deletions: node.deletions,
     ciStatus: mapCiStatus(lastCommit?.statusCheckRollup?.state),
     mergeable: mapMergeable(node.mergeable),
+    labels: node.labels.nodes.map((l) => l.name),
+    unresolvedThreads,
   };
 }
 
