@@ -12,6 +12,7 @@
  */
 
 import { join } from "path";
+import type { ValidationResult } from "../../packages/kb/src/types.ts";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 
 const verbose = process.argv.includes("--verbose");
@@ -34,7 +35,7 @@ async function main(): Promise<void> {
 
   const dataDir = join(PROJECT_ROOT, "packages/kb/data");
   const graph = await loadKB(dataDir);
-  const results = validate(graph);
+  const results: ValidationResult[] = validate(graph);
 
   // Separate blocking errors from demoted/warning-level issues
   const blockingErrors = results.filter(
