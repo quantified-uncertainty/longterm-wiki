@@ -336,8 +336,8 @@ jobs:
     # Vercel GitHub integration is disabled (vercel.json github.enabled=false) to
     # prevent PR failure statuses — deploy hooks bypass the GitHub integration.
     # The VERCEL_DEPLOY_HOOK_URL secret must be a hook configured for the "production" branch.
-    needs: [ci]
-    if: github.ref == 'refs/heads/production' && github.event_name == 'push'
+    needs: [ci, migrate-test]
+    if: vars.AUTOMATION_PAUSED != 'true' && github.ref == 'refs/heads/production' && github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
