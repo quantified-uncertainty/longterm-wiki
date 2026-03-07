@@ -28,23 +28,50 @@ import {
   upsertStatusComment,
 } from './comments.ts';
 
-// ── Re-exports (for backward compatibility with consumers) ───────────────────
+// ── Re-exports for backward compatibility ───────────────────────────────────
+// Consumers of pr-patrol/index.ts (like crux/commands/pr-patrol.ts) expect the
+// daemon-wrapped versions that accept PatrolConfig. For type-only re-exports
+// and pure functions, we re-export from the lib directly.
 
 export type {
-  PatrolConfig,
   PrIssueType,
+  BotComment,
+  DetectedPr,
+  ScoredPr,
   MergeBlockReason,
   MergeCandidate,
   GqlPrNode,
-} from './types.ts';
+  GqlReviewThread,
+  MainBranchStatus,
+  PrOverlap,
+  AutoRebaseResult,
+} from '../lib/pr-analysis/index.ts';
 
-export { detectIssues, fetchOpenPrs, fetchSinglePr } from './detection.ts';
-export { computeScore, computeBudget, rankPrs } from './scoring.ts';
-export { checkMergeEligibility, findMergeCandidates } from './merge.ts';
+export type { PatrolConfig } from './types.ts';
+
+// Pure functions from lib (no signature change)
+export {
+  detectIssues,
+  extractBotComments,
+  detectOverlaps,
+  checkMergeEligibility,
+  findMergeCandidates,
+  ISSUE_SCORES,
+  computeScore,
+  rankPrs,
+  tryAutomatedRebase,
+} from '../lib/pr-analysis/index.ts';
+
+// Daemon-wrapped versions (different signatures than lib versions)
+export { fetchOpenPrs, fetchSinglePr } from './detection.ts';
+export { checkMainBranch } from './execution.ts';
+
+// Daemon-specific exports
+export { computeBudget } from './scoring.ts';
 export { looksLikeNoOp } from './execution.ts';
 export { JSONL_FILE, REFLECTION_FILE } from './state.ts';
 
-// ── Internal imports ─────────────────────────────────────────────────────────
+// ── Internal imports (daemon-wrapped versions for the daemon loop) ──────────
 
 import type { PatrolConfig } from './types.ts';
 import {
@@ -52,19 +79,23 @@ import {
   ensureDirs,
   isAbandoned,
   isRecentlyProcessed,
-  JSONL_FILE,
+  JSONL_FILE as JSONL_FILE_INTERNAL,
   log,
   logHeader,
 } from './state.ts';
 import {
   detectAllPrIssuesFromNodes,
   detectPrOverlaps,
-  fetchOpenPrs,
+  fetchOpenPrs as daemonFetchOpenPrs,
 } from './detection.ts';
-import { rankPrs } from './scoring.ts';
-import { findMergeCandidates, mergePr, undraftPr } from './merge.ts';
+import { rankPrs as daemonRankPrs } from './scoring.ts';
 import {
-  checkMainBranch,
+  findMergeCandidates as daemonFindMergeCandidates,
+  mergePr,
+  undraftPr,
+} from './merge.ts';
+import {
+  checkMainBranch as daemonCheckMainBranch,
   fixMainBranch,
   fixPr,
   releaseCurrentClaim,
@@ -166,11 +197,11 @@ async function runCheckCycle(
   logHeader(`Check cycle #${cycleCount}`);
 
   // 0. Check main branch CI first — highest priority
-  const mainStatus = await checkMainBranch(config);
+  const mainStatus = await daemonCheckMainBranch(config);
   if (mainStatus.isRed) {
     log(`${cl.red}Main branch CI is red${cl.reset} — prioritizing fix over PR queue`);
     await fixMainBranch(mainStatus, config);
-    appendJsonl(JSONL_FILE, {
+    appendJsonl(JSONL_FILE_INTERNAL, {
       type: 'cycle_summary',
       cycle_number: cycleCount,
       prs_scanned: 0,
@@ -182,7 +213,7 @@ async function runCheckCycle(
   }
 
   // 1. Fetch all open PRs (shared between fix and merge phases)
-  const allPrs = await fetchOpenPrs(config);
+  const allPrs = await daemonFetchOpenPrs(config);
 
   // ── Fix phase ──────────────────────────────────────────────────────
 
@@ -210,7 +241,7 @@ async function runCheckCycle(
       return true;
     });
 
-    const ranked = rankPrs(eligible);
+    const ranked = daemonRankPrs(eligible);
     if (ranked.length > 0) {
       log('');
       log(`${cl.bold}Fix queue${cl.reset} (${ranked.length} items):`);
@@ -233,7 +264,7 @@ async function runCheckCycle(
   // Auto-undraft draft PRs that are otherwise eligible for merge.
   // A PR is auto-undrafted when its only block reason is 'is-draft'.
 
-  const draftCandidates = findMergeCandidates(allPrs).filter(
+  const draftCandidates = daemonFindMergeCandidates(allPrs).filter(
     (c) => !c.eligible && c.blockReasons.length === 1 && c.blockReasons[0] === 'is-draft',
   );
 
@@ -250,7 +281,7 @@ async function runCheckCycle(
 
   // ── Merge phase ────────────────────────────────────────────────────
   // Re-evaluate after undrafting (only successfully undrafted PRs become eligible)
-  const mergeCandidates = findMergeCandidates(allPrs).map((c) => {
+  const mergeCandidates = daemonFindMergeCandidates(allPrs).map((c) => {
     if (undraftedNumbers.has(c.number)) {
       const updated = { ...c, blockReasons: c.blockReasons.filter((r) => r !== 'is-draft') };
       return { ...updated, eligible: updated.blockReasons.length === 0 };
@@ -291,7 +322,7 @@ async function runCheckCycle(
 
   // ── Cycle summary ──────────────────────────────────────────────────
 
-  appendJsonl(JSONL_FILE, {
+  appendJsonl(JSONL_FILE_INTERNAL, {
     type: 'cycle_summary',
     cycle_number: cycleCount,
     prs_scanned: allPrs.length,
@@ -323,7 +354,7 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
     `Config: interval=${config.intervalSeconds}s, max-turns=${config.maxTurns}, cooldown=${config.cooldownSeconds}s, model=${config.model}`,
   );
   log(`Repo: ${config.repo}`);
-  log(`JSONL: ${JSONL_FILE}`);
+  log(`JSONL: ${JSONL_FILE_INTERNAL}`);
   log(
     `Mode: ${config.once ? 'single pass' : config.dryRun ? 'dry run' : 'continuous'}`,
   );
@@ -373,9 +404,9 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
 // ── Status command ──────────────────────────────────────────────────────────
 
 export function readRecentLogs(count: number): string {
-  if (!existsSync(JSONL_FILE)) return 'No PR Patrol logs found.\n';
+  if (!existsSync(JSONL_FILE_INTERNAL)) return 'No PR Patrol logs found.\n';
 
-  const lines = readFileSync(JSONL_FILE, 'utf-8').trim().split('\n');
+  const lines = readFileSync(JSONL_FILE_INTERNAL, 'utf-8').trim().split('\n');
   const recent = lines.slice(-count);
   const output: string[] = ['Recent PR Patrol activity:\n'];
 
