@@ -225,6 +225,86 @@ export async function githubGraphQL<T = unknown>(
   return result.data;
 }
 
+// ---------------------------------------------------------------------------
+// Issue helpers — typed wrappers around common GitHub Issues API operations
+// ---------------------------------------------------------------------------
+
+/** Minimal issue shape returned by the GitHub Issues API. */
+export interface GitHubIssue {
+  number: number;
+  state: string;
+  title: string;
+  labels: Array<{ name: string }>;
+}
+
+/** List open issues filtered by a single label. */
+export async function listIssuesByLabel(label: string, limit = 5): Promise<GitHubIssue[]> {
+  return githubApi<GitHubIssue[]>(
+    `/repos/${REPO}/issues?labels=${encodeURIComponent(label)}&state=open&per_page=${limit}`,
+  );
+}
+
+/** List recent open issues sorted by creation date (newest first). */
+export async function listRecentOpenIssues(limit = 30): Promise<GitHubIssue[]> {
+  return githubApi<GitHubIssue[]>(
+    `/repos/${REPO}/issues?state=open&per_page=${limit}&sort=created&direction=desc`,
+  );
+}
+
+/** Create a comment on an issue. */
+export async function createIssueComment(issueNumber: number, body: string): Promise<void> {
+  await githubApi(`/repos/${REPO}/issues/${issueNumber}/comments`, {
+    method: 'POST',
+    body: { body },
+  });
+}
+
+/** Close an issue via PATCH. */
+export async function closeIssue(issueNumber: number): Promise<void> {
+  await githubApi(`/repos/${REPO}/issues/${issueNumber}`, {
+    method: 'PATCH',
+    body: { state: 'closed' },
+  });
+}
+
+/** Create a new issue. Returns the created issue with its number. */
+export async function createIssue(options: {
+  title: string;
+  body: string;
+  labels: string[];
+}): Promise<{ number: number }> {
+  return githubApi<{ number: number }>(`/repos/${REPO}/issues`, {
+    method: 'POST',
+    body: options,
+  });
+}
+
+/**
+ * Ensure a label exists on the repo. No-ops if it already exists (422).
+ */
+export async function ensureLabel(
+  name: string,
+  color: string,
+  description: string,
+): Promise<void> {
+  try {
+    await githubApi(`/repos/${REPO}/labels`, {
+      method: 'POST',
+      body: { name, color, description },
+    });
+  } catch (err) {
+    // 422 = already exists — fine
+    const msg = err instanceof Error ? err.message : String(err);
+    if (!msg.includes('422') && !msg.includes('already_exists')) {
+      console.warn(`Warning: could not ensure label "${name}": ${msg}`);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// GraphQL API (for GitHub Discussions — no REST equivalent)
+// ---------------------------------------------------------------------------
+
 /**
  * Get the GraphQL node ID for the repository.
  * Required for mutations like createDiscussion that take repositoryId.
