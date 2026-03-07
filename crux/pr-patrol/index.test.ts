@@ -4,6 +4,7 @@ import {
   findMergeCandidates,
   detectIssues,
   computeBudget,
+  looksLikeNoOp,
   type GqlPrNode,
 } from './index.ts';
 
@@ -470,5 +471,45 @@ describe('detectIssues', () => {
     // Set stale threshold to far in the past so this PR is not stale
     const result = detectIssues(pr, 0);
     expect(result.issues).toEqual([]);
+  });
+});
+
+// ── looksLikeNoOp ───────────────────────────────────────────────────────────
+
+describe('looksLikeNoOp', () => {
+  it('detects "no action needed" in output tail', () => {
+    expect(looksLikeNoOp('Analyzed the issue. No action needed for this PR.')).toBe(true);
+  });
+
+  it('detects "requires human intervention"', () => {
+    expect(looksLikeNoOp('The check-protected-paths check requires human intervention to add the label.')).toBe(true);
+  });
+
+  it('detects "pre-existing failure"', () => {
+    expect(looksLikeNoOp('This is a pre-existing failure also present on main.')).toBe(true);
+  });
+
+  it('detects "also failing on main"', () => {
+    expect(looksLikeNoOp('The CI check is also failing on main, so this is not introduced by this PR.')).toBe(true);
+  });
+
+  it('detects "stopping early"', () => {
+    expect(looksLikeNoOp('Stopping early because the issue cannot be resolved automatically.')).toBe(true);
+  });
+
+  it('does NOT flag normal fix output', () => {
+    expect(looksLikeNoOp('Fixed the TypeScript error in src/index.ts. All tests passing now.')).toBe(false);
+  });
+
+  it('does NOT flag output with "no" in unrelated context', () => {
+    expect(looksLikeNoOp('Added the missing test. No regressions found after running the suite.')).toBe(false);
+  });
+
+  it('only checks last 1000 chars of output', () => {
+    const longOutput = 'x'.repeat(2000) + 'No action needed.';
+    expect(looksLikeNoOp(longOutput)).toBe(true);
+    // Pattern in the first 1000 chars but not the last 1000
+    const earlyMatch = 'No action needed.' + 'x'.repeat(2000);
+    expect(looksLikeNoOp(earlyMatch)).toBe(false);
   });
 });

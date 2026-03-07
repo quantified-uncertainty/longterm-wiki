@@ -48,7 +48,7 @@ interface ScoredPr extends DetectedPr {
   score: number;
 }
 
-export type FixOutcome = 'fixed' | 'max-turns' | 'timeout' | 'error' | 'dry-run';
+export type FixOutcome = 'fixed' | 'no-op' | 'max-turns' | 'timeout' | 'error' | 'dry-run';
 
 export type MergeOutcome = 'merged' | 'dry-run' | 'error';
 
@@ -204,6 +204,33 @@ function recordFailure(key: number | string): number {
   return count;
 }
 
+function resetFailCount(key: number | string): void {
+  const file = join(STATE_DIR, `failures-${key}`);
+  if (existsSync(file)) writeFileSync(file, '0');
+}
+
+/**
+ * Detect when Claude exited cleanly but didn't actually fix anything
+ * (e.g., followed "stop early" guidance for human-required issues).
+ */
+const NO_OP_PATTERNS = [
+  /no action needed/i,
+  /no code changes? needed/i,
+  /requires? human intervention/i,
+  /needs? human/i,
+  /cannot be fixed automatically/i,
+  /pre-existing.*(failure|issue|problem)/i,
+  /also failing on main/i,
+  /stopping early/i,
+  /nothing to fix/i,
+];
+
+export function looksLikeNoOp(output: string): boolean {
+  // Only check the last portion of output (where the conclusion lives)
+  const tail = output.slice(-1000);
+  return NO_OP_PATTERNS.some((p) => p.test(tail));
+}
+
 function isAbandoned(key: number | string): boolean {
   return getFailCount(key) >= 2;
 }
@@ -351,8 +378,16 @@ async function fixMainBranch(status: MainBranchStatus, config: PatrolConfig): Pr
         log(`${cl.red}✗ Main branch fix abandoned after ${failCount} failures${cl.reset}`);
       }
     } else if (result.exitCode === 0 && !result.hitMaxTurns) {
-      outcome = 'fixed';
-      log(`${cl.green}✓ Main branch CI fix processed${cl.reset} (${elapsedS}s)`);
+      const isNoOp = looksLikeNoOp(result.output);
+      outcome = isNoOp ? 'no-op' : 'fixed';
+      if (isNoOp) {
+        recordFailure(MAIN_BRANCH_KEY);
+        reason = 'No-op: agent determined issue needs human intervention';
+        log(`${cl.yellow}⚠ Main branch fix no-op — agent stopped early${cl.reset} (${elapsedS}s)`);
+      } else {
+        resetFailCount(MAIN_BRANCH_KEY);
+        log(`${cl.green}✓ Main branch CI fix processed${cl.reset} (${elapsedS}s)`);
+      }
     } else if (result.hitMaxTurns) {
       const failCount = recordFailure(MAIN_BRANCH_KEY);
       outcome = 'max-turns';
@@ -1323,8 +1358,20 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
         ).catch(() => log('  Warning: could not post abandonment comment'));
       }
     } else if (result.exitCode === 0 && !result.hitMaxTurns) {
-      log(`${cl.green}✓ PR #${pr.number} processed successfully${cl.reset} (${elapsedS}s)`);
-      outcome = 'fixed';
+      const isNoOp = looksLikeNoOp(result.output);
+      outcome = isNoOp ? 'no-op' : 'fixed';
+
+      if (isNoOp) {
+        // No-op: Claude determined the issue can't be fixed automatically.
+        // Don't reset fail count — treat like a soft failure so the PR
+        // gets skipped on future cycles instead of being retried forever.
+        const failCount = recordFailure(pr.number);
+        reason = `No-op: agent determined issue needs human intervention (attempt ${failCount})`;
+        log(`${cl.yellow}⚠ PR #${pr.number} no-op — agent stopped early${cl.reset} (${elapsedS}s)`);
+      } else {
+        resetFailCount(pr.number);
+        log(`${cl.green}✓ PR #${pr.number} processed successfully${cl.reset} (${elapsedS}s)`);
+      }
 
       // Post summary comment
       const summary = result.output.slice(-500);
@@ -1450,19 +1497,35 @@ ${recentEntries}
       timeoutMinutes: 5, // Should complete quickly
     });
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
-    const filedIssue = /Created issue #|created.*#\d/.test(result.output);
 
-    appendJsonl(REFLECTION_FILE, {
-      cycle_number: cycleCount,
-      elapsed_s: elapsedS,
-      filed_issue: filedIssue,
-      exit_code: result.exitCode,
-      summary: result.output.slice(-500),
-    });
-
-    log(
-      `${cl.green}✓ Reflection complete${cl.reset} (${elapsedS}s, filed_issue=${filedIssue})`,
-    );
+    if (result.timedOut || result.hitMaxTurns) {
+      const reason = result.timedOut ? 'timeout' : 'max-turns';
+      appendJsonl(REFLECTION_FILE, {
+        cycle_number: cycleCount,
+        elapsed_s: elapsedS,
+        filed_issue: false,
+        exit_code: result.exitCode,
+        outcome: 'incomplete',
+        reason,
+        summary: result.output.slice(-500),
+      });
+      log(
+        `${cl.yellow}⚠ Reflection incomplete${cl.reset} (${elapsedS}s, ${reason})`,
+      );
+    } else {
+      const filedIssue = /Created issue #|created.*#\d/.test(result.output);
+      appendJsonl(REFLECTION_FILE, {
+        cycle_number: cycleCount,
+        elapsed_s: elapsedS,
+        filed_issue: filedIssue,
+        exit_code: result.exitCode,
+        outcome: 'complete',
+        summary: result.output.slice(-500),
+      });
+      log(
+        `${cl.green}✓ Reflection complete${cl.reset} (${elapsedS}s, filed_issue=${filedIssue})`,
+      );
+    }
   } catch (e) {
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
     log(
