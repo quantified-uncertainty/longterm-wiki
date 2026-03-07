@@ -3,21 +3,20 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    branches:
+      - main  # Only review PRs targeting main (not production release PRs)
 
 jobs:
   claude-review:
-    # Skip draft PRs and bot-created PRs (claude/ branches from automation)
-    # to reduce unnecessary Anthropic API spending.
+    # Skip draft PRs, bot-created PRs (claude/ branches), and merge-queue re-runs.
+    # Note: pull_request.user.type is the PR *author*, but github.actor is the
+    # event *trigger* — the merge queue bot passes the author check but fails
+    # inside claude-code-action which checks github.actor. Guard against both.
     if: |
       github.event.pull_request.draft == false &&
       !startsWith(github.event.pull_request.head.ref, 'claude/') &&
-      github.event.pull_request.user.type != 'Bot'
+      github.event.pull_request.user.type != 'Bot' &&
+      github.actor != 'github-merge-queue[bot]'
 
     runs-on: ubuntu-latest
     permissions:
