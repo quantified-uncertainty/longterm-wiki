@@ -1,11 +1,19 @@
 /**
  * PR Patrol — Claude spawning, PR fixing, main branch fixing, claim management
+ *
+ * Main branch CI checking uses crux/lib/pr-analysis/ci-status.ts (pure API call).
+ * This module wraps it with daemon concerns (cooldown, abandoned tracking, logging).
+ *
+ * Automated rebase uses crux/lib/pr-analysis/rebase.ts for stale PRs before
+ * falling back to Claude when conflicts exist.
  */
 
 import { spawn } from 'child_process';
 import { githubApi } from '../lib/github.ts';
 import { gitSafe } from '../lib/git.ts';
-import type { FixOutcome, PatrolConfig, ScoredPr } from './types.ts';
+import { checkMainBranch as libCheckMainBranch } from '../lib/pr-analysis/index.ts';
+import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
+import type { FixOutcome, MainBranchStatus, PatrolConfig, ScoredPr } from './types.ts';
 import { LABELS } from './types.ts';
 import {
   buildAbandonmentComment,
@@ -52,32 +60,16 @@ export function looksLikeNoOp(output: string): boolean {
   return NO_OP_PATTERNS.some((p) => p.test(tail));
 }
 
-// ── Main Branch CI Check ────────────────────────────────────────────────────
+// ── Main Branch CI Check (daemon wrapper) ────────────────────────────────────
 
-interface WorkflowRun {
-  id: number;
-  status: string;
-  conclusion: string | null;
-  created_at: string;
-  head_sha: string;
-  html_url: string;
-}
+export { type MainBranchStatus };
 
-interface WorkflowRunsResponse {
-  workflow_runs: WorkflowRun[];
-  total_count: number;
-}
-
-export interface MainBranchStatus {
-  isRed: boolean;
-  runId: number | null;
-  sha: string;
-  htmlUrl: string;
-}
-
-const CI_WORKFLOW = 'ci.yml';
 const MAIN_BRANCH_KEY = 'main-branch';
 
+/**
+ * Check main branch CI with daemon-specific cooldown and abandoned tracking.
+ * Delegates to the pure lib function for the actual API call.
+ */
 export async function checkMainBranch(config: PatrolConfig): Promise<MainBranchStatus> {
   const notRed: MainBranchStatus = { isRed: false, runId: null, sha: '', htmlUrl: '' };
 
@@ -92,30 +84,15 @@ export async function checkMainBranch(config: PatrolConfig): Promise<MainBranchS
   }
 
   try {
-    // Fetch the latest completed CI runs on main
-    const resp = await githubApi<WorkflowRunsResponse>(
-      `/repos/${config.repo}/actions/workflows/${CI_WORKFLOW}/runs?branch=main&status=completed&per_page=5`,
-    );
+    const status = await libCheckMainBranch(config.repo);
 
-    const runs = resp.workflow_runs ?? [];
-    if (runs.length === 0) {
-      log('  No completed CI runs on main found');
-      return notRed;
+    if (status.isRed) {
+      log(`  🔴 Main branch CI is RED (run #${status.runId}, sha ${status.sha.slice(0, 8)})`);
+    } else {
+      log(`  Main branch CI is green`);
     }
 
-    const latest = runs[0];
-    if (latest.conclusion === 'failure') {
-      log(`  🔴 Main branch CI is RED (run #${latest.id}, sha ${latest.head_sha.slice(0, 8)})`);
-      return {
-        isRed: true,
-        runId: latest.id,
-        sha: latest.head_sha,
-        htmlUrl: latest.html_url,
-      };
-    }
-
-    log(`  Main branch CI is green (latest run #${latest.id}: ${latest.conclusion})`);
-    return notRed;
+    return status;
   } catch (e) {
     log(`  Warning: could not check main branch CI: ${e instanceof Error ? e.message : String(e)}`);
     return notRed;
@@ -351,6 +328,46 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
     });
     markProcessed(pr.number);
     return;
+  }
+
+  // ── Automated rebase pre-step ──────────────────────────────────────
+  // For stale PRs without conflicts, try a plain git rebase first.
+  // This saves the full Claude spawn (~5 turns, ~3-10 min) for the majority
+  // of stale PRs that just need a clean rebase onto main.
+  if (pr.issues.includes('stale') && !pr.issues.includes('conflict')) {
+    log('  Attempting automated rebase (no Claude needed)...');
+    const origBranch = gitSafe('branch', '--show-current');
+    const originalBranch = origBranch.ok ? origBranch.output.trim() : '';
+
+    const rebaseResult = tryAutomatedRebase(pr.branch);
+
+    // Restore original branch after rebase attempt
+    if (originalBranch) {
+      gitSafe('checkout', originalBranch);
+    }
+
+    if (rebaseResult.success) {
+      log(`  ✓ Automated rebase ${rebaseResult.status} — no Claude needed`);
+      appendJsonl(JSONL_FILE, {
+        type: 'pr_result',
+        pr_num: pr.number,
+        issues: pr.issues,
+        outcome: 'fixed' as FixOutcome,
+        elapsed_s: 0,
+        reason: `automated-rebase: ${rebaseResult.status}`,
+      });
+
+      // If the only issue was 'stale', mark processed and return
+      const remainingIssues = pr.issues.filter((i) => i !== 'stale');
+      if (remainingIssues.length === 0) {
+        markProcessed(pr.number);
+        return;
+      }
+      // Don't markProcessed — remaining issues need Claude, avoid starting cooldown
+      log(`  Remaining issues after rebase: ${remainingIssues.join(', ')} — falling through to Claude`);
+    } else {
+      log(`  Automated rebase failed (${rebaseResult.status}) — falling through to Claude`);
+    }
   }
 
   // Save current branch to restore after fix

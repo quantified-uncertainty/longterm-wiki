@@ -647,7 +647,7 @@ async function ready(_args: string[], options: CommandOptions): Promise<CommandR
   }
 
   // Fetch full PR details via GraphQL for eligibility checks
-  const { checkMergeEligibility, fetchSinglePr } = await import('../pr-patrol/index.ts');
+  const { checkMergeEligibility, fetchSinglePr } = await import('../lib/pr-analysis/index.ts');
   const prNode = await fetchSinglePr(prNum);
 
   if (!prNode) {
@@ -700,6 +700,218 @@ async function ready(_args: string[], options: CommandOptions): Promise<CommandR
 }
 
 // ---------------------------------------------------------------------------
+// PR check — issue detection and merge eligibility report
+// ---------------------------------------------------------------------------
+
+/**
+ * Check a single PR or all open PRs for issues and merge eligibility.
+ *
+ * Usage:
+ *   crux pr check 1837           Single PR: issues + merge eligibility report
+ *   crux pr check --all          All open PRs: ranked by issue score
+ *   crux pr check --all --json   Machine-readable output
+ */
+async function check(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+  const c = log.colors;
+  const json = Boolean(options.json);
+  const all = Boolean(options.all);
+
+  const {
+    fetchOpenPrs,
+    fetchSinglePr,
+    detectIssues,
+    checkMergeEligibility,
+    rankPrs,
+    ISSUE_SCORES,
+  } = await import('../lib/pr-analysis/index.ts');
+
+  const staleThresholdMs = Date.now() - 48 * 3600 * 1000; // 48h default
+
+  if (all) {
+    // All open PRs: ranked by issue score
+    const prs = await fetchOpenPrs();
+
+    const results = prs.map((pr) => {
+      const { issues, botComments } = detectIssues(pr, staleThresholdMs);
+      const eligibility = checkMergeEligibility(pr);
+      return {
+        number: pr.number,
+        title: pr.title,
+        branch: pr.headRefName,
+        createdAt: pr.createdAt,
+        isDraft: pr.isDraft,
+        issues,
+        botComments,
+        botCommentCount: botComments.length,
+        eligible: eligibility.eligible,
+        blockReasons: eligibility.blockReasons,
+      };
+    });
+
+    const withIssues = results.filter((r) => r.issues.length > 0);
+    const ranked = rankPrs(
+      withIssues.map((r) => ({
+        number: r.number,
+        title: r.title,
+        branch: r.branch,
+        createdAt: r.createdAt,
+        issues: r.issues,
+        botComments: r.botComments,
+      })),
+    );
+
+    if (json) {
+      return { output: JSON.stringify({ total: prs.length, withIssues: withIssues.length, prs: results }, null, 2) + '\n', exitCode: withIssues.length > 0 ? 1 : 0 };
+    }
+
+    let output = `${c.bold}PR Check — ${prs.length} open PRs${c.reset}\n\n`;
+
+    if (ranked.length === 0) {
+      output += `${c.green}All PRs clean — no issues detected.${c.reset}\n`;
+    } else {
+      output += `${c.bold}PRs with issues${c.reset} (${ranked.length}, ranked by priority):\n`;
+      for (const pr of ranked) {
+        const r = results.find((x) => x.number === pr.number)!;
+        output += `  ${c.cyan}#${pr.number}${c.reset} [score=${pr.score}] ${pr.issues.join(', ')}`;
+        if (!r.eligible) output += ` ${c.dim}(merge blocked: ${r.blockReasons.join(', ')})${c.reset}`;
+        output += `\n    ${c.dim}${pr.title}${c.reset}\n`;
+      }
+    }
+
+    const clean = results.filter((r) => r.issues.length === 0);
+    if (clean.length > 0) {
+      output += `\n${c.green}Clean PRs${c.reset} (${clean.length}):\n`;
+      for (const r of clean) {
+        const eligIcon = r.eligible ? `${c.green}✓${c.reset}` : `${c.dim}-${c.reset}`;
+        output += `  ${eligIcon} ${c.cyan}#${r.number}${c.reset} ${c.dim}${r.title}${c.reset}\n`;
+      }
+    }
+
+    return { output, exitCode: withIssues.length > 0 ? 1 : 0 };
+  }
+
+  // Single PR mode
+  const prNum = parseInt(args[0], 10);
+  if (!prNum || isNaN(prNum)) {
+    return {
+      output: `${c.red}Usage: crux pr check <N> or crux pr check --all${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  const pr = await fetchSinglePr(prNum);
+  if (!pr) {
+    return {
+      output: `${c.red}Could not fetch PR #${prNum}.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  const { issues, botComments } = detectIssues(pr, staleThresholdMs);
+  const eligibility = checkMergeEligibility(pr);
+
+  if (json) {
+    return {
+      output: JSON.stringify({
+        number: pr.number,
+        title: pr.title,
+        branch: pr.headRefName,
+        isDraft: pr.isDraft,
+        issues,
+        botComments: botComments.length,
+        eligible: eligibility.eligible,
+        blockReasons: eligibility.blockReasons,
+      }, null, 2) + '\n',
+      exitCode: issues.length > 0 ? 1 : 0,
+    };
+  }
+
+  let output = `${c.bold}PR #${prNum}: ${pr.title}${c.reset}\n`;
+  output += `  Branch: ${pr.headRefName}\n`;
+  output += `  Draft: ${pr.isDraft ? 'yes' : 'no'}\n`;
+  output += `  Mergeable: ${pr.mergeable}\n\n`;
+
+  if (issues.length === 0) {
+    output += `${c.green}✓ No issues detected.${c.reset}\n`;
+  } else {
+    output += `${c.yellow}Issues detected (${issues.length}):${c.reset}\n`;
+    for (const issue of issues) {
+      const score = ISSUE_SCORES[issue] ?? 0;
+      output += `  ${c.yellow}•${c.reset} ${issue} (priority: ${score})\n`;
+    }
+  }
+
+  if (botComments.length > 0) {
+    output += `\n${c.yellow}Bot review comments (${botComments.length}):${c.reset}\n`;
+    for (const bc of botComments) {
+      output += `  ${c.dim}${bc.author}${c.reset} on ${bc.path}${bc.line ? `:${bc.line}` : ''}\n`;
+    }
+  }
+
+  output += `\n${c.bold}Merge eligibility:${c.reset} ${eligibility.eligible ? `${c.green}eligible${c.reset}` : `${c.red}blocked${c.reset}`}\n`;
+  if (eligibility.blockReasons.length > 0) {
+    for (const reason of eligibility.blockReasons) {
+      output += `  ${c.red}✗${c.reset} ${reason}\n`;
+    }
+  }
+
+  return { output, exitCode: issues.length > 0 ? 1 : 0 };
+}
+
+// ---------------------------------------------------------------------------
+// PR overlaps — detect file-level overlaps across open PRs
+// ---------------------------------------------------------------------------
+
+/**
+ * Detect file-level overlaps across open PRs.
+ *
+ * Usage:
+ *   crux pr overlaps            Show file overlaps across open PRs
+ *   crux pr overlaps --json     Machine-readable
+ */
+async function overlaps(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+  const c = log.colors;
+  const json = Boolean(options.json);
+
+  const { fetchOpenPrs, detectOverlaps } = await import('../lib/pr-analysis/index.ts');
+
+  const prs = await fetchOpenPrs();
+  const overlapResults = await detectOverlaps(prs);
+
+  if (json) {
+    return {
+      output: JSON.stringify({ total_prs: prs.length, overlaps: overlapResults }, null, 2) + '\n',
+      exitCode: overlapResults.length > 0 ? 1 : 0,
+    };
+  }
+
+  if (overlapResults.length === 0) {
+    return {
+      output: `${c.green}✓ No file overlaps detected across ${prs.length} open PRs.${c.reset}\n`,
+      exitCode: 0,
+    };
+  }
+
+  let output = `${c.bold}File overlaps across ${prs.length} open PRs${c.reset}\n\n`;
+  output += `${c.yellow}Found ${overlapResults.length} overlapping PR pair(s):${c.reset}\n\n`;
+
+  for (const overlap of overlapResults) {
+    output += `  ${c.cyan}#${overlap.prA}${c.reset} ↔ ${c.cyan}#${overlap.prB}${c.reset}: ${overlap.sharedFiles.length} shared file(s)\n`;
+    for (const file of overlap.sharedFiles.slice(0, 10)) {
+      output += `    ${c.dim}${file}${c.reset}\n`;
+    }
+    if (overlap.sharedFiles.length > 10) {
+      output += `    ${c.dim}(+${overlap.sharedFiles.length - 10} more)${c.reset}\n`;
+    }
+    output += '\n';
+  }
+
+  return { output, exitCode: 1 };
+}
+
+// ---------------------------------------------------------------------------
 // Domain entry point (required by crux.mjs dispatch)
 // ---------------------------------------------------------------------------
 
@@ -707,6 +919,8 @@ export const commands = {
   create,
   ready,
   detect,
+  check,
+  overlaps,
   'fix-body': fixBody,
   'rebase-all': rebaseAll,
   'validate-test-plan': validateTestPlanCmd,
@@ -721,6 +935,9 @@ Commands:
   create                        Create a draft PR for the current branch (corruption-safe).
   ready [--pr=N]                Mark PR as ready (validates eligibility, removes draft status).
   detect                        Detect open PR for current branch (returns URL + number).
+  check <N>                     Check a single PR for issues and merge eligibility.
+  check --all                   Check all open PRs, ranked by issue priority score.
+  overlaps                      Detect file-level overlaps across open PRs.
   fix-body [--pr=N]             Detect and repair literal \\n in the current branch's PR body.
   rebase-all                    Rebase all open non-draft PRs onto main (used by CI).
   validate-test-plan [--pr=N]   Check that the PR's test plan section is complete.
@@ -777,6 +994,11 @@ Examples:
   pnpm crux pr validate-test-plan --pr=42 --json  # Check specific PR (JSON)
   pnpm crux pr rebase-all                 # Rebase all open PRs onto main
   pnpm crux pr rebase-all --verbose       # With detailed output
+  pnpm crux pr check 1837                # Check single PR for issues
+  pnpm crux pr check --all               # Check all open PRs, ranked
+  pnpm crux pr check --all --json        # Machine-readable output
+  pnpm crux pr overlaps                  # Detect file overlaps across PRs
+  pnpm crux pr overlaps --json           # Machine-readable output
   pnpm crux pr resolve-conflicts         # Resolve all conflicted PRs
   pnpm crux pr resolve-conflicts --verbose  # With detailed output
 `.trim();

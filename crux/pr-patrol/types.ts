@@ -1,63 +1,31 @@
 /**
  * PR Patrol — Shared types and constants
+ *
+ * Daemon-specific types live here (PatrolConfig, FixOutcome, MergeOutcome).
+ * General-purpose analysis types are re-exported from crux/lib/pr-analysis/.
  */
 
-// ── Types ────────────────────────────────────────────────────────────────────
+// ── Re-export general-purpose types from lib ─────────────────────────────────
 
-export type PrIssueType =
-  | 'conflict'
-  | 'ci-failure'
-  | 'missing-testplan'
-  | 'missing-issue-ref'
-  | 'stale'
-  | 'bot-review-major'
-  | 'bot-review-nitpick';
+export type {
+  PrIssueType,
+  BotComment,
+  DetectedPr,
+  ScoredPr,
+  MergeBlockReason,
+  MergeCandidate,
+  GqlReviewThread,
+  GqlPrNode,
+  MainBranchStatus,
+  PrOverlap,
+  AutoRebaseResult,
+} from '../lib/pr-analysis/types.ts';
 
-export interface BotComment {
-  threadId: string;
-  path: string;
-  line: number | null;
-  startLine: number | null;
-  body: string;
-  author: string;
-}
-
-export interface DetectedPr {
-  number: number;
-  title: string;
-  branch: string;
-  createdAt: string;
-  issues: PrIssueType[];
-  botComments: BotComment[];
-}
-
-export interface ScoredPr extends DetectedPr {
-  score: number;
-}
+// ── Daemon-specific types ────────────────────────────────────────────────────
 
 export type FixOutcome = 'fixed' | 'no-op' | 'max-turns' | 'timeout' | 'error' | 'dry-run';
 
 export type MergeOutcome = 'merged' | 'dry-run' | 'error';
-
-/** Reason a PR with stage:approved label is NOT eligible for merge. */
-export type MergeBlockReason =
-  | 'not-mergeable'
-  | 'ci-failing'
-  | 'ci-pending'
-  | 'unresolved-threads'
-  | 'unchecked-items'
-  | 'agent-working'
-  | 'is-draft';
-
-export interface MergeCandidate {
-  number: number;
-  title: string;
-  branch: string;
-  createdAt: string;
-  headOid: string;
-  eligible: boolean;
-  blockReasons: MergeBlockReason[];
-}
 
 // Re-export LABELS for backward compatibility with consumers that import from types.ts
 export { LABELS } from '../lib/labels.ts';
@@ -77,46 +45,4 @@ export interface PatrolConfig {
   verbose: boolean;
   reflectionInterval: number;
   timeoutMinutes: number;
-}
-
-// ── GraphQL Types ────────────────────────────────────────────────────────────
-
-export interface GqlReviewThread {
-  id: string;
-  isResolved: boolean;
-  isOutdated: boolean;
-  path: string;
-  line: number | null;
-  startLine: number | null;
-  comments: {
-    nodes: Array<{
-      author: { login: string } | null;
-      body: string;
-    }>;
-  };
-}
-
-export interface GqlPrNode {
-  number: number;
-  title: string;
-  headRefName: string;
-  headRefOid: string;
-  mergeable: string;
-  isDraft: boolean;
-  createdAt: string;
-  updatedAt: string;
-  body: string | null;
-  labels: { nodes: Array<{ name: string }> };
-  commits: {
-    nodes: Array<{
-      commit: {
-        statusCheckRollup: {
-          contexts: {
-            nodes: Array<{ conclusion?: string | null; state?: string }>;
-          };
-        } | null;
-      };
-    }>;
-  };
-  reviewThreads?: { nodes: GqlReviewThread[] };
 }
