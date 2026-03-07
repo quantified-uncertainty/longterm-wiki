@@ -6,6 +6,11 @@ import {
   postJson,
 } from "./test-utils";
 
+// ---- In-memory sessions fixture (simulates FK target) ----
+// Pre-seeded IDs that are valid FK targets for session_id.
+// Tests that use sessionId: 42 must find it here; others must not.
+const VALID_SESSION_IDS = new Set<number>([42]);
+
 // ---- In-memory store simulating agent_sessions table ----
 
 let nextId = 1;
@@ -90,9 +95,17 @@ const dispatch: SqlDispatcher = (query, params) => {
           case "checklist_md":
             store[idx].checklist_md = params[pIdx] as string;
             break;
-          case "session_id":
-            store[idx].session_id = params[pIdx] as number | null;
+          case "session_id": {
+            const sid = params[pIdx] as number | null;
+            if (sid !== null && !VALID_SESSION_IDS.has(sid)) {
+              // Simulate FK constraint violation — the route translates this to 400.
+              throw new Error(
+                `insert or update on table "agent_sessions" violates foreign key constraint`
+              );
+            }
+            store[idx].session_id = sid;
             break;
+          }
           case "status":
             store[idx].status = params[pIdx] as string;
             break;
@@ -534,6 +547,17 @@ describe("Agent Sessions API", () => {
         sessionId: 0,
       });
       expect(res.status).toBe(400);
+    });
+
+    it("returns 400 invalid_reference for non-existent sessionId", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        sessionId: 9999, // not in VALID_SESSION_IDS — FK violation
+      });
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toBe("invalid_reference");
     });
   });
 

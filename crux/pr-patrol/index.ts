@@ -1205,26 +1205,6 @@ function spawnClaude(
   });
 }
 
-/** Best-effort: resolve CodeRabbit review threads that were addressed by the fix. */
-async function resolveBotReviewThreads(botComments: BotComment[]): Promise<void> {
-  if (botComments.length === 0) return;
-
-  let resolved = 0;
-  for (const comment of botComments) {
-    try {
-      await githubGraphQL(
-        `mutation($id: ID!) { resolveReviewThread(input: {threadId: $id}) { thread { isResolved } } }`,
-        { id: comment.threadId },
-      );
-      resolved++;
-    } catch (e) {
-      log(`  ${cl.dim}Warning: could not resolve thread on ${comment.path}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
-    }
-  }
-  if (resolved > 0) {
-    log(`  Resolved ${resolved}/${botComments.length} bot review thread(s)`);
-  }
-}
 
 async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
   log(`${cl.bold}→${cl.reset} Fixing PR ${cl.cyan}#${pr.number}${cl.reset} (${pr.title})`);
@@ -1279,10 +1259,11 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
         }).catch(() => log('  Warning: could not post summary comment'));
       }
 
-      // Resolve bot review threads that were addressed by this fix
-      if (pr.botComments.length > 0) {
-        await resolveBotReviewThreads(pr.botComments);
-      }
+      // Note: we intentionally do NOT auto-resolve bot review threads here.
+      // A zero exit code only means Claude ran without crashing — it does not
+      // guarantee every open thread was addressed. Blanket resolution would
+      // dismiss valid feedback that wasn't actually fixed. Threads are resolved
+      // by CodeRabbit re-review after the fix is pushed, or manually.
     } else if (result.hitMaxTurns) {
       const failCount = recordMaxTurnsFailure(pr.number);
       outcome = 'max-turns';

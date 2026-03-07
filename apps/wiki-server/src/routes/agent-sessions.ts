@@ -149,10 +149,20 @@ const agentSessionsApp = new Hono()
         .where(eq(agentSessions.id, id))
         .returning();
     } catch (e: unknown) {
-      // Translate FK violation into a 400 response
+      // Drizzle wraps DB errors in DrizzleQueryError; the FK message lives in e.cause.
       const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes("foreign key") || msg.includes("violates foreign key")) {
-        return c.json({ error: "invalid_reference", message: "sessionId references a non-existent session" }, 400);
+      const causeMsg =
+        e instanceof Error && e.cause instanceof Error ? e.cause.message : "";
+      const isFkViolation =
+        msg.includes("foreign key") ||
+        msg.includes("violates foreign key") ||
+        causeMsg.includes("foreign key") ||
+        causeMsg.includes("violates foreign key");
+      if (isFkViolation) {
+        return c.json(
+          { error: "invalid_reference", message: "sessionId references a non-existent session" },
+          400,
+        );
       }
       throw e;
     }
