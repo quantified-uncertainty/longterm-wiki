@@ -1,4 +1,5 @@
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
+import { fetchAllPaginated } from "@lib/fetch-paginated";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { AgentSessionsTable } from "./sessions-table";
 import type {
@@ -40,16 +41,18 @@ async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
   );
   if (!agentResult.ok) return agentResult;
 
-  // Fetch session logs (completed sessions with PR/cost info)
-  const logsResult = await fetchDetailed<{ sessions: SessionRow[] }>(
-    "/api/sessions?limit=500",
-    { revalidate: 60 }
-  );
+  // Fetch all session logs (completed sessions with PR/cost info), paginating through all pages
+  const logsResult = await fetchAllPaginated<SessionRow>({
+    path: "/api/sessions",
+    itemsKey: "sessions",
+    pageSize: 500,
+    revalidate: 60,
+  });
 
   // Build a branch → session log map for enrichment
   const logsByBranch = new Map<string, SessionRow>();
   if (logsResult.ok) {
-    for (const log of logsResult.data.sessions) {
+    for (const log of logsResult.data.items) {
       if (log.branch) {
         logsByBranch.set(log.branch, log);
       }

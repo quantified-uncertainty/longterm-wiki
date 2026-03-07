@@ -14,6 +14,7 @@ import { join } from 'path';
 import { githubApi, githubGraphQL, REPO } from '../lib/github.ts';
 import { gitSafe } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';
+import { getColors } from '../lib/output.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -137,16 +138,28 @@ export function buildConfig(
 
 // ── Logging ──────────────────────────────────────────────────────────────────
 
+const cl = getColors();
+
+function formatLocalTime(): string {
+  return new Date().toLocaleTimeString('en-US', {
+    timeZone: 'America/Los_Angeles',
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+}
+
 function log(msg: string): void {
-  const line = `[${new Date().toISOString()}] ${msg}`;
-  console.error(line);
+  console.error(`${cl.dim}${formatLocalTime()}${cl.reset} ${msg}`);
 }
 
 function logHeader(msg: string): void {
+  const t = formatLocalTime();
   console.error('');
-  log('═'.repeat(55));
-  log(msg);
-  log('═'.repeat(55));
+  console.error(`${cl.dim}${t}${cl.reset} ${cl.cyan}${'─'.repeat(50)}${cl.reset}`);
+  console.error(`${cl.dim}${t}${cl.reset} ${cl.bold}${msg}${cl.reset}`);
+  console.error(`${cl.dim}${t}${cl.reset} ${cl.cyan}${'─'.repeat(50)}${cl.reset}`);
 }
 
 function appendJsonl(file: string, entry: Record<string, unknown>): void {
@@ -219,11 +232,11 @@ async function checkMainBranch(config: PatrolConfig): Promise<MainBranchStatus> 
 
   // Check cooldown and abandoned status first
   if (isAbandoned(MAIN_BRANCH_KEY)) {
-    log('  Main branch fix abandoned — needs human intervention');
+    log(`  ${cl.yellow}Main branch fix abandoned — needs human intervention${cl.reset}`);
     return notRed;
   }
   if (isRecentlyProcessed(MAIN_BRANCH_KEY, config.cooldownSeconds)) {
-    log('  Main branch recently processed — skipping');
+    log(`  ${cl.dim}Main branch recently processed — skipping${cl.reset}`);
     return notRed;
   }
 
@@ -241,7 +254,7 @@ async function checkMainBranch(config: PatrolConfig): Promise<MainBranchStatus> 
 
     const latest = runs[0];
     if (latest.conclusion === 'failure') {
-      log(`  🔴 Main branch CI is RED (run #${latest.id}, sha ${latest.head_sha.slice(0, 8)})`);
+      log(`  ${cl.red}🔴 Main branch CI is RED${cl.reset} (run #${latest.id}, sha ${latest.head_sha.slice(0, 8)})`);
       return {
         isRed: true,
         runId: latest.id,
@@ -250,10 +263,10 @@ async function checkMainBranch(config: PatrolConfig): Promise<MainBranchStatus> 
       };
     }
 
-    log(`  Main branch CI is green (latest run #${latest.id}: ${latest.conclusion})`);
+    log(`  ${cl.green}Main branch CI is green${cl.reset} (latest run #${latest.id}: ${latest.conclusion})`);
     return notRed;
   } catch (e) {
-    log(`  Warning: could not check main branch CI: ${e instanceof Error ? e.message : String(e)}`);
+    log(`  ${cl.yellow}Warning: could not check main branch CI: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
     return notRed;
   }
 }
@@ -295,10 +308,10 @@ The CI workflow on the \`main\` branch is failing. Run ID: ${runId}
 }
 
 async function fixMainBranch(status: MainBranchStatus, config: PatrolConfig): Promise<void> {
-  log(`→ Fixing main branch CI (run #${status.runId})`);
+  log(`${cl.bold}→${cl.reset} Fixing main branch CI (run #${status.runId})`);
 
   if (config.dryRun) {
-    log('  [DRY RUN] Would invoke Claude to fix main branch CI');
+    log(`  ${cl.dim}[DRY RUN] Would invoke Claude to fix main branch CI${cl.reset}`);
     appendJsonl(JSONL_FILE, {
       type: 'main_branch_result',
       run_id: status.runId,
@@ -323,24 +336,24 @@ async function fixMainBranch(status: MainBranchStatus, config: PatrolConfig): Pr
     if (result.timedOut) {
       outcome = 'timeout';
       reason = `Killed after ${config.timeoutMinutes}m timeout`;
-      log(`✗ Main branch fix timed out after ${config.timeoutMinutes}m`);
+      log(`${cl.red}✗ Main branch fix timed out after ${config.timeoutMinutes}m${cl.reset}`);
     } else if (result.exitCode === 0 && !result.hitMaxTurns) {
       outcome = 'fixed';
-      log(`✓ Main branch CI fix processed (${elapsedS}s)`);
+      log(`${cl.green}✓ Main branch CI fix processed${cl.reset} (${elapsedS}s)`);
     } else if (result.hitMaxTurns) {
       const failCount = recordMaxTurnsFailure(MAIN_BRANCH_KEY);
       outcome = 'max-turns';
       reason = `Hit max turns (${config.maxTurns}) — attempt ${failCount}`;
-      log(`⚠ Main branch fix hit max turns after ${elapsedS}s`);
+      log(`${cl.yellow}⚠ Main branch fix hit max turns after ${elapsedS}s${cl.reset}`);
 
       if (failCount >= 2) {
         reason = `Abandoned after ${failCount} max-turns failures`;
-        log(`✗ Main branch fix abandoned after ${failCount} max-turns failures`);
+        log(`${cl.red}✗ Main branch fix abandoned after ${failCount} max-turns failures${cl.reset}`);
       }
     } else {
       outcome = 'error';
       reason = `Exit code: ${result.exitCode}`;
-      log(`✗ Main branch fix failed (exit: ${result.exitCode}, ${elapsedS}s)`);
+      log(`${cl.red}✗ Main branch fix failed${cl.reset} (exit: ${result.exitCode}, ${elapsedS}s)`);
     }
 
     appendJsonl(JSONL_FILE, {
@@ -380,7 +393,7 @@ async function detectPrOverlaps(config: PatrolConfig, prs: DetectedPr[]): Promis
   const prSubset = prs.slice(0, 20);
   if (prSubset.length < 2) return;
 
-  log(`Checking ${prSubset.length} PRs for file overlaps...`);
+  log(`${cl.dim}Checking ${prSubset.length} PRs for file overlaps...${cl.reset}`);
 
   // Fetch changed files for each PR
   const prFiles: PrFiles[] = [];
@@ -395,7 +408,7 @@ async function detectPrOverlaps(config: PatrolConfig, prs: DetectedPr[]): Promis
         files: files.map((f) => f.filename),
       });
     } catch (e) {
-      log(`  Warning: could not fetch files for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}`);
+      log(`  ${cl.yellow}Warning: could not fetch files for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
     }
   }
 
@@ -425,11 +438,11 @@ async function detectPrOverlaps(config: PatrolConfig, prs: DetectedPr[]): Promis
   }
 
   if (overlaps.size === 0) {
-    log('  No file overlaps detected');
+    log(`  ${cl.dim}No file overlaps detected${cl.reset}`);
     return;
   }
 
-  log(`  Found ${overlaps.size} PR pair(s) with shared files`);
+  log(`  ${cl.yellow}Found ${overlaps.size} PR pair(s) with shared files${cl.reset}`);
 
   // Post warning comments (respecting cooldown)
   for (const [pairKey, sharedFiles] of overlaps) {
@@ -456,7 +469,7 @@ Coordinate to avoid merge conflicts.
 _Posted by PR Patrol — informational only._`;
 
     if (config.dryRun) {
-      log(`  [DRY RUN] Would warn PR #${prA} and #${prB} about ${uniqueFiles.length} shared files`);
+      log(`  ${cl.dim}[DRY RUN] Would warn PR #${prA} and #${prB} about ${uniqueFiles.length} shared files${cl.reset}`);
     } else {
       // Post on both PRs
       for (const prNum of [prA, prB]) {
@@ -466,7 +479,7 @@ _Posted by PR Patrol — informational only._`;
           method: 'POST',
           body: { body: commentBody },
         }).catch((e) =>
-          log(`  Warning: could not post overlap comment on PR #${prNum}: ${e instanceof Error ? e.message : String(e)}`),
+          log(`  ${cl.yellow}Warning: could not post overlap comment on PR #${prNum}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`),
         );
       }
     }
@@ -623,7 +636,7 @@ export async function fetchOpenPrs(config: PatrolConfig): Promise<GqlPrNode[]> {
     repository: { pullRequests: { nodes: GqlPrNode[] } };
   }>(PR_QUERY, { owner, name });
   const prs = data.repository.pullRequests.nodes;
-  log(`Found ${prs.length} open PRs`);
+  log(`Found ${cl.bold}${prs.length}${cl.reset} open PRs`);
   return prs;
 }
 
@@ -658,7 +671,7 @@ export async function fetchSinglePr(prNumber: number): Promise<GqlPrNode | null>
     }>(SINGLE_PR_QUERY, { owner, name, number: prNumber });
     return data.repository.pullRequest;
   } catch (e) {
-    log(`Warning: could not fetch PR #${prNumber}: ${e instanceof Error ? e.message : String(e)}`);
+    log(`${cl.yellow}Warning: could not fetch PR #${prNumber}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
     return null;
   }
 }
@@ -806,7 +819,7 @@ export function findMergeCandidates(prs: GqlPrNode[]): MergeCandidate[] {
 // ── Undraft execution ────────────────────────────────────────────────────────
 
 async function undraftPr(prNum: number, config: PatrolConfig): Promise<boolean> {
-  log(`→ Undrafting PR #${prNum} (all eligibility checks pass)`);
+  log(`${cl.bold}→${cl.reset} Undrafting PR ${cl.cyan}#${prNum}${cl.reset} (all eligibility checks pass)`);
 
   try {
     // GitHub REST API doesn't support undrafting — must use GraphQL mutation
@@ -818,7 +831,7 @@ async function undraftPr(prNum: number, config: PatrolConfig): Promise<boolean> 
       { id: prData.node_id },
     );
 
-    log(`✓ PR #${prNum} marked as ready for review`);
+    log(`${cl.green}✓ PR #${prNum} marked as ready for review${cl.reset}`);
     appendJsonl(JSONL_FILE, {
       type: 'undraft_result',
       pr_num: prNum,
@@ -827,7 +840,7 @@ async function undraftPr(prNum: number, config: PatrolConfig): Promise<boolean> 
     return true;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    log(`✗ Failed to undraft PR #${prNum}: ${msg}`);
+    log(`${cl.red}✗ Failed to undraft PR #${prNum}: ${msg}${cl.reset}`);
     appendJsonl(JSONL_FILE, {
       type: 'undraft_result',
       pr_num: prNum,
@@ -844,11 +857,11 @@ async function mergePr(
   candidate: MergeCandidate,
   config: PatrolConfig,
 ): Promise<void> {
-  log(`→ Merging PR #${candidate.number} (${candidate.title})`);
-  log(`  Branch: ${candidate.branch}`);
+  log(`${cl.bold}→${cl.reset} Merging PR ${cl.cyan}#${candidate.number}${cl.reset} (${candidate.title})`);
+  log(`  Branch: ${cl.dim}${candidate.branch}${cl.reset}`);
 
   if (config.dryRun) {
-    log('  [DRY RUN] Would squash-merge this PR');
+    log(`  ${cl.dim}[DRY RUN] Would squash-merge this PR${cl.reset}`);
     appendJsonl(JSONL_FILE, {
       type: 'merge_result',
       pr_num: candidate.number,
@@ -868,7 +881,7 @@ async function mergePr(
       },
     );
 
-    log(`✓ PR #${candidate.number} merged successfully`);
+    log(`${cl.green}✓ PR #${candidate.number} merged successfully${cl.reset}`);
 
     appendJsonl(JSONL_FILE, {
       type: 'merge_result',
@@ -877,7 +890,7 @@ async function mergePr(
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    log(`✗ Failed to merge PR #${candidate.number}: ${msg}`);
+    log(`${cl.red}✗ Failed to merge PR #${candidate.number}: ${msg}${cl.reset}`);
 
     appendJsonl(JSONL_FILE, {
       type: 'merge_result',
@@ -996,7 +1009,7 @@ async function claimPr(prNum: number, repo: string): Promise<void> {
     });
     claimedPr = prNum;
   } catch {
-    log(`  Warning: could not add claude-working label to PR #${prNum}`);
+    log(`  ${cl.yellow}Warning: could not add claude-working label to PR #${prNum}${cl.reset}`);
   }
 }
 
@@ -1048,7 +1061,7 @@ function spawnClaude(
     const timeoutMs = config.timeoutMinutes * 60 * 1000;
     const timer = setTimeout(() => {
       timedOut = true;
-      log(`  ⚠ Claude subprocess timed out after ${config.timeoutMinutes}m — killing`);
+      log(`  ${cl.yellow}⚠ Claude subprocess timed out after ${config.timeoutMinutes}m — killing${cl.reset}`);
       child.kill('SIGTERM');
       // Force kill if SIGTERM doesn't work within 10s
       setTimeout(() => {
@@ -1085,12 +1098,12 @@ function spawnClaude(
 }
 
 async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
-  log(`→ Fixing PR #${pr.number} (${pr.title})`);
-  log(`  Issues: ${pr.issues.join(', ')}`);
-  log(`  Branch: ${pr.branch}`);
+  log(`${cl.bold}→${cl.reset} Fixing PR ${cl.cyan}#${pr.number}${cl.reset} (${pr.title})`);
+  log(`  Issues: ${cl.yellow}${pr.issues.join(', ')}${cl.reset}`);
+  log(`  Branch: ${cl.dim}${pr.branch}${cl.reset}`);
 
   if (config.dryRun) {
-    log('  [DRY RUN] Would invoke Claude to fix');
+    log(`  ${cl.dim}[DRY RUN] Would invoke Claude to fix${cl.reset}`);
     appendJsonl(JSONL_FILE, {
       type: 'pr_result',
       pr_num: pr.number,
@@ -1121,9 +1134,9 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
     if (result.timedOut) {
       outcome = 'timeout';
       reason = `Killed after ${config.timeoutMinutes}m timeout`;
-      log(`✗ PR #${pr.number} timed out after ${config.timeoutMinutes}m`);
+      log(`${cl.red}✗ PR #${pr.number} timed out after ${config.timeoutMinutes}m${cl.reset}`);
     } else if (result.exitCode === 0 && !result.hitMaxTurns) {
-      log(`✓ PR #${pr.number} processed successfully (${elapsedS}s)`);
+      log(`${cl.green}✓ PR #${pr.number} processed successfully${cl.reset} (${elapsedS}s)`);
       outcome = 'fixed';
 
       // Post summary comment
@@ -1140,12 +1153,12 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
       const failCount = recordMaxTurnsFailure(pr.number);
       outcome = 'max-turns';
       reason = `Hit max turns (${config.maxTurns}) — attempt ${failCount}`;
-      log(`⚠ PR #${pr.number} hit max turns after ${elapsedS}s`);
+      log(`${cl.yellow}⚠ PR #${pr.number} hit max turns after ${elapsedS}s${cl.reset}`);
 
       if (failCount >= 2) {
         reason = `Abandoned after ${failCount} max-turns failures`;
         log(
-          `✗ PR #${pr.number} abandoned after ${failCount} max-turns failures`,
+          `${cl.red}✗ PR #${pr.number} abandoned after ${failCount} max-turns failures${cl.reset}`,
         );
         await githubApi(
           `/repos/${config.repo}/issues/${pr.number}/comments`,
@@ -1161,7 +1174,7 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
       outcome = 'error';
       reason = `Exit code: ${result.exitCode}`;
       log(
-        `✗ PR #${pr.number} processing failed (exit: ${result.exitCode}, ${elapsedS}s)`,
+        `${cl.red}✗ PR #${pr.number} processing failed${cl.reset} (exit: ${result.exitCode}, ${elapsedS}s)`,
       );
     }
 
@@ -1198,13 +1211,13 @@ async function runReflection(
   logHeader(`Reflection (cycle #${cycleCount})`);
 
   if (!existsSync(JSONL_FILE)) {
-    log('Skipping reflection — no log file yet');
+    log(`${cl.dim}Skipping reflection — no log file yet${cl.reset}`);
     return;
   }
 
   const allEntries = readFileSync(JSONL_FILE, 'utf-8').trim().split('\n');
   if (allEntries.length < 10) {
-    log(`Skipping reflection — only ${allEntries.length} log entries (need ≥10)`);
+    log(`${cl.dim}Skipping reflection — only ${allEntries.length} log entries (need ≥10)${cl.reset}`);
     return;
   }
 
@@ -1259,12 +1272,12 @@ ${recentEntries}
     });
 
     log(
-      `✓ Reflection complete (${elapsedS}s, filed_issue=${filedIssue})`,
+      `${cl.green}✓ Reflection complete${cl.reset} (${elapsedS}s, filed_issue=${filedIssue})`,
     );
   } catch (e) {
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
     log(
-      `✗ Reflection failed (${elapsedS}s): ${e instanceof Error ? e.message : String(e)}`,
+      `${cl.red}✗ Reflection failed${cl.reset} (${elapsedS}s): ${e instanceof Error ? e.message : String(e)}`,
     );
   }
 }
@@ -1316,7 +1329,7 @@ async function runCheckCycle(
   // 0. Check main branch CI first — highest priority
   const mainStatus = await checkMainBranch(config);
   if (mainStatus.isRed) {
-    log('Main branch CI is red — prioritizing fix over PR queue');
+    log(`${cl.red}Main branch CI is red${cl.reset} — prioritizing fix over PR queue`);
     await fixMainBranch(mainStatus, config);
     appendJsonl(JSONL_FILE, {
       type: 'cycle_summary',
@@ -1343,16 +1356,16 @@ async function runCheckCycle(
   }
 
   if (detected.length === 0) {
-    log('All PRs clean — nothing to fix');
+    log(`${cl.dim}All PRs clean — nothing to fix${cl.reset}`);
   } else {
     // Filter cooldowns and abandoned
     const eligible = detected.filter((pr) => {
       if (isAbandoned(pr.number)) {
-        log(`  Skipping PR #${pr.number} (abandoned — needs human intervention)`);
+        log(`  ${cl.dim}Skipping PR #${pr.number} (abandoned — needs human intervention)${cl.reset}`);
         return false;
       }
       if (isRecentlyProcessed(pr.number, config.cooldownSeconds)) {
-        log(`  Skipping PR #${pr.number} (recently processed)`);
+        log(`  ${cl.dim}Skipping PR #${pr.number} (recently processed)${cl.reset}`);
         return false;
       }
       return true;
@@ -1361,10 +1374,10 @@ async function runCheckCycle(
     const ranked = rankPrs(eligible);
     if (ranked.length > 0) {
       log('');
-      log(`Fix queue (${ranked.length} items):`);
+      log(`${cl.bold}Fix queue${cl.reset} (${ranked.length} items):`);
       for (const pr of ranked) {
         log(
-          `  [score=${pr.score}] PR #${pr.number}: ${pr.issues.join(',')} — ${pr.title}`,
+          `  ${cl.yellow}[score=${pr.score}]${cl.reset} PR ${cl.cyan}#${pr.number}${cl.reset}: ${pr.issues.join(',')} ${cl.dim}—${cl.reset} ${pr.title}`,
         );
       }
       log('');
@@ -1373,7 +1386,7 @@ async function runCheckCycle(
       await fixPr(top, config);
       fixedPr = top.number;
     } else {
-      log('All issues recently processed — nothing to fix');
+      log(`${cl.dim}All issues recently processed — nothing to fix${cl.reset}`);
     }
   }
 
@@ -1388,7 +1401,7 @@ async function runCheckCycle(
   const undraftedNumbers = new Set<number>();
   for (const candidate of draftCandidates) {
     if (config.dryRun) {
-      log(`  [DRY RUN] Would undraft PR #${candidate.number} (all other checks pass)`);
+      log(`  ${cl.dim}[DRY RUN] Would undraft PR #${candidate.number} (all other checks pass)${cl.reset}`);
       undraftedNumbers.add(candidate.number);
     } else {
       const success = await undraftPr(candidate.number, config);
@@ -1411,12 +1424,12 @@ async function runCheckCycle(
 
   if (mergeCandidates.length > 0) {
     log('');
-    log(`Merge candidates (${mergeCandidates.length} with ${READY_TO_MERGE_LABEL}):`);
-    for (const c of eligibleForMerge) {
-      log(`  ✓ PR #${c.number}: eligible — ${c.title}`);
+    log(`${cl.bold}Merge candidates${cl.reset} (${mergeCandidates.length} with ${READY_TO_MERGE_LABEL}):`);
+    for (const mc of eligibleForMerge) {
+      log(`  ${cl.green}✓${cl.reset} PR ${cl.cyan}#${mc.number}${cl.reset}: eligible ${cl.dim}—${cl.reset} ${mc.title}`);
     }
-    for (const c of blockedForMerge) {
-      log(`  ✗ PR #${c.number}: blocked (${c.blockReasons.join(', ')}) — ${c.title}`);
+    for (const mc of blockedForMerge) {
+      log(`  ${cl.red}✗${cl.reset} PR ${cl.cyan}#${mc.number}${cl.reset}: blocked (${mc.blockReasons.join(', ')}) ${cl.dim}—${cl.reset} ${mc.title}`);
     }
   }
 
@@ -1456,12 +1469,12 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
 
   logHeader('PR Patrol starting');
   log(
-    `Config: interval=${config.intervalSeconds}s, max-turns=${config.maxTurns}, cooldown=${config.cooldownSeconds}s, model=${config.model}`,
+    `${cl.dim}Config: interval=${config.intervalSeconds}s, max-turns=${config.maxTurns}, cooldown=${config.cooldownSeconds}s, model=${config.model}${cl.reset}`,
   );
-  log(`Repo: ${config.repo}`);
-  log(`JSONL: ${JSONL_FILE}`);
+  log(`${cl.dim}Repo: ${config.repo}${cl.reset}`);
+  log(`${cl.dim}JSONL: ${JSONL_FILE}${cl.reset}`);
   log(
-    `Mode: ${config.once ? 'single pass' : config.dryRun ? 'dry run' : 'continuous'}`,
+    `${cl.dim}Mode: ${config.once ? 'single pass' : config.dryRun ? 'dry run' : 'continuous'}${cl.reset}`,
   );
 
   // Signal handlers for graceful shutdown
@@ -1488,7 +1501,7 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
       await runCheckCycle(cycleCount, config);
     } catch (e) {
       log(
-        `Check cycle failed: ${e instanceof Error ? e.message : String(e)}`,
+        `${cl.red}Check cycle failed: ${e instanceof Error ? e.message : String(e)}${cl.reset}`,
       );
     }
 
@@ -1497,11 +1510,11 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
       try {
         await runReflection(cycleCount, config);
       } catch {
-        log('Reflection failed — continuing');
+        log(`${cl.yellow}Reflection failed — continuing${cl.reset}`);
       }
     }
 
-    log(`Sleeping ${config.intervalSeconds}s until next check...`);
+    log(`${cl.dim}Sleeping ${config.intervalSeconds}s until next check...${cl.reset}`);
     await new Promise((r) => setTimeout(r, config.intervalSeconds * 1000));
   }
 }
