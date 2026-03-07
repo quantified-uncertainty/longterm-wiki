@@ -1,0 +1,36 @@
+thing:
+  id: sam-altman
+  stableId: JKsVHQ5stQ
+  type: person
+  name: "Sam Altman"
+  numericId: 16
+  aliases:
+    - "Samuel H. Altman"
+
+facts:
+  - id: f_StIAxD850A
+    property: employed-by
+    value: !ref 1LcLlMGLbw  # openai
+    asOf: 2015-12
+    source: https://openai.com/about
+    notes: "Co-founded OpenAI in December 2015; co-chairman initially, became CEO in 2019 when capped-profit entity was created"
+
+  - id: f_WLIAavRzUQ
+    property: role
+    value: "CEO"
+    asOf: 2019-03
+    source: https://openai.com/about
+    notes: "Briefly fired by the board on November 17, 2023; reinstated November 22, 2023 after employee revolt and Microsoft intervention"
+
+  - id: f_ZfbfHkh9Uw
+    property: born-year
+    value: 1985
+    notes: "Born April 22, 1985 in Chicago, Illinois"
+
+  - id: f_Zu4CcuDsTw
+    property: role
+    value: "President, Y Combinator"
+    asOf: "2014"
+    validEnd: "2019"
+    source: https://www.ycombinator.com/blog/sam-altman-is-the-new-president-of-y-combinator
+    notes: "Succeeded Paul Graham as YC president in 2014; stepped down in 2019 to focus on OpenAI full-time"

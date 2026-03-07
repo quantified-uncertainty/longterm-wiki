@@ -1,0 +1,28 @@
+thing:
+  id: neel-nanda
+  stableId: zaRXTCXPPk
+  type: person
+  name: "Neel Nanda"
+  numericId: 214
+  aliases:
+    - Neel
+
+facts:
+  - id: f_MC1O0jwEcB
+    property: employed-by
+    value: !ref A4XoubikkQ  # deepmind
+    asOf: 2023-01
+    source: https://www.neelnanda.io/
+    notes: "Research Scientist at Google DeepMind working on mechanistic interpretability"
+
+  - id: f_oLC3AS7GeZ
+    property: role
+    value: "Research Scientist, Google DeepMind"
+    asOf: 2023-01
+    source: https://www.neelnanda.io/
+    notes: "Leading mechanistic interpretability research at DeepMind; previously at Anthropic; creator of TransformerLens library"
+
+  - id: f_Gnpzguqlys
+    property: born-year
+    value: 1999
+    notes: "Born approximately 1999"

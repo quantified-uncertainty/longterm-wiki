@@ -1,0 +1,30 @@
+thing:
+  id: eliezer-yudkowsky
+  stableId: fS1tEGKuNq
+  type: person
+  name: "Eliezer Yudkowsky"
+  numericId: 114
+  aliases:
+    - Eliezer
+    - EY
+
+facts:
+  - id: f_pMYY3GyUXY
+    property: employed-by
+    value: !ref puAffUjWSS  # miri
+    asOf: 2000-01
+    source: https://intelligence.org/about/
+    notes: "Founded MIRI (originally Singularity Institute) in 2000; has been its primary researcher and intellectual leader"
+
+  - id: f_zu6WSAbDAq
+    property: role
+    value: "Founder & Senior Research Fellow"
+    asOf: 2000-01
+    source: https://intelligence.org/about/
+    notes: "Pioneered the field of AI alignment research; author of the Sequences and HPMOR"
+
+  - id: f_NYrlVTqJXm
+    property: born-year
+    value: 1979
+    source: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
+    notes: "Born September 11, 1979 in Chicago, Illinois"

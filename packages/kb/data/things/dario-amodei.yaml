@@ -1,0 +1,27 @@
+thing:
+  id: dario-amodei
+  stableId: zR4nW8xB2f
+  type: person
+  name: "Dario Amodei"
+  numericId: 15
+  aliases:
+    - "Dario"
+
+facts:
+  - id: f_aE3mK7pQ9x
+    property: employed-by
+    value: !ref mK9pX3rQ7n  # anthropic
+    asOf: 2021-01
+    source: https://anthropic.com/company
+    notes: "Co-founded Anthropic in January 2021; serves as CEO"
+
+  - id: f_bT6wL2nH5v
+    property: role
+    value: "CEO"
+    asOf: 2021-01
+    source: https://anthropic.com/company
+
+  - id: f_cY9rP4jS1d
+    property: born-year
+    value: 1983
+    notes: "Born 1983; approximate from public reporting"

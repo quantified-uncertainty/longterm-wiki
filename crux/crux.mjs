@@ -98,6 +98,7 @@ import * as statementsCommands from './commands/statements.ts';
 import * as auditsCommands from './commands/audits.ts';
 import * as releaseCommands from './commands/release.ts';
 import * as prPatrolCommands from './commands/pr-patrol.ts';
+import * as kbCommands from './commands/kb.ts';
 
 const domains = {
   validate: validateCommands,
@@ -140,6 +141,7 @@ const domains = {
   audits: auditsCommands,
   release: releaseCommands,
   'pr-patrol': prPatrolCommands,
+  kb: kbCommands,
 };
 
 /**
@@ -225,6 +227,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   audits      System-level behavioral verification (ongoing + post-merge)
   release     Production release management (main → production)
   pr-patrol   Continuous PR maintenance daemon (scan, prioritize, fix)
+  kb          Knowledge base tools (show, list, lookup, validate)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
