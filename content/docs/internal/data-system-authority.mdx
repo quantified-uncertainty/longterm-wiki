@@ -1,0 +1,144 @@
+---
+numericId: E1042
+title: "Data System Authority Rules"
+description: "Defines which data system is authoritative for each entity type, resolving overlaps between KB YAML, old YAML facts, and Postgres statements."
+subcategory: architecture
+lastEdited: "2026-03-07"
+update_frequency: 180
+---
+
+## Overview
+
+The wiki has three overlapping systems that store structured entity data:
+
+1. **KB YAML** (`packages/kb/data/things/*.yaml`) — the new knowledge base package, with rich typed facts, time series, and cross-entity references
+2. **Old YAML facts** (`data/facts/*.yaml`) — the legacy facts system, powering the `<F>` inline component and `<Calc>` expressions
+3. **Postgres statements** (`statements` table) — web-sourced citations and claims, LLM-extracted from page text, with verdict and source tracking
+
+Nine entities currently have entries in both KB YAML and old YAML facts. Without a clear rule, editors may update one system while the other goes stale. This document defines the authority hierarchy.
+
+---
+
+## Authority Hierarchy
+
+### Rule 1: KB YAML is authoritative for entities it covers
+
+For any entity that has a `packages/kb/data/things/<slug>.yaml` file, **KB YAML is the single source of truth** for structured properties (revenue, valuation, headcount, founding date, legal structure, etc.).
+
+- Do not update `data/facts/<slug>.yaml` for entities with KB entries
+- When a number changes (new funding round, updated headcount), edit the KB YAML file only
+- The old facts file for that entity should be treated as deprecated (see migration path below)
+
+### Rule 2: Old YAML facts remain authoritative for non-KB entities
+
+For entities **not yet in KB**, `data/facts/<slug>.yaml` remains the authoritative source for structured properties. These facts power `<F>` and `<Calc>` components on wiki pages and should continue to be updated normally.
+
+Current non-KB entities with old facts files:
+- `anthropic-government-standoff.yaml` — event file, not an entity; no KB equivalent planned
+- `center-for-ai-safety.yaml`
+- `chan-zuckerberg-initiative.yaml`
+- `coefficient-giving.yaml`
+- `google-deepmind.yaml`
+- `jaan-tallinn.yaml`
+- `manifund.yaml`
+- `survival-and-flourishing-fund.yaml`
+
+### Rule 3: Postgres statements are not the source of truth for structured properties
+
+The `statements` table stores web-sourced citations extracted by LLMs. It is authoritative for **claim provenance and verification status** (what was said, where, and whether it's accurate), not for canonical property values.
+
+When a statement's structured value conflicts with KB YAML or old facts, the YAML is correct and the statement may be stale or approximate. Do not update YAML to match statements without independently verifying the source.
+
+---
+
+## The 9 Overlapping Entities
+
+These entities have entries in both `data/facts/` and `packages/kb/data/things/`. KB YAML is authoritative for all of them.
+
+| Entity | KB file | Old facts file | Status |
+|--------|---------|---------------|--------|
+| anthropic | `packages/kb/data/things/anthropic.yaml` | `data/facts/anthropic.yaml` | KB authoritative |
+| dustin-moskovitz | `packages/kb/data/things/dustin-moskovitz.yaml` | `data/facts/dustin-moskovitz.yaml` | KB authoritative |
+| elon-musk | `packages/kb/data/things/elon-musk.yaml` | `data/facts/elon-musk.yaml` | KB authoritative |
+| meta-ai | `packages/kb/data/things/meta-ai.yaml` | `data/facts/meta-ai.yaml` | KB authoritative |
+| miri | `packages/kb/data/things/miri.yaml` | `data/facts/miri.yaml` | KB authoritative |
+| openai | `packages/kb/data/things/openai.yaml` | `data/facts/openai.yaml` | KB authoritative |
+| sam-altman | `packages/kb/data/things/sam-altman.yaml` | `data/facts/sam-altman.yaml` | KB authoritative |
+| ssi | `packages/kb/data/things/ssi.yaml` | `data/facts/ssi.yaml` | KB authoritative |
+| xai | `packages/kb/data/things/xai.yaml` | `data/facts/xai.yaml` | KB authoritative |
+
+---
+
+## Migration Path
+
+When adding a new entity to KB:
+
+1. Create `packages/kb/data/things/<slug>.yaml` with the entity's structured data
+2. Migrate any facts from `data/facts/<slug>.yaml` that are still current into KB format
+3. Delete or mark deprecated the old facts file — add a comment at the top:
+   ```yaml
+   # DEPRECATED: This entity is now in packages/kb/data/things/<slug>.yaml.
+   # KB YAML is authoritative. This file is kept only for any remaining <F> tag references.
+   ```
+
+4. Search for `<F e="<slug>"` in MDX pages — these will continue to render from the old facts file until they are updated to use KB data components (`<KBFactTable>`, `<KBEntitySidebar>`, etc.)
+5. File an issue to migrate any remaining `<F>` tag usage on pages for that entity
+
+Do not delete old facts files outright if there are still active `<F>` tags referencing them — the `<F>` component reads from `data/facts/`, not from KB YAML.
+
+---
+
+## System Comparison
+
+| Dimension | KB YAML | Old YAML facts | Postgres statements |
+|-----------|---------|---------------|---------------------|
+| Location | `packages/kb/data/things/` | `data/facts/` | `statements` table (wiki-server DB) |
+| Authority | Properties for KB entities | Properties for non-KB entities | Claim provenance + verdicts |
+| Data model | Typed facts with `property`, `value`, `asOf`, `source`, `validEnd` | Hash-keyed facts with `measure`, `value`, `asOf`, `source` | LLM-extracted claims with `structuredValue`, `verdict`, citation join table |
+| Cross-entity refs | Yes — `!ref` format for entity references | No | `relatedEntities` array |
+| Time series | Yes — multiple facts per property with `asOf` | Yes — multiple entries with `asOf` | Partial — `valueDate` field |
+| Display components | `<KBFactTable>`, `<KBEntitySidebar>`, `<KBEntityFacts>` | `<F>`, `<Calc>` inline components | `<EntityStatementsCard>`, statements pages |
+| Update workflow | Edit KB YAML file | Edit facts YAML file | LLM extraction or manual via wiki-server API |
+| Build integration | Compiled into `database.json` via build-data | Compiled into `database.json` via build-data | Real-time API queries to wiki-server |
+
+---
+
+## KB Cross-Entity Comparisons
+
+The `KBCompareTable` component renders a single property across multiple KB entities side-by-side. Time-series properties (revenue, valuation, headcount) produce a year-columnar table; point-in-time properties produce a simple latest-value table.
+
+```mdx
+{/* Compare revenue across all orgs that have it */}
+<KBCompareTable property="revenue" />
+
+{/* Filter to specific entities */}
+<KBCompareTable property="headcount" entities={["anthropic", "openai", "deepmind", "meta-ai", "xai"]} />
+
+{/* Force latest-only mode */}
+<KBCompareTable property="valuation" mode="latest" title="AI Lab Valuations" />
+```
+
+Example — revenue run-rate for frontier AI labs:
+
+<KBCompareTable
+  property="revenue"
+  entities={["anthropic", "openai", "xai", "meta-ai", "deepmind"]}
+  title="AI Lab Revenue (ARR, time series)"
+/>
+
+Example — latest valuation across labs with KB data:
+
+<KBCompareTable
+  property="valuation"
+  entities={["anthropic", "openai", "xai", "ssi"]}
+  mode="latest"
+  title="AI Lab Valuations (latest)"
+/>
+
+---
+
+## Related Documents
+
+- `content/docs/internal/fact-system-strategy.mdx` — Strategy and phase plan for old YAML facts
+- `content/docs/internal/structured-data-architecture.mdx` — Migration path from facts to claims
+- `packages/kb/EXPERIMENTAL.md` — KB package status and roadmap
