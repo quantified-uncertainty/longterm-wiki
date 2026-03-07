@@ -8,6 +8,7 @@
  *   crux kb show <entity-id>       Show a single entity with all its data
  *   crux kb list [--type=X]        List all entities
  *   crux kb lookup <stableId>      Look up entity by stableId
+ *   crux kb properties             List all property definitions with usage counts
  */
 
 import { join } from 'path';
@@ -221,19 +222,27 @@ async function listCommand(
       type: e.type,
       stableId: e.stableId,
       factCount: graph.getFacts(e.id).length,
+      itemCount: graph.getItemCollectionNames(e.id).reduce(
+        (sum, col) => sum + graph.getItems(e.id, col).length,
+        0,
+      ),
     }));
     return { exitCode: 0, output: JSON.stringify(data) };
   }
 
   // Table header
   const lines: string[] = [];
-  const header = `${'ID'.padEnd(24)} ${'Name'.padEnd(24)} ${'Type'.padEnd(16)} ${'StableId'.padEnd(14)} Facts`;
+  const header = `${'ID'.padEnd(24)} ${'Name'.padEnd(24)} ${'Type'.padEnd(16)} ${'StableId'.padEnd(14)} ${'Facts'.padEnd(7)} Items`;
   lines.push(`\x1b[1m${header}\x1b[0m`);
   lines.push('-'.repeat(header.length));
 
   for (const entity of entities) {
     const facts = graph.getFacts(entity.id);
-    const row = `${entity.id.padEnd(24)} ${entity.name.padEnd(24)} ${entity.type.padEnd(16)} ${entity.stableId.padEnd(14)} ${facts.length}`;
+    const itemCount = graph.getItemCollectionNames(entity.id).reduce(
+      (sum, col) => sum + graph.getItems(entity.id, col).length,
+      0,
+    );
+    const row = `${entity.id.padEnd(24)} ${entity.name.padEnd(24)} ${entity.type.padEnd(16)} ${entity.stableId.padEnd(14)} ${String(facts.length).padEnd(7)} ${itemCount}`;
     lines.push(row);
   }
 
@@ -343,6 +352,84 @@ async function validateCommand(
   return { exitCode: errors.length > 0 ? 1 : 0, output: lines.join('\n') };
 }
 
+// ── properties command ───────────────────────────────────────────────────
+
+async function propertiesCommand(
+  args: string[],
+  options: KBCommandOptions,
+): Promise<CommandResult> {
+  const graph = await loadGraph();
+  const allProperties = graph.getAllProperties();
+  const allEntities = graph.getAllEntities();
+
+  // Compute usage counts for each property
+  const usageData = allProperties.map((prop) => {
+    let totalFactCount = 0;
+    let usedByCount = 0;
+
+    for (const entity of allEntities) {
+      const facts = graph.getFacts(entity.id, { property: prop.id });
+      if (facts.length > 0) {
+        usedByCount++;
+        totalFactCount += facts.length;
+      }
+    }
+
+    return {
+      property: prop,
+      usedByCount,
+      totalFactCount,
+    };
+  });
+
+  // Filter by category if specified
+  let filtered = usageData;
+  if (options.type) {
+    filtered = filtered.filter((d) => d.property.category === options.type);
+  }
+
+  // Sort by total fact count descending, then by name
+  filtered.sort((a, b) => {
+    const countDiff = b.totalFactCount - a.totalFactCount;
+    if (countDiff !== 0) return countDiff;
+    return a.property.name.localeCompare(b.property.name);
+  });
+
+  if (options.ci) {
+    const data = filtered.map((d) => ({
+      id: d.property.id,
+      name: d.property.name,
+      dataType: d.property.dataType,
+      category: d.property.category ?? '',
+      computed: d.property.computed ?? false,
+      temporal: d.property.temporal ?? false,
+      usedByCount: d.usedByCount,
+      totalFactCount: d.totalFactCount,
+    }));
+    return { exitCode: 0, output: JSON.stringify(data) };
+  }
+
+  const lines: string[] = [];
+  const header = `${'Property'.padEnd(28)} ${'Category'.padEnd(14)} ${'Type'.padEnd(8)} ${'Used By'.padEnd(9)} ${'Count'.padEnd(7)} Flags`;
+  lines.push(`\x1b[1m${header}\x1b[0m`);
+  lines.push('-'.repeat(header.length));
+
+  for (const { property, usedByCount, totalFactCount } of filtered) {
+    const flags: string[] = [];
+    if (property.computed) flags.push('computed');
+    if (property.temporal) flags.push('temporal');
+    if (property.inverseId) flags.push(`inv:${property.inverseId}`);
+
+    const row = `${property.id.padEnd(28)} ${(property.category ?? '').padEnd(14)} ${property.dataType.padEnd(8)} ${String(usedByCount).padEnd(9)} ${String(totalFactCount).padEnd(7)} ${flags.join(', ')}`;
+    lines.push(row);
+  }
+
+  lines.push('');
+  lines.push(`Total: ${filtered.length} properties`);
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
 // ── Exports ─────────────────────────────────────────────────────────────
 
 export const commands = {
@@ -350,6 +437,7 @@ export const commands = {
   list: listCommand,
   lookup: lookupCommand,
   validate: validateCommand,
+  properties: propertiesCommand,
 };
 
 export function getHelp(): string {
@@ -358,12 +446,13 @@ KB Domain -- Knowledge Base readability tools
 
 Commands:
   show <entity-id>      Show a single entity with all data, resolving stableIds
-  list [--type=X]       List all entities with name, type, stableId, and fact count
+  list [--type=X]       List all entities with name, type, stableId, fact/item counts
   lookup <stableId>     Look up an entity by its stableId
+  properties            List all property definitions with usage counts
   validate [entity-id]  Validate all entities or a single entity
 
 Options:
-  --type=X              Filter list by entity type (e.g. organization, person)
+  --type=X              Filter by entity type (list) or property category (properties)
   --limit=N             Limit number of results (list only)
   --errors-only         Show only errors (validate only)
   --rule=X              Filter by rule name (validate only)
@@ -375,6 +464,8 @@ Examples:
   crux kb list                        List all entities
   crux kb list --type=person          List only person entities
   crux kb lookup mK9pX3rQ7n           Look up entity by stableId
+  crux kb properties                  List all properties with usage counts
+  crux kb properties --type=financial Filter properties by category
   crux kb validate                    Validate all entities
   crux kb validate anthropic          Validate a single entity
   crux kb validate --errors-only      Show only errors

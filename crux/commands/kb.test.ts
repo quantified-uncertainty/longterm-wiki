@@ -29,7 +29,14 @@ describe('crux kb list', () => {
     expect(result.output).not.toContain('anthropic '); // slug 'anthropic' not in person list
   });
 
-  it('returns JSON in ci mode', async () => {
+  it('includes Items column in table output', async () => {
+    const result = await commands.list([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('Items');
+    expect(result.output).toContain('Facts');
+  });
+
+  it('returns JSON in ci mode with itemCount', async () => {
     const result = await commands.list([], { ci: true });
     expect(result.exitCode).toBe(0);
     const data = JSON.parse(result.output);
@@ -38,6 +45,7 @@ describe('crux kb list', () => {
     expect(data[0]).toHaveProperty('id');
     expect(data[0]).toHaveProperty('name');
     expect(data[0]).toHaveProperty('factCount');
+    expect(data[0]).toHaveProperty('itemCount');
   });
 });
 
@@ -121,5 +129,54 @@ describe('crux kb lookup', () => {
     const result = await commands.lookup([], {});
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Usage');
+  });
+});
+
+describe('crux kb properties', () => {
+  it('lists all properties with usage counts', async () => {
+    const result = await commands.properties([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('Property');
+    expect(result.output).toContain('Category');
+    expect(result.output).toContain('Used By');
+    expect(result.output).toContain('Count');
+    expect(result.output).toContain('revenue');
+    expect(result.output).toContain('financial');
+    expect(result.output).toContain('Total:');
+  });
+
+  it('shows temporal and computed flags', async () => {
+    const result = await commands.properties([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('temporal');
+    expect(result.output).toContain('computed');
+  });
+
+  it('shows inverse property references', async () => {
+    const result = await commands.properties([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('inv:');
+  });
+
+  it('filters by category with --type', async () => {
+    const result = await commands.properties([], { type: 'financial' });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('revenue');
+    // People category properties should not appear
+    expect(result.output).not.toContain('employed-by');
+  });
+
+  it('returns JSON in ci mode', async () => {
+    const result = await commands.properties([], { ci: true });
+    expect(result.exitCode).toBe(0);
+    const data = JSON.parse(result.output);
+    expect(Array.isArray(data)).toBe(true);
+    expect(data.length).toBeGreaterThan(0);
+    expect(data[0]).toHaveProperty('id');
+    expect(data[0]).toHaveProperty('name');
+    expect(data[0]).toHaveProperty('dataType');
+    expect(data[0]).toHaveProperty('category');
+    expect(data[0]).toHaveProperty('usedByCount');
+    expect(data[0]).toHaveProperty('totalFactCount');
   });
 });
