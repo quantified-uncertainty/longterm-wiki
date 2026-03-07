@@ -38,12 +38,12 @@ async function main(): Promise<void> {
 
   // Separate blocking errors from demoted/warning-level issues
   const blockingErrors = results.filter(
-    (r) => r.severity === "error" && !DEMOTED_RULES.has(r.rule)
+    (r: { severity: string; rule: string }) => r.severity === "error" && !DEMOTED_RULES.has(r.rule)
   );
   const demotedErrors = results.filter(
-    (r) => r.severity === "error" && DEMOTED_RULES.has(r.rule)
+    (r: { severity: string; rule: string }) => r.severity === "error" && DEMOTED_RULES.has(r.rule)
   );
-  const warnings = results.filter((r) => r.severity === "warning");
+  const warnings = results.filter((r: { severity: string }) => r.severity === "warning");
 
   if (verbose) {
     for (const w of warnings) {
