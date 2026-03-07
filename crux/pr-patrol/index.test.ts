@@ -3,6 +3,7 @@ import {
   checkMergeEligibility,
   findMergeCandidates,
   detectIssues,
+  computeBudget,
   type GqlPrNode,
 } from './index.ts';
 
@@ -380,6 +381,46 @@ describe('findMergeCandidates', () => {
       (c) => !c.eligible && c.blockReasons.length === 1 && c.blockReasons[0] === 'is-draft',
     );
     expect(undraftEligible).toHaveLength(1);
+  });
+});
+
+// ── computeBudget ────────────────────────────────────────────────────────────
+
+describe('computeBudget', () => {
+  it('gives small budget for missing-issue-ref only', () => {
+    const budget = computeBudget(['missing-issue-ref']);
+    expect(budget.maxTurns).toBe(5);
+    expect(budget.timeoutMinutes).toBe(3);
+  });
+
+  it('gives small budget for missing-testplan only', () => {
+    const budget = computeBudget(['missing-testplan']);
+    expect(budget.maxTurns).toBe(8);
+    expect(budget.timeoutMinutes).toBe(5);
+  });
+
+  it('gives medium budget for ci-failure', () => {
+    const budget = computeBudget(['ci-failure']);
+    expect(budget.maxTurns).toBe(25);
+    expect(budget.timeoutMinutes).toBe(15);
+  });
+
+  it('gives full budget for conflict', () => {
+    const budget = computeBudget(['conflict']);
+    expect(budget.maxTurns).toBe(40);
+    expect(budget.timeoutMinutes).toBe(30);
+  });
+
+  it('uses highest budget when multiple issues present', () => {
+    const budget = computeBudget(['missing-issue-ref', 'ci-failure']);
+    expect(budget.maxTurns).toBe(25);
+    expect(budget.timeoutMinutes).toBe(15);
+  });
+
+  it('conflict dominates when mixed with smaller issues', () => {
+    const budget = computeBudget(['missing-testplan', 'conflict', 'missing-issue-ref']);
+    expect(budget.maxTurns).toBe(40);
+    expect(budget.timeoutMinutes).toBe(30);
   });
 });
 

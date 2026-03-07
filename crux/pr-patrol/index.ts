@@ -185,20 +185,27 @@ function markProcessed(key: number | string): void {
   );
 }
 
-function getMaxTurnsFailCount(key: number | string): number {
-  const file = join(STATE_DIR, `max-turns-${key}`);
-  if (!existsSync(file)) return 0;
-  return parseInt(readFileSync(file, 'utf-8').trim(), 10) || 0;
+function getFailCount(key: number | string): number {
+  // Check both new and legacy file names for backwards compat
+  const newFile = join(STATE_DIR, `failures-${key}`);
+  const legacyFile = join(STATE_DIR, `max-turns-${key}`);
+  if (existsSync(newFile)) {
+    return parseInt(readFileSync(newFile, 'utf-8').trim(), 10) || 0;
+  }
+  if (existsSync(legacyFile)) {
+    return parseInt(readFileSync(legacyFile, 'utf-8').trim(), 10) || 0;
+  }
+  return 0;
 }
 
-function recordMaxTurnsFailure(key: number | string): number {
-  const count = getMaxTurnsFailCount(key) + 1;
-  writeFileSync(join(STATE_DIR, `max-turns-${key}`), String(count));
+function recordFailure(key: number | string): number {
+  const count = getFailCount(key) + 1;
+  writeFileSync(join(STATE_DIR, `failures-${key}`), String(count));
   return count;
 }
 
 function isAbandoned(key: number | string): boolean {
-  return getMaxTurnsFailCount(key) >= 2;
+  return getFailCount(key) >= 2;
 }
 
 // ── Main Branch CI Check ────────────────────────────────────────────────────
@@ -334,21 +341,27 @@ async function fixMainBranch(status: MainBranchStatus, config: PatrolConfig): Pr
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
     if (result.timedOut) {
+      const failCount = recordFailure(MAIN_BRANCH_KEY);
       outcome = 'timeout';
-      reason = `Killed after ${config.timeoutMinutes}m timeout`;
-      log(`${cl.red}✗ Main branch fix timed out after ${config.timeoutMinutes}m${cl.reset}`);
+      reason = `Killed after ${config.timeoutMinutes}m timeout — attempt ${failCount}`;
+      log(`${cl.red}✗ Main branch fix timed out after ${config.timeoutMinutes}m (attempt ${failCount})${cl.reset}`);
+
+      if (failCount >= 2) {
+        reason = `Abandoned after ${failCount} failures (timeout)`;
+        log(`${cl.red}✗ Main branch fix abandoned after ${failCount} failures${cl.reset}`);
+      }
     } else if (result.exitCode === 0 && !result.hitMaxTurns) {
       outcome = 'fixed';
       log(`${cl.green}✓ Main branch CI fix processed${cl.reset} (${elapsedS}s)`);
     } else if (result.hitMaxTurns) {
-      const failCount = recordMaxTurnsFailure(MAIN_BRANCH_KEY);
+      const failCount = recordFailure(MAIN_BRANCH_KEY);
       outcome = 'max-turns';
       reason = `Hit max turns (${config.maxTurns}) — attempt ${failCount}`;
       log(`${cl.yellow}⚠ Main branch fix hit max turns after ${elapsedS}s${cl.reset}`);
 
       if (failCount >= 2) {
-        reason = `Abandoned after ${failCount} max-turns failures`;
-        log(`${cl.red}✗ Main branch fix abandoned after ${failCount} max-turns failures${cl.reset}`);
+        reason = `Abandoned after ${failCount} failures`;
+        log(`${cl.red}✗ Main branch fix abandoned after ${failCount} failures${cl.reset}`);
       }
     } else {
       outcome = 'error';
@@ -821,6 +834,37 @@ const ISSUE_SCORES: Record<PrIssueType, number> = {
   'bot-review-nitpick': 15,
 };
 
+// ── Issue-type-specific resource limits ──────────────────────────────────────
+// Scale max-turns and timeout based on the hardest issue in a PR.
+// This prevents trivial issues from consuming the full 40-turn / 30-min budget.
+
+interface IssueBudget {
+  maxTurns: number;
+  timeoutMinutes: number;
+}
+
+const ISSUE_BUDGETS: Record<PrIssueType, IssueBudget> = {
+  conflict:            { maxTurns: 40, timeoutMinutes: 30 },
+  'ci-failure':        { maxTurns: 25, timeoutMinutes: 15 },
+  'bot-review-major':  { maxTurns: 25, timeoutMinutes: 15 },
+  'missing-issue-ref': { maxTurns: 5,  timeoutMinutes: 3 },
+  stale:               { maxTurns: 10, timeoutMinutes: 5 },
+  'missing-testplan':  { maxTurns: 8,  timeoutMinutes: 5 },
+  'bot-review-nitpick':{ maxTurns: 8,  timeoutMinutes: 5 },
+};
+
+/** Compute the budget for a PR based on its hardest issue. */
+export function computeBudget(issues: PrIssueType[]): IssueBudget {
+  let maxTurns = 5;
+  let timeoutMinutes = 3;
+  for (const issue of issues) {
+    const budget = ISSUE_BUDGETS[issue];
+    if (budget.maxTurns > maxTurns) maxTurns = budget.maxTurns;
+    if (budget.timeoutMinutes > timeoutMinutes) timeoutMinutes = budget.timeoutMinutes;
+  }
+  return { maxTurns, timeoutMinutes };
+}
+
 /** Pure function — computes priority score for a detected PR. */
 export function computeScore(pr: DetectedPr): number {
   let score = 0;
@@ -1045,9 +1089,12 @@ ${issues.join(', ')}
 ### CI Failure
 - Check CI status: gh pr checks ${num} --repo ${repo}
 - Read the failing check logs to understand the failure
-- Fix the issue (build error, test failure, lint error)
-- Run locally to verify: pnpm build and/or pnpm test
-- Commit and push the fix`);
+- **STOP IMMEDIATELY and report** if ANY of these apply:
+  - The check requires a human action (adding a label like \`rules-change-reviewed\`, manual approval, etc.)
+  - The failure is in a Vercel deployment or external service (not a code issue)
+  - The same check is also failing on the \`main\` branch (pre-existing, not caused by this PR)
+  - The failure is a permissions or authentication issue
+- If the failure IS a code issue you can fix: fix it, run locally to verify (pnpm build / pnpm test), commit and push`);
   }
 
   if (issues.includes('missing-testplan')) {
@@ -1097,7 +1144,14 @@ ${issues.join(', ')}
 - Use git push --force-with-lease (never --force) when pushing rebased branches
 - Do not modify files unrelated to the fix
 - Do NOT run /agent-session-start or /agent-session-ready-PR — this is a targeted fix, not a full session
-- Do NOT create new branches — work on the existing PR branch`);
+- Do NOT create new branches — work on the existing PR branch
+
+## When to stop early
+- **If the issue requires human intervention** (adding labels, approvals, external service fixes): output a clear summary of why and stop immediately. Do not attempt workarounds.
+- **If the issue is pre-existing** (also failing on main, not introduced by this PR): state that and stop.
+- **If you've tried 2+ approaches and none worked**: stop and summarize what you tried. Do not keep cycling through the same strategies.
+- **If the fix is "no action needed"** (e.g., no matching issue exists for missing-issue-ref): say so and stop. Not every detected issue requires a code change.
+- Stopping early with a clear explanation is BETTER than burning through all turns without progress.`);
 
   return sections.join('\n');
 }
@@ -1226,6 +1280,13 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
 
   await claimPr(pr.number, config.repo);
 
+  // Compute issue-specific budget (capped by global config)
+  const budget = computeBudget(pr.issues);
+  const effectiveMaxTurns = Math.min(budget.maxTurns, config.maxTurns);
+  const effectiveTimeout = Math.min(budget.timeoutMinutes, config.timeoutMinutes);
+
+  log(`  Budget: ${effectiveMaxTurns} max-turns, ${effectiveTimeout}m timeout (based on: ${pr.issues.join(', ')})`);
+
   const prompt = buildPrompt(pr, config.repo);
   const startTime = Date.now();
 
@@ -1233,13 +1294,34 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
   let reason = '';
 
   try {
-    const result = await spawnClaude(prompt, config);
+    const result = await spawnClaude(prompt, {
+      ...config,
+      maxTurns: effectiveMaxTurns,
+      timeoutMinutes: effectiveTimeout,
+    });
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
     if (result.timedOut) {
+      // Timeouts count toward abandonment — a PR that times out repeatedly
+      // is likely unfixable and should not keep burning compute.
+      const failCount = recordFailure(pr.number);
       outcome = 'timeout';
-      reason = `Killed after ${config.timeoutMinutes}m timeout`;
-      log(`${cl.red}✗ PR #${pr.number} timed out after ${config.timeoutMinutes}m${cl.reset}`);
+      reason = `Killed after ${effectiveTimeout}m timeout — attempt ${failCount}`;
+      log(`${cl.red}✗ PR #${pr.number} timed out after ${effectiveTimeout}m (attempt ${failCount})${cl.reset}`);
+
+      if (failCount >= 2) {
+        reason = `Abandoned after ${failCount} failures (timeout)`;
+        log(`${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`);
+        await githubApi(
+          `/repos/${config.repo}/issues/${pr.number}/comments`,
+          {
+            method: 'POST',
+            body: {
+              body: `🤖 **PR Patrol**: Abandoning automatic fix after ${failCount} failed attempts (timed out each time).\n\n**Issues detected**: ${pr.issues.join(', ')}\n**Last attempt**: ${elapsedS}s, ${effectiveTimeout}m timeout\n\nThis PR likely needs human intervention to resolve.`,
+            },
+          },
+        ).catch(() => log('  Warning: could not post abandonment comment'));
+      }
     } else if (result.exitCode === 0 && !result.hitMaxTurns) {
       log(`${cl.green}✓ PR #${pr.number} processed successfully${cl.reset} (${elapsedS}s)`);
       outcome = 'fixed';
@@ -1250,27 +1332,27 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
         await githubApi(`/repos/${config.repo}/issues/${pr.number}/comments`, {
           method: 'POST',
           body: {
-            body: `🤖 **PR Patrol** ran for ${elapsedS}s (${config.maxTurns} max turns, model: ${config.model}).\n\n**Issues detected**: ${pr.issues.join(', ')}\n\n**Result**:\n${summary}`,
+            body: `🤖 **PR Patrol** ran for ${elapsedS}s (${effectiveMaxTurns} max turns, model: ${config.model}).\n\n**Issues detected**: ${pr.issues.join(', ')}\n\n**Result**:\n${summary}`,
           },
         }).catch(() => log('  Warning: could not post summary comment'));
       }
     } else if (result.hitMaxTurns) {
-      const failCount = recordMaxTurnsFailure(pr.number);
+      const failCount = recordFailure(pr.number);
       outcome = 'max-turns';
-      reason = `Hit max turns (${config.maxTurns}) — attempt ${failCount}`;
-      log(`${cl.yellow}⚠ PR #${pr.number} hit max turns after ${elapsedS}s${cl.reset}`);
+      reason = `Hit max turns (${effectiveMaxTurns}) — attempt ${failCount}`;
+      log(`${cl.yellow}⚠ PR #${pr.number} hit max turns after ${elapsedS}s (attempt ${failCount})${cl.reset}`);
 
       if (failCount >= 2) {
-        reason = `Abandoned after ${failCount} max-turns failures`;
+        reason = `Abandoned after ${failCount} failures`;
         log(
-          `${cl.red}✗ PR #${pr.number} abandoned after ${failCount} max-turns failures${cl.reset}`,
+          `${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`,
         );
         await githubApi(
           `/repos/${config.repo}/issues/${pr.number}/comments`,
           {
             method: 'POST',
             body: {
-              body: `🤖 **PR Patrol**: Abandoning automatic fix after ${failCount} failed attempts (hit max turns each time).\n\n**Issues detected**: ${pr.issues.join(', ')}\n**Last attempt**: ${elapsedS}s, ${config.maxTurns} turns\n\nThis PR likely needs human intervention to resolve.`,
+              body: `🤖 **PR Patrol**: Abandoning automatic fix after ${failCount} failed attempts.\n\n**Issues detected**: ${pr.issues.join(', ')}\n**Last attempt**: ${elapsedS}s, ${effectiveMaxTurns} turns\n\nThis PR likely needs human intervention to resolve.`,
             },
           },
         ).catch(() => log('  Warning: could not post abandonment comment'));
@@ -1364,6 +1446,8 @@ ${recentEntries}
     const result = await spawnClaude(prompt, {
       ...config,
       maxTurns: 10, // Reflection needs fewer turns
+      model: 'haiku', // Reflection is log analysis — doesn't need sonnet
+      timeoutMinutes: 5, // Should complete quickly
     });
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
     const filedIssue = /Created issue #|created.*#\d/.test(result.output);
