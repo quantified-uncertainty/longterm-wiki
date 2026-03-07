@@ -25,7 +25,7 @@ facts:
 
   - id: f_QtqNoKoBgw
     property: employed-by
-    value: ssi
+    value: !ref 1OSiYOaWVL  # ssi
     asOf: 2024-06
     source: https://ssi.inc
     notes: "Co-founded Safe Superintelligence Inc (SSI) in June 2024 with Daniel Gross and Daniel Levy"

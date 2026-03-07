@@ -1,0 +1,29 @@
+thing:
+  id: nick-bostrom
+  stableId: IQvWHA3OiF
+  type: person
+  name: "Nick Bostrom"
+  numericId: 215
+  aliases:
+    - Niklas Bostr\u00F6m
+
+facts:
+  - id: f_1dHuIat2Xt
+    property: employed-by
+    value: "University of Oxford"
+    asOf: 2005-01
+    source: https://nickbostrom.com/
+    notes: "Founded the Future of Humanity Institute (FHI) at Oxford in 2005; FHI closed in April 2024"
+
+  - id: f_F5iVdik64y
+    property: role
+    value: "Professor of Philosophy, University of Oxford; Founder of FHI"
+    asOf: 2005-01
+    source: https://nickbostrom.com/
+    notes: "Author of 'Superintelligence: Paths, Dangers, Strategies' (2014), which catalyzed mainstream concern about AI existential risk"
+
+  - id: f_YhxyxeHHdA
+    property: born-year
+    value: 1973
+    source: https://en.wikipedia.org/wiki/Nick_Bostrom
+    notes: "Born March 10, 1973 in Helsingborg, Sweden"

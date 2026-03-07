@@ -26,6 +26,12 @@ facts:
     value: "Private company"
     source: https://x.ai/about
 
+  - id: f_xai_founded_by
+    property: founded-by
+    value:
+      - !ref 69vftmr1jg  # elon-musk
+    source: https://x.ai/about
+
   - id: f_Uxbvs82r3w
     property: total-funding
     value: 12e9

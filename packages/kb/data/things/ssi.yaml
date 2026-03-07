@@ -1,0 +1,77 @@
+thing:
+  id: ssi
+  stableId: 1OSiYOaWVL
+  type: organization
+  name: "Safe Superintelligence Inc"
+  numericId: 425
+  aliases:
+    - SSI
+    - Safe Superintelligence
+
+facts:
+  - id: f_RYwXutlEmN
+    property: founded-date
+    value: 2024-06
+    source: https://ssi.inc
+    notes: "Founded June 2024 by Ilya Sutskever, Daniel Gross, and Daniel Levy after Sutskever's departure from OpenAI"
+
+  - id: f_wsceMu4laG
+    property: headquarters
+    value: "Palo Alto, CA"
+    source: https://ssi.inc
+    notes: "Dual offices in Palo Alto and Tel Aviv"
+
+  - id: f_kS32utFnCA
+    property: legal-structure
+    value: "Private company"
+    source: https://ssi.inc
+
+  - id: f_ssi_founded_by
+    property: founded-by
+    value:
+      - !ref eYrBgMLJDw  # ilya-sutskever
+      - daniel-gross
+      - daniel-levy
+    source: https://ssi.inc
+
+  - id: f_Oa0nwGGdna
+    property: total-funding
+    value: 1e9
+    asOf: 2024-09
+    source: https://www.reuters.com/technology/artificial-intelligence/ilya-sutskevers-ai-startup-ssi-nears-1-billion-funding-2024-09-04/
+    notes: "Raised $1B in September 2024; investors include Andreessen Horowitz, Sequoia, DST Global, and the NFDG fund"
+
+  - id: f_AfvPC6aOTK
+    property: valuation
+    value: 5e9
+    asOf: 2024-09
+    source: https://www.reuters.com/technology/artificial-intelligence/ilya-sutskevers-ai-startup-ssi-nears-1-billion-funding-2024-09-04/
+    notes: "Post-money valuation at time of $1B funding round"
+
+items:
+  key-people:
+    type: key-person
+    entries:
+      i_b9oci1WvqG:
+        person: !ref eYrBgMLJDw  # ilya-sutskever
+        title: "Chief Scientist & Co-founder"
+        start: 2024-06
+        is_founder: true
+        source: https://ssi.inc
+        notes: "Former OpenAI co-founder and Chief Scientist; left OpenAI June 2024"
+
+      i_hy73NqnE5Q:
+        person: daniel-gross
+        title: "Co-founder"
+        start: 2024-06
+        is_founder: true
+        source: https://ssi.inc
+        notes: "Former head of AI at Apple; Y Combinator partner; investor"
+
+      i_vOtkNvw2HH:
+        person: daniel-levy
+        title: "Co-founder"
+        start: 2024-06
+        is_founder: true
+        source: https://ssi.inc
+        notes: "Former OpenAI researcher"

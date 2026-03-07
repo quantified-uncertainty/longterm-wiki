@@ -30,7 +30,7 @@ describe("graph", () => {
   describe("getAllEntities", () => {
     it("returns all entities in the graph", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(16);
+      expect(entities).toHaveLength(30);
     });
   });
 
@@ -41,8 +41,9 @@ describe("graph", () => {
       // + 1 headquarters + 1 legal-structure + 2 gross-margin + 2 cash-burn
       // + 2 enterprise-market-share + 1 coding-market-share + 1 monthly-active-users
       // + 1 business-customers + 1 api-calls-monthly + 1 product-revenue
-      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size = 36
-      expect(facts).toHaveLength(36);
+      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size
+      // + 1 founded-by = 37
+      expect(facts).toHaveLength(37);
     });
 
     it("returns empty array for an entity with no facts", () => {
@@ -131,8 +132,8 @@ describe("graph", () => {
 
     it("returns facts from multiple entities", () => {
       const roleMap = graph.getByProperty("role");
-      // All 11 people have role facts
-      expect(roleMap.size).toBe(11);
+      // All 20 people have role facts
+      expect(roleMap.size).toBe(20);
       expect(roleMap.has("dario-amodei")).toBe(true);
       expect(roleMap.has("jan-leike")).toBe(true);
       expect(roleMap.has("sam-altman")).toBe(true);
@@ -155,19 +156,25 @@ describe("graph", () => {
   describe("getByType", () => {
     it("returns entities of a given type", () => {
       const orgs = graph.getByType("organization");
-      expect(orgs).toHaveLength(5);
+      expect(orgs).toHaveLength(10);
       const orgIds = orgs.map((o) => o.id).sort();
-      expect(orgIds).toEqual(["anthropic", "deepmind", "meta-ai", "openai", "xai"]);
+      expect(orgIds).toEqual([
+        "anthropic", "arc", "conjecture", "deepmind", "meta-ai",
+        "miri", "openai", "redwood-research", "ssi", "xai",
+      ]);
     });
 
     it("returns multiple entities of the same type", () => {
       const people = graph.getByType("person");
-      expect(people).toHaveLength(11);
+      expect(people).toHaveLength(20);
       const ids = people.map((p) => p.id).sort();
       expect(ids).toEqual([
-        "chris-olah", "daniela-amodei", "dario-amodei", "demis-hassabis",
-        "elon-musk", "geoffrey-hinton", "greg-brockman", "ilya-sutskever",
-        "jan-leike", "sam-altman", "yann-lecun",
+        "chris-olah", "connor-leahy", "daniela-amodei", "dario-amodei",
+        "demis-hassabis", "dustin-moskovitz", "eliezer-yudkowsky",
+        "elon-musk", "geoffrey-hinton", "greg-brockman", "holden-karnofsky",
+        "ilya-sutskever", "jan-leike", "neel-nanda", "nick-bostrom",
+        "paul-christiano", "sam-altman", "stuart-russell", "yann-lecun",
+        "yoshua-bengio",
       ].sort());
     });
 

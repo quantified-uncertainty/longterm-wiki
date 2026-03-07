@@ -1,0 +1,28 @@
+thing:
+  id: connor-leahy
+  stableId: CrXoCsIucX
+  type: person
+  name: "Connor Leahy"
+  numericId: 71
+  aliases:
+    - Connor
+
+facts:
+  - id: f_6RTYYOtNHd
+    property: employed-by
+    value: !ref 0u4J70VqFY  # conjecture
+    asOf: 2022-03
+    source: https://www.conjecture.dev/
+    notes: "Co-founded Conjecture in 2022; previously co-founded EleutherAI"
+
+  - id: f_cflb799S8T
+    property: role
+    value: "CEO & Co-founder, Conjecture"
+    asOf: 2022-03
+    source: https://www.conjecture.dev/
+    notes: "Prominent public advocate for AI safety; testified before UK Parliament and EU; frequent media commentator"
+
+  - id: f_2HGntp6Jt1
+    property: born-year
+    value: 1998
+    notes: "Born approximately 1998; grew up in Germany"

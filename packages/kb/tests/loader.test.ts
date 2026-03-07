@@ -22,16 +22,20 @@ describe("loader", () => {
       expect(anthropic!.numericId).toBe(3);
     });
 
-    it("loads all 16 entities", () => {
+    it("loads all 30 entities", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(16);
+      expect(entities).toHaveLength(30);
 
       const ids = entities.map((t) => t.id).sort();
       expect(ids).toEqual([
-        "anthropic", "chris-olah", "daniela-amodei", "dario-amodei",
-        "deepmind", "demis-hassabis", "elon-musk", "geoffrey-hinton",
-        "greg-brockman", "ilya-sutskever", "jan-leike", "meta-ai",
-        "openai", "sam-altman", "xai", "yann-lecun",
+        "anthropic", "arc", "chris-olah", "conjecture", "connor-leahy",
+        "daniela-amodei", "dario-amodei", "deepmind", "demis-hassabis",
+        "dustin-moskovitz", "eliezer-yudkowsky", "elon-musk",
+        "geoffrey-hinton", "greg-brockman", "holden-karnofsky",
+        "ilya-sutskever", "jan-leike", "meta-ai", "miri", "neel-nanda",
+        "nick-bostrom", "openai", "paul-christiano", "redwood-research",
+        "sam-altman", "ssi", "stuart-russell", "xai", "yann-lecun",
+        "yoshua-bengio",
       ].sort());
     });
 
@@ -117,14 +121,15 @@ describe("loader", () => {
   });
 
   describe("facts", () => {
-    it("loads correct number of facts for Anthropic (36)", () => {
+    it("loads correct number of facts for Anthropic (37)", () => {
       const facts = graph.getFacts("anthropic");
       // 9 revenue + 4 valuation + 3 total-funding + 3 headcount + 1 founded-date
       // + 1 headquarters + 1 legal-structure + 2 gross-margin + 2 cash-burn
       // + 2 enterprise-market-share + 1 coding-market-share + 1 monthly-active-users
       // + 1 business-customers + 1 api-calls-monthly + 1 product-revenue
-      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size = 36
-      expect(facts).toHaveLength(36);
+      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size
+      // + 1 founded-by = 37
+      expect(facts).toHaveLength(37);
     });
 
     it("loads correct number of facts for Dario Amodei (3)", () => {

@@ -1,0 +1,58 @@
+thing:
+  id: holden-karnofsky
+  stableId: eQh3ZhWv8D
+  type: person
+  name: "Holden Karnofsky"
+  numericId: 156
+  aliases:
+    - Holden
+
+facts:
+  - id: f_hk_givewell
+    property: employed-by
+    value: "GiveWell"
+    asOf: 2007-01
+    validEnd: "2014"
+    source: https://www.givewell.org/about/people
+    notes: "Co-founded GiveWell in 2007 with Elie Hassenfeld"
+
+  - id: f_hk_openphil
+    property: employed-by
+    value: "Open Philanthropy"
+    asOf: 2014-01
+    validEnd: "2024"
+    source: https://www.openphilanthropy.org/about/team/
+    notes: "Co-CEO of Open Philanthropy from 2017; stepped back from operational role in 2024"
+
+  - id: f_vAidx4lhTo
+    property: employed-by
+    value: !ref mK9pX3rQ7n  # anthropic
+    asOf: 2025-01
+    source: https://www.anthropic.com/
+    notes: "Joined Anthropic as Member of Technical Staff in early 2025; works on responsible scaling policy"
+
+  - id: f_hk_role_givewell
+    property: role
+    value: "Co-founder & Co-Executive Director, GiveWell"
+    asOf: 2007-01
+    validEnd: "2014"
+    source: https://www.givewell.org/about/people
+
+  - id: f_hk_role_openphil
+    property: role
+    value: "Co-CEO, Open Philanthropy"
+    asOf: 2017-01
+    validEnd: "2024"
+    source: https://www.openphilanthropy.org/about/team/
+
+  - id: f_XAT3w4UXai
+    property: role
+    value: "Member of Technical Staff, Anthropic"
+    asOf: 2025-01
+    notes: "Also serves as Anthropic board observer"
+
+  - id: f_jptHKWBAFL
+    property: born-year
+    value: 1981
+    source: https://en.wikipedia.org/wiki/Holden_Karnofsky
+    notes: "Born approximately 1981"
