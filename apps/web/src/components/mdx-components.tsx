@@ -27,6 +27,7 @@ import { KBEntityFacts } from "@/components/wiki/kb/KBEntityFacts";
 import { KBItemCollection } from "@/components/wiki/kb/KBItemCollection";
 import { KBEntitySidebar } from "@/components/wiki/kb/KBEntitySidebar";
 import { KBRefLink } from "@/components/wiki/kb/KBRefLink";
+import { KBCompareTable } from "@/components/wiki/kb/KBCompareTable";
 
 // Table view components
 import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
@@ -177,6 +178,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   KBItemCollection,
   KBEntitySidebar,
   KBRefLink,
+  KBCompareTable,
 
   // Epic tracking
   EpicTracker,
