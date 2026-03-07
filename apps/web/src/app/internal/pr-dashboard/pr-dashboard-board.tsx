@@ -120,7 +120,9 @@ function PRCard({ pr }: { pr: PullData }) {
       l !== "stage:approved" &&
       l !== "ready-to-merge" &&
       l !== "claude-working" &&
-      l !== "filed-by-agent"
+      l !== "agent:working" &&
+      l !== "filed-by-agent" &&
+      l !== "agent:filed"
   );
 
   return (
