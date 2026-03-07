@@ -13,9 +13,7 @@ import type { SerializedKB } from "@longterm-wiki/kb";
 function getKB(): SerializedKB | undefined {
   try {
     const db = getDatabase();
-    // The kb field is added by build-data.mjs but not yet in DatabaseShape.
-    // Use a type assertion to access it.
-    return (db as unknown as Record<string, unknown>).kb as SerializedKB | undefined;
+    return db.kb;
   } catch {
     return undefined;
   }

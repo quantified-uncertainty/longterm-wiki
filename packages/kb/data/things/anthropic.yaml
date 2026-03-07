@@ -154,10 +154,10 @@ facts:
   - id: f_anthropic_founded_by
     property: founded-by
     value:
-      - !ref c4bV91sTy6  # dario-amodei
-      - daniela-amodei
+      - !ref zR4nW8xB2f  # dario-amodei
+      - !ref tKMznr07QA  # daniela-amodei
       - tom-brown
-      - chris-olah
+      - !ref Tz48rTriBg  # chris-olah
       - jared-kaplan
       - sam-mccandlish
       - jack-clark
