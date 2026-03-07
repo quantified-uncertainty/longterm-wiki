@@ -14,7 +14,7 @@
  */
 
 import type { ExtractedStatement } from './extract.ts';
-import type { CreateStatementInput } from '../lib/wiki-server/statements.ts';
+import type { CreateStatementInput, StatementRow } from '../lib/wiki-server/statements.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -276,4 +276,71 @@ export function printQualityReport(
     console.log(`  ${c.red}Pipeline aborted. Fix the extraction issue or use --dry-run to inspect.${c.reset}`);
   }
   console.log('');
+}
+
+// ---------------------------------------------------------------------------
+// Cross-session duplicate check (new batch vs existing active statements)
+// ---------------------------------------------------------------------------
+
+/**
+ * Check a batch of about-to-be-inserted statements against existing active
+ * statements in the DB for the same entity.
+ *
+ * Returns violations for any new statement that exactly duplicates an already-
+ * active statement (same propertyId + value + valueDate). These are statements
+ * that the batch-level DUPLICATE_TUPLE check cannot catch because the existing
+ * statement lives in a prior session.
+ *
+ * Call this immediately before createStatementBatch() and treat violations as
+ * warnings (not hard failures) — the caller may still want to insert non-duplicate
+ * statements from the same batch.
+ */
+export function checkAgainstExisting(
+  incoming: CreateStatementInput[],
+  existingActive: StatementRow[],
+): QualityViolation[] {
+  const violations: QualityViolation[] = [];
+
+  // Build a lookup key for each existing active statement that has enough
+  // fields to make the comparison meaningful.
+  const existingKeys = new Set<string>();
+  for (const s of existingActive) {
+    if (!s.propertyId) continue;
+    const valueKey = s.valueNumeric !== null && s.valueNumeric !== undefined
+      ? `num:${s.valueNumeric}`
+      : s.valueText !== null && s.valueText !== undefined
+        ? `txt:${s.valueText}`
+        : s.valueEntityId !== null && s.valueEntityId !== undefined
+          ? `eid:${s.valueEntityId}`
+          : null;
+    if (!valueKey) continue;
+    existingKeys.add(`${s.subjectEntityId}|${s.propertyId}|${valueKey}|${s.valueDate ?? ''}`);
+  }
+
+  for (let i = 0; i < incoming.length; i++) {
+    const item = incoming[i]!;
+    if (!item.propertyId || !item.subjectEntityId) continue;
+
+    const valueKey = item.valueNumeric !== null && item.valueNumeric !== undefined
+      ? `num:${item.valueNumeric}`
+      : item.valueText !== null && item.valueText !== undefined
+        ? `txt:${item.valueText}`
+        : item.valueEntityId !== null && item.valueEntityId !== undefined
+          ? `eid:${item.valueEntityId}`
+          : null;
+    if (!valueKey) continue;
+
+    const key = `${item.subjectEntityId}|${item.propertyId}|${valueKey}|${item.valueDate ?? ''}`;
+    if (existingKeys.has(key)) {
+      violations.push({
+        code: 'CROSS_SESSION_DUPLICATE',
+        message: `Statement at index ${i} duplicates an existing active statement `
+          + `(${item.subjectEntityId} / ${item.propertyId} = ${valueKey} @ ${item.valueDate ?? 'no date'}).`,
+        statementIndex: i,
+        excerpt: (item.statementText ?? '').slice(0, 60),
+      });
+    }
+  }
+
+  return violations;
 }

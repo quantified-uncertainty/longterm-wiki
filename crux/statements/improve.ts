@@ -44,7 +44,7 @@ import {
   type ScoringResult,
 } from './scoring.ts';
 import { resolveCoverageTargets } from './coverage-targets.ts';
-import { validateCreateStatementBatch } from './validate-quality.ts';
+import { validateCreateStatementBatch, checkAgainstExisting } from './validate-quality.ts';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -1089,6 +1089,19 @@ export async function runSinglePass(opts: ImproveOptions): Promise<PassResult> {
       throw new Error(
         `Data quality assertions failed (${codes}): ${details}. ` +
         'Use --dry-run to inspect the generated statements without writing.',
+      );
+    }
+
+    // Cross-session duplicate check — warn if any new statements duplicate
+    // existing active ones (catches re-runs extracting the same facts).
+    const existingActive = (analysis.allStatements as import('../lib/wiki-server/statements.ts').StatementRow[])
+      .filter((s) => s.status === 'active');
+    const crossDupeViolations = checkAgainstExisting(allAccepted, existingActive);
+    if (crossDupeViolations.length > 0) {
+      console.warn(
+        `\n⚠ Cross-session duplicates detected: ${crossDupeViolations.length} statement(s) already exist as active.\n` +
+        crossDupeViolations.map(v => `  [${v.code}] ${v.message}`).join('\n') +
+        '\n  These will still be inserted. Run `crux statements audit` to clean up.\n',
       );
     }
 
