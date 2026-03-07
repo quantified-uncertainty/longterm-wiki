@@ -11,6 +11,7 @@ import type {
   PatrolConfig,
   PrIssueType,
 } from './types.ts';
+import { LABELS } from './types.ts';
 import {
   appendJsonl,
   isRecentlyProcessed,
@@ -179,7 +180,7 @@ export function detectAllPrIssuesFromNodes(
   return prs
     .filter((pr) => {
       const labels = pr.labels.nodes.map((l) => l.name);
-      if (labels.includes('claude-working')) return false;
+      if (labels.includes(LABELS.AGENT_WORKING)) return false;
       // Skip draft PRs — they're not ready for automated fixes
       if (pr.isDraft) return false;
       return true;

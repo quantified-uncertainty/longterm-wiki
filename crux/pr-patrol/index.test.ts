@@ -20,7 +20,7 @@ function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-03-05T00:00:00Z',
     body: '## Summary\n\n- [x] Task done\n\n## Test plan\n\n- [x] Tests pass\n\nCloses #1',
-    labels: { nodes: [{ name: 'ready-to-merge' }] },
+    labels: { nodes: [{ name: 'stage:approved' }] },
     commits: {
       nodes: [
         {
@@ -274,16 +274,16 @@ describe('checkMergeEligibility', () => {
     expect(result.eligible).toBe(true);
   });
 
-  it('blocks when claude-working label is present', () => {
+  it('blocks when agent:working label is present', () => {
     const result = checkMergeEligibility(
       makePrNode({
         labels: {
-          nodes: [{ name: 'ready-to-merge' }, { name: 'claude-working' }],
+          nodes: [{ name: 'stage:approved' }, { name: 'agent:working' }],
         },
       }),
     );
     expect(result.eligible).toBe(false);
-    expect(result.blockReasons).toContain('claude-working');
+    expect(result.blockReasons).toContain('agent-working');
   });
 
   it('blocks when PR is a draft', () => {
@@ -306,7 +306,7 @@ describe('checkMergeEligibility', () => {
         mergeable: 'CONFLICTING',
         body: '- [ ] Not done',
         labels: {
-          nodes: [{ name: 'ready-to-merge' }, { name: 'claude-working' }],
+          nodes: [{ name: 'stage:approved' }, { name: 'agent:working' }],
         },
         commits: {
           nodes: [
@@ -324,7 +324,7 @@ describe('checkMergeEligibility', () => {
       }),
     );
     expect(result.eligible).toBe(false);
-    expect(result.blockReasons).toContain('claude-working');
+    expect(result.blockReasons).toContain('agent-working');
     expect(result.blockReasons).toContain('not-mergeable');
     expect(result.blockReasons).toContain('ci-failing');
     expect(result.blockReasons).toContain('unchecked-items');
@@ -334,7 +334,7 @@ describe('checkMergeEligibility', () => {
 // ── findMergeCandidates ──────────────────────────────────────────────────────
 
 describe('findMergeCandidates', () => {
-  it('returns empty when no PRs have ready-to-merge label', () => {
+  it('returns empty when no PRs have stage:approved label', () => {
     const prs = [
       makePrNode({ labels: { nodes: [{ name: 'enhancement' }] } }),
     ];

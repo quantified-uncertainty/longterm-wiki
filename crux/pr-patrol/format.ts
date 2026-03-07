@@ -306,12 +306,12 @@ ${c.bold}Scoring${c.reset}
   The highest-scoring PR is fixed each cycle.
 
 ${c.bold}Auto-Merge${c.reset}
-  PRs labeled \`ready-to-merge\` are squash-merged when:
+  PRs labeled \`stage:approved\` are squash-merged when:
   ${c.green}\u2713${c.reset} CI is green (no failures or pending checks)
   ${c.green}\u2713${c.reset} No merge conflicts
   ${c.green}\u2713${c.reset} No unresolved review threads
   ${c.green}\u2713${c.reset} No unchecked checkboxes in PR body
-  ${c.green}\u2713${c.reset} No \`claude-working\` label
+  ${c.green}\u2713${c.reset} No \`agent:working\` label
   ${c.green}\u2713${c.reset} Not a draft (drafts are auto-undrafted first if eligible)
 
 ${c.bold}Safety${c.reset}

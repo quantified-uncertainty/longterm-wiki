@@ -3,7 +3,7 @@
  *
  * Continuous PR maintenance daemon — scans open PRs for issues,
  * scores them by priority, spawns Claude CLI to fix the top one,
- * and auto-merges PRs labeled `ready-to-merge` when clean.
+ * and auto-merges PRs labeled `stage:approved` when clean.
  *
  * Usage:
  *   crux pr-patrol run              Run the daemon (continuous)
@@ -141,10 +141,10 @@ async function mergeStatus(
   const candidates = findMergeCandidates(prs);
 
   if (candidates.length === 0) {
-    return { output: 'No PRs with `ready-to-merge` label found.\n', exitCode: 0 };
+    return { output: 'No PRs with `stage:approved` label found.\n', exitCode: 0 };
   }
 
-  const lines: string[] = ['PRs labeled `ready-to-merge`:\n'];
+  const lines: string[] = ['PRs labeled `stage:approved`:\n'];
   for (const c of candidates) {
     const s = c.eligible
       ? '\u2713 ELIGIBLE'
@@ -177,7 +177,7 @@ Commands:
   history          Browse full log with time ranges and filters
   stats            Aggregated metrics and success rates
   explain          Detailed explanation of what PR Patrol does
-  merge-status     Show PRs labeled ready-to-merge and their eligibility
+  merge-status     Show PRs labeled stage:approved and their eligibility
 
 Status/History Options:
   --count=N        Number of entries to show (default: 20 for status, 100 for history)

@@ -39,14 +39,14 @@ export type FixOutcome = 'fixed' | 'no-op' | 'max-turns' | 'timeout' | 'error' |
 
 export type MergeOutcome = 'merged' | 'dry-run' | 'error';
 
-/** Reason a PR with ready-to-merge label is NOT eligible for merge. */
+/** Reason a PR with stage:approved label is NOT eligible for merge. */
 export type MergeBlockReason =
   | 'not-mergeable'
   | 'ci-failing'
   | 'ci-pending'
   | 'unresolved-threads'
   | 'unchecked-items'
-  | 'claude-working'
+  | 'agent-working'
   | 'is-draft';
 
 export interface MergeCandidate {
@@ -58,7 +58,8 @@ export interface MergeCandidate {
   blockReasons: MergeBlockReason[];
 }
 
-export const READY_TO_MERGE_LABEL = 'ready-to-merge';
+// Re-export LABELS for backward compatibility with consumers that import from types.ts
+export { LABELS } from '../lib/labels.ts';
 
 // ── Config ───────────────────────────────────────────────────────────────────
 

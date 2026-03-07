@@ -6,6 +6,7 @@ import { spawn } from 'child_process';
 import { githubApi } from '../lib/github.ts';
 import { gitSafe } from '../lib/git.ts';
 import type { FixOutcome, PatrolConfig, ScoredPr } from './types.ts';
+import { LABELS } from './types.ts';
 import {
   buildAbandonmentComment,
   buildFixAttemptComment,
@@ -285,17 +286,17 @@ async function claimPr(prNum: number, repo: string): Promise<void> {
   try {
     await githubApi(`/repos/${repo}/issues/${prNum}/labels`, {
       method: 'POST',
-      body: { labels: ['claude-working'] },
+      body: { labels: [LABELS.AGENT_WORKING] },
     });
     claimedPr = prNum;
   } catch {
-    log(`  Warning: could not add claude-working label to PR #${prNum}`);
+    log(`  Warning: could not add ${LABELS.AGENT_WORKING} label to PR #${prNum}`);
   }
 }
 
 async function releasePr(prNum: number, repo: string): Promise<void> {
   try {
-    await githubApi(`/repos/${repo}/issues/${prNum}/labels/claude-working`, {
+    await githubApi(`/repos/${repo}/issues/${prNum}/labels/${encodeURIComponent(LABELS.AGENT_WORKING)}`, {
       method: 'DELETE',
     });
   } catch (e) {

@@ -10,7 +10,7 @@ import type {
   MergeOutcome,
   PatrolConfig,
 } from './types.ts';
-import { READY_TO_MERGE_LABEL } from './types.ts';
+import { LABELS } from './types.ts';
 import { appendJsonl, JSONL_FILE, log } from './state.ts';
 import {
   buildMergeComment,
@@ -20,7 +20,7 @@ import {
 
 // ── Merge eligibility ────────────────────────────────────────────────────────
 
-/** Pure function — checks whether a PR with ready-to-merge label is eligible for auto-merge. */
+/** Pure function — checks whether a PR with stage:approved label is eligible for auto-merge. */
 export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
   const blockReasons: MergeBlockReason[] = [];
   const labels = pr.labels.nodes.map((l) => l.name);
@@ -29,8 +29,8 @@ export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
     blockReasons.push('is-draft');
   }
 
-  if (labels.includes('claude-working')) {
-    blockReasons.push('claude-working');
+  if (labels.includes(LABELS.AGENT_WORKING)) {
+    blockReasons.push('agent-working');
   }
 
   if (pr.mergeable !== 'MERGEABLE') {
@@ -86,12 +86,12 @@ export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
   };
 }
 
-/** Find all PRs labeled ready-to-merge and check their merge eligibility. Sorted oldest first. */
+/** Find all PRs labeled stage:approved and check their merge eligibility. Sorted oldest first. */
 export function findMergeCandidates(prs: GqlPrNode[]): MergeCandidate[] {
   return prs
     .filter((pr) => {
       const labels = pr.labels.nodes.map((l) => l.name);
-      return labels.includes(READY_TO_MERGE_LABEL);
+      return labels.includes(LABELS.STAGE_APPROVED);
     })
     .map(checkMergeEligibility)
     .sort(
