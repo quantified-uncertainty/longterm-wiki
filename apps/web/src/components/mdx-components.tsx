@@ -19,6 +19,15 @@ import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 import { OverviewBanner } from "@/components/wiki/OverviewBanner";
 import { AnthropicStakeholdersTable } from "@/components/wiki/AnthropicStakeholdersTable";
 
+// KB (Knowledge Base) components — typed facts, properties, items
+import { KBFactTable } from "@/components/wiki/kb/KBFactTable";
+import { KBItemTable } from "@/components/wiki/kb/KBItemTable";
+import { KBFactValue } from "@/components/wiki/kb/KBFactValue";
+import { KBEntityFacts } from "@/components/wiki/kb/KBEntityFacts";
+import { KBItemCollection } from "@/components/wiki/kb/KBItemCollection";
+import { KBEntitySidebar } from "@/components/wiki/kb/KBEntitySidebar";
+import { KBRefLink } from "@/components/wiki/kb/KBRefLink";
+
 // Table view components
 import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
 import AccidentRisksTableView from "@/components/tables/views/AccidentRisksTableView";
@@ -56,6 +65,7 @@ import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/grou
 import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
 import { StatementQualityContent } from "@/app/internal/statement-quality/statement-quality-content";
 import { StatementScoresContent } from "@/app/internal/statement-scores/statement-scores-content";
+import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -159,6 +169,15 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   // Anthropic-specific table
   AnthropicStakeholdersTable,
 
+  // KB (Knowledge Base) — typed facts, item collections, entity data
+  KBFactTable,
+  KBItemTable,
+  KBFactValue,
+  KBEntityFacts,
+  KBItemCollection,
+  KBEntitySidebar,
+  KBRefLink,
+
   // Epic tracking
   EpicTracker,
 
@@ -184,6 +203,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   SystemHealthContent,
   StatementQualityContent,
   StatementScoresContent,
+  PRDashboardContent,
 
   // Table view components
   SafetyApproachesTableView,

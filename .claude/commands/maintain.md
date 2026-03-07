@@ -62,9 +62,9 @@ This is a key output of maintenance — converting discovered problems into trac
 
 ### Issue tracking cleanup
 
-Check for stale `claude-working` labels on issues where the session has ended:
+Check for stale `agent:working` labels on issues where the session has ended:
 ```bash
-pnpm crux issues list   # shows "In Progress" section with claude-working issues
+pnpm crux issues list   # shows "In Progress" section with agent:working issues
 ```
 For each orphaned in-progress issue:
 - If work completed: `pnpm crux issues done <N> --pr=<URL>` (posts comment + removes label)

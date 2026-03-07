@@ -20,6 +20,7 @@ import { fileURLToPath } from 'url';
 import { parse as parseYaml } from 'yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { createSession, type SessionApiEntry } from '../lib/wiki-server/sessions.ts';
+import { getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
 
 const PAGE_ID_RE = /^[a-z0-9][a-z0-9-]*$/;
 
@@ -112,13 +113,34 @@ export function parseSessionYaml(filePath: string): SessionApiEntry | null {
 /**
  * Sync a single session YAML file to the wiki-server.
  * Returns true if the POST succeeded, false otherwise.
+ *
+ * After successfully creating the session record, also updates the corresponding
+ * agent_session (matched by branch) to set session_id — establishing the FK link
+ * between the live tracking record and the historical session log.
  */
 export async function syncSessionFile(filePath: string): Promise<boolean> {
   const entry = parseSessionYaml(filePath);
   if (!entry) return false;
 
   const result = await createSession(entry);
-  return result.ok;
+  if (!result.ok) return false;
+
+  // Best-effort: link the agent_session to the newly-created session log via FK.
+  // This replaces the fragile branch-name join used by the Agent Sessions dashboard.
+  if (entry.branch) {
+    try {
+      const agentSessionResult = await getAgentSessionByBranch(entry.branch);
+      if (agentSessionResult.ok && agentSessionResult.data.sessionId == null) {
+        await updateAgentSession(agentSessionResult.data.id, {
+          sessionId: result.data.id,
+        });
+      }
+    } catch {
+      // Best-effort — local YAML is authoritative; FK linking is a nice-to-have
+    }
+  }
+
+  return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -153,9 +175,9 @@ async function main() {
   console.log(`  Branch: ${entry.branch || '(none)'}`);
   console.log(`  Pages: ${entry.pages?.length || 0}`);
 
-  const result = await createSession(entry);
-  if (result.ok) {
-    console.log(`\u2713 Session synced to wiki-server (id: ${result.data.id})`);
+  const ok = await syncSessionFile(resolved);
+  if (ok) {
+    console.log(`\u2713 Session synced to wiki-server`);
   } else {
     console.log('Warning: could not sync session to wiki-server (server unavailable or error)');
     // Not a hard failure — YAML is authoritative

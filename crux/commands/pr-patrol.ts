@@ -3,24 +3,42 @@
  *
  * Continuous PR maintenance daemon — scans open PRs for issues,
  * scores them by priority, spawns Claude CLI to fix the top one,
- * and auto-merges PRs labeled `ready-to-merge` when clean.
+ * and auto-merges PRs labeled `stage:approved` when clean.
  *
  * Usage:
  *   crux pr-patrol run              Run the daemon (continuous)
  *   crux pr-patrol once             Single check cycle
  *   crux pr-patrol once --dry-run   Show what would be done
  *   crux pr-patrol status           Show recent patrol activity
+ *   crux pr-patrol history          Browse full log with filters
+ *   crux pr-patrol stats            Aggregated metrics
  *   crux pr-patrol merge-status     Show merge-eligible PRs
+ *   crux pr-patrol explain          What PR Patrol does
  */
 
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
+import { LABELS } from '../lib/labels.ts';
+import { getColors } from '../lib/output.ts';
 import {
   buildConfig,
   runDaemon,
-  readRecentLogs,
   fetchOpenPrs,
   findMergeCandidates,
+  JSONL_FILE,
 } from '../pr-patrol/index.ts';
+import {
+  readAllEntries,
+  filterByTime,
+  filterByType,
+  filterByPr,
+  filterByOutcome,
+  computeStats,
+} from '../pr-patrol/log-reader.ts';
+import {
+  formatStatus,
+  formatStats,
+  formatExplain,
+} from '../pr-patrol/format.ts';
 
 async function run(
   args: string[],
@@ -40,9 +58,79 @@ async function once(
 
 async function status(
   _args: string[],
-  _options: CommandOptions,
+  options: CommandOptions,
 ): Promise<CommandResult> {
-  return { output: readRecentLogs(20), exitCode: 0 };
+  const colors = getColors(options.ci as boolean | undefined);
+  const count = typeof options.count === 'number' ? options.count : (typeof options.count === 'string' ? parseInt(options.count, 10) : 20);
+
+  let entries = readAllEntries(JSONL_FILE);
+
+  if (options.type) entries = filterByType(entries, options.type as string);
+  if (options.pr) entries = filterByPr(entries, parseInt(options.pr as string, 10));
+
+  const recent = entries.slice(-count);
+
+  if (options.json) {
+    return { output: JSON.stringify(recent, null, 2) + '\n', exitCode: 0 };
+  }
+
+  return { output: formatStatus(recent, colors), exitCode: 0 };
+}
+
+async function history(
+  _args: string[],
+  options: CommandOptions,
+): Promise<CommandResult> {
+  const colors = getColors(options.ci as boolean | undefined);
+  const since = (options.since as string) ?? '24h';
+  const count = typeof options.count === 'number' ? options.count : (typeof options.count === 'string' ? parseInt(options.count, 10) : 100);
+
+  let entries = readAllEntries(JSONL_FILE);
+  entries = filterByTime(entries, since);
+
+  if (options.type) entries = filterByType(entries, options.type as string);
+  if (options.pr) entries = filterByPr(entries, parseInt(options.pr as string, 10));
+  if (options.outcome) entries = filterByOutcome(entries, options.outcome as string);
+
+  const limited = entries.slice(-count);
+
+  if (options.json) {
+    return { output: JSON.stringify(limited, null, 2) + '\n', exitCode: 0 };
+  }
+
+  return { output: formatStatus(limited, colors), exitCode: 0 };
+}
+
+async function stats(
+  _args: string[],
+  options: CommandOptions,
+): Promise<CommandResult> {
+  const colors = getColors(options.ci as boolean | undefined);
+  const since = (options.since as string) ?? '7d';
+
+  let entries = readAllEntries(JSONL_FILE);
+  entries = filterByTime(entries, since);
+
+  const aggregated = computeStats(entries);
+
+  if (options.json) {
+    // Convert Map to plain object for JSON serialization
+    const jsonStats = {
+      ...aggregated,
+      prTouched: Object.fromEntries(aggregated.prTouched),
+    };
+    return { output: JSON.stringify(jsonStats, null, 2) + '\n', exitCode: 0 };
+  }
+
+  return { output: formatStats(aggregated, since, colors), exitCode: 0 };
+}
+
+async function explain(
+  _args: string[],
+  options: CommandOptions,
+): Promise<CommandResult> {
+  const colors = getColors(options.ci as boolean | undefined);
+  return { output: formatExplain(colors), exitCode: 0 };
 }
 
 async function mergeStatus(
@@ -54,15 +142,15 @@ async function mergeStatus(
   const candidates = findMergeCandidates(prs);
 
   if (candidates.length === 0) {
-    return { output: 'No PRs with `ready-to-merge` label found.\n', exitCode: 0 };
+    return { output: `No PRs with \`${LABELS.STAGE_APPROVED}\` label found.\n`, exitCode: 0 };
   }
 
-  const lines: string[] = ['PRs labeled `ready-to-merge`:\n'];
+  const lines: string[] = [`PRs labeled \`${LABELS.STAGE_APPROVED}\`:\n`];
   for (const c of candidates) {
-    const status = c.eligible
-      ? '✓ ELIGIBLE'
-      : `✗ BLOCKED (${c.blockReasons.join(', ')})`;
-    lines.push(`  PR #${c.number}: ${status} — ${c.title}`);
+    const s = c.eligible
+      ? '\u2713 ELIGIBLE'
+      : `\u2717 BLOCKED (${c.blockReasons.join(', ')})`;
+    lines.push(`  PR #${c.number}: ${s} \u2014 ${c.title}`);
   }
 
   return { output: lines.join('\n') + '\n', exitCode: 0 };
@@ -72,6 +160,9 @@ export const commands = {
   run,
   once,
   status,
+  history,
+  stats,
+  explain,
   'merge-status': mergeStatus,
   default: run,
 };
@@ -83,20 +174,31 @@ PR Patrol Domain — Continuous PR maintenance daemon
 Commands:
   run (default)    Run the PR patrol daemon (continuous)
   once             Single check cycle, then exit
-  status           Show recent patrol activity
-  merge-status     Show PRs labeled ready-to-merge and their eligibility
+  status           Show recent patrol activity (colorized, filterable)
+  history          Browse full log with time ranges and filters
+  stats            Aggregated metrics and success rates
+  explain          Detailed explanation of what PR Patrol does
+  merge-status     Show PRs labeled ${LABELS.STAGE_APPROVED} and their eligibility
 
-Auto-Merge:
-  PRs labeled \`ready-to-merge\` are automatically squash-merged when clean.
-  Eligibility: CI green, no conflicts, no unresolved threads, no unchecked items.
-  At most 1 PR is merged per cycle to allow CI to re-run on the updated main.
+Status/History Options:
+  --count=N        Number of entries to show (default: 20 for status, 100 for history)
+  --type=TYPE      Filter by type: pr, merge, cycle, main, overlap, undraft
+  --pr=N           Filter to a specific PR number
+  --outcome=X      Filter by outcome: fixed, max-turns, timeout, error, merged
+  --since=DURATION Time window for history (default: 24h). Format: 1h, 6h, 24h, 7d, 30d
+  --json           Output raw JSON for scripting
 
-Options:
+Stats Options:
+  --since=DURATION Time window (default: 7d). Format: 1h, 6h, 24h, 7d, 30d
+  --json           Output raw JSON for scripting
+
+Daemon Options:
   --dry-run         Show what would be done, don't fix or merge
   --interval=N      Seconds between checks (default: 300)
   --max-turns=N     Max Claude turns per fix (default: 40)
   --timeout=N       Hard timeout in minutes per fix (default: 30)
   --cooldown=N      Skip recently-processed PRs for N seconds (default: 1800)
+  --stale-hours=N   Hours before a PR is considered stale (default: 48)
   --model=MODEL     Claude model (default: sonnet)
   --skip-perms      Add --dangerously-skip-permissions to Claude CLI
   --verbose         Detailed output
@@ -116,6 +218,10 @@ Examples:
   crux pr-patrol once --dry-run          Preview what would be fixed/merged
   crux pr-patrol run --interval=120      Run with 2-minute cycles
   crux pr-patrol status                  Show recent activity
+  crux pr-patrol status --pr=1234        Show activity for a specific PR
+  crux pr-patrol history --since=7d      Browse last 7 days of logs
+  crux pr-patrol stats --since=30d       Monthly performance stats
+  crux pr-patrol explain                 How PR Patrol works
   crux pr-patrol merge-status            Show merge-eligible PRs
 `.trim();
 }

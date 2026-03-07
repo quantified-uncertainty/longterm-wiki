@@ -9,9 +9,9 @@
  *   crux issues next                 Show the single next issue to work on
  *   crux issues search <query>       Search existing issues before filing a new one
  *   crux issues comment <N> <msg>    Post a comment on an existing issue
- *   crux issues start <N>            Signal start: comment + add claude-working label
+ *   crux issues start <N>            Signal start: comment + add agent:working label
  *   crux issues done <N> [--pr=URL]  Signal completion: comment + remove label
- *   crux issues cleanup              Detect stale claude-working labels + potential duplicates
+ *   crux issues cleanup              Detect stale agent:working labels + potential duplicates
  *   crux issues close <N> [--reason] Close an issue with an optional comment
  */
 
@@ -24,6 +24,7 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 import { parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
 import { listActiveAgents, registerAgent } from '../lib/wiki-server/active-agents.ts';
 import { getAgentSessionByBranch, updateAgentSession, PR_OUTCOMES, type PrOutcome } from '../lib/wiki-server/agent-sessions.ts';
+import { LABELS, LABEL_META } from '../lib/labels.ts';
 
 /**
  * Read a text value from a `--*-file=<path>` flag.
@@ -105,9 +106,9 @@ interface CommandOptions extends BaseOptions {
 // Constants
 // ---------------------------------------------------------------------------
 
-const CLAUDE_WORKING_LABEL = 'claude-working';
-const CLAUDE_WORKING_COLOR = '0075ca';
-const CLAUDE_WORKING_DESC = 'Claude Code is actively working on this';
+const CLAUDE_WORKING_LABEL = LABELS.AGENT_WORKING;
+const CLAUDE_WORKING_COLOR = LABEL_META[LABELS.AGENT_WORKING].color;
+const CLAUDE_WORKING_DESC = LABEL_META[LABELS.AGENT_WORKING].description;
 
 const SKIP_LABELS = new Set(['wontfix', 'on-hold', 'invalid', 'duplicate', "won't fix"]);
 
@@ -422,7 +423,7 @@ const MODEL_COLORS: Record<ModelName, string> = {
 
 function formatIssueRow(issue: RankedIssue, c: Colors, showScores = false): string {
   const priorityLabel = issue.priority < 99 ? `P${issue.priority}` : '  ';
-  const inProgressMark = issue.inProgress ? `${c.yellow}[claude-working]${c.reset} ` : '';
+  const inProgressMark = issue.inProgress ? `${c.yellow}[${CLAUDE_WORKING_LABEL}]${c.reset} ` : '';
   const blockedMark = issue.blocked ? `${c.red}[blocked]${c.reset} ` : '';
   const claudeReadyMark = issue.labels.includes(CLAUDE_READY_LABEL) ? `${c.green}[claude-ready]${c.reset} ` : '';
   const labelStr = issue.labels
@@ -852,11 +853,11 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     await applyModelLabel(issue.number, modelName, labels);
   }
 
-  // Apply filed-by-agent label for tracking agent-originated issues
+  // Apply agent:filed label for tracking agent-originated issues
   try {
     await githubApi(`/repos/${REPO}/issues/${issue.number}/labels`, {
       method: 'POST',
-      body: { labels: ['filed-by-agent'] },
+      body: { labels: [LABELS.AGENT_FILED] },
     });
   } catch { /* non-fatal — label might not exist yet */ }
 
@@ -886,7 +887,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
 }
 
 /**
- * Signal start of work: post a comment and add the claude-working label.
+ * Signal start of work: post a comment and add the agent:working label.
  * Blocks if another active agent is already working on the same issue
  * (use --force to override).
  */
@@ -973,7 +974,7 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
 }
 
 /**
- * Signal completion: post a comment and remove the claude-working label.
+ * Signal completion: post a comment and remove the agent:working label.
  */
 async function done(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -1019,7 +1020,7 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
     body: { body: completionBody },
   });
 
-  // Remove the claude-working label (404 = label wasn't applied — that's fine)
+  // Remove the agent:working label (404 = label wasn't applied — that's fine)
   try {
     await githubApi(
       `/repos/${REPO}/issues/${issueNum}/labels/${encodeURIComponent(CLAUDE_WORKING_LABEL)}`,
@@ -1088,10 +1089,10 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
 }
 
 /**
- * Detect stale claude-working labels and potential duplicate issues.
+ * Detect stale agent:working labels and potential duplicate issues.
  *
  * Checks:
- * 1. Issues with `claude-working` whose associated branches don't exist on remote
+ * 1. Issues with `agent:working` whose associated branches don't exist on remote
  * 2. Issues with very similar titles (potential duplicates)
  */
 async function cleanup(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -1103,10 +1104,10 @@ async function cleanup(_args: string[], options: CommandOptions): Promise<Comman
   let output = '';
   let problemCount = 0;
 
-  // --- 1. Stale claude-working labels ---
+  // --- 1. Stale agent:working labels ---
   const inProgress = issues.filter(i => i.inProgress);
   if (inProgress.length > 0) {
-    output += `${c.bold}Checking ${inProgress.length} claude-working issue(s) for stale labels...${c.reset}\n\n`;
+    output += `${c.bold}Checking ${inProgress.length} ${CLAUDE_WORKING_LABEL} issue(s) for stale labels...${c.reset}\n\n`;
 
     for (const issue of inProgress) {
       // Look for a branch reference in comments
@@ -1157,7 +1158,7 @@ async function cleanup(_args: string[], options: CommandOptions): Promise<Comman
           await githubApi(`/repos/${REPO}/issues/${issue.number}/comments`, {
             method: 'POST',
             body: {
-              body: `Removing stale \`claude-working\` label — branch \`${branchName}\` no longer exists on remote. Issue is ready to be picked up again.`,
+              body: `Removing stale \`${CLAUDE_WORKING_LABEL}\` label — branch \`${branchName}\` no longer exists on remote. Issue is ready to be picked up again.`,
             },
           });
           output += `    ${c.green}→ Fixed: removed label and posted comment${c.reset}\n`;
@@ -1166,7 +1167,7 @@ async function cleanup(_args: string[], options: CommandOptions): Promise<Comman
     }
     output += '\n';
   } else {
-    output += `${c.green}✓${c.reset} No claude-working issues found.\n\n`;
+    output += `${c.green}✓${c.reset} No ${CLAUDE_WORKING_LABEL} issues found.\n\n`;
   }
 
   // --- 2. Duplicate detection ---
@@ -1192,7 +1193,7 @@ async function cleanup(_args: string[], options: CommandOptions): Promise<Comman
   } else {
     output += `${c.yellow}Found ${problemCount} issue(s) to review.${c.reset}\n`;
     if (!fix && inProgress.length > 0) {
-      output += `${c.dim}Run with --fix to auto-remove stale claude-working labels.${c.reset}\n`;
+      output += `${c.dim}Run with --fix to auto-remove stale ${CLAUDE_WORKING_LABEL} labels.${c.reset}\n`;
     }
   }
 
@@ -1581,7 +1582,7 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
     },
   });
 
-  // Remove claude-working label if present
+  // Remove agent:working label if present
   const labels = (issue.labels || []).map(l => l.name);
   if (labels.includes(CLAUDE_WORKING_LABEL)) {
     try {
@@ -1925,9 +1926,9 @@ Commands:
   update-body <N>     Update an issue body using structured template args
   update-title <N>    Update an issue title
   lint [N]            Check issue formatting (all issues, or single by number)
-  start <N>           Signal start: post comment + add \`claude-working\` label
+  start <N>           Signal start: post comment + add \`agent:working\` label
   done <N>            Signal completion: post comment + remove label
-  cleanup             Detect stale claude-working labels + potential duplicates
+  cleanup             Detect stale agent:working labels + potential duplicates
   close <N>           Close an issue with optional comment
 
 Options (list/next):
@@ -1977,7 +1978,7 @@ Options (close):
   --duplicate=N       Close as duplicate of issue N
 
 Options (cleanup):
-  --fix               Auto-remove stale claude-working labels
+  --fix               Auto-remove stale agent:working labels
 
 Issue Formatting Standard:
   Well-formatted issues should have:
@@ -2018,7 +2019,7 @@ Examples:
   crux issues start 239 --force      Override conflict check
   crux issues done 239 --pr=https://github.com/.../pull/42
   crux issues cleanup                Check for stale labels and duplicates
-  crux issues cleanup --fix          Auto-remove stale claude-working labels
+  crux issues cleanup --fix          Auto-remove stale agent:working labels
   crux issues close 42 --duplicate=10
   crux issues close 42 --reason="Already done in PR #100"
 

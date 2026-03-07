@@ -1,0 +1,123 @@
+thing:
+  id: dario-amodei
+  stableId: zR4nW8xB2f
+  type: person
+  name: "Dario Amodei"
+  numericId: 15
+  aliases:
+    - "Dario"
+
+facts:
+  - id: f_aE3mK7pQ9x
+    property: employed-by
+    value: !ref mK9pX3rQ7n:anthropic
+    asOf: 2021-01
+    source: https://anthropic.com/company
+    notes: "Co-founded Anthropic in January 2021; serves as CEO"
+
+  - id: f_bT6wL2nH5v
+    property: role
+    value: "CEO"
+    asOf: 2021-01
+    source: https://anthropic.com/company
+
+  - id: f_cY9rP4jS1d
+    property: born-year
+    value: 1983
+    notes: "Born 1983; approximate from public reporting"
+
+  - id: f_dA1eF2gH3i
+    property: education
+    value: "PhD in Computational Neuroscience, Princeton University"
+    source: https://en.wikipedia.org/wiki/Dario_Amodei
+    notes: "Undergraduate at Stanford University; PhD at Princeton"
+
+  - id: f_dA4jK5lM6n
+    property: notable-for
+    value: "CEO and co-founder of Anthropic; formerly VP of Research at OpenAI; leading proponent of responsible AI scaling"
+    source: https://en.wikipedia.org/wiki/Dario_Amodei
+
+  - id: f_dA7oP8qR9s
+    property: social-media
+    value: "@DarioAmodei"
+    source: https://x.com/DarioAmodei
+
+  - id: f_dAtT1uV2w
+    property: role
+    value: "VP of Research"
+    asOf: "2016"
+    validEnd: 2021-01
+    source: https://en.wikipedia.org/wiki/Dario_Amodei
+    notes: "VP of Research at OpenAI; led GPT-2 and GPT-3 safety research before departing to found Anthropic"
+
+  - id: f_dAxX3yZ4a
+    property: employed-by
+    value: !ref 1LcLlMGLbw:openai
+    asOf: "2016"
+    validEnd: 2021-01
+    source: https://en.wikipedia.org/wiki/Dario_Amodei
+    notes: "Joined OpenAI as VP of Research around 2016; left to co-found Anthropic in January 2021"
+
+  - id: f_dAbB5cD6e
+    property: role
+    value: "Research Scientist"
+    asOf: "2014"
+    validEnd: "2016"
+    source: https://en.wikipedia.org/wiki/Dario_Amodei
+    notes: "Researcher at Baidu's AI lab under Andrew Ng; worked on speech recognition"
+
+items:
+  career-history:
+    type: career-entry
+    entries:
+      i_dA1fG2hI3j:
+        organization: "D. E. Shaw Research"
+        title: "Research Scientist"
+        start: "2011"
+        end: "2014"
+        source: https://en.wikipedia.org/wiki/Dario_Amodei
+        notes: "Computational biology and molecular dynamics simulations"
+
+      i_dA4kL5mN6o:
+        organization: "Baidu AI Lab"
+        title: "Research Scientist"
+        start: "2014"
+        end: "2016"
+        source: https://en.wikipedia.org/wiki/Dario_Amodei
+        notes: "Worked on deep learning for speech recognition under Andrew Ng"
+
+      i_dA7pQ8rS9t:
+        organization: !ref 1LcLlMGLbw:openai
+        title: "VP of Research"
+        start: "2016"
+        end: 2021-01
+        source: https://en.wikipedia.org/wiki/Dario_Amodei
+        notes: "Led GPT-2 and GPT-3 research; grew increasingly concerned about safety culture; departed with six colleagues to found Anthropic"
+
+      i_dAuV1wX2y:
+        organization: !ref mK9pX3rQ7n:anthropic
+        title: "CEO & Co-founder"
+        start: 2021-01
+        source: https://anthropic.com/company
+        notes: "Co-founded Anthropic with sister Daniela and five other former OpenAI researchers"
+
+  notable-publications:
+    type: publication
+    entries:
+      i_dAzA3bC4d:
+        title: "Concrete Problems in AI Safety"
+        year: 2016
+        url: https://arxiv.org/abs/1606.06565
+        notes: "Co-authored influential paper outlining five practical safety problems for ML systems"
+
+      i_dAeF5gH6i:
+        title: "Language Models are Few-Shot Learners (GPT-3)"
+        year: 2020
+        url: https://arxiv.org/abs/2005.14165
+        notes: "Key contributor to GPT-3 paper demonstrating in-context learning at scale"
+
+      i_dAjK7lM8n:
+        title: "Machines of Loving Grace"
+        year: 2024
+        url: https://darioamodei.com/machines-of-loving-grace
+        notes: "Influential essay on how AI could transform biology, poverty, governance, and work"

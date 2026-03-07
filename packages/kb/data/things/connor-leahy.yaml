@@ -1,0 +1,74 @@
+thing:
+  id: connor-leahy
+  stableId: CrXoCsIucX
+  type: person
+  name: "Connor Leahy"
+  numericId: 71
+  aliases:
+    - Connor
+
+facts:
+  - id: f_6RTYYOtNHd
+    property: employed-by
+    value: !ref 0u4J70VqFY:conjecture
+    asOf: 2022-03
+    source: https://www.conjecture.dev/
+    notes: "Co-founded Conjecture in 2022; previously co-founded EleutherAI"
+
+  - id: f_cflb799S8T
+    property: role
+    value: "CEO & Co-founder, Conjecture"
+    asOf: 2022-03
+    source: https://www.conjecture.dev/
+    notes: "Prominent public advocate for AI safety; testified before UK Parliament and EU; frequent media commentator"
+
+  - id: f_2HGntp6Jt1
+    property: born-year
+    value: 1998
+    notes: "Born approximately 1998; grew up in Germany"
+
+  - id: f_cL1aB2cD3e
+    property: notable-for
+    value: "CEO of Conjecture; co-founder of EleutherAI; prominent AI safety advocate; testified before UK Parliament and EU on AI risks"
+    source: https://en.wikipedia.org/wiki/Connor_Leahy
+
+  - id: f_cL4fG5hI6j
+    property: social-media
+    value: "@NPCollapse"
+    source: https://x.com/NPCollapse
+
+  - id: f_cL7kL8mN9o
+    property: role
+    value: "Co-founder"
+    asOf: "2020"
+    validEnd: "2022"
+    source: https://www.eleuther.ai/
+    notes: "Co-founded EleutherAI, an open-source AI research collective; developed GPT-NeoX and GPT-J"
+
+items:
+  career-history:
+    type: career-entry
+    entries:
+      i_cL1zA2bC3d:
+        organization: "EleutherAI"
+        title: "Co-founder"
+        start: "2020"
+        end: "2022"
+        source: https://www.eleuther.ai/
+        notes: "Co-founded open-source AI research collective; developed GPT-NeoX-20B and GPT-J-6B; started as a Discord community replicating GPT-3"
+
+      i_cL4eF5gH6i:
+        organization: !ref 0u4J70VqFY:conjecture
+        title: "CEO & Co-founder"
+        start: 2022-03
+        source: https://www.conjecture.dev/
+        notes: "Founded Conjecture to work on AI alignment; shifted from capabilities to safety; prominent public advocate for AI risk"
+
+  notable-publications:
+    type: publication
+    entries:
+      i_cL7jK8lM9n:
+        title: "GPT-NeoX-20B: An Open-Source Autoregressive Language Model"
+        year: 2022
+        url: https://arxiv.org/abs/2204.06745
+        notes: "One of the first large open-source language models; demonstrated that large LMs could be trained outside major labs"

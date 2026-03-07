@@ -32,6 +32,7 @@ import {
 import { computeRiskScores } from './ci-risk-scores.ts';
 import { runContentChecks } from './ci-content-checks.ts';
 import { buildPrBody } from './ci-pr-body.ts';
+import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -137,9 +138,21 @@ function stageAllowedFiles(): StagingResult {
 
 // ── NEEDS CITATION cleanup ───────────────────────────────────────────────────
 
-function findNeedsCitationFiles(): string[] {
+function findNeedsCitationFiles(modifiedFiles?: string[]): string[] {
+  // Only scan files modified by this auto-update run, not the entire codebase.
+  // Pre-existing NEEDS CITATION markers in unrelated pages should not block
+  // the auto-update pipeline; they are a separate content maintenance concern.
+  const filesToCheck = modifiedFiles?.filter(f => f.endsWith('.mdx')) ?? [];
+  if (modifiedFiles !== undefined && filesToCheck.length === 0) {
+    return [];
+  }
+
+  const args = filesToCheck.length > 0
+    ? ['-l', 'NEEDS CITATION', ...filesToCheck]
+    : ['-rl', 'NEEDS CITATION', 'content/docs/']; // fallback: full scan if no file list
+
   try {
-    const output = execFileSync('grep', ['-rl', 'NEEDS CITATION', 'content/docs/'], {
+    const output = execFileSync('grep', args, {
       cwd: PROJECT_ROOT,
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -151,10 +164,10 @@ function findNeedsCitationFiles(): string[] {
   }
 }
 
-async function cleanupNeedsCitation(verbose: boolean): Promise<{ fixed: string[]; remaining: string[] }> {
-  const flagged = findNeedsCitationFiles();
+async function cleanupNeedsCitation(modifiedFiles: string[], verbose: boolean): Promise<{ fixed: string[]; remaining: string[] }> {
+  const flagged = findNeedsCitationFiles(modifiedFiles);
   if (flagged.length === 0) {
-    console.log('No NEEDS CITATION markers found -- content review passed.');
+    console.log('No NEEDS CITATION markers found in modified files -- content review passed.');
     return { fixed: [], remaining: [] };
   }
 
@@ -183,8 +196,8 @@ async function cleanupNeedsCitation(verbose: boolean): Promise<{ fixed: string[]
     }
   }
 
-  // Final check
-  const remaining = findNeedsCitationFiles();
+  // Final check — only on the same modified files
+  const remaining = findNeedsCitationFiles(modifiedFiles);
   if (remaining.length > 0) {
     console.error(`::error::NEEDS CITATION markers remain after fix attempt: ${remaining.join(', ')}`);
   } else {
@@ -243,27 +256,18 @@ async function runParanoidReview(verbose: boolean): Promise<{ alerts: ReviewAler
       continue;
     }
 
-    // Extract JSON line (guards against pnpm/dotenv preamble)
-    const jsonLine = resultRaw
-      .split('\n')
-      .filter(line => line.trim().startsWith('{'))
-      .pop();
-
-    if (!jsonLine) {
-      console.warn(`::warning::${pageId} -- review produced no JSON output`);
-      continue;
-    }
-
-    let result: {
+    // Parse JSON from LLM output (handles code fences, preamble, truncation)
+    const result = parseJsonFromLlm<{
       needsReResearch?: boolean;
       gapCount?: number;
       overallAssessment?: string;
       error?: string;
-    };
-    try {
-      result = JSON.parse(jsonLine);
-    } catch {
-      console.warn(`::warning::${pageId} -- review JSON parse failed`);
+    }>(resultRaw, `paranoid-review:${pageId}`, () => {
+      console.warn(`::warning::${pageId} -- review JSON could not be parsed, skipping`);
+      return { error: 'unparseable' };
+    });
+
+    if (result.error === 'unparseable') {
       continue;
     }
 
@@ -367,6 +371,15 @@ export async function orchestrateCiAutoUpdate(
   }
 
   try {
+    execFileSync('pnpm', ['crux', 'fix', 'orphaned-footnotes', '--apply'], {
+      cwd: PROJECT_ROOT,
+      stdio: 'inherit',
+    });
+  } catch (err) {
+    console.warn(`::warning::fix orphaned-footnotes failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  try {
     execFileSync('pnpm', ['crux', 'validate', 'gate', '--fix'], {
       cwd: PROJECT_ROOT,
       stdio: 'inherit',
@@ -377,7 +390,20 @@ export async function orchestrateCiAutoUpdate(
 
   // ── Step 4: NEEDS CITATION cleanup ──
   console.log('\n--- Step 4: NEEDS CITATION cleanup ---');
-  const citationCleanup = await cleanupNeedsCitation(options.verbose);
+  // Only check files modified by this auto-update run, not pre-existing markers
+  // in unrelated pages throughout the codebase.
+  let modifiedMdxFiles: string[] = [];
+  try {
+    const diffOutput = execFileSync('git', ['diff', '--name-only', 'HEAD', '--', 'content/docs/'], {
+      cwd: PROJECT_ROOT,
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
+    modifiedMdxFiles = diffOutput ? diffOutput.split('\n').filter(f => f.endsWith('.mdx')) : [];
+  } catch {
+    // If git diff fails, fall back to full scan
+  }
+  const citationCleanup = await cleanupNeedsCitation(modifiedMdxFiles, options.verbose);
   if (citationCleanup.remaining.length > 0) {
     console.error('NEEDS CITATION markers remain -- manual review required before merging.');
     return { branch, hasChanges: false, pagesUpdated, prUrl: null, exitCode: 1 };

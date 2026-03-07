@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { LABELS } from './labels.ts';
 import { shouldSkipPr, type RebaseCandidate } from './pr-rebase.ts';
 
 // Helper to create a base candidate with sensible defaults
@@ -21,11 +22,11 @@ const NOW = Math.floor(new Date('2026-01-01T02:00:00Z').getTime() / 1000);
 const OLD_BRANCH_TIP = NOW - ONE_HOUR;
 
 describe('shouldSkipPr', () => {
-  it('skips PR with claude-working label', () => {
-    const pr = makeCandidate({ labels: ['claude-working', 'enhancement'] });
+  it('skips PR with agent:working label', () => {
+    const pr = makeCandidate({ labels: [LABELS.AGENT_WORKING, 'enhancement'] });
     const result = shouldSkipPr(pr, NOW, OLD_BRANCH_TIP, 'fix: some change', RECENT_WINDOW);
     expect(result.skip).toBe(true);
-    expect(result.reason).toContain('claude-working');
+    expect(result.reason).toContain(LABELS.AGENT_WORKING);
   });
 
   it('skips recently updated PR', () => {
@@ -96,11 +97,11 @@ describe('shouldSkipPr', () => {
   });
 
   it('checks safeguards in priority order (label first)', () => {
-    // PR has both claude-working label AND recent activity — should mention label
+    // PR has both agent:working label AND recent activity — should mention label
     const recentUpdate = new Date((NOW - 60) * 1000).toISOString();
-    const pr = makeCandidate({ labels: ['claude-working'], updatedAt: recentUpdate });
+    const pr = makeCandidate({ labels: [LABELS.AGENT_WORKING], updatedAt: recentUpdate });
     const result = shouldSkipPr(pr, NOW, NOW - 60, '[ci-autofix] fix', RECENT_WINDOW);
     expect(result.skip).toBe(true);
-    expect(result.reason).toContain('claude-working');
+    expect(result.reason).toContain(LABELS.AGENT_WORKING);
   });
 });

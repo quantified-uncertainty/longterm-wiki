@@ -20,6 +20,7 @@ export default defineConfig({
       'wiki-server/**/*.test.ts',
       'evals/**/*.test.ts',
       'health/**/*.test.ts',
+      'pr-patrol/**/*.test.ts',
     ],
     exclude: [
       'claims/archive/**',

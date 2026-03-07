@@ -27,10 +27,16 @@ async function callSweepEndpoint(
   timeoutHours: number,
 ): Promise<SweepResponse | null> {
   const url = `${config.wikiServerUrl}/api/agent-sessions/sweep`;
-  const apiKey = process.env["WIKI_SERVER_API_KEY"];
+  // Use project-scoped key (preferred) or legacy superkey (fallback).
+  // The /api/agent-sessions/* routes require `project` scope.
+  const apiKey =
+    process.env["LONGTERMWIKI_PROJECT_KEY"] ??
+    process.env["LONGTERMWIKI_SERVER_API_KEY"];
 
   if (!apiKey) {
-    logger.warn("WIKI_SERVER_API_KEY not set, skipping sweep");
+    logger.warn(
+      "Neither LONGTERMWIKI_PROJECT_KEY nor LONGTERMWIKI_SERVER_API_KEY is set — skipping sweep",
+    );
     return null;
   }
 
@@ -62,7 +68,7 @@ async function callSweepEndpoint(
 }
 
 /**
- * Remove the claude-working label from a GitHub issue if it has that label.
+ * Remove the agent:working label from a GitHub issue if it has that label.
  * Returns true if the label was removed (or wasn't present), false on error.
  */
 async function removeClaudeWorkingLabel(
@@ -86,11 +92,11 @@ async function removeClaudeWorkingLabel(
     }
 
     const hasLabel = issue.labels.some(
-      (label) => (typeof label === "string" ? label : label.name) === "claude-working",
+      (label) => (typeof label === "string" ? label : label.name) === "agent:working",
     );
 
     if (!hasLabel) {
-      logger.info({ issueNumber }, "Issue has no claude-working label, nothing to remove");
+      logger.info({ issueNumber }, "Issue has no agent:working label, nothing to remove");
       return true;
     }
 
@@ -98,15 +104,15 @@ async function removeClaudeWorkingLabel(
       owner,
       repo,
       issue_number: issueNumber,
-      name: "claude-working",
+      name: "agent:working",
     });
 
-    logger.info({ issueNumber }, "Removed claude-working label from closed issue");
+    logger.info({ issueNumber }, "Removed agent:working label from closed issue");
     return true;
   } catch (err) {
     logger.warn(
       { error: err instanceof Error ? err.message : String(err), issueNumber },
-      "Failed to remove claude-working label",
+      "Failed to remove agent:working label",
     );
     return false;
   }
@@ -115,7 +121,7 @@ async function removeClaudeWorkingLabel(
 /**
  * Session sweep task:
  * 1. Marks stale active sessions (>STALE_TIMEOUT_HOURS old) as completed via wiki-server.
- * 2. For each swept session with a linked GitHub issue, removes the claude-working label
+ * 2. For each swept session with a linked GitHub issue, removes the agent:working label
  *    if the issue is closed.
  *
  * Runs every 4 hours. Idempotent — safe to run multiple times.
@@ -136,7 +142,7 @@ export async function sessionSweep(
     return { success: true, summary: "No stale sessions to sweep" };
   }
 
-  // Step 2: Remove claude-working label from closed issues linked to swept sessions
+  // Step 2: Remove agent:working label from closed issues linked to swept sessions
   const issueNumbers = sweepResult.sessions
     .map((s) => s.issueNumber)
     .filter((n): n is number => n !== null && n > 0);
@@ -162,7 +168,7 @@ export async function sessionSweep(
     }
   }
 
-  const summary = `Swept ${sweepResult.swept} stale session(s); claude-working label cleaned up for ${labelsRemoved}/${uniqueIssueNumbers.length} issue(s)${labelErrors > 0 ? ` (${labelErrors} error(s))` : ""}`;
+  const summary = `Swept ${sweepResult.swept} stale session(s); agent:working label cleaned up for ${labelsRemoved}/${uniqueIssueNumbers.length} issue(s)${labelErrors > 0 ? ` (${labelErrors} error(s))` : ""}`;
 
   return {
     success: labelErrors === 0,

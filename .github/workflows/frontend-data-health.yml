@@ -11,8 +11,8 @@ name: Frontend & Data Health
 
 on:
   schedule:
-    - cron: "0 8 * * *" # 8 AM UTC daily
-    - cron: "0 20 * * *" # 8 PM UTC daily
+    - cron: "5 8 * * *" # 8:05 AM UTC daily (staggered +5min from server-api-health to avoid duplicate issue creation)
+    - cron: "5 20 * * *" # 8:05 PM UTC daily
   workflow_dispatch:
 
 concurrency:

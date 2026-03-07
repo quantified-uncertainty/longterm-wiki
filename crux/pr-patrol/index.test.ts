@@ -1,8 +1,11 @@
 import { describe, it, expect } from 'vitest';
+import { LABELS } from '../lib/labels.ts';
 import {
   checkMergeEligibility,
   findMergeCandidates,
   detectIssues,
+  computeBudget,
+  looksLikeNoOp,
   type GqlPrNode,
 } from './index.ts';
 
@@ -13,12 +16,13 @@ function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
     number: 1,
     title: 'Test PR',
     headRefName: 'claude/test',
+    headRefOid: 'abc123def456',
     mergeable: 'MERGEABLE',
     isDraft: false,
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-03-05T00:00:00Z',
     body: '## Summary\n\n- [x] Task done\n\n## Test plan\n\n- [x] Tests pass\n\nCloses #1',
-    labels: { nodes: [{ name: 'ready-to-merge' }] },
+    labels: { nodes: [{ name: LABELS.STAGE_APPROVED }] },
     commits: {
       nodes: [
         {
@@ -106,6 +110,94 @@ describe('checkMergeEligibility', () => {
     expect(result.blockReasons).toContain('ci-failing');
   });
 
+  it('blocks when CI has TIMED_OUT conclusion', () => {
+    const result = checkMergeEligibility(
+      makePrNode({
+        commits: {
+          nodes: [
+            {
+              commit: {
+                statusCheckRollup: {
+                  contexts: {
+                    nodes: [{ conclusion: 'TIMED_OUT' }],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('ci-failing');
+  });
+
+  it('blocks when CI has ACTION_REQUIRED conclusion', () => {
+    const result = checkMergeEligibility(
+      makePrNode({
+        commits: {
+          nodes: [
+            {
+              commit: {
+                statusCheckRollup: {
+                  contexts: {
+                    nodes: [{ conclusion: 'ACTION_REQUIRED' }],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('ci-failing');
+  });
+
+  it('blocks when CI has STARTUP_FAILURE conclusion', () => {
+    const result = checkMergeEligibility(
+      makePrNode({
+        commits: {
+          nodes: [
+            {
+              commit: {
+                statusCheckRollup: {
+                  contexts: {
+                    nodes: [{ conclusion: 'STARTUP_FAILURE' }],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('ci-failing');
+  });
+
+  it('blocks when CI has STALE conclusion', () => {
+    const result = checkMergeEligibility(
+      makePrNode({
+        commits: {
+          nodes: [
+            {
+              commit: {
+                statusCheckRollup: {
+                  contexts: {
+                    nodes: [{ conclusion: 'STALE' }],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('ci-failing');
+  });
+
   it('blocks when CI has CANCELLED conclusion', () => {
     const result = checkMergeEligibility(
       makePrNode({
@@ -177,6 +269,7 @@ describe('checkMergeEligibility', () => {
         reviewThreads: {
           nodes: [
             {
+              id: 'thread-1',
               isResolved: false,
               isOutdated: false,
               path: 'src/foo.ts',
@@ -202,6 +295,7 @@ describe('checkMergeEligibility', () => {
         reviewThreads: {
           nodes: [
             {
+              id: 'thread-2',
               isResolved: false,
               isOutdated: true,
               path: 'src/foo.ts',
@@ -227,6 +321,7 @@ describe('checkMergeEligibility', () => {
         reviewThreads: {
           nodes: [
             {
+              id: 'thread-3',
               isResolved: true,
               isOutdated: false,
               path: 'src/foo.ts',
@@ -272,16 +367,16 @@ describe('checkMergeEligibility', () => {
     expect(result.eligible).toBe(true);
   });
 
-  it('blocks when claude-working label is present', () => {
+  it('blocks when agent:working label is present', () => {
     const result = checkMergeEligibility(
       makePrNode({
         labels: {
-          nodes: [{ name: 'ready-to-merge' }, { name: 'claude-working' }],
+          nodes: [{ name: LABELS.STAGE_APPROVED }, { name: LABELS.AGENT_WORKING }],
         },
       }),
     );
     expect(result.eligible).toBe(false);
-    expect(result.blockReasons).toContain('claude-working');
+    expect(result.blockReasons).toContain('agent-working');
   });
 
   it('blocks when PR is a draft', () => {
@@ -304,7 +399,7 @@ describe('checkMergeEligibility', () => {
         mergeable: 'CONFLICTING',
         body: '- [ ] Not done',
         labels: {
-          nodes: [{ name: 'ready-to-merge' }, { name: 'claude-working' }],
+          nodes: [{ name: LABELS.STAGE_APPROVED }, { name: LABELS.AGENT_WORKING }],
         },
         commits: {
           nodes: [
@@ -322,7 +417,7 @@ describe('checkMergeEligibility', () => {
       }),
     );
     expect(result.eligible).toBe(false);
-    expect(result.blockReasons).toContain('claude-working');
+    expect(result.blockReasons).toContain('agent-working');
     expect(result.blockReasons).toContain('not-mergeable');
     expect(result.blockReasons).toContain('ci-failing');
     expect(result.blockReasons).toContain('unchecked-items');
@@ -332,7 +427,7 @@ describe('checkMergeEligibility', () => {
 // ── findMergeCandidates ──────────────────────────────────────────────────────
 
 describe('findMergeCandidates', () => {
-  it('returns empty when no PRs have ready-to-merge label', () => {
+  it('returns empty when no PRs have stage:approved label', () => {
     const prs = [
       makePrNode({ labels: { nodes: [{ name: 'enhancement' }] } }),
     ];
@@ -383,6 +478,46 @@ describe('findMergeCandidates', () => {
   });
 });
 
+// ── computeBudget ────────────────────────────────────────────────────────────
+
+describe('computeBudget', () => {
+  it('gives small budget for missing-issue-ref only', () => {
+    const budget = computeBudget(['missing-issue-ref']);
+    expect(budget.maxTurns).toBe(5);
+    expect(budget.timeoutMinutes).toBe(3);
+  });
+
+  it('gives small budget for missing-testplan only', () => {
+    const budget = computeBudget(['missing-testplan']);
+    expect(budget.maxTurns).toBe(8);
+    expect(budget.timeoutMinutes).toBe(5);
+  });
+
+  it('gives medium budget for ci-failure', () => {
+    const budget = computeBudget(['ci-failure']);
+    expect(budget.maxTurns).toBe(25);
+    expect(budget.timeoutMinutes).toBe(15);
+  });
+
+  it('gives full budget for conflict', () => {
+    const budget = computeBudget(['conflict']);
+    expect(budget.maxTurns).toBe(40);
+    expect(budget.timeoutMinutes).toBe(30);
+  });
+
+  it('uses highest budget when multiple issues present', () => {
+    const budget = computeBudget(['missing-issue-ref', 'ci-failure']);
+    expect(budget.maxTurns).toBe(25);
+    expect(budget.timeoutMinutes).toBe(15);
+  });
+
+  it('conflict dominates when mixed with smaller issues', () => {
+    const budget = computeBudget(['missing-testplan', 'conflict', 'missing-issue-ref']);
+    expect(budget.maxTurns).toBe(40);
+    expect(budget.timeoutMinutes).toBe(30);
+  });
+});
+
 // ── detectIssues (regression test after refactor) ────────────────────────────
 
 describe('detectIssues', () => {
@@ -429,5 +564,45 @@ describe('detectIssues', () => {
     // Set stale threshold to far in the past so this PR is not stale
     const result = detectIssues(pr, 0);
     expect(result.issues).toEqual([]);
+  });
+});
+
+// ── looksLikeNoOp ───────────────────────────────────────────────────────────
+
+describe('looksLikeNoOp', () => {
+  it('detects "no action needed" in output tail', () => {
+    expect(looksLikeNoOp('Analyzed the issue. No action needed for this PR.')).toBe(true);
+  });
+
+  it('detects "requires human intervention"', () => {
+    expect(looksLikeNoOp('The check-protected-paths check requires human intervention to add the label.')).toBe(true);
+  });
+
+  it('detects "pre-existing failure"', () => {
+    expect(looksLikeNoOp('This is a pre-existing failure also present on main.')).toBe(true);
+  });
+
+  it('detects "also failing on main"', () => {
+    expect(looksLikeNoOp('The CI check is also failing on main, so this is not introduced by this PR.')).toBe(true);
+  });
+
+  it('detects "stopping early"', () => {
+    expect(looksLikeNoOp('Stopping early because the issue cannot be resolved automatically.')).toBe(true);
+  });
+
+  it('does NOT flag normal fix output', () => {
+    expect(looksLikeNoOp('Fixed the TypeScript error in src/index.ts. All tests passing now.')).toBe(false);
+  });
+
+  it('does NOT flag output with "no" in unrelated context', () => {
+    expect(looksLikeNoOp('Added the missing test. No regressions found after running the suite.')).toBe(false);
+  });
+
+  it('only checks last 1000 chars of output', () => {
+    const longOutput = 'x'.repeat(2000) + 'No action needed.';
+    expect(looksLikeNoOp(longOutput)).toBe(true);
+    // Pattern in the first 1000 chars but not the last 1000
+    const earlyMatch = 'No action needed.' + 'x'.repeat(2000);
+    expect(looksLikeNoOp(earlyMatch)).toBe(false);
   });
 });

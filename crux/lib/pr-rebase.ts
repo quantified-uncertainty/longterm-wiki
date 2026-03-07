@@ -5,7 +5,7 @@
  * to avoid disrupting active agent work.
  *
  * Safeguards:
- *   1. Skip PRs with the `claude-working` label (agent actively working)
+ *   1. Skip PRs with the `agent:working` label (agent actively working)
  *   2. Skip PRs updated within 30 minutes (active work)
  *   3. Skip branches with commits pushed within 30 minutes (active work)
  *   4. Skip branches where the last commit message contains `[ci-autofix]` (feedback loop)
@@ -15,6 +15,7 @@
 
 import { git, gitSafe, isValidBranchName, commitEpoch, commitSubject, pushWithRetry, revParse, configBotUser } from './git.ts';
 import { githubApi, REPO } from './github.ts';
+import { LABELS } from './labels.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -53,7 +54,7 @@ const DEFAULT_RECENT_WINDOW = 1800; // 30 minutes in seconds
  * Determine whether a PR should be skipped for rebase.
  *
  * Encapsulates all 4 safeguards:
- *   1. `claude-working` label
+ *   1. `agent:working` label
  *   2. PR updated within recentWindow
  *   3. Branch tip pushed within recentWindow
  *   4. Last commit message contains `[ci-autofix]`
@@ -72,9 +73,9 @@ export function shouldSkipPr(
   lastCommitMessage: string,
   recentWindow: number,
 ): { skip: boolean; reason?: string } {
-  // Safeguard 1: claude-working label
-  if (pr.labels.includes('claude-working')) {
-    return { skip: true, reason: "has 'claude-working' label (agent actively working)" };
+  // Safeguard 1: agent:working label
+  if (pr.labels.includes(LABELS.AGENT_WORKING)) {
+    return { skip: true, reason: `has '${LABELS.AGENT_WORKING}' label (agent actively working)` };
   }
 
   // Safeguard 2: PR updated recently

@@ -92,6 +92,8 @@ This is the main Anthropic company page. For detailed analysis on specific topic
 
 As of February 2026: <F e="anthropic" f="6796e194">\$380B</F> valuation (Series G), <F e="anthropic" f="0ed4db9e">\$14B</F> run-rate revenue, targeting <F e="anthropic" f="2038f3f6">\$20–26B</F> for 2026. Anthropic trades at ≈<Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" /> current revenue vs <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s <Calc expr="{openai.39d6868e} / {openai.609b9796}" precision={0} prefix="≈" suffix="x" />—see <EntityLink id="E405" name="anthropic-valuation">Valuation Analysis</EntityLink> for analysis, including <F e="anthropic" f="fac5b934">25%</F> customer concentration risk and margin pressure.
 
+<KBFactTable entity="anthropic" property="revenue" title="Revenue History (ARR)" />
+
 <SquiggleEstimate title="Anthropic Revenue Trajectory (ARR, $B)" code={`
 // Anthropic revenue growth trajectory
 rev2024 = 1    // \$1B start of 2025
@@ -142,6 +144,8 @@ The founding team includes 7 ex-OpenAI researchers: GPT-3 lead author Tom Brown,
 
 Anthropic is led by siblings Dario Amodei (CEO) and Daniela Amodei (President), both formerly of OpenAI. The company reportedly had approximately 870 employees as of December 31, 2024, with various sources reporting employee counts ranging from approximately 1,097 to 2,847 depending on data collection methods.[^rc-2ec0] Anthropic has also reportedly announced plans to triple its international headcount and grow its applied AI team fivefold.[^rc-2ec0]
 
+<KBItemTable entity="anthropic" collection="key-people" title="Key People" columns={["person", "title", "start", "end", "is_founder"]} />
+
 ### Notable Researchers and Staff
 
 In May 2024, <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink> joined Anthropic after resigning from OpenAI where he had co-led the Superalignment team. At Anthropic, he leads the Alignment Science team, focusing on <EntityLink id="E271" name="scalable-oversight">scalable oversight</EntityLink>, <EntityLink id="E452" name="weak-to-strong">weak-to-strong generalization</EntityLink>, and robustness to jailbreaks.[^rc-79d4]
@@ -168,6 +172,8 @@ The RSP has been updated multiple times since its initial publication. Critics, 
 
 ## Products and Capabilities
 
+<KBItemTable entity="anthropic" collection="model-releases" title="Claude Model Releases" columns={["name", "released", "safety_level", "notes"]} />
+
 ### Claude Model Family
 
 In May 2025, Anthropic announced Claude 4, introducing both Claude Opus 4 and Claude Sonnet 4 with improved coding capabilities.[^rc-d84a] Also in May, Anthropic launched a web search API that enables Claude to access real-time information.
@@ -193,6 +199,8 @@ Claude has several documented limitations. Various third-party benchmarks have r
 Unlike some competitors, Claude does not support native video or audio processing, nor does it generate images directly—relying on external tools when creation is needed.
 
 ## Safety Research
+
+<KBItemTable entity="anthropic" collection="safety-milestones" title="Safety Research & Policy Milestones" columns={["name", "date", "type", "description"]} />
 
 ### Constitutional AI
 
@@ -245,6 +253,8 @@ In November 2025, Microsoft and <EntityLink id="E693" name="nvidia">Nvidia</Enti
 In February 2026, Anthropic closed a <F e="anthropic" f="5b0663a0">\$30 billion</F> Series G round at a <F e="anthropic" f="6796e194">\$380 billion</F> valuation, led by GIC and Coatue, with participation from Accel, Baillie Gifford, Bessemer Venture Partners, BlackRock, Blackstone, D.E. Shaw Ventures, Dragoneer, Fidelity, <EntityLink id="E529" name="founders-fund">Founders Fund</EntityLink>, General Catalyst, Goldman Sachs, ICONIQ, JPMorgan Chase, MGX, Morgan Stanley, and Sequoia Capital.[^rc-1068]
 
 Total financing has reached over \$67 billion.[^rc-1068] For detailed analysis of investor composition, EA connections, and founder donation pledges, see <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink>.
+
+<KBItemTable entity="anthropic" collection="funding-rounds" title="Funding History" columns={["date", "amount", "valuation", "lead_investor", "notes"]} />
 
 ## Enterprise Adoption
 

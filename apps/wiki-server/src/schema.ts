@@ -762,6 +762,7 @@ export const agentSessions = pgTable(
     prUrl: text("pr_url"), // PR URL recorded when crux issues done --pr=URL is called
     prOutcome: text("pr_outcome"), // Outcome: merged | merged_with_revisions | reverted | closed_without_merge
     fixesPrUrl: text("fixes_pr_url"), // URL of the PR this session is fixing (enables fix-chain tracking)
+    sessionId: bigint("session_id", { mode: "number" }).references(() => sessions.id, { onDelete: "set null" }), // FK to session log — set when session completes and log is synced
     status: text("status").notNull().default("active"),
     startedAt: timestamp("started_at", { withTimezone: true })
       .notNull()
@@ -779,6 +780,7 @@ export const agentSessions = pgTable(
     index("idx_as_status").on(table.status),
     index("idx_as_issue").on(table.issueNumber),
     index("idx_as_started_at").on(table.startedAt),
+    index("idx_as_session_id").on(table.sessionId),
   ]
 );
 

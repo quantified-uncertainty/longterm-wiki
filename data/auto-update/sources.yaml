@@ -115,7 +115,7 @@ sources:
     frequency: daily
     categories: [ai-labs, models, policy, research]
     reliability: high
-    enabled: true
+    enabled: false  # Substack blocks automated RSS fetchers (403). See #1803.
 
   - id: the-gradient
     name: The Gradient
@@ -124,8 +124,8 @@ sources:
     frequency: daily
     categories: [research, models, safety]
     reliability: high
-    enabled: true
-    # Note: thegradient.pub/rss/ returns 502; using Substack mirror instead.
+    enabled: false  # Substack blocks automated RSS fetchers (403). See #1803.
+    # Note: thegradient.pub/rss/ returns 502; Substack mirror also returns 403.
 
   - id: ml-safety-newsletter
     name: ML Safety Newsletter
@@ -143,7 +143,7 @@ sources:
     frequency: daily
     categories: [safety, policy, models, ai-labs, governance]
     reliability: high
-    enabled: true
+    enabled: false  # Substack blocks automated RSS fetchers (403). See #1803.
 
   - id: cais-newsletter
     name: AI Safety Newsletter (CAIS)

@@ -1,0 +1,8 @@
+- id: pr-dashboard
+  numericId: E1011
+  type: internal
+  title: PR Dashboard
+  description: >-
+    Kanban view of all open pull requests grouped by stage (Draft, CI Issues,
+    Needs Review, Approved). Used for monitoring PR pipeline health.
+  lastUpdated: 2026-03

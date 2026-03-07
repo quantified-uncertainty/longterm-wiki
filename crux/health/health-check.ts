@@ -22,7 +22,7 @@
  *   crux health --json               JSON output
  *   crux health --report             Aggregate markdown report to stdout
  *   crux health --auto-issue         Manage GitHub wellness issue
- *   crux health --cleanup-labels     Auto-remove stale claude-working labels
+ *   crux health --cleanup-labels     Auto-remove stale agent:working labels
  */
 
 import { getColors } from '../lib/output.ts';
@@ -249,6 +249,7 @@ interface WorkflowRun {
   conclusion: string | null;
   created_at: string;
   id: number;
+  event: string;
 }
 
 interface WorkflowRunsResponse {
@@ -259,6 +260,16 @@ interface WorkflowRunsResponse {
 // citation verification. For these, we check if ANY of the last 5 runs
 // succeeded rather than requiring the most recent one to succeed.
 const FLAKY_WORKFLOWS = new Set(['auto-update.yml']);
+
+// Workflows that only run on schedule or workflow_dispatch (not push).
+// For these, we filter out push-triggered runs which can be spurious
+// workflow file validation failures from branch pushes.
+const SCHEDULED_ONLY_WORKFLOWS = new Set([
+  'database-backup.yml',
+  'scheduled-maintenance.yml',
+  'server-health-monitor.yml',
+  'scheduled-deploy.yml',
+]);
 
 export async function checkActions(): Promise<CheckResult> {
   const name = 'GitHub Actions';
@@ -280,10 +291,33 @@ export async function checkActions(): Promise<CheckResult> {
 
   for (const wf of workflowFiles) {
     try {
-      const resp = await githubApi<WorkflowRunsResponse>(
-        `/repos/${REPO}/actions/workflows/${wf}/runs?per_page=5&status=completed`
-      );
-      const runs = resp.workflow_runs ?? [];
+      let runs: WorkflowRun[];
+
+      if (SCHEDULED_ONLY_WORKFLOWS.has(wf)) {
+        // For scheduled-only workflows, query by event type to avoid push-triggered
+        // workflow file validation failures from branch pushes polluting the list.
+        // These "push" failures occur when GitHub validates the workflow YAML on a branch
+        // and have nothing to do with the actual scheduled workflow health.
+        const [schedResp, dispatchResp] = await Promise.all([
+          githubApi<WorkflowRunsResponse>(
+            `/repos/${REPO}/actions/workflows/${wf}/runs?per_page=3&status=completed&event=schedule`
+          ),
+          githubApi<WorkflowRunsResponse>(
+            `/repos/${REPO}/actions/workflows/${wf}/runs?per_page=3&status=completed&event=workflow_dispatch`
+          ),
+        ]);
+        const combined = [
+          ...(schedResp.workflow_runs ?? []),
+          ...(dispatchResp.workflow_runs ?? []),
+        ];
+        // Sort combined results by most recent first
+        runs = combined.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      } else {
+        const resp = await githubApi<WorkflowRunsResponse>(
+          `/repos/${REPO}/actions/workflows/${wf}/runs?per_page=5&status=completed`
+        );
+        runs = resp.workflow_runs ?? [];
+      }
       const latest = runs[0];
       const maxAgeH = MAX_AGE[wf] ?? 48;
 

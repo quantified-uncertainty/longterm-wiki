@@ -1,0 +1,114 @@
+thing:
+  id: yann-lecun
+  stableId: cMbVUVK29Q
+  type: person
+  name: "Yann LeCun"
+  numericId: 582
+  aliases:
+    - "LeCun"
+
+facts:
+  - id: f_y9K773heIw
+    property: employed-by
+    value: !ref tt0f5PYDCw:meta-ai
+    asOf: 2013-12
+    source: https://ai.meta.com/people/yann-lecun/
+    notes: "Joined Facebook AI Research (FAIR) as founding director in December 2013; became Chief AI Scientist at Meta"
+
+  - id: f_DQUCjz4rhQ
+    property: role
+    value: "Chief AI Scientist"
+    asOf: "2018"
+    source: https://ai.meta.com/people/yann-lecun/
+    notes: "Turing Award 2018 (shared with Yoshua Bengio and Geoffrey Hinton) for work on deep learning"
+
+  - id: f_A9r9tPNCOQ
+    property: born-year
+    value: 1960
+    notes: "Born July 8, 1960 in Soisy-sous-Montmorency, France"
+
+  - id: f_yL1aB2cD3e
+    property: education
+    value: "PhD in Computer Science, Universit\u00E9 Pierre et Marie Curie (Paris VI, 1987); Diplome d'Ingenieur, ESIEE Paris"
+    source: https://en.wikipedia.org/wiki/Yann_LeCun
+    notes: "PhD advisor was Maurice Milgram; postdoc at University of Toronto with Geoffrey Hinton"
+
+  - id: f_yL4fG5hI6j
+    property: notable-for
+    value: "Pioneer of convolutional neural networks (CNNs); Chief AI Scientist at Meta; Turing Award 2018; vocal skeptic of AGI existential risk"
+    source: https://en.wikipedia.org/wiki/Yann_LeCun
+
+  - id: f_yL7kL8mN9o
+    property: social-media
+    value: "@ylecun"
+    source: https://x.com/ylecun
+
+  - id: f_yLpQ1rS2t
+    property: role
+    value: "Research Scientist"
+    asOf: "1988"
+    validEnd: "2003"
+    source: https://en.wikipedia.org/wiki/Yann_LeCun
+    notes: "At AT&T Bell Laboratories, then AT&T Labs-Research; developed LeNet for handwritten digit recognition"
+
+  - id: f_yLuV3wX4y
+    property: role
+    value: "Silver Professor of Computer Science"
+    asOf: "2003"
+    source: https://en.wikipedia.org/wiki/Yann_LeCun
+    notes: "At New York University's Courant Institute; founded the NYU Center for Data Science"
+
+items:
+  career-history:
+    type: career-entry
+    entries:
+      i_yL1zA2bC3d:
+        organization: "University of Toronto"
+        title: "Postdoctoral Researcher"
+        start: "1987"
+        end: "1988"
+        source: https://en.wikipedia.org/wiki/Yann_LeCun
+        notes: "Postdoc with Geoffrey Hinton"
+
+      i_yL4eF5gH6i:
+        organization: "AT&T Bell Laboratories"
+        title: "Research Scientist"
+        start: "1988"
+        end: "2003"
+        source: https://en.wikipedia.org/wiki/Yann_LeCun
+        notes: "Developed convolutional neural networks (LeNet) for handwritten check reading; deployed commercially at banks"
+
+      i_yL7jK8lM9n:
+        organization: "New York University"
+        title: "Silver Professor of Computer Science, Courant Institute"
+        start: "2003"
+        source: https://en.wikipedia.org/wiki/Yann_LeCun
+        notes: "Founded the NYU Center for Data Science in 2013; continues to hold this position alongside Meta role"
+
+      i_yLoP1qR2s:
+        organization: !ref tt0f5PYDCw:meta-ai
+        title: "Founding Director, FAIR; then Chief AI Scientist"
+        start: 2013-12
+        source: https://ai.meta.com/people/yann-lecun/
+        notes: "Founded Facebook AI Research (FAIR) in 2013; became Chief AI Scientist at Meta"
+
+  notable-publications:
+    type: publication
+    entries:
+      i_yLtU3vW4x:
+        title: "Backpropagation Applied to Handwritten Zip Code Recognition"
+        year: 1989
+        url: https://ieeexplore.ieee.org/document/6795724
+        notes: "Introduced convolutional neural networks (CNNs); one of the most cited papers in deep learning"
+
+      i_yLyZ5aB6c:
+        title: "Gradient-Based Learning Applied to Document Recognition (LeNet-5)"
+        year: 1998
+        url: http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf
+        notes: "Definitive CNN architecture paper; LeNet deployed commercially for reading checks at banks"
+
+      i_yLdE7fG8h:
+        title: "A Path Towards Autonomous Machine Intelligence"
+        year: 2022
+        url: https://openreview.net/pdf?id=BZ5a1r-kVsf
+        notes: "Position paper proposing Joint Embedding Predictive Architectures (JEPA) as path to human-level AI"

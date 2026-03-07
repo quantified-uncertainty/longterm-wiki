@@ -159,7 +159,7 @@ describe("issue-responder", () => {
           ...issue,
           labels: [
             { name: "groundskeeper-autofix" },
-            { name: "claude-working" },
+            { name: "agent:working" },
           ],
         },
       });
@@ -174,7 +174,7 @@ describe("issue-responder", () => {
       expect(mockAddLabels).toHaveBeenCalledWith(
         expect.objectContaining({
           issue_number: 42,
-          labels: ["claude-working"],
+          labels: ["agent:working"],
         })
       );
     });
@@ -189,7 +189,7 @@ describe("issue-responder", () => {
           ...issue,
           labels: [
             { name: "groundskeeper-autofix" },
-            { name: "claude-working" },
+            { name: "agent:working" },
           ],
         },
       });
@@ -225,15 +225,15 @@ describe("issue-responder", () => {
       expect(mockRemoveLabel).toHaveBeenCalledWith(
         expect.objectContaining({
           issue_number: 42,
-          name: "claude-working",
+          name: "agent:working",
         })
       );
     });
 
-    it("skips items that already have claude-working label", async () => {
+    it("skips items that already have agent:working label", async () => {
       const issue = makeIssue(42, [
         "groundskeeper-autofix",
-        "claude-working",
+        "agent:working",
       ]);
       mockListForRepo.mockResolvedValue({ data: [issue] });
 
@@ -253,7 +253,7 @@ describe("issue-responder", () => {
           ...issue,
           labels: [
             { name: "groundskeeper-autofix" },
-            { name: "claude-working" },
+            { name: "agent:working" },
           ],
         },
       });
@@ -279,7 +279,7 @@ describe("issue-responder", () => {
           ...issue,
           labels: [
             { name: "groundskeeper-autofix" },
-            { name: "claude-working" },
+            { name: "agent:working" },
           ],
         },
       });
@@ -305,7 +305,7 @@ describe("issue-responder", () => {
           ...issue,
           labels: [
             { name: "groundskeeper-autofix" },
-            { name: "claude-working" },
+            { name: "agent:working" },
           ],
         },
       });
@@ -326,7 +326,7 @@ describe("issue-responder", () => {
           ...issue,
           labels: [
             { name: "groundskeeper-autofix" },
-            { name: "claude-working" },
+            { name: "agent:working" },
           ],
         },
       });
@@ -423,7 +423,7 @@ describe("issue-responder", () => {
         .mockResolvedValueOnce({
           data: {
             ...makeIssue(42),
-            labels: [{ name: "claude-working" }],
+            labels: [{ name: "agent:working" }],
           },
         }); // for claim verification
 
@@ -481,7 +481,7 @@ describe("issue-responder", () => {
           ...issues[0],
           labels: [
             { name: "groundskeeper-autofix" },
-            { name: "claude-working" },
+            { name: "agent:working" },
           ],
         },
       });
@@ -526,10 +526,10 @@ describe("issue-responder", () => {
       );
     });
 
-    it("filters out issues already labeled with claude-working", async () => {
+    it("filters out issues already labeled with agent:working", async () => {
       const workingIssue = makeIssue(20, [
         "groundskeeper-autofix",
-        "claude-working",
+        "agent:working",
       ]);
       const readyIssue = makeIssue(21, ["groundskeeper-autofix"]);
       mockListForRepo.mockResolvedValue({
@@ -690,7 +690,7 @@ describe("issue-responder", () => {
 
       // Issue is already being worked on
       mockGetIssue.mockResolvedValue({
-        data: makeIssue(70, ["claude-working"]),
+        data: makeIssue(70, ["agent:working"]),
       });
 
       const result = await issueResponder(config);
@@ -1120,7 +1120,7 @@ describe("issue-responder", () => {
       expect(mockRemoveLabel).toHaveBeenCalledWith(
         expect.objectContaining({
           issue_number: 401,
-          name: "claude-working",
+          name: "agent:working",
         })
       );
     });
@@ -1211,7 +1211,7 @@ describe("issue-responder", () => {
       expect(mockRemoveLabel).toHaveBeenCalledWith(
         expect.objectContaining({
           issue_number: 500,
-          name: "claude-working",
+          name: "agent:working",
         })
       );
     });

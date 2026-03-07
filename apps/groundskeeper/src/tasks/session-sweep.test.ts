@@ -62,12 +62,13 @@ describe("sessionSweep", () => {
 
   beforeEach(() => {
     config = makeConfig();
-    process.env["WIKI_SERVER_API_KEY"] = "test-key";
+    process.env["LONGTERMWIKI_PROJECT_KEY"] = "test-key";
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-    delete process.env["WIKI_SERVER_API_KEY"];
+    delete process.env["LONGTERMWIKI_PROJECT_KEY"];
+    delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
   });
 
   it("returns success with no stale sessions message when swept=0", async () => {
@@ -101,13 +102,34 @@ describe("sessionSweep", () => {
     expect((calls[0][1] as RequestInit).method).toBe("POST");
   });
 
-  it("returns failure when API key is not set", async () => {
-    delete process.env["WIKI_SERVER_API_KEY"];
+  it("returns failure when no API key is set", async () => {
+    delete process.env["LONGTERMWIKI_PROJECT_KEY"];
+    delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
 
     const result = await sessionSweep(config);
 
     expect(result.success).toBe(false);
     expect(result.summary).toContain("failed");
+  });
+
+  it("uses LONGTERMWIKI_SERVER_API_KEY as fallback when project key is absent", async () => {
+    delete process.env["LONGTERMWIKI_PROJECT_KEY"];
+    process.env["LONGTERMWIKI_SERVER_API_KEY"] = "legacy-superkey";
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ swept: 0, sessions: [] }),
+      })
+    );
+
+    const result = await sessionSweep(config);
+
+    expect(result.success).toBe(true);
+    const calls = vi.mocked(fetch).mock.calls;
+    const headers = (calls[0][1] as RequestInit).headers as Record<string, string>;
+    expect(headers.Authorization).toBe("Bearer legacy-superkey");
   });
 
   it("returns failure when sweep endpoint fails", async () => {
@@ -148,7 +170,7 @@ describe("sessionSweep", () => {
     expect(result.summary).toContain("no linked issues");
   });
 
-  it("removes claude-working label from closed issues", async () => {
+  it("removes agent:working label from closed issues", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
@@ -163,7 +185,7 @@ describe("sessionSweep", () => {
       })
     );
 
-    const mockOctokit = makeMockOctokit("closed", ["claude-working", "bug"]);
+    const mockOctokit = makeMockOctokit("closed", ["agent:working", "bug"]);
     vi.mocked(getOctokit).mockReturnValue(mockOctokit as never);
 
     const result = await sessionSweep(config);
@@ -175,7 +197,7 @@ describe("sessionSweep", () => {
       owner: "test-owner",
       repo: "test-repo",
       issue_number: 100,
-      name: "claude-working",
+      name: "agent:working",
     });
   });
 
@@ -191,7 +213,7 @@ describe("sessionSweep", () => {
       })
     );
 
-    const mockOctokit = makeMockOctokit("open", ["claude-working"]);
+    const mockOctokit = makeMockOctokit("open", ["agent:working"]);
     vi.mocked(getOctokit).mockReturnValue(mockOctokit as never);
 
     const result = await sessionSweep(config);
@@ -200,7 +222,7 @@ describe("sessionSweep", () => {
     expect(mockOctokit.rest.issues.removeLabel).not.toHaveBeenCalled();
   });
 
-  it("skips label removal when issue lacks claude-working label", async () => {
+  it("skips label removal when issue lacks agent:working label", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
@@ -237,7 +259,7 @@ describe("sessionSweep", () => {
       })
     );
 
-    const mockOctokit = makeMockOctokit("closed", ["claude-working"]);
+    const mockOctokit = makeMockOctokit("closed", ["agent:working"]);
     vi.mocked(getOctokit).mockReturnValue(mockOctokit as never);
 
     const result = await sessionSweep(config);

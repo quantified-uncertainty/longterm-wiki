@@ -1,0 +1,32 @@
+type: person
+name: Person
+
+required: []
+# People often lack publicly available birth years; no hard requirements.
+
+recommended:
+  - employed-by
+  - role
+  - born-year
+  - education
+  - notable-for
+
+items:
+  career-history:
+    description: "Chronological career positions, including current and past roles"
+    fields:
+      organization: { type: text, required: true, description: "Organization name or Thing ID" }
+      title: { type: text, required: true, description: "Job title or role" }
+      start: { type: date, description: "Start date (YYYY or YYYY-MM)" }
+      end: { type: date, description: "End date (omit if current)" }
+      source: { type: text, description: "URL confirming the role" }
+      notes: { type: text, description: "Context about the role or transition" }
+
+  notable-publications:
+    description: "Key publications, papers, and books authored or co-authored"
+    fields:
+      title: { type: text, required: true, description: "Publication title" }
+      year: { type: number, required: true, description: "Publication year" }
+      url: { type: text, description: "URL to the publication" }
+      source: { type: text, description: "URL to a citation or reference" }
+      notes: { type: text, description: "Impact, significance, or citation count" }

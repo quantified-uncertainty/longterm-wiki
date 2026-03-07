@@ -89,5 +89,4 @@ crux/evals/results/
 # Semantic diff snapshots (audit trail — not source code, stored locally)
 .claude/snapshots/
 
-# Ontology drafts (generated for human review, not source code)
-.claude/ontology-drafts/
+# Design docs — committed for review. Gitignore removed intentionally.
