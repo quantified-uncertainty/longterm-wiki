@@ -46,9 +46,9 @@ describe("loader", () => {
   });
 
   describe("properties", () => {
-    it("loads 32 properties", () => {
+    it("loads 60 properties (32 original + 28 new concept entity properties)", () => {
       const properties = graph.getAllProperties();
-      expect(properties).toHaveLength(32);
+      expect(properties).toHaveLength(60);
     });
 
     it("loads property details correctly", () => {
@@ -83,9 +83,32 @@ describe("loader", () => {
   });
 
   describe("schemas", () => {
-    it("loads 2 schemas (organization, person)", () => {
+    it("loads 8 schemas (organization, person + 6 concept entity types)", () => {
       const schemas = graph.getAllSchemas();
-      expect(schemas).toHaveLength(2);
+      expect(schemas).toHaveLength(8);
+    });
+
+    it("loads new concept entity schemas", () => {
+      expect(graph.getSchema("ai-model")).toBeDefined();
+      expect(graph.getSchema("risk")).toBeDefined();
+      expect(graph.getSchema("approach")).toBeDefined();
+      expect(graph.getSchema("debate")).toBeDefined();
+      expect(graph.getSchema("capability")).toBeDefined();
+      expect(graph.getSchema("concept")).toBeDefined();
+    });
+
+    it("loads ai-model schema with required properties", () => {
+      const modelSchema = graph.getSchema("ai-model");
+      expect(modelSchema!.required).toEqual(["developed-by", "model-release-date"]);
+      expect(modelSchema!.recommended).toContain("parameter-count");
+      expect(modelSchema!.recommended).toContain("context-window");
+    });
+
+    it("loads risk schema with recommended properties", () => {
+      const riskSchema = graph.getSchema("risk");
+      expect(riskSchema!.recommended).toContain("severity-level");
+      expect(riskSchema!.recommended).toContain("likelihood-estimate");
+      expect(riskSchema!.recommended).toContain("evidence-strength");
     });
 
     it("loads organization schema with required and recommended properties", () => {

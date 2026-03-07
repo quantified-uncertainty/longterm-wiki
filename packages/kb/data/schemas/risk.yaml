@@ -1,0 +1,48 @@
+type: risk
+name: AI Risk
+
+required: []
+# Risk entities often lack precise quantitative estimates; no hard requirements.
+
+recommended:
+  - severity-level
+  - likelihood-estimate
+  - time-horizon
+  - reversibility
+  - evidence-strength
+  - expert-consensus-level
+
+items:
+  contributing-factors:
+    description: "Key factors that increase the probability or severity of this risk"
+    fields:
+      factor: { type: text, required: true, description: "Factor name or description" }
+      mechanism: { type: text, description: "How this factor contributes to the risk" }
+      source: { type: text, description: "URL to supporting evidence" }
+      notes: { type: text, description: "Context or current status" }
+
+  mitigating-factors:
+    description: "Key factors that reduce the probability or severity of this risk"
+    fields:
+      factor: { type: text, required: true, description: "Factor name or description" }
+      mechanism: { type: text, description: "How this factor reduces the risk" }
+      source: { type: text, description: "URL to supporting evidence" }
+      notes: { type: text, description: "Context or limitations of the mitigation" }
+
+  expert-estimates:
+    description: "Probability or severity estimates from named experts or surveys"
+    fields:
+      source: { type: text, required: true, description: "Expert name, survey name, or report title" }
+      estimate: { type: number, description: "Numerical probability estimate (%)" }
+      date: { type: date, description: "Date of estimate (YYYY or YYYY-MM)" }
+      url: { type: text, description: "URL to source" }
+      notes: { type: text, description: "Context, caveats, or methodology" }
+
+  key-interventions:
+    description: "Approaches or policies proposed to address this risk"
+    fields:
+      intervention: { type: text, required: true, description: "Intervention name or description" }
+      type: { type: text, description: "Type: technical / policy / governance / research" }
+      effectiveness: { type: text, description: "Estimated effectiveness: high / medium / low / unknown" }
+      source: { type: text, description: "URL to supporting analysis" }
+      notes: { type: text, description: "Key proponents or implementation challenges" }
