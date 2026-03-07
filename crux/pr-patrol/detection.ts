@@ -136,17 +136,21 @@ _Posted by PR Patrol — informational only._`;
     if (config.dryRun) {
       log(`  [DRY RUN] Would warn PR #${overlap.prA} and #${overlap.prB} about ${uniqueFiles.length} shared files`);
     } else {
-      // Post on both PRs
+      // Post on both PRs — only mark processed if both succeed
+      let postedCount = 0;
       for (const prNum of [overlap.prA, overlap.prB]) {
         const otherPr = prNum === overlap.prA ? overlap.prB : overlap.prA;
         const commentBody = body.replaceAll(`PR #${overlap.prB}`, `PR #${otherPr}`);
-        await githubApi(`/repos/${config.repo}/issues/${prNum}/comments`, {
+        const ok = await githubApi(`/repos/${config.repo}/issues/${prNum}/comments`, {
           method: 'POST',
           body: { body: commentBody },
-        }).catch((e) =>
-          log(`  Warning: could not post overlap comment on PR #${prNum}: ${e instanceof Error ? e.message : String(e)}`),
-        );
+        }).then(() => true).catch((e) => {
+          log(`  Warning: could not post overlap comment on PR #${prNum}: ${e instanceof Error ? e.message : String(e)}`);
+          return false;
+        });
+        if (ok) postedCount++;
       }
+      if (postedCount < 2) continue; // Don't start cooldown if a comment failed to post
     }
 
     markProcessed(overlapKey);

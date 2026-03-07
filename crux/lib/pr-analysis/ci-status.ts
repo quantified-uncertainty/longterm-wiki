@@ -47,6 +47,9 @@ export async function checkMainBranch(repo?: string): Promise<MainBranchStatus> 
     if (runs.length === 0) return notRed;
 
     const latest = runs[0];
+    // Intentionally narrower than merge-check.ts FAILING_CONCLUSIONS:
+    // main-branch alert only fires on hard 'failure', not 'cancelled'/'timed_out'.
+    // Cancelled/timed-out runs on main are transient and self-heal on re-run.
     if (latest.conclusion === 'failure') {
       return {
         isRed: true,
@@ -57,10 +60,9 @@ export async function checkMainBranch(repo?: string): Promise<MainBranchStatus> 
     }
 
     return notRed;
-  } catch (e: unknown) {
+  } catch {
     // Best-effort: if the API call fails (network, auth, rate-limit), assume CI is not red.
-    // CLI callers see "green" on failure — PR Patrol's wrapper adds its own error logging.
-    console.warn(`checkMainBranch failed: ${e instanceof Error ? e.message : String(e)}`);
+    // Callers handle their own error reporting if needed.
     return notRed;
   }
 }

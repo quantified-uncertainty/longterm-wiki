@@ -348,22 +348,23 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
 
     if (rebaseResult.success) {
       log(`  ✓ Automated rebase ${rebaseResult.status} — no Claude needed`);
-      appendJsonl(JSONL_FILE, {
-        type: 'pr_result',
-        pr_num: pr.number,
-        issues: pr.issues,
-        outcome: 'fixed' as FixOutcome,
-        elapsed_s: 0,
-        reason: `automated-rebase: ${rebaseResult.status}`,
-      });
 
-      // If the only issue was 'stale', mark processed and return
+      // If the only issue was 'stale', log as fixed and return
       const remainingIssues = pr.issues.filter((i) => i !== 'stale');
       if (remainingIssues.length === 0) {
+        appendJsonl(JSONL_FILE, {
+          type: 'pr_result',
+          pr_num: pr.number,
+          issues: pr.issues,
+          outcome: 'fixed' as FixOutcome,
+          elapsed_s: 0,
+          reason: `automated-rebase: ${rebaseResult.status}`,
+        });
         markProcessed(pr.number);
         return;
       }
-      // Don't markProcessed — remaining issues need Claude, avoid starting cooldown
+      // Remaining issues need Claude — update pr.issues so Claude doesn't re-address 'stale'
+      pr.issues = remainingIssues;
       log(`  Remaining issues after rebase: ${remainingIssues.join(', ')} — falling through to Claude`);
     } else {
       log(`  Automated rebase failed (${rebaseResult.status}) — falling through to Claude`);

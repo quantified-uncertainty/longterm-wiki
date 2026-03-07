@@ -761,8 +761,9 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
       })),
     );
 
+    const hasProblems = results.some((r) => r.issues.length > 0 || !r.eligible);
     if (json) {
-      return { output: JSON.stringify({ total: prs.length, withIssues: withIssues.length, prs: results }, null, 2) + '\n', exitCode: withIssues.length > 0 ? 1 : 0 };
+      return { output: JSON.stringify({ total: prs.length, withIssues: withIssues.length, prs: results }, null, 2) + '\n', exitCode: hasProblems ? 1 : 0 };
     }
 
     let output = `${c.bold}PR Check — ${prs.length} open PRs${c.reset}\n\n`;
@@ -788,7 +789,7 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
       }
     }
 
-    return { output, exitCode: withIssues.length > 0 ? 1 : 0 };
+    return { output, exitCode: hasProblems ? 1 : 0 };
   }
 
   // Single PR mode
@@ -823,7 +824,7 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
         eligible: eligibility.eligible,
         blockReasons: eligibility.blockReasons,
       }, null, 2) + '\n',
-      exitCode: issues.length > 0 ? 1 : 0,
+      exitCode: issues.length > 0 || !eligibility.eligible ? 1 : 0,
     };
   }
 
@@ -856,7 +857,7 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
     }
   }
 
-  return { output, exitCode: issues.length > 0 ? 1 : 0 };
+  return { output, exitCode: issues.length > 0 || !eligibility.eligible ? 1 : 0 };
 }
 
 // ---------------------------------------------------------------------------

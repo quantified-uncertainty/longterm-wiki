@@ -19,7 +19,11 @@ import type { AutoRebaseResult } from './types.ts';
  * The caller must save/restore the original branch if needed.
  */
 export function tryAutomatedRebase(branch: string): AutoRebaseResult {
-  configBotUser();
+  try {
+    configBotUser();
+  } catch {
+    return { success: false, status: 'checkout-failed' };
+  }
 
   // Fetch latest
   const fetchMain = gitSafe('fetch', 'origin', 'main');
@@ -39,7 +43,12 @@ export function tryAutomatedRebase(branch: string): AutoRebaseResult {
   }
 
   // Check if already up-to-date with main
-  const mainSha = revParse('origin/main');
+  let mainSha: string;
+  try {
+    mainSha = revParse('origin/main');
+  } catch {
+    return { success: false, status: 'checkout-failed' };
+  }
   const mergeBase = gitSafe('merge-base', branch, 'origin/main');
   if (mergeBase.ok && mergeBase.output.trim() === mainSha) {
     return { success: true, status: 'up-to-date' };

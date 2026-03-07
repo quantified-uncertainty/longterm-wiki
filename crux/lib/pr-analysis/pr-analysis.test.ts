@@ -5,7 +5,7 @@
  * These tests import directly from the library, not from the PR Patrol re-exports.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   detectIssues,
   extractBotComments,
