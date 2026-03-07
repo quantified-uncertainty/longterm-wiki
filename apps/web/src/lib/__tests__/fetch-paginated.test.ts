@@ -118,6 +118,24 @@ describe("fetchAllPaginated", () => {
     }
   });
 
+  it("fails if response lacks a numeric total field", async () => {
+    mockFetchDetailed.mockResolvedValueOnce({
+      ok: true,
+      data: { items: [{ id: 1 }] },
+    } as FetchResult<Record<string, unknown>>);
+
+    const result = await fetchAllPaginated<{ id: number }>({
+      path: "/api/things",
+      itemsKey: "items",
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.type).toBe("connection-error");
+      expect((result.error as { message: string }).message).toContain("total");
+    }
+  });
+
   it("fails if response lacks the expected items key", async () => {
     mockFetchDetailed.mockResolvedValueOnce({
       ok: true,
