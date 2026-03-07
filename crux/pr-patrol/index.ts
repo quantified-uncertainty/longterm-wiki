@@ -15,6 +15,18 @@ import { githubApi, githubGraphQL, REPO } from '../lib/github.ts';
 import { gitSafe } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
+import {
+  buildAbandonmentComment,
+  buildFixAttemptComment,
+  buildFixCompleteComment,
+  buildMergeComment,
+  buildMergeFailedComment,
+  buildNoOpComment,
+  buildStatusCommentBody,
+  buildTimeoutComment,
+  postEventComment,
+  upsertStatusComment,
+} from './comments.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -1070,6 +1082,9 @@ async function mergePr(
 
     log(`${cl.green}✓ PR #${candidate.number} merged successfully${cl.reset}`);
 
+    await postEventComment(candidate.number, config.repo, buildMergeComment())
+      .catch((e: unknown) => log(`  ${cl.yellow}Warning: could not post merge comment: ${e instanceof Error ? e.message : String(e)}${cl.reset}`));
+
     appendJsonl(JSONL_FILE, {
       type: 'merge_result',
       pr_num: candidate.number,
@@ -1078,6 +1093,9 @@ async function mergePr(
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     log(`${cl.red}✗ Failed to merge PR #${candidate.number}: ${msg}${cl.reset}`);
+
+    await postEventComment(candidate.number, config.repo, buildMergeFailedComment(msg))
+      .catch((e2: unknown) => log(`  ${cl.yellow}Warning: could not post merge failure comment: ${e2 instanceof Error ? e2.message : String(e2)}${cl.reset}`));
 
     appendJsonl(JSONL_FILE, {
       type: 'merge_result',
@@ -1326,6 +1344,10 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
 
   log(`  Budget: ${effectiveMaxTurns} max-turns, ${effectiveTimeout}m timeout (based on: ${pr.issues.join(', ')})`);
 
+  // Post "attempting fix" event comment before spawning Claude
+  await postEventComment(pr.number, config.repo, buildFixAttemptComment(pr.issues))
+    .catch((e: unknown) => log(`  ${cl.yellow}Warning: could not post fix attempt comment: ${e instanceof Error ? e.message : String(e)}${cl.reset}`));
+
   const prompt = buildPrompt(pr, config.repo);
   const startTime = Date.now();
 
@@ -1351,15 +1373,11 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
       if (failCount >= 2) {
         reason = `Abandoned after ${failCount} failures (timeout)`;
         log(`${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`);
-        await githubApi(
-          `/repos/${config.repo}/issues/${pr.number}/comments`,
-          {
-            method: 'POST',
-            body: {
-              body: `🤖 **PR Patrol**: Abandoning automatic fix after ${failCount} failed attempts (timed out each time).\n\n**Issues detected**: ${pr.issues.join(', ')}\n**Last attempt**: ${elapsedS}s, ${effectiveTimeout}m timeout\n\nThis PR likely needs human intervention to resolve.`,
-            },
-          },
-        ).catch(() => log('  Warning: could not post abandonment comment'));
+        await postEventComment(pr.number, config.repo, buildAbandonmentComment(failCount, pr.issues))
+          .catch((e: unknown) => log(`  ${cl.yellow}Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}${cl.reset}`));
+      } else {
+        await postEventComment(pr.number, config.repo, buildTimeoutComment(failCount, effectiveTimeout, pr.issues))
+          .catch((e: unknown) => log(`  ${cl.yellow}Warning: could not post timeout comment: ${e instanceof Error ? e.message : String(e)}${cl.reset}`));
       }
     } else if (result.exitCode === 0 && !result.hitMaxTurns) {
       const isNoOp = looksLikeNoOp(result.output);
@@ -1372,20 +1390,17 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
         const failCount = recordFailure(pr.number);
         reason = `No-op: agent determined issue needs human intervention (attempt ${failCount})`;
         log(`${cl.yellow}⚠ PR #${pr.number} no-op — agent stopped early${cl.reset} (${elapsedS}s)`);
+
+        await postEventComment(pr.number, config.repo, buildNoOpComment(pr.issues))
+          .catch((e: unknown) => log(`  ${cl.yellow}Warning: could not post no-op comment: ${e instanceof Error ? e.message : String(e)}${cl.reset}`));
       } else {
         resetFailCount(pr.number);
         log(`${cl.green}✓ PR #${pr.number} processed successfully${cl.reset} (${elapsedS}s)`);
-      }
 
-      // Post summary comment
-      const summary = result.output.slice(-500);
-      if (summary) {
-        await githubApi(`/repos/${config.repo}/issues/${pr.number}/comments`, {
-          method: 'POST',
-          body: {
-            body: `🤖 **PR Patrol** ran for ${elapsedS}s (${effectiveMaxTurns} max turns, model: ${config.model}).\n\n**Issues detected**: ${pr.issues.join(', ')}\n\n**Result**:\n${summary}`,
-          },
-        }).catch(() => log('  Warning: could not post summary comment'));
+        // Post fix-complete summary comment
+        const outputTail = result.output.slice(-500);
+        await postEventComment(pr.number, config.repo, buildFixCompleteComment(elapsedS, effectiveMaxTurns, config.model, pr.issues, outputTail))
+          .catch((e: unknown) => log(`  ${cl.yellow}Warning: could not post fix-complete comment: ${e instanceof Error ? e.message : String(e)}${cl.reset}`));
       }
 
       // Note: we intentionally do NOT auto-resolve bot review threads here.
@@ -1404,15 +1419,8 @@ async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
         log(
           `${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`,
         );
-        await githubApi(
-          `/repos/${config.repo}/issues/${pr.number}/comments`,
-          {
-            method: 'POST',
-            body: {
-              body: `🤖 **PR Patrol**: Abandoning automatic fix after ${failCount} failed attempts.\n\n**Issues detected**: ${pr.issues.join(', ')}\n**Last attempt**: ${elapsedS}s, ${effectiveMaxTurns} turns\n\nThis PR likely needs human intervention to resolve.`,
-            },
-          },
-        ).catch(() => log('  Warning: could not post abandonment comment'));
+        await postEventComment(pr.number, config.repo, buildAbandonmentComment(failCount, pr.issues))
+          .catch((e: unknown) => log(`  ${cl.yellow}Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}${cl.reset}`));
       }
     } else {
       outcome = 'error';
@@ -1692,6 +1700,17 @@ async function runCheckCycle(
     }
     for (const mc of blockedForMerge) {
       log(`  ${cl.red}✗${cl.reset} PR ${cl.cyan}#${mc.number}${cl.reset}: blocked (${mc.blockReasons.join(', ')}) ${cl.dim}—${cl.reset} ${mc.title}`);
+    }
+
+    // Upsert status comments on merge candidates so humans can see WHY
+    // a PR can or cannot merge. Build a lookup from PR number to GqlPrNode.
+    const prNodeByNumber = new Map(allPrs.map((p) => [p.number, p]));
+    for (const mc of mergeCandidates) {
+      const prNode = prNodeByNumber.get(mc.number);
+      if (!prNode) continue;
+      const statusBody = buildStatusCommentBody(prNode, mc.blockReasons);
+      await upsertStatusComment(mc.number, config.repo, statusBody)
+        .catch((e: unknown) => log(`  ${cl.yellow}Warning: could not upsert status comment on PR #${mc.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`));
     }
   }
 
