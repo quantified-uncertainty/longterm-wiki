@@ -12,7 +12,7 @@ on:
 jobs:
   check-protected-paths:
     # Only run on label events if the label is gate:rules-ok.
-    # Other label changes (e.g. claude-working heartbeat) are irrelevant.
+    # Other label changes (e.g. agent:working heartbeat) are irrelevant.
     if: >-
       github.event.action != 'labeled' && github.event.action != 'unlabeled' ||
       github.event.label.name == 'gate:rules-ok'

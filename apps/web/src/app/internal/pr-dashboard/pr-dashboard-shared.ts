@@ -46,7 +46,7 @@ export function classifyPR(pr: PullData): KanbanColumn {
   if (pr.isDraft) return "draft";
 
   const hasApproved = pr.labels.some(
-    (l) => l === "stage:approved" || l === "ready-to-merge"
+    (l) => l === "stage:approved"
   );
   if (hasApproved) return "approved";
 
