@@ -270,9 +270,18 @@ facts:
     property: safety-level
     value: "ASL-3 (Opus 4+), ASL-2 (Sonnet/Haiku)"
     asOf: 2025-05
+    validEnd: 2026-02
     source: https://www.anthropic.com/news/activating-asl3-protections
     sourceResource: 7512ddb574f82249
     notes: "First activation of ASL-3 for Claude Opus 4; precautionary/provisional"
+
+  - id: f_safety_level_2026
+    property: safety-level
+    value: "ASL-3 (Opus 4, Opus 4.5, Opus 4.6), ASL-2 (Sonnet, Haiku)"
+    asOf: 2026-02
+    source: https://www.anthropic.com/news/activating-asl3-protections
+    sourceResource: 7512ddb574f82249
+    notes: "Opus 4.6 launched Feb 2026 under ASL-3; all Opus-tier models are ASL-3, Sonnet/Haiku remain ASL-2"
 
   - id: f_safety_researchers
     property: safety-researcher-count
