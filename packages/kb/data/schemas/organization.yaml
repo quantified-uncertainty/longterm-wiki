@@ -1,11 +1,11 @@
 type: organization
 name: Organization
 
-required:
-  - founded-date
-  - headquarters
+required: []
 
 recommended:
+  - founded-date
+  - headquarters
   - revenue
   - valuation
   - headcount
