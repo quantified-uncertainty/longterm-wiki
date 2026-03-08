@@ -50,8 +50,6 @@ import { temporalArtifactsRule } from './temporal-artifacts.ts';
 import { editorialArtifactsRule } from './editorial-artifacts.ts';
 import { outdatedNamesRule } from './outdated-names.ts';
 
-// Fact consistency
-import { factConsistencyRule } from './fact-consistency.ts';
 import { hardcodedCalculationsRule } from './hardcoded-calculations.ts';
 
 // Squiggle model quality
@@ -129,9 +127,6 @@ import { probabilityConsistencyRule } from './probability-consistency.ts';
 import { terminologyVariantsRule } from './terminology-variants.ts';
 import { causalRelationshipCoverageRule } from './causal-relationship-coverage.ts';
 
-// Fact entity attribution validation (issue #1272)
-import { factEntityMatchRule } from './fact-entity-match.ts';
-
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -161,7 +156,6 @@ export {
   temporalArtifactsRule,
   editorialArtifactsRule,
   outdatedNamesRule,
-  factConsistencyRule,
   hardcodedCalculationsRule,
   insiderJargonRule,
   falseCertaintyRule,
@@ -197,7 +191,6 @@ export {
   probabilityConsistencyRule,
   terminologyVariantsRule,
   causalRelationshipCoverageRule,
-  factEntityMatchRule,
 };
 
 export const allRules: Rule[] = [
@@ -228,7 +221,6 @@ export const allRules: Rule[] = [
   temporalArtifactsRule,
   editorialArtifactsRule,
   outdatedNamesRule,
-  factConsistencyRule,
   hardcodedCalculationsRule,
   insiderJargonRule,
   falseCertaintyRule,
@@ -264,7 +256,6 @@ export const allRules: Rule[] = [
   probabilityConsistencyRule,
   terminologyVariantsRule,
   causalRelationshipCoverageRule,
-  factEntityMatchRule,
 ];
 
 export default allRules;

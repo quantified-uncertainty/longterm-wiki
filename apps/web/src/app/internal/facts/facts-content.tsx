@@ -1,58 +1,26 @@
-import { getAllFacts, getEntityHref, getFactMeasures, getFactUsage } from "@/data";
-import { FactDashboard } from "@/components/internal/FactDashboard";
-import { FactPageTabs } from "./fact-page-tabs";
-import { FactsDataTable } from "./facts-data-table";
+import { Callout } from "@/components/wiki/Callout";
 
 export function FactsPageContent() {
-  const facts = getAllFacts().map((f) => ({
-    key: f.key,
-    entity: f.entity,
-    factId: f.factId,
-    value: f.value,
-    numeric: f.numeric,
-    low: f.low,
-    high: f.high,
-    asOf: f.asOf,
-    source: f.source,
-    sourceResource: f.sourceResource,
-    sourceTitle: f.sourceTitle,
-    sourcePublication: f.sourcePublication,
-    sourceCredibility: f.sourceCredibility,
-    note: f.note,
-    computed: f.computed,
-    compute: f.compute,
-    measure: f.measure,
-    subject: f.subject,
-    format: f.format,
-    formatDivisor: f.formatDivisor,
-    noCompute: f.noCompute,
-  }));
-
-  // Compute entity hrefs server-side (requires id-registry)
-  const entityHrefs: Record<string, string> = {};
-  for (const f of facts) {
-    if (!entityHrefs[f.entity]) {
-      entityHrefs[f.entity] = getEntityHref(f.entity);
-    }
-  }
-
-  const factMeasures = getFactMeasures();
-  const factUsage = getFactUsage();
-
   return (
-    <>
-      <p className="text-muted-foreground">
-        All canonical facts from the YAML fact store, used by the <code>&lt;F&gt;</code> component.
-        Facts are defined in <code>data/facts/*.yaml</code>, measures in <code>data/fact-measures.yaml</code>.
+    <Callout variant="caution" title="Legacy Dashboard">
+      <p>
+        The old YAML facts pipeline has been retired. All structured entity data
+        now lives in the{" "}
+        <a href="/wiki/E827" className="text-primary hover:underline">
+          KB (Knowledge Base)
+        </a>{" "}
+        system. This dashboard previously displayed facts from{" "}
+        <code>data/facts/*.yaml</code>, which are no longer loaded into{" "}
+        <code>database.json</code>.
       </p>
-      <FactPageTabs
-        dashboardContent={
-          <FactDashboard facts={facts} entityHrefs={entityHrefs} factMeasures={factMeasures} factUsage={factUsage} />
-        }
-        dataContent={
-          <FactsDataTable facts={facts} entityHrefs={entityHrefs} factMeasures={factMeasures} />
-        }
-      />
-    </>
+      <p className="mt-2">
+        To view current structured data, use the{" "}
+        <a href="/internal/entities" className="text-primary hover:underline">
+          Entities dashboard
+        </a>{" "}
+        or the KB components (<code>&lt;KBFactTable&gt;</code>,{" "}
+        <code>&lt;KBEntityFacts&gt;</code>) on individual entity pages.
+      </p>
+    </Callout>
   );
 }

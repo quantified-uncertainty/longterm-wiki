@@ -1,18 +1,11 @@
 import React from "react";
 import { InfoBox, type InfoBoxProps } from "./InfoBox";
 import { HideableInfoBox } from "./InfoBoxVisibility";
-import { getEntityInfoBoxData, getPageById, getExternalLinks, getFactsForEntityWithFallback } from "@data";
+import { getEntityInfoBoxData, getPageById, getExternalLinks } from "@data";
 
 interface DataInfoBoxProps extends Partial<Omit<InfoBoxProps, "type">> {
   entityId?: string;
   type?: string;
-}
-
-function formatFactLabel(factId: string): string {
-  return factId
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
 }
 
 export async function DataInfoBox({ entityId, type: inlineType, ...inlineProps }: DataInfoBoxProps) {
@@ -22,18 +15,6 @@ export async function DataInfoBox({ entityId, type: inlineType, ...inlineProps }
 
     const pageData = getPageById(entityId);
     const externalLinks = getExternalLinks(entityId);
-
-    // Get top facts for entity (first 5)
-    const factsResult = await getFactsForEntityWithFallback(entityId);
-    const allFacts = factsResult.data;
-    const topFacts = Object.entries(allFacts)
-      .slice(0, 5)
-      .map(([factId, fact]) => ({
-        label: formatFactLabel(factId),
-        value: fact.value || String(fact.numeric ?? ""),
-        asOf: fact.asOf,
-      }))
-      .filter((f) => f.value);
 
     const description = pageData?.llmSummary || pageData?.description || undefined;
     const clusters: string[] | undefined = pageData?.clusters?.length ? pageData.clusters : undefined;
@@ -61,7 +42,6 @@ export async function DataInfoBox({ entityId, type: inlineType, ...inlineProps }
           uncertainty={pageData?.uncertainty ?? undefined}
           description={description}
           externalLinks={externalLinks}
-          topFacts={topFacts.length > 0 ? topFacts : undefined}
           clusters={clusters}
           wordCount={wordCount}
           backlinkCount={backlinkCount}

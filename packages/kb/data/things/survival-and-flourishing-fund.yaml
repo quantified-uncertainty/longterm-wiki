@@ -20,6 +20,7 @@ facts:
     value: 141e6
     asOf: "2025"
     source: https://survivalandflourishing.fund/recommendations
+    sourceResource: aebe92781f2a19fb
     notes: "Cumulative grants distributed since founding in 2019 through 2025"
 
   - id: f_sff_ai_share_2025

@@ -23,7 +23,6 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles, findPageFile } from '../lib/file-utils.ts';
-import { buildFactLookupForContent } from '../lib/fact-lookup.ts';
 import { createLlmClient, MODELS, callLlm } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { parseCliArgs } from '../lib/cli.ts';
@@ -407,70 +406,17 @@ export function buildFactRefChunks(content: string): string[] {
  */
 export async function enrichFactRefs(
   content: string,
-  options: {
+  _options: {
     pageId?: string;
     root?: string;
     useLlm?: boolean;
   } = {},
 ): Promise<FactRefEnrichResult> {
-  const root = options.root ?? PROJECT_ROOT;
-  const pageId = options.pageId ?? '';
-  const useLlm = options.useLlm ?? true;
-
-  const factLookup = buildFactLookupForContent(pageId, content, root);
-  if (!factLookup.trim()) {
-    return { content, insertedCount: 0, replacements: [] };
-  }
-
-  let replacements: FactRefReplacement[] = [];
-
-  if (useLlm) {
-    // Track already-proposed searchTexts for cross-chunk dedup
-    const alreadyProposed = new Set<string>();
-    const chunks = buildFactRefChunks(content);
-
-    for (const chunk of chunks) {
-      const chunkReplacements = await callLlmForFactRefs(chunk, factLookup);
-
-      // Filter out searchTexts already proposed by previous chunks
-      const filtered = chunkReplacements.filter(r => !alreadyProposed.has(r.searchText));
-      for (const r of filtered) {
-        alreadyProposed.add(r.searchText);
-      }
-
-      replacements.push(...filtered);
-    }
-  }
-
-  // Validate factIds are 8-char hex
-  const hexRe = /^[0-9a-f]{8}$/i;
-  replacements = replacements.filter(r => hexRe.test(r.factId));
-
-  // Validate entity attribution (#1272): warn about and filter out cross-entity
-  // fact refs. The LLM sometimes matches dollar amounts or numbers to facts from
-  // the wrong entity.
-  if (pageId) {
-    const crossEntityRefs = replacements.filter(r => r.entityId !== pageId);
-    if (crossEntityRefs.length > 0) {
-      replacements = replacements.filter(r => r.entityId === pageId);
-      const crossSummary = crossEntityRefs.map(
-        r => `  ${r.entityId}.${r.factId} "${r.searchText}"`
-      ).join('\n');
-      console.warn(
-        `[fact-ref-enrich] Filtered ${crossEntityRefs.length} cross-entity ` +
-        `fact ref(s) on page "${pageId}":\n${crossSummary}\n` +
-        `  These reference a different entity's facts. Add manually if intentional.`
-      );
-    }
-  }
-
-  const { content: enriched, applied, appliedReplacements } = applyFactRefReplacements(content, replacements);
-
-  return {
-    content: enriched,
-    insertedCount: applied,
-    replacements: appliedReplacements,
-  };
+  // The data/facts/*.yaml pipeline has been retired. This function is a no-op
+  // until it is rewritten to use an alternative fact source (e.g., KB data or
+  // claims store). Callers still invoke it from the improve/enrich pipelines,
+  // so we return a safe empty result.
+  return { content, insertedCount: 0, replacements: [] };
 }
 
 // ---------------------------------------------------------------------------

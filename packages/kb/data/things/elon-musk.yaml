@@ -28,6 +28,7 @@ facts:
     value: !ref GLXKjYAEKw:xai
     asOf: 2023-03
     source: https://x.ai
+    sourceResource: 2c762da6c4432ac1
     notes: "Founded xAI in March 2023 to develop AI; also CEO of Tesla and SpaceX"
 
   - id: f_AJGGu7rpAw
@@ -35,6 +36,7 @@ facts:
     value: "Founder & CEO"
     asOf: 2023-03
     source: https://x.ai
+    sourceResource: 2c762da6c4432ac1
 
   - id: f_CwDWKGq7Ig
     property: born-year
@@ -127,6 +129,7 @@ items:
         title: "Founder & CEO"
         start: 2023-03
         source: https://x.ai
+        sourceResource: 2c762da6c4432ac1
         notes: "Founded xAI in March 2023; developed Grok AI model; built Colossus 100K GPU cluster"
 
       i_eMiJ9kL1m:

@@ -8,7 +8,6 @@
 import fs from 'fs';
 import { MODELS } from '../../../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../../../lib/entity-lookup.ts';
-import { buildFactLookupForContent } from '../../../lib/fact-lookup.ts';
 import { buildClaimsContextForContent } from '../../../lib/claims-context.ts';
 import { runGapAnalysis, formatGapAnalysisForPrompt } from '../../../claims/gap-analysis.ts';
 import { convertSlugsToNumericIds } from '../../creator/deployment.ts';
@@ -36,11 +35,6 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   const entityLookup = buildEntityLookupForContent(currentContent, ROOT);
   const entityLookupCount = entityLookup.split('\n').filter(Boolean).length;
   log('improve', `  Found ${entityLookupCount} relevant entities for lookup`);
-
-  log('improve', 'Building fact lookup table...');
-  const factLookup = buildFactLookupForContent(page.id, currentContent, ROOT);
-  const factLookupCount = factLookup ? factLookup.split('\n').filter(l => l && !l.startsWith('#')).length : 0;
-  log('improve', `  Found ${factLookupCount} available facts for wrapping`);
 
   log('improve', 'Fetching claims context from wiki-server...');
   let claimsContext: string | null = null;
@@ -86,7 +80,7 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   const prompt = IMPROVE_PROMPT({
     page, filePath, importPath, directions,
     analysis, research, objectivityContext,
-    currentContent, entityLookup, factLookup, claimsContext,
+    currentContent, entityLookup, claimsContext,
     gapAnalysisContext, tier,
   });
 

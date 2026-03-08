@@ -15,12 +15,14 @@ facts:
     property: founded-date
     value: 2013-12
     source: https://ai.meta.com/research/
+    sourceResource: a9d72a37dea2e2a9
     notes: "Founded December 2013 as Facebook AI Research (FAIR) by Yann LeCun; rebranded to Meta AI after Meta rebrand in 2021"
 
   - id: f_S0d9WF0E8g
     property: headquarters
     value: "Menlo Park, CA"
     source: https://ai.meta.com/
+    sourceResource: 278254c1e0630e9d
     notes: "Part of Meta Platforms; labs also in New York, Paris, Montreal, London, and Tel Aviv"
 
   - id: f_meta_ai_founded_by
@@ -28,11 +30,13 @@ facts:
     value:
       - !ref cMbVUVK29Q:yann-lecun
     source: https://ai.meta.com/research/
+    sourceResource: a9d72a37dea2e2a9
 
   - id: f_Hh20Dvc90g
     property: legal-structure
     value: "Division of Meta Platforms, Inc."
     source: https://ai.meta.com/
+    sourceResource: 278254c1e0630e9d
     notes: "Not a separate legal entity; research division within Meta Platforms (formerly Facebook)"
 
   - id: f_adIN3DEEYw
@@ -47,6 +51,7 @@ facts:
     value: 1e9
     asOf: 2025-03
     source: https://resourcera.com/data/artificial-intelligence/meta-ai-users/
+    sourceResource: 6c10f36af718a1bc
     notes: "Over 1 billion monthly active users across Meta platforms"
 
   - id: f_whatsapp_ai_users
@@ -54,6 +59,7 @@ facts:
     value: 630e6
     asOf: 2025-03
     source: https://resourcera.com/data/artificial-intelligence/meta-ai-users/
+    sourceResource: 6c10f36af718a1bc
     notes: "630M active AI users on WhatsApp, representing 63% of all Meta AI interactions"
 
   - id: f_meta_capex_2025
@@ -61,6 +67,7 @@ facts:
     value: 69e9
     asOf: "2025"
     source: https://about.fb.com/news/2026/01/2026-ai-drives-performance/
+    sourceResource: 9a5932d18793c667
     notes: "$66-72B capital expenditure for AI infrastructure in 2025 (midpoint used)"
 
   - id: f_meta_capex_2026
@@ -68,6 +75,7 @@ facts:
     value: 125e9
     asOf: "2026"
     source: https://about.fb.com/news/2026/01/2026-ai-drives-performance/
+    sourceResource: 9a5932d18793c667
     notes: "Projected $115-135B CapEx for 2026 (midpoint used); includes Meta Superintelligence Labs and Prometheus supercluster"
 
   - id: f_reality_labs_losses
@@ -75,6 +83,7 @@ facts:
     value: 70e9
     asOf: 2026-01
     source: https://www.cnbc.com/2026/01/13/meta-lays-off-vr-employees-underscoring-zuckerbergs-pivot-to-ai.html
+    sourceResource: 764e7e86f8a83538
     notes: "Reality Labs cumulative losses since late 2020; cited at time of January 2026 layoffs"
 
   - id: f_meta_revenue_2025
@@ -114,12 +123,14 @@ facts:
     property: description
     value: "AMI Labs (Yann LeCun) seeking ~$3.5B valuation in fundraising talks (2025)"
     source: https://fortune.com/2025/12/19/yann-lecun-ami-labs-ai-startup-valuation-meta-departure/
+    sourceResource: 96212024a0dc8d36
     notes: "Separate entity from Meta AI"
 
   - id: f_mtia_cost_reduction
     property: description
     value: "MTIA v3 Iris: 40-44% cost reduction vs GPUs for total cost of ownership (2026)"
     source: https://markets.financialcontent.com/stocks/article/tokenring-2026-2-5-silicon-sovereignty-meta-charges-into-2026-with-iris-mtia-rollout-and-rapid-custom-chip-roadmap
+    sourceResource: a81542a8aa3b3d91
 
 items:
   key-people:
@@ -145,6 +156,7 @@ items:
         title: "VP of Generative AI"
         start: 2023-01
         source: https://ai.meta.com/
+        sourceResource: 278254c1e0630e9d
         notes: "Leads Meta's Generative AI group responsible for Llama models"
 
       i_eeaaZZitVw:
@@ -168,6 +180,7 @@ items:
         released: 2023-07
         description: "Open-weight release (7B-70B params) with commercial license"
         source: https://ai.meta.com/llama/
+        sourceResource: 69c685f410104791
         notes: "Trained on 2T tokens; partnership with Microsoft for Azure distribution"
 
       i_x2ckZfsuWg:
@@ -175,6 +188,7 @@ items:
         released: 2024-04
         description: "Major upgrade (8B, 70B params); 405B released July 2024"
         source: https://ai.meta.com/blog/meta-llama-3/
+        sourceResource: f9616f30e8f51cb0
         notes: "405B was largest open-weight model at release; trained on 15T+ tokens"
 
       i_rmmt1cxUYQ:
@@ -228,6 +242,7 @@ items:
         launched: 2023-09
         description: "AI assistant integrated across Meta apps (WhatsApp, Instagram, Messenger, Facebook)"
         source: https://ai.meta.com/
+        sourceResource: 278254c1e0630e9d
         notes: "Powered by Llama models; available across Meta's 3B+ user platform"
 
   safety-milestones:
@@ -255,4 +270,5 @@ items:
         type: safety-eval
         description: "Open-source tools for evaluating and improving LLM safety including CyberSecEval"
         source: https://ai.meta.com/blog/purple-llama-open-trust-safety-generative-ai/
+        sourceResource: 315e5a93a4e6fa9f
         notes: "Collaborative project for AI safety evaluations; includes Llama Guard and CyberSecEval benchmarks"

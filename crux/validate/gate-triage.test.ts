@@ -9,7 +9,7 @@ describe('categorizeFiles', () => {
   });
 
   it('categorizes YAML data files', () => {
-    const result = categorizeFiles(['data/entities/miri.yaml', 'data/facts/compute.yaml']);
+    const result = categorizeFiles(['data/entities/miri.yaml', 'data/resources/compute.yaml']);
     expect(result.yamlData).toHaveLength(2);
   });
 

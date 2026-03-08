@@ -14,6 +14,7 @@ facts:
     asOf: 2021-01
     validEnd: 2024-05
     source: https://openai.com/blog/introducing-superalignment
+    sourceResource: 41000216ddbfc99d
     notes: "Joined OpenAI circa 2021; co-led the Superalignment team from its founding in July 2023"
 
   - id: f_eH9jV6nK4t
@@ -34,6 +35,7 @@ facts:
     property: education
     value: "PhD in Machine Learning, Australian National University"
     source: https://jan.leike.name/
+    sourceResource: 2a84eb0982d4de6a
     notes: "PhD supervised by Marcus Hutter; research on universal reinforcement learning"
 
   - id: f_jL4fG5hI6j
@@ -52,6 +54,7 @@ facts:
     asOf: "2017"
     validEnd: "2021"
     source: https://jan.leike.name/
+    sourceResource: 2a84eb0982d4de6a
     notes: "Research scientist at DeepMind working on agent alignment and reinforcement learning"
 
   - id: f_jLuV3wX4y
@@ -60,6 +63,7 @@ facts:
     asOf: "2017"
     validEnd: "2021"
     source: https://jan.leike.name/
+    sourceResource: 2a84eb0982d4de6a
     notes: "At DeepMind, focused on reinforcement learning and alignment"
 
   - id: f_jLzA1bC2d
@@ -68,6 +72,7 @@ facts:
     asOf: 2023-07
     validEnd: 2024-05
     source: https://openai.com/blog/introducing-superalignment
+    sourceResource: 41000216ddbfc99d
     notes: "Co-led OpenAI Superalignment team with Ilya Sutskever; resigned May 2024 citing insufficient safety resources"
 
 items:
@@ -80,6 +85,7 @@ items:
         start: "2017"
         end: "2021"
         source: https://jan.leike.name/
+        sourceResource: 2a84eb0982d4de6a
         notes: "Worked on reinforcement learning theory and agent alignment"
 
       i_jL4eF5gH6i:
@@ -88,6 +94,7 @@ items:
         start: "2021"
         end: 2024-05
         source: https://openai.com/blog/introducing-superalignment
+        sourceResource: 41000216ddbfc99d
         notes: "Led alignment research; co-led Superalignment team from July 2023; resigned publicly citing safety concerns and insufficient compute allocation"
 
       i_jL7jK8lM9n:
