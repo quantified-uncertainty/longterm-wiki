@@ -291,13 +291,15 @@ facts:
     property: valuation
     value: 350e9
     asOf: 2025-11
-    notes: "Valuation at Microsoft/Nvidia commitment. sourceResource: 787a2639f9e64ca5"
+    sourceResource: 787a2639f9e64ca5
+    notes: "Valuation at Microsoft/Nvidia commitment."
 
   - id: f_revenue_guidance_2026
     property: revenue-guidance
     value: 20e9
     asOf: 2026-01
-    notes: "Base case $20B, best case $26B per Reuters. sourceResource: cb3e2358bd128df5"
+    sourceResource: cb3e2358bd128df5
+    notes: "Base case $20B, best case $26B per Reuters."
 
   - id: f_retention_rate_2025
     property: retention-rate
@@ -321,41 +323,48 @@ facts:
     property: infrastructure-investment
     value: 50e9
     asOf: "2026"
-    notes: "AI infrastructure expansion plan announced November 2025. sourceResource: 52c1c2def0184008"
+    sourceResource: 52c1c2def0184008
+    notes: "AI infrastructure expansion plan announced November 2025."
 
   - id: f_breakeven_target
     property: description
     value: "Projected breakeven year: 2028"
-    notes: "Per internal financial projections. sourceResource: eb642ee7de582ff5"
+    sourceResource: eb642ee7de582ff5
+    notes: "Per internal financial projections."
 
   - id: f_google_stake_pct
     property: equity-stake-percent
     value: 14
     asOf: 2026-02
-    notes: "Approximate Google post-Series G equity stake; computed from $3.3B invested across 3 rounds. sourceResource: 233fe5e95bfcf8bc"
+    sourceResource: 233fe5e95bfcf8bc
+    notes: "Approximate Google post-Series G equity stake; computed from $3.3B invested across 3 rounds."
 
   - id: f_founder_equity_value
     property: equity-value
     value: 66.5e9
     asOf: 2026-02
-    notes: "All seven co-founders combined equity value estimated $53-80B (midpoint used); 2-3% each x $380B valuation. sourceResource: fd8351a24e375eba"
+    sourceResource: fd8351a24e375eba
+    notes: "All seven co-founders combined equity value estimated $53-80B (midpoint used); 2-3% each x $380B valuation."
 
   - id: f_founder_pledge_total
     property: description
     value: "Founder pledge total (80% of equity): $43-64B estimated"
-    notes: "All seven co-founders pledged to donate 80% of their wealth. sourceResource: fd8351a24e375eba"
+    sourceResource: fd8351a24e375eba
+    notes: "All seven co-founders pledged to donate 80% of their wealth."
 
   - id: f_employee_equity_value
     property: equity-value
     value: 57e9
     asOf: 2026-02
-    notes: "Employee equity pool value estimated $46-68B (midpoint used); 12-18% of $380B valuation. sourceResource: 8e3ff50b9ef2a1a8"
+    sourceResource: 8e3ff50b9ef2a1a8
+    notes: "Employee equity pool value estimated $46-68B (midpoint used); 12-18% of $380B valuation."
 
   - id: f_per_founder_stake_pct
     property: equity-stake-percent
     value: 2.5
     asOf: 2026-02
-    notes: "Per-founder equity stake; each of 7 co-founders holds approximately 2-3% (midpoint used). sourceResource: fd8351a24e375eba"
+    sourceResource: fd8351a24e375eba
+    notes: "Per-founder equity stake; each of 7 co-founders holds approximately 2-3% (midpoint used)."
 
   - id: f_tallinn_stake_pct
     property: equity-stake-percent
