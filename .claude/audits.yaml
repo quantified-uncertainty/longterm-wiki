@@ -122,6 +122,23 @@ audits:
     last_checked: "2026-03-05"
     last_result: pass
 
+  - id: explore-search-ranking
+    category: feature-health
+    description: "Explore page search ranks exact title matches above partial matches (e.g., 'Anthropic' page ranks #1 when searching 'Anthropic')"
+    check_type: automated
+    check_command: |
+      cd apps/web && npx vitest run src/lib/__tests__/explore-search.test.ts --reporter=tap 2>&1 | tail -5
+    how_to_verify: |
+      The explore-search.test.ts file contains regression tests for search ranking.
+      Key test: "ensures exact match ranks above high-recommendedScore partial match"
+      verifies that searching "Anthropic" ranks the "Anthropic" page first, even when
+      other pages have higher recommendedScore values.
+      If the test passes, search ranking is working correctly in the client-side fallback.
+      Also visually check: visit longtermwiki.com/wiki?tag=Anthropic and verify
+      "Anthropic" appears as the first result.
+    frequency: weekly
+    added: "2026-03-07"
+
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"

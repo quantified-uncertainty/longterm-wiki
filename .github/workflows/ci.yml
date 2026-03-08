@@ -209,6 +209,18 @@ jobs:
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
           LONGTERMWIKI_PROJECT_KEY: ${{ secrets.LONGTERMWIKI_PROJECT_KEY }}
 
+      # --- E2E smoke tests (production gate only — not run on normal PRs) ---
+
+      - name: E2E smoke tests
+        if: github.ref == 'refs/heads/production' || (github.event_name == 'pull_request' && github.base_ref == 'production')
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+        run: |
+          cd apps/web
+          npx playwright install chromium --with-deps
+          npx playwright test
+
   migrate-test:
     name: Test DB migrations
     runs-on: ubuntu-latest

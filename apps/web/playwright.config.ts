@@ -7,4 +7,11 @@ export default defineConfig({
     baseURL: "http://localhost:3001",
     headless: true,
   },
+  webServer: {
+    command: "PORT=3001 pnpm start",
+    port: 3001,
+    timeout: 30_000,
+    // If you already have `pnpm dev` running locally, reuse it
+    reuseExistingServer: true,
+  },
 });
