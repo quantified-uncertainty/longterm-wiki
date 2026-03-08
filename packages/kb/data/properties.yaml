@@ -585,3 +585,45 @@ properties:
     dataType: text
     category: organization
     appliesTo: [organization]
+
+  # ── Incident Properties ──────────────────────────────────────────────
+
+  incident-date:
+    name: Incident Date
+    description: "Date the incident occurred or started"
+    dataType: date
+    category: incident
+    appliesTo: [incident]
+
+  organizations-involved:
+    name: Organizations Involved
+    description: "Organizations involved in or affected by this incident"
+    dataType: refs
+    category: incident
+    appliesTo: [incident]
+
+  financial-impact:
+    name: Financial Impact
+    description: "Estimated financial impact of the incident in USD"
+    dataType: number
+    unit: USD
+    category: incident
+    appliesTo: [incident]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  casualties:
+    name: Casualties
+    description: "Number of people killed or seriously injured"
+    dataType: number
+    category: incident
+    appliesTo: [incident]
+
+  incident-status:
+    name: Status
+    description: "Current status of the incident: ongoing, resolved, litigation, under-investigation"
+    dataType: text
+    category: incident
+    appliesTo: [incident]

@@ -22,13 +22,14 @@ describe("loader", () => {
       expect(anthropic!.numericId).toBe("E22");
     });
 
-    it("loads all 31 entities", () => {
+    it("loads all 32 entities", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(31);
+      expect(entities).toHaveLength(32);
 
       const ids = entities.map((t) => t.id).sort();
       expect(ids).toEqual([
-        "anthropic", "arc", "chris-olah", "conjecture", "connor-leahy",
+        "anthropic", "anthropic-government-standoff", "arc", "chris-olah",
+        "conjecture", "connor-leahy",
         "daniela-amodei", "dario-amodei", "deepmind", "demis-hassabis",
         "dustin-moskovitz", "eliezer-yudkowsky", "elon-musk",
         "geoffrey-hinton", "greg-brockman", "holden-karnofsky",
@@ -65,9 +66,9 @@ describe("loader", () => {
   });
 
   describe("properties", () => {
-    it("loads 63 properties (60 original + 3 general properties)", () => {
+    it("loads 68 properties (60 original + 3 general + 5 incident properties)", () => {
       const properties = graph.getAllProperties();
-      expect(properties).toHaveLength(63);
+      expect(properties).toHaveLength(68);
     });
 
     it("loads property details correctly", () => {
@@ -102,9 +103,9 @@ describe("loader", () => {
   });
 
   describe("schemas", () => {
-    it("loads 13 schemas (8 original + 5 new entity types)", () => {
+    it("loads 14 schemas (8 original + 5 new entity types + 1 incident)", () => {
       const schemas = graph.getAllSchemas();
-      expect(schemas).toHaveLength(13);
+      expect(schemas).toHaveLength(14);
     });
 
     it("loads original concept entity schemas", () => {

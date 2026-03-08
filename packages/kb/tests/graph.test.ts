@@ -30,7 +30,7 @@ describe("graph", () => {
   describe("getAllEntities", () => {
     it("returns all entities in the graph", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(31);
+      expect(entities).toHaveLength(32);
     });
   });
 
