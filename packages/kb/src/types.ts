@@ -32,7 +32,7 @@ export interface Entity {
   /** Former slugs for redirects */
   previousIds?: string[];
   /** Legacy wiki URL ID (E42) */
-  numericId?: number;
+  numericId?: string;
 }
 
 // ── Fact ────────────────────────────────────────────────────────────
@@ -149,7 +149,7 @@ export interface EntityFile {
     parent?: string;
     aliases?: string[];
     previousIds?: string[];
-    numericId?: number;
+    numericId?: string;
   };
   facts?: RawFact[];
   items?: Record<string, RawItemCollection>;

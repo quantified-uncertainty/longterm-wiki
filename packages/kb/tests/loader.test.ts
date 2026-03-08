@@ -19,12 +19,12 @@ describe("loader", () => {
       expect(anthropic!.name).toBe("Anthropic");
       expect(anthropic!.stableId).toBe("mK9pX3rQ7n");
       expect(anthropic!.type).toBe("organization");
-      expect(anthropic!.numericId).toBe(3);
+      expect(anthropic!.numericId).toBe("E22");
     });
 
-    it("loads all 30 entities", () => {
+    it("loads all 31 entities", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(30);
+      expect(entities).toHaveLength(31);
 
       const ids = entities.map((t) => t.id).sort();
       expect(ids).toEqual([
@@ -33,9 +33,9 @@ describe("loader", () => {
         "dustin-moskovitz", "eliezer-yudkowsky", "elon-musk",
         "geoffrey-hinton", "greg-brockman", "holden-karnofsky",
         "ilya-sutskever", "jan-leike", "meta-ai", "miri", "neel-nanda",
-        "nick-bostrom", "openai", "paul-christiano", "redwood-research",
-        "sam-altman", "ssi", "stuart-russell", "xai", "yann-lecun",
-        "yoshua-bengio",
+        "nick-bostrom", "openai", "paul-christiano", "red-queen-bio",
+        "redwood-research", "sam-altman", "ssi", "stuart-russell", "xai",
+        "yann-lecun", "yoshua-bengio",
       ].sort());
     });
 
@@ -46,9 +46,9 @@ describe("loader", () => {
   });
 
   describe("properties", () => {
-    it("loads 60 properties (32 original + 28 new concept entity properties)", () => {
+    it("loads 63 properties (60 original + 3 general properties)", () => {
       const properties = graph.getAllProperties();
-      expect(properties).toHaveLength(60);
+      expect(properties).toHaveLength(63);
     });
 
     it("loads property details correctly", () => {
@@ -83,18 +83,26 @@ describe("loader", () => {
   });
 
   describe("schemas", () => {
-    it("loads 8 schemas (organization, person + 6 concept entity types)", () => {
+    it("loads 13 schemas (8 original + 5 new entity types)", () => {
       const schemas = graph.getAllSchemas();
-      expect(schemas).toHaveLength(8);
+      expect(schemas).toHaveLength(13);
     });
 
-    it("loads new concept entity schemas", () => {
+    it("loads original concept entity schemas", () => {
       expect(graph.getSchema("ai-model")).toBeDefined();
       expect(graph.getSchema("risk")).toBeDefined();
       expect(graph.getSchema("approach")).toBeDefined();
       expect(graph.getSchema("debate")).toBeDefined();
       expect(graph.getSchema("capability")).toBeDefined();
       expect(graph.getSchema("concept")).toBeDefined();
+    });
+
+    it("loads new entity type schemas", () => {
+      expect(graph.getSchema("event")).toBeDefined();
+      expect(graph.getSchema("policy")).toBeDefined();
+      expect(graph.getSchema("project")).toBeDefined();
+      expect(graph.getSchema("analysis")).toBeDefined();
+      expect(graph.getSchema("argument")).toBeDefined();
     });
 
     it("loads ai-model schema with required properties", () => {

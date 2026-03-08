@@ -20,6 +20,7 @@ import { formatFactValue, formatItemEntry } from '../../packages/kb/src/format.t
 import { validate } from '../../packages/kb/src/validate.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
 import type { Entity, Fact, ItemEntry, ValidationResult } from '../../packages/kb/src/types.ts';
+import { commands as kbMigrateCommands } from './kb-migrate.ts';
 
 const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
 
@@ -92,7 +93,7 @@ function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): Co
 
   // Header
   lines.push(`\x1b[1m${entity.name}\x1b[0m (${entity.stableId})`);
-  lines.push(`Type: ${entity.type} | Slug: ${entity.id}${entity.numericId ? ` | E${entity.numericId}` : ''}`);
+  lines.push(`Type: ${entity.type} | Slug: ${entity.id}${entity.numericId ? ` | ${entity.numericId}` : ''}`);
   if (entity.aliases?.length) {
     lines.push(`Aliases: ${entity.aliases.join(', ')}`);
   }
@@ -292,7 +293,7 @@ Examples:
 
   return {
     exitCode: 0,
-    output: `${stableId} -> ${entity.name} (${entity.id})\n  Type: ${entity.type}${entity.numericId ? ` | E${entity.numericId}` : ''}`,
+    output: `${stableId} -> ${entity.name} (${entity.id})\n  Type: ${entity.type}${entity.numericId ? ` | ${entity.numericId}` : ''}`,
   };
 }
 
@@ -470,11 +471,12 @@ export const commands = {
   lookup: lookupCommand,
   validate: validateCommand,
   properties: propertiesCommand,
+  migrate: kbMigrateCommands.default,
 };
 
 export function getHelp(): string {
   return `
-KB Domain -- Knowledge Base readability tools
+KB Domain -- Knowledge Base readability and migration tools
 
 Commands:
   show <entity-id>      Show a single entity with all data, resolving stableIds
@@ -482,6 +484,7 @@ Commands:
   lookup <stableId>     Look up an entity by its stableId
   validate              Run all KB validation checks
   properties [--type=X] List all property definitions with usage counts
+  migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
 
 Options:
   --type=X              Filter list by entity type (e.g. organization, person)
@@ -489,6 +492,8 @@ Options:
   --ci                  JSON output
   --errors-only         Show only errors (validate)
   --rule=X              Filter by rule name (validate)
+  --dry-run             Preview migration without writing files (migrate only)
+  --stub-old            Strip old entity to stub after migration (migrate only)
 
 Examples:
   crux kb show anthropic              Show Anthropic with all facts and items
@@ -497,5 +502,7 @@ Examples:
   crux kb list --type=person          List only person entities
   crux kb lookup mK9pX3rQ7n           Look up entity by stableId
   crux kb properties                  List all properties with usage stats
+  crux kb migrate ajeya-cotra --dry-run   Preview entity migration
+  crux kb migrate ajeya-cotra --stub-old  Migrate + strip old entity
 `;
 }

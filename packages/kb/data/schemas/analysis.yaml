@@ -1,0 +1,18 @@
+type: analysis
+name: Analysis
+
+required: []
+# Analyses vary widely; no properties are universally required.
+
+recommended:
+  - description
+  - evidence-strength
+
+items:
+  key-findings:
+    description: "Major findings or conclusions of this analysis"
+    fields:
+      description: { type: text, required: true, description: "Finding description" }
+      evidence-strength: { type: text, description: "Quality of supporting evidence: strong / moderate / weak / mixed" }
+      source: { type: text, description: "URL to the supporting evidence" }
+      notes: { type: text, description: "Context, caveats, or methodology" }

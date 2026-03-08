@@ -273,13 +273,19 @@ function parseFact(
 
   const value = normalizeValue(rawFact.value, prop?.dataType);
 
+  // asOf/validEnd may be DateMarker objects from !date YAML tags
+  const asOfRaw: unknown = rawFact.asOf;
+  const validEndRaw: unknown = rawFact.validEnd;
+  const asOf = asOfRaw instanceof DateMarker ? asOfRaw.value : asOfRaw !== undefined ? String(asOfRaw) : undefined;
+  const validEnd = validEndRaw instanceof DateMarker ? validEndRaw.value : validEndRaw !== undefined ? String(validEndRaw) : undefined;
+
   return {
     id: rawFact.id,
     subjectId: entityId,
     propertyId: rawFact.property,
     value,
-    ...(rawFact.asOf !== undefined && { asOf: String(rawFact.asOf) }),
-    ...(rawFact.validEnd !== undefined && { validEnd: String(rawFact.validEnd) }),
+    ...(asOf !== undefined && { asOf }),
+    ...(validEnd !== undefined && { validEnd }),
     ...(rawFact.source !== undefined && { source: rawFact.source }),
     ...(rawFact.sourceQuote !== undefined && {
       sourceQuote: rawFact.sourceQuote,

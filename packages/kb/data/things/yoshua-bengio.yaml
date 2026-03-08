@@ -3,7 +3,7 @@ thing:
   stableId: nGFBXZeM3d
   type: person
   name: "Yoshua Bengio"
-  numericId: 380
+  numericId: "E380"
   aliases:
     - Bengio
 
