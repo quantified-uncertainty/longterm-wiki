@@ -29,7 +29,7 @@ export type ApiKeyScope = 'project' | 'content';
  * instead of the default `LONGTERMWIKI_*`. This lets you have both a
  * local dev server and prod configured in `.env` and switch with one var.
  *
- *   WIKI_SERVER_ENV=prod pnpm crux statements improve anthropic --dry-run
+ *   WIKI_SERVER_ENV=prod pnpm crux query search "anthropic"
  */
 function getEnvPrefix(): string {
   const env = process.env.WIKI_SERVER_ENV;

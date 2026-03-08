@@ -77,7 +77,7 @@ export const numberedFootnotesRule = {
         new Issue({
           rule: 'numbered-footnotes',
           file: contentFile.path,
-          message: `Page has ${seenNumbers.size} old-style numbered footnote(s) ([^N]). Migrate to DB-driven markers: [^cr-XXXX] or [^rc-XXXX]. Run: pnpm crux claims migrate-footnotes ${contentFile.slug} --apply`,
+          message: `Page has ${seenNumbers.size} old-style numbered footnote(s) ([^N]). Migrate to DB-driven markers: [^cr-XXXX] or [^rc-XXXX].`,
           severity: Severity.ERROR,
         })
       );

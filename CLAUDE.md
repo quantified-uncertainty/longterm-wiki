@@ -86,7 +86,7 @@ longterm-wiki/
 - **Hono RPC**: Mandatory for new wiki-server routes. See `.claude/rules/wiki-server-rpc-migration.md`
 - **Content pages use local data**: Wiki pages read `database.json` — zero runtime API calls. Only internal dashboards make live wiki-server requests.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
-- **Wiki-server env switching**: Set `WIKI_SERVER_ENV=prod` to target the production wiki-server instead of localhost. This makes all `LONGTERMWIKI_*` env var lookups use the `PROD_` prefix (e.g., `PROD_LONGTERMWIKI_SERVER_URL`). Usage: `WIKI_SERVER_ENV=prod pnpm crux statements improve anthropic --dry-run`
+- **Wiki-server env switching**: Set `WIKI_SERVER_ENV=prod` to target the production wiki-server instead of localhost. This makes all `LONGTERMWIKI_*` env var lookups use the `PROD_` prefix (e.g., `PROD_LONGTERMWIKI_SERVER_URL`). Usage: `WIKI_SERVER_ENV=prod pnpm crux query search "anthropic"`
 - **No new bash scripts**: Write new scripts/tools as TypeScript in `crux/`. Bash is only acceptable for git hooks (`.githooks/`), Claude Code hooks (`.claude/hooks/`), and CI glue where Node.js isn't available.
 
 ## Detailed Guides (loaded automatically by Claude Code)

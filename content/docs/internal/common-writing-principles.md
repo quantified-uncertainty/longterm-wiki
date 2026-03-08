@@ -143,18 +143,12 @@ Reference definitions are stored in the database and injected at render time. **
 
 Old-style `[^1]`, `[^2]`, etc. footnotes still render correctly (backward compatibility is maintained), but new content should use the DB-driven format. Existing numbered footnotes will be migrated gradually.
 
-To migrate existing numbered footnotes on a page, run:
-
-```
-pnpm crux claims migrate-footnotes <page-id> --apply
-```
-
 ### Why DB-Driven References
 
-1. **Central verification**: Claim references are checked against source material
+1. **Central verification**: Citation references are checked against source material
 2. **Consistency**: The same source cited on multiple pages always shows the same metadata
 3. **Maintainability**: Updating a source URL or title propagates to all pages that cite it
-4. **Quality tracking**: The claims system tracks citation accuracy and can flag stale sources
+4. **Quality tracking**: The citations system tracks citation accuracy and can flag stale sources
 
 ---
 

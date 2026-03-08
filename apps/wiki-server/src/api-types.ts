@@ -378,10 +378,10 @@ export const UpsertSummaryBatchSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
-// Claims (archived — route deleted, schemas kept for references/citations routes)
+// Page References & Citation Links (used by references.ts and citations.ts routes)
 // ---------------------------------------------------------------------------
 
-// -- Claims: Page References types -------------------------------------------
+// -- Page References types ---------------------------------------------------
 
 export interface ClaimPageReferenceRow {
   id: number;
@@ -435,7 +435,7 @@ export interface PageCitationRow {
   createdAt: string;
 }
 
-// -- Claims: Citation linking types ------------------------------------------
+// -- Citation linking types --------------------------------------------------
 
 export const LinkCitationClaimSchema = z.object({
   claimId: z.number().int().positive(),
@@ -448,10 +448,6 @@ export const LinkCitationsClaimsBatchSchema = z.object({
     claimId: z.number().int().positive(),
   })).min(1).max(200),
 });
-
-// -- Claims: Backward propagation — REMOVED in #1310 -----------
-// PropagateFromClaimsSchema was deleted. Claims are now the single source of truth.
-// The old endpoint POST /quotes/propagate-from-claims no longer exists.
 
 // ---------------------------------------------------------------------------
 // Page Links
