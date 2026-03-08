@@ -1,0 +1,14 @@
+thing:
+  id: sff
+  stableId: 1ST9vViYbg
+  type: organization
+  name: Survival and Flourishing Fund (SFF)
+  numericId: E567
+facts:
+  - id: f_kaaqNJ0uTA
+    property: description
+    value: SFF distributed $141M since 2019 (primarily from Jaan Tallinn's ~$900M fortune), with the 2025 round totaling
+      $34.33M (86% to AI safety). Uses unique S-process mechanism where 6-12 recommenders express utility functions and
+      an algorithm allocates grants favoring projects with enthusiastic champions
+    asOf: 2026-03
+    notes: Migrated from old entity system

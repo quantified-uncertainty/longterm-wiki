@@ -1,0 +1,17 @@
+thing:
+  id: us-aisi
+  stableId: fYyAxYlHDQ
+  type: organization
+  name: US AI Safety Institute
+  numericId: E365
+facts:
+  - id: f_LiIWWhTjAw
+    property: description
+    value: The US AI Safety Institute (US AISI) is a government agency within the National Institute of Standards and
+      Technology (NIST) established in 2023 to develop standards, evaluations, and guidelines for safe and trustworthy
+      artificial intelligence.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_8mEYv5duFQ
+    property: website
+    value: https://www.nist.gov/aisi

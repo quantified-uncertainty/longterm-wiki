@@ -1,0 +1,13 @@
+thing:
+  id: seoul-declaration
+  stableId: 1i59OZ3q5w
+  type: policy
+  name: Seoul Declaration on AI Safety
+  numericId: E279
+facts:
+  - id: f_t0E2zpTRIQ
+    property: description
+    value: The Seoul AI Safety Summit (May 21-22, 2024) was the second in a series of international AI safety summits,
+      following the Bletchley Park Summit in November 2023.
+    asOf: 2026-03
+    notes: Migrated from old entity system

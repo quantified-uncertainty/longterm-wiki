@@ -1,0 +1,14 @@
+thing:
+  id: stampy-aisafety-info
+  stableId: 9f8eF0CObQ
+  type: project
+  name: Stampy / AISafety.info
+  numericId: E382
+facts:
+  - id: f_pO7q8RaK4A
+    property: description
+    value: AISafety.info is a volunteer-maintained wiki with 280+ answers on AI existential risk, complemented by Stampy, an
+      LLM chatbot searching 10K-100K alignment documents via RAG. Features include a Discord bot bridging YouTube
+      comments, PageRank-style karma voting for answer quality control, and the Dist
+    asOf: 2026-03
+    notes: Migrated from old entity system

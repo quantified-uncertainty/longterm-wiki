@@ -1,0 +1,12 @@
+thing:
+  id: transformative-ai
+  stableId: bmVIhwpQww
+  type: concept
+  name: Transformative AI
+  numericId: E357
+facts:
+  - id: f_wn3dvLqMxg
+    property: description
+    value: AI systems capable of causing changes to society as significant as the industrial or agricultural revolutions.
+    asOf: 2026-03
+    notes: Migrated from old entity system

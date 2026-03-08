@@ -21,12 +21,13 @@ import {
 } from "../api-types.js";
 import { logger } from "../logger.js";
 
-// Static service registry — no DB table needed
+// Static service registry — no DB table needed.
+// Only includes services with actual health check wiring.
+// discord-bot and vercel-frontend were removed because they permanently
+// showed "unknown" / "Not monitored" with no health check logic.
 const SERVICES = [
   "wiki-server",
   "groundskeeper",
-  "discord-bot",
-  "vercel-frontend",
   "github-actions",
 ] as const;
 

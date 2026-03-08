@@ -1,0 +1,16 @@
+thing:
+  id: metr
+  stableId: rQEkFJxS5w
+  type: organization
+  name: METR
+  numericId: E201
+facts:
+  - id: f_HHpuTWlptw
+    property: description
+    value: METR (Model Evaluation and Threat Research), formerly known as ARC Evals, is an organization dedicated to
+      evaluating frontier AI models for dangerous capabilities before deployment.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_YryJVbw2Bw
+    property: website
+    value: https://metr.org

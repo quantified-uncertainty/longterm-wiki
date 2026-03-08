@@ -1,0 +1,14 @@
+thing:
+  id: claude-opus-4-5
+  stableId: tppPAkJqjQ
+  type: project
+  name: Claude Opus 4.5
+  numericId: E1038
+facts:
+  - id: f_FeCjS95oeQ
+    property: description
+    value: Claude Opus 4.5 was released November 24, 2025. First model to break 80% on SWE-bench Verified (80.9%). Featured
+      a 67% price reduction from Opus 4 ($5/$25 vs $15/$75 per MTok). Scored 44% on Terminal-Bench Hard and 70 on
+      Artificial Analysis Intelligence Index.
+    asOf: 2026-03
+    notes: Migrated from old entity system

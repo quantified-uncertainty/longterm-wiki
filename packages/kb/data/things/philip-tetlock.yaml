@@ -1,0 +1,14 @@
+thing:
+  id: philip-tetlock
+  stableId: BCisPStEdQ
+  type: person
+  name: Philip Tetlock (Forecasting Pioneer)
+  numericId: E434
+facts:
+  - id: f_gv0LsY9KoQ
+    property: description
+    value: Psychologist and forecasting researcher who pioneered the science of superforecasting through the Good Judgment
+      Project, demonstrating that systematic forecasting methods can outperform expert predictions and intelligence
+      analysts.
+    asOf: 2026-03
+    notes: Migrated from old entity system

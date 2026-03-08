@@ -1,0 +1,15 @@
+thing:
+  id: provable-safe
+  stableId: gmRaYb1fgg
+  type: concept
+  name: Provable / Guaranteed Safe AI
+  numericId: E402
+facts:
+  - id: f_dToAVhIc2A
+    property: description
+    value: AI systems designed with formal mathematical safety guarantees from the ground up. The UK's ARIA programme has
+      committed GBP 59M to develop guaranteed safe AI systems by 2028. Current neural network verification handles
+      networks up to 10^6 parameters, but frontier models exceed 10^12, representing a 6 order-of-magnitude gap.
+      Estimated 1-5% probability of paradigm dominance at transformative AI.
+    asOf: 2026-03
+    notes: Migrated from old entity system

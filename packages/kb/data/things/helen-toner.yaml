@@ -1,0 +1,14 @@
+thing:
+  id: helen-toner
+  stableId: oTieHq0pRA
+  type: person
+  name: Helen Toner
+  numericId: E575
+facts:
+  - id: f_xzqOizPpxQ
+    property: description
+    value: Comprehensive biographical profile of Helen Toner documenting her career from EA Melbourne founder to CSET
+      Interim Executive Director, with detailed timeline of the November 2023 OpenAI board crisis where she voted to
+      remove Sam Altman. Compiles public testimony, publications, and media appearances
+    asOf: 2026-03
+    notes: Migrated from old entity system

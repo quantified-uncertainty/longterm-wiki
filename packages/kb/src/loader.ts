@@ -291,6 +291,11 @@ function parseFact(
       sourceQuote: rawFact.sourceQuote,
     }),
     ...(rawFact.notes !== undefined && { notes: rawFact.notes }),
+    ...(rawFact.currency !== undefined && { currency: rawFact.currency }),
+    ...(rawFact.usdEquivalent !== undefined && { usdEquivalent: Number(rawFact.usdEquivalent) }),
+    ...(rawFact.exchangeRate !== undefined && { exchangeRate: Number(rawFact.exchangeRate) }),
+    ...(rawFact.exchangeRateDate !== undefined && { exchangeRateDate: rawFact.exchangeRateDate }),
+    ...(rawFact.dollarYear !== undefined && { dollarYear: Number(rawFact.dollarYear) }),
   };
 }
 

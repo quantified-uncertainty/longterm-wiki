@@ -1,0 +1,14 @@
+thing:
+  id: ssm-mamba
+  stableId: DjKKneEtdA
+  type: capability
+  name: State-Space Models / Mamba
+  numericId: E501
+facts:
+  - id: f_cvrfPGhChw
+    property: description
+    value: "Comprehensive analysis of state-space models (SSMs) like Mamba as transformer alternatives, documenting that
+      Mamba-3B matches Transformer-6B perplexity with 5x throughput but lags on in-context learning (MMLU: 46.3% vs
+      51.2% at 8B scale). Hybrid architectures combining 43% SSM + 7% attention outperf"
+    asOf: 2026-03
+    notes: Migrated from old entity system

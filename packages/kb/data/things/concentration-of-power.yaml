@@ -1,0 +1,14 @@
+thing:
+  id: concentration-of-power
+  stableId: KpMBQkdQ5g
+  type: risk
+  name: AI-Driven Concentration of Power
+  numericId: E68
+facts:
+  - id: f_mhXrl9Pvag
+    property: description
+    value: AI could enable small groups—companies, governments, or individuals—to accumulate and exercise power at scales
+      previously impossible. The concern isn't just inequality (which has always existed) but a qualitative shift in
+      what power concentration looks like when AI can substitute for large numbers of humans across many domains.
+    asOf: 2026-03
+    notes: Migrated from old entity system

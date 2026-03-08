@@ -1,0 +1,13 @@
+thing:
+  id: emergent-capabilities
+  stableId: x19LcGDk6Q
+  type: risk
+  name: Emergent Capabilities
+  numericId: E117
+facts:
+  - id: f_gv7ucetiKQ
+    property: description
+    value: Emergent capabilities are abilities that appear in AI systems at certain scales without being explicitly trained
+      for, often appearing abruptly rather than gradually.
+    asOf: 2026-03
+    notes: Migrated from old entity system

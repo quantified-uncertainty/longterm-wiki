@@ -1,0 +1,12 @@
+thing:
+  id: benchmarking
+  stableId: bfK5RgQBcQ
+  type: concept
+  name: AI Benchmarking
+  numericId: E38
+facts:
+  - id: f_HU1AmRajLw
+    property: description
+    value: Standardized evaluation methods for comparing AI system performance across tasks and capabilities.
+    asOf: 2026-03
+    notes: Migrated from old entity system

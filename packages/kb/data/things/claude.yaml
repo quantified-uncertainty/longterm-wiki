@@ -1,0 +1,15 @@
+thing:
+  id: claude
+  stableId: cMKB5i2WZQ
+  type: project
+  name: Claude
+  numericId: E1041
+facts:
+  - id: f_E9HZ253h0A
+    property: description
+    value: Claude is Anthropic's family of AI assistants, first released in March 2023. The product line spans three tiers —
+      Haiku (fast/cheap), Sonnet (balanced), and Opus (most capable) — with major generations including Claude 1, Claude
+      2, Claude 3, and Claude 4. Claude is available via API, the claude.ai web interface, and Claude Code (a CLI tool
+      for software engineering).
+    asOf: 2026-03
+    notes: Migrated from old entity system

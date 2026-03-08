@@ -1,0 +1,13 @@
+thing:
+  id: miri-era
+  stableId: 7kMHUDshhw
+  type: event
+  name: The MIRI Era
+  numericId: E203
+facts:
+  - id: f_v3jez4h83w
+    property: description
+    value: The MIRI era marks the transition from scattered warnings to organized research. For the first time, AI safety
+      had an institution, a community, and a research agenda.
+    asOf: 2026-03
+    notes: Migrated from old entity system

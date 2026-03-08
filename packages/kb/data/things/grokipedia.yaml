@@ -1,0 +1,13 @@
+thing:
+  id: grokipedia
+  stableId: 2QDkp6k5pw
+  type: project
+  name: Grokipedia
+  numericId: E682
+facts:
+  - id: f_5aZtjmXMCw
+    property: description
+    value: xAI's AI-generated encyclopedia launched October 2025, growing to 6M+ articles with documented quality concerns
+      including political bias and scientific inaccuracies.
+    asOf: 2026-03
+    notes: Migrated from old entity system

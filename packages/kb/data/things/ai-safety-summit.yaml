@@ -1,0 +1,13 @@
+thing:
+  id: ai-safety-summit
+  stableId: mnhBgvNfXA
+  type: event
+  name: AI Safety Summit (Bletchley Park)
+  numericId: E14
+facts:
+  - id: f_eqsk38NhtQ
+    property: description
+    value: International summit on AI safety held at Bletchley Park, UK in November 2023, resulting in the Bletchley
+      Declaration.
+    asOf: 2026-03
+    notes: Migrated from old entity system

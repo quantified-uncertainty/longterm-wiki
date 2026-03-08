@@ -1,0 +1,13 @@
+thing:
+  id: reasoning
+  stableId: hD7bZ2b7BQ
+  type: capability
+  name: Reasoning and Planning
+  numericId: E246
+facts:
+  - id: f_PIiaf5jIOw
+    property: description
+    value: Reasoning and planning capabilities refer to AI systems' ability to break down complex problems into steps,
+      maintain coherent chains of logic, and solve problems that require multiple inference steps.
+    asOf: 2026-03
+    notes: Migrated from old entity system

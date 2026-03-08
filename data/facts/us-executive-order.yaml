@@ -1,0 +1,135 @@
+entity: us-executive-order
+facts:
+
+  # === Policy Metadata ===
+
+  # enacted
+  a1b2c3d4:
+    measure: enacted-date
+    value: "2023-10-30"
+    asOf: "2023-10"
+    note: "Signed by President Biden. Full title: 'Executive Order on the Safe, Secure, and Trustworthy Development and Use of Artificial Intelligence' (EO 14110)"
+    source: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+
+  # revoked
+  e5f6a7b8:
+    measure: revoked-date
+    value: "2025-01-20"
+    asOf: "2025-01"
+    note: "Revoked by President Trump on his first day in office via EO 14179 ('Removing Barriers to American Leadership in Artificial Intelligence')"
+    source: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
+
+  # signer
+  c9d0e1f2:
+    measure: signer
+    value: joe-biden
+    asOf: "2023-10"
+
+  # word-count
+  a3b4c5d6:
+    measure: word-count
+    value: 30000
+    asOf: "2023-10"
+    note: "Approximately 30,000 words across 8 policy sections; longest AI policy document issued by any government at time of signing"
+    source: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+
+  # duration
+  f8d0a4b6:
+    label: "Duration in effect (days)"
+    measure: generic-count
+    value: 448
+    asOf: "2025-01"
+    note: "In effect for 448 days (Oct 30, 2023 to Jan 20, 2025)"
+    noCompute: true
+
+  # === Scope & Requirements ===
+
+  # total-requirements
+  f6d8a2b4:
+    label: "Total requirements"
+    measure: generic-count
+    value:
+      min: 150
+    asOf: "2023-10"
+    note: "150+ specific requirements; most detailed AI policy directive ever issued by any government"
+    source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+
+  # federal-entities-assigned
+  a7e9b3c5:
+    label: "Federal entities assigned"
+    measure: generic-count
+    value:
+      min: 50
+    asOf: "2023-10"
+    note: "Over 50 federal agencies given specific responsibilities"
+    source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+
+  # companies-affected
+  d0b2e6f8:
+    label: "Companies exceeding compute thresholds"
+    measure: generic-count
+    value: 15
+    asOf: "2024-09"
+    note: "BIS assessed no more than 15 companies exceeded reporting thresholds for models and computing clusters"
+    source: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
+
+  # === Compute Thresholds ===
+
+  # compute-threshold-general
+  e1c3f7a9:
+    label: "General model threshold"
+    measure: compute-flops
+    value: 1e26
+    asOf: "2023-10"
+    note: "10^26 FLOP for dual-use foundation models; invoked Defense Production Act for mandatory reporting. No model triggered this threshold before revocation."
+    source: https://www.federalregister.gov/documents/2023/11/01/2023-24283/safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence
+    noCompute: true
+
+  # compute-threshold-biological
+  f2d4a8b0:
+    label: "Biological model threshold"
+    measure: compute-flops
+    value: 1e23
+    asOf: "2023-10"
+    note: "10^23 FLOP for biological sequence models; 1,000x lower than general threshold, reflecting bioweapon design concerns"
+    source: https://www.federalregister.gov/documents/2023/11/01/2023-24283/safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence
+    noCompute: true
+
+  # === Implementation Progress ===
+
+  # completion-at-revocation
+  b8f0c4d6:
+    label: "Completion rate at revocation"
+    measure: completion-rate
+    value: 85
+    asOf: "2025-01"
+    note: "~85% of 150+ requirements completed before revocation on Jan 20, 2025"
+    source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+
+  # 90-day-requirements-due
+  b4f6c0d2:
+    label: "Requirements due at 90 days"
+    measure: generic-count
+    value: 21
+    asOf: "2024-01"
+    note: "21 requirements had 90-day deadlines; 19 showed progress (90%), 11 fully implemented (52%)"
+    source: https://hai.stanford.edu/news/transparency-ai-eo-implementation-assessment-90-days
+
+  # management-requirements
+  c9a1d5e7:
+    label: "Management requirements completed"
+    measure: generic-count
+    value: 13
+    asOf: "2024-03"
+    note: "13 of 13 AI management and talent requirements fully implemented per GAO assessment"
+    source: https://www.gao.gov/products/gao-24-107332
+
+  # === Public Response ===
+
+  # public-support
+  a3e5b9c1:
+    measure: public-approval
+    value: 69
+    asOf: "2023-11"
+    note: "AI Policy Institute poll: 69% of voters supported the EO (78% Democrats, 65% independents, 64% Republicans)"
+    source: https://theaipi.org/poll-reveals-bipartisan-support-for-ai-executive-order/

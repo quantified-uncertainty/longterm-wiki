@@ -1,0 +1,14 @@
+thing:
+  id: export-controls
+  stableId: SpFgTz2INg
+  type: policy
+  name: US AI Chip Export Controls
+  numericId: E136
+facts:
+  - id: f_EtUqpwCXzw
+    property: description
+    value: The United States has implemented unprecedented export controls on advanced semiconductors and semiconductor
+      manufacturing equipment, primarily targeting China. These controls represent one of the most significant attempts
+      to constrain AI development through hardware governance.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,30 @@
+thing:
+  id: reality-fragmentation
+  stableId: 4Rz7XtP9Uw
+  type: risk
+  name: AI-Accelerated Reality Fragmentation
+  numericId: E244
+facts:
+  - id: f_eT0Uh5YJqQ
+    property: description
+    value: >-
+      Reality fragmentation occurs when different groups of people come to inhabit incompatible information
+      environments, holding fundamentally different beliefs about basic facts rather than just different values or
+      opinions. This goes beyond political disagreement - it represents a breakdown of the shared reality that enables
+      collective deliberation and action.
+
+
+      The mechanism involves algorithmic curation that optimizes for engagement, which often means showing people
+      content that confirms their existing beliefs and emotional responses. Over time, groups develop not just different
+      interpretations of events but different sets of accepted facts. One group believes an election was stolen; another
+      considers this a dangerous conspiracy theory. They're not debating values - they're operating from incompatible
+      factual premises.
+
+
+      AI accelerates reality fragmentation in several ways: more personalized content curation, AI-generated content
+      tailored to specific communities, deepfakes that can fabricate "evidence" for any narrative, and the scale of
+      synthetic content that drowns out shared sources of information. The danger is not just polarization but the loss
+      of any common ground for discourse. When groups cannot agree on basic facts - what happened, what is happening,
+      what is real - democratic governance becomes impossible and conflict becomes more likely.
+    asOf: 2026-03
+    notes: Migrated from old entity system

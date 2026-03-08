@@ -1,0 +1,14 @@
+thing:
+  id: china-ai-regulations
+  stableId: LyLbPk4iNQ
+  type: policy
+  name: China AI Regulatory Framework
+  numericId: E58
+facts:
+  - id: f_mGgihUKCOQ
+    property: description
+    value: China has developed one of the world's most comprehensive AI regulatory frameworks through a series of targeted
+      regulations addressing specific AI applications and risks. Unlike the EU's comprehensive AI Act, China's approach
+      is iterative and sector-specific, with new rules issued as technologies emerge.
+    asOf: 2026-03
+    notes: Migrated from old entity system

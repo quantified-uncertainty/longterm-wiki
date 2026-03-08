@@ -1,0 +1,14 @@
+thing:
+  id: coordination-mechanisms
+  stableId: 4a6Sf9Fupg
+  type: policy
+  name: International Coordination Mechanisms
+  numericId: E470
+facts:
+  - id: f_NNIDBg6foQ
+    property: description
+    value: International coordination on AI safety involves multilateral treaties, bilateral dialogues, and institutional
+      networks to manage AI risks globally. Current efforts include the Council of Europe AI Treaty (17 signatories),
+      the International Network of AI Safety Institutes (11+ members), and the Paris Summit 2025 with 61 signatories.
+    asOf: 2026-03
+    notes: Migrated from old entity system

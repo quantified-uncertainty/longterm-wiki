@@ -1,0 +1,14 @@
+thing:
+  id: securebio
+  stableId: QFIL8r7vPA
+  type: organization
+  name: SecureBio
+  numericId: E563
+facts:
+  - id: f_rwGRhie6mA
+    property: description
+    value: A biosecurity nonprofit applying the Delay/Detect/Defend framework to protect against catastrophic pandemics,
+      including AI-enabled biological threats, through wastewater surveillance (Nucleic Acid Observatory) and AI
+      capability evaluations (Virology Capabilities Test). Co-founded by Kevin Esvelt, wh
+    asOf: 2026-03
+    notes: Migrated from old entity system

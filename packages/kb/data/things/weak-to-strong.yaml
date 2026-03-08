@@ -1,0 +1,14 @@
+thing:
+  id: weak-to-strong
+  stableId: JOXqSmPOiQ
+  type: approach
+  name: Weak-to-Strong Generalization
+  numericId: E452
+facts:
+  - id: f_MOiHXSK0mQ
+    property: description
+    value: Weak-to-strong generalization investigates whether weak supervisors can reliably elicit good behavior from
+      stronger AI systems. OpenAI's ICML 2024 research shows GPT-2-level models can recover 80% of GPT-4's performance
+      gap with auxiliary confidence loss, but reward modeling achieves only 20-40% PGR.
+    asOf: 2026-03
+    notes: Migrated from old entity system

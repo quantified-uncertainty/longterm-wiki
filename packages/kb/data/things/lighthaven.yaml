@@ -1,0 +1,14 @@
+thing:
+  id: lighthaven
+  stableId: 7E2ylGl7Ug
+  type: organization
+  name: Lighthaven (Event Venue)
+  numericId: E539
+facts:
+  - id: f_VOFvbODcSA
+    property: description
+    value: Lighthaven is a Berkeley conference venue operated by Lightcone Infrastructure that serves as physical
+      infrastructure for AI safety, rationality, and EA communities. While well-documented as a facility, it represents
+      supporting infrastructure rather than core AI safety research or strategy.
+    asOf: 2026-03
+    notes: Migrated from old entity system

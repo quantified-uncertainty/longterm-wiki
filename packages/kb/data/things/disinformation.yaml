@@ -1,0 +1,14 @@
+thing:
+  id: disinformation
+  stableId: AaAOkTHkug
+  type: risk
+  name: AI Disinformation
+  numericId: E102
+facts:
+  - id: f_M1gumKNh6g
+    property: description
+    value: AI enables disinformation at unprecedented scale and sophistication. Language models can generate convincing
+      text, image generators can create realistic fake photos, and AI can personalize messages to individual targets.
+      What previously required human effort for each piece of content can now be automated.
+    asOf: 2026-03
+    notes: Migrated from old entity system

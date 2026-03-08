@@ -1,0 +1,14 @@
+thing:
+  id: alignment
+  stableId: rt6jVH9yuA
+  type: approach
+  name: AI Alignment
+  numericId: E439
+facts:
+  - id: f_zbzg5bIlgA
+    property: description
+    value: Technical approaches to ensuring AI systems pursue intended goals and remain aligned with human values throughout
+      training and deployment. Current methods show promise but face fundamental scalability challenges, with oversight
+      success dropping to 52% at 400 Elo capability gaps.
+    asOf: 2026-03
+    notes: Migrated from old entity system

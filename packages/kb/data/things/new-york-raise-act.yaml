@@ -1,0 +1,14 @@
+thing:
+  id: new-york-raise-act
+  stableId: qHOO4Xb9dA
+  type: policy
+  name: New York RAISE Act
+  numericId: E471
+facts:
+  - id: f_WlEbjQiGPw
+    property: description
+    value: State legislation requiring safety protocols, incident reporting, and transparency from developers of frontier AI
+      models. Signed December 2025, effective January 2027, with civil penalties up to $3M enforced by the NY Attorney
+      General.
+    asOf: 2026-03
+    notes: Migrated from old entity system

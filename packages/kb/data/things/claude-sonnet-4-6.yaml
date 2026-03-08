@@ -1,0 +1,14 @@
+thing:
+  id: claude-sonnet-4-6
+  stableId: Au1yMEZYWQ
+  type: project
+  name: Claude Sonnet 4.6
+  numericId: E1040
+facts:
+  - id: f_WAysYIXQHw
+    property: description
+    value: Claude Sonnet 4.6 was released February 17, 2026. Scored 79.6% on SWE-bench Verified and ranked No. 1 on
+      GDPval-AA leaderboard. Matches Opus-class performance on many benchmarks at one-fifth the cost. Default model for
+      free and Pro Claude users. Priced at $3/$15 per million tokens with 200K context (1M beta).
+    asOf: 2026-03
+    notes: Migrated from old entity system

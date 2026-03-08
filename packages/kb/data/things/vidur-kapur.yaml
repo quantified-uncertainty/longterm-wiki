@@ -1,0 +1,14 @@
+thing:
+  id: vidur-kapur
+  stableId: XqvdX3YisQ
+  type: person
+  name: Vidur Kapur
+  numericId: E580
+facts:
+  - id: f_JqWDigPJnQ
+    property: description
+    value: Vidur Kapur is a superforecaster and AI policy researcher involved in multiple forecasting organizations and the
+      Sentinel early warning system, contributing to AI risk assessment and EA Forum discussions. While he appears to be
+      a competent practitioner in forecasting and risk assessment, his individ
+    asOf: 2026-03
+    notes: Migrated from old entity system
