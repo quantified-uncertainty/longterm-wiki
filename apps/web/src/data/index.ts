@@ -38,66 +38,26 @@ interface IdRegistryMaps {
   bySlug: Record<string, string>; // slug → E1
 }
 
+/**
+ * Legacy Fact interface — kept as a bridge type for calc-engine and
+ * AnthropicStakeholdersTable. The old facts pipeline has been retired;
+ * database.facts is always empty. New code should use KB data instead.
+ */
 export interface Fact {
   value?: string;
   numeric?: number;
-  /** Lower bound of range (for estimates like "$20-26 billion") */
   low?: number;
-  /** Upper bound of range */
   high?: number;
   asOf?: string;
-  /** Short human-readable name (e.g., "Anthropic post-money valuation") */
   label?: string;
   source?: string;
   sourceResource?: string;
-  /** Resolved resource metadata (populated at build time from sourceResource) */
   sourceTitle?: string;
   sourcePublication?: string;
   sourceCredibility?: number;
   note?: string;
-  noCompute?: boolean;
-  /** Measure ID from data/fact-measures.yaml — groups related facts into timeseries.
-   *  Auto-inferred from fact ID at build time if not set explicitly. */
-  measure?: string;
-  /** Subject override — defaults to parent entity. Use for benchmark/comparison facts
-   *  (e.g., subject: "industry-average") that shouldn't appear in entity timeseries. */
-  subject?: string;
-  compute?: string;
-  format?: string;
-  formatDivisor?: number;
   entity: string;
   factId: string;
-  computed?: boolean;
-}
-
-export interface FactMeasure {
-  id: string;
-  label: string;
-  unit: string;
-  category: string;
-  direction?: "higher" | "lower";
-  description?: string;
-  display?: {
-    divisor?: number;
-    prefix?: string;
-    suffix?: string;
-  };
-  relatedMeasures?: string[];
-  applicableTo?: string[];
-}
-
-/** A timeseries entry — a fact observation for a specific entity+measure at a point in time */
-export interface TimeseriesPoint {
-  entity: string;
-  factId: string;
-  measure: string;
-  asOf: string;
-  value?: string;
-  numeric?: number;
-  low?: number;
-  high?: number;
-  note?: string;
-  source?: string;
 }
 
 /** Raw entity shape as stored in database.json (before transformation) */
@@ -174,12 +134,6 @@ interface DatabaseShape {
   pathRegistry: Record<string, string>;
   idRegistry: IdRegistryMaps;
   pages: Page[];
-  facts: Record<string, Fact>;
-  factMeasures: Record<string, FactMeasure>;
-  /** Timeseries index: measure ID → sorted array of observations */
-  factTimeseries: Record<string, TimeseriesPoint[]>;
-  /** Reverse index: "entity.factId" → pages that reference it via <F> */
-  factUsage: Record<string, FactUsagePage[]>;
   /** Page → resource IDs mapping (computed at build time from inline <R>, cited_by, URL matching) */
   pageResources: Record<string, string[]>;
   stats: Record<string, unknown>;
@@ -1237,156 +1191,6 @@ export function getRelatedGraphWithFallback(
   return { data: getRelatedGraphFor(entityId), source: "local" };
 }
 
-// ============================================================================
-// CANONICAL FACTS
-// ============================================================================
-
-export function getFact(entityId: string, factId: string): Fact | undefined {
-  const slug = resolveId(entityId);
-  const db = getDatabase();
-  return db.facts?.[`${slug}.${factId}`];
-}
-
-export function getFactValue(entityId: string, factId: string): string | undefined {
-  return getFact(entityId, factId)?.value;
-}
-
-export function getFactsForEntity(entityId: string): Record<string, Fact> {
-  const resolvedId = resolveId(entityId);
-  const db = getDatabase();
-  const result: Record<string, Fact> = {};
-  for (const [key, fact] of Object.entries(db.facts || {})) {
-    if (fact.entity === resolvedId) {
-      result[fact.factId] = fact;
-    }
-  }
-  return result;
-}
-
-/**
- * Get all facts for an entity from local database.json.
- * Content pages always use build-time data — no runtime API calls.
- */
-export function getFactsForEntityWithFallback(
-  entityId: string
-): WithSource<Record<string, Fact>> {
-  return { data: getFactsForEntity(entityId), source: "local" };
-}
-
-/**
- * Get a single fact from local database.json.
- */
-export function getFactWithFallback(
-  entityId: string,
-  factId: string
-): Fact | undefined {
-  return getFactsForEntity(entityId)[factId];
-}
-
-export function getAllFacts(): Array<Fact & { key: string }> {
-  const db = getDatabase();
-  return Object.entries(db.facts || {}).map(([key, fact]) => ({
-    ...fact,
-    key,
-  }));
-}
-
-// ============================================================================
-// FACT MEASURES & TIMESERIES
-// ============================================================================
-
-/** Get all measure definitions */
-export function getFactMeasures(): Record<string, FactMeasure> {
-  return getDatabase().factMeasures || {};
-}
-
-/** Get a single measure definition by ID */
-export function getFactMeasure(measureId: string): FactMeasure | undefined {
-  return getDatabase().factMeasures?.[measureId];
-}
-
-/**
- * Get timeseries for a measure, optionally filtered by entity.
- * Returns observations sorted chronologically (oldest first).
- */
-export function getMeasureTimeseries(measureId: string, entityId?: string): TimeseriesPoint[] {
-  const db = getDatabase();
-  const series = db.factTimeseries?.[measureId] || [];
-  if (entityId) {
-    return series.filter(p => p.entity === entityId);
-  }
-  return series;
-}
-
-/**
- * Get all timeseries data for a given entity, grouped by measure.
- * Returns a map of measureId → sorted observations.
- */
-export function getEntityTimeseries(entityId: string): Record<string, TimeseriesPoint[]> {
-  const db = getDatabase();
-  const result: Record<string, TimeseriesPoint[]> = {};
-  for (const [measureId, series] of Object.entries(db.factTimeseries || {})) {
-    const filtered = series.filter(p => p.entity === entityId);
-    if (filtered.length > 0) {
-      result[measureId] = filtered;
-    }
-  }
-  return result;
-}
-
-/** Get all measures that have data for a given entity */
-export function getEntityMeasures(entityId: string): FactMeasure[] {
-  const db = getDatabase();
-  const measures: FactMeasure[] = [];
-  const seen = new Set<string>();
-  for (const [measureId, series] of Object.entries(db.factTimeseries || {})) {
-    if (seen.has(measureId)) continue;
-    if (series.some(p => p.entity === entityId)) {
-      const measure = db.factMeasures?.[measureId];
-      if (measure) {
-        measures.push(measure);
-        seen.add(measureId);
-      }
-    }
-  }
-  return measures;
-}
-
-/**
- * Get timeseries from local database.json.
- * Content pages always use build-time data — no runtime API calls.
- */
-export function getMeasureTimeseriesWithFallback(
-  measureId: string,
-  entityId?: string
-): TimeseriesPoint[] {
-  return getMeasureTimeseries(measureId, entityId);
-}
-
-/**
- * Get all timeseries data for an entity from local database.json.
- */
-export function getEntityTimeseriesWithFallback(
-  entityId: string
-): Record<string, TimeseriesPoint[]> {
-  return getEntityTimeseries(entityId);
-}
-
-// ============================================================================
-// FACT USAGE (reverse index: which pages use each fact)
-// ============================================================================
-
-export interface FactUsagePage {
-  id: string;
-  title: string;
-  path: string;
-}
-
-/** Get the reverse index of which pages reference each fact via the <F> component.
- *  Returns a map of "entity.factId" → array of pages that use it. */
-export function getFactUsage(): Record<string, FactUsagePage[]> {
-  return getDatabase().factUsage || {};
-}
 
 // ============================================================================
 // CRUXES

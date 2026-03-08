@@ -9,7 +9,7 @@ import {
   type ContentFormat,
 } from "@/lib/page-types";
 import type { ChangeEntry, Page } from "@/data";
-import { getRatioStatus, getMetricStatus as getCoverageMetricStatus, ENTITY_LIKE_TYPES, FACTS_GREEN_THRESHOLD } from "@/lib/coverage";
+import { getRatioStatus, getMetricStatus as getCoverageMetricStatus } from "@/lib/coverage";
 import type { CoverageStatus } from "@/lib/coverage";
 import styles from "@/components/wiki/tooltip.module.css";
 
@@ -84,7 +84,6 @@ export interface PageStatusProps {
   resourceCount?: number;
   citationHealth?: CitationHealth;
   ratings?: PageRatings;
-  factCount?: number;
   coverage?: Page["coverage"];
 }
 
@@ -713,7 +712,6 @@ function ContentCoverageSection({
   wordCount,
   contentFormat,
   ratings,
-  factCount,
   coverage,
   entityType,
   backlinkCount,
@@ -728,7 +726,6 @@ function ContentCoverageSection({
   wordCount?: number;
   contentFormat?: ContentFormat;
   ratings?: PageRatings;
-  factCount?: number;
   coverage?: Page["coverage"];
   entityType?: string;
   backlinkCount?: number;
@@ -737,8 +734,6 @@ function ContentCoverageSection({
   const recommended = coverage?.targets ?? getRecommendedMetrics(wordCount || 0, contentFormat || "article");
 
   // Entity types where canonical facts are scored (real-world people and organizations)
-  const isEntityLike = entityType && ENTITY_LIKE_TYPES.has(entityType);
-
   // Overview is scored for article and diagram formats
   const isOverviewFormat = !contentFormat || contentFormat === "article" || contentFormat === "diagram";
 
@@ -859,15 +854,6 @@ function ContentCoverageSection({
       description: "Citations verified against their sources for factual accuracy.",
       anchor: "accuracy-checked",
     },
-    // Facts — scored for person and organization pages only
-    ...(isEntityLike ? [{
-      label: "Facts",
-      actual: factCount ?? 0,
-      target: FACTS_GREEN_THRESHOLD,
-      hint: "Add canonical facts in data/facts/ YAML",
-      description: "Canonical facts for this entity defined in data/facts/ YAML. Used by <F> components for structured data access.",
-      anchor: "entity-facts",
-    }] : []),
   ];
 
   // --- Info-only items (no pass/fail, just data) ---
@@ -886,15 +872,6 @@ function ContentCoverageSection({
         description: "Sub-quality ratings: Novelty, Rigor, Actionability, Completeness (0-10 scale).",
       });
     }
-  }
-
-  // Facts as info-only for non-entity-like pages (e.g. concept, risk, analysis)
-  if (!isEntityLike && factCount != null && factCount > 0) {
-    infoItems.push({
-      label: "Facts",
-      value: `${factCount}`,
-      description: "Canonical facts defined for this entity in data/facts/ YAML. Used by <F> components.",
-    });
   }
 
   if (backlinkCount != null && backlinkCount > 0) {
@@ -1183,7 +1160,6 @@ export function PageStatus({
   resourceCount,
   citationHealth,
   ratings,
-  factCount,
   coverage,
 }: PageStatusProps) {
   const detectedType = detectPageType(pathname || "", pageType);
@@ -1288,7 +1264,6 @@ export function PageStatus({
         wordCount={wordCount}
         contentFormat={contentFormat}
         ratings={ratings}
-        factCount={factCount}
         coverage={coverage}
         entityType={entityType}
         backlinkCount={backlinkCount}

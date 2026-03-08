@@ -9,7 +9,6 @@ import {
   getPageById,
   getEntityPath,
   getBacklinksFor,
-  getFactsForEntityWithFallback,
   getExternalLinks,
   getResourceById,
   getResourceCredibility,
@@ -445,7 +444,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
   const pageData = getPageById(slug);
   const entityPath = getEntityPath(slug);
   const backlinks = getBacklinksFor(slug);
-  const facts = (await getFactsForEntityWithFallback(slug)).data;
   const externalLinks = getExternalLinks(slug);
   const claims = await fetchPageClaims(slug);
 
@@ -488,8 +486,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
             &larr; Back to page
           </Link>
           <span className="text-gray-400">
-            {Object.keys(facts).length} facts
-            {" · "}
             {backlinks.length} backlinks
             {claims !== null && ` · ${claims.length} claims`}
           </span>
@@ -573,39 +569,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
             </div>
             <ReferencesTable claims={claims} />
           </div>
-        )}
-      </Section>
-
-      <Section title={`Canonical Facts (${Object.keys(facts).length})`}>
-        {Object.keys(facts).length > 0 ? (
-          <table className="text-xs w-full border-collapse">
-            <thead>
-              <tr className="border-b text-left">
-                <th className="p-2">factId</th>
-                <th className="p-2">value</th>
-                <th className="p-2">numeric</th>
-                <th className="p-2">asOf</th>
-                <th className="p-2">source</th>
-                <th className="p-2">note</th>
-                <th className="p-2">computed</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(facts).map(([factId, fact]) => (
-                <tr key={factId} className="border-b">
-                  <td className="p-2 font-mono">{factId}</td>
-                  <td className="p-2">{fact.value ?? "—"}</td>
-                  <td className="p-2">{fact.numeric ?? "—"}</td>
-                  <td className="p-2">{fact.asOf ?? "—"}</td>
-                  <td className="p-2 max-w-[200px] truncate">{fact.source ?? "—"}</td>
-                  <td className="p-2 max-w-[200px] truncate">{fact.note ?? "—"}</td>
-                  <td className="p-2">{fact.computed ? "yes" : "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-sm text-gray-500">No facts for this entity</p>
         )}
       </Section>
 
