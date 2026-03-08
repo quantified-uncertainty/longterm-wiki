@@ -20,7 +20,7 @@ import type {
   MergeOutcome,
   PatrolConfig,
 } from './types.ts';
-import { appendJsonl, JSONL_FILE, log } from './state.ts';
+import { appendJsonl, cl, JSONL_FILE, log } from './state.ts';
 import {
   buildEnqueuedComment,
   buildEnqueueFailedComment,
@@ -35,7 +35,7 @@ export { libFindMergeCandidates as findMergeCandidates };
 // ── Undraft execution ────────────────────────────────────────────────────
 
 export async function undraftPr(prNum: number, config: PatrolConfig): Promise<boolean> {
-  log(`→ Undrafting PR #${prNum} (all eligibility checks pass)`);
+  log(`${cl.bold}→${cl.reset} Undrafting PR ${cl.cyan}#${prNum}${cl.reset} (all eligibility checks pass)`);
 
   try {
     // GitHub REST API doesn't support undrafting — must use GraphQL mutation
@@ -47,7 +47,7 @@ export async function undraftPr(prNum: number, config: PatrolConfig): Promise<bo
       { id: prData.node_id },
     );
 
-    log(`✓ PR #${prNum} marked as ready for review`);
+    log(`${cl.green}✓ PR #${prNum} marked as ready for review${cl.reset}`);
     appendJsonl(JSONL_FILE, {
       type: 'undraft_result',
       pr_num: prNum,
@@ -56,7 +56,7 @@ export async function undraftPr(prNum: number, config: PatrolConfig): Promise<bo
     return true;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    log(`✗ Failed to undraft PR #${prNum}: ${msg}`);
+    log(`${cl.red}✗ Failed to undraft PR #${prNum}: ${msg}${cl.reset}`);
     appendJsonl(JSONL_FILE, {
       type: 'undraft_result',
       pr_num: prNum,
@@ -131,11 +131,11 @@ export async function enqueuePr(
   candidate: MergeCandidate,
   config: PatrolConfig,
 ): Promise<MergeOutcome> {
-  log(`→ Enqueuing PR #${candidate.number} into merge queue (${candidate.title})`);
-  log(`  Branch: ${candidate.branch}`);
+  log(`${cl.bold}→${cl.reset} Enqueuing PR ${cl.cyan}#${candidate.number}${cl.reset} into merge queue (${candidate.title})`);
+  log(`  Branch: ${cl.dim}${candidate.branch}${cl.reset}`);
 
   if (config.dryRun) {
-    log('  [DRY RUN] Would enqueue this PR into the merge queue');
+    log(`  ${cl.dim}[DRY RUN] Would enqueue this PR into the merge queue${cl.reset}`);
     appendJsonl(JSONL_FILE, {
       type: 'merge_result',
       pr_num: candidate.number,
@@ -154,7 +154,7 @@ export async function enqueuePr(
       expectedHeadOid: candidate.headOid,
     });
 
-    log(`✓ PR #${candidate.number} added to merge queue`);
+    log(`${cl.green}✓ PR #${candidate.number} added to merge queue${cl.reset}`);
 
     await postEventComment(candidate.number, config.repo, buildEnqueuedComment())
       .catch((e2: unknown) => log(`  Warning: could not post enqueue comment: ${e2 instanceof Error ? e2.message : String(e2)}`));
@@ -167,7 +167,7 @@ export async function enqueuePr(
     return 'enqueued';
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    log(`✗ Failed to enqueue PR #${candidate.number}: ${msg}`);
+    log(`${cl.red}✗ Failed to enqueue PR #${candidate.number}: ${msg}${cl.reset}`);
 
     // The enqueue may have succeeded despite the thrown error (e.g. transport
     // error after GitHub accepted the mutation). Check actual queue state
