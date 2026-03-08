@@ -40,6 +40,7 @@ facts:
     property: education
     value: "Attended University of Toronto (did not complete degree); Thiel Fellow"
     source: https://colah.github.io/about.html
+    sourceResource: 632366427b7fcd19
     notes: "Received Thiel Fellowship in 2012; largely self-taught in deep learning"
 
   - id: f_cO4fG5hI6j

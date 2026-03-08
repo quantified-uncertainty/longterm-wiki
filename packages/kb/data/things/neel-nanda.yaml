@@ -13,6 +13,7 @@ facts:
     value: !ref A4XoubikkQ:deepmind
     asOf: 2023-01
     source: https://www.neelnanda.io/
+    sourceResource: 028435b427f72e06
     notes: "Research Scientist at Google DeepMind working on mechanistic interpretability"
 
   - id: f_oLC3AS7GeZ
@@ -20,6 +21,7 @@ facts:
     value: "Research Scientist, Google DeepMind"
     asOf: 2023-01
     source: https://www.neelnanda.io/
+    sourceResource: 028435b427f72e06
     notes: "Leading mechanistic interpretability research at DeepMind; previously at Anthropic; creator of TransformerLens library"
 
   - id: f_Gnpzguqlys

@@ -22,6 +22,7 @@ facts:
     value: 2.8e9
     asOf: "2024"
     source: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
+    sourceResource: 7ca35422b79c3ac9
     notes: "Total grants recommended 2017-2024 per annual reports"
 
   - id: f_cg_grants_2024
@@ -29,6 +30,7 @@ facts:
     value: 650e6
     asOf: "2024"
     source: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
+    sourceResource: 7ca35422b79c3ac9
     notes: "Annual grantmaking figure for 2024"
 
   # ── AI Safety Funding ─────────────────────────────────────────
@@ -36,18 +38,21 @@ facts:
     property: description
     value: "Cumulative AI safety grants (2017-2024): $336M (~12% of total giving)"
     source: https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation
+    sourceResource: b1ab921f9cbae109
     notes: "Per third-party LessWrong analysis; approximately 12% of $2.8B total giving"
 
   - id: f_cg_ai_safety_2023
     property: description
     value: "AI safety spending (2023): $46M"
     source: https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation
+    sourceResource: b1ab921f9cbae109
     notes: "Annual AI safety deployment; made it dominant external funder"
 
   - id: f_cg_ai_safety_2024
     property: description
     value: "AI safety spending (2024): $63.6M"
     source: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
+    sourceResource: 7ca35422b79c3ac9
     notes: "Reportedly ~60% of all external AI safety investment globally"
 
   - id: f_cg_ai_safety_rfp_2025
