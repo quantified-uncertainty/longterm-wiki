@@ -109,7 +109,7 @@ Two-stage approach:
 
 ```
 "White House AI Czar <EntityLink id="E431" name="david-sacks">John Smith</EntityLink> announced new regulations"
-"Anthropic's valuation reached <F id="6796e194" />"
+"Anthropic's valuation reached <KBFactValue entity="anthropic" property="valuation" />"
 "The model achieved {/* NEEDS CITATION */} impressive results"
 ```
 
@@ -117,7 +117,7 @@ Two-stage approach:
 
 **Three sub-types:**
 1. **`<EntityLink>` tags** — These are arguably acceptable if we render them later, but they make claim text ugly in non-rendering contexts (search, API responses, exports)
-2. **`<F>` canonical fact tags** — These resolve to dynamic values at render time. A claim containing `<F id="6796e194" />` is meaningless without the fact resolution pipeline. The claim should contain the actual value.
+2. **`<KBFactValue>` canonical fact tags** — These resolve to dynamic values at render time. A claim containing `<KBFactValue entity="anthropic" property="valuation" />` is meaningless without the KB resolution pipeline. The claim should contain the actual value.
 3. **MDX comments `{/* */}`** — These should never appear in claims. They indicate the extraction pulled in editorial notes.
 
 **Detection:**

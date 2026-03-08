@@ -54,7 +54,7 @@ Obsidian's Dataview plugin demonstrates dual metadata: YAML frontmatter for stru
 
 The critical pattern is that **inline annotations are write-once, read-many** — you write `Revenue:: $9.7B` once in a page, and queries on other pages display it. The annotation IS the single source of truth.
 
-**Lesson for us:** Self-closing `<F f="id" />` tags are exactly this pattern — an inline query pulling from structured YAML. The wrapping form `<F>...$9.7B...</F>` is the anti-pattern: it creates TWO sources of truth (YAML and display text).
+**Lesson for us:** Self-closing `<KBFactValue entity="x" property="y" />` tags are exactly this pattern — an inline query pulling from structured KB data. The wrapping form `<KBFactValue>...$9.7B...</KBFactValue>` is the anti-pattern: it creates TWO sources of truth (KB data and display text).
 
 ### Data Journalism (OWID, FiveThirtyEight)
 
@@ -72,12 +72,12 @@ Academic temporal knowledge graphs attach explicit timestamps to every fact: `(A
 
 Facts and Statements are **complementary, not competing** systems:
 
-- **Facts** (YAML) are the volatile numeric data layer — rendered via `\<F>` and `\<Calc>` components at build time, optimized for "update one YAML entry, correct 9 pages."
+- **Facts** (KB YAML) are the volatile numeric data layer — rendered via `\<KBFactValue>` and `\<Calc>` components at build time, optimized for "update one KB entry, correct 9 pages."
 - **Statements** (PostgreSQL) are the broader structured assertion layer — covering all assertion types (numeric, text, entity-valued, attributed) with property taxonomy, citations, and temporal validity.
 
-Statements link to Facts via `source_fact_key` (e.g., "anthropic.6796e194"), providing traceability without requiring migration of the YAML build-time pipeline. The property taxonomy in `data/fact-measures.yaml` is shared — it seeds the `properties` table that Statements use.
+Statements link to Facts via `source_fact_key` (e.g., "anthropic.valuation"), providing traceability without requiring migration of the KB build-time pipeline. The property taxonomy in KB property definitions is shared — it seeds the `properties` table that Statements use.
 
-**Long-term convergence**: Facts may eventually become a subset of Statements (numeric statements with canonical status), but the YAML → `\<F>` → build pipeline works well and doesn't need immediate migration.
+**Long-term convergence**: Facts may eventually become a subset of Statements (numeric statements with canonical status), but the KB YAML → `\<KBFactValue>` → build pipeline works well and doesn't need immediate migration.
 
 See <EntityLink id="E1006" name="statements-system-architecture">Statements System Architecture (E1006)</EntityLink> for the full Statements system reference.
 
@@ -99,26 +99,26 @@ When Anthropic raises a new round, updating one YAML entry should update the com
 
 ## Problems with the Current Approach
 
-### 1. Most `<F>` tags duplicate inline text and add no value
+### 1. Most `<KBFactValue>` tags should use self-closing form
 
-81% of existing `<F>` usages are wrapping form — the display text is hardcoded in the MDX:
+The wrapping form duplicates the display text in the MDX:
 
 ```mdx
 {/* Wrapping form — the number is hardcoded in display text */}
-xAI raised <F e="xai" f="6d5128e4">\$26 billion</F> in funding
+xAI raised <KBFactValue entity="xai" property="total-funding">\$26 billion</KBFactValue> in funding
 
-{/* If YAML updates to $30B, display still says "$26 billion" */}
+{/* If KB updates to $30B, display still says "$26 billion" */}
 ```
 
-This is worse than plain text: it adds JSX complexity without providing the core benefit of single-source-of-truth updates.
+This is worse than plain text: it adds JSX complexity without providing the core benefit of single-source-of-truth updates. Prefer the self-closing form: `<KBFactValue entity="xai" property="total-funding" />`.
 
 ### 2. The enrichment pipeline tags numbers indiscriminately
 
 `crux enrich fact-refs` uses an LLM to match inline numbers to facts, but it has no judgment about whether tagging adds value. It wraps benchmark scores (will never change), historical funding amounts (fixed in time), and random contextual numbers.
 
-### 3. Entity ID syntax is inconsistent and unnecessarily verbose
+### 3. Entity and property naming is now consistent
 
-`<F e="ssi" f="a0502d56">` uses entity slugs, while `EntityLink` uses numeric IDs like `E338`. The `e` attribute is also technically unnecessary since fact hash IDs are globally unique — entity can be resolved at build time.
+`<KBFactValue entity="ssi" property="headcount">` uses entity slugs and human-readable property names, aligning with KB conventions. `EntityLink` continues to use numeric IDs like `E338` for entity pages.
 
 ### 4. The extraction pipeline creates too many low-value facts
 
@@ -144,50 +144,39 @@ Examples of bad facts: founding dates, historical funding round amounts, benchma
 
 **Target scope:** \~50 volatile facts across 8-10 entities, down from 139 facts across 18 entities.
 
-### Self-closing `<F>` is the only acceptable inline form
+### Self-closing `<KBFactValue>` is the only acceptable inline form
 
-Self-closing `<F f="id" />` must be the default and strongly-preferred form:
+Self-closing `<KBFactValue entity="x" property="y" />` must be the default and strongly-preferred form:
 
 ```mdx
-{/* Correct — value comes from YAML, updates automatically */}
-xAI is valued at <F f="99a5a666" /> as of its Series E round.
+{/* Correct — value comes from KB, updates automatically */}
+xAI is valued at <KBFactValue entity="xai" property="valuation" /> as of its Series E round.
 
 {/* Wrong — value is hardcoded, defeats the purpose */}
-xAI is valued at <F e="xai" f="99a5a666">\$230 billion</F> as of its Series E round.
+xAI is valued at <KBFactValue entity="xai" property="valuation">\$230 billion</KBFactValue> as of its Series E round.
 ```
 
-Wrapping form should only be used when the prose requires a format that cannot be expressed via the `format` prop (see below). Even then, consider whether the number should just be plain text instead.
+Wrapping form should only be used when the prose requires a format that cannot be expressed via the component's formatting. Even then, consider whether the number should just be plain text instead.
 
-### Make `e` (entity) optional
+### Entity and property are both required
 
-Since fact IDs are globally unique 8-char hashes, the entity can be resolved at build time:
+The `<KBFactValue>` component requires both `entity` (slug) and `property` (human-readable name):
 
 ```mdx
-{/* Current — redundant entity ID */}
-<F e="anthropic" f="6796e194" />
-
-{/* Proposed — entity looked up from fact database */}
-<F f="6796e194" />
+<KBFactValue entity="anthropic" property="valuation" />
+<KBFactValue entity="anthropic" property="revenue" asOf="2025-12" />
 ```
 
-The `e` attribute becomes an optional readability hint for authors reading the MDX source. It should not be required by the component.
+### Display format control
 
-### Add a `format` prop for display variants
-
-The `<F>` component should support format variants to handle prose vs. table contexts:
+The `<KBFactValue>` component uses KB property display rules for formatting. For historical values, use the `asOf` prop:
 
 ```mdx
-{/* Default — uses measure's display rules: "$380B" */}
-<F f="6796e194" />
+{/* Latest value */}
+<KBFactValue entity="anthropic" property="valuation" />
 
-{/* Short — abbreviated: "$380B" (explicit, same as default for most measures) */}
-<F f="6796e194" format="short" />
-
-{/* Long — written out: "$380 billion" */}
-<F f="6796e194" format="long" />
-
-{/* Raw — just the number: "380000000000" (for Calc inputs) */}
-<F f="6796e194" format="raw" />
+{/* Specific historical value */}
+<KBFactValue entity="anthropic" property="valuation" asOf="2025-11" />
 ```
 
 Format rules would be defined per-measure in `fact-measures.yaml`:
@@ -315,7 +304,7 @@ Each phase is gated on the previous phase working reliably. Start with detection
 
 ### Q2: Should the enrichment pipeline be removed or repurposed?
 
-**Answer: Repurpose.** Kill the wrapping behavior (which produces the 81% low-value tags). Rebuild as a migration tool: scan MDX for hardcoded numbers that match existing fact values, and propose replacements with self-closing `<F f="id" />` tags. This is the inverse of what it does now — instead of adding redundant wrappers, it removes hardcoded values.
+**Answer: Repurpose.** Kill the wrapping behavior (which produces the 81% low-value tags). Rebuild as a migration tool: scan MDX for hardcoded numbers that match existing KB fact values, and propose replacements with self-closing `<KBFactValue entity="x" property="y" />` tags. This is the inverse of what it does now — instead of adding redundant wrappers, it removes hardcoded values.
 
 ### Q3: How should facts interact with the auto-update system?
 
@@ -323,4 +312,4 @@ Each phase is gated on the previous phase working reliably. Start with detection
 
 ### Q4: What's the right display format for self-closing `<F>` tags?
 
-**Answer: Add a `format` prop.** Default uses measure display rules (usually short like "\$380B"). `format="long"` produces written-out form ("\$380 billion"). `format="raw"` gives the numeric value for `<Calc>` inputs. This eliminates the main reason people use wrapping form (to control display text).
+**Answer:** The `<KBFactValue>` component uses KB property display rules for formatting. The `asOf` prop handles historical values. This eliminates the main reason people use wrapping form (to control display text).
