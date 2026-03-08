@@ -71,7 +71,7 @@ facts:
     notes: "Grant to establish Biohub New York focused on infectious disease"
 
   - id: f_czi_gpu_cluster_2024
-    property: infrastructure-investment
+    property: gpu-count
     value: 1024
     asOf: "2024"
     source: https://chanzuckerberg.com/rfa/ai-computing-gpu/
@@ -79,7 +79,7 @@ facts:
     notes: "NVIDIA H100 DGX SuperPOD cluster (1,024 GPUs) for life sciences AI"
 
   - id: f_czi_gpu_planned_2028
-    property: infrastructure-investment
+    property: gpu-count
     value: 10000
     asOf: "2025"
     source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
