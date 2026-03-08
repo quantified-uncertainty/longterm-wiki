@@ -47,8 +47,9 @@ facts:
     property: equity-stake-percent
     value: 1.65
     asOf: "2026"
-    notes: "Estimated 0.8-2.5% Anthropic equity (midpoint used); seed and Series A participant; $500M portion moved to nonprofit Nov 2025"
+    notes: "Estimate; no primary source available. Estimated 0.8-2.5% Anthropic equity (midpoint used); seed and Series A participant; $500M portion moved to nonprofit Nov 2025"
 
   - id: f_dm_lifetime_giving
     property: description
     value: "Lifetime philanthropic giving (2011-2025): $4B+ through Good Ventures"
+    notes: "Estimate; no primary source available. Aggregated from Open Philanthropy grant database and public reporting"

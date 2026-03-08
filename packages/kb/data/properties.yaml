@@ -353,6 +353,8 @@ properties:
     category: financial
     temporal: true
     appliesTo: [organization]
+    display:
+      suffix: "%"
 
   customer-concentration:
     name: Customer Concentration
@@ -362,6 +364,8 @@ properties:
     category: financial
     temporal: true
     appliesTo: [organization]
+    display:
+      suffix: "%"
 
   infrastructure-investment:
     name: Infrastructure Investment
@@ -384,6 +388,8 @@ properties:
     category: financial
     temporal: true
     appliesTo: [person, organization]
+    display:
+      suffix: "%"
 
   equity-value:
     name: Equity Value
@@ -408,6 +414,8 @@ properties:
     category: safety
     temporal: true
     appliesTo: [organization]
+    display:
+      suffix: "%"
 
   # ── Product & Technical ──────────────────────────────────────
 

@@ -63,11 +63,10 @@ facts:
     notes: "Total expenses for fiscal year 2024 per ProPublica filing"
 
   - id: f_miri_net_assets_2024
-    property: total-funding
-    value: 15242215
-    asOf: "2024"
+    property: description
+    value: "Net assets (2024): $15,242,215"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
-    notes: "Net assets as of 2024; implies ~2 years operational runway"
+    notes: "Net assets per ProPublica filing, not total funding raised; implies ~2 years operational runway"
 
   - id: f_miri_headcount_2024
     property: headcount

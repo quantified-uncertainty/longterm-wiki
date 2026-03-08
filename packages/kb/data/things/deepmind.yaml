@@ -63,8 +63,8 @@ facts:
   - id: f_gemini_context_window
     property: context-window
     value: 2000000
-    asOf: 2024-02
-    notes: "Gemini 1.5 maximum context window length (2M tokens)"
+    asOf: 2024-05
+    notes: "Gemini 1.5 Pro 2M token context window; launched Feb 2024 with 1M tokens, expanded to 2M in May 2024"
 
 items:
   key-people:

@@ -107,13 +107,13 @@ facts:
     property: total-funding
     value: 4.4e9
     asOf: 2023-10
-    notes: "After Google $2B investment and Amazon first tranche"
+    notes: "Estimate; no published source. After Google $2B investment and Amazon first tranche"
 
   - id: f_fund_2025_07
     property: total-funding
     value: 15e9
     asOf: 2025-07
-    notes: "Approximate cumulative through Series F"
+    notes: "Estimate; no published source. Approximate cumulative through Series F"
 
   - id: f_sQ2kP9nZ4r
     property: total-funding
@@ -267,13 +267,13 @@ facts:
     property: safety-researcher-count
     value: 265
     asOf: 2025-12
-    notes: "Estimated 200-330 across interpretability, alignment science, policy, trust & safety; ~20-30% of technical staff"
+    notes: "Estimate; no published source. Estimated 200-330 across interpretability, alignment science, policy, trust & safety; ~20-30% of technical staff"
 
   - id: f_interp_team
     property: interpretability-team-size
     value: 50
     asOf: 2025-12
-    notes: "Estimated 40-60 researchers; among the largest concentrations globally"
+    notes: "Estimate; no published source. Estimated 40-60 researchers; among the largest concentrations globally"
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_val_2025_11
@@ -298,13 +298,13 @@ facts:
     property: customer-concentration
     value: 25
     asOf: "2025"
-    notes: "Revenue share from top customers (Cursor, GitHub Copilot); estimate based on reporting"
+    notes: "Estimate; no published source. Revenue share from top customers (Cursor, GitHub Copilot); inferred from reporting"
 
   - id: f_safety_staffing_ratio_2025
     property: safety-staffing-ratio
     value: 25
     asOf: "2025"
-    notes: "Estimate 20-30% of technical staff in safety-related roles; no published source"
+    notes: "Estimate; no published source. 20-30% of technical staff in safety-related roles"
 
   - id: f_infra_investment_2026
     property: infrastructure-investment
@@ -350,12 +350,12 @@ facts:
     property: equity-stake-percent
     value: 1.15
     asOf: 2026-02
-    notes: "Jaan Tallinn equity stake estimated 0.6-1.7% (midpoint used); Series A lead position"
+    notes: "Estimate; no published source. Jaan Tallinn equity stake estimated 0.6-1.7% (midpoint used); Series A lead position"
 
   - id: f_ea_aligned_capital
     property: description
     value: "EA-aligned capital (risk-adjusted): $27-76B estimated"
-    notes: "Risk-adjusted estimate of EA-aligned philanthropic capital from all Anthropic stakeholders"
+    notes: "Estimate; no published source. Risk-adjusted estimate of EA-aligned philanthropic capital from all Anthropic stakeholders"
 
 items:
   # ── Funding Rounds ──────────────────────────────────────────────
