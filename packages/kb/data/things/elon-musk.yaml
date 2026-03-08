@@ -63,6 +63,16 @@ facts:
     value: "@elonmusk"
     source: https://x.com/elonmusk
 
+  # ── Migrated from old facts system ─────────────────────────────
+  - id: f_em_openai_contribution
+    property: description
+    value: "Actual OpenAI contribution by 2020: $44M (vs $1B pledge)"
+    notes: "Per public reporting"
+
+  - id: f_em_openai_lawsuit
+    property: description
+    value: "Damages sought in Musk v. OpenAI expanded lawsuit (Aug 2024): $134.5B (racketeering claims)"
+
 items:
   career-history:
     type: career-entry

@@ -116,6 +116,36 @@ facts:
     asOf: 2025-12
     notes: "Approximate gross margin; lower than Anthropic due to heavier compute usage"
 
+  # ── Migrated from old facts system ─────────────────────────────
+  - id: f_gpt3_parameters
+    property: model-parameters
+    value: 175e9
+    asOf: 2020-06
+    source: https://arxiv.org/abs/2005.14165
+    notes: "GPT-3 parameter count. sourceResource: 2cab3ea10b8b7ae2"
+
+  - id: f_o1_aime_score
+    property: benchmark-score
+    value: 83
+    asOf: 2024-09
+    notes: "o1 model performance on AIME math competition. sourceResource: 9edf2bd5938d8386"
+
+  - id: f_o1_swe_bench
+    property: benchmark-score
+    value: 71.7
+    asOf: 2024-09
+    notes: "o1 model on SWE-bench Verified. sourceResource: 9edf2bd5938d8386"
+
+  - id: f_revenue_growth_2024
+    property: description
+    value: "Monthly revenue growth from early 2023 to September 2024: 1,700%"
+    notes: "Not single-year YoY; reflects rapid growth from near-zero base. sourceResource: 9437e7cf32e629df"
+
+  - id: f_cofounder_departure
+    property: description
+    value: "75% of co-founders departed within 9 years of founding (by 2024)"
+    notes: "sourceResource: 85ba042a002437a0"
+
 items:
   funding-rounds:
     type: funding-round

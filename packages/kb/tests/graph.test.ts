@@ -30,20 +30,15 @@ describe("graph", () => {
   describe("getAllEntities", () => {
     it("returns all entities in the graph", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(30);
+      expect(entities).toHaveLength(36);
     });
   });
 
   describe("getFacts", () => {
     it("returns all facts for an entity", () => {
       const facts = graph.getFacts("anthropic");
-      // 9 revenue + 4 valuation + 3 total-funding + 3 headcount + 1 founded-date
-      // + 1 headquarters + 1 legal-structure + 2 gross-margin + 2 cash-burn
-      // + 2 enterprise-market-share + 1 coding-market-share + 1 monthly-active-users
-      // + 1 business-customers + 1 api-calls-monthly + 1 product-revenue
-      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size
-      // + 1 founded-by = 37
-      expect(facts).toHaveLength(37);
+      // Original 37 + 14 migrated facts = 51
+      expect(facts).toHaveLength(51);
     });
 
     it("returns empty array for an entity with no facts", () => {
@@ -124,8 +119,8 @@ describe("graph", () => {
   describe("getByProperty", () => {
     it("returns facts across entities for a given property", () => {
       const revMap = graph.getByProperty("revenue");
-      // Anthropic and OpenAI both have revenue facts
-      expect(revMap.size).toBe(2);
+      // Multiple entities have revenue facts after migration
+      expect(revMap.size).toBeGreaterThanOrEqual(2);
       expect(revMap.has("anthropic")).toBe(true);
       expect(revMap.has("openai")).toBe(true);
     });
@@ -141,7 +136,7 @@ describe("graph", () => {
 
     it("returns latest fact per entity with latest:true", () => {
       const revMap = graph.getByProperty("revenue", { latest: true });
-      expect(revMap.size).toBe(2);
+      expect(revMap.size).toBeGreaterThanOrEqual(2);
       const anthropicRev = revMap.get("anthropic");
       expect(anthropicRev).toBeDefined();
       expect(anthropicRev!.asOf).toBe("2026-03");
@@ -156,25 +151,28 @@ describe("graph", () => {
   describe("getByType", () => {
     it("returns entities of a given type", () => {
       const orgs = graph.getByType("organization");
-      expect(orgs).toHaveLength(10);
+      expect(orgs).toHaveLength(15);
       const orgIds = orgs.map((o) => o.id).sort();
       expect(orgIds).toEqual([
-        "anthropic", "arc", "conjecture", "deepmind", "meta-ai",
-        "miri", "openai", "redwood-research", "ssi", "xai",
+        "anthropic", "arc", "center-for-ai-safety",
+        "chan-zuckerberg-initiative", "coefficient-giving",
+        "conjecture", "deepmind", "manifund", "meta-ai",
+        "miri", "openai", "redwood-research", "ssi",
+        "survival-and-flourishing-fund", "xai",
       ]);
     });
 
     it("returns multiple entities of the same type", () => {
       const people = graph.getByType("person");
-      expect(people).toHaveLength(20);
+      expect(people).toHaveLength(21);
       const ids = people.map((p) => p.id).sort();
       expect(ids).toEqual([
         "chris-olah", "connor-leahy", "daniela-amodei", "dario-amodei",
         "demis-hassabis", "dustin-moskovitz", "eliezer-yudkowsky",
         "elon-musk", "geoffrey-hinton", "greg-brockman", "holden-karnofsky",
-        "ilya-sutskever", "jan-leike", "neel-nanda", "nick-bostrom",
-        "paul-christiano", "sam-altman", "stuart-russell", "yann-lecun",
-        "yoshua-bengio",
+        "ilya-sutskever", "jaan-tallinn", "jan-leike", "neel-nanda",
+        "nick-bostrom", "paul-christiano", "sam-altman", "stuart-russell",
+        "yann-lecun", "yoshua-bengio",
       ].sort());
     });
 

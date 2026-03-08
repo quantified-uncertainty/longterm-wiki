@@ -41,6 +41,86 @@ facts:
     asOf: 2024-12
     notes: "Estimated 1,000-2,000 AI researchers across FAIR and Meta GenAI teams; exact figure not publicly disclosed"
 
+  # ── Migrated from old facts system ─────────────────────────────
+  - id: f_meta_ai_mau_2025
+    property: user-count
+    value: 1e9
+    asOf: 2025-03
+    source: https://resourcera.com/data/artificial-intelligence/meta-ai-users/
+    notes: "Over 1 billion monthly active users across Meta platforms"
+
+  - id: f_whatsapp_ai_users
+    property: user-count
+    value: 630e6
+    asOf: 2025-03
+    source: https://resourcera.com/data/artificial-intelligence/meta-ai-users/
+    notes: "630M active AI users on WhatsApp, representing 63% of all Meta AI interactions"
+
+  - id: f_meta_capex_2025
+    property: infrastructure-investment
+    value: 69e9
+    asOf: "2025"
+    source: https://about.fb.com/news/2026/01/2026-ai-drives-performance/
+    notes: "$66-72B capital expenditure for AI infrastructure in 2025 (midpoint used)"
+
+  - id: f_meta_capex_2026
+    property: infrastructure-investment
+    value: 125e9
+    asOf: "2026"
+    source: https://about.fb.com/news/2026/01/2026-ai-drives-performance/
+    notes: "Projected $115-135B CapEx for 2026 (midpoint used); includes Meta Superintelligence Labs and Prometheus supercluster"
+
+  - id: f_reality_labs_losses
+    property: cash-burn
+    value: 70e9
+    asOf: 2026-01
+    source: https://www.cnbc.com/2026/01/13/meta-lays-off-vr-employees-underscoring-zuckerbergs-pivot-to-ai.html
+    notes: "Reality Labs cumulative losses since late 2020; cited at time of January 2026 layoffs"
+
+  - id: f_meta_revenue_2025
+    property: revenue
+    value: 200.97e9
+    asOf: "2025"
+    notes: "Meta Platforms parent company FY 2025 total revenue"
+
+  - id: f_meta_headcount_2025
+    property: headcount
+    value: 78800
+    asOf: 2025-12
+    notes: "Meta Platforms parent company total headcount Q4 2025"
+
+  - id: f_llama_downloads
+    property: user-count
+    value: 1e9
+    asOf: 2025-04
+    source: https://medium.com/@tarifabeach/metas-llamacon-2025-redefining-the-future-of-open-source-ai-fa6551826e50
+    notes: "LLaMA model family 1 billion+ downloads; announced at LlamaCon April 29, 2025"
+
+  - id: f_pytorch_market_share
+    property: market-share
+    value: 63
+    asOf: "2025"
+    source: https://www.metacareers.com/blog/how-pytorch-unlocks-ai-research-and-productization-at-scale
+    notes: "63% of training models globally use PyTorch"
+
+  - id: f_hyperion_investment
+    property: infrastructure-investment
+    value: 27e9
+    asOf: 2025-10
+    source: https://fortune.com/2025/10/31/metas-27-billion-bet-turns-ai-compute-into-wall-streets-hottest-new-investment/
+    notes: "$27B partnership with Blue Owl Capital for Hyperion data center project"
+
+  - id: f_ami_labs_valuation
+    property: description
+    value: "AMI Labs (Yann LeCun) seeking ~$3.5B valuation in fundraising talks (2025)"
+    source: https://fortune.com/2025/12/19/yann-lecun-ami-labs-ai-startup-valuation-meta-departure/
+    notes: "Separate entity from Meta AI"
+
+  - id: f_mtia_cost_reduction
+    property: description
+    value: "MTIA v3 Iris: 40-44% cost reduction vs GPUs for total cost of ownership (2026)"
+    source: https://markets.financialcontent.com/stocks/article/tokenring-2026-2-5-silicon-sovereignty-meta-charges-into-2026-with-iris-mtia-rollout-and-rapid-custom-chip-roadmap
+
 items:
   key-people:
     type: key-person

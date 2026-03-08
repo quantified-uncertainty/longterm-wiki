@@ -49,6 +49,23 @@ facts:
     asOf: 2025-06
     notes: "Estimated 100-150 researchers working on AI safety, alignment, and responsible AI across multiple teams"
 
+  # ── Migrated from old facts system (google-deepmind.yaml) ──────
+  - id: f_alphafold_structures
+    property: description
+    value: "AlphaFold database: 200M+ protein structures predicted and freely available (2023)"
+    notes: "Number of protein structures predicted by AlphaFold"
+
+  - id: f_gnome_materials
+    property: description
+    value: "GNoME AI discovered 380,000 new stable materials (2023)"
+    notes: "Number of new stable materials discovered by GNoME AI system"
+
+  - id: f_gemini_context_window
+    property: context-window
+    value: 2000000
+    asOf: 2024-02
+    notes: "Gemini 1.5 maximum context window length (2M tokens)"
+
 items:
   key-people:
     type: key-person
