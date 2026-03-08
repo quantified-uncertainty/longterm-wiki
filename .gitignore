@@ -56,6 +56,7 @@ test-results/
 .claude/agent-id
 .claude/last-heartbeat
 .claude/review-done
+.claude/worktree-cleanup.log
 
 # MCP config (contains tokens)
 .mcp.json
