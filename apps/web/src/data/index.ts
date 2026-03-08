@@ -38,28 +38,6 @@ interface IdRegistryMaps {
   bySlug: Record<string, string>; // slug → E1
 }
 
-/**
- * Legacy Fact interface — kept solely as a bridge type for calc-engine.
- * Not backed by any database collection; database.facts is always empty.
- * The old facts pipeline has been retired. New code should use KB data instead.
- */
-export interface Fact {
-  value?: string;
-  numeric?: number;
-  low?: number;
-  high?: number;
-  asOf?: string;
-  label?: string;
-  source?: string;
-  sourceResource?: string;
-  sourceTitle?: string;
-  sourcePublication?: string;
-  sourceCredibility?: number;
-  note?: string;
-  entity: string;
-  factId: string;
-}
-
 /** Raw entity shape as stored in database.json (before transformation) */
 interface RawEntity {
   id: string;

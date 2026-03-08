@@ -1,40 +1,31 @@
 import { describe, it, expect } from "vitest";
-import { calc, formatValue, type CalcFormat } from "../calc-engine";
-import type { Fact } from "@/data";
+import { calc, formatValue, type CalcFormat, type CalcFact } from "../calc-engine";
 
 // Mock fact store — fact IDs are 8-char hex hashes
-const mockFacts: Record<string, Fact> = {
+const mockFacts: Record<string, CalcFact> = {
   "anthropic.6796e194": {
     value: "$380 billion",
     numeric: 380_000_000_000,
     asOf: "2026-02",
-    entity: "anthropic",
-    factId: "6796e194",
   },
   "anthropic.55d88868": {
     value: "$9 billion",
     numeric: 9_000_000_000,
     asOf: "2025-12",
-    entity: "anthropic",
-    factId: "55d88868",
   },
   "anthropic.a1e87600": {
     value: "40%",
     numeric: 0.4,
     asOf: "2025",
-    entity: "anthropic",
-    factId: "a1e87600",
   },
   "anthropic.7a3815b4": {
     value: "300,000+",
     numeric: 300_000,
     asOf: "2025",
-    entity: "anthropic",
-    factId: "7a3815b4",
   },
 };
 
-function mockLookup(entity: string, factId: string): Fact | undefined {
+function mockLookup(entity: string, factId: string): CalcFact | undefined {
   return mockFacts[`${entity}.${factId}`];
 }
 
@@ -207,32 +198,25 @@ describe("formatValue", () => {
 // ────────────────────────────────────────────────────────────
 
 describe("calc — KB-style property references", () => {
-  // Simulates what combinedFactLookup produces when resolving KB facts
-  const kbFacts: Record<string, Fact> = {
+  const kbFacts: Record<string, CalcFact> = {
     "anthropic.valuation": {
       value: "$380 billion",
       numeric: 380_000_000_000,
       asOf: "2026-02",
-      entity: "anthropic",
-      factId: "valuation",
     },
     "anthropic.revenue": {
       value: "$9 billion",
       numeric: 9_000_000_000,
       asOf: "2025-12",
-      entity: "anthropic",
-      factId: "revenue",
     },
     "anthropic.gross-margin": {
       value: "40%",
       numeric: 0.4,
       asOf: "2025",
-      entity: "anthropic",
-      factId: "gross-margin",
     },
   };
 
-  function kbLookup(entity: string, factId: string): Fact | undefined {
+  function kbLookup(entity: string, factId: string): CalcFact | undefined {
     return kbFacts[`${entity}.${factId}`];
   }
 
@@ -271,7 +255,7 @@ describe("calc — KB-style property references", () => {
 
   it("works with combined old and KB lookups (fallback pattern)", () => {
     // Simulate the combinedFactLookup: old system first, KB fallback
-    function combinedLookup(entity: string, factId: string): Fact | undefined {
+    function combinedLookup(entity: string, factId: string): CalcFact | undefined {
       return mockLookup(entity, factId) ?? kbLookup(entity, factId);
     }
 
