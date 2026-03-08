@@ -42,8 +42,8 @@ This page covers Anthropic valuation analysis. For company overview, see <Entity
 | **Revenue (Run Rate)** | <KBF entity="anthropic" property="revenue">\$14B</KBF> (Feb 2026) | <KBF entity="openai" property="revenue">\$20B</KBF> (Jan 2026) | OpenAI 1.4x higher |
 | **Revenue Multiple** | <Calc expr="{anthropic.valuation} / {anthropic.revenue}" precision={0} suffix="x" /> | <Calc expr="{openai.valuation} / {openai.revenue}" precision={0} prefix="≈" suffix="x" />, ≈41x (at \$830B) | Near parity |
 | **Gross Margin** | <KBF entity="anthropic" property="gross-margin">40%</KBF> (revised down) | 40-50% (70% compute margin) | Similar, both under pressure |
-| **Enterprise Retention** | <KBF entity="anthropic" property="retention-rate">88%</KBF> | Unknown | Anthropic above industry (<KBF entity="anthropic" property="retention-rate-industry">76%</KBF> avg) |
-| **Path to Breakeven** | <KBF entity="anthropic" property="breakeven-target">2028</KBF> | Unknown | Anthropic more transparent |
+| **Enterprise Retention** | 88% | Unknown | Anthropic above industry (76% avg) |
+| **Path to Breakeven** | 2028 | Unknown | Anthropic more transparent |
 
 ## Overview
 
@@ -51,7 +51,7 @@ This page covers Anthropic valuation analysis. For company overview, see <Entity
 
 This page provides an investment-grade analysis of scenarios across different outcomes, incorporating data on customer concentration, margin pressure, and competitive dynamics.[^cr-e56b]
 
-**Updated thesis**: The revenue multiple gap between Anthropic and OpenAI has narrowed substantially (<Calc expr="{anthropic.valuation} / {anthropic.revenue}" precision={0} suffix="x" /> vs 25x). The remaining difference may reflect enterprise performance metrics (<KBF entity="anthropic" property="retention-rate">88%</KBF> retention, 80% enterprise revenue, 500+ million-dollar customers) and coding benchmark positioning—or may indicate persistent valuation risk given customer concentration and margin compression.
+**Updated thesis**: The revenue multiple gap between Anthropic and OpenAI has narrowed substantially (<Calc expr="{anthropic.valuation} / {anthropic.revenue}" precision={0} suffix="x" /> vs 25x). The remaining difference may reflect enterprise performance metrics (88% retention, 80% enterprise revenue, 500+ million-dollar customers) and coding benchmark positioning—or may indicate persistent valuation risk given customer concentration and margin compression.
 
 ## Current Valuation Context
 
@@ -70,7 +70,7 @@ This page provides an investment-grade analysis of scenarios across different ou
 
 | Company | 2024 | 2025 | Current Run Rate | 2026 (Guidance) | 2027 (Projected) |
 |---------|------|------|-----------------|-----------------|------------------|
-| **Anthropic** | <KBF entity="anthropic" property="revenue" asOf="2024-12">\$1B</KBF> | <KBF entity="anthropic" property="revenue" asOf="2025-12">\$9B</KBF> | <KBF entity="anthropic" property="revenue">\$14B</KBF> (Feb 2026) | <KBF entity="anthropic" property="revenue-guidance">\$20-26B</KBF> | \$34.5B |
+| **Anthropic** | <KBF entity="anthropic" property="revenue" asOf="2024-12">\$1B</KBF> | <KBF entity="anthropic" property="revenue" asOf="2025-12">\$9B</KBF> | <KBF entity="anthropic" property="revenue">\$14B</KBF> (Feb 2026) | \$20-26B | \$34.5B |
 | **OpenAI** | \$6B | <KBF entity="openai" property="revenue">\$20B</KBF> | <KBF entity="openai" property="revenue">\$20B</KBF> (Jan 2026) | \$46B (2.3x) | \$92B (2x) |
 
 Both companies are growing rapidly. OpenAI projects reaching \$100B revenue by 2028.[^cr-9e97]
@@ -96,12 +96,12 @@ Anthropic's enterprise metrics exceed industry benchmarks:
 
 | Metric | Anthropic | Industry Average | Difference |
 |--------|-----------|------------------|-----------|
-| **Enterprise retention** | <KBF entity="anthropic" property="retention-rate">88%</KBF> | <KBF entity="anthropic" property="retention-rate-industry">76%</KBF> | +12 percentage points |
+| **Enterprise retention** | 88% | 76% | +12 percentage points |
 | **Revenue from enterprise** | 80% | Varies | High-quality revenue |
 | **Multi-year commitments** | Growing | Uncommon | Improved forecasting |
 | **Large accounts (>\$100K)** | 7x YoY growth | — | Expansion pattern |
 
-The <KBF entity="anthropic" property="retention-rate">88%</KBF> retention rate indicates product-market fit and switching costs. Enterprise contracts include SLA guarantees, compliance certifications (HIPAA, SOC 2 Type II, ISO 27001), and custom data retention policies that create lock-in.[^cr-4dc1][^cr-98de]
+The 88% retention rate indicates product-market fit and switching costs. Enterprise contracts include SLA guarantees, compliance certifications (HIPAA, SOC 2 Type II, ISO 27001), and custom data retention policies that create lock-in.[^cr-4dc1][^cr-98de]
 
 ### 2. Coding Benchmark Performance
 
@@ -152,7 +152,7 @@ Anthropic's founding team includes researchers from <EntityLink id="E218" name="
 
 **Team Scale:**
 - Interpretability team: <KBF entity="anthropic" property="interpretability-team-size">40-60</KBF> researchers (largest globally)
-- Safety researchers: <KBF entity="anthropic" property="safety-researcher-count">200-330</KBF> (<KBF entity="anthropic" property="safety-staffing-ratio">20-30%</KBF> of technical staff)
+- Safety researchers: <KBF entity="anthropic" property="safety-researcher-count">200-330</KBF> (20-30% of technical staff)
 
 ### 5. Open Source Competition Dynamics
 
@@ -176,9 +176,9 @@ Anthropic's revenue shows concentration in two customers:
 |----------|-------------------|----------------|
 | **Cursor** | ≈\$600M | ≈13% |
 | **GitHub Copilot** | ≈\$600M | ≈13% |
-| **Combined** | ≈\$1.2B | <KBF entity="anthropic" property="customer-concentration">≈25%+</KBF> |
+| **Combined** | ≈\$1.2B | ≈25%+ |
 
-Approximately <KBF entity="anthropic" property="customer-concentration">25%</KBF> of Anthropic's revenue comes from two coding tool customers. If either relationship ends or shifts to a competitor, revenue would decline. This concentration in AI-assisted coding also means Anthropic is vulnerable to disruption in that specific market.[^cr-4b92]
+Approximately 25% of Anthropic's revenue comes from two coding tool customers. If either relationship ends or shifts to a competitor, revenue would decline. This concentration in AI-assisted coding also means Anthropic is vulnerable to disruption in that specific market.[^cr-4b92]
 
 ### 2. Gross Margin Revision
 
@@ -274,10 +274,10 @@ AI companies operate with structurally lower margins than traditional SaaS due t
 | Milestone | Anthropic | OpenAI |
 |-----------|-----------|--------|
 | **Stop burning cash** | 2027 | Unknown |
-| **Breakeven** | <KBF entity="anthropic" property="breakeven-target">2028</KBF> | "Years away" |
+| **Breakeven** | 2028 | "Years away" |
 | **Positive FCF** | 2027 (projected \$17B by 2028) | Unknown |
 
-Anthropic projects reaching <KBF entity="anthropic" property="breakeven-target">breakeven in 2028</KBF>, which provides visibility into profitability timeline.[^cr-a5a0]
+Anthropic projects reaching breakeven in 2028, which provides visibility into profitability timeline.[^cr-a5a0]
 
 ## Implications for Stakeholders
 
