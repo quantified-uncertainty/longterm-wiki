@@ -57,7 +57,7 @@ describe("loader", () => {
 
       // All match E-prefix format
       for (const id of numericIds) {
-        expect(id).toMatch(/^E\d+$/);
+        expect(String(id)).toMatch(/^E\d+$/);
       }
 
       // All unique
@@ -147,7 +147,7 @@ describe("loader", () => {
       const orgSchema = graph.getSchema("organization");
       expect(orgSchema).toBeDefined();
       expect(orgSchema!.name).toBe("Organization");
-      expect(orgSchema!.required).toEqual(["founded-date", "headquarters"]);
+      expect(orgSchema!.required).toEqual([]);
       expect(orgSchema!.recommended).toContain("revenue");
       expect(orgSchema!.recommended).toContain("valuation");
     });

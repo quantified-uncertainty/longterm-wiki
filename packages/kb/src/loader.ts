@@ -264,6 +264,12 @@ function parseSchema(raw: unknown): TypeSchema {
   };
 }
 
+/** Coerce numericId to a string with E prefix (YAML may parse bare numbers like 1100). */
+function normalizeNumericId(raw: string | number): string {
+  const s = String(raw);
+  return s.startsWith("E") ? s : `E${s}`;
+}
+
 function parseEntity(raw: EntityFile["thing"]): Entity {
   return {
     id: raw.id,
@@ -273,7 +279,9 @@ function parseEntity(raw: EntityFile["thing"]): Entity {
     ...(raw.parent !== undefined && { parent: raw.parent }),
     ...(raw.aliases !== undefined && { aliases: raw.aliases }),
     ...(raw.previousIds !== undefined && { previousIds: raw.previousIds }),
-    ...(raw.numericId !== undefined && { numericId: raw.numericId }),
+    ...(raw.numericId !== undefined && {
+      numericId: normalizeNumericId(raw.numericId),
+    }),
   };
 }
 

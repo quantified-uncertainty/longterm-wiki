@@ -4,8 +4,8 @@
  * Maps entity IDs to their human-readable display names (used for fuzzy
  * matching when scanning page content for entity mentions).
  *
- * Single source of truth — imported by fact-lookup.ts and any future code
- * that needs entity ID → display name resolution.
+ * Single source of truth — imported by any code that needs entity ID →
+ * display name resolution.
  */
 
 export const entityDisplayNames: Record<string, string[]> = {

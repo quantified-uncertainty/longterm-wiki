@@ -375,7 +375,6 @@ const VALIDATE_SCRIPTS: Record<string, Pick<ScriptConfig, 'passthrough'>> = {
   all: { passthrough: ['ci', 'failFast', 'skip', 'fix'] },
   unified: { passthrough: ['ci', 'rules', 'fix', 'list', 'errorsOnly', 'fixable'] },
   gate: { passthrough: ['ci', 'full', 'fix', 'fullGate', 'noTriage', 'noCache', 'scope'] },
-  'stale-facts': { passthrough: ['ci', 'json', 'top', 'entity', 'months'] },
   'cross-links': { passthrough: ['ci', 'threshold', 'json'] },
 };
 
@@ -445,22 +444,6 @@ describe('validate unified — flag forwarding', () => {
 
   it('forwards --list', () => {
     expect(filterArgs({ list: true }, config)).toContain('--list');
-  });
-});
-
-describe('validate stale-facts — flag forwarding', () => {
-  const config = VALIDATE_SCRIPTS['stale-facts'];
-
-  it('forwards --top=20', () => {
-    expect(filterArgs({ top: 20 }, config)).toContain('--top=20');
-  });
-
-  it('forwards --entity=kalshi', () => {
-    expect(filterArgs({ entity: 'kalshi' }, config)).toContain('--entity=kalshi');
-  });
-
-  it('forwards --months=6', () => {
-    expect(filterArgs({ months: 6 }, config)).toContain('--months=6');
   });
 });
 
