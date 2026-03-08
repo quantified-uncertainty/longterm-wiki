@@ -1,7 +1,7 @@
 thing:
   id: anthropic-investors
   stableId: sKOD0uMVGg
-  type: analysis
+  type: organization
   name: Anthropic (Funder)
   numericId: E406
 facts:

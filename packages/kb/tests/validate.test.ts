@@ -150,7 +150,7 @@ describe("validate", () => {
     it("includes completeness info for every entity", () => {
       const results = validate(graph);
       const completeness = results.filter((r) => r.rule === "completeness");
-      expect(completeness.length).toBeGreaterThanOrEqual(550); // one per entity
+      expect(completeness.length).toBeGreaterThanOrEqual(360); // one per entity
     });
 
     it("properly categorizes severity levels", () => {

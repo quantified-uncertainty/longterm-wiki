@@ -1,7 +1,7 @@
 thing:
   id: musk-openai-lawsuit
   stableId: RQsF3N9BQA
-  type: analysis
+  type: event
   name: Musk v. OpenAI Lawsuit
   numericId: E408
 facts:

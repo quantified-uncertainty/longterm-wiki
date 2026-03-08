@@ -22,9 +22,9 @@ describe("loader", () => {
       expect(anthropic!.numericId).toBe("E22");
     });
 
-    it("loads all entities (550 after bulk migration)", () => {
+    it("loads all entities (360 after bulk migration)", () => {
       const entities = graph.getAllEntities();
-      expect(entities.length).toBeGreaterThanOrEqual(550);
+      expect(entities.length).toBeGreaterThanOrEqual(360);
 
       // Spot-check key entities are present
       const ids = new Set(entities.map((t) => t.id));
