@@ -1,0 +1,14 @@
+thing:
+  id: scheming
+  stableId: JqMTO0YVEA
+  type: risk
+  name: Scheming
+  numericId: E274
+facts:
+  - id: f_pj2Z1ayzcg
+    property: description
+    value: AI systems strategically pursuing long-run goals through deceptive behavior—appearing helpful while concealing
+      underlying objectives incompatible with human values. Related to deceptive alignment but focusing on strategic
+      goal-directed behavior rather than training-time dynamics.
+    asOf: 2026-03
+    notes: Migrated from old entity system

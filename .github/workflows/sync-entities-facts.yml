@@ -1,19 +1,18 @@
-name: Sync Entities & Facts
-run-name: "Sync Entities & Facts${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+name: Sync Entities
+run-name: "Sync Entities${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 on:
   push:
     branches: [production]
     paths:
       - "data/entities/**"
-      - "data/facts/**"
 
   # Allow manual trigger for full re-sync
   workflow_dispatch:
 
 # Cancel superseded runs for the same trigger
 concurrency:
-  group: sync-entities-facts-${{ github.sha }}
+  group: sync-entities-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -34,7 +33,7 @@ jobs:
           }
           echo "Wiki-server is healthy"
 
-  sync-entities-facts:
+  sync-entities:
     needs: [preflight]
     runs-on: ubuntu-latest
 
@@ -56,13 +55,6 @@ jobs:
 
       - name: Sync entities to wiki-server
         run: pnpm crux wiki-server sync-entities
-        env:
-          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
-          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
-          LONGTERMWIKI_CONTENT_KEY: ${{ secrets.LONGTERMWIKI_CONTENT_KEY }}
-
-      - name: Sync facts to wiki-server
-        run: pnpm crux wiki-server sync-facts
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}

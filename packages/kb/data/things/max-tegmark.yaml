@@ -1,0 +1,14 @@
+thing:
+  id: max-tegmark
+  stableId: 3KjUCZCV8w
+  type: person
+  name: Max Tegmark
+  numericId: E433
+facts:
+  - id: f_oLpabpFPtg
+    property: description
+    value: Swedish-American physicist at MIT, co-founder of the Future of Life Institute, and prominent AI safety advocate
+      known for his work on the Mathematical Universe Hypothesis and efforts to promote safe artificial intelligence
+      development.
+    asOf: 2026-03
+    notes: Migrated from old entity system

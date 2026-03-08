@@ -1,0 +1,14 @@
+thing:
+  id: sandboxing
+  stableId: yycfp6INgw
+  type: approach
+  name: Sandboxing / Containment
+  numericId: E485
+facts:
+  - id: f_U2tsvZnb7Q
+    property: description
+    value: Sandboxing limits AI system access to resources, networks, and capabilities as a defense-in-depth measure. METR's
+      August 2025 evaluation found GPT-5's time horizon at approximately 2 hours, insufficient for autonomous
+      replication. AI boxing experiments show 60-70% social engineering escape rates.
+    asOf: 2026-03
+    notes: Migrated from old entity system

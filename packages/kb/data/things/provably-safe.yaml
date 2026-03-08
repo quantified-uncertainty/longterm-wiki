@@ -1,0 +1,14 @@
+thing:
+  id: provably-safe
+  stableId: MEt9F7f50w
+  type: approach
+  name: Provably Safe AI (davidad agenda)
+  numericId: E484
+facts:
+  - id: f_jcv8swDPxQ
+    property: description
+    value: An ambitious research agenda to design AI systems with mathematical safety guarantees from the ground up, led by
+      ARIA's 59M pound Safeguarded AI programme with the goal of creating superintelligent systems that are provably
+      beneficial through formal verification of world models and value specifications.
+    asOf: 2026-03
+    notes: Migrated from old entity system

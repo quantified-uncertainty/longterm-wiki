@@ -1,0 +1,12 @@
+thing:
+  id: adversarial-robustness
+  stableId: gWxL0U06oQ
+  type: concept
+  name: Adversarial Robustness
+  numericId: E1
+facts:
+  - id: f_eOvbg9l9YQ
+    property: description
+    value: AI systems' resistance to adversarial inputs designed to cause errors or unintended behaviors.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -6,6 +6,7 @@ import {
   detectIssues,
   computeBudget,
   looksLikeNoOp,
+  looksLikeMainRootCause,
   type GqlPrNode,
 } from './index.ts';
 
@@ -604,5 +605,57 @@ describe('looksLikeNoOp', () => {
     // Pattern in the first 1000 chars but not the last 1000
     const earlyMatch = 'No action needed.' + 'x'.repeat(2000);
     expect(looksLikeNoOp(earlyMatch)).toBe(false);
+  });
+});
+
+// ── looksLikeMainRootCause ──────────────────────────────────────────────────
+
+describe('looksLikeMainRootCause', () => {
+  it('detects "pre-existing failure"', () => {
+    expect(looksLikeMainRootCause('This is a pre-existing failure on main.')).toBe(true);
+  });
+
+  it('detects "pre-existing issue"', () => {
+    expect(looksLikeMainRootCause('Found a pre-existing issue from a previous commit.')).toBe(true);
+  });
+
+  it('detects "also failing on main"', () => {
+    expect(looksLikeMainRootCause('The CI check is also failing on main.')).toBe(true);
+  });
+
+  it('detects "not introduced by this PR"', () => {
+    expect(looksLikeMainRootCause('This error was not introduced by this PR.')).toBe(true);
+  });
+
+  it('detects "not caused by this PR"', () => {
+    expect(looksLikeMainRootCause('The test failure is not caused by this PR.')).toBe(true);
+  });
+
+  it('detects "main branch is also failing"', () => {
+    expect(looksLikeMainRootCause('The main branch is also failing with the same error.')).toBe(true);
+  });
+
+  it('detects "main branch is broken"', () => {
+    expect(looksLikeMainRootCause('The main branch is broken and needs a fix.')).toBe(true);
+  });
+
+  it('detects "same failure on main"', () => {
+    expect(looksLikeMainRootCause('This is the same failure on main branch.')).toBe(true);
+  });
+
+  it('does NOT flag normal fix output', () => {
+    expect(looksLikeMainRootCause('Fixed the TypeScript error. All tests passing now.')).toBe(false);
+  });
+
+  it('does NOT flag generic no-op output', () => {
+    expect(looksLikeMainRootCause('Stopping early because the issue cannot be resolved automatically.')).toBe(false);
+  });
+
+  it('checks last 2000 chars of output', () => {
+    const longOutput = 'x'.repeat(3000) + 'This is a pre-existing failure on main.';
+    expect(looksLikeMainRootCause(longOutput)).toBe(true);
+    // Pattern beyond the 2000 char tail
+    const earlyMatch = 'pre-existing failure on main' + 'x'.repeat(3000);
+    expect(looksLikeMainRootCause(earlyMatch)).toBe(false);
   });
 });

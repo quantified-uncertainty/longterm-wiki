@@ -1,0 +1,15 @@
+thing:
+  id: center-for-ai-safety
+  stableId: oa9A0OV0RX
+  type: organization
+  name: "Center for AI Safety"
+  numericId: 1100
+  aliases:
+    - CAIS
+
+facts:
+  - id: f_cais_sff_funding
+    property: total-funding
+    value: 6400000
+    asOf: "2025"
+    notes: "Cumulative SFF grants to CAIS across multiple rounds; lower bound"

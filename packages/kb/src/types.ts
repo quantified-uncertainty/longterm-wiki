@@ -12,6 +12,8 @@ export type FactValue =
   | { type: "boolean"; value: boolean }
   | { type: "ref"; value: string }
   | { type: "refs"; value: string[] }
+  | { type: "range"; low: number; high: number; unit?: string }
+  | { type: "min"; value: number; unit?: string }
   | { type: "json"; value: unknown };
 
 // ── Entity ──────────────────────────────────────────────────────────
@@ -58,6 +60,16 @@ export interface Fact {
   notes?: string;
   /** If this fact was computed (e.g., inverse relationship) */
   derivedFrom?: string;
+  /** ISO 4217 currency override (e.g., "GBP"). If absent, property.unit applies. */
+  currency?: string;
+  /** Approximate USD value for cross-currency comparison */
+  usdEquivalent?: number;
+  /** Exchange rate used for conversion (e.g., 1.25 for £1 = $1.25) */
+  exchangeRate?: number;
+  /** When the exchange rate was observed (YYYY-MM or YYYY-MM-DD) */
+  exchangeRateDate?: string;
+  /** Dollar year for inflation context (e.g., 2024). Reserved for future use. */
+  dollarYear?: number;
 }
 
 // ── Property ────────────────────────────────────────────────────────
@@ -168,6 +180,16 @@ export interface RawFact {
   source?: string;
   sourceQuote?: string;
   notes?: string;
+  /** ISO 4217 currency override (e.g., "GBP") */
+  currency?: string;
+  /** Approximate USD value for cross-currency comparison */
+  usdEquivalent?: number;
+  /** Exchange rate used for conversion */
+  exchangeRate?: number;
+  /** When the exchange rate was observed */
+  exchangeRateDate?: string;
+  /** Dollar year for inflation context (reserved for future use) */
+  dollarYear?: number;
 }
 
 /** Item collection as stored in YAML */

@@ -1,0 +1,14 @@
+thing:
+  id: nuno-sempere
+  stableId: AnFfbQlIog
+  type: person
+  name: Nuño Sempere
+  numericId: E579
+facts:
+  - id: f_xAJL18iX9A
+    property: description
+    value: Nuño Sempere is a Spanish superforecaster who co-founded the highly successful Samotsvety forecasting group and
+      now runs Sentinel for global catastrophe early warning, while being known for skeptical views on high AI
+      existential risk estimates and critical perspectives on EA institutions. The articl
+    asOf: 2026-03
+    notes: Migrated from old entity system

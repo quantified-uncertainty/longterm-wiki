@@ -42,7 +42,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          echo "Seeding properties from data/fact-measures.yaml..."
+          echo "Seeding properties (note: data/fact-measures.yaml has been retired; this step may need updating to use packages/kb/data/properties.yaml)..."
           cd apps/wiki-server && npx tsx scripts/seed-properties.ts
 
       - name: Migrate YAML facts to statements

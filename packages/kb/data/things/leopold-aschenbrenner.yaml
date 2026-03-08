@@ -1,0 +1,14 @@
+thing:
+  id: leopold-aschenbrenner
+  stableId: izkduIMBDg
+  type: person
+  name: Leopold Aschenbrenner
+  numericId: E578
+facts:
+  - id: f_qMoglL9DLg
+    property: description
+    value: Comprehensive biographical profile of Leopold Aschenbrenner, covering his trajectory from Columbia valedictorian
+      to OpenAI researcher to $1.5B hedge fund founder, with detailed documentation of his controversial "Situational
+      Awareness" essay predicting AGI by 2027, his disputed firing from OpenAI ov
+    asOf: 2026-03
+    notes: Migrated from old entity system

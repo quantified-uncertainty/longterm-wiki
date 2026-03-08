@@ -38,7 +38,7 @@ describe("buildCodePrompt", () => {
     const prompt = buildCodePrompt("test");
     expect(prompt).toContain("content/docs/");
     expect(prompt).toContain("data/entities/");
-    expect(prompt).toContain("data/facts/");
+    expect(prompt).toContain("packages/kb/data/");
   });
 
   it("includes wiki API tool references", () => {

@@ -1,0 +1,14 @@
+thing:
+  id: manifund
+  stableId: fFVOuFZCRf
+  type: organization
+  name: "Manifund"
+  numericId: 1104
+
+facts:
+  - id: f_manifund_ai_safety_2025
+    property: total-funding
+    value: 2250000
+    asOf: "2025"
+    source: https://manifund.org/about/regranting
+    notes: "2025 AI safety regranting pool with first 10 regrantors announced"

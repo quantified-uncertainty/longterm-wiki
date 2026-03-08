@@ -1,0 +1,14 @@
+thing:
+  id: persuasion
+  stableId: n9Mqc0XteA
+  type: capability
+  name: Persuasion and Social Manipulation
+  numericId: E224
+facts:
+  - id: f_0xzpFJCG5g
+    property: description
+    value: Persuasion capabilities refer to AI systems' ability to influence human beliefs, decisions, and behaviors through
+      communication. This encompasses everything from subtle suggestion to sophisticated manipulation, personalized
+      influence, and large-scale coordination of persuasive campaigns.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: wikipedia-views
+  stableId: SCwLOSwuiQ
+  type: project
+  name: Wikipedia Views
+  numericId: E390
+facts:
+  - id: f_2XQoeTnrxA
+    property: description
+    value: This article provides a comprehensive overview of Wikipedia pageview analytics tools and their declining traffic
+      due to AI summaries reducing direct visits. While well-documented, it's primarily about web analytics
+      infrastructure rather than core AI safety concerns.
+    asOf: 2026-03
+    notes: Migrated from old entity system

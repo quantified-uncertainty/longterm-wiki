@@ -1,0 +1,14 @@
+thing:
+  id: near-term-risks
+  stableId: zTPtio1cDA
+  type: risk
+  name: Key Near-Term AI Risks
+  numericId: E1005
+facts:
+  - id: f_rX1PcCoSSQ
+    property: description
+    value: Curated overview of the most urgent AI risks that are actively manifesting or expected to emerge by 2027,
+      organized by urgency rather than category. Covers governance, misuse, epistemic, and technical risks that are no
+      longer theoretical but producing observable real-world harms.
+    asOf: 2026-03
+    notes: Migrated from old entity system

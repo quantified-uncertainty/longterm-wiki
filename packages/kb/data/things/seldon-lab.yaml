@@ -1,0 +1,14 @@
+thing:
+  id: seldon-lab
+  stableId: eBYk2wn75Q
+  type: organization
+  name: Seldon Lab
+  numericId: E565
+facts:
+  - id: f_rWTu9hF2kg
+    property: description
+    value: Seldon Lab is a San Francisco-based AI safety accelerator founded in early 2025 that combines research
+      publication with startup investment, claiming early success with portfolio companies raising $10M+ and selling to
+      major AI companies. The article provides comprehensive documentation of a new organ
+    asOf: 2026-03
+    notes: Migrated from old entity system

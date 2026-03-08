@@ -1,0 +1,14 @@
+thing:
+  id: goal-misgeneralization
+  stableId: nYPuaov1hA
+  type: risk
+  name: Goal Misgeneralization
+  numericId: E151
+facts:
+  - id: f_OtNVXviKvw
+    property: description
+    value: Goal misgeneralization occurs when an AI system learns capabilities that generalize to new situations, but the
+      goals or behaviors it learned do not generalize correctly. The AI can competently pursue the wrong objective in
+      deployment.
+    asOf: 2026-03
+    notes: Migrated from old entity system

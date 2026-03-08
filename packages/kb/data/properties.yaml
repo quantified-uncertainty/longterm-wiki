@@ -330,6 +330,115 @@ properties:
     temporal: true
     appliesTo: [organization]
 
+  # ── Additional Financial ──────────────────────────────────────
+
+  revenue-guidance:
+    name: Revenue Guidance
+    description: "Forward-looking revenue projections or guidance ranges"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  retention-rate:
+    name: Retention Rate
+    description: "Customer or revenue retention rate"
+    dataType: number
+    unit: percent
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  customer-concentration:
+    name: Customer Concentration
+    description: "Revenue percentage from largest customer"
+    dataType: number
+    unit: percent
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  infrastructure-investment:
+    name: Infrastructure Investment
+    description: "Capital expenditure on compute, data centers, or infrastructure"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  equity-stake-percent:
+    name: Equity Stake
+    description: "Ownership percentage in an entity"
+    dataType: number
+    unit: percent
+    category: financial
+    temporal: true
+    appliesTo: [person, organization]
+    display:
+      suffix: "%"
+
+  equity-value:
+    name: Equity Value
+    description: "Estimated dollar value of equity holdings"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [person, organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  # ── Additional Safety ──────────────────────────────────────────
+
+  safety-staffing-ratio:
+    name: Safety Staffing Ratio
+    description: "Percentage of technical staff in safety-related roles"
+    dataType: number
+    unit: percent
+    category: safety
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  # ── Product & Technical ──────────────────────────────────────
+
+  model-parameters:
+    name: Model Parameters
+    description: "Number of parameters in a machine learning model"
+    dataType: number
+    unit: count
+    category: product
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      suffix: "B"
+
+  benchmark-score:
+    name: Benchmark Score
+    description: "Performance score on a specific benchmark"
+    dataType: number
+    category: product
+    temporal: true
+    appliesTo: [organization]
+
   # ── AI Model Properties ───────────────────────────────────────────────
 
   parameter-count:
@@ -585,3 +694,45 @@ properties:
     dataType: text
     category: organization
     appliesTo: [organization]
+
+  # ── Incident Properties ──────────────────────────────────────────────
+
+  incident-date:
+    name: Incident Date
+    description: "Date the incident occurred or started"
+    dataType: date
+    category: incident
+    appliesTo: [incident]
+
+  organizations-involved:
+    name: Organizations Involved
+    description: "Organizations involved in or affected by this incident"
+    dataType: refs
+    category: incident
+    appliesTo: [incident]
+
+  financial-impact:
+    name: Financial Impact
+    description: "Estimated financial impact of the incident in USD"
+    dataType: number
+    unit: USD
+    category: incident
+    appliesTo: [incident]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  casualties:
+    name: Casualties
+    description: "Number of people killed or seriously injured"
+    dataType: number
+    category: incident
+    appliesTo: [incident]
+
+  incident-status:
+    name: Status
+    description: "Current status of the incident: ongoing, resolved, litigation, under-investigation"
+    dataType: text
+    category: incident
+    appliesTo: [incident]

@@ -1,0 +1,14 @@
+thing:
+  id: corrigibility
+  stableId: aUMeFdALrA
+  type: approach
+  name: Corrigibility
+  numericId: E79
+facts:
+  - id: f_7N9ms2wIpA
+    property: description
+    value: The property of an AI system that allows it to be safely corrected, adjusted, or shut down by its operators.
+      Highly corrigible systems defer to human judgment; the key research challenge is making corrigibility robust under
+      capability scaling.
+    asOf: 2026-03
+    notes: Migrated from old entity system

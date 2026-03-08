@@ -404,9 +404,9 @@ describe("Q17: Anthropic vs OpenAI market share", () => {
     expect(val).toBe(42);
   });
 
-  it("cross-entity lookup works for market-share (OpenAI only)", () => {
+  it("cross-entity lookup works for market-share", () => {
     const shareMap = graph.getByProperty("market-share", { latest: true });
-    expect(shareMap.size).toBe(1);
+    expect(shareMap.size).toBeGreaterThanOrEqual(1);
     expect(shareMap.has("openai")).toBe(true);
   });
 

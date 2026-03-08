@@ -1,0 +1,14 @@
+thing:
+  id: world-models
+  stableId: vQugEFw5nA
+  type: capability
+  name: World Models + Planning
+  numericId: E503
+facts:
+  - id: f_4UF1k5qJvQ
+    property: description
+    value: "Comprehensive analysis of world models + planning architectures showing 10-500x sample efficiency gains over
+      model-free RL (EfficientZero: 194% human performance with 100k vs 50M steps), but estimating only 5-15%
+      probability of TAI dominance due to LLM superiority on general tasks. Key systems inclu"
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -41,6 +41,47 @@ facts:
     source: https://intelligence.org/2024/04/02/2023-review/
     notes: "Approximate staff count in 2023; MIRI significantly reduced staff in 2023-2024 as it shifted focus"
 
+  # ── Migrated from old facts system ─────────────────────────────
+  - id: f_miri_sff_funding
+    property: total-funding
+    value: 15e6
+    asOf: "2025"
+    notes: "Estimated cumulative SFF grants to MIRI; lower bound"
+
+  - id: f_miri_revenue_2024
+    property: revenue
+    value: 1534913
+    asOf: "2024"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "Total revenue for fiscal year 2024 per ProPublica filing"
+
+  - id: f_miri_expenses_2024
+    property: cash-burn
+    value: 6508701
+    asOf: "2024"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "Total expenses for fiscal year 2024 per ProPublica filing"
+
+  - id: f_miri_net_assets_2024
+    property: description
+    value: "Net assets (2024): $15,242,215"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "Net assets per ProPublica filing, not total funding raised; implies ~2 years operational runway"
+
+  - id: f_miri_headcount_2024
+    property: headcount
+    value: 42
+    asOf: "2024"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "Approximate headcount per ProPublica filing"
+
+  - id: f_miri_revenue_peak_2021
+    property: revenue
+    value: 25600000
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "Revenue spike partly due to Vitalik Buterin Ethereum donation"
+
 items:
   key-people:
     type: key-person

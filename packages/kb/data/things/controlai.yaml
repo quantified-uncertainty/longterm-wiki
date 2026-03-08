@@ -1,0 +1,13 @@
+thing:
+  id: controlai
+  stableId: uhTh3ndt0Q
+  type: organization
+  name: ControlAI
+  numericId: E426
+facts:
+  - id: f_kD7n4YOz5g
+    property: description
+    value: UK-based AI safety advocacy organization focused on preventing artificial superintelligence development through
+      policy campaigns and grassroots outreach to lawmakers.
+    asOf: 2026-03
+    notes: Migrated from old entity system

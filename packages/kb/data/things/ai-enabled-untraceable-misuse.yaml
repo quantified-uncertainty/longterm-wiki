@@ -1,0 +1,15 @@
+thing:
+  id: ai-enabled-untraceable-misuse
+  stableId: 6c238j1BMw
+  type: risk
+  name: AI-Enabled Untraceable Misuse
+  numericId: E691
+facts:
+  - id: f_ZSXX1dxLhA
+    property: description
+    value: AI systems simultaneously amplify harmful capabilities and obscure attribution, enabling bad actors to conduct
+      spam campaigns, political manipulation, synthetic identity fraud, and coordinated harassment with reduced risk of
+      identification. This dual amplification creates a self-reinforcing cycle where greater capability enables more
+      autonomous agents, more attribution ambiguity, reduced deterrence, and further misuse.
+    asOf: 2026-03
+    notes: Migrated from old entity system

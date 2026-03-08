@@ -1,0 +1,14 @@
+thing:
+  id: hardware-enabled-governance
+  stableId: 57vCq45URQ
+  type: policy
+  name: Hardware-Enabled Governance
+  numericId: E463
+facts:
+  - id: f_soK8DuWeCA
+    property: description
+    value: Technical mechanisms built into AI chips enabling monitoring, access control, and enforcement of AI governance
+      policies. RAND analysis identifies attestation-based licensing as most feasible with 5-10 year timeline, while an
+      estimated 100,000+ export-controlled GPUs were smuggled to China in 2024.
+    asOf: 2026-03
+    notes: Migrated from old entity system

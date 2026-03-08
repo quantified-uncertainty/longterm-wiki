@@ -1285,7 +1285,9 @@ export const pageCitations = pgTable(
     title: varchar("title"),
     url: varchar("url"),
     note: text("note"),
-    resourceId: text("resource_id").references(() => resources.id),
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [

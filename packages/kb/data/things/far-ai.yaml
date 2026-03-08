@@ -1,0 +1,17 @@
+thing:
+  id: far-ai
+  stableId: lCiT37k9pA
+  type: organization
+  name: FAR AI
+  numericId: E138
+facts:
+  - id: f_5ThouaLWpw
+    property: description
+    value: FAR AI (Forecasting AI Research) is an AI safety research organization founded in 2023 with a focus on
+      adversarial robustness, model evaluation, and alignment research. The organization was co-founded by Dan
+      Hendrycks, a prominent AI safety researcher known for his work on benchmarks, robustness, and AI risk.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_PchO7e0QGA
+    property: website
+    value: https://far.ai

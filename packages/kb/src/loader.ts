@@ -170,6 +170,28 @@ function normalizeValue(raw: unknown, dataType?: string): FactValue {
     return { type: "date", value: raw.value };
   }
 
+  // Range/min detection — structural patterns that take priority over dataType.
+  // A two-element numeric array is always a range, and an object with { min: N }
+  // is always a min bound, regardless of what the property's dataType says.
+  if (
+    Array.isArray(raw) &&
+    raw.length === 2 &&
+    typeof raw[0] === "number" &&
+    typeof raw[1] === "number"
+  ) {
+    return { type: "range", low: raw[0], high: raw[1] };
+  }
+  if (
+    raw !== null &&
+    typeof raw === "object" &&
+    !Array.isArray(raw) &&
+    !(raw instanceof DateMarker) &&
+    "min" in raw &&
+    typeof (raw as Record<string, unknown>).min === "number"
+  ) {
+    return { type: "min", value: (raw as Record<string, unknown>).min as number };
+  }
+
   // When an explicit dataType is declared, it is authoritative.
   if (dataType) {
     switch (dataType) {
@@ -291,6 +313,11 @@ function parseFact(
       sourceQuote: rawFact.sourceQuote,
     }),
     ...(rawFact.notes !== undefined && { notes: rawFact.notes }),
+    ...(rawFact.currency !== undefined && { currency: rawFact.currency }),
+    ...(rawFact.usdEquivalent !== undefined && { usdEquivalent: Number(rawFact.usdEquivalent) }),
+    ...(rawFact.exchangeRate !== undefined && { exchangeRate: Number(rawFact.exchangeRate) }),
+    ...(rawFact.exchangeRateDate !== undefined && { exchangeRateDate: rawFact.exchangeRateDate }),
+    ...(rawFact.dollarYear !== undefined && { dollarYear: Number(rawFact.dollarYear) }),
   };
 }
 

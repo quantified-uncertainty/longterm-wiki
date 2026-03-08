@@ -1,0 +1,15 @@
+thing:
+  id: tool-use
+  stableId: C5XsvYDQGA
+  type: capability
+  name: Tool Use and Computer Use
+  numericId: E356
+facts:
+  - id: f_IjKedRyjSQ
+    property: description
+    value: Tool use capabilities allow AI systems to interact with external systems beyond just generating text. This
+      includes calling APIs, executing code, browsing the web, and even controlling computers directly. These
+      capabilities transform language models from passive responders into active agents that can take real-world
+      actions.
+    asOf: 2026-03
+    notes: Migrated from old entity system

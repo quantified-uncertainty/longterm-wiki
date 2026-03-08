@@ -1,0 +1,12 @@
+thing:
+  id: metaforecast
+  stableId: 1tpQRlyyIQ
+  type: project
+  name: Metaforecast
+  numericId: E200
+facts:
+  - id: f_3cJPlhlDBA
+    property: description
+    value: Forecast aggregation platform combining predictions from 10+ sources into a unified search interface.
+    asOf: 2026-03
+    notes: Migrated from old entity system

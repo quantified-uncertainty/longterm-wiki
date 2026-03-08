@@ -1,0 +1,14 @@
+thing:
+  id: longterm-wiki
+  stableId: WxrOEBPBpA
+  type: project
+  name: Longterm Wiki
+  numericId: E384
+facts:
+  - id: f_hg6wIUFYqQ
+    property: description
+    value: A self-referential documentation page describing the Longterm Wiki platform itself—a strategic intelligence tool
+      with ~550 pages, crux mapping of ~50 uncertainties, and quality scoring across 6 dimensions. Features include
+      entity cross-linking, interactive causal diagrams, and structured YAML databa
+    asOf: 2026-03
+    notes: Migrated from old entity system

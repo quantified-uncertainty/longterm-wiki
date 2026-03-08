@@ -1,0 +1,18 @@
+entity: canada-aisi
+facts:
+
+  # total-funding
+  c2e6a8d4:
+    measure: total-funding-commitment
+    value: 37000000
+    asOf: "2024-11"
+    note: "Canadian government pledged C$50M (~$37M USD) in initial funding. Converted at ~$0.74/C$"
+    source: https://ised-isde.canada.ca/site/artificial-intelligence/en/canadas-ai-safety-institute
+
+  # founded-date
+  f7b1c5e9:
+    measure: founded-date
+    value: "2024-11"
+    asOf: "2024-11"
+    note: "Launched at the Seoul AI Safety Summit in November 2024"
+    source: https://ised-isde.canada.ca/site/artificial-intelligence/en/canadas-ai-safety-institute

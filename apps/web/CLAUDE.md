@@ -48,7 +48,7 @@ Available aliases:
 ### MDX Components
 All MDX components are registered in `src/components/mdx-components.tsx`. Import statements in MDX source are stripped by `preprocessMdx()` — components are injected globally.
 
-Key ported components: `EntityLink`, `ResourceLink`, `R`, `F`, `DataInfoBox`, `Backlinks`, `InfoBox`, `ExternalLinks`, `MermaidDiagram`, `SquiggleEstimate`, `Callout`
+Key ported components: `EntityLink`, `ResourceLink`, `R`, `KBFactValue`, `DataInfoBox`, `Backlinks`, `InfoBox`, `ExternalLinks`, `MermaidDiagram`, `SquiggleEstimate`, `Callout`
 
 42+ stub components exist for not-yet-ported Astro components.
 
@@ -59,7 +59,6 @@ longterm-wiki/
 ├── content/docs/              # ~625 MDX wiki pages
 ├── data/                      # YAML sources
 │   ├── entities/              # 24 YAML entity files
-│   ├── facts/                 # Canonical facts
 │   ├── resources/             # External resource links
 │   ├── insights/              # Extracted insights
 │   └── graphs/                # Causal graph YAML
@@ -113,8 +112,8 @@ Wiki pages use `generateStaticParams()` to pre-render all pages at build time fr
 3. `compileMDX()` from next-mdx-remote/rsc compiles with remark/rehype plugins
 4. Components injected via `mdxComponents` map
 
-### Canonical Facts
-Facts are defined in `data/facts/*.yaml`, computed by `build-data.mjs`, and accessed via `getFact(entity, factId)`. The `<F>` component renders inline fact values.
+### Knowledge Base (KB)
+Structured facts are defined in `packages/kb/data/things/*.yaml` and accessed via the KB data layer (`src/data/kb.ts`). The `<KBFactValue>` component renders inline fact values. The old `data/facts/` pipeline has been retired.
 
 ### Content Architecture
 Content directories are **flat** (max 2 levels). Grouping is done via frontmatter `subcategory` metadata, not directory nesting:

@@ -1,0 +1,13 @@
+thing:
+  id: squiggle
+  stableId: nAjP2vwwSw
+  type: project
+  name: Squiggle
+  numericId: E286
+facts:
+  - id: f_voCxsWhgvg
+    property: description
+    value: Domain-specific programming language for probabilistic estimation with native distribution types and Monte Carlo
+      sampling.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,15 @@
+thing:
+  id: ai-powered-investigation
+  stableId: N0NF4lvS4Q
+  type: capability
+  name: AI-Powered Investigation
+  numericId: E698
+facts:
+  - id: f_mGXOnkuIEw
+    property: description
+    value: AI systems can synthesize vast volumes of public data — social media, corporate filings, court records, satellite
+      imagery — to conduct investigative work at a scale and speed previously impossible. A 2023 ETH Zurich study showed
+      GPT-4 inferred personal attributes from Reddit posts with 85% accuracy. This dual-use capability enables both
+      anti-corruption journalism and mass privacy erosion.
+    asOf: 2026-03
+    notes: Migrated from old entity system

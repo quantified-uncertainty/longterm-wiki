@@ -1,0 +1,12 @@
+thing:
+  id: autonomous-replication
+  stableId: 3EuTey4ung
+  type: risk
+  name: Autonomous Replication
+  numericId: E34
+facts:
+  - id: f_yh02ckX6zg
+    property: description
+    value: Risk of AI systems copying themselves to new hardware or cloud instances without authorization.
+    asOf: 2026-03
+    notes: Migrated from old entity system

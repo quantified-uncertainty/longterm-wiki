@@ -1,0 +1,14 @@
+thing:
+  id: us-executive-order
+  stableId: pz3KSt33AA
+  type: policy
+  name: US Executive Order on Safe, Secure, and Trustworthy AI
+  numericId: E366
+facts:
+  - id: f_Wdn2JgtzqA
+    property: description
+    value: The Executive Order on Safe, Secure, and Trustworthy Artificial Intelligence, signed by President Biden on
+      October 30, 2023, is the most comprehensive US government action on AI to date. It establishes safety requirements
+      for frontier AI systems, mandates government agency actions, and creates oversight mechanisms.
+    asOf: 2026-03
+    notes: Migrated from old entity system

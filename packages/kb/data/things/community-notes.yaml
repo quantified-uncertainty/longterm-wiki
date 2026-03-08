@@ -1,0 +1,14 @@
+thing:
+  id: community-notes
+  stableId: g75DdACthg
+  type: project
+  name: X Community Notes
+  numericId: E381
+facts:
+  - id: f_t0PiM5dVTA
+    property: description
+    value: Community Notes uses a bridging algorithm requiring cross-partisan consensus to display fact-checks, reducing
+      retweets 25-50% when notes appear. However, only 8.3% of notes achieve visibility, taking median 7 hours (mean
+      38.5 hours) by which time 96.7% of spread has occurred, limiting aggregate effe
+    asOf: 2026-03
+    notes: Migrated from old entity system

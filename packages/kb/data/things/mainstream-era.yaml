@@ -1,0 +1,14 @@
+thing:
+  id: mainstream-era
+  stableId: G1XyCr76gw
+  type: event
+  name: Mainstream Era
+  numericId: E195
+facts:
+  - id: f_9VJuL1eVGQ
+    property: description
+    value: The Mainstream Era marks AI safety's transformation from a niche research field to a central topic in technology
+      policy, corporate strategy, and public discourse. ChatGPT was the catalyst, but the shift reflected years of
+      groundwork meeting rapidly advancing capabilities.
+    asOf: 2026-03
+    notes: Migrated from old entity system

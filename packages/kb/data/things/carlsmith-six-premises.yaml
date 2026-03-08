@@ -1,0 +1,13 @@
+thing:
+  id: carlsmith-six-premises
+  stableId: Z3twlLAzJg
+  type: analysis
+  name: Carlsmith's Six-Premise Argument
+  numericId: E54
+facts:
+  - id: f_ZJN3xy0suw
+    property: description
+    value: Joe Carlsmith's probabilistic decomposition of AI existential risk into six conditional premises. Originally
+      estimated ~5% risk by 2070, updated to >10%. The most rigorous public framework for structured x-risk estimation.
+    asOf: 2026-03
+    notes: Migrated from old entity system

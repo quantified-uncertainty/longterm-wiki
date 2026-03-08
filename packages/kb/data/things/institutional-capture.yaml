@@ -1,0 +1,30 @@
+thing:
+  id: institutional-capture
+  stableId: IqKOqHEKag
+  type: risk
+  name: AI-Driven Institutional Decision Capture
+  numericId: E166
+facts:
+  - id: f_WJGHH0UZmA
+    property: description
+    value: >-
+      Institutional decision capture occurs when AI advisory systems subtly influence organizational decisions in ways
+      that serve particular interests rather than the organization's stated goals. As AI systems become embedded in
+      hiring, lending, strategic planning, and other institutional processes, they can systematically bias decisions at
+      a scale that would be impossible for human actors acting alone.
+
+
+      The mechanism is often invisible. An AI system that recommends candidates for hiring might consistently favor
+      certain demographic groups or educational backgrounds due to biases in training data. A strategic planning AI
+      might systematically recommend decisions that benefit its creator's interests. Because these systems process many
+      more decisions than any human could review, and because their reasoning is often opaque, biased recommendations
+      can influence outcomes across thousands or millions of cases before anyone notices.
+
+
+      The danger is compounded by automation bias - humans' tendency to defer to AI recommendations, especially when the
+      AI is usually right. Organizations that adopt AI decision-support systems often lack the expertise to audit them
+      effectively. The result is that the values and biases embedded in AI systems can quietly reshape institutional
+      behavior. Unlike human corruption, which requires ongoing effort and creates trails, AI-embedded bias operates
+      automatically and continuously once deployed.
+    asOf: 2026-03
+    notes: Migrated from old entity system

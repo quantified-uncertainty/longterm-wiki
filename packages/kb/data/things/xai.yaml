@@ -59,6 +59,95 @@ facts:
     asOf: 2024-12
     notes: "Estimated 150-250 employees; relatively small team compared to other frontier labs; emphasizes efficiency"
 
+  # ── Migrated from old facts system ─────────────────────────────
+  - id: f_val_2026_01
+    property: valuation
+    value: 230e9
+    asOf: 2026-01
+    source: https://x.ai/news/series-e
+    notes: "Post-money valuation at Series E round close"
+
+  - id: f_total_funding_2026
+    property: total-funding
+    value: 26e9
+    asOf: 2026-01
+    source: https://x.ai/news/series-e
+    notes: "Over $26B total raised across all rounds"
+
+  - id: f_revenue_2025
+    property: revenue
+    value: 3.8e9
+    asOf: "2025"
+    source: https://sacra.com/c/xai/
+    notes: "Annualized revenue run-rate at year-end 2025"
+
+  - id: f_headcount_2025
+    property: headcount
+    value: 4000
+    asOf: "2025"
+    source: https://www.trueup.io/co/xai
+    notes: "Headcount as of 2025 per TrueUp"
+
+  - id: f_grok_mau_2025
+    property: user-count
+    value: 30e6
+    asOf: "2025"
+    source: https://www.businessofapps.com/data/grok-statistics/
+    notes: "Grok monthly active users; nearly doubled since Q1 2025"
+
+  - id: f_grok_downloads
+    property: user-count
+    value: 60e6
+    asOf: "2025"
+    source: https://www.businessofapps.com/data/grok-statistics/
+    notes: "Grok cumulative downloads since launch"
+
+  - id: f_grok_revenue_q3_2025
+    property: product-revenue
+    value: 88e6
+    asOf: 2025-09
+    source: https://www.businessofapps.com/data/grok-statistics/
+    notes: "Quarterly revenue from Grok app in Q3 2025"
+
+  - id: f_grok3_aime
+    property: benchmark-score
+    value: 93.3
+    asOf: "2025"
+    source: https://x.ai/news/grok-3
+    notes: "Grok 3 AIME 2025 benchmark: 93.3% success rate"
+
+  - id: f_grok3_elo
+    property: benchmark-score
+    value: 1402
+    asOf: "2025"
+    source: https://x.ai/news/grok-3
+    notes: "Grok 3 Chatbot Arena Elo score"
+
+  - id: f_grok3_params
+    property: model-parameters
+    value: 2.7e12
+    asOf: "2025"
+    source: https://x.ai/news/grok-3
+    notes: "Grok 3: 2.7 trillion parameters"
+
+  - id: f_dod_contracts
+    property: revenue
+    value: 200e6
+    asOf: "2025"
+    source: https://fedscoop.com/grok-government-gsa-onegov-artificial-intelligence-elon-musk-contract-agency/
+    notes: "$200M in Department of Defense contracts"
+
+  - id: f_grok_deepfake_rate
+    property: description
+    value: "Grok generated ~6,700 sexualized/undressing images per hour vs ~79/hr on other platforms (Dec 2025-Jan 2026)"
+    source: https://www.cnn.com/2026/01/08/tech/elon-musk-xai-digital-undressing
+    notes: "During deepfake scandal period"
+
+  - id: f_grok_deepfake_total
+    property: description
+    value: "~3M sexualized images generated in 10 days during deepfake scandal (Dec 2025-Jan 2026)"
+    source: https://www.nbcnews.com/tech/internet/x-paywall-ai-image-grok-app-bikini-allows-sexual-deepfakes-rcna252647
+
 items:
   funding-rounds:
     type: funding-round
@@ -76,6 +165,13 @@ items:
         valuation: 50e9
         source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-closes-6-bln-funding-round-2024-12-24/
         notes: "Closed December 2024; investors include Andreessen Horowitz, BlackRock, Fidelity, Kingdom Holding, Sequoia, and others"
+
+      i_xai_series_e:
+        date: 2026-01
+        amount: 20e9
+        valuation: 230e9
+        source: https://x.ai/news/series-e
+        notes: "Series E round; brought total funding to over $26B"
 
   key-people:
     type: key-person

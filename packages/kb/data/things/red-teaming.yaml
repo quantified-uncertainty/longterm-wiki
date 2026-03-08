@@ -1,0 +1,14 @@
+thing:
+  id: red-teaming
+  stableId: k6BfxaEwuQ
+  type: approach
+  name: Red Teaming
+  numericId: E449
+facts:
+  - id: f_jqcmM746gw
+    property: description
+    value: Adversarial testing methodologies to systematically identify AI system vulnerabilities, dangerous capabilities,
+      and failure modes through structured adversarial evaluation. Effectiveness rates vary from 10-80% depending on
+      attack method.
+    asOf: 2026-03
+    notes: Migrated from old entity system

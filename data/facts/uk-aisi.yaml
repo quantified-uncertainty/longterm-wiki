@@ -1,0 +1,28 @@
+entity: uk-aisi
+facts:
+
+  # annual-budget
+  b7e1c3f9:
+    label: "Annual budget (estimated)"
+    measure: annual-budget
+    value: 42000000
+    asOf: "2023-11"
+    note: "UK government committed £100M (~$125M) over 3 years; approximately $42M/year. Converted at ~$1.25/£"
+    source: https://www.gov.uk/government/news/prime-minister-launches-new-ai-safety-institute
+
+  # headcount
+  a2d8f4b6:
+    measure: headcount
+    value:
+      min: 100
+    asOf: "2024-12"
+    note: "Over 100 staff, making it the best-resourced AI Safety Institute globally"
+    source: https://www.gov.uk/government/organisations/ai-safety-institute
+
+  # founded-date
+  c9e5a1d3:
+    measure: founded-date
+    value: "2023-11-01"
+    asOf: "2023-11"
+    note: "Established at the Bletchley Park AI Safety Summit; renamed to AI Security Institute in February 2025"
+    source: https://www.gov.uk/government/organisations/ai-safety-institute

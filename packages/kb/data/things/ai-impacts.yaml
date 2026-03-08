@@ -1,0 +1,14 @@
+thing:
+  id: ai-impacts
+  stableId: TdbypiKyCw
+  type: organization
+  name: AI Impacts
+  numericId: E512
+facts:
+  - id: f_KeADXc2nlQ
+    property: description
+    value: AI Impacts is a research organization that conducts empirical analysis of AI timelines and risks through surveys
+      and historical trend analysis, contributing valuable data to AI safety discourse. While their work provides useful
+      evidence synthesis and expert opinion surveys, it faces inherent limitat
+    asOf: 2026-03
+    notes: Migrated from old entity system
