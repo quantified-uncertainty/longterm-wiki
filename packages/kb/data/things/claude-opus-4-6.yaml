@@ -1,0 +1,14 @@
+thing:
+  id: claude-opus-4-6
+  stableId: Ac7c55KtVw
+  type: project
+  name: Claude Opus 4.6
+  numericId: E1039
+facts:
+  - id: f_qWKppqiSkQ
+    property: description
+    value: Claude Opus 4.6 was released February 5, 2026. Introduced adaptive thinking with four effort levels, agent teams
+      for splitting tasks, and 1M-token context window (beta). Scored 68.8% on ARC-AGI-2 (83% improvement over Opus
+      4.5), 65.4% on Terminal-Bench 2.0, and 72.7% on OSWorld. Priced at $5/$25 per million tokens.
+    asOf: 2026-03
+    notes: Migrated from old entity system

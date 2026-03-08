@@ -1,0 +1,13 @@
+thing:
+  id: frontier-model-forum
+  stableId: LgiqvRCrvg
+  type: organization
+  name: Frontier Model Forum
+  numericId: E427
+facts:
+  - id: f_rUwCV8MR4g
+    property: description
+    value: Industry-led non-profit organization promoting self-governance in frontier AI safety through collaborative
+      frameworks, research funding, and best practices development.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,12 @@
+thing:
+  id: scaling-laws
+  stableId: eZJ1oAKS6A
+  type: concept
+  name: AI Scaling Laws
+  numericId: E273
+facts:
+  - id: f_TNxcLNKMiA
+    property: description
+    value: Empirical relationships between model size, compute, data, and AI performance that have driven recent AI progress.
+    asOf: 2026-03
+    notes: Migrated from old entity system

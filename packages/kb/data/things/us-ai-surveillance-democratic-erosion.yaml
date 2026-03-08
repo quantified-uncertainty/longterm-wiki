@@ -1,0 +1,17 @@
+thing:
+  id: us-ai-surveillance-democratic-erosion
+  stableId: Tnd9iuHdjw
+  type: risk
+  name: AI Surveillance and US Democratic Erosion
+  numericId: E1003
+facts:
+  - id: f_krqLXGjcWQ
+    property: description
+    value: "The convergence of data centralization, oversight dismantlement, and AI capability acquisition by the US
+      government creates near-term risks to democratic processes. The Anthropic-Pentagon standoff crystallized what the
+      government sought: AI analysis of bulk commercial data on Americans including location, browsing, and financial
+      records. Infrastructure being assembled includes a national citizenship database, Palantir data-mining contracts,
+      and AI monitoring of federal workers. Whether deployed for electoral manipulation remains uncertain, but the risk
+      is significant and historically grounded in COINTELPRO, Nixon-era abuses, and post-9/11 bulk collection."
+    asOf: 2026-03
+    notes: Migrated from old entity system

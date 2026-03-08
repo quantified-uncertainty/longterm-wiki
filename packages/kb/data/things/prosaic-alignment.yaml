@@ -1,0 +1,13 @@
+thing:
+  id: prosaic-alignment
+  stableId: EQgTf1t7dg
+  type: approach
+  name: Prosaic Alignment
+  numericId: E235
+facts:
+  - id: f_xAkt2SYoDg
+    property: description
+    value: Approach to AI alignment that doesn't require fundamental theoretical breakthroughs, focusing on scaling current
+      techniques.
+    asOf: 2026-03
+    notes: Migrated from old entity system

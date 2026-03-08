@@ -1,0 +1,14 @@
+thing:
+  id: chan-zuckerberg-initiative
+  stableId: 47CMmjo4mQ
+  type: organization
+  name: Chan Zuckerberg Initiative
+  numericId: E519
+facts:
+  - id: f_bjfBVCAFlQ
+    property: description
+    value: The Chan Zuckerberg Initiative is a philanthropic LLC that has pivoted dramatically from broad social causes to
+      AI-powered biomedical research, with substantial funding ($10B+ over next decade) but minimal engagement with AI
+      safety concerns despite heavy AI investment. The article provides comprehen
+    asOf: 2026-03
+    notes: Migrated from old entity system

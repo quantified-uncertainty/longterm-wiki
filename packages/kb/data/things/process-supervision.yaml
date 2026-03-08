@@ -1,0 +1,14 @@
+thing:
+  id: process-supervision
+  stableId: a2PktXtU4A
+  type: approach
+  name: Process Supervision
+  numericId: E455
+facts:
+  - id: f_sar1r80isw
+    property: description
+    value: Process supervision trains AI systems to produce correct reasoning steps, not just correct final answers,
+      improving transparency and auditability of AI reasoning while achieving significant gains in mathematical and
+      coding tasks.
+    asOf: 2026-03
+    notes: Migrated from old entity system

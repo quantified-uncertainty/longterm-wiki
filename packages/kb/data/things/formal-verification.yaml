@@ -1,0 +1,14 @@
+thing:
+  id: formal-verification
+  stableId: DSSCdI8gLA
+  type: approach
+  name: Formal Verification (AI Safety)
+  numericId: E483
+facts:
+  - id: f_9Kozt7eUyA
+    property: description
+    value: Mathematical proofs of AI system properties and behavior bounds, offering potentially strong safety guarantees if
+      achievable but currently limited to small systems and facing fundamental challenges scaling to modern neural
+      networks.
+    asOf: 2026-03
+    notes: Migrated from old entity system

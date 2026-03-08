@@ -3,7 +3,7 @@ thing:
   stableId: 5N5UqXNkkg
   type: person
   name: "Geoffrey Hinton"
-  numericId: 149
+  numericId: "E149"
   aliases:
     - "Geoff Hinton"
     - "Godfather of Deep Learning"

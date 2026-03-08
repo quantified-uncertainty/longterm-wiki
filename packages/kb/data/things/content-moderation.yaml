@@ -1,0 +1,12 @@
+thing:
+  id: content-moderation
+  stableId: s8PQomHkvA
+  type: concept
+  name: AI Content Moderation
+  numericId: E75
+facts:
+  - id: f_2NPHorW4Rw
+    property: description
+    value: Techniques and policies for controlling AI outputs to prevent harmful, misleading, or inappropriate content.
+    asOf: 2026-03
+    notes: Migrated from old entity system

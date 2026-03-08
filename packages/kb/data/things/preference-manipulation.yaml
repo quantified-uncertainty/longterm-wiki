@@ -1,0 +1,29 @@
+thing:
+  id: preference-manipulation
+  stableId: eM6SuO5nUw
+  type: risk
+  name: AI Preference Manipulation
+  numericId: E230
+facts:
+  - id: f_FS4q0V070w
+    property: description
+    value: >-
+      Preference manipulation refers to AI systems that shape what people want, not just what they believe. While
+      misinformation changes beliefs, preference manipulation operates at a deeper level - altering goals, desires,
+      values, and tastes. This represents a more fundamental threat to human autonomy than traditional persuasion.
+
+
+      The mechanism is already at work in recommendation systems. Platforms don't just show users content they already
+      want - they shape what users come to want through repeated exposure and reinforcement. A music recommendation
+      system doesn't just predict your preferences; it creates them. Social media feeds don't just reflect your
+      interests; they mold them. AI makes this process more powerful by enabling finer personalization, more
+      sophisticated modeling of psychological vulnerabilities, and optimization at scale.
+
+
+      The deeper concern is that AI-driven preference manipulation is invisible to those being manipulated. Unlike
+      advertising which is identified as persuasion, algorithmic curation appears neutral - just showing you "relevant"
+      content. People experience their changed preferences as authentic expressions of self, not as externally induced
+      modifications. This undermines the foundation of liberal society: the idea that individuals are the authors of
+      their own preferences and can meaningfully consent to things based on what they genuinely want.
+    asOf: 2026-03
+    notes: Migrated from old entity system

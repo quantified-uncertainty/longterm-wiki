@@ -1,0 +1,14 @@
+thing:
+  id: california-sb1047
+  stableId: XcGTez1oFw
+  type: policy
+  name: Safe and Secure Innovation for Frontier Artificial Intelligence Models Act
+  numericId: E48
+facts:
+  - id: f_fIOdg7UWQA
+    property: description
+    value: SB 1047, the Safe and Secure Innovation for Frontier Artificial Intelligence Models Act, was California state
+      legislation that would have required safety testing and liability measures for developers of the most powerful AI
+      models.
+    asOf: 2026-03
+    notes: Migrated from old entity system

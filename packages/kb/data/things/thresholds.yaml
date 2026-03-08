@@ -1,0 +1,14 @@
+thing:
+  id: thresholds
+  stableId: 3OTN6TAzhw
+  type: policy
+  name: Compute Thresholds
+  numericId: E465
+facts:
+  - id: f_BslUtC4f8Q
+    property: description
+    value: Analysis of compute thresholds as regulatory triggers, examining current implementations (EU AI Act at 10^25
+      FLOP, US EO at 10^26 FLOP), their effectiveness as capability proxies, and core challenges including algorithmic
+      efficiency improvements that may render static thresholds obsolete within 3-5 years.
+    asOf: 2026-03
+    notes: Migrated from old entity system

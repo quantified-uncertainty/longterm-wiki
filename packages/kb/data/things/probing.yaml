@@ -1,0 +1,14 @@
+thing:
+  id: probing
+  stableId: iEJPJoRsOQ
+  type: approach
+  name: Probing / Linear Probes
+  numericId: E596
+facts:
+  - id: f_9hXt00YmPA
+    property: description
+    value: Linear probing achieves 71-83% accuracy detecting LLM truthfulness and is a foundational diagnostic tool for
+      interpretability research. While computationally cheap and widely adopted, probes are vulnerable to adversarial
+      hiding and only detect linearly separable features, limiting their standalone s
+    asOf: 2026-03
+    notes: Migrated from old entity system

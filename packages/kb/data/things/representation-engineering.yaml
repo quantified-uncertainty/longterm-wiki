@@ -1,0 +1,14 @@
+thing:
+  id: representation-engineering
+  stableId: xwxKWEAkSQ
+  type: approach
+  name: Representation Engineering
+  numericId: E479
+facts:
+  - id: f_YvlG2uTZ8Q
+    property: description
+    value: A top-down approach to understanding and controlling AI behavior by reading and modifying concept-level
+      representations in neural networks, enabling behavior steering without retraining through activation
+      interventions.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -409,6 +409,7 @@ function CategorySection({
               <th className="text-left px-3 py-2 text-xs font-medium">
                 Status
               </th>
+              <th className="px-3 py-2 w-6" />
             </tr>
           </thead>
           <tbody>
@@ -482,6 +483,15 @@ function StructuredRow({ statement: s, showVerdict }: { statement: ResolvedState
           </span>
         )}
       </td>
+      <td className="px-3 py-2 text-xs">
+        <Link
+          href={`/statements/statement/${s.id}`}
+          className="text-muted-foreground hover:text-blue-600"
+          title="Debug view"
+        >
+          →
+        </Link>
+      </td>
     </tr>
   );
 }
@@ -536,6 +546,13 @@ function AttributedCard({ statement: s }: { statement: ResolvedStatement }) {
           </span>
           <VerdictBadge verdict={s.verdict} score={s.verdictScore} size="sm" />
           <AttributedCitationDetail citations={s.citations} />
+          <Link
+            href={`/statements/statement/${s.id}`}
+            className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium text-muted-foreground hover:text-blue-600"
+            title="Debug view"
+          >
+            Debug →
+          </Link>
         </div>
       </div>
     </div>

@@ -1,0 +1,18 @@
+thing:
+  id: uk-aisi
+  stableId: aX0jkoaekQ
+  type: organization
+  name: UK AI Safety Institute
+  numericId: E364
+facts:
+  - id: f_S2fTBH9xxw
+    property: description
+    value: The UK AI Safety Institute (UK AISI) is a government organization established in 2023 to advance AI safety
+      through research, evaluation, and international coordination. Created in the wake of the first AI Safety Summit
+      hosted by the UK government, AISI represents the UK's commitment to being a global leader in AI safety and
+      governance.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_uEP85IlxRA
+    property: website
+    value: https://www.aisi.gov.uk

@@ -329,3 +329,301 @@ properties:
     category: safety
     temporal: true
     appliesTo: [organization]
+
+  # ── AI Model Properties ───────────────────────────────────────────────
+
+  parameter-count:
+    name: Parameter Count
+    description: "Total number of trainable parameters in the model (in billions)"
+    dataType: number
+    unit: parameters
+    category: model
+    appliesTo: [ai-model]
+    display:
+      divisor: 1e9
+      suffix: "B params"
+
+  context-window:
+    name: Context Window
+    description: "Maximum number of tokens the model can process in a single context"
+    dataType: number
+    unit: tokens
+    category: model
+    temporal: true
+    appliesTo: [ai-model]
+    display:
+      divisor: 1000
+      suffix: "K tokens"
+
+  training-compute:
+    name: Training Compute
+    description: "Estimated compute used for training (in FLOPs)"
+    dataType: number
+    unit: FLOPs
+    category: model
+    appliesTo: [ai-model]
+
+  model-release-date:
+    name: Release Date
+    description: "Date the model was publicly released or announced"
+    dataType: date
+    category: model
+    appliesTo: [ai-model]
+
+  developed-by:
+    name: Developed By
+    description: "Organization that developed or released this AI model"
+    dataType: ref
+    category: model
+    appliesTo: [ai-model, project]
+    inverseId: developed-models
+    inverseName: Developed Models
+
+  developed-models:
+    name: Developed Models
+    description: "AI models developed by this organization (computed from developed-by facts)"
+    dataType: refs
+    category: model
+    appliesTo: [organization]
+    inverseId: developed-by
+    inverseName: Developed By
+    computed: true
+
+  model-family:
+    name: Model Family
+    description: "Model series or family this model belongs to (e.g., GPT-4, Claude 3)"
+    dataType: text
+    category: model
+    appliesTo: [ai-model]
+
+  modality:
+    name: Modality
+    description: "Input/output modalities supported (e.g., text, vision, audio, code)"
+    dataType: text
+    category: model
+    appliesTo: [ai-model]
+
+  license-type:
+    name: License Type
+    description: "License type: open-weights, open-source, proprietary, research-only"
+    dataType: text
+    category: model
+    appliesTo: [ai-model]
+
+  # ── Risk & Concept Properties ─────────────────────────────────────────
+
+  p-doom:
+    name: P(doom)
+    description: "Expert estimate of probability of catastrophic/existential AI outcome (%)"
+    dataType: number
+    unit: percent
+    category: risk
+    temporal: true
+    appliesTo: [risk, concept, debate]
+    display:
+      suffix: "%"
+
+  expert-consensus-level:
+    name: Expert Consensus Level
+    description: "Degree of expert agreement: high / medium / low / contested / unknown"
+    dataType: text
+    category: epistemic
+    appliesTo: [risk, approach, debate, concept, capability]
+
+  evidence-strength:
+    name: Evidence Strength
+    description: "Quality of supporting evidence: strong / moderate / weak / mixed / theoretical"
+    dataType: text
+    category: epistemic
+    appliesTo: [risk, approach, debate, concept, capability, analysis]
+
+  severity-level:
+    name: Severity Level
+    description: "Potential impact severity: catastrophic / severe / moderate / minor"
+    dataType: text
+    category: risk
+    appliesTo: [risk]
+
+  likelihood-estimate:
+    name: Likelihood Estimate
+    description: "Estimated probability this risk materializes within the relevant timeframe (%)"
+    dataType: number
+    unit: percent
+    category: risk
+    temporal: true
+    appliesTo: [risk]
+    display:
+      suffix: "%"
+
+  reversibility:
+    name: Reversibility
+    description: "Whether the impact is reversible: reversible / partially-reversible / irreversible"
+    dataType: text
+    category: risk
+    appliesTo: [risk]
+
+  time-horizon:
+    name: Time Horizon
+    description: "Timeframe for risk materialization or approach relevance: near-term / medium-term / long-term / ongoing"
+    dataType: text
+    category: concept
+    appliesTo: [risk, approach, debate, concept, capability]
+
+  # ── Approach & Response Properties ────────────────────────────────────
+
+  intervention-type:
+    name: Intervention Type
+    description: "Category of approach: technical / policy / governance / research / community"
+    dataType: text
+    category: approach
+    appliesTo: [approach]
+
+  maturity-level:
+    name: Maturity Level
+    description: "Development stage: theoretical / early-research / active-research / deployed / mature"
+    dataType: text
+    category: approach
+    appliesTo: [approach, capability]
+
+  key-proponents:
+    name: Key Proponents
+    description: "People or organizations most associated with advocating this approach"
+    dataType: refs
+    category: approach
+    appliesTo: [approach, debate]
+
+  addresses-risk:
+    name: Addresses Risk
+    description: "Risk(s) this approach is designed to mitigate (refs to risk entities)"
+    dataType: refs
+    category: approach
+    appliesTo: [approach]
+
+  tractability:
+    name: Tractability
+    description: "How tractable the approach is: high / medium / low / unknown"
+    dataType: text
+    category: approach
+    appliesTo: [approach]
+
+  # ── Debate Properties ─────────────────────────────────────────────────
+
+  core-question:
+    name: Core Question
+    description: "The central question or crux of the debate"
+    dataType: text
+    category: debate
+    appliesTo: [debate]
+
+  mainstream-position:
+    name: Mainstream Position
+    description: "The dominant or most widely-held view among experts"
+    dataType: text
+    category: debate
+    appliesTo: [debate]
+
+  minority-position:
+    name: Minority Position
+    description: "A significant dissenting or minority view"
+    dataType: text
+    category: debate
+    appliesTo: [debate]
+
+  # ── Research & Epistemic Properties ──────────────────────────────────
+
+  publication-date:
+    name: Publication Date
+    description: "Date a research paper, report, or document was published"
+    dataType: date
+    category: research
+    appliesTo: [concept, approach, risk, debate]
+
+  research-consensus:
+    name: Research Consensus
+    description: "What the research literature broadly agrees on regarding this topic"
+    dataType: text
+    category: epistemic
+    appliesTo: [risk, approach, debate, concept, capability]
+
+  survey-result:
+    name: Survey Result
+    description: "Numerical result from a relevant survey or poll (e.g., expert survey response)"
+    dataType: number
+    unit: percent
+    category: epistemic
+    temporal: true
+    appliesTo: [risk, approach, debate, concept]
+    display:
+      suffix: "%"
+
+  open-questions:
+    name: Open Questions
+    description: "Key unresolved questions in this area"
+    dataType: text
+    category: epistemic
+    appliesTo: [risk, approach, debate, concept, capability]
+
+  # ── General Properties ───────────────────────────────────────────────
+
+  description:
+    name: Description
+    description: "Brief description of this entity"
+    dataType: text
+    category: general
+    appliesTo: [organization, person, ai-model, risk, approach, capability, concept, debate, policy, project, event, analysis, argument]
+
+  website:
+    name: Website
+    description: "Primary website URL"
+    dataType: text
+    category: general
+    appliesTo: [organization, person, project]
+
+  org-type:
+    name: Organization Type
+    description: "Type of organization (company, nonprofit, research lab, government agency, etc.)"
+    dataType: text
+    category: organization
+    appliesTo: [organization]
+
+  # ── Incident Properties ──────────────────────────────────────────────
+
+  incident-date:
+    name: Incident Date
+    description: "Date the incident occurred or started"
+    dataType: date
+    category: incident
+    appliesTo: [incident]
+
+  organizations-involved:
+    name: Organizations Involved
+    description: "Organizations involved in or affected by this incident"
+    dataType: refs
+    category: incident
+    appliesTo: [incident]
+
+  financial-impact:
+    name: Financial Impact
+    description: "Estimated financial impact of the incident in USD"
+    dataType: number
+    unit: USD
+    category: incident
+    appliesTo: [incident]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  casualties:
+    name: Casualties
+    description: "Number of people killed or seriously injured"
+    dataType: number
+    category: incident
+    appliesTo: [incident]
+
+  incident-status:
+    name: Status
+    description: "Current status of the incident: ongoing, resolved, litigation, under-investigation"
+    dataType: text
+    category: incident
+    appliesTo: [incident]

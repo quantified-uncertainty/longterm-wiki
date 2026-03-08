@@ -3,7 +3,7 @@ thing:
   stableId: vzxfzxBITd
   type: person
   name: "Paul Christiano"
-  numericId: 220
+  numericId: "E220"
   aliases:
     - Paul
 

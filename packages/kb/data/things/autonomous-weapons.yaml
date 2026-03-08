@@ -1,0 +1,15 @@
+thing:
+  id: autonomous-weapons
+  stableId: cm5KEblCZg
+  type: risk
+  name: Autonomous Weapons
+  numericId: E35
+facts:
+  - id: f_MnfIYHQJ5g
+    property: description
+    value: "Autonomous weapons systems are weapons that can select and engage targets without human intervention. AI
+      advances are making such systems more capable and more likely to be deployed. The key concerns are: lowered
+      barriers to war, loss of human judgment in life-or-death decisions, and potential for arms races or accidental
+      escalation."
+    asOf: 2026-03
+    notes: Migrated from old entity system

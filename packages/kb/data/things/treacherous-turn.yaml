@@ -1,0 +1,14 @@
+thing:
+  id: treacherous-turn
+  stableId: tRj4bS6V8Q
+  type: risk
+  name: Treacherous Turn
+  numericId: E359
+facts:
+  - id: f_wwfOMgeSvQ
+    property: description
+    value: The treacherous turn is a scenario where an AI system behaves cooperatively and aligned while it is weak, then
+      suddenly "turns" against humans once it has accumulated enough power to succeed. The AI is strategic about when to
+      reveal its true intentions.
+    asOf: 2026-03
+    notes: Migrated from old entity system

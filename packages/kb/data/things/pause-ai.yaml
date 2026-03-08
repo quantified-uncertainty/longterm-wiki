@@ -1,0 +1,14 @@
+thing:
+  id: pause-ai
+  stableId: woL5lkqLpg
+  type: organization
+  name: Pause AI
+  numericId: E553
+facts:
+  - id: f_rk8dJa89eA
+    property: description
+    value: Pause AI is a grassroots advocacy movement founded May 2023 calling for international pause on frontier AI
+      development until safety proven, growing to multi-continental network but achieving zero documented policy
+      victories despite ~70% public support in US polling. Organization operates primarily t
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: capability-elicitation
+  stableId: PQgF6Ve9ZA
+  type: approach
+  name: Capability Elicitation
+  numericId: E443
+facts:
+  - id: f_nzr39RC8aQ
+    property: description
+    value: Systematic methods to discover what AI models can actually do, including hidden capabilities that may not appear
+      in standard benchmarks, through scaffolding, fine-tuning, and specialized prompting techniques. METR research
+      shows AI agent task completion doubles every 7 months.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -114,6 +114,12 @@ const SCRIPTS = {
     passthrough: ['dry-run'],
     positional: false,
   },
+  audit: {
+    script: 'statements/audit.ts',
+    description: 'Detect duplicate and missing-qualifier conflicts in active statements',
+    passthrough: ['fix', 'json'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'quality');
@@ -133,7 +139,7 @@ Ontology Workflow:
 ${commandList.split('\n').filter(l => /^\s+(draft|apply-draft)\s/.test(l)).join('\n')}
 
 Analysis Commands:
-${commandList.split('\n').filter(l => /^\s+(extract|verify|quality|score|gaps|improve|ideate|seed-properties)\s/.test(l)).join('\n')}
+${commandList.split('\n').filter(l => /^\s+(extract|verify|quality|score|gaps|improve|ideate|seed-properties|audit)\s/.test(l)).join('\n')}
 
 CRUD Examples:
   crux statements list anthropic                   List all statements

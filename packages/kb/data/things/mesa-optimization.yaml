@@ -1,0 +1,14 @@
+thing:
+  id: mesa-optimization
+  stableId: 8Bv92x9G1A
+  type: risk
+  name: Mesa-Optimization
+  numericId: E197
+facts:
+  - id: f_0hCOMZmZrA
+    property: description
+    value: Mesa-optimization occurs when a learned model (like a neural network) is itself an optimizer. The "mesa-" prefix
+      means the optimization emerges from within the training process, as opposed to the "base" optimizer (the training
+      algorithm itself).
+    asOf: 2026-03
+    notes: Migrated from old entity system

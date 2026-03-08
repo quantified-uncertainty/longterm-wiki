@@ -1,0 +1,14 @@
+thing:
+  id: ibbis
+  stableId: 55HJBLrOzg
+  type: organization
+  name: IBBIS (International Biosecurity and Biosafety Initiative for Science)
+  numericId: E536
+facts:
+  - id: f_GF37tEIIOA
+    property: description
+    value: An independent Swiss foundation launched in February 2024, spun out of NTI | bio, that develops free open-source
+      tools for DNA synthesis screening and works to strengthen international biosecurity norms. Led by Piers Millett,
+      IBBIS created the Common Mechanism (commec), launched the DNA Screening St
+    asOf: 2026-03
+    notes: Migrated from old entity system

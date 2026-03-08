@@ -9,6 +9,7 @@ run-name: "Auto-Rebase PRs${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' ||
 #   2. Skip PRs updated within 30 minutes (active work)
 #   3. Skip branches with commits pushed within 30 minutes (active work)
 #   4. Skip branches where last commit contains [ci-autofix] (feedback loop)
+#   5. Skip PRs with the `stage:merging` label (in merge queue — rebase would invalidate entry)
 
 on:
   schedule:

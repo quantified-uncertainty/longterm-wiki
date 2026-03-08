@@ -1,0 +1,12 @@
+thing:
+  id: beth-barnes
+  stableId: ZvfLhIm7pw
+  type: person
+  name: Beth Barnes
+  numericId: E39
+facts:
+  - id: f_RrAkR6GYlQ
+    property: description
+    value: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
+    asOf: 2026-03
+    notes: Migrated from old entity system

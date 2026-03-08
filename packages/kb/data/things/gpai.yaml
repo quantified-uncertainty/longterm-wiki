@@ -1,0 +1,14 @@
+thing:
+  id: gpai
+  stableId: p2h6bEqhvQ
+  type: organization
+  name: Global Partnership on Artificial Intelligence (GPAI)
+  numericId: E533
+facts:
+  - id: f_ZPgV2Jzx3A
+    property: description
+    value: GPAI represents the first major multilateral AI governance initiative but operates as a non-binding policy
+      laboratory with limited enforcement power and structural coordination challenges. While providing valuable
+      international cooperation frameworks, its voluntary nature and exclusion of key AI-dev
+    asOf: 2026-03
+    notes: Migrated from old entity system

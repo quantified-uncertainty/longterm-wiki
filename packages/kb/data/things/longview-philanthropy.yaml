@@ -1,0 +1,14 @@
+thing:
+  id: longview-philanthropy
+  stableId: gV4U3qi2QA
+  type: organization
+  name: Longview Philanthropy
+  numericId: E542
+facts:
+  - id: f_wP669aJGyw
+    property: description
+    value: "Longview Philanthropy is a philanthropic advisory organization founded in 2018 that has directed $140M+ to
+      longtermist causes ($89M+ to AI risk), primarily through UHNW donor advising and managed funds (Frontier AI Fund:
+      $13M raised, $11.1M disbursed to 18 orgs). Funded primarily by Coefficient Givi"
+    asOf: 2026-03
+    notes: Migrated from old entity system

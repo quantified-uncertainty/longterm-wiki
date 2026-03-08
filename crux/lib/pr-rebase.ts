@@ -9,6 +9,7 @@
  *   2. Skip PRs updated within 30 minutes (active work)
  *   3. Skip branches with commits pushed within 30 minutes (active work)
  *   4. Skip branches where the last commit message contains `[ci-autofix]` (feedback loop)
+ *   5. Skip PRs with the `stage:merging` label (in merge queue — rebase would invalidate entry)
  *
  * Used by: crux pr rebase-all (CLI command) and .github/workflows/auto-rebase.yml
  */
@@ -53,11 +54,12 @@ const DEFAULT_RECENT_WINDOW = 1800; // 30 minutes in seconds
 /**
  * Determine whether a PR should be skipped for rebase.
  *
- * Encapsulates all 4 safeguards:
+ * Encapsulates all 5 safeguards:
  *   1. `agent:working` label
  *   2. PR updated within recentWindow
  *   3. Branch tip pushed within recentWindow
  *   4. Last commit message contains `[ci-autofix]`
+ *   5. `stage:merging` label (in merge queue — rebase would invalidate entry)
  *
  * @param pr - The PR candidate
  * @param nowEpoch - Current time as Unix epoch seconds
@@ -76,6 +78,11 @@ export function shouldSkipPr(
   // Safeguard 1: agent:working label
   if (pr.labels.includes(LABELS.AGENT_WORKING)) {
     return { skip: true, reason: `has '${LABELS.AGENT_WORKING}' label (agent actively working)` };
+  }
+
+  // Safeguard 5: stage:merging label (in merge queue — rebase would invalidate entry)
+  if (pr.labels.includes(LABELS.STAGE_MERGING)) {
+    return { skip: true, reason: `has '${LABELS.STAGE_MERGING}' label (in merge queue)` };
   }
 
   // Safeguard 2: PR updated recently

@@ -511,7 +511,7 @@ async function main(): Promise<void> {
           console.log(`\n${c.green}${c.bold}  ✅ Gate already passed for this commit${c.reset} ${c.dim}(${headHash.slice(0, 8)}, ${stamp.mode} mode)${c.reset}`);
           console.log(`${c.dim}  Skipping re-run. Use --no-cache to force.${c.reset}\n`);
         }
-        process.exit(0);
+        return;
       }
     }
   }
@@ -532,7 +532,8 @@ async function main(): Promise<void> {
         allResults.push(result);
         if (!result.passed) {
           printSummary(allResults, totalStart);
-          process.exit(1);
+          process.exitCode = 1;
+          return;
         }
       }
     }
@@ -547,10 +548,10 @@ async function main(): Promise<void> {
     printSummary(allResults, totalStart);
 
     if (contentResults.some(r => !r.passed && !r.advisory)) {
-      process.exit(1);
+      process.exitCode = 1;
     }
     // Do NOT write stamp cache for content-only runs
-    process.exit(0);
+    return;
   }
 
   // ── Phase 0: Triage — decide which checks to skip ─────────────────────────
@@ -623,7 +624,8 @@ async function main(): Promise<void> {
     allResults.push(buildDataResult);
     if (!buildDataResult.passed) {
       printSummary(allResults, totalStart, skippedCount);
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
   }
 
@@ -634,7 +636,8 @@ async function main(): Promise<void> {
       allResults.push(result);
       if (!result.passed) {
         printSummary(allResults, totalStart, skippedCount);
-        process.exit(1);
+        process.exitCode = 1;
+        return;
       }
     }
   }
@@ -644,7 +647,8 @@ async function main(): Promise<void> {
   allResults.push(...parallelResults);
   if (parallelResults.some(r => !r.passed && !r.advisory)) {
     printSummary(allResults, totalStart, skippedCount);
-    process.exit(1);
+    process.exitCode = 1;
+    return;
   }
 
   // ── Phase 4: Full Next.js build (only if all other checks pass) ────────────
@@ -653,7 +657,8 @@ async function main(): Promise<void> {
     allResults.push(buildResult);
     if (!buildResult.passed) {
       printSummary(allResults, totalStart, skippedCount);
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
   }
 
@@ -665,7 +670,6 @@ async function main(): Promise<void> {
     writeStamp(headHash, FULL_MODE ? 'full' : 'fast');
   }
 
-  process.exit(0);
 }
 
 function printSummary(results: StepResult[], totalStart: number, skippedCount: number = 0): void {
@@ -698,4 +702,7 @@ function printSummary(results: StepResult[], totalStart: number, skippedCount: n
   }
 }
 
-main();
+main().catch((e) => {
+  console.error(e instanceof Error ? e.message : String(e));
+  process.exitCode = 1;
+});

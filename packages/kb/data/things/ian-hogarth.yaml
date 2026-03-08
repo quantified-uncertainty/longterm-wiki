@@ -1,0 +1,12 @@
+thing:
+  id: ian-hogarth
+  stableId: DX4NK1gGtg
+  type: person
+  name: Ian Hogarth
+  numericId: E162
+facts:
+  - id: f_fIpd1bJ2xg
+    property: description
+    value: Chair of the UK AI Safety Institute, AI investor, and author of influential writing on frontier AI risks.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,16 @@
+thing:
+  id: financial-stability-risks-ai-capex
+  stableId: Q0msUgaClw
+  type: risk
+  name: Financial Stability Risks from AI Capital Expenditure
+  numericId: E690
+facts:
+  - id: f_CZFwfKw9bA
+    property: description
+    value: The $700B+ AI infrastructure investment in 2026 creates financial stability risks through a 6-14x gap between
+      capex and direct AI revenue, growing debt-financed construction ($200B+ in data center debt), free cash flow
+      destruction at major tech companies (Alphabet FCF down 89%, Meta down ~90%), and structural parallels to the 1990s
+      telecom bubble ($1.4T projected 2024-2026 vs $1.2T telecom inflation-adjusted). Risks could transmit to broader
+      markets through index fund concentration, credit contagion, and semiconductor supply chain cascades.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,12 @@
+thing:
+  id: bio-risk
+  stableId: kZQP3vYrXA
+  type: risk
+  name: AI-Enabled Biological Risks
+  numericId: E40
+facts:
+  - id: f_omvSZltcdg
+    property: description
+    value: Risk of AI systems enabling creation or enhancement of biological weapons or dangerous pathogens.
+    asOf: 2026-03
+    notes: Migrated from old entity system

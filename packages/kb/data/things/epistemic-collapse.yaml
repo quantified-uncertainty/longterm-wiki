@@ -1,0 +1,14 @@
+thing:
+  id: epistemic-collapse
+  stableId: GeYirWJrwA
+  type: risk
+  name: Epistemic Collapse
+  numericId: E119
+facts:
+  - id: f_cGmzzvhs8w
+    property: description
+    value: Epistemic collapse refers to a breakdown in society's collective ability to distinguish truth from falsehood,
+      leading to an inability to form shared beliefs about reality. AI accelerates this risk by enabling unprecedented
+      scale of content generation, personalization of information, and fabrication of evidence.
+    asOf: 2026-03
+    notes: Migrated from old entity system

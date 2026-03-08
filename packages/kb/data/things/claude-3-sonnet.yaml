@@ -1,0 +1,13 @@
+thing:
+  id: claude-3-sonnet
+  stableId: ReFcBG3rJQ
+  type: project
+  name: Claude 3 Sonnet
+  numericId: E1028
+facts:
+  - id: f_cqzJ66YCOg
+    property: description
+    value: Claude 3 Sonnet was the mid-tier model in the Claude 3 family, released March 4, 2024. It offered 2x the speed of
+      Claude 2 at higher intelligence levels. Priced at $3/$15 per million tokens with a 200K token context window.
+    asOf: 2026-03
+    notes: Migrated from old entity system

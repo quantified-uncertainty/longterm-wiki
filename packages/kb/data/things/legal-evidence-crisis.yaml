@@ -1,0 +1,31 @@
+thing:
+  id: legal-evidence-crisis
+  stableId: 52V4qNAQjw
+  type: risk
+  name: AI-Driven Legal Evidence Crisis
+  numericId: E188
+facts:
+  - id: f_ftlDS0KQTw
+    property: description
+    value: >-
+      The legal evidence crisis refers to the breakdown of courts' ability to rely on digital evidence as AI makes
+      generating convincing fake videos, audio, documents, and images trivially easy. Legal systems worldwide have
+      adapted to accept digital evidence - security camera footage, phone records, digital documents - as legitimate
+      proof. This adaptation assumed that fabricating such evidence was difficult. AI changes that assumption.
+
+
+      The immediate impact is the "liar's dividend" - defendants can now plausibly claim that damning video or audio
+      evidence is an AI-generated fake, even when it's real. This makes prosecution more difficult when evidence
+      actually is authentic. But the deeper problem is that as AI-generated fakes become common, the epistemics of the
+      courtroom break down. Judges and juries cannot reliably distinguish real from fake digital evidence without
+      sophisticated forensic analysis that may not be available.
+
+
+      Courts have several options, none satisfactory: require cryptographic provenance chains for digital evidence (C2PA
+      standard), rely more heavily on non-digital evidence, raise evidentiary standards so high that many crimes become
+      unprosecutable, or develop new forensic capabilities that can keep pace with generative AI. The race between
+      forgery capability and detection capability is unlikely to favor detection. The fundamental challenge is that
+      legal systems require reliable evidence to function, and AI is undermining the reliability of the most common
+      forms of modern evidence.
+    asOf: 2026-03
+    notes: Migrated from old entity system

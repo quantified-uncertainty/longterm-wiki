@@ -1,0 +1,29 @@
+thing:
+  id: learned-helplessness
+  stableId: SFFrl4Pmag
+  type: risk
+  name: Epistemic Learned Helplessness
+  numericId: E187
+facts:
+  - id: f_3bMLSsOEyQ
+    property: description
+    value: >-
+      Epistemic learned helplessness occurs when people give up trying to determine what is true because the effort
+      seems futile. Just as the original learned helplessness phenomenon describes animals that stop trying to escape
+      painful situations after repeated failures, epistemic learned helplessness describes people who stop trying to
+      evaluate information because they've learned that distinguishing truth from falsehood is too difficult.
+
+
+      The phenomenon is already visible. Surveys show increasing numbers of people "avoid" the news because it's
+      overwhelming or depressing. When exposed to conflicting claims, many people simply disengage rather than
+      investigate. The flood of AI-generated content, deepfakes, and sophisticated misinformation makes this worse - if
+      anything could be fake, why bother trying to verify anything?
+
+
+      Epistemic learned helplessness is self-reinforcing and dangerous for democracy. People who give up on knowing
+      what's true become vulnerable to manipulation - they may follow charismatic leaders, tribal affiliations, or
+      emotional appeals instead of evidence. Democratic deliberation requires citizens who believe they can evaluate
+      claims and hold informed opinions. As epistemic learned helplessness spreads, the population becomes
+      simultaneously more manipulable and more passive, accepting that "nobody knows what's really true anyway."
+    asOf: 2026-03
+    notes: Migrated from old entity system

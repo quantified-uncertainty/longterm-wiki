@@ -1,0 +1,14 @@
+thing:
+  id: anthropic-pre-ipo-daf-transfers
+  stableId: 1DjpqfXwjA
+  type: analysis
+  name: Anthropic Pre-IPO DAF Transfers
+  numericId: E412
+facts:
+  - id: f_ssPs0akaMA
+    property: description
+    value: Analysis of charitable giving mechanisms at Anthropic, focusing on the employee matching program and potential
+      founder transfers. The matching program (historically 3:1 at 50% of equity) is one of the most generous corporate
+      charitable giving vehicles ever offered, with $20-40B already committed to DAFs.
+    asOf: 2026-03
+    notes: Migrated from old entity system

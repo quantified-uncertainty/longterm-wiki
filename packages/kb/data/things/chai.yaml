@@ -1,0 +1,17 @@
+thing:
+  id: chai
+  stableId: zMfgJqiEPQ
+  type: organization
+  name: CHAI
+  numericId: E57
+facts:
+  - id: f_yNQJE8kYNw
+    property: description
+    value: The Center for Human-Compatible AI (CHAI) is an academic research center at UC Berkeley focused on ensuring AI
+      systems are beneficial to humans. Founded by Stuart Russell, author of the leading AI textbook, CHAI brings
+      academic rigor to AI safety research.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_q88t1C2dbw
+    property: website
+    value: https://humancompatible.ai

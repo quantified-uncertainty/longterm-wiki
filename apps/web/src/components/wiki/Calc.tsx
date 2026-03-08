@@ -66,8 +66,9 @@ function kbFactLookup(entity: string, propertyId: string): Fact | undefined {
  * inline with a hover tooltip showing the formula and inputs.
  *
  * Usage in MDX:
- *   <Calc expr="{anthropic.revenue} / {anthropic.valuation}" precision={1} suffix="x" />
- *   <Calc expr="{anthropic.revenue} * 2.5" format="currency" />
+ *   <Calc expr="{anthropic.valuation} / {anthropic.revenue}" precision={0} suffix="x" />
+ *   <Calc expr="{anthropic.revenue-run-rate} * 2.5" format="currency" />
+ *   <Calc expr="{anthropic.gross-margin}" format="percent" />
  */
 export function Calc({
   expr,

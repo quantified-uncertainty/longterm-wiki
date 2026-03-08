@@ -70,7 +70,17 @@ export async function fetchAllPaginated<T>(
   );
   if (!first.ok) return first;
 
-  const total = first.data.total as number;
+  const rawTotal = first.data.total;
+  if (typeof rawTotal !== "number" || !Number.isFinite(rawTotal)) {
+    return {
+      ok: false,
+      error: {
+        type: "connection-error",
+        message: `Expected numeric "total" in response, got ${typeof rawTotal} (${String(rawTotal)})`,
+      },
+    };
+  }
+  const total = rawTotal;
   const firstItems = first.data[itemsKey] as T[];
   if (!Array.isArray(firstItems)) {
     return {

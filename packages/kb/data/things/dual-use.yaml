@@ -1,0 +1,12 @@
+thing:
+  id: dual-use
+  stableId: CwBPBQAmxA
+  type: concept
+  name: Dual-Use AI Technology
+  numericId: E106
+facts:
+  - id: f_LghEUK12nQ
+    property: description
+    value: Technologies that have both beneficial civilian applications and potential military or harmful uses.
+    asOf: 2026-03
+    notes: Migrated from old entity system

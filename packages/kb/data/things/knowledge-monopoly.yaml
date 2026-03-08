@@ -1,0 +1,31 @@
+thing:
+  id: knowledge-monopoly
+  stableId: TaBC4uj0Bw
+  type: risk
+  name: AI Knowledge Monopoly
+  numericId: E183
+facts:
+  - id: f_VpW4dCKdmg
+    property: description
+    value: >-
+      AI knowledge monopoly refers to a future where a small number of AI systems become the primary or sole source of
+      information and knowledge for most of humanity. As AI systems become the dominant interface for answering
+      questions, conducting research, and accessing information, whoever controls these systems gains enormous power
+      over what humanity believes to be true.
+
+
+      The dynamics of AI development favor concentration. Training frontier models requires billions in compute,
+      proprietary datasets, and specialized talent - resources available to very few organizations. Network effects and
+      data advantages compound over time. The pattern from search (Google's dominance) and social media (a handful of
+      platforms) suggests similar concentration is likely for AI. Already, most AI-generated content comes from systems
+      built by a handful of companies.
+
+
+      The dangers are profound. A knowledge monopoly creates single points of failure - errors or biases in dominant
+      systems propagate everywhere. It enables unprecedented censorship, as controlling the AI means controlling what
+      information people can access. It creates massive power asymmetries between those who control AI systems and those
+      who depend on them. Unlike library systems or academic journals, AI systems can be updated centrally at any time,
+      meaning historical knowledge could be silently revised. Independent verification becomes difficult when all
+      information flows through the same bottlenecks.
+    asOf: 2026-03
+    notes: Migrated from old entity system

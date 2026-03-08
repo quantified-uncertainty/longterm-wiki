@@ -1,0 +1,26 @@
+type: project
+name: Project
+
+required: []
+# Projects vary widely; no properties are universally required.
+
+recommended:
+  - description
+  - developed-by
+
+items:
+  milestones:
+    description: "Key milestones and achievements of this project"
+    fields:
+      description: { type: text, required: true, description: "Milestone description" }
+      date: { type: date, description: "Date of the milestone (YYYY or YYYY-MM)" }
+      source: { type: text, description: "URL to announcement or documentation" }
+      notes: { type: text, description: "Context or significance" }
+
+  contributors:
+    description: "Key contributors to this project"
+    fields:
+      entity: { type: ref, required: true, description: "Thing ID of the contributor" }
+      role: { type: text, description: "Their role or contribution" }
+      source: { type: text, description: "URL confirming the contribution" }
+      notes: { type: text, description: "Context about their involvement" }

@@ -1,0 +1,14 @@
+thing:
+  id: standards-bodies
+  stableId: HXPEtPD1zw
+  type: policy
+  name: AI Standards Development
+  numericId: E288
+facts:
+  - id: f_6v2h3W6OEg
+    property: description
+    value: International and national organizations that develop technical standards for AI systems, including measurement
+      methodologies, safety requirements, and evaluation protocols. Key bodies include ISO/IEC JTC 1/SC 42, NIST, and
+      IEEE, whose standards increasingly inform government AI regulation.
+    asOf: 2026-03
+    notes: Migrated from old entity system

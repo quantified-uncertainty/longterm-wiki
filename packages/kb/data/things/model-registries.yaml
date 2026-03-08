@@ -1,0 +1,14 @@
+thing:
+  id: model-registries
+  stableId: r8rKW3KkSg
+  type: policy
+  name: Model Registries
+  numericId: E472
+facts:
+  - id: f_4nBs8OUkgA
+    property: description
+    value: Centralized databases of frontier AI models that enable governments to track development, enforce safety
+      requirements, and coordinate international oversight, serving as foundational infrastructure for AI governance
+      analogous to drug registries for the FDA.
+    asOf: 2026-03
+    notes: Migrated from old entity system

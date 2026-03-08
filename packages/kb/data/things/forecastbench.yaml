@@ -1,0 +1,12 @@
+thing:
+  id: forecastbench
+  stableId: 2smzyptQJg
+  type: project
+  name: ForecastBench
+  numericId: E144
+facts:
+  - id: f_WXk4Z58tdg
+    property: description
+    value: Dynamic, contamination-free benchmark for evaluating LLM forecasting capabilities, published at ICLR 2025.
+    asOf: 2026-03
+    notes: Migrated from old entity system

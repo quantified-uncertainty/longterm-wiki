@@ -1,0 +1,13 @@
+thing:
+  id: fri
+  stableId: KslhqGaeJw
+  type: organization
+  name: Forecasting Research Institute (FRI)
+  numericId: E147
+facts:
+  - id: f_ODgv72zg6w
+    property: description
+    value: Research institute advancing forecasting methodology through large-scale tournaments and rigorous experiments,
+      led by Philip Tetlock.
+    asOf: 2026-03
+    notes: Migrated from old entity system

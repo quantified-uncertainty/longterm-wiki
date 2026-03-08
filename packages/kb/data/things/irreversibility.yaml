@@ -1,0 +1,15 @@
+thing:
+  id: irreversibility
+  stableId: 7e3rvE5YgA
+  type: risk
+  name: AI-Induced Irreversibility
+  numericId: E179
+facts:
+  - id: f_QOKTa1CZNQ
+    property: description
+    value: Irreversibility in AI refers to changes that, once made, cannot be undone—points of no return after which course
+      correction becomes impossible. This could include AI systems that can't be shut down, values permanently embedded
+      in superintelligent systems, societal transformations that can't be reversed, or ecological or economic changes
+      that pas...
+    asOf: 2026-03
+    notes: Migrated from old entity system

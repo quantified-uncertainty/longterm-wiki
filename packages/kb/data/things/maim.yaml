@@ -1,0 +1,15 @@
+thing:
+  id: maim
+  stableId: HkJrXOlE2A
+  type: policy
+  name: MAIM (Mutually Assured AI Malfunction)
+  numericId: E685
+facts:
+  - id: f_S9xikTbr6w
+    property: description
+    value: A deterrence framework proposed by Dan Hendrycks, Eric Schmidt, and Alexandr Wang in their 2025 paper
+      'Superintelligence Strategy'. MAIM posits that rival states will naturally deter each other from pursuing
+      unilateral AI dominance because destabilizing AI projects can be sabotaged through an escalation ladder from
+      espionage to kinetic strikes. Part of a three-pillar framework including nonproliferation and competitiveness.
+    asOf: 2026-03
+    notes: Migrated from old entity system

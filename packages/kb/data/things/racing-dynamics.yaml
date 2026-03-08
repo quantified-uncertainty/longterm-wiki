@@ -1,0 +1,14 @@
+thing:
+  id: racing-dynamics
+  stableId: SUZgWeZLNA
+  type: risk
+  name: AI Development Racing Dynamics
+  numericId: E239
+facts:
+  - id: f_OU9bCFdx1g
+    property: description
+    value: Racing dynamics refers to competitive pressure between AI developers (labs, nations) that incentivizes speed over
+      safety. When multiple actors race to develop powerful AI, each faces pressure to cut corners on safety to avoid
+      falling behind.
+    asOf: 2026-03
+    notes: Migrated from old entity system

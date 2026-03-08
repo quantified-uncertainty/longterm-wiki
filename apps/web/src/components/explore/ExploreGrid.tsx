@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { ExploreItem } from "@/data";
 import { ENTITY_GROUPS } from "@/data/entity-ontology";
+import { filterAndRankBySearch } from "@/lib/explore-search";
 import { ContentCard } from "./ContentCard";
 import { ExploreTable } from "./ExploreTable";
 
@@ -564,8 +565,9 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     // Fallback: full client-side filtering pipeline
     let items = fallbackItems.filter((item) => item.wordCount);
 
-    // Search
-    if (search.trim()) items = textFilter(items, search);
+    // Search — filter and rank by title match quality
+    const hasSearch = search.trim().length > 0;
+    if (hasSearch) items = filterAndRankBySearch(items, search);
 
     // Field filter
     const fieldGroup = FIELD_GROUPS[activeField];
@@ -590,8 +592,10 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       items = items.filter((item) => item.riskCategory === riskCatGroup.value);
     }
 
-    // Sort — skip in table mode since TanStack handles its own column sorting
-    if (viewMode !== "table") {
+    // Sort — skip in table mode since TanStack handles its own column sorting.
+    // When search is active with default sort, keep search-relevance order from filterAndRankBySearch.
+    const useSearchRanking = hasSearch && sortKey === "recommended";
+    if (viewMode !== "table" && !useSearchRanking) {
       items = [...items].sort((a, b) => {
         switch (sortKey) {
           case "title":
