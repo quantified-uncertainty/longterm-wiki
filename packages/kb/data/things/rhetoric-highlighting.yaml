@@ -1,0 +1,14 @@
+thing:
+  id: rhetoric-highlighting
+  stableId: p7aBkxraPw
+  type: approach
+  name: AI-Assisted Rhetoric Highlighting
+  numericId: E601
+facts:
+  - id: f_4I9XdY2xjQ
+    property: description
+    value: A proposed automated system for detecting and flagging persuasive-but-misleading rhetoric, including logical
+      fallacies, emotionally loaded language, selective quoting, and citation misrepresentation. Could serve as a
+      reading aid or author-side linting tool.
+    asOf: 2026-03
+    notes: Migrated from old entity system

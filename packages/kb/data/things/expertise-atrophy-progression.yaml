@@ -1,0 +1,13 @@
+thing:
+  id: expertise-atrophy-progression
+  stableId: xQSDOYiJZg
+  type: analysis
+  name: Expertise Atrophy Progression Model
+  numericId: E135
+facts:
+  - id: f_JROCZfpnDw
+    property: description
+    value: This model traces five phases from AI augmentation to irreversible skill loss. It finds humans decline to 50-70%
+      of baseline capability in Phase 3, with reversibility becoming difficult after 3-10 years of heavy AI use.
+    asOf: 2026-03
+    notes: Migrated from old entity system

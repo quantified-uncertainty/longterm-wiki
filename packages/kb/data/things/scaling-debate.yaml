@@ -1,0 +1,12 @@
+thing:
+  id: scaling-debate
+  stableId: uRp4rw0nDQ
+  type: debate
+  name: Is Scaling All You Need?
+  numericId: E272
+facts:
+  - id: f_NjyBCJlcQg
+    property: description
+    value: The debate over whether scaling compute and data is sufficient for AGI or if we need new paradigms.
+    asOf: 2026-03
+    notes: Migrated from old entity system

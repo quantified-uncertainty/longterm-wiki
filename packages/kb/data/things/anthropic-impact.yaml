@@ -1,0 +1,14 @@
+thing:
+  id: anthropic-impact
+  stableId: ieFdrOeudg
+  type: analysis
+  name: Anthropic Impact Assessment Model
+  numericId: E413
+facts:
+  - id: f_7TSLJnYZ1g
+    property: description
+    value: Framework for estimating Anthropic's net impact on AI safety outcomes. Models the tension between safety research
+      value ($100-200M/year, industry-leading interpretability) and racing dynamics contribution (6-18 month timeline
+      compression).
+    asOf: 2026-03
+    notes: Migrated from old entity system

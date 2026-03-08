@@ -1,0 +1,13 @@
+thing:
+  id: media-policy-feedback-loop
+  stableId: 13WSrjPtBw
+  type: analysis
+  name: AI Media-Policy Feedback Loop Model
+  numericId: E196
+facts:
+  - id: f_5TIw9jes6g
+    property: description
+    value: This model analyzes cycles between media coverage, public opinion, and AI policy. It finds media framing
+      significantly shapes policy windows, with 6-18 month lag between coverage spikes and regulatory response.
+    asOf: 2026-03
+    notes: Migrated from old entity system

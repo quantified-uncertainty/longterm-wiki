@@ -1,0 +1,13 @@
+thing:
+  id: proliferation-risk-model
+  stableId: xfjvMPTI4A
+  type: analysis
+  name: AI Proliferation Risk Model
+  numericId: E234
+facts:
+  - id: f_u1xqy40gqg
+    property: description
+    value: This model analyzes AI capability diffusion dynamics. It estimates key capabilities spread within 2-5 years of
+      frontier development, with open-source accelerating timelines.
+    asOf: 2026-03
+    notes: Migrated from old entity system

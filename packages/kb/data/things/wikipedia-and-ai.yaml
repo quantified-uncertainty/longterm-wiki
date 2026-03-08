@@ -1,0 +1,13 @@
+thing:
+  id: wikipedia-and-ai
+  stableId: 3x20UYnC3g
+  type: concept
+  name: Wikipedia and AI Content
+  numericId: E683
+facts:
+  - id: f_F5fT0rDdQw
+    property: description
+    value: Wikipedia's evolving relationship with AI-generated content, including defensive policies, WikiProject AI
+      Cleanup, model collapse risks, and sustainability challenges.
+    asOf: 2026-03
+    notes: Migrated from old entity system

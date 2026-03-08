@@ -1,0 +1,14 @@
+thing:
+  id: output-filtering
+  stableId: NodqHBQZnQ
+  type: approach
+  name: AI Output Filtering
+  numericId: E595
+facts:
+  - id: f_METigTz7Sw
+    property: description
+    value: Comprehensive analysis of AI output filtering showing detection rates of 70-98% depending on content type, with
+      100% of models vulnerable to jailbreaks per UK AISI testing, though Anthropic's Constitutional Classifiers blocked
+      95.6% of attacks. Concludes filtering provides marginal safety benefits f
+    asOf: 2026-03
+    notes: Migrated from old entity system

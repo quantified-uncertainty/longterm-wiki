@@ -1,0 +1,30 @@
+thing:
+  id: deliberation
+  stableId: N5OlC8H7uQ
+  type: approach
+  name: AI-Assisted Deliberation
+  numericId: E100
+facts:
+  - id: f_bM2QxXBIEg
+    property: description
+    value: >-
+      AI-assisted deliberation uses AI to scale meaningful democratic dialogue beyond the constraints of traditional
+      town halls and focus groups. Rather than replacing human deliberation with AI decisions, these tools use AI to
+      facilitate, synthesize, and scale genuine human discussion - enabling thousands or millions of people to engage in
+      deliberative processes that traditionally require small groups.
+
+
+      Pioneering systems like Polis cluster participant opinions to surface areas of consensus and reveal the structure
+      of disagreement. Taiwan's vTaiwan platform has used these tools to engage citizens in policy development on
+      contentious issues. Anthropic's Collective Constitutional AI experiment used similar methods to gather public
+      input on how AI systems should behave. The core insight is that AI can help identify common ground, summarize
+      diverse viewpoints, and translate between different perspectives at scales previously impossible.
+
+
+      For AI governance, these tools offer a path to democratically legitimate AI policy. Rather than leaving AI
+      development decisions to companies or technical elites, deliberation platforms could engage broader publics in
+      decisions about how AI should be developed and deployed. For epistemic security, deliberative processes can help
+      societies navigate contested questions by surfacing genuine consensus where it exists and clarifying the structure
+      of genuine disagreement where it doesn't.
+    asOf: 2026-03
+    notes: Migrated from old entity system

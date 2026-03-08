@@ -1,0 +1,14 @@
+thing:
+  id: multi-actor-landscape
+  stableId: ShnibSJ2tA
+  type: analysis
+  name: AI Safety Multi-Actor Strategic Landscape
+  numericId: E418
+facts:
+  - id: f_g1485JbeYw
+    property: description
+    value: Model analyzing how risk depends on which actors develop TAI. US-China capability gap narrowed from 9.26% to
+      1.70% (2024-2025), while open-source closed to within 1.70% of frontier. Actor identity may determine 40-60% of
+      total risk variance.
+    asOf: 2026-03
+    notes: Migrated from old entity system

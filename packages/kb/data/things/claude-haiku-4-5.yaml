@@ -1,0 +1,14 @@
+thing:
+  id: claude-haiku-4-5
+  stableId: y87VxEBBIA
+  type: project
+  name: Claude Haiku 4.5
+  numericId: E1037
+facts:
+  - id: f_KcUpuzjuwg
+    property: description
+    value: Claude Haiku 4.5 was released October 15, 2025. Delivered performance comparable to Sonnet 4 at a fraction of the
+      cost, making near-frontier intelligence accessible for scaled deployments. Priced at $1/$5 per million tokens with
+      a 200K token context window.
+    asOf: 2026-03
+    notes: Migrated from old entity system

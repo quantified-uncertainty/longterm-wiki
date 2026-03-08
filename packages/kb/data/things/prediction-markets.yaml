@@ -1,0 +1,31 @@
+thing:
+  id: prediction-markets
+  stableId: 4ctZelqZfw
+  type: approach
+  name: Prediction Markets (AI Forecasting)
+  numericId: E228
+facts:
+  - id: f_GS6nDk33iQ
+    property: description
+    value: >-
+      Prediction markets use market mechanisms to aggregate beliefs about future events, producing probability estimates
+      that reflect the collective knowledge of participants. Unlike polls or expert surveys, prediction markets create
+      incentives for truthful revelation of beliefs - participants profit by being right, not by appearing smart or
+      conforming to social expectations. This makes them resistant to many of the biases that afflict other forecasting
+      methods.
+
+
+      Empirically, prediction markets have strong track records. They consistently outperform expert panels on questions
+      with clear resolution criteria. Platforms like Polymarket, Metaculus, and Manifold generate forecasts on AI
+      development, geopolitical events, and scientific questions that often prove more accurate than institutional
+      predictions. The Good Judgment Project demonstrated that carefully selected forecasters using prediction
+      market-like mechanisms could outperform intelligence analysts with access to classified information.
+
+
+      For AI governance and epistemic security, prediction markets offer several valuable functions. They can provide
+      credible forecasts of AI capability development, helping policymakers time interventions appropriately. They can
+      surface genuine expert consensus (or lack thereof) on contested questions. They can create accountability for AI
+      labs' claims about safety and timelines. And they can provide a coordination mechanism for collective knowledge
+      that is resistant to the manipulation that undermines traditional media and expert systems.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: deepfake-detection
+  stableId: iwwpbwOJsA
+  type: approach
+  name: Deepfake Detection
+  numericId: E591
+facts:
+  - id: f_uOwuYTjrxg
+    property: description
+    value: Comprehensive analysis of deepfake detection showing best commercial detectors achieve 78-87% in-the-wild
+      accuracy vs 96%+ in controlled settings, with Deepfake-Eval-2024 benchmark revealing 45-50% performance drops on
+      real-world content. Human detection averages 55.5% (meta-analysis of 56 papers).
+    asOf: 2026-03
+    notes: Migrated from old entity system

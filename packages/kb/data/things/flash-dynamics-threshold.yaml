@@ -1,0 +1,13 @@
+thing:
+  id: flash-dynamics-threshold
+  stableId: qiha5B5icA
+  type: analysis
+  name: Flash Dynamics Threshold Model
+  numericId: E143
+facts:
+  - id: f_MT460LnMOw
+    property: description
+    value: This model identifies thresholds where AI speed exceeds human oversight capacity. Current systems already operate
+      10-10,000x faster than humans in key domains, with oversight thresholds crossed in many areas.
+    asOf: 2026-03
+    notes: Migrated from old entity system

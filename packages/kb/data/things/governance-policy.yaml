@@ -1,0 +1,14 @@
+thing:
+  id: governance-policy
+  stableId: JIb2GMMbIQ
+  type: debate
+  name: AI Governance and Policy
+  numericId: E154
+facts:
+  - id: f_OehvpmO32g
+    property: description
+    value: The broad domain of regulatory, legal, and institutional frameworks governing the development and deployment of
+      AI systems. Encompasses national AI strategies, international coordination mechanisms, voluntary commitments by
+      labs, and technical standards bodies.
+    asOf: 2026-03
+    notes: Migrated from old entity system

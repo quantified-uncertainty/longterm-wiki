@@ -1,0 +1,14 @@
+thing:
+  id: manifest
+  stableId: KYKdAOzynA
+  type: organization
+  name: Manifest (Forecasting Conference)
+  numericId: E545
+facts:
+  - id: f_8pPGGoe7jQ
+    property: description
+    value: Manifest is a 2024 forecasting conference that generated significant controversy within EA/rationalist
+      communities due to speaker selection including individuals associated with race science, highlighting tensions
+      between intellectual openness and community standards. While not directly AI safety fo
+    asOf: 2026-03
+    notes: Migrated from old entity system

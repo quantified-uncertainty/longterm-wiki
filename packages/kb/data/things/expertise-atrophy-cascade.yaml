@@ -1,0 +1,13 @@
+thing:
+  id: expertise-atrophy-cascade
+  stableId: IUhIUOtaUA
+  type: analysis
+  name: Expertise Atrophy Cascade Model
+  numericId: E134
+facts:
+  - id: f_qXXZ6PVo0g
+    property: description
+    value: This model analyzes cascading skill degradation from AI dependency. It estimates dependency approximately doubles
+      every 2-3 years (1.7x per cycle), with 40-60% capability loss in Gen 1 users.
+    asOf: 2026-03
+    notes: Migrated from old entity system

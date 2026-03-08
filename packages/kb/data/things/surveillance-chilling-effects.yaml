@@ -1,0 +1,13 @@
+thing:
+  id: surveillance-chilling-effects
+  stableId: DhLtDVna5Q
+  type: analysis
+  name: Surveillance Chilling Effects Model
+  numericId: E294
+facts:
+  - id: f_YIhmeHKKMw
+    property: description
+    value: This model quantifies AI surveillance impact on expression and behavior. It estimates 50-70% reduction in dissent
+      within months, reaching 80-95% within 1-2 years under comprehensive surveillance.
+    asOf: 2026-03
+    notes: Migrated from old entity system

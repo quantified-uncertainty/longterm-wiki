@@ -1,0 +1,13 @@
+thing:
+  id: disinformation-detection-race
+  stableId: kkdCdjco5Q
+  type: analysis
+  name: Disinformation Detection Arms Race Model
+  numericId: E103
+facts:
+  - id: f_mjffGP9q0g
+    property: description
+    value: This model analyzes the arms race between AI generation and detection. It projects detection falling to
+      near-random (50%) by 2030 under medium adversarial pressure.
+    asOf: 2026-03
+    notes: Migrated from old entity system

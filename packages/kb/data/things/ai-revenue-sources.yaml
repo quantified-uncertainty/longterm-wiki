@@ -1,0 +1,14 @@
+thing:
+  id: ai-revenue-sources
+  stableId: EZou4exDGQ
+  type: organization
+  name: AI Revenue Sources
+  numericId: E513
+facts:
+  - id: f_OAhFpX22BA
+    property: description
+    value: "Analysis of the AI revenue gap. Hyperscalers are spending ~$700B on AI infrastructure in 2026 while direct AI
+      service revenue is ~$25-50B—a 6-14x mismatch. Sequoia's framework identifies a $500B+ hole between required and
+      actual AI revenue. Largest current revenue streams: Nvidia hardware ($130B), A"
+    asOf: 2026-03
+    notes: Migrated from old entity system

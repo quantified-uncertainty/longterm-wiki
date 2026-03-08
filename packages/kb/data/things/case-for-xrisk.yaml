@@ -1,0 +1,13 @@
+thing:
+  id: case-for-xrisk
+  stableId: pnrAUIAsPw
+  type: argument
+  name: The Case For AI Existential Risk
+  numericId: E56
+facts:
+  - id: f_9i87YJdDdQ
+    property: description
+    value: The strongest formal argument that AI poses existential risk to humanity, based on expert surveys and logical
+      analysis.
+    asOf: 2026-03
+    notes: Migrated from old entity system

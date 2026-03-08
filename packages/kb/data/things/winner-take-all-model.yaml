@@ -1,0 +1,13 @@
+thing:
+  id: winner-take-all-model
+  stableId: ay9HLO5aDg
+  type: analysis
+  name: Winner-Take-All Market Dynamics Model
+  numericId: E376
+facts:
+  - id: f_L8b2yKFqLw
+    property: description
+    value: Economic analysis of power law distributions and market concentration in AI, examining superstar economics and
+      increasing returns to scale.
+    asOf: 2026-03
+    notes: Migrated from old entity system

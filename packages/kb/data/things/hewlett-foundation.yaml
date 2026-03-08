@@ -1,0 +1,14 @@
+thing:
+  id: hewlett-foundation
+  stableId: 9nUCGERzgQ
+  type: organization
+  name: William and Flora Hewlett Foundation
+  numericId: E535
+facts:
+  - id: f_lgHSlgia8Q
+    property: description
+    value: The Hewlett Foundation is a $14.8 billion philanthropic organization that focuses primarily on AI cybersecurity
+      rather than AI alignment or existential risk, distinguishing it from AI safety-focused funders like Open
+      Philanthropy. While comprehensive in covering the foundation's history and controve
+    asOf: 2026-03
+    notes: Migrated from old entity system

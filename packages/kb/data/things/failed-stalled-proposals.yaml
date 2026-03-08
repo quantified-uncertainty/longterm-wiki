@@ -1,0 +1,13 @@
+thing:
+  id: failed-stalled-proposals
+  stableId: dj6xnXmB7A
+  type: policy
+  name: Failed and Stalled AI Proposals
+  numericId: E137
+facts:
+  - id: f_9Qsfs77rRg
+    property: description
+    value: Understanding why AI governance proposals fail is as important as understanding successes. Failed efforts reveal
+      political constraints, industry opposition patterns, and the challenges of regulating rapidly evolving technology.
+    asOf: 2026-03
+    notes: Migrated from old entity system

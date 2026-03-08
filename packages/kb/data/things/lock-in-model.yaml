@@ -1,0 +1,13 @@
+thing:
+  id: lock-in-model
+  stableId: uBqTMIZYZA
+  type: analysis
+  name: Lock-in Irreversibility Model
+  numericId: E191
+facts:
+  - id: f_gR5cxqW1fg
+    property: description
+    value: Analysis of irreversible transitions and path dependencies in AI development, examining value, political,
+      technical, economic, and cognitive lock-in mechanisms.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: societal-response
+  stableId: ydtaJTIJ0A
+  type: analysis
+  name: Societal Response & Adaptation Model
+  numericId: E508
+facts:
+  - id: f_kqtk4U3rvA
+    property: description
+    value: Quantitative model finding current societal response capacity at 20-25% adequacy with 3-5 year institutional lag,
+      requiring $550M-1.1B/year investment (5-10x current) across regulatory capacity (20%→60%), legislative speed (24→6
+      months), safety pipeline (500→2,000/year), and international coordinati
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,12 @@
+thing:
+  id: interpretability-sufficient
+  stableId: PhU6WXiFdQ
+  type: debate
+  name: Is Interpretability Sufficient for Safety?
+  numericId: E176
+facts:
+  - id: f_ab2iHOtckA
+    property: description
+    value: Debate over whether mechanistic interpretability can ensure AI safety.
+    asOf: 2026-03
+    notes: Migrated from old entity system

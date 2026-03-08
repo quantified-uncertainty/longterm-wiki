@@ -1,0 +1,13 @@
+thing:
+  id: irreversibility-threshold
+  stableId: ZBfnKmw0WQ
+  type: analysis
+  name: Irreversibility Threshold Model
+  numericId: E180
+facts:
+  - id: f_iauVzjVe0w
+    property: description
+    value: This model analyzes when AI decisions become permanently locked-in. It estimates 25% probability of crossing
+      infeasible-reversal thresholds by 2035, with expected time to major threshold at 4-5 years.
+    asOf: 2026-03
+    notes: Migrated from old entity system

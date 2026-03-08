@@ -1,0 +1,17 @@
+thing:
+  id: anthropic-core-views
+  stableId: yDkeCdz6lw
+  type: approach
+  name: Anthropic Core Views
+  numericId: E23
+facts:
+  - id: f_PSu6LM7cOg
+    property: description
+    value: Anthropic's Core Views on AI Safety is their publicly stated research agenda and organizational philosophy.
+      Published in 2023, it articulates why Anthropic believes safety-focused labs should be at the frontier of AI
+      development.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_XXhQcdXflA
+    property: website
+    value: https://anthropic.com/news/core-views-on-ai-safety

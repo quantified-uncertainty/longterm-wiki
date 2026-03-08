@@ -1,0 +1,14 @@
+thing:
+  id: council-on-strategic-risks
+  stableId: FL52kVPTlA
+  type: organization
+  name: Council on Strategic Risks
+  numericId: E522
+facts:
+  - id: f_dmsVtlWt9A
+    property: description
+    value: The Council on Strategic Risks is a DC-based nonprofit founded in 2017 that focuses on climate-security
+      intersections, strategic weapons, and ecological risks through three research centers. While the organization
+      claims nonpartisan status, its left-leaning funding sources and critical stance toward
+    asOf: 2026-03
+    notes: Migrated from old entity system

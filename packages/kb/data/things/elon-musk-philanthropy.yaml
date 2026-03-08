@@ -1,0 +1,14 @@
+thing:
+  id: elon-musk-philanthropy
+  stableId: aw8anZDbCg
+  type: analysis
+  name: Elon Musk (Funder)
+  numericId: E410
+facts:
+  - id: f_lOKOPFyjWw
+    property: description
+    value: Analysis of Elon Musk's charitable giving and future philanthropic potential. Despite ~$400B net worth and a 2012
+      Giving Pledge commitment, actual giving averages only ~$250M annually. The gap represents the largest untapped
+      philanthropic potential in history.
+    asOf: 2026-03
+    notes: Migrated from old entity system

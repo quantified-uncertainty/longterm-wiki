@@ -1,0 +1,13 @@
+thing:
+  id: leading-the-future
+  stableId: pg7Ym4EQ9A
+  type: organization
+  name: Leading the Future super PAC
+  numericId: E422
+facts:
+  - id: f_QHeg4m6Knw
+    property: description
+    value: Pro-AI industry super PAC launched in 2025 to influence federal AI regulation and the 2026 midterm elections,
+      backed by over $125 million from OpenAI, Andreessen Horowitz, and other tech leaders.
+    asOf: 2026-03
+    notes: Migrated from old entity system

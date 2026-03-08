@@ -1,0 +1,14 @@
+thing:
+  id: org-watch
+  stableId: dquHawryUA
+  type: project
+  name: Org Watch
+  numericId: E388
+facts:
+  - id: f_NMqcIKlSbQ
+    property: description
+    value: Org Watch is a tracking website by Issa Rice that monitors EA and AI safety organizations, but the article lacks
+      concrete information about its actual features, scope, or current status. The piece reads more like speculative
+      analysis about what the tool might do rather than documentation of an estab
+    asOf: 2026-03
+    notes: Migrated from old entity system

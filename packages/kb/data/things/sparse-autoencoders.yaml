@@ -1,0 +1,15 @@
+thing:
+  id: sparse-autoencoders
+  stableId: CUdfyx5Nkg
+  type: approach
+  name: Sparse Autoencoders (SAEs)
+  numericId: E480
+facts:
+  - id: f_NDpEN3h91g
+    property: description
+    value: Sparse autoencoders extract interpretable features from neural network activations using sparsity constraints.
+      Anthropic's 2024 research extracted 34 million features from Claude 3 Sonnet with 90% interpretability scores,
+      while Goodfire raised $50M in 2025 and released first-ever SAEs for the 671B-parameter DeepSeek R1 reasoning
+      model.
+    asOf: 2026-03
+    notes: Migrated from old entity system

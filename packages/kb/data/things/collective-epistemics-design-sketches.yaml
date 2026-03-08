@@ -1,0 +1,14 @@
+thing:
+  id: collective-epistemics-design-sketches
+  stableId: yCQuuQgU4A
+  type: approach
+  name: Design Sketches for Collective Epistemics
+  numericId: E588
+facts:
+  - id: f_3tKZc1i1xA
+    property: description
+    value: "Forethought Foundation's five proposed technologies for improving collective epistemics: community notes for
+      everything, rhetoric highlighting, reliability tracking, epistemic virtue evals, and provenance tracing. These
+      design sketches aim to shift society toward high-honesty equilibria."
+    asOf: 2026-03
+    notes: Migrated from old entity system

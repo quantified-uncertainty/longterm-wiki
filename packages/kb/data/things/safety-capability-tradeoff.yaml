@@ -1,0 +1,13 @@
+thing:
+  id: safety-capability-tradeoff
+  stableId: 4TtW7mHR9g
+  type: analysis
+  name: Safety-Capability Tradeoff Model
+  numericId: E262
+facts:
+  - id: f_BFLboS5wRw
+    property: description
+    value: This model analyzes when safety measures conflict with capabilities. It finds most safety interventions impose
+      5-15% capability cost, with some achieving safety gains at lower cost.
+    asOf: 2026-03
+    notes: Migrated from old entity system

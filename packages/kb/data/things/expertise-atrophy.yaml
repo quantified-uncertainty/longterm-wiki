@@ -1,0 +1,30 @@
+thing:
+  id: expertise-atrophy
+  stableId: ks0lqvZqUg
+  type: risk
+  name: AI-Induced Expertise Atrophy
+  numericId: E133
+facts:
+  - id: f_12usfHLpZw
+    property: description
+    value: >-
+      Expertise atrophy refers to the gradual erosion of human skills and judgment as AI systems take over more
+      cognitive tasks. When humans rely on AI for answers, navigation, calculations, or decisions, the underlying
+      cognitive capabilities that enable independent judgment slowly degrade. This process is insidious because it
+      happens gradually and often invisibly.
+
+
+      The phenomenon is already observable in several domains. Pilots who rely heavily on autopilot show degraded manual
+      flying skills. Doctors who use diagnostic AI may lose the clinical reasoning that allows them to catch AI errors.
+      Programmers using AI coding assistants may not develop the deep understanding that comes from struggling with
+      problems directly. As AI becomes more capable across more domains, this pattern could spread to virtually all
+      skilled human activity.
+
+
+      The key danger is that expertise atrophy undermines our ability to oversee AI systems. If humans can no longer
+      independently evaluate AI outputs because they've lost the relevant expertise, we cannot catch errors, biases, or
+      misalignment. We become dependent on AI to check AI, losing the human-in-the-loop safety that many governance
+      proposals assume. This creates a fragile system where a failure or misalignment in AI would be harder to detect
+      and correct because the human capacity to do so has eroded.
+    asOf: 2026-03
+    notes: Migrated from old entity system

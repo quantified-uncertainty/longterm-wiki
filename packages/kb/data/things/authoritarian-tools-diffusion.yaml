@@ -1,0 +1,14 @@
+thing:
+  id: authoritarian-tools-diffusion
+  stableId: g1PxNG7cmg
+  type: analysis
+  name: Authoritarian Tools Diffusion Model
+  numericId: E31
+facts:
+  - id: f_m8d0KuJRdA
+    property: description
+    value: This model analyzes how AI surveillance spreads to authoritarian regimes. It finds semiconductor supply chains
+      are the highest-leverage intervention point, but this advantage will erode within 5-10 years as domestic chip
+      manufacturing develops.
+    asOf: 2026-03
+    notes: Migrated from old entity system

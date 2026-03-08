@@ -1,0 +1,14 @@
+thing:
+  id: international-summits
+  stableId: B3alpHHvzg
+  type: policy
+  name: International AI Safety Summit Series
+  numericId: E173
+facts:
+  - id: f_luk0gzcjzA
+    property: description
+    value: The International AI Safety Summit series represents the first sustained effort at global coordination on AI
+      safety, bringing together governments, AI companies, civil society, and researchers to address the risks from
+      advanced AI.
+    asOf: 2026-03
+    notes: Migrated from old entity system

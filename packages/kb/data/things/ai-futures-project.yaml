@@ -1,0 +1,14 @@
+thing:
+  id: ai-futures-project
+  stableId: KDYvrwkgtw
+  type: organization
+  name: AI Futures Project
+  numericId: E511
+facts:
+  - id: f_4Wa5ItAEjw
+    property: description
+    value: AI Futures Project is a nonprofit founded in 2024-2025 by former OpenAI researcher Daniel Kokotajlo that produces
+      detailed AI capability forecasts, most notably the AI 2027 scenario depicting rapid progress to superintelligence.
+      The organization has revised timelines significantly (AGI median shifte
+    asOf: 2026-03
+    notes: Migrated from old entity system

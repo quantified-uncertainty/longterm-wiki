@@ -1,0 +1,14 @@
+thing:
+  id: solutions
+  stableId: SVBZNnVBRg
+  type: debate
+  name: AI Safety Solution Cruxes
+  numericId: E393
+facts:
+  - id: f_basibCr5Gw
+    property: description
+    value: Key uncertainties that determine which technical, coordination, and epistemic solutions to prioritize for AI
+      safety and governance, mapping decision-relevant uncertainties across verification scaling, international
+      cooperation, and infrastructure funding with specific probability estimates.
+    asOf: 2026-03
+    notes: Migrated from old entity system

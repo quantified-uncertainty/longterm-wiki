@@ -1,0 +1,13 @@
+thing:
+  id: why-alignment-easy
+  stableId: 7Aq9ifWXWw
+  type: argument
+  name: Why Alignment Might Be Easy
+  numericId: E372
+facts:
+  - id: f_MnjYnf9WlQ
+    property: description
+    value: Arguments that AI alignment is tractable with current methods including RLHF, Constitutional AI, and
+      interpretability research.
+    asOf: 2026-03
+    notes: Migrated from old entity system

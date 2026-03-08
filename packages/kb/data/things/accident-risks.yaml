@@ -1,0 +1,14 @@
+thing:
+  id: accident-risks
+  stableId: zPnVa7diDw
+  type: debate
+  name: AI Accident Risk Cruxes
+  numericId: E394
+facts:
+  - id: f_dqWeIWWlcw
+    property: description
+    value: Key uncertainties that determine views on AI accident risks and alignment difficulty, including mesa-optimization
+      (15-55% probability), deceptive alignment (15-50%), and P(doom) estimates (5-35% median). Integrates 2024-2025
+      empirical breakthroughs including Anthropic's Sleeper Agents study.
+    asOf: 2026-03
+    notes: Migrated from old entity system

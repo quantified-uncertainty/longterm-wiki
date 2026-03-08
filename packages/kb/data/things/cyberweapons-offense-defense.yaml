@@ -1,0 +1,13 @@
+thing:
+  id: cyberweapons-offense-defense
+  stableId: MiTWgjgYAw
+  type: analysis
+  name: Cyber Offense-Defense Balance Model
+  numericId: E88
+facts:
+  - id: f_YY9316PlEw
+    property: description
+    value: This model analyzes whether AI shifts cyber offense-defense balance. It projects 30-70% net improvement in attack
+      success rates, driven by automation scaling and vulnerability discovery.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,13 @@
+thing:
+  id: defense-in-depth-model
+  stableId: egvJ0qWkgQ
+  type: analysis
+  name: AI Safety Defense in Depth Model
+  numericId: E99
+facts:
+  - id: f_lDRIvf0Z5g
+    property: description
+    value: This model analyzes how layered safety measures combine. Individual layers provide 20-60% coverage; independence
+      between layers is critical for compound effectiveness.
+    asOf: 2026-03
+    notes: Migrated from old entity system

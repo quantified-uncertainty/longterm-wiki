@@ -1,0 +1,12 @@
+thing:
+  id: regulation-debate
+  stableId: o5mW52R6Xg
+  type: debate
+  name: Government Regulation vs Industry Self-Governance
+  numericId: E248
+facts:
+  - id: f_cffavEOyKg
+    property: description
+    value: Should AI be controlled through government regulation or industry self-governance?
+    asOf: 2026-03
+    notes: Migrated from old entity system

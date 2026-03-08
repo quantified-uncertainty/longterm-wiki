@@ -1,0 +1,14 @@
+thing:
+  id: scalable-eval-approaches
+  stableId: ps4YA3xMmg
+  type: approach
+  name: Scalable Eval Approaches
+  numericId: E440
+facts:
+  - id: f_dwVLDv1ZRw
+    property: description
+    value: Practical approaches for scaling AI evaluation to keep pace with capability growth, including LLM-as-judge (40%
+      production adoption but theoretically capped at 2x sample efficiency), automated behavioral evals, AI-assisted red
+      teaming, CoT monitoring, and debate-based evaluation achieving 76-88% accuracy.
+    asOf: 2026-03
+    notes: Migrated from old entity system

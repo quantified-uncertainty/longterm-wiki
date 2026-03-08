@@ -1,0 +1,14 @@
+thing:
+  id: ai-for-human-reasoning-fellowship
+  stableId: vmYImunnbw
+  type: approach
+  name: AI for Human Reasoning Fellowship
+  numericId: E585
+facts:
+  - id: f_Vma9A4ktMA
+    property: description
+    value: FLF's inaugural 12-week fellowship (July-October 2025) combined research fellowship with startup incubator
+      format. 30 fellows received $25-50K stipends to build AI tools for human reasoning. Produced 25+ projects across
+      epistemic tools (Community Notes AI, fact-checking), forecasting (Deliberation M
+    asOf: 2026-03
+    notes: Migrated from old entity system

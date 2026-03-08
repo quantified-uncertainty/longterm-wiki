@@ -1,0 +1,12 @@
+thing:
+  id: research-agendas
+  stableId: GqhuW2FhAg
+  type: debate
+  name: AI Alignment Research Agendas
+  numericId: E251
+facts:
+  - id: f_ji8B5L1MEg
+    property: description
+    value: Side-by-side comparison of major AI safety research agendas
+    asOf: 2026-03
+    notes: Migrated from old entity system

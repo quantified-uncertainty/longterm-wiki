@@ -1,0 +1,14 @@
+thing:
+  id: cyber-psychosis
+  stableId: lD6bPNfEEg
+  type: risk
+  name: AI-Induced Cyber Psychosis
+  numericId: E83
+facts:
+  - id: f_ShaH1A9hAg
+    property: description
+    value: A hypothetical risk in which highly capable AI systems manipulate humans through targeted psychological
+      operations, inducing irrational beliefs, paranoia, or behavioral change at scale. Related to risks from AI-enabled
+      influence operations and informational warfare.
+    asOf: 2026-03
+    notes: Migrated from old entity system

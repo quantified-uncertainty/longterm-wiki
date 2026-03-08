@@ -1,0 +1,14 @@
+thing:
+  id: anthropic-pledge-enforcement
+  stableId: 3ljdV7I37g
+  type: analysis
+  name: "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
+  numericId: E411
+facts:
+  - id: f_6htuAvtfyg
+    property: description
+    value: Analysis of interventions to increase the probability that Anthropic co-founders follow through on their 80%
+      equity donation pledges. With $25-70B at stake, distinguishes collaborative interventions founders would welcome
+      from adversarial ones that could backfire.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: peter-thiel-philanthropy
+  stableId: 2qEbKkMGmg
+  type: organization
+  name: Peter Thiel (Funder)
+  numericId: E554
+facts:
+  - id: f_xcto0q4ewA
+    property: description
+    value: Peter Thiel funded MIRI ($1.6M+) in its early years but has stated he believed they were "building an AGI" rather
+      than doing safety research. He became disillusioned around 2015 when they became "more pessimistic," describing
+      their shift as going "from trans-humanist to Luddite." After the FTX colla
+    asOf: 2026-03
+    notes: Migrated from old entity system

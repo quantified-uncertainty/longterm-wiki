@@ -1,0 +1,14 @@
+thing:
+  id: secure-ai-project
+  stableId: Mj1xuvdboQ
+  type: organization
+  name: Secure AI Project
+  numericId: E562
+facts:
+  - id: f_rgLTjTXrhA
+    property: description
+    value: Policy advocacy organization founded ~2022-2023 by Nick Beckstead focusing on legislative requirements for AI
+      safety protocols, whistleblower protections, and risk mitigation incentives. Rated highly by evaluators with
+      confidential achievements at major AI lab; advocates mandatory safety/security pr
+    asOf: 2026-03
+    notes: Migrated from old entity system

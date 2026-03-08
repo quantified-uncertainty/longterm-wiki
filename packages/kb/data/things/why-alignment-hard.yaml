@@ -1,0 +1,13 @@
+thing:
+  id: why-alignment-hard
+  stableId: EbQ0AdgGfA
+  type: argument
+  name: Why Alignment Might Be Hard
+  numericId: E373
+facts:
+  - id: f_Ff8wK7gI0g
+    property: description
+    value: Arguments that AI alignment faces fundamental challenges including specification problems, inner alignment
+      failures, and verification difficulties.
+    asOf: 2026-03
+    notes: Migrated from old entity system

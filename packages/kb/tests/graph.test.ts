@@ -30,7 +30,7 @@ describe("graph", () => {
   describe("getAllEntities", () => {
     it("returns all entities in the graph", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(31);
+      expect(entities.length).toBeGreaterThanOrEqual(550);
     });
   });
 
@@ -156,26 +156,22 @@ describe("graph", () => {
   describe("getByType", () => {
     it("returns entities of a given type", () => {
       const orgs = graph.getByType("organization");
-      expect(orgs).toHaveLength(11);
-      const orgIds = orgs.map((o) => o.id).sort();
-      expect(orgIds).toEqual([
-        "anthropic", "arc", "conjecture", "deepmind", "meta-ai",
-        "miri", "openai", "red-queen-bio", "redwood-research", "ssi", "xai",
-      ]);
+      expect(orgs.length).toBeGreaterThanOrEqual(11);
+      // Spot-check key organizations
+      const orgIds = new Set(orgs.map((o) => o.id));
+      expect(orgIds.has("anthropic")).toBe(true);
+      expect(orgIds.has("openai")).toBe(true);
+      expect(orgIds.has("deepmind")).toBe(true);
     });
 
     it("returns multiple entities of the same type", () => {
       const people = graph.getByType("person");
-      expect(people).toHaveLength(20);
-      const ids = people.map((p) => p.id).sort();
-      expect(ids).toEqual([
-        "chris-olah", "connor-leahy", "daniela-amodei", "dario-amodei",
-        "demis-hassabis", "dustin-moskovitz", "eliezer-yudkowsky",
-        "elon-musk", "geoffrey-hinton", "greg-brockman", "holden-karnofsky",
-        "ilya-sutskever", "jan-leike", "neel-nanda", "nick-bostrom",
-        "paul-christiano", "sam-altman", "stuart-russell", "yann-lecun",
-        "yoshua-bengio",
-      ].sort());
+      expect(people.length).toBeGreaterThanOrEqual(20);
+      // Spot-check key people
+      const ids = new Set(people.map((p) => p.id));
+      expect(ids.has("dario-amodei")).toBe(true);
+      expect(ids.has("sam-altman")).toBe(true);
+      expect(ids.has("eliezer-yudkowsky")).toBe(true);
     });
 
     it("returns empty array for unknown type", () => {

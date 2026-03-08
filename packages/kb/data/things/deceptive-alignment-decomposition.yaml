@@ -1,0 +1,13 @@
+thing:
+  id: deceptive-alignment-decomposition
+  stableId: Cc517I277g
+  type: analysis
+  name: Deceptive Alignment Decomposition Model
+  numericId: E94
+facts:
+  - id: f_Iwj2kg9ilw
+    property: description
+    value: This model decomposes deceptive alignment probability into five necessary conditions. It estimates 40-80%
+      probability for the outer alignment condition, 20-60% for situational awareness.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,13 @@
+thing:
+  id: winner-take-all-concentration
+  stableId: bqa0i4PPRw
+  type: analysis
+  name: Winner-Take-All Concentration Model
+  numericId: E375
+facts:
+  - id: f_1gjuU8WIyA
+    property: description
+    value: This model analyzes network effects driving AI capability concentration. It estimates top 3-5 actors will control
+      70-90% of frontier capabilities within 5 years.
+    asOf: 2026-03
+    notes: Migrated from old entity system

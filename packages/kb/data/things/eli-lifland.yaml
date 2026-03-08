@@ -1,0 +1,14 @@
+thing:
+  id: eli-lifland
+  stableId: wjtZjN8acQ
+  type: person
+  name: Eli Lifland
+  numericId: E435
+facts:
+  - id: f_MGt6wCbGFA
+    property: description
+    value: "AI researcher, forecaster, and entrepreneur specializing in AGI timelines forecasting, scenario planning, and AI
+      governance. Ranks #1 on the RAND Forecasting Initiative all-time leaderboard and co-authored the influential AI
+      2027 scenario forecast."
+    asOf: 2026-03
+    notes: Migrated from old entity system

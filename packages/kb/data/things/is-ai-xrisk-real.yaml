@@ -1,0 +1,12 @@
+thing:
+  id: is-ai-xrisk-real
+  stableId: vCVPiqx3LA
+  type: debate
+  name: Is AI Existential Risk Real?
+  numericId: E181
+facts:
+  - id: f_zbIc0TulRA
+    property: description
+    value: The fundamental debate about whether AI poses existential risk to humanity.
+    asOf: 2026-03
+    notes: Migrated from old entity system

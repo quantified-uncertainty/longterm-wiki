@@ -1,0 +1,14 @@
+thing:
+  id: model-auditing
+  stableId: IJBIuwy4hA
+  type: approach
+  name: Third-Party Model Auditing
+  numericId: E450
+facts:
+  - id: f_BK0xJKJUkA
+    property: description
+    value: External organizations independently assess AI models for safety and dangerous capabilities. METR, Apollo
+      Research, and government AI Safety Institutes now conduct pre-deployment evaluations of all major frontier models,
+      with the field evolving from voluntary arrangements to EU AI Act mandatory requirements.
+    asOf: 2026-03
+    notes: Migrated from old entity system

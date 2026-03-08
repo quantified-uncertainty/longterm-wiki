@@ -1,0 +1,13 @@
+thing:
+  id: cea
+  stableId: gNsqAes7Dw
+  type: organization
+  name: Centre for Effective Altruism
+  numericId: E517
+facts:
+  - id: f_GyKcbuIHcA
+    property: description
+    value: Oxford-based organization that coordinates the effective altruism movement, running EA Global conferences,
+      supporting local groups, and maintaining the EA Forum.
+    asOf: 2026-03
+    notes: Migrated from old entity system

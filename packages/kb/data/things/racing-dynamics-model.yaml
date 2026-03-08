@@ -1,0 +1,13 @@
+thing:
+  id: racing-dynamics-model
+  stableId: 88WMCVhGgQ
+  type: analysis
+  name: Racing Dynamics Game Theory Model
+  numericId: E241
+facts:
+  - id: f_kKvZnhHdWw
+    property: description
+    value: Game-theoretic analysis of competitive pressures in AI development, modeling safety-capability tradeoffs as
+      prisoner's dilemma with asymmetric payoffs.
+    asOf: 2026-03
+    notes: Migrated from old entity system

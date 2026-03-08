@@ -1,0 +1,14 @@
+thing:
+  id: state-capacity-ai-governance
+  stableId: XY366GPCuQ
+  type: concept
+  name: State Capacity and AI Governance
+  numericId: E852
+facts:
+  - id: f_s2eikLEATA
+    property: description
+    value: State capacity — the ability of government to implement its policy goals — is a binding constraint on AI
+      governance. Without technical expertise, institutional agility, and implementation capacity, even well-designed AI
+      regulations risk being toothless or counterproductive.
+    asOf: 2026-03
+    notes: Migrated from old entity system

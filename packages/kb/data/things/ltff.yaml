@@ -1,0 +1,14 @@
+thing:
+  id: ltff
+  stableId: yA12C1KcjQ
+  type: organization
+  name: Long-Term Future Fund (LTFF)
+  numericId: E543
+facts:
+  - id: f_i8pz77hbpw
+    property: description
+    value: LTFF is a regranting program that has distributed $20M since 2017 (approximately $10M to AI safety) with median
+      grants of $25K, filling a critical niche between personal savings and institutional funders like Coefficient
+      Giving (median $257K). In 2023, LTFF granted $6.67M with a 19.3% acceptance rat
+    asOf: 2026-03
+    notes: Migrated from old entity system

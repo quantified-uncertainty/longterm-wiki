@@ -1,0 +1,14 @@
+thing:
+  id: community-notes-for-everything
+  stableId: meZ1QqsS2A
+  type: approach
+  name: Community Notes for Everything
+  numericId: E589
+facts:
+  - id: f_iuAOaDWzpg
+    property: description
+    value: A proposed cross-platform context layer extending X's community notes model across the entire internet, using AI
+      classifiers to serve consensus-vetted context on potentially misleading content. Estimated cost of $0.01–0.10 per
+      post using current AI models.
+    asOf: 2026-03
+    notes: Migrated from old entity system

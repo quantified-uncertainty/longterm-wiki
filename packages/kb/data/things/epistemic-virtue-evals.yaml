@@ -1,0 +1,14 @@
+thing:
+  id: epistemic-virtue-evals
+  stableId: b88kkC84Xg
+  type: approach
+  name: Epistemic Virtue Evals
+  numericId: E592
+facts:
+  - id: f_UPmBjivCuA
+    property: description
+    value: "A proposed suite of open benchmarks evaluating AI models on epistemic virtues: calibration, clarity, bias
+      resistance, sycophancy avoidance, and manipulation detection. Includes the concept of 'pedantic mode' for
+      maximally accurate AI outputs."
+    asOf: 2026-03
+    notes: Migrated from old entity system

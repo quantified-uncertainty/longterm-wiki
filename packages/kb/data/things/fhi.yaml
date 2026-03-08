@@ -1,0 +1,12 @@
+thing:
+  id: fhi
+  stableId: Zmw9nfUYWA
+  type: organization
+  name: Future of Humanity Institute
+  numericId: E140
+facts:
+  - id: f_FsaYQdKRwQ
+    property: description
+    value: Oxford University research center focused on existential risks, founded by Nick Bostrom. Closed in 2024.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,13 @@
+thing:
+  id: trust-erosion-dynamics
+  stableId: pHNLXwivKQ
+  type: analysis
+  name: Trust Erosion Dynamics Model
+  numericId: E363
+facts:
+  - id: f_YWaMjtVxMA
+    property: description
+    value: This model analyzes how AI systems erode institutional trust. It identifies authentication failure and expertise
+      displacement as key mechanisms driving erosion.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: elicit
+  stableId: 2VexoROapg
+  type: organization
+  name: Elicit (AI Research Tool)
+  numericId: E526
+facts:
+  - id: f_bpBSyOAslA
+    property: description
+    value: Elicit is an AI research assistant with 2M+ users that searches 138M papers and automates literature reviews,
+      founded by AI alignment researchers from Ought and funded by Open Philanthropy ($31M total). The platform achieved
+      90%+ extraction accuracy and claims 80% time savings for systematic reviews
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,13 @@
+thing:
+  id: sycophancy-feedback-loop
+  stableId: 1PrZOwu9ZQ
+  type: analysis
+  name: Sycophancy Feedback Loop Model
+  numericId: E296
+facts:
+  - id: f_DRQKhdaV4g
+    property: description
+    value: This model analyzes how AI validation creates self-reinforcing dynamics. It identifies conditions where user
+      preferences and AI training create stable but problematic equilibria.
+    asOf: 2026-03
+    notes: Migrated from old entity system

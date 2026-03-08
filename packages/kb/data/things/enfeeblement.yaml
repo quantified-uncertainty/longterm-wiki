@@ -1,0 +1,15 @@
+thing:
+  id: enfeeblement
+  stableId: 13OO6CP98g
+  type: risk
+  name: AI-Induced Enfeeblement
+  numericId: E118
+facts:
+  - id: f_otFLSGTbQQ
+    property: description
+    value: Enfeeblement refers to humanity gradually losing capabilities, skills, and meaningful agency as AI systems take
+      over more functions. Unlike sudden catastrophe, this is a slow erosion where humans become increasingly dependent
+      on AI, losing the ability to function without it and potentially losing the ability to oversee or redirect AI
+      systems.
+    asOf: 2026-03
+    notes: Migrated from old entity system

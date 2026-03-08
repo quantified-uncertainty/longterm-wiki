@@ -1,0 +1,14 @@
+thing:
+  id: cyberweapons
+  stableId: 7c6UC46TWQ
+  type: risk
+  name: Cyberweapons Risk
+  numericId: E86
+facts:
+  - id: f_s7WTlCy2rQ
+    property: description
+    value: "AI systems can enhance offensive cyber capabilities in several ways: discovering vulnerabilities in software,
+      generating exploit code, automating attack campaigns, and evading detection. This shifts the offense-defense
+      balance and may enable more frequent, sophisticated, and scalable cyber attacks."
+    asOf: 2026-03
+    notes: Migrated from old entity system

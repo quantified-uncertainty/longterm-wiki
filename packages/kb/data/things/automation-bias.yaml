@@ -1,0 +1,14 @@
+thing:
+  id: automation-bias
+  stableId: 72cwRMbzMA
+  type: risk
+  name: Automation Bias (AI Systems)
+  numericId: E32
+facts:
+  - id: f_qeiiuaClaQ
+    property: description
+    value: Automation bias is the tendency to over-trust automated systems and AI outputs, accepting their conclusions
+      without appropriate scrutiny. Humans are prone to defer to systems that appear authoritative, especially when
+      those systems are usually right. This creates vulnerability when systems are wrong.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,13 @@
+thing:
+  id: surveillance-authoritarian-stability
+  stableId: 5VU1lfwYlg
+  type: analysis
+  name: AI Surveillance and Regime Durability Model
+  numericId: E293
+facts:
+  - id: f_kj8hxlFa2g
+    property: description
+    value: This model analyzes how AI surveillance affects authoritarian regime durability. It estimates AI-enabled regimes
+      may be 2-3x more durable than historical autocracies.
+    asOf: 2026-03
+    notes: Migrated from old entity system

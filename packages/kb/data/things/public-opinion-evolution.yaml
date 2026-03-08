@@ -1,0 +1,13 @@
+thing:
+  id: public-opinion-evolution
+  stableId: vD82PEFzDQ
+  type: analysis
+  name: Public Opinion on AI Evolution Model
+  numericId: E237
+facts:
+  - id: f_egHLT7VvIg
+    property: description
+    value: This model analyzes how public AI risk perception evolves. It finds major incidents shift opinion by 10-25
+      percentage points, decaying with 6-12 month half-life.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: ea-funding-absorption-capacity
+  stableId: EWCzeSGSwA
+  type: concept
+  name: EA Funding Absorption Capacity
+  numericId: E695
+facts:
+  - id: f_lndvzMGosA
+    property: description
+    value: Analysis of how much capital the effective altruism ecosystem can productively deploy per year. Current
+      absorption capacity is estimated at $500M-2B/year for AI safety, far below expected Anthropic-linked capital. Key
+      constraints are talent, management capacity, and strategic clarity.
+    asOf: 2026-03
+    notes: Migrated from old entity system

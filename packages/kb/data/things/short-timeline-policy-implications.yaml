@@ -1,0 +1,14 @@
+thing:
+  id: short-timeline-policy-implications
+  stableId: dtCXHWMgVA
+  type: analysis
+  name: Short AI Timeline Policy Implications
+  numericId: E415
+facts:
+  - id: f_CGrnJtmIZQ
+    property: description
+    value: Analysis of what policies and interventions become more or less important if transformative AI arrives in 1-5
+      years rather than decades. Short timelines dramatically shift cost-benefit calculus toward rapid lab-level safety
+      practices over long-term institution building.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,13 @@
+thing:
+  id: scheming-likelihood-model
+  stableId: wJgyGizyng
+  type: analysis
+  name: Scheming Likelihood Assessment
+  numericId: E275
+facts:
+  - id: f_FE1cVho50A
+    property: description
+    value: This model estimates probability of AI systems engaging in strategic deception. Key factors include situational
+      awareness, goal stability, and training environment transparency.
+    asOf: 2026-03
+    notes: Migrated from old entity system

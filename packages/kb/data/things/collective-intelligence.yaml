@@ -1,0 +1,14 @@
+thing:
+  id: collective-intelligence
+  stableId: T7emiK0ynA
+  type: capability
+  name: Collective Intelligence / Coordination
+  numericId: E493
+facts:
+  - id: f_UzhLtCCzBQ
+    property: description
+    value: Comprehensive analysis concluding human-only collective intelligence has <1% probability of matching
+      transformative AI, but collective AI architectures (MoE, multi-agent systems) have 60-80% probability of playing
+      significant roles with documented 5-40% performance gains. Multi-agent systems introdu
+    asOf: 2026-03
+    notes: Migrated from old entity system

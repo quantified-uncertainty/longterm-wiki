@@ -1,0 +1,13 @@
+thing:
+  id: nist-ai
+  stableId: Eac7pHF06Q
+  type: organization
+  name: NIST and AI Safety
+  numericId: E424
+facts:
+  - id: f_JXkqQ4jqwQ
+    property: description
+    value: The National Institute of Standards and Technology's role in developing AI standards, risk management frameworks,
+      and safety guidelines for the United States.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: instrumental-convergence
+  stableId: BYKermZj1A
+  type: risk
+  name: Instrumental Convergence
+  numericId: E168
+facts:
+  - id: f_UVqpAVCPJA
+    property: description
+    value: Instrumental convergence is the thesis that a wide variety of final goals lead to similar instrumental subgoals.
+      Regardless of what an AI ultimately wants to achieve, it will likely pursue certain intermediate objectives that
+      help achieve any goal.
+    asOf: 2026-03
+    notes: Migrated from old entity system

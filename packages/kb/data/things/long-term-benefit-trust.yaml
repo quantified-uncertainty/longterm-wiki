@@ -1,0 +1,13 @@
+thing:
+  id: long-term-benefit-trust
+  stableId: J1vQXdoAtw
+  type: analysis
+  name: Long-Term Benefit Trust (Anthropic)
+  numericId: E407
+facts:
+  - id: f_FDXBLh2cdQ
+    property: description
+    value: Independent governance mechanism at Anthropic designed to ensure board accountability to humanity's long-term
+      benefit through financially disinterested trustees with growing board appointment power.
+    asOf: 2026-03
+    notes: Migrated from old entity system

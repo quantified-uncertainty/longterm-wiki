@@ -1,0 +1,14 @@
+thing:
+  id: long-horizon
+  stableId: ymixRXGD3A
+  type: capability
+  name: Long-Horizon Autonomous Tasks
+  numericId: E192
+facts:
+  - id: f_Locc5AX46A
+    property: description
+    value: Long-horizon autonomy refers to AI systems' ability to work toward goals over extended time periods—hours, days,
+      or even weeks—with minimal human intervention. This capability requires maintaining context, adapting to
+      obstacles, managing subgoals, and staying aligned with objectives despite changing circumstances.
+    asOf: 2026-03
+    notes: Migrated from old entity system

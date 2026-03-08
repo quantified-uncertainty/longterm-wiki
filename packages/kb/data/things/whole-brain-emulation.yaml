@@ -1,0 +1,14 @@
+thing:
+  id: whole-brain-emulation
+  stableId: I1Rkha9EdQ
+  type: capability
+  name: Whole Brain Emulation
+  numericId: E502
+facts:
+  - id: f_P32B2Dvg8Q
+    property: description
+    value: Comprehensive analysis of whole brain emulation finding <1% probability of arriving before AI-based TAI, with
+      scanning speed (100,000x too slow for human brains) as the primary bottleneck despite resolution requirements
+      being met. Documents technical requirements (10^18-10^25 FLOPS depending on deta
+    asOf: 2026-03
+    notes: Migrated from old entity system

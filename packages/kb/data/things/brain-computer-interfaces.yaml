@@ -1,0 +1,14 @@
+thing:
+  id: brain-computer-interfaces
+  stableId: nDS7XLQevw
+  type: capability
+  name: Brain-Computer Interfaces
+  numericId: E492
+facts:
+  - id: f_mpWvhGWGmA
+    property: description
+    value: Comprehensive analysis of BCIs concluding they are irrelevant for TAI timelines (<1% probability of dominance)
+      due to fundamental bandwidth constraints—current best of 62 WPM vs. billions of operations/second for AI
+      systems—and slow biological adaptation timescales measured in months/years. Well-sou
+    asOf: 2026-03
+    notes: Migrated from old entity system

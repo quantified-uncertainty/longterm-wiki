@@ -22,21 +22,18 @@ describe("loader", () => {
       expect(anthropic!.numericId).toBe("E22");
     });
 
-    it("loads all 31 entities", () => {
+    it("loads all entities (550 after bulk migration)", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(31);
+      expect(entities.length).toBeGreaterThanOrEqual(550);
 
-      const ids = entities.map((t) => t.id).sort();
-      expect(ids).toEqual([
-        "anthropic", "arc", "chris-olah", "conjecture", "connor-leahy",
-        "daniela-amodei", "dario-amodei", "deepmind", "demis-hassabis",
-        "dustin-moskovitz", "eliezer-yudkowsky", "elon-musk",
-        "geoffrey-hinton", "greg-brockman", "holden-karnofsky",
-        "ilya-sutskever", "jan-leike", "meta-ai", "miri", "neel-nanda",
-        "nick-bostrom", "openai", "paul-christiano", "red-queen-bio",
-        "redwood-research", "sam-altman", "ssi", "stuart-russell", "xai",
-        "yann-lecun", "yoshua-bengio",
-      ].sort());
+      // Spot-check key entities are present
+      const ids = new Set(entities.map((t) => t.id));
+      expect(ids.has("anthropic")).toBe(true);
+      expect(ids.has("openai")).toBe(true);
+      expect(ids.has("deepmind")).toBe(true);
+      expect(ids.has("claude-3-opus")).toBe(true);
+      expect(ids.has("alignment")).toBe(true);
+      expect(ids.has("existential-risk")).toBe(true);
     });
 
     it("loads entity aliases", () => {

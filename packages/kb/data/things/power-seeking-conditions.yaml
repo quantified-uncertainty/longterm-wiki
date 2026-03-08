@@ -1,0 +1,13 @@
+thing:
+  id: power-seeking-conditions
+  stableId: YDHbPJqWVA
+  type: analysis
+  name: Power-Seeking Emergence Conditions Model
+  numericId: E227
+facts:
+  - id: f_PoksXEfh5w
+    property: description
+    value: This model identifies conditions for AI power-seeking behaviors. It estimates 60-90% probability of power-seeking
+      in sufficiently capable optimizers, emerging at 50-70% of optimal task performance.
+    asOf: 2026-03
+    notes: Migrated from old entity system

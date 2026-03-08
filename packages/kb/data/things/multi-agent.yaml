@@ -1,0 +1,14 @@
+thing:
+  id: multi-agent
+  stableId: QGbrkYpa2A
+  type: approach
+  name: Multi-Agent Safety
+  numericId: E488
+facts:
+  - id: f_DGsVEjcpJg
+    property: description
+    value: Multi-agent safety research addresses coordination failures, conflict, and collusion risks when multiple AI
+      systems interact. A 2025 report from 50+ researchers across DeepMind, Anthropic, and academia identifies seven key
+      risk factors and finds that even individually safe systems may contribute to harm through interaction.
+    asOf: 2026-03
+    notes: Migrated from old entity system

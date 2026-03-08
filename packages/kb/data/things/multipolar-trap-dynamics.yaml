@@ -1,0 +1,13 @@
+thing:
+  id: multipolar-trap-dynamics
+  stableId: NArnTHLjCQ
+  type: analysis
+  name: Multipolar Trap Dynamics Model
+  numericId: E210
+facts:
+  - id: f_V0qn1M4GxA
+    property: description
+    value: This model analyzes game-theoretic dynamics of AI competition traps. It estimates 20-35% probability of partial
+      coordination, 5-10% of catastrophic competitive lock-in, with compute governance offering 20-35% risk reduction.
+    asOf: 2026-03
+    notes: Migrated from old entity system

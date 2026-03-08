@@ -1,0 +1,33 @@
+thing:
+  id: epistemic-infrastructure
+  stableId: nj9Qcn26Cw
+  type: approach
+  name: AI-Era Epistemic Infrastructure
+  numericId: E122
+facts:
+  - id: f_3PuBkWYF0A
+    property: description
+    value: >-
+      Epistemic infrastructure refers to the foundational systems that societies depend on for creating, verifying,
+      preserving, and accessing knowledge. Just as physical infrastructure (roads, power grids) underlies economic
+      activity, epistemic infrastructure (archives, scientific publishing, fact-checking networks, educational
+      institutions) underlies society's capacity to know things collectively. This infrastructure is under stress and
+      requires deliberate investment.
+
+
+      Current epistemic infrastructure includes elements like Wikipedia (the largest attempt at collaborative knowledge
+      creation), the Internet Archive (preserving digital history), academic peer review (verifying scientific claims),
+      journalism (investigating and reporting events), and educational systems (transmitting knowledge across
+      generations). Each of these faces AI-related threats: Wikipedia can be corrupted with AI-generated misinformation,
+      archives struggle to authenticate materials, peer review cannot keep pace with AI-generated fraud, and journalism
+      is economically threatened.
+
+
+      Strengthening epistemic infrastructure requires treating it as a public good deserving of investment. This might
+      include: funding for fact-checking organizations and investigative journalism, technical infrastructure for
+      content authentication, archives designed for an AI-generated-content world, AI systems explicitly designed to
+      support human knowledge creation rather than replace it, and educational programs that teach critical evaluation
+      in an AI context. The alternative - letting epistemic infrastructure decay while AI advances - leads to knowledge
+      monopolies, trust collapse, and reality fragmentation.
+    asOf: 2026-03
+    notes: Migrated from old entity system

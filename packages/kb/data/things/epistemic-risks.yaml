@@ -1,0 +1,14 @@
+thing:
+  id: epistemic-risks
+  stableId: XM2xumeEiw
+  type: debate
+  name: AI Epistemic Cruxes
+  numericId: E396
+facts:
+  - id: f_GPxJSdxfZw
+    property: description
+    value: Key uncertainties that fundamentally determine AI safety prioritization and epistemic risk mitigation strategy.
+      Analyzes detection-generation arms race (40-60% permanent offense advantage), authentication adoption uncertainty
+      (30-50%), and potentially irreversible trust erosion dynamics.
+    asOf: 2026-03
+    notes: Migrated from old entity system

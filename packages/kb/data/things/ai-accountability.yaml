@@ -1,0 +1,15 @@
+thing:
+  id: ai-accountability
+  stableId: BOLsyJDsXw
+  type: approach
+  name: AI for Accountability and Anti-Corruption
+  numericId: E700
+facts:
+  - id: f_vccJcMMyDQ
+    property: description
+    value: AI systems are emerging as tools for holding powerful actors accountable, analyzing public records, tracing
+      financial flows, monitoring environmental violations, and documenting human rights abuses at previously impossible
+      scale. The ICIJ's AI-assisted investigations revealed $32+ trillion in hidden wealth. This sousveillance dynamic
+      represents the beneficial flip side of AI surveillance capabilities.
+    asOf: 2026-03
+    notes: Migrated from old entity system

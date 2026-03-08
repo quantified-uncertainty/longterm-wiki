@@ -1,0 +1,14 @@
+thing:
+  id: monitoring
+  stableId: BU00lGYGAw
+  type: policy
+  name: Compute Monitoring
+  numericId: E464
+facts:
+  - id: f_VRiRPzsLew
+    property: description
+    value: Framework analyzing compute monitoring approaches for AI governance, finding that cloud KYC targeting 10^26 FLOP
+      threshold is implementable now via three major providers controlling 60%+ of cloud infrastructure, while
+      hardware-level governance faces 3-5 year development timelines.
+    asOf: 2026-03
+    notes: Migrated from old entity system

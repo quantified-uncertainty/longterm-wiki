@@ -1,0 +1,13 @@
+thing:
+  id: safety-researcher-gap
+  stableId: 7tUcg6RznA
+  type: analysis
+  name: AI Safety Researcher Gap Model
+  numericId: E268
+facts:
+  - id: f_CEup5PloRw
+    property: description
+    value: This model analyzes mismatch between safety researcher supply and demand. It estimates 3-10x gap between needed
+      researchers and current pipeline capacity.
+    asOf: 2026-03
+    notes: Migrated from old entity system

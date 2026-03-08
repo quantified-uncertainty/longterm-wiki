@@ -1,0 +1,13 @@
+thing:
+  id: proliferation-model
+  stableId: E48LWV8V3g
+  type: analysis
+  name: AI Capability Proliferation Model
+  numericId: E233
+facts:
+  - id: f_fv935LYMJw
+    property: description
+    value: Diffusion dynamics and control challenges for advanced AI capabilities, analyzing spread mechanisms and
+      governance interventions.
+    asOf: 2026-03
+    notes: Migrated from old entity system

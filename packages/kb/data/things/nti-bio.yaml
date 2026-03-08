@@ -1,0 +1,14 @@
+thing:
+  id: nti-bio
+  stableId: D9lqMW2HVw
+  type: organization
+  name: NTI | bio (Nuclear Threat Initiative - Biological Program)
+  numericId: E551
+facts:
+  - id: f_3Ru8HX0IQQ
+    property: description
+    value: The biosecurity division of the Nuclear Threat Initiative, NTI | bio works to reduce global catastrophic
+      biological risks through DNA synthesis screening, BWC strengthening, the Global Health Security Index, and
+      international governance initiatives. Recipient of >$29M from Open Philanthropy.
+    asOf: 2026-03
+    notes: Migrated from old entity system

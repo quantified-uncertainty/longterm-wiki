@@ -1,0 +1,30 @@
+thing:
+  id: epistemic-security
+  stableId: s65zlVbk5A
+  type: approach
+  name: AI-Era Epistemic Security
+  numericId: E123
+facts:
+  - id: f_s0iCjnmCpw
+    property: description
+    value: >-
+      Epistemic security refers to protecting society's collective capacity for truth-finding in an era when AI can
+      generate convincing false content at unprecedented scale. Just as national security protects against physical
+      threats, epistemic security protects against threats to our ability to know what is true and form shared beliefs
+      about reality.
+
+
+      The threat landscape includes AI-generated deepfakes that can fabricate video evidence, language models that can
+      produce unlimited quantities of persuasive misinformation, and systems that can personalize deceptive content to
+      individual vulnerabilities. These capabilities threaten the basic information infrastructure that democratic
+      societies depend on - the shared understanding of facts that enables public deliberation, elections, and
+      collective decision-making.
+
+
+      Defending epistemic security requires multiple layers: technical tools for content authentication and provenance,
+      media literacy education that teaches critical evaluation of information sources, institutional reforms that
+      increase resilience to manipulation, and regulatory frameworks that create accountability for platforms and AI
+      developers. The challenge is that offensive capabilities (generating false content) are advancing faster than
+      defensive capabilities (detecting it), creating an asymmetry that favors attackers.
+    asOf: 2026-03
+    notes: Migrated from old entity system

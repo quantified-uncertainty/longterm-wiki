@@ -1,0 +1,14 @@
+thing:
+  id: fraud
+  stableId: GnUTRJhA4g
+  type: risk
+  name: AI-Powered Fraud
+  numericId: E145
+facts:
+  - id: f_FNoBoVyYow
+    property: description
+    value: AI dramatically amplifies fraud capabilities. Voice cloning requires just seconds of audio to create convincing
+      impersonations. Large language models generate personalized phishing at scale. Deepfakes enable video-based
+      impersonation.
+    asOf: 2026-03
+    notes: Migrated from old entity system

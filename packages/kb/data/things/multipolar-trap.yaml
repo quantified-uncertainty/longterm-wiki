@@ -1,0 +1,14 @@
+thing:
+  id: multipolar-trap
+  stableId: FAvAr2lvzg
+  type: risk
+  name: Multipolar Trap (AI Development)
+  numericId: E209
+facts:
+  - id: f_iCxLlqxUZw
+    property: description
+    value: A multipolar trap occurs when competition between multiple actors produces outcomes that none of them want but
+      none can escape individually. Each actor rationally pursues their own interest, but the aggregate result is
+      collectively irrational.
+    asOf: 2026-03
+    notes: Migrated from old entity system

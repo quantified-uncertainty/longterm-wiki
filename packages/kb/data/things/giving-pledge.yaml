@@ -1,0 +1,14 @@
+thing:
+  id: giving-pledge
+  stableId: 3w5hW5liew
+  type: organization
+  name: Giving Pledge
+  numericId: E531
+facts:
+  - id: f_LOqgkOyz7Q
+    property: description
+    value: The Giving Pledge, while attracting 250+ billionaire signatories since 2010, has a disappointing track record
+      with only 36% of deceased pledgers actually meeting their commitments and living pledgers growing wealth 166%
+      faster than they give it away. The initiative functions more as reputation manag
+    asOf: 2026-03
+    notes: Migrated from old entity system

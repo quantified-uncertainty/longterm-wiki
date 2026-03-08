@@ -1,0 +1,13 @@
+thing:
+  id: metaculus
+  stableId: CUBiiyCfOA
+  type: organization
+  name: Metaculus
+  numericId: E199
+facts:
+  - id: f_IpjoaSzaEQ
+    property: description
+    value: Reputation-based prediction aggregation platform that has become the primary source for AI timeline forecasts,
+      with over 1 million predictions across 15,000+ questions.
+    asOf: 2026-03
+    notes: Migrated from old entity system

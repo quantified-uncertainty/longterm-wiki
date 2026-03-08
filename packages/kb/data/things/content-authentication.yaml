@@ -1,0 +1,30 @@
+thing:
+  id: content-authentication
+  stableId: sThgpfaA6A
+  type: approach
+  name: AI Content Authentication
+  numericId: E74
+facts:
+  - id: f_PHrHQceMjg
+    property: description
+    value: >-
+      Content authentication technologies aim to establish verifiable provenance for digital content - allowing users to
+      confirm where content came from, whether it has been modified, and whether it was created by AI or humans. The
+      goal is to rebuild trust in digital media by creating technical guarantees of authenticity that complement human
+      judgment.
+
+
+      The leading approach is the C2PA (Coalition for Content Provenance and Authenticity) standard, backed by major
+      technology companies. C2PA embeds cryptographically signed metadata into content at the point of creation - when a
+      photo is taken, when a video is recorded, when an AI generates an image. This creates a chain of custody that can
+      be verified later. Other approaches include invisible watermarking (SynthID), blockchain-based verification, and
+      forensic analysis tools that detect signs of synthetic generation or manipulation.
+
+
+      The key challenges are adoption and circumvention. Content authentication only works if it becomes universal - if
+      users come to expect provenance information and distrust content without it. But metadata can be stripped,
+      watermarks can potentially be removed or spoofed, and AI-generated content without credentials can still
+      circulate. The race between authentication and forgery capability is uncertain, but authentication provides one of
+      the few technical defenses against the coming flood of synthetic content.
+    asOf: 2026-03
+    notes: Migrated from old entity system

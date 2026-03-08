@@ -1,0 +1,30 @@
+thing:
+  id: historical-revisionism
+  stableId: jiqdwTucCA
+  type: risk
+  name: AI-Enabled Historical Revisionism
+  numericId: E155
+facts:
+  - id: f_Oy80LvZuBQ
+    property: description
+    value: >-
+      AI-enabled historical revisionism refers to the use of generative AI to fabricate convincing historical "evidence"
+      - fake photographs, documents, audio recordings, and video footage that appear to document events that never
+      happened or contradict events that did. This goes beyond traditional disinformation because the fabricated
+      evidence can be indistinguishable from authentic historical materials.
+
+
+      The technical capabilities already exist. AI can generate photorealistic images of historical figures in
+      fabricated settings, create convincing audio of historical speeches that were never given, and produce video that
+      places people in events they never attended. As these capabilities improve and become more accessible, the barrier
+      to creating convincing fake historical evidence approaches zero.
+
+
+      The consequences threaten our ability to maintain shared historical knowledge. Holocaust denial could be
+      "supported" by fabricated evidence of alternative explanations. War crimes could be obscured by fake
+      documentation. Historical figures' reputations could be rehabilitated or destroyed with fabricated recordings.
+      Once AI-generated historical fakes become common, even authentic historical evidence may be dismissed as
+      potentially fake. Archives, which preserve the evidence on which historical understanding depends, face the
+      challenge of authenticating materials when forgery has become trivially easy.
+    asOf: 2026-03
+    notes: Migrated from old entity system

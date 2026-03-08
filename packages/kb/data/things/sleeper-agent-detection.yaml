@@ -1,0 +1,14 @@
+thing:
+  id: sleeper-agent-detection
+  stableId: BBVRwgJ43w
+  type: approach
+  name: Sleeper Agent Detection
+  numericId: E445
+facts:
+  - id: f_WI61pnLoCg
+    property: description
+    value: Methods to detect AI models that behave safely during training and evaluation but defect under specific
+      deployment conditions, addressing the core threat of deceptive alignment through behavioral testing,
+      interpretability, and monitoring approaches. Current methods achieve only 5-40% success rates.
+    asOf: 2026-03
+    notes: Migrated from old entity system

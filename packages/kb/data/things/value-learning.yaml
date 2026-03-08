@@ -1,0 +1,13 @@
+thing:
+  id: value-learning
+  stableId: Ub7IaobzDA
+  type: approach
+  name: AI Value Learning
+  numericId: E368
+facts:
+  - id: f_ceyayV13UQ
+    property: description
+    value: Research agenda focused on AI systems learning human values from data, behavior, or feedback rather than explicit
+      specification.
+    asOf: 2026-03
+    notes: Migrated from old entity system

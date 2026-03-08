@@ -1,0 +1,14 @@
+thing:
+  id: cooperative-ai
+  stableId: TY0z1D6S7g
+  type: approach
+  name: Cooperative AI
+  numericId: E590
+facts:
+  - id: f_t2UYDOZ35w
+    property: description
+    value: Cooperative AI research addresses multi-agent coordination failures through game theory and mechanism design,
+      with ~$1-20M/year investment primarily at DeepMind and academic groups. The field remains largely theoretical with
+      limited production deployment, facing fundamental challenges in defining co
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: self-improvement
+  stableId: eUR0jvxO5A
+  type: capability
+  name: Self-Improvement and Recursive Enhancement
+  numericId: E278
+facts:
+  - id: f_9IvR8eF36g
+    property: description
+    value: Self-improvement refers to AI systems' ability to enhance their own capabilities or create more capable successor
+      systems. This includes automated machine learning (AutoML), AI-assisted AI research, and the theoretical
+      possibility of recursive self-improvement where each generation of AI creates a more capable next generation.
+    asOf: 2026-03
+    notes: Migrated from old entity system

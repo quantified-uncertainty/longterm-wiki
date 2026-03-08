@@ -1,0 +1,14 @@
+thing:
+  id: pause-moratorium
+  stableId: 3Mc5fuvtMg
+  type: policy
+  name: Pause / Moratorium
+  numericId: E460
+facts:
+  - id: f_mZpNEVM5vg
+    property: description
+    value: Proposals to pause or slow frontier AI development until safety is better understood, offering potentially high
+      safety benefits if implemented but facing significant coordination challenges and currently lacking adoption by
+      major AI laboratories.
+    asOf: 2026-03
+    notes: Migrated from old entity system

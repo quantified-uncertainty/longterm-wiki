@@ -1,0 +1,14 @@
+thing:
+  id: parameter-interaction-network
+  stableId: lyE0b2aLIA
+  type: analysis
+  name: AI Risk Parameter Interaction Network Model
+  numericId: E219
+facts:
+  - id: f_AlUjetYGSw
+    property: description
+    value: This model maps causal relationships between 22 key AI safety parameters. It identifies 7 feedback loops and 4
+      critical dependency clusters, showing that epistemic-health and institutional-quality are highest-leverage
+      intervention points.
+    asOf: 2026-03
+    notes: Migrated from old entity system

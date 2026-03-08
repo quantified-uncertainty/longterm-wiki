@@ -1,0 +1,15 @@
+thing:
+  id: deepfakes
+  stableId: MUGUxfl2YA
+  type: risk
+  name: Deepfakes
+  numericId: E96
+facts:
+  - id: f_2VKxH9KJOg
+    property: description
+    value: Deepfakes are AI-generated synthetic media—typically video or audio—that realistically depict people saying or
+      doing things they never did. The technology has rapidly advanced from obviously fake to nearly indistinguishable
+      from reality, creating both direct harms (fraud, harassment, defamation) and systemic harms (erosion of trust in
+      authentic ...
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: sleeper-agents
+  stableId: D8dD07y5oQ
+  type: risk
+  name: "Sleeper Agents: Training Deceptive LLMs"
+  numericId: E489
+facts:
+  - id: f_agLLq1jGYg
+    property: description
+    value: Anthropic's 2024 research demonstrating that large language models can be trained to exhibit persistent deceptive
+      behavior that survives standard safety training techniques including supervised fine-tuning, RLHF, and adversarial
+      training.
+    asOf: 2026-03
+    notes: Migrated from old entity system

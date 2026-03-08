@@ -1,0 +1,13 @@
+thing:
+  id: autonomous-weapons-proliferation
+  stableId: 8MPIS7ZfbA
+  type: analysis
+  name: LAWS Proliferation Model
+  numericId: E37
+facts:
+  - id: f_emT7EhpNsQ
+    property: description
+    value: This model tracks lethal autonomous weapons proliferation. It projects 50% of militarily capable nations will
+      have LAWS by 2030, proliferating 4-6x faster than nuclear weapons and reaching non-state actors by 2030-2032.
+    asOf: 2026-03
+    notes: Migrated from old entity system

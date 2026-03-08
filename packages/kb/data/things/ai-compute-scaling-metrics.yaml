@@ -1,0 +1,14 @@
+thing:
+  id: ai-compute-scaling-metrics
+  stableId: x4uJJK5Kxg
+  type: analysis
+  name: AI Compute Scaling Metrics
+  numericId: E907
+facts:
+  - id: f_E03t3MxvdQ
+    property: description
+    value: "Empirical tracking of measurable indicators of AI compute scaling: training compute growth at 4-5x per year, GPU
+      deployment volumes, hyperscaler capital expenditure approaching $700B in 2026, the shift from training-dominant to
+      inference-dominant workloads, and AI coding tool adoption rates."
+    asOf: 2026-03
+    notes: Migrated from old entity system

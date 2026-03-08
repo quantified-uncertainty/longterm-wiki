@@ -1,0 +1,14 @@
+thing:
+  id: trust-decline
+  stableId: 1NWLygwzGw
+  type: risk
+  name: AI-Driven Trust Decline
+  numericId: E362
+facts:
+  - id: f_7lKP6cDdzA
+    property: description
+    value: Trust erosion is the gradual decline in public confidence in institutions, experts, media, and verification
+      systems. AI accelerates this by making it easier to generate disinformation, fabricate evidence, and create
+      customized attacks on institutional credibility.
+    asOf: 2026-03
+    notes: Migrated from old entity system

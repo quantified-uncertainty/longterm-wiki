@@ -1,0 +1,15 @@
+thing:
+  id: lock-in
+  stableId: nFwuCHi9qw
+  type: risk
+  name: AI Value Lock-in
+  numericId: E189
+facts:
+  - id: f_hIM5i2msOQ
+    property: description
+    value: Lock-in refers to the permanent entrenchment of values, systems, or power structures in ways that are extremely
+      difficult or impossible to reverse. AI could enable lock-in by giving certain actors the power to entrench their
+      position, by creating systems too complex to change, or by shaping the future according to early decisions that
+      become irr...
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: intervention-portfolio
+  stableId: UINSu5nbrw
+  type: approach
+  name: AI Safety Intervention Portfolio
+  numericId: E458
+facts:
+  - id: f_2EKwja6sAA
+    property: description
+    value: Strategic overview of AI safety interventions analyzing ~$650M annual investment across 1,100 FTEs. Maps 13+
+      interventions against 4 risk categories with ITN prioritization, finding 85% of external funding from 5 sources
+      and safety/capabilities ratio at 0.5-1.3%.
+    asOf: 2026-03
+    notes: Migrated from old entity system

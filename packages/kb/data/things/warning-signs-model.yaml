@@ -1,0 +1,13 @@
+thing:
+  id: warning-signs-model
+  stableId: qbsTjvCeAw
+  type: analysis
+  name: AI Risk Warning Signs Model
+  numericId: E370
+facts:
+  - id: f_51phn25qdg
+    property: description
+    value: This model catalogs early indicators for detecting emerging AI risks. It prioritizes indicators by lead time,
+      reliability, and actionability.
+    asOf: 2026-03
+    notes: Migrated from old entity system

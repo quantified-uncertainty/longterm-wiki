@@ -1,0 +1,13 @@
+thing:
+  id: deepfakes-authentication-crisis
+  stableId: iIeBwVJYog
+  type: analysis
+  name: Deepfakes Authentication Crisis Model
+  numericId: E97
+facts:
+  - id: f_sPkQ0iKfkg
+    property: description
+    value: This model projects when synthetic media becomes indistinguishable. Detection accuracy declined from 85-95%
+      (2018) to 55-65% (2025), projecting crisis threshold within 3-5 years.
+    asOf: 2026-03
+    notes: Migrated from old entity system

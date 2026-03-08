@@ -1,0 +1,14 @@
+thing:
+  id: early-warnings
+  stableId: kc0B6eOOyQ
+  type: event
+  name: Early Warnings Era
+  numericId: E107
+facts:
+  - id: f_ECRjitJrpg
+    property: description
+    value: Long before AI safety became a research field, a handful of visionaries recognized that machine intelligence
+      might pose unprecedented challenges to humanity. These early warnings—often dismissed as science fiction or
+      philosophical speculation—laid the conceptual groundwork for modern AI safety.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: planning-for-frontier-lab-scaling
+  stableId: sbug1NyyHQ
+  type: analysis
+  name: Planning for Frontier Lab Scaling
+  numericId: E705
+facts:
+  - id: f_1T6ZzrK2Ew
+    property: description
+    value: Strategic framework for how governments, philanthropies, academia, startups, and civil society should plan around
+      frontier AI labs deploying $100-300B+ pre-TAI. The 2025-2028 window is critical because spending patterns are
+      being established and pre-IPO accountability mechanisms are still available.
+    asOf: 2026-03
+    notes: Migrated from old entity system

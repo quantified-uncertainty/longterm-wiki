@@ -1,0 +1,14 @@
+thing:
+  id: projecting-compute-spending
+  stableId: NvpQiV9vxg
+  type: analysis
+  name: Projecting Compute Spending
+  numericId: E680
+facts:
+  - id: f_2fZz6Z54qA
+    property: description
+    value: Analysis of hyperscaler AI infrastructure capital expenditure, with $700B+ planned for 2026 across six major
+      companies. Examines spending projections through 2030, funding mechanisms, supply chain dynamics, and economic
+      conditions required to justify investments.
+    asOf: 2026-03
+    notes: Migrated from old entity system

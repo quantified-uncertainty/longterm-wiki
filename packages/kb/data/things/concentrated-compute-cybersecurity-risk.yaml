@@ -1,0 +1,16 @@
+thing:
+  id: concentrated-compute-cybersecurity-risk
+  stableId: VP53MHxfEg
+  type: risk
+  name: Concentrated Compute as a Cybersecurity Risk
+  numericId: E689
+facts:
+  - id: f_DE00eu9iIw
+    property: description
+    value: The concentration of $700B+ in AI infrastructure across 5-6 US companies creates a novel cybersecurity risk
+      surface where hardware monoculture (NVIDIA 90-95% market share), physical concentration (50% of US data centers in
+      two regions), and software supply chain dependencies (CUDA, PyTorch) mean a single vulnerability or attack could
+      compromise a significant fraction of global frontier AI compute. The NVIDIA Container Toolkit CVE-2025-23266 (CVSS
+      9.0) demonstrated this risk by affecting all major cloud providers simultaneously.
+    asOf: 2026-03
+    notes: Migrated from old entity system

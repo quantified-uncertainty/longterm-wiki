@@ -1,0 +1,12 @@
+thing:
+  id: existential-risk
+  stableId: bQ9a5lwwlg
+  type: concept
+  name: Existential Risk from AI
+  numericId: E131
+facts:
+  - id: f_QovYblRFEg
+    property: description
+    value: Risks that could cause human extinction or permanently curtail humanity's long-term potential.
+    asOf: 2026-03
+    notes: Migrated from old entity system

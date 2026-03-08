@@ -1,0 +1,13 @@
+thing:
+  id: anthropic-ipo
+  stableId: hPZbflFceQ
+  type: analysis
+  name: Anthropic IPO
+  numericId: E409
+facts:
+  - id: f_zvqYiIzJRw
+    property: description
+    value: Tracking Anthropic's preparation for a potential 2026 initial public offering, including timeline estimates,
+      valuation trajectory, competitive dynamics with OpenAI, and implications for EA funding.
+    asOf: 2026-03
+    notes: Migrated from old entity system

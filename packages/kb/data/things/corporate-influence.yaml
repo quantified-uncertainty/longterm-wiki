@@ -1,0 +1,14 @@
+thing:
+  id: corporate-influence
+  stableId: qtPC6TvU2w
+  type: debate
+  name: Corporate Influence on AI Policy
+  numericId: E78
+facts:
+  - id: f_i1EfwzgJQg
+    property: description
+    value: Rather than working on AI safety from outside, this category involves directly influencing frontier AI labs from
+      within or through stakeholder pressure. The theory is that since labs are building potentially dangerous systems,
+      shaping their decisions and culture may be the most direct path to safety.
+    asOf: 2026-03
+    notes: Migrated from old entity system

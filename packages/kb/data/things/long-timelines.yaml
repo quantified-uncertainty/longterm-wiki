@@ -1,0 +1,14 @@
+thing:
+  id: long-timelines
+  stableId: RgCQe8c9cw
+  type: concept
+  name: Long-Timelines Technical Worldview
+  numericId: E505
+facts:
+  - id: f_oOeS34PQKA
+    property: description
+    value: Comprehensive overview of the long-timelines worldview (20-40+ years to AGI, 5-20% P(doom)), arguing for
+      foundational research over rushed solutions based on historical AI overoptimism, current systems' limitations, and
+      scaling constraints. Provides concrete career and research prioritization guidan
+    asOf: 2026-03
+    notes: Migrated from old entity system

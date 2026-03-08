@@ -1,0 +1,13 @@
+thing:
+  id: concentration-of-power-model
+  stableId: Haphrq6lhQ
+  type: analysis
+  name: Concentration of Power Systems Model
+  numericId: E69
+facts:
+  - id: f_EFPSHEL3Mw
+    property: description
+    value: Systems dynamics analysis of power accumulation mechanisms across economic, political, military, and
+      informational domains through AI.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,13 @@
+thing:
+  id: risk-interaction-matrix
+  stableId: 8ax7Co25FQ
+  type: analysis
+  name: AI Risk Interaction Matrix
+  numericId: E257
+facts:
+  - id: f_jJEaTr9e4w
+    property: description
+    value: This model analyzes how risks amplify, mitigate, or transform each other. It identifies 15-25% of risk pairs as
+      strongly interacting, with compounding effects dominating.
+    asOf: 2026-03
+    notes: Migrated from old entity system

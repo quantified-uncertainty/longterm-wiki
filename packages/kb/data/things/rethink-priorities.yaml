@@ -1,0 +1,14 @@
+thing:
+  id: rethink-priorities
+  stableId: t0p43V5oLA
+  type: organization
+  name: Rethink Priorities
+  numericId: E558
+facts:
+  - id: f_lxaXiuCgfw
+    property: description
+    value: Rethink Priorities is a research organization founded in 2018 that grew from 2 to ~130 people by 2022, conducting
+      evidence-based analysis across animal welfare, global health, and AI governance. The organization reported
+      influencing >$10M in grants by 2023 but acknowledges significant failures in im
+    asOf: 2026-03
+    notes: Migrated from old entity system

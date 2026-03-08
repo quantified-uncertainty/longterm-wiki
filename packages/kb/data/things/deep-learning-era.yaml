@@ -1,0 +1,14 @@
+thing:
+  id: deep-learning-era
+  stableId: u97tJxB6qg
+  type: event
+  name: Deep Learning Revolution Era
+  numericId: E95
+facts:
+  - id: f_E7HZKmjuZA
+    property: description
+    value: The deep learning revolution transformed AI from a field of limited successes to one of rapidly compounding
+      breakthroughs. For AI safety, this meant moving from theoretical concerns about far-future AGI to practical
+      questions about current and near-future systems.
+    asOf: 2026-03
+    notes: Migrated from old entity system

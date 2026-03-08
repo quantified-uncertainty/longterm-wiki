@@ -1,0 +1,13 @@
+thing:
+  id: racing-dynamics-impact
+  stableId: kxUtkstNcg
+  type: analysis
+  name: Racing Dynamics Impact Model
+  numericId: E240
+facts:
+  - id: f_Wr426uoJvw
+    property: description
+    value: This model analyzes how competitive pressure creates race-to-the-bottom dynamics. It estimates racing conditions
+      reduce safety investment by 30-60% compared to coordinated scenarios.
+    asOf: 2026-03
+    notes: Migrated from old entity system

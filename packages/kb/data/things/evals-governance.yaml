@@ -1,0 +1,14 @@
+thing:
+  id: evals-governance
+  stableId: iCNSRgyFAA
+  type: policy
+  name: Evals-Based Deployment Gates
+  numericId: E459
+facts:
+  - id: f_j9Qn65qT0g
+    property: description
+    value: Evals-based deployment gates require AI models to pass safety evaluations before deployment or capability
+      scaling. The EU AI Act mandates conformity assessments for high-risk systems with fines up to EUR 35M or 7% global
+      turnover, while UK AISI has evaluated 30+ frontier models.
+    asOf: 2026-03
+    notes: Migrated from old entity system

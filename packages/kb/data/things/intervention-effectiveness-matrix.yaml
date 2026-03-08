@@ -1,0 +1,12 @@
+thing:
+  id: intervention-effectiveness-matrix
+  stableId: 9jMVmWnlmQ
+  type: analysis
+  name: AI Safety Intervention Effectiveness Matrix
+  numericId: E177
+facts:
+  - id: f_0KsnjA6YSQ
+    property: description
+    value: Mapping AI safety interventions to the risks they mitigate, with effectiveness estimates and gap analysis
+    asOf: 2026-03
+    notes: Migrated from old entity system

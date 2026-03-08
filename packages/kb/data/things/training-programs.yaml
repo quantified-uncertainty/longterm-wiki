@@ -1,0 +1,13 @@
+thing:
+  id: training-programs
+  stableId: 9BW13gXUXw
+  type: approach
+  name: AI Safety Training Programs
+  numericId: E468
+facts:
+  - id: f_horziGyQJg
+    property: description
+    value: Fellowships, PhD programs, research mentorship, and career transition pathways for growing the AI safety research
+      workforce, including MATS, Anthropic Fellows, SPAR, and academic programs.
+    asOf: 2026-03
+    notes: Migrated from old entity system

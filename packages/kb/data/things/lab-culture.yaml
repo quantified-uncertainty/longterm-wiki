@@ -1,0 +1,14 @@
+thing:
+  id: lab-culture
+  stableId: EK9L0OBjNw
+  type: approach
+  name: AI Lab Safety Culture
+  numericId: E466
+facts:
+  - id: f_kAjDnk7jEg
+    property: description
+    value: "Analysis of interventions to improve safety culture within AI labs. Evidence from 2024-2025 shows significant
+      gaps: no company scored above C+ overall (FLI Winter 2025), all received D or below on existential safety, and xAI
+      released Grok 4 without any safety documentation."
+    asOf: 2026-03
+    notes: Migrated from old entity system
