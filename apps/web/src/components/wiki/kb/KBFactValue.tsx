@@ -16,6 +16,7 @@ import type { Fact } from "@longterm-wiki/kb";
 import { CURRENCIES, resolveCurrency } from "@longterm-wiki/kb/currencies";
 import { formatValue } from "@lib/format-value";
 import { formatKBFactValue, formatKBDate, isUrl } from "./format";
+import styles from "../tooltip.module.css";
 
 interface KBFactValueProps {
   /** KB thing ID (e.g., "anthropic") */
@@ -75,7 +76,7 @@ export function KBFactValue({
   }
 
   return (
-    <span className="relative inline group/kb-fact">
+    <span className={styles.wrapper}>
       <span
         className={cn(
           "inline border-b border-dotted border-muted-foreground/40 cursor-help font-medium",
@@ -87,7 +88,10 @@ export function KBFactValue({
         {displayValue}
       </span>
       <span
-        className="absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible group-hover/kb-fact:opacity-100 group-hover/kb-fact:visible group-focus-within/kb-fact:opacity-100 group-focus-within/kb-fact:visible transition-opacity text-xs"
+        className={cn(
+          styles.tooltip,
+          "absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible transition-opacity text-xs",
+        )}
         role="tooltip"
       >
         <span className="block text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">

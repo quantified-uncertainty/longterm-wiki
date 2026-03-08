@@ -20,6 +20,7 @@ import {
   isUrl,
   shortDomain,
 } from "./kb/format";
+import styles from "./tooltip.module.css";
 
 interface KBFProps {
   /** KB entity ID (slug like "anthropic") */
@@ -109,7 +110,7 @@ export function KBF({
 
   // Full render: value with hover tooltip
   return (
-    <span className="relative inline group/kbf">
+    <span className={styles.wrapper}>
       <span
         className={cn(
           "inline border-b border-dotted border-muted-foreground/40 cursor-help",
@@ -121,7 +122,10 @@ export function KBF({
         {displayValue}
       </span>
       <span
-        className="absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible group-hover/kbf:opacity-100 group-hover/kbf:visible group-focus-within/kbf:opacity-100 group-focus-within/kbf:visible transition-opacity text-xs"
+        className={cn(
+          styles.tooltip,
+          "absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible transition-opacity text-xs",
+        )}
         role="tooltip"
       >
         {/* Property name (uppercase, muted) */}
