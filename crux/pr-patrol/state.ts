@@ -2,7 +2,7 @@
  * PR Patrol — State management (cooldowns, failure tracking, JSONL logging)
  */
 
-import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { getColors } from '../lib/output.ts';
 
@@ -120,4 +120,77 @@ export function resetFailCount(key: number | string): void {
 
 export function isAbandoned(key: number | string): boolean {
   return getFailCount(key) >= 2;
+}
+
+// ── Main branch cooldown (shorter than PR cooldown) ─────────────────────────
+
+/** Main branch uses a much shorter cooldown (5 min) since it blocks all PR work. */
+export const MAIN_BRANCH_COOLDOWN_SECONDS = 300;
+
+/**
+ * Main branch gets a higher abandonment threshold (4 vs 2) because:
+ * - Misdiagnosis is common (flaky vs real failure)
+ * - Main being broken blocks all PR work, so retrying is high-value
+ */
+export const MAIN_BRANCH_ABANDON_THRESHOLD = 4;
+
+export function isMainBranchAbandoned(key: string): boolean {
+  return getFailCount(key) >= MAIN_BRANCH_ABANDON_THRESHOLD;
+}
+
+// ── Tracked main fix PR ─────────────────────────────────────────────────────
+// When the patrol creates a fix PR for main, track it so we can poll for merge
+// and re-evaluate blocked PRs once main is green.
+
+const TRACKED_FIX_FILE = join(STATE_DIR, 'tracked-main-fix');
+
+export interface TrackedMainFix {
+  prNumber: number;
+  createdAt: string; // ISO timestamp
+}
+
+export function trackMainFixPr(prNumber: number): void {
+  const data: TrackedMainFix = {
+    prNumber,
+    createdAt: new Date().toISOString(),
+  };
+  writeFileSync(TRACKED_FIX_FILE, JSON.stringify(data));
+}
+
+/** Max age (24h) before we stop polling a tracked fix PR and clear the tracking. */
+const TRACKED_FIX_TTL_MS = 24 * 60 * 60 * 1000;
+
+export function getTrackedMainFixPr(): TrackedMainFix | null {
+  if (!existsSync(TRACKED_FIX_FILE)) return null;
+  try {
+    const raw = JSON.parse(readFileSync(TRACKED_FIX_FILE, 'utf-8'));
+    // Validate expected shape
+    if (typeof raw?.prNumber !== 'number' || typeof raw?.createdAt !== 'string') {
+      return null;
+    }
+    // Auto-expire stale tracked PRs (>24h)
+    const age = Date.now() - new Date(raw.createdAt).getTime();
+    if (age > TRACKED_FIX_TTL_MS) {
+      clearTrackedMainFixPr();
+      return null;
+    }
+    return raw as TrackedMainFix;
+  } catch {
+    return null;
+  }
+}
+
+export function clearTrackedMainFixPr(): void {
+  try {
+    if (existsSync(TRACKED_FIX_FILE)) unlinkSync(TRACKED_FIX_FILE);
+  } catch {
+    // Best-effort cleanup — file may already be gone
+  }
+}
+
+// ── Clear cooldown ──────────────────────────────────────────────────────────
+
+export function clearProcessed(key: number | string): void {
+  const file = join(STATE_DIR, `processed-${key}`);
+  if (existsSync(file)) writeFileSync(file, '0');
 }
