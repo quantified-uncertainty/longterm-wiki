@@ -174,10 +174,32 @@ function preflightChecks(config: PatrolConfig): string[] {
           return !IGNORED_PREFIXES.some((p) => filePath.startsWith(p));
         });
       if (significant.length > 0) {
-        errors.push(
-          'Working tree must be clean before starting PR Patrol. Commit or stash your changes first.\n' +
-            `  Dirty files: ${significant.slice(0, 5).map((l) => l.trim()).join(', ')}${significant.length > 5 ? ` (+${significant.length - 5} more)` : ''}`,
-        );
+        // If we're on a non-main branch, these are likely partial changes left
+        // by a previous patrol sub-agent that hit its max-turns limit. Auto-commit
+        // them so this cycle can continue without manual intervention.
+        const currentBranch = gitSafe('branch', '--show-current');
+        const branch = currentBranch.ok ? currentBranch.output.trim() : '';
+
+        if (branch && branch !== 'main' && branch !== 'master') {
+          log(`⚠ Working tree has ${significant.length} uncommitted change(s) from a previous patrol run — auto-committing`);
+          log(`  Dirty files: ${significant.slice(0, 5).map((l) => l.trim()).join(', ')}${significant.length > 5 ? ` (+${significant.length - 5} more)` : ''}`);
+
+          // Stage only already-tracked files (no untracked noise)
+          const addResult = gitSafe('add', '-u');
+          if (addResult.ok) {
+            const commitResult = gitSafe('commit', '-m', 'fix: partial patrol fix (auto-committed on patrol restart)');
+            if (commitResult.ok) {
+              log(`  ✓ Auto-committed leftover changes on ${branch}`);
+            } else if (!commitResult.output.includes('nothing to commit')) {
+              log(`  Warning: could not auto-commit leftover changes: ${commitResult.output.trim()}`);
+            }
+          }
+        } else {
+          errors.push(
+            'Working tree must be clean before starting PR Patrol. Commit or stash your changes first.\n' +
+              `  Dirty files: ${significant.slice(0, 5).map((l) => l.trim()).join(', ')}${significant.length > 5 ? ` (+${significant.length - 5} more)` : ''}`,
+          );
+        }
       }
     }
   }
