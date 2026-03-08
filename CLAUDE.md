@@ -59,7 +59,7 @@ pnpm crux --help                 # Full CLI reference
 ```
 longterm-wiki/
 ├── content/docs/               # ~700 MDX wiki pages
-├── data/                       # YAML source data (entities, facts, resources, etc.)
+├── data/                       # YAML source data (entities, resources, etc.)
 ├── apps/web/                    # Next.js 15 frontend (see apps/web/CLAUDE.md)
 ├── crux/                       # Crux CLI + validation (see crux/README.md)
 └── package.json                # Workspace root
@@ -67,7 +67,7 @@ longterm-wiki/
 
 ## Data Flow
 
-1. YAML files in `data/` define entities, facts, resources
+1. YAML files in `data/` define entities and resources; KB facts in `packages/kb/data/things/`
 2. `apps/web/scripts/build-data.mjs` transforms YAML + MDX frontmatter → `database.json`
 3. Next.js app reads `database.json` at build time
 4. MDX pages in `content/docs/` are compiled via next-mdx-remote
@@ -79,8 +79,7 @@ longterm-wiki/
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
 - **Page templates**: `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
-- **Canonical facts & Calc**: Follow `content/docs/internal/canonical-facts.mdx`
-- **Data system authority**: KB YAML (`packages/kb/data/things/`) is authoritative for entities it covers (9 migrated so far); old YAML facts (`data/facts/`) remain authoritative for others; Postgres statements track provenance, not canonical values. See `content/docs/internal/data-system-authority.mdx`.
+- **KB facts & Calc**: KB YAML (`packages/kb/data/things/`) is the sole authoritative source for structured facts. Use `<KBF>` / `<KBFactValue>` in MDX, `<Calc>` for computed values. See `content/docs/internal/canonical-facts.mdx`.
 - **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts`
 - **GitHub API**: Use `crux issues/pr/ci/epic` commands — never raw `curl`
 - **Entity IDs**: Never manually invent — always `pnpm crux ids allocate <slug>`
