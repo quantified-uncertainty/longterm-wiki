@@ -60,15 +60,30 @@ function main(): void {
       outputLines.push(lines[i]);
 
       // Match a `source:` line (indented, within a fact block)
-      const sourceMatch = lines[i].match(/^(\s+)source:\s+(\S.*)$/);
+      const sourceMatch = lines[i].match(/^(\s+)source:\s+(.+?)\s*$/);
       if (!sourceMatch) continue;
 
       const indent = sourceMatch[1];
-      const sourceUrl = sourceMatch[2];
+      const sourceUrl = sourceMatch[2]
+        .replace(/\s+#.*$/, "")       // strip inline comments
+        .replace(/^['"]|['"]$/g, ""); // strip surrounding quotes
 
-      // Skip if next line is already sourceResource
-      const nextLine = lines[i + 1] ?? "";
-      if (nextLine.trim().startsWith("sourceResource:")) {
+      // Skip if this fact block already has sourceResource (scan forward)
+      let alreadyHasSourceResource = false;
+      for (let j = i + 1; j < lines.length; j++) {
+        const line = lines[j];
+        if (!line.trim()) continue; // skip blank lines
+
+        const currentIndent = line.match(/^(\s*)/)?.[1].length ?? 0;
+        if (currentIndent < indent.length) break; // left the fact block
+
+        if (line.trim().startsWith("sourceResource:")) {
+          alreadyHasSourceResource = true;
+          break;
+        }
+      }
+
+      if (alreadyHasSourceResource) {
         stats.alreadyHasResource++;
         stats.factsWithSource++;
         continue;

@@ -52,6 +52,22 @@ WHERE pc.url IS NOT NULL
   AND pc.resource_id IS NULL
   AND rtrim(pc.url, '/') = replace(rtrim(r.url, '/'), '://www.', '://');
 
+-- http ↔ https: citation uses http, resource uses https
+UPDATE page_citations pc
+SET resource_id = r.id
+FROM resources r
+WHERE pc.url IS NOT NULL
+  AND pc.resource_id IS NULL
+  AND replace(rtrim(pc.url, '/'), 'http://', 'https://') = rtrim(r.url, '/');
+
+-- http ↔ https: citation uses https, resource uses http
+UPDATE page_citations pc
+SET resource_id = r.id
+FROM resources r
+WHERE pc.url IS NOT NULL
+  AND pc.resource_id IS NULL
+  AND rtrim(pc.url, '/') = replace(rtrim(r.url, '/'), 'http://', 'https://');
+
 -- ============================================================
 -- Step 3: Exact URL match — statement_citations
 -- ============================================================
@@ -87,6 +103,22 @@ FROM resources r
 WHERE sc.url IS NOT NULL
   AND sc.resource_id IS NULL
   AND rtrim(sc.url, '/') = replace(rtrim(r.url, '/'), '://www.', '://');
+
+-- http ↔ https: citation uses http, resource uses https
+UPDATE statement_citations sc
+SET resource_id = r.id
+FROM resources r
+WHERE sc.url IS NOT NULL
+  AND sc.resource_id IS NULL
+  AND replace(rtrim(sc.url, '/'), 'http://', 'https://') = rtrim(r.url, '/');
+
+-- http ↔ https: citation uses https, resource uses http
+UPDATE statement_citations sc
+SET resource_id = r.id
+FROM resources r
+WHERE sc.url IS NOT NULL
+  AND sc.resource_id IS NULL
+  AND rtrim(sc.url, '/') = replace(rtrim(r.url, '/'), 'http://', 'https://');
 
 -- ============================================================
 -- Step 5: Report results
