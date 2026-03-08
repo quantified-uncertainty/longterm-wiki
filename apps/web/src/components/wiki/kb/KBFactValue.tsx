@@ -90,7 +90,7 @@ export function KBFactValue({
       <span
         className={cn(
           styles.tooltip,
-          "absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible transition-opacity text-xs",
+          "absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md opacity-0 invisible transition-opacity text-xs",
         )}
         role="tooltip"
       >
