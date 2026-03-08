@@ -1,11 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync } from 'fs';
+import { describe, it, expect, beforeAll, afterEach } from 'vitest';
+import { rmSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { tmpdir } from 'os';
-
-// We test exported functions by importing them and overriding the state dir.
-// Since state.ts uses module-level constants for paths, we test the logic
-// indirectly through the exported functions after setting up the file state.
 
 import {
   MAIN_BRANCH_COOLDOWN_SECONDS,
@@ -15,11 +10,17 @@ import {
   getTrackedMainFixPr,
   clearTrackedMainFixPr,
   clearProcessed,
-  getFailCount,
+  ensureDirs,
   markProcessed,
   isRecentlyProcessed,
   STATE_DIR,
 } from './state.ts';
+
+// Ensure the state directory exists before any tests write to it.
+// On CI, ~/.cache/pr-patrol/state/ doesn't exist by default.
+beforeAll(() => {
+  ensureDirs();
+});
 
 // ── Constants ───────────────────────────────────────────────────────────────
 

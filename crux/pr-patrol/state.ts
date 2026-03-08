@@ -2,7 +2,7 @@
  * PR Patrol — State management (cooldowns, failure tracking, JSONL logging)
  */
 
-import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { getColors } from '../lib/output.ts';
 
@@ -157,17 +157,35 @@ export function trackMainFixPr(prNumber: number): void {
   writeFileSync(TRACKED_FIX_FILE, JSON.stringify(data));
 }
 
+/** Max age (24h) before we stop polling a tracked fix PR and clear the tracking. */
+const TRACKED_FIX_TTL_MS = 24 * 60 * 60 * 1000;
+
 export function getTrackedMainFixPr(): TrackedMainFix | null {
   if (!existsSync(TRACKED_FIX_FILE)) return null;
   try {
-    return JSON.parse(readFileSync(TRACKED_FIX_FILE, 'utf-8'));
+    const raw = JSON.parse(readFileSync(TRACKED_FIX_FILE, 'utf-8'));
+    // Validate expected shape
+    if (typeof raw?.prNumber !== 'number' || typeof raw?.createdAt !== 'string') {
+      return null;
+    }
+    // Auto-expire stale tracked PRs (>24h)
+    const age = Date.now() - new Date(raw.createdAt).getTime();
+    if (age > TRACKED_FIX_TTL_MS) {
+      clearTrackedMainFixPr();
+      return null;
+    }
+    return raw as TrackedMainFix;
   } catch {
     return null;
   }
 }
 
 export function clearTrackedMainFixPr(): void {
-  if (existsSync(TRACKED_FIX_FILE)) writeFileSync(TRACKED_FIX_FILE, '');
+  try {
+    if (existsSync(TRACKED_FIX_FILE)) unlinkSync(TRACKED_FIX_FILE);
+  } catch {
+    // Best-effort cleanup — file may already be gone
+  }
 }
 
 // ── Clear cooldown ──────────────────────────────────────────────────────────
