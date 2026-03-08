@@ -14,22 +14,16 @@ Collect all relevant data about the entity. Run these in parallel where possible
 # Entity metadata and related entities
 curl -s "http://localhost:3100/api/entities/$ENTITY_ID" | python3 -m json.tool
 
-# All active statements for this entity
-pnpm crux statements quality $ENTITY_ID
-
-# Coverage gaps
-pnpm crux statements gaps $ENTITY_ID
-
-# Quick automated cluster analysis (cheap Sonnet call for initial signal)
-pnpm crux statements ideate $ENTITY_ID --json
+# Entity metadata
+pnpm crux query entity $ENTITY_ID
 ```
 
 Also fetch:
 - The entity's wiki page content (read the MDX file via `pnpm crux context for-page $ENTITY_ID`)
 - Related entities' metadata (check each entity in `relatedEntries`)
-- Statement counts for related entities (to understand relative coverage)
+- KB facts for this entity (check `packages/kb/data/things/`)
 
-**Read all outputs carefully before proceeding.** The automated `ideate` gives you clusters — but you need to think deeper than pattern-matching.
+**Read all outputs carefully before proceeding.**
 
 ## Phase 2: Ontological Reasoning
 
@@ -131,25 +125,17 @@ Present the report to the user. Then, if they approve:
    ```
    Then sync via the API.
 
-2. **Move statements** — Use the PATCH endpoint:
-   ```bash
-   # For each statement to move:
-   curl -X PATCH "http://localhost:3100/api/statements/<ID>" \
-     -H "Content-Type: application/json" \
-     -d '{"subjectEntityId": "<new-entity-slug>"}'
-   ```
+2. **Fix relationships** — Update `relatedEntries` via entity sync.
 
-3. **Fix relationships** — Update `relatedEntries` via entity sync.
-
-4. **Verify** — After changes, re-run `pnpm crux statements quality <entity>` to confirm the parent entity's coverage still makes sense, and check the new entities have statements.
+3. **Verify** — After changes, check that the parent entity's page still makes sense, and create wiki pages for new entities.
 
 **Always ask before executing.** The report is the deliverable — execution is optional and requires explicit approval.
 
 ## Guardrails
 
-- **Think, don't pattern-match.** The automated `ideate` command does pattern-matching. Your job is deeper reasoning about what *should* exist, not just what clusters appear in the data.
+- **Think, don't pattern-match.** Your job is deeper reasoning about what *should* exist, not just what clusters appear in the data.
 - **Conservative by default.** Fewer high-quality entity splits are better than many marginal ones. If you're unsure, recommend keeping it on the parent.
 - **Don't split property groupings.** Financial data, market metrics, headcount — these are facts *about* the entity, not separate entities. Never suggest "anthropic-funding" as an entity.
-- **The roll-up exists.** Remember that `?includeChildren=true` lets viewers see parent + child statements together. This reduces the cost of splitting — but don't split just because you can.
+- **Don't split unless necessary.** Splitting entities adds maintenance burden. Only split when the sub-entity truly has its own identity.
 - **Don't create entities without pages.** An entity in the DB without a wiki page is an orphan. Note in the report which entities would need wiki pages created afterward.
 - **Respect existing structure.** Check what entities already exist before suggesting new ones. The knowledge base already has 600+ entities — duplication is the bigger risk than under-splitting.

@@ -320,7 +320,6 @@ Total: ~8-10 sessions spread over time.
 | citations.ts | 18 | No |
 | jobs.ts | 10 | No |
 | resources.ts | 8 | No |
-| claims.ts | 7 | No |
 | edit-logs.ts | 6 | No |
 | hallucination-risk.ts | 6 | No |
 | sessions.ts | 6 | **Yes** (4 interfaces) |

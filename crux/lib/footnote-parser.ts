@@ -4,7 +4,7 @@
  *
  * Used by:
  *   - crux citations register-resources to auto-create YAML entries
- *   - crux claims migrate-footnotes for batch migration
+ *   - crux citations for citation management
  */
 
 export interface ParsedFootnote {

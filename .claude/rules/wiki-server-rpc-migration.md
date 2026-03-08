@@ -4,7 +4,7 @@ All **new** wiki-server routes must use Hono RPC method-chaining. Existing route
 
 ## Status
 
-- **Migrated**: All route files — `facts.ts`, `claims.ts`, `citations.ts`, `references.ts`, `health.ts`, `ids.ts`, `edit-logs.ts`, `summaries.ts`, `artifacts.ts`, `agent-sessions.ts`, `entities.ts`, `explore.ts`, `sessions.ts`, `pages.ts`, `links.ts`, `hallucination-risk.ts`, `jobs.ts`, `resources.ts`, `auto-update-news.ts`, `auto-update-runs.ts`, `integrity.ts`
+- **Migrated**: All route files — `facts.ts`, `citations.ts`, `references.ts`, `health.ts`, `ids.ts`, `edit-logs.ts`, `summaries.ts`, `artifacts.ts`, `agent-sessions.ts`, `entities.ts`, `explore.ts`, `sessions.ts`, `pages.ts`, `links.ts`, `hallucination-risk.ts`, `jobs.ts`, `resources.ts`, `auto-update-news.ts`, `auto-update-runs.ts`, `integrity.ts`
 - **Utility files** (no migration needed): `ref-check.ts`, `utils.ts`
 
 ## Why
