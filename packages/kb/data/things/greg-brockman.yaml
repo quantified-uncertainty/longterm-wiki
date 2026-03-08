@@ -28,6 +28,7 @@ facts:
     value: "Co-founder & President"
     asOf: 2017-05
     source: https://openai.com/
+    sourceResource: 04d39e8bd5d50dd5
     notes: "Transitioned from CTO to President; took leave of absence August 2024 but still listed as President"
 
   - id: f_qVoWltsFvw

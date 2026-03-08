@@ -13,18 +13,21 @@ facts:
     property: founded-date
     value: 2024-06
     source: https://ssi.inc
+    sourceResource: 3fc4ee87e9bacb20
     notes: "Founded June 2024 by Ilya Sutskever, Daniel Gross, and Daniel Levy after Sutskever's departure from OpenAI"
 
   - id: f_wsceMu4laG
     property: headquarters
     value: "Palo Alto, CA"
     source: https://ssi.inc
+    sourceResource: 3fc4ee87e9bacb20
     notes: "Dual offices in Palo Alto and Tel Aviv"
 
   - id: f_kS32utFnCA
     property: legal-structure
     value: "Private company"
     source: https://ssi.inc
+    sourceResource: 3fc4ee87e9bacb20
 
   - id: f_ssi_founded_by
     property: founded-by
@@ -33,6 +36,7 @@ facts:
       - daniel-gross
       - daniel-levy
     source: https://ssi.inc
+    sourceResource: 3fc4ee87e9bacb20
 
   - id: f_Oa0nwGGdna
     property: total-funding
@@ -61,6 +65,7 @@ facts:
     value: 32e9
     asOf: 2025-04
     source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+    sourceResource: fb48a11860d8df22
     notes: "Post-money valuation after April 2025 funding round led by Greenoaks Capital"
 
   - id: f_ssi_total_funding_2025
@@ -68,6 +73,7 @@ facts:
     value: 3e9
     asOf: 2025-04
     source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+    sourceResource: fb48a11860d8df22
     notes: "Total venture capital raised across all rounds through April 2025"
 
   - id: f_ssi_headcount_2025
@@ -86,6 +92,7 @@ items:
         amount: 1e9
         valuation: 5e9
         source: https://observer.com/2024/09/openai-ilya-sutskever-raise-1b-ai-startup/
+        sourceResource: 9e682bdf36c864aa
         notes: "Seed round from a16z, Sequoia, DST Global, SV Angel, NFDG"
 
       i_ssi_2025_04:
@@ -93,6 +100,7 @@ items:
         amount: 2e9
         valuation: 32e9
         source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+        sourceResource: fb48a11860d8df22
         notes: "Led by Greenoaks with $500M commitment; Alphabet and NVIDIA participated"
 
   key-people:
@@ -104,6 +112,7 @@ items:
         start: 2024-06
         is_founder: true
         source: https://ssi.inc
+        sourceResource: 3fc4ee87e9bacb20
         notes: "Former OpenAI co-founder and Chief Scientist; left OpenAI June 2024"
 
       i_hy73NqnE5Q:
@@ -112,6 +121,7 @@ items:
         start: 2024-06
         is_founder: true
         source: https://ssi.inc
+        sourceResource: 3fc4ee87e9bacb20
         notes: "Former head of AI at Apple; Y Combinator partner; investor"
 
       i_vOtkNvw2HH:
@@ -120,4 +130,5 @@ items:
         start: 2024-06
         is_founder: true
         source: https://ssi.inc
+        sourceResource: 3fc4ee87e9bacb20
         notes: "Former OpenAI researcher"

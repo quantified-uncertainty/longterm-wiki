@@ -29,6 +29,7 @@ facts:
     value: !ref mK9pX3rQ7n:anthropic
     asOf: 2025-01
     source: https://www.anthropic.com/
+    sourceResource: afe2508ac4caf5ee
     notes: "Joined Anthropic as Member of Technical Staff in early 2025; works on responsible scaling policy"
 
   - id: f_hk_role_givewell
@@ -106,6 +107,7 @@ items:
         title: "Member of Technical Staff"
         start: 2025-01
         source: https://www.anthropic.com/
+        sourceResource: afe2508ac4caf5ee
         notes: "Works on responsible scaling policy; also serves as Anthropic board observer"
 
   notable-publications:

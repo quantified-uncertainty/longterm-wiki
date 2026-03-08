@@ -60,6 +60,7 @@ facts:
     value: 13e9
     asOf: 2024-01
     source: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
+    sourceResource: 862e2d851c171321
     notes: "Microsoft cumulative investment across multiple rounds"
 
   - id: f_b56n3kcD2g
@@ -122,6 +123,7 @@ facts:
     value: 175e9
     asOf: 2020-06
     source: https://arxiv.org/abs/2005.14165
+    sourceResource: 2cab3ea10b8b7ae2
     notes: "GPT-3 parameter count. sourceResource: 2cab3ea10b8b7ae2"
 
   - id: f_o1_aime_score
@@ -168,6 +170,7 @@ items:
         amount: 10e9
         lead_investor: microsoft
         source: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
+        sourceResource: 862e2d851c171321
         notes: "Microsoft's multi-year, multi-billion dollar investment reported at ~$10B; brought total Microsoft commitment to ~$13B"
 
       i_eTZe3xfv0w:
@@ -220,6 +223,7 @@ items:
         start: 2023-07
         end: 2024-05
         source: https://openai.com/blog/introducing-superalignment
+        sourceResource: 41000216ddbfc99d
         notes: "Co-led Superalignment team from its founding in July 2023; resigned May 2024 citing safety concerns, joined Anthropic"
 
       i_n2EXWPmoaw:

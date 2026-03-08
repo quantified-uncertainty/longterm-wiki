@@ -65,6 +65,7 @@ facts:
     value: 230e9
     asOf: 2026-01
     source: https://x.ai/news/series-e
+    sourceResource: 42d7d419776526a2
     notes: "Post-money valuation at Series E round close"
 
   - id: f_total_funding_2026
@@ -72,6 +73,7 @@ facts:
     value: 26e9
     asOf: 2026-01
     source: https://x.ai/news/series-e
+    sourceResource: 42d7d419776526a2
     notes: "Over $26B total raised across all rounds"
 
   - id: f_revenue_2025
@@ -79,6 +81,7 @@ facts:
     value: 3.8e9
     asOf: "2025"
     source: https://sacra.com/c/xai/
+    sourceResource: 5c9bae39f84b0a4e
     notes: "Annualized revenue run-rate at year-end 2025"
 
   - id: f_headcount_2025
@@ -86,6 +89,7 @@ facts:
     value: 4000
     asOf: "2025"
     source: https://www.trueup.io/co/xai
+    sourceResource: 7cc6429100d60677
     notes: "Headcount as of 2025 per TrueUp"
 
   - id: f_grok_mau_2025
@@ -93,6 +97,7 @@ facts:
     value: 30e6
     asOf: "2025"
     source: https://www.businessofapps.com/data/grok-statistics/
+    sourceResource: c3b39552b31a2c7e
     notes: "Grok monthly active users; nearly doubled since Q1 2025"
 
   - id: f_grok_downloads
@@ -100,6 +105,7 @@ facts:
     value: 60e6
     asOf: "2025"
     source: https://www.businessofapps.com/data/grok-statistics/
+    sourceResource: c3b39552b31a2c7e
     notes: "Grok cumulative downloads since launch"
 
   - id: f_grok_revenue_q3_2025
@@ -107,6 +113,7 @@ facts:
     value: 88e6
     asOf: 2025-09
     source: https://www.businessofapps.com/data/grok-statistics/
+    sourceResource: c3b39552b31a2c7e
     notes: "Quarterly revenue from Grok app in Q3 2025"
 
   - id: f_grok3_aime
@@ -114,6 +121,7 @@ facts:
     value: 93.3
     asOf: "2025"
     source: https://x.ai/news/grok-3
+    sourceResource: 9e8c6430d83420da
     notes: "Grok 3 AIME 2025 benchmark: 93.3% success rate"
 
   - id: f_grok3_elo
@@ -121,6 +129,7 @@ facts:
     value: 1402
     asOf: "2025"
     source: https://x.ai/news/grok-3
+    sourceResource: 9e8c6430d83420da
     notes: "Grok 3 Chatbot Arena Elo score"
 
   - id: f_grok3_params
@@ -128,6 +137,7 @@ facts:
     value: 2.7e12
     asOf: "2025"
     source: https://x.ai/news/grok-3
+    sourceResource: 9e8c6430d83420da
     notes: "Grok 3: 2.7 trillion parameters"
 
   - id: f_dod_contracts
@@ -135,6 +145,7 @@ facts:
     value: 200e6
     asOf: "2025"
     source: https://fedscoop.com/grok-government-gsa-onegov-artificial-intelligence-elon-musk-contract-agency/
+    sourceResource: d810022b134c68a9
     notes: "$200M in Department of Defense contracts"
 
   - id: f_grok_deepfake_rate
@@ -171,6 +182,7 @@ items:
         amount: 20e9
         valuation: 230e9
         source: https://x.ai/news/series-e
+        sourceResource: 42d7d419776526a2
         notes: "Series E round; brought total funding to over $26B"
 
   key-people:

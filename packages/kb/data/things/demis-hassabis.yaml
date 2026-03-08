@@ -30,12 +30,14 @@ facts:
     property: education
     value: "PhD in Cognitive Neuroscience, University College London; BA in Computer Science, University of Cambridge"
     source: https://en.wikipedia.org/wiki/Demis_Hassabis
+    sourceResource: 3700509af0b7f61d
     notes: "Double first in Computer Science from Queens' College, Cambridge"
 
   - id: f_dH4fG5hI6j
     property: notable-for
     value: "CEO of Google DeepMind; creator of AlphaGo, AlphaFold, and Gemini; Nobel Prize in Chemistry 2024; chess prodigy and game designer"
     source: https://en.wikipedia.org/wiki/Demis_Hassabis
+    sourceResource: 3700509af0b7f61d
 
   - id: f_dH7kL8mN9o
     property: social-media
@@ -59,6 +61,7 @@ items:
         start: "1994"
         end: "1997"
         source: https://en.wikipedia.org/wiki/Demis_Hassabis
+        sourceResource: 3700509af0b7f61d
         notes: "Joined Peter Molyneux's studio at age 17; co-designed Theme Park; led AI design for Black & White"
 
       i_dH4eF5gH6i:
@@ -67,6 +70,7 @@ items:
         start: "1998"
         end: "2005"
         source: https://en.wikipedia.org/wiki/Demis_Hassabis
+        sourceResource: 3700509af0b7f61d
         notes: "Founded game studio; developed Republic: The Revolution and Evil Genius"
 
       i_dH7jK8lM9n:
@@ -75,6 +79,7 @@ items:
         start: "2005"
         end: "2009"
         source: https://en.wikipedia.org/wiki/Demis_Hassabis
+        sourceResource: 3700509af0b7f61d
         notes: "PhD in cognitive neuroscience; research on imagination and memory in the hippocampus"
 
       i_dHoP1qR2s:

@@ -13,6 +13,7 @@ facts:
     value: !ref 0u4J70VqFY:conjecture
     asOf: 2022-03
     source: https://www.conjecture.dev/
+    sourceResource: b7aa1f2c839b5ee8
     notes: "Co-founded Conjecture in 2022; previously co-founded EleutherAI"
 
   - id: f_cflb799S8T
@@ -20,6 +21,7 @@ facts:
     value: "CEO & Co-founder, Conjecture"
     asOf: 2022-03
     source: https://www.conjecture.dev/
+    sourceResource: b7aa1f2c839b5ee8
     notes: "Prominent public advocate for AI safety; testified before UK Parliament and EU; frequent media commentator"
 
   - id: f_2HGntp6Jt1
@@ -43,6 +45,7 @@ facts:
     asOf: "2020"
     validEnd: "2022"
     source: https://www.eleuther.ai/
+    sourceResource: 120b456b2f9481b0
     notes: "Co-founded EleutherAI, an open-source AI research collective; developed GPT-NeoX and GPT-J"
 
 items:
@@ -55,6 +58,7 @@ items:
         start: "2020"
         end: "2022"
         source: https://www.eleuther.ai/
+        sourceResource: 120b456b2f9481b0
         notes: "Co-founded open-source AI research collective; developed GPT-NeoX-20B and GPT-J-6B; started as a Discord community replicating GPT-3"
 
       i_cL4eF5gH6i:
@@ -62,6 +66,7 @@ items:
         title: "CEO & Co-founder"
         start: 2022-03
         source: https://www.conjecture.dev/
+        sourceResource: b7aa1f2c839b5ee8
         notes: "Founded Conjecture to work on AI alignment; shifted from capabilities to safety; prominent public advocate for AI risk"
 
   notable-publications:

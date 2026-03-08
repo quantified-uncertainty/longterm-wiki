@@ -21,6 +21,7 @@ facts:
     value: !ref QsXVXtQ0zE:arc
     asOf: 2021-10
     source: https://alignment.org/
+    sourceResource: 0562f8c207d8b63f
     notes: "Founded Alignment Research Center (ARC) in 2021; stepped back from day-to-day operations in 2023 due to a brain injury"
 
   - id: f_rvwYSk7eFi
@@ -28,6 +29,7 @@ facts:
     value: "Founder, Alignment Research Center"
     asOf: 2021-10
     source: https://alignment.org/
+    sourceResource: 0562f8c207d8b63f
 
   - id: f_ZmXlEP6Y6H
     property: born-year
@@ -81,6 +83,7 @@ items:
         title: "Founder & President"
         start: 2021-10
         source: https://alignment.org/
+        sourceResource: 0562f8c207d8b63f
         notes: "Founded ARC to work on alignment theory and evals; stepped back from daily operations in 2023 due to brain injury sustained in an accident"
 
       i_pC7jK8lM9n:
