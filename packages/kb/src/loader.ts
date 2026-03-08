@@ -5,6 +5,12 @@
  * Supports !ref YAML tags for stable references between entities:
  *   value: !ref mK9pX3rQ7n:dario-amodei   → resolves stableId, cross-validates slug
  *   value: !ref mK9pX3rQ7n                 → bare stableId (deprecated, still works)
+ *
+ * Supports !date YAML tags for explicit date typing:
+ *   founded: !date 2019        → { type: "date", value: "2019" }
+ *   started: !date 2023-06     → { type: "date", value: "2023-06" }
+ *   born:    !date 2023-06-15  → { type: "date", value: "2023-06-15" }
+ * Useful for bare years (2019) which would otherwise be parsed as numbers.
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -65,7 +71,35 @@ const refTag: ScalarTag = {
   },
 };
 
-const CUSTOM_TAGS = [refTag];
+// ── !date YAML tag ──────────────────────────────────────────────────
+
+/**
+ * Marker class for !date YAML tags. Created during YAML parsing,
+ * converted to { type: "date", value: string } by normalizeValue.
+ *
+ * Accepts any scalar — bare years (2019), year-month (2023-06), or
+ * full ISO dates (2023-06-15). The raw value is stored as a string.
+ */
+export class DateMarker {
+  constructor(public readonly value: string) {}
+}
+
+/** Custom YAML tag: !date <value> */
+const dateTag: ScalarTag = {
+  tag: "!date",
+  resolve(str: string): DateMarker {
+    return new DateMarker(str);
+  },
+  identify(value: unknown): value is DateMarker {
+    return value instanceof DateMarker;
+  },
+  stringify(item: Scalar): string {
+    const marker = item.value as DateMarker;
+    return `!date ${marker.value}`;
+  },
+};
+
+const CUSTOM_TAGS = [refTag, dateTag];
 
 /**
  * Recursively resolves RefMarker instances in a parsed YAML structure.
@@ -76,6 +110,13 @@ function resolveRefs(
   graph: Graph,
   context: string
 ): unknown {
+  // DateMarker in facts: pass through as-is so normalizeValue() can handle it.
+  // DateMarker in items: convert to the plain date string, since item collections
+  // never go through normalizeValue() and would otherwise store a class instance.
+  if (value instanceof DateMarker) {
+    return context.endsWith("/facts") ? value : value.value;
+  }
+
   if (value instanceof RefMarker) {
     const slug = graph.resolveStableId(value.stableId);
     if (!slug) {
@@ -124,6 +165,11 @@ const DATE_RE = /^\d{4}-\d{2}(-\d{2})?$/;
  * a string value is wrapped as {type: "ref"} rather than {type: "text"}.
  */
 function normalizeValue(raw: unknown, dataType?: string): FactValue {
+  // !date YAML tag — explicit date typing, takes priority over everything.
+  if (raw instanceof DateMarker) {
+    return { type: "date", value: raw.value };
+  }
+
   // When an explicit dataType is declared, it is authoritative.
   if (dataType) {
     switch (dataType) {

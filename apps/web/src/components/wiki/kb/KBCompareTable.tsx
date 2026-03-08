@@ -185,7 +185,7 @@ function LatestValueTable({
   entityRows,
   property,
 }: {
-  entityRows: Array<{ entityId: string; name: string; fact: Fact }>;
+  entityRows: Array<{ entityId: string; name: string; fact: Fact | null }>;
   property: Property | undefined;
 }) {
   return (
@@ -206,10 +206,14 @@ function LatestValueTable({
               <KBRefLink id={entityId} label={name} />
             </TableCell>
             <TableCell className="text-right font-medium">
-              <FactCellValue fact={fact} property={property} />
+              {fact ? (
+                <FactCellValue fact={fact} property={property} />
+              ) : (
+                <span className="text-muted-foreground text-xs">No data</span>
+              )}
             </TableCell>
             <TableCell className="text-muted-foreground whitespace-nowrap">
-              {formatKBDate(fact.asOf)}
+              {fact ? formatKBDate(fact.asOf) : "—"}
             </TableCell>
           </TableRow>
         ))}
@@ -238,11 +242,10 @@ export function KBCompareTable({
   // Get all facts for this property, scoped to the requested entities
   const allFactsMap = getKBAllFactsByProperty(propertyId, scopeIds);
 
-  // If no entity filter was given, derive the list from entities that actually
-  // have facts for this property
-  const entityIds = scopeIds
-    ? scopeIds.filter((id) => allFactsMap.has(id))
-    : Array.from(allFactsMap.keys());
+  // If no entity filter was given, derive the list from entities that have facts.
+  // If a filter was given, keep ALL requested IDs — missing ones render as "No data"
+  // so the comparison is not silently truncated.
+  const entityIds = scopeIds ?? Array.from(allFactsMap.keys());
 
   if (entityIds.length === 0) {
     return (
@@ -340,22 +343,22 @@ export function KBCompareTable({
   }
 
   // ── Latest-value mode ───────────────────────────────────────────────────────
-  const latestMap = getKBFactsByProperty(propertyId, entityIds);
-
+  // Derive latest fact per entity from allFactsMap (already sorted most-recent-first).
+  // Entities with no data are kept as null so the table shows "No data" rather than
+  // silently omitting them (which would make the comparison look more complete than it is).
   const entityRows = entityIds
-    .filter((id) => latestMap.has(id))
     .map((entityId) => ({
       entityId,
       name: getEntityName(entityId),
-      fact: latestMap.get(entityId)!,
+      fact: allFactsMap.get(entityId)?.[0] ?? null,
     }))
     .sort((a, b) => {
-      if (
-        a.fact.value.type === "number" &&
-        b.fact.value.type === "number"
-      ) {
+      if (a.fact?.value.type === "number" && b.fact?.value.type === "number") {
         return b.fact.value.value - a.fact.value.value;
       }
+      // Entities with data sort before entities without
+      if (a.fact && !b.fact) return -1;
+      if (!a.fact && b.fact) return 1;
       return a.name.localeCompare(b.name);
     });
 

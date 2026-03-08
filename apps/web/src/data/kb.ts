@@ -19,6 +19,16 @@ function getKB(): SerializedKB | undefined {
   }
 }
 
+/** Sort facts most-recent-first by asOf (undefined asOf sorts last). */
+function sortByAsOfDesc(facts: Fact[]): Fact[] {
+  return facts.slice().sort((a, b) => {
+    if (a.asOf === undefined && b.asOf === undefined) return 0;
+    if (a.asOf === undefined) return 1;
+    if (b.asOf === undefined) return -1;
+    return b.asOf.localeCompare(a.asOf);
+  });
+}
+
 /**
  * Get all facts for an entity, optionally filtered by property.
  * Returns facts sorted most-recent-first (by asOf).
@@ -32,12 +42,7 @@ export function getKBFacts(entity: string, property?: string): Fact[] {
     ? facts.filter((f) => f.propertyId === property)
     : facts;
 
-  return filtered.slice().sort((a, b) => {
-    if (a.asOf === undefined && b.asOf === undefined) return 0;
-    if (a.asOf === undefined) return 1;
-    if (b.asOf === undefined) return -1;
-    return b.asOf.localeCompare(a.asOf);
-  });
+  return sortByAsOfDesc(filtered);
 }
 
 /**
@@ -117,19 +122,8 @@ export function getKBFactsByProperty(
   const result = new Map<string, Fact>();
 
   for (const entityId of ids) {
-    const facts = (kb.facts[entityId] ?? []).filter(
-      (f) => f.propertyId === propertyId,
-    );
-    if (facts.length === 0) continue;
-
-    // Pick the latest by asOf
-    const sorted = facts.slice().sort((a, b) => {
-      if (a.asOf === undefined && b.asOf === undefined) return 0;
-      if (a.asOf === undefined) return 1;
-      if (b.asOf === undefined) return -1;
-      return b.asOf.localeCompare(a.asOf);
-    });
-    result.set(entityId, sorted[0]!);
+    const facts = getKBFacts(entityId, propertyId);
+    if (facts.length > 0) result.set(entityId, facts[0]!);
   }
 
   return result;
@@ -151,18 +145,8 @@ export function getKBAllFactsByProperty(
   const result = new Map<string, Fact[]>();
 
   for (const entityId of ids) {
-    const facts = (kb.facts[entityId] ?? [])
-      .filter((f) => f.propertyId === propertyId)
-      .slice()
-      .sort((a, b) => {
-        if (a.asOf === undefined && b.asOf === undefined) return 0;
-        if (a.asOf === undefined) return 1;
-        if (b.asOf === undefined) return -1;
-        return b.asOf.localeCompare(a.asOf);
-      });
-    if (facts.length > 0) {
-      result.set(entityId, facts);
-    }
+    const facts = getKBFacts(entityId, propertyId);
+    if (facts.length > 0) result.set(entityId, facts);
   }
 
   return result;

@@ -891,6 +891,8 @@ export type Fact = z.infer<typeof Fact>;
 export const FactsFile = z.object({
   entity: z.string(),
   facts: z.record(z.string(), Fact),
+  /** If set, this file is deprecated and managed in the specified system (e.g. "kb") */
+  deprecated_by: z.string().optional(),
 });
 export type FactsFile = z.infer<typeof FactsFile>;
 
