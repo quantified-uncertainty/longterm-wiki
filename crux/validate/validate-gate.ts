@@ -63,16 +63,19 @@ const SCOPE: string = args.find(a => a.startsWith('--scope='))?.split('=')[1] ||
 const CONTENT_ONLY: boolean = SCOPE === 'content';
 
 // ── Stamp-based caching ──────────────────────────────────────────────────────
-// After a successful gate run, we write the HEAD commit hash + mode to a stamp
-// file inside .git/. On subsequent runs, if HEAD hasn't changed and the mode
-// is compatible, we skip the entire gate. This prevents re-running a ~5min
-// check suite on repeated push attempts for the same commit.
+// After a successful gate run, we write the HEAD tree hash + mode to a stamp
+// file inside .git/. On subsequent runs, if the tree hash hasn't changed and
+// the mode is compatible, we skip the entire gate. Using tree hash (not commit
+// hash) means rebases that don't change content still hit the cache, avoiding
+// the race condition where a 200s gate pass is invalidated by a rebase onto
+// updated main (#1821).
 
 const STAMP_FILE = join(PROJECT_ROOT, '.git', 'gate-stamp');
 
 function getHeadHash(): string {
   try {
-    return execSync('git rev-parse HEAD', { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
+    // Use tree hash so rebases with identical content still hit the cache
+    return execSync('git rev-parse HEAD^{tree}', { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
   } catch {
     // Fail-closed: empty hash means stamp cache won't match, so gate runs fully
     return '';
