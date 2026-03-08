@@ -1,6 +1,5 @@
 import {
   fetchDetailed,
-  fetchFromWikiServer,
   withApiFallback,
   type ApiErrorReason,
   type FetchResult,
@@ -760,17 +759,27 @@ export async function SystemHealthContent() {
   const [
     { data, source, apiError },
     extendedResult,
-    pullsData,
+    pullsResult,
   ] = await Promise.all([
     withApiFallback(loadFromApi, noLocalFallback),
     loadExtendedData(),
-    fetchFromWikiServer<PullsApiResponse>("/api/github/pulls", {
+    fetchDetailed<PullsApiResponse>("/api/github/pulls", {
       revalidate: 30,
     }),
   ]);
 
   const extended = extendedResult.ok ? extendedResult.data : null;
   const extendedError = !extendedResult.ok ? extendedResult.error : null;
+  const pullsData = pullsResult.ok ? pullsResult.data : null;
+  const pullsApiError = !pullsResult.ok ? pullsResult.error : null;
+  // Either the fetch itself failed, or the server returned an error field
+  const pullsError: string | null = pullsApiError
+    ? pullsApiError.type === "server-error"
+      ? `HTTP ${pullsApiError.status} ${pullsApiError.statusText}`
+      : pullsApiError.type === "connection-error"
+        ? pullsApiError.message
+        : pullsApiError.type
+    : pullsData?.error ?? null;
   const openPRs: OpenPRDisplayRow[] = pullsData?.pulls ?? [];
 
   const { overall, checkedAt, services: rawServices, recentIncidents } =
@@ -841,22 +850,31 @@ export async function SystemHealthContent() {
       ) : null}
 
       {/* Open Pull Requests */}
-      <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-        Open pull requests
-      </h3>
-      {openPRs.length === 0 ? (
-        <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground mb-6">
-          <p className="text-lg font-medium mb-2">No open pull requests</p>
-          <p className="text-sm">
-            {pullsData?.error
-              ? `Could not fetch PRs: ${pullsData.error}`
-              : "Open PRs will appear here when agents or contributors create them."}
-          </p>
-        </div>
+      {pullsError ? (
+        <>
+          <SectionHeader>Open pull requests</SectionHeader>
+          <div className="rounded-lg border border-red-200 bg-red-500/5 p-4 text-sm text-muted-foreground mb-6">
+            Failed to load ({pullsError})
+          </div>
+        </>
       ) : (
-        <div className="mb-6">
-          <OpenPRsTable data={openPRs} />
-        </div>
+        <>
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+            Open pull requests
+          </h3>
+          {openPRs.length === 0 ? (
+            <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground mb-6">
+              <p className="text-lg font-medium mb-2">No open pull requests</p>
+              <p className="text-sm">
+                Open PRs will appear here when agents or contributors create them.
+              </p>
+            </div>
+          ) : (
+            <div className="mb-6">
+              <OpenPRsTable data={openPRs} />
+            </div>
+          )}
+        </>
       )}
 
       {/* Recent incidents */}
