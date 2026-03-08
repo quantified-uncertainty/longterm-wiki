@@ -121,3 +121,57 @@ export function resetFailCount(key: number | string): void {
 export function isAbandoned(key: number | string): boolean {
   return getFailCount(key) >= 2;
 }
+
+// ── Main branch red-since tracking ──────────────────────────────────────────
+
+const MAIN_RED_SINCE_FILE = join(STATE_DIR, 'main-red-since');
+const MAIN_FIX_ATTEMPTS_FILE = join(STATE_DIR, 'main-fix-attempts');
+
+export function getMainRedSince(): string | null {
+  const file = MAIN_RED_SINCE_FILE;
+  if (!existsSync(file)) return null;
+  const content = readFileSync(file, 'utf-8').trim();
+  return content || null;
+}
+
+export function setMainRedSince(timestamp: string): void {
+  writeFileSync(MAIN_RED_SINCE_FILE, timestamp);
+}
+
+export function clearMainRedSince(): void {
+  const file = MAIN_RED_SINCE_FILE;
+  if (existsSync(file)) writeFileSync(file, '');
+}
+
+export function getMainFixAttempts(): number {
+  const file = MAIN_FIX_ATTEMPTS_FILE;
+  if (!existsSync(file)) return 0;
+  return parseInt(readFileSync(file, 'utf-8').trim(), 10) || 0;
+}
+
+export function incrementMainFixAttempts(): number {
+  const count = getMainFixAttempts() + 1;
+  writeFileSync(MAIN_FIX_ATTEMPTS_FILE, String(count));
+  return count;
+}
+
+export function resetMainFixAttempts(): void {
+  const file = MAIN_FIX_ATTEMPTS_FILE;
+  if (existsSync(file)) writeFileSync(file, '0');
+}
+
+// ── Claimed PR tracking (shared between daemon and watcher) ────────────────
+
+const CLAIMED_PR_FILE = join(STATE_DIR, 'claimed-pr');
+
+export function getPersistedClaimedPr(): number | null {
+  if (!existsSync(CLAIMED_PR_FILE)) return null;
+  const content = readFileSync(CLAIMED_PR_FILE, 'utf-8').trim();
+  if (!content) return null;
+  const n = parseInt(content, 10);
+  return Number.isNaN(n) ? null : n;
+}
+
+export function setPersistedClaimedPr(prNum: number | null): void {
+  writeFileSync(CLAIMED_PR_FILE, prNum != null ? String(prNum) : '');
+}

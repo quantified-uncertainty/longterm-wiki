@@ -39,6 +39,7 @@ import {
   formatStats,
   formatExplain,
 } from '../pr-patrol/format.ts';
+import { runWatchLoop } from '../pr-patrol/watch.ts';
 
 async function run(
   args: string[],
@@ -60,6 +61,21 @@ async function status(
   _args: string[],
   options: CommandOptions,
 ): Promise<CommandResult> {
+  // Watch mode — live refresh
+  if (options.watch) {
+    if (options.json) {
+      return { output: 'Error: --json is not supported with --watch\n', exitCode: 1 };
+    }
+    const rawInterval = typeof options.interval === 'number'
+      ? options.interval
+      : typeof options.interval === 'string'
+        ? parseInt(options.interval, 10)
+        : 10;
+    const interval = Number.isNaN(rawInterval) || rawInterval < 1 ? 10 : rawInterval;
+    await runWatchLoop(interval, options);
+    return { output: '', exitCode: 0 };
+  }
+
   const colors = getColors(options.ci as boolean | undefined);
   const count = typeof options.count === 'number' ? options.count : (typeof options.count === 'string' ? parseInt(options.count, 10) : 20);
 
@@ -185,8 +201,16 @@ Commands:
   explain          Detailed explanation of what PR Patrol does
   merge-status     Show PRs labeled ${LABELS.STAGE_APPROVED} and their eligibility
 
-Status/History Options:
+Status Options:
+  --watch          Live-refreshing display (clears and redraws every interval)
+  --interval=N     Refresh interval in seconds for --watch (default: 10)
   --count=N        Number of entries to show (default: 20 for status, 100 for history)
+  --type=TYPE      Filter by type: pr, merge, cycle, main, overlap, undraft
+  --pr=N           Filter to a specific PR number
+  --json           Output raw JSON for scripting
+
+History Options:
+  --count=N        Number of entries to show (default: 100)
   --type=TYPE      Filter by type: pr, merge, cycle, main, overlap, undraft
   --pr=N           Filter to a specific PR number
   --outcome=X      Filter by outcome: fixed, max-turns, timeout, error, enqueued, merged
@@ -223,6 +247,8 @@ Examples:
   crux pr-patrol once --dry-run          Preview what would be fixed/merged
   crux pr-patrol run --interval=120      Run with 2-minute cycles
   crux pr-patrol status                  Show recent activity
+  crux pr-patrol status --watch          Live-refreshing dashboard
+  crux pr-patrol status --watch --interval=5  Faster refresh
   crux pr-patrol status --pr=1234        Show activity for a specific PR
   crux pr-patrol history --since=7d      Browse last 7 days of logs
   crux pr-patrol stats --since=30d       Monthly performance stats

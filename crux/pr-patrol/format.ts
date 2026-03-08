@@ -12,6 +12,7 @@ import type {
   LogEntry,
   CycleSummaryEntry,
 } from './log-reader.ts';
+import type { DeployHealthStatus } from '../lib/pr-analysis/deploy-status.ts';
 
 // ── Utilities ───────────────────────────────────────────────────────────────
 
@@ -284,6 +285,77 @@ export function formatStats(stats: AggregatedStats, since: string, c: Colors): s
   }
 
   return lines.join('\n') + '\n';
+}
+
+// ── Health summary formatting ───────────────────────────────────────────────
+
+export interface HealthSummary {
+  mainBranch: {
+    isRed: boolean;
+    redSince: string | null;
+    fixAttempts: number;
+    culprits: number[]; // PR numbers
+  };
+  deploy: DeployHealthStatus;
+  daemon: {
+    state: 'idle' | 'fixing' | 'merging';
+    currentPr: number | null;
+    cycleCount: number;
+    lastCycleAt: string | null;
+  };
+}
+
+/** Format the system health summary for the watch view. */
+export function formatHealthSummary(health: HealthSummary, c: Colors): string {
+  const lines: string[] = [
+    `${c.bold}System Health${c.reset}`,
+    '',
+  ];
+
+  // Main branch
+  if (health.mainBranch.isRed) {
+    const duration = health.mainBranch.redSince
+      ? relativeTime(health.mainBranch.redSince).replace(' ago', '')
+      : 'unknown';
+    const culprits = health.mainBranch.culprits.length > 0
+      ? `  Likely culprits: ${health.mainBranch.culprits.map((n) => `#${n}`).join(', ')}`
+      : '';
+    lines.push(
+      `  Main CI:    ${c.red}RED${c.reset} for ${duration} (${health.mainBranch.fixAttempts} fix attempts)${culprits}`,
+    );
+  } else {
+    lines.push(`  Main CI:    ${c.green}GREEN${c.reset}`);
+  }
+
+  // Deploy
+  if (health.deploy.lastDeploy === null) {
+    lines.push(`  Deploy:     ${c.dim}no data${c.reset}`);
+  } else if (health.deploy.healthy) {
+    lines.push(
+      `  Deploy:     ${c.green}healthy${c.reset}  ${c.dim}(${relativeTime(health.deploy.lastDeploy.timestamp)})${c.reset}`,
+    );
+  } else {
+    const since = health.deploy.failingSince
+      ? relativeTime(health.deploy.failingSince).replace(' ago', '')
+      : 'unknown';
+    lines.push(`  Deploy:     ${c.red}FAILING${c.reset} for ${since}`);
+  }
+
+  // Daemon state
+  const stateStr = health.daemon.state === 'idle'
+    ? `${c.dim}idle${c.reset}`
+    : health.daemon.state === 'fixing'
+      ? health.daemon.currentPr != null
+        ? `${c.yellow}fixing PR #${health.daemon.currentPr}${c.reset}`
+        : `${c.yellow}fixing${c.reset}`
+      : `${c.cyan}merging${c.reset}`;
+  const lastCycle = health.daemon.lastCycleAt
+    ? `  ${c.dim}last cycle: ${relativeTime(health.daemon.lastCycleAt)}${c.reset}`
+    : '';
+  lines.push(`  Daemon:     ${stateStr}  cycles: ${health.daemon.cycleCount}${lastCycle}`);
+
+  lines.push('');
+  return lines.join('\n');
 }
 
 // ── Explain formatting ──────────────────────────────────────────────────────
