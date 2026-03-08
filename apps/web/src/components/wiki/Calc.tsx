@@ -1,6 +1,7 @@
 import { getKBLatest, getKBProperty } from "@data/kb";
 import { calc, formatValue, type CalcFormat, type CalcFact } from "@/lib/calc-engine";
 import { cn } from "@/lib/utils";
+import styles from "./tooltip.module.css";
 
 interface CalcProps {
   /** Expression with {entity.propertyId} references, e.g. "{anthropic.revenue} / {anthropic.valuation}" */
@@ -82,7 +83,7 @@ export function Calc({
     );
 
     return (
-      <span className="relative inline group/calc">
+      <span className={styles.wrapper}>
         <span
           className={cn(
             "inline font-medium border-b border-dotted border-blue-400/50 cursor-help",
@@ -94,7 +95,10 @@ export function Calc({
           {displayValue}
         </span>
         <span
-          className="absolute left-0 top-full mt-1 z-50 w-[260px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible group-hover/calc:opacity-100 group-hover/calc:visible transition-opacity text-xs"
+          className={cn(
+            styles.tooltip,
+            "absolute left-0 top-full mt-1 z-50 w-[260px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible transition-opacity text-xs",
+          )}
           role="tooltip"
         >
           <span className="block font-semibold text-foreground mb-1">
