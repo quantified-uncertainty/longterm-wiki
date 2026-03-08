@@ -16,7 +16,6 @@ import { hallucinationRiskRoute } from "./routes/hallucination-risk.js";
 import { sessionsRoute } from "./routes/sessions.js";
 import { resourcesRoute } from "./routes/resources.js";
 import { summariesRoute } from "./routes/summaries.js";
-import { claimsRoute } from "./routes/claims.js";
 import { linksRoute } from "./routes/links.js";
 import { autoUpdateNewsRoute } from "./routes/auto-update-news.js";
 import { entitiesRoute } from "./routes/entities.js";
@@ -28,7 +27,6 @@ import { jobsRoute } from "./routes/jobs.js";
 import { artifactsRoute } from "./routes/artifacts.js";
 import { exploreRoute } from "./routes/explore.js";
 import { integrityRoute } from "./routes/integrity.js";
-import { statementsRoute } from "./routes/statements.js";
 import { referencesRoute } from "./routes/references.js";
 import { githubIssuesRoute } from "./routes/github-issues.js";
 import { groundskeeperRunsRoute } from "./routes/groundskeeper-runs.js";
@@ -120,7 +118,6 @@ export function createApp() {
   app.use("/api/pages/*", requireWriteScope("content"));
   app.use("/api/entities/*", requireWriteScope("content"));
   app.use("/api/facts/*", requireWriteScope("content"));
-  app.use("/api/claims/*", requireWriteScope("content"));
   app.use("/api/citations/*", requireWriteScope("content"));
   app.use("/api/resources/*", requireWriteScope("content"));
   app.use("/api/links/*", requireWriteScope("content"));
@@ -128,7 +125,6 @@ export function createApp() {
   app.use("/api/hallucination-risk/*", requireWriteScope("content"));
   app.use("/api/artifacts/*", requireWriteScope("content"));
   app.use("/api/references/*", requireWriteScope("content"));
-  app.use("/api/statements/*", requireWriteScope("content"));
 
   // Project-scope routes: writes require the project key
   // (IDs, sessions, edit logs, jobs, agent sessions, auto-update tracking)
@@ -155,7 +151,6 @@ export function createApp() {
   app.route("/api/sessions", sessionsRoute);
   app.route("/api/resources", resourcesRoute);
   app.route("/api/summaries", summariesRoute);
-  app.route("/api/claims", claimsRoute);
   app.route("/api/links", linksRoute);
   app.route("/api/auto-update-news", autoUpdateNewsRoute);
   app.route("/api/entities", entitiesRoute);
@@ -167,7 +162,6 @@ export function createApp() {
   app.route("/api/artifacts", artifactsRoute);
   app.route("/api/explore", exploreRoute);
   app.route("/api/integrity", integrityRoute);
-  app.route("/api/statements", statementsRoute);
   app.route("/api/references", referencesRoute);
   app.route("/api/github/issues", githubIssuesRoute);
   app.route("/api/github/pulls", githubPullsRoute);

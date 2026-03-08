@@ -160,26 +160,6 @@ interface DatabaseShape {
     verificationDifficulty: string | null;
     accuracyCheckedAt: string | null;
   }>>;
-  /**
-   * Statement-backed citation dot data bundled at build time, keyed by page slug.
-   * Populated by buildStatementCitationDots() from /api/statements/citation-dots/all.
-   * Each entry is keyed by footnoteResourceId (e.g. "cr-abc123") and must be mapped
-   * to a numeric footnote number via the referenceMap from renderMdxPage().
-   */
-  statementCitationDots?: Record<string, Array<{
-    footnoteResourceId: string;
-    claimText: string;
-    url: string | null;
-    resourceId: string | null;
-    sourceQuote: string | null;
-    sourceTitle: string | null;
-    sourceType: string | null;
-    quoteVerified: boolean;
-    accuracyVerdict: string | null;
-    accuracyScore: number | null;
-    accuracyIssues: string | null;
-    accuracyCheckedAt: string | null;
-  }>>;
   /** KB (Knowledge Base) structured entity data from packages/kb */
   kb?: import("@longterm-wiki/kb").SerializedKB;
 }
@@ -1026,15 +1006,6 @@ export function getLocalCitationQuotes(pageId: string) {
   return getDatabase().citationQuotes?.[pageId];
 }
 
-/**
- * Get build-time statement citation dot data for a page from database.json.
- * Keyed by page slug (not numeric ID). Returns undefined if no data was bundled.
- * Each entry uses footnoteResourceId (e.g. "cr-abc123") instead of numeric footnote numbers;
- * callers must resolve to numeric footnotes via the referenceMap from renderMdxPage().
- */
-export function getStatementCitationDots(pageId: string) {
-  return getDatabase().statementCitationDots?.[pageId];
-}
 
 export function getResourceCredibility(
   resource: Resource

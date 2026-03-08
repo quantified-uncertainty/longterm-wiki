@@ -32,8 +32,6 @@ type CitationContentRow = InferResponseType<RpcClient['content']['$get'], 200>;
 type CitationContentListResult = InferResponseType<RpcClient['content']['list']['$get'], 200>;
 type CitationContentListEntry = CitationContentListResult['entries'][number];
 type CitationContentStatsResult = InferResponseType<RpcClient['content']['stats']['$get'], 200>;
-// PropagateFromClaimsResult removed — backward propagation eliminated in #1310
-
 // New query types
 type CitationStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 type CitationPageStatsResult = InferResponseType<RpcClient['page-stats']['$get'], 200>;
@@ -93,14 +91,12 @@ export type { MarkAccuracyResult, MarkAccuracyBatchResult, SnapshotResult, Accur
 // Citation Quotes API functions
 // ---------------------------------------------------------------------------
 
-/** @deprecated Use `insertClaim()` + claim_sources instead. Will be removed in #1311. */
 export async function upsertCitationQuote(
   item: UpsertCitationQuoteItem,
 ): Promise<ApiResult<UpsertCitationQuoteResult>> {
   return apiRequest<UpsertCitationQuoteResult>('POST', '/api/citations/quotes/upsert', item, undefined, 'content');
 }
 
-/** @deprecated Use `insertClaimBatch()` + claim_sources instead. Will be removed in #1311. */
 export async function upsertCitationQuoteBatch(
   items: UpsertCitationQuoteItem[],
 ): Promise<ApiResult<UpsertCitationQuoteBatchResult>> {
@@ -130,14 +126,12 @@ export async function getPageCitationHealth(
 // Citation Accuracy API functions
 // ---------------------------------------------------------------------------
 
-/** @deprecated Update claims.claimVerdict instead. Will be removed in #1311. */
 export async function markCitationAccuracy(
   item: MarkAccuracyItem,
 ): Promise<ApiResult<MarkAccuracyResult>> {
   return apiRequest<MarkAccuracyResult>('POST', '/api/citations/quotes/mark-accuracy', item, undefined, 'content');
 }
 
-/** @deprecated Batch update claims.claimVerdict instead. Will be removed in #1311. */
 export async function markCitationAccuracyBatch(
   items: MarkAccuracyItem[],
 ): Promise<ApiResult<MarkAccuracyBatchResult>> {
@@ -196,41 +190,6 @@ export async function getCitationContentStats(): Promise<ApiResult<CitationConte
 }
 
 // ---------------------------------------------------------------------------
-// Citation-Claim Linking API functions
-// ---------------------------------------------------------------------------
-
-/** @deprecated Claims are now the source of truth — no need to backward-link. Will be removed in #1311. */
-export async function linkCitationToClaim(
-  quoteId: number,
-  claimId: number,
-): Promise<ApiResult<{ linked: boolean; quoteId: number; claimId: number }>> {
-  return apiRequest<{ linked: boolean; quoteId: number; claimId: number }>(
-    'PATCH',
-    `/api/citations/quotes/${quoteId}/link-claim`,
-    { claimId },
-    undefined,
-    'content',
-  );
-}
-
-/** @deprecated Claims are now the source of truth — no need to backward-link. Will be removed in #1311. */
-export async function linkCitationsToClaimsBatch(
-  items: Array<{ quoteId: number; claimId: number }>,
-): Promise<ApiResult<{ linked: number }>> {
-  return apiRequest<{ linked: number }>(
-    'POST',
-    '/api/citations/quotes/link-claims-batch',
-    { items },
-    undefined,
-    'content',
-  );
-}
-
-// NOTE: propagateClaimVerdictsToPage() was removed in #1310.
-// Backward propagation from claims → citation_quotes is no longer needed
-// since claims is now the single source of truth for verification data.
-
-// ---------------------------------------------------------------------------
 // Citation Quotes Query API functions
 // ---------------------------------------------------------------------------
 
@@ -285,7 +244,6 @@ export async function getQuote(
   );
 }
 
-/** @deprecated Update claim_sources.sourceVerdict instead. Will be removed in #1311. */
 export async function markQuoteVerified(
   pageId: string,
   footnote: number,
@@ -301,7 +259,6 @@ export async function markQuoteVerified(
   );
 }
 
-/** @deprecated Update claim_sources.sourceVerdict instead. Will be removed in #1311. */
 export async function markQuoteUnverified(
   pageId: string,
   footnote: number,

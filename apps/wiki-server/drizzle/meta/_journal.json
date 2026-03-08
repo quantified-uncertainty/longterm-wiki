@@ -456,6 +456,13 @@
       "when": 1774166400000,
       "tag": "0064_page_citations_resource_fk_on_delete",
       "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1774252800000,
+      "tag": "0065_archive_statements_claims_tables",
+      "breakpoints": true
     }
   ]
 }

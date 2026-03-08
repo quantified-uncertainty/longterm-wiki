@@ -19,7 +19,7 @@ import type {
 import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
 import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
-import { createDbEntriesForRcFootnotes } from '../../claims/convert-new-footnotes.ts';
+import { createDbEntriesForRcFootnotes } from '../../lib/convert-new-footnotes.ts';
 import { isBiographicalPage } from '../../lib/page-analysis.ts';
 import { validateMdxContent } from '../../lib/validation/validate-mdx-content.ts';
 import { ValidationEngine } from '../../lib/validation/validation-engine.ts';

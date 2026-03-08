@@ -40,4 +40,5 @@ excluded_rules = [
   "constraint-missing-not-valid",
   "adding-not-nullable-field",
   "adding-foreign-key-constraint",
+  "renaming-table",
 ]

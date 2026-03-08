@@ -40,7 +40,6 @@ interface DbCountsRow {
 
 interface IntegritySummaryRow {
   dangling_facts: number;
-  dangling_claims: number;
   dangling_summaries: number;
   dangling_citations: number;
   dangling_edit_logs: number;
@@ -506,7 +505,6 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
   const result = await rawDb`
     SELECT
       (SELECT count(*) FROM facts WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_facts,
-      (SELECT count(*) FROM claims WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_claims,
       (SELECT count(*) FROM summaries WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_summaries,
       -- Only flag truly orphaned records where BOTH the legacy text page_id and the new integer
       -- page_id_int are NULL. Records with page_id_old populated but page_id_int NULL are
@@ -519,7 +517,6 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
 
   const totalDangling =
     row.dangling_facts +
-    row.dangling_claims +
     row.dangling_summaries +
     row.dangling_citations +
     row.dangling_edit_logs;
@@ -529,7 +526,6 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
     status: totalDangling === 0 ? "clean" : "issues_found",
     breakdown: {
       facts: row.dangling_facts,
-      claims: row.dangling_claims,
       summaries: row.dangling_summaries,
       citations: row.dangling_citations,
       editLogs: row.dangling_edit_logs,
