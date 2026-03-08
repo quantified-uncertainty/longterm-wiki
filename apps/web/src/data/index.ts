@@ -39,9 +39,9 @@ interface IdRegistryMaps {
 }
 
 /**
- * Legacy Fact interface — kept as a bridge type for calc-engine and
- * AnthropicStakeholdersTable. The old facts pipeline has been retired;
- * database.facts is always empty. New code should use KB data instead.
+ * Legacy Fact interface — kept solely as a bridge type for calc-engine.
+ * Not backed by any database collection; database.facts is always empty.
+ * The old facts pipeline has been retired. New code should use KB data instead.
  */
 export interface Fact {
   value?: string;

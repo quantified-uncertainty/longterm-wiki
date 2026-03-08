@@ -1,23 +1,17 @@
 /**
- * Fact Reference Enrichment Tool
+ * Fact Reference Enrichment Tool (RETIRED / NO-OP)
  *
- * Standalone tool to wrap hardcoded numbers in MDX content with
- * `<F e="entity" f="hashId">display</F>` canonical fact tags.
+ * This module previously wrapped hardcoded numbers in MDX content with
+ * `<F e="entity" f="hashId">display</F>` canonical fact tags using the
+ * data/facts/*.yaml pipeline. That pipeline has been retired.
  *
- * Features:
- * - Idempotent: skips numbers already inside <F> tags
- * - Works at section-level and page-level
- * - Uses LLM (Haiku) to verify semantic match before wrapping
- * - Handles approximate matching ($30B vs $30 billion vs 30000000000)
+ * The enrichFactRefs() function is now a no-op that returns the content
+ * unchanged. Callers in the improve/enrich pipelines still invoke it,
+ * so the interface is preserved. The CLI entry point prints a deprecation
+ * warning.
  *
- * Usage (CLI):
- *   pnpm crux enrich fact-refs <page-id>           # Preview (dry run)
- *   pnpm crux enrich fact-refs <page-id> --apply   # Write to file
- *   pnpm crux enrich fact-refs --all [--limit=N]   # Batch across wiki
- *
- * Usage (library):
- *   import { enrichFactRefs } from './enrich-fact-refs.ts';
- *   const result = await enrichFactRefs(content, { pageId, root: ROOT });
+ * Helper functions (applyFactRefReplacements, buildSkipRanges, etc.) are
+ * still exported and tested — they may be repurposed for KB-based enrichment.
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -432,6 +426,8 @@ async function main(): Promise<void> {
   const ALL_MODE = parsed.all === true;
   const LIMIT = parseInt(String(parsed.limit || '0'), 10);
   const pageId = positional[0];
+
+  console.warn(`${colors.yellow}⚠ DEPRECATED: enrich fact-refs is a no-op. The data/facts/*.yaml pipeline has been retired. Use KB data instead.${colors.reset}`);
 
   if (!pageId && !ALL_MODE) {
     console.error(`${colors.red}Error: Provide a page-id or --all${colors.reset}`);

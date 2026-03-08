@@ -81,7 +81,7 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
     page, filePath, importPath, directions,
     analysis, research, objectivityContext,
     currentContent, entityLookup, claimsContext,
-    gapAnalysisContext, tier,
+    gapAnalysisContext: tier === 'polish' ? null : gapAnalysisContext, tier,
   });
 
   const result = await runAgent(prompt, {
