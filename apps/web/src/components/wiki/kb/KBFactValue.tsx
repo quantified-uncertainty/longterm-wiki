@@ -13,7 +13,7 @@
 import { cn } from "@/lib/utils";
 import { getKBFacts, getKBLatest, getKBProperty } from "@data/kb";
 import type { Fact } from "@longterm-wiki/kb";
-import { CURRENCIES } from "@longterm-wiki/kb/currencies";
+import { CURRENCIES, resolveCurrency } from "@longterm-wiki/kb/currencies";
 import { formatValue } from "@lib/format-value";
 import { formatKBFactValue, formatKBDate, isUrl } from "./format";
 
@@ -59,6 +59,7 @@ export function KBFactValue({
   }
 
   const displayValue = formatKBFactValue(fact, prop?.unit, prop?.display);
+  const currencyCode = resolveCurrency(fact.currency, prop?.unit);
   const propertyName = prop?.name ?? property;
   const hasMetadata = propertyName || fact.asOf || fact.source;
 
@@ -95,9 +96,9 @@ export function KBFactValue({
         <span className="block font-semibold text-foreground mb-1">
           {displayValue}
         </span>
-        {fact.currency && fact.currency !== "USD" && fact.currency in CURRENCIES && (
+        {currencyCode !== "USD" && Object.hasOwn(CURRENCIES, currencyCode) && (
           <span className="block text-muted-foreground">
-            Currency: {CURRENCIES[fact.currency].name} ({fact.currency})
+            Currency: {CURRENCIES[currencyCode].name} ({currencyCode})
             {fact.usdEquivalent != null && (
               <> (~{formatValue(fact.usdEquivalent, "USD")})</>
             )}

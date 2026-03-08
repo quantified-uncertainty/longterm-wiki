@@ -51,7 +51,7 @@ export function formatValue(value: unknown, property?: Property, currency?: stri
     // If a currency override is provided and the property's default unit is a currency,
     // use the override currency's symbol instead of the hardcoded prefix.
     let effectivePrefix = prefix ?? "";
-    if (currency && property.unit && property.unit in CURRENCIES) {
+    if (currency && property.unit && Object.hasOwn(CURRENCIES, property.unit)) {
       const cur = CURRENCIES[currency] ?? CURRENCIES[property.unit];
       effectivePrefix = cur.symbol;
     }

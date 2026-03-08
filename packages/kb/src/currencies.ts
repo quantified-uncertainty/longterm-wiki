@@ -42,8 +42,8 @@ export function resolveCurrency(
   factCurrency?: string,
   propertyUnit?: string,
 ): string {
-  if (factCurrency && factCurrency in CURRENCIES) return factCurrency;
-  if (propertyUnit && propertyUnit in CURRENCIES) return propertyUnit;
+  if (factCurrency && Object.hasOwn(CURRENCIES, factCurrency)) return factCurrency;
+  if (propertyUnit && Object.hasOwn(CURRENCIES, propertyUnit)) return propertyUnit;
   return "USD";
 }
 
@@ -51,5 +51,5 @@ export function resolveCurrency(
  * Check if a string is a known currency code.
  */
 export function isCurrencyCode(code: string): boolean {
-  return code in CURRENCIES;
+  return Object.hasOwn(CURRENCIES, code);
 }

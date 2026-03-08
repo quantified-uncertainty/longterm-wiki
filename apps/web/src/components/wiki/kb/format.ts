@@ -70,7 +70,7 @@ export function formatKBNumber(
       : num.toLocaleString(undefined, { maximumFractionDigits: 2 });
     // If currency override provided and display has a currency-like prefix, use currency symbol
     let prefix = display.prefix ?? "";
-    if (currency && currency in CURRENCIES) {
+    if (currency && Object.hasOwn(CURRENCIES, currency)) {
       prefix = CURRENCIES[currency].symbol;
     }
     const suffix = display.suffix ?? "";

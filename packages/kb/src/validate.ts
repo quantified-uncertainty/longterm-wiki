@@ -782,7 +782,7 @@ function checkCurrencyCode(
   const facts = graph.getFacts(entityId);
 
   for (const fact of facts) {
-    if (fact.currency && !(fact.currency in CURRENCIES)) {
+    if (fact.currency && !Object.hasOwn(CURRENCIES, fact.currency)) {
       results.push({
         severity: "warning",
         entityId,

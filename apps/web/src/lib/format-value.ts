@@ -17,18 +17,25 @@ function cleanDecimal(n: number): string {
  * Returns null if the unit is not monetary.
  */
 function resolveCurrencyInfo(unit?: string | null, currency?: string | null): { symbol: string; position: "prefix" | "suffix" } | null {
-  if (currency && currency in CURRENCIES) {
-    return { symbol: CURRENCIES[currency].symbol, position: CURRENCIES[currency].symbolPosition };
+  if (currency && Object.hasOwn(CURRENCIES, currency)) {
+    // Only apply currency override if unit is absent or itself monetary.
+    // Prevents e.g. unit="percent" + currency="GBP" from formatting as £40.
+    if (!unit || Object.hasOwn(CURRENCIES, unit)) {
+      return { symbol: CURRENCIES[currency].symbol, position: CURRENCIES[currency].symbolPosition };
+    }
   }
-  if (unit && unit in CURRENCIES) {
+  if (unit && Object.hasOwn(CURRENCIES, unit)) {
     return { symbol: CURRENCIES[unit].symbol, position: CURRENCIES[unit].symbolPosition };
   }
   return null;
 }
 
-/** Format a number with a currency symbol, respecting prefix/suffix position. */
+/** Format a number with a currency symbol, respecting prefix/suffix position and negative sign. */
 function withCurrency(sym: string, position: "prefix" | "suffix", formatted: string): string {
-  return position === "suffix" ? `${formatted} ${sym}` : `${sym}${formatted}`;
+  if (position === "suffix") return `${formatted} ${sym}`;
+  // For prefix currencies, put the negative sign before the symbol: -$1,234 not $-1,234
+  if (formatted.startsWith("-")) return `-${sym}${formatted.slice(1)}`;
+  return `${sym}${formatted}`;
 }
 
 /**
