@@ -1756,12 +1756,8 @@ async function main() {
   console.log(`Unique tags: ${stats.totalTags}`);
   console.log(`Top types: ${Object.entries(stats.byType).slice(0, 5).map(([t, c]) => `${t}(${c})`).join(', ')}`);
 
-  // ==========================================================================
-  // Copy canonical schema.ts to apps/web output directory
-  // ==========================================================================
-  const SCHEMA_SRC = join(DATA_DIR, 'schema.ts');
-  copyFileSync(SCHEMA_SRC, join(OUTPUT_DIR, 'schema.ts'));
-  console.log('✓ Copied data/schema.ts → apps/web/src/data/schema.ts');
+  // schema.ts: apps/web/src/data/schema.ts re-exports from data/schema.ts
+  // (no build-time copy needed — see #1526)
 
   // ==========================================================================
   // LLM Accessibility Files
