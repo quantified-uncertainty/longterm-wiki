@@ -1,0 +1,14 @@
+thing:
+  id: mit-ai-risk-repository
+  stableId: Qalx4pvUXQ
+  type: project
+  name: MIT AI Risk Repository
+  numericId: E383
+facts:
+  - id: f_h9RLqzdaqQ
+    property: description
+    value: The MIT AI Risk Repository catalogs 1,700+ AI risks from 65+ frameworks into a searchable database with dual
+      taxonomies (causal and domain-based). Updated quarterly since August 2024, it provides the first comprehensive
+      public catalog of AI risks but is limited by framework extraction methodology an
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,12 @@
+thing:
+  id: elizabeth-kelly
+  stableId: 1CHfDs0vsg
+  type: person
+  name: Elizabeth Kelly (US AISI Director)
+  numericId: E115
+facts:
+  - id: f_UJ9mqFHBHQ
+    property: description
+    value: Director of the US AI Safety Institute (AISI), leading federal AI safety evaluation and policy efforts.
+    asOf: 2026-03
+    notes: Migrated from old entity system

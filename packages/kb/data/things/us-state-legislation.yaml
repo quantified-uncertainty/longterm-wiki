@@ -1,0 +1,14 @@
+thing:
+  id: us-state-legislation
+  stableId: 2dwY9wnuYA
+  type: policy
+  name: US State AI Legislation Landscape
+  numericId: E367
+facts:
+  - id: f_ZXY5qA4yJg
+    property: description
+    value: In the absence of comprehensive federal AI legislation, US states have become laboratories for AI governance. As
+      of 2024, hundreds of AI-related bills have been introduced across all 50 states, with several significant laws
+      enacted.
+    asOf: 2026-03
+    notes: Migrated from old entity system

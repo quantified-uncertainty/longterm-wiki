@@ -1,0 +1,14 @@
+thing:
+  id: authoritarian-takeover
+  stableId: AV6AJU1FhQ
+  type: risk
+  name: AI-Enabled Authoritarian Takeover
+  numericId: E29
+facts:
+  - id: f_L02FHcd2ig
+    property: description
+    value: AI could enable authoritarian regimes that are fundamentally more stable and durable than historical autocracies.
+      The concern is that AI-powered authoritarianism might become effectively permanent, with comprehensive
+      surveillance, predictive systems, and automated enforcement closing off traditional pathways for political change.
+    asOf: 2026-03
+    notes: Migrated from old entity system

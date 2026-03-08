@@ -1,0 +1,13 @@
+thing:
+  id: fast-takeoff
+  stableId: fRYu1EXclA
+  type: concept
+  name: Fast Takeoff
+  numericId: E139
+facts:
+  - id: f_fJfbHFw1aw
+    property: description
+    value: A scenario where AI capabilities improve extremely rapidly, potentially giving little time for society to adapt
+      or implement safety measures.
+    asOf: 2026-03
+    notes: Migrated from old entity system

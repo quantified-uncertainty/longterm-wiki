@@ -1,0 +1,22 @@
+thing:
+  id: will-macaskill
+  stableId: p1P9oQwB6w
+  type: person
+  name: Will MacAskill
+  numericId: E862
+facts:
+  - id: f_ai1K4HXqHA
+    property: description
+    value: Will MacAskill is an Associate Professor of Philosophy at Oxford University and a central figure in the effective
+      altruism (EA) movement. In 2009, he co-founded Giving What We Can with Toby Ord, an organization that encourages
+      members to pledge 10% of their income to highly effective charities. He also co-founded the Centre for Effective
+      Altruism. His 2015 book "Doing Good Better" popularized EA principles to a mainstream audience. His 2022 book
+      "What We Owe the Future" made the case for longtermism—the view that we should give significant weight to the
+      wellbeing of future generations— and brought widespread attention to existential risk and AI safety. He coined the
+      term "effective altruism" and has been instrumental in directing billions of dollars toward high-impact causes
+      including global health, animal welfare, and existential risk reduction.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_zFKfTWKs8w
+    property: website
+    value: https://www.willmacaskill.com/

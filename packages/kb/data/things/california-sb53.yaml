@@ -1,0 +1,13 @@
+thing:
+  id: california-sb53
+  stableId: UD11PlWtlg
+  type: policy
+  name: California SB 53
+  numericId: E457
+facts:
+  - id: f_qT9iciEztQ
+    property: description
+    value: California's Transparency in Frontier Artificial Intelligence Act, the first U.S. state law regulating frontier
+      AI models through transparency requirements, safety reporting, and whistleblower protections.
+    asOf: 2026-03
+    notes: Migrated from old entity system

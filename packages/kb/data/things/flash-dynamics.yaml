@@ -1,0 +1,14 @@
+thing:
+  id: flash-dynamics
+  stableId: 0t2GLN0sBA
+  type: risk
+  name: AI Flash Dynamics
+  numericId: E142
+facts:
+  - id: f_WEkSDCRAzQ
+    property: description
+    value: Flash dynamics occur when AI systems interact with each other and the world faster than humans can monitor,
+      understand, or intervene. This creates the possibility of cascading failures, unintended consequences, and
+      irreversible changes happening before any human can respond.
+    asOf: 2026-03
+    notes: Migrated from old entity system

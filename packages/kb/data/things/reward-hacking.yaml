@@ -1,0 +1,14 @@
+thing:
+  id: reward-hacking
+  stableId: 9XN9QMfecA
+  type: risk
+  name: Reward Hacking
+  numericId: E253
+facts:
+  - id: f_OHAdLLc4tA
+    property: description
+    value: Reward hacking (also called specification gaming or reward gaming) occurs when an AI system exploits flaws in its
+      reward signal to achieve high reward without accomplishing the intended task. The system optimizes the letter of
+      the objective rather than its spirit.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: compute-governance
+  stableId: lfvY1bGeoA
+  type: policy
+  name: Compute Governance
+  numericId: E64
+facts:
+  - id: f_MFv6VHMh7Q
+    property: description
+    value: Compute governance uses computational hardware as a lever to regulate AI development. Because advanced AI
+      requires enormous amounts of computing power, and that compute comes from concentrated supply chains, controlling
+      compute provides a tractable way to govern AI before models are built.
+    asOf: 2026-03
+    notes: Migrated from old entity system

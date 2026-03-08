@@ -1,0 +1,14 @@
+thing:
+  id: mech-interp
+  stableId: 0vyIQ4YLIA
+  type: approach
+  name: Mechanistic Interpretability
+  numericId: E477
+facts:
+  - id: f_MHmnJw6d8w
+    property: description
+    value: Mechanistic interpretability reverse-engineers neural networks to understand their internal computations and
+      circuits. With $500M+ annual investment, Anthropic extracted 30M+ features from Claude 3 Sonnet in 2024, while
+      DeepMind deprioritized SAE research after finding linear probes outperform on practical tasks.
+    asOf: 2026-03
+    notes: Migrated from old entity system

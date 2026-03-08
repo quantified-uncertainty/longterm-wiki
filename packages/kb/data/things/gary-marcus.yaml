@@ -1,0 +1,13 @@
+thing:
+  id: gary-marcus
+  stableId: ILx7EzDqXQ
+  type: person
+  name: Gary Marcus
+  numericId: E148
+facts:
+  - id: f_zftBN1DOUQ
+    property: description
+    value: Cognitive scientist and AI critic, known for skepticism of deep learning's path to AGI and advocacy for hybrid AI
+      approaches.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: interpretability
+  stableId: 73qTEkYyWA
+  type: approach
+  name: Interpretability
+  numericId: E174
+facts:
+  - id: f_XWURN27JKA
+    property: description
+    value: Mechanistic interpretability is a research field focused on reverse-engineering neural networks to understand how
+      they work internally. Rather than treating models as black boxes, researchers aim to identify meaningful circuits,
+      features, and algorithms that explain model behavior.
+    asOf: 2026-03
+    notes: Migrated from old entity system

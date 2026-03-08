@@ -1,0 +1,13 @@
+thing:
+  id: bletchley-declaration
+  stableId: X2gSvrOang
+  type: policy
+  name: Bletchley Declaration
+  numericId: E469
+facts:
+  - id: f_8JK2xkHdiA
+    property: description
+    value: World-first international agreement on AI safety signed by 28 countries at the November 2023 AI Safety Summit,
+      committing to cooperation on frontier AI risks.
+    asOf: 2026-03
+    notes: Migrated from old entity system

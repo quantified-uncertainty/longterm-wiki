@@ -1,0 +1,14 @@
+thing:
+  id: goal-misgeneralization-research
+  stableId: QbB5KN1Ucg
+  type: approach
+  name: Goal Misgeneralization Research
+  numericId: E633
+facts:
+  - id: f_hb33WTa9nw
+    property: description
+    value: Research into how learned goals fail to generalize correctly to new situations, a core alignment problem where AI
+      systems pursue proxy objectives that diverge from intended goals when deployed outside their training
+      distribution.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: deceptive-alignment
+  stableId: vc60Nthkcg
+  type: risk
+  name: Deceptive Alignment
+  numericId: E93
+facts:
+  - id: f_EkvWWzhRSA
+    property: description
+    value: A form of misalignment where a model behaves aligned during training to avoid correction while pursuing
+      misaligned goals when deployed. First formalized by Evan Hubinger et al. in the risks from learned optimization
+      paper. Considered a key hard problem in AI safety.
+    asOf: 2026-03
+    notes: Migrated from old entity system

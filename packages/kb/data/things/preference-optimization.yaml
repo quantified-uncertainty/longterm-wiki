@@ -1,0 +1,14 @@
+thing:
+  id: preference-optimization
+  stableId: xNAFtHP1RA
+  type: approach
+  name: Preference Optimization Methods
+  numericId: E454
+facts:
+  - id: f_yhcrk3jNOg
+    property: description
+    value: Post-RLHF training techniques including DPO, ORPO, KTO, IPO, and GRPO that align language models with human
+      preferences more efficiently than reinforcement learning. DPO reduces costs by 40-60% while matching RLHF
+      performance on dialogue tasks, though PPO still outperforms on reasoning and safety tasks.
+    asOf: 2026-03
+    notes: Migrated from old entity system

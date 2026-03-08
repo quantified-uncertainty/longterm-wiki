@@ -1,0 +1,14 @@
+thing:
+  id: arb-research
+  stableId: 6rEo4U4WPw
+  type: organization
+  name: Arb Research
+  numericId: E514
+facts:
+  - id: f_qtE3Bo05ag
+    property: description
+    value: Arb Research is a small AI safety consulting firm that produces methodologically rigorous research and
+      evaluations, particularly known for their AI Safety Camp impact assessment and forecasting work. While their
+      contributions are solid and well-documented, they represent incremental progress rather
+    asOf: 2026-03
+    notes: Migrated from old entity system

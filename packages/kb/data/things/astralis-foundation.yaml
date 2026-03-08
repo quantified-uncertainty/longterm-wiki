@@ -1,0 +1,18 @@
+thing:
+  id: astralis-foundation
+  stableId: QeknHipQPA
+  type: organization
+  name: Astralis Foundation
+  numericId: E702
+facts:
+  - id: f_BGt4Vo09rw
+    property: description
+    value: Astralis Foundation is a Swedish philanthropic organization focused on AI safety and governance. It operates the
+      Shared Horizons Fund and supports initiatives such as the International Dialogues on AI Safety (IDAIS) and the
+      Nordics AI Safety Summit. Led by CEO Jona Glade and President Vilhelm Skoglund, with offices in Stockholm, London,
+      New York, and Vienna.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_RHhkhesbww
+    property: website
+    value: https://astralisfoundation.org

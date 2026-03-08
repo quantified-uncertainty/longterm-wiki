@@ -1,0 +1,14 @@
+thing:
+  id: constitutional-ai
+  stableId: 6sdr78k9kQ
+  type: approach
+  name: Constitutional AI
+  numericId: E451
+facts:
+  - id: f_eRr3fA8yLA
+    property: description
+    value: Anthropic's Constitutional AI methodology uses explicit principles and AI-generated feedback to train safer
+      language models, demonstrating 3-10x improvements in harmlessness while maintaining helpfulness across major model
+      deployments.
+    asOf: 2026-03
+    notes: Migrated from old entity system

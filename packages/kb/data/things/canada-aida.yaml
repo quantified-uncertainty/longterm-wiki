@@ -1,0 +1,14 @@
+thing:
+  id: canada-aida
+  stableId: pxSyZBoBpA
+  type: policy
+  name: Artificial Intelligence and Data Act (AIDA)
+  numericId: E49
+facts:
+  - id: f_qXoS1mSjrA
+    property: description
+    value: The Artificial Intelligence and Data Act (AIDA) was Canada's proposed federal AI legislation, introduced as Part
+      3 of Bill C-27 (the Digital Charter Implementation Act, 2022). Despite years of debate and amendment, the bill
+      died on the order paper when Parliament was dissolved in January 2025.
+    asOf: 2026-03
+    notes: Migrated from old entity system

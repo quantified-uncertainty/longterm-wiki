@@ -1,0 +1,31 @@
+thing:
+  id: trust-cascade
+  stableId: IQ4E6VkW9A
+  type: risk
+  name: AI Trust Cascade Failure
+  numericId: E360
+facts:
+  - id: f_bJXKbSVrUw
+    property: description
+    value: >-
+      Trust cascade failure describes a scenario where the erosion of trust becomes self-reinforcing and irreversible -
+      once trust in institutions collapses below a certain threshold, there is no longer a trusted mechanism to rebuild
+      it. This represents a potential civilizational trap from which recovery may be extremely difficult.
+
+
+      The mechanism works as follows: rebuilding trust requires institutions that people trust to vouch for
+      trustworthiness. If people don't trust the media, they can't rely on journalists to verify which sources are
+      credible. If they don't trust government, they can't rely on regulators to certify which products or claims are
+      legitimate. If they don't trust science, they can't rely on peer review to distinguish real findings from fraud.
+      When trust falls below critical thresholds across multiple institutions simultaneously, the normal mechanisms for
+      establishing trustworthiness cease to function.
+
+
+      AI accelerates this risk by enabling sophisticated manipulation, creating content that corrodes trust in authentic
+      information, and generating personalized propaganda at scale. The danger is that we slide past a point of no
+      return where no institution or process retains enough legitimacy to coordinate society's return to trust-based
+      cooperation. Historical examples like failed states or periods of social collapse suggest that recovery from
+      severe trust breakdown is possible but costly and slow. AI may push society toward this cliff faster than natural
+      recovery mechanisms can operate.
+    asOf: 2026-03
+    notes: Migrated from old entity system

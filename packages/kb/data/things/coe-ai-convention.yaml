@@ -1,0 +1,14 @@
+thing:
+  id: coe-ai-convention
+  stableId: SrEFtBmBYg
+  type: policy
+  name: Council of Europe Framework Convention on Artificial Intelligence
+  numericId: E587
+facts:
+  - id: f_ycxL5xOiuQ
+    property: description
+    value: The Council of Europe's AI Framework Convention represents the first legally binding international AI treaty,
+      establishing human rights-focused governance principles across 57+ countries, though it has significant
+      enforcement gaps and excludes national security applications. While historically signi
+    asOf: 2026-03
+    notes: Migrated from old entity system

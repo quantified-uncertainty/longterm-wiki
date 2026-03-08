@@ -1,0 +1,14 @@
+thing:
+  id: scientific-research
+  stableId: dpTZOF78vg
+  type: capability
+  name: Scientific Research Capabilities
+  numericId: E277
+facts:
+  - id: f_2euF7FnoMg
+    property: description
+    value: Scientific research capabilities refer to AI systems' ability to conduct scientific investigations, generate
+      hypotheses, design experiments, analyze results, and make discoveries. This ranges from narrow tools that assist
+      with specific tasks to systems approaching autonomous scientific reasoning.
+    asOf: 2026-03
+    notes: Migrated from old entity system

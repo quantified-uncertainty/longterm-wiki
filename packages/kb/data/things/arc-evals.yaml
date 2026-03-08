@@ -1,0 +1,12 @@
+thing:
+  id: arc-evals
+  stableId: myeSKJXTMA
+  type: organization
+  name: ARC Evaluations
+  numericId: E26
+facts:
+  - id: f_YcQuGsd98A
+    property: description
+    value: Organization focused on evaluating AI systems for dangerous capabilities. Now largely absorbed into METR.
+    asOf: 2026-03
+    notes: Migrated from old entity system

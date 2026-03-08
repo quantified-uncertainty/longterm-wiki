@@ -1,0 +1,14 @@
+thing:
+  id: ea-global
+  stableId: k4IPgRP98A
+  type: organization
+  name: EA Global
+  numericId: E525
+facts:
+  - id: f_tsumVdflJQ
+    property: description
+    value: EA Global is a series of selective conferences organized by the Centre for Effective Altruism that connects
+      committed EA practitioners to collaborate on global challenges, with AI safety becoming increasingly prominent
+      (53% of 2024 survey respondents identified it as most pressing). The conferences
+    asOf: 2026-03
+    notes: Migrated from old entity system

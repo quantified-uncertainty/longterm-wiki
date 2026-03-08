@@ -1,0 +1,14 @@
+thing:
+  id: claude-opus-4-1
+  stableId: dHgSM46fMw
+  type: project
+  name: Claude Opus 4.1
+  numericId: E1035
+facts:
+  - id: f_UwIZf5fX0Q
+    property: description
+    value: Claude Opus 4.1 was released August 5, 2025 as an incremental improvement over Opus 4 with gains in software
+      engineering, agentic reasoning, and research-level tasks. Priced at $15/$75 per million tokens with a 200K token
+      context window.
+    asOf: 2026-03
+    notes: Migrated from old entity system

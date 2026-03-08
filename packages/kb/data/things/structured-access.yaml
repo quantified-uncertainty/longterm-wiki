@@ -1,0 +1,15 @@
+thing:
+  id: structured-access
+  stableId: cYETfX9wzA
+  type: approach
+  name: Structured Access / API-Only
+  numericId: E486
+facts:
+  - id: f_pQfRvtChwA
+    property: description
+    value: Structured access provides AI capabilities through controlled APIs rather than releasing model weights,
+      maintaining developer control over deployment and enabling monitoring, intervention, and policy enforcement.
+      Enterprise LLM spend reached $8.4B by mid-2025 under this model, but effectiveness depends on maintaining
+      capability gaps with open-weight models.
+    asOf: 2026-03
+    notes: Migrated from old entity system

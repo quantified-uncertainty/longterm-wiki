@@ -1,0 +1,13 @@
+thing:
+  id: scalable-oversight
+  stableId: MBGtb3Qlkw
+  type: approach
+  name: Scalable Oversight
+  numericId: E271
+facts:
+  - id: f_KY0XVVu5hQ
+    property: description
+    value: "Scalable oversight addresses a fundamental challenge: How can humans supervise AI systems on tasks where humans
+      can't directly evaluate the AI's output?"
+    asOf: 2026-03
+    notes: Migrated from old entity system

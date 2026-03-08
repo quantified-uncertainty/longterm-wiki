@@ -1,0 +1,14 @@
+thing:
+  id: bioweapons
+  stableId: wAglEMR2mg
+  type: risk
+  name: Bioweapons Risk
+  numericId: E42
+facts:
+  - id: f_2zQSbAvwPw
+    property: description
+    value: AI systems could accelerate biological weapons development by helping with pathogen design, synthesis planning,
+      or acquisition of dangerous knowledge. The concern isn't that AI creates entirely new risks, but that it lowers
+      barriers—making capabilities previously requiring rare expertise more accessible to bad actors.
+    asOf: 2026-03
+    notes: Migrated from old entity system

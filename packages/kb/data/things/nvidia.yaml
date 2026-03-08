@@ -1,0 +1,17 @@
+thing:
+  id: nvidia
+  stableId: UvpZCnW3wA
+  type: organization
+  name: NVIDIA
+  numericId: E693
+facts:
+  - id: f_V7wquvAqSQ
+    property: description
+    value: NVIDIA holds 90-95% of the AI accelerator market, with its H100, H200, and B200 GPUs powering virtually all
+      frontier AI training. Revenue reached $130.5B in FY2025 (114% YoY growth), driven almost entirely by data center
+      GPU sales. Its proprietary CUDA software ecosystem creates deep lock-in across the AI training stack.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_qNGX8xU6kA
+    property: website
+    value: https://www.nvidia.com

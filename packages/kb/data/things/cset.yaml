@@ -1,0 +1,14 @@
+thing:
+  id: cset
+  stableId: lvsDuyzPcg
+  type: organization
+  name: CSET (Center for Security and Emerging Technology)
+  numericId: E524
+facts:
+  - id: f_5GrL7XHIjQ
+    property: description
+    value: CSET is a $100M+ Georgetown center with 50+ staff conducting data-driven AI policy research, particularly on
+      U.S.-China competition and export controls. The center conducts hundreds of annual government briefings and
+      operates the Emerging Technology Observatory with 10 public tools and 8 datasets.
+    asOf: 2026-03
+    notes: Migrated from old entity system

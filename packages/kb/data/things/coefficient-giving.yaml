@@ -1,0 +1,14 @@
+thing:
+  id: coefficient-giving
+  stableId: sXyMZ8BKXw
+  type: organization
+  name: Coefficient Giving
+  numericId: E521
+facts:
+  - id: f_OG4HXG3qHw
+    property: description
+    value: Coefficient Giving (formerly Open Philanthropy) has directed $4B+ in grants since 2014, including $336M to AI
+      safety (~60% of external funding). The organization spent ~$50M on AI safety in 2024, with 68% going to
+      evaluations/benchmarking, and launched a $40M Technical AI Safety RFP in 2025 covering
+    asOf: 2026-03
+    notes: Migrated from old entity system

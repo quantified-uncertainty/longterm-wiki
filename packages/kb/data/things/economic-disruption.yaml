@@ -1,0 +1,14 @@
+thing:
+  id: economic-disruption
+  stableId: hRRC36tWDg
+  type: risk
+  name: AI-Driven Economic Disruption
+  numericId: E108
+facts:
+  - id: f_qY2pQobxeg
+    property: description
+    value: AI could automate large portions of the economy faster than workers can adapt, creating mass unemployment,
+      inequality, and social instability. While technological unemployment fears have historically been unfounded, AI
+      may be different in scope—potentially affecting cognitive work that previous automation couldn't touch.
+    asOf: 2026-03
+    notes: Migrated from old entity system

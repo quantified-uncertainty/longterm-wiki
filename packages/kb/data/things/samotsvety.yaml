@@ -1,0 +1,14 @@
+thing:
+  id: samotsvety
+  stableId: 9hPhtQ9AXw
+  type: organization
+  name: Samotsvety
+  numericId: E560
+facts:
+  - id: f_M2EOKVGeLg
+    property: description
+    value: Elite forecasting group Samotsvety dominated INFER competitions 2020-2022 with relative Brier scores twice as
+      good as competitors, providing influential probabilistic forecasts including 28% TAI by 2030, 60% by 2050, and 25%
+      misaligned AI takeover by 2100. Their work is widely cited in EA/rationalis
+    asOf: 2026-03
+    notes: Migrated from old entity system

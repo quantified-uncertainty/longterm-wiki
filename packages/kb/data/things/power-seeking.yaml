@@ -1,0 +1,14 @@
+thing:
+  id: power-seeking
+  stableId: hwDgNNDsDQ
+  type: risk
+  name: Power-Seeking AI
+  numericId: E226
+facts:
+  - id: f_BiCTuqGAvA
+    property: description
+    value: Power-seeking refers to the tendency of optimal policies to acquire resources, influence, and capabilities beyond
+      what's minimally necessary for their stated objective. Recent theoretical work has formalized when and why this
+      occurs.
+    asOf: 2026-03
+    notes: Migrated from old entity system

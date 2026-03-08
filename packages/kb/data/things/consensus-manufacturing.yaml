@@ -1,0 +1,30 @@
+thing:
+  id: consensus-manufacturing
+  stableId: gMaUtaXGaw
+  type: risk
+  name: AI-Powered Consensus Manufacturing
+  numericId: E72
+facts:
+  - id: f_V9uYIun6ng
+    property: description
+    value: >-
+      Consensus manufacturing refers to AI systems being used to create the false appearance of widespread agreement or
+      public support that doesn't actually exist. Unlike traditional astroturfing, which requires human labor for each
+      fake comment or endorsement, AI can generate unlimited quantities of seemingly authentic opinions, comments,
+      testimonials, and social media engagement.
+
+
+      The mechanism exploits how humans form beliefs about social consensus. We naturally look to what others think as a
+      guide to what is true and acceptable. If everyone seems to agree on something, we tend to go along. AI can flood
+      information channels with coordinated messaging that mimics organic public opinion, making fringe positions appear
+      mainstream and majority positions appear contested. This happened at scale during FCC net neutrality comment
+      periods, where millions of fake public comments were submitted.
+
+
+      The danger extends beyond misinformation to structural corruption of democratic processes. Town halls, public
+      comment periods, legislative outreach, product reviews, and social media discourse all rely on the assumption that
+      expressed opinions represent real people with genuine views. When AI can simulate entire populations of concerned
+      citizens, the feedback mechanisms that democratic and market systems depend on become unreliable. Decisions made
+      on the basis of manufactured consensus serve the interests of whoever controls the AI, not the actual public.
+    asOf: 2026-03
+    notes: Migrated from old entity system

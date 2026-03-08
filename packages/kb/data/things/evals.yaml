@@ -1,0 +1,14 @@
+thing:
+  id: evals
+  stableId: etuIjQhFbQ
+  type: approach
+  name: AI Evaluations
+  numericId: E128
+facts:
+  - id: f_fj8uLG4jOg
+    property: description
+    value: AI evaluation—systematic methods for measuring model capabilities, safety properties, and alignment. Includes
+      capability evaluations (red-teaming, benchmarks), dangerous capability evaluations, and behavioral assessments
+      used by frontier labs in their responsible scaling policies.
+    asOf: 2026-03
+    notes: Migrated from old entity system

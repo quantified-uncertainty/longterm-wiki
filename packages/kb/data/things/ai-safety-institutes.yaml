@@ -1,0 +1,14 @@
+thing:
+  id: ai-safety-institutes
+  stableId: aCEdTooCBw
+  type: policy
+  name: AI Safety Institutes (AISIs)
+  numericId: E13
+facts:
+  - id: f_Ufgd2soLGg
+    property: description
+    value: Government-run institutions dedicated to evaluating frontier AI systems for dangerous capabilities and safety
+      properties. Pioneered by the UK AISI in 2023, with analogues in the US (USAISI), EU, Japan, and others. Play a key
+      role in pre-deployment evaluations and responsible scaling policy thresholds.
+    asOf: 2026-03
+    notes: Migrated from old entity system

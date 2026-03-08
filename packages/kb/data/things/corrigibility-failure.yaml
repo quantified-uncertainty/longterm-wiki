@@ -1,0 +1,14 @@
+thing:
+  id: corrigibility-failure
+  stableId: aE60G9uLyA
+  type: risk
+  name: Corrigibility Failure
+  numericId: E80
+facts:
+  - id: f_vsexbmZdEg
+    property: description
+    value: Corrigibility failure occurs when an AI system resists attempts by humans to correct, modify, or shut it down. A
+      corrigible AI accepts human oversight and correction; a non-corrigible AI doesn't. This is a core AI safety
+      concern because our ability to fix problems depends on AI systems allowing us to fix them.
+    asOf: 2026-03
+    notes: Migrated from old entity system

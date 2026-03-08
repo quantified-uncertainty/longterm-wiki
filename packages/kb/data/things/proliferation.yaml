@@ -1,0 +1,14 @@
+thing:
+  id: proliferation
+  stableId: Pr5xmThNfA
+  type: risk
+  name: AI Proliferation
+  numericId: E232
+facts:
+  - id: f_E7cjB2LW9w
+    property: description
+    value: AI proliferation is the spread of AI capabilities to more actors over time—from major labs to smaller companies,
+      open-source communities, nation-states, and eventually individuals. As capabilities spread, more actors can cause
+      harm, intentionally or accidentally.
+    asOf: 2026-03
+    notes: Migrated from old entity system

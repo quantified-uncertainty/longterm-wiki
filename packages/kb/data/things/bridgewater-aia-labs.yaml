@@ -1,0 +1,14 @@
+thing:
+  id: bridgewater-aia-labs
+  stableId: 19XMJpUWqQ
+  type: organization
+  name: Bridgewater AIA Labs
+  numericId: E516
+facts:
+  - id: f_ixBGJlJwLw
+    property: description
+    value: Bridgewater AIA Labs launched a $2B AI-driven macro fund in July 2024 that returned 11.9% in 2025, using
+      proprietary ML models plus LLMs from OpenAI/Anthropic/Perplexity with multi-layer guardrails that reduced error
+      rates from 8% to 1.6%. The division has minimal AI safety relevance, focusing on fi
+    asOf: 2026-03
+    notes: Migrated from old entity system

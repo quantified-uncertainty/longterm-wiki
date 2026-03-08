@@ -1,0 +1,13 @@
+thing:
+  id: anthropic-investors
+  stableId: sKOD0uMVGg
+  type: organization
+  name: Anthropic (Funder)
+  numericId: E406
+facts:
+  - id: f_6EOi4oOMBQ
+    property: description
+    value: "Analysis of EA-aligned philanthropic capital at Anthropic. At $350B valuation: $25-70B risk-adjusted EA capital
+      from founder pledges, investor stakes (Tallinn, Moskovitz), and employee matching programs ($20-40B in DAFs)."
+    asOf: 2026-03
+    notes: Migrated from old entity system

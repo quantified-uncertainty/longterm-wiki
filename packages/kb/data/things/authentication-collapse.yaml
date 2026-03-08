@@ -1,0 +1,29 @@
+thing:
+  id: authentication-collapse
+  stableId: GvV1xPNXRw
+  type: risk
+  name: Authentication Collapse
+  numericId: E27
+facts:
+  - id: f_LTye2fgagQ
+    property: description
+    value: >-
+      Authentication collapse occurs when the systems we rely on to verify whether content is real can no longer keep
+      pace with synthetic content generation. Currently, we use various signals to determine authenticity - metadata,
+      forensic analysis, source reputation, and increasingly AI-based detection tools. Authentication collapse would
+      mean these defenses fail comprehensively.
+
+
+      The core problem is a fundamental asymmetry: generating convincing fake content is becoming easier and cheaper,
+      while reliably detecting fakes is becoming harder. Current AI detectors already struggle with cutting-edge
+      generators, and detection methods that work today may fail tomorrow as generators improve. Watermarking schemes
+      can often be removed or spoofed. The offense-defense balance structurally favors offense.
+
+
+      The consequences of authentication collapse extend beyond misinformation. Legal systems depend on evidence being
+      verifiable - what happens when any video or audio recording could plausibly be fake? Financial systems rely on
+      identity verification. Historical archives could be corrupted with convincing forgeries. The "liar's dividend"
+      effect means even real evidence can be dismissed as potentially fake. Once authentication collapses, rebuilding
+      trust in any form of digital evidence becomes extremely difficult.
+    asOf: 2026-03
+    notes: Migrated from old entity system

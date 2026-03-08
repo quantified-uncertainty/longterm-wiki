@@ -1,0 +1,14 @@
+thing:
+  id: 1day-sooner
+  stableId: 9k7drw6Qpg
+  type: organization
+  name: 1Day Sooner
+  numericId: E509
+facts:
+  - id: f_ym4qkTsDVg
+    property: description
+    value: A pandemic preparedness nonprofit originally founded to advocate for COVID-19 human challenge trials, now working
+      on indoor air quality (germicidal UV), advance market commitments for vaccines, hepatitis C challenge studies, and
+      biosecurity policy. Cumulative funding of ~$12.8M from sources includin
+    asOf: 2026-03
+    notes: Migrated from old entity system

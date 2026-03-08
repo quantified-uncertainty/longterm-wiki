@@ -1,0 +1,16 @@
+thing:
+  id: apollo-research
+  stableId: pKeaWwP6sQ
+  type: organization
+  name: Apollo Research
+  numericId: E24
+facts:
+  - id: f_lblFLoiIfQ
+    property: description
+    value: "Apollo Research is an AI safety research organization founded in 2022 with a specific focus on one of the most
+      concerning potential failure modes: deceptive alignment and scheming behavior in advanced AI systems."
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_ZJgtLkzc9w
+    property: website
+    value: https://www.apolloresearch.ai

@@ -1,0 +1,14 @@
+thing:
+  id: swift-centre
+  stableId: YlrwnKhMqQ
+  type: organization
+  name: Swift Centre
+  numericId: E569
+facts:
+  - id: f_gq0vpaWDHA
+    property: description
+    value: Swift Centre is a UK forecasting organization that provides conditional forecasting services to various clients
+      including some AI companies, but is not primarily focused on AI safety. While they demonstrate good forecasting
+      methodology and track record, their relevance to AI risk is limited to clien
+    asOf: 2026-03
+    notes: Migrated from old entity system
