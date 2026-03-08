@@ -4,8 +4,8 @@
  * Maps entity IDs to their human-readable display names (used for fuzzy
  * matching when scanning page content for entity mentions).
  *
- * Single source of truth — imported by any code that needs entity ID →
- * display name resolution.
+ * Shared alias map for entity mention scanning. Not exhaustive — fall
+ * back to KB data for authoritative names.
  */
 
 export const entityDisplayNames: Record<string, string[]> = {

@@ -120,6 +120,12 @@ const SCRIPTS = {
     passthrough: ['fix', 'json'],
     positional: true,
   },
+  'export-retracted': {
+    script: 'statements/export-retracted.ts',
+    description: 'Export retracted statements to JSON archive, optionally delete from DB',
+    passthrough: ['delete', 'output'],
+    positional: false,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'quality');

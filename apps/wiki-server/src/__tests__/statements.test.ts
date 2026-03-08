@@ -4,7 +4,7 @@
  * Covers the fixes from issue #1662:
  * - /cleanup requires non-empty entityId (returns 400 if missing)
  * - /clear-by-entity requires non-empty entityId (returns 400 if empty)
- * - includeRetracted query param correctly parses "false" as false
+ * - by-entity endpoint always excludes retracted statements
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -108,25 +108,10 @@ describe("Statements API — validation guards", () => {
     });
   });
 
-  // ---- GET /api/statements/by-entity — includeRetracted param ----
+  // ---- GET /api/statements/by-entity — basic validation ----
 
-  describe("GET /api/statements/by-entity — includeRetracted parsing", () => {
-    it('treats includeRetracted=false as false (not truthy)', async () => {
-      const res = await app.request(
-        "/api/statements/by-entity?entityId=anthropic&includeRetracted=false"
-      );
-      // Should succeed (not a validation error)
-      expect(res.status).toBe(200);
-    });
-
-    it('treats includeRetracted=true as true', async () => {
-      const res = await app.request(
-        "/api/statements/by-entity?entityId=anthropic&includeRetracted=true"
-      );
-      expect(res.status).toBe(200);
-    });
-
-    it('defaults includeRetracted to false when not provided', async () => {
+  describe("GET /api/statements/by-entity — validation", () => {
+    it('succeeds with valid entityId', async () => {
       const res = await app.request(
         "/api/statements/by-entity?entityId=anthropic"
       );

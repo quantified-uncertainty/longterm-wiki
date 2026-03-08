@@ -32,7 +32,6 @@ import { tool as queryWikiContext } from './query-wiki-context.ts';
 import { tool as readRelatedPage } from './read-related-page.ts';
 import { tool as editFrontmatter } from './edit-frontmatter.ts';
 import { tool as viewEditHistory } from './view-edit-history.ts';
-import { tool as extractFacts } from './extract-facts.ts';
 import { tool as deepCitationCheck } from './deep-citation-check.ts';
 import { tool as createVisual } from './create-visual.ts';
 import { tool as checkCrossReferences } from './check-cross-references.ts';
@@ -58,7 +57,6 @@ const ALL_TOOLS: ToolRegistration[] = [
   readRelatedPage,
   editFrontmatter,
   viewEditHistory,
-  extractFacts,
   deepCitationCheck,
   createVisual,
   checkCrossReferences,

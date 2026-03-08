@@ -68,10 +68,6 @@ const CurrentQuery = z.object({
 
 const ByEntityQuery = z.object({
   entityId: z.string().min(1).max(200),
-  includeRetracted: z
-    .string()
-    .optional()
-    .transform((v) => v === "true"),
   includeChildren: z
     .string()
     .optional()
@@ -424,7 +420,7 @@ const statementsApp = new Hono()
 
   // ---- GET /by-entity — all statements for an entity, with citations and property info ----
   .get("/by-entity", zv("query", ByEntityQuery), async (c) => {
-    const { entityId, includeRetracted, includeChildren } = c.req.valid("query");
+    const { entityId, includeChildren } = c.req.valid("query");
     const db = getDrizzleDb();
 
     // Determine which entity IDs to include
@@ -454,9 +450,7 @@ const statementsApp = new Hono()
             sql`, `,
           )})`;
     const entityConditions = [entityMatch];
-    if (!includeRetracted) {
-      entityConditions.push(sql`${statements.status} != 'retracted'`);
-    }
+    entityConditions.push(sql`${statements.status} != 'retracted'`);
     const entityWhere = and(...entityConditions);
 
     // Build the same entity match for the citations subquery
@@ -482,7 +476,7 @@ const statementsApp = new Hono()
           sql`${statementCitations.statementId} IN (
             SELECT ${statements.id} FROM ${statements}
             WHERE ${citationsSubquery}
-            ${includeRetracted ? sql`` : sql`AND ${statements.status} != 'retracted'`}
+            AND ${statements.status} != 'retracted'
           )`
         ),
       db.select().from(properties),
