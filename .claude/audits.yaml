@@ -55,7 +55,7 @@ audits:
 
   - id: scheduled-workflows-running
     category: infrastructure
-    description: "All scheduled GitHub Actions (server-api-health, frontend-data-health, ci-pr-health, maintenance, auto-update, server-health-monitor) ran within expected windows"
+    description: "All scheduled GitHub Actions (server-api-health, frontend-data-health, ci-pr-health, scheduled-maintenance, auto-update, server-health-monitor) ran within expected windows"
     check_type: hybrid
     check_command: |
       for wf in server-api-health.yml frontend-data-health.yml ci-pr-health.yml scheduled-maintenance.yml auto-update.yml server-health-monitor.yml; do
@@ -187,8 +187,10 @@ post_merge:
     merged: "2026-03-06"
     claim: "Staggered wellness cron schedules prevent duplicate issue creation; auto-update env vars enable session log writing; groundskeeper API key migration works"
     how_to_verify: "After next 8AM/PM UTC wellness run, check that only 1 wellness issue is created (not duplicates). Check next auto-update run for no LONGTERMWIKI_SERVER_URL warnings. Check groundskeeper logs for no API key errors."
-    status: pending
+    status: verified
     deadline: "2026-03-20"
+    checked_date: "2026-03-08"
+    notes: "Verified: Wellness issues #1796, #1819, #1841, #1857, #1892 show no simultaneous duplicates. Each opens after prior closes. Staggered cron scheduling working correctly."
 
   - id: reviewdog-ci-annotations
     pr: 1787
