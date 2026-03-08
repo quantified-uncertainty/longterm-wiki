@@ -7,7 +7,7 @@
  * Steps:
  *   1. Create date-stamped branch (auto-update/YYYY-MM-DD)
  *   2. Run auto-update pipeline (fetch -> digest -> route -> improve)
- *   3. Auto-fix: fix escaping, fix markdown, validate gate --fix
+ *   3. Auto-fix: fix escaping, fix markdown, orphaned-footnotes (scoped to updated pages only), validate gate --fix
  *   4. NEEDS CITATION cleanup (find markers, run improve, verify gone)
  *   5. Paranoid content review on each changed page
  *   6. Content quality checks (truncation + footnotes)
@@ -22,6 +22,7 @@
 import { execFileSync } from 'child_process';
 import { basename, join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { findPageFile } from '../lib/file-utils.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { runPipeline } from './orchestrator.ts';
 import {
@@ -328,6 +329,7 @@ export async function orchestrateCiAutoUpdate(
   // ── Step 2: Run auto-update pipeline ──
   console.log('\n--- Step 2: Run auto-update pipeline ---');
   let pagesUpdated = 0;
+  let updatedPageIds: string[] = [];
   try {
     const { report, reportPath: rp } = await runPipeline({
       budget: String(options.budget),
@@ -339,6 +341,12 @@ export async function orchestrateCiAutoUpdate(
     });
     reportPath = rp;
     pagesUpdated = report.execution.pagesUpdated;
+    // Track successfully updated pages so Step 3 fixes only touch those pages,
+    // not the entire codebase. Running fix tools globally would touch ~150+ pages
+    // with pre-existing issues, causing Step 5 paranoid review to time out.
+    updatedPageIds = report.execution.results
+      .filter(r => r.status === 'success')
+      .map(r => r.pageId);
     console.log(`Pipeline complete: ${pagesUpdated} page(s) updated, report at ${reportPath}`);
 
     if (report.execution.pagesFailed > 0) {
@@ -351,6 +359,10 @@ export async function orchestrateCiAutoUpdate(
   }
 
   // ── Step 3: Auto-fix (escaping, markdown, gate) ──
+  // IMPORTANT: Run fix tools scoped to auto-updated pages only.
+  // Global runs (e.g., `fix orphaned-footnotes --apply` with no file filter)
+  // touch ~150 pages with pre-existing issues, bloating `git diff HEAD` and
+  // causing Step 5 paranoid review to time out at 2h+.
   console.log('\n--- Step 3: Run validation fixes ---');
   try {
     execFileSync('pnpm', ['crux', 'fix', 'escaping'], {
@@ -370,13 +382,22 @@ export async function orchestrateCiAutoUpdate(
     console.warn(`::warning::fix markdown failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 
-  try {
-    execFileSync('pnpm', ['crux', 'fix', 'orphaned-footnotes', '--apply'], {
-      cwd: PROJECT_ROOT,
-      stdio: 'inherit',
-    });
-  } catch (err) {
-    console.warn(`::warning::fix orphaned-footnotes failed: ${err instanceof Error ? err.message : String(err)}`);
+  // Run orphaned-footnotes fix ONLY on the pages this run updated.
+  // Do NOT run globally — that would modify ~150+ unrelated pages.
+  if (updatedPageIds.length > 0) {
+    for (const pageId of updatedPageIds) {
+      const filePath = findPageFile(pageId);
+      if (!filePath) continue;
+      try {
+        execFileSync('pnpm', ['crux', 'fix', 'orphaned-footnotes', '--apply', `--file=${filePath}`], {
+          cwd: PROJECT_ROOT,
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
+      } catch (err) {
+        console.warn(`::warning::fix orphaned-footnotes failed for ${pageId}: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+    console.log(`Fixed orphaned footnotes on ${updatedPageIds.length} auto-updated page(s).`);
   }
 
   try {
@@ -407,6 +428,23 @@ export async function orchestrateCiAutoUpdate(
   if (citationCleanup.remaining.length > 0) {
     console.error('NEEDS CITATION markers remain -- manual review required before merging.');
     return { branch, hasChanges: false, pagesUpdated, prUrl: null, exitCode: 1 };
+  }
+
+  // Re-run orphaned-footnotes fix after citation cleanup, in case the improve
+  // pass introduced new orphaned refs. Scoped to the same set of pages.
+  if (updatedPageIds.length > 0) {
+    for (const pageId of updatedPageIds) {
+      const filePath = findPageFile(pageId);
+      if (!filePath) continue;
+      try {
+        execFileSync('pnpm', ['crux', 'fix', 'orphaned-footnotes', '--apply', `--file=${filePath}`], {
+          cwd: PROJECT_ROOT,
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
+      } catch {
+        // Non-fatal — already warned in Step 3
+      }
+    }
   }
 
   // ── Step 5: Paranoid content review ──
