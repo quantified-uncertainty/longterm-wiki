@@ -24,27 +24,6 @@ facts:
     sourceResource: b39807b5264f3f80
     notes: "Current value of 99% Facebook share pledge, exceeds $200B"
 
-  - id: f_czi_science_decade
-    property: description
-    value: "Science spending 2016-2025: $4-4.5B"
-    source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
-    sourceResource: ba7cf061039527d9
-    notes: "Total science spending first decade (2016-2025)"
-
-  - id: f_czi_social_decade
-    property: description
-    value: "Social causes spending 2016-2025: $3.5B (winding down)"
-    source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
-    sourceResource: ba7cf061039527d9
-    notes: "Total social causes spending 2016-2025, now winding down"
-
-  - id: f_czi_future_science
-    property: description
-    value: "Science spending commitment 2026-2036: $10B+ minimum"
-    source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
-    sourceResource: ba7cf061039527d9
-    notes: "Minimum commitment for science over next decade"
-
   - id: f_czi_annual_budget
     property: revenue
     value: 1e9
@@ -52,23 +31,6 @@ facts:
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
     sourceResource: 4d0f2f2e28cf4b4d
     notes: "Approximate annual operating budget as of 2025"
-
-  - id: f_czi_biohub_sf
-    property: description
-    value: "CZ Biohub SF founding grant (2016): $600M"
-    source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
-    sourceResource: b39807b5264f3f80
-    notes: "Initial grant to found CZ Biohub SF with UCSF/Berkeley/Stanford"
-
-  - id: f_czi_biohub_chicago
-    property: description
-    value: "CZ Biohub Chicago founding grant (2022): $250M"
-    notes: "Grant to establish Biohub Chicago focused on biosensors and inflammation"
-
-  - id: f_czi_biohub_ny
-    property: description
-    value: "CZ Biohub New York founding grant (2023): $250M"
-    notes: "Grant to establish Biohub New York focused on infectious disease"
 
   - id: f_czi_gpu_cluster_2024
     property: gpu-count
@@ -94,16 +56,65 @@ facts:
     sourceResource: 4d0f2f2e28cf4b4d
     notes: "Approximately 70 jobs cut (~8% of workforce) to refocus on AI-biomedical research"
 
-  - id: f_czi_publications
-    property: description
-    value: "8,000+ publications supported since founding"
-    source: https://biohub.org/research/
-    sourceResource: 384ed722aebe9eb4
-    notes: "More than 8,000 publications supported"
+items:
+  grants-and-programs:
+    type: grant-or-program
+    entries:
+      i_czi_science_decade:
+        name: "Science spending (first decade)"
+        amount: 4.25e9
+        period: "2016-2025"
+        status: "completed"
+        source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+        notes: "Total science spending first decade; estimated $4-4.5B"
 
-  - id: f_czi_rare_as_one
-    property: description
-    value: "Rare As One Project: 94 patient-led rare disease organizations (2024)"
-    source: https://chanzuckerberg.com/blog/2024-look-back/
-    sourceResource: d92403002e2c20bc
-    notes: "Grown from 30 to 94 organizations since 2020"
+      i_czi_social_decade:
+        name: "Social causes spending (first decade)"
+        amount: 3.5e9
+        period: "2016-2025"
+        status: "winding-down"
+        source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+        notes: "Total social causes spending 2016-2025; now winding down"
+
+      i_czi_future_science:
+        name: "Science spending commitment (second decade)"
+        amount: 10e9
+        period: "2026-2036"
+        status: "active"
+        source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+        notes: "Minimum commitment for science over next decade ($10B+)"
+
+      i_czi_biohub_sf:
+        name: "CZ Biohub SF founding grant"
+        amount: 600e6
+        date: 2016-09
+        status: "active"
+        source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+        notes: "Initial grant to found CZ Biohub SF with UCSF/Berkeley/Stanford"
+
+      i_czi_biohub_chicago:
+        name: "CZ Biohub Chicago founding grant"
+        amount: 250e6
+        date: 2022-10
+        status: "active"
+        notes: "Grant to establish Biohub Chicago focused on biosensors and inflammation"
+
+      i_czi_biohub_ny:
+        name: "CZ Biohub New York founding grant"
+        amount: 250e6
+        date: 2023-06
+        status: "active"
+        notes: "Grant to establish Biohub New York focused on infectious disease"
+
+      i_czi_publications:
+        name: "Research publications supported"
+        status: "active"
+        source: https://biohub.org/research/
+        notes: "More than 8,000 publications supported since founding"
+
+      i_czi_rare_as_one:
+        name: "Rare As One Project"
+        date: 2020-01
+        status: "active"
+        source: https://chanzuckerberg.com/blog/2024-look-back/
+        notes: "Patient-led rare disease organizations; grown from 30 to 94 since 2020"

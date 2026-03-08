@@ -94,3 +94,14 @@ items:
       description: { type: text, description: "Brief description" }
       source: { type: text, description: "URL to paper or announcement" }
       notes: { type: text, description: "Impact or significance" }
+
+  grants-and-programs:
+    description: "Major grants, programs, and spending initiatives"
+    fields:
+      name: { type: text, required: true, description: "Program or grant name" }
+      amount: { type: number, unit: USD, description: "Funding amount in USD" }
+      period: { type: text, description: "Time period (e.g. 2016-2025)" }
+      date: { type: date, description: "Start or announcement date (YYYY-MM)" }
+      status: { type: text, description: "Current status (active, completed, winding-down)" }
+      source: { type: text, description: "URL to announcement or report" }
+      notes: { type: text, description: "Context, impact, or important details" }
