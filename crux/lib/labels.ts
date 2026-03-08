@@ -69,4 +69,8 @@ export const LABEL_META = {
     color: 'bfdadc',
     description: 'Human has reviewed protected path changes',
   },
+  [LABELS.STAGE_MERGING]: {
+    color: '1d76db',
+    description: 'PR is in the merge queue',
+  },
 } satisfies Partial<Record<LabelName, LabelMeta>>;

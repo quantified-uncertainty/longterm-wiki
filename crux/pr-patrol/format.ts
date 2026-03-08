@@ -71,6 +71,7 @@ function outcomeIcon(outcome: string, c: Colors): string {
   switch (outcome) {
     case 'fixed':
     case 'merged':
+    case 'enqueued':
     case 'undrafted':
       return `${c.green}\u2713${c.reset}`;
     case 'max-turns':
@@ -89,6 +90,7 @@ function outcomeColor(outcome: string, c: Colors): string {
   switch (outcome) {
     case 'fixed':
     case 'merged':
+    case 'enqueued':
     case 'undrafted':
       return c.green;
     case 'max-turns':
@@ -150,7 +152,8 @@ function formatEntryLine(entry: LogEntry, c: Colors): string {
       const icon = outcomeIcon(entry.outcome, c);
       const color = outcomeColor(entry.outcome, c);
       const reason = entry.reason ? `  ${c.dim}(${entry.reason})${c.reset}` : '';
-      return `    ${icon} PR #${entry.pr_num}  ${color}merge-${entry.outcome}${c.reset}${reason}`;
+      const prefix = entry.outcome === 'enqueued' ? 'enqueued' : `merge-${entry.outcome}`;
+      return `    ${icon} PR #${entry.pr_num}  ${color}${prefix}${c.reset}${reason}`;
     }
     case 'main_branch_result': {
       const icon = outcomeIcon(entry.outcome, c);
@@ -203,7 +206,7 @@ export function formatStats(stats: AggregatedStats, since: string, c: Colors): s
   // Merge outcomes
   if (stats.merges.total > 0) {
     lines.push(`${c.bold}Merge Outcomes${c.reset}  ${c.dim}(${stats.merges.total} total)${c.reset}`);
-    const mergeOrder = ['merged', 'error', 'dry-run'];
+    const mergeOrder = ['enqueued', 'merged', 'error', 'dry-run'];
     for (const outcome of mergeOrder) {
       const count = stats.merges.byOutcome[outcome] ?? 0;
       if (count === 0) continue;
@@ -306,14 +309,18 @@ ${c.bold}Scoring${c.reset}
   Issues are summed + age bonus (1 pt/hour, capped at 50).
   The highest-scoring PR is fixed each cycle.
 
-${c.bold}Auto-Merge${c.reset}
-  PRs labeled \`${LABELS.STAGE_APPROVED}\` are squash-merged when:
+${c.bold}Auto-Merge (via Merge Queue)${c.reset}
+  PRs labeled \`${LABELS.STAGE_APPROVED}\` are enqueued into the GitHub merge queue when:
   ${c.green}\u2713${c.reset} CI is green (no failures or pending checks)
   ${c.green}\u2713${c.reset} No merge conflicts
   ${c.green}\u2713${c.reset} No unresolved review threads
   ${c.green}\u2713${c.reset} No unchecked checkboxes in PR body
   ${c.green}\u2713${c.reset} No \`${LABELS.AGENT_WORKING}\` label
+  ${c.green}\u2713${c.reset} No \`${LABELS.STAGE_MERGING}\` label (not already in queue)
   ${c.green}\u2713${c.reset} Not a draft (drafts are auto-undrafted first if eligible)
+
+  The merge queue runs CI in isolation and merges automatically.
+  All eligible PRs are enqueued each cycle (queue handles serialization).
 
 ${c.bold}Safety${c.reset}
   Cooldown:     Each PR is skipped for 30 min after being processed

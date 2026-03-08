@@ -93,3 +93,7 @@ If all check runs show **success**: Report success. Include the PR URL if on a f
 - Never force-push unless explicitly asked, **except** after a `git pull --rebase` in Step 0 (where `--force-with-lease` is required and safe because the rebase rewrote local history to match the remote's rebased history).
 - Never skip pre-commit hooks.
 - Always show the user what failed and what you're fixing before making changes.
+
+## Merge Queue
+
+PRs with `stage:approved` are auto-enqueued into the GitHub merge queue by PR Patrol. The merge queue runs CI in isolation and merges automatically — you don't need to merge PRs manually. Just push, ensure CI is green, and label `stage:approved` when ready.
