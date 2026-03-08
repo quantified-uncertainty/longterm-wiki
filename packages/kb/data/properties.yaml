@@ -467,7 +467,7 @@ properties:
     description: "Timeframe for risk materialization or approach relevance: near-term / medium-term / long-term / ongoing"
     dataType: text
     category: concept
-    appliesTo: [risk, approach, debate, concept]
+    appliesTo: [risk, approach, debate, concept, capability]
 
   # ── Approach & Response Properties ────────────────────────────────────
 

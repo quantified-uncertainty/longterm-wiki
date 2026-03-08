@@ -18,7 +18,7 @@ items:
     fields:
       factor: { type: text, required: true, description: "Factor name or description" }
       mechanism: { type: text, description: "How this factor contributes to the risk" }
-      source: { type: text, description: "URL to supporting evidence" }
+      url: { type: text, description: "URL to supporting evidence" }
       notes: { type: text, description: "Context or current status" }
 
   mitigating-factors:
@@ -26,7 +26,7 @@ items:
     fields:
       factor: { type: text, required: true, description: "Factor name or description" }
       mechanism: { type: text, description: "How this factor reduces the risk" }
-      source: { type: text, description: "URL to supporting evidence" }
+      url: { type: text, description: "URL to supporting evidence" }
       notes: { type: text, description: "Context or limitations of the mitigation" }
 
   expert-estimates:
@@ -44,5 +44,5 @@ items:
       intervention: { type: text, required: true, description: "Intervention name or description" }
       type: { type: text, description: "Type: technical / policy / governance / research" }
       effectiveness: { type: text, description: "Estimated effectiveness: high / medium / low / unknown" }
-      source: { type: text, description: "URL to supporting analysis" }
+      url: { type: text, description: "URL to supporting analysis" }
       notes: { type: text, description: "Key proponents or implementation challenges" }

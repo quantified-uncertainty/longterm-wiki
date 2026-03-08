@@ -32,6 +32,7 @@ import {
   getStatementsByEntity,
   patchStatement,
   type CreateStatementInput,
+  type StatementRow,
 } from '../lib/wiki-server/statements.ts';
 import { getEntity } from '../lib/wiki-server/entities.ts';
 import { analyzeGaps, type GapAnalysis } from './gaps.ts';
@@ -1094,8 +1095,8 @@ export async function runSinglePass(opts: ImproveOptions): Promise<PassResult> {
 
     // Cross-session duplicate check — warn if any new statements duplicate
     // existing active ones (catches re-runs extracting the same facts).
-    const existingActive = (analysis.allStatements as import('../lib/wiki-server/statements.ts').StatementRow[])
-      .filter((s) => s.status === 'active');
+    const existingActive = analysis.allStatements
+      .filter((s) => s.status === 'active') as StatementRow[];
     const crossDupeViolations = checkAgainstExisting(allAccepted, existingActive);
     if (crossDupeViolations.length > 0) {
       console.warn(

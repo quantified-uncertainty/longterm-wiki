@@ -110,9 +110,11 @@ function resolveRefs(
   graph: Graph,
   context: string
 ): unknown {
-  // DateMarker instances are not refs — pass through unchanged for normalizeValue.
+  // DateMarker in facts: pass through as-is so normalizeValue() can handle it.
+  // DateMarker in items: convert to the plain date string, since item collections
+  // never go through normalizeValue() and would otherwise store a class instance.
   if (value instanceof DateMarker) {
-    return value;
+    return context.endsWith("/facts") ? value : value.value;
   }
 
   if (value instanceof RefMarker) {

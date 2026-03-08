@@ -192,7 +192,10 @@ async function main() {
     process.exit(1);
   }
 
-  const statements = result.data.statements as StatementRow[];
+  const statements = [
+    ...(result.data.structured as StatementRow[]),
+    ...(result.data.attributed as StatementRow[]),
+  ];
   const active = statements.filter((s) => s.status === 'active');
   const issues = detectActiveConflicts(statements);
 
