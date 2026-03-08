@@ -71,6 +71,18 @@ export interface MainBranchStatus {
   runId: number | null;
   sha: string;
   htmlUrl: string;
+  /** SHA of the last successful CI run (only populated when isRed is true). */
+  lastGreenSha?: string;
+  /** ISO timestamp of the last successful CI run (only populated when isRed is true). */
+  lastGreenAt?: string;
+}
+
+export interface RecentMerge {
+  prNumber: number;
+  title: string;
+  mergedAt: string;
+  mergedBy: string;
+  sha: string;
 }
 
 // ── GraphQL types ───────────────────────────────────────────────────────────

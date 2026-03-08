@@ -30,6 +30,7 @@ export type {
   MergeBlockReason,
   MergeCandidate,
   MainBranchStatus,
+  RecentMerge,
   GqlReviewThread,
   GqlPrNode,
   PrOverlap,
@@ -63,7 +64,12 @@ export {
 
 // ── CI status ────────────────────────────────────────────────────────────────
 
-export { checkMainBranch } from './ci-status.ts';
+export { checkMainBranch, findRecentMerges } from './ci-status.ts';
+
+// ── Deploy health ────────────────────────────────────────────────────────────
+
+export { checkDeployHealth } from './deploy-status.ts';
+export type { DeployHealthStatus } from './deploy-status.ts';
 
 // ── Automated rebase ─────────────────────────────────────────────────────────
 

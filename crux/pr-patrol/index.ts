@@ -104,6 +104,8 @@ import {
   fixPr,
   releaseCurrentClaim,
 } from './execution.ts';
+import { checkDeployHealth as libCheckDeployHealth } from '../lib/pr-analysis/deploy-status.ts';
+import type { DeployHealthStatus } from '../lib/pr-analysis/deploy-status.ts';
 import { runReflection } from './reflection.ts';
 
 const cl = getColors();
@@ -260,6 +262,18 @@ async function runCheckCycle(
     return; // Main takes the whole cycle; PRs wait
   }
 
+  // 0b. Check deploy health
+  const deployHealth: DeployHealthStatus = await libCheckDeployHealth(config.repo).catch((e) => {
+    log(`  ${cl.yellow}Warning: deploy health check failed: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+    return { healthy: true, lastDeploy: null, failingSince: null } as DeployHealthStatus;
+  });
+
+  if (!deployHealth.healthy) {
+    log(`  ${cl.red}Deploy pipeline is failing${cl.reset} since ${deployHealth.failingSince ?? 'unknown'}`);
+  } else if (deployHealth.lastDeploy) {
+    log(`  Deploy pipeline is healthy`);
+  }
+
   // 1. Fetch all open PRs (shared between fix and merge phases)
   const allPrs = await daemonFetchOpenPrs(config);
 
@@ -374,10 +388,15 @@ async function runCheckCycle(
   }
 
   // Enqueue ALL eligible PRs — the merge queue handles serialization
-  for (const candidate of eligibleForMerge) {
-    const outcome = await enqueuePr(candidate, config);
-    if (outcome === 'enqueued' || outcome === 'dry-run') {
-      enqueuedPrs.push(candidate.number);
+  // Skip if deploy pipeline is failing — don't merge into a broken pipeline
+  if (!deployHealth.healthy) {
+    log(`  ${cl.yellow}Skipping merge enqueue — deploy pipeline is failing since ${deployHealth.failingSince ?? 'unknown'}${cl.reset}`);
+  } else {
+    for (const candidate of eligibleForMerge) {
+      const outcome = await enqueuePr(candidate, config);
+      if (outcome === 'enqueued' || outcome === 'dry-run') {
+        enqueuedPrs.push(candidate.number);
+      }
     }
   }
 
@@ -396,6 +415,8 @@ async function runCheckCycle(
     prs_enqueued: enqueuedPrs.length > 0 ? enqueuedPrs : undefined,
     merge_candidates: mergeCandidates.length,
     merge_eligible: eligibleForMerge.length,
+    deploy_healthy: deployHealth.healthy,
+    deploy_failing_since: deployHealth.failingSince ?? undefined,
   });
 }
 

@@ -11,7 +11,8 @@
 import { spawn } from 'child_process';
 import { githubApi } from '../lib/github.ts';
 import { gitSafe } from '../lib/git.ts';
-import { checkMainBranch as libCheckMainBranch } from '../lib/pr-analysis/index.ts';
+import { checkMainBranch as libCheckMainBranch, findRecentMerges as libFindRecentMerges } from '../lib/pr-analysis/index.ts';
+import type { RecentMerge } from '../lib/pr-analysis/index.ts';
 import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
 import type { FixOutcome, MainBranchStatus, PatrolConfig, ScoredPr } from './types.ts';
 import { LABELS } from './types.ts';
@@ -36,6 +37,13 @@ import {
   recordFailure,
   resetFailCount,
   trackMainFixPr,
+  getMainRedSince,
+  setMainRedSince,
+  clearMainRedSince,
+  getMainFixAttempts,
+  incrementMainFixAttempts,
+  resetMainFixAttempts,
+  setPersistedClaimedPr,
 } from './state.ts';
 import { buildMainBranchPrompt, buildPrompt } from './prompts.ts';
 import { computeBudget } from './scoring.ts';
@@ -126,7 +134,25 @@ export async function checkMainBranch(config: PatrolConfig): Promise<MainBranchS
 
     if (status.isRed) {
       log(`  ${cl.red}🔴 Main branch CI is RED${cl.reset} (run #${status.runId}, sha ${status.sha.slice(0, 8)})`);
+
+      // Track red-since state
+      if (!getMainRedSince()) {
+        setMainRedSince(new Date().toISOString());
+      }
+
+      // Identify likely culprits (PRs merged since last green)
+      const culprits = await libFindRecentMerges(config.repo, status.lastGreenAt).catch(() => [] as RecentMerge[]);
+      if (culprits.length > 0) {
+        log(`  Likely culprits: ${culprits.map((c) => `#${c.prNumber} (${c.title.slice(0, 40)})`).join(', ')}`);
+      }
     } else {
+      // Main is green — reset tracking if it was red before
+      if (getMainRedSince()) {
+        log(`  Main branch recovered (was red since ${getMainRedSince()})`);
+        clearMainRedSince();
+        resetMainFixAttempts();
+        resetFailCount(MAIN_BRANCH_KEY);
+      }
       log(`  ${cl.green}Main branch CI is green${cl.reset}`);
     }
 
@@ -152,6 +178,9 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
     markProcessed(MAIN_BRANCH_KEY);
     return;
   }
+
+  const attemptNum = incrementMainFixAttempts();
+  log(`  Fix attempt #${attemptNum}`);
 
   const prompt = buildMainBranchPrompt(status.runId!, config.repo);
   const startTime = Date.now();
@@ -323,6 +352,7 @@ async function claimPr(prNum: number, repo: string): Promise<void> {
       body: { labels: [LABELS.AGENT_WORKING] },
     });
     claimedPr = prNum;
+    setPersistedClaimedPr(prNum);
   } catch {
     log(`  ${cl.yellow}Warning: could not add ${LABELS.AGENT_WORKING} label to PR #${prNum}${cl.reset}`);
   }
@@ -342,7 +372,10 @@ async function releasePr(prNum: number, repo: string): Promise<void> {
       log(`  Warning: could not remove claude-working label from PR #${prNum}: ${msg}`);
     }
   }
-  if (claimedPr === prNum) claimedPr = null;
+  if (claimedPr === prNum) {
+    claimedPr = null;
+    setPersistedClaimedPr(null);
+  }
 }
 
 export async function releaseCurrentClaim(repo: string): Promise<void> {
