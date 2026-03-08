@@ -1,0 +1,29 @@
+thing:
+  id: ai-forecasting
+  stableId: RW4LTglM1Q
+  type: approach
+  name: AI-Augmented Forecasting
+  numericId: E9
+facts:
+  - id: f_0Ud8LQYQCA
+    property: description
+    value: >-
+      AI-augmented forecasting combines the pattern-recognition and data-processing capabilities of AI systems with the
+      contextual judgment and calibration of human forecasters. This hybrid approach aims to produce more accurate
+      predictions about future events than either humans or AI alone, particularly for questions relevant to policy and
+      risk assessment.
+
+
+      Current systems take several forms. AI can aggregate and weight forecasts from many human predictors, adjusting
+      for individual track records and biases. AI can assist forecasters by synthesizing relevant information,
+      identifying base rates, and flagging considerations that might otherwise be missed. More ambitiously, AI systems
+      can generate their own forecasts that human superforecasters then evaluate and combine with their own judgments.
+
+
+      For AI safety and epistemic security, improved forecasting offers several benefits. Better predictions about AI
+      capabilities help with governance timing. Forecasting AI-related risks provides early warning. Publicly visible
+      forecasts create accountability for claims about AI development. The key challenge is calibration - ensuring that
+      probability estimates are meaningful across diverse domains and maintaining accuracy as AI systems become the
+      subject of the forecasts themselves.
+    asOf: 2026-03
+    notes: Migrated from old entity system

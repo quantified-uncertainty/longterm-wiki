@@ -3,6 +3,7 @@ import { EntityLink, MultiEntityLinks } from "@/components/wiki/EntityLink";
 import { ResourceLink, R } from "@/components/wiki/ResourceLink";
 import { References } from "@/components/wiki/References";
 import { F } from "@/components/wiki/F";
+import { KBF } from "@/components/wiki/KBF";
 import { Calc } from "@/components/wiki/Calc";
 import { MermaidDiagram } from "@/components/wiki/MermaidDiagram";
 import { DataInfoBox } from "@/components/wiki/DataInfoBox";
@@ -135,6 +136,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   R,
   References,
   F,
+  KBF,
   Calc,
   DataInfoBox,
   Backlinks,

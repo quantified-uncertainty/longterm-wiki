@@ -1,0 +1,14 @@
+thing:
+  id: model-organisms-of-misalignment
+  stableId: OCU2M1tUnA
+  type: analysis
+  name: Model Organisms of Misalignment
+  numericId: E419
+facts:
+  - id: f_YcvAhgeliQ
+    property: description
+    value: Research agenda creating controlled AI models that exhibit specific misalignment behaviors to study alignment
+      failures and test interventions. Recent work achieves 99% coherence with 40% misalignment rates using models as
+      small as 0.5B parameters.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,15 @@
+thing:
+  id: shane-legg
+  stableId: muueuPOHfg
+  type: person
+  name: Shane Legg
+  numericId: E280
+facts:
+  - id: f_r70UvkiMgQ
+    property: description
+    value: Co-founder and Chief AGI Scientist at Google DeepMind, early pioneer of machine superintelligence research.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_BbpmsSq6zg
+    property: website
+    value: https://deepmind.google

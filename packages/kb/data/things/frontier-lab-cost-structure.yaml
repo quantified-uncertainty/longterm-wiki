@@ -1,0 +1,14 @@
+thing:
+  id: frontier-lab-cost-structure
+  stableId: gS4YxcslRg
+  type: analysis
+  name: Frontier Lab Cost Structure
+  numericId: E703
+facts:
+  - id: f_RKfchz0Jcw
+    property: description
+    value: Financial anatomy of frontier AI labs including revenue breakdown, cost allocation, path to profitability, and
+      how financial structure shapes safety priorities. OpenAI burns ~$9B/year on $20B ARR; Anthropic ~$5-7B on $9B ARR.
+      Safety receives 1-8% depending on the lab.
+    asOf: 2026-03
+    notes: Migrated from old entity system

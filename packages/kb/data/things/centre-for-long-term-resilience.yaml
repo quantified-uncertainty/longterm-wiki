@@ -1,0 +1,13 @@
+thing:
+  id: centre-for-long-term-resilience
+  stableId: yfUBQLMfgw
+  type: organization
+  name: Centre for Long-Term Resilience
+  numericId: E429
+facts:
+  - id: f_HDafGrfwfg
+    property: description
+    value: UK-based think tank focused on extreme risks from AI, biosecurity, and improving government risk management
+      through policy research and direct advisory work.
+    asOf: 2026-03
+    notes: Migrated from old entity system

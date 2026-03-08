@@ -1,0 +1,15 @@
+thing:
+  id: buck-shlegeris
+  stableId: Z62bQynY4g
+  type: person
+  name: Buck Shlegeris
+  numericId: E46
+facts:
+  - id: f_UR3u0VcRwQ
+    property: description
+    value: CEO of Redwood Research, focused on AI safety research and alignment techniques.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_fixd9Ra6uA
+    property: website
+    value: https://redwoodresearch.org

@@ -1,0 +1,14 @@
+thing:
+  id: model-spec
+  stableId: lHxzXeAMrg
+  type: policy
+  name: AI Model Specifications
+  numericId: E594
+facts:
+  - id: f_34JYoAyuHg
+    property: description
+    value: Model specifications are explicit documents defining AI behavior, now published by all major frontier labs
+      (Anthropic, OpenAI, Google, Meta) as of 2025. While they improve transparency and enable external scrutiny, they
+      face a fundamental spec-reality gap—specifications don't guarantee implementatio
+    asOf: 2026-03
+    notes: Migrated from old entity system

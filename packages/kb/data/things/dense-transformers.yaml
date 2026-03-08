@@ -1,0 +1,15 @@
+thing:
+  id: dense-transformers
+  stableId: RScckMUC2g
+  type: concept
+  name: Dense Transformers
+  numericId: E403
+facts:
+  - id: f_XeERIkKcRQ
+    property: description
+    value: The standard transformer architecture powering current frontier AI, where all parameters are active for every
+      token. Since Vaswani et al.'s 2017 paper (160,000+ citations), dense transformers power GPT-4, Claude 3, Llama 3,
+      and Gemini. Despite open weights for some models, mechanistic interpretability remains primitive with a
+      fundamental gap between feature extraction and behavior prediction.
+    asOf: 2026-03
+    notes: Migrated from old entity system

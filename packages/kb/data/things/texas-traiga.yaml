@@ -1,0 +1,14 @@
+thing:
+  id: texas-traiga
+  stableId: 561xbhJAeQ
+  type: policy
+  name: Texas TRAIGA Responsible AI Governance Act
+  numericId: E602
+facts:
+  - id: f_6FJA35ImyA
+    property: description
+    value: TRAIGA represents a state-level AI regulation focused on intent-based liability for harmful AI practices rather
+      than comprehensive safety requirements, creating enforcement mechanisms but avoiding technical safety standards.
+      The law establishes useful precedent for AI governance but doesn't address
+    asOf: 2026-03
+    notes: Migrated from old entity system

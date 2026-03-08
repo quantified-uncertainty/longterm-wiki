@@ -1,0 +1,14 @@
+thing:
+  id: sharp-left-turn
+  stableId: AMhUctK34Q
+  type: risk
+  name: Sharp Left Turn
+  numericId: E281
+facts:
+  - id: f_RnEBdisK9g
+    property: description
+    value: The "Sharp Left Turn" is a hypothesized failure mode where an AI system's capabilities suddenly generalize to a
+      new domain while its alignment properties do not. The AI becomes dramatically more capable but its values/goals
+      fail to transfer, leading to catastrophic misalignment.
+    asOf: 2026-03
+    notes: Migrated from old entity system

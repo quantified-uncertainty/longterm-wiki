@@ -1,0 +1,13 @@
+thing:
+  id: eu-ai-act
+  stableId: La8s84s3zg
+  type: policy
+  name: EU AI Act
+  numericId: E127
+facts:
+  - id: f_HyDGn7aMpA
+    property: description
+    value: The EU AI Act is the world's first comprehensive legal framework for artificial intelligence. Adopted in 2024, it
+      establishes a risk-based approach to AI regulation, with stricter requirements for higher-risk AI systems.
+    asOf: 2026-03
+    notes: Migrated from old entity system

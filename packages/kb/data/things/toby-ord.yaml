@@ -1,0 +1,33 @@
+thing:
+  id: toby-ord
+  stableId: 8nmqy7vFiA
+  type: person
+  name: Toby Ord
+  numericId: E355
+facts:
+  - id: f_jO6LtwIQmA
+    property: description
+    value: >-
+      Toby Ord is a philosopher at Oxford University and author of "The Precipice: Existential Risk and the Future of
+      Humanity" (2020), a comprehensive treatment of existential risks that helped establish AI as a central concern for
+      humanity's long-term future. His work has been influential in shaping how policymakers and researchers think about
+      catastrophic risks.
+
+
+      In "The Precipice," Ord provides quantitative estimates of existential risk from various sources, with AI among
+      the highest. He argues that we are living through a critical period in human history where our technological
+      capabilities have outpaced our wisdom, and that reducing existential risk should be a global priority. His
+      estimates - placing the probability of existential catastrophe this century at about 1 in 6, with AI being a major
+      contributor - are frequently cited in discussions of AI risk.
+
+
+      Ord is also a founding figure in the effective altruism movement. In 2009, he co-founded Giving What We Can, which
+      encourages people to donate significant portions of their income to effective charities. His transition from
+      focusing on global health and development to prioritizing existential risks mirrors a broader shift in the EA
+      movement. Through his writing, teaching, and advisory roles (including advising the UK government on AI), Ord has
+      helped translate abstract concerns about humanity's future into concrete policy discussions.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_UiqpPbYqPQ
+    property: website
+    value: https://www.tobyord.com

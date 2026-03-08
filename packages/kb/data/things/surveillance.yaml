@@ -1,0 +1,14 @@
+thing:
+  id: surveillance
+  stableId: 9ToBZjhsVg
+  type: risk
+  name: AI Mass Surveillance
+  numericId: E292
+facts:
+  - id: f_f8hVnFVu5w
+    property: description
+    value: AI dramatically expands surveillance capabilities. Previously, collecting data was easy but analysis was the
+      bottleneck—human analysts could only review so much. AI removes this constraint. Facial recognition can identify
+      individuals in crowds. Natural language processing can monitor communications at scale.
+    asOf: 2026-03
+    notes: Migrated from old entity system

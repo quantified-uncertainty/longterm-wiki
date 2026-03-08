@@ -1,0 +1,31 @@
+thing:
+  id: dan-hendrycks
+  stableId: VoNqoBJkyg
+  type: person
+  name: Dan Hendrycks
+  numericId: E89
+facts:
+  - id: f_13yRhPOk4w
+    property: description
+    value: >-
+      Dan Hendrycks is the Director of the Center for AI Safety (CAIS) and one of the most prolific researchers in AI
+      safety. His work spans technical safety research, benchmark creation, and public advocacy for taking AI risks
+      seriously. He is known for combining rigorous empirical research with clear communication about catastrophic
+      risks.
+
+
+      Hendrycks has made foundational contributions to AI safety evaluation. He created MMLU (Massive Multitask Language
+      Understanding), one of the most widely-used benchmarks for measuring AI capabilities, as well as numerous
+      benchmarks for robustness, calibration, and safety. His research on out-of-distribution detection, adversarial
+      robustness, and AI ethics has been highly cited and influenced how the field measures progress.
+
+
+      As CAIS director, Hendrycks has focused on building the case for AI risk as a serious issue. He was instrumental
+      in organizing the 2023 Statement on AI Risk, signed by hundreds of AI researchers including Turing Award winners,
+      which stated that "mitigating the risk of extinction from AI should be a global priority." His approach emphasizes
+      engaging mainstream ML researchers and policymakers who may not be part of the existing AI safety community.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_jm56ULnB8A
+    property: website
+    value: https://hendrycks.com

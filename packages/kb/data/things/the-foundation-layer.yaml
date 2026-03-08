@@ -1,0 +1,17 @@
+thing:
+  id: the-foundation-layer
+  stableId: 5jfxLzMZYg
+  type: organization
+  name: The Foundation Layer
+  numericId: E697
+facts:
+  - id: f_nSN5I77cmA
+    property: description
+    value: "A philanthropic guide and fund by Tyler John (Effective Institutions Project) aimed at mobilizing major donors
+      toward AI safety. The Foundation Layer Fund has facilitated 100+ grants exceeding $70M across five intervention
+      areas: alignment science, nonproliferation, defensive technology, power distribution, and talent mobilization."
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_aj2EOmQQ7Q
+    property: website
+    value: https://foundation-layer.ai

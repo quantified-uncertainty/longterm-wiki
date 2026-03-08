@@ -1,0 +1,16 @@
+thing:
+  id: govai
+  stableId: XLLyzaEaCA
+  type: organization
+  name: GovAI
+  numericId: E153
+facts:
+  - id: f_H6HJHvsAfg
+    property: description
+    value: The Centre for the Governance of AI (GovAI) is a research organization focused on AI policy and governance.
+      Originally part of the Future of Humanity Institute at Oxford, GovAI became independent in 2023 when FHI closed.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_JmckqJ2vnw
+    property: website
+    value: https://governance.ai

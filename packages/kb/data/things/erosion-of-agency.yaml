@@ -1,0 +1,14 @@
+thing:
+  id: erosion-of-agency
+  stableId: 54ItAwh4QA
+  type: risk
+  name: Erosion of Human Agency
+  numericId: E126
+facts:
+  - id: f_ccUokYgs9w
+    property: description
+    value: Human agency—the capacity to make meaningful choices that shape one's life and the world—may be eroding as AI
+      systems increasingly mediate, predict, and direct human behavior. Unlike enfeeblement (losing capability), erosion
+      of agency concerns losing meaningful control even while retaining capability.
+    asOf: 2026-03
+    notes: Migrated from old entity system

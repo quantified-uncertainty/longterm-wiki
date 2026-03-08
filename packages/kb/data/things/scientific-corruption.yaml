@@ -1,0 +1,31 @@
+thing:
+  id: scientific-corruption
+  stableId: IK5egiQE9w
+  type: risk
+  name: Scientific Knowledge Corruption
+  numericId: E276
+facts:
+  - id: f_G9I5Syd4bg
+    property: description
+    value: >-
+      Scientific knowledge corruption refers to AI enabling the degradation of scientific literature through fraud,
+      fabricated data, fake papers, and citation gaming at scales that overwhelm traditional quality control mechanisms.
+      Science depends on trust - researchers building on previous work, peer reviewers evaluating submissions, and
+      practitioners applying findings. AI threatens to flood this system with plausible-seeming but false content.
+
+
+      The threat vectors are numerous. Paper mills - organizations that produce fake academic papers for profit - can
+      now use AI to generate unlimited quantities of plausible-looking research. AI can fabricate realistic-looking
+      data, create fake images and figures, and generate text that passes plagiarism detectors. Large language models
+      can produce papers that are coherent and cite real sources, even when the claimed findings are entirely
+      fabricated.
+
+
+      The consequences extend beyond individual fraudulent papers. When the scientific literature becomes unreliable,
+      the entire edifice of evidence-based knowledge is undermined. Researchers cannot trust the findings they cite.
+      Meta-analyses aggregate unreliable studies. Clinical decisions are made based on fabricated evidence. The
+      replication crisis, already severe, becomes worse when fraud is easier and detection is harder. Scientific
+      integrity, already stressed, could collapse under the weight of AI-enabled fraud faster than institutions can
+      adapt their quality controls.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,15 @@
+thing:
+  id: rogue-ai-scenarios
+  stableId: jfSHBPsKiA
+  type: risk
+  name: Rogue AI Scenarios
+  numericId: E490
+facts:
+  - id: f_zXOHP7cdgw
+    property: description
+    value: Analysis of five lean scenarios for agentic AI takeover-by-accident—sandbox escape, training signal corruption,
+      correlated policy failure, delegation chain collapse, and emergent self-preservation—each evaluated for warning
+      shot likelihood and mapped against current deployment patterns. None require superhuman intelligence, explicit
+      deception, or rich self-awareness.
+    asOf: 2026-03
+    notes: Migrated from old entity system

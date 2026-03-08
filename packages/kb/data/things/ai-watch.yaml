@@ -1,0 +1,14 @@
+thing:
+  id: ai-watch
+  stableId: gDdFdUktjA
+  type: project
+  name: AI Watch
+  numericId: E386
+facts:
+  - id: f_vcpkgpw53g
+    property: description
+    value: AI Watch is a tracking database by Issa Rice that monitors AI safety organizations, people, funding, and
+      publications as part of his broader knowledge infrastructure ecosystem. The article provides useful context about
+      Rice's systematic approach to documentation but lacks concrete details about AI W
+    asOf: 2026-03
+    notes: Migrated from old entity system

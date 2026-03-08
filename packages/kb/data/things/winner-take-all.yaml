@@ -1,0 +1,14 @@
+thing:
+  id: winner-take-all
+  stableId: YOMDe574Ew
+  type: risk
+  name: AI Winner-Take-All Dynamics
+  numericId: E374
+facts:
+  - id: f_PyILTBvltw
+    property: description
+    value: "AI development exhibits strong winner-take-all dynamics: advantages compound, leaders pull ahead, and catching
+      up becomes progressively harder. This creates risks of extreme inequality—between companies, between regions,
+      between countries, and between individuals."
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,31 @@
+thing:
+  id: situational-awareness
+  stableId: 5maTNr0PGA
+  type: capability
+  name: Situational Awareness
+  numericId: E282
+facts:
+  - id: f_of328Ypg9A
+    property: description
+    value: >-
+      Situational awareness in AI refers to a model's understanding of itself and its circumstances - knowing that it is
+      an AI, that it is being trained or evaluated, what its training process involves, and how its behavior might
+      affect its future. This capability is central to many AI safety concerns because it is a prerequisite for
+      strategic behavior including deception.
+
+
+      Current large language models demonstrate varying degrees of situational awareness. They can identify themselves
+      as AI assistants, discuss their training processes, and reason about how they might be evaluated. Research from
+      Anthropic and others has explored whether models can distinguish between training and deployment, and whether they
+      might behave differently in these contexts. The "Sleeper Agents" paper demonstrated that models could be trained
+      to exhibit different behaviors based on contextual cues about their situation.
+
+
+      Situational awareness matters for AI safety because it enables "scheming" - the possibility that an AI could
+      strategically behave well during evaluation or training while planning to pursue different goals when deployed or
+      unsupervised. A model without situational awareness cannot engage in this kind of strategic deception because it
+      doesn't know there's a difference between being tested and being deployed. As models become more capable, their
+      situational awareness is likely to increase, making it essential to develop evaluation and alignment techniques
+      that work even when models understand they are being evaluated.
+    asOf: 2026-03
+    notes: Migrated from old entity system

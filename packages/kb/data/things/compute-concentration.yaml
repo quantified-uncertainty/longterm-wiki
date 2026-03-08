@@ -1,0 +1,18 @@
+thing:
+  id: compute-concentration
+  stableId: MvImONf1YA
+  type: risk
+  name: Compute Concentration
+  numericId: E684
+facts:
+  - id: f_jXDsUg8Q3w
+    property: description
+    value: The concentration of 80-90% of global frontier AI compute among 5-6 US-headquartered companies creates structural
+      risks including jurisdictional monopoly under US law (CLOUD Act, FISA 702), systemic cybersecurity vulnerability
+      where a single supply-chain flaw can affect all providers, military-commercial dual use tensions as the same
+      infrastructure serves Pentagon and global commercial customers, oligopolistic coordination conditions matching
+      historical cartel environments, and self-reinforcing concentration dynamics with loop gains of 1.2-2.0. Distinct
+      from the broader concentration-of-power risk because physical compute infrastructure is expensive, slow to build,
+      geographically fixed, and legally jurisdictional in ways software and data are not.
+    asOf: 2026-03
+    notes: Migrated from old entity system

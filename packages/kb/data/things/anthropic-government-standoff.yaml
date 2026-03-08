@@ -1,0 +1,17 @@
+thing:
+  id: anthropic-government-standoff
+  stableId: IJPsuwU9dA
+  type: event
+  name: Anthropic-Pentagon Standoff (2026)
+  numericId: E924
+facts:
+  - id: f_tjpgyjMH1w
+    property: description
+    value: In February 2026, the Trump administration ordered all federal agencies to cease using Anthropic's technology and
+      designated the company a "supply chain risk to national security" — a category normally reserved for foreign
+      adversaries — after Anthropic refused to remove restrictions on autonomous weapons and mass domestic surveillance
+      from its Pentagon contract. The standoff, triggered by the use of Claude AI in the January 2026 Venezuela raid,
+      represents the first major confrontation between a frontier AI lab and the US government over ethical red lines in
+      military AI deployment.
+    asOf: 2026-03
+    notes: Migrated from old entity system

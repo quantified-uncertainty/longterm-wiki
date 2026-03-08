@@ -1,0 +1,14 @@
+thing:
+  id: singapore-consensus
+  stableId: NLSUTzzH5g
+  type: policy
+  name: Singapore Consensus on AI Safety Research Priorities
+  numericId: E701
+facts:
+  - id: f_oJdOncWzZg
+    property: description
+    value: "Consensus document from the 2025 Singapore Conference on AI (SCAI), authored by 88 researchers from 11
+      countries, organizing AI safety research into a defence-in-depth framework across three areas: Assessment,
+      Development, and Control."
+    asOf: 2026-03
+    notes: Migrated from old entity system

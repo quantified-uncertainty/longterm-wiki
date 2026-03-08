@@ -1,0 +1,19 @@
+thing:
+  id: ajeya-cotra
+  stableId: dPzCwzIxiQ
+  type: person
+  name: Ajeya Cotra
+  numericId: E864
+facts:
+  - id: f_A33S9FgkxA
+    property: description
+    value: Ajeya Cotra is a member of technical staff at METR (Model Evaluation and Threat Research) and formerly a senior
+      advisor at Coefficient Giving (Open Philanthropy), where she led technical AI safety grantmaking and authored the
+      influential Bio Anchors report on AI timelines. She is among the most respected commentators on AI development
+      trajectories, intelligence explosion dynamics, and the strategic use of early transformative AI for safety work
+      during what she terms "crunch time."
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_zABjoVjk7g
+    property: website
+    value: https://metr.org

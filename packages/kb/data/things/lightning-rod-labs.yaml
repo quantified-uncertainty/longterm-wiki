@@ -1,0 +1,14 @@
+thing:
+  id: lightning-rod-labs
+  stableId: 4804DX6Zbg
+  type: organization
+  name: Lightning Rod Labs
+  numericId: E540
+facts:
+  - id: f_OyfHjujlCQ
+    property: description
+    value: Lightning Rod Labs is an early-stage AI company using temporal data to train prediction models, claiming 10%
+      returns on prediction markets but with limited independent validation. The company has no apparent connection to
+      AI safety concerns and represents standard commercial AI development rather th
+    asOf: 2026-03
+    notes: Migrated from old entity system

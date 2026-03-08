@@ -1,0 +1,12 @@
+thing:
+  id: ai-forecasting-benchmark
+  stableId: fNqR8JGdog
+  type: project
+  name: AI Forecasting Benchmark Tournament
+  numericId: E10
+facts:
+  - id: f_2MO1utgRzg
+    property: description
+    value: Quarterly competition run by Metaculus comparing human Pro Forecasters against AI forecasting bots.
+    asOf: 2026-03
+    notes: Migrated from old entity system

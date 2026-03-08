@@ -1,0 +1,14 @@
+thing:
+  id: coding
+  stableId: 64WDhlxxKA
+  type: capability
+  name: Autonomous Coding
+  numericId: E61
+facts:
+  - id: f_efSuCb0t2w
+    property: description
+    value: The ability of AI systems to write, analyze, debug, and generate software code across multiple programming
+      languages and problem domains. Coding capability has advanced significantly, with frontier models now able to
+      solve complex programming challenges, contribute to real codebases, and automate software development workflows.
+    asOf: 2026-03
+    notes: Migrated from old entity system

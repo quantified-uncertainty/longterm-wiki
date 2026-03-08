@@ -1,0 +1,12 @@
+thing:
+  id: superintelligence
+  stableId: 3fyHbDnHIQ
+  type: concept
+  name: Superintelligence
+  numericId: E291
+facts:
+  - id: f_rtGiz6tnlQ
+    property: description
+    value: Hypothetical AI systems with cognitive abilities vastly exceeding those of humans across virtually all domains.
+    asOf: 2026-03
+    notes: Migrated from old entity system

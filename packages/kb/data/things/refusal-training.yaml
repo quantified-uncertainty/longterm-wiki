@@ -1,0 +1,14 @@
+thing:
+  id: refusal-training
+  stableId: wPEnPRTQVQ
+  type: approach
+  name: Refusal Training
+  numericId: E456
+facts:
+  - id: f_vVwMulR1nw
+    property: description
+    value: Refusal training teaches AI models to decline harmful requests rather than comply. While universally deployed and
+      achieving 99%+ refusal rates on explicit violations, jailbreak techniques bypass defenses with 1.5-6.5% success
+      rates, and over-refusal blocks 12-43% of legitimate queries.
+    asOf: 2026-03
+    notes: Migrated from old entity system

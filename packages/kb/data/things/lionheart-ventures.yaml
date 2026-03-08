@@ -1,0 +1,14 @@
+thing:
+  id: lionheart-ventures
+  stableId: fACyX00cnQ
+  type: organization
+  name: Lionheart Ventures
+  numericId: E541
+facts:
+  - id: f_amwoW75Tjg
+    property: description
+    value: Lionheart Ventures is a small venture capital firm ($25M inaugural fund) focused on AI safety and mental health
+      investments, notable for its investment in Anthropic and integration with the EA community through advisors and
+      personnel. The firm represents an interesting model of for-profit AI safety
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: steganography
+  stableId: 5dNWb70CDA
+  type: risk
+  name: AI Model Steganography
+  numericId: E603
+facts:
+  - id: f_FYR7dj9zBA
+    property: description
+    value: Comprehensive analysis of AI steganography risks - systems hiding information in outputs to enable covert
+      coordination or evade oversight. GPT-4 class models encode 3-5 bits/KB with under 30% human detection rates.
+      NeurIPS 2024 research achieved information-theoretically undetectable channels; LASR
+    asOf: 2026-03
+    notes: Migrated from old entity system

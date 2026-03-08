@@ -1,0 +1,14 @@
+thing:
+  id: schmidt-futures
+  stableId: h6ntSGk8fg
+  type: organization
+  name: Schmidt Futures
+  numericId: E561
+facts:
+  - id: f_gvxwABjqxA
+    property: description
+    value: Schmidt Futures is a major philanthropic initiative founded by Eric Schmidt that has committed substantial
+      funding to AI safety research ($135M across AI2050 and AI Safety Science programs) while also supporting talent
+      development and scientific research across multiple domains. The organization has
+    asOf: 2026-03
+    notes: Migrated from old entity system

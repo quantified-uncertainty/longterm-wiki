@@ -1,0 +1,14 @@
+thing:
+  id: voluntary-commitments
+  stableId: ZXvLxl4RMw
+  type: policy
+  name: Voluntary AI Safety Commitments
+  numericId: E369
+facts:
+  - id: f_q1qmuJUkxA
+    property: description
+    value: In July 2023, the White House secured voluntary commitments from leading AI companies on safety, security, and
+      trust. These commitments represent the first coordinated industry-wide AI safety pledges, establishing baseline
+      practices for frontier AI development.
+    asOf: 2026-03
+    notes: Migrated from old entity system

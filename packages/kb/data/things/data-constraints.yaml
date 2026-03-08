@@ -1,0 +1,12 @@
+thing:
+  id: data-constraints
+  stableId: HLakK5zplg
+  type: concept
+  name: AI Training Data Constraints
+  numericId: E92
+facts:
+  - id: f_ammPYMAfIg
+    property: description
+    value: Limitations on AI training due to availability, quality, or accessibility of training data.
+    asOf: 2026-03
+    notes: Migrated from old entity system

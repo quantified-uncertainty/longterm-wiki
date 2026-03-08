@@ -17,3 +17,5 @@ export {
   formatItemEntry,
   resolveRefName,
 } from "./format";
+export { CURRENCIES, resolveCurrency, isCurrencyCode } from "./currencies";
+export type { CurrencyFormat } from "./currencies";

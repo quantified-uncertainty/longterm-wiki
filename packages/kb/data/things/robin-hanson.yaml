@@ -1,0 +1,13 @@
+thing:
+  id: robin-hanson
+  stableId: DmGXPl1h2g
+  type: person
+  name: Robin Hanson
+  numericId: E260
+facts:
+  - id: f_Gtl0JxK7MQ
+    property: description
+    value: Economist and futurist at George Mason University, known for work on prediction markets, near-term AI economics,
+      and the Em scenario (brain emulation). Author of The Age of Em and co-author of The Elephant in the Brain.
+    asOf: 2026-03
+    notes: Migrated from old entity system

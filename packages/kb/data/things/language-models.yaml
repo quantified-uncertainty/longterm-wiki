@@ -1,0 +1,14 @@
+thing:
+  id: language-models
+  stableId: MznJisvptw
+  type: capability
+  name: Large Language Models
+  numericId: E186
+facts:
+  - id: f_EWNGEbX6jA
+    property: description
+    value: Large Language Models (LLMs) are neural networks trained on vast amounts of text data to predict the next token.
+      Despite this simple objective, they develop sophisticated capabilities including reasoning, coding, and general
+      knowledge.
+    asOf: 2026-03
+    notes: Migrated from old entity system

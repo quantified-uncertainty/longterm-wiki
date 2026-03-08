@@ -1,0 +1,12 @@
+thing:
+  id: squiggleai
+  stableId: 8slnDr4emg
+  type: project
+  name: SquiggleAI
+  numericId: E287
+facts:
+  - id: f_KaC6RqSuIw
+    property: description
+    value: LLM-powered tool for generating probabilistic models in Squiggle from natural language descriptions.
+    asOf: 2026-03
+    notes: Migrated from old entity system

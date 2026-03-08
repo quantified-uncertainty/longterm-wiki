@@ -1,0 +1,21 @@
+thing:
+  id: nick-beckstead
+  stableId: licWPlOJMg
+  type: person
+  name: Nick Beckstead
+  numericId: E861
+facts:
+  - id: f_NwIcIbqfqQ
+    property: description
+    value: Nick Beckstead is a philosopher and philanthropist who completed his PhD at Rutgers University in 2013 with a
+      dissertation arguing for the overwhelming importance of shaping the far future—one of the first rigorous academic
+      defenses of longtermism. He served as a program officer at Open Philanthropy, where he managed a substantial
+      longtermism portfolio focusing on existential risk reduction and global catastrophic risk. He later became a
+      founding team member of the FTX Future Fund before its collapse in November 2022 when FTX filed for bankruptcy. He
+      subsequently founded the Secure AI Project, a policy advocacy organization focused on legislative requirements for
+      AI safety protocols and whistleblower protections.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_9EOQ53N4Gg
+    property: website
+    value: https://www.nickbeckstead.com/

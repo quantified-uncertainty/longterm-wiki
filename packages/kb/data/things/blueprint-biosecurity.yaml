@@ -1,0 +1,14 @@
+thing:
+  id: blueprint-biosecurity
+  stableId: lZRKSfs5wg
+  type: organization
+  name: Blueprint Biosecurity
+  numericId: E515
+facts:
+  - id: f_KviVbST13g
+    property: description
+    value: An EA-funded biosecurity nonprofit founded in 2023 by Jake Swett, dedicated to achieving breakthroughs in
+      pandemic prevention through far-UVC germicidal light, next-generation PPE, and glycol vapor air disinfection.
+      Funded primarily by Open Philanthropy (~$1.85M) and recommended by Founders Pledge.
+    asOf: 2026-03
+    notes: Migrated from old entity system

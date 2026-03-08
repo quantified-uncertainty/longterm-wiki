@@ -1,0 +1,14 @@
+thing:
+  id: whistleblower-protections
+  stableId: nvyazaJFew
+  type: policy
+  name: AI Whistleblower Protections
+  numericId: E475
+facts:
+  - id: f_9kQI00Ihkw
+    property: description
+    value: Legal and institutional frameworks for protecting AI researchers and employees who report safety concerns. The
+      bipartisan AI Whistleblower Protection Act (S.1792) introduced May 2025 addresses critical gaps in current law,
+      while EU AI Act Article 87 provides protections from August 2026.
+    asOf: 2026-03
+    notes: Migrated from old entity system

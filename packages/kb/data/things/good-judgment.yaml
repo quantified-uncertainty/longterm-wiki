@@ -1,0 +1,14 @@
+thing:
+  id: good-judgment
+  stableId: Zx7ckq6syw
+  type: organization
+  name: Good Judgment (Forecasting)
+  numericId: E532
+facts:
+  - id: f_GlDCNPXumA
+    property: description
+    value: Good Judgment Inc. is a commercial forecasting organization that emerged from successful IARPA research,
+      demonstrating that trained 'superforecasters' can outperform intelligence analysts and prediction markets by
+      30-72%. While not directly focused on AI safety, their methodology for identifying for
+    asOf: 2026-03
+    notes: Migrated from old entity system
