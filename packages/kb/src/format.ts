@@ -90,6 +90,17 @@ export function formatFactValue(
     return formatValue(val.value, property);
   }
 
+  if (val.type === "range") {
+    const lowStr = formatValue(val.low, property);
+    const highStr = formatValue(val.high, property);
+    return `${lowStr}\u2013${highStr}`;
+  }
+
+  if (val.type === "min") {
+    const valStr = formatValue(val.value, property);
+    return `\u2265${valStr}`;
+  }
+
   return String(val.value);
 }
 

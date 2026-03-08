@@ -12,6 +12,8 @@ export type FactValue =
   | { type: "boolean"; value: boolean }
   | { type: "ref"; value: string }
   | { type: "refs"; value: string[] }
+  | { type: "range"; low: number; high: number; unit?: string }
+  | { type: "min"; value: number; unit?: string }
   | { type: "json"; value: unknown };
 
 // ── Entity ──────────────────────────────────────────────────────────

@@ -744,6 +744,59 @@ function _padDateForFutureCheck(dateStr: string): string {
   return dateStr;
 }
 
+/** Check 23: range/min value integrity — validate numeric bounds. */
+function checkRangeValues(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  for (const fact of facts) {
+    const v = fact.value;
+
+    if (v.type === "range") {
+      if (!Number.isFinite(v.low) || !Number.isFinite(v.high)) {
+        results.push({
+          severity: "error",
+          entityId,
+          propertyId: fact.propertyId,
+          message:
+            `Fact "${fact.id}" on "${entityId}": range values must be finite numbers ` +
+            `(got low=${v.low}, high=${v.high}).`,
+          rule: "range-value",
+        });
+      } else if (v.low >= v.high) {
+        results.push({
+          severity: "error",
+          entityId,
+          propertyId: fact.propertyId,
+          message:
+            `Fact "${fact.id}" on "${entityId}": range low (${v.low}) must be less ` +
+            `than high (${v.high}).`,
+          rule: "range-value",
+        });
+      }
+    }
+
+    if (v.type === "min") {
+      if (!Number.isFinite(v.value)) {
+        results.push({
+          severity: "error",
+          entityId,
+          propertyId: fact.propertyId,
+          message:
+            `Fact "${fact.id}" on "${entityId}": min value must be a finite number ` +
+            `(got ${v.value}).`,
+          rule: "range-value",
+        });
+      }
+    }
+  }
+
+  return results;
+}
+
 /** Check 21: orphan entity — no facts and no items. */
 function checkOrphanEntity(
   graph: Graph,
@@ -892,6 +945,7 @@ export function validateEntity(
     ...checkDateFormat(graph, entityId),
     ...checkFutureDate(graph, entityId),
     ...checkOrphanEntity(graph, entityId),
+    ...checkRangeValues(graph, entityId),
   ];
 
   const schema = graph.getSchema(entity.type);
