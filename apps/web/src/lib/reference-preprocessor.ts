@@ -212,7 +212,7 @@ export function preprocessReferences(
         data = claimData;
         definitionText = buildClaimFootnote(claimData);
       } else {
-        definitionText = `Claim reference ${refId} (data unavailable)`;
+        definitionText = `Claim reference ${refId} (data unavailable — rebuild with wiki-server access)`;
       }
     } else {
       kind = "citation";
@@ -221,7 +221,7 @@ export function preprocessReferences(
         data = citData;
         definitionText = buildCitationFootnote(citData);
       } else {
-        definitionText = `Citation ${refId} (data unavailable)`;
+        definitionText = `Citation ${refId} (data unavailable — rebuild with wiki-server access)`;
       }
     }
 
