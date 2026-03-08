@@ -1,0 +1,27 @@
+entity: japan-aisi
+facts:
+
+  # annual-budget
+  d4f8b2a6:
+    label: "Japan AISI initial allocation"
+    measure: annual-budget
+    value: 13000000
+    asOf: "2024-02"
+    note: "Initial allocation of ¥2B (~$13M USD) from Ministry of Economy, Trade and Industry (METI). Converted at ~¥154/$"
+    source: https://www.meti.go.jp/english/
+
+  # headcount
+  e1c7d3f5:
+    label: "Japan AISI staff"
+    measure: headcount
+    value: 30
+    asOf: "2024-12"
+    note: "Approximately 30 staff; focused on standards research and evaluation frameworks"
+
+  # founded-date
+  a6b9e2c8:
+    label: "Japan AISI established under METI"
+    measure: founded-date
+    value: "2024-02"
+    asOf: "2024-02"
+    note: "Established under the Ministry of Economy, Trade and Industry (METI)"

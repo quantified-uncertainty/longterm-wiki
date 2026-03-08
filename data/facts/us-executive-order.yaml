@@ -1,86 +1,67 @@
 entity: us-executive-order
 facts:
 
-  # aisi-budget-fy2024
-  a1e3b7c9:
-    label: "AISI initial budget (FY2024)"
-    measure: government-budget
-    value: 10000000
-    asOf: "2024-03"
-    note: "Initial allocation to US AI Safety Institute at NIST"
-    source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+  # === Policy Metadata ===
 
-  # aisi-actual-available
-  b2f4c8d0:
-    label: "AISI actual available funding"
-    measure: government-budget
-    value: 1000000
-    asOf: "2024-05"
-    note: "NIST Director Laurie Locascio warned only $1M was actually available; stated it would be 'very, very tough' to continue operations"
-    source: https://fedscoop.com/nist-budget-cuts-ai-safety-institute/
+  # signed
+  a1b2c3d4:
+    measure: signed-date
+    value: "2023-10-30"
+    asOf: "2023-10"
+    note: "Signed by President Biden. Full title: 'Executive Order on the Safe, Secure, and Trustworthy Development and Use of Artificial Intelligence' (EO 14110)"
+    source: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
 
-  # aisi-budget-request-fy2025
-  c3a5d9e1:
-    label: "AISI budget request (FY2025)"
-    measure: government-budget
-    value: 47700000
-    asOf: "2024-03"
-    note: "Biden administration requested $47.7M for AISI in FY2025 budget; not fulfilled before revocation"
-    source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+  # revoked
+  e5f6a7b8:
+    measure: revoked-date
+    value: "2025-01-20"
+    asOf: "2025-01"
+    note: "Revoked by President Trump on his first day in office via EO 14179 ('Removing Barriers to American Leadership in Artificial Intelligence')"
+    source: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
 
-  # aisi-headcount
-  d4b6e0f2:
-    label: "AISI estimated staff"
-    measure: headcount
-    value: 50
-    asOf: "2024-12"
-    note: "Estimated ~50 staff; well below the 200+ personnel estimated for full capacity"
-    source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+  # signer
+  c9d0e1f2:
+    measure: signer
+    value: joe-biden
+    asOf: "2023-10"
 
-  # aisic-consortium-members
-  e5c7f1a3:
-    label: "AISIC consortium member organizations"
+  # word-count
+  a3b4c5d6:
+    label: "EO 14110 word count"
+    measure: word-count
+    value: 30000
+    asOf: "2023-10"
+    note: "Approximately 30,000 words across 8 policy sections; longest AI policy document issued by any government at time of signing"
+    source: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+
+  # duration
+  f8d0a4b6:
+    label: "Duration in effect (days)"
     measure: generic-count
-    value: 200
-    asOf: "2024-02"
-    note: "AI Safety Institute Consortium (AISIC) launched with 200+ member organizations including AI labs, academia, and civil society"
-    source: https://www.nist.gov/artificial-intelligence/artificial-intelligence-safety-institute
+    value: 448
+    asOf: "2025-01"
+    note: "In effect for 448 days (Oct 30, 2023 to Jan 20, 2025)"
+    noCompute: true
+
+  # === Scope & Requirements ===
 
   # total-requirements
   f6d8a2b4:
-    label: "Total EO requirements"
+    label: "Total requirements"
     measure: generic-count
     value: 150
     asOf: "2023-10"
-    note: "150+ specific requirements placed on 50+ federal entities; most detailed AI policy directive ever issued by any government"
+    note: "150+ specific requirements; most detailed AI policy directive ever issued by any government"
     source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
 
   # federal-entities-assigned
   a7e9b3c5:
-    label: "Federal entities with assigned requirements"
+    label: "Federal entities assigned"
     measure: generic-count
     value: 50
     asOf: "2023-10"
-    note: "Over 50 federal agencies given specific responsibilities under the order"
+    note: "Over 50 federal agencies given specific responsibilities"
     source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
-
-  # completion-rate
-  b8f0c4d6:
-    label: "Requirements completion rate at revocation"
-    measure: implementation-rate
-    value: 85
-    asOf: "2025-01"
-    note: "Approximately 85% of 150 requirements completed before revocation on Jan 20, 2025"
-    source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
-
-  # management-requirements-completion
-  c9a1d5e7:
-    label: "Management requirements fully implemented"
-    measure: generic-count
-    value: 13
-    asOf: "2024-03"
-    note: "13 of 13 AI management and talent requirements fully implemented per GAO assessment"
-    source: https://www.gao.gov/products/gao-24-107332
 
   # companies-affected
   d0b2e6f8:
@@ -91,45 +72,69 @@ facts:
     note: "BIS assessed no more than 15 companies exceeded reporting thresholds for models and computing clusters"
     source: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
 
+  # === Compute Thresholds ===
+
   # compute-threshold-general
   e1c3f7a9:
-    label: "General compute reporting threshold"
+    label: "General model threshold"
     measure: compute-flops
     value: 1e26
     asOf: "2023-10"
-    note: "10^26 FLOP threshold for dual-use foundation models; invoked Defense Production Act for mandatory reporting. No model ever triggered this threshold before revocation."
+    note: "10^26 FLOP for dual-use foundation models; invoked Defense Production Act for mandatory reporting. No model triggered this threshold before revocation."
     source: https://www.federalregister.gov/documents/2023/11/01/2023-24283/safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence
     noCompute: true
 
   # compute-threshold-biological
   f2d4a8b0:
-    label: "Biological model compute threshold"
+    label: "Biological model threshold"
     measure: compute-flops
     value: 1e23
     asOf: "2023-10"
-    note: "10^23 FLOP threshold for biological sequence models; 1,000x lower than general threshold, reflecting concern about bioweapon design at lower compute scales"
+    note: "10^23 FLOP for biological sequence models; 1,000x lower than general threshold, reflecting bioweapon design concerns"
     source: https://www.federalregister.gov/documents/2023/11/01/2023-24283/safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence
     noCompute: true
 
-  # public-support-polling
+  # === Implementation Progress ===
+
+  # completion-at-revocation
+  b8f0c4d6:
+    label: "Completion rate at revocation"
+    measure: completion-rate
+    value: 85
+    asOf: "2025-01"
+    note: "~85% of 150+ requirements completed before revocation on Jan 20, 2025"
+    source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+
+  # 90-day-requirements-due
+  b4f6c0d2:
+    label: "Requirements due at 90 days"
+    measure: generic-count
+    value: 21
+    asOf: "2024-01"
+    note: "21 requirements had 90-day deadlines; 19 showed progress (90%), 11 fully implemented (52%)"
+    source: https://hai.stanford.edu/news/transparency-ai-eo-implementation-assessment-90-days
+
+  # management-requirements
+  c9a1d5e7:
+    label: "Management requirements completed"
+    measure: generic-count
+    value: 13
+    asOf: "2024-03"
+    note: "13 of 13 AI management and talent requirements fully implemented per GAO assessment"
+    source: https://www.gao.gov/products/gao-24-107332
+
+  # === Public & Legislative Response ===
+
+  # public-support
   a3e5b9c1:
-    label: "Public support for EO 14110"
+    label: "Public support"
     measure: public-approval
     value: 69
     asOf: "2023-11"
     note: "AI Policy Institute poll: 69% of voters supported the EO (78% Democrats, 65% independents, 64% Republicans)"
     source: https://theaipi.org/poll-reveals-bipartisan-support-for-ai-executive-order/
 
-  # 90-day-implementation-rate
-  b4f6c0d2:
-    label: "90-day requirements showing progress"
-    measure: implementation-rate
-    value: 90
-    asOf: "2024-01"
-    note: "Stanford HAI tracker: 19 of 21 requirements due at 90 days showed implementation progress (90%); 11 fully implemented (52%)"
-    source: https://hai.stanford.edu/news/transparency-ai-eo-implementation-assessment-90-days
-
-  # state-ai-bills-2024
+  # state-ai-bills
   c5a7d1e3:
     label: "State AI bills proposed (2024)"
     measure: legislation-count
@@ -138,7 +143,7 @@ facts:
     note: "629 state AI bills proposed in 2024, up from ~300 in 2023 (+110%); 131 passed (+162% from ~50)"
     source: https://hai.stanford.edu/ai-index/2025-ai-index-report/policy-and-governance
 
-  # federal-regulations-2024
+  # federal-regulations
   d6b8e2f4:
     label: "Federal AI regulations issued (2024)"
     measure: legislation-count
@@ -147,30 +152,11 @@ facts:
     note: "59 federal AI regulations in 2024, up from 25 in 2023 (+136%); issued by 42 agencies (up from 21)"
     source: https://hai.stanford.edu/ai-index/2025-ai-index-report/policy-and-governance
 
-  # uk-aisi-budget-comparison
-  e7c9f3a5:
-    label: "UK AISI budget (3-year commitment)"
-    measure: government-budget
-    value: 125000000
-    asOf: "2023-11"
-    note: "UK AI Safety Institute received £100M (~$125M) over 3 years with 100+ staff; contrasts with US AISI's $10M and ~50 staff"
-    source: https://www.gov.uk/government/news/prime-minister-launches-new-ai-safety-institute
-    noCompute: true
-
-  # order-duration-days
-  f8d0a4b6:
-    label: "Duration of EO 14110 (days)"
-    measure: generic-count
-    value: 448
-    asOf: "2025-01"
-    note: "EO 14110 was in effect for 448 days (Oct 30, 2023 to Jan 20, 2025) before being revoked by President Trump on his first day in office"
-    noCompute: true
-
   # ai-action-plan-comments
   a9e1b5c7:
-    label: "Public comments on Trump AI Action Plan"
+    label: "Comments on successor AI Action Plan"
     measure: generic-count
     value: 10000
     asOf: "2025-07"
-    note: "Over 10,000 public comments received on the AI Action Plan mandated by EO 14179; plan released July 23, 2025 with 90 policy positions"
+    note: "Over 10,000 public comments on the AI Action Plan mandated by Trump's EO 14179; plan released July 23, 2025 with 90 policy positions"
     source: https://hai.stanford.edu/ai-index/2025-ai-index-report/policy-and-governance

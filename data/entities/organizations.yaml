@@ -860,6 +860,79 @@
     - regulatory-capture
     - standard-setting
   lastUpdated: 2025-12
+- id: japan-aisi
+  numericId: E1013
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: Japan AI Safety Institute
+  description: >-
+    Japan's national AI safety institute, established in February 2024 under the Ministry of Economy, Trade and
+    Industry (METI). Focuses on AI standards research and evaluation frameworks. Part of the international AISI
+    network established through the Seoul Declaration.
+  relatedEntries:
+    - id: us-aisi
+      type: organization
+    - id: uk-aisi
+      type: organization
+    - id: ai-safety-institutes
+      type: policy
+  lastUpdated: 2026-03
+- id: singapore-aisi
+  numericId: E1014
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: Singapore AI Safety Institute
+  description: >-
+    Singapore's national AI safety testing institute, established in February 2024 under the Infocomm Media
+    Development Authority (IMDA). Focuses on testing frameworks and regional AI safety coordination in Southeast
+    Asia.
+  relatedEntries:
+    - id: us-aisi
+      type: organization
+    - id: uk-aisi
+      type: organization
+    - id: ai-safety-institutes
+      type: policy
+  lastUpdated: 2026-03
+- id: canada-aisi
+  numericId: E1015
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: Canadian AI Safety Institute
+  description: >-
+    Canada's national AI safety institute, launched in November 2024 at the San Francisco AI Safety Summit.
+    Received C\$50M (\$37M USD) in initial pledged funding from the Canadian government.
+  relatedEntries:
+    - id: us-aisi
+      type: organization
+    - id: uk-aisi
+      type: organization
+    - id: ai-safety-institutes
+      type: policy
+  lastUpdated: 2026-03
+- id: eu-ai-office
+  numericId: E1016
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: EU AI Office
+  description: >-
+    The European Commission's dedicated office for AI governance, established in February 2024. Responsible for
+    enforcing the EU AI Act, developing standards and codes of practice, and coordinating EU-wide AI policy.
+    Operates within the European Commission budget with approximately 140 staff.
+  relatedEntries:
+    - id: eu-ai-act
+      type: policy
+    - id: uk-aisi
+      type: organization
+    - id: us-aisi
+      type: organization
+    - id: ai-safety-institutes
+      type: policy
+  lastUpdated: 2026-03
 - id: arc-evals
   numericId: E26
   type: organization
