@@ -614,7 +614,7 @@ async function main() {
           // Look up URL from wiki-server page_citations table (rc-XXXX → URL)
           const pageCit = citationUrlMap.get(ref);
           return {
-            resourceId: null,
+            resourceId: pageCit?.resourceId ?? null,
             url: pageCit?.url ?? null,
             sourceQuote: null,
             locationNote: `footnote: ${ref}`,
