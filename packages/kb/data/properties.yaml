@@ -431,6 +431,17 @@ properties:
       divisor: 1e9
       suffix: "B"
 
+  gpu-count:
+    name: GPU Count
+    description: "Number of GPUs in a compute cluster or available for training/inference"
+    dataType: number
+    unit: GPUs
+    category: product
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: " GPUs"
+
   benchmark-score:
     name: Benchmark Score
     description: "Performance score on a specific benchmark"
