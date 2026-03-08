@@ -65,11 +65,19 @@ export function isAutoUpdateAllowedFile(path: string): boolean {
 // ── Git helpers ──────────────────────────────────────────────────────────────
 
 function git(args: string[]): string {
-  return execFileSync('git', args, {
-    cwd: PROJECT_ROOT,
-    encoding: 'utf-8',
-    stdio: ['pipe', 'pipe', 'pipe'],
-  }).trim();
+  try {
+    return execFileSync('git', args, {
+      cwd: PROJECT_ROOT,
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
+  } catch (err: unknown) {
+    // execFileSync wraps the error but stderr is on err.stderr
+    const e = err as { stderr?: string; message?: string };
+    const stderr = typeof e.stderr === 'string' ? e.stderr.trim() : '';
+    const detail = stderr || e.message || String(err);
+    throw new Error(`git ${args[0]} failed: ${detail}`);
+  }
 }
 
 function configBotUser(): void {
@@ -542,7 +550,15 @@ export async function orchestrateCiAutoUpdate(
 
   const commitMsg = `auto-update: ${date} daily wiki refresh\n\nAutomated news-driven wiki update.\nRun report: ${reportPath || 'N/A'}`;
   git(['commit', '-m', commitMsg]);
-  git(['push', '-u', 'origin', branch]);
+
+  // Use --force-with-lease for same-day re-runs where the remote branch may
+  // already exist from a prior failed attempt.
+  try {
+    git(['push', '-u', 'origin', branch]);
+  } catch {
+    console.log('Standard push failed, retrying with --force-with-lease (same-day re-run)');
+    git(['push', '--force-with-lease', '-u', 'origin', branch]);
+  }
   console.log(`Pushed to origin/${branch}`);
 
   // ── Step 12: Create or update PR ──
