@@ -19,7 +19,7 @@ interface StatementsClientProps {
   entitySlug: string;
 }
 
-type StatusFilter = "active" | "superseded" | "retracted";
+type StatusFilter = "active" | "superseded";
 
 // ---- Export helpers ----
 
@@ -256,7 +256,7 @@ export function StatementsClient({
         </select>
 
         <div className="flex gap-2 text-xs">
-          {(["active", "superseded", "retracted"] as StatusFilter[]).map(
+          {(["active", "superseded"] as StatusFilter[]).map(
             (status) => (
               <label
                 key={status}

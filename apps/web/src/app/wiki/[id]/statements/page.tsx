@@ -87,9 +87,9 @@ export default async function EntityStatementsPage({ params }: PageProps) {
   const activeStructured = resolvedStructured.filter((s) => s.status === "active");
   const activeAttributed = resolvedAttributed.filter((s) => s.status === "active");
   const activeTotal = activeStructured.length + activeAttributed.length;
-  const retractedCount =
-    resolvedStructured.filter((s) => s.status === "retracted").length +
-    resolvedAttributed.filter((s) => s.status === "retracted").length;
+  const supersededCount =
+    resolvedStructured.filter((s) => s.status === "superseded").length +
+    resolvedAttributed.filter((s) => s.status === "superseded").length;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
@@ -123,7 +123,7 @@ export default async function EntityStatementsPage({ params }: PageProps) {
         <StatCard label="Active" value={activeTotal} />
         <StatCard label="Structured" value={activeStructured.length} color="blue" />
         <StatCard label="Attributed" value={activeAttributed.length} color="amber" />
-        <StatCard label="Retracted" value={retractedCount} color={retractedCount > 0 ? "rose" : undefined} />
+        <StatCard label="Superseded" value={supersededCount} color={supersededCount > 0 ? "amber" : undefined} />
       </div>
 
       {/* Brief intro */}

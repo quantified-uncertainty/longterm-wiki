@@ -184,17 +184,29 @@ export async function patchStatement(
 }
 
 export async function listStatements(
-  opts: { entityId?: string; propertyId?: string; limit?: number; offset?: number } = {},
+  opts: { entityId?: string; propertyId?: string; status?: string; limit?: number; offset?: number } = {},
 ): Promise<ApiResult<ListStatementsResult>> {
   const params = new URLSearchParams();
   if (opts.entityId) params.set('entityId', opts.entityId);
   if (opts.propertyId) params.set('propertyId', opts.propertyId);
+  if (opts.status) params.set('status', opts.status);
   if (opts.limit) params.set('limit', String(opts.limit));
   if (opts.offset) params.set('offset', String(opts.offset));
   const qs = params.toString();
   return apiRequest<ListStatementsResult>(
     'GET',
     `/api/statements${qs ? `?${qs}` : ''}`,
+  );
+}
+
+export async function cleanupStatements(
+  entityId: string,
+  dryRun = true,
+): Promise<ApiResult<{ dryRun: boolean; retracted: number; empty: number; totalToDelete?: number; deleted?: number; ok: boolean }>> {
+  return apiRequest(
+    'POST',
+    '/api/statements/cleanup',
+    { entityId, dryRun },
   );
 }
 
