@@ -13,11 +13,11 @@
  */
 
 import { createHash } from 'crypto';
-import { parseFootnotes } from '../lib/footnote-parser.ts';
-import { createCitationsBatch } from '../lib/wiki-server/references.ts';
-import { isServerAvailable } from '../lib/wiki-server/client.ts';
+import { parseFootnotes } from './footnote-parser.ts';
+import { createCitationsBatch } from './wiki-server/references.ts';
+import { isServerAvailable } from './wiki-server/client.ts';
 import type { PageCitationInsert } from '../../apps/wiki-server/src/api-types.ts';
-import { getResourceByUrl } from '../lib/search/resource-lookup.ts';
+import { getResourceByUrl } from './search/resource-lookup.ts';
 
 // ---------------------------------------------------------------------------
 // Reference ID generation (shared with migrate-footnotes.ts)

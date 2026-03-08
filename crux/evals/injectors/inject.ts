@@ -8,7 +8,6 @@
 import { randomUUID } from 'node:crypto';
 import type { ErrorCategory, ErrorManifest, InjectedError } from '../types.ts';
 import { injectWrongNumbers } from './wrong-numbers.ts';
-import { injectFabricatedClaims } from './fabricated-claims.ts';
 import { injectExaggerations } from './exaggerations.ts';
 import { injectFabricatedCitations } from './fabricated-citations.ts';
 import { injectMissingNuance } from './missing-nuance.ts';
@@ -30,7 +29,6 @@ const DEFAULT_PLAN: Required<InjectionPlan> = {
   errorsPerCategory: 1,
   categories: [
     'wrong-number',
-    'fabricated-claim',
     'exaggeration',
     'fabricated-citation',
     'missing-nuance',
@@ -50,7 +48,6 @@ type Injector = (
 
 const INJECTORS: Partial<Record<ErrorCategory, Injector>> = {
   'wrong-number': injectWrongNumbers,
-  'fabricated-claim': injectFabricatedClaims,
   'exaggeration': injectExaggerations,
   'fabricated-citation': injectFabricatedCitations,
   'missing-nuance': injectMissingNuance,
