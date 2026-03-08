@@ -46,6 +46,7 @@ import {
 } from './scoring.ts';
 import { resolveCoverageTargets } from './coverage-targets.ts';
 import { validateCreateStatementBatch, checkAgainstExisting } from './validate-quality.ts';
+import { getResourceByUrl } from '../lib/search/resource-lookup.ts';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -259,7 +260,7 @@ export function qualityGate(
       status: 'active',
       claimCategory: null,
       citations: gen.citations?.map((c) => ({
-        resourceId: null,
+        resourceId: c.url ? (getResourceByUrl(c.url)?.id ?? null) : null,
         url: c.url ?? null,
         sourceQuote: c.sourceQuote ?? null,
       })),
@@ -316,6 +317,7 @@ export function qualityGate(
       valueDate: normalizeValueDate(gen.valueDate),
       validStart: gen.validStart,
       citations: gen.citations?.map((c) => ({
+        resourceId: c.url ? (getResourceByUrl(c.url)?.id ?? undefined) : undefined,
         url: c.url,
         sourceQuote: c.sourceQuote,
       })),

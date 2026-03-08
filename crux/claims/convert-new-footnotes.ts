@@ -17,6 +17,7 @@ import { parseFootnotes } from '../lib/footnote-parser.ts';
 import { createCitationsBatch } from '../lib/wiki-server/references.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import type { PageCitationInsert } from '../../apps/wiki-server/src/api-types.ts';
+import { getResourceByUrl } from '../lib/search/resource-lookup.ts';
 
 // ---------------------------------------------------------------------------
 // Reference ID generation (shared with migrate-footnotes.ts)
@@ -118,6 +119,7 @@ export async function convertNewFootnotes(
         title: fn.title ?? undefined,
         url: fn.url ?? undefined,
         note: fn.rawText,
+        resourceId: fn.url ? (getResourceByUrl(fn.url)?.id ?? undefined) : undefined,
       }));
 
       if (citationInserts.length > 0) {
@@ -177,12 +179,14 @@ export async function createDbEntriesForRcFootnotes(
     const mdLink = entry.rawText.match(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
     const bareUrl = entry.rawText.match(/(https?:\/\/[^\s,)"']+)/);
 
+    const resolvedUrl = mdLink?.[2] ?? bareUrl?.[1];
     return {
       referenceId: entry.referenceId,
       pageId,
       title: mdLink?.[1] ?? undefined,
-      url: mdLink?.[2] ?? bareUrl?.[1] ?? undefined,
+      url: resolvedUrl ?? undefined,
       note: entry.rawText,
+      resourceId: resolvedUrl ? (getResourceByUrl(resolvedUrl)?.id ?? undefined) : undefined,
     };
   });
 
