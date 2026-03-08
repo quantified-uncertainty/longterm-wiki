@@ -13,7 +13,7 @@
  *                    database.json for local dev but omits dashboard data.
  *   --quick          Alias for --scope=content
  *   --phase=<name>   Run only a specific phase (for debugging). Valid names:
- *                    yaml, ids, mdx, derived, facts, kb, pages, links, blocks,
+ *                    yaml, ids, mdx, derived, kb, pages, links, blocks,
  *                    risk, resources, footnotes, refs, redundancy, graph,
  *                    history, coverage, rankings, schedule, transform, write
 */
@@ -40,7 +40,6 @@ import { computePageCoverage } from '../../../crux/lib/page-coverage.ts';
 import { parseFootnoteSources } from '../../../crux/lib/footnote-parser.ts';
 import { buildIdRegistry, extendIdRegistryWithPages } from './lib/id-registry.mjs';
 import { computePageRankings, computeRecommendedScores, buildUpdateSchedule } from './lib/page-rankings.mjs';
-import { loadFacts, loadFactMeasures, normalizeFactValues, enrichFactSources, buildFactTimeseries } from './lib/facts-loader.mjs';
 import { computeAllHallucinationRisks, syncRiskSnapshots } from './lib/hallucination-risk-build.mjs';
 
 // ---------------------------------------------------------------------------
@@ -202,49 +201,6 @@ function scanContentEntityLinks(pages, entityMap, numericIdToSlug) {
   }
 
   return { inbound, totalLinks };
-}
-
-/**
- * Scan MDX content for <F e="..." f="..."> references.
- * Returns a reverse index: factKey ("entity.factId") -> array of pages using it.
- * Must be called before rawContent is stripped from pages.
- */
-function scanFactUsage(pages) {
-  /** @type {Record<string, {id: string, title: string, path: string}[]>} */
-  const usage = {};
-  let totalRefs = 0;
-
-  for (const page of pages) {
-    if (!page.rawContent) continue;
-
-    // Match both attribute orderings: <F e="x" f="y"> and <F f="y" e="x">
-    const regexEF = /<F\s[^>]*e="([^"]+)"[^>]*f="([^"]+)"/g;
-    const regexFE = /<F\s[^>]*f="([^"]+)"[^>]*e="([^"]+)"/g;
-
-    const seen = new Set();
-
-    let match;
-    while ((match = regexEF.exec(page.rawContent)) !== null) {
-      const key = `${match[1]}.${match[2]}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        if (!usage[key]) usage[key] = [];
-        usage[key].push({ id: page.id, title: page.title, path: page.path || `/${page.id}/` });
-        totalRefs++;
-      }
-    }
-    while ((match = regexFE.exec(page.rawContent)) !== null) {
-      const key = `${match[2]}.${match[1]}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        if (!usage[key]) usage[key] = [];
-        usage[key].push({ id: page.id, title: page.title, path: page.path || `/${page.id}/` });
-        totalRefs++;
-      }
-    }
-  }
-
-  return { usage, totalRefs };
 }
 
 /**
@@ -1284,17 +1240,11 @@ async function main() {
   database.pathRegistry = pathRegistry;
   console.log(`  pathRegistry: ${Object.keys(pathRegistry).length} paths mapped`);
 
-  // Load and process canonical facts (extracted to facts-loader.mjs)
-  const facts = loadFacts(DATA_DIR);
-  const factMeasures = loadFactMeasures(DATA_DIR);
-  database.factMeasures = factMeasures;
-  normalizeFactValues(facts, factMeasures);
-  enrichFactSources(facts, database.resources || [], database.publications || []);
-  database.facts = facts;
-
-  // Build timeseries index
-  const factTimeseries = buildFactTimeseries(facts);
-  database.factTimeseries = factTimeseries;
+  // Old facts pipeline retired — KB is the replacement.
+  // Initialize empty structures for backward compatibility with facts dashboard.
+  database.facts = {};
+  database.factMeasures = {};
+  database.factTimeseries = {};
 
   // Load KB (knowledge base graph) from packages/kb
   const kbDataDir = join(REPO_ROOT, 'packages', 'kb', 'data');
@@ -1386,10 +1336,8 @@ async function main() {
   }
   console.log(`  contentLinks: ${contentLinkCount} EntityLink references scanned, ${contentBacklinksMerged} new backlinks added`);
 
-  // Scan MDX for <F> component usage — build reverse index for the fact dashboard
-  const { usage: factUsage, totalRefs: factRefCount } = scanFactUsage(pages);
-  database.factUsage = factUsage;
-  console.log(`  factUsage: ${factRefCount} <F> references across ${Object.keys(factUsage).length} unique facts`);
+  // Old facts usage scanning retired — KB replaces the <F> component.
+  database.factUsage = {};
 
   // =========================================================================
   // BLOCK-LEVEL IR — extract per-section metadata (entity links, facts,

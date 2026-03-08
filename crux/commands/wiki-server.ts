@@ -22,11 +22,6 @@ const SCRIPTS = {
     description: 'Sync data/entities/*.yaml to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
   },
-  'sync-facts': {
-    script: 'wiki-server/sync-facts.ts',
-    description: 'Sync data/facts/*.yaml to wiki-server',
-    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
-  },
   'sync-session': {
     script: 'wiki-server/sync-session.ts',
     description: 'Sync a single session YAML file to wiki-server',
@@ -75,8 +70,6 @@ Examples:
   crux wiki-server sync-resources            Sync all resources
   crux wiki-server sync-entities             Sync all entities
   crux wiki-server sync-entities --dry-run   Preview entity sync
-  crux wiki-server sync-facts                Sync all facts
-  crux wiki-server sync-facts --dry-run      Preview fact sync
   crux wiki-server sync-session .claude/sessions/2026-02-21_my-branch.yaml
   crux wiki-server sync-sessions           Sync all session logs
   crux wiki-server sync-auto-update-runs   Sync all auto-update runs
