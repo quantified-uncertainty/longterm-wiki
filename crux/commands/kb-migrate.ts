@@ -1,16 +1,3 @@
-/**
- * KB Migrate Command
- *
- * Migrates a single entity from the old data system (data/entities/*.yaml)
- * to the KB package (packages/kb/data/things/*.yaml).
- *
- * Usage:
- *   crux kb migrate <entity-slug> [--dry-run] [--stub-old]
- *
- *   --dry-run    Print the generated YAML without writing any files
- *   --stub-old   After migration, strip the old entity to a minimal stub
- */
-
 import { join, dirname } from 'path';
 import { readFileSync, writeFileSync, existsSync, readdirSync, renameSync } from 'fs';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
