@@ -85,7 +85,7 @@ async function removeLabel(prNum: number, repo: string, label: string): Promise<
   });
 }
 
-// ── Merge queue enqueue ──────────────────────────────────────────────────
+// ── Merge queue queries ──────────────────────────────────────────────────
 
 const ENQUEUE_MUTATION = `mutation($prId: ID!, $expectedHeadOid: GitObjectID) {
   enqueuePullRequestForMerge(input: {
@@ -98,6 +98,27 @@ const ENQUEUE_MUTATION = `mutation($prId: ID!, $expectedHeadOid: GitObjectID) {
     }
   }
 }`;
+
+/** Check whether a PR is currently in the merge queue (read-only). */
+const QUEUE_STATUS_QUERY = `query($prId: ID!) {
+  node(id: $prId) {
+    ... on PullRequest {
+      mergeQueueEntry { id position }
+    }
+  }
+}`;
+
+async function isInMergeQueue(nodeId: string): Promise<boolean> {
+  try {
+    const data = await githubGraphQL<{
+      node: { mergeQueueEntry: { id: string; position: number } | null } | null;
+    }>(QUEUE_STATUS_QUERY, { prId: nodeId });
+    return data.node?.mergeQueueEntry != null;
+  } catch {
+    // If the query fails, assume indeterminate — safer to keep the label
+    return true;
+  }
+}
 
 /**
  * Enqueue a PR into the GitHub merge queue.
@@ -148,7 +169,22 @@ export async function enqueuePr(
     const msg = e instanceof Error ? e.message : String(e);
     log(`✗ Failed to enqueue PR #${candidate.number}: ${msg}`);
 
-    // Remove stage:merging label since enqueue failed
+    // The enqueue may have succeeded despite the thrown error (e.g. transport
+    // error after GitHub accepted the mutation). Check actual queue state
+    // before removing the label to avoid clearing it incorrectly.
+    const actuallyInQueue = await isInMergeQueue(candidate.nodeId);
+    if (actuallyInQueue) {
+      log(`  PR #${candidate.number} is actually in the merge queue — keeping stage:merging label`);
+      appendJsonl(JSONL_FILE, {
+        type: 'merge_result',
+        pr_num: candidate.number,
+        outcome: 'enqueued' as MergeOutcome,
+        reason: `enqueue succeeded despite error: ${msg}`,
+      });
+      return 'enqueued';
+    }
+
+    // Confirmed not in queue — safe to remove label
     await removeLabel(candidate.number, config.repo, LABELS.STAGE_MERGING);
 
     await postEventComment(candidate.number, config.repo, buildEnqueueFailedComment(msg))
@@ -161,5 +197,37 @@ export async function enqueuePr(
       reason: msg,
     });
     return 'error';
+  }
+}
+
+// ── Merge queue reconciliation ───────────────────────────────────────────
+
+/**
+ * Reconcile `stage:merging` labels against actual merge queue state.
+ *
+ * GitHub can eject PRs from the merge queue (CI failure in the merge group,
+ * manual dequeue, base branch changes) without notifying us. This leaves
+ * stale `stage:merging` labels that block both re-enqueuing and auto-rebasing.
+ *
+ * Call this at the start of each cycle to clean up.
+ */
+export async function reconcileMergeQueueLabels(
+  allPrs: Array<{ id: string; number: number; labels: { nodes: Array<{ name: string }> } }>,
+  config: PatrolConfig,
+): Promise<void> {
+  const prsWithMergingLabel = allPrs.filter((pr) =>
+    pr.labels.nodes.some((l) => l.name === LABELS.STAGE_MERGING),
+  );
+
+  if (prsWithMergingLabel.length === 0) return;
+
+  log(`Reconciling ${prsWithMergingLabel.length} PR(s) with stage:merging label...`);
+
+  for (const pr of prsWithMergingLabel) {
+    const inQueue = await isInMergeQueue(pr.id);
+    if (!inQueue) {
+      log(`  PR #${pr.number}: not in merge queue — removing stale stage:merging label`);
+      await removeLabel(pr.number, config.repo, LABELS.STAGE_MERGING);
+    }
   }
 }

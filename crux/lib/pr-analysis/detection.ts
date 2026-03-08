@@ -42,7 +42,7 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
 const SINGLE_PR_QUERY = `query($owner: String!, $name: String!, $number: Int!) {
   repository(owner: $owner, name: $name) {
     pullRequest(number: $number) {
-      number title headRefName headRefOid mergeable isDraft createdAt updatedAt body
+      id number title headRefName headRefOid mergeable isDraft createdAt updatedAt body
       labels(first: 20) { nodes { name } }
       commits(last: 1) { nodes { commit { statusCheckRollup {
         contexts(first: 50) { nodes {
@@ -172,7 +172,7 @@ interface PrFileEntry {
  * Detect file-level overlaps across open PRs. Read-only — returns data,
  * does not post comments or track state. Callers decide what to do with results.
  */
-export async function detectOverlaps(prs: GqlPrNode[], repo?: string): Promise<PrOverlap[]> {
+export async function detectOverlaps(prs: ReadonlyArray<{ number: number }>, repo?: string): Promise<PrOverlap[]> {
   const r = repo ?? REPO;
   const prSubset = prs.slice(0, 20);
   if (prSubset.length < 2) return [];

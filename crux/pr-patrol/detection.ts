@@ -88,23 +88,11 @@ export async function detectPrOverlaps(config: PatrolConfig, prs: DetectedPr[]):
 
   log(`Checking ${Math.min(prs.length, 20)} PRs for file overlaps...`);
 
-  // Use GqlPrNode-shaped objects for the lib function
-  const prNodes: GqlPrNode[] = prs.map((pr) => ({
-    id: '',
-    number: pr.number,
-    title: pr.title,
-    headRefName: pr.branch,
-    headRefOid: '',
-    mergeable: '',
-    isDraft: false,
-    createdAt: pr.createdAt,
-    updatedAt: pr.createdAt,
-    body: null,
-    labels: { nodes: [] },
-    commits: { nodes: [] },
-  }));
-
-  const overlaps = await libDetectOverlaps(prNodes, config.repo);
+  // detectOverlaps only needs { number } — pass narrow objects
+  const overlaps = await libDetectOverlaps(
+    prs.map((pr) => ({ number: pr.number })),
+    config.repo,
+  );
 
   if (overlaps.length === 0) {
     log('  No file overlaps detected');

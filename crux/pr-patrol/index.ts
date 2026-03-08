@@ -93,6 +93,7 @@ import {
   findMergeCandidates as daemonFindMergeCandidates,
   enqueuePr,
   undraftPr,
+  reconcileMergeQueueLabels,
 } from './merge.ts';
 import {
   checkMainBranch as daemonCheckMainBranch,
@@ -214,6 +215,11 @@ async function runCheckCycle(
 
   // 1. Fetch all open PRs (shared between fix and merge phases)
   const allPrs = await daemonFetchOpenPrs(config);
+
+  // 1a. Reconcile stale stage:merging labels against actual merge queue state.
+  // GitHub ejects PRs from the queue (CI failure, manual dequeue) without
+  // notifying us, leaving stale labels that block re-enqueuing and auto-rebase.
+  await reconcileMergeQueueLabels(allPrs, config);
 
   // ── Fix phase ──────────────────────────────────────────────────────
 
