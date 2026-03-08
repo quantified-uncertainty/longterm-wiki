@@ -42,7 +42,6 @@ vi.mock("../auth.js", () => ({
 interface MonitoringScenario {
   // fetchIntegritySummary results
   danglingFacts?: number;
-  danglingClaims?: number;
   danglingSummaries?: number;
   danglingCitations?: number;
   danglingEditLogs?: number;
@@ -77,7 +76,6 @@ interface MonitoringScenario {
 function buildMonitoringDispatch(scenario: MonitoringScenario = {}): SqlDispatcher {
   const {
     danglingFacts = 0,
-    danglingClaims = 0,
     danglingSummaries = 0,
     danglingCitations = 0,
     danglingEditLogs = 0,
@@ -102,16 +100,14 @@ function buildMonitoringDispatch(scenario: MonitoringScenario = {}): SqlDispatch
       return _params.map((p) => ({ id: p }));
     }
 
-    // fetchIntegritySummary — the 5-subquery SELECT
+    // fetchIntegritySummary — the 4-subquery SELECT
     if (
       q.includes("dangling_facts") &&
-      q.includes("dangling_claims") &&
       q.includes("dangling_summaries")
     ) {
       return [
         {
           dangling_facts: danglingFacts,
-          dangling_claims: danglingClaims,
           dangling_summaries: danglingSummaries,
           dangling_citations: danglingCitations,
           dangling_edit_logs: danglingEditLogs,
@@ -204,7 +200,6 @@ describe("GET /api/monitoring/extended — fetchIntegritySummary", () => {
 
     const breakdown = integrity.breakdown as Record<string, number>;
     expect(breakdown.facts).toBe(0);
-    expect(breakdown.claims).toBe(0);
     expect(breakdown.summaries).toBe(0);
     expect(breakdown.citations).toBe(0);
     expect(breakdown.editLogs).toBe(0);
@@ -212,7 +207,7 @@ describe("GET /api/monitoring/extended — fetchIntegritySummary", () => {
 
   it("returns issues_found status when any dangling count is non-zero", async () => {
     const app = await createMonitoringApp(
-      buildMonitoringDispatch({ danglingClaims: 5, danglingFacts: 2 })
+      buildMonitoringDispatch({ danglingFacts: 2 })
     );
 
     const res = await app.request("/api/monitoring/extended");
@@ -220,14 +215,13 @@ describe("GET /api/monitoring/extended — fetchIntegritySummary", () => {
     const integrity = body.integrity as Record<string, unknown>;
 
     expect(integrity.status).toBe("issues_found");
-    expect(integrity.totalDanglingRefs).toBe(7); // 5 + 2
+    expect(integrity.totalDanglingRefs).toBe(2);
   });
 
   it("sums all dangling types into totalDanglingRefs", async () => {
     const app = await createMonitoringApp(
       buildMonitoringDispatch({
         danglingFacts: 1,
-        danglingClaims: 2,
         danglingSummaries: 3,
         danglingCitations: 4,
         danglingEditLogs: 5,
@@ -238,10 +232,9 @@ describe("GET /api/monitoring/extended — fetchIntegritySummary", () => {
     const body = (await res.json()) as Record<string, unknown>;
     const integrity = body.integrity as Record<string, unknown>;
 
-    expect(integrity.totalDanglingRefs).toBe(15); // 1+2+3+4+5
+    expect(integrity.totalDanglingRefs).toBe(13); // 1+3+4+5
     const breakdown = integrity.breakdown as Record<string, number>;
     expect(breakdown.facts).toBe(1);
-    expect(breakdown.claims).toBe(2);
     expect(breakdown.summaries).toBe(3);
     expect(breakdown.citations).toBe(4);
     expect(breakdown.editLogs).toBe(5);
@@ -255,7 +248,6 @@ describe("GET /api/monitoring/extended — fetchIntegritySummary", () => {
     const breakdown = integrity.breakdown as Record<string, unknown>;
 
     expect(breakdown).toHaveProperty("facts");
-    expect(breakdown).toHaveProperty("claims");
     expect(breakdown).toHaveProperty("summaries");
     expect(breakdown).toHaveProperty("citations");
     expect(breakdown).toHaveProperty("editLogs");
