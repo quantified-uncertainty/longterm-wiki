@@ -3,7 +3,7 @@ thing:
   stableId: fFVOuFZCRf
   type: organization
   name: "Manifund"
-  numericId: 1104
+  numericId: E547
 
 facts:
   - id: f_manifund_ai_safety_2025
