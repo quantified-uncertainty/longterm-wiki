@@ -552,6 +552,18 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       log(
         `${cl.red}✗ PR #${pr.number} processing failed${cl.reset} (exit: ${result.exitCode}, ${elapsedS}s)`,
       );
+
+      // Track errors as failures so the PR gets abandoned after repeated failures
+      // (previously missing — errored PRs would retry forever after cooldown expired)
+      const failCount = recordFailure(pr.number);
+      if (failCount >= 2) {
+        reason = `Abandoned after ${failCount} failures (last: exit code ${result.exitCode})`;
+        log(
+          `${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`,
+        );
+        await postEventComment(pr.number, config.repo, buildAbandonmentComment(failCount, pr.issues))
+          .catch((e: unknown) => log(`  Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}`));
+      }
     }
 
     appendJsonl(JSONL_FILE, {
