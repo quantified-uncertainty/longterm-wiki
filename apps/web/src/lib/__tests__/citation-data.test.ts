@@ -182,28 +182,6 @@ describe("getCitationQuotes", () => {
   });
 });
 
-describe("getCitationQuotesByUrl", () => {
-  it("calls the claims by-source-url endpoint (not deprecated citations/quotes-by-url)", async () => {
-    vi.resetModules();
-    const mockFetch = vi.fn().mockResolvedValue({ quotes: [], stats: {} });
-    mockCitationDeps({ fetchFromWikiServer: mockFetch });
-    const mod = await import("../citation-data");
-    await mod.getCitationQuotesByUrl("https://example.com/test");
-    expect(mockFetch).toHaveBeenCalledWith(
-      "/api/claims/by-source-url?url=https%3A%2F%2Fexample.com%2Ftest",
-      { revalidate: 600 }
-    );
-  });
-
-  it("returns null when server is unavailable", async () => {
-    vi.resetModules();
-    mockCitationDeps({ fetchFromWikiServer: vi.fn().mockResolvedValue(null) });
-    const mod = await import("../citation-data");
-    const result = await mod.getCitationQuotesByUrl("https://example.com/test");
-    expect(result).toBeNull();
-  });
-});
-
 describe("isSafeUrl", () => {
   it("allows https URLs", () => {
     expect(isSafeUrl("https://example.com")).toBe(true);

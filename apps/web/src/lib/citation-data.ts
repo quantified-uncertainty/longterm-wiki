@@ -1,8 +1,4 @@
-import { fetchFromWikiServer } from "./wiki-server";
 import { getLocalCitationQuotes } from "@/data";
-import type {
-  ClaimsBySourceUrlResult,
-} from "@wiki-server/api-response-types";
 import type {
   AccuracyVerdict,
 } from "@wiki-server/api-types";
@@ -116,27 +112,10 @@ function getLocalCitationQuotesForPage(pageId: string): CitationQuote[] {
     }));
 }
 
-/** Citation quote with page context — returned by by-source-url endpoint */
+/** Citation quote with page context */
 export interface CrossPageCitationQuote extends CitationQuote {
   pageId: string;
 }
-
-/**
- * Fetch all claims across all pages for a given source URL.
- * Used by /source/[id] pages to show cross-page citation data.
- *
- * Reads from the claims system via the /api/claims/by-source-url endpoint,
- * which replaced the deprecated /api/citations/quotes-by-url endpoint (#1311).
- */
-export async function getCitationQuotesByUrl(
-  url: string
-): Promise<ClaimsBySourceUrlResult | null> {
-  return fetchFromWikiServer<ClaimsBySourceUrlResult>(
-    `/api/claims/by-source-url?url=${encodeURIComponent(url)}`,
-    { revalidate: 600 }
-  );
-}
-
 
 /**
  * Computes a summary of citation health from the quotes array.
