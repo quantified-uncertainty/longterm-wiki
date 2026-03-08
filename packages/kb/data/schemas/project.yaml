@@ -7,6 +7,11 @@ required: []
 recommended:
   - description
   - developed-by
+  - project-status
+  - project-type
+  - launched-date
+  - website
+  - related-risks
 
 items:
   milestones:
@@ -24,3 +29,12 @@ items:
       role: { type: text, description: "Their role or contribution" }
       source: { type: text, description: "URL confirming the contribution" }
       notes: { type: text, description: "Context about their involvement" }
+
+  releases:
+    description: "Major releases or versions of this project"
+    fields:
+      version: { type: text, required: true, description: "Version number or release name" }
+      date: { type: date, required: true, description: "Release date (YYYY-MM or YYYY-MM-DD)" }
+      description: { type: text, description: "What was new in this release" }
+      source: { type: text, description: "URL to release notes or announcement" }
+      notes: { type: text, description: "Significance or adoption impact" }
