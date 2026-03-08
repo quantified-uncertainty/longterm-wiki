@@ -27,8 +27,8 @@ export interface IssueBudget {
 
 const ISSUE_BUDGETS: Record<PrIssueType, IssueBudget> = {
   conflict:            { maxTurns: 40, timeoutMinutes: 30 },
-  'ci-failure':        { maxTurns: 25, timeoutMinutes: 15 },
-  'bot-review-major':  { maxTurns: 25, timeoutMinutes: 15 },
+  'ci-failure':        { maxTurns: 35, timeoutMinutes: 20 },
+  'bot-review-major':  { maxTurns: 35, timeoutMinutes: 20 },
   'missing-issue-ref': { maxTurns: 5,  timeoutMinutes: 3 },
   stale:               { maxTurns: 10, timeoutMinutes: 5 },
   'missing-testplan':  { maxTurns: 8,  timeoutMinutes: 5 },

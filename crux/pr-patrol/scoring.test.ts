@@ -76,8 +76,8 @@ describe('computeBudget', () => {
 
   it('gives medium budget for ci-failure', () => {
     const budget = computeBudget(['ci-failure']);
-    expect(budget.maxTurns).toBe(25);
-    expect(budget.timeoutMinutes).toBe(15);
+    expect(budget.maxTurns).toBe(35);
+    expect(budget.timeoutMinutes).toBe(20);
   });
 
   it('gives full budget for conflict', () => {
@@ -88,8 +88,8 @@ describe('computeBudget', () => {
 
   it('uses highest budget when multiple issues present', () => {
     const budget = computeBudget(['missing-issue-ref', 'ci-failure']);
-    expect(budget.maxTurns).toBe(25);
-    expect(budget.timeoutMinutes).toBe(15);
+    expect(budget.maxTurns).toBe(35);
+    expect(budget.timeoutMinutes).toBe(20);
   });
 
   it('conflict dominates when mixed with smaller issues', () => {
@@ -100,8 +100,8 @@ describe('computeBudget', () => {
 
   it('gives medium budget for bot-review-major', () => {
     const budget = computeBudget(['bot-review-major']);
-    expect(budget.maxTurns).toBe(25);
-    expect(budget.timeoutMinutes).toBe(15);
+    expect(budget.maxTurns).toBe(35);
+    expect(budget.timeoutMinutes).toBe(20);
   });
 
   it('gives small budget for bot-review-nitpick', () => {

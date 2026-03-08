@@ -147,9 +147,14 @@ async function mergeStatus(
 
   const lines: string[] = [`PRs labeled \`${LABELS.STAGE_APPROVED}\`:\n`];
   for (const c of candidates) {
-    const s = c.eligible
-      ? '\u2713 ELIGIBLE'
-      : `\u2717 BLOCKED (${c.blockReasons.join(', ')})`;
+    let s: string;
+    if (c.blockReasons.includes('in-merge-queue')) {
+      s = '\u23F3 IN QUEUE';
+    } else if (c.eligible) {
+      s = '\u2713 ELIGIBLE';
+    } else {
+      s = `\u2717 BLOCKED (${c.blockReasons.join(', ')})`;
+    }
     lines.push(`  PR #${c.number}: ${s} \u2014 ${c.title}`);
   }
 
@@ -184,7 +189,7 @@ Status/History Options:
   --count=N        Number of entries to show (default: 20 for status, 100 for history)
   --type=TYPE      Filter by type: pr, merge, cycle, main, overlap, undraft
   --pr=N           Filter to a specific PR number
-  --outcome=X      Filter by outcome: fixed, max-turns, timeout, error, merged
+  --outcome=X      Filter by outcome: fixed, max-turns, timeout, error, enqueued, merged
   --since=DURATION Time window for history (default: 24h). Format: 1h, 6h, 24h, 7d, 30d
   --json           Output raw JSON for scripting
 
