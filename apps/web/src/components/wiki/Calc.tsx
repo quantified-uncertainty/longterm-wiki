@@ -1,7 +1,6 @@
 import { getKBLatest, getKBProperty } from "@data/kb";
-import { calc, formatValue, type CalcFormat } from "@/lib/calc-engine";
+import { calc, formatValue, type CalcFormat, type CalcFact } from "@/lib/calc-engine";
 import { cn } from "@/lib/utils";
-import type { Fact } from "@/data";
 
 interface CalcProps {
   /** Expression with {entity.propertyId} references, e.g. "{anthropic.revenue} / {anthropic.valuation}" */
@@ -20,10 +19,9 @@ interface CalcProps {
 }
 
 /**
- * Bridge from KB fact to the shape expected by calc-engine.
- * Converts KB's typed FactValue to the flat { value, numeric, asOf } shape.
+ * Resolve a KB fact to the minimal shape needed by calc-engine.
  */
-function kbFactLookup(entity: string, propertyId: string): Fact | undefined {
+function kbFactLookup(entity: string, propertyId: string): CalcFact | undefined {
   const kbFact = getKBLatest(entity, propertyId);
   if (!kbFact) return undefined;
 
@@ -33,7 +31,6 @@ function kbFactLookup(entity: string, propertyId: string): Fact | undefined {
 
   if (kbFact.value.type === "number") {
     numeric = kbFact.value.value;
-    // Format for display
     const unit = kbFact.value.unit ?? prop?.unit;
     if (unit === "USD") {
       const abs = Math.abs(numeric);
@@ -50,13 +47,7 @@ function kbFactLookup(entity: string, propertyId: string): Fact | undefined {
     value = kbFact.value.value;
   }
 
-  return {
-    value,
-    numeric,
-    asOf: kbFact.asOf,
-    entity,
-    factId: propertyId,
-  };
+  return { value, numeric, asOf: kbFact.asOf };
 }
 
 /**

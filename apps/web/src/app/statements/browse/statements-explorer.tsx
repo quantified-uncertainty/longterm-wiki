@@ -211,7 +211,6 @@ export function StatementsExplorer({
           <option value="">All statuses</option>
           <option value="active">Active</option>
           <option value="superseded">Superseded</option>
-          <option value="retracted">Retracted</option>
         </select>
 
         <select
