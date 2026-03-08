@@ -10,7 +10,9 @@
  *   <KBFactValue entity="anthropic" property="revenue" asOf="2024-01" />
  */
 
+import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { getEntityById, getEntityHref } from "@data";
 import { getKBFacts, getKBLatest, getKBProperty } from "@data/kb";
 import type { Fact } from "@longterm-wiki/kb";
 import { CURRENCIES, resolveCurrency } from "@longterm-wiki/kb/currencies";
@@ -138,7 +140,14 @@ export function KBFactValue({
           </span>
         )}
         <span className="block text-muted-foreground/60 mt-1.5 font-mono text-xs">
-          {entity}.{property}
+          {getEntityById(entity) ? (
+            <Link href={getEntityHref(entity)} className="text-primary hover:underline">
+              {entity}
+            </Link>
+          ) : (
+            entity
+          )}
+          .{property}
         </span>
       </span>
     </span>

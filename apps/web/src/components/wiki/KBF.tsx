@@ -11,7 +11,9 @@
  *   <KBF entity="anthropic" property="revenue">$19 billion</KBF>
  */
 
+import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { getEntityById, getEntityHref } from "@data";
 import { getKBFacts, getKBLatest, getKBProperty } from "@data/kb";
 import type { Fact } from "@longterm-wiki/kb";
 import {
@@ -173,9 +175,16 @@ export function KBF({
           </span>
         )}
 
-        {/* entity.property key in monospace */}
+        {/* entity.property key — link entity to its page if it exists */}
         <span className="block text-muted-foreground/60 mt-1.5 font-mono text-[10px]">
-          {entity}.{property}
+          {getEntityById(entity) ? (
+            <Link href={getEntityHref(entity)} className="text-primary hover:underline">
+              {entity}
+            </Link>
+          ) : (
+            entity
+          )}
+          .{property}
         </span>
       </span>
     </span>
