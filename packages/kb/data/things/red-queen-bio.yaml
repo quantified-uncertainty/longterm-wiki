@@ -1,0 +1,75 @@
+thing:
+  id: red-queen-bio
+  stableId: W9J9yMK82X
+  type: organization
+  name: "Red Queen Bio"
+  numericId: "E556"
+  aliases:
+    - RQB
+
+facts:
+  - id: f_rqb_founded
+    property: founded-date
+    value: !date 2025-11
+    source: https://www.redqueenbio.com/
+    notes: "Launched November 2025; spun out of HelixNano"
+
+  - id: f_rqb_hq
+    property: headquarters
+    value: "Boston, MA"
+    source: https://www.redqueenbio.com/
+
+  - id: f_rqb_legal
+    property: legal-structure
+    value: "Public Benefit Corporation (PBC)"
+    source: https://www.redqueenbio.com/
+    notes: "Governance ensures mission precedence over individual partnerships"
+
+  - id: f_rqb_founders
+    property: founded-by
+    value:
+      - nikolai-eroshenko
+      - hannu-rajaniemi
+    source: https://techcrunch.com/2025/11/19/red-queen-bio-openai-biosecurity/
+
+  - id: f_rqb_seed
+    property: total-funding
+    value: 15000000
+    asOf: !date 2025-11
+    source: https://techcrunch.com/2025/11/19/red-queen-bio-openai-biosecurity/
+    notes: "$15M seed round led by OpenAI; additional investors: Cerberus Ventures, Fifty Years, Halcyon Futures, Dhuna Ventures, LongeVC"
+
+items:
+  key-people:
+    type: key-person
+    entries:
+      i_rqb_eroshenko:
+        person: nikolai-eroshenko
+        title: "Co-founder & CEO"
+        start: !date 2025-11
+        is_founder: true
+        source: https://www.redqueenbio.com/
+        notes: "Previously co-founder of HelixNano; led collaboration with OpenAI on biological risk evaluations"
+
+      i_rqb_rajaniemi:
+        person: hannu-rajaniemi
+        title: "Co-founder"
+        start: !date 2025-11
+        is_founder: true
+        source: https://www.redqueenbio.com/
+        notes: "Sci-fi author and scientist; co-founded HelixNano in 2013"
+
+  research-areas:
+    type: research-area
+    entries:
+      i_rqb_defensive_coscaling:
+        name: Defensive Co-scaling
+        description: "Coupling defensive biological infrastructure to the same technological and financial forces driving AI capability advancement; pre-building countermeasures against AI-identified threats"
+        started: !date 2025-11
+        notes: "Core thesis: scale biological defenses proportionally with advancing AI capabilities; named after the Red Queen evolutionary hypothesis"
+
+      i_rqb_countermeasures:
+        name: AI-accelerated Countermeasure Design
+        description: "Using frontier AI models, lab automation, and reinforcement learning to design medical countermeasures against biothreats identified through threat mapping"
+        started: !date 2025-11
+        source: https://www.redqueenbio.com/

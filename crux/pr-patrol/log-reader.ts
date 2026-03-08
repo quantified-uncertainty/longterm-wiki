@@ -24,7 +24,7 @@ export interface MergeResultEntry {
   type: 'merge_result';
   timestamp: string;
   pr_num: number;
-  outcome: 'merged' | 'dry-run' | 'error';
+  outcome: 'merged' | 'enqueued' | 'dry-run' | 'error';
   reason?: string;
 }
 
@@ -36,6 +36,7 @@ export interface CycleSummaryEntry {
   queue_size: number;
   pr_processed: number | null;
   pr_merged?: number | null;
+  prs_enqueued?: number[];
   merge_candidates?: number;
   merge_eligible?: number;
   main_branch_fix?: boolean;
@@ -137,7 +138,7 @@ export function filterByType(entries: LogEntry[], type: string): LogEntry[] {
 export function filterByPr(entries: LogEntry[], prNum: number): LogEntry[] {
   return entries.filter((e) => {
     if ('pr_num' in e && e.pr_num === prNum) return true;
-    if (e.type === 'cycle_summary' && (e.pr_processed === prNum || e.pr_merged === prNum))
+    if (e.type === 'cycle_summary' && (e.pr_processed === prNum || e.pr_merged === prNum || e.prs_enqueued?.includes(prNum)))
       return true;
     if (e.type === 'overlap_warning' && (e.pr_a === prNum || e.pr_b === prNum)) return true;
     return false;

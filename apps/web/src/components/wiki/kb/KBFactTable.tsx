@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getKBFacts, getKBProperty } from "@data/kb";
-import { formatKBFactValue, formatKBDate, isUrl, shortDomain } from "./format";
+import { formatKBDate, isUrl, shortDomain } from "./format";
+import { KBFactValueDisplay } from "./KBFactValueDisplay";
 
 interface KBFactTableProps {
   /** KB thing ID (e.g., "anthropic") */
@@ -74,7 +75,7 @@ export function KBFactTable({ entity, property, title }: KBFactTableProps) {
                   {formatKBDate(fact.asOf)}
                 </TableCell>
                 <TableCell className="font-medium tabular-nums">
-                  {formatKBFactValue(fact, prop?.unit, prop?.display)}
+                  <KBFactValueDisplay fact={fact} property={prop} />
                 </TableCell>
                 <TableCell className="max-w-[200px] truncate">
                   {fact.source ? (

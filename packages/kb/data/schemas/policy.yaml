@@ -1,0 +1,25 @@
+type: policy
+name: Policy
+
+required: []
+# Policies vary widely; no properties are universally required.
+
+recommended:
+  - description
+
+items:
+  key-provisions:
+    description: "Major provisions or requirements of this policy"
+    fields:
+      description: { type: text, required: true, description: "Provision description" }
+      status: { type: text, description: "Implementation status (proposed, enacted, enforced, expired)" }
+      source: { type: text, description: "URL to the provision text or analysis" }
+      notes: { type: text, description: "Context, scope, or enforcement details" }
+
+  affected-entities:
+    description: "Organizations or groups affected by this policy"
+    fields:
+      entity: { type: ref, required: true, description: "Thing ID of the affected entity" }
+      impact: { type: text, description: "How this entity is affected" }
+      source: { type: text, description: "URL to impact analysis" }
+      notes: { type: text, description: "Context or compliance status" }

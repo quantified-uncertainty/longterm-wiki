@@ -3,7 +3,7 @@ thing:
   stableId: 1LcLlMGLbw
   type: organization
   name: OpenAI
-  numericId: 4
+  numericId: "E218"
   aliases:
     - OpenAI Inc
     - OpenAI LP

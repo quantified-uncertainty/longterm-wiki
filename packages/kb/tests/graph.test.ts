@@ -30,7 +30,7 @@ describe("graph", () => {
   describe("getAllEntities", () => {
     it("returns all entities in the graph", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(30);
+      expect(entities).toHaveLength(31);
     });
   });
 
@@ -156,11 +156,11 @@ describe("graph", () => {
   describe("getByType", () => {
     it("returns entities of a given type", () => {
       const orgs = graph.getByType("organization");
-      expect(orgs).toHaveLength(10);
+      expect(orgs).toHaveLength(11);
       const orgIds = orgs.map((o) => o.id).sort();
       expect(orgIds).toEqual([
         "anthropic", "arc", "conjecture", "deepmind", "meta-ai",
-        "miri", "openai", "redwood-research", "ssi", "xai",
+        "miri", "openai", "red-queen-bio", "redwood-research", "ssi", "xai",
       ]);
     });
 

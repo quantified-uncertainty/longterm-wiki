@@ -1,0 +1,41 @@
+type: debate
+name: AI Safety Debate
+
+required: []
+# Debates are open-ended; no properties are universally required.
+
+recommended:
+  - core-question
+  - expert-consensus-level
+  - evidence-strength
+  - time-horizon
+
+items:
+  positions:
+    description: "Distinct positions in the debate with key proponents and arguments"
+    fields:
+      position: { type: text, required: true, description: "Position label (e.g., 'scaling optimists', 'alignment pessimists')" }
+      summary: { type: text, required: true, description: "Brief description of this position's core claim" }
+      key-proponents: { type: text, description: "Named individuals or organizations holding this position" }
+      main-argument: { type: text, description: "The strongest argument for this position" }
+      main-objection: { type: text, description: "The strongest objection to this position" }
+      source: { type: text, description: "URL to a representative statement of this position" }
+      notes: { type: text, description: "Context, nuances, or internal variation within this position" }
+
+  key-cruxes:
+    description: "Key empirical or philosophical disagreements that separate positions"
+    fields:
+      crux: { type: text, required: true, description: "Crux name or description" }
+      type: { type: text, description: "Type: empirical / philosophical / definitional / methodological" }
+      resolution: { type: text, description: "How this crux might be resolved (e.g., 'depends on X experiment')" }
+      source: { type: text, description: "URL to analysis of this crux" }
+      notes: { type: text, description: "Current state of evidence or agreement" }
+
+  evidence:
+    description: "Key pieces of evidence cited by different sides of the debate"
+    fields:
+      evidence: { type: text, required: true, description: "Evidence name or description" }
+      supports: { type: text, description: "Which position(s) this evidence supports" }
+      strength: { type: text, description: "Evidence quality: strong / moderate / weak / disputed" }
+      source: { type: text, required: true, description: "URL to the evidence" }
+      notes: { type: text, description: "Context, methodological caveats, or counterinterpretations" }

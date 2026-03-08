@@ -491,6 +491,27 @@ function reverseRelationship(rel: string): string {
 }
 
 // ---------------------------------------------------------------------------
+// Confirmation prompt
+// ---------------------------------------------------------------------------
+
+async function confirmPrompt(question: string): Promise<boolean> {
+  if (!process.stdin.isTTY) {
+    console.error(
+      'Stdin is not a TTY — aborting to prevent unattended destructive mutations. Use --yes to bypass.',
+    );
+    return false;
+  }
+  const { createInterface } = await import('readline');
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(`${question} [y/N] `, (answer) => {
+      rl.close();
+      resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
 // CLI main
 // ---------------------------------------------------------------------------
 
@@ -498,6 +519,7 @@ async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const jsonOutput = args.json === true;
   const apply = args.apply === true;
+  const yes = args.yes === true;
   const minCluster =
     typeof args['min-cluster'] === 'string'
       ? parseInt(args['min-cluster'], 10)
@@ -515,7 +537,7 @@ async function main() {
 
   if (!entityId) {
     console.error('Error: provide an entity ID');
-    console.error('Usage: pnpm crux statements ideate <entity-id> [--json] [--apply] [--min-cluster=N] [--budget=N]');
+    console.error('Usage: pnpm crux statements ideate <entity-id> [--json] [--apply] [--yes] [--min-cluster=N] [--budget=N]');
     process.exit(1);
   }
 
@@ -548,6 +570,15 @@ async function main() {
   // Apply if requested
   let applyResult: Awaited<ReturnType<typeof applyIdeation>> | undefined;
   if (apply && result.clusters.length > 0) {
+    if (!jsonOutput && !yes) {
+      const proceed = await confirmPrompt(
+        '\nProceed with applying? This will create entities and reassign statements.',
+      );
+      if (!proceed) {
+        console.log('Aborted. No changes were made.');
+        process.exit(0);
+      }
+    }
     if (!jsonOutput) {
       console.log(`\n${c.bold}Applying ideation results...${c.reset}\n`);
     }

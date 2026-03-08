@@ -3,7 +3,7 @@ thing:
   stableId: QsXVXtQ0zE
   type: organization
   name: "Alignment Research Center"
-  numericId: 25
+  numericId: "E25"
   aliases:
     - ARC
     - ARC Alignment
