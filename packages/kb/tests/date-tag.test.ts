@@ -164,4 +164,16 @@ facts:
     const facts = graph.getFacts("test-org", { property: "headcount" });
     expect(facts[0].value.type).toBe("date");
   });
+
+  it("!date in asOf field produces string, not [object Object]", async () => {
+    // Regression test: DateMarker in asOf was converted via String() producing "[object Object]"
+    // This verifies the fix in loader.ts parseFact()
+    const realDataDir = join(__dirname, "../data");
+    const graph = await loadKB(realDataDir);
+    const facts = graph.getFacts("red-queen-bio", { property: "total-funding" });
+    const seedFact = facts.find((f) => f.id === "f_rqb_seed");
+    expect(seedFact).toBeDefined();
+    expect(seedFact!.asOf).toBe("2025-11");
+    expect(seedFact!.asOf).not.toBe("[object Object]");
+  });
 });

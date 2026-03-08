@@ -155,13 +155,16 @@ export interface EntityFile {
   items?: Record<string, RawItemCollection>;
 }
 
-/** Fact as stored in YAML (before normalization) */
+/** Fact as stored in YAML (before normalization).
+ * Note: asOf/validEnd are typed as `unknown` because YAML custom tags
+ * (e.g., `!date 2025-11`) produce DateMarker objects, not strings.
+ * The loader's parseFact() normalizes these to strings. */
 export interface RawFact {
   id: string;
   property: string;
   value: unknown;
-  asOf?: string;
-  validEnd?: string;
+  asOf?: unknown;
+  validEnd?: unknown;
   source?: string;
   sourceQuote?: string;
   notes?: string;

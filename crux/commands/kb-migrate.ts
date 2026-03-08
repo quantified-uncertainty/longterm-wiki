@@ -11,8 +11,8 @@
  *   --stub-old   After migration, strip the old entity to a minimal stub
  */
 
-import { join } from 'path';
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
+import { join, dirname } from 'path';
+import { readFileSync, writeFileSync, existsSync, readdirSync, renameSync } from 'fs';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -67,6 +67,7 @@ const TYPE_MAP: Record<string, string> = {
   crux: 'debate',
   'safety-agenda': 'approach',
   historical: 'event',
+  model: 'analysis',
 };
 
 /**
@@ -95,9 +96,9 @@ function isValidNumericId(numericId: string): boolean {
   return /^E\d+$/.test(numericId);
 }
 
-/** Get today's date as YYYY-MM-DD */
+/** Get today's date as YYYY-MM (matches KB convention) */
 function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  return new Date().toISOString().slice(0, 7);
 }
 
 /**
@@ -323,7 +324,10 @@ Examples:
         // Add comment header and migration note
         const headerMatch = readFileSync(filePath, 'utf-8').match(/^#[^\n]*\n(?:#[^\n]*\n)*/);
         const header = headerMatch ? headerMatch[0] : '';
-        writeFileSync(filePath, header + updatedYaml, 'utf-8');
+        // Write to temp file first, then atomic rename to avoid data loss on crash
+        const tmpPath = join(dirname(filePath), `.${slug}.yaml.tmp`);
+        writeFileSync(tmpPath, header + updatedYaml, 'utf-8');
+        renameSync(tmpPath, filePath);
         lines.push(`\x1b[33mStubbed old entity in:\x1b[0m ${filePath}`);
         lines.push('  Kept: id, numericId, type, title, relatedEntries');
         lines.push('  Removed: description, website, sources, tags, customFields, type-specific fields');

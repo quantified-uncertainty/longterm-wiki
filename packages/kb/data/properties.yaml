@@ -375,7 +375,7 @@ properties:
     description: "Organization that developed or released this AI model"
     dataType: ref
     category: model
-    appliesTo: [ai-model]
+    appliesTo: [ai-model, project]
     inverseId: developed-models
     inverseName: Developed Models
 
@@ -435,7 +435,7 @@ properties:
     description: "Quality of supporting evidence: strong / moderate / weak / mixed / theoretical"
     dataType: text
     category: epistemic
-    appliesTo: [risk, approach, debate, concept, capability]
+    appliesTo: [risk, approach, debate, concept, capability, analysis]
 
   severity-level:
     name: Severity Level

@@ -43,6 +43,25 @@ describe("loader", () => {
       const anthropic = graph.getEntity("anthropic");
       expect(anthropic!.aliases).toEqual(["Anthropic PBC", "Anthropic AI"]);
     });
+
+    it("all numericIds use E-prefix format and are unique", () => {
+      const entities = graph.getAllEntities();
+      const numericIds = entities
+        .map((e) => e.numericId)
+        .filter((id): id is string => id !== undefined);
+
+      // All have numericIds
+      expect(numericIds).toHaveLength(entities.length);
+
+      // All match E-prefix format
+      for (const id of numericIds) {
+        expect(id).toMatch(/^E\d+$/);
+      }
+
+      // All unique
+      const unique = new Set(numericIds);
+      expect(unique.size).toBe(numericIds.length);
+    });
   });
 
   describe("properties", () => {
