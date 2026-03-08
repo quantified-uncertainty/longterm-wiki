@@ -105,7 +105,7 @@ async function main() {
   let totalDeleted = 0;
   let failures = 0;
 
-  for (const [entityId, stmts] of byEntity) {
+  for (const entityId of byEntity.keys()) {
     const result = await cleanupStatements(entityId, false);
     if (result.ok) {
       const deleted = result.data.deleted ?? 0;
