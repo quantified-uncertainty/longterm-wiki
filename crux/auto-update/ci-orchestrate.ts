@@ -551,12 +551,15 @@ export async function orchestrateCiAutoUpdate(
   const commitMsg = `auto-update: ${date} daily wiki refresh\n\nAutomated news-driven wiki update.\nRun report: ${reportPath || 'N/A'}`;
   git(['commit', '-m', commitMsg]);
 
-  // Use --force-with-lease for same-day re-runs where the remote branch may
-  // already exist from a prior failed attempt.
+  // For same-day re-runs the remote branch may already exist from a prior
+  // failed attempt. Fetch it first so --force-with-lease knows the remote ref,
+  // then force-push if needed. This is safe because auto-update branches are
+  // exclusively owned by this CI pipeline.
   try {
     git(['push', '-u', 'origin', branch]);
   } catch {
-    console.log('Standard push failed, retrying with --force-with-lease (same-day re-run)');
+    console.log('Standard push failed, fetching remote ref and retrying with --force-with-lease');
+    try { git(['fetch', 'origin', branch]); } catch { /* branch may not exist remotely yet */ }
     git(['push', '--force-with-lease', '-u', 'origin', branch]);
   }
   console.log(`Pushed to origin/${branch}`);
