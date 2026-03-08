@@ -7,7 +7,7 @@
  * Steps:
  *   1. Create date-stamped branch (auto-update/YYYY-MM-DD)
  *   2. Run auto-update pipeline (fetch -> digest -> route -> improve)
- *   3. Auto-fix: fix escaping, fix markdown, validate gate --fix
+ *   3. Auto-fix: fix escaping, fix markdown, fix orphaned-footnotes (scoped), validate gate --fix
  *   4. NEEDS CITATION cleanup (find markers, run improve, verify gone)
  *   5. Paranoid content review on each changed page
  *   6. Content quality checks (truncation + footnotes)
@@ -214,16 +214,22 @@ interface ReviewAlert {
   reason: string;
 }
 
-async function runParanoidReview(verbose: boolean): Promise<{ alerts: ReviewAlert[]; blocked: string[] }> {
-  // Find MDX files modified (not yet committed)
+async function runParanoidReview(verbose: boolean, scopedFiles?: string[]): Promise<{ alerts: ReviewAlert[]; blocked: string[] }> {
+  // Use the explicitly scoped file list when provided (files modified by the pipeline).
+  // Falling back to git diff would include any files touched by fix steps (e.g.,
+  // gate --fix or orphaned-footnotes sweeps), which can bloat the review to 100+ pages.
   let changedMdx: string[];
-  try {
-    const diff = git(['diff', '--name-only', 'HEAD', '--', 'content/docs/']);
-    changedMdx = diff
-      ? diff.split('\n').filter(f => f.endsWith('.mdx'))
-      : [];
-  } catch {
-    changedMdx = [];
+  if (scopedFiles !== undefined) {
+    changedMdx = scopedFiles.filter(f => f.endsWith('.mdx'));
+  } else {
+    try {
+      const diff = git(['diff', '--name-only', 'HEAD', '--', 'content/docs/']);
+      changedMdx = diff
+        ? diff.split('\n').filter(f => f.endsWith('.mdx'))
+        : [];
+    } catch {
+      changedMdx = [];
+    }
   }
 
   if (changedMdx.length === 0) {
@@ -350,6 +356,22 @@ export async function orchestrateCiAutoUpdate(
     return { branch, hasChanges: false, pagesUpdated: 0, prUrl: null, exitCode: 1 };
   }
 
+  // Capture the set of MDX files actually modified by the pipeline (Step 2),
+  // BEFORE any broad fix commands run. This prevents fix orphaned-footnotes from
+  // sweeping the entire codebase and inflating the paranoid review to 100+ pages.
+  let pipelineModifiedMdx: string[] = [];
+  try {
+    const diffOutput = execFileSync('git', ['diff', '--name-only', 'HEAD', '--', 'content/docs/'], {
+      cwd: PROJECT_ROOT,
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
+    pipelineModifiedMdx = diffOutput ? diffOutput.split('\n').filter(f => f.endsWith('.mdx')) : [];
+  } catch {
+    // If git diff fails, fall back to empty list (review will run on git diff at that time)
+  }
+  console.log(`Pipeline modified ${pipelineModifiedMdx.length} MDX file(s) in content/docs/`);
+
   // ── Step 3: Auto-fix (escaping, markdown, gate) ──
   console.log('\n--- Step 3: Run validation fixes ---');
   try {
@@ -370,13 +392,23 @@ export async function orchestrateCiAutoUpdate(
     console.warn(`::warning::fix markdown failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 
-  try {
-    execFileSync('pnpm', ['crux', 'fix', 'orphaned-footnotes', '--apply'], {
-      cwd: PROJECT_ROOT,
-      stdio: 'inherit',
-    });
-  } catch (err) {
-    console.warn(`::warning::fix orphaned-footnotes failed: ${err instanceof Error ? err.message : String(err)}`);
+  // Fix orphaned footnotes only in files modified by this pipeline run.
+  // Running `fix orphaned-footnotes --apply` without --file sweeps the entire
+  // codebase (600+ pages), which inflates git diff and causes paranoid review
+  // to process 100+ pages, blowing the 2-hour timeout.
+  if (pipelineModifiedMdx.length > 0) {
+    for (const file of pipelineModifiedMdx) {
+      try {
+        execFileSync('pnpm', ['crux', 'fix', 'orphaned-footnotes', '--apply', `--file=${join(PROJECT_ROOT, file)}`], {
+          cwd: PROJECT_ROOT,
+          stdio: 'inherit',
+        });
+      } catch (err) {
+        console.warn(`::warning::fix orphaned-footnotes failed for ${file}: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+  } else {
+    console.log('No MDX files modified — skipping orphaned-footnotes fix');
   }
 
   try {
@@ -392,17 +424,7 @@ export async function orchestrateCiAutoUpdate(
   console.log('\n--- Step 4: NEEDS CITATION cleanup ---');
   // Only check files modified by this auto-update run, not pre-existing markers
   // in unrelated pages throughout the codebase.
-  let modifiedMdxFiles: string[] = [];
-  try {
-    const diffOutput = execFileSync('git', ['diff', '--name-only', 'HEAD', '--', 'content/docs/'], {
-      cwd: PROJECT_ROOT,
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    }).trim();
-    modifiedMdxFiles = diffOutput ? diffOutput.split('\n').filter(f => f.endsWith('.mdx')) : [];
-  } catch {
-    // If git diff fails, fall back to full scan
-  }
+  const modifiedMdxFiles = pipelineModifiedMdx;
   const citationCleanup = await cleanupNeedsCitation(modifiedMdxFiles, options.verbose);
   if (citationCleanup.remaining.length > 0) {
     console.error('NEEDS CITATION markers remain -- manual review required before merging.');
@@ -411,7 +433,9 @@ export async function orchestrateCiAutoUpdate(
 
   // ── Step 5: Paranoid content review ──
   console.log('\n--- Step 5: Paranoid content review ---');
-  const review = await runParanoidReview(options.verbose);
+  // Pass the original pipeline files so review is scoped to them, not any
+  // additional files changed by the fix steps (e.g., gate --fix touching other pages).
+  const review = await runParanoidReview(options.verbose, pipelineModifiedMdx);
   if (review.blocked.length > 0) {
     console.error('Paranoid review blocked commit. Re-run the improve pipeline on blocked pages.');
     return { branch, hasChanges: false, pagesUpdated, prUrl: null, exitCode: 1 };
