@@ -140,7 +140,7 @@ describe("validate", () => {
     it("returns results for all entities", () => {
       const results = validate(graph);
 
-      // Should have results for all 30 entities
+      // Should have results for all 31 entities
       const entityIds = new Set(results.map((r) => r.entityId).filter(Boolean));
       expect(entityIds.has("anthropic")).toBe(true);
       expect(entityIds.has("dario-amodei")).toBe(true);
@@ -150,7 +150,7 @@ describe("validate", () => {
     it("includes completeness info for every entity", () => {
       const results = validate(graph);
       const completeness = results.filter((r) => r.rule === "completeness");
-      expect(completeness).toHaveLength(30); // one per entity
+      expect(completeness).toHaveLength(31); // one per entity
     });
 
     it("properly categorizes severity levels", () => {
@@ -161,8 +161,8 @@ describe("validate", () => {
 
       // There should be at least some warnings (recommended properties, or item ref warnings)
       expect(warnings.length).toBeGreaterThan(0);
-      // There should be info messages (completeness for all 30 entities + any orphan-entity infos)
-      expect(infos.length).toBeGreaterThanOrEqual(30);
+      // There should be info messages (completeness for all 31 entities + any orphan-entity infos)
+      expect(infos.length).toBeGreaterThanOrEqual(31);
     });
   });
 

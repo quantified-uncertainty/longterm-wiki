@@ -375,7 +375,7 @@ properties:
     description: "Organization that developed or released this AI model"
     dataType: ref
     category: model
-    appliesTo: [ai-model]
+    appliesTo: [ai-model, project]
     inverseId: developed-models
     inverseName: Developed Models
 
@@ -435,7 +435,7 @@ properties:
     description: "Quality of supporting evidence: strong / moderate / weak / mixed / theoretical"
     dataType: text
     category: epistemic
-    appliesTo: [risk, approach, debate, concept, capability]
+    appliesTo: [risk, approach, debate, concept, capability, analysis]
 
   severity-level:
     name: Severity Level
@@ -562,3 +562,26 @@ properties:
     dataType: text
     category: epistemic
     appliesTo: [risk, approach, debate, concept, capability]
+
+  # ── General Properties ───────────────────────────────────────────────
+
+  description:
+    name: Description
+    description: "Brief description of this entity"
+    dataType: text
+    category: general
+    appliesTo: [organization, person, ai-model, risk, approach, capability, concept, debate, policy, project, event, analysis, argument]
+
+  website:
+    name: Website
+    description: "Primary website URL"
+    dataType: text
+    category: general
+    appliesTo: [organization, person, project]
+
+  org-type:
+    name: Organization Type
+    description: "Type of organization (company, nonprofit, research lab, government agency, etc.)"
+    dataType: text
+    category: organization
+    appliesTo: [organization]

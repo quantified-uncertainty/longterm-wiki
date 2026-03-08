@@ -32,7 +32,7 @@ export interface Entity {
   /** Former slugs for redirects */
   previousIds?: string[];
   /** Legacy wiki URL ID (E42) */
-  numericId?: number;
+  numericId?: string;
 }
 
 // ── Fact ────────────────────────────────────────────────────────────
@@ -149,19 +149,22 @@ export interface EntityFile {
     parent?: string;
     aliases?: string[];
     previousIds?: string[];
-    numericId?: number;
+    numericId?: string;
   };
   facts?: RawFact[];
   items?: Record<string, RawItemCollection>;
 }
 
-/** Fact as stored in YAML (before normalization) */
+/** Fact as stored in YAML (before normalization).
+ * Note: asOf/validEnd are typed as `unknown` because YAML custom tags
+ * (e.g., `!date 2025-11`) produce DateMarker objects, not strings.
+ * The loader's parseFact() normalizes these to strings. */
 export interface RawFact {
   id: string;
   property: string;
   value: unknown;
-  asOf?: string;
-  validEnd?: string;
+  asOf?: unknown;
+  validEnd?: unknown;
   source?: string;
   sourceQuote?: string;
   notes?: string;
