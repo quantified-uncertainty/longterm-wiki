@@ -1,14 +1,14 @@
 thing:
   id: manifund
-  stableId: UD0v2MIjVA
+  stableId: fFVOuFZCRf
   type: organization
-  name: Manifund
-  numericId: E547
+  name: "Manifund"
+  numericId: 1104
+
 facts:
-  - id: f_HL2ToNtiIQ
-    property: description
-    value: Manifund is a $2M+ annual charitable regranting platform (founded 2022) that provides fast grants (<1 week) to AI
-      safety projects through expert regrantors ($50K-400K budgets), fiscal sponsorship, and experimental impact
-      certificates. The platform distributed $2.06M in 2023 (~40% to AI safety resear
-    asOf: 2026-03
-    notes: Migrated from old entity system
+  - id: f_manifund_ai_safety_2025
+    property: total-funding
+    value: 2250000
+    asOf: "2025"
+    source: https://manifund.org/about/regranting
+    notes: "2025 AI safety regranting pool with first 10 regrantors announced"

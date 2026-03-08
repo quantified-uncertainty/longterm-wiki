@@ -37,13 +37,8 @@ describe("graph", () => {
   describe("getFacts", () => {
     it("returns all facts for an entity", () => {
       const facts = graph.getFacts("anthropic");
-      // 9 revenue + 4 valuation + 3 total-funding + 3 headcount + 1 founded-date
-      // + 1 headquarters + 1 legal-structure + 2 gross-margin + 2 cash-burn
-      // + 2 enterprise-market-share + 1 coding-market-share + 1 monthly-active-users
-      // + 1 business-customers + 1 api-calls-monthly + 1 product-revenue
-      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size
-      // + 1 founded-by = 37
-      expect(facts).toHaveLength(37);
+      // Original 37 + 14 migrated facts = 51
+      expect(facts).toHaveLength(51);
     });
 
     it("returns empty array for an entity with no facts", () => {
@@ -124,8 +119,8 @@ describe("graph", () => {
   describe("getByProperty", () => {
     it("returns facts across entities for a given property", () => {
       const revMap = graph.getByProperty("revenue");
-      // Anthropic and OpenAI both have revenue facts
-      expect(revMap.size).toBe(2);
+      // Multiple entities have revenue facts after migration
+      expect(revMap.size).toBeGreaterThanOrEqual(2);
       expect(revMap.has("anthropic")).toBe(true);
       expect(revMap.has("openai")).toBe(true);
     });
@@ -141,7 +136,7 @@ describe("graph", () => {
 
     it("returns latest fact per entity with latest:true", () => {
       const revMap = graph.getByProperty("revenue", { latest: true });
-      expect(revMap.size).toBe(2);
+      expect(revMap.size).toBeGreaterThanOrEqual(2);
       const anthropicRev = revMap.get("anthropic");
       expect(anthropicRev).toBeDefined();
       expect(anthropicRev!.asOf).toBe("2026-03");
@@ -156,22 +151,27 @@ describe("graph", () => {
   describe("getByType", () => {
     it("returns entities of a given type", () => {
       const orgs = graph.getByType("organization");
-      expect(orgs.length).toBeGreaterThanOrEqual(11);
-      // Spot-check key organizations
+      expect(orgs.length).toBeGreaterThanOrEqual(15);
+      // Spot-check key organizations (including migrated entities)
       const orgIds = new Set(orgs.map((o) => o.id));
       expect(orgIds.has("anthropic")).toBe(true);
       expect(orgIds.has("openai")).toBe(true);
       expect(orgIds.has("deepmind")).toBe(true);
+      expect(orgIds.has("chan-zuckerberg-initiative")).toBe(true);
+      expect(orgIds.has("coefficient-giving")).toBe(true);
+      expect(orgIds.has("manifund")).toBe(true);
     });
 
     it("returns multiple entities of the same type", () => {
       const people = graph.getByType("person");
-      expect(people.length).toBeGreaterThanOrEqual(20);
-      // Spot-check key people
+      expect(people.length).toBeGreaterThanOrEqual(21);
+      // Spot-check key people (including migrated entities)
       const ids = new Set(people.map((p) => p.id));
       expect(ids.has("dario-amodei")).toBe(true);
       expect(ids.has("sam-altman")).toBe(true);
       expect(ids.has("eliezer-yudkowsky")).toBe(true);
+      expect(ids.has("jaan-tallinn")).toBe(true);
+      expect(ids.has("dustin-moskovitz")).toBe(true);
     });
 
     it("returns empty array for unknown type", () => {

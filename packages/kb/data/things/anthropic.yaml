@@ -107,13 +107,13 @@ facts:
     property: total-funding
     value: 4.4e9
     asOf: 2023-10
-    notes: "After Google $2B investment and Amazon first tranche"
+    notes: "Estimate; no published source. After Google $2B investment and Amazon first tranche"
 
   - id: f_fund_2025_07
     property: total-funding
     value: 15e9
     asOf: 2025-07
-    notes: "Approximate cumulative through Series F"
+    notes: "Estimate; no published source. Approximate cumulative through Series F"
 
   - id: f_sQ2kP9nZ4r
     property: total-funding
@@ -267,13 +267,95 @@ facts:
     property: safety-researcher-count
     value: 265
     asOf: 2025-12
-    notes: "Estimated 200-330 across interpretability, alignment science, policy, trust & safety; ~20-30% of technical staff"
+    notes: "Estimate; no published source. Estimated 200-330 across interpretability, alignment science, policy, trust & safety; ~20-30% of technical staff"
 
   - id: f_interp_team
     property: interpretability-team-size
     value: 50
     asOf: 2025-12
-    notes: "Estimated 40-60 researchers; among the largest concentrations globally"
+    notes: "Estimate; no published source. Estimated 40-60 researchers; among the largest concentrations globally"
+
+  # ── Migrated from old facts system ─────────────────────────────
+  - id: f_val_2025_11
+    property: valuation
+    value: 350e9
+    asOf: 2025-11
+    notes: "Valuation at Microsoft/Nvidia commitment. sourceResource: 787a2639f9e64ca5"
+
+  - id: f_revenue_guidance_2026
+    property: revenue-guidance
+    value: 20e9
+    asOf: 2026-01
+    notes: "Base case $20B, best case $26B per Reuters. sourceResource: cb3e2358bd128df5"
+
+  - id: f_retention_rate_2025
+    property: retention-rate
+    value: 88
+    asOf: "2025"
+    notes: "Estimate; no published source identified for this specific figure"
+
+  - id: f_customer_concentration_2025
+    property: customer-concentration
+    value: 25
+    asOf: "2025"
+    notes: "Estimate; no published source. Revenue share from top customers (Cursor, GitHub Copilot); inferred from reporting"
+
+  - id: f_safety_staffing_ratio_2025
+    property: safety-staffing-ratio
+    value: 25
+    asOf: "2025"
+    notes: "Estimate; no published source. 20-30% of technical staff in safety-related roles"
+
+  - id: f_infra_investment_2026
+    property: infrastructure-investment
+    value: 50e9
+    asOf: "2026"
+    notes: "AI infrastructure expansion plan announced November 2025. sourceResource: 52c1c2def0184008"
+
+  - id: f_breakeven_target
+    property: description
+    value: "Projected breakeven year: 2028"
+    notes: "Per internal financial projections. sourceResource: eb642ee7de582ff5"
+
+  - id: f_google_stake_pct
+    property: equity-stake-percent
+    value: 14
+    asOf: 2026-02
+    notes: "Approximate Google post-Series G equity stake; computed from $3.3B invested across 3 rounds. sourceResource: 233fe5e95bfcf8bc"
+
+  - id: f_founder_equity_value
+    property: equity-value
+    value: 66.5e9
+    asOf: 2026-02
+    notes: "All seven co-founders combined equity value estimated $53-80B (midpoint used); 2-3% each x $380B valuation. sourceResource: fd8351a24e375eba"
+
+  - id: f_founder_pledge_total
+    property: description
+    value: "Founder pledge total (80% of equity): $43-64B estimated"
+    notes: "All seven co-founders pledged to donate 80% of their wealth. sourceResource: fd8351a24e375eba"
+
+  - id: f_employee_equity_value
+    property: equity-value
+    value: 57e9
+    asOf: 2026-02
+    notes: "Employee equity pool value estimated $46-68B (midpoint used); 12-18% of $380B valuation. sourceResource: 8e3ff50b9ef2a1a8"
+
+  - id: f_per_founder_stake_pct
+    property: equity-stake-percent
+    value: 2.5
+    asOf: 2026-02
+    notes: "Per-founder equity stake; each of 7 co-founders holds approximately 2-3% (midpoint used). sourceResource: fd8351a24e375eba"
+
+  - id: f_tallinn_stake_pct
+    property: equity-stake-percent
+    value: 1.15
+    asOf: 2026-02
+    notes: "Estimate; no published source. Jaan Tallinn equity stake estimated 0.6-1.7% (midpoint used); Series A lead position"
+
+  - id: f_ea_aligned_capital
+    property: description
+    value: "EA-aligned capital (risk-adjusted): $27-76B estimated"
+    notes: "Estimate; no published source. Risk-adjusted estimate of EA-aligned philanthropic capital from all Anthropic stakeholders"
 
 items:
   # ── Funding Rounds ──────────────────────────────────────────────

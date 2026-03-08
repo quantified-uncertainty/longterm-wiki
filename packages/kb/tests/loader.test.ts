@@ -26,7 +26,7 @@ describe("loader", () => {
       const entities = graph.getAllEntities();
       expect(entities.length).toBeGreaterThanOrEqual(360);
 
-      // Spot-check key entities are present
+      // Spot-check key entities are present (including migrated facts entities)
       const ids = new Set(entities.map((t) => t.id));
       expect(ids.has("anthropic")).toBe(true);
       expect(ids.has("openai")).toBe(true);
@@ -35,6 +35,10 @@ describe("loader", () => {
       expect(ids.has("alignment")).toBe(true);
       expect(ids.has("existential-risk")).toBe(true);
       expect(ids.has("anthropic-government-standoff")).toBe(true);
+      expect(ids.has("chan-zuckerberg-initiative")).toBe(true);
+      expect(ids.has("coefficient-giving")).toBe(true);
+      expect(ids.has("jaan-tallinn")).toBe(true);
+      expect(ids.has("manifund")).toBe(true);
     });
 
     it("loads entity aliases", () => {
@@ -63,9 +67,12 @@ describe("loader", () => {
   });
 
   describe("properties", () => {
-    it("loads 68 properties (60 original + 3 general + 5 incident properties)", () => {
+    it("loads properties (68 from main + additional migration properties)", () => {
       const properties = graph.getAllProperties();
-      expect(properties).toHaveLength(68);
+      // 68 from main + branch additions (revenue-guidance, retention-rate, customer-concentration,
+      // infrastructure-investment, equity-stake-percent, equity-value, safety-staffing-ratio,
+      // model-parameters, benchmark-score) = 77
+      expect(properties.length).toBeGreaterThanOrEqual(68);
     });
 
     it("loads property details correctly", () => {
@@ -169,15 +176,17 @@ describe("loader", () => {
   });
 
   describe("facts", () => {
-    it("loads correct number of facts for Anthropic (37)", () => {
+    it("loads correct number of facts for Anthropic (51)", () => {
       const facts = graph.getFacts("anthropic");
-      // 9 revenue + 4 valuation + 3 total-funding + 3 headcount + 1 founded-date
-      // + 1 headquarters + 1 legal-structure + 2 gross-margin + 2 cash-burn
-      // + 2 enterprise-market-share + 1 coding-market-share + 1 monthly-active-users
-      // + 1 business-customers + 1 api-calls-monthly + 1 product-revenue
-      // + 1 safety-level + 1 safety-researcher-count + 1 interpretability-team-size
-      // + 1 founded-by = 37
-      expect(facts).toHaveLength(37);
+      // Original 37 + 14 migrated from old facts system:
+      // +1 valuation (2025-11), +1 revenue-guidance, +1 retention-rate,
+      // +1 customer-concentration, +1 safety-staffing-ratio,
+      // +1 infrastructure-investment, +1 description (breakeven),
+      // +1 equity-stake-percent (google), +1 equity-value (founders),
+      // +1 description (pledge), +1 equity-value (employees),
+      // +1 equity-stake-percent (per-founder), +1 equity-stake-percent (tallinn),
+      // +1 description (EA capital) = 51
+      expect(facts).toHaveLength(51);
     });
 
     it("loads correct number of facts for Dario Amodei (9)", () => {

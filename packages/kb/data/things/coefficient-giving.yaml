@@ -1,14 +1,82 @@
 thing:
   id: coefficient-giving
-  stableId: sXyMZ8BKXw
+  stableId: ULjDXpSLCI
   type: organization
-  name: Coefficient Giving
-  numericId: E521
+  name: "Coefficient Giving"
+  numericId: 1102
+  aliases:
+    - Open Philanthropy
+    - OP
+
 facts:
-  - id: f_OG4HXG3qHw
+  # ── Total Grants ──────────────────────────────────────────────
+  - id: f_cg_total_grants_2025
+    property: total-funding
+    value: 4e9
+    asOf: "2025-06"
+    source: https://coefficientgiving.org/
+    notes: "Total grants disbursed since 2014 across all cause areas; lower bound ($4B+)"
+
+  - id: f_cg_total_giving_2017_2024
+    property: total-funding
+    value: 2.8e9
+    asOf: "2024"
+    source: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
+    notes: "Total grants recommended 2017-2024 per annual reports"
+
+  - id: f_cg_grants_2024
+    property: total-funding
+    value: 650e6
+    asOf: "2024"
+    source: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
+    notes: "Annual grantmaking figure for 2024"
+
+  # ── AI Safety Funding ─────────────────────────────────────────
+  - id: f_cg_ai_safety_cumulative
     property: description
-    value: Coefficient Giving (formerly Open Philanthropy) has directed $4B+ in grants since 2014, including $336M to AI
-      safety (~60% of external funding). The organization spent ~$50M on AI safety in 2024, with 68% going to
-      evaluations/benchmarking, and launched a $40M Technical AI Safety RFP in 2025 covering
-    asOf: 2026-03
-    notes: Migrated from old entity system
+    value: "Cumulative AI safety grants (2017-2024): $336M (~12% of total giving)"
+    source: https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation
+    notes: "Per third-party LessWrong analysis; approximately 12% of $2.8B total giving"
+
+  - id: f_cg_ai_safety_2023
+    property: description
+    value: "AI safety spending (2023): $46M"
+    source: https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation
+    notes: "Annual AI safety deployment; made it dominant external funder"
+
+  - id: f_cg_ai_safety_2024
+    property: description
+    value: "AI safety spending (2024): $63.6M"
+    source: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
+    notes: "Reportedly ~60% of all external AI safety investment globally"
+
+  - id: f_cg_ai_safety_rfp_2025
+    property: description
+    value: "Technical AI Safety RFP (2025): $40M across 21 research areas"
+    source: https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-technical-ai-safety-research/
+    notes: "2025 RFP; more available based on quality"
+
+  # ── Market Position ───────────────────────────────────────────
+  - id: f_cg_external_funding_share
+    property: market-share
+    value: 60
+    asOf: "2024"
+    notes: "Approximate percentage of external philanthropic AI safety funding"
+
+  - id: f_cg_evals_share_2024
+    property: description
+    value: "68% of technical AI safety grants went to evaluations/benchmarking (2024)"
+    source: https://www.lesswrong.com/posts/adzfKEW98TswZEA6T/brief-analysis-of-op-technical-ai-safety-funding
+    notes: "68% of $28M recorded technical AI safety grants"
+
+  - id: f_cg_non_gv_funding
+    property: description
+    value: "Non-Good Ventures donor funding (2024): $100M+"
+    notes: "Directed from donors besides Good Ventures; more than doubled by 2025"
+
+  # ── Organizational ────────────────────────────────────────────
+  - id: f_cg_headcount
+    property: headcount
+    value: 100
+    asOf: "2025"
+    notes: "Approximate headcount after rebrand to Coefficient Giving"

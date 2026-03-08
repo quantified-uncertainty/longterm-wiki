@@ -48,7 +48,53 @@ facts:
     source: https://www.reuters.com/technology/artificial-intelligence/ilya-sutskevers-ai-startup-ssi-nears-1-billion-funding-2024-09-04/
     notes: "Post-money valuation at time of $1B funding round"
 
+  # ── Migrated from old facts system ─────────────────────────────
+  - id: f_ssi_val_2025_03
+    property: valuation
+    value: 30e9
+    asOf: 2025-03
+    source: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
+    notes: "Valuation at March 2025 Greenoaks-led round, before April 2025 top-up"
+
+  - id: f_ssi_val_2025_04
+    property: valuation
+    value: 32e9
+    asOf: 2025-04
+    source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+    notes: "Post-money valuation after April 2025 funding round led by Greenoaks Capital"
+
+  - id: f_ssi_total_funding_2025
+    property: total-funding
+    value: 3e9
+    asOf: 2025-04
+    source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+    notes: "Total venture capital raised across all rounds through April 2025"
+
+  - id: f_ssi_headcount_2025
+    property: headcount
+    value: 20
+    asOf: 2025-06
+    source: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
+    notes: "Approximate headcount; described as a 'lean, cracked team'"
+
 items:
+  funding-rounds:
+    type: funding-round
+    entries:
+      i_ssi_seed:
+        date: 2024-09
+        amount: 1e9
+        valuation: 5e9
+        source: https://observer.com/2024/09/openai-ilya-sutskever-raise-1b-ai-startup/
+        notes: "Seed round from a16z, Sequoia, DST Global, SV Angel, NFDG"
+
+      i_ssi_2025_04:
+        date: 2025-04
+        amount: 2e9
+        valuation: 32e9
+        source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+        notes: "Led by Greenoaks with $500M commitment; Alphabet and NVIDIA participated"
+
   key-people:
     type: key-person
     entries:

@@ -1,14 +1,97 @@
 thing:
   id: chan-zuckerberg-initiative
-  stableId: 47CMmjo4mQ
+  stableId: rYERluiUwH
   type: organization
-  name: Chan Zuckerberg Initiative
-  numericId: E519
+  name: "Chan Zuckerberg Initiative"
+  numericId: 1101
+  aliases:
+    - CZI
+
 facts:
-  - id: f_bjfBVCAFlQ
+  - id: f_czi_pledge_initial
+    property: total-funding
+    value: 45e9
+    asOf: "2015-12"
+    source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    notes: "Initial value of 99% Facebook share pledge at founding"
+
+  - id: f_czi_pledge_current
+    property: total-funding
+    value: 200e9
+    asOf: "2025"
+    source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    notes: "Current value of 99% Facebook share pledge, exceeds $200B"
+
+  - id: f_czi_science_decade
     property: description
-    value: The Chan Zuckerberg Initiative is a philanthropic LLC that has pivoted dramatically from broad social causes to
-      AI-powered biomedical research, with substantial funding ($10B+ over next decade) but minimal engagement with AI
-      safety concerns despite heavy AI investment. The article provides comprehen
-    asOf: 2026-03
-    notes: Migrated from old entity system
+    value: "Science spending 2016-2025: $4-4.5B"
+    source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+    notes: "Total science spending first decade (2016-2025)"
+
+  - id: f_czi_social_decade
+    property: description
+    value: "Social causes spending 2016-2025: $3.5B (winding down)"
+    source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+    notes: "Total social causes spending 2016-2025, now winding down"
+
+  - id: f_czi_future_science
+    property: description
+    value: "Science spending commitment 2026-2036: $10B+ minimum"
+    source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+    notes: "Minimum commitment for science over next decade"
+
+  - id: f_czi_annual_budget
+    property: revenue
+    value: 1e9
+    asOf: "2025"
+    source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
+    notes: "Approximate annual operating budget as of 2025"
+
+  - id: f_czi_biohub_sf
+    property: description
+    value: "CZ Biohub SF founding grant (2016): $600M"
+    source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    notes: "Initial grant to found CZ Biohub SF with UCSF/Berkeley/Stanford"
+
+  - id: f_czi_biohub_chicago
+    property: description
+    value: "CZ Biohub Chicago founding grant (2022): $250M"
+    notes: "Grant to establish Biohub Chicago focused on biosensors and inflammation"
+
+  - id: f_czi_biohub_ny
+    property: description
+    value: "CZ Biohub New York founding grant (2023): $250M"
+    notes: "Grant to establish Biohub New York focused on infectious disease"
+
+  - id: f_czi_gpu_cluster_2024
+    property: infrastructure-investment
+    value: 1024
+    asOf: "2024"
+    source: https://chanzuckerberg.com/rfa/ai-computing-gpu/
+    notes: "NVIDIA H100 DGX SuperPOD cluster (1,024 GPUs) for life sciences AI"
+
+  - id: f_czi_gpu_planned_2028
+    property: infrastructure-investment
+    value: 10000
+    asOf: "2025"
+    source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+    notes: "Planned 10x expansion of GPU cluster by 2028 (10,000 GPUs)"
+
+  - id: f_czi_workforce_cut
+    property: headcount
+    value: 70
+    asOf: "2026"
+    source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
+    notes: "Approximately 70 jobs cut (~8% of workforce) to refocus on AI-biomedical research"
+
+  - id: f_czi_publications
+    property: description
+    value: "8,000+ publications supported since founding"
+    source: https://biohub.org/research/
+    notes: "More than 8,000 publications supported"
+
+  - id: f_czi_rare_as_one
+    property: description
+    value: "Rare As One Project: 94 patient-led rare disease organizations (2024)"
+    source: https://chanzuckerberg.com/blog/2024-look-back/
+    notes: "Grown from 30 to 94 organizations since 2020"
