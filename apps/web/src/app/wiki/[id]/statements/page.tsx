@@ -60,7 +60,7 @@ export default async function EntityStatementsPage({ params }: PageProps) {
     () =>
       fetchDetailed<ByEntityResult>(
         `/api/statements/by-entity?entityId=${encodeURIComponent(slug!)}`,
-        { revalidate: 300 }
+        { revalidate: 30 }
       ),
     () => ({ structured: [], attributed: [], total: 0 })
   );
