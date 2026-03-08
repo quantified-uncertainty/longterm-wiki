@@ -151,7 +151,7 @@ function StatCard({
       <p
         className={`text-2xl font-semibold tabular-nums ${isUnavailable ? "text-muted-foreground/50" : (colorClass ?? "")}`}
       >
-        {isUnavailable ? "—" : value}
+        {isUnavailable ? "\u2014" : value}
       </p>
       {subtext && !isUnavailable && (
         <p className="text-xs text-muted-foreground mt-0.5">{subtext}</p>
@@ -182,11 +182,17 @@ const STATUS_STYLES: Record<
   },
 };
 
+/** Services that are actually monitored. discord-bot and vercel-frontend
+ *  have no health check wiring and permanently show "Not monitored". */
+const MONITORED_SERVICES = new Set([
+  "wiki-server",
+  "groundskeeper",
+  "github-actions",
+]);
+
 const SERVICE_LABELS: Record<string, string> = {
   "wiki-server": "Wiki Server",
   groundskeeper: "Groundskeeper",
-  "discord-bot": "Discord Bot",
-  "vercel-frontend": "Vercel Frontend",
   "github-actions": "GitHub Actions",
 };
 
@@ -397,9 +403,33 @@ function GroundskeeperSection({
     );
   }
 
+  const failingTasks = tasks.filter(
+    (t) => t.successRate !== null && t.successRate < 80
+  );
+
   return (
     <>
       <SectionHeader>Groundskeeper Tasks (last 24h)</SectionHeader>
+
+      {/* Alert banner for failing tasks */}
+      {failingTasks.length > 0 && (
+        <div className="rounded-lg border-2 border-red-300 bg-red-500/10 p-4 mb-4">
+          <p className="text-sm font-semibold text-red-600 mb-2">
+            {failingTasks.length} task{failingTasks.length !== 1 ? "s" : ""} failing
+          </p>
+          <div className="space-y-1">
+            {failingTasks.map((task) => (
+              <p key={task.taskName} className="text-xs text-red-600/80">
+                <span className="font-mono font-medium">{task.taskName}</span>
+                {" \u2014 "}
+                {task.failureCount} of {task.totalRuns} run{task.totalRuns !== 1 ? "s" : ""} failed
+                {task.successRate !== null && ` (${task.successRate}% success rate)`}
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto mb-6">
         <table className="w-full text-sm">
           <thead>
@@ -423,6 +453,7 @@ function GroundskeeperSection({
           </thead>
           <tbody>
             {tasks.map((task) => {
+              const isFailing = task.successRate !== null && task.successRate < 80;
               const rateColor =
                 task.successRate === null
                   ? ""
@@ -434,7 +465,7 @@ function GroundskeeperSection({
               return (
                 <tr
                   key={task.taskName}
-                  className="border-b border-border/30"
+                  className={`border-b border-border/30 ${isFailing ? "bg-red-500/5" : ""}`}
                 >
                   <td className="py-2 pr-4 font-mono text-xs">
                     {task.taskName}
@@ -448,7 +479,7 @@ function GroundskeeperSection({
                     )}
                   </td>
                   <td
-                    className={`py-2 px-3 text-right tabular-nums ${rateColor}`}
+                    className={`py-2 px-3 text-right tabular-nums font-medium ${rateColor}`}
                   >
                     {task.successRate !== null
                       ? `${task.successRate}%`
@@ -607,82 +638,6 @@ function AutoUpdateSection({
   );
 }
 
-function RecentSessionsSection({
-  sessions,
-}: {
-  sessions: ExtendedHealthData["recentSessions"];
-}) {
-  if (sessions.length === 0) return null;
-
-  const activeSessions = sessions.filter((s) => s.status === "active");
-  const completedSessions = sessions.filter((s) => s.status === "completed");
-
-  return (
-    <>
-      <SectionHeader>
-        Agent Sessions ({activeSessions.length} active, {completedSessions.length} recent)
-      </SectionHeader>
-      <div className="overflow-x-auto mb-6">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border/60">
-              <th className="text-left text-xs text-muted-foreground font-medium py-2 pr-4">
-                Status
-              </th>
-              <th className="text-left text-xs text-muted-foreground font-medium py-2 px-3">
-                Branch
-              </th>
-              <th className="text-left text-xs text-muted-foreground font-medium py-2 px-3">
-                Task
-              </th>
-              <th className="text-right text-xs text-muted-foreground font-medium py-2 px-3">
-                Issue
-              </th>
-              <th className="text-right text-xs text-muted-foreground font-medium py-2 pl-3">
-                Started
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {sessions.map((s) => (
-              <tr
-                key={s.id}
-                className="border-b border-border/30"
-              >
-                <td className="py-2 pr-4">
-                  <span
-                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                      s.status === "active"
-                        ? "bg-blue-500/15 text-blue-600"
-                        : s.status === "completed"
-                          ? "bg-green-500/15 text-green-600"
-                          : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {s.status}
-                  </span>
-                </td>
-                <td className="py-2 px-3 text-xs font-mono truncate max-w-[200px]">
-                  {s.branch ?? "-"}
-                </td>
-                <td className="py-2 px-3 text-xs truncate max-w-[250px]">
-                  {s.task ?? "-"}
-                </td>
-                <td className="py-2 px-3 text-right text-xs tabular-nums">
-                  {s.issueNumber ? `#${s.issueNumber}` : "-"}
-                </td>
-                <td className="py-2 pl-3 text-right text-xs text-muted-foreground" suppressHydrationWarning>
-                  {s.startedAt ? formatRelativeTime(s.startedAt) : "-"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
-
 const GITHUB_REPO = "quantified-uncertainty/longterm-wiki";
 
 function CurrentDeploymentSection() {
@@ -736,7 +691,7 @@ function CurrentDeploymentSection() {
                   {shortSha}
                 </a>
               ) : (
-                shortSha || "—"
+                shortSha || "\u2014"
               )}
               {commitMessage && (
                 <span className="ml-2 text-muted-foreground truncate inline-block max-w-[300px] align-bottom">
@@ -750,7 +705,7 @@ function CurrentDeploymentSection() {
           <div>
             <span className="text-muted-foreground text-xs">Branch</span>
             <div className="text-xs mt-0.5">
-              <span className="font-mono">{commitRef || "—"}</span>
+              <span className="font-mono">{commitRef || "\u2014"}</span>
               {prSearchUrl && (
                 <a
                   href={prSearchUrl}
@@ -818,38 +773,35 @@ export async function SystemHealthContent() {
   const extendedError = !extendedResult.ok ? extendedResult.error : null;
   const openPRs: OpenPRDisplayRow[] = pullsData?.pulls ?? [];
 
-  // When using fallback data (API down), stat values should show as unavailable
-  const isApiFallback = source === "local";
-
-  const { overall, checkedAt, services: rawServices, dbCounts, recentIncidents, jobsQueue, activeAgents } =
+  const { overall, checkedAt, services: rawServices, recentIncidents } =
     data;
 
-  // Augment github-actions service status with CI data when available
-  const services = rawServices.map((svc) => {
-    if (svc.name === "github-actions" && svc.status === "unknown" && extended?.ci) {
-      const ciStatus = extended.ci.anyFailed
-        ? "degraded" as const
-        : extended.ci.allPassed
-          ? "healthy" as const
-          : "unknown" as const;
-      return { ...svc, status: ciStatus };
-    }
-    return svc;
-  });
-  const openIncidentCount = recentIncidents.filter(
-    (i) => i.status === "open"
-  ).length;
-  const criticalCount = recentIncidents.filter(
-    (i) => i.severity === "critical" && i.status === "open"
-  ).length;
+  // Augment github-actions service status with CI data when available.
+  // Filter out unmonitored services (discord-bot, vercel-frontend) that
+  // permanently show "Not monitored" — they have no health check wiring.
+  const services = rawServices
+    .filter((svc) => MONITORED_SERVICES.has(svc.name))
+    .map((svc) => {
+      if (svc.name === "github-actions" && svc.status === "unknown" && extended?.ci) {
+        const ciStatus = extended.ci.anyFailed
+          ? "degraded" as const
+          : extended.ci.allPassed
+            ? "healthy" as const
+            : "unknown" as const;
+        return { ...svc, status: ciStatus };
+      }
+      return svc;
+    });
 
-  const incidentRows: IncidentDisplayRow[] = recentIncidents;
-
-  const totalJobs = Object.values(jobsQueue).reduce(
-    (sum, n) => sum + n,
+  // Count open incidents from service cards (all-time) to reconcile with
+  // the recent-only (last 24h) incident list shown below
+  const totalOpenIncidentsAllTime = services.reduce(
+    (sum, svc) => sum + svc.openIncidents,
     0
   );
-  const pendingJobs = jobsQueue["pending"] ?? 0;
+  const incidentRows: IncidentDisplayRow[] = recentIncidents;
+  const recentOpenCount = recentIncidents.filter((i) => i.status === "open").length;
+  const olderOpenCount = totalOpenIncidentsAllTime - recentOpenCount;
 
   return (
     <>
@@ -862,9 +814,9 @@ export async function SystemHealthContent() {
       {/* Overall status banner */}
       <OverallBanner status={overall} checkedAt={checkedAt} />
 
-      {/* Service status cards */}
+      {/* Service status cards — only monitored services */}
       {services.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+        <div className="grid grid-cols-3 gap-3 mb-6">
           {services.map((svc) => (
             <ServiceCard key={svc.name} service={svc} />
           ))}
@@ -873,46 +825,6 @@ export async function SystemHealthContent() {
 
       {/* Current deployment */}
       <CurrentDeploymentSection />
-
-      {/* Quick stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-        <StatCard
-          label="Active agents"
-          value={isApiFallback ? null : activeAgents}
-          colorClass={activeAgents > 0 ? "text-blue-600" : undefined}
-        />
-        <StatCard
-          label="Open PRs"
-          value={openPRs.length}
-          subtext={
-            openPRs.filter((p) => p.mergeable === "conflicting").length > 0
-              ? `${openPRs.filter((p) => p.mergeable === "conflicting").length} with conflicts`
-              : undefined
-          }
-          colorClass={openPRs.length > 0 ? "text-purple-600" : undefined}
-        />
-        <StatCard
-          label="Open incidents"
-          value={isApiFallback ? null : openIncidentCount}
-          subtext="last 24h"
-          colorClass={openIncidentCount > 0 ? "text-yellow-600" : undefined}
-        />
-        <StatCard
-          label="Critical"
-          value={isApiFallback ? null : criticalCount}
-          colorClass={criticalCount > 0 ? "text-red-500" : "text-green-600"}
-        />
-        <StatCard
-          label="Wiki pages"
-          value={isApiFallback ? null : dbCounts.pages.toLocaleString()}
-          subtext={isApiFallback ? undefined : `${dbCounts.entities} entities`}
-        />
-        <StatCard
-          label="Jobs queue"
-          value={isApiFallback ? null : totalJobs}
-          subtext={isApiFallback ? undefined : pendingJobs > 0 ? `${pendingJobs} pending` : "idle"}
-        />
-      </div>
 
       {/* CI Pipeline Status */}
       {extended ? (
@@ -949,7 +861,7 @@ export async function SystemHealthContent() {
 
       {/* Recent incidents */}
       <SectionHeader>Recent incidents (last 24h)</SectionHeader>
-      {incidentRows.length === 0 ? (
+      {incidentRows.length === 0 && olderOpenCount === 0 ? (
         <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground mb-6">
           <p className="text-lg font-medium mb-2">No recent incidents</p>
           <p className="text-sm">
@@ -958,7 +870,21 @@ export async function SystemHealthContent() {
           </p>
         </div>
       ) : (
-        <SystemHealthTable data={incidentRows} />
+        <>
+          {incidentRows.length > 0 && (
+            <SystemHealthTable data={incidentRows} />
+          )}
+          {olderOpenCount > 0 && (
+            <div className="rounded-lg border border-yellow-300 bg-yellow-500/10 p-4 mb-6 text-sm">
+              <span className="font-medium text-yellow-700">
+                {olderOpenCount} older open incident{olderOpenCount !== 1 ? "s" : ""}
+              </span>
+              <span className="text-muted-foreground">
+                {" "}detected more than 24h ago{incidentRows.length === 0 ? " (none in last 24h)" : ""}
+              </span>
+            </div>
+          )}
+        </>
       )}
 
       {/* Groundskeeper Tasks */}
@@ -973,13 +899,6 @@ export async function SystemHealthContent() {
         <AutoUpdateSection autoUpdate={extended.autoUpdate} />
       ) : extendedError ? (
         <SectionUnavailable title="Auto-Update System" error={extendedError} />
-      ) : null}
-
-      {/* Agent Sessions */}
-      {extended ? (
-        <RecentSessionsSection sessions={extended.recentSessions} />
-      ) : extendedError ? (
-        <SectionUnavailable title="Agent Sessions" error={extendedError} />
       ) : null}
 
       <DataSourceBanner source={source} apiError={apiError} />
