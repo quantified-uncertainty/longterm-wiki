@@ -4,15 +4,14 @@
  * Reads the latest Anthropic valuation from the KB system and entity previews
  * server-side, passing them to the interactive client component.
  *
- * The old facts pipeline has been retired — stakeholder-specific data (per-founder
- * stakes, pledge rates, etc.) is hardcoded in the client component. Only the
- * overall valuation is dynamic via KB.
+ * Stakeholder-specific data (per-founder stakes, pledge rates, etc.) is
+ * hardcoded in the client component. Only the overall valuation is dynamic via KB.
  */
 
 import { getKBLatest } from "@data/kb";
 import { getEntityById, getPageById, getEntityHref } from "@/data";
 import { numericIdToSlug } from "@/lib/mdx";
-import { AnthropicStakeholdersTableClient, type FactData, type EntityPreview } from "./AnthropicStakeholdersTableClient";
+import { AnthropicStakeholdersTableClient, type EntityPreview } from "./AnthropicStakeholdersTableClient";
 
 /** Entity numeric IDs that appear as links in the table */
 const ENTITY_NUMERIC_IDS = ["E91", "E90", "E59", "E577", "E436"] as const;
@@ -58,7 +57,6 @@ export async function AnthropicStakeholdersTable() {
       valuation={valuation}
       valuationDisplay={valuationDisplay}
       asOf={asOf}
-      facts={{}}
       entityPreviews={entityPreviews}
     />
   );

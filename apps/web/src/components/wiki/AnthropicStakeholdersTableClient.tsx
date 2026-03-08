@@ -4,7 +4,6 @@
  * Features:
  * - Column visibility toggles
  * - User-adjustable parameters (valuation, pledge multiplier)
- * - Radix HoverCards on fact values (interactive, stays open on cursor move)
  * - Entity preview HoverCards on stakeholder name links
  * - Pledge shown as a range where uncertain (employee pool: 25–50%)
  * - Derived columns: Exp. Donated, Exp. EA-Effective
@@ -22,16 +21,6 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 // ─── Exported types (used by server wrapper) ─────────────────────────────────
-
-export interface FactData {
-  label?: string;
-  value?: string;
-  asOf?: string;
-  note?: string;
-  sourceTitle?: string;
-  sourcePublication?: string;
-  sourceCredibility?: number;
-}
 
 export interface EntityPreview {
   title: string;
@@ -68,8 +57,6 @@ interface Stakeholder {
   link?: string;
   notes?: string;
   includeInTotal?: boolean;
-  stakeFactRef?: string;
-  pledgeFactRef?: string;
 }
 
 const STAKEHOLDERS: Stakeholder[] = [
@@ -82,7 +69,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     link: "/wiki/E91",
     notes: "GWWC signatory; early GiveWell supporter",
     includeInTotal: true,
-    stakeFactRef: "anthropic.e3b8a291",
   },
   {
     name: "Daniela Amodei",
@@ -93,7 +79,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     link: "/wiki/E90",
     notes: "Married to Holden Karnofsky (GiveWell co-founder)",
     includeInTotal: true,
-    stakeFactRef: "anthropic.e3b8a291",
   },
   {
     name: "Chris Olah",
@@ -104,7 +89,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     link: "/wiki/E59",
     notes: "Interpretability pioneer; participated in EA events; safety-focused",
     includeInTotal: true,
-    stakeFactRef: "anthropic.e3b8a291",
   },
   {
     name: "Jack Clark",
@@ -114,7 +98,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     eaAlignMin: 0.3, eaAlignMax: 0.5,
     notes: "Former OpenAI Policy Director; responsible AI advocate; EA-adjacent framing",
     includeInTotal: true,
-    stakeFactRef: "anthropic.e3b8a291",
   },
   {
     name: "Tom Brown",
@@ -124,7 +107,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     eaAlignMin: 0.15, eaAlignMax: 0.3,
     notes: "GPT-3 lead author; chose Anthropic's safety mission over other options",
     includeInTotal: true,
-    stakeFactRef: "anthropic.e3b8a291",
   },
   {
     name: "Jared Kaplan",
@@ -134,7 +116,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     eaAlignMin: 0.15, eaAlignMax: 0.3,
     notes: "Scaling laws pioneer; safety-motivated co-founder; no documented EA pledge",
     includeInTotal: true,
-    stakeFactRef: "anthropic.e3b8a291",
   },
   {
     name: "Sam McCandlish",
@@ -144,7 +125,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     eaAlignMin: 0.15, eaAlignMax: 0.3,
     notes: "Alignment researcher; no publicly documented EA connections",
     includeInTotal: true,
-    stakeFactRef: "anthropic.e3b8a291",
   },
   {
     name: "Jaan Tallinn",
@@ -155,7 +135,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     link: "/wiki/E577",
     notes: "Led Series A; Skype co-founder; major AI safety funder",
     includeInTotal: true,
-    stakeFactRef: "anthropic.d7c6f042",
   },
   {
     name: "Dustin Moskovitz",
@@ -166,7 +145,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     link: "/wiki/E436",
     notes: "$500M already in Good Ventures nonprofit vehicle",
     includeInTotal: true,
-    stakeFactRef: "anthropic.a9e1f835",
   },
   {
     name: "Employee equity pool",
@@ -176,8 +154,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     eaAlignMin: 0.4, eaAlignMax: 0.7,
     notes: "Pledge rates vary: pre-2025 hires up to 50% with 3:1 match; post-2024 hires 25% with 1:1 match. EA Forum estimates ~$20\u201340B in employee DAFs already transferred.",
     includeInTotal: true,
-    stakeFactRef: "anthropic.f2a06bd3",
-    pledgeFactRef: "anthropic.b2c4d87e",
   },
   {
     name: "Google",
@@ -186,7 +162,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     pledgeMin: 0, pledgeMax: 0,
     eaAlignMin: 0, eaAlignMax: 0,
     notes: "$3.3B invested across 3 rounds; no philanthropic pledge",
-    stakeFactRef: "anthropic.b3a9f201",
   },
   {
     name: "Amazon",
@@ -195,7 +170,6 @@ const STAKEHOLDERS: Stakeholder[] = [
     pledgeMin: 0, pledgeMax: 0,
     eaAlignMin: 0, eaAlignMax: 0,
     notes: "$10.75B invested; exact stake undisclosed; primary cloud partner",
-    stakeFactRef: "anthropic.9a1f5c63",
   },
   {
     name: "Series G / Other institutional",
@@ -249,64 +223,6 @@ function eaAlignBadge(min: number, max: number): { label: string; cls: string } 
   if (mid >= 0.4)  return { label: "Medium",    cls: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800" };
   if (mid >= 0.08) return { label: "Low",       cls: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800" };
   return { label: "None", cls: "bg-gray-100 text-gray-500 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-800" };
-}
-
-// ─── Fact hover card ──────────────────────────────────────────────────────────
-
-function FactHoverCard({ factData, children }: { factData?: FactData; children: React.ReactNode }) {
-  if (!factData) return <>{children}</>;
-  return (
-    <HoverCard.Root openDelay={200} closeDelay={100}>
-      <HoverCard.Trigger asChild>
-        <span className="border-b border-dotted border-muted-foreground/50 cursor-help decoration-muted-foreground/40">
-          {children}
-        </span>
-      </HoverCard.Trigger>
-      <HoverCard.Portal>
-        <HoverCard.Content
-          className="w-[260px] p-3 bg-popover text-popover-foreground border rounded-md shadow-lg z-50 text-xs"
-          sideOffset={4}
-          align="start"
-        >
-          <HoverCard.Arrow className="fill-border" />
-          {factData.label && (
-            <span className="block text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide mb-1">
-              {factData.label}
-            </span>
-          )}
-          {factData.value && (
-            <span className="block font-semibold text-foreground mb-1">{factData.value}</span>
-          )}
-          {factData.asOf && (
-            <span className="block text-muted-foreground">As of: {factData.asOf}</span>
-          )}
-          {factData.note && (
-            <span className="block text-muted-foreground mt-1 leading-snug">{factData.note}</span>
-          )}
-          {factData.sourceTitle && (
-            <span className="block text-muted-foreground mt-1.5">
-              <span className="block truncate">Source: {factData.sourceTitle}</span>
-              {factData.sourcePublication && (
-                <span className="flex items-center gap-1 mt-0.5">
-                  <span className="text-muted-foreground/80">{factData.sourcePublication}</span>
-                  {factData.sourceCredibility != null && (
-                    <span className={cn(
-                      "inline-block px-1 py-px rounded text-[9px] font-medium",
-                      factData.sourceCredibility >= 4 ? "bg-green-500/15 text-green-600 dark:text-green-400" :
-                      factData.sourceCredibility >= 3 ? "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400" :
-                      "bg-red-500/15 text-red-600 dark:text-red-400"
-                    )}>
-                      {factData.sourceCredibility}/5
-                    </span>
-                  )}
-                </span>
-              )}
-            </span>
-          )}
-        </HoverCard.Content>
-      </HoverCard.Portal>
-    </HoverCard.Root>
-  );
 }
 
 // ─── Entity preview hover card ────────────────────────────────────────────────
@@ -374,7 +290,6 @@ interface Props {
   valuation: number;
   valuationDisplay: string;
   asOf?: string;
-  facts: Record<string, FactData>;
   entityPreviews: Record<string, EntityPreview>;
 }
 
@@ -382,7 +297,6 @@ export function AnthropicStakeholdersTableClient({
   valuation,
   valuationDisplay,
   asOf,
-  facts,
   entityPreviews,
 }: Props) {
   const [visibleCols, setVisibleCols] = useState<Set<ColKey>>(
@@ -438,13 +352,9 @@ export function AnthropicStakeholdersTableClient({
             )}
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed max-w-2xl">
-            Dollar values at{" "}
-            <FactHoverCard factData={facts["anthropic.6796e194"]}>
-              {effectiveDisplay} valuation
-            </FactHoverCard>
-            . <strong>Pledge&nbsp;%</strong> = fraction of equity pledged to charity.{" "}
+            Dollar values at {effectiveDisplay} valuation.{" "}
+            <strong>Pledge&nbsp;%</strong> = fraction of equity pledged to charity.{" "}
             <strong>EA&nbsp;Align&nbsp;%</strong> = estimated probability donations go to EA-aligned causes.
-            Hover underlined values for sources.
           </p>
         </div>
 
@@ -517,8 +427,6 @@ export function AnthropicStakeholdersTableClient({
               const { label: eaLabel, cls: eaCls } = eaAlignBadge(s.eaAlignMin, s.eaAlignMax);
               const stakeKnown = s.stakeMin !== null && s.stakeMax !== null;
               const hasPledge = s.pledgeMax > 0;
-              const stakeFactData = s.stakeFactRef ? facts[s.stakeFactRef] : undefined;
-              const pledgeFactData = s.pledgeFactRef ? facts[s.pledgeFactRef] : undefined;
 
               return (
                 <TableRow key={i}>
@@ -546,22 +454,18 @@ export function AnthropicStakeholdersTableClient({
 
                   {show("stake") && (
                     <TableCell className="text-right text-sm tabular-nums">
-                      <FactHoverCard factData={stakeFactData}>
-                        {stakeKnown ? (
-                          fmtStake(s.stakeMin, s.stakeMax)
-                        ) : (
-                          <span className="text-muted-foreground italic text-xs">Undisclosed</span>
-                        )}
-                      </FactHoverCard>
+                      {stakeKnown ? (
+                        fmtStake(s.stakeMin, s.stakeMax)
+                      ) : (
+                        <span className="text-muted-foreground italic text-xs">Undisclosed</span>
+                      )}
                     </TableCell>
                   )}
 
                   {show("value") && (
                     <TableCell className="text-right text-sm tabular-nums">
                       {stakeKnown && s.valueMin !== null && s.valueMax !== null ? (
-                        <FactHoverCard factData={stakeFactData}>
-                          {fmtDollarRange(s.valueMin, s.valueMax)}
-                        </FactHoverCard>
+                        fmtDollarRange(s.valueMin, s.valueMax)
                       ) : (
                         <span className="text-muted-foreground">&mdash;</span>
                       )}
@@ -571,9 +475,7 @@ export function AnthropicStakeholdersTableClient({
                   {show("pledge") && (
                     <TableCell className="text-right text-sm tabular-nums">
                       {hasPledge ? (
-                        <FactHoverCard factData={pledgeFactData ?? stakeFactData}>
-                          {fmtPledge(s.pledgeMin, s.pledgeMax)}
-                        </FactHoverCard>
+                        fmtPledge(s.pledgeMin, s.pledgeMax)
                       ) : (
                         <span className="text-muted-foreground">&mdash;</span>
                       )}
@@ -640,8 +542,7 @@ export function AnthropicStakeholdersTableClient({
       </div>
 
       <p className="text-[10px] text-muted-foreground/60 mt-1.5">
-        Underlined values have source citations — hover to view. Ranges reflect uncertainty.
-        Pledges are not legally binding.
+        Ranges reflect uncertainty. Pledges are not legally binding.
       </p>
     </div>
   );

@@ -733,7 +733,6 @@ function ContentCoverageSection({
   // Use pre-computed coverage targets when available, else compute from scratch
   const recommended = coverage?.targets ?? getRecommendedMetrics(wordCount || 0, contentFormat || "article");
 
-  // Entity types where canonical facts are scored (real-world people and organizations)
   // Overview is scored for article and diagram formats
   const isOverviewFormat = !contentFormat || contentFormat === "article" || contentFormat === "diagram";
 

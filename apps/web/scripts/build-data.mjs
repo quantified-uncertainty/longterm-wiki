@@ -1636,9 +1636,7 @@ async function main() {
       accuracyChecked: page.citationHealth?.accuracyChecked ?? 0,
       accuracyTotal: page.citationHealth?.total ?? 0,
       ratings: page.ratings,
-      factCount: 0,
       hasOverview: page.metrics?.hasOverview,
-      entityType: page.entityType ?? null,
     });
     page.coverage = coverage;
     const pct = coverage.passing / coverage.total;

@@ -507,7 +507,6 @@ export interface Page {
     items: Record<string, "green" | "amber" | "red">;
     editHistoryCount?: number;
     ratingsString?: string;
-    factCount?: number;
   };
   /** Pre-computed reader importance rank (1 = most important) */
   readerRank?: number;
