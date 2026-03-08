@@ -67,6 +67,9 @@ async function callSweepEndpoint(
   }
 }
 
+/** The label used by Claude Code agent sessions (not PR Patrol). */
+const AGENT_WORKING_LABEL = "agent:working";
+
 /**
  * Remove the agent:working label from a GitHub issue if it has that label.
  * Returns true if the label was removed (or wasn't present), false on error.
@@ -92,7 +95,7 @@ async function removeClaudeWorkingLabel(
     }
 
     const hasLabel = issue.labels.some(
-      (label) => (typeof label === "string" ? label : label.name) === "agent:working",
+      (label) => (typeof label === "string" ? label : label.name) === AGENT_WORKING_LABEL,
     );
 
     if (!hasLabel) {
@@ -104,7 +107,7 @@ async function removeClaudeWorkingLabel(
       owner,
       repo,
       issue_number: issueNumber,
-      name: "agent:working",
+      name: AGENT_WORKING_LABEL,
     });
 
     logger.info({ issueNumber }, "Removed agent:working label from closed issue");

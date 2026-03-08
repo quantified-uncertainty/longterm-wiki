@@ -165,7 +165,12 @@ describe('buildStatusCommentBody', () => {
 
   it('shows stage for agent-working', () => {
     const body = buildStatusCommentBody(makePrNode(), ['agent-working']);
-    expect(body).toContain('Claude is working on this PR');
+    expect(body).toContain('An agent is actively working on this PR');
+  });
+
+  it('shows stage for pr-patrol-working', () => {
+    const body = buildStatusCommentBody(makePrNode(), ['pr-patrol-working']);
+    expect(body).toContain('PR Patrol is actively working on this PR');
   });
 
   it('shows draft stage', () => {
@@ -202,7 +207,7 @@ describe('buildStatusCommentBody', () => {
       'ci-failing',
       'agent-working',
     ]);
-    expect(body).toContain('Claude is working on this PR');
+    expect(body).toContain('An agent is actively working on this PR');
     // Both block reasons should still appear in the Blocks line
     expect(body).toContain('`ci-failing`');
     expect(body).toContain('`agent-working`');

@@ -22,7 +22,7 @@
  *   crux health --json               JSON output
  *   crux health --report             Aggregate markdown report to stdout
  *   crux health --auto-issue         Manage GitHub wellness issue
- *   crux health --cleanup-labels     Auto-remove stale agent:working labels
+ *   crux health --cleanup-labels     Auto-remove stale working labels
  */
 
 import { getColors } from '../lib/output.ts';

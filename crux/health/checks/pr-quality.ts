@@ -4,15 +4,15 @@
  * Checks:
  *   - Recent PRs with empty/missing body (<20 chars)
  *   - Stale open PRs (>7 days since last update)
- *   - Issues stuck with agent:working label (>8 hours)
+ *   - Issues/PRs stuck with working labels (agent:working, pr-patrol:working) >8 hours
  *   - Open bug count (informational)
  *
- * Optionally auto-removes stale agent:working labels (self-healing).
+ * Optionally auto-removes stale working labels (self-healing).
  */
 
 import type { CheckResult } from '../health-check.ts';
 import { githubApi, REPO } from '../../lib/github.ts';
-import { LABELS } from '../../lib/labels.ts';
+import { LABELS, ANY_WORKING_LABELS } from '../../lib/labels.ts';
 
 interface PullRequest {
   number: number;
@@ -110,49 +110,52 @@ export async function checkPrQuality(options?: {
 
   // ── Issue quality checks ─────────────────────────────────────────────
 
-  // Check for agent:working label issues stuck >8 hours
-  let stuckIssues: Issue[] = [];
-  try {
-    stuckIssues = await githubApi<Issue[]>(
-      `/repos/${REPO}/issues?labels=${encodeURIComponent(LABELS.AGENT_WORKING)}&state=open&per_page=20`,
-    );
-  } catch (err) {
-    detail.push(`SKIP  ${LABELS.AGENT_WORKING} issues: ${err instanceof Error ? err.message : String(err)}`);
-  }
+  // Check for working labels (agent:working, pr-patrol:working) stuck >8 hours
+  for (const workingLabel of ANY_WORKING_LABELS) {
+    let stuckIssues: Issue[] = [];
+    try {
+      stuckIssues = await githubApi<Issue[]>(
+        `/repos/${REPO}/issues?labels=${encodeURIComponent(workingLabel)}&state=open&per_page=20`,
+      );
+    } catch (err) {
+      detail.push(`SKIP  ${workingLabel} issues: ${err instanceof Error ? err.message : String(err)}`);
+      continue;
+    }
 
-  const stuckOnes = stuckIssues.filter((issue) => {
-    const lastActivity = issue.updated_at || issue.created_at;
-    return hoursAgoFromNow(lastActivity, now) > STUCK_LABEL_THRESHOLD_H;
-  });
+    const stuckOnes = stuckIssues.filter((issue) => {
+      const lastActivity = issue.updated_at || issue.created_at;
+      return hoursAgoFromNow(lastActivity, now) > STUCK_LABEL_THRESHOLD_H;
+    });
 
-  if (stuckOnes.length > 0) {
-    failures.push(`${stuckOnes.length} issue(s) stuck with ${LABELS.AGENT_WORKING} label for 8+ hours`);
+    if (stuckOnes.length > 0) {
+      failures.push(`${stuckOnes.length} issue(s) stuck with ${workingLabel} label for 8+ hours`);
 
-    if (cleanupStaleLabels) {
-      for (const issue of stuckOnes) {
-        try {
-          await githubApi(
-            `/repos/${REPO}/issues/${issue.number}/labels/${encodeURIComponent(LABELS.AGENT_WORKING)}`,
-            { method: 'DELETE' },
-          );
-          detail.push(`WARN  #${issue.number} ${issue.title.slice(0, 50)} — auto-removed stale ${LABELS.AGENT_WORKING} label`);
-        } catch (err) {
-          // 404 means label was already removed — that's fine
-          const msg = err instanceof Error ? err.message : String(err);
-          if (!msg.includes('404')) {
-            detail.push(`WARN  #${issue.number} — failed to remove label: ${msg}`);
-          } else {
-            detail.push(`WARN  #${issue.number} ${issue.title.slice(0, 50)} — label already removed`);
+      if (cleanupStaleLabels) {
+        for (const issue of stuckOnes) {
+          try {
+            await githubApi(
+              `/repos/${REPO}/issues/${issue.number}/labels/${encodeURIComponent(workingLabel)}`,
+              { method: 'DELETE' },
+            );
+            detail.push(`WARN  #${issue.number} ${issue.title.slice(0, 50)} — auto-removed stale ${workingLabel} label`);
+          } catch (err) {
+            // 404 means label was already removed — that's fine
+            const msg = err instanceof Error ? err.message : String(err);
+            if (!msg.includes('404')) {
+              detail.push(`WARN  #${issue.number} — failed to remove label: ${msg}`);
+            } else {
+              detail.push(`WARN  #${issue.number} ${issue.title.slice(0, 50)} — label already removed`);
+            }
           }
+        }
+      } else {
+        for (const issue of stuckOnes) {
+          detail.push(`WARN  #${issue.number} ${issue.title.slice(0, 50)} — stuck with ${workingLabel}`);
         }
       }
     } else {
-      for (const issue of stuckOnes) {
-        detail.push(`WARN  #${issue.number} ${issue.title.slice(0, 50)} — stuck with ${LABELS.AGENT_WORKING}`);
-      }
+      detail.push(`PASS  No stuck ${workingLabel} sessions`);
     }
-  } else {
-    detail.push(`PASS  No stuck ${LABELS.AGENT_WORKING} sessions`);
   }
 
   // Count open bugs (informational)

@@ -2,7 +2,7 @@ name: CI & PR Health
 run-name: "CI & PR Health${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 # Checks GitHub Actions workflow health, job queue status, and PR/issue quality.
-# Also cleans up stale agent:working labels.
+# Also cleans up stale working labels (agent:working, pr-patrol:working).
 # Runs twice daily — same schedule as the unified wellness check it replaced.
 #
 # Checks performed:

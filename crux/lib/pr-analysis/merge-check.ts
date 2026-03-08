@@ -37,6 +37,10 @@ export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
     blockReasons.push('agent-working');
   }
 
+  if (labels.includes(LABELS.PR_PATROL_WORKING)) {
+    blockReasons.push('pr-patrol-working');
+  }
+
   if (labels.includes(LABELS.STAGE_MERGING)) {
     blockReasons.push('in-merge-queue');
   }
