@@ -4,6 +4,7 @@
 
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { getColors } from '../lib/output.ts';
 
 // ── Paths ────────────────────────────────────────────────────────────────────
 
@@ -38,16 +39,31 @@ export function ensureDirs(): void {
 
 // ── Logging ──────────────────────────────────────────────────────────────────
 
+const cl = getColors();
+
+/** Exported for submodules that need to colorize their own log messages. */
+export { cl };
+
+function formatLocalTime(): string {
+  return new Date().toLocaleTimeString('en-US', {
+    timeZone: 'America/Los_Angeles',
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+}
+
 export function log(msg: string): void {
-  const line = `[${new Date().toISOString()}] ${msg}`;
-  console.error(line);
+  console.error(`${cl.dim}${formatLocalTime()}${cl.reset} ${msg}`);
 }
 
 export function logHeader(msg: string): void {
+  const t = formatLocalTime();
   console.error('');
-  log('═'.repeat(55));
-  log(msg);
-  log('═'.repeat(55));
+  console.error(`${cl.dim}${t}${cl.reset} ${cl.cyan}${'─'.repeat(50)}${cl.reset}`);
+  console.error(`${cl.dim}${t}${cl.reset} ${cl.bold}${msg}${cl.reset}`);
+  console.error(`${cl.dim}${t}${cl.reset} ${cl.cyan}${'─'.repeat(50)}${cl.reset}`);
 }
 
 export function appendJsonl(file: string, entry: Record<string, unknown>): void {

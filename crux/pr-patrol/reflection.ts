@@ -4,7 +4,7 @@
 
 import { existsSync, readFileSync } from 'fs';
 import type { PatrolConfig } from './types.ts';
-import { appendJsonl, JSONL_FILE, log, logHeader, REFLECTION_FILE } from './state.ts';
+import { appendJsonl, cl, JSONL_FILE, log, logHeader, REFLECTION_FILE } from './state.ts';
 import { spawnClaude } from './execution.ts';
 
 export async function runReflection(
@@ -14,13 +14,13 @@ export async function runReflection(
   logHeader(`Reflection (cycle #${cycleCount})`);
 
   if (!existsSync(JSONL_FILE)) {
-    log('Skipping reflection — no log file yet');
+    log(`${cl.dim}Skipping reflection — no log file yet${cl.reset}`);
     return;
   }
 
   const allEntries = readFileSync(JSONL_FILE, 'utf-8').trim().split('\n');
   if (allEntries.length < 10) {
-    log(`Skipping reflection — only ${allEntries.length} log entries (need ≥10)`);
+    log(`${cl.dim}Skipping reflection — only ${allEntries.length} log entries (need ≥10)${cl.reset}`);
     return;
   }
 
@@ -79,7 +79,7 @@ ${recentEntries}
         summary: result.output.slice(-500),
       });
       log(
-        `⚠ Reflection incomplete (${elapsedS}s, ${reason})`,
+        `${cl.yellow}⚠ Reflection incomplete${cl.reset} (${elapsedS}s, ${reason})`,
       );
     } else if (result.exitCode !== 0) {
       // Non-zero exit without timeout/max-turns — subprocess crashed or errored
@@ -93,7 +93,7 @@ ${recentEntries}
         summary: result.output.slice(-500),
       });
       log(
-        `⚠ Reflection failed with exit code ${result.exitCode} (${elapsedS}s)`,
+        `${cl.yellow}⚠ Reflection failed with exit code ${result.exitCode}${cl.reset} (${elapsedS}s)`,
       );
     } else {
       const filedIssue = /Created issue #|created.*#\d/.test(result.output);
@@ -106,13 +106,13 @@ ${recentEntries}
         summary: result.output.slice(-500),
       });
       log(
-        `✓ Reflection complete (${elapsedS}s, filed_issue=${filedIssue})`,
+        `${cl.green}✓ Reflection complete${cl.reset} (${elapsedS}s, filed_issue=${filedIssue})`,
       );
     }
   } catch (e) {
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
     log(
-      `✗ Reflection failed (${elapsedS}s): ${e instanceof Error ? e.message : String(e)}`,
+      `${cl.red}✗ Reflection failed${cl.reset} (${elapsedS}s): ${e instanceof Error ? e.message : String(e)}`,
     );
   }
 }

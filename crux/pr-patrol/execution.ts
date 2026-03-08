@@ -25,6 +25,7 @@ import {
 } from './comments.ts';
 import {
   appendJsonl,
+  cl,
   isAbandoned,
   isRecentlyProcessed,
   JSONL_FILE,
@@ -75,11 +76,11 @@ export async function checkMainBranch(config: PatrolConfig): Promise<MainBranchS
 
   // Check cooldown and abandoned status first
   if (isAbandoned(MAIN_BRANCH_KEY)) {
-    log('  Main branch fix abandoned — needs human intervention');
+    log(`  ${cl.yellow}Main branch fix abandoned — needs human intervention${cl.reset}`);
     return notRed;
   }
   if (isRecentlyProcessed(MAIN_BRANCH_KEY, config.cooldownSeconds)) {
-    log('  Main branch recently processed — skipping');
+    log(`  ${cl.dim}Main branch recently processed — skipping${cl.reset}`);
     return notRed;
   }
 
@@ -87,23 +88,23 @@ export async function checkMainBranch(config: PatrolConfig): Promise<MainBranchS
     const status = await libCheckMainBranch(config.repo);
 
     if (status.isRed) {
-      log(`  🔴 Main branch CI is RED (run #${status.runId}, sha ${status.sha.slice(0, 8)})`);
+      log(`  ${cl.red}🔴 Main branch CI is RED${cl.reset} (run #${status.runId}, sha ${status.sha.slice(0, 8)})`);
     } else {
-      log(`  Main branch CI is green`);
+      log(`  ${cl.green}Main branch CI is green${cl.reset}`);
     }
 
     return status;
   } catch (e) {
-    log(`  Warning: could not check main branch CI: ${e instanceof Error ? e.message : String(e)}`);
+    log(`  ${cl.yellow}Warning: could not check main branch CI: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
     return notRed;
   }
 }
 
 export async function fixMainBranch(status: MainBranchStatus, config: PatrolConfig): Promise<void> {
-  log(`→ Fixing main branch CI (run #${status.runId})`);
+  log(`${cl.bold}→${cl.reset} Fixing main branch CI (run #${status.runId})`);
 
   if (config.dryRun) {
-    log('  [DRY RUN] Would invoke Claude to fix main branch CI');
+    log(`  ${cl.dim}[DRY RUN] Would invoke Claude to fix main branch CI${cl.reset}`);
     appendJsonl(JSONL_FILE, {
       type: 'main_branch_result',
       run_id: status.runId,
@@ -129,11 +130,11 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
       const failCount = recordFailure(MAIN_BRANCH_KEY);
       outcome = 'timeout';
       reason = `Killed after ${config.timeoutMinutes}m timeout — attempt ${failCount}`;
-      log(`✗ Main branch fix timed out after ${config.timeoutMinutes}m (attempt ${failCount})`);
+      log(`${cl.red}✗ Main branch fix timed out after ${config.timeoutMinutes}m${cl.reset} (attempt ${failCount})`);
 
       if (failCount >= 2) {
         reason = `Abandoned after ${failCount} failures (timeout)`;
-        log(`✗ Main branch fix abandoned after ${failCount} failures`);
+        log(`${cl.red}✗ Main branch fix abandoned after ${failCount} failures${cl.reset}`);
       }
     } else if (result.exitCode === 0 && !result.hitMaxTurns) {
       const isNoOp = looksLikeNoOp(result.output);
@@ -141,25 +142,25 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
       if (isNoOp) {
         recordFailure(MAIN_BRANCH_KEY);
         reason = 'No-op: agent determined issue needs human intervention';
-        log(`⚠ Main branch fix no-op — agent stopped early (${elapsedS}s)`);
+        log(`${cl.yellow}⚠ Main branch fix no-op — agent stopped early${cl.reset} (${elapsedS}s)`);
       } else {
         resetFailCount(MAIN_BRANCH_KEY);
-        log(`✓ Main branch CI fix processed (${elapsedS}s)`);
+        log(`${cl.green}✓ Main branch CI fix processed${cl.reset} (${elapsedS}s)`);
       }
     } else if (result.hitMaxTurns) {
       const failCount = recordFailure(MAIN_BRANCH_KEY);
       outcome = 'max-turns';
       reason = `Hit max turns (${config.maxTurns}) — attempt ${failCount}`;
-      log(`⚠ Main branch fix hit max turns after ${elapsedS}s`);
+      log(`${cl.yellow}⚠ Main branch fix hit max turns after ${elapsedS}s${cl.reset}`);
 
       if (failCount >= 2) {
         reason = `Abandoned after ${failCount} failures`;
-        log(`✗ Main branch fix abandoned after ${failCount} failures`);
+        log(`${cl.red}✗ Main branch fix abandoned after ${failCount} failures${cl.reset}`);
       }
     } else {
       outcome = 'error';
       reason = `Exit code: ${result.exitCode}`;
-      log(`✗ Main branch fix failed (exit: ${result.exitCode}, ${elapsedS}s)`);
+      log(`${cl.red}✗ Main branch fix failed${cl.reset} (exit: ${result.exitCode}, ${elapsedS}s)`);
     }
 
     appendJsonl(JSONL_FILE, {
@@ -224,7 +225,7 @@ export function spawnClaude(
     const timeoutMs = config.timeoutMinutes * 60 * 1000;
     const timer = setTimeout(() => {
       timedOut = true;
-      log(`  ⚠ Claude subprocess timed out after ${config.timeoutMinutes}m — killing`);
+      log(`  ${cl.yellow}⚠ Claude subprocess timed out after ${config.timeoutMinutes}m — killing${cl.reset}`);
       child.kill('SIGTERM');
       // Force kill if SIGTERM doesn't exit within 10s.
       // Note: child.killed is true as soon as kill() is called, so we check
@@ -280,7 +281,7 @@ async function claimPr(prNum: number, repo: string): Promise<void> {
     });
     claimedPr = prNum;
   } catch {
-    log(`  Warning: could not add ${LABELS.AGENT_WORKING} label to PR #${prNum}`);
+    log(`  ${cl.yellow}Warning: could not add ${LABELS.AGENT_WORKING} label to PR #${prNum}${cl.reset}`);
   }
 }
 
@@ -313,12 +314,12 @@ export async function releaseCurrentClaim(repo: string): Promise<void> {
 // ── PR fix execution ────────────────────────────────────────────────────────
 
 export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
-  log(`→ Fixing PR #${pr.number} (${pr.title})`);
-  log(`  Issues: ${pr.issues.join(', ')}`);
-  log(`  Branch: ${pr.branch}`);
+  log(`${cl.bold}→${cl.reset} Fixing PR ${cl.cyan}#${pr.number}${cl.reset} (${pr.title})`);
+  log(`  Issues: ${cl.yellow}${pr.issues.join(', ')}${cl.reset}`);
+  log(`  Branch: ${cl.dim}${pr.branch}${cl.reset}`);
 
   if (config.dryRun) {
-    log('  [DRY RUN] Would invoke Claude to fix');
+    log(`  ${cl.dim}[DRY RUN] Would invoke Claude to fix${cl.reset}`);
     appendJsonl(JSONL_FILE, {
       type: 'pr_result',
       pr_num: pr.number,
@@ -408,11 +409,11 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
       const failCount = recordFailure(pr.number);
       outcome = 'timeout';
       reason = `Killed after ${effectiveTimeout}m timeout — attempt ${failCount}`;
-      log(`✗ PR #${pr.number} timed out after ${effectiveTimeout}m (attempt ${failCount})`);
+      log(`${cl.red}✗ PR #${pr.number} timed out after ${effectiveTimeout}m${cl.reset} (attempt ${failCount})`);
 
       if (failCount >= 2) {
         reason = `Abandoned after ${failCount} failures (timeout)`;
-        log(`✗ PR #${pr.number} abandoned after ${failCount} consecutive failures`);
+        log(`${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`);
         await postEventComment(pr.number, config.repo, buildAbandonmentComment(failCount, pr.issues))
           .catch((e: unknown) => log(`  Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}`));
       } else {
@@ -429,13 +430,13 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
         // gets skipped on future cycles instead of being retried forever.
         const failCount = recordFailure(pr.number);
         reason = `No-op: agent determined issue needs human intervention (attempt ${failCount})`;
-        log(`⚠ PR #${pr.number} no-op — agent stopped early (${elapsedS}s)`);
+        log(`${cl.yellow}⚠ PR #${pr.number} no-op — agent stopped early${cl.reset} (${elapsedS}s)`);
 
         await postEventComment(pr.number, config.repo, buildNoOpComment(pr.issues))
           .catch((e: unknown) => log(`  Warning: could not post no-op comment: ${e instanceof Error ? e.message : String(e)}`));
       } else {
         resetFailCount(pr.number);
-        log(`✓ PR #${pr.number} processed successfully (${elapsedS}s)`);
+        log(`${cl.green}✓ PR #${pr.number} processed successfully${cl.reset} (${elapsedS}s)`);
 
         // Post fix-complete summary comment
         const outputTail = result.output.slice(-500);
@@ -446,12 +447,12 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
       const failCount = recordFailure(pr.number);
       outcome = 'max-turns';
       reason = `Hit max turns (${effectiveMaxTurns}) — attempt ${failCount}`;
-      log(`⚠ PR #${pr.number} hit max turns after ${elapsedS}s (attempt ${failCount})`);
+      log(`${cl.yellow}⚠ PR #${pr.number} hit max turns after ${elapsedS}s${cl.reset} (attempt ${failCount})`);
 
       if (failCount >= 2) {
         reason = `Abandoned after ${failCount} failures`;
         log(
-          `✗ PR #${pr.number} abandoned after ${failCount} consecutive failures`,
+          `${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`,
         );
         await postEventComment(pr.number, config.repo, buildAbandonmentComment(failCount, pr.issues))
           .catch((e: unknown) => log(`  Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}`));
@@ -460,7 +461,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
       outcome = 'error';
       reason = `Exit code: ${result.exitCode}`;
       log(
-        `✗ PR #${pr.number} processing failed (exit: ${result.exitCode}, ${elapsedS}s)`,
+        `${cl.red}✗ PR #${pr.number} processing failed${cl.reset} (exit: ${result.exitCode}, ${elapsedS}s)`,
       );
     }
 
