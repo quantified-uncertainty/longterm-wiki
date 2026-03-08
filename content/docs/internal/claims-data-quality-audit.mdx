@@ -164,15 +164,15 @@ The second cause is particularly frustrating — the claims DO have footnote ref
 
 ### Issue 7: MDX/HTML Markup in Text (4.6%)
 
-69 claims contain raw `<EntityLink>`, `<KBFactValue>`, or other MDX markup.
+69 claims contain raw `<EntityLink>`, `<KBF>`, or other MDX markup.
 
 **Examples:**
 - `"White House AI Czar <EntityLink id=\"E431\">...</EntityLink> announced new regulations"`
-- `"Anthropic's valuation reached <KBFactValue entity=\"anthropic\" property=\"valuation\" />"` (the KB fact component)
+- `"Anthropic's valuation reached <KBF entity=\"anthropic\" property=\"valuation\" />"` (the KB fact component)
 
-**Decision:** `<EntityLink>` markup in claims is **acceptable** but needs to render correctly in all display contexts. `<KBFactValue>` markup should be resolved to the actual value before storage.
+**Decision:** `<EntityLink>` markup in claims is **acceptable** but needs to render correctly in all display contexts. `<KBF>` markup should be resolved to the actual value before storage.
 
-**Remediation:** For `<KBFactValue>` tags: resolve to literal values during extraction. For `<EntityLink>`: keep in claim_text but ensure rendering pipeline handles them. Add a `claim_text_plain` computed field that strips all markup for search/display contexts.
+**Remediation:** For `<KBF>` tags: resolve to literal values during extraction. For `<EntityLink>`: keep in claim_text but ensure rendering pipeline handles them. Add a `claim_text_plain` computed field that strips all markup for search/display contexts.
 
 ### Issue 8: Self-Referencing relatedEntities (from audit)
 
