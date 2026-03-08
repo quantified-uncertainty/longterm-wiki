@@ -13,7 +13,7 @@
 import { cn } from "@/lib/utils";
 import { getKBFacts, getKBLatest, getKBProperty } from "@data/kb";
 import type { Fact } from "@longterm-wiki/kb";
-import { CURRENCIES } from "@longterm-wiki/kb";
+import { CURRENCIES } from "@longterm-wiki/kb/currencies";
 import { formatValue } from "@lib/format-value";
 import { formatKBFactValue, formatKBDate, isUrl } from "./format";
 

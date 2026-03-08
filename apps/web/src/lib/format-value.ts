@@ -5,7 +5,7 @@
  * for use by both the facts system and the claims system.
  */
 
-import { CURRENCIES } from "@longterm-wiki/kb";
+import { CURRENCIES } from "@longterm-wiki/kb/currencies";
 
 /** Remove trailing .0 from formatted numbers: 380.0 -> "380", 2.5 -> "2.5" */
 function cleanDecimal(n: number): string {
