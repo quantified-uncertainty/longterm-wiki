@@ -1,6 +1,38 @@
-import { getFact } from "@/data";
+import { getFact, type Fact } from "@/data";
+import { getKBLatest, getKBProperty } from "@data/kb";
+import { formatKBFactValue } from "@/components/wiki/kb/format";
 import { calc, formatValue, type CalcFormat } from "@/lib/calc-engine";
 import { cn } from "@/lib/utils";
+
+/**
+ * Combined fact lookup: tries old-system facts first, falls back to KB facts.
+ * Converts KB facts into the old Fact format so the calc engine can consume them.
+ */
+function combinedFactLookup(entity: string, factId: string): Fact | undefined {
+  // Try old-system fact lookup first
+  const oldFact = getFact(entity, factId);
+  if (oldFact) return oldFact;
+
+  // Fall back to KB lookup (entity = KB entity ID, factId = KB property ID)
+  const kbFact = getKBLatest(entity, factId);
+  if (!kbFact) return undefined;
+
+  // Extract numeric value from the KB FactValue — Calc only works with numbers
+  const v = kbFact.value;
+  if (v.type !== "number") return undefined;
+
+  const prop = getKBProperty(factId);
+  const displayValue = formatKBFactValue(kbFact, prop?.unit, prop?.display);
+
+  return {
+    value: displayValue,
+    numeric: v.value,
+    asOf: kbFact.asOf,
+    entity,
+    factId,
+    source: kbFact.source,
+  };
+}
 
 interface CalcProps {
   /** Expression with {entity.factId} references, e.g. "{anthropic.valuation} / {anthropic.revenue-arr-2025}" */
@@ -24,8 +56,12 @@ interface CalcProps {
  * Evaluates a math expression referencing canonical facts, renders the result
  * inline with a hover tooltip showing the formula and inputs.
  *
+ * Supports both old-system fact references (8-char hex IDs) and KB property
+ * references. Old-system facts are tried first; KB facts are used as fallback.
+ *
  * Usage in MDX:
- *   <Calc expr="{anthropic.valuation} / {anthropic.revenue-arr-2025}" precision={1} suffix="x" />
+ *   <Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={1} suffix="x" />
+ *   <Calc expr="{anthropic.valuation} / {anthropic.revenue}" precision={0} suffix="x" />
  *   <Calc expr="{anthropic.revenue-run-rate} * 2.5" format="currency" />
  *   <Calc expr="{anthropic.gross-margin}" format="percent" />
  */
@@ -39,7 +75,7 @@ export function Calc({
   className,
 }: CalcProps) {
   try {
-    const result = calc(expr, getFact, { format, precision, prefix, suffix });
+    const result = calc(expr, combinedFactLookup, { format, precision, prefix, suffix });
     const displayValue = children || result.display;
 
     // Build human-readable formula for tooltip: replace refs with their values
