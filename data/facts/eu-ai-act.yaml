@@ -13,8 +13,7 @@ facts:
 
   # adoption-date
   b3e7a1d9:
-    label: "EU AI Act adopted by European Parliament"
-    measure: signed-date
+    measure: enacted-date
     value: "2024-03-13"
     asOf: "2024-03"
     note: "Adopted by the European Parliament with 523 votes in favor, 46 against, and 49 abstentions"

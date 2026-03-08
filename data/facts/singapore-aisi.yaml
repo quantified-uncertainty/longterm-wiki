@@ -3,16 +3,16 @@ facts:
 
   # headcount
   f3a5c9d1:
-    label: "Singapore AISI staff"
     measure: headcount
     value: 20
     asOf: "2024-12"
     note: "Approximately 20 staff; focuses on testing frameworks and regional coordination in Southeast Asia"
+    source: https://aisi.gov.sg/
 
   # founded-date
   b8d2e6f4:
-    label: "Singapore AISI established under IMDA"
     measure: founded-date
     value: "2024-02"
     asOf: "2024-02"
     note: "Established under the Infocomm Media Development Authority (IMDA)"
+    source: https://aisi.gov.sg/

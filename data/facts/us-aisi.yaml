@@ -3,7 +3,7 @@ facts:
 
   # initial-budget-fy2024
   a3f7b2c1:
-    label: "AISI initial FY2024 allocation"
+    label: "FY2024 allocation"
     measure: annual-budget
     value: 10000000
     asOf: "2024-03"
@@ -12,7 +12,7 @@ facts:
 
   # actual-spending-fy2024
   d9e4a8f6:
-    label: "AISI actual available funding"
+    label: "FY2024 available funding (actual)"
     measure: annual-budget
     value: 6000000
     asOf: "2024-05"
@@ -21,7 +21,7 @@ facts:
 
   # budget-request-fy2025
   b5c1d7e3:
-    label: "AISI FY2025 budget request (Biden admin)"
+    label: "FY2025 budget request (Biden admin)"
     measure: annual-budget
     value: 47700000
     asOf: "2024-03"
@@ -30,7 +30,6 @@ facts:
 
   # headcount
   e8f2a6b4:
-    label: "AISI estimated staff"
     measure: headcount
     value: 50
     asOf: "2024-12"
@@ -39,17 +38,18 @@ facts:
 
   # founded-date
   c4d9f1a7:
-    label: "AISI established within NIST"
     measure: founded-date
     value: "2023-11"
     asOf: "2023-11"
     note: "Established within NIST following Executive Order 14110 on Safe, Secure, and Trustworthy AI"
+    source: https://www.nist.gov/artificial-intelligence/artificial-intelligence-safety-institute
 
   # aisic-consortium-members
   f6a3b8d2:
-    label: "AISIC consortium member organizations"
+    label: "AISIC consortium members"
     measure: generic-count
-    value: 200
+    value:
+      min: 200
     asOf: "2024-02"
     note: "AI Safety Institute Consortium (AISIC) launched with 200+ member organizations including AI labs, academia, and civil society"
     source: https://www.nist.gov/artificial-intelligence/artificial-intelligence-safety-institute

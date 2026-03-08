@@ -466,8 +466,20 @@ measures:
       divisor: 1000000
       prefix: "$"
       suffix: "M"
-    relatedMeasures: [revenue, infrastructure-investment]
-    applicableTo: [organization]
+    relatedMeasures: [revenue, infrastructure-investment, total-funding-commitment]
+    applicableTo: [organization, policy]
+
+  total-funding-commitment:
+    label: "Total Funding Commitment"
+    unit: USD
+    category: financial
+    description: "Total multi-year or one-time funding pledge/commitment. Distinct from annual-budget which is a yearly allocation. Values in USD; use note to record original currency and timeframe."
+    display:
+      divisor: 1000000
+      prefix: "$"
+      suffix: "M"
+    relatedMeasures: [annual-budget, infrastructure-investment]
+    applicableTo: [organization, policy]
 
   # === Technical / Compute ===
   compute-flops:
@@ -475,7 +487,7 @@ measures:
     unit: count
     category: performance
     description: "Compute measured in floating point operations (FLOP). Used for training compute, regulatory thresholds, and capability benchmarks. Values are typically in scientific notation (e.g., 1e26)."
-    applicableTo: [organization]
+    applicableTo: [organization, policy]
 
   # === Policy & Governance (numeric) ===
   completion-rate:
@@ -484,51 +496,50 @@ measures:
     category: policy
     direction: higher
     description: "Percentage of requirements, mandates, or commitments that have been completed"
-    applicableTo: [organization]
+    applicableTo: [organization, policy]
 
   public-approval:
     label: "Public Approval"
     unit: percent
     category: policy
     description: "Public polling or survey approval/support percentage"
-    applicableTo: [organization, person]
+    applicableTo: [organization, person, policy]
 
   legislation-count:
     label: "Legislation Count"
     unit: count
     category: policy
-    direction: higher
     description: "Number of bills, laws, or regulations proposed, enacted, or issued"
-    applicableTo: [organization]
+    applicableTo: [organization, policy]
 
   # === Policy & Governance (dates and relations) ===
-  signed-date:
-    label: "Signed Date"
+  enacted-date:
+    label: "Enacted Date"
     unit: date
     category: policy
-    description: "Date a policy, order, or agreement was signed or enacted"
-    applicableTo: [organization]
+    description: "Date a policy, order, or agreement was signed, enacted, or adopted"
+    applicableTo: [policy]
 
   revoked-date:
     label: "Revoked Date"
     unit: date
     category: policy
     description: "Date a policy, order, or regulation was revoked, repealed, or superseded"
-    applicableTo: [organization]
+    applicableTo: [policy]
 
   signer:
     label: "Signer"
     unit: entity
     category: relation
     description: "Person who signed, issued, or enacted a policy or order"
-    applicableTo: [organization]
+    applicableTo: [policy]
 
   word-count:
     label: "Word Count"
     unit: count
-    category: organizational
+    category: policy
     description: "Number of words in a document, report, or publication"
-    applicableTo: [organization]
+    applicableTo: [policy]
 
   # === Generic Fallback ===
   generic-count:
@@ -1077,7 +1088,8 @@ propertyAliases:
   completion_rate: completion-rate
   public_approval: public-approval
   legislation_count: legislation-count
-  signed_date: signed-date
+  enacted_date: enacted-date
+  signed_date: enacted-date
   revoked_date: revoked-date
-  signer: signer
   word_count: word-count
+  total_funding_commitment: total-funding-commitment

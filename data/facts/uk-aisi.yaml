@@ -3,7 +3,7 @@ facts:
 
   # annual-budget
   b7e1c3f9:
-    label: "UK AISI annual budget (estimated)"
+    label: "Annual budget (estimated)"
     measure: annual-budget
     value: 42000000
     asOf: "2023-11"
@@ -12,7 +12,6 @@ facts:
 
   # headcount
   a2d8f4b6:
-    label: "UK AISI staff"
     measure: headcount
     value:
       min: 100
@@ -22,8 +21,8 @@ facts:
 
   # founded-date
   c9e5a1d3:
-    label: "UK AISI established at Bletchley Park Summit"
     measure: founded-date
     value: "2023-11-01"
     asOf: "2023-11"
     note: "Established at the Bletchley Park AI Safety Summit; renamed to AI Security Institute in February 2025"
+    source: https://www.gov.uk/government/organisations/ai-safety-institute
