@@ -860,6 +860,119 @@
     - regulatory-capture
     - standard-setting
   lastUpdated: 2025-12
+- id: japan-aisi
+  numericId: E1013
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: Japan AI Safety Institute
+  website: https://aisi.go.jp/en/
+  description: >-
+    Japan's national AI safety institute, established in February 2024 under the Ministry of Economy, Trade and
+    Industry (METI). Focuses on AI standards research and evaluation frameworks. Part of the international AISI
+    network established through the Seoul Declaration.
+  relatedEntries:
+    - id: us-aisi
+      type: organization
+    - id: uk-aisi
+      type: organization
+    - id: ai-safety-institutes
+      type: policy
+  sources:
+    - title: Japan AISI Website
+      url: https://aisi.go.jp/en/
+    - title: METI Announcement
+      url: https://www.meti.go.jp/english/press/2024/0214_002.html
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - evaluations
+    - international
+  lastUpdated: 2026-03
+- id: singapore-aisi
+  numericId: E1014
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: Singapore AI Safety Institute
+  website: https://aisi.gov.sg/
+  description: >-
+    Singapore's national AI safety testing institute, established in February 2024 under the Infocomm Media
+    Development Authority (IMDA). Focuses on testing frameworks and regional AI safety coordination in Southeast
+    Asia.
+  relatedEntries:
+    - id: us-aisi
+      type: organization
+    - id: uk-aisi
+      type: organization
+    - id: ai-safety-institutes
+      type: policy
+  sources:
+    - title: Singapore AISI Website
+      url: https://aisi.gov.sg/
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - evaluations
+    - international
+  lastUpdated: 2026-03
+- id: canada-aisi
+  numericId: E1015
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: Canadian AI Safety Institute
+  website: https://ised-isde.canada.ca/site/artificial-intelligence/en/canadas-ai-safety-institute
+  description: >-
+    Canada's national AI safety institute, launched in November 2024 at the Seoul AI Safety Summit. Received
+    C$50M (~$37M USD) in initial pledged funding from the Canadian government.
+  relatedEntries:
+    - id: us-aisi
+      type: organization
+    - id: uk-aisi
+      type: organization
+    - id: ai-safety-institutes
+      type: policy
+  sources:
+    - title: Canadian AI Safety Institute
+      url: https://ised-isde.canada.ca/site/artificial-intelligence/en/canadas-ai-safety-institute
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - international
+  lastUpdated: 2026-03
+- id: eu-ai-office
+  numericId: E1016
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: EU AI Office
+  website: https://digital-strategy.ec.europa.eu/en/policies/ai-office
+  description: >-
+    The European Commission's dedicated office for AI governance, established in February 2024. Responsible for
+    enforcing the EU AI Act, developing standards and codes of practice, and coordinating EU-wide AI policy.
+  relatedEntries:
+    - id: eu-ai-act
+      type: policy
+    - id: uk-aisi
+      type: organization
+    - id: us-aisi
+      type: organization
+    - id: ai-safety-institutes
+      type: policy
+  sources:
+    - title: EU AI Office
+      url: https://digital-strategy.ec.europa.eu/en/policies/ai-office
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - regulatory-framework
+    - international
+  lastUpdated: 2026-03
 - id: arc-evals
   numericId: E26
   type: organization

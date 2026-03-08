@@ -1,0 +1,14 @@
+thing:
+  id: futuresearch
+  stableId: PIC4ivhNpw
+  type: organization
+  name: FutureSearch
+  numericId: E530
+facts:
+  - id: f_NsWFzyt9Ag
+    property: description
+    value: FutureSearch is an AI forecasting startup founded by former Metaculus leaders that combines LLM research agents
+      with human judgment, demonstrating some prediction accuracy but facing uncertain commercial viability and limited
+      proven impact on AI safety decisions. While the company contributes to AGI
+    asOf: 2026-03
+    notes: Migrated from old entity system

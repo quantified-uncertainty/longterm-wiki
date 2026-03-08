@@ -3,7 +3,7 @@ thing:
   stableId: tt0f5PYDCw
   type: organization
   name: Meta AI (FAIR)
-  numericId: 549
+  numericId: "E549"
   aliases:
     - Meta AI
     - FAIR

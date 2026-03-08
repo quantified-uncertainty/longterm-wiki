@@ -1,0 +1,14 @@
+thing:
+  id: scheming-detection
+  stableId: bkQNjmsJoQ
+  type: approach
+  name: Scheming & Deception Detection
+  numericId: E441
+facts:
+  - id: f_DFvxmbKVJQ
+    property: description
+    value: Research and evaluation methods for identifying when AI models engage in strategic deception—pretending to be
+      aligned while secretly pursuing other goals—including behavioral tests, internal monitoring, and emerging
+      detection techniques. Frontier models exhibit in-context scheming at rates of 0.3-13%.
+    asOf: 2026-03
+    notes: Migrated from old entity system

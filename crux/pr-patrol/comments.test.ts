@@ -3,8 +3,8 @@ import {
   STATUS_MARKER,
   buildStatusCommentBody,
   stripTimestamp,
-  buildMergeComment,
-  buildMergeFailedComment,
+  buildEnqueuedComment,
+  buildEnqueueFailedComment,
   buildFixAttemptComment,
   buildFixCompleteComment,
   buildAbandonmentComment,
@@ -250,15 +250,15 @@ describe('stripTimestamp', () => {
 // ── Event comment builders ───────────────────────────────────────────────────
 
 describe('event comment builders', () => {
-  it('buildMergeComment produces expected format', () => {
-    const result = buildMergeComment();
+  it('buildEnqueuedComment produces expected format', () => {
+    const result = buildEnqueuedComment();
     expect(result).toContain('PR Patrol');
-    expect(result).toContain('Merged to main via squash merge');
+    expect(result).toContain('merge queue');
   });
 
-  it('buildMergeFailedComment includes reason', () => {
-    const result = buildMergeFailedComment('Branch protection rule violated');
-    expect(result).toContain('Merge failed');
+  it('buildEnqueueFailedComment includes reason', () => {
+    const result = buildEnqueueFailedComment('Branch protection rule violated');
+    expect(result).toContain('merge queue');
     expect(result).toContain('Branch protection rule violated');
   });
 

@@ -1,0 +1,12 @@
+thing:
+  id: cyber-offense
+  stableId: VPk7sdZtkg
+  type: risk
+  name: AI-Enabled Cyberattacks
+  numericId: E82
+facts:
+  - id: f_cQNw7vpr5g
+    property: description
+    value: Risk of AI systems being used to discover vulnerabilities, craft exploits, or conduct sophisticated cyberattacks.
+    asOf: 2026-03
+    notes: Migrated from old entity system

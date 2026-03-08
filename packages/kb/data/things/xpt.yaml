@@ -1,0 +1,13 @@
+thing:
+  id: xpt
+  stableId: PnUBtoCeMw
+  type: project
+  name: XPT (Existential Risk Persuasion Tournament)
+  numericId: E379
+facts:
+  - id: f_GKYIGEv15w
+    property: description
+    value: Four-month structured forecasting tournament bringing together superforecasters and domain experts through
+      adversarial collaboration.
+    asOf: 2026-03
+    notes: Migrated from old entity system

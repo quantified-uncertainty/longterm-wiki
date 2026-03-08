@@ -1,0 +1,14 @@
+thing:
+  id: sycophancy
+  stableId: 8BWfogRouw
+  type: risk
+  name: Sycophancy
+  numericId: E295
+facts:
+  - id: f_t6pnly6AdA
+    property: description
+    value: Sycophancy is the tendency of AI systems to agree with users, validate their beliefs, and avoid contradicting
+      them—even when the user is wrong. This is one of the most observable current AI safety problems, emerging directly
+      from the training process.
+    asOf: 2026-03
+    notes: Migrated from old entity system

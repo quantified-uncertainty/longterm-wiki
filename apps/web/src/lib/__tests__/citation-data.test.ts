@@ -148,19 +148,20 @@ describe("getCitationQuotes", () => {
     expect(result).toEqual([]);
   });
 
-  it("filters out quotes without verification data", async () => {
+  it("returns all quotes including those without verification data", async () => {
     vi.resetModules();
     const localQuotes = [
       makeQuote({ footnote: 1, quoteVerified: true }), // has verification
-      makeQuote({ footnote: 2 }), // no verification data — should be filtered
+      makeQuote({ footnote: 2 }), // no verification data — still included (NULL-verdict dots)
       makeQuote({ footnote: 3, accuracyVerdict: "accurate" }), // has accuracy
     ];
     mockCitationDeps({ getLocalCitationQuotes: () => localQuotes });
     const mod = await import("../citation-data");
     const result = mod.getCitationQuotes("test-page");
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(3);
     expect(result[0].footnote).toBe(1);
-    expect(result[1].footnote).toBe(3);
+    expect(result[1].footnote).toBe(2);
+    expect(result[2].footnote).toBe(3);
   });
 
   it("always uses local data (no API calls)", async () => {

@@ -77,6 +77,20 @@ export async function snapshotRetention(
 ): Promise<{ success: boolean; summary?: string }> {
   const keep = config.tasks.snapshotRetention.keep;
 
+  // Check for API key early — missing config is a graceful skip, not a failure.
+  // Treating it as failure trips the circuit breaker on every run (see #1770).
+  const apiKey =
+    process.env["LONGTERMWIKI_CONTENT_KEY"] ??
+    process.env["LONGTERMWIKI_SERVER_API_KEY"];
+  if (!apiKey) {
+    logger.warn(
+      "Neither LONGTERMWIKI_CONTENT_KEY nor LONGTERMWIKI_SERVER_API_KEY is set — skipping cleanup. " +
+        "Set LONGTERMWIKI_CONTENT_KEY (content-scoped) or LONGTERMWIKI_SERVER_API_KEY (legacy superkey) " +
+        "in the groundskeeper environment.",
+    );
+    return { success: true, summary: "Skipped: no API key configured (see #1770)" };
+  }
+
   const results: string[] = [];
   let anyFailed = false;
 

@@ -3,7 +3,7 @@ thing:
   stableId: 69vftmr1jg
   type: person
   name: "Elon Musk"
-  numericId: 116
+  numericId: "E116"
   aliases:
     - "Musk"
 

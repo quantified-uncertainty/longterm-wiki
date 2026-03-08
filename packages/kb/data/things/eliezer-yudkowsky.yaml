@@ -3,7 +3,7 @@ thing:
   stableId: fS1tEGKuNq
   type: person
   name: "Eliezer Yudkowsky"
-  numericId: 114
+  numericId: "E114"
   aliases:
     - Eliezer
     - EY

@@ -1,0 +1,16 @@
+thing:
+  id: deanonymization
+  stableId: 0J0pDyhVtQ
+  type: risk
+  name: AI-Powered Deanonymization
+  numericId: E699
+facts:
+  - id: f_k9d1jSji5g
+    property: description
+    value: AI dramatically lowers the cost and skill required to identify individuals from supposedly anonymous data.
+      Research shows 99.98% of Americans are re-identifiable from 15 demographic attributes, and GPT-4 can infer
+      personal attributes from Reddit posts with 85% accuracy at $0.15 per profile. AI transforms deanonymization from a
+      specialist skill into a commodity capability, threatening pseudonymity and enabling targeted harassment,
+      discrimination, and political repression.
+    asOf: 2026-03
+    notes: Migrated from old entity system

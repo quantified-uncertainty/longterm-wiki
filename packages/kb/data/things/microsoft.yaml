@@ -1,0 +1,14 @@
+thing:
+  id: microsoft
+  stableId: OIY5gaPpBA
+  type: organization
+  name: Microsoft AI
+  numericId: E550
+facts:
+  - id: f_1yvvPWOHUQ
+    property: description
+    value: Microsoft invested $80B+ in AI infrastructure (FY2025) with a restructured $135B stake (27%) in OpenAI,
+      generating $13B AI revenue run rate (175% YoY growth) and 16 percentage points of Azure's 39% growth. GitHub
+      Copilot reached 20M users generating 46% of code, while responsible AI framework conduc
+    asOf: 2026-03
+    notes: Migrated from old entity system

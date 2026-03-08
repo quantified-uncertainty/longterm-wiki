@@ -456,6 +456,91 @@ measures:
     description: "Observed or estimated rate of alignment faking behavior in AI systems"
     applicableTo: [organization]
 
+  # === Budget & Operations ===
+  annual-budget:
+    label: "Annual Budget"
+    unit: USD
+    category: financial
+    description: "Annual operating budget or budget allocation. Values in USD; use note to record original currency (e.g., '£100M over 3 years')."
+    display:
+      divisor: 1000000
+      prefix: "$"
+      suffix: "M"
+    relatedMeasures: [revenue, infrastructure-investment, total-funding-commitment]
+    applicableTo: [organization, policy]
+
+  total-funding-commitment:
+    label: "Total Funding Commitment"
+    unit: USD
+    category: financial
+    description: "Total multi-year or one-time funding pledge/commitment. Distinct from annual-budget which is a yearly allocation. Values in USD; use note to record original currency and timeframe."
+    display:
+      divisor: 1000000
+      prefix: "$"
+      suffix: "M"
+    relatedMeasures: [annual-budget, infrastructure-investment]
+    applicableTo: [organization, policy]
+
+  # === Technical / Compute ===
+  compute-flops:
+    label: "Compute (FLOP)"
+    unit: count
+    category: performance
+    description: "Compute measured in floating point operations (FLOP). Used for training compute, regulatory thresholds, and capability benchmarks. Values are typically in scientific notation (e.g., 1e26)."
+    applicableTo: [organization, policy]
+
+  # === Policy & Governance (numeric) ===
+  completion-rate:
+    label: "Completion Rate"
+    unit: percent
+    category: policy
+    direction: higher
+    description: "Percentage of requirements, mandates, or commitments that have been completed"
+    applicableTo: [organization, policy]
+
+  public-approval:
+    label: "Public Approval"
+    unit: percent
+    category: policy
+    description: "Public polling or survey approval/support percentage"
+    applicableTo: [organization, person, policy]
+
+  legislation-count:
+    label: "Legislation Count"
+    unit: count
+    category: policy
+    description: "Number of bills, laws, or regulations proposed, enacted, or issued"
+    applicableTo: [organization, policy]
+
+  # === Policy & Governance (dates and relations) ===
+  enacted-date:
+    label: "Enacted Date"
+    unit: date
+    category: policy
+    description: "Date a policy, order, or agreement was signed, enacted, or adopted"
+    applicableTo: [policy]
+
+  revoked-date:
+    label: "Revoked Date"
+    unit: date
+    category: policy
+    description: "Date a policy, order, or regulation was revoked, repealed, or superseded"
+    applicableTo: [policy]
+
+  signer:
+    label: "Signer"
+    unit: entity
+    category: relation
+    description: "Person who signed, issued, or enacted a policy or order"
+    applicableTo: [policy]
+
+  word-count:
+    label: "Word Count"
+    unit: count
+    category: policy
+    description: "Number of words in a document, report, or publication"
+    applicableTo: [policy]
+
   # === Generic Fallback ===
   generic-count:
     label: "Count"
@@ -997,3 +1082,14 @@ propertyAliases:
   interview_quote: interview-quote
   compute_budget: compute-budget
   release_date: release-date
+  # Policy & government measures
+  annual_budget: annual-budget
+  compute_flops: compute-flops
+  completion_rate: completion-rate
+  public_approval: public-approval
+  legislation_count: legislation-count
+  enacted_date: enacted-date
+  signed_date: enacted-date
+  revoked_date: revoked-date
+  word_count: word-count
+  total_funding_commitment: total-funding-commitment

@@ -1,0 +1,14 @@
+thing:
+  id: large-language-models
+  stableId: KwyMqBNvOQ
+  type: concept
+  name: Large Language Models
+  numericId: E400
+facts:
+  - id: f_Mpifk7VljQ
+    property: description
+    value: Transformer-based models trained on massive text datasets that exhibit emergent capabilities and pose significant
+      safety challenges. Training costs have grown 2.4x/year since 2016, while frontier models demonstrate in-context
+      scheming and unprecedented capability gains. ChatGPT reached 800-900M weekly active users by late 2025.
+    asOf: 2026-03
+    notes: Migrated from old entity system

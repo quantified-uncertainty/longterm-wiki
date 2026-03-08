@@ -1,0 +1,14 @@
+thing:
+  id: polymarket
+  stableId: fRo2H0Q2xQ
+  type: organization
+  name: Polymarket
+  numericId: E555
+facts:
+  - id: f_aUf0i5YixA
+    property: description
+    value: This is a comprehensive overview of Polymarket as a prediction market platform, covering its history, mechanics,
+      and accuracy, but has minimal relevance to AI safety beyond brief mentions in the EA/forecasting section. While
+      well-documented, it primarily serves as general reference material about a
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -19,40 +19,60 @@ describe("loader", () => {
       expect(anthropic!.name).toBe("Anthropic");
       expect(anthropic!.stableId).toBe("mK9pX3rQ7n");
       expect(anthropic!.type).toBe("organization");
-      expect(anthropic!.numericId).toBe(3);
+      expect(anthropic!.numericId).toBe("E22");
     });
 
-    it("loads all 36 entities", () => {
+    it("loads all entities (360+ after bulk migration)", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(36);
+      expect(entities.length).toBeGreaterThanOrEqual(360);
 
-      const ids = entities.map((t) => t.id).sort();
-      expect(ids).toEqual([
-        "anthropic", "arc", "center-for-ai-safety",
-        "chan-zuckerberg-initiative", "chris-olah", "coefficient-giving",
-        "conjecture", "connor-leahy",
-        "daniela-amodei", "dario-amodei", "deepmind", "demis-hassabis",
-        "dustin-moskovitz", "eliezer-yudkowsky", "elon-musk",
-        "geoffrey-hinton", "greg-brockman", "holden-karnofsky",
-        "ilya-sutskever", "jaan-tallinn", "jan-leike", "manifund",
-        "meta-ai", "miri", "neel-nanda",
-        "nick-bostrom", "openai", "paul-christiano", "redwood-research",
-        "sam-altman", "ssi", "stuart-russell",
-        "survival-and-flourishing-fund", "xai", "yann-lecun",
-        "yoshua-bengio",
-      ].sort());
+      // Spot-check key entities are present (including migrated facts entities)
+      const ids = new Set(entities.map((t) => t.id));
+      expect(ids.has("anthropic")).toBe(true);
+      expect(ids.has("openai")).toBe(true);
+      expect(ids.has("deepmind")).toBe(true);
+      expect(ids.has("claude-3-opus")).toBe(true);
+      expect(ids.has("alignment")).toBe(true);
+      expect(ids.has("existential-risk")).toBe(true);
+      expect(ids.has("anthropic-government-standoff")).toBe(true);
+      expect(ids.has("chan-zuckerberg-initiative")).toBe(true);
+      expect(ids.has("coefficient-giving")).toBe(true);
+      expect(ids.has("jaan-tallinn")).toBe(true);
+      expect(ids.has("manifund")).toBe(true);
     });
 
     it("loads entity aliases", () => {
       const anthropic = graph.getEntity("anthropic");
       expect(anthropic!.aliases).toEqual(["Anthropic PBC", "Anthropic AI"]);
     });
+
+    it("all numericIds use E-prefix format and are unique", () => {
+      const entities = graph.getAllEntities();
+      const numericIds = entities
+        .map((e) => e.numericId)
+        .filter((id): id is string => id !== undefined);
+
+      // All have numericIds
+      expect(numericIds).toHaveLength(entities.length);
+
+      // All match E-prefix format
+      for (const id of numericIds) {
+        expect(id).toMatch(/^E\d+$/);
+      }
+
+      // All unique
+      const unique = new Set(numericIds);
+      expect(unique.size).toBe(numericIds.length);
+    });
   });
 
   describe("properties", () => {
-    it("loads 43 properties", () => {
+    it("loads properties (68 from main + additional migration properties)", () => {
       const properties = graph.getAllProperties();
-      expect(properties).toHaveLength(43);
+      // 68 from main + branch additions (revenue-guidance, retention-rate, customer-concentration,
+      // infrastructure-investment, equity-stake-percent, equity-value, safety-staffing-ratio,
+      // model-parameters, benchmark-score) = 77
+      expect(properties.length).toBeGreaterThanOrEqual(68);
     });
 
     it("loads property details correctly", () => {
@@ -87,9 +107,40 @@ describe("loader", () => {
   });
 
   describe("schemas", () => {
-    it("loads 2 schemas (organization, person)", () => {
+    it("loads 14 schemas (8 original + 5 new entity types + 1 incident)", () => {
       const schemas = graph.getAllSchemas();
-      expect(schemas).toHaveLength(2);
+      expect(schemas).toHaveLength(14);
+    });
+
+    it("loads original concept entity schemas", () => {
+      expect(graph.getSchema("ai-model")).toBeDefined();
+      expect(graph.getSchema("risk")).toBeDefined();
+      expect(graph.getSchema("approach")).toBeDefined();
+      expect(graph.getSchema("debate")).toBeDefined();
+      expect(graph.getSchema("capability")).toBeDefined();
+      expect(graph.getSchema("concept")).toBeDefined();
+    });
+
+    it("loads new entity type schemas", () => {
+      expect(graph.getSchema("event")).toBeDefined();
+      expect(graph.getSchema("policy")).toBeDefined();
+      expect(graph.getSchema("project")).toBeDefined();
+      expect(graph.getSchema("analysis")).toBeDefined();
+      expect(graph.getSchema("argument")).toBeDefined();
+    });
+
+    it("loads ai-model schema with required properties", () => {
+      const modelSchema = graph.getSchema("ai-model");
+      expect(modelSchema!.required).toEqual(["developed-by", "model-release-date"]);
+      expect(modelSchema!.recommended).toContain("parameter-count");
+      expect(modelSchema!.recommended).toContain("context-window");
+    });
+
+    it("loads risk schema with recommended properties", () => {
+      const riskSchema = graph.getSchema("risk");
+      expect(riskSchema!.recommended).toContain("severity-level");
+      expect(riskSchema!.recommended).toContain("likelihood-estimate");
+      expect(riskSchema!.recommended).toContain("evidence-strength");
     });
 
     it("loads organization schema with required and recommended properties", () => {

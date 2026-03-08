@@ -8,7 +8,7 @@ subcategory: legislation
 quality: 91
 readerImportance: 57
 researchImportance: 24.5
-lastEdited: "2026-01-30"
+lastEdited: "2026-03-07"
 update_frequency: 7
 llmSummary: Executive Order 14110 (Oct 2023) established compute thresholds (10^26 FLOP general, 10^23 biological) and created AISI, but was revoked after 15 months with ~85% completion. The 10^26 threshold was never triggered before revocation; GPT-5 estimated at 3×10^25 FLOP remained below it, demonstrating threshold obsolescence concerns. International comparison shows EU AI Act set 10x lower threshold (10^25 FLOP) and cannot be revoked by executive action.
 ratings:
@@ -28,6 +28,8 @@ import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
 ## Overview
 
 <R id="80350b150694b2ae">Executive Order 14110</R> on Safe, Secure, and Trustworthy Artificial Intelligence, signed by President Biden on October 30, 2023, represented the most comprehensive federal response to AI governance in US history. The 111-page directive established mandatory reporting requirements for frontier AI systems, created new oversight institutions, and addressed both immediate risks like algorithmic bias and long-term catastrophic risks from advanced AI capabilities. According to analysis by [Stanford HAI](https://hai.stanford.edu/policy/tracking-us-ai-executive-order), the order placed 150 specific requirements on over 50 federal entities—making it the most detailed AI policy directive ever issued by any government.
+
+The timing was strategically significant: Biden signed the EO one day before the UK's AI Safety Summit at Bletchley Park (November 1-2, 2023), where the US joined 27 other countries in signing the <EntityLink id="E469" name="bletchley-declaration">Bletchley Declaration</EntityLink> on AI safety. On the same day the EO was released, G7 leaders announced the Hiroshima AI Process Guiding Principles and a voluntary Code of Conduct for organizations developing advanced AI systems, aligning with the EO on red-teaming and content authentication.
 
 **The order was revoked by President Trump on January 20, 2025**, within hours of his assuming office. The White House stated that EO 14110 "hindered AI innovation and imposed onerous and unnecessary government control over the development of AI." <R id="adc7475b9d9e8300">Stanford HAI tracking</R> showed that approximately 85% of the order's 150 distinct requirements had been completed before revocation.
 
@@ -147,6 +149,27 @@ flowchart TD
 
 The practical implementation faced several challenges. Defining "large training runs" in real-time requires technical sophistication from cloud providers, who must distinguish AI training from other compute-intensive applications. Moreover, determined adversaries might circumvent these requirements by using non-US cloud providers or developing domestic computing capabilities.
 
+### Broader Policy Scope
+
+While the compute thresholds and AISI attracted the most attention, the order addressed AI governance across eight policy areas. Several provisions addressed immediate, non-frontier risks:
+
+| Policy Area | Key Requirements | Lead Agencies | Deadline | Status at Revocation |
+|-------------|-----------------|---------------|----------|---------------------|
+| **Civil Rights & Bias** | Guidance to prevent AI discrimination in housing, benefits, hiring; DOJ coordination on civil rights enforcement | DOJ, HUD, EEOC | 180 days | Guidance issued |
+| **Healthcare** | AI safety program for harm reporting; quality control strategy for AI-enabled medical devices | HHS | 180 days | Framework published |
+| **Immigration & Talent** | Streamlined visa processing for AI researchers; modernized O-1A, EB-1A, EB-2 pathways; updated Schedule A occupations | State, DHS, DOL | 45-180 days | Largely completed |
+| **Consumer Protection** | Encouraged FTC/CFPB to apply existing consumer protection laws to AI; directed new safeguards against AI-related fraud | FTC, CFPB | Ongoing | Some actions taken |
+| **Government Modernization** | Each agency to designate a Chief AI Officer; risk-based approach to generative AI use | OMB, all agencies | 60 days | 13/13 fully implemented |
+| **Innovation & Competition** | NSF to launch <R id="80350b150694b2ae">NAIRR pilot program</R> within 90 days; measures to attract AI talent | NSF | 90 days | Pilot launched |
+
+The government modernization provisions had notably high completion rates. OMB issued guidance M-24-10 defining "rights-impacting" and "safety-impacting" AI categories—terminology that mirrored the EU AI Act's "high-risk" framework—and all 24 CFO Act agencies designated Chief AI Officers by the deadline. These institutional changes largely survived the revocation, as agencies retained their AI leadership structures at their own discretion.
+
+### Legal Basis and Enforcement Authority
+
+The order relied on two key legal authorities for its mandatory provisions. The <R id="80350b150694b2ae">Defense Production Act</R> (DPA) was invoked to compel reporting from companies developing dual-use foundation models above the compute thresholds—an expansive application of Cold War-era industrial mobilization law to commercial AI development. Some legal scholars questioned whether the DPA could legitimately be used for information-gathering rather than production mandates. The International Emergency Economic Powers Act (IEEPA) underpinned the KYC requirements for cloud providers, enabling civil and criminal penalties for violations.
+
+However, the order included no new enforcement mechanisms for most provisions. The BIS proposed rule on developer reporting requirements—published September 2024 with a comment period closing October 11, 2024—was never finalized before revocation, meaning the compute-based reporting regime never achieved full regulatory force. This gap between the order's sweeping scope and its limited enforcement authority was a recurring criticism.
+
 ## Safety Implications and Risk Assessment
 
 ### Promising Aspects for AI Safety
@@ -230,6 +253,12 @@ This represents a shift from:
 
 The December 2025 NIST announcement of <R id="d9196fad6b85c5a3">\$10M in AI centers</R> (with MITRE) and a planned \$10M AI for Resilient Manufacturing Institute suggests resources are being redirected toward manufacturing and cybersecurity applications rather than frontier model safety evaluation.
 
+### Trump AI Action Plan (July 2025)
+
+On July 23, 2025, the White House OSTP released "Winning the Race: America's AI Action Plan," outlining 90 federal policy positions across three pillars: accelerating innovation, building American AI infrastructure, and leading in international diplomacy and security. The plan was developed in response to EO 14179's mandate for a 180-day action plan and incorporated over 10,000 public comments.
+
+The plan takes a deregulatory stance, directing OMB to identify and repeal regulations that hinder AI development. It emphasizes national security applications and competitive positioning against China rather than the safety-testing framework of EO 14110. CAISI's role under the plan focuses on cybersecurity, biosecurity, chemical weapons, and countering foreign adversarial influence—areas that align with national defense priorities rather than the broad consumer protection and civil rights mandate of EO 14110.
+
 ### State Law Preemption Order (December 2025)
 
 On December 11, 2025, President Trump signed a new executive order titled "Ensuring a National Policy Framework for Artificial Intelligence," which directly targets state-level AI regulation. This order represents a significant expansion of federal AI policy beyond simply revoking Biden-era rules.
@@ -269,6 +298,8 @@ timeline
                  : Paris communique refused
         Jun 2025 : AISI renamed CAISI
                  : Mission pivots to innovation
+        Jul 2025 : AI Action Plan released
+                 : 90 policy positions
         Dec 2025 : State preemption EO
                  : DOJ AI Litigation Task Force
 `} />
@@ -299,6 +330,14 @@ Despite its short duration, the order achieved several notable outcomes:
 **International Network:** In November 2024, the US launched the <R id="a65ad4f1a30f1737">International Network of AI Safety Institutes</R>, establishing formal cooperation with the UK, Canada, Japan, Singapore, and other allies on AI safety research.
 
 **Industry Cooperation:** Voluntary agreements with Anthropic and OpenAI demonstrated that frontier AI companies would accept government access to pre-release models—a precedent that may persist even after revocation.
+
+### Expert and Public Reactions
+
+The order received broadly positive reactions from AI governance researchers and Democratic lawmakers. Stanford HAI experts characterized it as "a good start" but cautioned it was "not enough" without congressional legislation. Representative Don Beyer called it a "comprehensive strategy for responsible innovation." Polling from the AI Policy Institute found 69% of voters supported the EO, including 64% of Republicans.
+
+Critics focused on two concerns. Senator Ted Cruz described it as creating "barriers to innovation disguised as safety measures." Some legal scholars questioned whether the Defense Production Act could legitimately compel disclosures from AI companies, arguing the statute was designed for industrial production requirements rather than information-gathering mandates.
+
+The revocation generated a different debate. Legal analysts from firms including Skadden and Wiley noted that rescinding the order created significant regulatory uncertainty, since many agency actions taken under EO 14110 were already in effect and their post-revocation legal status was unclear.
 
 ## Key Uncertainties and Future Outlook
 
@@ -363,5 +402,7 @@ The EO 14110 experience offers several lessons for future AI governance efforts:
 - [TechPolicy.Press Analysis](https://www.techpolicy.press/from-safety-to-security-renaming-the-us-ai-safety-institute-is-not-just-semantics/) - AISI to CAISI renaming implications
 - [Epoch AI Notes on GPT-5 Compute](https://epochai.substack.com/p/notes-on-gpt-5-training-compute) - Compute threshold analysis
 - [Gibson Dunn State Preemption Analysis](https://www.gibsondunn.com/president-trump-latest-executive-order-on-ai-seeks-to-preempt-state-laws/) - Legal analysis of December 2025 order
+- [Skadden: AI Broad Biden Order Withdrawn](https://www.skadden.com/insights/publications/executive-briefing/ai-broad-biden-order-is-withdrawn) - Post-revocation legal analysis
+- [Wiley: Trump Revokes Biden AI EO](https://www.wiley.law/alert-President-Trump-Revokes-Biden-Administrations-AI-EO-What-To-Know) - Regulatory uncertainty analysis
 
 ---

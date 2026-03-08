@@ -1,0 +1,13 @@
+thing:
+  id: ai-welfare
+  stableId: TK450w7sTw
+  type: concept
+  name: AI Welfare and Digital Minds
+  numericId: E391
+facts:
+  - id: f_wObIEA7IMA
+    property: description
+    value: An emerging field examining whether AI systems could deserve moral consideration due to consciousness, sentience,
+      or agency, and developing ethical frameworks to prevent potential harm to digital minds.
+    asOf: 2026-03
+    notes: Migrated from old entity system

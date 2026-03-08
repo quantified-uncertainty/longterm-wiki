@@ -1,0 +1,14 @@
+thing:
+  id: international-regimes
+  stableId: uvwmYLYstg
+  type: policy
+  name: International Compute Regimes
+  numericId: E473
+facts:
+  - id: f_sNLrIgmMDQ
+    property: description
+    value: Multilateral coordination mechanisms for AI compute governance, exploring pathways from non-binding declarations
+      to comprehensive treaties. Assessment finds 10-25% chance of meaningful regimes by 2035, but potential for 30-60%
+      reduction in racing dynamics if achieved.
+    asOf: 2026-03
+    notes: Migrated from old entity system

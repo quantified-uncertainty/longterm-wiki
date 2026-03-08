@@ -96,7 +96,6 @@ function getLocalCitationQuotesForPage(pageId: string): CitationQuote[] {
   if (!localQuotes) return [];
 
   return localQuotes
-    .filter((q: Record<string, unknown>) => q.quoteVerified || q.accuracyVerdict !== null)
     .map((q: Record<string, unknown>): CitationQuote => ({
       footnote: q.footnote as number,
       url: q.url as string | null,

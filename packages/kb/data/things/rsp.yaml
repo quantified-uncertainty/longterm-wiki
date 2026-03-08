@@ -1,0 +1,14 @@
+thing:
+  id: rsp
+  stableId: i1qSgjAj5A
+  type: policy
+  name: Responsible Scaling Policies
+  numericId: E461
+facts:
+  - id: f_l3IjlPutCQ
+    property: description
+    value: Responsible Scaling Policies (RSPs) are voluntary commitments by AI labs to pause scaling when capability or
+      safety thresholds are crossed. As of December 2025, 20 companies have published policies, though SaferAI grades
+      the three major frameworks 1.9-2.2/5 for specificity.
+    asOf: 2026-03
+    notes: Migrated from old entity system

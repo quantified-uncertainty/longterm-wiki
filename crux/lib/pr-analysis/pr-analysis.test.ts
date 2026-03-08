@@ -21,6 +21,7 @@ import type { GqlPrNode, DetectedPr } from './types.ts';
 
 function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
   return {
+    id: 'PR_test_id',
     number: 1,
     title: 'Test PR',
     headRefName: 'claude/test',
@@ -246,6 +247,21 @@ describe('checkMergeEligibility (lib)', () => {
     });
     const result = checkMergeEligibility(pr);
     expect(result.blockReasons).toContain('unchecked-items');
+  });
+
+  it('blocks PRs with stage:merging label (in merge queue)', () => {
+    const pr = makePrNode({
+      labels: { nodes: [{ name: 'stage:approved' }, { name: 'stage:merging' }] },
+    });
+    const result = checkMergeEligibility(pr);
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('in-merge-queue');
+  });
+
+  it('includes nodeId in MergeCandidate', () => {
+    const pr = makePrNode({ id: 'PR_kwDON_test' });
+    const result = checkMergeEligibility(pr);
+    expect(result.nodeId).toBe('PR_kwDON_test');
   });
 });
 

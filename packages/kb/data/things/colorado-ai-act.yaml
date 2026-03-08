@@ -1,0 +1,13 @@
+thing:
+  id: colorado-ai-act
+  stableId: AhnHVmUdyw
+  type: policy
+  name: Colorado Artificial Intelligence Act
+  numericId: E62
+facts:
+  - id: f_1vbzPQfTng
+    property: description
+    value: The Colorado AI Act (SB 21-205) is the first comprehensive AI regulation enacted by a US state. Signed into law
+      on May 17, 2024, it takes effect February 1, 2026.
+    asOf: 2026-03
+    notes: Migrated from old entity system

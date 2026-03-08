@@ -1,0 +1,14 @@
+thing:
+  id: tool-restrictions
+  stableId: nl9oD17gfg
+  type: approach
+  name: Tool-Use Restrictions
+  numericId: E487
+facts:
+  - id: f_E8vKq523fA
+    property: description
+    value: Tool-use restrictions limit what actions and APIs AI systems can access, directly constraining their potential
+      for harm. This approach is critical for agentic AI systems, providing hard limits on capabilities regardless of
+      model intentions, with METR evaluations showing agentic task completion horizons doubling every 7 months.
+    asOf: 2026-03
+    notes: Migrated from old entity system

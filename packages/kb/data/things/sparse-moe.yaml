@@ -1,0 +1,14 @@
+thing:
+  id: sparse-moe
+  stableId: qSUpeYPEoQ
+  type: capability
+  name: Sparse / MoE Transformers
+  numericId: E500
+facts:
+  - id: f_hd73waMYPw
+    property: description
+    value: MoE architectures activate only 3-18% of total parameters per token, achieving 2-7x compute savings while
+      matching dense model performance (Mixtral 8x7B with 12.9B active matches Llama 2 70B). Safety research is
+      underdeveloped - no expert-level interpretability tools exist despite rapid adoption (Mi
+    asOf: 2026-03
+    notes: Migrated from old entity system

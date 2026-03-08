@@ -1,0 +1,14 @@
+thing:
+  id: 80000-hours
+  stableId: hvg9ecR3nA
+  type: organization
+  name: 80,000 Hours
+  numericId: E510
+facts:
+  - id: f_XmU8cfMaCw
+    property: description
+    value: 80,000 Hours is the largest EA career organization, reaching 10M+ readers and reporting 3,000+ significant career
+      plan changes, with 80% of $10M+ funding from Coefficient Giving. Since 2016 they've prioritized AI safety,
+      shifting explicitly to AGI focus in 2025, providing career guidance through the
+    asOf: 2026-03
+    notes: Migrated from old entity system

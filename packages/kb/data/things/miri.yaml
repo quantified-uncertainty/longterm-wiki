@@ -3,7 +3,7 @@ thing:
   stableId: puAffUjWSS
   type: organization
   name: "Machine Intelligence Research Institute"
-  numericId: 202
+  numericId: "E202"
   aliases:
     - MIRI
     - Singularity Institute

@@ -202,6 +202,97 @@ describe("formatValue", () => {
 // Integration: calc with formatting
 // ────────────────────────────────────────────────────────────
 
+// ────────────────────────────────────────────────────────────
+// KB-style property references (human-readable keys)
+// ────────────────────────────────────────────────────────────
+
+describe("calc — KB-style property references", () => {
+  // Simulates what combinedFactLookup produces when resolving KB facts
+  const kbFacts: Record<string, Fact> = {
+    "anthropic.valuation": {
+      value: "$380 billion",
+      numeric: 380_000_000_000,
+      asOf: "2026-02",
+      entity: "anthropic",
+      factId: "valuation",
+    },
+    "anthropic.revenue": {
+      value: "$9 billion",
+      numeric: 9_000_000_000,
+      asOf: "2025-12",
+      entity: "anthropic",
+      factId: "revenue",
+    },
+    "anthropic.gross-margin": {
+      value: "40%",
+      numeric: 0.4,
+      asOf: "2025",
+      entity: "anthropic",
+      factId: "gross-margin",
+    },
+  };
+
+  function kbLookup(entity: string, factId: string): Fact | undefined {
+    return kbFacts[`${entity}.${factId}`];
+  }
+
+  it("resolves human-readable property names", () => {
+    const result = calc("{anthropic.valuation}", kbLookup);
+    expect(result.value).toBe(380_000_000_000);
+  });
+
+  it("computes ratios using KB property names", () => {
+    const result = calc(
+      "{anthropic.valuation} / {anthropic.revenue}",
+      kbLookup,
+      { precision: 0, suffix: "x" }
+    );
+    expect(result.display).toBe("42x");
+  });
+
+  it("tracks inputs with KB property names", () => {
+    const result = calc(
+      "{anthropic.valuation} / {anthropic.revenue}",
+      kbLookup
+    );
+    expect(result.inputs).toHaveLength(2);
+    expect(result.inputs[0].ref).toBe("anthropic.valuation");
+    expect(result.inputs[0].factId).toBe("valuation");
+    expect(result.inputs[1].ref).toBe("anthropic.revenue");
+    expect(result.inputs[1].factId).toBe("revenue");
+  });
+
+  it("handles hyphenated property names", () => {
+    const result = calc("{anthropic.gross-margin}", kbLookup, {
+      format: "percent",
+    });
+    expect(result.display).toBe("40%");
+  });
+
+  it("works with combined old and KB lookups (fallback pattern)", () => {
+    // Simulate the combinedFactLookup: old system first, KB fallback
+    function combinedLookup(entity: string, factId: string): Fact | undefined {
+      return mockLookup(entity, factId) ?? kbLookup(entity, factId);
+    }
+
+    // Old-system ref should still work
+    const oldResult = calc("{anthropic.6796e194}", combinedLookup);
+    expect(oldResult.value).toBe(380_000_000_000);
+
+    // KB-style ref should also work
+    const kbResult = calc("{anthropic.valuation}", combinedLookup);
+    expect(kbResult.value).toBe(380_000_000_000);
+
+    // Mixed expression with both styles
+    const mixedResult = calc(
+      "{anthropic.6796e194} / {anthropic.revenue}",
+      combinedLookup,
+      { precision: 0, suffix: "x" }
+    );
+    expect(mixedResult.display).toBe("42x");
+  });
+});
+
 describe("calc — formatted output", () => {
   it("formats P/S ratio with suffix", () => {
     const result = calc(

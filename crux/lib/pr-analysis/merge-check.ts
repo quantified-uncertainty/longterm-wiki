@@ -37,6 +37,10 @@ export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
     blockReasons.push('agent-working');
   }
 
+  if (labels.includes(LABELS.STAGE_MERGING)) {
+    blockReasons.push('in-merge-queue');
+  }
+
   if (pr.mergeable !== 'MERGEABLE') {
     blockReasons.push('not-mergeable');
   }
@@ -85,6 +89,7 @@ export function checkMergeEligibility(pr: GqlPrNode): MergeCandidate {
     branch: pr.headRefName,
     createdAt: pr.createdAt,
     headOid: pr.headRefOid,
+    nodeId: pr.id,
     eligible: blockReasons.length === 0,
     blockReasons,
   };

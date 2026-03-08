@@ -1,0 +1,13 @@
+thing:
+  id: agi-race
+  stableId: QVsRgOaeUw
+  type: concept
+  name: AGI Race
+  numericId: E3
+facts:
+  - id: f_eZDUSUGW6Q
+    property: description
+    value: Competition between AI labs and nations to develop artificial general intelligence first, potentially at the
+      expense of safety.
+    asOf: 2026-03
+    notes: Migrated from old entity system

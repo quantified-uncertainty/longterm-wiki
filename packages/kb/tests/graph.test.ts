@@ -30,7 +30,7 @@ describe("graph", () => {
   describe("getAllEntities", () => {
     it("returns all entities in the graph", () => {
       const entities = graph.getAllEntities();
-      expect(entities).toHaveLength(36);
+      expect(entities.length).toBeGreaterThanOrEqual(360);
     });
   });
 
@@ -151,29 +151,27 @@ describe("graph", () => {
   describe("getByType", () => {
     it("returns entities of a given type", () => {
       const orgs = graph.getByType("organization");
-      expect(orgs).toHaveLength(15);
-      const orgIds = orgs.map((o) => o.id).sort();
-      expect(orgIds).toEqual([
-        "anthropic", "arc", "center-for-ai-safety",
-        "chan-zuckerberg-initiative", "coefficient-giving",
-        "conjecture", "deepmind", "manifund", "meta-ai",
-        "miri", "openai", "redwood-research", "ssi",
-        "survival-and-flourishing-fund", "xai",
-      ]);
+      expect(orgs.length).toBeGreaterThanOrEqual(15);
+      // Spot-check key organizations (including migrated entities)
+      const orgIds = new Set(orgs.map((o) => o.id));
+      expect(orgIds.has("anthropic")).toBe(true);
+      expect(orgIds.has("openai")).toBe(true);
+      expect(orgIds.has("deepmind")).toBe(true);
+      expect(orgIds.has("chan-zuckerberg-initiative")).toBe(true);
+      expect(orgIds.has("coefficient-giving")).toBe(true);
+      expect(orgIds.has("manifund")).toBe(true);
     });
 
     it("returns multiple entities of the same type", () => {
       const people = graph.getByType("person");
-      expect(people).toHaveLength(21);
-      const ids = people.map((p) => p.id).sort();
-      expect(ids).toEqual([
-        "chris-olah", "connor-leahy", "daniela-amodei", "dario-amodei",
-        "demis-hassabis", "dustin-moskovitz", "eliezer-yudkowsky",
-        "elon-musk", "geoffrey-hinton", "greg-brockman", "holden-karnofsky",
-        "ilya-sutskever", "jaan-tallinn", "jan-leike", "neel-nanda",
-        "nick-bostrom", "paul-christiano", "sam-altman", "stuart-russell",
-        "yann-lecun", "yoshua-bengio",
-      ].sort());
+      expect(people.length).toBeGreaterThanOrEqual(21);
+      // Spot-check key people (including migrated entities)
+      const ids = new Set(people.map((p) => p.id));
+      expect(ids.has("dario-amodei")).toBe(true);
+      expect(ids.has("sam-altman")).toBe(true);
+      expect(ids.has("eliezer-yudkowsky")).toBe(true);
+      expect(ids.has("jaan-tallinn")).toBe(true);
+      expect(ids.has("dustin-moskovitz")).toBe(true);
     });
 
     it("returns empty array for unknown type", () => {

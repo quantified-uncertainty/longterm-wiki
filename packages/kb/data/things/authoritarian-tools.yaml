@@ -1,0 +1,14 @@
+thing:
+  id: authoritarian-tools
+  stableId: eXd3Fe8Lzg
+  type: risk
+  name: AI Authoritarian Tools
+  numericId: E30
+facts:
+  - id: f_F2Eo7wmO2w
+    property: description
+    value: AI can strengthen authoritarian control through surveillance, censorship, propaganda, and prediction of dissent.
+      The concern isn't just that AI enables human rights abuses today, but that AI-enabled authoritarianism might
+      become stable and durable—harder to resist or overthrow than historical autocracies.
+    asOf: 2026-03
+    notes: Migrated from old entity system

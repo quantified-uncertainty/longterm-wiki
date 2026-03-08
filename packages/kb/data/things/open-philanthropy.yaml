@@ -1,0 +1,13 @@
+thing:
+  id: open-philanthropy
+  stableId: NifCYhN75w
+  type: organization
+  name: Open Philanthropy
+  numericId: E552
+facts:
+  - id: f_n7p8kOo2Tw
+    property: description
+    value: Open Philanthropy rebranded to Coefficient Giving in November 2025. See the Coefficient Giving page for current
+      information.
+    asOf: 2026-03
+    notes: Migrated from old entity system

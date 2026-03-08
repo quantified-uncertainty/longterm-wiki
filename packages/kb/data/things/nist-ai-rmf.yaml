@@ -1,0 +1,13 @@
+thing:
+  id: nist-ai-rmf
+  stableId: O643v0TxvQ
+  type: policy
+  name: NIST AI Risk Management Framework (AI RMF)
+  numericId: E216
+facts:
+  - id: f_OYG7e0jkAA
+    property: description
+    value: The NIST AI Risk Management Framework (AI RMF) is a voluntary guidance document developed by the National
+      Institute of Standards and Technology to help organizations manage risks associated with AI systems.
+    asOf: 2026-03
+    notes: Migrated from old entity system

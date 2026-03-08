@@ -1,0 +1,13 @@
+thing:
+  id: quri
+  stableId: Khej79OA8g
+  type: organization
+  name: QURI (Quantified Uncertainty Research Institute)
+  numericId: E238
+facts:
+  - id: f_hdxXdOaXLg
+    property: description
+    value: Nonprofit research organization developing tools for probabilistic reasoning and forecasting, including Squiggle,
+      Metaforecast, and SquiggleAI.
+    asOf: 2026-03
+    notes: Migrated from old entity system

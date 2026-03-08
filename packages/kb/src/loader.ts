@@ -5,6 +5,12 @@
  * Supports !ref YAML tags for stable references between entities:
  *   value: !ref mK9pX3rQ7n:dario-amodei   → resolves stableId, cross-validates slug
  *   value: !ref mK9pX3rQ7n                 → bare stableId (deprecated, still works)
+ *
+ * Supports !date YAML tags for explicit date typing:
+ *   founded: !date 2019        → { type: "date", value: "2019" }
+ *   started: !date 2023-06     → { type: "date", value: "2023-06" }
+ *   born:    !date 2023-06-15  → { type: "date", value: "2023-06-15" }
+ * Useful for bare years (2019) which would otherwise be parsed as numbers.
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -65,7 +71,35 @@ const refTag: ScalarTag = {
   },
 };
 
-const CUSTOM_TAGS = [refTag];
+// ── !date YAML tag ──────────────────────────────────────────────────
+
+/**
+ * Marker class for !date YAML tags. Created during YAML parsing,
+ * converted to { type: "date", value: string } by normalizeValue.
+ *
+ * Accepts any scalar — bare years (2019), year-month (2023-06), or
+ * full ISO dates (2023-06-15). The raw value is stored as a string.
+ */
+export class DateMarker {
+  constructor(public readonly value: string) {}
+}
+
+/** Custom YAML tag: !date <value> */
+const dateTag: ScalarTag = {
+  tag: "!date",
+  resolve(str: string): DateMarker {
+    return new DateMarker(str);
+  },
+  identify(value: unknown): value is DateMarker {
+    return value instanceof DateMarker;
+  },
+  stringify(item: Scalar): string {
+    const marker = item.value as DateMarker;
+    return `!date ${marker.value}`;
+  },
+};
+
+const CUSTOM_TAGS = [refTag, dateTag];
 
 /**
  * Recursively resolves RefMarker instances in a parsed YAML structure.
@@ -76,6 +110,13 @@ function resolveRefs(
   graph: Graph,
   context: string
 ): unknown {
+  // DateMarker in facts: pass through as-is so normalizeValue() can handle it.
+  // DateMarker in items: convert to the plain date string, since item collections
+  // never go through normalizeValue() and would otherwise store a class instance.
+  if (value instanceof DateMarker) {
+    return context.endsWith("/facts") ? value : value.value;
+  }
+
   if (value instanceof RefMarker) {
     const slug = graph.resolveStableId(value.stableId);
     if (!slug) {
@@ -124,6 +165,33 @@ const DATE_RE = /^\d{4}-\d{2}(-\d{2})?$/;
  * a string value is wrapped as {type: "ref"} rather than {type: "text"}.
  */
 function normalizeValue(raw: unknown, dataType?: string): FactValue {
+  // !date YAML tag — explicit date typing, takes priority over everything.
+  if (raw instanceof DateMarker) {
+    return { type: "date", value: raw.value };
+  }
+
+  // Range/min detection — structural patterns that take priority over dataType.
+  // A two-element numeric array is always a range, and an object with { min: N }
+  // is always a min bound, regardless of what the property's dataType says.
+  if (
+    Array.isArray(raw) &&
+    raw.length === 2 &&
+    typeof raw[0] === "number" &&
+    typeof raw[1] === "number"
+  ) {
+    return { type: "range", low: raw[0], high: raw[1] };
+  }
+  if (
+    raw !== null &&
+    typeof raw === "object" &&
+    !Array.isArray(raw) &&
+    !(raw instanceof DateMarker) &&
+    "min" in raw &&
+    typeof (raw as Record<string, unknown>).min === "number"
+  ) {
+    return { type: "min", value: (raw as Record<string, unknown>).min as number };
+  }
+
   // When an explicit dataType is declared, it is authoritative.
   if (dataType) {
     switch (dataType) {
@@ -227,18 +295,29 @@ function parseFact(
 
   const value = normalizeValue(rawFact.value, prop?.dataType);
 
+  // asOf/validEnd may be DateMarker objects from !date YAML tags
+  const asOfRaw: unknown = rawFact.asOf;
+  const validEndRaw: unknown = rawFact.validEnd;
+  const asOf = asOfRaw instanceof DateMarker ? asOfRaw.value : asOfRaw !== undefined ? String(asOfRaw) : undefined;
+  const validEnd = validEndRaw instanceof DateMarker ? validEndRaw.value : validEndRaw !== undefined ? String(validEndRaw) : undefined;
+
   return {
     id: rawFact.id,
     subjectId: entityId,
     propertyId: rawFact.property,
     value,
-    ...(rawFact.asOf !== undefined && { asOf: String(rawFact.asOf) }),
-    ...(rawFact.validEnd !== undefined && { validEnd: String(rawFact.validEnd) }),
+    ...(asOf !== undefined && { asOf }),
+    ...(validEnd !== undefined && { validEnd }),
     ...(rawFact.source !== undefined && { source: rawFact.source }),
     ...(rawFact.sourceQuote !== undefined && {
       sourceQuote: rawFact.sourceQuote,
     }),
     ...(rawFact.notes !== undefined && { notes: rawFact.notes }),
+    ...(rawFact.currency !== undefined && { currency: rawFact.currency }),
+    ...(rawFact.usdEquivalent !== undefined && { usdEquivalent: Number(rawFact.usdEquivalent) }),
+    ...(rawFact.exchangeRate !== undefined && { exchangeRate: Number(rawFact.exchangeRate) }),
+    ...(rawFact.exchangeRateDate !== undefined && { exchangeRateDate: rawFact.exchangeRateDate }),
+    ...(rawFact.dollarYear !== undefined && { dollarYear: Number(rawFact.dollarYear) }),
   };
 }
 

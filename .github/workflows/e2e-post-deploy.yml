@@ -1,0 +1,54 @@
+name: E2E Post-Deploy Smoke Tests
+
+# Runs Playwright E2E tests against the live production site after deploy.
+# Triggers automatically when CI completes on the production branch,
+# or manually via workflow_dispatch.
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [production]
+  workflow_dispatch: {}
+
+jobs:
+  e2e:
+    # Only run if CI succeeded (or on manual trigger)
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: cd apps/web && npx playwright install chromium --with-deps
+
+      # Vercel deploy takes a few minutes after CI triggers the hook.
+      # Wait for the site to be reachable before running tests.
+      - name: Wait for production site
+        run: |
+          echo "Waiting for https://www.longtermwiki.com to be reachable..."
+          for i in $(seq 1 30); do
+            if curl -sf -o /dev/null https://www.longtermwiki.com; then
+              echo "Site is up (attempt $i)"
+              break
+            fi
+            echo "Attempt $i/30 — waiting 30s..."
+            sleep 30
+          done
+
+      - name: Run E2E smoke tests against production
+        env:
+          PLAYWRIGHT_BASE_URL: https://www.longtermwiki.com
+        run: cd apps/web && npx playwright test

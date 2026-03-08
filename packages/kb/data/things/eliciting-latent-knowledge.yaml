@@ -1,0 +1,14 @@
+thing:
+  id: eliciting-latent-knowledge
+  stableId: GJOgOYunnw
+  type: approach
+  name: Eliciting Latent Knowledge (ELK)
+  numericId: E481
+facts:
+  - id: f_YsTxWeOzSQ
+    property: description
+    value: ELK is the unsolved problem of extracting an AI's true beliefs rather than human-approved outputs. ARC's 2022
+      prize contest received 197 proposals and awarded $274K, but the $50K and $100K solution prizes remain unclaimed.
+      The problem remains fundamentally unsolved after 3+ years of focused research.
+    asOf: 2026-03
+    notes: Migrated from old entity system

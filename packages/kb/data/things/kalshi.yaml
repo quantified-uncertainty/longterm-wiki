@@ -1,0 +1,14 @@
+thing:
+  id: kalshi
+  stableId: M7656wW5Bg
+  type: organization
+  name: Kalshi (Prediction Market)
+  numericId: E537
+facts:
+  - id: f_QNucBwZfpw
+    property: description
+    value: This is a comprehensive corporate profile of Kalshi, a US prediction market platform that offers some AI
+      safety-related contracts but is primarily focused on sports, politics, and economics. The AI safety relevance is
+      minimal, limited to a few markets on AI research pauses and regulation that show l
+    asOf: 2026-03
+    notes: Migrated from old entity system

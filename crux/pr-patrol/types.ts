@@ -25,7 +25,7 @@ export type {
 
 export type FixOutcome = 'fixed' | 'no-op' | 'max-turns' | 'timeout' | 'error' | 'dry-run';
 
-export type MergeOutcome = 'merged' | 'dry-run' | 'error';
+export type MergeOutcome = 'merged' | 'enqueued' | 'dry-run' | 'error';
 
 // Re-export LABELS for backward compatibility with consumers that import from types.ts
 export { LABELS } from '../lib/labels.ts';

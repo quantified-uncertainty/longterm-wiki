@@ -1,0 +1,14 @@
+thing:
+  id: claude-sonnet-4-5
+  stableId: fdp0LajPwQ
+  type: project
+  name: Claude Sonnet 4.5
+  numericId: E1036
+facts:
+  - id: f_BS6QBOx2Pw
+    property: description
+    value: Claude Sonnet 4.5 was released September 29, 2025. Scored 77.2% on SWE-bench Verified (82.0% with parallel
+      compute) and 61.4% on OSWorld. Maintained focus for 30+ hours on multi-step tasks. Launched alongside Claude Code
+      2.0. Priced at $3/$15 per million tokens with 200K context (1M beta).
+    asOf: 2026-03
+    notes: Migrated from old entity system

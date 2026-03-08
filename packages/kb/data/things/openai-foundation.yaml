@@ -1,0 +1,13 @@
+thing:
+  id: openai-foundation
+  stableId: GQuPhNkZbg
+  type: organization
+  name: OpenAI Foundation
+  numericId: E421
+facts:
+  - id: f_O77nrMaAKQ
+    property: description
+    value: Nonprofit organization holding 26% equity stake (~$130B) in OpenAI Group PBC, with governance control through
+      board appointment rights and philanthropic commitments focused on health and AI resilience.
+    asOf: 2026-03
+    notes: Migrated from old entity system

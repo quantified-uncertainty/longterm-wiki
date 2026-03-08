@@ -91,8 +91,9 @@ import {
 import { rankPrs as daemonRankPrs } from './scoring.ts';
 import {
   findMergeCandidates as daemonFindMergeCandidates,
-  mergePr,
+  enqueuePr,
   undraftPr,
+  reconcileMergeQueueLabels,
 } from './merge.ts';
 import {
   checkMainBranch as daemonCheckMainBranch,
@@ -173,10 +174,32 @@ function preflightChecks(config: PatrolConfig): string[] {
           return !IGNORED_PREFIXES.some((p) => filePath.startsWith(p));
         });
       if (significant.length > 0) {
-        errors.push(
-          'Working tree must be clean before starting PR Patrol. Commit or stash your changes first.\n' +
-            `  Dirty files: ${significant.slice(0, 5).map((l) => l.trim()).join(', ')}${significant.length > 5 ? ` (+${significant.length - 5} more)` : ''}`,
-        );
+        // If we're on a non-main branch, these are likely partial changes left
+        // by a previous patrol sub-agent that hit its max-turns limit. Auto-commit
+        // them so this cycle can continue without manual intervention.
+        const currentBranch = gitSafe('branch', '--show-current');
+        const branch = currentBranch.ok ? currentBranch.output.trim() : '';
+
+        if (branch && branch !== 'main' && branch !== 'master') {
+          log(`⚠ Working tree has ${significant.length} uncommitted change(s) from a previous patrol run — auto-committing`);
+          log(`  Dirty files: ${significant.slice(0, 5).map((l) => l.trim()).join(', ')}${significant.length > 5 ? ` (+${significant.length - 5} more)` : ''}`);
+
+          // Stage only already-tracked files (no untracked noise)
+          const addResult = gitSafe('add', '-u');
+          if (addResult.ok) {
+            const commitResult = gitSafe('commit', '-m', 'fix: partial patrol fix (auto-committed on patrol restart)');
+            if (commitResult.ok) {
+              log(`  ✓ Auto-committed leftover changes on ${branch}`);
+            } else if (!commitResult.output.includes('nothing to commit')) {
+              log(`  Warning: could not auto-commit leftover changes: ${commitResult.output.trim()}`);
+            }
+          }
+        } else {
+          errors.push(
+            'Working tree must be clean before starting PR Patrol. Commit or stash your changes first.\n' +
+              `  Dirty files: ${significant.slice(0, 5).map((l) => l.trim()).join(', ')}${significant.length > 5 ? ` (+${significant.length - 5} more)` : ''}`,
+          );
+        }
       }
     }
   }
@@ -214,6 +237,11 @@ async function runCheckCycle(
 
   // 1. Fetch all open PRs (shared between fix and merge phases)
   const allPrs = await daemonFetchOpenPrs(config);
+
+  // 1a. Reconcile stale stage:merging labels against actual merge queue state.
+  // GitHub ejects PRs from the queue (CI failure, manual dequeue) without
+  // notifying us, leaving stale labels that block re-enqueuing and auto-rebase.
+  await reconcileMergeQueueLabels(allPrs, config);
 
   // ── Fix phase ──────────────────────────────────────────────────────
 
@@ -290,7 +318,7 @@ async function runCheckCycle(
   });
   const eligibleForMerge = mergeCandidates.filter((c) => c.eligible);
   const blockedForMerge = mergeCandidates.filter((c) => !c.eligible);
-  let mergedPr: number | null = null;
+  const enqueuedPrs: number[] = [];
 
   if (mergeCandidates.length > 0) {
     log('');
@@ -314,10 +342,12 @@ async function runCheckCycle(
     }
   }
 
-  if (eligibleForMerge.length > 0) {
-    const toMerge = eligibleForMerge[0];
-    await mergePr(toMerge, config);
-    mergedPr = toMerge.number;
+  // Enqueue ALL eligible PRs — the merge queue handles serialization
+  for (const candidate of eligibleForMerge) {
+    const outcome = await enqueuePr(candidate, config);
+    if (outcome === 'enqueued' || outcome === 'dry-run') {
+      enqueuedPrs.push(candidate.number);
+    }
   }
 
   // ── Cycle summary ──────────────────────────────────────────────────
@@ -332,7 +362,7 @@ async function runCheckCycle(
         !isRecentlyProcessed(pr.number, config.cooldownSeconds),
     ).length,
     pr_processed: fixedPr,
-    pr_merged: mergedPr,
+    prs_enqueued: enqueuedPrs.length > 0 ? enqueuedPrs : undefined,
     merge_candidates: mergeCandidates.length,
     merge_eligible: eligibleForMerge.length,
   });
@@ -431,13 +461,16 @@ export function readRecentLogs(count: number): string {
         );
       } else if (entry.type === 'cycle_summary') {
         const mainFix = entry.main_branch_fix ? ', main_branch_fix=true' : '';
+        const enqueueInfo = entry.prs_enqueued?.length
+          ? `, enqueued=[${entry.prs_enqueued.map((n: number) => `#${n}`).join(', ')}]`
+          : '';
         const mergeInfo = entry.pr_merged
           ? `, merged=#${entry.pr_merged}`
-          : entry.merge_candidates > 0
+          : !enqueueInfo && entry.merge_candidates > 0
             ? `, merge-blocked=${entry.merge_candidates}`
             : '';
         output.push(
-          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}${mainFix}${mergeInfo}`,
+          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}${mainFix}${enqueueInfo}${mergeInfo}`,
         );
       }
     } catch {

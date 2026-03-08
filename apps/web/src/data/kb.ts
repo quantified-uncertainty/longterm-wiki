@@ -19,6 +19,16 @@ function getKB(): SerializedKB | undefined {
   }
 }
 
+/** Sort facts most-recent-first by asOf (undefined asOf sorts last). */
+function sortByAsOfDesc(facts: Fact[]): Fact[] {
+  return facts.slice().sort((a, b) => {
+    if (a.asOf === undefined && b.asOf === undefined) return 0;
+    if (a.asOf === undefined) return 1;
+    if (b.asOf === undefined) return -1;
+    return b.asOf.localeCompare(a.asOf);
+  });
+}
+
 /**
  * Get all facts for an entity, optionally filtered by property.
  * Returns facts sorted most-recent-first (by asOf).
@@ -32,12 +42,7 @@ export function getKBFacts(entity: string, property?: string): Fact[] {
     ? facts.filter((f) => f.propertyId === property)
     : facts;
 
-  return filtered.slice().sort((a, b) => {
-    if (a.asOf === undefined && b.asOf === undefined) return 0;
-    if (a.asOf === undefined) return 1;
-    if (b.asOf === undefined) return -1;
-    return b.asOf.localeCompare(a.asOf);
-  });
+  return sortByAsOfDesc(filtered);
 }
 
 /**
@@ -100,6 +105,52 @@ export function getKBProperties(): Property[] {
 
 /** @deprecated Use getKBEntity instead */
 export const getKBThing = getKBEntity;
+
+/**
+ * Get the latest fact for a given property across all entities.
+ * Returns a map of entityId → latest Fact for entities that have the property.
+ * Optionally filtered to a subset of entity IDs.
+ */
+export function getKBFactsByProperty(
+  propertyId: string,
+  entityIds?: string[],
+): Map<string, Fact> {
+  const kb = getKB();
+  if (!kb) return new Map();
+
+  const ids = entityIds ?? kb.entities.map((e) => e.id);
+  const result = new Map<string, Fact>();
+
+  for (const entityId of ids) {
+    const facts = getKBFacts(entityId, propertyId);
+    if (facts.length > 0) result.set(entityId, facts[0]!);
+  }
+
+  return result;
+}
+
+/**
+ * Get all facts for a given property across all entities (full history).
+ * Returns a map of entityId → Fact[] (sorted most-recent-first).
+ * Optionally filtered to a subset of entity IDs.
+ */
+export function getKBAllFactsByProperty(
+  propertyId: string,
+  entityIds?: string[],
+): Map<string, Fact[]> {
+  const kb = getKB();
+  if (!kb) return new Map();
+
+  const ids = entityIds ?? kb.entities.map((e) => e.id);
+  const result = new Map<string, Fact[]>();
+
+  for (const entityId of ids) {
+    const facts = getKBFacts(entityId, propertyId);
+    if (facts.length > 0) result.set(entityId, facts);
+  }
+
+  return result;
+}
 
 /**
  * Get a type schema by type name.

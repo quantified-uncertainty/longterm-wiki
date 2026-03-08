@@ -1,0 +1,13 @@
+thing:
+  id: goodfire
+  stableId: H74rOLotqg
+  type: organization
+  name: Goodfire
+  numericId: E430
+facts:
+  - id: f_NPjYnmfB4w
+    property: description
+    value: AI interpretability research lab developing tools to decode and control neural network internals for safer AI
+      systems.
+    asOf: 2026-03
+    notes: Migrated from old entity system

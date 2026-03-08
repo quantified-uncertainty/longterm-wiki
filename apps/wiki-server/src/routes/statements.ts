@@ -1769,9 +1769,9 @@ const statementsApp = new Hono()
       if (!row.pageSlug || !row.footnoteResourceId) continue;
 
       const accuracyVerdict = verdictToAccuracy(row.verdict);
-      // Only include rows that have something to show (verified or has verdict)
+      // Include all statements with footnote references, including unverified ones
+      // (which show as neutral dots in the UI)
       const quoteVerified = row.verdict === "verified";
-      if (!quoteVerified && !accuracyVerdict) continue;
 
       if (!pages[row.pageSlug]) pages[row.pageSlug] = [];
       pages[row.pageSlug].push({

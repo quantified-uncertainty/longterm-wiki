@@ -1,0 +1,13 @@
+thing:
+  id: nate-soares
+  stableId: 5MVd90lzCg
+  type: person
+  name: Nate Soares (MIRI)
+  numericId: E212
+facts:
+  - id: f_MCKelTrhAw
+    property: description
+    value: Executive Director of the Machine Intelligence Research Institute (MIRI), focused on mathematical foundations of
+      AI alignment.
+    asOf: 2026-03
+    notes: Migrated from old entity system

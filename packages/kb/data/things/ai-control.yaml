@@ -1,0 +1,14 @@
+thing:
+  id: ai-control
+  stableId: sFjyY5xXZA
+  type: approach
+  name: AI Control
+  numericId: E6
+facts:
+  - id: f_VniJGgrVgA
+    property: description
+    value: "AI Control is a research agenda that focuses on maintaining safety even when using AI systems that might be
+      actively trying to subvert safety measures. Rather than assuming alignment succeeds, it asks: \"How can we safely
+      use AI systems that might be misaligned?\""
+    asOf: 2026-03
+    notes: Migrated from old entity system

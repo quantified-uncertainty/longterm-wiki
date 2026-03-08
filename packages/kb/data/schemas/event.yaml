@@ -1,0 +1,25 @@
+type: event
+name: Event
+
+required: []
+# Events vary widely; no properties are universally required.
+
+recommended:
+  - description
+
+items:
+  key-outcomes:
+    description: "Significant outcomes or consequences of this event"
+    fields:
+      description: { type: text, required: true, description: "Outcome description" }
+      date: { type: date, description: "Date of the outcome (YYYY or YYYY-MM)" }
+      source: { type: text, description: "URL to supporting evidence" }
+      notes: { type: text, description: "Context or long-term impact" }
+
+  participants:
+    description: "Key individuals or organizations involved in this event"
+    fields:
+      entity: { type: ref, required: true, description: "Thing ID of the participant" }
+      role: { type: text, description: "Their role in the event" }
+      source: { type: text, description: "URL confirming participation" }
+      notes: { type: text, description: "Context about their involvement" }

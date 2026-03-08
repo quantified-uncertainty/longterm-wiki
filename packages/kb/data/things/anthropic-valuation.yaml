@@ -1,0 +1,14 @@
+thing:
+  id: anthropic-valuation
+  stableId: HrokCBSmBA
+  type: analysis
+  name: Anthropic Valuation Analysis
+  numericId: E405
+facts:
+  - id: f_0TUh4le5dQ
+    property: description
+    value: "Analysis of Anthropic's $350B valuation. Corrected data shows Anthropic trades at 39x revenue vs OpenAI's 25x.
+      Bull case: 88% enterprise retention, coding benchmark leadership. Bear case: 25% customer concentration, margin
+      pressure, AI bubble warnings."
+    asOf: 2026-03
+    notes: Migrated from old entity system

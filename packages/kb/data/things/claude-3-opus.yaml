@@ -1,0 +1,14 @@
+thing:
+  id: claude-3-opus
+  stableId: Ko9DCNV87A
+  type: project
+  name: Claude 3 Opus
+  numericId: E1027
+facts:
+  - id: f_nMKfXJ65ww
+    property: description
+    value: Claude 3 Opus was Anthropic's most capable model at launch on March 4, 2024. It outperformed GPT-4 on MMLU
+      (86.8%), GPQA, GSM8K, and HumanEval benchmarks. Priced at $15/$75 per million tokens (input/output) with a 200K
+      token context window.
+    asOf: 2026-03
+    notes: Migrated from old entity system

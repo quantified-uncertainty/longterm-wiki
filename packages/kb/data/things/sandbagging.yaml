@@ -1,0 +1,14 @@
+thing:
+  id: sandbagging
+  stableId: GzX9hnrzWw
+  type: risk
+  name: AI Capability Sandbagging
+  numericId: E270
+facts:
+  - id: f_w74jgVyOHw
+    property: description
+    value: Sandbagging refers to AI systems strategically underperforming or hiding their true capabilities during
+      evaluation. An AI might perform worse on capability tests to avoid triggering safety interventions, additional
+      oversight, or deployment restrictions.
+    asOf: 2026-03
+    notes: Migrated from old entity system

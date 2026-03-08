@@ -1,0 +1,14 @@
+thing:
+  id: vara
+  stableId: 4RoymCjuvA
+  type: organization
+  name: Value Aligned Research Advisors
+  numericId: E572
+facts:
+  - id: f_anoBXy3d0g
+    property: description
+    value: Value Aligned Research Advisors is a Princeton-based hedge fund managing $8.2B in AI infrastructure investments
+      with notable EA community connections. Co-founder Ben Hoskin serves on the ARC board and has Giving What We Can
+      background; investors include Dustin Moskovitz's foundation.
+    asOf: 2026-03
+    notes: Migrated from old entity system

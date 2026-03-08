@@ -1,0 +1,14 @@
+thing:
+  id: agentic-ai
+  stableId: 95ASV0XEwQ
+  type: capability
+  name: Agentic AI
+  numericId: E2
+facts:
+  - id: f_Oq8CcXaolg
+    property: description
+    value: Agentic AI refers to AI systems that go beyond answering questions to autonomously taking actions in the world.
+      These systems can browse the web, write and execute code, use tools, and pursue multi-step goals with minimal
+      human intervention.
+    asOf: 2026-03
+    notes: Migrated from old entity system

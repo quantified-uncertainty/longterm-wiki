@@ -1,0 +1,13 @@
+thing:
+  id: capability-evaluations
+  stableId: CD9w0PDxvg
+  type: concept
+  name: Capability Evaluations
+  numericId: E52
+facts:
+  - id: f_39oSmzz3cw
+    property: description
+    value: Systematic assessment of AI systems' abilities, especially dangerous capabilities like deception, manipulation,
+      or autonomous operation.
+    asOf: 2026-03
+    notes: Migrated from old entity system

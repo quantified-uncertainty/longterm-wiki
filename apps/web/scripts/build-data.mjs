@@ -72,7 +72,6 @@ const DATA_FILES = [
   { key: 'funders', file: 'funders.yaml' },
   { key: 'resources', dir: 'resources' }, // Split into multiple files
   { key: 'publications', file: 'publications.yaml' },
-  { key: 'parameterGraph', file: 'parameter-graph.yaml', isObject: true }, // Graph structure (not array)
 ];
 
 function loadYaml(filename) {
@@ -1210,17 +1209,10 @@ async function main() {
 
   const database = {};
 
-  for (const { key, file, dir, isObject } of DATA_FILES) {
+  for (const { key, file, dir } of DATA_FILES) {
     const data = dir ? loadYamlDir(dir) : loadYaml(file);
     database[key] = data;
-    if (isObject) {
-      // Object with structure (e.g., parameterGraph with nodes/edges)
-      const nodeCount = data?.nodes?.length || 0;
-      const edgeCount = data?.edges?.length || 0;
-      console.log(`  ${key}: ${nodeCount} nodes, ${edgeCount} edges`);
-    } else {
-      console.log(`  ${key}: ${countEntries(data)} entries`);
-    }
+    console.log(`  ${key}: ${countEntries(data)} entries`);
   }
 
   // Compute derived data for entities
@@ -1588,10 +1580,10 @@ async function main() {
     const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex);
     console.log(`  linkSignals: ${linkSignals.length} link signals collected for server sync`);
     const linkResult = await syncPageLinks(linkSignals);
-    if (linkResult) {
-      console.log(`  linkSync: synced ${linkResult.upserted} links to wiki server`);
+    if (linkResult.ok) {
+      console.log(`  linkSync: synced ${linkResult.data.upserted} links to wiki server`);
     } else {
-      console.log('  linkSync: skipped (server unavailable or error)');
+      console.log(`  linkSync: skipped (${linkResult.message || 'server unavailable or error'})`);
     }
   }
 

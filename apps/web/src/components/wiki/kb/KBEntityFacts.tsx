@@ -123,9 +123,19 @@ function SingleValueProperty({
   propertyId: string;
   items: FactWithProperty[];
 }) {
-  const prop = items[0]?.property;
+  // Prefer currently-active facts (validEnd == null), then sort by asOf descending
+  const candidates = items.some((item) => !item.fact.validEnd)
+    ? items.filter((item) => !item.fact.validEnd)
+    : items;
+  const sorted = [...candidates].sort((a, b) => {
+    if (!a.fact.asOf && !b.fact.asOf) return 0;
+    if (!a.fact.asOf) return 1;
+    if (!b.fact.asOf) return -1;
+    return b.fact.asOf.localeCompare(a.fact.asOf);
+  });
+  const prop = sorted[0]?.property;
   const label = prop?.name ?? titleCase(propertyId);
-  const fact = items[0]?.fact;
+  const fact = sorted[0]?.fact;
 
   if (!fact) return null;
 

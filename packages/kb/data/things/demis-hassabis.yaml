@@ -3,7 +3,7 @@ thing:
   stableId: Aqcyu3onCA
   type: person
   name: "Demis Hassabis"
-  numericId: 101
+  numericId: "E101"
   aliases:
     - "Demis"
 

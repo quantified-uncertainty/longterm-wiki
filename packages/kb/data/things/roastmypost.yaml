@@ -1,0 +1,14 @@
+thing:
+  id: roastmypost
+  stableId: xFFP7KkzFQ
+  type: project
+  name: RoastMyPost
+  numericId: E385
+facts:
+  - id: f_LwlMmudfYw
+    property: description
+    value: RoastMyPost is an LLM tool (Claude Sonnet 4.5 + Perplexity) that evaluates written content through multiple
+      specialized AI agents—fact-checking, logical fallacy detection, math verification, and more. Aimed at improving
+      epistemic quality of research posts, particularly in EA/rationalist communities.
+    asOf: 2026-03
+    notes: Migrated from old entity system

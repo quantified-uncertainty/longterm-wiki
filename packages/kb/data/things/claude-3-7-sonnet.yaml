@@ -1,0 +1,14 @@
+thing:
+  id: claude-3-7-sonnet
+  stableId: ePVee3jidQ
+  type: project
+  name: Claude 3.7 Sonnet
+  numericId: E1032
+facts:
+  - id: f_OZ4w8EhxQg
+    property: description
+    value: Claude 3.7 Sonnet was released February 24, 2025 as the first hybrid reasoning model. Users could toggle extended
+      thinking mode on or off, allowing the model to self-reflect before answering. Priced at $3/$15 per million tokens
+      with a 200K token context window.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -80,6 +80,7 @@ longterm-wiki/
 - **Tailwind CSS v4** with shadcn/ui components
 - **Page templates**: `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
 - **Canonical facts & Calc**: Follow `content/docs/internal/canonical-facts.mdx`
+- **Data system authority**: KB YAML (`packages/kb/data/things/`) is authoritative for entities it covers (9 migrated so far); old YAML facts (`data/facts/`) remain authoritative for others; Postgres statements track provenance, not canonical values. See `content/docs/internal/data-system-authority.mdx`.
 - **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts`
 - **GitHub API**: Use `crux issues/pr/ci/epic` commands — never raw `curl`
 - **Entity IDs**: Never manually invent — always `pnpm crux ids allocate <slug>`

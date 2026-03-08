@@ -1,0 +1,14 @@
+thing:
+  id: distributional-shift
+  stableId: qYk1BOLgqA
+  type: risk
+  name: AI Distributional Shift
+  numericId: E105
+facts:
+  - id: f_2v4muuXRSw
+    property: description
+    value: Distributional shift occurs when an AI system encounters inputs or situations that differ from its training
+      distribution, leading to degraded or unpredictable performance. A model trained on daytime driving may fail at
+      night. A language model trained on 2022 data may give outdated answers in 2024.
+    asOf: 2026-03
+    notes: Migrated from old entity system

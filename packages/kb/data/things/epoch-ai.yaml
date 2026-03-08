@@ -1,0 +1,17 @@
+thing:
+  id: epoch-ai
+  stableId: cBPkzcVBBQ
+  type: organization
+  name: Epoch AI
+  numericId: E125
+facts:
+  - id: f_jhTXlLe1eA
+    property: description
+    value: Epoch AI is a research organization dedicated to producing rigorous, data-driven forecasts and analysis about
+      artificial intelligence progress, with particular focus on compute trends, training datasets, algorithmic
+      efficiency, and AI timelines.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_GTFSlqnFlw
+    property: website
+    value: https://epochai.org

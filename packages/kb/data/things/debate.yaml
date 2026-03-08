@@ -1,0 +1,14 @@
+thing:
+  id: debate
+  stableId: kNfdvSgC2g
+  type: approach
+  name: AI Safety via Debate
+  numericId: E482
+facts:
+  - id: f_nKjp92MKzA
+    property: description
+    value: AI Safety via Debate proposes using adversarial AI systems to argue opposing positions while humans judge,
+      designed to scale alignment to superhuman capabilities. While theoretically promising and specifically designed to
+      address RLHF's scalability limitations, it remains experimental with limited empirical validation.
+    asOf: 2026-03
+    notes: Migrated from old entity system

@@ -1,0 +1,14 @@
+thing:
+  id: timelines-wiki
+  stableId: 8AMSTHrvSg
+  type: project
+  name: Timelines Wiki
+  numericId: E387
+facts:
+  - id: f_sBiX4f2Dig
+    property: description
+    value: Timelines Wiki is a specialized MediaWiki project documenting chronological histories of AI safety and EA
+      organizations, created by Issa Rice with funding from Vipul Naik in 2017. While useful as a historical reference
+      source, it primarily serves as documentation infrastructure rather than providing
+    asOf: 2026-03
+    notes: Migrated from old entity system

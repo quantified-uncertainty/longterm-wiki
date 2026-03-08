@@ -40,6 +40,9 @@
  * Informational:
  * 21. orphan-entity        (info)     — Entity has zero facts and zero items
  * 22. dead-source          (info)     — Source URL returns non-200 (expensive, optional)
+ *
+ * Currency:
+ * 23. currency-code        (warning)  — Fact has unknown currency code
  */
 
 import type { Graph } from "./graph";
@@ -51,6 +54,7 @@ import type {
   TypeSchema,
   ValidationResult,
 } from "./types";
+import { CURRENCIES } from "./currencies";
 
 // ── Validation options ────────────────────────────────────────────────────────
 
@@ -744,6 +748,59 @@ function _padDateForFutureCheck(dateStr: string): string {
   return dateStr;
 }
 
+/** Check 23: range/min value integrity — validate numeric bounds. */
+function checkRangeValues(
+  graph: Graph,
+  entityId: string
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  for (const fact of facts) {
+    const v = fact.value;
+
+    if (v.type === "range") {
+      if (!Number.isFinite(v.low) || !Number.isFinite(v.high)) {
+        results.push({
+          severity: "error",
+          entityId,
+          propertyId: fact.propertyId,
+          message:
+            `Fact "${fact.id}" on "${entityId}": range values must be finite numbers ` +
+            `(got low=${v.low}, high=${v.high}).`,
+          rule: "range-value",
+        });
+      } else if (v.low >= v.high) {
+        results.push({
+          severity: "error",
+          entityId,
+          propertyId: fact.propertyId,
+          message:
+            `Fact "${fact.id}" on "${entityId}": range low (${v.low}) must be less ` +
+            `than high (${v.high}).`,
+          rule: "range-value",
+        });
+      }
+    }
+
+    if (v.type === "min") {
+      if (!Number.isFinite(v.value)) {
+        results.push({
+          severity: "error",
+          entityId,
+          propertyId: fact.propertyId,
+          message:
+            `Fact "${fact.id}" on "${entityId}": min value must be a finite number ` +
+            `(got ${v.value}).`,
+          rule: "range-value",
+        });
+      }
+    }
+  }
+
+  return results;
+}
+
 /** Check 21: orphan entity — no facts and no items. */
 function checkOrphanEntity(
   graph: Graph,
@@ -767,6 +824,31 @@ function checkOrphanEntity(
   }
 
   return [];
+}
+
+/** Check 23: currency code — fact.currency must be a known ISO 4217 code. */
+function checkCurrencyCode(
+  graph: Graph,
+  entityId: string,
+): ValidationResult[] {
+  const results: ValidationResult[] = [];
+  const facts = graph.getFacts(entityId);
+
+  for (const fact of facts) {
+    if (fact.currency && !Object.hasOwn(CURRENCIES, fact.currency)) {
+      results.push({
+        severity: "warning",
+        entityId,
+        propertyId: fact.propertyId,
+        message:
+          `Fact "${fact.id}" on "${entityId}": unknown currency code "${fact.currency}". ` +
+          `Use ISO 4217 codes (USD, GBP, EUR, CAD, JPY, etc.).`,
+        rule: "currency-code",
+      });
+    }
+  }
+
+  return results;
 }
 
 // ── Graph-level checks (run once across all entities) ─────────────────────────
@@ -892,6 +974,8 @@ export function validateEntity(
     ...checkDateFormat(graph, entityId),
     ...checkFutureDate(graph, entityId),
     ...checkOrphanEntity(graph, entityId),
+    ...checkRangeValues(graph, entityId),
+    ...checkCurrencyCode(graph, entityId),
   ];
 
   const schema = graph.getSchema(entity.type);

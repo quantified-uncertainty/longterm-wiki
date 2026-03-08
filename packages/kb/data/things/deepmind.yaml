@@ -3,7 +3,7 @@ thing:
   stableId: A4XoubikkQ
   type: organization
   name: Google DeepMind
-  numericId: 98
+  numericId: "E98"
   aliases:
     - DeepMind
     - DeepMind Technologies

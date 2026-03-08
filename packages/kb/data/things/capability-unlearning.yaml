@@ -1,0 +1,14 @@
+thing:
+  id: capability-unlearning
+  stableId: PUhEWjLnnQ
+  type: approach
+  name: Capability Unlearning / Removal
+  numericId: E453
+facts:
+  - id: f_r1hWNp2xOA
+    property: description
+    value: Methods to remove specific dangerous capabilities from trained AI models, directly addressing misuse risks by
+      eliminating harmful knowledge, though current techniques face challenges around verification, capability recovery,
+      and general performance degradation.
+    asOf: 2026-03
+    notes: Migrated from old entity system

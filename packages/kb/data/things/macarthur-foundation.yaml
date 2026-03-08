@@ -1,0 +1,14 @@
+thing:
+  id: macarthur-foundation
+  stableId: 8q2GhtEmkA
+  type: organization
+  name: MacArthur Foundation
+  numericId: E544
+facts:
+  - id: f_hzPewqzvnA
+    property: description
+    value: Comprehensive profile of the $9 billion MacArthur Foundation documenting its evolution from 1978 to present, with
+      $8.27 billion in total grants across climate, criminal justice, nuclear threats, and journalism. AI governance
+      work totals modest funding ($400K to IST for LLM risk; general support to P
+    asOf: 2026-03
+    notes: Migrated from old entity system

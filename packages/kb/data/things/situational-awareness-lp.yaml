@@ -1,0 +1,14 @@
+thing:
+  id: situational-awareness-lp
+  stableId: FxJ9jQ7SlA
+  type: organization
+  name: Situational Awareness LP
+  numericId: E568
+facts:
+  - id: f_RBtEr426TQ
+    property: description
+    value: Situational Awareness LP is a hedge fund founded by Leopold Aschenbrenner in 2024 that manages ~$2B in AI-focused
+      public equities (semiconductors, energy infrastructure, data centers), delivering 47% gains in H1 2025. The fund's
+      concentrated portfolio (100% in top 10 positions) includes major holdin
+    asOf: 2026-03
+    notes: Migrated from old entity system

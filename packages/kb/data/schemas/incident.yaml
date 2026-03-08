@@ -1,0 +1,26 @@
+type: incident
+name: Incident
+
+required: []
+
+recommended:
+  - incident-date
+  - organizations-involved
+  - description
+
+items:
+  timeline:
+    description: "Key events in chronological order"
+    fields:
+      date: { type: date, required: true, description: "Date of the event (YYYY-MM-DD or YYYY-MM)" }
+      event: { type: text, required: true, description: "Brief description of what happened" }
+      source: { type: text, description: "URL to news article or primary source" }
+      notes: { type: text, description: "Additional context or significance" }
+
+  parties:
+    description: "Organizations and individuals involved in the incident"
+    fields:
+      entity: { type: ref, required: true, description: "Thing ID of the organization or person" }
+      role: { type: text, required: true, description: "Role in the incident (e.g. protagonist, antagonist, mediator)" }
+      description: { type: text, description: "Brief description of their involvement" }
+      source: { type: text, description: "URL confirming involvement" }

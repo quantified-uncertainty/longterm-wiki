@@ -1,0 +1,13 @@
+thing:
+  id: palisade-research
+  stableId: sgEt2BpyOg
+  type: organization
+  name: Palisade Research
+  numericId: E428
+facts:
+  - id: f_W5qch31OcA
+    property: description
+    value: Nonprofit organization investigating offensive AI capabilities and controllability of frontier AI models through
+      empirical research on autonomous hacking, shutdown resistance, and agentic misalignment.
+    asOf: 2026-03
+    notes: Migrated from old entity system

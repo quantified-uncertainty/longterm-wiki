@@ -1,0 +1,14 @@
+thing:
+  id: founders-fund
+  stableId: LYfneQJbSA
+  type: organization
+  name: Founders Fund
+  numericId: E529
+facts:
+  - id: f_QJ9J38qA6Q
+    property: description
+    value: Founders Fund is a $17B contrarian VC firm that has backed major AI companies like OpenAI and DeepMind but shows
+      no explicit focus on AI safety or alignment research, instead emphasizing rapid capability development and
+      transformative technologies. The firm has achieved exceptional returns through c
+    asOf: 2026-03
+    notes: Migrated from old entity system
