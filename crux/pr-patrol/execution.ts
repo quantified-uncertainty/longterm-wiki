@@ -26,13 +26,16 @@ import {
 import {
   appendJsonl,
   cl,
-  isAbandoned,
+  isMainBranchAbandoned,
   isRecentlyProcessed,
   JSONL_FILE,
   log,
+  MAIN_BRANCH_ABANDON_THRESHOLD,
+  MAIN_BRANCH_COOLDOWN_SECONDS,
   markProcessed,
   recordFailure,
   resetFailCount,
+  trackMainFixPr,
 } from './state.ts';
 import { buildMainBranchPrompt, buildPrompt } from './prompts.ts';
 import { computeBudget } from './scoring.ts';
@@ -61,6 +64,40 @@ export function looksLikeNoOp(output: string): boolean {
   return NO_OP_PATTERNS.some((p) => p.test(tail));
 }
 
+// ── Main root cause detection ───────────────────────────────────────────────
+
+/**
+ * Detect when a PR fix no-op is because the root cause is on main branch.
+ * This is a subset of no-op patterns — specifically indicates main is broken
+ * and this PR's CI failure isn't its own fault.
+ */
+const MAIN_ROOT_CAUSE_PATTERNS = [
+  /pre-existing.*(failure|issue|problem)/i,
+  /also failing on main/i,
+  /not (introduced|caused) by this PR/i,
+  /main branch.*(is|also).*(failing|broken|red)/i,
+  /failure.*(originat|com).*(from|on) main/i,
+  /same (failure|error|issue) on main/i,
+];
+
+export function looksLikeMainRootCause(output: string): boolean {
+  const tail = output.slice(-2000);
+  return MAIN_ROOT_CAUSE_PATTERNS.some((p) => p.test(tail));
+}
+
+/**
+ * Extract a fix PR number from Claude's output.
+ * Looks for patterns like github.com/.../pull/1234 or "PR #1234".
+ */
+function extractFixPrNumber(output: string): number | null {
+  const tail = output.slice(-3000);
+  const urlMatch = tail.match(/github\.com\/[^/]+\/[^/]+\/pull\/(\d+)/);
+  if (urlMatch) return parseInt(urlMatch[1], 10);
+  const prMatch = tail.match(/(?:PR|pull request)\s*#(\d+)/i);
+  if (prMatch) return parseInt(prMatch[1], 10);
+  return null;
+}
+
 // ── Main Branch CI Check (daemon wrapper) ────────────────────────────────────
 
 export { type MainBranchStatus };
@@ -75,12 +112,12 @@ export async function checkMainBranch(config: PatrolConfig): Promise<MainBranchS
   const notRed: MainBranchStatus = { isRed: false, runId: null, sha: '', htmlUrl: '' };
 
   // Check cooldown and abandoned status first
-  if (isAbandoned(MAIN_BRANCH_KEY)) {
-    log(`  ${cl.yellow}Main branch fix abandoned — needs human intervention${cl.reset}`);
+  if (isMainBranchAbandoned(MAIN_BRANCH_KEY)) {
+    log(`  ${cl.yellow}Main branch fix abandoned (${MAIN_BRANCH_ABANDON_THRESHOLD} attempts) — needs human intervention${cl.reset}`);
     return notRed;
   }
-  if (isRecentlyProcessed(MAIN_BRANCH_KEY, config.cooldownSeconds)) {
-    log(`  ${cl.dim}Main branch recently processed — skipping${cl.reset}`);
+  if (isRecentlyProcessed(MAIN_BRANCH_KEY, MAIN_BRANCH_COOLDOWN_SECONDS)) {
+    log(`  ${cl.dim}Main branch recently processed — skipping (${MAIN_BRANCH_COOLDOWN_SECONDS}s cooldown)${cl.reset}`);
     return notRed;
   }
 
@@ -132,7 +169,7 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
       reason = `Killed after ${config.timeoutMinutes}m timeout — attempt ${failCount}`;
       log(`${cl.red}✗ Main branch fix timed out after ${config.timeoutMinutes}m${cl.reset} (attempt ${failCount})`);
 
-      if (failCount >= 2) {
+      if (failCount >= MAIN_BRANCH_ABANDON_THRESHOLD) {
         reason = `Abandoned after ${failCount} failures (timeout)`;
         log(`${cl.red}✗ Main branch fix abandoned after ${failCount} failures${cl.reset}`);
       }
@@ -146,6 +183,12 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
       } else {
         resetFailCount(MAIN_BRANCH_KEY);
         log(`${cl.green}✓ Main branch CI fix processed${cl.reset} (${elapsedS}s)`);
+        // Track the fix PR so we can poll for merge and verify main is green
+        const fixPrNum = extractFixPrNumber(result.output);
+        if (fixPrNum) {
+          trackMainFixPr(fixPrNum);
+          log(`  ${cl.cyan}Tracking fix PR #${fixPrNum} for merge verification${cl.reset}`);
+        }
       }
     } else if (result.hitMaxTurns) {
       const failCount = recordFailure(MAIN_BRANCH_KEY);
@@ -153,7 +196,7 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
       reason = `Hit max turns (${config.maxTurns}) — attempt ${failCount}`;
       log(`${cl.yellow}⚠ Main branch fix hit max turns after ${elapsedS}s${cl.reset}`);
 
-      if (failCount >= 2) {
+      if (failCount >= MAIN_BRANCH_ABANDON_THRESHOLD) {
         reason = `Abandoned after ${failCount} failures`;
         log(`${cl.red}✗ Main branch fix abandoned after ${failCount} failures${cl.reset}`);
       }
@@ -313,7 +356,12 @@ export async function releaseCurrentClaim(repo: string): Promise<void> {
 
 // ── PR fix execution ────────────────────────────────────────────────────────
 
-export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
+export interface FixPrResult {
+  /** True when the PR's CI failure is caused by main branch being broken, not the PR itself. */
+  mainIsRootCause: boolean;
+}
+
+export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrResult> {
   log(`${cl.bold}→${cl.reset} Fixing PR ${cl.cyan}#${pr.number}${cl.reset} (${pr.title})`);
   log(`  Issues: ${cl.yellow}${pr.issues.join(', ')}${cl.reset}`);
   log(`  Branch: ${cl.dim}${pr.branch}${cl.reset}`);
@@ -328,7 +376,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
       elapsed_s: 0,
     });
     markProcessed(pr.number);
-    return;
+    return { mainIsRootCause: false };
   }
 
   // ── Automated rebase pre-step ──────────────────────────────────────
@@ -362,7 +410,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
           reason: `automated-rebase: ${rebaseResult.status}`,
         });
         markProcessed(pr.number);
-        return;
+        return { mainIsRootCause: false };
       }
       // Remaining issues need Claude — update pr.issues so Claude doesn't re-address 'stale'
       pr.issues = remainingIssues;
@@ -394,6 +442,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
 
   let outcome: FixOutcome = 'fixed';
   let reason = '';
+  let mainIsRootCause = false;
 
   try {
     const result = await spawnClaude(prompt, {
@@ -425,12 +474,19 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
       outcome = isNoOp ? 'no-op' : 'fixed';
 
       if (isNoOp) {
-        // No-op: Claude determined the issue can't be fixed automatically.
-        // Don't reset fail count — treat like a soft failure so the PR
-        // gets skipped on future cycles instead of being retried forever.
-        const failCount = recordFailure(pr.number);
-        reason = `No-op: agent determined issue needs human intervention (attempt ${failCount})`;
-        log(`${cl.yellow}⚠ PR #${pr.number} no-op — agent stopped early${cl.reset} (${elapsedS}s)`);
+        if (looksLikeMainRootCause(result.output)) {
+          // PR's CI failure is caused by main being broken — don't penalize this PR
+          mainIsRootCause = true;
+          reason = `No-op: CI failure is pre-existing on main branch`;
+          log(`${cl.yellow}⚠ PR #${pr.number} no-op — root cause is on main branch${cl.reset} (${elapsedS}s)`);
+        } else {
+          // No-op: Claude determined the issue can't be fixed automatically.
+          // Don't reset fail count — treat like a soft failure so the PR
+          // gets skipped on future cycles instead of being retried forever.
+          const failCount = recordFailure(pr.number);
+          reason = `No-op: agent determined issue needs human intervention (attempt ${failCount})`;
+          log(`${cl.yellow}⚠ PR #${pr.number} no-op — agent stopped early${cl.reset} (${elapsedS}s)`);
+        }
 
         await postEventComment(pr.number, config.repo, buildNoOpComment(pr.issues))
           .catch((e: unknown) => log(`  Warning: could not post no-op comment: ${e instanceof Error ? e.message : String(e)}`));
@@ -487,4 +543,6 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<void> {
 
     markProcessed(pr.number);
   }
+
+  return { mainIsRootCause };
 }

@@ -121,3 +121,58 @@ export function resetFailCount(key: number | string): void {
 export function isAbandoned(key: number | string): boolean {
   return getFailCount(key) >= 2;
 }
+
+// ── Main branch cooldown (shorter than PR cooldown) ─────────────────────────
+
+/** Main branch uses a much shorter cooldown (5 min) since it blocks all PR work. */
+export const MAIN_BRANCH_COOLDOWN_SECONDS = 300;
+
+/**
+ * Main branch gets a higher abandonment threshold (4 vs 2) because:
+ * - Misdiagnosis is common (flaky vs real failure)
+ * - Main being broken blocks all PR work, so retrying is high-value
+ */
+export const MAIN_BRANCH_ABANDON_THRESHOLD = 4;
+
+export function isMainBranchAbandoned(key: string): boolean {
+  return getFailCount(key) >= MAIN_BRANCH_ABANDON_THRESHOLD;
+}
+
+// ── Tracked main fix PR ─────────────────────────────────────────────────────
+// When the patrol creates a fix PR for main, track it so we can poll for merge
+// and re-evaluate blocked PRs once main is green.
+
+const TRACKED_FIX_FILE = join(STATE_DIR, 'tracked-main-fix');
+
+export interface TrackedMainFix {
+  prNumber: number;
+  createdAt: string; // ISO timestamp
+}
+
+export function trackMainFixPr(prNumber: number): void {
+  const data: TrackedMainFix = {
+    prNumber,
+    createdAt: new Date().toISOString(),
+  };
+  writeFileSync(TRACKED_FIX_FILE, JSON.stringify(data));
+}
+
+export function getTrackedMainFixPr(): TrackedMainFix | null {
+  if (!existsSync(TRACKED_FIX_FILE)) return null;
+  try {
+    return JSON.parse(readFileSync(TRACKED_FIX_FILE, 'utf-8'));
+  } catch {
+    return null;
+  }
+}
+
+export function clearTrackedMainFixPr(): void {
+  if (existsSync(TRACKED_FIX_FILE)) writeFileSync(TRACKED_FIX_FILE, '');
+}
+
+// ── Clear cooldown ──────────────────────────────────────────────────────────
+
+export function clearProcessed(key: number | string): void {
+  const file = join(STATE_DIR, `processed-${key}`);
+  if (existsSync(file)) writeFileSync(file, '0');
+}

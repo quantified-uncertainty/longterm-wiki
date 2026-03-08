@@ -19,7 +19,7 @@
  */
 
 import { existsSync, readFileSync } from 'fs';
-import { REPO } from '../lib/github.ts';
+import { githubApi, REPO } from '../lib/github.ts';
 import { gitSafe } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
@@ -68,7 +68,7 @@ export { checkMainBranch } from './execution.ts';
 
 // Daemon-specific exports
 export { computeBudget } from './scoring.ts';
-export { looksLikeNoOp } from './execution.ts';
+export { looksLikeNoOp, looksLikeMainRootCause } from './execution.ts';
 export { JSONL_FILE, REFLECTION_FILE } from './state.ts';
 
 // ── Internal imports (daemon-wrapped versions for the daemon loop) ──────────
@@ -76,7 +76,10 @@ export { JSONL_FILE, REFLECTION_FILE } from './state.ts';
 import type { PatrolConfig } from './types.ts';
 import {
   appendJsonl,
+  clearProcessed,
+  clearTrackedMainFixPr,
   ensureDirs,
+  getTrackedMainFixPr,
   isAbandoned,
   isRecentlyProcessed,
   JSONL_FILE as JSONL_FILE_INTERNAL,
@@ -219,7 +222,29 @@ async function runCheckCycle(
 ): Promise<void> {
   logHeader(`Check cycle #${cycleCount}`);
 
-  // 0. Check main branch CI first — highest priority
+  // 0a. Check if a tracked main-branch fix PR has been merged
+  const trackedFix = getTrackedMainFixPr();
+  if (trackedFix) {
+    try {
+      const pr = await githubApi<{ merged: boolean; state: string }>(
+        `/repos/${config.repo}/pulls/${trackedFix.prNumber}`,
+      );
+      if (pr.merged) {
+        log(`${cl.green}✓ Main branch fix PR #${trackedFix.prNumber} merged${cl.reset} — clearing main cooldown`);
+        clearTrackedMainFixPr();
+        clearProcessed('main-branch');
+      } else if (pr.state === 'closed') {
+        log(`${cl.yellow}⚠ Main branch fix PR #${trackedFix.prNumber} closed without merging${cl.reset}`);
+        clearTrackedMainFixPr();
+      } else {
+        log(`  ${cl.dim}Tracked fix PR #${trackedFix.prNumber} still open — waiting for merge${cl.reset}`);
+      }
+    } catch (e) {
+      log(`  ${cl.yellow}Warning: could not check tracked fix PR: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+    }
+  }
+
+  // 0b. Check main branch CI first — highest priority
   const mainStatus = await daemonCheckMainBranch(config);
   if (mainStatus.isRed) {
     log(`${cl.red}Main branch CI is red${cl.reset} — prioritizing fix over PR queue`);
@@ -281,8 +306,14 @@ async function runCheckCycle(
       log('');
 
       const top = ranked[0];
-      await fixPr(top, config);
+      const fixResult = await fixPr(top, config);
       fixedPr = top.number;
+
+      // If the PR's CI failure is caused by main being broken, immediately re-check main
+      if (fixResult.mainIsRootCause) {
+        log(`${cl.yellow}⚠ PR #${top.number} blocked by broken main — clearing main cooldown for immediate re-check${cl.reset}`);
+        clearProcessed('main-branch');
+      }
     } else {
       log(`${cl.dim}All issues recently processed — nothing to fix${cl.reset}`);
     }
