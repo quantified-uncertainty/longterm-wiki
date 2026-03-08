@@ -22,7 +22,7 @@ describe("loader", () => {
       expect(anthropic!.numericId).toBe("E22");
     });
 
-    it("loads all entities (360 after bulk migration)", () => {
+    it("loads all entities (360+ after bulk migration)", () => {
       const entities = graph.getAllEntities();
       expect(entities.length).toBeGreaterThanOrEqual(360);
 
@@ -34,6 +34,7 @@ describe("loader", () => {
       expect(ids.has("claude-3-opus")).toBe(true);
       expect(ids.has("alignment")).toBe(true);
       expect(ids.has("existential-risk")).toBe(true);
+      expect(ids.has("anthropic-government-standoff")).toBe(true);
     });
 
     it("loads entity aliases", () => {
@@ -62,9 +63,9 @@ describe("loader", () => {
   });
 
   describe("properties", () => {
-    it("loads 63 properties (60 original + 3 general properties)", () => {
+    it("loads 68 properties (60 original + 3 general + 5 incident properties)", () => {
       const properties = graph.getAllProperties();
-      expect(properties).toHaveLength(63);
+      expect(properties).toHaveLength(68);
     });
 
     it("loads property details correctly", () => {
@@ -99,9 +100,9 @@ describe("loader", () => {
   });
 
   describe("schemas", () => {
-    it("loads 13 schemas (8 original + 5 new entity types)", () => {
+    it("loads 14 schemas (8 original + 5 new entity types + 1 incident)", () => {
       const schemas = graph.getAllSchemas();
-      expect(schemas).toHaveLength(13);
+      expect(schemas).toHaveLength(14);
     });
 
     it("loads original concept entity schemas", () => {
