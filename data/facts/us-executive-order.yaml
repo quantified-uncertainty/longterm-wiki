@@ -4,7 +4,7 @@ facts:
   # aisi-budget-fy2024
   a1e3b7c9:
     label: "AISI initial budget (FY2024)"
-    measure: funding-round
+    measure: government-budget
     value: 10000000
     asOf: "2024-03"
     note: "Initial allocation to US AI Safety Institute at NIST"
@@ -13,7 +13,7 @@ facts:
   # aisi-actual-available
   b2f4c8d0:
     label: "AISI actual available funding"
-    measure: funding-round
+    measure: government-budget
     value: 1000000
     asOf: "2024-05"
     note: "NIST Director Laurie Locascio warned only $1M was actually available; stated it would be 'very, very tough' to continue operations"
@@ -22,7 +22,7 @@ facts:
   # aisi-budget-request-fy2025
   c3a5d9e1:
     label: "AISI budget request (FY2025)"
-    measure: funding-round
+    measure: government-budget
     value: 47700000
     asOf: "2024-03"
     note: "Biden administration requested $47.7M for AISI in FY2025 budget; not fulfilled before revocation"
@@ -67,7 +67,7 @@ facts:
   # completion-rate
   b8f0c4d6:
     label: "Requirements completion rate at revocation"
-    measure: generic-percent
+    measure: implementation-rate
     value: 85
     asOf: "2025-01"
     note: "Approximately 85% of 150 requirements completed before revocation on Jan 20, 2025"
@@ -93,8 +93,8 @@ facts:
 
   # compute-threshold-general
   e1c3f7a9:
-    label: "General compute reporting threshold (FLOP)"
-    measure: generic-count
+    label: "General compute reporting threshold"
+    measure: compute-flops
     value: 1e26
     asOf: "2023-10"
     note: "10^26 FLOP threshold for dual-use foundation models; invoked Defense Production Act for mandatory reporting. No model ever triggered this threshold before revocation."
@@ -103,8 +103,8 @@ facts:
 
   # compute-threshold-biological
   f2d4a8b0:
-    label: "Biological model compute threshold (FLOP)"
-    measure: generic-count
+    label: "Biological model compute threshold"
+    measure: compute-flops
     value: 1e23
     asOf: "2023-10"
     note: "10^23 FLOP threshold for biological sequence models; 1,000x lower than general threshold, reflecting concern about bioweapon design at lower compute scales"
@@ -114,7 +114,7 @@ facts:
   # public-support-polling
   a3e5b9c1:
     label: "Public support for EO 14110"
-    measure: generic-percent
+    measure: public-approval
     value: 69
     asOf: "2023-11"
     note: "AI Policy Institute poll: 69% of voters supported the EO (78% Democrats, 65% independents, 64% Republicans)"
@@ -123,7 +123,7 @@ facts:
   # 90-day-implementation-rate
   b4f6c0d2:
     label: "90-day requirements showing progress"
-    measure: generic-percent
+    measure: implementation-rate
     value: 90
     asOf: "2024-01"
     note: "Stanford HAI tracker: 19 of 21 requirements due at 90 days showed implementation progress (90%); 11 fully implemented (52%)"
@@ -132,7 +132,7 @@ facts:
   # state-ai-bills-2024
   c5a7d1e3:
     label: "State AI bills proposed (2024)"
-    measure: generic-count
+    measure: legislation-count
     value: 629
     asOf: "2024-12"
     note: "629 state AI bills proposed in 2024, up from ~300 in 2023 (+110%); 131 passed (+162% from ~50)"
@@ -141,7 +141,7 @@ facts:
   # federal-regulations-2024
   d6b8e2f4:
     label: "Federal AI regulations issued (2024)"
-    measure: generic-count
+    measure: legislation-count
     value: 59
     asOf: "2024-12"
     note: "59 federal AI regulations in 2024, up from 25 in 2023 (+136%); issued by 42 agencies (up from 21)"
@@ -150,7 +150,7 @@ facts:
   # uk-aisi-budget-comparison
   e7c9f3a5:
     label: "UK AISI budget (3-year commitment)"
-    measure: funding-round
+    measure: government-budget
     value: 125000000
     asOf: "2023-11"
     note: "UK AI Safety Institute received £100M (~$125M) over 3 years with 100+ staff; contrasts with US AISI's $10M and ~50 staff"

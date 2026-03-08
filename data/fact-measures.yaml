@@ -456,6 +456,49 @@ measures:
     description: "Observed or estimated rate of alignment faking behavior in AI systems"
     applicableTo: [organization]
 
+  # === Government & Policy (numeric) ===
+  government-budget:
+    label: "Government Budget"
+    unit: USD
+    category: policy
+    description: "Government budget allocation, appropriation, or funding commitment (distinct from private funding rounds)"
+    display:
+      divisor: 1000000
+      prefix: "$"
+      suffix: "M"
+    relatedMeasures: [infrastructure-investment]
+    applicableTo: [organization]
+
+  compute-flops:
+    label: "Compute (FLOP)"
+    unit: count
+    category: performance
+    description: "Compute measured in floating point operations (FLOP). Used for training compute, regulatory thresholds, and capability benchmarks. Values are typically in scientific notation (e.g., 1e26)."
+    applicableTo: [organization]
+
+  implementation-rate:
+    label: "Implementation Rate"
+    unit: percent
+    category: policy
+    direction: higher
+    description: "Percentage of policy requirements, mandates, or commitments that have been implemented or completed"
+    applicableTo: [organization]
+
+  public-approval:
+    label: "Public Approval"
+    unit: percent
+    category: policy
+    description: "Public polling or survey approval/support percentage"
+    applicableTo: [organization, person]
+
+  legislation-count:
+    label: "Legislation Count"
+    unit: count
+    category: policy
+    direction: higher
+    description: "Number of bills, laws, or regulations proposed, enacted, or issued"
+    applicableTo: [organization]
+
   # === Generic Fallback ===
   generic-count:
     label: "Count"
@@ -997,3 +1040,9 @@ propertyAliases:
   interview_quote: interview-quote
   compute_budget: compute-budget
   release_date: release-date
+  # Policy & government measures
+  government_budget: government-budget
+  compute_flops: compute-flops
+  implementation_rate: implementation-rate
+  public_approval: public-approval
+  legislation_count: legislation-count
