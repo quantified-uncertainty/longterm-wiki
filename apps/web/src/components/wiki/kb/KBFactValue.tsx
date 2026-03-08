@@ -13,6 +13,8 @@
 import { cn } from "@/lib/utils";
 import { getKBFacts, getKBLatest, getKBProperty } from "@data/kb";
 import type { Fact } from "@longterm-wiki/kb";
+import { CURRENCIES } from "@longterm-wiki/kb";
+import { formatValue } from "@lib/format-value";
 import { formatKBFactValue, formatKBDate, isUrl } from "./format";
 
 interface KBFactValueProps {
@@ -93,6 +95,14 @@ export function KBFactValue({
         <span className="block font-semibold text-foreground mb-1">
           {displayValue}
         </span>
+        {fact.currency && fact.currency !== "USD" && fact.currency in CURRENCIES && (
+          <span className="block text-muted-foreground">
+            Currency: {CURRENCIES[fact.currency].name} ({fact.currency})
+            {fact.usdEquivalent != null && (
+              <> (~{formatValue(fact.usdEquivalent, "USD")})</>
+            )}
+          </span>
+        )}
         {fact.asOf && (
           <span className="block text-muted-foreground">
             As of: {formatKBDate(fact.asOf)}

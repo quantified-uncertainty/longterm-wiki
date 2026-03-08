@@ -6,6 +6,7 @@
  */
 
 import { formatValue as smartFormatValue } from "@lib/format-value";
+import { CURRENCIES } from "@longterm-wiki/kb";
 import type { Fact, FieldDef, ItemEntry, PropertyDisplay } from "@longterm-wiki/kb";
 
 // ── Date formatting ────────────────────────────────────────────────
@@ -42,16 +43,20 @@ export function formatKBDate(dateStr: string | undefined): string {
  * Format a numeric fact value. Prefers the smart unit-aware formatter
  * from format-value.ts when a unit is available; falls back to
  * PropertyDisplay config (divisor/prefix/suffix).
+ *
+ * When `currency` is provided, it overrides the property's default
+ * currency symbol (e.g., "GBP" → "£" instead of "$").
  */
 export function formatKBNumber(
   value: number,
   unit?: string,
   display?: PropertyDisplay,
+  currency?: string,
 ): string {
   // If the property has a known unit (USD, percent, count, tokens),
   // use the smart formatter which produces "$850 million", "40%", etc.
   if (unit) {
-    return smartFormatValue(value, unit);
+    return smartFormatValue(value, unit, currency);
   }
 
   // Fall back to PropertyDisplay config
@@ -63,7 +68,11 @@ export function formatKBNumber(
     const formatted = Number.isInteger(num)
       ? num.toLocaleString()
       : num.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    const prefix = display.prefix ?? "";
+    // If currency override provided and display has a currency-like prefix, use currency symbol
+    let prefix = display.prefix ?? "";
+    if (currency && currency in CURRENCIES) {
+      prefix = CURRENCIES[currency].symbol;
+    }
     const suffix = display.suffix ?? "";
     return `${prefix}${formatted}${suffix}`;
   }
@@ -87,7 +96,7 @@ export function formatKBFactValue(
 
   switch (v.type) {
     case "number":
-      return formatKBNumber(v.value, unit ?? v.unit, display);
+      return formatKBNumber(v.value, unit ?? v.unit, display, fact.currency);
     case "boolean":
       return v.value ? "Yes" : "No";
     case "date":

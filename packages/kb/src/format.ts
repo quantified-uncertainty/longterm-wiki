@@ -7,21 +7,31 @@
 
 import type { Fact, Property, ItemEntry } from "./types";
 import type { Graph } from "./graph";
+import { CURRENCIES, resolveCurrency } from "./currencies";
 
 // ── Monetary formatting ─────────────────────────────────────────────
 
 /**
  * Format a monetary amount in a compact human-readable form.
- * e.g. 1_500_000_000 → "$1.5B", -5_000_000_000 → "-$5.0B"
+ * e.g. formatMoney(1_500_000_000) → "$1.5B"
+ *      formatMoney(100_000_000, "GBP") → "£100M"
+ *      formatMoney(-5_000_000_000) → "-$5.0B"
  */
-export function formatMoney(value: number): string {
+export function formatMoney(value: number, currencyCode: string = "USD"): string {
+  const cur = CURRENCIES[currencyCode] ?? CURRENCIES.USD;
   const abs = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-  if (abs >= 1e12) return `${sign}$${(abs / 1e12).toFixed(1)}T`;
-  if (abs >= 1e9) return `${sign}$${(abs / 1e9).toFixed(1)}B`;
-  if (abs >= 1e6) return `${sign}$${(abs / 1e6).toFixed(0)}M`;
-  if (abs >= 1e3) return `${sign}$${(abs / 1e3).toFixed(0)}K`;
-  return `${sign}$${abs}`;
+  let num: string;
+  if (abs >= 1e12) num = `${(abs / 1e12).toFixed(1)}T`;
+  else if (abs >= 1e9) num = `${(abs / 1e9).toFixed(1)}B`;
+  else if (abs >= 1e6) num = `${(abs / 1e6).toFixed(0)}M`;
+  else if (abs >= 1e3) num = `${(abs / 1e3).toFixed(0)}K`;
+  else num = `${abs}`;
+
+  if (cur.symbolPosition === "suffix") {
+    return `${sign}${num} ${cur.symbol}`;
+  }
+  return `${sign}${cur.symbol}${num}`;
 }
 
 // ── Value formatting ────────────────────────────────────────────────
@@ -29,12 +39,23 @@ export function formatMoney(value: number): string {
 /**
  * Format a numeric value using a property's display config.
  * Falls back to locale-formatted number if no display config exists.
+ *
+ * When `currency` is provided and the property is financial (unit: USD),
+ * the currency's symbol replaces the property's display prefix.
  */
-export function formatValue(value: unknown, property?: Property): string {
+export function formatValue(value: unknown, property?: Property, currency?: string): string {
   if (value === null || value === undefined) return "(none)";
 
   if (typeof value === "number" && property?.display) {
     const { divisor, prefix, suffix } = property.display;
+    // If a currency override is provided and the property's default unit is a currency,
+    // use the override currency's symbol instead of the hardcoded prefix.
+    let effectivePrefix = prefix ?? "";
+    if (currency && property.unit && property.unit in CURRENCIES) {
+      const cur = CURRENCIES[currency] ?? CURRENCIES[property.unit];
+      effectivePrefix = cur.symbol;
+    }
+
     let formatted: string;
     if (divisor && Number.isFinite(divisor)) {
       const divided = value / divisor;
@@ -52,7 +73,7 @@ export function formatValue(value: unknown, property?: Property): string {
       // This handles cases like "born-year: 1983" where commas would be wrong.
       formatted = String(value);
     }
-    return `${prefix ?? ""}${formatted}${suffix ?? ""}`;
+    return `${effectivePrefix}${formatted}${suffix ?? ""}`;
   }
 
   if (typeof value === "number") {
@@ -87,7 +108,7 @@ export function formatFactValue(
   }
 
   if (val.type === "number") {
-    return formatValue(val.value, property);
+    return formatValue(val.value, property, fact.currency);
   }
 
   return String(val.value);
@@ -120,11 +141,12 @@ export function formatItemEntry(
   switch (collectionName) {
     case "funding-rounds": {
       const date = f.date ?? "";
+      const cur = typeof f.currency === "string" ? f.currency : "USD";
       const amount =
-        typeof f.amount === "number" ? formatMoney(f.amount) : "";
+        typeof f.amount === "number" ? formatMoney(f.amount, cur) : "";
       const valuation =
         typeof f.valuation === "number"
-          ? ` @ ${formatMoney(f.valuation)}`
+          ? ` @ ${formatMoney(f.valuation, cur)}`
           : "";
       const lead = f.lead_investor
         ? resolveRefName(String(f.lead_investor), graph)
@@ -170,9 +192,10 @@ export function formatItemEntry(
       const partner = f.partner ?? item.key;
       const date = f.date ?? "";
       const type = f.type ? ` [${f.type}]` : "";
+      const partnerCur = typeof f.currency === "string" ? f.currency : "USD";
       const investAmount =
         typeof f.investment_amount === "number"
-          ? ` ${formatMoney(f.investment_amount)}`
+          ? ` ${formatMoney(f.investment_amount, partnerCur)}`
           : "";
       return `${date}  ${partner}${type}${investAmount}`;
     }
