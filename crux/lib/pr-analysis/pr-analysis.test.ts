@@ -191,6 +191,14 @@ describe('checkMergeEligibility (lib)', () => {
     expect(result.blockReasons).toContain('agent-working');
   });
 
+  it('blocks PRs with pr-patrol:working label', () => {
+    const pr = makePrNode({
+      labels: { nodes: [{ name: 'stage:approved' }, { name: 'pr-patrol:working' }] },
+    });
+    const result = checkMergeEligibility(pr);
+    expect(result.blockReasons).toContain('pr-patrol-working');
+  });
+
   it('blocks PRs with CI failures', () => {
     const pr = makePrNode({
       commits: {

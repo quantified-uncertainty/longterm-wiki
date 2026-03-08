@@ -5,7 +5,7 @@ run-name: "Auto-Rebase PRs${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' ||
 # Logic lives in crux/lib/pr-rebase.ts; this workflow is a thin orchestrator.
 #
 # Safeguards (implemented in TypeScript):
-#   1. Skip PRs with the `agent:working` label (agent actively working)
+#   1. Skip PRs with any working label (`agent:working`, `pr-patrol:working`)
 #   2. Skip PRs updated within 30 minutes (active work)
 #   3. Skip branches with commits pushed within 30 minutes (active work)
 #   4. Skip branches where last commit contains [ci-autofix] (feedback loop)

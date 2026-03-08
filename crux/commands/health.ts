@@ -42,7 +42,7 @@ Options:
   --json          JSON output (all results as structured data)
   --report        Aggregate markdown report to stdout
   --auto-issue    Manage GitHub wellness issue (create/update/close)
-  --cleanup-labels Auto-remove stale agent:working labels (>8 hours)
+  --cleanup-labels Auto-remove stale working labels (>8 hours)
 
 Environment:
   LONGTERMWIKI_SERVER_URL        Wiki-server URL (required for most checks)
