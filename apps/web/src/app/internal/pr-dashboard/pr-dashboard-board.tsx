@@ -115,7 +115,7 @@ function relativeTime(date: string): string {
 
 function PRCard({ pr }: { pr: PullData }) {
   // Filter labels that are purely workflow/stage markers from display
-  const displayLabels = pr.labels.filter(
+  const displayLabels = (pr.labels ?? []).filter(
     (l) =>
       l !== "stage:approved" &&
       l !== "agent:working" &&
