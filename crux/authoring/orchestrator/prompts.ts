@@ -39,7 +39,7 @@ Plan your tool calls carefully. You will see a budget counter after each tool re
 
 Follow this general approach, adapting based on the page's specific needs:
 
-1. **Understand context**: Start with \`read_page\` and \`get_page_metrics\`. Then use \`query_wiki_context\` to understand the page's place in the wiki graph — what links here, what it relates to, and its hallucination risk level. Use \`view_edit_history\` to see what's already been done recently (avoid redundant work). Use \`extract_facts\` to see which canonical \`<F>\` tags are available.
+1. **Understand context**: Start with \`read_page\` and \`get_page_metrics\`. Then use \`query_wiki_context\` to understand the page's place in the wiki graph — what links here, what it relates to, and its hallucination risk level. Use \`view_edit_history\` to see what's already been done recently (avoid redundant work).
 
 2. **Plan improvements**: Based on what you see, decide which improvements are most valuable:
    - Low citation count → run \`run_research\` then \`rewrite_section\` on weak sections

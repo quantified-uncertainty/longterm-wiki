@@ -1232,12 +1232,6 @@ async function main() {
   database.pathRegistry = pathRegistry;
   console.log(`  pathRegistry: ${Object.keys(pathRegistry).length} paths mapped`);
 
-  // Old facts pipeline retired — KB is the replacement.
-  // Initialize empty structures for backward compatibility with facts dashboard.
-  database.facts = {};
-  database.factMeasures = {};
-  database.factTimeseries = {};
-
   // Load KB (knowledge base graph) from packages/kb
   const kbDataDir = join(REPO_ROOT, 'packages', 'kb', 'data');
   if (existsSync(kbDataDir)) {
@@ -1327,9 +1321,6 @@ async function main() {
     }
   }
   console.log(`  contentLinks: ${contentLinkCount} EntityLink references scanned, ${contentBacklinksMerged} new backlinks added`);
-
-  // Old facts usage scanning retired — KB replaces the <F> component.
-  database.factUsage = {};
 
   // =========================================================================
   // BLOCK-LEVEL IR — extract per-section metadata (entity links, facts,
@@ -1625,11 +1616,6 @@ async function main() {
   // Used by PageStatus component and the /internal/page-coverage dashboard.
   // =========================================================================
   console.log('  Computing page coverage scores...');
-  // Pre-compute entity fact counts
-  const entityFactCounts = {};
-  for (const [_key, fact] of Object.entries(database.facts || {})) {
-    entityFactCounts[fact.entity] = (entityFactCounts[fact.entity] || 0) + 1;
-  }
   let coverageGreen = 0, coverageAmber = 0, coverageRed = 0;
   for (const page of pages) {
     const coverage = computePageCoverage({
@@ -1650,9 +1636,7 @@ async function main() {
       accuracyChecked: page.citationHealth?.accuracyChecked ?? 0,
       accuracyTotal: page.citationHealth?.total ?? 0,
       ratings: page.ratings,
-      factCount: entityFactCounts[page.id] || 0,
       hasOverview: page.metrics?.hasOverview,
-      entityType: page.entityType ?? null,
     });
     page.coverage = coverage;
     const pct = coverage.passing / coverage.total;

@@ -4,8 +4,6 @@ import {
   getRecommendedTargets,
   getMetricStatus,
   getRatioStatus,
-  ENTITY_LIKE_TYPES,
-  FACTS_GREEN_THRESHOLD,
   type CoverageInput,
 } from './page-coverage.ts';
 
@@ -34,30 +32,6 @@ function makeInput(overrides: Partial<CoverageInput> = {}): CoverageInput {
     ...overrides,
   };
 }
-
-// ---------------------------------------------------------------------------
-// ENTITY_LIKE_TYPES
-// ---------------------------------------------------------------------------
-
-describe('ENTITY_LIKE_TYPES', () => {
-  it.each(['person', 'organization'])('includes %s', (type) => {
-    expect(ENTITY_LIKE_TYPES.has(type)).toBe(true);
-  });
-
-  it.each(['concept', 'model', 'risk', 'analysis', 'approach'])('does not include %s', (type) => {
-    expect(ENTITY_LIKE_TYPES.has(type)).toBe(false);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// FACTS_GREEN_THRESHOLD
-// ---------------------------------------------------------------------------
-
-describe('FACTS_GREEN_THRESHOLD', () => {
-  it('is 5', () => {
-    expect(FACTS_GREEN_THRESHOLD).toBe(5);
-  });
-});
 
 // ---------------------------------------------------------------------------
 // getMetricStatus
@@ -250,98 +224,6 @@ describe('computePageCoverage — overview conditional scoring', () => {
 });
 
 // ---------------------------------------------------------------------------
-// computePageCoverage — facts conditional scoring
-// ---------------------------------------------------------------------------
-
-describe('computePageCoverage — facts scoring for person/organization', () => {
-  it('facts item scored for person entityType', () => {
-    const result = computePageCoverage(
-      makeInput({ entityType: 'person', factCount: 0 }),
-    );
-    expect(result.items).toHaveProperty('facts');
-  });
-
-  it('facts item scored for organization entityType', () => {
-    const result = computePageCoverage(
-      makeInput({ entityType: 'organization', factCount: 0 }),
-    );
-    expect(result.items).toHaveProperty('facts');
-  });
-
-  it('facts green when factCount >= FACTS_GREEN_THRESHOLD (5)', () => {
-    const result = computePageCoverage(
-      makeInput({ entityType: 'person', factCount: 5 }),
-    );
-    expect(result.items.facts).toBe('green');
-  });
-
-  it('facts green when factCount > FACTS_GREEN_THRESHOLD', () => {
-    const result = computePageCoverage(
-      makeInput({ entityType: 'organization', factCount: 10 }),
-    );
-    expect(result.items.facts).toBe('green');
-  });
-
-  it('facts amber when 1 <= factCount < FACTS_GREEN_THRESHOLD', () => {
-    const result = computePageCoverage(
-      makeInput({ entityType: 'person', factCount: 1 }),
-    );
-    expect(result.items.facts).toBe('amber');
-  });
-
-  it('facts amber at factCount 4 (one below threshold)', () => {
-    const result = computePageCoverage(
-      makeInput({ entityType: 'person', factCount: 4 }),
-    );
-    expect(result.items.facts).toBe('amber');
-  });
-
-  it('facts red when factCount is 0', () => {
-    const result = computePageCoverage(
-      makeInput({ entityType: 'person', factCount: 0 }),
-    );
-    expect(result.items.facts).toBe('red');
-  });
-
-  it('facts red when factCount is undefined (person page)', () => {
-    const result = computePageCoverage(
-      makeInput({ entityType: 'person', factCount: undefined }),
-    );
-    expect(result.items.facts).toBe('red');
-  });
-
-  it('facts counts toward total for person page', () => {
-    const withFacts = computePageCoverage(
-      makeInput({ entityType: 'person', factCount: 5 }),
-    );
-    const withoutFacts = computePageCoverage(
-      makeInput({ entityType: undefined, factCount: 5 }),
-    );
-    expect(withFacts.total).toBe(withoutFacts.total + 1);
-  });
-});
-
-describe('computePageCoverage — facts NOT scored for non-entity types', () => {
-  it.each(['concept', 'risk', 'model', 'analysis', 'approach', 'event', null, undefined])(
-    'facts item NOT present for entityType=%s',
-    (entityType) => {
-      const result = computePageCoverage(
-        makeInput({ entityType: entityType as string | null | undefined, factCount: 10 }),
-      );
-      expect(result.items).not.toHaveProperty('facts');
-    },
-  );
-
-  it('factCount still passed through to output when entityType is concept', () => {
-    const result = computePageCoverage(
-      makeInput({ entityType: 'concept', factCount: 7 }),
-    );
-    // factCount is still stored in the output for informational use
-    expect(result.factCount).toBe(7);
-  });
-});
-
-// ---------------------------------------------------------------------------
 // computePageCoverage — ratio metrics (quotes, accuracy)
 // ---------------------------------------------------------------------------
 
@@ -429,7 +311,6 @@ describe('computePageCoverage — passing and total counts', () => {
         quotesTotal: 10,
         accuracyChecked: 10,
         accuracyTotal: 10,
-        entityType: undefined, // no facts item
       }),
     );
     expect(result.passing).toBe(result.total);
@@ -490,22 +371,6 @@ describe('computePageCoverage — editHistoryCount passthrough', () => {
   it('editHistoryCount is undefined when changeHistoryCount is 0', () => {
     const result = computePageCoverage(makeInput({ changeHistoryCount: 0 }));
     expect(result.editHistoryCount).toBeUndefined();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// computePageCoverage — factCount passthrough
-// ---------------------------------------------------------------------------
-
-describe('computePageCoverage — factCount passthrough', () => {
-  it('factCount is set in output when provided', () => {
-    const result = computePageCoverage(makeInput({ factCount: 3 }));
-    expect(result.factCount).toBe(3);
-  });
-
-  it('factCount is undefined when not provided or zero', () => {
-    const result = computePageCoverage(makeInput({ factCount: 0 }));
-    expect(result.factCount).toBeUndefined();
   });
 });
 
@@ -578,58 +443,12 @@ describe('computePageCoverage — edge cases', () => {
     });
   });
 
-  it('person page with 0 facts and hasOverview undefined: facts scored, overview omitted', () => {
-    const result = computePageCoverage(
-      makeInput({
-        contentFormat: 'article',
-        entityType: 'person',
-        factCount: 0,
-        hasOverview: undefined,
-      }),
-    );
-    expect(result.items).toHaveProperty('facts');
-    expect(result.items.facts).toBe('red');
-    expect(result.items).not.toHaveProperty('overview');
-  });
-
-  it('organization page: both facts and overview can be scored simultaneously', () => {
-    const result = computePageCoverage(
-      makeInput({
-        contentFormat: 'article',
-        entityType: 'organization',
-        factCount: 6,
-        hasOverview: true,
-      }),
-    );
-    expect(result.items).toHaveProperty('facts');
-    expect(result.items.facts).toBe('green');
-    expect(result.items).toHaveProperty('overview');
-    expect(result.items.overview).toBe('green');
-  });
-
-  it('index page with person entity: overview omitted, facts scored', () => {
-    const result = computePageCoverage(
-      makeInput({
-        contentFormat: 'index',
-        entityType: 'person',
-        factCount: 3,
-        hasOverview: true,
-      }),
-    );
-    // index format excludes overview
-    expect(result.items).not.toHaveProperty('overview');
-    // person entity still scores facts
-    expect(result.items).toHaveProperty('facts');
-    expect(result.items.facts).toBe('amber');
-  });
-
   it('total is consistent: no extra unknown keys', () => {
     const result = computePageCoverage(makeInput());
     const knownKeys = new Set([
       'llmSummary', 'schedule', 'entity', 'editHistory',
       'overview',
       'tables', 'diagrams', 'internalLinks', 'externalLinks', 'footnotes', 'references',
-      'facts',
       'quotes', 'accuracy',
     ]);
     Object.keys(result.items).forEach((key) => {

@@ -17,7 +17,6 @@ interface ImprovePromptArgs {
   objectivityContext: string;
   currentContent: string;
   entityLookup: string;
-  factLookup: string | null;
   claimsContext: string | null;
   /** Structured directions from claims gap analysis (missing verified facts + contradictions) */
   gapAnalysisContext: string | null;
@@ -25,7 +24,7 @@ interface ImprovePromptArgs {
 }
 
 export function IMPROVE_PROMPT(args: ImprovePromptArgs): string {
-  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, factLookup, claimsContext, gapAnalysisContext, tier } = args;
+  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, claimsContext, gapAnalysisContext, tier } = args;
 
   const isPolish = tier === 'polish';
   const pageType = getPageType(page);
@@ -124,22 +123,7 @@ ONLY use IDs from this table. If an entity is not listed here, use plain text in
 \`\`\`
 ${entityLookup}
 \`\`\`
-${factLookup ? `
-### Fact Lookup Table
-
-These canonical facts are available for wrapping with \`<F>\`. The format is: entity.hashId: "display value" [measure] (as of date) — note.
-Fact IDs are 8-char hex hashes. ONLY use IDs from this table. If a value doesn't match a fact here, leave it as plain text.
-
-When you encounter a hardcoded number in the prose that matches a fact below, wrap it:
-- Before: \`Anthropic raised \\$30 billion\`
-- After: \`Anthropic raised <F e="anthropic" f="5b0663a0">\\$30 billion</F>\`
-
-**Important:** Only wrap a value when the prose is clearly referring to the same thing the fact describes. For example, "\\$1B" could be revenue OR investment — check the fact's note to confirm the semantic match. When in doubt, leave it unwrapped.
-
-\`\`\`
-${factLookup}
-\`\`\`
-` : ''}${claimsContext ? `
+${claimsContext ? `
 ### Claims Context (Verified Facts from Claims Store)
 
 The following claims have been extracted and verified from this page's sources. Use them as follows:

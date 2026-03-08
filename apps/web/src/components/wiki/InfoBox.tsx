@@ -52,7 +52,6 @@ export interface InfoBoxProps {
   ratings?: ModelRatingsData;
   description?: string;
   externalLinks?: ExternalLinksData;
-  topFacts?: { label: string; value: string; asOf?: string }[];
   clusters?: string[];
   wordCount?: number;
   backlinkCount?: number;
@@ -171,7 +170,6 @@ export function InfoBox({
   ratings,
   description,
   externalLinks,
-  topFacts,
   clusters,
   wordCount,
   backlinkCount,
@@ -378,26 +376,6 @@ export function InfoBox({
               <Link key={i} href={s.href} className="inline-block px-2 py-1 bg-emerald-500/15 rounded text-xs text-emerald-500 no-underline hover:bg-emerald-500/25">
                 {s.title}
               </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Key Facts */}
-      {topFacts && topFacts.length > 0 && (
-        <div className="px-4 py-3 border-t border-border">
-          <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Key Facts</div>
-          <div className="flex flex-col gap-1.5">
-            {topFacts.map((fact, i) => (
-              <div key={i} className="flex flex-col">
-                <div className="flex justify-between items-baseline gap-2">
-                  <span className="text-xs text-muted-foreground">{fact.label}</span>
-                  <span className="text-xs font-semibold text-foreground text-right">{fact.value}</span>
-                </div>
-                {fact.asOf && (
-                  <span className="text-[0.65rem] text-muted-foreground/60 text-right">as of {fact.asOf}</span>
-                )}
-              </div>
             ))}
           </div>
         </div>

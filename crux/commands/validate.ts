@@ -101,11 +101,6 @@ const SCRIPTS = {
     description: 'Financial data staleness and consistency',
     passthrough: ['ci'],
   },
-  'stale-facts': {
-    script: 'validate/validate-stale-facts.ts',
-    description: 'Detect stale facts in data/facts/*.yaml by asOf date',
-    passthrough: ['ci', 'json', 'top', 'entity', 'months'],
-  },
   'numeric-consistency': {
     script: 'validate/validate-numeric-consistency.ts',
     description: 'Cross-page numeric claim consistency checker — flag contradictory facts about the same entity',

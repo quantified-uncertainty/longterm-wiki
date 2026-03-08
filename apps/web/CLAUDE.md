@@ -91,7 +91,6 @@ Key data functions in `src/data/index.ts`:
 - `getEntityById(id)` — Entity lookup
 - `getPageById(id)` — Page metadata (quality, importance, lastUpdated, etc.)
 - `getBacklinksFor(id)` — Reverse references
-- `getFact(entityId, factId)` — Canonical fact lookup
 - `getExploreItems()` — All items for browse page
 - `getEntityHref(id)` — Canonical URL (uses numeric IDs like E42)
 
@@ -113,7 +112,7 @@ Wiki pages use `generateStaticParams()` to pre-render all pages at build time fr
 4. Components injected via `mdxComponents` map
 
 ### Knowledge Base (KB)
-Structured facts are defined in `packages/kb/data/things/*.yaml` and accessed via the KB data layer (`src/data/kb.ts`). The `<KBFactValue>` component renders inline fact values. The old `data/facts/` pipeline has been retired.
+Structured facts are defined in `packages/kb/data/things/*.yaml` and accessed via the KB data layer (`src/data/kb.ts`). Use `<KBF>` for inline fact values, `<KBFactValue>` for standalone display, and `<Calc>` for computed expressions referencing KB facts.
 
 ### Content Architecture
 Content directories are **flat** (max 2 levels). Grouping is done via frontmatter `subcategory` metadata, not directory nesting:

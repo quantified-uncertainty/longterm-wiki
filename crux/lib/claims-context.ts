@@ -3,8 +3,8 @@
  *
  * Fetches claims from wiki-server for a page's entity and formats them
  * into context for the LLM improve prompt. Parallel to entity-lookup.ts
- * and fact-lookup.ts — those provide entity/fact reference tables; this
- * provides the structured claims store as trusted context.
+ * which provides entity reference tables; this provides the structured
+ * claims store as trusted context.
  *
  * Usage:
  *   const ctx = await buildClaimsContextForContent(pageId, content);

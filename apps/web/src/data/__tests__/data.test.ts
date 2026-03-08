@@ -259,19 +259,6 @@ const mockDatabase = {
       category: "internal",
     },
   ],
-  facts: {
-    "test-entity.a1b2c3d4": {
-      value: "high",
-      entity: "test-entity",
-      factId: "a1b2c3d4",
-    },
-    "test-entity.e5f6a7b8": {
-      value: "$1 billion",
-      numeric: 1000000000,
-      entity: "test-entity",
-      factId: "e5f6a7b8",
-    },
-  },
   stats: {},
 };
 
@@ -361,41 +348,6 @@ describe("Data Layer", () => {
     it("falls back to slug when no numeric ID", async () => {
       const { getEntityHref } = await import("../../data/index");
       expect(getEntityHref("unknown-slug")).toBe("/wiki/unknown-slug");
-    });
-  });
-
-  describe("getFact / getFactValue", () => {
-    it("returns fact by composite key", async () => {
-      const { getFact } = await import("../../data/index");
-      const fact = getFact("test-entity", "a1b2c3d4");
-      expect(fact).toBeDefined();
-      expect(fact?.value).toBe("high");
-    });
-
-    it("returns undefined for missing fact", async () => {
-      const { getFact } = await import("../../data/index");
-      expect(getFact("test-entity", "nonexistent")).toBeUndefined();
-    });
-
-    it("getFactValue returns just the value string", async () => {
-      const { getFactValue } = await import("../../data/index");
-      expect(getFactValue("test-entity", "e5f6a7b8")).toBe("$1 billion");
-    });
-  });
-
-  describe("getFactsForEntity", () => {
-    it("returns all facts keyed by factId", async () => {
-      const { getFactsForEntity } = await import("../../data/index");
-      const facts = getFactsForEntity("test-entity");
-      expect(Object.keys(facts)).toHaveLength(2);
-      expect(facts["a1b2c3d4"]).toBeDefined();
-      expect(facts["e5f6a7b8"]).toBeDefined();
-    });
-
-    it("returns empty object for entity with no facts", async () => {
-      const { getFactsForEntity } = await import("../../data/index");
-      const facts = getFactsForEntity("nonexistent");
-      expect(Object.keys(facts)).toHaveLength(0);
     });
   });
 
