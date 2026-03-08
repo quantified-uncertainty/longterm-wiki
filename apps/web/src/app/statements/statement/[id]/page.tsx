@@ -369,13 +369,15 @@ export default async function StatementDetailPage({ params }: PageProps) {
               <QualityBar score={statement.qualityScore} label="Overall" />
               {statement.qualityDimensions && (
                 <div className="space-y-1.5 pt-2 border-t border-border/40">
-                  {QUALITY_DIMENSIONS.map(({ key, label }) => {
+                  {(() => {
                     const dims = statement.qualityDimensions as Record<string, number | undefined>;
-                    const val = dims[key];
-                    return val != null ? (
-                      <QualityBar key={key} score={val} label={label} />
-                    ) : null;
-                  })}
+                    return QUALITY_DIMENSIONS.map(({ key, label }) => {
+                      const val = dims[key];
+                      return val != null ? (
+                        <QualityBar key={key} score={val} label={label} />
+                      ) : null;
+                    });
+                  })()}
                 </div>
               )}
               {statement.scoredAt && (
@@ -574,7 +576,7 @@ const QUALITY_DIMENSIONS = [
 ];
 
 function QualityBar({ score, label }: { score: number; label: string }) {
-  const pct = Math.round(score * 100);
+  const pct = Math.min(100, Math.max(0, Math.round(score * 100)));
   const color =
     score >= 0.7
       ? "bg-green-500"
