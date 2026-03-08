@@ -107,6 +107,13 @@ export function formatKBFactValue(
       return v.value; // Caller should render as EntityLink
     case "refs":
       return v.value.join(", "); // Caller should render as EntityLinks
+    case "range": {
+      const lowStr = formatKBNumber(v.low, unit, display);
+      const highStr = formatKBNumber(v.high, unit, display);
+      return `${lowStr}\u2013${highStr}`;
+    }
+    case "min":
+      return `\u2265${formatKBNumber(v.value, unit, display)}`;
     case "json":
       return JSON.stringify(v.value);
     default:
