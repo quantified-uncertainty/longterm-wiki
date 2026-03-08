@@ -4,11 +4,8 @@
  * A stripped-down version of app/src/lib/calc-engine.ts, adapted
  * for use in the crux/ directory without Next.js path aliases.
  *
- * Evaluates math expressions with {entity.factId} references,
+ * Evaluates math expressions with {entity.propertyId} references,
  * resolving values from a caller-supplied lookup function.
- *
- * Used by crux/facts/calc-derive.ts to validate proposed <Calc> expressions
- * before applying them to MDX files.
  */
 
 // ---------------------------------------------------------------------------

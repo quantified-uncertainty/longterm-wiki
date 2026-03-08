@@ -1,41 +1,10 @@
-import { getFact, type Fact } from "@/data";
 import { getKBLatest, getKBProperty } from "@data/kb";
-import { formatKBFactValue } from "@/components/wiki/kb/format";
 import { calc, formatValue, type CalcFormat } from "@/lib/calc-engine";
 import { cn } from "@/lib/utils";
-
-/**
- * Combined fact lookup: tries old-system facts first, falls back to KB facts.
- * Converts KB facts into the old Fact format so the calc engine can consume them.
- */
-function combinedFactLookup(entity: string, factId: string): Fact | undefined {
-  // Try old-system fact lookup first
-  const oldFact = getFact(entity, factId);
-  if (oldFact) return oldFact;
-
-  // Fall back to KB lookup (entity = KB entity ID, factId = KB property ID)
-  const kbFact = getKBLatest(entity, factId);
-  if (!kbFact) return undefined;
-
-  // Extract numeric value from the KB FactValue — Calc only works with numbers
-  const v = kbFact.value;
-  if (v.type !== "number") return undefined;
-
-  const prop = getKBProperty(factId);
-  const displayValue = formatKBFactValue(kbFact, prop?.unit, prop?.display);
-
-  return {
-    value: displayValue,
-    numeric: v.value,
-    asOf: kbFact.asOf,
-    entity,
-    factId,
-    source: kbFact.source,
-  };
-}
+import type { Fact } from "@/data";
 
 interface CalcProps {
-  /** Expression with {entity.factId} references, e.g. "{anthropic.valuation} / {anthropic.revenue-arr-2025}" */
+  /** Expression with {entity.propertyId} references, e.g. "{anthropic.revenue} / {anthropic.valuation}" */
   expr: string;
   /** Format mode: "currency" ($X billion), "percent" (X%), "number" (X,XXX), or auto */
   format?: CalcFormat;
@@ -51,16 +20,52 @@ interface CalcProps {
 }
 
 /**
+ * Bridge from KB fact to the shape expected by calc-engine.
+ * Converts KB's typed FactValue to the flat { value, numeric, asOf } shape.
+ */
+function kbFactLookup(entity: string, propertyId: string): Fact | undefined {
+  const kbFact = getKBLatest(entity, propertyId);
+  if (!kbFact) return undefined;
+
+  const prop = getKBProperty(propertyId);
+  let value: string | undefined;
+  let numeric: number | undefined;
+
+  if (kbFact.value.type === "number") {
+    numeric = kbFact.value.value;
+    // Format for display
+    const unit = kbFact.value.unit ?? prop?.unit;
+    if (unit === "USD") {
+      const abs = Math.abs(numeric);
+      if (abs >= 1e12) value = `$${(numeric / 1e12).toFixed(1)} trillion`;
+      else if (abs >= 1e9) value = `$${(numeric / 1e9).toFixed(1)} billion`;
+      else if (abs >= 1e6) value = `$${(numeric / 1e6).toFixed(1)} million`;
+      else value = `$${numeric.toLocaleString("en-US")}`;
+    } else if (unit === "percent") {
+      value = `${(numeric * 100).toFixed(1)}%`;
+    } else {
+      value = numeric.toLocaleString("en-US");
+    }
+  } else if (kbFact.value.type === "text") {
+    value = kbFact.value.value;
+  }
+
+  return {
+    value,
+    numeric,
+    asOf: kbFact.asOf,
+    entity,
+    factId: propertyId,
+  };
+}
+
+/**
  * Calc — Inline computed value from fact expressions.
  *
- * Evaluates a math expression referencing canonical facts, renders the result
+ * Evaluates a math expression referencing KB facts, renders the result
  * inline with a hover tooltip showing the formula and inputs.
  *
- * Supports both old-system fact references (8-char hex IDs) and KB property
- * references. Old-system facts are tried first; KB facts are used as fallback.
- *
  * Usage in MDX:
- *   <Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={1} suffix="x" />
  *   <Calc expr="{anthropic.valuation} / {anthropic.revenue}" precision={0} suffix="x" />
  *   <Calc expr="{anthropic.revenue-run-rate} * 2.5" format="currency" />
  *   <Calc expr="{anthropic.gross-margin}" format="percent" />
@@ -75,7 +80,7 @@ export function Calc({
   className,
 }: CalcProps) {
   try {
-    const result = calc(expr, combinedFactLookup, { format, precision, prefix, suffix });
+    const result = calc(expr, kbFactLookup, { format, precision, prefix, suffix });
     const displayValue = children || result.display;
 
     // Build human-readable formula for tooltip: replace refs with their values

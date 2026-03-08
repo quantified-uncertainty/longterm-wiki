@@ -1,11 +1,10 @@
 /**
  * Calc Engine — Expression evaluator for inline wiki calculations.
  *
- * Evaluates mathematical expressions with {entity.factId} references,
- * resolving values from the canonical facts database.
+ * Evaluates mathematical expressions with {entity.propertyId} references,
+ * resolving values from the KB fact store.
  *
- * Uses the same recursive-descent parser as computed-facts.mjs (build-time),
- * ported to TypeScript for runtime use in the <Calc> MDX component.
+ * Recursive-descent parser for runtime use in the <Calc> MDX component.
  */
 
 import type { Fact } from "@/data";

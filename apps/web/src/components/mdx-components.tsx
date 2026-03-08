@@ -135,7 +135,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   ResourceLink,
   R,
   References,
-  F,
+  F, // Legacy shim — renders children inline; pages should migrate to <KBFactValue>
   KBF,
   Calc,
   DataInfoBox,

@@ -1,15 +1,13 @@
 /**
- * Fact Lookup Utilities
+ * Fact Lookup Utilities (LEGACY)
  *
- * Builds a fact lookup table for LLM prompts, so the improve pipeline
- * knows which <F> tags are available for a given page.
+ * Previously built a fact lookup table from data/facts/*.yaml for LLM prompts.
+ * The old facts pipeline has been retired in favor of the KB system
+ * (packages/kb/data/). This module now returns empty results since
+ * data/facts/ no longer exists.
  *
- * Parallel to entity-lookup.ts — entities tell the LLM which EntityLinks
- * exist; this tells the LLM which canonical facts exist.
- *
- * Usage:
- *   const table = buildFactLookupForContent(pageId, content, ROOT);
- *   // Include `table` in the LLM prompt
+ * TODO: Rewrite to read from KB data, or remove if the orchestrator
+ * is updated to use KB-native fact references.
  */
 
 import fs from 'fs';
