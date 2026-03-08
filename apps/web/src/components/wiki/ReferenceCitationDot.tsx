@@ -24,10 +24,9 @@ export function ReferenceCitationDot({ url }: { url: string }) {
   const verdict = best.accuracyVerdict;
   const info = verdict ? VERDICT_COLORS[verdict] : null;
 
-  if (!info && !best.quoteVerified) return null;
-
-  const bg = info?.bg ?? "bg-blue-500";
-  const title = info?.title ?? "Source verified";
+  // Show all statement-backed citations: verified (blue), verdict-colored, or neutral (unverified)
+  const bg = info?.bg ?? (best.quoteVerified ? "bg-blue-500" : "bg-muted-foreground/40");
+  const title = info?.title ?? (best.quoteVerified ? "Source verified" : "Citation present (unverified)");
 
   return (
     <span
