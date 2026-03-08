@@ -147,13 +147,13 @@ export default async function SourcePage({ params }: PageProps) {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
-      {/* Back link to Resources index */}
+      {/* Back link */}
       <Link
-        href="/claims/resources"
+        href="/wiki"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        All Resources
+        Back
       </Link>
 
       {/* Header */}
@@ -173,16 +173,7 @@ export default async function SourcePage({ params }: PageProps) {
           {metadataItems.map((item, i) => (
             <span key={i} className="inline-flex items-center gap-1.5">
               {i > 0 && <span className="text-muted-foreground/30">&middot;</span>}
-              {publication && item.includes(publication.name) ? (
-                <a
-                  href={`/claims/publications/${publication.id}`}
-                  className="hover:underline text-primary"
-                >
-                  {item}
-                </a>
-              ) : (
-                <span>{item}</span>
-              )}
+              <span>{item}</span>
             </span>
           ))}
           {credibility != null && (

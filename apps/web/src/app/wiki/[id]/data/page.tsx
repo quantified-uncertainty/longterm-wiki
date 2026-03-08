@@ -525,20 +525,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
           </p>
         ) : (
           <div>
-            <div className="flex items-center gap-3 mb-3 text-sm">
-              <Link
-                href={`/wiki/${numericId || slug}/claims`}
-                className="text-blue-600 hover:underline font-medium"
-              >
-                View full claims tab &rarr;
-              </Link>
-              <Link
-                href={`/claims/entity/${slug}`}
-                className="text-muted-foreground hover:underline"
-              >
-                Claims Explorer
-              </Link>
-            </div>
             <ClaimsTable claims={claims} />
           </div>
         )}
@@ -553,20 +539,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
           <p className="text-sm text-gray-500">No claims extracted yet — run claims extract first.</p>
         ) : (
           <div>
-            <div className="flex items-center gap-3 mb-3 text-sm">
-              <Link
-                href={`/wiki/${numericId || slug}/claims`}
-                className="text-blue-600 hover:underline font-medium"
-              >
-                View full claims tab &rarr;
-              </Link>
-              <Link
-                href={`/claims/entity/${slug}`}
-                className="text-muted-foreground hover:underline"
-              >
-                Claims Explorer
-              </Link>
-            </div>
             <ReferencesTable claims={claims} />
           </div>
         )}

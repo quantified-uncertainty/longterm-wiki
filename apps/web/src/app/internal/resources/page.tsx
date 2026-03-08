@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function ResourcesPage() {
-  redirect("/claims/resources");
+  redirect("/wiki");
 }
