@@ -20,11 +20,13 @@ interface ImprovePromptArgs {
   claimsContext: string | null;
   /** Structured directions from claims gap analysis (missing verified facts + contradictions) */
   gapAnalysisContext: string | null;
+  /** Structured KB facts for the page's entity, if one exists in the KB. */
+  kbContext: string | null;
   tier: string;
 }
 
 export function IMPROVE_PROMPT(args: ImprovePromptArgs): string {
-  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, claimsContext, gapAnalysisContext, tier } = args;
+  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, claimsContext, gapAnalysisContext, kbContext, tier } = args;
 
   const isPolish = tier === 'polish';
   const pageType = getPageType(page);
@@ -123,7 +125,18 @@ ONLY use IDs from this table. If an entity is not listed here, use plain text in
 \`\`\`
 ${entityLookup}
 \`\`\`
-${claimsContext ? `
+${kbContext ? `
+### KB Structured Facts (AUTHORITATIVE)
+
+The following facts are stored in the Knowledge Base for this entity. They are the canonical source of truth for structured data. When writing prose:
+- **DO NOT contradict these values** — they are sourced and verified
+- **Prefer \`<KBF>\`** over hardcoded values for KB properties — values stay in sync as facts update
+- **Prefer \`<F>\`** for inline citations with hover tooltips (copy the fact ID from the table below)
+
+\`\`\`
+${kbContext}
+\`\`\`
+` : ''}${claimsContext ? `
 ### Claims Context (Verified Facts from Claims Store)
 
 The following claims have been extracted and verified from this page's sources. Use them as follows:

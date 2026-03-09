@@ -14,13 +14,14 @@
  *   npx tsx crux/validate/validate-component-refs.ts --ci
  */
 
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync } from 'fs';
+import { join } from 'path';
 import { fileURLToPath } from 'url';
 
 // Use shared libraries
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { createLogger, formatPath } from '../lib/output.ts';
-import { CONTENT_DIR, DATA_DIR, loadDatabase as loadDatabaseJson } from '../lib/content-types.ts';
+import { CONTENT_DIR, DATA_DIR, PROJECT_ROOT, loadDatabase as loadDatabaseJson } from '../lib/content-types.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import { ENTITY_LINK_RE } from '../lib/patterns.ts';
 import { stripFencedCodeBlocks } from '../lib/mdx-utils.ts';
@@ -95,6 +96,103 @@ interface ValidationIssues {
   missingRefs: MissingRef[];
   unusedImports: UnusedImportIssue[];
   noDataForComponent: NoDataComponent[];
+  brokenKbfRefs: BrokenKbfRef[];
+}
+
+/**
+ * A KBF/KBFactValue reference found in MDX content.
+ */
+interface KbfRef {
+  component: string;
+  entity: string;
+  property: string;
+  line: number;
+}
+
+/**
+ * A broken KBF reference (entity or property not found in KB).
+ */
+interface BrokenKbfRef {
+  file: string;
+  line: number;
+  component: string;
+  entity: string;
+  property: string;
+  reason: 'unknown-entity' | 'unknown-property';
+}
+
+// ── KB data loaders ────────────────────────────────────────────────────
+
+const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
+
+/**
+ * Load valid KB property IDs by parsing properties.yaml keys.
+ * Lightweight: no full graph load needed.
+ */
+function loadKbPropertyIds(): Set<string> {
+  try {
+    const raw = readFileSync(join(KB_DATA_DIR, 'properties.yaml'), 'utf-8');
+    const ids = new Set<string>();
+    // Property keys appear as "  <key>:" at exactly 2-space indentation under "properties:".
+    // Nested field keys (name, description, appliesTo, display, etc.) are at 4+ spaces and won't match.
+    for (const match of raw.matchAll(/^  ([a-z][a-z-]*):/gm)) {
+      ids.add(match[1]);
+    }
+    return ids;
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[validate-component-refs] Could not load KB properties.yaml: ${msg} — KBF property validation will be skipped`);
+    return new Set();
+  }
+}
+
+/**
+ * Load valid KB entity slugs from the filesystem.
+ * An entity has KB data if `packages/kb/data/things/<slug>.yaml` exists.
+ */
+function loadKbEntitySlugs(): Set<string> {
+  try {
+    const thingsDir = join(KB_DATA_DIR, 'things');
+    const slugs = new Set<string>();
+    for (const file of readdirSync(thingsDir)) {
+      if (file.endsWith('.yaml')) {
+        slugs.add(file.slice(0, -5));
+      }
+    }
+    return slugs;
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[validate-component-refs] Could not read KB things/ directory: ${msg} — KBF entity validation will be skipped`);
+    return new Set();
+  }
+}
+
+/**
+ * Parse all <KBF> and <KBFactValue> usages from MDX content.
+ * Returns objects with entity + property attr values.
+ */
+function findKbfRefs(content: string): KbfRef[] {
+  const refs: KbfRef[] = [];
+  // Match the complete <KBF ...> or <KBFactValue ...> opening/self-closing tag.
+  // We match the full tag (group 0) and extract entity/property from the whole
+  // string — NOT from a captured group — to avoid the non-greedy group 2
+  // stopping after the first attribute and missing subsequent ones.
+  const tagRegex = /<(KBF|KBFactValue)\s[^>]*\/?>/g;
+  let tagMatch: RegExpExecArray | null;
+  while ((tagMatch = tagRegex.exec(content)) !== null) {
+    const fullTag = tagMatch[0];
+    const entityMatch = fullTag.match(/entity=["']([^"']+)["']/);
+    const propertyMatch = fullTag.match(/property=["']([^"']+)["']/);
+    if (entityMatch && propertyMatch) {
+      refs.push({
+        component: tagMatch[1],
+        entity: entityMatch[1],
+        property: propertyMatch[1],
+        line: content.slice(0, tagMatch.index).split('\n').length,
+      });
+    }
+  }
+  return refs;
 }
 
 // Load data sources
@@ -223,11 +321,49 @@ function findComponentRefs(content: string): ComponentRef[] {
 }
 
 /**
+ * Shared helper: validate <KBF> / <KBFactValue> refs in one MDX file.
+ * Reports both unknown-entity AND unknown-property for the same ref (separate if blocks).
+ */
+function validateKbfRefsInFile(
+  content: string,
+  relPath: string,
+  issues: ValidationIssues,
+  kbEntitySlugs: Set<string>,
+  kbPropertyIds: Set<string>,
+): void {
+  if (kbEntitySlugs.size === 0 && kbPropertyIds.size === 0) return;
+  for (const ref of findKbfRefs(content)) {
+    if (kbEntitySlugs.size > 0 && !kbEntitySlugs.has(ref.entity)) {
+      issues.brokenKbfRefs.push({
+        file: relPath,
+        line: ref.line,
+        component: ref.component,
+        entity: ref.entity,
+        property: ref.property,
+        reason: 'unknown-entity',
+      });
+    }
+    if (kbPropertyIds.size > 0 && !kbPropertyIds.has(ref.property)) {
+      issues.brokenKbfRefs.push({
+        file: relPath,
+        line: ref.line,
+        component: ref.component,
+        entity: ref.entity,
+        property: ref.property,
+        reason: 'unknown-property',
+      });
+    }
+  }
+}
+
+/**
  * Run the component reference check and return a ValidatorResult.
  */
 export async function runCheck(options: ValidatorOptions = {}): Promise<ValidatorResult> {
   const entities: Set<string> = loadEntities();
   const externalLinks: Set<string> = loadExternalLinks();
+  const kbEntitySlugs: Set<string> = loadKbEntitySlugs();
+  const kbPropertyIds: Set<string> = loadKbPropertyIds();
 
   const files: string[] = findMdxFiles(CONTENT_DIR);
 
@@ -235,6 +371,7 @@ export async function runCheck(options: ValidatorOptions = {}): Promise<Validato
     missingRefs: [],
     unusedImports: [],
     noDataForComponent: [],
+    brokenKbfRefs: [],
   };
 
   for (const file of files) {
@@ -294,12 +431,14 @@ export async function runCheck(options: ValidatorOptions = {}): Promise<Validato
         });
       }
     }
+
+    validateKbfRefsInFile(content, relPath, issues, kbEntitySlugs, kbPropertyIds);
   }
 
   return {
     passed: issues.missingRefs.length === 0,
     errors: issues.missingRefs.length,
-    warnings: issues.noDataForComponent.length + issues.unusedImports.length,
+    warnings: issues.noDataForComponent.length + issues.unusedImports.length + issues.brokenKbfRefs.length,
   };
 }
 
@@ -312,9 +451,13 @@ async function main(): Promise<void> {
   log.dim('Loading data sources...');
   const entities: Set<string> = loadEntities();
   const externalLinks: Set<string> = loadExternalLinks();
+  const kbEntitySlugs: Set<string> = loadKbEntitySlugs();
+  const kbPropertyIds: Set<string> = loadKbPropertyIds();
 
   log.dim(`  Entities + Pages: ${entities.size}`);
   log.dim(`  External Links: ${externalLinks.size}`);
+  log.dim(`  KB Entities: ${kbEntitySlugs.size}`);
+  log.dim(`  KB Properties: ${kbPropertyIds.size}`);
   console.log();
 
   const files: string[] = findMdxFiles(CONTENT_DIR);
@@ -325,6 +468,7 @@ async function main(): Promise<void> {
     missingRefs: [],
     unusedImports: [],
     noDataForComponent: [],
+    brokenKbfRefs: [],
   };
 
   for (const file of files) {
@@ -386,6 +530,8 @@ async function main(): Promise<void> {
         });
       }
     }
+
+    validateKbfRefsInFile(content, relPath, issues, kbEntitySlugs, kbPropertyIds);
   }
 
   // Report results
@@ -418,6 +564,22 @@ async function main(): Promise<void> {
     }
   }
 
+  if (issues.brokenKbfRefs.length > 0) {
+    console.log(`${c.yellow}${c.bold}Broken KBF References (${issues.brokenKbfRefs.length})${c.reset}`);
+    log.dim('<KBF> or <KBFactValue> referencing unknown entity or property — will show red badge at runtime');
+    console.log();
+
+    for (const ref of issues.brokenKbfRefs) {
+      console.log(`  ${c.yellow}${ref.file}:${ref.line}${c.reset}`);
+      const desc = ref.reason === 'unknown-entity'
+        ? `entity "${ref.entity}" not found in packages/kb/data/things/`
+        : `property "${ref.property}" not found in packages/kb/data/properties.yaml`;
+      console.log(`    <${ref.component} entity="${ref.entity}" property="${ref.property}" />`);
+      log.dim(`    ${desc}`);
+      console.log();
+    }
+  }
+
   if (issues.unusedImports.length > 0) {
     console.log(`${c.yellow}${c.bold}Unused Imports (${issues.unusedImports.length})${c.reset}`);
     log.dim('These components are imported but never used');
@@ -441,6 +603,7 @@ async function main(): Promise<void> {
   console.log(`  Files checked: ${files.length}`);
   console.log(`  ${c.red}Missing references: ${issues.missingRefs.length}${c.reset}`);
   console.log(`  ${c.yellow}No-data components: ${issues.noDataForComponent.length}${c.reset}`);
+  console.log(`  ${c.yellow}Broken KBF refs: ${issues.brokenKbfRefs.length}${c.reset}`);
   console.log(`  ${c.yellow}Unused imports: ${issues.unusedImports.length}${c.reset}`);
 
   if (hasErrors) {
