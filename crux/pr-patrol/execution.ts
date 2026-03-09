@@ -10,7 +10,7 @@
 
 import { spawn } from 'child_process';
 import { githubApi } from '../lib/github.ts';
-import { gitSafe } from '../lib/git.ts';
+import { git, createWorktree, removeWorktree } from '../lib/git.ts';
 import { checkMainBranch as libCheckMainBranch, findRecentMerges as libFindRecentMerges } from '../lib/pr-analysis/index.ts';
 import type { RecentMerge } from '../lib/pr-analysis/index.ts';
 import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
@@ -182,6 +182,20 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
   const attemptNum = incrementMainFixAttempts();
   log(`  Fix attempt #${attemptNum}`);
 
+  // Create an isolated worktree for the fix (detached HEAD at origin/main).
+  // Claude will create its own fix branch from there.
+  const projectRoot = git('rev-parse', '--show-toplevel');
+  const wtName = `patrol-main-${Date.now()}`;
+  let worktreePath: string;
+  try {
+    worktreePath = createWorktree(projectRoot, wtName, 'origin/main', { detach: true });
+    log(`  Worktree: ${cl.dim}${worktreePath}${cl.reset}`);
+  } catch (e) {
+    log(`${cl.red}✗ Failed to create worktree for main branch fix: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+    markProcessed(MAIN_BRANCH_KEY);
+    return;
+  }
+
   const prompt = buildMainBranchPrompt(status.runId!, config.repo);
   const startTime = Date.now();
 
@@ -189,7 +203,7 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
   let reason = '';
 
   try {
-    const result = await spawnClaude(prompt, config);
+    const result = await spawnClaude(prompt, config, { cwd: worktreePath });
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
     if (result.timedOut) {
@@ -244,13 +258,7 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
       reason: reason || undefined,
     });
   } finally {
-    // Clean up any in-progress rebase/merge
-    gitSafe('rebase', '--abort');
-    gitSafe('merge', '--abort');
-
-    // Restore to main branch
-    gitSafe('checkout', 'main');
-
+    removeWorktree(worktreePath);
     markProcessed(MAIN_BRANCH_KEY);
   }
 }
@@ -260,6 +268,7 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
 export function spawnClaude(
   prompt: string,
   config: PatrolConfig,
+  opts?: { cwd?: string },
 ): Promise<{ exitCode: number; output: string; hitMaxTurns: boolean; timedOut: boolean }> {
   return new Promise((resolve, reject) => {
     const args = [
@@ -277,6 +286,7 @@ export function spawnClaude(
     delete env.CLAUDECODE;
 
     const child = spawn('claude', args, {
+      cwd: opts?.cwd,
       env,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
@@ -412,7 +422,19 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
     return { mainIsRootCause: false };
   }
 
-  // ── Automated rebase pre-step ──────────────────────────────────────
+  // ── Create worktree ──────────────────────────────────────────────
+  const projectRoot = git('rev-parse', '--show-toplevel');
+  const wtName = `patrol-pr-${pr.number}`;
+  let worktreePath: string;
+  try {
+    worktreePath = createWorktree(projectRoot, wtName, pr.branch);
+    log(`  Worktree: ${cl.dim}${worktreePath}${cl.reset}`);
+  } catch (e) {
+    log(`${cl.red}✗ Failed to create worktree for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+    return { mainIsRootCause: false };
+  }
+
+  // ── Automated rebase pre-step (runs in worktree) ──────────────────
   // For stale or conflicting PRs, try a plain git rebase first.
   // This saves the full Claude spawn (~5 turns, ~3-10 min) when the
   // rebase resolves cleanly. Even when GitHub reports CONFLICTING,
@@ -420,15 +442,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
   // Cost of a failed attempt is negligible (<1s of git commands).
   if (pr.issues.includes('stale') || pr.issues.includes('conflict')) {
     log('  Attempting automated rebase (no Claude needed)...');
-    const origBranch = gitSafe('branch', '--show-current');
-    const originalBranch = origBranch.ok ? origBranch.output.trim() : '';
-
-    const rebaseResult = tryAutomatedRebase(pr.branch);
-
-    // Restore original branch after rebase attempt
-    if (originalBranch) {
-      gitSafe('checkout', originalBranch);
-    }
+    const rebaseResult = tryAutomatedRebase(pr.branch, worktreePath);
 
     if (rebaseResult.success) {
       log(`  ✓ Automated rebase ${rebaseResult.status} — no Claude needed`);
@@ -436,6 +450,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       // Strip both 'stale' and 'conflict' — rebase resolved them
       const remainingIssues = pr.issues.filter((i) => i !== 'stale' && i !== 'conflict');
       if (remainingIssues.length === 0) {
+        removeWorktree(worktreePath);
         appendJsonl(JSONL_FILE, {
           type: 'pr_result',
           pr_num: pr.number,
@@ -454,10 +469,6 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       log(`  Automated rebase failed (${rebaseResult.status}) — falling through to Claude`);
     }
   }
-
-  // Save current branch to restore after fix
-  const origBranch = gitSafe('branch', '--show-current');
-  const originalBranch = origBranch.ok ? origBranch.output.trim() : '';
 
   await claimPr(pr.number, config.repo);
 
@@ -484,7 +495,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       ...config,
       maxTurns: effectiveMaxTurns,
       timeoutMinutes: effectiveTimeout,
-    });
+    }, { cwd: worktreePath });
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
     if (result.timedOut) {
@@ -579,14 +590,8 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
   } finally {
     await releasePr(pr.number, config.repo);
 
-    // Clean up any in-progress rebase/merge left by the spawned session
-    gitSafe('rebase', '--abort');
-    gitSafe('merge', '--abort');
-
-    // Restore original branch
-    if (originalBranch) {
-      gitSafe('checkout', originalBranch);
-    }
+    // Clean up worktree (handles rebase/merge abort internally)
+    removeWorktree(worktreePath);
 
     markProcessed(pr.number);
   }
