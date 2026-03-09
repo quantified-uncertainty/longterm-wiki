@@ -8,7 +8,7 @@ subcategory: architecture
 quality: 50
 readerImportance: 80
 researchImportance: 75
-lastEdited: "2026-02-25"
+lastEdited: "2026-03-09"
 createdAt: 2026-02-25
 evergreen: false
 llmSummary: "Architecture document analyzing why adding a wiki page takes 15-30 minutes and evaluating six options to reduce that latency: full database migration, git repo split, hybrid draft-in-DB, ISR with webhooks, lightweight write path, and incremental builds. Recommends a phased approach starting with quick build optimizations, then a draft/preview system, then ISR. Includes detailed red-teaming of each option."
@@ -42,8 +42,9 @@ The core tension: **git gives versioning, review, and auditability, but forces a
 ### What Lives Where
 
 **In Git (authoritative source of truth):**
+- `packages/kb/data/things/*.yaml` — KB structured facts (authoritative for migrated entities)
 - `data/entities/*.yaml` — entity definitions, relationships, sources
-- `data/facts/*.yaml` — canonical numeric facts
+- `data/facts/*.yaml` — legacy numeric facts (deprecated for entities migrated to KB)
 - `content/docs/**/*.mdx` — wiki page content
 - `numericId` fields in both (assigned by server, written back to files)
 

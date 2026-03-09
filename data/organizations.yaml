@@ -19,8 +19,8 @@
     - daniela-amodei
     - chris-olah
     - jan-leike
-  funding: "$7B+"
-  employees: "~1000"
+  funding: "$67B+"
+  employees: "~4000"
   safetyFocus: >
     Constitutional AI, interpretability research, responsible scaling policies.
     Publishes safety research openly.
@@ -37,8 +37,8 @@
   keyPeople:
     - sam-altman
     - ilya-sutskever
-  funding: "$13B+ from Microsoft"
-  employees: "~1500"
+  funding: "$18B+"
+  employees: "~3500"
   safetyFocus: >
     Superalignment team (now disbanded). RLHF development. Some interpretability.
     Safety culture has been criticized.
@@ -77,7 +77,7 @@
     - eliezer-yudkowsky
     - nate-soares
   funding: "~$5M/year"
-  employees: "~15"
+  employees: "~40"
   safetyFocus: >
     Agent foundations, decision theory, deceptive alignment. Currently
     pursuing new research directions after pivoting from earlier approaches.
@@ -222,6 +222,8 @@
     Startup focused solely on building safe superintelligence.
   keyPeople:
     - ilya-sutskever
+  funding: "$3B+"
+  employees: "~20"
   safetyFocus: >
     Pursuing superintelligence with safety as the core goal.
 

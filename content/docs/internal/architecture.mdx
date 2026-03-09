@@ -9,7 +9,7 @@ subcategory: architecture
 pageType: documentation
 readerImportance: 9.5
 researchImportance: 9
-lastEdited: "2026-02-15"
+lastEdited: "2026-03-09"
 update_frequency: 60
 ---
 import { Mermaid } from '@components/wiki';
@@ -29,8 +29,9 @@ The wiki is a **Next.js 15** application with a YAML-first data layer, a CLI too
 <Mermaid chart={`
 flowchart TB
     subgraph Sources["Data Sources"]
-        YAML[("YAML Files\nentities, facts, resources")]
-        MDX[("MDX Pages\n~625 articles")]
+        KB[("KB YAML\npackages/kb/data/things/")]
+        YAML[("YAML Files\nentities, resources")]
+        MDX[("MDX Pages\n~700 articles")]
         GRAPHS[("Graph Data\ncause-effect YAML")]
     end
 
@@ -52,6 +53,7 @@ flowchart TB
         PAGES["MDX rendering\nnext-mdx-remote"]
     end
 
+    KB --> BUILDDATA
     YAML --> TRANSFORM --> BUILDDATA
     MDX --> BUILDDATA
     GRAPHS --> BUILDDATA
@@ -77,7 +79,7 @@ flowchart TB
 | **Diagrams** | Mermaid 11 |
 | **Search** | PostgreSQL full-text search (wiki-server) |
 | **CLI** | Crux (custom multi-domain CLI) |
-| **Data** | YAML sources → JSON build artifacts |
+| **Data** | KB YAML + YAML sources → JSON build artifacts |
 | **Workspace** | pnpm workspaces (app + crux) |
 
 ---
@@ -319,6 +321,7 @@ A tag shared by 3 entities is more informative than one shared by 300. This prev
 
 | Component | Location | Purpose |
 |-----------|----------|---------|
+| KB YAML | `packages/kb/data/things/*.yaml` | Authoritative structured facts (valuations, revenue, etc.) |
 | Source YAML | `data/entities/*.yaml` | Human-editable entity definitions |
 | Entity transform | `app/scripts/lib/entity-transform.mjs` | Type mapping and normalization |
 | Build script | `app/scripts/build-data.mjs` | Main compilation pipeline |
@@ -340,7 +343,6 @@ A tag shared by 3 entities is more informative than one shared by 300. This prev
 | `citation_content` | Full text of fetched source URLs |
 | `citation_audits` | Per-page citation verification results |
 | `claims` | Extracted atomic claims with source references |
-| `facts` | Canonical facts with values |
 | `resources` | External resource metadata |
 | `entities` | Entity metadata (synced from YAML) |
 | `agent_sessions` | Claude Code session logs |
@@ -542,14 +544,18 @@ All are optional. Features gracefully degrade when keys are missing.
 
 ```
 longterm-wiki/
-├── content/docs/               # ~625 MDX wiki pages
+├── content/docs/               # ~700 MDX wiki pages
 │   ├── knowledge-base/         # Risks, responses, orgs, people
 │   ├── models/                 # Analytical frameworks
 │   ├── project/                # Public project documentation
 │   └── internal/               # Contributor docs (including this page)
+├── packages/kb/                # Knowledge Base package
+│   ├── data/things/            # Authoritative structured facts (KB YAML)
+│   ├── data/schemas/           # Property schemas (60 properties)
+│   └── src/                    # KB loader, custom YAML tags (!ref, !date)
 ├── data/                       # YAML source data
 │   ├── entities/               # Entity definitions (split by type)
-│   ├── facts/                  # Canonical facts with computed values
+│   ├── facts/                  # Legacy facts (deprecated for KB entities)
 │   ├── resources/              # External resource metadata
 │   ├── insights/               # Cross-page insights
 │   ├── graphs/                 # Cause-effect graph YAML
@@ -594,3 +600,5 @@ This architecture documentation should be updated when:
 - <EntityLink id="E747" name="page-creator-pipeline">Page Creator Pipeline</EntityLink> — Generation experiments
 - [Schema Overview](/internal/schema/) — Entity types and data relationships
 - <EntityLink id="E752" name="entities">Entity Reference</EntityLink> — Complete entity type catalog
+- <EntityLink id="E1042" name="data-system-authority">Data System Authority Rules</EntityLink> — Which data system is authoritative for each entity
+- <EntityLink id="E827" name="canonical-facts">Canonical Facts & Calc</EntityLink> — KB fact components and usage conventions

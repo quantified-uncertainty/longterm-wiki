@@ -32,7 +32,7 @@ export type UpsertSummaryBatchResult = InferResponseType<RpcClient['batch']['$po
 export async function upsertSummary(
   item: UpsertSummaryItem,
 ): Promise<ApiResult<UpsertSummaryResult>> {
-  return apiRequest<UpsertSummaryResult>('POST', '/api/summaries', item, undefined, 'content');
+  return apiRequest<UpsertSummaryResult>('POST', '/api/summaries', item);
 }
 
 export async function upsertSummaryBatch(
@@ -41,9 +41,7 @@ export async function upsertSummaryBatch(
   return apiRequest<UpsertSummaryBatchResult>(
     'POST',
     '/api/summaries/batch',
-    { items },
-    undefined,
-    'content',
+    { items }
   );
 }
 

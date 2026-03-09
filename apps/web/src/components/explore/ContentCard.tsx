@@ -9,10 +9,18 @@ const FORMAT_BADGE_COLORS: Record<string, string> = {
   dashboard: "bg-slate-500/20 text-slate-600 dark:text-slate-400",
 };
 
+function formatKBBadge(factCount?: number, itemCount?: number): string | null {
+  const parts: string[] = [];
+  if (factCount) parts.push(`${factCount} fact${factCount !== 1 ? "s" : ""}`);
+  if (itemCount) parts.push(`${itemCount} item${itemCount !== 1 ? "s" : ""}`);
+  return parts.length > 0 ? parts.join(" \u00b7 ") : null;
+}
+
 export function ContentCard({ item }: { item: ExploreItem }) {
   const href = item.href || `/wiki/${item.numericId}`;
   const format = item.contentFormat || "article";
   const showFormatBadge = format !== "article" && FORMAT_BADGE_COLORS[format];
+  const kbBadge = formatKBBadge(item.kbFactCount, item.kbItemCount);
 
   return (
     <Link
@@ -27,6 +35,11 @@ export function ContentCard({ item }: { item: ExploreItem }) {
           {showFormatBadge && (
             <span className={`text-[0.65rem] font-medium px-1.5 py-0.5 rounded ${FORMAT_BADGE_COLORS[format]}`}>
               {format.charAt(0).toUpperCase() + format.slice(1)}
+            </span>
+          )}
+          {kbBadge && (
+            <span className="text-[0.65rem] font-medium px-1.5 py-0.5 rounded bg-violet-500/15 text-violet-600 dark:text-violet-400">
+              {kbBadge}
             </span>
           )}
         </div>

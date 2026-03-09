@@ -61,7 +61,7 @@ Anthropic PBC is an American artificial intelligence company headquartered in Sa
 
 The company's name was chosen because it "connotes being human centered and human oriented"—and the domain name happened to be available in early 2021.[^rc-953f] Anthropic incorporated as a Delaware public-benefit corporation (PBC), a legal structure enabling directors to balance stockholders' financial interests with its stated purpose: "the responsible development and maintenance of advanced AI for the long-term benefit of humanity."[^rc-d84a][^rc-c16b]
 
-In February 2026, Anthropic closed a \$30 billion Series G funding round at a <KBF entity="anthropic" property="valuation">\$380 billion</KBF> post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX.[^rc-1068] The company has raised over \$67 billion in total funding.[^rc-d84a] At the time of the announcement, Anthropic reported <KBF entity="anthropic" property="revenue">\$14 billion</KBF> in run-rate revenue, growing over 10x annually for three years, with more than 500 customers spending over \$1 million annually and 8 of the Fortune 10 as customers.[^rc-1068] The company's customer base expanded from fewer than 1,000 businesses to over <KBF entity="anthropic" property="business-customers">300,000</KBF> in two years, with 80% of revenue coming from business customers.[^rc-fb1e]
+In February 2026, Anthropic closed a \$30 billion Series G funding round at a <KBF entity="anthropic" property="valuation">\$380 billion</KBF> post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX.[^rc-1068] The company has raised over <KBF entity="anthropic" property="total-funding" /> in total funding.[^rc-d84a] At the time of the announcement, Anthropic reported <KBF entity="anthropic" property="revenue">\$14 billion</KBF> in run-rate revenue, growing over 10x annually for three years, with more than 500 customers spending over \$1 million annually and 8 of the Fortune 10 as customers.[^rc-1068] The company's customer base expanded from fewer than 1,000 businesses to over <KBF entity="anthropic" property="business-customers">300,000</KBF> in two years, with 80% of revenue coming from business customers.[^rc-fb1e]
 
 ## History
 
@@ -93,6 +93,8 @@ This is the main Anthropic company page. For detailed analysis on specific topic
 As of February 2026: <KBF entity="anthropic" property="valuation">\$380B</KBF> valuation (Series G), <KBF entity="anthropic" property="revenue">\$14B</KBF> run-rate revenue, targeting \$20–26B for 2026. Anthropic trades at ≈<Calc expr="{anthropic.valuation} / {anthropic.revenue}" precision={0} suffix="x" /> current revenue vs <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s <Calc expr="{openai.valuation} / {openai.revenue}" precision={0} prefix="≈" suffix="x" />—see <EntityLink id="E405" name="anthropic-valuation">Valuation Analysis</EntityLink> for analysis, including 25% customer concentration risk and margin pressure.
 
 <KBFactTable entity="anthropic" property="revenue" title="Revenue History (ARR)" />
+
+<KBFactTable entity="anthropic" property="valuation" title="Valuation History" />
 
 <SquiggleEstimate title="Anthropic Revenue Trajectory (ARR, $B)" code={`
 // Anthropic revenue growth trajectory
@@ -142,7 +144,9 @@ The founding team includes 7 ex-OpenAI researchers: GPT-3 lead author Tom Brown,
 
 ### Leadership
 
-Anthropic is led by siblings Dario Amodei (CEO) and Daniela Amodei (President), both formerly of OpenAI. The company reportedly had approximately 870 employees as of December 31, 2024, with various sources reporting employee counts ranging from approximately 1,097 to 2,847 depending on data collection methods.[^rc-2ec0] Anthropic has also reportedly announced plans to triple its international headcount and grow its applied AI team fivefold.[^rc-2ec0]
+Anthropic is led by siblings Dario Amodei (CEO) and Daniela Amodei (President), both formerly of OpenAI. The company had approximately <KBF entity="anthropic" property="headcount" asOf="2024-09" /> employees as of late 2024, depending on data collection methods.[^rc-2ec0] Anthropic has also reportedly announced plans to triple its international headcount and grow its applied AI team fivefold.[^rc-2ec0]
+
+<KBFactTable entity="anthropic" property="headcount" title="Headcount Growth" />
 
 <KBItemTable entity="anthropic" collection="key-people" title="Key People" columns={["person", "title", "start", "end", "is_founder"]} />
 
@@ -162,6 +166,8 @@ Anthropic's safety-to-capabilities researcher ratio is difficult to verify from 
 
 Anthropic established a <EntityLink id="E407" name="long-term-benefit-trust">Long-Term Benefit Trust</EntityLink> (LTBT) comprising five Trustees with backgrounds in AI safety, national security, public policy, and social enterprise.[^rc-c16b] The Trust holds Class T Common Stock granting power to elect a gradually increasing number of company directors—initially one out of five, increasing to a board majority by 2027.[^rc-c16b] This structure is intended to insulate Anthropic's safety mission from short-term commercial pressures, giving an independent body meaningful oversight leverage that grows over time as the company scales.[^rc-c16b] See the dedicated page for full analysis of the Trust's structure, trustees, and critiques.
 
+<KBItemTable entity="anthropic" collection="board-members" title="Board of Directors" columns={["name", "role", "appointed", "background", "appointed_by"]} />
+
 ### Responsible Scaling Policy
 
 Anthropic's Responsible Scaling Policy (RSP) is a public commitment not to train or deploy models capable of causing catastrophic harm without first implementing corresponding safeguards.[^rc-80ba] The RSP defines a series of AI Safety Levels (ASL-1 through ASL-4+) based on evaluated model capabilities, with each level triggering mandatory security and deployment standards before a model can be released. Claude Opus 4 was released under ASL-3 Standard and Claude Sonnet 4 under ASL-2 Standard.[^rc-d84a]
@@ -174,19 +180,21 @@ The RSP has been updated multiple times since its initial publication. Critics, 
 
 <KBItemTable entity="anthropic" collection="model-releases" title="Claude Model Releases" columns={["name", "released", "safety_level", "notes"]} />
 
+<KBItemTable entity="anthropic" collection="products" title="Products & Services" columns={["name", "launched", "description"]} />
+
 ### Claude Model Family
 
 In May 2025, Anthropic announced Claude 4, introducing both Claude Opus 4 and Claude Sonnet 4 with improved coding capabilities.[^rc-d84a] Also in May, Anthropic launched a web search API that enables Claude to access real-time information.
 
 Claude Opus 4.5, released in November 2025, achieved results on benchmarks for complex enterprise tasks: 80.9% on SWE-bench Verified (the first AI model to exceed 80%), 60%+ on Terminal-Bench 2.0 (the first to exceed 60%), and 61.4% on OSWorld for computer use capabilities (compared to 7.8% for the next-best model).[^rc-9605] Reports show 50% to 75% reductions in both tool calling errors and build/lint errors with Claude Opus 4.5.
 
-### <EntityLink id="E286" name="squiggle">Squiggle</EntityLink>
+### Claude Code
 
-Claude Code's run-rate revenue exceeded <KBF entity="anthropic" property="product-revenue">\$2.5 billion</KBF> as of February 2026, more than doubling since early 2025.[^rc-1068] According to Menlo Ventures data from July 2025, Anthropic holds 42% of the enterprise market share for coding, more than double OpenAI's 21%.[^rc-9c6d]
+Claude Code's run-rate revenue exceeded <KBF entity="anthropic" property="product-revenue">\$2.5 billion</KBF> as of February 2026, more than doubling since early 2025.[^rc-1068] According to Menlo Ventures data from July 2025, Anthropic holds <KBF entity="anthropic" property="coding-market-share" />% of the enterprise market share for coding, more than double OpenAI's 21%.[^rc-9c6d]
 
 ### Competitive Positioning
 
-Anthropic's enterprise market position has strengthened relative to competitors. According to Menlo Ventures data from July 2025, Anthropic captured 32% of the overall enterprise LLM market share by usage—up from 12% two years prior—while OpenAI's share declined from 50% to 25% over the same period.[^rc-9c6d] In the coding segment specifically, Anthropic holds 42% enterprise share versus OpenAI's 21%.
+Anthropic's enterprise market position has strengthened relative to competitors. According to Menlo Ventures data from July 2025, Anthropic captured <KBF entity="anthropic" property="enterprise-market-share" />% of the overall enterprise LLM market share by usage—up from 12% two years prior—while OpenAI's share declined from 50% to 25% over the same period.[^rc-9c6d] In the coding segment specifically, Anthropic holds <KBF entity="anthropic" property="coding-market-share" />% enterprise share versus OpenAI's 21%.
 
 The company's differentiation strategy rests on three pillars: safety-oriented model behavior (lower rates of harmful outputs, stronger instruction-following), benchmark leadership on agentic and coding tasks, and enterprise trust built around Constitutional AI transparency. Critics note this framing conflates safety research with product marketing; proponents argue that Constitutional AI and interpretability investments produce measurable behavioral differences relative to competitors.
 
@@ -201,6 +209,8 @@ Unlike some competitors, Claude does not support native video or audio processin
 ## Safety Research
 
 <KBItemTable entity="anthropic" collection="safety-milestones" title="Safety Research & Policy Milestones" columns={["name", "date", "type", "description"]} />
+
+<KBItemTable entity="anthropic" collection="research-areas" title="Research Programs" columns={["name", "description", "team-size", "started"]} />
 
 ### Constitutional AI
 
@@ -252,13 +262,15 @@ In November 2025, Microsoft and <EntityLink id="E693" name="nvidia">Nvidia</Enti
 
 In February 2026, Anthropic closed a \$30 billion Series G round at a <KBF entity="anthropic" property="valuation">\$380 billion</KBF> valuation, led by GIC and Coatue, with participation from Accel, Baillie Gifford, Bessemer Venture Partners, BlackRock, Blackstone, D.E. Shaw Ventures, Dragoneer, Fidelity, <EntityLink id="E529" name="founders-fund">Founders Fund</EntityLink>, General Catalyst, Goldman Sachs, ICONIQ, JPMorgan Chase, MGX, Morgan Stanley, and Sequoia Capital.[^rc-1068]
 
-Total financing has reached over \$67 billion.[^rc-1068] For detailed analysis of investor composition, EA connections, and founder donation pledges, see <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink>.
+Total financing has reached over <KBF entity="anthropic" property="total-funding" />.[^rc-1068] For detailed analysis of investor composition, EA connections, and founder donation pledges, see <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink>.
+
+<KBItemTable entity="anthropic" collection="strategic-partnerships" title="Strategic Partnerships" columns={["partner", "type", "date", "investment_amount", "notes"]} />
 
 <KBItemTable entity="anthropic" collection="funding-rounds" title="Funding History" columns={["date", "amount", "valuation", "lead_investor", "notes"]} />
 
 ## Enterprise Adoption
 
-According to Menlo Ventures data from July 2025, Anthropic captured 32% of the enterprise LLM market share by usage—up from 12% two years prior. OpenAI's share declined from 50% to 25% over the same period.[^rc-9c6d]
+According to Menlo Ventures data from July 2025, Anthropic captured <KBF entity="anthropic" property="enterprise-market-share" />% of the enterprise LLM market share by usage—up from 12% two years prior. OpenAI's share declined from 50% to 25% over the same period.[^rc-9c6d]
 
 Large enterprise accounts generating over \$100,000 in annualized revenue grew nearly 7x in one year.[^rc-fb1e] Notable adopters reportedly include Pfizer, Intuit, Perplexity, the European Parliament, Slack, Zoom, GitLab, Notion, Asana, BCG, Bridgewater, and Scale AI, among others. Accenture and Anthropic have reportedly formed the Accenture Anthropic Business Group, with approximately 30,000 professionals slated to receive training on Claude-based solutions, though the precise scope of this initiative has not been independently verified.
 

@@ -6,11 +6,16 @@ import { mockDbModule, postJson } from "./test-utils.js";
 
 let entitiesStore: Map<string, Record<string, unknown>>;
 
+/** Captured dispatch calls for asserting SQL parameters. */
+let dispatchCalls: Array<{ query: string; params: unknown[] }>;
+
 function resetStores() {
   entitiesStore = new Map();
+  dispatchCalls = [];
 }
 
 function dispatch(query: string, params: unknown[]): unknown[] {
+  dispatchCalls.push({ query, params: [...params] });
   const q = query.toLowerCase();
 
   // --- ref-check: SELECT id FROM entities WHERE id IN (...) ---
@@ -381,6 +386,62 @@ describe("Entities API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.results).toHaveLength(0);
+    });
+
+    // ---- SQL metacharacter escaping ----
+
+    it("escapes % in search query so it is treated as a literal character", async () => {
+      await seedEntity(app, "test-percent", "100% Safe AI");
+      dispatchCalls = [];
+
+      const res = await app.request(
+        `/api/entities/search?q=${encodeURIComponent("100%")}`
+      );
+      expect(res.status).toBe(200);
+
+      // Verify the ILIKE parameter escapes % as \%
+      const ilikeCall = dispatchCalls.find((c) =>
+        c.query.toLowerCase().includes("ilike")
+      );
+      expect(ilikeCall).toBeDefined();
+      // The pattern should be %100\%% — wrapping wildcards around the escaped literal
+      expect(ilikeCall!.params[0]).toBe("%100\\%%");
+    });
+
+    it("escapes _ in search query so it is treated as a literal character", async () => {
+      await seedEntity(app, "test-underscore", "my_variable_name");
+      dispatchCalls = [];
+
+      const res = await app.request(
+        `/api/entities/search?q=${encodeURIComponent("my_var")}`
+      );
+      expect(res.status).toBe(200);
+
+      // Verify the ILIKE parameter escapes _ as \_
+      const ilikeCall = dispatchCalls.find((c) =>
+        c.query.toLowerCase().includes("ilike")
+      );
+      expect(ilikeCall).toBeDefined();
+      // The pattern should be %my\_var% — wrapping wildcards around the escaped literal
+      expect(ilikeCall!.params[0]).toBe("%my\\_var%");
+    });
+
+    it("escapes \\ in search query so it does not act as an escape character", async () => {
+      await seedEntity(app, "test-backslash", "C:\\Users\\docs");
+      dispatchCalls = [];
+
+      const res = await app.request(
+        `/api/entities/search?q=${encodeURIComponent("C:\\Users")}`
+      );
+      expect(res.status).toBe(200);
+
+      // Verify the ILIKE parameter escapes \ as \\
+      const ilikeCall = dispatchCalls.find((c) =>
+        c.query.toLowerCase().includes("ilike")
+      );
+      expect(ilikeCall).toBeDefined();
+      // The pattern should be %C:\\Users% — wrapping wildcards around the escaped literal
+      expect(ilikeCall!.params[0]).toBe("%C:\\\\Users%");
     });
   });
 

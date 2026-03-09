@@ -51,11 +51,9 @@ jobs:
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
-          LONGTERMWIKI_PROJECT_KEY: ${{ secrets.LONGTERMWIKI_PROJECT_KEY }}
 
       - name: Sync auto-update runs to wiki-server
         run: pnpm crux wiki-server sync-auto-update-runs
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
-          LONGTERMWIKI_PROJECT_KEY: ${{ secrets.LONGTERMWIKI_PROJECT_KEY }}

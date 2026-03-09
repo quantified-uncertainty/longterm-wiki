@@ -10,6 +10,7 @@ import {
   invalidJsonError,
   notFoundError,
   paginationQuery,
+  escapeIlike,
 } from "./utils.js";
 import {
   SyncEntitySchema as SharedSyncEntitySchema,
@@ -35,10 +36,6 @@ const SearchQuery = z.object({
 });
 
 // ---- Helpers ----
-
-function escapeIlike(s: string): string {
-  return s.replace(/[%_\\]/g, "\\$&");
-}
 
 function formatEntity(e: typeof entities.$inferSelect) {
   return {

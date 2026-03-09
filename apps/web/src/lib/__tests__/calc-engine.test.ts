@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { calc, formatValue, type CalcFormat, type CalcFact } from "../calc-engine";
+import {
+  calc,
+  formatValue,
+  type CalcFormat,
+  type CalcFact,
+  type FactLookup,
+} from "../calc-engine";
 
 // Mock fact store — fact IDs are 8-char hex hashes
 const mockFacts: Record<string, CalcFact> = {
@@ -299,5 +305,212 @@ describe("calc — formatted output", () => {
       format: "currency",
     });
     expect(result.display).toBe("$9.0 billion");
+  });
+});
+
+// ────────────────────────────────────────────────────────────
+// Operator precedence and associativity
+// ────────────────────────────────────────────────────────────
+
+describe("calc — operator precedence", () => {
+  it("multiplication binds tighter than addition", () => {
+    const result = calc("2 + 3 * 4", mockLookup);
+    expect(result.value).toBe(14); // not 20
+  });
+
+  it("division binds tighter than subtraction", () => {
+    const result = calc("10 - 6 / 2", mockLookup);
+    expect(result.value).toBe(7); // not 2
+  });
+
+  it("exponentiation binds tighter than multiplication", () => {
+    const result = calc("2 * 3 ^ 2", mockLookup);
+    expect(result.value).toBe(18); // 2 * 9, not 36
+  });
+
+  it("parentheses override precedence", () => {
+    const result = calc("(2 + 3) * 4", mockLookup);
+    expect(result.value).toBe(20);
+  });
+
+  it("nested parentheses evaluate correctly", () => {
+    const result = calc("((2 + 3) * (4 - 1))", mockLookup);
+    expect(result.value).toBe(15);
+  });
+
+  it("deeply nested parentheses", () => {
+    const result = calc("(((1 + 2) * 3) + 4) * 2", mockLookup);
+    expect(result.value).toBe(26); // ((3 * 3) + 4) * 2 = 13 * 2
+  });
+
+  it("left-associative addition and subtraction", () => {
+    const result = calc("10 - 3 - 2", mockLookup);
+    expect(result.value).toBe(5); // (10 - 3) - 2, not 10 - (3 - 2)
+  });
+
+  it("left-associative multiplication and division", () => {
+    const result = calc("24 / 4 / 2", mockLookup);
+    expect(result.value).toBe(3); // (24 / 4) / 2, not 24 / (4 / 2)
+  });
+});
+
+// ────────────────────────────────────────────────────────────
+// Additional error handling
+// ────────────────────────────────────────────────────────────
+
+describe("calc — additional error cases", () => {
+  it("throws on fact with no numeric value", () => {
+    const noNumericLookup: FactLookup = () => ({
+      value: "not a number",
+    });
+    expect(() => calc("{entity.prop}", noNumericLookup)).toThrow(
+      "has no numeric value"
+    );
+  });
+
+  it("throws on empty expression after reference resolution", () => {
+    expect(() => calc("", mockLookup)).toThrow();
+  });
+
+  it("throws on trailing operator", () => {
+    expect(() => calc("5 +", mockLookup)).toThrow();
+  });
+
+  it("throws on double operators", () => {
+    expect(() => calc("5 + * 3", mockLookup)).toThrow();
+  });
+
+  it("throws on unmatched opening parenthesis", () => {
+    expect(() => calc("(2 + 3", mockLookup)).toThrow();
+  });
+
+  it("throws on unmatched closing parenthesis", () => {
+    expect(() => calc("2 + 3)", mockLookup)).toThrow();
+  });
+
+  it("throws on empty parentheses", () => {
+    expect(() => calc("()", mockLookup)).toThrow();
+  });
+});
+
+// ────────────────────────────────────────────────────────────
+// formatValue — edge cases and scale boundaries
+// ────────────────────────────────────────────────────────────
+
+describe("formatValue — edge cases", () => {
+  it("auto-formats small integers as plain numbers", () => {
+    expect(formatValue(42)).toBe("42");
+    expect(formatValue(0)).toBe("0");
+    expect(formatValue(999)).toBe("999");
+  });
+
+  it("auto-formats small decimals to 2 places", () => {
+    expect(formatValue(3.14159)).toBe("3.14");
+    expect(formatValue(0.5)).toBe("0.50");
+  });
+
+  it("auto-formats thousands with locale commas", () => {
+    expect(formatValue(1_000)).toBe("1,000");
+    expect(formatValue(999_999)).toBe("999,999");
+  });
+
+  it("auto-formats at scale boundaries", () => {
+    expect(formatValue(1_000_000)).toBe("1.0 million");
+    expect(formatValue(999_999_999)).toBe("1000.0 million");
+    expect(formatValue(1_000_000_000)).toBe("1.0 billion");
+    expect(formatValue(1_000_000_000_000)).toBe("1.0 trillion");
+  });
+
+  it("handles negative numbers in auto-format", () => {
+    expect(formatValue(-42)).toBe("-42");
+    expect(formatValue(-1_500_000)).toBe("-1.5 million");
+  });
+
+  it("handles Infinity", () => {
+    expect(formatValue(Infinity)).toBe("Infinity");
+    expect(formatValue(-Infinity)).toBe("-Infinity");
+  });
+
+  it("handles NaN", () => {
+    expect(formatValue(NaN)).toBe("NaN");
+  });
+
+  it("currency with explicit precision", () => {
+    expect(formatValue(5_000_000_000, { format: "currency", precision: 2 })).toBe(
+      "$5.00 billion"
+    );
+    expect(formatValue(1_234, { format: "currency", precision: 2 })).toBe(
+      "$1,234.00"
+    );
+  });
+
+  it("currency at million scale", () => {
+    expect(formatValue(2_500_000, { format: "currency" })).toBe("$2.5 million");
+  });
+
+  it("currency at trillion scale", () => {
+    expect(formatValue(3_000_000_000_000, { format: "currency" })).toBe(
+      "$3.0 trillion"
+    );
+  });
+
+  it("percent with zero precision", () => {
+    expect(formatValue(0.456, { format: "percent", precision: 0 })).toBe("46%");
+  });
+
+  it("percent rounds correctly without precision", () => {
+    expect(formatValue(0.335, { format: "percent" })).toBe("34%");
+  });
+
+  it("number format with precision", () => {
+    expect(formatValue(1_234.5, { format: "number", precision: 2 })).toBe(
+      "1,234.50"
+    );
+  });
+
+  it("prefix and suffix combine with format", () => {
+    expect(
+      formatValue(0.4, { format: "percent", prefix: "~", suffix: " est." })
+    ).toBe("~40% est.");
+  });
+
+  it("precision 0 rounds to integer", () => {
+    expect(formatValue(3.7, { precision: 0 })).toBe("4");
+  });
+});
+
+// ────────────────────────────────────────────────────────────
+// Scientific notation and special numeric values
+// ────────────────────────────────────────────────────────────
+
+describe("calc — scientific notation and edge cases", () => {
+  it("parses scientific notation with positive exponent", () => {
+    const result = calc("3.5e+12", mockLookup);
+    expect(result.value).toBe(3.5e12);
+  });
+
+  it("parses scientific notation with negative exponent", () => {
+    const result = calc("1e-7", mockLookup);
+    expect(result.value).toBeCloseTo(0.0000001);
+  });
+
+  it("parses scientific notation without sign", () => {
+    const result = calc("2.5e3", mockLookup);
+    expect(result.value).toBe(2500);
+  });
+
+  it("handles decimal numbers without integer part", () => {
+    const result = calc(".5 + .5", mockLookup);
+    expect(result.value).toBe(1);
+  });
+
+  it("handles multiple unary negations", () => {
+    const result = calc("--5", mockLookup);
+    expect(result.value).toBe(5);
+  });
+
+  it("handles unary negation in nested expression", () => {
+    const result = calc("10 + (-3)", mockLookup);
+    expect(result.value).toBe(7);
   });
 });

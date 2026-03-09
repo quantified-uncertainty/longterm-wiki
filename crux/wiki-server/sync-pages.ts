@@ -189,7 +189,6 @@ export async function syncPages(
           // Not JSON — raw body already printed by batchSync
         }
       },
-      scope: 'content',
       extraBodyFields,
       _sleep: options._sleep,
     },

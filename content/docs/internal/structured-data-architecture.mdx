@@ -1,127 +1,267 @@
 ---
 numericId: E904
-title: "Structured Data Architecture"
-description: "Architecture document for the claims-as-foundation approach to structured entity data, including the facts-to-claims migration path."
+title: "Knowledge Base Architecture"
+description: "Architecture document for the KB system — YAML-based structured facts, property taxonomy, item collections, and how they relate to the wiki's data pipeline."
 sidebar:
   order: 12
 subcategory: architecture
 quality: 50
 readerImportance: 10
 researchImportance: 35
-lastEdited: "2026-02-26"
+lastEdited: "2026-03-09"
 update_frequency: 60
 ratings:
   novelty: 7
   rigor: 7
   actionability: 9
-  completeness: 6
+  completeness: 7
 ---
 
 ## Overview
 
-The wiki has two systems for structured entity data that partially overlap:
+The **Knowledge Base (KB)** is the wiki's structured data system. It stores curated facts about entities in YAML files, validates them against typed schemas, and feeds them into the wiki's build pipeline where they power inline components, hover tooltips, comparison tables, and entity sidebar panels.
 
-1. **Facts system** \- YAML files in `data/facts/`, \~145 canonical facts across 18 entities. Powers the `\<F\>` inline component for dynamic values with hover tooltips. Measure taxonomy defined in `data/fact-measures.yaml` (35 measures with display formatting metadata).
+The KB lives in `packages/kb/` and consists of:
 
-2. **Structured claims** \- PostgreSQL columns on the `claims` table, \~111 enriched claims. LLM-extracted from wiki page text via `crux claims enrich-structured`. Property taxonomy in `data/claims-properties.yaml` (28 properties).
+- **362 entity files** in `packages/kb/data/things/*.yaml` (organizations, people, AI models, risks, etc.)
+- **95 properties** defined in `packages/kb/data/properties.yaml` with display formatting, type constraints, and inverse relationships
+- **19 entity type schemas** in `packages/kb/data/schemas/*.yaml` specifying required and recommended properties plus item collection definitions
+- **23 validation rules** enforced at build time
 
-This document lays out the architectural direction: **claims become the foundation**, and facts become a legacy input format that is eventually migrated.
+Facts flow through the wiki as: **YAML \-\> Graph (loader.ts) \-\> serialize \-\> database.json \-\> Next.js reads at build time**. No runtime API calls are needed for structured data on wiki pages.
 
-## Key Decision: Claims Are the Foundation
+## Core Data Model
 
-The claims table (PostgreSQL, LLM-extractable, source-tracked, verifiable) is the primary structured data system. The facts YAML system, while valuable for its display formatting and inline components, is a narrower, less scalable approach.
+### Entities
 
-### Why claims win
+Each entity is a YAML file in `packages/kb/data/things/`. The file contains an entity header, a list of facts, and optional item collections:
 
-| Dimension | Facts (YAML) | Claims (PostgreSQL) |
-|-----------|-------------|-------------------|
-| Storage | Flat YAML files | PostgreSQL with indexes |
-| Extraction | Manual entry | LLM-extractable from page text |
-| Source tracking | Single `source` URL field | Full `claim_sources` join table with primary/quote/resourceId |
-| Verification | None | Verdict system (verified/disputed/unsupported) |
-| Temporal | Single `asOf` field | `valueDate` + `asOf` + temporal qualifiers |
-| Cross-entity | Manual duplication | `relatedEntities` array, `subjectEntity` field |
-| Scale | ≈145 facts, 18 entities | Growing with every enrichment run |
-| API | Build-time JSON | Real-time server queries |
+```yaml
+thing:
+  id: anthropic          # Human-readable slug
+  stableId: mK9pX3rQ7n  # Random 10-char ID that survives renames
+  type: organization     # References a TypeSchema
+  name: Anthropic
+  numericId: "E22"       # Legacy wiki page ID
+  aliases: [Anthropic PBC, Anthropic AI]
 
-### What facts do better (for now)
+facts:
+  - id: f_rev_2026_02
+    property: revenue
+    value: 14e9
+    asOf: 2026-02
+    source: https://www.reuters.com/...
+    sourceResource: 8e3ff50b9ef2a1a8
+    notes: "Run-rate revenue at Series G announcement"
 
-- **Display formatting**: `fact-measures.yaml` has rich display config (divisor, prefix, suffix) that the claims system lacks
-- **Inline components**: `\<KBF entity="anthropic" property="valuation"\>` renders beautifully with hover tooltips
-- **Computed values**: Facts support `computed` expressions that derive values from other facts
-
-These capabilities need to be replicated in the claims system before facts can be fully retired.
-
-## Migration Path
-
-### Phase A: Structured claims extraction (done)
-
-Structured claim fields (`property`, `structuredValue`, `valueUnit`, `valueDate`, `qualifiers`) added to the claims table. LLM extraction pipeline (`crux claims enrich-structured`) populates these from claim text.
-
-### Phase B: Better UI and shared formatting (done)
-
-- Shared `formatValue()` / `formatStructuredValue()` utility extracted from the facts system's formatting logic
-- Structured Claims Table component on entity pages showing property/value/date/qualifiers/source
-- Claims table badge shows human-readable formatted values instead of raw numbers
-
-### Phase C: Pinned claims (done)
-
-Added `isPinned` boolean column to the claims table (migration 0034). A pinned claim is the canonical value for display in `\<F\>` components.
-
-Key semantics:
-- Only one claim should be pinned per entity + property + valueDate triple
-- Pinning is a manual curation action, not automatic
-- A pinned claim can still be unverified \- pinning means "this is the value we display", not "this is confirmed true"
-- CLI: `crux claims pin \<claim-id\>`, `crux claims pin \<id\> --unpin`, `crux claims pin --list=\<entity\>`
-- API: `GET /api/claims/pinned/:entityId` returns pinned claims for an entity
-- `PATCH /api/claims/:id` accepts `isPinned` boolean
-
-### Phase D: F component reads from claims (future)
-
-Modify the `\<F\>` component to read from pinned claims as its primary data source, with YAML facts as a fallback.
-
-```
-Lookup order:
-1. Pinned claim for (entity, measure, nearest date)
-2. YAML fact (current behavior)
-3. Error display
+items:
+  funding-rounds:
+    type: funding-round
+    entries:
+      i_OVNz9C3XUA:
+        date: 2026-02
+        amount: 30e9
+        valuation: 380e9
+        lead_investor: gic
+        source: https://www.reuters.com/...
 ```
 
-### Phase E: Batch migration (future)
+### Facts
 
-Script to convert existing facts YAML entries into claims:
-- Each fact becomes a claim with `property` set to the measure ID
-- `structuredValue` from the fact value
-- `valueDate` from the fact `asOf`
-- `isPinned = true` since these were the canonical values
-- Source information preserved from the fact's `source`/`sourceResource`
+A fact is a typed, source-attributed assertion about an entity. The `Fact` interface supports:
 
-### Phase F: Retire facts YAML (future)
+| Field | Purpose |
+|-------|---------|
+| `id` | Unique identifier (prefixed `f_` for authored, `inv_` for computed inverses) |
+| `property` | References a property in the registry (e.g., `revenue`, `founded-by`) |
+| `value` | Typed: number, text, date, boolean, ref, refs, range, min, or json |
+| `asOf` | When this was true (ISO date: YYYY, YYYY-MM, or YYYY-MM-DD) |
+| `validEnd` | When this stopped being true (omit if still current) |
+| `source` | URL to the primary source |
+| `sourceResource` | ID linking to the wiki's curated resource registry |
+| `sourceQuote` | Relevant excerpt from the source |
+| `notes` | Free-text annotation explaining caveats or methodology |
+| `currency` | ISO 4217 override for non-USD monetary values (e.g., GBP) |
+| `usdEquivalent` | Approximate USD conversion for cross-currency comparison |
 
-Once all facts are migrated and the `\<F\>` component reads from claims:
-- Remove `data/facts/*.yaml` files
-- Remove facts pipeline from `build-data.mjs`
-- Remove `data/fact-measures.yaml` (merged into claims property config)
-- Remove `getFact()` / `getFactWithFallback()` from the data layer
+### Properties
 
-## Unified Taxonomy (done)
+Properties are the taxonomy that gives facts meaning. Defined in `packages/kb/data/properties.yaml`, each property specifies:
 
-The `data/fact-measures.yaml` file is now the single source of truth for both the facts system and structured claims. It contains:
-- **Measures** (36 entries): numeric and non-numeric property definitions with display config, direction, relatedMeasures, applicableTo
-- **Property aliases**: a `propertyAliases` map at the bottom that maps snake\_case claim property IDs (e.g., `funding_round_amount`) to kebab-case measure IDs (e.g., `funding-round`)
+- **Data type**: number, text, date, boolean, ref, refs
+- **Unit**: USD, percent, tokens, employees, etc.
+- **Category**: financial, people, safety, model, risk, policy, etc.
+- **Display config**: divisor, prefix, suffix for human-readable formatting (e.g., `$14.0B` from `14e9`)
+- **Temporal flag**: whether values change over time (revenue, headcount) vs. are static (founded-date)
+- **Applies-to constraint**: which entity types can use this property
+- **Inverse relationships**: `employed-by` automatically generates `employer-of` on the referenced entity
 
-The `data/claims-properties.yaml` file still exists for backward compatibility with the extraction prompt, but the unified taxonomy in `fact-measures.yaml` is canonical. New measures/properties should be added there.
+There are currently 95 properties across 21 categories, supporting entity types from organizations and people to AI models, risks, policies, and incidents.
+
+### Inverse Relationships
+
+When a property declares an `inverseId`, the KB automatically computes mirror facts. For example:
+
+- `employed-by` on a person entity (e.g., Jan Leike \-\> Anthropic) generates an `employer-of` fact on the organization entity (Anthropic \-\> Jan Leike)
+- `founded-by` on an organization generates `founder-of` on each referenced person
+- `developed-by` on an AI model generates `developed-models` on the organization
+
+Inverse facts are content-addressed (deterministic IDs based on a SHA-256 hash of subject + property + value) and carry the `derivedFrom` field pointing to their source fact. The `computed: true` flag on the inverse property prevents authors from manually storing both sides.
+
+### Type Schemas
+
+Each entity type has a schema in `packages/kb/data/schemas/` that defines:
+
+- **Required properties**: must have at least one fact (validation error if missing)
+- **Recommended properties**: should have facts (validation info if missing)
+- **Item collection schemas**: structured sub-data with typed fields
+
+For example, the `organization` schema recommends `founded-date`, `headquarters`, `revenue`, `valuation`, `headcount`, `legal-structure`, `total-funding` and defines item collections for `funding-rounds`, `key-people`, `products`, `model-releases`, `board-members`, `strategic-partnerships`, `safety-milestones`, `research-areas`, and `grants-and-programs`.
+
+The 19 entity types with schemas are: ai-model, analysis, approach, argument, capability, case-study, concept, debate, event, funder, historical, incident, organization, person, policy, project, risk, risk-factor, and safety-agenda.
+
+## Item Collections
+
+Item collections store ordered sub-data that does not fit the simple property-value model. They are defined per entity type in the schema and stored inline in each entity's YAML file.
+
+Examples:
+
+| Collection | Entity Type | Fields |
+|------------|-------------|--------|
+| `funding-rounds` | organization | date, amount, valuation, lead\_investor, source, notes |
+| `key-people` | organization | person (ref), title, start, end, is\_founder, source, notes |
+| `products` | organization | name, launched, description, source, notes |
+| `model-releases` | organization | name, released, description, safety\_level, source, notes |
+| `board-members` | organization | name, role, appointed, departed, background, appointed\_by, source |
+| `safety-milestones` | organization | name, date, type, description, source, notes |
+
+Each entry has a stable key (e.g., `i_OVNz9C3XUA`) and typed fields validated against the schema. Fields can reference other entities via `!ref` YAML tags (e.g., `person: !ref zR4nW8xB2f:dario-amodei`), which are cross-validated during loading.
+
+## MDX Components
+
+The KB powers several MDX components used in wiki pages:
+
+### `<KBF>` \- Inline Fact Display
+
+Renders a single KB fact with a hover tooltip showing source, date, and notes:
+
+```jsx
+<KBF entity="anthropic" property="valuation" />          {/* Auto-formatted: "$380.0B" */}
+<KBF entity="anthropic" property="revenue" showDate />   {/* "$19.0B (as of 2026-03)" */}
+<KBF entity="anthropic" property="valuation">$380B</KBF> {/* Custom display text */}
+```
+
+### `<KBFactValue>` \- Block Fact Display
+
+Renders a fact value with more context, used in structured sections.
+
+### `<Calc>` \- Computed Values
+
+Derives a value from multiple facts at render time:
+
+```jsx
+<Calc expr="{anthropic.valuation} / {anthropic.revenue}" precision={0} suffix="x" />
+```
+
+### KB Footnotes
+
+Facts referenced via `<KBF>` automatically generate footnote citations using the `[^kb-factId]` format. These appear in the page's footnote section with full source attribution.
+
+### Entity Sidebar and Fact Tables
+
+Entity pages include an auto-generated sidebar panel showing key facts (`KBEntitySidebar`) and comparison tables (`KBCompareTable`, `KBFactTable`) for cross-entity analysis.
+
+## Validation
+
+The KB runs 23 validation checks at build time, organized into three severity levels:
+
+**Errors (block build):**
+1. Required properties missing
+2. Ref/refs point to nonexistent entities
+3. StableId format invalid (must be 10 alphanumeric chars)
+4. Fact ID format invalid (must start with `f_` or `inv_`)
+5. Entity has empty name
+6. validEnd is earlier than asOf
+7. Duplicate stableIds across entities
+8. Item collection field type mismatches or missing required fields
+9. Range value bounds invalid
+
+**Warnings:**
+
+10. Recommended properties missing
+11. Property used on wrong entity type
+12. Temporal property missing asOf date
+13. Non-temporal property has multiple facts
+14. Stale temporal data (\>2 years old for financial/product categories)
+15. Duplicate facts (same entity + property + asOf)
+16. Missing source URL
+17. Unknown property ID
+18. Invalid date format
+19. Future asOf date
+20. Bidirectional redundancy (both sides of an inverse stored)
+21. Unknown currency code
+
+**Informational:**
+
+22. Orphan entity (no facts and no items)
+23. Completeness percentage per entity
+
+## Data Pipeline
+
+The KB integrates into the wiki's build pipeline:
+
+1. **Load**: `loadKB()` reads YAML files using a two-pass approach \- first pass builds the stableId index, second pass resolves `!ref` tags and loads facts/items
+2. **Compute inverses**: `computeInverses()` generates mirror facts for all properties with `inverseId`
+3. **Validate**: `validate()` runs all 23 checks across the graph
+4. **Serialize**: `serialize()` converts the in-memory Graph to a plain JSON object
+5. **Build-data**: `apps/web/scripts/build-data.mjs` merges KB data into `database.json`
+6. **Render**: Next.js reads `database.json` at build time; MDX components look up facts by entity + property
+
+The in-memory `Graph` class provides a rich query API: `getEntity()`, `getFacts()`, `getLatest()`, `getByProperty()`, `getRelated()`, `getItems()`, `getItemsMentioning()`.
+
+## Relationship to Statements in PostgreSQL
+
+The wiki-server's PostgreSQL database stores **statements** (formerly called "claims") \- text-level assertions extracted from wiki page prose. These are complementary to KB facts, not a replacement:
+
+| Dimension | KB Facts (YAML) | Statements (PostgreSQL) |
+|-----------|----------------|------------------------|
+| **Purpose** | Curated canonical data | Page text analysis |
+| **Storage** | YAML files in git | PostgreSQL |
+| **Authoring** | Manual curation | LLM-extracted from prose |
+| **Data types** | Typed (number, date, ref, range, etc.) | Free text with optional structured fields |
+| **Temporal** | `asOf` / `validEnd` | `valueDate` |
+| **Source tracking** | `source`, `sourceResource`, `sourceQuote` | `claim_sources` join table |
+| **Display** | `<KBF>`, `<Calc>`, tooltips | Statements table on entity pages |
+| **Build dependency** | Yes (feeds database.json) | No (runtime queries) |
+
+KB facts are the **authoritative source** for structured data that appears across wiki pages. Statements provide a complementary view of what the prose says, useful for citation checking, hallucination detection, and verifying consistency between page text and canonical data.
 
 ## Current Status
 
 | Component | Status |
 |-----------|--------|
-| Structured claim extraction | Working |
-| Shared value formatting | Working |
-| Structured claims table UI | Working |
-| Auto-normalize during extraction | Working |
-| Graph navigation on entity pages | Working |
-| Pinned claims (DB + API + CLI) | Working |
-| Unified taxonomy | Working |
-| F component migration | Not started |
-| Facts YAML migration | Not started |
+| KB YAML data layer (362 entities) | Working |
+| Property taxonomy (95 properties) | Working |
+| 19 entity type schemas with item collections | Working |
+| 23 validation rules | Working |
+| Inverse relationship computation | Working |
+| `!ref` and `!date` YAML tags with cross-validation | Working |
+| Currency support with USD equivalents | Working |
+| `\<KBF\>` inline fact display with tooltips | Working |
+| `\<KBFactValue\>` block display | Working |
+| `\<Calc\>` computed values | Working |
+| KB footnotes integration | Working |
+| Entity sidebar and fact tables | Working |
+| Comparison tables (`KBCompareTable`) | Working |
+| Build pipeline integration (YAML \-\> database.json) | Working |
+
+## Future Directions
+
+Several areas are under consideration for extending the KB system:
+
+- **Broader entity coverage**: Expanding beyond the current 362 entities to cover more of the wiki's \~700 pages with structured facts
+- **Richer item collection types**: Adding more collection schemas (e.g., regulatory actions, benchmark results, governance events) to entity types beyond organization
+- **Temporal queries in components**: Enabling `\<KBF\>` to reference facts at specific dates (e.g., "Anthropic's revenue as of 2025-03") rather than always showing the latest
+- **Cross-entity computed properties**: Supporting `\<Calc\>` expressions that aggregate across entities (e.g., total funding across all AI safety organizations)
+- **Statement-KB reconciliation**: Automated checks that verify page prose (statements) stays consistent with canonical KB facts, flagging contradictions for human review
+- **Property completeness tracking**: Dashboard showing which entity types have the best coverage and where data gaps exist

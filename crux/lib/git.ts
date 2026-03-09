@@ -6,6 +6,8 @@
  */
 
 import { execFileSync } from 'child_process';
+import { mkdirSync, rmSync } from 'fs';
+import { join } from 'path';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -48,6 +50,29 @@ export function gitIn(cwd: string, ...args: string[]): string {
 export function gitSafe(...args: string[]): GitResult {
   try {
     const output = execFileSync('git', args, {
+      encoding: 'utf-8',
+      maxBuffer: 10 * 1024 * 1024,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
+    return { ok: true, output, stderr: '', code: 0 };
+  } catch (err: unknown) {
+    const e = err as { status?: number; stdout?: Buffer | string; stderr?: Buffer | string };
+    return {
+      ok: false,
+      output: String(e.stdout ?? '').trim(),
+      stderr: String(e.stderr ?? '').trim(),
+      code: e.status ?? 1,
+    };
+  }
+}
+
+/**
+ * Non-throwing git command with custom cwd. Returns { ok, output, stderr, code }.
+ */
+export function gitSafeIn(cwd: string, ...args: string[]): GitResult {
+  try {
+    const output = execFileSync('git', args, {
+      cwd,
       encoding: 'utf-8',
       maxBuffer: 10 * 1024 * 1024,
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -143,6 +168,76 @@ export function pushWithRetry(
     }
   }
   return false;
+}
+
+/**
+ * Push with --force-with-lease and retry logic, in a specific directory.
+ */
+export function pushWithRetryIn(
+  cwd: string,
+  branch: string,
+  maxAttempts = 3,
+  baseDelayMs = 2000,
+): boolean {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const result = gitSafeIn(cwd, 'push', '--force-with-lease', 'origin', branch);
+    if (result.ok) return true;
+
+    console.warn(
+      `Push attempt ${attempt}/${maxAttempts} failed: ${result.stderr}`,
+    );
+
+    if (attempt < maxAttempts) {
+      const delayMs = baseDelayMs * Math.pow(2, attempt - 1);
+      execFileSync('sleep', [String(delayMs / 1000)]);
+      gitSafeIn(cwd, 'fetch', 'origin', branch);
+    }
+  }
+  return false;
+}
+
+// ── Worktree management ─────────────────────────────────────────────────────
+
+/**
+ * Create a git worktree for the given branch.
+ * Returns the worktree path. Throws on failure.
+ */
+export function createWorktree(
+  basePath: string,
+  name: string,
+  branch: string,
+  opts?: { detach?: boolean },
+): string {
+  const wtPath = join(basePath, '.claude', 'worktrees', name);
+  mkdirSync(join(basePath, '.claude', 'worktrees'), { recursive: true });
+
+  // Remove stale worktree at this path if it exists
+  gitSafe('worktree', 'remove', '--force', wtPath);
+
+  if (opts?.detach) {
+    git('worktree', 'add', '--detach', wtPath, branch);
+  } else {
+    gitSafe('fetch', 'origin', branch);
+    git('worktree', 'add', '-B', branch, wtPath, `origin/${branch}`);
+  }
+
+  return wtPath;
+}
+
+/**
+ * Remove a git worktree. Best-effort — logs warning on failure.
+ * Cleans up any in-progress rebase/merge state first.
+ */
+export function removeWorktree(wtPath: string): void {
+  gitSafeIn(wtPath, 'rebase', '--abort');
+  gitSafeIn(wtPath, 'merge', '--abort');
+
+  const result = gitSafe('worktree', 'remove', '--force', wtPath);
+  if (!result.ok) {
+    console.warn(`Warning: could not remove worktree ${wtPath}: ${result.stderr}`);
+    try { rmSync(wtPath, { recursive: true, force: true }); } catch { /* best-effort */ }
+    gitSafe('worktree', 'prune');
+  }
 }
 
 /**

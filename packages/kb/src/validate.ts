@@ -268,7 +268,7 @@ function _validateItemEntry(
 
     // Type validity check (warning) — only when value is present.
     if (value !== undefined && value !== null) {
-      const typeError = _checkFieldType(graph, fieldDef, value, fieldName, prefix);
+      const typeError = _checkFieldType(graph, entityId, fieldDef, value, fieldName, prefix);
       if (typeError) {
         results.push({
           severity: "warning",
@@ -289,6 +289,7 @@ function _validateItemEntry(
  */
 function _checkFieldType(
   graph: Graph,
+  entityId: string,
   fieldDef: FieldDef,
   value: unknown,
   fieldName: string,
@@ -296,8 +297,13 @@ function _checkFieldType(
 ): string | null {
   switch (fieldDef.type) {
     case "number":
+      // Accept plain numbers or [min, max] range arrays
       if (typeof value !== "number") {
-        return `${prefix}: field "${fieldName}" expected number, got ${typeof value}.`;
+        const isRange = Array.isArray(value) && value.length === 2
+          && typeof value[0] === "number" && typeof value[1] === "number";
+        if (!isRange) {
+          return `${prefix}: field "${fieldName}" expected number or [min, max] range, got ${typeof value}.`;
+        }
       }
       break;
 
@@ -331,6 +337,23 @@ function _checkFieldType(
     case "text":
       if (typeof value !== "string") {
         return `${prefix}: field "${fieldName}" expected string (text), got ${typeof value}.`;
+      }
+      break;
+
+    case "item-ref":
+      if (typeof value !== "string") {
+        return `${prefix}: field "${fieldName}" expected an item key string (item-ref), got ${typeof value}.`;
+      }
+      // Verify the referenced item exists in the specified sibling collection.
+      if (fieldDef.collection) {
+        const siblingEntries = graph.getItems(entityId, fieldDef.collection);
+        const exists = siblingEntries.some((e) => e.key === value);
+        if (!exists) {
+          return (
+            `${prefix}: field "${fieldName}" references unknown item key "${value}" ` +
+            `in collection "${fieldDef.collection}".`
+          );
+        }
       }
       break;
 

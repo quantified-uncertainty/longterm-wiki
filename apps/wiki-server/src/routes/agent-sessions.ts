@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   firstOrThrow,
+  escapeIlike,
 } from "./utils.js";
 import {
   CreateAgentSessionSchema,
@@ -288,7 +289,7 @@ const agentSessionsApp = new Hono()
     const { branch_prefix: branchPrefix } = parsed.data;
     const db = getDrizzleDb();
     const whereClause = branchPrefix
-      ? like(agentSessions.branch, `${branchPrefix.replace(/%/g, "\\%").replace(/_/g, "\\_")}%`)
+      ? like(agentSessions.branch, `${escapeIlike(branchPrefix)}%`)
       : undefined;
     const INSIGHTS_LIMIT = 5000;
     const rows = await db.select({

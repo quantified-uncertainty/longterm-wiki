@@ -45,7 +45,7 @@ const COLUMN_CONFIG: Array<{ key: ColKey; shortLabel: string; defaultVisible: bo
 
 // ─── Stakeholder data ─────────────────────────────────────────────────────────
 
-interface Stakeholder {
+export interface Stakeholder {
   name: string;
   category: string;
   stakeMin: number | null;
@@ -58,128 +58,6 @@ interface Stakeholder {
   notes?: string;
   includeInTotal?: boolean;
 }
-
-const STAKEHOLDERS: Stakeholder[] = [
-  {
-    name: "Dario Amodei",
-    category: "Co-founder, CEO",
-    stakeMin: 0.02, stakeMax: 0.03,
-    pledgeMin: 0.8, pledgeMax: 0.8,
-    eaAlignMin: 0.8, eaAlignMax: 0.9,
-    link: "/wiki/E91",
-    notes: "GWWC signatory; early GiveWell supporter",
-    includeInTotal: true,
-  },
-  {
-    name: "Daniela Amodei",
-    category: "Co-founder, President",
-    stakeMin: 0.02, stakeMax: 0.03,
-    pledgeMin: 0.8, pledgeMax: 0.8,
-    eaAlignMin: 0.8, eaAlignMax: 0.9,
-    link: "/wiki/E90",
-    notes: "Married to Holden Karnofsky (GiveWell co-founder)",
-    includeInTotal: true,
-  },
-  {
-    name: "Chris Olah",
-    category: "Co-founder",
-    stakeMin: 0.02, stakeMax: 0.03,
-    pledgeMin: 0.8, pledgeMax: 0.8,
-    eaAlignMin: 0.4, eaAlignMax: 0.6,
-    link: "/wiki/E59",
-    notes: "Interpretability pioneer; participated in EA events; safety-focused",
-    includeInTotal: true,
-  },
-  {
-    name: "Jack Clark",
-    category: "Co-founder",
-    stakeMin: 0.02, stakeMax: 0.03,
-    pledgeMin: 0.8, pledgeMax: 0.8,
-    eaAlignMin: 0.3, eaAlignMax: 0.5,
-    notes: "Former OpenAI Policy Director; responsible AI advocate; EA-adjacent framing",
-    includeInTotal: true,
-  },
-  {
-    name: "Tom Brown",
-    category: "Co-founder",
-    stakeMin: 0.02, stakeMax: 0.03,
-    pledgeMin: 0.8, pledgeMax: 0.8,
-    eaAlignMin: 0.15, eaAlignMax: 0.3,
-    notes: "GPT-3 lead author; chose Anthropic's safety mission over other options",
-    includeInTotal: true,
-  },
-  {
-    name: "Jared Kaplan",
-    category: "Co-founder, Chief Scientist",
-    stakeMin: 0.02, stakeMax: 0.03,
-    pledgeMin: 0.8, pledgeMax: 0.8,
-    eaAlignMin: 0.15, eaAlignMax: 0.3,
-    notes: "Scaling laws pioneer; safety-motivated co-founder; no documented EA pledge",
-    includeInTotal: true,
-  },
-  {
-    name: "Sam McCandlish",
-    category: "Co-founder",
-    stakeMin: 0.02, stakeMax: 0.03,
-    pledgeMin: 0.8, pledgeMax: 0.8,
-    eaAlignMin: 0.15, eaAlignMax: 0.3,
-    notes: "Alignment researcher; no publicly documented EA connections",
-    includeInTotal: true,
-  },
-  {
-    name: "Jaan Tallinn",
-    category: "Early investor",
-    stakeMin: 0.006, stakeMax: 0.017,
-    pledgeMin: 0.9, pledgeMax: 0.9,
-    eaAlignMin: 0.9, eaAlignMax: 0.95,
-    link: "/wiki/E577",
-    notes: "Led Series A; Skype co-founder; major AI safety funder",
-    includeInTotal: true,
-  },
-  {
-    name: "Dustin Moskovitz",
-    category: "Early investor",
-    stakeMin: 0.008, stakeMax: 0.025,
-    pledgeMin: 0.95, pledgeMax: 0.95,
-    eaAlignMin: 0.9, eaAlignMax: 0.95,
-    link: "/wiki/E436",
-    notes: "$500M already in Good Ventures nonprofit vehicle",
-    includeInTotal: true,
-  },
-  {
-    name: "Employee equity pool",
-    category: "Employees",
-    stakeMin: 0.12, stakeMax: 0.18,
-    pledgeMin: 0.25, pledgeMax: 0.5,
-    eaAlignMin: 0.4, eaAlignMax: 0.7,
-    notes: "Pledge rates vary: pre-2025 hires up to 50% with 3:1 match; post-2024 hires 25% with 1:1 match. EA Forum estimates ~$20\u201340B in employee DAFs already transferred.",
-    includeInTotal: true,
-  },
-  {
-    name: "Google",
-    category: "Strategic investor",
-    stakeMin: 0.13, stakeMax: 0.15,
-    pledgeMin: 0, pledgeMax: 0,
-    eaAlignMin: 0, eaAlignMax: 0,
-    notes: "$3.3B invested across 3 rounds; no philanthropic pledge",
-  },
-  {
-    name: "Amazon",
-    category: "Strategic investor",
-    stakeMin: null, stakeMax: null,
-    pledgeMin: 0, pledgeMax: 0,
-    eaAlignMin: 0, eaAlignMax: 0,
-    notes: "$10.75B invested; exact stake undisclosed; primary cloud partner",
-  },
-  {
-    name: "Series G / Other institutional",
-    category: "Institutional",
-    stakeMin: null, stakeMax: null,
-    pledgeMin: 0, pledgeMax: 0,
-    eaAlignMin: 0, eaAlignMax: 0,
-    notes: "GIC, Coatue, D.E. Shaw, Dragoneer, Founders Fund, ICONIQ, MGX",
-  },
-];
 
 // ─── Formatting helpers ───────────────────────────────────────────────────────
 
@@ -291,6 +169,7 @@ interface Props {
   valuationDisplay: string;
   asOf?: string;
   entityPreviews: Record<string, EntityPreview>;
+  stakeholders: Stakeholder[];
 }
 
 export function AnthropicStakeholdersTableClient({
@@ -298,6 +177,7 @@ export function AnthropicStakeholdersTableClient({
   valuationDisplay,
   asOf,
   entityPreviews,
+  stakeholders,
 }: Props) {
   const [visibleCols, setVisibleCols] = useState<Set<ColKey>>(
     new Set(COLUMN_CONFIG.filter((c) => c.defaultVisible).map((c) => c.key))
@@ -316,7 +196,7 @@ export function AnthropicStakeholdersTableClient({
   };
   const show = (key: ColKey) => visibleCols.has(key);
 
-  const rows = STAKEHOLDERS.map((s) => {
+  const rows = stakeholders.map((s) => {
     const valueMin = s.stakeMin !== null ? s.stakeMin * effectiveValuation : null;
     const valueMax = s.stakeMax !== null ? s.stakeMax * effectiveValuation : null;
     const donatedMin = valueMin !== null ? valueMin * s.pledgeMin : null;

@@ -746,6 +746,7 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
         botCommentCount: botComments.length,
         eligible: eligibility.eligible,
         blockReasons: eligibility.blockReasons,
+        labels: pr.labels.nodes.map((l) => l.name),
       };
     });
 
@@ -758,6 +759,7 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
         createdAt: r.createdAt,
         issues: r.issues,
         botComments: r.botComments,
+        labels: r.labels,
       })),
     );
 

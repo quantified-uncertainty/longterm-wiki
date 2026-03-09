@@ -115,6 +115,20 @@ export function getKBItems(entity: string, collection: string): ItemEntry[] {
 }
 
 /**
+ * Get all item collections for an entity.
+ * Returns a map of collection name → ItemEntry[].
+ */
+export function getKBAllItemCollections(
+  entity: string,
+): Record<string, ItemEntry[]> {
+  const kb = getKB();
+  if (!kb) return {};
+
+  // Return a shallow copy to avoid exposing the mutable cache reference
+  return { ...(kb.items[entity] ?? {}) };
+}
+
+/**
  * Get a property definition by ID.
  */
 export function getKBProperty(propertyId: string): Property | undefined {
@@ -156,6 +170,44 @@ export function getKBProperties(): Property[] {
 
 /** @deprecated Use getKBEntity instead */
 export const getKBThing = getKBEntity;
+
+/**
+ * Verification verdict values that can be returned by getKBFactVerification.
+ * Matches the accuracy verdicts from the citation system plus 'verified'
+ * (source quote verified but not accuracy-checked).
+ */
+export type KBFactVerdict =
+  | "accurate"
+  | "minor_issues"
+  | "inaccurate"
+  | "unsupported"
+  | "not_verifiable"
+  | "verified";
+
+const VALID_VERDICTS: Set<string> = new Set([
+  "accurate",
+  "minor_issues",
+  "inaccurate",
+  "unsupported",
+  "not_verifiable",
+  "verified",
+]);
+
+/**
+ * Get the citation verification status for a KB fact.
+ * Returns the best verdict found by cross-referencing the fact's source URL
+ * against citation quotes at build time, or undefined if no match.
+ */
+export function getKBFactVerification(factId: string): KBFactVerdict | undefined {
+  try {
+    const db = getDatabase();
+    const verdict = db.kbFactVerification?.[factId];
+    if (!verdict || !VALID_VERDICTS.has(verdict)) return undefined;
+    return verdict as KBFactVerdict;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * Get the latest fact for a given property across all entities.
@@ -218,6 +270,57 @@ export function getKBSchema(type: string): TypeSchema | undefined {
   if (!kb) return undefined;
 
   return kb.schemas.find((s) => s.type === type);
+}
+
+/**
+ * Get all item entries across all entities as a flat list.
+ * Returns [entityId, collectionName, ItemEntry] tuples.
+ */
+export function getAllKBItems(): Array<{
+  entityId: string;
+  collection: string;
+  entry: ItemEntry;
+}> {
+  const kb = getKB();
+  if (!kb) return [];
+
+  const results: Array<{
+    entityId: string;
+    collection: string;
+    entry: ItemEntry;
+  }> = [];
+
+  for (const [entityId, collections] of Object.entries(kb.items)) {
+    for (const [collectionName, entries] of Object.entries(collections)) {
+      for (const entry of entries) {
+        results.push({ entityId, collection: collectionName, entry });
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Look up a single item entry by its key (globally unique).
+ * Returns the item along with its owner entity ID and collection name.
+ */
+export function getKBItemByKey(
+  itemKey: string,
+): { entityId: string; collection: string; entry: ItemEntry } | undefined {
+  const kb = getKB();
+  if (!kb) return undefined;
+
+  for (const [entityId, collections] of Object.entries(kb.items)) {
+    for (const [collectionName, entries] of Object.entries(collections)) {
+      for (const entry of entries) {
+        if (entry.key === itemKey) {
+          return { entityId, collection: collectionName, entry };
+        }
+      }
+    }
+  }
+  return undefined;
 }
 
 /**

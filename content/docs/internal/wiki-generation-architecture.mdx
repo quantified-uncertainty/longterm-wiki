@@ -7,7 +7,7 @@ sidebar:
 subcategory: architecture
 quality: 55
 readerImportance: 75
-lastEdited: "2026-02-24"
+lastEdited: "2026-03-09"
 createdAt: 2026-02-16
 evergreen: false
 llmSummary: "Architecture proposal for next-generation wiki page generation. Analyzes current single-pipeline limitations, surveys state-of-the-art (Stanford STORM, GraphRAG, CrewAI, Self-Refine), and proposes a multi-agent multi-pass architecture with 8 specialist agents, 12+ composable passes, knowledge graph-driven linking, and dynamic computation embedding. Includes concrete implementation plan, composable module architecture, and academic foundations drawing on proposition-level retrieval (Dense X Retrieval), FActScore verification, nanopublications, and argumentation frameworks."
@@ -19,9 +19,13 @@ ratings:
 ---
 import { Mermaid } from '@components/wiki';
 
+<Aside type="note" title="Status: Vision Document">
+This is an architecture proposal, not a description of the current system. Some elements have been partially implemented (section-level rewriting, KB fact system, basic citation verification), but the full multi-agent orchestrator has not been built. The KB system (`packages/kb/`) now provides the structured data layer that this architecture assumes as a prerequisite — structured facts in YAML, `<KBF>` for inline values, and `<Calc>` for computed values.
+</Aside>
+
 ## Executive Summary
 
-**See also**: The Claim-First Wiki Architecture proposal (now removed) was a companion proposal that inverted the data model, making verified atomic claims (rather than prose documents) the primary artifact, with wiki pages as derived views.
+**See also**: The Claim-First Wiki Architecture proposal (removed) was a companion proposal that inverted the data model, making verified atomic claims the primary artifact. That proposal's structured-data ideas have been partially superseded by the KB system (`packages/kb/`), which provides entity-level structured facts in YAML, the `<KBF>` component for inline fact values, and `<Calc>` for computed values.
 
 Our current page generation pipeline (Crux content create/improve) is a **single-pipeline, single-agent** system. It works, but produces pages that are adequate rather than excellent. The best wiki pages require depth that a single LLM pass cannot achieve: dense cross-linking, verified citations, complex diagrams, embedded calculations, and knowledge graph coherence.
 
@@ -304,7 +308,7 @@ This is the biggest departure from the current system. Instead of one synthesis 
 
 **Pass E2: Computation Embedding**
 - Input: Draft + facts database + graph data
-- Process: Identify quantitative claims that could be dynamic. Create Squiggle models that compute from wiki data (facts YAML, entity metrics). Embed `<SquiggleEstimate>` components.
+- Process: Identify quantitative claims that could be dynamic. Create Squiggle models that compute from wiki data (KB facts in `packages/kb/data/things/`, entity metrics). Embed `<SquiggleEstimate>` components.
 - Output: Draft with dynamic computations
 - Agent: Enricher
 - Cost: \$0.50-1
@@ -317,11 +321,12 @@ This is the biggest departure from the current system. Instead of one synthesis 
 - Cost: \$0.25
 
 **Pass E4: Fact Extraction**
-- Input: Draft + existing facts YAML
-- Process: Extract key quantitative claims from the page and propose additions to `data/facts/`. Link computed facts to their source pages.
-- Output: `proposed-facts.yaml` + draft with fact references
+- Input: Draft + existing KB facts
+- Process: Extract key quantitative claims from the page and propose additions to KB facts in `packages/kb/data/things/`. Link computed facts to their source pages via `<KBF>` references.
+- Output: Proposed KB fact entries + draft with `<KBF>` references
 - Agent: Enricher
 - Cost: \$0.25
+- **Status**: The KB system now partially serves this role. Structured facts for 360+ entities exist in `packages/kb/data/things/*.yaml`, with properties defined in `packages/kb/data/properties.yaml`. Pages can reference these via `<KBF>` components and `[^kb-factId]` footnotes. The automated extraction pipeline (proposing new facts from page content) has not been built.
 
 #### Verification Passes
 
@@ -468,6 +473,8 @@ These summaries can be used by the Writer agent as context when synthesizing con
 
 ### The Vision
 
+**Partial implementation note**: The `<Calc>` and `<KBF>` (KB Fact) components now partially implement the "computation embedding" vision described here. `<KBF>` pulls live values from KB YAML files in `packages/kb/data/things/`, and `<Calc>` computes derived values from those facts. The Squiggle-based uncertainty modeling described below remains aspirational.
+
 Wiki pages shouldn't just *state* numbers -- they should *compute* them from the knowledge base.
 
 Example: A page about "AI lab safety spending" could include:
@@ -496,14 +503,14 @@ Example: A page about "AI lab safety spending" could include:
 ### How the Enricher Agent Creates These
 
 1. **Identify computational opportunities**: Scan the draft for quantitative claims that involve estimation or aggregation
-2. **Pull from facts YAML**: Use existing `data/facts/` values as inputs where available
+2. **Pull from KB facts**: Use existing KB fact values from `packages/kb/data/things/` as inputs where available
 3. **Create Squiggle models**: Write distribution-based models (never point estimates) following the Squiggle style guide
 4. **Validate**: Run the Squiggle code to ensure it executes without errors
 5. **Embed**: Place `<SquiggleEstimate>` components at appropriate locations
 
 ### Fact Feedback Loop
 
-The Enricher can also propose *new* facts to `data/facts/` based on claims in the page, creating a feedback loop where page content enriches the data layer, which in turn feeds future computations.
+The Enricher can also propose *new* facts to the KB (`packages/kb/data/things/`) based on claims in the page, creating a feedback loop where page content enriches the data layer, which in turn feeds future computations.
 
 ---
 
@@ -707,7 +714,7 @@ A page with good prose but no diagrams gets diagram tools. A page with bad sourc
 | Module | Purpose | Standalone CLI | Cost |
 |--------|---------|----------------|------|
 | `add-entity-links` | Insert EntityLink components for mentioned entities | `crux enrich entity-links <id>` | \$0.05 (Haiku) |
-| `add-fact-refs` | Wrap hardcoded numbers in `<F>` tags | `crux enrich fact-refs <id>` | \$0.05 (Haiku) |
+| `add-fact-refs` | Wrap hardcoded numbers in `<KBF>` tags referencing KB facts | `crux enrich fact-refs <id>` | \$0.05 (Haiku) |
 | `add-diagram` | Generate Mermaid diagram for a section | `crux enrich diagram <id>` | \$0.10-0.20 |
 | `add-squiggle` | Add uncertainty modeling for a section | `crux enrich squiggle <id>` | \$0.10-0.20 |
 
@@ -788,7 +795,7 @@ Dependency order: #633 is the foundation. #634 and #635 depend on it. #636 is in
 
 ## Part 12: Academic Foundations for Claim-First Content
 
-Recent academic work provides strong validation for the proposition-level and claim-first approaches described in this document and the companion Claim-First Architecture proposal.
+Recent academic work provides strong validation for the proposition-level and claim-first approaches described in this document and the companion Claim-First Architecture proposal (now superseded by the KB system).
 
 ### Proposition-Level Retrieval (Dense X Retrieval)
 

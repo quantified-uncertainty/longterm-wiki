@@ -35,13 +35,13 @@ export type ResourceListResult = InferResponseType<RpcClient['all']['$get'], 200
 export async function upsertResource(
   item: UpsertResourceItem,
 ): Promise<ApiResult<UpsertResourceResult>> {
-  return apiRequest<UpsertResourceResult>('POST', '/api/resources', item, undefined, 'content');
+  return apiRequest<UpsertResourceResult>('POST', '/api/resources', item);
 }
 
 export async function upsertResourceBatch(
   items: UpsertResourceItem[],
 ): Promise<ApiResult<{ upserted: number; results: Array<{ id: string; url: string }> }>> {
-  return apiRequest('POST', '/api/resources/batch', { items }, undefined, 'content');
+  return apiRequest('POST', '/api/resources/batch', { items });
 }
 
 export async function getResource(

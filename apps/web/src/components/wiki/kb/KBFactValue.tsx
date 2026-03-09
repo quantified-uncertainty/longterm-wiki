@@ -12,12 +12,12 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { getEntityById, getEntityHref } from "@data";
-import { getKBFacts, getKBLatest, getKBProperty } from "@data/kb";
+import { getKBFacts, getKBLatest, getKBProperty, getKBFactVerification } from "@data/kb";
 import type { Fact } from "@longterm-wiki/kb";
 import { CURRENCIES, resolveCurrency } from "@longterm-wiki/kb/currencies";
 import { formatValue } from "@lib/format-value";
 import { formatKBFactValue, formatKBDate, isUrl } from "./format";
+import { VerificationDot } from "./VerificationDot";
 import styles from "../tooltip.module.css";
 
 interface KBFactValueProps {
@@ -64,6 +64,7 @@ export function KBFactValue({
   const displayValue = formatKBFactValue(fact, prop?.unit, prop?.display);
   const currencyCode = resolveCurrency(fact.currency, prop?.unit);
   const propertyName = prop?.name ?? property;
+  const verification = getKBFactVerification(fact.id);
   const hasMetadata = propertyName || fact.asOf || fact.source;
 
   if (!hasMetadata) {
@@ -123,7 +124,7 @@ export function KBFactValue({
         {fact.source && (
           <span className="block text-muted-foreground mt-1 truncate">
             {isUrl(fact.source) ? (
-              <>
+              <span className="inline-flex items-center gap-1">
                 Source:{" "}
                 <a
                   href={fact.source}
@@ -133,21 +134,29 @@ export function KBFactValue({
                 >
                   Link
                 </a>
-              </>
+                {verification && <VerificationDot verdict={verification} />}
+              </span>
             ) : (
-              <>Source: {fact.source}</>
+              <span className="inline-flex items-center gap-1">
+                Source: {fact.source}
+                {verification && <VerificationDot verdict={verification} />}
+              </span>
             )}
           </span>
         )}
-        <span className="block text-muted-foreground/60 mt-1.5 font-mono text-xs">
-          {getEntityById(entity) ? (
-            <Link href={getEntityHref(entity)} className="text-primary hover:underline">
-              {entity}
-            </Link>
-          ) : (
-            entity
-          )}
-          .{property}
+        {verification && (
+          <span className="block text-muted-foreground/80 mt-0.5">
+            <VerificationDot verdict={verification} showLabel />
+          </span>
+        )}
+        {/* Fact detail link */}
+        <span className="block mt-1.5">
+          <Link
+            href={`/kb/fact/${fact.id}`}
+            className="text-primary/70 hover:text-primary hover:underline font-mono text-[10px]"
+          >
+            {entity}.{property} →
+          </Link>
         </span>
       </span>
     </span>

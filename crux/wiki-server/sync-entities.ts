@@ -146,7 +146,6 @@ export async function syncEntities(
       bodyKey: "entities",
       responseCountKey: "upserted",
       itemLabel: "entities",
-      scope: 'content',
       _sleep: options._sleep,
     },
   );

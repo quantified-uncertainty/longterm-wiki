@@ -4,9 +4,12 @@
  * Tries a non-interactive `git rebase origin/main` on a PR branch.
  * If the rebase is clean, pushes. If conflicts arise, aborts and returns.
  * Callers can fall back to Claude for conflict resolution.
+ *
+ * Accepts an optional `cwd` parameter to run in a git worktree.
  */
 
-import { gitSafe, pushWithRetry, configBotUser, revParse } from '../git.ts';
+import { gitSafe, gitSafeIn, pushWithRetry, pushWithRetryIn, configBotUser, revParse } from '../git.ts';
+import { gitIn } from '../git.ts';
 import type { AutoRebaseResult } from './types.ts';
 
 /**
@@ -16,28 +19,41 @@ import type { AutoRebaseResult } from './types.ts';
  * - On clean rebase: pushes with --force-with-lease
  * - On conflict: aborts rebase and returns failure
  *
- * The caller must save/restore the original branch if needed.
+ * When `cwd` is provided, all git operations run in that directory (worktree).
+ * When omitted, operations run in the current working directory (caller must
+ * save/restore the original branch).
  */
-export function tryAutomatedRebase(branch: string): AutoRebaseResult {
+export function tryAutomatedRebase(branch: string, cwd?: string): AutoRebaseResult {
+  // Create cwd-aware wrappers
+  const safe = cwd
+    ? (...args: string[]) => gitSafeIn(cwd, ...args)
+    : (...args: string[]) => gitSafe(...args);
+  const push = cwd
+    ? (b: string) => pushWithRetryIn(cwd, b)
+    : (b: string) => pushWithRetry(b);
+  const parse = cwd
+    ? (ref: string) => gitIn(cwd, 'rev-parse', ref)
+    : (ref: string) => revParse(ref);
+
   try {
-    configBotUser();
+    configBotUser(cwd);
   } catch {
     return { success: false, status: 'checkout-failed' };
   }
 
   // Fetch latest
-  const fetchMain = gitSafe('fetch', 'origin', 'main');
+  const fetchMain = safe('fetch', 'origin', 'main');
   if (!fetchMain.ok) {
     return { success: false, status: 'checkout-failed' };
   }
 
-  const fetchBranch = gitSafe('fetch', 'origin', branch);
+  const fetchBranch = safe('fetch', 'origin', branch);
   if (!fetchBranch.ok) {
     return { success: false, status: 'checkout-failed' };
   }
 
   // Checkout the PR branch
-  const checkout = gitSafe('checkout', '-B', branch, `origin/${branch}`);
+  const checkout = safe('checkout', '-B', branch, `origin/${branch}`);
   if (!checkout.ok) {
     return { success: false, status: 'checkout-failed' };
   }
@@ -45,25 +61,25 @@ export function tryAutomatedRebase(branch: string): AutoRebaseResult {
   // Check if already up-to-date with main
   let mainSha: string;
   try {
-    mainSha = revParse('origin/main');
+    mainSha = parse('origin/main');
   } catch {
     return { success: false, status: 'checkout-failed' };
   }
-  const mergeBase = gitSafe('merge-base', branch, 'origin/main');
+  const mergeBase = safe('merge-base', branch, 'origin/main');
   if (mergeBase.ok && mergeBase.output.trim() === mainSha) {
     return { success: true, status: 'up-to-date' };
   }
 
   // Try rebase
-  const rebase = gitSafe('rebase', 'origin/main');
+  const rebase = safe('rebase', 'origin/main');
   if (!rebase.ok) {
     // Conflict — abort and return
-    gitSafe('rebase', '--abort');
+    safe('rebase', '--abort');
     return { success: false, status: 'conflict' };
   }
 
   // Push
-  const pushed = pushWithRetry(branch);
+  const pushed = push(branch);
   if (!pushed) {
     return { success: false, status: 'push-failed' };
   }

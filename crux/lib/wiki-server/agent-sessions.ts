@@ -47,7 +47,7 @@ export type AgentSessionListResponse = InferResponseType<
 export async function upsertAgentSession(
   session: CreateAgentSession,
 ): Promise<ApiResult<AgentSessionEntry>> {
-  return apiRequest<AgentSessionEntry>('POST', '/api/agent-sessions', session, undefined, 'project');
+  return apiRequest<AgentSessionEntry>('POST', '/api/agent-sessions', session);
 }
 
 /**
@@ -70,7 +70,7 @@ export async function updateAgentSession(
   id: number,
   updates: UpdateAgentSession,
 ): Promise<ApiResult<AgentSessionEntry>> {
-  return apiRequest<AgentSessionEntry>('PATCH', `/api/agent-sessions/${id}`, updates, undefined, 'project');
+  return apiRequest<AgentSessionEntry>('PATCH', `/api/agent-sessions/${id}`, updates);
 }
 
 /**
@@ -91,5 +91,5 @@ export async function listAgentSessions(
 export async function sweepStaleSessions(
   timeoutHours = 2,
 ): Promise<ApiResult<{ swept: number; sessions: Array<{ id: number; branch: string }> }>> {
-  return apiRequest('POST', '/api/agent-sessions/sweep', { timeoutHours }, undefined, 'project');
+  return apiRequest('POST', '/api/agent-sessions/sweep', { timeoutHours });
 }

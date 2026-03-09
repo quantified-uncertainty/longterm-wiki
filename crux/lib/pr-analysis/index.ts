@@ -58,6 +58,7 @@ export {
 
 export {
   ISSUE_SCORES,
+  APPROVED_BONUS,
   computeScore,
   rankPrs,
 } from './scoring.ts';

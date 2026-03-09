@@ -80,9 +80,7 @@ export async function syncEntities(
     const result = await batchedRequest<SyncEntitiesResult>(
       'POST',
       '/api/entities/sync',
-      { entities: batch },
-      undefined,
-      'content',
+      { entities: batch }
     );
 
     if (!result.ok) {

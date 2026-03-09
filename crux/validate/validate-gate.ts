@@ -212,6 +212,8 @@ const UNIFIED_BLOCKING_RULES = [
   'entitylink-ids',
   'footnote-integrity',
   'frontmatter-schema',
+  'kbf-refs',
+  'no-deprecated-components',
   'no-quoted-subcategory',
   'numeric-id-integrity',
   'pipeline-artifacts',

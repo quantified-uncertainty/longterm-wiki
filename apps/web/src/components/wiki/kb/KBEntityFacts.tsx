@@ -12,10 +12,11 @@
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBFacts, getKBEntity, getKBProperties, isFactExpired } from "@data/kb";
+import { getKBFacts, getKBEntity, getKBProperties, isFactExpired, getKBFactVerification } from "@data/kb";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import { formatKBDate, isUrl, shortDomain, titleCase } from "./format";
 import { KBFactValueDisplay } from "./KBFactValueDisplay";
+import { VerificationDot } from "./VerificationDot";
 
 interface KBEntityFactsProps {
   /** KB entity ID (e.g., "anthropic") */
@@ -87,29 +88,35 @@ function TimeSeriesProperty({
         {label}
       </div>
       <div className="flex flex-col gap-1">
-        {sorted.map((item) => (
-          <div
-            key={item.fact.id}
-            className="flex items-baseline justify-between gap-3 py-0.5 border-b border-border/50 last:border-b-0"
-          >
-            <span className="text-xs text-muted-foreground whitespace-nowrap min-w-[60px]">
-              {formatKBDate(item.fact.asOf)}
-            </span>
-            <span className="text-sm text-right">
-              <KBFactValueDisplay fact={item.fact} property={prop} />
-            </span>
-            {item.fact.source && isUrl(item.fact.source) && (
-              <a
-                href={item.fact.source}
-                className="text-xs text-primary/60 hover:text-primary hover:underline whitespace-nowrap"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {shortDomain(item.fact.source)}
-              </a>
-            )}
-          </div>
-        ))}
+        {sorted.map((item) => {
+          const verification = getKBFactVerification(item.fact.id);
+          return (
+            <div
+              key={item.fact.id}
+              className="flex items-baseline justify-between gap-3 py-0.5 border-b border-border/50 last:border-b-0"
+            >
+              <span className="text-xs text-muted-foreground whitespace-nowrap min-w-[60px]">
+                {formatKBDate(item.fact.asOf)}
+              </span>
+              <span className="text-sm text-right">
+                <KBFactValueDisplay fact={item.fact} property={prop} />
+              </span>
+              {item.fact.source && isUrl(item.fact.source) && (
+                <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                  {verification && <VerificationDot verdict={verification} />}
+                  <a
+                    href={item.fact.source}
+                    className="text-xs text-primary/60 hover:text-primary hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {shortDomain(item.fact.source)}
+                  </a>
+                </span>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -139,6 +146,8 @@ function SingleValueProperty({
 
   if (!fact) return null;
 
+  const verification = getKBFactVerification(fact.id);
+
   return (
     <div className="flex items-baseline justify-between gap-3 py-1.5 border-b border-border/50 last:border-b-0">
       <span className="text-xs text-muted-foreground min-w-[100px]">
@@ -151,6 +160,7 @@ function SingleValueProperty({
             ({formatKBDate(fact.asOf)})
           </span>
         )}
+        {verification && <VerificationDot verdict={verification} />}
       </div>
     </div>
   );

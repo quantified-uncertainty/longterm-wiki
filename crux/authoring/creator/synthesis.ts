@@ -248,14 +248,14 @@ ratings:
   actionability: 5
   completeness: 6
 ---
-import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
 
 ## Inline Data Components
 
 Use these to keep numbers in sync with the canonical facts database:
 
-- **\\\`<F e="entity-id" f="hashId">display text</F>\\\`** — Inline canonical fact with hover tooltip. Fact IDs are 8-char hex hashes — use only IDs from the Fact Lookup Table.
-  Example: \\\`<F e="anthropic" f="6796e194">\\\\$380B</F>\\\`
+- **\\\`<KBF entity="entity-slug" property="property-id" />\\\`** — Inline canonical KB fact value with hover tooltip showing source and date. Use the entity slug and property ID from the KB Fact Lookup Table.
+  Example: \\\`<KBF entity="anthropic" property="valuation" />\\\`
 - **\\\`<Calc expr="..." format="..." precision={N} suffix="x" />\\\`** — Computed value from fact expressions.
   The \\\`expr\\\` uses \\\`{entity.hashId}\\\` references and supports +, -, *, /, ^, ().
   Example: \\\`<Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" />\\\` → "27x"
