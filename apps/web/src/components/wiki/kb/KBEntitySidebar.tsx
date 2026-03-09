@@ -31,7 +31,12 @@ interface KBEntitySidebarProps {
   className?: string;
 }
 
-/** Default properties to show for each entity type, in display order. */
+/** Default properties to show for each entity type, in display order.
+ *
+ * Each list is derived from the schema's `required` + `recommended` properties
+ * (in `packages/kb/data/schemas/<type>.yaml`), with `description` excluded
+ * (it belongs in the page content, not the sidebar).
+ */
 const DEFAULT_PROPERTIES: Record<string, string[]> = {
   organization: [
     "founded-date",
@@ -54,6 +59,79 @@ const DEFAULT_PROPERTIES: Record<string, string[]> = {
     "employed-by",
     "role",
     "founder-of",
+    "education",
+    "notable-for",
+  ],
+  "ai-model": [
+    "developed-by",
+    "model-release-date",
+    "model-family",
+    "parameter-count",
+    "context-window",
+    "modality",
+    "license-type",
+    "training-compute",
+  ],
+  analysis: [
+    "evidence-strength",
+    "publication-date",
+  ],
+  approach: [
+    "intervention-type",
+    "maturity-level",
+    "time-horizon",
+    "tractability",
+    "evidence-strength",
+    "expert-consensus-level",
+  ],
+  argument: [
+    "evidence-strength",
+    "expert-consensus-level",
+  ],
+  capability: [
+    "maturity-level",
+    "evidence-strength",
+    "expert-consensus-level",
+    "time-horizon",
+  ],
+  concept: [
+    "expert-consensus-level",
+    "evidence-strength",
+    "time-horizon",
+    "research-consensus",
+  ],
+  debate: [
+    "core-question",
+    "expert-consensus-level",
+    "evidence-strength",
+    "time-horizon",
+  ],
+  event: [
+    "publication-date",
+  ],
+  incident: [
+    "incident-date",
+    "organizations-involved",
+    "incident-status",
+    "financial-impact",
+    "casualties",
+  ],
+  policy: [
+    "time-horizon",
+    "evidence-strength",
+  ],
+  project: [
+    "developed-by",
+    "launched-date",
+    "maturity-level",
+  ],
+  risk: [
+    "severity-level",
+    "likelihood-estimate",
+    "time-horizon",
+    "reversibility",
+    "evidence-strength",
+    "expert-consensus-level",
   ],
 };
 
