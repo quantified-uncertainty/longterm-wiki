@@ -125,7 +125,7 @@ function FactValueDisplay({
         {v.value.map((refId, i) => {
           const refEntity = getKBEntity(refId);
           return (
-            <span key={refId}>
+            <span key={`${refId}-${i}`}>
               {i > 0 && ", "}
               <Link
                 href={`/kb/entity/${refId}`}
