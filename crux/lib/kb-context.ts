@@ -115,7 +115,7 @@ export async function buildKbContextForPage(
     const nonDerived = propertyFacts.filter((f) => !f.id.startsWith('inv_'));
     if (nonDerived.length === 0) continue;
 
-    // Sort newest-first so the most authoritative (recent) value appears last in prompt context
+    // Sort newest-first so the most recent (most authoritative) value appears at the top of the table
     const sorted = nonDerived.slice().sort((a, b) => {
       if (!a.asOf && !b.asOf) return 0;
       if (!a.asOf) return 1;

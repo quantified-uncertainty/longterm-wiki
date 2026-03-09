@@ -173,13 +173,16 @@ function loadKbEntitySlugs(): Set<string> {
  */
 function findKbfRefs(content: string): KbfRef[] {
   const refs: KbfRef[] = [];
-  // Match opening tag with any attribute order; stop at `>` or `/>`
-  const tagRegex = /<(KBF|KBFactValue)\s+([^>]+?)(?:\/?>|\s+[^>]*>)/g;
+  // Match the complete <KBF ...> or <KBFactValue ...> opening/self-closing tag.
+  // We match the full tag (group 0) and extract entity/property from the whole
+  // string — NOT from a captured group — to avoid the non-greedy group 2
+  // stopping after the first attribute and missing subsequent ones.
+  const tagRegex = /<(KBF|KBFactValue)\s[^>]*\/?>/g;
   let tagMatch: RegExpExecArray | null;
   while ((tagMatch = tagRegex.exec(content)) !== null) {
-    const attrs = tagMatch[2];
-    const entityMatch = attrs.match(/entity=["']([^"']+)["']/);
-    const propertyMatch = attrs.match(/property=["']([^"']+)["']/);
+    const fullTag = tagMatch[0];
+    const entityMatch = fullTag.match(/entity=["']([^"']+)["']/);
+    const propertyMatch = fullTag.match(/property=["']([^"']+)["']/);
     if (entityMatch && propertyMatch) {
       refs.push({
         component: tagMatch[1],
