@@ -11,6 +11,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import Link from "next/link";
 import { Search } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
@@ -49,7 +50,12 @@ const columns: ColumnDef<PropertyRow>[] = [
     ),
     cell: ({ row }) => (
       <div>
-        <div className="text-xs font-medium">{row.original.name}</div>
+        <Link
+          href={`/kb/property/${row.original.id}`}
+          className="text-xs font-medium text-primary hover:underline"
+        >
+          {row.original.name}
+        </Link>
         <div className="text-xs text-muted-foreground truncate max-w-[250px]">
           {row.original.description}
         </div>

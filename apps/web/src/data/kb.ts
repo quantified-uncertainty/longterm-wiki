@@ -235,6 +235,57 @@ export function getKBSchema(type: string): TypeSchema | undefined {
 }
 
 /**
+ * Get all item entries across all entities as a flat list.
+ * Returns [entityId, collectionName, ItemEntry] tuples.
+ */
+export function getAllKBItems(): Array<{
+  entityId: string;
+  collection: string;
+  entry: ItemEntry;
+}> {
+  const kb = getKB();
+  if (!kb) return [];
+
+  const results: Array<{
+    entityId: string;
+    collection: string;
+    entry: ItemEntry;
+  }> = [];
+
+  for (const [entityId, collections] of Object.entries(kb.items)) {
+    for (const [collectionName, entries] of Object.entries(collections)) {
+      for (const entry of entries) {
+        results.push({ entityId, collection: collectionName, entry });
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Look up a single item entry by its key (globally unique).
+ * Returns the item along with its owner entity ID and collection name.
+ */
+export function getKBItemByKey(
+  itemKey: string,
+): { entityId: string; collection: string; entry: ItemEntry } | undefined {
+  const kb = getKB();
+  if (!kb) return undefined;
+
+  for (const [entityId, collections] of Object.entries(kb.items)) {
+    for (const [collectionName, entries] of Object.entries(collections)) {
+      for (const entry of entries) {
+        if (entry.key === itemKey) {
+          return { entityId, collection: collectionName, entry };
+        }
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
  * Find all item entries across all entities that reference the given entityId.
  * Scans item fields for string matches against the entityId.
  * Uses schema field definitions when available to identify ref-type fields.
