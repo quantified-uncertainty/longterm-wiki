@@ -45,14 +45,14 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  // /knowledge-base → /wiki (root index page)
+  // /knowledge-base → /wiki/E840 (Knowledge Base index page)
   // /knowledge-base/risks → /wiki (category index — no standalone page in new site)
   // /knowledge-base/[category/]slug → /wiki/slug
   if (segments[0] === "knowledge-base") {
     const url = request.nextUrl.clone();
     if (segments.length <= 1) {
-      // Root: /knowledge-base
-      url.pathname = "/wiki";
+      // Root: /knowledge-base → Knowledge Base index page
+      url.pathname = "/wiki/E840";
       return NextResponse.redirect(url, 308);
     }
     const slug = segments[segments.length - 1];
