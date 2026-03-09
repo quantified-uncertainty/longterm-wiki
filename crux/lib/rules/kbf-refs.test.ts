@@ -69,25 +69,40 @@ describe('kbf-refs rule', () => {
     expect(issues[0].message).toContain('does not match any KB entity');
   });
 
-  it('reports WARNING for missing property', async () => {
+  it('reports ERROR for missing property', async () => {
     const content = mockContent('<KBF entity="anthropic" property="unknown-metric" />');
     const issues = await kbfRefsRule.check(content as any, {} as any);
     expect(issues.length).toBe(1);
-    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].severity).toBe(Severity.ERROR);
     expect(issues[0].message).toContain('unknown-metric');
     expect(issues[0].message).toContain('does not match any property');
   });
 
-  it('reports both ERROR and WARNING when both entity and property are invalid', async () => {
+  it('reports two ERRORs when both entity and property are invalid', async () => {
     const content = mockContent('<KBF entity="fake-co" property="fake-prop" />');
     const issues = await kbfRefsRule.check(content as any, {} as any);
     expect(issues.length).toBe(2);
-    const severities = issues.map(i => i.severity).sort();
-    expect(severities).toEqual([Severity.ERROR, Severity.WARNING]);
+    expect(issues.every(i => i.severity === Severity.ERROR)).toBe(true);
   });
 
   it('handles property before entity attribute order', async () => {
     const content = mockContent('<KBF property="revenue" entity="anthropic" />');
+    const issues = await kbfRefsRule.check(content as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('validates multiline KBF tags correctly', async () => {
+    const body = '<KBF\n  entity="nonexistent"\n  property="valuation"\n/>';
+    const content = mockContent(body);
+    const issues = await kbfRefsRule.check(content as any, {} as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].message).toContain('nonexistent');
+  });
+
+  it('passes for multiline KBF tag with valid refs', async () => {
+    const body = '<KBF\n  entity="anthropic"\n  property="valuation"\n/>';
+    const content = mockContent(body);
     const issues = await kbfRefsRule.check(content as any, {} as any);
     expect(issues.length).toBe(0);
   });
@@ -116,12 +131,12 @@ describe('kbf-refs rule', () => {
     expect(errors[0].message).toContain('missing-org');
   });
 
-  it('reports WARNING for missing property in Calc expression', async () => {
+  it('reports ERROR for missing property in Calc expression', async () => {
     const content = mockContent('<Calc expr="{anthropic.unknown-metric}" />');
     const issues = await kbfRefsRule.check(content as any, {} as any);
-    const warnings = issues.filter(i => i.severity === Severity.WARNING);
-    expect(warnings.length).toBe(1);
-    expect(warnings[0].message).toContain('unknown-metric');
+    const errors = issues.filter(i => i.severity === Severity.ERROR);
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toContain('unknown-metric');
   });
 
   it('validates multiple refs in a single Calc expression', async () => {

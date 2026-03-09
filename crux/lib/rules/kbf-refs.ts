@@ -21,27 +21,30 @@ const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages/kb/data/things');
 const KB_PROPERTIES_FILE = join(PROJECT_ROOT, 'packages/kb/data/properties.yaml');
 
 // ── Caches (populated on first use, like resource-ref-integrity) ─────────────
+// undefined = not yet attempted; null = load failed; Set = loaded successfully
 
-let entitySlugCache: Set<string> | null = null;
-let propertyIdCache: Set<string> | null = null;
+let entitySlugCache: Set<string> | null | undefined = undefined;
+let propertyIdCache: Set<string> | null | undefined = undefined;
 
-export function loadEntitySlugs(): Set<string> {
-  if (entitySlugCache) return entitySlugCache;
-  entitySlugCache = new Set<string>();
+export function loadEntitySlugs(): Set<string> | null {
+  if (entitySlugCache !== undefined) return entitySlugCache;
+  const loaded = new Set<string>();
   try {
     const files = readdirSync(KB_THINGS_DIR).filter((f) => f.endsWith('.yaml'));
     for (const file of files) {
-      entitySlugCache.add(file.replace(/\.yaml$/, ''));
+      loaded.add(file.replace(/\.yaml$/, ''));
     }
+    entitySlugCache = loaded;
   } catch {
-    // skip if KB things dir doesn't exist
+    // KB things dir doesn't exist or is unreadable — signal to callers to skip validation
+    entitySlugCache = null;
   }
   return entitySlugCache;
 }
 
-export function loadPropertyIds(): Set<string> {
-  if (propertyIdCache) return propertyIdCache;
-  propertyIdCache = new Set<string>();
+export function loadPropertyIds(): Set<string> | null {
+  if (propertyIdCache !== undefined) return propertyIdCache;
+  const loaded = new Set<string>();
   try {
     const raw = readFileSync(KB_PROPERTIES_FILE, 'utf-8');
     const parsed = parseYaml(raw);
@@ -49,12 +52,14 @@ export function loadPropertyIds(): Set<string> {
       const props = (parsed as { properties: Record<string, unknown> }).properties;
       if (props && typeof props === 'object') {
         for (const key of Object.keys(props)) {
-          propertyIdCache.add(key);
+          loaded.add(key);
         }
       }
     }
+    propertyIdCache = loaded;
   } catch {
-    // skip if properties file doesn't exist or is unparsable
+    // Properties file doesn't exist or is unparsable — signal to callers to skip validation
+    propertyIdCache = null;
   }
   return propertyIdCache;
 }
@@ -63,8 +68,8 @@ export function loadPropertyIds(): Set<string> {
 
 /**
  * Match <KBF ...> or <KBF ... /> with entity and property attributes in either
- * order. Uses a single regex that captures all attributes, then extracts
- * entity/property from the attribute string.
+ * order. Uses [^>]+ so it naturally spans newlines (newlines are not '>'),
+ * enabling multiline MDX components to be validated correctly.
  */
 const KBF_TAG_RE = /<KBF\s+([^>]+?)>/g;
 const ENTITY_ATTR_RE = /entity=["']([^"']+)["']/;
@@ -72,6 +77,7 @@ const PROPERTY_ATTR_RE = /property=["']([^"']+)["']/;
 
 /**
  * Match <Calc expr="..." ...> and extract the expr value.
+ * [^>]* spans newlines for the same reason as KBF_TAG_RE.
  */
 const CALC_EXPR_RE = /<Calc\s+[^>]*expr=["']([^"']+)["'][^>]*>/g;
 
@@ -98,90 +104,113 @@ export const kbfRefsRule = createRule({
 
     const entitySlugs = loadEntitySlugs();
     const propertyIds = loadPropertyIds();
+
+    // Skip validation if KB metadata could not be loaded (avoids false violations)
+    if (entitySlugs === null || propertyIds === null) {
+      return issues;
+    }
+
+    // Build unfenced body: fenced block contents replaced with empty lines to
+    // preserve line offsets. Inline code spans are also stripped. Running the
+    // regexes against the full body (rather than line-by-line) ensures that
+    // multiline MDX components like:
+    //   <KBF
+    //     entity="anthropic"
+    //     property="valuation"
+    //   />
+    // are matched and validated correctly.
     const lines = content.body.split('\n');
+    const unfencedLines: string[] = [];
     let inFencedBlock = false;
 
-    for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
-      const line = lines[lineIdx];
-
-      // Track fenced code blocks (``` or ~~~)
+    for (const line of lines) {
       if (/^[ \t]*(`{3,}|~{3,})/.test(line)) {
         inFencedBlock = !inFencedBlock;
+        unfencedLines.push('');
         continue;
       }
-      if (inFencedBlock) continue;
+      if (inFencedBlock) {
+        unfencedLines.push('');
+      } else {
+        unfencedLines.push(line.replace(/`[^`]*`/g, ''));
+      }
+    }
 
-      // Strip inline code spans before checking
-      const strippedLine = line.replace(/`[^`]*`/g, '');
+    const unfencedBody = unfencedLines.join('\n');
 
-      // ── Check <KBF> tags ──────────────────────────────────────────
-      KBF_TAG_RE.lastIndex = 0;
-      let match: RegExpExecArray | null;
+    // Helper: 1-based line number for a match at byte offset `index`
+    const lineAt = (index: number): number =>
+      unfencedBody.slice(0, index).split('\n').length;
 
-      while ((match = KBF_TAG_RE.exec(strippedLine)) !== null) {
-        const attrString = match[1];
-        const entityMatch = ENTITY_ATTR_RE.exec(attrString);
-        const propertyMatch = PROPERTY_ATTR_RE.exec(attrString);
+    // ── Check <KBF> tags ──────────────────────────────────────────
+    KBF_TAG_RE.lastIndex = 0;
+    let match: RegExpExecArray | null;
 
-        if (entityMatch) {
-          const entity = entityMatch[1];
-          if (!entitySlugs.has(entity)) {
-            issues.push(new Issue({
-              rule: 'kbf-refs',
-              file: content.path,
-              line: lineIdx + 1,
-              message: `<KBF entity="${entity}"> does not match any KB entity in packages/kb/data/things/`,
-              severity: Severity.ERROR,
-            }));
-          }
-        }
+    while ((match = KBF_TAG_RE.exec(unfencedBody)) !== null) {
+      const attrString = match[1];
+      const entityMatch = ENTITY_ATTR_RE.exec(attrString);
+      const propertyMatch = PROPERTY_ATTR_RE.exec(attrString);
+      const lineIdx = lineAt(match.index);
 
-        if (propertyMatch) {
-          const property = propertyMatch[1];
-          if (!propertyIds.has(property)) {
-            issues.push(new Issue({
-              rule: 'kbf-refs',
-              file: content.path,
-              line: lineIdx + 1,
-              message: `<KBF property="${property}"> does not match any property in packages/kb/data/properties.yaml`,
-              severity: Severity.WARNING,
-            }));
-          }
+      if (entityMatch) {
+        const entity = entityMatch[1];
+        if (!entitySlugs.has(entity)) {
+          issues.push(new Issue({
+            rule: 'kbf-refs',
+            file: content.path,
+            line: lineIdx,
+            message: `<KBF entity="${entity}"> does not match any KB entity in packages/kb/data/things/`,
+            severity: Severity.ERROR,
+          }));
         }
       }
 
-      // ── Check <Calc> expressions ──────────────────────────────────
-      CALC_EXPR_RE.lastIndex = 0;
+      if (propertyMatch) {
+        const property = propertyMatch[1];
+        if (!propertyIds.has(property)) {
+          issues.push(new Issue({
+            rule: 'kbf-refs',
+            file: content.path,
+            line: lineIdx,
+            message: `<KBF property="${property}"> does not match any property in packages/kb/data/properties.yaml`,
+            severity: Severity.ERROR,
+          }));
+        }
+      }
+    }
 
-      while ((match = CALC_EXPR_RE.exec(strippedLine)) !== null) {
-        const expr = match[1];
+    // ── Check <Calc> expressions ──────────────────────────────────
+    CALC_EXPR_RE.lastIndex = 0;
 
-        CALC_REF_RE.lastIndex = 0;
-        let refMatch: RegExpExecArray | null;
+    while ((match = CALC_EXPR_RE.exec(unfencedBody)) !== null) {
+      const expr = match[1];
+      const lineIdx = lineAt(match.index);
 
-        while ((refMatch = CALC_REF_RE.exec(expr)) !== null) {
-          const entity = refMatch[1];
-          const property = refMatch[2];
+      CALC_REF_RE.lastIndex = 0;
+      let refMatch: RegExpExecArray | null;
 
-          if (!entitySlugs.has(entity)) {
-            issues.push(new Issue({
-              rule: 'kbf-refs',
-              file: content.path,
-              line: lineIdx + 1,
-              message: `<Calc> references entity "${entity}" which does not match any KB entity in packages/kb/data/things/`,
-              severity: Severity.ERROR,
-            }));
-          }
+      while ((refMatch = CALC_REF_RE.exec(expr)) !== null) {
+        const entity = refMatch[1];
+        const property = refMatch[2];
 
-          if (!propertyIds.has(property)) {
-            issues.push(new Issue({
-              rule: 'kbf-refs',
-              file: content.path,
-              line: lineIdx + 1,
-              message: `<Calc> references property "${property}" which does not match any property in packages/kb/data/properties.yaml`,
-              severity: Severity.WARNING,
-            }));
-          }
+        if (!entitySlugs.has(entity)) {
+          issues.push(new Issue({
+            rule: 'kbf-refs',
+            file: content.path,
+            line: lineIdx,
+            message: `<Calc> references entity "${entity}" which does not match any KB entity in packages/kb/data/things/`,
+            severity: Severity.ERROR,
+          }));
+        }
+
+        if (!propertyIds.has(property)) {
+          issues.push(new Issue({
+            rule: 'kbf-refs',
+            file: content.path,
+            line: lineIdx,
+            message: `<Calc> references property "${property}" which does not match any property in packages/kb/data/properties.yaml`,
+            severity: Severity.ERROR,
+          }));
         }
       }
     }
