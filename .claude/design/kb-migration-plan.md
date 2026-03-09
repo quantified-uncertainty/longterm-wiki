@@ -1,9 +1,9 @@
 # KB Migration Plan — YAML Facts to KB Library
 
-> **Status**: Draft
+> **Status**: Largely completed — KB migration executed in March 2026 (PRs #1880, #1891, etc.)
 > **Date**: 2026-03-06
 > **Prerequisite**: KB library promoted (see `kb-library.md` evaluation results)
-> **Related**: `kb-library.md` (data model), `statements-strategy.md` (broader data architecture), `anthropic-ontology.md` (Anthropic data audit)
+> **Related**: `kb-library.md` (data model), `statements-strategy.md` (superseded — statements deleted in PR #1908), `anthropic-ontology.md` (Anthropic data audit)
 
 ## 1. Scope Assessment
 

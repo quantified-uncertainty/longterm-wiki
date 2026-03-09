@@ -1,6 +1,8 @@
 # Statements System: Strategy & Red-Teaming
 
-> Living document. Updated across sessions. Goal: decide whether statements are the right data model for this wiki's structured data, and where they need to be supplemented or replaced.
+> **SUPERSEDED** — The statements/claims system was deleted in PR #1908 (March 2026). The KB system (`packages/kb/`) replaced it. This document is retained for historical reference only.
+
+> ~~Living document. Updated across sessions.~~ Goal was: decide whether statements are the right data model for this wiki's structured data, and where they need to be supplemented or replaced.
 
 ## The fundamental question
 
