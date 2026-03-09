@@ -296,8 +296,13 @@ function _checkFieldType(
 ): string | null {
   switch (fieldDef.type) {
     case "number":
+      // Accept plain numbers or [min, max] range arrays
       if (typeof value !== "number") {
-        return `${prefix}: field "${fieldName}" expected number, got ${typeof value}.`;
+        const isRange = Array.isArray(value) && value.length === 2
+          && typeof value[0] === "number" && typeof value[1] === "number";
+        if (!isRange) {
+          return `${prefix}: field "${fieldName}" expected number or [min, max] range, got ${typeof value}.`;
+        }
       }
       break;
 

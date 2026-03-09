@@ -95,6 +95,25 @@ items:
       source: { type: text, description: "URL to paper or announcement" }
       notes: { type: text, description: "Impact or significance" }
 
+  equity-holders:
+    description: "Equity ownership stakeholders. Stake values are decimals (0.02 = 2%). Use a [min, max] array for ranges."
+    fields:
+      holder: { type: text, required: true, description: "Stakeholder name" }
+      entity_ref: { type: ref, description: "Entity numeric ID for linking (e.g. E91)" }
+      category: { type: text, required: true, description: "Role or category (e.g. Co-founder, Strategic investor)" }
+      stake: { type: number, description: "Equity stake as decimal. Single number or [min, max] for ranges." }
+      source: { type: text, description: "URL to source" }
+      notes: { type: text, description: "Context about the stake estimate" }
+
+  charitable-pledges:
+    description: "Charitable giving commitments by stakeholders. Pledge values are decimals (0.8 = 80%). Use [min, max] for ranges."
+    fields:
+      pledger: { type: text, required: true, description: "Who made the pledge" }
+      entity_ref: { type: ref, description: "Entity numeric ID for linking (e.g. E91)" }
+      pledge: { type: number, description: "Fraction of equity pledged. Single number or [min, max] for ranges." }
+      source: { type: text, description: "URL documenting the pledge" }
+      notes: { type: text, description: "Context about the pledge" }
+
   grants-and-programs:
     description: "Major grants, programs, and spending initiatives"
     fields:
@@ -105,3 +124,4 @@ items:
       status: { type: text, description: "Current status (active, completed, winding-down)" }
       source: { type: text, description: "URL to announcement or report" }
       notes: { type: text, description: "Context, impact, or important details" }
+

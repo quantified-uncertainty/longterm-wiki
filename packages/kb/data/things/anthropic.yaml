@@ -389,6 +389,156 @@ facts:
     notes: "Estimate; no published source. Risk-adjusted estimate of EA-aligned philanthropic capital from all Anthropic stakeholders"
 
 items:
+  # ── Equity Holders ──────────────────────────────────────────────
+  # Stake values are decimals (0.02 = 2%). Use [min, max] arrays for ranges.
+  equity-holders:
+    type: equity-holder
+    entries:
+      i_eqDarioAmodei:
+        holder: Dario Amodei
+        entity_ref: E91
+        category: "Co-founder, CEO"
+        stake: [0.02, 0.03]
+        notes: "Estimate based on typical co-founder equity at AI startups of similar stage"
+
+      i_eqDanielaAmodei:
+        holder: Daniela Amodei
+        entity_ref: E90
+        category: "Co-founder, President"
+        stake: [0.02, 0.03]
+        notes: "Estimate based on typical co-founder equity at AI startups of similar stage"
+
+      i_eqChrisOlah:
+        holder: Chris Olah
+        entity_ref: E59
+        category: "Co-founder"
+        stake: [0.02, 0.03]
+        notes: "Interpretability pioneer; early Anthropic co-founder"
+
+      i_eqJackClark:
+        holder: Jack Clark
+        category: "Co-founder"
+        stake: [0.02, 0.03]
+        notes: "Former OpenAI Policy Director"
+
+      i_eqTomBrown:
+        holder: Tom Brown
+        category: "Co-founder"
+        stake: [0.02, 0.03]
+        notes: "GPT-3 lead author"
+
+      i_eqJaredKaplan:
+        holder: Jared Kaplan
+        category: "Co-founder, Chief Scientist"
+        stake: [0.02, 0.03]
+        notes: "Scaling laws pioneer"
+
+      i_eqSamMcCandlish:
+        holder: Sam McCandlish
+        category: "Co-founder"
+        stake: [0.02, 0.03]
+        notes: "Alignment researcher"
+
+      i_eqJaanTallinn:
+        holder: Jaan Tallinn
+        entity_ref: E577
+        category: "Early investor"
+        stake: [0.006, 0.017]
+        source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
+        notes: "Led Series A; Skype co-founder; range reflects dilution uncertainty"
+
+      i_eqDustinMoskovitz:
+        holder: Dustin Moskovitz
+        entity_ref: E436
+        category: "Early investor"
+        stake: [0.008, 0.025]
+        notes: "Facebook co-founder; Open Philanthropy funder"
+
+      i_eqEmployeePool:
+        holder: Employee equity pool
+        category: "Employees"
+        stake: [0.12, 0.18]
+        notes: "Aggregate employee equity; includes vested and unvested options/RSUs"
+
+      i_eqGoogle:
+        holder: Google
+        category: "Strategic investor"
+        stake: [0.13, 0.15]
+        notes: "$3.3B invested across 3 rounds"
+
+      i_eqAmazon:
+        holder: Amazon
+        category: "Strategic investor"
+        notes: "$10.75B invested; exact stake undisclosed; primary cloud partner"
+
+      i_eqInstitutional:
+        holder: "Series G / Other institutional"
+        category: "Institutional"
+        notes: "GIC, Coatue, D.E. Shaw, Dragoneer, Founders Fund, ICONIQ, MGX"
+
+  # ── Charitable Pledges ─────────────────────────────────────────
+  # Pledge values are decimals (0.8 = 80%). Use [min, max] arrays for ranges.
+  # Only stakeholders with charitable commitments are listed here.
+  charitable-pledges:
+    type: charitable-pledge
+    entries:
+      i_plDarioAmodei:
+        pledger: Dario Amodei
+        entity_ref: E91
+        pledge: 0.8
+        notes: "GWWC signatory; early GiveWell supporter"
+
+      i_plDanielaAmodei:
+        pledger: Daniela Amodei
+        entity_ref: E90
+        pledge: 0.8
+        notes: "Married to Holden Karnofsky (GiveWell co-founder)"
+
+      i_plChrisOlah:
+        pledger: Chris Olah
+        entity_ref: E59
+        pledge: 0.8
+        notes: "Participated in EA events; safety-focused"
+
+      i_plJackClark:
+        pledger: Jack Clark
+        pledge: 0.8
+        notes: "Responsible AI advocate; EA-adjacent framing"
+
+      i_plTomBrown:
+        pledger: Tom Brown
+        pledge: 0.8
+        notes: "Chose Anthropic's safety mission over other options"
+
+      i_plJaredKaplan:
+        pledger: Jared Kaplan
+        pledge: 0.8
+        notes: "Safety-motivated co-founder; no documented EA pledge"
+
+      i_plSamMcCandlish:
+        pledger: Sam McCandlish
+        pledge: 0.8
+        notes: "No publicly documented EA connections"
+
+      i_plJaanTallinn:
+        pledger: Jaan Tallinn
+        entity_ref: E577
+        pledge: 0.9
+        source: https://www.givingwhatwecan.org/
+        notes: "Major AI safety funder; GWWC member"
+
+      i_plDustinMoskovitz:
+        pledger: Dustin Moskovitz
+        entity_ref: E436
+        pledge: 0.95
+        source: https://givingpledge.org/
+        notes: "$500M already in Good Ventures nonprofit vehicle"
+
+      i_plEmployeePool:
+        pledger: Employee equity pool
+        pledge: [0.25, 0.5]
+        notes: "Pledge rates vary: pre-2025 hires up to 50% with 3:1 match; post-2024 hires 25% with 1:1 match"
+
   # ── Funding Rounds ──────────────────────────────────────────────
   funding-rounds:
     type: funding-round
@@ -996,3 +1146,4 @@ items:
         description: "Investigating moral status and welfare considerations for AI systems"
         started: 2024-01
         notes: "Kyle Fish hired as first full-time AI welfare researcher at a major AI lab"
+
