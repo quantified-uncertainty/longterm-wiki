@@ -8,6 +8,9 @@ import {
 
 // ---- In-memory store simulating agent_sessions table ----
 
+/** Captured dispatch calls for asserting SQL parameters. */
+let dispatchCalls: Array<{ query: string; params: unknown[] }>;
+
 let nextId = 1;
 let store: Array<{
   id: number;
@@ -36,9 +39,11 @@ let store: Array<{
 function resetStore() {
   store = [];
   nextId = 1;
+  dispatchCalls = [];
 }
 
 const dispatch: SqlDispatcher = (query, params) => {
+  dispatchCalls.push({ query, params: [...params] });
   const q = query.toLowerCase();
 
   // ---- entity_ids (for health check) ----
@@ -47,6 +52,29 @@ const dispatch: SqlDispatcher = (query, params) => {
   }
   if (q.includes("last_value")) {
     return [{ last_value: 0, is_called: false }];
+  }
+
+  // ---- SELECT from agent_sessions with LIKE (insights endpoint) ----
+  if (
+    q.includes("agent_sessions") &&
+    q.includes("like") &&
+    !q.includes("insert") &&
+    !q.includes("update")
+  ) {
+    // Return rows with learnings/recommendations fields for insights
+    const pattern = params[0] as string;
+    // Simple prefix matching: strip trailing % and do startsWith
+    const prefix = pattern.replace(/%$/, "");
+    const limit = 5000;
+    const matches = store.filter((r) => r.branch.startsWith(prefix));
+    return matches.slice(0, limit).map((r) => ({
+      date: r.date,
+      branch: r.branch,
+      title: r.title,
+      task: r.task,
+      learnings_json: null,
+      recommendations_json: null,
+    }));
   }
 
   // ---- INSERT INTO agent_sessions ----
@@ -683,6 +711,88 @@ describe("Agent Sessions API", () => {
         body: JSON.stringify(sampleSession),
       });
       expect(res.status).toBe(401);
+    });
+  });
+
+  // ================================================================
+  // GET /insights — SQL metacharacter escaping
+  // ================================================================
+
+  describe("GET /api/agent-sessions/insights", () => {
+    it("returns 200 with empty insights when no sessions exist", async () => {
+      const res = await app.request("/api/agent-sessions/insights");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.insights).toHaveLength(0);
+      expect(body.summary.total).toBe(0);
+    });
+
+    it("escapes % in branch_prefix so it is treated as a literal character", async () => {
+      await postJson(app, "/api/agent-sessions", {
+        ...sampleSession,
+        branch: "claude/50%-done",
+      });
+      dispatchCalls = [];
+
+      const res = await app.request(
+        `/api/agent-sessions/insights?branch_prefix=${encodeURIComponent("claude/50%")}`
+      );
+      expect(res.status).toBe(200);
+
+      // Verify the LIKE parameter escapes % as \%
+      const likeCall = dispatchCalls.find((c) =>
+        c.query.toLowerCase().includes("like")
+      );
+      expect(likeCall).toBeDefined();
+      // The pattern should be claude/50\%% — escaped literal % followed by trailing wildcard
+      expect(likeCall!.params[0]).toBe("claude/50\\%%");
+    });
+
+    it("escapes _ in branch_prefix so it is treated as a literal character", async () => {
+      await postJson(app, "/api/agent-sessions", {
+        ...sampleSession,
+        branch: "claude/my_branch",
+      });
+      dispatchCalls = [];
+
+      const res = await app.request(
+        `/api/agent-sessions/insights?branch_prefix=${encodeURIComponent("claude/my_")}`
+      );
+      expect(res.status).toBe(200);
+
+      // Verify the LIKE parameter escapes _ as \_
+      const likeCall = dispatchCalls.find((c) =>
+        c.query.toLowerCase().includes("like")
+      );
+      expect(likeCall).toBeDefined();
+      // The pattern should be claude/my\_% — escaped literal _ followed by trailing wildcard
+      expect(likeCall!.params[0]).toBe("claude/my\\_%");
+    });
+
+    // NOTE: The current agent-sessions.ts code does NOT escape backslashes in
+    // branch_prefix. It only escapes % and _. A backslash in the prefix could
+    // act as a LIKE escape character rather than a literal. This is a known gap;
+    // the fix is tracked separately. This test documents current behavior.
+    it("does not currently escape \\\\ in branch_prefix (known gap)", async () => {
+      await postJson(app, "/api/agent-sessions", {
+        ...sampleSession,
+        branch: "claude/path\\to\\branch",
+      });
+      dispatchCalls = [];
+
+      const res = await app.request(
+        `/api/agent-sessions/insights?branch_prefix=${encodeURIComponent("claude/path\\")}`
+      );
+      expect(res.status).toBe(200);
+
+      // Current behavior: backslash is NOT escaped — it passes through as-is
+      const likeCall = dispatchCalls.find((c) =>
+        c.query.toLowerCase().includes("like")
+      );
+      expect(likeCall).toBeDefined();
+      // Current (buggy) behavior: claude/path\% — backslash not escaped
+      // Correct behavior would be: claude/path\\%
+      expect(likeCall!.params[0]).toBe("claude/path\\%");
     });
   });
 });
