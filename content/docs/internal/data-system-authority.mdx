@@ -95,6 +95,7 @@ Do not delete old facts files outright if there are still active `<F>` tags refe
 | Authority | Properties for KB entities | Properties for non-KB entities |
 | Data model | Typed facts with `property`, `value`, `asOf`, `source`, `validEnd` | Hash-keyed facts with `measure`, `value`, `asOf`, `source` |
 | Cross-entity refs | Yes — `!ref` format for entity references | No |
+| Custom YAML tags | `!ref` (entity references), `!date` (explicit date typing) | None |
 | Time series | Yes — multiple facts per property with `asOf` | Yes — multiple entries with `asOf` |
 | Display components | `<KBFactTable>`, `<KBEntitySidebar>`, `<KBEntityFacts>` | `<F>`, `<Calc>` inline components |
 | Update workflow | Edit KB YAML file | Edit facts YAML file |
