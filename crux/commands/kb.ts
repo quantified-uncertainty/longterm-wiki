@@ -616,6 +616,239 @@ async function coverageCommand(
   return { exitCode: 0, output: lines.join('\n') };
 }
 
+// ── fact command ─────────────────────────────────────────────────────────
+
+async function factCommand(
+  args: string[],
+  options: KBCommandOptions,
+): Promise<CommandResult> {
+  const factId = args.find((a) => !a.startsWith('--'));
+
+  if (!factId) {
+    return {
+      exitCode: 1,
+      output: `Usage: crux kb fact <fact-id>
+
+  Show a single fact with full metadata.
+
+Examples:
+  crux kb fact f_dW5cR9mJ8q`,
+    };
+  }
+
+  const graph = await loadGraph();
+
+  // Search all entities for this fact
+  for (const entity of graph.getAllEntities()) {
+    const facts = graph.getFacts(entity.id);
+    const match = facts.find((f: Fact) => f.id === factId);
+    if (match) {
+      const property = graph.getProperty(match.propertyId);
+      const val = formatFactValue(match, property, graph);
+
+      if (options.ci) {
+        return { exitCode: 0, output: JSON.stringify({ entity: entity.id, entityName: entity.name, fact: match, formattedValue: val }) };
+      }
+
+      const lines: string[] = [];
+      lines.push(`\x1b[1m${match.id}\x1b[0m`);
+      lines.push(`Entity:   ${entity.name} (${entity.id})`);
+      lines.push(`Property: ${property?.name ?? match.propertyId} (${match.propertyId})`);
+      lines.push(`Value:    ${val}`);
+      if (match.asOf) lines.push(`As of:    ${match.asOf}`);
+      if (match.validEnd) lines.push(`Valid until: ${match.validEnd}`);
+      if (match.source) lines.push(`Source:   ${match.source}`);
+      if (match.sourceResource) lines.push(`Source Resource: ${match.sourceResource}`);
+      if (match.notes) lines.push(`Notes:    ${match.notes}`);
+      if (match.currency) lines.push(`Currency: ${match.currency}`);
+      lines.push(`\nWeb: /kb/fact/${match.id}`);
+      lines.push(`Entity page: /kb/entity/${entity.id}#${match.propertyId}`);
+      return { exitCode: 0, output: lines.join('\n') };
+    }
+  }
+
+  return { exitCode: 1, output: `Fact not found: ${factId}` };
+}
+
+// ── stale command ────────────────────────────────────────────────────────
+
+async function staleCommand(
+  args: string[],
+  options: KBCommandOptions,
+): Promise<CommandResult> {
+  const daysStr = args.find((a) => !a.startsWith('--')) ?? '180';
+  const days = parseInt(daysStr, 10);
+  if (isNaN(days) || days <= 0) {
+    return { exitCode: 1, output: `Invalid days: ${daysStr}` };
+  }
+
+  const graph = await loadGraph();
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+
+  interface StaleEntry { entityId: string; entityName: string; propertyId: string; propertyName: string; asOf: string; factId: string; }
+  const stale: StaleEntry[] = [];
+
+  for (const entity of graph.getAllEntities()) {
+    const facts = graph.getFacts(entity.id);
+    // Group by property, take latest per property
+    const latestByProp = new Map<string, Fact>();
+    for (const f of facts) {
+      if (f.propertyId === 'description') continue;
+      if (f.id.startsWith('inv_')) continue;
+      const existing = latestByProp.get(f.propertyId);
+      if (!existing || (f.asOf && (!existing.asOf || f.asOf > existing.asOf))) {
+        latestByProp.set(f.propertyId, f);
+      }
+    }
+
+    for (const [propertyId, fact] of latestByProp) {
+      if (fact.asOf && fact.asOf < cutoffStr) {
+        const property = graph.getProperty(propertyId);
+        stale.push({
+          entityId: entity.id,
+          entityName: entity.name,
+          propertyId,
+          propertyName: property?.name ?? propertyId,
+          asOf: fact.asOf,
+          factId: fact.id,
+        });
+      }
+    }
+  }
+
+  stale.sort((a, b) => a.asOf.localeCompare(b.asOf));
+
+  const limit = options.limit ? parseInt(String(options.limit), 10) : 30;
+  const shown = stale.slice(0, limit);
+
+  if (options.ci) {
+    return { exitCode: 0, output: JSON.stringify(stale) };
+  }
+
+  if (stale.length === 0) {
+    return { exitCode: 0, output: `No facts older than ${days} days found.` };
+  }
+
+  const lines: string[] = [];
+  lines.push(`\x1b[1mStale facts (older than ${days} days, cutoff: ${cutoffStr}):\x1b[0m`);
+  lines.push('');
+  const header = `${'Entity'.padEnd(24)} ${'Property'.padEnd(24)} ${'As Of'.padEnd(12)} Fact ID`;
+  lines.push(header);
+  lines.push('-'.repeat(header.length + 16));
+  for (const s of shown) {
+    lines.push(`${s.entityName.slice(0, 23).padEnd(24)} ${s.propertyName.slice(0, 23).padEnd(24)} ${s.asOf.padEnd(12)} ${s.factId}`);
+  }
+  if (stale.length > limit) {
+    lines.push(`\n... and ${stale.length - limit} more (use --limit=${stale.length} to see all)`);
+  }
+  lines.push(`\nTotal: ${stale.length} stale facts`);
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
+// ── needs-update command ─────────────────────────────────────────────────
+
+async function needsUpdateCommand(
+  args: string[],
+  options: KBCommandOptions,
+): Promise<CommandResult> {
+  const entityId = args.find((a) => !a.startsWith('--'));
+
+  if (!entityId) {
+    return {
+      exitCode: 1,
+      output: `Usage: crux kb needs-update <entity-id>
+
+  Show what data is missing or stale for an entity.
+
+Examples:
+  crux kb needs-update anthropic
+  crux kb needs-update openai`,
+    };
+  }
+
+  const graph = await loadGraph();
+  const entity = graph.getEntity(entityId);
+
+  if (!entity) {
+    return { exitCode: 1, output: `Entity not found: ${entityId}` };
+  }
+
+  // Get applicable properties for this entity type
+  const allProperties = graph.getAllProperties().filter((p) => !p.computed);
+  const applicable = allProperties.filter((p) =>
+    !p.appliesTo || p.appliesTo.length === 0 || p.appliesTo.includes(entity.type),
+  );
+
+  const facts = graph.getFacts(entity.id).filter((f: Fact) => !f.id.startsWith('inv_'));
+  const usedProps = new Set(facts.map((f: Fact) => f.propertyId));
+
+  // Missing properties
+  const missing = applicable.filter((p) => !usedProps.has(p.id));
+
+  // Stale properties (latest fact > 180 days old)
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 180);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+
+  interface StaleProperty { property: typeof applicable[0]; latestAsOf: string; }
+  const staleProps: StaleProperty[] = [];
+
+  for (const prop of applicable) {
+    if (!usedProps.has(prop.id)) continue;
+    const propFacts = facts.filter((f: Fact) => f.propertyId === prop.id);
+    const latest = propFacts.reduce((best: Fact | null, f: Fact) =>
+      !best || (f.asOf && (!best.asOf || f.asOf > best.asOf)) ? f : best, null);
+    if (latest?.asOf && latest.asOf < cutoffStr) {
+      staleProps.push({ property: prop, latestAsOf: latest.asOf });
+    }
+  }
+
+  if (options.ci) {
+    return {
+      exitCode: 0,
+      output: JSON.stringify({
+        entityId: entity.id,
+        entityName: entity.name,
+        entityType: entity.type,
+        totalApplicable: applicable.length,
+        totalUsed: usedProps.size,
+        missing: missing.map((p) => ({ id: p.id, name: p.name, category: p.category })),
+        stale: staleProps.map((s) => ({ id: s.property.id, name: s.property.name, latestAsOf: s.latestAsOf })),
+      }),
+    };
+  }
+
+  const lines: string[] = [];
+  lines.push(`\x1b[1m${entity.name}\x1b[0m (${entity.id}) — ${entity.type}`);
+  lines.push(`Properties: ${usedProps.size}/${applicable.length} used (${Math.round((usedProps.size / applicable.length) * 100)}%)`);
+  lines.push('');
+
+  if (missing.length > 0) {
+    lines.push(`\x1b[33mMissing properties (${missing.length}):\x1b[0m`);
+    for (const p of missing.slice(0, 20)) {
+      lines.push(`  ${p.id.padEnd(28)} ${p.name} ${p.category ? `[${p.category}]` : ''}`);
+    }
+    if (missing.length > 20) lines.push(`  ... and ${missing.length - 20} more`);
+    lines.push('');
+  }
+
+  if (staleProps.length > 0) {
+    lines.push(`\x1b[31mStale properties (>${cutoffStr}):\x1b[0m`);
+    for (const s of staleProps) {
+      lines.push(`  ${s.property.id.padEnd(28)} ${s.property.name.padEnd(20)} last: ${s.latestAsOf}`);
+    }
+    lines.push('');
+  }
+
+  if (missing.length === 0 && staleProps.length === 0) {
+    lines.push('\x1b[32mAll applicable properties are present and up-to-date.\x1b[0m');
+  }
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
 // ── Exports ─────────────────────────────────────────────────────────────
 
 export const commands = {
@@ -626,6 +859,9 @@ export const commands = {
   properties: propertiesCommand,
   search: searchCommand,
   coverage: coverageCommand,
+  fact: factCommand,
+  stale: staleCommand,
+  'needs-update': needsUpdateCommand,
   migrate: kbMigrateCommands.default,
 };
 
@@ -641,30 +877,25 @@ Commands:
   properties [--type=X] List all property definitions with usage counts
   search <query>        Search entities by name, ID, or alias
   coverage [--type=X]   Show entity coverage against required/recommended properties
+  fact <fact-id>        Show a single fact with full metadata
+  stale [days]          List facts older than N days (default: 180)
+  needs-update <id>     Show missing and stale data for an entity
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
 
 Options:
   --type=X              Filter list/search/coverage by entity type (e.g. organization, person)
-  --limit=N             Limit number of results (list only)
+  --limit=N             Limit number of results
   --ci                  JSON output
   --errors-only         Show only errors (validate)
   --rule=X              Filter by rule name (validate)
-  --dry-run             Preview migration without writing files (migrate only)
-  --stub-old            Strip old entity to stub after migration (migrate only)
-  --force               Overwrite existing KB thing file (migrate only)
 
 Examples:
   crux kb show anthropic              Show Anthropic with all facts and items
-  crux kb show dario-amodei           Show a person entity
-  crux kb list                        List all entities
   crux kb list --type=person          List only person entities
-  crux kb lookup mK9pX3rQ7n           Look up entity by stableId
-  crux kb properties                  List all properties with usage stats
   crux kb search anthropic            Find entities matching "anthropic"
-  crux kb search amodei --type=person Search only person entities
-  crux kb coverage                    Show all entities scored by property coverage
-  crux kb coverage --type=organization Organizations only
-  crux kb migrate ajeya-cotra --dry-run   Preview entity migration
-  crux kb migrate ajeya-cotra --stub-old  Migrate + strip old entity
+  crux kb fact f_dW5cR9mJ8q           Show fact details
+  crux kb stale 90                    Facts older than 90 days
+  crux kb needs-update anthropic      What's missing for Anthropic
+  crux kb coverage --type=organization Organizations property coverage
 `;
 }

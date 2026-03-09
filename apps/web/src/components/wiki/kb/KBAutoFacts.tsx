@@ -21,6 +21,7 @@ import type { Fact, Property, ItemEntry, FieldDef } from "@longterm-wiki/kb";
 import { formatKBDate, isUrl, shortDomain, titleCase } from "@components/wiki/kb/format";
 import { KBFactValueDisplay } from "@components/wiki/kb/KBFactValueDisplay";
 import { KBCellValue } from "@components/wiki/kb/KBCellValue";
+import Link from "next/link";
 import {
   ChevronRight,
   ExternalLink,
@@ -460,12 +461,15 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
         </summary>
 
         <div className="px-4 pb-4 pt-2 border-t border-border/50">
-          {/* Attribution */}
+          {/* Attribution + KB detail link */}
           <p className="text-xs text-muted-foreground/60 mb-3">
             Structured data for {entityName}.{" "}
-            <span className="text-muted-foreground/40">
-              Source: KB
-            </span>
+            <Link
+              href={`/kb/entity/${entityId}`}
+              className="text-primary/60 hover:text-primary hover:underline"
+            >
+              View full KB profile →
+            </Link>
           </p>
 
           {/* Facts table grouped by category */}

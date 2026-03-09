@@ -12,7 +12,6 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { getEntityById, getEntityHref } from "@data";
 import { getKBFacts, getKBLatest, getKBProperty, getKBFactVerification } from "@data/kb";
 import type { Fact } from "@longterm-wiki/kb";
 import { CURRENCIES, resolveCurrency } from "@longterm-wiki/kb/currencies";
@@ -150,15 +149,14 @@ export function KBFactValue({
             <VerificationDot verdict={verification} showLabel />
           </span>
         )}
-        <span className="block text-muted-foreground/60 mt-1.5 font-mono text-xs">
-          {getEntityById(entity) ? (
-            <Link href={getEntityHref(entity)} className="text-primary hover:underline">
-              {entity}
-            </Link>
-          ) : (
-            entity
-          )}
-          .{property}
+        {/* Fact detail link */}
+        <span className="block mt-1.5">
+          <Link
+            href={`/kb/fact/${fact.id}`}
+            className="text-primary/70 hover:text-primary hover:underline font-mono text-[10px]"
+          >
+            {entity}.{property} →
+          </Link>
         </span>
       </span>
     </span>
