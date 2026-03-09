@@ -390,91 +390,180 @@ facts:
 
 items:
   # ── Equity Holders ──────────────────────────────────────────────
-  # Stake values are decimals (0.02 = 2%). Use [min, max] arrays for ranges.
+  # Current ownership snapshot. Category is derived from round-investments.
   equity-holders:
     type: equity-holder
     entries:
       i_eqDarioAmodei:
         holder: Dario Amodei
         entity_ref: E91
-        category: "Co-founder, CEO"
         stake: [0.02, 0.03]
         notes: "Estimate based on typical co-founder equity at AI startups of similar stage"
 
       i_eqDanielaAmodei:
         holder: Daniela Amodei
         entity_ref: E90
-        category: "Co-founder, President"
         stake: [0.02, 0.03]
         notes: "Estimate based on typical co-founder equity at AI startups of similar stage"
 
       i_eqChrisOlah:
         holder: Chris Olah
         entity_ref: E59
-        category: "Co-founder"
         stake: [0.02, 0.03]
-        notes: "Interpretability pioneer; early Anthropic co-founder"
 
       i_eqJackClark:
         holder: Jack Clark
-        category: "Co-founder"
         stake: [0.02, 0.03]
-        notes: "Former OpenAI Policy Director"
 
       i_eqTomBrown:
         holder: Tom Brown
-        category: "Co-founder"
         stake: [0.02, 0.03]
-        notes: "GPT-3 lead author"
 
       i_eqJaredKaplan:
         holder: Jared Kaplan
-        category: "Co-founder, Chief Scientist"
         stake: [0.02, 0.03]
-        notes: "Scaling laws pioneer"
 
       i_eqSamMcCandlish:
         holder: Sam McCandlish
-        category: "Co-founder"
         stake: [0.02, 0.03]
-        notes: "Alignment researcher"
 
       i_eqJaanTallinn:
         holder: Jaan Tallinn
         entity_ref: E577
-        category: "Early investor"
         stake: [0.006, 0.017]
-        source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
-        notes: "Led Series A; Skype co-founder; range reflects dilution uncertainty"
+        notes: "Range reflects dilution uncertainty across multiple rounds"
 
       i_eqDustinMoskovitz:
         holder: Dustin Moskovitz
         entity_ref: E436
-        category: "Early investor"
         stake: [0.008, 0.025]
-        notes: "Facebook co-founder; Open Philanthropy funder"
 
       i_eqEmployeePool:
         holder: Employee equity pool
-        category: "Employees"
         stake: [0.12, 0.18]
         notes: "Aggregate employee equity; includes vested and unvested options/RSUs"
 
       i_eqGoogle:
         holder: Google
-        category: "Strategic investor"
         stake: [0.13, 0.15]
-        notes: "$3.3B invested across 3 rounds"
 
       i_eqAmazon:
         holder: Amazon
-        category: "Strategic investor"
-        notes: "$10.75B invested; exact stake undisclosed; primary cloud partner"
+        notes: "Exact stake undisclosed; primary cloud partner"
 
       i_eqInstitutional:
-        holder: "Series G / Other institutional"
-        category: "Institutional"
-        notes: "GIC, Coatue, D.E. Shaw, Dragoneer, Founders Fund, ICONIQ, MGX"
+        holder: "Other institutional"
+        notes: "Spark Capital, Menlo Ventures, Lightspeed, ICONIQ, Fidelity, GIC, Coatue, D.E. Shaw, Dragoneer, Founders Fund, MGX"
+
+  # ── Round Investments ──────────────────────────────────────────
+  # Links equity-holders to funding-rounds. Derives category, timing, amounts.
+  round-investments:
+    type: round-investment
+    entries:
+      # ── Founding ──
+      i_riDarioFounding:
+        investor: Dario Amodei
+        investor_ref: E91
+        round: i_founding
+        role: founder
+      i_riDanielaFounding:
+        investor: Daniela Amodei
+        investor_ref: E90
+        round: i_founding
+        role: founder
+      i_riChrisOlahFounding:
+        investor: Chris Olah
+        investor_ref: E59
+        round: i_founding
+        role: founder
+      i_riJackClarkFounding:
+        investor: Jack Clark
+        round: i_founding
+        role: founder
+      i_riTomBrownFounding:
+        investor: Tom Brown
+        round: i_founding
+        role: founder
+      i_riJaredKaplanFounding:
+        investor: Jared Kaplan
+        round: i_founding
+        role: founder
+      i_riSamMcCandlishFounding:
+        investor: Sam McCandlish
+        round: i_founding
+        role: founder
+
+      # ── Seed ──
+      i_riTallinnSeed:
+        investor: Jaan Tallinn
+        investor_ref: E577
+        round: i_k7RmTe4nPQ
+        role: lead
+        notes: "Co-led seed with Moskovitz and Eric Schmidt"
+      i_riMoskovitzSeed:
+        investor: Dustin Moskovitz
+        investor_ref: E436
+        round: i_k7RmTe4nPQ
+        role: lead
+        notes: "Co-led seed with Tallinn and Eric Schmidt"
+
+      # ── Series A ──
+      i_riTallinnSeriesA:
+        investor: Jaan Tallinn
+        investor_ref: E577
+        round: i_VImpFJfKiQ
+        role: lead
+        source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
+      i_riMoskovitzSeriesA:
+        investor: Dustin Moskovitz
+        investor_ref: E436
+        round: i_VImpFJfKiQ
+        role: participant
+
+      # ── Google rounds ──
+      i_riGoogleInitial:
+        investor: Google
+        round: i_hR5cYm9tKQ
+        amount: 300e6
+        stake_acquired: 0.10
+        role: lead
+        notes: "Initial Google investment for ~10% stake"
+      i_riGoogleFollowOn:
+        investor: Google
+        round: i_U9En9RX4lg
+        amount: 2e9
+        role: lead
+        source: https://blog.google/technology/ai/google-anthropic-investment/
+      i_riGoogleThird:
+        investor: Google
+        round: i_ihHzB8VnpQ
+        amount: 1e9
+        role: lead
+        source: https://www.cnbc.com/2025/01/22/google-agrees-to-new-1-billion-investment-in-anthropic.html
+        notes: "Brings total Google equity investment to ~$3.3B"
+
+      # ── Amazon rounds ──
+      i_riAmazonFirst:
+        investor: Amazon
+        round: i_ndAluFEJAQ
+        amount: 1.25e9
+        role: lead
+        source: https://press.aboutamazon.com/2023/9/amazon-and-anthropic-announce-strategic-collaboration
+        notes: "First tranche of up-to-$4B commitment; AWS becomes primary cloud partner"
+      i_riAmazonSecond:
+        investor: Amazon
+        round: i_05J6ESa7gA
+        amount: 2.75e9
+        role: lead
+        source: https://www.aboutamazon.com/news/aws/amazon-invests-additional-4-billion-anthropic-ai
+        notes: "Completing initial $4B commitment"
+      i_riAmazonThird:
+        investor: Amazon
+        round: i_xzJjSXceVA
+        amount: 4e9
+        role: lead
+        source: https://www.cnbc.com/2024/11/22/amazon-to-invest-another-4-billion-in-anthropic-openais-biggest-rival.html
+        notes: "Brings total Amazon investment to $8B"
 
   # ── Charitable Pledges ─────────────────────────────────────────
   # Pledge values are decimals (0.8 = 80%). Use [min, max] arrays for ranges.
@@ -543,48 +632,59 @@ items:
   funding-rounds:
     type: funding-round
     entries:
-      i_k7RmTe4nPQ:
+      i_founding:
+        name: Founding
         date: 2021-01
-        amount: null
+        notes: "Company incorporation; initial equity allocation to co-founders"
+
+      i_k7RmTe4nPQ:
+        name: Seed
+        date: 2021-01
         lead_investor: "Tallinn, Moskovitz, Eric Schmidt"
         notes: "Seed round; amount undisclosed"
 
       i_VImpFJfKiQ:
+        name: Series A
         date: 2021-05
         amount: 124e6
         valuation: 550e6
         lead_investor: jaan-tallinn
         source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
-        notes: "Series A; Jaan Tallinn led, Dustin Moskovitz participated"
+        notes: "Jaan Tallinn led, Dustin Moskovitz participated"
 
       i_Xdb6KUs2og:
+        name: Series B
         date: 2022-04
         amount: 580e6
         valuation: 4e9
         lead_investor: spark-capital
         source: https://fortune.com/2022/04/29/ai-startup-anthropic-raises-580-million/
-        notes: "Series B led by Spark Capital"
+        notes: "Led by Spark Capital"
 
       i_wQ8pNx3vJA:
+        name: FTX Investment
         date: 2022-06
         amount: 500e6
         lead_investor: ftx
         notes: "FTX/Alameda investment; stake later sold for ~$1.4B to pay creditors"
 
       i_hR5cYm9tKQ:
+        name: Google Initial
         date: 2022-11
         amount: 300e6
         lead_investor: google
         notes: "Initial Google investment for ~10% stake"
 
       i_aJCVQbfceQ:
+        name: Bridge Round
         date: 2023-05
         amount: 450e6
         valuation: 4.1e9
         source: https://fortune.com/2023/05/25/anthropic-raises-450-million/
-        notes: "Bridge round led by Spark Capital"
+        notes: "Led by Spark Capital"
 
       i_ndAluFEJAQ:
+        name: Amazon Initial
         date: 2023-09
         amount: 1.25e9
         lead_investor: amazon
@@ -592,27 +692,31 @@ items:
         notes: "First tranche of Amazon's up-to-$4B commitment; AWS becomes primary cloud partner"
 
       i_U9En9RX4lg:
+        name: Google Follow-on
         date: 2023-10
         amount: 2e9
         lead_investor: google
         source: https://blog.google/technology/ai/google-anthropic-investment/
-        notes: "Google follow-on; part of up-to-$2B commitment; board observer seat"
+        notes: "Part of up-to-$2B commitment; board observer seat"
 
       i_dN6bLx2wRA:
+        name: Series D
         date: 2023-12
         amount: 2e9
         valuation: 18e9
-        notes: "Series D; various investors"
+        notes: "Various investors"
 
       i_05J6ESa7gA:
+        name: Amazon Second Tranche
         date: 2024-03
         amount: 2.75e9
         lead_investor: amazon
         source: https://www.aboutamazon.com/news/aws/amazon-invests-additional-4-billion-anthropic-ai
         sourceResource: 3dde9794b9713369
-        notes: "Amazon second tranche; completing initial $4B commitment"
+        notes: "Completing initial $4B commitment"
 
       i_ubgY3jW3mg:
+        name: Menlo Round
         date: 2024-02
         amount: 750e6
         valuation: 18.5e9
@@ -621,21 +725,24 @@ items:
         notes: "Led by Menlo Ventures"
 
       i_xzJjSXceVA:
+        name: Amazon Third Tranche
         date: 2024-11
         amount: 4e9
         lead_investor: amazon
         source: https://www.cnbc.com/2024/11/22/amazon-to-invest-another-4-billion-in-anthropic-openais-biggest-rival.html
-        notes: "Amazon third tranche; brings total Amazon investment to $8B"
+        notes: "Brings total Amazon investment to $8B"
 
       i_ihHzB8VnpQ:
+        name: Google Additional
         date: 2025-01
         amount: 1e9
         lead_investor: google
         source: https://www.cnbc.com/2025/01/22/google-agrees-to-new-1-billion-investment-in-anthropic.html
         sourceResource: ac6cbd8d06bd1b94
-        notes: "Additional Google investment; brings total Google equity to ~$3B"
+        notes: "Brings total Google equity investment to ~$3.3B"
 
       i_guKCmeQaTw:
+        name: Series E
         date: 2025-03
         amount: 3.5e9
         valuation: 61.5e9
@@ -644,6 +751,7 @@ items:
         notes: "Led by Lightspeed Venture Partners"
 
       i_R6dd3cZH8A:
+        name: Series F
         date: 2025-09
         amount: 13e9
         valuation: 183e9
@@ -652,12 +760,14 @@ items:
         notes: "Led by ICONIQ, Fidelity, Lightspeed; ARR had reached $4B"
 
       i_Qci9UDdgkw:
+        name: Microsoft/Nvidia Partnership
         date: 2025-11
         amount: 15e9
-        notes: "Strategic partnership: Microsoft up to $5B, Nvidia up to $10B; $30B Azure compute commitment"
+        notes: "Microsoft up to $5B, Nvidia up to $10B; $30B Azure compute commitment"
         source: https://blogs.microsoft.com/blog/2025/11/18/microsoft-nvidia-and-anthropic-announce-strategic-partnerships/
 
       i_OVNz9C3XUA:
+        name: Series G
         date: 2026-02
         amount: 30e9
         valuation: 380e9
