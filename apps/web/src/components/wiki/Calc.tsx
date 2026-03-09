@@ -40,7 +40,12 @@ function kbFactLookup(entity: string, propertyId: string): CalcFact | undefined 
       else if (abs >= 1e6) value = `$${(numeric / 1e6).toFixed(1)} million`;
       else value = `$${numeric.toLocaleString("en-US")}`;
     } else if (unit === "percent") {
-      value = `${(numeric * 100).toFixed(1)}%`;
+      // KB stores percent as whole numbers (e.g., 40 = 40%), not decimals.
+      // Display the whole-number form for the tooltip value string.
+      value = `${numeric.toFixed(1)}%`;
+      // Normalize to decimal for calc-engine arithmetic so that
+      // format="percent" (which multiplies by 100) produces the right result.
+      numeric = numeric / 100;
     } else {
       value = numeric.toLocaleString("en-US");
     }
