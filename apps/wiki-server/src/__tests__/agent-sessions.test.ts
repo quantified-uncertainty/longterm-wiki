@@ -769,11 +769,7 @@ describe("Agent Sessions API", () => {
       expect(likeCall!.params[0]).toBe("claude/my\\_%");
     });
 
-    // NOTE: The current agent-sessions.ts code does NOT escape backslashes in
-    // branch_prefix. It only escapes % and _. A backslash in the prefix could
-    // act as a LIKE escape character rather than a literal. This is a known gap;
-    // the fix is tracked separately. This test documents current behavior.
-    it("does not currently escape \\\\ in branch_prefix (known gap)", async () => {
+    it("escapes \\\\ in branch_prefix so it is treated as a literal character", async () => {
       await postJson(app, "/api/agent-sessions", {
         ...sampleSession,
         branch: "claude/path\\to\\branch",
@@ -785,14 +781,12 @@ describe("Agent Sessions API", () => {
       );
       expect(res.status).toBe(200);
 
-      // Current behavior: backslash is NOT escaped — it passes through as-is
       const likeCall = dispatchCalls.find((c) =>
         c.query.toLowerCase().includes("like")
       );
       expect(likeCall).toBeDefined();
-      // Current (buggy) behavior: claude/path\% — backslash not escaped
-      // Correct behavior would be: claude/path\\%
-      expect(likeCall!.params[0]).toBe("claude/path\\%");
+      // The pattern should be claude/path\\% — escaped literal \ followed by trailing wildcard
+      expect(likeCall!.params[0]).toBe("claude/path\\\\%");
     });
   });
 });
