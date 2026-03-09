@@ -26,7 +26,7 @@ function extractPrNumber(prUrl: string | null): number | undefined {
  */
 async function loadSessionsFromApi() {
   const result = await fetchDetailed<{ sessions: SessionRow[] }>(
-    "/api/sessions/page-changes?limit=500",
+    "/api/agent-sessions/page-changes?limit=500",
     { revalidate: 300 }
   );
   if (!result.ok) return result;

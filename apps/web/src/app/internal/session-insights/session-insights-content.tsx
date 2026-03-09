@@ -16,7 +16,7 @@ type InsightsResponse = {
 };
 
 async function loadFromApi() {
-  return fetchDetailed<InsightsResponse>("/api/sessions/insights", {
+  return fetchDetailed<InsightsResponse>("/api/agent-sessions/insights", {
     revalidate: 60,
   });
 }

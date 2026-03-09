@@ -20,7 +20,7 @@ import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { parseIntOpt } from '../lib/cli.ts';
-import { listSessions } from '../lib/wiki-server/sessions.ts';
+import { listAgentSessions } from '../lib/wiki-server/agent-sessions.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -184,7 +184,7 @@ function parseSessionLog(content: string): SessionLogEntry | null {
 async function loadSessionLogsSince(since: string): Promise<SessionLogEntry[]> {
   // Try DB-backed sessions first (canonical source per session-logging.md)
   try {
-    const result = await listSessions(200);
+    const result = await listAgentSessions(200);
     if (result.ok) {
       const entries: SessionLogEntry[] = [];
       for (const row of result.data.sessions) {
@@ -194,12 +194,12 @@ async function loadSessionLogsSince(since: string): Promise<SessionLogEntry[]> {
         // Parse issues and learnings from JSON fields
         const issues = parseJsonArray(row.issuesJson);
         const learnings = parseJsonArray(row.learningsJson);
-        const pages = Array.isArray(row.pages) ? row.pages : [];
+        const pages: string[] = []; // pages not included in list endpoint (in agent_session_pages)
 
         entries.push({
           date: sessionDate,
           branch: row.branch || '',
-          title: row.title || '',
+          title: row.title ?? row.task ?? '',
           whatWasDone: row.summary || '',
           pages,
           issues,

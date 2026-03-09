@@ -762,7 +762,20 @@ export const agentSessions = pgTable(
     prUrl: text("pr_url"), // PR URL recorded when crux issues done --pr=URL is called
     prOutcome: text("pr_outcome"), // Outcome: merged | merged_with_revisions | reverted | closed_without_merge
     fixesPrUrl: text("fixes_pr_url"), // URL of the PR this session is fixing (enables fix-chain tracking)
-    sessionId: bigint("session_id", { mode: "number" }).references(() => sessions.id, { onDelete: "set null" }), // FK to session log — set when session completes and log is synced
+    // Session log fields — written at session end via sync-session (replaces sessions table for agent workflow)
+    date: date("date"),
+    title: text("title"), // final session title (PR title-style), distinct from task (checklist description)
+    summary: text("summary"),
+    model: text("model"),
+    duration: text("duration"),
+    durationMinutes: real("duration_minutes"),
+    cost: text("cost"),
+    costCents: integer("cost_cents"),
+    checksYaml: text("checks_yaml"),
+    issuesJson: jsonb("issues_json"),
+    learningsJson: jsonb("learnings_json"),
+    recommendationsJson: jsonb("recommendations_json"),
+    reviewed: boolean("reviewed"),
     status: text("status").notNull().default("active"),
     startedAt: timestamp("started_at", { withTimezone: true })
       .notNull()
@@ -780,7 +793,26 @@ export const agentSessions = pgTable(
     index("idx_as_status").on(table.status),
     index("idx_as_issue").on(table.issueNumber),
     index("idx_as_started_at").on(table.startedAt),
-    index("idx_as_session_id").on(table.sessionId),
+    index("idx_as_date").on(table.date),
+  ]
+);
+
+export const agentSessionPages = pgTable(
+  "agent_session_pages",
+  {
+    agentSessionId: bigint("agent_session_id", { mode: "number" })
+      .notNull()
+      .references(() => agentSessions.id, { onDelete: "cascade" }),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
+  },
+  (table) => [
+    primaryKey({ columns: [table.agentSessionId, table.pageId] }),
+    index("idx_asp_page_id").on(table.pageId),
+    index("idx_asp_page_id_int").on(table.pageIdInt),
+    index("idx_asp_agent_session_id").on(table.agentSessionId),
   ]
 );
 

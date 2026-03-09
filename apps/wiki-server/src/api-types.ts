@@ -1174,8 +1174,22 @@ export const UpdateAgentSessionSchema = z.object({
   prUrl: z.string().url().max(1000).nullable().optional(),
   prOutcome: z.enum(PR_OUTCOMES).nullable().optional(),
   fixesPrUrl: z.string().url().max(1000).nullable().optional(),
-  /** FK to the sessions table — set when the session log is synced to the DB */
-  sessionId: z.number().int().positive().nullable().optional(),
+  // Session log fields — written at session end (replaces separate sessions table for agent workflow)
+  date: DateStringSchema.optional(),
+  title: z.string().min(1).max(1000).optional(),
+  summary: z.string().max(10000).nullable().optional(),
+  model: z.string().max(100).nullable().optional(),
+  duration: z.string().max(100).nullable().optional(),
+  cost: z.string().max(100).nullable().optional(),
+  costCents: z.number().int().min(0).nullable().optional(),
+  durationMinutes: z.number().min(0).nullable().optional(),
+  checksYaml: z.string().max(10000).nullable().optional(),
+  issuesJson: z.unknown().nullable().optional(),
+  learningsJson: z.unknown().nullable().optional(),
+  recommendationsJson: z.unknown().nullable().optional(),
+  reviewed: z.boolean().nullable().optional(),
+  /** Page IDs touched in this session — replaces agent_session_pages when provided */
+  pages: z.array(z.string().min(1).max(200)).optional(),
 });
 export type UpdateAgentSession = z.infer<typeof UpdateAgentSessionSchema>;
 
