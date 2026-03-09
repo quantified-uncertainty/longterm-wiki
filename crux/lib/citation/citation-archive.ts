@@ -14,6 +14,7 @@
  * Part of the hallucination risk reduction initiative (issue #200).
  */
 
+import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
@@ -738,13 +739,14 @@ export async function verifyCitationsForPage(
     }
   }
 
+  const statusCounts = _.countBy(citations, 'status');
   const archive: CitationArchiveFile = {
     pageId,
     verifiedAt: new Date().toISOString().slice(0, 10),
     totalCitations: citations.length,
-    verified: citations.filter(c => c.status === 'verified').length,
-    broken: citations.filter(c => c.status === 'broken').length,
-    unverifiable: citations.filter(c => c.status === 'unverifiable').length,
+    verified: statusCounts['verified'] ?? 0,
+    broken: statusCounts['broken'] ?? 0,
+    unverifiable: statusCounts['unverifiable'] ?? 0,
     citations,
   };
 

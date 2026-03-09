@@ -18,6 +18,7 @@
  * See issue #671.
  */
 
+import _ from 'lodash';
 import type { SourceCacheEntry } from './section-writer.ts';
 // Note: patterns.ts has FRONTMATTER_RE but it captures only the body without
 // delimiters.  We need the full block (including ---) for lossless reassembly,
@@ -318,7 +319,7 @@ export function renumberFootnotes(content: string, options?: { warn?: boolean })
 
   // Step 5: rebuild definitions block in numeric order
   const defLines: string[] = [];
-  const sorted = [...mapping.entries()].sort((a, b) => a[1] - b[1]);
+  const sorted = _.sortBy([...mapping.entries()], ([, v]) => v);
   for (const [marker, num] of sorted) {
     const defText = defs.get(marker);
     if (defText) defLines.push(`[^${num}]: ${defText}`);
@@ -371,10 +372,9 @@ export function filterSourcesForSection(
     return { src, score };
   });
 
-  const anyScore = scored.some(s => s.score > 0);
-  if (!anyScore) return sources;
+  if (scored.every(s => s.score === 0)) return sources;
 
-  return scored.sort((a, b) => b.score - a.score).map(s => s.src);
+  return _.orderBy(scored, s => s.score, 'desc').map(s => s.src);
 }
 
 /**

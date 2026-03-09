@@ -13,6 +13,7 @@
  * The LLM check only runs on added/changed claims, keeping cost minimal.
  */
 
+import _ from 'lodash';
 import { jaccardWordSimilarity } from '../claim-utils.ts';
 import { createLlmClient, callLlm, MODELS } from '../llm.ts';
 import { parseJsonFromLlm } from '../json-parsing.ts';
@@ -307,10 +308,11 @@ export async function checkContradictions(
     }
   }
 
+  const counts = _.countBy(allContradictions, 'severity');
   const summary = {
-    high: allContradictions.filter(c => c.severity === 'high').length,
-    medium: allContradictions.filter(c => c.severity === 'medium').length,
-    low: allContradictions.filter(c => c.severity === 'low').length,
+    high: counts['high'] ?? 0,
+    medium: counts['medium'] ?? 0,
+    low: counts['low'] ?? 0,
   };
 
   return {
