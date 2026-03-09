@@ -107,9 +107,9 @@ describe("loader", () => {
   });
 
   describe("schemas", () => {
-    it("loads 14 schemas (8 original + 5 new entity types + 1 incident)", () => {
+    it("loads 19 schemas", () => {
       const schemas = graph.getAllSchemas();
-      expect(schemas).toHaveLength(14);
+      expect(schemas).toHaveLength(19);
     });
 
     it("loads original concept entity schemas", () => {
@@ -127,6 +127,11 @@ describe("loader", () => {
       expect(graph.getSchema("project")).toBeDefined();
       expect(graph.getSchema("analysis")).toBeDefined();
       expect(graph.getSchema("argument")).toBeDefined();
+      expect(graph.getSchema("case-study")).toBeDefined();
+      expect(graph.getSchema("funder")).toBeDefined();
+      expect(graph.getSchema("historical")).toBeDefined();
+      expect(graph.getSchema("risk-factor")).toBeDefined();
+      expect(graph.getSchema("safety-agenda")).toBeDefined();
     });
 
     it("loads ai-model schema with required properties", () => {
@@ -176,17 +181,9 @@ describe("loader", () => {
   });
 
   describe("facts", () => {
-    it("loads correct number of facts for Anthropic (51)", () => {
+    it("loads correct number of facts for Anthropic (52)", () => {
       const facts = graph.getFacts("anthropic");
-      // Original 37 + 14 migrated from old facts system:
-      // +1 valuation (2025-11), +1 revenue-guidance, +1 retention-rate,
-      // +1 customer-concentration, +1 safety-staffing-ratio,
-      // +1 infrastructure-investment, +1 description (breakeven),
-      // +1 equity-stake-percent (google), +1 equity-value (founders),
-      // +1 description (pledge), +1 equity-value (employees),
-      // +1 equity-stake-percent (per-founder), +1 equity-stake-percent (tallinn),
-      // +1 description (EA capital) = 51
-      expect(facts).toHaveLength(51);
+      expect(facts).toHaveLength(52);
     });
 
     it("loads correct number of facts for Dario Amodei (9)", () => {
