@@ -50,33 +50,36 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   const property = getKBProperty(propertyId);
   if (!property) notFound();
 
-  // Get all facts across all entities for this property (include expired for completeness)
-  const factsByEntity = getKBAllFactsByProperty(propertyId, undefined, {
+  // All facts (including expired) for the history table
+  const allFactsByEntity = getKBAllFactsByProperty(propertyId, undefined, {
     includeExpired: true,
   });
+  // Current (non-expired) facts for coverage calculation
+  const currentFactsByEntity = getKBAllFactsByProperty(propertyId);
 
-  // Compute totals
+  // Compute totals from all-time data
   let totalFacts = 0;
-  for (const facts of factsByEntity.values()) {
+  for (const facts of allFactsByEntity.values()) {
     totalFacts += facts.length;
   }
-  const entityCount = factsByEntity.size;
+  const allTimeEntityCount = allFactsByEntity.size;
 
-  // Compute coverage if appliesTo is defined
+  // Compute coverage from current (non-expired) facts
   const allEntities = getKBEntities();
   const applicableEntities = property.appliesTo
     ? allEntities.filter((e) => property.appliesTo!.includes(e.type))
     : allEntities;
+  const coveredEntityCount = currentFactsByEntity.size;
   const coverage =
     applicableEntities.length > 0
-      ? Math.round((entityCount / applicableEntities.length) * 100)
+      ? Math.round((coveredEntityCount / applicableEntities.length) * 100)
       : 0;
   const missingEntities = applicableEntities.filter(
-    (e) => !factsByEntity.has(e.id),
+    (e) => !currentFactsByEntity.has(e.id),
   );
 
   // Sort entities by latest fact value (descending for numbers, alpha for text)
-  const sortedEntities = [...factsByEntity.entries()].sort((a, b) => {
+  const sortedEntities = [...allFactsByEntity.entries()].sort((a, b) => {
     // Sort by fact count descending
     return b[1].length - a[1].length;
   });
@@ -101,8 +104,8 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       <p className="text-sm text-muted-foreground mb-6">
         <code className="text-xs">{propertyId}</code>
         {" \u00B7 "}
-        {totalFacts} fact{totalFacts !== 1 ? "s" : ""} across {entityCount}{" "}
-        entit{entityCount !== 1 ? "ies" : "y"}
+        {totalFacts} fact{totalFacts !== 1 ? "s" : ""} across {allTimeEntityCount}{" "}
+        entit{allTimeEntityCount !== 1 ? "ies" : "y"}
         {property.category && (
           <>
             {" \u00B7 "}
@@ -179,12 +182,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 <details key={entityId} className="group">
                   <summary className="flex items-center gap-4 px-4 py-2.5 cursor-pointer hover:bg-muted/50 text-sm select-none">
                     <span className="font-medium min-w-[12rem]">
-                      <Link
-                        href={`/kb/entity/${entityId}`}
-                        className="text-blue-600 hover:underline dark:text-blue-400"
-                      >
-                        {entityName}
-                      </Link>
+                      {entityName}
                     </span>
                     <span className="flex-1 text-muted-foreground truncate font-mono">
                       {formatKBFactValue(
@@ -204,6 +202,14 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                     </span>
                   </summary>
                   <div className="px-4 pb-3 pt-1 bg-muted/20">
+                    <div className="mb-2">
+                      <Link
+                        href={`/kb/entity/${entityId}`}
+                        className="text-blue-600 hover:underline dark:text-blue-400 text-sm"
+                      >
+                        {entityName} &rarr;
+                      </Link>
+                    </div>
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="text-xs text-muted-foreground border-b border-border">
@@ -287,8 +293,8 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             <KVRow label="Applicable Entities">
               {applicableEntities.length}
             </KVRow>
-            <KVRow label="Have Data">
-              {entityCount} of {applicableEntities.length} ({coverage}%)
+            <KVRow label="Have Current Data">
+              {coveredEntityCount} of {applicableEntities.length} ({coverage}%)
             </KVRow>
           </KVTable>
 

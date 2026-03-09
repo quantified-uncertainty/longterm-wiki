@@ -22,7 +22,24 @@ import { KVRow, KVTable } from "@/components/wiki/kb/kb-detail-shared";
 // ── Static params ────────────────────────────────────────────────────
 
 export function generateStaticParams() {
-  return getAllKBItems().map(({ entry }) => ({ itemId: entry.key }));
+  const allItems = getAllKBItems();
+
+  // Assert global uniqueness of item keys at build time
+  const seen = new Map<string, string>();
+  for (const { entityId, collection, entry } of allItems) {
+    const prev = seen.get(entry.key);
+    if (prev) {
+      console.warn(
+        `[KB] Duplicate item key "${entry.key}": found in ${prev} and ${entityId}/${collection}. ` +
+        `Only the first match will be used for /kb/item/${entry.key}.`,
+      );
+    } else {
+      seen.set(entry.key, `${entityId}/${collection}`);
+    }
+  }
+
+  // Deduplicate: only generate one page per key
+  return [...seen.keys()].map((key) => ({ itemId: key }));
 }
 
 // ── Metadata ─────────────────────────────────────────────────────────

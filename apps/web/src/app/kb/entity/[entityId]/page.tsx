@@ -300,18 +300,10 @@ export default async function KBEntityPage({
                     <details key={propertyId} className="group">
                       <summary className="flex items-center gap-4 px-4 py-2.5 cursor-pointer hover:bg-muted/50 text-sm select-none">
                         <span className="font-medium min-w-[10rem]">
-                          <Link
-                            href={`/kb/property/${propertyId}`}
-                            className="text-blue-600 hover:underline dark:text-blue-400"
-                          >
-                            {property?.name ?? propertyId}
-                          </Link>
+                          {property?.name ?? propertyId}
                         </span>
-                        <span className="flex-1 text-muted-foreground truncate">
-                          <FactValueDisplay
-                            fact={latestFact}
-                            property={property}
-                          />
+                        <span className="flex-1 text-muted-foreground truncate font-mono">
+                          {formatKBFactValue(latestFact, property?.unit, property?.display)}
                         </span>
                         <span className="text-muted-foreground text-xs whitespace-nowrap">
                           {formatKBDate(latestFact.asOf)}
@@ -325,6 +317,14 @@ export default async function KBEntityPage({
                       </summary>
 
                       <div className="px-4 pb-3 pt-1 bg-muted/20">
+                        <div className="mb-2">
+                          <Link
+                            href={`/kb/property/${propertyId}`}
+                            className="text-blue-600 hover:underline dark:text-blue-400 text-sm"
+                          >
+                            {property?.name ?? propertyId} &rarr;
+                          </Link>
+                        </div>
                         <table className="w-full text-sm">
                           <thead>
                             <tr className="text-xs text-muted-foreground border-b border-border">

@@ -184,7 +184,8 @@ export function KBFactsTable({ data }: { data: FactRow[] }) {
         r.entityName.toLowerCase().includes(search) ||
         r.propertyName.toLowerCase().includes(search) ||
         r.displayValue.toLowerCase().includes(search) ||
-        r.category.toLowerCase().includes(search)
+        r.category.toLowerCase().includes(search) ||
+        r.factId.toLowerCase().includes(search)
       );
     },
   });
