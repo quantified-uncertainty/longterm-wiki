@@ -15,6 +15,7 @@ import { parse as parseYaml } from 'yaml';
 import { PROJECT_ROOT, CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { batchedRequest, isServerAvailable } from '../lib/wiki-server/client.ts';
+import { normalizeUrlForDedup } from '../lib/footnote-parser.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 
 // ── Types ─────────────────────────────────────────────────────────────
@@ -97,17 +98,6 @@ const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data', 'things');
 // ── Helpers ───────────────────────────────────────────────────────────
 
 /**
- * Normalize a URL for comparison by stripping protocol, www, and trailing slashes.
- */
-function normalizeUrl(url: string): string {
-  return url
-    .replace(/^https?:\/\//, '')
-    .replace(/^www\./, '')
-    .replace(/\/+$/, '')
-    .toLowerCase();
-}
-
-/**
  * Load KB facts for a given entity ID.
  * Returns an empty array if the KB file doesn't exist.
  */
@@ -151,40 +141,66 @@ function findCrRefs(content: string): string[] {
 }
 
 /**
- * Try to match a claim reference to a KB fact by source URL.
- *
- * The claim references from the API include claimText but not source URLs.
- * For citation matching, we look at page-level citations (which have URLs)
- * and try to match them against KB fact sources.
- *
- * Returns the KB fact ID if a match is found, null otherwise.
+ * Find all existing [^rc-XXXX] reference IDs in content.
+ * Used to prevent collisions when converting cr- to rc- refs.
  */
-function matchClaimToKBFact(
-  _claimRef: ClaimReference,
-  citations: PageCitation[],
-  kbFacts: KBFact[],
-): string | null {
-  // KB facts with source URLs
-  const kbFactsWithSources = kbFacts.filter(f => f.source);
-  if (kbFactsWithSources.length === 0) return null;
+function findExistingRcRefs(content: string): Set<string> {
+  const re = /\[\^(rc-[a-f0-9]+)\]/g;
+  const refs = new Set<string>();
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(content)) !== null) {
+    refs.add(match[1]);
+  }
+  return refs;
+}
 
-  // Build a normalized URL → KB fact ID map
+/**
+ * Build a normalized URL → KB fact ID map for an entity's KB facts.
+ * Uses the same normalizeUrlForDedup as the improve pipeline for consistency.
+ */
+function buildKBUrlMap(kbFacts: KBFact[]): Map<string, string> {
   const urlToFactId = new Map<string, string>();
-  for (const fact of kbFactsWithSources) {
+  for (const fact of kbFacts) {
     if (fact.source) {
-      urlToFactId.set(normalizeUrl(fact.source), fact.id);
+      urlToFactId.set(normalizeUrlForDedup(fact.source), fact.id);
     }
   }
+  return urlToFactId;
+}
 
-  // Try to match citations' URLs against KB fact source URLs
-  for (const citation of citations) {
-    if (citation.url) {
-      const normalized = normalizeUrl(citation.url);
-      const factId = urlToFactId.get(normalized);
+/**
+ * Try to match a specific claim reference to a KB fact.
+ *
+ * Strategy: look up the claim's associated citation (same referenceId) to get
+ * a source URL, then match that URL against KB fact sources. This ensures each
+ * cr- ref is matched only to the KB fact for its own citation, not any
+ * arbitrary citation on the page.
+ *
+ * Falls back to matching the claim text against KB fact notes if no URL match.
+ */
+function matchClaimToKBFact(
+  claimRef: ClaimReference,
+  citations: PageCitation[],
+  kbUrlMap: Map<string, string>,
+): string | null {
+  if (kbUrlMap.size === 0) return null;
+
+  // Strategy 1: Find the citation with the same referenceId as this claim ref.
+  // The claims API returns a referenceId that links to the citation in the same
+  // footnote. Match that specific citation's URL against KB facts.
+  if (claimRef.referenceId) {
+    const associatedCitation = citations.find(c => c.referenceId === claimRef.referenceId);
+    if (associatedCitation?.url) {
+      const normalized = normalizeUrlForDedup(associatedCitation.url);
+      const factId = kbUrlMap.get(normalized);
       if (factId) return factId;
     }
   }
 
+  // Strategy 2: No direct citation association — no match.
+  // We intentionally do NOT fall back to matching any citation on the page,
+  // as that would produce false positives (different claims mapped to the
+  // same unrelated KB fact).
   return null;
 }
 
@@ -272,6 +288,7 @@ async function migrateCrCommand(
 
     // Load KB facts for this entity
     const kbFacts = loadKBFacts(entityId);
+    const kbUrlMap = buildKBUrlMap(kbFacts);
 
     // Get claim references from the API for this page
     const pageData = allRefs.pages[slug];
@@ -286,6 +303,11 @@ async function migrateCrCommand(
       }
     }
 
+    // Collect existing rc- refs in the file to prevent collisions
+    const existingRcRefs = findExistingRcRefs(content);
+    // Also track new rc- refs we assign during this file
+    const usedKbFactIds = new Set<string>();
+
     // Determine migration actions for each cr- ref
     const actions: MigrationAction[] = [];
 
@@ -294,12 +316,16 @@ async function migrateCrCommand(
 
       // Try to match to a KB fact
       let kbFactId: string | null = null;
-      if (claimRef && kbFacts.length > 0) {
-        kbFactId = matchClaimToKBFact(claimRef, citations, kbFacts);
+      if (claimRef && kbUrlMap.size > 0) {
+        kbFactId = matchClaimToKBFact(claimRef, citations, kbUrlMap);
+        // Prevent multiple cr- refs mapping to the same KB fact
+        if (kbFactId && usedKbFactIds.has(kbFactId)) {
+          kbFactId = null;
+        }
       }
 
       if (kbFactId) {
-        // Matched to KB fact
+        usedKbFactIds.add(kbFactId);
         actions.push({
           originalRef: crRef,
           newRef: `kb-${kbFactId}`,
@@ -310,11 +336,17 @@ async function migrateCrCommand(
         });
         totalKbMatches++;
       } else {
-        // No match — convert cr- to rc-
+        // No match — convert cr- to rc-, checking for collisions
         const suffix = crRef.replace('cr-', '');
+        let newRef = `rc-${suffix}`;
+        if (existingRcRefs.has(newRef)) {
+          // Collision — append extra chars to disambiguate
+          newRef = `rc-${suffix}x`;
+        }
+        existingRcRefs.add(newRef);
         actions.push({
           originalRef: crRef,
-          newRef: `rc-${suffix}`,
+          newRef,
           matched: false,
           description: claimRef
             ? `${claimRef.claimText.slice(0, 60)}...`

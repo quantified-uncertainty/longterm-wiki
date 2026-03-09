@@ -146,18 +146,40 @@ function buildCitationFootnote(data: CitationData): string {
 export function formatFactValueForFootnote(value: unknown): string {
   if (!value || typeof value !== "object") return String(value ?? "");
   const v = value as Record<string, unknown>;
-  if (v.type === "number" && typeof v.value === "number") {
-    const num = v.value as number;
+
+  function formatNumber(num: number, unit?: string): string {
     const abs = Math.abs(num);
-    if (abs >= 1e12) return `${(num / 1e12).toFixed(1)}T`;
-    if (abs >= 1e9) return `${(num / 1e9).toFixed(1)}B`;
-    if (abs >= 1e6) return `${(num / 1e6).toFixed(1)}M`;
-    if (abs >= 1e3) return `${(num / 1e3).toFixed(1)}K`;
-    return String(num);
+    let str: string;
+    if (abs >= 1e12) str = `${(num / 1e12).toFixed(1)}T`;
+    else if (abs >= 1e9) str = `${(num / 1e9).toFixed(1)}B`;
+    else if (abs >= 1e6) str = `${(num / 1e6).toFixed(1)}M`;
+    else if (abs >= 1e3) str = `${(num / 1e3).toFixed(1)}K`;
+    else str = String(num);
+    return unit ? `${str} ${unit}` : str;
+  }
+
+  if (v.type === "number" && typeof v.value === "number") {
+    return formatNumber(v.value as number, v.unit as string | undefined);
   }
   if (v.type === "text" && typeof v.value === "string") return v.value;
   if (v.type === "date" && typeof v.value === "string") return v.value;
   if (v.type === "boolean") return v.value ? "Yes" : "No";
+  if (v.type === "ref" && typeof v.value === "string") return v.value;
+  if (v.type === "refs" && Array.isArray(v.value)) {
+    return (v.value as string[]).join(", ");
+  }
+  if (v.type === "range") {
+    const low = typeof v.low === "number" ? v.low : 0;
+    const high = typeof v.high === "number" ? v.high : 0;
+    const unit = v.unit as string | undefined;
+    return `${formatNumber(low, unit)}–${formatNumber(high, unit)}`;
+  }
+  if (v.type === "min" && typeof v.value === "number") {
+    return `≥${formatNumber(v.value as number, v.unit as string | undefined)}`;
+  }
+  if (v.type === "json") {
+    try { return JSON.stringify(v.value); } catch { return ""; }
+  }
   return String(v.value ?? "");
 }
 

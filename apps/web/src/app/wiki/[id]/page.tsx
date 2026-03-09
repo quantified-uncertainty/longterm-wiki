@@ -32,6 +32,7 @@ import { CitationQuotesProvider } from "@/components/wiki/CitationQuotesContext"
 import { ReferenceProvider } from "@/components/wiki/ReferenceContext";
 import type { RefMapEntry } from "@/components/wiki/ReferenceContext";
 import type { RefMapEntry as PreprocessorRefMapEntry, KBFactRefData } from "@/lib/reference-preprocessor";
+import { getDomain } from "@/components/wiki/resource-utils";
 import { formatFactValueForFootnote } from "@/lib/reference-preprocessor";
 import { References } from "@/components/wiki/References";
 import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
@@ -79,7 +80,7 @@ function buildReferenceMap(
           type: "citation",
           title: d.title ?? null,
           url: d.url ?? null,
-          domain: d.url ? new URL(d.url).hostname.replace(/^www\./, "") : null,
+          domain: d.url ? getDomain(d.url) : null,
           note: d.note ?? null,
         });
       }
