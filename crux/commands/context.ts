@@ -43,6 +43,7 @@ import type {
 import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
+import { buildKbContextForPage } from '../lib/kb-context.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -487,6 +488,20 @@ async function forEntity(
     bundle += factsBlock(factsResult.data.facts);
   }
 
+  // KB structured facts (from packages/kb/data/things/*.yaml)
+  const kbContext = await buildKbContextForPage(
+    e.numericId ?? '',
+    `${entityId}.mdx`,
+  ).catch((err: unknown) => {
+    const msg = err instanceof Error ? err.message : String(err);
+    log.warn(`KB context load failed: ${msg}`);
+    return null;
+  });
+  if (kbContext) {
+    bundle += `## KB Structured Facts\n\n\`\`\`\n${kbContext}\n\`\`\`\n\n`;
+    bundle += `> View full KB profile: /kb/entity/${entityId}\n\n`;
+  }
+
   if (e.relatedEntries?.length) {
     bundle += `## Related Entities\n\n`;
     for (const r of e.relatedEntries.slice(0, 10)) {
@@ -526,6 +541,7 @@ async function forEntity(
     `${c.green}✓${c.reset} Context bundle written to ${c.cyan}${outputPath}${c.reset}`,
     `  Entity: ${e.title} (${entityId}) [${e.entityType}]`,
     factsResult.ok ? `  Facts: ${factsResult.data.facts.length}` : '',
+    kbContext ? `  KB structured facts: included` : '',
     pageSearchResult.ok ? `  Pages mentioning entity: ${pageSearchResult.data.results.length}` : '',
   ]
     .filter(Boolean)

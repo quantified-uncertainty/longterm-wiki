@@ -297,7 +297,7 @@ export default async function KBEntityPage({
                   const latestFact = facts[0];
 
                   return (
-                    <details key={propertyId} className="group">
+                    <details key={propertyId} id={propertyId} className="group scroll-mt-16">
                       <summary className="flex items-center gap-4 px-4 py-2.5 cursor-pointer hover:bg-muted/50 text-sm select-none">
                         <span className="font-medium min-w-[10rem]">
                           {property?.name ?? propertyId}
@@ -344,7 +344,7 @@ export default async function KBEntityPage({
                           </thead>
                           <tbody className="divide-y divide-border/50">
                             {facts.map((fact) => (
-                              <tr key={fact.id}>
+                              <tr key={fact.id} id={fact.id} className="scroll-mt-16">
                                 <td className="py-1.5 pr-3 text-muted-foreground whitespace-nowrap">
                                   {formatKBDate(fact.asOf)}
                                 </td>
@@ -409,7 +409,7 @@ export default async function KBEntityPage({
                       : [...allFieldNames];
 
                     return (
-                      <details key={collectionName} className="group">
+                      <details key={collectionName} id={`items-${collectionName}`} className="group scroll-mt-16">
                         <summary className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-muted/50 text-sm select-none border border-border rounded-lg">
                           <span className="font-medium">
                             {titleCase(collectionName)}
