@@ -23,15 +23,10 @@ async function apiRequest<T>(
   body?: unknown,
 ): Promise<ApiResult<T>> {
   const url = `${config.wikiServerUrl}${path}`;
-  // Use project-scoped key (preferred) or legacy superkey (fallback).
-  // Do NOT use WIKI_SERVER_API_KEY — that name is ambiguous and may refer
-  // to a different key scope. See snapshot-retention.ts for the same pattern.
-  const apiKey =
-    process.env["LONGTERMWIKI_PROJECT_KEY"] ??
-    process.env["LONGTERMWIKI_SERVER_API_KEY"];
+  const apiKey = process.env["LONGTERMWIKI_SERVER_API_KEY"];
 
   if (!apiKey) {
-    return { ok: false, error: "Neither LONGTERMWIKI_PROJECT_KEY nor LONGTERMWIKI_SERVER_API_KEY is set" };
+    return { ok: false, error: "LONGTERMWIKI_SERVER_API_KEY is not set" };
   }
 
   try {

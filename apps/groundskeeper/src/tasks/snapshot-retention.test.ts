@@ -39,15 +39,11 @@ describe("snapshotRetention", () => {
 
   beforeEach(() => {
     config = makeConfig();
-    // Use LONGTERMWIKI_CONTENT_KEY — the content-scoped key required for
-    // cleanup endpoints (DELETE /api/hallucination-risk/cleanup and
-    // DELETE /api/citations/accuracy-snapshots/cleanup).
-    process.env["LONGTERMWIKI_CONTENT_KEY"] = "test-content-key";
+    process.env["LONGTERMWIKI_SERVER_API_KEY"] = "test-key";
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-    delete process.env["LONGTERMWIKI_CONTENT_KEY"];
     delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
   });
 
@@ -108,38 +104,12 @@ describe("snapshotRetention", () => {
   });
 
   it("returns success (skipped) when no API key is set", async () => {
-    // Clear both content key and legacy superkey — neither is available.
-    // Missing config is a graceful skip, not a failure, so the circuit
-    // breaker doesn't trip on every run.
-    delete process.env["LONGTERMWIKI_CONTENT_KEY"];
     delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
 
     const result = await snapshotRetention(config);
 
     expect(result.success).toBe(true);
     expect(result.summary).toContain("Skipped");
-  });
-
-  it("uses LONGTERMWIKI_SERVER_API_KEY as fallback when content key is absent", async () => {
-    delete process.env["LONGTERMWIKI_CONTENT_KEY"];
-    process.env["LONGTERMWIKI_SERVER_API_KEY"] = "legacy-superkey";
-
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ deleted: 5, keep: 100 }),
-      })
-    );
-
-    const result = await snapshotRetention(config);
-
-    expect(result.success).toBe(true);
-    // Verify the legacy Bearer token was sent
-    const calls = vi.mocked(fetch).mock.calls;
-    expect((calls[0][1] as RequestInit).headers).toMatchObject({
-      Authorization: "Bearer legacy-superkey",
-    });
   });
 
   it("still runs second cleanup when first throws", async () => {

@@ -19,9 +19,6 @@ import {
 } from '../config.ts';
 export { BATCH_TIMEOUT_MS };
 
-/** API key scope — determines which env var to prefer for authentication. */
-export type ApiKeyScope = 'project' | 'content';
-
 /**
  * Environment prefix for wiki-server env vars.
  *
@@ -43,37 +40,19 @@ export function getServerUrl(): string {
 }
 
 /**
- * Get the API key for a given scope.
- *
- * Resolution order:
- *   - 'project' → LONGTERMWIKI_PROJECT_KEY, then LONGTERMWIKI_SERVER_API_KEY
- *   - 'content' → LONGTERMWIKI_CONTENT_KEY, then LONGTERMWIKI_SERVER_API_KEY
- *   - undefined  → LONGTERMWIKI_SERVER_API_KEY (backward compatible)
- *
- * All keys respect the WIKI_SERVER_ENV=prod prefix.
+ * Get the API key. Respects the WIKI_SERVER_ENV=prod prefix.
  */
-export function getApiKey(scope?: ApiKeyScope): string {
+export function getApiKey(): string {
   const prefix = getEnvPrefix();
-  if (scope === 'project') {
-    return process.env[`${prefix}LONGTERMWIKI_PROJECT_KEY`]
-      || process.env[`${prefix}LONGTERMWIKI_SERVER_API_KEY`]
-      || '';
-  }
-  if (scope === 'content') {
-    return process.env[`${prefix}LONGTERMWIKI_CONTENT_KEY`]
-      || process.env[`${prefix}LONGTERMWIKI_SERVER_API_KEY`]
-      || '';
-  }
   return process.env[`${prefix}LONGTERMWIKI_SERVER_API_KEY`] || '';
 }
 
 /**
- * Build HTTP headers with the appropriate API key for the given scope.
- * If no scope is provided, uses the legacy key for backward compatibility.
+ * Build HTTP headers with the API key for wiki-server requests.
  */
-export function buildHeaders(scope?: ApiKeyScope): Record<string, string> {
+export function buildHeaders(): Record<string, string> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  const apiKey = getApiKey(scope);
+  const apiKey = getApiKey();
   if (apiKey) {
     headers['Authorization'] = `Bearer ${apiKey}`;
   }
@@ -125,7 +104,6 @@ export async function apiRequest<T>(
   path: string,
   body?: unknown,
   timeoutMs: number = TIMEOUT_MS,
-  scope?: ApiKeyScope,
 ): Promise<ApiResult<T>> {
   const serverUrl = getServerUrl();
   if (!serverUrl) {
@@ -139,7 +117,7 @@ export async function apiRequest<T>(
 
     const options: RequestInit = {
       method,
-      headers: buildHeaders(scope),
+      headers: buildHeaders(),
       signal: controller.signal,
     };
 
@@ -177,9 +155,8 @@ export async function batchedRequest<T>(
   path: string,
   body?: unknown,
   timeoutMs: number = BATCH_TIMEOUT_MS,
-  scope?: ApiKeyScope,
 ): Promise<ApiResult<T>> {
-  return apiRequest<T>(method, path, body, timeoutMs, scope);
+  return apiRequest<T>(method, path, body, timeoutMs);
 }
 
 // ---------------------------------------------------------------------------

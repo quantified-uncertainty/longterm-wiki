@@ -92,11 +92,7 @@ export function getWikiServerConfig(): {
   if (!serverUrl) return null;
 
   const headers: Record<string, string> = {};
-  // Frontend only makes GET requests — any valid key works.
-  // Prefer scoped keys with fallback to legacy superkey.
-  const apiKey = process.env.LONGTERMWIKI_PROJECT_KEY
-    || process.env.LONGTERMWIKI_CONTENT_KEY
-    || process.env.LONGTERMWIKI_SERVER_API_KEY;
+  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
   if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
 
   return { serverUrl, headers };

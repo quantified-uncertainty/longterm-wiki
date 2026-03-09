@@ -185,7 +185,6 @@ export async function syncResources(
       bodyKey: "items",
       responseCountKey: "upserted",
       itemLabel: "resources",
-      scope: 'content',
       _sleep: options._sleep,
     },
   );

@@ -109,7 +109,7 @@ async function fetchServerIds(): Promise<Map<string, ServerIdEntry>> {
 
   while (true) {
     const res = await fetch(`${serverUrl}/api/ids?limit=${limit}&offset=${offset}`, {
-      headers: buildHeaders('project'),
+      headers: buildHeaders(),
       signal: AbortSignal.timeout(10_000),
     });
     if (!res.ok) break;

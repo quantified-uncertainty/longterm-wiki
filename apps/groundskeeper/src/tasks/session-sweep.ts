@@ -27,15 +27,11 @@ async function callSweepEndpoint(
   timeoutHours: number,
 ): Promise<SweepResponse | null> {
   const url = `${config.wikiServerUrl}/api/agent-sessions/sweep`;
-  // Use project-scoped key (preferred) or legacy superkey (fallback).
-  // The /api/agent-sessions/* routes require `project` scope.
-  const apiKey =
-    process.env["LONGTERMWIKI_PROJECT_KEY"] ??
-    process.env["LONGTERMWIKI_SERVER_API_KEY"];
+  const apiKey = process.env["LONGTERMWIKI_SERVER_API_KEY"];
 
   if (!apiKey) {
     logger.warn(
-      "Neither LONGTERMWIKI_PROJECT_KEY nor LONGTERMWIKI_SERVER_API_KEY is set — skipping sweep",
+      "LONGTERMWIKI_SERVER_API_KEY is not set — skipping sweep",
     );
     return null;
   }
