@@ -36,6 +36,7 @@ import { References } from "@/components/wiki/References";
 import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 import type { CitationQuote } from "@/lib/citation-data";
 
+import { KBAutoFacts } from "@/components/wiki/kb/KBAutoFacts";
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
 /**
@@ -389,6 +390,8 @@ async function ContentView({
           <CitationOverlay quotes={citationQuotes} />
         )}
       </CitationQuotesProvider>
+      {/* KB facts section: auto-rendered for entities with substantive KB data */}
+      {isArticle && !isInternal && entity && <KBAutoFacts entityId={slug} />}
       {/* Related pages rendered outside prose to avoid inherited link styles */}
       {isArticle && !isInternal && <RelatedPages entityId={slug} entity={entity} />}
     </InfoBoxVisibilityProvider>
