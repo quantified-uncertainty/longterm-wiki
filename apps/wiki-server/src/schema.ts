@@ -806,7 +806,9 @@ export const agentSessionPages = pgTable(
     pageId: text("page_id")
       .notNull()
       .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
+    // pageIdInt mirrors wiki_pages.integer_id but has no FK — integer_id was added
+    // via manual migration (phase4a), not Drizzle, so a FK here would break fresh-DB migrations.
+    pageIdInt: integer("page_id_int"),
   },
   (table) => [
     primaryKey({ columns: [table.agentSessionId, table.pageId] }),

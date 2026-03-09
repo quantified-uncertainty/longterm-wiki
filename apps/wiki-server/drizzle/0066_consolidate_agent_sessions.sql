@@ -26,7 +26,7 @@ ALTER TABLE "agent_sessions"
 CREATE TABLE IF NOT EXISTS "agent_session_pages" (
   "agent_session_id" bigint NOT NULL REFERENCES "agent_sessions"("id") ON DELETE CASCADE,
   "page_id" text NOT NULL REFERENCES "wiki_pages"("id") ON DELETE CASCADE,
-  "page_id_int" integer REFERENCES "wiki_pages"("integer_id"),
+  "page_id_int" integer,  -- wiki_pages.integer_id; no FK because integer_id was added via manual migration (phase4a), not Drizzle
   PRIMARY KEY ("agent_session_id", "page_id")
 );
 
