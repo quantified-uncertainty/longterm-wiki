@@ -3,6 +3,8 @@ import {
   getKBProperties,
   getKBFacts,
   getKBItemCounts,
+  getKBEntity,
+  isFactExpired,
 } from "@/data/kb";
 import { getEntityHref } from "@/data";
 import { formatKBFactValue } from "@/components/wiki/kb/format";
@@ -74,7 +76,8 @@ export function FactsPageContent() {
 
   for (const entity of kbEntities) {
     const facts = getKBFacts(entity.id);
-    if (facts.length > 0) {
+    // Only include entities that have at least one non-description fact
+    if (facts.some((f) => f.propertyId !== "description")) {
       entitiesWithFacts.push({
         entityId: entity.id,
         entityName: entity.name,
@@ -98,7 +101,21 @@ export function FactsPageContent() {
       if (fact.source || fact.sourceResource) factsWithSource++;
 
       const prop = propertyMap.get(fact.propertyId);
-      const displayValue = formatKBFactValue(fact, prop?.unit, prop?.display);
+      let displayValue = formatKBFactValue(fact, prop?.unit, prop?.display);
+
+      // Resolve ref/refs entity slugs to display names
+      const v = fact.value;
+      if (v.type === "ref") {
+        const refEntity = getKBEntity(String(v.value));
+        if (refEntity) displayValue = refEntity.name;
+      } else if (v.type === "refs") {
+        displayValue = v.value
+          .map((slug) => {
+            const refEntity = getKBEntity(slug);
+            return refEntity?.name ?? slug;
+          })
+          .join(", ");
+      }
 
       allFactRows.push({
         entityId: entry.entityId,
@@ -112,6 +129,7 @@ export function FactsPageContent() {
         asOf: fact.asOf ?? null,
         hasSource: !!(fact.source || fact.sourceResource),
         staleDays: fact.asOf ? daysSince(fact.asOf) : null,
+        isExpired: isFactExpired(fact),
       });
     }
   }

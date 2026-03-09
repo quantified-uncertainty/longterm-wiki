@@ -34,6 +34,7 @@ export interface FactRow {
   asOf: string | null;
   hasSource: boolean;
   staleDays: number | null;
+  isExpired: boolean;
 }
 
 export interface PropertyRow {
@@ -135,6 +136,44 @@ function CoverageBar({ pct }: { pct: number }) {
 }
 
 // ---------------------------------------------------------------------------
+// Pagination controls
+// ---------------------------------------------------------------------------
+
+function PaginationControls({ table }: { table: { getCanPreviousPage: () => boolean; getCanNextPage: () => boolean; previousPage: () => void; nextPage: () => void; getState: () => { pagination: { pageIndex: number; pageSize: number } }; getPageCount: () => number } }) {
+  const { pageIndex } = table.getState().pagination;
+  const pageCount = table.getPageCount();
+  if (pageCount <= 1) return null;
+
+  return (
+    <div className="flex items-center justify-between pt-3 border-t border-border/40">
+      <span className="text-xs text-muted-foreground tabular-nums">
+        Page {pageIndex + 1} of {pageCount}
+      </span>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+          className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium shadow-sm hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+          Previous
+        </button>
+        <button
+          type="button"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+          className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium shadow-sm hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Next
+          <ChevronRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Tab types
 // ---------------------------------------------------------------------------
 
@@ -214,6 +253,17 @@ const factsColumns: ColumnDef<FactRow>[] = [
       return <span className={`text-xs tabular-nums font-medium ${color}`}>{label}</span>;
     },
     size: 80,
+  },
+  {
+    accessorKey: "isExpired",
+    header: ({ column }) => <SortableHeader column={column} title="Fact has a validEnd date in the past">Status</SortableHeader>,
+    cell: ({ row }) =>
+      row.original.isExpired ? (
+        <span className="inline-block rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-medium text-red-700 dark:bg-red-900/50 dark:text-red-300">
+          Expired
+        </span>
+      ) : null,
+    size: 70,
   },
 ];
 
@@ -339,6 +389,12 @@ export function FactsDashboardTable({
   const [globalFilter, setGlobalFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
+  const [showExpired, setShowExpired] = useState(true);
+
+  // Pagination state for each table
+  const [factsPagination, setFactsPagination] = useState({ pageIndex: 0, pageSize: 100 });
+  const [propsPagination, setPropsPagination] = useState({ pageIndex: 0, pageSize: 100 });
+  const [entityPagination, setEntityPagination] = useState({ pageIndex: 0, pageSize: 100 });
 
   // Unique categories for filter dropdown
   const categories = useMemo(() => {
@@ -357,6 +413,9 @@ export function FactsDashboardTable({
   // Filter facts based on active filters
   const filteredFacts = useMemo(() => {
     let result = facts;
+    if (!showExpired) {
+      result = result.filter((f) => !f.isExpired);
+    }
     if (categoryFilter !== "all") {
       result = result.filter((f) => f.propertyCategory === categoryFilter);
     }
@@ -375,7 +434,7 @@ export function FactsDashboardTable({
       );
     }
     return result;
-  }, [facts, categoryFilter, sourceFilter, globalFilter]);
+  }, [facts, categoryFilter, sourceFilter, globalFilter, showExpired]);
 
   // Filter properties
   const filteredProperties = useMemo(() => {
@@ -416,7 +475,8 @@ export function FactsDashboardTable({
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setFactsSorting,
-    state: { sorting: factsSorting, pagination: { pageIndex: 0, pageSize: 100 } },
+    onPaginationChange: setFactsPagination,
+    state: { sorting: factsSorting, pagination: factsPagination },
   });
 
   // ── Properties table instance ───────────────────────────────────
@@ -430,7 +490,8 @@ export function FactsDashboardTable({
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setPropsSorting,
-    state: { sorting: propsSorting, pagination: { pageIndex: 0, pageSize: 100 } },
+    onPaginationChange: setPropsPagination,
+    state: { sorting: propsSorting, pagination: propsPagination },
   });
 
   // ── Entity coverage table instance ──────────────────────────────
@@ -444,7 +505,8 @@ export function FactsDashboardTable({
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setEntitySorting,
-    state: { sorting: entitySorting, pagination: { pageIndex: 0, pageSize: 100 } },
+    onPaginationChange: setEntityPagination,
+    state: { sorting: entitySorting, pagination: entityPagination },
   });
 
   // Determine which filter options to show in the category dropdown
@@ -464,6 +526,9 @@ export function FactsDashboardTable({
               setActiveTab(tab.id);
               setCategoryFilter("all");
               setSourceFilter("all");
+              setFactsPagination((p) => ({ ...p, pageIndex: 0 }));
+              setPropsPagination((p) => ({ ...p, pageIndex: 0 }));
+              setEntityPagination((p) => ({ ...p, pageIndex: 0 }));
             }}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === tab.id
@@ -507,15 +572,29 @@ export function FactsDashboardTable({
         </select>
 
         {activeTab === "facts" && (
-          <select
-            value={sourceFilter}
-            onChange={(e) => setSourceFilter(e.target.value)}
-            className="h-9 rounded-lg border border-border bg-background px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            <option value="all">All Sources</option>
-            <option value="yes">Has Source</option>
-            <option value="no">No Source</option>
-          </select>
+          <>
+            <select
+              value={sourceFilter}
+              onChange={(e) => setSourceFilter(e.target.value)}
+              className="h-9 rounded-lg border border-border bg-background px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="all">All Sources</option>
+              <option value="yes">Has Source</option>
+              <option value="no">No Source</option>
+            </select>
+            <label className="flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showExpired}
+                onChange={(e) => {
+                  setShowExpired(e.target.checked);
+                  setFactsPagination((p) => ({ ...p, pageIndex: 0 }));
+                }}
+                className="rounded border-border"
+              />
+              Show expired
+            </label>
+          </>
         )}
 
         <span className="text-xs text-muted-foreground whitespace-nowrap">
@@ -527,13 +606,22 @@ export function FactsDashboardTable({
 
       {/* Table content */}
       {activeTab === "facts" && (
-        <DataTable table={factsTable} stickyFirstColumn />
+        <>
+          <DataTable table={factsTable} stickyFirstColumn />
+          <PaginationControls table={factsTable} />
+        </>
       )}
       {activeTab === "properties" && (
-        <DataTable table={propsTable} />
+        <>
+          <DataTable table={propsTable} />
+          <PaginationControls table={propsTable} />
+        </>
       )}
       {activeTab === "entities" && (
-        <DataTable table={entityTable} stickyFirstColumn />
+        <>
+          <DataTable table={entityTable} stickyFirstColumn />
+          <PaginationControls table={entityTable} />
+        </>
       )}
     </div>
   );
