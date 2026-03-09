@@ -12,10 +12,11 @@
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBFacts, getKBEntity, getKBProperties, isFactExpired } from "@data/kb";
+import { getKBFacts, getKBEntity, getKBProperties, isFactExpired, getKBFactVerification } from "@data/kb";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import { formatKBDate, isUrl, shortDomain, titleCase } from "./format";
 import { KBFactValueDisplay } from "./KBFactValueDisplay";
+import { VerificationDot } from "./VerificationDot";
 
 interface KBEntityFactsProps {
   /** KB entity ID (e.g., "anthropic") */
@@ -99,14 +100,20 @@ function TimeSeriesProperty({
               <KBFactValueDisplay fact={item.fact} property={prop} />
             </span>
             {item.fact.source && isUrl(item.fact.source) && (
-              <a
-                href={item.fact.source}
-                className="text-xs text-primary/60 hover:text-primary hover:underline whitespace-nowrap"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {shortDomain(item.fact.source)}
-              </a>
+              <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                {(() => {
+                  const v = getKBFactVerification(item.fact.id);
+                  return v ? <VerificationDot verdict={v} /> : null;
+                })()}
+                <a
+                  href={item.fact.source}
+                  className="text-xs text-primary/60 hover:text-primary hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {shortDomain(item.fact.source)}
+                </a>
+              </span>
             )}
           </div>
         ))}
@@ -151,6 +158,10 @@ function SingleValueProperty({
             ({formatKBDate(fact.asOf)})
           </span>
         )}
+        {(() => {
+          const v = getKBFactVerification(fact.id);
+          return v ? <VerificationDot verdict={v} /> : null;
+        })()}
       </div>
     </div>
   );

@@ -827,6 +827,78 @@ async function buildCitationQuotesBundle() {
 }
 
 /**
+ * Cross-reference KB fact source URLs with citation quotes to produce
+ * a verification status map: factId → best accuracy verdict.
+ *
+ * This runs at build time with data already in memory — no API calls.
+ * Returns { [factId]: verdictString } for facts whose source URL matches
+ * a verified citation quote.
+ */
+function buildKBFactVerification(kb, citationQuotesBundle) {
+  if (!kb || !kb.facts || !citationQuotesBundle) {
+    console.log('  kbFactVerification: skipped (no KB or citation data)');
+    return {};
+  }
+
+  // Build a URL → best verdict map from all citation quotes across all pages.
+  // A URL may appear in multiple pages with different verdicts; prefer the
+  // most informative verdict (accurate > minor_issues > unsupported > inaccurate > not_verifiable > verified-only).
+  const VERDICT_PRIORITY = {
+    accurate: 6,
+    minor_issues: 5,
+    inaccurate: 4,
+    unsupported: 3,
+    not_verifiable: 2,
+    verified: 1,
+  };
+
+  const urlToVerdict = new Map();
+
+  for (const quotes of Object.values(citationQuotesBundle)) {
+    for (const q of quotes) {
+      if (!q.url) continue;
+      const verdict = q.accuracyVerdict || (q.quoteVerified ? 'verified' : null);
+      if (!verdict) continue;
+
+      const normalizedUrl = q.url.replace(/\/+$/, '').toLowerCase();
+      const existing = urlToVerdict.get(normalizedUrl);
+      const existingPriority = existing ? (VERDICT_PRIORITY[existing] ?? 0) : 0;
+      const newPriority = VERDICT_PRIORITY[verdict] ?? 0;
+      if (newPriority > existingPriority) {
+        urlToVerdict.set(normalizedUrl, verdict);
+      }
+    }
+  }
+
+  if (urlToVerdict.size === 0) {
+    console.log('  kbFactVerification: 0 matches (no citation URLs with verdicts)');
+    return {};
+  }
+
+  // Match KB fact source URLs against the citation URL map
+  const verification = {};
+  let matchCount = 0;
+
+  for (const [entityId, facts] of Object.entries(kb.facts)) {
+    for (const fact of facts) {
+      if (!fact.source || typeof fact.source !== 'string') continue;
+      // Only match URL sources
+      if (!fact.source.startsWith('http://') && !fact.source.startsWith('https://')) continue;
+
+      const normalizedSource = fact.source.replace(/\/+$/, '').toLowerCase();
+      const verdict = urlToVerdict.get(normalizedSource);
+      if (verdict) {
+        verification[fact.id] = verdict;
+        matchCount++;
+      }
+    }
+  }
+
+  console.log(`  kbFactVerification: ${matchCount} facts matched from ${urlToVerdict.size} citation URLs`);
+  return verification;
+}
+
+/**
  * Fetch all page references (claim refs + citations) from the wiki-server.
  * Returns a map of pageId → { claimReferences, citations } for the reference preprocessor.
  * Falls back to an empty object if the server is unavailable.
@@ -1245,6 +1317,11 @@ async function main() {
         buildCitationQuotesBundle(),
       ]);
   database.citationQuotes = citationQuotesBundle;
+
+  // =========================================================================
+  // KB FACT VERIFICATION — cross-reference KB source URLs with citation quotes
+  // =========================================================================
+  database.kbFactVerification = buildKBFactVerification(database.kb, citationQuotesBundle);
 
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates);
