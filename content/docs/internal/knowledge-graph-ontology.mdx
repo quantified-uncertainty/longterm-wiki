@@ -1,17 +1,17 @@
 ---
 numericId: E894
-title: "Knowledge Graph Ontology: From Facts to Structured Claims"
-description: "Design document for extending the wiki's data layer from numeric facts to a full knowledge graph with typed properties, entity relationships, and structured claims — including a concrete refactoring of the Kalshi page as a worked example"
+title: "Knowledge Graph Ontology: Design & Implementation Status"
+description: "Design document for the wiki's knowledge graph property ontology, tracking what was proposed versus what the KB system now implements — including typed properties, entity schemas, temporal facts, source attribution, and inverse relationships"
 sidebar:
   order: 37
 subcategory: architecture
 quality: 45
 readerImportance: 85
 researchImportance: 80
-lastEdited: "2026-02-25"
+lastEdited: "2026-03-09"
 createdAt: 2026-02-25
 evergreen: false
-llmSummary: "Architecture document proposing a property ontology for the wiki's knowledge graph. Extends the existing fact-measures system to cover non-numeric claims using typed properties with domain/range constraints, qualifiers, and confidence levels. Includes a complete worked example decomposing the Kalshi wiki page into 60+ structured claims across 6 claim types and 18 properties, demonstrating how the system would work in practice."
+llmSummary: "Architecture document for the wiki's knowledge graph property ontology, updated to reflect the KB system's implementation. The KB system (packages/kb/) now realizes most of what was proposed: 100+ typed properties in properties.yaml, 19 entity type schemas, 360+ entity files with structured facts, temporal support, source attribution, and inverse relationship computation. Includes a Kalshi worked example showing how prose decomposes into structured claims, and tracks which design proposals remain aspirational (confidence taxonomies, claim-level verification)."
 ratings:
   novelty: 7
   rigor: 6
@@ -23,30 +23,42 @@ import { Mermaid } from '@components/wiki';
 
 ## Motivation
 
-The wiki currently has two data layers that represent knowledge:
+This document was originally written (February 2025) when the wiki had two disconnected data layers: a small set of numeric facts in `data/facts/*.yaml` and thousands of unstructured prose claims across \~700 MDX pages. It proposed a property ontology to bridge those layers.
 
-1. **Numeric facts** (`data/facts/*.yaml`) — 139 structured entries with measures, temporal metadata, source attribution. Well-typed but narrow: only quantitative data.
-2. **Prose claims** — Thousands of assertions embedded in \~700 MDX pages. Unstructured, unqueryable, prone to staleness and cross-page inconsistency.
+Since then, the **KB system** (`packages/kb/`) has been built and implements most of what was proposed here. The KB system provides:
 
-The <EntityLink id="E886" name="fact-system-strategy">Fact System Strategy</EntityLink> refined how numeric facts work. The Claim-First Architecture proposal described making all claims first-class data objects. This document tackles the missing piece between those two: **the property ontology** — what types of claims exist, what constraints they have, and how they connect to entities.
+- **100+ typed properties** defined in `packages/kb/data/properties.yaml` with display config, categories, temporal flags, `inverseId` declarations, and `appliesTo` constraints
+- **19 entity type schemas** in `packages/kb/data/schemas/` defining which properties are required/recommended per type
+- **360+ entity files** in `packages/kb/data/things/` with structured facts (number, text, date, boolean, ref, refs, range, min, json value types)
+- **Temporal support** via `asOf` and `validEnd` fields on facts
+- **Source attribution** via `source` URL, `sourceResource`, `sourceQuote`, and `notes` fields
+- **Inverse relationships** auto-computed from `inverseId` declarations on properties
+- **Item collections** for structured sub-data (funding-rounds, key-people, products, model-releases, board-members, etc.)
+- **23 validation rules** covering integrity, consistency, and quality
+- **Custom YAML tags** (`!ref` for entity references, `!date` for dates)
 
-Without a property ontology, a claim store is just a bag of strings. With one, it becomes a queryable knowledge graph.
+The <EntityLink id="E886" name="fact-system-strategy">Fact System Strategy</EntityLink> refined how numeric facts work. The Claim-First Architecture proposal described making all claims first-class data objects. This document tackled the missing piece between those two: **the property ontology** — what types of claims exist, what constraints they have, and how they connect to entities. The KB system is the realized implementation of that ontology.
 
-## What We Already Have
+The rest of this document preserves the original design thinking and worked examples, annotated with what KB now implements versus what remains aspirational.
 
-The existing system maps surprisingly well to knowledge graph concepts:
+## What the KB System Implements
 
-| Knowledge graph concept | Our current equivalent | Status |
+The KB system (`packages/kb/`) now covers most knowledge graph concepts that were originally gaps:
+
+| Knowledge graph concept | KB implementation | Status |
 |---|---|---|
-| **Entity classes** (types) | `entityType` field — 24 canonical types | Mature, well-defined |
-| **Numeric properties** | `fact-measures.yaml` — 25 measures | Working, has `applicableTo` constraints |
-| **Domain constraints** | `applicableTo: [organization]` on measures | Exists for numeric facts only |
-| **Temporal qualifiers** | `asOf` field on facts | Exists for numeric facts only |
-| **Source attribution** | `sourceResource` linking to `data/resources/` | Exists but incomplete coverage |
-| **Entity relationships** | `relatedEntries` in entity YAML (45 relationship types) | Exists but unstructured |
-| **Non-numeric claims** | Embedded in MDX prose | Not structured at all |
+| **Entity classes** (types) | 19 type schemas in `packages/kb/data/schemas/` (organization, person, concept, ai-model, etc.) | Implemented |
+| **Typed properties** | 100+ properties in `packages/kb/data/properties.yaml` with `dataType`, `category`, `appliesTo` | Implemented |
+| **Domain constraints** | `appliesTo: [organization]` on each property | Implemented |
+| **Temporal qualifiers** | `asOf` and `validEnd` fields on individual facts | Implemented |
+| **Source attribution** | `source` URL, `sourceResource`, `sourceQuote`, `notes` per fact | Implemented |
+| **Entity relationships** | `ref`/`refs` fact types with `inverseId` auto-computation | Implemented |
+| **Non-numeric facts** | text, date, boolean, ref, refs, range, min, json value types | Implemented |
+| **Item collections** | Structured sub-data: funding-rounds, key-people, products, model-releases, board-members | Implemented |
+| **Confidence / verification** | Not in KB; source/notes fields provide partial coverage | Not yet implemented |
+| **Claim-type taxonomy** | Not in KB; no factual/consensus/analytical/speculative distinction | Not yet implemented |
 
-The gap: we have a working property system for numeric data (measures) but **no property vocabulary for non-numeric claims**. We have 45 relationship types in `relatedEntries` but they lack the metadata that makes claims useful (sources, confidence, temporality).
+The remaining gap is the **claim-level metadata** proposed in Layer 4 below: confidence levels, verification status, claim-type taxonomy, and explicit reasoning chains for analytical claims. The KB system captures *what is true* with sources, but does not yet capture *how confident we are* or *what type of assertion this is*.
 
 ## Design Principles
 
@@ -92,80 +104,85 @@ A single TechCrunch article produces 8-12 claims. A single annual report might p
 
 ### Layer 1: Universal Properties (apply to all entity types)
 
-These partially exist in entity YAML frontmatter already:
+**Status: Largely implemented in KB.** Each KB entity file (`packages/kb/data/things/*.yaml`) has a `thing:` header with `id`, `name`, `type`, `numericId`, and `aliases`. Many of the properties below now exist as KB properties:
 
-| Property | Value type | Description | Currently exists? |
+| Property | Value type | Description | KB status |
 |---|---|---|---|
-| `name` | string | Primary name | Yes (title) |
-| `description` | string | Short description | Yes |
-| `foundedDate` | date | When created/founded | Partial (in prose) |
-| `endDate` | date | When dissolved/died | No |
-| `status` | enum | active, inactive, dissolved, deceased | No |
-| `officialUrl` | url | Primary website | Partial (in prose) |
-| `wikipediaUrl` | url | Wikipedia page | Partial (in prose) |
-| `wikidataId` | string | Wikidata Q-identifier | No |
-| `parentEntity` | entity | Parent org, broader concept | Partial (relatedEntries) |
+| `name` | string | Primary name | Implemented (`thing.name`) |
+| `description` | string | Short description | Implemented (MDX frontmatter `description`) |
+| `founded-date` | date | When created/founded | Implemented (KB property, `appliesTo: [organization, funder]`) |
+| `end-date` | date | When dissolved/died | Not yet a KB property |
+| `status` | enum | active, inactive, dissolved, deceased | Not yet a KB property |
+| `official-url` | url | Primary website | Implemented (KB property `website`) |
+| `wikipedia-url` | url | Wikipedia page | Not yet a KB property |
+| `wikidata-id` | string | Wikidata Q-identifier | Not yet a KB property |
+| `parent-org` | ref | Parent org, broader concept | Implemented (KB property with inverse) |
 
 ### Layer 2: Type-Specific Properties
 
-Following the "properties for this type" pattern (Wikidata's P1963):
+**Status: Implemented in KB.** The 19 schema files in `packages/kb/data/schemas/` define `required` and `recommended` properties per entity type. For example, `organization.yaml` recommends `founded-date`, `headquarters`, `revenue`, `valuation`, `headcount`, `legal-structure`, `total-funding` and defines item collections for `funding-rounds`, `key-people`, `products`, etc.
 
-**Organization properties:**
+**Organization properties (KB implementation):**
 
-| Property | Value type | Qualifiers | Notes |
+| Property | KB `dataType` | KB status | Notes |
 |---|---|---|---|
-| `headquarters` | entity/string | | Location |
-| `founder` | entity\[\] (person) | | |
-| `ceo` | entity (person) | startTime, endTime | |
-| `industry` | enum\[\] | | ai, prediction-markets, finance, ... |
-| `legalForm` | enum | | nonprofit, llc, corp, ... |
-| `orgType` | enum | | Already exists: frontier-lab, safety-org, funder, ... |
-| `regulatoryStatus` | string | jurisdiction, grantedDate | CFTC-licensed, SEC-registered, etc. |
-| `numberOfEmployees` | quantity | pointInTime | Maps to existing `headcount` measure |
-| `numberOfUsers` | quantity | pointInTime | Maps to existing `user-count` measure |
-| `tradingVolume` | quantity | period, pointInTime | Domain-specific |
-| `marketCategory` | string\[\] | | What markets/products |
-| `revenueModel` | string | | How it makes money |
+| `headquarters` | text | Implemented | Location string |
+| `founded-by` | refs | Implemented | With `inverseId: founder-of` |
+| `legal-structure` | text | Implemented | nonprofit, llc, corp, etc. |
+| `headcount` | number (temporal) | Implemented | With display config |
+| `user-count` | number (temporal) | Implemented | |
+| `revenue` | number (temporal) | Implemented | Display: divisor 1e9, prefix \$, suffix B |
+| `valuation` | number (temporal) | Implemented | Display: divisor 1e9, prefix \$, suffix B |
+| `total-funding` | number (temporal) | Implemented | |
+| `market-share` | number (temporal) | Implemented | Display: suffix % |
+| `gross-margin` | number (temporal) | Implemented | Display: suffix % |
 
-**Person properties:**
+**Person properties (KB implementation):**
 
-| Property | Value type | Qualifiers | Notes |
+| Property | KB `dataType` | KB status | Notes |
 |---|---|---|---|
-| `birthDate` | date | | |
-| `nationality` | string\[\] | | |
-| `educatedAt` | entity\[\] (org) | degree, field | |
-| `employedAt` | entity\[\] (org) | role, startTime, endTime | |
-| `fieldOfWork` | entity\[\] (concept) | | |
-| `notableWork` | entity\[\] | | |
+| `born-year` | number | Implemented | |
+| `education` | text | Implemented | |
+| `employed-by` | ref (temporal) | Implemented | With `inverseId: employer-of` |
+| `role` | text (temporal) | Implemented | Job title at primary employer |
+| `notable-for` | text | Implemented | One-line summary |
+| `net-worth` | number (temporal) | Implemented | |
+| `founder-of` | refs (computed) | Implemented | Auto-computed from `founded-by` inverse |
 
-**Risk/concept properties:**
+**Risk/concept properties (from original proposal):**
 
-| Property | Value type | Qualifiers | Notes |
+| Property | KB `dataType` | KB status | Notes |
 |---|---|---|---|
-| `riskCategory` | enum | | existential, catastrophic, systemic |
-| `affectedBy` | entity\[\] | | capabilities, approaches |
-| `mitigatedBy` | entity\[\] | | approaches, policies |
-| `estimatedProbability` | quantity | timeHorizon, source, method | |
+| `riskCategory` | enum | Not yet a KB property | |
+| `affectedBy` | refs | Not yet a KB property | |
+| `mitigatedBy` | refs | Not yet a KB property | |
+| `estimatedProbability` | number | Not yet a KB property | |
+
+Risk and concept schemas exist (`packages/kb/data/schemas/risk.yaml`, `concept.yaml`) but have fewer defined properties than organization and person schemas. These remain an area for growth.
 
 ### Layer 3: Relationship Properties (cross-entity claims)
 
-These are the "verbs" connecting entities — currently buried in prose:
+**Status: Partially implemented in KB.** The KB system uses `ref` and `refs` data types for entity relationships, with `inverseId` declarations enabling automatic inverse computation. Many of the proposed relationship properties now exist:
 
-| Property | Domain | Range | Qualifiers | Example |
-|---|---|---|---|---|
-| `investedIn` | org, person | org | amount, date, round | "Sequoia invested in Kalshi" |
-| `fundedBy` | org | org, person | amount, date, round | Inverse of investedIn |
-| `acquiredBy` | org | org | amount, date | |
-| `partneredWith` | org | org | type, startDate, scope | "Kalshi partnered with NHL" |
-| `regulatedBy` | org | org | jurisdiction, status | "Kalshi regulated by CFTC" |
-| `suedBy` | org, person | org, person | date, jurisdiction, status | "Kalshi sued by Nevada" |
-| `competesWith` | org | org | market, basis | "Kalshi competes with Polymarket" |
-| `employedAt` | person | org | role, startTime, endTime | |
-| `foundedOrg` | person | org | date | |
-| `addresses` | approach, policy | risk | | |
-| `implementedBy` | approach | org, project | | |
+| Property | KB status | KB `inverseId` | Notes |
+|---|---|---|---|
+| `employed-by` | Implemented | `employer-of` | ref, temporal |
+| `founded-by` | Implemented | `founder-of` | refs |
+| `parent-org` | Implemented | `subsidiary-of` | ref |
+| `subsidiary-of` | Implemented | `parent-org` | refs, computed |
+| `invested-in` | Not yet | — | Partially covered by funding-rounds item collection |
+| `partnered-with` | Not yet | — | |
+| `regulated-by` | Not yet | — | |
+| `sued-by` | Not yet | — | |
+| `competes-with` | Not yet | — | |
+| `addresses` | Not yet | — | For approach/policy to risk |
+| `implemented-by` | Not yet | — | For approach to org/project |
+
+The KB's item collections (e.g., `funding-rounds` with `lead_investor` as a `ref` field) handle some relationship patterns that don't map cleanly to simple property-value facts. For example, a funding round involves an amount, date, valuation, and lead investor — this is better represented as a structured item than as separate `investedIn` facts.
 
 ### Layer 4: Claim Types and Confidence
+
+**Status: Not yet implemented in KB.** This layer remains aspirational. The KB system's `source`, `sourceQuote`, and `notes` fields provide basic provenance, but the structured confidence taxonomy below is not part of the current KB schema. This is the most significant gap between the proposal and the implementation.
 
 Following the taxonomy from the Claim-First Architecture proposal:
 
@@ -182,6 +199,8 @@ Following the taxonomy from the Claim-First Architecture proposal:
 
 ## Worked Example: Kalshi Page Decomposed
 
+> **Note (March 2026):** This worked example was created before the KB system existed and uses a hypothetical claim schema (`data/claims/kalshi.yaml`) that was never implemented. Many of the properties used below (e.g., `foundedBy`, `fundedBy`, `headquarters`) now exist as KB properties in `packages/kb/data/properties.yaml`, and entity data like funding rounds are stored as structured items in KB entity files (`packages/kb/data/things/kalshi.yaml`). The claim-level metadata (confidence, type taxonomy, reasoning chains) shown here remains aspirational — the KB system does not yet track these. The example is preserved because it demonstrates the analytical decomposition process and the value of structured claims.
+
 The Kalshi wiki page contains \~332 lines of prose with 87 footnoted citations. Below is how its content would decompose into structured claims using the property ontology above.
 
 ### Entity Profile (Structured Properties)
@@ -189,7 +208,8 @@ The Kalshi wiki page contains \~332 lines of prose with 87 footnoted citations. 
 These are property-value pairs on the Kalshi entity itself — the equivalent of a Wikidata item's core statements:
 
 ```yaml
-# data/claims/kalshi-profile.yaml
+# Hypothetical format — not implemented. In the KB system, entity data lives
+# in packages/kb/data/things/kalshi.yaml using the KB fact schema.
 entity: kalshi
 entityType: organization
 subcategory: architecture
@@ -238,7 +258,9 @@ properties:
 These are verifiable assertions extracted from the prose. Each links to its source and can be independently verified, updated, or superseded.
 
 ```yaml
-# data/claims/kalshi.yaml
+# Hypothetical claim schema — not implemented as shown. The KB system stores
+# facts per-entity in packages/kb/data/things/kalshi.yaml without claim-level
+# metadata like confidence, type taxonomy, or reasoning chains.
 entity: kalshi
 claims:
 
@@ -1128,9 +1150,9 @@ With these 62 claims structured, you could:
 
 ### Decision 1: How many properties to start with?
 
-Start with **25-30** relationship properties covering the most common cross-entity relationships in the wiki domain. Based on the Kalshi exercise and the wiki's entity types:
+**Resolved.** The KB system launched with \~100 properties and continues to grow. The original recommendation of 25-30 was conservative; in practice, the combination of financial metrics, biographical data, organizational structure, and AI-specific properties required a larger vocabulary. This aligns with the document's own research note that "80-150 total properties" would be needed.
 
-**Recommended initial vocabulary:**
+**Originally recommended initial vocabulary (most now exist in KB):**
 
 | # | Property | Domain | Range |
 |---|---|---|---|
@@ -1162,105 +1184,139 @@ Start with **25-30** relationship properties covering the most common cross-enti
 
 ### Decision 2: Where do properties live?
 
-A new file: `data/properties.yaml`, following the pattern of `data/fact-measures.yaml`:
+**Resolved.** Properties live in `packages/kb/data/properties.yaml`. The format evolved from what was proposed but follows the same principles:
 
 ```yaml
-# data/properties.yaml
+# packages/kb/data/properties.yaml (actual format)
 properties:
-  foundedBy:
-    label: "Founded by"
-    description: "Person(s) who founded an organization"
-    domainIncludes: [organization]
-    rangeIncludes: [person]
-    inverse: foundedOrg
-    cardinality: multi        # can have multiple founders
-    qualifiers: [date]
+  founded-by:
+    name: Founded By
+    description: "Person(s) who founded this organization"
+    dataType: refs
+    category: people
+    appliesTo: [organization]
+    inverseId: founder-of
+    inverseName: Founded
 
-  investedIn:
-    label: "Invested in"
-    description: "Financial investment by one entity in another"
-    domainIncludes: [organization, person, funder]
-    rangeIncludes: [organization]
-    inverse: fundedBy
-    cardinality: multi
-    qualifiers: [amount, date, round, leadInvestor]
+  employed-by:
+    name: Employed By
+    description: "Organization this person currently or historically works for"
+    dataType: ref
+    category: people
+    temporal: true
+    appliesTo: [person]
+    inverseId: employer-of
+    inverseName: Employs
 
-  partneredWith:
-    label: "Partnered with"
-    description: "Business or strategic partnership"
-    domainIncludes: [organization]
-    rangeIncludes: [organization]
-    symmetric: true           # A partners with B implies B partners with A
-    cardinality: multi
-    qualifiers: [partnershipType, startDate, duration, scope]
+  revenue:
+    name: Revenue
+    description: "Annualized run-rate revenue (ARR) or trailing twelve-month revenue"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
 ```
+
+Key differences from the original proposal: kebab-case property IDs instead of camelCase, `appliesTo` instead of `domainIncludes`/`rangeIncludes`, `inverseId` instead of `inverse`, and `display` config for rendering. The `rangeIncludes` concept is implicit in the `dataType` (ref/refs targets are validated against entity existence, not type-constrained).
 
 ### Decision 3: How do claims and facts coexist?
 
-Numeric claims should **reference** fact entries rather than duplicate them:
+**Partially resolved by KB.** In the KB system, all structured data lives in a single place: entity files in `packages/kb/data/things/`. Facts are stored directly on entities with source attribution:
 
 ```yaml
-# Claim references a fact
-- id: c-kalshi-025
-  property: fundedBy
-  text: "Raised $1 billion Series E at $11 billion valuation"
-  type: numeric
-  factRef:
-    entity: kalshi
-    factId: abc123        # Points to data/facts/kalshi.yaml
-  # ...
+# packages/kb/data/things/kalshi.yaml (actual KB format)
+facts:
+  - id: f_kalshi_val_2025
+    property: valuation
+    value: 11e9
+    asOf: 2025-12
+    source: https://example.com/kalshi-series-e
+    sourceQuote: "$11 billion valuation"
+    notes: "Series E round led by Paradigm"
 ```
 
-This avoids two sources of truth for the same number. The fact store handles display formatting, timeseries, staleness detection. The claim store handles provenance, confidence, entity relationships.
+This eliminates the dual-store problem. The original proposal's distinction between "fact store" (display, timeseries) and "claim store" (provenance, confidence) collapsed into a single KB fact with both display config (from `properties.yaml`) and provenance (source fields on each fact). The claim-level metadata (confidence, type taxonomy) proposed in Layer 4 is not yet part of KB facts.
 
 ### Decision 4: Advisory constraints or hard enforcement?
 
-**Advisory** (Schema.org style). Constraints in `properties.yaml` serve three purposes:
-
-1. **Dashboard filtering** — Show "all `investedIn` claims" on a funding overview page
-2. **Validation warnings** — `crux validate` flags a `foundedBy` claim on a risk entity as unusual
-3. **Authoring suggestions** — When extracting claims for an organization entity, suggest organization-applicable properties
-
-But never block a claim from being created because it uses a property outside its declared domain. Real-world data is messy.
+**Resolved: Advisory with validation.** The KB system follows the Schema.org-style approach recommended here. `appliesTo` constraints in `properties.yaml` are enforced by KB validation rules — using a property on an entity type it doesn't apply to generates a validation warning — but the system does not hard-block fact creation. The 23 validation rules cover integrity (valid property IDs, valid refs), consistency (temporal flags match property declarations), and quality (source coverage) without being overly restrictive.
 
 ---
 
 ## Implementation Path
 
-### Phase 1: Property vocabulary (data layer only)
+### Phase 1: Property vocabulary (data layer only) — COMPLETE
 
-1. Create `data/properties.yaml` with the initial 25 properties
-2. Add a `Property` Zod schema to `data/schema.ts`
-3. Validate property references in build-data
+1. ~~Create `data/properties.yaml` with the initial 25 properties~~ -- Done: `packages/kb/data/properties.yaml` with 100+ properties
+2. ~~Add a `Property` Zod schema to `data/schema.ts`~~ -- Done: KB validation in `packages/kb/`
+3. ~~Validate property references in build-data~~ -- Done: 23 validation rules
 
-### Phase 2: Kalshi pilot
+### Phase 2: Entity data population — COMPLETE
 
-1. Create `data/claims/kalshi.yaml` with the 62 claims above
-2. Build a basic `/internal/claims/` dashboard showing claims by entity, cluster, and property
-3. Verify the Kalshi wiki page could be regenerated from claims (don't actually regenerate — just verify coverage)
+1. ~~Pilot with a few entities~~ -- Done: 360+ entities in `packages/kb/data/things/`
+2. ~~Build dashboards~~ -- Done: Fact Dashboard (E898) and related citation dashboards
+3. ~~Define schemas per entity type~~ -- Done: 19 schemas in `packages/kb/data/schemas/`
 
-### Phase 3: Extraction tooling
+### Phase 3: Extraction and display tooling — COMPLETE
 
-1. Extend `crux facts extract` to produce full claims (not just numeric facts)
-2. Add `crux claims extract <entity>` that processes an MDX page into structured claims
-3. Add `crux claims validate` that checks property constraints, source coverage, and temporal freshness
+1. ~~Integrate KB facts into wiki pages~~ -- Done: `<KBF>`, `<KBFactValue>`, and `<Calc>` MDX components
+2. ~~Build fact extraction pipeline~~ -- Done: `crux footnotes` commands for migrating claims to KB facts
+3. ~~Validate property constraints and source coverage~~ -- Done: KB validation rules
 
-### Phase 4: Second entity, iteration
+### Phase 4: Claim-level metadata — NOT STARTED
 
-1. Pick a well-developed entity (Anthropic, OpenAI) and extract its claims
-2. Test cross-entity queries (e.g., all `investedIn` claims mentioning both)
-3. Refine the property vocabulary based on what's missing or redundant
+This is the remaining gap. The KB system captures *what is true* with sources, but does not yet support:
+
+1. Claim-type taxonomy (factual, consensus, analytical, speculative)
+2. Confidence levels (verified, partial, unverified)
+3. Explicit reasoning chains for analytical claims (`supportingClaims`)
+4. Verification status tracking
+5. Claim clustering for topical grouping
 
 ---
 
 ## Open Questions
 
-1. **Claim ID format.** The `c-kalshi-001` format is readable but doesn't scale across entities. Alternative: 8-char hex like fact IDs. Trade-off: readability vs. collision resistance.
+Some original questions have been resolved by KB; others remain open.
 
-2. **Claim file granularity.** One file per entity (`data/claims/kalshi.yaml`) or one file per cluster (`data/claims/kalshi/funding.yaml`)? Per-entity is simpler; per-cluster is more manageable for large entities.
+1. **~~Claim ID format.~~** Resolved: KB uses `f_` prefixed IDs (e.g., `f_qR5tY9wE1a`) — 10-char alphanumeric, generated, collision-resistant. The `c-kalshi-001` format from this proposal was never adopted.
 
-3. **Who maintains claims?** The content pipeline (`crux content improve`) writes prose. Should it also update claims? Or should claims be a separate pipeline that the prose pipeline reads from?
+2. **~~File granularity.~~** Resolved: One file per entity in `packages/kb/data/things/`. Large entities have many facts in one file, which works well in practice.
 
-4. **How do claims and prose stay in sync?** If a claim is updated (new valuation), the prose page should reflect it. If prose is edited directly, should claims be re-extracted? The Claim-First Architecture proposal's answer is "claims are primary, prose is derived" — but that's the long-term vision. In the short term, they'll coexist.
+3. **Who maintains facts?** Partially resolved. The `crux footnotes` pipeline can migrate prose claims to KB facts. The content improve pipeline (`crux content improve`) writes prose but does not yet update KB facts directly. KB facts and prose coexist, with `<KBF>` components bridging them in MDX.
 
-5. **Property hierarchy.** Should `fundedBy` be a sub-property of `investedIn`? Schema.org uses `rdfs:subPropertyOf`. For 25 properties this probably isn't needed yet, but as the vocabulary grows, grouping related properties becomes useful for dashboard navigation.
+4. **How do facts and prose stay in sync?** The `<KBF>` and `<KBFactValue>` MDX components render KB fact values inline in prose, so updating a KB fact automatically updates the displayed value. For prose that doesn't use these components, sync remains manual.
+
+5. **Property hierarchy.** Not yet implemented. KB properties have `category` groupings (financial, people, biographical, organization, product, etc.) but no formal sub-property relationships. With 100+ properties, some hierarchy may become useful for dashboard navigation.
+
+6. **Claim-level metadata.** (New) Should the KB system add confidence/verification fields to facts? The current source/notes fields are free-text. Adding structured confidence would enable the verification workflows described in Layer 4, but adds complexity to every fact entry.
+
+---
+
+## Current Status Summary (March 2026)
+
+| Proposal area | Status | Where it lives |
+|---|---|---|
+| Property vocabulary | Implemented (100+ properties) | `packages/kb/data/properties.yaml` |
+| Entity type schemas | Implemented (19 types) | `packages/kb/data/schemas/*.yaml` |
+| Entity data files | Implemented (360+ entities) | `packages/kb/data/things/*.yaml` |
+| Value types (number, text, date, ref, etc.) | Implemented (9 types) | KB fact schema |
+| Temporal qualifiers | Implemented (`asOf`, `validEnd`) | KB fact fields |
+| Source attribution | Implemented (source, sourceResource, sourceQuote, notes) | KB fact fields |
+| Inverse relationships | Implemented (auto-computed from `inverseId`) | `properties.yaml` declarations |
+| Item collections (funding-rounds, etc.) | Implemented | Entity type schemas |
+| Display configuration | Implemented (divisor, prefix, suffix) | `properties.yaml` display config |
+| Validation | Implemented (23 rules) | KB validation system |
+| MDX integration | Implemented (`<KBF>`, `<KBFactValue>`, `<Calc>`) | MDX components |
+| Fact extraction pipeline | Implemented | `crux footnotes` commands |
+| Claim-type taxonomy | Not implemented | — |
+| Confidence / verification levels | Not implemented | — |
+| Reasoning chains (`supportingClaims`) | Not implemented | — |
+| Claim clustering | Not implemented | — |
+
+The KB system has successfully realized the core data model proposed in this document. The remaining aspirational layer (claim-level metadata for confidence, verification, and reasoning) represents an evolution beyond what most knowledge graphs implement, and may be pursued if the use cases for it become clearer.
