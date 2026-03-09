@@ -873,28 +873,45 @@ async function buildPageReferenceIndex() {
     return {};
   }
 
-  try {
-    const headers = { 'Content-Type': 'application/json' };
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+  const headers = { 'Content-Type': 'application/json' };
+  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
-    const res = await fetch(`${serverUrl}/api/references/all`, {
-      headers,
-      signal: AbortSignal.timeout(15_000),
-    });
+  // Retry with increasing timeouts — this endpoint can be slow on large datasets
+  const retryTimeouts = [30_000, 60_000];
+  for (let i = 0; i < retryTimeouts.length; i++) {
+    try {
+      const res = await fetch(`${serverUrl}/api/references/all`, {
+        headers,
+        signal: AbortSignal.timeout(retryTimeouts[i]),
+      });
 
-    if (!res.ok) {
-      console.log(`  pageReferenceIndex: skipped (server returned ${res.status})`);
+      if (!res.ok) {
+        console.log(`  pageReferenceIndex: server returned ${res.status} (attempt ${i + 1}/${retryTimeouts.length})`);
+        if (i < retryTimeouts.length - 1) continue;
+        console.warn('  ⚠ pageReferenceIndex: all attempts failed — citations will show "data unavailable"');
+        return {};
+      }
+
+      const data = await res.json();
+      const pages = data.pages || {};
+      const pageCount = Object.keys(pages).length;
+      console.log(`  pageReferenceIndex: ${pageCount} pages, ${data.totalClaimRefs} claim refs, ${data.totalCitations} citations`);
+
+      if (pageCount === 0 && data.totalCitations === 0) {
+        console.warn('  ⚠ pageReferenceIndex: server returned 0 pages — citations will show "data unavailable"');
+      }
+
+      return pages;
+    } catch (err) {
+      console.log(`  pageReferenceIndex: ${err.message || 'server unavailable'} (attempt ${i + 1}/${retryTimeouts.length})`);
+      if (i < retryTimeouts.length - 1) continue;
+      console.warn('  ⚠ pageReferenceIndex: all attempts failed — citations will show "data unavailable"');
       return {};
     }
-
-    const data = await res.json();
-    console.log(`  pageReferenceIndex: ${data.totalPages} pages, ${data.totalClaimRefs} claim refs, ${data.totalCitations} citations`);
-    return data.pages || {};
-  } catch (err) {
-    console.log(`  pageReferenceIndex: skipped (${err.message || 'server unavailable'})`);
-    return {};
   }
+  // Unreachable — loop always returns, but TypeScript/eslint may require it
+  return {};
 }
 
 /**

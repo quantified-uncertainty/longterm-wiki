@@ -6,6 +6,9 @@ import {
   MAIN_BRANCH_COOLDOWN_SECONDS,
   MAIN_BRANCH_ABANDON_THRESHOLD,
   isMainBranchAbandoned,
+  isAbandoned,
+  recordFailure,
+  resetFailCount,
   trackMainFixPr,
   getTrackedMainFixPr,
   clearTrackedMainFixPr,
@@ -101,6 +104,40 @@ describe('tracked main fix PR', () => {
     expect(getTrackedMainFixPr()).not.toBeNull();
     clearTrackedMainFixPr();
     expect(getTrackedMainFixPr()).toBeNull();
+  });
+});
+
+// ── isAbandoned (PR failure tracking) ────────────────────────────────────────
+
+describe('isAbandoned', () => {
+  const testKey = `test-abandoned-${Date.now()}`;
+
+  afterEach(() => {
+    const file = join(STATE_DIR, `failures-${testKey}`);
+    if (existsSync(file)) rmSync(file);
+  });
+
+  it('returns false with no failures', () => {
+    expect(isAbandoned(testKey)).toBe(false);
+  });
+
+  it('returns false after 1 failure', () => {
+    recordFailure(testKey);
+    expect(isAbandoned(testKey)).toBe(false);
+  });
+
+  it('returns true after 2 failures (threshold)', () => {
+    recordFailure(testKey);
+    recordFailure(testKey);
+    expect(isAbandoned(testKey)).toBe(true);
+  });
+
+  it('resets to non-abandoned after resetFailCount', () => {
+    recordFailure(testKey);
+    recordFailure(testKey);
+    expect(isAbandoned(testKey)).toBe(true);
+    resetFailCount(testKey);
+    expect(isAbandoned(testKey)).toBe(false);
   });
 });
 
