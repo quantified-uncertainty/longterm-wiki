@@ -62,7 +62,7 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
       const lineCount = kbContext.split('\n').length;
       log('improve', `  Found KB entity with ${lineCount} lines of structured facts`);
     } else {
-      log('improve', '  No KB entity found for this page');
+      log('improve', '  No KB entity found for this page (or entity has no facts)');
     }
   } catch (err: unknown) {
     const error = err instanceof Error ? err : new Error(String(err));

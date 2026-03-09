@@ -82,7 +82,9 @@ export async function buildKbContextForPage(
   let graph: Graph;
   try {
     graph = await getGraph();
-  } catch {
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[kb-context] Failed to load KB graph: ${msg} — skipping KB context`);
     return null;
   }
 
@@ -113,11 +115,12 @@ export async function buildKbContextForPage(
     const nonDerived = propertyFacts.filter((f) => !f.id.startsWith('inv_'));
     if (nonDerived.length === 0) continue;
 
+    // Sort newest-first so the most authoritative (recent) value appears last in prompt context
     const sorted = nonDerived.slice().sort((a, b) => {
       if (!a.asOf && !b.asOf) return 0;
       if (!a.asOf) return 1;
       if (!b.asOf) return -1;
-      return a.asOf.localeCompare(b.asOf);
+      return b.asOf.localeCompare(a.asOf);
     });
 
     for (const fact of sorted) {

@@ -133,12 +133,15 @@ function loadKbPropertyIds(): Set<string> {
   try {
     const raw = readFileSync(join(KB_DATA_DIR, 'properties.yaml'), 'utf-8');
     const ids = new Set<string>();
-    // Property keys appear as "  <key>:" at 2-space indentation under "properties:"
+    // Property keys appear as "  <key>:" at exactly 2-space indentation under "properties:".
+    // Nested field keys (name, description, appliesTo, display, etc.) are at 4+ spaces and won't match.
     for (const match of raw.matchAll(/^  ([a-z][a-z-]*):/gm)) {
       ids.add(match[1]);
     }
     return ids;
-  } catch {
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[validate-component-refs] Could not load KB properties.yaml: ${msg} — KBF property validation will be skipped`);
     return new Set();
   }
 }
@@ -157,7 +160,9 @@ function loadKbEntitySlugs(): Set<string> {
       }
     }
     return slugs;
-  } catch {
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[validate-component-refs] Could not read KB things/ directory: ${msg} — KBF entity validation will be skipped`);
     return new Set();
   }
 }
