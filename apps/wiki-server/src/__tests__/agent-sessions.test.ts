@@ -6,11 +6,6 @@ import {
   postJson,
 } from "./test-utils";
 
-// ---- In-memory sessions fixture (simulates FK target) ----
-// Pre-seeded IDs that are valid FK targets for session_id.
-// Tests that use sessionId: 42 must find it here; others must not.
-const VALID_SESSION_IDS = new Set<number>([42]);
-
 // ---- In-memory store simulating agent_sessions table ----
 
 let nextId = 1;
@@ -21,12 +16,21 @@ let store: Array<{
   session_type: string;
   issue_number: number | null;
   checklist_md: string;
-  session_id: number | null;
   status: string;
   started_at: Date;
   completed_at: Date | null;
   created_at: Date;
   updated_at: Date;
+  // Session log fields (Phase 2+3 consolidation, issue #1668)
+  date: string | null;
+  title: string | null;
+  summary: string | null;
+  model: string | null;
+  cost: string | null;
+  cost_cents: number | null;
+  duration: string | null;
+  duration_minutes: number | null;
+  reviewed: boolean | null;
 }>;
 
 function resetStore() {
@@ -54,12 +58,20 @@ const dispatch: SqlDispatcher = (query, params) => {
       session_type: params[2] as string,
       issue_number: params[3] as number | null,
       checklist_md: params[4] as string,
-      session_id: null,
       status: "active",
       started_at: new Date(),
       completed_at: null,
       created_at: new Date(),
       updated_at: new Date(),
+      date: null,
+      title: null,
+      summary: null,
+      model: null,
+      cost: null,
+      cost_cents: null,
+      duration: null,
+      duration_minutes: null,
+      reviewed: null,
     };
     store.push(row);
     return [row];
@@ -95,17 +107,27 @@ const dispatch: SqlDispatcher = (query, params) => {
           case "checklist_md":
             store[idx].checklist_md = params[pIdx] as string;
             break;
-          case "session_id": {
-            const sid = params[pIdx] as number | null;
-            if (sid !== null && !VALID_SESSION_IDS.has(sid)) {
-              // Simulate FK constraint violation — the route translates this to 400.
-              throw new Error(
-                `insert or update on table "agent_sessions" violates foreign key constraint`
-              );
-            }
-            store[idx].session_id = sid;
+          case "date":
+            store[idx].date = params[pIdx] as string | null;
             break;
-          }
+          case "title":
+            store[idx].title = params[pIdx] as string | null;
+            break;
+          case "model":
+            store[idx].model = params[pIdx] as string | null;
+            break;
+          case "cost":
+            store[idx].cost = params[pIdx] as string | null;
+            break;
+          case "cost_cents":
+            store[idx].cost_cents = params[pIdx] as number | null;
+            break;
+          case "duration_minutes":
+            store[idx].duration_minutes = params[pIdx] as number | null;
+            break;
+          case "reviewed":
+            store[idx].reviewed = params[pIdx] as boolean | null;
+            break;
           case "status":
             store[idx].status = params[pIdx] as string;
             break;
@@ -505,59 +527,70 @@ describe("Agent Sessions API", () => {
       expect(res.status).toBe(400);
     });
 
-    it("sets sessionId FK link to session log", async () => {
+    it("sets session log fields (title, model, cost)", async () => {
       await postJson(app, "/api/agent-sessions", sampleSession);
 
       const res = await patchJson(app, "/api/agent-sessions/1", {
-        sessionId: 42,
+        title: "Fix widget rendering bug",
+        model: "claude-sonnet-4-6",
+        cost: "~$0.50",
+        date: "2026-03-08",
       });
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.sessionId).toBe(42);
+      expect(body.title).toBe("Fix widget rendering bug");
+      expect(body.model).toBe("claude-sonnet-4-6");
+      expect(body.cost).toBe("~$0.50");
+      // cost_cents parsed from cost string
+      expect(body.costCents).toBe(50);
     });
 
-    it("clears sessionId with null", async () => {
+    it("clears session log fields with null", async () => {
       await postJson(app, "/api/agent-sessions", sampleSession);
+      await patchJson(app, "/api/agent-sessions/1", {
+        title: "Some title",
+        model: "claude-sonnet-4-6",
+      });
 
-      // Set it first
-      await patchJson(app, "/api/agent-sessions/1", { sessionId: 42 });
-
-      // Now clear it
       const res = await patchJson(app, "/api/agent-sessions/1", {
-        sessionId: null,
+        title: null,
+        model: null,
       });
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.sessionId).toBeNull();
+      expect(body.title).toBeNull();
+      expect(body.model).toBeNull();
     });
 
-    it("rejects non-integer sessionId", async () => {
+    it("rejects invalid date format", async () => {
       await postJson(app, "/api/agent-sessions", sampleSession);
 
       const res = await patchJson(app, "/api/agent-sessions/1", {
-        sessionId: 1.5,
+        date: "March 8, 2026",
       });
       expect(res.status).toBe(400);
     });
 
-    it("rejects zero sessionId", async () => {
+    it("accepts explicit costCents without cost string", async () => {
       await postJson(app, "/api/agent-sessions", sampleSession);
 
       const res = await patchJson(app, "/api/agent-sessions/1", {
-        sessionId: 0,
+        costCents: 250,
       });
-      expect(res.status).toBe(400);
-    });
-
-    it("returns 400 invalid_reference for non-existent sessionId", async () => {
-      await postJson(app, "/api/agent-sessions", sampleSession);
-
-      const res = await patchJson(app, "/api/agent-sessions/1", {
-        sessionId: 9999, // not in VALID_SESSION_IDS — FK violation
-      });
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.error).toBe("invalid_reference");
+      expect(body.costCents).toBe(250);
+    });
+
+    it("accepts reviewed flag", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        reviewed: true,
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.reviewed).toBe(true);
     });
   });
 

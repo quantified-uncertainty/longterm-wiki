@@ -1176,7 +1176,7 @@ export const UpdateAgentSessionSchema = z.object({
   fixesPrUrl: z.string().url().max(1000).nullable().optional(),
   // Session log fields — written at session end (replaces separate sessions table for agent workflow)
   date: DateStringSchema.optional(),
-  title: z.string().min(1).max(1000).optional(),
+  title: z.string().min(1).max(1000).nullable().optional(),
   summary: z.string().max(10000).nullable().optional(),
   model: z.string().max(100).nullable().optional(),
   duration: z.string().max(100).nullable().optional(),
@@ -1184,9 +1184,9 @@ export const UpdateAgentSessionSchema = z.object({
   costCents: z.number().int().min(0).nullable().optional(),
   durationMinutes: z.number().min(0).nullable().optional(),
   checksYaml: z.string().max(10000).nullable().optional(),
-  issuesJson: z.unknown().nullable().optional(),
-  learningsJson: z.unknown().nullable().optional(),
-  recommendationsJson: z.unknown().nullable().optional(),
+  issuesJson: z.array(z.unknown()).nullable().optional(),
+  learningsJson: z.array(z.unknown()).nullable().optional(),
+  recommendationsJson: z.array(z.unknown()).nullable().optional(),
   reviewed: z.boolean().nullable().optional(),
   /** Page IDs touched in this session — replaces agent_session_pages when provided */
   pages: z.array(z.string().min(1).max(200)).optional(),

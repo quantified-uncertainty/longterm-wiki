@@ -181,6 +181,7 @@ const agentSessionsApp = new Hono()
       checklistMd, status, prUrl, prOutcome, fixesPrUrl,
       date, title, summary, model, duration, cost, checksYaml,
       issuesJson, learningsJson, recommendationsJson, reviewed, pages,
+      parsed.data.costCents, parsed.data.durationMinutes,
     ].some((v) => v !== undefined);
     if (!hasAnyField) return validationError(c, "At least one field must be provided");
     const updates: Record<string, unknown> = { updatedAt: new Date() };
