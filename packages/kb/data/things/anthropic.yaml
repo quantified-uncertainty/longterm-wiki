@@ -137,11 +137,13 @@ facts:
 
   - id: f_hc_2024_09
     property: headcount
-    value: 1097
+    value:
+      - 870
+      - 2847
     asOf: 2024-09
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
     sourceResource: 423364c2f6bc5f49
-    notes: "Various sources report 870-2847 depending on method; 1097 is one consistent estimate"
+    notes: "Point estimate 1097 from LinkedIn/consistent sources; full range 870-2847 depending on methodology"
 
   - id: f_hc_2026_01
     property: headcount
