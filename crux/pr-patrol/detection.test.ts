@@ -240,6 +240,31 @@ describe('detectIssues', () => {
     expect(result.issues).toContain('ci-failure');
   });
 
+  it('returns names of failing checks', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: { nodes: [
+                { name: 'build', conclusion: 'SUCCESS' },
+                { name: 'validate', conclusion: 'FAILURE' },
+              ] },
+            },
+          },
+        }],
+      },
+    });
+    const result = detectIssues(pr, 0);
+    expect(result.failingChecks).toEqual(['validate']);
+  });
+
+  it('returns empty failingChecks when all checks pass', () => {
+    const pr = makePrNode();
+    const result = detectIssues(pr, 0);
+    expect(result.failingChecks).toEqual([]);
+  });
+
   it('accepts Fixes and Resolves as issue refs', () => {
     for (const keyword of ['Closes #1', 'Fixes #2', 'Resolves #3']) {
       const pr = makePrNode({ body: `## Test plan\n\n${keyword}` });

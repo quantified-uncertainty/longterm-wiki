@@ -40,6 +40,35 @@ describe('buildPrompt', () => {
     expect(prompt).toContain('pre-existing failure on main');
   });
 
+  it('includes failing check names in CI failure section when provided', () => {
+    const pr = makeDetectedPr({
+      issues: ['ci-failure'],
+      failingChecks: ['validate', 'test'],
+    });
+    const prompt = buildPrompt(pr, REPO);
+    expect(prompt).toContain('The following CI checks are failing: validate, test');
+    expect(prompt).toContain('saves you from needing to run');
+  });
+
+  it('does not include failing check info when failingChecks is empty', () => {
+    const pr = makeDetectedPr({
+      issues: ['ci-failure'],
+      failingChecks: [],
+    });
+    const prompt = buildPrompt(pr, REPO);
+    expect(prompt).toContain('### CI Failure');
+    expect(prompt).not.toContain('The following CI checks are failing');
+  });
+
+  it('does not include failing check info when failingChecks is undefined', () => {
+    const pr = makeDetectedPr({
+      issues: ['ci-failure'],
+    });
+    const prompt = buildPrompt(pr, REPO);
+    expect(prompt).toContain('### CI Failure');
+    expect(prompt).not.toContain('The following CI checks are failing');
+  });
+
   it('includes missing-testplan section', () => {
     const pr = makeDetectedPr({ issues: ['missing-testplan'] });
     const prompt = buildPrompt(pr, REPO);
