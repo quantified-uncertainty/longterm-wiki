@@ -288,3 +288,24 @@ export function getKBItemsMentioning(
 
   return results;
 }
+
+/**
+ * Get a map of entityId → total item entry count across all collections.
+ * Useful for dashboard-level aggregation without knowing collection names.
+ */
+export function getKBItemCounts(): Map<string, number> {
+  const kb = getKB();
+  if (!kb) return new Map();
+
+  const result = new Map<string, number>();
+  for (const [entityId, collections] of Object.entries(kb.items)) {
+    let count = 0;
+    for (const entries of Object.values(collections)) {
+      count += entries.length;
+    }
+    if (count > 0) {
+      result.set(entityId, count);
+    }
+  }
+  return result;
+}
