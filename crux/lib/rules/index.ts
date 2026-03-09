@@ -93,9 +93,11 @@ import { noExecSyncRule } from './no-exec-sync.ts';
 
 // Data integrity checks
 import { resourceRefIntegrityRule } from './resource-ref-integrity.ts';
+import { kbfRefsRule } from './kbf-refs.ts';
 
 // Deprecated component detection
 import { noDeprecatedComponentsRule } from './no-deprecated-components.ts';
+
 // Pipeline artifact detection
 import { pipelineArtifactsRule } from './pipeline-artifacts.ts';
 
@@ -180,6 +182,7 @@ export {
   urlSafetyRule,
   noExecSyncRule,
   resourceRefIntegrityRule,
+  kbfRefsRule,
   noDeprecatedComponentsRule,
   pipelineArtifactsRule,
   footnoteIntegrityRule,
@@ -246,6 +249,7 @@ export const allRules: Rule[] = [
   urlSafetyRule,
   noExecSyncRule,
   resourceRefIntegrityRule,
+  kbfRefsRule,
   noDeprecatedComponentsRule,
   pipelineArtifactsRule,
   footnoteIntegrityRule,
