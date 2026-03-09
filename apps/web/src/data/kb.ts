@@ -170,6 +170,15 @@ export type KBFactVerdict =
   | "not_verifiable"
   | "verified";
 
+const VALID_VERDICTS: Set<string> = new Set([
+  "accurate",
+  "minor_issues",
+  "inaccurate",
+  "unsupported",
+  "not_verifiable",
+  "verified",
+]);
+
 /**
  * Get the citation verification status for a KB fact.
  * Returns the best verdict found by cross-referencing the fact's source URL
@@ -179,7 +188,8 @@ export function getKBFactVerification(factId: string): KBFactVerdict | undefined
   try {
     const db = getDatabase();
     const verdict = db.kbFactVerification?.[factId];
-    return verdict as KBFactVerdict | undefined;
+    if (!verdict || !VALID_VERDICTS.has(verdict)) return undefined;
+    return verdict as KBFactVerdict;
   } catch {
     return undefined;
   }

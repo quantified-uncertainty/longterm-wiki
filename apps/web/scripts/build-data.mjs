@@ -827,14 +827,36 @@ async function buildCitationQuotesBundle() {
 }
 
 /**
+ * Normalize a URL for fuzzy matching between resource URLs and citation URLs.
+ * Strips protocol, www. prefix, trailing slashes, and hash fragments. Preserves
+ * query string. Mirrors the logic in resource-utils.ts (cannot import .ts in .mjs).
+ */
+function normalizeUrlForMatch(str) {
+  try {
+    const url = new URL(str);
+    url.hostname = url.hostname.replace(/^www\./, '');
+    url.hash = '';
+    return (
+      url.host + url.pathname.replace(/\/+$/, '') + url.search
+    ).toLowerCase();
+  } catch {
+    return str.replace(/\/+$/, '').toLowerCase();
+  }
+}
+
+/**
  * Cross-reference KB fact source URLs with citation quotes to produce
  * a verification status map: factId → best accuracy verdict.
  *
  * This runs at build time with data already in memory — no API calls.
  * Returns { [factId]: verdictString } for facts whose source URL matches
  * a verified citation quote.
+ *
+ * @param {object} kb - Serialized KB data
+ * @param {object} citationQuotesBundle - Citation quotes keyed by page ID
+ * @param {Array} resources - Resources array from database.resources (for sourceResource lookups)
  */
-function buildKBFactVerification(kb, citationQuotesBundle) {
+function buildKBFactVerification(kb, citationQuotesBundle, resources) {
   if (!kb || !kb.facts || !citationQuotesBundle) {
     console.log('  kbFactVerification: skipped (no KB or citation data)');
     return {};
@@ -842,13 +864,13 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
 
   // Build a URL → best verdict map from all citation quotes across all pages.
   // A URL may appear in multiple pages with different verdicts; prefer the
-  // most informative verdict (accurate > minor_issues > unsupported > inaccurate > not_verifiable > verified-only).
+  // MOST CAUTIOUS verdict (worst case wins) so flagged issues are never hidden.
   const VERDICT_PRIORITY = {
-    accurate: 6,
-    minor_issues: 5,
-    inaccurate: 4,
-    unsupported: 3,
-    not_verifiable: 2,
+    inaccurate: 6,    // Most concerning → highest priority
+    unsupported: 5,
+    minor_issues: 4,
+    not_verifiable: 3,
+    accurate: 2,
     verified: 1,
   };
 
@@ -860,7 +882,7 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
       const verdict = q.accuracyVerdict || (q.quoteVerified ? 'verified' : null);
       if (!verdict) continue;
 
-      const normalizedUrl = q.url.replace(/\/+$/, '').toLowerCase();
+      const normalizedUrl = normalizeUrlForMatch(q.url);
       const existing = urlToVerdict.get(normalizedUrl);
       const existingPriority = existing ? (VERDICT_PRIORITY[existing] ?? 0) : 0;
       const newPriority = VERDICT_PRIORITY[verdict] ?? 0;
@@ -875,17 +897,38 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
     return {};
   }
 
+  // Build resource ID → URL map for sourceResource lookups
+  const resourceUrlById = new Map();
+  if (resources && Array.isArray(resources)) {
+    for (const r of resources) {
+      if (r.id && r.url) {
+        resourceUrlById.set(r.id, r.url);
+      }
+    }
+  }
+
   // Match KB fact source URLs against the citation URL map
   const verification = {};
   let matchCount = 0;
+  let resourceLookupCount = 0;
 
   for (const [entityId, facts] of Object.entries(kb.facts)) {
     for (const fact of facts) {
-      if (!fact.source || typeof fact.source !== 'string') continue;
-      // Only match URL sources
-      if (!fact.source.startsWith('http://') && !fact.source.startsWith('https://')) continue;
+      // Resolve the source URL: direct `source` field, or look up via `sourceResource`
+      let url = (fact.source && typeof fact.source === 'string') ? fact.source : null;
+      if (!url && fact.sourceResource) {
+        const resourceUrl = resourceUrlById.get(fact.sourceResource);
+        if (resourceUrl) {
+          url = resourceUrl;
+          resourceLookupCount++;
+        }
+      }
+      if (!url) continue;
 
-      const normalizedSource = fact.source.replace(/\/+$/, '').toLowerCase();
+      // Only match URL sources
+      if (!url.startsWith('http://') && !url.startsWith('https://')) continue;
+
+      const normalizedSource = normalizeUrlForMatch(url);
       const verdict = urlToVerdict.get(normalizedSource);
       if (verdict) {
         verification[fact.id] = verdict;
@@ -894,7 +937,7 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
     }
   }
 
-  console.log(`  kbFactVerification: ${matchCount} facts matched from ${urlToVerdict.size} citation URLs`);
+  console.log(`  kbFactVerification: ${matchCount} facts matched from ${urlToVerdict.size} citation URLs (${resourceLookupCount} via sourceResource)`);
   return verification;
 }
 
@@ -1321,7 +1364,7 @@ async function main() {
   // =========================================================================
   // KB FACT VERIFICATION — cross-reference KB source URLs with citation quotes
   // =========================================================================
-  database.kbFactVerification = buildKBFactVerification(database.kb, citationQuotesBundle);
+  database.kbFactVerification = buildKBFactVerification(database.kb, citationQuotesBundle, resources);
 
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates);

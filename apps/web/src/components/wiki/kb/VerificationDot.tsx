@@ -38,7 +38,7 @@ const VERDICT_CONFIG: Record<KBFactVerdict, VerificationDotConfig> = {
     label: "Unsupported",
   },
   not_verifiable: {
-    dotColor: "bg-gray-400",
+    dotColor: "bg-muted-foreground/40",
     label: "Not verifiable",
   },
   verified: {
