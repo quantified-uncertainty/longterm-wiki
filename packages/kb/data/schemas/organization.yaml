@@ -105,3 +105,17 @@ items:
       status: { type: text, description: "Current status (active, completed, winding-down)" }
       source: { type: text, description: "URL to announcement or report" }
       notes: { type: text, description: "Context, impact, or important details" }
+
+  stakeholders:
+    description: "Ownership stakeholders with equity, pledge, and alignment data"
+    fields:
+      name: { type: text, required: true, description: "Stakeholder name" }
+      category: { type: text, required: true, description: "Category (e.g., Co-founder CEO, Early investor, Strategic investor, Employees, Institutional)" }
+      stake_min: { type: number, description: "Minimum estimated equity stake as decimal (e.g., 0.02 = 2%)" }
+      stake_max: { type: number, description: "Maximum estimated equity stake as decimal" }
+      pledge_min: { type: number, description: "Minimum charitable pledge rate as decimal (e.g., 0.8 = 80%)" }
+      pledge_max: { type: number, description: "Maximum charitable pledge rate as decimal" }
+      ea_align_min: { type: number, description: "Minimum estimated EA alignment probability as decimal" }
+      ea_align_max: { type: number, description: "Maximum estimated EA alignment probability as decimal" }
+      entity_ref: { type: text, description: "Wiki entity numeric ID for linking (e.g., E91)" }
+      notes: { type: text, description: "Context notes shown in the table" }
