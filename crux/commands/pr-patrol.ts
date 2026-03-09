@@ -40,6 +40,8 @@ import {
   formatExplain,
 } from '../pr-patrol/format.ts';
 import { runWatchLoop } from '../pr-patrol/watch.ts';
+import { runBranchAgent, buildBranchAgentConfig } from '../pr-patrol/branch-agent.ts';
+import { parseRequiredInt } from '../lib/cli.ts';
 
 async function run(
   args: string[],
@@ -149,6 +151,23 @@ async function explain(
   return { output: formatExplain(colors), exitCode: 0 };
 }
 
+async function branchAgent(
+  args: string[],
+  options: CommandOptions,
+): Promise<CommandResult> {
+  const prArg = args[0];
+  const prNumber = parseRequiredInt(prArg);
+  if (!prNumber) {
+    return {
+      output: 'Error: branch-agent requires a PR number\n  Usage: crux pr-patrol branch-agent <PR#>\n',
+      exitCode: 1,
+    };
+  }
+  const config = buildBranchAgentConfig(prNumber, options);
+  await runBranchAgent(config);
+  return { output: '', exitCode: 0 };
+}
+
 async function mergeStatus(
   _args: string[],
   options: CommandOptions,
@@ -185,6 +204,7 @@ export const commands = {
   stats,
   explain,
   'merge-status': mergeStatus,
+  'branch-agent': branchAgent,
   default: run,
 };
 
@@ -195,11 +215,31 @@ PR Patrol Domain — Continuous PR maintenance daemon
 Commands:
   run (default)    Run the PR patrol daemon (continuous)
   once             Single check cycle, then exit
+  branch-agent     Per-PR persistent agent (Phase 1): dedicate full attention to one PR
   status           Show recent patrol activity (colorized, filterable)
   history          Browse full log with time ranges and filters
   stats            Aggregated metrics and success rates
   explain          Detailed explanation of what PR Patrol does
   merge-status     Show PRs labeled ${LABELS.STAGE_APPROVED} and their eligibility
+
+Branch Agent (phase 1 persistent watchdog):
+  crux pr-patrol branch-agent <PR#>     Watch and fix a specific PR continuously
+  crux pr-patrol branch-agent <PR#> --max-invocations=10   Cap at 10 fix sessions
+  crux pr-patrol branch-agent <PR#> --timeout=15           15-min per session timeout
+
+  The branch-agent dedicates full attention to one PR, running multiple short
+  fix sessions with CI waits between them. Unlike the daemon (which fixes one PR
+  per cycle), it doesn't compete for priority — useful for complex PRs that need
+  several iterations to get right.
+
+Branch Agent Options:
+  --max-invocations=N  Max Claude sessions to run (default: 20)
+  --timeout=N          Per-session timeout in minutes (default: 15)
+  --max-turns=N        Max turns per session (default: 30)
+  --ci-timeout=N       Max seconds to wait for CI (default: 900 = 15 min)
+  --ci-poll=N          CI poll interval in seconds (default: 30)
+  --dry-run            Show what would be done, don't fix
+  --skip-perms         Add --dangerously-skip-permissions to Claude CLI
 
 Status Options:
   --watch          Live-refreshing display (clears and redraws every interval)
@@ -244,15 +284,17 @@ Environment:
   PR_PATROL_REFLECTION_INTERVAL   Reflect every N cycles (default: 10)
 
 Examples:
-  crux pr-patrol once --dry-run          Preview what would be fixed/merged
-  crux pr-patrol run --interval=120      Run with 2-minute cycles
-  crux pr-patrol status                  Show recent activity
-  crux pr-patrol status --watch          Live-refreshing dashboard
-  crux pr-patrol status --watch --interval=5  Faster refresh
-  crux pr-patrol status --pr=1234        Show activity for a specific PR
-  crux pr-patrol history --since=7d      Browse last 7 days of logs
-  crux pr-patrol stats --since=30d       Monthly performance stats
-  crux pr-patrol explain                 How PR Patrol works
-  crux pr-patrol merge-status            Show merge-eligible PRs
+  crux pr-patrol once --dry-run                 Preview what would be fixed/merged
+  crux pr-patrol run --interval=120             Run with 2-minute cycles
+  crux pr-patrol branch-agent 1234              Watch PR #1234 until fixed/merged
+  crux pr-patrol branch-agent 1234 --dry-run    Preview what branch-agent would do
+  crux pr-patrol status                         Show recent activity
+  crux pr-patrol status --watch                 Live-refreshing dashboard
+  crux pr-patrol status --watch --interval=5    Faster refresh
+  crux pr-patrol status --pr=1234               Show activity for a specific PR
+  crux pr-patrol history --since=7d             Browse last 7 days of logs
+  crux pr-patrol stats --since=30d              Monthly performance stats
+  crux pr-patrol explain                        How PR Patrol works
+  crux pr-patrol merge-status                   Show merge-eligible PRs
 `.trim();
 }
