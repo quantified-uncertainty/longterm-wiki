@@ -164,6 +164,7 @@ items:
     type: funding-round
     entries:
       i_U3IQcbcouw:
+        name: "Series B"
         date: 2024-05
         amount: 6e9
         valuation: 24e9
@@ -171,6 +172,7 @@ items:
         notes: "Led by Andreessen Horowitz, Sequoia Capital, and others; valued at $24B pre-money"
 
       i_Eh90tSjmBw:
+        name: "Series C"
         date: 2024-12
         amount: 6e9
         valuation: 50e9
@@ -178,6 +180,7 @@ items:
         notes: "Closed December 2024; investors include Andreessen Horowitz, BlackRock, Fidelity, Kingdom Holding, Sequoia, and others"
 
       i_xai_series_e:
+        name: "Series E"
         date: 2026-01
         amount: 20e9
         valuation: 230e9
