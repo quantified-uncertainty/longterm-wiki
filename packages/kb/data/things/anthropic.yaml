@@ -393,21 +393,39 @@ items:
   funding-rounds:
     type: funding-round
     entries:
+      i_k7RmTe4nPQ:
+        date: 2021-01
+        amount: null
+        lead_investor: "Tallinn, Moskovitz, Eric Schmidt"
+        notes: "Seed round; amount undisclosed"
+
       i_VImpFJfKiQ:
-        date: 2021-04
+        date: 2021-05
         amount: 124e6
         valuation: 550e6
         lead_investor: jaan-tallinn
         source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
-        notes: "Seed/Series A combined round; Jaan Tallinn led, Dustin Moskovitz participated"
+        notes: "Series A; Jaan Tallinn led, Dustin Moskovitz participated"
 
       i_Xdb6KUs2og:
         date: 2022-04
         amount: 580e6
         valuation: 4e9
-        lead_investor: ftx
+        lead_investor: spark-capital
         source: https://fortune.com/2022/04/29/ai-startup-anthropic-raises-580-million/
-        notes: "FTX reportedly invested ~$500M; estate later sold stake for ~$1.4B"
+        notes: "Series B led by Spark Capital"
+
+      i_wQ8pNx3vJA:
+        date: 2022-06
+        amount: 500e6
+        lead_investor: ftx
+        notes: "FTX/Alameda investment; stake later sold for ~$1.4B to pay creditors"
+
+      i_hR5cYm9tKQ:
+        date: 2022-11
+        amount: 300e6
+        lead_investor: google
+        notes: "Initial Google investment for ~10% stake"
 
       i_aJCVQbfceQ:
         date: 2023-05
@@ -428,7 +446,13 @@ items:
         amount: 2e9
         lead_investor: google
         source: https://blog.google/technology/ai/google-anthropic-investment/
-        notes: "Part of Google's up-to-$2B commitment; ~10% equity stake and board observer seat"
+        notes: "Google follow-on; part of up-to-$2B commitment; board observer seat"
+
+      i_dN6bLx2wRA:
+        date: 2023-12
+        amount: 2e9
+        valuation: 18e9
+        notes: "Series D; various investors"
 
       i_05J6ESa7gA:
         date: 2024-03
