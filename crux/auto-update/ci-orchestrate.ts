@@ -557,8 +557,9 @@ export async function orchestrateCiAutoUpdate(
   // exclusively owned by this CI pipeline.
   try {
     git(['push', '-u', 'origin', branch]);
-  } catch {
-    console.log('Standard push failed, fetching remote ref and retrying with --force-with-lease');
+  } catch (pushErr: unknown) {
+    const msg = pushErr instanceof Error ? pushErr.message : String(pushErr);
+    console.log(`Standard push failed (${msg}), fetching remote ref and retrying with --force-with-lease`);
     try { git(['fetch', 'origin', branch]); } catch { /* branch may not exist remotely yet */ }
     git(['push', '--force-with-lease', '-u', 'origin', branch]);
   }

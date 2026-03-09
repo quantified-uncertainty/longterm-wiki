@@ -136,7 +136,8 @@ for i in "${!PATHS[@]}"; do
 
   if [ "$SHOULD_REMOVE" = true ]; then
     log "Removing stale worktree: $WT_PATH (branch: ${WT_BRANCH:-detached})"
-    if git worktree remove "$WT_PATH" --force 2>/dev/null; then
+    # Try without --force first to respect locks; fall back to --force only if needed
+    if git worktree remove "$WT_PATH" 2>/dev/null || git worktree remove "$WT_PATH" --force 2>/dev/null; then
       CLEANED=$((CLEANED + 1))
       log "  -> Removed successfully"
 
