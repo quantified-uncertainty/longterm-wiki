@@ -3,7 +3,6 @@ import {
   getKBProperties,
   getKBFacts,
 } from "@/data/kb";
-import { getEntityHref } from "@/data";
 import type { Fact, Property, Entity } from "@longterm-wiki/kb";
 import { formatKBFactValue, formatKBDate } from "@/components/wiki/kb/format";
 import { KBFactsTable } from "./kb-facts-table";
@@ -12,7 +11,6 @@ export interface FactRow {
   factId: string;
   entityId: string;
   entityName: string;
-  entityHref: string;
   entityType: string;
   propertyId: string;
   propertyName: string;
@@ -72,7 +70,6 @@ export function KBFactsExplorerContent() {
         factId: fact.id,
         entityId: entity.id,
         entityName: entity.name,
-        entityHref: getEntityHref(entity.id),
         entityType: entity.type,
         propertyId: fact.propertyId,
         propertyName: property?.name ?? fact.propertyId,

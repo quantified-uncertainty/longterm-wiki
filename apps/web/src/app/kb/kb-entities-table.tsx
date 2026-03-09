@@ -50,7 +50,7 @@ const columns: ColumnDef<EntityRow>[] = [
     ),
     cell: ({ row }) => (
       <Link
-        href={row.original.entityHref}
+        href={`/kb/entity/${row.original.entityId}`}
         className="text-primary hover:underline text-xs font-medium"
       >
         {row.original.entityName}

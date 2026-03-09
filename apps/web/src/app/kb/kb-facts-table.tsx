@@ -29,7 +29,7 @@ const columns: ColumnDef<FactRow>[] = [
     ),
     cell: ({ row }) => (
       <Link
-        href={row.original.entityHref}
+        href={`/kb/entity/${row.original.entityId}`}
         className="text-primary hover:underline text-xs font-medium"
       >
         {row.original.entityName}
@@ -43,7 +43,12 @@ const columns: ColumnDef<FactRow>[] = [
       <SortableHeader column={column}>Property</SortableHeader>
     ),
     cell: ({ row }) => (
-      <span className="text-xs">{row.original.propertyName}</span>
+      <Link
+        href={`/kb/property/${row.original.propertyId}`}
+        className="text-primary hover:underline text-xs"
+      >
+        {row.original.propertyName}
+      </Link>
     ),
     size: 140,
   },
@@ -109,6 +114,23 @@ const columns: ColumnDef<FactRow>[] = [
     },
     size: 70,
   },
+  {
+    accessorKey: "factId",
+    header: ({ column }) => (
+      <SortableHeader column={column}>ID</SortableHeader>
+    ),
+    cell: ({ row }) => (
+      <Link
+        href={`/kb/fact/${row.original.factId}`}
+        className="text-primary hover:underline text-xs font-mono"
+      >
+        {row.original.factId.length > 12
+          ? row.original.factId.slice(0, 12) + "\u2026"
+          : row.original.factId}
+      </Link>
+    ),
+    size: 110,
+  },
 ];
 
 export function KBFactsTable({ data }: { data: FactRow[] }) {
@@ -162,7 +184,8 @@ export function KBFactsTable({ data }: { data: FactRow[] }) {
         r.entityName.toLowerCase().includes(search) ||
         r.propertyName.toLowerCase().includes(search) ||
         r.displayValue.toLowerCase().includes(search) ||
-        r.category.toLowerCase().includes(search)
+        r.category.toLowerCase().includes(search) ||
+        r.factId.toLowerCase().includes(search)
       );
     },
   });

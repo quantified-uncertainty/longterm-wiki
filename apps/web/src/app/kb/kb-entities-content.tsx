@@ -4,14 +4,12 @@ import {
   getKBFacts,
   getKBItems,
 } from "@/data/kb";
-import { getEntityHref } from "@/data";
 import type { Fact, Entity } from "@longterm-wiki/kb";
 import { KBEntitiesTable } from "./kb-entities-table";
 
 export interface EntityRow {
   entityId: string;
   entityName: string;
-  entityHref: string;
   entityType: string;
   factCount: number;
   propertyCount: number;
@@ -66,7 +64,6 @@ export function KBEntityCoverageContent() {
     rows.push({
       entityId: entity.id,
       entityName: entity.name,
-      entityHref: getEntityHref(entity.id),
       entityType: entity.type,
       factCount: structuredFacts.length,
       propertyCount: propertyIds.size,

@@ -12,6 +12,7 @@
  */
 
 import { getEntityHref, getAllPages, getPageById } from "@/data";
+import { getKBEntities, getKBFacts } from "@/data/kb";
 import type { NavSection } from "./internal-nav";
 
 // Re-export NavSection so consumers can import from one place
@@ -343,6 +344,22 @@ export function getInternalNav(): NavSection[] {
  * ID registry differ from the page-level slugs assigned by build-data).
  */
 export function getKBDataNav(): NavSection[] {
+  // Build top entities list sorted by structured fact count
+  const entities = getKBEntities();
+  const entityItems: { label: string; href: string; count: number }[] = [];
+  for (const entity of entities) {
+    const facts = getKBFacts(entity.id);
+    const structured = facts.filter((f) => f.propertyId !== "description");
+    if (structured.length > 0) {
+      entityItems.push({
+        label: `${entity.name} (${structured.length})`,
+        href: `/kb/entity/${entity.id}`,
+        count: structured.length,
+      });
+    }
+  }
+  entityItems.sort((a, b) => b.count - a.count);
+
   return [
     {
       title: "KB Data",
@@ -353,6 +370,13 @@ export function getKBDataNav(): NavSection[] {
         { label: "Properties", href: "/wiki/E1021" },
         { label: "Entity Coverage", href: "/wiki/E1022" },
       ],
+    },
+    {
+      title: "Top Entities",
+      items: entityItems.slice(0, 15).map(({ label, href }) => ({
+        label,
+        href,
+      })),
     },
   ];
 }
