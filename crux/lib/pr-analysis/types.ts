@@ -130,7 +130,14 @@ export interface GqlPrNode {
       commit: {
         statusCheckRollup: {
           contexts: {
-            nodes: Array<{ conclusion?: string | null; state?: string }>;
+            nodes: Array<{
+              conclusion?: string | null;
+              state?: string;
+              /** CheckRun name (e.g. 'build', 'check-protected-paths') */
+              name?: string;
+              /** StatusContext context string (e.g. 'ci/circleci') */
+              context?: string;
+            }>;
           };
         } | null;
       };
