@@ -1,9 +1,9 @@
 /**
  * AnthropicStakeholdersTable — server wrapper
  *
- * Reads equity-holders and charitable-pledges from KB, joins them,
- * and overlays editorial EA-alignment estimates before passing to the
- * interactive client component.
+ * Reads equity-holders, round-investments, funding-rounds, and charitable-pledges
+ * from KB, joins them relationally, derives display categories from round data,
+ * and overlays editorial EA-alignment estimates before passing to the client.
  */
 
 import { getKBLatest, getKBItems } from "@data/kb";
@@ -37,6 +37,47 @@ function parseRange(field: unknown): [number, number] | null {
   return null;
 }
 
+/**
+ * Derive a display category for a stakeholder from their round-investments.
+ * - If any investment has role=founder → "Co-founder"
+ * - If earliest round is seed or Series A → "Early investor"
+ * - If investor name contains "pool" or "employee" → "Employees"
+ * - Otherwise → "Investor"
+ */
+function deriveCategory(
+  holderName: string,
+  investments: Array<{ role?: string; roundDate?: string; roundName?: string }>,
+): string {
+  if (investments.length === 0) {
+    // No round-investments — infer from name
+    if (holderName.toLowerCase().includes("employee")) return "Employees";
+    if (holderName.toLowerCase().includes("institutional") || holderName.toLowerCase().includes("other")) return "Institutional";
+    return "Investor";
+  }
+
+  const hasFounderRole = investments.some(inv => inv.role === "founder");
+  if (hasFounderRole) return "Co-founder";
+
+  // Check if earliest participation was seed/Series A
+  const dates = investments.map(inv => inv.roundDate).filter(Boolean).sort();
+  const earliestDate = dates[0];
+  if (earliestDate && earliestDate <= "2021-12") return "Early investor";
+
+  // Check if this is a major tech company (strategic investor)
+  const lowerName = holderName.toLowerCase();
+  const strategicNames = ["google", "amazon", "microsoft", "nvidia"];
+  if (strategicNames.some(s => lowerName.includes(s))) return "Strategic investor";
+
+  // Also check round names for strategic rounds
+  const roundNames = investments.map(inv => inv.roundName?.toLowerCase() || "");
+  const isStrategic = roundNames.some(n =>
+    strategicNames.some(s => n.includes(s)) || n.includes("partnership")
+  );
+  if (isStrategic) return "Strategic investor";
+
+  return "Investor";
+}
+
 export async function AnthropicStakeholdersTable() {
   // Get latest valuation from KB — fail-closed if missing (KB is authoritative)
   const valuationFact = getKBLatest("anthropic", "valuation");
@@ -55,15 +96,51 @@ export async function AnthropicStakeholdersTable() {
   else if (abs >= 1e6) valuationDisplay = `$${(valuation / 1e6).toFixed(0)}M`;
   else valuationDisplay = `$${valuation.toLocaleString("en-US")}`;
 
-  // Load both KB collections
+  // Load all four KB collections
   const equityItems = getKBItems("anthropic", "equity-holders");
   const pledgeItems = getKBItems("anthropic", "charitable-pledges");
+  const roundInvestments = getKBItems("anthropic", "round-investments");
+  const fundingRounds = getKBItems("anthropic", "funding-rounds");
 
   if (equityItems.length === 0) {
     throw new Error("Missing KB equity-holders items for anthropic");
   }
 
-  // Index pledges by pledger name for joining
+  // Index funding rounds by key for quick lookup
+  const roundsByKey = new Map<string, { date?: string; name?: string; valuation?: number }>();
+  for (const round of fundingRounds) {
+    roundsByKey.set(round.key, {
+      date: typeof round.fields.date === "string" ? round.fields.date : undefined,
+      name: typeof round.fields.name === "string" ? round.fields.name : undefined,
+      valuation: typeof round.fields.valuation === "number" ? round.fields.valuation : undefined,
+    });
+  }
+
+  // Index round-investments by investor name
+  const investmentsByHolder = new Map<string, Array<{
+    role?: string;
+    roundKey: string;
+    roundDate?: string;
+    roundName?: string;
+    amount?: number;
+  }>>();
+  for (const inv of roundInvestments) {
+    const name = String(inv.fields.investor ?? "");
+    const roundKey = String(inv.fields.round ?? "");
+    const roundInfo = roundsByKey.get(roundKey);
+    const entry = {
+      role: typeof inv.fields.role === "string" ? inv.fields.role : undefined,
+      roundKey,
+      roundDate: roundInfo?.date,
+      roundName: roundInfo?.name,
+      amount: typeof inv.fields.amount === "number" ? inv.fields.amount : undefined,
+    };
+    const existing = investmentsByHolder.get(name) || [];
+    existing.push(entry);
+    investmentsByHolder.set(name, existing);
+  }
+
+  // Index pledges by pledger name
   const pledgeByName = new Map<string, { pledge: [number, number]; notes?: string }>();
   for (const item of pledgeItems) {
     const name = String(item.fields.pledger ?? item.key);
@@ -76,12 +153,14 @@ export async function AnthropicStakeholdersTable() {
     }
   }
 
-  // Collect entity numeric IDs from both collections
+  // Collect entity numeric IDs from all collections
   const entityNumericIds = new Set<string>();
-  for (const item of [...equityItems, ...pledgeItems]) {
-    const ref = item.fields.entity_ref;
-    if (typeof ref === "string" && ref.startsWith("E")) {
-      entityNumericIds.add(ref);
+  for (const item of [...equityItems, ...pledgeItems, ...roundInvestments]) {
+    for (const refField of ["entity_ref", "investor_ref"]) {
+      const ref = item.fields[refField];
+      if (typeof ref === "string" && ref.startsWith("E")) {
+        entityNumericIds.add(ref);
+      }
     }
   }
 
@@ -103,13 +182,17 @@ export async function AnthropicStakeholdersTable() {
     };
   }
 
-  // Join equity holders with pledges and EA alignment
+  // Join equity holders with round-investments, pledges, and EA alignment
   const stakeholders: Stakeholder[] = equityItems.map((item) => {
     const f = item.fields;
     const name = String(f.holder ?? item.key);
     const stake = parseRange(f.stake);
     const stakeMin = stake ? stake[0] : null;
     const stakeMax = stake ? stake[1] : null;
+
+    // Derive category from round-investments
+    const investments = investmentsByHolder.get(name) || [];
+    const category = deriveCategory(name, investments);
 
     // Look up pledge by name
     const pledgeData = pledgeByName.get(name);
@@ -127,14 +210,11 @@ export async function AnthropicStakeholdersTable() {
     // Include in totals if they have a non-zero pledge and a defined stake
     const includeInTotal = pledgeMax > 0 && stakeMin !== null;
 
-    // Combine notes from equity and pledge entries
-    const equityNotes = typeof f.notes === "string" ? f.notes : undefined;
-    const pledgeNotes = pledgeData?.notes;
-    const notes = [equityNotes, pledgeNotes].filter(Boolean).join("; ") || undefined;
+    const notes = typeof f.notes === "string" ? f.notes : undefined;
 
     return {
       name,
-      category: String(f.category ?? ""),
+      category,
       stakeMin,
       stakeMax,
       pledgeMin,
