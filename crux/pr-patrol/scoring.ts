@@ -47,3 +47,30 @@ export function computeBudget(issues: PrIssueType[]): IssueBudget {
   }
   return { maxTurns, timeoutMinutes };
 }
+
+/**
+ * Compute the retry budget multiplier based on the number of previous failures.
+ * First attempt gets full budget (1.0), subsequent attempts get half (0.5).
+ * This prevents wasting compute on PRs where the full budget already failed.
+ */
+export function getRetryBudgetMultiplier(failCount: number): number {
+  return failCount === 0 ? 1.0 : 0.5;
+}
+
+/**
+ * Compute the effective budget for a PR, accounting for retry reduction.
+ * Combines the issue-based budget, global config caps, and retry multiplier.
+ */
+export function computeEffectiveBudget(
+  issues: PrIssueType[],
+  configMaxTurns: number,
+  configTimeoutMinutes: number,
+  failCount: number,
+): IssueBudget {
+  const budget = computeBudget(issues);
+  const multiplier = getRetryBudgetMultiplier(failCount);
+  return {
+    maxTurns: Math.ceil(Math.min(budget.maxTurns, configMaxTurns) * multiplier),
+    timeoutMinutes: Math.ceil(Math.min(budget.timeoutMinutes, configTimeoutMinutes) * multiplier),
+  };
+}
