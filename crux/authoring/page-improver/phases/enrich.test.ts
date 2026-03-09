@@ -84,14 +84,14 @@ describe('enrichPhase', () => {
     const { enrichFactRefs } = await import('../../../enrich/enrich-fact-refs.ts');
     (enrichEntityLinks as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('LLM timeout'));
     (enrichFactRefs as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      content: '## Test\n\nContent with <F entity="x" fact="y" />.',
+      content: '## Test\n\nContent with <KBF entity="x" property="y" />.',
       insertedCount: 1,
     });
 
     const { content, result } = await enrichPhase(makePage(), '## Test\n\nContent.', makeOptions());
 
     // Fact-ref should still have run successfully
-    expect(content).toContain('<F entity=');
+    expect(content).toContain('<KBF entity=');
     expect(result.entityLinks.insertedCount).toBe(0); // failed
     expect(result.factRefs.insertedCount).toBe(1); // succeeded
   });
