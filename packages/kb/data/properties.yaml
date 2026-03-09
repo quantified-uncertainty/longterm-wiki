@@ -548,14 +548,14 @@ properties:
     description: "Degree of expert agreement: high / medium / low / contested / unknown"
     dataType: text
     category: epistemic
-    appliesTo: [risk, risk-factor, approach, debate, concept, capability, safety-agenda]
+    appliesTo: [risk, risk-factor, approach, debate, concept, capability, argument, safety-agenda]
 
   evidence-strength:
     name: Evidence Strength
     description: "Quality of supporting evidence: strong / moderate / weak / mixed / theoretical"
     dataType: text
     category: epistemic
-    appliesTo: [risk, risk-factor, approach, debate, concept, capability, analysis, safety-agenda, case-study]
+    appliesTo: [risk, risk-factor, approach, debate, concept, capability, analysis, argument, safety-agenda, case-study]
 
   severity-level:
     name: Severity Level
@@ -656,7 +656,7 @@ properties:
     description: "Date a research paper, report, or document was published"
     dataType: date
     category: research
-    appliesTo: [concept, approach, risk, risk-factor, debate, analysis, safety-agenda]
+    appliesTo: [concept, approach, risk, risk-factor, debate, analysis, argument, safety-agenda]
 
   research-consensus:
     name: Research Consensus
@@ -796,14 +796,14 @@ properties:
     description: "Risk entities that this entity is relevant to or addresses"
     dataType: refs
     category: relationship
-    appliesTo: [approach, concept, capability, event, policy, project, safety-agenda, case-study]
+    appliesTo: [approach, concept, capability, event, policy, project, safety-agenda, case-study, analysis, argument]
 
   related-entities:
     name: Related Entities
     description: "Other entities closely related to this one (general cross-reference)"
     dataType: refs
     category: relationship
-    appliesTo: [event, policy, project, concept, analysis, argument, case-study, funder, historical, risk-factor, safety-agenda]
+    appliesTo: [event, policy, project, concept, analysis, argument, case-study, funder, historical, risk-factor, safety-agenda, incident]
 
   # ── Funder Properties ──────────────────────────────────────────────
 
