@@ -115,6 +115,8 @@ export interface FieldDef {
   required?: boolean;
   unit?: string;
   description?: string;
+  /** For item-ref fields: which sibling collection the referenced key must exist in */
+  collection?: string;
 }
 
 export interface ItemCollectionSchema {
