@@ -90,7 +90,7 @@ Jan Kulveit's [Limits to Legibility](https://www.lesswrong.com/posts/4gDbqL3Tods
 
 ### The Reasoning Trace Object
 
-Building on the existing claims schema (see <EntityLink id="E896" name="claims-architecture-decisions">Architecture Decisions E896</EntityLink>), a reasoning trace adds the following fields to each claim:
+Building on the existing claims schema, a reasoning trace adds the following fields to each claim:
 
 ```
 reasoning_trace: {
@@ -130,7 +130,7 @@ reasoning_trace: {
 
 ### Tiered Trace Depth
 
-Not all claims need the same trace depth (see <EntityLink id="E896" name="claims-architecture-decisions">Crux 11 in E896</EntityLink>):
+Not all claims need the same trace depth:
 
 **Tier 1 — Minimal (factual, historical, numeric):** Store `inferenceType` only. The `sourceQuote` on `claimSources` IS the trace for direct assertions. ~70% of claims.
 
@@ -375,8 +375,8 @@ Cost: Significant infrastructure. Only pursue after Phase 2 proves its value.
 
 ## Related Documents
 
-- <EntityLink id="E896" name="claims-architecture-decisions">Claims Architecture Decisions (E896)</EntityLink> — Core design decisions including reasoning trace crux (Crux 11) and worked examples with traces
-- <EntityLink id="E897" name="claims-system-development-roadmap">Claims Development Roadmap (E897)</EntityLink> — Sprint plan including Sprint 7 on reasoning traces
-- <EntityLink id="E892" name="claim-first-architecture">Claim-First Architecture (E892)</EntityLink> — Long-term vision for claims as primary artifact, enhanced with reasoning transparency layer
-- <EntityLink id="E902" name="claims-extraction-quality-patterns">Extraction Quality Patterns (E902)</EntityLink> — Failure modes that reasoning traces help detect
+- Claims Architecture Decisions — Core design decisions including reasoning trace crux and worked examples with traces (page removed)
+- Claims Development Roadmap — Sprint plan including Sprint 7 on reasoning traces (page removed)
+- Claim-First Architecture — Long-term vision for claims as primary artifact, enhanced with reasoning transparency layer (page removed)
+- Statement Extraction Quality Patterns — Failure modes that reasoning traces help detect (page removed)
 - <EntityLink id="E891" name="citation-architecture">Citation Architecture (E891)</EntityLink> — Unified footnote system that surfaces reasoning traces to readers

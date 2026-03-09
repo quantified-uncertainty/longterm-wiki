@@ -380,6 +380,18 @@ describe('checkMergeEligibility', () => {
     expect(result.blockReasons).toContain('agent-working');
   });
 
+  it('blocks when pr-patrol:working label is present', () => {
+    const result = checkMergeEligibility(
+      makePrNode({
+        labels: {
+          nodes: [{ name: LABELS.STAGE_APPROVED }, { name: LABELS.PR_PATROL_WORKING }],
+        },
+      }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('pr-patrol-working');
+  });
+
   it('blocks when PR is a draft', () => {
     const result = checkMergeEligibility(
       makePrNode({ isDraft: true }),
@@ -496,26 +508,26 @@ describe('computeBudget', () => {
 
   it('gives medium budget for ci-failure', () => {
     const budget = computeBudget(['ci-failure']);
-    expect(budget.maxTurns).toBe(35);
-    expect(budget.timeoutMinutes).toBe(20);
+    expect(budget.maxTurns).toBe(50);
+    expect(budget.timeoutMinutes).toBe(45);
   });
 
   it('gives full budget for conflict', () => {
     const budget = computeBudget(['conflict']);
-    expect(budget.maxTurns).toBe(40);
-    expect(budget.timeoutMinutes).toBe(30);
+    expect(budget.maxTurns).toBe(60);
+    expect(budget.timeoutMinutes).toBe(60);
   });
 
   it('uses highest budget when multiple issues present', () => {
     const budget = computeBudget(['missing-issue-ref', 'ci-failure']);
-    expect(budget.maxTurns).toBe(35);
-    expect(budget.timeoutMinutes).toBe(20);
+    expect(budget.maxTurns).toBe(50);
+    expect(budget.timeoutMinutes).toBe(45);
   });
 
   it('conflict dominates when mixed with smaller issues', () => {
     const budget = computeBudget(['missing-testplan', 'conflict', 'missing-issue-ref']);
-    expect(budget.maxTurns).toBe(40);
-    expect(budget.timeoutMinutes).toBe(30);
+    expect(budget.maxTurns).toBe(60);
+    expect(budget.timeoutMinutes).toBe(60);
   });
 });
 

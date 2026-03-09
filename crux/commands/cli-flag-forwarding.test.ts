@@ -8,7 +8,7 @@
  * Pattern tested: declare flag in passthrough → optionsToArgs → filteredArgs → subprocess
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { optionsToArgs, parseCliArgs, type ScriptConfig } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
@@ -30,189 +30,6 @@ function filterArgs(
     return config.passthrough.includes(camelKey) || config.passthrough.includes(key);
   });
 }
-
-// ---------------------------------------------------------------------------
-// Claims command SCRIPTS config (replicated from commands/claims.ts)
-// If the actual config changes, these tests should break — that's the point.
-// ---------------------------------------------------------------------------
-
-const CLAIMS_SCRIPTS: Record<string, Pick<ScriptConfig, 'passthrough' | 'positional'>> = {
-  extract: {
-    passthrough: ['dry-run', 'model'],
-    positional: true,
-  },
-  verify: {
-    passthrough: ['dry-run', 'model', 'fetch'],
-    positional: true,
-  },
-  status: {
-    passthrough: ['json'],
-    positional: true,
-  },
-  'ingest-resource': {
-    passthrough: ['dry-run', 'model', 'entity', 'force'],
-    positional: true,
-  },
-  'from-resource': {
-    passthrough: ['dry-run', 'model', 'entity', 'no-auto-resource', 'batch', 'limit'],
-    positional: true,
-  },
-  'evaluate-baseline': {
-    passthrough: ['from-logs', 'sample'],
-    positional: false,
-  },
-  audit: {
-    passthrough: ['json'],
-    positional: false,
-  },
-};
-
-// ---------------------------------------------------------------------------
-// Test: flag forwarding for each claims command
-// ---------------------------------------------------------------------------
-
-describe('claims extract — flag forwarding', () => {
-  const config = CLAIMS_SCRIPTS.extract;
-
-  it('forwards --dry-run', () => {
-    const args = filterArgs({ dryRun: true }, config);
-    expect(args).toContain('--dry-run');
-  });
-
-  it('forwards --model=<value>', () => {
-    const args = filterArgs({ model: 'google/gemini-2.0-flash-001' }, config);
-    expect(args).toContain('--model=google/gemini-2.0-flash-001');
-  });
-
-  it('drops non-passthrough flags', () => {
-    const args = filterArgs({ dryRun: true, force: true, json: true }, config);
-    expect(args).toContain('--dry-run');
-    expect(args).not.toContain('--force');
-    expect(args).not.toContain('--json');
-  });
-});
-
-describe('claims verify — flag forwarding', () => {
-  const config = CLAIMS_SCRIPTS.verify;
-
-  it('forwards --dry-run', () => {
-    expect(filterArgs({ dryRun: true }, config)).toContain('--dry-run');
-  });
-
-  it('forwards --model=<value>', () => {
-    expect(filterArgs({ model: 'haiku' }, config)).toContain('--model=haiku');
-  });
-
-  it('forwards --fetch', () => {
-    expect(filterArgs({ fetch: true }, config)).toContain('--fetch');
-  });
-
-  it('drops non-passthrough flags', () => {
-    const args = filterArgs({ fetch: true, force: true, entity: 'kalshi' }, config);
-    expect(args).toContain('--fetch');
-    expect(args).not.toContain('--force');
-    expect(args).not.toContain('--entity=kalshi');
-  });
-});
-
-describe('claims status — flag forwarding', () => {
-  const config = CLAIMS_SCRIPTS.status;
-
-  it('forwards --json', () => {
-    expect(filterArgs({ json: true }, config)).toContain('--json');
-  });
-
-  it('drops non-passthrough flags', () => {
-    const args = filterArgs({ json: true, dryRun: true, model: 'x' }, config);
-    expect(args).toContain('--json');
-    expect(args).not.toContain('--dry-run');
-    expect(args).not.toContain('--model=x');
-  });
-});
-
-describe('claims ingest-resource — flag forwarding', () => {
-  const config = CLAIMS_SCRIPTS['ingest-resource'];
-
-  it('forwards --dry-run, --model, --entity, --force', () => {
-    const args = filterArgs(
-      { dryRun: true, model: 'haiku', entity: 'kalshi', force: true },
-      config,
-    );
-    expect(args).toContain('--dry-run');
-    expect(args).toContain('--model=haiku');
-    expect(args).toContain('--entity=kalshi');
-    expect(args).toContain('--force');
-  });
-
-  it('drops non-passthrough flags', () => {
-    const args = filterArgs({ force: true, limit: 5, json: true }, config);
-    expect(args).toContain('--force');
-    expect(args).not.toContain('--limit=5');
-    expect(args).not.toContain('--json');
-  });
-});
-
-describe('claims from-resource — flag forwarding', () => {
-  const config = CLAIMS_SCRIPTS['from-resource'];
-
-  it('forwards all 6 passthrough flags', () => {
-    const args = filterArgs(
-      {
-        dryRun: true,
-        model: 'haiku',
-        entity: 'kalshi',
-        noAutoResource: true,
-        batch: 'urls.txt',
-        limit: 5,
-      },
-      config,
-    );
-    expect(args).toContain('--dry-run');
-    expect(args).toContain('--model=haiku');
-    expect(args).toContain('--entity=kalshi');
-    expect(args).toContain('--no-auto-resource');
-    expect(args).toContain('--batch=urls.txt');
-    expect(args).toContain('--limit=5');
-  });
-
-  it('drops non-passthrough flags', () => {
-    const args = filterArgs({ limit: 5, force: true, json: true }, config);
-    expect(args).toContain('--limit=5');
-    expect(args).not.toContain('--force');
-    expect(args).not.toContain('--json');
-  });
-});
-
-describe('claims evaluate-baseline — flag forwarding', () => {
-  const config = CLAIMS_SCRIPTS['evaluate-baseline'];
-
-  it('forwards --from-logs and --sample', () => {
-    const args = filterArgs({ fromLogs: true, sample: 5 }, config);
-    expect(args).toContain('--from-logs');
-    expect(args).toContain('--sample=5');
-  });
-
-  it('drops non-passthrough flags', () => {
-    const args = filterArgs({ fromLogs: true, model: 'x', dryRun: true }, config);
-    expect(args).toContain('--from-logs');
-    expect(args).not.toContain('--model=x');
-    expect(args).not.toContain('--dry-run');
-  });
-});
-
-describe('claims audit — flag forwarding', () => {
-  const config = CLAIMS_SCRIPTS.audit;
-
-  it('forwards --json', () => {
-    expect(filterArgs({ json: true }, config)).toContain('--json');
-  });
-
-  it('drops non-passthrough flags', () => {
-    const args = filterArgs({ json: true, dryRun: true }, config);
-    expect(args).toContain('--json');
-    expect(args).not.toContain('--dry-run');
-  });
-});
 
 // ---------------------------------------------------------------------------
 // Test: parseCliArgs correctly parses flags that subprocesses receive
@@ -290,80 +107,50 @@ describe('parseCliArgs — flag parsing in scripts', () => {
 describe('end-to-end flag round-trip', () => {
   it('--dry-run survives the full pipeline', () => {
     // User passes dryRun: true → optionsToArgs → filterArgs → parseCliArgs
-    const forwarded = filterArgs({ dryRun: true }, CLAIMS_SCRIPTS.extract);
+    const forwarded = filterArgs({ dryRun: true }, CITATIONS_SCRIPTS['extract-quotes']);
     const parsed = parseCliArgs(forwarded);
     expect(parsed['dry-run']).toBe(true);
   });
 
-  it('--model=value survives the full pipeline', () => {
-    const forwarded = filterArgs({ model: 'google/gemini-2.0-flash-001' }, CLAIMS_SCRIPTS.extract);
+  it('--recheck survives the full pipeline for citations verify', () => {
+    const forwarded = filterArgs({ recheck: true }, CITATIONS_SCRIPTS.verify);
     const parsed = parseCliArgs(forwarded);
-    expect(parsed.model).toBe('google/gemini-2.0-flash-001');
+    expect(parsed.recheck).toBe(true);
   });
 
-  it('--fetch survives the full pipeline for verify', () => {
-    const forwarded = filterArgs({ fetch: true }, CLAIMS_SCRIPTS.verify);
+  it('--fix survives the full pipeline for validate gate', () => {
+    const forwarded = filterArgs({ fix: true }, VALIDATE_SCRIPTS.gate);
     const parsed = parseCliArgs(forwarded);
-    expect(parsed.fetch).toBe(true);
+    expect(parsed.fix).toBe(true);
   });
 
-  it('--entity=kalshi survives the full pipeline for ingest-resource', () => {
-    const forwarded = filterArgs({ entity: 'kalshi' }, CLAIMS_SCRIPTS['ingest-resource']);
+  it('--apply survives the full pipeline for content improve', () => {
+    const forwarded = filterArgs({ apply: true }, CONTENT_SCRIPTS.improve);
     const parsed = parseCliArgs(forwarded);
-    expect(parsed.entity).toBe('kalshi');
+    expect(parsed.apply).toBe(true);
   });
 
-  it('--force survives the full pipeline for ingest-resource', () => {
-    const forwarded = filterArgs({ force: true }, CLAIMS_SCRIPTS['ingest-resource']);
+  it('--tier=premium survives the full pipeline for content improve', () => {
+    const forwarded = filterArgs({ tier: 'premium' }, CONTENT_SCRIPTS.improve);
     const parsed = parseCliArgs(forwarded);
-    expect(parsed.force).toBe(true);
+    expect(parsed.tier).toBe('premium');
   });
 
-  it('--no-auto-resource survives the full pipeline for from-resource', () => {
-    const forwarded = filterArgs({ noAutoResource: true }, CLAIMS_SCRIPTS['from-resource']);
+  it('--escalate survives the full pipeline for citations fix-inaccuracies', () => {
+    const forwarded = filterArgs({ escalate: true }, CITATIONS_SCRIPTS['fix-inaccuracies']);
     const parsed = parseCliArgs(forwarded);
-    expect(parsed['no-auto-resource']).toBe(true);
-  });
-
-  it('--batch=urls.txt survives the full pipeline for from-resource', () => {
-    const forwarded = filterArgs({ batch: 'urls.txt' }, CLAIMS_SCRIPTS['from-resource']);
-    const parsed = parseCliArgs(forwarded);
-    expect(parsed.batch).toBe('urls.txt');
-  });
-
-  it('--from-logs survives the full pipeline for evaluate-baseline', () => {
-    const forwarded = filterArgs({ fromLogs: true }, CLAIMS_SCRIPTS['evaluate-baseline']);
-    const parsed = parseCliArgs(forwarded);
-    expect(parsed['from-logs']).toBe(true);
-  });
-
-  it('--json survives the full pipeline for audit', () => {
-    const forwarded = filterArgs({ json: true }, CLAIMS_SCRIPTS.audit);
-    const parsed = parseCliArgs(forwarded);
-    expect(parsed.json).toBe(true);
-  });
-
-  it('multiple flags all survive the pipeline', () => {
-    const forwarded = filterArgs(
-      { dryRun: true, model: 'haiku', entity: 'kalshi', force: true },
-      CLAIMS_SCRIPTS['ingest-resource'],
-    );
-    const parsed = parseCliArgs(forwarded);
-    expect(parsed['dry-run']).toBe(true);
-    expect(parsed.model).toBe('haiku');
-    expect(parsed.entity).toBe('kalshi');
-    expect(parsed.force).toBe(true);
+    expect(parsed.escalate).toBe(true);
   });
 
   it('dropped flags do NOT survive the pipeline', () => {
     const forwarded = filterArgs(
-      { dryRun: true, force: true, json: true },
-      CLAIMS_SCRIPTS.extract, // extract only allows dry-run, model
+      { fix: true, json: true, verbose: true },
+      VALIDATE_SCRIPTS.gate, // gate allows fix but not json/verbose
     );
     const parsed = parseCliArgs(forwarded);
-    expect(parsed['dry-run']).toBe(true);
-    expect(parsed.force).toBeUndefined();
+    expect(parsed.fix).toBe(true);
     expect(parsed.json).toBeUndefined();
+    expect(parsed.verbose).toBeUndefined();
   });
 });
 
@@ -642,33 +429,15 @@ describe('content create — flag forwarding', () => {
 // ---------------------------------------------------------------------------
 
 describe('structural guard — test configs stay in sync with source', () => {
-  it('test covers all claims subcommands', () => {
-    const tested = Object.keys(CLAIMS_SCRIPTS);
-    expect(tested).toEqual(
-      expect.arrayContaining([
-        'extract', 'verify', 'status', 'ingest-resource',
-        'from-resource', 'evaluate-baseline', 'audit',
-      ]),
-    );
-  });
-
-  it('claims extract passthrough has exactly 2 entries', () => {
-    expect(CLAIMS_SCRIPTS.extract.passthrough).toHaveLength(2);
-  });
-
-  it('claims verify passthrough has exactly 3 entries', () => {
-    expect(CLAIMS_SCRIPTS.verify.passthrough).toHaveLength(3);
-  });
-
-  it('claims from-resource passthrough has exactly 6 entries', () => {
-    expect(CLAIMS_SCRIPTS['from-resource'].passthrough).toHaveLength(6);
-  });
-
   it('validate gate passthrough has exactly 7 entries', () => {
     expect(VALIDATE_SCRIPTS.gate.passthrough).toHaveLength(7);
   });
 
   it('content improve passthrough has exactly 25 entries', () => {
     expect(CONTENT_SCRIPTS.improve.passthrough).toHaveLength(25);
+  });
+
+  it('citations verify passthrough has exactly 6 entries', () => {
+    expect(CITATIONS_SCRIPTS.verify.passthrough).toHaveLength(6);
   });
 });

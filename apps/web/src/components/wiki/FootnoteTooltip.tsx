@@ -183,6 +183,66 @@ function CitationContent({ entry }: { entry: RefMapEntry }) {
   );
 }
 
+/**
+ * Content displayed for a KB fact reference.
+ * Shows property name, value, date, source link -- mirrors the KBF tooltip.
+ */
+function KBFactContent({ entry }: { entry: RefMapEntry }) {
+  const sourceUrl = entry.kbSource;
+  const domain = sourceUrl ? getDomain(sourceUrl) : null;
+
+  return (
+    <>
+      {/* Property label */}
+      {entry.kbProperty && (
+        <span className="block text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">
+          {entry.kbProperty}
+        </span>
+      )}
+
+      {/* Value */}
+      {entry.kbValue && (
+        <span className="block font-semibold text-foreground text-sm mb-1">
+          {entry.kbValue}
+        </span>
+      )}
+
+      {/* As-of date */}
+      {entry.kbAsOf && (
+        <span className="block text-xs text-muted-foreground">
+          As of: {entry.kbAsOf}
+        </span>
+      )}
+
+      {/* Notes */}
+      {entry.kbNotes && (
+        <p className="text-xs text-muted-foreground/80 m-0 mt-1 line-clamp-3">
+          {entry.kbNotes}
+        </p>
+      )}
+
+      {/* Source link */}
+      {sourceUrl && isSafeUrl(sourceUrl) && (
+        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/50">
+          <SafeExternalLink
+            href={sourceUrl}
+            className="text-[11px] text-blue-500 hover:underline flex items-center gap-0.5 !no-underline hover:!underline"
+          >
+            Source{domain ? ` (${domain})` : ""} <ExternalLink className="w-2.5 h-2.5" />
+          </SafeExternalLink>
+        </div>
+      )}
+
+      {/* entity.property key */}
+      {entry.kbEntity && (
+        <span className="block text-muted-foreground/60 mt-1.5 font-mono text-[10px]">
+          {entry.kbEntity}.{entry.kbProperty}
+        </span>
+      )}
+    </>
+  );
+}
+
 interface FootnoteTooltipProps {
   /** The footnote number (1-based) */
   footnoteNumber: number;
@@ -234,6 +294,8 @@ export function FootnoteTooltip({
         >
           {refData.type === "claim" ? (
             <ClaimContent entry={refData} />
+          ) : refData.type === "kb" ? (
+            <KBFactContent entry={refData} />
           ) : (
             <CitationContent entry={refData} />
           )}

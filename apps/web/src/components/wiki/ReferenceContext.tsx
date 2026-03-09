@@ -14,7 +14,7 @@ import type { AccuracyVerdict } from "@wiki-server/api-types";
  * from the DB-driven reference data.
  */
 export interface RefMapEntry {
-  type: "claim" | "citation";
+  type: "claim" | "citation" | "kb";
 
   // --- Claim fields (populated when type === "claim") ---
   /** Claim text from the citation verification system */
@@ -47,6 +47,22 @@ export interface RefMapEntry {
   domain?: string | null;
   /** Note or additional context */
   note?: string | null;
+
+  // --- KB fact fields (populated when type === "kb") ---
+  /** KB entity ID (slug) */
+  kbEntity?: string;
+  /** KB property ID */
+  kbProperty?: string;
+  /** Formatted display value */
+  kbValue?: string;
+  /** As-of date */
+  kbAsOf?: string;
+  /** Source URL */
+  kbSource?: string;
+  /** Source resource ID */
+  kbSourceResource?: string;
+  /** Notes */
+  kbNotes?: string;
 }
 
 interface ReferenceContextValue {

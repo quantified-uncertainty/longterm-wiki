@@ -827,41 +827,6 @@ async function buildCitationQuotesBundle() {
 }
 
 /**
- * Fetch all statement-backed citation dot data from the new statements pipeline.
- * Returns { [pageSlug]: DotEntry[] } keyed by page slug (not numeric ID).
- * This replaces the legacy citationQuotes bundle for pages that have Statements V2 data.
- * Returns an empty object if the server is unavailable.
- */
-async function buildStatementCitationDots() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  statementCitationDots: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return {};
-  }
-
-  try {
-    const headers = { 'Content-Type': 'application/json' };
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
-
-    const res = await fetch(
-      `${serverUrl}/api/statements/citation-dots/all`,
-      { headers, signal: AbortSignal.timeout(30_000) }
-    );
-    if (!res.ok) {
-      console.log(`  statementCitationDots: skipped (server returned ${res.status})`);
-      return {};
-    }
-    const data = await res.json();
-    console.log(`  statementCitationDots: ${data.totalEntries ?? 0} entries across ${data.totalPages ?? 0} pages`);
-    return data.pages || {};
-  } catch (err) {
-    console.log(`  statementCitationDots: skipped (${err.message || 'server unavailable'})`);
-    return {};
-  }
-}
-
-/**
  * Fetch all page references (claim refs + citations) from the wiki-server.
  * Returns a map of pageId → { claimReferences, citations } for the reference preprocessor.
  * Falls back to an empty object if the server is unavailable.
@@ -873,28 +838,45 @@ async function buildPageReferenceIndex() {
     return {};
   }
 
-  try {
-    const headers = { 'Content-Type': 'application/json' };
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+  const headers = { 'Content-Type': 'application/json' };
+  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
-    const res = await fetch(`${serverUrl}/api/references/all`, {
-      headers,
-      signal: AbortSignal.timeout(15_000),
-    });
+  // Retry with increasing timeouts — this endpoint can be slow on large datasets
+  const retryTimeouts = [30_000, 60_000];
+  for (let i = 0; i < retryTimeouts.length; i++) {
+    try {
+      const res = await fetch(`${serverUrl}/api/references/all`, {
+        headers,
+        signal: AbortSignal.timeout(retryTimeouts[i]),
+      });
 
-    if (!res.ok) {
-      console.log(`  pageReferenceIndex: skipped (server returned ${res.status})`);
+      if (!res.ok) {
+        console.log(`  pageReferenceIndex: server returned ${res.status} (attempt ${i + 1}/${retryTimeouts.length})`);
+        if (i < retryTimeouts.length - 1) continue;
+        console.warn('  ⚠ pageReferenceIndex: all attempts failed — citations will show "data unavailable"');
+        return {};
+      }
+
+      const data = await res.json();
+      const pages = data.pages || {};
+      const pageCount = Object.keys(pages).length;
+      console.log(`  pageReferenceIndex: ${pageCount} pages, ${data.totalClaimRefs} claim refs, ${data.totalCitations} citations`);
+
+      if (pageCount === 0 && data.totalCitations === 0) {
+        console.warn('  ⚠ pageReferenceIndex: server returned 0 pages — citations will show "data unavailable"');
+      }
+
+      return pages;
+    } catch (err) {
+      console.log(`  pageReferenceIndex: ${err.message || 'server unavailable'} (attempt ${i + 1}/${retryTimeouts.length})`);
+      if (i < retryTimeouts.length - 1) continue;
+      console.warn('  ⚠ pageReferenceIndex: all attempts failed — citations will show "data unavailable"');
       return {};
     }
-
-    const data = await res.json();
-    console.log(`  pageReferenceIndex: ${data.totalPages} pages, ${data.totalClaimRefs} claim refs, ${data.totalCitations} citations`);
-    return data.pages || {};
-  } catch (err) {
-    console.log(`  pageReferenceIndex: skipped (${err.message || 'server unavailable'})`);
-    return {};
   }
+  // Unreachable — loop always returns, but TypeScript/eslint may require it
+  return {};
 }
 
 /**
@@ -1254,17 +1236,15 @@ async function main() {
   // Fetch edit log dates, earliest edit log dates, and citation stats from
   // wiki-server (parallel). Also build git-based date maps (synchronous, fast).
   const gitDateMaps = CONTENT_ONLY ? { gitCreatedMap: new Map(), gitModifiedMap: new Map() } : buildGitDateMaps();
-  const [editLogDates, earliestEditLogDates, citationStats, citationQuotesBundle, statementCitationDots] = CONTENT_ONLY
-    ? [new Map(), new Map(), new Map(), {}, {}]
+  const [editLogDates, earliestEditLogDates, citationStats, citationQuotesBundle] = CONTENT_ONLY
+    ? [new Map(), new Map(), new Map(), {}]
     : await Promise.all([
         buildEditLogDateMap(),
         buildEarliestEditLogDateMap(),
         buildCitationStatsMap(),
         buildCitationQuotesBundle(),
-        buildStatementCitationDots(),
       ]);
   database.citationQuotes = citationQuotesBundle;
-  database.statementCitationDots = statementCitationDots;
 
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates);
@@ -1756,12 +1736,8 @@ async function main() {
   console.log(`Unique tags: ${stats.totalTags}`);
   console.log(`Top types: ${Object.entries(stats.byType).slice(0, 5).map(([t, c]) => `${t}(${c})`).join(', ')}`);
 
-  // ==========================================================================
-  // Copy canonical schema.ts to apps/web output directory
-  // ==========================================================================
-  const SCHEMA_SRC = join(DATA_DIR, 'schema.ts');
-  copyFileSync(SCHEMA_SRC, join(OUTPUT_DIR, 'schema.ts'));
-  console.log('✓ Copied data/schema.ts → apps/web/src/data/schema.ts');
+  // schema.ts: apps/web/src/data/schema.ts re-exports from data/schema.ts
+  // (no build-time copy needed — see #1526)
 
   // ==========================================================================
   // LLM Accessibility Files

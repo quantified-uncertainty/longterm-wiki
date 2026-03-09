@@ -8,10 +8,9 @@
 import fs from 'fs';
 import { MODELS } from '../../../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../../../lib/entity-lookup.ts';
-import { buildClaimsContextForContent } from '../../../lib/claims-context.ts';
-import { runGapAnalysis, formatGapAnalysisForPrompt } from '../../../claims/gap-analysis.ts';
+import { buildKbContextForPage } from '../../../lib/kb-context.ts';
 import { convertSlugsToNumericIds } from '../../creator/deployment.ts';
-import { convertNewFootnotes } from '../../../claims/convert-new-footnotes.ts';
+import { convertNewFootnotes } from '../../../lib/convert-new-footnotes.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
 import {
   ROOT, log, getFilePath, getImportPath, writeTemp,
@@ -36,52 +35,28 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   const entityLookupCount = entityLookup.split('\n').filter(Boolean).length;
   log('improve', `  Found ${entityLookupCount} relevant entities for lookup`);
 
-  log('improve', 'Fetching claims context from wiki-server...');
-  let claimsContext: string | null = null;
+  // Load KB facts for the entity associated with this page
+  log('improve', 'Loading KB facts for entity...');
+  let kbContext: string | null = null;
   try {
-    const claimsResult = await buildClaimsContextForContent(page.id);
-    if (claimsResult) {
-      claimsContext = claimsResult.promptText;
-      const s = claimsResult.stats;
-      log('improve', `  ${s.total} claims: ${s.verified} verified, ${s.disputed} disputed, ${s.unsupported} unsupported, ${s.unverified} unverified`);
+    kbContext = await buildKbContextForPage(page.id, page.path);
+    if (kbContext) {
+      const lineCount = kbContext.split('\n').length;
+      log('improve', `  Found KB entity with ${lineCount} lines of structured facts`);
     } else {
-      log('improve', '  No claims available (server unavailable or no claims for this entity)');
+      log('improve', '  No KB entity found for this page (or entity has no facts)');
     }
   } catch (err: unknown) {
     const error = err instanceof Error ? err : new Error(String(err));
-    log('improve', `  Claims fetch failed: ${error.message} — continuing without claims context`);
-  }
-
-  // Run gap analysis if --gap-analysis flag is set
-  let gapAnalysisContext: string | null = null;
-  if (options.gapAnalysis) {
-    log('improve', 'Running claims gap analysis...');
-    try {
-      const gapResult = await runGapAnalysis(page.id);
-      if (gapResult) {
-        const formatted = formatGapAnalysisForPrompt(gapResult);
-        if (formatted) {
-          gapAnalysisContext = formatted;
-          log('improve', `  Gap analysis: ${gapResult.stats.verified} verified claims, ${gapResult.stats.onPage} on page, ${gapResult.stats.missing} missing, ${gapResult.contradictions.length} contradictions`);
-          writeTemp(page.id, 'gap-analysis.json', gapResult);
-        } else {
-          log('improve', '  Gap analysis: all verified claims are already on the page');
-        }
-      } else {
-        log('improve', '  Gap analysis: no results (server unavailable or no verified claims)');
-      }
-    } catch (err: unknown) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      log('improve', `  Gap analysis failed: ${error.message} — continuing without gap analysis`);
-    }
+    log('improve', `  KB context load failed: ${error.message} — continuing without KB context`);
   }
 
   const tier = options.tier || 'standard';
   const prompt = IMPROVE_PROMPT({
     page, filePath, importPath, directions,
     analysis, research, objectivityContext,
-    currentContent, entityLookup, claimsContext,
-    gapAnalysisContext, tier,
+    currentContent, entityLookup, claimsContext: null,
+    gapAnalysisContext: null, kbContext, tier,
   });
 
   const result = await runAgent(prompt, {
@@ -183,16 +158,26 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
     improvedContent = convertedContent;
   }
 
-  // Convert numbered footnotes [^N] to DB-driven [^rc-XXXX] references.
+  // Convert numbered footnotes [^N] to [^kb-factId] or [^rc-XXXX] references.
+  // KB fact matching is attempted first when the page has a corresponding KB entity.
   // DB entries are NOT created here (dry-run semantics) — they are created
   // when the pipeline applies changes via --apply. This step only rewrites
   // the footnote format in the content string.
   try {
     const fnResult = await convertNewFootnotes(improvedContent, page.id, {
       createDbEntries: false,
+      entityId: page.id,
     });
     if (fnResult.convertedCount > 0) {
-      log('improve', `  Converted ${fnResult.convertedCount} numbered footnote(s) to [^rc-XXXX] format`);
+      const parts: string[] = [];
+      if (fnResult.kbMatchCount > 0) {
+        parts.push(`${fnResult.kbMatchCount} to [^kb-...] (KB fact match)`);
+      }
+      const rcCount = fnResult.convertedCount - fnResult.kbMatchCount;
+      if (rcCount > 0) {
+        parts.push(`${rcCount} to [^rc-XXXX]`);
+      }
+      log('improve', `  Converted ${fnResult.convertedCount} numbered footnote(s): ${parts.join(', ')}`);
       improvedContent = fnResult.content;
     }
   } catch (err: unknown) {

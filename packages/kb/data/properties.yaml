@@ -185,7 +185,7 @@ properties:
     description: "Date the organization was incorporated or officially founded"
     dataType: date
     category: organization
-    appliesTo: [organization]
+    appliesTo: [organization, funder]
 
   born-year:
     name: Birth Year
@@ -210,7 +210,7 @@ properties:
     description: "Primary office location (city, state/country)"
     dataType: text
     category: organization
-    appliesTo: [organization]
+    appliesTo: [organization, funder]
 
   legal-structure:
     name: Legal Structure
@@ -431,6 +431,17 @@ properties:
       divisor: 1e9
       suffix: "B"
 
+  gpu-count:
+    name: GPU Count
+    description: "Number of GPUs in a compute cluster or available for training/inference"
+    dataType: number
+    unit: GPUs
+    category: product
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: " GPUs"
+
   benchmark-score:
     name: Benchmark Score
     description: "Performance score on a specific benchmark"
@@ -537,21 +548,21 @@ properties:
     description: "Degree of expert agreement: high / medium / low / contested / unknown"
     dataType: text
     category: epistemic
-    appliesTo: [risk, approach, debate, concept, capability]
+    appliesTo: [risk, risk-factor, approach, debate, concept, capability, argument, safety-agenda]
 
   evidence-strength:
     name: Evidence Strength
     description: "Quality of supporting evidence: strong / moderate / weak / mixed / theoretical"
     dataType: text
     category: epistemic
-    appliesTo: [risk, approach, debate, concept, capability, analysis]
+    appliesTo: [risk, risk-factor, approach, debate, concept, capability, analysis, argument, safety-agenda, case-study]
 
   severity-level:
     name: Severity Level
     description: "Potential impact severity: catastrophic / severe / moderate / minor"
     dataType: text
     category: risk
-    appliesTo: [risk]
+    appliesTo: [risk, risk-factor]
 
   likelihood-estimate:
     name: Likelihood Estimate
@@ -560,7 +571,7 @@ properties:
     unit: percent
     category: risk
     temporal: true
-    appliesTo: [risk]
+    appliesTo: [risk, risk-factor]
     display:
       suffix: "%"
 
@@ -569,14 +580,14 @@ properties:
     description: "Whether the impact is reversible: reversible / partially-reversible / irreversible"
     dataType: text
     category: risk
-    appliesTo: [risk]
+    appliesTo: [risk, risk-factor]
 
   time-horizon:
     name: Time Horizon
     description: "Timeframe for risk materialization or approach relevance: near-term / medium-term / long-term / ongoing"
     dataType: text
     category: concept
-    appliesTo: [risk, approach, debate, concept, capability]
+    appliesTo: [risk, risk-factor, approach, debate, concept, capability, safety-agenda]
 
   # ── Approach & Response Properties ────────────────────────────────────
 
@@ -585,35 +596,35 @@ properties:
     description: "Category of approach: technical / policy / governance / research / community"
     dataType: text
     category: approach
-    appliesTo: [approach]
+    appliesTo: [approach, safety-agenda]
 
   maturity-level:
     name: Maturity Level
     description: "Development stage: theoretical / early-research / active-research / deployed / mature"
     dataType: text
     category: approach
-    appliesTo: [approach, capability]
+    appliesTo: [approach, capability, safety-agenda]
 
   key-proponents:
     name: Key Proponents
     description: "People or organizations most associated with advocating this approach"
     dataType: refs
     category: approach
-    appliesTo: [approach, debate]
+    appliesTo: [approach, debate, safety-agenda]
 
   addresses-risk:
     name: Addresses Risk
     description: "Risk(s) this approach is designed to mitigate (refs to risk entities)"
     dataType: refs
     category: approach
-    appliesTo: [approach]
+    appliesTo: [approach, safety-agenda]
 
   tractability:
     name: Tractability
     description: "How tractable the approach is: high / medium / low / unknown"
     dataType: text
     category: approach
-    appliesTo: [approach]
+    appliesTo: [approach, safety-agenda]
 
   # ── Debate Properties ─────────────────────────────────────────────────
 
@@ -645,14 +656,14 @@ properties:
     description: "Date a research paper, report, or document was published"
     dataType: date
     category: research
-    appliesTo: [concept, approach, risk, debate]
+    appliesTo: [concept, approach, risk, risk-factor, debate, analysis, argument, safety-agenda]
 
   research-consensus:
     name: Research Consensus
     description: "What the research literature broadly agrees on regarding this topic"
     dataType: text
     category: epistemic
-    appliesTo: [risk, approach, debate, concept, capability]
+    appliesTo: [risk, risk-factor, approach, debate, concept, capability, safety-agenda]
 
   survey-result:
     name: Survey Result
@@ -661,7 +672,7 @@ properties:
     unit: percent
     category: epistemic
     temporal: true
-    appliesTo: [risk, approach, debate, concept]
+    appliesTo: [risk, risk-factor, approach, debate, concept]
     display:
       suffix: "%"
 
@@ -670,7 +681,7 @@ properties:
     description: "Key unresolved questions in this area"
     dataType: text
     category: epistemic
-    appliesTo: [risk, approach, debate, concept, capability]
+    appliesTo: [risk, risk-factor, approach, debate, concept, capability, safety-agenda]
 
   # ── General Properties ───────────────────────────────────────────────
 
@@ -679,14 +690,14 @@ properties:
     description: "Brief description of this entity"
     dataType: text
     category: general
-    appliesTo: [organization, person, ai-model, risk, approach, capability, concept, debate, policy, project, event, analysis, argument]
+    appliesTo: [organization, person, ai-model, risk, risk-factor, approach, capability, concept, debate, policy, project, event, analysis, argument, safety-agenda, case-study, funder, historical, incident]
 
   website:
     name: Website
     description: "Primary website URL"
     dataType: text
     category: general
-    appliesTo: [organization, person, project]
+    appliesTo: [organization, person, project, funder, safety-agenda]
 
   org-type:
     name: Organization Type
@@ -694,6 +705,143 @@ properties:
     dataType: text
     category: organization
     appliesTo: [organization]
+
+  # ── Event Properties ───────────────────────────────────────────────
+
+  event-date:
+    name: Event Date
+    description: "Date the event occurred or began"
+    dataType: date
+    category: event
+    appliesTo: [event]
+
+  event-type:
+    name: Event Type
+    description: "Category of event: summit, announcement, legislative, milestone, conference, publication, launch"
+    dataType: text
+    category: event
+    appliesTo: [event]
+
+  event-organizers:
+    name: Organizers
+    description: "Organizations or people who organized this event"
+    dataType: refs
+    category: event
+    appliesTo: [event]
+
+  event-location:
+    name: Location
+    description: "Where the event took place (city, country)"
+    dataType: text
+    category: event
+    appliesTo: [event]
+
+  # ── Policy Properties ──────────────────────────────────────────────
+
+  policy-status:
+    name: Policy Status
+    description: "Current status: proposed, enacted, enforced, rescinded, expired, superseded"
+    dataType: text
+    category: policy
+    appliesTo: [policy]
+
+  policy-type:
+    name: Policy Type
+    description: "Type of policy: executive-order, legislation, regulation, voluntary-commitment, treaty, standard, guideline"
+    dataType: text
+    category: policy
+    appliesTo: [policy]
+
+  jurisdiction:
+    name: Jurisdiction
+    description: "Geographic or political jurisdiction: US, EU, UK, China, international, state-level"
+    dataType: text
+    category: policy
+    appliesTo: [policy]
+
+  enacted-date:
+    name: Enacted Date
+    description: "Date the policy was enacted, signed, or took effect"
+    dataType: date
+    category: policy
+    appliesTo: [policy]
+
+  sponsoring-body:
+    name: Sponsoring Body
+    description: "Government body, agency, or organization that introduced the policy"
+    dataType: ref
+    category: policy
+    appliesTo: [policy]
+
+  # ── Project Properties ─────────────────────────────────────────────
+
+  project-status:
+    name: Project Status
+    description: "Current status: active, completed, abandoned, paused, archived"
+    dataType: text
+    category: project
+    appliesTo: [project]
+
+  project-type:
+    name: Project Type
+    description: "Type of project: research, software, benchmark, dataset, framework, tool, evaluation"
+    dataType: text
+    category: project
+    appliesTo: [project]
+
+  # ── Cross-Entity Relationship Properties ────────────────────────────
+
+  related-risks:
+    name: Related Risks
+    description: "Risk entities that this entity is relevant to or addresses"
+    dataType: refs
+    category: relationship
+    appliesTo: [approach, concept, capability, event, policy, project, safety-agenda, case-study, analysis, argument]
+
+  related-entities:
+    name: Related Entities
+    description: "Other entities closely related to this one (general cross-reference)"
+    dataType: refs
+    category: relationship
+    appliesTo: [event, policy, project, concept, analysis, argument, case-study, funder, historical, risk-factor, safety-agenda, incident]
+
+  # ── Funder Properties ──────────────────────────────────────────────
+
+  total-granted:
+    name: Total Granted
+    description: "Total amount of grants or donations made"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [funder, organization]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  focus-areas:
+    name: Focus Areas
+    description: "Primary areas of funding or philanthropic focus"
+    dataType: text
+    category: funder
+    appliesTo: [funder, organization]
+
+  # ── Historical Properties ──────────────────────────────────────────
+
+  start-date:
+    name: Start Date
+    description: "When this era, period, or historical entity began"
+    dataType: date
+    category: historical
+    appliesTo: [historical, event]
+
+  end-date:
+    name: End Date
+    description: "When this era, period, or historical entity ended (omit if ongoing)"
+    dataType: date
+    category: historical
+    appliesTo: [historical, event]
 
   # ── Incident Properties ──────────────────────────────────────────────
 

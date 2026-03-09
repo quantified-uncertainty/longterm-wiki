@@ -6,6 +6,11 @@ required: []
 
 recommended:
   - description
+  - event-date
+  - event-type
+  - event-location
+  - event-organizers
+  - related-entities
 
 items:
   key-outcomes:
@@ -23,3 +28,11 @@ items:
       role: { type: text, description: "Their role in the event" }
       source: { type: text, description: "URL confirming participation" }
       notes: { type: text, description: "Context about their involvement" }
+
+  timeline:
+    description: "Chronological sequence of key moments within this event"
+    fields:
+      date: { type: date, required: true, description: "Date of the moment (YYYY-MM-DD or YYYY-MM)" }
+      event: { type: text, required: true, description: "Brief description of what happened" }
+      source: { type: text, description: "URL to news article or primary source" }
+      notes: { type: text, description: "Additional context or significance" }

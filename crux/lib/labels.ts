@@ -34,6 +34,7 @@ export const LABELS = {
   // Agent activity
   AGENT_WORKING: 'agent:working',
   AGENT_FILED: 'agent:filed',
+  PR_PATROL_WORKING: 'pr-patrol:working',
 } as const;
 
 export type LabelName = (typeof LABELS)[keyof typeof LABELS];
@@ -44,6 +45,12 @@ export const STAGE_LABELS = Object.values(LABELS).filter((l) =>
 export const BLOCK_LABELS = Object.values(LABELS).filter((l) =>
   l.startsWith('block:'),
 );
+
+/** All labels that indicate something is actively working on an issue/PR. */
+export const ANY_WORKING_LABELS: readonly string[] = [
+  LABELS.AGENT_WORKING,
+  LABELS.PR_PATROL_WORKING,
+];
 
 type LabelMeta = { color: string; description: string };
 
@@ -56,6 +63,10 @@ export const LABEL_META = {
   [LABELS.AGENT_FILED]: {
     color: 'ededed',
     description: 'Issue filed by an agent',
+  },
+  [LABELS.PR_PATROL_WORKING]: {
+    color: '6f42c1',
+    description: 'PR Patrol actively working on this',
   },
   [LABELS.STAGE_APPROVED]: {
     color: '0e8a16',

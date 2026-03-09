@@ -16,7 +16,7 @@ import { RelatedPages } from "@/components/RelatedPages";
 import { WikiSidebar, MobileSidebarTrigger } from "@/components/wiki/WikiSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { detectSidebarType, getWikiNav, isAboutPage } from "@/lib/wiki-nav";
-import { AlertTriangle, Database, Github, FileCheck, BarChart3 } from "lucide-react";
+import { AlertTriangle, Database, Github } from "lucide-react";
 import { PageFeedback } from "@/components/wiki/PageFeedback";
 import type { Metadata } from "next";
 import {
@@ -31,13 +31,14 @@ import { CitationHealthBanner } from "@/components/wiki/CitationHealthBanner";
 import { CitationQuotesProvider } from "@/components/wiki/CitationQuotesContext";
 import { ReferenceProvider } from "@/components/wiki/ReferenceContext";
 import type { RefMapEntry } from "@/components/wiki/ReferenceContext";
-import type { RefMapEntry as PreprocessorRefMapEntry } from "@/lib/reference-preprocessor";
+import type { RefMapEntry as PreprocessorRefMapEntry, KBFactRefData } from "@/lib/reference-preprocessor";
+import { getDomain } from "@/components/wiki/resource-utils";
+import { formatFactValueForFootnote } from "@/lib/reference-preprocessor";
 import { References } from "@/components/wiki/References";
-import { getCitationQuotes, getStatementCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
+import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 import type { CitationQuote } from "@/lib/citation-data";
-import { EntityStatementsCard } from "@/components/wiki/EntityStatementsCard";
-import { PageStatementsSection } from "@/components/wiki/PageStatementsSection";
 
+import { KBAutoFacts } from "@/components/wiki/kb/KBAutoFacts";
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
 /**
@@ -62,13 +63,25 @@ function buildReferenceMap(
           sourceUrl: d.sourceUrl ?? null,
           sourceTitle: d.sourceTitle ?? null,
         });
+      } else if (entry.kind === "kb" && entry.data) {
+        const d = entry.data as KBFactRefData;
+        map.set(num, {
+          type: "kb",
+          kbEntity: d.subjectId,
+          kbProperty: d.propertyId,
+          kbValue: formatFactValueForFootnote(d.value),
+          kbAsOf: d.asOf,
+          kbSource: d.source,
+          kbSourceResource: d.sourceResource,
+          kbNotes: d.notes,
+        });
       } else if (entry.kind === "citation" && entry.data) {
         const d = entry.data as { title?: string; url?: string; note?: string };
         map.set(num, {
           type: "citation",
           title: d.title ?? null,
           url: d.url ?? null,
-          domain: d.url ? new URL(d.url).hostname.replace(/^www\./, "") : null,
+          domain: d.url ? getDomain(d.url) : null,
           note: d.note ?? null,
         });
       }
@@ -248,18 +261,6 @@ function ContentMeta({
             Data
           </a>
         )}
-        {numId && (
-          <a href={`/wiki/${numId}/statements`} className="page-meta-github">
-            <BarChart3 size={14} />
-            Statements
-          </a>
-        )}
-        {numId && (
-          <a href={`/claims/entity/${slug}`} className="page-meta-github">
-            <FileCheck size={14} />
-            Claims
-          </a>
-        )}
         <PageFeedback pageTitle={pageTitle} pageSlug={slug} />
         {!isInternal && <InfoBoxToggle />}
       </div>
@@ -396,9 +397,6 @@ async function ContentView({
           {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
           {showToc && <TableOfContents headings={tocHeadings} />}
           {page.content}
-          {isArticle && !isInternal && entity && (
-            <PageStatementsSection entityId={slug} />
-          )}
           {!isInternal && <References pageId={slug} />}
         </article>
         </ReferenceProvider>
@@ -406,6 +404,8 @@ async function ContentView({
           <CitationOverlay quotes={citationQuotes} />
         )}
       </CitationQuotesProvider>
+      {/* KB facts section: auto-rendered for entities with substantive KB data */}
+      {isArticle && !isInternal && entity && <KBAutoFacts entityId={slug} />}
       {/* Related pages rendered outside prose to avoid inherited link styles */}
       {isArticle && !isInternal && <RelatedPages entityId={slug} entity={entity} />}
     </InfoBoxVisibilityProvider>
@@ -467,23 +467,11 @@ export default async function WikiPage({ params }: PageProps) {
 
     const entityPath = getEntityPath(slug) || "";
 
-    const [result, legacyCitationQuotes] = await Promise.all([
-      renderMdxPage(slug),
-      getCitationQuotes(slug),
-    ]);
+    const result = await renderMdxPage(slug);
     if (!result) notFound();
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
-    // Merge statement-pipeline quotes (Statements V2) with legacy quotes.
-    // Statement quotes take precedence for any footnote they cover.
-    const stmtCitationQuotes = result.referenceMap
-      ? getStatementCitationQuotes(slug, result.referenceMap)
-      : [];
-    const stmtFootnotes = new Set(stmtCitationQuotes.map((q) => q.footnote));
-    const citationQuotes: CitationQuote[] = [
-      ...stmtCitationQuotes,
-      ...legacyCitationQuotes.filter((q) => !stmtFootnotes.has(q.footnote)),
-    ];
+    const citationQuotes = getCitationQuotes(slug);
 
     const pageData = getPageById(slug);
     const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
@@ -513,23 +501,11 @@ export default async function WikiPage({ params }: PageProps) {
     // No numeric ID — render directly by slug (page-only content without entity)
     const entityPath = getEntityPath(id) || "";
 
-    const [result, legacyCitationQuotes] = await Promise.all([
-      renderMdxPage(id),
-      getCitationQuotes(id),
-    ]);
+    const result = await renderMdxPage(id);
     if (!result) notFound();
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
-    // Merge statement-pipeline quotes (Statements V2) with legacy quotes.
-    // Statement quotes take precedence for any footnote they cover.
-    const stmtCitationQuotes = result.referenceMap
-      ? getStatementCitationQuotes(id, result.referenceMap)
-      : [];
-    const stmtFootnotes = new Set(stmtCitationQuotes.map((q) => q.footnote));
-    const citationQuotes: CitationQuote[] = [
-      ...stmtCitationQuotes,
-      ...legacyCitationQuotes.filter((q) => !stmtFootnotes.has(q.footnote)),
-    ];
+    const citationQuotes = getCitationQuotes(id);
 
     const pageData = getPageById(id);
     const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;

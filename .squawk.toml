@@ -21,14 +21,20 @@ pg_version = "16"
 #   integrity check (validate-drizzle-journal.ts) provides the equivalent safety guarantee
 #   by ensuring migrations only run once.
 #
-# require-concurrent-index-creation, disallowed-unique-constraint, constraint-missing-not-valid,
+# require-concurrent-index-creation, require-concurrent-index-deletion,
+# disallowed-unique-constraint, constraint-missing-not-valid,
 # adding-not-nullable-field, adding-foreign-key-constraint:
 #   Drizzle's migrator runs ALL statements in a single transaction (see pg-core/dialect.js
-#   line 60). CREATE INDEX CONCURRENTLY cannot run inside a transaction, and the NOT VALID
+#   line 60). CREATE/DROP INDEX CONCURRENTLY cannot run inside a transaction, and the NOT VALID
 #   two-step pattern for FK constraints requires two separate transactions — both impossible
 #   with Drizzle. Tables are small (hundreds of rows) so brief locking is acceptable.
 #   If large-table migrations are needed in the future, use a separate raw SQL runner
 #   outside Drizzle (see .claude/rules/database-migrations.md for the manual migration pattern).
+#
+# ban-drop-column:
+#   Intentional column removals are part of the deliberate consolidation/cleanup migrations
+#   in this project (e.g. removing FK columns superseded by a new data model). The column
+#   removal risk is mitigated by updating all consumers in the same PR before deploying.
 excluded_rules = [
   "prefer-bigint-over-int",
   "prefer-identity",
@@ -36,8 +42,11 @@ excluded_rules = [
   "require-timeout-settings",
   "prefer-robust-stmts",
   "require-concurrent-index-creation",
+  "require-concurrent-index-deletion",
   "disallowed-unique-constraint",
   "constraint-missing-not-valid",
   "adding-not-nullable-field",
   "adding-foreign-key-constraint",
+  "renaming-table",
+  "ban-drop-column",
 ]

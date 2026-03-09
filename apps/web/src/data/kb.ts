@@ -29,6 +29,28 @@ function sortByAsOfDesc(facts: Fact[]): Fact[] {
   });
 }
 
+/** Lazy-initialized index: factId → Fact. Built once on first call. */
+let factByIdIndex: Map<string, Fact> | undefined;
+
+/**
+ * Look up a single fact by its ID (e.g. "f_dW5cR9mJ8q").
+ * Uses a lazy-built index for O(1) lookups after initial build.
+ */
+export function getKBFactById(factId: string): Fact | undefined {
+  const kb = getKB();
+  if (!kb) return undefined;
+
+  if (!factByIdIndex) {
+    factByIdIndex = new Map();
+    for (const facts of Object.values(kb.facts)) {
+      for (const f of facts) {
+        factByIdIndex.set(f.id, f);
+      }
+    }
+  }
+  return factByIdIndex.get(factId);
+}
+
 /**
  * Get all facts for an entity, optionally filtered by property.
  * Returns facts sorted most-recent-first (by asOf).
@@ -46,11 +68,40 @@ export function getKBFacts(entity: string, property?: string): Fact[] {
 }
 
 /**
- * Get the latest (most recent by asOf) fact for an entity + property.
+ * Check whether a fact has expired based on its validEnd field.
+ * A fact is expired if validEnd is set AND validEnd < today's date.
+ * Supports YYYY, YYYY-MM, and YYYY-MM-DD formats.
+ * Facts without validEnd are never expired.
  */
-export function getKBLatest(entity: string, property: string): Fact | undefined {
+export function isFactExpired(fact: Fact): boolean {
+  if (!fact.validEnd) return false;
+  // Pad partial dates so comparison works: "2024" → "2024-01-01", "2024-06" → "2024-06-01"
+  const parts = fact.validEnd.split("-");
+  const padded =
+    parts.length === 1
+      ? `${parts[0]}-01-01`
+      : parts.length === 2
+        ? `${parts[0]}-${parts[1]}-01`
+        : fact.validEnd;
+  const today = new Date().toISOString().slice(0, 10);
+  return padded < today;
+}
+
+/**
+ * Get the latest (most recent by asOf) fact for an entity + property.
+ * By default, excludes expired facts (those with a validEnd in the past).
+ * Set includeExpired=true to return expired facts as well.
+ */
+export function getKBLatest(
+  entity: string,
+  property: string,
+  options?: { includeExpired?: boolean },
+): Fact | undefined {
   const facts = getKBFacts(entity, property);
-  return facts[0]; // Already sorted most-recent-first
+  if (options?.includeExpired) {
+    return facts[0]; // Already sorted most-recent-first
+  }
+  return facts.find((f) => !isFactExpired(f));
 }
 
 /**
@@ -110,10 +161,12 @@ export const getKBThing = getKBEntity;
  * Get the latest fact for a given property across all entities.
  * Returns a map of entityId → latest Fact for entities that have the property.
  * Optionally filtered to a subset of entity IDs.
+ * By default, excludes expired facts (those with a validEnd in the past).
  */
 export function getKBFactsByProperty(
   propertyId: string,
   entityIds?: string[],
+  options?: { includeExpired?: boolean },
 ): Map<string, Fact> {
   const kb = getKB();
   if (!kb) return new Map();
@@ -122,8 +175,8 @@ export function getKBFactsByProperty(
   const result = new Map<string, Fact>();
 
   for (const entityId of ids) {
-    const facts = getKBFacts(entityId, propertyId);
-    if (facts.length > 0) result.set(entityId, facts[0]!);
+    const fact = getKBLatest(entityId, propertyId, options);
+    if (fact) result.set(entityId, fact);
   }
 
   return result;
@@ -133,10 +186,12 @@ export function getKBFactsByProperty(
  * Get all facts for a given property across all entities (full history).
  * Returns a map of entityId → Fact[] (sorted most-recent-first).
  * Optionally filtered to a subset of entity IDs.
+ * By default, excludes expired facts (those with a validEnd in the past).
  */
 export function getKBAllFactsByProperty(
   propertyId: string,
   entityIds?: string[],
+  options?: { includeExpired?: boolean },
 ): Map<string, Fact[]> {
   const kb = getKB();
   if (!kb) return new Map();
@@ -145,7 +200,10 @@ export function getKBAllFactsByProperty(
   const result = new Map<string, Fact[]>();
 
   for (const entityId of ids) {
-    const facts = getKBFacts(entityId, propertyId);
+    let facts = getKBFacts(entityId, propertyId);
+    if (!options?.includeExpired) {
+      facts = facts.filter((f) => !isFactExpired(f));
+    }
     if (facts.length > 0) result.set(entityId, facts);
   }
 

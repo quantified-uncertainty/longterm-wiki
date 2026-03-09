@@ -153,7 +153,10 @@ function computeStage(blockReasons: MergeBlockReason[]): string {
     return 'In merge queue';
   }
   if (blockReasons.includes('agent-working')) {
-    return 'Claude is working on this PR';
+    return 'An agent is actively working on this PR';
+  }
+  if (blockReasons.includes('pr-patrol-working')) {
+    return 'PR Patrol is actively working on this PR';
   }
   if (blockReasons.includes('ci-pending')) {
     return 'Waiting for CI to complete';

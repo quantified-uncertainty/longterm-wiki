@@ -50,12 +50,24 @@ ${issues.join(', ')}
 ### CI Failure
 - Check CI status: gh pr checks ${num} --repo ${repo}
 - Read the failing check logs to understand the failure
-- **STOP IMMEDIATELY and report** if ANY of these apply:
-  - The check requires a human action (adding a label like \`gate:rules-ok\`, manual approval, etc.)
-  - The failure is in a Vercel deployment or external service (not a code issue)
-  - The same check is also failing on the \`main\` branch (pre-existing, not caused by this PR)
-  - The failure is a permissions or authentication issue
-- If the failure IS a code issue you can fix: fix it, run locally to verify (pnpm build / pnpm test), commit and push`);
+- For each failing check, determine the cause:
+
+  **If the check requires a label like \`gate:rules-ok\`:**
+  - Read what the check enforces (usually in the CI log or check name)
+  - Verify whether the condition is actually satisfied for this PR
+  - If yes: add the label yourself — \`gh pr edit ${num} --repo ${repo} --add-label gate:rules-ok\`
+  - If no: fix the underlying issue so the condition is satisfied, then add the label
+
+  **If the check is a pre-existing failure on main** (also failing on main, not caused by this PR):
+  - Confirm by checking main: gh run list --repo ${repo} --branch main --limit 3
+  - If confirmed pre-existing: state that and stop (this is a dead end, not fixable here)
+
+  **If the failure is in a Vercel deployment or external service:**
+  - Re-triggering CI often resolves transient Vercel failures: gh pr comment ${num} --repo ${repo} --body "/retry"
+  - If it's a persistent Vercel issue, stop and report
+
+  **If the failure is a code issue you can fix:**
+  - Fix it, run locally to verify (pnpm build / pnpm test), commit and push`);
   }
 
   if (issues.includes('missing-testplan')) {
@@ -128,14 +140,71 @@ re-review is not required:
 - Do NOT run /agent-session-start or /agent-session-ready-PR — this is a targeted fix, not a full session
 - Do NOT create new branches — work on the existing PR branch
 
-## When to stop early
-- **If the issue requires human intervention** (adding labels, approvals, external service fixes): output a clear summary of why and stop immediately. Do not attempt workarounds.
-- **If the issue is pre-existing** (also failing on main, not introduced by this PR): state that and stop.
-- **If you've tried 2+ approaches and none worked**: stop and summarize what you tried. Do not keep cycling through the same strategies.
-- **If the fix is "no action needed"** (e.g., no matching issue exists for missing-issue-ref): say so and stop. Not every detected issue requires a code change.
-- Stopping early with a clear explanation is BETTER than burning through all turns without progress.`);
+## Escalation order — exhaust automation before stopping
+
+Work through issues in this order. Only escalate to "needs human" after attempting all earlier steps:
+
+1. **Fix the code** — address CI failures, conflicts, and bot review comments directly
+2. **Add labels you can verify** — if \`gate:rules-ok\` is needed, verify the rule is actually satisfied,
+   then add the label yourself: \`gh pr edit ${num} --add-label gate:rules-ok\`
+3. **Address ALL bot comments** — don't skip CodeRabbit/bot comments; try to fix them even if they look complex
+4. **Complete checklist items** — update PR body unchecked items when you've verified the task is done
+5. **Only then escalate** — if after all the above there's still something only a human can do
+   (e.g., approve a security exception, provide missing context the bot flagged as ambiguous),
+   output a clear summary and stop
+
+## When to stop (escalate to human)
+
+ONLY stop early for issues that **genuinely require human decision-making**:
+- A named individual's approval is required (e.g., security team sign-off)
+- External service configuration that only an admin can change
+- The PR has intentional breaking changes that need owner confirmation
+- Merge conflicts where the intent of both sides is truly ambiguous
+
+**Do NOT stop early for:**
+- Labels you can add yourself after verifying the condition is met
+- Bot review comments you haven't attempted to fix yet
+- CI failures you haven't investigated
+- Anything where you could plausibly make progress with more investigation
+
+If the issue is pre-existing (same failure on main branch, not caused by this PR):
+state that clearly and stop — this is not a human escalation, just a dead end.
+
+If you've tried 2+ distinct approaches and none worked: stop and summarize what you tried.
+Do not keep cycling through the same strategies.`);
 
   return sections.join('\n');
+}
+
+// ── Branch agent prompt ──────────────────────────────────────────────────────
+
+/**
+ * Build the prompt for a branch-agent fix session.
+ * Similar to buildPrompt but:
+ * - Includes cycle context (session N of M)
+ * - Emphasizes CI-wait-then-retry workflow
+ * - Tells the agent it has multiple sessions available (don't try to do everything at once)
+ */
+export function buildBranchAgentPrompt(
+  pr: DetectedPr,
+  repo: string,
+  cycle: number,
+  maxCycles: number,
+): string {
+  const basePrompt = buildPrompt(pr, repo);
+
+  const cycleContext = `
+## Branch Agent Context
+
+You are session ${cycle} of up to ${maxCycles} for this PR.
+- After you finish, CI will run and results will be checked
+- If CI still fails after your session, another session will be spawned
+- You do NOT need to fix everything in one session — focus on making clear progress
+- Stop when you've done one logical unit of work (e.g., fixed the CI failure, or addressed bot comments)
+- The outer loop handles retrying and waiting for CI — don't spin endlessly yourself
+`;
+
+  return cycleContext + '\n' + basePrompt;
 }
 
 // ── Main branch fix prompt ───────────────────────────────────────────────────

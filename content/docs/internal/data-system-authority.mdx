@@ -1,7 +1,7 @@
 ---
 numericId: E1042
 title: "Data System Authority Rules"
-description: "Defines which data system is authoritative for each entity type, resolving overlaps between KB YAML, old YAML facts, and Postgres statements."
+description: "Defines which data system is authoritative for each entity type, resolving overlaps between KB YAML and old YAML facts."
 subcategory: architecture
 lastEdited: "2026-03-07"
 update_frequency: 180
@@ -9,13 +9,14 @@ update_frequency: 180
 
 ## Overview
 
-The wiki has three overlapping systems that store structured entity data:
+The wiki has two overlapping systems that store structured entity data:
 
-1. **KB YAML** (`packages/kb/data/things/*.yaml`) — the new knowledge base package, with rich typed facts, time series, and cross-entity references
+1. **KB YAML** (`packages/kb/data/things/*.yaml`) — the knowledge base package, with rich typed facts, time series, and cross-entity references
 2. **Old YAML facts** (`data/facts/*.yaml`) — the legacy facts system, powering the `<F>` inline component and `<Calc>` expressions
-3. **Postgres statements** (`statements` table) — web-sourced citations and claims, LLM-extracted from page text, with verdict and source tracking
 
 Nine entities currently have entries in both KB YAML and old YAML facts. Without a clear rule, editors may update one system while the other goes stale. This document defines the authority hierarchy.
+
+> **Note:** The Postgres statements system was retired in March 2026 (PR #1908). The DB tables have been archived with a `_archived_` prefix. This document now covers only the two remaining data systems.
 
 ---
 
@@ -43,11 +44,9 @@ Current non-KB entities with old facts files:
 - `manifund.yaml`
 - `survival-and-flourishing-fund.yaml`
 
-### Rule 3: Postgres statements are not the source of truth for structured properties
+### Rule 3: Citations system is separate from structured facts
 
-The `statements` table stores web-sourced citations extracted by LLMs. It is authoritative for **claim provenance and verification status** (what was said, where, and whether it's accurate), not for canonical property values.
-
-When a statement's structured value conflicts with KB YAML or old facts, the YAML is correct and the statement may be stale or approximate. Do not update YAML to match statements without independently verifying the source.
+The citations system (citation quotes, accuracy checks) operates independently. It tracks which sources are cited on wiki pages and verifies their accuracy, but it is not a source of structured property values.
 
 ---
 
@@ -90,16 +89,17 @@ Do not delete old facts files outright if there are still active `<F>` tags refe
 
 ## System Comparison
 
-| Dimension | KB YAML | Old YAML facts | Postgres statements |
-|-----------|---------|---------------|---------------------|
-| Location | `packages/kb/data/things/` | `data/facts/` | `statements` table (wiki-server DB) |
-| Authority | Properties for KB entities | Properties for non-KB entities | Claim provenance + verdicts |
-| Data model | Typed facts with `property`, `value`, `asOf`, `source`, `validEnd` | Hash-keyed facts with `measure`, `value`, `asOf`, `source` | LLM-extracted claims with `structuredValue`, `verdict`, citation join table |
-| Cross-entity refs | Yes — `!ref` format for entity references | No | `relatedEntities` array |
-| Time series | Yes — multiple facts per property with `asOf` | Yes — multiple entries with `asOf` | Partial — `valueDate` field |
-| Display components | `<KBFactTable>`, `<KBEntitySidebar>`, `<KBEntityFacts>` | `<F>`, `<Calc>` inline components | `<EntityStatementsCard>`, statements pages |
-| Update workflow | Edit KB YAML file | Edit facts YAML file | LLM extraction or manual via wiki-server API |
-| Build integration | Compiled into `database.json` via build-data | Compiled into `database.json` via build-data | Real-time API queries to wiki-server |
+| Dimension | KB YAML | Old YAML facts |
+|-----------|---------|---------------|
+| Location | `packages/kb/data/things/` | `data/facts/` |
+| Authority | Properties for KB entities | Properties for non-KB entities |
+| Data model | Typed facts with `property`, `value`, `asOf`, `source`, `validEnd` | Hash-keyed facts with `measure`, `value`, `asOf`, `source` |
+| Cross-entity refs | Yes — `!ref` format for entity references | No |
+| Custom YAML tags | `!ref` (entity references), `!date` (explicit date typing) | None |
+| Time series | Yes — multiple facts per property with `asOf` | Yes — multiple entries with `asOf` |
+| Display components | `<KBFactTable>`, `<KBEntitySidebar>`, `<KBEntityFacts>` | `<F>`, `<Calc>` inline components |
+| Update workflow | Edit KB YAML file | Edit facts YAML file |
+| Build integration | Compiled into `database.json` via build-data | Compiled into `database.json` via build-data |
 
 ---
 

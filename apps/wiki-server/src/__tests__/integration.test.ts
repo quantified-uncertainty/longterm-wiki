@@ -32,10 +32,6 @@ const migrationsFolder = path.resolve(__dirname, "../../drizzle");
  * first for clarity.
  */
 async function dropAllTables(conn: ReturnType<typeof postgres>) {
-  // Children with FKs first (statements system)
-  await conn`DROP TABLE IF EXISTS statement_citations CASCADE`;
-  await conn`DROP TABLE IF EXISTS statements CASCADE`;
-  await conn`DROP TABLE IF EXISTS properties CASCADE`;
   // Children with FKs first (existing)
   await conn`DROP TABLE IF EXISTS resource_citations CASCADE`;
   await conn`DROP TABLE IF EXISTS auto_update_results CASCADE`;
@@ -78,10 +74,6 @@ const ALL_EXPECTED_TABLES = [
   "summaries",
   "claims",
   "page_links",
-  // Statements system (migration 0051)
-  "properties",
-  "statements",
-  "statement_citations",
 ];
 
 describeWithDb("Integration: Drizzle migrations", () => {

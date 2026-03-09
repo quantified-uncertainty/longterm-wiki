@@ -10,6 +10,9 @@ vi.mock("next-mdx-remote/rsc", () => ({
 vi.mock("@/data", () => ({
   getIdRegistry: () => ({ byNumericId: {}, bySlug: {} }),
 }));
+vi.mock("@data/kb", () => ({
+  getKBFactById: () => undefined,
+}));
 
 import { preprocessMdx } from "../mdx";
 

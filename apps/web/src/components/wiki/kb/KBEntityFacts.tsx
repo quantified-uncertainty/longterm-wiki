@@ -12,7 +12,7 @@
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBFacts, getKBEntity, getKBProperties } from "@data/kb";
+import { getKBFacts, getKBEntity, getKBProperties, isFactExpired } from "@data/kb";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import { formatKBDate, isUrl, shortDomain, titleCase } from "./format";
 import { KBFactValueDisplay } from "./KBFactValueDisplay";
@@ -123,9 +123,9 @@ function SingleValueProperty({
   propertyId: string;
   items: FactWithProperty[];
 }) {
-  // Prefer currently-active facts (validEnd == null), then sort by asOf descending
-  const candidates = items.some((item) => !item.fact.validEnd)
-    ? items.filter((item) => !item.fact.validEnd)
+  // Prefer non-expired facts (validEnd absent or in the future), then sort by asOf descending
+  const candidates = items.some((item) => !isFactExpired(item.fact))
+    ? items.filter((item) => !isFactExpired(item.fact))
     : items;
   const sorted = [...candidates].sort((a, b) => {
     if (!a.fact.asOf && !b.fact.asOf) return 0;

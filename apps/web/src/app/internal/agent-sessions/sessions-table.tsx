@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { GITHUB_REPO_URL } from "@lib/site-config";
 import { shortenDirectory } from "@lib/format";
-import type { AgentSessionRow } from "./agent-sessions-content";
+import type { AgentSessionListRow as AgentSessionRow } from "@wiki-server/api-response-types";
 
 // ── Status Badge ─────────────────────────────────────────────────────────
 

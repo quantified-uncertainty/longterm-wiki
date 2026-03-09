@@ -3,9 +3,9 @@ import { DataSourceBanner } from "@/components/internal/DataSourceBanner";
 import { InsightsTable } from "./insights-table";
 
 export type InsightRow = {
-  date: string;
+  date: string | null;
   branch: string | null;
-  title: string;
+  title: string | null;
   type: "learning" | "recommendation";
   text: string;
 };
@@ -16,7 +16,7 @@ type InsightsResponse = {
 };
 
 async function loadFromApi() {
-  return fetchDetailed<InsightsResponse>("/api/sessions/insights", {
+  return fetchDetailed<InsightsResponse>("/api/agent-sessions/insights", {
     revalidate: 60,
   });
 }
