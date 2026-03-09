@@ -9,13 +9,13 @@
  *   crux footnotes migrate-cr --page=<id>    Process a single page
  */
 
-import { join, basename } from 'path';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { parse as parseYaml } from 'yaml';
-import { PROJECT_ROOT, CONTENT_DIR_ABS } from '../lib/content-types.ts';
+import { basename } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
+import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { batchedRequest, isServerAvailable } from '../lib/wiki-server/client.ts';
 import { normalizeUrlForDedup } from '../lib/footnote-parser.ts';
+import { buildKBFactSourceMap, type KBFactMatch } from '../lib/kb-fact-lookup.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 
 // ── Types ─────────────────────────────────────────────────────────────
@@ -53,25 +53,6 @@ interface ReferencesAllResponse {
   totalCitations: number;
 }
 
-interface KBFact {
-  id: string;
-  property: string;
-  value: unknown;
-  source?: string;
-  notes?: string;
-}
-
-interface KBEntityFile {
-  thing: {
-    id: string;
-    stableId: string;
-    type: string;
-    name: string;
-    numericId?: string;
-  };
-  facts?: KBFact[];
-}
-
 interface MigrationAction {
   /** Original cr- reference ID (e.g., "cr-abc1") */
   originalRef: string;
@@ -91,28 +72,7 @@ interface PageMigrationResult {
   written: boolean;
 }
 
-// ── Constants ─────────────────────────────────────────────────────────
-
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data', 'things');
-
 // ── Helpers ───────────────────────────────────────────────────────────
-
-/**
- * Load KB facts for a given entity ID.
- * Returns an empty array if the KB file doesn't exist.
- */
-function loadKBFacts(entityId: string): KBFact[] {
-  const filePath = join(KB_THINGS_DIR, `${entityId}.yaml`);
-  if (!existsSync(filePath)) return [];
-
-  try {
-    const content = readFileSync(filePath, 'utf-8');
-    const parsed = parseYaml(content) as KBEntityFile;
-    return parsed.facts ?? [];
-  } catch {
-    return [];
-  }
-}
 
 /**
  * Extract the page slug from an MDX file path.
@@ -142,30 +102,17 @@ function findCrRefs(content: string): string[] {
 
 /**
  * Find all existing [^rc-XXXX] reference IDs in content.
+ * Matches hex chars plus any trailing 'x' disambiguators.
  * Used to prevent collisions when converting cr- to rc- refs.
  */
 function findExistingRcRefs(content: string): Set<string> {
-  const re = /\[\^(rc-[a-f0-9]+)\]/g;
+  const re = /\[\^(rc-[a-z0-9]+)\]/gi;
   const refs = new Set<string>();
   let match: RegExpExecArray | null;
   while ((match = re.exec(content)) !== null) {
     refs.add(match[1]);
   }
   return refs;
-}
-
-/**
- * Build a normalized URL → KB fact ID map for an entity's KB facts.
- * Uses the same normalizeUrlForDedup as the improve pipeline for consistency.
- */
-function buildKBUrlMap(kbFacts: KBFact[]): Map<string, string> {
-  const urlToFactId = new Map<string, string>();
-  for (const fact of kbFacts) {
-    if (fact.source) {
-      urlToFactId.set(normalizeUrlForDedup(fact.source), fact.id);
-    }
-  }
-  return urlToFactId;
 }
 
 /**
@@ -176,28 +123,29 @@ function buildKBUrlMap(kbFacts: KBFact[]): Map<string, string> {
  * cr- ref is matched only to the KB fact for its own citation, not any
  * arbitrary citation on the page.
  *
- * Falls back to matching the claim text against KB fact notes if no URL match.
+ * Uses the shared buildKBFactSourceMap from kb-fact-lookup.ts (same normalization
+ * and first-match semantics as the improve pipeline).
  */
 function matchClaimToKBFact(
   claimRef: ClaimReference,
   citations: PageCitation[],
-  kbUrlMap: Map<string, string>,
+  kbSourceMap: Map<string, KBFactMatch>,
 ): string | null {
-  if (kbUrlMap.size === 0) return null;
+  if (kbSourceMap.size === 0) return null;
 
-  // Strategy 1: Find the citation with the same referenceId as this claim ref.
+  // Find the citation with the same referenceId as this claim ref.
   // The claims API returns a referenceId that links to the citation in the same
   // footnote. Match that specific citation's URL against KB facts.
   if (claimRef.referenceId) {
     const associatedCitation = citations.find(c => c.referenceId === claimRef.referenceId);
     if (associatedCitation?.url) {
       const normalized = normalizeUrlForDedup(associatedCitation.url);
-      const factId = kbUrlMap.get(normalized);
-      if (factId) return factId;
+      const match = kbSourceMap.get(normalized);
+      if (match) return match.factId;
     }
   }
 
-  // Strategy 2: No direct citation association — no match.
+  // No direct citation association — no match.
   // We intentionally do NOT fall back to matching any citation on the page,
   // as that would produce false positives (different claims mapped to the
   // same unrelated KB fact).
@@ -270,6 +218,15 @@ async function migrateCrCommand(
   }
 
   if (filesWithCr.length === 0) {
+    if (options.ci) {
+      return {
+        exitCode: 0,
+        output: JSON.stringify({
+          pages: [],
+          summary: { totalCrRefs: 0, totalKbMatches: 0, totalRcConversions: 0, totalPages: 0 },
+        }),
+      };
+    }
     const msg = pageFilter
       ? `No [^cr-] references found in page: ${pageFilter}`
       : 'No [^cr-] references found in any MDX files.';
@@ -286,9 +243,8 @@ async function migrateCrCommand(
     // Get page's entity ID from the slug
     const entityId = slug;
 
-    // Load KB facts for this entity
-    const kbFacts = loadKBFacts(entityId);
-    const kbUrlMap = buildKBUrlMap(kbFacts);
+    // Load KB fact source map for this entity (reuses shared kb-fact-lookup.ts)
+    const kbSourceMap = await buildKBFactSourceMap(entityId);
 
     // Get claim references from the API for this page
     const pageData = allRefs.pages[slug];
@@ -316,8 +272,8 @@ async function migrateCrCommand(
 
       // Try to match to a KB fact
       let kbFactId: string | null = null;
-      if (claimRef && kbUrlMap.size > 0) {
-        kbFactId = matchClaimToKBFact(claimRef, citations, kbUrlMap);
+      if (claimRef && kbSourceMap.size > 0) {
+        kbFactId = matchClaimToKBFact(claimRef, citations, kbSourceMap);
         // Prevent multiple cr- refs mapping to the same KB fact
         if (kbFactId && usedKbFactIds.has(kbFactId)) {
           kbFactId = null;
@@ -339,9 +295,8 @@ async function migrateCrCommand(
         // No match — convert cr- to rc-, checking for collisions
         const suffix = crRef.replace('cr-', '');
         let newRef = `rc-${suffix}`;
-        if (existingRcRefs.has(newRef)) {
-          // Collision — append extra chars to disambiguate
-          newRef = `rc-${suffix}x`;
+        while (existingRcRefs.has(newRef)) {
+          newRef = `${newRef}x`;
         }
         existingRcRefs.add(newRef);
         actions.push({
