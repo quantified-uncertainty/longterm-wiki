@@ -827,6 +827,121 @@ async function buildCitationQuotesBundle() {
 }
 
 /**
+ * Normalize a URL for fuzzy matching between resource URLs and citation URLs.
+ * Strips protocol, www. prefix, trailing slashes, and hash fragments. Preserves
+ * query string. Mirrors the logic in resource-utils.ts (cannot import .ts in .mjs).
+ */
+function normalizeUrlForMatch(str) {
+  try {
+    const url = new URL(str);
+    url.hostname = url.hostname.replace(/^www\./, '');
+    url.hash = '';
+    return (
+      url.host + url.pathname.replace(/\/+$/, '') + url.search
+    ).toLowerCase();
+  } catch {
+    return str.replace(/\/+$/, '').toLowerCase();
+  }
+}
+
+/**
+ * Cross-reference KB fact source URLs with citation quotes to produce
+ * a verification status map: factId → best accuracy verdict.
+ *
+ * This runs at build time with data already in memory — no API calls.
+ * Returns { [factId]: verdictString } for facts whose source URL matches
+ * a verified citation quote.
+ *
+ * @param {object} kb - Serialized KB data
+ * @param {object} citationQuotesBundle - Citation quotes keyed by page ID
+ * @param {Array} resources - Resources array from database.resources (for sourceResource lookups)
+ */
+function buildKBFactVerification(kb, citationQuotesBundle, resources) {
+  if (!kb || !kb.facts || !citationQuotesBundle) {
+    console.log('  kbFactVerification: skipped (no KB or citation data)');
+    return {};
+  }
+
+  // Build a URL → best verdict map from all citation quotes across all pages.
+  // A URL may appear in multiple pages with different verdicts; prefer the
+  // MOST CAUTIOUS verdict (worst case wins) so flagged issues are never hidden.
+  const VERDICT_PRIORITY = {
+    inaccurate: 6,    // Most concerning → highest priority
+    unsupported: 5,
+    minor_issues: 4,
+    not_verifiable: 3,
+    accurate: 2,
+    verified: 1,
+  };
+
+  const urlToVerdict = new Map();
+
+  for (const quotes of Object.values(citationQuotesBundle)) {
+    for (const q of quotes) {
+      if (!q.url) continue;
+      const verdict = q.accuracyVerdict || (q.quoteVerified ? 'verified' : null);
+      if (!verdict) continue;
+
+      const normalizedUrl = normalizeUrlForMatch(q.url);
+      const existing = urlToVerdict.get(normalizedUrl);
+      const existingPriority = existing ? (VERDICT_PRIORITY[existing] ?? 0) : 0;
+      const newPriority = VERDICT_PRIORITY[verdict] ?? 0;
+      if (newPriority > existingPriority) {
+        urlToVerdict.set(normalizedUrl, verdict);
+      }
+    }
+  }
+
+  if (urlToVerdict.size === 0) {
+    console.log('  kbFactVerification: 0 matches (no citation URLs with verdicts)');
+    return {};
+  }
+
+  // Build resource ID → URL map for sourceResource lookups
+  const resourceUrlById = new Map();
+  if (resources && Array.isArray(resources)) {
+    for (const r of resources) {
+      if (r.id && r.url) {
+        resourceUrlById.set(r.id, r.url);
+      }
+    }
+  }
+
+  // Match KB fact source URLs against the citation URL map
+  const verification = {};
+  let matchCount = 0;
+  let resourceLookupCount = 0;
+
+  for (const [entityId, facts] of Object.entries(kb.facts)) {
+    for (const fact of facts) {
+      // Resolve the source URL: direct `source` field, or look up via `sourceResource`
+      let url = (fact.source && typeof fact.source === 'string') ? fact.source : null;
+      if (!url && fact.sourceResource) {
+        const resourceUrl = resourceUrlById.get(fact.sourceResource);
+        if (resourceUrl) {
+          url = resourceUrl;
+          resourceLookupCount++;
+        }
+      }
+      if (!url) continue;
+
+      // Only match URL sources
+      if (!url.startsWith('http://') && !url.startsWith('https://')) continue;
+
+      const normalizedSource = normalizeUrlForMatch(url);
+      const verdict = urlToVerdict.get(normalizedSource);
+      if (verdict) {
+        verification[fact.id] = verdict;
+        matchCount++;
+      }
+    }
+  }
+
+  console.log(`  kbFactVerification: ${matchCount} facts matched from ${urlToVerdict.size} citation URLs (${resourceLookupCount} via sourceResource)`);
+  return verification;
+}
+
+/**
  * Fetch all page references (claim refs + citations) from the wiki-server.
  * Returns a map of pageId → { claimReferences, citations } for the reference preprocessor.
  * Falls back to an empty object if the server is unavailable.
@@ -1245,6 +1360,11 @@ async function main() {
         buildCitationQuotesBundle(),
       ]);
   database.citationQuotes = citationQuotesBundle;
+
+  // =========================================================================
+  // KB FACT VERIFICATION — cross-reference KB source URLs with citation quotes
+  // =========================================================================
+  database.kbFactVerification = buildKBFactVerification(database.kb, citationQuotesBundle, resources);
 
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates);

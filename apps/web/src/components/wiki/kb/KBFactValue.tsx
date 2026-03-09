@@ -13,11 +13,12 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { getEntityById, getEntityHref } from "@data";
-import { getKBFacts, getKBLatest, getKBProperty } from "@data/kb";
+import { getKBFacts, getKBLatest, getKBProperty, getKBFactVerification } from "@data/kb";
 import type { Fact } from "@longterm-wiki/kb";
 import { CURRENCIES, resolveCurrency } from "@longterm-wiki/kb/currencies";
 import { formatValue } from "@lib/format-value";
 import { formatKBFactValue, formatKBDate, isUrl } from "./format";
+import { VerificationDot } from "./VerificationDot";
 import styles from "../tooltip.module.css";
 
 interface KBFactValueProps {
@@ -64,6 +65,7 @@ export function KBFactValue({
   const displayValue = formatKBFactValue(fact, prop?.unit, prop?.display);
   const currencyCode = resolveCurrency(fact.currency, prop?.unit);
   const propertyName = prop?.name ?? property;
+  const verification = getKBFactVerification(fact.id);
   const hasMetadata = propertyName || fact.asOf || fact.source;
 
   if (!hasMetadata) {
@@ -123,7 +125,7 @@ export function KBFactValue({
         {fact.source && (
           <span className="block text-muted-foreground mt-1 truncate">
             {isUrl(fact.source) ? (
-              <>
+              <span className="inline-flex items-center gap-1">
                 Source:{" "}
                 <a
                   href={fact.source}
@@ -133,10 +135,19 @@ export function KBFactValue({
                 >
                   Link
                 </a>
-              </>
+                {verification && <VerificationDot verdict={verification} />}
+              </span>
             ) : (
-              <>Source: {fact.source}</>
+              <span className="inline-flex items-center gap-1">
+                Source: {fact.source}
+                {verification && <VerificationDot verdict={verification} />}
+              </span>
             )}
+          </span>
+        )}
+        {verification && (
+          <span className="block text-muted-foreground/80 mt-0.5">
+            <VerificationDot verdict={verification} showLabel />
           </span>
         )}
         <span className="block text-muted-foreground/60 mt-1.5 font-mono text-xs">

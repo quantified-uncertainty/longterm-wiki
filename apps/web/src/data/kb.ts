@@ -172,6 +172,44 @@ export function getKBProperties(): Property[] {
 export const getKBThing = getKBEntity;
 
 /**
+ * Verification verdict values that can be returned by getKBFactVerification.
+ * Matches the accuracy verdicts from the citation system plus 'verified'
+ * (source quote verified but not accuracy-checked).
+ */
+export type KBFactVerdict =
+  | "accurate"
+  | "minor_issues"
+  | "inaccurate"
+  | "unsupported"
+  | "not_verifiable"
+  | "verified";
+
+const VALID_VERDICTS: Set<string> = new Set([
+  "accurate",
+  "minor_issues",
+  "inaccurate",
+  "unsupported",
+  "not_verifiable",
+  "verified",
+]);
+
+/**
+ * Get the citation verification status for a KB fact.
+ * Returns the best verdict found by cross-referencing the fact's source URL
+ * against citation quotes at build time, or undefined if no match.
+ */
+export function getKBFactVerification(factId: string): KBFactVerdict | undefined {
+  try {
+    const db = getDatabase();
+    const verdict = db.kbFactVerification?.[factId];
+    if (!verdict || !VALID_VERDICTS.has(verdict)) return undefined;
+    return verdict as KBFactVerdict;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Get the latest fact for a given property across all entities.
  * Returns a map of entityId → latest Fact for entities that have the property.
  * Optionally filtered to a subset of entity IDs.
