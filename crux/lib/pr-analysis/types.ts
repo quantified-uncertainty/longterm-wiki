@@ -18,6 +18,14 @@ export type PrIssueType =
   | 'bot-review-major'
   | 'bot-review-nitpick';
 
+/** Issues that are logged but not fixed — advisory only.
+ *  These are still detected by the shared library but filtered out by the
+ *  PR Patrol daemon before scoring/fixing. They waste budget (e.g.,
+ *  missing-issue-ref consistently hits max-turns with no useful outcome). */
+export const ADVISORY_ISSUES: ReadonlySet<PrIssueType> = new Set([
+  'missing-issue-ref',
+]);
+
 export interface BotComment {
   threadId: string;
   path: string;

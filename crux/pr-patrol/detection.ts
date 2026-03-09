@@ -23,6 +23,7 @@ import type {
   PatrolConfig,
 } from './types.ts';
 import { LABELS } from './types.ts';
+import { ADVISORY_ISSUES } from '../lib/pr-analysis/types.ts';
 import { ANY_WORKING_LABELS } from '../lib/labels.ts';
 import {
   appendJsonl,
@@ -71,13 +72,18 @@ export function detectAllPrIssuesFromNodes(
       return true;
     })
     .map((pr) => {
-      const { issues, botComments } = libDetectIssues(pr, staleThresholdMs);
+      const { issues: allIssues, botComments } = libDetectIssues(pr, staleThresholdMs);
+      const advisoryIssues = allIssues.filter((i) => ADVISORY_ISSUES.has(i));
+      const fixableIssues = allIssues.filter((i) => !ADVISORY_ISSUES.has(i));
+      if (advisoryIssues.length > 0) {
+        log(`  PR #${pr.number}: advisory issues (skipped): ${advisoryIssues.join(', ')}`);
+      }
       return {
         number: pr.number,
         title: pr.title,
         branch: pr.headRefName,
         createdAt: pr.createdAt,
-        issues,
+        issues: fixableIssues,
         botComments,
         labels: pr.labels.nodes.map((l) => l.name),
       };

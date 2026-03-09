@@ -26,11 +26,12 @@ export interface IssueBudget {
   timeoutMinutes: number;
 }
 
-const ISSUE_BUDGETS: Record<PrIssueType, IssueBudget> = {
+// Note: missing-issue-ref is an advisory-only issue (see ADVISORY_ISSUES in types.ts)
+// and is filtered out before reaching the budget system, so it's not listed here.
+const ISSUE_BUDGETS: Partial<Record<PrIssueType, IssueBudget>> = {
   conflict:            { maxTurns: 60, timeoutMinutes: 60 },
   'ci-failure':        { maxTurns: 50, timeoutMinutes: 45 },
   'bot-review-major':  { maxTurns: 50, timeoutMinutes: 45 },
-  'missing-issue-ref': { maxTurns: 5,  timeoutMinutes: 3 },
   stale:               { maxTurns: 10, timeoutMinutes: 5 },
   'missing-testplan':  { maxTurns: 8,  timeoutMinutes: 5 },
   'bot-review-nitpick':{ maxTurns: 8,  timeoutMinutes: 5 },
@@ -42,6 +43,7 @@ export function computeBudget(issues: PrIssueType[]): IssueBudget {
   let timeoutMinutes = 3;
   for (const issue of issues) {
     const budget = ISSUE_BUDGETS[issue];
+    if (!budget) continue; // advisory-only issues have no budget entry
     if (budget.maxTurns > maxTurns) maxTurns = budget.maxTurns;
     if (budget.timeoutMinutes > timeoutMinutes) timeoutMinutes = budget.timeoutMinutes;
   }
