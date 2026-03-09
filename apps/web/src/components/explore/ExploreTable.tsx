@@ -111,6 +111,27 @@ function buildColumns(onSearchChange: (value: string) => void): ColumnDef<Explor
       sortUndefined: "last",
     },
     {
+      id: "kbData",
+      accessorFn: (row) => (row.kbFactCount ?? 0) + (row.kbItemCount ?? 0),
+      header: ({ column }) => <SortableHeader column={column} title="Structured KB facts and items">KB</SortableHeader>,
+      cell: ({ row }) => {
+        const facts = row.original.kbFactCount ?? 0;
+        const items = row.original.kbItemCount ?? 0;
+        const total = facts + items;
+        if (total === 0) return <span className="text-muted-foreground/50">{"\u2014"}</span>;
+        const parts: string[] = [];
+        if (facts) parts.push(`${facts}f`);
+        if (items) parts.push(`${items}i`);
+        return (
+          <span className="text-xs text-violet-600 dark:text-violet-400 tabular-nums" title={`${facts} facts, ${items} items`}>
+            {parts.join("+")}
+          </span>
+        );
+      },
+      size: 55,
+      sortUndefined: "last",
+    },
+    {
       accessorKey: "backlinkCount",
       header: ({ column }) => <SortableHeader column={column} title="Pages linking to this one">Links</SortableHeader>,
       cell: ({ row }) => {
