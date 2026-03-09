@@ -29,6 +29,13 @@ describe('shouldSkipPr', () => {
     expect(result.reason).toContain(LABELS.AGENT_WORKING);
   });
 
+  it('skips PR with pr-patrol:working label', () => {
+    const pr = makeCandidate({ labels: [LABELS.PR_PATROL_WORKING] });
+    const result = shouldSkipPr(pr, NOW, OLD_BRANCH_TIP, 'fix: some change', RECENT_WINDOW);
+    expect(result.skip).toBe(true);
+    expect(result.reason).toContain(LABELS.PR_PATROL_WORKING);
+  });
+
   it('skips recently updated PR', () => {
     // PR was updated 10 minutes ago
     const recentUpdate = new Date((NOW - 600) * 1000).toISOString();

@@ -7,6 +7,9 @@ recommended:
   - incident-date
   - organizations-involved
   - description
+  - incident-status
+  - financial-impact
+  - related-entities
 
 items:
   timeline:

@@ -9,7 +9,7 @@ import {
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { PageChangesSessions } from "./page-changes-sessions";
-import type { SessionRow } from "@wiki-server/api-response-types";
+import type { AgentSessionPageChangesRow } from "@wiki-server/api-response-types";
 
 // ── Data loading ─────────────────────────────────────────────────────────────
 
@@ -25,7 +25,7 @@ function extractPrNumber(prUrl: string | null): number | undefined {
  * Returns null if the server is unavailable.
  */
 async function loadSessionsFromApi() {
-  const result = await fetchDetailed<{ sessions: SessionRow[] }>(
+  const result = await fetchDetailed<{ sessions: AgentSessionPageChangesRow[] }>(
     "/api/agent-sessions/page-changes?limit=500",
     { revalidate: 300 }
   );

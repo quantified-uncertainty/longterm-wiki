@@ -11,12 +11,8 @@ Comprehensive review of a single entity: its wiki page, statements, relationship
 Gather everything about this entity:
 
 ```bash
-# Full context (page + entity + statements + facts)
+# Full context (page + entity + facts)
 pnpm crux context for-page $ENTITY_ID
-
-# Statement quality and coverage
-pnpm crux statements quality $ENTITY_ID
-pnpm crux statements gaps $ENTITY_ID
 
 # Check the wiki page content
 pnpm crux query search "$ENTITY_ID"
@@ -26,7 +22,6 @@ Read the wiki page MDX file if it exists. Read the entity's YAML definition if i
 
 Also check:
 - What other entities reference this one? (backlinks)
-- What statements mention this entity in their text but aren't assigned to it?
 - How does this entity's coverage compare to similar entities of the same type?
 
 ## Phase 2: Evaluate Quality Dimensions
@@ -62,10 +57,10 @@ For each dimension, rate the entity and identify specific issues:
 
 Based on your assessment, take action in priority order:
 
-1. **Fix factual errors** — Retract incorrect statements, create corrected replacements
-2. **Fill critical gaps** — Run `pnpm crux statements improve $ENTITY_ID` for the most important missing areas
+1. **Fix factual errors** — Correct inaccurate information in the wiki page and KB facts
+2. **Fill critical gaps** — Add missing KB facts to `packages/kb/data/things/`
 3. **Fix relationships** — Update `relatedEntries` to add missing connections
-4. **Update stale content** — Supersede outdated statements with current data
+4. **Update stale content** — Fix outdated information with current data
 5. **Improve the wiki page** — If the MDX page is thin, run `pnpm crux content improve $ENTITY_ID --tier=standard --apply`
 
 ## Phase 4: Report

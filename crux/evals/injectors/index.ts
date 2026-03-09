@@ -11,7 +11,6 @@
  */
 
 export { injectWrongNumbers } from './wrong-numbers.ts';
-export { injectFabricatedClaims } from './fabricated-claims.ts';
 export { injectExaggerations } from './exaggerations.ts';
 export { injectFabricatedCitations } from './fabricated-citations.ts';
 export { injectMissingNuance } from './missing-nuance.ts';

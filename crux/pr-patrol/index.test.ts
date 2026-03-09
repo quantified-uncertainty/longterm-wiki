@@ -380,6 +380,18 @@ describe('checkMergeEligibility', () => {
     expect(result.blockReasons).toContain('agent-working');
   });
 
+  it('blocks when pr-patrol:working label is present', () => {
+    const result = checkMergeEligibility(
+      makePrNode({
+        labels: {
+          nodes: [{ name: LABELS.STAGE_APPROVED }, { name: LABELS.PR_PATROL_WORKING }],
+        },
+      }),
+    );
+    expect(result.eligible).toBe(false);
+    expect(result.blockReasons).toContain('pr-patrol-working');
+  });
+
   it('blocks when PR is a draft', () => {
     const result = checkMergeEligibility(
       makePrNode({ isDraft: true }),

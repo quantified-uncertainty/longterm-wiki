@@ -58,7 +58,7 @@ export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
       'add_entity_links', 'add_fact_refs', 'validate_content',
       // Context & cross-page tools
       'query_wiki_context', 'read_related_page', 'edit_frontmatter',
-      'view_edit_history', 'extract_facts', 'create_visual',
+      'view_edit_history', 'create_visual',
       // Cross-reference & linking
       'check_cross_references', 'suggest_cross_links',
       // Citation analysis
@@ -79,7 +79,7 @@ export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
       'add_entity_links', 'add_fact_refs', 'validate_content',
       // Context & cross-page tools
       'query_wiki_context', 'read_related_page', 'edit_frontmatter',
-      'view_edit_history', 'extract_facts', 'create_visual',
+      'view_edit_history', 'create_visual',
       // Cross-reference & linking
       'check_cross_references', 'suggest_cross_links',
       // Citation analysis

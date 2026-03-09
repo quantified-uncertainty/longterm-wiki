@@ -6,8 +6,8 @@
  *   - Project key (`LONGTERMWIKI_PROJECT_KEY`) — append-only coordination
  *     (IDs, sessions, edit logs, jobs, agent sessions, auto-update tracking)
  *   - Content key (`LONGTERMWIKI_CONTENT_KEY`) — destructive content sync
- *     (pages, entities, facts, claims, citations, resources, links, summaries,
- *      hallucination risk, artifacts)
+ *     (pages, entities, facts, citations, resources, links, summaries,
+ *      hallucination risk, artifacts, references)
  *
  * Read requests (GET) are allowed by any valid key.
  * Write requests require the appropriate scope.

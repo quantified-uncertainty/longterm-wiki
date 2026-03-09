@@ -1,6 +1,5 @@
 import {
   fetchDetailed,
-  fetchFromWikiServer,
   withApiFallback,
   type ApiErrorReason,
   type FetchResult,
@@ -511,24 +510,27 @@ function IntegritySection({
   integrity: ExtendedHealthData["integrity"];
 }) {
   const isClean = integrity.status === "clean";
+  const isError = integrity.status === "error";
 
   return (
     <>
       <SectionHeader>Data Integrity</SectionHeader>
       <div
         className={`rounded-lg border border-border/60 p-4 mb-6 ${
-          isClean ? "bg-green-500/10" : "bg-yellow-500/10"
+          isError ? "bg-muted/50" : isClean ? "bg-green-500/10" : "bg-yellow-500/10"
         }`}
       >
         <div className="flex items-center justify-between mb-2">
           <span
             className={`text-sm font-semibold ${
-              isClean ? "text-green-600" : "text-yellow-600"
+              isError ? "text-muted-foreground" : isClean ? "text-green-600" : "text-yellow-600"
             }`}
           >
-            {isClean
-              ? "No dangling references"
-              : `${integrity.totalDanglingRefs} dangling reference${integrity.totalDanglingRefs !== 1 ? "s" : ""}`}
+            {isError
+              ? "Could not check integrity (database query failed)"
+              : isClean
+                ? "No dangling references"
+                : `${integrity.totalDanglingRefs} dangling reference${integrity.totalDanglingRefs !== 1 ? "s" : ""}`}
           </span>
         </div>
         {!isClean && (
@@ -760,17 +762,27 @@ export async function SystemHealthContent() {
   const [
     { data, source, apiError },
     extendedResult,
-    pullsData,
+    pullsResult,
   ] = await Promise.all([
     withApiFallback(loadFromApi, noLocalFallback),
     loadExtendedData(),
-    fetchFromWikiServer<PullsApiResponse>("/api/github/pulls", {
+    fetchDetailed<PullsApiResponse>("/api/github/pulls", {
       revalidate: 30,
     }),
   ]);
 
   const extended = extendedResult.ok ? extendedResult.data : null;
   const extendedError = !extendedResult.ok ? extendedResult.error : null;
+  const pullsData = pullsResult.ok ? pullsResult.data : null;
+  const pullsApiError = !pullsResult.ok ? pullsResult.error : null;
+  // Either the fetch itself failed, or the server returned an error field
+  const pullsError: string | null = pullsApiError
+    ? pullsApiError.type === "server-error"
+      ? `HTTP ${pullsApiError.status} ${pullsApiError.statusText}`
+      : pullsApiError.type === "connection-error"
+        ? pullsApiError.message
+        : pullsApiError.type
+    : pullsData?.error ?? null;
   const openPRs: OpenPRDisplayRow[] = pullsData?.pulls ?? [];
 
   const { overall, checkedAt, services: rawServices, recentIncidents } =
@@ -841,22 +853,31 @@ export async function SystemHealthContent() {
       ) : null}
 
       {/* Open Pull Requests */}
-      <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-        Open pull requests
-      </h3>
-      {openPRs.length === 0 ? (
-        <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground mb-6">
-          <p className="text-lg font-medium mb-2">No open pull requests</p>
-          <p className="text-sm">
-            {pullsData?.error
-              ? `Could not fetch PRs: ${pullsData.error}`
-              : "Open PRs will appear here when agents or contributors create them."}
-          </p>
-        </div>
+      {pullsError ? (
+        <>
+          <SectionHeader>Open pull requests</SectionHeader>
+          <div className="rounded-lg border border-red-200 bg-red-500/5 p-4 text-sm text-muted-foreground mb-6">
+            Failed to load ({pullsError})
+          </div>
+        </>
       ) : (
-        <div className="mb-6">
-          <OpenPRsTable data={openPRs} />
-        </div>
+        <>
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+            Open pull requests
+          </h3>
+          {openPRs.length === 0 ? (
+            <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground mb-6">
+              <p className="text-lg font-medium mb-2">No open pull requests</p>
+              <p className="text-sm">
+                Open PRs will appear here when agents or contributors create them.
+              </p>
+            </div>
+          ) : (
+            <div className="mb-6">
+              <OpenPRsTable data={openPRs} />
+            </div>
+          )}
+        </>
       )}
 
       {/* Recent incidents */}

@@ -349,27 +349,27 @@ async function claimPr(prNum: number, repo: string): Promise<void> {
   try {
     await githubApi(`/repos/${repo}/issues/${prNum}/labels`, {
       method: 'POST',
-      body: { labels: [LABELS.AGENT_WORKING] },
+      body: { labels: [LABELS.PR_PATROL_WORKING] },
     });
     claimedPr = prNum;
     setPersistedClaimedPr(prNum);
   } catch {
-    log(`  ${cl.yellow}Warning: could not add ${LABELS.AGENT_WORKING} label to PR #${prNum}${cl.reset}`);
+    log(`  ${cl.yellow}Warning: could not add ${LABELS.PR_PATROL_WORKING} label to PR #${prNum}${cl.reset}`);
   }
 }
 
 async function releasePr(prNum: number, repo: string): Promise<void> {
   try {
-    await githubApi(`/repos/${repo}/issues/${prNum}/labels/${encodeURIComponent(LABELS.AGENT_WORKING)}`, {
+    await githubApi(`/repos/${repo}/issues/${prNum}/labels/${encodeURIComponent(LABELS.PR_PATROL_WORKING)}`, {
       method: 'DELETE',
     });
   } catch (e) {
     // 404 is expected (label already absent) — swallow silently.
     // Any other error (network, 500, auth) needs visibility since a stale
-    // claude-working label makes detectAllPrIssuesFromNodes skip the PR.
+    // pr-patrol:working label makes detectAllPrIssuesFromNodes skip the PR.
     const msg = e instanceof Error ? e.message : String(e);
     if (!msg.includes('404') && !msg.includes('Not Found')) {
-      log(`  Warning: could not remove claude-working label from PR #${prNum}: ${msg}`);
+      log(`  Warning: could not remove pr-patrol:working label from PR #${prNum}: ${msg}`);
     }
   }
   if (claimedPr === prNum) {
@@ -552,6 +552,18 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       log(
         `${cl.red}✗ PR #${pr.number} processing failed${cl.reset} (exit: ${result.exitCode}, ${elapsedS}s)`,
       );
+
+      // Track errors as failures so the PR gets abandoned after repeated failures
+      // (previously missing — errored PRs would retry forever after cooldown expired)
+      const failCount = recordFailure(pr.number);
+      if (failCount >= 2) {
+        reason = `Abandoned after ${failCount} failures (last: exit code ${result.exitCode})`;
+        log(
+          `${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`,
+        );
+        await postEventComment(pr.number, config.repo, buildAbandonmentComment(failCount, pr.issues))
+          .catch((e: unknown) => log(`  Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}`));
+      }
     }
 
     appendJsonl(JSONL_FILE, {

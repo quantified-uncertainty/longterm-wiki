@@ -6,6 +6,12 @@ required: []
 
 recommended:
   - description
+  - policy-status
+  - policy-type
+  - jurisdiction
+  - enacted-date
+  - sponsoring-body
+  - related-risks
 
 items:
   key-provisions:
@@ -23,3 +29,11 @@ items:
       impact: { type: text, description: "How this entity is affected" }
       source: { type: text, description: "URL to impact analysis" }
       notes: { type: text, description: "Context or compliance status" }
+
+  legislative-history:
+    description: "Key dates and milestones in the policy's legislative or regulatory process"
+    fields:
+      date: { type: date, required: true, description: "Date of the milestone (YYYY-MM-DD or YYYY-MM)" }
+      event: { type: text, required: true, description: "What happened (introduced, amended, passed, signed, enforced)" }
+      source: { type: text, description: "URL to official record or news coverage" }
+      notes: { type: text, description: "Context, vote counts, or amendments" }

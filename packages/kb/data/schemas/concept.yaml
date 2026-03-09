@@ -5,10 +5,15 @@ required: []
 # General-purpose schema for concepts that don't fit other entity types.
 
 recommended:
+  - description
   - expert-consensus-level
   - evidence-strength
   - time-horizon
   - research-consensus
+  - publication-date
+  - related-risks
+  - related-entities
+  - open-questions
 
 items:
   key-definitions:

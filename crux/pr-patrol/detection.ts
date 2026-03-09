@@ -23,6 +23,7 @@ import type {
   PatrolConfig,
 } from './types.ts';
 import { LABELS } from './types.ts';
+import { ANY_WORKING_LABELS } from '../lib/labels.ts';
 import {
   appendJsonl,
   cl,
@@ -64,7 +65,7 @@ export function detectAllPrIssuesFromNodes(
   return prs
     .filter((pr) => {
       const labels = pr.labels.nodes.map((l) => l.name);
-      if (labels.includes(LABELS.AGENT_WORKING)) return false;
+      if (ANY_WORKING_LABELS.some((wl) => labels.includes(wl))) return false;
       // Skip draft PRs — they're not ready for automated fixes
       if (pr.isDraft) return false;
       return true;

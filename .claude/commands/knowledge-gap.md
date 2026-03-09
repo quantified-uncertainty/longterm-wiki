@@ -12,36 +12,10 @@ Gather quantitative data about what exists.
 
 ```bash
 # Entity stats by type
-curl -s "http://localhost:3100/api/entities/stats" | python3 -m json.tool
+pnpm crux query stats
 
-# Statement stats
-curl -s "http://localhost:3100/api/statements/stats" | python3 -m json.tool
-
-# Top entities by statement count (proxy for coverage depth)
-curl -s "http://localhost:3100/api/statements?limit=5000" | python3 -c "
-import sys, json
-d = json.load(sys.stdin)
-counts = {}
-for s in d['statements']:
-    eid = s.get('subjectEntityId', '?')
-    if s.get('status') == 'active':
-        counts[eid] = counts.get(eid, 0) + 1
-for e, c in sorted(counts.items(), key=lambda x: -x[1])[:30]:
-    print(f'  {e}: {c}')
-print(f'Total entities with statements: {len(counts)}')
-"
-
-# List entity types and their counts
-curl -s "http://localhost:3100/api/entities?limit=1000" | python3 -c "
-import sys, json
-d = json.load(sys.stdin)
-types = {}
-for e in d['entities']:
-    t = e.get('entityType', '?')
-    types[t] = types.get(t, 0) + 1
-for t, c in sorted(types.items(), key=lambda x: -x[1]):
-    print(f'  {t}: {c}')
-"
+# Search for entities
+pnpm crux query search "<topic>"
 ```
 
 Also check the wiki pages to see what content exists:
@@ -75,12 +49,12 @@ Search for each topic you think should exist:
 pnpm crux query search "<topic>"
 ```
 
-### 2b. Statement Depth Gaps
+### 2b. Content Depth Gaps
 
 For entities that DO exist, check which ones have thin coverage:
-- Entities with 0 statements (have a wiki page but no structured data)
-- Entities with <10 statements (probably need improvement runs)
-- Entities with statements but poor coverage scores
+- Entities with no wiki page or a very short page
+- Entities with no KB facts (check `packages/kb/data/things/`)
+- Entities with pages but poor quality scores
 
 ### 2c. Relationship Gaps
 
@@ -105,9 +79,9 @@ Check for important recent developments (last 6 months) that aren't reflected:
 
 ### Coverage Summary
 - Total entities: [N] across [N] types
-- Entities with statements: [N] / [N]
-- Entities with 50+ statements: [list]
-- Entities with 0 statements: [count]
+- Entities with wiki pages: [N] / [N]
+- Entities with KB facts: [list]
+- Entities with no content: [count]
 
 ### Critical Gaps (Priority 1)
 [Important topics that are completely absent from the knowledge base]
@@ -143,17 +117,12 @@ If the user approves, pick the highest-priority gaps and:
    pnpm crux ids allocate <slug>
    ```
 
-2. **Generate initial statements:**
-   ```bash
-   pnpm crux statements improve <entity-id> --budget=5
-   ```
-
-3. **Create wiki pages:**
+2. **Create wiki pages:**
    ```bash
    pnpm crux content create "<Title>" --tier=standard
    ```
 
-4. **Fix relationships:** Update `relatedEntries` via entity sync.
+3. **Fix relationships:** Update `relatedEntries` via entity sync.
 
 **Always present the report first and get approval before creating anything.**
 
@@ -161,6 +130,6 @@ If the user approves, pick the highest-priority gaps and:
 
 - **Use your AI safety knowledge.** You know this field — don't just look at what data is missing; reason about what data *should* exist for a comprehensive AI safety knowledge base.
 - **Prioritize by importance, not ease.** A missing page on a major lab matters more than a missing page on a minor research paper.
-- **Don't create empty entities.** Only suggest entities you're confident can be populated with 10+ meaningful statements.
+- **Don't create empty entities.** Only suggest entities you're confident can be populated with meaningful wiki content.
 - **Check before suggesting.** Always search the existing database before claiming something is missing — it might exist under a different name or slug.
 - **Focus area matters.** If the user specified a focus area, limit your analysis to that domain rather than trying to cover everything.

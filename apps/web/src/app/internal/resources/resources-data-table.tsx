@@ -201,13 +201,9 @@ function makeColumns(): ColumnDef<ResourceDataRow>[] {
         if (!p) return <span className="text-muted-foreground/40 text-xs">-</span>;
         if (pid) {
           return (
-            <Link
-              href={`/claims/publications/${pid}`}
-              className="text-xs text-primary hover:underline italic max-w-[140px] truncate block"
-              title={p}
-            >
+            <span className="text-xs text-muted-foreground italic max-w-[140px] truncate block" title={p}>
               {p}
-            </Link>
+            </span>
           );
         }
         return (

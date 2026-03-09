@@ -3,9 +3,9 @@ import { DataSourceBanner } from "@/components/internal/DataSourceBanner";
 import { InsightsTable } from "./insights-table";
 
 export type InsightRow = {
-  date: string;
+  date: string | null;
   branch: string | null;
-  title: string;
+  title: string | null;
   type: "learning" | "recommendation";
   text: string;
 };

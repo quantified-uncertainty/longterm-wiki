@@ -1,0 +1,43 @@
+type: safety-agenda
+name: Safety Agenda
+
+required: []
+# Safety agendas are comprehensive research programs; no properties are universally required.
+
+recommended:
+  - description
+  - intervention-type
+  - maturity-level
+  - time-horizon
+  - evidence-strength
+  - expert-consensus-level
+  - website
+
+items:
+  research-threads:
+    description: "Major research threads or workstreams within this agenda"
+    fields:
+      name: { type: text, required: true, description: "Research thread name" }
+      description: { type: text, required: true, description: "What this thread aims to achieve" }
+      status: { type: text, description: "Current status: active / completed / planned / abandoned" }
+      lead-org: { type: text, description: "Primary organization pursuing this thread" }
+      source: { type: text, description: "URL to research program description" }
+      notes: { type: text, description: "Progress, key results, or open challenges" }
+
+  key-publications:
+    description: "Foundational publications defining or advancing this agenda"
+    fields:
+      title: { type: text, required: true, description: "Publication title" }
+      authors: { type: text, description: "Author(s)" }
+      year: { type: number, required: true, description: "Publication year" }
+      url: { type: text, description: "URL to paper" }
+      notes: { type: text, description: "Significance or key arguments" }
+
+  proponent-orgs:
+    description: "Organizations actively pursuing this safety agenda"
+    fields:
+      organization: { type: ref, required: true, description: "Thing ID of the organization" }
+      role: { type: text, description: "Their role: pioneer, major-contributor, implementer, funder" }
+      commitment-level: { type: text, description: "Commitment: primary-focus / significant / partial / exploratory" }
+      source: { type: text, description: "URL to evidence of their involvement" }
+      notes: { type: text, description: "Context about their approach or contributions" }

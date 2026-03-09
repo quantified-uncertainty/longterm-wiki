@@ -8,10 +8,8 @@
 import fs from 'fs';
 import { MODELS } from '../../../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../../../lib/entity-lookup.ts';
-import { buildClaimsContextForContent } from '../../../lib/claims-context.ts';
-import { runGapAnalysis, formatGapAnalysisForPrompt } from '../../../claims/gap-analysis.ts';
 import { convertSlugsToNumericIds } from '../../creator/deployment.ts';
-import { convertNewFootnotes } from '../../../claims/convert-new-footnotes.ts';
+import { convertNewFootnotes } from '../../../lib/convert-new-footnotes.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
 import {
   ROOT, log, getFilePath, getImportPath, writeTemp,
@@ -36,52 +34,12 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   const entityLookupCount = entityLookup.split('\n').filter(Boolean).length;
   log('improve', `  Found ${entityLookupCount} relevant entities for lookup`);
 
-  log('improve', 'Fetching claims context from wiki-server...');
-  let claimsContext: string | null = null;
-  try {
-    const claimsResult = await buildClaimsContextForContent(page.id);
-    if (claimsResult) {
-      claimsContext = claimsResult.promptText;
-      const s = claimsResult.stats;
-      log('improve', `  ${s.total} claims: ${s.verified} verified, ${s.disputed} disputed, ${s.unsupported} unsupported, ${s.unverified} unverified`);
-    } else {
-      log('improve', '  No claims available (server unavailable or no claims for this entity)');
-    }
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err : new Error(String(err));
-    log('improve', `  Claims fetch failed: ${error.message} — continuing without claims context`);
-  }
-
-  // Run gap analysis if --gap-analysis flag is set
-  let gapAnalysisContext: string | null = null;
-  if (options.gapAnalysis) {
-    log('improve', 'Running claims gap analysis...');
-    try {
-      const gapResult = await runGapAnalysis(page.id);
-      if (gapResult) {
-        const formatted = formatGapAnalysisForPrompt(gapResult);
-        if (formatted) {
-          gapAnalysisContext = formatted;
-          log('improve', `  Gap analysis: ${gapResult.stats.verified} verified claims, ${gapResult.stats.onPage} on page, ${gapResult.stats.missing} missing, ${gapResult.contradictions.length} contradictions`);
-          writeTemp(page.id, 'gap-analysis.json', gapResult);
-        } else {
-          log('improve', '  Gap analysis: all verified claims are already on the page');
-        }
-      } else {
-        log('improve', '  Gap analysis: no results (server unavailable or no verified claims)');
-      }
-    } catch (err: unknown) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      log('improve', `  Gap analysis failed: ${error.message} — continuing without gap analysis`);
-    }
-  }
-
   const tier = options.tier || 'standard';
   const prompt = IMPROVE_PROMPT({
     page, filePath, importPath, directions,
     analysis, research, objectivityContext,
-    currentContent, entityLookup, claimsContext,
-    gapAnalysisContext, tier,
+    currentContent, entityLookup, claimsContext: null,
+    gapAnalysisContext: null, tier,
   });
 
   const result = await runAgent(prompt, {

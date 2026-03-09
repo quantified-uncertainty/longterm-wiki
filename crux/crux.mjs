@@ -87,12 +87,10 @@ import * as sessionsCommands from './commands/sessions.ts';
 import * as researchCommands from './commands/research.ts';
 import * as evalsCommands from './commands/evals.ts';
 import * as healthCommands from './commands/health.ts';
-import * as claimsCommands from './commands/claims.ts';
 import * as epicCommands from './commands/epic.ts';
 import * as idsCommands from './commands/ids.ts';
 import * as agentsCommands from './commands/agents.ts';
 import * as agentSessionEventsCommands from './commands/agent-session-events.ts';
-import * as statementsCommands from './commands/statements.ts';
 import * as auditsCommands from './commands/audits.ts';
 import * as releaseCommands from './commands/release.ts';
 import * as prPatrolCommands from './commands/pr-patrol.ts';
@@ -129,12 +127,10 @@ const domains = {
   research: researchCommands,
   evals: evalsCommands,
   health: healthCommands,
-  claims: claimsCommands,
   epic: epicCommands,
   ids: idsCommands,
   agents: agentsCommands,
   'agent-session-events': agentSessionEventsCommands,
-  statements: statementsCommands,
   audits: auditsCommands,
   release: releaseCommands,
   'pr-patrol': prPatrolCommands,
@@ -217,10 +213,8 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   sessions    Session log management (write: scaffold a session YAML)
   research    Multi-source research → SourceCacheEntry[] (Exa, Perplexity, SCRY)
   evals       Hallucination detection evals & adversarial agents
-  claims      Extract and verify atomic factual claims from wiki pages
   epic        Multi-issue epic management (via GitHub Discussions)
   ids         Entity ID allocation and lookup (allocate, check, list)
-  statements  Extract and verify structured statements from wiki pages
   audits      System-level behavioral verification (ongoing + post-merge)
   release     Production release management (main → production)
   pr-patrol   Continuous PR maintenance daemon (scan, prioritize, fix)

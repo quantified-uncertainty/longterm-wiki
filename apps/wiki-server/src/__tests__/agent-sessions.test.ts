@@ -122,6 +122,9 @@ const dispatch: SqlDispatcher = (query, params) => {
           case "cost_cents":
             store[idx].cost_cents = params[pIdx] as number | null;
             break;
+          case "duration":
+            store[idx].duration = params[pIdx] as string | null;
+            break;
           case "duration_minutes":
             store[idx].duration_minutes = params[pIdx] as number | null;
             break;
