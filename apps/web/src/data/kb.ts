@@ -115,6 +115,19 @@ export function getKBItems(entity: string, collection: string): ItemEntry[] {
 }
 
 /**
+ * Get all item collections for an entity.
+ * Returns a map of collection name → ItemEntry[].
+ */
+export function getKBAllItemCollections(
+  entity: string,
+): Record<string, ItemEntry[]> {
+  const kb = getKB();
+  if (!kb) return {};
+
+  return kb.items[entity] ?? {};
+}
+
+/**
  * Get a property definition by ID.
  */
 export function getKBProperty(propertyId: string): Property | undefined {
