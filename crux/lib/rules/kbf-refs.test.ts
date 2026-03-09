@@ -4,7 +4,7 @@
  * Mocks `fs` so tests run deterministically without reading actual YAML files.
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Severity } from '../validation/validation-engine.ts';
 
 // vi.mock is hoisted before all imports by vitest — fs is mocked before
@@ -29,7 +29,11 @@ vi.mock('fs', () => ({
 }));
 
 // Import AFTER vi.mock so the mocked fs is used when the module initialises.
-import { kbfRefsRule } from './kbf-refs.ts';
+import { kbfRefsRule, _resetCache } from './kbf-refs.ts';
+
+beforeEach(() => {
+  _resetCache();
+});
 
 function mockContent(
   body: string,

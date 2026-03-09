@@ -86,6 +86,12 @@ const CALC_EXPR_RE = /<Calc\s+[^>]*expr=["']([^"']+)["'][^>]*>/g;
  */
 const CALC_REF_RE = /\{([^.}]+)\.([^}]+)\}/g;
 
+/** Reset caches for testing purposes. */
+export function _resetCache(): void {
+  entitySlugCache = undefined;
+  propertyIdCache = undefined;
+}
+
 export const kbfRefsRule = createRule({
   id: 'kbf-refs',
   name: 'KBF Cross-Reference Integrity',
