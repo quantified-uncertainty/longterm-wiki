@@ -100,7 +100,7 @@ function groupByProperty(
   return groups;
 }
 
-/** Source indicator: link icon for URLs, dim dash for missing. */
+/** Source indicator: link icon for URLs, text for non-URL sources, dim dash for missing. */
 function SourceCell({ source }: { source: string | undefined }) {
   if (source && isUrl(source)) {
     return (
@@ -113,6 +113,16 @@ function SourceCell({ source }: { source: string | undefined }) {
       >
         <ExternalLink size={12} />
       </a>
+    );
+  }
+  if (source) {
+    return (
+      <span
+        className="text-xs text-muted-foreground truncate max-w-[120px]"
+        title={source}
+      >
+        {source}
+      </span>
     );
   }
   return (
@@ -402,8 +412,12 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
 
   const entityName = kbEntity?.name ?? entityId;
 
-  // Open by default for entities with 5+ facts
-  const defaultOpen = substantiveFacts.length >= 5;
+  // Open by default for entities with enough structured data
+  const AUTO_OPEN_THRESHOLD_FACTS = 5;
+  const AUTO_OPEN_THRESHOLD_ITEMS = 10;
+  const defaultOpen =
+    substantiveFacts.length >= AUTO_OPEN_THRESHOLD_FACTS ||
+    totalItems >= AUTO_OPEN_THRESHOLD_ITEMS;
 
   return (
     <section className="not-prose mt-8 mb-6">
@@ -449,7 +463,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
 
           {/* Facts table grouped by category */}
           {substantiveFacts.length > 0 && (
-            <div className="mb-4">
+            <div className="mb-4 overflow-x-auto">
               {categoryKeys.map((category) => {
                 const categoryFacts = byCategory[category];
                 if (!categoryFacts || categoryFacts.length === 0) return null;

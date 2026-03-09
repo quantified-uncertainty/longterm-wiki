@@ -124,7 +124,8 @@ export function getKBAllItemCollections(
   const kb = getKB();
   if (!kb) return {};
 
-  return kb.items[entity] ?? {};
+  // Return a shallow copy to avoid exposing the mutable cache reference
+  return { ...(kb.items[entity] ?? {}) };
 }
 
 /**
