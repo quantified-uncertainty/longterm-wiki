@@ -36,7 +36,7 @@ describe('buildPrompt', () => {
     const pr = makeDetectedPr({ issues: ['ci-failure'] });
     const prompt = buildPrompt(pr, REPO);
     expect(prompt).toContain('### CI Failure');
-    expect(prompt).toContain('STOP IMMEDIATELY');
+    expect(prompt).toContain('pre-existing failure on main');
   });
 
   it('includes missing-testplan section', () => {
@@ -136,7 +136,7 @@ describe('buildPrompt', () => {
     const pr = makeDetectedPr({ issues: ['conflict'] });
     const prompt = buildPrompt(pr, REPO);
     expect(prompt).toContain('## Guardrails');
-    expect(prompt).toContain('## When to stop early');
+    expect(prompt).toContain('## When to stop (escalate to human)');
   });
 
   it('truncates long bot comment bodies', () => {
