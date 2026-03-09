@@ -827,41 +827,6 @@ async function buildCitationQuotesBundle() {
 }
 
 /**
- * Fetch all statement-backed citation dot data from the new statements pipeline.
- * Returns { [pageSlug]: DotEntry[] } keyed by page slug (not numeric ID).
- * This replaces the legacy citationQuotes bundle for pages that have Statements V2 data.
- * Returns an empty object if the server is unavailable.
- */
-async function buildStatementCitationDots() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  statementCitationDots: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return {};
-  }
-
-  try {
-    const headers = { 'Content-Type': 'application/json' };
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
-
-    const res = await fetch(
-      `${serverUrl}/api/statements/citation-dots/all`,
-      { headers, signal: AbortSignal.timeout(30_000) }
-    );
-    if (!res.ok) {
-      console.log(`  statementCitationDots: skipped (server returned ${res.status})`);
-      return {};
-    }
-    const data = await res.json();
-    console.log(`  statementCitationDots: ${data.totalEntries ?? 0} entries across ${data.totalPages ?? 0} pages`);
-    return data.pages || {};
-  } catch (err) {
-    console.log(`  statementCitationDots: skipped (${err.message || 'server unavailable'})`);
-    return {};
-  }
-}
-
-/**
  * Fetch all page references (claim refs + citations) from the wiki-server.
  * Returns a map of pageId → { claimReferences, citations } for the reference preprocessor.
  * Falls back to an empty object if the server is unavailable.
@@ -1254,17 +1219,15 @@ async function main() {
   // Fetch edit log dates, earliest edit log dates, and citation stats from
   // wiki-server (parallel). Also build git-based date maps (synchronous, fast).
   const gitDateMaps = CONTENT_ONLY ? { gitCreatedMap: new Map(), gitModifiedMap: new Map() } : buildGitDateMaps();
-  const [editLogDates, earliestEditLogDates, citationStats, citationQuotesBundle, statementCitationDots] = CONTENT_ONLY
-    ? [new Map(), new Map(), new Map(), {}, {}]
+  const [editLogDates, earliestEditLogDates, citationStats, citationQuotesBundle] = CONTENT_ONLY
+    ? [new Map(), new Map(), new Map(), {}]
     : await Promise.all([
         buildEditLogDateMap(),
         buildEarliestEditLogDateMap(),
         buildCitationStatsMap(),
         buildCitationQuotesBundle(),
-        buildStatementCitationDots(),
       ]);
   database.citationQuotes = citationQuotesBundle;
-  database.statementCitationDots = statementCitationDots;
 
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates);

@@ -6,7 +6,6 @@ import { normalizeUrl, VERDICT_STYLES, VERDICT_SEVERITY } from "./resource-utils
 import type { CitationQuote } from "@/lib/citation-data";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import { CheckCircle2, AlertTriangle, XCircle, HelpCircle, Clock } from "lucide-react";
-import Link from "next/link";
 
 function formatDate(iso: string): string {
   try {
@@ -157,14 +156,6 @@ export function ReferenceCitationDetails({ url, pageId }: { url: string; pageId?
         <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wide">
           Claims ({sorted.length})
         </span>
-        {pageId && (
-          <Link
-            href={`/claims/entity/${pageId}`}
-            className="text-[10px] text-muted-foreground/50 hover:text-foreground transition-colors !no-underline"
-          >
-            View all claims
-          </Link>
-        )}
       </div>
       <div>
         {shown.map((q, i) => (
@@ -172,18 +163,9 @@ export function ReferenceCitationDetails({ url, pageId }: { url: string; pageId?
         ))}
       </div>
       {remaining > 0 && (
-        pageId ? (
-          <Link
-            href={`/claims/entity/${pageId}`}
-            className="text-[11px] text-muted-foreground/50 hover:text-foreground transition-colors block mt-1 pb-0.5 !no-underline"
-          >
-            +{remaining} more claims
-          </Link>
-        ) : (
-          <span className="text-[11px] text-muted-foreground/50 block mt-1 pb-0.5">
-            +{remaining} more claims
-          </span>
-        )
+        <span className="text-[11px] text-muted-foreground/50 block mt-1 pb-0.5">
+          +{remaining} more claims
+        </span>
       )}
     </div>
   );
