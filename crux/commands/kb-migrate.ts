@@ -68,13 +68,12 @@ const TYPE_MAP: Record<string, string> = {
   executive: 'person',
   // Renamed types
   crux: 'debate',
-  model: 'analysis',
   // Plural aliases
   'safety-approaches': 'safety-agenda',
   policies: 'policy',
   concepts: 'concept',
   events: 'event',
-  models: 'analysis',
+  models: 'model',
 };
 
 /**
@@ -93,6 +92,7 @@ const VALID_KB_TYPES = new Set([
   'funder',
   'historical',
   'incident',
+  'model', // alias for ai-model schema; resolveKBType() handles the mapping
   'organization',
   'person',
   'policy',

@@ -46,6 +46,7 @@
  */
 
 import type { Graph } from "./graph";
+import { resolveKBType } from "./graph";
 import type {
   Fact,
   FactValue,
@@ -144,13 +145,16 @@ function checkPropertyAppliesTo(
 ): ValidationResult[] {
   const results: ValidationResult[] = [];
   const facts = graph.getFacts(entityId);
+  // Resolve the entity type through KB aliases (e.g., "model" → "ai-model")
+  // so that appliesTo: [ai-model] matches entities with type: model.
+  const resolvedType = resolveKBType(entityType);
 
   for (const fact of facts) {
     const property = graph.getProperty(fact.propertyId);
     if (!property) continue; // Unknown properties are caught by other checks if needed.
     if (!property.appliesTo || property.appliesTo.length === 0) continue;
 
-    if (!property.appliesTo.includes(entityType)) {
+    if (!property.appliesTo.includes(entityType) && !property.appliesTo.includes(resolvedType)) {
       results.push({
         severity: "warning",
         entityId,

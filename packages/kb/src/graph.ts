@@ -14,6 +14,34 @@ import type {
   PropertyQuery,
 } from "./types";
 
+// ── KB type aliases ─────────────────────────────────────────────────────────
+//
+// Maps entity type names (from data/entities/) to KB schema type names
+// (from packages/kb/data/schemas/). The canonical entity type system uses
+// "model" but the KB schema is named "ai-model" to be more descriptive.
+// This alias ensures model entities are validated against the ai-model schema.
+
+export const KB_TYPE_ALIASES: Record<string, string> = {
+  model: "ai-model",
+};
+
+/** Reverse map: schema type → entity type alias(es) that map to it. */
+const KB_TYPE_REVERSE: Map<string, string[]> = new Map();
+for (const [alias, canonical] of Object.entries(KB_TYPE_ALIASES)) {
+  const existing = KB_TYPE_REVERSE.get(canonical) ?? [];
+  existing.push(alias);
+  KB_TYPE_REVERSE.set(canonical, existing);
+}
+
+/**
+ * Resolves an entity type to its KB schema type.
+ * If the type has an alias (e.g., "model" → "ai-model"), returns the alias target.
+ * Otherwise returns the type unchanged.
+ */
+export function resolveKBType(type: string): string {
+  return KB_TYPE_ALIASES[type] ?? type;
+}
+
 export class Graph {
   private entities: Map<string, Entity> = new Map();
   private facts: Map<string, Fact[]> = new Map(); // keyed by subjectId
@@ -91,7 +119,12 @@ export class Graph {
   }
 
   getByType(type: string): Entity[] {
-    return Array.from(this.entities.values()).filter((t) => t.type === type);
+    // Match entities whose type is either the given type or any alias that
+    // maps to it (e.g., getByType("ai-model") also returns type:"model" entities).
+    const aliases = KB_TYPE_REVERSE.get(type) ?? [];
+    return Array.from(this.entities.values()).filter(
+      (t) => t.type === type || aliases.includes(t.type)
+    );
   }
 
   // ── Fact queries ───────────────────────────────────────────────────
@@ -231,7 +264,7 @@ export class Graph {
 
       const ownerEntity = this.entities.get(ownerEntityId);
       const schema = ownerEntity
-        ? this.schemas.get(ownerEntity.type)
+        ? this.getSchema(ownerEntity.type)
         : undefined;
 
       for (const [collectionName, collection] of entityCollections.entries()) {
@@ -284,7 +317,7 @@ export class Graph {
   }
 
   getSchema(type: string): TypeSchema | undefined {
-    return this.schemas.get(type);
+    return this.schemas.get(type) ?? this.schemas.get(resolveKBType(type));
   }
 
   getAllSchemas(): TypeSchema[] {

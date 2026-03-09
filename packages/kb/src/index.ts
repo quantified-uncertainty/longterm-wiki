@@ -3,7 +3,7 @@
  */
 
 export { loadKB } from "./loader";
-export { Graph } from "./graph";
+export { Graph, resolveKBType, KB_TYPE_ALIASES } from "./graph";
 export { computeInverses } from "./inverse";
 export { validate, validateEntity } from "./validate";
 export * from "./types";
