@@ -14,6 +14,7 @@ import {
 
 function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
   return {
+    id: 'PR_test_id',
     number: 1,
     title: 'Test PR',
     headRefName: 'claude/test',
@@ -23,6 +24,7 @@ function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-03-05T00:00:00Z',
     body: '## Summary\n\n- [x] Task done\n\n## Test plan\n\n- [x] Tests pass\n\nCloses #1',
+    author: { login: 'testuser' },
     labels: { nodes: [{ name: LABELS.STAGE_APPROVED }] },
     commits: {
       nodes: [

@@ -123,6 +123,7 @@ export interface GqlPrNode {
   createdAt: string;
   updatedAt: string;
   body: string | null;
+  author: { login: string } | null;
   labels: { nodes: Array<{ name: string }> };
   commits: {
     nodes: Array<{
