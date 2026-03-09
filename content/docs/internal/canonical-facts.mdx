@@ -8,7 +8,7 @@ subcategory: style-guides
 quality: 50
 readerImportance: 12
 researchImportance: 15
-lastEdited: "2026-02-18"
+lastEdited: "2026-03-09"
 update_frequency: 90
 ratings:
   novelty: 3
@@ -206,18 +206,24 @@ When new data arrives:
     asOf: 2025-11
 ```
 
+## Data Authority
+
+KB YAML (`packages/kb/data/things/*.yaml`) is the authoritative source for structured facts on entities it covers. As of March 2026, 9+ entities have been migrated to KB: Anthropic, OpenAI, xAI, Meta AI, MIRI, SSI, Dustin Moskovitz, Elon Musk, and Sam Altman. Old `data/facts/*.yaml` files for these entities are deprecated — do not update them.
+
+For entities not yet in KB, `data/facts/*.yaml` remains authoritative. See <EntityLink id="E1042" name="data-system-authority">Data System Authority Rules</EntityLink> for the full hierarchy.
+
 ## Scaling Strategy
 
-Current state: 4 entity YAML files, ~5 pages using facts. Priority order for expansion:
+Current state: 9+ entity KB YAML files in `packages/kb/data/things/`, 60 properties across the KB schema, ~13 pages actively using `<KBF>` tags. Priority order for expansion:
 
-**Phase 1 — Organizations with fast-changing financials**
-Anthropic, OpenAI, xAI, Google DeepMind, Meta AI. These have valuations, revenue, headcounts that change quarterly. Highest density of volatile numbers.
+**Phase 1 — Migrate remaining organizations with old facts files**
+Google DeepMind, Center for AI Safety, Chan Zuckerberg Initiative, and other entities still using `data/facts/*.yaml`. Move their structured data into KB YAML.
 
 **Phase 2 — Field-level metrics**
 Compute benchmarks, total AI safety funding, researcher headcounts. Numbers that get updated with each new report and appear across multiple pages.
 
 **Phase 3 — Cross-referenced numbers**
-Any figure appearing on 3+ pages. Find these via grep and migrate to facts for consistency.
+Any figure appearing on 3+ pages. Find these via grep and migrate to KB facts for consistency.
 
 Don't try to fact-ify everything at once. Expand entity-by-entity as pages get created or updated.
 

@@ -7,7 +7,7 @@ sidebar:
 quality: 44
 readerImportance: 10.5
 researchImportance: 9
-lastEdited: "2026-02-27"
+lastEdited: "2026-03-09"
 update_frequency: 60
 llmSummary: "Documentation for the wiki's multi-layer data storage architecture. The wiki-server PostgreSQL database stores citation content, audit results, claims, facts, and structured data accessed via Hono RPC API. An in-memory LRU cache provides session-local caching for source fetching. YAML files in data/ define entities, facts, and resources. The build pipeline compiles YAML + MDX into database.json for the Next.js frontend."
 ratings:
@@ -28,6 +28,7 @@ The wiki uses a multi-layer storage architecture. There is no single database �
 flowchart TD
     subgraph Durable["Durable Storage"]
         PG[("PostgreSQL\n(wiki-server)")]
+        KB[("KB YAML\npackages/kb/data/things/")]
         YAML[("YAML Files\ndata/")]
         MDX[("MDX Pages\ncontent/docs/")]
     end
@@ -42,6 +43,7 @@ flowchart TD
         JSON[("database.json\nYAML + MDX → JSON")]
     end
 
+    KB --> JSON
     YAML --> JSON
     MDX --> JSON
     PG -.->|"Hono RPC API"| LRU
@@ -93,14 +95,25 @@ When fetching a URL, the system checks:
 
 Results are written back to both the LRU cache and PostgreSQL.
 
-### 3. YAML Files (data/)
+### 3. KB YAML (packages/kb/)
+
+The Knowledge Base package (`packages/kb/`) is the authoritative source for structured entity facts — valuations, revenue, headcounts, founding dates, and other typed properties. As of March 2026, 9+ entities have been migrated here from the older `data/facts/` system.
+
+| Path | Content |
+|------|---------|
+| `packages/kb/data/things/*.yaml` | Entity facts with typed properties, time series, sources |
+| `packages/kb/data/schemas/` | Property schemas (60 properties across orgs, people, AI models, etc.) |
+
+KB facts are rendered on wiki pages via `<KBF>` and `<KBFactValue>` components, and computed values via `<Calc>`. See <EntityLink id="E1042" name="data-system-authority">Data System Authority Rules</EntityLink> for which system is authoritative for which entities.
+
+### 4. YAML Files (data/)
 
 Human-editable YAML files are the source of truth for content metadata:
 
 | Directory | Content |
 |-----------|---------|
 | `data/entities/` | Entity definitions (type, description, relations) |
-| `data/facts/` | Canonical facts with values and expressions |
+| `data/facts/` | Legacy facts (deprecated for entities migrated to KB) |
 | `data/resources/` | External resource metadata |
 | `data/graphs/` | Cause-effect graph data |
 | `data/edit-logs/` | Per-page edit history |
@@ -109,7 +122,7 @@ Human-editable YAML files are the source of truth for content metadata:
 
 YAML files are checked into git and are the canonical source for everything they contain. PostgreSQL mirrors some of this data for API access and full-text search.
 
-### 4. File-System Caches (.cache/)
+### 5. File-System Caches (.cache/)
 
 Temporary files for local development workflows:
 
@@ -120,7 +133,7 @@ Temporary files for local development workflows:
 
 These are gitignored and can be deleted without data loss.
 
-### 5. Build Artifact (database.json)
+### 6. Build Artifact (database.json)
 
 The build pipeline (`apps/web/scripts/build-data.mjs`) compiles YAML + MDX frontmatter into `apps/web/src/data/database.json`. This single JSON file contains all entities, pages, relations, facts, search data, and statistics needed by the Next.js frontend.
 
@@ -215,4 +228,4 @@ sequenceDiagram
 
 - <EntityLink id="E734" name="architecture">Architecture</EntityLink> — System overview and design patterns
 - <EntityLink id="E757" name="automation-tools">Automation Tools</EntityLink> — Full CLI reference
-- Claim-First Architecture — Future direction for structured claims (page removed)
+- <EntityLink id="E1042" name="data-system-authority">Data System Authority Rules</EntityLink> — Which data system is authoritative for each entity
