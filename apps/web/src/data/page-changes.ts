@@ -99,6 +99,13 @@ export function getPageChangeSessions(): PageChangesSession[] {
           ...(entry.cost !== undefined && { cost: entry.cost }),
           pages: [],
         });
+      } else {
+        // Merge missing optional fields from subsequent entries
+        const session = sessionMap.get(sessionKey)!;
+        if (session.pr === undefined && entry.pr !== undefined) session.pr = entry.pr;
+        if (session.model === undefined && entry.model !== undefined) session.model = entry.model;
+        if (session.duration === undefined && entry.duration !== undefined) session.duration = entry.duration;
+        if (session.cost === undefined && entry.cost !== undefined) session.cost = entry.cost;
       }
       sessionMap.get(sessionKey)!.pages.push({
         pageId: page.id,

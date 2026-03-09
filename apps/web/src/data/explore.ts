@@ -56,22 +56,52 @@ const CATEGORY_TO_TYPE: Record<string, string> = {
 // The hardcoded TABLES array has been eliminated — all table pages are
 // detected automatically via the contentFormat field in frontmatter.
 
+// Resolve the page ID for an entity, handling cases where entity ID differs
+// from page ID (e.g., entity "tmc-compute" → page "compute").
+function resolvePageId(entity: AnyEntity, pageMap: Map<string, unknown>): string | null {
+  // 1. Direct match: entity ID is the page ID
+  if (pageMap.has(entity.id)) return entity.id;
+  // 2. Entity has explicit path field → derive page ID from path
+  const raw = entity as unknown as RawEntity;
+  if (raw.path) {
+    const segments = raw.path.replace(/\/$/, "").split("/");
+    const pageId = segments[segments.length - 1];
+    if (pageId && pageMap.has(pageId)) return pageId;
+  }
+  // 3. Factor entities: try "factors-{id}-overview" pattern
+  const overviewId = `factors-${entity.id}-overview`;
+  if (pageMap.has(overviewId)) return overviewId;
+  return null;
+}
+
 export function getExploreItems(): ExploreItem[] {
   const db = getDatabase();
   const typedEntities = getTypedEntities();
   const pageMap = new Map((db.pages || []).map((p) => [p.id, p]));
-  const entityIds = new Set(typedEntities.map((e) => e.id));
+
+  // Build a set of page IDs claimed by entities (including aliased ones)
+  const entityClaimedPageIds = new Set<string>();
+  const entityPageIdMap = new Map<string, string>(); // entity.id → resolved page ID
+  for (const entity of typedEntities) {
+    const pageId = resolvePageId(entity, pageMap);
+    if (pageId) {
+      entityClaimedPageIds.add(pageId);
+      entityPageIdMap.set(entity.id, pageId);
+    }
+  }
 
   // Items from typed entities (only those with actual content pages and numeric IDs)
   const entityItems: ExploreItem[] = typedEntities.filter((entity) => {
-    if (!pageMap.has(entity.id)) return false;
-    const numId = entity.numericId || db.idRegistry?.bySlug[entity.id];
+    const pageId = entityPageIdMap.get(entity.id);
+    if (!pageId) return false;
+    const numId = entity.numericId || db.idRegistry?.bySlug[pageId];
     return !!numId;
   }).map((entity) => {
-    const page = pageMap.get(entity.id)!;
+    const pageId = entityPageIdMap.get(entity.id)!;
+    const page = pageMap.get(pageId)!;
     return {
       id: entity.id,
-      numericId: (entity.numericId || db.idRegistry?.bySlug[entity.id])!,
+      numericId: (entity.numericId || db.idRegistry?.bySlug[pageId])!,
       title: entity.title,
       type: page?.contentFormat === "table" ? "table" : page?.contentFormat === "diagram" ? "diagram" : entity.entityType,
       description: page?.llmSummary || page?.description || entity.description || null,
@@ -94,7 +124,7 @@ export function getExploreItems(): ExploreItem[] {
 
   // Items from pages that have no entity (only those with numeric IDs)
   const pageOnlyItems: ExploreItem[] = (db.pages || [])
-    .filter((p) => !entityIds.has(p.id))
+    .filter((p) => !entityClaimedPageIds.has(p.id))
     .filter((p) => p.title && p.category !== "schema")
     .filter((p) => db.idRegistry?.bySlug[p.id])
     .map((page) => ({
@@ -121,29 +151,12 @@ export function getExploreItems(): ExploreItem[] {
 
   // Diagram items — entities with causeEffectGraph data
   // Generic entities preserve all raw fields including causeEffectGraph.
-  // Entity IDs may differ from page IDs (e.g. entity "tmc-compute" → page "compute",
-  // entity "misalignment-potential" → page "factors-misalignment-potential-overview"),
-  // so we resolve the correct page for each diagram entity.
+  // Entity IDs may differ from page IDs, resolved via resolvePageId above.
   function resolveDiagramHref(e: AnyEntity): string | null {
-    const raw = e as unknown as RawEntity;
-    // 1. Direct match: entity ID is the page ID
-    if (pageMap.has(e.id)) return getEntityHref(e.id);
-    // 2. Entity has explicit path field → derive page ID from path
-    if (raw.path) {
-      const segments = raw.path.replace(/\/$/, "").split("/");
-      const pageId = segments[segments.length - 1];
-      if (pageId && pageMap.has(pageId)) {
-        const numId = db.idRegistry?.bySlug[pageId];
-        return numId ? `/wiki/${numId}` : `/wiki/${pageId}`;
-      }
-    }
-    // 3. Factor entities: try "factors-{id}-overview" pattern
-    const overviewId = `factors-${e.id}-overview`;
-    if (pageMap.has(overviewId)) {
-      const numId = db.idRegistry?.bySlug[overviewId];
-      return numId ? `/wiki/${numId}` : `/wiki/${overviewId}`;
-    }
-    return null;
+    const pageId = resolvePageId(e, pageMap);
+    if (!pageId) return null;
+    const numId = db.idRegistry?.bySlug[pageId];
+    return numId ? `/wiki/${numId}` : `/wiki/${pageId}`;
   }
 
   const diagramItems: ExploreItem[] = typedEntities
