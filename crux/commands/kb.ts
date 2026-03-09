@@ -494,6 +494,7 @@ Options:
   --rule=X              Filter by rule name (validate)
   --dry-run             Preview migration without writing files (migrate only)
   --stub-old            Strip old entity to stub after migration (migrate only)
+  --force               Overwrite existing KB thing file (migrate only)
 
 Examples:
   crux kb show anthropic              Show Anthropic with all facts and items
