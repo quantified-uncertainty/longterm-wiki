@@ -224,8 +224,8 @@ Stats Options:
 Daemon Options:
   --dry-run         Show what would be done, don't fix or merge
   --interval=N      Seconds between checks (default: 300)
-  --max-turns=N     Max Claude turns per fix (default: 40)
-  --timeout=N       Hard timeout in minutes per fix (default: 30)
+  --max-turns=N     Max Claude turns per fix (default: 60)
+  --timeout=N       Hard timeout in minutes per fix (default: 60)
   --cooldown=N      Skip recently-processed PRs for N seconds (default: 1800)
   --stale-hours=N   Hours before a PR is considered stale (default: 48)
   --model=MODEL     Claude model (default: sonnet)
@@ -235,7 +235,7 @@ Daemon Options:
 Environment:
   PR_PATROL_INTERVAL              Seconds between checks
   PR_PATROL_MAX_TURNS             Max Claude turns per fix
-  PR_PATROL_TIMEOUT_MINUTES       Hard timeout per fix in minutes (default: 30)
+  PR_PATROL_TIMEOUT_MINUTES       Hard timeout per fix in minutes (default: 60)
   PR_PATROL_COOLDOWN              Cooldown per PR (seconds)
   PR_PATROL_STALE_HOURS           Hours before a PR is stale (default: 48)
   PR_PATROL_MODEL                 Claude model
