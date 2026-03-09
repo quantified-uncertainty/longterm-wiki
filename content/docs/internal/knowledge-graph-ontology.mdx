@@ -46,7 +46,7 @@ The KB system (`packages/kb/`) now covers most knowledge graph concepts that wer
 | Knowledge graph concept | KB implementation | Status |
 |---|---|---|
 | **Entity classes** (types) | 19 type schemas in `packages/kb/data/schemas/` (organization, person, concept, ai-model, etc.) | Implemented |
-| **Typed properties** | 100+ properties in `packages/kb/data/properties.yaml` with `dataType`, `category`, `appliesTo` | Implemented |
+| **Typed properties** | 95 properties in `packages/kb/data/properties.yaml` with `dataType`, `category`, `appliesTo` | Implemented |
 | **Domain constraints** | `appliesTo: [organization]` on each property | Implemented |
 | **Temporal qualifiers** | `asOf` and `validEnd` fields on individual facts | Implemented |
 | **Source attribution** | `source` URL, `sourceResource`, `sourceQuote`, `notes` per fact | Implemented |
@@ -114,7 +114,7 @@ A single TechCrunch article produces 8-12 claims. A single annual report might p
 | `official-url` | url | Primary website | Implemented (KB property `website`) |
 | `wikipedia-url` | url | Wikipedia page | Not yet a KB property |
 | `wikidata-id` | string | Wikidata Q-identifier | Not yet a KB property |
-| `parent-org` | ref | Parent org, broader concept | Implemented (KB property with inverse) |
+| `parent-org` | ref | Parent org, broader concept | Not yet a KB property |
 
 ### Layer 2: Type-Specific Properties
 
@@ -166,8 +166,8 @@ Risk and concept schemas exist (`packages/kb/data/schemas/risk.yaml`, `concept.y
 |---|---|---|---|
 | `employed-by` | Implemented | `employer-of` | ref, temporal |
 | `founded-by` | Implemented | `founder-of` | refs |
-| `parent-org` | Implemented | `subsidiary-of` | ref |
-| `subsidiary-of` | Implemented | `parent-org` | refs, computed |
+| `parent-org` | Not yet | — | |
+| `subsidiary-of` | Not yet | — | |
 | `invested-in` | Not yet | — | Partially covered by funding-rounds item collection |
 | `partnered-with` | Not yet | — | |
 | `regulated-by` | Not yet | — | |
@@ -1250,7 +1250,7 @@ This eliminates the dual-store problem. The original proposal's distinction betw
 
 ### Phase 1: Property vocabulary (data layer only) — COMPLETE
 
-1. ~~Create `data/properties.yaml` with the initial 25 properties~~ -- Done: `packages/kb/data/properties.yaml` with 100+ properties
+1. ~~Create `data/properties.yaml` with the initial 25 properties~~ -- Done: `packages/kb/data/properties.yaml` with 95 properties
 2. ~~Add a `Property` Zod schema to `data/schema.ts`~~ -- Done: KB validation in `packages/kb/`
 3. ~~Validate property references in build-data~~ -- Done: 23 validation rules
 
@@ -1290,7 +1290,7 @@ Some original questions have been resolved by KB; others remain open.
 
 4. **How do facts and prose stay in sync?** The `<KBF>` and `<KBFactValue>` MDX components render KB fact values inline in prose, so updating a KB fact automatically updates the displayed value. For prose that doesn't use these components, sync remains manual.
 
-5. **Property hierarchy.** Not yet implemented. KB properties have `category` groupings (financial, people, biographical, organization, product, etc.) but no formal sub-property relationships. With 100+ properties, some hierarchy may become useful for dashboard navigation.
+5. **Property hierarchy.** Not yet implemented. KB properties have `category` groupings (financial, people, biographical, organization, product, etc.) but no formal sub-property relationships. With 95 properties, some hierarchy may become useful for dashboard navigation.
 
 6. **Claim-level metadata.** (New) Should the KB system add confidence/verification fields to facts? The current source/notes fields are free-text. Adding structured confidence would enable the verification workflows described in Layer 4, but adds complexity to every fact entry.
 
@@ -1300,7 +1300,7 @@ Some original questions have been resolved by KB; others remain open.
 
 | Proposal area | Status | Where it lives |
 |---|---|---|
-| Property vocabulary | Implemented (100+ properties) | `packages/kb/data/properties.yaml` |
+| Property vocabulary | Implemented (95 properties) | `packages/kb/data/properties.yaml` |
 | Entity type schemas | Implemented (19 types) | `packages/kb/data/schemas/*.yaml` |
 | Entity data files | Implemented (360+ entities) | `packages/kb/data/things/*.yaml` |
 | Value types (number, text, date, ref, etc.) | Implemented (9 types) | KB fact schema |

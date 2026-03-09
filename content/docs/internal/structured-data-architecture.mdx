@@ -24,7 +24,7 @@ The **Knowledge Base (KB)** is the wiki's structured data system. It stores cura
 The KB lives in `packages/kb/` and consists of:
 
 - **362 entity files** in `packages/kb/data/things/*.yaml` (organizations, people, AI models, risks, etc.)
-- **100+ properties** defined in `packages/kb/data/properties.yaml` with display formatting, type constraints, and inverse relationships
+- **95 properties** defined in `packages/kb/data/properties.yaml` with display formatting, type constraints, and inverse relationships
 - **19 entity type schemas** in `packages/kb/data/schemas/*.yaml` specifying required and recommended properties plus item collection definitions
 - **23 validation rules** enforced at build time
 
@@ -96,7 +96,7 @@ Properties are the taxonomy that gives facts meaning. Defined in `packages/kb/da
 - **Applies-to constraint**: which entity types can use this property
 - **Inverse relationships**: `employed-by` automatically generates `employer-of` on the referenced entity
 
-There are currently 80+ properties across 15 categories, supporting entity types from organizations and people to AI models, risks, policies, and incidents.
+There are currently 95 properties across 21 categories, supporting entity types from organizations and people to AI models, risks, policies, and incidents.
 
 ### Inverse Relationships
 
@@ -241,7 +241,7 @@ KB facts are the **authoritative source** for structured data that appears acros
 | Component | Status |
 |-----------|--------|
 | KB YAML data layer (362 entities) | Working |
-| Property taxonomy (100+ properties) | Working |
+| Property taxonomy (95 properties) | Working |
 | 19 entity type schemas with item collections | Working |
 | 23 validation rules | Working |
 | Inverse relationship computation | Working |
