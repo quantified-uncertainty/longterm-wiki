@@ -141,16 +141,26 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
     improvedContent = convertedContent;
   }
 
-  // Convert numbered footnotes [^N] to DB-driven [^rc-XXXX] references.
+  // Convert numbered footnotes [^N] to [^kb-factId] or [^rc-XXXX] references.
+  // KB fact matching is attempted first when the page has a corresponding KB entity.
   // DB entries are NOT created here (dry-run semantics) — they are created
   // when the pipeline applies changes via --apply. This step only rewrites
   // the footnote format in the content string.
   try {
     const fnResult = await convertNewFootnotes(improvedContent, page.id, {
       createDbEntries: false,
+      entityId: page.id,
     });
     if (fnResult.convertedCount > 0) {
-      log('improve', `  Converted ${fnResult.convertedCount} numbered footnote(s) to [^rc-XXXX] format`);
+      const parts: string[] = [];
+      if (fnResult.kbMatchCount > 0) {
+        parts.push(`${fnResult.kbMatchCount} to [^kb-...] (KB fact match)`);
+      }
+      const rcCount = fnResult.convertedCount - fnResult.kbMatchCount;
+      if (rcCount > 0) {
+        parts.push(`${rcCount} to [^rc-XXXX]`);
+      }
+      log('improve', `  Converted ${fnResult.convertedCount} numbered footnote(s): ${parts.join(', ')}`);
       improvedContent = fnResult.content;
     }
   } catch (err: unknown) {
