@@ -85,7 +85,40 @@ If any GitHub CI **check run** has `conclusion: failure`:
 2. Analyze the failure and fix the underlying issue.
 3. Go back to **Step 1** and repeat the full cycle.
 
-If all check runs show **success**: Report success. Include the PR URL if on a feature branch, or confirm the push is green on main.
+If all check runs show **success**: proceed to Step 4b (CodeRabbit review check) before reporting success.
+
+## Step 4b: Check for unresolved CodeRabbit comments
+
+After CI passes, check whether CodeRabbit or other bots left unresolved review comments:
+
+```bash
+gh pr view <PR#> --json reviewThreads --jq '
+  .reviewThreads.nodes[] |
+  select(.isResolved == false and .isOutdated == false) |
+  select(.comments.nodes[0].author.login == "coderabbitai" or
+         .comments.nodes[0].author.login == "github-actions") |
+  "\(.path):\(.line) — \(.comments.nodes[0].body[:200])"
+'
+```
+
+### How to handle CodeRabbit comments
+
+- **🔴 Critical / 🟠 Major / 🟡 Minor** — Address these. Verify the concern is valid, fix if so.
+  Look for a "Prompt for AI Agents" section in the comment body — it contains ready-made instructions.
+- **🧹 Nitpick** — Fix only if trivial and clearly correct. Skip if debatable.
+- **Informational notes** — No action needed; these are just observations.
+
+After addressing comments: commit, push, and go back to Step 3 to verify CI stays green.
+
+### Human review — final step, not first blocker
+
+Only flag for human review AFTER you have:
+1. CI passing
+2. All CodeRabbit major/minor comments addressed (or confirmed as false positives)
+3. No unchecked PR checklist items
+
+If at that point something still requires human attention (e.g., design decision, security exception),
+note it clearly but do not block the PR from being labeled `stage:approved` for merge queue.
 
 ## Guardrails
 

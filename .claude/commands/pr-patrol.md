@@ -4,6 +4,26 @@ Scan all open PRs for issues and fix them in priority order. One-shot version of
 
 **When to use:** Periodically, or when you want to clean up the PR backlog. It can also be run as a daemon via `pnpm crux pr-patrol`.
 
+## Branch Agent mode (Phase 1 — per-PR watchdog)
+
+For PRs needing sustained attention, use **branch-agent** instead of waiting for the daemon:
+
+```bash
+pnpm crux pr-patrol branch-agent <PR#>   # Watch PR until fixed/merged
+```
+
+This runs multiple short fix sessions (15 min each) with CI waits between them.
+Use this when a PR keeps timing out or needs several rounds of CodeRabbit feedback.
+
+## Escalation order — automation first, human last
+
+When fixing any PR, work through issues in this order:
+1. **Fix code issues** — CI failures, merge conflicts, test failures
+2. **Add labels you can verify** — e.g. `gate:rules-ok` if you've confirmed the rule is satisfied
+3. **Address ALL bot comments** — CodeRabbit Critical/Major/Minor must be attempted, not skipped
+4. **Complete unchecked checklist items** — update PR body when tasks are done
+5. **Flag for human review** — only AFTER exhausting all automated fixes
+
 ## Phase 1: Scan all open PRs
 
 Fetch all open PRs and detect issues:
