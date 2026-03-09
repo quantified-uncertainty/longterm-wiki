@@ -4,8 +4,8 @@
  * Main branch CI checking uses crux/lib/pr-analysis/ci-status.ts (pure API call).
  * This module wraps it with daemon concerns (cooldown, abandoned tracking, logging).
  *
- * Automated rebase uses crux/lib/pr-analysis/rebase.ts for stale PRs before
- * falling back to Claude when conflicts exist.
+ * Automated rebase uses crux/lib/pr-analysis/rebase.ts for stale or conflicting
+ * PRs before falling back to Claude when the rebase can't auto-resolve.
  */
 
 import { spawn } from 'child_process';
@@ -413,10 +413,12 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
   }
 
   // ── Automated rebase pre-step ──────────────────────────────────────
-  // For stale PRs without conflicts, try a plain git rebase first.
-  // This saves the full Claude spawn (~5 turns, ~3-10 min) for the majority
-  // of stale PRs that just need a clean rebase onto main.
-  if (pr.issues.includes('stale') && !pr.issues.includes('conflict')) {
+  // For stale or conflicting PRs, try a plain git rebase first.
+  // This saves the full Claude spawn (~5 turns, ~3-10 min) when the
+  // rebase resolves cleanly. Even when GitHub reports CONFLICTING,
+  // git rebase can auto-resolve many cases (different merge strategies).
+  // Cost of a failed attempt is negligible (<1s of git commands).
+  if (pr.issues.includes('stale') || pr.issues.includes('conflict')) {
     log('  Attempting automated rebase (no Claude needed)...');
     const origBranch = gitSafe('branch', '--show-current');
     const originalBranch = origBranch.ok ? origBranch.output.trim() : '';
@@ -431,8 +433,8 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
     if (rebaseResult.success) {
       log(`  ✓ Automated rebase ${rebaseResult.status} — no Claude needed`);
 
-      // If the only issue was 'stale', log as fixed and return
-      const remainingIssues = pr.issues.filter((i) => i !== 'stale');
+      // Strip both 'stale' and 'conflict' — rebase resolved them
+      const remainingIssues = pr.issues.filter((i) => i !== 'stale' && i !== 'conflict');
       if (remainingIssues.length === 0) {
         appendJsonl(JSONL_FILE, {
           type: 'pr_result',
@@ -445,7 +447,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
         markProcessed(pr.number);
         return { mainIsRootCause: false };
       }
-      // Remaining issues need Claude — update pr.issues so Claude doesn't re-address 'stale'
+      // Remaining issues need Claude — update pr.issues so Claude doesn't re-address resolved ones
       pr.issues = remainingIssues;
       log(`  Remaining issues after rebase: ${remainingIssues.join(', ')} — falling through to Claude`);
     } else {

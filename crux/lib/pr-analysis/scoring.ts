@@ -5,6 +5,7 @@
  */
 
 import type { DetectedPr, PrIssueType, ScoredPr } from './types.ts';
+import { LABELS } from '../labels.ts';
 
 // ── Issue scores ─────────────────────────────────────────────────────────────
 
@@ -18,6 +19,9 @@ export const ISSUE_SCORES: Record<PrIssueType, number> = {
   'bot-review-nitpick': 15,
 };
 
+/** Bonus for PRs with stage:approved — they're one fix away from merging. */
+export const APPROVED_BONUS = 100;
+
 /** Pure function — computes priority score for a detected PR. */
 export function computeScore(pr: DetectedPr): number {
   let score = 0;
@@ -26,6 +30,11 @@ export function computeScore(pr: DetectedPr): number {
   // Age bonus: 1 point per hour, capped at 50
   const ageHours = (Date.now() - new Date(pr.createdAt).getTime()) / 3_600_000;
   score += Math.min(50, Math.max(0, Math.floor(ageHours)));
+
+  // Approved PRs get a priority boost — fixing them unblocks a merge
+  if (pr.labels?.includes(LABELS.STAGE_APPROVED)) {
+    score += APPROVED_BONUS;
+  }
 
   return score;
 }

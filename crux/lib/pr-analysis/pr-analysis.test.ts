@@ -58,6 +58,7 @@ function makeDetectedPr(overrides: Partial<DetectedPr> = {}): DetectedPr {
     createdAt: new Date().toISOString(),
     issues: [],
     botComments: [],
+    labels: [],
     ...overrides,
   };
 }
