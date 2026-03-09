@@ -73,20 +73,23 @@ function groupFactsByProperty(facts: Fact[]): Map<string, Fact[]> {
 /** Render a source cell for a fact. */
 function SourceCell({ fact }: { fact: Fact }) {
   if (fact.source) {
-    return (
-      <a
-        href={fact.source}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-blue-600 hover:underline dark:text-blue-400"
-      >
-        {shortDomain(fact.source)}
-      </a>
-    );
+    if (isUrl(fact.source)) {
+      return (
+        <a
+          href={fact.source}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline dark:text-blue-400"
+        >
+          {shortDomain(fact.source)}
+        </a>
+      );
+    }
+    return <span className="text-xs text-muted-foreground">{fact.source}</span>;
   }
   if (fact.sourceResource) {
     return (
-      <span className="text-muted-foreground">R: {fact.sourceResource}</span>
+      <span className="text-muted-foreground text-xs">R: {fact.sourceResource}</span>
     );
   }
   return <span className="text-muted-foreground">&mdash;</span>;
@@ -157,6 +160,7 @@ export default async function KBEntityPage({
   if (!entity) return notFound();
 
   const allFacts = getKBFacts(entityId);
+  const structuredFacts = allFacts.filter((f) => f.propertyId !== "description");
   const factGroups = groupFactsByProperty(allFacts);
   const itemCollections = getKBAllItemCollections(entityId);
   const schema = getKBSchema(entity.type);
@@ -249,7 +253,19 @@ export default async function KBEntityPage({
                     />
                   )}
                   {entity.parent && (
-                    <MetaRow label="Parent" value={entity.parent} />
+                    <tr>
+                      <td className="py-2 px-4 font-medium text-muted-foreground w-[10rem] text-sm bg-card">
+                        Parent
+                      </td>
+                      <td className="py-2 px-4 text-sm bg-card">
+                        <Link
+                          href={`/kb/entity/${entity.parent}`}
+                          className="text-blue-600 hover:underline dark:text-blue-400"
+                        >
+                          {getKBEntity(entity.parent)?.name ?? entity.parent}
+                        </Link>
+                      </td>
+                    </tr>
                   )}
                   <MetaRow
                     label="YAML File"
@@ -257,7 +273,7 @@ export default async function KBEntityPage({
                   />
                   <MetaRow
                     label="Total Facts"
-                    value={`${allFacts.length} structured facts`}
+                    value={`${structuredFacts.length} structured facts${allFacts.length !== structuredFacts.length ? ` (${allFacts.length} total incl. description)` : ""}`}
                   />
                   {totalItems > 0 && (
                     <MetaRow
@@ -274,7 +290,7 @@ export default async function KBEntityPage({
           {sortedPropertyIds.length > 0 && (
             <section className="mb-8">
               <h2 className="text-lg font-semibold mb-3">Facts by Property</h2>
-              <div className="border border-border rounded-lg overflow-hidden divide-y divide-border">
+              <div className="border border-border rounded-lg overflow-hidden overflow-x-auto divide-y divide-border">
                 {sortedPropertyIds.map((propertyId) => {
                   const facts = factGroups.get(propertyId)!;
                   const property = getKBProperty(propertyId);

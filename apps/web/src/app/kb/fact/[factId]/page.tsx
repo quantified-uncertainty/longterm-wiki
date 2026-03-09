@@ -15,6 +15,7 @@ import {
 import { getEntityHref } from "@/data";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import { formatKBFactValue, formatKBDate, shortDomain, isUrl } from "@/components/wiki/kb/format";
+import { KVRow, KVTable, Dash } from "@/components/wiki/kb/kb-detail-shared";
 
 // ── Static params ────────────────────────────────────────────────────
 
@@ -49,33 +50,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
-function KVRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <tr className="border-b border-border last:border-b-0">
-      <td className="px-3 py-2 text-muted-foreground font-medium text-xs uppercase tracking-wide whitespace-nowrap align-top w-40">
-        {label}
-      </td>
-      <td className="px-3 py-2 text-sm">{children}</td>
-    </tr>
-  );
-}
-
-function KVTable({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="border border-border rounded-lg overflow-hidden">
-      <table className="w-full">
-        <tbody className="[&>tr:nth-child(even)]:bg-muted/30">{children}</tbody>
-      </table>
-    </div>
-  );
-}
-
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return <h2 className="text-base font-semibold mt-6 mb-2">{children}</h2>;
-}
-
-function Dash() {
-  return <span className="text-muted-foreground">{"\u2014"}</span>;
 }
 
 function FactLink({ href, children }: { href: string; children: React.ReactNode }) {
@@ -231,8 +207,8 @@ export default async function FactDetailPage({ params }: PageProps) {
         </KVRow>
         <KVRow label="Source Resource">
           {fact.sourceResource ? (
-            <FactLink href={getEntityHref(fact.sourceResource)}>
-              {fact.sourceResource}
+            <FactLink href={`/kb/entity/${fact.sourceResource}`}>
+              {getKBEntity(fact.sourceResource)?.name ?? fact.sourceResource}
             </FactLink>
           ) : (
             <Dash />
@@ -271,7 +247,7 @@ export default async function FactDetailPage({ params }: PageProps) {
               )}
             </KVRow>
             <KVRow label="Exchange Rate Date">
-              {formatKBDate(fact.exchangeRateDate) !== "\u2014"
+              {fact.exchangeRateDate
                 ? formatKBDate(fact.exchangeRateDate)
                 : <Dash />}
             </KVRow>

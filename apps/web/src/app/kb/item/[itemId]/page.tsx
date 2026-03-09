@@ -17,6 +17,7 @@ import {
   shortDomain,
   isUrl,
 } from "@/components/wiki/kb/format";
+import { KVRow, KVTable } from "@/components/wiki/kb/kb-detail-shared";
 
 // ── Static params ────────────────────────────────────────────────────
 
@@ -36,33 +37,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `Item: ${itemId}`,
     robots: { index: false },
   };
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────
-
-function KVRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <tr className="border-b border-border last:border-b-0">
-      <td className="px-3 py-2 text-muted-foreground font-medium text-xs uppercase tracking-wide whitespace-nowrap align-top w-40">
-        {label}
-      </td>
-      <td className="px-3 py-2 text-sm">{children}</td>
-    </tr>
-  );
-}
-
-function KVTable({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="border border-border rounded-lg overflow-hidden">
-      <table className="w-full">
-        <tbody className="[&>tr:nth-child(even)]:bg-muted/30">{children}</tbody>
-      </table>
-    </div>
-  );
-}
-
-function Dash() {
-  return <span className="text-muted-foreground">{"\u2014"}</span>;
 }
 
 // ── Page ─────────────────────────────────────────────────────────────
@@ -105,7 +79,15 @@ export default async function ItemDetailPage({ params }: PageProps) {
       </nav>
 
       {/* Header */}
-      <h1 className="text-2xl font-bold mb-1">{titleCase(itemId.replace(/^i_/, ""))}</h1>
+      <h1 className="text-2xl font-bold mb-1">
+        {(() => {
+          // Try to find a meaningful display name from fields (name, title, label, or first text field)
+          const nameField = entry.fields["name"] ?? entry.fields["title"] ?? entry.fields["label"];
+          if (typeof nameField === "string") return nameField;
+          // Fall back to collection singular + entity
+          return `${titleCase(collection)} Item`;
+        })()}
+      </h1>
       <p className="text-sm text-muted-foreground mb-6">
         <Link
           href={`/kb/entity/${entityId}`}
@@ -115,6 +97,8 @@ export default async function ItemDetailPage({ params }: PageProps) {
         </Link>
         {" \u203A "}
         <span>{titleCase(collection)}</span>
+        {" \u203A "}
+        <code className="text-xs">{itemId}</code>
       </p>
 
       {/* Item Context */}
