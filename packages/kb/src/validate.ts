@@ -124,7 +124,7 @@ function checkRecommended(
   for (const propertyId of schema.recommended) {
     if (!hasFact(graph, entityId, propertyId)) {
       results.push({
-        severity: "warning",
+        severity: "info",
         entityId,
         propertyId,
         message: `Missing recommended property "${propertyId}" on entity "${entityId}" (type: ${schema.type}).`,
@@ -528,6 +528,10 @@ function checkNonTemporalMultiple(
   return results;
 }
 
+// Property categories where stale temporal data is actionable (changes frequently).
+// Other categories (people, biographical, etc.) have data that stays stable for years.
+const STALE_WARNING_CATEGORIES = new Set(["financial", "product"]);
+
 /** Check 14: stale temporal data — most recent asOf is >2 years old. */
 function checkStaleTemporal(
   graph: Graph,
@@ -556,8 +560,15 @@ function checkStaleTemporal(
 
   for (const [propertyId, latest] of latestAsOf) {
     if (latest < twoYearsAgo) {
+      const property = graph.getProperty(propertyId);
+      const category = property?.category;
+      // Financial/product properties change frequently — staleness is actionable.
+      // Other categories (people, biographical) are stable and demoted to info.
+      const severity: "warning" | "info" =
+        category && STALE_WARNING_CATEGORIES.has(category) ? "warning" : "info";
+
       results.push({
-        severity: "warning",
+        severity,
         entityId,
         propertyId,
         message:
