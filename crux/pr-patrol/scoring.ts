@@ -18,7 +18,7 @@ export {
 
 // ── Issue-type-specific resource limits (daemon-specific) ────────────────────
 // Scale max-turns and timeout based on the hardest issue in a PR.
-// This prevents trivial issues from consuming the full 40-turn / 30-min budget.
+// This prevents trivial issues from consuming the full 60-turn / 60-min budget.
 
 export interface IssueBudget {
   maxTurns: number;
@@ -26,9 +26,9 @@ export interface IssueBudget {
 }
 
 const ISSUE_BUDGETS: Record<PrIssueType, IssueBudget> = {
-  conflict:            { maxTurns: 40, timeoutMinutes: 30 },
-  'ci-failure':        { maxTurns: 35, timeoutMinutes: 20 },
-  'bot-review-major':  { maxTurns: 35, timeoutMinutes: 20 },
+  conflict:            { maxTurns: 60, timeoutMinutes: 60 },
+  'ci-failure':        { maxTurns: 50, timeoutMinutes: 45 },
+  'bot-review-major':  { maxTurns: 50, timeoutMinutes: 45 },
   'missing-issue-ref': { maxTurns: 5,  timeoutMinutes: 3 },
   stale:               { maxTurns: 10, timeoutMinutes: 5 },
   'missing-testplan':  { maxTurns: 8,  timeoutMinutes: 5 },

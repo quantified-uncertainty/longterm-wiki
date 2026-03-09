@@ -125,7 +125,7 @@ export function buildConfig(
     ),
     maxTurns: parseIntOpt(
       options.maxTurns ?? process.env.PR_PATROL_MAX_TURNS,
-      40,
+      60,
     ),
     cooldownSeconds: parseIntOpt(
       options.cooldown ?? process.env.PR_PATROL_COOLDOWN,
@@ -151,7 +151,7 @@ export function buildConfig(
     ),
     timeoutMinutes: parseIntOpt(
       options.timeout ?? process.env.PR_PATROL_TIMEOUT_MINUTES,
-      30,
+      60,
     ),
   };
 }
