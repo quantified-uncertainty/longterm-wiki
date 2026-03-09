@@ -6,8 +6,9 @@ export function PropertyExplorerContent() {
   const properties = getKBProperties();
   const entities = getKBEntities();
 
-  // Build entity type index: entityId → type
+  // Build entity lookup maps for O(1) access instead of O(n) entities.find()
   const entityTypeMap = new Map(entities.map((e) => [e.id, e.type]));
+  const entityNameMap = new Map(entities.map((e) => [e.id, e.name ?? e.id]));
 
   // Build rows for each property
   const rows: PropertyRow[] = properties.map((prop) => {
@@ -26,9 +27,8 @@ export function PropertyExplorerContent() {
       const latest = facts[0]; // Already sorted most-recent-first
       entityData.push({
         entityId,
-        entityName:
-          entities.find((e) => e.id === entityId)?.name ?? entityId,
-        latestValue: formatValue(latest.value),
+        entityName: entityNameMap.get(entityId) ?? entityId,
+        latestValue: formatValue(latest.value, prop.dataType, entityNameMap),
         asOf: latest.asOf ?? null,
         source: latest.source ?? null,
         allValuesCount: facts.length,
@@ -47,8 +47,13 @@ export function PropertyExplorerContent() {
     const applicableCount = prop.appliesTo
       ? entities.filter((e) => prop.appliesTo!.includes(e.type)).length
       : entities.length;
+    // Only count entities whose type is in appliesTo (prevents coverage > 100%)
+    const applicableEntityIds = entityIds.filter((id) => {
+      const entityType = entityTypeMap.get(id);
+      return entityType && (!prop.appliesTo || prop.appliesTo.length === 0 || prop.appliesTo.includes(entityType));
+    });
     const coverage =
-      applicableCount > 0 ? entityIds.length / applicableCount : 0;
+      applicableCount > 0 ? Math.min(applicableEntityIds.length / applicableCount, 1) : 0;
 
     return {
       id: prop.id,
@@ -144,12 +149,27 @@ export function PropertyExplorerContent() {
 }
 
 /** Format a FactValue for display as a simple string. */
-function formatValue(value: {
-  type: string;
-  value?: unknown;
-  low?: number;
-  high?: number;
-}): string {
+function formatValue(
+  value: {
+    type: string;
+    value?: unknown;
+    low?: number;
+    high?: number;
+  },
+  propertyDataType?: string,
+  entityNameMap?: Map<string, string>,
+): string {
+  // Resolve ref/refs values to entity display names when possible
+  if (propertyDataType === "ref" && entityNameMap) {
+    const name = entityNameMap.get(String(value.value));
+    if (name) return name;
+  }
+  if (propertyDataType === "refs" && entityNameMap && Array.isArray(value.value)) {
+    return (value.value as string[])
+      .map((v) => entityNameMap.get(String(v)) ?? String(v))
+      .join(", ");
+  }
+
   switch (value.type) {
     case "number":
       return typeof value.value === "number"

@@ -343,6 +343,7 @@ export function PropertyExplorerTable({ data }: { data: PropertyRow[] }) {
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onExpandedChange: setExpanded,
+    getRowId: (row) => row.id,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
