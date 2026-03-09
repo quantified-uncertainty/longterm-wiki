@@ -26,20 +26,33 @@ export interface CitationData {
   resourceId?: string;
 }
 
+export interface KBFactRefData {
+  factId: string;
+  subjectId: string;
+  propertyId: string;
+  value: unknown; // FactValue from KB types
+  asOf?: string;
+  source?: string;
+  sourceResource?: string;
+  notes?: string;
+}
+
 export interface ReferenceData {
   /** Keyed by reference_id, e.g. "cr-3d34" */
   claimReferences: Map<string, ClaimRefData>;
   /** Keyed by reference_id, e.g. "rc-4552" */
   citations: Map<string, CitationData>;
+  /** Keyed by fact_id, e.g. "f_dW5cR9mJ8q" */
+  kbFacts: Map<string, KBFactRefData>;
 }
 
-export type RefKind = "claim" | "citation";
+export type RefKind = "claim" | "citation" | "kb";
 
 export interface RefMapEntry {
   kind: RefKind;
   originalId: string;
   footnoteNumber: number;
-  data: ClaimRefData | CitationData | null;
+  data: ClaimRefData | CitationData | KBFactRefData | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -53,7 +66,7 @@ export interface RefMapEntry {
  * NOTE: This intentionally does NOT match the definition form `[^cr-XXXX]: ...`
  * because we never expect those to be authored — we generate them ourselves.
  */
-const DB_REF_USAGE_RE = /\[\^(cr-[a-zA-Z0-9]+|rc-[a-zA-Z0-9]+)\]/g;
+const DB_REF_USAGE_RE = /\[\^(cr-[a-zA-Z0-9]+|rc-[a-zA-Z0-9]+|kb-[a-zA-Z0-9_]+)\]/g;
 
 /**
  * Escape `<` characters that could trigger JSX/HTML parsing in MDX footnote
@@ -128,6 +141,46 @@ function buildCitationFootnote(data: CitationData): string {
 }
 
 /**
+ * Format a KB FactValue for plain-text display in a footnote definition.
+ */
+export function formatFactValueForFootnote(value: unknown): string {
+  if (!value || typeof value !== "object") return String(value ?? "");
+  const v = value as Record<string, unknown>;
+  if (v.type === "number" && typeof v.value === "number") {
+    const num = v.value as number;
+    const abs = Math.abs(num);
+    if (abs >= 1e12) return `${(num / 1e12).toFixed(1)}T`;
+    if (abs >= 1e9) return `${(num / 1e9).toFixed(1)}B`;
+    if (abs >= 1e6) return `${(num / 1e6).toFixed(1)}M`;
+    if (abs >= 1e3) return `${(num / 1e3).toFixed(1)}K`;
+    return String(num);
+  }
+  if (v.type === "text" && typeof v.value === "string") return v.value;
+  if (v.type === "date" && typeof v.value === "string") return v.value;
+  if (v.type === "boolean") return v.value ? "Yes" : "No";
+  return String(v.value ?? "");
+}
+
+/**
+ * Build the footnote definition string for a KB fact reference.
+ */
+function buildKBFactFootnote(data: KBFactRefData): string {
+  const parts: string[] = [];
+  const valueStr = formatFactValueForFootnote(data.value);
+  if (valueStr) parts.push(valueStr);
+  if (data.asOf) parts.push(`as of ${data.asOf}`);
+  if (data.source) {
+    if (data.source.startsWith("http")) {
+      parts.push(`[Source](${data.source})`);
+    } else {
+      parts.push(`Source: ${data.source}`);
+    }
+  }
+  if (data.notes) parts.push(data.notes);
+  return sanitizeFootnoteText(parts.join(" \u2014 ") || `KB fact ${data.factId}`);
+}
+
+/**
  * Pre-process MDX content, replacing DB-driven reference markers with standard
  * numbered footnotes and appending footnote definitions.
  *
@@ -185,7 +238,7 @@ export function preprocessReferences(
   }
 
   // -----------------------------------------------------------------------
-  // 5. Replace [^cr-XXXX] / [^rc-XXXX] usage sites with [^N]
+  // 5. Replace [^cr-XXXX] / [^rc-XXXX] / [^kb-XXXX] usage sites with [^N]
   // -----------------------------------------------------------------------
   let transformed = mdxContent.replace(DB_REF_USAGE_RE, (_match, refId: string) => {
     const num = idToNumber.get(refId);
@@ -203,7 +256,7 @@ export function preprocessReferences(
 
     let definitionText: string;
     let kind: RefKind;
-    let data: ClaimRefData | CitationData | null = null;
+    let data: ClaimRefData | CitationData | KBFactRefData | null = null;
 
     if (isClaim) {
       kind = "claim";
@@ -213,6 +266,16 @@ export function preprocessReferences(
         definitionText = buildClaimFootnote(claimData);
       } else {
         definitionText = `Claim reference ${refId} (data unavailable)`;
+      }
+    } else if (refId.startsWith("kb-")) {
+      kind = "kb";
+      const factId = refId.slice(3); // Remove "kb-" prefix
+      const kbData = referenceData.kbFacts.get(factId);
+      if (kbData) {
+        data = kbData;
+        definitionText = buildKBFactFootnote(kbData);
+      } else {
+        definitionText = `KB fact ${factId} (data unavailable)`;
       }
     } else {
       kind = "citation";
@@ -246,5 +309,6 @@ export function emptyReferenceData(): ReferenceData {
   return {
     claimReferences: new Map(),
     citations: new Map(),
+    kbFacts: new Map(),
   };
 }

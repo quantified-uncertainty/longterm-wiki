@@ -2,9 +2,11 @@ import { describe, it, expect } from "vitest";
 import {
   preprocessReferences,
   emptyReferenceData,
+  formatFactValueForFootnote,
   type ReferenceData,
   type ClaimRefData,
   type CitationData,
+  type KBFactRefData,
 } from "../reference-preprocessor";
 
 // ---------------------------------------------------------------------------
@@ -18,6 +20,7 @@ function makeReferenceData(
   return {
     claimReferences: new Map(Object.entries(claims)),
     citations: new Map(Object.entries(citations)),
+    kbFacts: new Map(),
   };
 }
 
@@ -530,6 +533,127 @@ describe("preprocessReferences", () => {
     // Should have a blank line before footnote definitions
     expect(result).toContain("\n\n[^1]:");
   });
+
+  // -----------------------------------------------------------------------
+  // KB fact references
+  // -----------------------------------------------------------------------
+
+  it("injects definitions for [^kb-XXXX] KB fact references", () => {
+    const content = "Revenue was significant[^kb-f_abc123].";
+    const refData: ReferenceData = {
+      claimReferences: new Map(),
+      citations: new Map(),
+      kbFacts: new Map([
+        [
+          "f_abc123",
+          {
+            factId: "f_abc123",
+            subjectId: "anthropic",
+            propertyId: "revenue",
+            value: { type: "number", value: 2000000000 },
+            asOf: "2025-06",
+            source: "https://example.com/report",
+            notes: "Annual revenue",
+          },
+        ],
+      ]),
+    };
+
+    const { content: result, referenceMap } = preprocessReferences(
+      content,
+      refData
+    );
+
+    expect(result).toContain("Revenue was significant[^1].");
+    expect(result).toContain("[^1]:");
+    expect(result).toContain("2.0B");
+    expect(result).toContain("as of 2025-06");
+    expect(result).toContain("[Source](https://example.com/report)");
+
+    const entry = referenceMap.get(1);
+    expect(entry).toBeDefined();
+    expect(entry!.kind).toBe("kb");
+    expect(entry!.originalId).toBe("kb-f_abc123");
+  });
+
+  it("handles missing KB fact data gracefully", () => {
+    const content = "Fact[^kb-f_missing].";
+    const refData = emptyReferenceData();
+
+    const { content: result, referenceMap } = preprocessReferences(
+      content,
+      refData
+    );
+
+    expect(result).toContain("[^1]: KB fact f_missing (data unavailable)");
+    expect(referenceMap.get(1)?.data).toBeNull();
+    expect(referenceMap.get(1)?.kind).toBe("kb");
+  });
+
+  it("handles KB fact with text value and no source", () => {
+    const content = "Name[^kb-f_text1].";
+    const refData: ReferenceData = {
+      claimReferences: new Map(),
+      citations: new Map(),
+      kbFacts: new Map([
+        [
+          "f_text1",
+          {
+            factId: "f_text1",
+            subjectId: "openai",
+            propertyId: "ceo",
+            value: { type: "text", value: "Sam Altman" },
+          },
+        ],
+      ]),
+    };
+
+    const { content: result } = preprocessReferences(content, refData);
+    expect(result).toContain("[^1]: Sam Altman");
+  });
+});
+
+describe("formatFactValueForFootnote", () => {
+  it("formats large numbers with abbreviations", () => {
+    expect(
+      formatFactValueForFootnote({ type: "number", value: 2000000000 })
+    ).toBe("2.0B");
+    expect(
+      formatFactValueForFootnote({ type: "number", value: 1500000 })
+    ).toBe("1.5M");
+    expect(
+      formatFactValueForFootnote({ type: "number", value: 5000 })
+    ).toBe("5.0K");
+    expect(
+      formatFactValueForFootnote({ type: "number", value: 42 })
+    ).toBe("42");
+  });
+
+  it("formats text values", () => {
+    expect(
+      formatFactValueForFootnote({ type: "text", value: "hello" })
+    ).toBe("hello");
+  });
+
+  it("formats boolean values", () => {
+    expect(
+      formatFactValueForFootnote({ type: "boolean", value: true })
+    ).toBe("Yes");
+    expect(
+      formatFactValueForFootnote({ type: "boolean", value: false })
+    ).toBe("No");
+  });
+
+  it("formats date values", () => {
+    expect(
+      formatFactValueForFootnote({ type: "date", value: "2025-06" })
+    ).toBe("2025-06");
+  });
+
+  it("handles null/undefined", () => {
+    expect(formatFactValueForFootnote(null)).toBe("");
+    expect(formatFactValueForFootnote(undefined)).toBe("");
+  });
 });
 
 describe("emptyReferenceData", () => {
@@ -537,5 +661,6 @@ describe("emptyReferenceData", () => {
     const data = emptyReferenceData();
     expect(data.claimReferences.size).toBe(0);
     expect(data.citations.size).toBe(0);
+    expect(data.kbFacts.size).toBe(0);
   });
 });

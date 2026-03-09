@@ -15,6 +15,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      "@data/kb": path.resolve(__dirname, "./src/data/kb.ts"),
       "@": path.resolve(__dirname, "./src"),
       "@components": path.resolve(__dirname, "./src/components"),
       "@data": path.resolve(__dirname, "./src/data/index.ts"),

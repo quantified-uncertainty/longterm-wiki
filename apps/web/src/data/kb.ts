@@ -30,6 +30,21 @@ function sortByAsOfDesc(facts: Fact[]): Fact[] {
 }
 
 /**
+ * Look up a single fact by its ID (e.g. "f_dW5cR9mJ8q").
+ * Scans all entities since fact IDs are globally unique.
+ */
+export function getKBFactById(factId: string): Fact | undefined {
+  const kb = getKB();
+  if (!kb) return undefined;
+
+  for (const facts of Object.values(kb.facts)) {
+    const found = facts.find((f) => f.id === factId);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+/**
  * Get all facts for an entity, optionally filtered by property.
  * Returns facts sorted most-recent-first (by asOf).
  */

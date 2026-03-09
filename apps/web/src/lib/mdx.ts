@@ -17,6 +17,7 @@ import {
   type ReferenceData,
   type RefMapEntry,
 } from "./reference-preprocessor";
+import { getKBFactById } from "@data/kb";
 
 const CONTENT_DIR = path.resolve(process.cwd(), "../../content/docs");
 const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
@@ -200,7 +201,7 @@ function toReferenceData(serialized: SerializedPageReferences | null): Reference
     ])
   );
 
-  return { claimReferences, citations };
+  return { claimReferences, citations, kbFacts: new Map() };
 }
 
 /**
@@ -216,6 +217,27 @@ async function compileFromPath(filePath: string, slug: string): Promise<MdxPage 
   // Run DB-driven reference preprocessor (after preprocessMdx, before compileMDX)
   const pageRefs = getPageReferences(slug);
   const refData = toReferenceData(pageRefs);
+
+  // Resolve KB fact references from content
+  const kbMarkerRe = /\[\^kb-([a-zA-Z0-9_]+)\]/g;
+  for (const m of preprocessed.matchAll(kbMarkerRe)) {
+    const factId = m[1];
+    if (refData.kbFacts.has(factId)) continue;
+    const fact = getKBFactById(factId);
+    if (fact) {
+      refData.kbFacts.set(factId, {
+        factId: fact.id,
+        subjectId: fact.subjectId,
+        propertyId: fact.propertyId,
+        value: fact.value,
+        asOf: fact.asOf,
+        source: fact.source,
+        sourceResource: fact.sourceResource,
+        notes: fact.notes,
+      });
+    }
+  }
+
   const { content: refProcessed, referenceMap } = preprocessReferences(preprocessed, refData);
 
   try {
