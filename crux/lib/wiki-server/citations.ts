@@ -94,7 +94,7 @@ export type { MarkAccuracyResult, MarkAccuracyBatchResult, SnapshotResult, Accur
 export async function upsertCitationQuote(
   item: UpsertCitationQuoteItem,
 ): Promise<ApiResult<UpsertCitationQuoteResult>> {
-  return apiRequest<UpsertCitationQuoteResult>('POST', '/api/citations/quotes/upsert', item, undefined, 'content');
+  return apiRequest<UpsertCitationQuoteResult>('POST', '/api/citations/quotes/upsert', item);
 }
 
 export async function upsertCitationQuoteBatch(
@@ -103,9 +103,7 @@ export async function upsertCitationQuoteBatch(
   return apiRequest<UpsertCitationQuoteBatchResult>(
     'POST',
     '/api/citations/quotes/upsert-batch',
-    { items },
-    undefined,
-    'content',
+    { items }
   );
 }
 
@@ -129,7 +127,7 @@ export async function getPageCitationHealth(
 export async function markCitationAccuracy(
   item: MarkAccuracyItem,
 ): Promise<ApiResult<MarkAccuracyResult>> {
-  return apiRequest<MarkAccuracyResult>('POST', '/api/citations/quotes/mark-accuracy', item, undefined, 'content');
+  return apiRequest<MarkAccuracyResult>('POST', '/api/citations/quotes/mark-accuracy', item);
 }
 
 export async function markCitationAccuracyBatch(
@@ -138,14 +136,12 @@ export async function markCitationAccuracyBatch(
   return apiRequest<MarkAccuracyBatchResult>(
     'POST',
     '/api/citations/quotes/mark-accuracy-batch',
-    { items },
-    undefined,
-    'content',
+    { items }
   );
 }
 
 export async function createAccuracySnapshot(): Promise<ApiResult<SnapshotResult>> {
-  return apiRequest<SnapshotResult>('POST', '/api/citations/accuracy-snapshot', {}, undefined, 'content');
+  return apiRequest<SnapshotResult>('POST', '/api/citations/accuracy-snapshot', {});
 }
 
 export async function getAccuracyDashboard(): Promise<ApiResult<AccuracyDashboardData>> {
@@ -163,7 +159,7 @@ export type { CitationContentRow, CitationContentListEntry, CitationContentListR
 export async function upsertCitationContent(
   item: UpsertCitationContentInput,
 ): Promise<ApiResult<{ url: string }>> {
-  return apiRequest<{ url: string }>('POST', '/api/citations/content/upsert', item, undefined, 'content');
+  return apiRequest<{ url: string }>('POST', '/api/citations/content/upsert', item);
 }
 
 export async function getCitationContentByUrl(
@@ -253,9 +249,7 @@ export async function markQuoteVerified(
   return apiRequest<MarkVerifiedResult>(
     'POST',
     '/api/citations/quotes/mark-verified',
-    { pageId, footnote, method, score },
-    undefined,
-    'content',
+    { pageId, footnote, method, score }
   );
 }
 
@@ -268,9 +262,7 @@ export async function markQuoteUnverified(
   return apiRequest<MarkUnverifiedResult>(
     'POST',
     '/api/citations/quotes/mark-unverified',
-    { pageId, footnote, method, score },
-    undefined,
-    'content',
+    { pageId, footnote, method, score }
   );
 }
 

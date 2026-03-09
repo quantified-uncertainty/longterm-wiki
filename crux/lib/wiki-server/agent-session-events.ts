@@ -44,7 +44,7 @@ export type AppendEventResponse = InferResponseType<
 export async function appendEvent(
   event: CreateAgentEvent,
 ): Promise<ApiResult<AppendEventResponse>> {
-  return apiRequest<AppendEventResponse>('POST', '/api/agent-session-events', event, undefined, 'project');
+  return apiRequest<AppendEventResponse>('POST', '/api/agent-session-events', event);
 }
 
 /**

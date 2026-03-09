@@ -56,9 +56,7 @@ export async function syncPageLinks(
     const result = await batchedRequest<SyncLinksResult>(
       'POST',
       '/api/links/sync',
-      { links: batch, replace: isFirst },
-      undefined,
-      'content',
+      { links: batch, replace: isFirst }
     );
 
     if (!result.ok) {

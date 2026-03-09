@@ -44,13 +44,13 @@ export type SessionEntry = SessionRow;
 export async function createSession(
   entry: SessionApiEntry,
 ): Promise<ApiResult<CreateSessionResult>> {
-  return apiRequest<CreateSessionResult>('POST', '/api/sessions', entry, undefined, 'project');
+  return apiRequest<CreateSessionResult>('POST', '/api/sessions', entry);
 }
 
 export async function createSessionBatch(
   items: SessionApiEntry[],
 ): Promise<ApiResult<SessionBatchResult>> {
-  return apiRequest<SessionBatchResult>('POST', '/api/sessions/batch', { items }, undefined, 'project');
+  return apiRequest<SessionBatchResult>('POST', '/api/sessions/batch', { items });
 }
 
 export async function listSessions(

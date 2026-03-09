@@ -37,13 +37,13 @@ export type EditLogApiEntry = EditLogEntry;
 export async function appendEditLogToServer(
   entry: EditLogApiEntry,
 ): Promise<ApiResult<AppendResult>> {
-  return apiRequest<AppendResult>('POST', '/api/edit-logs', entry, undefined, 'project');
+  return apiRequest<AppendResult>('POST', '/api/edit-logs', entry);
 }
 
 export async function appendEditLogBatch(
   items: EditLogApiEntry[],
 ): Promise<ApiResult<BatchResult>> {
-  return apiRequest<BatchResult>('POST', '/api/edit-logs/batch', { items }, undefined, 'project');
+  return apiRequest<BatchResult>('POST', '/api/edit-logs/batch', { items });
 }
 
 export async function getEditLogsForPage(

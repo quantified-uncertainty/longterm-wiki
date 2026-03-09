@@ -75,9 +75,7 @@ export async function syncFacts(
     const result = await batchedRequest<SyncFactsResult>(
       'POST',
       '/api/facts/sync',
-      { facts: batch },
-      undefined,
-      'content',
+      { facts: batch }
     );
 
     if (!result.ok) {

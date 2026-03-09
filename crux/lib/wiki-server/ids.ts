@@ -52,9 +52,7 @@ export async function allocateId(
   return apiRequest<AllocatedId>(
     'POST',
     '/api/ids/allocate',
-    body,
-    undefined,
-    'project',
+    body
   );
 }
 

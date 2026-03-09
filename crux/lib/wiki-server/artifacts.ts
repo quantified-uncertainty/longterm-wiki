@@ -46,7 +46,7 @@ export type ArtifactEntry = InferResponseType<RpcClient[':id']['$get'], 200>;
 export async function saveArtifacts(
   input: SaveArtifactsInput,
 ): Promise<ApiResult<SaveArtifactsResult>> {
-  return apiRequest<SaveArtifactsResult>('POST', '/api/artifacts', input, undefined, 'content');
+  return apiRequest<SaveArtifactsResult>('POST', '/api/artifacts', input);
 }
 
 /** Get artifacts for a specific page (most recent first). */
