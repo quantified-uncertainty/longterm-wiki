@@ -5,10 +5,10 @@ description: "Guidelines for creating research reports on AI safety topics"
 sidebar:
   order: 5
 subcategory: style-guides
-quality: 36
+quality: 20
 readerImportance: 12.5
 researchImportance: 10.5
-lastEdited: "2026-02-17"
+lastEdited: "2026-03-09"
 update_frequency: 90
 llmSummary: "Internal style guide for deprecated research report format, specifying table-based layouts, escaped dollar signs, YAML schema, and causal factor documentation for diagram creation. Provides comprehensive formatting rules and validation checklists but addresses an obsolete content structure."
 ratings:
@@ -19,6 +19,9 @@ ratings:
 ---
 import {EntityLink} from '@components/wiki';
 
+<Aside type="caution" title="Deprecated">
+This style guide describes the deprecated research-reports format. Research content now lives in the relevant knowledge-base sections. For creating and improving wiki pages, use the Crux content pipeline: `pnpm crux content create "Title" --tier=standard` and `pnpm crux content improve <id> --tier=standard --apply`. See the <EntityLink id="E763" name="knowledge-base">Knowledge Base Style Guide</EntityLink> for current formatting guidelines.
+</Aside>
 
 ## Purpose
 
@@ -28,8 +31,6 @@ Research reports are **deep-dive investigations** into specific topics within th
 2. **Input for diagram creation** - reports inform the causal models in cause-effect diagrams
 
 Reports are generated with AI assistance (Claude Code) using web research and synthesis of existing content.
-
-**Note:** The research-reports section has been deprecated. Research content now lives in the relevant knowledge-base sections (risks/, responses/, etc.).
 
 ---
 
