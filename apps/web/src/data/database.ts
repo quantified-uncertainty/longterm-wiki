@@ -494,7 +494,7 @@ export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, Organization
 export { isRisk, isPerson, isOrganization, isPolicy } from "./entity-schemas";
 
 /** @deprecated Use TypedEntity instead */
-export interface Entity {
+interface Entity {
   id: string;
   type: string;
   title: string;

@@ -3,7 +3,7 @@
  */
 
 import { getDatabase, fetchFromWikiServer, withApiFallback } from "./database";
-import type { Page } from "./database";
+import type { Page, WithSource } from "./database";
 
 export interface UpdateScheduleItem {
   id: string;
@@ -20,7 +20,7 @@ export interface UpdateScheduleItem {
   category: string;
 }
 
-export async function getUpdateSchedule() {
+export async function getUpdateSchedule(): Promise<WithSource<UpdateScheduleItem[]>> {
   return withApiFallback(
     async () => {
       const data = await fetchFromWikiServer<UpdateScheduleItem[]>(
