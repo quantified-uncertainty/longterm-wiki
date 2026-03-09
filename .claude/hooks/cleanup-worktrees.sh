@@ -92,6 +92,9 @@ if [ -n "$CURRENT_PATH" ]; then
   BRANCHES+=("$CURRENT_BRANCH")
 fi
 
+# ─── Pre-compute merged branches (once, not per-worktree) ────────────────────
+MERGED_BRANCHES=$(git branch --merged "$MAIN_BRANCH" 2>/dev/null | sed 's/^[* ]*//' || true)
+
 # ─── Process each worktree ──────────────────────────────────────────────────────
 for i in "${!PATHS[@]}"; do
   WT_PATH="${PATHS[$i]}"
@@ -120,8 +123,8 @@ for i in "${!PATHS[@]}"; do
     # Detached HEAD with clean working tree — safe to remove
     SHOULD_REMOVE=true
   elif [ -n "$WT_BRANCH" ]; then
-    # Check 1: Is the branch merged into main?
-    if git branch --merged "$MAIN_BRANCH" 2>/dev/null | sed 's/^[* ]*//' | grep -qFx "$WT_BRANCH"; then
+    # Check 1: Is the branch merged into main? (uses pre-computed list)
+    if echo "$MERGED_BRANCHES" | grep -qFx "$WT_BRANCH"; then
       SHOULD_REMOVE=true
     fi
 
