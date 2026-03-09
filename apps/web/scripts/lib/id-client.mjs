@@ -17,9 +17,7 @@ function getServerUrl() {
 }
 
 function getApiKey() {
-  return process.env.LONGTERMWIKI_PROJECT_KEY
-    || process.env.LONGTERMWIKI_SERVER_API_KEY
-    || "";
+  return process.env.LONGTERMWIKI_SERVER_API_KEY || "";
 }
 
 function buildHeaders() {
