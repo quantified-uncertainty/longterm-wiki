@@ -20,6 +20,7 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
     pullRequests(first: 50, states: [OPEN], orderBy: {field: UPDATED_AT, direction: DESC}) {
       nodes {
         id number title headRefName headRefOid mergeable isDraft createdAt updatedAt body
+        author { login }
         labels(first: 20) { nodes { name } }
         commits(last: 1) { nodes { commit { statusCheckRollup {
           contexts(first: 50) { nodes {
@@ -43,6 +44,7 @@ const SINGLE_PR_QUERY = `query($owner: String!, $name: String!, $number: Int!) {
   repository(owner: $owner, name: $name) {
     pullRequest(number: $number) {
       id number title headRefName headRefOid mergeable isDraft createdAt updatedAt body
+      author { login }
       labels(first: 20) { nodes { name } }
       commits(last: 1) { nodes { commit { statusCheckRollup {
         contexts(first: 50) { nodes {

@@ -33,6 +33,22 @@ import {
   markProcessed,
 } from './state.ts';
 
+// ── Bot / release PR skip lists ──────────────────────────────────────────────
+
+/** PR authors that are bots — their PRs never reference issues. */
+const SKIP_AUTHORS = new Set([
+  'dependabot[bot]',
+  'renovate[bot]',
+  'github-actions[bot]',
+]);
+
+/** Branch prefixes whose PRs should be skipped (e.g. dependabot/, release/). */
+const SKIP_BRANCH_PREFIXES = [
+  'dependabot/',
+  'renovate/',
+  'release/',
+];
+
 // ── Re-exports for backward compatibility ────────────────────────────────────
 
 export { libExtractBotComments as extractBotComments };
@@ -68,6 +84,20 @@ export function detectAllPrIssuesFromNodes(
       if (ANY_WORKING_LABELS.some((wl) => labels.includes(wl))) return false;
       // Skip draft PRs — they're not ready for automated fixes
       if (pr.isDraft) return false;
+      // Skip bot-authored PRs — they don't reference issues and waste cycles
+      if (pr.author?.login && SKIP_AUTHORS.has(pr.author.login)) {
+        if (config.verbose) {
+          log(`  ${cl.dim}Skipping PR #${pr.number} — bot author: ${pr.author.login}${cl.reset}`);
+        }
+        return false;
+      }
+      // Skip release/dependency branches — they inherently lack issue refs
+      if (SKIP_BRANCH_PREFIXES.some((prefix) => pr.headRefName.startsWith(prefix))) {
+        if (config.verbose) {
+          log(`  ${cl.dim}Skipping PR #${pr.number} — skip-listed branch: ${pr.headRefName}${cl.reset}`);
+        }
+        return false;
+      }
       return true;
     })
     .map((pr) => {
