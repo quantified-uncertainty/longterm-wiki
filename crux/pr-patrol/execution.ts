@@ -27,6 +27,7 @@ import {
 import {
   appendJsonl,
   cl,
+  getFailCount,
   isMainBranchAbandoned,
   isRecentlyProcessed,
   JSONL_FILE,
@@ -46,7 +47,7 @@ import {
   setPersistedClaimedPr,
 } from './state.ts';
 import { buildMainBranchPrompt, buildPrompt } from './prompts.ts';
-import { computeBudget } from './scoring.ts';
+import { computeEffectiveBudget } from './scoring.ts';
 
 // ── No-op detection ─────────────────────────────────────────────────────────
 
@@ -473,10 +474,14 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
   await claimPr(pr.number, config.repo);
 
   // Compute issue-specific budget (capped by global config)
-  const budget = computeBudget(pr.issues);
-  const effectiveMaxTurns = Math.min(budget.maxTurns, config.maxTurns);
-  const effectiveTimeout = Math.min(budget.timeoutMinutes, config.timeoutMinutes);
+  // Reduce budget on retry — the full budget already failed once, so give less on subsequent attempts
+  const failCount = getFailCount(pr.number);
+  const { maxTurns: effectiveMaxTurns, timeoutMinutes: effectiveTimeout } =
+    computeEffectiveBudget(pr.issues, config.maxTurns, config.timeoutMinutes, failCount);
 
+  if (failCount > 0) {
+    log(`  ${cl.dim}Retry #${failCount + 1} — budget reduced to ${effectiveMaxTurns} turns / ${effectiveTimeout}m${cl.reset}`);
+  }
   log(`  Budget: ${effectiveMaxTurns} max-turns, ${effectiveTimeout}m timeout (based on: ${pr.issues.join(', ')})`);
 
   // Post "attempting fix" event comment before spawning Claude
