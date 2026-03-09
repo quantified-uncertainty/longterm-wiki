@@ -15,11 +15,12 @@ import {
   getKBProperties,
   getKBAllItemCollections,
   getKBSchema,
+  isFactExpired,
 } from "@data/kb";
 import type { Fact, Property, ItemEntry, FieldDef } from "@longterm-wiki/kb";
-import { formatKBDate, isUrl, shortDomain, titleCase } from "./format";
-import { KBFactValueDisplay } from "./KBFactValueDisplay";
-import { KBCellValue } from "./KBCellValue";
+import { formatKBDate, isUrl, shortDomain, titleCase } from "@components/wiki/kb/format";
+import { KBFactValueDisplay } from "@components/wiki/kb/KBFactValueDisplay";
+import { KBCellValue } from "@components/wiki/kb/KBCellValue";
 import {
   ChevronRight,
   ExternalLink,
@@ -110,8 +111,9 @@ function SourceCell({ source }: { source: string | undefined }) {
         target="_blank"
         rel="noopener noreferrer"
         title={shortDomain(source)}
+        aria-label={`Open source ${shortDomain(source)} in a new tab`}
       >
-        <ExternalLink size={12} />
+        <ExternalLink size={12} aria-hidden="true" />
       </a>
     );
   }
@@ -219,9 +221,9 @@ function SingleFactRow({
   propertyId: string;
   items: FactWithProperty[];
 }) {
-  // Prefer currently-active facts (validEnd == null), then sort by asOf descending
-  const candidates = items.some((item) => !item.fact.validEnd)
-    ? items.filter((item) => !item.fact.validEnd)
+  // Prefer currently-active facts (not expired), then sort by asOf descending
+  const candidates = items.some((item) => !isFactExpired(item.fact))
+    ? items.filter((item) => !isFactExpired(item.fact))
     : items;
   const sorted = [...candidates].sort((a, b) => {
     if (!a.fact.asOf && !b.fact.asOf) return 0;
@@ -283,14 +285,19 @@ function resolveItemColumns(
   items: ItemEntry[],
   fieldDefs?: Record<string, FieldDef>,
 ): string[] {
-  // Use defaults if we have them
   const defaults = DEFAULT_ITEM_COLUMNS[collectionName];
-  if (defaults) return defaults;
 
-  // Use schema-defined fields, excluding metadata
   if (fieldDefs) {
-    return Object.keys(fieldDefs).filter((f) => !EXCLUDED_ITEM_FIELDS.has(f));
+    const schemaFields = Object.keys(fieldDefs).filter(
+      (f) => !EXCLUDED_ITEM_FIELDS.has(f),
+    );
+    if (!defaults) return schemaFields;
+    // Prefer defaults order, but only for columns actually in the schema
+    const filtered = defaults.filter((f) => fieldDefs[f]);
+    return filtered.length > 0 ? filtered : schemaFields;
   }
+
+  if (defaults) return defaults;
 
   // Derive from actual data, excluding metadata
   const seen = new Set<string>();
