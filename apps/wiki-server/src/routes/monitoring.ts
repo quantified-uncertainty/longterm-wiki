@@ -359,7 +359,8 @@ const monitoringApp = new Hono()
     const db = getDrizzleDb();
     const rawDb = getDb();
 
-    // Run all queries in parallel
+    // Run all queries in parallel — each with .catch() so a single failure
+    // doesn't take down the entire /extended endpoint (see #1909).
     const [
       ciResult,
       gkStatsResult,
@@ -374,16 +375,28 @@ const monitoringApp = new Hono()
       }),
 
       // 2. Groundskeeper task stats (last 24h)
-      fetchGroundskeeperStats(db),
+      fetchGroundskeeperStats(db).catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch groundskeeper stats");
+        return [];
+      }),
 
       // 3. Data integrity summary (dangling refs)
-      fetchIntegritySummary(rawDb),
+      fetchIntegritySummary(rawDb).catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch integrity summary");
+        return { totalDanglingRefs: 0, status: "error" as const, breakdown: { facts: 0, claims: 0, summaries: 0, citations: 0, editLogs: 0 } };
+      }),
 
       // 4. Auto-update system stats
-      fetchAutoUpdateStats(db),
+      fetchAutoUpdateStats(db).catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch auto-update stats");
+        return { totalRuns: 0, recentRuns: [] as { id: number; date: string; trigger: string; pagesUpdated: number; pagesFailed: number; budgetSpent: number; completed: boolean }[] };
+      }),
 
       // 5. Recent agent sessions
-      fetchRecentSessions(rawDb),
+      fetchRecentSessions(rawDb).catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch recent sessions");
+        return [];
+      }),
     ]);
 
     return c.json({
