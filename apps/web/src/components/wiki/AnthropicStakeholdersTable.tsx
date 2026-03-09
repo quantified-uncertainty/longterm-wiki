@@ -63,10 +63,15 @@ function deriveCategory(
   const earliestDate = dates[0];
   if (earliestDate && earliestDate <= "2021-12") return "Early investor";
 
-  // Check round names for strategic investors
+  // Check if this is a major tech company (strategic investor)
+  const lowerName = holderName.toLowerCase();
+  const strategicNames = ["google", "amazon", "microsoft", "nvidia"];
+  if (strategicNames.some(s => lowerName.includes(s))) return "Strategic investor";
+
+  // Also check round names for strategic rounds
   const roundNames = investments.map(inv => inv.roundName?.toLowerCase() || "");
   const isStrategic = roundNames.some(n =>
-    n.includes("google") || n.includes("amazon") || n.includes("microsoft") || n.includes("nvidia")
+    strategicNames.some(s => n.includes(s)) || n.includes("partnership")
   );
   if (isStrategic) return "Strategic investor";
 
