@@ -44,6 +44,12 @@ import { KeyTakeaways } from "@/components/wiki/KeyTakeaways";
 // Usage: <EpicTracker issues={[1043, 1065, 1074]} /> — renders live GitHub issue status table
 import { EpicTracker } from "@/components/wiki/EpicTracker";
 
+// KB Data section content components (public structured data at /kb/)
+import { KBOverviewContent } from "@/app/kb/kb-overview-content";
+import { KBFactsExplorerContent } from "@/app/kb/kb-facts-content";
+import { KBPropertiesExplorerContent } from "@/app/kb/kb-properties-content";
+import { KBEntityCoverageContent } from "@/app/kb/kb-entities-content";
+
 // Dashboard content components (rendered via MDX stubs at /wiki/E<id>)
 import { FactsPageContent } from "@/app/internal/facts/facts-content";
 import { PageCoverageContent } from "@/app/internal/page-coverage/page-coverage-content";
@@ -179,6 +185,12 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
 
   // Epic tracking
   EpicTracker,
+
+  // KB Data section components
+  KBOverviewContent,
+  KBFactsExplorerContent,
+  KBPropertiesExplorerContent,
+  KBEntityCoverageContent,
 
   // Dashboard content components
   FactsPageContent,

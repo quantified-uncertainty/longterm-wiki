@@ -63,6 +63,12 @@ export default function RootLayout({
                 Explore
               </Link>
               <Link
+                href="/kb"
+                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+              >
+                Data
+              </Link>
+              <Link
                 href="/wiki/E755"
                 className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
               >
