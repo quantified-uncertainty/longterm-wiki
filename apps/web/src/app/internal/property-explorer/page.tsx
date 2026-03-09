@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function PropertyExplorerPage() {
-  redirect("/wiki");
+  redirect("/wiki/E1004");
 }

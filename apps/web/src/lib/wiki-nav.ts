@@ -262,6 +262,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Auto-Update Runs", href: internalHref("auto-update-runs-dashboard") },
         { label: "Auto-Update News", href: internalHref("auto-update-news-dashboard") },
         { label: "Groundskeeper Runs", href: internalHref("groundskeeper-runs-dashboard") },
+        { label: "Property Explorer", href: internalHref("property-explorer-dashboard") },
       ],
     },
     {
