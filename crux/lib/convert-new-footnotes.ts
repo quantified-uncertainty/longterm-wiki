@@ -5,9 +5,10 @@
  * because LLMs are unreliable at generating hash-based IDs. This module:
  *
  * 1. Finds all [^N] footnotes in the content
- * 2. Generates [^rc-XXXX] reference IDs for each
- * 3. Rewrites inline refs and definitions
- * 4. Optionally creates DB citation entries via the wiki-server API
+ * 2. Checks if the footnote URL matches a KB fact source (→ [^kb-factId])
+ * 3. Otherwise generates [^rc-XXXX] reference IDs for each
+ * 4. Rewrites inline refs and definitions
+ * 5. Optionally creates DB citation entries via the wiki-server API
  *
  * Used as a post-processing step in the improve pipeline.
  */
@@ -18,6 +19,7 @@ import { createCitationsBatch } from './wiki-server/references.ts';
 import { isServerAvailable } from './wiki-server/client.ts';
 import type { PageCitationInsert } from '../../apps/wiki-server/src/api-types.ts';
 import { getResourceByUrl } from './search/resource-lookup.ts';
+import { buildKBFactSourceMap, findKBFactByUrl } from './kb-fact-lookup.ts';
 
 // ---------------------------------------------------------------------------
 // Reference ID generation (shared with migrate-footnotes.ts)
@@ -46,46 +48,77 @@ function generateRefId(data: string, existingIds: Set<string>): string {
 // ---------------------------------------------------------------------------
 
 export interface ConvertResult {
-  /** The rewritten content with [^rc-XXXX] references */
+  /** The rewritten content with [^rc-XXXX] or [^kb-factId] references */
   content: string;
   /** Number of footnotes converted */
   convertedCount: number;
+  /** Number of footnotes matched to KB facts (subset of convertedCount) */
+  kbMatchCount: number;
   /** Whether DB entries were created */
   dbEntriesCreated: boolean;
 }
 
 /**
- * Convert numbered footnotes [^N] in content to DB-driven [^rc-XXXX] references.
+ * Convert numbered footnotes [^N] in content to [^kb-factId] or [^rc-XXXX] references.
+ *
+ * When an entityId is provided, footnote URLs are checked against KB fact sources.
+ * Matches use [^kb-{factId}] (no DB entry needed — KB data lives in YAML).
+ * Non-matches fall back to [^rc-XXXX] references with optional DB entries.
  *
  * @param content - MDX content with [^N] style footnotes
  * @param pageId - Entity ID for the page (used in DB entries and hash generation)
  * @param options.createDbEntries - Whether to create citation entries in the DB (default: false)
+ * @param options.entityId - Entity slug to enable KB fact matching (e.g., "anthropic")
  */
 export async function convertNewFootnotes(
   content: string,
   pageId: string,
-  options: { createDbEntries?: boolean } = {},
+  options: { createDbEntries?: boolean; entityId?: string } = {},
 ): Promise<ConvertResult> {
-  const { createDbEntries = false } = options;
+  const { createDbEntries = false, entityId } = options;
 
   // Parse existing numbered footnotes
   const footnotes = parseFootnotes(content);
   if (footnotes.length === 0) {
-    return { content, convertedCount: 0, dbEntriesCreated: false };
+    return { content, convertedCount: 0, kbMatchCount: 0, dbEntriesCreated: false };
   }
 
-  // Also check if there are already [^rc-XXXX] or [^cr-XXXX] refs in the content.
+  // Load KB fact source map if entityId is provided
+  const kbSourceMap = entityId
+    ? await buildKBFactSourceMap(entityId)
+    : new Map();
+
+  // Also check if there are already [^rc-XXXX], [^cr-XXXX], or [^kb-...] refs in the content.
   // Collect their IDs so we don't collide.
   const existingIds = new Set<string>();
-  const existingRefPattern = /\[\^((?:rc|cr)-[a-f0-9]+)\]/g;
+  const existingRefPattern = /\[\^((?:rc|cr)-[a-f0-9]+|kb-[^\]]+)\]/g;
   let existingMatch;
   while ((existingMatch = existingRefPattern.exec(content)) !== null) {
     existingIds.add(existingMatch[1]);
   }
 
   // Build mapping: footnote number -> new reference ID
+  // Prefer KB fact IDs when the footnote URL matches a KB fact source.
   const refMap = new Map<number, string>();
+  let kbMatchCount = 0;
+
   for (const fn of footnotes) {
+    // Try KB fact matching first
+    if (fn.url && kbSourceMap.size > 0) {
+      const kbMatch = findKBFactByUrl(kbSourceMap, fn.url);
+      if (kbMatch) {
+        const kbRefId = `kb-${kbMatch.factId}`;
+        if (!existingIds.has(kbRefId)) {
+          existingIds.add(kbRefId);
+          refMap.set(fn.number, kbRefId);
+          kbMatchCount++;
+          continue;
+        }
+        // If the kb-factId already exists in the content, fall through to rc-XXXX
+      }
+    }
+
+    // Fall back to generated rc-XXXX reference
     const refId = generateRefId(
       `cite:${pageId}:${fn.number}:${fn.url ?? fn.rawText}`,
       existingIds,
@@ -96,24 +129,30 @@ export async function convertNewFootnotes(
   // Rewrite content: replace inline refs and definition lines
   let modified = content;
 
-  // Replace inline references [^N] -> [^rc-XXXX] (process in reverse order)
+  // Replace inline references [^N] -> [^rc-XXXX] or [^kb-factId] (process in reverse order)
   const sortedEntries = [...refMap.entries()].sort((a, b) => b[0] - a[0]);
   for (const [fnNum, refId] of sortedEntries) {
     // Replace inline references [^N] (not definition lines [^N]:)
     const inlinePattern = new RegExp(`\\[\\^${fnNum}\\](?!:)`, 'g');
     modified = modified.replace(inlinePattern, `[^${refId}]`);
 
-    // Replace definition line [^N]: -> [^rc-XXXX]:
+    // Replace definition line [^N]: -> [^rc-XXXX]: or [^kb-factId]:
     const defPattern = new RegExp(`^\\[\\^${fnNum}\\]:`, 'gm');
     modified = modified.replace(defPattern, `[^${refId}]:`);
   }
 
-  // Create DB entries if requested
+  // Create DB entries if requested — only for rc-XXXX refs (not kb- refs)
   let dbEntriesCreated = false;
   if (createDbEntries) {
     const serverAvailable = await isServerAvailable();
     if (serverAvailable) {
-      const citationInserts: PageCitationInsert[] = footnotes.map((fn) => ({
+      // Only create DB entries for footnotes that got rc-XXXX refs (not kb- refs)
+      const rcFootnotes = footnotes.filter((fn) => {
+        const refId = refMap.get(fn.number);
+        return refId && refId.startsWith('rc-');
+      });
+
+      const citationInserts: PageCitationInsert[] = rcFootnotes.map((fn) => ({
         referenceId: refMap.get(fn.number)!,
         pageId,
         title: fn.title ?? undefined,
@@ -137,6 +176,7 @@ export async function convertNewFootnotes(
   return {
     content: modified,
     convertedCount: footnotes.length,
+    kbMatchCount,
     dbEntriesCreated,
   };
 }

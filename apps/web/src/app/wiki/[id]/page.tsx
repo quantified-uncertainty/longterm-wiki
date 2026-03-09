@@ -31,7 +31,9 @@ import { CitationHealthBanner } from "@/components/wiki/CitationHealthBanner";
 import { CitationQuotesProvider } from "@/components/wiki/CitationQuotesContext";
 import { ReferenceProvider } from "@/components/wiki/ReferenceContext";
 import type { RefMapEntry } from "@/components/wiki/ReferenceContext";
-import type { RefMapEntry as PreprocessorRefMapEntry } from "@/lib/reference-preprocessor";
+import type { RefMapEntry as PreprocessorRefMapEntry, KBFactRefData } from "@/lib/reference-preprocessor";
+import { getDomain } from "@/components/wiki/resource-utils";
+import { formatFactValueForFootnote } from "@/lib/reference-preprocessor";
 import { References } from "@/components/wiki/References";
 import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 import type { CitationQuote } from "@/lib/citation-data";
@@ -61,13 +63,25 @@ function buildReferenceMap(
           sourceUrl: d.sourceUrl ?? null,
           sourceTitle: d.sourceTitle ?? null,
         });
+      } else if (entry.kind === "kb" && entry.data) {
+        const d = entry.data as KBFactRefData;
+        map.set(num, {
+          type: "kb",
+          kbEntity: d.subjectId,
+          kbProperty: d.propertyId,
+          kbValue: formatFactValueForFootnote(d.value),
+          kbAsOf: d.asOf,
+          kbSource: d.source,
+          kbSourceResource: d.sourceResource,
+          kbNotes: d.notes,
+        });
       } else if (entry.kind === "citation" && entry.data) {
         const d = entry.data as { title?: string; url?: string; note?: string };
         map.set(num, {
           type: "citation",
           title: d.title ?? null,
           url: d.url ?? null,
-          domain: d.url ? new URL(d.url).hostname.replace(/^www\./, "") : null,
+          domain: d.url ? getDomain(d.url) : null,
           note: d.note ?? null,
         });
       }

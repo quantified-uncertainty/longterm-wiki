@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "next/link";
 import {
   getResourceById,
   getResourceCredibility,
@@ -287,14 +286,6 @@ export function References({
         >
           {title}
         </h2>
-        {pageId && (
-          <Link
-            href={`/claims/entity/${pageId}`}
-            className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors !no-underline"
-          >
-            View claims
-          </Link>
-        )}
       </div>
 
       {refs.length > 0 && (
