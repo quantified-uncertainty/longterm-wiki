@@ -8,6 +8,11 @@ interface CleanupResult {
   keep: number;
 }
 
+function getWikiServerApiKey(): string | undefined {
+  const prefix = process.env["WIKI_SERVER_ENV"] === "prod" ? "PROD_" : "";
+  return process.env[`${prefix}LONGTERMWIKI_SERVER_API_KEY`];
+}
+
 /**
  * Call the wiki-server cleanup endpoint for a snapshot table.
  * Returns the number of rows deleted, or null on failure.
@@ -18,7 +23,7 @@ async function callCleanupEndpoint(
   keep: number,
 ): Promise<CleanupResult | null> {
   const url = `${config.wikiServerUrl}${path}?keep=${keep}`;
-  const apiKey = process.env["LONGTERMWIKI_SERVER_API_KEY"];
+  const apiKey = getWikiServerApiKey();
 
   if (!apiKey) {
     logger.warn("LONGTERMWIKI_SERVER_API_KEY is not set — skipping cleanup.");
@@ -63,7 +68,7 @@ export async function snapshotRetention(
 
   // Check for API key early — missing config is a graceful skip, not a failure.
   // Treating it as failure trips the circuit breaker on every run (see #1770).
-  const apiKey = process.env["LONGTERMWIKI_SERVER_API_KEY"];
+  const apiKey = getWikiServerApiKey();
   if (!apiKey) {
     logger.warn("LONGTERMWIKI_SERVER_API_KEY is not set — skipping cleanup.");
     return { success: true, summary: "Skipped: no API key configured (see #1770)" };

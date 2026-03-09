@@ -23,7 +23,8 @@ async function apiRequest<T>(
   body?: unknown,
 ): Promise<ApiResult<T>> {
   const url = `${config.wikiServerUrl}${path}`;
-  const apiKey = process.env["LONGTERMWIKI_SERVER_API_KEY"];
+  const prefix = process.env["WIKI_SERVER_ENV"] === "prod" ? "PROD_" : "";
+  const apiKey = process.env[`${prefix}LONGTERMWIKI_SERVER_API_KEY`];
 
   if (!apiKey) {
     return { ok: false, error: "LONGTERMWIKI_SERVER_API_KEY is not set" };

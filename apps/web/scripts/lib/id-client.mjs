@@ -12,12 +12,17 @@
 const TIMEOUT_MS = 5000;
 const BATCH_TIMEOUT_MS = 30000;
 
+function getEnv(name) {
+  const prefix = process.env.WIKI_SERVER_ENV === "prod" ? "PROD_" : "";
+  return process.env[`${prefix}${name}`] || "";
+}
+
 function getServerUrl() {
-  return process.env.LONGTERMWIKI_SERVER_URL || "";
+  return getEnv("LONGTERMWIKI_SERVER_URL");
 }
 
 function getApiKey() {
-  return process.env.LONGTERMWIKI_SERVER_API_KEY || "";
+  return getEnv("LONGTERMWIKI_SERVER_API_KEY");
 }
 
 function buildHeaders() {

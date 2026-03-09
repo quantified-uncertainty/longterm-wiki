@@ -68,7 +68,6 @@ export async function allocateBatch(
     '/api/ids/allocate-batch',
     { items },
     30_000,
-    'project',
   );
 }
 
