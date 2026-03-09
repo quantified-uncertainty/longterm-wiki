@@ -26,7 +26,7 @@ const columns: ColumnDef<InsightRow>[] = [
     ),
     cell: ({ row }) => (
       <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
-        {row.original.date}
+        {row.original.date ?? "\u2014"}
       </span>
     ),
   },
@@ -47,7 +47,7 @@ const columns: ColumnDef<InsightRow>[] = [
       <SortableHeader column={column}>Session</SortableHeader>
     ),
     cell: ({ row }) => (
-      <span className="text-sm">{row.original.title}</span>
+      <span className="text-sm">{row.original.title ?? "\u2014"}</span>
     ),
   },
   {

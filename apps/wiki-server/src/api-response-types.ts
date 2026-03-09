@@ -100,8 +100,20 @@ export type SessionRow = SessionListResult['sessions'][number];
 // Agent Sessions
 // ---------------------------------------------------------------------------
 
-/** A single agent session row. */
+/** A single agent session row (from by-branch or list endpoint). */
 export type AgentSessionRow = InferResponseType<AgentSessionsRpc['by-branch'][':branch']['$get'], 200>;
+
+/** Agent session list response. */
+type AgentSessionListResult = InferResponseType<AgentSessionsRpc['index']['$get'], 200>;
+
+/** A single agent session row from the list endpoint. */
+export type AgentSessionListRow = AgentSessionListResult['sessions'][number];
+
+/** Agent session page-changes response. */
+type AgentSessionPageChangesResult = InferResponseType<AgentSessionsRpc['page-changes']['$get'], 200>;
+
+/** A session row from the page-changes endpoint (includes pages array). */
+export type AgentSessionPageChangesRow = AgentSessionPageChangesResult['sessions'][number];
 
 // ---------------------------------------------------------------------------
 // Active Agents

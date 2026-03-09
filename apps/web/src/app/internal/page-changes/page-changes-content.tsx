@@ -9,7 +9,7 @@ import {
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { PageChangesSessions } from "./page-changes-sessions";
-import type { SessionRow } from "@wiki-server/api-response-types";
+import type { AgentSessionPageChangesRow } from "@wiki-server/api-response-types";
 
 // ── Data loading ─────────────────────────────────────────────────────────────
 
@@ -25,8 +25,8 @@ function extractPrNumber(prUrl: string | null): number | undefined {
  * Returns null if the server is unavailable.
  */
 async function loadSessionsFromApi() {
-  const result = await fetchDetailed<{ sessions: SessionRow[] }>(
-    "/api/sessions/page-changes?limit=500",
+  const result = await fetchDetailed<{ sessions: AgentSessionPageChangesRow[] }>(
+    "/api/agent-sessions/page-changes?limit=500",
     { revalidate: 300 }
   );
   if (!result.ok) return result;
@@ -54,18 +54,18 @@ async function loadSessionsFromApi() {
     .map((s) => {
       const pr = extractPrNumber(s.prUrl);
       return {
-        sessionKey: `${s.date}|${s.branch || "unknown"}`,
-        date: s.date,
+        sessionKey: `${s.date ?? ""}|${s.branch || "unknown"}`,
+        date: s.date ?? "",
         branch: s.branch || "unknown",
-        sessionTitle: s.title,
+        sessionTitle: s.title ?? "",
         summary: s.summary || "",
         ...(pr !== undefined && { pr }),
         ...(s.model && { model: s.model }),
         ...(s.duration && { duration: s.duration }),
         ...(s.cost && { cost: s.cost }),
-        issues: Array.isArray(s.issuesJson) ? s.issuesJson.map(String) : [],
-        learnings: Array.isArray(s.learningsJson) ? s.learningsJson.map(String) : [],
-        recommendations: Array.isArray(s.recommendationsJson) ? s.recommendationsJson.map(String) : [],
+        ...(Array.isArray(s.issuesJson) && s.issuesJson.length > 0 && { issues: s.issuesJson.map(String) }),
+        ...(Array.isArray(s.learningsJson) && s.learningsJson.length > 0 && { learnings: s.learningsJson.map(String) }),
+        ...(Array.isArray(s.recommendationsJson) && s.recommendationsJson.length > 0 && { recommendations: s.recommendationsJson.map(String) }),
         pages: s.pages.map((pageId: string) => {
           const meta = pageMap.get(pageId);
           return {
