@@ -45,7 +45,7 @@ const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
   { label: "Epistemic", value: "epistemic" },
 ];
 
-type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "researchImportance" | "tacticalValue" | "quality" | "wordCount" | "recentlyEdited" | "recentlyCreated";
+type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "researchImportance" | "tacticalValue" | "quality" | "wordCount" | "recentlyEdited" | "recentlyCreated" | "kbFacts";
 
 /** Use pre-computed recommended score from build-time (see build-data.mjs). */
 function recommendedScore(item: ExploreItem): number {
@@ -263,7 +263,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
   const rawView = searchParams.get("view");
   const initialView: ViewMode = rawView === "table" ? "table" : "cards";
 
-  const VALID_SORT_KEYS: SortKey[] = ["recommended", "recentlyEdited", "recentlyCreated", "quality", "readerImportance", "researchImportance", "tacticalValue", "relevance", "wordCount", "title"];
+  const VALID_SORT_KEYS: SortKey[] = ["recommended", "recentlyEdited", "recentlyCreated", "quality", "readerImportance", "researchImportance", "tacticalValue", "relevance", "wordCount", "title", "kbFacts"];
   const rawSort = searchParams.get("sort");
   const initialSort: SortKey = rawSort && VALID_SORT_KEYS.includes(rawSort as SortKey) ? (rawSort as SortKey) : "recommended";
 
@@ -276,6 +276,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
   );
   const [activeRiskCat, setActiveRiskCat] = useState(initialRiskCatIndex);
   const [sortKey, setSortKey] = useState<SortKey>(initialSort);
+  const [hasDataOnly, setHasDataOnly] = useState(searchParams.get("hasData") === "1");
   const [visibleCount, setVisibleCount] = useState(60);
 
   // Debounced URL update for search
@@ -319,8 +320,8 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       const entityGroup = ENTITY_GROUPS[entity];
       const riskCatGroup = RISK_CATEGORY_GROUPS[riskCat];
 
-      // Map "relevance" to "recommended" for server (relevance is client-only composite)
-      const serverSort = sk === "relevance" ? "recommended" : sk;
+      // Map client-only sort keys to "recommended" for server (relevance and kbFacts are client-only)
+      const serverSort = sk === "relevance" || sk === "kbFacts" ? "recommended" : sk;
 
       return {
         limit: PAGE_SIZE,
@@ -554,12 +555,49 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     });
   }, [fallbackToLocal, serverFacets, fallbackItems, search]);
 
+  // ---- Enrich server results with KB counts from local data ----
+  // Server /api/explore doesn't return kbFactCount/kbItemCount. Merge from allItems.
+  const kbLookup = useMemo(() => {
+    if (!allItems) return null;
+    const map = new Map<string, { kbFactCount?: number; kbItemCount?: number }>();
+    for (const item of allItems) {
+      if (item.kbFactCount || item.kbItemCount) {
+        map.set(item.id, { kbFactCount: item.kbFactCount, kbItemCount: item.kbItemCount });
+      }
+    }
+    return map;
+  }, [allItems]);
+
+  const enrichedServerItems = useMemo(() => {
+    if (fallbackToLocal || !kbLookup || kbLookup.size === 0) return serverItems;
+    return serverItems.map((item) => {
+      if (item.kbFactCount !== undefined || item.kbItemCount !== undefined) return item;
+      const local = kbLookup.get(item.id);
+      if (!local) return item;
+      return { ...item, ...local };
+    });
+  }, [fallbackToLocal, serverItems, kbLookup]);
+
   // ---- Compute displayed items ----
 
   const displayedItems = useMemo(() => {
     if (!fallbackToLocal) {
       // In server mode, items are already filtered/sorted by the server
-      return serverItems;
+      // KB counts are enriched from local data above
+      // Apply client-side "has data" filter since server doesn't know KB counts
+      const items = enrichedServerItems;
+      if (hasDataOnly) {
+        return items.filter((item) => (item.kbFactCount ?? 0) > 0 || (item.kbItemCount ?? 0) > 0);
+      }
+      // If sorting by kbFacts, re-sort client-side since server uses "recommended" fallback
+      if (sortKey === "kbFacts") {
+        return [...items].sort((a, b) => {
+          const aTotal = (a.kbFactCount ?? 0) + (a.kbItemCount ?? 0);
+          const bTotal = (b.kbFactCount ?? 0) + (b.kbItemCount ?? 0);
+          return bTotal - aTotal;
+        });
+      }
+      return items;
     }
 
     // Fallback: full client-side filtering pipeline
@@ -592,6 +630,11 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       items = items.filter((item) => item.riskCategory === riskCatGroup.value);
     }
 
+    // "Has structured data" filter
+    if (hasDataOnly) {
+      items = items.filter((item) => (item.kbFactCount ?? 0) > 0 || (item.kbItemCount ?? 0) > 0);
+    }
+
     // Sort — skip in table mode since TanStack handles its own column sorting.
     // When search is active with default sort, keep search-relevance order from filterAndRankBySearch.
     const useSearchRanking = hasSearch && sortKey === "recommended";
@@ -622,6 +665,11 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
             const scoreB = (b.readerImportance || 0) * 2 + (b.quality || 0);
             return scoreB - scoreA;
           }
+          case "kbFacts": {
+            const aTotal = (a.kbFactCount ?? 0) + (a.kbItemCount ?? 0);
+            const bTotal = (b.kbFactCount ?? 0) + (b.kbItemCount ?? 0);
+            return bTotal - aTotal;
+          }
           case "recommended":
           default: {
             return recommendedScore(b) - recommendedScore(a);
@@ -631,9 +679,9 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     }
 
     return items;
-  }, [fallbackToLocal, serverItems, fallbackItems, search, activeField, activeSection, activeEntity, activeRiskCat, sortKey, viewMode, SECTION_GROUPS]);
+  }, [fallbackToLocal, enrichedServerItems, fallbackItems, search, activeField, activeSection, activeEntity, activeRiskCat, hasDataOnly, sortKey, viewMode, SECTION_GROUPS]);
 
-  const totalCount = fallbackToLocal ? displayedItems.length : serverTotal;
+  const totalCount = (fallbackToLocal || hasDataOnly) ? displayedItems.length : serverTotal;
   const hasMore = fallbackToLocal
     ? displayedItems.length > visibleCount
     : serverItems.length < serverTotal;
@@ -692,10 +740,25 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
 
         {/* Results header */}
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-muted-foreground">
-            {totalCount} items
-            {isLoading && <span className="ml-2 opacity-60">Loading...</span>}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">
+              {totalCount} items
+              {isLoading && <span className="ml-2 opacity-60">Loading...</span>}
+            </span>
+            <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={hasDataOnly}
+                onChange={(e) => {
+                  setHasDataOnly(e.target.checked);
+                  setVisibleCount(60);
+                  updateUrlParams({ hasData: e.target.checked ? "1" : null });
+                }}
+                className="rounded border-border"
+              />
+              Has structured data
+            </label>
+          </div>
           <div className="flex items-center gap-3">
             {/* View toggle */}
             <div className="flex items-center border border-border rounded-md overflow-hidden">
@@ -749,6 +812,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
                 <option value="researchImportance">Research Importance</option>
                 <option value="tacticalValue">Tactical Value</option>
                 <option value="relevance">Relevance</option>
+                <option value="kbFacts">KB Facts</option>
                 <option value="wordCount">Word Count</option>
                 <option value="title">Title (A-Z)</option>
               </select>
@@ -787,7 +851,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       {viewMode === "table" && (
         <div className="px-6">
           <ExploreTable
-            items={fallbackToLocal ? displayedItems : serverItems}
+            items={fallbackToLocal ? displayedItems : enrichedServerItems}
             onSearchChange={handleSearchChange}
           />
           {!fallbackToLocal && hasMore && (

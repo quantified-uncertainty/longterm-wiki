@@ -5,6 +5,7 @@
 import { getDatabase, getTypedEntities, isRisk } from "./database";
 import type { ContentFormat, RawEntity, AnyEntity } from "./database";
 import { getEntityHref } from "./entity-nav";
+import type { SerializedKB } from "@longterm-wiki/kb";
 
 export interface ExploreItem {
   id: string;
@@ -30,6 +31,10 @@ export interface ExploreItem {
   sourceTitle?: string;
   /** Pre-computed blended score for "recommended" sort (build-time) */
   recommendedScore?: number;
+  /** Number of KB structured facts (excluding description) */
+  kbFactCount?: number;
+  /** Number of KB item entries (funding rounds, key people, etc.) */
+  kbItemCount?: number;
 }
 
 // Map page categories to entity-like types for display
@@ -51,6 +56,24 @@ const CATEGORY_TO_TYPE: Record<string, string> = {
   internal: "internal",
   other: "concept",
 };
+
+/**
+ * Compute KB fact count (excluding description) and item count for an entity.
+ */
+function getKBCounts(entityId: string, kb: SerializedKB | undefined): { factCount: number; itemCount: number } {
+  if (!kb) return { factCount: 0, itemCount: 0 };
+
+  const facts = kb.facts[entityId] ?? [];
+  const factCount = facts.filter((f) => f.propertyId !== "description").length;
+
+  const collections = kb.items[entityId] ?? {};
+  const itemCount = Object.values(collections).reduce(
+    (sum, entries) => sum + entries.length,
+    0,
+  );
+
+  return { factCount, itemCount };
+}
 
 // Table items are now derived from pages with contentFormat=table.
 // The hardcoded TABLES array has been eliminated — all table pages are
@@ -78,6 +101,7 @@ export function getExploreItems(): ExploreItem[] {
   const db = getDatabase();
   const typedEntities = getTypedEntities();
   const pageMap = new Map((db.pages || []).map((p) => [p.id, p]));
+  const kb = db.kb;
 
   // Build a set of page IDs claimed by entities (including aliased ones)
   const entityClaimedPageIds = new Set<string>();
@@ -99,6 +123,7 @@ export function getExploreItems(): ExploreItem[] {
   }).map((entity) => {
     const pageId = entityPageIdMap.get(entity.id)!;
     const page = pageMap.get(pageId)!;
+    const kbCounts = getKBCounts(entity.id, kb);
     return {
       id: entity.id,
       numericId: (entity.numericId || db.idRegistry?.bySlug[pageId])!,
@@ -119,6 +144,8 @@ export function getExploreItems(): ExploreItem[] {
       dateCreated: page?.dateCreated ?? null,
       contentFormat: page?.contentFormat,
       recommendedScore: page?.recommendedScore,
+      kbFactCount: kbCounts.factCount || undefined,
+      kbItemCount: kbCounts.itemCount || undefined,
     };
   });
 
@@ -127,27 +154,32 @@ export function getExploreItems(): ExploreItem[] {
     .filter((p) => !entityClaimedPageIds.has(p.id))
     .filter((p) => p.title && p.category !== "schema")
     .filter((p) => db.idRegistry?.bySlug[p.id])
-    .map((page) => ({
-      id: page.id,
-      numericId: db.idRegistry!.bySlug[page.id],
-      title: page.title,
-      type: page.contentFormat === "table" ? "table" : page.contentFormat === "diagram" ? "diagram" : CATEGORY_TO_TYPE[page.category] || "concept",
-      description: page.llmSummary || page.description || null,
-      tags: page.tags || [],
-      clusters: page.clusters || [],
-      wordCount: page.wordCount ?? null,
-      quality: page.quality ?? null,
-      readerImportance: page.readerImportance ?? null,
-      researchImportance: page.researchImportance ?? null,
-      tacticalValue: page.tacticalValue ?? null,
-      backlinkCount: page.backlinkCount ?? null,
-      category: page.category ?? null,
-      riskCategory: null,
-      lastUpdated: page.lastUpdated ?? null,
-      dateCreated: page.dateCreated ?? null,
-      contentFormat: page.contentFormat,
-      recommendedScore: page.recommendedScore,
-    }));
+    .map((page) => {
+      const kbCounts = getKBCounts(page.id, kb);
+      return {
+        id: page.id,
+        numericId: db.idRegistry!.bySlug[page.id],
+        title: page.title,
+        type: page.contentFormat === "table" ? "table" : page.contentFormat === "diagram" ? "diagram" : CATEGORY_TO_TYPE[page.category] || "concept",
+        description: page.llmSummary || page.description || null,
+        tags: page.tags || [],
+        clusters: page.clusters || [],
+        wordCount: page.wordCount ?? null,
+        quality: page.quality ?? null,
+        readerImportance: page.readerImportance ?? null,
+        researchImportance: page.researchImportance ?? null,
+        tacticalValue: page.tacticalValue ?? null,
+        backlinkCount: page.backlinkCount ?? null,
+        category: page.category ?? null,
+        riskCategory: null,
+        lastUpdated: page.lastUpdated ?? null,
+        dateCreated: page.dateCreated ?? null,
+        contentFormat: page.contentFormat,
+        recommendedScore: page.recommendedScore,
+        kbFactCount: kbCounts.factCount || undefined,
+        kbItemCount: kbCounts.itemCount || undefined,
+      };
+    });
 
   // Diagram items — entities with causeEffectGraph data
   // Generic entities preserve all raw fields including causeEffectGraph.
