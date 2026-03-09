@@ -62,24 +62,19 @@ const TYPE_MAP: Record<string, string> = {
   nonprofit: 'organization',
   government: 'organization',
   company: 'organization',
-  funder: 'organization',
   // People subtypes → person
   researcher: 'person',
   policymaker: 'person',
   executive: 'person',
   // Renamed types
   crux: 'debate',
-  'safety-agenda': 'approach',
-  historical: 'event',
-  model: 'ai-model',
-  'risk-factor': 'risk',
-  'case-study': 'incident',
+  model: 'analysis',
   // Plural aliases
-  'safety-approaches': 'approach',
+  'safety-approaches': 'safety-agenda',
   policies: 'policy',
   concepts: 'concept',
   events: 'event',
-  models: 'ai-model',
+  models: 'analysis',
 };
 
 /**
@@ -91,15 +86,20 @@ const VALID_KB_TYPES = new Set([
   'approach',
   'argument',
   'capability',
+  'case-study',
   'concept',
   'debate',
   'event',
+  'funder',
+  'historical',
   'incident',
   'organization',
   'person',
   'policy',
   'project',
   'risk',
+  'risk-factor',
+  'safety-agenda',
 ]);
 
 // ── Helpers ───────────────────────────────────────────────────────────
@@ -402,15 +402,13 @@ Options:
   --force      Overwrite existing KB thing file if it already exists
 
 Type Mapping:
-  lab, lab-*, nonprofit, government, company, funder -> organization
+  lab, lab-*, nonprofit, government, company          -> organization
   researcher, policymaker, executive                 -> person
   crux                                               -> debate
-  safety-agenda, safety-approaches                   -> approach
-  historical                                         -> event
-  model, models                                      -> ai-model
-  risk-factor                                        -> risk
-  case-study                                         -> incident
-  (all others pass through unchanged)
+  model, models                                      -> analysis
+  safety-approaches                                  -> safety-agenda
+  (all others pass through unchanged, including: safety-agenda,
+   historical, risk-factor, case-study — these have their own KB schemas)
 
 What gets migrated:
   - id, numericId, type, name/title, aliases
