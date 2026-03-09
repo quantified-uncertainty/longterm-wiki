@@ -8,7 +8,7 @@
  *
  * Usage:
  *   npx tsx crux/validate/validate-kb-schema.ts            # errors only (gate mode)
- *   npx tsx crux/validate/validate-kb-schema.ts --verbose   # include warnings
+ *   npx tsx crux/validate/validate-kb-schema.ts --verbose   # include warnings + info
  */
 
 import { join } from "path";
@@ -23,6 +23,58 @@ const verbose = process.argv.includes("--verbose");
 // (e.g., "University of Toronto", "Google Brain"). These are data quality items,
 // not integrity violations.
 const DEMOTED_RULES = new Set(["ref-integrity"]);
+
+/** Print a summary table of validation results grouped by rule and severity. */
+function printSummaryTable(results: ValidationResult[]): void {
+  // Count by rule × severity
+  const counts = new Map<string, { error: number; warning: number; info: number }>();
+
+  for (const r of results) {
+    if (!counts.has(r.rule)) {
+      counts.set(r.rule, { error: 0, warning: 0, info: 0 });
+    }
+    const entry = counts.get(r.rule)!;
+    if (r.severity === "error") entry.error++;
+    else if (r.severity === "warning") entry.warning++;
+    else entry.info++;
+  }
+
+  // Sort by total count descending
+  const sorted = [...counts.entries()].sort((a, b) => {
+    const totalA = a[1].error + a[1].warning + a[1].info;
+    const totalB = b[1].error + b[1].warning + b[1].info;
+    return totalB - totalA;
+  });
+
+  console.log("\n┌─────────────────────────────────┬───────┬─────────┬──────┬───────┐");
+  console.log("│ Rule                            │ Error │ Warning │ Info │ Total │");
+  console.log("├─────────────────────────────────┼───────┼─────────┼──────┼───────┤");
+
+  let totalErrors = 0;
+  let totalWarnings = 0;
+  let totalInfo = 0;
+
+  for (const [rule, c] of sorted) {
+    const total = c.error + c.warning + c.info;
+    totalErrors += c.error;
+    totalWarnings += c.warning;
+    totalInfo += c.info;
+
+    const ruleCol = rule.padEnd(31);
+    const errCol = (c.error || "").toString().padStart(5);
+    const warnCol = (c.warning || "").toString().padStart(7);
+    const infoCol = (c.info || "").toString().padStart(4);
+    const totalCol = total.toString().padStart(5);
+    console.log(`│ ${ruleCol} │ ${errCol} │ ${warnCol} │ ${infoCol} │ ${totalCol} │`);
+  }
+
+  const grandTotal = totalErrors + totalWarnings + totalInfo;
+  console.log("├─────────────────────────────────┼───────┼─────────┼──────┼───────┤");
+  console.log(
+    `│ ${"TOTAL".padEnd(31)} │ ${totalErrors.toString().padStart(5)} │ ${totalWarnings.toString().padStart(7)} │ ${totalInfo.toString().padStart(4)} │ ${grandTotal.toString().padStart(5)} │`
+  );
+  console.log("└─────────────────────────────────┴───────┴─────────┴──────┴───────┘");
+}
 
 async function main(): Promise<void> {
   // Dynamic import to avoid loading KB code when this validator is skipped
@@ -45,24 +97,28 @@ async function main(): Promise<void> {
     (r: { severity: string; rule: string }) => r.severity === "error" && DEMOTED_RULES.has(r.rule)
   );
   const warnings = results.filter((r: { severity: string }) => r.severity === "warning");
+  const infos = results.filter((r: { severity: string }) => r.severity === "info");
 
   if (verbose) {
     for (const w of warnings) {
-      console.log(`⚠ [${w.rule}] ${w.message}`);
+      console.log(`\u26A0 [${w.rule}] ${w.message}`);
     }
     for (const d of demotedErrors) {
-      console.log(`⚠ [${d.rule}] ${d.message} (demoted to warning)`);
+      console.log(`\u26A0 [${d.rule}] ${d.message} (demoted to warning)`);
     }
   }
 
   for (const e of blockingErrors) {
-    console.error(`✗ [${e.rule}] ${e.message}`);
+    console.error(`\u2717 [${e.rule}] ${e.message}`);
   }
+
+  // Always print the summary table for visibility
+  printSummaryTable(results);
 
   if (blockingErrors.length > 0) {
     console.error(
       `\nKB schema validation failed: ${blockingErrors.length} blocking error(s), ` +
-        `${demotedErrors.length} demoted, ${warnings.length} warning(s)`
+        `${demotedErrors.length} demoted, ${warnings.length} warning(s), ${infos.length} info`
     );
     process.exit(1);
   }
@@ -73,7 +129,7 @@ async function main(): Promise<void> {
       ? `, ${demotedErrors.length} ref-integrity warning(s)`
       : "";
   console.log(
-    `KB schema validation passed: ${entityCount} entities, 0 blocking errors${demotedNote}, ${warnings.length} warning(s)`
+    `\nKB schema validation passed: ${entityCount} entities, 0 blocking errors${demotedNote}, ${warnings.length} warning(s), ${infos.length} info`
   );
 }
 
