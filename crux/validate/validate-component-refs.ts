@@ -321,6 +321,42 @@ function findComponentRefs(content: string): ComponentRef[] {
 }
 
 /**
+ * Shared helper: validate <KBF> / <KBFactValue> refs in one MDX file.
+ * Reports both unknown-entity AND unknown-property for the same ref (separate if blocks).
+ */
+function validateKbfRefsInFile(
+  content: string,
+  relPath: string,
+  issues: ValidationIssues,
+  kbEntitySlugs: Set<string>,
+  kbPropertyIds: Set<string>,
+): void {
+  if (kbEntitySlugs.size === 0 && kbPropertyIds.size === 0) return;
+  for (const ref of findKbfRefs(content)) {
+    if (kbEntitySlugs.size > 0 && !kbEntitySlugs.has(ref.entity)) {
+      issues.brokenKbfRefs.push({
+        file: relPath,
+        line: ref.line,
+        component: ref.component,
+        entity: ref.entity,
+        property: ref.property,
+        reason: 'unknown-entity',
+      });
+    }
+    if (kbPropertyIds.size > 0 && !kbPropertyIds.has(ref.property)) {
+      issues.brokenKbfRefs.push({
+        file: relPath,
+        line: ref.line,
+        component: ref.component,
+        entity: ref.entity,
+        property: ref.property,
+        reason: 'unknown-property',
+      });
+    }
+  }
+}
+
+/**
  * Run the component reference check and return a ValidatorResult.
  */
 export async function runCheck(options: ValidatorOptions = {}): Promise<ValidatorResult> {
@@ -396,30 +432,7 @@ export async function runCheck(options: ValidatorOptions = {}): Promise<Validato
       }
     }
 
-    // Validate KBF / KBFactValue references
-    if (kbEntitySlugs.size > 0 || kbPropertyIds.size > 0) {
-      for (const ref of findKbfRefs(content)) {
-        if (kbEntitySlugs.size > 0 && !kbEntitySlugs.has(ref.entity)) {
-          issues.brokenKbfRefs.push({
-            file: relPath,
-            line: ref.line,
-            component: ref.component,
-            entity: ref.entity,
-            property: ref.property,
-            reason: 'unknown-entity',
-          });
-        } else if (kbPropertyIds.size > 0 && !kbPropertyIds.has(ref.property)) {
-          issues.brokenKbfRefs.push({
-            file: relPath,
-            line: ref.line,
-            component: ref.component,
-            entity: ref.entity,
-            property: ref.property,
-            reason: 'unknown-property',
-          });
-        }
-      }
-    }
+    validateKbfRefsInFile(content, relPath, issues, kbEntitySlugs, kbPropertyIds);
   }
 
   return {
@@ -518,30 +531,7 @@ async function main(): Promise<void> {
       }
     }
 
-    // Validate KBF / KBFactValue references
-    if (kbEntitySlugs.size > 0 || kbPropertyIds.size > 0) {
-      for (const ref of findKbfRefs(content)) {
-        if (kbEntitySlugs.size > 0 && !kbEntitySlugs.has(ref.entity)) {
-          issues.brokenKbfRefs.push({
-            file: relPath,
-            line: ref.line,
-            component: ref.component,
-            entity: ref.entity,
-            property: ref.property,
-            reason: 'unknown-entity',
-          });
-        } else if (kbPropertyIds.size > 0 && !kbPropertyIds.has(ref.property)) {
-          issues.brokenKbfRefs.push({
-            file: relPath,
-            line: ref.line,
-            component: ref.component,
-            entity: ref.entity,
-            property: ref.property,
-            reason: 'unknown-property',
-          });
-        }
-      }
-    }
+    validateKbfRefsInFile(content, relPath, issues, kbEntitySlugs, kbPropertyIds);
   }
 
   // Report results

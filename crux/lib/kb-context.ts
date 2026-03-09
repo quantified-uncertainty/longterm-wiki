@@ -103,7 +103,7 @@ export async function buildKbContextForPage(
   }
 
   const lines: string[] = [];
-  lines.push(`KB Facts for ${entity.name} (entity: "${entity.id}", stableId: ${entity.stableId})`);
+  lines.push(`KB Facts for ${entity.name} (entity: "${entity.id}"${entity.stableId != null ? `, stableId: ${entity.stableId}` : ''})`);
   lines.push(`Use <KBF entity="${entity.id}" property="PROPERTY_ID" /> to reference these inline.`);
   lines.push(`The fact ID (8-char hex) can be used in <F e="${entity.id}" f="FACT_ID">display</F> for hover tooltips.`);
   lines.push('');
