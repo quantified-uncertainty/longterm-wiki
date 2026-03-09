@@ -334,10 +334,34 @@ export function getInternalNav(): NavSection[] {
 }
 
 // ============================================================================
+// KB DATA SECTION NAV (public structured data pages)
+// ============================================================================
+
+/**
+ * Build sidebar navigation for the /kb/ section (public structured data).
+ * Uses numeric entity IDs directly for stability (the slugs in the wiki-server
+ * ID registry differ from the page-level slugs assigned by build-data).
+ */
+export function getKBDataNav(): NavSection[] {
+  return [
+    {
+      title: "KB Data",
+      defaultOpen: true,
+      items: [
+        { label: "Overview", href: "/wiki/E1019" },
+        { label: "Facts Explorer", href: "/wiki/E1020" },
+        { label: "Properties", href: "/wiki/E1021" },
+        { label: "Entity Coverage", href: "/wiki/E1022" },
+      ],
+    },
+  ];
+}
+
+// ============================================================================
 // DETECT WHICH SIDEBAR TO SHOW
 // ============================================================================
 
-export type WikiSidebarType = "models" | "internal" | "about" | "kb" | "section" | null;
+export type WikiSidebarType = "models" | "internal" | "about" | "kb-data" | "kb" | "section" | null;
 
 /**
  * Determine which sidebar to show based on the entity path.
@@ -364,6 +388,11 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
 
   if (entityPath.startsWith("/internal/") || entityPath === "/internal") {
     return "internal";
+  }
+
+  // KB Data section — public structured data pages at /kb/
+  if (entityPath.startsWith("/kb/") || entityPath === "/kb") {
+    return "kb-data";
   }
 
   // Any knowledge-base subsection gets a sidebar (no hardcoded list needed)
@@ -431,6 +460,8 @@ export function getWikiNav(
       return getAboutNav();
     case "internal":
       return getInternalNav();
+    case "kb-data":
+      return getKBDataNav();
     case "kb": {
       const section = entityPath ? extractKbSection(entityPath) : null;
       return section ? getKbSectionNav(section) : [];
