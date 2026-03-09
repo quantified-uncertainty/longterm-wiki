@@ -37,6 +37,8 @@ export type {
   AutoRebaseResult,
 } from './types.ts';
 
+export { ADVISORY_ISSUES } from './types.ts';
+
 // ── Detection ────────────────────────────────────────────────────────────────
 
 export {

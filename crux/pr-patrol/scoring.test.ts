@@ -69,7 +69,9 @@ describe('computeScore', () => {
 // ── computeBudget ────────────────────────────────────────────────────────────
 
 describe('computeBudget', () => {
-  it('gives small budget for missing-issue-ref only', () => {
+  it('returns default budget for advisory-only issue (missing-issue-ref)', () => {
+    // missing-issue-ref is advisory-only and has no budget entry;
+    // computeBudget returns the default minimum budget
     const budget = computeBudget(['missing-issue-ref']);
     expect(budget.maxTurns).toBe(5);
     expect(budget.timeoutMinutes).toBe(3);
