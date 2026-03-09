@@ -29,7 +29,7 @@ const SUBCATEGORY_BY_ENTITY_TYPE: Partial<Record<string, readonly string[]>> = {
     'alignment-interpretability', 'alignment'],
   policy: ['legislation', 'governance', 'alignment-policy', 'compute-governance',
     'international', 'organizational-practices', 'resilience', 'institutions', 'biosecurity'],
-  model: ['domain-models', 'analysis-models', 'risk-models', 'governance-models',
+  analysis: ['domain-models', 'analysis-models', 'risk-models', 'governance-models',
     'societal-models', 'timeline-models', 'safety-models', 'intervention-models',
     'dynamics-models', 'threshold-models', 'impact-models', 'framework-models',
     'economic-models', 'cascade-models', 'race-models'],
