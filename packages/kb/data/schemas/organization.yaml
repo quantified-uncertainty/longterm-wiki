@@ -95,19 +95,24 @@ items:
       source: { type: text, description: "URL to paper or announcement" }
       notes: { type: text, description: "Impact or significance" }
 
-  stakeholders:
-    description: "Equity stakeholders with philanthropy estimates"
+  equity-holders:
+    description: "Equity ownership stakeholders. Stake values are decimals (0.02 = 2%). Use a [min, max] array for ranges."
     fields:
-      name: { type: text, required: true, description: "Stakeholder name" }
-      category: { type: text, required: true, description: "Role or category (e.g. Co-founder, CEO)" }
-      stake_min: { type: number, description: "Minimum estimated equity stake (0-1 fraction)" }
-      stake_max: { type: number, description: "Maximum estimated equity stake (0-1 fraction)" }
-      pledge_min: { type: number, description: "Minimum pledge fraction (0-1)" }
-      pledge_max: { type: number, description: "Maximum pledge fraction (0-1)" }
-      ea_align_min: { type: number, description: "Minimum EA alignment probability (0-1)" }
-      ea_align_max: { type: number, description: "Maximum EA alignment probability (0-1)" }
-      entity_ref: { type: ref, description: "Entity numeric ID (e.g. E91)" }
-      notes: { type: text, description: "Context about the stakeholder" }
+      holder: { type: text, required: true, description: "Stakeholder name" }
+      entity_ref: { type: ref, description: "Entity numeric ID for linking (e.g. E91)" }
+      category: { type: text, required: true, description: "Role or category (e.g. Co-founder, Strategic investor)" }
+      stake: { type: number, description: "Equity stake as decimal. Single number or [min, max] for ranges." }
+      source: { type: text, description: "URL to source" }
+      notes: { type: text, description: "Context about the stake estimate" }
+
+  charitable-pledges:
+    description: "Charitable giving commitments by stakeholders. Pledge values are decimals (0.8 = 80%). Use [min, max] for ranges."
+    fields:
+      pledger: { type: text, required: true, description: "Who made the pledge" }
+      entity_ref: { type: ref, description: "Entity numeric ID for linking (e.g. E91)" }
+      pledge: { type: number, description: "Fraction of equity pledged. Single number or [min, max] for ranges." }
+      source: { type: text, description: "URL documenting the pledge" }
+      notes: { type: text, description: "Context about the pledge" }
 
   grants-and-programs:
     description: "Major grants, programs, and spending initiatives"
