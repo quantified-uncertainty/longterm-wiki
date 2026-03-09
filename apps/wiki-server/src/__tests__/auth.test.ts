@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { Hono } from "hono";
-import { validateApiKey } from "../auth.js";
+import { validateApiKey, verifyToken } from "../auth.js";
 
 describe("validateApiKey middleware", () => {
   let savedKey: string | undefined;
@@ -72,5 +72,23 @@ describe("validateApiKey middleware", () => {
       });
       expect(res.status).toBe(401);
     });
+  });
+});
+
+describe("verifyToken", () => {
+  it("returns true for matching tokens", () => {
+    expect(verifyToken("secret-key", "secret-key")).toBe(true);
+  });
+
+  it("returns false for mismatched tokens", () => {
+    expect(verifyToken("wrong-key", "secret-key")).toBe(false);
+  });
+
+  it("returns false for different-length tokens", () => {
+    expect(verifyToken("short", "much-longer-key")).toBe(false);
+  });
+
+  it("returns false for prefix match", () => {
+    expect(verifyToken("secret", "secret-key")).toBe(false);
   });
 });

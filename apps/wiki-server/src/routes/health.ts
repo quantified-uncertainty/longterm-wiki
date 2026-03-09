@@ -3,6 +3,7 @@ import { count } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
 import { entityIds, wikiPages, entities, facts } from "../schema.js";
 import { logger } from "../logger.js";
+import { verifyToken } from "../auth.js";
 
 const startTime = Date.now();
 
@@ -75,7 +76,7 @@ const healthApp = new Hono()
       return c.json({ valid: true, keyConfigured: false });
     }
 
-    if (token !== expectedKey) {
+    if (!verifyToken(token, expectedKey)) {
       return c.json({ error: "Invalid API key" }, 401);
     }
 
