@@ -276,7 +276,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
   );
   const [activeRiskCat, setActiveRiskCat] = useState(initialRiskCatIndex);
   const [sortKey, setSortKey] = useState<SortKey>(initialSort);
-  const [hasDataOnly, setHasDataOnly] = useState(false);
+  const [hasDataOnly, setHasDataOnly] = useState(searchParams.get("hasData") === "1");
   const [visibleCount, setVisibleCount] = useState(60);
 
   // Debounced URL update for search
@@ -320,8 +320,8 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       const entityGroup = ENTITY_GROUPS[entity];
       const riskCatGroup = RISK_CATEGORY_GROUPS[riskCat];
 
-      // Map "relevance" to "recommended" for server (relevance is client-only composite)
-      const serverSort = sk === "relevance" ? "recommended" : sk;
+      // Map client-only sort keys to "recommended" for server (relevance and kbFacts are client-only)
+      const serverSort = sk === "relevance" || sk === "kbFacts" ? "recommended" : sk;
 
       return {
         limit: PAGE_SIZE,
@@ -555,16 +555,49 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     });
   }, [fallbackToLocal, serverFacets, fallbackItems, search]);
 
+  // ---- Enrich server results with KB counts from local data ----
+  // Server /api/explore doesn't return kbFactCount/kbItemCount. Merge from allItems.
+  const kbLookup = useMemo(() => {
+    if (!allItems) return null;
+    const map = new Map<string, { kbFactCount?: number; kbItemCount?: number }>();
+    for (const item of allItems) {
+      if (item.kbFactCount || item.kbItemCount) {
+        map.set(item.id, { kbFactCount: item.kbFactCount, kbItemCount: item.kbItemCount });
+      }
+    }
+    return map;
+  }, [allItems]);
+
+  const enrichedServerItems = useMemo(() => {
+    if (fallbackToLocal || !kbLookup || kbLookup.size === 0) return serverItems;
+    return serverItems.map((item) => {
+      if (item.kbFactCount !== undefined || item.kbItemCount !== undefined) return item;
+      const local = kbLookup.get(item.id);
+      if (!local) return item;
+      return { ...item, ...local };
+    });
+  }, [fallbackToLocal, serverItems, kbLookup]);
+
   // ---- Compute displayed items ----
 
   const displayedItems = useMemo(() => {
     if (!fallbackToLocal) {
       // In server mode, items are already filtered/sorted by the server
-      // But apply client-side "has data" filter since server doesn't know KB counts
+      // KB counts are enriched from local data above
+      // Apply client-side "has data" filter since server doesn't know KB counts
+      const items = enrichedServerItems;
       if (hasDataOnly) {
-        return serverItems.filter((item) => (item.kbFactCount ?? 0) > 0 || (item.kbItemCount ?? 0) > 0);
+        return items.filter((item) => (item.kbFactCount ?? 0) > 0 || (item.kbItemCount ?? 0) > 0);
       }
-      return serverItems;
+      // If sorting by kbFacts, re-sort client-side since server uses "recommended" fallback
+      if (sortKey === "kbFacts") {
+        return [...items].sort((a, b) => {
+          const aTotal = (a.kbFactCount ?? 0) + (a.kbItemCount ?? 0);
+          const bTotal = (b.kbFactCount ?? 0) + (b.kbItemCount ?? 0);
+          return bTotal - aTotal;
+        });
+      }
+      return items;
     }
 
     // Fallback: full client-side filtering pipeline
@@ -646,9 +679,9 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     }
 
     return items;
-  }, [fallbackToLocal, serverItems, fallbackItems, search, activeField, activeSection, activeEntity, activeRiskCat, hasDataOnly, sortKey, viewMode, SECTION_GROUPS]);
+  }, [fallbackToLocal, enrichedServerItems, fallbackItems, search, activeField, activeSection, activeEntity, activeRiskCat, hasDataOnly, sortKey, viewMode, SECTION_GROUPS]);
 
-  const totalCount = fallbackToLocal ? displayedItems.length : serverTotal;
+  const totalCount = (fallbackToLocal || hasDataOnly) ? displayedItems.length : serverTotal;
   const hasMore = fallbackToLocal
     ? displayedItems.length > visibleCount
     : serverItems.length < serverTotal;
@@ -719,6 +752,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
                 onChange={(e) => {
                   setHasDataOnly(e.target.checked);
                   setVisibleCount(60);
+                  updateUrlParams({ hasData: e.target.checked ? "1" : null });
                 }}
                 className="rounded border-border"
               />
@@ -817,7 +851,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       {viewMode === "table" && (
         <div className="px-6">
           <ExploreTable
-            items={fallbackToLocal ? displayedItems : serverItems}
+            items={fallbackToLocal ? displayedItems : enrichedServerItems}
             onSearchChange={handleSearchChange}
           />
           {!fallbackToLocal && hasMore && (
