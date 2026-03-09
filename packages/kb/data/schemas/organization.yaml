@@ -95,6 +95,20 @@ items:
       source: { type: text, description: "URL to paper or announcement" }
       notes: { type: text, description: "Impact or significance" }
 
+  stakeholders:
+    description: "Equity stakeholders with philanthropy estimates"
+    fields:
+      name: { type: text, required: true, description: "Stakeholder name" }
+      category: { type: text, required: true, description: "Role or category (e.g. Co-founder, CEO)" }
+      stake_min: { type: number, description: "Minimum estimated equity stake (0-1 fraction)" }
+      stake_max: { type: number, description: "Maximum estimated equity stake (0-1 fraction)" }
+      pledge_min: { type: number, description: "Minimum pledge fraction (0-1)" }
+      pledge_max: { type: number, description: "Maximum pledge fraction (0-1)" }
+      ea_align_min: { type: number, description: "Minimum EA alignment probability (0-1)" }
+      ea_align_max: { type: number, description: "Maximum EA alignment probability (0-1)" }
+      entity_ref: { type: ref, description: "Entity numeric ID (e.g. E91)" }
+      notes: { type: text, description: "Context about the stakeholder" }
+
   grants-and-programs:
     description: "Major grants, programs, and spending initiatives"
     fields:

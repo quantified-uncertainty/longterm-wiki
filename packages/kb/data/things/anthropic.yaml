@@ -389,6 +389,154 @@ facts:
     notes: "Estimate; no published source. Risk-adjusted estimate of EA-aligned philanthropic capital from all Anthropic stakeholders"
 
 items:
+  # ── Stakeholders (Equity & Philanthropy) ────────────────────────
+  stakeholders:
+    type: stakeholder
+    entries:
+      i_stkDarioAmodei:
+        name: Dario Amodei
+        category: "Co-founder, CEO"
+        stake_min: 0.02
+        stake_max: 0.03
+        pledge_min: 0.8
+        pledge_max: 0.8
+        ea_align_min: 0.8
+        ea_align_max: 0.9
+        entity_ref: E91
+        notes: "GWWC signatory; early GiveWell supporter"
+
+      i_stkDanielaAmodei:
+        name: Daniela Amodei
+        category: "Co-founder, President"
+        stake_min: 0.02
+        stake_max: 0.03
+        pledge_min: 0.8
+        pledge_max: 0.8
+        ea_align_min: 0.8
+        ea_align_max: 0.9
+        entity_ref: E90
+        notes: "Married to Holden Karnofsky (GiveWell co-founder)"
+
+      i_stkChrisOlah:
+        name: Chris Olah
+        category: "Co-founder"
+        stake_min: 0.02
+        stake_max: 0.03
+        pledge_min: 0.8
+        pledge_max: 0.8
+        ea_align_min: 0.4
+        ea_align_max: 0.6
+        entity_ref: E59
+        notes: "Interpretability pioneer; participated in EA events; safety-focused"
+
+      i_stkJackClark:
+        name: Jack Clark
+        category: "Co-founder"
+        stake_min: 0.02
+        stake_max: 0.03
+        pledge_min: 0.8
+        pledge_max: 0.8
+        ea_align_min: 0.3
+        ea_align_max: 0.5
+        notes: "Former OpenAI Policy Director; responsible AI advocate; EA-adjacent framing"
+
+      i_stkTomBrown:
+        name: Tom Brown
+        category: "Co-founder"
+        stake_min: 0.02
+        stake_max: 0.03
+        pledge_min: 0.8
+        pledge_max: 0.8
+        ea_align_min: 0.15
+        ea_align_max: 0.3
+        notes: "GPT-3 lead author; chose Anthropic's safety mission over other options"
+
+      i_stkJaredKaplan:
+        name: Jared Kaplan
+        category: "Co-founder, Chief Scientist"
+        stake_min: 0.02
+        stake_max: 0.03
+        pledge_min: 0.8
+        pledge_max: 0.8
+        ea_align_min: 0.15
+        ea_align_max: 0.3
+        notes: "Scaling laws pioneer; safety-motivated co-founder; no documented EA pledge"
+
+      i_stkSamMcCandlish:
+        name: Sam McCandlish
+        category: "Co-founder"
+        stake_min: 0.02
+        stake_max: 0.03
+        pledge_min: 0.8
+        pledge_max: 0.8
+        ea_align_min: 0.15
+        ea_align_max: 0.3
+        notes: "Alignment researcher; no publicly documented EA connections"
+
+      i_stkJaanTallinn:
+        name: Jaan Tallinn
+        category: "Early investor"
+        stake_min: 0.006
+        stake_max: 0.017
+        pledge_min: 0.9
+        pledge_max: 0.9
+        ea_align_min: 0.9
+        ea_align_max: 0.95
+        entity_ref: E577
+        notes: "Led Series A; Skype co-founder; major AI safety funder"
+
+      i_stkDustinMoskovitz:
+        name: Dustin Moskovitz
+        category: "Early investor"
+        stake_min: 0.008
+        stake_max: 0.025
+        pledge_min: 0.95
+        pledge_max: 0.95
+        ea_align_min: 0.9
+        ea_align_max: 0.95
+        entity_ref: E436
+        notes: "$500M already in Good Ventures nonprofit vehicle"
+
+      i_stkEmployeePool:
+        name: Employee equity pool
+        category: "Employees"
+        stake_min: 0.12
+        stake_max: 0.18
+        pledge_min: 0.25
+        pledge_max: 0.5
+        ea_align_min: 0.4
+        ea_align_max: 0.7
+        notes: "Pledge rates vary: pre-2025 hires up to 50% with 3:1 match; post-2024 hires 25% with 1:1 match. EA Forum estimates ~$20\u201340B in employee DAFs already transferred."
+
+      i_stkGoogle:
+        name: Google
+        category: "Strategic investor"
+        stake_min: 0.13
+        stake_max: 0.15
+        pledge_min: 0
+        pledge_max: 0
+        ea_align_min: 0
+        ea_align_max: 0
+        notes: "$3.3B invested across 3 rounds; no philanthropic pledge"
+
+      i_stkAmazon:
+        name: Amazon
+        category: "Strategic investor"
+        pledge_min: 0
+        pledge_max: 0
+        ea_align_min: 0
+        ea_align_max: 0
+        notes: "$10.75B invested; exact stake undisclosed; primary cloud partner"
+
+      i_stkInstitutional:
+        name: "Series G / Other institutional"
+        category: "Institutional"
+        pledge_min: 0
+        pledge_max: 0
+        ea_align_min: 0
+        ea_align_max: 0
+        notes: "GIC, Coatue, D.E. Shaw, Dragoneer, Founders Fund, ICONIQ, MGX"
+
   # ── Funding Rounds ──────────────────────────────────────────────
   funding-rounds:
     type: funding-round
