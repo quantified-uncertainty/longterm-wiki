@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "./logger.js";
-import { validateApiKey, requireWriteScope } from "./auth.js";
+import { validateApiKey } from "./auth.js";
 import {
   rateLimitMiddleware,
   createDefaultRateLimiters,
@@ -110,36 +110,8 @@ export function createApp() {
   // Detailed health endpoint — unauthenticated, includes DB stats
   app.route("/health", healthRoute);
 
-  // API routes — all require a valid API key (any scope)
+  // API routes — all require a valid API key
   app.use("/api/*", validateApiKey());
-
-  // Content-scope routes: writes require the content key
-  // (reads/GETs work with any valid key)
-  app.use("/api/pages/*", requireWriteScope("content"));
-  app.use("/api/entities/*", requireWriteScope("content"));
-  app.use("/api/facts/*", requireWriteScope("content"));
-  app.use("/api/citations/*", requireWriteScope("content"));
-  app.use("/api/resources/*", requireWriteScope("content"));
-  app.use("/api/links/*", requireWriteScope("content"));
-  app.use("/api/summaries/*", requireWriteScope("content"));
-  app.use("/api/hallucination-risk/*", requireWriteScope("content"));
-  app.use("/api/artifacts/*", requireWriteScope("content"));
-  app.use("/api/references/*", requireWriteScope("content"));
-
-  // Project-scope routes: writes require the project key
-  // (IDs, sessions, edit logs, jobs, agent sessions, auto-update tracking)
-  app.use("/api/ids/*", requireWriteScope("project"));
-  app.use("/api/sessions/*", requireWriteScope("project"));
-  app.use("/api/edit-logs/*", requireWriteScope("project"));
-  app.use("/api/jobs/*", requireWriteScope("project"));
-  app.use("/api/agent-sessions/*", requireWriteScope("project"));
-  app.use("/api/active-agents/*", requireWriteScope("project"));
-  app.use("/api/agent-session-events/*", requireWriteScope("project"));
-  app.use("/api/auto-update-runs/*", requireWriteScope("project"));
-  app.use("/api/auto-update-news/*", requireWriteScope("project"));
-  app.use("/api/github/*", requireWriteScope("project"));
-  app.use("/api/groundskeeper-runs/*", requireWriteScope("project"));
-  app.use("/api/monitoring/*", requireWriteScope("project"));
 
   // Mount route handlers
   app.route("/api/ids", idsRoute);

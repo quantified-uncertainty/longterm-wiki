@@ -13,7 +13,7 @@ update_frequency: 90
 
 This document analyzes how the wiki-server handles (or fails to handle) environment isolation between development, preview, and production. It identifies the core architectural tension — entity ID allocation must be globally shared, but content data should not — and proposes a tiered remediation plan.
 
-**Status:** Analysis complete (Feb 2026). Tier 3 alternative (scoped API keys) implemented — server-side auth middleware, client-side scope propagation, CI workflow updates, audit columns on page sync. GitHub secrets and legacy key removal are pending deployment steps.
+**Status:** Analysis complete (Feb 2026). Scoped API keys were implemented then removed (Mar 2026) — the added complexity wasn't justified. The system uses a single `LONGTERMWIKI_SERVER_API_KEY` for all API access, with timing-safe comparison.
 
 ---
 
@@ -186,18 +186,9 @@ Configured via: `LONGTERMWIKI_PROJECT_DB_URL` + `LONGTERMWIKI_PROJECT_DB_KEY` (a
 - **Development**: Local-only (`database.json` fallback), or optional local server for testing server-driven features
 - **Preview**: Local-only (no server)
 
-Configured via: `LONGTERMWIKI_CONTENT_SERVER_URL` + `LONGTERMWIKI_CONTENT_SERVER_KEY` (only prod CI gets the prod content key; unset in dev for local-only mode).
-
-Dev literally cannot corrupt prod content because they're different databases. No guards needed.
+Configured via: `LONGTERMWIKI_SERVER_URL` + `LONGTERMWIKI_SERVER_API_KEY`. Dev uses `localhost:3002`, prod uses the k8s URL. The URL separation is the isolation mechanism.
 
 **H. ID allocation becomes a pre-commit step.** Instead of `assign-ids.mjs` running during the build and silently calling production, creating a new entity is an explicit action: run `crux ids allocate`, get the ID, commit it to the YAML file. The build pipeline becomes fully offline — no production server dependency at build time.
-
-**Alternative (simpler):** Same server URL, two API keys with different scopes:
-```
-LONGTERMWIKI_SERVER_URL=https://...        # Same URL for everyone
-LONGTERMWIKI_PROJECT_KEY=<key>             # Grants: IDs, sessions, edit logs (all envs)
-LONGTERMWIKI_CONTENT_KEY=<key>             # Grants: page/entity/fact sync (prod CI only)
-```
 
 ---
 

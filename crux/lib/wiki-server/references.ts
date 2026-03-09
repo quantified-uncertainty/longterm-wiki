@@ -60,9 +60,7 @@ export async function createClaimReference(
   return apiRequest<ClaimPageReferenceRow>(
     'POST',
     '/api/references/claim',
-    data,
-    undefined,
-    'content',
+    data
   );
 }
 
@@ -75,9 +73,7 @@ export async function createCitation(
   return apiRequest<PageCitationRow>(
     'POST',
     '/api/references/citation',
-    data,
-    undefined,
-    'content',
+    data
   );
 }
 
@@ -90,8 +86,6 @@ export async function createCitationsBatch(
   return apiRequest<{ inserted: number }>(
     'POST',
     '/api/references/citations/batch',
-    { items },
-    undefined,
-    'content',
+    { items }
   );
 }

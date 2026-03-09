@@ -46,9 +46,7 @@ export async function recordRiskSnapshots(
     const result = await batchedRequest<RiskBatchResult>(
       'POST',
       '/api/hallucination-risk/batch',
-      { snapshots: batch },
-      undefined,
-      'content',
+      { snapshots: batch }
     );
 
     if (!result.ok) {

@@ -53,14 +53,14 @@ export type SweepResult = InferResponseType<RpcClient['sweep']['$post'], 200>;
 export async function createJob(
   input: CreateJobInput,
 ): Promise<ApiResult<JobEntry>> {
-  return apiRequest<JobEntry>('POST', '/api/jobs', input, undefined, 'project');
+  return apiRequest<JobEntry>('POST', '/api/jobs', input);
 }
 
 /** Create multiple jobs in a batch. */
 export async function createJobBatch(
   inputs: CreateJobInput[],
 ): Promise<ApiResult<JobEntry[]>> {
-  return apiRequest<JobEntry[]>('POST', '/api/jobs', inputs, undefined, 'project');
+  return apiRequest<JobEntry[]>('POST', '/api/jobs', inputs);
 }
 
 /** List jobs with optional filters. */
@@ -92,12 +92,12 @@ export async function claimJob(
   return batchedRequest<ClaimResult>('POST', '/api/jobs/claim', {
     workerId,
     ...(type ? { type } : {}),
-  }, undefined, 'project');
+  });
 }
 
 /** Mark a claimed job as running. */
 export async function startJob(id: number): Promise<ApiResult<JobEntry>> {
-  return apiRequest<JobEntry>('POST', `/api/jobs/${id}/start`, {}, undefined, 'project');
+  return apiRequest<JobEntry>('POST', `/api/jobs/${id}/start`, {});
 }
 
 /** Mark a running job as completed with a result. */
@@ -107,7 +107,7 @@ export async function completeJob(
 ): Promise<ApiResult<JobEntry>> {
   return apiRequest<JobEntry>('POST', `/api/jobs/${id}/complete`, {
     result: result ?? null,
-  }, undefined, 'project');
+  });
 }
 
 /** Mark a running/claimed job as failed with an error message. */
@@ -118,15 +118,13 @@ export async function failJob(
   return apiRequest<JobEntry & { retried: boolean }>(
     'POST',
     `/api/jobs/${id}/fail`,
-    { error },
-    undefined,
-    'project',
+    { error }
   );
 }
 
 /** Cancel a pending or claimed job. */
 export async function cancelJob(id: number): Promise<ApiResult<JobEntry>> {
-  return apiRequest<JobEntry>('POST', `/api/jobs/${id}/cancel`, {}, undefined, 'project');
+  return apiRequest<JobEntry>('POST', `/api/jobs/${id}/cancel`, {});
 }
 
 /** Get aggregate job statistics. */
@@ -140,5 +138,5 @@ export async function sweepJobs(
 ): Promise<ApiResult<SweepResult>> {
   return apiRequest<SweepResult>('POST', '/api/jobs/sweep', {
     ...(timeoutMinutes ? { timeoutMinutes } : {}),
-  }, undefined, 'project');
+  });
 }

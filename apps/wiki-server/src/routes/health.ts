@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import { count } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
 import { entityIds, wikiPages, entities, facts } from "../schema.js";
-import { resolveScopes, getKeyConfig, type ApiScope } from "../auth.js";
 import { logger } from "../logger.js";
+import { verifyToken } from "../auth.js";
 
 const startTime = Date.now();
 
@@ -60,9 +60,8 @@ const healthApp = new Hono()
     });
   })
   /**
-   * GET /auth — Check which scopes a Bearer token grants.
+   * GET /auth — Check if a Bearer token is valid.
    * Returns 401 if no token or invalid token.
-   * Returns { scopes, keyType } on success.
    */
   .get("/auth", (c) => {
     const authHeader = c.req.header("Authorization");
@@ -71,28 +70,17 @@ const healthApp = new Hono()
     }
 
     const token = authHeader.slice(7);
-    const config = getKeyConfig();
+    const expectedKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
 
-    if (!config.legacyKey && !config.projectKey && !config.contentKey) {
-      return c.json({ scopes: ["project", "content"], keyType: "none_configured" });
+    if (!expectedKey) {
+      return c.json({ valid: true, keyConfigured: false });
     }
 
-    const scopes = resolveScopes(token, config);
-    if (scopes.length === 0) {
+    if (!verifyToken(token, expectedKey)) {
       return c.json({ error: "Invalid API key" }, 401);
     }
 
-    // Determine key type for diagnostics
-    let keyType: string;
-    if (config.legacyKey && token === config.legacyKey) {
-      keyType = "legacy";
-    } else if (config.projectKey && token === config.projectKey) {
-      keyType = "project";
-    } else {
-      keyType = "content";
-    }
-
-    return c.json({ scopes, keyType });
+    return c.json({ valid: true, keyConfigured: true });
   });
 
 export const healthRoute = healthApp;

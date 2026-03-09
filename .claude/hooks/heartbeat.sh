@@ -26,7 +26,7 @@ fi
 # Read agent ID and env vars
 AGENT_ID=$(cat "$AGENT_ID_FILE" 2>/dev/null || true)
 WIKI_SERVER_URL="${LONGTERMWIKI_SERVER_URL:-}"
-API_KEY="${LONGTERMWIKI_PROJECT_KEY:-${LONGTERMWIKI_SERVER_API_KEY:-}}"
+API_KEY="${LONGTERMWIKI_SERVER_API_KEY:-}"
 
 # Validate inputs
 [[ "$AGENT_ID" =~ ^[0-9]+$ ]] || exit 0

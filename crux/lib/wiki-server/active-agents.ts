@@ -51,7 +51,7 @@ export type RegisterAgentResponse = InferResponseType<
 export async function registerAgent(
   agent: RegisterAgent,
 ): Promise<ApiResult<RegisterAgentResponse>> {
-  return apiRequest<RegisterAgentResponse>('POST', '/api/active-agents', agent, undefined, 'project');
+  return apiRequest<RegisterAgentResponse>('POST', '/api/active-agents', agent);
 }
 
 /**
@@ -77,7 +77,7 @@ export async function updateAgent(
   id: number,
   updates: UpdateAgent,
 ): Promise<ApiResult<ActiveAgentEntry>> {
-  return apiRequest<ActiveAgentEntry>('PATCH', `/api/active-agents/${id}`, updates, undefined, 'project');
+  return apiRequest<ActiveAgentEntry>('PATCH', `/api/active-agents/${id}`, updates);
 }
 
 /**
@@ -86,7 +86,7 @@ export async function updateAgent(
 export async function heartbeat(
   id: number,
 ): Promise<ApiResult<{ ok: boolean; heartbeatAt: string }>> {
-  return apiRequest<{ ok: boolean; heartbeatAt: string }>('POST', `/api/active-agents/${id}/heartbeat`, {}, undefined, 'project');
+  return apiRequest<{ ok: boolean; heartbeatAt: string }>('POST', `/api/active-agents/${id}/heartbeat`, {});
 }
 
 /**
@@ -95,5 +95,5 @@ export async function heartbeat(
 export async function sweepStaleAgents(
   timeoutMinutes = 30,
 ): Promise<ApiResult<{ swept: number; agents: Array<{ id: number; sessionId: string }> }>> {
-  return apiRequest('POST', '/api/active-agents/sweep', { timeoutMinutes }, undefined, 'project');
+  return apiRequest('POST', '/api/active-agents/sweep', { timeoutMinutes });
 }

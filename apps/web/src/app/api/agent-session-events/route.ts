@@ -38,7 +38,6 @@ export async function GET(request: NextRequest) {
   try {
     const headers: Record<string, string> = {};
     const apiKey =
-      process.env.LONGTERMWIKI_PROJECT_KEY ||
       process.env.LONGTERMWIKI_SERVER_API_KEY;
     if (apiKey) {
       headers["Authorization"] = `Bearer ${apiKey}`;

@@ -30,9 +30,7 @@ vi.mock("../logger.js", () => ({
 }));
 
 vi.mock("../auth.js", () => ({
-  requireAuth: () => (c: unknown, next: () => Promise<void>) => next(),
-  resolveScopes: vi.fn(() => ["project", "content"]),
-  getKeyConfig: vi.fn(() => ({})),
+  validateApiKey: () => (c: unknown, next: () => Promise<void>) => next(),
 }));
 
 // ---------------------------------------------------------------------------

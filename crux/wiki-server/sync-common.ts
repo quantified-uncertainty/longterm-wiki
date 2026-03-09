@@ -10,7 +10,7 @@
  * then delegates the actual sync loop to batchSync().
  */
 
-import { buildHeaders, type ApiKeyScope } from "../lib/wiki-server/client.ts";
+import { buildHeaders } from "../lib/wiki-server/client.ts";
 import {
   WIKI_SERVER_BATCH_TIMEOUT_MS as BATCH_TIMEOUT_MS,
   WIKI_SERVER_HEALTH_CHECK_TIMEOUT_MS as HEALTH_CHECK_TIMEOUT_MS,
@@ -52,8 +52,6 @@ export interface BatchSyncOptions<T> {
     totalBatches: number,
     count: number,
   ) => void;
-  /** API key scope for authentication. Sync scripts typically use 'content'. */
-  scope?: ApiKeyScope;
   /** Extra fields to include in the request body alongside the batched items. */
   extraBodyFields?: Record<string, unknown>;
   _sleep?: (ms: number) => Promise<void>;
@@ -216,7 +214,6 @@ export async function batchSync<T>(
     itemLabel = "items",
     onBatchError,
     onBatchSuccess,
-    scope,
     extraBodyFields,
     _sleep,
   } = options;
@@ -240,7 +237,7 @@ export async function batchSync<T>(
         url,
         {
           method: "POST",
-          headers: buildHeaders(scope),
+          headers: buildHeaders(),
           body: requestBody,
         },
         { _sleep },

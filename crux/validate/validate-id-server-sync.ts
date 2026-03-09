@@ -109,10 +109,15 @@ async function fetchServerIds(): Promise<Map<string, ServerIdEntry>> {
 
   while (true) {
     const res = await fetch(`${serverUrl}/api/ids?limit=${limit}&offset=${offset}`, {
-      headers: buildHeaders('project'),
+      headers: buildHeaders(),
       signal: AbortSignal.timeout(10_000),
     });
-    if (!res.ok) break;
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      throw new Error(
+        `Failed to fetch wiki-server IDs (${res.status})${detail ? `: ${detail.slice(0, 200)}` : ""}`,
+      );
+    }
 
     const data = await res.json() as { ids: ServerIdEntry[]; total: number };
     for (const entry of data.ids) {
