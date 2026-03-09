@@ -9,6 +9,7 @@ import fs from 'fs';
 import { MODELS } from '../../../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../../../lib/entity-lookup.ts';
 import { buildClaimsContextForContent } from '../../../lib/claims-context.ts';
+import { buildKbContextForPage } from '../../../lib/kb-context.ts';
 import { runGapAnalysis, formatGapAnalysisForPrompt } from '../../../claims/gap-analysis.ts';
 import { convertSlugsToNumericIds } from '../../creator/deployment.ts';
 import { convertNewFootnotes } from '../../../claims/convert-new-footnotes.ts';
@@ -52,6 +53,22 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
     log('improve', `  Claims fetch failed: ${error.message} — continuing without claims context`);
   }
 
+  // Load KB facts for the entity associated with this page
+  log('improve', 'Loading KB facts for entity...');
+  let kbContext: string | null = null;
+  try {
+    kbContext = await buildKbContextForPage(page.id, page.path);
+    if (kbContext) {
+      const lineCount = kbContext.split('\n').length;
+      log('improve', `  Found KB entity with ${lineCount} lines of structured facts`);
+    } else {
+      log('improve', '  No KB entity found for this page');
+    }
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('improve', `  KB context load failed: ${error.message} — continuing without KB context`);
+  }
+
   // Run gap analysis if --gap-analysis flag is set
   let gapAnalysisContext: string | null = null;
   if (options.gapAnalysis) {
@@ -81,7 +98,7 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
     page, filePath, importPath, directions,
     analysis, research, objectivityContext,
     currentContent, entityLookup, claimsContext,
-    gapAnalysisContext, tier,
+    gapAnalysisContext, kbContext, tier,
   });
 
   const result = await runAgent(prompt, {

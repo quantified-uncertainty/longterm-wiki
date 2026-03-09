@@ -463,6 +463,159 @@ async function propertiesCommand(
   return { exitCode: 0, output: lines.join('\n') };
 }
 
+// ── search command ───────────────────────────────────────────────────────
+
+async function searchCommand(
+  args: string[],
+  options: KBCommandOptions,
+): Promise<CommandResult> {
+  const query = args.find((a) => !a.startsWith('--'));
+
+  if (!query) {
+    return {
+      exitCode: 1,
+      output: `Usage: crux kb search <query> [--type=X]
+
+  Search KB entities by name, ID, or alias (case-insensitive substring match).
+
+Examples:
+  crux kb search anthropic
+  crux kb search "open ai"
+  crux kb search amodei --type=person`,
+    };
+  }
+
+  const graph = await loadGraph();
+  let entities = graph.getAllEntities();
+
+  if (options.type) {
+    entities = entities.filter((e) => e.type === options.type);
+  }
+
+  const q = query.toLowerCase();
+  const matches = entities.filter((e) => {
+    if (e.id.toLowerCase().includes(q)) return true;
+    if (e.name.toLowerCase().includes(q)) return true;
+    if (e.aliases?.some((a) => a.toLowerCase().includes(q))) return true;
+    if (e.numericId?.toLowerCase().includes(q)) return true;
+    return false;
+  });
+
+  if (options.ci) {
+    const data = matches.map((e) => ({
+      id: e.id,
+      name: e.name,
+      type: e.type,
+      stableId: e.stableId,
+      numericId: e.numericId,
+      aliases: e.aliases,
+      factCount: graph.getFacts(e.id).length,
+    }));
+    return { exitCode: 0, output: JSON.stringify(data) };
+  }
+
+  if (matches.length === 0) {
+    return { exitCode: 0, output: `No KB entities found matching "${query}"` };
+  }
+
+  const lines: string[] = [];
+  const header = `${'ID'.padEnd(28)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} ${'NumericID'.padEnd(10)} Facts`;
+  lines.push(`\x1b[1m${header}\x1b[0m`);
+  lines.push('-'.repeat(header.length));
+
+  for (const entity of matches) {
+    const factCount = graph.getFacts(entity.id).length;
+    const row = `${entity.id.padEnd(28)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${(entity.numericId ?? '').padEnd(10)} ${factCount}`;
+    lines.push(row);
+    if (entity.aliases?.length) {
+      lines.push(`  ${''.padEnd(26)} Aliases: ${entity.aliases.join(', ')}`);
+    }
+  }
+
+  lines.push('');
+  lines.push(`${matches.length} result(s) for "${query}"`);
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
+// ── coverage command ─────────────────────────────────────────────────────
+
+async function coverageCommand(
+  args: string[],
+  options: KBCommandOptions,
+): Promise<CommandResult> {
+  const graph = await loadGraph();
+  let entities = graph.getAllEntities();
+
+  if (options.type) {
+    entities = entities.filter((e) => e.type === options.type);
+  }
+
+  // For each entity: facts count and distinct properties used vs applicable for type
+  interface CoverageRow {
+    entity: Entity;
+    factCount: number;
+    applicable: number;   // non-computed properties that apply to this entity type
+    used: number;         // distinct propertyIds with ≥1 stored fact
+    score: number;        // 0–100 (used/applicable * 100)
+  }
+
+  const allProperties = graph.getAllProperties().filter((p) => !p.computed);
+
+  const rows: CoverageRow[] = entities.map((entity) => {
+    const applicable = allProperties.filter((p) =>
+      !p.appliesTo || p.appliesTo.length === 0 || p.appliesTo.includes(entity.type)
+    ).length;
+
+    const entityFacts = graph.getFacts(entity.id).filter((f) => !f.id.startsWith('inv_'));
+    const factCount = entityFacts.length;
+    const usedProps = new Set(entityFacts.map((f) => f.propertyId));
+    const used = usedProps.size;
+    const score = applicable > 0 && factCount > 0 ? Math.round((used / applicable) * 100) : 0;
+
+    return { entity, factCount, applicable, used, score };
+  });
+
+  // Sort: most facts first, then alphabetically
+  rows.sort((a, b) => {
+    if (b.factCount !== a.factCount) return b.factCount - a.factCount;
+    return a.entity.name.localeCompare(b.entity.name);
+  });
+
+  if (options.ci) {
+    const data = rows.map((r) => ({
+      id: r.entity.id,
+      name: r.entity.name,
+      type: r.entity.type,
+      factCount: r.factCount,
+      applicableProperties: r.applicable,
+      usedProperties: r.used,
+      score: r.score,
+    }));
+    return { exitCode: 0, output: JSON.stringify(data) };
+  }
+
+  const lines: string[] = [];
+  const header = `${'Entity'.padEnd(28)} ${'Type'.padEnd(16)} ${'Facts'.padEnd(7)} ${'Props used'.padEnd(12)} Coverage`;
+  lines.push(`\x1b[1m${header}\x1b[0m`);
+  lines.push('-'.repeat(header.length));
+
+  for (const r of rows) {
+    const scoreColor = r.factCount === 0 ? '\x1b[90m' : r.score >= 20 ? '\x1b[32m' : r.score >= 10 ? '\x1b[33m' : '\x1b[31m';
+    const propStr = r.factCount > 0 ? `${r.used}/${r.applicable}` : '-';
+    const scoreStr = r.factCount === 0 ? 'stub' : `${r.score}%`;
+    const row = `${r.entity.id.padEnd(28)} ${r.entity.type.padEnd(16)} ${String(r.factCount).padEnd(7)} ${propStr.padEnd(12)} ${scoreColor}${scoreStr}\x1b[0m`;
+    lines.push(row);
+  }
+
+  const withFacts = rows.filter((r) => r.factCount > 0).length;
+  const stubs = rows.filter((r) => r.factCount === 0).length;
+  lines.push('');
+  lines.push(`Total: ${rows.length} entities | With facts: ${withFacts} | Stubs: ${stubs}`);
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
 // ── Exports ─────────────────────────────────────────────────────────────
 
 export const commands = {
@@ -471,6 +624,8 @@ export const commands = {
   lookup: lookupCommand,
   validate: validateCommand,
   properties: propertiesCommand,
+  search: searchCommand,
+  coverage: coverageCommand,
   migrate: kbMigrateCommands.default,
 };
 
@@ -484,10 +639,12 @@ Commands:
   lookup <stableId>     Look up an entity by its stableId
   validate              Run all KB validation checks
   properties [--type=X] List all property definitions with usage counts
+  search <query>        Search entities by name, ID, or alias
+  coverage [--type=X]   Show entity coverage against required/recommended properties
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
 
 Options:
-  --type=X              Filter list by entity type (e.g. organization, person)
+  --type=X              Filter list/search/coverage by entity type (e.g. organization, person)
   --limit=N             Limit number of results (list only)
   --ci                  JSON output
   --errors-only         Show only errors (validate)
@@ -502,6 +659,10 @@ Examples:
   crux kb list --type=person          List only person entities
   crux kb lookup mK9pX3rQ7n           Look up entity by stableId
   crux kb properties                  List all properties with usage stats
+  crux kb search anthropic            Find entities matching "anthropic"
+  crux kb search amodei --type=person Search only person entities
+  crux kb coverage                    Show all entities scored by property coverage
+  crux kb coverage --type=organization Organizations only
   crux kb migrate ajeya-cotra --dry-run   Preview entity migration
   crux kb migrate ajeya-cotra --stub-old  Migrate + strip old entity
 `;
