@@ -35,7 +35,6 @@ const CANONICAL_ENTITY_TYPE_NAMES = [
   "funder",
   "historical",
   "analysis",
-  "model",
   "parameter",
   "argument",
   "table",
@@ -72,7 +71,8 @@ export const ENTITY_TYPE_ALIASES: Record<string, CanonicalEntityTypeName> = {
   policies: "policy",
   concepts: "concept",
   events: "event",
-  models: "model",
+  models: "analysis",
+  model: "analysis",
 };
 
 /** All alias type name strings */

@@ -95,9 +95,11 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { id: 'has-risk-links', label: 'Links to Risks', weight: 15, detection: 'content', pattern: '/knowledge-base/risks/' },
     ],
   },
+  // Template key kept as 'knowledge-base-model' for backward compatibility.
+  // Entity type 'model' was merged into 'analysis' — new pages use entityType: analysis.
   'knowledge-base-model': {
     id: 'knowledge-base-model',
-    name: 'Knowledge Base - Model',
+    name: 'Knowledge Base - Analysis Model',
     minWordCount: 600,
     frontmatter: [
       { name: 'title', required: true, weight: 5 },

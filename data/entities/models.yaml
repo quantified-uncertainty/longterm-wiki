@@ -3,7 +3,7 @@
 
 - id: lock-in-mechanisms
   numericId: E190
-  type: model
+  type: analysis
   title: Lock-in Mechanisms Model
   maturity: Growing
   description: >-
@@ -21,7 +21,7 @@
   lastUpdated: 2025-12
 - id: ai-risk-portfolio-analysis
   numericId: E12
-  type: model
+  type: analysis
   title: AI Risk Portfolio Analysis
   description: >-
     This framework compares AI risk categories to guide resource allocation. It estimates misalignment accounts for
@@ -35,10 +35,10 @@
       value: Risk magnitude comparisons and allocation recommendations
   relatedEntries:
     - id: compounding-risks-analysis
-      type: model
+      type: analysis
       relationship: related
     - id: flash-dynamics-threshold
-      type: model
+      type: analysis
       relationship: related
   tags:
     - prioritization
@@ -49,7 +49,7 @@
   lastUpdated: 2025-12
 - id: worldview-intervention-mapping
   numericId: E377
-  type: model
+  type: analysis
   title: Worldview-Intervention Mapping
   description: >-
     This model maps how beliefs about timelines and difficulty affect intervention priorities. Different worldviews
@@ -63,10 +63,10 @@
       value: Intervention priorities given different worldviews
   relatedEntries:
     - id: ai-risk-portfolio-analysis
-      type: model
+      type: analysis
       relationship: related
     - id: racing-dynamics
-      type: model
+      type: analysis
       relationship: related
   tags:
     - prioritization
@@ -77,7 +77,7 @@
   lastUpdated: 2025-12
 - id: intervention-timing-windows
   numericId: E178
-  type: model
+  type: analysis
   title: Intervention Timing Windows
   description: >-
     This model identifies closing vs stable intervention windows. It recommends shifting 20-30% of resources toward
@@ -91,13 +91,13 @@
       value: Prioritization based on closing vs stable windows
   relatedEntries:
     - id: ai-risk-portfolio-analysis
-      type: model
+      type: analysis
       relationship: related
     - id: worldview-intervention-mapping
-      type: model
+      type: analysis
       relationship: related
     - id: racing-dynamics
-      type: model
+      type: analysis
       relationship: related
   tags:
     - prioritization
@@ -108,7 +108,7 @@
   lastUpdated: 2025-12
 - id: deceptive-alignment-decomposition
   numericId: E94
-  type: model
+  type: analysis
   title: Deceptive Alignment Decomposition Model
   description: >-
     This model decomposes deceptive alignment probability into five necessary conditions. It estimates 40-80%
@@ -142,7 +142,7 @@
   lastUpdated: 2025-12
 - id: carlsmith-six-premises
   numericId: E54
-  type: model
+  type: analysis
   title: Carlsmith's Six-Premise Argument
   maturity: Growing
   description: >-
@@ -160,10 +160,10 @@
       type: risk
       relationship: analyzes
     - id: power-seeking-conditions
-      type: model
+      type: analysis
       relationship: related
     - id: deceptive-alignment-decomposition
-      type: model
+      type: analysis
       relationship: related
   tags:
     - probability
@@ -174,7 +174,7 @@
   lastUpdated: 2026-01
 - id: mesa-optimization-analysis
   numericId: E198
-  type: model
+  type: analysis
   title: Mesa-Optimization Risk Analysis
   description: >-
     This model analyzes when mesa-optimizers might emerge during training. It estimates emergence probability increases
@@ -204,7 +204,7 @@
   lastUpdated: 2025-12
 - id: goal-misgeneralization-probability
   numericId: E152
-  type: model
+  type: analysis
   title: Goal Misgeneralization Probability Model
   description: >-
     This model estimates likelihood of goal misgeneralization across scenarios. Key factors include distribution shift
@@ -234,7 +234,7 @@
   lastUpdated: 2025-12
 - id: reward-hacking-taxonomy
   numericId: E254
-  type: model
+  type: analysis
   title: Reward Hacking Taxonomy and Severity Model
   description: Comprehensive taxonomy of reward hacking failure modes with severity estimates and mitigation analysis
   customFields:
@@ -265,7 +265,7 @@
   lastUpdated: 2025-12
 - id: power-seeking-conditions
   numericId: E227
-  type: model
+  type: analysis
   title: Power-Seeking Emergence Conditions Model
   description: >-
     This model identifies conditions for AI power-seeking behaviors. It estimates 60-90% probability of power-seeking in
@@ -295,7 +295,7 @@
   lastUpdated: 2025-12
 - id: instrumental-convergence-framework
   numericId: E169
-  type: model
+  type: analysis
   title: Instrumental Convergence Framework
   description: >-
     This model analyzes universal subgoals emerging in AI systems. It finds self-preservation converges in 95-99% of
@@ -328,7 +328,7 @@
   lastUpdated: 2025-12
 - id: scheming-likelihood-model
   numericId: E275
-  type: model
+  type: analysis
   title: Scheming Likelihood Assessment
   description: >-
     This model estimates probability of AI systems engaging in strategic deception. Key factors include situational
@@ -361,7 +361,7 @@
   lastUpdated: 2025-12
 - id: corrigibility-failure-pathways
   numericId: E81
-  type: model
+  type: analysis
   title: Corrigibility Failure Pathways
   description: >-
     This model maps pathways from AI training to corrigibility failure. It estimates 60-90% failure probability for
@@ -394,7 +394,7 @@
   lastUpdated: 2025-12
 - id: bioweapons-attack-chain
   numericId: E44
-  type: model
+  type: analysis
   title: Bioweapons Attack Chain Model
   description: >-
     This model decomposes bioweapons attacks into seven sequential steps with independent failure modes. DNA synthesis
@@ -416,7 +416,7 @@
   lastUpdated: 2025-12
 - id: bioweapons-ai-uplift
   numericId: E43
-  type: model
+  type: analysis
   title: AI Uplift Assessment Model
   description: >-
     This model estimates AI's marginal contribution to bioweapons risk over time. It projects uplift increasing from
@@ -439,7 +439,7 @@
   lastUpdated: 2025-12
 - id: bioweapons-timeline
   numericId: E45
-  type: model
+  type: analysis
   title: AI-Bioweapons Timeline Model
   description: >-
     This model projects when AI crosses capability thresholds for bioweapons. It estimates knowledge democratization is
@@ -461,7 +461,7 @@
   lastUpdated: 2025-12
 - id: racing-dynamics-impact
   numericId: E240
-  type: model
+  type: analysis
   title: Racing Dynamics Impact Model
   description: >-
     This model analyzes how competitive pressure creates race-to-the-bottom dynamics. It estimates racing conditions
@@ -486,7 +486,7 @@
   lastUpdated: 2025-12
 - id: multipolar-trap-dynamics
   numericId: E210
-  type: model
+  type: analysis
   title: Multipolar Trap Dynamics Model
   description: >-
     This model analyzes game-theoretic dynamics of AI competition traps. It estimates 20-35% probability of partial
@@ -511,7 +511,7 @@
   lastUpdated: 2025-12
 - id: flash-dynamics-threshold
   numericId: E143
-  type: model
+  type: analysis
   title: Flash Dynamics Threshold Model
   description: >-
     This model identifies thresholds where AI speed exceeds human oversight capacity. Current systems already operate
@@ -536,7 +536,7 @@
   lastUpdated: 2025-12
 - id: expertise-atrophy-progression
   numericId: E135
-  type: model
+  type: analysis
   title: Expertise Atrophy Progression Model
   description: >-
     This model traces five phases from AI augmentation to irreversible skill loss. It finds humans decline to 50-70% of
@@ -561,7 +561,7 @@
   lastUpdated: 2025-12
 - id: economic-disruption-impact
   numericId: E109
-  type: model
+  type: analysis
   title: Economic Disruption Impact Model
   description: >-
     This model analyzes AI labor displacement cascades. It estimates 2-5% workforce displacement over 5 years vs 1-3%
@@ -586,7 +586,7 @@
   lastUpdated: 2025-12
 - id: proliferation-risk-model
   numericId: E234
-  type: model
+  type: analysis
   title: AI Proliferation Risk Model
   description: >-
     This model analyzes AI capability diffusion dynamics. It estimates key capabilities spread within 2-5 years of
@@ -611,7 +611,7 @@
   lastUpdated: 2025-12
 - id: winner-take-all-concentration
   numericId: E375
-  type: model
+  type: analysis
   title: Winner-Take-All Concentration Model
   description: >-
     This model analyzes network effects driving AI capability concentration. It estimates top 3-5 actors will control
@@ -636,7 +636,7 @@
   lastUpdated: 2025-12
 - id: cyberweapons-offense-defense
   numericId: E88
-  type: model
+  type: analysis
   title: Cyber Offense-Defense Balance Model
   description: >-
     This model analyzes whether AI shifts cyber offense-defense balance. It projects 30-70% net improvement in attack
@@ -658,7 +658,7 @@
   lastUpdated: 2025-12
 - id: cyberweapons-attack-automation
   numericId: E87
-  type: model
+  type: analysis
   title: Autonomous Cyber Attack Timeline
   description: >-
     This model projects when AI achieves autonomous cyber attack capability. It estimates Level 3 (AI-directed) attacks
@@ -680,7 +680,7 @@
   lastUpdated: 2025-12
 - id: autonomous-weapons-escalation
   numericId: E36
-  type: model
+  type: analysis
   title: Autonomous Weapons Escalation Model
   description: >-
     This model analyzes AI-accelerated conflict escalation risks. It estimates 1-5% annual probability of catastrophic
@@ -702,7 +702,7 @@
   lastUpdated: 2025-12
 - id: autonomous-weapons-proliferation
   numericId: E37
-  type: model
+  type: analysis
   title: LAWS Proliferation Model
   description: >-
     This model tracks lethal autonomous weapons proliferation. It projects 50% of militarily capable nations will have
@@ -724,7 +724,7 @@
   lastUpdated: 2025-12
 - id: disinformation-detection-race
   numericId: E103
-  type: model
+  type: analysis
   title: Disinformation Detection Arms Race Model
   description: >-
     This model analyzes the arms race between AI generation and detection. It projects detection falling to near-random
@@ -746,7 +746,7 @@
   lastUpdated: 2025-12
 - id: disinformation-electoral-impact
   numericId: E104
-  type: model
+  type: analysis
   title: Electoral Impact Assessment Model
   description: >-
     This model estimates AI disinformation's marginal impact on elections. It finds AI increases reach by 1.5-3x over
@@ -768,7 +768,7 @@
   lastUpdated: 2025-12
 - id: surveillance-authoritarian-stability
   numericId: E293
-  type: model
+  type: analysis
   title: AI Surveillance and Regime Durability Model
   description: >-
     This model analyzes how AI surveillance affects authoritarian regime durability. It estimates AI-enabled regimes may
@@ -790,7 +790,7 @@
   lastUpdated: 2025-12
 - id: surveillance-chilling-effects
   numericId: E294
-  type: model
+  type: analysis
   title: Surveillance Chilling Effects Model
   description: >-
     This model quantifies AI surveillance impact on expression and behavior. It estimates 50-70% reduction in dissent
@@ -812,7 +812,7 @@
   lastUpdated: 2025-12
 - id: deepfakes-authentication-crisis
   numericId: E97
-  type: model
+  type: analysis
   title: Deepfakes Authentication Crisis Model
   description: >-
     This model projects when synthetic media becomes indistinguishable. Detection accuracy declined from 85-95% (2018)
@@ -834,7 +834,7 @@
   lastUpdated: 2025-12
 - id: trust-cascade-model
   numericId: E361
-  type: model
+  type: analysis
   title: Trust Cascade Failure Model
   description: >-
     This model analyzes how institutional trust collapses cascade. It finds trust failures propagate at 1.5-2x rates in
@@ -865,7 +865,7 @@
   lastUpdated: 2025-12
 - id: sycophancy-feedback-loop
   numericId: E296
-  type: model
+  type: analysis
   title: Sycophancy Feedback Loop Model
   description: >-
     This model analyzes how AI validation creates self-reinforcing dynamics. It identifies conditions where user
@@ -896,7 +896,7 @@
   lastUpdated: 2025-12
 - id: authentication-collapse-timeline
   numericId: E28
-  type: model
+  type: analysis
   title: Authentication Collapse Timeline Model
   description: >-
     This model projects when digital verification systems cross critical failure thresholds. It estimates text detection
@@ -928,7 +928,7 @@
   lastUpdated: 2025-12
 - id: expertise-atrophy-cascade
   numericId: E134
-  type: model
+  type: analysis
   title: Expertise Atrophy Cascade Model
   description: >-
     This model analyzes cascading skill degradation from AI dependency. It estimates dependency approximately doubles
@@ -959,7 +959,7 @@
   lastUpdated: 2025-12
 - id: epistemic-collapse-threshold
   numericId: E120
-  type: model
+  type: analysis
   title: Epistemic Collapse Threshold Model
   description: >-
     This model identifies thresholds where society loses ability to establish shared facts. It estimates 35-45%
@@ -993,7 +993,7 @@
   lastUpdated: 2025-12
 - id: reality-fragmentation-network
   numericId: E245
-  type: model
+  type: analysis
   title: Reality Fragmentation Network Model
   description: >-
     This model analyzes how AI personalization creates incompatible reality bubbles. It projects 30-50% divergence in
@@ -1024,7 +1024,7 @@
   lastUpdated: 2025-12
 - id: racing-dynamics-model
   numericId: E241
-  type: model
+  type: analysis
   title: Racing Dynamics Game Theory Model
   description: >-
     Game-theoretic analysis of competitive pressures in AI development, modeling safety-capability tradeoffs as
@@ -1057,7 +1057,7 @@
   lastUpdated: 2025-12
 - id: multipolar-trap-model
   numericId: E211
-  type: model
+  type: analysis
   title: Multipolar Trap Coordination Model
   description: >-
     Systems analysis of collective action failures where rational individual action produces collectively catastrophic
@@ -1088,7 +1088,7 @@
   lastUpdated: 2025-12
 - id: winner-take-all-model
   numericId: E376
-  type: model
+  type: analysis
   title: Winner-Take-All Market Dynamics Model
   description: >-
     Economic analysis of power law distributions and market concentration in AI, examining superstar economics and
@@ -1119,7 +1119,7 @@
   lastUpdated: 2025-12
 - id: concentration-of-power-model
   numericId: E69
-  type: model
+  type: analysis
   title: Concentration of Power Systems Model
   description: >-
     Systems dynamics analysis of power accumulation mechanisms across economic, political, military, and informational
@@ -1153,7 +1153,7 @@
   lastUpdated: 2025-12
 - id: lock-in-model
   numericId: E191
-  type: model
+  type: analysis
   title: Lock-in Irreversibility Model
   description: >-
     Analysis of irreversible transitions and path dependencies in AI development, examining value, political, technical,
@@ -1187,7 +1187,7 @@
   lastUpdated: 2025-12
 - id: economic-disruption-model
   numericId: E110
-  type: model
+  type: analysis
   title: Economic Disruption Structural Model
   description: >-
     Macroeconomic analysis of AI-driven labor market transformations, examining displacement dynamics, inequality, and
@@ -1221,7 +1221,7 @@
   lastUpdated: 2025-12
 - id: proliferation-model
   numericId: E233
-  type: model
+  type: analysis
   title: AI Capability Proliferation Model
   description: >-
     Diffusion dynamics and control challenges for advanced AI capabilities, analyzing spread mechanisms and governance
@@ -1252,7 +1252,7 @@
   lastUpdated: 2025-12
 - id: risk-activation-timeline
   numericId: E255
-  type: model
+  type: analysis
   title: AI Risk Activation Timeline Model
   description: >-
     This model maps when risks become critical based on capability levels. Near-term risks activate at current
@@ -1266,13 +1266,13 @@
       value: Risks activate at different times based on capability thresholds
   relatedEntries:
     - id: capability-threshold-model
-      type: model
+      type: analysis
       relationship: related
     - id: warning-signs-model
-      type: model
+      type: analysis
       relationship: related
     - id: bioweapons-timeline
-      type: model
+      type: analysis
       relationship: related
   tags:
     - timeline
@@ -1282,7 +1282,7 @@
   lastUpdated: 2025-12
 - id: capability-threshold-model
   numericId: E53
-  type: model
+  type: analysis
   title: AI Capability Threshold Model
   description: >-
     This model maps capability levels to risk activation thresholds. It identifies 15-25% benchmark performance as
@@ -1296,13 +1296,13 @@
       value: Many risks have threshold dynamics rather than gradual activation
   relatedEntries:
     - id: risk-activation-timeline
-      type: model
+      type: analysis
       relationship: related
     - id: warning-signs-model
-      type: model
+      type: analysis
       relationship: related
     - id: scheming-likelihood-model
-      type: model
+      type: analysis
       relationship: related
   tags:
     - capability
@@ -1312,7 +1312,7 @@
   lastUpdated: 2025-12
 - id: warning-signs-model
   numericId: E370
-  type: model
+  type: analysis
   title: AI Risk Warning Signs Model
   description: >-
     This model catalogs early indicators for detecting emerging AI risks. It prioritizes indicators by lead time,
@@ -1326,13 +1326,13 @@
       value: Leading indicators enable proactive response before risks materialize
   relatedEntries:
     - id: risk-activation-timeline
-      type: model
+      type: analysis
       relationship: related
     - id: capability-threshold-model
-      type: model
+      type: analysis
       relationship: related
     - id: scheming-likelihood-model
-      type: model
+      type: analysis
       relationship: related
   tags:
     - monitoring
@@ -1342,7 +1342,7 @@
   lastUpdated: 2025-12
 - id: authoritarian-tools-diffusion
   numericId: E31
-  type: model
+  type: analysis
   title: Authoritarian Tools Diffusion Model
   description: >-
     This model analyzes how AI surveillance spreads to authoritarian regimes. It finds semiconductor supply chains are
@@ -1360,7 +1360,7 @@
       type: risk
       relationship: related
     - id: proliferation-risk-model
-      type: model
+      type: analysis
       relationship: related
   tags:
     - diffusion
@@ -1370,7 +1370,7 @@
   lastUpdated: 2025-12
 - id: consensus-manufacturing-dynamics
   numericId: E73
-  type: model
+  type: analysis
   title: Consensus Manufacturing Dynamics Model
   description: >-
     This model analyzes AI-enabled artificial consensus creation. It estimates 15-40% shifts in perceived opinion
@@ -1387,7 +1387,7 @@
       type: risk
       relationship: related
     - id: disinformation-detection-race
-      type: model
+      type: analysis
       relationship: related
   tags:
     - manipulation
@@ -1397,7 +1397,7 @@
   lastUpdated: 2025-12
 - id: irreversibility-threshold
   numericId: E180
-  type: model
+  type: analysis
   title: Irreversibility Threshold Model
   description: >-
     This model analyzes when AI decisions become permanently locked-in. It estimates 25% probability of crossing
@@ -1414,7 +1414,7 @@
       type: risk
       relationship: related
     - id: lock-in-model
-      type: model
+      type: analysis
       relationship: related
   tags:
     - irreversibility
@@ -1424,7 +1424,7 @@
   lastUpdated: 2025-12
 - id: preference-manipulation-drift
   numericId: E231
-  type: model
+  type: analysis
   title: Preference Manipulation Drift Model
   description: >-
     This model analyzes gradual AI-driven preference shifts. It estimates 5-15% probability of significant harm from
@@ -1441,7 +1441,7 @@
       type: risk
       relationship: related
     - id: sycophancy-feedback-loop
-      type: model
+      type: analysis
       relationship: related
   tags:
     - autonomy
@@ -1451,7 +1451,7 @@
   lastUpdated: 2025-12
 - id: trust-erosion-dynamics
   numericId: E363
-  type: model
+  type: analysis
   title: Trust Erosion Dynamics Model
   description: >-
     This model analyzes how AI systems erode institutional trust. It identifies authentication failure and expertise
@@ -1468,7 +1468,7 @@
       type: risk
       relationship: related
     - id: trust-cascade-model
-      type: model
+      type: analysis
       relationship: related
   tags:
     - trust
@@ -1478,7 +1478,7 @@
   lastUpdated: 2025-12
 - id: automation-bias-cascade
   numericId: E33
-  type: model
+  type: analysis
   title: Automation Bias Cascade Model
   description: >-
     This model analyzes how AI over-reliance creates cascading failures. It estimates skill atrophy rates of 10-25%/year
@@ -1505,7 +1505,7 @@
   lastUpdated: 2025-12
 - id: cyber-psychosis-cascade
   numericId: E84
-  type: model
+  type: analysis
   title: Cyber Psychosis Cascade Model
   description: >-
     This model analyzes AI-generated content triggering psychological harm cascades. It identifies 1-3% of population as
@@ -1531,7 +1531,7 @@
   lastUpdated: 2025-12
 - id: fraud-sophistication-curve
   numericId: E146
-  type: model
+  type: analysis
   title: Fraud Sophistication Curve Model
   description: >-
     This model analyzes AI-enabled fraud evolution. It finds AI-personalized attacks achieve 20-30% higher success
@@ -1557,7 +1557,7 @@
   lastUpdated: 2025-12
 - id: intervention-effectiveness-matrix
   numericId: E177
-  type: model
+  type: analysis
   title: AI Safety Intervention Effectiveness Matrix
   description: Mapping AI safety interventions to the risks they mitigate, with effectiveness estimates and gap analysis
   customFields:
@@ -1574,7 +1574,7 @@
   lastUpdated: 2025-12
 - id: lab-incentives-model
   numericId: E185
-  type: model
+  type: analysis
   title: AI Lab Incentives Model
   description: >-
     This model analyzes competitive and reputational pressures on lab safety decisions. It identifies conditions where
@@ -1600,7 +1600,7 @@
   lastUpdated: 2025-12
 - id: risk-interaction-matrix
   numericId: E257
-  type: model
+  type: analysis
   title: AI Risk Interaction Matrix
   description: >-
     This model analyzes how risks amplify, mitigate, or transform each other. It identifies 15-25% of risk pairs as
@@ -1619,7 +1619,7 @@
   lastUpdated: 2025-12
 - id: safety-research-value
   numericId: E267
-  type: model
+  type: analysis
   title: AI Safety Research Value Model
   description: >-
     This model estimates marginal returns on safety research investment. It finds current funding levels significantly
@@ -1638,7 +1638,7 @@
   lastUpdated: 2025-12
 - id: capabilities-to-safety-pipeline
   numericId: E51
-  type: model
+  type: analysis
   title: Capabilities-to-Safety Pipeline Model
   description: >-
     This model analyzes researcher transitions from capabilities to safety work. It finds only 10-15% of aware
@@ -1652,7 +1652,7 @@
       value: Capabilities researchers are the primary talent pool for safety work
   relatedEntries:
     - id: safety-researcher-gap
-      type: model
+      type: analysis
       relationship: related
   tags:
     - talent
@@ -1661,7 +1661,7 @@
   lastUpdated: 2025-12
 - id: compounding-risks-analysis
   numericId: E63
-  type: model
+  type: analysis
   title: AI Compounding Risks Analysis Model
   description: >-
     This model analyzes how risks compound beyond additive effects. Key combinations include racing+concentration
@@ -1675,10 +1675,10 @@
       value: Combined risks often exceed the sum of individual risks due to non-linear interactions
   relatedEntries:
     - id: risk-interaction-matrix
-      type: model
+      type: analysis
       relationship: related
     - id: risk-cascade-pathways
-      type: model
+      type: analysis
       relationship: related
   tags:
     - risk-interactions
@@ -1687,7 +1687,7 @@
   lastUpdated: 2025-12
 - id: defense-in-depth-model
   numericId: E99
-  type: model
+  type: analysis
   title: AI Safety Defense in Depth Model
   description: >-
     This model analyzes how layered safety measures combine. Individual layers provide 20-60% coverage; independence
@@ -1706,7 +1706,7 @@
   lastUpdated: 2025-12
 - id: institutional-adaptation-speed
   numericId: E165
-  type: model
+  type: analysis
   title: Institutional AI Adaptation Speed Model
   description: >-
     This model analyzes institutional adaptation rates to AI. It finds institutions change at 10-30% of needed rate per
@@ -1729,7 +1729,7 @@
   lastUpdated: 2025-12
 - id: international-coordination-game
   numericId: E172
-  type: model
+  type: analysis
   title: International AI Coordination Game Model
   description: >-
     This model analyzes game-theoretic dynamics of international AI governance. It identifies key equilibria between
@@ -1755,7 +1755,7 @@
   lastUpdated: 2025-12
 - id: media-policy-feedback-loop
   numericId: E196
-  type: model
+  type: analysis
   title: AI Media-Policy Feedback Loop Model
   description: >-
     This model analyzes cycles between media coverage, public opinion, and AI policy. It finds media framing
@@ -1774,7 +1774,7 @@
   lastUpdated: 2025-12
 - id: post-incident-recovery
   numericId: E225
-  type: model
+  type: analysis
   title: Post-AI-Incident Recovery Model
   description: >-
     This model analyzes recovery pathways from AI incidents. It finds clear attribution enables 3-5x faster recovery,
@@ -1793,7 +1793,7 @@
   lastUpdated: 2025-12
 - id: public-opinion-evolution
   numericId: E237
-  type: model
+  type: analysis
   title: Public Opinion on AI Evolution Model
   description: >-
     This model analyzes how public AI risk perception evolves. It finds major incidents shift opinion by 10-25
@@ -1807,7 +1807,7 @@
       value: Public opinion on AI risk follows event-driven cycles with gradual baseline shifts
   relatedEntries:
     - id: media-policy-feedback-loop
-      type: model
+      type: analysis
       relationship: related
   tags:
     - public-opinion
@@ -1816,7 +1816,7 @@
   lastUpdated: 2025-12
 - id: risk-cascade-pathways
   numericId: E256
-  type: model
+  type: analysis
   title: AI Risk Cascade Pathways Model
   description: >-
     This model maps common pathways where one risk triggers others. Key cascades include
@@ -1830,10 +1830,10 @@
       value: Risks propagate through system interdependencies, often in non-obvious paths
   relatedEntries:
     - id: compounding-risks-analysis
-      type: model
+      type: analysis
       relationship: related
     - id: risk-interaction-network
-      type: model
+      type: analysis
       relationship: related
   tags:
     - cascades
@@ -1842,7 +1842,7 @@
   lastUpdated: 2025-12
 - id: risk-interaction-network
   numericId: E258
-  type: model
+  type: analysis
   title: AI Risk Interaction Network Model
   description: >-
     This model maps how risks enable and reinforce each other. It identifies racing dynamics and concentration of power
@@ -1856,10 +1856,10 @@
       value: Risk network structure reveals critical nodes and amplification pathways
   relatedEntries:
     - id: risk-cascade-pathways
-      type: model
+      type: analysis
       relationship: related
     - id: compounding-risks-analysis
-      type: model
+      type: analysis
       relationship: related
   tags:
     - networks
@@ -1868,7 +1868,7 @@
   lastUpdated: 2025-12
 - id: safety-capability-tradeoff
   numericId: E262
-  type: model
+  type: analysis
   title: Safety-Capability Tradeoff Model
   description: >-
     This model analyzes when safety measures conflict with capabilities. It finds most safety interventions impose 5-15%
@@ -1891,7 +1891,7 @@
   lastUpdated: 2025-12
 - id: ai-acceleration-tradeoff
   numericId: E687
-  type: model
+  type: analysis
   title: AI Acceleration Tradeoff Model
   description: >-
     A quantitative framework for evaluating the costs and benefits of speeding up or slowing down AI development.
@@ -1906,13 +1906,13 @@
       value: The value of acceleration vs. deceleration depends critically on current safety readiness level
   relatedEntries:
     - id: safety-capability-tradeoff
-      type: model
+      type: analysis
       relationship: related
     - id: capability-alignment-race
-      type: model
+      type: analysis
       relationship: related
     - id: intervention-timing-windows
-      type: model
+      type: analysis
       relationship: related
     - id: racing-dynamics
       type: risk
@@ -1925,7 +1925,7 @@
   lastUpdated: 2026-02
 - id: safety-research-allocation
   numericId: E266
-  type: model
+  type: analysis
   title: AI Safety Research Allocation Model
   description: >-
     This model analyzes safety research resource distribution. It identifies neglected areas including multi-agent
@@ -1939,10 +1939,10 @@
       value: Optimal allocation depends on problem tractability, neglectedness, and time-sensitivity
   relatedEntries:
     - id: safety-research-value
-      type: model
+      type: analysis
       relationship: related
     - id: intervention-effectiveness-matrix
-      type: model
+      type: analysis
       relationship: related
   tags:
     - resource-allocation
@@ -1951,7 +1951,7 @@
   lastUpdated: 2025-12
 - id: safety-researcher-gap
   numericId: E268
-  type: model
+  type: analysis
   title: AI Safety Researcher Gap Model
   description: >-
     This model analyzes mismatch between safety researcher supply and demand. It estimates 3-10x gap between needed
@@ -1965,7 +1965,7 @@
       value: Safety researcher demand is growing faster than supply, creating widening gaps
   relatedEntries:
     - id: capabilities-to-safety-pipeline
-      type: model
+      type: analysis
       relationship: related
   tags:
     - talent
@@ -1974,7 +1974,7 @@
   lastUpdated: 2025-12
 - id: whistleblower-dynamics
   numericId: E371
-  type: model
+  type: analysis
   title: AI Lab Whistleblower Dynamics Model
   description: >-
     This model analyzes information flow from AI insiders to the public. It estimates significant barriers reduce
@@ -1988,7 +1988,7 @@
       value: Current incentive structures strongly discourage whistleblowing, creating information asymmetries
   relatedEntries:
     - id: lab-incentives-model
-      type: model
+      type: analysis
       relationship: related
   tags:
     - whistleblowing
@@ -1997,7 +1997,7 @@
   lastUpdated: 2025-12
 - id: parameter-interaction-network
   numericId: E219
-  type: model
+  type: analysis
   title: AI Risk Parameter Interaction Network Model
   description: >-
     This model maps causal relationships between 22 key AI safety parameters. It identifies 7 feedback loops and 4
@@ -2014,7 +2014,7 @@
         hubs
   relatedEntries:
     - id: risk-interaction-network
-      type: model
+      type: analysis
       relationship: related
   tags:
     - networks
@@ -2024,7 +2024,7 @@
   lastUpdated: 2025-12
 - id: safety-culture-equilibrium
   numericId: E263
-  type: model
+  type: analysis
   title: AI Safety Culture Equilibrium Model
   description: >-
     This model analyzes stable states for AI lab safety culture under competitive pressure. It identifies three
@@ -2040,10 +2040,10 @@
         forcing event
   relatedEntries:
     - id: lab-incentives-model
-      type: model
+      type: analysis
       relationship: related
     - id: racing-dynamics-model
-      type: model
+      type: analysis
       relationship: related
   tags:
     - equilibrium
@@ -2053,7 +2053,7 @@
   lastUpdated: 2025-12
 - id: regulatory-capacity-threshold
   numericId: E250
-  type: model
+  type: analysis
   title: AI Regulatory Capacity Threshold Model
   description: >-
     This model estimates minimum regulatory capacity for credible AI oversight. It finds current US/UK capacity at
@@ -2067,7 +2067,7 @@
       value: Gap between regulatory capacity and industry capability is widening; crisis-level investment needed
   relatedEntries:
     - id: institutional-adaptation-speed
-      type: model
+      type: analysis
       relationship: related
   tags:
     - governance
@@ -2077,7 +2077,7 @@
   lastUpdated: 2025-12
 - id: alignment-robustness-trajectory
   numericId: E21
-  type: model
+  type: analysis
   title: Alignment Robustness Trajectory Model
   description: >-
     This model analyzes how alignment robustness changes with capability scaling. It estimates current techniques
@@ -2091,10 +2091,10 @@
       value: Critical zone at 10-30x current capability where techniques become insufficient; alignment valley problem
   relatedEntries:
     - id: deceptive-alignment-decomposition
-      type: model
+      type: analysis
       relationship: related
     - id: safety-capability-tradeoff
-      type: model
+      type: analysis
       relationship: related
   tags:
     - alignment
@@ -2105,7 +2105,7 @@
 
 - id: projecting-compute-spending
   numericId: E680
-  type: model
+  type: analysis
   title: Projecting Compute Spending
   description: >-
     Analysis of hyperscaler AI infrastructure capital expenditure, with $700B+ planned for 2026 across six major
@@ -2136,7 +2136,7 @@
 # === Auto-generated stubs for pages missing entities ===
 - id: longtermwiki-impact
   numericId: E507
-  type: model
+  type: analysis
   title: LongtermWiki Impact Model
   description: >-
     Fermi estimation of LongtermWiki value grounded in base rates. GiveWell
@@ -2150,7 +2150,7 @@
   lastUpdated: 2026-02
 - id: societal-response
   numericId: E508
-  type: model
+  type: analysis
   title: "Societal Response & Adaptation Model"
   description: >-
     Quantitative model finding current societal response capacity at 20-25%
@@ -2164,7 +2164,7 @@
   lastUpdated: 2026-02
 - id: pre-tai-capital-deployment
   numericId: E706
-  type: model
+  type: analysis
   title: "Pre-TAI Capital Deployment: $100B-$300B+ Spending Analysis"
   description: >-
     Analytical model examining how frontier AI labs could deploy $100-300B+
@@ -2173,19 +2173,19 @@
     scaling. Compute infrastructure absorbs 50-65%, safety gets 1-5%.
   relatedEntries:
     - id: ai-megaproject-infrastructure
-      type: model
+      type: analysis
     - id: safety-spending-at-scale
-      type: model
+      type: analysis
     - id: frontier-lab-cost-structure
-      type: model
+      type: analysis
     - id: ai-talent-market-dynamics
-      type: model
+      type: analysis
     - id: planning-for-frontier-lab-scaling
-      type: model
+      type: analysis
     - id: safety-research-value
-      type: model
+      type: analysis
     - id: winner-take-all-concentration
-      type: model
+      type: analysis
   tags:
     - capital-deployment
     - ai-spending
@@ -2199,7 +2199,7 @@
   lastUpdated: 2026-02
 - id: ai-megaproject-infrastructure
   numericId: E707
-  type: model
+  type: analysis
   title: "AI Megaproject Infrastructure"
   description: >-
     Analysis of the unprecedented data center and infrastructure buildout
@@ -2208,11 +2208,11 @@
     facilities. Individual campuses cost $10-50B and require 100MW-1GW+ power.
   relatedEntries:
     - id: pre-tai-capital-deployment
-      type: model
+      type: analysis
     - id: compute-governance
       type: policy
     - id: winner-take-all-concentration
-      type: model
+      type: analysis
   tags:
     - data-centers
     - infrastructure
@@ -2225,7 +2225,7 @@
   lastUpdated: 2026-02
 - id: safety-spending-at-scale
   numericId: E708
-  type: model
+  type: analysis
   title: "Safety Spending at Scale"
   description: >-
     Analysis of what $1-50B+ annual AI safety budgets could accomplish,
@@ -2235,11 +2235,11 @@
     is talent pipeline (~1,000 qualified safety researchers globally).
   relatedEntries:
     - id: pre-tai-capital-deployment
-      type: model
+      type: analysis
     - id: safety-research-value
-      type: model
+      type: analysis
     - id: ai-talent-market-dynamics
-      type: model
+      type: analysis
     - id: field-building-analysis
       type: approach
   tags:
@@ -2254,7 +2254,7 @@
   lastUpdated: 2026-02
 - id: frontier-lab-cost-structure
   numericId: E703
-  type: model
+  type: analysis
   title: "Frontier Lab Cost Structure"
   description: >-
     Financial anatomy of frontier AI labs including revenue breakdown, cost
@@ -2263,13 +2263,13 @@
     on $9B ARR. Safety receives 1-8% depending on the lab.
   relatedEntries:
     - id: pre-tai-capital-deployment
-      type: model
+      type: analysis
     - id: anthropic-valuation
       type: analysis
     - id: openai-foundation
       type: organization
     - id: racing-dynamics-impact
-      type: model
+      type: analysis
   tags:
     - lab-finances
     - cost-structure
@@ -2281,7 +2281,7 @@
   lastUpdated: 2026-02
 - id: ai-talent-market-dynamics
   numericId: E704
-  type: model
+  type: analysis
   title: "AI Talent Market Dynamics"
   description: >-
     Analysis of the AI researcher talent market as the binding constraint on
@@ -2290,11 +2290,11 @@
     Safety workforce (~2,000-3,500) is an order of magnitude smaller.
   relatedEntries:
     - id: pre-tai-capital-deployment
-      type: model
+      type: analysis
     - id: safety-spending-at-scale
-      type: model
+      type: analysis
     - id: capabilities-to-safety-pipeline
-      type: model
+      type: analysis
     - id: field-building-analysis
       type: approach
   tags:
@@ -2309,7 +2309,7 @@
   lastUpdated: 2026-02
 - id: planning-for-frontier-lab-scaling
   numericId: E705
-  type: model
+  type: analysis
   title: "Planning for Frontier Lab Scaling"
   description: >-
     Strategic framework for how governments, philanthropies, academia, startups,
@@ -2318,9 +2318,9 @@
     being established and pre-IPO accountability mechanisms are still available.
   relatedEntries:
     - id: pre-tai-capital-deployment
-      type: model
+      type: analysis
     - id: safety-spending-at-scale
-      type: model
+      type: analysis
     - id: openai-foundation
       type: organization
     - id: anthropic-investors
@@ -2338,7 +2338,7 @@
   lastUpdated: 2026-02
 - id: longtermist-value-comparisons
   numericId: E887
-  type: model
+  type: analysis
   title: Relative Longtermist Value Comparisons
   description: >-
     A quantitative framework for comparing the expected value of different longtermist
@@ -2358,7 +2358,7 @@
   lastUpdated: 2026-02
 - id: ai-compute-scaling-metrics
   numericId: E907
-  type: model
+  type: analysis
   title: AI Compute Scaling Metrics
   description: >-
     Empirical tracking of measurable indicators of AI compute scaling: training
@@ -2369,7 +2369,7 @@
     - id: scaling-laws
       type: concept
     - id: projecting-compute-spending
-      type: model
+      type: analysis
     - id: scaling-debate
       type: concept
     - id: compute-concentration
