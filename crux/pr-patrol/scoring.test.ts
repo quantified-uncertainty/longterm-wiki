@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { computeScore, computeBudget, rankPrs } from './scoring.ts';
+import { computeScore, computeBudget, rankPrs, APPROVED_BONUS } from './scoring.ts';
 import type { DetectedPr, PrIssueType } from './types.ts';
 
 function makeDetectedPr(overrides: Partial<DetectedPr> = {}): DetectedPr {
@@ -10,6 +10,7 @@ function makeDetectedPr(overrides: Partial<DetectedPr> = {}): DetectedPr {
     createdAt: new Date().toISOString(),
     issues: [],
     botComments: [],
+    labels: [],
     ...overrides,
   };
 }
@@ -45,6 +46,12 @@ describe('computeScore', () => {
     const future = new Date(Date.now() + 3600 * 1000).toISOString();
     const pr = makeDetectedPr({ createdAt: future });
     expect(computeScore(pr)).toBe(0);
+  });
+
+  it('adds approved bonus for stage:approved PRs', () => {
+    const pr = makeDetectedPr({ issues: ['conflict'], labels: ['stage:approved'] });
+    const prNoLabel = makeDetectedPr({ issues: ['conflict'] });
+    expect(computeScore(pr) - computeScore(prNoLabel)).toBe(APPROVED_BONUS);
   });
 
   it('scores each issue type', () => {
@@ -130,6 +137,15 @@ describe('rankPrs', () => {
     expect(ranked[0].number).toBe(2); // conflict=100
     expect(ranked[1].number).toBe(3); // ci-failure=80
     expect(ranked[2].number).toBe(1); // missing-testplan=20
+  });
+
+  it('prioritizes approved PRs with simple issues over unapproved PRs with complex issues', () => {
+    const prs = [
+      makeDetectedPr({ number: 1, issues: ['ci-failure', 'bot-review-major'] }), // 135 + age
+      makeDetectedPr({ number: 2, issues: ['conflict'], labels: ['stage:approved'] }), // 100 + 100 + age
+    ];
+    const ranked = rankPrs(prs);
+    expect(ranked[0].number).toBe(2); // approved conflict beats unapproved ci-failure+bot-review
   });
 
   it('returns empty array for empty input', () => {

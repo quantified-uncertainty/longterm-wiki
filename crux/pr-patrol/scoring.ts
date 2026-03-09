@@ -12,6 +12,7 @@ import type { PrIssueType } from './types.ts';
 
 export {
   ISSUE_SCORES,
+  APPROVED_BONUS,
   computeScore,
   rankPrs,
 } from '../lib/pr-analysis/index.ts';

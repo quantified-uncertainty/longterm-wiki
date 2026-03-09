@@ -251,6 +251,7 @@ export async function runBranchAgent(config: BranchAgentConfig): Promise<void> {
       createdAt: pr.createdAt,
       issues,
       botComments,
+      labels: pr.labels.nodes.map((l: { name: string }) => l.name),
     };
     const scoredPr: ScoredPr = {
       ...detectedPr,

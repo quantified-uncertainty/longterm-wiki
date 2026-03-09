@@ -79,6 +79,7 @@ export function detectAllPrIssuesFromNodes(
         createdAt: pr.createdAt,
         issues,
         botComments,
+        labels: pr.labels.nodes.map((l) => l.name),
       };
     })
     .filter((pr) => pr.issues.length > 0);

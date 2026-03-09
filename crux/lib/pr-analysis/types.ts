@@ -34,6 +34,7 @@ export interface DetectedPr {
   createdAt: string;
   issues: PrIssueType[];
   botComments: BotComment[];
+  labels: string[];
 }
 
 export interface ScoredPr extends DetectedPr {
