@@ -131,7 +131,7 @@ ${kbContext ? `
 The following facts are stored in the Knowledge Base for this entity. They are the canonical source of truth for structured data. When writing prose:
 - **DO NOT contradict these values** — they are sourced and verified
 - **Prefer \`<KBF>\`** over hardcoded values for KB properties — values stay in sync as facts update
-- **Prefer \`<F>\`** for inline citations with hover tooltips (copy the fact ID from the table below)
+- Use \`<KBF entity="entity-slug" property="property-id" />\` for inline facts with hover tooltips (use the entity slug and property ID from the table below)
 
 \`\`\`
 ${kbContext}
