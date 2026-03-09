@@ -112,7 +112,7 @@ Make targeted improvements based on the analysis and directions. Follow these gu
 - EntityLinks use **numeric IDs**: \`<EntityLink id="E22">Anthropic</EntityLink>\`
 - Escape dollar signs: \\$100M not $100M
 - Import from: '${importPath}'
-- Use \`<F e="entity" f="hashId">display</F>\` for canonical fact values (hover tooltip shows source/date). Fact IDs are 8-char hex hashes — always copy from the Fact Lookup Table below.
+- Use \`<KBF entity="entity" property="property" />\` for canonical KB fact values (auto-renders with hover tooltip showing source/date)
 - Use \`<Calc expr="{entity.hashId} / {entity.hashId}" precision={1} suffix="x" />\` for derived values (ratios, multiples, percentages)
   - Supports: +, -, *, /, ^, (). Formats: "currency", "percent", "number", or auto.
   - Prefer \`<Calc>\` over hardcoded derived numbers — it stays in sync when source facts update
@@ -160,9 +160,9 @@ ${gapAnalysisContext}
 ` : ''}
 ### Quality Standards
 - Add citations from the research sources
-- Replace vague claims with specific numbers; use \`<F>\` for canonical facts and \`<Calc>\` for derived values
+- Replace vague claims with specific numbers; use \`<KBF>\` for canonical KB facts and \`<Calc>\` for derived values
 - When a page has hardcoded ratios/multiples (e.g. "≈27x revenue"), replace with \`<Calc expr="{a.valuation} / {a.revenue}" precision={0} suffix="x" />\`
-- **F component — mandatory, not optional**: Review ALL prose numbers against the Fact Lookup Table. If a number matches a canonical fact, ALWAYS wrap it with \`<F>\`. Do not selectively apply F to some numbers but leave others bare. Consistency is required.
+- **KB facts — mandatory, not optional**: Review ALL prose numbers against the KB data. If a number matches a canonical KB fact, ALWAYS wrap it with \`<KBF entity="entity" property="property" />\`. Do not selectively apply KBF to some numbers but leave others bare. Consistency is required.
 - Add EntityLinks for related concepts (using E## IDs from the lookup table above)
 - Ensure tables have source links
 - **NEVER use vague citations** like "Interview", "Earnings call", "Conference talk", "Reports", "Various"

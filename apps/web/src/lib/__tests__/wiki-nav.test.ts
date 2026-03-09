@@ -169,12 +169,12 @@ describe("getInternalNav (mocked data)", () => {
     setMockPages([]);
   });
 
-  it("returns hardcoded sections: Overview, Dashboards, Claims & Citations, Style Guides, Research, Architecture & Reference", () => {
+  it("returns hardcoded sections: Overview, Dashboards, Citations, Style Guides, Research, Architecture & Reference", () => {
     const sections = getInternalNav();
     const titles = sections.map(s => s.title);
     expect(titles).toContain("Overview");
     expect(titles).toContain("Dashboards");
-    expect(titles).toContain("Claims & Citations");
+    expect(titles).toContain("Citations");
     expect(titles).toContain("Style Guides");
     expect(titles).toContain("Research");
     expect(titles).toContain("Architecture & Reference");
@@ -202,42 +202,35 @@ describe("getInternalNav (mocked data)", () => {
     expect(updatesItem!.href).toBe("/wiki/E900");
   });
 
-  it("fact dashboard is in Claims & Citations section", () => {
+  it("fact dashboard is in Citations section", () => {
     const sections = getInternalNav();
-    const claims = sections.find(s => s.title === "Claims & Citations")!;
+    const citations = sections.find(s => s.title === "Citations")!;
 
-    const factItem = claims.items.find(i => i.label === "Fact Dashboard");
+    const factItem = citations.items.find(i => i.label === "Fact Dashboard");
     expect(factItem).toBeDefined();
     expect(factItem!.href).toBe("/wiki/E898");
   });
 
-  it("all dashboard items use /wiki/E<id> hrefs or link to public pages", () => {
+  it("all dashboard items use /wiki/E<id> hrefs", () => {
     const sections = getInternalNav();
     const dashboards = sections.find(s => s.title === "Dashboards")!;
 
-    // Items that link to public pages instead of internal MDX dashboards
-    const publicPageLabels = new Set(["Statements", "Properties"]);
-
     for (const item of dashboards.items) {
       if (item.label === "Internal Home") continue; // Overview link
-      if (publicPageLabels.has(item.label)) {
-        expect(item.href).toMatch(/^\/statements/);
-      } else {
-        expect(item.href).toMatch(/^\/wiki\//);
-      }
+      expect(item.href).toMatch(/^\/wiki\//);
     }
   });
 
-  it("all Claims & Citations monitoring items use /wiki/ hrefs (fully migrated)", () => {
+  it("all Citations items use /wiki/ hrefs (fully migrated)", () => {
     const sections = getInternalNav();
-    const claims = sections.find(s => s.title === "Claims & Citations")!;
+    const citations = sections.find(s => s.title === "Citations")!;
 
     const monitoringLabels = [
-      "Claims Ingestion", "Citation Accuracy", "Citation Content",
+      "Citation Accuracy", "Citation Content",
       "Hallucination Risk", "Hallucination Evals", "Fact Dashboard",
     ];
     for (const label of monitoringLabels) {
-      const item = claims.items.find(i => i.label === label);
+      const item = citations.items.find(i => i.label === label);
       expect(item).toBeDefined();
       expect(item!.href).toMatch(/^\/wiki\//);
     }
@@ -360,7 +353,6 @@ describe("internal sidebar completeness (real data)", () => {
       const KNOWN_NO_SUBCATEGORY = new Set([
         "automation-tools.mdx",
         "content-database.mdx",
-        "claims-system-development-roadmap.mdx",
       ]);
 
       const unexpected = missing.filter(f => !KNOWN_NO_SUBCATEGORY.has(f));
@@ -417,7 +409,7 @@ describe("internal sidebar completeness (real data)", () => {
 
   // -----------------------------------------------------------------------
   // Test: Every React dashboard directory has a corresponding entry
-  // in the hardcoded sidebar sections (Dashboards, Claims & Citations, etc.).
+  // in the hardcoded sidebar sections (Dashboards, Citations, etc.).
   // -----------------------------------------------------------------------
 
   it("every React dashboard page directory is in the sidebar or migrated to MDX", () => {

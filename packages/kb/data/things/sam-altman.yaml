@@ -64,37 +64,40 @@ facts:
     property: net-worth
     value: 2.8e9
     asOf: "2024"
-    notes: "Investment portfolio value per WSJ investigation. sourceResource: 69a7aca55efbfa51"
+    sourceResource: 69a7aca55efbfa51
+    notes: "Investment portfolio value per WSJ investigation."
 
   - id: f_sa_openai_salary
     property: description
     value: "OpenAI annual salary (2024): $76,001"
-    notes: "Per OpenAI tax filing. sourceResource: 29e5d58fe306259d"
+    sourceResource: 29e5d58fe306259d
+    notes: "Per OpenAI tax filing."
 
   - id: f_sa_loopt_sale
     property: description
     value: "Loopt sold to Green Dot Corporation for $43.4M"
-    notes: "sourceResource: 9eb603bcd6ee754a"
+    sourceResource: 9eb603bcd6ee754a
 
   - id: f_sa_stripe_investment
     property: description
     value: "Early Stripe investment (2009): $15,000 for 2%"
-    notes: "Per WSJ investigation. sourceResource: 792c07f18a99af7c"
+    sourceResource: 792c07f18a99af7c
+    notes: "Per WSJ investigation."
 
   - id: f_sa_yc_companies
     property: description
     value: "Y Combinator companies funded during tenure: 1,900 (through 2019)"
-    notes: "sourceResource: b795385697c55df2"
+    sourceResource: b795385697c55df2
 
   - id: f_sa_board_crisis
     property: description
     value: "Board crisis (Nov 2023): 738 of 770 employees (95%) signed letter threatening to quit"
-    notes: "sourceResource: ddced8916d043aa2"
+    sourceResource: ddced8916d043aa2
 
   - id: f_sa_helion_investment
     property: description
     value: "Personal investment in Helion Energy: $375M"
-    notes: "sourceResource: 003e2cbd0f507952"
+    sourceResource: 003e2cbd0f507952
 
 items:
   career-history:

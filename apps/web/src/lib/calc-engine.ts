@@ -7,11 +7,16 @@
  * Recursive-descent parser for runtime use in the <Calc> MDX component.
  */
 
-import type { Fact } from "@/data";
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
+
+/** Minimal fact shape needed by the calc engine. */
+export interface CalcFact {
+  numeric?: number;
+  value?: string;
+  asOf?: string;
+}
 
 export interface CalcResult {
   value: number;
@@ -169,13 +174,13 @@ function evaluate(tokens: Token[]): number {
 // Fact resolution
 // ---------------------------------------------------------------------------
 
-type FactLookup = (entity: string, factId: string) => Fact | undefined;
+export type FactLookup = (entity: string, factId: string) => CalcFact | undefined;
 
 interface ResolvedRef {
   ref: string;
   entity: string;
   factId: string;
-  fact: Fact | undefined;
+  fact: CalcFact | undefined;
   numeric: number;
 }
 

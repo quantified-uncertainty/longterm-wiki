@@ -68,13 +68,10 @@ describe('wiki-server-client barrel exports', () => {
     expect(typeof client.getAutoUpdateNewsDashboard).toBe('function');
   });
 
-  it('exports risk, summary, claims, links, resource, entity, and fact functions', () => {
+  it('exports risk, summary, links, resource, entity, and fact functions', () => {
     expect(typeof client.recordRiskSnapshots).toBe('function');
     expect(typeof client.upsertSummary).toBe('function');
     expect(typeof client.upsertSummaryBatch).toBe('function');
-    expect(typeof client.insertClaim).toBe('function');
-    expect(typeof client.insertClaimBatch).toBe('function');
-    expect(typeof client.clearClaimsForEntity).toBe('function');
     expect(typeof client.syncPageLinks).toBe('function');
     expect(typeof client.upsertResource).toBe('function');
     expect(typeof client.syncEntities).toBe('function');

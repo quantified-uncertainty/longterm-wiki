@@ -40,7 +40,6 @@ interface DbCountsRow {
 
 interface IntegritySummaryRow {
   dangling_facts: number;
-  dangling_claims: number;
   dangling_summaries: number;
   dangling_citations: number;
   dangling_edit_logs: number;
@@ -360,7 +359,8 @@ const monitoringApp = new Hono()
     const db = getDrizzleDb();
     const rawDb = getDb();
 
-    // Run all queries in parallel
+    // Run all queries in parallel — each with .catch() so a single failure
+    // doesn't take down the entire /extended endpoint (see #1909).
     const [
       ciResult,
       gkStatsResult,
@@ -375,16 +375,28 @@ const monitoringApp = new Hono()
       }),
 
       // 2. Groundskeeper task stats (last 24h)
-      fetchGroundskeeperStats(db),
+      fetchGroundskeeperStats(db).catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch groundskeeper stats");
+        return [];
+      }),
 
       // 3. Data integrity summary (dangling refs)
-      fetchIntegritySummary(rawDb),
+      fetchIntegritySummary(rawDb).catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch integrity summary");
+        return { totalDanglingRefs: 0, status: "error" as const, breakdown: { facts: 0, claims: 0, summaries: 0, citations: 0, editLogs: 0 } };
+      }),
 
       // 4. Auto-update system stats
-      fetchAutoUpdateStats(db),
+      fetchAutoUpdateStats(db).catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch auto-update stats");
+        return { totalRuns: 0, recentRuns: [] as { id: number; date: string; trigger: string; pagesUpdated: number; pagesFailed: number; budgetSpent: number; completed: boolean }[] };
+      }),
 
       // 5. Recent agent sessions
-      fetchRecentSessions(rawDb),
+      fetchRecentSessions(rawDb).catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch recent sessions");
+        return [];
+      }),
     ]);
 
     return c.json({
@@ -506,7 +518,6 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
   const result = await rawDb`
     SELECT
       (SELECT count(*) FROM facts WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_facts,
-      (SELECT count(*) FROM claims WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_claims,
       (SELECT count(*) FROM summaries WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_summaries,
       -- Only flag truly orphaned records where BOTH the legacy text page_id and the new integer
       -- page_id_int are NULL. Records with page_id_old populated but page_id_int NULL are
@@ -519,7 +530,6 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
 
   const totalDangling =
     row.dangling_facts +
-    row.dangling_claims +
     row.dangling_summaries +
     row.dangling_citations +
     row.dangling_edit_logs;
@@ -529,7 +539,6 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
     status: totalDangling === 0 ? "clean" : "issues_found",
     breakdown: {
       facts: row.dangling_facts,
-      claims: row.dangling_claims,
       summaries: row.dangling_summaries,
       citations: row.dangling_citations,
       editLogs: row.dangling_edit_logs,

@@ -387,7 +387,7 @@ ${c.bold}Auto-Merge (via Merge Queue)${c.reset}
   ${c.green}\u2713${c.reset} No merge conflicts
   ${c.green}\u2713${c.reset} No unresolved review threads
   ${c.green}\u2713${c.reset} No unchecked checkboxes in PR body
-  ${c.green}\u2713${c.reset} No \`${LABELS.AGENT_WORKING}\` label
+  ${c.green}\u2713${c.reset} No working labels (\`${LABELS.AGENT_WORKING}\` or \`${LABELS.PR_PATROL_WORKING}\`)
   ${c.green}\u2713${c.reset} No \`${LABELS.STAGE_MERGING}\` label (not already in queue)
   ${c.green}\u2713${c.reset} Not a draft (drafts are auto-undrafted first if eligible)
 

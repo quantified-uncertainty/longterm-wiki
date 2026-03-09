@@ -10,9 +10,8 @@ import {
   getPageById,
   getEntityHref,
 } from "@data";
-import { getCitationQuotesByUrl } from "@/lib/citation-data";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
-import type { CitationContentResult, CrossPageClaimQuoteRow } from "@wiki-server/api-response-types";
+import type { CitationContentResult } from "@wiki-server/api-response-types";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getDomain } from "@/components/wiki/resource-utils";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
@@ -27,7 +26,6 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { cn } from "@lib/utils";
-import { CollapsibleClaims } from "./CollapsibleClaims";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -81,42 +79,13 @@ export default async function SourcePage({ params }: PageProps) {
   const citingPages = getPagesForResource(id);
   const domain = resource.url ? (getDomain(resource.url) ?? "unknown") : null;
 
-  // Fetch cross-page citation quotes and cached content in parallel
-  const [quotesData, contentData] = await Promise.all([
-    resource.url ? getCitationQuotesByUrl(resource.url) : null,
-    resource.url
-      ? fetchFromWikiServer<CitationContentResult>(
-          `/api/citations/content?url=${encodeURIComponent(resource.url)}`,
-          { revalidate: 3600 }
-        )
-      : null,
-  ]);
-
-  const quotes = quotesData?.quotes ?? [];
-  const stats = quotesData?.stats;
-
-  // Group quotes by page and resolve titles/hrefs server-side
-  const quotesByPage = new Map<string, typeof quotes>();
-  for (const q of quotes) {
-    const pageId = q.pageId;
-    if (!quotesByPage.has(pageId)) quotesByPage.set(pageId, []);
-    quotesByPage.get(pageId)!.push(q);
-  }
-
-  const pageGroups = [...quotesByPage.entries()].map(([pageId, pageQuotes]) => ({
-    pageId,
-    pageTitle: getPageTitle(pageId),
-    pageHref: `/wiki/${pageId}`,
-    quotes: pageQuotes.map((q: CrossPageClaimQuoteRow) => ({
-      pageId: q.pageId,
-      claimText: q.claimText,
-      sourceQuote: q.sourceQuote ?? null,
-      accuracyVerdict: q.accuracyVerdict ?? null,
-      accuracyScore: q.accuracyScore ?? null,
-      accuracyIssues: q.accuracyIssues ?? null,
-      accuracyCheckedAt: q.accuracyCheckedAt ?? null,
-    })),
-  }));
+  // Fetch cached content
+  const contentData = resource.url
+    ? await fetchFromWikiServer<CitationContentResult>(
+        `/api/citations/content?url=${encodeURIComponent(resource.url)}`,
+        { revalidate: 3600 }
+      )
+    : null;
 
   // Determine whether content sections exist
   const hasAbstract = !!resource.abstract;
@@ -147,13 +116,13 @@ export default async function SourcePage({ params }: PageProps) {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
-      {/* Back link to Resources index */}
+      {/* Back link */}
       <Link
-        href="/claims/resources"
+        href="/wiki"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        All Resources
+        Back
       </Link>
 
       {/* Header */}
@@ -173,16 +142,7 @@ export default async function SourcePage({ params }: PageProps) {
           {metadataItems.map((item, i) => (
             <span key={i} className="inline-flex items-center gap-1.5">
               {i > 0 && <span className="text-muted-foreground/30">&middot;</span>}
-              {publication && item.includes(publication.name) ? (
-                <a
-                  href={`/claims/publications/${publication.id}`}
-                  className="hover:underline text-primary"
-                >
-                  {item}
-                </a>
-              ) : (
-                <span>{item}</span>
-              )}
+              <span>{item}</span>
             </span>
           ))}
           {credibility != null && (
@@ -317,51 +277,6 @@ export default async function SourcePage({ params }: PageProps) {
             </div>
           )}
         </section>
-      )}
-
-      {/* Verification Stats */}
-      {stats && stats.totalQuotes > 0 && (
-        <section className="mb-8 p-4 rounded-lg border border-border bg-card">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Citation Verification
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold tabular-nums">
-                {stats.totalQuotes}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Claims citing this
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold tabular-nums text-emerald-600">
-                {stats.accurate}
-              </div>
-              <div className="text-xs text-muted-foreground">Accurate</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold tabular-nums">
-                {stats.totalPages}
-              </div>
-              <div className="text-xs text-muted-foreground">Wiki pages</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold tabular-nums text-amber-600">
-                {stats.inaccurate + stats.unsupported + stats.minorIssues}
-              </div>
-              <div className="text-xs text-muted-foreground">Flagged</div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Cross-page claims — collapsible, grouped by wiki page */}
-      {pageGroups.length > 0 && (
-        <CollapsibleClaims
-          pageGroups={pageGroups}
-          totalClaims={quotes.length}
-        />
       )}
 
       {/* Citing pages — uses EntityLink-style pill links */}

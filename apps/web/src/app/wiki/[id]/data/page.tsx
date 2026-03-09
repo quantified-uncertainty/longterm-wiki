@@ -10,15 +10,8 @@ import {
   getEntityPath,
   getBacklinksFor,
   getExternalLinks,
-  getResourceById,
-  getResourceCredibility,
   getEntityHref,
 } from "@/data";
-import { fetchFromWikiServer } from "@lib/wiki-server";
-import { getDomain } from "@/components/wiki/resource-utils";
-import type { ClaimRow, GetClaimsResult } from "@wiki-server/api-response-types";
-
-type ClaimSource = NonNullable<ClaimRow['sources']>[number];
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -28,19 +21,8 @@ function isNumericId(id: string): boolean {
   return /^E\d+$/i.test(id);
 }
 
-// Opt out of static generation — these pages fetch from the wiki-server
-// which can't handle hundreds of concurrent requests during build.
-// They'll be rendered on-demand with ISR revalidation instead.
+// Opt out of static generation — these pages are debug/internal tools.
 export const dynamicParams = true;
-
-/** Fetch claims for a page from the wiki-server. Returns null if unavailable. */
-async function fetchPageClaims(pageId: string): Promise<ClaimRow[] | null> {
-  const result = await fetchFromWikiServer<GetClaimsResult>(
-    `/api/claims/by-entity/${encodeURIComponent(pageId)}?includeSources=true`,
-    { revalidate: 300, timeoutMs: 30_000 }
-  );
-  return result?.claims ?? null;
-}
 
 function Section({
   title,
@@ -74,357 +56,6 @@ function JsonDump({ data }: { data: unknown }) {
   );
 }
 
-function ConfidenceBadge({ confidence }: { confidence: string | null }) {
-  const val = confidence ?? "unverified";
-  const colorMap: Record<string, string> = {
-    verified: "bg-green-100 text-green-800",
-    unverified: "bg-yellow-100 text-yellow-800",
-    unsourced: "bg-red-100 text-red-800",
-    unsupported: "bg-red-100 text-red-800",
-  };
-  const cls = colorMap[val] ?? "bg-gray-100 text-gray-800";
-  return (
-    <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-medium ${cls}`}>
-      {val}
-    </span>
-  );
-}
-
-/**
- * Server-compatible verdict badge — intentionally duplicates the styling from
- * `@/app/claims/components/verdict-badge.tsx` (VerdictBadge).
- *
- * The canonical VerdictBadge is a "use client" component (uses Lucide icons
- * + shadcn Badge), but this page is a React Server Component and cannot import
- * client components without a wrapper. Since the inline version is just a tiny
- * styled <span> with no interactivity, duplicating it here avoids the overhead
- * of a client boundary for a purely visual element.
- */
-function VerdictBadgeInline({ verdict, score }: { verdict: string | null; score?: number | null }) {
-  if (!verdict) return <span className="text-gray-300">—</span>;
-  const colorMap: Record<string, string> = {
-    verified: "bg-green-100 text-green-800 border-green-200",
-    unsupported: "bg-red-100 text-red-800 border-red-200",
-    disputed: "bg-amber-100 text-amber-800 border-amber-200",
-    unverified: "bg-gray-100 text-gray-500 border-gray-200",
-  };
-  const cls = colorMap[verdict] ?? "bg-gray-100 text-gray-500 border-gray-200";
-  return (
-    <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium border ${cls}`}>
-      {verdict}
-      {score != null && <span className="ml-0.5 opacity-70">({Math.round(score * 100)}%)</span>}
-    </span>
-  );
-}
-
-/** Badge for claim category (factual, opinion, analytical, speculative, relational) */
-function CategoryBadge({ category }: { category: string | null }) {
-  if (!category) return null;
-  const colorMap: Record<string, string> = {
-    factual: "bg-blue-50 text-blue-700 border-blue-200",
-    opinion: "bg-purple-50 text-purple-700 border-purple-200",
-    analytical: "bg-amber-50 text-amber-700 border-amber-200",
-    speculative: "bg-orange-50 text-orange-700 border-orange-200",
-    relational: "bg-teal-50 text-teal-700 border-teal-200",
-  };
-  const cls = colorMap[category] ?? "bg-gray-50 text-gray-600 border-gray-200";
-  return (
-    <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium border ${cls}`}>
-      {category}
-    </span>
-  );
-}
-
-/** Render related entity badges as links */
-function RelatedEntityBadges({ entities }: { entities: string[] | null }) {
-  if (!entities || entities.length === 0) return null;
-  return (
-    <span className="inline-flex gap-1 flex-wrap">
-      {entities.map(eid => (
-        <Link
-          key={eid}
-          href={getEntityHref(eid)}
-          className="inline-block px-1 py-0.5 rounded text-[10px] bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
-          title={`Related entity: ${eid}`}
-        >
-          {eid}
-        </Link>
-      ))}
-    </span>
-  );
-}
-
-/** Parse a comma-separated footnote number string (from claim.footnoteRefs). */
-function parseFootnoteNums(unit: string | null): number[] {
-  if (!unit) return [];
-  return unit.split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
-}
-
-/** Credibility dot (1–5 scale) */
-function CredDots({ level }: { level: number }) {
-  return (
-    <span className="inline-flex gap-0.5">
-      {[1, 2, 3, 4, 5].map(i => (
-        <span
-          key={i}
-          className={`inline-block w-1.5 h-1.5 rounded-full ${i <= level ? "bg-green-500" : "bg-gray-200"}`}
-        />
-      ))}
-    </span>
-  );
-}
-
-/** Get the section name for a claim */
-function getClaimSection(claim: ClaimRow): string {
-  return claim.section ?? "Unknown";
-}
-
-/** Get footnote ref string for a claim */
-function getClaimFootnoteRefs(claim: ClaimRow): string | null {
-  return claim.footnoteRefs ?? null;
-}
-
-/** Build shared data structures from claims */
-function buildClaimsData(claims: ClaimRow[]) {
-  const byConfidence: Record<string, number> = {};
-  for (const c of claims) {
-    const key = c.claimVerdict ?? c.confidence ?? "unverified";
-    byConfidence[key] = (byConfidence[key] ?? 0) + 1;
-  }
-
-  const byCategory: Record<string, number> = {};
-  for (const c of claims) {
-    const cat = c.claimCategory ?? "uncategorized";
-    byCategory[cat] = (byCategory[cat] ?? 0) + 1;
-  }
-
-  const sections = [...new Set(claims.map(c => getClaimSection(c)))];
-
-  // Count multi-entity claims
-  const multiEntityCount = claims.filter(c =>
-    c.relatedEntities && c.relatedEntities.length > 0
-  ).length;
-
-  return { byConfidence, byCategory, sections, multiEntityCount };
-}
-
-function ClaimsTable({ claims }: { claims: ClaimRow[] }) {
-  const { byConfidence, byCategory, sections, multiEntityCount } = buildClaimsData(claims);
-
-  return (
-    <div>
-      {/* Verdict/confidence distribution (prefers claimVerdict, falls back to confidence) */}
-      <div className="flex gap-3 mb-3 flex-wrap">
-        {Object.entries(byConfidence).map(([v, cnt]) => (
-          <div key={v} className="flex items-center gap-1">
-            <VerdictBadgeInline verdict={v} />
-            <span className="text-xs text-gray-600">{cnt}</span>
-          </div>
-        ))}
-        <span className="text-xs text-gray-500 ml-auto">{claims.length} total claims</span>
-      </div>
-
-      {/* Category distribution bar */}
-      {Object.keys(byCategory).length > 1 && (
-        <div className="flex gap-3 mb-3 flex-wrap">
-          {Object.entries(byCategory).sort((a, b) => b[1] - a[1]).map(([cat, cnt]) => (
-            <div key={cat} className="flex items-center gap-1">
-              <CategoryBadge category={cat} />
-              <span className="text-xs text-gray-600">{cnt}</span>
-            </div>
-          ))}
-          {multiEntityCount > 0 && (
-            <span className="text-xs text-gray-500 ml-auto">
-              {multiEntityCount} multi-entity
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Section heatmap */}
-      {sections.length > 1 && (
-        <div className="mb-4">
-          <p className="text-xs font-medium text-gray-600 mb-2">Section breakdown:</p>
-          <div className="flex flex-wrap gap-2">
-            {sections.map(section => {
-              const sectionClaims = claims.filter(c => getClaimSection(c) === section);
-              const verifiedCount = sectionClaims.filter(c => (c.claimVerdict ?? c.confidence) === "verified").length;
-              const pct = sectionClaims.length > 0 ? Math.round((verifiedCount / sectionClaims.length) * 100) : 0;
-              const heatColor = pct >= 70 ? "bg-green-100 border-green-300"
-                : pct >= 40 ? "bg-yellow-100 border-yellow-300"
-                : "bg-red-100 border-red-300";
-              return (
-                <span key={section} className={`text-xs px-2 py-1 rounded border ${heatColor}`}>
-                  {section.slice(0, 30)} ({verifiedCount}/{sectionClaims.length})
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      <table className="text-xs w-full border-collapse">
-        <thead>
-          <tr className="border-b text-left bg-gray-50">
-            <th className="p-2 w-[24%]">Claim</th>
-            <th className="p-2 w-[16%]">Source Quote</th>
-            <th className="p-2">Type</th>
-            <th className="p-2">Category</th>
-            <th className="p-2">Verdict</th>
-            <th className="p-2">Section</th>
-            <th className="p-2">Sources</th>
-            <th className="p-2">Related</th>
-            <th className="p-2">Citations</th>
-          </tr>
-        </thead>
-        <tbody>
-          {claims.map((claim) => {
-            const footnoteNums = parseFootnoteNums(getClaimFootnoteRefs(claim));
-            const sectionName = getClaimSection(claim);
-            return (
-              <tr key={claim.id} className="border-b hover:bg-gray-50 align-top">
-                <td className="p-2">
-                  {claim.claimText}
-                  {claim.factId && (
-                    <span className="block mt-0.5 text-[10px] text-gray-400 font-mono" title="Linked to fact system">
-                      fact: {claim.factId}
-                    </span>
-                  )}
-                </td>
-                <td className="p-2 text-gray-500 italic">
-                  {claim.sourceQuote
-                    ? <span title={claim.sourceQuote}>&ldquo;{claim.sourceQuote.slice(0, 100)}{claim.sourceQuote.length > 100 ? "…" : ""}&rdquo;</span>
-                    : <span className="text-gray-300 not-italic">—</span>}
-                </td>
-                <td className="p-2 font-mono whitespace-nowrap text-[10px]">{claim.claimType}</td>
-                <td className="p-2 whitespace-nowrap">
-                  <CategoryBadge category={claim.claimCategory} />
-                </td>
-                <td className="p-2 whitespace-nowrap">
-                  <VerdictBadgeInline verdict={claim.claimVerdict ?? claim.confidence ?? "unverified"} score={claim.claimVerdictScore} />
-                </td>
-                <td className="p-2 text-gray-600 max-w-[100px] truncate" title={sectionName}>
-                  {sectionName}
-                </td>
-                <td className="p-2 text-[10px]">
-                  {claim.sources && claim.sources.length > 0 ? (
-                    <div className="space-y-0.5">
-                      {claim.sources.slice(0, 2).map((s: ClaimSource) => (
-                        <div key={s.id} className="flex items-center gap-1">
-                          {s.isPrimary && (
-                            <span className="bg-blue-100 text-blue-700 px-0.5 rounded text-[9px]">P</span>
-                          )}
-                          {s.resourceId ? (
-                            <Link href={`/source/${s.resourceId}`} className="text-blue-600 hover:underline truncate max-w-[80px] block">
-                              {s.resourceId}
-                            </Link>
-                          ) : s.url ? (
-                            <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate max-w-[80px] block">
-                              {getDomain(s.url) ?? "link"}
-                            </a>
-                          ) : (
-                            <span className="text-gray-400">—</span>
-                          )}
-                        </div>
-                      ))}
-                      {claim.sources.length > 2 && (
-                        <span className="text-gray-400">+{claim.sources.length - 2}</span>
-                      )}
-                    </div>
-                  ) : (
-                    <span className="text-gray-300">—</span>
-                  )}
-                </td>
-                <td className="p-2 max-w-[120px]">
-                  <RelatedEntityBadges entities={claim.relatedEntities} />
-                  {(!claim.relatedEntities || claim.relatedEntities.length === 0) && (
-                    <span className="text-gray-400 text-[10px]">—</span>
-                  )}
-                </td>
-                <td className="p-2 whitespace-nowrap">
-                  {footnoteNums.length > 0
-                    ? footnoteNums.slice(0, 3).map(n => (
-                        <span key={n} className="inline-block font-mono text-gray-500 mr-1">[^{n}]</span>
-                      ))
-                    : "—"}
-                  {footnoteNums.length > 3 && (
-                    <span className="text-gray-400 text-[10px]">+{footnoteNums.length - 3}</span>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function ReferencesTable({ claims }: { claims: ClaimRow[] }) {
-  // Build unique sources from claim source data
-  const seenUrls = new Set<string>();
-  const uniqueSources: { url: string | null; title: string | null; resourceId?: string; domain: string | null; credibility?: number }[] = [];
-  for (const claim of claims) {
-    if (!claim.sources) continue;
-    for (const s of claim.sources) {
-      const key = s.url ?? s.resourceId ?? `claim-${claim.id}`;
-      if (seenUrls.has(key)) continue;
-      seenUrls.add(key);
-      const resource = s.resourceId ? getResourceById(s.resourceId) : undefined;
-      const credibility = resource ? getResourceCredibility(resource) : undefined;
-      uniqueSources.push({ url: s.url ?? null, title: resource?.title ?? null, resourceId: s.resourceId ?? undefined, domain: s.url ? getDomain(s.url) : null, credibility });
-    }
-  }
-
-  if (uniqueSources.length === 0) {
-    return <p className="text-sm text-gray-500">No references found. Citations may not be indexed yet.</p>;
-  }
-
-  return (
-    <table className="text-xs w-full border-collapse">
-      <thead>
-        <tr className="border-b text-left bg-gray-50">
-          <th className="p-2">Source</th>
-          <th className="p-2">Domain</th>
-          <th className="p-2">Credibility</th>
-          <th className="p-2">Links</th>
-        </tr>
-      </thead>
-      <tbody>
-        {uniqueSources.map((src, i) => (
-          <tr key={i} className="border-b hover:bg-gray-50">
-            <td className="p-2 max-w-[280px]">
-              {src.url ? (
-                <a href={src.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" title={src.url}>
-                  {(src.title ?? src.url).slice(0, 70)}{(src.title ?? src.url).length > 70 ? "…" : ""}
-                </a>
-              ) : (
-                <span>{src.title ?? "—"}</span>
-              )}
-            </td>
-            <td className="p-2 text-gray-500">{src.domain ?? "—"}</td>
-            <td className="p-2">
-              {src.credibility != null ? <CredDots level={src.credibility} /> : <span className="text-gray-400">—</span>}
-            </td>
-            <td className="p-2 whitespace-nowrap">
-              {src.resourceId && (
-                <Link href={`/source/${src.resourceId}`} className="text-blue-600 hover:underline mr-2">
-                  source page
-                </Link>
-              )}
-              {src.url && (
-                <a href={src.url} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:underline text-[10px]">
-                  ↗ original
-                </a>
-              )}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
 export default async function WikiInfoPage({ params }: PageProps) {
   const { id } = await params;
 
@@ -445,7 +76,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
   const entityPath = getEntityPath(slug);
   const backlinks = getBacklinksFor(slug);
   const externalLinks = getExternalLinks(slug);
-  const claims = await fetchPageClaims(slug);
 
   const title = pageData?.title || slug;
   const entityType = pageData?.entityType || null;
@@ -467,7 +97,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
               )}
             </div>
           </div>
-          {/* EID — the canonical numeric entity identifier used in URLs and EntityLink refs */}
           {numericId && (
             <div className="shrink-0 flex flex-col items-end gap-1">
               <span className="font-mono text-2xl font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-lg select-all">
@@ -487,7 +116,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
           </Link>
           <span className="text-gray-400">
             {backlinks.length} backlinks
-            {claims !== null && ` · ${claims.length} claims`}
           </span>
           {pageData?.quality != null && (
             <span className="text-gray-500">
@@ -510,66 +138,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
         {pageData
           ? <JsonDump data={pageData} />
           : <p className="text-sm text-gray-500">No compiled record found for &quot;{slug}&quot;</p>}
-      </Section>
-
-      <Section title={`Claims ${claims && claims.length > 0 ? `(${claims.length})` : ""}`}>
-        {claims === null ? (
-          <p className="text-sm text-gray-500">
-            Claims data unavailable (wiki-server offline or not configured).{" "}
-            <span className="font-mono text-xs">Set LONGTERMWIKI_SERVER_URL to enable.</span>
-          </p>
-        ) : claims.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            No claims extracted yet. Run:{" "}
-            <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">pnpm crux claims extract {slug}</code>
-          </p>
-        ) : (
-          <div>
-            <div className="flex items-center gap-3 mb-3 text-sm">
-              <Link
-                href={`/wiki/${numericId || slug}/claims`}
-                className="text-blue-600 hover:underline font-medium"
-              >
-                View full claims tab &rarr;
-              </Link>
-              <Link
-                href={`/claims/entity/${slug}`}
-                className="text-muted-foreground hover:underline"
-              >
-                Claims Explorer
-              </Link>
-            </div>
-            <ClaimsTable claims={claims} />
-          </div>
-        )}
-      </Section>
-
-      <Section title="References">
-        {claims === null ? (
-          <p className="text-sm text-gray-500">
-            Claims data unavailable (wiki-server offline or not configured).
-          </p>
-        ) : claims.length === 0 ? (
-          <p className="text-sm text-gray-500">No claims extracted yet — run claims extract first.</p>
-        ) : (
-          <div>
-            <div className="flex items-center gap-3 mb-3 text-sm">
-              <Link
-                href={`/wiki/${numericId || slug}/claims`}
-                className="text-blue-600 hover:underline font-medium"
-              >
-                View full claims tab &rarr;
-              </Link>
-              <Link
-                href={`/claims/entity/${slug}`}
-                className="text-muted-foreground hover:underline"
-              >
-                Claims Explorer
-              </Link>
-            </div>
-            <ReferencesTable claims={claims} />
-          </div>
-        )}
       </Section>
 
       <Section title="External Links">

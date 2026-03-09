@@ -2826,7 +2826,7 @@
     - id: racing-dynamics
       type: risk
     - id: projecting-compute-spending
-      type: model
+      type: analysis
   sources:
     - title: "Securing the Backbone of AI: Cyber Threats (New America)"
       url: https://www.newamerica.org/future-security/reports/securing-the-backbone-of-ai/cyber-threats/
@@ -2921,7 +2921,7 @@
     through index fund concentration, credit contagion, and semiconductor supply chain cascades.
   relatedEntries:
     - id: projecting-compute-spending
-      type: model
+      type: analysis
     - id: ai-revenue-sources
       type: organization
     - id: economic-disruption

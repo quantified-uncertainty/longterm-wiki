@@ -16,7 +16,6 @@ import { injectWrongNumbers } from './injectors/wrong-numbers.ts';
 import { injectFabricatedCitations } from './injectors/fabricated-citations.ts';
 import { injectExaggerations } from './injectors/exaggerations.ts';
 import { injectMissingNuance } from './injectors/missing-nuance.ts';
-import { injectFabricatedClaims } from './injectors/fabricated-claims.ts';
 import { matchFindings, computeScores, formatScoreReport } from './score.ts';
 import { extractClaims } from './agents/reference-sniffer.ts';
 import { extractFacts } from './agents/cross-reference-checker.ts';
@@ -188,23 +187,6 @@ describe('injectMissingNuance', () => {
     for (const error of result.errors) {
       expect(error.category).toBe('missing-nuance');
     }
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Fabricated claims injection tests
-// ---------------------------------------------------------------------------
-
-describe('injectFabricatedClaims', () => {
-  it('inserts fabricated claims with existing footnote refs', async () => {
-    const result = await injectFabricatedClaims(SAMPLE_ORG_PAGE, 1, false);
-
-    expect(result.errors.length).toBe(1);
-    expect(result.errors[0].category).toBe('fabricated-claim');
-    // Corrupted content should be longer (we added text)
-    expect(result.content.length).toBeGreaterThan(SAMPLE_ORG_PAGE.length);
-    // The fabricated text should contain a footnote reference
-    expect(result.errors[0].corruptedText).toMatch(/\[\^\d+\]/);
   });
 });
 

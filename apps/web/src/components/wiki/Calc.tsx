@@ -1,7 +1,7 @@
 import { getKBLatest, getKBProperty } from "@data/kb";
-import { calc, formatValue, type CalcFormat } from "@/lib/calc-engine";
+import { calc, formatValue, type CalcFormat, type CalcFact } from "@/lib/calc-engine";
 import { cn } from "@/lib/utils";
-import type { Fact } from "@/data";
+import styles from "./tooltip.module.css";
 
 interface CalcProps {
   /** Expression with {entity.propertyId} references, e.g. "{anthropic.revenue} / {anthropic.valuation}" */
@@ -20,10 +20,9 @@ interface CalcProps {
 }
 
 /**
- * Bridge from KB fact to the shape expected by calc-engine.
- * Converts KB's typed FactValue to the flat { value, numeric, asOf } shape.
+ * Resolve a KB fact to the minimal shape needed by calc-engine.
  */
-function kbFactLookup(entity: string, propertyId: string): Fact | undefined {
+function kbFactLookup(entity: string, propertyId: string): CalcFact | undefined {
   const kbFact = getKBLatest(entity, propertyId);
   if (!kbFact) return undefined;
 
@@ -33,7 +32,6 @@ function kbFactLookup(entity: string, propertyId: string): Fact | undefined {
 
   if (kbFact.value.type === "number") {
     numeric = kbFact.value.value;
-    // Format for display
     const unit = kbFact.value.unit ?? prop?.unit;
     if (unit === "USD") {
       const abs = Math.abs(numeric);
@@ -42,7 +40,12 @@ function kbFactLookup(entity: string, propertyId: string): Fact | undefined {
       else if (abs >= 1e6) value = `$${(numeric / 1e6).toFixed(1)} million`;
       else value = `$${numeric.toLocaleString("en-US")}`;
     } else if (unit === "percent") {
-      value = `${(numeric * 100).toFixed(1)}%`;
+      // KB stores percent as whole numbers (e.g., 40 = 40%), not decimals.
+      // Display the whole-number form for the tooltip value string.
+      value = `${numeric.toFixed(1)}%`;
+      // Normalize to decimal for calc-engine arithmetic so that
+      // format="percent" (which multiplies by 100) produces the right result.
+      numeric = numeric / 100;
     } else {
       value = numeric.toLocaleString("en-US");
     }
@@ -50,13 +53,7 @@ function kbFactLookup(entity: string, propertyId: string): Fact | undefined {
     value = kbFact.value.value;
   }
 
-  return {
-    value,
-    numeric,
-    asOf: kbFact.asOf,
-    entity,
-    factId: propertyId,
-  };
+  return { value, numeric, asOf: kbFact.asOf };
 }
 
 /**
@@ -91,7 +88,7 @@ export function Calc({
     );
 
     return (
-      <span className="relative inline group/calc">
+      <span className={styles.wrapper}>
         <span
           className={cn(
             "inline font-medium border-b border-dotted border-blue-400/50 cursor-help",
@@ -103,7 +100,10 @@ export function Calc({
           {displayValue}
         </span>
         <span
-          className="absolute left-0 top-full mt-1 z-50 w-[260px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible group-hover/calc:opacity-100 group-hover/calc:visible transition-opacity text-xs"
+          className={cn(
+            styles.tooltip,
+            "absolute left-0 top-full mt-1 z-50 w-[260px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible transition-opacity text-xs",
+          )}
           role="tooltip"
         >
           <span className="block font-semibold text-foreground mb-1">

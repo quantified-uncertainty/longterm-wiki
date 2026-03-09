@@ -42,19 +42,39 @@ interface KBCommandOptions extends BaseOptions {
   'dry-run'?: boolean;
   stubOld?: boolean;
   'stub-old'?: boolean;
+  force?: boolean;
 }
 
 // ── Entity type mapping ───────────────────────────────────────────────
 
 /**
  * Maps old entity types to KB thing types.
- * Only types that need remapping are listed; others pass through.
+ * Types not listed here pass through unchanged (e.g., organization, person, concept).
+ * See apps/web/src/data/entity-type-names.ts for the full canonical type list.
  */
 const TYPE_MAP: Record<string, string> = {
+  // Organization subtypes (old lab-* types and synonyms → organization)
+  lab: 'organization',
+  'lab-frontier': 'organization',
+  'lab-research': 'organization',
+  'lab-startup': 'organization',
+  'lab-academic': 'organization',
+  nonprofit: 'organization',
+  government: 'organization',
+  company: 'organization',
+  // People subtypes → person
+  researcher: 'person',
+  policymaker: 'person',
+  executive: 'person',
+  // Renamed types
   crux: 'debate',
-  'safety-agenda': 'approach',
-  historical: 'event',
   model: 'analysis',
+  // Plural aliases
+  'safety-approaches': 'safety-agenda',
+  policies: 'policy',
+  concepts: 'concept',
+  events: 'event',
+  models: 'analysis',
 };
 
 /**
@@ -66,14 +86,20 @@ const VALID_KB_TYPES = new Set([
   'approach',
   'argument',
   'capability',
+  'case-study',
   'concept',
   'debate',
   'event',
+  'funder',
+  'historical',
+  'incident',
   'organization',
   'person',
   'policy',
   'project',
   'risk',
+  'risk-factor',
+  'safety-agenda',
 ]);
 
 // ── Helpers ───────────────────────────────────────────────────────────
@@ -243,17 +269,19 @@ async function migrateCommand(
   const slug = args.find((a) => !a.startsWith('--'));
   const dryRun = options.dryRun || options['dry-run'] || false;
   const stubOld = options.stubOld || options['stub-old'] || false;
+  const force = options.force || false;
 
   if (!slug) {
     return {
       exitCode: 1,
-      output: `Usage: crux kb migrate <entity-slug> [--dry-run] [--stub-old]
+      output: `Usage: crux kb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
 
   Migrate an entity from data/entities/*.yaml to packages/kb/data/things/*.yaml.
 
 Options:
   --dry-run    Print the generated YAML without writing any files
   --stub-old   After migration, strip the old entity to a minimal stub
+  --force      Overwrite existing KB thing file if it already exists
 
 Examples:
   crux kb migrate deepmind --dry-run
@@ -264,10 +292,10 @@ Examples:
 
   // 1. Check if KB thing already exists
   const kbPath = join(KB_THINGS_DIR, `${slug}.yaml`);
-  if (existsSync(kbPath)) {
+  if (existsSync(kbPath) && !force) {
     return {
       exitCode: 1,
-      output: `KB thing already exists at ${kbPath}\nUse 'crux kb show ${slug}' to inspect it.`,
+      output: `KB thing already exists at ${kbPath}\nUse 'crux kb show ${slug}' to inspect it, or pass --force to overwrite.`,
     };
   }
 
@@ -362,7 +390,7 @@ export function getHelp(): string {
 KB Migrate — Migrate entities from old system to KB
 
 Usage:
-  crux kb migrate <entity-slug> [--dry-run] [--stub-old]
+  crux kb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
 
   Reads an entity from data/entities/*.yaml and creates a new KB thing file
   at packages/kb/data/things/<slug>.yaml with the mapped structure.
@@ -371,12 +399,16 @@ Options:
   --dry-run    Print the generated YAML without writing any files
   --stub-old   After migration, strip the old entity down to a minimal stub
                (keeps id, numericId, type, title, relatedEntries)
+  --force      Overwrite existing KB thing file if it already exists
 
 Type Mapping:
-  crux         -> debate
-  safety-agenda -> approach
-  historical   -> event
-  (all others pass through unchanged)
+  lab, lab-*, nonprofit, government, company          -> organization
+  researcher, policymaker, executive                 -> person
+  crux                                               -> debate
+  model, models                                      -> analysis
+  safety-approaches                                  -> safety-agenda
+  (all others pass through unchanged, including: safety-agenda,
+   historical, risk-factor, case-study — these have their own KB schemas)
 
 What gets migrated:
   - id, numericId, type, name/title, aliases
@@ -394,5 +426,6 @@ Examples:
   crux kb migrate deepmind --dry-run        Preview migration
   crux kb migrate ajeya-cotra               Create KB thing file
   crux kb migrate ajeya-cotra --stub-old    Create KB thing + strip old entity
+  crux kb migrate deepmind --force          Overwrite existing KB thing
 `;
 }

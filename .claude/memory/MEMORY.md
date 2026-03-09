@@ -19,4 +19,4 @@
 - **SCRY_PUBLIC_KEY** is defined in `crux/lib/api-keys.ts`. All consumers import from there (consolidated Feb 2026).
 - **crux/ import direction**: `lib → authoring`, never `authoring → lib`.
 - **SQLite knowledge.db retired**: All data access migrated to PostgreSQL wiki-server (completed Feb 2026).
-- **citation_quotes → claims migration**: Write pipelines redirected to claims system. citation_quotes table is read-only pending frontend migration (#1311).
+- **Statements/Claims system retired**: The entire statements and claims system was deleted in PR #1908 (March 2026). DB tables archived with `_archived_` prefix. KB YAML is now the sole structured facts system.

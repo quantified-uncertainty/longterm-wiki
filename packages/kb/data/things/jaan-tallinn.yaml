@@ -3,7 +3,7 @@ thing:
   stableId: 6gjF5d3geg
   type: person
   name: "Jaan Tallinn"
-  numericId: 1103
+  numericId: E577
   aliases:
     - Tallinn
 
@@ -11,7 +11,7 @@ facts:
   - id: f_jt_skype_cofound
     property: description
     value: "Co-founded Skype in 2003, sold to eBay for $2.6B in 2005"
-    notes: "sourceResource: 3f21a01b3b4948e1"
+    sourceResource: 3f21a01b3b4948e1
 
   - id: f_jt_net_worth
     property: net-worth

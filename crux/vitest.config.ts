@@ -14,17 +14,13 @@ export default defineConfig({
       'facts/**/*.test.ts',
       'entity/**/*.test.ts',
       'citations/**/*.test.ts',
-      'claims/**/*.test.ts',
-      'statements/**/*.test.ts',
       'validate/**/*.test.ts',
       'wiki-server/**/*.test.ts',
       'evals/**/*.test.ts',
       'health/**/*.test.ts',
       'pr-patrol/**/*.test.ts',
     ],
-    exclude: [
-      'claims/archive/**',
-    ],
+    exclude: [],
     root: __dirname,
     // Run test files sequentially to prevent cross-file test contamination.
     // Some test files share mocked module state; parallel execution can cause

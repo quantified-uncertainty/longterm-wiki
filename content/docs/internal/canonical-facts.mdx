@@ -173,6 +173,45 @@ facts:
 - `notes` — shown in tooltip
 - `source` — attribution link
 
+### Custom YAML Tags
+
+KB YAML files support two custom tags for type-safe data entry:
+
+#### `!ref` — Entity References
+
+Cross-references between entities. Ensures referential integrity at load time.
+
+```yaml
+# Preferred format (stableId:slug — enables cross-validation)
+value: !ref mK9pX3rQ7n:dario-amodei
+
+# Bare stableId (deprecated, still works)
+value: !ref mK9pX3rQ7n
+```
+
+#### `!date` — Explicit Date Typing
+
+Forces a value to be treated as a date, even when YAML would otherwise parse it as a number or string. This is especially important for **bare years** like `2019`, which YAML auto-parses as the integer 1919 (or similar numeric coercion).
+
+```yaml
+# Without !date — YAML parses 2019 as an integer, not a date
+founded: 2019          # ⚠️ Parsed as number 2019, not a date
+
+# With !date — explicitly typed as a date
+founded: !date 2019        # ✓ { type: "date", value: "2019" }
+started: !date 2023-06     # ✓ { type: "date", value: "2023-06" }
+born:    !date 2023-06-15  # ✓ { type: "date", value: "2023-06-15" }
+```
+
+**When to use `!date`:**
+- **Bare years** (e.g. `2019`, `2023`) — always use `!date` to prevent numeric parsing
+- **Year-month** (e.g. `2023-06`) — use `!date` for clarity, though the loader's date heuristic (`DATE_RE`) can usually detect these
+- **Full ISO dates** (e.g. `2023-06-15`) — optional; the heuristic detects these reliably, but `!date` makes intent explicit
+
+**When `!date` is not needed:**
+- Date strings in `asOf` and `validEnd` fields — these are always treated as dates by the loader regardless of format
+- Quoted date strings that match the `YYYY-MM-DD` or `YYYY-MM` pattern — the loader's regex heuristic handles these
+
 ## Adding New Facts
 
 1. Add the entry to the appropriate `packages/kb/data/things/<entity>.yaml` file

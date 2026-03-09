@@ -28,7 +28,7 @@ The wiki currently has two data layers that represent knowledge:
 1. **Numeric facts** (`data/facts/*.yaml`) — 139 structured entries with measures, temporal metadata, source attribution. Well-typed but narrow: only quantitative data.
 2. **Prose claims** — Thousands of assertions embedded in \~700 MDX pages. Unstructured, unqueryable, prone to staleness and cross-page inconsistency.
 
-The <EntityLink id="E886" name="fact-system-strategy">Fact System Strategy</EntityLink> refined how numeric facts work. The <EntityLink id="E892" name="claim-first-architecture">Claim-First Architecture</EntityLink> proposed making all claims first-class data objects. This document tackles the missing piece between those two: **the property ontology** — what types of claims exist, what constraints they have, and how they connect to entities.
+The <EntityLink id="E886" name="fact-system-strategy">Fact System Strategy</EntityLink> refined how numeric facts work. The Claim-First Architecture proposal described making all claims first-class data objects. This document tackles the missing piece between those two: **the property ontology** — what types of claims exist, what constraints they have, and how they connect to entities.
 
 Without a property ontology, a claim store is just a bag of strings. With one, it becomes a queryable knowledge graph.
 
@@ -167,7 +167,7 @@ These are the "verbs" connecting entities — currently buried in prose:
 
 ### Layer 4: Claim Types and Confidence
 
-Following the taxonomy from the <EntityLink id="E892" name="claim-first-architecture">Claim-First Architecture</EntityLink>:
+Following the taxonomy from the Claim-First Architecture proposal:
 
 | Claim type | Verification strategy | Confidence levels | Example |
 |---|---|---|---|
@@ -1261,6 +1261,6 @@ But never block a claim from being created because it uses a property outside it
 
 3. **Who maintains claims?** The content pipeline (`crux content improve`) writes prose. Should it also update claims? Or should claims be a separate pipeline that the prose pipeline reads from?
 
-4. **How do claims and prose stay in sync?** If a claim is updated (new valuation), the prose page should reflect it. If prose is edited directly, should claims be re-extracted? The E892 proposal's answer is "claims are primary, prose is derived" — but that's the long-term vision. In the short term, they'll coexist.
+4. **How do claims and prose stay in sync?** If a claim is updated (new valuation), the prose page should reflect it. If prose is edited directly, should claims be re-extracted? The Claim-First Architecture proposal's answer is "claims are primary, prose is derived" — but that's the long-term vision. In the short term, they'll coexist.
 
 5. **Property hierarchy.** Should `fundedBy` be a sub-property of `investedIn`? Schema.org uses `rdfs:subPropertyOf`. For 25 properties this probably isn't needed yet, but as the vocabulary grows, grouping related properties becomes useful for dashboard navigation.

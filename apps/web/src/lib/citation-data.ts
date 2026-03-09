@@ -1,12 +1,8 @@
-import { fetchFromWikiServer } from "./wiki-server";
-import { getLocalCitationQuotes, getStatementCitationDots } from "@/data";
-import type {
-  ClaimsBySourceUrlResult,
-} from "@wiki-server/api-response-types";
+import { getLocalCitationQuotes } from "@/data";
 import type {
   AccuracyVerdict,
 } from "@wiki-server/api-types";
-import type { RefMapEntry } from "@/lib/reference-preprocessor";
+
 
 /**
  * Valid accuracy verdict values — mirrors ACCURACY_VERDICTS from api-types.
@@ -116,77 +112,9 @@ function getLocalCitationQuotesForPage(pageId: string): CitationQuote[] {
     }));
 }
 
-/** Citation quote with page context — returned by by-source-url endpoint */
+/** Citation quote with page context */
 export interface CrossPageCitationQuote extends CitationQuote {
   pageId: string;
-}
-
-/**
- * Fetch all claims across all pages for a given source URL.
- * Used by /source/[id] pages to show cross-page citation data.
- *
- * Reads from the claims system via the /api/claims/by-source-url endpoint,
- * which replaced the deprecated /api/citations/quotes-by-url endpoint (#1311).
- */
-export async function getCitationQuotesByUrl(
-  url: string
-): Promise<ClaimsBySourceUrlResult | null> {
-  return fetchFromWikiServer<ClaimsBySourceUrlResult>(
-    `/api/claims/by-source-url?url=${encodeURIComponent(url)}`,
-    { revalidate: 600 }
-  );
-}
-
-/**
- * Get citation quotes for a page from the Statements V2 pipeline.
- *
- * Reads the build-time statementCitationDots bundle and resolves
- * footnoteResourceId strings (e.g. "cr-abc123") to numeric footnote
- * numbers using the referenceMap produced by renderMdxPage().
- *
- * Returns an empty array if no statement data exists for this page,
- * or if no entries map to footnote numbers in the referenceMap.
- */
-export function getStatementCitationQuotes(
-  pageId: string,
-  referenceMap: Map<number, RefMapEntry>
-): CitationQuote[] {
-  const dots = getStatementCitationDots(pageId);
-  if (!dots || dots.length === 0) return [];
-
-  // Build reverse map: originalId (e.g. "cr-abc123") → numeric footnote number
-  const idToFootnote = new Map<string, number>();
-  for (const [footnoteNum, entry] of referenceMap) {
-    if (entry.originalId) {
-      idToFootnote.set(entry.originalId, footnoteNum);
-    }
-  }
-
-  const result: CitationQuote[] = [];
-  for (const dot of dots) {
-    const footnoteNum = idToFootnote.get(dot.footnoteResourceId);
-    if (footnoteNum === undefined) continue;
-
-    result.push({
-      footnote: footnoteNum,
-      url: dot.url,
-      resourceId: dot.resourceId,
-      claimText: dot.claimText,
-      sourceQuote: dot.sourceQuote,
-      sourceTitle: dot.sourceTitle,
-      sourceType: dot.sourceType,
-      quoteVerified: dot.quoteVerified,
-      verificationScore: null,
-      verifiedAt: null,
-      accuracyVerdict: toAccuracyVerdict(dot.accuracyVerdict),
-      accuracyScore: dot.accuracyScore,
-      accuracyIssues: dot.accuracyIssues,
-      accuracySupportingQuotes: null,
-      verificationDifficulty: null,
-      accuracyCheckedAt: dot.accuracyCheckedAt,
-    });
-  }
-  return result;
 }
 
 /**

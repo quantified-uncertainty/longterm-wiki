@@ -50,6 +50,7 @@ export type MergeBlockReason =
   | 'unresolved-threads'
   | 'unchecked-items'
   | 'agent-working'
+  | 'pr-patrol-working'
   | 'is-draft'
   | 'in-merge-queue';
 

@@ -32,7 +32,6 @@ export type {
 } from './auto-update.ts';
 export type { RiskSnapshot, RiskLatestResult } from './risk.ts';
 export type { UpsertSummaryItem } from './summaries.ts';
-export type { InsertClaimItem } from './claims.ts';
 export type { PageLinkItem } from './links.ts';
 export type {
   PageSearchResult,
@@ -110,13 +109,6 @@ export {
   upsertSummary,
   upsertSummaryBatch,
 } from './summaries.ts';
-
-// Claims
-export {
-  insertClaim,
-  insertClaimBatch,
-  clearClaimsForEntity,
-} from './claims.ts';
 
 // Page Links
 export { syncPageLinks } from './links.ts';

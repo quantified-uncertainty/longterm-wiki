@@ -1,0 +1,34 @@
+type: funder
+name: Funder
+
+required: []
+# Funders vary from foundations to individuals; no properties are universally required.
+
+recommended:
+  - description
+  - total-granted
+  - focus-areas
+  - website
+  - founded-date
+  - headquarters
+
+items:
+  major-grants:
+    description: "Significant grants or donations made by this funder"
+    fields:
+      recipient: { type: text, required: true, description: "Recipient organization name or Thing ID" }
+      amount: { type: number, unit: USD, description: "Grant amount in USD" }
+      year: { type: number, required: true, description: "Year the grant was made" }
+      purpose: { type: text, description: "What the funding was for" }
+      source: { type: text, description: "URL to grant announcement or tax filing" }
+      notes: { type: text, description: "Context, conditions, or impact" }
+
+  funding-programs:
+    description: "Recurring funding programs or initiatives"
+    fields:
+      name: { type: text, required: true, description: "Program name" }
+      annual-budget: { type: number, unit: USD, description: "Annual budget in USD" }
+      started: { type: date, description: "When the program began" }
+      status: { type: text, description: "Current status: active, completed, paused" }
+      source: { type: text, description: "URL to program description" }
+      notes: { type: text, description: "Scope, impact, or notable recipients" }

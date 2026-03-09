@@ -510,24 +510,27 @@ function IntegritySection({
   integrity: ExtendedHealthData["integrity"];
 }) {
   const isClean = integrity.status === "clean";
+  const isError = integrity.status === "error";
 
   return (
     <>
       <SectionHeader>Data Integrity</SectionHeader>
       <div
         className={`rounded-lg border border-border/60 p-4 mb-6 ${
-          isClean ? "bg-green-500/10" : "bg-yellow-500/10"
+          isError ? "bg-muted/50" : isClean ? "bg-green-500/10" : "bg-yellow-500/10"
         }`}
       >
         <div className="flex items-center justify-between mb-2">
           <span
             className={`text-sm font-semibold ${
-              isClean ? "text-green-600" : "text-yellow-600"
+              isError ? "text-muted-foreground" : isClean ? "text-green-600" : "text-yellow-600"
             }`}
           >
-            {isClean
-              ? "No dangling references"
-              : `${integrity.totalDanglingRefs} dangling reference${integrity.totalDanglingRefs !== 1 ? "s" : ""}`}
+            {isError
+              ? "Could not check integrity (database query failed)"
+              : isClean
+                ? "No dangling references"
+                : `${integrity.totalDanglingRefs} dangling reference${integrity.totalDanglingRefs !== 1 ? "s" : ""}`}
           </span>
         </div>
         {!isClean && (
