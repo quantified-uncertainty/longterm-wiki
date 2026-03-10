@@ -21,6 +21,9 @@ import { validate } from '../../packages/kb/src/validate.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
 import type { Entity, Fact, ItemEntry, RecordEntry, ValidationResult } from '../../packages/kb/src/types.ts';
 import { commands as kbMigrateCommands } from './kb-migrate.ts';
+import { verifyCommand } from './kb-verify.ts';
+import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
+import { hashId, guessResourceType } from '../resource-utils.ts';
 
 const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
 
@@ -903,6 +906,120 @@ Examples:
   return { exitCode: 0, output: lines.join('\n') };
 }
 
+// ── sync-sources command ─────────────────────────────────────────────────
+
+async function syncSourcesCommand(
+  args: string[],
+  options: KBCommandOptions,
+): Promise<CommandResult> {
+  const graph = await loadGraph();
+
+  // Collect all facts with source URLs
+  const allEntities = graph.getAllEntities();
+  let factsWithSources = 0;
+  const urlToFacts = new Map<string, { entityId: string; factId: string }[]>();
+
+  for (const entity of allEntities) {
+    const facts = graph.getFacts(entity.id);
+    for (const fact of facts) {
+      if (fact.source && isUrl(fact.source)) {
+        factsWithSources++;
+        const existing = urlToFacts.get(fact.source);
+        if (existing) {
+          existing.push({ entityId: entity.id, factId: fact.id });
+        } else {
+          urlToFacts.set(fact.source, [{ entityId: entity.id, factId: fact.id }]);
+        }
+      }
+    }
+  }
+
+  const uniqueUrls = urlToFacts.size;
+
+  if (options.ci) {
+    // Dry run: just report counts
+    const data = {
+      factsWithSources,
+      uniqueUrls,
+      urls: Array.from(urlToFacts.keys()),
+    };
+    return { exitCode: 0, output: JSON.stringify(data) };
+  }
+
+  const lines: string[] = [];
+  lines.push(`\x1b[1mKB Source URL Sync\x1b[0m`);
+  lines.push(`Facts with source URLs: ${factsWithSources}`);
+  lines.push(`Unique URLs: ${uniqueUrls}`);
+  lines.push('');
+
+  let alreadyExisted = 0;
+  let newlyCreated = 0;
+  let errors = 0;
+
+  for (const [url, facts] of urlToFacts) {
+    // Check if resource already exists
+    const lookupResult = await lookupResourceByUrl(url);
+    if (lookupResult.ok) {
+      alreadyExisted++;
+      continue;
+    }
+
+    // If not found (404), create it. For other errors, log and skip.
+    if (!lookupResult.ok && lookupResult.error !== 'bad_request') {
+      // Server unavailable or timeout — log warning and skip
+      console.warn(
+        `Failed to look up resource for URL ${url}: ${lookupResult.message}`
+      );
+      errors++;
+      continue;
+    }
+
+    // Create the resource
+    const resourceId = `kb-${hashId(url)}`;
+    let resourceType: string | null;
+    try {
+      resourceType = guessResourceType(url);
+    } catch {
+      resourceType = null;
+    }
+
+    const upsertResult = await upsertResource({
+      id: resourceId,
+      url,
+      type: resourceType as "paper" | "blog" | "report" | "book" | "talk" | "podcast" | "government" | "reference" | "web" | null,
+      title: null,
+    });
+
+    if (upsertResult.ok) {
+      newlyCreated++;
+      lines.push(`  \x1b[32m+\x1b[0m ${url} -> ${resourceId} (${facts.length} fact(s))`);
+    } else {
+      errors++;
+      console.warn(
+        `Failed to create resource for ${url}: ${upsertResult.message}`
+      );
+      lines.push(`  \x1b[31m!\x1b[0m ${url} (error: ${upsertResult.message.slice(0, 100)})`);
+    }
+  }
+
+  lines.push('');
+  lines.push(`\x1b[1mResults:\x1b[0m`);
+  lines.push(`  Facts with sources: ${factsWithSources}`);
+  lines.push(`  Unique URLs: ${uniqueUrls}`);
+  lines.push(`  Already existed: ${alreadyExisted}`);
+  lines.push(`  New resources created: ${newlyCreated}`);
+  if (errors > 0) {
+    lines.push(`  \x1b[31mErrors: ${errors}\x1b[0m`);
+  }
+
+  return { exitCode: errors > 0 && newlyCreated === 0 ? 1 : 0, output: lines.join('\n') };
+}
+
+/** Check if a string looks like a URL (starts with http:// or https://) */
+function isUrl(s: string): boolean {
+  return s.startsWith('http://') || s.startsWith('https://');
+}
+
 // ── Exports ─────────────────────────────────────────────────────────────
 
 export const commands = {
@@ -917,6 +1034,8 @@ export const commands = {
   stale: staleCommand,
   'needs-update': needsUpdateCommand,
   migrate: kbMigrateCommands.default,
+  'sync-sources': syncSourcesCommand,
+  verify: verifyCommand,
 };
 
 export function getHelp(): string {
@@ -935,13 +1054,18 @@ Commands:
   stale [days]          List facts older than N days (default: 180)
   needs-update <id>     Show missing and stale data for an entity
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
+  sync-sources          Sync KB fact source URLs to wiki-server as Resources
+  verify                Verify KB facts against source URLs using LLM
 
 Options:
   --type=X              Filter list/search/coverage by entity type (e.g. organization, person)
   --limit=N             Limit number of results
-  --ci                  JSON output
+  --ci                  JSON output (sync-sources: dry-run, lists URLs only)
   --errors-only         Show only errors (validate)
   --rule=X              Filter by rule name (validate)
+  --entity=X            (verify) Verify all facts for one entity
+  --fact=X              (verify) Verify a single fact by ID
+  --dry-run             (verify) Show what would be checked without calling LLM
 
 Examples:
   crux kb show anthropic              Show Anthropic with all facts and items
@@ -951,5 +1075,8 @@ Examples:
   crux kb stale 90                    Facts older than 90 days
   crux kb needs-update anthropic      What's missing for Anthropic
   crux kb coverage --type=organization Organizations property coverage
+  crux kb sync-sources                Sync source URLs to wiki-server resources
+  crux kb verify --entity=anthropic   Verify Anthropic facts against sources
+  crux kb verify --dry-run --limit=5  Preview 5 facts that would be checked
 `;
 }

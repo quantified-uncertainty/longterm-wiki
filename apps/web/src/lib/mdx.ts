@@ -18,6 +18,7 @@ import {
   type RefMapEntry,
 } from "./reference-preprocessor";
 import { getKBFactById } from "@data/kb";
+import { preprocessFactFootnotes } from "./fact-footnote-preprocessor";
 
 const CONTENT_DIR = path.resolve(process.cwd(), "../../content/docs");
 const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
@@ -214,13 +215,20 @@ async function compileFromPath(filePath: string, slug: string): Promise<MdxPage 
   const preprocessed = preprocessMdx(mdxSource);
   const headings = extractHeadings(mdxSource);
 
+  // Expand [^fact:FACTID] markers into standard markdown footnotes
+  // (must run before the reference preprocessor to avoid conflicts)
+  const { content: factProcessed } = preprocessFactFootnotes(
+    preprocessed,
+    getKBFactById
+  );
+
   // Run DB-driven reference preprocessor (after preprocessMdx, before compileMDX)
   const pageRefs = getPageReferences(slug);
   const refData = toReferenceData(pageRefs);
 
   // Resolve KB fact references from content
   const kbMarkerRe = /\[\^kb-([a-zA-Z0-9_]+)\]/g;
-  for (const m of preprocessed.matchAll(kbMarkerRe)) {
+  for (const m of factProcessed.matchAll(kbMarkerRe)) {
     const factId = m[1];
     if (refData.kbFacts.has(factId)) continue;
     const fact = getKBFactById(factId);
@@ -237,7 +245,7 @@ async function compileFromPath(filePath: string, slug: string): Promise<MdxPage 
     }
   }
 
-  const { content: refProcessed, referenceMap } = preprocessReferences(preprocessed, refData);
+  const { content: refProcessed, referenceMap } = preprocessReferences(factProcessed, refData);
 
   try {
     const { content } = await compileMDX({
