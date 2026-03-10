@@ -146,7 +146,7 @@ async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
       /^169\.254\./.test(host) ||
       // IPv6 private/reserved ranges
       /^fe80:/i.test(host) ||          // link-local
-      /^f[cd]/i.test(host) ||          // unique local (fc00::/7)
+      /^f[cd][0-9a-f]{2}:/i.test(host) || // unique local (fc00::/7)
       /^::ffff:127\./i.test(host) ||   // IPv4-mapped loopback
       /^::ffff:10\./i.test(host) ||    // IPv4-mapped private
       /^::ffff:192\.168\./i.test(host) || // IPv4-mapped private

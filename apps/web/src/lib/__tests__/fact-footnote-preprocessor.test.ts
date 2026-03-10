@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   preprocessFactFootnotes,
   buildFactFootnoteDefinition,
+  escapeMarkdownInQuote,
   type FactLookupFn,
 } from "../fact-footnote-preprocessor";
 import type { Fact } from "@longterm-wiki/kb";
@@ -383,5 +384,74 @@ describe("buildFactFootnoteDefinition", () => {
 
     const def = buildFactFootnoteDefinition(fact);
     expect(def).toBe("Source: SEC filing Q4 2024");
+  });
+
+  it("escapes Markdown special characters in sourceQuote", () => {
+    const fact = makeFact({
+      id: "f_mdchars",
+      source: "https://example.com",
+      sourceQuote: "Revenue was *very* high with `code` and _emphasis_ [link]",
+    });
+
+    const def = buildFactFootnoteDefinition(fact);
+
+    // Special chars should be escaped
+    expect(def).toContain("\\*very\\*");
+    expect(def).toContain("\\`code\\`");
+    expect(def).toContain("\\_emphasis\\_");
+    expect(def).toContain("\\[link\\]");
+    // The outer italic markers should still be present
+    expect(def).toContain('*"Revenue');
+    expect(def).toContain('\\]"*');
+  });
+
+  it("escapes backslashes in sourceQuote", () => {
+    const fact = makeFact({
+      id: "f_backslash",
+      sourceQuote: "path\\to\\file",
+    });
+
+    const def = buildFactFootnoteDefinition(fact);
+    expect(def).toContain("path\\\\to\\\\file");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Tests: escapeMarkdownInQuote
+// ---------------------------------------------------------------------------
+
+describe("escapeMarkdownInQuote", () => {
+  it("escapes asterisks", () => {
+    expect(escapeMarkdownInQuote("*bold*")).toBe("\\*bold\\*");
+  });
+
+  it("escapes backticks", () => {
+    expect(escapeMarkdownInQuote("`code`")).toBe("\\`code\\`");
+  });
+
+  it("escapes underscores", () => {
+    expect(escapeMarkdownInQuote("_italic_")).toBe("\\_italic\\_");
+  });
+
+  it("escapes square brackets", () => {
+    expect(escapeMarkdownInQuote("[link](url)")).toBe("\\[link\\](url)");
+  });
+
+  it("escapes backslashes", () => {
+    expect(escapeMarkdownInQuote("a\\b")).toBe("a\\\\b");
+  });
+
+  it("returns plain text unchanged", () => {
+    expect(escapeMarkdownInQuote("Revenue reached $1B")).toBe(
+      "Revenue reached $1B"
+    );
+  });
+
+  it("handles multiple special characters together", () => {
+    expect(escapeMarkdownInQuote("*_`[\\")).toBe("\\*\\_\\`\\[\\\\");
+  });
+
+  it("handles empty string", () => {
+    expect(escapeMarkdownInQuote("")).toBe("");
   });
 });
