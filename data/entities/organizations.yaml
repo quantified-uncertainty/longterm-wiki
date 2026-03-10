@@ -31,7 +31,7 @@
       relationship: addresses
     - id: racing-dynamics
       type: risk
-      relationship: affected-by
+      relationship: shaped-by
     - id: daniela-amodei
       type: person
       relationship: leads-to
