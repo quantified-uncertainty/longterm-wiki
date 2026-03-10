@@ -1,30 +1,32 @@
 /**
  * AnthropicStakeholdersTable — server wrapper
  *
- * Reads equity-holders, round-investments, funding-rounds, and charitable-pledges
- * from KB, joins them relationally, derives display categories from round data,
- * and overlays editorial EA-alignment estimates before passing to the client.
+ * Reads equity-positions, investments, funding-rounds, and charitable-pledges
+ * from KB records, joins them relationally, derives display categories from
+ * round data, and overlays editorial EA-alignment estimates before passing
+ * to the client.
  */
 
-import { getKBLatest, getKBItems } from "@data/kb";
+import { getKBLatest, getKBRecords, getKBEntity } from "@data/kb";
 import { getEntityById, getPageById, getEntityHref } from "@/data";
-import { numericIdToSlug } from "@/lib/mdx";
 import { AnthropicStakeholdersTableClient, type EntityPreview, type Stakeholder } from "@components/wiki/AnthropicStakeholdersTableClient";
+import type { RecordEntry } from "@longterm-wiki/kb";
 
 // ── EA Alignment (editorial estimates, not KB data) ─────────────────────────
 // These are subjective editorial assessments of how likely each stakeholder's
 // charitable giving is to flow to EA-aligned causes. They don't belong in KB
 // because they are analytical opinions, not facts.
+// Keys are entity slugs where the person has a KB entity, or displayName for non-entities.
 const EA_ALIGNMENT: Record<string, [number, number]> = {
-  "Dario Amodei":             [0.8,  0.9],
-  "Daniela Amodei":           [0.8,  0.9],
-  "Chris Olah":               [0.4,  0.6],
-  "Jack Clark":               [0.3,  0.5],
-  "Tom Brown":                [0.15, 0.3],
-  "Jared Kaplan":             [0.15, 0.3],
-  "Sam McCandlish":           [0.15, 0.3],
-  "Jaan Tallinn":             [0.9,  0.95],
-  "Dustin Moskovitz":         [0.9,  0.95],
+  "dario-amodei":             [0.8,  0.9],
+  "daniela-amodei":           [0.8,  0.9],
+  "chris-olah":               [0.4,  0.6],
+  "jack-clark":               [0.3,  0.5],
+  "tom-brown":                [0.15, 0.3],
+  "jared-kaplan":             [0.15, 0.3],
+  "sam-mccandlish":           [0.15, 0.3],
+  "jaan-tallinn":             [0.9,  0.95],
+  "dustin-moskovitz":         [0.9,  0.95],
   "Employee equity pool":     [0.4,  0.7],
 };
 
@@ -35,6 +37,20 @@ function parseRange(field: unknown): [number, number] | null {
     return [field[0], field[1]];
   }
   return null;
+}
+
+/** Get a display name for a record's endpoint field. */
+function resolveRecordName(record: RecordEntry, endpointField: string): string {
+  if (record.displayName) return record.displayName;
+  const slug = record.fields[endpointField] as string;
+  if (!slug) return record.key;
+  const entity = getKBEntity(slug);
+  return entity?.name ?? slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+/** Get a join key for matching records across collections. Uses slug or displayName. */
+function getRecordJoinKey(record: RecordEntry, endpointField: string): string {
+  return (record.fields[endpointField] as string) || record.displayName || record.key;
 }
 
 /**
@@ -96,85 +112,72 @@ export async function AnthropicStakeholdersTable() {
   else if (abs >= 1e6) valuationDisplay = `$${(valuation / 1e6).toFixed(0)}M`;
   else valuationDisplay = `$${valuation.toLocaleString("en-US")}`;
 
-  // Load all four KB collections
-  const equityItems = getKBItems("anthropic", "equity-holders");
-  const pledgeItems = getKBItems("anthropic", "charitable-pledges");
-  const roundInvestments = getKBItems("anthropic", "round-investments");
-  const fundingRounds = getKBItems("anthropic", "funding-rounds");
-
-  if (equityItems.length === 0) {
-    throw new Error("Missing KB equity-holders items for anthropic");
+  // Load all four KB record collections
+  const equityRecords = getKBRecords("anthropic", "equity-positions");
+  const pledgeRecords = getKBRecords("anthropic", "charitable-pledges");
+  const investmentRecords = getKBRecords("anthropic", "investments");
+  if (equityRecords.length === 0) {
+    throw new Error("Missing KB equity-positions records for anthropic");
   }
 
-  // Index funding rounds by key for quick lookup
-  const roundsByKey = new Map<string, { date?: string; name?: string; valuation?: number }>();
-  for (const round of fundingRounds) {
-    roundsByKey.set(round.key, {
-      date: typeof round.fields.date === "string" ? round.fields.date : undefined,
-      name: typeof round.fields.name === "string" ? round.fields.name : undefined,
-      valuation: typeof round.fields.valuation === "number" ? round.fields.valuation : undefined,
-    });
-  }
-
-  // Index round-investments by investor name
+  // Index investments by investor join key (entity slug or displayName)
+  // In the records format, investments have round_name and date directly
   const investmentsByHolder = new Map<string, Array<{
     role?: string;
-    roundKey: string;
     roundDate?: string;
     roundName?: string;
     amount?: number;
   }>>();
-  for (const inv of roundInvestments) {
-    const name = String(inv.fields.investor ?? "");
-    const roundKey = String(inv.fields.round ?? "");
-    const roundInfo = roundsByKey.get(roundKey);
+  for (const inv of investmentRecords) {
+    const joinKey = getRecordJoinKey(inv, "investor");
     const entry = {
       role: typeof inv.fields.role === "string" ? inv.fields.role : undefined,
-      roundKey,
-      roundDate: roundInfo?.date,
-      roundName: roundInfo?.name,
+      roundDate: typeof inv.fields.date === "string" ? inv.fields.date : undefined,
+      roundName: typeof inv.fields.round_name === "string" ? inv.fields.round_name : undefined,
       amount: typeof inv.fields.amount === "number" ? inv.fields.amount : undefined,
     };
-    const existing = investmentsByHolder.get(name) || [];
+    const existing = investmentsByHolder.get(joinKey) || [];
     existing.push(entry);
-    investmentsByHolder.set(name, existing);
+    investmentsByHolder.set(joinKey, existing);
   }
 
-  // Index pledges by pledger name
-  const pledgeByName = new Map<string, { pledge: [number, number]; notes?: string }>();
-  for (const item of pledgeItems) {
-    const name = String(item.fields.pledger ?? item.key);
-    const pledge = parseRange(item.fields.pledge);
+  // Index pledges by pledger join key (entity slug or displayName)
+  const pledgeByKey = new Map<string, { pledge: [number, number]; notes?: string }>();
+  for (const rec of pledgeRecords) {
+    const joinKey = getRecordJoinKey(rec, "pledger");
+    const pledge = parseRange(rec.fields.pledge);
     if (pledge) {
-      pledgeByName.set(name, {
+      pledgeByKey.set(joinKey, {
         pledge,
-        notes: typeof item.fields.notes === "string" ? item.fields.notes : undefined,
+        notes: typeof rec.fields.notes === "string" ? rec.fields.notes : undefined,
       });
     }
   }
 
-  // Collect entity numeric IDs from all collections
-  const entityNumericIds = new Set<string>();
-  for (const item of [...equityItems, ...pledgeItems, ...roundInvestments]) {
-    for (const refField of ["entity_ref", "investor_ref"]) {
-      const ref = item.fields[refField];
-      if (typeof ref === "string" && ref.startsWith("E")) {
-        entityNumericIds.add(ref);
-      }
-    }
+  // Collect entity slugs from all record endpoint fields for entity preview lookups
+  const entitySlugs = new Set<string>();
+  for (const rec of equityRecords) {
+    const slug = rec.fields.holder;
+    if (typeof slug === "string") entitySlugs.add(slug);
+  }
+  for (const rec of pledgeRecords) {
+    const slug = rec.fields.pledger;
+    if (typeof slug === "string") entitySlugs.add(slug);
+  }
+  for (const rec of investmentRecords) {
+    const slug = rec.fields.investor;
+    if (typeof slug === "string") entitySlugs.add(slug);
   }
 
-  // Fetch entity previews
+  // Fetch entity previews using slugs
   const entityPreviews: Record<string, EntityPreview> = {};
-  for (const numId of entityNumericIds) {
-    const slug = numericIdToSlug(numId);
-    if (!slug) continue;
+  for (const slug of entitySlugs) {
     const entity = getEntityById(slug);
     const page = getPageById(slug);
     if (!entity) continue;
     const href = getEntityHref(slug, entity.type);
-    const wikiKey = `/wiki/${numId}`;
-    entityPreviews[wikiKey] = {
+    // Use the href as the key so client can look up by link
+    entityPreviews[href] = {
       title: entity.title || slug,
       type: entity.type,
       description: page?.description || entity.description,
@@ -182,30 +185,42 @@ export async function AnthropicStakeholdersTable() {
     };
   }
 
-  // Join equity holders with round-investments, pledges, and EA alignment
-  const stakeholders: Stakeholder[] = equityItems.map((item) => {
-    const f = item.fields;
-    const name = String(f.holder ?? item.key);
+  // Join equity positions with investments, pledges, and EA alignment
+  const stakeholders: Stakeholder[] = equityRecords.map((record) => {
+    const f = record.fields;
+    const joinKey = getRecordJoinKey(record, "holder");
+    const name = resolveRecordName(record, "holder");
     const stake = parseRange(f.stake);
     const stakeMin = stake ? stake[0] : null;
     const stakeMax = stake ? stake[1] : null;
 
-    // Derive category from round-investments
-    const investments = investmentsByHolder.get(name) || [];
+    // Derive category from investments
+    const investments = investmentsByHolder.get(joinKey) || [];
     const category = deriveCategory(name, investments);
 
-    // Look up pledge by name
-    const pledgeData = pledgeByName.get(name);
+    // Look up pledge by join key
+    const pledgeData = pledgeByKey.get(joinKey);
     const pledgeMin = pledgeData ? pledgeData.pledge[0] : 0;
     const pledgeMax = pledgeData ? pledgeData.pledge[1] : 0;
 
-    // Look up EA alignment from editorial map
-    const ea = EA_ALIGNMENT[name];
+    // Look up EA alignment from editorial map (keyed by slug or displayName)
+    const ea = EA_ALIGNMENT[joinKey];
     const eaAlignMin = ea ? ea[0] : 0;
     const eaAlignMax = ea ? ea[1] : 0;
 
-    const entityRef = typeof f.entity_ref === "string" ? f.entity_ref : undefined;
-    const link = entityRef ? `/wiki/${entityRef}` : undefined;
+    // Build link from entity slug
+    const holderSlug = typeof f.holder === "string" ? f.holder : undefined;
+    let link: string | undefined;
+    if (holderSlug) {
+      const kbEntity = getKBEntity(holderSlug);
+      if (kbEntity?.numericId) {
+        link = `/wiki/${kbEntity.numericId}`;
+      } else {
+        // Try the wiki data layer
+        const href = getEntityHref(holderSlug);
+        if (href !== `/wiki/${holderSlug}`) link = href; // only if it resolved to a numeric ID
+      }
+    }
 
     // Include in totals if they have a non-zero pledge and a defined stake
     const includeInTotal = pledgeMax > 0 && stakeMin !== null;

@@ -5,7 +5,8 @@ temporal: false
 endpoints:
   pledger:
     types: [person]
-    implicit: true
+    required: true
+    allow_display_name: true
 
 fields:
   pledge: { type: number, description: "Fraction of equity/wealth pledged (0.8 = 80%). Single number or [min, max]." }

@@ -14,6 +14,7 @@ import {
   getKBEntity,
   getKBProperties,
   getKBAllItemCollections,
+  getKBAllRecordCollections,
   getKBSchema,
   isFactExpired,
 } from "@data/kb";
@@ -391,8 +392,10 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
     (f) => f.propertyId !== "description",
   );
 
-  // Get item collections
-  const allCollections = getKBAllItemCollections(entityId);
+  // Get item collections (items + records merged)
+  const itemCollections = getKBAllItemCollections(entityId);
+  const recordCollections = getKBAllRecordCollections(entityId);
+  const allCollections = { ...itemCollections, ...recordCollections };
   const collectionNames = Object.keys(allCollections);
   const totalItems = collectionNames.reduce(
     (sum, name) => sum + (allCollections[name]?.length ?? 0),

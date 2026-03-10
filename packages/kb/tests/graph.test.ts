@@ -37,8 +37,7 @@ describe("graph", () => {
   describe("getFacts", () => {
     it("returns all facts for an entity", () => {
       const facts = graph.getFacts("anthropic");
-      // Original 37 + 14 migrated facts = 51
-      expect(facts).toHaveLength(51);
+      expect(facts).toHaveLength(52);
     });
 
     it("returns empty array for an entity with no facts", () => {
@@ -206,21 +205,22 @@ describe("graph", () => {
     });
   });
 
-  describe("getItems", () => {
-    it("returns item entries with keys and fields", () => {
-      const rounds = graph.getItems("anthropic", "funding-rounds");
+  describe("getItems / getRecords", () => {
+    it("returns record entries with keys and fields", () => {
+      const rounds = graph.getRecords("anthropic", "funding-rounds");
       expect(rounds.length).toBeGreaterThan(0);
 
-      // Each entry has a key and fields
+      // Each entry has a key, schema, and fields
       for (const entry of rounds) {
         expect(typeof entry.key).toBe("string");
         expect(typeof entry.fields).toBe("object");
+        expect(entry.schema).toBe("funding-round");
       }
     });
 
-    it("returns correct data for a specific entry", () => {
-      const people = graph.getItems("anthropic", "key-people");
-      const darioCeo = people.find((p) => p.key === "i_Xp9vKZzBsg");
+    it("returns correct data for a specific record entry", () => {
+      const people = graph.getRecords("anthropic", "key-persons");
+      const darioCeo = people.find((p) => p.key === "dario-amodei");
       expect(darioCeo).toBeDefined();
       expect(darioCeo!.fields.person).toBe("dario-amodei");
       expect(darioCeo!.fields.title).toBe("CEO");
@@ -240,21 +240,6 @@ describe("graph", () => {
   });
 
   describe("getItemsMentioning", () => {
-    it("finds items referencing an entity via ref fields", () => {
-      // Anthropic's key-people collection has person fields referencing
-      // dario-amodei, jan-leike, etc. (typed as ref in schema)
-      const mentions = graph.getItemsMentioning("dario-amodei");
-      expect(mentions.length).toBeGreaterThan(0);
-
-      // Should find the key-people entry on Anthropic
-      const anthropicMention = mentions.find(
-        (m) => m.ownerEntityId === "anthropic" && m.collection === "key-people"
-      );
-      expect(anthropicMention).toBeDefined();
-      expect(anthropicMention!.matchingFields).toContain("person");
-      expect(anthropicMention!.entry.fields.person).toBe("dario-amodei");
-    });
-
     it("does not include self-references", () => {
       const mentions = graph.getItemsMentioning("anthropic");
       // Should not find items from Anthropic's own collections

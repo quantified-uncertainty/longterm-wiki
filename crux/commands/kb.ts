@@ -19,7 +19,7 @@ import { computeInverses } from '../../packages/kb/src/inverse.ts';
 import { formatFactValue, formatItemEntry } from '../../packages/kb/src/format.ts';
 import { validate } from '../../packages/kb/src/validate.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
-import type { Entity, Fact, ItemEntry, ValidationResult } from '../../packages/kb/src/types.ts';
+import type { Entity, Fact, ItemEntry, RecordEntry, ValidationResult } from '../../packages/kb/src/types.ts';
 import { commands as kbMigrateCommands } from './kb-migrate.ts';
 
 const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
@@ -169,6 +169,20 @@ function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): Co
     }
   }
 
+  // Record collections
+  const recordCollections = getEntityRecordCollections(entity.id, graph);
+  if (recordCollections.length > 0) {
+    lines.push(`\x1b[1mRecords:\x1b[0m`);
+    for (const { name, records } of recordCollections) {
+      lines.push(`  ${name} (${records.length} entries)`);
+      for (const record of records) {
+        const summary = formatRecordEntry(record, graph);
+        lines.push(`    ${summary}`);
+      }
+      lines.push('');
+    }
+  }
+
   return { exitCode: 0, output: lines.join('\n') };
 }
 
@@ -187,6 +201,41 @@ function getEntityItemCollections(
     }
   }
   return results;
+}
+
+/**
+ * Get all record collections for an entity by querying the graph directly.
+ */
+function getEntityRecordCollections(
+  entityId: string,
+  graph: Graph,
+): Array<{ name: string; records: RecordEntry[] }> {
+  const results: Array<{ name: string; records: RecordEntry[] }> = [];
+  for (const collName of graph.getRecordCollectionNames(entityId)) {
+    const records = graph.getRecords(entityId, collName);
+    if (records.length > 0) {
+      results.push({ name: collName, records });
+    }
+  }
+  return results;
+}
+
+/**
+ * Format a record entry for display.
+ */
+function formatRecordEntry(record: RecordEntry, graph: Graph): string {
+  const name = record.displayName || record.key;
+  const fields = Object.entries(record.fields)
+    .map(([k, v]) => {
+      // Resolve entity refs to names
+      if (typeof v === 'string') {
+        const entity = graph.getEntity(v);
+        if (entity) return `${k}: ${entity.name} (${v})`;
+      }
+      return `${k}: ${v}`;
+    })
+    .join(', ');
+  return `${name}: ${fields}`;
 }
 
 // ── list command ────────────────────────────────────────────────────────
@@ -226,6 +275,9 @@ async function listCommand(
       itemCount: graph.getItemCollectionNames(e.id).reduce(
         (sum, col) => sum + graph.getItems(e.id, col).length,
         0,
+      ) + graph.getRecordCollectionNames(e.id).reduce(
+        (sum, col) => sum + graph.getRecords(e.id, col).length,
+        0,
       ),
     }));
     return { exitCode: 0, output: JSON.stringify(data) };
@@ -241,6 +293,9 @@ async function listCommand(
     const facts = graph.getFacts(entity.id);
     const itemCount = graph.getItemCollectionNames(entity.id).reduce(
       (sum, col) => sum + graph.getItems(entity.id, col).length,
+      0,
+    ) + graph.getRecordCollectionNames(entity.id).reduce(
+      (sum, col) => sum + graph.getRecords(entity.id, col).length,
       0,
     );
     const row = `${entity.id.padEnd(24)} ${entity.name.padEnd(24)} ${entity.type.padEnd(16)} ${entity.stableId.padEnd(14)} ${String(facts.length).padEnd(7)} ${itemCount}`;
