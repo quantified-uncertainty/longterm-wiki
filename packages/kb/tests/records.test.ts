@@ -156,7 +156,8 @@ describe("records", () => {
 
   describe("endpoint index", () => {
     it("indexes records by explicit endpoint (investor)", () => {
-      const tallinnRecords = graph.getRecordsReferencing(idOf("jaan-tallinn"));
+      // Record fields store slugs (not entity IDs) as references, so look up by slug
+      const tallinnRecords = graph.getRecordsReferencing("jaan-tallinn");
       expect(tallinnRecords.length).toBeGreaterThanOrEqual(3);
 
       // Should include equity-position, investment, and charitable-pledge
@@ -167,11 +168,11 @@ describe("records", () => {
     });
 
     it("filters endpoint index by collection name", () => {
-      const tallinnEquity = graph.getRecordsReferencing(idOf("jaan-tallinn"), "equity-positions");
+      const tallinnEquity = graph.getRecordsReferencing("jaan-tallinn", "equity-positions");
       expect(tallinnEquity).toHaveLength(1);
       expect(tallinnEquity[0].fields.stake).toEqual([0.006, 0.017]);
 
-      const tallinnInvestments = graph.getRecordsReferencing(idOf("jaan-tallinn"), "investments");
+      const tallinnInvestments = graph.getRecordsReferencing("jaan-tallinn", "investments");
       expect(tallinnInvestments.length).toBeGreaterThanOrEqual(2); // seed + series-a
     });
 
