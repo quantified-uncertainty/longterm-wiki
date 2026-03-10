@@ -854,9 +854,8 @@ function normalizeUrlForMatch(str) {
  *
  * @param {object} kb - Serialized KB data
  * @param {object} citationQuotesBundle - Citation quotes keyed by page ID
- * @param {Array} resources - Resources array from database.resources (unused, kept for API compat)
  */
-function buildKBFactVerification(kb, citationQuotesBundle, resources) {
+function buildKBFactVerification(kb, citationQuotesBundle) {
   if (!kb || !kb.facts || !citationQuotesBundle) {
     console.log('  kbFactVerification: skipped (no KB or citation data)');
     return {};
@@ -1345,7 +1344,7 @@ async function main() {
   // =========================================================================
   // KB FACT VERIFICATION — cross-reference KB source URLs with citation quotes
   // =========================================================================
-  database.kbFactVerification = buildKBFactVerification(database.kb, citationQuotesBundle, resources);
+  database.kbFactVerification = buildKBFactVerification(database.kb, citationQuotesBundle);
 
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates);
