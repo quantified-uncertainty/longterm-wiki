@@ -1326,3 +1326,39 @@ export const pageCitations = pgTable(
     index("idx_pc_reference_id").on(table.referenceId),
   ]
 );
+
+/**
+ * KB fact verifications — stores verification results for KB facts.
+ *
+ * Each row records the result of checking a KB fact against its source URL.
+ * An LLM checker visits the source, extracts the relevant value, and
+ * compares it to the KB fact's stored value.
+ */
+export const kbFactVerifications = pgTable(
+  "kb_fact_verifications",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    factId: text("fact_id").notNull(), // KB fact ID (e.g., f_i59sRXPSZw)
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
+    verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial
+    confidence: real("confidence"), // 0.0 to 1.0
+    extractedValue: text("extracted_value"), // What the source actually says
+    checkerModel: text("checker_model"), // Which LLM checked this (e.g., claude-sonnet-4-6)
+    checkedAt: timestamp("checked_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_kbfv_fact_id").on(table.factId),
+    index("idx_kbfv_verdict").on(table.verdict),
+  ]
+);
