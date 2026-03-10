@@ -21,6 +21,7 @@ import { Graph } from "./graph";
 import type {
   PropertiesFile,
   SchemaFile,
+  RecordSchemaFile,
   EntityFile,
   RawFact,
   Property,
@@ -29,6 +30,9 @@ import type {
   Fact,
   FactValue,
   ItemCollection,
+  RecordSchema,
+  RecordEntry,
+  EndpointDef,
 } from "./types";
 
 // ── !ref YAML tag ──────────────────────────────────────────────────
@@ -261,6 +265,28 @@ function parseSchema(raw: unknown): TypeSchema {
     required: file.required ?? [],
     recommended: file.recommended ?? [],
     items: file.items,
+    ...(file.records && { records: file.records }),
+  };
+}
+
+function parseRecordSchema(id: string, raw: unknown): RecordSchema {
+  const file = raw as RecordSchemaFile;
+  const endpoints: Record<string, EndpointDef> = {};
+  for (const [name, def] of Object.entries(file.endpoints ?? {})) {
+    endpoints[name] = {
+      types: def.types,
+      ...(def.implicit && { implicit: true }),
+      ...(def.required && { required: true }),
+      ...(def.allow_display_name && { allowDisplayName: true }),
+    };
+  }
+  return {
+    id,
+    name: file.name,
+    ...(file.description && { description: file.description }),
+    endpoints,
+    fields: file.fields ?? {},
+    ...(file.temporal && { temporal: true }),
   };
 }
 
@@ -370,6 +396,76 @@ async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unkno
   return results;
 }
 
+// ── Record helpers ─────────────────────────────────────────────────────
+
+/**
+ * Maps a collection name (e.g., "funding-rounds") to a record schema ID
+ * (e.g., "funding-round"). Tries exact match, then depluralization (strip trailing "s").
+ */
+function findRecordSchemaId(
+  collectionName: string,
+  allowedIds: string[],
+  graph: Graph,
+): string | undefined {
+  // Exact match (e.g., collection "career-history" → schema "career-history")
+  if (allowedIds.includes(collectionName) && graph.getRecordSchema(collectionName)) {
+    return collectionName;
+  }
+  // Depluralize: "funding-rounds" → "funding-round"
+  if (collectionName.endsWith("s")) {
+    const singular = collectionName.slice(0, -1);
+    if (allowedIds.includes(singular) && graph.getRecordSchema(singular)) {
+      return singular;
+    }
+  }
+  // Check all allowed IDs for plural match: schema "grant" → collection "grants"
+  for (const id of allowedIds) {
+    if (id + "s" === collectionName && graph.getRecordSchema(id)) {
+      return id;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Parses a raw YAML record entry into a RecordEntry.
+ * Separates temporal fields (asOf, validEnd), display_name, and data fields.
+ */
+function parseRecordEntry(
+  key: string,
+  raw: Record<string, unknown>,
+  schemaId: string,
+  ownerEntityId: string,
+  schema: RecordSchema,
+): RecordEntry {
+  const fields: Record<string, unknown> = {};
+  let displayName: string | undefined;
+  let asOf: string | undefined;
+  let validEnd: string | undefined;
+
+  for (const [fieldName, fieldValue] of Object.entries(raw)) {
+    if (fieldName === "display_name") {
+      displayName = String(fieldValue);
+    } else if (fieldName === "asOf") {
+      asOf = fieldValue instanceof DateMarker ? fieldValue.value : String(fieldValue);
+    } else if (fieldName === "validEnd") {
+      validEnd = fieldValue instanceof DateMarker ? fieldValue.value : String(fieldValue);
+    } else {
+      fields[fieldName] = fieldValue;
+    }
+  }
+
+  return {
+    key,
+    schema: schemaId,
+    ownerEntityId,
+    fields,
+    ...(displayName && { displayName }),
+    ...(asOf && { asOf }),
+    ...(validEnd && { validEnd }),
+  };
+}
+
 // ── Main loader ────────────────────────────────────────────────────────
 
 /**
@@ -413,6 +509,14 @@ export async function loadKB(dataDir: string): Promise<Graph> {
     graph.addSchema(schema);
   }
 
+  // 2b. Load record schemas (schemas/records/*.yaml)
+  const recordSchemaFiles = await readYamlFiles(join(dataDir, "schemas", "records"));
+  for (const { name, parsed } of recordSchemaFiles) {
+    const id = name.replace(/\.(yaml|yml)$/, "");
+    const recordSchema = parseRecordSchema(id, parsed);
+    graph.addRecordSchema(recordSchema);
+  }
+
   // 3. Load entities (two passes)
   const entityFiles = await readYamlFiles(join(dataDir, "things"));
 
@@ -447,6 +551,52 @@ export async function loadKB(dataDir: string): Promise<Graph> {
         const collection = parseItemCollection(resolvedItems, collectionName);
         if (collection) {
           graph.addItemCollection(entity.id, collectionName, collection);
+        }
+      }
+    }
+
+    // Parse records (new unified format)
+    if (file.records) {
+      const resolvedRecords = resolveRefs(
+        file.records,
+        graph,
+        `${entity.id}/records`
+      ) as Record<string, Record<string, Record<string, unknown>>>;
+
+      // Look up which record schemas this entity type can host
+      const typeSchema = graph.getSchema(entity.type);
+      const allowedRecordIds = typeSchema?.records ?? [];
+
+      for (const [collectionName, rawEntries] of Object.entries(resolvedRecords)) {
+        // Map collection name to schema ID. Collection names use pluralized
+        // form (e.g., "funding-rounds") while schema IDs are singular
+        // (e.g., "funding-round"). Try both.
+        const schemaId = findRecordSchemaId(collectionName, allowedRecordIds, graph);
+        if (!schemaId) {
+          console.warn(
+            `[kb/loader] Unknown record collection "${collectionName}" on entity "${entity.id}" ` +
+            `(allowed: ${allowedRecordIds.join(", ")})`
+          );
+          continue;
+        }
+
+        const recordSchema = graph.getRecordSchema(schemaId);
+        if (!recordSchema) {
+          console.warn(
+            `[kb/loader] Record schema "${schemaId}" not found for collection "${collectionName}" on "${entity.id}"`
+          );
+          continue;
+        }
+
+        for (const [key, rawEntry] of Object.entries(rawEntries)) {
+          const entry = parseRecordEntry(
+            key,
+            rawEntry,
+            schemaId,
+            entity.id,
+            recordSchema,
+          );
+          graph.addRecord(collectionName, entry);
         }
       }
     }

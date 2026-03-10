@@ -1,0 +1,16 @@
+name: Career History
+description: "Chronological career positions, including current and past roles."
+temporal: true
+
+endpoints:
+  person:
+    types: [person]
+    implicit: true
+
+fields:
+  organization: { type: text, required: true, description: "Organization name or entity slug" }
+  title: { type: text, required: true, description: "Job title or role" }
+  start: { type: date, description: "Start date (YYYY or YYYY-MM)" }
+  end: { type: date, description: "End date (omit if current)" }
+  source: { type: text, description: "URL confirming the role" }
+  notes: { type: text, description: "Context about the role or transition" }
