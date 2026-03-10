@@ -7,7 +7,7 @@
  */
 
 import { getDatabase } from "@data";
-import type { Fact, Property, Entity, TypeSchema, ItemEntry } from "@longterm-wiki/kb";
+import type { Fact, Property, Entity, TypeSchema, ItemEntry, RecordEntry, RecordSchema } from "@longterm-wiki/kb";
 import type { SerializedKB } from "@longterm-wiki/kb";
 
 function getKB(): SerializedKB | undefined {
@@ -270,6 +270,83 @@ export function getKBSchema(type: string): TypeSchema | undefined {
   if (!kb) return undefined;
 
   return kb.schemas.find((s) => s.type === type);
+}
+
+// ── Record access (unified records with schema-defined endpoints) ────
+
+/**
+ * Get record entries for a named collection on an entity (primary index).
+ */
+export function getKBRecords(entity: string, collection: string): RecordEntry[] {
+  const kb = getKB();
+  if (!kb) return [];
+  return kb.records?.[entity]?.[collection] ?? [];
+}
+
+/**
+ * Get all record collections for an entity.
+ */
+export function getKBAllRecordCollections(entity: string): Record<string, RecordEntry[]> {
+  const kb = getKB();
+  if (!kb) return {};
+  return { ...(kb.records?.[entity] ?? {}) };
+}
+
+/**
+ * Get a record schema by ID.
+ */
+export function getKBRecordSchema(schemaId: string): RecordSchema | undefined {
+  const kb = getKB();
+  if (!kb) return undefined;
+  return kb.recordSchemas?.find((s) => s.id === schemaId);
+}
+
+/**
+ * Get all record schemas.
+ */
+export function getKBRecordSchemas(): RecordSchema[] {
+  const kb = getKB();
+  if (!kb) return [];
+  return kb.recordSchemas ?? [];
+}
+
+/**
+ * Find all records across all entities that reference the given entityId
+ * via an explicit endpoint field. Optionally filter by collection name.
+ *
+ * This is the serialized equivalent of Graph.getRecordsReferencing().
+ * Scans all records and checks explicit endpoint fields using record schemas.
+ */
+export function getKBRecordsReferencing(
+  entityId: string,
+  collectionName?: string,
+): RecordEntry[] {
+  const kb = getKB();
+  if (!kb || !kb.records || !kb.recordSchemas) return [];
+
+  // Build schema Map for O(1) lookups instead of linear scan per entry
+  const schemaMap = new Map(kb.recordSchemas.map((s) => [s.id, s]));
+
+  const results: RecordEntry[] = [];
+
+  for (const [, collections] of Object.entries(kb.records)) {
+    for (const [colName, entries] of Object.entries(collections)) {
+      if (collectionName && colName !== collectionName) continue;
+      for (const entry of entries) {
+        const schema = schemaMap.get(entry.schema);
+        if (!schema) continue;
+        for (const [endpointName, endpointDef] of Object.entries(schema.endpoints)) {
+          if (endpointDef.implicit) continue;
+          if (entry.fields[endpointName] === entityId) {
+            results.push(entry);
+            break; // Don't add same entry twice
+          }
+        }
+      }
+    }
+  }
+
+  return results;
 }
 
 /**

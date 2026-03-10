@@ -3,7 +3,7 @@
  */
 
 import type { Graph } from "./graph";
-import type { ItemEntry } from "./types";
+import type { ItemEntry, RecordEntry, RecordSchema } from "./types";
 
 export interface SerializedKB {
   entities: ReturnType<Graph["getAllEntities"]>;
@@ -11,6 +11,10 @@ export interface SerializedKB {
   properties: ReturnType<Graph["getAllProperties"]>;
   schemas: ReturnType<Graph["getAllSchemas"]>;
   items: Record<string, Record<string, ItemEntry[]>>;
+  /** Record schemas (id → schema) */
+  recordSchemas: RecordSchema[];
+  /** Records indexed by ownerEntityId → collectionName → entries */
+  records: Record<string, Record<string, RecordEntry[]>>;
 }
 
 /**
@@ -21,9 +25,11 @@ export function serialize(graph: Graph): SerializedKB {
   const entities = graph.getAllEntities();
   const properties = graph.getAllProperties();
   const schemas = graph.getAllSchemas();
+  const recordSchemas = graph.getAllRecordSchemas();
 
   const facts: SerializedKB["facts"] = {};
   const items: SerializedKB["items"] = {};
+  const records: SerializedKB["records"] = {};
 
   for (const entity of entities) {
     const entityFacts = graph.getFacts(entity.id);
@@ -45,7 +51,21 @@ export function serialize(graph: Graph): SerializedKB {
         items[entity.id] = entityItems;
       }
     }
+
+    // Serialize record collections for this entity
+    const recordCollections = graph.getAllRecordCollections(entity.id);
+    if (recordCollections.size > 0) {
+      const entityRecords: Record<string, RecordEntry[]> = {};
+      for (const [collectionName, entries] of recordCollections) {
+        if (entries.length > 0) {
+          entityRecords[collectionName] = entries;
+        }
+      }
+      if (Object.keys(entityRecords).length > 0) {
+        records[entity.id] = entityRecords;
+      }
+    }
   }
 
-  return { entities, facts, properties, schemas, items };
+  return { entities, facts, properties, schemas, items, recordSchemas, records };
 }

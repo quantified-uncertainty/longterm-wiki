@@ -1,0 +1,18 @@
+name: Funding Round
+description: "Equity and strategic investment rounds, in chronological order."
+temporal: false
+
+endpoints:
+  company:
+    types: [organization]
+    implicit: true
+
+fields:
+  name: { type: text, required: true, description: "Round name (e.g. Series A, Founding)" }
+  date: { type: date, required: true, description: "Close date (YYYY-MM)" }
+  raised: { type: number, unit: USD, description: "Capital raised in this round" }
+  valuation: { type: number, unit: USD, description: "Post-money valuation" }
+  instrument: { type: text, description: "Investment instrument: equity, convertible-note, strategic-partnership, or founding" }
+  lead_investor: { type: ref, description: "Lead investor (entity slug)" }
+  source: { type: text, description: "URL to announcement or news article" }
+  notes: { type: text, description: "Context, caveats, or important details" }

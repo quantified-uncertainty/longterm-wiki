@@ -135,6 +135,8 @@ export interface TypeSchema {
   recommended: string[];
   /** Named item collections (e.g., funding-rounds, key-people) */
   items?: Record<string, ItemCollectionSchema>;
+  /** Record schema IDs this entity type can host (e.g., ["funding-round", "investment"]) */
+  records?: string[];
 }
 
 // ── Items (lightweight sub-collections) ─────────────────────────────
@@ -153,6 +155,50 @@ export interface ItemCollection {
   entries: Record<string, Record<string, unknown>>;
 }
 
+// ── Records (unified sub-collections with schema-defined endpoints) ──
+
+export interface EndpointDef {
+  /** Valid entity types for this endpoint */
+  types: string[];
+  /** If true, inferred from containing entity file (not written in YAML) */
+  implicit?: boolean;
+  /** If true, the endpoint entity ref must be provided */
+  required?: boolean;
+  /** If true, display_name can substitute for entity ref */
+  allowDisplayName?: boolean;
+}
+
+export interface RecordSchema {
+  /** Schema ID: "investment", "funding-round" */
+  id: string;
+  /** Display name */
+  name: string;
+  description?: string;
+  /** Entity reference fields that position this record in the graph */
+  endpoints: Record<string, EndpointDef>;
+  /** Data fields */
+  fields: Record<string, FieldDef>;
+  /** If true, entries support asOf/validEnd */
+  temporal?: boolean;
+}
+
+export interface RecordEntry {
+  /** Local key within the collection */
+  key: string;
+  /** Schema ID (record type) */
+  schema: string;
+  /** Entity ID of the containing file (the implicit endpoint) */
+  ownerEntityId: string;
+  /** Typed fields (data + explicit endpoint values) */
+  fields: Record<string, unknown>;
+  /** Display name for non-entity participants (when allow_display_name is true) */
+  displayName?: string;
+  /** When this record was valid from (ISO date or YYYY-MM) */
+  asOf?: string;
+  /** When this record stopped being valid */
+  validEnd?: string;
+}
+
 // ── YAML file shapes ────────────────────────────────────────────────
 
 /** Shape of an entity's YAML file (data/things/anthropic.yaml) */
@@ -169,6 +215,19 @@ export interface EntityFile {
   };
   facts?: RawFact[];
   items?: Record<string, RawItemCollection>;
+  /** Unified records (replaces items for new data) */
+  records?: Record<string, Record<string, RawRecordEntry>>;
+}
+
+/** Raw record entry as stored in YAML (before normalization) */
+export interface RawRecordEntry {
+  /** Display name for non-entity participants */
+  display_name?: string;
+  /** Temporal bounds */
+  asOf?: unknown;
+  validEnd?: unknown;
+  /** All other fields (data + explicit endpoints) */
+  [field: string]: unknown;
 }
 
 /** Fact as stored in YAML (before normalization).
@@ -219,6 +278,22 @@ export interface SchemaFile {
     description: string;
     fields: Record<string, FieldDef>;
   }>;
+  /** Record schema IDs this entity type can host */
+  records?: string[];
+}
+
+/** Shape of a record schema YAML file (schemas/records/investment.yaml) */
+export interface RecordSchemaFile {
+  name: string;
+  description?: string;
+  temporal?: boolean;
+  endpoints: Record<string, {
+    types: string[];
+    implicit?: boolean;
+    required?: boolean;
+    allow_display_name?: boolean;
+  }>;
+  fields: Record<string, FieldDef>;
 }
 
 // ── Validation ──────────────────────────────────────────────────────
