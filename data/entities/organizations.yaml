@@ -58,9 +58,6 @@
       relationship: related
     - id: deepmind
       type: organization
-    - id: computer-use
-      type: capability
-      relationship: research
     - id: anthropic-government-standoff
       type: event
       relationship: related
