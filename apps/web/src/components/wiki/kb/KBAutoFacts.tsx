@@ -442,7 +442,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
           <span className="text-sm font-semibold text-foreground">
             Structured Data
           </span>
-          <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground flex items-center gap-1.5 ml-1">
             {substantiveFacts.length > 0 && (
               <span>
                 {substantiveFacts.length}{" "}

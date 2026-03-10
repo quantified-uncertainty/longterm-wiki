@@ -67,7 +67,7 @@ export function formatKBNumber(
     }
     const formatted = Number.isInteger(num)
       ? num.toLocaleString()
-      : num.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      : num.toLocaleString("en-US", { maximumFractionDigits: 2 });
     // If currency override provided and display has a currency-like prefix, use currency symbol
     let prefix = display.prefix ?? "";
     if (currency && Object.hasOwn(CURRENCIES, currency)) {

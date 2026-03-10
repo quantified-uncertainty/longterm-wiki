@@ -87,14 +87,14 @@ facts:
     property: valuation
     value: 61.5e9
     asOf: 2025-03
-    source: https://www.anthropic.com/news/series-e
+    source: https://www.anthropic.com/news/anthropic-raises-series-e-at-usd61-5b-post-money-valuation
     notes: "Series E post-money valuation"
 
   - id: f_val_2025_09
     property: valuation
     value: 183e9
     asOf: 2025-09
-    source: https://www.anthropic.com/news/series-f
+    source: https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation
     notes: "Series F post-money valuation"
 
   - id: f_mN3pQ7kX2r
@@ -839,7 +839,7 @@ items:
         valuation: 61.5e9
         instrument: equity
         lead_investor: lightspeed
-        source: https://www.anthropic.com/news/series-e
+        source: https://www.anthropic.com/news/anthropic-raises-series-e-at-usd61-5b-post-money-valuation
         notes: "Led by Lightspeed Venture Partners. ~5.7% dilution."
 
       i_R6dd3cZH8A:
@@ -849,7 +849,7 @@ items:
         valuation: 183e9
         instrument: equity
         lead_investor: iconiq
-        source: https://www.anthropic.com/news/series-f
+        source: https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation
         notes: "Led by ICONIQ, Fidelity, Lightspeed. ARR had reached $4B. ~7.1% dilution."
 
       i_Qci9UDdgkw:
