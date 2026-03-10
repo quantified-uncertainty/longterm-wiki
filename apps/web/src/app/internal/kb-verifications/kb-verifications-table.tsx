@@ -1,9 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import type { ColumnDef } from "@tanstack/react-table";
+import { useState, useEffect, useCallback } from "react";
+import type { ColumnDef, ExpandedState } from "@tanstack/react-table";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getExpandedRowModel,
+  type SortingState,
+  type ColumnFiltersState,
+} from "@tanstack/react-table";
+import { ChevronRight, Loader2 } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
-import type { VerdictRow } from "./kb-verifications-content";
+import { cn } from "@/lib/utils";
+import type { VerdictRow, VerdictDetailResult } from "./kb-verifications-content";
 
 // ── Verdict badge ─────────────────────────────────────────────────────────────
 
@@ -27,9 +39,38 @@ function VerdictBadge({ verdict }: { verdict: string }) {
   );
 }
 
+// ── Expand toggle column ─────────────────────────────────────────────────────
+
+function expandToggleColumn<TData>(): ColumnDef<TData> {
+  return {
+    id: "expand",
+    size: 32,
+    header: () => null,
+    cell: ({ row }) => (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          row.toggleExpanded();
+        }}
+        className="p-1 rounded hover:bg-muted transition-colors"
+        aria-label={row.getIsExpanded() ? "Collapse" : "Expand"}
+      >
+        <ChevronRight
+          className={cn(
+            "h-4 w-4 text-muted-foreground transition-transform",
+            row.getIsExpanded() && "rotate-90"
+          )}
+        />
+      </button>
+    ),
+  };
+}
+
 // ── Columns ───────────────────────────────────────────────────────────────────
 
 const columns: ColumnDef<VerdictRow>[] = [
+  expandToggleColumn<VerdictRow>(),
   {
     accessorKey: "factId",
     header: ({ column }) => (
@@ -118,10 +159,128 @@ const columns: ColumnDef<VerdictRow>[] = [
   },
 ];
 
+// ── Expanded row detail ─────────────────────────────────────────────────────
+
+type DetailCache = Record<string, {
+  status: "loading" | "error" | "loaded";
+  data?: VerdictDetailResult;
+  error?: string;
+}>;
+
+function ExpandedVerificationDetail({
+  factId,
+  cache,
+  onLoad,
+}: {
+  factId: string;
+  cache: DetailCache;
+  onLoad: (factId: string) => void;
+}) {
+  const entry = cache[factId];
+
+  useEffect(() => {
+    if (!entry) {
+      onLoad(factId);
+    }
+  }, [factId, entry, onLoad]);
+
+  if (!entry || entry.status === "loading") {
+    return (
+      <div className="flex items-center gap-2 px-6 py-4 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Loading verification details...
+      </div>
+    );
+  }
+
+  if (entry.status === "error") {
+    return (
+      <div className="px-6 py-4 text-sm text-red-500">
+        Failed to load details: {entry.error}
+      </div>
+    );
+  }
+
+  const verifications = entry.data?.verifications ?? [];
+
+  if (verifications.length === 0) {
+    return (
+      <div className="px-6 py-4 text-sm text-muted-foreground">
+        No per-resource verifications found for this fact.
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-6 py-4 bg-muted/30">
+      <div className="text-xs font-semibold text-muted-foreground mb-2">
+        Per-Resource Verifications ({verifications.length})
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-border/40 text-left text-muted-foreground">
+              <th className="py-1.5 pr-3 font-medium">Resource</th>
+              <th className="py-1.5 pr-3 font-medium">Verdict</th>
+              <th className="py-1.5 pr-3 font-medium">Confidence</th>
+              <th className="py-1.5 pr-3 font-medium">Extracted Value</th>
+              <th className="py-1.5 pr-3 font-medium">Model</th>
+              <th className="py-1.5 pr-3 font-medium">Primary</th>
+              <th className="py-1.5 pr-3 font-medium">Checked At</th>
+              <th className="py-1.5 font-medium">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {verifications.map((v) => (
+              <tr key={v.id} className="border-b border-border/20 last:border-0">
+                <td className="py-1.5 pr-3 font-mono text-muted-foreground">
+                  {v.resourceId}
+                </td>
+                <td className="py-1.5 pr-3">
+                  <VerdictBadge verdict={v.verdict} />
+                </td>
+                <td className="py-1.5 pr-3 tabular-nums">
+                  {v.confidence != null
+                    ? `${Math.round(v.confidence * 100)}%`
+                    : "-"}
+                </td>
+                <td className="py-1.5 pr-3 max-w-[200px] truncate" title={v.extractedValue ?? undefined}>
+                  {v.extractedValue || (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                </td>
+                <td className="py-1.5 pr-3 text-muted-foreground">
+                  {v.checkerModel || "-"}
+                </td>
+                <td className="py-1.5 pr-3">
+                  {v.isPrimarySource ? (
+                    <span className="text-emerald-500 font-medium">yes</span>
+                  ) : (
+                    <span className="text-muted-foreground">no</span>
+                  )}
+                </td>
+                <td className="py-1.5 pr-3 tabular-nums text-muted-foreground">
+                  {v.checkedAt
+                    ? new Date(v.checkedAt).toLocaleDateString()
+                    : "-"}
+                </td>
+                <td className="py-1.5 max-w-[250px] truncate text-muted-foreground" title={v.notes ?? undefined}>
+                  {v.notes || "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 // ── Table component ───────────────────────────────────────────────────────────
 
 export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
   const [filterVerdict, setFilterVerdict] = useState<string>("all");
+  const [detailCache, setDetailCache] = useState<DetailCache>({});
 
   // Compute unique verdicts for filter buttons
   const verdictCounts = new Map<string, number>();
@@ -134,6 +293,68 @@ export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
     filterVerdict === "all"
       ? data
       : data.filter((d) => d.verdict === filterVerdict);
+
+  // Table state
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "confidence", desc: true },
+  ]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [expanded, setExpanded] = useState<ExpandedState>({});
+
+  const table = useReactTable({
+    data: filtered,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    onExpandedChange: setExpanded,
+    globalFilterFn: "includesString",
+    state: {
+      sorting,
+      columnFilters,
+      globalFilter,
+      expanded,
+      pagination: { pageIndex: 0, pageSize: 100 },
+    },
+  });
+
+  const fetchDetail = useCallback(
+    async (factId: string) => {
+      setDetailCache((prev) => ({
+        ...prev,
+        [factId]: { status: "loading" },
+      }));
+
+      try {
+        const res = await fetch(
+          `/api/kb-verdict-detail?factId=${encodeURIComponent(factId)}`
+        );
+        if (!res.ok) {
+          throw new Error(`Server returned ${res.status} ${res.statusText}`);
+        }
+        const json = await res.json();
+        setDetailCache((prev) => ({
+          ...prev,
+          [factId]: { status: "loaded", data: json },
+        }));
+      } catch (e) {
+        const message =
+          e instanceof Error ? e.message : String(e);
+        console.warn(`Failed to fetch verdict detail for ${factId}: ${message}`);
+        setDetailCache((prev) => ({
+          ...prev,
+          [factId]: { status: "error", error: message },
+        }));
+      }
+    },
+    []
+  );
 
   return (
     <div className="not-prose">
@@ -166,10 +387,17 @@ export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
       </div>
 
       <DataTable
-        columns={columns}
-        data={filtered}
-        defaultSorting={[{ id: "confidence", desc: true }]}
-        searchPlaceholder="Search facts..."
+        table={table}
+        renderExpandedRow={(row) => {
+          if (!row.getIsExpanded()) return null;
+          return (
+            <ExpandedVerificationDetail
+              factId={row.original.factId}
+              cache={detailCache}
+              onLoad={fetchDetail}
+            />
+          );
+        }}
       />
     </div>
   );
