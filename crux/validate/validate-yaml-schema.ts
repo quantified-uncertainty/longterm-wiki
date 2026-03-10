@@ -157,11 +157,6 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   allErrors.push(...pubErrors);
   if (!ciMode) console.log(`  ${publications.length} publications loaded`);
 
-  // Build set of valid resource IDs for sourceResource cross-referencing
-  const validResourceIds = new Set<string>(
-    resources.map((r: YamlItemWithSource) => (r as Record<string, unknown>).id as string).filter(Boolean)
-  );
-
   // Build set of valid entity IDs (slugs) for fact entity cross-referencing
   const validEntityIds = new Set<string>(
     entities.map((e: YamlItemWithSource) => (e as Record<string, unknown>).id as string).filter(Boolean)
@@ -223,17 +218,6 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
                 issues: [`Unknown measure "${fact.measure}" — not defined in data/fact-measures.yaml`],
               });
             }
-          }
-        }
-        // Cross-reference: check that sourceResource IDs point to valid resources
-        for (const [factId, fact] of Object.entries(result.data.facts)) {
-          if (fact.sourceResource && !validResourceIds.has(fact.sourceResource)) {
-            allErrors.push({
-              file: filepath,
-              id: `${result.data.entity}.${factId}`,
-              type: 'Fact',
-              issues: [`Unknown sourceResource "${fact.sourceResource}" — not found in data/resources/`],
-            });
           }
         }
         // Cross-reference: check that entity references a valid entity ID

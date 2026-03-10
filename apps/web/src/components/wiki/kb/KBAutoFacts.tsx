@@ -274,7 +274,6 @@ const DEFAULT_ITEM_COLUMNS: Record<string, string[]> = {
 /** Excluded fields (metadata, not useful in summary view). */
 const EXCLUDED_ITEM_FIELDS = new Set([
   "source",
-  "sourceResource",
   "notes",
   "key-publication",
   "key_publication",

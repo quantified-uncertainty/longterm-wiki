@@ -8,52 +8,46 @@ thing:
     - CZI
 
 facts:
-  - id: f_czi_pledge_initial
+  - id: f_AXsBEkGCvg
     property: total-funding
     value: 45e9
     asOf: "2015-12"
     source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
-    sourceResource: b39807b5264f3f80
     notes: "Initial value of 99% Facebook share pledge at founding"
 
-  - id: f_czi_pledge_current
+  - id: f_xL0PjvPDlQ
     property: total-funding
     value: 200e9
     asOf: "2025"
     source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
-    sourceResource: b39807b5264f3f80
     notes: "Current value of 99% Facebook share pledge, exceeds $200B"
 
-  - id: f_czi_annual_budget
+  - id: f_bQVfcGecvg
     property: revenue
     value: 1e9
     asOf: "2025"
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
-    sourceResource: 4d0f2f2e28cf4b4d
     notes: "Approximate annual operating budget as of 2025"
 
-  - id: f_czi_gpu_cluster_2024
+  - id: f_nwzajasrug
     property: gpu-count
     value: 1024
     asOf: "2024"
     source: https://chanzuckerberg.com/rfa/ai-computing-gpu/
-    sourceResource: d2b65bcf69368ae7
     notes: "NVIDIA H100 DGX SuperPOD cluster (1,024 GPUs) for life sciences AI"
 
-  - id: f_czi_gpu_planned_2028
+  - id: f_WeyydGaZNw
     property: gpu-count
     value: 10000
     asOf: "2025"
     source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
-    sourceResource: ba7cf061039527d9
     notes: "Planned 10x expansion of GPU cluster by 2028 (10,000 GPUs)"
 
-  - id: f_czi_workforce_cut
+  - id: f_60fN0AilQQ
     property: headcount
     value: 70
     asOf: "2026"
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
-    sourceResource: 4d0f2f2e28cf4b4d
     notes: "Approximately 70 jobs cut (~8% of workforce) to refocus on AI-biomedical research"
 
 items:

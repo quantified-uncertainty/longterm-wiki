@@ -29,7 +29,7 @@ facts:
     source: https://openai.com/blog/introducing-openai
     notes: "Originally incorporated as nonprofit OpenAI Inc."
 
-  - id: f_legalStruct2
+  - id: f_tuq7f39JMg
     property: legal-structure
     value: "Capped-profit LLC"
     asOf: 2019-03
@@ -37,14 +37,14 @@ facts:
     source: https://openai.com/blog/openai-lp
     notes: "Created capped-profit subsidiary OpenAI LP"
 
-  - id: f_legalStruct3
+  - id: f_tz2t0YfIWg
     property: legal-structure
     value: "Public Benefit Corporation (converting)"
     asOf: "2025"
     source: https://openai.com/blog/openai-lp
     notes: "Announced conversion to PBC in 2025"
 
-  - id: f_openai_founded_by
+  - id: f_A4ImW0y2sw
     property: founded-by
     value:
       - !ref JKsVHQ5stQ:sam-altman
@@ -60,7 +60,6 @@ facts:
     value: 13e9
     asOf: 2024-01
     source: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
-    sourceResource: 862e2d851c171321
     notes: "Microsoft cumulative investment across multiple rounds"
 
   - id: f_b56n3kcD2g
@@ -118,38 +117,33 @@ facts:
     notes: "Approximate gross margin; lower than Anthropic due to heavier compute usage"
 
   # ── Migrated from old facts system ─────────────────────────────
-  - id: f_gpt3_parameters
+  - id: f_ZencK2XFDA
     property: model-parameters
     value: 175e9
     asOf: 2020-06
     source: https://arxiv.org/abs/2005.14165
-    sourceResource: 2cab3ea10b8b7ae2
     notes: "GPT-3 parameter count."
 
-  - id: f_o1_aime_score
+  - id: f_W5pFmO2ocw
     property: benchmark-score
     value: 83
     asOf: 2024-09
-    sourceResource: 9edf2bd5938d8386
     notes: "o1 model performance on AIME math competition."
 
-  - id: f_o1_swe_bench
+  - id: f_5MsUCUfbSw
     property: benchmark-score
     value: 71.7
     asOf: 2024-09
-    sourceResource: 9edf2bd5938d8386
     notes: "o1 model on SWE-bench Verified."
 
-  - id: f_revenue_growth_2024
+  - id: f_Cvorun6akA
     property: description
     value: "Monthly revenue growth from early 2023 to September 2024: 1,700%"
-    sourceResource: 9437e7cf32e629df
     notes: "Not single-year YoY; reflects rapid growth from near-zero base."
 
-  - id: f_cofounder_departure
+  - id: f_cOr3zkAB2Q
     property: description
     value: "75% of co-founders departed within 9 years of founding (by 2024)"
-    sourceResource: 85ba042a002437a0
 
 items:
   funding-rounds:
@@ -176,7 +170,6 @@ items:
         amount: 10e9
         lead_investor: microsoft
         source: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
-        sourceResource: 862e2d851c171321
         notes: "Microsoft's multi-year, multi-billion dollar investment reported at ~$10B; brought total Microsoft commitment to ~$13B"
 
       i_eTZe3xfv0w:
@@ -230,7 +223,6 @@ items:
         start: 2023-07
         end: 2024-05
         source: https://openai.com/blog/introducing-superalignment
-        sourceResource: 41000216ddbfc99d
         notes: "Co-led Superalignment team from its founding in July 2023; resigned May 2024 citing safety concerns, joined Anthropic"
 
       i_n2EXWPmoaw:

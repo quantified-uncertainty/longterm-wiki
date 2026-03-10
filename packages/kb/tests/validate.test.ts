@@ -359,6 +359,30 @@ describe("validate", () => {
       expect(formatErrors).toHaveLength(1);
       expect(formatErrors[0].severity).toBe("error");
     });
+
+    it("rejects descriptive fact IDs (old format)", () => {
+      const g = new Graph();
+      g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
+      g.addProperty({ id: "revenue", name: "Revenue", dataType: "number" });
+      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addFact({ id: "f_rev_2024_12", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 1e9 } });
+
+      const results = validateEntity(g, "ent");
+      const formatErrors = results.filter((r) => r.rule === "factid-format");
+      expect(formatErrors).toHaveLength(1);
+    });
+
+    it("rejects fact IDs with wrong length after f_ prefix", () => {
+      const g = new Graph();
+      g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
+      g.addProperty({ id: "name", name: "Name", dataType: "text" });
+      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addFact({ id: "f_short", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" } });
+
+      const results = validateEntity(g, "ent");
+      const formatErrors = results.filter((r) => r.rule === "factid-format");
+      expect(formatErrors).toHaveLength(1);
+    });
   });
 
   describe("empty-name check", () => {

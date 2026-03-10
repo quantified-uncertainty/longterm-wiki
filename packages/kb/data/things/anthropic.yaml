@@ -24,7 +24,7 @@ facts:
     source: https://uk.finance.yahoo.com/news/anthropic-arr-surges-19-billion-151210607.html
     notes: "ARR mid-2024"
 
-  - id: f_rev_2024_12
+  - id: f_i59sRXPSZw
     property: revenue
     value: 1e9
     asOf: 2024-12
@@ -38,19 +38,18 @@ facts:
     source: https://www.reuters.com/technology/anthropic-on-track-raise-money-2-billion-run-rate-revenue-sources-2025-03-15/
     notes: "Run-rate revenue March 2025"
 
-  - id: f_rev_2025_07
+  - id: f_WLpl0xLCEA
     property: revenue
     value: 4e9
     asOf: 2025-07
     source: https://uk.finance.yahoo.com/news/anthropic-arr-surges-19-billion-151210607.html
     notes: "ARR at time of Series F announcement"
 
-  - id: f_rev_2025_10
+  - id: f_5KhEeJqXzg
     property: revenue
     value: 7e9
     asOf: 2025-10
     source: https://www.pminsights.com/insights/anthropic-approaches-7b-run-rate-in-2025-outpaces-openai
-    sourceResource: 926e4c583994b48d
     notes: "ARR approaching $7B; outpacing OpenAI growth rate"
 
   - id: f_tG6nH1yS3b
@@ -60,12 +59,11 @@ facts:
     source: https://uk.finance.yahoo.com/news/anthropic-arr-surges-19-billion-151210607.html
     notes: "Run-rate exceeding $9B at end of 2025"
 
-  - id: f_rev_2026_02
+  - id: f_esWJIYxVFQ
     property: revenue
     value: 14e9
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Run-rate revenue at Series G announcement; 500+ customers spending $1M+ annually"
 
   - id: f_dW5cR9mJ8q
@@ -76,21 +74,21 @@ facts:
     notes: "Nearing $20B ARR; company guidance $20-26B for 2026"
 
   # ── Valuation ───────────────────────────────────────────────────
-  - id: f_val_2024_02
+  - id: f_CdywhhCodg
     property: valuation
     value: 18e9
     asOf: 2024-02
     source: https://fortune.com/2024/02/20/anthropic-750-million-funding/
     notes: "Series D post-money valuation"
 
-  - id: f_val_2025_03
+  - id: f_Vs2y6JyGAA
     property: valuation
     value: 61.5e9
     asOf: 2025-03
     source: https://www.anthropic.com/news/anthropic-raises-series-e-at-usd61-5b-post-money-valuation
     notes: "Series E post-money valuation"
 
-  - id: f_val_2025_09
+  - id: f_QNbaTzUdGQ
     property: valuation
     value: 183e9
     asOf: 2025-09
@@ -102,17 +100,16 @@ facts:
     value: 380e9
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Series G post-money valuation; second-largest venture deal ever behind OpenAI's $40B"
 
   # ── Total Funding ───────────────────────────────────────────────
-  - id: f_fund_2023_10
+  - id: f_V3qsrDVY3A
     property: total-funding
     value: 4.4e9
     asOf: 2023-10
     notes: "Estimate; no published source. After Google $2B investment and Amazon first tranche"
 
-  - id: f_fund_2025_07
+  - id: f_oBMR5hGA6A
     property: total-funding
     value: 15e9
     asOf: 2025-07
@@ -123,29 +120,26 @@ facts:
     value: 67e9
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Total funding raised including $30B Series G. Exceeds equity round sum because it includes Amazon cloud credit commitments and multi-tranche strategic investments not listed as individual rounds."
 
   # ── Headcount ───────────────────────────────────────────────────
-  - id: f_hc_2022
+  - id: f_zBoko30S4g
     property: headcount
     value: 192
     asOf: 2022-12
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
-    sourceResource: 423364c2f6bc5f49
     notes: "Early-stage headcount"
 
-  - id: f_hc_2024_09
+  - id: f_a7TezcOwMA
     property: headcount
     value:
       - 870
       - 2847
     asOf: 2024-09
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
-    sourceResource: 423364c2f6bc5f49
     notes: "Point estimate 1097 from LinkedIn/consistent sources; full range 870-2847 depending on methodology"
 
-  - id: f_hc_2026_01
+  - id: f_BdGi5l9dOg
     property: headcount
     value: 4074
     asOf: 2026-01
@@ -159,7 +153,7 @@ facts:
     source: https://anthropic.com/company
     notes: "Founded by seven former OpenAI researchers in January 2021"
 
-  - id: f_anthropic_founded_by
+  - id: f_tAtOfKqDjg
     property: founded-by
     value:
       - !ref zR4nW8xB2f:dario-amodei
@@ -181,7 +175,6 @@ facts:
     property: legal-structure
     value: "Public benefit corporation"
     source: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
-    sourceResource: 357cf00ad44eea37
     notes: "Incorporated as Delaware PBC with Long-Term Benefit Trust holding Class T stock"
 
   # ── Financial Detail ────────────────────────────────────────────
@@ -192,21 +185,21 @@ facts:
     source: https://www.theinformation.com/articles/anthropics-finances
     notes: "10 percentage points below previous estimate; inference costs surged 23% more than expected"
 
-  - id: f_gm_target_2026
+  - id: f_VeJPtr2gAQ
     property: gross-margin
     value: 63
     asOf: 2026-12
     source: https://www.theinformation.com/articles/anthropics-finances
     notes: "2026 target gross margin; 2028 target is 77%"
 
-  - id: f_burn_2024
+  - id: f_TaHnceQDdQ
     property: cash-burn
     value: 5.6e9
     asOf: 2024-12
     source: https://www.investing.com/news/company-news/anthropic-set-to-become-profitable-before-openai-amid-ai-race-4349418
     notes: "Annual cash burn for 2024"
 
-  - id: f_burn_2025
+  - id: f_SImz3xFPTw
     property: cash-burn
     value: 3e9
     asOf: 2025-12
@@ -214,176 +207,162 @@ facts:
     notes: "Expected cash burn for 2025; down from $5.6B in 2024"
 
   # ── Market Share ────────────────────────────────────────────────
-  - id: f_ems_2024
+  - id: f_bqY8WIQxNg
     property: enterprise-market-share
     value: 18
     asOf: 2024-12
     source: https://www.emarketer.com/content/openai-leads--anthropic-surges-enterprise-ai-shifts-multi-model-reality
     notes: "Enterprise AI assistant market share"
 
-  - id: f_ems_2025
+  - id: f_nitUVudRdQ
     property: enterprise-market-share
     value: 32
     asOf: 2025-07
     source: https://dataconomy.com/2025/08/04/anthropic-leads-enterprise-llms-with-32-market-share/
     notes: "Menlo Ventures survey; up from 12% two years prior. OpenAI at 50% → 25%"
 
-  - id: f_cms_2025
+  - id: f_qgj5UBfOAg
     property: coding-market-share
     value: 42
     asOf: 2025-07
     source: https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/
-    sourceResource: 3a07423e8bf204c2
     notes: "Enterprise coding market share; more than double OpenAI's 21%"
 
   # ── Product & Usage ─────────────────────────────────────────────
-  - id: f_mau_2025
+  - id: f_JoN2Jr8liA
     property: monthly-active-users
     value: 18.9e6
     asOf: 2025-03
     source: https://backlinko.com/claude-users
     notes: "Monthly active users across claude.ai"
 
-  - id: f_biz_customers
+  - id: f_GYoFtt5wsw
     property: business-customers
     value: 300000
     asOf: 2025-10
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Grew from fewer than 1,000 businesses to 300,000+ in two years; 80% of revenue from business"
 
-  - id: f_api_calls
+  - id: f_Nje8oobrCw
     property: api-calls-monthly
     value: 25e9
     asOf: 2025-12
     source: https://www.businessofapps.com/data/claude-statistics/
     notes: "Monthly API calls"
 
-  - id: f_cc_revenue
+  - id: f_C3f6dHDO8Q
     property: product-revenue
     value: 2.5e9
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Claude Code run-rate revenue; hit $1B milestone in Nov 2025, doubled by Feb 2026"
 
   # ── Safety ──────────────────────────────────────────────────────
-  - id: f_safety_level
+  - id: f_BnkEWenniQ
     property: safety-level
     value: "ASL-3 (Opus 4+), ASL-2 (Sonnet/Haiku)"
     asOf: 2025-05
     validEnd: 2026-02
     source: https://www.anthropic.com/news/activating-asl3-protections
-    sourceResource: 7512ddb574f82249
     notes: "First activation of ASL-3 for Claude Opus 4; precautionary/provisional"
 
-  - id: f_safety_level_2026
+  - id: f_R59LmVVzcw
     property: safety-level
     value: "ASL-3 (Opus 4, Opus 4.5, Opus 4.6), ASL-2 (Sonnet, Haiku)"
     asOf: 2026-02
     source: https://www.anthropic.com/news/activating-asl3-protections
-    sourceResource: 7512ddb574f82249
     notes: "Opus 4.6 launched Feb 2026 under ASL-3; all Opus-tier models are ASL-3, Sonnet/Haiku remain ASL-2"
 
-  - id: f_safety_researchers
+  - id: f_ddR2zmZ1ZQ
     property: safety-researcher-count
     value: 265
     asOf: 2025-12
     notes: "Estimate; no published source. Estimated 200-330 across interpretability, alignment science, policy, trust & safety; ~20-30% of technical staff"
 
-  - id: f_interp_team
+  - id: f_vNw3jgVCvg
     property: interpretability-team-size
     value: 50
     asOf: 2025-12
     notes: "Estimate; no published source. Estimated 40-60 researchers; among the largest concentrations globally"
 
   # ── Migrated from old facts system ─────────────────────────────
-  - id: f_val_2025_11
+  - id: f_Pd29CR24TA
     property: valuation
     value: 350e9
     asOf: 2025-11
-    sourceResource: 787a2639f9e64ca5
     notes: "Valuation at Microsoft/Nvidia commitment."
 
-  - id: f_revenue_guidance_2026
+  - id: f_U3LMAv6zjQ
     property: revenue-guidance
     value: 20e9
     asOf: 2026-01
-    sourceResource: cb3e2358bd128df5
     notes: "Base case $20B, best case $26B per Reuters."
 
-  - id: f_retention_rate_2025
+  - id: f_VuX4YGhERw
     property: retention-rate
     value: 88
     asOf: "2025"
     notes: "Estimate; no published source identified for this specific figure"
 
-  - id: f_customer_concentration_2025
+  - id: f_AySLGNdWrw
     property: customer-concentration
     value: 25
     asOf: "2025"
     notes: "Estimate; no published source. Revenue share from top customers (Cursor, GitHub Copilot); inferred from reporting"
 
-  - id: f_safety_staffing_ratio_2025
+  - id: f_w2MNMoBnsg
     property: safety-staffing-ratio
     value: 25
     asOf: "2025"
     notes: "Estimate; no published source. 20-30% of technical staff in safety-related roles"
 
-  - id: f_infra_investment_2026
+  - id: f_CrjYKVhbow
     property: infrastructure-investment
     value: 50e9
     asOf: "2026"
-    sourceResource: 52c1c2def0184008
     notes: "AI infrastructure expansion plan announced November 2025."
 
-  - id: f_breakeven_target
+  - id: f_gwwJxIwrNA
     property: description
     value: "Projected breakeven year: 2028"
-    sourceResource: eb642ee7de582ff5
     notes: "Per internal financial projections."
 
-  - id: f_google_stake_pct
+  - id: f_HLyq7TgthA
     property: equity-stake-percent
     value: 14
     asOf: 2026-02
-    sourceResource: 233fe5e95bfcf8bc
     notes: "Approximate Google post-Series G equity stake; computed from $3.3B invested across 3 rounds."
 
-  - id: f_founder_equity_value
+  - id: f_FXudrRDOeQ
     property: equity-value
     value: 66.5e9
     asOf: 2026-02
-    sourceResource: fd8351a24e375eba
     notes: "All seven co-founders combined equity value estimated $53-80B (midpoint used); 2-3% each x $380B valuation."
 
-  - id: f_founder_pledge_total
+  - id: f_RqnR8XyGFQ
     property: description
     value: "Founder pledge total (80% of equity): $43-64B estimated"
-    sourceResource: fd8351a24e375eba
     notes: "All seven co-founders pledged to donate 80% of their wealth."
 
-  - id: f_employee_equity_value
+  - id: f_4rxgmu6Z7A
     property: equity-value
     value: 57e9
     asOf: 2026-02
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Employee equity pool value estimated $46-68B (midpoint used); 12-18% of $380B valuation."
 
-  - id: f_per_founder_stake_pct
+  - id: f_akJZvJpTFg
     property: equity-stake-percent
     value: 2.5
     asOf: 2026-02
-    sourceResource: fd8351a24e375eba
     notes: "Per-founder equity stake; each of 7 co-founders holds approximately 2-3% (midpoint used)."
 
-  - id: f_tallinn_stake_pct
+  - id: f_nJ9CJQcZ4A
     property: equity-stake-percent
     value: 1.15
     asOf: 2026-02
     notes: "Estimate; no published source. Jaan Tallinn equity stake estimated 0.6-1.7% (midpoint used); Series A lead position"
 
-  - id: f_ea_aligned_capital
+  - id: f_xKAnrZIbwg
     property: description
     value: "EA-aligned capital (risk-adjusted): $27-76B estimated"
     notes: "Estimate; no published source. Risk-adjusted estimate of EA-aligned philanthropic capital from all Anthropic stakeholders"
@@ -800,7 +779,6 @@ items:
         instrument: convertible-note
         lead_investor: amazon
         source: https://www.aboutamazon.com/news/aws/amazon-invests-additional-4-billion-anthropic-ai
-        sourceResource: 3dde9794b9713369
         notes: "Completing initial $4B commitment. Convertible notes; partially converted to equity in Q1 2025."
 
       i_ubgY3jW3mg:
@@ -829,7 +807,6 @@ items:
         instrument: equity
         lead_investor: google
         source: https://www.cnbc.com/2025/01/22/google-agrees-to-new-1-billion-investment-in-anthropic.html
-        sourceResource: ac6cbd8d06bd1b94
         notes: "Brings total Google equity investment to ~$3.3B; current stake ~14%"
 
       i_guKCmeQaTw:
@@ -868,7 +845,6 @@ items:
         instrument: equity
         lead_investor: gic
         source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-        sourceResource: 8e3ff50b9ef2a1a8
         notes: "Led by GIC and Coatue; co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, MGX. Second-largest venture deal ever. ARR ~$14B."
 
   # ── Key People ──────────────────────────────────────────────────
@@ -895,7 +871,6 @@ items:
         start: 2021-01
         is_founder: true
         source: https://transformer-circuits.pub/
-        sourceResource: 5083d746c2728ff2
 
       i_Lk0hINDSpw:
         person: tom-brown
@@ -964,7 +939,6 @@ items:
         title: "Managing Director, International"
         start: 2025-09
         source: https://www.anthropic.com/news/anthropic-expands-global-leadership-in-enterprise-ai-naming-chris-ciauri-as-managing-director-of
-        sourceResource: e51a9f82540a1841
         notes: "Former Google/Salesforce executive; leads international expansion"
 
       i_ARzSHznWcw:
@@ -1008,21 +982,18 @@ items:
         launched: 2024-06
         description: "In-chat content creation and preview feature"
         source: https://www.anthropic.com/news/claude-3-5-sonnet
-        sourceResource: e91e6f80eaaceb58
 
       i_WQYrxcbW3A:
         name: Computer Use
         launched: 2024-10
         description: "Beta feature allowing Claude to control computer interfaces"
         source: https://www.anthropic.com/news/3-5-models-and-computer-use
-        sourceResource: 9e4ef9c155b6d9f3
 
       i_092nWs831A:
         name: Model Context Protocol (MCP)
         launched: 2024-11
         description: "Open standard for LLM-tool integration; donated to Linux Foundation's AAIF Dec 2025"
         source: https://www.anthropic.com/news/model-context-protocol
-        sourceResource: e283b9c34207eff8
 
       i_5ZyixnNTeg:
         name: Claude Code
@@ -1058,7 +1029,6 @@ items:
         description: "Three-tier model family; Opus was most capable model at launch"
         safety_level: ASL-2
         source: https://www.anthropic.com/news/claude-3-family
-        sourceResource: a2cf0d0271acb097
 
       i_awvmOlUY6w:
         name: Claude 3.5 Sonnet
@@ -1066,7 +1036,6 @@ items:
         description: "Outperformed larger Opus model; launched with Artifacts feature"
         safety_level: ASL-2
         source: https://www.anthropic.com/news/claude-3-5-sonnet
-        sourceResource: e91e6f80eaaceb58
 
       i_nXh3T0GNeg:
         name: "Claude 3.5 Sonnet v2 + 3.5 Haiku"
@@ -1101,7 +1070,6 @@ items:
         description: "80.9% SWE-bench Verified — first model above 80%; 42% enterprise coding share"
         safety_level: ASL-3
         source: https://www.anthropic.com/news/claude-opus-4-5
-        sourceResource: 57f01cae307e1cb1
         notes: "Up to 65% fewer tokens; 50-75% reduction in tool calling & build errors"
 
       i_NCUgFGdwKA:
@@ -1176,7 +1144,6 @@ items:
         date: 2023-09
         investment_amount: 8e9
         source: https://www.aboutamazon.com/news/aws/amazon-invests-additional-4-billion-anthropic-ai
-        sourceResource: 3dde9794b9713369
         notes: "Primary cloud and training partner; uses Trainium and Inferentia chips; $8B total across 3 tranches"
 
       i_7Bl5QFSAmw:
@@ -1185,7 +1152,6 @@ items:
         date: 2023-10
         investment_amount: 3e9
         source: https://www.cnbc.com/2025/01/22/google-agrees-to-new-1-billion-investment-in-anthropic.html
-        sourceResource: ac6cbd8d06bd1b94
         notes: "~$3B equity investment; 10% stake; board observer seat. Oct 2025: multi-billion cloud deal for up to 1M TPUs"
 
       i_hkkAEWKMyg:
@@ -1194,7 +1160,6 @@ items:
         date: 2025-10
         compute_commitment: 10e9
         source: https://www.cnbc.com/2025/10/23/anthropic-google-cloud-deal-tpu.html
-        sourceResource: 6b9e7fcf6e29c869
         notes: "Multi-billion-dollar deal for up to 1 million TPUs; 1+ GW compute capacity by 2026"
 
       i_9cMIfMtdPg:
@@ -1223,7 +1188,6 @@ items:
         type: research-paper
         description: "Foundational paper on training AI systems to follow principles through self-critique"
         source: https://arxiv.org/abs/2212.08073
-        sourceResource: 683aef834ac1612a
 
       i_I9mDKUVTsg:
         name: "Responsible Scaling Policy v1.0"
@@ -1231,7 +1195,6 @@ items:
         type: policy-update
         description: "Original RSP framework introducing AI Safety Levels (ASL)"
         source: https://www.anthropic.com/index/anthropics-responsible-scaling-policy
-        sourceResource: c637506d2cd4d849
 
       i_JQQecOjTeQ:
         name: "Sleeper Agents Paper"
@@ -1239,7 +1202,6 @@ items:
         type: research-paper
         description: "Showed deceptive LLM behaviors can persist through safety training"
         source: https://arxiv.org/abs/2401.05566
-        sourceResource: e5c0904211c7d0cc
         notes: "Seminal paper on deceptive alignment; model inserted vulnerabilities when year changed"
 
       i_L57xQkDrWw:
@@ -1248,7 +1210,6 @@ items:
         type: research-paper
         description: "Applied sparse autoencoders to Claude 3 Sonnet; identified ~34M interpretable features"
         source: https://transformer-circuits.pub/2024/scaling-monosemanticity/
-        sourceResource: e724db341d6e0065
 
       i_etA6yat4HA:
         name: "RSP v2.0"
@@ -1256,7 +1217,6 @@ items:
         type: policy-update
         description: "Updated thresholds and procedures"
         source: https://www.anthropic.com/responsible-scaling-policy
-        sourceResource: afe1e125f3ba3f14
 
       i_iv1DYkBurQ:
         name: "Alignment Faking Paper"
@@ -1272,7 +1232,6 @@ items:
         type: red-team
         description: "300K+ messages, ~3700 hours of effort; 4 participants found jailbreaks, 1 universal"
         source: https://www.anthropic.com/research/next-generation-constitutional-classifiers
-        sourceResource: 8919b8ee25621cf0
         notes: "$55,000 paid to winners"
 
       i_wjZqjFATpA:
@@ -1281,7 +1240,6 @@ items:
         type: research-paper
         description: "Showed Claude has a shared conceptual space where reasoning happens before language translation"
         source: https://transformer-circuits.pub/
-        sourceResource: 5083d746c2728ff2
 
       i_6UqtJ6tEKw:
         name: "ASL-3 Activation"
@@ -1289,7 +1247,6 @@ items:
         type: safety-eval
         description: "First-ever activation of ASL-3 for Claude Opus 4 due to elevated CBRN capabilities"
         source: https://www.anthropic.com/news/activating-asl3-protections
-        sourceResource: 7512ddb574f82249
         notes: "Precautionary/provisional activation; external red teamers reported qualitatively different capabilities"
 
       i_P4q1xZWkoQ:
@@ -1305,7 +1262,6 @@ items:
         type: policy-update
         description: "Introduces Risk Reports every 3-6 months; mandatory external review for redacted reports"
         source: https://www.anthropic.com/responsible-scaling-policy
-        sourceResource: afe1e125f3ba3f14
 
   # ── Research Areas ──────────────────────────────────────────────
   research-areas:

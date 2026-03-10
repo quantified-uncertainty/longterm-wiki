@@ -54,8 +54,6 @@ export interface Fact {
   validEnd?: string;
   /** Source URL */
   source?: string;
-  /** Resource ID linking to the curated resource registry */
-  sourceResource?: string;
   /** Relevant excerpt from source */
   sourceQuote?: string;
   /** Free-text annotation */
@@ -241,8 +239,6 @@ export interface RawFact {
   asOf?: unknown;
   validEnd?: unknown;
   source?: string;
-  /** Resource ID linking to the curated resource registry */
-  sourceResource?: string;
   sourceQuote?: string;
   notes?: string;
   /** ISO 4217 currency override (e.g., "GBP") */

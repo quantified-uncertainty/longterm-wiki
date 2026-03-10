@@ -19,7 +19,6 @@ export interface FactRow {
   rawRefValues: string[] | null;
   asOf: string;
   source: string;
-  sourceResource: string | undefined;
   hasSource: boolean;
   valueType: string;
   notes: string;
@@ -105,7 +104,7 @@ export function KBFactsExplorerContent() {
       const refNames = resolveRefDisplayNames(fact, entitiesById);
 
       const completeness = [
-        fact.source || fact.sourceResource,
+        fact.source,
         fact.asOf,
         fact.notes,
         fact.sourceQuote,
@@ -125,8 +124,7 @@ export function KBFactsExplorerContent() {
         rawRefValues: refNames,
         asOf: formatKBDate(fact.asOf),
         source: fact.source ?? "",
-        sourceResource: fact.sourceResource,
-        hasSource: !!(fact.source || fact.sourceResource),
+        hasSource: !!fact.source,
         valueType: fact.value.type,
         notes: fact.notes ?? "",
         sourceQuote: fact.sourceQuote ?? "",

@@ -8,36 +8,35 @@ thing:
     - SFF
 
 facts:
-  - id: f_sff_grants_2025
+  - id: f_bw7KsUsLzQ
     property: revenue
     value: 34330000
     asOf: "2025"
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "2025 grant round total; three-track structure (Main, Freedom, Fairness)"
 
-  - id: f_sff_total_giving
+  - id: f_XsQ4aRyDsA
     property: total-funding
     value: 141e6
     asOf: "2025"
     source: https://survivalandflourishing.fund/recommendations
-    sourceResource: aebe92781f2a19fb
     notes: "Cumulative grants distributed since founding in 2019 through 2025"
 
-  - id: f_sff_ai_share_2025
+  - id: f_fv1CZsQBGQ
     property: market-share
     value: 86
     asOf: "2025"
     source: https://forum.effectivealtruism.org/posts/vhw6R5P52qJr6opou/sff-2025-funding-by-cause-area-usd34-million-to-ai-86-bio-7
     notes: "86% of 2025 grants went to AI safety/governance; up from ~50% in 2019"
 
-  - id: f_sff_speculation_grants
+  - id: f_bUXNUigmsw
     property: total-funding
     value: 16e6
     asOf: "2025"
     source: https://survivalandflourishing.fund/speculation-grants
     notes: "Speculation Grants total budget across ~35 grantors; up from $4M initially"
 
-  - id: f_sff_grants_2024
+  - id: f_MS2cGoMp1g
     property: revenue
     value: 19860000
     asOf: "2024"

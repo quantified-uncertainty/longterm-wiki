@@ -8,7 +8,7 @@ thing:
     - Holden
 
 facts:
-  - id: f_hk_givewell
+  - id: f_FxnbY9edJA
     property: employed-by
     value: "GiveWell"
     asOf: 2007-01
@@ -16,7 +16,7 @@ facts:
     source: https://www.givewell.org/about/people
     notes: "Co-founded GiveWell in 2007 with Elie Hassenfeld"
 
-  - id: f_hk_openphil
+  - id: f_S7CquLh2pg
     property: employed-by
     value: "Open Philanthropy"
     asOf: 2014-01
@@ -29,17 +29,16 @@ facts:
     value: !ref mK9pX3rQ7n:anthropic
     asOf: 2025-01
     source: https://www.anthropic.com/
-    sourceResource: afe2508ac4caf5ee
     notes: "Joined Anthropic as Member of Technical Staff in early 2025; works on responsible scaling policy"
 
-  - id: f_hk_role_givewell
+  - id: f_eXyY0wAm3Q
     property: role
     value: "Co-founder & Co-Executive Director, GiveWell"
     asOf: 2007-01
     validEnd: "2014"
     source: https://www.givewell.org/about/people
 
-  - id: f_hk_role_openphil
+  - id: f_1T4BNHSCJg
     property: role
     value: "Co-CEO, Open Philanthropy"
     asOf: 2017-01
@@ -107,7 +106,6 @@ items:
         title: "Member of Technical Staff"
         start: 2025-01
         source: https://www.anthropic.com/
-        sourceResource: afe2508ac4caf5ee
         notes: "Works on responsible scaling policy; also serves as Anthropic board observer"
 
   notable-publications:

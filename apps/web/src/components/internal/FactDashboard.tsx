@@ -35,7 +35,6 @@ interface FactEntry {
   high?: number;
   asOf?: string;
   source?: string;
-  sourceResource?: string;
   sourceTitle?: string;
   sourcePublication?: string;
   sourceCredibility?: number;
@@ -66,8 +65,8 @@ export function FactDashboard({
 
   const filtered = useMemo(() => facts.filter((f) => {
     if (!showComputed && f.computed) return false;
-    if (sourceFilter === "sourced" && !f.sourceResource && !f.source) return false;
-    if (sourceFilter === "unsourced" && (f.sourceResource || f.source)) return false;
+    if (sourceFilter === "sourced" && !f.source) return false;
+    if (sourceFilter === "unsourced" && f.source) return false;
     if (!filter) return true;
     const q = filter.toLowerCase();
     return (
@@ -93,10 +92,9 @@ export function FactDashboard({
   // Source coverage stats (computed from all facts, not filtered)
   const sourceStats = useMemo(() => {
     const total = facts.length;
-    const withResource = facts.filter(f => f.sourceResource).length;
-    const withUrlOnly = facts.filter(f => f.source && !f.sourceResource).length;
-    const unsourced = total - withResource - withUrlOnly;
-    const pct = total > 0 ? Math.round((withResource / total) * 100) : 0;
+    const withSource = facts.filter(f => f.source).length;
+    const unsourced = total - withSource;
+    const pct = total > 0 ? Math.round((withSource / total) * 100) : 0;
     // Credibility breakdown
     const credCounts = { high: 0, medium: 0, low: 0 };
     for (const f of facts) {
@@ -106,7 +104,7 @@ export function FactDashboard({
         else credCounts.low++;
       }
     }
-    return { total, withResource, withUrlOnly, unsourced, pct, credCounts };
+    return { total, withSource, unsourced, pct, credCounts };
   }, [facts]);
 
   return (
@@ -136,11 +134,7 @@ export function FactDashboard({
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-green-500/60 inline-block" />
-            {sourceStats.withResource} linked
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-yellow-500/60 inline-block" />
-            {sourceStats.withUrlOnly} URL only
+            {sourceStats.withSource} sourced
           </span>
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-red-500/40 inline-block" />

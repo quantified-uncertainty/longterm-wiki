@@ -87,11 +87,6 @@ function SourceCell({ fact }: { fact: Fact }) {
     }
     return <span className="text-xs text-muted-foreground">{fact.source}</span>;
   }
-  if (fact.sourceResource) {
-    return (
-      <span className="text-muted-foreground text-xs">R: {fact.sourceResource}</span>
-    );
-  }
   return <span className="text-muted-foreground">&mdash;</span>;
 }
 

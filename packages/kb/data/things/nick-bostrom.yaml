@@ -13,7 +13,6 @@ facts:
     value: "University of Oxford"
     asOf: 2005-01
     source: https://nickbostrom.com/
-    sourceResource: 9cf1412a293bfdbe
     notes: "Founded the Future of Humanity Institute (FHI) at Oxford in 2005; FHI closed in April 2024"
 
   - id: f_F5iVdik64y
@@ -21,7 +20,6 @@ facts:
     value: "Professor of Philosophy, University of Oxford; Founder of FHI"
     asOf: 2005-01
     source: https://nickbostrom.com/
-    sourceResource: 9cf1412a293bfdbe
     notes: "Author of 'Superintelligence: Paths, Dangers, Strategies' (2014), which catalyzed mainstream concern about AI existential risk"
 
   - id: f_YhxyxeHHdA

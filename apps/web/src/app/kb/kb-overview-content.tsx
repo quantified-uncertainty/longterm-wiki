@@ -34,7 +34,7 @@ function computeStats() {
     }
 
     for (const fact of structured) {
-      factsWithSource += fact.source || fact.sourceResource ? 1 : 0;
+      factsWithSource += fact.source ? 1 : 0;
       propertyUsage.set(
         fact.propertyId,
         (propertyUsage.get(fact.propertyId) ?? 0) + 1

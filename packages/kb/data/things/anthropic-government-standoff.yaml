@@ -11,21 +11,21 @@ thing:
 facts:
   # Migrated from data/facts/anthropic-government-standoff.yaml
 
-  - id: f_ags_pentagon_contract
+  - id: f_e77ZYDfnbA
     property: financial-impact
     value: 200000000
     asOf: !date 2025-07
     source: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
     notes: "Up to $200M, two-year contract signed July 2025; shared with OpenAI, Google, and xAI"
 
-  - id: f_ags_maduro_deaths
+  - id: f_Tuf3eFU1Qg
     property: casualties
     value: 83
     asOf: !date 2026-01
     source: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
     notes: "83 killed including 47 Venezuelan soldiers during US special operation"
 
-  - id: f_ags_pac_donation
+  - id: f_4kajRFghbw
     property: description
     value: "Anthropic donated $20M to Public First Action PAC supporting pro-AI-regulation candidates"
     asOf: !date 2026-02
@@ -33,13 +33,13 @@ facts:
 
   # Additional structured facts from the MDX page
 
-  - id: f_ags_incident_date
+  - id: f_EViczG0Fng
     property: incident-date
     value: !date 2026-02-27
     source: https://fortune.com/2026/02/27/trump-us-government-anthropic-claude-pentagon-6-months-phaseout-ai-standoff/
     notes: "Designation issued Feb 27, 2026; triggered by events starting Jan 2026"
 
-  - id: f_ags_orgs_involved
+  - id: f_O44njDhfpA
     property: organizations-involved
     value:
       - !ref mK9pX3rQ7n:anthropic
@@ -48,7 +48,7 @@ facts:
     source: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
     notes: "Pentagon awarded AI contracts to Anthropic, OpenAI, Google, and xAI"
 
-  - id: f_ags_status
+  - id: f_ikjybLssfg
     property: incident-status
     value: "litigation"
     asOf: !date 2026-02-28

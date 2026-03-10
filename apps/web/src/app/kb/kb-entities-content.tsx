@@ -33,7 +33,7 @@ export function KBEntityCoverageContent() {
 
     const propertyIds = new Set(structuredFacts.map((f) => f.propertyId));
     const factsWithSource = structuredFacts.filter(
-      (f) => f.source || f.sourceResource
+      (f) => f.source
     ).length;
     const sourceCoverage =
       structuredFacts.length > 0

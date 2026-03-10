@@ -27,21 +27,18 @@ facts:
     property: born-year
     value: 1979
     source: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
-    sourceResource: d8d60a1c46155a15
     notes: "Born September 11, 1979 in Chicago, Illinois"
 
   - id: f_eY1aB2cD3e
     property: education
     value: "Self-taught; no formal university education"
     source: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
-    sourceResource: d8d60a1c46155a15
     notes: "Autodidact; dropped out of school at age 12; taught himself AI and mathematics"
 
   - id: f_eY4fG5hI6j
     property: notable-for
     value: "Founder of MIRI; pioneer of AI alignment as a field; author of 'The Sequences' on rationality; author of Harry Potter and the Methods of Rationality; prominent AI doomer"
     source: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
-    sourceResource: d8d60a1c46155a15
 
   - id: f_eY7kL8mN9o
     property: social-media

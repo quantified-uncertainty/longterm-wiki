@@ -8,31 +8,31 @@ thing:
     - RQB
 
 facts:
-  - id: f_rqb_founded
+  - id: f_zxbmbdSgwA
     property: founded-date
     value: !date 2025-11
     source: https://www.redqueenbio.com/
     notes: "Launched November 2025; spun out of HelixNano"
 
-  - id: f_rqb_hq
+  - id: f_uytPwpHPUA
     property: headquarters
     value: "Boston, MA"
     source: https://www.redqueenbio.com/
 
-  - id: f_rqb_legal
+  - id: f_8HoTluYT0g
     property: legal-structure
     value: "Public Benefit Corporation (PBC)"
     source: https://www.redqueenbio.com/
     notes: "Governance ensures mission precedence over individual partnerships"
 
-  - id: f_rqb_founders
+  - id: f_YndqOVXiTA
     property: founded-by
     value:
       - nikolai-eroshenko
       - hannu-rajaniemi
     source: https://techcrunch.com/2025/11/19/red-queen-bio-openai-biosecurity/
 
-  - id: f_rqb_seed
+  - id: f_iNzsKTtpRQ
     property: total-funding
     value: 15000000
     asOf: !date 2025-11

@@ -28,7 +28,7 @@ facts:
     source: https://en.wikipedia.org/wiki/Google_DeepMind
     notes: "Acquired by Google in January 2014 for approximately $500M; merged with Google Brain in April 2023 to form Google DeepMind"
 
-  - id: f_deepmind_founded_by
+  - id: f_AX7AnnLZQQ
     property: founded-by
     value:
       - !ref Aqcyu3onCA:demis-hassabis
@@ -50,17 +50,17 @@ facts:
     notes: "Estimated 100-150 researchers working on AI safety, alignment, and responsible AI across multiple teams"
 
   # ── Migrated from old facts system (google-deepmind.yaml) ──────
-  - id: f_alphafold_structures
+  - id: f_knwLHy8iXg
     property: description
     value: "AlphaFold database: 200M+ protein structures predicted and freely available (2023)"
     notes: "Number of protein structures predicted by AlphaFold"
 
-  - id: f_gnome_materials
+  - id: f_vH8oNUqEFQ
     property: description
     value: "GNoME AI discovered 380,000 new stable materials (2023)"
     notes: "Number of new stable materials discovered by GNoME AI system"
 
-  - id: f_gemini_context_window
+  - id: f_4aWyQKbNYA
     property: context-window
     value: 2000000
     asOf: 2024-05
@@ -116,7 +116,6 @@ items:
         released: 2018-12
         description: "Won CASP13 protein structure prediction competition"
         source: https://deepmind.google/technologies/alphafold/
-        sourceResource: ba8ca1cafdf06556
         notes: "Revolutionized structural biology; AlphaFold 2 (2020) solved the protein folding problem"
 
       i_etrnodoTbw:
@@ -124,7 +123,6 @@ items:
         released: 2020-11
         description: "Solved protein structure prediction; accuracy comparable to experimental methods"
         source: https://www.nature.com/articles/s41586-021-03819-2
-        sourceResource: c38a8009142b3b2f
         notes: "CASP14 median GDT score of 92.4; database of 200M+ predicted structures released 2022"
 
       i_HyFb0PNE0w:
@@ -132,7 +130,6 @@ items:
         released: 2023-12
         description: "Google's first natively multimodal model family (Ultra, Pro, Nano)"
         source: https://deepmind.google/technologies/gemini/
-        sourceResource: 3b8b5072889c4f8a
         notes: "Ultra claimed to exceed GPT-4 on several benchmarks"
 
       i_0jS4lG0xDw:
@@ -140,7 +137,6 @@ items:
         released: 2024-02
         description: "Introduced 1M token context window; mixture-of-experts architecture"
         source: https://deepmind.google/technologies/gemini/
-        sourceResource: 3b8b5072889c4f8a
         notes: "First commercially available model with 1M+ token context"
 
       i_kNaEA6XilQ:
@@ -148,7 +144,6 @@ items:
         released: 2024-12
         description: "Next-generation Gemini with improved agentic capabilities"
         source: https://deepmind.google/technologies/gemini/
-        sourceResource: 3b8b5072889c4f8a
         notes: "Launched with Project Astra and other agentic features"
 
   research-areas:
@@ -198,7 +193,6 @@ items:
         type: policy-update
         description: "Framework for evaluating and mitigating risks from frontier AI models"
         source: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
-        sourceResource: d8c3d29798412b9f
         notes: "Defines Critical Capability Levels (CCLs) analogous to Anthropic's ASLs"
 
       i_myU0a0pYoA:
@@ -232,5 +226,4 @@ items:
         type: spin-off
         date: 2021-11
         source: https://www.isomorphiclabs.com/
-        sourceResource: 315c1a6070c33d87
         notes: "Drug discovery spin-off from DeepMind, led by Demis Hassabis; leverages AlphaFold technology"

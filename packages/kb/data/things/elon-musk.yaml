@@ -28,7 +28,6 @@ facts:
     value: !ref GLXKjYAEKw:xai
     asOf: 2023-03
     source: https://x.ai
-    sourceResource: 2c762da6c4432ac1
     notes: "Founded xAI in March 2023 to develop AI; also CEO of Tesla and SpaceX"
 
   - id: f_AJGGu7rpAw
@@ -36,7 +35,6 @@ facts:
     value: "Founder & CEO"
     asOf: 2023-03
     source: https://x.ai
-    sourceResource: 2c762da6c4432ac1
 
   - id: f_CwDWKGq7Ig
     property: born-year
@@ -60,18 +58,18 @@ facts:
     source: https://www.bloomberg.com/billionaires/
     notes: "Fluctuates significantly with Tesla stock price; Bloomberg Billionaires Index estimate"
 
-  - id: f_eMpQ1rS2t
+  - id: f_SxwgL1y46Q
     property: social-media
     value: "@elonmusk"
     source: https://x.com/elonmusk
 
   # ── Migrated from old facts system ─────────────────────────────
-  - id: f_em_openai_contribution
+  - id: f_1gz02lBMyw
     property: description
     value: "Actual OpenAI contribution by 2020: $44M (vs $1B pledge)"
     notes: "Per public reporting"
 
-  - id: f_em_openai_lawsuit
+  - id: f_K7bEkeGkVA
     property: description
     value: "Damages sought in Musk v. OpenAI expanded lawsuit (Aug 2024): $134.5B (racketeering claims)"
 
@@ -129,7 +127,6 @@ items:
         title: "Founder & CEO"
         start: 2023-03
         source: https://x.ai
-        sourceResource: 2c762da6c4432ac1
         notes: "Founded xAI in March 2023; developed Grok AI model; built Colossus 100K GPU cluster"
 
       i_eMiJ9kL1m:
