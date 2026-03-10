@@ -101,6 +101,28 @@ function resetStores() {
   ];
 }
 
+/** Apply verdict and entity_id filters to the verdicts store */
+function applyVerdictFilters(params: unknown[]): VerdictRecord[] {
+  let filtered = verdicts;
+  const verdictParam = params.find(
+    (p) => typeof p === "string" && verdicts.some((v) => v.verdict === p)
+  );
+  const entityParam = params.find(
+    (p) => typeof p === "string" && factsStore.some((f) => f.entity_id === p)
+  );
+
+  if (verdictParam) {
+    filtered = filtered.filter((v) => v.verdict === verdictParam);
+  }
+  if (entityParam) {
+    filtered = filtered.filter((v) => {
+      const fact = factsStore.find((f) => f.fact_id === v.fact_id);
+      return fact?.entity_id === entityParam;
+    });
+  }
+  return filtered;
+}
+
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
@@ -126,48 +148,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     }
 
     // Simple count for verdict list pagination (may include LEFT JOIN for entity_id filter)
-    let filtered = verdicts;
-    if (q.includes("where")) {
-      const verdictFilter = params.find(
-        (p) => typeof p === "string" && verdicts.some((v) => v.verdict === p)
-      );
-      if (verdictFilter) {
-        filtered = filtered.filter((v) => v.verdict === verdictFilter);
-      }
-      const entityFilter = params.find(
-        (p) => typeof p === "string" && factsStore.some((f) => f.entity_id === p)
-      );
-      if (entityFilter) {
-        filtered = filtered.filter((v) => {
-          const fact = factsStore.find((f) => f.fact_id === v.fact_id);
-          return fact?.entity_id === entityFilter;
-        });
-      }
-    }
+    const filtered = q.includes("where") ? applyVerdictFilters(params) : verdicts;
     return [{ count: filtered.length }];
   }
 
   // SELECT from kb_fact_verdicts with LEFT JOIN facts (verdicts list)
   if (q.includes("kb_fact_verdicts") && q.includes("left join") && q.includes("limit")) {
-    let filtered = verdicts;
-    if (params.length > 0) {
-      const verdictParam = params.find(
-        (p) => typeof p === "string" && verdicts.some((v) => v.verdict === p)
-      );
-      const entityParam = params.find(
-        (p) => typeof p === "string" && factsStore.some((f) => f.entity_id === p)
-      );
-
-      if (verdictParam) {
-        filtered = filtered.filter((v) => v.verdict === verdictParam);
-      }
-      if (entityParam) {
-        filtered = filtered.filter((v) => {
-          const fact = factsStore.find((f) => f.fact_id === v.fact_id);
-          return fact?.entity_id === entityParam;
-        });
-      }
-    }
+    const filtered = applyVerdictFilters(params);
     // Enrich with entity_id and label from factsStore
     return filtered.map((v) => {
       const fact = factsStore.find((f) => f.fact_id === v.fact_id);
@@ -182,19 +169,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // SELECT from kb_fact_verdicts with WHERE fact_id = ? (single verdict lookup)
   if (q.includes("kb_fact_verdicts") && q.includes("limit")) {
     if (params.length > 0) {
-      // Check for verdict filter or fact_id filter
       const factIdParam = params.find(
         (p) => typeof p === "string" && (p as string).startsWith("f_")
       );
-      const verdictParam = params.find(
-        (p) => typeof p === "string" && verdicts.some((v) => v.verdict === p)
-      );
-
       if (factIdParam) {
         return verdicts.filter((v) => v.fact_id === factIdParam);
-      }
-      if (verdictParam) {
-        return verdicts.filter((v) => v.verdict === verdictParam);
       }
     }
     return verdicts;
@@ -265,11 +244,15 @@ describe("GET /api/kb-verifications/verdicts", () => {
     const res = await app.request("/api/kb-verifications/verdicts?limit=10");
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.verdicts.length).toBeGreaterThan(0);
-    // First verdict should have entityId from facts JOIN
+    expect(body.verdicts.length).toBe(3);
+    // Verify entity enrichment from LEFT JOIN with facts table
     const first = body.verdicts[0];
-    expect(first).toHaveProperty("entityId");
-    expect(first).toHaveProperty("factLabel");
+    expect(first.entityId).toBe("anthropic");
+    expect(first.factLabel).toBe("Funding total");
+    // Verify a verdict with null label
+    const third = body.verdicts[2];
+    expect(third.entityId).toBe("openai");
+    expect(third.factLabel).toBeNull();
   });
 
   it("filters by entity_id", async () => {

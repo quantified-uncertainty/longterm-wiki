@@ -80,7 +80,7 @@ const kbVerificationsApp = new Hono()
       conditions.push(eq(kbFactVerdicts.needsRecheck, needs_recheck));
     }
 
-    // For entity_id filtering, add a condition on the joined facts table
+    // Filter by entity_id via the joined facts table
     if (entity_id) {
       conditions.push(eq(facts.entityId, entity_id));
     }
@@ -88,7 +88,11 @@ const kbVerificationsApp = new Hono()
     const whereClause =
       conditions.length > 0 ? and(...conditions) : undefined;
 
-    // LEFT JOIN with facts to get entityId and label for each verdict
+    // LEFT JOIN facts to get entityId and label for each verdict.
+    // Note: the facts table's unique key is (entityId, factId), not factId alone.
+    // In practice, KB fact IDs are random hashes (e.g., "f_abc123") that are
+    // unique across all entities, so this JOIN is 1:1. If that assumption ever
+    // breaks, switch to a DISTINCT ON subquery.
     const rows = await db
       .select({
         factId: kbFactVerdicts.factId,
@@ -111,16 +115,17 @@ const kbVerificationsApp = new Hono()
       .offset(offset);
 
     // Count query — needs the LEFT JOIN when filtering by entity_id
-    const countBase = db
-      .select({ count: count() })
-      .from(kbFactVerdicts);
-    const countResult = entity_id
-      ? await db
+    const countQuery = entity_id
+      ? db
           .select({ count: count() })
           .from(kbFactVerdicts)
           .leftJoin(facts, eq(kbFactVerdicts.factId, facts.factId))
           .where(whereClause)
-      : await countBase.where(whereClause);
+      : db
+          .select({ count: count() })
+          .from(kbFactVerdicts)
+          .where(whereClause);
+    const countResult = await countQuery;
     const total = countResult[0].count;
 
     return c.json({
