@@ -484,7 +484,7 @@ function parseRecordEntry(
  *
  * Uses a two-pass approach for entities:
  *   Pass 1: Load all entity headers (builds stableId → slug index)
- *   Pass 2: Load facts and items (resolves !ref tags using the index)
+ *   Pass 2: Load facts and records (resolves !ref tags using the index)
  */
 export async function loadKB(dataDir: string): Promise<Graph> {
   const graph = new Graph();
