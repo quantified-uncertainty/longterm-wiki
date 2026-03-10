@@ -118,7 +118,7 @@ A single TechCrunch article produces 8-12 claims. A single annual report might p
 
 ### Layer 2: Type-Specific Properties
 
-**Status: Implemented in KB.** The 19 schema files in `packages/kb/data/schemas/` define `required` and `recommended` properties per entity type. For example, `organization.yaml` recommends `founded-date`, `headquarters`, `revenue`, `valuation`, `headcount`, `legal-structure`, `total-funding` and defines item collections for `funding-rounds`, `key-people`, `products`, etc.
+**Status: Implemented in KB.** The 19 schema files in `packages/kb/data/schemas/` define `required` and `recommended` properties per entity type. For example, `organization.yaml` recommends `founded-date`, `headquarters`, `revenue`, `valuation`, `headcount`, `legal-structure`, `total-funding` and defines record collections for `funding-rounds`, `key-people`, `products`, etc.
 
 **Organization properties (KB implementation):**
 
@@ -168,7 +168,7 @@ Risk and concept schemas exist (`packages/kb/data/schemas/risk.yaml`, `concept.y
 | `founded-by` | Implemented | `founder-of` | refs |
 | `parent-org` | Not yet | — | |
 | `subsidiary-of` | Not yet | — | |
-| `invested-in` | Not yet | — | Partially covered by funding-rounds item collection |
+| `invested-in` | Not yet | — | Partially covered by funding-rounds record collection |
 | `partnered-with` | Not yet | — | |
 | `regulated-by` | Not yet | — | |
 | `sued-by` | Not yet | — | |
@@ -176,7 +176,7 @@ Risk and concept schemas exist (`packages/kb/data/schemas/risk.yaml`, `concept.y
 | `addresses` | Not yet | — | For approach/policy to risk |
 | `implemented-by` | Not yet | — | For approach to org/project |
 
-The KB's item collections (e.g., `funding-rounds` with `lead_investor` as a `ref` field) handle some relationship patterns that don't map cleanly to simple property-value facts. For example, a funding round involves an amount, date, valuation, and lead investor — this is better represented as a structured item than as separate `investedIn` facts.
+The KB's record collections (e.g., `funding-rounds` with `lead_investor` as a `ref` field) handle some relationship patterns that don't map cleanly to simple property-value facts. For example, a funding round involves an amount, date, valuation, and lead investor — this is better represented as a structured item than as separate `investedIn` facts.
 
 ### Layer 4: Claim Types and Confidence
 
