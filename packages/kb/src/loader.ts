@@ -38,14 +38,16 @@ import type {
 
 /**
  * Marker class for !ref YAML tags. Created during YAML parsing,
- * resolved to slugs after all things are loaded.
+ * resolved to entity IDs after all things are loaded.
  *
- * Format: !ref <stableId>:<slug>  (preferred — enables cross-validation)
- *         !ref <stableId>         (bare — still works but triggers validation warning)
+ * Format: !ref <entityId>:<slug>  (preferred — enables cross-validation)
+ *         !ref <entityId>         (bare — still works)
  */
 export class RefMarker {
   constructor(
+    /** The entity ID (10-char stable ID) from the !ref tag */
     public readonly stableId: string,
+    /** Optional slug for cross-validation */
     public readonly expectedSlug?: string,
   ) {}
 }
@@ -120,22 +122,22 @@ function resolveRefs(
   }
 
   if (value instanceof RefMarker) {
-    const slug = graph.resolveStableId(value.stableId);
-    if (!slug) {
+    const entity = graph.getEntity(value.stableId);
+    if (!entity) {
       console.warn(
         `[kb/loader] Unresolved !ref "${value.stableId}" in ${context}`
       );
-      return value.stableId; // fallback: use raw stableId
+      return value.stableId; // fallback: use raw ID
     }
     // Cross-validate: if expectedSlug was provided, verify it matches
-    if (value.expectedSlug && value.expectedSlug !== slug) {
+    if (value.expectedSlug && value.expectedSlug !== entity.slug) {
       throw new Error(
-        `[kb/loader] !ref mismatch in ${context}: stableId "${value.stableId}" ` +
-          `resolves to "${slug}" but expected slug "${value.expectedSlug}". ` +
-          `Either the stableId or the slug is wrong.`
+        `[kb/loader] !ref mismatch in ${context}: id "${value.stableId}" ` +
+          `resolves to slug "${entity.slug}" but expected "${value.expectedSlug}". ` +
+          `Either the id or the slug is wrong.`
       );
     }
-    return slug;
+    return entity.id; // return the entity ID (stable 10-char)
   }
 
   if (Array.isArray(value)) {
@@ -287,24 +289,61 @@ function parseRecordSchema(id: string, raw: unknown): RecordSchema {
   };
 }
 
-/** Coerce numericId to a string with E prefix (YAML may parse bare numbers like 1100). */
-function normalizeNumericId(raw: string | number): string {
+/** Coerce wiki page ID to a string with E prefix (YAML may parse bare numbers like 1100). */
+function normalizeWikiPageId(raw: string | number): string {
   const s = String(raw);
   return s.startsWith("E") ? s : `E${s}`;
 }
 
+/**
+ * Parse a YAML entity thing block into an Entity, handling both old and new formats.
+ *
+ * Old format: { id: "anthropic", stableId: "mK9pX3rQ7n", numericId: "E22" }
+ * New format: { id: "mK9pX3rQ7n", slug: "anthropic", wikiPageId: "E22" }
+ *
+ * Detection: if `stableId` is present, it's old format.
+ */
 function parseEntity(raw: EntityFile["thing"]): Entity {
+  const isOldFormat = raw.stableId !== undefined;
+
+  if (isOldFormat) {
+    // Old format: id is slug, stableId is the stable ID
+    const wikiPageId = raw.numericId !== undefined
+      ? normalizeWikiPageId(raw.numericId)
+      : undefined;
+    return {
+      id: raw.stableId!,
+      slug: raw.id,
+      type: raw.type,
+      name: raw.name,
+      ...(raw.parent !== undefined && { parent: raw.parent }),
+      ...(raw.aliases !== undefined && { aliases: raw.aliases }),
+      ...(raw.previousIds !== undefined && { previousIds: raw.previousIds }),
+      ...(wikiPageId !== undefined && { wikiPageId }),
+      // Deprecated aliases for backward compat
+      stableId: raw.stableId!,
+      ...(wikiPageId !== undefined && { numericId: wikiPageId }),
+    };
+  }
+
+  // New format: id is the stable ID, slug is the slug
+  const wikiPageId = raw.wikiPageId !== undefined
+    ? normalizeWikiPageId(raw.wikiPageId)
+    : raw.numericId !== undefined
+      ? normalizeWikiPageId(raw.numericId)
+      : undefined;
   return {
     id: raw.id,
-    stableId: raw.stableId,
+    slug: raw.slug!,
     type: raw.type,
     name: raw.name,
     ...(raw.parent !== undefined && { parent: raw.parent }),
     ...(raw.aliases !== undefined && { aliases: raw.aliases }),
     ...(raw.previousIds !== undefined && { previousIds: raw.previousIds }),
-    ...(raw.numericId !== undefined && {
-      numericId: normalizeNumericId(raw.numericId),
-    }),
+    ...(wikiPageId !== undefined && { wikiPageId }),
+    // Deprecated aliases
+    stableId: raw.id,
+    ...(wikiPageId !== undefined && { numericId: wikiPageId }),
   };
 }
 
@@ -537,9 +576,9 @@ export async function loadKB(dataDir: string): Promise<Graph> {
 
   // Pass 2: Load facts and records with !ref resolution
   for (const { entity, file } of parsedEntityFiles) {
-    // Resolve !ref markers in facts
+    // Resolve !ref markers in facts (use entity.slug for log context)
     for (const rawFact of file.facts ?? []) {
-      const resolvedValue = resolveRefs(rawFact.value, graph, `${entity.id}/facts`);
+      const resolvedValue = resolveRefs(rawFact.value, graph, `${entity.slug}/facts`);
       const resolvedFact = { ...rawFact, value: resolvedValue };
       const fact = parseFact(resolvedFact as RawFact, entity.id, properties);
       if (fact) graph.addFact(fact);
@@ -550,7 +589,7 @@ export async function loadKB(dataDir: string): Promise<Graph> {
       const resolvedRecords = resolveRefs(
         file.records,
         graph,
-        `${entity.id}/records`
+        `${entity.slug}/records`
       ) as Record<string, Record<string, Record<string, unknown>>>;
 
       // Look up which record schemas this entity type can host
@@ -564,7 +603,7 @@ export async function loadKB(dataDir: string): Promise<Graph> {
         const schemaId = findRecordSchemaId(collectionName, allowedRecordIds, graph);
         if (!schemaId) {
           console.warn(
-            `[kb/loader] Unknown record collection "${collectionName}" on entity "${entity.id}" ` +
+            `[kb/loader] Unknown record collection "${collectionName}" on entity "${entity.slug}" ` +
             `(allowed: ${allowedRecordIds.join(", ")})`
           );
           continue;
@@ -573,7 +612,7 @@ export async function loadKB(dataDir: string): Promise<Graph> {
         const recordSchema = graph.getRecordSchema(schemaId);
         if (!recordSchema) {
           console.warn(
-            `[kb/loader] Record schema "${schemaId}" not found for collection "${collectionName}" on "${entity.id}"`
+            `[kb/loader] Record schema "${schemaId}" not found for collection "${collectionName}" on "${entity.slug}"`
           );
           continue;
         }

@@ -29,8 +29,8 @@ describe("inverse", () => {
         expect(f.value.type).toBe("ref");
         return (f.value as { type: "ref"; value: string }).value;
       });
-      expect(refValues).toContain("dario-amodei");
-      expect(refValues).toContain("jan-leike");
+      expect(refValues).toContain(graph.getEntity("dario-amodei")!.id);
+      expect(refValues).toContain(graph.getEntity("jan-leike")!.id);
     });
 
     it("inverse facts have derivedFrom set", () => {
@@ -57,10 +57,11 @@ describe("inverse", () => {
         property: "employer-of",
       });
       // Dario's employed-by has asOf: 2021-01, so the inverse should too
+      const darioId = graph.getEntity("dario-amodei")!.id;
       const darioInverse = employerOfFacts.find(
         (f) =>
           f.value.type === "ref" &&
-          (f.value as { type: "ref"; value: string }).value === "dario-amodei"
+          (f.value as { type: "ref"; value: string }).value === darioId
       );
       expect(darioInverse).toBeDefined();
       expect(darioInverse!.asOf).toBe("2021-01");
@@ -70,12 +71,13 @@ describe("inverse", () => {
       // Jan Leike's OpenAI employment has validEnd: 2024-05
       // OpenAI is in the graph, so it gets an employer-of inverse with validEnd.
       // Jan Leike's Anthropic employment has no validEnd.
+      const janLeikId = graph.getEntity("jan-leike")!.id;
       const janInverse = graph
         .getFacts("anthropic", { property: "employer-of" })
         .find(
           (f) =>
             f.value.type === "ref" &&
-            (f.value as { type: "ref"; value: string }).value === "jan-leike"
+            (f.value as { type: "ref"; value: string }).value === janLeikId
         );
       expect(janInverse).toBeDefined();
       expect(janInverse!.validEnd).toBeUndefined();
@@ -83,8 +85,8 @@ describe("inverse", () => {
 
     it("getRelated returns person IDs via employer-of after computing inverses", () => {
       const related = graph.getRelated("anthropic", "employer-of");
-      expect(related).toContain("dario-amodei");
-      expect(related).toContain("jan-leike");
+      expect(related).toContain(graph.getEntity("dario-amodei")!.id);
+      expect(related).toContain(graph.getEntity("jan-leike")!.id);
     });
 
     it("skips inverse when referenced entity does not exist in graph", () => {
@@ -120,7 +122,8 @@ describe("inverse", () => {
         computed: true,
       });
       freshGraph.addEntity({
-        id: "test-person",
+        id: "test123456",
+        slug: "test-person",
         stableId: "test123456",
         type: "person",
         name: "Test Person",

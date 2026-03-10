@@ -86,7 +86,7 @@ describe("records", () => {
       const tallinn = positions.find((p) => p.key === "jaan-tallinn");
       expect(tallinn).toBeDefined();
       expect(tallinn!.schema).toBe("equity-position");
-      expect(tallinn!.ownerEntityId).toBe("anthropic");
+      expect(tallinn!.ownerEntityId).toBe(graph.getEntity("anthropic")!.id);
       expect(tallinn!.fields.holder).toBe("jaan-tallinn");
       expect(tallinn!.fields.stake).toEqual([0.006, 0.017]);
     });
