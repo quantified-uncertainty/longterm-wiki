@@ -91,32 +91,6 @@ describe("validate", () => {
     });
   });
 
-  describe("item-collection-schema validation", () => {
-    it("produces no item-collection-schema results for records-migrated entities", () => {
-      // Anthropic has been migrated from items: to records: format.
-      // The item-collection-schema validator only checks getItems(), not getRecords(),
-      // so migrated entities should produce no item-collection-schema results.
-      const results = validateEntity(graph, "anthropic");
-      const itemResults = results.filter(
-        (r) => r.rule === "item-collection-schema"
-      );
-      expect(itemResults).toHaveLength(0);
-    });
-
-    it("does not report errors for required fields that are present", () => {
-      // funding-rounds schema requires 'date', key-people requires 'person' and 'title'
-      // All entries in our test data provide these fields
-      const results = validateEntity(graph, "anthropic");
-      const requiredFieldErrors = results.filter(
-        (r) =>
-          r.rule === "item-collection-schema" &&
-          r.severity === "error" &&
-          r.message.includes("missing required field")
-      );
-      expect(requiredFieldErrors).toHaveLength(0);
-    });
-  });
-
   describe("validate (full graph)", () => {
     it("returns results for all entities", () => {
       const results = validate(graph);

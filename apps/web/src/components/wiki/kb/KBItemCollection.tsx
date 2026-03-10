@@ -25,8 +25,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBItems, getKBRecords, getKBEntity, getKBSchema } from "@data/kb";
-import type { ItemEntry, RecordEntry, ItemCollectionSchema } from "@longterm-wiki/kb";
+import { getKBRecords, getKBRecordSchema } from "@data/kb";
+import type { RecordEntry } from "@longterm-wiki/kb";
 import { titleCase, sortKBItems } from "./format";
 import { KBCellValue } from "./KBCellValue";
 
@@ -56,8 +56,8 @@ const HIDDEN_BY_DEFAULT = new Set(["source", "notes", "key-publication", "key_pu
 
 /** Determine columns to display. */
 function resolveColumns(
-  items: ItemEntry[],
-  schema: ItemCollectionSchema | undefined,
+  items: RecordEntry[],
+  fieldDefs: Record<string, unknown> | undefined,
   columns?: string[],
   showNotes?: boolean,
   showSource?: boolean,
@@ -65,8 +65,8 @@ function resolveColumns(
   if (columns && columns.length > 0) return columns;
 
   // Use schema field order if available, otherwise collect from entries
-  const allFields: string[] = schema
-    ? Object.keys(schema.fields)
+  const allFields: string[] = fieldDefs
+    ? Object.keys(fieldDefs)
     : [...new Set(items.flatMap((item) => Object.keys(item.fields)))];
 
   // Filter hidden fields unless explicitly shown
@@ -80,12 +80,12 @@ function resolveColumns(
 
 /** Find the first date-type field for default sorting. */
 function findDateField(
-  schema: ItemCollectionSchema | undefined,
+  fieldDefs: Record<string, { type?: string }> | undefined,
   columns: string[],
 ): string | undefined {
-  if (schema) {
+  if (fieldDefs) {
     for (const col of columns) {
-      if (schema.fields[col]?.type === "date") return col;
+      if (fieldDefs[col]?.type === "date") return col;
     }
   }
   // Common date field names as fallback
@@ -105,17 +105,10 @@ export function KBItemCollection({
   sortBy,
   sortAsc = false,
 }: KBItemCollectionProps) {
-  // Try items first, fall back to records (entities migrated to unified records format)
-  let items: (ItemEntry | RecordEntry)[] = getKBItems(entity, collection);
-  if (items.length === 0) {
-    items = getKBRecords(entity, collection);
-  }
-  const kbEntity = getKBEntity(entity);
-  const schema = kbEntity
-    ? getKBSchema(kbEntity.type)?.items?.[collection]
-    : undefined;
+  const items = getKBRecords(entity, collection);
+  const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
 
-  const heading = title ?? schema?.description ?? titleCase(collection);
+  const heading = title ?? recordSchema?.description ?? titleCase(collection);
 
   if (items.length === 0) {
     return (
@@ -130,11 +123,11 @@ export function KBItemCollection({
     );
   }
 
-  const cols = resolveColumns(items, schema, columns, showNotes, showSource);
-  const fieldDefs = schema?.fields;
+  const fieldDefs = recordSchema?.fields;
+  const cols = resolveColumns(items, fieldDefs, columns, showNotes, showSource);
 
   // Sort items
-  const effectiveSortBy = sortBy ?? findDateField(schema, cols);
+  const effectiveSortBy = sortBy ?? findDateField(fieldDefs, cols);
   let sorted = effectiveSortBy
     ? sortKBItems(items, effectiveSortBy, sortAsc)
     : items;

@@ -29,7 +29,6 @@ import type {
   Entity,
   Fact,
   FactValue,
-  ItemCollection,
   RecordSchema,
   RecordEntry,
   EndpointDef,
@@ -115,8 +114,7 @@ function resolveRefs(
   context: string
 ): unknown {
   // DateMarker in facts: pass through as-is so normalizeValue() can handle it.
-  // DateMarker in items: convert to the plain date string, since item collections
-  // never go through normalizeValue() and would otherwise store a class instance.
+  // DateMarker in records: convert to the plain date string.
   if (value instanceof DateMarker) {
     return context.endsWith("/facts") ? value : value.value;
   }
@@ -264,7 +262,6 @@ function parseSchema(raw: unknown): TypeSchema {
     name: file.name,
     required: file.required ?? [],
     recommended: file.recommended ?? [],
-    items: file.items,
     ...(file.records && { records: file.records }),
   };
 }
@@ -352,19 +349,6 @@ function parseFact(
     ...(rawFact.exchangeRate !== undefined && { exchangeRate: Number(rawFact.exchangeRate) }),
     ...(rawFact.exchangeRateDate !== undefined && { exchangeRateDate: rawFact.exchangeRateDate }),
     ...(rawFact.dollarYear !== undefined && { dollarYear: Number(rawFact.dollarYear) }),
-  };
-}
-
-function parseItemCollection(
-  raw: EntityFile["items"],
-  collectionName: string
-): ItemCollection | undefined {
-  if (!raw) return undefined;
-  const col = raw[collectionName];
-  if (!col) return undefined;
-  return {
-    type: col.type,
-    entries: col.entries ?? {},
   };
 }
 
@@ -551,7 +535,7 @@ export async function loadKB(dataDir: string): Promise<Graph> {
     parsedEntityFiles.push({ entity, file });
   }
 
-  // Pass 2: Load facts and items with !ref resolution
+  // Pass 2: Load facts and records with !ref resolution
   for (const { entity, file } of parsedEntityFiles) {
     // Resolve !ref markers in facts
     for (const rawFact of file.facts ?? []) {
@@ -561,23 +545,7 @@ export async function loadKB(dataDir: string): Promise<Graph> {
       if (fact) graph.addFact(fact);
     }
 
-    // Resolve !ref markers in items and add collections
-    if (file.items) {
-      const resolvedItems = resolveRefs(
-        file.items,
-        graph,
-        `${entity.id}/items`
-      ) as EntityFile["items"];
-
-      for (const collectionName of Object.keys(resolvedItems!)) {
-        const collection = parseItemCollection(resolvedItems, collectionName);
-        if (collection) {
-          graph.addItemCollection(entity.id, collectionName, collection);
-        }
-      }
-    }
-
-    // Parse records (new unified format)
+    // Parse records
     if (file.records) {
       const resolvedRecords = resolveRefs(
         file.records,

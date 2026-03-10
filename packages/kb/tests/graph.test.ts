@@ -205,7 +205,7 @@ describe("graph", () => {
     });
   });
 
-  describe("getItems / getRecords", () => {
+  describe("getRecords", () => {
     it("returns record entries with keys and fields", () => {
       const rounds = graph.getRecords("anthropic", "funding-rounds");
       expect(rounds.length).toBeGreaterThan(0);
@@ -229,27 +229,13 @@ describe("graph", () => {
     });
 
     it("returns empty array for missing collection", () => {
-      const items = graph.getItems("anthropic", "nonexistent");
-      expect(items).toEqual([]);
+      const records = graph.getRecords("anthropic", "nonexistent");
+      expect(records).toEqual([]);
     });
 
-    it("returns empty array for entity without items", () => {
-      const items = graph.getItems("jan-leike", "key-people");
-      expect(items).toEqual([]);
-    });
-  });
-
-  describe("getItemsMentioning", () => {
-    it("does not include self-references", () => {
-      const mentions = graph.getItemsMentioning("anthropic");
-      // Should not find items from Anthropic's own collections
-      const selfRefs = mentions.filter((m) => m.ownerEntityId === "anthropic");
-      expect(selfRefs).toHaveLength(0);
-    });
-
-    it("returns empty array for entity with no mentions", () => {
-      const mentions = graph.getItemsMentioning("nonexistent-entity");
-      expect(mentions).toHaveLength(0);
+    it("returns empty array for entity without records", () => {
+      const records = graph.getRecords("jan-leike", "key-persons");
+      expect(records).toEqual([]);
     });
   });
 

@@ -6,10 +6,10 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { getKBDataNav } from "@/lib/wiki-nav";
 import {
   getKBEntity,
-  getKBItems,
-  getKBItemByKey,
-  getKBSchema,
-  getAllKBItems,
+  getKBRecords,
+  getKBRecordByKey,
+  getKBRecordSchema,
+  getAllKBRecords,
 } from "@/data/kb";
 import {
   formatKBCellValue,
@@ -22,9 +22,9 @@ import { KVRow, KVTable } from "@/components/wiki/kb/kb-detail-shared";
 // ── Static params ────────────────────────────────────────────────────
 
 export function generateStaticParams() {
-  const allItems = getAllKBItems();
+  const allItems = getAllKBRecords();
 
-  // Assert global uniqueness of item keys at build time
+  // Assert global uniqueness of record keys at build time
   const seen = new Map<string, string>();
   for (const { entityId, collection, entry } of allItems) {
     const prev = seen.get(entry.key);
@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ItemDetailPage({ params }: PageProps) {
   const { itemId } = await params;
-  const result = getKBItemByKey(itemId);
+  const result = getKBRecordByKey(itemId);
   if (!result) notFound();
 
   const { entityId, collection, entry } = result;
@@ -68,12 +68,11 @@ export default async function ItemDetailPage({ params }: PageProps) {
   const entityName = entity?.name ?? entityId;
 
   // Get schema for field definitions
-  const schema = entity ? getKBSchema(entity.type) : undefined;
-  const collectionSchema = schema?.items?.[collection];
-  const fieldDefs = collectionSchema?.fields;
+  const recordSchema = getKBRecordSchema(entry.schema);
+  const fieldDefs = recordSchema?.fields;
 
-  // Get sibling items in the same collection
-  const siblingItems = getKBItems(entityId, collection);
+  // Get sibling records in the same collection
+  const siblingItems = getKBRecords(entityId, collection);
 
   const content = (
     <div>
@@ -138,10 +137,10 @@ export default async function ItemDetailPage({ params }: PageProps) {
             ({siblingItems.length} item{siblingItems.length !== 1 ? "s" : ""} total)
           </span>
         </KVRow>
-        {collectionSchema && (
+        {recordSchema && (
           <KVRow label="Schema">
             <span className="text-xs text-muted-foreground">
-              {collectionSchema.description}
+              {recordSchema.id}
             </span>
           </KVRow>
         )}

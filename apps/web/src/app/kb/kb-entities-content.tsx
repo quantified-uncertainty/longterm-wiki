@@ -2,7 +2,7 @@ import {
   getKBEntities,
   getKBProperties,
   getKBFacts,
-  getKBItems,
+  getKBRecords,
 } from "@/data/kb";
 import type { Fact, Entity } from "@longterm-wiki/kb";
 import { KBEntitiesTable } from "./kb-entities-table";
@@ -40,21 +40,20 @@ export function KBEntityCoverageContent() {
         ? Math.round((factsWithSource / structuredFacts.length) * 100)
         : 0;
 
-    // Count items across all collections
+    // Count records across all collections
     let itemCount = 0;
-    // We can't enumerate collections without the schema, so check common ones
     const commonCollections = [
       "funding-rounds",
-      "key-people",
+      "key-persons",
       "products",
       "model-releases",
-      "board-members",
+      "board-seats",
       "strategic-partnerships",
       "safety-milestones",
       "research-areas",
     ];
     for (const collection of commonCollections) {
-      itemCount += getKBItems(entity.id, collection).length;
+      itemCount += getKBRecords(entity.id, collection).length;
     }
 
     const propertyNames = [...propertyIds]

@@ -271,19 +271,19 @@ describe("loader", () => {
     });
   });
 
-  describe("item collections", () => {
+  describe("record collections", () => {
     it("returns empty array for non-existent collection", () => {
-      const items = graph.getItems("anthropic", "nonexistent");
-      expect(items).toEqual([]);
+      const records = graph.getRecords("anthropic", "nonexistent");
+      expect(records).toEqual([]);
     });
 
     it("returns empty array for non-existent entity", () => {
-      const items = graph.getItems("nonexistent", "funding-rounds");
-      expect(items).toEqual([]);
+      const records = graph.getRecords("nonexistent", "funding-rounds");
+      expect(records).toEqual([]);
     });
   });
 
-  describe("record collections (migrated from items)", () => {
+  describe("record collections (data verification)", () => {
     it("loads funding-rounds records for Anthropic", () => {
       const rounds = graph.getRecords("anthropic", "funding-rounds");
       expect(rounds.length).toBeGreaterThanOrEqual(13);
