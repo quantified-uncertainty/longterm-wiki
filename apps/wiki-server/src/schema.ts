@@ -1328,14 +1328,13 @@ export const pageCitations = pgTable(
 );
 
 /**
- * KB fact verifications — stores verification results for KB facts.
+ * Per-resource verification evidence for KB facts.
  *
- * Each row records the result of checking a KB fact against its source URL.
- * An LLM checker visits the source, extracts the relevant value, and
- * compares it to the KB fact's stored value.
+ * Each row records one LLM check of a KB fact against a specific resource.
+ * A fact can have multiple rows (one per resource checked).
  */
-export const kbFactVerifications = pgTable(
-  "kb_fact_verifications",
+export const kbFactResourceVerifications = pgTable(
+  "kb_fact_resource_verifications",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     factId: text("fact_id").notNull(),
@@ -1346,7 +1345,6 @@ export const kbFactVerifications = pgTable(
     confidence: real("confidence"), // 0.0 to 1.0
     extractedValue: text("extracted_value"),
     checkerModel: text("checker_model"),
-    contentHash: text("content_hash"), // SHA-256 prefix of source text at check time
     isPrimarySource: boolean("is_primary_source").notNull().default(false),
     checkedAt: timestamp("checked_at", { withTimezone: true })
       .notNull()
@@ -1360,15 +1358,15 @@ export const kbFactVerifications = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_kbfv_fact_id").on(table.factId),
-    index("idx_kbfv_verdict").on(table.verdict),
+    index("idx_kbfrv_fact_id").on(table.factId),
+    index("idx_kbfrv_verdict").on(table.verdict),
   ]
 );
 
 /**
- * Aggregate per-fact verdicts — one row per fact, derived from verifications.
+ * Aggregate per-fact verdicts — one row per fact, derived from resource verifications.
  *
- * Recomputed periodically from kb_fact_verifications. Separates evidence
+ * Recomputed periodically from kb_fact_resource_verifications. Separates evidence
  * (per-resource checks) from conclusions (all-things-considered verdict).
  */
 export const kbFactVerdicts = pgTable(

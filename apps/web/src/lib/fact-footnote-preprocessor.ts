@@ -32,7 +32,9 @@ export type FactLookupFn = (factId: string) => Fact | undefined;
  * definitions. Reuses the same logic as the reference preprocessor.
  */
 function sanitizeFootnoteText(text: string): string {
-  return text.replace(/<(?=[a-zA-Z/])/g, "\\<");
+  return text
+    .replace(/<(?=[a-zA-Z/])/g, "\\<")
+    .replace(/\r?\n+/g, " "); // Flatten newlines — multiline text breaks footnote definitions
 }
 
 /**
@@ -96,9 +98,14 @@ export function preprocessFactFootnotes(
   const resolvedFactIds = new Set<string>();
   const unresolvedFactIds = new Set<string>();
 
-  // Collect all unique fact IDs used in the content
+  // Mask code blocks and inline code to avoid matching markers inside them
+  const masked = mdxContent
+    .replace(/```[\s\S]*?```/g, (m) => "\0".repeat(m.length))
+    .replace(/`[^`]+`/g, (m) => "\0".repeat(m.length));
+
+  // Collect all unique fact IDs used in the content (scanning masked version)
   const usedFactIds = new Set<string>();
-  for (const m of mdxContent.matchAll(FACT_FOOTNOTE_RE)) {
+  for (const m of masked.matchAll(FACT_FOOTNOTE_RE)) {
     usedFactIds.add(m[1]);
   }
 
@@ -107,12 +114,21 @@ export function preprocessFactFootnotes(
     return { content: mdxContent, resolvedFactIds, unresolvedFactIds };
   }
 
-  // Replace [^fact:FACTID] with [^fact-FACTID] (colon → hyphen for valid
-  // markdown footnote identifiers)
-  let transformed = mdxContent.replace(
-    FACT_FOOTNOTE_RE,
-    (_match, factId: string) => `[^fact-${factId}]`
-  );
+  // Replace [^fact:FACTID] with [^fact-FACTID] only outside code blocks.
+  // Split content into code/non-code segments, only replace in non-code.
+  const CODE_SEGMENT_RE = /(```[\s\S]*?```|`[^`]+`)/g;
+  let transformed = "";
+  let lastIndex = 0;
+  for (const seg of mdxContent.matchAll(CODE_SEGMENT_RE)) {
+    // Process non-code text before this code segment
+    const before = mdxContent.slice(lastIndex, seg.index!);
+    transformed += before.replace(FACT_FOOTNOTE_RE, (_m, fid: string) => `[^fact-${fid}]`);
+    // Keep code segment unchanged
+    transformed += seg[0];
+    lastIndex = seg.index! + seg[0].length;
+  }
+  // Process remaining non-code text after the last code segment
+  transformed += mdxContent.slice(lastIndex).replace(FACT_FOOTNOTE_RE, (_m, fid: string) => `[^fact-${fid}]`);
 
   // Build footnote definitions
   const footnoteLines: string[] = [];
