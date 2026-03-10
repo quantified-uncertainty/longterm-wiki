@@ -42,7 +42,7 @@ facts:
     value: "@DarioAmodei"
     source: https://x.com/DarioAmodei
 
-  - id: f_dAtT1uV2w
+  - id: f_9Rz2EK1pYA
     property: role
     value: "VP of Research"
     asOf: "2016"
@@ -50,7 +50,7 @@ facts:
     source: https://en.wikipedia.org/wiki/Dario_Amodei
     notes: "VP of Research at OpenAI; led GPT-2 and GPT-3 safety research before departing to found Anthropic"
 
-  - id: f_dAxX3yZ4a
+  - id: f_nuoya5WHmQ
     property: employed-by
     value: !ref 1LcLlMGLbw:openai
     asOf: "2016"
@@ -58,7 +58,7 @@ facts:
     source: https://en.wikipedia.org/wiki/Dario_Amodei
     notes: "Joined OpenAI as VP of Research around 2016; left to co-found Anthropic in January 2021"
 
-  - id: f_dAbB5cD6e
+  - id: f_vNgM0OKk5w
     property: role
     value: "Research Scientist"
     asOf: "2014"

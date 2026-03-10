@@ -28,7 +28,6 @@ facts:
     value: !ref 1OSiYOaWVL:ssi
     asOf: 2024-06
     source: https://ssi.inc
-    sourceResource: 3fc4ee87e9bacb20
     notes: "Co-founded Safe Superintelligence Inc (SSI) in June 2024 with Daniel Gross and Daniel Levy"
 
   - id: f_rDk51er7Jw
@@ -36,7 +35,6 @@ facts:
     value: "Co-founder & Chief Scientist"
     asOf: 2024-06
     source: https://ssi.inc
-    sourceResource: 3fc4ee87e9bacb20
 
   - id: f_D7v4CpKtMw
     property: born-year
@@ -47,36 +45,32 @@ facts:
     property: education
     value: "PhD in Machine Learning, University of Toronto (advisor: Geoffrey Hinton)"
     source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-    sourceResource: 3abf4294b701d95e
     notes: "BSc and MSc from University of Toronto as well"
 
   - id: f_iS4fG5hI6j
     property: notable-for
     value: "Co-founder of OpenAI and SSI; co-inventor of the sequence-to-sequence model and AlexNet; key figure in the deep learning revolution"
     source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-    sourceResource: 3abf4294b701d95e
 
   - id: f_iS7kL8mN9o
     property: social-media
     value: "@iabornamore"
     source: https://x.com/iabornamore
 
-  - id: f_iSpQ1rS2t
+  - id: f_h3HeIqbtpA
     property: employed-by
     value: "Google Brain"
     asOf: 2012-11
     validEnd: 2015-12
     source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-    sourceResource: 3abf4294b701d95e
     notes: "Research scientist at Google Brain (predates 2023 merger into Google DeepMind); worked with Geoffrey Hinton after the DNNresearch acquisition"
 
-  - id: f_iSuV3wX4y
+  - id: f_oNoknPJnkQ
     property: role
     value: "Research Scientist"
     asOf: 2012-11
     validEnd: 2015-12
     source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-    sourceResource: 3abf4294b701d95e
     notes: "At Google Brain, before co-founding OpenAI"
 
 items:
@@ -89,7 +83,6 @@ items:
         start: "2009"
         end: "2012"
         source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-        sourceResource: 3abf4294b701d95e
         notes: "PhD under Geoffrey Hinton; co-developed AlexNet which won ImageNet 2012"
 
       i_iS4eF5gH6i:
@@ -98,7 +91,6 @@ items:
         start: 2012-11
         end: 2015-12
         source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-        sourceResource: 3abf4294b701d95e
         notes: "Joined after Google acquired DNNresearch; co-developed sequence-to-sequence learning and TensorFlow"
 
       i_iS7jK8lM9n:
@@ -114,7 +106,6 @@ items:
         title: "Co-founder & Chief Scientist"
         start: 2024-06
         source: https://ssi.inc
-        sourceResource: 3fc4ee87e9bacb20
         notes: "Co-founded Safe Superintelligence Inc with Daniel Gross and Daniel Levy; raised $1B in initial funding"
 
   notable-publications:

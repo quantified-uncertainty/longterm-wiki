@@ -72,7 +72,6 @@ function buildReferenceMap(
           kbValue: formatFactValueForFootnote(d.value),
           kbAsOf: d.asOf,
           kbSource: d.source,
-          kbSourceResource: d.sourceResource,
           kbNotes: d.notes,
         });
       } else if (entry.kind === "citation" && entry.data) {

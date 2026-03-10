@@ -867,8 +867,7 @@ export const Fact = z.object({
   high: z.number().optional(),                 // Upper bound of range
   asOf: z.string().optional(),
   label: z.string().optional(),            // Short human-readable name (e.g., "Google equity stake") — machine-readable version of the YAML comment
-  source: z.string().optional(),           // Fallback bare URL — prefer sourceResource when a curated resource entry exists
-  sourceResource: z.string().optional(),   // Resource ID from data/resources/ — links fact to a curated source with metadata
+  source: z.string().optional(),           // Source URL
   note: z.string().optional(),
   noCompute: z.boolean().optional(),           // If true, numeric value cannot be referenced in compute expressions
   // Measure grouping — links this fact to a reusable measure definition

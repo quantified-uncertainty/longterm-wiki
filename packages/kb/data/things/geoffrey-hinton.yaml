@@ -15,7 +15,6 @@ facts:
     asOf: 2013-03
     validEnd: 2023-05
     source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
-    sourceResource: 5461e12e076b0f80
     notes: "VP and Engineering Fellow at Google; resigned May 2023 to speak freely about AI risks"
 
   - id: f_dIsk3jBSrg
@@ -24,7 +23,6 @@ facts:
     asOf: 2013-03
     validEnd: 2023-05
     source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
-    sourceResource: 5461e12e076b0f80
 
   - id: f_l7LgM4CmFg
     property: role
@@ -53,14 +51,14 @@ facts:
     value: "@geoffreyhinton"
     source: https://x.com/geoffreyhinton
 
-  - id: f_gHpQ1rS2t
+  - id: f_lpaINqQFBw
     property: role
     value: "Professor of Computer Science"
     asOf: "1987"
     source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
     notes: "University of Toronto; University Professor (highest rank); professor emeritus since retirement in 2023"
 
-  - id: f_gHuV3wX4y
+  - id: f_fQhNdXYo9w
     property: employed-by
     value: "University of Toronto"
     asOf: "1987"
@@ -108,7 +106,6 @@ items:
         start: 2013-03
         end: 2023-05
         source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
-        sourceResource: 5461e12e076b0f80
         notes: "Joined after Google acquired DNNresearch (his startup with Alex Krizhevsky and Ilya Sutskever); resigned May 2023 to speak freely about AI risks"
 
   notable-publications:

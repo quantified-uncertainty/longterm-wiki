@@ -205,15 +205,6 @@ export default async function FactDetailPage({ params }: PageProps) {
             <Dash />
           )}
         </KVRow>
-        <KVRow label="Source Resource">
-          {fact.sourceResource ? (
-            <FactLink href={`/kb/entity/${fact.sourceResource}`}>
-              {getKBEntity(fact.sourceResource)?.name ?? fact.sourceResource}
-            </FactLink>
-          ) : (
-            <Dash />
-          )}
-        </KVRow>
         <KVRow label="Source Quote">
           {fact.sourceQuote ? (
             <span className="italic text-muted-foreground">{"\u201C"}{fact.sourceQuote}{"\u201D"}</span>

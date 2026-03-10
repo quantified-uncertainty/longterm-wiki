@@ -254,10 +254,6 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                                 <span className="text-xs text-muted-foreground">
                                   {fact.source}
                                 </span>
-                              ) : fact.sourceResource ? (
-                                <span className="text-muted-foreground text-xs">
-                                  R: {fact.sourceResource}
-                                </span>
                               ) : (
                                 <Dash />
                               )}

@@ -343,7 +343,6 @@ function parseFact(
     ...(asOf !== undefined && { asOf }),
     ...(validEnd !== undefined && { validEnd }),
     ...(rawFact.source !== undefined && { source: rawFact.source }),
-    ...(rawFact.sourceResource !== undefined && { sourceResource: rawFact.sourceResource }),
     ...(rawFact.sourceQuote !== undefined && {
       sourceQuote: rawFact.sourceQuote,
     }),

@@ -60,44 +60,37 @@ facts:
     notes: "Location-based social networking app; acquired by Green Dot Corporation for $43.4M in 2012"
 
   # ── Migrated from old facts system ─────────────────────────────
-  - id: f_sa_net_worth
+  - id: f_U5suM3Dqcg
     property: net-worth
     value: 2.8e9
     asOf: "2024"
-    sourceResource: 69a7aca55efbfa51
     notes: "Investment portfolio value per WSJ investigation."
 
-  - id: f_sa_openai_salary
+  - id: f_kFUCZeA9vg
     property: description
     value: "OpenAI annual salary (2024): $76,001"
-    sourceResource: 29e5d58fe306259d
     notes: "Per OpenAI tax filing."
 
-  - id: f_sa_loopt_sale
+  - id: f_QQPVOIMyoQ
     property: description
     value: "Loopt sold to Green Dot Corporation for $43.4M"
-    sourceResource: 9eb603bcd6ee754a
 
-  - id: f_sa_stripe_investment
+  - id: f_0raqAkyYDw
     property: description
     value: "Early Stripe investment (2009): $15,000 for 2%"
-    sourceResource: 792c07f18a99af7c
     notes: "Per WSJ investigation."
 
-  - id: f_sa_yc_companies
+  - id: f_W5AHRbYniw
     property: description
     value: "Y Combinator companies funded during tenure: 1,900 (through 2019)"
-    sourceResource: b795385697c55df2
 
-  - id: f_sa_board_crisis
+  - id: f_kmBIoQdLEQ
     property: description
     value: "Board crisis (Nov 2023): 738 of 770 employees (95%) signed letter threatening to quit"
-    sourceResource: ddced8916d043aa2
 
-  - id: f_sa_helion_investment
+  - id: f_7lQ4XtaMBQ
     property: description
     value: "Personal investment in Helion Energy: $375M"
-    sourceResource: 003e2cbd0f507952
 
 items:
   career-history:

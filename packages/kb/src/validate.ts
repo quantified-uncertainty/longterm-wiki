@@ -20,7 +20,7 @@
  * Data integrity (errors):
  *  7. stableid-format      (error)    — StableId must be exactly 10 alphanumeric chars
  *  8. duplicate-stableid   (error)    — Two entities sharing the same stableId
- *  9. factid-format        (error)    — Fact ID must start with f_ or inv_ prefix
+ *  9. factid-format        (error)    — Fact ID must be f_ + 10 alphanumeric chars (or inv_ for inverses)
  * 10. empty-name           (error)    — Entity has empty or missing name
  * 11. valid-end-before-as-of (error)  — validEnd is earlier than asOf on a fact
  *
@@ -82,8 +82,8 @@ function looksLikeDate(value: unknown): boolean {
 /** StableId format: exactly 10 alphanumeric characters. */
 const STABLEID_RE = /^[A-Za-z0-9]{10}$/;
 
-/** Fact ID format: must start with f_ or inv_ prefix. */
-const FACTID_RE = /^(f_|inv_).+$/;
+/** Fact ID format: f_ + exactly 10 alphanumeric chars, or inv_ prefix (for computed inverses). */
+const FACTID_RE = /^(f_[A-Za-z0-9]{10}|inv_.+)$/;
 
 /** Date format: YYYY, YYYY-MM, or YYYY-MM-DD. */
 const DATE_FORMAT_RE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
@@ -426,7 +426,7 @@ function checkFactIdFormat(
         entityId,
         message:
           `Fact "${fact.id}" on entity "${entityId}" has invalid ID format ` +
-          `(must start with "f_" or "inv_").`,
+          `(must be "f_" + 10 alphanumeric chars, or "inv_" prefix for inverses).`,
         rule: "factid-format",
       });
     }

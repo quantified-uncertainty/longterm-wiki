@@ -658,7 +658,6 @@ Examples:
       if (match.asOf) lines.push(`As of:    ${match.asOf}`);
       if (match.validEnd) lines.push(`Valid until: ${match.validEnd}`);
       if (match.source) lines.push(`Source:   ${match.source}`);
-      if (match.sourceResource) lines.push(`Source Resource: ${match.sourceResource}`);
       if (match.notes) lines.push(`Notes:    ${match.notes}`);
       if (match.currency) lines.push(`Currency: ${match.currency}`);
       lines.push(`\nWeb: /kb/fact/${match.id}`);

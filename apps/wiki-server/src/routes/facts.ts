@@ -68,7 +68,6 @@ function formatFact(f: typeof facts.$inferSelect) {
     subject: f.subject,
     note: f.note,
     source: f.source,
-    sourceResource: f.sourceResource,
     format: f.format,
     formatDivisor: f.formatDivisor,
     syncedAt: f.syncedAt,
@@ -256,27 +255,6 @@ const factsApp = new Hono()
       }
     }
 
-    // Validate sourceResource references (optional field, points to resources)
-    const resourceIds = [
-      ...new Set(
-        items.map((f) => f.sourceResource).filter((r): r is string => r != null)
-      ),
-    ];
-    if (resourceIds.length > 0) {
-      const missingResources = await checkRefsExist(
-        db,
-        resources,
-        resources.id,
-        resourceIds
-      );
-      if (missingResources.length > 0) {
-        return validationError(
-          c,
-          `Referenced resources not found: ${missingResources.join(", ")}`
-        );
-      }
-    }
-
     let upserted = 0;
 
     await db.transaction(async (tx) => {
@@ -293,7 +271,6 @@ const factsApp = new Hono()
         subject: f.subject ?? null,
         note: f.note ?? null,
         source: f.source ?? null,
-        sourceResource: f.sourceResource ?? null,
         format: f.format ?? null,
         formatDivisor: f.formatDivisor ?? null,
       }));
@@ -314,7 +291,6 @@ const factsApp = new Hono()
             subject: sql`excluded.subject`,
             note: sql`excluded.note`,
             source: sql`excluded.source`,
-            sourceResource: sql`excluded.source_resource`,
             format: sql`excluded.format`,
             formatDivisor: sql`excluded.format_divisor`,
             syncedAt: sql`now()`,

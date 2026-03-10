@@ -31,35 +31,31 @@ facts:
     property: education
     value: "PhD in Computer Science, Universit\u00E9 Pierre et Marie Curie (Paris VI, 1987); Diplome d'Ingenieur, ESIEE Paris"
     source: https://en.wikipedia.org/wiki/Yann_LeCun
-    sourceResource: 914e07c146555ae9
     notes: "PhD advisor was Maurice Milgram; postdoc at University of Toronto with Geoffrey Hinton"
 
   - id: f_yL4fG5hI6j
     property: notable-for
     value: "Pioneer of convolutional neural networks (CNNs); Chief AI Scientist at Meta; Turing Award 2018; vocal skeptic of AGI existential risk"
     source: https://en.wikipedia.org/wiki/Yann_LeCun
-    sourceResource: 914e07c146555ae9
 
   - id: f_yL7kL8mN9o
     property: social-media
     value: "@ylecun"
     source: https://x.com/ylecun
 
-  - id: f_yLpQ1rS2t
+  - id: f_4vHT9Lh28Q
     property: role
     value: "Research Scientist"
     asOf: "1988"
     validEnd: "2003"
     source: https://en.wikipedia.org/wiki/Yann_LeCun
-    sourceResource: 914e07c146555ae9
     notes: "At AT&T Bell Laboratories, then AT&T Labs-Research; developed LeNet for handwritten digit recognition"
 
-  - id: f_yLuV3wX4y
+  - id: f_rDiSYw96dg
     property: role
     value: "Silver Professor of Computer Science"
     asOf: "2003"
     source: https://en.wikipedia.org/wiki/Yann_LeCun
-    sourceResource: 914e07c146555ae9
     notes: "At New York University's Courant Institute; founded the NYU Center for Data Science"
 
 items:
@@ -72,7 +68,6 @@ items:
         start: "1987"
         end: "1988"
         source: https://en.wikipedia.org/wiki/Yann_LeCun
-        sourceResource: 914e07c146555ae9
         notes: "Postdoc with Geoffrey Hinton"
 
       i_yL4eF5gH6i:
@@ -81,7 +76,6 @@ items:
         start: "1988"
         end: "2003"
         source: https://en.wikipedia.org/wiki/Yann_LeCun
-        sourceResource: 914e07c146555ae9
         notes: "Developed convolutional neural networks (LeNet) for handwritten check reading; deployed commercially at banks"
 
       i_yL7jK8lM9n:
@@ -89,7 +83,6 @@ items:
         title: "Silver Professor of Computer Science, Courant Institute"
         start: "2003"
         source: https://en.wikipedia.org/wiki/Yann_LeCun
-        sourceResource: 914e07c146555ae9
         notes: "Founded the NYU Center for Data Science in 2013; continues to hold this position alongside Meta role"
 
       i_yLoP1qR2s:

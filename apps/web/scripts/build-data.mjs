@@ -854,7 +854,7 @@ function normalizeUrlForMatch(str) {
  *
  * @param {object} kb - Serialized KB data
  * @param {object} citationQuotesBundle - Citation quotes keyed by page ID
- * @param {Array} resources - Resources array from database.resources (for sourceResource lookups)
+ * @param {Array} resources - Resources array from database.resources (unused, kept for API compat)
  */
 function buildKBFactVerification(kb, citationQuotesBundle, resources) {
   if (!kb || !kb.facts || !citationQuotesBundle) {
@@ -897,32 +897,13 @@ function buildKBFactVerification(kb, citationQuotesBundle, resources) {
     return {};
   }
 
-  // Build resource ID → URL map for sourceResource lookups
-  const resourceUrlById = new Map();
-  if (resources && Array.isArray(resources)) {
-    for (const r of resources) {
-      if (r.id && r.url) {
-        resourceUrlById.set(r.id, r.url);
-      }
-    }
-  }
-
   // Match KB fact source URLs against the citation URL map
   const verification = {};
   let matchCount = 0;
-  let resourceLookupCount = 0;
 
   for (const [entityId, facts] of Object.entries(kb.facts)) {
     for (const fact of facts) {
-      // Resolve the source URL: direct `source` field, or look up via `sourceResource`
-      let url = (fact.source && typeof fact.source === 'string') ? fact.source : null;
-      if (!url && fact.sourceResource) {
-        const resourceUrl = resourceUrlById.get(fact.sourceResource);
-        if (resourceUrl) {
-          url = resourceUrl;
-          resourceLookupCount++;
-        }
-      }
+      const url = (fact.source && typeof fact.source === 'string') ? fact.source : null;
       if (!url) continue;
 
       // Only match URL sources
@@ -937,7 +918,7 @@ function buildKBFactVerification(kb, citationQuotesBundle, resources) {
     }
   }
 
-  console.log(`  kbFactVerification: ${matchCount} facts matched from ${urlToVerdict.size} citation URLs (${resourceLookupCount} via sourceResource)`);
+  console.log(`  kbFactVerification: ${matchCount} facts matched from ${urlToVerdict.size} citation URLs`);
   return verification;
 }
 

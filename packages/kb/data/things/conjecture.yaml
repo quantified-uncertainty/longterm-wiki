@@ -12,20 +12,17 @@ facts:
     property: founded-date
     value: 2022-03
     source: https://www.conjecture.dev/
-    sourceResource: b7aa1f2c839b5ee8
     notes: "Founded in 2022 by Connor Leahy, Sid Black, and Gabriel Alfour"
 
   - id: f_z0kXfDgUiU
     property: headquarters
     value: "London, UK"
     source: https://www.conjecture.dev/
-    sourceResource: b7aa1f2c839b5ee8
 
   - id: f_zIr7FV665p
     property: legal-structure
     value: "Private company"
     source: https://www.conjecture.dev/
-    sourceResource: b7aa1f2c839b5ee8
 
   - id: f_q5ovrpum9y
     property: total-funding
@@ -34,14 +31,13 @@ facts:
     source: https://techcrunch.com/2022/07/20/conjecture-raises-25m-seed-round/
     notes: "Raised $25M seed round in 2022; investors included Nat Friedman and Daniel Gross"
 
-  - id: f_conjecture_founded_by
+  - id: f_Tu50nzl3OA
     property: founded-by
     value:
       - !ref CrXoCsIucX:connor-leahy
       - sid-black
       - gabriel-alfour
     source: https://www.conjecture.dev/
-    sourceResource: b7aa1f2c839b5ee8
 
 items:
   key-people:
@@ -53,7 +49,6 @@ items:
         start: 2022-03
         is_founder: true
         source: https://www.conjecture.dev/
-        sourceResource: b7aa1f2c839b5ee8
         notes: "Previously co-founded EleutherAI; prominent AI safety advocate and public commentator"
 
       i_KQFlH3C8xF:

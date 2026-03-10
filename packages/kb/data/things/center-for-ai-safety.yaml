@@ -8,7 +8,7 @@ thing:
     - CAIS
 
 facts:
-  - id: f_cais_sff_funding
+  - id: f_SaGQWpxjYQ
     property: total-funding
     value: 6400000
     asOf: "2025"

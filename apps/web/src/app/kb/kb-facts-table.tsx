@@ -107,9 +107,6 @@ const columns: ColumnDef<FactRow>[] = [
           </a>
         );
       }
-      if (row.original.sourceResource) {
-        return <span className="text-xs text-muted-foreground">{row.original.sourceResource}</span>;
-      }
       return <span className="text-xs text-muted-foreground/30">&mdash;</span>;
     },
     size: 70,

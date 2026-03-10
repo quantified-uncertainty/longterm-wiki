@@ -19,7 +19,6 @@ export interface FactRow {
   rawRefValues: string[] | null;
   asOf: string;
   source: string;
-  sourceResource: string | undefined;
   hasSource: boolean;
 }
 
@@ -78,8 +77,7 @@ export function KBFactsExplorerContent() {
         rawRefValues: refNames,
         asOf: formatKBDate(fact.asOf),
         source: fact.source ?? "",
-        sourceResource: fact.sourceResource,
-        hasSource: !!(fact.source || fact.sourceResource),
+        hasSource: !!fact.source,
       });
     }
   }

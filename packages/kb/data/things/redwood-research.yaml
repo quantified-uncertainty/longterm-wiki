@@ -12,28 +12,24 @@ facts:
     property: founded-date
     value: 2021-06
     source: https://www.redwoodresearch.org/
-    sourceResource: 42e7247cbc33fc4c
     notes: "Founded in 2021 by Nate Thomas and Buck Shlegeris"
 
   - id: f_gnQEBSrD2L
     property: headquarters
     value: "San Francisco, CA"
     source: https://www.redwoodresearch.org/
-    sourceResource: 42e7247cbc33fc4c
 
   - id: f_72UoXSEqwe
     property: legal-structure
     value: "Nonprofit research lab"
     source: https://www.redwoodresearch.org/
-    sourceResource: 42e7247cbc33fc4c
 
-  - id: f_redwood_founded_by
+  - id: f_yii7fct7Gw
     property: founded-by
     value:
       - nate-thomas
       - buck-shlegeris
     source: https://www.redwoodresearch.org/
-    sourceResource: 42e7247cbc33fc4c
 
 items:
   key-people:
@@ -45,7 +41,6 @@ items:
         start: 2021-06
         is_founder: true
         source: https://www.redwoodresearch.org/
-        sourceResource: 42e7247cbc33fc4c
         notes: "Previously researcher at MIRI; leads Redwood's research agenda on AI control"
 
       i_tAoC59MQQm:

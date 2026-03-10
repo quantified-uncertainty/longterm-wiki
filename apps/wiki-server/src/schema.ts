@@ -681,9 +681,6 @@ export const facts = pgTable(
     }),
     note: text("note"),
     source: text("source"), // URL to source
-    sourceResource: text("source_resource").references(() => resources.id, {
-      onDelete: "set null",
-    }),
     format: text("format"),
     formatDivisor: real("format_divisor"),
     syncedAt: timestamp("synced_at", { withTimezone: true })

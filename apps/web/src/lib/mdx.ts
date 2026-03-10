@@ -232,7 +232,6 @@ async function compileFromPath(filePath: string, slug: string): Promise<MdxPage 
         value: fact.value,
         asOf: fact.asOf,
         source: fact.source,
-        sourceResource: fact.sourceResource,
         notes: fact.notes,
       });
     }
