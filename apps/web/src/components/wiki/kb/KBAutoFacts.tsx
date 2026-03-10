@@ -391,13 +391,13 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
   // Get record collections
   const allCollections = getKBAllRecordCollections(entityId);
   const collectionNames = Object.keys(allCollections);
-  const totalItems = collectionNames.reduce(
+  const totalRecords = collectionNames.reduce(
     (sum, name) => sum + (allCollections[name]?.length ?? 0),
     0,
   );
 
-  // Don't render if no substantive facts and no items
-  if (substantiveFacts.length === 0 && totalItems === 0) {
+  // Don't render if no substantive facts and no records
+  if (substantiveFacts.length === 0 && totalRecords === 0) {
     return null;
   }
 
@@ -418,10 +418,10 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
 
   // Open by default for entities with enough structured data
   const AUTO_OPEN_THRESHOLD_FACTS = 5;
-  const AUTO_OPEN_THRESHOLD_ITEMS = 10;
+  const AUTO_OPEN_THRESHOLD_RECORDS = 10;
   const defaultOpen =
     substantiveFacts.length >= AUTO_OPEN_THRESHOLD_FACTS ||
-    totalItems >= AUTO_OPEN_THRESHOLD_ITEMS;
+    totalRecords >= AUTO_OPEN_THRESHOLD_RECORDS;
 
   return (
     <section className="not-prose mt-8 mb-6">
@@ -445,12 +445,12 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
                 {substantiveFacts.length === 1 ? "fact" : "facts"}
               </span>
             )}
-            {substantiveFacts.length > 0 && totalItems > 0 && (
+            {substantiveFacts.length > 0 && totalRecords > 0 && (
               <span className="text-muted-foreground/40">{"\u00B7"}</span>
             )}
-            {totalItems > 0 && (
+            {totalRecords > 0 && (
               <span>
-                {totalItems} {totalItems === 1 ? "item" : "items"}
+                {totalRecords} {totalRecords === 1 ? "record" : "records"}
               </span>
             )}
           </span>
@@ -528,7 +528,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
             </div>
           )}
 
-          {/* Item collections */}
+          {/* Record collections */}
           {collectionNames.length > 0 && (
             <div>
               {substantiveFacts.length > 0 && (

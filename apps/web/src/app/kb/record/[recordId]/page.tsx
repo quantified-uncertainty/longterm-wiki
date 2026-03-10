@@ -22,16 +22,16 @@ import { KVRow, KVTable } from "@/components/wiki/kb/kb-detail-shared";
 // ── Static params ────────────────────────────────────────────────────
 
 export function generateStaticParams() {
-  const allItems = getAllKBRecords();
+  const allRecords = getAllKBRecords();
 
   // Assert global uniqueness of record keys at build time
   const seen = new Map<string, string>();
-  for (const { entityId, collection, entry } of allItems) {
+  for (const { entityId, collection, entry } of allRecords) {
     const prev = seen.get(entry.key);
     if (prev) {
       console.warn(
-        `[KB] Duplicate item key "${entry.key}": found in ${prev} and ${entityId}/${collection}. ` +
-        `Only the first match will be used for /kb/item/${entry.key}.`,
+        `[KB] Duplicate record key "${entry.key}": found in ${prev} and ${entityId}/${collection}. ` +
+        `Only the first match will be used for /kb/record/${entry.key}.`,
       );
     } else {
       seen.set(entry.key, `${entityId}/${collection}`);
@@ -39,28 +39,28 @@ export function generateStaticParams() {
   }
 
   // Deduplicate: only generate one page per key
-  return [...seen.keys()].map((key) => ({ itemId: key }));
+  return [...seen.keys()].map((key) => ({ recordId: key }));
 }
 
 // ── Metadata ─────────────────────────────────────────────────────────
 
 interface PageProps {
-  params: Promise<{ itemId: string }>;
+  params: Promise<{ recordId: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { itemId } = await params;
+  const { recordId } = await params;
   return {
-    title: `Item: ${itemId}`,
+    title: `Record: ${recordId}`,
     robots: { index: false },
   };
 }
 
 // ── Page ─────────────────────────────────────────────────────────────
 
-export default async function ItemDetailPage({ params }: PageProps) {
-  const { itemId } = await params;
-  const result = getKBRecordByKey(itemId);
+export default async function RecordDetailPage({ params }: PageProps) {
+  const { recordId } = await params;
+  const result = getKBRecordByKey(recordId);
   if (!result) notFound();
 
   const { entityId, collection, entry } = result;
@@ -72,7 +72,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
   const fieldDefs = recordSchema?.fields;
 
   // Get sibling records in the same collection
-  const siblingItems = getKBRecords(entityId, collection);
+  const siblingRecords = getKBRecords(entityId, collection);
 
   const content = (
     <div>
@@ -91,7 +91,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
         <span>/</span>
         <span>{titleCase(collection)}</span>
         <span>/</span>
-        <span className="font-mono text-xs">{itemId}</span>
+        <span className="font-mono text-xs">{recordId}</span>
       </nav>
 
       {/* Header */}
@@ -101,7 +101,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
           const nameField = entry.fields["name"] ?? entry.fields["title"] ?? entry.fields["label"];
           if (typeof nameField === "string") return nameField;
           // Fall back to collection singular + entity
-          return `${titleCase(collection)} Item`;
+          return `${titleCase(collection)} Record`;
         })()}
       </h1>
       <p className="text-sm text-muted-foreground mb-6">
@@ -114,13 +114,13 @@ export default async function ItemDetailPage({ params }: PageProps) {
         {" \u203A "}
         <span>{titleCase(collection)}</span>
         {" \u203A "}
-        <code className="text-xs">{itemId}</code>
+        <code className="text-xs">{recordId}</code>
       </p>
 
-      {/* Item Context */}
-      <h2 className="text-base font-semibold mt-4 mb-2">Item Metadata</h2>
+      {/* Record Context */}
+      <h2 className="text-base font-semibold mt-4 mb-2">Record Metadata</h2>
       <KVTable>
-        <KVRow label="Item Key">
+        <KVRow label="Record Key">
           <code className="text-xs">{entry.key}</code>
         </KVRow>
         <KVRow label="Entity">
@@ -134,13 +134,13 @@ export default async function ItemDetailPage({ params }: PageProps) {
         <KVRow label="Collection">
           {titleCase(collection)}
           <span className="text-muted-foreground ml-2 text-xs">
-            ({siblingItems.length} item{siblingItems.length !== 1 ? "s" : ""} total)
+            ({siblingRecords.length} record{siblingRecords.length !== 1 ? "s" : ""} total)
           </span>
         </KVRow>
         {recordSchema && (
           <KVRow label="Schema">
             <span className="text-xs text-muted-foreground">
-              {recordSchema.id}
+              {recordSchema.description ?? recordSchema.name ?? recordSchema.id}
             </span>
           </KVRow>
         )}
@@ -210,11 +210,11 @@ export default async function ItemDetailPage({ params }: PageProps) {
         })}
       </KVTable>
 
-      {/* Sibling Items */}
-      {siblingItems.length > 1 && (
+      {/* Sibling Records */}
+      {siblingRecords.length > 1 && (
         <>
           <h2 className="text-base font-semibold mt-6 mb-2">
-            Other Items in {titleCase(collection)} ({siblingItems.length - 1})
+            Other Records in {titleCase(collection)} ({siblingRecords.length - 1})
           </h2>
           <div className="border border-border rounded-lg overflow-hidden">
             <table className="w-full text-sm">
@@ -222,7 +222,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
                 <tr className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-3 py-2 font-medium">Key</th>
                   {/* Show first 3 fields as preview columns */}
-                  {Object.keys(siblingItems[0]?.fields ?? {})
+                  {Object.keys(siblingRecords[0]?.fields ?? {})
                     .slice(0, 3)
                     .map((col) => (
                       <th key={col} className="px-3 py-2 font-medium">
@@ -232,11 +232,11 @@ export default async function ItemDetailPage({ params }: PageProps) {
                 </tr>
               </thead>
               <tbody>
-                {siblingItems
+                {siblingRecords
                   .filter((s) => s.key !== entry.key)
                   .map((sibling) => {
                     const previewFields = Object.keys(
-                      siblingItems[0]?.fields ?? {},
+                      siblingRecords[0]?.fields ?? {},
                     ).slice(0, 3);
                     return (
                       <tr
@@ -245,7 +245,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
                       >
                         <td className="px-3 py-1.5 font-mono text-xs">
                           <Link
-                            href={`/kb/item/${sibling.key}`}
+                            href={`/kb/record/${sibling.key}`}
                             className="text-primary hover:underline"
                           >
                             {sibling.key}

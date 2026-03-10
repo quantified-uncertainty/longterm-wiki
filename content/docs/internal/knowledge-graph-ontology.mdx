@@ -31,7 +31,7 @@ Since then, the **KB system** (`packages/kb/`) has been built and implements mos
 - **Temporal support** via `asOf` and `validEnd` fields on facts
 - **Source attribution** via `source` URL, `sourceResource`, `sourceQuote`, and `notes` fields
 - **Inverse relationships** auto-computed from `inverseId` declarations on properties
-- **Item collections** for structured sub-data (funding-rounds, key-people, products, model-releases, board-members, etc.)
+- **Record collections** for structured sub-data (funding-rounds, key-people, products, model-releases, board-members, etc.)
 - **23 validation rules** covering integrity, consistency, and quality
 - **Custom YAML tags** (`!ref` for entity references, `!date` for dates)
 
@@ -52,7 +52,7 @@ The KB system (`packages/kb/`) now covers most knowledge graph concepts that wer
 | **Source attribution** | `source` URL, `sourceResource`, `sourceQuote`, `notes` per fact | Implemented |
 | **Entity relationships** | `ref`/`refs` fact types with `inverseId` auto-computation | Implemented |
 | **Non-numeric facts** | text, date, boolean, ref, refs, range, min, json value types | Implemented |
-| **Item collections** | Structured sub-data: funding-rounds, key-people, products, model-releases, board-members | Implemented |
+| **Record collections** | Structured sub-data: funding-rounds, key-people, products, model-releases, board-members | Implemented |
 | **Confidence / verification** | Not in KB; source/notes fields provide partial coverage | Not yet implemented |
 | **Claim-type taxonomy** | Not in KB; no factual/consensus/analytical/speculative distinction | Not yet implemented |
 
@@ -118,7 +118,7 @@ A single TechCrunch article produces 8-12 claims. A single annual report might p
 
 ### Layer 2: Type-Specific Properties
 
-**Status: Implemented in KB.** The 19 schema files in `packages/kb/data/schemas/` define `required` and `recommended` properties per entity type. For example, `organization.yaml` recommends `founded-date`, `headquarters`, `revenue`, `valuation`, `headcount`, `legal-structure`, `total-funding` and defines item collections for `funding-rounds`, `key-people`, `products`, etc.
+**Status: Implemented in KB.** The 19 schema files in `packages/kb/data/schemas/` define `required` and `recommended` properties per entity type. For example, `organization.yaml` recommends `founded-date`, `headquarters`, `revenue`, `valuation`, `headcount`, `legal-structure`, `total-funding` and defines record collections for `funding-rounds`, `key-people`, `products`, etc.
 
 **Organization properties (KB implementation):**
 
@@ -168,7 +168,7 @@ Risk and concept schemas exist (`packages/kb/data/schemas/risk.yaml`, `concept.y
 | `founded-by` | Implemented | `founder-of` | refs |
 | `parent-org` | Not yet | — | |
 | `subsidiary-of` | Not yet | — | |
-| `invested-in` | Not yet | — | Partially covered by funding-rounds item collection |
+| `invested-in` | Not yet | — | Partially covered by funding-rounds record collection |
 | `partnered-with` | Not yet | — | |
 | `regulated-by` | Not yet | — | |
 | `sued-by` | Not yet | — | |
@@ -176,7 +176,7 @@ Risk and concept schemas exist (`packages/kb/data/schemas/risk.yaml`, `concept.y
 | `addresses` | Not yet | — | For approach/policy to risk |
 | `implemented-by` | Not yet | — | For approach to org/project |
 
-The KB's item collections (e.g., `funding-rounds` with `lead_investor` as a `ref` field) handle some relationship patterns that don't map cleanly to simple property-value facts. For example, a funding round involves an amount, date, valuation, and lead investor — this is better represented as a structured item than as separate `investedIn` facts.
+The KB's record collections (e.g., `funding-rounds` with `lead_investor` as a `ref` field) handle some relationship patterns that don't map cleanly to simple property-value facts. For example, a funding round involves an amount, date, valuation, and lead investor — this is better represented as a structured item than as separate `investedIn` facts.
 
 ### Layer 4: Claim Types and Confidence
 
@@ -1307,7 +1307,7 @@ Some original questions have been resolved by KB; others remain open.
 | Temporal qualifiers | Implemented (`asOf`, `validEnd`) | KB fact fields |
 | Source attribution | Implemented (source, sourceResource, sourceQuote, notes) | KB fact fields |
 | Inverse relationships | Implemented (auto-computed from `inverseId`) | `properties.yaml` declarations |
-| Item collections (funding-rounds, etc.) | Implemented | Entity type schemas |
+| Record collections (funding-rounds, etc.) | Implemented | Entity type schemas |
 | Display configuration | Implemented (divisor, prefix, suffix) | `properties.yaml` display config |
 | Validation | Implemented (23 rules) | KB validation system |
 | MDX integration | Implemented (`<KBF>`, `<KBFactValue>`, `<Calc>`) | MDX components |

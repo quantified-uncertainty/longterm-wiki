@@ -1,7 +1,7 @@
 ---
 numericId: E904
 title: "Knowledge Base Architecture"
-description: "Architecture document for the KB system — YAML-based structured facts, property taxonomy, item collections, and how they relate to the wiki's data pipeline."
+description: "Architecture document for the KB system — YAML-based structured facts, property taxonomy, record collections, and how they relate to the wiki's data pipeline."
 sidebar:
   order: 12
 subcategory: architecture
@@ -25,7 +25,7 @@ The KB lives in `packages/kb/` and consists of:
 
 - **362 entity files** in `packages/kb/data/things/*.yaml` (organizations, people, AI models, risks, etc.)
 - **95 properties** defined in `packages/kb/data/properties.yaml` with display formatting, type constraints, and inverse relationships
-- **19 entity type schemas** in `packages/kb/data/schemas/*.yaml` specifying required and recommended properties plus item collection definitions
+- **19 entity type schemas** in `packages/kb/data/schemas/*.yaml` specifying required and recommended properties plus record collection definitions
 - **23 validation rules** enforced at build time
 
 Facts flow through the wiki as: **YAML \-\> Graph (loader.ts) \-\> serialize \-\> database.json \-\> Next.js reads at build time**. No runtime API calls are needed for structured data on wiki pages.
@@ -34,7 +34,7 @@ Facts flow through the wiki as: **YAML \-\> Graph (loader.ts) \-\> serialize \-\
 
 ### Entities
 
-Each entity is a YAML file in `packages/kb/data/things/`. The file contains an entity header, a list of facts, and optional item collections:
+Each entity is a YAML file in `packages/kb/data/things/`. The file contains an entity header, a list of facts, and optional record collections:
 
 ```yaml
 thing:
@@ -114,15 +114,15 @@ Each entity type has a schema in `packages/kb/data/schemas/` that defines:
 
 - **Required properties**: must have at least one fact (validation error if missing)
 - **Recommended properties**: should have facts (validation info if missing)
-- **Item collection schemas**: structured sub-data with typed fields
+- **Record collection schemas**: structured sub-data with typed fields
 
-For example, the `organization` schema recommends `founded-date`, `headquarters`, `revenue`, `valuation`, `headcount`, `legal-structure`, `total-funding` and defines item collections for `funding-rounds`, `key-people`, `products`, `model-releases`, `board-members`, `strategic-partnerships`, `safety-milestones`, `research-areas`, and `grants-and-programs`.
+For example, the `organization` schema recommends `founded-date`, `headquarters`, `revenue`, `valuation`, `headcount`, `legal-structure`, `total-funding` and defines record collections for `funding-rounds`, `key-people`, `products`, `model-releases`, `board-members`, `strategic-partnerships`, `safety-milestones`, `research-areas`, and `grants-and-programs`.
 
 The 19 entity types with schemas are: ai-model, analysis, approach, argument, capability, case-study, concept, debate, event, funder, historical, incident, organization, person, policy, project, risk, risk-factor, and safety-agenda.
 
-## Item Collections
+## Record Collections
 
-Item collections store ordered sub-data that does not fit the simple property-value model. They are defined per entity type in the schema and stored inline in each entity's YAML file.
+Record collections store ordered sub-data that does not fit the simple property-value model. They are defined per entity type in the schema and stored inline in each entity's YAML file.
 
 Examples:
 
@@ -183,7 +183,7 @@ The KB runs 23 validation checks at build time, organized into three severity le
 5. Entity has empty name
 6. validEnd is earlier than asOf
 7. Duplicate stableIds across entities
-8. Item collection field type mismatches or missing required fields
+8. Record collection field type mismatches or missing required fields
 9. Range value bounds invalid
 
 **Warnings:**
@@ -203,7 +203,7 @@ The KB runs 23 validation checks at build time, organized into three severity le
 
 **Informational:**
 
-22. Orphan entity (no facts and no items)
+22. Orphan entity (no facts and no records)
 23. Completeness percentage per entity
 
 ## Data Pipeline
@@ -242,7 +242,7 @@ KB facts are the **authoritative source** for structured data that appears acros
 |-----------|--------|
 | KB YAML data layer (362 entities) | Working |
 | Property taxonomy (95 properties) | Working |
-| 19 entity type schemas with item collections | Working |
+| 19 entity type schemas with record collections | Working |
 | 23 validation rules | Working |
 | Inverse relationship computation | Working |
 | `!ref` and `!date` YAML tags with cross-validation | Working |
@@ -260,7 +260,7 @@ KB facts are the **authoritative source** for structured data that appears acros
 Several areas are under consideration for extending the KB system:
 
 - **Broader entity coverage**: Expanding beyond the current 362 entities to cover more of the wiki's \~700 pages with structured facts
-- **Richer item collection types**: Adding more collection schemas (e.g., regulatory actions, benchmark results, governance events) to entity types beyond organization
+- **Richer record collection types**: Adding more collection schemas (e.g., regulatory actions, benchmark results, governance events) to entity types beyond organization
 - **Temporal queries in components**: Enabling `\<KBF\>` to reference facts at specific dates (e.g., "Anthropic's revenue as of 2025-03") rather than always showing the latest
 - **Cross-entity computed properties**: Supporting `\<Calc\>` expressions that aggregate across entities (e.g., total funding across all AI safety organizations)
 - **Statement-KB reconciliation**: Automated checks that verify page prose (statements) stays consistent with canonical KB facts, flagging contradictions for human review
