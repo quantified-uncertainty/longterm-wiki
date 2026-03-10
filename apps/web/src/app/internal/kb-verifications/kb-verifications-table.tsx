@@ -12,7 +12,7 @@ import {
   type SortingState,
   type ColumnFiltersState,
 } from "@tanstack/react-table";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight, ChevronLeft, Loader2, Search, RotateCcw } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
 import type { VerdictRow, VerdictDetailResult } from "./kb-verifications-content";
@@ -195,8 +195,16 @@ function ExpandedVerificationDetail({
 
   if (entry.status === "error") {
     return (
-      <div className="px-6 py-4 text-sm text-red-500">
-        Failed to load details: {entry.error}
+      <div className="flex items-center gap-3 px-6 py-4 text-sm text-red-500">
+        <span>Failed to load details: {entry.error}</span>
+        <button
+          type="button"
+          onClick={() => onLoad(factId)}
+          className="inline-flex items-center gap-1 rounded-md border border-red-300 px-2 py-1 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+        >
+          <RotateCcw className="h-3 w-3" />
+          Retry
+        </button>
       </div>
     );
   }
@@ -302,9 +310,20 @@ export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 100,
+  });
+
+  // Reset to page 1 when search filter changes
+  useEffect(() => {
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
+  }, [globalFilter]);
+
   const table = useReactTable({
     data: filtered,
     columns,
+    getRowId: (row) => row.factId,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -314,13 +333,14 @@ export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     onExpandedChange: setExpanded,
+    onPaginationChange: setPagination,
     globalFilterFn: "includesString",
     state: {
       sorting,
       columnFilters,
       globalFilter,
       expanded,
-      pagination: { pageIndex: 0, pageSize: 100 },
+      pagination,
     },
   });
 
@@ -356,10 +376,19 @@ export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
     []
   );
 
+  const filteredCount = table.getFilteredRowModel().rows.length;
+  const pageCount = table.getPageCount();
+  const currentPage = table.getState().pagination.pageIndex + 1;
+  const canPrev = table.getCanPreviousPage();
+  const canNext = table.getCanNextPage();
+  const { pageIndex, pageSize: ps } = table.getState().pagination;
+  const rangeStart = pageIndex * ps + 1;
+  const rangeEnd = Math.min((pageIndex + 1) * ps, filteredCount);
+
   return (
-    <div className="not-prose">
+    <div className="not-prose space-y-4">
       {/* Verdict filter tabs */}
-      <div className="flex gap-2 mb-4 flex-wrap">
+      <div className="flex gap-2 flex-wrap">
         <button
           onClick={() => setFilterVerdict("all")}
           className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
@@ -386,6 +415,24 @@ export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
         ))}
       </div>
 
+      {/* Search + row count */}
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            placeholder="Search verifications..."
+            value={globalFilter ?? ""}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+          />
+        </div>
+        <span className="text-sm text-muted-foreground whitespace-nowrap">
+          {filteredCount === filtered.length
+            ? `${filtered.length} results`
+            : `${filteredCount} of ${filtered.length} results`}
+        </span>
+      </div>
+
       <DataTable
         table={table}
         renderExpandedRow={(row) => {
@@ -399,6 +446,38 @@ export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
           );
         }}
       />
+
+      {/* Pagination controls */}
+      {pageCount > 1 && (
+        <div className="flex items-center justify-between px-1">
+          <span className="text-sm text-muted-foreground">
+            Showing {rangeStart}–{rangeEnd} of {filteredCount}
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => table.previousPage()}
+              disabled={!canPrev}
+              className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Prev
+            </button>
+            <span className="px-2 text-xs text-muted-foreground tabular-nums">
+              {currentPage} / {pageCount}
+            </span>
+            <button
+              onClick={() => table.nextPage()}
+              disabled={!canNext}
+              className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              aria-label="Next page"
+            >
+              Next
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
