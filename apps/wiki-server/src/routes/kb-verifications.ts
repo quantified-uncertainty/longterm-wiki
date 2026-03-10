@@ -7,14 +7,43 @@ import {
   kbFactResourceVerifications,
   facts,
 } from "../schema.js";
-import { zv, notFoundError } from "./utils.js";
+import {
+  zv,
+  notFoundError,
+  parseJsonBody,
+  validationError,
+  invalidJsonError,
+} from "./utils.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
 const MAX_FACT_ID_LENGTH = 100;
+const MAX_URL_LENGTH = 2048;
+
+// ---- Valid verdict values ----
+
+const VALID_RESOURCE_VERDICTS = [
+  "confirmed",
+  "contradicted",
+  "unverifiable",
+  "outdated",
+  "partial",
+] as const;
 
 // ---- Query schemas ----
+
+const ResourceVerificationBody = z.object({
+  factId: z.string().min(1).max(MAX_FACT_ID_LENGTH),
+  resourceId: z.string().max(200).optional(),
+  verdict: z.enum(VALID_RESOURCE_VERDICTS),
+  confidence: z.number().min(0).max(1).optional(),
+  extractedValue: z.string().max(2000).optional(),
+  checkerModel: z.string().max(100).optional(),
+  isPrimarySource: z.boolean().default(false),
+  notes: z.string().max(5000).optional(),
+  sourceUrl: z.string().url().max(MAX_URL_LENGTH).optional(),
+});
 
 const VerdictsQuery = z.object({
   verdict: z.string().max(50).optional(),
@@ -198,10 +227,57 @@ const kbVerificationsApp = new Hono()
         isPrimarySource: v.isPrimarySource,
         checkedAt: v.checkedAt,
         notes: v.notes,
+        sourceUrl: v.sourceUrl,
         createdAt: v.createdAt,
         updatedAt: v.updatedAt,
       })),
     });
+  })
+
+  // ---- POST /verifications ----
+  .post("/verifications", async (c) => {
+    const raw = await parseJsonBody(c);
+    if (!raw) return invalidJsonError(c);
+
+    const parsed = ResourceVerificationBody.safeParse(raw);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const body = parsed.data;
+    const db = getDrizzleDb();
+
+    const now = new Date();
+
+    // Insert the resource verification
+    const [inserted] = await db
+      .insert(kbFactResourceVerifications)
+      .values({
+        factId: body.factId,
+        resourceId: body.resourceId ?? null,
+        verdict: body.verdict,
+        confidence: body.confidence ?? null,
+        extractedValue: body.extractedValue ?? null,
+        checkerModel: body.checkerModel ?? null,
+        isPrimarySource: body.isPrimarySource,
+        notes: body.notes ?? null,
+        sourceUrl: body.sourceUrl ?? null,
+        checkedAt: now,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning({ id: kbFactResourceVerifications.id });
+
+    // Auto-set needs_recheck on the corresponding verdict if one exists.
+    // When new evidence is inserted, the aggregate verdict may be stale.
+    const updated = await db
+      .update(kbFactVerdicts)
+      .set({ needsRecheck: true, updatedAt: now })
+      .where(eq(kbFactVerdicts.factId, body.factId))
+      .returning({ factId: kbFactVerdicts.factId });
+
+    return c.json({
+      id: inserted.id,
+      verdictFlagged: updated.length > 0,
+    }, 201);
   });
 
 // ---- Exports ----

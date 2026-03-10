@@ -24,6 +24,7 @@ import type { Entity, Fact, Property } from '../../packages/kb/src/types.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
+import { apiRequest } from '../lib/wiki-server/client.ts';
 import {
   detectPaywall,
   isUnverifiableDomain,
@@ -366,6 +367,33 @@ async function verifySingleFact(
 }
 
 /**
+ * Store a verification result in the wiki-server database.
+ * Best-effort: logs a warning on failure but does not block the pipeline.
+ */
+async function storeVerificationResult(result: VerificationResult): Promise<void> {
+  const body = {
+    factId: result.factId,
+    verdict: result.verdict,
+    confidence: result.confidence,
+    extractedValue: result.extractedValue,
+    checkerModel: 'claude-3-haiku', // matches MODELS.haiku used in verifySingleFact
+    isPrimarySource: true,
+    notes: result.reasoning,
+    sourceUrl: result.sourceUrl,
+  };
+
+  const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
+    'POST',
+    '/api/kb-verifications/verifications',
+    body,
+  );
+
+  if (!response.ok) {
+    console.warn(`[kb-verify] Failed to store verification for ${result.factId}: ${response.error}`);
+  }
+}
+
+/**
  * Collect facts to verify based on the command options.
  */
 function collectFacts(
@@ -520,6 +548,11 @@ export async function verifyCommand(
       if (result.verdict === 'contradicted' || result.verdict === 'outdated') {
         console.log(`    Source says: ${result.extractedValue.slice(0, 100)}`);
       }
+
+      // Store result in wiki-server (best-effort, does not block pipeline)
+      storeVerificationResult(result).catch((e: unknown) => {
+        console.warn(`[kb-verify] Failed to store result for ${result.factId}: ${e instanceof Error ? e.message : String(e)}`);
+      });
     }
   }
 

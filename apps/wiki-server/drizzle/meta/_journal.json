@@ -484,6 +484,13 @@
       "when": 1774512000000,
       "tag": "0068_add_kb_fact_verifications",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1774598400000,
+      "tag": "0069_add_source_url_to_kb_verifications",
+      "breakpoints": true
     }
   ]
 }
