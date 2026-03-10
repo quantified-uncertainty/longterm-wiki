@@ -35,7 +35,6 @@ export interface FactDataRow {
   high?: number;
   asOf?: string;
   source?: string;
-  sourceResource?: string;
   sourceTitle?: string;
   sourcePublication?: string;
   sourceCredibility?: number;
@@ -258,15 +257,6 @@ function makeColumns(
         return <span className="text-xs text-muted-foreground">{s}</span>;
       },
     },
-    {
-      accessorKey: "sourceResource",
-      header: "Resource ID",
-      cell: ({ row }) => {
-        const sr = row.original.sourceResource;
-        if (!sr) return <span className="text-muted-foreground/40 text-xs">-</span>;
-        return <span className="font-mono text-[10px] text-muted-foreground">{sr}</span>;
-      },
-    },
   ];
 }
 
@@ -274,7 +264,6 @@ function makeColumns(
 const DEFAULT_HIDDEN: Record<string, boolean> = {
   compute: false,
   subject: false,
-  sourceResource: false,
   range: false,
 };
 

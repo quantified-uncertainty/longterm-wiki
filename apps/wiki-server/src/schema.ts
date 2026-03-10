@@ -681,9 +681,6 @@ export const facts = pgTable(
     }),
     note: text("note"),
     source: text("source"), // URL to source
-    sourceResource: text("source_resource").references(() => resources.id, {
-      onDelete: "set null",
-    }),
     format: text("format"),
     formatDivisor: real("format_divisor"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
@@ -1327,5 +1324,72 @@ export const pageCitations = pgTable(
   (table) => [
     index("idx_pc_page_id").on(table.pageId),
     index("idx_pc_reference_id").on(table.referenceId),
+  ]
+);
+
+/**
+ * Per-resource verification evidence for KB facts.
+ *
+ * Each row records one LLM check of a KB fact against a specific resource.
+ * A fact can have multiple rows (one per resource checked).
+ */
+export const kbFactResourceVerifications = pgTable(
+  "kb_fact_resource_verifications",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    factId: text("fact_id").notNull(),
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
+    verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial
+    confidence: real("confidence"), // 0.0 to 1.0
+    extractedValue: text("extracted_value"),
+    checkerModel: text("checker_model"),
+    isPrimarySource: boolean("is_primary_source").notNull().default(false),
+    checkedAt: timestamp("checked_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_kbfrv_fact_id").on(table.factId),
+    index("idx_kbfrv_verdict").on(table.verdict),
+  ]
+);
+
+/**
+ * Aggregate per-fact verdicts — one row per fact, derived from resource verifications.
+ *
+ * Recomputed periodically from kb_fact_resource_verifications. Separates evidence
+ * (per-resource checks) from conclusions (all-things-considered verdict).
+ */
+export const kbFactVerdicts = pgTable(
+  "kb_fact_verdicts",
+  {
+    factId: text("fact_id").primaryKey(),
+    verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial | unchecked
+    confidence: real("confidence"),
+    reasoning: text("reasoning"),
+    sourcesChecked: integer("sources_checked").notNull().default(0),
+    needsRecheck: boolean("needs_recheck").notNull().default(false),
+    lastComputedAt: timestamp("last_computed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_kbfv_verdicts_verdict").on(table.verdict),
+    index("idx_kbfv_verdicts_recheck").on(table.needsRecheck),
   ]
 );

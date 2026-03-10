@@ -54,8 +54,6 @@ export interface Fact {
   validEnd?: string;
   /** Source URL */
   source?: string;
-  /** Resource ID linking to the curated resource registry */
-  sourceResource?: string;
   /** Relevant excerpt from source */
   sourceQuote?: string;
   /** Free-text annotation */
@@ -115,13 +113,6 @@ export interface FieldDef {
   required?: boolean;
   unit?: string;
   description?: string;
-  /** For item-ref fields: which sibling collection the referenced key must exist in */
-  collection?: string;
-}
-
-export interface ItemCollectionSchema {
-  description: string;
-  fields: Record<string, FieldDef>;
 }
 
 export interface TypeSchema {
@@ -133,26 +124,8 @@ export interface TypeSchema {
   required: string[];
   /** Property IDs that should have facts */
   recommended: string[];
-  /** Named item collections (e.g., funding-rounds, key-people) */
-  items?: Record<string, ItemCollectionSchema>;
   /** Record schema IDs this entity type can host (e.g., ["funding-round", "investment"]) */
   records?: string[];
-}
-
-// ── Items (lightweight sub-collections) ─────────────────────────────
-
-export interface ItemEntry {
-  /** Local key within the collection: "series-a", "dario-ceo" */
-  key: string;
-  /** Typed fields (schema defined in ItemCollectionSchema) */
-  fields: Record<string, unknown>;
-}
-
-export interface ItemCollection {
-  /** References an item type (used for schema lookup) */
-  type: string;
-  /** Keyed entries */
-  entries: Record<string, Record<string, unknown>>;
 }
 
 // ── Records (unified sub-collections with schema-defined endpoints) ──
@@ -214,8 +187,6 @@ export interface EntityFile {
     numericId?: string;
   };
   facts?: RawFact[];
-  items?: Record<string, RawItemCollection>;
-  /** Unified records (replaces items for new data) */
   records?: Record<string, Record<string, RawRecordEntry>>;
 }
 
@@ -241,8 +212,6 @@ export interface RawFact {
   asOf?: unknown;
   validEnd?: unknown;
   source?: string;
-  /** Resource ID linking to the curated resource registry */
-  sourceResource?: string;
   sourceQuote?: string;
   notes?: string;
   /** ISO 4217 currency override (e.g., "GBP") */
@@ -257,12 +226,6 @@ export interface RawFact {
   dollarYear?: number;
 }
 
-/** Item collection as stored in YAML */
-export interface RawItemCollection {
-  type: string;
-  entries: Record<string, Record<string, unknown>>;
-}
-
 /** Shape of properties.yaml */
 export interface PropertiesFile {
   properties: Record<string, Omit<Property, "id">>;
@@ -274,10 +237,6 @@ export interface SchemaFile {
   name: string;
   required: string[];
   recommended: string[];
-  items?: Record<string, {
-    description: string;
-    fields: Record<string, FieldDef>;
-  }>;
   /** Record schema IDs this entity type can host */
   records?: string[];
 }

@@ -6,7 +6,7 @@ thing:
   numericId: E547
 
 facts:
-  - id: f_manifund_ai_safety_2025
+  - id: f_9cmhuAHFrA
     property: total-funding
     value: 2250000
     asOf: "2025"

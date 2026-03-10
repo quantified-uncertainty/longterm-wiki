@@ -50,6 +50,8 @@ import { KBFactsExplorerContent } from "@/app/kb/kb-facts-content";
 import { KBPropertiesExplorerContent } from "@/app/kb/kb-properties-content";
 import { KBEntityCoverageContent } from "@/app/kb/kb-entities-content";
 import { KBItemsExplorerContent } from "@/app/kb/kb-items-content";
+import { KBResourcesContent } from "@/app/kb/kb-resources-content";
+import { KBPublicationsContent } from "@/app/kb/kb-publications-content";
 
 // Dashboard content components (rendered via MDX stubs at /wiki/E<id>)
 import { FactsPageContent } from "@/app/internal/facts/facts-content";
@@ -71,6 +73,7 @@ import { ActiveAgentsContent } from "@/app/internal/active-agents/active-agents-
 import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/groundskeeper-runs-content";
 import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
 import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
+import { KbVerificationsContent } from "@/app/internal/kb-verifications/kb-verifications-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -193,6 +196,8 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   KBPropertiesExplorerContent,
   KBEntityCoverageContent,
   KBItemsExplorerContent,
+  KBResourcesContent,
+  KBPublicationsContent,
 
   // Dashboard content components
   FactsPageContent,
@@ -214,6 +219,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   GroundskeeperRunsContent,
   SystemHealthContent,
   PRDashboardContent,
+  KbVerificationsContent,
 
   // Table view components
   SafetyApproachesTableView,

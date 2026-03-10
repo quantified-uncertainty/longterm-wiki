@@ -28,7 +28,6 @@ facts:
     value: !ref 1OSiYOaWVL:ssi
     asOf: 2024-06
     source: https://ssi.inc
-    sourceResource: 3fc4ee87e9bacb20
     notes: "Co-founded Safe Superintelligence Inc (SSI) in June 2024 with Daniel Gross and Daniel Levy"
 
   - id: f_rDk51er7Jw
@@ -36,7 +35,6 @@ facts:
     value: "Co-founder & Chief Scientist"
     asOf: 2024-06
     source: https://ssi.inc
-    sourceResource: 3fc4ee87e9bacb20
 
   - id: f_D7v4CpKtMw
     property: born-year
@@ -47,93 +45,82 @@ facts:
     property: education
     value: "PhD in Machine Learning, University of Toronto (advisor: Geoffrey Hinton)"
     source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-    sourceResource: 3abf4294b701d95e
     notes: "BSc and MSc from University of Toronto as well"
 
   - id: f_iS4fG5hI6j
     property: notable-for
     value: "Co-founder of OpenAI and SSI; co-inventor of the sequence-to-sequence model and AlexNet; key figure in the deep learning revolution"
     source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-    sourceResource: 3abf4294b701d95e
 
   - id: f_iS7kL8mN9o
     property: social-media
     value: "@iabornamore"
     source: https://x.com/iabornamore
 
-  - id: f_iSpQ1rS2t
+  - id: f_h3HeIqbtpA
     property: employed-by
     value: "Google Brain"
     asOf: 2012-11
     validEnd: 2015-12
     source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-    sourceResource: 3abf4294b701d95e
     notes: "Research scientist at Google Brain (predates 2023 merger into Google DeepMind); worked with Geoffrey Hinton after the DNNresearch acquisition"
 
-  - id: f_iSuV3wX4y
+  - id: f_oNoknPJnkQ
     property: role
     value: "Research Scientist"
     asOf: 2012-11
     validEnd: 2015-12
     source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-    sourceResource: 3abf4294b701d95e
     notes: "At Google Brain, before co-founding OpenAI"
 
-items:
+records:
   career-history:
-    type: career-entry
-    entries:
-      i_iS1zA2bC3d:
-        organization: "University of Toronto / DNNresearch"
-        title: "PhD Student & Researcher"
-        start: "2009"
-        end: "2012"
-        source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-        sourceResource: 3abf4294b701d95e
-        notes: "PhD under Geoffrey Hinton; co-developed AlexNet which won ImageNet 2012"
+    i_iS1zA2bC3d:
+      organization: "University of Toronto / DNNresearch"
+      title: "PhD Student & Researcher"
+      start: "2009"
+      end: "2012"
+      source: https://en.wikipedia.org/wiki/Ilya_Sutskever
+      notes: "PhD under Geoffrey Hinton; co-developed AlexNet which won ImageNet 2012"
 
-      i_iS4eF5gH6i:
-        organization: "Google Brain"
-        title: "Research Scientist"
-        start: 2012-11
-        end: 2015-12
-        source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-        sourceResource: 3abf4294b701d95e
-        notes: "Joined after Google acquired DNNresearch; co-developed sequence-to-sequence learning and TensorFlow"
+    i_iS4eF5gH6i:
+      organization: "Google Brain"
+      title: "Research Scientist"
+      start: "2012-11"
+      end: "2015-12"
+      source: https://en.wikipedia.org/wiki/Ilya_Sutskever
+      notes: "Joined after Google acquired DNNresearch; co-developed sequence-to-sequence learning and TensorFlow"
 
-      i_iS7jK8lM9n:
-        organization: !ref 1LcLlMGLbw:openai
-        title: "Co-founder & Chief Scientist"
-        start: 2015-12
-        end: 2024-06
-        source: https://openai.com/blog/introducing-openai
-        notes: "Chief Scientist from founding; involved in board decision to fire Sam Altman Nov 2023; departed June 2024"
+    i_iS7jK8lM9n:
+      organization: openai
+      title: "Co-founder & Chief Scientist"
+      start: "2015-12"
+      end: "2024-06"
+      source: https://openai.com/blog/introducing-openai
+      notes: "Chief Scientist from founding; involved in board decision to fire Sam Altman Nov 2023; departed June 2024"
 
-      i_iSoP1qR2s:
-        organization: !ref 1OSiYOaWVL:ssi
-        title: "Co-founder & Chief Scientist"
-        start: 2024-06
-        source: https://ssi.inc
-        sourceResource: 3fc4ee87e9bacb20
-        notes: "Co-founded Safe Superintelligence Inc with Daniel Gross and Daniel Levy; raised $1B in initial funding"
+    i_iSoP1qR2s:
+      organization: ssi
+      title: "Co-founder & Chief Scientist"
+      start: "2024-06"
+      source: https://ssi.inc
+      notes: "Co-founded Safe Superintelligence Inc with Daniel Gross and Daniel Levy; raised $1B in initial funding"
 
   notable-publications:
-    type: publication
-    entries:
-      i_iStU3vW4x:
-        title: "ImageNet Classification with Deep Convolutional Neural Networks (AlexNet)"
-        year: 2012
-        url: https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html
-        notes: "Co-authored with Alex Krizhevsky and Geoffrey Hinton; catalyzed the deep learning revolution by winning ImageNet with a large margin"
+    i_iStU3vW4x:
+      title: "ImageNet Classification with Deep Convolutional Neural Networks (AlexNet)"
+      year: 2012
+      url: https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html
+      notes: "Co-authored with Alex Krizhevsky and Geoffrey Hinton; catalyzed the deep learning revolution by winning ImageNet with a large margin"
 
-      i_iSyZ5aB6c:
-        title: "Sequence to Sequence Learning with Neural Networks"
-        year: 2014
-        url: https://arxiv.org/abs/1409.3215
-        notes: "Foundational paper for neural machine translation and many NLP tasks; introduced seq2seq architecture"
+    i_iSyZ5aB6c:
+      title: "Sequence to Sequence Learning with Neural Networks"
+      year: 2014
+      url: https://arxiv.org/abs/1409.3215
+      notes: "Foundational paper for neural machine translation and many NLP tasks; introduced seq2seq architecture"
 
-      i_iSdE7fG8h:
-        title: "Language Models are Unsupervised Multitask Learners (GPT-2)"
-        year: 2019
-        url: https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf
-        notes: "Demonstrated large language models could perform tasks without task-specific training"
+    i_iSdE7fG8h:
+      title: "Language Models are Unsupervised Multitask Learners (GPT-2)"
+      year: 2019
+      url: https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf
+      notes: "Demonstrated large language models could perform tasks without task-specific training"

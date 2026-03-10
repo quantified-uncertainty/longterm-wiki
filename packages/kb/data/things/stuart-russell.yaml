@@ -13,7 +13,6 @@ facts:
     value: "UC Berkeley"
     asOf: 1986-01
     source: https://people.eecs.berkeley.edu/~russell/
-    sourceResource: 2ccf0b6518e285d6
     notes: "Professor of Computer Science at UC Berkeley since 1986; founder of Center for Human-Compatible AI (CHAI)"
 
   - id: f_hlx9NqiojX
@@ -21,71 +20,61 @@ facts:
     value: "Professor of Computer Science, UC Berkeley; Founder of CHAI"
     asOf: 1986-01
     source: https://people.eecs.berkeley.edu/~russell/
-    sourceResource: 2ccf0b6518e285d6
     notes: "Co-author of 'Artificial Intelligence: A Modern Approach', the standard AI textbook; author of 'Human Compatible' (2019)"
 
   - id: f_iRPcKCTGM3
     property: born-year
     value: 1962
     source: https://en.wikipedia.org/wiki/Stuart_J._Russell
-    sourceResource: 3e294a74f192a4d8
     notes: "Born February 5, 1962 in Portsmouth, England"
 
   - id: f_sR1aB2cD3e
     property: education
     value: "PhD in Computer Science, Stanford University; BA in Physics, University of Oxford (First Class Honours)"
     source: https://en.wikipedia.org/wiki/Stuart_J._Russell
-    sourceResource: 3e294a74f192a4d8
     notes: "PhD supervised by Michael Genesereth"
 
   - id: f_sR4fG5hI6j
     property: notable-for
     value: "Co-author of 'AI: A Modern Approach' (the standard AI textbook); founder of CHAI at UC Berkeley; leading advocate for provably beneficial AI"
     source: https://en.wikipedia.org/wiki/Stuart_J._Russell
-    sourceResource: 3e294a74f192a4d8
 
   - id: f_sR7kL8mN9o
     property: social-media
     value: "@StuartJRussell"
     source: https://x.com/StuartJRussell
 
-items:
+records:
   career-history:
-    type: career-entry
-    entries:
-      i_sR1zA2bC3d:
-        organization: "UC Berkeley"
-        title: "Professor of Computer Science"
-        start: "1986"
-        source: https://people.eecs.berkeley.edu/~russell/
-        sourceResource: 2ccf0b6518e285d6
-        notes: "Smith-Zadeh Professor in Engineering; has been at Berkeley for nearly 40 years"
+    i_sR1zA2bC3d:
+      organization: "UC Berkeley"
+      title: "Professor of Computer Science"
+      start: "1986"
+      source: https://people.eecs.berkeley.edu/~russell/
+      notes: "Smith-Zadeh Professor in Engineering; has been at Berkeley for nearly 40 years"
 
-      i_sR4eF5gH6i:
-        organization: "Center for Human-Compatible AI (CHAI)"
-        title: "Founder & Director"
-        start: "2016"
-        source: https://humancompatible.ai/
-        sourceResource: 9c4106b68045dbd6
-        notes: "Founded CHAI at UC Berkeley with Open Philanthropy funding; research on value alignment and cooperative inverse reinforcement learning"
+    i_sR4eF5gH6i:
+      organization: "Center for Human-Compatible AI (CHAI)"
+      title: "Founder & Director"
+      start: "2016"
+      source: https://humancompatible.ai/
+      notes: "Founded CHAI at UC Berkeley with Open Philanthropy funding; research on value alignment and cooperative inverse reinforcement learning"
 
   notable-publications:
-    type: publication
-    entries:
-      i_sR7jK8lM9n:
-        title: "Artificial Intelligence: A Modern Approach"
-        year: 1995
-        url: https://aima.cs.berkeley.edu/
-        notes: "Co-authored with Peter Norvig; the most widely used AI textbook worldwide; used in 1,500+ universities across 135 countries; now in 4th edition (2020)"
+    i_sR7jK8lM9n:
+      title: "Artificial Intelligence: A Modern Approach"
+      year: 1995
+      url: https://aima.cs.berkeley.edu/
+      notes: "Co-authored with Peter Norvig; the most widely used AI textbook worldwide; used in 1,500+ universities across 135 countries; now in 4th edition (2020)"
 
-      i_sRoP1qR2s:
-        title: "Human Compatible: Artificial Intelligence and the Problem of Control"
-        year: 2019
-        url: https://en.wikipedia.org/wiki/Human_Compatible
-        notes: "Book proposing 'provably beneficial AI' through cooperative inverse reinforcement learning; widely praised in AI safety circles"
+    i_sRoP1qR2s:
+      title: "Human Compatible: Artificial Intelligence and the Problem of Control"
+      year: 2019
+      url: https://en.wikipedia.org/wiki/Human_Compatible
+      notes: "Book proposing 'provably beneficial AI' through cooperative inverse reinforcement learning; widely praised in AI safety circles"
 
-      i_sRtU3vW4x:
-        title: "Research Priorities for Robust and Beneficial Artificial Intelligence"
-        year: 2015
-        url: https://futureoflife.org/data/documents/research_priorities.pdf
-        notes: "Open letter co-authored with Max Tegmark and others; signed by thousands of AI researchers; helped mainstream AI safety concerns"
+    i_sRtU3vW4x:
+      title: "Research Priorities for Robust and Beneficial Artificial Intelligence"
+      year: 2015
+      url: https://futureoflife.org/data/documents/research_priorities.pdf
+      notes: "Open letter co-authored with Max Tegmark and others; signed by thousands of AI researchers; helped mainstream AI safety concerns"

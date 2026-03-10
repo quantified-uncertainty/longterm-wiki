@@ -147,6 +147,7 @@ export function dataSourceLabel(source: DataSource): string {
 
 import { hc, type InferResponseType } from "hono/client";
 import type { FactsRoute } from "@wiki-server/facts-route";
+import type { KbVerificationsRoute } from "@wiki-server/kb-verifications-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -185,4 +186,22 @@ export type RpcFactsByEntityResult = InferResponseType<FactsClient['by-entity'][
 
 /** Inferred response type for GET /api/facts/timeseries/:entityId */
 export type RpcTimeseriesResult = InferResponseType<FactsClient['timeseries'][':entityId']['$get'], 200>;
+
+// ============================================================================
+// Hono RPC client — KB Verifications API
+// ============================================================================
+
+type KbVerificationsClient = ReturnType<typeof hc<KbVerificationsRoute>>;
+
+/** Inferred response type for GET /api/kb-verifications/stats */
+export type RpcKbStatsResult = InferResponseType<KbVerificationsClient['stats']['$get'], 200>;
+
+/** Inferred response type for GET /api/kb-verifications/verdicts */
+export type RpcKbVerdictsResult = InferResponseType<KbVerificationsClient['verdicts']['$get'], 200>;
+
+/** A single verdict row from the verdicts list */
+export type RpcKbVerdictRow = RpcKbVerdictsResult['verdicts'][number];
+
+/** Inferred response type for GET /api/kb-verifications/verdicts/:factId */
+export type RpcKbVerdictDetailResult = InferResponseType<KbVerificationsClient['verdicts'][':factId']['$get'], 200>;
 

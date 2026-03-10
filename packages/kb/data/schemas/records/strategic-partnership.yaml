@@ -6,6 +6,7 @@ endpoints:
   partner:
     types: [organization]
     required: true
+    allow_display_name: true
   organization:
     types: [organization]
     implicit: true

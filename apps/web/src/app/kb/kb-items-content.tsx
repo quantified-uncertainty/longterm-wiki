@@ -1,4 +1,4 @@
-import { getAllKBItems, getKBEntity } from "@/data/kb";
+import { getAllKBRecords, getKBEntity } from "@/data/kb";
 import { titleCase } from "@/components/wiki/kb/format";
 import { KBItemsTable } from "./kb-items-table";
 
@@ -13,7 +13,7 @@ export interface ItemRow {
 }
 
 export function KBItemsExplorerContent() {
-  const allItems = getAllKBItems();
+  const allItems = getAllKBRecords();
 
   const rows: ItemRow[] = allItems.map(({ entityId, collection, entry }) => {
     const entity = getKBEntity(entityId);

@@ -269,6 +269,7 @@ export function getInternalNav(): NavSection[] {
       title: "Citations",
       items: [
         { label: "Fact Dashboard", href: internalHref("fact-dashboard") },
+        { label: "KB Fact Verifications", href: internalHref("kb-fact-verifications-dashboard") },
         { label: "Citation Accuracy", href: internalHref("citation-accuracy-dashboard") },
         { label: "Citation Content", href: internalHref("citation-content-dashboard") },
         { label: "Hallucination Risk", href: internalHref("hallucination-risk-dashboard") },
@@ -370,6 +371,8 @@ export function getKBDataNav(): NavSection[] {
         { label: "Properties", href: "/wiki/E1021" },
         { label: "Entity Coverage", href: "/wiki/E1022" },
         { label: "Items Explorer", href: "/wiki/E1026" },
+        { label: "Resources", href: "/wiki/E1043" },
+        { label: "Publications", href: "/wiki/E1044" },
       ],
     },
     {

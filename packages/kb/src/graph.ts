@@ -8,8 +8,6 @@ import type {
   Fact,
   Property,
   TypeSchema,
-  ItemCollection,
-  ItemEntry,
   RecordSchema,
   RecordEntry,
   FactQuery,
@@ -22,8 +20,6 @@ export class Graph {
   private factIds: Set<string> = new Set(); // dedup guard
   private properties: Map<string, Property> = new Map();
   private schemas: Map<string, TypeSchema> = new Map();
-  // entityId → collectionName → collection
-  private items: Map<string, Map<string, ItemCollection>> = new Map();
   // stableId → slug reverse index
   private stableIdIndex: Map<string, string> = new Map();
   // Record schemas (id → schema)
@@ -62,19 +58,6 @@ export class Graph {
 
   addSchema(schema: TypeSchema): void {
     this.schemas.set(schema.type, schema);
-  }
-
-  addItemCollection(
-    entityId: string,
-    collectionName: string,
-    collection: ItemCollection
-  ): void {
-    let entityCollections = this.items.get(entityId);
-    if (!entityCollections) {
-      entityCollections = new Map();
-      this.items.set(entityId, entityCollections);
-    }
-    entityCollections.set(collectionName, collection);
   }
 
   addRecordSchema(schema: RecordSchema): void {
@@ -236,97 +219,6 @@ export class Graph {
     }
 
     return ids;
-  }
-
-  // ── Item queries ───────────────────────────────────────────────────
-
-  getItemCollectionNames(entityId: string): string[] {
-    const entityCollections = this.items.get(entityId);
-    if (!entityCollections) return [];
-    return Array.from(entityCollections.keys());
-  }
-
-  getItems(entityId: string, collectionName: string): ItemEntry[] {
-    const entityCollections = this.items.get(entityId);
-    if (!entityCollections) return [];
-
-    const collection = entityCollections.get(collectionName);
-    if (!collection) return [];
-
-    return Object.entries(collection.entries).map(([key, fields]) => ({
-      key,
-      fields,
-    }));
-  }
-
-  /**
-   * Scans all items across all entities for fields that reference the
-   * given entityId. Returns matches with context about where they appear.
-   *
-   * Uses schema field definitions to identify `ref` type fields. Falls
-   * back to string-matching if no schema is available.
-   */
-  getItemsMentioning(
-    entityId: string
-  ): Array<{
-    ownerEntityId: string;
-    collection: string;
-    entry: ItemEntry;
-    /** Which field(s) contain the reference */
-    matchingFields: string[];
-  }> {
-    const results: Array<{
-      ownerEntityId: string;
-      collection: string;
-      entry: ItemEntry;
-      matchingFields: string[];
-    }> = [];
-
-    for (const [ownerEntityId, entityCollections] of this.items.entries()) {
-      if (ownerEntityId === entityId) continue; // Skip self-references
-
-      const ownerEntity = this.entities.get(ownerEntityId);
-      const schema = ownerEntity
-        ? this.schemas.get(ownerEntity.type)
-        : undefined;
-
-      for (const [collectionName, collection] of entityCollections.entries()) {
-        const collectionSchema = schema?.items?.[collectionName];
-        const fieldDefs = collectionSchema?.fields;
-
-        for (const [entryKey, fields] of Object.entries(collection.entries)) {
-          const matchingFields: string[] = [];
-
-          for (const [fieldName, fieldValue] of Object.entries(fields)) {
-            const fieldDef = fieldDefs?.[fieldName];
-
-            // Check ref fields explicitly
-            if (fieldDef?.type === "ref" && fieldValue === entityId) {
-              matchingFields.push(fieldName);
-            }
-            // Also check string values that match (covers untyped fields)
-            else if (
-              !fieldDef &&
-              typeof fieldValue === "string" &&
-              fieldValue === entityId
-            ) {
-              matchingFields.push(fieldName);
-            }
-          }
-
-          if (matchingFields.length > 0) {
-            results.push({
-              ownerEntityId,
-              collection: collectionName,
-              entry: { key: entryKey, fields },
-              matchingFields,
-            });
-          }
-        }
-      }
-    }
-
-    return results;
   }
 
   // ── Property & schema queries ──────────────────────────────────────

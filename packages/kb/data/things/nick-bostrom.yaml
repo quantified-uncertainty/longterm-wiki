@@ -13,7 +13,6 @@ facts:
     value: "University of Oxford"
     asOf: 2005-01
     source: https://nickbostrom.com/
-    sourceResource: 9cf1412a293bfdbe
     notes: "Founded the Future of Humanity Institute (FHI) at Oxford in 2005; FHI closed in April 2024"
 
   - id: f_F5iVdik64y
@@ -21,7 +20,6 @@ facts:
     value: "Professor of Philosophy, University of Oxford; Founder of FHI"
     asOf: 2005-01
     source: https://nickbostrom.com/
-    sourceResource: 9cf1412a293bfdbe
     notes: "Author of 'Superintelligence: Paths, Dangers, Strategies' (2014), which catalyzed mainstream concern about AI existential risk"
 
   - id: f_YhxyxeHHdA
@@ -46,49 +44,45 @@ facts:
     value: "@NickBostrom"
     source: https://x.com/NickBostrom
 
-items:
+records:
   career-history:
-    type: career-entry
-    entries:
-      i_nB1zA2bC3d:
-        organization: "Yale University"
-        title: "Postdoctoral Fellow"
-        start: "2000"
-        end: "2003"
-        source: https://en.wikipedia.org/wiki/Nick_Bostrom
-        notes: "Taught at Yale's Department of Philosophy"
+    i_nB1zA2bC3d:
+      organization: "Yale University"
+      title: "Postdoctoral Fellow"
+      start: "2000"
+      end: "2003"
+      source: https://en.wikipedia.org/wiki/Nick_Bostrom
+      notes: "Taught at Yale's Department of Philosophy"
 
-      i_nB4eF5gH6i:
-        organization: "University of Oxford"
-        title: "Professor of Philosophy; Founding Director, Future of Humanity Institute"
-        start: "2005"
-        end: "2024"
-        source: https://en.wikipedia.org/wiki/Nick_Bostrom
-        notes: "Founded FHI in 2005; FHI closed in April 2024 due to administrative conflicts with the Faculty of Philosophy"
+    i_nB4eF5gH6i:
+      organization: "University of Oxford"
+      title: "Professor of Philosophy; Founding Director, Future of Humanity Institute"
+      start: "2005"
+      end: "2024"
+      source: https://en.wikipedia.org/wiki/Nick_Bostrom
+      notes: "Founded FHI in 2005; FHI closed in April 2024 due to administrative conflicts with the Faculty of Philosophy"
 
   notable-publications:
-    type: publication
-    entries:
-      i_nB7jK8lM9n:
-        title: "Are We Living in a Computer Simulation?"
-        year: 2003
-        url: https://www.simulation-argument.com/simulation.html
-        notes: "Proposed the simulation argument; one of the most discussed thought experiments in modern philosophy"
+    i_nB7jK8lM9n:
+      title: "Are We Living in a Computer Simulation?"
+      year: 2003
+      url: https://www.simulation-argument.com/simulation.html
+      notes: "Proposed the simulation argument; one of the most discussed thought experiments in modern philosophy"
 
-      i_nBoP1qR2s:
-        title: "Superintelligence: Paths, Dangers, Strategies"
-        year: 2014
-        url: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
-        notes: "New York Times bestseller; catalyzed mainstream concern about AI existential risk; influenced Bill Gates, Elon Musk, and others"
+    i_nBoP1qR2s:
+      title: "Superintelligence: Paths, Dangers, Strategies"
+      year: 2014
+      url: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
+      notes: "New York Times bestseller; catalyzed mainstream concern about AI existential risk; influenced Bill Gates, Elon Musk, and others"
 
-      i_nBtU3vW4x:
-        title: "The Vulnerable World Hypothesis"
-        year: 2019
-        url: https://onlinelibrary.wiley.com/doi/abs/10.1111/1758-5899.12718
-        notes: "Argued that technological development may produce 'black ball' technologies enabling world destruction"
+    i_nBtU3vW4x:
+      title: "The Vulnerable World Hypothesis"
+      year: 2019
+      url: https://onlinelibrary.wiley.com/doi/abs/10.1111/1758-5899.12718
+      notes: "Argued that technological development may produce 'black ball' technologies enabling world destruction"
 
-      i_nByZ5aB6c:
-        title: "Deep Utopia: Life and Meaning in a Solved World"
-        year: 2024
-        url: https://en.wikipedia.org/wiki/Deep_Utopia
-        notes: "Book examining what a positive post-AI future might look like and the problem of meaning in a world of abundance"
+    i_nByZ5aB6c:
+      title: "Deep Utopia: Life and Meaning in a Solved World"
+      year: 2024
+      url: https://en.wikipedia.org/wiki/Deep_Utopia
+      notes: "Book examining what a positive post-AI future might look like and the problem of meaning in a world of abundance"

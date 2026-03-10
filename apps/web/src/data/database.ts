@@ -54,7 +54,6 @@ export interface Fact {
   asOf?: string;
   label?: string;
   source?: string;
-  sourceResource?: string;
   sourceTitle?: string;
   sourcePublication?: string;
   sourceCredibility?: number;

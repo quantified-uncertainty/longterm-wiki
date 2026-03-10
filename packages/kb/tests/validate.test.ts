@@ -91,51 +91,6 @@ describe("validate", () => {
     });
   });
 
-  describe("item-collection-schema validation", () => {
-    it("validates item entries against schema", () => {
-      const results = validateEntity(graph, "anthropic");
-      const itemResults = results.filter(
-        (r) => r.rule === "item-collection-schema"
-      );
-      // The anthropic data has funding-round entries with lead_investor referencing
-      // entities not in our test graph (ftx, amazon, google, gic, jaan-tallinn).
-      // These should produce type warnings since they reference non-existent entities.
-      const refWarnings = itemResults.filter(
-        (r) =>
-          r.severity === "warning" && r.message.includes("unknown entity")
-      );
-      expect(refWarnings.length).toBeGreaterThan(0);
-    });
-
-    it("does not report errors for required fields that are present", () => {
-      // funding-rounds schema requires 'date', key-people requires 'person' and 'title'
-      // All entries in our test data provide these fields
-      const results = validateEntity(graph, "anthropic");
-      const requiredFieldErrors = results.filter(
-        (r) =>
-          r.rule === "item-collection-schema" &&
-          r.severity === "error" &&
-          r.message.includes("missing required field")
-      );
-      expect(requiredFieldErrors).toHaveLength(0);
-    });
-
-    it("validates key-people person refs against the graph", () => {
-      const results = validateEntity(graph, "anthropic");
-      const itemResults = results.filter(
-        (r) =>
-          r.rule === "item-collection-schema" &&
-          r.message.includes("key-people")
-      );
-      // Some key-people reference persons not in the graph
-      // (daniela-amodei, chris-olah, tom-brown, mike-krieger, holden-karnofsky)
-      const unknownPeople = itemResults.filter(
-        (r) => r.message.includes("unknown entity")
-      );
-      expect(unknownPeople.length).toBeGreaterThan(0);
-    });
-  });
-
   describe("validate (full graph)", () => {
     it("returns results for all entities", () => {
       const results = validate(graph);
@@ -359,6 +314,30 @@ describe("validate", () => {
       expect(formatErrors).toHaveLength(1);
       expect(formatErrors[0].severity).toBe("error");
     });
+
+    it("rejects descriptive fact IDs (old format)", () => {
+      const g = new Graph();
+      g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
+      g.addProperty({ id: "revenue", name: "Revenue", dataType: "number" });
+      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addFact({ id: "f_rev_2024_12", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 1e9 } });
+
+      const results = validateEntity(g, "ent");
+      const formatErrors = results.filter((r) => r.rule === "factid-format");
+      expect(formatErrors).toHaveLength(1);
+    });
+
+    it("rejects fact IDs with wrong length after f_ prefix", () => {
+      const g = new Graph();
+      g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
+      g.addProperty({ id: "name", name: "Name", dataType: "text" });
+      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addFact({ id: "f_short", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" } });
+
+      const results = validateEntity(g, "ent");
+      const formatErrors = results.filter((r) => r.rule === "factid-format");
+      expect(formatErrors).toHaveLength(1);
+    });
   });
 
   describe("empty-name check", () => {
@@ -525,7 +504,7 @@ describe("validate", () => {
     it("warns when most recent temporal fact is >2 years old", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
-      g.addProperty({ id: "revenue", name: "Revenue", dataType: "number", temporal: true });
+      g.addProperty({ id: "revenue", name: "Revenue", dataType: "number", temporal: true, category: "financial" });
       g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
       g.addFact({ id: "f_old", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 100 }, asOf: "2020-01" });
 

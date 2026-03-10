@@ -21,7 +21,6 @@ facts:
     value: !ref QsXVXtQ0zE:arc
     asOf: 2021-10
     source: https://alignment.org/
-    sourceResource: 0562f8c207d8b63f
     notes: "Founded Alignment Research Center (ARC) in 2021; stepped back from day-to-day operations in 2023 due to a brain injury"
 
   - id: f_rvwYSk7eFi
@@ -29,7 +28,6 @@ facts:
     value: "Founder, Alignment Research Center"
     asOf: 2021-10
     source: https://alignment.org/
-    sourceResource: 0562f8c207d8b63f
 
   - id: f_ZmXlEP6Y6H
     property: born-year
@@ -52,64 +50,59 @@ facts:
     value: "@paulfchristiano"
     source: https://x.com/paulfchristiano
 
-  - id: f_pCpQ1rS2t
+  - id: f_DRwx53YvWw
     property: role
     value: "Head of AI Safety, US AI Safety Institute"
     asOf: 2024-02
     source: https://www.nist.gov/people/paul-christiano
     notes: "Joined the U.S. AI Safety Institute (under NIST) in 2024 as Head of AI Safety"
 
-  - id: f_pCuV3wX4y
+  - id: f_He1SsMRfAw
     property: employed-by
     value: us-aisi
     asOf: 2024-02
     source: https://www.nist.gov/people/paul-christiano
     notes: "Stepped back from day-to-day ARC operations in 2023 after a brain injury; joined US AISI in 2024"
 
-items:
+records:
   career-history:
-    type: career-entry
-    entries:
-      i_pC1zA2bC3d:
-        organization: !ref 1LcLlMGLbw:openai
-        title: "Research Scientist"
-        start: "2017"
-        end: 2021-10
-        source: https://paulfchristiano.com/
-        notes: "Led alignment research; key contributor to RLHF methodology; developed debate and iterated amplification approaches"
+    i_pC1zA2bC3d:
+      organization: openai
+      title: "Research Scientist"
+      start: "2017"
+      end: "2021-10"
+      source: https://paulfchristiano.com/
+      notes: "Led alignment research; key contributor to RLHF methodology; developed debate and iterated amplification approaches"
 
-      i_pC4eF5gH6i:
-        organization: !ref QsXVXtQ0zE:arc
-        title: "Founder & President"
-        start: 2021-10
-        source: https://alignment.org/
-        sourceResource: 0562f8c207d8b63f
-        notes: "Founded ARC to work on alignment theory and evals; stepped back from daily operations in 2023 due to brain injury sustained in an accident"
+    i_pC4eF5gH6i:
+      organization: arc
+      title: "Founder & President"
+      start: "2021-10"
+      source: https://alignment.org/
+      notes: "Founded ARC to work on alignment theory and evals; stepped back from daily operations in 2023 due to brain injury sustained in an accident"
 
-      i_pC7jK8lM9n:
-        organization: us-aisi
-        title: "Head of AI Safety"
-        start: 2024-02
-        source: https://www.nist.gov/people/paul-christiano
-        notes: "Joined the U.S. AI Safety Institute (under NIST) to lead safety research"
+    i_pC7jK8lM9n:
+      organization: us-aisi
+      title: "Head of AI Safety"
+      start: "2024-02"
+      source: https://www.nist.gov/people/paul-christiano
+      notes: "Joined the U.S. AI Safety Institute (under NIST) to lead safety research"
 
   notable-publications:
-    type: publication
-    entries:
-      i_pCoP1qR2s:
-        title: "Deep Reinforcement Learning from Human Feedback"
-        year: 2017
-        url: https://arxiv.org/abs/1706.03741
-        notes: "Foundational RLHF paper; enabled alignment of language models to human preferences; one of the most impactful alignment papers"
+    i_pCoP1qR2s:
+      title: "Deep Reinforcement Learning from Human Feedback"
+      year: 2017
+      url: https://arxiv.org/abs/1706.03741
+      notes: "Foundational RLHF paper; enabled alignment of language models to human preferences; one of the most impactful alignment papers"
 
-      i_pCtU3vW4x:
-        title: "AI Safety via Debate"
-        year: 2018
-        url: https://arxiv.org/abs/1805.00899
-        notes: "Proposed debate as a scalable oversight mechanism for aligning superhuman AI"
+    i_pCtU3vW4x:
+      title: "AI Safety via Debate"
+      year: 2018
+      url: https://arxiv.org/abs/1805.00899
+      notes: "Proposed debate as a scalable oversight mechanism for aligning superhuman AI"
 
-      i_pCyZ5aB6c:
-        title: "Eliciting Latent Knowledge (ELK)"
-        year: 2021
-        url: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
-        notes: "ARC's central research problem; how to determine if an AI model's answers match its internal beliefs"
+    i_pCyZ5aB6c:
+      title: "Eliciting Latent Knowledge (ELK)"
+      year: 2021
+      url: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
+      notes: "ARC's central research problem; how to determine if an AI model's answers match its internal beliefs"

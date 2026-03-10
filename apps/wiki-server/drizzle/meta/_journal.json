@@ -470,6 +470,20 @@
       "when": 1774339200000,
       "tag": "0066_consolidate_agent_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1774425600000,
+      "tag": "0067_drop_facts_source_resource",
+      "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1774512000000,
+      "tag": "0068_add_kb_fact_verifications",
+      "breakpoints": true
     }
   ]
 }

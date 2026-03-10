@@ -8,113 +8,105 @@ thing:
     - CZI
 
 facts:
-  - id: f_czi_pledge_initial
+  - id: f_AXsBEkGCvg
     property: total-funding
     value: 45e9
     asOf: "2015-12"
     source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
-    sourceResource: b39807b5264f3f80
     notes: "Initial value of 99% Facebook share pledge at founding"
 
-  - id: f_czi_pledge_current
+  - id: f_xL0PjvPDlQ
     property: total-funding
     value: 200e9
     asOf: "2025"
     source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
-    sourceResource: b39807b5264f3f80
     notes: "Current value of 99% Facebook share pledge, exceeds $200B"
 
-  - id: f_czi_annual_budget
+  - id: f_bQVfcGecvg
     property: revenue
     value: 1e9
     asOf: "2025"
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
-    sourceResource: 4d0f2f2e28cf4b4d
     notes: "Approximate annual operating budget as of 2025"
 
-  - id: f_czi_gpu_cluster_2024
+  - id: f_nwzajasrug
     property: gpu-count
     value: 1024
     asOf: "2024"
     source: https://chanzuckerberg.com/rfa/ai-computing-gpu/
-    sourceResource: d2b65bcf69368ae7
     notes: "NVIDIA H100 DGX SuperPOD cluster (1,024 GPUs) for life sciences AI"
 
-  - id: f_czi_gpu_planned_2028
+  - id: f_WeyydGaZNw
     property: gpu-count
     value: 10000
     asOf: "2025"
     source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
-    sourceResource: ba7cf061039527d9
     notes: "Planned 10x expansion of GPU cluster by 2028 (10,000 GPUs)"
 
-  - id: f_czi_workforce_cut
+  - id: f_60fN0AilQQ
     property: headcount
     value: 70
     asOf: "2026"
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
-    sourceResource: 4d0f2f2e28cf4b4d
     notes: "Approximately 70 jobs cut (~8% of workforce) to refocus on AI-biomedical research"
 
-items:
-  grants-and-programs:
-    type: grant-or-program
-    entries:
-      i_czi_science_decade:
-        name: "Science spending (first decade)"
-        amount: 4.25e9
-        period: "2016-2025"
-        status: "completed"
-        source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
-        notes: "Total science spending first decade; estimated $4-4.5B"
+records:
+  grants:
+    science-spending-first-decade:
+      name: "Science spending (first decade)"
+      amount: 4.25e9
+      period: "2016-2025"
+      status: "completed"
+      source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+      notes: "Total science spending first decade; estimated $4-4.5B"
 
-      i_czi_social_decade:
-        name: "Social causes spending (first decade)"
-        amount: 3.5e9
-        period: "2016-2025"
-        status: "winding-down"
-        source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
-        notes: "Total social causes spending 2016-2025; now winding down"
+    social-causes-spending-first-decade:
+      name: "Social causes spending (first decade)"
+      amount: 3.5e9
+      period: "2016-2025"
+      status: "winding-down"
+      source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+      notes: "Total social causes spending 2016-2025; now winding down"
 
-      i_czi_future_science:
-        name: "Science spending commitment (second decade)"
-        amount: 10e9
-        period: "2026-2036"
-        status: "active"
-        source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
-        notes: "Minimum commitment for science over next decade ($10B+)"
+    science-spending-commitment-second-decade:
+      name: "Science spending commitment (second decade)"
+      amount: 10e9
+      period: "2026-2036"
+      status: "active"
+      source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+      notes: "Minimum commitment for science over next decade ($10B+)"
 
-      i_czi_biohub_sf:
-        name: "CZ Biohub SF founding grant"
-        amount: 600e6
-        date: 2016-09
-        status: "active"
-        source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
-        notes: "Initial grant to found CZ Biohub SF with UCSF/Berkeley/Stanford"
+    cz-biohub-sf-founding-grant:
+      name: "CZ Biohub SF founding grant"
+      amount: 600e6
+      date: "2016-09"
+      status: "active"
+      source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+      notes: "Initial grant to found CZ Biohub SF with UCSF/Berkeley/Stanford"
 
-      i_czi_biohub_chicago:
-        name: "CZ Biohub Chicago founding grant"
-        amount: 250e6
-        date: 2022-10
-        status: "active"
-        notes: "Grant to establish Biohub Chicago focused on biosensors and inflammation"
+    cz-biohub-chicago-founding-grant:
+      name: "CZ Biohub Chicago founding grant"
+      amount: 250e6
+      date: "2022-10"
+      status: "active"
+      notes: "Grant to establish Biohub Chicago focused on biosensors and inflammation"
 
-      i_czi_biohub_ny:
-        name: "CZ Biohub New York founding grant"
-        amount: 250e6
-        date: 2023-06
-        status: "active"
-        notes: "Grant to establish Biohub New York focused on infectious disease"
+    cz-biohub-new-york-founding-grant:
+      name: "CZ Biohub New York founding grant"
+      amount: 250e6
+      date: "2023-06"
+      status: "active"
+      notes: "Grant to establish Biohub New York focused on infectious disease"
 
-      i_czi_publications:
-        name: "Research publications supported"
-        status: "active"
-        source: https://biohub.org/research/
-        notes: "More than 8,000 publications supported since founding"
+    research-publications-supported:
+      name: "Research publications supported"
+      status: "active"
+      source: https://biohub.org/research/
+      notes: "More than 8,000 publications supported since founding"
 
-      i_czi_rare_as_one:
-        name: "Rare As One Project"
-        date: 2020-01
-        status: "active"
-        source: https://chanzuckerberg.com/blog/2024-look-back/
-        notes: "Patient-led rare disease organizations; grown from 30 to 94 since 2020"
+    rare-as-one-project:
+      name: "Rare As One Project"
+      date: "2020-01"
+      status: "active"
+      source: https://chanzuckerberg.com/blog/2024-look-back/
+      notes: "Patient-led rare disease organizations; grown from 30 to 94 since 2020"

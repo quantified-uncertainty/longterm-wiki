@@ -5,7 +5,7 @@
  * that needs human-readable representations of KB values.
  */
 
-import type { Fact, Property, ItemEntry } from "./types";
+import type { Fact, Property } from "./types";
 import type { Graph } from "./graph";
 import { CURRENCIES, resolveCurrency } from "./currencies";
 
@@ -135,100 +135,3 @@ export function resolveRefName(slug: string, graph: Graph): string {
   return entity ? entity.name : slug;
 }
 
-// ── Item formatting ─────────────────────────────────────────────────
-
-/**
- * Format a single item entry for display.
- * Uses the collection name to apply property-specific formatting
- * (e.g., funding rounds show amount + valuation, key-people show role + dates).
- */
-export function formatItemEntry(
-  item: ItemEntry,
-  collectionName: string,
-  graph: Graph
-): string {
-  const f = item.fields;
-
-  switch (collectionName) {
-    case "funding-rounds": {
-      const date = f.date ?? "";
-      const cur = typeof f.currency === "string" ? f.currency : "USD";
-      const amount =
-        typeof f.amount === "number" ? formatMoney(f.amount, cur) : "";
-      const valuation =
-        typeof f.valuation === "number"
-          ? ` @ ${formatMoney(f.valuation, cur)}`
-          : "";
-      const lead = f.lead_investor
-        ? resolveRefName(String(f.lead_investor), graph)
-        : "";
-      const leadStr = lead ? `  lead: ${lead}` : "";
-      return `${date}  ${amount}${valuation}${leadStr}`;
-    }
-
-    case "key-people": {
-      const person = f.person
-        ? resolveRefName(String(f.person), graph)
-        : "(unknown)";
-      const title = f.title ?? "";
-      const start = f.start ?? "";
-      const end = f.end ?? "present";
-      const founder = f.is_founder ? ", founder" : "";
-      return `${person} -- ${title} (${start}--${end}${founder})`;
-    }
-
-    case "products": {
-      const name = f.name ?? item.key;
-      const launched = f.launched ?? "";
-      const desc = f.description ? ` - ${f.description}` : "";
-      return `${launched}  ${name}${desc}`;
-    }
-
-    case "model-releases": {
-      const name = f.name ?? item.key;
-      const released = f.released ?? "";
-      const safety = f.safety_level ? ` [${f.safety_level}]` : "";
-      const desc = f.description ? ` - ${f.description}` : "";
-      return `${released}  ${name}${safety}${desc}`;
-    }
-
-    case "board-members": {
-      const name = f.name ?? item.key;
-      const role = f.role ? ` -- ${f.role}` : "";
-      const appointed = f.appointed ? ` (${f.appointed})` : "";
-      return `${name}${role}${appointed}`;
-    }
-
-    case "strategic-partnerships": {
-      const partner = f.partner ?? item.key;
-      const date = f.date ?? "";
-      const type = f.type ? ` [${f.type}]` : "";
-      const partnerCur = typeof f.currency === "string" ? f.currency : "USD";
-      const investAmount =
-        typeof f.investment_amount === "number"
-          ? ` ${formatMoney(f.investment_amount, partnerCur)}`
-          : "";
-      return `${date}  ${partner}${type}${investAmount}`;
-    }
-
-    case "safety-milestones": {
-      const name = f.name ?? item.key;
-      const date = f.date ?? "";
-      const type = f.type ? ` [${f.type}]` : "";
-      return `${date}  ${name}${type}`;
-    }
-
-    case "research-areas": {
-      const name = f.name ?? item.key;
-      const desc = f.description ? ` - ${f.description}` : "";
-      return `${name}${desc}`;
-    }
-
-    default: {
-      const parts = Object.entries(f)
-        .filter(([_, v]) => v !== null && v !== undefined)
-        .map(([k, v]) => `${k}: ${String(v)}`);
-      return parts.join(", ");
-    }
-  }
-}

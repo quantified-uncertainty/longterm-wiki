@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { validator } from "hono/validator";
 import { z } from "zod";
 import { eq, and, count, asc, sql, isNotNull, lte } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
@@ -9,7 +8,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
-  VALIDATION_ERROR,
+  zv,
 } from "./utils.js";
 import { SyncFactsBatchSchema } from "../api-types.js";
 
@@ -36,21 +35,6 @@ const StalenessQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
-// ---- Zod validator helper (uses Hono's built-in validator for RPC type inference) ----
-
-function zv<T extends z.ZodType>(target: "query", schema: T) {
-  return validator(target, (value, c) => {
-    const result = schema.safeParse(value);
-    if (!result.success) {
-      return c.json(
-        { error: VALIDATION_ERROR, message: result.error.message },
-        400
-      );
-    }
-    return result.data as z.infer<T>;
-  });
-}
-
 // ---- Helpers ----
 
 function formatFact(f: typeof facts.$inferSelect) {
@@ -68,7 +52,6 @@ function formatFact(f: typeof facts.$inferSelect) {
     subject: f.subject,
     note: f.note,
     source: f.source,
-    sourceResource: f.sourceResource,
     format: f.format,
     formatDivisor: f.formatDivisor,
     syncedAt: f.syncedAt,
@@ -256,27 +239,6 @@ const factsApp = new Hono()
       }
     }
 
-    // Validate sourceResource references (optional field, points to resources)
-    const resourceIds = [
-      ...new Set(
-        items.map((f) => f.sourceResource).filter((r): r is string => r != null)
-      ),
-    ];
-    if (resourceIds.length > 0) {
-      const missingResources = await checkRefsExist(
-        db,
-        resources,
-        resources.id,
-        resourceIds
-      );
-      if (missingResources.length > 0) {
-        return validationError(
-          c,
-          `Referenced resources not found: ${missingResources.join(", ")}`
-        );
-      }
-    }
-
     let upserted = 0;
 
     await db.transaction(async (tx) => {
@@ -293,7 +255,6 @@ const factsApp = new Hono()
         subject: f.subject ?? null,
         note: f.note ?? null,
         source: f.source ?? null,
-        sourceResource: f.sourceResource ?? null,
         format: f.format ?? null,
         formatDivisor: f.formatDivisor ?? null,
       }));
@@ -314,7 +275,6 @@ const factsApp = new Hono()
             subject: sql`excluded.subject`,
             note: sql`excluded.note`,
             source: sql`excluded.source`,
-            sourceResource: sql`excluded.source_resource`,
             format: sql`excluded.format`,
             formatDivisor: sql`excluded.format_divisor`,
             syncedAt: sql`now()`,

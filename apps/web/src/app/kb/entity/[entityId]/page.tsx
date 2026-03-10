@@ -6,9 +6,9 @@ import {
   getKBEntities,
   getKBEntity,
   getKBFacts,
-  getKBAllItemCollections,
+  getKBAllRecordCollections,
   getKBProperty,
-  getKBSchema,
+  getKBRecordSchema,
 } from "@/data/kb";
 import { getEntityHref } from "@/data";
 import type { Fact, Property } from "@longterm-wiki/kb";
@@ -87,11 +87,6 @@ function SourceCell({ fact }: { fact: Fact }) {
     }
     return <span className="text-xs text-muted-foreground">{fact.source}</span>;
   }
-  if (fact.sourceResource) {
-    return (
-      <span className="text-muted-foreground text-xs">R: {fact.sourceResource}</span>
-    );
-  }
   return <span className="text-muted-foreground">&mdash;</span>;
 }
 
@@ -162,8 +157,7 @@ export default async function KBEntityPage({
   const allFacts = getKBFacts(entityId);
   const structuredFacts = allFacts.filter((f) => f.propertyId !== "description");
   const factGroups = groupFactsByProperty(allFacts);
-  const itemCollections = getKBAllItemCollections(entityId);
-  const schema = getKBSchema(entity.type);
+  const recordCollections = getKBAllRecordCollections(entityId);
 
   // Sort property groups alphabetically by property name
   const sortedPropertyIds = [...factGroups.keys()].sort((a, b) => {
@@ -172,11 +166,11 @@ export default async function KBEntityPage({
     return (pA?.name ?? a).localeCompare(pB?.name ?? b);
   });
 
-  const totalItems = Object.values(itemCollections).reduce(
+  const totalItems = Object.values(recordCollections).reduce(
     (sum, entries) => sum + entries.length,
     0,
   );
-  const totalCollections = Object.keys(itemCollections).length;
+  const totalCollections = Object.keys(recordCollections).length;
 
   const wikiHref = entity.numericId
     ? `/wiki/${entity.numericId}`
@@ -377,17 +371,16 @@ export default async function KBEntityPage({
             </section>
           )}
 
-          {/* ── Item Collections ─────────────────────────────────── */}
+          {/* ── Record Collections ─────────────────────────────────── */}
           {totalCollections > 0 && (
             <section className="mb-8">
-              <h2 className="text-lg font-semibold mb-3">Item Collections</h2>
+              <h2 className="text-lg font-semibold mb-3">Record Collections</h2>
               <div className="space-y-4">
-                {Object.entries(itemCollections)
+                {Object.entries(recordCollections)
                   .sort(([a], [b]) => a.localeCompare(b))
                   .map(([collectionName, items]) => {
-                    const collectionSchema =
-                      schema?.items?.[collectionName];
-                    const fieldDefs = collectionSchema?.fields;
+                    const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
+                    const fieldDefs = recordSchema?.fields;
 
                     // Determine column order: schema fields first, then any extra fields from data
                     const schemaFieldNames = fieldDefs
