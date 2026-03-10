@@ -144,6 +144,51 @@ describe('detectIssues (lib)', () => {
     expect(issues).toContain('ci-failure');
   });
 
+  it('returns failing check names from CheckRun nodes', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: { nodes: [
+                { name: 'build', conclusion: 'SUCCESS' },
+                { name: 'validate', conclusion: 'FAILURE' },
+                { name: 'test', conclusion: 'FAILURE' },
+              ] },
+            },
+          },
+        }],
+      },
+    });
+    const { failingChecks } = detectIssues(pr, 0);
+    expect(failingChecks).toEqual(['validate', 'test']);
+  });
+
+  it('returns failing check names from StatusContext nodes', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: { nodes: [
+                { context: 'ci/circleci', state: 'FAILURE' },
+                { context: 'deploy/vercel', state: 'ERROR' },
+              ] },
+            },
+          },
+        }],
+      },
+    });
+    const { failingChecks } = detectIssues(pr, 0);
+    expect(failingChecks).toEqual(['ci/circleci', 'deploy/vercel']);
+  });
+
+  it('returns empty failingChecks when no CI failures', () => {
+    const pr = makePrNode();
+    const { failingChecks } = detectIssues(pr, 0);
+    expect(failingChecks).toEqual([]);
+  });
+
   it('detects missing-testplan', () => {
     const pr = makePrNode({ body: 'No test plan here\nCloses #1' });
     const { issues } = detectIssues(pr, 0);
