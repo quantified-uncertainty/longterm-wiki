@@ -27,6 +27,13 @@ import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
 
 const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
 
+// ── Constants ─────────────────────────────────────────────────────────
+
+/** Max characters of source content to send to the LLM */
+const MAX_CONTENT_LENGTH = 8000;
+/** HTTP fetch timeout in milliseconds */
+const FETCH_TIMEOUT_MS = 15_000;
+
 // ── Types ──────────────────────────────────────────────────────────────
 
 interface VerifyCommandOptions extends BaseOptions {
@@ -89,6 +96,12 @@ async function loadGraph(): Promise<Graph> {
  * a direct HTTP fetch with HTML tag stripping.
  */
 async function fetchSourceContent(url: string): Promise<string | null> {
+  // SSRF protection: only allow https:// URLs (no http://, file://, ftp://, etc.)
+  if (!url.startsWith('https://')) {
+    console.warn(`[kb-verify] Skipping non-HTTPS URL: ${url}`);
+    return null;
+  }
+
   // Try wiki-server citation_content cache first
   try {
     const result = await getCitationContentByUrl(url);
@@ -96,7 +109,7 @@ async function fetchSourceContent(url: string): Promise<string | null> {
       const content = (result.data as { content?: string; text?: string }).content
         || (result.data as { content?: string; text?: string }).text;
       if (content && content.length > 0) {
-        return content.slice(0, 8000);
+        return content.slice(0, MAX_CONTENT_LENGTH);
       }
     }
   } catch (e: unknown) {
@@ -107,7 +120,7 @@ async function fetchSourceContent(url: string): Promise<string | null> {
   // Direct fetch with timeout
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     const response = await fetch(url, {
       signal: controller.signal,
       headers: {
@@ -137,7 +150,7 @@ async function fetchSourceContent(url: string): Promise<string | null> {
       .replace(/\s+/g, ' ')
       .trim();
 
-    return text.slice(0, 8000);
+    return text.slice(0, MAX_CONTENT_LENGTH);
   } catch (e: unknown) {
     if (e instanceof DOMException && e.name === 'AbortError') {
       console.warn(`[kb-verify] Timeout fetching ${url}`);
