@@ -40,50 +40,12 @@ function stripRef(value: string): string {
   return value;
 }
 
-interface ItemEntry {
-  [key: string]: unknown;
-}
-
-interface ItemCollection {
-  type?: string;
-  entries?: Record<string, ItemEntry>;
-}
-
-function deriveKey(entry: ItemEntry, collectionName: string): string {
-  // Try to derive a readable key from the entry fields
-  const name = entry.name as string | undefined;
-  const person = entry.person as string | undefined;
-  const member = entry.member as string | undefined;
-  const partner = entry.partner as string | undefined;
-  const investor = entry.investor as string | undefined;
-  const pledger = entry.pledger as string | undefined;
-  const holder = entry.holder as string | undefined;
-
-  // For person-referencing collections, use the person slug
-  if (person) {
-    const slug = stripRef(String(person));
-    return slug;
-  }
-  if (member) return stripRef(String(member));
-  if (partner) return stripRef(String(partner));
-  if (investor) return stripRef(String(investor));
-  if (pledger) return stripRef(String(pledger));
-  if (holder) return stripRef(String(holder));
-
-  // For named entries, slugify the name
-  if (name) return toSlug(String(name));
-
-  // Fallback to collection-based key
-  return `entry-${Math.random().toString(36).slice(2, 8)}`;
-}
-
 // Collection name renames (items name → records name)
 const COLLECTION_RENAMES: Record<string, string> = {
   "key-people": "key-persons",
   "board-members": "board-seats",
   "equity-holders": "equity-positions",
   "round-investments": "investments",
-  "notable-publications": "notable-publications", // same
 };
 
 // Field renaming rules per collection type (keyed by OLD collection name)
@@ -120,10 +82,7 @@ function processFile(filePath: string): { changed: boolean; entityId: string } {
   // Transform the items section to records format
   const recordLines: string[] = ["records:"];
   let currentCollection = "";
-  let currentEntryKey = "";
   let inEntries = false;
-  let indent = 0;
-  const renames = new Map<string, Record<string, string>>();
 
   for (let i = 1; i < itemsSection.length; i++) {
     const line = itemsSection[i];
@@ -166,9 +125,6 @@ function processFile(filePath: string): { changed: boolean; entityId: string } {
     // Entry key (6-space indent under entries:, or 4-space if no entries wrapper)
     if (inEntries && lineIndent === 6 && trimmed.match(/^[\w-]+:$/)) {
       const oldKey = trimmed.replace(":", "");
-      // We'll need to read ahead to derive the key
-      // For now, store the old key and we'll derive later
-      currentEntryKey = oldKey;
 
       // Look ahead to find name/person field for key derivation
       let newKey = oldKey;
