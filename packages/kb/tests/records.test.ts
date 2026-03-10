@@ -7,9 +7,20 @@ const DATA_DIR = path.resolve(__dirname, "../data");
 
 describe("records", () => {
   let graph: Graph;
+  let idOf: (filename: string) => string;
 
   beforeAll(async () => {
-    graph = await loadKB(DATA_DIR);
+    const result = await loadKB(DATA_DIR);
+    graph = result.graph;
+    const reverseMap = new Map<string, string>();
+    for (const [entityId, filename] of result.filenameMap) {
+      reverseMap.set(filename, entityId);
+    }
+    idOf = (filename: string) => {
+      const id = reverseMap.get(filename);
+      if (!id) throw new Error(`No entity for filename "${filename}"`);
+      return id;
+    };
   });
 
   describe("record schemas", () => {
@@ -79,20 +90,20 @@ describe("records", () => {
 
   describe("record loading from entity files", () => {
     it("loads equity-position records from Anthropic", () => {
-      const positions = graph.getRecords("anthropic", "equity-positions");
+      const positions = graph.getRecords(idOf("anthropic"), "equity-positions");
       expect(positions.length).toBeGreaterThanOrEqual(10);
 
       // Find the Tallinn entry
       const tallinn = positions.find((p) => p.key === "jaan-tallinn");
       expect(tallinn).toBeDefined();
       expect(tallinn!.schema).toBe("equity-position");
-      expect(tallinn!.ownerEntityId).toBe(graph.getEntity("anthropic")!.id);
+      expect(tallinn!.ownerEntityId).toBe(idOf("anthropic"));
       expect(tallinn!.fields.holder).toBe("jaan-tallinn");
       expect(tallinn!.fields.stake).toEqual([0.006, 0.017]);
     });
 
     it("handles display_name for non-entity participants", () => {
-      const positions = graph.getRecords("anthropic", "equity-positions");
+      const positions = graph.getRecords(idOf("anthropic"), "equity-positions");
       const pool = positions.find((p) => p.key === "employee-pool");
       expect(pool).toBeDefined();
       expect(pool!.displayName).toBe("Employee equity pool");
@@ -100,7 +111,7 @@ describe("records", () => {
     });
 
     it("loads investment records from Anthropic", () => {
-      const investments = graph.getRecords("anthropic", "investments");
+      const investments = graph.getRecords(idOf("anthropic"), "investments");
       expect(investments.length).toBeGreaterThanOrEqual(10);
 
       const tallinnSeed = investments.find((i) => i.key === "tallinn-seed");
@@ -111,7 +122,7 @@ describe("records", () => {
     });
 
     it("loads funding-round records from Anthropic", () => {
-      const rounds = graph.getRecords("anthropic", "funding-rounds");
+      const rounds = graph.getRecords(idOf("anthropic"), "funding-rounds");
       expect(rounds.length).toBeGreaterThanOrEqual(15);
 
       const seriesA = rounds.find((r) => r.key === "series-a");
@@ -121,7 +132,7 @@ describe("records", () => {
     });
 
     it("loads charitable-pledge records from Anthropic", () => {
-      const pledges = graph.getRecords("anthropic", "charitable-pledges");
+      const pledges = graph.getRecords(idOf("anthropic"), "charitable-pledges");
       expect(pledges.length).toBeGreaterThanOrEqual(9);
 
       const dario = pledges.find((p) => p.key === "dario-amodei");
@@ -131,7 +142,7 @@ describe("records", () => {
     });
 
     it("loads key-person records from Anthropic", () => {
-      const people = graph.getRecords("anthropic", "key-persons");
+      const people = graph.getRecords(idOf("anthropic"), "key-persons");
       expect(people.length).toBeGreaterThanOrEqual(10);
 
       const dario = people.find((p) => p.key === "dario-amodei");
@@ -141,7 +152,7 @@ describe("records", () => {
     });
 
     it("returns collection names for entity", () => {
-      const names = graph.getRecordCollectionNames("anthropic");
+      const names = graph.getRecordCollectionNames(idOf("anthropic"));
       expect(names).toContain("equity-positions");
       expect(names).toContain("investments");
       expect(names).toContain("funding-rounds");
@@ -158,7 +169,7 @@ describe("records", () => {
 
   describe("endpoint index", () => {
     it("indexes records by explicit endpoint (investor)", () => {
-      const tallinnRecords = graph.getRecordsReferencing("jaan-tallinn");
+      const tallinnRecords = graph.getRecordsReferencing(idOf("jaan-tallinn"));
       expect(tallinnRecords.length).toBeGreaterThanOrEqual(3);
 
       // Should include equity-position, investment, and charitable-pledge
@@ -169,11 +180,11 @@ describe("records", () => {
     });
 
     it("filters endpoint index by collection name", () => {
-      const tallinnEquity = graph.getRecordsReferencing("jaan-tallinn", "equity-positions");
+      const tallinnEquity = graph.getRecordsReferencing(idOf("jaan-tallinn"), "equity-positions");
       expect(tallinnEquity).toHaveLength(1);
       expect(tallinnEquity[0].fields.stake).toEqual([0.006, 0.017]);
 
-      const tallinnInvestments = graph.getRecordsReferencing("jaan-tallinn", "investments");
+      const tallinnInvestments = graph.getRecordsReferencing(idOf("jaan-tallinn"), "investments");
       expect(tallinnInvestments.length).toBeGreaterThanOrEqual(2); // seed + series-a
     });
 
@@ -208,7 +219,7 @@ describe("records", () => {
 
   describe("1-endpoint record types", () => {
     it("loads product records", () => {
-      const products = graph.getRecords("anthropic", "products");
+      const products = graph.getRecords(idOf("anthropic"), "products");
       expect(products.length).toBeGreaterThanOrEqual(5);
 
       const claudeCode = products.find((p) => p.key === "claude-code");
@@ -217,7 +228,7 @@ describe("records", () => {
     });
 
     it("loads model-release records", () => {
-      const models = graph.getRecords("anthropic", "model-releases");
+      const models = graph.getRecords(idOf("anthropic"), "model-releases");
       expect(models.length).toBeGreaterThanOrEqual(10);
 
       const opus46 = models.find((m) => m.key === "claude-opus-4-6");
@@ -226,7 +237,7 @@ describe("records", () => {
     });
 
     it("loads board-seat records with display_name", () => {
-      const seats = graph.getRecords("anthropic", "board-seats");
+      const seats = graph.getRecords(idOf("anthropic"), "board-seats");
       expect(seats.length).toBeGreaterThanOrEqual(4);
 
       // Dario has entity ref
@@ -241,12 +252,12 @@ describe("records", () => {
     });
 
     it("loads safety-milestone records", () => {
-      const milestones = graph.getRecords("anthropic", "safety-milestones");
+      const milestones = graph.getRecords(idOf("anthropic"), "safety-milestones");
       expect(milestones.length).toBeGreaterThanOrEqual(8);
     });
 
     it("loads research-area records", () => {
-      const areas = graph.getRecords("anthropic", "research-areas");
+      const areas = graph.getRecords(idOf("anthropic"), "research-areas");
       expect(areas.length).toBeGreaterThanOrEqual(4);
 
       const interp = areas.find((a) => a.key === "mechanistic-interpretability");
@@ -255,7 +266,7 @@ describe("records", () => {
     });
 
     it("loads strategic-partnership records with display_name", () => {
-      const partnerships = graph.getRecords("anthropic", "strategic-partnerships");
+      const partnerships = graph.getRecords(idOf("anthropic"), "strategic-partnerships");
       expect(partnerships.length).toBeGreaterThanOrEqual(4);
 
       const aws = partnerships.find((p) => p.key === "aws-investment");

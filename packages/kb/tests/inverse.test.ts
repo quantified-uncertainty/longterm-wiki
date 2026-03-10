@@ -8,18 +8,27 @@ const DATA_DIR = path.resolve(__dirname, "../data");
 
 describe("inverse", () => {
   let graph: Graph;
+  let anthropicId: string;
+  let darioId: string;
+  let janLeikeId: string;
 
   beforeAll(async () => {
-    graph = await loadKB(DATA_DIR);
+    ({ graph } = await loadKB(DATA_DIR));
     // Suppress console.warn for expected warnings about missing things
     vi.spyOn(console, "warn").mockImplementation(() => {});
     computeInverses(graph);
     vi.restoreAllMocks();
+
+    anthropicId = "mK9pX3rQ7n";
+    const find = (name: string) =>
+      graph.getAllEntities().find((e) => e.name === name)!.id;
+    darioId = find("Dario Amodei");
+    janLeikeId = find("Jan Leike");
   });
 
   describe("computeInverses", () => {
     it("creates employer-of facts on anthropic from employed-by on persons", () => {
-      const employerOfFacts = graph.getFacts("anthropic", {
+      const employerOfFacts = graph.getFacts(anthropicId, {
         property: "employer-of",
       });
       // Both dario-amodei and jan-leike have employed-by: anthropic
@@ -29,12 +38,12 @@ describe("inverse", () => {
         expect(f.value.type).toBe("ref");
         return (f.value as { type: "ref"; value: string }).value;
       });
-      expect(refValues).toContain(graph.getEntity("dario-amodei")!.id);
-      expect(refValues).toContain(graph.getEntity("jan-leike")!.id);
+      expect(refValues).toContain(darioId);
+      expect(refValues).toContain(janLeikeId);
     });
 
     it("inverse facts have derivedFrom set", () => {
-      const employerOfFacts = graph.getFacts("anthropic", {
+      const employerOfFacts = graph.getFacts(anthropicId, {
         property: "employer-of",
       });
       for (const fact of employerOfFacts) {
@@ -44,7 +53,7 @@ describe("inverse", () => {
     });
 
     it("inverse fact IDs start with inv_", () => {
-      const employerOfFacts = graph.getFacts("anthropic", {
+      const employerOfFacts = graph.getFacts(anthropicId, {
         property: "employer-of",
       });
       for (const fact of employerOfFacts) {
@@ -53,11 +62,10 @@ describe("inverse", () => {
     });
 
     it("inverse facts preserve asOf temporal bound", () => {
-      const employerOfFacts = graph.getFacts("anthropic", {
+      const employerOfFacts = graph.getFacts(anthropicId, {
         property: "employer-of",
       });
       // Dario's employed-by has asOf: 2021-01, so the inverse should too
-      const darioId = graph.getEntity("dario-amodei")!.id;
       const darioInverse = employerOfFacts.find(
         (f) =>
           f.value.type === "ref" &&
@@ -71,22 +79,21 @@ describe("inverse", () => {
       // Jan Leike's OpenAI employment has validEnd: 2024-05
       // OpenAI is in the graph, so it gets an employer-of inverse with validEnd.
       // Jan Leike's Anthropic employment has no validEnd.
-      const janLeikId = graph.getEntity("jan-leike")!.id;
       const janInverse = graph
-        .getFacts("anthropic", { property: "employer-of" })
+        .getFacts(anthropicId, { property: "employer-of" })
         .find(
           (f) =>
             f.value.type === "ref" &&
-            (f.value as { type: "ref"; value: string }).value === janLeikId
+            (f.value as { type: "ref"; value: string }).value === janLeikeId
         );
       expect(janInverse).toBeDefined();
       expect(janInverse!.validEnd).toBeUndefined();
     });
 
     it("getRelated returns person IDs via employer-of after computing inverses", () => {
-      const related = graph.getRelated("anthropic", "employer-of");
-      expect(related).toContain(graph.getEntity("dario-amodei")!.id);
-      expect(related).toContain(graph.getEntity("jan-leike")!.id);
+      const related = graph.getRelated(anthropicId, "employer-of");
+      expect(related).toContain(darioId);
+      expect(related).toContain(janLeikeId);
     });
 
     it("skips inverse when referenced entity does not exist in graph", () => {
@@ -123,14 +130,13 @@ describe("inverse", () => {
       });
       freshGraph.addEntity({
         id: "test123456",
-        slug: "test-person",
         stableId: "test123456",
         type: "person",
         name: "Test Person",
       });
       freshGraph.addFact({
         id: "f_test1",
-        subjectId: "test-person",
+        subjectId: "test123456",
         propertyId: "employed-by",
         value: { type: "ref", value: "nonexistent-org" },
       });
@@ -149,8 +155,8 @@ describe("inverse", () => {
 
     it("inverse fact IDs are deterministic (content-addressed)", async () => {
       // Load two separate graphs, compute inverses on both, compare IDs
-      const graph1 = await loadKB(DATA_DIR);
-      const graph2 = await loadKB(DATA_DIR);
+      const { graph: graph1 } = await loadKB(DATA_DIR);
+      const { graph: graph2 } = await loadKB(DATA_DIR);
 
       const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       computeInverses(graph1);
@@ -158,11 +164,11 @@ describe("inverse", () => {
       warnSpy.mockRestore();
 
       const facts1 = graph1
-        .getFacts("anthropic", { property: "employer-of" })
+        .getFacts("mK9pX3rQ7n", { property: "employer-of" })
         .map((f) => f.id)
         .sort();
       const facts2 = graph2
-        .getFacts("anthropic", { property: "employer-of" })
+        .getFacts("mK9pX3rQ7n", { property: "employer-of" })
         .map((f) => f.id)
         .sort();
 

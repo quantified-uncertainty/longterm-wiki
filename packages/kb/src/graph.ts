@@ -16,9 +16,8 @@ import type {
 
 export class Graph {
   private entities: Map<string, Entity> = new Map(); // keyed by entity.id (stableId)
-  private slugIndex: Map<string, string> = new Map(); // slug → entity.id
   /** Tracks duplicate entity IDs detected during loading */
-  private _duplicateIds: Array<{ id: string; slug: string; existingSlug: string }> = [];
+  private _duplicateIds: Array<{ id: string; name: string; existingName: string }> = [];
   private facts: Map<string, Fact[]> = new Map(); // keyed by entity.id (subjectId)
   private factIds: Set<string> = new Set(); // dedup guard
   private properties: Map<string, Property> = new Map();
@@ -30,59 +29,38 @@ export class Graph {
   // Endpoint index: referencedEntityId → collectionName → RecordEntry[]
   private endpointIndex: Map<string, Map<string, RecordEntry[]>> = new Map();
 
-  // ── Internal helpers ──────────────────────────────────────────────
-
-  /**
-   * Resolves an entity ID or slug to the canonical entity ID.
-   * Tries direct ID lookup first, then slug lookup.
-   */
-  private resolveToId(idOrSlug: string): string {
-    if (this.entities.has(idOrSlug)) return idOrSlug;
-    return this.slugIndex.get(idOrSlug) ?? idOrSlug;
-  }
-
   // ── Mutation (used by loader and inverse computation) ──────────────
 
   addEntity(entity: Entity): void {
     const existing = this.entities.get(entity.id);
-    if (existing && existing.slug !== entity.slug) {
+    if (existing && existing.name !== entity.name) {
       this._duplicateIds.push({
         id: entity.id,
-        slug: entity.slug,
-        existingSlug: existing.slug,
+        name: entity.name,
+        existingName: existing.name,
       });
     }
-    const existingBySlug = this.slugIndex.get(entity.slug);
-    if (existingBySlug && existingBySlug !== entity.id) {
-      console.warn(
-        `[kb/graph] Slug collision: "${entity.slug}" maps to both ` +
-        `"${existingBySlug}" and "${entity.id}". Keeping latest.`
-      );
-    }
     this.entities.set(entity.id, entity);
-    this.slugIndex.set(entity.slug, entity.id);
   }
 
   /** Returns duplicate entity IDs detected during loading. */
-  getDuplicateIds(): Array<{ id: string; slug: string; existingSlug: string }> {
+  getDuplicateIds(): Array<{ id: string; name: string; existingName: string }> {
     return this._duplicateIds;
   }
 
   /**
    * Adds a fact to the graph. Silently skips if a fact with the same ID
    * already exists (deduplication for inverse computation re-runs).
-   * The subjectId is resolved to the canonical entity ID if needed.
    */
   addFact(fact: Fact): void {
     if (this.factIds.has(fact.id)) return; // dedup
     this.factIds.add(fact.id);
 
-    const subjectId = this.resolveToId(fact.subjectId);
-    const existing = this.facts.get(subjectId);
+    const existing = this.facts.get(fact.subjectId);
     if (existing) {
       existing.push(fact);
     } else {
-      this.facts.set(subjectId, [fact]);
+      this.facts.set(fact.subjectId, [fact]);
     }
   }
 
@@ -101,19 +79,16 @@ export class Graph {
   /**
    * Adds a record entry, indexing it in both the primary index (by owner)
    * and the endpoint index (by each explicit endpoint's entity ref).
-   * The ownerEntityId and endpoint refs are resolved to canonical entity IDs.
    */
   addRecord(
     collectionName: string,
     entry: RecordEntry,
   ): void {
-    const ownerId = this.resolveToId(entry.ownerEntityId);
-
     // Primary index: ownerEntityId → collectionName → entries
-    let ownerCollections = this.records.get(ownerId);
+    let ownerCollections = this.records.get(entry.ownerEntityId);
     if (!ownerCollections) {
       ownerCollections = new Map();
-      this.records.set(ownerId, ownerCollections);
+      this.records.set(entry.ownerEntityId, ownerCollections);
     }
     let entries = ownerCollections.get(collectionName);
     if (!entries) {
@@ -129,11 +104,10 @@ export class Graph {
         if (endpointDef.implicit) continue; // implicit endpoint = owner, already indexed
         const refValue = entry.fields[endpointName];
         if (typeof refValue === "string") {
-          const resolvedRef = this.resolveToId(refValue);
-          let refCollections = this.endpointIndex.get(resolvedRef);
+          let refCollections = this.endpointIndex.get(refValue);
           if (!refCollections) {
             refCollections = new Map();
-            this.endpointIndex.set(resolvedRef, refCollections);
+            this.endpointIndex.set(refValue, refCollections);
           }
           let refEntries = refCollections.get(collectionName);
           if (!refEntries) {
@@ -149,43 +123,17 @@ export class Graph {
   // ── Entity queries ─────────────────────────────────────────────────
 
   /**
-   * Look up an entity by its ID (stable 10-char) or slug.
-   * Tries ID first, then falls back to slug lookup.
+   * Look up an entity by its ID (stable 10-char).
    */
-  getEntity(idOrSlug: string): Entity | undefined {
-    const byId = this.entities.get(idOrSlug);
-    if (byId) return byId;
-    const entityId = this.slugIndex.get(idOrSlug);
-    return entityId ? this.entities.get(entityId) : undefined;
-  }
-
-  /** Look up an entity by slug only. */
-  getEntityBySlug(slug: string): Entity | undefined {
-    const entityId = this.slugIndex.get(slug);
-    return entityId ? this.entities.get(entityId) : undefined;
+  getEntity(id: string): Entity | undefined {
+    return this.entities.get(id);
   }
 
   /**
-   * @deprecated Use `getEntity()` instead (it now accepts stableIds directly).
+   * @deprecated Use `getEntity()` instead.
    */
   getEntityByStableId(stableId: string): Entity | undefined {
     return this.getEntity(stableId);
-  }
-
-  /**
-   * Resolve an entity ID to its slug. Returns undefined if not found.
-   * Also accepts slugs (returns the slug itself).
-   */
-  resolveSlug(idOrSlug: string): string | undefined {
-    const entity = this.getEntity(idOrSlug);
-    return entity?.slug;
-  }
-
-  /**
-   * @deprecated Use `resolveSlug()` instead.
-   */
-  resolveStableId(stableId: string): string | undefined {
-    return this.resolveSlug(stableId);
   }
 
   getAllEntities(): Entity[] {
@@ -198,8 +146,7 @@ export class Graph {
 
   // ── Fact queries ───────────────────────────────────────────────────
 
-  getFacts(entityIdOrSlug: string, query?: FactQuery): Fact[] {
-    const entityId = this.resolveToId(entityIdOrSlug);
+  getFacts(entityId: string, query?: FactQuery): Fact[] {
     const all = this.facts.get(entityId) ?? [];
     let result = all;
 
@@ -218,8 +165,8 @@ export class Graph {
    * Returns the most recent fact for a given (entityId, propertyId) pair,
    * ordering by asOf descending. Facts without asOf come last.
    */
-  getLatest(entityIdOrSlug: string, propertyId: string): Fact | undefined {
-    const facts = this.getFacts(entityIdOrSlug, { property: propertyId });
+  getLatest(entityId: string, propertyId: string): Fact | undefined {
+    const facts = this.getFacts(entityId, { property: propertyId });
     if (facts.length === 0) return undefined;
 
     return facts.slice().sort((a, b) => {
@@ -270,8 +217,8 @@ export class Graph {
   /**
    * Returns the IDs of entities referenced by ref/refs facts on this entity.
    */
-  getRelated(entityIdOrSlug: string, propertyId: string): string[] {
-    const facts = this.getFacts(entityIdOrSlug, { property: propertyId });
+  getRelated(entityId: string, propertyId: string): string[] {
+    const facts = this.getFacts(entityId, { property: propertyId });
     const ids: string[] = [];
 
     for (const fact of facts) {
@@ -315,18 +262,15 @@ export class Graph {
 
   /**
    * Get record entries for a collection owned by an entity.
-   * This is the primary index query (analogous to getItems).
    */
-  getRecords(entityIdOrSlug: string, collectionName: string): RecordEntry[] {
-    const entityId = this.resolveToId(entityIdOrSlug);
+  getRecords(entityId: string, collectionName: string): RecordEntry[] {
     return this.records.get(entityId)?.get(collectionName) ?? [];
   }
 
   /**
    * Get all collection names that have records for an entity.
    */
-  getRecordCollectionNames(entityIdOrSlug: string): string[] {
-    const entityId = this.resolveToId(entityIdOrSlug);
+  getRecordCollectionNames(entityId: string): string[] {
     const entityCollections = this.records.get(entityId);
     if (!entityCollections) return [];
     return Array.from(entityCollections.keys());
@@ -335,8 +279,7 @@ export class Graph {
   /**
    * Get all record collections for an entity as a map.
    */
-  getAllRecordCollections(entityIdOrSlug: string): Map<string, RecordEntry[]> {
-    const entityId = this.resolveToId(entityIdOrSlug);
+  getAllRecordCollections(entityId: string): Map<string, RecordEntry[]> {
     return this.records.get(entityId) ?? new Map();
   }
 
@@ -346,10 +289,9 @@ export class Graph {
    * Otherwise returns all records referencing this entity.
    */
   getRecordsReferencing(
-    entityIdOrSlug: string,
+    entityId: string,
     collectionName?: string,
   ): RecordEntry[] {
-    const entityId = this.resolveToId(entityIdOrSlug);
     const refCollections = this.endpointIndex.get(entityId);
     if (!refCollections) return [];
 

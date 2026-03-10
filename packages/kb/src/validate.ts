@@ -229,15 +229,15 @@ function checkCompleteness(
 
 /** Check 7: entity ID format — must be exactly 10 alphanumeric chars. */
 function checkEntityIdFormat(
-  entity: { id: string; slug: string }
+  entity: { id: string; name: string }
 ): ValidationResult[] {
   if (!ENTITY_ID_RE.test(entity.id)) {
     return [
       {
         severity: "error",
-        entityId: entity.slug,
+        entityId: entity.id,
         message:
-          `Entity "${entity.slug}" has invalid id "${entity.id}" ` +
+          `Entity "${entity.name}" has invalid id "${entity.id}" ` +
           `(must be exactly 10 alphanumeric characters).`,
         rule: "stableid-format", // keep rule name for backward compat
       },
@@ -730,10 +730,10 @@ function checkDuplicateEntityIds(graph: Graph): ValidationResult[] {
   for (const dup of graph.getDuplicateIds()) {
     results.push({
       severity: "error",
-      entityId: dup.slug,
+      entityId: dup.id,
       message:
-        `Entity "${dup.slug}" shares id "${dup.id}" ` +
-        `with entity "${dup.existingSlug}".`,
+        `Entity "${dup.name}" shares id "${dup.id}" ` +
+        `with entity "${dup.existingName}".`,
       rule: "duplicate-stableid", // keep rule name for backward compat
     });
   }
@@ -762,32 +762,32 @@ function checkBidirectionalRedundancy(graph: Graph): ValidationResult[] {
     // Get all entities that have a non-derived fact for this property.
     for (const entity of graph.getAllEntities()) {
       const facts = graph
-        .getFacts(entity.slug, { property: propertyId })
+        .getFacts(entity.id, { property: propertyId })
         .filter((f) => !f.derivedFrom);
 
       for (const fact of facts) {
         // For ref values, check if the referenced entity has an explicit inverse fact.
         if (fact.value.type === "ref") {
-          const refIdOrSlug = fact.value.value;
+          const refEntityId = fact.value.value;
           const inverseFacts = graph
-            .getFacts(refIdOrSlug, { property: inverseId })
+            .getFacts(refEntityId, { property: inverseId })
             .filter(
               (f) =>
                 !f.derivedFrom &&
                 f.value.type === "ref" &&
-                // Compare by resolving both to entity ID
-                graph.resolveSlug(f.value.value) === entity.slug
+                f.value.value === entity.id
             );
 
           if (inverseFacts.length > 0) {
-            const refSlug = graph.resolveSlug(refIdOrSlug) ?? refIdOrSlug;
+            const refEntity = graph.getEntity(refEntityId);
+            const refName = refEntity?.name ?? refEntityId;
             results.push({
               severity: "warning",
-              entityId: entity.slug,
+              entityId: entity.id,
               propertyId,
               message:
-                `Bidirectional redundancy: "${entity.slug}" has "${propertyId}" → "${refSlug}", ` +
-                `and "${refSlug}" has explicit "${inverseId}" → "${entity.slug}". ` +
+                `Bidirectional redundancy: "${entity.name}" has "${propertyId}" → "${refName}", ` +
+                `and "${refName}" has explicit "${inverseId}" → "${entity.name}". ` +
                 `Only one side needs to be stored; the other is computed via inverse.`,
               rule: "bidirectional-redundancy",
             });
@@ -878,9 +878,9 @@ export function validate(
 ): ValidationResult[] {
   const results: ValidationResult[] = [];
 
-  // Per-entity checks (use slug for human-readable validation output)
+  // Per-entity checks
   for (const entity of graph.getAllEntities()) {
-    results.push(...validateEntity(graph, entity.slug));
+    results.push(...validateEntity(graph, entity.id));
   }
 
   // Graph-level checks

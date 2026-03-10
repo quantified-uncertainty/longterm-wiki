@@ -38,10 +38,54 @@ interface KBCommandOptions extends BaseOptions {
 
 // ── KB loading helper ───────────────────────────────────────────────────
 
-async function loadGraph(): Promise<Graph> {
-  const graph = await loadKB(KB_DATA_DIR);
+/** Cached load result with filenameMap for reverse lookups. */
+interface LoadedKB {
+  graph: Graph;
+  filenameMap: Map<string, string>;
+  /** Reverse map: filename → entityId */
+  idByFilename: Map<string, string>;
+}
+
+async function loadGraphFull(): Promise<LoadedKB> {
+  const { graph, filenameMap } = await loadKB(KB_DATA_DIR);
   computeInverses(graph);
+  const idByFilename = new Map<string, string>();
+  for (const [entityId, filename] of filenameMap) {
+    idByFilename.set(filename, entityId);
+  }
+  return { graph, filenameMap, idByFilename };
+}
+
+async function loadGraph(): Promise<Graph> {
+  const { graph } = await loadGraphFull();
   return graph;
+}
+
+/**
+ * Resolve a user-provided entity identifier (could be ID, filename/slug, or name).
+ * Returns the entity or undefined.
+ */
+function resolveEntity(
+  identifier: string,
+  kb: LoadedKB,
+): Entity | undefined {
+  // Direct ID lookup
+  const byId = kb.graph.getEntity(identifier);
+  if (byId) return byId;
+
+  // Filename/slug lookup (e.g., "anthropic" → entity ID via filenameMap)
+  const idFromFilename = kb.idByFilename.get(identifier);
+  if (idFromFilename) {
+    return kb.graph.getEntity(idFromFilename);
+  }
+
+  // StableId lookup
+  const byStableId = kb.graph.getEntityByStableId(identifier);
+  if (byStableId) return byStableId;
+
+  // Case-insensitive name match
+  const lower = identifier.toLowerCase();
+  return kb.graph.getAllEntities().find((e) => e.name.toLowerCase() === lower);
 }
 
 // ── show command ────────────────────────────────────────────────────────
@@ -65,22 +109,17 @@ Examples:
     };
   }
 
-  const graph = await loadGraph();
-  const entity = graph.getEntity(entityId);
+  const kb = await loadGraphFull();
+  const entity = resolveEntity(entityId, kb);
 
   if (!entity) {
-    // Try resolving as a stableId
-    const resolved = graph.getEntityByStableId(entityId);
-    if (resolved) {
-      return showEntity(resolved, graph, options);
-    }
     return {
       exitCode: 1,
       output: `Entity not found: ${entityId}\n  Try: crux kb list`,
     };
   }
 
-  return showEntity(entity, graph, options);
+  return showEntity(entity, kb.graph, options);
 }
 
 function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): CommandResult {
@@ -96,7 +135,7 @@ function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): Co
 
   // Header
   lines.push(`\x1b[1m${entity.name}\x1b[0m (${entity.id})`);
-  lines.push(`Type: ${entity.type} | Slug: ${entity.slug}${entity.wikiPageId ? ` | ${entity.wikiPageId}` : ''}`);
+  lines.push(`Type: ${entity.type}${entity.wikiPageId ? ` | ${entity.wikiPageId}` : ''}`);
   if (entity.aliases?.length) {
     lines.push(`Aliases: ${entity.aliases.join(', ')}`);
   }
@@ -240,7 +279,6 @@ async function listCommand(
   if (options.ci) {
     const data = entities.map((e) => ({
       id: e.id,
-      slug: e.slug,
       name: e.name,
       type: e.type,
       factCount: graph.getFacts(e.id).length,
@@ -254,7 +292,7 @@ async function listCommand(
 
   // Table header
   const lines: string[] = [];
-  const header = `${'Slug'.padEnd(24)} ${'Name'.padEnd(24)} ${'Type'.padEnd(16)} ${'ID'.padEnd(14)} ${'Facts'.padEnd(7)} Items`;
+  const header = `${'ID'.padEnd(14)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} ${'Facts'.padEnd(7)} Records`;
   lines.push(`\x1b[1m${header}\x1b[0m`);
   lines.push('-'.repeat(header.length));
 
@@ -264,7 +302,7 @@ async function listCommand(
       (sum, col) => sum + graph.getRecords(entity.id, col).length,
       0,
     );
-    const row = `${entity.slug.padEnd(24)} ${entity.name.padEnd(24)} ${entity.type.padEnd(16)} ${entity.id.padEnd(14)} ${String(facts.length).padEnd(7)} ${itemCount}`;
+    const row = `${entity.id.padEnd(14)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${String(facts.length).padEnd(7)} ${itemCount}`;
     lines.push(row);
   }
 
@@ -308,13 +346,13 @@ Examples:
   if (options.ci) {
     return {
       exitCode: 0,
-      output: JSON.stringify({ stableId, slug: entity.slug, name: entity.name, type: entity.type }),
+      output: JSON.stringify({ stableId, name: entity.name, type: entity.type }),
     };
   }
 
   return {
     exitCode: 0,
-    output: `${stableId} -> ${entity.name} (${entity.slug})\n  Type: ${entity.type}${entity.wikiPageId ? ` | ${entity.wikiPageId}` : ''}`,
+    output: `${stableId} -> ${entity.name}\n  Type: ${entity.type}${entity.wikiPageId ? ` | ${entity.wikiPageId}` : ''}`,
   };
 }
 
@@ -515,7 +553,6 @@ Examples:
 
   const q = query.toLowerCase();
   const matches = entities.filter((e) => {
-    if (e.slug.toLowerCase().includes(q)) return true;
     if (e.id.toLowerCase().includes(q)) return true;
     if (e.name.toLowerCase().includes(q)) return true;
     if (e.aliases?.some((a) => a.toLowerCase().includes(q))) return true;
@@ -526,7 +563,6 @@ Examples:
   if (options.ci) {
     const data = matches.map((e) => ({
       id: e.id,
-      slug: e.slug,
       name: e.name,
       type: e.type,
       wikiPageId: e.wikiPageId,
@@ -541,13 +577,13 @@ Examples:
   }
 
   const lines: string[] = [];
-  const header = `${'Slug'.padEnd(28)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} ${'WikiPageId'.padEnd(10)} Facts`;
+  const header = `${'ID'.padEnd(14)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} ${'WikiPageId'.padEnd(10)} Facts`;
   lines.push(`\x1b[1m${header}\x1b[0m`);
   lines.push('-'.repeat(header.length));
 
   for (const entity of matches) {
     const factCount = graph.getFacts(entity.id).length;
-    const row = `${entity.slug.padEnd(28)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${(entity.wikiPageId ?? '').padEnd(10)} ${factCount}`;
+    const row = `${entity.id.padEnd(14)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${(entity.wikiPageId ?? '').padEnd(10)} ${factCount}`;
     lines.push(row);
     if (entity.aliases?.length) {
       lines.push(`  ${''.padEnd(26)} Aliases: ${entity.aliases.join(', ')}`);
@@ -626,7 +662,7 @@ async function coverageCommand(
     const scoreColor = r.factCount === 0 ? '\x1b[90m' : r.score >= 20 ? '\x1b[32m' : r.score >= 10 ? '\x1b[33m' : '\x1b[31m';
     const propStr = r.factCount > 0 ? `${r.used}/${r.applicable}` : '-';
     const scoreStr = r.factCount === 0 ? 'stub' : `${r.score}%`;
-    const row = `${r.entity.slug.padEnd(28)} ${r.entity.type.padEnd(16)} ${String(r.factCount).padEnd(7)} ${propStr.padEnd(12)} ${scoreColor}${scoreStr}\x1b[0m`;
+    const row = `${r.entity.name.padEnd(28)} ${r.entity.type.padEnd(16)} ${String(r.factCount).padEnd(7)} ${propStr.padEnd(12)} ${scoreColor}${scoreStr}\x1b[0m`;
     lines.push(row);
   }
 
@@ -789,8 +825,9 @@ Examples:
     };
   }
 
-  const graph = await loadGraph();
-  const entity = graph.getEntity(entityId);
+  const kb = await loadGraphFull();
+  const entity = resolveEntity(entityId, kb);
+  const graph = kb.graph;
 
   if (!entity) {
     return { exitCode: 1, output: `Entity not found: ${entityId}` };

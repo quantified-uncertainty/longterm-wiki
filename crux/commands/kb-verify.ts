@@ -95,10 +95,39 @@ interface VerificationSummary {
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
-async function loadGraph(): Promise<Graph> {
-  const graph = await loadKB(KB_DATA_DIR);
+interface LoadedKB {
+  graph: Graph;
+  idByFilename: Map<string, string>;
+}
+
+async function loadGraphFull(): Promise<LoadedKB> {
+  const { graph, filenameMap } = await loadKB(KB_DATA_DIR);
   computeInverses(graph);
-  return graph;
+  const idByFilename = new Map<string, string>();
+  for (const [entityId, filename] of filenameMap) {
+    idByFilename.set(filename, entityId);
+  }
+  return { graph, idByFilename };
+}
+
+/**
+ * Resolve a user-provided entity identifier (ID, filename, stableId, or name).
+ */
+function resolveEntity(
+  identifier: string,
+  kb: LoadedKB,
+): Entity | undefined {
+  const byId = kb.graph.getEntity(identifier);
+  if (byId) return byId;
+
+  const idFromFilename = kb.idByFilename.get(identifier);
+  if (idFromFilename) return kb.graph.getEntity(idFromFilename);
+
+  const byStableId = kb.graph.getEntityByStableId(identifier);
+  if (byStableId) return byStableId;
+
+  const lower = identifier.toLowerCase();
+  return kb.graph.getAllEntities().find((e) => e.name.toLowerCase() === lower);
 }
 
 /** Result of fetching source content, with structured error info */
@@ -397,9 +426,10 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
  * Collect facts to verify based on the command options.
  */
 function collectFacts(
-  graph: Graph,
+  kb: LoadedKB,
   options: VerifyCommandOptions,
 ): Array<{ entity: Entity; fact: Fact }> {
+  const graph = kb.graph;
   const factsToVerify: Array<{ entity: Entity; fact: Fact }> = [];
 
   if (options.fact) {
@@ -415,8 +445,8 @@ function collectFacts(
       }
     }
   } else if (options.entity) {
-    // All facts for a specific entity
-    const entity = graph.getEntity(options.entity);
+    // All facts for a specific entity (supports ID, filename, stableId, or name)
+    const entity = resolveEntity(options.entity, kb);
     if (entity) {
       const facts = graph.getFacts(entity.id);
       for (const fact of facts) {
@@ -454,8 +484,9 @@ export async function verifyCommand(
 ): Promise<CommandResult> {
   const isDryRun = options['dry-run'] || options.dryRun;
 
-  const graph = await loadGraph();
-  const factsToVerify = collectFacts(graph, options);
+  const kb = await loadGraphFull();
+  const graph = kb.graph;
+  const factsToVerify = collectFacts(kb, options);
 
   if (factsToVerify.length === 0) {
     const hint = options.entity

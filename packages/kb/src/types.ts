@@ -21,17 +21,15 @@ export type FactValue =
 export interface Entity {
   /** Stable 10-char random ID (primary identity, formerly stableId) */
   id: string;
-  /** Human-readable slug: "anthropic", "claude-3-5-sonnet" (formerly id) */
-  slug: string;
   /** References a TypeSchema: "organization", "person" */
   type: string;
   /** Display name */
   name: string;
-  /** Parent entity slug (e.g., funding round → org) */
+  /** Parent entity ID (e.g., funding round → org) */
   parent?: string;
   /** Alternative names for search */
   aliases?: string[];
-  /** Former slugs for redirects */
+  /** Former IDs for redirects */
   previousIds?: string[];
   /** Wiki page URL ID with E prefix, e.g. "E22" (formerly numericId) */
   wikiPageId?: string;

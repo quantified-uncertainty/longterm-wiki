@@ -12,15 +12,21 @@ export interface SerializedKB {
   schemas: ReturnType<Graph["getAllSchemas"]>;
   /** Record schemas (id → schema) */
   recordSchemas: RecordSchema[];
-  /** Records indexed by ownerEntityId → collectionName → entries */
+  /** Records indexed by filename → collectionName → entries */
   records: Record<string, Record<string, RecordEntry[]>>;
 }
 
 /**
  * Serialize a Graph to a plain JSON-friendly object.
  * Useful for writing to database.json or sending over the wire.
+ *
+ * @param filenameMap Maps entity ID → YAML filename stem (e.g., "mK9pX3rQ7n" → "anthropic").
+ *                    Used to key facts/records by filename for frontend backward compat.
  */
-export function serialize(graph: Graph): SerializedKB {
+export function serialize(
+  graph: Graph,
+  filenameMap: Map<string, string>,
+): SerializedKB {
   const entities = graph.getAllEntities();
   const properties = graph.getAllProperties();
   const schemas = graph.getAllSchemas();
@@ -31,12 +37,13 @@ export function serialize(graph: Graph): SerializedKB {
 
   for (const entity of entities) {
     const entityFacts = graph.getFacts(entity.id);
-    // Key by slug for backward compat with frontend consumers (kb.ts uses slugs)
+    // Key by filename for backward compat with frontend consumers (kb.ts uses slug/filename keys)
+    const key = filenameMap.get(entity.id) ?? entity.id;
     if (entityFacts.length > 0) {
-      facts[entity.slug] = entityFacts;
+      facts[key] = entityFacts;
     }
 
-    // Serialize record collections for this entity (keyed by slug)
+    // Serialize record collections for this entity (keyed by filename)
     const recordCollections = graph.getAllRecordCollections(entity.id);
     if (recordCollections.size > 0) {
       const entityRecords: Record<string, RecordEntry[]> = {};
@@ -46,7 +53,7 @@ export function serialize(graph: Graph): SerializedKB {
         }
       }
       if (Object.keys(entityRecords).length > 0) {
-        records[entity.slug] = entityRecords;
+        records[key] = entityRecords;
       }
     }
   }

@@ -128,10 +128,10 @@ export function formatFactValue(
 // ── Ref resolution ──────────────────────────────────────────────────
 
 /**
- * Resolve an entity ID or slug to its display name, falling back to the input.
+ * Resolve an entity ID to its display name, falling back to the input.
  */
-export function resolveRefName(idOrSlug: string, graph: Graph): string {
-  const entity = graph.getEntity(idOrSlug);
-  return entity ? entity.name : idOrSlug;
+export function resolveRefName(entityId: string, graph: Graph): string {
+  const entity = graph.getEntity(entityId);
+  return entity ? entity.name : entityId;
 }
 

@@ -23,15 +23,16 @@ let _graph: Graph | null = null;
 
 async function getGraph(): Promise<Graph> {
   if (!_graph) {
-    _graph = await loadKB(KB_DATA_DIR);
-    computeInverses(_graph);
+    const { graph } = await loadKB(KB_DATA_DIR);
+    computeInverses(graph);
+    _graph = graph;
   }
   return _graph;
 }
 
 /**
  * Find the KB entity for a wiki page by matching `entity.numericId === pageId`.
- * Falls back to matching `entity.id` against the last path segment (slug).
+ * Falls back to searching entity names against the last path segment.
  */
 function findKbEntity(graph: Graph, pageId: string, pagePath?: string): Entity | undefined {
   // Primary: match by numericId (e.g., "E22" → anthropic)
@@ -39,12 +40,12 @@ function findKbEntity(graph: Graph, pageId: string, pagePath?: string): Entity |
   const byNumericId = all.find((e) => e.numericId === pageId);
   if (byNumericId) return byNumericId;
 
-  // Fallback: match by slug extracted from path
+  // Fallback: match by entity ID
   if (pagePath) {
-    const slug = pagePath.split('/').pop()?.replace(/\.mdx$/, '');
-    if (slug) {
-      const bySlug = graph.getEntity(slug);
-      if (bySlug) return bySlug;
+    const segment = pagePath.split('/').pop()?.replace(/\.mdx$/, '');
+    if (segment) {
+      const byId = graph.getEntity(segment);
+      if (byId) return byId;
     }
   }
 

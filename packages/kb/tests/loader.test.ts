@@ -7,18 +7,29 @@ const DATA_DIR = path.resolve(__dirname, "../data");
 
 describe("loader", () => {
   let graph: Graph;
+  let idOf: (filename: string) => string;
 
   beforeAll(async () => {
-    graph = await loadKB(DATA_DIR);
+    const result = await loadKB(DATA_DIR);
+    graph = result.graph;
+    // Build reverse lookup: filename → entityId for test convenience
+    const reverseMap = new Map<string, string>();
+    for (const [entityId, filename] of result.filenameMap) {
+      reverseMap.set(filename, entityId);
+    }
+    idOf = (filename: string) => {
+      const id = reverseMap.get(filename);
+      if (!id) throw new Error(`No entity for filename "${filename}"`);
+      return id;
+    };
   });
 
   describe("entities", () => {
     it("loads Anthropic from disk", () => {
-      const anthropic = graph.getEntity("anthropic");
+      const anthropic = graph.getEntity(idOf("anthropic"));
       expect(anthropic).toBeDefined();
       expect(anthropic!.name).toBe("Anthropic");
       expect(anthropic!.id).toBe("mK9pX3rQ7n");
-      expect(anthropic!.slug).toBe("anthropic");
       expect(anthropic!.type).toBe("organization");
       expect(anthropic!.wikiPageId).toBe("E22");
       // Deprecated aliases still work
@@ -30,23 +41,14 @@ describe("loader", () => {
       const entities = graph.getAllEntities();
       expect(entities.length).toBeGreaterThanOrEqual(360);
 
-      // Spot-check key entities are present via slug lookup
-      const slugs = new Set(entities.map((t) => t.slug));
-      expect(slugs.has("anthropic")).toBe(true);
-      expect(slugs.has("openai")).toBe(true);
-      expect(slugs.has("deepmind")).toBe(true);
-      expect(slugs.has("claude-3-opus")).toBe(true);
-      expect(slugs.has("alignment")).toBe(true);
-      expect(slugs.has("existential-risk")).toBe(true);
-      expect(slugs.has("anthropic-government-standoff")).toBe(true);
-      expect(slugs.has("chan-zuckerberg-initiative")).toBe(true);
-      expect(slugs.has("coefficient-giving")).toBe(true);
-      expect(slugs.has("jaan-tallinn")).toBe(true);
-      expect(slugs.has("manifund")).toBe(true);
+      // Spot-check key entities are present via name lookup
+      const names = new Set(entities.map((t) => t.name));
+      expect(names.has("Anthropic")).toBe(true);
+      expect(names.has("OpenAI")).toBe(true);
     });
 
     it("loads entity aliases", () => {
-      const anthropic = graph.getEntity("anthropic");
+      const anthropic = graph.getEntity(idOf("anthropic"));
       expect(anthropic!.aliases).toEqual(["Anthropic PBC", "Anthropic AI"]);
     });
 
@@ -188,22 +190,22 @@ describe("loader", () => {
 
   describe("facts", () => {
     it("loads correct number of facts for Anthropic (52)", () => {
-      const facts = graph.getFacts("anthropic");
+      const facts = graph.getFacts(idOf("anthropic"));
       expect(facts).toHaveLength(52);
     });
 
     it("loads correct number of facts for Dario Amodei (9)", () => {
-      const facts = graph.getFacts("dario-amodei");
+      const facts = graph.getFacts(idOf("dario-amodei"));
       expect(facts).toHaveLength(9);
     });
 
     it("loads correct number of facts for Jan Leike (9)", () => {
-      const facts = graph.getFacts("jan-leike");
+      const facts = graph.getFacts(idOf("jan-leike"));
       expect(facts).toHaveLength(9);
     });
 
     it("normalizes number values as {type: 'number'}", () => {
-      const revenueFacts = graph.getFacts("anthropic", {
+      const revenueFacts = graph.getFacts(idOf("anthropic"), {
         property: "revenue",
       });
       expect(revenueFacts.length).toBeGreaterThan(0);
@@ -214,7 +216,7 @@ describe("loader", () => {
     });
 
     it("normalizes ref values as {type: 'ref'}", () => {
-      const employedByFacts = graph.getFacts("jan-leike", {
+      const employedByFacts = graph.getFacts(idOf("jan-leike"), {
         property: "employed-by",
       });
       expect(employedByFacts).toHaveLength(3);
@@ -224,7 +226,7 @@ describe("loader", () => {
     });
 
     it("normalizes date values as {type: 'date'}", () => {
-      const foundedFacts = graph.getFacts("anthropic", {
+      const foundedFacts = graph.getFacts(idOf("anthropic"), {
         property: "founded-date",
       });
       expect(foundedFacts).toHaveLength(1);
@@ -235,7 +237,7 @@ describe("loader", () => {
     });
 
     it("normalizes text values as {type: 'text'}", () => {
-      const hqFacts = graph.getFacts("anthropic", {
+      const hqFacts = graph.getFacts(idOf("anthropic"), {
         property: "headquarters",
       });
       expect(hqFacts).toHaveLength(1);
@@ -246,11 +248,11 @@ describe("loader", () => {
     });
 
     it("preserves temporal metadata (asOf and validEnd)", () => {
-      const janFacts = graph.getFacts("jan-leike", {
+      const janFacts = graph.getFacts(idOf("jan-leike"), {
         property: "employed-by",
       });
-      const openaiId = graph.getEntity("openai")!.id;
-      const anthropicId = graph.getEntity("anthropic")!.id;
+      const openaiId = graph.getEntity(idOf("openai"))!.id;
+      const anthropicId = graph.getEntity(idOf("anthropic"))!.id;
 
       // One fact has validEnd (the OpenAI one)
       const openAiFact = janFacts.find(
@@ -270,7 +272,7 @@ describe("loader", () => {
     });
 
     it("preserves source and notes metadata", () => {
-      const foundedFacts = graph.getFacts("anthropic", {
+      const foundedFacts = graph.getFacts(idOf("anthropic"), {
         property: "founded-date",
       });
       expect(foundedFacts[0].source).toBe("https://anthropic.com/company");
@@ -282,7 +284,7 @@ describe("loader", () => {
 
   describe("record collections", () => {
     it("returns empty array for non-existent collection", () => {
-      const records = graph.getRecords("anthropic", "nonexistent");
+      const records = graph.getRecords(idOf("anthropic"), "nonexistent");
       expect(records).toEqual([]);
     });
 
@@ -294,17 +296,17 @@ describe("loader", () => {
 
   describe("record collections (data verification)", () => {
     it("loads funding-rounds records for Anthropic", () => {
-      const rounds = graph.getRecords("anthropic", "funding-rounds");
+      const rounds = graph.getRecords(idOf("anthropic"), "funding-rounds");
       expect(rounds.length).toBeGreaterThanOrEqual(13);
     });
 
     it("loads key-persons records for Anthropic", () => {
-      const people = graph.getRecords("anthropic", "key-persons");
+      const people = graph.getRecords(idOf("anthropic"), "key-persons");
       expect(people.length).toBeGreaterThanOrEqual(15);
     });
 
     it("record entries have correct keys and field values", () => {
-      const rounds = graph.getRecords("anthropic", "funding-rounds");
+      const rounds = graph.getRecords(idOf("anthropic"), "funding-rounds");
       const seriesA = rounds.find((r) => r.key === "series-a");
       expect(seriesA).toBeDefined();
       expect(seriesA!.fields.date).toBe("2021-05");

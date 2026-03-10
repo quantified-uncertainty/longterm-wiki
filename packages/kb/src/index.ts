@@ -3,6 +3,7 @@
  */
 
 export { loadKB } from "./loader";
+export type { LoadResult } from "./loader";
 export { Graph } from "./graph";
 export { computeInverses } from "./inverse";
 export { validate, validateEntity } from "./validate";
