@@ -16,10 +16,10 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 
 import { loadKB } from '../../packages/kb/src/loader.ts';
 import { computeInverses } from '../../packages/kb/src/inverse.ts';
-import { formatFactValue, formatItemEntry } from '../../packages/kb/src/format.ts';
+import { formatFactValue } from '../../packages/kb/src/format.ts';
 import { validate } from '../../packages/kb/src/validate.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
-import type { Entity, Fact, ItemEntry, RecordEntry, ValidationResult } from '../../packages/kb/src/types.ts';
+import type { Entity, Fact, RecordEntry, ValidationResult } from '../../packages/kb/src/types.ts';
 import { commands as kbMigrateCommands } from './kb-migrate.ts';
 
 const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
@@ -155,20 +155,6 @@ function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): Co
     lines.push('');
   }
 
-  // Item collections
-  const entityCollections = getEntityItemCollections(entity.id, graph);
-  if (entityCollections.length > 0) {
-    lines.push(`\x1b[1mItems:\x1b[0m`);
-    for (const { name, items } of entityCollections) {
-      lines.push(`  ${name} (${items.length} entries)`);
-      for (const item of items) {
-        const summary = formatItemEntry(item, name, graph);
-        lines.push(`    ${summary}`);
-      }
-      lines.push('');
-    }
-  }
-
   // Record collections
   const recordCollections = getEntityRecordCollections(entity.id, graph);
   if (recordCollections.length > 0) {
@@ -184,23 +170,6 @@ function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): Co
   }
 
   return { exitCode: 0, output: lines.join('\n') };
-}
-
-/**
- * Get all item collections for an entity by querying the graph directly.
- */
-function getEntityItemCollections(
-  entityId: string,
-  graph: Graph,
-): Array<{ name: string; items: ItemEntry[] }> {
-  const results: Array<{ name: string; items: ItemEntry[] }> = [];
-  for (const collName of graph.getItemCollectionNames(entityId)) {
-    const items = graph.getItems(entityId, collName);
-    if (items.length > 0) {
-      results.push({ name: collName, items });
-    }
-  }
-  return results;
 }
 
 /**
@@ -272,10 +241,7 @@ async function listCommand(
       type: e.type,
       stableId: e.stableId,
       factCount: graph.getFacts(e.id).length,
-      itemCount: graph.getItemCollectionNames(e.id).reduce(
-        (sum, col) => sum + graph.getItems(e.id, col).length,
-        0,
-      ) + graph.getRecordCollectionNames(e.id).reduce(
+      itemCount: graph.getRecordCollectionNames(e.id).reduce(
         (sum, col) => sum + graph.getRecords(e.id, col).length,
         0,
       ),
@@ -291,10 +257,7 @@ async function listCommand(
 
   for (const entity of entities) {
     const facts = graph.getFacts(entity.id);
-    const itemCount = graph.getItemCollectionNames(entity.id).reduce(
-      (sum, col) => sum + graph.getItems(entity.id, col).length,
-      0,
-    ) + graph.getRecordCollectionNames(entity.id).reduce(
+    const itemCount = graph.getRecordCollectionNames(entity.id).reduce(
       (sum, col) => sum + graph.getRecords(entity.id, col).length,
       0,
     );

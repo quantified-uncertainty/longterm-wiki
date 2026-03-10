@@ -350,6 +350,56 @@ export function getKBRecordsReferencing(
 }
 
 /**
+ * Get all record entries across all entities as a flat list.
+ */
+export function getAllKBRecords(): Array<{
+  entityId: string;
+  collection: string;
+  entry: RecordEntry;
+}> {
+  const kb = getKB();
+  if (!kb || !kb.records) return [];
+
+  const results: Array<{
+    entityId: string;
+    collection: string;
+    entry: RecordEntry;
+  }> = [];
+
+  for (const [entityId, collections] of Object.entries(kb.records)) {
+    for (const [collectionName, entries] of Object.entries(collections)) {
+      for (const entry of entries) {
+        results.push({ entityId, collection: collectionName, entry });
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Look up a single record entry by its key (globally unique).
+ * Returns the record along with its owner entity ID and collection name.
+ */
+export function getKBRecordByKey(
+  recordKey: string,
+): { entityId: string; collection: string; entry: RecordEntry } | undefined {
+  const kb = getKB();
+  if (!kb || !kb.records) return undefined;
+
+  for (const [entityId, collections] of Object.entries(kb.records)) {
+    for (const [collectionName, entries] of Object.entries(collections)) {
+      for (const entry of entries) {
+        if (entry.key === recordKey) {
+          return { entityId, collection: collectionName, entry };
+        }
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
  * Get all item entries across all entities as a flat list.
  * Returns [entityId, collectionName, ItemEntry] tuples.
  */
