@@ -48,8 +48,8 @@ const SINGLE_PR_QUERY = `query($owner: String!, $name: String!, $number: Int!) {
       labels(first: 20) { nodes { name } }
       commits(last: 1) { nodes { commit { statusCheckRollup {
         contexts(first: 50) { nodes {
-          ... on CheckRun { conclusion }
-          ... on StatusContext { state }
+          ... on CheckRun { name conclusion }
+          ... on StatusContext { context state }
         }}
       }}}}
       reviewThreads(first: 50) { nodes {
@@ -115,7 +115,7 @@ export const HUMAN_REQUIRED_CHECKS = new Set([
 export function detectIssues(
   pr: GqlPrNode,
   staleThresholdMs: number,
-): { issues: PrIssueType[]; botComments: BotComment[] } {
+): { issues: PrIssueType[]; botComments: BotComment[]; failingChecks: string[] } {
   const issues: PrIssueType[] = [];
 
   if (pr.mergeable === 'CONFLICTING') issues.push('conflict');
@@ -128,6 +128,10 @@ export function detectIssues(
       c.state === 'FAILURE' ||
       c.state === 'ERROR',
   );
+  const failingChecks = failingContexts
+    .map((c) => c.name ?? c.context ?? 'unknown')
+    .filter(Boolean);
+
   if (failingContexts.length > 0) {
     // Check if ALL failing checks are human-required — if so, skip ci-failure
     const allHumanRequired = failingContexts.every((c) => {
@@ -152,7 +156,7 @@ export function detectIssues(
     issues.push(hasActionable ? 'bot-review-major' : 'bot-review-nitpick');
   }
 
-  return { issues, botComments };
+  return { issues, botComments, failingChecks };
 }
 
 // ── PR fetching ──────────────────────────────────────────────────────────────

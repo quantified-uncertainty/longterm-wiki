@@ -150,12 +150,14 @@ items:
     type: funding-round
     entries:
       i_r5HaOs6mXg:
+        name: "Founding"
         date: 2015-12
         amount: 1e9
         notes: "Initial $1B commitment from founders and backers including Elon Musk, Sam Altman, Peter Thiel, Reid Hoffman, Jessica Livingston"
         source: https://openai.com/blog/introducing-openai
 
       i_RHwgHUtkcw:
+        name: "Microsoft Investment"
         date: 2019-07
         amount: 1e9
         lead_investor: microsoft
@@ -163,6 +165,7 @@ items:
         notes: "Microsoft's initial $1B investment; coincided with creation of capped-profit entity OpenAI LP"
 
       i_Jghs4gXSnw:
+        name: "Microsoft Extension"
         date: 2023-01
         amount: 10e9
         lead_investor: microsoft
@@ -170,6 +173,7 @@ items:
         notes: "Microsoft's multi-year, multi-billion dollar investment reported at ~$10B; brought total Microsoft commitment to ~$13B"
 
       i_eTZe3xfv0w:
+        name: "Growth Round"
         date: 2024-10
         amount: 6.6e9
         valuation: 157e9

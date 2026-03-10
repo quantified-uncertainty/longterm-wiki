@@ -82,6 +82,7 @@ items:
     type: funding-round
     entries:
       i_ssi_seed:
+        name: "Seed"
         date: 2024-09
         amount: 1e9
         valuation: 5e9
@@ -89,6 +90,7 @@ items:
         notes: "Seed round from a16z, Sequoia, DST Global, SV Angel, NFDG"
 
       i_ssi_2025_04:
+        name: "Series A"
         date: 2025-04
         amount: 2e9
         valuation: 32e9

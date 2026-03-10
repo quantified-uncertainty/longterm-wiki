@@ -20,6 +20,22 @@ export interface FactRow {
   asOf: string;
   source: string;
   hasSource: boolean;
+  valueType: string;
+  notes: string;
+  sourceQuote: string;
+  validEnd: string;
+  isCurrent: boolean;
+  derivedFrom: string;
+  currency: string;
+  usdEquivalent: number | null;
+  unit: string;
+  temporal: boolean;
+  /** Months since asOf date (for sorting). -1 = unknown, negative = future. */
+  freshnessMonths: number;
+  /** Human-readable freshness label */
+  freshnessLabel: string;
+  /** Filled optional metadata fields out of 4 (source, asOf, notes, sourceQuote) */
+  completenessScore: number;
 }
 
 function resolveRefDisplayNames(
@@ -38,6 +54,28 @@ function resolveRefDisplayNames(
     });
   }
   return null;
+}
+
+/** Returns { months, label } — months is raw count for sorting, label is display string.
+ *  Computed at build time so freshness reflects the build date, not viewer's clock. */
+function computeFreshness(asOf: string | undefined): {
+  months: number;
+  label: string;
+} {
+  if (!asOf) return { months: -1, label: "Unknown" };
+  const now = new Date();
+  const parts = asOf.split("-").map(Number);
+  const date = new Date(parts[0], (parts[1] ?? 1) - 1, parts[2] ?? 1);
+  const months = Math.floor(
+    (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24 * 30.44),
+  );
+  if (months < 0) return { months, label: "Future" };
+  if (months < 1) return { months: 0, label: "< 1 month" };
+  if (months < 12) return { months, label: `${months}mo` };
+  const years = Math.floor(months / 12);
+  const rem = months % 12;
+  const label = rem > 0 ? `${years}y ${rem}mo` : `${years}y`;
+  return { months, label };
 }
 
 export function KBFactsExplorerContent() {
@@ -65,6 +103,15 @@ export function KBFactsExplorerContent() {
 
       const refNames = resolveRefDisplayNames(fact, entitiesById);
 
+      const completeness = [
+        fact.source,
+        fact.asOf,
+        fact.notes,
+        fact.sourceQuote,
+      ].filter(Boolean).length;
+
+      const freshness = computeFreshness(fact.asOf);
+
       rows.push({
         factId: fact.id,
         entityId: entity.id,
@@ -78,6 +125,19 @@ export function KBFactsExplorerContent() {
         asOf: formatKBDate(fact.asOf),
         source: fact.source ?? "",
         hasSource: !!fact.source,
+        valueType: fact.value.type,
+        notes: fact.notes ?? "",
+        sourceQuote: fact.sourceQuote ?? "",
+        validEnd: formatKBDate(fact.validEnd),
+        isCurrent: !fact.validEnd,
+        derivedFrom: fact.derivedFrom ?? "",
+        currency: fact.currency ?? "",
+        usdEquivalent: fact.usdEquivalent ?? null,
+        unit: property?.unit ?? "",
+        temporal: property?.temporal ?? false,
+        freshnessMonths: freshness.months,
+        freshnessLabel: freshness.label,
+        completenessScore: completeness,
       });
     }
   }
