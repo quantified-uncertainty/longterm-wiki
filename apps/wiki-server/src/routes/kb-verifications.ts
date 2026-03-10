@@ -80,36 +80,47 @@ const kbVerificationsApp = new Hono()
       conditions.push(eq(kbFactVerdicts.needsRecheck, needs_recheck));
     }
 
-    // For entity_id filtering, join with facts table
+    // For entity_id filtering, add a condition on the joined facts table
     if (entity_id) {
-      const factIdsResult = await db
-        .select({ factId: facts.factId })
-        .from(facts)
-        .where(eq(facts.entityId, entity_id));
-      const factIds = factIdsResult.map((r) => r.factId);
-      if (factIds.length === 0) {
-        return c.json({ verdicts: [], total: 0 });
-      }
-      conditions.push(
-        sql`${kbFactVerdicts.factId} = ANY(${factIds})`
-      );
+      conditions.push(eq(facts.entityId, entity_id));
     }
 
     const whereClause =
       conditions.length > 0 ? and(...conditions) : undefined;
 
+    // LEFT JOIN with facts to get entityId and label for each verdict
     const rows = await db
-      .select()
+      .select({
+        factId: kbFactVerdicts.factId,
+        verdict: kbFactVerdicts.verdict,
+        confidence: kbFactVerdicts.confidence,
+        reasoning: kbFactVerdicts.reasoning,
+        sourcesChecked: kbFactVerdicts.sourcesChecked,
+        needsRecheck: kbFactVerdicts.needsRecheck,
+        lastComputedAt: kbFactVerdicts.lastComputedAt,
+        createdAt: kbFactVerdicts.createdAt,
+        updatedAt: kbFactVerdicts.updatedAt,
+        entityId: facts.entityId,
+        factLabel: facts.label,
+      })
       .from(kbFactVerdicts)
+      .leftJoin(facts, eq(kbFactVerdicts.factId, facts.factId))
       .where(whereClause)
       .orderBy(desc(kbFactVerdicts.lastComputedAt))
       .limit(limit)
       .offset(offset);
 
-    const countResult = await db
+    // Count query — needs the LEFT JOIN when filtering by entity_id
+    const countBase = db
       .select({ count: count() })
-      .from(kbFactVerdicts)
-      .where(whereClause);
+      .from(kbFactVerdicts);
+    const countResult = entity_id
+      ? await db
+          .select({ count: count() })
+          .from(kbFactVerdicts)
+          .leftJoin(facts, eq(kbFactVerdicts.factId, facts.factId))
+          .where(whereClause)
+      : await countBase.where(whereClause);
     const total = countResult[0].count;
 
     return c.json({
@@ -123,6 +134,8 @@ const kbVerificationsApp = new Hono()
         lastComputedAt: r.lastComputedAt,
         createdAt: r.createdAt,
         updatedAt: r.updatedAt,
+        entityId: r.entityId,
+        factLabel: r.factLabel,
       })),
       total,
     });
