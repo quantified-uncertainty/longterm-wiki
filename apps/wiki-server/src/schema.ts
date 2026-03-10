@@ -1338,14 +1338,16 @@ export const kbFactVerifications = pgTable(
   "kb_fact_verifications",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    factId: text("fact_id").notNull(), // KB fact ID (e.g., f_i59sRXPSZw)
+    factId: text("fact_id").notNull(),
     resourceId: text("resource_id").references(() => resources.id, {
       onDelete: "set null",
     }),
     verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial
     confidence: real("confidence"), // 0.0 to 1.0
-    extractedValue: text("extracted_value"), // What the source actually says
-    checkerModel: text("checker_model"), // Which LLM checked this (e.g., claude-sonnet-4-6)
+    extractedValue: text("extracted_value"),
+    checkerModel: text("checker_model"),
+    contentHash: text("content_hash"), // SHA-256 prefix of source text at check time
+    isPrimarySource: boolean("is_primary_source").notNull().default(false),
     checkedAt: timestamp("checked_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1360,5 +1362,36 @@ export const kbFactVerifications = pgTable(
   (table) => [
     index("idx_kbfv_fact_id").on(table.factId),
     index("idx_kbfv_verdict").on(table.verdict),
+  ]
+);
+
+/**
+ * Aggregate per-fact verdicts — one row per fact, derived from verifications.
+ *
+ * Recomputed periodically from kb_fact_verifications. Separates evidence
+ * (per-resource checks) from conclusions (all-things-considered verdict).
+ */
+export const kbFactVerdicts = pgTable(
+  "kb_fact_verdicts",
+  {
+    factId: text("fact_id").primaryKey(),
+    verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial | unchecked
+    confidence: real("confidence"),
+    reasoning: text("reasoning"),
+    sourcesChecked: integer("sources_checked").notNull().default(0),
+    needsRecheck: boolean("needs_recheck").notNull().default(false),
+    lastComputedAt: timestamp("last_computed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_kbfv_verdicts_verdict").on(table.verdict),
+    index("idx_kbfv_verdicts_recheck").on(table.needsRecheck),
   ]
 );
