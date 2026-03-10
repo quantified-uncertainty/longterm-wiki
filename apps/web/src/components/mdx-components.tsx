@@ -243,6 +243,16 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   Tabs: MdxTabs,
   TabItem: MdxTabItem,
 
+  // Wrap markdown tables with overflow-x-auto to prevent horizontal page overflow
+  table: (props: React.ComponentProps<"table">) => (
+    <div className="overflow-x-auto">
+      <table {...props} />
+    </div>
+  ),
+
+  // Add scope="col" to th elements for accessibility
+  th: (props: React.ComponentProps<"th">) => <th scope="col" {...props} />,
+
   // Override sup to add rich tooltips on footnote superscripts
   sup: FootnoteSup,
 
