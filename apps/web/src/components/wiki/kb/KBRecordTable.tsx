@@ -1,5 +1,5 @@
 /**
- * KBItemTable — Record collection table for KB data.
+ * KBRecordTable — Record collection table for KB data.
  *
  * Server component that renders a record collection for a given entity
  * (e.g., funding rounds, key people). Uses the schema to determine field
@@ -7,8 +7,8 @@
  * for USD amounts, and formatted dates.
  *
  * Usage in MDX:
- *   <KBItemTable entity="anthropic" collection="funding-rounds" />
- *   <KBItemTable entity="anthropic" collection="key-persons" columns={["person", "title", "start", "is_founder"]} />
+ *   <KBRecordTable entity="anthropic" collection="funding-rounds" />
+ *   <KBRecordTable entity="anthropic" collection="key-persons" columns={["person", "title", "start", "is_founder"]} />
  */
 
 import {
@@ -25,7 +25,7 @@ import type { RecordEntry } from "@longterm-wiki/kb";
 import { titleCase } from "./format";
 import { KBCellValue } from "./KBCellValue";
 
-interface KBItemTableProps {
+interface KBRecordTableProps {
   /** KB thing ID (e.g., "anthropic") */
   entity: string;
   /** Collection name (e.g., "funding-rounds") */
@@ -50,12 +50,12 @@ function resolveColumns(items: RecordEntry[], columns?: string[]): string[] {
   return Array.from(seen);
 }
 
-export function KBItemTable({
+export function KBRecordTable({
   entity,
   collection,
   title,
   columns,
-}: KBItemTableProps) {
+}: KBRecordTableProps) {
   const items = getKBRecords(entity, collection);
   const heading = title ?? titleCase(collection);
 

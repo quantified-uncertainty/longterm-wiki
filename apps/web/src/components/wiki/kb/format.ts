@@ -121,7 +121,7 @@ export function formatKBFactValue(
   }
 }
 
-// ── Item cell formatting ───────────────────────────────────────────
+// ── Record cell formatting ─────────────────────────────────────────
 
 /**
  * Format a cell value from an item collection, using the field definition
@@ -167,10 +167,10 @@ export function formatKBCellValue(
   return String(value);
 }
 
-// ── Item sorting ───────────────────────────────────────────────────
+// ── Record sorting ─────────────────────────────────────────────────
 
 /** Sort record collection entries by a field value, ascending or descending. */
-export function sortKBItems(
+export function sortKBRecords(
   items: RecordEntry[],
   sortBy: string,
   ascending: boolean,

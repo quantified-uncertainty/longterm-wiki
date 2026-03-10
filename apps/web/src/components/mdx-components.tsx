@@ -19,12 +19,12 @@ import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 import { OverviewBanner } from "@/components/wiki/OverviewBanner";
 import { AnthropicStakeholdersTable } from "@/components/wiki/AnthropicStakeholdersTable";
 
-// KB (Knowledge Base) components — typed facts, properties, items
+// KB (Knowledge Base) components — typed facts, properties, records
 import { KBFactTable } from "@/components/wiki/kb/KBFactTable";
-import { KBItemTable } from "@/components/wiki/kb/KBItemTable";
+import { KBRecordTable } from "@/components/wiki/kb/KBRecordTable";
 import { KBFactValue } from "@/components/wiki/kb/KBFactValue";
 import { KBEntityFacts } from "@/components/wiki/kb/KBEntityFacts";
-import { KBItemCollection } from "@/components/wiki/kb/KBItemCollection";
+import { KBRecordCollection } from "@/components/wiki/kb/KBRecordCollection";
 import { KBEntitySidebar } from "@/components/wiki/kb/KBEntitySidebar";
 import { KBRefLink } from "@/components/wiki/kb/KBRefLink";
 import { KBCompareTable } from "@/components/wiki/kb/KBCompareTable";
@@ -49,7 +49,7 @@ import { KBOverviewContent } from "@/app/kb/kb-overview-content";
 import { KBFactsExplorerContent } from "@/app/kb/kb-facts-content";
 import { KBPropertiesExplorerContent } from "@/app/kb/kb-properties-content";
 import { KBEntityCoverageContent } from "@/app/kb/kb-entities-content";
-import { KBItemsExplorerContent } from "@/app/kb/kb-items-content";
+import { KBRecordsExplorerContent } from "@/app/kb/kb-records-content";
 import { KBResourcesContent } from "@/app/kb/kb-resources-content";
 import { KBPublicationsContent } from "@/app/kb/kb-publications-content";
 
@@ -177,12 +177,12 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   // Anthropic-specific table
   AnthropicStakeholdersTable,
 
-  // KB (Knowledge Base) — typed facts, item collections, entity data
+  // KB (Knowledge Base) — typed facts, record collections, entity data
   KBFactTable,
-  KBItemTable,
+  KBRecordTable,
   KBFactValue,
   KBEntityFacts,
-  KBItemCollection,
+  KBRecordCollection,
   KBEntitySidebar,
   KBRefLink,
   KBCompareTable,
@@ -195,7 +195,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   KBFactsExplorerContent,
   KBPropertiesExplorerContent,
   KBEntityCoverageContent,
-  KBItemsExplorerContent,
+  KBRecordsExplorerContent,
   KBResourcesContent,
   KBPublicationsContent,
 

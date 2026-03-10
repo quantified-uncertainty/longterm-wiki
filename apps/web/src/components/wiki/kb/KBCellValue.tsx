@@ -1,7 +1,7 @@
 /**
  * KBCellValue — Shared cell value renderer for KB table components.
  *
- * Used by both KBItemTable and KBItemCollection to render type-aware cell values
+ * Used by both KBRecordTable and KBRecordCollection to render type-aware cell values
  * with consistent formatting. Supports refs, URLs, numbers, dates, and booleans.
  */
 

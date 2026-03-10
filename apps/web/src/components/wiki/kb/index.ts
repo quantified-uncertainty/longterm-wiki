@@ -1,8 +1,8 @@
 export { KBFactTable } from "./KBFactTable";
-export { KBItemTable } from "./KBItemTable";
+export { KBRecordTable } from "./KBRecordTable";
 export { KBFactValue } from "./KBFactValue";
 export { KBEntityFacts } from "./KBEntityFacts";
-export { KBItemCollection } from "./KBItemCollection";
+export { KBRecordCollection } from "./KBRecordCollection";
 export { KBEntitySidebar } from "./KBEntitySidebar";
 export { KBRefLink } from "./KBRefLink";
 export { KBAutoFacts } from "./KBAutoFacts";

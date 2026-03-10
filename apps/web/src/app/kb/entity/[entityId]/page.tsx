@@ -166,7 +166,7 @@ export default async function KBEntityPage({
     return (pA?.name ?? a).localeCompare(pB?.name ?? b);
   });
 
-  const totalItems = Object.values(recordCollections).reduce(
+  const totalRecords = Object.values(recordCollections).reduce(
     (sum, entries) => sum + entries.length,
     0,
   );
@@ -269,10 +269,10 @@ export default async function KBEntityPage({
                     label="Total Facts"
                     value={`${structuredFacts.length} structured facts${allFacts.length !== structuredFacts.length ? ` (${allFacts.length} total incl. description)` : ""}`}
                   />
-                  {totalItems > 0 && (
+                  {totalRecords > 0 && (
                     <MetaRow
-                      label="Total Items"
-                      value={`${totalItems} items in ${totalCollections} collection${totalCollections !== 1 ? "s" : ""}`}
+                      label="Total Records"
+                      value={`${totalRecords} records in ${totalCollections} collection${totalCollections !== 1 ? "s" : ""}`}
                     />
                   )}
                 </tbody>
@@ -402,13 +402,13 @@ export default async function KBEntityPage({
                       : [...allFieldNames];
 
                     return (
-                      <details key={collectionName} id={`items-${collectionName}`} className="group scroll-mt-16">
+                      <details key={collectionName} id={`records-${collectionName}`} className="group scroll-mt-16">
                         <summary className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-muted/50 text-sm select-none border border-border rounded-lg">
                           <span className="font-medium">
                             {titleCase(collectionName)}
                           </span>
                           <span className="text-muted-foreground text-xs">
-                            {items.length} item
+                            {items.length} record
                             {items.length !== 1 ? "s" : ""}
                           </span>
                           <span className="ml-auto text-muted-foreground text-xs group-open:rotate-90 transition-transform">
@@ -438,7 +438,7 @@ export default async function KBEntityPage({
                                 <tr key={item.key}>
                                   <td className="py-1.5 px-3 font-mono text-xs">
                                     <Link
-                                      href={`/kb/item/${item.key}`}
+                                      href={`/kb/record/${item.key}`}
                                       className="text-blue-600 hover:underline dark:text-blue-400"
                                     >
                                       {item.key}

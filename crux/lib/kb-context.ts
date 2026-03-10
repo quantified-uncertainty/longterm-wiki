@@ -131,7 +131,7 @@ export async function buildKbContextForPage(
   const collections = graph.getRecordCollectionNames(entity.id);
   if (collections.length > 0) {
     lines.push('');
-    lines.push(`Record collections: ${collections.join(', ')} (use <KBF> or <KBItemCollection> to render)`);
+    lines.push(`Record collections: ${collections.join(', ')} (use <KBF> or <KBRecordCollection> to render)`);
   }
 
   return lines.join('\n');
