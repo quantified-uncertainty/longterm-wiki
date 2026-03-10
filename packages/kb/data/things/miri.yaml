@@ -82,43 +82,39 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/582565917
     notes: "Revenue spike partly due to Vitalik Buterin Ethereum donation"
 
-items:
-  key-people:
-    type: key-person
-    entries:
-      i_XVLjPAQXky:
-        person: !ref fS1tEGKuNq:eliezer-yudkowsky
-        title: "Founder & Senior Research Fellow"
-        start: 2000-01
-        is_founder: true
-        source: https://intelligence.org/about/
-        notes: "Founded MIRI (as SIAI) in 2000; transitioned to Senior Research Fellow role"
+records:
+  key-persons:
+    eliezer-yudkowsky:
+      person: eliezer-yudkowsky
+      title: "Founder & Senior Research Fellow"
+      start: "2000-01"
+      is_founder: true
+      source: https://intelligence.org/about/
+      notes: "Founded MIRI (as SIAI) in 2000; transitioned to Senior Research Fellow role"
 
-      i_ZJ54jX7Ppq:
-        person: nate-soares
-        title: "President"
-        start: 2015-05
-        source: https://intelligence.org/about/
-        notes: "Initially Executive Director (2015-2023); transitioned to President role"
+    nate-soares:
+      person: nate-soares
+      title: "President"
+      start: "2015-05"
+      source: https://intelligence.org/about/
+      notes: "Initially Executive Director (2015-2023); transitioned to President role"
 
-      i_mBceo2024:
-        person: malo-bourgon
-        title: "CEO"
-        start: 2023-01
-        source: https://intelligence.org/about/
-        notes: "Became CEO as MIRI restructured leadership"
+    malo-bourgon:
+      person: malo-bourgon
+      title: "CEO"
+      start: "2023-01"
+      source: https://intelligence.org/about/
+      notes: "Became CEO as MIRI restructured leadership"
 
   research-areas:
-    type: research-area
-    entries:
-      i_w1EXpcMmLN:
-        name: Agent Foundations
-        description: "Mathematical foundations of goal-directed AI systems"
-        started: 2014-01
-        notes: "Core research program focused on logical uncertainty, decision theory, and Vingean reflection"
+    agent-foundations:
+      name: Agent Foundations
+      description: "Mathematical foundations of goal-directed AI systems"
+      started: "2014-01"
+      notes: "Core research program focused on logical uncertainty, decision theory, and Vingean reflection"
 
-      i_6z7IpVMRRT:
-        name: Alignment Theory
-        description: "Theoretical approaches to ensuring advanced AI systems are aligned with human values"
-        started: 2000-01
-        notes: "MIRI's founding research focus; published extensively on corrigibility and value alignment"
+    alignment-theory:
+      name: Alignment Theory
+      description: "Theoretical approaches to ensuring advanced AI systems are aligned with human values"
+      started: "2000-01"
+      notes: "MIRI's founding research focus; published extensively on corrigibility and value alignment"

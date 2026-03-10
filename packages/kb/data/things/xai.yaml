@@ -148,137 +148,127 @@ facts:
     value: "~3M sexualized images generated in 10 days during deepfake scandal (Dec 2025-Jan 2026)"
     source: https://www.nbcnews.com/tech/internet/x-paywall-ai-image-grok-app-bikini-allows-sexual-deepfakes-rcna252647
 
-items:
+records:
   funding-rounds:
-    type: funding-round
-    entries:
-      i_U3IQcbcouw:
-        name: "Series B"
-        date: 2024-05
-        amount: 6e9
-        valuation: 24e9
-        source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-raises-6-bln-series-b-round-2024-05-27/
-        notes: "Led by Andreessen Horowitz, Sequoia Capital, and others; valued at $24B pre-money"
+    series-b:
+      name: "Series B"
+      date: "2024-05"
+      raised: 6e9
+      valuation: 24e9
+      source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-raises-6-bln-series-b-round-2024-05-27/
+      notes: "Led by Andreessen Horowitz, Sequoia Capital, and others; valued at $24B pre-money"
 
-      i_Eh90tSjmBw:
-        name: "Series C"
-        date: 2024-12
-        amount: 6e9
-        valuation: 50e9
-        source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-closes-6-bln-funding-round-2024-12-24/
-        notes: "Closed December 2024; investors include Andreessen Horowitz, BlackRock, Fidelity, Kingdom Holding, Sequoia, and others"
+    series-c:
+      name: "Series C"
+      date: "2024-12"
+      raised: 6e9
+      valuation: 50e9
+      source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-closes-6-bln-funding-round-2024-12-24/
+      notes: "Closed December 2024; investors include Andreessen Horowitz, BlackRock, Fidelity, Kingdom Holding, Sequoia, and others"
 
-      i_xai_series_e:
-        name: "Series E"
-        date: 2026-01
-        amount: 20e9
-        valuation: 230e9
-        source: https://x.ai/news/series-e
-        notes: "Series E round; brought total funding to over $26B"
+    series-e:
+      name: "Series E"
+      date: "2026-01"
+      raised: 20e9
+      valuation: 230e9
+      source: https://x.ai/news/series-e
+      notes: "Series E round; brought total funding to over $26B"
 
-  key-people:
-    type: key-person
-    entries:
-      i_5Vvzf1r8RA:
-        person: !ref 69vftmr1jg:elon-musk
-        title: "CEO & Founder"
-        start: 2023-03
-        is_founder: true
-        source: https://x.ai/about
-        notes: "Also CEO of Tesla, SpaceX; owner of X (Twitter); former OpenAI co-founder and board member"
+  key-persons:
+    elon-musk:
+      person: elon-musk
+      title: "CEO & Founder"
+      start: "2023-03"
+      is_founder: true
+      source: https://x.ai/about
+      notes: "Also CEO of Tesla, SpaceX; owner of X (Twitter); former OpenAI co-founder and board member"
 
-      i_kec2HrrLJA:
-        person: igor-babuschkin
-        title: "Co-founder"
-        start: 2023-03
-        is_founder: true
-        notes: "Former DeepMind researcher; early engineering lead at xAI"
+    igor-babuschkin:
+      person: igor-babuschkin
+      title: "Co-founder"
+      start: "2023-03"
+      is_founder: true
+      notes: "Former DeepMind researcher; early engineering lead at xAI"
 
-      i_tvj6Dy1U8g:
-        person: jimmy-ba
-        title: "Co-founder"
-        start: 2023-03
-        is_founder: true
-        notes: "University of Toronto professor; co-inventor of Adam optimizer and Layer Normalization"
+    jimmy-ba:
+      person: jimmy-ba
+      title: "Co-founder"
+      start: "2023-03"
+      is_founder: true
+      notes: "University of Toronto professor; co-inventor of Adam optimizer and Layer Normalization"
 
-      i_2er9OKcIxA:
-        person: greg-yang
-        title: "Co-founder"
-        start: 2023-03
-        is_founder: true
-        notes: "Former Microsoft Research; developed Tensor Programs / muP theory for neural network scaling"
+    greg-yang:
+      person: greg-yang
+      title: "Co-founder"
+      start: "2023-03"
+      is_founder: true
+      notes: "Former Microsoft Research; developed Tensor Programs / muP theory for neural network scaling"
 
-      i_nIEC73V2gQ:
-        person: toby-pohlen
-        title: "Co-founder"
-        start: 2023-03
-        is_founder: true
-        notes: "Former DeepMind researcher"
+    toby-pohlen:
+      person: toby-pohlen
+      title: "Co-founder"
+      start: "2023-03"
+      is_founder: true
+      notes: "Former DeepMind researcher"
 
   model-releases:
-    type: model-release
-    entries:
-      i_mwFKxzobhw:
-        name: Grok-1
-        released: 2023-11
-        description: "First xAI model; 314B parameter mixture-of-experts; open-sourced March 2024"
-        source: https://x.ai/blog/grok
-        notes: "Integrated into X (Twitter) platform; open-sourced weights under Apache 2.0 license"
+    grok-1:
+      name: Grok-1
+      released: "2023-11"
+      description: "First xAI model; 314B parameter mixture-of-experts; open-sourced March 2024"
+      source: https://x.ai/blog/grok
+      notes: "Integrated into X (Twitter) platform; open-sourced weights under Apache 2.0 license"
 
-      i_dUAYvkVLPQ:
-        name: Grok-2
-        released: 2024-08
-        description: "Major capability upgrade; competitive with GPT-4 and Claude 3.5 Sonnet on benchmarks"
-        source: https://x.ai/blog/grok-2
-        notes: "Available through X Premium+ subscription and xAI API"
+    grok-2:
+      name: Grok-2
+      released: "2024-08"
+      description: "Major capability upgrade; competitive with GPT-4 and Claude 3.5 Sonnet on benchmarks"
+      source: https://x.ai/blog/grok-2
+      notes: "Available through X Premium+ subscription and xAI API"
 
-      i_0sE5wuHWjw:
-        name: Grok-3
-        released: 2025-02
-        description: "Trained on Colossus supercluster (200K H100 GPUs); significant reasoning improvements"
-        source: https://x.ai/blog/grok-3
-        notes: "Claimed top scores on several math and coding benchmarks at launch"
+    grok-3:
+      name: Grok-3
+      released: "2025-02"
+      description: "Trained on Colossus supercluster (200K H100 GPUs); significant reasoning improvements"
+      source: https://x.ai/blog/grok-3
+      notes: "Claimed top scores on several math and coding benchmarks at launch"
 
   research-areas:
-    type: research-area
-    entries:
-      i_Y7w8DPtfog:
-        name: Large-Scale Training Infrastructure
-        description: "Building and operating massive GPU clusters for frontier model training"
-        started: 2023-07
-        notes: "Colossus cluster in Memphis with 200K H100 GPUs; one of the largest single training clusters globally"
+    large-scale-training-infrastructure:
+      name: Large-Scale Training Infrastructure
+      description: "Building and operating massive GPU clusters for frontier model training"
+      started: "2023-07"
+      notes: "Colossus cluster in Memphis with 200K H100 GPUs; one of the largest single training clusters globally"
 
-      i_gsmelgkpAw:
-        name: Reasoning and Problem Solving
-        description: "Improving AI reasoning capabilities in mathematics, coding, and scientific domains"
-        started: 2023-07
-        notes: "Focus on chain-of-thought and multi-step reasoning; Grok-3 emphasized reasoning benchmarks"
+    reasoning-and-problem-solving:
+      name: Reasoning and Problem Solving
+      description: "Improving AI reasoning capabilities in mathematics, coding, and scientific domains"
+      started: "2023-07"
+      notes: "Focus on chain-of-thought and multi-step reasoning; Grok-3 emphasized reasoning benchmarks"
 
-      i_ribf7dlwsA:
-        name: Real-Time Information Integration
-        description: "Integrating live data from X platform and web into AI responses"
-        started: 2023-11
-        notes: "Unique advantage from X (Twitter) data access; real-time news and social media integration"
+    real-time-information-integration:
+      name: Real-Time Information Integration
+      description: "Integrating live data from X platform and web into AI responses"
+      started: "2023-11"
+      notes: "Unique advantage from X (Twitter) data access; real-time news and social media integration"
 
   strategic-partnerships:
-    type: strategic-partnership
-    entries:
-      i_QA3rV7Rf7w:
-        partner: X (Twitter)
-        type: distribution + data
-        date: 2023-11
-        source: https://x.ai/blog/grok
-        notes: "Grok integrated into X platform for Premium+ subscribers; access to X data for training"
+    i_QA3rV7Rf7w:
+      partner: X (Twitter)
+      type: distribution + data
+      date: "2023-11"
+      source: https://x.ai/blog/grok
+      notes: "Grok integrated into X platform for Premium+ subscribers; access to X data for training"
 
-      i_t8JrParM9w:
-        partner: Oracle Cloud
-        type: cloud
-        date: 2024-06
-        source: https://www.oracle.com/news/announcement/oracle-xai-partnership-2024/
-        notes: "Oracle Cloud infrastructure partnership for additional compute capacity beyond Colossus"
+    i_t8JrParM9w:
+      partner: Oracle Cloud
+      type: cloud
+      date: "2024-06"
+      source: https://www.oracle.com/news/announcement/oracle-xai-partnership-2024/
+      notes: "Oracle Cloud infrastructure partnership for additional compute capacity beyond Colossus"
 
-      i_1LQjsDLebw:
-        partner: Nvidia
-        type: compute
-        date: 2024-01
-        notes: "Major Nvidia GPU customer; 200K H100 GPUs for Colossus cluster; among the largest single orders"
+    i_1LQjsDLebw:
+      partner: Nvidia
+      type: compute
+      date: "2024-01"
+      notes: "Major Nvidia GPU customer; 200K H100 GPUs for Colossus cluster; among the largest single orders"

@@ -31,26 +31,22 @@ facts:
       - !ref vzxfzxBITd:paul-christiano
     source: https://alignment.org/
 
-items:
-  key-people:
-    type: key-person
-    entries:
-      i_6mcYQLF7nq:
-        person: !ref vzxfzxBITd:paul-christiano
-        title: "Founder & Head of Research"
-        start: 2021-10
-        is_founder: true
-        source: https://alignment.org/
-        notes: "Founded ARC after leaving OpenAI; stepped back from day-to-day role in 2023"
+records:
+  key-persons:
+    paul-christiano:
+      person: paul-christiano
+      title: "Founder & Head of Research"
+      start: "2021-10"
+      is_founder: true
+      source: https://alignment.org/
+      notes: "Founded ARC after leaving OpenAI; stepped back from day-to-day role in 2023"
 
   research-areas:
-    type: research-area
-    entries:
-      i_R6wEuK4j5Z:
-        name: Eliciting Latent Knowledge (ELK)
-        description: "Research on extracting truthful knowledge from AI models regardless of learned deceptive behaviors"
-        started: 2021-12
-        key-publication: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
-        notes: "Seminal ELK report posed as a prize problem; attracted significant community engagement"
+    eliciting-latent-knowledge-elk:
+      name: Eliciting Latent Knowledge (ELK)
+      description: "Research on extracting truthful knowledge from AI models regardless of learned deceptive behaviors"
+      started: "2021-12"
+      key-publication: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
+      notes: "Seminal ELK report posed as a prize problem; attracted significant community engagement"
 
 

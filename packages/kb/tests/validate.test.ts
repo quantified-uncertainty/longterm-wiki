@@ -92,19 +92,15 @@ describe("validate", () => {
   });
 
   describe("item-collection-schema validation", () => {
-    it("validates item entries against schema", () => {
+    it("produces no item-collection-schema results for records-migrated entities", () => {
+      // Anthropic has been migrated from items: to records: format.
+      // The item-collection-schema validator only checks getItems(), not getRecords(),
+      // so migrated entities should produce no item-collection-schema results.
       const results = validateEntity(graph, "anthropic");
       const itemResults = results.filter(
         (r) => r.rule === "item-collection-schema"
       );
-      // The anthropic data has funding-round entries with lead_investor referencing
-      // entities not in our test graph (ftx, amazon, google, gic, jaan-tallinn).
-      // These should produce type warnings since they reference non-existent entities.
-      const refWarnings = itemResults.filter(
-        (r) =>
-          r.severity === "warning" && r.message.includes("unknown entity")
-      );
-      expect(refWarnings.length).toBeGreaterThan(0);
+      expect(itemResults).toHaveLength(0);
     });
 
     it("does not report errors for required fields that are present", () => {
@@ -118,21 +114,6 @@ describe("validate", () => {
           r.message.includes("missing required field")
       );
       expect(requiredFieldErrors).toHaveLength(0);
-    });
-
-    it("validates key-people person refs against the graph", () => {
-      const results = validateEntity(graph, "anthropic");
-      const itemResults = results.filter(
-        (r) =>
-          r.rule === "item-collection-schema" &&
-          r.message.includes("key-people")
-      );
-      // Some key-people reference persons not in the graph
-      // (daniela-amodei, chris-olah, tom-brown, mike-krieger, holden-karnofsky)
-      const unknownPeople = itemResults.filter(
-        (r) => r.message.includes("unknown entity")
-      );
-      expect(unknownPeople.length).toBeGreaterThan(0);
     });
   });
 
@@ -549,7 +530,7 @@ describe("validate", () => {
     it("warns when most recent temporal fact is >2 years old", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
-      g.addProperty({ id: "revenue", name: "Revenue", dataType: "number", temporal: true });
+      g.addProperty({ id: "revenue", name: "Revenue", dataType: "number", temporal: true, category: "financial" });
       g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
       g.addFact({ id: "f_old", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 100 }, asOf: "2020-01" });
 

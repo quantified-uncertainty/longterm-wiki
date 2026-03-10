@@ -145,105 +145,101 @@ facts:
     property: description
     value: "75% of co-founders departed within 9 years of founding (by 2024)"
 
-items:
+records:
   funding-rounds:
-    type: funding-round
-    entries:
-      i_r5HaOs6mXg:
-        name: "Founding"
-        date: 2015-12
-        amount: 1e9
-        notes: "Initial $1B commitment from founders and backers including Elon Musk, Sam Altman, Peter Thiel, Reid Hoffman, Jessica Livingston"
-        source: https://openai.com/blog/introducing-openai
+    founding:
+      name: "Founding"
+      date: "2015-12"
+      raised: 1e9
+      notes: "Initial $1B commitment from founders and backers including Elon Musk, Sam Altman, Peter Thiel, Reid Hoffman, Jessica Livingston"
+      source: https://openai.com/blog/introducing-openai
 
-      i_RHwgHUtkcw:
-        name: "Microsoft Investment"
-        date: 2019-07
-        amount: 1e9
-        lead_investor: microsoft
-        source: https://openai.com/blog/microsoft
-        notes: "Microsoft's initial $1B investment; coincided with creation of capped-profit entity OpenAI LP"
+    microsoft-investment:
+      name: "Microsoft Investment"
+      date: "2019-07"
+      raised: 1e9
+      lead_investor: microsoft
+      source: https://openai.com/blog/microsoft
+      notes: "Microsoft's initial $1B investment; coincided with creation of capped-profit entity OpenAI LP"
 
-      i_Jghs4gXSnw:
-        name: "Microsoft Extension"
-        date: 2023-01
-        amount: 10e9
-        lead_investor: microsoft
-        source: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
-        notes: "Microsoft's multi-year, multi-billion dollar investment reported at ~$10B; brought total Microsoft commitment to ~$13B"
+    microsoft-extension:
+      name: "Microsoft Extension"
+      date: "2023-01"
+      raised: 10e9
+      lead_investor: microsoft
+      source: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
+      notes: "Microsoft's multi-year, multi-billion dollar investment reported at ~$10B; brought total Microsoft commitment to ~$13B"
 
-      i_eTZe3xfv0w:
-        name: "Growth Round"
-        date: 2024-10
-        amount: 6.6e9
-        valuation: 157e9
-        lead_investor: thrive-capital
-        source: https://www.wsj.com/tech/ai/openai-completes-6-6-billion-funding-round-e16ffab4
-        notes: "Led by Thrive Capital; investors included Microsoft, NVIDIA, SoftBank, and others"
+    growth-round:
+      name: "Growth Round"
+      date: "2024-10"
+      raised: 6.6e9
+      valuation: 157e9
+      lead_investor: thrive-capital
+      source: https://www.wsj.com/tech/ai/openai-completes-6-6-billion-funding-round-e16ffab4
+      notes: "Led by Thrive Capital; investors included Microsoft, NVIDIA, SoftBank, and others"
 
-  key-people:
-    type: key-person
-    entries:
-      i_ehqVPXPsgg:
-        person: !ref JKsVHQ5stQ:sam-altman
-        title: CEO
-        start: 2019-03
-        is_founder: true
-        source: https://openai.com/about
-        notes: "Co-chairman from founding (2015); became CEO when OpenAI LP was created in 2019. Briefly fired and reinstated in November 2023."
+  key-persons:
+    sam-altman:
+      person: sam-altman
+      title: CEO
+      start: "2019-03"
+      is_founder: true
+      source: https://openai.com/about
+      notes: "Co-chairman from founding (2015); became CEO when OpenAI LP was created in 2019. Briefly fired and reinstated in November 2023."
 
-      i_g3658QZeaA:
-        person: !ref eYrBgMLJDw:ilya-sutskever
-        title: "Co-founder & Chief Scientist"
-        start: 2015-12
-        end: 2024-06
-        is_founder: true
-        source: https://openai.com/blog/introducing-openai
-        notes: "Left OpenAI in June 2024 to found Safe Superintelligence Inc (SSI)"
+    ilya-sutskever:
+      person: ilya-sutskever
+      title: "Co-founder & Chief Scientist"
+      start: "2015-12"
+      end: "2024-06"
+      is_founder: true
+      source: https://openai.com/blog/introducing-openai
+      notes: "Left OpenAI in June 2024 to found Safe Superintelligence Inc (SSI)"
 
-      i_zhIYVQlAcQ:
-        person: !ref Yq4s2cI7ng:greg-brockman
-        title: President
-        start: 2015-12
-        end: 2024-08
-        is_founder: true
-        notes: "Co-founder and president; took leave of absence in August 2024"
+    greg-brockman:
+      person: greg-brockman
+      title: President
+      start: "2015-12"
+      end: "2024-08"
+      is_founder: true
+      notes: "Co-founder and president; took leave of absence in August 2024"
 
-      i_G3hMEl1Smg:
-        person: mira-murati
-        title: CTO
-        start: "2018"
-        end: 2024-09
-        source: https://openai.com/about
-        notes: "Served as interim CEO during Sam Altman's brief ousting in November 2023; departed September 2024"
+    mira-murati:
+      person: mira-murati
+      title: CTO
+      start: "2018"
+      end: "2024-09"
+      source: https://openai.com/about
+      notes: "Served as interim CEO during Sam Altman's brief ousting in November 2023; departed September 2024"
 
-      i_dfRtbbZ86w:
-        person: !ref hQ7mR2kN5p:jan-leike
-        title: "Co-lead, Superalignment"
-        start: 2023-07
-        end: 2024-05
-        source: https://openai.com/blog/introducing-superalignment
-        notes: "Co-led Superalignment team from its founding in July 2023; resigned May 2024 citing safety concerns, joined Anthropic"
+    jan-leike:
+      person: jan-leike
+      title: "Co-lead, Superalignment"
+      start: "2023-07"
+      end: "2024-05"
+      source: https://openai.com/blog/introducing-superalignment
+      notes: "Co-led Superalignment team from its founding in July 2023; resigned May 2024 citing safety concerns, joined Anthropic"
 
-      i_n2EXWPmoaw:
-        person: !ref 69vftmr1jg:elon-musk
-        title: "Co-chairman (board)"
-        start: 2015-12
-        end: 2018-02
-        is_founder: true
-        notes: "Left the board in February 2018; later sued OpenAI alleging breach of founding agreement"
+    elon-musk:
+      person: elon-musk
+      title: "Co-chairman (board)"
+      start: "2015-12"
+      end: "2018-02"
+      is_founder: true
+      notes: "Left the board in February 2018; later sued OpenAI alleging breach of founding agreement"
 
-      i_G6F08BW94g:
-        person: john-schulman
-        title: "Co-founder, Research"
-        start: 2015-12
-        end: 2024-08
-        is_founder: true
-        notes: "Key contributor to RLHF and PPO; departed August 2024 to join Anthropic"
+    john-schulman:
+      person: john-schulman
+      title: "Co-founder, Research"
+      start: "2015-12"
+      end: "2024-08"
+      is_founder: true
+      notes: "Key contributor to RLHF and PPO; departed August 2024 to join Anthropic"
 
-      i_eGGLFokWkw:
-        person: wojciech-zaremba
-        title: "Co-founder, VP of Research"
-        start: 2015-12
-        is_founder: true
-        notes: "Leads codegen research; one of the few remaining co-founders as of 2025"
+    wojciech-zaremba:
+      person: wojciech-zaremba
+      title: "Co-founder, VP of Research"
+      start: "2015-12"
+      is_founder: true
+      notes: "Leads codegen research; one of the few remaining co-founders as of 2025"
