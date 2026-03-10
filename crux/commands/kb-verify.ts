@@ -133,13 +133,25 @@ async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
       host === 'localhost' ||
       host === '127.0.0.1' ||
       host === '[::1]' ||
+      host === '::1' ||
       host === '0.0.0.0' ||
+      host === '[::]' ||
+      host === '::' ||
       host.endsWith('.local') ||
       host.endsWith('.internal') ||
+      // IPv4 private ranges
       /^10\./.test(host) ||
       /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
       /^192\.168\./.test(host) ||
-      /^169\.254\./.test(host)
+      /^169\.254\./.test(host) ||
+      // IPv6 private/reserved ranges
+      /^fe80:/i.test(host) ||          // link-local
+      /^f[cd]/i.test(host) ||          // unique local (fc00::/7)
+      /^::ffff:127\./i.test(host) ||   // IPv4-mapped loopback
+      /^::ffff:10\./i.test(host) ||    // IPv4-mapped private
+      /^::ffff:192\.168\./i.test(host) || // IPv4-mapped private
+      /^::ffff:172\.(1[6-9]|2\d|3[01])\./i.test(host) || // IPv4-mapped private
+      /^::ffff:169\.254\./i.test(host) // IPv4-mapped link-local
     ) {
       console.warn(`[kb-verify] Blocking private/internal URL: ${url}`);
       return { content: null, errorType: 'access_denied', errorMessage: 'Private/internal host blocked' };
