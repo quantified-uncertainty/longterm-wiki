@@ -29,7 +29,7 @@ export interface PublicationDataRow {
   id: string;
   name: string;
   type: string;
-  credibility: number;
+  credibility: number | null;
   peerReviewed: boolean;
   resourceCount: number;
   pageCount: number;
@@ -112,9 +112,12 @@ function makeColumns(): ColumnDef<PublicationDataRow>[] {
       header: ({ column }) => (
         <SortableHeader column={column}>Credibility</SortableHeader>
       ),
-      cell: ({ row }) => (
-        <CredibilityBadge level={row.original.credibility} size="sm" showLabel />
-      ),
+      cell: ({ row }) => {
+        const c = row.original.credibility;
+        if (c == null) return <span className="text-muted-foreground/40 text-xs">-</span>;
+        return <CredibilityBadge level={c} size="sm" showLabel />;
+      },
+      sortUndefined: "last",
     },
     {
       accessorKey: "peerReviewed",

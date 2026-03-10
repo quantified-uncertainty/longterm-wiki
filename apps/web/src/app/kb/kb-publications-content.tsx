@@ -22,7 +22,7 @@ export function KBPublicationsContent() {
       id: pub.id,
       name: pub.name,
       type: pub.type,
-      credibility: pub.credibility,
+      credibility: pub.credibility ?? null,
       peerReviewed: pub.peer_reviewed ?? false,
       resourceCount: resources.length,
       pageCount: pageSet.size,
@@ -31,10 +31,11 @@ export function KBPublicationsContent() {
 
   const totalResources = rows.reduce((s, r) => s + r.resourceCount, 0);
   const peerReviewedCount = rows.filter((r) => r.peerReviewed).length;
+  const withCredibility = rows.filter((r) => r.credibility != null);
   const avgCredibility =
-    rows.length > 0
-      ? (rows.reduce((s, r) => s + r.credibility, 0) / rows.length).toFixed(1)
-      : "0";
+    withCredibility.length > 0
+      ? (withCredibility.reduce((s, r) => s + r.credibility!, 0) / withCredibility.length).toFixed(1)
+      : "-";
 
   return (
     <>

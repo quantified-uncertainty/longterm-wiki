@@ -28,6 +28,14 @@ const FACT_FOOTNOTE_RE = /\[\^fact:([a-zA-Z0-9_]+)\](?!:)/g;
 export type FactLookupFn = (factId: string) => Fact | undefined;
 
 /**
+ * Escape Markdown special characters in source quotes to prevent them from
+ * being interpreted as formatting. Characters escaped: \ * ` _ [ ]
+ */
+export function escapeMarkdownInQuote(text: string): string {
+  return text.replace(/([\\*`_\[\]])/g, "\\$1");
+}
+
+/**
  * Escape `<` characters that could trigger JSX/HTML parsing in MDX footnote
  * definitions. Reuses the same logic as the reference preprocessor.
  */
@@ -56,7 +64,7 @@ export function buildFactFootnoteDefinition(fact: Fact): string {
   }
 
   if (fact.sourceQuote) {
-    parts.push(`*"${fact.sourceQuote}"*`);
+    parts.push(`*"${escapeMarkdownInQuote(fact.sourceQuote)}"*`);
   }
 
   if (fact.asOf) {
