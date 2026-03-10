@@ -31,15 +31,43 @@ function VerdictBadge({ verdict }: { verdict: string }) {
 
 const columns: ColumnDef<VerdictRow>[] = [
   {
+    accessorKey: "entityId",
+    header: ({ column }) => (
+      <SortableHeader column={column}>Entity</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const entityId = row.original.entityId;
+      if (!entityId) return <span className="text-xs text-muted-foreground">-</span>;
+      return (
+        <a
+          href={`/wiki/${entityId}`}
+          className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
+        >
+          {entityId}
+        </a>
+      );
+    },
+    filterFn: "includesString",
+  },
+  {
     accessorKey: "factId",
     header: ({ column }) => (
-      <SortableHeader column={column}>Fact ID</SortableHeader>
+      <SortableHeader column={column}>Fact</SortableHeader>
     ),
-    cell: ({ row }) => (
-      <span className="text-xs font-mono text-muted-foreground">
-        {row.original.factId}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const label = row.original.factLabel;
+      const factId = row.original.factId;
+      return (
+        <div className="flex flex-col gap-0.5">
+          {label && (
+            <span className="text-xs font-medium text-foreground">{label}</span>
+          )}
+          <span className="text-[11px] font-mono text-muted-foreground">
+            {factId}
+          </span>
+        </div>
+      );
+    },
     filterFn: "includesString",
   },
   {

@@ -34,6 +34,7 @@ interface VerificationRecord {
 interface FactRecord {
   fact_id: string;
   entity_id: string;
+  label: string | null;
 }
 
 let verdicts: VerdictRecord[];
@@ -94,10 +95,32 @@ function resetStores() {
     },
   ];
   factsStore = [
-    { fact_id: "f_abc123", entity_id: "anthropic" },
-    { fact_id: "f_def456", entity_id: "anthropic" },
-    { fact_id: "f_ghi789", entity_id: "openai" },
+    { fact_id: "f_abc123", entity_id: "anthropic", label: "Funding total" },
+    { fact_id: "f_def456", entity_id: "anthropic", label: "Founded year" },
+    { fact_id: "f_ghi789", entity_id: "openai", label: null },
   ];
+}
+
+/** Apply verdict and entity_id filters to the verdicts store */
+function applyVerdictFilters(params: unknown[]): VerdictRecord[] {
+  let filtered = verdicts;
+  const verdictParam = params.find(
+    (p) => typeof p === "string" && verdicts.some((v) => v.verdict === p)
+  );
+  const entityParam = params.find(
+    (p) => typeof p === "string" && factsStore.some((f) => f.entity_id === p)
+  );
+
+  if (verdictParam) {
+    filtered = filtered.filter((v) => v.verdict === verdictParam);
+  }
+  if (entityParam) {
+    filtered = filtered.filter((v) => {
+      const fact = factsStore.find((f) => f.fact_id === v.fact_id);
+      return fact?.entity_id === entityParam;
+    });
+  }
+  return filtered;
 }
 
 function dispatch(query: string, params: unknown[]): unknown[] {
@@ -124,35 +147,33 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       return [...groups.entries()].map(([verdict, count]) => ({ verdict, count }));
     }
 
-    // Simple count for verdict list pagination
-    let filtered = verdicts;
-    if (q.includes("where")) {
-      if (params.some((p) => typeof p === "string" && verdicts.some((v) => v.verdict === p))) {
-        const verdictFilter = params.find(
-          (p) => typeof p === "string" && verdicts.some((v) => v.verdict === p)
-        ) as string;
-        filtered = filtered.filter((v) => v.verdict === verdictFilter);
-      }
-    }
+    // Simple count for verdict list pagination (may include LEFT JOIN for entity_id filter)
+    const filtered = q.includes("where") ? applyVerdictFilters(params) : verdicts;
     return [{ count: filtered.length }];
+  }
+
+  // SELECT from kb_fact_verdicts with LEFT JOIN facts (verdicts list)
+  if (q.includes("kb_fact_verdicts") && q.includes("left join") && q.includes("limit")) {
+    const filtered = applyVerdictFilters(params);
+    // Enrich with entity_id and label from factsStore
+    return filtered.map((v) => {
+      const fact = factsStore.find((f) => f.fact_id === v.fact_id);
+      return {
+        ...v,
+        entity_id: fact?.entity_id ?? null,
+        label: fact?.label ?? null,
+      };
+    });
   }
 
   // SELECT from kb_fact_verdicts with WHERE fact_id = ? (single verdict lookup)
   if (q.includes("kb_fact_verdicts") && q.includes("limit")) {
     if (params.length > 0) {
-      // Check for verdict filter or fact_id filter
       const factIdParam = params.find(
         (p) => typeof p === "string" && (p as string).startsWith("f_")
       );
-      const verdictParam = params.find(
-        (p) => typeof p === "string" && verdicts.some((v) => v.verdict === p)
-      );
-
       if (factIdParam) {
         return verdicts.filter((v) => v.fact_id === factIdParam);
-      }
-      if (verdictParam) {
-        return verdicts.filter((v) => v.verdict === verdictParam);
       }
     }
     return verdicts;
@@ -167,14 +188,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       return verifications.filter((v) => v.fact_id === factId);
     }
     return verifications;
-  }
-
-  // SELECT from facts (entity_id filtering)
-  if (q.includes('"facts"') && q.includes("entity_id")) {
-    const entityId = params[0] as string;
-    return factsStore
-      .filter((f) => f.entity_id === entityId)
-      .map((f) => ({ fact_id: f.fact_id }));
   }
 
   return [];
@@ -225,6 +238,32 @@ describe("GET /api/kb-verifications/verdicts", () => {
   it("validates offset parameter", async () => {
     const res = await app.request("/api/kb-verifications/verdicts?offset=-1");
     expect(res.status).toBe(400);
+  });
+
+  it("includes entityId and factLabel in verdict rows", async () => {
+    const res = await app.request("/api/kb-verifications/verdicts?limit=10");
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.verdicts.length).toBe(3);
+    // Verify entity enrichment from LEFT JOIN with facts table
+    const first = body.verdicts[0];
+    expect(first.entityId).toBe("anthropic");
+    expect(first.factLabel).toBe("Funding total");
+    // Verify a verdict with null label
+    const third = body.verdicts[2];
+    expect(third.entityId).toBe("openai");
+    expect(third.factLabel).toBeNull();
+  });
+
+  it("filters by entity_id", async () => {
+    const res = await app.request(
+      "/api/kb-verifications/verdicts?entity_id=openai&limit=10"
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.verdicts.length).toBe(1);
+    expect(body.verdicts[0].entityId).toBe("openai");
+    expect(body.total).toBe(1);
   });
 });
 
