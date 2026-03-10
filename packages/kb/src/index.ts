@@ -14,7 +14,6 @@ export {
   formatMoney,
   formatValue,
   formatFactValue,
-  formatItemEntry,
   resolveRefName,
 } from "./format";
 export { CURRENCIES, resolveCurrency, isCurrencyCode } from "./currencies";
