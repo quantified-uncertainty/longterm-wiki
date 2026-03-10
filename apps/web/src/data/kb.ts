@@ -7,7 +7,7 @@
  */
 
 import { getDatabase } from "@data";
-import type { Fact, Property, Entity, TypeSchema, ItemEntry, RecordEntry, RecordSchema } from "@longterm-wiki/kb";
+import type { Fact, Property, Entity, RecordEntry, RecordSchema } from "@longterm-wiki/kb";
 import type { SerializedKB } from "@longterm-wiki/kb";
 
 function getKB(): SerializedKB | undefined {
@@ -105,30 +105,6 @@ export function getKBLatest(
 }
 
 /**
- * Get item entries for a named collection on an entity.
- */
-export function getKBItems(entity: string, collection: string): ItemEntry[] {
-  const kb = getKB();
-  if (!kb) return [];
-
-  return kb.items[entity]?.[collection] ?? [];
-}
-
-/**
- * Get all item collections for an entity.
- * Returns a map of collection name → ItemEntry[].
- */
-export function getKBAllItemCollections(
-  entity: string,
-): Record<string, ItemEntry[]> {
-  const kb = getKB();
-  if (!kb) return {};
-
-  // Return a shallow copy to avoid exposing the mutable cache reference
-  return { ...(kb.items[entity] ?? {}) };
-}
-
-/**
  * Get a property definition by ID.
  */
 export function getKBProperty(propertyId: string): Property | undefined {
@@ -167,9 +143,6 @@ export function getKBProperties(): Property[] {
 
   return kb.properties;
 }
-
-/** @deprecated Use getKBEntity instead */
-export const getKBThing = getKBEntity;
 
 /**
  * Verification verdict values that can be returned by getKBFactVerification.
@@ -260,16 +233,6 @@ export function getKBAllFactsByProperty(
   }
 
   return result;
-}
-
-/**
- * Get a type schema by type name.
- */
-export function getKBSchema(type: string): TypeSchema | undefined {
-  const kb = getKB();
-  if (!kb) return undefined;
-
-  return kb.schemas.find((s) => s.type === type);
 }
 
 // ── Record access (unified records with schema-defined endpoints) ────
@@ -399,122 +362,3 @@ export function getKBRecordByKey(
   return undefined;
 }
 
-/**
- * Get all item entries across all entities as a flat list.
- * Returns [entityId, collectionName, ItemEntry] tuples.
- */
-export function getAllKBItems(): Array<{
-  entityId: string;
-  collection: string;
-  entry: ItemEntry;
-}> {
-  const kb = getKB();
-  if (!kb) return [];
-
-  const results: Array<{
-    entityId: string;
-    collection: string;
-    entry: ItemEntry;
-  }> = [];
-
-  for (const [entityId, collections] of Object.entries(kb.items)) {
-    for (const [collectionName, entries] of Object.entries(collections)) {
-      for (const entry of entries) {
-        results.push({ entityId, collection: collectionName, entry });
-      }
-    }
-  }
-
-  return results;
-}
-
-/**
- * Look up a single item entry by its key (globally unique).
- * Returns the item along with its owner entity ID and collection name.
- */
-export function getKBItemByKey(
-  itemKey: string,
-): { entityId: string; collection: string; entry: ItemEntry } | undefined {
-  const kb = getKB();
-  if (!kb) return undefined;
-
-  for (const [entityId, collections] of Object.entries(kb.items)) {
-    for (const [collectionName, entries] of Object.entries(collections)) {
-      for (const entry of entries) {
-        if (entry.key === itemKey) {
-          return { entityId, collection: collectionName, entry };
-        }
-      }
-    }
-  }
-  return undefined;
-}
-
-/**
- * Find all item entries across all entities that reference the given entityId.
- * Scans item fields for string matches against the entityId.
- * Uses schema field definitions when available to identify ref-type fields.
- */
-export function getKBItemsMentioning(
-  entityId: string
-): Array<{
-  ownerEntityId: string;
-  ownerName: string;
-  collection: string;
-  entry: ItemEntry;
-  matchingFields: string[];
-}> {
-  const kb = getKB();
-  if (!kb) return [];
-
-  const results: Array<{
-    ownerEntityId: string;
-    ownerName: string;
-    collection: string;
-    entry: ItemEntry;
-    matchingFields: string[];
-  }> = [];
-
-  for (const [ownerEntityId, collections] of Object.entries(kb.items)) {
-    if (ownerEntityId === entityId) continue; // Skip self
-
-    const ownerEntity = kb.entities.find((t: Entity) => t.id === ownerEntityId);
-    const schema = ownerEntity
-      ? kb.schemas.find((s) => s.type === ownerEntity.type)
-      : undefined;
-
-    for (const [collectionName, entries] of Object.entries(collections)) {
-      const fieldDefs = schema?.items?.[collectionName]?.fields;
-
-      for (const entry of entries) {
-        const matchingFields: string[] = [];
-
-        for (const [fieldName, fieldValue] of Object.entries(entry.fields)) {
-          const fieldDef = fieldDefs?.[fieldName];
-
-          if (fieldDef?.type === "ref" && fieldValue === entityId) {
-            matchingFields.push(fieldName);
-          } else if (
-            !fieldDef &&
-            typeof fieldValue === "string" &&
-            fieldValue === entityId
-          ) {
-            matchingFields.push(fieldName);
-          }
-        }
-
-        if (matchingFields.length > 0) {
-          results.push({
-            ownerEntityId,
-            ownerName: ownerEntity?.name ?? ownerEntityId,
-            collection: collectionName,
-            entry,
-            matchingFields,
-          });
-        }
-      }
-    }
-  }
-
-  return results;
-}
