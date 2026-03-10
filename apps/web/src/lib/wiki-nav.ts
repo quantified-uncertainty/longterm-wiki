@@ -374,7 +374,7 @@ export function getKBDataNav(): NavSection[] {
     },
     {
       title: "Top Entities",
-      items: entityItems.slice(0, 15).map(({ label, href }) => ({
+      items: entityItems.slice(0, 30).map(({ label, href }) => ({
         label,
         href,
       })),

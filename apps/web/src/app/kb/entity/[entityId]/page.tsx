@@ -189,36 +189,23 @@ export default async function KBEntityPage({
         <div className="md:hidden px-4 pt-3">
           <MobileSidebarTrigger />
         </div>
-        <div className="max-w-[65rem] mx-auto px-8 py-4">
+        <div className="max-w-[65rem] mx-auto px-4 md:px-8 py-4">
           {/* ── Breadcrumbs ─────────────────────────────────────── */}
           <nav className="text-sm text-muted-foreground mb-4">
-            <Link href="/wiki/E1019" className="hover:underline">
+            <Link href="/wiki/E1019" className="hover:underline hover:text-foreground">
               KB Data
             </Link>
-            <span className="mx-1.5">/</span>
-            <span>{entity.name}</span>
+            <span className="mx-1.5 text-muted-foreground/50">/</span>
+            <span className="text-foreground">{entity.name}</span>
           </nav>
 
           {/* ── Header ──────────────────────────────────────────── */}
           <h1 className="text-2xl font-bold mb-1">{entity.name}</h1>
-          <p className="text-sm text-muted-foreground mb-1">
-            <code className="text-xs">{entity.id}</code>
-            {entity.stableId && (
-              <>
-                {" "}
-                &middot;{" "}
-                <code className="text-xs">{entity.stableId}</code>
-              </>
-            )}
-            {entity.numericId && (
-              <>
-                {" "}
-                &middot;{" "}
-                <code className="text-xs">{entity.numericId}</code>
-              </>
-            )}
-            {" "}
-            &middot; <span>{entity.type}</span>
+          <p className="text-xs text-muted-foreground/60 mb-1 font-mono">
+            {entity.id}
+            {entity.stableId && <> &middot; {entity.stableId}</>}
+            {entity.numericId && <> &middot; {entity.numericId}</>}
+            {" "}&middot; {entity.type}
           </p>
           <p className="text-sm mb-1">
             <Link
@@ -228,15 +215,17 @@ export default async function KBEntityPage({
               &rarr; Wiki page: {wikiHref}
             </Link>
           </p>
-          <p className="text-xs text-muted-foreground mb-6">
-            Source:{" "}
-            <code>packages/kb/data/things/{entityId}.yaml</code>
+          <p className="text-xs text-muted-foreground/50 mb-6 font-mono">
+            Source: packages/kb/data/things/{entityId}.yaml
           </p>
 
           {/* ── Thing Metadata ──────────────────────────────────── */}
-          <section className="mb-8">
-            <h2 className="text-lg font-semibold mb-3">Thing Metadata</h2>
-            <div className="border border-border rounded-lg overflow-hidden">
+          <details className="mb-6 group/meta">
+            <summary className="text-sm font-medium text-muted-foreground mb-2 cursor-pointer hover:text-foreground select-none flex items-center gap-1.5">
+              <span className="text-xs group-open/meta:rotate-90 transition-transform">&#9654;</span>
+              Thing Metadata
+            </summary>
+            <div className="border border-border rounded-lg overflow-hidden overflow-x-auto">
               <table className="w-full text-sm">
                 <tbody className="divide-y divide-border">
                   <MetaRow label="ID" value={entity.id} />
@@ -254,7 +243,7 @@ export default async function KBEntityPage({
                   )}
                   {entity.parent && (
                     <tr>
-                      <td className="py-2 px-4 font-medium text-muted-foreground w-[10rem] text-sm bg-card">
+                      <td className="py-2 px-4 font-medium text-muted-foreground w-[7rem] md:w-[10rem] text-sm bg-card whitespace-nowrap">
                         Parent
                       </td>
                       <td className="py-2 px-4 text-sm bg-card">
@@ -284,12 +273,12 @@ export default async function KBEntityPage({
                 </tbody>
               </table>
             </div>
-          </section>
+          </details>
 
           {/* ── Facts by Property ───────────────────────────────── */}
           {sortedPropertyIds.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-lg font-semibold mb-3">Facts by Property</h2>
+              <h2 className="text-xl font-semibold mb-3">Facts by Property</h2>
               <div className="border border-border rounded-lg overflow-hidden overflow-x-auto divide-y divide-border">
                 {sortedPropertyIds.map((propertyId) => {
                   const facts = factGroups.get(propertyId)!;
@@ -302,16 +291,18 @@ export default async function KBEntityPage({
                         <span className="font-medium min-w-[10rem]">
                           {property?.name ?? propertyId}
                         </span>
-                        <span className="flex-1 text-muted-foreground truncate font-mono">
-                          {formatKBFactValue(latestFact, property?.unit, property?.display)}
+                        <span className="flex-1 text-muted-foreground truncate">
+                          <FactValueDisplay fact={latestFact} property={property} />
                         </span>
-                        <span className="text-muted-foreground text-xs whitespace-nowrap">
-                          {formatKBDate(latestFact.asOf)}
-                        </span>
+                        {latestFact.asOf && (
+                          <span className="text-muted-foreground text-xs whitespace-nowrap">
+                            {formatKBDate(latestFact.asOf)}
+                          </span>
+                        )}
                         <span className="text-muted-foreground text-xs whitespace-nowrap">
                           {facts.length} fact{facts.length !== 1 ? "s" : ""}
                         </span>
-                        <span className="text-muted-foreground text-xs group-open:rotate-90 transition-transform">
+                        <span className="text-muted-foreground group-open:rotate-90 transition-transform">
                           &#9654;
                         </span>
                       </summary>
@@ -380,7 +371,7 @@ export default async function KBEntityPage({
           {/* ── Item Collections ─────────────────────────────────── */}
           {totalCollections > 0 && (
             <section className="mb-8">
-              <h2 className="text-lg font-semibold mb-3">Item Collections</h2>
+              <h2 className="text-xl font-semibold mb-3">Record Collections</h2>
               <div className="space-y-4">
                 {Object.entries(itemCollections)
                   .sort(([a], [b]) => a.localeCompare(b))
@@ -399,7 +390,7 @@ export default async function KBEntityPage({
                         allFieldNames.add(key);
                       }
                     }
-                    const columns = schemaFieldNames.length > 0
+                    const allColumns = schemaFieldNames.length > 0
                       ? [
                           ...schemaFieldNames,
                           ...[...allFieldNames].filter(
@@ -407,6 +398,8 @@ export default async function KBEntityPage({
                           ),
                         ]
                       : [...allFieldNames];
+                    // Remove "name" from data columns — it's shown in the link column
+                    const columns = allColumns.filter((col) => col !== "name");
 
                     return (
                       <details key={collectionName} id={`items-${collectionName}`} className="group scroll-mt-16">
@@ -418,7 +411,7 @@ export default async function KBEntityPage({
                             {items.length} item
                             {items.length !== 1 ? "s" : ""}
                           </span>
-                          <span className="ml-auto text-muted-foreground text-xs group-open:rotate-90 transition-transform">
+                          <span className="ml-auto text-muted-foreground group-open:rotate-90 transition-transform">
                             &#9654;
                           </span>
                         </summary>
@@ -428,7 +421,7 @@ export default async function KBEntityPage({
                             <thead>
                               <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
                                 <th className="text-left py-1.5 px-3 font-medium">
-                                  Key
+                                  Name
                                 </th>
                                 {columns.map((col) => (
                                   <th
@@ -443,12 +436,12 @@ export default async function KBEntityPage({
                             <tbody className="divide-y divide-border/50">
                               {items.map((item) => (
                                 <tr key={item.key}>
-                                  <td className="py-1.5 px-3 font-mono text-xs">
+                                  <td className="py-1.5 px-3 text-sm">
                                     <Link
                                       href={`/kb/item/${item.key}`}
                                       className="text-blue-600 hover:underline dark:text-blue-400"
                                     >
-                                      {item.key}
+                                      {typeof item.fields.name === "string" ? item.fields.name : titleCase(item.key)}
                                     </Link>
                                   </td>
                                   {columns.map((col) => {
@@ -533,7 +526,7 @@ export default async function KBEntityPage({
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
     <tr>
-      <td className="py-2 px-4 font-medium text-muted-foreground w-[10rem] text-sm bg-card">
+      <td className="py-2 px-4 font-medium text-muted-foreground w-[7rem] md:w-[10rem] text-sm bg-card whitespace-nowrap">
         {label}
       </td>
       <td className="py-2 px-4 text-sm bg-card">
