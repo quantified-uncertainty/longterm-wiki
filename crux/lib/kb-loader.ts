@@ -63,10 +63,6 @@ export function resolveEntity(
     return kb.graph.getEntity(idFromFilename);
   }
 
-  // StableId lookup (deprecated but still supported)
-  const byStableId = kb.graph.getEntityByStableId(identifier);
-  if (byStableId) return byStableId;
-
   // Case-insensitive name match
   const lower = identifier.toLowerCase();
   return kb.graph.getAllEntities().find((e) => e.name.toLowerCase() === lower);

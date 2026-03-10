@@ -1,27 +1,13 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import path from "node:path";
-import { loadKB } from "../src/loader";
 import type { Graph } from "../src/graph";
-
-const DATA_DIR = path.resolve(__dirname, "../data");
+import { loadTestKB } from "./test-helpers";
 
 describe("loader", () => {
   let graph: Graph;
   let idOf: (filename: string) => string;
 
   beforeAll(async () => {
-    const result = await loadKB(DATA_DIR);
-    graph = result.graph;
-    // Build reverse lookup: filename → entityId for test convenience
-    const reverseMap = new Map<string, string>();
-    for (const [entityId, filename] of result.filenameMap) {
-      reverseMap.set(filename, entityId);
-    }
-    idOf = (filename: string) => {
-      const id = reverseMap.get(filename);
-      if (!id) throw new Error(`No entity for filename "${filename}"`);
-      return id;
-    };
+    ({ graph, idOf } = await loadTestKB());
   });
 
   describe("entities", () => {

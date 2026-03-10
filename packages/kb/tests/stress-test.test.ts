@@ -11,28 +11,14 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
-import { resolve } from "path";
-import { loadKB } from "../src/loader";
-import { computeInverses } from "../src/inverse";
 import type { Graph } from "../src/graph";
+import { loadTestKB } from "./test-helpers";
 
-const dataDir = resolve(import.meta.dirname, "../data");
 let graph: Graph;
 let idOf: (filename: string) => string;
 
 beforeAll(async () => {
-  const result = await loadKB(dataDir);
-  graph = result.graph;
-  computeInverses(graph);
-  const reverseMap = new Map<string, string>();
-  for (const [entityId, filename] of result.filenameMap) {
-    reverseMap.set(filename, entityId);
-  }
-  idOf = (filename: string) => {
-    const id = reverseMap.get(filename);
-    if (!id) throw new Error(`No entity for filename "${filename}"`);
-    return id;
-  };
+  ({ graph, idOf } = await loadTestKB({ withInverses: true }));
 });
 
 // ── Query 1: What is Anthropic's latest valuation? ──────────────────

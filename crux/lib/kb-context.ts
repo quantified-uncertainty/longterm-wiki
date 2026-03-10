@@ -9,36 +9,29 @@
  * - Avoid contradicting structured data when writing prose
  */
 
-import { join } from 'path';
-import { PROJECT_ROOT } from './content-types.ts';
-import { loadKB } from '../../packages/kb/src/loader.ts';
-import { computeInverses } from '../../packages/kb/src/inverse.ts';
 import { formatFactValue } from '../../packages/kb/src/format.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
 import type { Entity, Fact } from '../../packages/kb/src/types.ts';
-
-const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
+import { loadGraph } from './kb-loader.ts';
 
 let _graph: Graph | null = null;
 
 async function getGraph(): Promise<Graph> {
   if (!_graph) {
-    const { graph } = await loadKB(KB_DATA_DIR);
-    computeInverses(graph);
-    _graph = graph;
+    _graph = await loadGraph();
   }
   return _graph;
 }
 
 /**
- * Find the KB entity for a wiki page by matching `entity.numericId === pageId`.
+ * Find the KB entity for a wiki page by matching `entity.wikiPageId === pageId`.
  * Falls back to searching entity names against the last path segment.
  */
 function findKbEntity(graph: Graph, pageId: string, pagePath?: string): Entity | undefined {
-  // Primary: match by numericId (e.g., "E22" → anthropic)
+  // Primary: match by wikiPageId (e.g., "E22" → anthropic)
   const all = graph.getAllEntities();
-  const byNumericId = all.find((e) => e.numericId === pageId);
-  if (byNumericId) return byNumericId;
+  const byWikiPageId = all.find((e) => e.wikiPageId === pageId);
+  if (byWikiPageId) return byWikiPageId;
 
   // Fallback: match by entity ID
   if (pagePath) {
