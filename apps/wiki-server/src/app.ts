@@ -32,6 +32,7 @@ import { githubIssuesRoute } from "./routes/github-issues.js";
 import { groundskeeperRunsRoute } from "./routes/groundskeeper-runs.js";
 import { monitoringRoute } from "./routes/monitoring.js";
 import { githubPullsRoute } from "./routes/github-pulls.js";
+import { kbVerificationsRoute } from "./routes/kb-verifications.js";
 
 let requestCounter = 0;
 
@@ -139,6 +140,7 @@ export function createApp() {
   app.route("/api/github/pulls", githubPullsRoute);
   app.route("/api/groundskeeper-runs", groundskeeperRunsRoute);
   app.route("/api/monitoring", monitoringRoute);
+  app.route("/api/kb-verifications", kbVerificationsRoute);
 
   return app;
 }

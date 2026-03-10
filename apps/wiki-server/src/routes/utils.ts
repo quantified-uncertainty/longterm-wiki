@@ -1,4 +1,5 @@
 import type { Context } from "hono";
+import { validator } from "hono/validator";
 import { z } from "zod";
 import { logger as rootLogger } from "../logger.js";
 
@@ -72,4 +73,21 @@ export function firstOrThrow<T>(rows: T[], context: string): T {
 /** Escape SQL ILIKE/LIKE wildcard metacharacters: %, _, and \ */
 export function escapeIlike(s: string): string {
   return s.replace(/[%_\\]/g, "\\$&");
+}
+
+/**
+ * Zod validator helper for Hono query params.
+ * Uses Hono's built-in validator to preserve RPC type inference in method-chained routes.
+ */
+export function zv<T extends z.ZodType>(target: "query", schema: T) {
+  return validator(target, (value, c) => {
+    const result = schema.safeParse(value);
+    if (!result.success) {
+      return c.json(
+        { error: VALIDATION_ERROR, message: result.error.message },
+        400
+      );
+    }
+    return result.data as z.infer<T>;
+  });
 }
