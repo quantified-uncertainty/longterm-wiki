@@ -212,7 +212,7 @@ export default async function KBEntityPage({
               href={wikiHref}
               className="text-blue-600 hover:underline dark:text-blue-400"
             >
-              &rarr; Wiki page: {wikiHref}
+              &rarr; Wiki page
             </Link>
           </p>
           <p className="text-xs text-muted-foreground/50 mb-6 font-mono">
@@ -278,7 +278,7 @@ export default async function KBEntityPage({
           {/* ── Facts by Property ───────────────────────────────── */}
           {sortedPropertyIds.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-xl font-semibold mb-3">Facts by Property</h2>
+              <h2 className="text-xl font-semibold mb-3 pb-2 border-b border-border">Facts by Property</h2>
               <div className="border border-border rounded-lg overflow-hidden overflow-x-auto divide-y divide-border">
                 {sortedPropertyIds.map((propertyId) => {
                   const facts = factGroups.get(propertyId)!;
@@ -287,18 +287,16 @@ export default async function KBEntityPage({
 
                   return (
                     <details key={propertyId} id={propertyId} className="group scroll-mt-16">
-                      <summary className="flex items-center gap-4 px-4 py-2.5 cursor-pointer hover:bg-muted/50 text-sm select-none">
-                        <span className="font-medium min-w-[10rem]">
+                      <summary className="flex items-center gap-3 md:gap-4 px-4 py-2.5 cursor-pointer hover:bg-muted/50 text-sm select-none">
+                        <span className="font-medium shrink-0 w-[8rem] md:w-[11rem]">
                           {property?.name ?? propertyId}
                         </span>
-                        <span className="flex-1 text-muted-foreground truncate">
+                        <span className="text-muted-foreground truncate min-w-0 flex-1 hidden md:inline">
                           <FactValueDisplay fact={latestFact} property={property} />
                         </span>
-                        {latestFact.asOf && (
-                          <span className="text-muted-foreground text-xs whitespace-nowrap">
-                            {formatKBDate(latestFact.asOf)}
-                          </span>
-                        )}
+                        <span className="text-muted-foreground text-xs whitespace-nowrap ml-auto">
+                          {latestFact.asOf ? formatKBDate(latestFact.asOf) : ""}
+                        </span>
                         <span className="text-muted-foreground text-xs whitespace-nowrap">
                           {facts.length} fact{facts.length !== 1 ? "s" : ""}
                         </span>
@@ -307,7 +305,7 @@ export default async function KBEntityPage({
                         </span>
                       </summary>
 
-                      <div className="px-4 pb-3 pt-1 bg-muted/20">
+                      <div className="px-4 pb-3 pt-1 bg-muted/20 border-l-2 border-l-blue-200 dark:border-l-blue-800">
                         <div className="mb-2">
                           <Link
                             href={`/kb/property/${propertyId}`}
@@ -371,7 +369,7 @@ export default async function KBEntityPage({
           {/* ── Item Collections ─────────────────────────────────── */}
           {totalCollections > 0 && (
             <section className="mb-8">
-              <h2 className="text-xl font-semibold mb-3">Record Collections</h2>
+              <h2 className="text-xl font-semibold mb-3 pb-2 border-b border-border">Record Collections</h2>
               <div className="space-y-4">
                 {Object.entries(itemCollections)
                   .sort(([a], [b]) => a.localeCompare(b))
@@ -426,9 +424,9 @@ export default async function KBEntityPage({
                                 {columns.map((col) => (
                                   <th
                                     key={col}
-                                    className="text-left py-1.5 px-3 font-medium"
+                                    className={`text-left py-1.5 px-3 font-medium${col === "notes" ? " min-w-[10rem] max-w-[14rem]" : ""}`}
                                   >
-                                    {titleCase(col)}
+                                    {titleCase(col.replace(/([a-z])([A-Z])/g, "$1 $2"))}
                                   </th>
                                 ))}
                               </tr>
@@ -495,7 +493,7 @@ export default async function KBEntityPage({
                                     return (
                                       <td
                                         key={col}
-                                        className="py-1.5 px-3"
+                                        className={`py-1.5 px-3${col === "notes" ? " max-w-[14rem] text-xs text-muted-foreground" : ""}`}
                                       >
                                         {formatKBCellValue(
                                           cellValue,
