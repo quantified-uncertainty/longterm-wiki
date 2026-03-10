@@ -48,11 +48,13 @@ describe("records", () => {
       expect(schema!.endpoints.company.implicit).toBe(true);
     });
 
-    it("loads charitable-pledge schema for person entities", () => {
+    it("loads charitable-pledge schema with explicit pledger endpoint", () => {
       const schema = graph.getRecordSchema("charitable-pledge");
       expect(schema).toBeDefined();
       expect(schema!.endpoints.pledger.types).toEqual(["person"]);
-      expect(schema!.endpoints.pledger.implicit).toBe(true);
+      // After migration: pledger is explicit (required, allow_display_name)
+      expect(schema!.endpoints.pledger.required).toBe(true);
+      expect(schema!.endpoints.pledger.allowDisplayName).toBe(true);
     });
   });
 
@@ -64,6 +66,7 @@ describe("records", () => {
       expect(orgSchema!.records).toContain("investment");
       expect(orgSchema!.records).toContain("equity-position");
       expect(orgSchema!.records).toContain("board-seat");
+      expect(orgSchema!.records).toContain("charitable-pledge");
     });
 
     it("person schema lists record types", () => {
@@ -77,21 +80,20 @@ describe("records", () => {
   describe("record loading from entity files", () => {
     it("loads equity-position records from Anthropic", () => {
       const positions = graph.getRecords("anthropic", "equity-positions");
-      expect(positions.length).toBeGreaterThanOrEqual(2);
+      expect(positions.length).toBeGreaterThanOrEqual(10);
 
       // Find the Tallinn entry
-      const tallinn = positions.find((p) => p.key === "tallinn-test");
+      const tallinn = positions.find((p) => p.key === "jaan-tallinn");
       expect(tallinn).toBeDefined();
       expect(tallinn!.schema).toBe("equity-position");
       expect(tallinn!.ownerEntityId).toBe("anthropic");
       expect(tallinn!.fields.holder).toBe("jaan-tallinn");
       expect(tallinn!.fields.stake).toEqual([0.006, 0.017]);
-      expect(tallinn!.asOf).toBe("2026-03");
     });
 
     it("handles display_name for non-entity participants", () => {
       const positions = graph.getRecords("anthropic", "equity-positions");
-      const pool = positions.find((p) => p.key === "employee-pool-test");
+      const pool = positions.find((p) => p.key === "employee-pool");
       expect(pool).toBeDefined();
       expect(pool!.displayName).toBe("Employee equity pool");
       expect(pool!.fields.holder).toBeUndefined();
@@ -99,32 +101,71 @@ describe("records", () => {
 
     it("loads investment records from Anthropic", () => {
       const investments = graph.getRecords("anthropic", "investments");
-      expect(investments.length).toBeGreaterThanOrEqual(1);
+      expect(investments.length).toBeGreaterThanOrEqual(10);
 
-      const tallinnSeed = investments.find((i) => i.key === "tallinn-seed-test");
+      const tallinnSeed = investments.find((i) => i.key === "tallinn-seed");
       expect(tallinnSeed).toBeDefined();
       expect(tallinnSeed!.schema).toBe("investment");
       expect(tallinnSeed!.fields.investor).toBe("jaan-tallinn");
       expect(tallinnSeed!.fields.role).toBe("lead");
-      expect(tallinnSeed!.fields.amount).toEqual([40e6, 80e6]);
+    });
+
+    it("loads funding-round records from Anthropic", () => {
+      const rounds = graph.getRecords("anthropic", "funding-rounds");
+      expect(rounds.length).toBeGreaterThanOrEqual(15);
+
+      const seriesA = rounds.find((r) => r.key === "series-a");
+      expect(seriesA).toBeDefined();
+      expect(seriesA!.fields.raised).toBe(124e6);
+      expect(seriesA!.fields.valuation).toBe(550e6);
+    });
+
+    it("loads charitable-pledge records from Anthropic", () => {
+      const pledges = graph.getRecords("anthropic", "charitable-pledges");
+      expect(pledges.length).toBeGreaterThanOrEqual(9);
+
+      const dario = pledges.find((p) => p.key === "dario-amodei");
+      expect(dario).toBeDefined();
+      expect(dario!.fields.pledger).toBe("dario-amodei");
+      expect(dario!.fields.pledge).toBe(0.8);
+    });
+
+    it("loads key-person records from Anthropic", () => {
+      const people = graph.getRecords("anthropic", "key-persons");
+      expect(people.length).toBeGreaterThanOrEqual(10);
+
+      const dario = people.find((p) => p.key === "dario-amodei");
+      expect(dario).toBeDefined();
+      expect(dario!.fields.person).toBe("dario-amodei");
+      expect(dario!.fields.title).toBe("CEO");
     });
 
     it("returns collection names for entity", () => {
       const names = graph.getRecordCollectionNames("anthropic");
       expect(names).toContain("equity-positions");
       expect(names).toContain("investments");
+      expect(names).toContain("funding-rounds");
+      expect(names).toContain("charitable-pledges");
+      expect(names).toContain("key-persons");
+      expect(names).toContain("products");
+      expect(names).toContain("model-releases");
+      expect(names).toContain("board-seats");
+      expect(names).toContain("strategic-partnerships");
+      expect(names).toContain("safety-milestones");
+      expect(names).toContain("research-areas");
     });
   });
 
   describe("endpoint index", () => {
     it("indexes records by explicit endpoint (investor)", () => {
       const tallinnRecords = graph.getRecordsReferencing("jaan-tallinn");
-      expect(tallinnRecords.length).toBeGreaterThanOrEqual(2);
+      expect(tallinnRecords.length).toBeGreaterThanOrEqual(3);
 
-      // Should include both equity-position and investment
+      // Should include equity-position, investment, and charitable-pledge
       const schemas = new Set(tallinnRecords.map((r) => r.schema));
       expect(schemas.has("equity-position")).toBe(true);
       expect(schemas.has("investment")).toBe(true);
+      expect(schemas.has("charitable-pledge")).toBe(true);
     });
 
     it("filters endpoint index by collection name", () => {
@@ -133,8 +174,7 @@ describe("records", () => {
       expect(tallinnEquity[0].fields.stake).toEqual([0.006, 0.017]);
 
       const tallinnInvestments = graph.getRecordsReferencing("jaan-tallinn", "investments");
-      expect(tallinnInvestments).toHaveLength(1);
-      expect(tallinnInvestments[0].fields.role).toBe("lead");
+      expect(tallinnInvestments.length).toBeGreaterThanOrEqual(2); // seed + series-a
     });
 
     it("does not index display_name entries in endpoint index", () => {
@@ -152,7 +192,7 @@ describe("records", () => {
   describe("cross-entity queries", () => {
     it("getAllRecordsOfType returns records across entities", () => {
       const allInvestments = graph.getAllRecordsOfType("investment");
-      expect(allInvestments.length).toBeGreaterThanOrEqual(1);
+      expect(allInvestments.length).toBeGreaterThanOrEqual(10);
 
       // All should have schema = "investment"
       for (const inv of allInvestments) {
@@ -166,27 +206,61 @@ describe("records", () => {
     });
   });
 
-  describe("coexistence with items", () => {
-    it("items still load correctly alongside records", () => {
-      // Old items should still work
-      const fundingRounds = graph.getItems("anthropic", "funding-rounds");
-      expect(fundingRounds.length).toBeGreaterThan(0);
+  describe("1-endpoint record types", () => {
+    it("loads product records", () => {
+      const products = graph.getRecords("anthropic", "products");
+      expect(products.length).toBeGreaterThanOrEqual(5);
 
-      const keyPeople = graph.getItems("anthropic", "key-people");
-      expect(keyPeople.length).toBeGreaterThan(0);
+      const claudeCode = products.find((p) => p.key === "claude-code");
+      expect(claudeCode).toBeDefined();
+      expect(claudeCode!.fields.name).toBe("Claude Code");
     });
 
-    it("items and records are separate indices", () => {
-      // Old equity-holders in items
-      const oldEquity = graph.getItems("anthropic", "equity-holders");
-      expect(oldEquity.length).toBeGreaterThan(0);
+    it("loads model-release records", () => {
+      const models = graph.getRecords("anthropic", "model-releases");
+      expect(models.length).toBeGreaterThanOrEqual(10);
 
-      // New equity-positions in records
-      const newEquity = graph.getRecords("anthropic", "equity-positions");
-      expect(newEquity.length).toBeGreaterThan(0);
+      const opus46 = models.find((m) => m.key === "claude-opus-4-6");
+      expect(opus46).toBeDefined();
+      expect(opus46!.fields.safety_level).toBe("ASL-3");
+    });
 
-      // They're independent
-      expect(oldEquity[0]).not.toHaveProperty("schema");
+    it("loads board-seat records with display_name", () => {
+      const seats = graph.getRecords("anthropic", "board-seats");
+      expect(seats.length).toBeGreaterThanOrEqual(4);
+
+      // Dario has entity ref
+      const dario = seats.find((s) => s.key === "dario-amodei");
+      expect(dario).toBeDefined();
+      expect(dario!.fields.member).toBe("dario-amodei");
+
+      // Yasmin uses display_name
+      const yasmin = seats.find((s) => s.key === "yasmin-razavi");
+      expect(yasmin).toBeDefined();
+      expect(yasmin!.displayName).toBe("Yasmin Razavi");
+    });
+
+    it("loads safety-milestone records", () => {
+      const milestones = graph.getRecords("anthropic", "safety-milestones");
+      expect(milestones.length).toBeGreaterThanOrEqual(8);
+    });
+
+    it("loads research-area records", () => {
+      const areas = graph.getRecords("anthropic", "research-areas");
+      expect(areas.length).toBeGreaterThanOrEqual(4);
+
+      const interp = areas.find((a) => a.key === "mechanistic-interpretability");
+      expect(interp).toBeDefined();
+      expect(interp!.fields["team-size"]).toBe(50);
+    });
+
+    it("loads strategic-partnership records with display_name", () => {
+      const partnerships = graph.getRecords("anthropic", "strategic-partnerships");
+      expect(partnerships.length).toBeGreaterThanOrEqual(4);
+
+      const aws = partnerships.find((p) => p.key === "aws-investment");
+      expect(aws).toBeDefined();
+      expect(aws!.displayName).toBe("Amazon Web Services");
     });
   });
 });

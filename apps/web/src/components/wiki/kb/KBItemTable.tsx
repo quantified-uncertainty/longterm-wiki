@@ -20,8 +20,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBItems, getKBEntity, getKBSchema } from "@data/kb";
-import type { ItemEntry, ItemCollectionSchema } from "@longterm-wiki/kb";
+import { getKBItems, getKBRecords, getKBEntity, getKBSchema } from "@data/kb";
+import type { ItemEntry, RecordEntry, ItemCollectionSchema } from "@longterm-wiki/kb";
 import { titleCase } from "./format";
 import { KBCellValue } from "./KBCellValue";
 
@@ -36,8 +36,10 @@ interface KBItemTableProps {
   columns?: string[];
 }
 
+type TableEntry = ItemEntry | RecordEntry;
+
 /** Determine columns: use provided columns, or derive from all entries. */
-function resolveColumns(items: ItemEntry[], columns?: string[]): string[] {
+function resolveColumns(items: TableEntry[], columns?: string[]): string[] {
   if (columns && columns.length > 0) return columns;
 
   // Collect all unique field names across all entries, preserving insertion order
@@ -66,7 +68,11 @@ export function KBItemTable({
   title,
   columns,
 }: KBItemTableProps) {
-  const items = getKBItems(entity, collection);
+  // Try items first, fall back to records (entities migrated to unified records format)
+  let items: TableEntry[] = getKBItems(entity, collection);
+  if (items.length === 0) {
+    items = getKBRecords(entity, collection);
+  }
   const heading = title ?? titleCase(collection);
 
   if (items.length === 0) {

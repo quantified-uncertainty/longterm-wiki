@@ -25,8 +25,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBItems, getKBEntity, getKBSchema } from "@data/kb";
-import type { ItemEntry, ItemCollectionSchema } from "@longterm-wiki/kb";
+import { getKBItems, getKBRecords, getKBEntity, getKBSchema } from "@data/kb";
+import type { ItemEntry, RecordEntry, ItemCollectionSchema } from "@longterm-wiki/kb";
 import { titleCase, sortKBItems } from "./format";
 import { KBCellValue } from "./KBCellValue";
 
@@ -105,7 +105,11 @@ export function KBItemCollection({
   sortBy,
   sortAsc = false,
 }: KBItemCollectionProps) {
-  const items = getKBItems(entity, collection);
+  // Try items first, fall back to records (entities migrated to unified records format)
+  let items: (ItemEntry | RecordEntry)[] = getKBItems(entity, collection);
+  if (items.length === 0) {
+    items = getKBRecords(entity, collection);
+  }
   const kbEntity = getKBEntity(entity);
   const schema = kbEntity
     ? getKBSchema(kbEntity.type)?.items?.[collection]

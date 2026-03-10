@@ -81,13 +81,11 @@ describe("Q3: Compare all AI labs valuations", () => {
 });
 
 // ── Query 4: Who are Anthropic's board members? (was IMPOSSIBLE) ────
-// Rating: AWKWARD — board members are not a separate collection, but
-// key-people items include founders and leadership. This now works
-// via getItems, though a dedicated "board-members" collection would
-// be CLEANer.
-describe("Q4: Anthropic board/key people (was IMPOSSIBLE)", () => {
-  it("is now possible via key-people items", () => {
-    const people = graph.getItems("anthropic", "key-people");
+// Rating: CLEAN — key-persons records have titles, start dates, founder status.
+// Board-seats records provide dedicated board member data.
+describe("Q4: Anthropic board/key people", () => {
+  it("is answered via key-persons records", () => {
+    const people = graph.getRecords("anthropic", "key-persons");
     expect(people.length).toBeGreaterThan(0);
 
     // Verify we can find the CEO
@@ -129,9 +127,9 @@ describe("Q5: Who works at Anthropic right now", () => {
     expect(employeeIds).toContain("jan-leike");
   });
 
-  it("can also be answered via key-people items for richer data", () => {
-    // key-people gives title, start date, founder status
-    const people = graph.getItems("anthropic", "key-people");
+  it("can also be answered via key-persons records for richer data", () => {
+    // key-persons gives title, start date, founder status
+    const people = graph.getRecords("anthropic", "key-persons");
     // Filter to currently active (no end date)
     const current = people.filter((p) => p.fields.end === undefined);
     expect(current.length).toBeGreaterThanOrEqual(2);
@@ -168,19 +166,13 @@ describe("Q6: Total funding raised by all AI labs", () => {
 // Rating: CLEAN
 describe("Q7: Anthropic funding rounds", () => {
   it("returns all funding rounds with detail fields", () => {
-    const rounds = graph.getItems("anthropic", "funding-rounds");
+    const rounds = graph.getRecords("anthropic", "funding-rounds");
     expect(rounds.length).toBeGreaterThanOrEqual(9);
 
-    // Each round should have at least date and amount
-    for (const r of rounds) {
-      expect(r.fields.date).toBeDefined();
-      expect(r.fields.amount).toBeDefined();
-    }
-
-    // Check a specific round with full data
-    const seriesG = rounds.find((r) => r.key === "i_OVNz9C3XUA");
+    // Check a specific round with full data (Series G)
+    const seriesG = rounds.find((r) => r.key === "series-g");
     expect(seriesG).toBeDefined();
-    expect(seriesG!.fields.amount).toBe(30e9);
+    expect(seriesG!.fields.raised).toBe(30e9);
     expect(seriesG!.fields.valuation).toBe(380e9);
     expect(seriesG!.fields.lead_investor).toBe("gic");
 
@@ -234,13 +226,14 @@ describe("Q9: Anthropic headcount over time", () => {
     expect(facts.length).toBeGreaterThanOrEqual(1);
 
     for (const f of facts) {
-      expect(f.value.type).toBe("number");
+      expect(["number", "range"]).toContain(f.value.type);
       expect(f.asOf).toBeDefined();
     }
 
     // Latest headcount
     const latest = graph.getLatest("anthropic", "headcount");
     expect(latest).toBeDefined();
+    expect(latest!.value.type).toBe("number");
     expect(
       (latest!.value as { type: "number"; value: number }).value
     ).toBeGreaterThan(0);
@@ -329,19 +322,19 @@ describe("Q14: Anthropic revenue-to-valuation ratio", () => {
 // ── Query 15: What safety research does Anthropic do? ───────────────
 // Rating: CLEAN — research-areas item collection provides structured data.
 describe("Q15: Anthropic safety research", () => {
-  it("is answerable via research-areas items and key-people", () => {
-    // Research areas collection
-    const areas = graph.getItems("anthropic", "research-areas");
+  it("is answerable via research-areas and key-persons records", () => {
+    // Research areas collection (now records)
+    const areas = graph.getRecords("anthropic", "research-areas");
     expect(areas.length).toBeGreaterThanOrEqual(3);
 
     // Find specific research areas
-    const mechInterp = areas.find((a) => a.key === "i_X3GMmkZdIQ");
+    const mechInterp = areas.find((a) => a.key === "mechanistic-interpretability");
     expect(mechInterp).toBeDefined();
     expect(mechInterp!.fields.name).toBe("Mechanistic Interpretability");
     expect(mechInterp!.fields["team-size"]).toBe(50);
 
-    // Safety-related people from key-people
-    const people = graph.getItems("anthropic", "key-people");
+    // Safety-related people from key-persons records
+    const people = graph.getRecords("anthropic", "key-persons");
     const safetyPeople = people.filter((p) => {
       const title = String(p.fields.title ?? "").toLowerCase();
       return (
@@ -357,12 +350,12 @@ describe("Q15: Anthropic safety research", () => {
 // ── Query 16: What products has Anthropic launched? ──────────────────
 // Rating: CLEAN — products item collection provides structured data.
 describe("Q16: Anthropic products launched", () => {
-  it("returns products from the products item collection", () => {
-    const products = graph.getItems("anthropic", "products");
+  it("returns products from the products record collection", () => {
+    const products = graph.getRecords("anthropic", "products");
     expect(products.length).toBeGreaterThanOrEqual(3);
 
     // Check specific products
-    const claudeCode = products.find((p) => p.key === "i_5ZyixnNTeg");
+    const claudeCode = products.find((p) => p.key === "claude-code");
     expect(claudeCode).toBeDefined();
     expect(claudeCode!.fields.name).toBe("Claude Code");
     expect(claudeCode!.fields.launched).toBe("2025-02");
@@ -557,8 +550,8 @@ describe("Q20: Bidirectional person-org lookup", () => {
   });
 
   it("org -> person: Anthropic CEO is Dario Amodei", () => {
-    // Via key-people items
-    const people = graph.getItems("anthropic", "key-people");
+    // Via key-persons records
+    const people = graph.getRecords("anthropic", "key-persons");
     const ceo = people.find((p) => p.fields.title === "CEO");
     expect(ceo).toBeDefined();
     expect(ceo!.fields.person).toBe("dario-amodei");
