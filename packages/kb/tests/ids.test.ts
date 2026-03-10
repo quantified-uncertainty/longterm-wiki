@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  generateId,
   generateStableId,
   generateFactId,
   contentHash,
@@ -7,16 +8,15 @@ import {
 } from "../src/ids";
 
 describe("ids", () => {
-  describe("generateStableId", () => {
+  describe("generateId", () => {
     it("returns a 10-character string", () => {
-      const id = generateStableId();
+      const id = generateId();
       expect(id).toHaveLength(10);
     });
 
     it("returns only alphanumeric characters (no - or _)", () => {
-      // Run multiple times to increase confidence since replacement is probabilistic
       for (let i = 0; i < 50; i++) {
-        const id = generateStableId();
+        const id = generateId();
         expect(id).toMatch(/^[A-Za-z0-9]{10}$/);
       }
     });
@@ -24,10 +24,17 @@ describe("ids", () => {
     it("generates unique IDs on successive calls", () => {
       const ids = new Set<string>();
       for (let i = 0; i < 100; i++) {
-        ids.add(generateStableId());
+        ids.add(generateId());
       }
-      // With 10 alphanumeric chars, collisions in 100 tries are astronomically unlikely
       expect(ids.size).toBe(100);
+    });
+  });
+
+  describe("generateStableId (deprecated alias)", () => {
+    it("returns same format as generateId", () => {
+      const id = generateStableId();
+      expect(id).toHaveLength(10);
+      expect(id).toMatch(/^[A-Za-z0-9]{10}$/);
     });
   });
 

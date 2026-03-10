@@ -19,30 +19,34 @@ export type FactValue =
 // ── Entity ──────────────────────────────────────────────────────────
 
 export interface Entity {
-  /** Human-readable slug: "anthropic", "claude-3-5-sonnet" */
+  /** Stable 10-char random ID (primary identity, formerly stableId) */
   id: string;
-  /** Random 10-char ID that survives renames */
-  stableId: string;
+  /** Human-readable slug: "anthropic", "claude-3-5-sonnet" (formerly id) */
+  slug: string;
   /** References a TypeSchema: "organization", "person" */
   type: string;
   /** Display name */
   name: string;
-  /** Parent entity ID (e.g., funding round → org) */
+  /** Parent entity slug (e.g., funding round → org) */
   parent?: string;
   /** Alternative names for search */
   aliases?: string[];
   /** Former slugs for redirects */
   previousIds?: string[];
-  /** Legacy wiki URL ID (E42) */
+  /** Wiki page URL ID with E prefix, e.g. "E22" (formerly numericId) */
+  wikiPageId?: string;
+  /** @deprecated Use `id` instead. Alias kept for backward compat during migration. */
+  stableId: string;
+  /** @deprecated Use `wikiPageId` instead. Alias kept for backward compat during migration. */
   numericId?: string;
 }
 
 // ── Fact ────────────────────────────────────────────────────────────
 
 export interface Fact {
-  /** Random 10-char "f_xxxxxxxx" or content-hash */
+  /** Fact ID: 10-char alphanumeric, or legacy "f_" + 10-char, or "inv_" for derived */
   id: string;
-  /** Entity ID (slug) this fact is about */
+  /** Entity ID (stable 10-char ID) this fact is about */
   subjectId: string;
   /** Property ID from the registry */
   propertyId: string;
@@ -174,17 +178,27 @@ export interface RecordEntry {
 
 // ── YAML file shapes ────────────────────────────────────────────────
 
-/** Shape of an entity's YAML file (data/things/anthropic.yaml) */
+/**
+ * Shape of an entity's YAML file (data/things/anthropic.yaml).
+ * Supports both old format (id=slug, stableId) and new format (id=stableId, slug).
+ */
 export interface EntityFile {
   thing: {
+    /** Old format: slug. New format: stable 10-char ID. */
     id: string;
-    stableId: string;
+    /** Old format only: stable 10-char ID. Absent in new format. */
+    stableId?: string;
+    /** New format only: human-readable slug. Absent in old format. */
+    slug?: string;
     type: string;
     name: string;
     parent?: string;
     aliases?: string[];
     previousIds?: string[];
+    /** Old format: wiki page ID. */
     numericId?: string;
+    /** New format: wiki page ID. */
+    wikiPageId?: string;
   };
   facts?: RawFact[];
   records?: Record<string, Record<string, RawRecordEntry>>;

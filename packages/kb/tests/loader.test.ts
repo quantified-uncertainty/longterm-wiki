@@ -17,8 +17,12 @@ describe("loader", () => {
       const anthropic = graph.getEntity("anthropic");
       expect(anthropic).toBeDefined();
       expect(anthropic!.name).toBe("Anthropic");
-      expect(anthropic!.stableId).toBe("mK9pX3rQ7n");
+      expect(anthropic!.id).toBe("mK9pX3rQ7n");
+      expect(anthropic!.slug).toBe("anthropic");
       expect(anthropic!.type).toBe("organization");
+      expect(anthropic!.wikiPageId).toBe("E22");
+      // Deprecated aliases still work
+      expect(anthropic!.stableId).toBe("mK9pX3rQ7n");
       expect(anthropic!.numericId).toBe("E22");
     });
 
@@ -26,19 +30,19 @@ describe("loader", () => {
       const entities = graph.getAllEntities();
       expect(entities.length).toBeGreaterThanOrEqual(360);
 
-      // Spot-check key entities are present (including migrated facts entities)
-      const ids = new Set(entities.map((t) => t.id));
-      expect(ids.has("anthropic")).toBe(true);
-      expect(ids.has("openai")).toBe(true);
-      expect(ids.has("deepmind")).toBe(true);
-      expect(ids.has("claude-3-opus")).toBe(true);
-      expect(ids.has("alignment")).toBe(true);
-      expect(ids.has("existential-risk")).toBe(true);
-      expect(ids.has("anthropic-government-standoff")).toBe(true);
-      expect(ids.has("chan-zuckerberg-initiative")).toBe(true);
-      expect(ids.has("coefficient-giving")).toBe(true);
-      expect(ids.has("jaan-tallinn")).toBe(true);
-      expect(ids.has("manifund")).toBe(true);
+      // Spot-check key entities are present via slug lookup
+      const slugs = new Set(entities.map((t) => t.slug));
+      expect(slugs.has("anthropic")).toBe(true);
+      expect(slugs.has("openai")).toBe(true);
+      expect(slugs.has("deepmind")).toBe(true);
+      expect(slugs.has("claude-3-opus")).toBe(true);
+      expect(slugs.has("alignment")).toBe(true);
+      expect(slugs.has("existential-risk")).toBe(true);
+      expect(slugs.has("anthropic-government-standoff")).toBe(true);
+      expect(slugs.has("chan-zuckerberg-initiative")).toBe(true);
+      expect(slugs.has("coefficient-giving")).toBe(true);
+      expect(slugs.has("jaan-tallinn")).toBe(true);
+      expect(slugs.has("manifund")).toBe(true);
     });
 
     it("loads entity aliases", () => {
@@ -46,23 +50,23 @@ describe("loader", () => {
       expect(anthropic!.aliases).toEqual(["Anthropic PBC", "Anthropic AI"]);
     });
 
-    it("all numericIds use E-prefix format and are unique", () => {
+    it("all wikiPageIds use E-prefix format and are unique", () => {
       const entities = graph.getAllEntities();
-      const numericIds = entities
-        .map((e) => e.numericId)
+      const wikiPageIds = entities
+        .map((e) => e.wikiPageId)
         .filter((id): id is string => id !== undefined);
 
-      // All have numericIds
-      expect(numericIds).toHaveLength(entities.length);
+      // All have wikiPageIds
+      expect(wikiPageIds).toHaveLength(entities.length);
 
       // All match E-prefix format
-      for (const id of numericIds) {
+      for (const id of wikiPageIds) {
         expect(String(id)).toMatch(/^E\d+$/);
       }
 
       // All unique
-      const unique = new Set(numericIds);
-      expect(unique.size).toBe(numericIds.length);
+      const unique = new Set(wikiPageIds);
+      expect(unique.size).toBe(wikiPageIds.length);
     });
   });
 
@@ -168,15 +172,17 @@ describe("loader", () => {
 
     it("loads record collection schemas on organization", () => {
       const orgSchema = graph.getSchema("organization");
-      expect(orgSchema!.items).toBeDefined();
-      expect(orgSchema!.items!["funding-rounds"]).toBeDefined();
-      expect(orgSchema!.items!["key-people"]).toBeDefined();
+      expect(orgSchema!.records).toBeDefined();
+      expect(orgSchema!.records).toContain("funding-round");
+      expect(orgSchema!.records).toContain("key-person");
 
-      const frFields = orgSchema!.items!["funding-rounds"].fields;
-      expect(frFields["date"].required).toBe(true);
-      expect(frFields["date"].type).toBe("date");
-      expect(frFields["amount"].type).toBe("number");
-      expect(frFields["lead_investor"].type).toBe("ref");
+      // Verify the record schemas themselves are loaded
+      const frSchema = graph.getRecordSchema("funding-round");
+      expect(frSchema).toBeDefined();
+      expect(frSchema!.fields["date"].required).toBe(true);
+      expect(frSchema!.fields["date"].type).toBe("date");
+      expect(frSchema!.fields["raised"].type).toBe("number");
+      expect(frSchema!.fields["lead_investor"].type).toBe("ref");
     });
   });
 
@@ -243,9 +249,12 @@ describe("loader", () => {
       const janFacts = graph.getFacts("jan-leike", {
         property: "employed-by",
       });
+      const openaiId = graph.getEntity("openai")!.id;
+      const anthropicId = graph.getEntity("anthropic")!.id;
+
       // One fact has validEnd (the OpenAI one)
       const openAiFact = janFacts.find(
-        (f) => f.value.type === "ref" && f.value.value === "openai"
+        (f) => f.value.type === "ref" && f.value.value === openaiId
       );
       expect(openAiFact).toBeDefined();
       expect(openAiFact!.asOf).toBe("2021-01");
@@ -253,7 +262,7 @@ describe("loader", () => {
 
       // One fact has no validEnd (the Anthropic one)
       const anthropicFact = janFacts.find(
-        (f) => f.value.type === "ref" && f.value.value === "anthropic"
+        (f) => f.value.type === "ref" && f.value.value === anthropicId
       );
       expect(anthropicFact).toBeDefined();
       expect(anthropicFact!.asOf).toBe("2024-05");

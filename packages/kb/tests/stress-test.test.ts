@@ -70,9 +70,10 @@ describe("Q3: Compare all AI labs valuations", () => {
     const valuations = graph.getByProperty("valuation", { latest: true });
     // At minimum, Anthropic should have valuation data
     expect(valuations.size).toBeGreaterThanOrEqual(1);
-    expect(valuations.has("anthropic")).toBe(true);
+    const anthropicId = graph.getEntity("anthropic")!.id;
+    expect(valuations.has(anthropicId)).toBe(true);
 
-    const anthropicVal = valuations.get("anthropic")!;
+    const anthropicVal = valuations.get(anthropicId)!;
     expect(anthropicVal.value.type).toBe("number");
     expect(
       (anthropicVal.value as { type: "number"; value: number }).value
@@ -138,8 +139,8 @@ describe("Q5: Who works at Anthropic right now", () => {
     });
 
     // Dario and Jan should both currently work at Anthropic
-    expect(employeeIds).toContain("dario-amodei");
-    expect(employeeIds).toContain("jan-leike");
+    expect(employeeIds).toContain(graph.getEntity("dario-amodei")!.id);
+    expect(employeeIds).toContain(graph.getEntity("jan-leike")!.id);
   });
 
   it("can also be answered via key-persons records for richer data", () => {
@@ -159,8 +160,9 @@ describe("Q6: Total funding raised by all AI labs", () => {
     expect(fundingMap.size).toBeGreaterThanOrEqual(1);
 
     // Anthropic should have total funding data
-    expect(fundingMap.has("anthropic")).toBe(true);
-    const anthropicFunding = fundingMap.get("anthropic")!;
+    const anthropicId = graph.getEntity("anthropic")!.id;
+    expect(fundingMap.has(anthropicId)).toBe(true);
+    const anthropicFunding = fundingMap.get(anthropicId)!;
     expect(
       (anthropicFunding.value as { type: "number"; value: number }).value
     ).toBe(67e9);
@@ -273,11 +275,12 @@ describe("Q11: Which entities have revenue data", () => {
     const revenueMap = graph.getByProperty("revenue", { latest: true });
     // At minimum Anthropic has revenue
     expect(revenueMap.size).toBeGreaterThanOrEqual(1);
-    expect(revenueMap.has("anthropic")).toBe(true);
+    const anthropicId = graph.getEntity("anthropic")!.id;
+    expect(revenueMap.has(anthropicId)).toBe(true);
 
     // List entity IDs that have revenue data
     const entitiesWithRevenue = Array.from(revenueMap.keys());
-    expect(entitiesWithRevenue).toContain("anthropic");
+    expect(entitiesWithRevenue).toContain(anthropicId);
   });
 });
 
@@ -289,7 +292,7 @@ describe("Q12: Compare headcount across AI labs", () => {
     expect(headcountMap.size).toBeGreaterThanOrEqual(1);
 
     // Anthropic headcount
-    const anthropicHc = headcountMap.get("anthropic");
+    const anthropicHc = headcountMap.get(graph.getEntity("anthropic")!.id);
     expect(anthropicHc).toBeDefined();
     expect(anthropicHc!.value.type).toBe("number");
     expect(
@@ -415,13 +418,13 @@ describe("Q17: Anthropic vs OpenAI market share", () => {
   it("cross-entity lookup works for market-share", () => {
     const shareMap = graph.getByProperty("market-share", { latest: true });
     expect(shareMap.size).toBeGreaterThanOrEqual(1);
-    expect(shareMap.has("openai")).toBe(true);
+    expect(shareMap.has(graph.getEntity("openai")!.id)).toBe(true);
   });
 
   it("cross-entity lookup works for enterprise-market-share (Anthropic only)", () => {
     const shareMap = graph.getByProperty("enterprise-market-share", { latest: true });
     expect(shareMap.size).toBe(1);
-    expect(shareMap.has("anthropic")).toBe(true);
+    expect(shareMap.has(graph.getEntity("anthropic")!.id)).toBe(true);
   });
 });
 
@@ -445,19 +448,19 @@ describe("Q18: Jan Leike career history (was IMPOSSIBLE)", () => {
 
     // First position: DeepMind (2017 to 2021)
     const deepmind = sorted[0];
-    expect(deepmind.value).toEqual({ type: "ref", value: "deepmind" });
+    expect(deepmind.value).toEqual({ type: "ref", value: graph.getEntity("deepmind")!.id });
     expect(deepmind.asOf).toBe("2017");
     expect(deepmind.validEnd).toBe("2021");
 
     // Second position: OpenAI (2021-01 to 2024-05)
     const openai = sorted[1];
-    expect(openai.value).toEqual({ type: "ref", value: "openai" });
+    expect(openai.value).toEqual({ type: "ref", value: graph.getEntity("openai")!.id });
     expect(openai.asOf).toBe("2021-01");
     expect(openai.validEnd).toBe("2024-05");
 
     // Third position: Anthropic (2024-05, ongoing)
     const anthropic = sorted[2];
-    expect(anthropic.value).toEqual({ type: "ref", value: "anthropic" });
+    expect(anthropic.value).toEqual({ type: "ref", value: graph.getEntity("anthropic")!.id });
     expect(anthropic.asOf).toBe("2024-05");
     expect(anthropic.validEnd).toBeUndefined(); // Still there
 
@@ -474,7 +477,7 @@ describe("Q18: Jan Leike career history (was IMPOSSIBLE)", () => {
           .map((f) => (f.value as { type: "ref"; value: string }).value)
       ),
     ];
-    expect(currentEmployers).toContain("anthropic");
+    expect(currentEmployers).toContain(graph.getEntity("anthropic")!.id);
 
     // Role history
     const roles = graph.getFacts("jan-leike", { property: "role" });
@@ -542,7 +545,7 @@ describe("Q20: Bidirectional person-org lookup", () => {
     // original and derived employed-by facts. Use getRelated for a clean
     // list of employer IDs.
     const employers = graph.getRelated("dario-amodei", "employed-by");
-    expect(employers).toContain("anthropic");
+    expect(employers).toContain(graph.getEntity("anthropic")!.id);
 
     // Alternatively, filter to non-derived facts for the canonical record
     const originalFacts = graph
@@ -551,7 +554,7 @@ describe("Q20: Bidirectional person-org lookup", () => {
     expect(originalFacts).toHaveLength(1);
     expect(
       (originalFacts[0].value as { type: "ref"; value: string }).value
-    ).toBe("anthropic");
+    ).toBe(graph.getEntity("anthropic")!.id);
 
     // Get Dario's role
     const role = graph.getLatest("dario-amodei", "role");
@@ -580,7 +583,7 @@ describe("Q20: Bidirectional person-org lookup", () => {
   it("org -> person: also works via inverse employer-of facts", () => {
     // computeInverses should have created employer-of facts on Anthropic
     const employees = graph.getRelated("anthropic", "employer-of");
-    expect(employees).toContain("dario-amodei");
-    expect(employees).toContain("jan-leike");
+    expect(employees).toContain(graph.getEntity("dario-amodei")!.id);
+    expect(employees).toContain(graph.getEntity("jan-leike")!.id);
   });
 });

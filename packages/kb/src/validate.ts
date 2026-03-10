@@ -74,11 +74,11 @@ function looksLikeDate(value: unknown): boolean {
   return /^\d{4}(-\d{2}(-\d{2})?)?$/.test(value);
 }
 
-/** StableId format: exactly 10 alphanumeric characters. */
-const STABLEID_RE = /^[A-Za-z0-9]{10}$/;
+/** Entity ID format: exactly 10 alphanumeric characters. */
+const ENTITY_ID_RE = /^[A-Za-z0-9]{10}$/;
 
-/** Fact ID format: f_ + exactly 10 alphanumeric chars, or inv_ prefix (for computed inverses). */
-const FACTID_RE = /^(f_[A-Za-z0-9]{10}|inv_.+)$/;
+/** Fact ID format: 10 alphanumeric chars (new), or f_ + 10 (legacy), or inv_ (computed). */
+const FACTID_RE = /^([A-Za-z0-9]{10}|f_[A-Za-z0-9]{10}|inv_.+)$/;
 
 /** Date format: YYYY, YYYY-MM, or YYYY-MM-DD. */
 const DATE_FORMAT_RE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
@@ -227,27 +227,26 @@ function checkCompleteness(
 
 // ── New per-entity checks (7–21) ─────────────────────────────────────────────
 
-/** Check 7: stableId format — must be exactly 10 alphanumeric chars. */
-function checkStableIdFormat(
-  entityId: string,
-  stableId: string
+/** Check 7: entity ID format — must be exactly 10 alphanumeric chars. */
+function checkEntityIdFormat(
+  entity: { id: string; slug: string }
 ): ValidationResult[] {
-  if (!STABLEID_RE.test(stableId)) {
+  if (!ENTITY_ID_RE.test(entity.id)) {
     return [
       {
         severity: "error",
-        entityId,
+        entityId: entity.slug,
         message:
-          `Entity "${entityId}" has invalid stableId "${stableId}" ` +
+          `Entity "${entity.slug}" has invalid id "${entity.id}" ` +
           `(must be exactly 10 alphanumeric characters).`,
-        rule: "stableid-format",
+        rule: "stableid-format", // keep rule name for backward compat
       },
     ];
   }
   return [];
 }
 
-/** Check 9: fact ID format — must start with f_ or inv_ prefix. */
+/** Check 9: fact ID format — must be 10 alphanumeric, or f_ + 10, or inv_ prefix. */
 function checkFactIdFormat(
   graph: Graph,
   entityId: string
@@ -262,7 +261,7 @@ function checkFactIdFormat(
         entityId,
         message:
           `Fact "${fact.id}" on entity "${entityId}" has invalid ID format ` +
-          `(must be "f_" + 10 alphanumeric chars, or "inv_" prefix for inverses).`,
+          `(must be 10 alphanumeric chars, "f_" + 10 chars, or "inv_" prefix for inverses).`,
         rule: "factid-format",
       });
     }
@@ -723,25 +722,20 @@ function checkCurrencyCode(
 
 // ── Graph-level checks (run once across all entities) ─────────────────────────
 
-/** Check 8: duplicate stableIds across the graph. */
-function checkDuplicateStableIds(graph: Graph): ValidationResult[] {
+/** Check 8: duplicate entity IDs across the graph. */
+function checkDuplicateEntityIds(graph: Graph): ValidationResult[] {
   const results: ValidationResult[] = [];
-  const seen = new Map<string, string>(); // stableId → first entityId
 
-  for (const entity of graph.getAllEntities()) {
-    const existing = seen.get(entity.stableId);
-    if (existing) {
-      results.push({
-        severity: "error",
-        entityId: entity.id,
-        message:
-          `Entity "${entity.id}" shares stableId "${entity.stableId}" ` +
-          `with entity "${existing}".`,
-        rule: "duplicate-stableid",
-      });
-    } else {
-      seen.set(entity.stableId, entity.id);
-    }
+  // Check duplicates detected during loading (since Map overwrites, post-hoc check misses them)
+  for (const dup of graph.getDuplicateIds()) {
+    results.push({
+      severity: "error",
+      entityId: dup.slug,
+      message:
+        `Entity "${dup.slug}" shares id "${dup.id}" ` +
+        `with entity "${dup.existingSlug}".`,
+      rule: "duplicate-stableid", // keep rule name for backward compat
+    });
   }
 
   return results;
@@ -768,30 +762,32 @@ function checkBidirectionalRedundancy(graph: Graph): ValidationResult[] {
     // Get all entities that have a non-derived fact for this property.
     for (const entity of graph.getAllEntities()) {
       const facts = graph
-        .getFacts(entity.id, { property: propertyId })
+        .getFacts(entity.slug, { property: propertyId })
         .filter((f) => !f.derivedFrom);
 
       for (const fact of facts) {
         // For ref values, check if the referenced entity has an explicit inverse fact.
         if (fact.value.type === "ref") {
-          const refId = fact.value.value;
+          const refIdOrSlug = fact.value.value;
           const inverseFacts = graph
-            .getFacts(refId, { property: inverseId })
+            .getFacts(refIdOrSlug, { property: inverseId })
             .filter(
               (f) =>
                 !f.derivedFrom &&
                 f.value.type === "ref" &&
-                f.value.value === entity.id
+                // Compare by resolving both to entity ID
+                graph.resolveSlug(f.value.value) === entity.slug
             );
 
           if (inverseFacts.length > 0) {
+            const refSlug = graph.resolveSlug(refIdOrSlug) ?? refIdOrSlug;
             results.push({
               severity: "warning",
-              entityId: entity.id,
+              entityId: entity.slug,
               propertyId,
               message:
-                `Bidirectional redundancy: "${entity.id}" has "${propertyId}" → "${refId}", ` +
-                `and "${refId}" has explicit "${inverseId}" → "${entity.id}". ` +
+                `Bidirectional redundancy: "${entity.slug}" has "${propertyId}" → "${refSlug}", ` +
+                `and "${refSlug}" has explicit "${inverseId}" → "${entity.slug}". ` +
                 `Only one side needs to be stored; the other is computed via inverse.`,
               rule: "bidirectional-redundancy",
             });
@@ -831,7 +827,7 @@ export function validateEntity(
 
   // General checks that don't depend on a TypeSchema.
   const generalResults: ValidationResult[] = [
-    ...checkStableIdFormat(entityId, entity.stableId),
+    ...checkEntityIdFormat(entity),
     ...checkEmptyName(entityId, entity.name),
     ...checkFactIdFormat(graph, entityId),
     ...checkValidEndBeforeAsOf(graph, entityId),
@@ -882,13 +878,13 @@ export function validate(
 ): ValidationResult[] {
   const results: ValidationResult[] = [];
 
-  // Per-entity checks
+  // Per-entity checks (use slug for human-readable validation output)
   for (const entity of graph.getAllEntities()) {
-    results.push(...validateEntity(graph, entity.id));
+    results.push(...validateEntity(graph, entity.slug));
   }
 
   // Graph-level checks
-  results.push(...checkDuplicateStableIds(graph));
+  results.push(...checkDuplicateEntityIds(graph));
   results.push(...checkBidirectionalRedundancy(graph));
 
   return results;

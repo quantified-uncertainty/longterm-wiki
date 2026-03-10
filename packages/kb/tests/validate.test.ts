@@ -3,9 +3,14 @@ import path from "node:path";
 import { loadKB } from "../src/loader";
 import { validate, validateEntity } from "../src/validate";
 import { Graph } from "../src/graph";
-import type { ValidationResult } from "../src/types";
+import type { Entity, ValidationResult } from "../src/types";
 
 const DATA_DIR = path.resolve(__dirname, "../data");
+
+/** Helper: create an Entity with both old and new field names. */
+function ent(slug: string, stableId: string, type: string, name: string, extra?: Partial<Entity>): Entity {
+  return { id: stableId, slug, stableId, type, name, ...extra };
+}
 
 describe("validate", () => {
   let graph: Graph;
@@ -132,12 +137,7 @@ describe("validate", () => {
     it("returns warning for entity with no registered schema", () => {
       // Create a minimal graph with an entity of unknown type
       const minGraph = new Graph();
-      minGraph.addEntity({
-        id: "test-product",
-        stableId: "abc123def0",
-        type: "product",
-        name: "Test Product",
-      });
+      minGraph.addEntity(ent("test-product", "abc123def0", "product", "Test Product"));
 
       const results = validateEntity(minGraph, "test-product");
       // schema-exists warning + orphan-entity info (no facts, no items)
@@ -156,12 +156,7 @@ describe("validate", () => {
         required: ["founded-date", "headquarters"],
         recommended: ["revenue"],
       });
-      minGraph.addEntity({
-        id: "empty-org",
-        stableId: "xyz456abc0",
-        type: "organization",
-        name: "Empty Org",
-      });
+      minGraph.addEntity(ent("empty-org", "xyz456abc0", "organization", "Empty Org"));
 
       const results = validateEntity(minGraph, "empty-org");
       const requiredErrors = results.filter(
@@ -191,12 +186,7 @@ describe("validate", () => {
         dataType: "number",
         appliesTo: ["organization"],
       });
-      testGraph.addEntity({
-        id: "wrong-type",
-        stableId: "abc123def0",
-        type: "person",
-        name: "Wrong Type",
-      });
+      testGraph.addEntity(ent("wrong-type", "abc123def0", "person", "Wrong Type"));
       testGraph.addFact({
         id: "f_test123456",
         subjectId: "wrong-type",
@@ -221,7 +211,7 @@ describe("validate", () => {
     it("accepts valid 10-char alphanumeric stableId", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
-      g.addEntity({ id: "good", stableId: "aB3cD4eF5g", type: "org", name: "Good" });
+      g.addEntity(ent("good", "aB3cD4eF5g", "org", "Good"));
       g.addFact({ id: "f_x1", subjectId: "good", propertyId: "p", value: { type: "text", value: "v" } });
 
       const results = validateEntity(g, "good");
@@ -232,7 +222,7 @@ describe("validate", () => {
     it("rejects stableId that is too short", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
-      g.addEntity({ id: "short", stableId: "abc12", type: "org", name: "Short" });
+      g.addEntity(ent("short", "abc12", "org", "Short"));
 
       const results = validateEntity(g, "short");
       const formatErrors = results.filter((r) => r.rule === "stableid-format");
@@ -243,7 +233,7 @@ describe("validate", () => {
     it("rejects stableId with non-alphanumeric characters", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
-      g.addEntity({ id: "bad", stableId: "abc-123_fg", type: "org", name: "Bad" });
+      g.addEntity(ent("bad", "abc-123_fg", "org", "Bad"));
 
       const results = validateEntity(g, "bad");
       const formatErrors = results.filter((r) => r.rule === "stableid-format");
@@ -256,8 +246,8 @@ describe("validate", () => {
     it("catches two entities sharing a stableId", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
-      g.addEntity({ id: "ent-a", stableId: "aB3cD4eF5g", type: "org", name: "A" });
-      g.addEntity({ id: "ent-b", stableId: "aB3cD4eF5g", type: "org", name: "B" });
+      g.addEntity(ent("ent-a", "aB3cD4eF5g", "org", "A"));
+      g.addEntity(ent("ent-b", "aB3cD4eF5g", "org", "B"));
 
       const results = validate(g);
       const dupErrors = results.filter((r) => r.rule === "duplicate-stableid");
@@ -268,8 +258,8 @@ describe("validate", () => {
     it("does not flag unique stableIds", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
-      g.addEntity({ id: "ent-a", stableId: "aB3cD4eF5g", type: "org", name: "A" });
-      g.addEntity({ id: "ent-b", stableId: "xY7zW8vU9t", type: "org", name: "B" });
+      g.addEntity(ent("ent-a", "aB3cD4eF5g", "org", "A"));
+      g.addEntity(ent("ent-b", "xY7zW8vU9t", "org", "B"));
 
       const results = validate(g);
       const dupErrors = results.filter((r) => r.rule === "duplicate-stableid");
@@ -282,7 +272,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_abc123def0", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" } });
 
       const results = validateEntity(g, "ent");
@@ -294,7 +284,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "inv_abc123def0", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" } });
 
       const results = validateEntity(g, "ent");
@@ -306,7 +296,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "bad_id", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" } });
 
       const results = validateEntity(g, "ent");
@@ -319,7 +309,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "revenue", name: "Revenue", dataType: "number" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_rev_2024_12", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 1e9 } });
 
       const results = validateEntity(g, "ent");
@@ -331,7 +321,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_short", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" } });
 
       const results = validateEntity(g, "ent");
@@ -344,7 +334,7 @@ describe("validate", () => {
     it("catches entity with empty name", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
-      g.addEntity({ id: "no-name", stableId: "aB3cD4eF5g", type: "org", name: "" });
+      g.addEntity(ent("no-name", "aB3cD4eF5g", "org", ""));
 
       const results = validateEntity(g, "no-name");
       const nameErrors = results.filter((r) => r.rule === "empty-name");
@@ -355,7 +345,7 @@ describe("validate", () => {
     it("catches entity with whitespace-only name", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
-      g.addEntity({ id: "space-name", stableId: "aB3cD4eF5g", type: "org", name: "   " });
+      g.addEntity(ent("space-name", "aB3cD4eF5g", "org", "   "));
 
       const results = validateEntity(g, "space-name");
       const nameErrors = results.filter((r) => r.rule === "empty-name");
@@ -365,7 +355,7 @@ describe("validate", () => {
     it("does not flag entity with valid name", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
-      g.addEntity({ id: "good", stableId: "aB3cD4eF5g", type: "org", name: "Good Name" });
+      g.addEntity(ent("good", "aB3cD4eF5g", "org", "Good Name"));
 
       const results = validateEntity(g, "good");
       const nameErrors = results.filter((r) => r.rule === "empty-name");
@@ -378,7 +368,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "status", name: "Status", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({
         id: "f_bad_dates",
         subjectId: "ent",
@@ -398,7 +388,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "status", name: "Status", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({
         id: "f_good_dates",
         subjectId: "ent",
@@ -419,7 +409,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "revenue", name: "Revenue", dataType: "number", temporal: true });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({
         id: "f_no_date",
         subjectId: "ent",
@@ -438,7 +428,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "revenue", name: "Revenue", dataType: "number", temporal: true });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({
         id: "f_with_date",
         subjectId: "ent",
@@ -456,7 +446,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "revenue", name: "Revenue", dataType: "number", temporal: true });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({
         id: "inv_derived",
         subjectId: "ent",
@@ -476,7 +466,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "headquarters", name: "HQ", dataType: "text", temporal: false });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_hq1", subjectId: "ent", propertyId: "headquarters", value: { type: "text", value: "SF" } });
       g.addFact({ id: "f_hq2", subjectId: "ent", propertyId: "headquarters", value: { type: "text", value: "NYC" } });
 
@@ -490,7 +480,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "revenue", name: "Revenue", dataType: "number", temporal: true });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_r1", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 100 }, asOf: "2024-01" });
       g.addFact({ id: "f_r2", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 200 }, asOf: "2024-06" });
 
@@ -505,7 +495,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "revenue", name: "Revenue", dataType: "number", temporal: true, category: "financial" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_old", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 100 }, asOf: "2020-01" });
 
       const results = validateEntity(g, "ent");
@@ -518,7 +508,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "revenue", name: "Revenue", dataType: "number", temporal: true });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_new", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 100 }, asOf: "2025-06" });
 
       const results = validateEntity(g, "ent");
@@ -532,7 +522,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "revenue", name: "Revenue", dataType: "number" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_dup1", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 100 }, asOf: "2024-01" });
       g.addFact({ id: "f_dup2", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 200 }, asOf: "2024-01" });
 
@@ -546,7 +536,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "revenue", name: "Revenue", dataType: "number" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_ts1", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 100 }, asOf: "2024-01" });
       g.addFact({ id: "f_ts2", subjectId: "ent", propertyId: "revenue", value: { type: "number", value: 200 }, asOf: "2024-06" });
 
@@ -561,7 +551,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_nosrc", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" } });
 
       const results = validateEntity(g, "ent");
@@ -574,7 +564,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_withsrc", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" }, source: "https://example.com" });
 
       const results = validateEntity(g, "ent");
@@ -588,7 +578,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       // Do NOT add property "mystery" to the graph
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_unk", subjectId: "ent", propertyId: "mystery", value: { type: "text", value: "v" } });
 
       const results = validateEntity(g, "ent");
@@ -602,7 +592,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_known", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" } });
 
       const results = validateEntity(g, "ent");
@@ -616,7 +606,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_baddate", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" }, asOf: "Jan 2024" });
 
       const results = validateEntity(g, "ent");
@@ -629,7 +619,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_badend", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" }, asOf: "2024", validEnd: "2024/06/01" });
 
       const results = validateEntity(g, "ent");
@@ -642,7 +632,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_y", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" }, asOf: "2024" });
       g.addFact({ id: "f_ym", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" }, asOf: "2024-06" });
       g.addFact({ id: "f_ymd", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" }, asOf: "2024-06-15" });
@@ -658,7 +648,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_future", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" }, asOf: "2099-01-01" });
 
       const results = validateEntity(g, "ent");
@@ -671,7 +661,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "ent", stableId: "aB3cD4eF5g", type: "org", name: "E" });
+      g.addEntity(ent("ent", "aB3cD4eF5g", "org", "E"));
       g.addFact({ id: "f_past", subjectId: "ent", propertyId: "name", value: { type: "text", value: "v" }, asOf: "2020-01-01" });
 
       const results = validateEntity(g, "ent");
@@ -684,7 +674,7 @@ describe("validate", () => {
     it("reports orphan entity with no facts and no items", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
-      g.addEntity({ id: "orphan", stableId: "aB3cD4eF5g", type: "org", name: "Orphan" });
+      g.addEntity(ent("orphan", "aB3cD4eF5g", "org", "Orphan"));
 
       const results = validateEntity(g, "orphan");
       const orphanInfos = results.filter((r) => r.rule === "orphan-entity");
@@ -696,7 +686,7 @@ describe("validate", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addProperty({ id: "name", name: "Name", dataType: "text" });
-      g.addEntity({ id: "active", stableId: "aB3cD4eF5g", type: "org", name: "Active" });
+      g.addEntity(ent("active", "aB3cD4eF5g", "org", "Active"));
       g.addFact({ id: "f_a1", subjectId: "active", propertyId: "name", value: { type: "text", value: "v" } });
 
       const results = validateEntity(g, "active");
@@ -713,8 +703,8 @@ describe("validate", () => {
       g.addProperty({ id: "employed-by", name: "Employed By", dataType: "ref", inverseId: "employer-of" });
       g.addProperty({ id: "employer-of", name: "Employs", dataType: "ref", computed: true });
 
-      g.addEntity({ id: "alice", stableId: "aB3cD4eF5g", type: "person", name: "Alice" });
-      g.addEntity({ id: "acme", stableId: "xY7zW8vU9t", type: "org", name: "ACME" });
+      g.addEntity(ent("alice", "aB3cD4eF5g", "person", "Alice"));
+      g.addEntity(ent("acme", "xY7zW8vU9t", "org", "ACME"));
 
       // Both sides stored explicitly (the inverse should be computed, not stored)
       g.addFact({ id: "f_alice_emp", subjectId: "alice", propertyId: "employed-by", value: { type: "ref", value: "acme" } });
@@ -733,8 +723,8 @@ describe("validate", () => {
       g.addProperty({ id: "employed-by", name: "Employed By", dataType: "ref", inverseId: "employer-of" });
       g.addProperty({ id: "employer-of", name: "Employs", dataType: "ref", computed: true });
 
-      g.addEntity({ id: "alice", stableId: "aB3cD4eF5g", type: "person", name: "Alice" });
-      g.addEntity({ id: "acme", stableId: "xY7zW8vU9t", type: "org", name: "ACME" });
+      g.addEntity(ent("alice", "aB3cD4eF5g", "person", "Alice"));
+      g.addEntity(ent("acme", "xY7zW8vU9t", "org", "ACME"));
 
       g.addFact({ id: "f_alice_emp", subjectId: "alice", propertyId: "employed-by", value: { type: "ref", value: "acme" } });
       // employer-of NOT explicitly stored — will be computed

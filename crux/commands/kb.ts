@@ -95,8 +95,8 @@ function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): Co
   const lines: string[] = [];
 
   // Header
-  lines.push(`\x1b[1m${entity.name}\x1b[0m (${entity.stableId})`);
-  lines.push(`Type: ${entity.type} | Slug: ${entity.id}${entity.numericId ? ` | ${entity.numericId}` : ''}`);
+  lines.push(`\x1b[1m${entity.name}\x1b[0m (${entity.id})`);
+  lines.push(`Type: ${entity.type} | Slug: ${entity.slug}${entity.wikiPageId ? ` | ${entity.wikiPageId}` : ''}`);
   if (entity.aliases?.length) {
     lines.push(`Aliases: ${entity.aliases.join(', ')}`);
   }
@@ -240,9 +240,9 @@ async function listCommand(
   if (options.ci) {
     const data = entities.map((e) => ({
       id: e.id,
+      slug: e.slug,
       name: e.name,
       type: e.type,
-      stableId: e.stableId,
       factCount: graph.getFacts(e.id).length,
       itemCount: graph.getRecordCollectionNames(e.id).reduce(
         (sum, col) => sum + graph.getRecords(e.id, col).length,
@@ -254,7 +254,7 @@ async function listCommand(
 
   // Table header
   const lines: string[] = [];
-  const header = `${'ID'.padEnd(24)} ${'Name'.padEnd(24)} ${'Type'.padEnd(16)} ${'StableId'.padEnd(14)} ${'Facts'.padEnd(7)} Items`;
+  const header = `${'Slug'.padEnd(24)} ${'Name'.padEnd(24)} ${'Type'.padEnd(16)} ${'ID'.padEnd(14)} ${'Facts'.padEnd(7)} Items`;
   lines.push(`\x1b[1m${header}\x1b[0m`);
   lines.push('-'.repeat(header.length));
 
@@ -264,7 +264,7 @@ async function listCommand(
       (sum, col) => sum + graph.getRecords(entity.id, col).length,
       0,
     );
-    const row = `${entity.id.padEnd(24)} ${entity.name.padEnd(24)} ${entity.type.padEnd(16)} ${entity.stableId.padEnd(14)} ${String(facts.length).padEnd(7)} ${itemCount}`;
+    const row = `${entity.slug.padEnd(24)} ${entity.name.padEnd(24)} ${entity.type.padEnd(16)} ${entity.id.padEnd(14)} ${String(facts.length).padEnd(7)} ${itemCount}`;
     lines.push(row);
   }
 
@@ -308,13 +308,13 @@ Examples:
   if (options.ci) {
     return {
       exitCode: 0,
-      output: JSON.stringify({ stableId, slug: entity.id, name: entity.name, type: entity.type }),
+      output: JSON.stringify({ stableId, slug: entity.slug, name: entity.name, type: entity.type }),
     };
   }
 
   return {
     exitCode: 0,
-    output: `${stableId} -> ${entity.name} (${entity.id})\n  Type: ${entity.type}${entity.numericId ? ` | ${entity.numericId}` : ''}`,
+    output: `${stableId} -> ${entity.name} (${entity.slug})\n  Type: ${entity.type}${entity.wikiPageId ? ` | ${entity.wikiPageId}` : ''}`,
   };
 }
 
@@ -515,20 +515,21 @@ Examples:
 
   const q = query.toLowerCase();
   const matches = entities.filter((e) => {
+    if (e.slug.toLowerCase().includes(q)) return true;
     if (e.id.toLowerCase().includes(q)) return true;
     if (e.name.toLowerCase().includes(q)) return true;
     if (e.aliases?.some((a) => a.toLowerCase().includes(q))) return true;
-    if (e.numericId?.toLowerCase().includes(q)) return true;
+    if (e.wikiPageId?.toLowerCase().includes(q)) return true;
     return false;
   });
 
   if (options.ci) {
     const data = matches.map((e) => ({
       id: e.id,
+      slug: e.slug,
       name: e.name,
       type: e.type,
-      stableId: e.stableId,
-      numericId: e.numericId,
+      wikiPageId: e.wikiPageId,
       aliases: e.aliases,
       factCount: graph.getFacts(e.id).length,
     }));
@@ -540,13 +541,13 @@ Examples:
   }
 
   const lines: string[] = [];
-  const header = `${'ID'.padEnd(28)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} ${'NumericID'.padEnd(10)} Facts`;
+  const header = `${'Slug'.padEnd(28)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} ${'WikiPageId'.padEnd(10)} Facts`;
   lines.push(`\x1b[1m${header}\x1b[0m`);
   lines.push('-'.repeat(header.length));
 
   for (const entity of matches) {
     const factCount = graph.getFacts(entity.id).length;
-    const row = `${entity.id.padEnd(28)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${(entity.numericId ?? '').padEnd(10)} ${factCount}`;
+    const row = `${entity.slug.padEnd(28)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${(entity.wikiPageId ?? '').padEnd(10)} ${factCount}`;
     lines.push(row);
     if (entity.aliases?.length) {
       lines.push(`  ${''.padEnd(26)} Aliases: ${entity.aliases.join(', ')}`);
@@ -625,7 +626,7 @@ async function coverageCommand(
     const scoreColor = r.factCount === 0 ? '\x1b[90m' : r.score >= 20 ? '\x1b[32m' : r.score >= 10 ? '\x1b[33m' : '\x1b[31m';
     const propStr = r.factCount > 0 ? `${r.used}/${r.applicable}` : '-';
     const scoreStr = r.factCount === 0 ? 'stub' : `${r.score}%`;
-    const row = `${r.entity.id.padEnd(28)} ${r.entity.type.padEnd(16)} ${String(r.factCount).padEnd(7)} ${propStr.padEnd(12)} ${scoreColor}${scoreStr}\x1b[0m`;
+    const row = `${r.entity.slug.padEnd(28)} ${r.entity.type.padEnd(16)} ${String(r.factCount).padEnd(7)} ${propStr.padEnd(12)} ${scoreColor}${scoreStr}\x1b[0m`;
     lines.push(row);
   }
 

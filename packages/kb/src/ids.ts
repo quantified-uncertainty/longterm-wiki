@@ -1,8 +1,9 @@
 /**
- * Stable ID generation for the Knowledge Base library.
+ * ID generation for the Knowledge Base library.
  *
- * - generateStableId()         — random 10-char alphanumeric (for Entity.stableId)
- * - generateFactId()           — "f_" + 10-char alphanumeric (random)
+ * - generateId()               — random 10-char alphanumeric (for entities and new facts)
+ * - generateStableId()         — deprecated alias for generateId()
+ * - generateFactId()           — "f_" + 10-char alphanumeric (legacy format, still works)
  * - contentHash(parts)         — deterministic SHA-256-based 10-char token
  * - generateContentFactId(...) — "f_" + contentHash (idempotent sync helper)
  */
@@ -35,14 +36,21 @@ function randomAlphanumeric10(): string {
 }
 
 /**
- * Returns a random 10-character alphanumeric string suitable for use as a
- * Entity's `stableId`.  Survives renames because it is purely random.
+ * Returns a random 10-character alphanumeric string suitable for use as an
+ * entity ID or fact ID. Survives renames because it is purely random.
  *
  * @example
- * generateStableId() // "a3Kf2rZ9mQ"
+ * generateId() // "a3Kf2rZ9mQ"
+ */
+export function generateId(): string {
+  return randomAlphanumeric10();
+}
+
+/**
+ * @deprecated Use `generateId()` instead. Alias kept for backward compat.
  */
 export function generateStableId(): string {
-  return randomAlphanumeric10();
+  return generateId();
 }
 
 /**
