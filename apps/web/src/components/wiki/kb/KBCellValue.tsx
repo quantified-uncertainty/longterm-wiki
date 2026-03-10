@@ -74,7 +74,7 @@ export function KBCellValue({ value, fieldName, fieldDef }: KBCellValueProps) {
   // Booleans
   if (fieldType === "boolean" || typeof value === "boolean") {
     return (
-      <span className="text-muted-foreground">
+      <span className="text-muted-foreground" aria-label={value ? "Yes" : "No"}>
         {value ? "\u2713" : "\u2717"}
       </span>
     );

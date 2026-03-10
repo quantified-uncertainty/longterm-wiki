@@ -7,7 +7,19 @@ import { KBPublicationsTable } from "./kb-publications-table";
 import type { PublicationDataRow } from "./kb-publications-table";
 
 export function KBPublicationsContent() {
-  const publications = getAllPublications();
+  let publications;
+  try {
+    publications = getAllPublications();
+  } catch (error) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-destructive font-medium">Failed to load publications data</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          {error instanceof Error ? error.message : "Unknown error"}
+        </p>
+      </div>
+    );
+  }
 
   const rows: PublicationDataRow[] = publications.map((pub) => {
     const resources = getResourcesForPublication(pub.id);
