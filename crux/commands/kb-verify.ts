@@ -66,6 +66,8 @@ interface VerificationResult {
   confidence: number;
   extractedValue: string;
   reasoning: string;
+  /** Structured error type when source had issues (e.g., paywall) but content was still usable */
+  errorType?: SourceFetchErrorType;
 }
 
 interface VerificationError {
@@ -133,8 +135,8 @@ async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
   try {
     const result = await getCitationContentByUrl(url);
     if (result.ok && result.data) {
-      const data = result.data as { fullText?: string; content?: string; text?: string };
-      const content = data.fullText || data.content || data.text;
+      const cached = result.data;
+      const content = cached.fullText;
       if (content && content.length > 0) {
         // Check for paywall signals even in cached content
         if (detectPaywall(content)) {
@@ -273,9 +275,8 @@ async function verifySingleFact(
     };
   }
 
-  // If content was fetched but is paywalled, still attempt verification
-  // with the partial content — the LLM may still extract useful info.
-  // The errorType is preserved for reporting.
+  // If content was fetched but has issues (e.g., paywall), still attempt
+  // verification with the partial content — the LLM may still extract useful info.
   const sourceText = fetchResult.content;
 
   // Truncate source text for prompt
@@ -316,6 +317,7 @@ async function verifySingleFact(
       confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.5)),
       extractedValue: parsed.extracted_value ?? '',
       reasoning: parsed.reasoning ?? '',
+      ...(fetchResult.errorType && { errorType: fetchResult.errorType }),
     };
   } catch (e: unknown) {
     return {

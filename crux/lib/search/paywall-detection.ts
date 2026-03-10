@@ -92,9 +92,12 @@ export function classifyFetchError(
     return 'unverifiable_domain';
   }
 
-  // Timeout
-  if (errorMessage && (errorMessage.includes('abort') || errorMessage.includes('timeout') || errorMessage.includes('AbortError'))) {
-    return 'timeout';
+  // Timeout — match specific patterns to avoid false positives on unrelated substrings
+  if (errorMessage) {
+    const lowerMsg = errorMessage.toLowerCase();
+    if (lowerMsg.includes('timeout') || lowerMsg.includes('aborterror') || lowerMsg.includes('aborted') || lowerMsg === 'abort') {
+      return 'timeout';
+    }
   }
 
   // HTTP error codes
