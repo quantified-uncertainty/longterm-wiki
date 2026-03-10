@@ -2,17 +2,18 @@
  * KBAutoFacts -- Auto-rendered KB structured data section for entity pages.
  *
  * Server component that checks if an entity has substantive KB facts
- * (beyond just a description stub) and renders them in a card-like
- * collapsible section. Designed to be automatically included on entity
+ * (beyond just a description stub) and renders them in a visually rich
+ * section with hero stat cards, person cards, funding timeline, and
+ * categorized fact tables. Designed to be automatically included on entity
  * wiki pages without requiring manual MDX markup.
- *
- * Uses native HTML <details>/<summary> for collapsibility (no client JS needed).
  */
 
 import {
   getKBFacts,
   getKBEntity,
   getKBProperties,
+  getKBProperty,
+  getKBLatest,
   getKBAllRecordCollections,
   getKBRecordSchema,
   isFactExpired,
@@ -21,6 +22,7 @@ import type { Fact, Property, RecordEntry, FieldDef } from "@longterm-wiki/kb";
 import { formatKBDate, isUrl, shortDomain, titleCase } from "@components/wiki/kb/format";
 import { KBFactValueDisplay } from "@components/wiki/kb/KBFactValueDisplay";
 import { KBCellValue } from "@components/wiki/kb/KBCellValue";
+import { KBRefLink } from "@components/wiki/kb/KBRefLink";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -38,6 +40,8 @@ interface FactWithProperty {
   fact: Fact;
   property: Property | undefined;
 }
+
+// ── Constants ────────────────────────────────────────────────────────
 
 /** Sort categories in a stable, logical order. */
 const CATEGORY_ORDER: Record<string, number> = {
@@ -63,6 +67,44 @@ const CATEGORY_ORDER: Record<string, number> = {
   research: 19,
   other: 99,
 };
+
+/** Properties to show as hero stat cards by entity type. */
+const HERO_STAT_PROPERTIES: Record<string, string[]> = {
+  organization: ["revenue", "valuation", "headcount", "total-funding", "founded-date"],
+  person: ["employed-by", "role", "born-year"],
+  "ai-model": ["developed-by", "parameter-count", "context-window", "model-release-date"],
+};
+
+/** Collections that get dedicated visual renderers. */
+const SPECIAL_COLLECTIONS = new Set([
+  "key-persons",
+  "funding-rounds",
+  "model-releases",
+  "products",
+]);
+
+/** Default columns per collection type, used when schema is unavailable. */
+const DEFAULT_RECORD_COLUMNS: Record<string, string[]> = {
+  "funding-rounds": ["date", "raised", "lead_investor"],
+  "key-persons": ["person", "title", "start"],
+  products: ["name", "launched", "description"],
+  "model-releases": ["name", "released", "description"],
+  "board-seats": ["name", "role", "appointed"],
+  "strategic-partnerships": ["partner", "type", "date"],
+  "safety-milestones": ["name", "date", "description"],
+  "research-areas": ["name", "description", "started"],
+  grants: ["name", "amount", "date"],
+};
+
+/** Excluded fields (metadata, not useful in summary view). */
+const EXCLUDED_RECORD_FIELDS = new Set([
+  "source",
+  "notes",
+  "key-publication",
+  "key_publication",
+]);
+
+// ── Helpers ──────────────────────────────────────────────────────────
 
 function sortCategories(categories: string[]): string[] {
   return [...categories].sort((a, b) => {
@@ -102,6 +144,57 @@ function groupByProperty(
   return groups;
 }
 
+/** Safely extract a string field from a record entry. */
+function field(item: RecordEntry, key: string): string | undefined {
+  const v = item.fields[key];
+  if (v == null) return undefined;
+  return String(v);
+}
+
+/** Format a currency amount compactly. */
+function formatAmount(value: unknown): string | null {
+  if (value == null) return null;
+  const num = typeof value === "number" ? value : Number(value);
+  if (isNaN(num)) return String(value);
+  if (num >= 1e9) return `$${(num / 1e9).toFixed(1)}B`;
+  if (num >= 1e6) return `$${(num / 1e6).toFixed(0)}M`;
+  return `$${num.toLocaleString()}`;
+}
+
+/** Resolve which columns to show for a collection. */
+function resolveRecordColumns(
+  collectionName: string,
+  items: RecordEntry[],
+  fieldDefs?: Record<string, FieldDef>,
+): string[] {
+  const defaults = DEFAULT_RECORD_COLUMNS[collectionName];
+
+  if (fieldDefs) {
+    const schemaFields = Object.keys(fieldDefs).filter(
+      (f) => !EXCLUDED_RECORD_FIELDS.has(f),
+    );
+    if (!defaults) return schemaFields;
+    // Prefer defaults order, but only for columns actually in the schema
+    const filtered = defaults.filter((f) => fieldDefs[f]);
+    return filtered.length > 0 ? filtered : schemaFields;
+  }
+
+  if (defaults) return defaults;
+
+  // Derive from actual data, excluding metadata
+  const seen = new Set<string>();
+  for (const item of items) {
+    for (const key of Object.keys(item.fields)) {
+      if (!EXCLUDED_RECORD_FIELDS.has(key)) {
+        seen.add(key);
+      }
+    }
+  }
+  return Array.from(seen).slice(0, 5); // Cap at 5 columns
+}
+
+// ── Sub-components ───────────────────────────────────────────────────
+
 /** Source indicator: link icon for URLs, text for non-URL sources, dim dash for missing. */
 function SourceCell({ source }: { source: string | undefined }) {
   if (source && isUrl(source)) {
@@ -132,6 +225,233 @@ function SourceCell({ source }: { source: string | undefined }) {
     <span className="text-muted-foreground/30" title="No source URL">
       {"\u2014"}
     </span>
+  );
+}
+
+/** Section divider with title and optional count badge. */
+function SectionDivider({ title, count }: { title: string; count?: number }) {
+  return (
+    <div className="flex items-center gap-3 mb-3 mt-6 first:mt-0">
+      <h3 className="text-sm font-bold tracking-tight text-foreground">{title}</h3>
+      {count != null && (
+        <span className="text-[10px] font-medium tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+          {count}
+        </span>
+      )}
+      <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
+    </div>
+  );
+}
+
+/** Hero stat card for a key metric. */
+function StatCard({
+  entityId,
+  propertyId,
+}: {
+  entityId: string;
+  propertyId: string;
+}) {
+  const fact = getKBLatest(entityId, propertyId);
+  const prop = getKBProperty(propertyId);
+  if (!fact) return null;
+
+  return (
+    <div className="relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-3.5 transition-shadow hover:shadow-md">
+      <div className="absolute top-0 right-0 w-12 h-12 bg-primary/[0.03] rounded-bl-[2rem]" />
+      <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1">
+        {prop?.name ?? titleCase(propertyId)}
+      </div>
+      <div className="text-lg font-bold tabular-nums tracking-tight text-foreground">
+        <KBFactValueDisplay fact={fact} property={prop} />
+      </div>
+      {fact.asOf && (
+        <div className="text-[10px] text-muted-foreground/50 mt-0.5">
+          as of {formatKBDate(fact.asOf)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Person card for key-persons collection. */
+function PersonCard({ item }: { item: RecordEntry }) {
+  const personId = field(item, "person");
+  const personEntity = personId ? getKBEntity(personId) : null;
+  const name = personEntity?.name ?? field(item, "display_name") ?? titleCase(item.key);
+  const title = field(item, "title");
+  const start = field(item, "start");
+  const end = field(item, "end");
+  const isFounder = !!item.fields.is_founder;
+
+  const initials = name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  return (
+    <div className="group relative rounded-xl border border-border/60 bg-card p-3.5 transition-all hover:shadow-md hover:border-border">
+      <div className="flex items-start gap-2.5">
+        <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-[10px] font-semibold text-primary/70">
+          {initials}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {personId ? (
+              <KBRefLink id={personId} className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors" />
+            ) : (
+              <span className="font-semibold text-sm">{name}</span>
+            )}
+            {isFounder && (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                Founder
+              </span>
+            )}
+          </div>
+          {title && (
+            <div className="text-xs text-muted-foreground mt-0.5">{title}</div>
+          )}
+          <div className="text-[10px] text-muted-foreground/50 mt-0.5">
+            {start && formatKBDate(start)}
+            {end ? ` \u2013 ${formatKBDate(end)}` : start ? " \u2013 present" : ""}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Funding round row for timeline display. */
+function FundingRoundRow({ item }: { item: RecordEntry }) {
+  const name = field(item, "name") ?? titleCase(item.key);
+  const date = field(item, "date");
+  const raised = item.fields.raised;
+  const valuation = item.fields.valuation;
+  const leadInvestor = field(item, "lead_investor");
+  const instrument = field(item, "instrument");
+  const source = field(item, "source");
+
+  return (
+    <div className="flex gap-3 py-3 border-b border-border/40 last:border-b-0 group/row hover:bg-muted/20 -mx-4 px-4 transition-colors">
+      {/* Timeline dot */}
+      <div className="flex flex-col items-center pt-1">
+        <div className="w-2.5 h-2.5 rounded-full border-2 border-primary/50 bg-card shrink-0 group-hover/row:border-primary transition-colors" />
+        <div className="w-px flex-1 bg-gradient-to-b from-border/50 to-transparent mt-1" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline gap-2 flex-wrap">
+          <span className="font-semibold text-sm">{name}</span>
+          {instrument && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+              {instrument}
+            </span>
+          )}
+          {date && (
+            <span className="text-xs text-muted-foreground/70">
+              {formatKBDate(date)}
+            </span>
+          )}
+        </div>
+        <div className="flex items-baseline gap-3 mt-1 flex-wrap">
+          {raised != null && (
+            <span className="text-sm font-bold tabular-nums tracking-tight text-foreground">
+              {formatAmount(raised)}
+            </span>
+          )}
+          {valuation != null && (
+            <span className="text-xs text-muted-foreground">
+              at {formatAmount(valuation)} valuation
+            </span>
+          )}
+          {leadInvestor && (
+            <span className="text-xs text-muted-foreground">
+              Led by <KBRefLink id={leadInvestor} />
+            </span>
+          )}
+        </div>
+        {source && isUrl(source) && (
+          <a
+            href={source}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] text-primary/50 hover:text-primary hover:underline mt-1 inline-block transition-colors"
+          >
+            {shortDomain(source)}
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Product card. */
+function ProductCard({ item }: { item: RecordEntry }) {
+  const name = field(item, "name") ?? titleCase(item.key);
+  const launched = field(item, "launched");
+  const description = field(item, "description");
+  const source = field(item, "source");
+
+  return (
+    <div className="group rounded-xl border border-border/60 bg-card p-3.5 transition-all hover:shadow-md hover:border-border">
+      <div className="flex items-baseline gap-2">
+        <span className="font-semibold text-sm group-hover:text-primary transition-colors">
+          {name}
+        </span>
+        {launched && (
+          <span className="text-[10px] text-muted-foreground/60">
+            {formatKBDate(launched)}
+          </span>
+        )}
+      </div>
+      {description && (
+        <div className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+          {description}
+        </div>
+      )}
+      {source && isUrl(source) && (
+        <a
+          href={source}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] text-primary/50 hover:text-primary hover:underline mt-1 inline-block transition-colors"
+        >
+          {shortDomain(source)}
+        </a>
+      )}
+    </div>
+  );
+}
+
+/** Model release row. */
+function ModelReleaseRow({ item }: { item: RecordEntry }) {
+  const name = field(item, "name") ?? titleCase(item.key);
+  const released = field(item, "released");
+  const description = field(item, "description");
+  const safetyLevel = field(item, "safety_level");
+
+  return (
+    <div className="flex items-start gap-3 py-2.5 border-b border-border/50 last:border-b-0">
+      <div className="min-w-[65px] text-xs text-muted-foreground pt-0.5">
+        {released ? formatKBDate(released) : "\u2014"}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline gap-2 flex-wrap">
+          <span className="font-medium text-sm">{name}</span>
+          {safetyLevel && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+              {safetyLevel}
+            </span>
+          )}
+        </div>
+        {description && (
+          <div className="text-xs text-muted-foreground mt-0.5">
+            {description}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -256,62 +576,7 @@ function SingleFactRow({
   );
 }
 
-// ── Item collection defaults ─────────────────────────────────────────
-
-/** Default columns per collection type, used when schema is unavailable. */
-const DEFAULT_RECORD_COLUMNS: Record<string, string[]> = {
-  "funding-rounds": ["date", "raised", "lead_investor"],
-  "key-persons": ["person", "title", "start"],
-  products: ["name", "launched", "description"],
-  "model-releases": ["name", "released", "description"],
-  "board-seats": ["name", "role", "appointed"],
-  "strategic-partnerships": ["partner", "type", "date"],
-  "safety-milestones": ["name", "date", "description"],
-  "research-areas": ["name", "description", "started"],
-  grants: ["name", "amount", "date"],
-};
-
-/** Excluded fields (metadata, not useful in summary view). */
-const EXCLUDED_RECORD_FIELDS = new Set([
-  "source",
-  "notes",
-  "key-publication",
-  "key_publication",
-]);
-
-/** Resolve which columns to show for a collection. */
-function resolveRecordColumns(
-  collectionName: string,
-  items: RecordEntry[],
-  fieldDefs?: Record<string, FieldDef>,
-): string[] {
-  const defaults = DEFAULT_RECORD_COLUMNS[collectionName];
-
-  if (fieldDefs) {
-    const schemaFields = Object.keys(fieldDefs).filter(
-      (f) => !EXCLUDED_RECORD_FIELDS.has(f),
-    );
-    if (!defaults) return schemaFields;
-    // Prefer defaults order, but only for columns actually in the schema
-    const filtered = defaults.filter((f) => fieldDefs[f]);
-    return filtered.length > 0 ? filtered : schemaFields;
-  }
-
-  if (defaults) return defaults;
-
-  // Derive from actual data, excluding metadata
-  const seen = new Set<string>();
-  for (const item of items) {
-    for (const key of Object.keys(item.fields)) {
-      if (!EXCLUDED_RECORD_FIELDS.has(key)) {
-        seen.add(key);
-      }
-    }
-  }
-  return Array.from(seen).slice(0, 5); // Cap at 5 columns
-}
-
-/** Render a collapsible record collection. */
+/** Render a collapsible record collection (generic fallback). */
 function RecordCollectionSection({
   collectionName,
   items,
@@ -324,28 +589,17 @@ function RecordCollectionSection({
   const cols = resolveRecordColumns(collectionName, items, fieldDefs);
 
   return (
-    <details className="group/item">
-      <summary className="cursor-pointer select-none flex items-center gap-1.5 py-1.5 hover:bg-muted/30 transition-colors rounded px-1 -mx-1">
-        <ChevronRight
-          size={12}
-          className="text-muted-foreground/60 transition-transform group-open/item:rotate-90 shrink-0"
-        />
-        <span className="text-sm text-foreground">
-          {titleCase(collectionName)}
-        </span>
-        <span className="text-xs text-muted-foreground/60">
-          ({items.length})
-        </span>
-      </summary>
-      <div className="mt-1 mb-2 overflow-x-auto">
+    <div className="mt-4">
+      <SectionDivider title={titleCase(collectionName)} count={items.length} />
+      <div className="overflow-x-auto border border-border/40 rounded-xl">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border/50">
+            <tr className="border-b border-border/50 bg-muted/20">
               {cols.map((col) => (
                 <th
                   key={col}
                   scope="col"
-                  className="text-left text-xs font-medium text-muted-foreground/70 py-1 pr-3 whitespace-nowrap"
+                  className="text-left text-xs font-medium text-muted-foreground/70 py-1.5 px-3 whitespace-nowrap"
                 >
                   {titleCase(col)}
                 </th>
@@ -361,7 +615,7 @@ function RecordCollectionSection({
                 {cols.map((col) => (
                   <td
                     key={col}
-                    className="py-1 pr-3 text-sm align-baseline whitespace-normal"
+                    className="py-1.5 px-3 text-sm align-baseline whitespace-normal"
                   >
                     <KBCellValue
                       value={item.fields[col]}
@@ -375,9 +629,11 @@ function RecordCollectionSection({
           </tbody>
         </table>
       </div>
-    </details>
+    </div>
   );
 }
+
+// ── Main component ───────────────────────────────────────────────────
 
 export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
   const allFacts = getKBFacts(entityId);
@@ -414,28 +670,46 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
   const byCategory = groupByCategory(factsWithProps);
   const categoryKeys = sortCategories(Object.keys(byCategory));
 
-  const entityName = kbEntity?.name ?? entityId;
+  // Hero stat properties for this entity type
+  const entityType = kbEntity?.type ?? "";
+  const heroProps = HERO_STAT_PROPERTIES[entityType] ?? [];
 
-  // Open by default for entities with enough structured data
-  const AUTO_OPEN_THRESHOLD_FACTS = 5;
-  const AUTO_OPEN_THRESHOLD_RECORDS = 10;
-  const defaultOpen =
-    substantiveFacts.length >= AUTO_OPEN_THRESHOLD_FACTS ||
-    totalRecords >= AUTO_OPEN_THRESHOLD_RECORDS;
+  // Extract special collections
+  const keyPersons = allCollections["key-persons"];
+  const fundingRounds = allCollections["funding-rounds"];
+  const modelReleases = allCollections["model-releases"];
+  const products = allCollections["products"];
+
+  // Sort funding rounds by date descending
+  const sortedFundingRounds = fundingRounds
+    ? [...fundingRounds].sort((a, b) => {
+        const dateA = a.fields.date ? String(a.fields.date) : "";
+        const dateB = b.fields.date ? String(b.fields.date) : "";
+        return dateB.localeCompare(dateA);
+      })
+    : [];
+
+  // Sort model releases by date descending
+  const sortedModelReleases = modelReleases
+    ? [...modelReleases].sort((a, b) => {
+        const dateA = a.fields.released ? String(a.fields.released) : "";
+        const dateB = b.fields.released ? String(b.fields.released) : "";
+        return dateB.localeCompare(dateA);
+      })
+    : [];
+
+  // Generic collections = everything not in SPECIAL_COLLECTIONS
+  const genericCollections = Object.entries(allCollections)
+    .filter(([name]) => !SPECIAL_COLLECTIONS.has(name))
+    .sort(([a], [b]) => a.localeCompare(b));
 
   return (
     <section className="not-prose mt-8 mb-6">
-      <details
-        className="group border border-border rounded-lg bg-card shadow-sm"
-        open={defaultOpen || undefined}
-      >
-        <summary className="flex items-center gap-2.5 px-4 py-3 cursor-pointer select-none hover:bg-muted/40 transition-colors rounded-lg">
-          <ChevronRight
-            size={16}
-            className="text-muted-foreground transition-transform group-open:rotate-90 shrink-0"
-          />
-          <Database size={14} className="text-muted-foreground/60 shrink-0" />
-          <span className="text-sm font-semibold text-foreground">
+      <div className="border border-border/60 rounded-xl bg-card shadow-sm overflow-hidden">
+        {/* Header bar */}
+        <div className="px-5 py-3 border-b border-border/40 flex items-center gap-2.5">
+          <Database size={14} className="text-muted-foreground/60" />
+          <span className="text-sm font-bold tracking-tight">
             Structured Data
           </span>
           <span className="text-xs text-muted-foreground flex items-center gap-1.5 ml-1">
@@ -454,23 +728,84 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
               </span>
             )}
           </span>
-        </summary>
-
-        <div className="px-4 pb-4 pt-2 border-t border-border/50">
-          {/* Attribution + KB detail link */}
-          <p className="text-xs text-muted-foreground/60 mb-3">
-            Structured data for {entityName}.{" "}
+          <span className="ml-auto">
             <Link
               href={`/kb/entity/${entityId}`}
-              className="text-primary/60 hover:text-primary hover:underline"
+              className="text-xs text-primary/60 hover:text-primary hover:underline transition-colors"
             >
-              View full KB profile →
+              View full profile &rarr;
             </Link>
-          </p>
+          </span>
+        </div>
 
-          {/* Facts table grouped by category */}
+        <div className="px-5 py-4">
+          {/* 1. Hero stat cards */}
+          {heroProps.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-4">
+              {heroProps.map((propId) => (
+                <StatCard key={propId} entityId={entityId} propertyId={propId} />
+              ))}
+            </div>
+          )}
+
+          {/* 2. Key People */}
+          {keyPersons && keyPersons.length > 0 && (
+            <>
+              <SectionDivider title="Key People" count={keyPersons.length} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {keyPersons.map((item) => (
+                  <PersonCard key={item.key} item={item} />
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* 3. Funding History */}
+          {sortedFundingRounds.length > 0 && (
+            <>
+              <SectionDivider
+                title="Funding History"
+                count={sortedFundingRounds.length}
+              />
+              <div className="border border-border/40 rounded-xl px-4 bg-card">
+                {sortedFundingRounds.map((item) => (
+                  <FundingRoundRow key={item.key} item={item} />
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* 4. Model Releases */}
+          {sortedModelReleases.length > 0 && (
+            <>
+              <SectionDivider
+                title="Model Releases"
+                count={sortedModelReleases.length}
+              />
+              <div className="border border-border/40 rounded-xl px-4 bg-card">
+                {sortedModelReleases.map((item) => (
+                  <ModelReleaseRow key={item.key} item={item} />
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* 5. Products */}
+          {products && products.length > 0 && (
+            <>
+              <SectionDivider title="Products" count={products.length} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {products.map((item) => (
+                  <ProductCard key={item.key} item={item} />
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* 6. Category-grouped facts */}
           {substantiveFacts.length > 0 && (
-            <div className="mb-4 overflow-x-auto">
+            <>
+              <SectionDivider title="All Facts" />
               {categoryKeys.map((category) => {
                 const categoryFacts = byCategory[category];
                 if (!categoryFacts || categoryFacts.length === 0) return null;
@@ -525,46 +860,22 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
                   </div>
                 );
               })}
-            </div>
+            </>
           )}
 
-          {/* Record collections */}
-          {collectionNames.length > 0 && (
-            <div>
-              {substantiveFacts.length > 0 && (
-                <div className="border-t border-border/40 pt-3 mt-1" />
-              )}
-              {/* Collection summary badges */}
-              <div className="flex flex-wrap gap-x-3 gap-y-1 mb-2 text-xs text-muted-foreground/60">
-                {collectionNames.map((name) => {
-                  const count = allCollections[name]?.length ?? 0;
-                  return (
-                    <span key={name}>
-                      {titleCase(name)}{" "}
-                      <span className="text-muted-foreground/40">
-                        ({count})
-                      </span>
-                    </span>
-                  );
-                })}
-              </div>
-              {/* Expandable collection tables */}
-              {collectionNames.map((name) => {
-                const items = allCollections[name];
-                if (!items || items.length === 0) return null;
-
-                return (
-                  <RecordCollectionSection
-                    key={name}
-                    collectionName={name}
-                    items={items}
-                  />
-                );
-              })}
-            </div>
-          )}
+          {/* 7. Other collections (generic table) */}
+          {genericCollections.map(([name, items]) => {
+            if (!items || items.length === 0) return null;
+            return (
+              <RecordCollectionSection
+                key={name}
+                collectionName={name}
+                items={items}
+              />
+            );
+          })}
         </div>
-      </details>
+      </div>
     </section>
   );
 }
