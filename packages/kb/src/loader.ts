@@ -332,9 +332,14 @@ function parseEntity(raw: EntityFile["thing"]): Entity {
     : raw.numericId !== undefined
       ? normalizeWikiPageId(raw.numericId)
       : undefined;
+  if (!raw.slug) {
+    throw new Error(
+      `[kb/loader] Entity "${raw.id}" is in new format but missing required "slug" field`
+    );
+  }
   return {
     id: raw.id,
-    slug: raw.slug!,
+    slug: raw.slug,
     type: raw.type,
     name: raw.name,
     ...(raw.parent !== undefined && { parent: raw.parent }),

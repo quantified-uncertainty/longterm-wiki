@@ -31,11 +31,12 @@ export function serialize(graph: Graph): SerializedKB {
 
   for (const entity of entities) {
     const entityFacts = graph.getFacts(entity.id);
+    // Key by slug for backward compat with frontend consumers (kb.ts uses slugs)
     if (entityFacts.length > 0) {
-      facts[entity.id] = entityFacts;
+      facts[entity.slug] = entityFacts;
     }
 
-    // Serialize record collections for this entity
+    // Serialize record collections for this entity (keyed by slug)
     const recordCollections = graph.getAllRecordCollections(entity.id);
     if (recordCollections.size > 0) {
       const entityRecords: Record<string, RecordEntry[]> = {};
@@ -45,7 +46,7 @@ export function serialize(graph: Graph): SerializedKB {
         }
       }
       if (Object.keys(entityRecords).length > 0) {
-        records[entity.id] = entityRecords;
+        records[entity.slug] = entityRecords;
       }
     }
   }

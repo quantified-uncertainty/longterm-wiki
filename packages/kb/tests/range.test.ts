@@ -32,7 +32,8 @@ function graphWithFact(value: FactValue, property?: Partial<Property>): {
   };
   graph.addProperty(propDef);
   graph.addEntity({
-    id: "test-entity",
+    id: "aB3cD4eF5g",
+    slug: "test-entity",
     stableId: "aB3cD4eF5g",
     type: "org",
     name: "Test Entity",

@@ -52,6 +52,13 @@ export class Graph {
         existingSlug: existing.slug,
       });
     }
+    const existingBySlug = this.slugIndex.get(entity.slug);
+    if (existingBySlug && existingBySlug !== entity.id) {
+      console.warn(
+        `[kb/graph] Slug collision: "${entity.slug}" maps to both ` +
+        `"${existingBySlug}" and "${entity.id}". Keeping latest.`
+      );
+    }
     this.entities.set(entity.id, entity);
     this.slugIndex.set(entity.slug, entity.id);
   }
