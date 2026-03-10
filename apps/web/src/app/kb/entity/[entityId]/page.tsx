@@ -250,15 +250,16 @@ function StatCard({ entityId, propertyId }: { entityId: string; propertyId: stri
   if (!fact) return null;
 
   return (
-    <div className="border border-border rounded-lg p-3 bg-card">
-      <div className="text-xs text-muted-foreground mb-1">
+    <div className="relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4 transition-shadow hover:shadow-md">
+      <div className="absolute top-0 right-0 w-16 h-16 bg-primary/[0.03] rounded-bl-[2rem]" />
+      <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1.5">
         {prop?.name ?? titleCase(propertyId)}
       </div>
-      <div className="text-lg font-semibold tabular-nums">
+      <div className="text-xl font-bold tabular-nums tracking-tight text-foreground">
         <FactValueDisplay fact={fact} property={prop} />
       </div>
       {fact.asOf && (
-        <div className="text-[10px] text-muted-foreground/60 mt-0.5">
+        <div className="text-[10px] text-muted-foreground/50 mt-1">
           as of {formatKBDate(fact.asOf)}
         </div>
       )}
@@ -284,30 +285,37 @@ function PersonCard({ item }: { item: RecordEntry }) {
   const isFounder = !!item.fields.is_founder;
   const notes = field(item, "notes");
 
+  const initials = name.split(/\s+/).map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+
   return (
-    <div className="border border-border rounded-lg p-3 bg-card flex flex-col gap-1">
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          {personEntity && personId ? (
-            <Link href={`/kb/entity/${personId}`} className="font-medium text-sm text-blue-600 hover:underline dark:text-blue-400">
-              {name}
-            </Link>
-          ) : (
-            <span className="font-medium text-sm">{name}</span>
-          )}
-          {isFounder && (
-            <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary">
-              Founder
-            </span>
-          )}
+    <div className="group relative rounded-xl border border-border/60 bg-card p-4 transition-all hover:shadow-md hover:border-border">
+      <div className="flex items-start gap-3">
+        <div className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xs font-semibold text-primary/70">
+          {initials}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {personEntity && personId ? (
+              <Link href={`/kb/entity/${personId}`} className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                {name}
+              </Link>
+            ) : (
+              <span className="font-semibold text-sm">{name}</span>
+            )}
+            {isFounder && (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                Founder
+              </span>
+            )}
+          </div>
+          {title && <div className="text-xs text-muted-foreground mt-0.5">{title}</div>}
+          <div className="text-[10px] text-muted-foreground/50 mt-1">
+            {start && formatKBDate(start)}
+            {end ? ` \u2013 ${formatKBDate(end)}` : start ? " \u2013 present" : ""}
+          </div>
+          {notes && <div className="text-[10px] text-muted-foreground/50 mt-1 line-clamp-2">{notes}</div>}
         </div>
       </div>
-      {title && <div className="text-xs text-muted-foreground">{title}</div>}
-      <div className="text-[10px] text-muted-foreground/60">
-        {start && formatKBDate(start)}
-        {end ? ` \u2013 ${formatKBDate(end)}` : start ? " \u2013 present" : ""}
-      </div>
-      {notes && <div className="text-[10px] text-muted-foreground/60 mt-0.5 line-clamp-2">{notes}</div>}
     </div>
   );
 }
@@ -336,38 +344,38 @@ function FundingRoundRow({ item }: { item: RecordEntry }) {
   const leadEntity = leadInvestor ? getKBEntity(leadInvestor) : null;
 
   return (
-    <div className="flex gap-3 py-3 border-b border-border/50 last:border-b-0">
-      {/* Timeline dot + date */}
-      <div className="flex flex-col items-center pt-0.5">
-        <div className="w-2.5 h-2.5 rounded-full bg-primary/60 shrink-0" />
-        <div className="w-px flex-1 bg-border/50 mt-1" />
+    <div className="flex gap-4 py-4 border-b border-border/40 last:border-b-0 group/row hover:bg-muted/20 -mx-4 px-4 transition-colors">
+      {/* Timeline dot */}
+      <div className="flex flex-col items-center pt-1">
+        <div className="w-3 h-3 rounded-full border-2 border-primary/50 bg-card shrink-0 group-hover/row:border-primary transition-colors" />
+        <div className="w-px flex-1 bg-gradient-to-b from-border/50 to-transparent mt-1" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
-          <span className="font-medium text-sm">{name}</span>
+          <span className="font-semibold text-sm">{name}</span>
           {instrument && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
               {instrument}
             </span>
           )}
-          {date && <span className="text-xs text-muted-foreground">{formatKBDate(date)}</span>}
+          {date && <span className="text-xs text-muted-foreground/70">{formatKBDate(date)}</span>}
         </div>
-        <div className="flex items-baseline gap-4 mt-1 flex-wrap">
+        <div className="flex items-baseline gap-4 mt-1.5 flex-wrap">
           {raised != null && (
-            <span className="text-sm font-semibold tabular-nums">
+            <span className="text-base font-bold tabular-nums tracking-tight text-foreground">
               {formatAmount(raised)}
             </span>
           )}
           {valuation != null && (
             <span className="text-xs text-muted-foreground">
-              at {formatAmount(valuation)}
+              at {formatAmount(valuation)} valuation
             </span>
           )}
           {leadInvestor && (
             <span className="text-xs text-muted-foreground">
               Led by{" "}
               {leadEntity ? (
-                <Link href={`/kb/entity/${leadInvestor}`} className="text-blue-600 hover:underline dark:text-blue-400">
+                <Link href={`/kb/entity/${leadInvestor}`} className="text-primary hover:underline">
                   {leadEntity.name}
                 </Link>
               ) : (
@@ -376,9 +384,9 @@ function FundingRoundRow({ item }: { item: RecordEntry }) {
             </span>
           )}
         </div>
-        {notes && <div className="text-[10px] text-muted-foreground/60 mt-1 line-clamp-2">{notes}</div>}
+        {notes && <div className="text-[10px] text-muted-foreground/50 mt-1.5 line-clamp-2">{notes}</div>}
         {source && isUrl(source) && (
-          <a href={source} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-600/60 hover:underline dark:text-blue-400/60 mt-0.5 inline-block">
+          <a href={source} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary/50 hover:text-primary hover:underline mt-1 inline-block transition-colors">
             {shortDomain(source)}
           </a>
         )}
@@ -395,16 +403,16 @@ function ProductCard({ item }: { item: RecordEntry }) {
   const source = field(item, "source");
 
   return (
-    <div className="border border-border rounded-lg p-3 bg-card">
+    <div className="group rounded-xl border border-border/60 bg-card p-4 transition-all hover:shadow-md hover:border-border">
       <div className="flex items-baseline gap-2">
-        <span className="font-medium text-sm">{name}</span>
+        <span className="font-semibold text-sm group-hover:text-primary transition-colors">{name}</span>
         {launched && (
-          <span className="text-[10px] text-muted-foreground">{formatKBDate(launched)}</span>
+          <span className="text-[10px] text-muted-foreground/60">{formatKBDate(launched)}</span>
         )}
       </div>
-      {description && <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{description}</div>}
+      {description && <div className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">{description}</div>}
       {source && isUrl(source) && (
-        <a href={source} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-600/60 hover:underline dark:text-blue-400/60 mt-1 inline-block">
+        <a href={source} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary/50 hover:text-primary hover:underline mt-1.5 inline-block transition-colors">
           {shortDomain(source)}
         </a>
       )}
@@ -442,11 +450,14 @@ function ModelReleaseRow({ item }: { item: RecordEntry }) {
 /** Section header with optional count badge. */
 function SectionHeader({ title, count, id }: { title: string; count?: number; id?: string }) {
   return (
-    <div className="flex items-baseline gap-2 mb-3" id={id}>
-      <h2 className="text-base font-semibold">{title}</h2>
+    <div className="flex items-center gap-3 mb-4" id={id}>
+      <h2 className="text-base font-bold tracking-tight">{title}</h2>
       {count != null && (
-        <span className="text-xs text-muted-foreground">({count})</span>
+        <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+          {count}
+        </span>
       )}
+      <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
     </div>
   );
 }
@@ -469,7 +480,7 @@ function CategoryFactSection({
         title={CATEGORY_LABELS[category] ?? titleCase(category)}
         id={`cat-${category}`}
       />
-      <div className="border border-border rounded-lg overflow-hidden divide-y divide-border">
+      <div className="border border-border/60 rounded-xl overflow-hidden divide-y divide-border/40">
         {propertyIds.map((propertyId) => {
           const facts = factGroups.get(propertyId) ?? [];
           if (facts.length === 0) return null;
@@ -478,22 +489,22 @@ function CategoryFactSection({
 
           return (
             <details key={propertyId} id={propertyId} className="group scroll-mt-16">
-              <summary className="flex items-center gap-4 px-4 py-2.5 cursor-pointer hover:bg-muted/50 text-sm select-none">
-                <span className="font-medium min-w-[10rem]">
+              <summary className="flex items-center gap-4 px-4 py-3 cursor-pointer hover:bg-muted/30 text-sm select-none transition-colors">
+                <span className="font-semibold min-w-[10rem] text-foreground/90">
                   {property?.name ?? propertyId}
                 </span>
-                <span className="flex-1 text-muted-foreground truncate font-mono">
+                <span className="flex-1 text-muted-foreground truncate font-mono text-[13px]">
                   {formatKBFactValue(latestFact, property?.unit, property?.display)}
                 </span>
-                <span className="text-muted-foreground text-xs whitespace-nowrap">
+                <span className="text-muted-foreground/60 text-xs whitespace-nowrap">
                   {formatKBDate(latestFact.asOf)}
                 </span>
                 {facts.length > 1 && (
-                  <span className="text-muted-foreground text-xs whitespace-nowrap">
+                  <span className="text-[10px] font-medium tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground whitespace-nowrap">
                     {facts.length} pts
                   </span>
                 )}
-                <span className="text-muted-foreground text-xs group-open:rotate-90 transition-transform">
+                <span className="text-muted-foreground/40 text-xs group-open:rotate-90 transition-transform">
                   &#9654;
                 </span>
               </summary>
@@ -743,22 +754,22 @@ export default async function KBEntityPage({
           </nav>
 
           {/* ── Header ──────────────────────────────────────────── */}
-          <div className="mb-6">
-            <div className="flex items-baseline gap-3 mb-1">
-              <h1 className="text-2xl font-bold">{entity.name}</h1>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-1.5">
+              <h1 className="text-3xl font-extrabold tracking-tight">{entity.name}</h1>
+              <span className="text-[11px] px-2.5 py-1 rounded-full bg-primary/10 text-primary font-semibold uppercase tracking-wider">
                 {titleCase(entity.type)}
               </span>
             </div>
             {entity.aliases && entity.aliases.length > 0 && (
-              <p className="text-sm text-muted-foreground mb-1">
+              <p className="text-sm text-muted-foreground/70 mb-2">
                 Also known as: {entity.aliases.join(", ")}
               </p>
             )}
             <div className="flex items-center gap-3 text-sm">
               <Link
                 href={wikiHref}
-                className="text-blue-600 hover:underline dark:text-blue-400"
+                className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors"
               >
                 Wiki page &rarr;
               </Link>
@@ -795,7 +806,7 @@ export default async function KBEntityPage({
           {itemCollections["funding-rounds"] && itemCollections["funding-rounds"].length > 0 && (
             <section className="mb-8">
               <SectionHeader title="Funding History" count={itemCollections["funding-rounds"].length} id="col-funding-rounds" />
-              <div className="border border-border rounded-lg px-4 bg-card">
+              <div className="border border-border/60 rounded-xl px-4 bg-card">
                 {[...itemCollections["funding-rounds"]]
                   .sort((a, b) => {
                     const dateA = a.fields.date ? String(a.fields.date) : "";
@@ -813,7 +824,7 @@ export default async function KBEntityPage({
           {itemCollections["model-releases"] && itemCollections["model-releases"].length > 0 && (
             <section className="mb-8">
               <SectionHeader title="Model Releases" count={itemCollections["model-releases"].length} id="col-model-releases" />
-              <div className="border border-border rounded-lg px-4 bg-card">
+              <div className="border border-border/60 rounded-xl px-4 bg-card">
                 {[...itemCollections["model-releases"]]
                   .sort((a, b) => {
                     const dateA = a.fields.released ? String(a.fields.released) : "";
@@ -842,17 +853,20 @@ export default async function KBEntityPage({
           {/* ── Facts by Category ─────────────────────────────────── */}
           {sortedCategories.length > 0 && (
             <div className="mb-8">
-              <h2 className="text-lg font-semibold mb-4">All Facts</h2>
+              <div className="flex items-center gap-3 mb-5">
+                <h2 className="text-lg font-bold tracking-tight">All Facts</h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
+              </div>
               {/* Category jump links */}
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-1.5 mb-6">
                 {sortedCategories.map((cat) => (
                   <a
                     key={cat}
                     href={`#cat-${cat}`}
-                    className="text-xs px-2 py-1 rounded-full border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-[11px] font-medium px-3 py-1.5 rounded-lg border border-border/60 bg-card hover:bg-primary/5 hover:border-primary/30 text-muted-foreground hover:text-primary transition-all"
                   >
                     {CATEGORY_LABELS[cat] ?? titleCase(cat)}
-                    <span className="ml-1 opacity-50">
+                    <span className="ml-1.5 text-muted-foreground/40 tabular-nums">
                       {categoryGroups.get(cat)?.length ?? 0}
                     </span>
                   </a>
