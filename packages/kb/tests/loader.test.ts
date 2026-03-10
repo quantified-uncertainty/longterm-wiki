@@ -166,7 +166,7 @@ describe("loader", () => {
       expect(personSchema!.recommended).toContain("born-year");
     });
 
-    it("loads item collection schemas on organization", () => {
+    it("loads record collection schemas on organization", () => {
       const orgSchema = graph.getSchema("organization");
       expect(orgSchema!.items).toBeDefined();
       expect(orgSchema!.items!["funding-rounds"]).toBeDefined();
