@@ -19,6 +19,18 @@ function getKB(): SerializedKB | undefined {
   }
 }
 
+/**
+ * Resolve an entity identifier to the entity ID used as key in facts/records.
+ * Accepts either an entity ID (10-char alphanumeric) or a YAML filename/slug.
+ * MDX components pass slugs like "anthropic"; entity pages pass IDs like "mK9pX3rQ7n".
+ */
+function resolveEntityKey(entityOrSlug: string): string {
+  const kb = getKB();
+  if (!kb?.slugToEntityId) return entityOrSlug;
+  // If it's a slug, resolve to entity ID; otherwise return as-is (already an ID)
+  return kb.slugToEntityId[entityOrSlug] ?? entityOrSlug;
+}
+
 /** Sort facts most-recent-first by asOf (undefined asOf sorts last). */
 function sortByAsOfDesc(facts: Fact[]): Fact[] {
   return facts.slice().sort((a, b) => {
@@ -59,7 +71,8 @@ export function getKBFacts(entity: string, property?: string): Fact[] {
   const kb = getKB();
   if (!kb) return [];
 
-  const facts = kb.facts[entity] ?? [];
+  const key = resolveEntityKey(entity);
+  const facts = kb.facts[key] ?? [];
   const filtered = property
     ? facts.filter((f) => f.propertyId === property)
     : facts;
@@ -243,7 +256,8 @@ export function getKBAllFactsByProperty(
 export function getKBRecords(entity: string, collection: string): RecordEntry[] {
   const kb = getKB();
   if (!kb) return [];
-  return kb.records?.[entity]?.[collection] ?? [];
+  const key = resolveEntityKey(entity);
+  return kb.records?.[key]?.[collection] ?? [];
 }
 
 /**
@@ -252,7 +266,8 @@ export function getKBRecords(entity: string, collection: string): RecordEntry[] 
 export function getKBAllRecordCollections(entity: string): Record<string, RecordEntry[]> {
   const kb = getKB();
   if (!kb) return {};
-  return { ...(kb.records?.[entity] ?? {}) };
+  const key = resolveEntityKey(entity);
+  return { ...(kb.records?.[key] ?? {}) };
 }
 
 /**

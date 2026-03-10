@@ -13,11 +13,7 @@
  *   crux kb verify --limit=10                  Check at most 10 facts
  */
 
-import { join } from 'path';
-import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { loadKB } from '../../packages/kb/src/loader.ts';
-import { computeInverses } from '../../packages/kb/src/inverse.ts';
 import { formatFactValue } from '../../packages/kb/src/format.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
 import type { Entity, Fact, Property } from '../../packages/kb/src/types.ts';
@@ -31,8 +27,8 @@ import {
   classifyFetchError,
   type SourceFetchErrorType,
 } from '../lib/search/paywall-detection.ts';
-
-const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
+import { loadGraphFull, resolveEntity } from '../lib/kb-loader.ts';
+import type { LoadedKB } from '../lib/kb-loader.ts';
 
 // ── Constants ─────────────────────────────────────────────────────────
 
@@ -95,40 +91,7 @@ interface VerificationSummary {
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
-interface LoadedKB {
-  graph: Graph;
-  idByFilename: Map<string, string>;
-}
-
-async function loadGraphFull(): Promise<LoadedKB> {
-  const { graph, filenameMap } = await loadKB(KB_DATA_DIR);
-  computeInverses(graph);
-  const idByFilename = new Map<string, string>();
-  for (const [entityId, filename] of filenameMap) {
-    idByFilename.set(filename, entityId);
-  }
-  return { graph, idByFilename };
-}
-
-/**
- * Resolve a user-provided entity identifier (ID, filename, stableId, or name).
- */
-function resolveEntity(
-  identifier: string,
-  kb: LoadedKB,
-): Entity | undefined {
-  const byId = kb.graph.getEntity(identifier);
-  if (byId) return byId;
-
-  const idFromFilename = kb.idByFilename.get(identifier);
-  if (idFromFilename) return kb.graph.getEntity(idFromFilename);
-
-  const byStableId = kb.graph.getEntityByStableId(identifier);
-  if (byStableId) return byStableId;
-
-  const lower = identifier.toLowerCase();
-  return kb.graph.getAllEntities().find((e) => e.name.toLowerCase() === lower);
-}
+// LoadedKB, loadGraphFull, resolveEntity imported from ../lib/kb-loader.ts
 
 /** Result of fetching source content, with structured error info */
 interface FetchSourceResult {

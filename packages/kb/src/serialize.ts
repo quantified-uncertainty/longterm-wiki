@@ -12,8 +12,10 @@ export interface SerializedKB {
   schemas: ReturnType<Graph["getAllSchemas"]>;
   /** Record schemas (id → schema) */
   recordSchemas: RecordSchema[];
-  /** Records indexed by filename → collectionName → entries */
+  /** Records indexed by entityId → collectionName → entries */
   records: Record<string, Record<string, RecordEntry[]>>;
+  /** Maps YAML filename/slug → entity ID, for resolving slug-based lookups */
+  slugToEntityId?: Record<string, string>;
 }
 
 /**
@@ -37,13 +39,12 @@ export function serialize(
 
   for (const entity of entities) {
     const entityFacts = graph.getFacts(entity.id);
-    // Key by filename for backward compat with frontend consumers (kb.ts uses slug/filename keys)
-    const key = filenameMap.get(entity.id) ?? entity.id;
+    // Key by entity ID (the stable 10-char alphanumeric ID)
     if (entityFacts.length > 0) {
-      facts[key] = entityFacts;
+      facts[entity.id] = entityFacts;
     }
 
-    // Serialize record collections for this entity (keyed by filename)
+    // Serialize record collections for this entity
     const recordCollections = graph.getAllRecordCollections(entity.id);
     if (recordCollections.size > 0) {
       const entityRecords: Record<string, RecordEntry[]> = {};
@@ -53,10 +54,16 @@ export function serialize(
         }
       }
       if (Object.keys(entityRecords).length > 0) {
-        records[key] = entityRecords;
+        records[entity.id] = entityRecords;
       }
     }
   }
 
-  return { entities, facts, properties, schemas, recordSchemas, records };
+  // Build slug → entity ID map for resolving slug-based lookups from MDX components
+  const slugToEntityId: Record<string, string> = {};
+  for (const [entityId, filename] of filenameMap) {
+    slugToEntityId[filename] = entityId;
+  }
+
+  return { entities, facts, properties, schemas, recordSchemas, records, slugToEntityId };
 }

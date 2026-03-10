@@ -10,12 +10,8 @@
  *   crux kb lookup <stableId>      Look up entity by stableId
  */
 
-import { join } from 'path';
-import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 
-import { loadKB } from '../../packages/kb/src/loader.ts';
-import { computeInverses } from '../../packages/kb/src/inverse.ts';
 import { formatFactValue } from '../../packages/kb/src/format.ts';
 import { validate } from '../../packages/kb/src/validate.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
@@ -24,8 +20,8 @@ import { commands as kbMigrateCommands } from './kb-migrate.ts';
 import { verifyCommand } from './kb-verify.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
-
-const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
+import { loadGraphFull, loadGraph, resolveEntity } from '../lib/kb-loader.ts';
+import type { LoadedKB } from '../lib/kb-loader.ts';
 
 interface KBCommandOptions extends BaseOptions {
   type?: string;
@@ -34,58 +30,6 @@ interface KBCommandOptions extends BaseOptions {
   errorsOnly?: boolean;
   'errors-only'?: boolean;
   rule?: string;
-}
-
-// ── KB loading helper ───────────────────────────────────────────────────
-
-/** Cached load result with filenameMap for reverse lookups. */
-interface LoadedKB {
-  graph: Graph;
-  filenameMap: Map<string, string>;
-  /** Reverse map: filename → entityId */
-  idByFilename: Map<string, string>;
-}
-
-async function loadGraphFull(): Promise<LoadedKB> {
-  const { graph, filenameMap } = await loadKB(KB_DATA_DIR);
-  computeInverses(graph);
-  const idByFilename = new Map<string, string>();
-  for (const [entityId, filename] of filenameMap) {
-    idByFilename.set(filename, entityId);
-  }
-  return { graph, filenameMap, idByFilename };
-}
-
-async function loadGraph(): Promise<Graph> {
-  const { graph } = await loadGraphFull();
-  return graph;
-}
-
-/**
- * Resolve a user-provided entity identifier (could be ID, filename/slug, or name).
- * Returns the entity or undefined.
- */
-function resolveEntity(
-  identifier: string,
-  kb: LoadedKB,
-): Entity | undefined {
-  // Direct ID lookup
-  const byId = kb.graph.getEntity(identifier);
-  if (byId) return byId;
-
-  // Filename/slug lookup (e.g., "anthropic" → entity ID via filenameMap)
-  const idFromFilename = kb.idByFilename.get(identifier);
-  if (idFromFilename) {
-    return kb.graph.getEntity(idFromFilename);
-  }
-
-  // StableId lookup
-  const byStableId = kb.graph.getEntityByStableId(identifier);
-  if (byStableId) return byStableId;
-
-  // Case-insensitive name match
-  const lower = identifier.toLowerCase();
-  return kb.graph.getAllEntities().find((e) => e.name.toLowerCase() === lower);
 }
 
 // ── show command ────────────────────────────────────────────────────────
@@ -282,7 +226,7 @@ async function listCommand(
       name: e.name,
       type: e.type,
       factCount: graph.getFacts(e.id).length,
-      itemCount: graph.getRecordCollectionNames(e.id).reduce(
+      recordCount: graph.getRecordCollectionNames(e.id).reduce(
         (sum, col) => sum + graph.getRecords(e.id, col).length,
         0,
       ),
@@ -298,11 +242,11 @@ async function listCommand(
 
   for (const entity of entities) {
     const facts = graph.getFacts(entity.id);
-    const itemCount = graph.getRecordCollectionNames(entity.id).reduce(
+    const recordCount = graph.getRecordCollectionNames(entity.id).reduce(
       (sum, col) => sum + graph.getRecords(entity.id, col).length,
       0,
     );
-    const row = `${entity.id.padEnd(14)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${String(facts.length).padEnd(7)} ${itemCount}`;
+    const row = `${entity.id.padEnd(14)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${String(facts.length).padEnd(7)} ${recordCount}`;
     lines.push(row);
   }
 

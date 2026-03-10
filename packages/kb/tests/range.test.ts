@@ -258,7 +258,7 @@ describe("range value types", () => {
       const json = JSON.stringify(serialized);
       const parsed = JSON.parse(json);
 
-      const facts = parsed.facts["test-entity"];
+      const facts = parsed.facts["aB3cD4eF5g"];
       expect(facts).toHaveLength(1);
       expect(facts[0].value).toEqual({
         type: "range",
@@ -279,7 +279,7 @@ describe("range value types", () => {
       const json = JSON.stringify(serialized);
       const parsed = JSON.parse(json);
 
-      const facts = parsed.facts["test-entity"];
+      const facts = parsed.facts["aB3cD4eF5g"];
       expect(facts).toHaveLength(1);
       expect(facts[0].value).toEqual({
         type: "min",
