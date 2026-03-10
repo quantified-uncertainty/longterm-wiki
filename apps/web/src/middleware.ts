@@ -51,8 +51,8 @@ export function middleware(request: NextRequest) {
   if (segments[0] === "knowledge-base") {
     const url = request.nextUrl.clone();
     if (segments.length <= 1) {
-      // Root: /knowledge-base → Knowledge Base index page
-      url.pathname = "/wiki/E840";
+      // Root: /knowledge-base → /kb (canonical KB entry point)
+      url.pathname = "/kb";
       return NextResponse.redirect(url, 308);
     }
     const slug = segments[segments.length - 1];
