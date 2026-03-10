@@ -370,6 +370,8 @@ export function getKBDataNav(): NavSection[] {
         { label: "Properties", href: "/wiki/E1021" },
         { label: "Entity Coverage", href: "/wiki/E1022" },
         { label: "Items Explorer", href: "/wiki/E1026" },
+        { label: "Resources", href: "/wiki/E1043" },
+        { label: "Publications", href: "/wiki/E1044" },
       ],
     },
     {
