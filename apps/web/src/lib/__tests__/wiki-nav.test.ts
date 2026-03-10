@@ -518,7 +518,7 @@ describe("internal sidebar completeness (real data)", () => {
 
     const db = loadJson<{
       idRegistry: { byNumericId: Record<string, string> };
-      pages: Array<{ id: string; contentFormat: string; subcategory: string }>;
+      pages: Array<{ id: string; contentFormat: string; subcategory: string; filePath?: string }>;
     }>(dbPath);
 
     const errors: string[] = [];
@@ -542,8 +542,7 @@ describe("internal sidebar completeness (real data)", () => {
       }
 
       // Skip pages that live outside /internal/ (e.g., KB pages redirected from legacy /internal/ URLs)
-      const filePath = (page as { filePath?: string }).filePath ?? "";
-      if (!filePath.startsWith("internal/")) continue;
+      if (page.filePath && !page.filePath.startsWith("internal/")) continue;
 
       if (page.contentFormat !== "dashboard") {
         errors.push(`${entry.name}: MDX stub '${slug}' has contentFormat '${page.contentFormat}' (expected 'dashboard')`);
@@ -566,12 +565,12 @@ describe("internal sidebar completeness (real data)", () => {
 
     // Load DB to check whether redirect targets are internal dashboards
     const dbPath = path.join(DATA_DIR, "database.json");
-    const db2 = fs.existsSync(dbPath)
-      ? loadJson<{
-          idRegistry: { byNumericId: Record<string, string> };
-          pages: Array<{ id: string; filePath?: string }>;
-        }>(dbPath)
-      : null;
+    if (!fs.existsSync(dbPath)) return;
+
+    const db = loadJson<{
+      idRegistry: { byNumericId: Record<string, string> };
+      pages: Array<{ id: string; filePath?: string }>;
+    }>(dbPath);
 
     const errors: string[] = [];
     for (const entry of fs.readdirSync(APP_INTERNAL_DIR, { withFileTypes: true })) {
@@ -584,13 +583,11 @@ describe("internal sidebar completeness (real data)", () => {
       if (!redirectMatch) continue;
 
       // Skip redirects to non-internal pages (e.g., legacy URLs redirecting to /kb/)
-      if (db2) {
-        const eid = redirectMatch[1];
-        const slug = db2.idRegistry.byNumericId[eid];
-        if (slug) {
-          const page = db2.pages.find(p => p.id === slug);
-          if (page?.filePath && !page.filePath.startsWith("internal/")) continue;
-        }
+      const eid = redirectMatch[1];
+      const slug = db.idRegistry.byNumericId[eid];
+      if (slug) {
+        const page = db.pages.find(p => p.id === slug);
+        if (page?.filePath && !page.filePath.startsWith("internal/")) continue;
       }
 
       // This is a migrated dashboard — it should have a *-content.tsx file

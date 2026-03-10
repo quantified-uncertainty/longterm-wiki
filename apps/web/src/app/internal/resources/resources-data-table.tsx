@@ -45,7 +45,7 @@ export interface ResourceDataRow {
   hasReview: boolean;
   hasKeyPoints: boolean;
   publicationName: string | null;
-  publicationId: string | null;
+  publicationId?: string | null;
   credibility: number | null;
   citingPageCount: number;
   tags: string[];
@@ -73,7 +73,7 @@ const FETCH_STATUS_STYLES: Record<
   },
 };
 
-const TYPE_COLORS: Record<string, string> = {
+export const RESOURCE_TYPE_COLORS: Record<string, string> = {
   paper: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
   blog: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
   report: "bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300",
@@ -86,7 +86,7 @@ const TYPE_COLORS: Record<string, string> = {
   reference: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900 dark:text-cyan-300",
 };
 
-const DEFAULT_TYPE_COLOR =
+export const DEFAULT_RESOURCE_TYPE_COLOR =
   "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
 
 function makeColumns(): ColumnDef<ResourceDataRow>[] {
@@ -114,7 +114,7 @@ function makeColumns(): ColumnDef<ResourceDataRow>[] {
       ),
       cell: ({ row }) => {
         const t = row.original.type;
-        const color = TYPE_COLORS[t] || DEFAULT_TYPE_COLOR;
+        const color = RESOURCE_TYPE_COLORS[t] || DEFAULT_RESOURCE_TYPE_COLOR;
         return (
           <span className={`text-xs px-1.5 py-0.5 rounded ${color}`}>{t}</span>
         );

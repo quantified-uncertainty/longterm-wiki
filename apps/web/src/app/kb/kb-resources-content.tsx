@@ -5,8 +5,8 @@ import {
   getResourcePublication,
 } from "@/data";
 import type { Resource } from "@/data";
-import { KBResourcesTable } from "./kb-resources-table";
-import type { ResourceDataRow } from "./kb-resources-table";
+import { ResourcesDataTable } from "@/app/internal/resources/resources-data-table";
+import type { ResourceDataRow } from "@/app/internal/resources/resources-data-table";
 
 function deriveFetchStatus(r: Resource): "full" | "metadata-only" | "unfetched" {
   if (r.local_filename) return "full";
@@ -66,7 +66,7 @@ export function KBResourcesContent() {
         <StatCard label="Cited by pages" value={cited} total={resources.length} color="teal" />
       </div>
 
-      <KBResourcesTable resources={rows} />
+      <ResourcesDataTable resources={rows} />
     </>
   );
 }

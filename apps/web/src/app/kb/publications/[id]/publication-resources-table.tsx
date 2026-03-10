@@ -27,6 +27,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  RESOURCE_TYPE_COLORS,
+  DEFAULT_RESOURCE_TYPE_COLOR,
+} from "@/app/internal/resources/resources-data-table";
 
 export interface PublicationResourceRow {
   id: string;
@@ -36,21 +40,6 @@ export interface PublicationResourceRow {
   hasSummary: boolean;
   citingPageCount: number;
 }
-
-const TYPE_COLORS: Record<string, string> = {
-  paper: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
-  blog: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
-  report: "bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300",
-  book: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
-  web: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
-  government:
-    "bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300",
-  talk: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
-  podcast: "bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300",
-  reference: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900 dark:text-cyan-300",
-};
-const DEFAULT_TYPE_COLOR =
-  "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
 
 function makeColumns(): ColumnDef<PublicationResourceRow>[] {
   return [
@@ -77,7 +66,7 @@ function makeColumns(): ColumnDef<PublicationResourceRow>[] {
       ),
       cell: ({ row }) => {
         const t = row.original.type;
-        const color = TYPE_COLORS[t] || DEFAULT_TYPE_COLOR;
+        const color = RESOURCE_TYPE_COLORS[t] || DEFAULT_RESOURCE_TYPE_COLOR;
         return (
           <span className={`text-xs px-1.5 py-0.5 rounded ${color}`}>{t}</span>
         );

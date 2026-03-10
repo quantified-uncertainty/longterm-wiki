@@ -80,20 +80,20 @@ export default async function PublicationDetailPage({ params }: PageProps) {
   const resources = getResourcesForPublication(pub.id);
 
   const pageSet = new Set<string>();
-  for (const r of resources) {
-    for (const pageId of getPagesForResource(r.id)) {
+  const resourceRows: PublicationResourceRow[] = resources.map((r) => {
+    const citingPages = getPagesForResource(r.id);
+    for (const pageId of citingPages) {
       pageSet.add(pageId);
     }
-  }
-
-  const resourceRows: PublicationResourceRow[] = resources.map((r) => ({
-    id: r.id,
-    title: r.title,
-    type: r.type,
-    publishedDate: r.published_date ?? null,
-    hasSummary: !!r.summary,
-    citingPageCount: getPagesForResource(r.id).length,
-  }));
+    return {
+      id: r.id,
+      title: r.title,
+      type: r.type,
+      publishedDate: r.published_date ?? null,
+      hasSummary: !!r.summary,
+      citingPageCount: citingPages.length,
+    };
+  });
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
