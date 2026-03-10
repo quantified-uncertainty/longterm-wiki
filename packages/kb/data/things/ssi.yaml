@@ -77,49 +77,45 @@ facts:
     source: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
     notes: "Approximate headcount; described as a 'lean, cracked team'"
 
-items:
+records:
   funding-rounds:
-    type: funding-round
-    entries:
-      i_ssi_seed:
-        name: "Seed"
-        date: 2024-09
-        amount: 1e9
-        valuation: 5e9
-        source: https://observer.com/2024/09/openai-ilya-sutskever-raise-1b-ai-startup/
-        notes: "Seed round from a16z, Sequoia, DST Global, SV Angel, NFDG"
+    seed:
+      name: "Seed"
+      date: "2024-09"
+      raised: 1e9
+      valuation: 5e9
+      source: https://observer.com/2024/09/openai-ilya-sutskever-raise-1b-ai-startup/
+      notes: "Seed round from a16z, Sequoia, DST Global, SV Angel, NFDG"
 
-      i_ssi_2025_04:
-        name: "Series A"
-        date: 2025-04
-        amount: 2e9
-        valuation: 32e9
-        source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
-        notes: "Led by Greenoaks with $500M commitment; Alphabet and NVIDIA participated"
+    series-a:
+      name: "Series A"
+      date: "2025-04"
+      raised: 2e9
+      valuation: 32e9
+      source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+      notes: "Led by Greenoaks with $500M commitment; Alphabet and NVIDIA participated"
 
-  key-people:
-    type: key-person
-    entries:
-      i_b9oci1WvqG:
-        person: !ref eYrBgMLJDw:ilya-sutskever
-        title: "Chief Scientist & Co-founder"
-        start: 2024-06
-        is_founder: true
-        source: https://ssi.inc
-        notes: "Former OpenAI co-founder and Chief Scientist; left OpenAI June 2024"
+  key-persons:
+    ilya-sutskever:
+      person: ilya-sutskever
+      title: "Chief Scientist & Co-founder"
+      start: "2024-06"
+      is_founder: true
+      source: https://ssi.inc
+      notes: "Former OpenAI co-founder and Chief Scientist; left OpenAI June 2024"
 
-      i_hy73NqnE5Q:
-        person: daniel-gross
-        title: "Co-founder"
-        start: 2024-06
-        is_founder: true
-        source: https://ssi.inc
-        notes: "Former head of AI at Apple; Y Combinator partner; investor"
+    daniel-gross:
+      person: daniel-gross
+      title: "Co-founder"
+      start: "2024-06"
+      is_founder: true
+      source: https://ssi.inc
+      notes: "Former head of AI at Apple; Y Combinator partner; investor"
 
-      i_vOtkNvw2HH:
-        person: daniel-levy
-        title: "Co-founder"
-        start: 2024-06
-        is_founder: true
-        source: https://ssi.inc
-        notes: "Former OpenAI researcher"
+    daniel-levy:
+      person: daniel-levy
+      title: "Co-founder"
+      start: "2024-06"
+      is_founder: true
+      source: https://ssi.inc
+      notes: "Former OpenAI researcher"

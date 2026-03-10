@@ -66,164 +66,154 @@ facts:
     asOf: 2024-05
     notes: "Gemini 1.5 Pro 2M token context window; launched Feb 2024 with 1M tokens, expanded to 2M in May 2024"
 
-items:
-  key-people:
-    type: key-person
-    entries:
-      i_cqQKO0KpfQ:
-        person: !ref Aqcyu3onCA:demis-hassabis
-        title: "Co-founder & CEO"
-        start: 2010-09
-        is_founder: true
-        source: https://deepmind.google/about
-        notes: "CEO since founding; became head of Google DeepMind after 2023 Brain merger; 2024 Nobel Prize in Chemistry for AlphaFold"
+records:
+  key-persons:
+    demis-hassabis:
+      person: demis-hassabis
+      title: "Co-founder & CEO"
+      start: "2010-09"
+      is_founder: true
+      source: https://deepmind.google/about
+      notes: "CEO since founding; became head of Google DeepMind after 2023 Brain merger; 2024 Nobel Prize in Chemistry for AlphaFold"
 
-      i_hRsflrOEmQ:
-        person: shane-legg
-        title: "Co-founder & Chief AGI Scientist"
-        start: 2010-09
-        is_founder: true
-        source: https://deepmind.google/about
-        notes: "Leads AGI safety research; PhD on machine super intelligence"
+    shane-legg:
+      person: shane-legg
+      title: "Co-founder & Chief AGI Scientist"
+      start: "2010-09"
+      is_founder: true
+      source: https://deepmind.google/about
+      notes: "Leads AGI safety research; PhD on machine super intelligence"
 
-      i_qciZrFjeZw:
-        person: mustafa-suleyman
-        title: "Co-founder & Head of Applied AI"
-        start: 2010-09
-        end: 2022-01
-        is_founder: true
-        notes: "Left DeepMind in 2022; co-founded Inflection AI, then joined Microsoft as EVP and CEO of Microsoft AI in 2024"
+    mustafa-suleyman:
+      person: mustafa-suleyman
+      title: "Co-founder & Head of Applied AI"
+      start: "2010-09"
+      end: "2022-01"
+      is_founder: true
+      notes: "Left DeepMind in 2022; co-founded Inflection AI, then joined Microsoft as EVP and CEO of Microsoft AI in 2024"
 
-      i_fPMjZgiKoQ:
-        person: pushmeet-kohli
-        title: "VP of Research"
-        start: "2017"
-        source: https://deepmind.google/about
-        notes: "Leads research across science, safety, and foundational AI"
+    pushmeet-kohli:
+      person: pushmeet-kohli
+      title: "VP of Research"
+      start: "2017"
+      source: https://deepmind.google/about
+      notes: "Leads research across science, safety, and foundational AI"
 
   model-releases:
-    type: model-release
-    entries:
-      i_1ux32OwfMQ:
-        name: AlphaGo
-        released: 2016-01
-        description: "First AI to defeat a professional Go player; beat Lee Sedol 4-1 in March 2016"
-        source: https://deepmind.google/technologies/alphago/
-        notes: "Landmark achievement in AI; used deep reinforcement learning and Monte Carlo tree search"
+    alphago:
+      name: AlphaGo
+      released: "2016-01"
+      description: "First AI to defeat a professional Go player; beat Lee Sedol 4-1 in March 2016"
+      source: https://deepmind.google/technologies/alphago/
+      notes: "Landmark achievement in AI; used deep reinforcement learning and Monte Carlo tree search"
 
-      i_JIOL3d0VCg:
-        name: AlphaFold
-        released: 2018-12
-        description: "Won CASP13 protein structure prediction competition"
-        source: https://deepmind.google/technologies/alphafold/
-        notes: "Revolutionized structural biology; AlphaFold 2 (2020) solved the protein folding problem"
+    alphafold:
+      name: AlphaFold
+      released: "2018-12"
+      description: "Won CASP13 protein structure prediction competition"
+      source: https://deepmind.google/technologies/alphafold/
+      notes: "Revolutionized structural biology; AlphaFold 2 (2020) solved the protein folding problem"
 
-      i_etrnodoTbw:
-        name: AlphaFold 2
-        released: 2020-11
-        description: "Solved protein structure prediction; accuracy comparable to experimental methods"
-        source: https://www.nature.com/articles/s41586-021-03819-2
-        notes: "CASP14 median GDT score of 92.4; database of 200M+ predicted structures released 2022"
+    alphafold-2:
+      name: AlphaFold 2
+      released: "2020-11"
+      description: "Solved protein structure prediction; accuracy comparable to experimental methods"
+      source: https://www.nature.com/articles/s41586-021-03819-2
+      notes: "CASP14 median GDT score of 92.4; database of 200M+ predicted structures released 2022"
 
-      i_HyFb0PNE0w:
-        name: Gemini 1.0
-        released: 2023-12
-        description: "Google's first natively multimodal model family (Ultra, Pro, Nano)"
-        source: https://deepmind.google/technologies/gemini/
-        notes: "Ultra claimed to exceed GPT-4 on several benchmarks"
+    gemini-1-0:
+      name: Gemini 1.0
+      released: "2023-12"
+      description: "Google's first natively multimodal model family (Ultra, Pro, Nano)"
+      source: https://deepmind.google/technologies/gemini/
+      notes: "Ultra claimed to exceed GPT-4 on several benchmarks"
 
-      i_0jS4lG0xDw:
-        name: Gemini 1.5
-        released: 2024-02
-        description: "Introduced 1M token context window; mixture-of-experts architecture"
-        source: https://deepmind.google/technologies/gemini/
-        notes: "First commercially available model with 1M+ token context"
+    gemini-1-5:
+      name: Gemini 1.5
+      released: "2024-02"
+      description: "Introduced 1M token context window; mixture-of-experts architecture"
+      source: https://deepmind.google/technologies/gemini/
+      notes: "First commercially available model with 1M+ token context"
 
-      i_kNaEA6XilQ:
-        name: Gemini 2.0
-        released: 2024-12
-        description: "Next-generation Gemini with improved agentic capabilities"
-        source: https://deepmind.google/technologies/gemini/
-        notes: "Launched with Project Astra and other agentic features"
+    gemini-2-0:
+      name: Gemini 2.0
+      released: "2024-12"
+      description: "Next-generation Gemini with improved agentic capabilities"
+      source: https://deepmind.google/technologies/gemini/
+      notes: "Launched with Project Astra and other agentic features"
 
   research-areas:
-    type: research-area
-    entries:
-      i_7zcSaauqdA:
-        name: Game-Playing AI
-        description: "Reinforcement learning for complex games including Go, chess, StarCraft, and Diplomacy"
-        started: 2013-01
-        key-publication: https://www.nature.com/articles/nature16961
-        notes: "AlphaGo (2016), AlphaZero (2017), AlphaStar (2019)"
+    game-playing-ai:
+      name: Game-Playing AI
+      description: "Reinforcement learning for complex games including Go, chess, StarCraft, and Diplomacy"
+      started: "2013-01"
+      key-publication: https://www.nature.com/articles/nature16961
+      notes: "AlphaGo (2016), AlphaZero (2017), AlphaStar (2019)"
 
-      i_W8Bt29YtBg:
-        name: Protein Structure Prediction
-        description: "Deep learning for predicting 3D protein structures from amino acid sequences"
-        started: 2016-01
-        key-publication: https://www.nature.com/articles/s41586-021-03819-2
-        notes: "AlphaFold 2 solved the 50-year protein folding problem; Demis Hassabis received 2024 Nobel Prize in Chemistry"
+    protein-structure-prediction:
+      name: Protein Structure Prediction
+      description: "Deep learning for predicting 3D protein structures from amino acid sequences"
+      started: "2016-01"
+      key-publication: https://www.nature.com/articles/s41586-021-03819-2
+      notes: "AlphaFold 2 solved the 50-year protein folding problem; Demis Hassabis received 2024 Nobel Prize in Chemistry"
 
-      i_3i8poI2o3A:
-        name: Neuroscience-Inspired AI
-        description: "Using insights from neuroscience to improve AI architectures and learning algorithms"
-        started: 2010-09
-        notes: "Core research area since founding; memory systems, attention, and reward-based learning"
+    neuroscience-inspired-ai:
+      name: Neuroscience-Inspired AI
+      description: "Using insights from neuroscience to improve AI architectures and learning algorithms"
+      started: "2010-09"
+      notes: "Core research area since founding; memory systems, attention, and reward-based learning"
 
-      i_lqETloaWNw:
-        name: AI Safety
-        description: "Responsible AI development including alignment, robustness, and societal impact"
-        started: 2017-01
-        key-publication: https://deepmind.google/discover/blog/specification-gaming-the-flip-side-of-ai-ingenuity/
-        notes: "Frontier Safety Framework published 2024; safety team includes alignment, interpretability, and ethics researchers"
+    ai-safety:
+      name: AI Safety
+      description: "Responsible AI development including alignment, robustness, and societal impact"
+      started: "2017-01"
+      key-publication: https://deepmind.google/discover/blog/specification-gaming-the-flip-side-of-ai-ingenuity/
+      notes: "Frontier Safety Framework published 2024; safety team includes alignment, interpretability, and ethics researchers"
 
   safety-milestones:
-    type: safety-milestone
-    entries:
-      i_8GlDHrsyiw:
-        name: "Specification Gaming Research"
-        date: 2020-04
-        type: research-paper
-        description: "Catalogued examples of AI systems exploiting reward misspecification"
-        source: https://deepmind.google/discover/blog/specification-gaming-the-flip-side-of-ai-ingenuity/
-        notes: "Influential taxonomy of reward hacking failures"
+    specification-gaming-research:
+      name: "Specification Gaming Research"
+      date: "2020-04"
+      type: research-paper
+      description: "Catalogued examples of AI systems exploiting reward misspecification"
+      source: https://deepmind.google/discover/blog/specification-gaming-the-flip-side-of-ai-ingenuity/
+      notes: "Influential taxonomy of reward hacking failures"
 
-      i_PL3gh8Vfug:
-        name: "Frontier Safety Framework"
-        date: 2024-05
-        type: policy-update
-        description: "Framework for evaluating and mitigating risks from frontier AI models"
-        source: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
-        notes: "Defines Critical Capability Levels (CCLs) analogous to Anthropic's ASLs"
+    frontier-safety-framework:
+      name: "Frontier Safety Framework"
+      date: "2024-05"
+      type: policy-update
+      description: "Framework for evaluating and mitigating risks from frontier AI models"
+      source: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
+      notes: "Defines Critical Capability Levels (CCLs) analogous to Anthropic's ASLs"
 
-      i_myU0a0pYoA:
-        name: "Dangerous Capability Evaluations"
-        date: 2023-10
-        type: safety-eval
-        description: "Systematic evaluations for dangerous capabilities in frontier models"
-        source: https://arxiv.org/abs/2311.09247
-        notes: "Published jointly with DeepMind safety team; covers bio, cyber, autonomy, and persuasion risks"
+    dangerous-capability-evaluations:
+      name: "Dangerous Capability Evaluations"
+      date: "2023-10"
+      type: safety-eval
+      description: "Systematic evaluations for dangerous capabilities in frontier models"
+      source: https://arxiv.org/abs/2311.09247
+      notes: "Published jointly with DeepMind safety team; covers bio, cyber, autonomy, and persuasion risks"
 
   strategic-partnerships:
-    type: strategic-partnership
-    entries:
-      i_BdtkhsbPew:
-        partner: Google (Alphabet)
-        type: acquisition
-        date: 2014-01
-        investment_amount: 500e6
-        source: https://en.wikipedia.org/wiki/Google_DeepMind
-        notes: "Acquired by Google for approximately $500M; conditions included creation of AI ethics board"
+    i_BdtkhsbPew:
+      partner: Google (Alphabet)
+      type: acquisition
+      date: "2014-01"
+      investment_amount: 500e6
+      source: https://en.wikipedia.org/wiki/Google_DeepMind
+      notes: "Acquired by Google for approximately $500M; conditions included creation of AI ethics board"
 
-      i_Az3ry4WK8w:
-        partner: Google Brain
-        type: merger
-        date: 2023-04
-        source: https://blog.google/technology/ai/april-ai-update/
-        notes: "DeepMind merged with Google Brain to form Google DeepMind; Jeff Dean became Chief Scientist of Google DeepMind and Google Research"
+    i_Az3ry4WK8w:
+      partner: Google Brain
+      type: merger
+      date: "2023-04"
+      source: https://blog.google/technology/ai/april-ai-update/
+      notes: "DeepMind merged with Google Brain to form Google DeepMind; Jeff Dean became Chief Scientist of Google DeepMind and Google Research"
 
-      i_SPdnZrrkgg:
-        partner: Isomorphic Labs
-        type: spin-off
-        date: 2021-11
-        source: https://www.isomorphiclabs.com/
-        notes: "Drug discovery spin-off from DeepMind, led by Demis Hassabis; leverages AlphaFold technology"
+    i_SPdnZrrkgg:
+      partner: Isomorphic Labs
+      type: spin-off
+      date: "2021-11"
+      source: https://www.isomorphiclabs.com/
+      notes: "Drug discovery spin-off from DeepMind, led by Demis Hassabis; leverages AlphaFold technology"

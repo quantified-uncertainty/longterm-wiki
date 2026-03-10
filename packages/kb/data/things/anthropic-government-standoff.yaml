@@ -55,93 +55,89 @@ facts:
     source: https://www.cbsnews.com/news/anthropic-ceo-dario-amodei-calls-white-house-actions-retaliatory-and-punitive/
     notes: "Anthropic filed lawsuit challenging supply chain risk designation on Feb 28, 2026"
 
-items:
+records:
   timeline:
-    type: timeline-event
-    entries:
-      i_ags_contract:
-        date: !date 2025-07
-        event: "Pentagon awards $200M AI contracts to Anthropic, OpenAI, Google, xAI"
-        source: https://www.aljazeera.com/news/2026/2/25/anthropic-vs-the-pentagon-why-ai-firm-is-taking-on-trump-administration
-        notes: "Anthropic first AI company on classified networks via Palantir"
+    i_ags_contract:
+      date: !date 2025-07
+      event: "Pentagon awards $200M AI contracts to Anthropic, OpenAI, Google, xAI"
+      source: https://www.aljazeera.com/news/2026/2/25/anthropic-vs-the-pentagon-why-ai-firm-is-taking-on-trump-administration
+      notes: "Anthropic first AI company on classified networks via Palantir"
 
-      i_ags_maduro_raid:
-        date: !date 2026-01-03
-        event: "US operation captures Venezuelan President Maduro; Claude AI used during raid"
-        source: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
-        notes: "83 killed; Anthropic contacts Palantir to ask if Claude was used"
+    i_ags_maduro_raid:
+      date: !date 2026-01-03
+      event: "US operation captures Venezuelan President Maduro; Claude AI used during raid"
+      source: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
+      notes: "83 killed; Anthropic contacts Palantir to ask if Claude was used"
 
-      i_ags_sharma_resigns:
-        date: !date 2026-02-09
-        event: "Mrinank Sharma resigns from Anthropic Safeguards Research Team"
-        source: https://www.eweek.com/news/ai-safety-leader-resigns-anthropic-global-risks/
+    i_ags_sharma_resigns:
+      date: !date 2026-02-09
+      event: "Mrinank Sharma resigns from Anthropic Safeguards Research Team"
+      source: https://www.eweek.com/news/ai-safety-leader-resigns-anthropic-global-risks/
 
-      i_ags_pac:
-        date: !date 2026-02-12
-        event: "Anthropic donates $20M to Public First Action PAC"
-        source: https://www.cnbc.com/2026/02/12/anthropic-gives-20-million-to-group-pushing-for-ai-regulations-.html
+    i_ags_pac:
+      date: !date 2026-02-12
+      event: "Anthropic donates $20M to Public First Action PAC"
+      source: https://www.cnbc.com/2026/02/12/anthropic-gives-20-million-to-group-pushing-for-ai-regulations-.html
 
-      i_ags_hegseth_threat:
-        date: !date 2026-02-16
-        event: "Hegseth threatens supply chain risk designation"
-        source: https://www.cnbc.com/2026/02/26/anthropic-pentagon-ai-amodei.html
+    i_ags_hegseth_threat:
+      date: !date 2026-02-16
+      event: "Hegseth threatens supply chain risk designation"
+      source: https://www.cnbc.com/2026/02/26/anthropic-pentagon-ai-amodei.html
 
-      i_ags_xai_approved:
-        date: !date 2026-02-23
-        event: "xAI approved for classified networks; agrees to all terms without reservation"
+    i_ags_xai_approved:
+      date: !date 2026-02-23
+      event: "xAI approved for classified networks; agrees to all terms without reservation"
 
-      i_ags_pentagon_meeting:
-        date: !date 2026-02-24
-        event: "Hegseth meets Amodei at Pentagon; demands signed document for full access"
-        source: https://www.washingtonpost.com/technology/2026/02/27/anthropic-pentagon-lethal-military-ai/
-        notes: "Pentagon tech chief poses ICBM hypothetical"
+    i_ags_pentagon_meeting:
+      date: !date 2026-02-24
+      event: "Hegseth meets Amodei at Pentagon; demands signed document for full access"
+      source: https://www.washingtonpost.com/technology/2026/02/27/anthropic-pentagon-lethal-military-ai/
+      notes: "Pentagon tech chief poses ICBM hypothetical"
 
-      i_ags_rsp_v3:
-        date: !date 2026-02-25
-        event: "Anthropic publishes RSP v3.0, dropping hard commitment to pause training"
-        source: https://time.com/7380854/exclusive-anthropic-drops-flagship-safety-pledge/
+    i_ags_rsp_v3:
+      date: !date 2026-02-25
+      event: "Anthropic publishes RSP v3.0, dropping hard commitment to pause training"
+      source: https://time.com/7380854/exclusive-anthropic-drops-flagship-safety-pledge/
 
-      i_ags_amodei_statement:
-        date: !date 2026-02-26
-        event: "Amodei publishes statement: 'cannot in good conscience accede'"
-        source: https://fortune.com/2026/02/27/dario-amodei-says-he-cannot-in-good-conscience-bow-to-pentagons-demands-over-ai-use-in-military/
+    i_ags_amodei_statement:
+      date: !date 2026-02-26
+      event: "Amodei publishes statement: 'cannot in good conscience accede'"
+      source: https://fortune.com/2026/02/27/dario-amodei-says-he-cannot-in-good-conscience-bow-to-pentagons-demands-over-ai-use-in-military/
 
-      i_ags_senate_letter:
-        date: !date 2026-02-27
-        event: "Senate Armed Services leaders send bipartisan letter urging extension"
-        source: https://www.axios.com/2026/02/27/senate-defense-anthropic-pentagon-ai
+    i_ags_senate_letter:
+      date: !date 2026-02-27
+      event: "Senate Armed Services leaders send bipartisan letter urging extension"
+      source: https://www.axios.com/2026/02/27/senate-defense-anthropic-pentagon-ai
 
-      i_ags_designation:
-        date: !date 2026-02-27
-        event: "Trump orders all agencies to cease using Anthropic; Hegseth designates it a supply chain risk"
-        source: https://fortune.com/2026/02/27/trump-us-government-anthropic-claude-pentagon-6-months-phaseout-ai-standoff/
+    i_ags_designation:
+      date: !date 2026-02-27
+      event: "Trump orders all agencies to cease using Anthropic; Hegseth designates it a supply chain risk"
+      source: https://fortune.com/2026/02/27/trump-us-government-anthropic-claude-pentagon-6-months-phaseout-ai-standoff/
 
-      i_ags_openai_deal:
-        date: !date 2026-02-27
-        event: "OpenAI announces Pentagon deal for classified networks with similar safeguards"
-        source: https://www.npr.org/2026/02/27/nx-s1-5729118/trump-anthropic-pentagon-openai-ai-weapons-ban
+    i_ags_openai_deal:
+      date: !date 2026-02-27
+      event: "OpenAI announces Pentagon deal for classified networks with similar safeguards"
+      source: https://www.npr.org/2026/02/27/nx-s1-5729118/trump-anthropic-pentagon-openai-ai-weapons-ban
 
-      i_ags_lawsuit:
-        date: !date 2026-02-28
-        event: "Anthropic files lawsuit challenging supply chain risk designation"
-        source: https://www.cbsnews.com/news/anthropic-ceo-dario-amodei-calls-white-house-actions-retaliatory-and-punitive/
+    i_ags_lawsuit:
+      date: !date 2026-02-28
+      event: "Anthropic files lawsuit challenging supply chain risk designation"
+      source: https://www.cbsnews.com/news/anthropic-ceo-dario-amodei-calls-white-house-actions-retaliatory-and-punitive/
 
   parties:
-    type: party
-    entries:
-      i_ags_anthropic:
-        entity: !ref mK9pX3rQ7n:anthropic
-        role: "protagonist"
-        description: "Refused Pentagon demands for unrestricted military use; received supply chain risk designation"
-        source: https://fortune.com/2026/02/27/dario-amodei-says-he-cannot-in-good-conscience-bow-to-pentagons-demands-over-ai-use-in-military/
+    i_ags_anthropic:
+      entity: anthropic
+      role: "protagonist"
+      description: "Refused Pentagon demands for unrestricted military use; received supply chain risk designation"
+      source: https://fortune.com/2026/02/27/dario-amodei-says-he-cannot-in-good-conscience-bow-to-pentagons-demands-over-ai-use-in-military/
 
-      i_ags_openai:
-        entity: !ref 1LcLlMGLbw:openai
-        role: "competitor"
-        description: "Signed competing Pentagon deal hours after Anthropic ban, claiming similar safeguards"
-        source: https://www.npr.org/2026/02/27/nx-s1-5729118/trump-anthropic-pentagon-openai-ai-weapons-ban
+    i_ags_openai:
+      entity: openai
+      role: "competitor"
+      description: "Signed competing Pentagon deal hours after Anthropic ban, claiming similar safeguards"
+      source: https://www.npr.org/2026/02/27/nx-s1-5729118/trump-anthropic-pentagon-openai-ai-weapons-ban
 
-      i_ags_xai:
-        entity: !ref GLXKjYAEKw:xai
-        role: "competitor"
-        description: "Agreed to Pentagon terms without reservation; second company on classified networks"
+    i_ags_xai:
+      entity: xai
+      role: "competitor"
+      description: "Agreed to Pentagon terms without reservation; second company on classified networks"

@@ -70,44 +70,40 @@ facts:
     source: https://openai.com/blog/introducing-superalignment
     notes: "Co-led OpenAI Superalignment team with Ilya Sutskever; resigned May 2024 citing insufficient safety resources"
 
-items:
+records:
   career-history:
-    type: career-entry
-    entries:
-      i_jL1zA2bC3d:
-        organization: !ref A4XoubikkQ:deepmind
-        title: "Research Scientist"
-        start: "2017"
-        end: "2021"
-        source: https://jan.leike.name/
-        notes: "Worked on reinforcement learning theory and agent alignment"
+    i_jL1zA2bC3d:
+      organization: deepmind
+      title: "Research Scientist"
+      start: "2017"
+      end: "2021"
+      source: https://jan.leike.name/
+      notes: "Worked on reinforcement learning theory and agent alignment"
 
-      i_jL4eF5gH6i:
-        organization: !ref 1LcLlMGLbw:openai
-        title: "Alignment Team Lead; then Co-lead of Superalignment"
-        start: "2021"
-        end: 2024-05
-        source: https://openai.com/blog/introducing-superalignment
-        notes: "Led alignment research; co-led Superalignment team from July 2023; resigned publicly citing safety concerns and insufficient compute allocation"
+    i_jL4eF5gH6i:
+      organization: openai
+      title: "Alignment Team Lead; then Co-lead of Superalignment"
+      start: "2021"
+      end: "2024-05"
+      source: https://openai.com/blog/introducing-superalignment
+      notes: "Led alignment research; co-led Superalignment team from July 2023; resigned publicly citing safety concerns and insufficient compute allocation"
 
-      i_jL7jK8lM9n:
-        organization: !ref mK9pX3rQ7n:anthropic
-        title: "Head of Alignment Science"
-        start: 2024-05
-        source: https://anthropic.com/news/jan-leike-joins-anthropic
-        notes: "Joined Anthropic same month he left OpenAI; leads scalable oversight and alignment research"
+    i_jL7jK8lM9n:
+      organization: anthropic
+      title: "Head of Alignment Science"
+      start: "2024-05"
+      source: https://anthropic.com/news/jan-leike-joins-anthropic
+      notes: "Joined Anthropic same month he left OpenAI; leads scalable oversight and alignment research"
 
   notable-publications:
-    type: publication
-    entries:
-      i_jLoP1qR2s:
-        title: "Scalable agent alignment via reward modeling: a research direction"
-        year: 2018
-        url: https://arxiv.org/abs/1811.07871
-        notes: "Influential research agenda laying out iterated amplification and reward modeling for alignment"
+    i_jLoP1qR2s:
+      title: "Scalable agent alignment via reward modeling: a research direction"
+      year: 2018
+      url: https://arxiv.org/abs/1811.07871
+      notes: "Influential research agenda laying out iterated amplification and reward modeling for alignment"
 
-      i_jLtU3vW4x:
-        title: "AI alignment research overview"
-        year: 2022
-        url: https://arxiv.org/abs/2209.00626
-        notes: "Comprehensive overview of the alignment research landscape"
+    i_jLtU3vW4x:
+      title: "AI alignment research overview"
+      year: 2022
+      url: https://arxiv.org/abs/2209.00626
+      notes: "Comprehensive overview of the alignment research landscape"
