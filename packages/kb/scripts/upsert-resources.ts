@@ -79,9 +79,9 @@ async function main() {
       }
     }
 
-    // Collect URLs from items
-    for (const coll of Object.values(data.items ?? {})) {
-      const entries = (coll as { entries?: Record<string, Record<string, unknown>> }).entries ?? {};
+    // Collect URLs from records
+    for (const coll of Object.values(data.records ?? {})) {
+      const entries = coll as Record<string, Record<string, unknown>>;
       for (const entry of Object.values(entries)) {
         for (const field of ["source", "key-publication", "url"]) {
           const url = entry[field] as string | undefined;

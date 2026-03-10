@@ -166,17 +166,11 @@ describe("loader", () => {
       expect(personSchema!.recommended).toContain("born-year");
     });
 
-    it("loads item collection schemas on organization", () => {
+    it("loads record schema IDs on organization", () => {
       const orgSchema = graph.getSchema("organization");
-      expect(orgSchema!.items).toBeDefined();
-      expect(orgSchema!.items!["funding-rounds"]).toBeDefined();
-      expect(orgSchema!.items!["key-people"]).toBeDefined();
-
-      const frFields = orgSchema!.items!["funding-rounds"].fields;
-      expect(frFields["date"].required).toBe(true);
-      expect(frFields["date"].type).toBe("date");
-      expect(frFields["amount"].type).toBe("number");
-      expect(frFields["lead_investor"].type).toBe("ref");
+      expect(orgSchema!.records).toBeDefined();
+      expect(orgSchema!.records).toContain("funding-round");
+      expect(orgSchema!.records).toContain("key-person");
     });
   });
 

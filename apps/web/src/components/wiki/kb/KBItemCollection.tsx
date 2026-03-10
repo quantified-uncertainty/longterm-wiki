@@ -12,7 +12,7 @@
  *
  * Usage in MDX:
  *   <KBItemCollection entity="anthropic" collection="funding-rounds" />
- *   <KBItemCollection entity="anthropic" collection="key-people" showNotes />
+ *   <KBItemCollection entity="anthropic" collection="key-persons" showNotes />
  *   <KBItemCollection entity="anthropic" collection="model-releases" columns={["name", "released", "safety_level"]} />
  */
 

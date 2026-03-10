@@ -140,7 +140,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
         {recordSchema && (
           <KVRow label="Schema">
             <span className="text-xs text-muted-foreground">
-              {recordSchema.id}
+              {recordSchema.description ?? recordSchema.name ?? recordSchema.id}
             </span>
           </KVRow>
         )}
