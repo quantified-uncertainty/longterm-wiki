@@ -518,7 +518,7 @@ describe("internal sidebar completeness (real data)", () => {
 
     const db = loadJson<{
       idRegistry: { byNumericId: Record<string, string> };
-      pages: Array<{ id: string; contentFormat: string; subcategory: string }>;
+      pages: Array<{ id: string; contentFormat: string; subcategory: string; filePath?: string }>;
     }>(dbPath);
 
     const errors: string[] = [];
@@ -541,6 +541,9 @@ describe("internal sidebar completeness (real data)", () => {
         continue;
       }
 
+      // Skip pages that live outside /internal/ (e.g., KB pages redirected from legacy /internal/ URLs)
+      if (page.filePath && !page.filePath.startsWith("internal/")) continue;
+
       if (page.contentFormat !== "dashboard") {
         errors.push(`${entry.name}: MDX stub '${slug}' has contentFormat '${page.contentFormat}' (expected 'dashboard')`);
       }
@@ -560,6 +563,15 @@ describe("internal sidebar completeness (real data)", () => {
   it("every migrated dashboard redirect has a corresponding content component file", () => {
     if (!fs.existsSync(APP_INTERNAL_DIR)) return;
 
+    // Load DB to check whether redirect targets are internal dashboards
+    const dbPath = path.join(DATA_DIR, "database.json");
+    if (!fs.existsSync(dbPath)) return;
+
+    const db = loadJson<{
+      idRegistry: { byNumericId: Record<string, string> };
+      pages: Array<{ id: string; filePath?: string }>;
+    }>(dbPath);
+
     const errors: string[] = [];
     for (const entry of fs.readdirSync(APP_INTERNAL_DIR, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
@@ -567,7 +579,16 @@ describe("internal sidebar completeness (real data)", () => {
       if (!fs.existsSync(pagePath)) continue;
 
       const source = fs.readFileSync(pagePath, "utf-8");
-      if (!/redirect\(["']\/wiki\/E\d+["']\)/.test(source)) continue;
+      const redirectMatch = source.match(/redirect\(["']\/wiki\/(E\d+)["']\)/);
+      if (!redirectMatch) continue;
+
+      // Skip redirects to non-internal pages (e.g., legacy URLs redirecting to /kb/)
+      const eid = redirectMatch[1];
+      const slug = db.idRegistry.byNumericId[eid];
+      if (slug) {
+        const page = db.pages.find(p => p.id === slug);
+        if (page?.filePath && !page.filePath.startsWith("internal/")) continue;
+      }
 
       // This is a migrated dashboard — it should have a *-content.tsx file
       const dirPath = path.join(APP_INTERNAL_DIR, entry.name);

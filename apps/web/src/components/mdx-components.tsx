@@ -50,6 +50,8 @@ import { KBFactsExplorerContent } from "@/app/kb/kb-facts-content";
 import { KBPropertiesExplorerContent } from "@/app/kb/kb-properties-content";
 import { KBEntityCoverageContent } from "@/app/kb/kb-entities-content";
 import { KBItemsExplorerContent } from "@/app/kb/kb-items-content";
+import { KBResourcesContent } from "@/app/kb/kb-resources-content";
+import { KBPublicationsContent } from "@/app/kb/kb-publications-content";
 
 // Dashboard content components (rendered via MDX stubs at /wiki/E<id>)
 import { FactsPageContent } from "@/app/internal/facts/facts-content";
@@ -193,6 +195,8 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   KBPropertiesExplorerContent,
   KBEntityCoverageContent,
   KBItemsExplorerContent,
+  KBResourcesContent,
+  KBPublicationsContent,
 
   // Dashboard content components
   FactsPageContent,
