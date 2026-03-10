@@ -85,7 +85,7 @@ jobs:
             exit 0
           fi
 
-          GK_STATUS=$(cat /tmp/monitoring.json | jq -r '.services.groundskeeper.status // "unknown"')
+          GK_STATUS=$(cat /tmp/monitoring.json | jq -r '(.services[] | select(.name == "groundskeeper") | .status) // "unknown"')
 
           if [ "$GK_STATUS" = "healthy" ]; then
             echo "status=ok" >> "$GITHUB_OUTPUT"

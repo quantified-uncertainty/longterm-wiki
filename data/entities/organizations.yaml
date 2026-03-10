@@ -31,8 +31,11 @@
       relationship: addresses
     - id: racing-dynamics
       type: risk
-      relationship: affects
+      relationship: shaped-by
     - id: daniela-amodei
+      type: person
+      relationship: leads-to
+    - id: holden-karnofsky
       type: person
       relationship: leads-to
     - id: claude
@@ -52,6 +55,26 @@
       relationship: related
     - id: long-term-benefit-trust
       type: concept
+      relationship: related
+    - id: deepmind
+      type: organization
+    - id: anthropic-government-standoff
+      type: event
+      relationship: related
+    - id: anthropic-valuation
+      type: analysis
+      relationship: related
+    - id: anthropic-stakeholders
+      type: analysis
+      relationship: related
+    - id: anthropic-investors
+      type: analysis
+      relationship: related
+    - id: anthropic-ipo
+      type: analysis
+      relationship: related
+    - id: anthropic-impact
+      type: analysis
       relationship: related
   sources:
     - title: Anthropic Company Website
