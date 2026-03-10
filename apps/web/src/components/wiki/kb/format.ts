@@ -124,7 +124,7 @@ export function formatKBFactValue(
 // ── Record cell formatting ─────────────────────────────────────────
 
 /**
- * Format a cell value from an item collection, using the field definition
+ * Format a cell value from a record collection, using the field definition
  * from the schema when available for type-aware formatting.
  *
  * Returns a string for simple values. Callers that need JSX (e.g., for
