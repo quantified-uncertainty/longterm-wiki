@@ -27,6 +27,73 @@ import {
 } from "@/components/wiki/WikiSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { getKBDataNav } from "@/lib/wiki-nav";
+import { fetchFromWikiServer } from "@/lib/wiki-server";
+
+// ─── Verification types & helpers ────────────────────────────────────
+
+type VerdictType = "confirmed" | "contradicted" | "unverifiable" | "outdated" | "partial" | "unchecked";
+
+interface VerdictRow {
+  factId: string;
+  verdict: string;
+  confidence: number | null;
+  reasoning: string | null;
+  sourcesChecked: number | null;
+  needsRecheck: boolean | null;
+  lastComputedAt: string | null;
+}
+
+interface VerdictsResponse {
+  verdicts: VerdictRow[];
+  total: number;
+}
+
+/** Fetch all verdicts for an entity from wiki-server. Returns empty map on failure. */
+async function fetchEntityVerdicts(entityId: string): Promise<Map<string, VerdictRow>> {
+  const data = await fetchFromWikiServer<VerdictsResponse>(
+    `/api/kb-verifications/verdicts?entity_id=${encodeURIComponent(entityId)}&limit=200`,
+    { revalidate: 300 }
+  );
+  const map = new Map<string, VerdictRow>();
+  if (data) {
+    for (const v of data.verdicts) {
+      map.set(v.factId, v);
+    }
+  }
+  return map;
+}
+
+const VERDICT_STYLES: Record<VerdictType, { label: string; className: string }> = {
+  confirmed:    { label: "Confirmed",    className: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300" },
+  contradicted: { label: "Contradicted", className: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300" },
+  outdated:     { label: "Outdated",     className: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300" },
+  partial:      { label: "Partial",      className: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300" },
+  unverifiable: { label: "Unverifiable", className: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" },
+  unchecked:    { label: "Unchecked",    className: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" },
+};
+
+function VerdictBadge({ verdict }: { verdict: VerdictRow }) {
+  const style = VERDICT_STYLES[verdict.verdict as VerdictType] ?? VERDICT_STYLES.unchecked;
+  const confidence = verdict.confidence != null ? Math.round(verdict.confidence * 100) : null;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium leading-tight ${style.className}`}
+      title={verdict.reasoning ?? undefined}
+    >
+      {style.label}
+      {confidence != null && <span className="opacity-70">{confidence}%</span>}
+    </span>
+  );
+}
+
+/** Build a summary of verdict counts from the map. */
+function verdictSummary(verdicts: Map<string, VerdictRow>): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const v of verdicts.values()) {
+    counts[v.verdict] = (counts[v.verdict] ?? 0) + 1;
+  }
+  return counts;
+}
 
 // ─── Static params ───────────────────────────────────────────────────
 
@@ -158,6 +225,7 @@ export default async function KBEntityPage({
   const structuredFacts = allFacts.filter((f) => f.propertyId !== "description");
   const factGroups = groupFactsByProperty(allFacts);
   const recordCollections = getKBAllRecordCollections(entityId);
+  const verdicts = await fetchEntityVerdicts(entityId);
 
   // Sort property groups alphabetically by property name
   const sortedPropertyIds = [...factGroups.keys()].sort((a, b) => {
@@ -275,6 +343,16 @@ export default async function KBEntityPage({
                       value={`${totalRecords} records in ${totalCollections} collection${totalCollections !== 1 ? "s" : ""}`}
                     />
                   )}
+                  {verdicts.size > 0 && (
+                    <tr>
+                      <td className="py-2 px-4 font-medium text-muted-foreground w-[10rem] text-sm bg-card">
+                        Verification
+                      </td>
+                      <td className="py-2 px-4 text-sm bg-card">
+                        <VerificationSummary verdicts={verdicts} totalFacts={structuredFacts.length} />
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -331,36 +409,53 @@ export default async function KBEntityPage({
                               <th className="text-left py-1 pr-3 font-medium">
                                 Source
                               </th>
+                              {verdicts.size > 0 && (
+                                <th className="text-left py-1 pr-3 font-medium">
+                                  Verified
+                                </th>
+                              )}
                               <th className="text-left py-1 font-medium">
                                 Fact ID
                               </th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-border/50">
-                            {facts.map((fact) => (
-                              <tr key={fact.id} id={fact.id} className="scroll-mt-16">
-                                <td className="py-1.5 pr-3 text-muted-foreground whitespace-nowrap">
-                                  {formatKBDate(fact.asOf)}
-                                </td>
-                                <td className="py-1.5 pr-3">
-                                  <FactValueDisplay
-                                    fact={fact}
-                                    property={property}
-                                  />
-                                </td>
-                                <td className="py-1.5 pr-3">
-                                  <SourceCell fact={fact} />
-                                </td>
-                                <td className="py-1.5">
-                                  <Link
-                                    href={`/kb/fact/${fact.id}`}
-                                    className="text-blue-600 hover:underline dark:text-blue-400 font-mono text-xs"
-                                  >
-                                    {fact.id}
-                                  </Link>
-                                </td>
-                              </tr>
-                            ))}
+                            {facts.map((fact) => {
+                              const verdict = verdicts.get(fact.id);
+                              return (
+                                <tr key={fact.id} id={fact.id} className="scroll-mt-16">
+                                  <td className="py-1.5 pr-3 text-muted-foreground whitespace-nowrap">
+                                    {formatKBDate(fact.asOf)}
+                                  </td>
+                                  <td className="py-1.5 pr-3">
+                                    <FactValueDisplay
+                                      fact={fact}
+                                      property={property}
+                                    />
+                                  </td>
+                                  <td className="py-1.5 pr-3">
+                                    <SourceCell fact={fact} />
+                                  </td>
+                                  {verdicts.size > 0 && (
+                                    <td className="py-1.5 pr-3">
+                                      {verdict ? (
+                                        <VerdictBadge verdict={verdict} />
+                                      ) : (
+                                        <span className="text-xs text-muted-foreground">&mdash;</span>
+                                      )}
+                                    </td>
+                                  )}
+                                  <td className="py-1.5">
+                                    <Link
+                                      href={`/kb/fact/${fact.id}`}
+                                      className="text-blue-600 hover:underline dark:text-blue-400 font-mono text-xs"
+                                    >
+                                      {fact.id}
+                                    </Link>
+                                  </td>
+                                </tr>
+                              );
+                            })}
                           </tbody>
                         </table>
                       </div>
@@ -533,5 +628,39 @@ function MetaRow({ label, value }: { label: string; value: string }) {
         <code className="text-xs">{value}</code>
       </td>
     </tr>
+  );
+}
+
+function VerificationSummary({
+  verdicts,
+  totalFacts,
+}: {
+  verdicts: Map<string, VerdictRow>;
+  totalFacts: number;
+}) {
+  const counts = verdictSummary(verdicts);
+  const checked = verdicts.size;
+  const unchecked = totalFacts - checked;
+
+  return (
+    <span className="flex flex-wrap items-center gap-2 text-xs">
+      <span className="text-muted-foreground">
+        {checked}/{totalFacts} checked
+      </span>
+      {(["confirmed", "contradicted", "outdated", "partial", "unverifiable"] as const).map(
+        (v) =>
+          counts[v] ? (
+            <span
+              key={v}
+              className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded font-medium leading-tight ${VERDICT_STYLES[v].className}`}
+            >
+              {counts[v]} {VERDICT_STYLES[v].label.toLowerCase()}
+            </span>
+          ) : null,
+      )}
+      {unchecked > 0 && (
+        <span className="text-muted-foreground">{unchecked} unchecked</span>
+      )}
+    </span>
   );
 }
