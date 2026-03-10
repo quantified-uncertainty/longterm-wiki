@@ -552,16 +552,15 @@ export async function orchestrateCiAutoUpdate(
   git(['commit', '-m', commitMsg]);
 
   // For same-day re-runs the remote branch may already exist from a prior
-  // failed attempt. Fetch it first so --force-with-lease knows the remote ref,
-  // then force-push if needed. This is safe because auto-update branches are
-  // exclusively owned by this CI pipeline.
+  // failed attempt. Use --force on retry because the shallow CI clone
+  // (fetch-depth: 1) lacks the reflog data that --force-with-lease needs.
+  // This is safe because auto-update branches are exclusively owned by CI.
   try {
     git(['push', '-u', 'origin', branch]);
   } catch (pushErr: unknown) {
     const msg = pushErr instanceof Error ? pushErr.message : String(pushErr);
-    console.log(`Standard push failed (${msg}), fetching remote ref and retrying with --force-with-lease`);
-    try { git(['fetch', 'origin', branch]); } catch { /* branch may not exist remotely yet */ }
-    git(['push', '--force-with-lease', '-u', 'origin', branch]);
+    console.log(`Standard push failed (${msg}), retrying with --force`);
+    git(['push', '--force', '-u', 'origin', branch]);
   }
   console.log(`Pushed to origin/${branch}`);
 

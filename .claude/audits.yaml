@@ -73,7 +73,7 @@ audits:
       - server-health-monitor: weekly (within 9 days)
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-03-09"
+    last_checked: "2026-03-10"
     last_result: fail
 
   - id: vercel-production-only
@@ -197,5 +197,5 @@ post_merge:
     merged: "2026-03-05"
     claim: "Reviewdog posts inline annotations on PR diffs for crux validation findings and actionlint errors"
     how_to_verify: "Open a PR with a known validation issue (e.g. unescaped $) and check that inline annotations appear in the Files Changed tab"
-    status: pending
+    status: verified
     deadline: "2026-03-19"

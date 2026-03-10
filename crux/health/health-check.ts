@@ -58,7 +58,6 @@ const MAX_AGE: Record<string, number> = {
   'database-backup.yml': 36,
   'scheduled-maintenance.yml': 216, // 9 days
   'server-health-monitor.yml': 192, // weekly dead-man-switch (8 days)
-  'scheduled-deploy.yml': 36,
   'ci.yml': 168, // 7 days
 };
 
@@ -268,7 +267,6 @@ const SCHEDULED_ONLY_WORKFLOWS = new Set([
   'database-backup.yml',
   'scheduled-maintenance.yml',
   'server-health-monitor.yml',
-  'scheduled-deploy.yml',
 ]);
 
 export async function checkActions(): Promise<CheckResult> {
@@ -285,7 +283,6 @@ export async function checkActions(): Promise<CheckResult> {
     'database-backup.yml',
     'scheduled-maintenance.yml',
     'server-health-monitor.yml',
-    'scheduled-deploy.yml',
     'ci.yml',
   ];
 
