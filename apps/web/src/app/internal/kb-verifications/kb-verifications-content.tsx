@@ -1,44 +1,24 @@
 import {
   fetchDetailed,
   type FetchResult,
+  type RpcKbStatsResult,
+  type RpcKbVerdictsResult,
+  type RpcKbVerdictRow,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { KbVerificationsTable } from "./kb-verifications-table";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-interface StatsResponse {
-  total_facts: number;
-  by_verdict: Record<string, number>;
-  needs_recheck: number;
-  avg_confidence: number;
-}
-
-export interface VerdictRow {
-  factId: string;
-  verdict: string;
-  confidence: number | null;
-  reasoning: string | null;
-  sourcesChecked: number;
-  needsRecheck: boolean;
-  lastComputedAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface VerdictsResponse {
-  verdicts: VerdictRow[];
-  total: number;
-}
+// Re-export the RPC-inferred type for the table component
+export type VerdictRow = RpcKbVerdictRow;
 
 // ── Data loading ──────────────────────────────────────────────────────────────
 
-async function loadStats(): Promise<FetchResult<StatsResponse>> {
-  return fetchDetailed<StatsResponse>("/api/kb-verifications/stats");
+async function loadStats(): Promise<FetchResult<RpcKbStatsResult>> {
+  return fetchDetailed<RpcKbStatsResult>("/api/kb-verifications/stats");
 }
 
-async function loadVerdicts(): Promise<FetchResult<VerdictsResponse>> {
-  return fetchDetailed<VerdictsResponse>(
+async function loadVerdicts(): Promise<FetchResult<RpcKbVerdictsResult>> {
+  return fetchDetailed<RpcKbVerdictsResult>(
     "/api/kb-verifications/verdicts?limit=200"
   );
 }
@@ -73,6 +53,17 @@ const VERDICT_COLORS: Record<string, string> = {
   partial: "text-amber-500",
   unverifiable: "text-muted-foreground",
   unchecked: "text-muted-foreground",
+};
+
+// ── Bar colors ────────────────────────────────────────────────────────────────
+
+const BAR_COLORS: Record<string, string> = {
+  confirmed: "bg-emerald-500",
+  contradicted: "bg-red-500",
+  outdated: "bg-amber-500",
+  partial: "bg-amber-400",
+  unverifiable: "bg-gray-400",
+  unchecked: "bg-gray-300",
 };
 
 // ── Main content component ────────────────────────────────────────────────────
@@ -168,26 +159,16 @@ export async function KbVerificationsContent() {
       {stats.total_facts > 0 && verdictEntries.length > 0 && (
         <div className="not-prose mb-6">
           <div className="flex rounded-full overflow-hidden h-4">
-            {verdictEntries.map(([verdict, verdictCount]) => {
-              const barColors: Record<string, string> = {
-                confirmed: "bg-emerald-500",
-                contradicted: "bg-red-500",
-                outdated: "bg-amber-500",
-                partial: "bg-amber-400",
-                unverifiable: "bg-gray-400",
-                unchecked: "bg-gray-300",
-              };
-              return (
-                <div
-                  key={verdict}
-                  className={barColors[verdict] || "bg-gray-300"}
-                  style={{
-                    width: `${(verdictCount / stats.total_facts) * 100}%`,
-                  }}
-                  title={`${verdict}: ${verdictCount}`}
-                />
-              );
-            })}
+            {verdictEntries.map(([verdict, verdictCount]) => (
+              <div
+                key={verdict}
+                className={BAR_COLORS[verdict] || "bg-gray-300"}
+                style={{
+                  width: `${(verdictCount / stats.total_facts) * 100}%`,
+                }}
+                title={`${verdict}: ${verdictCount}`}
+              />
+            ))}
           </div>
           <div className="flex justify-between text-xs text-muted-foreground mt-1 flex-wrap gap-x-4">
             {verdictEntries.map(([verdict, verdictCount]) => (

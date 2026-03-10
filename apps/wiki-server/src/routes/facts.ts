@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { validator } from "hono/validator";
 import { z } from "zod";
 import { eq, and, count, asc, sql, isNotNull, lte } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
@@ -9,7 +8,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
-  VALIDATION_ERROR,
+  zv,
 } from "./utils.js";
 import { SyncFactsBatchSchema } from "../api-types.js";
 
@@ -35,21 +34,6 @@ const StalenessQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
-
-// ---- Zod validator helper (uses Hono's built-in validator for RPC type inference) ----
-
-function zv<T extends z.ZodType>(target: "query", schema: T) {
-  return validator(target, (value, c) => {
-    const result = schema.safeParse(value);
-    if (!result.success) {
-      return c.json(
-        { error: VALIDATION_ERROR, message: result.error.message },
-        400
-      );
-    }
-    return result.data as z.infer<T>;
-  });
-}
 
 // ---- Helpers ----
 

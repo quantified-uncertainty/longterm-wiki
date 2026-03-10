@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { validator } from "hono/validator";
 import { z } from "zod";
 import { eq, and, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
@@ -8,10 +7,12 @@ import {
   kbFactResourceVerifications,
   facts,
 } from "../schema.js";
+import { zv, notFoundError } from "./utils.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
+const MAX_FACT_ID_LENGTH = 100;
 
 // ---- Query schemas ----
 
@@ -26,21 +27,6 @@ const VerdictsQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
-// ---- Zod validator helper (uses Hono's built-in validator for RPC type inference) ----
-
-function zv<T extends z.ZodType>(target: "query", schema: T) {
-  return validator(target, (value, c) => {
-    const result = schema.safeParse(value);
-    if (!result.success) {
-      return c.json(
-        { error: "validation_error" as const, message: result.error.message },
-        400
-      );
-    }
-    return result.data as z.infer<T>;
-  });
-}
-
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
 const kbVerificationsApp = new Hono()
@@ -49,12 +35,16 @@ const kbVerificationsApp = new Hono()
   .get("/stats", async (c) => {
     const db = getDrizzleDb();
 
-    const totalResult = await db
-      .select({ count: count() })
+    // Single aggregation query instead of 4 sequential queries
+    const [statsRow] = await db
+      .select({
+        total: count(),
+        needsRecheck: sql<number>`count(*) filter (where ${kbFactVerdicts.needsRecheck} = true)`,
+        avgConfidence: sql<number>`coalesce(avg(${kbFactVerdicts.confidence}), 0)`,
+      })
       .from(kbFactVerdicts);
-    const totalFacts = totalResult[0].count;
 
-    // Breakdown by verdict
+    // Breakdown by verdict (still a separate query — GROUP BY can't merge into the aggregate above)
     const byVerdictRows = await db
       .select({
         verdict: kbFactVerdicts.verdict,
@@ -68,26 +58,11 @@ const kbVerificationsApp = new Hono()
       byVerdict[row.verdict] = row.count;
     }
 
-    // Needs recheck count
-    const recheckResult = await db
-      .select({ count: count() })
-      .from(kbFactVerdicts)
-      .where(eq(kbFactVerdicts.needsRecheck, true));
-    const needsRecheck = recheckResult[0].count;
-
-    // Average confidence
-    const avgResult = await db
-      .select({
-        avg: sql<number>`coalesce(avg(${kbFactVerdicts.confidence}), 0)`,
-      })
-      .from(kbFactVerdicts);
-    const avgConfidence = Math.round(Number(avgResult[0].avg) * 100) / 100;
-
     return c.json({
-      total_facts: totalFacts,
+      total_facts: statsRow.total,
       by_verdict: byVerdict,
-      needs_recheck: needsRecheck,
-      avg_confidence: avgConfidence,
+      needs_recheck: Number(statsRow.needsRecheck),
+      avg_confidence: Math.round(Number(statsRow.avgConfidence) * 100) / 100,
     });
   })
 
@@ -156,6 +131,12 @@ const kbVerificationsApp = new Hono()
   // ---- GET /verdicts/:factId ----
   .get("/verdicts/:factId", async (c) => {
     const factId = c.req.param("factId");
+
+    // Validate path param length
+    if (factId.length > MAX_FACT_ID_LENGTH) {
+      return notFoundError(c, "Fact verdict not found");
+    }
+
     const db = getDrizzleDb();
 
     const verdictRows = await db

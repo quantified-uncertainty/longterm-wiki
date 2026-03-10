@@ -64,6 +64,19 @@ const columns: ColumnDef<VerdictRow>[] = [
     },
   },
   {
+    accessorKey: "reasoning",
+    header: "Reasoning",
+    cell: ({ row }) => {
+      const r = row.original.reasoning;
+      if (!r) return <span className="text-xs text-muted-foreground">-</span>;
+      return (
+        <span className="text-xs text-muted-foreground line-clamp-2 max-w-[300px]" title={r}>
+          {r}
+        </span>
+      );
+    },
+  },
+  {
     accessorKey: "sourcesChecked",
     header: ({ column }) => (
       <SortableHeader column={column}>Sources</SortableHeader>
@@ -105,14 +118,10 @@ const columns: ColumnDef<VerdictRow>[] = [
   },
 ];
 
-// ── Filter types ──────────────────────────────────────────────────────────────
-
-type FilterVerdict = "all" | string;
-
 // ── Table component ───────────────────────────────────────────────────────────
 
 export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
-  const [filterVerdict, setFilterVerdict] = useState<FilterVerdict>("all");
+  const [filterVerdict, setFilterVerdict] = useState<string>("all");
 
   // Compute unique verdicts for filter buttons
   const verdictCounts = new Map<string, number>();
@@ -125,13 +134,6 @@ export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
     filterVerdict === "all"
       ? data
       : data.filter((d) => d.verdict === filterVerdict);
-
-  // Sort by confidence descending by default
-  const sorted = [...filtered].sort((a, b) => {
-    const ca = a.confidence ?? 0;
-    const cb = b.confidence ?? 0;
-    return cb - ca;
-  });
 
   return (
     <div className="not-prose">
@@ -165,7 +167,8 @@ export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
 
       <DataTable
         columns={columns}
-        data={sorted}
+        data={filtered}
+        defaultSorting={[{ id: "confidence", desc: true }]}
         searchPlaceholder="Search facts..."
       />
     </div>
