@@ -37,6 +37,8 @@ export type {
   AutoRebaseResult,
 } from './types.ts';
 
+export { ADVISORY_ISSUES } from './types.ts';
+
 // ── Detection ────────────────────────────────────────────────────────────────
 
 export {
@@ -45,6 +47,7 @@ export {
   fetchOpenPrs,
   fetchSinglePr,
   detectOverlaps,
+  HUMAN_REQUIRED_CHECKS,
 } from './detection.ts';
 
 // ── Merge eligibility ────────────────────────────────────────────────────────

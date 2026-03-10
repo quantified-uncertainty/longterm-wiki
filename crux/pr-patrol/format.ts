@@ -372,7 +372,7 @@ ${c.bold}Issue Types${c.reset} ${c.dim}(by priority score)${c.reset}
   ${c.red}conflict${c.reset}            ${c.dim}(100)${c.reset}  PR has merge conflicts with main
   ${c.red}ci-failure${c.reset}           ${c.dim}(80)${c.reset}   CI checks are failing
   ${c.yellow}bot-review-major${c.reset}    ${c.dim}(55)${c.reset}   Bot reviewers flagged critical/major issues
-  ${c.yellow}missing-issue-ref${c.reset}   ${c.dim}(40)${c.reset}   PR body lacks "Closes #N" reference
+  ${c.dim}missing-issue-ref${c.reset}   ${c.dim}(40)${c.reset}   PR body lacks "Closes #N" reference ${c.dim}(advisory only)${c.reset}
   ${c.yellow}stale${c.reset}               ${c.dim}(30)${c.reset}   PR not updated in 48+ hours
   ${c.dim}missing-testplan${c.reset}    ${c.dim}(20)${c.reset}   PR body lacks "## Test plan" section
   ${c.dim}bot-review-nitpick${c.reset}  ${c.dim}(15)${c.reset}   Bot reviewers left minor nitpick comments

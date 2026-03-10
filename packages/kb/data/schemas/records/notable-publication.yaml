@@ -1,0 +1,15 @@
+name: Notable Publication
+description: "Key publications, papers, and books authored or co-authored."
+temporal: false
+
+endpoints:
+  author:
+    types: [person]
+    implicit: true
+
+fields:
+  title: { type: text, required: true, description: "Publication title" }
+  year: { type: number, required: true, description: "Publication year" }
+  url: { type: text, description: "URL to the publication" }
+  source: { type: text, description: "URL to a citation or reference" }
+  notes: { type: text, description: "Impact, significance, or citation count" }

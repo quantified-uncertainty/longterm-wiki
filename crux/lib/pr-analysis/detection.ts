@@ -20,11 +20,12 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
     pullRequests(first: 50, states: [OPEN], orderBy: {field: UPDATED_AT, direction: DESC}) {
       nodes {
         id number title headRefName headRefOid mergeable isDraft createdAt updatedAt body
+        author { login }
         labels(first: 20) { nodes { name } }
         commits(last: 1) { nodes { commit { statusCheckRollup {
           contexts(first: 50) { nodes {
-            ... on CheckRun { conclusion }
-            ... on StatusContext { state }
+            ... on CheckRun { name conclusion }
+            ... on StatusContext { context state }
           }}
         }}}}
         reviewThreads(first: 50) { nodes {
@@ -43,11 +44,12 @@ const SINGLE_PR_QUERY = `query($owner: String!, $name: String!, $number: Int!) {
   repository(owner: $owner, name: $name) {
     pullRequest(number: $number) {
       id number title headRefName headRefOid mergeable isDraft createdAt updatedAt body
+      author { login }
       labels(first: 20) { nodes { name } }
       commits(last: 1) { nodes { commit { statusCheckRollup {
         contexts(first: 50) { nodes {
-          ... on CheckRun { conclusion }
-          ... on StatusContext { state }
+          ... on CheckRun { name conclusion }
+          ... on StatusContext { context state }
         }}
       }}}}
       reviewThreads(first: 50) { nodes {
@@ -96,28 +98,49 @@ export function extractBotComments(pr: GqlPrNode): BotComment[] {
   return comments;
 }
 
+// ── Human-required CI checks ─────────────────────────────────────────────────
+
+/**
+ * CI checks that require human intervention (e.g. adding a label) and cannot
+ * be fixed by the bot. If ALL failing checks are in this set, we skip the
+ * `ci-failure` issue since the bot would waste turns trying to fix them.
+ */
+export const HUMAN_REQUIRED_CHECKS = new Set([
+  'check-protected-paths',
+]);
+
 // ── Issue detection ──────────────────────────────────────────────────────────
 
 /** Pure function — detects issues on a single PR node. No I/O. */
 export function detectIssues(
   pr: GqlPrNode,
   staleThresholdMs: number,
-): { issues: PrIssueType[]; botComments: BotComment[] } {
+): { issues: PrIssueType[]; botComments: BotComment[]; failingChecks: string[] } {
   const issues: PrIssueType[] = [];
 
   if (pr.mergeable === 'CONFLICTING') issues.push('conflict');
 
   const contexts =
     pr.commits?.nodes?.[0]?.commit?.statusCheckRollup?.contexts?.nodes ?? [];
-  if (
-    contexts.some(
-      (c) =>
-        c.conclusion === 'FAILURE' ||
-        c.state === 'FAILURE' ||
-        c.state === 'ERROR',
-    )
-  ) {
-    issues.push('ci-failure');
+  const failingContexts = contexts.filter(
+    (c) =>
+      c.conclusion === 'FAILURE' ||
+      c.state === 'FAILURE' ||
+      c.state === 'ERROR',
+  );
+  const failingChecks = failingContexts
+    .map((c) => c.name ?? c.context ?? 'unknown')
+    .filter(Boolean);
+
+  if (failingContexts.length > 0) {
+    // Check if ALL failing checks are human-required — if so, skip ci-failure
+    const allHumanRequired = failingContexts.every((c) => {
+      const checkName = c.name ?? c.context ?? '';
+      return HUMAN_REQUIRED_CHECKS.has(checkName);
+    });
+    if (!allHumanRequired) {
+      issues.push('ci-failure');
+    }
   }
 
   const body = pr.body ?? '';
@@ -133,7 +156,7 @@ export function detectIssues(
     issues.push(hasActionable ? 'bot-review-major' : 'bot-review-nitpick');
   }
 
-  return { issues, botComments };
+  return { issues, botComments, failingChecks };
 }
 
 // ── PR fetching ──────────────────────────────────────────────────────────────

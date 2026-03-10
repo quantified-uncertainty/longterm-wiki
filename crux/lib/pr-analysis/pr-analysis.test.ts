@@ -14,6 +14,7 @@ import {
   computeScore,
   rankPrs,
   ISSUE_SCORES,
+  HUMAN_REQUIRED_CHECKS,
 } from './index.ts';
 import type { GqlPrNode, DetectedPr } from './types.ts';
 
@@ -31,6 +32,7 @@ function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-03-05T00:00:00Z',
     body: '## Summary\n\n- [x] Task done\n\n## Test plan\n\n- [x] Tests pass\n\nCloses #1',
+    author: { login: 'testuser' },
     labels: { nodes: [{ name: 'stage:approved' }] },
     commits: {
       nodes: [
@@ -142,6 +144,51 @@ describe('detectIssues (lib)', () => {
     expect(issues).toContain('ci-failure');
   });
 
+  it('returns failing check names from CheckRun nodes', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: { nodes: [
+                { name: 'build', conclusion: 'SUCCESS' },
+                { name: 'validate', conclusion: 'FAILURE' },
+                { name: 'test', conclusion: 'FAILURE' },
+              ] },
+            },
+          },
+        }],
+      },
+    });
+    const { failingChecks } = detectIssues(pr, 0);
+    expect(failingChecks).toEqual(['validate', 'test']);
+  });
+
+  it('returns failing check names from StatusContext nodes', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: { nodes: [
+                { context: 'ci/circleci', state: 'FAILURE' },
+                { context: 'deploy/vercel', state: 'ERROR' },
+              ] },
+            },
+          },
+        }],
+      },
+    });
+    const { failingChecks } = detectIssues(pr, 0);
+    expect(failingChecks).toEqual(['ci/circleci', 'deploy/vercel']);
+  });
+
+  it('returns empty failingChecks when no CI failures', () => {
+    const pr = makePrNode();
+    const { failingChecks } = detectIssues(pr, 0);
+    expect(failingChecks).toEqual([]);
+  });
+
   it('detects missing-testplan', () => {
     const pr = makePrNode({ body: 'No test plan here\nCloses #1' });
     const { issues } = detectIssues(pr, 0);
@@ -158,6 +205,116 @@ describe('detectIssues (lib)', () => {
     const pr = makePrNode();
     const { issues } = detectIssues(pr, 0);
     expect(issues).toEqual([]);
+  });
+
+  it('skips ci-failure when only human-required checks are failing', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [
+                  { name: 'check-protected-paths', conclusion: 'FAILURE' },
+                  { name: 'build', conclusion: 'SUCCESS' },
+                ],
+              },
+            },
+          },
+        }],
+      },
+    });
+    const { issues } = detectIssues(pr, 0);
+    expect(issues).not.toContain('ci-failure');
+  });
+
+  it('still reports ci-failure when human-required AND other checks fail', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [
+                  { name: 'check-protected-paths', conclusion: 'FAILURE' },
+                  { name: 'build', conclusion: 'FAILURE' },
+                ],
+              },
+            },
+          },
+        }],
+      },
+    });
+    const { issues } = detectIssues(pr, 0);
+    expect(issues).toContain('ci-failure');
+  });
+
+  it('still reports ci-failure for non-human-required failing checks', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [
+                  { name: 'build', conclusion: 'FAILURE' },
+                ],
+              },
+            },
+          },
+        }],
+      },
+    });
+    const { issues } = detectIssues(pr, 0);
+    expect(issues).toContain('ci-failure');
+  });
+
+  it('handles StatusContext failures with human-required context name', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [
+                  { context: 'check-protected-paths', state: 'FAILURE' },
+                ],
+              },
+            },
+          },
+        }],
+      },
+    });
+    const { issues } = detectIssues(pr, 0);
+    expect(issues).not.toContain('ci-failure');
+  });
+
+  it('reports ci-failure for checks with no name (unknown checks)', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [
+                  { conclusion: 'FAILURE' },  // no name or context
+                ],
+              },
+            },
+          },
+        }],
+      },
+    });
+    const { issues } = detectIssues(pr, 0);
+    expect(issues).toContain('ci-failure');
+  });
+});
+
+// ── HUMAN_REQUIRED_CHECKS ────────────────────────────────────────────────────
+
+describe('HUMAN_REQUIRED_CHECKS', () => {
+  it('contains check-protected-paths', () => {
+    expect(HUMAN_REQUIRED_CHECKS.has('check-protected-paths')).toBe(true);
   });
 });
 

@@ -75,7 +75,7 @@ export function KBCellValue({ value, fieldName, fieldDef }: KBCellValueProps) {
   if (fieldType === "boolean" || typeof value === "boolean") {
     return (
       <span className="text-muted-foreground">
-        {value ? "\u2713" : "\u2014"}
+        {value ? "\u2713" : "\u2717"}
       </span>
     );
   }

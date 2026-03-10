@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { computeScore, computeBudget, rankPrs, APPROVED_BONUS } from './scoring.ts';
+import { computeScore, computeBudget, rankPrs, APPROVED_BONUS, getRetryBudgetMultiplier, computeEffectiveBudget } from './scoring.ts';
 import type { DetectedPr, PrIssueType } from './types.ts';
 
 function makeDetectedPr(overrides: Partial<DetectedPr> = {}): DetectedPr {
@@ -69,7 +69,9 @@ describe('computeScore', () => {
 // ── computeBudget ────────────────────────────────────────────────────────────
 
 describe('computeBudget', () => {
-  it('gives small budget for missing-issue-ref only', () => {
+  it('returns default budget for advisory-only issue (missing-issue-ref)', () => {
+    // missing-issue-ref is advisory-only and has no budget entry;
+    // computeBudget returns the default minimum budget
     const budget = computeBudget(['missing-issue-ref']);
     expect(budget.maxTurns).toBe(5);
     expect(budget.timeoutMinutes).toBe(3);
@@ -121,6 +123,66 @@ describe('computeBudget', () => {
     const budget = computeBudget(['stale']);
     expect(budget.maxTurns).toBe(10);
     expect(budget.timeoutMinutes).toBe(5);
+  });
+});
+
+// ── getRetryBudgetMultiplier ─────────────────────────────────────────────────
+
+describe('getRetryBudgetMultiplier', () => {
+  it('returns 1.0 on first attempt (no prior failures)', () => {
+    expect(getRetryBudgetMultiplier(0)).toBe(1.0);
+  });
+
+  it('returns 0.5 on second attempt (1 prior failure)', () => {
+    expect(getRetryBudgetMultiplier(1)).toBe(0.5);
+  });
+
+  it('returns 0.5 on third attempt (2 prior failures)', () => {
+    expect(getRetryBudgetMultiplier(2)).toBe(0.5);
+  });
+});
+
+// ── computeEffectiveBudget ──────────────────────────────────────────────────
+
+describe('computeEffectiveBudget', () => {
+  it('returns full budget on first attempt', () => {
+    const budget = computeEffectiveBudget(['ci-failure'], 60, 60, 0);
+    expect(budget.maxTurns).toBe(50); // ci-failure base is 50, config cap 60
+    expect(budget.timeoutMinutes).toBe(45); // ci-failure base is 45, config cap 60
+  });
+
+  it('returns half budget on retry', () => {
+    const budget = computeEffectiveBudget(['ci-failure'], 60, 60, 1);
+    expect(budget.maxTurns).toBe(25); // ceil(50 * 0.5)
+    expect(budget.timeoutMinutes).toBe(23); // ceil(45 * 0.5)
+  });
+
+  it('applies config cap before multiplier', () => {
+    // Config caps at 30 turns / 20 min, ci-failure base is 50/45
+    const first = computeEffectiveBudget(['ci-failure'], 30, 20, 0);
+    expect(first.maxTurns).toBe(30);
+    expect(first.timeoutMinutes).toBe(20);
+
+    const retry = computeEffectiveBudget(['ci-failure'], 30, 20, 1);
+    expect(retry.maxTurns).toBe(15); // ceil(30 * 0.5)
+    expect(retry.timeoutMinutes).toBe(10); // ceil(20 * 0.5)
+  });
+
+  it('uses Math.ceil so budget never rounds down to 0', () => {
+    // missing-issue-ref has 5 turns / 3 min — half should be 3 / 2, not 2 / 1
+    const budget = computeEffectiveBudget(['missing-issue-ref'], 60, 60, 1);
+    expect(budget.maxTurns).toBe(3); // ceil(5 * 0.5) = 3
+    expect(budget.timeoutMinutes).toBe(2); // ceil(3 * 0.5) = 2
+  });
+
+  it('conflict issue gets full 60 turns on first attempt, 30 on retry', () => {
+    const first = computeEffectiveBudget(['conflict'], 60, 60, 0);
+    expect(first.maxTurns).toBe(60);
+    expect(first.timeoutMinutes).toBe(60);
+
+    const retry = computeEffectiveBudget(['conflict'], 60, 60, 1);
+    expect(retry.maxTurns).toBe(30);
+    expect(retry.timeoutMinutes).toBe(30);
   });
 });
 

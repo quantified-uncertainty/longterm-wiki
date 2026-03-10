@@ -37,7 +37,6 @@ interface KBFactTableProps {
 export function KBFactTable({ entity, property, title, includeExpired }: KBFactTableProps) {
   const allFacts = getKBFacts(entity, property);
   const facts = includeExpired ? allFacts : allFacts.filter((f) => !isFactExpired(f));
-  const expiredCount = allFacts.length - facts.length;
   const prop = getKBProperty(property);
   const heading = title ?? prop?.name ?? property;
 

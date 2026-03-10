@@ -1,0 +1,20 @@
+name: Board Seat
+description: "Board of directors membership, current and former."
+temporal: true
+
+endpoints:
+  member:
+    types: [person]
+    required: true
+  organization:
+    types: [organization]
+    implicit: true
+
+fields:
+  role: { type: text, description: "Board role (e.g. Director, Observer)" }
+  appointed: { type: date, description: "Date appointed (YYYY-MM)" }
+  departed: { type: date, description: "Date departed (omit if current)" }
+  appointed_by: { type: text, description: "Who appointed (e.g. LTBT, investors, founders)" }
+  background: { type: text, description: "Prior role or affiliation" }
+  source: { type: text, description: "URL confirming appointment" }
+  notes: { type: text, description: "Context about the appointment" }

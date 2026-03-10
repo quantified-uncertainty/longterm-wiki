@@ -23,6 +23,7 @@ import type {
   PatrolConfig,
 } from './types.ts';
 import { LABELS } from './types.ts';
+import { ADVISORY_ISSUES } from '../lib/pr-analysis/types.ts';
 import { ANY_WORKING_LABELS } from '../lib/labels.ts';
 import {
   appendJsonl,
@@ -32,6 +33,22 @@ import {
   log,
   markProcessed,
 } from './state.ts';
+
+// ── Bot / release PR skip lists ──────────────────────────────────────────────
+
+/** PR authors that are bots — their PRs never reference issues. */
+const SKIP_AUTHORS = new Set([
+  'dependabot[bot]',
+  'renovate[bot]',
+  'github-actions[bot]',
+]);
+
+/** Branch prefixes whose PRs should be skipped (e.g. dependabot/, release/). */
+const SKIP_BRANCH_PREFIXES = [
+  'dependabot/',
+  'renovate/',
+  'release/',
+];
 
 // ── Re-exports for backward compatibility ────────────────────────────────────
 
@@ -68,18 +85,38 @@ export function detectAllPrIssuesFromNodes(
       if (ANY_WORKING_LABELS.some((wl) => labels.includes(wl))) return false;
       // Skip draft PRs — they're not ready for automated fixes
       if (pr.isDraft) return false;
+      // Skip bot-authored PRs — they don't reference issues and waste cycles
+      if (pr.author?.login && SKIP_AUTHORS.has(pr.author.login)) {
+        if (config.verbose) {
+          log(`  ${cl.dim}Skipping PR #${pr.number} — bot author: ${pr.author.login}${cl.reset}`);
+        }
+        return false;
+      }
+      // Skip release/dependency branches — they inherently lack issue refs
+      if (SKIP_BRANCH_PREFIXES.some((prefix) => pr.headRefName.startsWith(prefix))) {
+        if (config.verbose) {
+          log(`  ${cl.dim}Skipping PR #${pr.number} — skip-listed branch: ${pr.headRefName}${cl.reset}`);
+        }
+        return false;
+      }
       return true;
     })
     .map((pr) => {
-      const { issues, botComments } = libDetectIssues(pr, staleThresholdMs);
+      const { issues: allIssues, botComments, failingChecks } = libDetectIssues(pr, staleThresholdMs);
+      const advisoryIssues = allIssues.filter((i) => ADVISORY_ISSUES.has(i));
+      const fixableIssues = allIssues.filter((i) => !ADVISORY_ISSUES.has(i));
+      if (advisoryIssues.length > 0) {
+        log(`  PR #${pr.number}: advisory issues (skipped): ${advisoryIssues.join(', ')}`);
+      }
       return {
         number: pr.number,
         title: pr.title,
         branch: pr.headRefName,
         createdAt: pr.createdAt,
-        issues,
+        issues: fixableIssues,
         botComments,
         labels: pr.labels.nodes.map((l) => l.name),
+        failingChecks: failingChecks.length > 0 ? failingChecks : undefined,
       };
     })
     .filter((pr) => pr.issues.length > 0);

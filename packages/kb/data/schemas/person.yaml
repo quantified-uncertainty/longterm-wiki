@@ -11,6 +11,11 @@ recommended:
   - education
   - notable-for
 
+records:
+  - charitable-pledge
+  - career-history
+  - notable-publication
+
 items:
   career-history:
     description: "Chronological career positions, including current and past roles"

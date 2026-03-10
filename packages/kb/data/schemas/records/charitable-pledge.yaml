@@ -1,0 +1,13 @@
+name: Charitable Pledge
+description: "Charitable giving commitment by a person."
+temporal: false
+
+endpoints:
+  pledger:
+    types: [person]
+    implicit: true
+
+fields:
+  pledge: { type: number, description: "Fraction of equity/wealth pledged (0.8 = 80%). Single number or [min, max]." }
+  source: { type: text, description: "URL documenting the pledge" }
+  notes: { type: text, description: "Context about the pledge" }

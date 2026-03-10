@@ -18,6 +18,14 @@ export type PrIssueType =
   | 'bot-review-major'
   | 'bot-review-nitpick';
 
+/** Issues that are logged but not fixed — advisory only.
+ *  These are still detected by the shared library but filtered out by the
+ *  PR Patrol daemon before scoring/fixing. They waste budget (e.g.,
+ *  missing-issue-ref consistently hits max-turns with no useful outcome). */
+export const ADVISORY_ISSUES: ReadonlySet<PrIssueType> = new Set([
+  'missing-issue-ref',
+]);
+
 export interface BotComment {
   threadId: string;
   path: string;
@@ -35,6 +43,7 @@ export interface DetectedPr {
   issues: PrIssueType[];
   botComments: BotComment[];
   labels: string[];
+  failingChecks?: string[];
 }
 
 export interface ScoredPr extends DetectedPr {
@@ -115,13 +124,21 @@ export interface GqlPrNode {
   createdAt: string;
   updatedAt: string;
   body: string | null;
+  author: { login: string } | null;
   labels: { nodes: Array<{ name: string }> };
   commits: {
     nodes: Array<{
       commit: {
         statusCheckRollup: {
           contexts: {
-            nodes: Array<{ conclusion?: string | null; state?: string }>;
+            nodes: Array<{
+              conclusion?: string | null;
+              state?: string;
+              /** CheckRun name (e.g. 'build', 'check-protected-paths') */
+              name?: string;
+              /** StatusContext context string (e.g. 'ci/circleci') */
+              context?: string;
+            }>;
           };
         } | null;
       };

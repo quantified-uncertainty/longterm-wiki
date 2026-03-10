@@ -46,9 +46,12 @@ ${issues.join(', ')}
   }
 
   if (issues.includes('ci-failure')) {
+    const failingCheckInfo = pr.failingChecks?.length
+      ? `\nThe following CI checks are failing: ${pr.failingChecks.join(', ')}\nThis saves you from needing to run \`gh pr checks\` to discover which checks failed.\n`
+      : '';
     sections.push(`
 ### CI Failure
-- Check CI status: gh pr checks ${num} --repo ${repo}
+${failingCheckInfo}- Check CI status: gh pr checks ${num} --repo ${repo}
 - Read the failing check logs to understand the failure
 - For each failing check, determine the cause:
 

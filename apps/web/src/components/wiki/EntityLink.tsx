@@ -80,6 +80,7 @@ export function EntityLink({
             "absolute left-0 top-full mt-1 z-50 w-[280px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
           )}
           role="tooltip"
+          aria-hidden="true"
         >
           {entityType && (
             <span className="flex items-center gap-1.5 mb-2 text-xs text-muted-foreground">
