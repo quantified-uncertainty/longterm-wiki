@@ -112,7 +112,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const avgConf =
         verdicts.reduce((sum, v) => sum + (v.confidence ?? 0), 0) /
         (total || 1);
-      return [{ count: total, needs_recheck: needsRecheck, avg_confidence: avgConf }];
+      return [{ total, needs_recheck: needsRecheck, avg_confidence: avgConf }];
     }
 
     // Group by verdict
