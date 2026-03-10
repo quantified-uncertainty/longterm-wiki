@@ -50,7 +50,7 @@ audits:
       A large gap means agents are completing work without logging sessions.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-03-09"
+    last_checked: "2026-03-10"
     last_result: pass
 
   - id: scheduled-workflows-running
@@ -73,7 +73,7 @@ audits:
       - server-health-monitor: weekly (within 9 days)
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-03-09"
+    last_checked: "2026-03-10"
     last_result: fail
 
   - id: vercel-production-only
