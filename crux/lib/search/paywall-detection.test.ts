@@ -11,6 +11,7 @@ import {
   isUnverifiableDomain,
   classifyFetchError,
   PAYWALL_SIGNALS,
+  NEGATIVE_PAYWALL_SIGNALS,
   UNVERIFIABLE_DOMAINS,
 } from './paywall-detection.ts';
 
@@ -44,7 +45,7 @@ describe('detectPaywall', () => {
     expect(detectPaywall(longContent)).toBe(false);
   });
 
-  it('detects paywall when two signals appear early in longer content', () => {
+  it('detects paywall when two signals appear early and close together', () => {
     const longContent = 'Subscribe to read this content is for subscribers ' + 'A'.repeat(2000);
     expect(detectPaywall(longContent)).toBe(true);
   });
@@ -64,6 +65,46 @@ describe('detectPaywall', () => {
     for (const signal of PAYWALL_SIGNALS) {
       expect(detectPaywall(signal)).toBe(true);
     }
+  });
+
+  // ---- Proximity-based detection ----
+
+  it('rejects two signals that are far apart in long content (>500 chars gap)', () => {
+    // Two signals exist but are >500 chars apart — should NOT trigger
+    const longContent = 'subscribe to read ' + 'A'.repeat(600) + ' login required ' + 'B'.repeat(800);
+    expect(detectPaywall(longContent)).toBe(false);
+  });
+
+  it('detects paywall when two signals are within 500 chars of each other', () => {
+    // Two signals within proximity window
+    const longContent = 'subscribe to read ' + 'A'.repeat(200) + ' login required ' + 'B'.repeat(1500);
+    expect(detectPaywall(longContent)).toBe(true);
+  });
+
+  it('detects paywall when signals are adjacent', () => {
+    const longContent = 'subscribe to read. please sign in to continue. ' + 'A'.repeat(1500);
+    expect(detectPaywall(longContent)).toBe(true);
+  });
+
+  // ---- Negative signal suppression ----
+
+  it('suppresses paywall detection when multiple negative signals are present', () => {
+    // Real article (>= 500 chars) with paywall-like words but clear article body indicators.
+    // The two paywall signals are within proximity range, but the negative signals override.
+    const articleContent =
+      'subscribe to read more about this topic. login required for premium features. ' +
+      'A'.repeat(500) +
+      ' comments section at the bottom. share this article with friends. ' +
+      'about the author: John Doe. references listed below. related articles follow.';
+    expect(detectPaywall(articleContent)).toBe(false);
+  });
+
+  it('does not suppress with fewer than 3 negative signals', () => {
+    // Only 2 negative signals — not enough to suppress
+    const content = 'subscribe to read. login required. ' +
+      'A'.repeat(500) +
+      ' comments section at the bottom. about the author.';
+    expect(detectPaywall(content)).toBe(true);
   });
 });
 

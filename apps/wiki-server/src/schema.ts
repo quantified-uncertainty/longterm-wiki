@@ -1350,6 +1350,7 @@ export const kbFactResourceVerifications = pgTable(
       .notNull()
       .defaultNow(),
     notes: text("notes"),
+    sourceUrl: text("source_url"), // URL that was actually verified (fact source can change over time)
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

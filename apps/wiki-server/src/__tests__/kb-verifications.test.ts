@@ -19,7 +19,7 @@ interface VerdictRecord {
 interface VerificationRecord {
   id: number;
   fact_id: string;
-  resource_id: string;
+  resource_id: string | null;
   verdict: string;
   confidence: number | null;
   extracted_value: string | null;
@@ -27,6 +27,7 @@ interface VerificationRecord {
   is_primary_source: boolean;
   checked_at: string;
   notes: string | null;
+  source_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -90,6 +91,7 @@ function resetStores() {
       is_primary_source: true,
       checked_at: now,
       notes: "Direct match",
+      source_url: "https://example.com/funding",
       created_at: now,
       updated_at: now,
     },
@@ -177,6 +179,49 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       }
     }
     return verdicts;
+  }
+
+  // INSERT into kb_fact_resource_verifications (POST /verifications)
+  if (q.includes("insert") && q.includes("kb_fact_resource_verifications")) {
+    const nextId = verifications.length > 0 ? Math.max(...verifications.map((v) => v.id)) + 1 : 1;
+    const now = new Date().toISOString();
+    // Extract fact_id from params (first string starting with f_)
+    const factId = params.find(
+      (p) => typeof p === "string" && (p as string).startsWith("f_")
+    ) as string ?? "unknown";
+    const record: VerificationRecord = {
+      id: nextId,
+      fact_id: factId,
+      resource_id: null,
+      verdict: "confirmed",
+      confidence: null,
+      extracted_value: null,
+      checker_model: null,
+      is_primary_source: false,
+      checked_at: now,
+      notes: null,
+      source_url: null,
+      created_at: now,
+      updated_at: now,
+    };
+    verifications.push(record);
+    return [{ id: nextId }];
+  }
+
+  // UPDATE kb_fact_verdicts SET needs_recheck (auto-flag on new verification)
+  if (q.includes("update") && q.includes("kb_fact_verdicts")) {
+    const factId = params.find(
+      (p) => typeof p === "string" && (p as string).startsWith("f_")
+    ) as string | undefined;
+    if (factId) {
+      const verdict = verdicts.find((v) => v.fact_id === factId);
+      if (verdict) {
+        verdict.needs_recheck = true;
+        verdict.updated_at = new Date().toISOString();
+        return [{ fact_id: verdict.fact_id }];
+      }
+    }
+    return [];
   }
 
   // SELECT from kb_fact_resource_verifications
@@ -292,5 +337,85 @@ describe("GET /api/kb-verifications/verdicts/:factId", () => {
       `/api/kb-verifications/verdicts/${longId}`
     );
     expect(res.status).toBe(404);
+  });
+});
+
+describe("POST /api/kb-verifications/verifications", () => {
+  it("inserts a resource verification and returns 201", async () => {
+    const res = await app.request("/api/kb-verifications/verifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        factId: "f_abc123",
+        verdict: "confirmed",
+        confidence: 0.9,
+        extractedValue: "14 billion",
+        checkerModel: "claude-3-haiku",
+        isPrimarySource: true,
+        notes: "Direct match from source",
+        sourceUrl: "https://example.com/funding-report",
+      }),
+    });
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.id).toBeGreaterThan(0);
+    expect(body.verdictFlagged).toBe(true);
+  });
+
+  it("sets needs_recheck on existing verdict when new verification is inserted", async () => {
+    // f_abc123 starts with needs_recheck: false
+    const preVerdict = verdicts.find((v) => v.fact_id === "f_abc123");
+    expect(preVerdict?.needs_recheck).toBe(false);
+
+    await app.request("/api/kb-verifications/verifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        factId: "f_abc123",
+        verdict: "contradicted",
+        confidence: 0.8,
+      }),
+    });
+
+    // After insertion, the verdict should be flagged for recheck
+    const postVerdict = verdicts.find((v) => v.fact_id === "f_abc123");
+    expect(postVerdict?.needs_recheck).toBe(true);
+  });
+
+  it("returns verdictFlagged: false when no existing verdict exists", async () => {
+    const res = await app.request("/api/kb-verifications/verifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        factId: "f_newFact999",
+        verdict: "confirmed",
+      }),
+    });
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.verdictFlagged).toBe(false);
+  });
+
+  it("rejects invalid verdict values", async () => {
+    const res = await app.request("/api/kb-verifications/verifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        factId: "f_abc123",
+        verdict: "invalid_verdict",
+      }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects missing factId", async () => {
+    const res = await app.request("/api/kb-verifications/verifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        verdict: "confirmed",
+      }),
+    });
+    expect(res.status).toBe(400);
   });
 });

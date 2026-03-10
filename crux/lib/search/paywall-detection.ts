@@ -24,6 +24,15 @@ export const PAYWALL_SIGNALS = [
   'please sign in', 'register to read',
 ];
 
+/**
+ * Negative signals — patterns that indicate the page is NOT paywalled,
+ * even if paywall-like phrases appear (e.g., a blog post about newsletters).
+ */
+export const NEGATIVE_PAYWALL_SIGNALS = [
+  'comments section', 'share this article', 'related articles',
+  'about the author', 'table of contents', 'references',
+];
+
 // ---------------------------------------------------------------------------
 // Structured error types for source fetch failures
 // ---------------------------------------------------------------------------
@@ -56,8 +65,13 @@ export function isUnverifiableDomain(url: string): boolean {
  * Detect paywall signals in page content.
  *
  * For short content (< 500 chars), a single paywall signal is enough.
- * For longer content, at least 2 signals must appear in the first 2000 chars
- * to avoid false positives from pages that merely mention paywalls.
+ * For longer content (>= 500 chars):
+ *   1. At least 2 paywall signals must appear in the first 2000 chars
+ *   2. Those 2 signals must appear within a 500-character window of each other
+ *      (proximity check) to reduce false positives from articles that merely
+ *      mention paywalls in different contexts
+ *   3. If enough negative signals are present (indicating real article content),
+ *      the detection is suppressed
  */
 export function detectPaywall(content: string): boolean {
   if (!content) return false;
@@ -66,10 +80,47 @@ export function detectPaywall(content: string): boolean {
   if (content.length < 500) {
     return PAYWALL_SIGNALS.some(s => lower.includes(s));
   }
-  // Longer content: paywall signal must appear early (first 2000 chars)
+  // Longer content: paywall signals must appear early (first 2000 chars)
   const early = lower.slice(0, 2000);
-  const signalCount = PAYWALL_SIGNALS.filter(s => early.includes(s)).length;
-  return signalCount >= 2;
+
+  // Find positions of all matching paywall signals in the early content
+  const signalPositions: number[] = [];
+  for (const signal of PAYWALL_SIGNALS) {
+    const idx = early.indexOf(signal);
+    if (idx !== -1) {
+      signalPositions.push(idx);
+    }
+  }
+
+  // Need at least 2 distinct signals
+  if (signalPositions.length < 2) {
+    return false;
+  }
+
+  // Proximity check: at least 2 signals must appear within a 500-char window
+  signalPositions.sort((a, b) => a - b);
+  let hasProximity = false;
+  for (let i = 0; i < signalPositions.length - 1; i++) {
+    if (signalPositions[i + 1] - signalPositions[i] <= 500) {
+      hasProximity = true;
+      break;
+    }
+  }
+
+  if (!hasProximity) {
+    return false;
+  }
+
+  // Negative signal check: if the content has multiple indicators of a real
+  // article body, suppress the paywall detection. Count negative signals
+  // across the full content (not just early), since article markers like
+  // "about the author" and "references" tend to appear at the end.
+  const negativeCount = NEGATIVE_PAYWALL_SIGNALS.filter(s => lower.includes(s)).length;
+  if (negativeCount >= 3) {
+    return false;
+  }
+
+  return true;
 }
 
 /**
