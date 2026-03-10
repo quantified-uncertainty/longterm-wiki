@@ -125,6 +125,29 @@ async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
     return { content: null, errorType: 'fetch_error', errorMessage: 'Non-HTTPS URL' };
   }
 
+  // SSRF protection: block private/internal hosts
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    if (
+      host === 'localhost' ||
+      host === '127.0.0.1' ||
+      host === '[::1]' ||
+      host === '0.0.0.0' ||
+      host.endsWith('.local') ||
+      host.endsWith('.internal') ||
+      /^10\./.test(host) ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
+      /^192\.168\./.test(host) ||
+      /^169\.254\./.test(host)
+    ) {
+      console.warn(`[kb-verify] Blocking private/internal URL: ${url}`);
+      return { content: null, errorType: 'access_denied', errorMessage: 'Private/internal host blocked' };
+    }
+  } catch {
+    return { content: null, errorType: 'fetch_error', errorMessage: 'Invalid URL' };
+  }
+
   // Check for unverifiable domains (social media, etc.)
   if (isUnverifiableDomain(url)) {
     console.warn(`[kb-verify] Unverifiable domain: ${url}`);
