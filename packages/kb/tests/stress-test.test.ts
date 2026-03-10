@@ -103,6 +103,21 @@ describe("Q4: Anthropic board/key people", () => {
       expect(p.fields.title).toBeDefined();
     }
   });
+
+  it("board-seats records provide dedicated board data", () => {
+    const seats = graph.getRecords("anthropic", "board-seats");
+    expect(seats.length).toBeGreaterThanOrEqual(4);
+
+    // Dario should be on the board
+    const dario = seats.find((s) => s.key === "dario-amodei");
+    expect(dario).toBeDefined();
+    expect(dario!.fields.member).toBe("dario-amodei");
+
+    // Board members with display_name (no KB entity)
+    const yasmin = seats.find((s) => s.key === "yasmin-razavi");
+    expect(yasmin).toBeDefined();
+    expect(yasmin!.displayName).toBe("Yasmin Razavi");
+  });
 });
 
 // ── Query 5: Who works at Anthropic right now? (was awkward) ────────
