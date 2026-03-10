@@ -48,15 +48,7 @@ const integrityApp = new Hono()
         "entity_id",
         "entities"
       ),
-      // 2. facts.source_resource → resources
-      checkDangling(
-        db,
-        sql`SELECT DISTINCT source_resource AS ref FROM facts WHERE source_resource IS NOT NULL AND source_resource NOT IN (SELECT id FROM resources)`,
-        "facts",
-        "source_resource",
-        "resources"
-      ),
-      // 3. summaries.entity_id → entities
+      // 2. summaries.entity_id → entities
       checkDangling(
         db,
         sql`SELECT DISTINCT entity_id AS ref FROM summaries WHERE entity_id NOT IN (SELECT id FROM entities)`,

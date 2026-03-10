@@ -715,7 +715,6 @@ export const SyncFactSchema = z.object({
   subject: z.string().max(300).nullable().optional(),
   note: z.string().max(5000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
-  sourceResource: z.string().max(200).nullable().optional(),
   format: z.string().max(100).nullable().optional(),
   formatDivisor: z.number().nullable().optional(),
 });

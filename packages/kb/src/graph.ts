@@ -8,8 +8,8 @@ import type {
   Fact,
   Property,
   TypeSchema,
-  ItemCollection,
-  ItemEntry,
+  RecordSchema,
+  RecordEntry,
   FactQuery,
   PropertyQuery,
 } from "./types";
@@ -20,10 +20,14 @@ export class Graph {
   private factIds: Set<string> = new Set(); // dedup guard
   private properties: Map<string, Property> = new Map();
   private schemas: Map<string, TypeSchema> = new Map();
-  // entityId → collectionName → collection
-  private items: Map<string, Map<string, ItemCollection>> = new Map();
   // stableId → slug reverse index
   private stableIdIndex: Map<string, string> = new Map();
+  // Record schemas (id → schema)
+  private recordSchemas: Map<string, RecordSchema> = new Map();
+  // Primary index: ownerEntityId → collectionName → RecordEntry[]
+  private records: Map<string, Map<string, RecordEntry[]>> = new Map();
+  // Endpoint index: referencedEntityId → collectionName → RecordEntry[]
+  private endpointIndex: Map<string, Map<string, RecordEntry[]>> = new Map();
 
   // ── Mutation (used by loader and inverse computation) ──────────────
 
@@ -56,17 +60,52 @@ export class Graph {
     this.schemas.set(schema.type, schema);
   }
 
-  addItemCollection(
-    entityId: string,
+  addRecordSchema(schema: RecordSchema): void {
+    this.recordSchemas.set(schema.id, schema);
+  }
+
+  /**
+   * Adds a record entry, indexing it in both the primary index (by owner)
+   * and the endpoint index (by each explicit endpoint's entity ref).
+   */
+  addRecord(
     collectionName: string,
-    collection: ItemCollection
+    entry: RecordEntry,
   ): void {
-    let entityCollections = this.items.get(entityId);
-    if (!entityCollections) {
-      entityCollections = new Map();
-      this.items.set(entityId, entityCollections);
+    // Primary index: ownerEntityId → collectionName → entries
+    let ownerCollections = this.records.get(entry.ownerEntityId);
+    if (!ownerCollections) {
+      ownerCollections = new Map();
+      this.records.set(entry.ownerEntityId, ownerCollections);
     }
-    entityCollections.set(collectionName, collection);
+    let entries = ownerCollections.get(collectionName);
+    if (!entries) {
+      entries = [];
+      ownerCollections.set(collectionName, entries);
+    }
+    entries.push(entry);
+
+    // Endpoint index: scan explicit endpoint fields
+    const schema = this.recordSchemas.get(entry.schema);
+    if (schema) {
+      for (const [endpointName, endpointDef] of Object.entries(schema.endpoints)) {
+        if (endpointDef.implicit) continue; // implicit endpoint = owner, already indexed
+        const refValue = entry.fields[endpointName];
+        if (typeof refValue === "string") {
+          let refCollections = this.endpointIndex.get(refValue);
+          if (!refCollections) {
+            refCollections = new Map();
+            this.endpointIndex.set(refValue, refCollections);
+          }
+          let refEntries = refCollections.get(collectionName);
+          if (!refEntries) {
+            refEntries = [];
+            refCollections.set(collectionName, refEntries);
+          }
+          refEntries.push(entry);
+        }
+      }
+    }
   }
 
   // ── Entity queries ─────────────────────────────────────────────────
@@ -182,97 +221,6 @@ export class Graph {
     return ids;
   }
 
-  // ── Item queries ───────────────────────────────────────────────────
-
-  getItemCollectionNames(entityId: string): string[] {
-    const entityCollections = this.items.get(entityId);
-    if (!entityCollections) return [];
-    return Array.from(entityCollections.keys());
-  }
-
-  getItems(entityId: string, collectionName: string): ItemEntry[] {
-    const entityCollections = this.items.get(entityId);
-    if (!entityCollections) return [];
-
-    const collection = entityCollections.get(collectionName);
-    if (!collection) return [];
-
-    return Object.entries(collection.entries).map(([key, fields]) => ({
-      key,
-      fields,
-    }));
-  }
-
-  /**
-   * Scans all items across all entities for fields that reference the
-   * given entityId. Returns matches with context about where they appear.
-   *
-   * Uses schema field definitions to identify `ref` type fields. Falls
-   * back to string-matching if no schema is available.
-   */
-  getItemsMentioning(
-    entityId: string
-  ): Array<{
-    ownerEntityId: string;
-    collection: string;
-    entry: ItemEntry;
-    /** Which field(s) contain the reference */
-    matchingFields: string[];
-  }> {
-    const results: Array<{
-      ownerEntityId: string;
-      collection: string;
-      entry: ItemEntry;
-      matchingFields: string[];
-    }> = [];
-
-    for (const [ownerEntityId, entityCollections] of this.items.entries()) {
-      if (ownerEntityId === entityId) continue; // Skip self-references
-
-      const ownerEntity = this.entities.get(ownerEntityId);
-      const schema = ownerEntity
-        ? this.schemas.get(ownerEntity.type)
-        : undefined;
-
-      for (const [collectionName, collection] of entityCollections.entries()) {
-        const collectionSchema = schema?.items?.[collectionName];
-        const fieldDefs = collectionSchema?.fields;
-
-        for (const [entryKey, fields] of Object.entries(collection.entries)) {
-          const matchingFields: string[] = [];
-
-          for (const [fieldName, fieldValue] of Object.entries(fields)) {
-            const fieldDef = fieldDefs?.[fieldName];
-
-            // Check ref fields explicitly
-            if (fieldDef?.type === "ref" && fieldValue === entityId) {
-              matchingFields.push(fieldName);
-            }
-            // Also check string values that match (covers untyped fields)
-            else if (
-              !fieldDef &&
-              typeof fieldValue === "string" &&
-              fieldValue === entityId
-            ) {
-              matchingFields.push(fieldName);
-            }
-          }
-
-          if (matchingFields.length > 0) {
-            results.push({
-              ownerEntityId,
-              collection: collectionName,
-              entry: { key: entryKey, fields },
-              matchingFields,
-            });
-          }
-        }
-      }
-    }
-
-    return results;
-  }
-
   // ── Property & schema queries ──────────────────────────────────────
 
   getProperty(id: string): Property | undefined {
@@ -289,5 +237,80 @@ export class Graph {
 
   getAllSchemas(): TypeSchema[] {
     return Array.from(this.schemas.values());
+  }
+
+  // ── Record queries ──────────────────────────────────────────────────
+
+  getRecordSchema(id: string): RecordSchema | undefined {
+    return this.recordSchemas.get(id);
+  }
+
+  getAllRecordSchemas(): RecordSchema[] {
+    return Array.from(this.recordSchemas.values());
+  }
+
+  /**
+   * Get record entries for a collection owned by an entity.
+   * This is the primary index query (analogous to getItems).
+   */
+  getRecords(entityId: string, collectionName: string): RecordEntry[] {
+    return this.records.get(entityId)?.get(collectionName) ?? [];
+  }
+
+  /**
+   * Get all collection names that have records for an entity.
+   */
+  getRecordCollectionNames(entityId: string): string[] {
+    const entityCollections = this.records.get(entityId);
+    if (!entityCollections) return [];
+    return Array.from(entityCollections.keys());
+  }
+
+  /**
+   * Get all record collections for an entity as a map.
+   */
+  getAllRecordCollections(entityId: string): Map<string, RecordEntry[]> {
+    return this.records.get(entityId) ?? new Map();
+  }
+
+  /**
+   * Get records that reference an entity via an explicit endpoint.
+   * If collectionName is given, only returns records from that collection.
+   * Otherwise returns all records referencing this entity.
+   */
+  getRecordsReferencing(
+    entityId: string,
+    collectionName?: string,
+  ): RecordEntry[] {
+    const refCollections = this.endpointIndex.get(entityId);
+    if (!refCollections) return [];
+
+    if (collectionName) {
+      return refCollections.get(collectionName) ?? [];
+    }
+
+    const results: RecordEntry[] = [];
+    for (const entries of refCollections.values()) {
+      results.push(...entries);
+    }
+    return results;
+  }
+
+  /**
+   * Get all records of a given schema type across all entities.
+   * Scans the primary index. For cross-entity dashboards.
+   */
+  getAllRecordsOfType(schemaId: string): RecordEntry[] {
+    const results: RecordEntry[] = [];
+    for (const entityCollections of this.records.values()) {
+      for (const [, entries] of entityCollections) {
+        for (const entry of entries) {
+          if (entry.schema === schemaId) {
+            results.push(entry);
+          }
+        }
+      }
+    }
+    return results;
   }
 }

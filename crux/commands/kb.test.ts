@@ -50,9 +50,9 @@ describe('crux kb show', () => {
     expect(result.output).toContain('organization');
     expect(result.output).toContain('Facts');
     expect(result.output).toContain('Revenue');
-    expect(result.output).toContain('Items');
+    expect(result.output).toContain('Records');
     expect(result.output).toContain('funding-rounds');
-    expect(result.output).toContain('key-people');
+    expect(result.output).toContain('key-persons');
   });
 
   it('formats financial values with proper units', async () => {

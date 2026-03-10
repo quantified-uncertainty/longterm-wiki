@@ -59,8 +59,6 @@ export interface RefMapEntry {
   kbAsOf?: string;
   /** Source URL */
   kbSource?: string;
-  /** Source resource ID */
-  kbSourceResource?: string;
   /** Notes */
   kbNotes?: string;
 }

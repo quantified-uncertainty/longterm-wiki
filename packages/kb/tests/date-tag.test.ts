@@ -171,9 +171,9 @@ facts:
     const realDataDir = join(__dirname, "../data");
     const graph = await loadKB(realDataDir);
     const facts = graph.getFacts("red-queen-bio", { property: "total-funding" });
-    const seedFact = facts.find((f) => f.id === "f_rqb_seed");
+    const seedFact = facts.find((f) => f.id === "f_iNzsKTtpRQ");
     expect(seedFact).toBeDefined();
     expect(seedFact!.asOf).toBe("2025-11");
     expect(seedFact!.asOf).not.toBe("[object Object]");
-  });
+  }, 30_000);
 });

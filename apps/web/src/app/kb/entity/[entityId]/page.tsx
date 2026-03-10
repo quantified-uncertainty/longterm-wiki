@@ -6,9 +6,9 @@ import {
   getKBEntities,
   getKBEntity,
   getKBFacts,
-  getKBAllItemCollections,
+  getKBAllRecordCollections,
   getKBProperty,
-  getKBSchema,
+  getKBRecordSchema,
 } from "@/data/kb";
 import { getEntityHref } from "@/data";
 import type { Fact, Property } from "@longterm-wiki/kb";
@@ -87,11 +87,6 @@ function SourceCell({ fact }: { fact: Fact }) {
     }
     return <span className="text-xs text-muted-foreground">{fact.source}</span>;
   }
-  if (fact.sourceResource) {
-    return (
-      <span className="text-muted-foreground text-xs">R: {fact.sourceResource}</span>
-    );
-  }
   return <span className="text-muted-foreground">&mdash;</span>;
 }
 
@@ -162,8 +157,7 @@ export default async function KBEntityPage({
   const allFacts = getKBFacts(entityId);
   const structuredFacts = allFacts.filter((f) => f.propertyId !== "description");
   const factGroups = groupFactsByProperty(allFacts);
-  const itemCollections = getKBAllItemCollections(entityId);
-  const schema = getKBSchema(entity.type);
+  const recordCollections = getKBAllRecordCollections(entityId);
 
   // Sort property groups alphabetically by property name
   const sortedPropertyIds = [...factGroups.keys()].sort((a, b) => {
@@ -172,11 +166,11 @@ export default async function KBEntityPage({
     return (pA?.name ?? a).localeCompare(pB?.name ?? b);
   });
 
-  const totalItems = Object.values(itemCollections).reduce(
+  const totalRecords = Object.values(recordCollections).reduce(
     (sum, entries) => sum + entries.length,
     0,
   );
-  const totalCollections = Object.keys(itemCollections).length;
+  const totalCollections = Object.keys(recordCollections).length;
 
   const wikiHref = entity.numericId
     ? `/wiki/${entity.numericId}`
@@ -264,10 +258,10 @@ export default async function KBEntityPage({
                     label="Total Facts"
                     value={`${structuredFacts.length} structured facts${allFacts.length !== structuredFacts.length ? ` (${allFacts.length} total incl. description)` : ""}`}
                   />
-                  {totalItems > 0 && (
+                  {totalRecords > 0 && (
                     <MetaRow
-                      label="Total Items"
-                      value={`${totalItems} items in ${totalCollections} collection${totalCollections !== 1 ? "s" : ""}`}
+                      label="Total Records"
+                      value={`${totalRecords} records in ${totalCollections} collection${totalCollections !== 1 ? "s" : ""}`}
                     />
                   )}
                 </tbody>
@@ -366,17 +360,16 @@ export default async function KBEntityPage({
             </section>
           )}
 
-          {/* ── Item Collections ─────────────────────────────────── */}
+          {/* ── Record Collections ─────────────────────────────────── */}
           {totalCollections > 0 && (
             <section className="mb-8">
-              <h2 className="text-xl font-semibold mb-3 pb-2 border-b border-border">Record Collections</h2>
+              <h2 className="text-lg font-semibold mb-3 pb-2 border-b border-border">Record Collections</h2>
               <div className="space-y-4">
-                {Object.entries(itemCollections)
+                {Object.entries(recordCollections)
                   .sort(([a], [b]) => a.localeCompare(b))
                   .map(([collectionName, items]) => {
-                    const collectionSchema =
-                      schema?.items?.[collectionName];
-                    const fieldDefs = collectionSchema?.fields;
+                    const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
+                    const fieldDefs = recordSchema?.fields;
 
                     // Determine column order: schema fields first, then any extra fields from data
                     const schemaFieldNames = fieldDefs
@@ -400,13 +393,13 @@ export default async function KBEntityPage({
                     const columns = allColumns.filter((col) => col !== "name");
 
                     return (
-                      <details key={collectionName} id={`items-${collectionName}`} className="group scroll-mt-16">
+                      <details key={collectionName} id={`records-${collectionName}`} className="group scroll-mt-16">
                         <summary className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-muted/50 text-sm select-none border border-border rounded-lg">
                           <span className="font-medium">
                             {titleCase(collectionName)}
                           </span>
                           <span className="text-muted-foreground text-xs">
-                            {items.length} item
+                            {items.length} record
                             {items.length !== 1 ? "s" : ""}
                           </span>
                           <span className="ml-auto text-muted-foreground group-open:rotate-90 transition-transform">
@@ -436,7 +429,7 @@ export default async function KBEntityPage({
                                 <tr key={item.key}>
                                   <td className="py-1.5 px-3 text-sm">
                                     <Link
-                                      href={`/kb/item/${item.key}`}
+                                      href={`/kb/record/${item.key}`}
                                       className="text-blue-600 hover:underline dark:text-blue-400"
                                     >
                                       {typeof item.fields.name === "string" ? item.fields.name : titleCase(item.key)}

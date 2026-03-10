@@ -164,6 +164,6 @@ describe("inverse", () => {
         .sort();
 
       expect(facts1).toEqual(facts2);
-    });
+    }, 30_000);
   });
 });

@@ -127,11 +127,11 @@ export async function buildKbContextForPage(
     }
   }
 
-  // Item collections
-  const collections = graph.getItemCollectionNames(entity.id);
+  // Record collections
+  const collections = graph.getRecordCollectionNames(entity.id);
   if (collections.length > 0) {
     lines.push('');
-    lines.push(`Item collections: ${collections.join(', ')} (use <KBF> or <KBItemCollection> to render)`);
+    lines.push(`Record collections: ${collections.join(', ')} (use <KBF> or <KBRecordCollection> to render)`);
   }
 
   return lines.join('\n');

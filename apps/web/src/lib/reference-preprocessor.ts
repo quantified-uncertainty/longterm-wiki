@@ -33,7 +33,6 @@ export interface KBFactRefData {
   value: unknown; // FactValue from KB types
   asOf?: string;
   source?: string;
-  sourceResource?: string;
   notes?: string;
 }
 

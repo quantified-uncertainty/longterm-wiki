@@ -7,7 +7,7 @@
  */
 
 import { getDatabase } from "@data";
-import type { Fact, Property, Entity, TypeSchema, ItemEntry } from "@longterm-wiki/kb";
+import type { Fact, Property, Entity, RecordEntry, RecordSchema } from "@longterm-wiki/kb";
 import type { SerializedKB } from "@longterm-wiki/kb";
 
 function getKB(): SerializedKB | undefined {
@@ -105,30 +105,6 @@ export function getKBLatest(
 }
 
 /**
- * Get item entries for a named collection on an entity.
- */
-export function getKBItems(entity: string, collection: string): ItemEntry[] {
-  const kb = getKB();
-  if (!kb) return [];
-
-  return kb.items[entity]?.[collection] ?? [];
-}
-
-/**
- * Get all item collections for an entity.
- * Returns a map of collection name → ItemEntry[].
- */
-export function getKBAllItemCollections(
-  entity: string,
-): Record<string, ItemEntry[]> {
-  const kb = getKB();
-  if (!kb) return {};
-
-  // Return a shallow copy to avoid exposing the mutable cache reference
-  return { ...(kb.items[entity] ?? {}) };
-}
-
-/**
  * Get a property definition by ID.
  */
 export function getKBProperty(propertyId: string): Property | undefined {
@@ -167,9 +143,6 @@ export function getKBProperties(): Property[] {
 
   return kb.properties;
 }
-
-/** @deprecated Use getKBEntity instead */
-export const getKBThing = getKBEntity;
 
 /**
  * Verification verdict values that can be returned by getKBFactVerification.
@@ -262,35 +235,101 @@ export function getKBAllFactsByProperty(
   return result;
 }
 
-/**
- * Get a type schema by type name.
- */
-export function getKBSchema(type: string): TypeSchema | undefined {
-  const kb = getKB();
-  if (!kb) return undefined;
+// ── Record access (unified records with schema-defined endpoints) ────
 
-  return kb.schemas.find((s) => s.type === type);
+/**
+ * Get record entries for a named collection on an entity (primary index).
+ */
+export function getKBRecords(entity: string, collection: string): RecordEntry[] {
+  const kb = getKB();
+  if (!kb) return [];
+  return kb.records?.[entity]?.[collection] ?? [];
 }
 
 /**
- * Get all item entries across all entities as a flat list.
- * Returns [entityId, collectionName, ItemEntry] tuples.
+ * Get all record collections for an entity.
  */
-export function getAllKBItems(): Array<{
-  entityId: string;
-  collection: string;
-  entry: ItemEntry;
-}> {
+export function getKBAllRecordCollections(entity: string): Record<string, RecordEntry[]> {
+  const kb = getKB();
+  if (!kb) return {};
+  return { ...(kb.records?.[entity] ?? {}) };
+}
+
+/**
+ * Get a record schema by ID.
+ */
+export function getKBRecordSchema(schemaId: string): RecordSchema | undefined {
+  const kb = getKB();
+  if (!kb) return undefined;
+  return kb.recordSchemas?.find((s) => s.id === schemaId);
+}
+
+/**
+ * Get all record schemas.
+ */
+export function getKBRecordSchemas(): RecordSchema[] {
   const kb = getKB();
   if (!kb) return [];
+  return kb.recordSchemas ?? [];
+}
+
+/**
+ * Find all records across all entities that reference the given entityId
+ * via an explicit endpoint field. Optionally filter by collection name.
+ *
+ * This is the serialized equivalent of Graph.getRecordsReferencing().
+ * Scans all records and checks explicit endpoint fields using record schemas.
+ */
+export function getKBRecordsReferencing(
+  entityId: string,
+  collectionName?: string,
+): RecordEntry[] {
+  const kb = getKB();
+  if (!kb || !kb.records || !kb.recordSchemas) return [];
+
+  // Build schema Map for O(1) lookups instead of linear scan per entry
+  const schemaMap = new Map(kb.recordSchemas.map((s) => [s.id, s]));
+
+  const results: RecordEntry[] = [];
+
+  for (const [, collections] of Object.entries(kb.records)) {
+    for (const [colName, entries] of Object.entries(collections)) {
+      if (collectionName && colName !== collectionName) continue;
+      for (const entry of entries) {
+        const schema = schemaMap.get(entry.schema);
+        if (!schema) continue;
+        for (const [endpointName, endpointDef] of Object.entries(schema.endpoints)) {
+          if (endpointDef.implicit) continue;
+          if (entry.fields[endpointName] === entityId) {
+            results.push(entry);
+            break; // Don't add same entry twice
+          }
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Get all record entries across all entities as a flat list.
+ */
+export function getAllKBRecords(): Array<{
+  entityId: string;
+  collection: string;
+  entry: RecordEntry;
+}> {
+  const kb = getKB();
+  if (!kb || !kb.records) return [];
 
   const results: Array<{
     entityId: string;
     collection: string;
-    entry: ItemEntry;
+    entry: RecordEntry;
   }> = [];
 
-  for (const [entityId, collections] of Object.entries(kb.items)) {
+  for (const [entityId, collections] of Object.entries(kb.records)) {
     for (const [collectionName, entries] of Object.entries(collections)) {
       for (const entry of entries) {
         results.push({ entityId, collection: collectionName, entry });
@@ -302,19 +341,19 @@ export function getAllKBItems(): Array<{
 }
 
 /**
- * Look up a single item entry by its key (globally unique).
- * Returns the item along with its owner entity ID and collection name.
+ * Look up a single record entry by its key (globally unique).
+ * Returns the record along with its owner entity ID and collection name.
  */
-export function getKBItemByKey(
-  itemKey: string,
-): { entityId: string; collection: string; entry: ItemEntry } | undefined {
+export function getKBRecordByKey(
+  recordKey: string,
+): { entityId: string; collection: string; entry: RecordEntry } | undefined {
   const kb = getKB();
-  if (!kb) return undefined;
+  if (!kb || !kb.records) return undefined;
 
-  for (const [entityId, collections] of Object.entries(kb.items)) {
+  for (const [entityId, collections] of Object.entries(kb.records)) {
     for (const [collectionName, entries] of Object.entries(collections)) {
       for (const entry of entries) {
-        if (entry.key === itemKey) {
+        if (entry.key === recordKey) {
           return { entityId, collection: collectionName, entry };
         }
       }
@@ -323,71 +362,3 @@ export function getKBItemByKey(
   return undefined;
 }
 
-/**
- * Find all item entries across all entities that reference the given entityId.
- * Scans item fields for string matches against the entityId.
- * Uses schema field definitions when available to identify ref-type fields.
- */
-export function getKBItemsMentioning(
-  entityId: string
-): Array<{
-  ownerEntityId: string;
-  ownerName: string;
-  collection: string;
-  entry: ItemEntry;
-  matchingFields: string[];
-}> {
-  const kb = getKB();
-  if (!kb) return [];
-
-  const results: Array<{
-    ownerEntityId: string;
-    ownerName: string;
-    collection: string;
-    entry: ItemEntry;
-    matchingFields: string[];
-  }> = [];
-
-  for (const [ownerEntityId, collections] of Object.entries(kb.items)) {
-    if (ownerEntityId === entityId) continue; // Skip self
-
-    const ownerEntity = kb.entities.find((t: Entity) => t.id === ownerEntityId);
-    const schema = ownerEntity
-      ? kb.schemas.find((s) => s.type === ownerEntity.type)
-      : undefined;
-
-    for (const [collectionName, entries] of Object.entries(collections)) {
-      const fieldDefs = schema?.items?.[collectionName]?.fields;
-
-      for (const entry of entries) {
-        const matchingFields: string[] = [];
-
-        for (const [fieldName, fieldValue] of Object.entries(entry.fields)) {
-          const fieldDef = fieldDefs?.[fieldName];
-
-          if (fieldDef?.type === "ref" && fieldValue === entityId) {
-            matchingFields.push(fieldName);
-          } else if (
-            !fieldDef &&
-            typeof fieldValue === "string" &&
-            fieldValue === entityId
-          ) {
-            matchingFields.push(fieldName);
-          }
-        }
-
-        if (matchingFields.length > 0) {
-          results.push({
-            ownerEntityId,
-            ownerName: ownerEntity?.name ?? ownerEntityId,
-            collection: collectionName,
-            entry,
-            matchingFields,
-          });
-        }
-      }
-    }
-  }
-
-  return results;
-}

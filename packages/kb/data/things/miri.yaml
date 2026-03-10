@@ -28,7 +28,7 @@ facts:
     value: "501(c)(3) nonprofit"
     source: https://intelligence.org/about/
 
-  - id: f_miri_founded_by
+  - id: f_QYWh1IZqjA
     property: founded-by
     value:
       - !ref fS1tEGKuNq:eliezer-yudkowsky
@@ -42,83 +42,79 @@ facts:
     notes: "Approximate staff count in 2023; MIRI significantly reduced staff in 2023-2024 as it shifted focus"
 
   # ── Migrated from old facts system ─────────────────────────────
-  - id: f_miri_sff_funding
+  - id: f_L3HohIdUBA
     property: total-funding
     value: 15e6
     asOf: "2025"
     notes: "Estimated cumulative SFF grants to MIRI; lower bound"
 
-  - id: f_miri_revenue_2024
+  - id: f_DgTzpJumMg
     property: revenue
     value: 1534913
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
     notes: "Total revenue for fiscal year 2024 per ProPublica filing"
 
-  - id: f_miri_expenses_2024
+  - id: f_I3Ifo1LuEg
     property: cash-burn
     value: 6508701
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
     notes: "Total expenses for fiscal year 2024 per ProPublica filing"
 
-  - id: f_miri_net_assets_2024
+  - id: f_WcIuEd2qNQ
     property: description
     value: "Net assets (2024): $15,242,215"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
     notes: "Net assets per ProPublica filing, not total funding raised; implies ~2 years operational runway"
 
-  - id: f_miri_headcount_2024
+  - id: f_61BEuj13Jg
     property: headcount
     value: 42
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
     notes: "Approximate headcount per ProPublica filing"
 
-  - id: f_miri_revenue_peak_2021
+  - id: f_RRODDJe5Xw
     property: revenue
     value: 25600000
     asOf: "2021"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
     notes: "Revenue spike partly due to Vitalik Buterin Ethereum donation"
 
-items:
-  key-people:
-    type: key-person
-    entries:
-      i_XVLjPAQXky:
-        person: !ref fS1tEGKuNq:eliezer-yudkowsky
-        title: "Founder & Senior Research Fellow"
-        start: 2000-01
-        is_founder: true
-        source: https://intelligence.org/about/
-        notes: "Founded MIRI (as SIAI) in 2000; transitioned to Senior Research Fellow role"
+records:
+  key-persons:
+    eliezer-yudkowsky:
+      person: eliezer-yudkowsky
+      title: "Founder & Senior Research Fellow"
+      start: "2000-01"
+      is_founder: true
+      source: https://intelligence.org/about/
+      notes: "Founded MIRI (as SIAI) in 2000; transitioned to Senior Research Fellow role"
 
-      i_ZJ54jX7Ppq:
-        person: nate-soares
-        title: "President"
-        start: 2015-05
-        source: https://intelligence.org/about/
-        notes: "Initially Executive Director (2015-2023); transitioned to President role"
+    nate-soares:
+      person: nate-soares
+      title: "President"
+      start: "2015-05"
+      source: https://intelligence.org/about/
+      notes: "Initially Executive Director (2015-2023); transitioned to President role"
 
-      i_mBceo2024:
-        person: malo-bourgon
-        title: "CEO"
-        start: 2023-01
-        source: https://intelligence.org/about/
-        notes: "Became CEO as MIRI restructured leadership"
+    malo-bourgon:
+      person: malo-bourgon
+      title: "CEO"
+      start: "2023-01"
+      source: https://intelligence.org/about/
+      notes: "Became CEO as MIRI restructured leadership"
 
   research-areas:
-    type: research-area
-    entries:
-      i_w1EXpcMmLN:
-        name: Agent Foundations
-        description: "Mathematical foundations of goal-directed AI systems"
-        started: 2014-01
-        notes: "Core research program focused on logical uncertainty, decision theory, and Vingean reflection"
+    agent-foundations:
+      name: Agent Foundations
+      description: "Mathematical foundations of goal-directed AI systems"
+      started: "2014-01"
+      notes: "Core research program focused on logical uncertainty, decision theory, and Vingean reflection"
 
-      i_6z7IpVMRRT:
-        name: Alignment Theory
-        description: "Theoretical approaches to ensuring advanced AI systems are aligned with human values"
-        started: 2000-01
-        notes: "MIRI's founding research focus; published extensively on corrigibility and value alignment"
+    alignment-theory:
+      name: Alignment Theory
+      description: "Theoretical approaches to ensuring advanced AI systems are aligned with human values"
+      started: "2000-01"
+      notes: "MIRI's founding research focus; published extensively on corrigibility and value alignment"

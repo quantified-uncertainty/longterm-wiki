@@ -1,14 +1,14 @@
 /**
- * KBItemTable — Item collection table for KB data.
+ * KBRecordTable — Record collection table for KB data.
  *
- * Server component that renders an item collection for a given entity
+ * Server component that renders a record collection for a given entity
  * (e.g., funding rounds, key people). Uses the schema to determine field
  * types and renders EntityLinks for ref fields, smart currency formatting
  * for USD amounts, and formatted dates.
  *
  * Usage in MDX:
- *   <KBItemTable entity="anthropic" collection="funding-rounds" />
- *   <KBItemTable entity="anthropic" collection="key-people" columns={["person", "title", "start", "is_founder"]} />
+ *   <KBRecordTable entity="anthropic" collection="funding-rounds" />
+ *   <KBRecordTable entity="anthropic" collection="key-persons" columns={["person", "title", "start", "is_founder"]} />
  */
 
 import {
@@ -20,12 +20,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBItems, getKBEntity, getKBSchema } from "@data/kb";
-import type { ItemEntry, ItemCollectionSchema } from "@longterm-wiki/kb";
+import { getKBRecords, getKBRecordSchema } from "@data/kb";
+import type { RecordEntry } from "@longterm-wiki/kb";
 import { titleCase } from "./format";
 import { KBCellValue } from "./KBCellValue";
 
-interface KBItemTableProps {
+interface KBRecordTableProps {
   /** KB thing ID (e.g., "anthropic") */
   entity: string;
   /** Collection name (e.g., "funding-rounds") */
@@ -37,7 +37,7 @@ interface KBItemTableProps {
 }
 
 /** Determine columns: use provided columns, or derive from all entries. */
-function resolveColumns(items: ItemEntry[], columns?: string[]): string[] {
+function resolveColumns(items: RecordEntry[], columns?: string[]): string[] {
   if (columns && columns.length > 0) return columns;
 
   // Collect all unique field names across all entries, preserving insertion order
@@ -50,23 +50,13 @@ function resolveColumns(items: ItemEntry[], columns?: string[]): string[] {
   return Array.from(seen);
 }
 
-/** Get the schema-defined field definitions for a collection. */
-function getCollectionSchema(
-  entityType: string | undefined,
-  collection: string,
-): ItemCollectionSchema | undefined {
-  if (!entityType) return undefined;
-  const schema = getKBSchema(entityType);
-  return schema?.items?.[collection];
-}
-
-export function KBItemTable({
+export function KBRecordTable({
   entity,
   collection,
   title,
   columns,
-}: KBItemTableProps) {
-  const items = getKBItems(entity, collection);
+}: KBRecordTableProps) {
+  const items = getKBRecords(entity, collection);
   const heading = title ?? titleCase(collection);
 
   if (items.length === 0) {
@@ -82,10 +72,9 @@ export function KBItemTable({
     );
   }
 
-  // Look up schema for type-aware rendering
-  const kbEntity = getKBEntity(entity);
-  const collectionSchema = getCollectionSchema(kbEntity?.type, collection);
-  const fieldDefs = collectionSchema?.fields;
+  // Look up record schema for type-aware rendering
+  const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
+  const fieldDefs = recordSchema?.fields;
 
   const cols = resolveColumns(items, columns);
 

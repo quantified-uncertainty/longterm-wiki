@@ -1,19 +1,19 @@
 /**
- * KBItemCollection -- Renders a KB item collection as a styled table.
+ * KBRecordCollection -- Renders a KB record collection as a styled table.
  *
- * Server component that renders an item collection (funding-rounds, key-people,
+ * Server component that renders a record collection (funding-rounds, key-persons,
  * model-releases, etc.) with type-aware formatting from the schema. Columns
  * come from the schema's field definitions. Ref fields render as EntityLinks.
  * Date fields format nicely. Numbers use the property's display config.
  *
- * This is a richer alternative to KBItemTable, with better defaults for
+ * This is a richer alternative to KBRecordTable, with better defaults for
  * column selection (hides source/notes by default), compact row styling,
  * and built-in sorting by date fields.
  *
  * Usage in MDX:
- *   <KBItemCollection entity="anthropic" collection="funding-rounds" />
- *   <KBItemCollection entity="anthropic" collection="key-people" showNotes />
- *   <KBItemCollection entity="anthropic" collection="model-releases" columns={["name", "released", "safety_level"]} />
+ *   <KBRecordCollection entity="anthropic" collection="funding-rounds" />
+ *   <KBRecordCollection entity="anthropic" collection="key-persons" showNotes />
+ *   <KBRecordCollection entity="anthropic" collection="model-releases" columns={["name", "released", "safety_level"]} />
  */
 
 import {
@@ -25,12 +25,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBItems, getKBEntity, getKBSchema } from "@data/kb";
-import type { ItemEntry, ItemCollectionSchema } from "@longterm-wiki/kb";
-import { titleCase, sortKBItems } from "./format";
+import { getKBRecords, getKBRecordSchema } from "@data/kb";
+import type { RecordEntry } from "@longterm-wiki/kb";
+import { titleCase, sortKBRecords } from "./format";
 import { KBCellValue } from "./KBCellValue";
 
-interface KBItemCollectionProps {
+interface KBRecordCollectionProps {
   /** KB entity ID (e.g., "anthropic") */
   entity: string;
   /** Collection name (e.g., "funding-rounds") */
@@ -56,8 +56,8 @@ const HIDDEN_BY_DEFAULT = new Set(["source", "notes", "key-publication", "key_pu
 
 /** Determine columns to display. */
 function resolveColumns(
-  items: ItemEntry[],
-  schema: ItemCollectionSchema | undefined,
+  items: RecordEntry[],
+  fieldDefs: Record<string, unknown> | undefined,
   columns?: string[],
   showNotes?: boolean,
   showSource?: boolean,
@@ -65,8 +65,8 @@ function resolveColumns(
   if (columns && columns.length > 0) return columns;
 
   // Use schema field order if available, otherwise collect from entries
-  const allFields: string[] = schema
-    ? Object.keys(schema.fields)
+  const allFields: string[] = fieldDefs
+    ? Object.keys(fieldDefs)
     : [...new Set(items.flatMap((item) => Object.keys(item.fields)))];
 
   // Filter hidden fields unless explicitly shown
@@ -80,12 +80,12 @@ function resolveColumns(
 
 /** Find the first date-type field for default sorting. */
 function findDateField(
-  schema: ItemCollectionSchema | undefined,
+  fieldDefs: Record<string, { type?: string }> | undefined,
   columns: string[],
 ): string | undefined {
-  if (schema) {
+  if (fieldDefs) {
     for (const col of columns) {
-      if (schema.fields[col]?.type === "date") return col;
+      if (fieldDefs[col]?.type === "date") return col;
     }
   }
   // Common date field names as fallback
@@ -94,7 +94,7 @@ function findDateField(
 }
 
 
-export function KBItemCollection({
+export function KBRecordCollection({
   entity,
   collection,
   title,
@@ -104,14 +104,11 @@ export function KBItemCollection({
   limit,
   sortBy,
   sortAsc = false,
-}: KBItemCollectionProps) {
-  const items = getKBItems(entity, collection);
-  const kbEntity = getKBEntity(entity);
-  const schema = kbEntity
-    ? getKBSchema(kbEntity.type)?.items?.[collection]
-    : undefined;
+}: KBRecordCollectionProps) {
+  const items = getKBRecords(entity, collection);
+  const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
 
-  const heading = title ?? schema?.description ?? titleCase(collection);
+  const heading = title ?? recordSchema?.description ?? titleCase(collection);
 
   if (items.length === 0) {
     return (
@@ -126,13 +123,13 @@ export function KBItemCollection({
     );
   }
 
-  const cols = resolveColumns(items, schema, columns, showNotes, showSource);
-  const fieldDefs = schema?.fields;
+  const fieldDefs = recordSchema?.fields;
+  const cols = resolveColumns(items, fieldDefs, columns, showNotes, showSource);
 
   // Sort items
-  const effectiveSortBy = sortBy ?? findDateField(schema, cols);
+  const effectiveSortBy = sortBy ?? findDateField(fieldDefs, cols);
   let sorted = effectiveSortBy
-    ? sortKBItems(items, effectiveSortBy, sortAsc)
+    ? sortKBRecords(items, effectiveSortBy, sortAsc)
     : items;
 
   // Limit rows

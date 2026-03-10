@@ -1,7 +1,7 @@
 /**
  * Schema validation for the Knowledge Base graph.
  *
- * Original checks (1–6):
+ * Original checks (1–5):
  *  1. required-properties  (error)   — each entity must have a fact for every
  *                                      property listed in its TypeSchema.required
  *  2. recommended-properties (warning) — same check for TypeSchema.recommended
@@ -9,10 +9,7 @@
  *                                       the entity's type is in that list
  *  4. ref-integrity        (error)    — ref/refs values must point to existing
  *                                       entities in the graph
- *  5. item-collection-schema (error/warning) — validate item entries against
- *                                       the ItemCollectionSchema defined in the
- *                                       entity's TypeSchema (if one exists)
- *  6. completeness         (info)     — percentage of required+recommended
+ *  5. completeness         (info)     — percentage of required+recommended
  *                                       properties that have at least one fact
  *
  * New checks (7–22):
@@ -20,7 +17,7 @@
  * Data integrity (errors):
  *  7. stableid-format      (error)    — StableId must be exactly 10 alphanumeric chars
  *  8. duplicate-stableid   (error)    — Two entities sharing the same stableId
- *  9. factid-format        (error)    — Fact ID must start with f_ or inv_ prefix
+ *  9. factid-format        (error)    — Fact ID must be f_ + 10 alphanumeric chars (or inv_ for inverses)
  * 10. empty-name           (error)    — Entity has empty or missing name
  * 11. valid-end-before-as-of (error)  — validEnd is earlier than asOf on a fact
  *
@@ -49,8 +46,6 @@ import type { Graph } from "./graph";
 import type {
   Fact,
   FactValue,
-  FieldDef,
-  ItemCollectionSchema,
   TypeSchema,
   ValidationResult,
 } from "./types";
@@ -82,8 +77,8 @@ function looksLikeDate(value: unknown): boolean {
 /** StableId format: exactly 10 alphanumeric characters. */
 const STABLEID_RE = /^[A-Za-z0-9]{10}$/;
 
-/** Fact ID format: must start with f_ or inv_ prefix. */
-const FACTID_RE = /^(f_|inv_).+$/;
+/** Fact ID format: f_ + exactly 10 alphanumeric chars, or inv_ prefix (for computed inverses). */
+const FACTID_RE = /^(f_[A-Za-z0-9]{10}|inv_.+)$/;
 
 /** Date format: YYYY, YYYY-MM, or YYYY-MM-DD. */
 const DATE_FORMAT_RE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
@@ -206,166 +201,7 @@ function _findMissingRefs(graph: Graph, value: FactValue): string[] {
   return [];
 }
 
-/** Check 5: item collection schema validation. */
-function checkItemCollections(
-  graph: Graph,
-  entityId: string,
-  schema: TypeSchema
-): ValidationResult[] {
-  const results: ValidationResult[] = [];
-
-  if (!schema.items) return results;
-
-  for (const [collectionName, collectionSchema] of Object.entries(
-    schema.items
-  )) {
-    const entries = graph.getItems(entityId, collectionName);
-
-    for (const entry of entries) {
-      const entryResults = _validateItemEntry(
-        graph,
-        entityId,
-        collectionName,
-        entry.key,
-        entry.fields,
-        collectionSchema
-      );
-      results.push(...entryResults);
-    }
-  }
-
-  return results;
-}
-
-/**
- * Validates a single item entry against an ItemCollectionSchema.
- * Produces errors for missing required fields and warnings for type mismatches.
- */
-function _validateItemEntry(
-  graph: Graph,
-  entityId: string,
-  collectionName: string,
-  entryKey: string,
-  fields: Record<string, unknown>,
-  schema: ItemCollectionSchema
-): ValidationResult[] {
-  const results: ValidationResult[] = [];
-  const prefix = `Item "${collectionName}/${entryKey}" on entity "${entityId}"`;
-
-  for (const [fieldName, fieldDef] of Object.entries(schema.fields)) {
-    const value = fields[fieldName];
-
-    // Required field presence check (error).
-    if (fieldDef.required && (value === undefined || value === null)) {
-      results.push({
-        severity: "error",
-        entityId,
-        message: `${prefix}: missing required field "${fieldName}".`,
-        rule: "item-collection-schema",
-      });
-      continue; // Skip type check for absent field.
-    }
-
-    // Type validity check (warning) — only when value is present.
-    if (value !== undefined && value !== null) {
-      const typeError = _checkFieldType(graph, entityId, fieldDef, value, fieldName, prefix);
-      if (typeError) {
-        results.push({
-          severity: "warning",
-          entityId,
-          message: typeError,
-          rule: "item-collection-schema",
-        });
-      }
-    }
-  }
-
-  return results;
-}
-
-/**
- * Returns an error message string if `value` does not match the expected type
- * from `fieldDef`, or null if the value is acceptable.
- */
-function _checkFieldType(
-  graph: Graph,
-  entityId: string,
-  fieldDef: FieldDef,
-  value: unknown,
-  fieldName: string,
-  prefix: string
-): string | null {
-  switch (fieldDef.type) {
-    case "number":
-      // Accept plain numbers or [min, max] range arrays
-      if (typeof value !== "number") {
-        const isRange = Array.isArray(value) && value.length === 2
-          && typeof value[0] === "number" && typeof value[1] === "number";
-        if (!isRange) {
-          return `${prefix}: field "${fieldName}" expected number or [min, max] range, got ${typeof value}.`;
-        }
-      }
-      break;
-
-    case "boolean":
-      if (typeof value !== "boolean") {
-        return `${prefix}: field "${fieldName}" expected boolean, got ${typeof value}.`;
-      }
-      break;
-
-    case "date":
-      if (!looksLikeDate(value)) {
-        return (
-          `${prefix}: field "${fieldName}" expected a date string (YYYY, YYYY-MM, ` +
-          `or YYYY-MM-DD), got ${JSON.stringify(value)}.`
-        );
-      }
-      break;
-
-    case "ref":
-      if (typeof value !== "string") {
-        return `${prefix}: field "${fieldName}" expected an entity ID string (ref), got ${typeof value}.`;
-      }
-      // Verify the referenced entity exists.
-      if (!graph.getEntity(value)) {
-        return (
-          `${prefix}: field "${fieldName}" references unknown entity "${value}".`
-        );
-      }
-      break;
-
-    case "text":
-      if (typeof value !== "string") {
-        return `${prefix}: field "${fieldName}" expected string (text), got ${typeof value}.`;
-      }
-      break;
-
-    case "item-ref":
-      if (typeof value !== "string") {
-        return `${prefix}: field "${fieldName}" expected an item key string (item-ref), got ${typeof value}.`;
-      }
-      // Verify the referenced item exists in the specified sibling collection.
-      if (fieldDef.collection) {
-        const siblingEntries = graph.getItems(entityId, fieldDef.collection);
-        const exists = siblingEntries.some((e) => e.key === value);
-        if (!exists) {
-          return (
-            `${prefix}: field "${fieldName}" references unknown item key "${value}" ` +
-            `in collection "${fieldDef.collection}".`
-          );
-        }
-      }
-      break;
-
-    // "json" and unknown types: no type check.
-    default:
-      break;
-  }
-
-  return null;
-}
-
-/** Check 6: completeness report. */
+/** Check 5: completeness report. */
 function checkCompleteness(
   graph: Graph,
   entityId: string,
@@ -426,7 +262,7 @@ function checkFactIdFormat(
         entityId,
         message:
           `Fact "${fact.id}" on entity "${entityId}" has invalid ID format ` +
-          `(must start with "f_" or "inv_").`,
+          `(must be "f_" + 10 alphanumeric chars, or "inv_" prefix for inverses).`,
         rule: "factid-format",
       });
     }
@@ -835,23 +671,23 @@ function checkRangeValues(
   return results;
 }
 
-/** Check 21: orphan entity — no facts and no items. */
+/** Check 21: orphan entity — no facts and no records. */
 function checkOrphanEntity(
   graph: Graph,
   entityId: string
 ): ValidationResult[] {
   const facts = graph.getFacts(entityId);
-  const hasItems = graph.getItemCollectionNames(entityId).length > 0;
+  const hasRecords = graph.getRecordCollectionNames(entityId).length > 0;
 
   // Only count non-derived facts.
   const nonDerivedFacts = facts.filter((f) => !f.derivedFrom);
 
-  if (nonDerivedFacts.length === 0 && !hasItems) {
+  if (nonDerivedFacts.length === 0 && !hasRecords) {
     return [
       {
         severity: "info",
         entityId,
-        message: `Entity "${entityId}" is an orphan (no facts and no item collections).`,
+        message: `Entity "${entityId}" is an orphan (no facts and no record collections).`,
         rule: "orphan-entity",
       },
     ];
@@ -1030,7 +866,6 @@ export function validateEntity(
     ...checkRecommended(graph, entityId, schema),
     ...checkPropertyAppliesTo(graph, entityId, entity.type),
     ...checkRefIntegrity(graph, entityId),
-    ...checkItemCollections(graph, entityId, schema),
     ...checkCompleteness(graph, entityId, schema),
     ...generalResults,
   ];

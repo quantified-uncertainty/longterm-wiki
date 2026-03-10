@@ -43,6 +43,7 @@ export interface DetectedPr {
   issues: PrIssueType[];
   botComments: BotComment[];
   labels: string[];
+  failingChecks?: string[];
 }
 
 export interface ScoredPr extends DetectedPr {

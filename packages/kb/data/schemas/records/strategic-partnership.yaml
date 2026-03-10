@@ -1,0 +1,20 @@
+name: Strategic Partnership
+description: "Major strategic partnerships and cloud/compute deals."
+temporal: false
+
+endpoints:
+  partner:
+    types: [organization]
+    required: true
+    allow_display_name: true
+  organization:
+    types: [organization]
+    implicit: true
+
+fields:
+  type: { type: text, required: true, description: "Partnership type (investment, cloud, distribution)" }
+  date: { type: date, required: true, description: "Announcement date" }
+  investment_amount: { type: number, description: "Investment amount in USD (if applicable)" }
+  compute_commitment: { type: number, description: "Compute commitment in USD (if applicable)" }
+  source: { type: text, description: "URL to announcement" }
+  notes: { type: text, description: "Key terms and significance" }

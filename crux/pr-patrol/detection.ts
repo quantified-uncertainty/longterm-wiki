@@ -102,7 +102,7 @@ export function detectAllPrIssuesFromNodes(
       return true;
     })
     .map((pr) => {
-      const { issues: allIssues, botComments } = libDetectIssues(pr, staleThresholdMs);
+      const { issues: allIssues, botComments, failingChecks } = libDetectIssues(pr, staleThresholdMs);
       const advisoryIssues = allIssues.filter((i) => ADVISORY_ISSUES.has(i));
       const fixableIssues = allIssues.filter((i) => !ADVISORY_ISSUES.has(i));
       if (advisoryIssues.length > 0) {
@@ -116,6 +116,7 @@ export function detectAllPrIssuesFromNodes(
         issues: fixableIssues,
         botComments,
         labels: pr.labels.nodes.map((l) => l.name),
+        failingChecks: failingChecks.length > 0 ? failingChecks : undefined,
       };
     })
     .filter((pr) => pr.issues.length > 0);

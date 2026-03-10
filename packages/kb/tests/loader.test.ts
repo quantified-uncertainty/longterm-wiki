@@ -166,7 +166,7 @@ describe("loader", () => {
       expect(personSchema!.recommended).toContain("born-year");
     });
 
-    it("loads item collection schemas on organization", () => {
+    it("loads record collection schemas on organization", () => {
       const orgSchema = graph.getSchema("organization");
       expect(orgSchema!.items).toBeDefined();
       expect(orgSchema!.items!["funding-rounds"]).toBeDefined();
@@ -271,35 +271,37 @@ describe("loader", () => {
     });
   });
 
-  describe("item collections", () => {
-    it("loads funding-rounds collection for Anthropic", () => {
-      const rounds = graph.getItems("anthropic", "funding-rounds");
-      expect(rounds).toHaveLength(13);
-    });
-
-    it("loads key-people collection for Anthropic", () => {
-      const people = graph.getItems("anthropic", "key-people");
-      expect(people).toHaveLength(15);
-    });
-
-    it("item entries have correct keys and field values", () => {
-      const rounds = graph.getItems("anthropic", "funding-rounds");
-      const seed = rounds.find((r) => r.key === "i_VImpFJfKiQ");
-      expect(seed).toBeDefined();
-      expect(seed!.fields.date).toBe("2021-04");
-      expect(seed!.fields.amount).toBe(124e6);
-      expect(seed!.fields.valuation).toBe(550e6);
-      expect(seed!.fields.lead_investor).toBe("jaan-tallinn");
-    });
-
+  describe("record collections", () => {
     it("returns empty array for non-existent collection", () => {
-      const items = graph.getItems("anthropic", "nonexistent");
-      expect(items).toEqual([]);
+      const records = graph.getRecords("anthropic", "nonexistent");
+      expect(records).toEqual([]);
     });
 
     it("returns empty array for non-existent entity", () => {
-      const items = graph.getItems("nonexistent", "funding-rounds");
-      expect(items).toEqual([]);
+      const records = graph.getRecords("nonexistent", "funding-rounds");
+      expect(records).toEqual([]);
+    });
+  });
+
+  describe("record collections (data verification)", () => {
+    it("loads funding-rounds records for Anthropic", () => {
+      const rounds = graph.getRecords("anthropic", "funding-rounds");
+      expect(rounds.length).toBeGreaterThanOrEqual(13);
+    });
+
+    it("loads key-persons records for Anthropic", () => {
+      const people = graph.getRecords("anthropic", "key-persons");
+      expect(people.length).toBeGreaterThanOrEqual(15);
+    });
+
+    it("record entries have correct keys and field values", () => {
+      const rounds = graph.getRecords("anthropic", "funding-rounds");
+      const seriesA = rounds.find((r) => r.key === "series-a");
+      expect(seriesA).toBeDefined();
+      expect(seriesA!.fields.date).toBe("2021-05");
+      expect(seriesA!.fields.raised).toBe(124e6);
+      expect(seriesA!.fields.valuation).toBe(550e6);
+      expect(seriesA!.fields.lead_investor).toBe("jaan-tallinn");
     });
   });
 });

@@ -13,11 +13,11 @@ import {
   getKBFacts,
   getKBEntity,
   getKBProperties,
-  getKBAllItemCollections,
-  getKBSchema,
+  getKBAllRecordCollections,
+  getKBRecordSchema,
   isFactExpired,
 } from "@data/kb";
-import type { Fact, Property, ItemEntry, FieldDef } from "@longterm-wiki/kb";
+import type { Fact, Property, RecordEntry, FieldDef } from "@longterm-wiki/kb";
 import { formatKBDate, isUrl, shortDomain, titleCase } from "@components/wiki/kb/format";
 import { KBFactValueDisplay } from "@components/wiki/kb/KBFactValueDisplay";
 import { KBCellValue } from "@components/wiki/kb/KBCellValue";
@@ -259,38 +259,37 @@ function SingleFactRow({
 // ── Item collection defaults ─────────────────────────────────────────
 
 /** Default columns per collection type, used when schema is unavailable. */
-const DEFAULT_ITEM_COLUMNS: Record<string, string[]> = {
-  "funding-rounds": ["date", "amount", "lead_investor"],
-  "key-people": ["person", "title", "start"],
+const DEFAULT_RECORD_COLUMNS: Record<string, string[]> = {
+  "funding-rounds": ["date", "raised", "lead_investor"],
+  "key-persons": ["person", "title", "start"],
   products: ["name", "launched", "description"],
   "model-releases": ["name", "released", "description"],
-  "board-members": ["name", "role", "appointed"],
+  "board-seats": ["name", "role", "appointed"],
   "strategic-partnerships": ["partner", "type", "date"],
   "safety-milestones": ["name", "date", "description"],
   "research-areas": ["name", "description", "started"],
-  "grants-and-programs": ["name", "amount", "date"],
+  grants: ["name", "amount", "date"],
 };
 
 /** Excluded fields (metadata, not useful in summary view). */
-const EXCLUDED_ITEM_FIELDS = new Set([
+const EXCLUDED_RECORD_FIELDS = new Set([
   "source",
-  "sourceResource",
   "notes",
   "key-publication",
   "key_publication",
 ]);
 
 /** Resolve which columns to show for a collection. */
-function resolveItemColumns(
+function resolveRecordColumns(
   collectionName: string,
-  items: ItemEntry[],
+  items: RecordEntry[],
   fieldDefs?: Record<string, FieldDef>,
 ): string[] {
-  const defaults = DEFAULT_ITEM_COLUMNS[collectionName];
+  const defaults = DEFAULT_RECORD_COLUMNS[collectionName];
 
   if (fieldDefs) {
     const schemaFields = Object.keys(fieldDefs).filter(
-      (f) => !EXCLUDED_ITEM_FIELDS.has(f),
+      (f) => !EXCLUDED_RECORD_FIELDS.has(f),
     );
     if (!defaults) return schemaFields;
     // Prefer defaults order, but only for columns actually in the schema
@@ -304,7 +303,7 @@ function resolveItemColumns(
   const seen = new Set<string>();
   for (const item of items) {
     for (const key of Object.keys(item.fields)) {
-      if (!EXCLUDED_ITEM_FIELDS.has(key)) {
+      if (!EXCLUDED_RECORD_FIELDS.has(key)) {
         seen.add(key);
       }
     }
@@ -312,20 +311,17 @@ function resolveItemColumns(
   return Array.from(seen).slice(0, 5); // Cap at 5 columns
 }
 
-/** Render a collapsible item collection. */
-function ItemCollectionSection({
+/** Render a collapsible record collection. */
+function RecordCollectionSection({
   collectionName,
   items,
-  entityType,
 }: {
   collectionName: string;
-  items: ItemEntry[];
-  entityType: string | undefined;
+  items: RecordEntry[];
 }) {
-  const schema = entityType ? getKBSchema(entityType) : undefined;
-  const collectionSchema = schema?.items?.[collectionName];
-  const fieldDefs = collectionSchema?.fields;
-  const cols = resolveItemColumns(collectionName, items, fieldDefs);
+  const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
+  const fieldDefs = recordSchema?.fields;
+  const cols = resolveRecordColumns(collectionName, items, fieldDefs);
 
   return (
     <details className="group/item">
@@ -392,16 +388,16 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
     (f) => f.propertyId !== "description",
   );
 
-  // Get item collections
-  const allCollections = getKBAllItemCollections(entityId);
+  // Get record collections
+  const allCollections = getKBAllRecordCollections(entityId);
   const collectionNames = Object.keys(allCollections);
-  const totalItems = collectionNames.reduce(
+  const totalRecords = collectionNames.reduce(
     (sum, name) => sum + (allCollections[name]?.length ?? 0),
     0,
   );
 
-  // Don't render if no substantive facts and no items
-  if (substantiveFacts.length === 0 && totalItems === 0) {
+  // Don't render if no substantive facts and no records
+  if (substantiveFacts.length === 0 && totalRecords === 0) {
     return null;
   }
 
@@ -422,10 +418,10 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
 
   // Open by default for entities with enough structured data
   const AUTO_OPEN_THRESHOLD_FACTS = 5;
-  const AUTO_OPEN_THRESHOLD_ITEMS = 10;
+  const AUTO_OPEN_THRESHOLD_RECORDS = 10;
   const defaultOpen =
     substantiveFacts.length >= AUTO_OPEN_THRESHOLD_FACTS ||
-    totalItems >= AUTO_OPEN_THRESHOLD_ITEMS;
+    totalRecords >= AUTO_OPEN_THRESHOLD_RECORDS;
 
   return (
     <section className="not-prose mt-8 mb-6">
@@ -442,19 +438,19 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
           <span className="text-sm font-semibold text-foreground">
             Structured Data
           </span>
-          <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground flex items-center gap-1.5 ml-1">
             {substantiveFacts.length > 0 && (
               <span>
                 {substantiveFacts.length}{" "}
                 {substantiveFacts.length === 1 ? "fact" : "facts"}
               </span>
             )}
-            {substantiveFacts.length > 0 && totalItems > 0 && (
+            {substantiveFacts.length > 0 && totalRecords > 0 && (
               <span className="text-muted-foreground/40">{"\u00B7"}</span>
             )}
-            {totalItems > 0 && (
+            {totalRecords > 0 && (
               <span>
-                {totalItems} {totalItems === 1 ? "item" : "items"}
+                {totalRecords} {totalRecords === 1 ? "record" : "records"}
               </span>
             )}
           </span>
@@ -532,7 +528,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
             </div>
           )}
 
-          {/* Item collections */}
+          {/* Record collections */}
           {collectionNames.length > 0 && (
             <div>
               {substantiveFacts.length > 0 && (
@@ -558,11 +554,10 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
                 if (!items || items.length === 0) return null;
 
                 return (
-                  <ItemCollectionSection
+                  <RecordCollectionSection
                     key={name}
                     collectionName={name}
                     items={items}
-                    entityType={kbEntity?.type}
                   />
                 );
               })}

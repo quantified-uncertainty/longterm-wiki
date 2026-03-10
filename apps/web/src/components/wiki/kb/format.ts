@@ -7,7 +7,7 @@
 
 import { formatValue as smartFormatValue } from "@lib/format-value";
 import { CURRENCIES } from "@longterm-wiki/kb/currencies";
-import type { Fact, FieldDef, ItemEntry, PropertyDisplay } from "@longterm-wiki/kb";
+import type { Fact, FieldDef, RecordEntry, PropertyDisplay } from "@longterm-wiki/kb";
 
 // ── Date formatting ────────────────────────────────────────────────
 
@@ -67,7 +67,7 @@ export function formatKBNumber(
     }
     const formatted = Number.isInteger(num)
       ? num.toLocaleString()
-      : num.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      : num.toLocaleString("en-US", { maximumFractionDigits: 2 });
     // If currency override provided and display has a currency-like prefix, use currency symbol
     let prefix = display.prefix ?? "";
     if (currency && Object.hasOwn(CURRENCIES, currency)) {
@@ -121,10 +121,10 @@ export function formatKBFactValue(
   }
 }
 
-// ── Item cell formatting ───────────────────────────────────────────
+// ── Record cell formatting ─────────────────────────────────────────
 
 /**
- * Format a cell value from an item collection, using the field definition
+ * Format a cell value from a record collection, using the field definition
  * from the schema when available for type-aware formatting.
  *
  * Returns a string for simple values. Callers that need JSX (e.g., for
@@ -167,14 +167,14 @@ export function formatKBCellValue(
   return String(value);
 }
 
-// ── Item sorting ───────────────────────────────────────────────────
+// ── Record sorting ─────────────────────────────────────────────────
 
-/** Sort item collection entries by a field value, ascending or descending. */
-export function sortKBItems(
-  items: ItemEntry[],
+/** Sort record collection entries by a field value, ascending or descending. */
+export function sortKBRecords(
+  items: RecordEntry[],
   sortBy: string,
   ascending: boolean,
-): ItemEntry[] {
+): RecordEntry[] {
   return [...items].sort((a, b) => {
     const va = a.fields[sortBy];
     const vb = b.fields[sortBy];

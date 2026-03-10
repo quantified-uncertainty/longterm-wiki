@@ -42,7 +42,7 @@ facts:
     value: "@DarioAmodei"
     source: https://x.com/DarioAmodei
 
-  - id: f_dAtT1uV2w
+  - id: f_9Rz2EK1pYA
     property: role
     value: "VP of Research"
     asOf: "2016"
@@ -50,7 +50,7 @@ facts:
     source: https://en.wikipedia.org/wiki/Dario_Amodei
     notes: "VP of Research at OpenAI; led GPT-2 and GPT-3 safety research before departing to found Anthropic"
 
-  - id: f_dAxX3yZ4a
+  - id: f_nuoya5WHmQ
     property: employed-by
     value: !ref 1LcLlMGLbw:openai
     asOf: "2016"
@@ -58,7 +58,7 @@ facts:
     source: https://en.wikipedia.org/wiki/Dario_Amodei
     notes: "Joined OpenAI as VP of Research around 2016; left to co-found Anthropic in January 2021"
 
-  - id: f_dAbB5cD6e
+  - id: f_vNgM0OKk5w
     property: role
     value: "Research Scientist"
     asOf: "2014"
@@ -66,58 +66,54 @@ facts:
     source: https://en.wikipedia.org/wiki/Dario_Amodei
     notes: "Researcher at Baidu's AI lab under Andrew Ng; worked on speech recognition"
 
-items:
+records:
   career-history:
-    type: career-entry
-    entries:
-      i_dA1fG2hI3j:
-        organization: "D. E. Shaw Research"
-        title: "Research Scientist"
-        start: "2011"
-        end: "2014"
-        source: https://en.wikipedia.org/wiki/Dario_Amodei
-        notes: "Computational biology and molecular dynamics simulations"
+    i_dA1fG2hI3j:
+      organization: "D. E. Shaw Research"
+      title: "Research Scientist"
+      start: "2011"
+      end: "2014"
+      source: https://en.wikipedia.org/wiki/Dario_Amodei
+      notes: "Computational biology and molecular dynamics simulations"
 
-      i_dA4kL5mN6o:
-        organization: "Baidu AI Lab"
-        title: "Research Scientist"
-        start: "2014"
-        end: "2016"
-        source: https://en.wikipedia.org/wiki/Dario_Amodei
-        notes: "Worked on deep learning for speech recognition under Andrew Ng"
+    i_dA4kL5mN6o:
+      organization: "Baidu AI Lab"
+      title: "Research Scientist"
+      start: "2014"
+      end: "2016"
+      source: https://en.wikipedia.org/wiki/Dario_Amodei
+      notes: "Worked on deep learning for speech recognition under Andrew Ng"
 
-      i_dA7pQ8rS9t:
-        organization: !ref 1LcLlMGLbw:openai
-        title: "VP of Research"
-        start: "2016"
-        end: 2021-01
-        source: https://en.wikipedia.org/wiki/Dario_Amodei
-        notes: "Led GPT-2 and GPT-3 research; grew increasingly concerned about safety culture; departed with six colleagues to found Anthropic"
+    i_dA7pQ8rS9t:
+      organization: openai
+      title: "VP of Research"
+      start: "2016"
+      end: "2021-01"
+      source: https://en.wikipedia.org/wiki/Dario_Amodei
+      notes: "Led GPT-2 and GPT-3 research; grew increasingly concerned about safety culture; departed with six colleagues to found Anthropic"
 
-      i_dAuV1wX2y:
-        organization: !ref mK9pX3rQ7n:anthropic
-        title: "CEO & Co-founder"
-        start: 2021-01
-        source: https://anthropic.com/company
-        notes: "Co-founded Anthropic with sister Daniela and five other former OpenAI researchers"
+    i_dAuV1wX2y:
+      organization: anthropic
+      title: "CEO & Co-founder"
+      start: "2021-01"
+      source: https://anthropic.com/company
+      notes: "Co-founded Anthropic with sister Daniela and five other former OpenAI researchers"
 
   notable-publications:
-    type: publication
-    entries:
-      i_dAzA3bC4d:
-        title: "Concrete Problems in AI Safety"
-        year: 2016
-        url: https://arxiv.org/abs/1606.06565
-        notes: "Co-authored influential paper outlining five practical safety problems for ML systems"
+    i_dAzA3bC4d:
+      title: "Concrete Problems in AI Safety"
+      year: 2016
+      url: https://arxiv.org/abs/1606.06565
+      notes: "Co-authored influential paper outlining five practical safety problems for ML systems"
 
-      i_dAeF5gH6i:
-        title: "Language Models are Few-Shot Learners (GPT-3)"
-        year: 2020
-        url: https://arxiv.org/abs/2005.14165
-        notes: "Key contributor to GPT-3 paper demonstrating in-context learning at scale"
+    i_dAeF5gH6i:
+      title: "Language Models are Few-Shot Learners (GPT-3)"
+      year: 2020
+      url: https://arxiv.org/abs/2005.14165
+      notes: "Key contributor to GPT-3 paper demonstrating in-context learning at scale"
 
-      i_dAjK7lM8n:
-        title: "Machines of Loving Grace"
-        year: 2024
-        url: https://darioamodei.com/machines-of-loving-grace
-        notes: "Influential essay on how AI could transform biology, poverty, governance, and work"
+    i_dAjK7lM8n:
+      title: "Machines of Loving Grace"
+      year: 2024
+      url: https://darioamodei.com/machines-of-loving-grace
+      notes: "Influential essay on how AI could transform biology, poverty, governance, and work"

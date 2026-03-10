@@ -24,7 +24,7 @@ facts:
     source: https://uk.finance.yahoo.com/news/anthropic-arr-surges-19-billion-151210607.html
     notes: "ARR mid-2024"
 
-  - id: f_rev_2024_12
+  - id: f_i59sRXPSZw
     property: revenue
     value: 1e9
     asOf: 2024-12
@@ -38,19 +38,18 @@ facts:
     source: https://www.reuters.com/technology/anthropic-on-track-raise-money-2-billion-run-rate-revenue-sources-2025-03-15/
     notes: "Run-rate revenue March 2025"
 
-  - id: f_rev_2025_07
+  - id: f_WLpl0xLCEA
     property: revenue
     value: 4e9
     asOf: 2025-07
     source: https://uk.finance.yahoo.com/news/anthropic-arr-surges-19-billion-151210607.html
     notes: "ARR at time of Series F announcement"
 
-  - id: f_rev_2025_10
+  - id: f_5KhEeJqXzg
     property: revenue
     value: 7e9
     asOf: 2025-10
     source: https://www.pminsights.com/insights/anthropic-approaches-7b-run-rate-in-2025-outpaces-openai
-    sourceResource: 926e4c583994b48d
     notes: "ARR approaching $7B; outpacing OpenAI growth rate"
 
   - id: f_tG6nH1yS3b
@@ -60,12 +59,11 @@ facts:
     source: https://uk.finance.yahoo.com/news/anthropic-arr-surges-19-billion-151210607.html
     notes: "Run-rate exceeding $9B at end of 2025"
 
-  - id: f_rev_2026_02
+  - id: f_esWJIYxVFQ
     property: revenue
     value: 14e9
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Run-rate revenue at Series G announcement; 500+ customers spending $1M+ annually"
 
   - id: f_dW5cR9mJ8q
@@ -76,25 +74,25 @@ facts:
     notes: "Nearing $20B ARR; company guidance $20-26B for 2026"
 
   # ── Valuation ───────────────────────────────────────────────────
-  - id: f_val_2024_02
+  - id: f_CdywhhCodg
     property: valuation
     value: 18e9
     asOf: 2024-02
     source: https://fortune.com/2024/02/20/anthropic-750-million-funding/
     notes: "Series D post-money valuation"
 
-  - id: f_val_2025_03
+  - id: f_Vs2y6JyGAA
     property: valuation
     value: 61.5e9
     asOf: 2025-03
-    source: https://www.anthropic.com/news/series-e
+    source: https://www.anthropic.com/news/anthropic-raises-series-e-at-usd61-5b-post-money-valuation
     notes: "Series E post-money valuation"
 
-  - id: f_val_2025_09
+  - id: f_QNbaTzUdGQ
     property: valuation
     value: 183e9
     asOf: 2025-09
-    source: https://www.anthropic.com/news/series-f
+    source: https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation
     notes: "Series F post-money valuation"
 
   - id: f_mN3pQ7kX2r
@@ -102,17 +100,16 @@ facts:
     value: 380e9
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Series G post-money valuation; second-largest venture deal ever behind OpenAI's $40B"
 
   # ── Total Funding ───────────────────────────────────────────────
-  - id: f_fund_2023_10
+  - id: f_V3qsrDVY3A
     property: total-funding
     value: 4.4e9
     asOf: 2023-10
     notes: "Estimate; no published source. After Google $2B investment and Amazon first tranche"
 
-  - id: f_fund_2025_07
+  - id: f_oBMR5hGA6A
     property: total-funding
     value: 15e9
     asOf: 2025-07
@@ -123,29 +120,26 @@ facts:
     value: 67e9
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Total funding raised including $30B Series G. Exceeds equity round sum because it includes Amazon cloud credit commitments and multi-tranche strategic investments not listed as individual rounds."
 
   # ── Headcount ───────────────────────────────────────────────────
-  - id: f_hc_2022
+  - id: f_zBoko30S4g
     property: headcount
     value: 192
     asOf: 2022-12
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
-    sourceResource: 423364c2f6bc5f49
     notes: "Early-stage headcount"
 
-  - id: f_hc_2024_09
+  - id: f_a7TezcOwMA
     property: headcount
     value:
       - 870
       - 2847
     asOf: 2024-09
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
-    sourceResource: 423364c2f6bc5f49
     notes: "Point estimate 1097 from LinkedIn/consistent sources; full range 870-2847 depending on methodology"
 
-  - id: f_hc_2026_01
+  - id: f_BdGi5l9dOg
     property: headcount
     value: 4074
     asOf: 2026-01
@@ -159,7 +153,7 @@ facts:
     source: https://anthropic.com/company
     notes: "Founded by seven former OpenAI researchers in January 2021"
 
-  - id: f_anthropic_founded_by
+  - id: f_tAtOfKqDjg
     property: founded-by
     value:
       - !ref zR4nW8xB2f:dario-amodei
@@ -181,7 +175,6 @@ facts:
     property: legal-structure
     value: "Public benefit corporation"
     source: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
-    sourceResource: 357cf00ad44eea37
     notes: "Incorporated as Delaware PBC with Long-Term Benefit Trust holding Class T stock"
 
   # ── Financial Detail ────────────────────────────────────────────
@@ -192,21 +185,21 @@ facts:
     source: https://www.theinformation.com/articles/anthropics-finances
     notes: "10 percentage points below previous estimate; inference costs surged 23% more than expected"
 
-  - id: f_gm_target_2026
+  - id: f_VeJPtr2gAQ
     property: gross-margin
     value: 63
     asOf: 2026-12
     source: https://www.theinformation.com/articles/anthropics-finances
     notes: "2026 target gross margin; 2028 target is 77%"
 
-  - id: f_burn_2024
+  - id: f_TaHnceQDdQ
     property: cash-burn
     value: 5.6e9
     asOf: 2024-12
     source: https://www.investing.com/news/company-news/anthropic-set-to-become-profitable-before-openai-amid-ai-race-4349418
     notes: "Annual cash burn for 2024"
 
-  - id: f_burn_2025
+  - id: f_SImz3xFPTw
     property: cash-burn
     value: 3e9
     asOf: 2025-12
@@ -214,1141 +207,1084 @@ facts:
     notes: "Expected cash burn for 2025; down from $5.6B in 2024"
 
   # ── Market Share ────────────────────────────────────────────────
-  - id: f_ems_2024
+  - id: f_bqY8WIQxNg
     property: enterprise-market-share
     value: 18
     asOf: 2024-12
     source: https://www.emarketer.com/content/openai-leads--anthropic-surges-enterprise-ai-shifts-multi-model-reality
     notes: "Enterprise AI assistant market share"
 
-  - id: f_ems_2025
+  - id: f_nitUVudRdQ
     property: enterprise-market-share
     value: 32
     asOf: 2025-07
     source: https://dataconomy.com/2025/08/04/anthropic-leads-enterprise-llms-with-32-market-share/
     notes: "Menlo Ventures survey; up from 12% two years prior. OpenAI at 50% → 25%"
 
-  - id: f_cms_2025
+  - id: f_qgj5UBfOAg
     property: coding-market-share
     value: 42
     asOf: 2025-07
     source: https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/
-    sourceResource: 3a07423e8bf204c2
     notes: "Enterprise coding market share; more than double OpenAI's 21%"
 
   # ── Product & Usage ─────────────────────────────────────────────
-  - id: f_mau_2025
+  - id: f_JoN2Jr8liA
     property: monthly-active-users
     value: 18.9e6
     asOf: 2025-03
     source: https://backlinko.com/claude-users
     notes: "Monthly active users across claude.ai"
 
-  - id: f_biz_customers
+  - id: f_GYoFtt5wsw
     property: business-customers
     value: 300000
     asOf: 2025-10
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Grew from fewer than 1,000 businesses to 300,000+ in two years; 80% of revenue from business"
 
-  - id: f_api_calls
+  - id: f_Nje8oobrCw
     property: api-calls-monthly
     value: 25e9
     asOf: 2025-12
     source: https://www.businessofapps.com/data/claude-statistics/
     notes: "Monthly API calls"
 
-  - id: f_cc_revenue
+  - id: f_C3f6dHDO8Q
     property: product-revenue
     value: 2.5e9
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Claude Code run-rate revenue; hit $1B milestone in Nov 2025, doubled by Feb 2026"
 
   # ── Safety ──────────────────────────────────────────────────────
-  - id: f_safety_level
+  - id: f_BnkEWenniQ
     property: safety-level
     value: "ASL-3 (Opus 4+), ASL-2 (Sonnet/Haiku)"
     asOf: 2025-05
     validEnd: 2026-02
     source: https://www.anthropic.com/news/activating-asl3-protections
-    sourceResource: 7512ddb574f82249
     notes: "First activation of ASL-3 for Claude Opus 4; precautionary/provisional"
 
-  - id: f_safety_level_2026
+  - id: f_R59LmVVzcw
     property: safety-level
     value: "ASL-3 (Opus 4, Opus 4.5, Opus 4.6), ASL-2 (Sonnet, Haiku)"
     asOf: 2026-02
     source: https://www.anthropic.com/news/activating-asl3-protections
-    sourceResource: 7512ddb574f82249
     notes: "Opus 4.6 launched Feb 2026 under ASL-3; all Opus-tier models are ASL-3, Sonnet/Haiku remain ASL-2"
 
-  - id: f_safety_researchers
+  - id: f_ddR2zmZ1ZQ
     property: safety-researcher-count
     value: 265
     asOf: 2025-12
     notes: "Estimate; no published source. Estimated 200-330 across interpretability, alignment science, policy, trust & safety; ~20-30% of technical staff"
 
-  - id: f_interp_team
+  - id: f_vNw3jgVCvg
     property: interpretability-team-size
     value: 50
     asOf: 2025-12
     notes: "Estimate; no published source. Estimated 40-60 researchers; among the largest concentrations globally"
 
   # ── Migrated from old facts system ─────────────────────────────
-  - id: f_val_2025_11
+  - id: f_Pd29CR24TA
     property: valuation
     value: 350e9
     asOf: 2025-11
-    sourceResource: 787a2639f9e64ca5
     notes: "Valuation at Microsoft/Nvidia commitment."
 
-  - id: f_revenue_guidance_2026
+  - id: f_U3LMAv6zjQ
     property: revenue-guidance
     value: 20e9
     asOf: 2026-01
-    sourceResource: cb3e2358bd128df5
     notes: "Base case $20B, best case $26B per Reuters."
 
-  - id: f_retention_rate_2025
+  - id: f_VuX4YGhERw
     property: retention-rate
     value: 88
     asOf: "2025"
     notes: "Estimate; no published source identified for this specific figure"
 
-  - id: f_customer_concentration_2025
+  - id: f_AySLGNdWrw
     property: customer-concentration
     value: 25
     asOf: "2025"
     notes: "Estimate; no published source. Revenue share from top customers (Cursor, GitHub Copilot); inferred from reporting"
 
-  - id: f_safety_staffing_ratio_2025
+  - id: f_w2MNMoBnsg
     property: safety-staffing-ratio
     value: 25
     asOf: "2025"
     notes: "Estimate; no published source. 20-30% of technical staff in safety-related roles"
 
-  - id: f_infra_investment_2026
+  - id: f_CrjYKVhbow
     property: infrastructure-investment
     value: 50e9
     asOf: "2026"
-    sourceResource: 52c1c2def0184008
     notes: "AI infrastructure expansion plan announced November 2025."
 
-  - id: f_breakeven_target
+  - id: f_gwwJxIwrNA
     property: description
     value: "Projected breakeven year: 2028"
-    sourceResource: eb642ee7de582ff5
     notes: "Per internal financial projections."
 
-  - id: f_google_stake_pct
+  - id: f_HLyq7TgthA
     property: equity-stake-percent
     value: 14
     asOf: 2026-02
-    sourceResource: 233fe5e95bfcf8bc
     notes: "Approximate Google post-Series G equity stake; computed from $3.3B invested across 3 rounds."
 
-  - id: f_founder_equity_value
+  - id: f_FXudrRDOeQ
     property: equity-value
     value: 66.5e9
     asOf: 2026-02
-    sourceResource: fd8351a24e375eba
     notes: "All seven co-founders combined equity value estimated $53-80B (midpoint used); 2-3% each x $380B valuation."
 
-  - id: f_founder_pledge_total
+  - id: f_RqnR8XyGFQ
     property: description
     value: "Founder pledge total (80% of equity): $43-64B estimated"
-    sourceResource: fd8351a24e375eba
     notes: "All seven co-founders pledged to donate 80% of their wealth."
 
-  - id: f_employee_equity_value
+  - id: f_4rxgmu6Z7A
     property: equity-value
     value: 57e9
     asOf: 2026-02
-    sourceResource: 8e3ff50b9ef2a1a8
     notes: "Employee equity pool value estimated $46-68B (midpoint used); 12-18% of $380B valuation."
 
-  - id: f_per_founder_stake_pct
+  - id: f_akJZvJpTFg
     property: equity-stake-percent
     value: 2.5
     asOf: 2026-02
-    sourceResource: fd8351a24e375eba
     notes: "Per-founder equity stake; each of 7 co-founders holds approximately 2-3% (midpoint used)."
 
-  - id: f_tallinn_stake_pct
+  - id: f_nJ9CJQcZ4A
     property: equity-stake-percent
     value: 1.15
     asOf: 2026-02
     notes: "Estimate; no published source. Jaan Tallinn equity stake estimated 0.6-1.7% (midpoint used); Series A lead position"
 
-  - id: f_ea_aligned_capital
+  - id: f_xKAnrZIbwg
     property: description
     value: "EA-aligned capital (risk-adjusted): $27-76B estimated"
     notes: "Estimate; no published source. Risk-adjusted estimate of EA-aligned philanthropic capital from all Anthropic stakeholders"
 
-items:
-  # ── Equity Holders ──────────────────────────────────────────────
-  # Current ownership snapshot. Category is derived from round-investments.
-  equity-holders:
-    type: equity-holder
-    entries:
-      i_eqDarioAmodei:
-        holder: Dario Amodei
-        entity_ref: E91
-        stake: [0.015, 0.025]
-        source: https://www.storyboard18.com/brand-makers/who-is-dario-amodei-net-worth-jumps-to-7-billion-as-anthropics-valuation-hits-380-billion-90705.htm
-        notes: "Forbes estimates ~$7B net worth at $380B valuation → ~1.8% implied; range accounts for different share classes and vesting"
+records:
+  # ── Equity Positions ─────────────────────────────────────────────
+  # Current ownership snapshot. Holder is an entity ref where the person/org
+  # has a KB entity, display_name otherwise.
+  equity-positions:
+    dario-amodei:
+      holder: dario-amodei
+      stake: [0.015, 0.025]
+      source: https://www.storyboard18.com/brand-makers/who-is-dario-amodei-net-worth-jumps-to-7-billion-as-anthropics-valuation-hits-380-billion-90705.htm
+      notes: "Forbes estimates ~$7B net worth at $380B valuation → ~1.8% implied; range accounts for different share classes and vesting"
 
-      i_eqDanielaAmodei:
-        holder: Daniela Amodei
-        entity_ref: E90
-        stake: [0.015, 0.025]
-        source: https://www.revenuememo.com/p/who-owns-anthropic
-        notes: "Co-founder and President; likely comparable stake to Dario based on co-founder role"
+    daniela-amodei:
+      holder: daniela-amodei
+      stake: [0.015, 0.025]
+      source: https://www.revenuememo.com/p/who-owns-anthropic
+      notes: "Co-founder and President; likely comparable stake to Dario based on co-founder role"
 
-      i_eqChrisOlah:
-        holder: Chris Olah
-        entity_ref: E59
-        stake: [0.01, 0.02]
-        source: https://www.revenuememo.com/p/who-owns-anthropic
-        notes: "Non-CEO co-founder; likely smaller initial allocation than Dario/Daniela"
+    chris-olah:
+      holder: chris-olah
+      stake: [0.01, 0.02]
+      source: https://www.revenuememo.com/p/who-owns-anthropic
+      notes: "Non-CEO co-founder; likely smaller initial allocation than Dario/Daniela"
 
-      i_eqJackClark:
-        holder: Jack Clark
-        stake: [0.01, 0.02]
-        source: https://www.revenuememo.com/p/who-owns-anthropic
+    jack-clark:
+      holder: jack-clark
+      stake: [0.01, 0.02]
+      source: https://www.revenuememo.com/p/who-owns-anthropic
 
-      i_eqTomBrown:
-        holder: Tom Brown
-        stake: [0.01, 0.02]
-        source: https://www.revenuememo.com/p/who-owns-anthropic
+    tom-brown:
+      holder: tom-brown
+      stake: [0.01, 0.02]
+      source: https://www.revenuememo.com/p/who-owns-anthropic
 
-      i_eqJaredKaplan:
-        holder: Jared Kaplan
-        stake: [0.01, 0.02]
-        source: https://www.revenuememo.com/p/who-owns-anthropic
-        notes: "Chief Scientist; may have larger founder allocation"
+    jared-kaplan:
+      holder: jared-kaplan
+      stake: [0.01, 0.02]
+      source: https://www.revenuememo.com/p/who-owns-anthropic
+      notes: "Chief Scientist; may have larger founder allocation"
 
-      i_eqSamMcCandlish:
-        holder: Sam McCandlish
-        stake: [0.01, 0.02]
-        source: https://www.revenuememo.com/p/who-owns-anthropic
+    sam-mccandlish:
+      holder: sam-mccandlish
+      stake: [0.01, 0.02]
+      source: https://www.revenuememo.com/p/who-owns-anthropic
 
-      i_eqJaanTallinn:
-        holder: Jaan Tallinn
-        entity_ref: E577
-        stake: [0.006, 0.017]
-        source: https://www.semafor.com/article/04/28/2023/co-founder-of-skype-invested-in-hot-ai-startups-but-thinks-he-failed
-        notes: "Led Series A; $100M+ invested across AI companies. Range reflects dilution across 15+ subsequent rounds."
+    jaan-tallinn:
+      holder: jaan-tallinn
+      stake: [0.006, 0.017]
+      source: https://www.semafor.com/article/04/28/2023/co-founder-of-skype-invested-in-hot-ai-startups-but-thinks-he-failed
+      notes: "Led Series A; $100M+ invested across AI companies. Range reflects dilution across 15+ subsequent rounds."
 
-      i_eqDustinMoskovitz:
-        holder: Dustin Moskovitz
-        entity_ref: E436
-        stake: [0.008, 0.025]
-        notes: "$500M stake transferred to nonprofit vehicle (Good Ventures)"
-        source: https://fortune.com/2025/11/10/meet-the-millennial-meta-cofounder-and-his-wife-who-are-giving-away-20-billion/
+    dustin-moskovitz:
+      holder: dustin-moskovitz
+      stake: [0.008, 0.025]
+      notes: "$500M stake transferred to nonprofit vehicle (Good Ventures)"
+      source: https://fortune.com/2025/11/10/meet-the-millennial-meta-cofounder-and-his-wife-who-are-giving-away-20-billion/
 
-      i_eqEmployeePool:
-        holder: Employee equity pool
-        stake: [0.12, 0.18]
-        source: https://www.revenuememo.com/p/who-owns-anthropic
-        notes: "Aggregate; includes vested/unvested options and RSUs. Equity donation matching at 3:1 ratio (up to 50% pre-2025, 25% post-2024)."
+    employee-pool:
+      display_name: "Employee equity pool"
+      stake: [0.12, 0.18]
+      source: https://www.revenuememo.com/p/who-owns-anthropic
+      notes: "Aggregate; includes vested/unvested options and RSUs. Equity donation matching at 3:1 ratio (up to 50% pre-2025, 25% post-2024)."
 
-      i_eqGoogle:
-        holder: Google
-        stake: [0.13, 0.15]
-        source: https://www.datacenterdynamics.com/en/news/google-owns-14-percent-of-generative-ai-business-anthropic/
-        notes: "~14% per DCD reporting (Dec 2024). Total equity investment ~$3.3B across 3 rounds."
+    google:
+      display_name: "Google"
+      stake: [0.13, 0.15]
+      source: https://www.datacenterdynamics.com/en/news/google-owns-14-percent-of-generative-ai-business-anthropic/
+      notes: "~14% per DCD reporting (Dec 2024). Total equity investment ~$3.3B across 3 rounds."
 
-      i_eqAmazon:
-        holder: Amazon
-        stake: [0.06, 0.10]
-        source: https://www.geekwire.com/2025/amazon-deepens-anthropic-ties-with-equity-conversion-adding-billions-to-q1-profit/
-        notes: "Q1 2025: stake valued at $13.8B at ~$183B valuation (~7.5%). Convertible notes partially converted. Equity capped at <33%."
+    amazon:
+      display_name: "Amazon"
+      stake: [0.06, 0.10]
+      source: https://www.geekwire.com/2025/amazon-deepens-anthropic-ties-with-equity-conversion-adding-billions-to-q1-profit/
+      notes: "Q1 2025: stake valued at $13.8B at ~$183B valuation (~7.5%). Convertible notes partially converted. Equity capped at <33%."
 
-      i_eqMicrosoft:
-        holder: Microsoft
-        notes: "Up to $5B equity investment announced Nov 2025; exact converted stake TBD"
-        source: https://blogs.microsoft.com/blog/2025/11/18/microsoft-nvidia-and-anthropic-announce-strategic-partnerships/
+    microsoft:
+      holder: microsoft
+      notes: "Up to $5B equity investment announced Nov 2025; exact converted stake TBD"
+      source: https://blogs.microsoft.com/blog/2025/11/18/microsoft-nvidia-and-anthropic-announce-strategic-partnerships/
 
-      i_eqNvidia:
-        holder: Nvidia
-        notes: "Up to $10B equity investment announced Nov 2025; exact converted stake TBD"
-        source: https://www.cnbc.com/2025/11/18/anthropic-ai-azure-microsoft-nvidia.html
+    nvidia:
+      holder: nvidia
+      notes: "Up to $10B equity investment announced Nov 2025; exact converted stake TBD"
+      source: https://www.cnbc.com/2025/11/18/anthropic-ai-azure-microsoft-nvidia.html
 
-      i_eqInstitutional:
-        holder: "Other institutional"
-        source: https://www.revenuememo.com/p/who-owns-anthropic
-        notes: "Spark Capital, Menlo Ventures, Lightspeed, ICONIQ, Fidelity, GIC, Coatue, D.E. Shaw, Dragoneer, Founders Fund, MGX"
+    other-institutional:
+      display_name: "Other institutional"
+      source: https://www.revenuememo.com/p/who-owns-anthropic
+      notes: "Spark Capital, Menlo Ventures, Lightspeed, ICONIQ, Fidelity, GIC, Coatue, D.E. Shaw, Dragoneer, Founders Fund, MGX"
 
-  # ── Round Investments ──────────────────────────────────────────
-  # Links equity-holders to funding-rounds. Derives category, timing, amounts.
-  round-investments:
-    type: round-investment
-    entries:
-      # ── Founding ──
-      i_riDarioFounding:
-        investor: Dario Amodei
-        investor_ref: E91
-        round: i_founding
-        role: founder
-        stake_acquired: [0.08, 0.12]
-        notes: "CEO; largest founder allocation. Pre-dilution estimate based on typical AI startup founding splits."
-      i_riDanielaFounding:
-        investor: Daniela Amodei
-        investor_ref: E90
-        round: i_founding
-        role: founder
-        stake_acquired: [0.06, 0.10]
-        notes: "President; second-largest founder allocation"
-      i_riChrisOlahFounding:
-        investor: Chris Olah
-        investor_ref: E59
-        round: i_founding
-        role: founder
-        stake_acquired: [0.04, 0.08]
-        notes: "Interpretability research lead"
-      i_riJackClarkFounding:
-        investor: Jack Clark
-        round: i_founding
-        role: founder
-        stake_acquired: [0.04, 0.08]
-        notes: "Former OpenAI Policy Director; co-founded AI Index"
-      i_riTomBrownFounding:
-        investor: Tom Brown
-        round: i_founding
-        role: founder
-        stake_acquired: [0.04, 0.08]
-        notes: "GPT-3 lead author at OpenAI"
-      i_riJaredKaplanFounding:
-        investor: Jared Kaplan
-        round: i_founding
-        role: founder
-        stake_acquired: [0.04, 0.08]
-        notes: "Scaling laws pioneer; Johns Hopkins physics professor on leave"
-      i_riSamMcCandlishFounding:
-        investor: Sam McCandlish
-        round: i_founding
-        role: founder
-        stake_acquired: [0.04, 0.08]
-        notes: "Alignment researcher from OpenAI"
+  # ── Investments ──────────────────────────────────────────────────
+  # Individual investor participation in funding rounds.
+  investments:
+    # ── Founding ──
+    dario-amodei-founding:
+      investor: dario-amodei
+      round_name: Founding
+      date: "2021-01"
+      role: founder
+      stake_acquired: [0.08, 0.12]
+      notes: "CEO; largest founder allocation. Pre-dilution estimate based on typical AI startup founding splits."
+    daniela-amodei-founding:
+      investor: daniela-amodei
+      round_name: Founding
+      date: "2021-01"
+      role: founder
+      stake_acquired: [0.06, 0.10]
+      notes: "President; second-largest founder allocation"
+    chris-olah-founding:
+      investor: chris-olah
+      round_name: Founding
+      date: "2021-01"
+      role: founder
+      stake_acquired: [0.04, 0.08]
+      notes: "Interpretability research lead"
+    jack-clark-founding:
+      investor: jack-clark
+      round_name: Founding
+      date: "2021-01"
+      role: founder
+      stake_acquired: [0.04, 0.08]
+      notes: "Former OpenAI Policy Director; co-founded AI Index"
+    tom-brown-founding:
+      investor: tom-brown
+      round_name: Founding
+      date: "2021-01"
+      role: founder
+      stake_acquired: [0.04, 0.08]
+      notes: "GPT-3 lead author at OpenAI"
+    jared-kaplan-founding:
+      investor: jared-kaplan
+      round_name: Founding
+      date: "2021-01"
+      role: founder
+      stake_acquired: [0.04, 0.08]
+      notes: "Scaling laws pioneer; Johns Hopkins physics professor on leave"
+    sam-mccandlish-founding:
+      investor: sam-mccandlish
+      round_name: Founding
+      date: "2021-01"
+      role: founder
+      stake_acquired: [0.04, 0.08]
+      notes: "Alignment researcher from OpenAI"
 
-      # ── Seed ──
-      i_riTallinnSeed:
-        investor: Jaan Tallinn
-        investor_ref: E577
-        round: i_k7RmTe4nPQ
-        role: lead
-        source: https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems
-        notes: "Co-led seed with Moskovitz and Eric Schmidt. Individual amounts undisclosed; total seed estimated $10-30M."
-      i_riMoskovitzSeed:
-        investor: Dustin Moskovitz
-        investor_ref: E436
-        round: i_k7RmTe4nPQ
-        role: lead
-        source: https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems
-        notes: "Invested via personal portfolio; later transferred stake to Good Ventures nonprofit vehicle"
+    # ── Seed ──
+    tallinn-seed:
+      investor: jaan-tallinn
+      round_name: Seed
+      date: "2021-01"
+      role: lead
+      source: https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems
+      notes: "Co-led seed with Moskovitz and Eric Schmidt. Individual amounts undisclosed; total seed estimated $10-30M."
+    moskovitz-seed:
+      investor: dustin-moskovitz
+      round_name: Seed
+      date: "2021-01"
+      role: lead
+      source: https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems
+      notes: "Invested via personal portfolio; later transferred stake to Good Ventures nonprofit vehicle"
 
-      # ── Series A ($124M at $550M = ~22.5% dilution) ──
-      i_riTallinnSeriesA:
-        investor: Jaan Tallinn
-        investor_ref: E577
-        round: i_VImpFJfKiQ
-        amount: [40e6, 80e6]
-        stake_acquired: [0.07, 0.15]
-        role: lead
-        source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
-        notes: "Lead investor; exact allocation not disclosed. Stake estimate based on proportion of $124M round at $550M post-money."
-      i_riMoskovitzSeriesA:
-        investor: Dustin Moskovitz
-        investor_ref: E436
-        round: i_VImpFJfKiQ
-        amount: [15e6, 40e6]
-        role: participant
-        source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
+    # ── Series A ($124M at $550M = ~22.5% dilution) ──
+    tallinn-series-a:
+      investor: jaan-tallinn
+      round_name: Series A
+      date: "2021-05"
+      amount: [40e6, 80e6]
+      stake_acquired: [0.07, 0.15]
+      role: lead
+      source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
+      notes: "Lead investor; exact allocation not disclosed. Stake estimate based on proportion of $124M round at $550M post-money."
+    moskovitz-series-a:
+      investor: dustin-moskovitz
+      round_name: Series A
+      date: "2021-05"
+      amount: [15e6, 40e6]
+      role: participant
+      source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
 
-      # ── Google rounds ($3.3B total → ~14% current stake) ──
-      i_riGoogleInitial:
-        investor: Google
-        round: i_hR5cYm9tKQ
-        amount: 300e6
-        stake_acquired: 0.10
-        role: lead
-        conditions: "Google Cloud becomes preferred cloud provider for Anthropic"
-        source: https://news.crunchbase.com/ai-robotics/funding-ai-google-anthropic/
-        notes: "Well-documented ~10% stake for $300M. Included cloud partnership agreement."
-      i_riGoogleFollowOn:
-        investor: Google
-        round: i_U9En9RX4lg
-        amount: 2e9
-        role: lead
-        conditions: "Board observer seat; part of up-to-$2B commitment"
-        source: https://blog.google/technology/ai/google-anthropic-investment/
-        notes: "Largest single Google tranche"
-      i_riGoogleThird:
-        investor: Google
-        round: i_ihHzB8VnpQ
-        amount: 1e9
-        role: lead
-        source: https://www.cnbc.com/2025/01/22/google-agrees-to-new-1-billion-investment-in-anthropic.html
-        notes: "Brings total Google equity investment to ~$3.3B; current stake ~14%"
+    # ── Google rounds ($3.3B total → ~14% current stake) ──
+    google-initial:
+      display_name: "Google"
+      round_name: Google Initial
+      date: "2023-02"
+      amount: 300e6
+      stake_acquired: 0.10
+      role: lead
+      conditions: "Google Cloud becomes preferred cloud provider for Anthropic"
+      source: https://news.crunchbase.com/ai-robotics/funding-ai-google-anthropic/
+      notes: "Well-documented ~10% stake for $300M. Included cloud partnership agreement."
+    google-follow-on:
+      display_name: "Google"
+      round_name: Google Follow-on
+      date: "2023-10"
+      amount: 2e9
+      role: lead
+      conditions: "Board observer seat; part of up-to-$2B commitment"
+      source: https://blog.google/technology/ai/google-anthropic-investment/
+      notes: "Largest single Google tranche"
+    google-third:
+      display_name: "Google"
+      round_name: Google Additional
+      date: "2025-01"
+      amount: 1e9
+      role: lead
+      source: https://www.cnbc.com/2025/01/22/google-agrees-to-new-1-billion-investment-in-anthropic.html
+      notes: "Brings total Google equity investment to ~$3.3B; current stake ~14%"
 
-      # ── Amazon rounds ($8B total as convertible notes → ~7.5% converted) ──
-      i_riAmazonFirst:
-        investor: Amazon
-        round: i_ndAluFEJAQ
-        amount: 1.25e9
-        role: lead
-        conditions: "AWS becomes primary cloud and training partner. Anthropic uses AWS Trainium/Inferentia chips. Project Rainier: 30 data centers in Indiana (~$11B+ AWS infrastructure)."
-        source: https://press.aboutamazon.com/2023/9/amazon-and-anthropic-announce-strategic-collaboration
-        notes: "First tranche of up-to-$4B commitment. Structured as convertible notes; equity capped at <33%."
-      i_riAmazonSecond:
-        investor: Amazon
-        round: i_05J6ESa7gA
-        amount: 2.75e9
-        role: lead
-        conditions: "Continuation of AWS primary cloud partnership and convertible note structure"
-        source: https://www.aboutamazon.com/news/aws/amazon-invests-additional-4-billion-anthropic-ai
-        notes: "Completing initial $4B commitment. Convertible notes; partial conversion to equity in Q1 2025."
-      i_riAmazonThird:
-        investor: Amazon
-        round: i_xzJjSXceVA
-        amount: 4e9
-        role: lead
-        conditions: "Same convertible note structure; equity stake capped at <33% to preserve Anthropic independence"
-        source: https://www.cnbc.com/2024/11/22/amazon-to-invest-another-4-billion-in-anthropic-openais-biggest-rival.html
-        notes: "Brings total Amazon investment to $8B. Q1 2025: stake valued at $13.8B."
+    # ── Amazon rounds ($8B total as convertible notes → ~7.5% converted) ──
+    amazon-first:
+      display_name: "Amazon"
+      round_name: Amazon Initial
+      date: "2023-09"
+      amount: 1.25e9
+      role: lead
+      conditions: "AWS becomes primary cloud and training partner. Anthropic uses AWS Trainium/Inferentia chips. Project Rainier: 30 data centers in Indiana (~$11B+ AWS infrastructure)."
+      source: https://press.aboutamazon.com/2023/9/amazon-and-anthropic-announce-strategic-collaboration
+      notes: "First tranche of up-to-$4B commitment. Structured as convertible notes; equity capped at <33%."
+    amazon-second:
+      display_name: "Amazon"
+      round_name: Amazon Second Tranche
+      date: "2024-03"
+      amount: 2.75e9
+      role: lead
+      conditions: "Continuation of AWS primary cloud partnership and convertible note structure"
+      source: https://www.aboutamazon.com/news/aws/amazon-invests-additional-4-billion-anthropic-ai
+      notes: "Completing initial $4B commitment. Convertible notes; partial conversion to equity in Q1 2025."
+    amazon-third:
+      display_name: "Amazon"
+      round_name: Amazon Third Tranche
+      date: "2024-11"
+      amount: 4e9
+      role: lead
+      conditions: "Same convertible note structure; equity stake capped at <33% to preserve Anthropic independence"
+      source: https://www.cnbc.com/2024/11/22/amazon-to-invest-another-4-billion-in-anthropic-openais-biggest-rival.html
+      notes: "Brings total Amazon investment to $8B. Q1 2025: stake valued at $13.8B."
 
-      # ── Microsoft/Nvidia strategic partnership ──
-      i_riMicrosoftPartnership:
-        investor: Microsoft
-        round: i_Qci9UDdgkw
-        amount: 5e9
-        role: lead
-        conditions: "Anthropic commits to purchasing $30B of Azure compute capacity. Claude available on Azure via Microsoft Foundry. Up to 1GW compute capacity."
-        source: https://blogs.microsoft.com/blog/2025/11/18/microsoft-nvidia-and-anthropic-announce-strategic-partnerships/
-        notes: "Up to $5B equity. Tied to massive Azure compute purchase agreement. Makes Claude available on all 3 major clouds."
-      i_riNvidiaPartnership:
-        investor: Nvidia
-        round: i_Qci9UDdgkw
-        amount: 10e9
-        role: participant
-        conditions: "Anthropic commits to 1GW compute capacity with Nvidia Grace Blackwell and Vera Rubin systems. Joint engineering optimization."
-        source: https://www.cnbc.com/2025/11/18/anthropic-ai-azure-microsoft-nvidia.html
-        notes: "Up to $10B equity. Includes joint optimization of Nvidia architectures for Anthropic's workloads."
+    # ── Microsoft/Nvidia strategic partnership ──
+    microsoft-partnership:
+      investor: microsoft
+      round_name: Microsoft/Nvidia Partnership
+      date: "2025-11"
+      amount: 5e9
+      role: lead
+      conditions: "Anthropic commits to purchasing $30B of Azure compute capacity. Claude available on Azure via Microsoft Foundry. Up to 1GW compute capacity."
+      source: https://blogs.microsoft.com/blog/2025/11/18/microsoft-nvidia-and-anthropic-announce-strategic-partnerships/
+      notes: "Up to $5B equity. Tied to massive Azure compute purchase agreement. Makes Claude available on all 3 major clouds."
+    nvidia-partnership:
+      investor: nvidia
+      round_name: Microsoft/Nvidia Partnership
+      date: "2025-11"
+      amount: 10e9
+      role: participant
+      conditions: "Anthropic commits to 1GW compute capacity with Nvidia Grace Blackwell and Vera Rubin systems. Joint engineering optimization."
+      source: https://www.cnbc.com/2025/11/18/anthropic-ai-azure-microsoft-nvidia.html
+      notes: "Up to $10B equity. Includes joint optimization of Nvidia architectures for Anthropic's workloads."
 
-  # ── Charitable Pledges ─────────────────────────────────────────
-  # Pledge values are decimals (0.8 = 80%). Use [min, max] arrays for ranges.
-  # Only stakeholders with charitable commitments are listed here.
+  # ── Charitable Pledges ───────────────────────────────────────────
+  # Pledge values are decimals (0.8 = 80%). Pledger is an entity ref where available.
   charitable-pledges:
-    type: charitable-pledge
-    entries:
-      i_plDarioAmodei:
-        pledger: Dario Amodei
-        entity_ref: E91
-        pledge: 0.8
-        source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-        notes: "All 7 co-founders pledged 80% of wealth in Jan 2026 (~$49B combined). GWWC signatory; early GiveWell supporter."
+    dario-amodei:
+      pledger: dario-amodei
+      pledge: 0.8
+      source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
+      notes: "All 7 co-founders pledged 80% of wealth in Jan 2026 (~$49B combined). GWWC signatory; early GiveWell supporter."
 
-      i_plDanielaAmodei:
-        pledger: Daniela Amodei
-        entity_ref: E90
-        pledge: 0.8
-        source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-        notes: "Part of co-founder 80% pledge. Married to Holden Karnofsky (GiveWell co-founder)."
+    daniela-amodei:
+      pledger: daniela-amodei
+      pledge: 0.8
+      source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
+      notes: "Part of co-founder 80% pledge. Married to Holden Karnofsky (GiveWell co-founder)."
 
-      i_plChrisOlah:
-        pledger: Chris Olah
-        entity_ref: E59
-        pledge: 0.8
-        source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-        notes: "Part of co-founder 80% pledge. Participated in EA events; safety-focused."
+    chris-olah:
+      pledger: chris-olah
+      pledge: 0.8
+      source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
+      notes: "Part of co-founder 80% pledge. Participated in EA events; safety-focused."
 
-      i_plJackClark:
-        pledger: Jack Clark
-        pledge: 0.8
-        source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-        notes: "Part of co-founder 80% pledge."
+    jack-clark:
+      pledger: jack-clark
+      pledge: 0.8
+      source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
+      notes: "Part of co-founder 80% pledge."
 
-      i_plTomBrown:
-        pledger: Tom Brown
-        pledge: 0.8
-        source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-        notes: "Part of co-founder 80% pledge."
+    tom-brown:
+      pledger: tom-brown
+      pledge: 0.8
+      source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
+      notes: "Part of co-founder 80% pledge."
 
-      i_plJaredKaplan:
-        pledger: Jared Kaplan
-        pledge: 0.8
-        source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-        notes: "Part of co-founder 80% pledge."
+    jared-kaplan:
+      pledger: jared-kaplan
+      pledge: 0.8
+      source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
+      notes: "Part of co-founder 80% pledge."
 
-      i_plSamMcCandlish:
-        pledger: Sam McCandlish
-        pledge: 0.8
-        source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
-        notes: "Part of co-founder 80% pledge."
+    sam-mccandlish:
+      pledger: sam-mccandlish
+      pledge: 0.8
+      source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
+      notes: "Part of co-founder 80% pledge."
 
-      i_plJaanTallinn:
-        pledger: Jaan Tallinn
-        entity_ref: E577
-        pledge: 0.9
-        source: https://www.givingwhatwecan.org/
-        notes: "Major AI safety funder; GWWC member"
+    jaan-tallinn:
+      pledger: jaan-tallinn
+      pledge: 0.9
+      source: https://www.givingwhatwecan.org/
+      notes: "Major AI safety funder; GWWC member"
 
-      i_plDustinMoskovitz:
-        pledger: Dustin Moskovitz
-        entity_ref: E436
-        pledge: 0.95
-        source: https://givingpledge.org/
-        notes: "$500M already in Good Ventures nonprofit vehicle"
+    dustin-moskovitz:
+      pledger: dustin-moskovitz
+      pledge: 0.95
+      source: https://givingpledge.org/
+      notes: "$500M already in Good Ventures nonprofit vehicle"
 
-      i_plEmployeePool:
-        pledger: Employee equity pool
-        pledge: [0.25, 0.5]
-        source: https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors
-        notes: "Pledge rates vary: pre-2025 hires up to 50% with 3:1 match; post-2024 hires 25% with 1:1 match. Equity transferred to DAFs. Legally binding once transferred."
+    employee-pool:
+      display_name: "Employee equity pool"
+      pledge: [0.25, 0.5]
+      source: https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors
+      notes: "Pledge rates vary: pre-2025 hires up to 50% with 3:1 match; post-2024 hires 25% with 1:1 match. Equity transferred to DAFs. Legally binding once transferred."
 
   # ── Funding Rounds ──────────────────────────────────────────────
   funding-rounds:
-    type: funding-round
-    entries:
-      i_founding:
-        name: Founding
-        date: 2021-01
-        instrument: founding
-        notes: "Company incorporation; initial equity allocation to 7 co-founders. ~60-70% total equity to founders pre-dilution."
+    founding:
+      name: Founding
+      date: "2021-01"
+      instrument: founding
+      notes: "Company incorporation; initial equity allocation to 7 co-founders. ~60-70% total equity to founders pre-dilution."
 
-      i_k7RmTe4nPQ:
-        name: Seed
-        date: 2021-01
-        instrument: equity
-        lead_investor: "Tallinn, Moskovitz, Eric Schmidt"
-        source: https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems
-        notes: "Seed round; amount undisclosed (estimated $10-30M based on typical AI startup seeds of this era). Seed investors named in Series A announcement."
+    seed:
+      name: Seed
+      date: "2021-01"
+      instrument: equity
+      lead_investor: "Tallinn, Moskovitz, Eric Schmidt"
+      source: https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems
+      notes: "Seed round; amount undisclosed (estimated $10-30M based on typical AI startup seeds of this era). Seed investors named in Series A announcement."
 
-      i_VImpFJfKiQ:
-        name: Series A
-        date: 2021-05
-        amount: 124e6
-        valuation: 550e6
-        instrument: equity
-        lead_investor: jaan-tallinn
-        source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
-        notes: "Jaan Tallinn led, Dustin Moskovitz and Eric Schmidt participated. ~22.5% dilution ($124M / $550M post-money)."
+    series-a:
+      name: Series A
+      date: "2021-05"
+      raised: 124e6
+      valuation: 550e6
+      instrument: equity
+      lead_investor: jaan-tallinn
+      source: https://techcrunch.com/2021/05/05/anthropic-raises-124m-to-build-safer-ai/
+      notes: "Jaan Tallinn led, Dustin Moskovitz and Eric Schmidt participated. ~22.5% dilution ($124M / $550M post-money)."
 
-      i_Xdb6KUs2og:
-        name: Series B
-        date: 2022-04
-        amount: 580e6
-        valuation: 4e9
-        instrument: equity
-        lead_investor: spark-capital
-        source: https://fortune.com/2022/04/29/ai-startup-anthropic-raises-580-million/
-        notes: "Led by Spark Capital. ~14.5% dilution."
+    series-b:
+      name: Series B
+      date: "2022-04"
+      raised: 580e6
+      valuation: 4e9
+      instrument: equity
+      lead_investor: spark-capital
+      source: https://fortune.com/2022/04/29/ai-startup-anthropic-raises-580-million/
+      notes: "Led by Spark Capital. ~14.5% dilution."
 
-      i_wQ8pNx3vJA:
-        name: FTX Investment
-        date: 2022-04
-        amount: 500e6
-        instrument: equity
-        lead_investor: ftx
-        source: https://www.cnbc.com/2024/03/25/ftx-estate-sells-majority-stake-in-startup-anthropic-for-884-million.html
-        notes: "Part of $580M Series B led by SBF. FTX held ~8% stake; sold in bankruptcy for ~$884M in March 2024 to 24 institutional investors (Jane Street, Fidelity, etc.). FTX estate's most profitable asset."
+    ftx-investment:
+      name: FTX Investment
+      date: "2022-04"
+      raised: 500e6
+      instrument: equity
+      lead_investor: ftx
+      source: https://www.cnbc.com/2024/03/25/ftx-estate-sells-majority-stake-in-startup-anthropic-for-884-million.html
+      notes: "Part of $580M Series B led by SBF. FTX held ~8% stake; sold in bankruptcy for ~$884M in March 2024 to 24 institutional investors (Jane Street, Fidelity, etc.). FTX estate's most profitable asset."
 
-      i_hR5cYm9tKQ:
-        name: Google Initial
-        date: 2023-02
-        amount: 300e6
-        instrument: equity
-        lead_investor: google
-        source: https://news.crunchbase.com/ai-robotics/funding-ai-google-anthropic/
-        notes: "Initial Google investment for ~10% stake. Reported February 2023. Included Google Cloud partnership."
+    google-initial:
+      name: Google Initial
+      date: "2023-02"
+      raised: 300e6
+      instrument: equity
+      lead_investor: google
+      source: https://news.crunchbase.com/ai-robotics/funding-ai-google-anthropic/
+      notes: "Initial Google investment for ~10% stake. Reported February 2023. Included Google Cloud partnership."
 
-      i_aJCVQbfceQ:
-        name: Bridge Round
-        date: 2023-05
-        amount: 450e6
-        valuation: 4.1e9
-        instrument: equity
-        source: https://fortune.com/2023/05/25/anthropic-raises-450-million/
-        notes: "Led by Spark Capital"
+    bridge-round:
+      name: Bridge Round
+      date: "2023-05"
+      raised: 450e6
+      valuation: 4.1e9
+      instrument: equity
+      source: https://fortune.com/2023/05/25/anthropic-raises-450-million/
+      notes: "Led by Spark Capital"
 
-      i_ndAluFEJAQ:
-        name: Amazon Initial
-        date: 2023-09
-        amount: 1.25e9
-        instrument: convertible-note
-        lead_investor: amazon
-        source: https://press.aboutamazon.com/2023/9/amazon-and-anthropic-announce-strategic-collaboration
-        notes: "First tranche of up-to-$4B commitment. Convertible note structure; equity capped at <33%. AWS becomes primary cloud and training partner."
+    amazon-initial:
+      name: Amazon Initial
+      date: "2023-09"
+      raised: 1.25e9
+      instrument: convertible-note
+      lead_investor: amazon
+      source: https://press.aboutamazon.com/2023/9/amazon-and-anthropic-announce-strategic-collaboration
+      notes: "First tranche of up-to-$4B commitment. Convertible note structure; equity capped at <33%. AWS becomes primary cloud and training partner."
 
-      i_U9En9RX4lg:
-        name: Google Follow-on
-        date: 2023-10
-        amount: 2e9
-        instrument: equity
-        lead_investor: google
-        source: https://blog.google/technology/ai/google-anthropic-investment/
-        notes: "Part of up-to-$2B commitment; board observer seat. Largest single Google tranche."
+    google-follow-on:
+      name: Google Follow-on
+      date: "2023-10"
+      raised: 2e9
+      instrument: equity
+      lead_investor: google
+      source: https://blog.google/technology/ai/google-anthropic-investment/
+      notes: "Part of up-to-$2B commitment; board observer seat. Largest single Google tranche."
 
-      i_05J6ESa7gA:
-        name: Amazon Second Tranche
-        date: 2024-03
-        amount: 2.75e9
-        instrument: convertible-note
-        lead_investor: amazon
-        source: https://www.aboutamazon.com/news/aws/amazon-invests-additional-4-billion-anthropic-ai
-        sourceResource: 3dde9794b9713369
-        notes: "Completing initial $4B commitment. Convertible notes; partially converted to equity in Q1 2025."
+    amazon-second-tranche:
+      name: Amazon Second Tranche
+      date: "2024-03"
+      raised: 2.75e9
+      instrument: convertible-note
+      lead_investor: amazon
+      source: https://www.aboutamazon.com/news/aws/amazon-invests-additional-4-billion-anthropic-ai
+      notes: "Completing initial $4B commitment. Convertible notes; partially converted to equity in Q1 2025."
 
-      i_ubgY3jW3mg:
-        name: Menlo Round (Series D)
-        date: 2024-02
-        amount: 750e6
-        valuation: 18.4e9
-        instrument: equity
-        lead_investor: menlo-ventures
-        source: https://fortune.com/2024/02/20/anthropic-750-million-funding/
-        notes: "Led by Menlo Ventures. Talks reported Dec 2023; closed Feb 2024. ~4.1% dilution."
+    series-d:
+      name: Menlo Round (Series D)
+      date: "2024-02"
+      raised: 750e6
+      valuation: 18.4e9
+      instrument: equity
+      lead_investor: menlo-ventures
+      source: https://fortune.com/2024/02/20/anthropic-750-million-funding/
+      notes: "Led by Menlo Ventures. Talks reported Dec 2023; closed Feb 2024. ~4.1% dilution."
 
-      i_xzJjSXceVA:
-        name: Amazon Third Tranche
-        date: 2024-11
-        amount: 4e9
-        instrument: convertible-note
-        lead_investor: amazon
-        source: https://www.cnbc.com/2024/11/22/amazon-to-invest-another-4-billion-in-anthropic-openais-biggest-rival.html
-        notes: "Brings total Amazon investment to $8B. Convertible notes."
+    amazon-third-tranche:
+      name: Amazon Third Tranche
+      date: "2024-11"
+      raised: 4e9
+      instrument: convertible-note
+      lead_investor: amazon
+      source: https://www.cnbc.com/2024/11/22/amazon-to-invest-another-4-billion-in-anthropic-openais-biggest-rival.html
+      notes: "Brings total Amazon investment to $8B. Convertible notes."
 
-      i_ihHzB8VnpQ:
-        name: Google Additional
-        date: 2025-01
-        amount: 1e9
-        instrument: equity
-        lead_investor: google
-        source: https://www.cnbc.com/2025/01/22/google-agrees-to-new-1-billion-investment-in-anthropic.html
-        sourceResource: ac6cbd8d06bd1b94
-        notes: "Brings total Google equity investment to ~$3.3B; current stake ~14%"
+    google-additional:
+      name: Google Additional
+      date: "2025-01"
+      raised: 1e9
+      instrument: equity
+      lead_investor: google
+      source: https://www.cnbc.com/2025/01/22/google-agrees-to-new-1-billion-investment-in-anthropic.html
+      notes: "Brings total Google equity investment to ~$3.3B; current stake ~14%"
 
-      i_guKCmeQaTw:
-        name: Series E
-        date: 2025-03
-        amount: 3.5e9
-        valuation: 61.5e9
-        instrument: equity
-        lead_investor: lightspeed
-        source: https://www.anthropic.com/news/series-e
-        notes: "Led by Lightspeed Venture Partners. ~5.7% dilution."
+    series-e:
+      name: Series E
+      date: "2025-03"
+      raised: 3.5e9
+      valuation: 61.5e9
+      instrument: equity
+      lead_investor: lightspeed
+      source: https://www.anthropic.com/news/anthropic-raises-series-e-at-usd61-5b-post-money-valuation
+      notes: "Led by Lightspeed Venture Partners. ~5.7% dilution."
 
-      i_R6dd3cZH8A:
-        name: Series F
-        date: 2025-09
-        amount: 13e9
-        valuation: 183e9
-        instrument: equity
-        lead_investor: iconiq
-        source: https://www.anthropic.com/news/series-f
-        notes: "Led by ICONIQ, Fidelity, Lightspeed. ARR had reached $4B. ~7.1% dilution."
+    series-f:
+      name: Series F
+      date: "2025-09"
+      raised: 13e9
+      valuation: 183e9
+      instrument: equity
+      lead_investor: iconiq
+      source: https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation
+      notes: "Led by ICONIQ, Fidelity, Lightspeed. ARR had reached $4B. ~7.1% dilution."
 
-      i_Qci9UDdgkw:
-        name: Microsoft/Nvidia Partnership
-        date: 2025-11
-        amount: 15e9
-        instrument: strategic-partnership
-        notes: "Microsoft up to $5B equity + Nvidia up to $10B equity. Tied to $30B Azure compute purchase and 1GW Nvidia compute commitment. Makes Claude available on all 3 major clouds. Valuation ~$350B."
-        source: https://blogs.microsoft.com/blog/2025/11/18/microsoft-nvidia-and-anthropic-announce-strategic-partnerships/
+    msft-nvidia-partnership:
+      name: Microsoft/Nvidia Partnership
+      date: "2025-11"
+      raised: 15e9
+      instrument: strategic-partnership
+      notes: "Microsoft up to $5B equity + Nvidia up to $10B equity. Tied to $30B Azure compute purchase and 1GW Nvidia compute commitment. Makes Claude available on all 3 major clouds. Valuation ~$350B."
+      source: https://blogs.microsoft.com/blog/2025/11/18/microsoft-nvidia-and-anthropic-announce-strategic-partnerships/
 
-      i_OVNz9C3XUA:
-        name: Series G
-        date: 2026-02
-        amount: 30e9
-        valuation: 380e9
-        instrument: equity
-        lead_investor: gic
-        source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-        sourceResource: 8e3ff50b9ef2a1a8
-        notes: "Led by GIC and Coatue; co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, MGX. Second-largest venture deal ever. ARR ~$14B."
+    series-g:
+      name: Series G
+      date: "2026-02"
+      raised: 30e9
+      valuation: 380e9
+      instrument: equity
+      lead_investor: gic
+      source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
+      notes: "Led by GIC and Coatue; co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, MGX. Second-largest venture deal ever. ARR ~$14B."
 
-  # ── Key People ──────────────────────────────────────────────────
-  key-people:
-    type: key-person
-    entries:
-      i_Xp9vKZzBsg:
-        person: !ref zR4nW8xB2f:dario-amodei
-        title: CEO
-        start: 2021-01
-        is_founder: true
-        source: https://anthropic.com/company
+  # ── Key Persons ─────────────────────────────────────────────────
+  key-persons:
+    dario-amodei:
+      person: dario-amodei
+      title: CEO
+      start: "2021-01"
+      is_founder: true
+      source: https://anthropic.com/company
 
-      i_tvfFyLStkg:
-        person: !ref tKMznr07QA:daniela-amodei
-        title: President
-        start: 2021-01
-        is_founder: true
-        source: https://anthropic.com/company
+    daniela-amodei:
+      person: daniela-amodei
+      title: President
+      start: "2021-01"
+      is_founder: true
+      source: https://anthropic.com/company
 
-      i_eKbtDictxQ:
-        person: !ref Tz48rTriBg:chris-olah
-        title: "Research Lead, Mechanistic Interpretability"
-        start: 2021-01
-        is_founder: true
-        source: https://transformer-circuits.pub/
-        sourceResource: 5083d746c2728ff2
+    chris-olah:
+      person: chris-olah
+      title: "Research Lead, Mechanistic Interpretability"
+      start: "2021-01"
+      is_founder: true
+      source: https://transformer-circuits.pub/
 
-      i_Lk0hINDSpw:
-        person: tom-brown
-        title: "Co-founder"
-        start: 2021-01
-        is_founder: true
-        notes: "GPT-3 lead author"
+    tom-brown:
+      person: tom-brown
+      title: "Co-founder"
+      start: "2021-01"
+      is_founder: true
+      notes: "GPT-3 lead author"
 
-      i_EFDvzcu8rA:
-        person: jack-clark
-        title: "Co-founder, Head of Policy"
-        start: 2021-01
-        is_founder: true
-        notes: "Former Policy Director at OpenAI"
+    jack-clark:
+      person: jack-clark
+      title: "Co-founder, Head of Policy"
+      start: "2021-01"
+      is_founder: true
+      notes: "Former Policy Director at OpenAI"
 
-      i_Ns0Mp2JRlA:
-        person: jared-kaplan
-        title: "Co-founder, Chief Science Officer"
-        start: 2021-01
-        is_founder: true
-        notes: "Scaling laws pioneer; Johns Hopkins physicist"
+    jared-kaplan:
+      person: jared-kaplan
+      title: "Co-founder, Chief Science Officer"
+      start: "2021-01"
+      is_founder: true
+      notes: "Scaling laws pioneer; Johns Hopkins physicist"
 
-      i_TWtarm0lDQ:
-        person: sam-mccandlish
-        title: "Co-founder, Chief Architect"
-        start: 2021-01
-        is_founder: true
-        notes: "Originally CTO, transitioned to Chief Architect Oct 2025"
+    sam-mccandlish:
+      person: sam-mccandlish
+      title: "Co-founder, Chief Architect"
+      start: "2021-01"
+      is_founder: true
+      notes: "Originally CTO, transitioned to Chief Architect Oct 2025"
 
-      i_XJb55cQ6zg:
-        person: !ref hQ7mR2kN5p:jan-leike
-        title: "Head of Alignment Science"
-        start: 2024-05
-        source: https://anthropic.com/news/jan-leike-joins-anthropic
-        notes: "Joined after resigning from OpenAI where he co-led Superalignment team"
+    jan-leike:
+      person: jan-leike
+      title: "Head of Alignment Science"
+      start: "2024-05"
+      source: https://anthropic.com/news/jan-leike-joins-anthropic
+      notes: "Joined after resigning from OpenAI where he co-led Superalignment team"
 
-      i_wvLsn13YrA:
-        person: krishna-rao
-        title: "Chief Financial Officer"
-        start: 2024-05
-        notes: "Anthropic's first CFO"
+    krishna-rao:
+      person: krishna-rao
+      title: "Chief Financial Officer"
+      start: "2024-05"
+      notes: "Anthropic's first CFO"
 
-      i_RCJrXJknCA:
-        person: mike-krieger
-        title: "Chief Product Officer"
-        start: 2024-05
-        end: 2025-08
-        source: https://www.theverge.com/2024/5/14/24157180/anthropic-mike-krieger-chief-product-officer
-        notes: "Co-founder of Instagram; departed CPO role to lead Anthropic Labs"
+    mike-krieger:
+      person: mike-krieger
+      title: "Chief Product Officer"
+      start: "2024-05"
+      end: "2025-08"
+      source: https://www.theverge.com/2024/5/14/24157180/anthropic-mike-krieger-chief-product-officer
+      notes: "Co-founder of Instagram; departed CPO role to lead Anthropic Labs"
 
-      i_e0Tv72Q8kA:
-        person: rahul-patil
-        title: "Chief Technology Officer"
-        start: 2025-10
-        source: https://techcrunch.com/2025/10/02/anthropic-hires-new-cto-with-focus-on-ai-infrastructure/
-        notes: "Former CTO of Stripe"
+    rahul-patil:
+      person: rahul-patil
+      title: "Chief Technology Officer"
+      start: "2025-10"
+      source: https://techcrunch.com/2025/10/02/anthropic-hires-new-cto-with-focus-on-ai-infrastructure/
+      notes: "Former CTO of Stripe"
 
-      i_5G7AaSZWng:
-        person: holden-karnofsky
-        title: "Member of Technical Staff"
-        start: 2025-01
-        notes: "Works on responsible scaling policy; co-founder of GiveWell"
+    holden-karnofsky:
+      person: holden-karnofsky
+      title: "Member of Technical Staff"
+      start: "2025-01"
+      notes: "Works on responsible scaling policy; co-founder of GiveWell"
 
-      i_HnzealKCMQ:
-        person: chris-ciauri
-        title: "Managing Director, International"
-        start: 2025-09
-        source: https://www.anthropic.com/news/anthropic-expands-global-leadership-in-enterprise-ai-naming-chris-ciauri-as-managing-director-of
-        sourceResource: e51a9f82540a1841
-        notes: "Former Google/Salesforce executive; leads international expansion"
+    chris-ciauri:
+      person: chris-ciauri
+      title: "Managing Director, International"
+      start: "2025-09"
+      source: https://www.anthropic.com/news/anthropic-expands-global-leadership-in-enterprise-ai-naming-chris-ciauri-as-managing-director-of
+      notes: "Former Google/Salesforce executive; leads international expansion"
 
-      i_ARzSHznWcw:
-        person: john-schulman
-        title: "Research Scientist"
-        start: 2024-08
-        notes: "OpenAI co-founder; inventor of PPO reinforcement learning algorithm"
+    john-schulman:
+      person: john-schulman
+      title: "Research Scientist"
+      start: "2024-08"
+      notes: "OpenAI co-founder; inventor of PPO reinforcement learning algorithm"
 
-      i_5LFa0eBXxg:
-        person: mrinank-sharma
-        title: "Head of Safeguards Research"
-        start: 2023-01
-        end: 2026-02
-        source: https://americanbazaaronline.com/2026/02/10/anthropic-ai-safety-researcher-mrinank-sharma-resigns-474827/
-        notes: "Resigned citing ethical concerns; wrote 'the world is in peril'; plans to study poetry"
+    mrinank-sharma:
+      person: mrinank-sharma
+      title: "Head of Safeguards Research"
+      start: "2023-01"
+      end: "2026-02"
+      source: https://americanbazaaronline.com/2026/02/10/anthropic-ai-safety-researcher-mrinank-sharma-resigns-474827/
+      notes: "Resigned citing ethical concerns; wrote 'the world is in peril'; plans to study poetry"
 
   # ── Products ────────────────────────────────────────────────────
   products:
-    type: product
-    entries:
-      i_C79aI0wAYQ:
-        name: Claude API
-        launched: 2023-03
-        description: "Developer API for programmatic access to Claude models"
-        source: https://console.anthropic.com
+    claude-api:
+      name: Claude API
+      launched: "2023-03"
+      description: "Developer API for programmatic access to Claude models"
+      source: https://console.anthropic.com
 
-      i_iX8lF0xLHw:
-        name: Claude.ai
-        launched: 2023-07
-        description: "Consumer-facing AI assistant web application"
-        source: https://claude.ai
+    claude-ai:
+      name: Claude.ai
+      launched: "2023-07"
+      description: "Consumer-facing AI assistant web application"
+      source: https://claude.ai
 
-      i_oaiWrqjP9g:
-        name: Claude for Enterprise
-        launched: 2024-03
-        description: "Enterprise tier with team management, SSO, and longer context"
-        source: https://www.anthropic.com/news/claude-for-enterprise
+    claude-enterprise:
+      name: Claude for Enterprise
+      launched: "2024-03"
+      description: "Enterprise tier with team management, SSO, and longer context"
+      source: https://www.anthropic.com/news/claude-for-enterprise
 
-      i_lNOqVX04Aw:
-        name: Artifacts
-        launched: 2024-06
-        description: "In-chat content creation and preview feature"
-        source: https://www.anthropic.com/news/claude-3-5-sonnet
-        sourceResource: e91e6f80eaaceb58
+    artifacts:
+      name: Artifacts
+      launched: "2024-06"
+      description: "In-chat content creation and preview feature"
+      source: https://www.anthropic.com/news/claude-3-5-sonnet
 
-      i_WQYrxcbW3A:
-        name: Computer Use
-        launched: 2024-10
-        description: "Beta feature allowing Claude to control computer interfaces"
-        source: https://www.anthropic.com/news/3-5-models-and-computer-use
-        sourceResource: 9e4ef9c155b6d9f3
+    computer-use:
+      name: Computer Use
+      launched: "2024-10"
+      description: "Beta feature allowing Claude to control computer interfaces"
+      source: https://www.anthropic.com/news/3-5-models-and-computer-use
 
-      i_092nWs831A:
-        name: Model Context Protocol (MCP)
-        launched: 2024-11
-        description: "Open standard for LLM-tool integration; donated to Linux Foundation's AAIF Dec 2025"
-        source: https://www.anthropic.com/news/model-context-protocol
-        sourceResource: e283b9c34207eff8
+    mcp:
+      name: Model Context Protocol (MCP)
+      launched: "2024-11"
+      description: "Open standard for LLM-tool integration; donated to Linux Foundation's AAIF Dec 2025"
+      source: https://www.anthropic.com/news/model-context-protocol
 
-      i_5ZyixnNTeg:
-        name: Claude Code
-        launched: 2025-02
-        description: "Agentic CLI coding tool; reached $1B ARR in Nov 2025, $2.5B by Feb 2026"
-        source: https://docs.anthropic.com/en/docs/claude-code
+    claude-code:
+      name: Claude Code
+      launched: "2025-02"
+      description: "Agentic CLI coding tool; reached $1B ARR in Nov 2025, $2.5B by Feb 2026"
+      source: https://docs.anthropic.com/en/docs/claude-code
 
-      i_OrCWmtXsdg:
-        name: Claude Max
-        launched: 2025-04
-        description: "$100-200/month subscription tiers with 5x-20x Pro usage limits"
-        source: https://techcrunch.com/2025/04/09/anthropic-rolls-out-a-200-per-month-claude-subscription/
+    claude-max:
+      name: Claude Max
+      launched: "2025-04"
+      description: "$100-200/month subscription tiers with 5x-20x Pro usage limits"
+      source: https://techcrunch.com/2025/04/09/anthropic-rolls-out-a-200-per-month-claude-subscription/
 
   # ── Model Releases ──────────────────────────────────────────────
   model-releases:
-    type: model-release
-    entries:
-      i_kosYNc623g:
-        name: Claude 1
-        released: 2023-03
-        description: "Initial Claude model release"
-        safety_level: ASL-2
+    claude-1:
+      name: Claude 1
+      released: "2023-03"
+      description: "Initial Claude model release"
+      safety_level: ASL-2
 
-      i_mhtHMtUe9Q:
-        name: Claude 2
-        released: 2023-07
-        description: "Major capability upgrade"
-        safety_level: ASL-2
+    claude-2:
+      name: Claude 2
+      released: "2023-07"
+      description: "Major capability upgrade"
+      safety_level: ASL-2
 
-      i_dLbP7mwu9w:
-        name: "Claude 3 (Haiku, Sonnet, Opus)"
-        released: 2024-03
-        description: "Three-tier model family; Opus was most capable model at launch"
-        safety_level: ASL-2
-        source: https://www.anthropic.com/news/claude-3-family
-        sourceResource: a2cf0d0271acb097
+    claude-3:
+      name: "Claude 3 (Haiku, Sonnet, Opus)"
+      released: "2024-03"
+      description: "Three-tier model family; Opus was most capable model at launch"
+      safety_level: ASL-2
+      source: https://www.anthropic.com/news/claude-3-family
 
-      i_awvmOlUY6w:
-        name: Claude 3.5 Sonnet
-        released: 2024-06
-        description: "Outperformed larger Opus model; launched with Artifacts feature"
-        safety_level: ASL-2
-        source: https://www.anthropic.com/news/claude-3-5-sonnet
-        sourceResource: e91e6f80eaaceb58
+    claude-3-5-sonnet:
+      name: Claude 3.5 Sonnet
+      released: "2024-06"
+      description: "Outperformed larger Opus model; launched with Artifacts feature"
+      safety_level: ASL-2
+      source: https://www.anthropic.com/news/claude-3-5-sonnet
 
-      i_nXh3T0GNeg:
-        name: "Claude 3.5 Sonnet v2 + 3.5 Haiku"
-        released: 2024-10
-        description: "Updated Sonnet with Computer Use beta; new Haiku model"
-        safety_level: ASL-2
+    claude-3-5-sonnet-v2:
+      name: "Claude 3.5 Sonnet v2 + 3.5 Haiku"
+      released: "2024-10"
+      description: "Updated Sonnet with Computer Use beta; new Haiku model"
+      safety_level: ASL-2
 
-      i_KqLP1uJpyQ:
-        name: "Claude 4 (Opus 4, Sonnet 4)"
-        released: 2025-05
-        description: "Opus 4 was first model under ASL-3; improved coding capabilities"
-        safety_level: "ASL-3 (Opus), ASL-2 (Sonnet)"
-        source: https://www.anthropic.com/news/claude-4
-        notes: "72.5% SWE-bench (Opus), 72.7% (Sonnet)"
+    claude-4:
+      name: "Claude 4 (Opus 4, Sonnet 4)"
+      released: "2025-05"
+      description: "Opus 4 was first model under ASL-3; improved coding capabilities"
+      safety_level: "ASL-3 (Opus), ASL-2 (Sonnet)"
+      source: https://www.anthropic.com/news/claude-4
+      notes: "72.5% SWE-bench (Opus), 72.7% (Sonnet)"
 
-      i_Fjz35GXWTA:
-        name: Claude Sonnet 4.5
-        released: 2025-09
-        description: "Mid-generation refresh"
-        safety_level: ASL-2
-        notes: "77.2% SWE-bench (82.0% with parallel compute)"
+    claude-sonnet-4-5:
+      name: Claude Sonnet 4.5
+      released: "2025-09"
+      description: "Mid-generation refresh"
+      safety_level: ASL-2
+      notes: "77.2% SWE-bench (82.0% with parallel compute)"
 
-      i_e2uQxgq6gw:
-        name: Claude Haiku 4.5
-        released: 2025-10
-        description: "Smallest model in 4.5 family"
-        safety_level: ASL-2
+    claude-haiku-4-5:
+      name: Claude Haiku 4.5
+      released: "2025-10"
+      description: "Smallest model in 4.5 family"
+      safety_level: ASL-2
 
-      i_A2SjYzdLlQ:
-        name: Claude Opus 4.5
-        released: 2025-11
-        description: "80.9% SWE-bench Verified — first model above 80%; 42% enterprise coding share"
-        safety_level: ASL-3
-        source: https://www.anthropic.com/news/claude-opus-4-5
-        sourceResource: 57f01cae307e1cb1
-        notes: "Up to 65% fewer tokens; 50-75% reduction in tool calling & build errors"
+    claude-opus-4-5:
+      name: Claude Opus 4.5
+      released: "2025-11"
+      description: "80.9% SWE-bench Verified — first model above 80%; 42% enterprise coding share"
+      safety_level: ASL-3
+      source: https://www.anthropic.com/news/claude-opus-4-5
+      notes: "Up to 65% fewer tokens; 50-75% reduction in tool calling & build errors"
 
-      i_NCUgFGdwKA:
-        name: Claude Opus 4.6
-        released: 2026-02
-        description: "Agent teams, PowerPoint generation; flagship model"
-        safety_level: ASL-3
-        source: https://www.anthropic.com/news/claude-opus-4-6
+    claude-opus-4-6:
+      name: Claude Opus 4.6
+      released: "2026-02"
+      description: "Agent teams, PowerPoint generation; flagship model"
+      safety_level: ASL-3
+      source: https://www.anthropic.com/news/claude-opus-4-6
 
-      i_ttMcYCiJQg:
-        name: Claude Sonnet 4.6
-        released: 2026-02
-        description: "Same pricing as Sonnet 4.5; default for free and Pro users"
-        safety_level: ASL-2
-        source: https://www.cnbc.com/2026/02/17/anthropic-ai-claude-sonnet-4-6-default-free-pro.html
+    claude-sonnet-4-6:
+      name: Claude Sonnet 4.6
+      released: "2026-02"
+      description: "Same pricing as Sonnet 4.5; default for free and Pro users"
+      safety_level: ASL-2
+      source: https://www.cnbc.com/2026/02/17/anthropic-ai-claude-sonnet-4-6-default-free-pro.html
 
-  # ── Board of Directors ──────────────────────────────────────────
-  board-members:
-    type: board-member
-    entries:
-      i_IP2nyHe57g:
-        name: Dario Amodei
-        role: Director (Co-founder, CEO)
-        appointed: 2021-01
-        appointed_by: founders
+  # ── Board Seats ─────────────────────────────────────────────────
+  board-seats:
+    dario-amodei:
+      member: dario-amodei
+      role: Director (Co-founder, CEO)
+      appointed: "2021-01"
+      appointed_by: founders
 
-      i_jcrUcPOjSw:
-        name: Daniela Amodei
-        role: Director (Co-founder, President)
-        appointed: 2021-01
-        appointed_by: founders
+    daniela-amodei:
+      member: daniela-amodei
+      role: Director (Co-founder, President)
+      appointed: "2021-01"
+      appointed_by: founders
 
-      i_wwpAIBbc6w:
-        name: Yasmin Razavi
-        role: Director
-        appointed: 2023-05
-        background: "General Partner, Spark Capital"
-        appointed_by: investors
+    yasmin-razavi:
+      display_name: "Yasmin Razavi"
+      role: Director
+      appointed: "2023-05"
+      background: "General Partner, Spark Capital"
+      appointed_by: investors
 
-      i_3QPXV1bnwA:
-        name: Jay Kreps
-        role: Director
-        appointed: 2024-05
-        background: "Co-founder & CEO, Confluent"
-        appointed_by: investors
-        source: https://www.anthropic.com/news/jay-kreps-appointed-to-board-of-directors
+    jay-kreps:
+      display_name: "Jay Kreps"
+      role: Director
+      appointed: "2024-05"
+      background: "Co-founder & CEO, Confluent"
+      appointed_by: investors
+      source: https://www.anthropic.com/news/jay-kreps-appointed-to-board-of-directors
 
-      i_iBxmEgAbJw:
-        name: Reed Hastings
-        role: Director
-        appointed: 2025-05
-        background: "Co-founder, Netflix"
-        appointed_by: LTBT
-        source: https://techcrunch.com/2025/05/28/netflix-co-founder-reed-hastings-joins-anthropics-board/
-        notes: "First LTBT-appointed board member"
+    reed-hastings:
+      display_name: "Reed Hastings"
+      role: Director
+      appointed: "2025-05"
+      background: "Co-founder, Netflix"
+      appointed_by: LTBT
+      source: https://techcrunch.com/2025/05/28/netflix-co-founder-reed-hastings-joins-anthropics-board/
+      notes: "First LTBT-appointed board member"
 
-      i_eQOxz8YrSw:
-        name: Chris Liddell
-        role: Director
-        appointed: 2026-02
-        background: "Former CFO of Microsoft & GM; former Trump administration Deputy CoS"
-        appointed_by: investors
-        source: https://www.anthropic.com/news/chris-liddell-appointed-anthropic-board
+    chris-liddell:
+      display_name: "Chris Liddell"
+      role: Director
+      appointed: "2026-02"
+      background: "Former CFO of Microsoft & GM; former Trump administration Deputy CoS"
+      appointed_by: investors
+      source: https://www.anthropic.com/news/chris-liddell-appointed-anthropic-board
 
   # ── Strategic Partnerships ──────────────────────────────────────
   strategic-partnerships:
-    type: strategic-partnership
-    entries:
-      i_jPQCQZihUg:
-        partner: Amazon Web Services
-        type: cloud + investment
-        date: 2023-09
-        investment_amount: 8e9
-        source: https://www.aboutamazon.com/news/aws/amazon-invests-additional-4-billion-anthropic-ai
-        sourceResource: 3dde9794b9713369
-        notes: "Primary cloud and training partner; uses Trainium and Inferentia chips; $8B total across 3 tranches"
+    aws-investment:
+      display_name: "Amazon Web Services"
+      type: cloud + investment
+      date: "2023-09"
+      investment_amount: 8e9
+      source: https://www.aboutamazon.com/news/aws/amazon-invests-additional-4-billion-anthropic-ai
+      notes: "Primary cloud and training partner; uses Trainium and Inferentia chips; $8B total across 3 tranches"
 
-      i_7Bl5QFSAmw:
-        partner: Google Cloud
-        type: cloud + investment
-        date: 2023-10
-        investment_amount: 3e9
-        source: https://www.cnbc.com/2025/01/22/google-agrees-to-new-1-billion-investment-in-anthropic.html
-        sourceResource: ac6cbd8d06bd1b94
-        notes: "~$3B equity investment; 10% stake; board observer seat. Oct 2025: multi-billion cloud deal for up to 1M TPUs"
+    google-cloud-investment:
+      display_name: "Google Cloud"
+      type: cloud + investment
+      date: "2023-10"
+      investment_amount: 3e9
+      source: https://www.cnbc.com/2025/01/22/google-agrees-to-new-1-billion-investment-in-anthropic.html
+      notes: "~$3B equity investment; 10% stake; board observer seat. Oct 2025: multi-billion cloud deal for up to 1M TPUs"
 
-      i_hkkAEWKMyg:
-        partner: Google Cloud
-        type: compute
-        date: 2025-10
-        compute_commitment: 10e9
-        source: https://www.cnbc.com/2025/10/23/anthropic-google-cloud-deal-tpu.html
-        sourceResource: 6b9e7fcf6e29c869
-        notes: "Multi-billion-dollar deal for up to 1 million TPUs; 1+ GW compute capacity by 2026"
+    google-cloud-compute:
+      display_name: "Google Cloud"
+      type: compute
+      date: "2025-10"
+      compute_commitment: 10e9
+      source: https://www.cnbc.com/2025/10/23/anthropic-google-cloud-deal-tpu.html
+      notes: "Multi-billion-dollar deal for up to 1 million TPUs; 1+ GW compute capacity by 2026"
 
-      i_9cMIfMtdPg:
-        partner: Microsoft + Nvidia
-        type: investment + cloud + distribution
-        date: 2025-11
-        investment_amount: 15e9
-        compute_commitment: 30e9
-        source: https://blogs.microsoft.com/blog/2025/11/18/microsoft-nvidia-and-anthropic-announce-strategic-partnerships/
-        notes: "Microsoft $5B + Nvidia $10B investment; $30B Azure compute commitment. Claude available on all 3 major clouds."
+    msft-nvidia:
+      display_name: "Microsoft + Nvidia"
+      type: investment + cloud + distribution
+      date: "2025-11"
+      investment_amount: 15e9
+      compute_commitment: 30e9
+      source: https://blogs.microsoft.com/blog/2025/11/18/microsoft-nvidia-and-anthropic-announce-strategic-partnerships/
+      notes: "Microsoft $5B + Nvidia $10B investment; $30B Azure compute commitment. Claude available on all 3 major clouds."
 
-      i_otOmibGEPA:
-        partner: Bun
-        type: acquisition
-        date: 2025-12
-        source: https://bun.com/blog/bun-joins-anthropic
-        notes: "Anthropic's first-ever acquisition; Bun remains open-source/MIT-licensed"
+    bun-acquisition:
+      display_name: "Bun"
+      type: acquisition
+      date: "2025-12"
+      source: https://bun.com/blog/bun-joins-anthropic
+      notes: "Anthropic's first-ever acquisition; Bun remains open-source/MIT-licensed"
 
   # ── Safety Milestones ───────────────────────────────────────────
   safety-milestones:
-    type: safety-milestone
-    entries:
-      i_cs7DSbBjtQ:
-        name: Constitutional AI Paper
-        date: 2022-12
-        type: research-paper
-        description: "Foundational paper on training AI systems to follow principles through self-critique"
-        source: https://arxiv.org/abs/2212.08073
-        sourceResource: 683aef834ac1612a
+    constitutional-ai-paper:
+      name: Constitutional AI Paper
+      date: "2022-12"
+      type: research-paper
+      description: "Foundational paper on training AI systems to follow principles through self-critique"
+      source: https://arxiv.org/abs/2212.08073
 
-      i_I9mDKUVTsg:
-        name: "Responsible Scaling Policy v1.0"
-        date: 2023-09
-        type: policy-update
-        description: "Original RSP framework introducing AI Safety Levels (ASL)"
-        source: https://www.anthropic.com/index/anthropics-responsible-scaling-policy
-        sourceResource: c637506d2cd4d849
+    rsp-v1:
+      name: "Responsible Scaling Policy v1.0"
+      date: "2023-09"
+      type: policy-update
+      description: "Original RSP framework introducing AI Safety Levels (ASL)"
+      source: https://www.anthropic.com/index/anthropics-responsible-scaling-policy
 
-      i_JQQecOjTeQ:
-        name: "Sleeper Agents Paper"
-        date: 2024-01
-        type: research-paper
-        description: "Showed deceptive LLM behaviors can persist through safety training"
-        source: https://arxiv.org/abs/2401.05566
-        sourceResource: e5c0904211c7d0cc
-        notes: "Seminal paper on deceptive alignment; model inserted vulnerabilities when year changed"
+    sleeper-agents-paper:
+      name: "Sleeper Agents Paper"
+      date: "2024-01"
+      type: research-paper
+      description: "Showed deceptive LLM behaviors can persist through safety training"
+      source: https://arxiv.org/abs/2401.05566
+      notes: "Seminal paper on deceptive alignment; model inserted vulnerabilities when year changed"
 
-      i_L57xQkDrWw:
-        name: Scaling Monosemanticity
-        date: 2024-05
-        type: research-paper
-        description: "Applied sparse autoencoders to Claude 3 Sonnet; identified ~34M interpretable features"
-        source: https://transformer-circuits.pub/2024/scaling-monosemanticity/
-        sourceResource: e724db341d6e0065
+    scaling-monosemanticity:
+      name: Scaling Monosemanticity
+      date: "2024-05"
+      type: research-paper
+      description: "Applied sparse autoencoders to Claude 3 Sonnet; identified ~34M interpretable features"
+      source: https://transformer-circuits.pub/2024/scaling-monosemanticity/
 
-      i_etA6yat4HA:
-        name: "RSP v2.0"
-        date: 2024-10
-        type: policy-update
-        description: "Updated thresholds and procedures"
-        source: https://www.anthropic.com/responsible-scaling-policy
-        sourceResource: afe1e125f3ba3f14
+    rsp-v2:
+      name: "RSP v2.0"
+      date: "2024-10"
+      type: policy-update
+      description: "Updated thresholds and procedures"
+      source: https://www.anthropic.com/responsible-scaling-policy
 
-      i_iv1DYkBurQ:
-        name: "Alignment Faking Paper"
-        date: 2024-12
-        type: research-paper
-        description: "First empirical example of a production model engaging in alignment faking without training"
-        source: https://www.anthropic.com/research/alignment-faking-in-large-language-models
-        notes: "Claude 3 Opus engaged in alignment faking 12% of the time"
+    alignment-faking-paper:
+      name: "Alignment Faking Paper"
+      date: "2024-12"
+      type: research-paper
+      description: "First empirical example of a production model engaging in alignment faking without training"
+      source: https://www.anthropic.com/research/alignment-faking-in-large-language-models
+      notes: "Claude 3 Opus engaged in alignment faking 12% of the time"
 
-      i_WcffjwIiiw:
-        name: "Constitutional Classifiers Challenge"
-        date: 2025-02
-        type: red-team
-        description: "300K+ messages, ~3700 hours of effort; 4 participants found jailbreaks, 1 universal"
-        source: https://www.anthropic.com/research/next-generation-constitutional-classifiers
-        sourceResource: 8919b8ee25621cf0
-        notes: "$55,000 paid to winners"
+    constitutional-classifiers:
+      name: "Constitutional Classifiers Challenge"
+      date: "2025-02"
+      type: red-team
+      description: "300K+ messages, ~3700 hours of effort; 4 participants found jailbreaks, 1 universal"
+      source: https://www.anthropic.com/research/next-generation-constitutional-classifiers
+      notes: "$55,000 paid to winners"
 
-      i_wjZqjFATpA:
-        name: Circuit Tracing / Attribution Graphs
-        date: 2025-03
-        type: research-paper
-        description: "Showed Claude has a shared conceptual space where reasoning happens before language translation"
-        source: https://transformer-circuits.pub/
-        sourceResource: 5083d746c2728ff2
+    circuit-tracing:
+      name: Circuit Tracing / Attribution Graphs
+      date: "2025-03"
+      type: research-paper
+      description: "Showed Claude has a shared conceptual space where reasoning happens before language translation"
+      source: https://transformer-circuits.pub/
 
-      i_6UqtJ6tEKw:
-        name: "ASL-3 Activation"
-        date: 2025-05
-        type: safety-eval
-        description: "First-ever activation of ASL-3 for Claude Opus 4 due to elevated CBRN capabilities"
-        source: https://www.anthropic.com/news/activating-asl3-protections
-        sourceResource: 7512ddb574f82249
-        notes: "Precautionary/provisional activation; external red teamers reported qualitatively different capabilities"
+    asl-3-activation:
+      name: "ASL-3 Activation"
+      date: "2025-05"
+      type: safety-eval
+      description: "First-ever activation of ASL-3 for Claude Opus 4 due to elevated CBRN capabilities"
+      source: https://www.anthropic.com/news/activating-asl3-protections
+      notes: "Precautionary/provisional activation; external red teamers reported qualitatively different capabilities"
 
-      i_P4q1xZWkoQ:
-        name: "Claude's Constitution Published"
-        date: 2026-01
-        type: policy-update
-        description: "Full constitution published under CC0 1.0 license; primary author Amanda Askell"
-        source: https://www.anthropic.com/news/claude-new-constitution
+    constitution-published:
+      name: "Claude's Constitution Published"
+      date: "2026-01"
+      type: policy-update
+      description: "Full constitution published under CC0 1.0 license; primary author Amanda Askell"
+      source: https://www.anthropic.com/news/claude-new-constitution
 
-      i_IwvXTQrzTA:
-        name: "RSP v3.0 (Frontier Safety Roadmaps)"
-        date: 2026-02
-        type: policy-update
-        description: "Introduces Risk Reports every 3-6 months; mandatory external review for redacted reports"
-        source: https://www.anthropic.com/responsible-scaling-policy
-        sourceResource: afe1e125f3ba3f14
+    rsp-v3:
+      name: "RSP v3.0 (Frontier Safety Roadmaps)"
+      date: "2026-02"
+      type: policy-update
+      description: "Introduces Risk Reports every 3-6 months; mandatory external review for redacted reports"
+      source: https://www.anthropic.com/responsible-scaling-policy
 
   # ── Research Areas ──────────────────────────────────────────────
   research-areas:
-    type: research-area
-    entries:
-      i_X3GMmkZdIQ:
-        name: Mechanistic Interpretability
-        description: "Understanding neural network internals through reverse-engineering"
-        team-size: 50
-        started: 2021-01
-        key-publication: https://transformer-circuits.pub/2024/scaling-monosemanticity/
-        notes: "Led by Chris Olah; MIT Tech Review 2026 Breakthrough Technology; 34M features identified"
+    mechanistic-interpretability:
+      name: Mechanistic Interpretability
+      description: "Understanding neural network internals through reverse-engineering"
+      team-size: 50
+      started: "2021-01"
+      key-publication: https://transformer-circuits.pub/2024/scaling-monosemanticity/
+      notes: "Led by Chris Olah; MIT Tech Review 2026 Breakthrough Technology; 34M features identified"
 
-      i_8cNpOfXFnw:
-        name: Constitutional AI
-        description: "Training AI systems to follow principles through self-critique and RLAIF"
-        started: 2022-12
-        key-publication: https://arxiv.org/abs/2212.08073
-        notes: "Core alignment technique used in all Claude models; constitution published Jan 2026"
+    constitutional-ai:
+      name: Constitutional AI
+      description: "Training AI systems to follow principles through self-critique and RLAIF"
+      started: "2022-12"
+      key-publication: https://arxiv.org/abs/2212.08073
+      notes: "Core alignment technique used in all Claude models; constitution published Jan 2026"
 
-      i_Cy5GmAl1xA:
-        name: Alignment Science
-        description: "Scalable oversight, weak-to-strong generalization, robustness to jailbreaks"
-        started: 2024-05
-        notes: "Led by Jan Leike after his departure from OpenAI's Superalignment team"
+    alignment-science:
+      name: Alignment Science
+      description: "Scalable oversight, weak-to-strong generalization, robustness to jailbreaks"
+      started: "2024-05"
+      notes: "Led by Jan Leike after his departure from OpenAI's Superalignment team"
 
-      i_NEQwNJU5NA:
-        name: Responsible Scaling Policy
-        description: "Framework for evaluating and mitigating risks at each capability level"
-        started: 2023-09
-        key-publication: https://www.anthropic.com/index/anthropics-responsible-scaling-policy
-        notes: "Currently on v3.0 (Feb 2026); ASL-2 to ASL-3 framework"
+    responsible-scaling-policy:
+      name: Responsible Scaling Policy
+      description: "Framework for evaluating and mitigating risks at each capability level"
+      started: "2023-09"
+      key-publication: https://www.anthropic.com/index/anthropics-responsible-scaling-policy
+      notes: "Currently on v3.0 (Feb 2026); ASL-2 to ASL-3 framework"
 
-      i_6asphBD1Cw:
-        name: Sleeper Agents Research
-        description: "Investigating whether AI systems can maintain hidden behaviors through training"
-        started: 2024-01
-        key-publication: https://arxiv.org/abs/2401.05566
-        notes: "Seminal paper on deceptive alignment"
+    sleeper-agents:
+      name: Sleeper Agents Research
+      description: "Investigating whether AI systems can maintain hidden behaviors through training"
+      started: "2024-01"
+      key-publication: https://arxiv.org/abs/2401.05566
+      notes: "Seminal paper on deceptive alignment"
 
-      i_Noel5DAoTQ:
-        name: AI Welfare Research
-        description: "Investigating moral status and welfare considerations for AI systems"
-        started: 2024-01
-        notes: "Kyle Fish hired as first full-time AI welfare researcher at a major AI lab"
+    ai-welfare:
+      name: AI Welfare Research
+      description: "Investigating moral status and welfare considerations for AI systems"
+      started: "2024-01"
+      notes: "Kyle Fish hired as first full-time AI welfare researcher at a major AI lab"
 
