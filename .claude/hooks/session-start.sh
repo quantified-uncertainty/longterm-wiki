@@ -103,7 +103,7 @@ if [ -n "$WIKI_SERVER_URL" ] && [ "$BRANCH" != "main" ] && [ "$BRANCH" != "detac
   API_KEY="${LONGTERMWIKI_SERVER_API_KEY:-}"
   if [ -z "$API_KEY" ]; then
     CONTEXT_LINES+=("⚠ Active agent registration skipped: LONGTERMWIKI_SERVER_API_KEY not set")
-  elif [ -n "$API_KEY" ]; then
+  else
     # Determine task from existing checklist, or fall back to branch name
     AGENT_TASK=""
     CHECKLIST_PATH=".claude/wip-checklist.md"
