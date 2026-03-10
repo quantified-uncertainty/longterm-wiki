@@ -33,7 +33,6 @@ export interface PublicationDataRow {
   peerReviewed: boolean;
   resourceCount: number;
   pageCount: number;
-  domains: string[];
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -69,7 +68,9 @@ const DEFAULT_TYPE_COLOR =
   "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
 
 function formatType(type: string): string {
-  return type.replace(/_/g, " ");
+  return type
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function makeColumns(): ColumnDef<PublicationDataRow>[] {

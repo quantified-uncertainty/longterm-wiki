@@ -26,7 +26,6 @@ export function KBPublicationsContent() {
       peerReviewed: pub.peer_reviewed ?? false,
       resourceCount: resources.length,
       pageCount: pageSet.size,
-      domains: pub.domains,
     };
   });
 
