@@ -324,13 +324,16 @@ export function getKBRecordsReferencing(
   const kb = getKB();
   if (!kb || !kb.records || !kb.recordSchemas) return [];
 
+  // Build schema Map for O(1) lookups instead of linear scan per entry
+  const schemaMap = new Map(kb.recordSchemas.map((s) => [s.id, s]));
+
   const results: RecordEntry[] = [];
 
   for (const [, collections] of Object.entries(kb.records)) {
     for (const [colName, entries] of Object.entries(collections)) {
       if (collectionName && colName !== collectionName) continue;
       for (const entry of entries) {
-        const schema = kb.recordSchemas.find((s) => s.id === entry.schema);
+        const schema = schemaMap.get(entry.schema);
         if (!schema) continue;
         for (const [endpointName, endpointDef] of Object.entries(schema.endpoints)) {
           if (endpointDef.implicit) continue;

@@ -400,7 +400,7 @@ async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unkno
 
 /**
  * Maps a collection name (e.g., "funding-rounds") to a record schema ID
- * (e.g., "funding-round"). Tries exact match, then depluralization (strip trailing "s").
+ * (e.g., "funding-round"). Tries exact match, then depluralization.
  */
 function findRecordSchemaId(
   collectionName: string,
@@ -411,13 +411,22 @@ function findRecordSchemaId(
   if (allowedIds.includes(collectionName) && graph.getRecordSchema(collectionName)) {
     return collectionName;
   }
-  // Depluralize: "funding-rounds" → "funding-round"
+
+  // Depluralize and check: "funding-rounds" → "funding-round",
+  // "career-histories" → "career-history"
+  const candidates: string[] = [];
+  if (collectionName.endsWith("ies")) {
+    candidates.push(collectionName.slice(0, -3) + "y"); // histories → history
+  }
   if (collectionName.endsWith("s")) {
-    const singular = collectionName.slice(0, -1);
+    candidates.push(collectionName.slice(0, -1)); // rounds → round
+  }
+  for (const singular of candidates) {
     if (allowedIds.includes(singular) && graph.getRecordSchema(singular)) {
       return singular;
     }
   }
+
   // Check all allowed IDs for plural match: schema "grant" → collection "grants"
   for (const id of allowedIds) {
     if (id + "s" === collectionName && graph.getRecordSchema(id)) {
@@ -430,6 +439,7 @@ function findRecordSchemaId(
 /**
  * Parses a raw YAML record entry into a RecordEntry.
  * Separates temporal fields (asOf, validEnd), display_name, and data fields.
+ * Warns if required explicit endpoints are missing.
  */
 function parseRecordEntry(
   key: string,
@@ -443,15 +453,28 @@ function parseRecordEntry(
   let asOf: string | undefined;
   let validEnd: string | undefined;
 
+  // resolveRefs() already converts DateMarker to plain strings for non-facts
+  // contexts, so asOf/validEnd arrive as strings here.
   for (const [fieldName, fieldValue] of Object.entries(raw)) {
     if (fieldName === "display_name") {
       displayName = String(fieldValue);
     } else if (fieldName === "asOf") {
-      asOf = fieldValue instanceof DateMarker ? fieldValue.value : String(fieldValue);
+      asOf = String(fieldValue);
     } else if (fieldName === "validEnd") {
-      validEnd = fieldValue instanceof DateMarker ? fieldValue.value : String(fieldValue);
+      validEnd = String(fieldValue);
     } else {
       fields[fieldName] = fieldValue;
+    }
+  }
+
+  // Warn about missing required explicit endpoints
+  for (const [endpointName, endpointDef] of Object.entries(schema.endpoints)) {
+    if (endpointDef.implicit) continue;
+    if (endpointDef.required && !fields[endpointName] && !displayName) {
+      console.warn(
+        `[kb/loader] Record "${ownerEntityId}/${schemaId}/${key}" is missing ` +
+        `required endpoint "${endpointName}" (and no display_name fallback)`
+      );
     }
   }
 
