@@ -13,11 +13,7 @@
  *   crux kb verify --limit=10                  Check at most 10 facts
  */
 
-import { join } from 'path';
-import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { loadKB } from '../../packages/kb/src/loader.ts';
-import { computeInverses } from '../../packages/kb/src/inverse.ts';
 import { formatFactValue } from '../../packages/kb/src/format.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
 import type { Entity, Fact, Property } from '../../packages/kb/src/types.ts';
@@ -31,8 +27,8 @@ import {
   classifyFetchError,
   type SourceFetchErrorType,
 } from '../lib/search/paywall-detection.ts';
-
-const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
+import { loadGraphFull, resolveEntity } from '../lib/kb-loader.ts';
+import type { LoadedKB } from '../lib/kb-loader.ts';
 
 // ── Constants ─────────────────────────────────────────────────────────
 
@@ -95,11 +91,7 @@ interface VerificationSummary {
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
-async function loadGraph(): Promise<Graph> {
-  const graph = await loadKB(KB_DATA_DIR);
-  computeInverses(graph);
-  return graph;
-}
+// LoadedKB, loadGraphFull, resolveEntity imported from ../lib/kb-loader.ts
 
 /** Result of fetching source content, with structured error info */
 interface FetchSourceResult {
@@ -397,9 +389,10 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
  * Collect facts to verify based on the command options.
  */
 function collectFacts(
-  graph: Graph,
+  kb: LoadedKB,
   options: VerifyCommandOptions,
 ): Array<{ entity: Entity; fact: Fact }> {
+  const graph = kb.graph;
   const factsToVerify: Array<{ entity: Entity; fact: Fact }> = [];
 
   if (options.fact) {
@@ -415,8 +408,8 @@ function collectFacts(
       }
     }
   } else if (options.entity) {
-    // All facts for a specific entity
-    const entity = graph.getEntity(options.entity);
+    // All facts for a specific entity (supports ID, filename, stableId, or name)
+    const entity = resolveEntity(options.entity, kb);
     if (entity) {
       const facts = graph.getFacts(entity.id);
       for (const fact of facts) {
@@ -454,8 +447,9 @@ export async function verifyCommand(
 ): Promise<CommandResult> {
   const isDryRun = options['dry-run'] || options.dryRun;
 
-  const graph = await loadGraph();
-  const factsToVerify = collectFacts(graph, options);
+  const kb = await loadGraphFull();
+  const graph = kb.graph;
+  const factsToVerify = collectFacts(kb, options);
 
   if (factsToVerify.length === 0) {
     const hint = options.entity

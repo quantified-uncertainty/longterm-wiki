@@ -1,10 +1,11 @@
 /**
- * Stable ID generation for the Knowledge Base library.
+ * ID generation for the Knowledge Base library.
  *
- * - generateStableId()         — random 10-char alphanumeric (for Entity.stableId)
- * - generateFactId()           — "f_" + 10-char alphanumeric (random)
+ * - generateId()               — random 10-char alphanumeric (for entities and facts)
+ * - generateStableId()         — deprecated alias for generateId()
+ * - generateFactId()           — alias for generateId() (all IDs use the same format)
  * - contentHash(parts)         — deterministic SHA-256-based 10-char token
- * - generateContentFactId(...) — "f_" + contentHash (idempotent sync helper)
+ * - generateContentFactId(...) — contentHash (idempotent sync helper)
  */
 
 import { createHash, randomBytes } from "node:crypto";
@@ -35,26 +36,33 @@ function randomAlphanumeric10(): string {
 }
 
 /**
- * Returns a random 10-character alphanumeric string suitable for use as a
- * Entity's `stableId`.  Survives renames because it is purely random.
+ * Returns a random 10-character alphanumeric string suitable for use as an
+ * entity ID or fact ID. Survives renames because it is purely random.
  *
  * @example
- * generateStableId() // "a3Kf2rZ9mQ"
+ * generateId() // "a3Kf2rZ9mQ"
  */
-export function generateStableId(): string {
+export function generateId(): string {
   return randomAlphanumeric10();
 }
 
 /**
- * Returns a random fact ID: `"f_"` followed by 10 random alphanumeric chars.
+ * @deprecated Use `generateId()` instead. Alias kept for backward compat.
+ */
+export function generateStableId(): string {
+  return generateId();
+}
+
+/**
+ * Returns a random 10-char alphanumeric fact ID. Same format as entity IDs.
  * Use this when you do not need determinism (i.e., you are creating a brand-new
  * fact that has no natural content key).
  *
  * @example
- * generateFactId() // "f_x7Nm2pA0qR"
+ * generateFactId() // "a3Kf2rZ9mQ"
  */
 export function generateFactId(): string {
-  return `f_${randomAlphanumeric10()}`;
+  return generateId();
 }
 
 /**
@@ -85,20 +93,20 @@ export function contentHash(parts: string[]): string {
 
 /**
  * Generates a deterministic fact ID from its logical key components.
- * The ID is `"f_"` followed by a {@link contentHash} of
+ * Returns a {@link contentHash} of
  * `[subjectId, propertyId, JSON.stringify(value), asOf ?? ""]`.
  *
  * Use this when syncing facts from an external source so that re-running the
  * sync does not create duplicates.
  *
- * @param subjectId  - Entity slug the fact is about
+ * @param subjectId  - Entity ID the fact is about
  * @param propertyId - Property ID from the registry
  * @param value      - The fact value (any JSON-serialisable type)
  * @param asOf       - Optional temporal anchor (ISO date or YYYY-MM string)
  *
  * @example
- * generateContentFactId("anthropic", "revenue", 1_000_000_000, "2024")
- * // "f_<10 deterministic chars>"
+ * generateContentFactId("mK9pX3rQ7n", "revenue", 1_000_000_000, "2024")
+ * // "<10 deterministic chars>"
  */
 export function generateContentFactId(
   subjectId: string,
@@ -106,10 +114,10 @@ export function generateContentFactId(
   value: unknown,
   asOf?: string
 ): string {
-  return `f_${contentHash([
+  return contentHash([
     subjectId,
     propertyId,
     JSON.stringify(value),
     asOf ?? "",
-  ])}`;
+  ]);
 }

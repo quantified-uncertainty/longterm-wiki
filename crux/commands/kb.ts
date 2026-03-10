@@ -10,12 +10,8 @@
  *   crux kb lookup <stableId>      Look up entity by stableId
  */
 
-import { join } from 'path';
-import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 
-import { loadKB } from '../../packages/kb/src/loader.ts';
-import { computeInverses } from '../../packages/kb/src/inverse.ts';
 import { formatFactValue } from '../../packages/kb/src/format.ts';
 import { validate } from '../../packages/kb/src/validate.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
@@ -24,8 +20,8 @@ import { commands as kbMigrateCommands } from './kb-migrate.ts';
 import { verifyCommand } from './kb-verify.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
-
-const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
+import { loadGraphFull, loadGraph, resolveEntity } from '../lib/kb-loader.ts';
+import type { LoadedKB } from '../lib/kb-loader.ts';
 
 interface KBCommandOptions extends BaseOptions {
   type?: string;
@@ -34,14 +30,6 @@ interface KBCommandOptions extends BaseOptions {
   errorsOnly?: boolean;
   'errors-only'?: boolean;
   rule?: string;
-}
-
-// ── KB loading helper ───────────────────────────────────────────────────
-
-async function loadGraph(): Promise<Graph> {
-  const graph = await loadKB(KB_DATA_DIR);
-  computeInverses(graph);
-  return graph;
 }
 
 // ── show command ────────────────────────────────────────────────────────
@@ -65,22 +53,17 @@ Examples:
     };
   }
 
-  const graph = await loadGraph();
-  const entity = graph.getEntity(entityId);
+  const kb = await loadGraphFull();
+  const entity = resolveEntity(entityId, kb);
 
   if (!entity) {
-    // Try resolving as a stableId
-    const resolved = graph.getEntityByStableId(entityId);
-    if (resolved) {
-      return showEntity(resolved, graph, options);
-    }
     return {
       exitCode: 1,
       output: `Entity not found: ${entityId}\n  Try: crux kb list`,
     };
   }
 
-  return showEntity(entity, graph, options);
+  return showEntity(entity, kb.graph, options);
 }
 
 function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): CommandResult {
@@ -95,8 +78,8 @@ function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): Co
   const lines: string[] = [];
 
   // Header
-  lines.push(`\x1b[1m${entity.name}\x1b[0m (${entity.stableId})`);
-  lines.push(`Type: ${entity.type} | Slug: ${entity.id}${entity.numericId ? ` | ${entity.numericId}` : ''}`);
+  lines.push(`\x1b[1m${entity.name}\x1b[0m (${entity.id})`);
+  lines.push(`Type: ${entity.type}${entity.wikiPageId ? ` | ${entity.wikiPageId}` : ''}`);
   if (entity.aliases?.length) {
     lines.push(`Aliases: ${entity.aliases.join(', ')}`);
   }
@@ -242,9 +225,8 @@ async function listCommand(
       id: e.id,
       name: e.name,
       type: e.type,
-      stableId: e.stableId,
       factCount: graph.getFacts(e.id).length,
-      itemCount: graph.getRecordCollectionNames(e.id).reduce(
+      recordCount: graph.getRecordCollectionNames(e.id).reduce(
         (sum, col) => sum + graph.getRecords(e.id, col).length,
         0,
       ),
@@ -254,17 +236,17 @@ async function listCommand(
 
   // Table header
   const lines: string[] = [];
-  const header = `${'ID'.padEnd(24)} ${'Name'.padEnd(24)} ${'Type'.padEnd(16)} ${'StableId'.padEnd(14)} ${'Facts'.padEnd(7)} Items`;
+  const header = `${'ID'.padEnd(14)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} ${'Facts'.padEnd(7)} Records`;
   lines.push(`\x1b[1m${header}\x1b[0m`);
   lines.push('-'.repeat(header.length));
 
   for (const entity of entities) {
     const facts = graph.getFacts(entity.id);
-    const itemCount = graph.getRecordCollectionNames(entity.id).reduce(
+    const recordCount = graph.getRecordCollectionNames(entity.id).reduce(
       (sum, col) => sum + graph.getRecords(entity.id, col).length,
       0,
     );
-    const row = `${entity.id.padEnd(24)} ${entity.name.padEnd(24)} ${entity.type.padEnd(16)} ${entity.stableId.padEnd(14)} ${String(facts.length).padEnd(7)} ${itemCount}`;
+    const row = `${entity.id.padEnd(14)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${String(facts.length).padEnd(7)} ${recordCount}`;
     lines.push(row);
   }
 
@@ -308,13 +290,13 @@ Examples:
   if (options.ci) {
     return {
       exitCode: 0,
-      output: JSON.stringify({ stableId, slug: entity.id, name: entity.name, type: entity.type }),
+      output: JSON.stringify({ stableId, name: entity.name, type: entity.type }),
     };
   }
 
   return {
     exitCode: 0,
-    output: `${stableId} -> ${entity.name} (${entity.id})\n  Type: ${entity.type}${entity.numericId ? ` | ${entity.numericId}` : ''}`,
+    output: `${stableId} -> ${entity.name}\n  Type: ${entity.type}${entity.wikiPageId ? ` | ${entity.wikiPageId}` : ''}`,
   };
 }
 
@@ -518,7 +500,7 @@ Examples:
     if (e.id.toLowerCase().includes(q)) return true;
     if (e.name.toLowerCase().includes(q)) return true;
     if (e.aliases?.some((a) => a.toLowerCase().includes(q))) return true;
-    if (e.numericId?.toLowerCase().includes(q)) return true;
+    if (e.wikiPageId?.toLowerCase().includes(q)) return true;
     return false;
   });
 
@@ -527,8 +509,7 @@ Examples:
       id: e.id,
       name: e.name,
       type: e.type,
-      stableId: e.stableId,
-      numericId: e.numericId,
+      wikiPageId: e.wikiPageId,
       aliases: e.aliases,
       factCount: graph.getFacts(e.id).length,
     }));
@@ -540,13 +521,13 @@ Examples:
   }
 
   const lines: string[] = [];
-  const header = `${'ID'.padEnd(28)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} ${'NumericID'.padEnd(10)} Facts`;
+  const header = `${'ID'.padEnd(14)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} ${'WikiPageId'.padEnd(10)} Facts`;
   lines.push(`\x1b[1m${header}\x1b[0m`);
   lines.push('-'.repeat(header.length));
 
   for (const entity of matches) {
     const factCount = graph.getFacts(entity.id).length;
-    const row = `${entity.id.padEnd(28)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${(entity.numericId ?? '').padEnd(10)} ${factCount}`;
+    const row = `${entity.id.padEnd(14)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${(entity.wikiPageId ?? '').padEnd(10)} ${factCount}`;
     lines.push(row);
     if (entity.aliases?.length) {
       lines.push(`  ${''.padEnd(26)} Aliases: ${entity.aliases.join(', ')}`);
@@ -625,7 +606,7 @@ async function coverageCommand(
     const scoreColor = r.factCount === 0 ? '\x1b[90m' : r.score >= 20 ? '\x1b[32m' : r.score >= 10 ? '\x1b[33m' : '\x1b[31m';
     const propStr = r.factCount > 0 ? `${r.used}/${r.applicable}` : '-';
     const scoreStr = r.factCount === 0 ? 'stub' : `${r.score}%`;
-    const row = `${r.entity.id.padEnd(28)} ${r.entity.type.padEnd(16)} ${String(r.factCount).padEnd(7)} ${propStr.padEnd(12)} ${scoreColor}${scoreStr}\x1b[0m`;
+    const row = `${r.entity.name.padEnd(28)} ${r.entity.type.padEnd(16)} ${String(r.factCount).padEnd(7)} ${propStr.padEnd(12)} ${scoreColor}${scoreStr}\x1b[0m`;
     lines.push(row);
   }
 
@@ -788,8 +769,9 @@ Examples:
     };
   }
 
-  const graph = await loadGraph();
-  const entity = graph.getEntity(entityId);
+  const kb = await loadGraphFull();
+  const entity = resolveEntity(entityId, kb);
+  const graph = kb.graph;
 
   if (!entity) {
     return { exitCode: 1, output: `Entity not found: ${entityId}` };

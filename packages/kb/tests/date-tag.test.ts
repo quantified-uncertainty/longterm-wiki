@@ -138,30 +138,30 @@ facts:
   });
 
   it("!date 2019 → fact with type 'date' and value '2019'", async () => {
-    const graph = await loadKB(dataDir);
-    const facts = graph.getFacts("test-org", { property: "founded-date" });
+    const { graph } = await loadKB(dataDir);
+    const facts = graph.getFacts("testStableId1", { property: "founded-date" });
     expect(facts).toHaveLength(1);
     expect(facts[0].value).toEqual({ type: "date", value: "2019" });
   });
 
   it("!date 2019-06 → fact with type 'date' and value '2019-06' (same as DATE_RE heuristic)", async () => {
-    const graph = await loadKB(dataDir);
-    const facts = graph.getFacts("test-org", { property: "born-year" });
+    const { graph } = await loadKB(dataDir);
+    const facts = graph.getFacts("testStableId1", { property: "born-year" });
     expect(facts).toHaveLength(1);
     expect(facts[0].value).toEqual({ type: "date", value: "2019-06" });
   });
 
   it("!date 2019-06-15 → fact with type 'date' and value '2019-06-15' (same as DATE_RE heuristic)", async () => {
-    const graph = await loadKB(dataDir);
-    const facts = graph.getFacts("test-org", { property: "headcount" });
+    const { graph } = await loadKB(dataDir);
+    const facts = graph.getFacts("testStableId1", { property: "headcount" });
     expect(facts).toHaveLength(1);
     expect(facts[0].value).toEqual({ type: "date", value: "2019-06-15" });
   });
 
   it("!date tag takes priority over property dataType (date wins)", async () => {
     // headcount has dataType: number, but !date overrides it
-    const graph = await loadKB(dataDir);
-    const facts = graph.getFacts("test-org", { property: "headcount" });
+    const { graph } = await loadKB(dataDir);
+    const facts = graph.getFacts("testStableId1", { property: "headcount" });
     expect(facts[0].value.type).toBe("date");
   });
 
@@ -169,8 +169,12 @@ facts:
     // Regression test: DateMarker in asOf was converted via String() producing "[object Object]"
     // This verifies the fix in loader.ts parseFact()
     const realDataDir = join(__dirname, "../data");
-    const graph = await loadKB(realDataDir);
-    const facts = graph.getFacts("red-queen-bio", { property: "total-funding" });
+    const { graph } = await loadKB(realDataDir);
+    // Look up entity ID for "red-queen-bio" via entity search
+    const allEntities = graph.getAllEntities();
+    const rqb = allEntities.find((e) => e.name.toLowerCase().includes("red queen"));
+    expect(rqb).toBeDefined();
+    const facts = graph.getFacts(rqb!.id, { property: "total-funding" });
     const seedFact = facts.find((f) => f.id === "f_iNzsKTtpRQ");
     expect(seedFact).toBeDefined();
     expect(seedFact!.asOf).toBe("2025-11");

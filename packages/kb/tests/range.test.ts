@@ -32,14 +32,14 @@ function graphWithFact(value: FactValue, property?: Partial<Property>): {
   };
   graph.addProperty(propDef);
   graph.addEntity({
-    id: "test-entity",
+    id: "aB3cD4eF5g",
     stableId: "aB3cD4eF5g",
     type: "org",
     name: "Test Entity",
   });
   const fact: Fact = {
     id: "f_range_test",
-    subjectId: "test-entity",
+    subjectId: "aB3cD4eF5g",
     propertyId: "metric",
     value,
   };
@@ -99,7 +99,7 @@ describe("range value types", () => {
         low: 20e9,
         high: 26e9,
       });
-      const results = validateEntity(graph, "test-entity");
+      const results = validateEntity(graph, "aB3cD4eF5g");
       const rangeErrors = results.filter((r) => r.rule === "range-value");
       expect(rangeErrors).toHaveLength(0);
     });
@@ -110,7 +110,7 @@ describe("range value types", () => {
         low: 30e9,
         high: 20e9,
       });
-      const results = validateEntity(graph, "test-entity");
+      const results = validateEntity(graph, "aB3cD4eF5g");
       const rangeErrors = results.filter((r) => r.rule === "range-value");
       expect(rangeErrors).toHaveLength(1);
       expect(rangeErrors[0].severity).toBe("error");
@@ -124,7 +124,7 @@ describe("range value types", () => {
         low: 20e9,
         high: 20e9,
       });
-      const results = validateEntity(graph, "test-entity");
+      const results = validateEntity(graph, "aB3cD4eF5g");
       const rangeErrors = results.filter((r) => r.rule === "range-value");
       expect(rangeErrors).toHaveLength(1);
       expect(rangeErrors[0].severity).toBe("error");
@@ -136,7 +136,7 @@ describe("range value types", () => {
         low: Infinity,
         high: 26e9,
       });
-      const results = validateEntity(graph, "test-entity");
+      const results = validateEntity(graph, "aB3cD4eF5g");
       const rangeErrors = results.filter((r) => r.rule === "range-value");
       expect(rangeErrors).toHaveLength(1);
       expect(rangeErrors[0].message).toContain("finite");
@@ -148,7 +148,7 @@ describe("range value types", () => {
         low: 20e9,
         high: NaN,
       });
-      const results = validateEntity(graph, "test-entity");
+      const results = validateEntity(graph, "aB3cD4eF5g");
       const rangeErrors = results.filter((r) => r.rule === "range-value");
       expect(rangeErrors).toHaveLength(1);
       expect(rangeErrors[0].message).toContain("finite");
@@ -156,14 +156,14 @@ describe("range value types", () => {
 
     it("accepts valid min value", () => {
       const { graph } = graphWithFact({ type: "min", value: 67e9 });
-      const results = validateEntity(graph, "test-entity");
+      const results = validateEntity(graph, "aB3cD4eF5g");
       const rangeErrors = results.filter((r) => r.rule === "range-value");
       expect(rangeErrors).toHaveLength(0);
     });
 
     it("rejects min with non-finite value", () => {
       const { graph } = graphWithFact({ type: "min", value: NaN });
-      const results = validateEntity(graph, "test-entity");
+      const results = validateEntity(graph, "aB3cD4eF5g");
       const rangeErrors = results.filter((r) => r.rule === "range-value");
       expect(rangeErrors).toHaveLength(1);
       expect(rangeErrors[0].message).toContain("finite");
@@ -171,14 +171,14 @@ describe("range value types", () => {
 
     it("accepts min value of zero", () => {
       const { graph } = graphWithFact({ type: "min", value: 0 });
-      const results = validateEntity(graph, "test-entity");
+      const results = validateEntity(graph, "aB3cD4eF5g");
       const rangeErrors = results.filter((r) => r.rule === "range-value");
       expect(rangeErrors).toHaveLength(0);
     });
 
     it("accepts negative min value", () => {
       const { graph } = graphWithFact({ type: "min", value: -1000 });
-      const results = validateEntity(graph, "test-entity");
+      const results = validateEntity(graph, "aB3cD4eF5g");
       const rangeErrors = results.filter((r) => r.rule === "range-value");
       expect(rangeErrors).toHaveLength(0);
     });
@@ -253,11 +253,12 @@ describe("range value types", () => {
         high: 26e9,
         unit: "USD",
       });
-      const serialized = serialize(graph);
+      const filenameMap = new Map([["aB3cD4eF5g", "test-entity"]]);
+      const serialized = serialize(graph, filenameMap);
       const json = JSON.stringify(serialized);
       const parsed = JSON.parse(json);
 
-      const facts = parsed.facts["test-entity"];
+      const facts = parsed.facts["aB3cD4eF5g"];
       expect(facts).toHaveLength(1);
       expect(facts[0].value).toEqual({
         type: "range",
@@ -273,11 +274,12 @@ describe("range value types", () => {
         value: 67e9,
         unit: "USD",
       });
-      const serialized = serialize(graph);
+      const filenameMap = new Map([["aB3cD4eF5g", "test-entity"]]);
+      const serialized = serialize(graph, filenameMap);
       const json = JSON.stringify(serialized);
       const parsed = JSON.parse(json);
 
-      const facts = parsed.facts["test-entity"];
+      const facts = parsed.facts["aB3cD4eF5g"];
       expect(facts).toHaveLength(1);
       expect(facts[0].value).toEqual({
         type: "min",

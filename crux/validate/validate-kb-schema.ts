@@ -86,7 +86,7 @@ async function main(): Promise<void> {
   );
 
   const dataDir = join(PROJECT_ROOT, "packages/kb/data");
-  const graph = await loadKB(dataDir);
+  const { graph } = await loadKB(dataDir);
   const results: ValidationResult[] = validate(graph);
 
   // Separate blocking errors from demoted/warning-level issues

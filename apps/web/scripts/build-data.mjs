@@ -1315,8 +1315,8 @@ async function main() {
   const kbDataDir = join(REPO_ROOT, 'packages', 'kb', 'data');
   if (existsSync(kbDataDir)) {
     const { loadKB, serialize } = await import('../../../packages/kb/src/index.ts');
-    const graph = await loadKB(kbDataDir);
-    const serializedKB = serialize(graph);
+    const { graph, filenameMap } = await loadKB(kbDataDir);
+    const serializedKB = serialize(graph, filenameMap);
     database.kb = serializedKB;
     const entityCount = serializedKB.entities?.length ?? 0;
     const factCount = Object.keys(serializedKB.facts ?? {}).length;

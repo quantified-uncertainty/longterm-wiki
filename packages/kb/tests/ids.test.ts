@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  generateId,
   generateStableId,
   generateFactId,
   contentHash,
@@ -7,16 +8,15 @@ import {
 } from "../src/ids";
 
 describe("ids", () => {
-  describe("generateStableId", () => {
+  describe("generateId", () => {
     it("returns a 10-character string", () => {
-      const id = generateStableId();
+      const id = generateId();
       expect(id).toHaveLength(10);
     });
 
     it("returns only alphanumeric characters (no - or _)", () => {
-      // Run multiple times to increase confidence since replacement is probabilistic
       for (let i = 0; i < 50; i++) {
-        const id = generateStableId();
+        const id = generateId();
         expect(id).toMatch(/^[A-Za-z0-9]{10}$/);
       }
     });
@@ -24,31 +24,33 @@ describe("ids", () => {
     it("generates unique IDs on successive calls", () => {
       const ids = new Set<string>();
       for (let i = 0; i < 100; i++) {
-        ids.add(generateStableId());
+        ids.add(generateId());
       }
-      // With 10 alphanumeric chars, collisions in 100 tries are astronomically unlikely
       expect(ids.size).toBe(100);
     });
   });
 
+  describe("generateStableId (deprecated alias)", () => {
+    it("returns same format as generateId", () => {
+      const id = generateStableId();
+      expect(id).toHaveLength(10);
+      expect(id).toMatch(/^[A-Za-z0-9]{10}$/);
+    });
+  });
+
   describe("generateFactId", () => {
-    it('returns a string starting with "f_"', () => {
+    it("returns a 10-character alphanumeric string (same format as entity IDs)", () => {
       const id = generateFactId();
-      expect(id.startsWith("f_")).toBe(true);
+      expect(id).toHaveLength(10);
+      expect(id).toMatch(/^[A-Za-z0-9]{10}$/);
     });
 
-    it('returns "f_" followed by 10 alphanumeric characters', () => {
-      const id = generateFactId();
-      expect(id).toHaveLength(12); // "f_" + 10 chars
-      expect(id).toMatch(/^f_[A-Za-z0-9]{10}$/);
-    });
-
-    it("does not contain - or _ after the f_ prefix", () => {
+    it("generates unique IDs", () => {
+      const ids = new Set<string>();
       for (let i = 0; i < 50; i++) {
-        const id = generateFactId();
-        const suffix = id.slice(2);
-        expect(suffix).toMatch(/^[A-Za-z0-9]{10}$/);
+        ids.add(generateFactId());
       }
+      expect(ids.size).toBe(50);
     });
   });
 
@@ -85,38 +87,34 @@ describe("ids", () => {
   });
 
   describe("generateContentFactId", () => {
-    it('returns a string starting with "f_"', () => {
-      const id = generateContentFactId("anthropic", "revenue", 1e9, "2024");
-      expect(id.startsWith("f_")).toBe(true);
+    it("returns a 10-character string (no f_ prefix)", () => {
+      const id = generateContentFactId("mK9pX3rQ7n", "revenue", 1e9, "2024");
+      expect(id).toHaveLength(10);
+      expect(id).toMatch(/^[A-Za-z0-9]{10}$/);
     });
 
     it("is deterministic: same inputs produce same output", () => {
-      const id1 = generateContentFactId("anthropic", "revenue", 1e9, "2024");
-      const id2 = generateContentFactId("anthropic", "revenue", 1e9, "2024");
+      const id1 = generateContentFactId("mK9pX3rQ7n", "revenue", 1e9, "2024");
+      const id2 = generateContentFactId("mK9pX3rQ7n", "revenue", 1e9, "2024");
       expect(id1).toBe(id2);
     });
 
     it("produces different output for different values", () => {
-      const id1 = generateContentFactId("anthropic", "revenue", 1e9, "2024");
-      const id2 = generateContentFactId("anthropic", "revenue", 2e9, "2024");
+      const id1 = generateContentFactId("mK9pX3rQ7n", "revenue", 1e9, "2024");
+      const id2 = generateContentFactId("mK9pX3rQ7n", "revenue", 2e9, "2024");
       expect(id1).not.toBe(id2);
     });
 
     it("produces different output for different subjects", () => {
-      const id1 = generateContentFactId("anthropic", "revenue", 1e9, "2024");
-      const id2 = generateContentFactId("openai", "revenue", 1e9, "2024");
+      const id1 = generateContentFactId("mK9pX3rQ7n", "revenue", 1e9, "2024");
+      const id2 = generateContentFactId("xY7zW8vU9t", "revenue", 1e9, "2024");
       expect(id1).not.toBe(id2);
     });
 
     it("handles missing asOf parameter", () => {
-      const id1 = generateContentFactId("anthropic", "revenue", 1e9);
-      const id2 = generateContentFactId("anthropic", "revenue", 1e9);
+      const id1 = generateContentFactId("mK9pX3rQ7n", "revenue", 1e9);
+      const id2 = generateContentFactId("mK9pX3rQ7n", "revenue", 1e9);
       expect(id1).toBe(id2);
-    });
-
-    it("returns f_ + 10 characters (12 total)", () => {
-      const id = generateContentFactId("anthropic", "revenue", 1e9, "2024");
-      expect(id).toHaveLength(12);
     });
   });
 });
