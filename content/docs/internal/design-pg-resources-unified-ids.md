@@ -1,3 +1,10 @@
+---
+title: "Design: PG-Native Resources & Unified ID System"
+description: "Draft proposal for migrating resources to PG-native storage with a unified ID resolver."
+subcategory: architecture
+lastEdited: "2026-03-10"
+---
+
 # Design: PG-Native Resources & Unified ID System
 
 **Status**: Draft proposal
