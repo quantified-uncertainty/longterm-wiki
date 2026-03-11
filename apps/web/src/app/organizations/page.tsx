@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getKBEntities, getKBLatest, getKBRecords } from "@/data/kb";
+import { getKBEntities, getKBLatest, getKBRecords, getKBEntitySlug } from "@/data/kb";
 import { getEntityById } from "@/data";
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
@@ -45,6 +45,7 @@ export default function OrganizationsPage() {
 
     return {
       id: entity.id,
+      slug: getKBEntitySlug(entity.id) ?? entity.id,
       name: entity.name,
       numericId: entity.numericId ?? null,
       orgType: (dbEntity as { orgType?: string } | undefined)?.orgType ?? null,

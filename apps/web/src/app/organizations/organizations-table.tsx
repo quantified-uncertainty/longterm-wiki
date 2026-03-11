@@ -5,6 +5,7 @@ import Link from "next/link";
 
 export interface OrgRow {
   id: string;
+  slug: string;
   name: string;
   numericId: string | null;
   orgType: string | null;
@@ -279,7 +280,7 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
                 {/* Name */}
                 <td className="py-2.5 px-3">
                   <Link
-                    href={`/kb/entity/${row.id}`}
+                    href={`/organizations/${row.slug}`}
                     className="font-medium text-foreground hover:text-primary transition-colors"
                   >
                     {row.name}
