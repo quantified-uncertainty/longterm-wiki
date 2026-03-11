@@ -18,6 +18,7 @@ import type { Graph } from '../../packages/kb/src/graph.ts';
 import type { Entity, Fact, RecordEntry, ValidationResult } from '../../packages/kb/src/types.ts';
 import { commands as kbMigrateCommands } from './kb-migrate.ts';
 import { verifyCommand } from './kb-verify.ts';
+import { run as migrateRecordsRun } from './kb-migrate-records.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
 import { loadGraphFull, loadGraph, resolveEntity } from '../lib/kb-loader.ts';
@@ -979,6 +980,7 @@ export const commands = {
   stale: staleCommand,
   'needs-update': needsUpdateCommand,
   migrate: kbMigrateCommands.default,
+  'migrate-records': migrateRecordsRun,
   'sync-sources': syncSourcesCommand,
   verify: verifyCommand,
 };
@@ -999,6 +1001,7 @@ Commands:
   stale [days]          List facts older than N days (default: 180)
   needs-update <id>     Show missing and stale data for an entity
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
+  migrate-records       Sync key-persons/board-seats/career-history/grants to PG
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
   verify                Verify KB facts against source URLs using LLM
 
