@@ -65,7 +65,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to snapshot"
           else
-            RESOURCE_COUNT=$(node -e "console.log(JSON.parse(require('fs').readFileSync('data/resources-snapshot.json','utf-8')).length)")
+            RESOURCE_COUNT=$(node -e "console.log(JSON.parse(require('fs').readFileSync('data/resources-snapshot.json','utf-8')).length)") || RESOURCE_COUNT="unknown"
             git commit -m "chore: refresh resources snapshot (${RESOURCE_COUNT} resources)"
             git push
           fi
