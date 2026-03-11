@@ -196,7 +196,7 @@ export function saveResources(resources: Resource[]): void {
     // Remove internal tracking field before writing
     const { _sourceFile, ...cleanResource } = resource;
     byFile[category].push(cleanResource);
-    cleanResources.push(cleanResource as Resource);
+    cleanResources.push(cleanResource);
   }
 
   // Write each file that has resources
@@ -218,7 +218,13 @@ export function saveResources(resources: Resource[]): void {
 
 const PG_BATCH_SIZE = 200;
 
-/** Convert a Resource to the camelCase API payload for PG sync. */
+/**
+ * Convert a Resource to the camelCase API payload for PG sync.
+ *
+ * Similar to transformResource() in sync-resources.ts, but operates on the
+ * in-memory Resource type (not YamlResource) and passes through existing
+ * stable_id instead of generating a new one each time.
+ */
 function resourceToSyncPayload(r: Resource): SyncResource {
   return {
     id: r.id,
