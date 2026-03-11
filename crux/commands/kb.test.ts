@@ -406,6 +406,29 @@ describe('crux kb add-fact', () => {
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Cannot parse');
   }, 30_000);
+
+  it('detects duplicate fact by (property, value, asOf)', async () => {
+    // Anthropic has a revenue fact: value=100e6 (100000000), asOf=2023-12
+    const result = await commands['add-fact'](['anthropic', 'revenue', '100e6'], { asOf: '2023-12' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Duplicate fact');
+    expect(result.output).toContain('revenue');
+    expect(result.output).toContain('--force');
+  }, 30_000);
+
+  it('detects duplicate with equivalent numeric notation', async () => {
+    // 100000000 === 100e6 after coercion — should detect as duplicate
+    const result = await commands['add-fact'](['anthropic', 'revenue', '100000000'], { asOf: '2023-12' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Duplicate fact');
+  }, 30_000);
+
+  it('includes fact ID in duplicate error message', async () => {
+    const result = await commands['add-fact'](['anthropic', 'revenue', '100e6'], { asOf: '2023-12' });
+    expect(result.exitCode).toBe(1);
+    // The error should include the existing fact's ID
+    expect(result.output).toMatch(/fact ID: \w+/);
+  }, 30_000);
 });
 
 // ── add-record command tests (integration with real data) ────────────────

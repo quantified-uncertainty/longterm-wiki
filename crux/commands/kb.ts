@@ -46,6 +46,7 @@ interface KBCommandOptions extends BaseOptions {
   source?: string;
   notes?: string;
   currency?: string;
+  force?: boolean;
 }
 
 // ── show command ────────────────────────────────────────────────────────
@@ -1062,9 +1063,11 @@ async function addFactCommand(
   if (positionalArgs.length < 3) {
     return {
       exitCode: 1,
-      output: `Usage: crux kb add-fact <entity> <property> <value> [--asOf=YYYY-MM] [--source=URL] [--notes=TEXT] [--currency=USD]
+      output: `Usage: crux kb add-fact <entity> <property> <value> [--asOf=YYYY-MM] [--source=URL] [--notes=TEXT] [--currency=USD] [--force]
 
   Add a fact to a KB entity's YAML file.
+  Detects duplicates by (property, value, asOf) and errors if a match exists.
+  Use --force to skip the duplicate check.
 
 Examples:
   crux kb add-fact anthropic revenue 5e9 --asOf=2025-06 --source=https://example.com
@@ -1103,6 +1106,30 @@ Examples:
 
   // Build fact input
   const asOf = options.asOf ?? options['as-of'];
+
+  // Duplicate detection: check if a fact with the same (property, value, asOf) already exists
+  if (!options.force) {
+    const existingFacts = graph.getFacts(entity.id, { property: propertyArg });
+    const duplicate = existingFacts.find((f) => {
+      // Compare coerced value against the fact's typed value
+      const fv = f.value;
+      const rawVal = coerced.value;
+      let valuesMatch = false;
+      if ('value' in fv) {
+        valuesMatch = fv.value === rawVal;
+      }
+      // Compare asOf (both undefined counts as a match)
+      const asOfMatch = (f.asOf ?? undefined) === (asOf ?? undefined);
+      return valuesMatch && asOfMatch;
+    });
+    if (duplicate) {
+      return {
+        exitCode: 1,
+        output: `Duplicate fact: property "${propertyArg}" with value ${JSON.stringify(coerced.value)} and asOf "${asOf ?? '(none)'}" already exists (fact ID: ${duplicate.id}).\nUse --force to add anyway.`,
+      };
+    }
+  }
+
   const factInput: RawFactInput = {
     property: propertyArg,
     value: coerced.value,
