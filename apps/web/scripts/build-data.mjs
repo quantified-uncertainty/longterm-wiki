@@ -1119,6 +1119,87 @@ function grantRowToRecordEntry(row) {
 }
 
 /**
+ * Fetch all resources from the wiki-server PG database.
+ * Returns them in the same shape as YAML resources (snake_case keys, cited_by array).
+ * Falls back to null if the server is unavailable (caller should use YAML).
+ */
+async function fetchResourcesFromPG() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) return null;
+
+  const headers = buildHeaders();
+  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
+  const allResources = [];
+  let offset = 0;
+  const limit = 200;
+
+  try {
+    // Paginate through all resources
+    while (true) {
+      const resp = await fetch(
+        `${serverUrl}/api/resources/all?limit=${limit}&offset=${offset}`,
+        fetchOpts
+      );
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const rows = data.resources || [];
+      if (rows.length === 0) break;
+
+      for (const r of rows) {
+        // Transform PG camelCase → YAML snake_case shape for backward compat
+        allResources.push({
+          id: r.id,
+          url: r.url,
+          title: r.title ?? undefined,
+          type: r.type ?? undefined,
+          summary: r.summary ?? undefined,
+          review: r.review ?? undefined,
+          abstract: r.abstract ?? undefined,
+          key_points: r.keyPoints ?? undefined,
+          publication_id: r.publicationId ?? undefined,
+          authors: r.authors ?? undefined,
+          published_date: r.publishedDate ?? undefined,
+          tags: r.tags ?? undefined,
+          local_filename: r.localFilename ?? undefined,
+          credibility_override: r.credibilityOverride ?? undefined,
+          fetched_at: r.fetchedAt ?? undefined,
+          content_hash: r.contentHash ?? undefined,
+          stable_id: r.stableId ?? undefined,
+        });
+      }
+
+      offset += rows.length;
+      if (rows.length < limit) break;
+    }
+
+    // Fetch bulk citation index (resourceId → pageIds[])
+    try {
+      const citResp = await fetch(
+        `${serverUrl}/api/resources/citations/all`,
+        { headers, signal: AbortSignal.timeout(15_000) }
+      );
+      if (citResp.ok) {
+        const citData = await citResp.json();
+        const citations = citData.citations || {};
+        for (const r of allResources) {
+          const pages = citations[r.id];
+          if (pages && pages.length > 0) {
+            r.cited_by = pages;
+          }
+        }
+      }
+    } catch {
+      // Non-fatal — cited_by from YAML will be used for pageResources
+    }
+
+    return allResources;
+  } catch (err) {
+    console.log(`  resources-pg: fetch failed (${err instanceof Error ? err.message : String(err)})`);
+    return null;
+  }
+}
+
+/**
  * Fetch all page references (claim refs + citations) from the wiki-server.
  * Returns a map of pageId → { claimReferences, citations } for the reference preprocessor.
  * Falls back to an empty object if the server is unavailable.
@@ -1441,6 +1522,29 @@ async function main() {
     const data = dir ? loadYamlDir(dir) : loadYaml(file);
     database[key] = data;
     console.log(`  ${key}: ${countEntries(data)} entries`);
+  }
+
+  // Try to load resources from PG → snapshot → YAML (fallback chain)
+  if (!CONTENT_ONLY) {
+    const pgResources = await fetchResourcesFromPG();
+    if (pgResources && pgResources.length > 0) {
+      database.resources = pgResources;
+      console.log(`  resources: ${pgResources.length} loaded from PG (overrides YAML)`);
+    } else {
+      // Try snapshot fallback
+      const snapshotPath = join(DATA_DIR, 'resources-snapshot.json');
+      if (existsSync(snapshotPath)) {
+        try {
+          const snapshotData = JSON.parse(readFileSync(snapshotPath, 'utf-8'));
+          if (Array.isArray(snapshotData) && snapshotData.length > 0) {
+            database.resources = snapshotData;
+            console.log(`  resources: ${snapshotData.length} loaded from snapshot (PG unavailable)`);
+          }
+        } catch (err) {
+          console.warn(`  resources: snapshot parse failed (${err.message}), using YAML`);
+        }
+      }
+    }
   }
 
   // Compute derived data for entities

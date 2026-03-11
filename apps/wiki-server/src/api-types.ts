@@ -580,6 +580,7 @@ export const UpsertResourceSchema = z.object({
   credibilityOverride: z.number().min(0).max(1).nullable().optional(),
   fetchedAt: z.string().datetime().nullable().optional(),
   contentHash: z.string().max(200).nullable().optional(),
+  stableId: z.string().max(20).nullable().optional(),
   citedBy: z.array(z.string().min(1).max(200)).max(500).nullable().optional(),
 });
 export type UpsertResource = z.infer<typeof UpsertResourceSchema>;

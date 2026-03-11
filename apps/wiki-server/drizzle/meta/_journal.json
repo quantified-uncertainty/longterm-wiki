@@ -505,6 +505,13 @@
       "when": 1774771200000,
       "tag": "0071_fix_grants_amount_and_grantee",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1774857600000,
+      "tag": "0072_add_stable_id_to_resources",
+      "breakpoints": true
     }
   ]
 }

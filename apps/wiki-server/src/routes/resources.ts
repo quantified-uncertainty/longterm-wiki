@@ -50,6 +50,7 @@ interface ResourceSearchRow {
   credibility_override: number | null;
   fetched_at: string | null;
   content_hash: string | null;
+  stable_id: string | null;
   created_at: string;
   updated_at: string;
   rank: number;
@@ -130,6 +131,7 @@ function resourceValues(d: ResourceInput) {
     credibilityOverride: d.credibilityOverride ?? null,
     fetchedAt: d.fetchedAt ? new Date(d.fetchedAt) : null,
     contentHash: d.contentHash ?? null,
+    stableId: d.stableId ?? null,
   };
 }
 
@@ -161,6 +163,8 @@ async function upsertResource(
         credibilityOverride: vals.credibilityOverride,
         fetchedAt: vals.fetchedAt,
         contentHash: vals.contentHash,
+        // Preserve existing stableId; only set if row didn't have one
+        stableId: sql`COALESCE(${resources.stableId}, ${vals.stableId})`,
         updatedAt: sql`now()`,
       },
     })
@@ -223,6 +227,7 @@ function formatResource(r: typeof resources.$inferSelect) {
     credibilityOverride: r.credibilityOverride,
     fetchedAt: r.fetchedAt,
     contentHash: r.contentHash,
+    stableId: r.stableId,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
   };
@@ -342,7 +347,7 @@ const resourcesApp = new Hono()
           id, url, title, type, summary, review, abstract,
           key_points, publication_id, authors, published_date,
           tags, local_filename, credibility_override,
-          fetched_at, content_hash, created_at, updated_at,
+          fetched_at, content_hash, stable_id, created_at, updated_at,
           ts_rank_cd(search_vector, to_tsquery('english', $1), 1) AS rank
         FROM resources
         WHERE search_vector @@ to_tsquery('english', $1)
@@ -370,6 +375,7 @@ const resourcesApp = new Hono()
         credibilityOverride: r.credibility_override,
         fetchedAt: r.fetched_at,
         contentHash: r.content_hash,
+        stableId: r.stable_id,
         createdAt: r.created_at,
         updatedAt: r.updated_at,
       })),
@@ -576,6 +582,27 @@ const resourcesApp = new Hono()
       ...formatResource(resource),
       content: contentRows.length > 0 ? contentRows[0] : null,
     });
+  })
+
+  // ---- GET /citations/all (bulk citation index: resourceId → pageIds) ----
+
+  .get("/citations/all", async (c) => {
+    const db = getDrizzleDb();
+    const rows = await db
+      .select({
+        resourceId: resourceCitations.resourceId,
+        pageId: resourceCitations.pageId,
+      })
+      .from(resourceCitations);
+
+    // Group by resourceId
+    const index: Record<string, string[]> = {};
+    for (const row of rows) {
+      if (!index[row.resourceId]) index[row.resourceId] = [];
+      index[row.resourceId].push(row.pageId);
+    }
+
+    return c.json({ citations: index, count: rows.length });
   })
 
   // ---- GET /:id (get by ID) ----

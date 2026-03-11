@@ -26,6 +26,7 @@ import { parse as parseYaml } from "yaml";
 import { parseCliArgs } from "../lib/cli.ts";
 import { getServerUrl, getApiKey } from "../lib/wiki-server/client.ts";
 import { waitForHealthy, batchSync } from "./sync-common.ts";
+import { generateId } from "../../packages/kb/src/ids.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const RESOURCES_DIR = join(PROJECT_ROOT, "data/resources");
@@ -72,6 +73,7 @@ export interface SyncResource {
   credibilityOverride: number | null;
   fetchedAt: string | null;
   contentHash: string | null;
+  stableId: string | null;
   citedBy: string[] | null;
 }
 
@@ -122,6 +124,9 @@ export function transformResource(r: YamlResource): SyncResource {
     credibilityOverride: r.credibility_override ?? null,
     fetchedAt: normalizeTimestamp(r.fetched_at),
     contentHash: r.content_hash ?? null,
+    // Generate a 10-char alphanumeric stableId for each resource.
+    // The COALESCE in the upsert handler preserves existing stableIds.
+    stableId: generateId(),
     citedBy: r.cited_by ?? null,
   };
 }

@@ -21,6 +21,7 @@ function makeResource(id: string): SyncResource {
     credibilityOverride: null,
     fetchedAt: null,
     contentHash: null,
+    stableId: `stable_${id}`,
     citedBy: null,
   };
 }
@@ -49,8 +50,10 @@ describe("transformResource", () => {
       credibilityOverride: null,
       fetchedAt: null,
       contentHash: null,
+      stableId: expect.any(String),
       citedBy: null,
     });
+    expect(result.stableId).toHaveLength(10);
   });
 
   it("transforms a fully-populated YAML resource", () => {
