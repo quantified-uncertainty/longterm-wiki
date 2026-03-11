@@ -1185,6 +1185,22 @@ Examples:
     entry[key] = !isNaN(num) && val.trim() !== '' ? num : val;
   }
 
+  // Validate field names against the record schema
+  const conventionFields = ['asOf', 'validEnd', 'display_name'];
+  const validFields = new Set([
+    ...Object.keys(recordSchema.fields),
+    ...Object.keys(recordSchema.endpoints),
+    // Convention fields not defined in schema but allowed on any record
+    ...conventionFields,
+  ]);
+  const unknownFields = Object.keys(entry).filter((k) => !validFields.has(k));
+  if (unknownFields.length > 0) {
+    const schemaFields = [...Object.keys(recordSchema.fields), ...Object.keys(recordSchema.endpoints)].sort();
+    return {
+      exitCode: 1,
+      output: `Unknown field${unknownFields.length > 1 ? 's' : ''}: ${unknownFields.map((f) => `"${f}"`).join(', ')}\n  Valid fields for "${recordTypeArg}": ${schemaFields.join(', ')}\n  Also allowed on any record: ${conventionFields.join(', ')}`,
+    };
+  }
   // Add asOf if provided
   const asOf = options.asOf ?? options['as-of'];
   if (asOf) {
