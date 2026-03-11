@@ -54,11 +54,14 @@ export function extractPageIdsFromReport(reportPath: string): string[] {
     const content = readFileSync(reportPath, 'utf-8');
     const report = parseYaml(content);
 
-    if (!report?.execution?.pages || !Array.isArray(report.execution.pages)) {
+    // The run report stores page results under execution.results (see types.ts RunReport).
+    // Support both field names for backwards compatibility with older report files.
+    const pages = report?.execution?.results ?? report?.execution?.pages;
+    if (!Array.isArray(pages)) {
       return [];
     }
 
-    return report.execution.pages
+    return pages
       .filter((p: { status?: string }) => p.status === 'success')
       .map((p: { pageId?: string }) => p.pageId)
       .filter((id: unknown): id is string => typeof id === 'string');
