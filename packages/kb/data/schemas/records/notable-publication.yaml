@@ -1,5 +1,6 @@
 name: Notable Publication
 description: "Key publications, papers, and books authored or co-authored."
+collectionName: notable-publications
 temporal: false
 
 endpoints:

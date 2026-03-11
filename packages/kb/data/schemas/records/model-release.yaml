@@ -1,5 +1,6 @@
 name: Model Release
 description: "AI model releases in chronological order."
+collectionName: model-releases
 temporal: false
 
 endpoints:

@@ -290,6 +290,7 @@ function parseRecordSchema(id: string, raw: unknown): RecordSchema {
     id,
     name: file.name,
     ...(file.description && { description: file.description }),
+    ...(file.collectionName && { collectionName: file.collectionName }),
     endpoints,
     fields: file.fields ?? {},
     ...(file.temporal && { temporal: true }),
@@ -439,7 +440,8 @@ async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unkno
 
 /**
  * Maps a collection name (e.g., "funding-rounds") to a record schema ID
- * (e.g., "funding-round"). Tries exact match, then depluralization.
+ * (e.g., "funding-round"). Uses explicit collectionName from schemas first,
+ * then falls back to naive depluralization.
  */
 function findRecordSchemaId(
   collectionName: string,
@@ -451,8 +453,15 @@ function findRecordSchemaId(
     return collectionName;
   }
 
-  // Depluralize and check: "funding-rounds" → "funding-round",
-  // "career-histories" → "career-history"
+  // Primary path: check if any allowed schema has this as its explicit collectionName
+  for (const id of allowedIds) {
+    const schema = graph.getRecordSchema(id);
+    if (schema?.collectionName === collectionName) {
+      return id;
+    }
+  }
+
+  // Fallback: naive depluralization for schemas without explicit collectionName
   const candidates: string[] = [];
   if (collectionName.endsWith("ies")) {
     candidates.push(collectionName.slice(0, -3) + "y"); // histories → history

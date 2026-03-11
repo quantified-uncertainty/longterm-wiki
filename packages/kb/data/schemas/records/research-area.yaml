@@ -1,5 +1,6 @@
 name: Research Area
 description: "Major research initiatives and focus areas."
+collectionName: research-areas
 temporal: false
 
 endpoints:

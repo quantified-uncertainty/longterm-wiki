@@ -149,6 +149,8 @@ export interface RecordSchema {
   /** Display name */
   name: string;
   description?: string;
+  /** Plural collection name used in YAML files (e.g., "funding-rounds" for schema "funding-round") */
+  collectionName?: string;
   /** Entity reference fields that position this record in the graph */
   endpoints: Record<string, EndpointDef>;
   /** Data fields */
@@ -257,6 +259,8 @@ export interface SchemaFile {
 export interface RecordSchemaFile {
   name: string;
   description?: string;
+  /** Plural collection name used in YAML files (e.g., "funding-rounds" for schema "funding-round") */
+  collectionName?: string;
   temporal?: boolean;
   endpoints: Record<string, {
     types: string[];
