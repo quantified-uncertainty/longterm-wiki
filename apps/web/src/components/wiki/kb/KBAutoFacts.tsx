@@ -12,14 +12,13 @@ import {
   getKBFacts,
   getKBEntity,
   getKBProperties,
-  getKBProperty,
   getKBLatest,
   getKBAllRecordCollections,
   getKBRecordSchema,
   isFactExpired,
 } from "@data/kb";
 import type { Fact, Property, RecordEntry, FieldDef } from "@longterm-wiki/kb";
-import { formatKBDate, isUrl, shortDomain, titleCase } from "@components/wiki/kb/format";
+import { formatKBDate, isUrl, shortDomain, sortKBRecords, titleCase } from "@components/wiki/kb/format";
 import { KBFactValueDisplay } from "@components/wiki/kb/KBFactValueDisplay";
 import { KBCellValue } from "@components/wiki/kb/KBCellValue";
 import { KBRefLink } from "@components/wiki/kb/KBRefLink";
@@ -144,6 +143,16 @@ function groupByProperty(
   return groups;
 }
 
+/** Sort FactWithProperty[] by asOf descending (most recent first). */
+function sortFactsByAsOf(items: FactWithProperty[]): FactWithProperty[] {
+  return [...items].sort((a, b) => {
+    if (!a.fact.asOf && !b.fact.asOf) return 0;
+    if (!a.fact.asOf) return 1;
+    if (!b.fact.asOf) return -1;
+    return b.fact.asOf.localeCompare(a.fact.asOf);
+  });
+}
+
 /** Safely extract a string field from a record entry. */
 function field(item: RecordEntry, key: string): string | undefined {
   const v = item.fields[key];
@@ -222,7 +231,7 @@ function SourceCell({ source }: { source: string | undefined }) {
     );
   }
   return (
-    <span className="text-muted-foreground/30" title="No source URL">
+    <span className="text-muted-foreground/30" title="No source URL" aria-label="No source">
       {"\u2014"}
     </span>
   );
@@ -245,15 +254,14 @@ function SectionDivider({ title, count }: { title: string; count?: number }) {
 
 /** Hero stat card for a key metric. */
 function StatCard({
-  entityId,
+  fact,
+  prop,
   propertyId,
 }: {
-  entityId: string;
+  fact: Fact;
+  prop: Property | undefined;
   propertyId: string;
 }) {
-  const fact = getKBLatest(entityId, propertyId);
-  const prop = getKBProperty(propertyId);
-  if (!fact) return null;
 
   return (
     <div className="relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-3.5 transition-shadow hover:shadow-md">
@@ -466,14 +474,7 @@ function TimeSeriesFactRow({
   const prop = items[0]?.property;
   const label = prop?.name ?? titleCase(propertyId);
 
-  // Sort by asOf descending
-  const sorted = [...items].sort((a, b) => {
-    if (!a.fact.asOf && !b.fact.asOf) return 0;
-    if (!a.fact.asOf) return 1;
-    if (!b.fact.asOf) return -1;
-    return b.fact.asOf.localeCompare(a.fact.asOf);
-  });
-
+  const sorted = sortFactsByAsOf(items);
   const latest = sorted[0];
   const history = sorted.slice(1);
 
@@ -546,12 +547,7 @@ function SingleFactRow({
   const candidates = items.some((item) => !isFactExpired(item.fact))
     ? items.filter((item) => !isFactExpired(item.fact))
     : items;
-  const sorted = [...candidates].sort((a, b) => {
-    if (!a.fact.asOf && !b.fact.asOf) return 0;
-    if (!a.fact.asOf) return 1;
-    if (!b.fact.asOf) return -1;
-    return b.fact.asOf.localeCompare(a.fact.asOf);
-  });
+  const sorted = sortFactsByAsOf(candidates);
   const prop = sorted[0]?.property;
   const label = prop?.name ?? titleCase(propertyId);
   const fact = sorted[0]?.fact;
@@ -670,9 +666,18 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
   const byCategory = groupByCategory(factsWithProps);
   const categoryKeys = sortCategories(Object.keys(byCategory));
 
-  // Hero stat properties for this entity type
+  // Hero stat properties for this entity type (KB entity types, not wiki entity types)
   const entityType = kbEntity?.type ?? "";
-  const heroProps = HERO_STAT_PROPERTIES[entityType] ?? [];
+  const heroPropIds = HERO_STAT_PROPERTIES[entityType] ?? [];
+
+  // Pre-compute latest facts for hero stats to avoid per-card data re-fetching
+  const heroCards = heroPropIds
+    .map((propId) => {
+      const fact = getKBLatest(entityId, propId);
+      if (!fact) return null;
+      return { propId, fact, prop: propertyMap.get(propId) };
+    })
+    .filter((c): c is { propId: string; fact: Fact; prop: Property | undefined } => c != null);
 
   // Extract special collections
   const keyPersons = allCollections["key-persons"];
@@ -680,23 +685,8 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
   const modelReleases = allCollections["model-releases"];
   const products = allCollections["products"];
 
-  // Sort funding rounds by date descending
-  const sortedFundingRounds = fundingRounds
-    ? [...fundingRounds].sort((a, b) => {
-        const dateA = a.fields.date ? String(a.fields.date) : "";
-        const dateB = b.fields.date ? String(b.fields.date) : "";
-        return dateB.localeCompare(dateA);
-      })
-    : [];
-
-  // Sort model releases by date descending
-  const sortedModelReleases = modelReleases
-    ? [...modelReleases].sort((a, b) => {
-        const dateA = a.fields.released ? String(a.fields.released) : "";
-        const dateB = b.fields.released ? String(b.fields.released) : "";
-        return dateB.localeCompare(dateA);
-      })
-    : [];
+  const sortedFundingRounds = fundingRounds ? sortKBRecords(fundingRounds, "date", false) : [];
+  const sortedModelReleases = modelReleases ? sortKBRecords(modelReleases, "released", false) : [];
 
   // Generic collections = everything not in SPECIAL_COLLECTIONS
   const genericCollections = Object.entries(allCollections)
@@ -728,22 +718,20 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
               </span>
             )}
           </span>
-          <span className="ml-auto">
-            <Link
-              href={`/kb/entity/${entityId}`}
-              className="text-xs text-primary/60 hover:text-primary hover:underline transition-colors"
-            >
-              View full profile &rarr;
-            </Link>
-          </span>
+          <Link
+            href={`/kb/entity/${entityId}`}
+            className="ml-auto text-xs text-primary/60 hover:text-primary hover:underline transition-colors"
+          >
+            View full profile &rarr;
+          </Link>
         </div>
 
         <div className="px-5 py-4">
           {/* 1. Hero stat cards */}
-          {heroProps.length > 0 && (
+          {heroCards.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-4">
-              {heroProps.map((propId) => (
-                <StatCard key={propId} entityId={entityId} propertyId={propId} />
+              {heroCards.map(({ propId, fact, prop }) => (
+                <StatCard key={propId} propertyId={propId} fact={fact} prop={prop} />
               ))}
             </div>
           )}
