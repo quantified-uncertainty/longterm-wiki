@@ -157,7 +157,9 @@ function sortFactsByAsOf(items: FactWithProperty[]): FactWithProperty[] {
 function field(item: RecordEntry, key: string): string | undefined {
   const v = item.fields[key];
   if (v == null) return undefined;
-  return String(v);
+  if (typeof v === "string") return v;
+  if (typeof v === "number" || typeof v === "boolean") return String(v);
+  return undefined; // Don't coerce arrays/objects
 }
 
 /** Format a currency amount compactly. */
@@ -694,14 +696,14 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
     .sort(([a], [b]) => a.localeCompare(b));
 
   return (
-    <section className="not-prose mt-8 mb-6">
+    <section className="not-prose mt-8 mb-6" aria-labelledby="kb-auto-facts-heading">
       <div className="border border-border/60 rounded-xl bg-card shadow-sm overflow-hidden">
         {/* Header bar */}
         <div className="px-5 py-3 border-b border-border/40 flex items-center gap-2.5">
           <Database size={14} className="text-muted-foreground/60" />
-          <span className="text-sm font-bold tracking-tight">
+          <h2 id="kb-auto-facts-heading" className="text-sm font-bold tracking-tight">
             Structured Data
-          </span>
+          </h2>
           <span className="text-xs text-muted-foreground flex items-center gap-1.5 ml-1">
             {substantiveFacts.length > 0 && (
               <span>
