@@ -1,6 +1,9 @@
+import "dotenv/config";
 import { defineConfig } from "@playwright/test";
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3001";
+const devPort = process.env.DEV_PORT || "3001";
+const baseURL =
+  process.env.PLAYWRIGHT_BASE_URL || `http://localhost:${devPort}`;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -12,8 +15,8 @@ export default defineConfig({
   // Auto-start local server only when testing against localhost
   ...(!process.env.PLAYWRIGHT_BASE_URL && {
     webServer: {
-      command: "PORT=3001 pnpm start",
-      port: 3001,
+      command: `DEV_PORT=${devPort} pnpm start`,
+      port: Number(devPort),
       timeout: 30_000,
       reuseExistingServer: true,
     },
