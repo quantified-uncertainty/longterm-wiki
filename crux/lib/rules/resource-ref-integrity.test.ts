@@ -10,6 +10,7 @@ import { Severity } from '../validation/validation-engine.ts';
 // vi.mock is hoisted before all imports by vitest — fs is mocked before
 // resource-ref-integrity.ts initialises its module-level resourceIdCache.
 vi.mock('fs', () => ({
+  existsSync: vi.fn(() => true),
   readdirSync: vi.fn(() => ['test-resources.yaml']),
   readFileSync: vi.fn(
     () =>

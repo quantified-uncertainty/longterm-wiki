@@ -14,7 +14,7 @@ import { join } from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import type { Resource } from '../../resource-types.ts';
 import { RESOURCES_DIR } from '../../resource-types.ts';
-import { loadResources } from '../../resource-io.ts';
+import { loadResources, loadResourcesPGFirst } from '../../resource-io.ts';
 
 // Re-export Resource as ResourceEntry for consumers
 export type ResourceEntry = Resource;
@@ -70,10 +70,14 @@ function ensureLoaded(): void {
   if (cachedResources) return;
 
   cachedResources = loadResources();
+  buildIndexes(cachedResources);
+}
+
+function buildIndexes(resources: Resource[]): void {
   cachedById = new Map();
   cachedByUrl = new Map();
 
-  for (const resource of cachedResources) {
+  for (const resource of resources) {
     cachedById.set(resource.id, resource);
 
     // Index by normalized URL (with and without trailing slash, www variants)
@@ -83,6 +87,17 @@ function ensureLoaded(): void {
       cachedByUrl.set(norm + '/', resource);
     }
   }
+}
+
+/**
+ * Initialize the resource cache using PG-first loading.
+ * Call this before using getResourceById/getResourceByUrl
+ * to benefit from fresher PG data.
+ */
+export async function initFromPG(): Promise<void> {
+  if (cachedResources) return;
+  cachedResources = await loadResourcesPGFirst();
+  buildIndexes(cachedResources);
 }
 
 /** Clear the cached resource index (useful in tests). */
