@@ -164,7 +164,7 @@ async function fetchResourcesFromPG(): Promise<Resource[] | null> {
  */
 export async function loadResourcesPGFirst(): Promise<Resource[]> {
   const pgResources = await fetchResourcesFromPG();
-  if (pgResources && pgResources.length > 0) {
+  if (pgResources !== null) {
     return pgResources;
   }
   return loadResources();

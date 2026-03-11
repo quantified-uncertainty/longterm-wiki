@@ -52,15 +52,15 @@ let _resourceCache: Resource[] | null = null;
 let _citedByCache: Map<string, Set<string>> | null = null;
 let _validIdCache: Set<string> | null = null;
 
-function loadResources(_root: string): Resource[] {
+function getResources(): Resource[] {
   if (_resourceCache) return _resourceCache;
   _resourceCache = loadResourcesFromYaml();
   return _resourceCache;
 }
 
-function getCitedByIndex(root: string): Map<string, Set<string>> {
+function getCitedByIndex(): Map<string, Set<string>> {
   if (_citedByCache) return _citedByCache;
-  const resources = loadResources(root);
+  const resources = getResources();
   const index = new Map<string, Set<string>>();
   for (const r of resources) {
     if (!r.cited_by || !Array.isArray(r.cited_by)) continue;
@@ -73,9 +73,9 @@ function getCitedByIndex(root: string): Map<string, Set<string>> {
   return index;
 }
 
-function getValidIds(root: string): Set<string> {
+function getValidIds(): Set<string> {
   if (_validIdCache) return _validIdCache;
-  _validIdCache = new Set(loadResources(root).map(r => r.id));
+  _validIdCache = new Set(getResources().map(r => r.id));
   return _validIdCache;
 }
 
@@ -140,12 +140,11 @@ export function enrichReferences(
   content: string,
   options: { pageId?: string; root?: string } = {},
 ): ReferencesEnrichResult {
-  const root = options.root ?? PROJECT_ROOT;
   const pageId = options.pageId ?? '';
   const slug = slugFromPageId(pageId);
 
-  const validIds = getValidIds(root);
-  const citedByIndex = getCitedByIndex(root);
+  const validIds = getValidIds();
+  const citedByIndex = getCitedByIndex();
 
   // Collect IDs from inline <R> tags
   const inlineIds = extractInlineResourceIds(content);

@@ -121,7 +121,7 @@ function main() {
 
   // Load resources
   const resources = loadAllResources();
-  console.log(`Loaded ${resources.length} resources from ${RESOURCES_DIR}`);
+  console.log(`Loaded ${resources.length} resources`);
 
   // Build cited_by reverse index
   const citedByIndex = buildCitedByIndex(resources);
