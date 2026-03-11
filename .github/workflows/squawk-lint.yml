@@ -42,5 +42,10 @@ jobs:
           CHANGED_FILES: ${{ steps.changed.outputs.files }}
         run: |
           # shellcheck disable=SC2086
-          squawk $CHANGED_FILES
+          squawk \
+            --exclude-path='apps/wiki-server/drizzle/0073_drop_orphaned_kb_fact_verifications.sql' \
+            $CHANGED_FILES
         # squawk reads .squawk.toml from the current directory automatically
+        # --exclude-path: This migration intentionally drops an orphaned table (0 rows,
+        # no code references). ban-drop-table is not globally excluded because it's a
+        # useful safety check for most migrations.
