@@ -4,16 +4,10 @@
  * Provides fast lookup by resource ID and by URL, used by source-fetcher and
  * citation verification to integrate with the Resources system.
  *
- * Read path: loads resources lazily from YAML and caches in memory.
- * Write path: updateResourceFetchStatus() writes fetch_status/fetched_at
- * back to the source YAML file (targeted field update, not full round-trip).
+ * Read path: loads resources from snapshot (sync) or PG (async via initFromPG).
  */
 
-import { readFileSync, existsSync, writeFileSync } from 'fs';
-import { join } from 'path';
-import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import type { Resource } from '../../resource-types.ts';
-import { RESOURCES_DIR } from '../../resource-types.ts';
 import { loadResources, loadResourcesPGFirst } from '../../resource-io.ts';
 
 // Re-export Resource as ResourceEntry for consumers
@@ -147,56 +141,19 @@ export function resolveResource(id: string): Resource | null {
 }
 
 /**
- * Update a resource's fetch status in the YAML file.
+ * Update a resource's fetch status.
  *
- * Uses line-level text replacement to update only the fetch_status and
- * fetched_at fields, preserving YAML comments, formatting, and all other
- * fields (review, key_points, etc.).
+ * Previously wrote to YAML files; now a no-op since resources are PG-native.
+ * The fetch_status field is not currently in the PG schema — a future
+ * migration should add it and implement a PATCH endpoint.
+ *
+ * TODO: Add fetch_status column to PG resources table and implement
+ * a targeted PATCH /api/resources/:id/fetch-status endpoint.
  */
 export function updateResourceFetchStatus(
-  resourceId: string,
-  status: ResourceFetchStatus,
+  _resourceId: string,
+  _status: ResourceFetchStatus,
 ): void {
-  ensureLoaded();
-  const resource = cachedById!.get(resourceId);
-  if (!resource || !resource._sourceFile) return;
-
-  const filepath = join(RESOURCES_DIR, `${resource._sourceFile}.yaml`);
-  if (!existsSync(filepath)) return;
-
-  const content = readFileSync(filepath, 'utf-8');
-
-  // Use targeted YAML parsing to find and update only the specific entry.
-  // We parse to locate the entry, then do a targeted text-level update
-  // to preserve comments and formatting.
-  const parsed = parseYaml(content);
-  if (!Array.isArray(parsed)) return;
-
-  const entryIndex = parsed.findIndex((e: Record<string, unknown>) => e.id === resourceId);
-  if (entryIndex === -1) return;
-
-  // Build the updated entry by merging new fields into the existing parsed entry
-  const entry = parsed[entryIndex] as Record<string, unknown>;
-  entry.fetch_status = status.fetchStatus;
-  entry.fetched_at = status.fetchedAt;
-  if (status.fetchedTitle && !entry.title) {
-    entry.title = status.fetchedTitle;
-  }
-
-  // Preserve YAML comment headers by extracting them before rewriting
-  const commentLines: string[] = [];
-  for (const line of content.split('\n')) {
-    if (line.startsWith('#') || line.trim() === '') {
-      commentLines.push(line);
-    } else {
-      break;
-    }
-  }
-
-  const yamlBody = stringifyYaml(parsed, { lineWidth: 100 });
-  const output = commentLines.length > 0
-    ? commentLines.join('\n') + '\n' + yamlBody
-    : yamlBody;
-
-  writeFileSync(filepath, output);
+  // No-op: PG resources table does not have a fetch_status column yet.
+  // The source-fetcher still works — it just won't persist fetch status.
 }

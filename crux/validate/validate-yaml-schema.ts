@@ -136,13 +136,8 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   allErrors.push(...entityErrors);
   if (!ciMode) console.log(`  ${entities.length} entities loaded`);
 
-  // 2. Validate resources/*.yaml against Resource schema
-  if (!ciMode) console.log(`${colors.dim}Checking resources...${colors.reset}`);
-  const resources = loadYamlDir('resources');
-  totalValidated += resources.length;
-  const resourceErrors = validateItems(resources, Resource, 'Resource');
-  allErrors.push(...resourceErrors);
-  if (!ciMode) console.log(`  ${resources.length} resources loaded`);
+  // 2. Resources are PG-native (no YAML files to validate)
+  if (!ciMode) console.log(`${colors.dim}Resources: PG-native (skipped)${colors.reset}`);
 
   // 3. Validate publications.yaml against Publication schema
   if (!ciMode) console.log(`${colors.dim}Checking publications...${colors.reset}`);

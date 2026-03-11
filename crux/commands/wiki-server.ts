@@ -12,11 +12,8 @@ const SCRIPTS = {
     description: 'Sync wiki page content and metadata to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size', 'ci'],
   },
-  'sync-resources': {
-    script: 'wiki-server/sync-resources.ts',
-    description: 'Sync data/resources/*.yaml to wiki-server',
-    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
-  },
+  // sync-resources removed: YAML resource files deleted in R6 (PG is sole source of truth).
+  // The sync-resources.ts file is kept for its normalizeDate/normalizeTimestamp exports.
   'sync-entities': {
     script: 'wiki-server/sync-entities.ts',
     description: 'Sync data/entities/*.yaml to wiki-server',
@@ -72,7 +69,6 @@ Examples:
   crux wiki-server sync                      Sync all pages
   crux wiki-server sync --dry-run            Preview page sync
   crux wiki-server sync --batch-size=25      Use smaller batches
-  crux wiki-server sync-resources            Sync all resources
   crux wiki-server sync-entities             Sync all entities
   crux wiki-server sync-entities --dry-run   Preview entity sync
   crux wiki-server sync-session .claude/sessions/2026-02-21_my-branch.yaml
