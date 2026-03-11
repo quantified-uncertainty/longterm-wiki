@@ -1,5 +1,6 @@
 name: Investment Participation
 description: "An investor's participation in a company's funding round."
+collectionName: investments
 temporal: false
 
 endpoints:

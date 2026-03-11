@@ -56,6 +56,48 @@ describe("records", () => {
     });
   });
 
+  describe("collectionName in record schemas", () => {
+    it("all record schemas have explicit collectionName", () => {
+      const schemas = graph.getAllRecordSchemas();
+      for (const schema of schemas) {
+        expect(schema.collectionName, `schema "${schema.id}" missing collectionName`).toBeDefined();
+      }
+    });
+
+    it("funding-round schema has collectionName 'funding-rounds'", () => {
+      const schema = graph.getRecordSchema("funding-round");
+      expect(schema!.collectionName).toBe("funding-rounds");
+    });
+
+    it("career-history schema has collectionName 'career-history'", () => {
+      const schema = graph.getRecordSchema("career-history");
+      expect(schema!.collectionName).toBe("career-history");
+    });
+
+    it("grant schema has collectionName 'grants'", () => {
+      const schema = graph.getRecordSchema("grant");
+      expect(schema!.collectionName).toBe("grants");
+    });
+
+    it("collectionName values are unique across schemas", () => {
+      const schemas = graph.getAllRecordSchemas();
+      const names = schemas.map((s) => s.collectionName).filter(Boolean);
+      const unique = new Set(names);
+      expect(unique.size).toBe(names.length);
+    });
+
+    it("getRecordSchemaByCollectionName resolves to correct schema", () => {
+      const schema = graph.getRecordSchemaByCollectionName("funding-rounds");
+      expect(schema).toBeDefined();
+      expect(schema!.id).toBe("funding-round");
+    });
+
+    it("getRecordSchemaByCollectionName returns undefined for unknown name", () => {
+      const schema = graph.getRecordSchemaByCollectionName("nonexistent");
+      expect(schema).toBeUndefined();
+    });
+  });
+
   describe("entity type schema records list", () => {
     it("organization schema lists record types", () => {
       const orgSchema = graph.getSchema("organization");

@@ -1,5 +1,6 @@
 name: Grant or Program
 description: "Major grants, programs, and spending initiatives."
+collectionName: grants
 temporal: false
 
 endpoints:

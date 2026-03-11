@@ -1,5 +1,6 @@
 name: Equity Position
 description: "Current or historical equity ownership stake."
+collectionName: equity-positions
 temporal: true
 
 endpoints:
