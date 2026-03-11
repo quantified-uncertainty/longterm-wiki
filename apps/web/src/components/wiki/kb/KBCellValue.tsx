@@ -18,6 +18,9 @@ import { KBRefLink } from "./KBRefLink";
 /** Fields that store fractions (0-1) representing percentages. */
 const FRACTION_FIELDS = new Set(["stake", "stake_acquired", "pledge"]);
 
+/** Fields that are typically monetary amounts (USD), used as fallback when schema is unavailable. */
+const CURRENCY_FIELD_NAMES = new Set(["amount", "investment_amount", "raised", "valuation"]);
+
 function isFractionField(fieldName: string, fieldDef?: FieldDef): boolean {
   if (FRACTION_FIELDS.has(fieldName)) return true;
   // Check description for "fraction" or "0.8 = 80%" hints
@@ -106,6 +109,47 @@ export function KBCellValue({ value, fieldName, fieldDef }: KBCellValueProps) {
         {value ? "\u2713" : "\u2717"}
       </span>
     );
+  }
+
+  // Fallback: array of numbers (range) without schema — format with unit hint from fieldName
+  if (Array.isArray(value) && value.length === 2 && value.every((v) => typeof v === "number")) {
+    const unit = CURRENCY_FIELD_NAMES.has(fieldName) ? "USD" : undefined;
+    if (isFractionField(fieldName, fieldDef)) {
+      return <span className="tabular-nums">{formatPercent(value[0])}&ndash;{formatPercent(value[1])}</span>;
+    }
+    return <span className="tabular-nums">{formatKBNumber(value[0], unit)}&ndash;{formatKBNumber(value[1], unit)}</span>;
+  }
+
+  // Fallback: single number without schema — format with unit hint from fieldName
+  if (typeof value === "number") {
+    const unit = CURRENCY_FIELD_NAMES.has(fieldName) ? "USD" : undefined;
+    if (isFractionField(fieldName, fieldDef) && value >= 0 && value <= 1) {
+      return <span className="tabular-nums">{formatPercent(value)}</span>;
+    }
+    return (
+      <span className="font-mono text-sm tabular-nums">
+        {formatKBNumber(value, unit)}
+      </span>
+    );
+  }
+
+  // Role badges for known role values
+  if (fieldName === "role" && typeof value === "string") {
+    const roleLower = value.toLowerCase();
+    const roleStyles: Record<string, string> = {
+      founder: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+      lead: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+      "co-lead": "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+      participant: "bg-slate-100 text-slate-600 dark:bg-slate-800/50 dark:text-slate-300",
+    };
+    const style = roleStyles[roleLower];
+    if (style) {
+      return (
+        <span className={`inline-flex items-center px-1.5 py-px rounded-full text-[10px] font-semibold ${style}`}>
+          {value.charAt(0).toUpperCase() + value.slice(1)}
+        </span>
+      );
+    }
   }
 
   // Fallback

@@ -14,6 +14,7 @@ import { cn } from "@lib/utils";
 import { getKBEntity } from "@data/kb";
 import { getEntityById } from "@data";
 import { EntityLink } from "@/components/wiki/EntityLink";
+import { titleCase } from "./format";
 
 interface KBRefLinkProps {
   /** KB entity slug (e.g., "anthropic") or stableId */
@@ -36,8 +37,8 @@ export function KBRefLink({ id, label, className }: KBRefLinkProps) {
     );
   }
 
-  // Fallback: show the KB entity name or raw ID
-  const displayName = label ?? kbEntity?.name ?? id;
+  // Fallback: show the KB entity name or title-cased slug
+  const displayName = label ?? kbEntity?.name ?? titleCase(id);
   return (
     <span
       className={cn("text-muted-foreground", className)}

@@ -251,23 +251,23 @@ function SourceCell({ source }: { source: string | undefined }) {
     );
   }
   return (
-    <span className="text-muted-foreground/30" title="No source URL" aria-label="No source">
+    <span className="text-muted-foreground/50" title="No source URL" aria-label="No source">
       {"\u2014"}
     </span>
   );
 }
 
 /** Section divider with title and optional count badge. */
-function SectionDivider({ title, count }: { title: string; count?: number }) {
+function SectionDivider({ title, count, id }: { title: string; count?: number; id?: string }) {
   return (
-    <div className="flex items-center gap-2 mb-2 mt-5 first:mt-0">
-      <h3 className="text-sm font-bold tracking-tight text-foreground">{title}</h3>
+    <div id={id} className="flex items-center gap-2 mb-2 mt-5 first:mt-0 scroll-mt-4">
+      <h3 className="text-base font-bold tracking-tight text-foreground">{title}</h3>
       {count != null && (
         <span className="text-[10px] font-medium tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
           {count}
         </span>
       )}
-      <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
+      <div className="flex-1 h-px bg-gradient-to-r from-border/50 to-transparent" />
     </div>
   );
 }
@@ -284,9 +284,9 @@ function StatCard({
 }) {
 
   return (
-    <div className="relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-3.5 transition-shadow hover:shadow-md">
+    <div className="relative overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-card to-muted/30 p-3.5 transition-shadow hover:shadow-md">
       <div className="absolute top-0 right-0 w-12 h-12 bg-primary/[0.03] rounded-bl-[2rem]" />
-      <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1">
+      <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">
         {prop?.name ?? titleCase(propertyId)}
       </div>
       <div className="text-lg font-bold tabular-nums tracking-tight text-foreground">
@@ -320,7 +320,7 @@ function PersonCard({ item }: { item: RecordEntry }) {
     .toUpperCase();
 
   return (
-    <div className="group relative rounded-lg border border-border/50 bg-card px-2.5 py-2 transition-all hover:shadow-sm hover:border-border">
+    <div className="group relative rounded-lg border border-border/50 bg-card px-2.5 py-2 transition-all hover:shadow-sm hover:border-border h-full">
       <div className="flex items-center gap-2">
         <div className="shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center text-[10px] font-semibold text-primary/60">
           {initials}
@@ -363,33 +363,33 @@ function FundingRoundRow({ item }: { item: RecordEntry }) {
   const instrument = field(item, "instrument");
   const source = field(item, "source");
 
+  const hasSecondLine = !!(leadInvestor || valuation != null || (source && isUrl(source)));
+
   return (
-    <div className="py-1.5 border-b border-border/30 last:border-b-0">
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <span className="font-semibold text-sm">{name}</span>
-        {instrument && (
-          <span className="text-[10px] px-1.5 py-px rounded-full bg-muted text-muted-foreground font-medium">
-            {instrument}
-          </span>
-        )}
-        {date && (
-          <span className="text-xs text-muted-foreground/60">
-            {formatKBDate(date)}
-          </span>
-        )}
-        {raised != null && (
-          <span className="text-sm font-bold tabular-nums tracking-tight">
-            {formatAmount(raised)}
-          </span>
-        )}
-        {valuation != null && (
-          <span className="text-xs text-muted-foreground">
-            at {formatAmount(valuation)} valuation
-          </span>
-        )}
+    <div className="py-1.5 border-b border-border/40 last:border-b-0">
+      {/* Line 1: name+badge | date | amount — grid keeps columns aligned */}
+      <div className="grid grid-cols-[1fr_auto_auto] items-baseline gap-x-3">
+        <div className="flex items-baseline gap-1.5 min-w-0">
+          <span className="font-semibold text-sm truncate">{name}</span>
+          {instrument && (
+            <span className="text-[10px] px-1.5 py-px rounded-full bg-muted text-muted-foreground font-medium shrink-0">
+              {instrument}
+            </span>
+          )}
+        </div>
+        <span className="text-xs text-muted-foreground/60 tabular-nums whitespace-nowrap">
+          {date ? formatKBDate(date) : ""}
+        </span>
+        <span className="text-sm font-bold tabular-nums tracking-tight text-right whitespace-nowrap min-w-[5ch]">
+          {raised != null ? formatAmount(raised) : ""}
+        </span>
       </div>
-      {(leadInvestor || (source && isUrl(source))) && (
-        <div className="flex items-baseline gap-2 text-xs text-muted-foreground">
+      {/* Line 2: valuation, lead investor, source */}
+      {hasSecondLine && (
+        <div className="flex items-baseline gap-2 text-xs text-muted-foreground mt-0.5">
+          {valuation != null && (
+            <span>at {formatAmount(valuation)} valuation</span>
+          )}
           {leadInvestor && (
             <span>Led by <KBRefLink id={leadInvestor} /></span>
           )}
@@ -398,7 +398,7 @@ function FundingRoundRow({ item }: { item: RecordEntry }) {
               href={source}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary/40 hover:text-primary hover:underline transition-colors"
+              className="text-primary/50 hover:text-primary hover:underline transition-colors"
             >
               {shortDomain(source)}
             </a>
@@ -417,13 +417,13 @@ function ProductCard({ item }: { item: RecordEntry }) {
   const source = field(item, "source");
 
   return (
-    <div className="group rounded-xl border border-border/60 bg-card p-3.5 transition-all hover:shadow-md hover:border-border">
+    <div className="group rounded-xl border border-border/50 bg-card p-3.5 transition-all hover:shadow-md hover:border-border">
       <div className="flex items-baseline gap-2">
         <span className="font-semibold text-sm group-hover:text-primary transition-colors">
           {name}
         </span>
         {launched && (
-          <span className="text-[10px] text-muted-foreground/60">
+          <span className="text-xs text-muted-foreground">
             {formatKBDate(launched)}
           </span>
         )}
@@ -438,7 +438,7 @@ function ProductCard({ item }: { item: RecordEntry }) {
           href={source}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[10px] text-primary/50 hover:text-primary hover:underline mt-1 inline-block transition-colors"
+          className="text-xs text-primary/60 hover:text-primary hover:underline mt-1 inline-block transition-colors"
         >
           {shortDomain(source)}
         </a>
@@ -454,6 +454,9 @@ function ModelReleaseRow({ item }: { item: RecordEntry }) {
   const description = field(item, "description");
   const safetyLevel = field(item, "safety_level");
 
+  // Link to wiki page if the record key matches a KB entity (e.g., "claude-3-5-sonnet")
+  const hasKBEntity = !!getKBEntity(item.key);
+
   return (
     <div className="flex items-start gap-3 py-2.5 border-b border-border/50 last:border-b-0">
       <div className="min-w-[65px] text-xs text-muted-foreground pt-0.5">
@@ -461,9 +464,19 @@ function ModelReleaseRow({ item }: { item: RecordEntry }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
-          <span className="font-medium text-sm">{name}</span>
+          {hasKBEntity ? (
+            <KBRefLink id={item.key} label={name} className="font-medium text-sm" />
+          ) : (
+            <span className="font-medium text-sm">{name}</span>
+          )}
           {safetyLevel && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+              safetyLevel.includes("ASL-4") || safetyLevel.includes("ASL 4")
+                ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                : safetyLevel.includes("ASL-3") || safetyLevel.includes("ASL 3")
+                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                  : "bg-muted text-muted-foreground"
+            }`}>
               {safetyLevel}
             </span>
           )}
@@ -498,14 +511,14 @@ function TimeSeriesFactRow({
   return (
     <>
       {/* Main row showing latest value */}
-      <tr className="border-b border-border/30 last:border-b-0">
+      <tr className="border-b border-border/40 last:border-b-0">
         <td className="py-1.5 pr-3 text-sm text-muted-foreground align-baseline whitespace-nowrap">
           {label}
         </td>
         <td className="py-1.5 pr-3 text-sm align-baseline">
           <KBFactValueDisplay fact={latest.fact} property={prop} />
         </td>
-        <td className="py-1.5 pr-3 text-xs text-muted-foreground/60 align-baseline whitespace-nowrap">
+        <td className="py-1.5 pr-3 text-xs text-muted-foreground align-baseline whitespace-nowrap">
           {formatKBDate(latest.fact.asOf)}
         </td>
         <td className="py-1.5 align-baseline text-center">
@@ -514,7 +527,7 @@ function TimeSeriesFactRow({
       </tr>
       {/* Expandable history rows */}
       {history.length > 0 && (
-        <tr className="border-b border-border/30 last:border-b-0">
+        <tr className="border-b border-border/40 last:border-b-0">
           <td colSpan={4} className="py-0 pb-1">
             <details className="group/ts">
               <summary className="cursor-pointer select-none text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors py-0.5 flex items-center gap-1">
@@ -528,7 +541,7 @@ function TimeSeriesFactRow({
                 {history.map((item) => (
                   <div
                     key={item.fact.id}
-                    className="flex items-baseline gap-3 py-0.5 text-xs text-muted-foreground/70"
+                    className="flex items-baseline gap-3 py-0.5 text-xs text-muted-foreground"
                   >
                     <span className="whitespace-nowrap min-w-[60px]">
                       {formatKBDate(item.fact.asOf)}
@@ -570,14 +583,14 @@ function SingleFactRow({
   if (!fact) return null;
 
   return (
-    <tr className="border-b border-border/30 last:border-b-0">
+    <tr className="border-b border-border/40 last:border-b-0">
       <td className="py-1.5 pr-3 text-sm text-muted-foreground align-baseline whitespace-nowrap">
         {label}
       </td>
       <td className="py-1.5 pr-3 text-sm align-baseline">
         <KBFactValueDisplay fact={fact} property={prop} />
       </td>
-      <td className="py-1.5 pr-3 text-xs text-muted-foreground/60 align-baseline whitespace-nowrap">
+      <td className="py-1.5 pr-3 text-xs text-muted-foreground align-baseline whitespace-nowrap">
         {fact.asOf ? formatKBDate(fact.asOf) : ""}
       </td>
       <td className="py-1.5 align-baseline text-center">
@@ -587,13 +600,20 @@ function SingleFactRow({
   );
 }
 
+/** Max rows to show in a generic collection table (server component, no toggle). */
+const MAX_GENERIC_ROWS = 12;
+
 /** Render a record collection as a table (generic fallback). */
 function RecordCollectionSection({
   collectionName,
   items,
+  entityId,
+  sectionId,
 }: {
   collectionName: string;
   items: RecordEntry[];
+  entityId: string;
+  sectionId?: string;
 }) {
   const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
   const fieldDefs = recordSchema?.fields;
@@ -607,9 +627,22 @@ function RecordCollectionSection({
     }
   }
 
+  // Issue #2: Filter out rows where ALL displayed columns have null/undefined values
+  const nonEmptyItems = items.filter((item) =>
+    cols.some((col) => item.fields[col] != null),
+  );
+
+  if (nonEmptyItems.length === 0) return null;
+
+  // Issue #8: Cap at MAX_GENERIC_ROWS for server-rendered view
+  const isTruncated = nonEmptyItems.length > MAX_GENERIC_ROWS;
+  const displayItems = isTruncated
+    ? nonEmptyItems.slice(0, MAX_GENERIC_ROWS)
+    : nonEmptyItems;
+
   return (
     <div className="mt-4">
-      <SectionDivider title={titleCase(collectionName)} count={items.length} />
+      <SectionDivider title={titleCase(collectionName)} count={nonEmptyItems.length} id={sectionId} />
       <div className="overflow-x-auto border border-border/40 rounded-xl">
         <table className="w-full text-sm">
           <thead>
@@ -618,7 +651,7 @@ function RecordCollectionSection({
                 <th
                   key={col}
                   scope="col"
-                  className="text-left text-xs font-medium text-muted-foreground/70 py-1.5 px-3 whitespace-nowrap"
+                  className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap"
                 >
                   {titleCase(col)}
                 </th>
@@ -626,10 +659,10 @@ function RecordCollectionSection({
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => (
+            {displayItems.map((item) => (
               <tr
                 key={item.key}
-                className="border-b border-border/20 last:border-b-0"
+                className="border-b border-border/40 last:border-b-0 even:bg-muted/15"
               >
                 {cols.map((col) => (
                   <td
@@ -652,6 +685,16 @@ function RecordCollectionSection({
           </tbody>
         </table>
       </div>
+      {isTruncated && (
+        <div className="mt-1.5 text-center">
+          <Link
+            href={`/kb/entity/${entityId}`}
+            className="text-xs text-primary/60 hover:text-primary hover:underline transition-colors"
+          >
+            View all {nonEmptyItems.length} {titleCase(collectionName).toLowerCase()} in full profile &rarr;
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
@@ -720,13 +763,24 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
     .filter(([name]) => !SPECIAL_COLLECTIONS.has(name))
     .sort(([a], [b]) => a.localeCompare(b));
 
+  // Build section nav entries (only for sections that have data)
+  const sectionNavItems: { label: string; id: string }[] = [];
+  if (keyPersons && keyPersons.length > 0) sectionNavItems.push({ label: "Key People", id: "kb-key-people" });
+  if (sortedFundingRounds.length > 0) sectionNavItems.push({ label: "Funding History", id: "kb-funding-history" });
+  if (sortedModelReleases.length > 0) sectionNavItems.push({ label: "Model Releases", id: "kb-model-releases" });
+  if (products && products.length > 0) sectionNavItems.push({ label: "Products", id: "kb-products" });
+  if (substantiveFacts.length > 0) sectionNavItems.push({ label: "All Facts", id: "kb-all-facts" });
+  for (const [name, items] of genericCollections) {
+    if (items && items.length > 0) sectionNavItems.push({ label: titleCase(name), id: `kb-${name}` });
+  }
+
   return (
     <section className="not-prose mt-8 mb-6" aria-labelledby="kb-auto-facts-heading">
       <div>
         {/* Header bar */}
-        <div className="py-2 border-b border-border/60 flex items-center gap-2">
-          <Database size={14} className="text-muted-foreground/60" />
-          <h2 id="kb-auto-facts-heading" className="text-sm font-bold tracking-tight">
+        <div className="py-2 border-b border-border/50 flex items-center gap-2">
+          <Database size={14} className="text-muted-foreground" />
+          <h2 id="kb-auto-facts-heading" className="text-base font-bold tracking-tight">
             Structured Data
           </h2>
           <span className="text-xs text-muted-foreground flex items-center gap-1.5 ml-1">
@@ -737,7 +791,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
               </span>
             )}
             {substantiveFacts.length > 0 && totalRecords > 0 && (
-              <span className="text-muted-foreground/40">{"\u00B7"}</span>
+              <span className="text-muted-foreground/50">{"\u00B7"}</span>
             )}
             {totalRecords > 0 && (
               <span>
@@ -753,6 +807,21 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
           </Link>
         </div>
 
+        {/* Section nav (only when there are multiple sections) */}
+        {sectionNavItems.length > 1 && (
+          <nav className="flex flex-wrap gap-1.5 pt-2 pb-1" aria-label="Structured data sections">
+            {sectionNavItems.map(({ label, id }) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                className="text-[11px] px-2 py-0.5 rounded-full border border-border/50 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50 transition-colors"
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+        )}
+
         <div className="pt-3">
           {/* 1. Hero stat cards */}
           {heroCards.length > 0 && (
@@ -766,7 +835,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
           {/* 2. Key People */}
           {keyPersons && keyPersons.length > 0 && (
             <>
-              <SectionDivider title="Key People" count={keyPersons.length} />
+              <SectionDivider title="Key People" count={keyPersons.length} id="kb-key-people" />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {keyPersons.map((item) => (
                   <PersonCard key={item.key} item={item} />
@@ -781,6 +850,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
               <SectionDivider
                 title="Funding History"
                 count={sortedFundingRounds.length}
+                id="kb-funding-history"
               />
               <div className="border border-border/40 rounded-xl px-4 bg-card">
                 {sortedFundingRounds.map((item) => (
@@ -796,6 +866,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
               <SectionDivider
                 title="Model Releases"
                 count={sortedModelReleases.length}
+                id="kb-model-releases"
               />
               <div className="border border-border/40 rounded-xl px-4 bg-card">
                 {sortedModelReleases.map((item) => (
@@ -808,7 +879,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
           {/* 5. Products */}
           {products && products.length > 0 && (
             <>
-              <SectionDivider title="Products" count={products.length} />
+              <SectionDivider title="Products" count={products.length} id="kb-products" />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {products.map((item) => (
                   <ProductCard key={item.key} item={item} />
@@ -820,7 +891,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
           {/* 6. Category-grouped facts */}
           {substantiveFacts.length > 0 && (
             <>
-              <SectionDivider title="All Facts" />
+              <SectionDivider title="All Facts" id="kb-all-facts" />
               {categoryKeys.map((category) => {
                 const categoryFacts = byCategory[category];
                 if (!categoryFacts || categoryFacts.length === 0) return null;
@@ -830,7 +901,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
 
                 return (
                   <div key={category} className="mb-3 last:mb-0">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/60 mb-1 pb-0.5 border-b border-border/40">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1 pb-0.5 border-b border-border/40">
                       {titleCase(category)}
                     </div>
                     <table className="w-full">
@@ -886,6 +957,8 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
                 key={name}
                 collectionName={name}
                 items={items}
+                entityId={entityId}
+                sectionId={`kb-${name}`}
               />
             );
           })}
