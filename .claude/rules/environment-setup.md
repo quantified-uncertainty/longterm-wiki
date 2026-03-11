@@ -1,6 +1,8 @@
 # Environment Setup
 
-## Worktree setup (one-time per worktree)
+## Worktree setup (Claude Code worktrees only)
+
+This applies to **Claude Code git worktrees** (`.claude/worktrees/xyz/`), not `lw/` agent slots. Agent slots (`lw/a1`, `lw/a2`, ...) are full clones managed by `crux agent-workspace` and don't need symlinks.
 
 If running in a git worktree (check: `git worktree list`), symlink the env file and node_modules to avoid missing credentials and missing packages:
 

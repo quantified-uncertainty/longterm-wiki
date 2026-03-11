@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { defineConfig } from "@playwright/test";
 
 const devPort = process.env.DEV_PORT || "3001";

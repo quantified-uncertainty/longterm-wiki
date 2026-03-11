@@ -137,16 +137,20 @@ async function setup(args: string[], options: CommandOptions): Promise<CommandRe
     - .env generated from lw/.env.base with per-agent port overrides
 
   Port assignments (deterministic from slot number):
-    Agent N → Next.js on port 301N, wiki-server on port 311N
+    Agent N → Next.js on port (3010+N), wiki-server on port (3110+N)
+    e.g. slot 1 → 3011/3111, slot 10 → 3020/3120
 
 Options:
   --force    Re-initialize even if the slot directory already exists`,
     };
   }
 
+  if (!/^\d+$/.test(slotArg)) {
+    return { exitCode: 1, output: 'Error: Slot number must be a positive integer' };
+  }
   const slot = parseInt(slotArg, 10);
-  if (!Number.isInteger(slot) || slot < 1 || slot > 99) {
-    return { exitCode: 1, output: 'Error: Slot number must be an integer between 1 and 99' };
+  if (slot < 1 || slot > 99) {
+    return { exitCode: 1, output: 'Error: Slot number must be between 1 and 99' };
   }
 
   const lwDir = getLwDir();
@@ -343,6 +347,9 @@ async function clean(args: string[], options: CommandOptions): Promise<CommandRe
   const slots = findSlotDirs(lwDir);
 
   const targetSlot = args.find((a) => !a.startsWith('--'));
+  if (targetSlot && !/^\d+$/.test(targetSlot)) {
+    return { exitCode: 1, output: 'Error: Slot number must be a positive integer' };
+  }
   const toCheck = targetSlot
     ? slots.filter((s) => s.slot === parseInt(targetSlot, 10))
     : slots;
@@ -401,8 +408,11 @@ async function open(args: string[], _options: CommandOptions): Promise<CommandRe
     return { exitCode: 1, output: 'Error: Not inside a tmux session. Run this from within tmux.' };
   }
 
+  if (!/^\d+$/.test(slotArg)) {
+    return { exitCode: 1, output: 'Error: Slot number must be a positive integer.' };
+  }
   const slot = parseInt(slotArg, 10);
-  if (!Number.isInteger(slot) || slot < 1) {
+  if (slot < 1) {
     return { exitCode: 1, output: 'Error: Slot number must be a positive integer.' };
   }
 
@@ -457,7 +467,7 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
     }
 
     try {
-      execSync('git pull origin main', { cwd: dir, encoding: 'utf-8', timeout: 30000, stdio: 'pipe' });
+      execSync('git pull --ff-only origin main', { cwd: dir, encoding: 'utf-8', timeout: 30000, stdio: 'pipe' });
       updated.push(`  ✓ a${slot}: pulled latest main`);
     } catch (e) {
       skipped.push(`  a${slot}: git pull failed (${e instanceof Error ? e.message.split('\n')[0] : 'unknown error'})`);
@@ -514,7 +524,8 @@ Commands:
   refresh           Pull latest main in idle slots (on main, clean)
 
 Port assignments (deterministic from slot number):
-  Agent N → Next.js on port 301N, wiki-server on port 311N
+  Agent N → Next.js on port (3010+N), wiki-server on port (3110+N)
+  e.g. slot 1 → 3011/3111, slot 10 → 3020/3120
 
 Options:
   --force    Force re-init (setup) or actually delete (clean)
