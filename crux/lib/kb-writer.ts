@@ -10,26 +10,8 @@
 import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { Document, parseDocument, isSeq, isMap } from 'yaml';
-import type { ScalarTag, Scalar } from 'yaml';
-import { generateFactId, generateId } from '../../packages/kb/src/ids.ts';
-
-// ── Custom YAML tags (recreated for parseDocument compatibility) ──────
-
-/**
- * Passthrough ScalarTag for round-trip editing: resolves to the raw string,
- * never auto-identifies during writing, and stringifies as-is.
- * Matches tags in packages/kb/src/loader.ts but without marker classes.
- */
-function passthroughTag(tagName: string): ScalarTag {
-  return {
-    tag: tagName,
-    resolve(str: string): string { return str; },
-    identify(): boolean { return false; },
-    stringify(item: Scalar): string { return `${item.value}`; },
-  };
-}
-
-const WRITER_CUSTOM_TAGS = [passthroughTag('!ref'), passthroughTag('!date'), passthroughTag('!src')];
+import { generateId } from '../../packages/kb/src/ids.ts';
+import { CUSTOM_TAGS } from '../../packages/kb/src/loader.ts';
 
 // ── Public types ──────────────────────────────────────────────────────
 
@@ -51,16 +33,16 @@ export interface RawFactInput {
  */
 export function readEntityDocument(filepath: string): Document {
   const content = readFileSync(filepath, 'utf-8');
-  return parseDocument(content, { customTags: WRITER_CUSTOM_TAGS });
+  return parseDocument(content, { customTags: CUSTOM_TAGS });
 }
 
 /**
  * Append a fact to an entity YAML document.
  * Adds to the `facts` sequence node, preserving existing structure.
- * Auto-generates a fact ID using `generateFactId()`.
+ * Auto-generates a fact ID using `generateId()` (plain 10-char alphanumeric).
  */
 export function appendFact(doc: Document, fact: RawFactInput): string {
-  const factId = `f_${generateFactId()}`;
+  const factId = generateId();
 
   // Build the fact object in the order we want it serialized
   const factObj: Record<string, unknown> = { id: factId, property: fact.property };

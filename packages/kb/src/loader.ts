@@ -539,9 +539,19 @@ async function discoverEntityFiles(
   }
 
   const results: { name: string; parsed: unknown }[] = [];
+  const seenSlugs = new Set<string>();
 
   for (const entry of dirEntries) {
     if (entry.isFile() && (extname(entry.name) === ".yaml" || extname(entry.name) === ".yml")) {
+      const slug = entry.name.replace(/\.(yaml|yml)$/, "");
+      if (seenSlugs.has(slug)) {
+        throw new Error(
+          `[kb/loader] Slug collision: both "${slug}.yaml" (or .yml) and "${slug}/" directory ` +
+            `exist in things/. Remove one to avoid ambiguity.`
+        );
+      }
+      seenSlugs.add(slug);
+
       // Single-file entity (existing behavior)
       const content = await readFile(join(thingsDir, entry.name), "utf-8");
       results.push({
@@ -549,10 +559,19 @@ async function discoverEntityFiles(
         parsed: parseYaml(content, { customTags: CUSTOM_TAGS }),
       });
     } else if (entry.isDirectory()) {
-      // Per-entity directory
+      if (seenSlugs.has(entry.name)) {
+        throw new Error(
+          `[kb/loader] Slug collision: both "${entry.name}.yaml" (or .yml) and "${entry.name}/" directory ` +
+            `exist in things/. Remove one to avoid ambiguity.`
+        );
+      }
+      seenSlugs.add(entry.name);
+
+      // Per-entity directory — sort files for deterministic merge order
       const subFiles = await readYamlFiles(join(thingsDir, entry.name));
       if (subFiles.length === 0) continue; // empty directory, skip
 
+      subFiles.sort((a, b) => a.name.localeCompare(b.name));
       const merged = mergeEntityFiles(subFiles, entry.name);
       results.push({ name: entry.name, parsed: merged });
     }
@@ -633,9 +652,15 @@ function mergeEntityFiles(
       }
     }
 
-    // Merge _sources
+    // Merge _sources (validate values are strings)
     if (file._sources && typeof file._sources === "object") {
-      for (const [alias, url] of Object.entries(file._sources as Record<string, string>)) {
+      for (const [alias, url] of Object.entries(file._sources as Record<string, unknown>)) {
+        if (typeof url !== "string") {
+          console.warn(
+            `[kb/loader] _sources alias "${alias}" in "${dirName}" has non-string value (${typeof url}), skipping`
+          );
+          continue;
+        }
         if (mergedSources[alias] !== undefined && mergedSources[alias] !== url) {
           throw new Error(
             `[kb/loader] Per-entity directory "${dirName}": _sources alias conflict — ` +
@@ -828,9 +853,17 @@ export async function loadKB(dataDir: string): Promise<LoadResult> {
     sources: Record<string, string>;
   }[] = [];
   for (const { parsed } of entityFiles) {
-    const rawFile = parsed as EntityFile & { _sources?: Record<string, string> };
-    // Extract and strip _sources before treating as entity data
-    const sources = rawFile._sources ?? {};
+    const rawFile = parsed as EntityFile & { _sources?: Record<string, unknown> };
+    // Extract and strip _sources before treating as entity data; filter non-string values
+    const rawSources = rawFile._sources ?? {};
+    const sources: Record<string, string> = {};
+    for (const [alias, url] of Object.entries(rawSources)) {
+      if (typeof url === "string") {
+        sources[alias] = url;
+      } else {
+        console.warn(`[kb/loader] _sources alias "${alias}" has non-string value (${typeof url}), skipping`);
+      }
+    }
     const file: EntityFile = {
       thing: rawFile.thing,
       ...(rawFile.facts && { facts: rawFile.facts }),
