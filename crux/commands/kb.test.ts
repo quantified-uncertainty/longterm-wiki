@@ -448,5 +448,8 @@ describe('crux kb add-record', () => {
     expect(result.output).toContain('Valid fields');
     expect(result.output).toContain('raised');
     expect(result.output).toContain('name');
+    // Should also mention convention fields
+    expect(result.output).toContain('Also allowed');
+    expect(result.output).toContain('asOf');
   }, 30_000);
 });
