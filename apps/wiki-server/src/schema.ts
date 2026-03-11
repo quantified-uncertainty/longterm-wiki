@@ -9,6 +9,7 @@ import {
   boolean,
   real,
   doublePrecision,
+  numeric,
   date,
   timestamp,
   jsonb,
@@ -569,6 +570,7 @@ export const resources = pgTable(
     credibilityOverride: real("credibility_override"),
     fetchedAt: timestamp("fetched_at", { withTimezone: true }),
     contentHash: text("content_hash"),
+    stableId: text("stable_id").unique(),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -1392,5 +1394,82 @@ export const kbFactVerdicts = pgTable(
   (table) => [
     index("idx_kbfv_verdicts_verdict").on(table.verdict),
     index("idx_kbfv_verdicts_recheck").on(table.needsRecheck),
+  ]
+);
+
+/**
+ * Personnel — unified table covering key-persons, board-seats, and career-history.
+ *
+ * A single person connects to multiple organizations via different role types.
+ * Uses TEXT for person/org references because some records reference display names
+ * rather than entity IDs (e.g., board seats with non-entity members, career-history
+ * with non-entity organizations like "D. E. Shaw Research").
+ * When the reference is a known entity, the canonical 10-char entity ID is stored.
+ */
+export const personnel = pgTable(
+  "personnel",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    personId: text("person_id").notNull(), // entity ID or display name
+    organizationId: text("organization_id").notNull(), // entity ID or free text (career-history)
+    role: text("role").notNull(), // job title or board role
+    roleType: text("role_type").notNull(), // 'key-person' | 'board' | 'career'
+    startDate: text("start_date"), // YYYY or YYYY-MM (flexible KB date format)
+    endDate: text("end_date"), // YYYY or YYYY-MM; null if current
+    isFounder: boolean("is_founder").notNull().default(false),
+    appointedBy: text("appointed_by"), // board-seats only
+    background: text("background"), // board-seats only
+    source: text("source"), // URL confirming the role
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_personnel_person").on(table.personId),
+    index("idx_personnel_org").on(table.organizationId),
+    index("idx_personnel_role_type").on(table.roleType),
+  ]
+);
+
+/**
+ * Grants — major grants, programs, and spending initiatives.
+ *
+ * Each grant is associated with a grantor organization. Amount in USD by default.
+ */
+export const grants = pgTable(
+  "grants",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    organizationId: text("organization_id").notNull(), // grantor entity ID
+    granteeId: text("grantee_id"), // the recipient entity (nullable — many grants don't specify)
+    name: text("name").notNull(), // program or grant name
+    amount: numeric("amount"), // funding amount (NUMERIC for precise financial data; Drizzle returns string)
+    currency: text("currency").notNull().default("USD"),
+    period: text("period"), // time period (e.g. "2016-2025")
+    date: text("date"), // announcement/start date (YYYY-MM)
+    status: text("status"), // active | completed | winding-down
+    source: text("source"), // URL to announcement or report
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_grants_org").on(table.organizationId),
+    index("idx_grants_grantee").on(table.granteeId),
+    index("idx_grants_status").on(table.status),
   ]
 );

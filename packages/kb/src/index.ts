@@ -2,7 +2,7 @@
  * Public API for the @longterm-wiki/kb package.
  */
 
-export { loadKB } from "./loader";
+export { loadKB, CUSTOM_TAGS, RefMarker, DateMarker, SrcMarker } from "./loader";
 export type { LoadResult } from "./loader";
 export { Graph } from "./graph";
 export { computeInverses } from "./inverse";

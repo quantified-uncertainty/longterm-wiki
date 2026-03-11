@@ -11,6 +11,17 @@
  *   started: !date 2023-06     → { type: "date", value: "2023-06" }
  *   born:    !date 2023-06-15  → { type: "date", value: "2023-06-15" }
  * Useful for bare years (2019) which would otherwise be parsed as numbers.
+ *
+ * Supports !src YAML tags for file-level source aliases:
+ *   _sources:
+ *     anthropic-co: https://anthropic.com/company
+ *   facts:
+ *     - id: f_example
+ *       source: !src anthropic-co     → resolves to "https://anthropic.com/company"
+ *
+ * Supports per-entity directories: a directory in things/ with an entity.yaml
+ * (or any file containing a `thing:` block) plus additional YAML files that
+ * contribute facts, records, items, and _sources.
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -70,9 +81,9 @@ const refTag: ScalarTag = {
   stringify(item: Scalar): string {
     const marker = item.value as RefMarker;
     if (marker.expectedSlug) {
-      return `!ref ${marker.stableId}:${marker.expectedSlug}`;
+      return `${marker.stableId}:${marker.expectedSlug}`;
     }
-    return `!ref ${marker.stableId}`;
+    return marker.stableId;
   },
 };
 
@@ -100,11 +111,38 @@ const dateTag: ScalarTag = {
   },
   stringify(item: Scalar): string {
     const marker = item.value as DateMarker;
-    return `!date ${marker.value}`;
+    return marker.value;
   },
 };
 
-const CUSTOM_TAGS = [refTag, dateTag];
+// ── !src YAML tag ──────────────────────────────────────────────────
+
+/**
+ * Marker class for !src YAML tags. Created during YAML parsing,
+ * resolved to actual source URLs using the file's _sources map.
+ *
+ * Usage: source: !src anthropic-co  → resolved to _sources["anthropic-co"]
+ */
+export class SrcMarker {
+  constructor(public readonly alias: string) {}
+}
+
+/** Custom YAML tag: !src <alias> */
+const srcTag: ScalarTag = {
+  tag: "!src",
+  resolve(str: string): SrcMarker {
+    return new SrcMarker(str);
+  },
+  identify(value: unknown): value is SrcMarker {
+    return value instanceof SrcMarker;
+  },
+  stringify(item: Scalar): string {
+    const marker = item.value as SrcMarker;
+    return marker.alias;
+  },
+};
+
+export const CUSTOM_TAGS = [refTag, dateTag, srcTag];
 
 /**
  * Recursively resolves RefMarker instances in a parsed YAML structure.
@@ -155,6 +193,49 @@ function resolveRefs(
     const resolved: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
       resolved[k] = resolveRefs(v, graph, filenameMap, context);
+    }
+    return resolved;
+  }
+
+  return value;
+}
+
+// ── Source alias resolution ─────────────────────────────────────────────
+
+/**
+ * Recursively resolves SrcMarker instances in a parsed YAML structure.
+ * Replaces each SrcMarker with the corresponding URL from the _sources map.
+ * Warns if an alias is not found in _sources.
+ */
+function resolveSrcAliases(
+  value: unknown,
+  sources: Record<string, string>,
+  context: string
+): unknown {
+  if (value instanceof SrcMarker) {
+    const url = sources[value.alias];
+    if (url === undefined) {
+      console.warn(
+        `[kb/loader] Unresolved !src alias "${value.alias}" in ${context} — ` +
+          `not found in _sources`
+      );
+      return value.alias; // fallback: use raw alias name
+    }
+    return url;
+  }
+
+  if (value instanceof RefMarker || value instanceof DateMarker) {
+    return value; // pass through for later resolution
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((v) => resolveSrcAliases(v, sources, context));
+  }
+
+  if (value !== null && typeof value === "object") {
+    const resolved: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      resolved[k] = resolveSrcAliases(v, sources, context);
     }
     return resolved;
   }
@@ -435,6 +516,178 @@ async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unkno
   return results;
 }
 
+// ── Per-entity directory support ────────────────────────────────────────
+
+/**
+ * Scans the things/ directory and returns entity inputs. For each entry:
+ * - A .yaml file yields a single EntityFile (existing behavior).
+ * - A subdirectory yields a merged EntityFile from all .yaml files inside it.
+ *   Exactly one file must contain a `thing:` block (the main file); others
+ *   contribute additional facts, records, items, and _sources.
+ */
+async function discoverEntityFiles(
+  thingsDir: string
+): Promise<{ name: string; parsed: unknown }[]> {
+  let dirEntries: import("node:fs").Dirent[];
+  try {
+    dirEntries = await readdir(thingsDir, { withFileTypes: true });
+  } catch (error: unknown) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
+
+  const results: { name: string; parsed: unknown }[] = [];
+  const seenSlugs = new Set<string>();
+
+  for (const entry of dirEntries) {
+    if (entry.isFile() && (extname(entry.name) === ".yaml" || extname(entry.name) === ".yml")) {
+      const slug = entry.name.replace(/\.(yaml|yml)$/, "");
+      if (seenSlugs.has(slug)) {
+        throw new Error(
+          `[kb/loader] Slug collision: both "${slug}.yaml" (or .yml) and "${slug}/" directory ` +
+            `exist in things/. Remove one to avoid ambiguity.`
+        );
+      }
+      seenSlugs.add(slug);
+
+      // Single-file entity (existing behavior)
+      const content = await readFile(join(thingsDir, entry.name), "utf-8");
+      results.push({
+        name: entry.name,
+        parsed: parseYaml(content, { customTags: CUSTOM_TAGS }),
+      });
+    } else if (entry.isDirectory()) {
+      if (seenSlugs.has(entry.name)) {
+        throw new Error(
+          `[kb/loader] Slug collision: both "${entry.name}.yaml" (or .yml) and "${entry.name}/" directory ` +
+            `exist in things/. Remove one to avoid ambiguity.`
+        );
+      }
+      seenSlugs.add(entry.name);
+
+      // Per-entity directory — sort files for deterministic merge order
+      const subFiles = await readYamlFiles(join(thingsDir, entry.name));
+      if (subFiles.length === 0) continue; // empty directory, skip
+
+      subFiles.sort((a, b) => a.name.localeCompare(b.name));
+      const merged = mergeEntityFiles(subFiles, entry.name);
+      results.push({ name: entry.name, parsed: merged });
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Merges multiple YAML files from a per-entity directory into a single EntityFile.
+ *
+ * Rules:
+ * - Exactly one file must have a `thing:` block (the main file). Error if 0 or 2+.
+ * - `facts:` arrays are concatenated.
+ * - `records:` maps are deep-merged (collection → key → entry). Error on key conflicts.
+ * - `items:` maps are merged similarly. Error on key conflicts.
+ * - `_sources:` maps are merged. Error on key conflicts with different values.
+ */
+function mergeEntityFiles(
+  files: { name: string; parsed: unknown }[],
+  dirName: string
+): Record<string, unknown> {
+  let mainFile: { name: string; thing: unknown } | undefined;
+  const allFacts: unknown[] = [];
+  const mergedRecords: Record<string, Record<string, unknown>> = {};
+  const mergedItems: Record<string, unknown> = {};
+  const mergedSources: Record<string, string> = {};
+
+  for (const { name, parsed } of files) {
+    const file = parsed as Record<string, unknown>;
+
+    // Check for thing: block
+    if (file.thing !== undefined) {
+      if (mainFile) {
+        throw new Error(
+          `[kb/loader] Per-entity directory "${dirName}": multiple files have a ` +
+            `"thing:" block — "${mainFile.name}" and "${name}". Only one is allowed.`
+        );
+      }
+      mainFile = { name, thing: file.thing };
+    }
+
+    // Collect facts
+    if (Array.isArray(file.facts)) {
+      allFacts.push(...file.facts);
+    }
+
+    // Merge records (collection → key → entry)
+    if (file.records && typeof file.records === "object") {
+      for (const [collection, entries] of Object.entries(
+        file.records as Record<string, Record<string, unknown>>
+      )) {
+        if (!mergedRecords[collection]) {
+          mergedRecords[collection] = {};
+        }
+        for (const [key, entry] of Object.entries(entries)) {
+          if (mergedRecords[collection][key] !== undefined) {
+            throw new Error(
+              `[kb/loader] Per-entity directory "${dirName}": record key conflict ` +
+                `in collection "${collection}" — key "${key}" appears in multiple files.`
+            );
+          }
+          mergedRecords[collection][key] = entry;
+        }
+      }
+    }
+
+    // Merge items
+    if (file.items && typeof file.items === "object") {
+      for (const [key, value] of Object.entries(file.items as Record<string, unknown>)) {
+        if (mergedItems[key] !== undefined) {
+          throw new Error(
+            `[kb/loader] Per-entity directory "${dirName}": item key conflict — ` +
+              `key "${key}" appears in multiple files.`
+          );
+        }
+        mergedItems[key] = value;
+      }
+    }
+
+    // Merge _sources (validate values are strings)
+    if (file._sources && typeof file._sources === "object") {
+      for (const [alias, url] of Object.entries(file._sources as Record<string, unknown>)) {
+        if (typeof url !== "string") {
+          console.warn(
+            `[kb/loader] _sources alias "${alias}" in "${dirName}" has non-string value (${typeof url}), skipping`
+          );
+          continue;
+        }
+        if (mergedSources[alias] !== undefined && mergedSources[alias] !== url) {
+          throw new Error(
+            `[kb/loader] Per-entity directory "${dirName}": _sources alias conflict — ` +
+              `alias "${alias}" has different values: "${mergedSources[alias]}" vs "${url}".`
+          );
+        }
+        mergedSources[alias] = url;
+      }
+    }
+  }
+
+  if (!mainFile) {
+    throw new Error(
+      `[kb/loader] Per-entity directory "${dirName}": no file contains a ` +
+        `"thing:" block. Exactly one is required.`
+    );
+  }
+
+  const result: Record<string, unknown> = { thing: mainFile.thing };
+  if (allFacts.length > 0) result.facts = allFacts;
+  if (Object.keys(mergedRecords).length > 0) result.records = mergedRecords;
+  if (Object.keys(mergedItems).length > 0) result.items = mergedItems;
+  if (Object.keys(mergedSources).length > 0) result._sources = mergedSources;
+
+  return result;
+}
+
 // ── Record helpers ─────────────────────────────────────────────────────
 
 /**
@@ -588,32 +841,61 @@ export async function loadKB(dataDir: string): Promise<LoadResult> {
   }
 
   // 3. Load entities (two passes)
-  const entityFiles = await readYamlFiles(join(dataDir, "things"));
+  // discoverEntityFiles handles both single .yaml files and per-entity directories
+  const entityFiles = await discoverEntityFiles(join(dataDir, "things"));
 
-  // Pass 1: Load all entity headers to build entity ID index
-  const parsedEntityFiles: { entity: Entity; filename: string; file: EntityFile }[] = [];
+  // Pass 1: Load all entity headers to build entity ID index.
+  // Also extract _sources per entity file for !src resolution.
+  const parsedEntityFiles: {
+    entity: Entity;
+    filename: string;
+    file: EntityFile;
+    sources: Record<string, string>;
+  }[] = [];
   for (const { parsed } of entityFiles) {
-    const file = parsed as EntityFile;
+    const rawFile = parsed as EntityFile & { _sources?: Record<string, unknown> };
+    // Extract and strip _sources before treating as entity data; filter non-string values
+    const rawSources = rawFile._sources ?? {};
+    const sources: Record<string, string> = {};
+    for (const [alias, url] of Object.entries(rawSources)) {
+      if (typeof url === "string") {
+        sources[alias] = url;
+      } else {
+        console.warn(`[kb/loader] _sources alias "${alias}" has non-string value (${typeof url}), skipping`);
+      }
+    }
+    const file: EntityFile = {
+      thing: rawFile.thing,
+      ...(rawFile.facts && { facts: rawFile.facts }),
+      ...(rawFile.records && { records: rawFile.records }),
+    };
     const { entity, filename } = parseEntity(file.thing);
     graph.addEntity(entity);
     filenameMap.set(entity.id, filename);
-    parsedEntityFiles.push({ entity, filename, file });
+    parsedEntityFiles.push({ entity, filename, file, sources });
   }
 
-  // Pass 2: Load facts and records with !ref resolution
-  for (const { entity, filename, file } of parsedEntityFiles) {
-    // Resolve !ref markers in facts (use filename for log context)
+  // Pass 2: Load facts and records with !src and !ref resolution
+  for (const { entity, filename, file, sources } of parsedEntityFiles) {
+    // Resolve !src aliases in facts BEFORE !ref resolution (source aliases are file-scoped)
     for (const rawFact of file.facts ?? []) {
-      const resolvedValue = resolveRefs(rawFact.value, graph, filenameMap, `${filename}/facts`);
-      const resolvedFact = { ...rawFact, value: resolvedValue };
+      const srcResolved = resolveSrcAliases(rawFact, sources, `${filename}/facts`);
+      const resolvedValue = resolveRefs(
+        (srcResolved as RawFact).value, graph, filenameMap, `${filename}/facts`
+      );
+      const resolvedFact = { ...(srcResolved as RawFact), value: resolvedValue };
       const fact = parseFact(resolvedFact as RawFact, entity.id, properties);
       if (fact) graph.addFact(fact);
     }
 
     // Parse records
     if (file.records) {
+      // Resolve !src aliases first
+      const srcResolvedRecords = resolveSrcAliases(
+        file.records, sources, `${filename}/records`
+      );
       const resolvedRecords = resolveRefs(
-        file.records,
+        srcResolvedRecords,
         graph,
         filenameMap,
         `${filename}/records`

@@ -149,33 +149,22 @@ function groupByCategory(
   return groups;
 }
 
-const CATEGORY_ORDER: Record<string, number> = {
-  financial: 0,
-  product: 1,
-  organization: 2,
-  safety: 3,
-  people: 4,
-  biographical: 5,
-  model: 6,
-  risk: 7,
-  epistemic: 8,
-  approach: 9,
-  other: 99,
-};
+const CATEGORIES: { id: string; label: string; order: number }[] = [
+  { id: "financial", label: "Financial", order: 0 },
+  { id: "product", label: "Products & Usage", order: 1 },
+  { id: "organization", label: "Organization", order: 2 },
+  { id: "safety", label: "Safety & Research", order: 3 },
+  { id: "people", label: "People", order: 4 },
+  { id: "biographical", label: "Background", order: 5 },
+  { id: "model", label: "Model Details", order: 6 },
+  { id: "risk", label: "Risk Assessment", order: 7 },
+  { id: "epistemic", label: "Epistemic Status", order: 8 },
+  { id: "approach", label: "Approach", order: 9 },
+  { id: "other", label: "Other", order: 99 },
+];
 
-const CATEGORY_LABELS: Record<string, string> = {
-  financial: "Financial",
-  product: "Products & Usage",
-  organization: "Organization",
-  safety: "Safety & Research",
-  people: "People",
-  biographical: "Background",
-  model: "Model Details",
-  risk: "Risk Assessment",
-  epistemic: "Epistemic Status",
-  approach: "Approach",
-  other: "Other",
-};
+const CATEGORY_ORDER: Record<string, number> = Object.fromEntries(CATEGORIES.map(c => [c.id, c.order]));
+const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(CATEGORIES.map(c => [c.id, c.label]));
 
 /** Properties to show as hero stat cards (order matters). */
 const HERO_STAT_PROPERTIES: Record<string, string[]> = {
@@ -183,6 +172,15 @@ const HERO_STAT_PROPERTIES: Record<string, string[]> = {
   person: ["employed-by", "role", "net-worth", "born-year"],
   "ai-model": ["developed-by", "parameter-count", "context-window", "model-release-date"],
 };
+
+/** Sort record entries by a date field, newest first. */
+function sortByDateField(items: RecordEntry[], fieldName: string): RecordEntry[] {
+  return [...items].sort((a, b) => {
+    const dateA = a.fields[fieldName] ? String(a.fields[fieldName]) : "";
+    const dateB = b.fields[fieldName] ? String(b.fields[fieldName]) : "";
+    return dateB.localeCompare(dateA);
+  });
+}
 
 /** Collections that get special rendering. */
 const SPECIAL_COLLECTIONS = new Set([
@@ -705,10 +703,16 @@ export default async function KBEntityPage({
   const itemCollections = getKBAllRecordCollections(entityId);
   const verdicts = await fetchEntityVerdicts(entityId);
 
+  // Build property cache to avoid repeated linear lookups
+  const propertyCache = new Map<string, Property | undefined>();
+  for (const propId of factGroups.keys()) {
+    propertyCache.set(propId, getKBProperty(propId));
+  }
+
   // Sort property groups alphabetically within each category
   const sortedPropertyIds = [...factGroups.keys()].sort((a, b) => {
-    const pA = getKBProperty(a);
-    const pB = getKBProperty(b);
+    const pA = propertyCache.get(a);
+    const pB = propertyCache.get(b);
     return (pA?.name ?? a).localeCompare(pB?.name ?? b);
   });
 
@@ -807,12 +811,7 @@ export default async function KBEntityPage({
             <section className="mb-8">
               <SectionHeader title="Funding History" count={itemCollections["funding-rounds"].length} id="col-funding-rounds" />
               <div className="border border-border/60 rounded-xl px-4 bg-card">
-                {[...itemCollections["funding-rounds"]]
-                  .sort((a, b) => {
-                    const dateA = a.fields.date ? String(a.fields.date) : "";
-                    const dateB = b.fields.date ? String(b.fields.date) : "";
-                    return dateB.localeCompare(dateA);
-                  })
+                {sortByDateField(itemCollections["funding-rounds"], "date")
                   .map((item) => (
                     <FundingRoundRow key={item.key} item={item} />
                   ))}
@@ -825,12 +824,7 @@ export default async function KBEntityPage({
             <section className="mb-8">
               <SectionHeader title="Model Releases" count={itemCollections["model-releases"].length} id="col-model-releases" />
               <div className="border border-border/60 rounded-xl px-4 bg-card">
-                {[...itemCollections["model-releases"]]
-                  .sort((a, b) => {
-                    const dateA = a.fields.released ? String(a.fields.released) : "";
-                    const dateB = b.fields.released ? String(b.fields.released) : "";
-                    return dateB.localeCompare(dateA);
-                  })
+                {sortByDateField(itemCollections["model-releases"], "released")
                   .map((item) => (
                     <ModelReleaseRow key={item.key} item={item} />
                   ))}

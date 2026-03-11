@@ -163,8 +163,10 @@ async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
   try {
     const result = await getCitationContentByUrl(url);
     if (result.ok && result.data) {
-      const cached = result.data;
-      const content = cached.fullText;
+      // RPC type inference resolves to `never` because the route can return 400/404.
+      // The actual shape includes fullText from the citation_content table row.
+      const cached = result.data as Record<string, unknown>;
+      const content = cached.fullText as string | null;
       if (content && content.length > 0) {
         // Check for paywall signals even in cached content
         if (detectPaywall(content)) {

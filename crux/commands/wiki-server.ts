@@ -38,6 +38,11 @@ const SCRIPTS = {
     description: 'Sync data/auto-update/runs/*.yaml to wiki-server',
     passthrough: ['dryRun', 'dry-run'],
   },
+  'snapshot-resources': {
+    script: 'wiki-server/snapshot-resources.ts',
+    description: 'Export PG resources to data/resources-snapshot.json',
+    passthrough: ['dryRun', 'dry-run'],
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'sync');
@@ -73,5 +78,6 @@ Examples:
   crux wiki-server sync-session .claude/sessions/2026-02-21_my-branch.yaml
   crux wiki-server sync-sessions           Sync all session logs
   crux wiki-server sync-auto-update-runs   Sync all auto-update runs
+  crux wiki-server snapshot-resources      Export PG resources to snapshot JSON
 `;
 }
