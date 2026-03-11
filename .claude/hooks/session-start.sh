@@ -94,6 +94,16 @@ if [ -n "$ISSUE_NUM" ]; then
   CONTEXT_LINES+=("→ Remember to run: pnpm crux issues start ${ISSUE_NUM}")
 fi
 
+# ─── 5b. Tmux window naming from agent slot ───────────────────────────────────
+AGENT_SLOT_FILE="$REPO_ROOT/.agent-slot"
+if [ -f "$AGENT_SLOT_FILE" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
+  SLOT=$(cat "$AGENT_SLOT_FILE" 2>/dev/null || true)
+  if [ -n "$SLOT" ]; then
+    tmux rename-window "A${SLOT}:${BRANCH}" 2>/dev/null || true
+    CONTEXT_LINES+=("Tmux: window renamed to A${SLOT}:${BRANCH}")
+  fi
+fi
+
 # ─── 6. Active agent registration/heartbeat ──────────────────────────────────────
 # Register or refresh heartbeat with the active-agents coordination system (E925).
 # Uses curl for speed (avoids pnpm/node startup overhead).
@@ -118,14 +128,22 @@ if [ -n "$WIKI_SERVER_URL" ] && [ "$BRANCH" != "main" ] && [ "$BRANCH" != "detac
       AGENT_TASK="Session on ${BRANCH}"
     fi
 
+    # Include agent slot in metadata if available
+    SLOT_NUM=""
+    if [ -f "$REPO_ROOT/.agent-slot" ]; then
+      SLOT_NUM=$(cat "$REPO_ROOT/.agent-slot" 2>/dev/null | tr -d '[:space:]')
+    fi
+
     # Build JSON payload safely with jq
     REGISTER_JSON=$(jq -n \
       --arg sessionId "$BRANCH" \
       --arg branch "$BRANCH" \
       --arg task "$AGENT_TASK" \
       --arg issueNumber "${ISSUE_NUM:-}" \
+      --arg slot "${SLOT_NUM:-}" \
       '{sessionId: $sessionId, branch: $branch, task: $task} +
-       (if $issueNumber != "" then {issueNumber: ($issueNumber | tonumber)} else {} end)' 2>/dev/null || true)
+       (if $issueNumber != "" then {issueNumber: ($issueNumber | tonumber)} else {} end) +
+       (if $slot != "" then {metadata: {slot: ($slot | tonumber)}} else {} end)' 2>/dev/null || true)
 
     if [ -n "$REGISTER_JSON" ]; then
       REGISTER_RESULT=$(curl -s --max-time 3 \
