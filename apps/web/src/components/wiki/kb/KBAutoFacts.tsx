@@ -92,7 +92,7 @@ const DEFAULT_RECORD_COLUMNS: Record<string, string[]> = {
   "charitable-pledges": ["pledger", "pledge"],
   "equity-positions": ["holder", "stake"],
   "investments": ["investor", "round_name", "date", "amount", "stake_acquired", "role"],
-  "strategic-partnerships": ["partner", "type", "date", "investment_amount"],
+  "strategic-partnerships": ["partner", "type", "date", "investment_amount", "compute_commitment"],
   "safety-milestones": ["name", "date", "description"],
   "research-areas": ["name", "description", "started"],
   grants: ["name", "amount", "date"],
@@ -175,6 +175,35 @@ function formatAmount(value: unknown): string | null {
   return `$${num.toLocaleString()}`;
 }
 
+/**
+ * Find the first explicit endpoint that uses displayName (allowDisplayName + required).
+ * Returns the endpoint name (e.g. "partner") or undefined.
+ */
+function findDisplayNameEndpoint(schema?: RecordSchema): string | undefined {
+  if (!schema?.endpoints) return undefined;
+  for (const [name, ep] of Object.entries(schema.endpoints)) {
+    if (!ep.implicit && ep.allowDisplayName) return name;
+  }
+  return undefined;
+}
+
+/**
+ * Get the effective value for a column, considering displayName fallback.
+ * When an explicit endpoint uses allowDisplayName, the value is stored
+ * in item.displayName rather than item.fields[endpointName].
+ */
+function getColumnValue(
+  item: RecordEntry,
+  col: string,
+  displayNameEndpoint?: string,
+): unknown {
+  const fieldVal = item.fields[col];
+  if (fieldVal != null) return fieldVal;
+  // Fall back to displayName for the endpoint that uses it
+  if (col === displayNameEndpoint && item.displayName) return item.displayName;
+  return undefined;
+}
+
 /** Resolve which columns to show for a collection, including explicit endpoints. */
 function resolveRecordColumns(
   collectionName: string,
@@ -183,13 +212,15 @@ function resolveRecordColumns(
 ): string[] {
   const defaults = DEFAULT_RECORD_COLUMNS[collectionName];
   const fieldDefs = schema?.fields;
+  const displayNameEndpoint = findDisplayNameEndpoint(schema);
 
   // Collect explicit endpoint names (e.g. "holder", "pledger", "investor")
   // Only include if at least one item actually has the field populated
+  // (also checks displayName for allowDisplayName endpoints)
   const explicitEndpoints: string[] = [];
   if (schema?.endpoints) {
     for (const [name, ep] of Object.entries(schema.endpoints)) {
-      if (!ep.implicit && items.some((item) => item.fields[name] != null)) {
+      if (!ep.implicit && items.some((item) => getColumnValue(item, name, displayNameEndpoint) != null)) {
         explicitEndpoints.push(name);
       }
     }
@@ -617,6 +648,7 @@ function RecordCollectionSection({
 }) {
   const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
   const fieldDefs = recordSchema?.fields;
+  const displayNameEndpoint = findDisplayNameEndpoint(recordSchema);
   const cols = resolveRecordColumns(collectionName, items, recordSchema);
 
   // Build set of endpoint column names for entity-ref rendering
@@ -627,18 +659,22 @@ function RecordCollectionSection({
     }
   }
 
-  // Issue #2: Filter out rows where ALL displayed columns have null/undefined values
+  // Filter out rows where ALL displayed columns have null/undefined values
   const nonEmptyItems = items.filter((item) =>
-    cols.some((col) => item.fields[col] != null),
+    cols.some((col) => getColumnValue(item, col, displayNameEndpoint) != null),
   );
 
   if (nonEmptyItems.length === 0) return null;
 
-  // Issue #8: Cap at MAX_GENERIC_ROWS for server-rendered view
-  const isTruncated = nonEmptyItems.length > MAX_GENERIC_ROWS;
+  // Sort by date descending if a date column exists
+  const dateCol = cols.find((c) => c === "date" || c === "appointed" || c === "started" || c === "launched");
+  const sortedItems = dateCol ? sortKBRecords(nonEmptyItems, dateCol, false) : nonEmptyItems;
+
+  // Cap at MAX_GENERIC_ROWS for server-rendered view
+  const isTruncated = sortedItems.length > MAX_GENERIC_ROWS;
   const displayItems = isTruncated
-    ? nonEmptyItems.slice(0, MAX_GENERIC_ROWS)
-    : nonEmptyItems;
+    ? sortedItems.slice(0, MAX_GENERIC_ROWS)
+    : sortedItems;
 
   return (
     <div className="mt-4">
@@ -659,29 +695,38 @@ function RecordCollectionSection({
             </tr>
           </thead>
           <tbody>
-            {displayItems.map((item) => (
-              <tr
-                key={item.key}
-                className="border-b border-border/40 last:border-b-0 even:bg-muted/15"
-              >
-                {cols.map((col) => (
-                  <td
-                    key={col}
-                    className="py-1.5 px-3 text-sm align-baseline whitespace-normal"
-                  >
-                    {endpointCols.has(col) && typeof item.fields[col] === "string" ? (
-                      <KBRefLink id={item.fields[col] as string} />
-                    ) : (
-                      <KBCellValue
-                        value={item.fields[col]}
-                        fieldName={col}
-                        fieldDef={fieldDefs?.[col]}
-                      />
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {displayItems.map((item) => {
+              return (
+                <tr
+                  key={item.key}
+                  className="border-b border-border/40 last:border-b-0 even:bg-muted/15"
+                >
+                  {cols.map((col) => {
+                    const val = getColumnValue(item, col, displayNameEndpoint);
+                    const isEndpoint = endpointCols.has(col);
+                    const isDisplayNameFallback = col === displayNameEndpoint && item.fields[col] == null && item.displayName != null;
+                    return (
+                      <td
+                        key={col}
+                        className="py-1.5 px-3 text-sm align-baseline whitespace-normal"
+                      >
+                        {isEndpoint && typeof item.fields[col] === "string" ? (
+                          <KBRefLink id={item.fields[col] as string} />
+                        ) : isDisplayNameFallback ? (
+                          <span className="font-medium">{item.displayName}</span>
+                        ) : (
+                          <KBCellValue
+                            value={val}
+                            fieldName={col}
+                            fieldDef={fieldDefs?.[col]}
+                          />
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -891,7 +936,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
           {/* 6. Category-grouped facts */}
           {substantiveFacts.length > 0 && (
             <>
-              <SectionDivider title="All Facts" id="kb-all-facts" />
+              <SectionDivider title="All Facts" count={substantiveFacts.length} id="kb-all-facts" />
               {categoryKeys.map((category) => {
                 const categoryFacts = byCategory[category];
                 if (!categoryFacts || categoryFacts.length === 0) return null;

@@ -19,7 +19,7 @@ import { KBRefLink } from "./KBRefLink";
 const FRACTION_FIELDS = new Set(["stake", "stake_acquired", "pledge"]);
 
 /** Fields that are typically monetary amounts (USD), used as fallback when schema is unavailable. */
-const CURRENCY_FIELD_NAMES = new Set(["amount", "investment_amount", "raised", "valuation"]);
+const CURRENCY_FIELD_NAMES = new Set(["amount", "investment_amount", "raised", "valuation", "compute_commitment"]);
 
 function isFractionField(fieldName: string, fieldDef?: FieldDef): boolean {
   if (FRACTION_FIELDS.has(fieldName)) return true;
@@ -72,15 +72,17 @@ export function KBCellValue({ value, fieldName, fieldDef }: KBCellValueProps) {
     );
   }
 
-  // Numbers with unit
+  // Numbers with unit (or inferred currency from field name)
   if (fieldType === "number" && typeof value === "number") {
     // Fraction fields (0-1 range) display as percentages
     if (isFractionField(fieldName, fieldDef) && value >= 0 && value <= 1) {
       return <span className="tabular-nums">{formatPercent(value)}</span>;
     }
+    // Use schema unit, or infer USD from field name
+    const unit = fieldDef?.unit ?? (CURRENCY_FIELD_NAMES.has(fieldName) ? "USD" : undefined);
     return (
       <span className="font-mono text-sm tabular-nums">
-        {formatKBNumber(value, fieldDef?.unit)}
+        {formatKBNumber(value, unit)}
       </span>
     );
   }
@@ -90,7 +92,8 @@ export function KBCellValue({ value, fieldName, fieldDef }: KBCellValueProps) {
     if (isFractionField(fieldName, fieldDef)) {
       return <span className="tabular-nums">{formatPercent(value[0])}&ndash;{formatPercent(value[1])}</span>;
     }
-    return <span className="tabular-nums">{formatKBNumber(value[0], fieldDef?.unit)}&ndash;{formatKBNumber(value[1], fieldDef?.unit)}</span>;
+    const unit = fieldDef?.unit ?? (CURRENCY_FIELD_NAMES.has(fieldName) ? "USD" : undefined);
+    return <span className="tabular-nums">{formatKBNumber(value[0], unit)}&ndash;{formatKBNumber(value[1], unit)}</span>;
   }
 
   // Dates
