@@ -55,7 +55,7 @@ jobs:
           cache-to: type=gha,scope=groundskeeper,mode=max
 
       - name: Update ArgoCD image tag
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/production'
         env:
           ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}

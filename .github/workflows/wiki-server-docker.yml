@@ -68,7 +68,7 @@ jobs:
     name: Pre-deploy smoke test
     needs: build-and-push
     if: >-
-      github.ref == 'refs/heads/main'
+      github.ref == 'refs/heads/production'
       && inputs.skip_smoke_test != true
     runs-on: ubuntu-latest
 
@@ -156,7 +156,7 @@ jobs:
   pre-deploy-backup:
     name: Pre-deploy database backup
     needs: build-and-push
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/production'
     uses: ./.github/workflows/database-backup.yml
     with:
       backup_prefix: pre-deploy
@@ -166,7 +166,7 @@ jobs:
     name: Deploy to ArgoCD
     needs: [build-and-push, pre-deploy-smoke-test, pre-deploy-backup]
     if: >-
-      github.ref == 'refs/heads/main'
+      github.ref == 'refs/heads/production'
       && !cancelled()
       && (needs.pre-deploy-smoke-test.result == 'success' || needs.pre-deploy-smoke-test.result == 'skipped')
     # Deploy proceeds if smoke test passed OR was skipped (DDL migration deploys).
