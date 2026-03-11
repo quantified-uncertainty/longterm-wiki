@@ -544,9 +544,13 @@ function TimeSeriesFactRow({
   const prop = items[0]?.property;
   const label = prop?.name ?? titleCase(propertyId);
 
+  // Prefer non-expired active facts as "latest" — undated facts represent
+  // current values and shouldn't be buried by older dated snapshots.
+  const active = items.filter((i) => !isFactExpired(i.fact));
+  const undated = active.find((i) => !i.fact.asOf);
   const sorted = sortFactsByAsOf(items);
-  const latest = sorted[0];
-  const history = sorted.slice(1);
+  const latest = undated ?? sorted[0];
+  const history = sorted.filter((i) => i !== latest);
 
   if (!latest) return null;
 
