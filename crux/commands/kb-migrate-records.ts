@@ -67,6 +67,7 @@ interface PersonnelRow {
 interface GrantRow {
   id: string;
   organizationId: string;
+  granteeId: string | null;
   name: string;
   amount: number | null;
   currency: string;
@@ -77,27 +78,30 @@ interface GrantRow {
   notes: string | null;
 }
 
-function resolveEntitySlug(graph: Graph, filenameMap: Map<string, string>, entityId: string): string {
+/**
+ * Resolve an entity reference to a canonical entity ID.
+ * If the entity exists in the graph, returns its stable 10-char ID.
+ * If not found (e.g. a display name like "D. E. Shaw Research"), returns as-is.
+ */
+function resolveEntityId(graph: Graph, entityId: string): string {
   const entity = graph.getEntity(entityId);
-  if (!entity) return entityId;
-  return filenameMap.get(entity.id) ?? entityId;
+  return entity?.id ?? entityId;
 }
 
 function mapKeyPerson(
   record: RecordEntry,
   graph: Graph,
-  filenameMap: Map<string, string>,
-  ownerSlug: string,
+  ownerEntityId: string,
 ): PersonnelRow {
   const f = record.fields;
   const personId = f.person
-    ? resolveEntitySlug(graph, filenameMap, String(f.person))
+    ? resolveEntityId(graph, String(f.person))
     : record.displayName ?? record.key;
 
   return {
     id: personnelId(record.ownerEntityId, 'key-persons', record.key),
     personId,
-    organizationId: ownerSlug,
+    organizationId: ownerEntityId,
     role: String(f.title ?? 'Unknown'),
     roleType: 'key-person',
     startDate: f.start != null ? String(f.start) : null,
@@ -113,18 +117,17 @@ function mapKeyPerson(
 function mapBoardSeat(
   record: RecordEntry,
   graph: Graph,
-  filenameMap: Map<string, string>,
-  ownerSlug: string,
+  ownerEntityId: string,
 ): PersonnelRow {
   const f = record.fields;
   const personId = f.member
-    ? resolveEntitySlug(graph, filenameMap, String(f.member))
+    ? resolveEntityId(graph, String(f.member))
     : record.displayName ?? record.key;
 
   return {
     id: personnelId(record.ownerEntityId, 'board-seats', record.key),
     personId,
-    organizationId: ownerSlug,
+    organizationId: ownerEntityId,
     role: String(f.role ?? 'Board Member'),
     roleType: 'board',
     startDate: f.appointed != null ? String(f.appointed) : null,
@@ -140,16 +143,18 @@ function mapBoardSeat(
 function mapCareerHistory(
   record: RecordEntry,
   _graph: Graph,
-  _filenameMap: Map<string, string>,
-  ownerSlug: string,
+  ownerEntityId: string,
 ): PersonnelRow {
   const f = record.fields;
-  // Career history: the owner IS the person, organization is a text field
+  // Career history: the owner IS the person, organization is a free-text field.
+  // Unlike personId/organizationId in key-persons/board-seats (which reference known
+  // entities), career-history organizations may be non-entity strings like
+  // "D. E. Shaw Research" that have no entity ID. We store the raw text as-is.
   const orgText = f.organization != null ? String(f.organization) : 'Unknown';
 
   return {
     id: personnelId(record.ownerEntityId, 'career-history', record.key),
-    personId: ownerSlug,
+    personId: ownerEntityId,
     organizationId: orgText,
     role: String(f.title ?? 'Unknown'),
     roleType: 'career',
@@ -165,15 +170,15 @@ function mapCareerHistory(
 
 function mapGrant(
   record: RecordEntry,
-  _graph: Graph,
-  _filenameMap: Map<string, string>,
-  ownerSlug: string,
+  graph: Graph,
+  ownerEntityId: string,
 ): GrantRow {
   const f = record.fields;
 
   return {
     id: grantId(record.ownerEntityId, record.key),
-    organizationId: ownerSlug,
+    organizationId: ownerEntityId,
+    granteeId: f.grantee != null ? resolveEntityId(graph, String(f.grantee)) : null,
     name: String(f.name ?? record.key),
     amount: f.amount != null ? Number(f.amount) : null,
     currency: 'USD',
@@ -187,7 +192,7 @@ function mapGrant(
 
 // ── Extract all records ────────────────────────────────────────────────
 
-function extractRecords(graph: Graph, filenameMap: Map<string, string>): {
+function extractRecords(graph: Graph): {
   personnel: PersonnelRow[];
   grants: GrantRow[];
 } {
@@ -195,7 +200,7 @@ function extractRecords(graph: Graph, filenameMap: Map<string, string>): {
   const grantRows: GrantRow[] = [];
 
   for (const entity of graph.getAllEntities()) {
-    const ownerSlug = filenameMap.get(entity.id) ?? entity.id;
+    const ownerEntityId = entity.id;
     const collections = graph.getRecordCollectionNames(entity.id);
 
     for (const collection of collections) {
@@ -206,13 +211,13 @@ function extractRecords(graph: Graph, filenameMap: Map<string, string>): {
       const records = graph.getRecords(entity.id, collection);
       for (const record of records) {
         if (collection === 'key-persons') {
-          personnelRows.push(mapKeyPerson(record, graph, filenameMap, ownerSlug));
+          personnelRows.push(mapKeyPerson(record, graph, ownerEntityId));
         } else if (collection === 'board-seats') {
-          personnelRows.push(mapBoardSeat(record, graph, filenameMap, ownerSlug));
+          personnelRows.push(mapBoardSeat(record, graph, ownerEntityId));
         } else if (collection === 'career-history') {
-          personnelRows.push(mapCareerHistory(record, graph, filenameMap, ownerSlug));
+          personnelRows.push(mapCareerHistory(record, graph, ownerEntityId));
         } else if (collection === 'grants') {
-          grantRows.push(mapGrant(record, graph, filenameMap, ownerSlug));
+          grantRows.push(mapGrant(record, graph, ownerEntityId));
         }
       }
     }
@@ -224,8 +229,8 @@ function extractRecords(graph: Graph, filenameMap: Map<string, string>): {
 // ── Stats subcommand ───────────────────────────────────────────────────
 
 async function statsCommand(): Promise<CommandResult> {
-  const { graph, filenameMap } = await loadKB(KB_DATA_DIR);
-  const { personnel, grants } = extractRecords(graph, filenameMap);
+  const { graph } = await loadKB(KB_DATA_DIR);
+  const { personnel, grants } = extractRecords(graph);
 
   const byType: Record<string, number> = {};
   for (const row of personnel) {
@@ -257,8 +262,8 @@ async function statsCommand(): Promise<CommandResult> {
 
 async function syncCommand(options: MigrateOptions): Promise<CommandResult> {
   const dryRun = options.dryRun || options['dry-run'];
-  const { graph, filenameMap } = await loadKB(KB_DATA_DIR);
-  const { personnel, grants } = extractRecords(graph, filenameMap);
+  const { graph } = await loadKB(KB_DATA_DIR);
+  const { personnel, grants } = extractRecords(graph);
 
   console.log(`Found ${personnel.length} personnel records and ${grants.length} grant records`);
 
@@ -277,30 +282,41 @@ async function syncCommand(options: MigrateOptions): Promise<CommandResult> {
     return { exitCode: 0, output: `Dry run complete. ${personnel.length} personnel, ${grants.length} grants would be synced.` };
   }
 
-  // Sync personnel
+  // Sync in batches (API limit: 500 items per request)
+  const BATCH_SIZE = 500;
+
   if (personnel.length > 0) {
-    const result = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', {
-      items: personnel,
-    });
-    if (result.ok) {
-      console.log(`✓ Synced ${result.data.upserted} personnel records`);
-    } else {
-      console.error(`✗ Personnel sync failed: ${result.message}`);
-      return { exitCode: 1, output: `Personnel sync failed: ${result.message}` };
+    let totalUpserted = 0;
+    for (let i = 0; i < personnel.length; i += BATCH_SIZE) {
+      const batch = personnel.slice(i, i + BATCH_SIZE);
+      const result = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', {
+        items: batch,
+      });
+      if (result.ok) {
+        totalUpserted += result.data.upserted;
+      } else {
+        console.error(`✗ Personnel sync failed (batch ${Math.floor(i / BATCH_SIZE) + 1}): ${result.message}`);
+        return { exitCode: 1, output: `Personnel sync failed: ${result.message}` };
+      }
     }
+    console.log(`✓ Synced ${totalUpserted} personnel records`);
   }
 
-  // Sync grants
   if (grants.length > 0) {
-    const result = await apiRequest<{ upserted: number }>('POST', '/api/grants/sync', {
-      items: grants,
-    });
-    if (result.ok) {
-      console.log(`✓ Synced ${result.data.upserted} grant records`);
-    } else {
-      console.error(`✗ Grants sync failed: ${result.message}`);
-      return { exitCode: 1, output: `Grants sync failed: ${result.message}` };
+    let totalUpserted = 0;
+    for (let i = 0; i < grants.length; i += BATCH_SIZE) {
+      const batch = grants.slice(i, i + BATCH_SIZE);
+      const result = await apiRequest<{ upserted: number }>('POST', '/api/grants/sync', {
+        items: batch,
+      });
+      if (result.ok) {
+        totalUpserted += result.data.upserted;
+      } else {
+        console.error(`✗ Grants sync failed (batch ${Math.floor(i / BATCH_SIZE) + 1}): ${result.message}`);
+        return { exitCode: 1, output: `Grants sync failed: ${result.message}` };
+      }
     }
+    console.log(`✓ Synced ${totalUpserted} grant records`);
   }
 
   return {

@@ -929,6 +929,9 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
  * Fetch personnel and grants from the wiki-server PG tables and merge them
  * into the serialized KB records structure (same format as YAML-sourced records).
  *
+ * PG stores canonical entity IDs (10-char) in personId/organizationId fields,
+ * which match the keys used in kb.records. No slug→entityId remapping needed.
+ *
  * For collections that exist in both YAML and PG, PG records replace YAML.
  * Falls back gracefully if the wiki-server is unavailable (YAML records remain).
  */
@@ -948,24 +951,35 @@ async function mergePGRecordsIntoKB(kb) {
 
   if (!kb.records) kb.records = {};
 
-  // Build slug → entityId lookup from the serialized KB data
-  const slugToEntityId = kb.slugToEntityId || {};
-  function resolveKey(slug) {
-    return slugToEntityId[slug] || slug;
+  // Fetch all pages (paginate to avoid truncation at MAX_PAGE_SIZE)
+  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
+
+  async function fetchAllPages(endpoint) {
+    const pageSize = 200;
+    let allItems = [];
+    let offset = 0;
+    while (true) {
+      const url = `${serverUrl}${endpoint}?limit=${pageSize}&offset=${offset}`;
+      const resp = await fetch(url, fetchOpts);
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const items = data.personnel || data.grants || [];
+      allItems = allItems.concat(items);
+      if (items.length < pageSize) break; // last page
+      offset += pageSize;
+    }
+    return allItems;
   }
 
-  // Fetch personnel and grants in parallel
-  const fetchOpts = { headers, signal: AbortSignal.timeout(10_000) };
   const [personnelResult, grantsResult] = await Promise.allSettled([
-    fetch(`${serverUrl}/api/personnel/all?limit=200`, fetchOpts).then(r => r.ok ? r.json() : null),
-    fetch(`${serverUrl}/api/grants/all?limit=200`, fetchOpts).then(r => r.ok ? r.json() : null),
+    fetchAllPages('/api/personnel/all'),
+    fetchAllPages('/api/grants/all'),
   ]);
 
   // --- Process personnel ---
-  const personnelData = personnelResult.status === 'fulfilled' ? personnelResult.value : null;
-  if (personnelData) {
-    const rows = personnelData.personnel || [];
-    if (rows.length > 0) {
+  const personnelRows = personnelResult.status === 'fulfilled' ? personnelResult.value : null;
+  if (personnelRows) {
+    if (personnelRows.length > 0) {
       // Clear YAML-sourced personnel collections — PG is the authority when available
       for (const entityKey of Object.keys(kb.records)) {
         for (const collection of ['key-persons', 'board-seats', 'career-history']) {
@@ -978,23 +992,22 @@ async function mergePGRecordsIntoKB(kb) {
         }
       }
 
-      // Populate from PG (PG stores slugs; records are keyed by entity ID)
-      for (const row of rows) {
-        let ownerSlug, collectionName;
+      // Populate from PG — entity IDs are used directly as kb.records keys
+      for (const row of personnelRows) {
+        let entityKey, collectionName;
         if (row.roleType === 'key-person') {
-          ownerSlug = row.organizationId;
+          entityKey = row.organizationId;
           collectionName = 'key-persons';
         } else if (row.roleType === 'board') {
-          ownerSlug = row.organizationId;
+          entityKey = row.organizationId;
           collectionName = 'board-seats';
         } else if (row.roleType === 'career') {
-          ownerSlug = row.personId;
+          entityKey = row.personId;
           collectionName = 'career-history';
         } else {
           continue;
         }
 
-        const entityKey = resolveKey(ownerSlug);
         if (!kb.records[entityKey]) kb.records[entityKey] = {};
         if (!kb.records[entityKey][collectionName]) kb.records[entityKey][collectionName] = [];
 
@@ -1008,10 +1021,9 @@ async function mergePGRecordsIntoKB(kb) {
   }
 
   // --- Process grants ---
-  const grantsData = grantsResult.status === 'fulfilled' ? grantsResult.value : null;
-  if (grantsData) {
-    const rows = grantsData.grants || [];
-    if (rows.length > 0) {
+  const grantRows = grantsResult.status === 'fulfilled' ? grantsResult.value : null;
+  if (grantRows) {
+    if (grantRows.length > 0) {
       // Clear existing YAML grant collections, replace with PG
       for (const entityKey of Object.keys(kb.records)) {
         if (kb.records[entityKey]?.grants) {
@@ -1022,8 +1034,8 @@ async function mergePGRecordsIntoKB(kb) {
         }
       }
 
-      for (const row of rows) {
-        const entityKey = resolveKey(row.organizationId);
+      for (const row of grantRows) {
+        const entityKey = row.organizationId;
         if (!kb.records[entityKey]) kb.records[entityKey] = {};
         if (!kb.records[entityKey].grants) kb.records[entityKey].grants = [];
 
@@ -1041,8 +1053,7 @@ async function mergePGRecordsIntoKB(kb) {
 
 /**
  * Convert a PG personnel row to the RecordEntry format used by frontend components.
- * PG stores slugs in personId/organizationId; ownerEntityId should also be the slug
- * since the merge function handles slug→entityId resolution when keying into kb.records.
+ * PG stores canonical entity IDs in personId/organizationId.
  */
 function personnelRowToRecordEntry(row) {
   const fields = {};
@@ -1092,6 +1103,7 @@ function grantRowToRecordEntry(row) {
     name: row.name,
   };
   if (row.amount != null) fields.amount = row.amount;
+  if (row.granteeId) fields.grantee = row.granteeId;
   if (row.period) fields.period = row.period;
   if (row.date) fields.date = row.date;
   if (row.status) fields.status = row.status;

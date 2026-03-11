@@ -31,6 +31,7 @@ const AllQuery = z.object({
 const SyncGrantItemSchema = z.object({
   id: z.string().length(10),
   organizationId: z.string().min(1).max(200),
+  granteeId: z.string().max(200).nullable().optional(),
   name: z.string().min(1).max(500),
   amount: z.number().nullable().optional(),
   currency: z.string().max(10).optional().default("USD"),
@@ -51,8 +52,9 @@ function formatRow(r: typeof grants.$inferSelect) {
   return {
     id: r.id,
     organizationId: r.organizationId,
+    granteeId: r.granteeId,
     name: r.name,
-    amount: r.amount,
+    amount: r.amount != null ? Number(r.amount) : null,
     currency: r.currency,
     period: r.period,
     date: r.date,
@@ -159,8 +161,9 @@ const grantsApp = new Hono()
       const allVals = items.map((item) => ({
         id: item.id,
         organizationId: item.organizationId,
+        granteeId: item.granteeId ?? null,
         name: item.name,
-        amount: item.amount ?? null,
+        amount: item.amount != null ? String(item.amount) : null,
         currency: item.currency,
         period: item.period ?? null,
         date: item.date ?? null,
@@ -176,6 +179,7 @@ const grantsApp = new Hono()
           target: grants.id,
           set: {
             organizationId: sql`excluded.organization_id`,
+            granteeId: sql`excluded.grantee_id`,
             name: sql`excluded.name`,
             amount: sql`excluded.amount`,
             currency: sql`excluded.currency`,
