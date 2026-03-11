@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
   { href: "/wiki", label: "Explore" },
+  { href: "/organizations", label: "Organizations" },
+  { href: "/people", label: "People" },
   { href: "/kb", label: "Data" },
   { href: "/wiki/E755", label: "About" },
   { href: "/wiki/E779", label: "Internal" },
