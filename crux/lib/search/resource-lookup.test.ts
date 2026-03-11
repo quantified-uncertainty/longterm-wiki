@@ -2,7 +2,8 @@
  * Tests for resource-lookup.ts
  *
  * Covers: lazy loading, lookup by ID, lookup by URL (with normalization),
- * cache clearing, and graceful handling of missing data.
+ * cache clearing, resolveResource (hash + stable_id), and graceful handling
+ * of missing data.
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -18,6 +19,7 @@ vi.mock('../../resource-io.ts', () => ({
       authors: ['Jane Smith'],
       summary: 'A paper about AI safety',
       tags: ['safety', 'alignment'],
+      stable_id: 'aBcDeFgHiJ',
     },
     {
       id: 'xyz789ghi012',
@@ -25,6 +27,7 @@ vi.mock('../../resource-io.ts', () => ({
       title: 'Blog About Alignment',
       type: 'blog',
       tags: ['alignment'],
+      stable_id: 'abc123def456', // same as first resource's hash ID — tests precedence
     },
   ]),
 }));
@@ -32,6 +35,7 @@ vi.mock('../../resource-io.ts', () => ({
 import {
   getResourceById,
   getResourceByUrl,
+  resolveResource,
   clearResourceCache,
   updateResourceFetchStatus,
 } from './resource-lookup.ts';
@@ -77,6 +81,37 @@ describe('resource-lookup', () => {
 
     it('returns null for an unknown URL', () => {
       expect(getResourceByUrl('https://unknown.com/page')).toBeNull();
+    });
+  });
+
+  describe('resolveResource', () => {
+    it('resolves by hash ID', () => {
+      const r = resolveResource('abc123def456');
+      expect(r).not.toBeNull();
+      expect(r!.title).toBe('AI Safety Paper One');
+    });
+
+    it('resolves by stable_id', () => {
+      const r = resolveResource('aBcDeFgHiJ');
+      expect(r).not.toBeNull();
+      expect(r!.id).toBe('abc123def456');
+      expect(r!.title).toBe('AI Safety Paper One');
+    });
+
+    it('prefers hash ID over stable_id', () => {
+      // 'abc123def456' is both the hash ID of resource 1 and the stable_id of resource 2.
+      // Hash ID lookup should win.
+      const r = resolveResource('abc123def456');
+      expect(r!.id).toBe('abc123def456');
+      expect(r!.title).toBe('AI Safety Paper One');
+    });
+
+    it('returns null for unknown ID', () => {
+      expect(resolveResource('nonexistent')).toBeNull();
+    });
+
+    it('returns null when looking up nonexistent stable_id', () => {
+      expect(resolveResource('someStableId')).toBeNull();
     });
   });
 

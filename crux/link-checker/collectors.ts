@@ -1,7 +1,7 @@
 /**
  * URL collectors — extract URLs from various wiki data sources.
  *
- * Covers: resource YAML files, external-links.yaml, and MDX content.
+ * Covers: resources, external-links.yaml, and MDX content.
  */
 
 import { readFileSync, existsSync } from 'fs';
@@ -200,7 +200,7 @@ export function collectAllUrls(source: string): UrlEntry[] {
   }
 
   if (source === 'all' || source === 'resources') {
-    console.log('  Collecting URLs from resource YAML files...');
+    console.log('  Collecting URLs from resources...');
     const resourceUrls = collectResourceUrls();
     console.log(`    Found ${resourceUrls.length} unique URLs in resources`);
     mergeEntries(resourceUrls);

@@ -7,10 +7,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Severity } from '../validation/validation-engine.ts';
 
-// Mock resource-io.ts to return test resource IDs
+// Mock resource-io.ts to return test resource IDs (including stable_ids)
 vi.mock('../../resource-io.ts', () => ({
   loadResourceIdsPGFirst: vi.fn(async () =>
-    new Set(['aabbccdd11223344', 'ccdd1122aabb5566']),
+    new Set(['aabbccdd11223344', 'ccdd1122aabb5566', 'aB1cD2eF3g']),
   ),
 }));
 
@@ -114,6 +114,12 @@ describe('resource-ref-integrity rule', () => {
       '<R id="ccdd1122aabb5566">Resource B</R>',
     ].join('\n');
     const content = mockContent(body);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('accepts a stable_id in <R> tag', async () => {
+    const content = mockContent('<R id="aB1cD2eF3g">Resource via stable_id</R>');
     const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(0);
   });

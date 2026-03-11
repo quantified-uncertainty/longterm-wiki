@@ -29,11 +29,16 @@ const PG_BATCH_SIZE = 200;
  */
 export function loadResources(): Resource[] {
   if (!existsSync(SNAPSHOT_FILE)) {
-    console.warn('  resources: snapshot file not found, returning empty list');
-    return [];
+    throw new Error(
+      `Resources snapshot not found: ${SNAPSHOT_FILE}\n` +
+      `Run: pnpm crux wiki-server snapshot-resources`
+    );
   }
-  const content = readFileSync(SNAPSHOT_FILE, 'utf-8');
-  return JSON.parse(content) as Resource[];
+  const parsed = JSON.parse(readFileSync(SNAPSHOT_FILE, 'utf-8'));
+  if (!Array.isArray(parsed)) {
+    throw new Error(`Invalid resources snapshot: expected an array in ${SNAPSHOT_FILE}`);
+  }
+  return parsed as Resource[];
 }
 
 // ---------------------------------------------------------------------------
@@ -126,7 +131,10 @@ async function fetchResourcesFromPG(): Promise<Resource[] | null> {
   if (citResult.ok) {
     citationsIndex = citResult.data.citations;
   } else {
-    console.warn(`  resources: failed to fetch citations (${citResult.message})`);
+    // Abort PG load — continuing with empty citations would cause
+    // read-modify-write commands to wipe cited_by edges via null.
+    console.warn(`  resources: failed to fetch citations (${citResult.message}), falling back to snapshot`);
+    return null;
   }
 
   return allResources.map(row =>

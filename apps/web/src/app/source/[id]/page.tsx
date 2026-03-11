@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import {
-  getResourceById,
+  resolveResource,
   getResourceCredibility,
   getResourcePublication,
   getPagesForResource,
@@ -33,7 +33,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const resource = getResourceById(id);
+  const resource = resolveResource(id);
   if (!resource) return { title: "Source Not Found" };
 
   return {
@@ -70,13 +70,13 @@ function getPageTitle(pageId: string): string {
 
 export default async function SourcePage({ params }: PageProps) {
   const { id } = await params;
-  const resource = getResourceById(id);
+  const resource = resolveResource(id);
 
   if (!resource) notFound();
 
   const publication = getResourcePublication(resource);
   const credibility = getResourceCredibility(resource);
-  const citingPages = getPagesForResource(id);
+  const citingPages = getPagesForResource(resource.id);
   const domain = resource.url ? (getDomain(resource.url) ?? "unknown") : null;
 
   // Fetch cached content
@@ -349,7 +349,10 @@ export default async function SourcePage({ params }: PageProps) {
 
       {/* Footer */}
       <div className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
-        Resource ID: <code className="px-1 py-0.5 bg-muted rounded">{id}</code>
+        Resource ID: <code className="px-1 py-0.5 bg-muted rounded">{resource.id}</code>
+        {resource.stable_id && (
+          <> | Stable ID: <code className="px-1 py-0.5 bg-muted rounded">{resource.stable_id}</code></>
+        )}
       </div>
     </div>
   );

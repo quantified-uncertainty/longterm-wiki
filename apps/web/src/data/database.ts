@@ -187,6 +187,7 @@ export interface Resource {
   tags?: string[];
   publication_id?: string;
   credibility_override?: number;
+  stable_id?: string;
 }
 
 export interface Publication {
@@ -541,6 +542,7 @@ export function getIdRegistry(): IdRegistryMaps {
 
 let _typedEntityIndex: Map<string, AnyEntity> | null = null;
 let _resourceIndex: Map<string, Resource> | null = null;
+let _stableIdIndex: Map<string, Resource> | null = null;
 let _publicationIndex: Map<string, Publication> | null = null;
 let _expertIndex: Map<string, Expert> | null = null;
 let _orgIndex: Map<string, Organization> | null = null;
@@ -556,9 +558,28 @@ function typedEntityIndex() {
 function resourceIndex() {
   if (!_resourceIndex) {
     const db = getDatabase();
-    _resourceIndex = new Map((db.resources || []).map((r) => [r.id, r]));
+    const resources = db.resources || [];
+    _resourceIndex = new Map();
+    _stableIdIndex = new Map();
+    for (const r of resources) {
+      _resourceIndex.set(r.id, r);
+      if (r.stable_id) {
+        const existing = _stableIdIndex.get(r.stable_id);
+        if (existing && existing.id !== r.id) {
+          throw new Error(
+            `Duplicate resource stable_id "${r.stable_id}" for "${existing.id}" and "${r.id}"`
+          );
+        }
+        _stableIdIndex.set(r.stable_id, r);
+      }
+    }
   }
   return _resourceIndex;
+}
+
+function stableIdIndex() {
+  if (!_stableIdIndex) resourceIndex(); // builds both indexes
+  return _stableIdIndex!;
 }
 
 function publicationIndex() {
@@ -632,6 +653,14 @@ export function getEntityById(id: string): Entity | undefined {
 
 export function getResourceById(id: string): Resource | undefined {
   return resourceIndex().get(id);
+}
+
+/**
+ * Resolve a resource by hash ID or stable_id.
+ * Tries hash ID first (16-char hex), then stable_id (10-char alphanumeric).
+ */
+export function resolveResource(id: string): Resource | undefined {
+  return resourceIndex().get(id) ?? stableIdIndex().get(id);
 }
 
 /** Get all resources */
