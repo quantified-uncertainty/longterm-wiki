@@ -942,9 +942,7 @@ async function mergePGRecordsIntoKB(kb) {
     return { personnel: 0, grants: 0 };
   }
 
-  const headers = { 'Content-Type': 'application/json' };
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+  const headers = buildHeaders();
 
   let personnelCount = 0;
   let grantsCount = 0;
