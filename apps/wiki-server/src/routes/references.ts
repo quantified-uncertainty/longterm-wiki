@@ -1,18 +1,16 @@
 /**
- * References API — unified endpoint for claim-backed and regular page citations.
+ * References API — page citations endpoint.
  *
- * Provides a single GET endpoint that returns both claim_page_references (with
- * joined claim data) and page_citations for a given page, plus POST endpoints
- * for creating each type individually or in batch.
+ * The claim_page_references and claims tables were archived by migration 0065.
+ * This route now only serves page_citations data; claim-related fields are
+ * returned as empty to preserve backward-compatible response shapes.
  */
 
 import { Hono } from "hono";
 import { eq, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import {
-  claimPageReferences,
   pageCitations,
-  claims,
   wikiPages,
   resources,
 } from "../schema.js";
@@ -24,10 +22,8 @@ import {
   firstOrThrow,
 } from "./utils.js";
 import {
-  ClaimPageReferenceInsertSchema,
   PageCitationInsertSchema,
   PageCitationBatchSchema,
-  type ClaimPageReferenceRow,
   type PageCitationRow,
 } from "../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
@@ -36,17 +32,9 @@ import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
 // Types
 // ---------------------------------------------------------------------------
 
-interface ClaimReferenceItem extends ClaimPageReferenceRow {
-  type: "claim";
-  claimText: string;
-  claimVerdict: string | null;
-}
-
 interface CitationItem extends PageCitationRow {
   type: "citation";
 }
-
-type UnifiedReference = ClaimReferenceItem | CitationItem;
 
 // ---------------------------------------------------------------------------
 // Route
@@ -64,39 +52,9 @@ const app = new Hono()
       return c.json({ references: [], totalClaim: 0, totalCitation: 0 });
     }
 
-    // 1. Query claim_page_references JOIN claims for claim data
-    const claimRefRows = await db
-      .select({
-        id: claimPageReferences.id,
-        claimId: claimPageReferences.claimId,
-        pageId: claimPageReferences.pageId,
-        footnote: claimPageReferences.footnote,
-        section: claimPageReferences.section,
-        quoteText: claimPageReferences.quoteText,
-        referenceId: claimPageReferences.referenceId,
-        createdAt: claimPageReferences.createdAt,
-        claimText: claims.claimText,
-        claimVerdict: claims.claimVerdict,
-      })
-      .from(claimPageReferences)
-      .innerJoin(claims, eq(claimPageReferences.claimId, claims.id))
-      .where(eq(claimPageReferences.pageIdInt, intId));
+    // claim_page_references and claims were archived by migration 0065.
+    // Only page_citations remain.
 
-    const claimRefs: ClaimReferenceItem[] = claimRefRows.map((r) => ({
-      type: "claim" as const,
-      id: Number(r.id),
-      claimId: Number(r.claimId),
-      pageId, // use URL parameter — page_id_old no longer written for new rows (Phase D2a)
-      footnote: r.footnote,
-      section: r.section,
-      quoteText: r.quoteText,
-      referenceId: r.referenceId,
-      createdAt: r.createdAt?.toISOString() ?? new Date().toISOString(),
-      claimText: r.claimText,
-      claimVerdict: r.claimVerdict,
-    }));
-
-    // 2. Query page_citations for regular citations
     const citationRows = await db
       .select()
       .from(pageCitations)
@@ -114,80 +72,15 @@ const app = new Hono()
       createdAt: r.createdAt?.toISOString() ?? new Date().toISOString(),
     }));
 
-    // 3. Return unified list
-    const references: UnifiedReference[] = [
-      ...claimRefs,
-      ...citations,
-    ];
-
-    return c.json({ references, totalClaim: claimRefs.length, totalCitation: citations.length });
+    return c.json({ references: citations, totalClaim: 0, totalCitation: citations.length });
   })
 
-  // ---- POST /claim — create a claim page reference ----
+  // ---- POST /claim — DISABLED: claims tables archived by migration 0065 ----
   .post("/claim", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = ClaimPageReferenceInsertSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const db = getDrizzleDb();
-
-    // Verify claim exists
-    const missingClaims = await checkRefsExist(
-      db,
-      claims,
-      claims.id,
-      [String(parsed.data.claimId)]
+    return c.json(
+      { error: "Claim references are no longer supported. The claims tables were archived by migration 0065." },
+      410,
     );
-    if (missingClaims.length > 0) {
-      return validationError(c, `Claim not found: ${parsed.data.claimId}`);
-    }
-
-    // Verify page exists
-    const missingPages = await checkRefsExist(
-      db,
-      wikiPages,
-      wikiPages.id,
-      [parsed.data.pageId]
-    );
-    if (missingPages.length > 0) {
-      return validationError(c, `Page not found: ${parsed.data.pageId}`);
-    }
-
-    // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
-    const pageIdInt = await resolvePageIntId(db, parsed.data.pageId);
-
-    const rows = await db
-      .insert(claimPageReferences)
-      .values({
-        claimId: parsed.data.claimId,
-        pageIdInt,
-        footnote: parsed.data.footnote ?? null,
-        section: parsed.data.section ?? null,
-        quoteText: parsed.data.quoteText ?? null,
-        referenceId: parsed.data.referenceId ?? null,
-      })
-      .onConflictDoNothing()
-      .returning();
-
-    if (rows.length === 0) {
-      return c.json({ message: "Reference already exists" }, 200);
-    }
-
-    const row = rows[0];
-    const result: ClaimPageReferenceRow = {
-      id: Number(row.id),
-      claimId: Number(row.claimId),
-      pageId: parsed.data.pageId, // derived from input (page_id_old no longer written)
-      footnote: row.footnote,
-      section: row.section,
-      quoteText: row.quoteText,
-      referenceId: row.referenceId,
-      createdAt: row.createdAt?.toISOString() ?? new Date().toISOString(),
-    };
-
-    return c.json(result, 201);
   })
 
   // ---- POST /citation — create a regular citation ----
@@ -311,27 +204,9 @@ const app = new Hono()
   .get("/all", async (c) => {
     const db = getDrizzleDb();
 
-    // 1. Fetch all claim page references with joined claim data.
-    //    LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
-    //    (page_id_old is no longer written; fall back to wiki_pages.id via page_id_int).
-    const claimRefRows = await db
-      .select({
-        id: claimPageReferences.id,
-        claimId: claimPageReferences.claimId,
-        pageSlug: sql<string | null>`coalesce(${claimPageReferences.pageId}, ${wikiPages.id})`,
-        footnote: claimPageReferences.footnote,
-        section: claimPageReferences.section,
-        quoteText: claimPageReferences.quoteText,
-        referenceId: claimPageReferences.referenceId,
-        createdAt: claimPageReferences.createdAt,
-        claimText: claims.claimText,
-        claimVerdict: claims.claimVerdict,
-      })
-      .from(claimPageReferences)
-      .innerJoin(claims, eq(claimPageReferences.claimId, claims.id))
-      .leftJoin(wikiPages, eq(claimPageReferences.pageIdInt, wikiPages.integerIdCol));
+    // claim_page_references and claims were archived by migration 0065.
+    // Only page_citations remain.
 
-    // 2. Fetch all page citations with wiki_pages JOIN for slug recovery
     const citationRows = await db
       .select({
         referenceId: pageCitations.referenceId,
@@ -344,47 +219,23 @@ const app = new Hono()
       .from(pageCitations)
       .leftJoin(wikiPages, eq(pageCitations.pageIdInt, wikiPages.integerIdCol));
 
-    // 3. Group by pageId (skip rows with no recoverable slug)
+    // Group by pageId (skip rows with no recoverable slug)
     const byPage: Record<
       string,
-      {
-        claimReferences: Array<{
-          claimId: number;
-          claimText: string;
-          verdict: string | null;
-          referenceId: string | null;
-        }>;
-        citations: Array<{
-          referenceId: string;
-          title: string | null;
-          url: string | null;
-          note: string | null;
-          resourceId: string | null;
-        }>;
-      }
+      Array<{
+        referenceId: string;
+        title: string | null;
+        url: string | null;
+        note: string | null;
+        resourceId: string | null;
+      }>
     > = {};
-
-    for (const row of claimRefRows) {
-      const pageId = row.pageSlug;
-      if (!pageId) continue; // skip rows with no recoverable page slug
-      if (!byPage[pageId]) {
-        byPage[pageId] = { claimReferences: [], citations: [] };
-      }
-      byPage[pageId].claimReferences.push({
-        claimId: Number(row.claimId),
-        claimText: row.claimText,
-        verdict: row.claimVerdict,
-        referenceId: row.referenceId,
-      });
-    }
 
     for (const row of citationRows) {
       const pageId = row.pageSlug;
-      if (!pageId) continue; // skip rows with no recoverable page slug
-      if (!byPage[pageId]) {
-        byPage[pageId] = { claimReferences: [], citations: [] };
-      }
-      byPage[pageId].citations.push({
+      if (!pageId) continue;
+      if (!byPage[pageId]) byPage[pageId] = [];
+      byPage[pageId].push({
         referenceId: row.referenceId,
         title: row.title,
         url: row.url,
@@ -393,14 +244,17 @@ const app = new Hono()
       });
     }
 
-    // Derive totals from filtered byPage (rows with no recoverable slug are excluded)
-    const totalClaimRefs = Object.values(byPage).reduce((n, p) => n + p.claimReferences.length, 0);
-    const totalCitations = Object.values(byPage).reduce((n, p) => n + p.citations.length, 0);
+    const totalCitations = Object.values(byPage).reduce((n, p) => n + p.length, 0);
 
     return c.json({
-      pages: byPage,
+      pages: Object.fromEntries(
+        Object.entries(byPage).map(([id, citations]) => [
+          id,
+          { claimReferences: [], citations },
+        ])
+      ),
       totalPages: Object.keys(byPage).length,
-      totalClaimRefs,
+      totalClaimRefs: 0,
       totalCitations,
     });
   });
