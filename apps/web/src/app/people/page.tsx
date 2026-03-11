@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getKBEntities, getKBLatest, getKBRecords, getKBEntity } from "@/data/kb";
+import { getKBEntities, getKBLatest, getKBRecords, getKBEntity, getKBEntitySlug } from "@/data/kb";
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import { PeopleTable, type PersonRow } from "./people-table";
@@ -52,6 +52,7 @@ export default function PeoplePage() {
 
     return {
       id: entity.id,
+      slug: getKBEntitySlug(entity.id) ?? entity.id,
       name: entity.name,
       numericId: entity.numericId ?? null,
       wikiPageId: entity.wikiPageId ?? entity.numericId ?? null,

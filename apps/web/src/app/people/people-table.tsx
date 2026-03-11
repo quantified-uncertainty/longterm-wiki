@@ -5,6 +5,7 @@ import Link from "next/link";
 
 export interface PersonRow {
   id: string;
+  slug: string;
   name: string;
   numericId: string | null;
   wikiPageId: string | null;
@@ -179,7 +180,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
                 {/* Name */}
                 <td className="py-2.5 px-3">
                   <Link
-                    href={`/kb/entity/${row.id}`}
+                    href={`/people/${row.slug}`}
                     className="font-medium text-foreground hover:text-primary transition-colors"
                   >
                     {row.name}
