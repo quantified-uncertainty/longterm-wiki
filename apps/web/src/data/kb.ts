@@ -377,3 +377,41 @@ export function getKBRecordByKey(
   return undefined;
 }
 
+// ── Slug resolution (public) ─────────────────────────────────────
+
+/**
+ * Resolve a YAML filename slug (e.g. "anthropic") to a KB entity ID.
+ * Returns undefined if the slug is not in the mapping.
+ */
+export function resolveKBSlug(slug: string): string | undefined {
+  const kb = getKB();
+  if (!kb?.slugToEntityId) return undefined;
+  return kb.slugToEntityId[slug];
+}
+
+/**
+ * Get the full slug→entityId mapping.
+ * Useful for building static params or reverse lookups.
+ */
+export function getKBSlugMap(): Record<string, string> {
+  const kb = getKB();
+  return kb?.slugToEntityId ?? {};
+}
+
+/** Lazy-initialized inverted index: entityId → slug. Built once on first call. */
+let entityIdToSlugIndex: Map<string, string> | undefined;
+
+/**
+ * Reverse lookup: find the YAML slug for a given entity ID.
+ * Uses a lazy-built inverted index for O(1) lookups.
+ */
+export function getKBEntitySlug(entityId: string): string | undefined {
+  if (!entityIdToSlugIndex) {
+    const map = getKBSlugMap();
+    entityIdToSlugIndex = new Map();
+    for (const [slug, id] of Object.entries(map)) {
+      entityIdToSlugIndex.set(id, slug);
+    }
+  }
+  return entityIdToSlugIndex.get(entityId);
+}
