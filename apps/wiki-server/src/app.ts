@@ -35,6 +35,9 @@ import { githubPullsRoute } from "./routes/github-pulls.js";
 import { kbVerificationsRoute } from "./routes/kb-verifications.js";
 import { personnelRoute } from "./routes/personnel.js";
 import { grantsRoute } from "./routes/grants.js";
+import { fundingRoundsRoute } from "./routes/funding-rounds.js";
+import { investmentsRoute } from "./routes/investments.js";
+import { equityPositionsRoute } from "./routes/equity-positions.js";
 
 let requestCounter = 0;
 
@@ -145,6 +148,9 @@ export function createApp() {
   app.route("/api/kb-verifications", kbVerificationsRoute);
   app.route("/api/personnel", personnelRoute);
   app.route("/api/grants", grantsRoute);
+  app.route("/api/funding-rounds", fundingRoundsRoute);
+  app.route("/api/investments", investmentsRoute);
+  app.route("/api/equity-positions", equityPositionsRoute);
 
   return app;
 }

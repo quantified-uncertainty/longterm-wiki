@@ -926,8 +926,9 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
 }
 
 /**
- * Fetch personnel and grants from the wiki-server PG tables and merge them
- * into the serialized KB records structure (same format as YAML-sourced records).
+ * Fetch personnel, grants, funding rounds, investments, and equity positions
+ * from the wiki-server PG tables and merge them into the serialized KB records
+ * structure (same format as YAML-sourced records).
  *
  * PG stores canonical entity IDs (10-char) in personId/organizationId fields,
  * which match the keys used in kb.records. No slug→entityId remapping needed.
@@ -939,22 +940,26 @@ async function mergePGRecordsIntoKB(kb) {
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
   if (!serverUrl) {
     console.log('  kb-pg: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return { personnel: 0, grants: 0 };
+    return { personnel: 0, grants: 0, fundingRounds: 0, investments: 0, equityPositions: 0 };
   }
 
-  const headers = { 'Content-Type': 'application/json' };
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+  const headers = buildHeaders();
 
   let personnelCount = 0;
   let grantsCount = 0;
+  let fundingRoundsCount = 0;
+  let investmentsCount = 0;
+  let equityPositionsCount = 0;
 
   if (!kb.records) kb.records = {};
 
   // Fetch all pages (paginate to avoid truncation at MAX_PAGE_SIZE)
   const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
 
-  async function fetchAllPages(endpoint) {
+  /**
+   * Generic paginated fetcher. `itemsKey` is the response field containing the array.
+   */
+  async function fetchAllPages(endpoint, itemsKey) {
     const pageSize = 200;
     let allItems = [];
     let offset = 0;
@@ -963,7 +968,7 @@ async function mergePGRecordsIntoKB(kb) {
       const resp = await fetch(url, fetchOpts);
       if (!resp.ok) return null;
       const data = await resp.json();
-      const items = data.personnel || data.grants || [];
+      const items = data[itemsKey] || [];
       allItems = allItems.concat(items);
       if (items.length < pageSize) break; // last page
       offset += pageSize;
@@ -971,84 +976,131 @@ async function mergePGRecordsIntoKB(kb) {
     return allItems;
   }
 
-  const [personnelResult, grantsResult] = await Promise.allSettled([
-    fetchAllPages('/api/personnel/all'),
-    fetchAllPages('/api/grants/all'),
+  const [
+    personnelResult,
+    grantsResult,
+    fundingRoundsResult,
+    investmentsResult,
+    equityPositionsResult,
+  ] = await Promise.allSettled([
+    fetchAllPages('/api/personnel/all', 'personnel'),
+    fetchAllPages('/api/grants/all', 'grants'),
+    fetchAllPages('/api/funding-rounds/all', 'fundingRounds'),
+    fetchAllPages('/api/investments/all', 'investments'),
+    fetchAllPages('/api/equity-positions/all', 'equityPositions'),
   ]);
 
-  // --- Process personnel ---
-  const personnelRows = personnelResult.status === 'fulfilled' ? personnelResult.value : null;
-  if (personnelRows) {
-    if (personnelRows.length > 0) {
-      // Clear YAML-sourced personnel collections — PG is the authority when available
-      for (const entityKey of Object.keys(kb.records)) {
-        for (const collection of ['key-persons', 'board-seats', 'career-history']) {
-          if (kb.records[entityKey]?.[collection]) {
-            delete kb.records[entityKey][collection];
-            if (Object.keys(kb.records[entityKey]).length === 0) {
-              delete kb.records[entityKey];
-            }
-          }
-        }
-      }
-
-      // Populate from PG — entity IDs are used directly as kb.records keys
-      for (const row of personnelRows) {
-        let entityKey, collectionName;
-        if (row.roleType === 'key-person') {
-          entityKey = row.organizationId;
-          collectionName = 'key-persons';
-        } else if (row.roleType === 'board') {
-          entityKey = row.organizationId;
-          collectionName = 'board-seats';
-        } else if (row.roleType === 'career') {
-          entityKey = row.personId;
-          collectionName = 'career-history';
-        } else {
-          continue;
-        }
-
-        if (!kb.records[entityKey]) kb.records[entityKey] = {};
-        if (!kb.records[entityKey][collectionName]) kb.records[entityKey][collectionName] = [];
-
-        kb.records[entityKey][collectionName].push(personnelRowToRecordEntry(row));
-        personnelCount++;
-      }
+  /**
+   * Helper: clear YAML collections, replace with PG rows.
+   * @param {string} label - for logging
+   * @param {object} result - Promise.allSettled result
+   * @param {string[]} yamlCollections - collections to clear from kb.records
+   * @param {function} getEntityKey - (row) => entity key
+   * @param {function} getCollectionName - (row) => collection name
+   * @param {function} rowToEntry - (row) => RecordEntry
+   * @returns {number} count of records merged
+   */
+  function mergeCollection(label, result, yamlCollections, getEntityKey, getCollectionName, rowToEntry) {
+    const rows = result.status === 'fulfilled' ? result.value : null;
+    if (!rows) {
+      const reason = result.status === 'rejected' ? result.reason?.message : 'no data';
+      console.log(`  kb-pg ${label}: skipped (${reason || 'server unavailable'})`);
+      return 0;
     }
-  } else {
-    const reason = personnelResult.status === 'rejected' ? personnelResult.reason?.message : 'no data';
-    console.log(`  kb-pg personnel: skipped (${reason || 'server unavailable'})`);
-  }
+    if (rows.length === 0) return 0;
 
-  // --- Process grants ---
-  const grantRows = grantsResult.status === 'fulfilled' ? grantsResult.value : null;
-  if (grantRows) {
-    if (grantRows.length > 0) {
-      // Clear existing YAML grant collections, replace with PG
-      for (const entityKey of Object.keys(kb.records)) {
-        if (kb.records[entityKey]?.grants) {
-          delete kb.records[entityKey].grants;
+    // Clear YAML-sourced collections — PG is the authority when available
+    for (const entityKey of Object.keys(kb.records)) {
+      for (const collection of yamlCollections) {
+        if (kb.records[entityKey]?.[collection]) {
+          delete kb.records[entityKey][collection];
           if (Object.keys(kb.records[entityKey]).length === 0) {
             delete kb.records[entityKey];
           }
         }
       }
-
-      for (const row of grantRows) {
-        const entityKey = row.organizationId;
-        if (!kb.records[entityKey]) kb.records[entityKey] = {};
-        if (!kb.records[entityKey].grants) kb.records[entityKey].grants = [];
-
-        kb.records[entityKey].grants.push(grantRowToRecordEntry(row));
-        grantsCount++;
-      }
     }
-  } else {
-    const reason = grantsResult.status === 'rejected' ? grantsResult.reason?.message : 'no data';
-    console.log(`  kb-pg grants: skipped (${reason || 'server unavailable'})`);
+
+    let count = 0;
+    for (const row of rows) {
+      const entityKey = getEntityKey(row);
+      const collectionName = getCollectionName(row);
+      if (!entityKey || !collectionName) continue;
+
+      if (!kb.records[entityKey]) kb.records[entityKey] = {};
+      if (!kb.records[entityKey][collectionName]) kb.records[entityKey][collectionName] = [];
+
+      kb.records[entityKey][collectionName].push(rowToEntry(row));
+      count++;
+    }
+    return count;
   }
 
-  return { personnel: personnelCount, grants: grantsCount };
+  // --- Process personnel ---
+  personnelCount = mergeCollection(
+    'personnel',
+    personnelResult,
+    ['key-persons', 'board-seats', 'career-history'],
+    (row) => {
+      if (row.roleType === 'career') return row.personId;
+      return row.organizationId;
+    },
+    (row) => {
+      if (row.roleType === 'key-person') return 'key-persons';
+      if (row.roleType === 'board') return 'board-seats';
+      if (row.roleType === 'career') return 'career-history';
+      return null;
+    },
+    personnelRowToRecordEntry,
+  );
+
+  // --- Process grants ---
+  grantsCount = mergeCollection(
+    'grants',
+    grantsResult,
+    ['grants'],
+    (row) => row.organizationId,
+    () => 'grants',
+    grantRowToRecordEntry,
+  );
+
+  // --- Process funding rounds ---
+  fundingRoundsCount = mergeCollection(
+    'funding-rounds',
+    fundingRoundsResult,
+    ['funding-rounds'],
+    (row) => row.companyId,
+    () => 'funding-rounds',
+    fundingRoundRowToRecordEntry,
+  );
+
+  // --- Process investments ---
+  investmentsCount = mergeCollection(
+    'investments',
+    investmentsResult,
+    ['investments'],
+    (row) => row.companyId,
+    () => 'investments',
+    investmentRowToRecordEntry,
+  );
+
+  // --- Process equity positions ---
+  equityPositionsCount = mergeCollection(
+    'equity-positions',
+    equityPositionsResult,
+    ['equity-positions'],
+    (row) => row.companyId,
+    () => 'equity-positions',
+    equityPositionRowToRecordEntry,
+  );
+
+  return {
+    personnel: personnelCount,
+    grants: grantsCount,
+    fundingRounds: fundingRoundsCount,
+    investments: investmentsCount,
+    equityPositions: equityPositionsCount,
+  };
 }
 
 /**
@@ -1116,6 +1168,100 @@ function grantRowToRecordEntry(row) {
     ownerEntityId: row.organizationId,
     fields,
   };
+}
+
+/**
+ * Convert a PG funding round row to the RecordEntry format used by frontend components.
+ */
+function fundingRoundRowToRecordEntry(row) {
+  const fields = {
+    name: row.name,
+  };
+  if (row.date) fields.date = row.date;
+  if (row.raised != null) fields.raised = row.raised;
+  if (row.valuation != null) fields.valuation = row.valuation;
+  if (row.instrument) fields.instrument = row.instrument;
+  if (row.leadInvestor) fields.lead_investor = row.leadInvestor;
+  if (row.source) fields.source = row.source;
+  if (row.notes) fields.notes = row.notes;
+
+  return {
+    key: row.id,
+    schema: 'funding-round',
+    ownerEntityId: row.companyId,
+    fields,
+  };
+}
+
+/**
+ * Convert a PG investment row to the RecordEntry format used by frontend components.
+ */
+function investmentRowToRecordEntry(row) {
+  const fields = {};
+  fields.investor = row.investorId;
+  if (row.roundName) fields.round_name = row.roundName;
+  if (row.date) fields.date = row.date;
+  if (row.amount != null) fields.amount = row.amount;
+  if (row.stakeAcquired != null) {
+    // Parse JSON array back to array if applicable, otherwise use as number
+    try {
+      const parsed = JSON.parse(row.stakeAcquired);
+      if (Array.isArray(parsed)) {
+        fields.stake_acquired = parsed;
+      } else {
+        fields.stake_acquired = typeof parsed === 'number' ? parsed : row.stakeAcquired;
+      }
+    } catch {
+      const n = Number(row.stakeAcquired);
+      fields.stake_acquired = isNaN(n) ? row.stakeAcquired : n;
+    }
+  }
+  if (row.instrument) fields.instrument = row.instrument;
+  if (row.role) fields.role = row.role;
+  if (row.conditions) fields.conditions = row.conditions;
+  if (row.source) fields.source = row.source;
+  if (row.notes) fields.notes = row.notes;
+
+  return {
+    key: row.id,
+    schema: 'investment',
+    ownerEntityId: row.companyId,
+    fields,
+  };
+}
+
+/**
+ * Convert a PG equity position row to the RecordEntry format used by frontend components.
+ */
+function equityPositionRowToRecordEntry(row) {
+  const fields = {};
+  fields.holder = row.holderId;
+  if (row.stake) {
+    // Parse JSON array back to array if applicable, otherwise use as number
+    try {
+      const parsed = JSON.parse(row.stake);
+      if (Array.isArray(parsed)) {
+        fields.stake = parsed;
+      } else {
+        fields.stake = typeof parsed === 'number' ? parsed : row.stake;
+      }
+    } catch {
+      const n = Number(row.stake);
+      fields.stake = isNaN(n) ? row.stake : n;
+    }
+  }
+  if (row.source) fields.source = row.source;
+  if (row.notes) fields.notes = row.notes;
+
+  const entry = {
+    key: row.id,
+    schema: 'equity-position',
+    ownerEntityId: row.companyId,
+    fields,
+  };
+  if (row.asOf) entry.asOf = row.asOf;
+  if (row.validEnd) entry.validEnd = row.validEnd;
+  return entry;
 }
 
 /**
@@ -1654,8 +1800,9 @@ async function main() {
   // Merge PG-backed personnel and grants into KB records (overrides YAML for these collections)
   if (database.kb && !CONTENT_ONLY) {
     const pgRecordCounts = await mergePGRecordsIntoKB(database.kb);
-    if (pgRecordCounts.personnel > 0 || pgRecordCounts.grants > 0) {
-      console.log(`  kb-pg: ${pgRecordCounts.personnel} personnel, ${pgRecordCounts.grants} grants merged from PG`);
+    const pgTotal = pgRecordCounts.personnel + pgRecordCounts.grants + pgRecordCounts.fundingRounds + pgRecordCounts.investments + pgRecordCounts.equityPositions;
+    if (pgTotal > 0) {
+      console.log(`  kb-pg: ${pgRecordCounts.personnel} personnel, ${pgRecordCounts.grants} grants, ${pgRecordCounts.fundingRounds} funding rounds, ${pgRecordCounts.investments} investments, ${pgRecordCounts.equityPositions} equity positions merged from PG`);
     }
   }
 

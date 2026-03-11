@@ -36,7 +36,7 @@ const DEFAULT_BATCH_SIZE = 100;
 
 // --- Types ---
 
-interface YamlResource {
+export interface YamlResource {
   id: string;
   url: string;
   title?: string;
