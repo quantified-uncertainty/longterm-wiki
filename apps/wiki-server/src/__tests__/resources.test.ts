@@ -92,6 +92,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       credibility_override: params[13],
       fetched_at: params[14],
       content_hash: params[15],
+      // COALESCE: preserve existing stable_id, only set if row didn't have one
+      stable_id: existing?.stable_id ?? params[16] ?? null,
       created_at: existing?.created_at ?? now,
       updated_at: now,
     };

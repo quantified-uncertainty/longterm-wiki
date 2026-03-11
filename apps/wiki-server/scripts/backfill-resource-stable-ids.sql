@@ -1,6 +1,6 @@
 -- Backfill stable_id for resources that don't have one yet.
 -- Generates 10-char alphanumeric IDs from random bytes.
--- Run after deploying migration 0071.
+-- Run after deploying migration 0072_add_stable_id_to_resources.
 --
 -- Usage: psql "$DATABASE_MIGRATION_URL" -f apps/wiki-server/scripts/backfill-resource-stable-ids.sql
 --
