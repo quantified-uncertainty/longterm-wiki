@@ -54,6 +54,10 @@ interface PGResourceRow {
   publishedDate: string | null;
   tags: string[] | null;
   stableId: string | null;
+  localFilename: string | null;
+  credibilityOverride: number | null;
+  fetchedAt: string | null;
+  contentHash: string | null;
 }
 
 interface PGResourcesResponse {
@@ -82,6 +86,10 @@ function pgRowToResource(row: PGResourceRow, citedBy?: string[]): Resource {
     tags: row.tags ?? undefined,
     cited_by: citedBy && citedBy.length > 0 ? citedBy : undefined,
     stable_id: row.stableId ?? undefined,
+    local_filename: row.localFilename ?? undefined,
+    credibility_override: row.credibilityOverride ?? undefined,
+    fetched_at: row.fetchedAt ?? undefined,
+    content_hash: row.contentHash ?? undefined,
   };
 }
 
