@@ -15,7 +15,7 @@ export default defineConfig({
   // Auto-start local server only when testing against localhost
   ...(!process.env.PLAYWRIGHT_BASE_URL && {
     webServer: {
-      command: `PORT=${devPort} pnpm start`,
+      command: `DEV_PORT=${devPort} pnpm start`,
       port: Number(devPort),
       timeout: 30_000,
       reuseExistingServer: true,

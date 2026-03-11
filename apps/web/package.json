@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "NODE_USE_ENV_PROXY=1 next dev --port 3001",
+    "dev": "NODE_USE_ENV_PROXY=1 next dev --port ${DEV_PORT:-3001}",
     "build": "NODE_USE_ENV_PROXY=1 next build",
-    "start": "NODE_USE_ENV_PROXY=1 next start --port 3001",
+    "start": "NODE_USE_ENV_PROXY=1 next start --port ${DEV_PORT:-3001}",
     "assign-ids": "node scripts/assign-ids.mjs",
     "sync:data": "node scripts/assign-ids.mjs && NODE_USE_ENV_PROXY=1 node --import tsx/esm scripts/build-data.mjs",
     "sync:data:content": "node scripts/assign-ids.mjs --skip && NODE_USE_ENV_PROXY=1 node --import tsx/esm scripts/build-data.mjs --scope=content",
