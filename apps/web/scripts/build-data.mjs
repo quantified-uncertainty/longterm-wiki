@@ -1204,7 +1204,7 @@ function investmentRowToRecordEntry(row) {
   if (row.roundName) fields.round_name = row.roundName;
   if (row.date) fields.date = row.date;
   if (row.amount != null) fields.amount = row.amount;
-  if (row.stakeAcquired) {
+  if (row.stakeAcquired != null) {
     // Parse JSON array back to array if applicable, otherwise use as number
     try {
       const parsed = JSON.parse(row.stakeAcquired);
