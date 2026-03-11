@@ -27,6 +27,7 @@ export interface Resource {
   cited_by?: string[];
   doi?: string;
   date?: string;
+  stable_id?: string;
   _sourceFile?: string;
 }
 

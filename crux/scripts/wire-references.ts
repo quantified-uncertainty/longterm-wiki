@@ -13,17 +13,17 @@
 
 import fs from 'fs';
 import path from 'path';
-import { parse as parseYaml } from 'yaml';
+
+import { loadResources } from '../resource-io.ts';
 
 const ROOT = path.resolve(import.meta.dirname, '../..');
 const CONTENT_DIR = path.join(ROOT, 'content/docs');
-const RESOURCES_DIR = path.join(ROOT, 'data/resources');
 
 const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
 const VERBOSE = args.includes('--verbose');
 
-// ─── Resource Loading ────────────────────────────────────────────────
+// ─── Resource Loading (uses centralized loader from resource-io) ─────
 
 interface ResourceEntry {
   id: string;
@@ -33,16 +33,7 @@ interface ResourceEntry {
 }
 
 function loadAllResources(): ResourceEntry[] {
-  const files = fs.readdirSync(RESOURCES_DIR).filter(f => f.endsWith('.yaml'));
-  const all: ResourceEntry[] = [];
-  for (const file of files) {
-    const raw = fs.readFileSync(path.join(RESOURCES_DIR, file), 'utf-8');
-    const parsed = parseYaml(raw);
-    if (Array.isArray(parsed)) {
-      all.push(...parsed);
-    }
-  }
-  return all;
+  return loadResources();
 }
 
 /** Build reverse index: pageId → Set<resourceId> from cited_by fields */

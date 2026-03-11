@@ -1,7 +1,8 @@
 /**
- * Resource Manager — YAML I/O
+ * Resource Manager — YAML I/O + PG-first loading
  *
  * Reading and writing resource YAML files, publication loading.
+ * `loadResourcesPGFirst()` tries the wiki-server API first, falling back to YAML.
  *
  * Note: Resources are NOT dual-written to the wiki-server here because the
  * server's upsert endpoint does a full column replacement. The in-memory
@@ -17,6 +18,7 @@ import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { loadPages as loadPagesJson, type PageEntry } from './lib/content-types.ts';
 import { RESOURCES_DIR, PUBLICATIONS_FILE, FORUM_PUBLICATION_IDS } from './resource-types.ts';
 import type { Resource, Publication } from './resource-types.ts';
+import { apiRequest } from './lib/wiki-server/client.ts';
 
 /**
  * Determine which file a new resource belongs to based on type/publication.
@@ -61,6 +63,120 @@ export function loadResources(): Resource[] {
     resources.push(...data);
   }
   return resources;
+}
+
+// ---------------------------------------------------------------------------
+// PG-first resource loading
+// ---------------------------------------------------------------------------
+
+interface PGResourceRow {
+  id: string;
+  url: string;
+  title: string | null;
+  type: string | null;
+  summary: string | null;
+  review: string | null;
+  abstract: string | null;
+  keyPoints: string[] | null;
+  publicationId: string | null;
+  authors: string[] | null;
+  publishedDate: string | null;
+  tags: string[] | null;
+  stableId: string | null;
+}
+
+interface PGResourcesResponse {
+  resources: PGResourceRow[];
+  total: number;
+}
+
+interface PGCitationsResponse {
+  citations: Record<string, string[]>;
+  count: number;
+}
+
+function pgRowToResource(row: PGResourceRow, citedBy?: string[]): Resource {
+  return {
+    id: row.id,
+    url: row.url,
+    title: row.title ?? '',
+    type: row.type ?? '',
+    authors: row.authors ?? undefined,
+    published_date: row.publishedDate ?? undefined,
+    abstract: row.abstract ?? undefined,
+    summary: row.summary ?? undefined,
+    review: row.review ?? undefined,
+    key_points: row.keyPoints ?? undefined,
+    publication_id: row.publicationId ?? undefined,
+    tags: row.tags ?? undefined,
+    cited_by: citedBy && citedBy.length > 0 ? citedBy : undefined,
+    stable_id: row.stableId ?? undefined,
+  };
+}
+
+/**
+ * Fetch all resources from the wiki-server API (paginated).
+ * Returns null if the server is unavailable.
+ */
+async function fetchResourcesFromPG(): Promise<Resource[] | null> {
+  const allResources: PGResourceRow[] = [];
+  let offset = 0;
+  const limit = 200;
+
+  while (true) {
+    const result = await apiRequest<PGResourcesResponse>(
+      'GET',
+      `/api/resources/all?limit=${limit}&offset=${offset}`,
+    );
+    if (!result.ok) return null;
+
+    const rows = result.data.resources;
+    if (rows.length === 0) break;
+
+    allResources.push(...rows);
+    offset += rows.length;
+    if (rows.length < limit) break;
+  }
+
+  // Fetch bulk citations
+  let citationsIndex: Record<string, string[]> = {};
+  const citResult = await apiRequest<PGCitationsResponse>(
+    'GET',
+    '/api/resources/citations/all',
+  );
+  if (citResult.ok) {
+    citationsIndex = citResult.data.citations;
+  } else {
+    console.warn(`  resources: failed to fetch citations (${citResult.message})`);
+  }
+
+  return allResources.map(row =>
+    pgRowToResource(row, citationsIndex[row.id])
+  );
+}
+
+/**
+ * Load resources preferring PG, falling back to YAML.
+ *
+ * PG resources include stableId and are always fresher than YAML.
+ * Falls back silently to YAML when the wiki-server is unavailable
+ * (no env vars, server down, timeout).
+ */
+export async function loadResourcesPGFirst(): Promise<Resource[]> {
+  const pgResources = await fetchResourcesFromPG();
+  if (pgResources && pgResources.length > 0) {
+    return pgResources;
+  }
+  return loadResources();
+}
+
+/**
+ * Load just the set of valid resource IDs, preferring PG.
+ * Optimized for validation rules that only need to check ID existence.
+ */
+export async function loadResourceIdsPGFirst(): Promise<Set<string>> {
+  const resources = await loadResourcesPGFirst();
+  return new Set(resources.map(r => r.id));
 }
 
 /**
