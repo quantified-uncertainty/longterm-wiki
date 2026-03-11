@@ -954,93 +954,86 @@ async function mergePGRecordsIntoKB(kb) {
     return slugToEntityId[slug] || slug;
   }
 
-  // --- Fetch personnel ---
-  try {
-    const res = await fetch(`${serverUrl}/api/personnel/all?limit=200`, {
-      headers,
-      signal: AbortSignal.timeout(10_000),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const rows = data.personnel || [];
-      if (rows.length > 0) {
-        // Clear YAML-sourced personnel collections — PG is the authority when available
-        for (const entityKey of Object.keys(kb.records)) {
-          for (const collection of ['key-persons', 'board-seats', 'career-history']) {
-            if (kb.records[entityKey]?.[collection]) {
-              delete kb.records[entityKey][collection];
-              if (Object.keys(kb.records[entityKey]).length === 0) {
-                delete kb.records[entityKey];
-              }
-            }
-          }
-        }
+  // Fetch personnel and grants in parallel
+  const fetchOpts = { headers, signal: AbortSignal.timeout(10_000) };
+  const [personnelResult, grantsResult] = await Promise.allSettled([
+    fetch(`${serverUrl}/api/personnel/all?limit=200`, fetchOpts).then(r => r.ok ? r.json() : null),
+    fetch(`${serverUrl}/api/grants/all?limit=200`, fetchOpts).then(r => r.ok ? r.json() : null),
+  ]);
 
-        // Populate from PG (PG stores slugs; records are keyed by entity ID)
-        for (const row of rows) {
-          let ownerSlug, collectionName;
-          if (row.roleType === 'key-person') {
-            ownerSlug = row.organizationId;
-            collectionName = 'key-persons';
-          } else if (row.roleType === 'board') {
-            ownerSlug = row.organizationId;
-            collectionName = 'board-seats';
-          } else if (row.roleType === 'career') {
-            ownerSlug = row.personId;
-            collectionName = 'career-history';
-          } else {
-            continue;
-          }
-
-          const entityKey = resolveKey(ownerSlug);
-          if (!kb.records[entityKey]) kb.records[entityKey] = {};
-          if (!kb.records[entityKey][collectionName]) kb.records[entityKey][collectionName] = [];
-
-          kb.records[entityKey][collectionName].push(personnelRowToRecordEntry(row));
-          personnelCount++;
-        }
-      }
-    } else {
-      console.log(`  kb-pg personnel: skipped (server returned ${res.status})`);
-    }
-  } catch (err) {
-    console.log(`  kb-pg personnel: skipped (${err.message || 'server unavailable'})`);
-  }
-
-  // --- Fetch grants ---
-  try {
-    const res = await fetch(`${serverUrl}/api/grants/all?limit=200`, {
-      headers,
-      signal: AbortSignal.timeout(10_000),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const rows = data.grants || [];
-      if (rows.length > 0) {
-        // Clear existing YAML grant collections, replace with PG
-        for (const entityKey of Object.keys(kb.records)) {
-          if (kb.records[entityKey]?.grants) {
-            delete kb.records[entityKey].grants;
+  // --- Process personnel ---
+  const personnelData = personnelResult.status === 'fulfilled' ? personnelResult.value : null;
+  if (personnelData) {
+    const rows = personnelData.personnel || [];
+    if (rows.length > 0) {
+      // Clear YAML-sourced personnel collections — PG is the authority when available
+      for (const entityKey of Object.keys(kb.records)) {
+        for (const collection of ['key-persons', 'board-seats', 'career-history']) {
+          if (kb.records[entityKey]?.[collection]) {
+            delete kb.records[entityKey][collection];
             if (Object.keys(kb.records[entityKey]).length === 0) {
               delete kb.records[entityKey];
             }
           }
         }
+      }
 
-        for (const row of rows) {
-          const entityKey = resolveKey(row.organizationId);
-          if (!kb.records[entityKey]) kb.records[entityKey] = {};
-          if (!kb.records[entityKey].grants) kb.records[entityKey].grants = [];
+      // Populate from PG (PG stores slugs; records are keyed by entity ID)
+      for (const row of rows) {
+        let ownerSlug, collectionName;
+        if (row.roleType === 'key-person') {
+          ownerSlug = row.organizationId;
+          collectionName = 'key-persons';
+        } else if (row.roleType === 'board') {
+          ownerSlug = row.organizationId;
+          collectionName = 'board-seats';
+        } else if (row.roleType === 'career') {
+          ownerSlug = row.personId;
+          collectionName = 'career-history';
+        } else {
+          continue;
+        }
 
-          kb.records[entityKey].grants.push(grantRowToRecordEntry(row));
-          grantsCount++;
+        const entityKey = resolveKey(ownerSlug);
+        if (!kb.records[entityKey]) kb.records[entityKey] = {};
+        if (!kb.records[entityKey][collectionName]) kb.records[entityKey][collectionName] = [];
+
+        kb.records[entityKey][collectionName].push(personnelRowToRecordEntry(row));
+        personnelCount++;
+      }
+    }
+  } else {
+    const reason = personnelResult.status === 'rejected' ? personnelResult.reason?.message : 'no data';
+    console.log(`  kb-pg personnel: skipped (${reason || 'server unavailable'})`);
+  }
+
+  // --- Process grants ---
+  const grantsData = grantsResult.status === 'fulfilled' ? grantsResult.value : null;
+  if (grantsData) {
+    const rows = grantsData.grants || [];
+    if (rows.length > 0) {
+      // Clear existing YAML grant collections, replace with PG
+      for (const entityKey of Object.keys(kb.records)) {
+        if (kb.records[entityKey]?.grants) {
+          delete kb.records[entityKey].grants;
+          if (Object.keys(kb.records[entityKey]).length === 0) {
+            delete kb.records[entityKey];
+          }
         }
       }
-    } else {
-      console.log(`  kb-pg grants: skipped (server returned ${res.status})`);
+
+      for (const row of rows) {
+        const entityKey = resolveKey(row.organizationId);
+        if (!kb.records[entityKey]) kb.records[entityKey] = {};
+        if (!kb.records[entityKey].grants) kb.records[entityKey].grants = [];
+
+        kb.records[entityKey].grants.push(grantRowToRecordEntry(row));
+        grantsCount++;
+      }
     }
-  } catch (err) {
-    console.log(`  kb-pg grants: skipped (${err.message || 'server unavailable'})`);
+  } else {
+    const reason = grantsResult.status === 'rejected' ? grantsResult.reason?.message : 'no data';
+    console.log(`  kb-pg grants: skipped (${reason || 'server unavailable'})`);
   }
 
   return { personnel: personnelCount, grants: grantsCount };
