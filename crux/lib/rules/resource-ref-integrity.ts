@@ -11,9 +11,15 @@ import { loadResourceIdsPGFirst } from '../../resource-io.ts';
 // Cache to avoid re-fetching on every file check
 let resourceIdCache: Set<string> | null = null;
 
-async function getResourceIds(): Promise<Set<string>> {
+async function getResourceIds(): Promise<Set<string> | null> {
   if (resourceIdCache) return resourceIdCache;
-  resourceIdCache = await loadResourceIdsPGFirst();
+  try {
+    resourceIdCache = await loadResourceIdsPGFirst();
+  } catch {
+    // Neither PG nor snapshot available (e.g. CI without wiki-server).
+    // Return null so the rule can skip gracefully.
+    return null;
+  }
   return resourceIdCache;
 }
 
@@ -37,6 +43,7 @@ export const resourceRefIntegrityRule = createRule({
     }
 
     const resourceIds = await getResourceIds();
+    if (!resourceIds) return issues; // No resource data available — skip check
     const lines = content.body.split('\n');
     let inFencedBlock = false;
 
