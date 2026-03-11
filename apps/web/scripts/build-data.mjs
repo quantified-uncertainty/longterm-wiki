@@ -1128,7 +1128,6 @@ async function fetchResourcesFromPG() {
   if (!serverUrl) return null;
 
   const headers = buildHeaders();
-  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
   const allResources = [];
   let offset = 0;
   const limit = 200;
@@ -1138,7 +1137,7 @@ async function fetchResourcesFromPG() {
     while (true) {
       const resp = await fetch(
         `${serverUrl}/api/resources/all?limit=${limit}&offset=${offset}`,
-        fetchOpts
+        { headers, signal: AbortSignal.timeout(30_000) }
       );
       if (!resp.ok) return null;
       const data = await resp.json();
@@ -1188,8 +1187,9 @@ async function fetchResourcesFromPG() {
           }
         }
       }
-    } catch {
+    } catch (citErr) {
       // Non-fatal — cited_by from YAML will be used for pageResources
+      console.log(`  resources-pg: citation fetch failed (${citErr instanceof Error ? citErr.message : String(citErr)})`);
     }
 
     return allResources;

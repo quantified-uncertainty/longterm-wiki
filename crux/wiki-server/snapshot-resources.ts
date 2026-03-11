@@ -133,7 +133,7 @@ async function main() {
     if (r.credibilityOverride != null) entry.credibility_override = r.credibilityOverride;
     if (r.fetchedAt) entry.fetched_at = r.fetchedAt;
     if (r.contentHash) entry.content_hash = r.contentHash;
-    if (r.stableId) entry.stable_id = r.stableId;
+    if (r.stableId != null) entry.stable_id = r.stableId;
     const citedBy = citationsIndex[r.id];
     if (citedBy && citedBy.length > 0) entry.cited_by = citedBy;
     return entry;
