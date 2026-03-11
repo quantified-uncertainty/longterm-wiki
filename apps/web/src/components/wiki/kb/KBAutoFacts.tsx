@@ -17,7 +17,7 @@ import {
   getKBRecordSchema,
   isFactExpired,
 } from "@data/kb";
-import type { Fact, Property, RecordEntry, FieldDef } from "@longterm-wiki/kb";
+import type { Fact, Property, RecordEntry, RecordSchema, FieldDef } from "@longterm-wiki/kb";
 import { formatKBDate, isUrl, shortDomain, sortKBRecords, titleCase } from "@components/wiki/kb/format";
 import { KBFactValueDisplay } from "@components/wiki/kb/KBFactValueDisplay";
 import { KBCellValue } from "@components/wiki/kb/KBCellValue";
@@ -172,25 +172,38 @@ function formatAmount(value: unknown): string | null {
   return `$${num.toLocaleString()}`;
 }
 
-/** Resolve which columns to show for a collection. */
+/** Resolve which columns to show for a collection, including explicit endpoints. */
 function resolveRecordColumns(
   collectionName: string,
   items: RecordEntry[],
-  fieldDefs?: Record<string, FieldDef>,
+  schema?: RecordSchema,
 ): string[] {
   const defaults = DEFAULT_RECORD_COLUMNS[collectionName];
+  const fieldDefs = schema?.fields;
+
+  // Collect explicit endpoint names (e.g. "holder", "pledger", "investor")
+  // These are entity-ref columns stored in item.fields but not in schema.fields
+  const explicitEndpoints: string[] = [];
+  if (schema?.endpoints) {
+    for (const [name, ep] of Object.entries(schema.endpoints)) {
+      if (!ep.implicit) explicitEndpoints.push(name);
+    }
+  }
 
   if (fieldDefs) {
     const schemaFields = Object.keys(fieldDefs).filter(
       (f) => !EXCLUDED_RECORD_FIELDS.has(f),
     );
-    if (!defaults) return schemaFields;
-    // Prefer defaults order, but only for columns actually in the schema
-    const filtered = defaults.filter((f) => fieldDefs[f]);
-    return filtered.length > 0 ? filtered : schemaFields;
+    // Put explicit endpoints first, then schema fields
+    const allCols = [...explicitEndpoints, ...schemaFields];
+    if (!defaults) return allCols;
+    // Prefer defaults order, but only for columns actually available
+    const available = new Set(allCols);
+    const filtered = defaults.filter((f) => available.has(f));
+    return filtered.length > 0 ? filtered : allCols;
   }
 
-  if (defaults) return defaults;
+  if (defaults) return [...explicitEndpoints, ...defaults.filter((d) => !explicitEndpoints.includes(d))];
 
   // Derive from actual data, excluding metadata
   const seen = new Set<string>();
@@ -201,7 +214,7 @@ function resolveRecordColumns(
       }
     }
   }
-  return Array.from(seen).slice(0, 5); // Cap at 5 columns
+  return Array.from(seen).slice(0, 6); // Cap at 6 columns
 }
 
 // ── Sub-components ───────────────────────────────────────────────────
@@ -242,7 +255,7 @@ function SourceCell({ source }: { source: string | undefined }) {
 /** Section divider with title and optional count badge. */
 function SectionDivider({ title, count }: { title: string; count?: number }) {
   return (
-    <div className="flex items-center gap-3 mb-3 mt-6 first:mt-0">
+    <div className="flex items-center gap-2 mb-2 mt-5 first:mt-0">
       <h3 className="text-sm font-bold tracking-tight text-foreground">{title}</h3>
       {count != null && (
         <span className="text-[10px] font-medium tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
@@ -302,30 +315,32 @@ function PersonCard({ item }: { item: RecordEntry }) {
     .toUpperCase();
 
   return (
-    <div className="group relative rounded-xl border border-border/60 bg-card p-3.5 transition-all hover:shadow-md hover:border-border">
-      <div className="flex items-start gap-2.5">
-        <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-[10px] font-semibold text-primary/70">
+    <div className="group relative rounded-lg border border-border/50 bg-card px-2.5 py-2 transition-all hover:shadow-sm hover:border-border">
+      <div className="flex items-center gap-2">
+        <div className="shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center text-[10px] font-semibold text-primary/60">
           {initials}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 flex-wrap">
             {personId ? (
-              <KBRefLink id={personId} className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors" />
+              <KBRefLink id={personId} className="font-semibold text-sm leading-tight text-foreground group-hover:text-primary transition-colors" />
             ) : (
-              <span className="font-semibold text-sm">{name}</span>
+              <span className="font-semibold text-sm leading-tight">{name}</span>
             )}
             {isFounder && (
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+              <span className="inline-flex items-center px-1.5 py-px rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
                 Founder
               </span>
             )}
           </div>
-          {title && (
-            <div className="text-xs text-muted-foreground mt-0.5">{title}</div>
-          )}
-          <div className="text-[10px] text-muted-foreground/50 mt-0.5">
-            {start && formatKBDate(start)}
-            {end ? ` \u2013 ${formatKBDate(end)}` : start ? " \u2013 present" : ""}
+          <div className="text-xs text-muted-foreground leading-tight">
+            {title}{title && start ? " · " : ""}
+            {start && (
+              <span className="text-muted-foreground/50">
+                {formatKBDate(start)}
+                {end ? `\u2013${formatKBDate(end)}` : "\u2013present"}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -344,29 +359,27 @@ function FundingRoundRow({ item }: { item: RecordEntry }) {
   const source = field(item, "source");
 
   return (
-    <div className="flex gap-3 py-3 border-b border-border/40 last:border-b-0 group/row hover:bg-muted/20 -mx-4 px-4 transition-colors">
+    <div className="flex gap-2.5 py-2 border-b border-border/30 last:border-b-0 group/row hover:bg-muted/20 -mx-4 px-4 transition-colors">
       {/* Timeline dot */}
-      <div className="flex flex-col items-center pt-1">
-        <div className="w-2.5 h-2.5 rounded-full border-2 border-primary/50 bg-card shrink-0 group-hover/row:border-primary transition-colors" />
-        <div className="w-px flex-1 bg-gradient-to-b from-border/50 to-transparent mt-1" />
+      <div className="flex flex-col items-center pt-1.5">
+        <div className="w-2 h-2 rounded-full border-[1.5px] border-primary/40 bg-card shrink-0 group-hover/row:border-primary transition-colors" />
+        <div className="w-px flex-1 bg-border/30 mt-0.5" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
           <span className="font-semibold text-sm">{name}</span>
           {instrument && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+            <span className="text-[10px] px-1.5 py-px rounded-full bg-muted text-muted-foreground font-medium">
               {instrument}
             </span>
           )}
           {date && (
-            <span className="text-xs text-muted-foreground/70">
+            <span className="text-xs text-muted-foreground/60">
               {formatKBDate(date)}
             </span>
           )}
-        </div>
-        <div className="flex items-baseline gap-3 mt-1 flex-wrap">
           {raised != null && (
-            <span className="text-sm font-bold tabular-nums tracking-tight text-foreground">
+            <span className="text-sm font-bold tabular-nums tracking-tight">
               {formatAmount(raised)}
             </span>
           )}
@@ -380,17 +393,17 @@ function FundingRoundRow({ item }: { item: RecordEntry }) {
               Led by <KBRefLink id={leadInvestor} />
             </span>
           )}
+          {source && isUrl(source) && (
+            <a
+              href={source}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-primary/40 hover:text-primary hover:underline transition-colors"
+            >
+              {shortDomain(source)}
+            </a>
+          )}
         </div>
-        {source && isUrl(source) && (
-          <a
-            href={source}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] text-primary/50 hover:text-primary hover:underline mt-1 inline-block transition-colors"
-          >
-            {shortDomain(source)}
-          </a>
-        )}
       </div>
     </div>
   );
@@ -574,7 +587,7 @@ function SingleFactRow({
   );
 }
 
-/** Render a collapsible record collection (generic fallback). */
+/** Render a record collection as a table (generic fallback). */
 function RecordCollectionSection({
   collectionName,
   items,
@@ -584,7 +597,15 @@ function RecordCollectionSection({
 }) {
   const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
   const fieldDefs = recordSchema?.fields;
-  const cols = resolveRecordColumns(collectionName, items, fieldDefs);
+  const cols = resolveRecordColumns(collectionName, items, recordSchema);
+
+  // Build set of endpoint column names for entity-ref rendering
+  const endpointCols = new Set<string>();
+  if (recordSchema?.endpoints) {
+    for (const [name, ep] of Object.entries(recordSchema.endpoints)) {
+      if (!ep.implicit) endpointCols.add(name);
+    }
+  }
 
   return (
     <div className="mt-4">
@@ -615,11 +636,15 @@ function RecordCollectionSection({
                     key={col}
                     className="py-1.5 px-3 text-sm align-baseline whitespace-normal"
                   >
-                    <KBCellValue
-                      value={item.fields[col]}
-                      fieldName={col}
-                      fieldDef={fieldDefs?.[col]}
-                    />
+                    {endpointCols.has(col) && typeof item.fields[col] === "string" ? (
+                      <KBRefLink id={item.fields[col] as string} />
+                    ) : (
+                      <KBCellValue
+                        value={item.fields[col]}
+                        fieldName={col}
+                        fieldDef={fieldDefs?.[col]}
+                      />
+                    )}
                   </td>
                 ))}
               </tr>
@@ -697,9 +722,9 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
 
   return (
     <section className="not-prose mt-8 mb-6" aria-labelledby="kb-auto-facts-heading">
-      <div className="border border-border/60 rounded-xl bg-card shadow-sm overflow-hidden">
+      <div>
         {/* Header bar */}
-        <div className="px-5 py-3 border-b border-border/40 flex items-center gap-2.5">
+        <div className="py-2 border-b border-border/60 flex items-center gap-2">
           <Database size={14} className="text-muted-foreground/60" />
           <h2 id="kb-auto-facts-heading" className="text-sm font-bold tracking-tight">
             Structured Data
@@ -728,7 +753,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
           </Link>
         </div>
 
-        <div className="px-5 py-4">
+        <div className="pt-3">
           {/* 1. Hero stat cards */}
           {heroCards.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-4">
@@ -742,7 +767,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
           {keyPersons && keyPersons.length > 0 && (
             <>
               <SectionDivider title="Key People" count={keyPersons.length} />
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {keyPersons.map((item) => (
                   <PersonCard key={item.key} item={item} />
                 ))}
