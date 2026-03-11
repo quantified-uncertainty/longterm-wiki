@@ -222,30 +222,20 @@ const app = new Hono()
     // Group by pageId (skip rows with no recoverable slug)
     const byPage: Record<
       string,
-      {
-        claimReferences: Array<{
-          claimId: number;
-          claimText: string;
-          verdict: string | null;
-          referenceId: string | null;
-        }>;
-        citations: Array<{
-          referenceId: string;
-          title: string | null;
-          url: string | null;
-          note: string | null;
-          resourceId: string | null;
-        }>;
-      }
+      Array<{
+        referenceId: string;
+        title: string | null;
+        url: string | null;
+        note: string | null;
+        resourceId: string | null;
+      }>
     > = {};
 
     for (const row of citationRows) {
       const pageId = row.pageSlug;
-      if (!pageId) continue; // skip rows with no recoverable page slug
-      if (!byPage[pageId]) {
-        byPage[pageId] = { claimReferences: [], citations: [] };
-      }
-      byPage[pageId].citations.push({
+      if (!pageId) continue;
+      if (!byPage[pageId]) byPage[pageId] = [];
+      byPage[pageId].push({
         referenceId: row.referenceId,
         title: row.title,
         url: row.url,
@@ -254,10 +244,15 @@ const app = new Hono()
       });
     }
 
-    const totalCitations = Object.values(byPage).reduce((n, p) => n + p.citations.length, 0);
+    const totalCitations = Object.values(byPage).reduce((n, p) => n + p.length, 0);
 
     return c.json({
-      pages: byPage,
+      pages: Object.fromEntries(
+        Object.entries(byPage).map(([id, citations]) => [
+          id,
+          { claimReferences: [], citations },
+        ])
+      ),
       totalPages: Object.keys(byPage).length,
       totalClaimRefs: 0,
       totalCitations,
