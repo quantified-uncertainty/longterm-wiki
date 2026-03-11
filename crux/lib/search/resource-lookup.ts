@@ -35,6 +35,7 @@ export interface ResourceFetchStatus {
 
 let cachedResources: Resource[] | null = null;
 let cachedById: Map<string, Resource> | null = null;
+let cachedByStableId: Map<string, Resource> | null = null;
 let cachedByUrl: Map<string, Resource> | null = null;
 
 function normalizeUrlKey(url: string): string {
@@ -71,10 +72,15 @@ function ensureLoaded(): void {
 
   cachedResources = loadResources();
   cachedById = new Map();
+  cachedByStableId = new Map();
   cachedByUrl = new Map();
 
   for (const resource of cachedResources) {
     cachedById.set(resource.id, resource);
+
+    if (resource.stable_id) {
+      cachedByStableId.set(resource.stable_id, resource);
+    }
 
     // Index by normalized URL (with and without trailing slash, www variants)
     if (resource.url) {
@@ -89,6 +95,7 @@ function ensureLoaded(): void {
 export function clearResourceCache(): void {
   cachedResources = null;
   cachedById = null;
+  cachedByStableId = null;
   cachedByUrl = null;
 }
 
@@ -107,6 +114,15 @@ export function getResourceByUrl(url: string): Resource | null {
   ensureLoaded();
   const norm = normalizeUrlKey(url);
   return cachedByUrl!.get(norm) ?? cachedByUrl!.get(norm + '/') ?? null;
+}
+
+/**
+ * Resolve a resource by hash ID or stable_id.
+ * Tries hash ID first (16-char hex), then stable_id (10-char alphanumeric).
+ */
+export function resolveResource(id: string): Resource | null {
+  ensureLoaded();
+  return cachedById!.get(id) ?? cachedByStableId!.get(id) ?? null;
 }
 
 /**

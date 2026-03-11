@@ -30,6 +30,9 @@ function loadResourceIds(): Set<string> {
             if (entry && typeof entry.id === 'string' && entry.id) {
               resourceIdCache.add(entry.id);
             }
+            if (entry && typeof entry.stable_id === 'string' && entry.stable_id) {
+              resourceIdCache.add(entry.stable_id);
+            }
           }
         }
       } catch {

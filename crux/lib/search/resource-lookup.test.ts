@@ -19,6 +19,7 @@ vi.mock('../../resource-io.ts', () => ({
       authors: ['Jane Smith'],
       summary: 'A paper about AI safety',
       tags: ['safety', 'alignment'],
+      stable_id: 'aBcDeFgHiJ',
       _sourceFile: 'test-resources',
     },
     {
@@ -59,6 +60,7 @@ vi.mock('fs', async () => {
 import {
   getResourceById,
   getResourceByUrl,
+  resolveResource,
   clearResourceCache,
   updateResourceFetchStatus,
 } from './resource-lookup.ts';
@@ -105,6 +107,34 @@ describe('resource-lookup', () => {
 
     it('returns null for an unknown URL', () => {
       expect(getResourceByUrl('https://unknown.com/page')).toBeNull();
+    });
+  });
+
+  describe('resolveResource', () => {
+    it('resolves by hash ID', () => {
+      const r = resolveResource('abc123def456');
+      expect(r).not.toBeNull();
+      expect(r!.title).toBe('AI Safety Paper One');
+    });
+
+    it('resolves by stable_id', () => {
+      const r = resolveResource('aBcDeFgHiJ');
+      expect(r).not.toBeNull();
+      expect(r!.id).toBe('abc123def456');
+      expect(r!.title).toBe('AI Safety Paper One');
+    });
+
+    it('prefers hash ID over stable_id', () => {
+      const r = resolveResource('abc123def456');
+      expect(r!.id).toBe('abc123def456');
+    });
+
+    it('returns null for unknown ID', () => {
+      expect(resolveResource('nonexistent')).toBeNull();
+    });
+
+    it('returns null when looking up nonexistent stable_id', () => {
+      expect(resolveResource('someStableId')).toBeNull();
     });
   });
 

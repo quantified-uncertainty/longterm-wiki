@@ -13,7 +13,7 @@ vi.mock('fs', () => ({
   readdirSync: vi.fn(() => ['test-resources.yaml']),
   readFileSync: vi.fn(
     () =>
-      '- id: aabbccdd11223344\n  title: Valid Resource A\n- id: ccdd1122aabb5566\n  title: Valid Resource B\n',
+      '- id: aabbccdd11223344\n  title: Valid Resource A\n  stable_id: aB1cD2eF3g\n- id: ccdd1122aabb5566\n  title: Valid Resource B\n',
   ),
 }));
 
@@ -117,6 +117,12 @@ describe('resource-ref-integrity rule', () => {
       '<R id="ccdd1122aabb5566">Resource B</R>',
     ].join('\n');
     const content = mockContent(body);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('accepts a stable_id in <R> tag', async () => {
+    const content = mockContent('<R id="aB1cD2eF3g">Resource via stable_id</R>');
     const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(0);
   });

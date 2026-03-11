@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  getResourceById,
+  resolveResource,
   getResourceCredibility,
   getResourcePublication,
   getPageCitationHealth,
@@ -56,7 +56,7 @@ function resolveRefs(ids: string[]): {
     if (seen.has(id)) continue;
     seen.add(id);
 
-    const resource = getResourceById(id);
+    const resource = resolveResource(id);
     if (!resource) {
       missing.push(id);
       continue;

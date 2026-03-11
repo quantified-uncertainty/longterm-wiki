@@ -1,5 +1,5 @@
 import React from "react";
-import { getResourceById, getResourceCredibility, getResourcePublication } from "@data";
+import { resolveResource, getResourceCredibility, getResourcePublication } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
 import { ResourceTags } from "./ResourceTags";
 import { getResourceTypeIcon, isSafeUrl } from "./resource-utils";
@@ -30,7 +30,7 @@ export function ResourceLink({
   showCredibility?: boolean;
   className?: string;
 }) {
-  const resource = getResourceById(id);
+  const resource = resolveResource(id);
 
   if (!resource) {
     return (
