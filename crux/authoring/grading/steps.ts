@@ -10,6 +10,7 @@
 
 import { callLlm } from '../../lib/llm.ts';
 import { parseJsonResponse } from '../../lib/anthropic.ts';
+import { parseJsonFromLlm } from '../../lib/json-parsing.ts';
 import { readFileSync } from 'fs';
 import { stripFrontmatter } from '../../lib/patterns.ts';
 import { ValidationEngine, ContentFile } from '../../lib/validation/validation-engine.ts';
@@ -144,7 +145,14 @@ export async function runChecklistReview(client: Anthropic, page: PageInfo): Pro
       maxTokens: 1500,
     });
 
-    const parsed = parseJsonResponse(result.text) as { warnings?: ChecklistWarning[] };
+    // Use parseJsonFromLlm for resilient handling of truncated LLM output.
+    // The raw JSON.parse was failing with "Unterminated string in JSON" when
+    // responses hit the maxTokens limit, producing noisy error logs in CI.
+    const parsed = parseJsonFromLlm<{ warnings?: ChecklistWarning[] }>(
+      result.text,
+      `checklist-review:${page.id}`,
+      () => ({ warnings: [] }),
+    );
     return parsed.warnings || [];
   } catch (err: unknown) {
     const error = err instanceof Error ? err : new Error(String(err));

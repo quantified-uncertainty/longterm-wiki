@@ -28,6 +28,11 @@ export interface Resource {
   doi?: string;
   date?: string;
   stable_id?: string;
+  // YAML-only fields (not rendered in UI, used for sync/fetching)
+  local_filename?: string;
+  credibility_override?: number;
+  fetched_at?: string;
+  content_hash?: string;
   _sourceFile?: string;
 }
 

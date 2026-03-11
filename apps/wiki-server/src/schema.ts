@@ -1473,3 +1473,111 @@ export const grants = pgTable(
     index("idx_grants_status").on(table.status),
   ]
 );
+
+/**
+ * Funding rounds — equity and strategic investment rounds for companies.
+ *
+ * Stores amounts as NUMERIC for precision. `lead_investor` may be an entity ID
+ * or display name (same convention as personnel: entity IDs when known).
+ * `stake_acquired` and `stake` in investments/equity are stored as TEXT because
+ * they can be single values or ranges like "[0.07, 0.15]".
+ */
+export const fundingRounds = pgTable(
+  "funding_rounds",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    companyId: text("company_id").notNull(), // entity ID of the company
+    name: text("name").notNull(), // round name (e.g., "Series A", "Founding")
+    date: text("date"), // YYYY or YYYY-MM
+    raised: numeric("raised"), // capital raised (USD)
+    valuation: numeric("valuation"), // post-money valuation (USD)
+    instrument: text("instrument"), // equity, convertible-note, strategic-partnership, founding
+    leadInvestor: text("lead_investor"), // entity ID or display name
+    source: text("source"), // URL to announcement
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_fr_company").on(table.companyId),
+    index("idx_fr_date").on(table.date),
+  ]
+);
+
+/**
+ * Investments — investor participation in funding rounds.
+ *
+ * Links an investor to a company (and optionally a funding round by name).
+ * `stake_acquired` is TEXT to support ranges like "[0.07, 0.15]".
+ */
+export const investments = pgTable(
+  "investments",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    companyId: text("company_id").notNull(), // entity ID of the company
+    investorId: text("investor_id").notNull(), // entity ID or display name
+    roundName: text("round_name"), // name of the funding round
+    date: text("date"), // YYYY or YYYY-MM
+    amount: numeric("amount"), // capital contributed (USD)
+    stakeAcquired: text("stake_acquired"), // pre-dilution stake (single or range as JSON string)
+    instrument: text("instrument"), // equity, convertible-note, etc.
+    role: text("role"), // lead | participant | founder
+    conditions: text("conditions"), // investment conditions
+    source: text("source"), // URL to source
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_inv_company").on(table.companyId),
+    index("idx_inv_investor").on(table.investorId),
+    index("idx_inv_date").on(table.date),
+  ]
+);
+
+/**
+ * Equity positions — current/historical equity ownership stakes.
+ *
+ * Temporal: `as_of` marks when the position was valid from, `valid_end` when it expired.
+ * `stake` is TEXT to support ranges like "[0.015, 0.025]".
+ */
+export const equityPositions = pgTable(
+  "equity_positions",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    companyId: text("company_id").notNull(), // entity ID of the company
+    holderId: text("holder_id").notNull(), // entity ID or display name
+    stake: text("stake"), // current post-dilution equity stake (single or range as JSON string)
+    source: text("source"), // URL to source
+    notes: text("notes"),
+    asOf: text("as_of"), // when this position was valid from (YYYY or YYYY-MM)
+    validEnd: text("valid_end"), // when this position expired
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_ep_company").on(table.companyId),
+    index("idx_ep_holder").on(table.holderId),
+  ]
+);
