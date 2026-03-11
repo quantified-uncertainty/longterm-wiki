@@ -175,7 +175,12 @@ export async function loadResourcesPGFirst(): Promise<Resource[]> {
  */
 export async function loadResourceIdsPGFirst(): Promise<Set<string>> {
   const resources = await loadResourcesPGFirst();
-  return new Set(resources.map(r => r.id));
+  const ids = new Set(resources.map(r => r.id));
+  // Also include stable_ids so <R id="stableId"> lookups resolve
+  for (const r of resources) {
+    if (r.stable_id) ids.add(r.stable_id);
+  }
+  return ids;
 }
 
 /**
