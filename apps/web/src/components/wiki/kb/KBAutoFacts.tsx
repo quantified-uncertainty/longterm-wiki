@@ -679,7 +679,7 @@ function RecordCollectionSection({
 
   // Sort by date descending if a date column exists
   const dateCol = cols.find((c) => c === "date" || c === "appointed" || c === "started" || c === "launched");
-  const sortedItems = dateCol ? sortKBRecords(nonEmptyItems, dateCol, false) : nonEmptyItems;
+  const sortedItems = dateCol ? sortKBRecords(nonEmptyItems, dateCol, true) : nonEmptyItems;
 
   // Cap at MAX_GENERIC_ROWS for server-rendered view
   const isTruncated = sortedItems.length > MAX_GENERIC_ROWS;
@@ -811,8 +811,8 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
   const modelReleases = allCollections["model-releases"];
   const products = allCollections["products"];
 
-  const sortedFundingRounds = fundingRounds ? sortKBRecords(fundingRounds, "date", false) : [];
-  const sortedModelReleases = modelReleases ? sortKBRecords(modelReleases, "released", false) : [];
+  const sortedFundingRounds = fundingRounds ? sortKBRecords(fundingRounds, "date", true) : [];
+  const sortedModelReleases = modelReleases ? sortKBRecords(modelReleases, "released", true) : [];
 
   // Generic collections = everything not in SPECIAL_COLLECTIONS
   const genericCollections = Object.entries(allCollections)
