@@ -74,7 +74,7 @@ facts:
 `,
     );
 
-    graph = await loadKB(tmpDir);
+    ({ graph } = await loadKB(tmpDir));
   });
 
   afterAll(async () => {
@@ -82,7 +82,7 @@ facts:
   });
 
   it("parses [lo, hi] array as range value", () => {
-    const facts = graph.getFacts("test-org", { property: "revenue" });
+    const facts = graph.getFacts("aB3cD4eF5g", { property: "revenue" });
     const rangeFact = facts.find((f) => f.id === "f_range_rev");
     expect(rangeFact).toBeDefined();
     expect(rangeFact!.value).toEqual({
@@ -93,7 +93,7 @@ facts:
   });
 
   it("parses { min: N } object as min value", () => {
-    const facts = graph.getFacts("test-org", { property: "revenue" });
+    const facts = graph.getFacts("aB3cD4eF5g", { property: "revenue" });
     const minFact = facts.find((f) => f.id === "f_min_rev");
     expect(minFact).toBeDefined();
     expect(minFact!.value).toEqual({
@@ -103,7 +103,7 @@ facts:
   });
 
   it("still parses plain numbers normally", () => {
-    const facts = graph.getFacts("test-org", { property: "revenue" });
+    const facts = graph.getFacts("aB3cD4eF5g", { property: "revenue" });
     const normalFact = facts.find((f) => f.id === "f_normal_rev");
     expect(normalFact).toBeDefined();
     expect(normalFact!.value).toEqual({
@@ -113,7 +113,7 @@ facts:
   });
 
   it("parses range value for non-USD property", () => {
-    const facts = graph.getFacts("test-org", { property: "headcount" });
+    const facts = graph.getFacts("aB3cD4eF5g", { property: "headcount" });
     const rangeFact = facts.find((f) => f.id === "f_headcount");
     expect(rangeFact).toBeDefined();
     expect(rangeFact!.value).toEqual({

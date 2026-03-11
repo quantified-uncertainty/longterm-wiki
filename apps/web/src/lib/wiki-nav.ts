@@ -370,14 +370,14 @@ export function getKBDataNav(): NavSection[] {
         { label: "Facts Explorer", href: "/wiki/E1020" },
         { label: "Properties", href: "/wiki/E1021" },
         { label: "Entity Coverage", href: "/wiki/E1022" },
-        { label: "Items Explorer", href: "/wiki/E1026" },
+        { label: "Records Explorer", href: "/wiki/E1026" },
         { label: "Resources", href: "/wiki/E1043" },
         { label: "Publications", href: "/wiki/E1044" },
       ],
     },
     {
       title: "Top Entities",
-      items: entityItems.slice(0, 15).map(({ label, href }) => ({
+      items: entityItems.slice(0, 30).map(({ label, href }) => ({
         label,
         href,
       })),

@@ -15,7 +15,6 @@ describe('crux kb list', () => {
   it('lists all entities in table format', async () => {
     const result = await commands.list([], {});
     expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('anthropic');
     expect(result.output).toContain('Anthropic');
     expect(result.output).toContain('organization');
     expect(result.output).toContain('mK9pX3rQ7n');
@@ -25,8 +24,8 @@ describe('crux kb list', () => {
   it('filters by type', async () => {
     const result = await commands.list([], { type: 'person' });
     expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('dario-amodei');
-    expect(result.output).not.toContain('anthropic '); // slug 'anthropic' not in person list
+    expect(result.output).toContain('Dario Amodei');
+    expect(result.output).not.toContain('Anthropic'); // org not in person list
   });
 
   it('returns JSON in ci mode', async () => {
@@ -65,7 +64,9 @@ describe('crux kb show', () => {
   it('resolves refs to names in facts', async () => {
     const result = await commands.show(['dario-amodei'], {});
     expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('Anthropic (anthropic)');
+    // Ref values show as "Name (entityId)"
+    expect(result.output).toContain('Anthropic');
+    expect(result.output).toContain('mK9pX3rQ7n');
   });
 
   it('shows birth year without comma separator', async () => {
@@ -100,7 +101,6 @@ describe('crux kb lookup', () => {
     const result = await commands.lookup(['mK9pX3rQ7n'], {});
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('Anthropic');
-    expect(result.output).toContain('anthropic');
   });
 
   it('returns error for unknown stableId', async () => {
@@ -113,8 +113,8 @@ describe('crux kb lookup', () => {
     const result = await commands.lookup(['zR4nW8xB2f'], { ci: true });
     expect(result.exitCode).toBe(0);
     const data = JSON.parse(result.output);
-    expect(data.slug).toBe('dario-amodei');
     expect(data.name).toBe('Dario Amodei');
+    expect(data.type).toBe('person');
   });
 
   it('shows usage when no stableId specified', async () => {

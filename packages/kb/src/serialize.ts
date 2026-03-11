@@ -12,15 +12,23 @@ export interface SerializedKB {
   schemas: ReturnType<Graph["getAllSchemas"]>;
   /** Record schemas (id → schema) */
   recordSchemas: RecordSchema[];
-  /** Records indexed by ownerEntityId → collectionName → entries */
+  /** Records indexed by entityId → collectionName → entries */
   records: Record<string, Record<string, RecordEntry[]>>;
+  /** Maps YAML filename/slug → entity ID, for resolving slug-based lookups */
+  slugToEntityId?: Record<string, string>;
 }
 
 /**
  * Serialize a Graph to a plain JSON-friendly object.
  * Useful for writing to database.json or sending over the wire.
+ *
+ * @param filenameMap Maps entity ID → YAML filename stem (e.g., "mK9pX3rQ7n" → "anthropic").
+ *                    Used to key facts/records by filename for frontend backward compat.
  */
-export function serialize(graph: Graph): SerializedKB {
+export function serialize(
+  graph: Graph,
+  filenameMap: Map<string, string>,
+): SerializedKB {
   const entities = graph.getAllEntities();
   const properties = graph.getAllProperties();
   const schemas = graph.getAllSchemas();
@@ -31,6 +39,7 @@ export function serialize(graph: Graph): SerializedKB {
 
   for (const entity of entities) {
     const entityFacts = graph.getFacts(entity.id);
+    // Key by entity ID (the stable 10-char alphanumeric ID)
     if (entityFacts.length > 0) {
       facts[entity.id] = entityFacts;
     }
@@ -50,5 +59,11 @@ export function serialize(graph: Graph): SerializedKB {
     }
   }
 
-  return { entities, facts, properties, schemas, recordSchemas, records };
+  // Build slug → entity ID map for resolving slug-based lookups from MDX components
+  const slugToEntityId: Record<string, string> = {};
+  for (const [entityId, filename] of filenameMap) {
+    slugToEntityId[filename] = entityId;
+  }
+
+  return { entities, facts, properties, schemas, recordSchemas, records, slugToEntityId };
 }

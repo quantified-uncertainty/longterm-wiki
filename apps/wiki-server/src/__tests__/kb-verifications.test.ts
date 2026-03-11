@@ -19,7 +19,7 @@ interface VerdictRecord {
 interface VerificationRecord {
   id: number;
   fact_id: string;
-  resource_id: string;
+  resource_id: string | null;
   verdict: string;
   confidence: number | null;
   extracted_value: string | null;
@@ -27,6 +27,7 @@ interface VerificationRecord {
   is_primary_source: boolean;
   checked_at: string;
   notes: string | null;
+  source_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -34,6 +35,7 @@ interface VerificationRecord {
 interface FactRecord {
   fact_id: string;
   entity_id: string;
+  label: string | null;
 }
 
 let verdicts: VerdictRecord[];
@@ -89,15 +91,38 @@ function resetStores() {
       is_primary_source: true,
       checked_at: now,
       notes: "Direct match",
+      source_url: "https://example.com/funding",
       created_at: now,
       updated_at: now,
     },
   ];
   factsStore = [
-    { fact_id: "f_abc123", entity_id: "anthropic" },
-    { fact_id: "f_def456", entity_id: "anthropic" },
-    { fact_id: "f_ghi789", entity_id: "openai" },
+    { fact_id: "f_abc123", entity_id: "anthropic", label: "Funding total" },
+    { fact_id: "f_def456", entity_id: "anthropic", label: "Founded year" },
+    { fact_id: "f_ghi789", entity_id: "openai", label: null },
   ];
+}
+
+/** Apply verdict and entity_id filters to the verdicts store */
+function applyVerdictFilters(params: unknown[]): VerdictRecord[] {
+  let filtered = verdicts;
+  const verdictParam = params.find(
+    (p) => typeof p === "string" && verdicts.some((v) => v.verdict === p)
+  );
+  const entityParam = params.find(
+    (p) => typeof p === "string" && factsStore.some((f) => f.entity_id === p)
+  );
+
+  if (verdictParam) {
+    filtered = filtered.filter((v) => v.verdict === verdictParam);
+  }
+  if (entityParam) {
+    filtered = filtered.filter((v) => {
+      const fact = factsStore.find((f) => f.fact_id === v.fact_id);
+      return fact?.entity_id === entityParam;
+    });
+  }
+  return filtered;
 }
 
 function dispatch(query: string, params: unknown[]): unknown[] {
@@ -124,38 +149,79 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       return [...groups.entries()].map(([verdict, count]) => ({ verdict, count }));
     }
 
-    // Simple count for verdict list pagination
-    let filtered = verdicts;
-    if (q.includes("where")) {
-      if (params.some((p) => typeof p === "string" && verdicts.some((v) => v.verdict === p))) {
-        const verdictFilter = params.find(
-          (p) => typeof p === "string" && verdicts.some((v) => v.verdict === p)
-        ) as string;
-        filtered = filtered.filter((v) => v.verdict === verdictFilter);
-      }
-    }
+    // Simple count for verdict list pagination (may include LEFT JOIN for entity_id filter)
+    const filtered = q.includes("where") ? applyVerdictFilters(params) : verdicts;
     return [{ count: filtered.length }];
+  }
+
+  // SELECT from kb_fact_verdicts with LEFT JOIN facts (verdicts list)
+  if (q.includes("kb_fact_verdicts") && q.includes("left join") && q.includes("limit")) {
+    const filtered = applyVerdictFilters(params);
+    // Enrich with entity_id and label from factsStore
+    return filtered.map((v) => {
+      const fact = factsStore.find((f) => f.fact_id === v.fact_id);
+      return {
+        ...v,
+        entity_id: fact?.entity_id ?? null,
+        label: fact?.label ?? null,
+      };
+    });
   }
 
   // SELECT from kb_fact_verdicts with WHERE fact_id = ? (single verdict lookup)
   if (q.includes("kb_fact_verdicts") && q.includes("limit")) {
     if (params.length > 0) {
-      // Check for verdict filter or fact_id filter
       const factIdParam = params.find(
         (p) => typeof p === "string" && (p as string).startsWith("f_")
       );
-      const verdictParam = params.find(
-        (p) => typeof p === "string" && verdicts.some((v) => v.verdict === p)
-      );
-
       if (factIdParam) {
         return verdicts.filter((v) => v.fact_id === factIdParam);
       }
-      if (verdictParam) {
-        return verdicts.filter((v) => v.verdict === verdictParam);
-      }
     }
     return verdicts;
+  }
+
+  // INSERT into kb_fact_resource_verifications (POST /verifications)
+  if (q.includes("insert") && q.includes("kb_fact_resource_verifications")) {
+    const nextId = verifications.length > 0 ? Math.max(...verifications.map((v) => v.id)) + 1 : 1;
+    const now = new Date().toISOString();
+    // Extract fact_id from params (first string starting with f_)
+    const factId = params.find(
+      (p) => typeof p === "string" && (p as string).startsWith("f_")
+    ) as string ?? "unknown";
+    const record: VerificationRecord = {
+      id: nextId,
+      fact_id: factId,
+      resource_id: null,
+      verdict: "confirmed",
+      confidence: null,
+      extracted_value: null,
+      checker_model: null,
+      is_primary_source: false,
+      checked_at: now,
+      notes: null,
+      source_url: null,
+      created_at: now,
+      updated_at: now,
+    };
+    verifications.push(record);
+    return [{ id: nextId }];
+  }
+
+  // UPDATE kb_fact_verdicts SET needs_recheck (auto-flag on new verification)
+  if (q.includes("update") && q.includes("kb_fact_verdicts")) {
+    const factId = params.find(
+      (p) => typeof p === "string" && (p as string).startsWith("f_")
+    ) as string | undefined;
+    if (factId) {
+      const verdict = verdicts.find((v) => v.fact_id === factId);
+      if (verdict) {
+        verdict.needs_recheck = true;
+        verdict.updated_at = new Date().toISOString();
+        return [{ fact_id: verdict.fact_id }];
+      }
+    }
+    return [];
   }
 
   // SELECT from kb_fact_resource_verifications
@@ -167,14 +233,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       return verifications.filter((v) => v.fact_id === factId);
     }
     return verifications;
-  }
-
-  // SELECT from facts (entity_id filtering)
-  if (q.includes('"facts"') && q.includes("entity_id")) {
-    const entityId = params[0] as string;
-    return factsStore
-      .filter((f) => f.entity_id === entityId)
-      .map((f) => ({ fact_id: f.fact_id }));
   }
 
   return [];
@@ -226,6 +284,32 @@ describe("GET /api/kb-verifications/verdicts", () => {
     const res = await app.request("/api/kb-verifications/verdicts?offset=-1");
     expect(res.status).toBe(400);
   });
+
+  it("includes entityId and factLabel in verdict rows", async () => {
+    const res = await app.request("/api/kb-verifications/verdicts?limit=10");
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.verdicts.length).toBe(3);
+    // Verify entity enrichment from LEFT JOIN with facts table
+    const first = body.verdicts[0];
+    expect(first.entityId).toBe("anthropic");
+    expect(first.factLabel).toBe("Funding total");
+    // Verify a verdict with null label
+    const third = body.verdicts[2];
+    expect(third.entityId).toBe("openai");
+    expect(third.factLabel).toBeNull();
+  });
+
+  it("filters by entity_id", async () => {
+    const res = await app.request(
+      "/api/kb-verifications/verdicts?entity_id=openai&limit=10"
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.verdicts.length).toBe(1);
+    expect(body.verdicts[0].entityId).toBe("openai");
+    expect(body.total).toBe(1);
+  });
 });
 
 describe("GET /api/kb-verifications/verdicts/:factId", () => {
@@ -253,5 +337,85 @@ describe("GET /api/kb-verifications/verdicts/:factId", () => {
       `/api/kb-verifications/verdicts/${longId}`
     );
     expect(res.status).toBe(404);
+  });
+});
+
+describe("POST /api/kb-verifications/verifications", () => {
+  it("inserts a resource verification and returns 201", async () => {
+    const res = await app.request("/api/kb-verifications/verifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        factId: "f_abc123",
+        verdict: "confirmed",
+        confidence: 0.9,
+        extractedValue: "14 billion",
+        checkerModel: "claude-3-haiku",
+        isPrimarySource: true,
+        notes: "Direct match from source",
+        sourceUrl: "https://example.com/funding-report",
+      }),
+    });
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.id).toBeGreaterThan(0);
+    expect(body.verdictFlagged).toBe(true);
+  });
+
+  it("sets needs_recheck on existing verdict when new verification is inserted", async () => {
+    // f_abc123 starts with needs_recheck: false
+    const preVerdict = verdicts.find((v) => v.fact_id === "f_abc123");
+    expect(preVerdict?.needs_recheck).toBe(false);
+
+    await app.request("/api/kb-verifications/verifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        factId: "f_abc123",
+        verdict: "contradicted",
+        confidence: 0.8,
+      }),
+    });
+
+    // After insertion, the verdict should be flagged for recheck
+    const postVerdict = verdicts.find((v) => v.fact_id === "f_abc123");
+    expect(postVerdict?.needs_recheck).toBe(true);
+  });
+
+  it("returns verdictFlagged: false when no existing verdict exists", async () => {
+    const res = await app.request("/api/kb-verifications/verifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        factId: "f_newFact999",
+        verdict: "confirmed",
+      }),
+    });
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.verdictFlagged).toBe(false);
+  });
+
+  it("rejects invalid verdict values", async () => {
+    const res = await app.request("/api/kb-verifications/verifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        factId: "f_abc123",
+        verdict: "invalid_verdict",
+      }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects missing factId", async () => {
+    const res = await app.request("/api/kb-verifications/verifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        verdict: "confirmed",
+      }),
+    });
+    expect(res.status).toBe(400);
   });
 });

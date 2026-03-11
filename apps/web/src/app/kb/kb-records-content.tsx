@@ -1,9 +1,9 @@
 import { getAllKBRecords, getKBEntity } from "@/data/kb";
 import { titleCase } from "@/components/wiki/kb/format";
-import { KBItemsTable } from "./kb-items-table";
+import { KBRecordsTable } from "./kb-records-table";
 
-export interface ItemRow {
-  itemKey: string;
+export interface RecordRow {
+  recordKey: string;
   entityId: string;
   entityName: string;
   collection: string;
@@ -12,14 +12,14 @@ export interface ItemRow {
   previewFields: string[];
 }
 
-export function KBItemsExplorerContent() {
-  const allItems = getAllKBRecords();
+export function KBRecordsExplorerContent() {
+  const allRecords = getAllKBRecords();
 
-  const rows: ItemRow[] = allItems.map(({ entityId, collection, entry }) => {
+  const rows: RecordRow[] = allRecords.map(({ entityId, collection, entry }) => {
     const entity = getKBEntity(entityId);
     const fieldNames = Object.keys(entry.fields);
     return {
-      itemKey: entry.key,
+      recordKey: entry.key,
       entityId,
       entityName: entity?.name ?? entityId,
       collection: titleCase(collection),
@@ -41,10 +41,10 @@ export function KBItemsExplorerContent() {
   return (
     <>
       <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-        {rows.length} items across {collectionCount} collections from{" "}
+        {rows.length} records across {collectionCount} collections from{" "}
         {entityCount} entities.
       </p>
-      <KBItemsTable data={rows} />
+      <KBRecordsTable data={rows} />
     </>
   );
 }

@@ -43,6 +43,18 @@ import { computePageRankings, computeRecommendedScores, buildUpdateSchedule } fr
 import { computeAllHallucinationRisks, syncRiskSnapshots } from './lib/hallucination-risk-build.mjs';
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Build headers for wiki-server API requests, including auth if configured. */
+function buildHeaders() {
+  const headers = { 'Content-Type': 'application/json' };
+  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+  return headers;
+}
+
+// ---------------------------------------------------------------------------
 // Scope flag — `--scope=content` or `--quick` skips expensive non-content steps
 // ---------------------------------------------------------------------------
 const hasQuickFlag = process.argv.includes('--quick');
@@ -640,9 +652,7 @@ async function buildEditLogDateMap() {
   }
 
   try {
-    const headers = { 'Content-Type': 'application/json' };
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+    const headers = buildHeaders();
 
     const res = await fetch(`${serverUrl}/api/edit-logs/latest-dates`, {
       headers,
@@ -681,9 +691,7 @@ async function buildEarliestEditLogDateMap() {
   }
 
   try {
-    const headers = { 'Content-Type': 'application/json' };
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+    const headers = buildHeaders();
 
     const res = await fetch(`${serverUrl}/api/edit-logs/earliest-dates`, {
       headers,
@@ -721,9 +729,7 @@ async function buildCitationStatsMap() {
   }
 
   try {
-    const headers = { 'Content-Type': 'application/json' };
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+    const headers = buildHeaders();
 
     const res = await fetch(`${serverUrl}/api/citations/page-stats`, {
       headers,
@@ -770,9 +776,7 @@ async function buildCitationQuotesBundle() {
   }
 
   try {
-    const headers = { 'Content-Type': 'application/json' };
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+    const headers = buildHeaders();
 
     // Paginate through all quotes (max 5000 per page)
     const allQuotes = [];
@@ -933,9 +937,7 @@ async function buildPageReferenceIndex() {
     return {};
   }
 
-  const headers = { 'Content-Type': 'application/json' };
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+  const headers = buildHeaders();
 
   // Retry with increasing timeouts — this endpoint can be slow on large datasets
   const retryTimeouts = [30_000, 60_000];
@@ -1313,8 +1315,8 @@ async function main() {
   const kbDataDir = join(REPO_ROOT, 'packages', 'kb', 'data');
   if (existsSync(kbDataDir)) {
     const { loadKB, serialize } = await import('../../../packages/kb/src/index.ts');
-    const graph = await loadKB(kbDataDir);
-    const serializedKB = serialize(graph);
+    const { graph, filenameMap } = await loadKB(kbDataDir);
+    const serializedKB = serialize(graph, filenameMap);
     database.kb = serializedKB;
     const entityCount = serializedKB.entities?.length ?? 0;
     const factCount = Object.keys(serializedKB.facts ?? {}).length;
@@ -1622,9 +1624,7 @@ async function main() {
     const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
     if (serverUrl) {
       try {
-        const headers = { 'Content-Type': 'application/json' };
-        const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-        if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+        const headers = buildHeaders();
 
         const res = await fetch(`${serverUrl}/api/sessions/page-changes`, {
           headers,

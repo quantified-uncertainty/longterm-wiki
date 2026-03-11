@@ -7,7 +7,19 @@ import { KBPublicationsTable } from "./kb-publications-table";
 import type { PublicationDataRow } from "./kb-publications-table";
 
 export function KBPublicationsContent() {
-  const publications = getAllPublications();
+  let publications;
+  try {
+    publications = getAllPublications();
+  } catch (error) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-destructive font-medium">Failed to load publications data</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          {error instanceof Error ? error.message : "Unknown error"}
+        </p>
+      </div>
+    );
+  }
 
   const rows: PublicationDataRow[] = publications.map((pub) => {
     const resources = getResourcesForPublication(pub.id);
@@ -22,7 +34,7 @@ export function KBPublicationsContent() {
       id: pub.id,
       name: pub.name,
       type: pub.type,
-      credibility: pub.credibility,
+      credibility: pub.credibility ?? null,
       peerReviewed: pub.peer_reviewed ?? false,
       resourceCount: resources.length,
       pageCount: pageSet.size,
@@ -31,10 +43,11 @@ export function KBPublicationsContent() {
 
   const totalResources = rows.reduce((s, r) => s + r.resourceCount, 0);
   const peerReviewedCount = rows.filter((r) => r.peerReviewed).length;
+  const withCredibility = rows.filter((r) => r.credibility != null);
   const avgCredibility =
-    rows.length > 0
-      ? (rows.reduce((s, r) => s + r.credibility, 0) / rows.length).toFixed(1)
-      : "0";
+    withCredibility.length > 0
+      ? (withCredibility.reduce((s, r) => s + r.credibility!, 0) / withCredibility.length).toFixed(1)
+      : "-";
 
   return (
     <>

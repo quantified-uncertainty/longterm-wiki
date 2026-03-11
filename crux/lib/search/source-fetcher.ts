@@ -43,6 +43,10 @@ import {
   type ResourceEntry,
 } from './resource-lookup.ts';
 import { isYoutubeUrl } from '../../resource-utils.ts';
+import {
+  detectPaywall,
+  isUnverifiableDomain,
+} from './paywall-detection.ts';
 
 // ---------------------------------------------------------------------------
 // Public interfaces (spec from issue #633)
@@ -96,20 +100,6 @@ export interface FetchedSource {
 // ---------------------------------------------------------------------------
 // Internal types
 // ---------------------------------------------------------------------------
-
-/** Domains that block all automated access — skip fetch */
-const UNVERIFIABLE_DOMAINS = [
-  'twitter.com', 'x.com', 'linkedin.com', 'facebook.com', 't.co',
-  'instagram.com', 'tiktok.com',
-];
-
-/** Keywords indicating a paywall or login wall */
-const PAYWALL_SIGNALS = [
-  'subscribe to read', 'sign in to read', 'create a free account',
-  'this content is for subscribers', 'subscriber-only', 'paywall',
-  'to continue reading', 'unlimited access', 'login required',
-  'please sign in', 'register to read',
-];
 
 const FETCH_TIMEOUT_MS = 15_000;
 const FETCH_USER_AGENT = 'Mozilla/5.0 (compatible; LongtermWikiSourceFetcher/1.0)';
@@ -179,23 +169,6 @@ function sessionCacheSet(url: string, value: FetchedSource): void {
 }
 
 // ---------------------------------------------------------------------------
-// Domain helpers
-// ---------------------------------------------------------------------------
-
-function getDomain(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return '';
-  }
-}
-
-function isUnverifiable(url: string): boolean {
-  const domain = getDomain(url);
-  return UNVERIFIABLE_DOMAINS.some(d => domain === d || domain.endsWith('.' + d));
-}
-
-// ---------------------------------------------------------------------------
 // HTML-to-text conversion (fallback when Firecrawl unavailable)
 // ---------------------------------------------------------------------------
 
@@ -226,23 +199,6 @@ function htmlToText(html: string): string {
     .replace(/[ \t]+/g, ' ')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
-}
-
-// ---------------------------------------------------------------------------
-// Paywall detection
-// ---------------------------------------------------------------------------
-
-function detectPaywall(content: string): boolean {
-  if (!content) return false;
-  const lower = content.toLowerCase();
-  // Short content (< 500 chars) plus at least one paywall signal
-  if (content.length < 500) {
-    return PAYWALL_SIGNALS.some(s => lower.includes(s));
-  }
-  // Longer content: paywall signal must appear early (first 2000 chars)
-  const early = lower.slice(0, 2000);
-  const signalCount = PAYWALL_SIGNALS.filter(s => early.includes(s)).length;
-  return signalCount >= 2;
 }
 
 // ---------------------------------------------------------------------------
@@ -625,7 +581,7 @@ async function _fetchSourceCore(
   const now = new Date().toISOString();
 
   // ---- 1. Unverifiable domains ----
-  if (isUnverifiable(url)) {
+  if (isUnverifiableDomain(url)) {
     const result: FetchedSource = {
       url, title: resource?.title ?? '', fetchedAt: now, content: '',
       relevantExcerpts: [], status: 'error', resource: resourceMeta,

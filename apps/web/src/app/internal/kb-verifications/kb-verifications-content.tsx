@@ -4,12 +4,14 @@ import {
   type RpcKbStatsResult,
   type RpcKbVerdictsResult,
   type RpcKbVerdictRow,
+  type RpcKbVerdictDetailResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { KbVerificationsTable } from "./kb-verifications-table";
 
-// Re-export the RPC-inferred type for the table component
+// Re-export the RPC-inferred types for the table component
 export type VerdictRow = RpcKbVerdictRow;
+export type VerdictDetailResult = RpcKbVerdictDetailResult;
 
 // ── Data loading ──────────────────────────────────────────────────────────────
 

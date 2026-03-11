@@ -15,13 +15,13 @@ import type {
 } from "./types";
 
 export class Graph {
-  private entities: Map<string, Entity> = new Map();
-  private facts: Map<string, Fact[]> = new Map(); // keyed by subjectId
+  private entities: Map<string, Entity> = new Map(); // keyed by entity.id (stableId)
+  /** Tracks duplicate entity IDs detected during loading */
+  private _duplicateIds: Array<{ id: string; name: string; existingName: string }> = [];
+  private facts: Map<string, Fact[]> = new Map(); // keyed by entity.id (subjectId)
   private factIds: Set<string> = new Set(); // dedup guard
   private properties: Map<string, Property> = new Map();
   private schemas: Map<string, TypeSchema> = new Map();
-  // stableId → slug reverse index
-  private stableIdIndex: Map<string, string> = new Map();
   // Record schemas (id → schema)
   private recordSchemas: Map<string, RecordSchema> = new Map();
   // Primary index: ownerEntityId → collectionName → RecordEntry[]
@@ -32,8 +32,20 @@ export class Graph {
   // ── Mutation (used by loader and inverse computation) ──────────────
 
   addEntity(entity: Entity): void {
+    const existing = this.entities.get(entity.id);
+    if (existing && existing.name !== entity.name) {
+      this._duplicateIds.push({
+        id: entity.id,
+        name: entity.name,
+        existingName: existing.name,
+      });
+    }
     this.entities.set(entity.id, entity);
-    this.stableIdIndex.set(entity.stableId, entity.id);
+  }
+
+  /** Returns duplicate entity IDs detected during loading. */
+  getDuplicateIds(): Array<{ id: string; name: string; existingName: string }> {
+    return this._duplicateIds;
   }
 
   /**
@@ -110,19 +122,18 @@ export class Graph {
 
   // ── Entity queries ─────────────────────────────────────────────────
 
+  /**
+   * Look up an entity by its ID (stable 10-char).
+   */
   getEntity(id: string): Entity | undefined {
     return this.entities.get(id);
   }
 
-  /** Resolve a stableId to its Entity. */
+  /**
+   * @deprecated Use `getEntity()` instead.
+   */
   getEntityByStableId(stableId: string): Entity | undefined {
-    const slug = this.stableIdIndex.get(stableId);
-    return slug ? this.entities.get(slug) : undefined;
-  }
-
-  /** Resolve a stableId to a slug. Returns undefined if not found. */
-  resolveStableId(stableId: string): string | undefined {
-    return this.stableIdIndex.get(stableId);
+    return this.getEntity(stableId);
   }
 
   getAllEntities(): Entity[] {
@@ -251,7 +262,6 @@ export class Graph {
 
   /**
    * Get record entries for a collection owned by an entity.
-   * This is the primary index query (analogous to getItems).
    */
   getRecords(entityId: string, collectionName: string): RecordEntry[] {
     return this.records.get(entityId)?.get(collectionName) ?? [];

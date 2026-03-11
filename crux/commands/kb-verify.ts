@@ -13,19 +13,22 @@
  *   crux kb verify --limit=10                  Check at most 10 facts
  */
 
-import { join } from 'path';
-import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { loadKB } from '../../packages/kb/src/loader.ts';
-import { computeInverses } from '../../packages/kb/src/inverse.ts';
 import { formatFactValue } from '../../packages/kb/src/format.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
 import type { Entity, Fact, Property } from '../../packages/kb/src/types.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
-
-const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
+import { apiRequest } from '../lib/wiki-server/client.ts';
+import {
+  detectPaywall,
+  isUnverifiableDomain,
+  classifyFetchError,
+  type SourceFetchErrorType,
+} from '../lib/search/paywall-detection.ts';
+import { loadGraphFull, resolveEntity } from '../lib/kb-loader.ts';
+import type { LoadedKB } from '../lib/kb-loader.ts';
 
 // ── Constants ─────────────────────────────────────────────────────────
 
@@ -60,6 +63,8 @@ interface VerificationResult {
   confidence: number;
   extractedValue: string;
   reasoning: string;
+  /** Structured error type when source had issues (e.g., paywall) but content was still usable */
+  errorType?: SourceFetchErrorType;
 }
 
 interface VerificationError {
@@ -68,6 +73,8 @@ interface VerificationError {
   propertyId: string;
   sourceUrl: string;
   error: string;
+  /** Structured error type for machine-readable classification */
+  errorType?: SourceFetchErrorType;
 }
 
 interface VerificationSummary {
@@ -84,32 +91,87 @@ interface VerificationSummary {
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
-async function loadGraph(): Promise<Graph> {
-  const graph = await loadKB(KB_DATA_DIR);
-  computeInverses(graph);
-  return graph;
+// LoadedKB, loadGraphFull, resolveEntity imported from ../lib/kb-loader.ts
+
+/** Result of fetching source content, with structured error info */
+interface FetchSourceResult {
+  content: string | null;
+  errorType?: SourceFetchErrorType;
+  errorMessage?: string;
 }
 
 /**
  * Fetch source content for a URL.
- * First tries the wiki-server citation_content cache, then falls back to
- * a direct HTTP fetch with HTML tag stripping.
+ *
+ * Resolution order:
+ *   1. Check for unverifiable domains (social media etc.)
+ *   2. Try wiki-server citation_content cache (fullText field)
+ *   3. Direct HTTP fetch with HTML tag stripping
+ *   4. Detect paywall signals in fetched content
+ *
+ * Returns structured error types for machine-readable classification.
  */
-async function fetchSourceContent(url: string): Promise<string | null> {
+async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
   // SSRF protection: only allow https:// URLs (no http://, file://, ftp://, etc.)
   if (!url.startsWith('https://')) {
     console.warn(`[kb-verify] Skipping non-HTTPS URL: ${url}`);
-    return null;
+    return { content: null, errorType: 'fetch_error', errorMessage: 'Non-HTTPS URL' };
+  }
+
+  // SSRF protection: block private/internal hosts
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    if (
+      host === 'localhost' ||
+      host === '127.0.0.1' ||
+      host === '[::1]' ||
+      host === '::1' ||
+      host === '0.0.0.0' ||
+      host === '[::]' ||
+      host === '::' ||
+      host.endsWith('.local') ||
+      host.endsWith('.internal') ||
+      // IPv4 private ranges
+      /^10\./.test(host) ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
+      /^192\.168\./.test(host) ||
+      /^169\.254\./.test(host) ||
+      // IPv6 private/reserved ranges
+      /^fe80:/i.test(host) ||          // link-local
+      /^f[cd][0-9a-f]{2}:/i.test(host) || // unique local (fc00::/7)
+      /^::ffff:127\./i.test(host) ||   // IPv4-mapped loopback
+      /^::ffff:10\./i.test(host) ||    // IPv4-mapped private
+      /^::ffff:192\.168\./i.test(host) || // IPv4-mapped private
+      /^::ffff:172\.(1[6-9]|2\d|3[01])\./i.test(host) || // IPv4-mapped private
+      /^::ffff:169\.254\./i.test(host) // IPv4-mapped link-local
+    ) {
+      console.warn(`[kb-verify] Blocking private/internal URL: ${url}`);
+      return { content: null, errorType: 'access_denied', errorMessage: 'Private/internal host blocked' };
+    }
+  } catch {
+    return { content: null, errorType: 'fetch_error', errorMessage: 'Invalid URL' };
+  }
+
+  // Check for unverifiable domains (social media, etc.)
+  if (isUnverifiableDomain(url)) {
+    console.warn(`[kb-verify] Unverifiable domain: ${url}`);
+    return { content: null, errorType: 'unverifiable_domain', errorMessage: 'Domain blocks automated access' };
   }
 
   // Try wiki-server citation_content cache first
   try {
     const result = await getCitationContentByUrl(url);
     if (result.ok && result.data) {
-      const content = (result.data as { content?: string; text?: string }).content
-        || (result.data as { content?: string; text?: string }).text;
+      const cached = result.data;
+      const content = cached.fullText;
       if (content && content.length > 0) {
-        return content.slice(0, MAX_CONTENT_LENGTH);
+        // Check for paywall signals even in cached content
+        if (detectPaywall(content)) {
+          console.warn(`[kb-verify] Cached content for ${url} appears paywalled`);
+          return { content: content.slice(0, MAX_CONTENT_LENGTH), errorType: 'paywall', errorMessage: 'Cached content appears paywalled' };
+        }
+        return { content: content.slice(0, MAX_CONTENT_LENGTH) };
       }
     }
   } catch (e: unknown) {
@@ -131,8 +193,9 @@ async function fetchSourceContent(url: string): Promise<string | null> {
     clearTimeout(timer);
 
     if (!response.ok) {
+      const errorType = classifyFetchError(response.status, null, null, url);
       console.warn(`[kb-verify] HTTP ${response.status} for ${url}`);
-      return null;
+      return { content: null, errorType: errorType ?? 'fetch_error', errorMessage: `HTTP ${response.status}` };
     }
 
     const html = await response.text();
@@ -150,14 +213,23 @@ async function fetchSourceContent(url: string): Promise<string | null> {
       .replace(/\s+/g, ' ')
       .trim();
 
-    return text.slice(0, MAX_CONTENT_LENGTH);
+    const content = text.slice(0, MAX_CONTENT_LENGTH);
+
+    // Detect paywall in fetched content
+    if (detectPaywall(content)) {
+      console.warn(`[kb-verify] Paywall detected for ${url}`);
+      return { content, errorType: 'paywall', errorMessage: 'Content appears paywalled' };
+    }
+
+    return { content };
   } catch (e: unknown) {
     if (e instanceof DOMException && e.name === 'AbortError') {
       console.warn(`[kb-verify] Timeout fetching ${url}`);
-    } else {
-      console.warn(`[kb-verify] Failed to fetch ${url}: ${e instanceof Error ? e.message : String(e)}`);
+      return { content: null, errorType: 'timeout', errorMessage: 'Request timed out' };
     }
-    return null;
+    const msg = e instanceof Error ? e.message : String(e);
+    console.warn(`[kb-verify] Failed to fetch ${url}: ${msg}`);
+    return { content: null, errorType: 'fetch_error', errorMessage: msg };
   }
 }
 
@@ -219,16 +291,21 @@ async function verifySingleFact(
   const sourceUrl = fact.source!;
 
   // Fetch source content
-  const sourceText = await fetchSourceContent(sourceUrl);
-  if (!sourceText) {
+  const fetchResult = await fetchSourceContent(sourceUrl);
+  if (!fetchResult.content) {
     return {
       factId: fact.id,
       entityId: entity.id,
       propertyId: fact.propertyId,
       sourceUrl,
-      error: 'Could not fetch source content',
+      error: fetchResult.errorMessage ?? 'Could not fetch source content',
+      errorType: fetchResult.errorType,
     };
   }
+
+  // If content was fetched but has issues (e.g., paywall), still attempt
+  // verification with the partial content — the LLM may still extract useful info.
+  const sourceText = fetchResult.content;
 
   // Truncate source text for prompt
   const truncatedSource = sourceText.slice(0, 4000);
@@ -268,6 +345,7 @@ async function verifySingleFact(
       confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.5)),
       extractedValue: parsed.extracted_value ?? '',
       reasoning: parsed.reasoning ?? '',
+      ...(fetchResult.errorType && { errorType: fetchResult.errorType }),
     };
   } catch (e: unknown) {
     return {
@@ -281,12 +359,40 @@ async function verifySingleFact(
 }
 
 /**
+ * Store a verification result in the wiki-server database.
+ * Best-effort: logs a warning on failure but does not block the pipeline.
+ */
+async function storeVerificationResult(result: VerificationResult): Promise<void> {
+  const body = {
+    factId: result.factId,
+    verdict: result.verdict,
+    confidence: result.confidence,
+    extractedValue: result.extractedValue,
+    checkerModel: 'claude-3-haiku', // matches MODELS.haiku used in verifySingleFact
+    isPrimarySource: true,
+    notes: result.reasoning,
+    sourceUrl: result.sourceUrl,
+  };
+
+  const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
+    'POST',
+    '/api/kb-verifications/verifications',
+    body,
+  );
+
+  if (!response.ok) {
+    console.warn(`[kb-verify] Failed to store verification for ${result.factId}: ${response.error}`);
+  }
+}
+
+/**
  * Collect facts to verify based on the command options.
  */
 function collectFacts(
-  graph: Graph,
+  kb: LoadedKB,
   options: VerifyCommandOptions,
 ): Array<{ entity: Entity; fact: Fact }> {
+  const graph = kb.graph;
   const factsToVerify: Array<{ entity: Entity; fact: Fact }> = [];
 
   if (options.fact) {
@@ -302,8 +408,8 @@ function collectFacts(
       }
     }
   } else if (options.entity) {
-    // All facts for a specific entity
-    const entity = graph.getEntity(options.entity);
+    // All facts for a specific entity (supports ID, filename, stableId, or name)
+    const entity = resolveEntity(options.entity, kb);
     if (entity) {
       const facts = graph.getFacts(entity.id);
       for (const fact of facts) {
@@ -341,8 +447,9 @@ export async function verifyCommand(
 ): Promise<CommandResult> {
   const isDryRun = options['dry-run'] || options.dryRun;
 
-  const graph = await loadGraph();
-  const factsToVerify = collectFacts(graph, options);
+  const kb = await loadGraphFull();
+  const graph = kb.graph;
+  const factsToVerify = collectFacts(kb, options);
 
   if (factsToVerify.length === 0) {
     const hint = options.entity
@@ -421,7 +528,8 @@ export async function verifyCommand(
     if ('error' in result) {
       summary.errors++;
       summary.failures.push(result);
-      console.log(`    \x1b[31m✗ Error: ${result.error}\x1b[0m`);
+      const typeTag = result.errorType ? ` [${result.errorType}]` : '';
+      console.log(`    \x1b[31m✗ Error${typeTag}: ${result.error}\x1b[0m`);
     } else {
       summary[result.verdict]++;
       summary.results.push(result);
@@ -434,6 +542,11 @@ export async function verifyCommand(
       if (result.verdict === 'contradicted' || result.verdict === 'outdated') {
         console.log(`    Source says: ${result.extractedValue.slice(0, 100)}`);
       }
+
+      // Store result in wiki-server (best-effort, does not block pipeline)
+      storeVerificationResult(result).catch((e: unknown) => {
+        console.warn(`[kb-verify] Failed to store result for ${result.factId}: ${e instanceof Error ? e.message : String(e)}`);
+      });
     }
   }
 
@@ -484,12 +597,27 @@ export async function verifyCommand(
     }
   }
 
-  // Show errors
+  // Show errors grouped by type
   if (summary.failures.length > 0) {
     lines.push('');
     lines.push(`\x1b[31m\x1b[1mErrors:\x1b[0m`);
     for (const f of summary.failures) {
-      lines.push(`  ${f.factId} (${f.entityId} / ${f.propertyId}): ${f.error}`);
+      const typeTag = f.errorType ? ` [${f.errorType}]` : '';
+      lines.push(`  ${f.factId} (${f.entityId} / ${f.propertyId}):${typeTag} ${f.error}`);
+    }
+
+    // Show error type breakdown
+    const typeCounts = new Map<string, number>();
+    for (const f of summary.failures) {
+      const type = f.errorType ?? 'unknown';
+      typeCounts.set(type, (typeCounts.get(type) ?? 0) + 1);
+    }
+    if (typeCounts.size > 1) {
+      lines.push('');
+      lines.push('  Error breakdown:');
+      for (const [type, count] of [...typeCounts.entries()].sort((a, b) => b[1] - a[1])) {
+        lines.push(`    ${type}: ${count}`);
+      }
     }
   }
 

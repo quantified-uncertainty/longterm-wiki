@@ -1,22 +1,20 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import path from "node:path";
-import { loadKB } from "../src/loader";
 import type { Graph } from "../src/graph";
-
-const DATA_DIR = path.resolve(__dirname, "../data");
+import { loadTestKB } from "./test-helpers";
 
 describe("graph", () => {
   let graph: Graph;
+  let idOf: (filename: string) => string;
 
   beforeAll(async () => {
-    graph = await loadKB(DATA_DIR);
+    ({ graph, idOf } = await loadTestKB());
   });
 
   describe("getEntity", () => {
-    it("returns the correct entity for a valid ID", () => {
-      const entity = graph.getEntity("anthropic");
+    it("returns the correct entity for a valid slug", () => {
+      const entity = graph.getEntity(idOf("anthropic"));
       expect(entity).toBeDefined();
-      expect(entity!.id).toBe("anthropic");
+      expect(entity!.id).toBe("mK9pX3rQ7n");
       expect(entity!.name).toBe("Anthropic");
       expect(entity!.type).toBe("organization");
     });
@@ -36,7 +34,7 @@ describe("graph", () => {
 
   describe("getFacts", () => {
     it("returns all facts for an entity", () => {
-      const facts = graph.getFacts("anthropic");
+      const facts = graph.getFacts(idOf("anthropic"));
       expect(facts).toHaveLength(52);
     });
 
@@ -46,7 +44,7 @@ describe("graph", () => {
     });
 
     it("filters by property", () => {
-      const revenueFacts = graph.getFacts("anthropic", {
+      const revenueFacts = graph.getFacts(idOf("anthropic"), {
         property: "revenue",
       });
       expect(revenueFacts).toHaveLength(9);
@@ -57,19 +55,19 @@ describe("graph", () => {
 
     it("filters by current (no validEnd)", () => {
       // Jan Leike has 2 employed-by facts: one with validEnd (OpenAI), one without (Anthropic)
-      const currentFacts = graph.getFacts("jan-leike", {
+      const currentFacts = graph.getFacts(idOf("jan-leike"), {
         property: "employed-by",
         current: true,
       });
       expect(currentFacts).toHaveLength(1);
       expect(currentFacts[0].value).toEqual({
         type: "ref",
-        value: "anthropic",
+        value: graph.getEntity(idOf("anthropic"))!.id,
       });
     });
 
     it("returns both current and ended facts without current filter", () => {
-      const allFacts = graph.getFacts("jan-leike", {
+      const allFacts = graph.getFacts(idOf("jan-leike"), {
         property: "employed-by",
       });
       expect(allFacts).toHaveLength(3);
@@ -77,7 +75,7 @@ describe("graph", () => {
 
     it("can combine property and current filters", () => {
       // All Jan Leike's employed-by facts that are current
-      const facts = graph.getFacts("jan-leike", {
+      const facts = graph.getFacts(idOf("jan-leike"), {
         property: "employed-by",
         current: true,
       });
@@ -88,7 +86,7 @@ describe("graph", () => {
 
   describe("getLatest", () => {
     it("returns the most recent fact by asOf for a time series", () => {
-      const latest = graph.getLatest("anthropic", "revenue");
+      const latest = graph.getLatest(idOf("anthropic"), "revenue");
       expect(latest).toBeDefined();
       // The most recent revenue fact is asOf: 2026-03 with value 19e9
       expect(latest!.asOf).toBe("2026-03");
@@ -96,7 +94,7 @@ describe("graph", () => {
     });
 
     it("returns undefined for a missing property", () => {
-      const latest = graph.getLatest("anthropic", "nonexistent-property");
+      const latest = graph.getLatest(idOf("anthropic"), "nonexistent-property");
       expect(latest).toBeUndefined();
     });
 
@@ -106,7 +104,7 @@ describe("graph", () => {
     });
 
     it("returns the only fact when there is just one", () => {
-      const latest = graph.getLatest("anthropic", "headquarters");
+      const latest = graph.getLatest(idOf("anthropic"), "headquarters");
       expect(latest).toBeDefined();
       expect(latest!.value).toEqual({
         type: "text",
@@ -120,23 +118,23 @@ describe("graph", () => {
       const revMap = graph.getByProperty("revenue");
       // Multiple entities have revenue facts after migration
       expect(revMap.size).toBeGreaterThanOrEqual(2);
-      expect(revMap.has("anthropic")).toBe(true);
-      expect(revMap.has("openai")).toBe(true);
+      expect(revMap.has(graph.getEntity(idOf("anthropic"))!.id)).toBe(true);
+      expect(revMap.has(graph.getEntity(idOf("openai"))!.id)).toBe(true);
     });
 
     it("returns facts from multiple entities", () => {
       const roleMap = graph.getByProperty("role");
       // All 20 people have role facts
       expect(roleMap.size).toBe(20);
-      expect(roleMap.has("dario-amodei")).toBe(true);
-      expect(roleMap.has("jan-leike")).toBe(true);
-      expect(roleMap.has("sam-altman")).toBe(true);
+      expect(roleMap.has(graph.getEntity(idOf("dario-amodei"))!.id)).toBe(true);
+      expect(roleMap.has(graph.getEntity(idOf("jan-leike"))!.id)).toBe(true);
+      expect(roleMap.has(graph.getEntity(idOf("sam-altman"))!.id)).toBe(true);
     });
 
     it("returns latest fact per entity with latest:true", () => {
       const revMap = graph.getByProperty("revenue", { latest: true });
       expect(revMap.size).toBeGreaterThanOrEqual(2);
-      const anthropicRev = revMap.get("anthropic");
+      const anthropicRev = revMap.get(graph.getEntity(idOf("anthropic"))!.id);
       expect(anthropicRev).toBeDefined();
       expect(anthropicRev!.asOf).toBe("2026-03");
     });
@@ -151,26 +149,26 @@ describe("graph", () => {
     it("returns entities of a given type", () => {
       const orgs = graph.getByType("organization");
       expect(orgs.length).toBeGreaterThanOrEqual(15);
-      // Spot-check key organizations (including migrated entities)
-      const orgIds = new Set(orgs.map((o) => o.id));
-      expect(orgIds.has("anthropic")).toBe(true);
-      expect(orgIds.has("openai")).toBe(true);
-      expect(orgIds.has("deepmind")).toBe(true);
-      expect(orgIds.has("chan-zuckerberg-initiative")).toBe(true);
-      expect(orgIds.has("coefficient-giving")).toBe(true);
-      expect(orgIds.has("manifund")).toBe(true);
+      // Spot-check key organizations by name
+      const orgNames = new Set(orgs.map((o) => o.name));
+      expect(orgNames.has("Anthropic")).toBe(true);
+      expect(orgNames.has("OpenAI")).toBe(true);
+      expect(orgNames.has("Google DeepMind")).toBe(true);
+      expect(orgNames.has("Chan Zuckerberg Initiative")).toBe(true);
+      expect(orgNames.has("Coefficient Giving")).toBe(true);
+      expect(orgNames.has("Manifund")).toBe(true);
     });
 
     it("returns multiple entities of the same type", () => {
       const people = graph.getByType("person");
       expect(people.length).toBeGreaterThanOrEqual(21);
-      // Spot-check key people (including migrated entities)
-      const ids = new Set(people.map((p) => p.id));
-      expect(ids.has("dario-amodei")).toBe(true);
-      expect(ids.has("sam-altman")).toBe(true);
-      expect(ids.has("eliezer-yudkowsky")).toBe(true);
-      expect(ids.has("jaan-tallinn")).toBe(true);
-      expect(ids.has("dustin-moskovitz")).toBe(true);
+      // Spot-check key people by name
+      const names = new Set(people.map((p) => p.name));
+      expect(names.has("Dario Amodei")).toBe(true);
+      expect(names.has("Sam Altman")).toBe(true);
+      expect(names.has("Eliezer Yudkowsky")).toBe(true);
+      expect(names.has("Jaan Tallinn")).toBe(true);
+      expect(names.has("Dustin Moskovitz")).toBe(true);
     });
 
     it("returns empty array for unknown type", () => {
@@ -181,21 +179,21 @@ describe("graph", () => {
 
   describe("getRelated", () => {
     it("returns referenced entity IDs from ref facts", () => {
-      const related = graph.getRelated("jan-leike", "employed-by");
-      expect(related).toContain("openai");
-      expect(related).toContain("anthropic");
-      expect(related).toContain("deepmind");
+      const related = graph.getRelated(idOf("jan-leike"), "employed-by");
+      expect(related).toContain(graph.getEntity(idOf("openai"))!.id);
+      expect(related).toContain(graph.getEntity(idOf("anthropic"))!.id);
+      expect(related).toContain(graph.getEntity(idOf("deepmind"))!.id);
       expect(related).toHaveLength(3);
     });
 
     it("returns referenced entity IDs from multiple ref facts", () => {
-      const related = graph.getRelated("dario-amodei", "employed-by");
-      expect(related).toContain("anthropic");
+      const related = graph.getRelated(idOf("dario-amodei"), "employed-by");
+      expect(related).toContain(graph.getEntity(idOf("anthropic"))!.id);
       expect(related.length).toBeGreaterThanOrEqual(1);
     });
 
     it("returns empty array when no facts match", () => {
-      const related = graph.getRelated("anthropic", "employed-by");
+      const related = graph.getRelated(idOf("anthropic"), "employed-by");
       expect(related).toEqual([]);
     });
 
@@ -207,7 +205,7 @@ describe("graph", () => {
 
   describe("getRecords", () => {
     it("returns record entries with keys and fields", () => {
-      const rounds = graph.getRecords("anthropic", "funding-rounds");
+      const rounds = graph.getRecords(idOf("anthropic"), "funding-rounds");
       expect(rounds.length).toBeGreaterThan(0);
 
       // Each entry has a key, schema, and fields
@@ -219,7 +217,7 @@ describe("graph", () => {
     });
 
     it("returns correct data for a specific record entry", () => {
-      const people = graph.getRecords("anthropic", "key-persons");
+      const people = graph.getRecords(idOf("anthropic"), "key-persons");
       const darioCeo = people.find((p) => p.key === "dario-amodei");
       expect(darioCeo).toBeDefined();
       expect(darioCeo!.fields.person).toBe("dario-amodei");
@@ -229,12 +227,12 @@ describe("graph", () => {
     });
 
     it("returns empty array for missing collection", () => {
-      const records = graph.getRecords("anthropic", "nonexistent");
+      const records = graph.getRecords(idOf("anthropic"), "nonexistent");
       expect(records).toEqual([]);
     });
 
     it("returns empty array for entity without records", () => {
-      const records = graph.getRecords("jan-leike", "key-persons");
+      const records = graph.getRecords(idOf("jan-leike"), "key-persons");
       expect(records).toEqual([]);
     });
   });

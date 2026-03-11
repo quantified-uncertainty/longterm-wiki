@@ -7,14 +7,43 @@ import {
   kbFactResourceVerifications,
   facts,
 } from "../schema.js";
-import { zv, notFoundError } from "./utils.js";
+import {
+  zv,
+  notFoundError,
+  parseJsonBody,
+  validationError,
+  invalidJsonError,
+} from "./utils.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
 const MAX_FACT_ID_LENGTH = 100;
+const MAX_URL_LENGTH = 2048;
+
+// ---- Valid verdict values ----
+
+const VALID_RESOURCE_VERDICTS = [
+  "confirmed",
+  "contradicted",
+  "unverifiable",
+  "outdated",
+  "partial",
+] as const;
 
 // ---- Query schemas ----
+
+const ResourceVerificationBody = z.object({
+  factId: z.string().min(1).max(MAX_FACT_ID_LENGTH),
+  resourceId: z.string().max(200).optional(),
+  verdict: z.enum(VALID_RESOURCE_VERDICTS),
+  confidence: z.number().min(0).max(1).optional(),
+  extractedValue: z.string().max(2000).optional(),
+  checkerModel: z.string().max(100).optional(),
+  isPrimarySource: z.boolean().default(false),
+  notes: z.string().max(5000).optional(),
+  sourceUrl: z.string().url().max(MAX_URL_LENGTH).optional(),
+});
 
 const VerdictsQuery = z.object({
   verdict: z.string().max(50).optional(),
@@ -80,36 +109,52 @@ const kbVerificationsApp = new Hono()
       conditions.push(eq(kbFactVerdicts.needsRecheck, needs_recheck));
     }
 
-    // For entity_id filtering, join with facts table
+    // Filter by entity_id via the joined facts table
     if (entity_id) {
-      const factIdsResult = await db
-        .select({ factId: facts.factId })
-        .from(facts)
-        .where(eq(facts.entityId, entity_id));
-      const factIds = factIdsResult.map((r) => r.factId);
-      if (factIds.length === 0) {
-        return c.json({ verdicts: [], total: 0 });
-      }
-      conditions.push(
-        sql`${kbFactVerdicts.factId} = ANY(${factIds})`
-      );
+      conditions.push(eq(facts.entityId, entity_id));
     }
 
     const whereClause =
       conditions.length > 0 ? and(...conditions) : undefined;
 
+    // LEFT JOIN facts to get entityId and label for each verdict.
+    // Note: the facts table's unique key is (entityId, factId), not factId alone.
+    // In practice, KB fact IDs are random hashes (e.g., "f_abc123") that are
+    // unique across all entities, so this JOIN is 1:1. If that assumption ever
+    // breaks, switch to a DISTINCT ON subquery.
     const rows = await db
-      .select()
+      .select({
+        factId: kbFactVerdicts.factId,
+        verdict: kbFactVerdicts.verdict,
+        confidence: kbFactVerdicts.confidence,
+        reasoning: kbFactVerdicts.reasoning,
+        sourcesChecked: kbFactVerdicts.sourcesChecked,
+        needsRecheck: kbFactVerdicts.needsRecheck,
+        lastComputedAt: kbFactVerdicts.lastComputedAt,
+        createdAt: kbFactVerdicts.createdAt,
+        updatedAt: kbFactVerdicts.updatedAt,
+        entityId: facts.entityId,
+        factLabel: facts.label,
+      })
       .from(kbFactVerdicts)
+      .leftJoin(facts, eq(kbFactVerdicts.factId, facts.factId))
       .where(whereClause)
       .orderBy(desc(kbFactVerdicts.lastComputedAt))
       .limit(limit)
       .offset(offset);
 
-    const countResult = await db
-      .select({ count: count() })
-      .from(kbFactVerdicts)
-      .where(whereClause);
+    // Count query — needs the LEFT JOIN when filtering by entity_id
+    const countQuery = entity_id
+      ? db
+          .select({ count: count() })
+          .from(kbFactVerdicts)
+          .leftJoin(facts, eq(kbFactVerdicts.factId, facts.factId))
+          .where(whereClause)
+      : db
+          .select({ count: count() })
+          .from(kbFactVerdicts)
+          .where(whereClause);
+    const countResult = await countQuery;
     const total = countResult[0].count;
 
     return c.json({
@@ -123,6 +168,8 @@ const kbVerificationsApp = new Hono()
         lastComputedAt: r.lastComputedAt,
         createdAt: r.createdAt,
         updatedAt: r.updatedAt,
+        entityId: r.entityId,
+        factLabel: r.factLabel,
       })),
       total,
     });
@@ -180,10 +227,57 @@ const kbVerificationsApp = new Hono()
         isPrimarySource: v.isPrimarySource,
         checkedAt: v.checkedAt,
         notes: v.notes,
+        sourceUrl: v.sourceUrl,
         createdAt: v.createdAt,
         updatedAt: v.updatedAt,
       })),
     });
+  })
+
+  // ---- POST /verifications ----
+  .post("/verifications", async (c) => {
+    const raw = await parseJsonBody(c);
+    if (!raw) return invalidJsonError(c);
+
+    const parsed = ResourceVerificationBody.safeParse(raw);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const body = parsed.data;
+    const db = getDrizzleDb();
+
+    const now = new Date();
+
+    // Insert the resource verification
+    const [inserted] = await db
+      .insert(kbFactResourceVerifications)
+      .values({
+        factId: body.factId,
+        resourceId: body.resourceId ?? null,
+        verdict: body.verdict,
+        confidence: body.confidence ?? null,
+        extractedValue: body.extractedValue ?? null,
+        checkerModel: body.checkerModel ?? null,
+        isPrimarySource: body.isPrimarySource,
+        notes: body.notes ?? null,
+        sourceUrl: body.sourceUrl ?? null,
+        checkedAt: now,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning({ id: kbFactResourceVerifications.id });
+
+    // Auto-set needs_recheck on the corresponding verdict if one exists.
+    // When new evidence is inserted, the aggregate verdict may be stale.
+    const updated = await db
+      .update(kbFactVerdicts)
+      .set({ needsRecheck: true, updatedAt: now })
+      .where(eq(kbFactVerdicts.factId, body.factId))
+      .returning({ factId: kbFactVerdicts.factId });
+
+    return c.json({
+      id: inserted.id,
+      verdictFlagged: updated.length > 0,
+    }, 201);
   });
 
 // ---- Exports ----
