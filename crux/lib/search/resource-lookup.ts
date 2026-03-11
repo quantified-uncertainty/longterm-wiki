@@ -79,6 +79,12 @@ function ensureLoaded(): void {
     cachedById.set(resource.id, resource);
 
     if (resource.stable_id) {
+      const existing = cachedByStableId.get(resource.stable_id);
+      if (existing && existing.id !== resource.id) {
+        throw new Error(
+          `Duplicate resource stable_id "${resource.stable_id}" for "${existing.id}" and "${resource.id}"`
+        );
+      }
       cachedByStableId.set(resource.stable_id, resource);
     }
 

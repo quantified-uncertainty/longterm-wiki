@@ -28,6 +28,7 @@ vi.mock('../../resource-io.ts', () => ({
       title: 'Blog About Alignment',
       type: 'blog',
       tags: ['alignment'],
+      stable_id: 'abc123def456', // same as first resource's hash ID — tests precedence
       _sourceFile: 'test-resources',
     },
   ]),
@@ -125,8 +126,11 @@ describe('resource-lookup', () => {
     });
 
     it('prefers hash ID over stable_id', () => {
+      // 'abc123def456' is both the hash ID of resource 1 and the stable_id of resource 2.
+      // Hash ID lookup should win.
       const r = resolveResource('abc123def456');
       expect(r!.id).toBe('abc123def456');
+      expect(r!.title).toBe('AI Safety Paper One');
     });
 
     it('returns null for unknown ID', () => {

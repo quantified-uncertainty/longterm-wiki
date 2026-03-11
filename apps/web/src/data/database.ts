@@ -563,7 +563,15 @@ function resourceIndex() {
     _stableIdIndex = new Map();
     for (const r of resources) {
       _resourceIndex.set(r.id, r);
-      if (r.stable_id) _stableIdIndex.set(r.stable_id, r);
+      if (r.stable_id) {
+        const existing = _stableIdIndex.get(r.stable_id);
+        if (existing && existing.id !== r.id) {
+          throw new Error(
+            `Duplicate resource stable_id "${r.stable_id}" for "${existing.id}" and "${r.id}"`
+          );
+        }
+        _stableIdIndex.set(r.stable_id, r);
+      }
     }
   }
   return _resourceIndex;
