@@ -1205,12 +1205,17 @@ function investmentRowToRecordEntry(row) {
   if (row.date) fields.date = row.date;
   if (row.amount != null) fields.amount = row.amount;
   if (row.stakeAcquired) {
-    // Parse JSON array back to array if applicable, otherwise leave as string
+    // Parse JSON array back to array if applicable, otherwise use as number
     try {
       const parsed = JSON.parse(row.stakeAcquired);
-      fields.stake_acquired = parsed;
+      if (Array.isArray(parsed)) {
+        fields.stake_acquired = parsed;
+      } else {
+        fields.stake_acquired = typeof parsed === 'number' ? parsed : row.stakeAcquired;
+      }
     } catch {
-      fields.stake_acquired = Number(row.stakeAcquired) || row.stakeAcquired;
+      const n = Number(row.stakeAcquired);
+      fields.stake_acquired = isNaN(n) ? row.stakeAcquired : n;
     }
   }
   if (row.instrument) fields.instrument = row.instrument;
@@ -1234,12 +1239,17 @@ function equityPositionRowToRecordEntry(row) {
   const fields = {};
   fields.holder = row.holderId;
   if (row.stake) {
-    // Parse JSON array back to array if applicable, otherwise leave as string
+    // Parse JSON array back to array if applicable, otherwise use as number
     try {
       const parsed = JSON.parse(row.stake);
-      fields.stake = parsed;
+      if (Array.isArray(parsed)) {
+        fields.stake = parsed;
+      } else {
+        fields.stake = typeof parsed === 'number' ? parsed : row.stake;
+      }
     } catch {
-      fields.stake = Number(row.stake) || row.stake;
+      const n = Number(row.stake);
+      fields.stake = isNaN(n) ? row.stake : n;
     }
   }
   if (row.source) fields.source = row.source;
