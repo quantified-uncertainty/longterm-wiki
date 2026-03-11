@@ -3,10 +3,10 @@ import { getKBEntities, getKBLatest, getKBRecords, getKBEntitySlug } from "@/dat
 import { getEntityById } from "@/data";
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
-import { OrganizationsTable, type OrgRow } from "./organizations-table";
+import { OrganizationsTable, type OrgRow } from "@/app/organizations/organizations-table";
 
 export const metadata: Metadata = {
-  title: "Organizations | Longterm Wiki",
+  title: "Organizations",
   description:
     "Directory of AI safety organizations, frontier labs, research groups, and funders with key metrics.",
 };
@@ -45,7 +45,7 @@ export default function OrganizationsPage() {
 
     return {
       id: entity.id,
-      slug: getKBEntitySlug(entity.id) ?? entity.id,
+      slug: getKBEntitySlug(entity.id) ?? null,
       name: entity.name,
       numericId: entity.numericId ?? null,
       orgType: (dbEntity as { orgType?: string } | undefined)?.orgType ?? null,

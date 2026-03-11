@@ -398,13 +398,20 @@ export function getKBSlugMap(): Record<string, string> {
   return kb?.slugToEntityId ?? {};
 }
 
+/** Lazy-initialized inverted index: entityId → slug. Built once on first call. */
+let entityIdToSlugIndex: Map<string, string> | undefined;
+
 /**
  * Reverse lookup: find the YAML slug for a given entity ID.
+ * Uses a lazy-built inverted index for O(1) lookups.
  */
 export function getKBEntitySlug(entityId: string): string | undefined {
-  const map = getKBSlugMap();
-  for (const [slug, id] of Object.entries(map)) {
-    if (id === entityId) return slug;
+  if (!entityIdToSlugIndex) {
+    const map = getKBSlugMap();
+    entityIdToSlugIndex = new Map();
+    for (const [slug, id] of Object.entries(map)) {
+      entityIdToSlugIndex.set(id, slug);
+    }
   }
-  return undefined;
+  return entityIdToSlugIndex.get(entityId);
 }

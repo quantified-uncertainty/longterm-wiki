@@ -1,7 +1,7 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { resolveOrgBySlug, getOrgSlugs } from "../org-utils";
-import { getKBLatest, getKBRecords, getKBFacts, getKBEntitySlug } from "@/data/kb";
+import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
+import { getKBLatest, getKBRecords, getKBFacts, getKBEntitySlug, getKBEntity } from "@/data/kb";
 import { getEntityById } from "@/data";
 import { formatKBFactValue, formatKBDate } from "@/components/wiki/kb/format";
 import type { Fact, RecordEntry } from "@longterm-wiki/kb";
@@ -355,22 +355,30 @@ export default async function OrgProfilePage({
             </section>
           )}
 
-          {/* Investments (if this org is an investor) */}
+          {/* Investments (individual investor participation in this org's rounds) */}
           {investments.length > 0 && (
             <section>
               <h2 className="text-lg font-bold tracking-tight mb-4">
-                Investments
+                Investor Participation
                 <span className="ml-2 text-sm font-normal text-muted-foreground">
                   {investments.length}
                 </span>
               </h2>
               <div className="border border-border/60 rounded-xl divide-y divide-border/40 bg-card">
                 {investments.map((inv) => {
-                  const investee = inv.fields.investee
-                    ? String(inv.fields.investee)
+                  const investorRef = inv.fields.investor
+                    ? String(inv.fields.investor)
                     : null;
-                  const round = inv.fields.round
-                    ? String(inv.fields.round)
+                  const investorEntity = investorRef
+                    ? getKBEntity(investorRef)
+                    : null;
+                  const investorName =
+                    investorEntity?.name ??
+                    (inv.fields.display_name
+                      ? String(inv.fields.display_name)
+                      : investorRef);
+                  const roundName = inv.fields.round_name
+                    ? String(inv.fields.round_name)
                     : null;
                   const amount = inv.fields.amount;
                   const date = inv.fields.date
@@ -383,14 +391,23 @@ export default async function OrgProfilePage({
                       className="flex items-center gap-4 px-4 py-3"
                     >
                       <div className="flex-1 min-w-0">
-                        {investee && (
-                          <span className="font-semibold text-sm">
-                            {investee}
-                          </span>
+                        {investorName && (
+                          investorEntity && investorRef ? (
+                            <Link
+                              href={`/kb/entity/${investorRef}`}
+                              className="font-semibold text-sm text-primary hover:underline"
+                            >
+                              {investorName}
+                            </Link>
+                          ) : (
+                            <span className="font-semibold text-sm">
+                              {investorName}
+                            </span>
+                          )
                         )}
-                        {round && (
+                        {roundName && (
                           <span className="ml-2 text-xs text-muted-foreground">
-                            {round}
+                            {roundName}
                           </span>
                         )}
                       </div>
@@ -460,19 +477,22 @@ export default async function OrgProfilePage({
               </h2>
               <div className="border border-border/60 rounded-xl bg-card px-4">
                 {sortedPersons.map((person) => {
-                  const personId = person.fields.person
+                  const personRef = person.fields.person
                     ? String(person.fields.person)
                     : undefined;
+                  // Resolve the person entity for their actual name
+                  const personEntity = personRef
+                    ? getKBEntity(personRef)
+                    : undefined;
+                  const personId = personEntity?.id ?? personRef;
                   const name =
                     (person.fields.display_name as string) ??
-                    (personId
-                      ? person.fields.person
-                        ? String(person.fields.person)
-                            .replace(/-/g, " ")
-                            .replace(/\b\w/g, (c) => c.toUpperCase())
-                        : undefined
-                      : undefined) ??
-                    person.key.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+                    personEntity?.name ??
+                    (personRef
+                      ? personRef
+                          .replace(/-/g, " ")
+                          .replace(/\b\w/g, (c) => c.toUpperCase())
+                      : person.key.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()));
 
                   return (
                     <PersonRow

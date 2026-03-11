@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { resolveOrgBySlug, getOrgSlugs } from "../../org-utils";
+import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import {
   getKBRecords,
   getKBFacts,

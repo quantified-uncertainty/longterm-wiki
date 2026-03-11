@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export interface OrgRow {
   id: string;
-  slug: string;
+  slug: string | null;
   name: string;
   numericId: string | null;
   orgType: string | null;
@@ -110,21 +110,31 @@ function SortHeader({
   className?: string;
 }) {
   const isActive = currentSort === sortKey;
+  const ariaSort = isActive
+    ? currentDir === "asc"
+      ? ("ascending" as const)
+      : ("descending" as const)
+    : ("none" as const);
+
   return (
     <th
-      className={`py-2.5 px-3 font-medium cursor-pointer select-none hover:text-foreground transition-colors ${
-        isActive ? "text-foreground" : ""
-      } ${className ?? ""}`}
-      onClick={() => onSort(sortKey)}
+      className={`py-2.5 px-3 font-medium ${className ?? ""}`}
+      aria-sort={ariaSort}
     >
-      <span className="inline-flex items-center gap-1">
+      <button
+        type="button"
+        className={`inline-flex items-center gap-1 cursor-pointer select-none hover:text-foreground transition-colors ${
+          isActive ? "text-foreground" : ""
+        }`}
+        onClick={() => onSort(sortKey)}
+      >
         {label}
         {isActive && (
           <span className="text-[10px]">
             {currentDir === "asc" ? "\u25B2" : "\u25BC"}
           </span>
         )}
-      </span>
+      </button>
     </th>
   );
 }
@@ -279,12 +289,16 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
               >
                 {/* Name */}
                 <td className="py-2.5 px-3">
-                  <Link
-                    href={`/organizations/${row.slug}`}
-                    className="font-medium text-foreground hover:text-primary transition-colors"
-                  >
-                    {row.name}
-                  </Link>
+                  {row.slug ? (
+                    <Link
+                      href={`/organizations/${row.slug}`}
+                      className="font-medium text-foreground hover:text-primary transition-colors"
+                    >
+                      {row.name}
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-foreground">{row.name}</span>
+                  )}
                   {row.wikiPageId && (
                     <Link
                       href={`/wiki/${row.wikiPageId}`}
