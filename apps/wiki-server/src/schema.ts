@@ -9,6 +9,7 @@ import {
   boolean,
   real,
   doublePrecision,
+  numeric,
   date,
   timestamp,
   jsonb,
@@ -1402,13 +1403,14 @@ export const kbFactVerdicts = pgTable(
  * Uses TEXT for person/org references because some records reference display names
  * rather than entity IDs (e.g., board seats with non-entity members, career-history
  * with non-entity organizations like "D. E. Shaw Research").
+ * When the reference is a known entity, the canonical 10-char entity ID is stored.
  */
 export const personnel = pgTable(
   "personnel",
   {
     id: varchar("id", { length: 10 }).primaryKey(),
-    personId: text("person_id").notNull(), // entity slug or display name
-    organizationId: text("organization_id").notNull(), // entity slug or display name
+    personId: text("person_id").notNull(), // entity ID or display name
+    organizationId: text("organization_id").notNull(), // entity ID or free text (career-history)
     role: text("role").notNull(), // job title or board role
     roleType: text("role_type").notNull(), // 'key-person' | 'board' | 'career'
     startDate: text("start_date"), // YYYY or YYYY-MM (flexible KB date format)
@@ -1444,9 +1446,10 @@ export const grants = pgTable(
   "grants",
   {
     id: varchar("id", { length: 10 }).primaryKey(),
-    organizationId: text("organization_id").notNull(), // the grantor/funder entity
+    organizationId: text("organization_id").notNull(), // grantor entity ID
+    granteeId: text("grantee_id"), // the recipient entity (nullable — many grants don't specify)
     name: text("name").notNull(), // program or grant name
-    amount: doublePrecision("amount"), // funding amount in currency units
+    amount: numeric("amount"), // funding amount (NUMERIC for precise financial data; Drizzle returns string)
     currency: text("currency").notNull().default("USD"),
     period: text("period"), // time period (e.g. "2016-2025")
     date: text("date"), // announcement/start date (YYYY-MM)
@@ -1465,6 +1468,7 @@ export const grants = pgTable(
   },
   (table) => [
     index("idx_grants_org").on(table.organizationId),
+    index("idx_grants_grantee").on(table.granteeId),
     index("idx_grants_status").on(table.status),
   ]
 );
