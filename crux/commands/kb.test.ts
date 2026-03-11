@@ -434,4 +434,19 @@ describe('crux kb add-record', () => {
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Invalid key=value');
   }, 30_000);
+
+  it('returns error for unknown field names with list of valid fields', async () => {
+    const result = await commands['add-record']([
+      'anthropic', 'funding-round', 'amunt=2e9', 'naem=SeriesX'],
+      {},
+    );
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Unknown field');
+    expect(result.output).toContain('"amunt"');
+    expect(result.output).toContain('"naem"');
+    // Should list valid fields so the user can fix the typo
+    expect(result.output).toContain('Valid fields');
+    expect(result.output).toContain('raised');
+    expect(result.output).toContain('name');
+  }, 30_000);
 });
