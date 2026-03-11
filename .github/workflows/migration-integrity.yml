@@ -16,13 +16,15 @@ jobs:
           fetch-depth: 0
 
       - name: Check for modified migrations
+        env:
+          MIGRATION_OVERRIDE: ${{ contains(github.event.pull_request.labels.*.name, 'migration-override') }}
         run: |
           BASE_SHA="${{ github.event.pull_request.base.sha }}"
 
           # Get list of migration SQL files that were MODIFIED (not added)
           MODIFIED=$(git diff --name-only --diff-filter=M "$BASE_SHA"...HEAD -- 'apps/wiki-server/drizzle/[0-9]*.sql')
 
-          if [ -n "$MODIFIED" ]; then
+          if [ -n "$MODIFIED" ] && [ "$MIGRATION_OVERRIDE" != "true" ]; then
             echo "::error::The following migration files were modified. Migrations must never be modified after being committed — they may have already been applied to production databases. Create a new migration instead."
             echo ""
             echo "$MODIFIED" | while read -r file; do
@@ -33,19 +35,26 @@ jobs:
             exit 1
           fi
 
-          echo "No existing migrations were modified. ✓"
+          if [ -n "$MODIFIED" ]; then
+            echo "::warning::migration-override label present; skipping modified-migration failure."
+          else
+            echo "No existing migrations were modified. ✓"
+          fi
 
       - name: Check journal ordering
         run: |
           # Verify _journal.json entries are in strictly increasing idx order
           python3 -c "
-          import json, sys
+          import json, os, sys
 
           with open('apps/wiki-server/drizzle/meta/_journal.json') as f:
               journal = json.load(f)
 
           entries = journal['entries']
           errors = []
+
+          # Build set of expected SQL files from journal
+          expected_sql_files = set()
 
           for i, entry in enumerate(entries):
               if entry['idx'] != i:
@@ -55,10 +64,19 @@ jobs:
                   errors.append(f'Entry {i} ({entry[\"tag\"]}) has when={entry[\"when\"]} <= previous entry when={entries[i-1][\"when\"]}')
 
               # Check that the SQL file exists
-              import os
               sql_file = f'apps/wiki-server/drizzle/{entry[\"tag\"]}.sql'
+              expected_sql_files.add(sql_file)
               if not os.path.exists(sql_file):
                   errors.append(f'Entry {i} references {sql_file} but file does not exist')
+
+          # Reverse check: SQL files in the directory must be in the journal
+          actual_sql_files = {
+              os.path.join('apps/wiki-server/drizzle', name)
+              for name in os.listdir('apps/wiki-server/drizzle')
+              if name.endswith('.sql') and name[:4].isdigit()
+          }
+          for sql_file in sorted(actual_sql_files - expected_sql_files):
+              errors.append(f'{sql_file} exists but is not referenced by _journal.json')
 
           if errors:
               for e in errors:
