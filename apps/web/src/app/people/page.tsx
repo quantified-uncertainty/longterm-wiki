@@ -5,7 +5,7 @@ import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
 
 export const metadata: Metadata = {
-  title: "People | Longterm Wiki",
+  title: "People",
   description:
     "Directory of key people in AI safety, frontier AI research, policy, and effective altruism with roles, affiliations, and key metrics.",
 };

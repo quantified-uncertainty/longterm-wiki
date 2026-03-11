@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getKBEntities, getKBLatest, getKBRecords, getKBEntitySlug } from "@/data/kb";
-import { getEntityById } from "@/data";
+import { getTypedEntityById, isOrganization } from "@/data";
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import { OrganizationsTable, type OrgRow } from "@/app/organizations/organizations-table";
@@ -32,7 +32,7 @@ export default function OrganizationsPage() {
   const orgs = allEntities.filter((e) => e.type === "organization");
 
   const rows: OrgRow[] = orgs.map((entity) => {
-    const dbEntity = getEntityById(entity.id);
+    const typedEntity = getTypedEntityById(entity.id);
 
     const revenueFact = getKBLatest(entity.id, "revenue");
     const valuationFact = getKBLatest(entity.id, "valuation");
@@ -48,7 +48,7 @@ export default function OrganizationsPage() {
       slug: getKBEntitySlug(entity.id) ?? null,
       name: entity.name,
       numericId: entity.numericId ?? null,
-      orgType: (dbEntity as { orgType?: string } | undefined)?.orgType ?? null,
+      orgType: (typedEntity && isOrganization(typedEntity) ? typedEntity.orgType : null) ?? null,
       wikiPageId: entity.wikiPageId ?? entity.numericId ?? null,
 
       revenue: formatFact(revenueFact, { unit: "USD", display: { divisor: 1e9, prefix: "$", suffix: "B" } }),
