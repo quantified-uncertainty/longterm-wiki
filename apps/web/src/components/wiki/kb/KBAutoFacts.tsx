@@ -82,20 +82,21 @@ const SPECIAL_COLLECTIONS = new Set([
   "products",
 ]);
 
-/** Default columns per collection type, used when schema is unavailable. */
+/** Default columns per collection type, used when schema is unavailable.
+ *  Date columns are consistently placed second (after the primary identifier). */
 const DEFAULT_RECORD_COLUMNS: Record<string, string[]> = {
   "funding-rounds": ["date", "raised", "lead_investor"],
   "key-persons": ["person", "title", "start"],
   products: ["name", "launched", "description"],
   "model-releases": ["name", "released", "description"],
-  "board-seats": ["member", "role", "appointed"],
+  "board-seats": ["member", "appointed", "role"],
   "charitable-pledges": ["pledger", "pledge"],
   "equity-positions": ["holder", "stake"],
-  "investments": ["investor", "round_name", "date", "amount", "stake_acquired", "role"],
-  "strategic-partnerships": ["partner", "type", "date", "investment_amount", "compute_commitment"],
+  "investments": ["investor", "date", "round_name", "amount", "stake_acquired", "role"],
+  "strategic-partnerships": ["partner", "date", "type", "investment_amount", "compute_commitment"],
   "safety-milestones": ["name", "date", "description"],
-  "research-areas": ["name", "description", "started"],
-  grants: ["name", "amount", "date"],
+  "research-areas": ["name", "started", "description"],
+  grants: ["name", "date", "amount"],
 };
 
 /** Excluded fields (metadata, not useful in summary view). */
@@ -384,58 +385,68 @@ function PersonCard({ item }: { item: RecordEntry }) {
   );
 }
 
-/** Funding round row for timeline display. */
-function FundingRoundRow({ item }: { item: RecordEntry }) {
-  const name = field(item, "name") ?? titleCase(item.key);
-  const date = field(item, "date");
-  const raised = item.fields.raised;
-  const valuation = item.fields.valuation;
-  const leadInvestor = field(item, "lead_investor");
-  const instrument = field(item, "instrument");
-  const source = field(item, "source");
-
-  const hasSecondLine = !!(leadInvestor || valuation != null || (source && isUrl(source)));
-
+/** Funding history table with proper column headers. */
+function FundingHistoryTable({ items }: { items: RecordEntry[] }) {
   return (
-    <div className="py-1.5 border-b border-border/40 last:border-b-0">
-      {/* Line 1: name+badge | date | amount — grid keeps columns aligned */}
-      <div className="grid grid-cols-[1fr_auto_auto] items-baseline gap-x-3">
-        <div className="flex items-baseline gap-1.5 min-w-0">
-          <span className="font-semibold text-sm truncate">{name}</span>
-          {instrument && (
-            <span className="text-[10px] px-1.5 py-px rounded-full bg-muted text-muted-foreground font-medium shrink-0">
-              {instrument}
-            </span>
-          )}
-        </div>
-        <span className="text-xs text-muted-foreground/60 tabular-nums whitespace-nowrap">
-          {date ? formatKBDate(date) : ""}
-        </span>
-        <span className="text-sm font-bold tabular-nums tracking-tight text-right whitespace-nowrap min-w-[5ch]">
-          {raised != null ? formatAmount(raised) : ""}
-        </span>
-      </div>
-      {/* Line 2: valuation, lead investor, source */}
-      {hasSecondLine && (
-        <div className="flex items-baseline gap-2 text-xs text-muted-foreground mt-0.5">
-          {valuation != null && (
-            <span>at {formatAmount(valuation)} valuation</span>
-          )}
-          {leadInvestor && (
-            <span>Led by <KBRefLink id={leadInvestor} /></span>
-          )}
-          {source && isUrl(source) && (
-            <a
-              href={source}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary/50 hover:text-primary hover:underline transition-colors"
-            >
-              {shortDomain(source)}
-            </a>
-          )}
-        </div>
-      )}
+    <div className="overflow-x-auto border border-border/40 rounded-xl">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-border/50 bg-muted/20">
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Round</th>
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Date</th>
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Raised</th>
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Valuation</th>
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Lead Investor</th>
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => {
+            const name = field(item, "name") ?? titleCase(item.key);
+            const date = field(item, "date");
+            const raised = item.fields.raised;
+            const valuation = item.fields.valuation;
+            const leadInvestor = field(item, "lead_investor");
+            const instrument = field(item, "instrument");
+            const source = field(item, "source");
+
+            return (
+              <tr key={item.key} className="border-b border-border/40 last:border-b-0 even:bg-muted/15">
+                <td className="py-1.5 px-3 align-baseline whitespace-nowrap">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="font-medium">{name}</span>
+                    {instrument && instrument !== "equity" && instrument !== "founding" && (
+                      <span className="text-[10px] px-1.5 py-px rounded-full bg-muted text-muted-foreground font-medium">
+                        {instrument}
+                      </span>
+                    )}
+                  </div>
+                </td>
+                <td className="py-1.5 px-3 align-baseline whitespace-nowrap text-muted-foreground">
+                  {date ? formatKBDate(date) : "\u2014"}
+                </td>
+                <td className="py-1.5 px-3 align-baseline whitespace-nowrap font-mono tabular-nums">
+                  {raised != null ? formatAmount(raised) : <span className="text-muted-foreground">{"\u2014"}</span>}
+                </td>
+                <td className="py-1.5 px-3 align-baseline whitespace-nowrap font-mono tabular-nums">
+                  {valuation != null ? formatAmount(valuation) : <span className="text-muted-foreground">{"\u2014"}</span>}
+                </td>
+                <td className="py-1.5 px-3 align-baseline">
+                  {leadInvestor ? (
+                    // Try rendering as entity ref; falls back to titleCase via KBRefLink
+                    <KBRefLink id={leadInvestor} />
+                  ) : (
+                    <span className="text-muted-foreground">{"\u2014"}</span>
+                  )}
+                </td>
+                <td className="py-1.5 px-3 align-baseline text-center">
+                  <SourceCell source={source} />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -897,11 +908,7 @@ export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
                 count={sortedFundingRounds.length}
                 id="kb-funding-history"
               />
-              <div className="border border-border/40 rounded-xl px-4 bg-card">
-                {sortedFundingRounds.map((item) => (
-                  <FundingRoundRow key={item.key} item={item} />
-                ))}
-              </div>
+              <FundingHistoryTable items={sortedFundingRounds} />
             </>
           )}
 
