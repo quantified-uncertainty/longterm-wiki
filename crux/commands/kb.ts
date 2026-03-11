@@ -20,8 +20,18 @@ import { commands as kbMigrateCommands } from './kb-migrate.ts';
 import { verifyCommand } from './kb-verify.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
-import { loadGraphFull, loadGraph, resolveEntity } from '../lib/kb-loader.ts';
+import { loadGraphFull, loadGraph, resolveEntity, KB_DATA_DIR } from '../lib/kb-loader.ts';
 import type { LoadedKB } from '../lib/kb-loader.ts';
+import {
+  readEntityDocument,
+  appendFact,
+  appendRecord,
+  writeEntityDocument,
+  findEntityFilePath,
+  generateRecordKey,
+  pluralizeRecordType,
+} from '../lib/kb-writer.ts';
+import type { RawFactInput } from '../lib/kb-writer.ts';
 
 interface KBCommandOptions extends BaseOptions {
   type?: string;
@@ -30,6 +40,11 @@ interface KBCommandOptions extends BaseOptions {
   errorsOnly?: boolean;
   'errors-only'?: boolean;
   rule?: string;
+  asOf?: string;
+  'as-of'?: string;
+  source?: string;
+  notes?: string;
+  currency?: string;
 }
 
 // ── show command ────────────────────────────────────────────────────────
@@ -965,6 +980,246 @@ function isUrl(s: string): boolean {
   return s.startsWith('http://') || s.startsWith('https://');
 }
 
+// ── Shared helpers for authoring commands ────────────────────────────────
+
+/**
+ * Resolve a user-provided entity argument to an Entity.
+ * Tries: slug/filename lookup, stableId, case-insensitive name match.
+ */
+export function resolveEntityArg(arg: string, kb: LoadedKB): Entity | undefined {
+  return resolveEntity(arg, kb);
+}
+
+/**
+ * Coerce a string value to the appropriate type for a property.
+ */
+function coerceValue(raw: string, dataType: string, graph: Graph): { ok: true; value: unknown } | { ok: false; error: string } {
+  switch (dataType) {
+    case 'number': {
+      const num = Number(raw);
+      if (isNaN(num)) {
+        return { ok: false, error: `Cannot parse "${raw}" as a number` };
+      }
+      return { ok: true, value: num };
+    }
+    case 'boolean': {
+      const lower = raw.toLowerCase();
+      if (lower === 'true') return { ok: true, value: true };
+      if (lower === 'false') return { ok: true, value: false };
+      return { ok: false, error: `Cannot parse "${raw}" as a boolean (expected "true" or "false")` };
+    }
+    case 'date':
+      return { ok: true, value: raw };
+    case 'ref': {
+      // Validate referenced entity exists
+      const entity = graph.getEntity(raw);
+      if (!entity) {
+        return { ok: false, error: `Referenced entity not found: "${raw}"` };
+      }
+      return { ok: true, value: raw };
+    }
+    default:
+      // text, refs, json — keep as string
+      return { ok: true, value: raw };
+  }
+}
+
+// ── add-fact command ────────────────────────────────────────────────────
+
+async function addFactCommand(
+  args: string[],
+  options: KBCommandOptions,
+): Promise<CommandResult> {
+  const positionalArgs = args.filter((a) => !a.startsWith('--'));
+
+  if (positionalArgs.length < 3) {
+    return {
+      exitCode: 1,
+      output: `Usage: crux kb add-fact <entity> <property> <value> [--asOf=YYYY-MM] [--source=URL] [--notes=TEXT] [--currency=USD]
+
+  Add a fact to a KB entity's YAML file.
+
+Examples:
+  crux kb add-fact anthropic revenue 5e9 --asOf=2025-06 --source=https://example.com
+  crux kb add-fact dario-amodei employed-by mK9pX3rQ7n
+  crux kb add-fact openai headcount 3700 --asOf=2025-01 --notes="Approximate count"`,
+    };
+  }
+
+  const [entityArg, propertyArg, valueArg] = positionalArgs;
+
+  // Load graph
+  const kb = await loadGraphFull();
+  const { graph, filenameMap } = kb;
+
+  // Resolve entity
+  const entity = resolveEntityArg(entityArg, kb);
+  if (!entity) {
+    return {
+      exitCode: 1,
+      output: `Entity not found: "${entityArg}"\n  Try: crux kb search ${entityArg}`,
+    };
+  }
+
+  // Validate property exists
+  const property = graph.getProperty(propertyArg);
+  if (!property) {
+    return {
+      exitCode: 1,
+      output: `Property not found: "${propertyArg}"\n  Try: crux kb properties`,
+    };
+  }
+
+  if (property.computed) {
+    return {
+      exitCode: 1,
+      output: `Property "${propertyArg}" is computed and cannot have facts stored directly.`,
+    };
+  }
+
+  // Coerce value
+  const coerced = coerceValue(valueArg, property.dataType, graph);
+  if (!coerced.ok) {
+    return { exitCode: 1, output: coerced.error };
+  }
+
+  // Find the entity's YAML file
+  const slug = filenameMap.get(entity.id);
+  if (!slug) {
+    return { exitCode: 1, output: `Cannot find filename for entity "${entity.name}" (${entity.id})` };
+  }
+
+  const filePath = findEntityFilePath(slug, KB_DATA_DIR);
+  if (!filePath) {
+    return { exitCode: 1, output: `YAML file not found for entity "${entity.name}" (slug: ${slug})` };
+  }
+
+  // Build fact input
+  const asOf = options.asOf ?? options['as-of'];
+  const factInput: RawFactInput = {
+    property: propertyArg,
+    value: coerced.value,
+    ...(asOf && { asOf }),
+    ...(options.source && { source: String(options.source) }),
+    ...(options.notes && { notes: String(options.notes) }),
+    ...(options.currency && { currency: String(options.currency) }),
+  };
+
+  // Read, modify, write
+  const doc = readEntityDocument(filePath);
+  const factId = appendFact(doc, factInput);
+  writeEntityDocument(filePath, doc);
+
+  return {
+    exitCode: 0,
+    output: `Added fact ${factId} to ${entity.name} (${propertyArg}: ${valueArg})`,
+  };
+}
+
+// ── add-record command ──────────────────────────────────────────────────
+
+async function addRecordCommand(
+  args: string[],
+  options: KBCommandOptions,
+): Promise<CommandResult> {
+  const positionalArgs = args.filter((a) => !a.startsWith('--'));
+
+  if (positionalArgs.length < 2) {
+    return {
+      exitCode: 1,
+      output: `Usage: crux kb add-record <entity> <record-type> [key=value ...] [--asOf=YYYY-MM]
+
+  Add a record entry to a KB entity's YAML file.
+
+Examples:
+  crux kb add-record anthropic funding-round amount=2e9 round=SeriesE lead=mK9pX3rQ7n --asOf=2024-03
+  crux kb add-record dario-amodei career-history organization=mK9pX3rQ7n role=CEO --asOf=2021-01`,
+    };
+  }
+
+  const entityArg = positionalArgs[0];
+  const recordTypeArg = positionalArgs[1];
+  const kvArgs = positionalArgs.slice(2);
+
+  // Load graph
+  const kb = await loadGraphFull();
+  const { graph, filenameMap } = kb;
+
+  // Resolve entity
+  const entity = resolveEntityArg(entityArg, kb);
+  if (!entity) {
+    return {
+      exitCode: 1,
+      output: `Entity not found: "${entityArg}"\n  Try: crux kb search ${entityArg}`,
+    };
+  }
+
+  // Validate record type
+  const recordSchema = graph.getRecordSchema(recordTypeArg);
+  if (!recordSchema) {
+    return {
+      exitCode: 1,
+      output: `Record schema not found: "${recordTypeArg}"\n  Available: ${graph.getAllRecordSchemas().map((s) => s.id).join(', ')}`,
+    };
+  }
+
+  // Validate entity type allows this record schema
+  const typeSchema = graph.getSchema(entity.type);
+  if (typeSchema?.records && !typeSchema.records.includes(recordTypeArg)) {
+    return {
+      exitCode: 1,
+      output: `Entity type "${entity.type}" does not allow record schema "${recordTypeArg}"\n  Allowed: ${typeSchema.records.join(', ')}`,
+    };
+  }
+
+  // Parse key=value pairs
+  const entry: Record<string, unknown> = {};
+  for (const kv of kvArgs) {
+    const eqIdx = kv.indexOf('=');
+    if (eqIdx < 1) {
+      return { exitCode: 1, output: `Invalid key=value pair: "${kv}"` };
+    }
+    const key = kv.slice(0, eqIdx);
+    const val = kv.slice(eqIdx + 1);
+
+    // Try numeric coercion for values that look like numbers
+    const num = Number(val);
+    entry[key] = !isNaN(num) && val.trim() !== '' ? num : val;
+  }
+
+  // Add asOf if provided
+  const asOf = options.asOf ?? options['as-of'];
+  if (asOf) {
+    entry.asOf = asOf;
+  }
+
+  // Find the entity's YAML file
+  const slug = filenameMap.get(entity.id);
+  if (!slug) {
+    return { exitCode: 1, output: `Cannot find filename for entity "${entity.name}" (${entity.id})` };
+  }
+
+  const filePath = findEntityFilePath(slug, KB_DATA_DIR);
+  if (!filePath) {
+    return { exitCode: 1, output: `YAML file not found for entity "${entity.name}" (slug: ${slug})` };
+  }
+
+  // Generate key and determine collection name
+  const recordKey = generateRecordKey();
+  const collectionName = pluralizeRecordType(recordTypeArg);
+
+  // Read, modify, write
+  const doc = readEntityDocument(filePath);
+  appendRecord(doc, collectionName, recordKey, entry);
+  writeEntityDocument(filePath, doc);
+
+  const fieldSummary = kvArgs.length > 0 ? ` (${kvArgs.join(', ')})` : '';
+  return {
+    exitCode: 0,
+    output: `Added record ${recordKey} to ${entity.name} / ${collectionName}${fieldSummary}`,
+  };
+}
+
 // ── Exports ─────────────────────────────────────────────────────────────
 
 export const commands = {
@@ -981,11 +1236,13 @@ export const commands = {
   migrate: kbMigrateCommands.default,
   'sync-sources': syncSourcesCommand,
   verify: verifyCommand,
+  'add-fact': addFactCommand,
+  'add-record': addRecordCommand,
 };
 
 export function getHelp(): string {
   return `
-KB Domain -- Knowledge Base readability and migration tools
+KB Domain -- Knowledge Base readability, authoring, and migration tools
 
 Commands:
   show <entity-id>      Show a single entity with all data, resolving stableIds
@@ -998,6 +1255,8 @@ Commands:
   fact <fact-id>        Show a single fact with full metadata
   stale [days]          List facts older than N days (default: 180)
   needs-update <id>     Show missing and stale data for an entity
+  add-fact <entity> <property> <value>   Add a fact to an entity YAML file
+  add-record <entity> <type> [k=v ...]   Add a record entry to an entity YAML file
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
   verify                Verify KB facts against source URLs using LLM
@@ -1011,6 +1270,10 @@ Options:
   --entity=X            (verify) Verify all facts for one entity
   --fact=X              (verify) Verify a single fact by ID
   --dry-run             (verify) Show what would be checked without calling LLM
+  --asOf=YYYY-MM        (add-fact, add-record) Temporal anchor date
+  --source=URL          (add-fact) Source URL
+  --notes=TEXT           (add-fact) Free-text annotation
+  --currency=USD         (add-fact) ISO 4217 currency code
 
 Examples:
   crux kb show anthropic              Show Anthropic with all facts and items
@@ -1020,6 +1283,8 @@ Examples:
   crux kb stale 90                    Facts older than 90 days
   crux kb needs-update anthropic      What's missing for Anthropic
   crux kb coverage --type=organization Organizations property coverage
+  crux kb add-fact anthropic revenue 5e9 --asOf=2025-06 --source=https://example.com
+  crux kb add-record anthropic funding-round amount=2e9 round=SeriesE --asOf=2024-03
   crux kb sync-sources                Sync source URLs to wiki-server resources
   crux kb verify --entity=anthropic   Verify Anthropic facts against sources
   crux kb verify --dry-run --limit=5  Preview 5 facts that would be checked

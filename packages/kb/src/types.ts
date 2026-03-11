@@ -200,6 +200,8 @@ export interface EntityFile {
   };
   facts?: RawFact[];
   records?: Record<string, Record<string, RawRecordEntry>>;
+  /** File-level source aliases for !src tags. Maps alias → URL. */
+  _sources?: Record<string, string>;
 }
 
 /** Raw record entry as stored in YAML (before normalization) */
