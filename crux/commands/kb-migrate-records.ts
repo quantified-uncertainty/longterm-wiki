@@ -15,6 +15,7 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 import { loadKB } from '../../packages/kb/src/loader.ts';
 import { contentHash } from '../../packages/kb/src/ids.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
+import type { RecordEntry } from '../../packages/kb/src/types.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 
 const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
@@ -76,19 +77,21 @@ interface GrantRow {
   notes: string | null;
 }
 
-function resolveEntitySlug(graph: Graph, entityId: string): string {
+function resolveEntitySlug(graph: Graph, filenameMap: Map<string, string>, entityId: string): string {
   const entity = graph.getEntity(entityId);
-  return entity?.slug ?? entityId;
+  if (!entity) return entityId;
+  return filenameMap.get(entity.id) ?? entityId;
 }
 
 function mapKeyPerson(
   record: RecordEntry,
   graph: Graph,
+  filenameMap: Map<string, string>,
   ownerSlug: string,
 ): PersonnelRow {
   const f = record.fields;
   const personId = f.person
-    ? resolveEntitySlug(graph, String(f.person))
+    ? resolveEntitySlug(graph, filenameMap, String(f.person))
     : record.displayName ?? record.key;
 
   return {
@@ -110,11 +113,12 @@ function mapKeyPerson(
 function mapBoardSeat(
   record: RecordEntry,
   graph: Graph,
+  filenameMap: Map<string, string>,
   ownerSlug: string,
 ): PersonnelRow {
   const f = record.fields;
   const personId = f.member
-    ? resolveEntitySlug(graph, String(f.member))
+    ? resolveEntitySlug(graph, filenameMap, String(f.member))
     : record.displayName ?? record.key;
 
   return {
@@ -135,7 +139,8 @@ function mapBoardSeat(
 
 function mapCareerHistory(
   record: RecordEntry,
-  graph: Graph,
+  _graph: Graph,
+  _filenameMap: Map<string, string>,
   ownerSlug: string,
 ): PersonnelRow {
   const f = record.fields;
@@ -161,6 +166,7 @@ function mapCareerHistory(
 function mapGrant(
   record: RecordEntry,
   _graph: Graph,
+  _filenameMap: Map<string, string>,
   ownerSlug: string,
 ): GrantRow {
   const f = record.fields;
@@ -181,7 +187,7 @@ function mapGrant(
 
 // ── Extract all records ────────────────────────────────────────────────
 
-function extractRecords(graph: Graph): {
+function extractRecords(graph: Graph, filenameMap: Map<string, string>): {
   personnel: PersonnelRow[];
   grants: GrantRow[];
 } {
@@ -189,7 +195,7 @@ function extractRecords(graph: Graph): {
   const grantRows: GrantRow[] = [];
 
   for (const entity of graph.getAllEntities()) {
-    const ownerSlug = entity.slug;
+    const ownerSlug = filenameMap.get(entity.id) ?? entity.id;
     const collections = graph.getRecordCollectionNames(entity.id);
 
     for (const collection of collections) {
@@ -200,13 +206,13 @@ function extractRecords(graph: Graph): {
       const records = graph.getRecords(entity.id, collection);
       for (const record of records) {
         if (collection === 'key-persons') {
-          personnelRows.push(mapKeyPerson(record, graph, ownerSlug));
+          personnelRows.push(mapKeyPerson(record, graph, filenameMap, ownerSlug));
         } else if (collection === 'board-seats') {
-          personnelRows.push(mapBoardSeat(record, graph, ownerSlug));
+          personnelRows.push(mapBoardSeat(record, graph, filenameMap, ownerSlug));
         } else if (collection === 'career-history') {
-          personnelRows.push(mapCareerHistory(record, graph, ownerSlug));
+          personnelRows.push(mapCareerHistory(record, graph, filenameMap, ownerSlug));
         } else if (collection === 'grants') {
-          grantRows.push(mapGrant(record, graph, ownerSlug));
+          grantRows.push(mapGrant(record, graph, filenameMap, ownerSlug));
         }
       }
     }
@@ -218,8 +224,8 @@ function extractRecords(graph: Graph): {
 // ── Stats subcommand ───────────────────────────────────────────────────
 
 async function statsCommand(): Promise<CommandResult> {
-  const { graph } = await loadKB(KB_DATA_DIR);
-  const { personnel, grants } = extractRecords(graph);
+  const { graph, filenameMap } = await loadKB(KB_DATA_DIR);
+  const { personnel, grants } = extractRecords(graph, filenameMap);
 
   const byType: Record<string, number> = {};
   for (const row of personnel) {
@@ -251,8 +257,8 @@ async function statsCommand(): Promise<CommandResult> {
 
 async function syncCommand(options: MigrateOptions): Promise<CommandResult> {
   const dryRun = options.dryRun || options['dry-run'];
-  const { graph } = await loadKB(KB_DATA_DIR);
-  const { personnel, grants } = extractRecords(graph);
+  const { graph, filenameMap } = await loadKB(KB_DATA_DIR);
+  const { personnel, grants } = extractRecords(graph, filenameMap);
 
   console.log(`Found ${personnel.length} personnel records and ${grants.length} grant records`);
 

@@ -948,6 +948,12 @@ async function mergePGRecordsIntoKB(kb) {
 
   if (!kb.records) kb.records = {};
 
+  // Build slug → entityId lookup from the serialized KB data
+  const slugToEntityId = kb.slugToEntityId || {};
+  function resolveKey(slug) {
+    return slugToEntityId[slug] || slug;
+  }
+
   // --- Fetch personnel ---
   try {
     const res = await fetch(`${serverUrl}/api/personnel/all?limit=200`, {
@@ -959,18 +965,18 @@ async function mergePGRecordsIntoKB(kb) {
       const rows = data.personnel || [];
       if (rows.length > 0) {
         // Clear YAML-sourced personnel collections — PG is the authority when available
-        for (const ownerSlug of Object.keys(kb.records)) {
+        for (const entityKey of Object.keys(kb.records)) {
           for (const collection of ['key-persons', 'board-seats', 'career-history']) {
-            if (kb.records[ownerSlug]?.[collection]) {
-              delete kb.records[ownerSlug][collection];
-              if (Object.keys(kb.records[ownerSlug]).length === 0) {
-                delete kb.records[ownerSlug];
+            if (kb.records[entityKey]?.[collection]) {
+              delete kb.records[entityKey][collection];
+              if (Object.keys(kb.records[entityKey]).length === 0) {
+                delete kb.records[entityKey];
               }
             }
           }
         }
 
-        // Populate from PG
+        // Populate from PG (PG stores slugs; records are keyed by entity ID)
         for (const row of rows) {
           let ownerSlug, collectionName;
           if (row.roleType === 'key-person') {
@@ -986,10 +992,11 @@ async function mergePGRecordsIntoKB(kb) {
             continue;
           }
 
-          if (!kb.records[ownerSlug]) kb.records[ownerSlug] = {};
-          if (!kb.records[ownerSlug][collectionName]) kb.records[ownerSlug][collectionName] = [];
+          const entityKey = resolveKey(ownerSlug);
+          if (!kb.records[entityKey]) kb.records[entityKey] = {};
+          if (!kb.records[entityKey][collectionName]) kb.records[entityKey][collectionName] = [];
 
-          kb.records[ownerSlug][collectionName].push(personnelRowToRecordEntry(row));
+          kb.records[entityKey][collectionName].push(personnelRowToRecordEntry(row));
           personnelCount++;
         }
       }
@@ -1011,21 +1018,21 @@ async function mergePGRecordsIntoKB(kb) {
       const rows = data.grants || [];
       if (rows.length > 0) {
         // Clear existing YAML grant collections, replace with PG
-        for (const ownerSlug of Object.keys(kb.records)) {
-          if (kb.records[ownerSlug]?.grants) {
-            delete kb.records[ownerSlug].grants;
-            if (Object.keys(kb.records[ownerSlug]).length === 0) {
-              delete kb.records[ownerSlug];
+        for (const entityKey of Object.keys(kb.records)) {
+          if (kb.records[entityKey]?.grants) {
+            delete kb.records[entityKey].grants;
+            if (Object.keys(kb.records[entityKey]).length === 0) {
+              delete kb.records[entityKey];
             }
           }
         }
 
         for (const row of rows) {
-          const ownerSlug = row.organizationId;
-          if (!kb.records[ownerSlug]) kb.records[ownerSlug] = {};
-          if (!kb.records[ownerSlug].grants) kb.records[ownerSlug].grants = [];
+          const entityKey = resolveKey(row.organizationId);
+          if (!kb.records[entityKey]) kb.records[entityKey] = {};
+          if (!kb.records[entityKey].grants) kb.records[entityKey].grants = [];
 
-          kb.records[ownerSlug].grants.push(grantRowToRecordEntry(row));
+          kb.records[entityKey].grants.push(grantRowToRecordEntry(row));
           grantsCount++;
         }
       }
@@ -1041,6 +1048,8 @@ async function mergePGRecordsIntoKB(kb) {
 
 /**
  * Convert a PG personnel row to the RecordEntry format used by frontend components.
+ * PG stores slugs in personId/organizationId; ownerEntityId should also be the slug
+ * since the merge function handles slug→entityId resolution when keying into kb.records.
  */
 function personnelRowToRecordEntry(row) {
   const fields = {};
