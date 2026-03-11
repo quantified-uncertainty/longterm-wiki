@@ -15,6 +15,22 @@ import {
 } from "./format";
 import { KBRefLink } from "./KBRefLink";
 
+/** Fields that store fractions (0-1) representing percentages. */
+const FRACTION_FIELDS = new Set(["stake", "stake_acquired", "pledge"]);
+
+function isFractionField(fieldName: string, fieldDef?: FieldDef): boolean {
+  if (FRACTION_FIELDS.has(fieldName)) return true;
+  // Check description for "fraction" or "0.8 = 80%" hints
+  if (fieldDef?.description?.includes("= 80%")) return true;
+  return false;
+}
+
+function formatPercent(v: number): string {
+  const pct = v * 100;
+  // Use up to 1 decimal place, drop trailing zero
+  return pct % 1 === 0 ? `${pct}%` : `${pct.toFixed(1)}%`;
+}
+
 interface KBCellValueProps {
   value: unknown;
   fieldName: string;
@@ -55,11 +71,23 @@ export function KBCellValue({ value, fieldName, fieldDef }: KBCellValueProps) {
 
   // Numbers with unit
   if (fieldType === "number" && typeof value === "number") {
+    // Fraction fields (0-1 range) display as percentages
+    if (isFractionField(fieldName, fieldDef) && value >= 0 && value <= 1) {
+      return <span className="tabular-nums">{formatPercent(value)}</span>;
+    }
     return (
       <span className="font-mono text-sm tabular-nums">
         {formatKBNumber(value, fieldDef?.unit)}
       </span>
     );
+  }
+
+  // Array of numbers (ranges like [0.015, 0.025])
+  if (fieldType === "number" && Array.isArray(value) && value.length === 2 && value.every((v) => typeof v === "number")) {
+    if (isFractionField(fieldName, fieldDef)) {
+      return <span className="tabular-nums">{formatPercent(value[0])}&ndash;{formatPercent(value[1])}</span>;
+    }
+    return <span className="tabular-nums">{formatKBNumber(value[0], fieldDef?.unit)}&ndash;{formatKBNumber(value[1], fieldDef?.unit)}</span>;
   }
 
   // Dates

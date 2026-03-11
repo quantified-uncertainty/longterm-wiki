@@ -88,8 +88,11 @@ const DEFAULT_RECORD_COLUMNS: Record<string, string[]> = {
   "key-persons": ["person", "title", "start"],
   products: ["name", "launched", "description"],
   "model-releases": ["name", "released", "description"],
-  "board-seats": ["name", "role", "appointed"],
-  "strategic-partnerships": ["partner", "type", "date"],
+  "board-seats": ["member", "role", "appointed"],
+  "charitable-pledges": ["pledger", "pledge"],
+  "equity-positions": ["holder", "stake"],
+  "investments": ["investor", "round_name", "date", "amount", "stake_acquired", "role"],
+  "strategic-partnerships": ["partner", "type", "date", "investment_amount"],
   "safety-milestones": ["name", "date", "description"],
   "research-areas": ["name", "description", "started"],
   grants: ["name", "amount", "date"],
@@ -182,11 +185,13 @@ function resolveRecordColumns(
   const fieldDefs = schema?.fields;
 
   // Collect explicit endpoint names (e.g. "holder", "pledger", "investor")
-  // These are entity-ref columns stored in item.fields but not in schema.fields
+  // Only include if at least one item actually has the field populated
   const explicitEndpoints: string[] = [];
   if (schema?.endpoints) {
     for (const [name, ep] of Object.entries(schema.endpoints)) {
-      if (!ep.implicit) explicitEndpoints.push(name);
+      if (!ep.implicit && items.some((item) => item.fields[name] != null)) {
+        explicitEndpoints.push(name);
+      }
     }
   }
 
@@ -359,52 +364,47 @@ function FundingRoundRow({ item }: { item: RecordEntry }) {
   const source = field(item, "source");
 
   return (
-    <div className="flex gap-2.5 py-2 border-b border-border/30 last:border-b-0 group/row hover:bg-muted/20 -mx-4 px-4 transition-colors">
-      {/* Timeline dot */}
-      <div className="flex flex-col items-center pt-1.5">
-        <div className="w-2 h-2 rounded-full border-[1.5px] border-primary/40 bg-card shrink-0 group-hover/row:border-primary transition-colors" />
-        <div className="w-px flex-1 bg-border/30 mt-0.5" />
+    <div className="py-1.5 border-b border-border/30 last:border-b-0">
+      <div className="flex items-baseline gap-2 flex-wrap">
+        <span className="font-semibold text-sm">{name}</span>
+        {instrument && (
+          <span className="text-[10px] px-1.5 py-px rounded-full bg-muted text-muted-foreground font-medium">
+            {instrument}
+          </span>
+        )}
+        {date && (
+          <span className="text-xs text-muted-foreground/60">
+            {formatKBDate(date)}
+          </span>
+        )}
+        {raised != null && (
+          <span className="text-sm font-bold tabular-nums tracking-tight">
+            {formatAmount(raised)}
+          </span>
+        )}
+        {valuation != null && (
+          <span className="text-xs text-muted-foreground">
+            at {formatAmount(valuation)} valuation
+          </span>
+        )}
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline gap-2 flex-wrap">
-          <span className="font-semibold text-sm">{name}</span>
-          {instrument && (
-            <span className="text-[10px] px-1.5 py-px rounded-full bg-muted text-muted-foreground font-medium">
-              {instrument}
-            </span>
-          )}
-          {date && (
-            <span className="text-xs text-muted-foreground/60">
-              {formatKBDate(date)}
-            </span>
-          )}
-          {raised != null && (
-            <span className="text-sm font-bold tabular-nums tracking-tight">
-              {formatAmount(raised)}
-            </span>
-          )}
-          {valuation != null && (
-            <span className="text-xs text-muted-foreground">
-              at {formatAmount(valuation)} valuation
-            </span>
-          )}
+      {(leadInvestor || (source && isUrl(source))) && (
+        <div className="flex items-baseline gap-2 text-xs text-muted-foreground">
           {leadInvestor && (
-            <span className="text-xs text-muted-foreground">
-              Led by <KBRefLink id={leadInvestor} />
-            </span>
+            <span>Led by <KBRefLink id={leadInvestor} /></span>
           )}
           {source && isUrl(source) && (
             <a
               href={source}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[10px] text-primary/40 hover:text-primary hover:underline transition-colors"
+              className="text-primary/40 hover:text-primary hover:underline transition-colors"
             >
               {shortDomain(source)}
             </a>
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
