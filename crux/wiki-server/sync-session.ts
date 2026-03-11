@@ -20,7 +20,6 @@ import { fileURLToPath } from 'url';
 import { parse as parseYaml } from 'yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
-import { normalizeDate } from './sync-resources.ts';
 
 const PAGE_ID_RE = /^[a-z0-9][a-z0-9-]*$/;
 
@@ -58,6 +57,10 @@ interface YamlSession {
   reviewed?: boolean;
 }
 
+function normalizeDate(d: string | Date): string {
+  if (d instanceof Date) return d.toISOString().split('T')[0];
+  return String(d);
+}
 
 function normalizePrUrl(pr: unknown): string | null {
   if (pr == null) return null;
@@ -100,7 +103,7 @@ export function parseSessionYaml(filePath: string): SessionApiEntry | null {
     : [];
 
   return {
-    date: normalizeDate(parsed.date) ?? String(parsed.date),
+    date: normalizeDate(parsed.date),
     branch: parsed.branch ? String(parsed.branch) : null,
     title: String(parsed.title),
     summary: parsed.summary ? String(parsed.summary).trim() : null,

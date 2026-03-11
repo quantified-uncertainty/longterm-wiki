@@ -30,7 +30,6 @@ import type {
   AutoUpdateRunResultEntry,
 } from '../lib/wiki-server/auto-update.ts';
 import { waitForHealthy, batchSync } from './sync-common.ts';
-import { normalizeTimestamp } from './sync-resources.ts';
 
 const PROJECT_ROOT = join(import.meta.dirname!, '../..');
 const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
@@ -73,6 +72,15 @@ interface YamlAutoUpdateRun {
 
 // --- Helpers ---
 
+function normalizeTimestamp(d: string | Date): string {
+  if (d instanceof Date) return d.toISOString();
+  const str = String(d);
+  // Already an ISO string
+  if (str.includes('T')) return str;
+  // Just a date — add midnight
+  return str + 'T00:00:00Z';
+}
+
 function toTrigger(raw: string): 'scheduled' | 'manual' {
   return raw === 'scheduled' ? 'scheduled' : 'manual';
 }
@@ -106,8 +114,8 @@ export function parseRunYaml(filePath: string): RecordAutoUpdateRunInput | null 
   return {
     date: parsed.date
       ? (parsed.date instanceof Date ? parsed.date.toISOString().split('T')[0] : String(parsed.date))
-      : (normalizeTimestamp(parsed.startedAt) ?? String(parsed.startedAt)).split('T')[0],
-    startedAt: normalizeTimestamp(parsed.startedAt) ?? String(parsed.startedAt),
+      : normalizeTimestamp(parsed.startedAt).split('T')[0],
+    startedAt: normalizeTimestamp(parsed.startedAt),
     completedAt: parsed.completedAt ? normalizeTimestamp(parsed.completedAt) : null,
     trigger: toTrigger(String(parsed.trigger || 'manual')),
     budgetLimit: parsed.budget?.limit ?? null,

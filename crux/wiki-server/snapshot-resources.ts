@@ -5,6 +5,12 @@
  * a snapshot JSON file. This snapshot serves as a fallback for builds
  * when the wiki-server is unavailable.
  *
+ * The snapshot is intentionally trimmed: large text fields (summary,
+ * review, abstract, key_points) are excluded to keep the git-tracked
+ * file small (~1MB vs ~2.7MB). These fields are available from PG in
+ * normal builds; the snapshot only needs structural/metadata fields
+ * for the build to succeed. See #2073 for full discussion.
+ *
  * Usage:
  *   pnpm crux wiki-server snapshot-resources
  *   pnpm crux wiki-server snapshot-resources --dry-run
@@ -113,7 +119,9 @@ async function main() {
     );
   }
 
-  // Transform to YAML-compatible snake_case format
+  // Transform to snake_case format, excluding large text fields to keep
+  // the git-tracked snapshot small. Omitted: summary, review, abstract,
+  // key_points (~45% of full size). These are available from PG at build time.
   const snapshot = allResources.map((r) => {
     const entry: Record<string, unknown> = {
       id: r.id,
@@ -121,10 +129,6 @@ async function main() {
     };
     if (r.title) entry.title = r.title;
     if (r.type) entry.type = r.type;
-    if (r.summary) entry.summary = r.summary;
-    if (r.review) entry.review = r.review;
-    if (r.abstract) entry.abstract = r.abstract;
-    if (r.keyPoints) entry.key_points = r.keyPoints;
     if (r.publicationId) entry.publication_id = r.publicationId;
     if (r.authors) entry.authors = r.authors;
     if (r.publishedDate) entry.published_date = r.publishedDate;
@@ -132,7 +136,6 @@ async function main() {
     if (r.localFilename) entry.local_filename = r.localFilename;
     if (r.credibilityOverride != null) entry.credibility_override = r.credibilityOverride;
     if (r.fetchedAt) entry.fetched_at = r.fetchedAt;
-    if (r.contentHash) entry.content_hash = r.contentHash;
     if (r.stableId != null) entry.stable_id = r.stableId;
     const citedBy = citationsIndex[r.id];
     if (citedBy && citedBy.length > 0) entry.cited_by = citedBy;
