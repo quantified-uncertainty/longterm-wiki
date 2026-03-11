@@ -67,11 +67,11 @@ const CATEGORY_ORDER: Record<string, number> = {
   other: 99,
 };
 
-/** Properties to show as hero stat cards by entity type. */
+/** Properties to show as hero stat cards by entity type (KB entity types). */
 const HERO_STAT_PROPERTIES: Record<string, string[]> = {
   organization: ["revenue", "valuation", "headcount", "total-funding", "founded-date"],
   person: ["employed-by", "role", "born-year"],
-  "ai-model": ["developed-by", "parameter-count", "context-window", "model-release-date"],
+  project: ["developed-by", "parameter-count", "context-window", "model-release-date"],
 };
 
 /** Collections that get dedicated visual renderers. */
