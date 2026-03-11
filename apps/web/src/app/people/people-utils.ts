@@ -3,64 +3,67 @@
  */
 import {
   getKBEntities,
-  getKBEntity,
   getKBRecords,
-  resolveKBSlug,
-  getKBSlugMap,
   getKBEntitySlug,
 } from "@/data/kb";
+import {
+  resolveEntityBySlug,
+  getEntitySlugs,
+} from "@/lib/directory-utils";
 import type { Entity, RecordEntry } from "@longterm-wiki/kb";
 
-/**
- * Resolve a URL slug (e.g., "dario-amodei") to a KB person entity.
- */
-export function resolvePersonBySlug(slug: string): Entity | undefined {
-  const entityId = resolveKBSlug(slug);
-  if (!entityId) return undefined;
-  const entity = getKBEntity(entityId);
-  if (!entity || entity.type !== "person") return undefined;
-  return entity;
-}
+// Re-export generic utilities with people-specific signatures
+export const resolvePersonBySlug = (slug: string) =>
+  resolveEntityBySlug(slug, "person");
 
-/**
- * Get all person slugs for generateStaticParams.
- */
-export function getPersonSlugs(): string[] {
-  const slugMap = getKBSlugMap();
+export const getPersonSlugs = () => getEntitySlugs("person");
+
+/** Lazy-built index: personRef → Array<{ org, record }> across all organizations. */
+let orgRolesIndex: Map<string, Array<{ org: Entity; record: RecordEntry }>> | undefined;
+
+function buildOrgRolesIndex(): Map<string, Array<{ org: Entity; record: RecordEntry }>> {
+  const index = new Map<string, Array<{ org: Entity; record: RecordEntry }>>();
   const entities = getKBEntities();
-  const personIds = new Set(
-    entities.filter((e) => e.type === "person").map((e) => e.id),
-  );
-
-  return Object.entries(slugMap)
-    .filter(([, id]) => personIds.has(id))
-    .map(([slug]) => slug);
-}
-
-/**
- * Find all key-person records across all organizations that reference this person.
- * Returns records along with the owning organization entity.
- *
- * Record fields use slugs (e.g., "dario-amodei"), not entity IDs,
- * so we check against both.
- */
-export function getOrgRolesForPerson(
-  personEntityId: string,
-): Array<{ org: Entity; record: RecordEntry }> {
-  const personSlug = getKBEntitySlug(personEntityId);
-  const entities = getKBEntities();
-  const results: Array<{ org: Entity; record: RecordEntry }> = [];
 
   for (const entity of entities) {
     if (entity.type !== "organization") continue;
     const keyPersons = getKBRecords(entity.id, "key-persons");
     for (const record of keyPersons) {
       const personField = record.fields.person;
-      if (personField === personEntityId || personField === personSlug) {
-        results.push({ org: entity, record });
-      }
+      if (typeof personField !== "string") continue;
+      const existing = index.get(personField) ?? [];
+      existing.push({ org: entity, record });
+      index.set(personField, existing);
     }
   }
 
+  return index;
+}
+
+/**
+ * Find all key-person records across all organizations that reference this person.
+ * Uses a lazy-built index for O(1) lookups after initial build.
+ */
+export function getOrgRolesForPerson(
+  personEntityId: string,
+): Array<{ org: Entity; record: RecordEntry }> {
+  if (!orgRolesIndex) {
+    orgRolesIndex = buildOrgRolesIndex();
+  }
+
+  const personSlug = getKBEntitySlug(personEntityId);
+  const byId = orgRolesIndex.get(personEntityId) ?? [];
+  const bySlug = personSlug ? (orgRolesIndex.get(personSlug) ?? []) : [];
+
+  // Deduplicate in case both match the same record
+  const seen = new Set<string>();
+  const results: Array<{ org: Entity; record: RecordEntry }> = [];
+  for (const entry of [...byId, ...bySlug]) {
+    const key = `${entry.org.id}-${entry.record.key}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      results.push(entry);
+    }
+  }
   return results;
 }

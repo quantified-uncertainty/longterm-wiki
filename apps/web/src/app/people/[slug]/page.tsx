@@ -10,12 +10,24 @@ import {
   getKBFacts,
   getKBLatest,
   getKBRecords,
-  getKBEntity,
   getKBEntitySlug,
-  resolveKBSlug,
 } from "@/data/kb";
+import {
+  resolveEntityRef,
+  formatAmount,
+  formatDateRange,
+  getEntityWikiHref,
+  fieldStr,
+} from "@/lib/directory-utils";
+import {
+  ProfileStatCard,
+  Breadcrumbs,
+  CurrentBadge,
+  FounderBadge,
+  SourceLink,
+  DirectoryEntityLink,
+} from "@/components/directory";
 import { formatKBDate } from "@/components/wiki/kb/format";
-import type { RecordEntry } from "@longterm-wiki/kb";
 
 export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
@@ -34,84 +46,6 @@ export async function generateMetadata({
       ? `Profile for ${entity.name} — roles, career history, and affiliations.`
       : undefined,
   };
-}
-
-function formatAmount(value: unknown): string | null {
-  if (value == null) return null;
-  const num = typeof value === "number" ? value : Number(value);
-  if (isNaN(num)) return String(value);
-  if (num >= 1e12) return `$${(num / 1e12).toFixed(1)}T`;
-  if (num >= 1e9) return `$${(num / 1e9).toFixed(1)}B`;
-  if (num >= 1e6) return `$${(num / 1e6).toFixed(0)}M`;
-  return `$${num.toLocaleString()}`;
-}
-
-function isUrl(s: string): boolean {
-  return s.startsWith("http://") || s.startsWith("https://");
-}
-
-function shortDomain(url: string): string {
-  try {
-    return new URL(url).hostname.replace("www.", "");
-  } catch {
-    return url;
-  }
-}
-
-function StatCard({
-  label,
-  value,
-  sub,
-  href,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  href?: string;
-}) {
-  const content = (
-    <>
-      <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1.5">
-        {label}
-      </div>
-      <div className="text-xl font-bold tabular-nums tracking-tight">
-        {value}
-      </div>
-      {sub && (
-        <div className="text-[10px] text-muted-foreground/50 mt-1">{sub}</div>
-      )}
-    </>
-  );
-
-  if (href) {
-    return (
-      <Link
-        href={href}
-        className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4 hover:border-primary/30 hover:shadow-md transition-all"
-      >
-        {content}
-      </Link>
-    );
-  }
-
-  return (
-    <div className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4">
-      {content}
-    </div>
-  );
-}
-
-/** Resolve an org reference (slug or entity ID) to name + entity. */
-function resolveOrg(ref: unknown): { name: string; id: string; slug: string | undefined } | null {
-  if (typeof ref !== "string" || !ref) return null;
-  // Try as entity ID first, then as slug
-  let entity = getKBEntity(ref);
-  if (!entity) {
-    const entityId = resolveKBSlug(ref);
-    if (entityId) entity = getKBEntity(entityId);
-  }
-  if (!entity) return { name: ref, id: ref, slug: undefined };
-  return { name: entity.name, id: entity.id, slug: getKBEntitySlug(entity.id) ?? undefined };
 }
 
 export default async function PersonProfilePage({
@@ -148,7 +82,7 @@ export default async function PersonProfilePage({
   // Resolve employer reference
   const employer =
     employedByFact?.value.type === "ref"
-      ? resolveOrg(employedByFact.value.value)
+      ? resolveEntityRef(employedByFact.value.value)
       : null;
 
   // Sort career history by start date (most recent first)
@@ -175,11 +109,7 @@ export default async function PersonProfilePage({
     return sb.localeCompare(sa);
   });
 
-  const wikiHref = entity.numericId
-    ? `/wiki/${entity.numericId}`
-    : entity.wikiPageId
-      ? `/wiki/${entity.wikiPageId}`
-      : null;
+  const wikiHref = getEntityWikiHref(entity);
 
   // Build stat cards
   const stats: Array<{
@@ -193,11 +123,12 @@ export default async function PersonProfilePage({
     stats.push({ label: "Current Role", value: roleFact.value.value });
   }
   if (employer) {
-    const orgSlug = employer.slug;
     stats.push({
       label: "Organization",
       value: employer.name,
-      href: orgSlug ? `/organizations/${orgSlug}` : `/kb/entity/${employer.id}`,
+      href: employer.slug
+        ? `/organizations/${employer.slug}`
+        : `/kb/entity/${employer.id}`,
     });
   }
   if (bornYearFact?.value.type === "number") {
@@ -229,14 +160,12 @@ export default async function PersonProfilePage({
 
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
-      {/* Breadcrumbs */}
-      <nav className="text-sm text-muted-foreground mb-4">
-        <Link href="/people" className="hover:underline">
-          People
-        </Link>
-        <span className="mx-1.5">/</span>
-        <span>{entity.name}</span>
-      </nav>
+      <Breadcrumbs
+        items={[
+          { label: "People", href: "/people" },
+          { label: entity.name },
+        ]}
+      />
 
       {/* Header */}
       <div className="flex items-start gap-5 mb-8">
@@ -285,7 +214,7 @@ export default async function PersonProfilePage({
       {stats.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {stats.map((s) => (
-            <StatCard key={s.label} {...s} />
+            <ProfileStatCard key={s.label} {...s} />
           ))}
         </div>
       )}
@@ -304,22 +233,12 @@ export default async function PersonProfilePage({
               </h2>
               <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
                 {sortedCareer.map((entry) => {
-                  const org = resolveOrg(entry.fields.organization);
-                  const title = entry.fields.title
-                    ? String(entry.fields.title)
-                    : null;
-                  const start = entry.fields.start
-                    ? String(entry.fields.start)
-                    : null;
-                  const end = entry.fields.end
-                    ? String(entry.fields.end)
-                    : null;
-                  const notes = entry.fields.notes
-                    ? String(entry.fields.notes)
-                    : null;
-                  const source = entry.fields.source
-                    ? String(entry.fields.source)
-                    : null;
+                  const org = resolveEntityRef(entry.fields.organization);
+                  const title = fieldStr(entry.fields, "title");
+                  const start = fieldStr(entry.fields, "start");
+                  const end = fieldStr(entry.fields, "end");
+                  const notes = fieldStr(entry.fields, "notes");
+                  const source = fieldStr(entry.fields, "source");
 
                   return (
                     <div
@@ -344,49 +263,26 @@ export default async function PersonProfilePage({
                               {title}
                             </span>
                           )}
-                          {!end && (
-                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                              Current
-                            </span>
-                          )}
+                          {!end && <CurrentBadge />}
                         </div>
                         {org && (
                           <div className="text-sm mt-0.5">
-                            {org.slug ? (
-                              <Link
-                                href={`/organizations/${org.slug}`}
-                                className="text-primary hover:underline font-medium"
-                              >
-                                {org.name}
-                              </Link>
-                            ) : (
-                              <span className="font-medium">{org.name}</span>
-                            )}
+                            <DirectoryEntityLink
+                              entity={org}
+                              basePath="/organizations"
+                              className="text-primary hover:underline font-medium"
+                            />
                           </div>
                         )}
                         <div className="text-[10px] text-muted-foreground/60 mt-1">
-                          {start && formatKBDate(start)}
-                          {end
-                            ? ` \u2013 ${formatKBDate(end)}`
-                            : start
-                              ? " \u2013 present"
-                              : ""}
+                          {formatDateRange(start, end)}
                         </div>
                         {notes && (
                           <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
                             {notes}
                           </p>
                         )}
-                        {source && isUrl(source) && (
-                          <a
-                            href={source}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] text-primary/50 hover:text-primary hover:underline mt-1 inline-block transition-colors"
-                          >
-                            {shortDomain(source)}
-                          </a>
-                        )}
+                        <SourceLink source={source} />
                       </div>
                     </div>
                   );
@@ -406,14 +302,10 @@ export default async function PersonProfilePage({
               </h2>
               <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
                 {sortedPubs.map((pub) => {
-                  const title = pub.fields.title
-                    ? String(pub.fields.title)
-                    : pub.key;
+                  const title = fieldStr(pub.fields, "title") ?? pub.key;
                   const year = pub.fields.year ? Number(pub.fields.year) : null;
-                  const url = pub.fields.url ? String(pub.fields.url) : null;
-                  const notes = pub.fields.notes
-                    ? String(pub.fields.notes)
-                    : null;
+                  const url = fieldStr(pub.fields, "url");
+                  const notes = fieldStr(pub.fields, "notes");
 
                   return (
                     <div key={pub.key} className="px-5 py-3">
@@ -474,15 +366,9 @@ export default async function PersonProfilePage({
               </h2>
               <div className="border border-border/60 rounded-xl bg-card">
                 {sortedOrgRoles.map(({ org, record }) => {
-                  const title = record.fields.title
-                    ? String(record.fields.title)
-                    : null;
-                  const start = record.fields.start
-                    ? String(record.fields.start)
-                    : null;
-                  const end = record.fields.end
-                    ? String(record.fields.end)
-                    : null;
+                  const title = fieldStr(record.fields, "title");
+                  const start = fieldStr(record.fields, "start");
+                  const end = fieldStr(record.fields, "end");
                   const isFounder = !!record.fields.is_founder;
                   const orgSlug = getKBEntitySlug(org.id);
 
@@ -504,16 +390,8 @@ export default async function PersonProfilePage({
                             {org.name}
                           </span>
                         )}
-                        {isFounder && (
-                          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-                            Founder
-                          </span>
-                        )}
-                        {!end && (
-                          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                            Current
-                          </span>
-                        )}
+                        {isFounder && <FounderBadge />}
+                        {!end && <CurrentBadge />}
                       </div>
                       {title && (
                         <div className="text-xs text-muted-foreground mt-0.5">
@@ -521,12 +399,7 @@ export default async function PersonProfilePage({
                         </div>
                       )}
                       <div className="text-[10px] text-muted-foreground/50 mt-1">
-                        {start && formatKBDate(start)}
-                        {end
-                          ? ` \u2013 ${formatKBDate(end)}`
-                          : start
-                            ? " \u2013 present"
-                            : ""}
+                        {formatDateRange(start, end)}
                       </div>
                     </div>
                   );
@@ -546,16 +419,10 @@ export default async function PersonProfilePage({
               </h2>
               <div className="border border-border/60 rounded-xl bg-card">
                 {boardSeats.map((seat) => {
-                  const org = resolveOrg(seat.fields.organization);
-                  const role = seat.fields.role
-                    ? String(seat.fields.role)
-                    : "Board Member";
-                  const start = seat.fields.start
-                    ? String(seat.fields.start)
-                    : null;
-                  const end = seat.fields.end
-                    ? String(seat.fields.end)
-                    : null;
+                  const org = resolveEntityRef(seat.fields.organization);
+                  const role = fieldStr(seat.fields, "role") ?? "Board Member";
+                  const start = fieldStr(seat.fields, "start");
+                  const end = fieldStr(seat.fields, "end");
 
                   return (
                     <div
@@ -563,29 +430,17 @@ export default async function PersonProfilePage({
                       className="px-4 py-3 border-b border-border/40 last:border-b-0"
                     >
                       <div className="flex items-baseline gap-2">
-                        {org?.slug ? (
-                          <Link
-                            href={`/organizations/${org.slug}`}
-                            className="font-semibold text-sm hover:text-primary transition-colors"
-                          >
-                            {org.name}
-                          </Link>
-                        ) : (
-                          <span className="font-semibold text-sm">
-                            {org?.name ?? seat.key}
-                          </span>
-                        )}
+                        <DirectoryEntityLink
+                          entity={org}
+                          basePath="/organizations"
+                          className="font-semibold text-sm hover:text-primary transition-colors"
+                        />
                         <span className="text-xs text-muted-foreground">
                           {role}
                         </span>
                       </div>
                       <div className="text-[10px] text-muted-foreground/50 mt-1">
-                        {start && formatKBDate(start)}
-                        {end
-                          ? ` \u2013 ${formatKBDate(end)}`
-                          : start
-                            ? " \u2013 present"
-                            : ""}
+                        {formatDateRange(start, end)}
                       </div>
                     </div>
                   );

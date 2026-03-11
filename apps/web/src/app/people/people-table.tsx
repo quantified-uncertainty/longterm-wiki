@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { SortHeader } from "@/components/directory/SortHeader";
+import { formatCompactCurrency } from "@/lib/format-compact";
 
 export interface PersonRow {
   id: string;
@@ -17,7 +19,6 @@ export interface PersonRow {
 
   bornYear: number | null;
 
-  netWorth: string | null;
   netWorthNum: number | null;
 
   careerHistoryCount: number;
@@ -32,50 +33,6 @@ type SortKey =
   | "careerHistory";
 
 type SortDir = "asc" | "desc";
-
-function formatCompactCurrency(n: number | null): string {
-  if (n == null) return "";
-  if (n >= 1e12) return `$${(n / 1e12).toFixed(1)}T`;
-  if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
-  if (n >= 1e6) return `$${(n / 1e6).toFixed(0)}M`;
-  if (n >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
-  return `$${n.toLocaleString()}`;
-}
-
-function SortHeader({
-  label,
-  sortKey,
-  currentSort,
-  currentDir,
-  onSort,
-  className,
-}: {
-  label: string;
-  sortKey: SortKey;
-  currentSort: SortKey;
-  currentDir: SortDir;
-  onSort: (key: SortKey) => void;
-  className?: string;
-}) {
-  const isActive = currentSort === sortKey;
-  return (
-    <th
-      className={`py-2.5 px-3 font-medium cursor-pointer select-none hover:text-foreground transition-colors ${
-        isActive ? "text-foreground" : ""
-      } ${className ?? ""}`}
-      onClick={() => onSort(sortKey)}
-    >
-      <span className="inline-flex items-center gap-1">
-        {label}
-        {isActive && (
-          <span className="text-[10px]">
-            {currentDir === "asc" ? "\u25B2" : "\u25BC"}
-          </span>
-        )}
-      </span>
-    </th>
-  );
-}
 
 export function PeopleTable({ rows }: { rows: PersonRow[] }) {
   const [search, setSearch] = useState("");

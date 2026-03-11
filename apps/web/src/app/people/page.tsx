@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getKBEntities, getKBLatest, getKBRecords, getKBEntity, getKBEntitySlug } from "@/data/kb";
-import { formatKBFactValue } from "@/components/wiki/kb/format";
-import type { Fact, Property } from "@longterm-wiki/kb";
+import type { Fact } from "@longterm-wiki/kb";
+import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
 
 export const metadata: Metadata = {
@@ -10,23 +10,12 @@ export const metadata: Metadata = {
     "Directory of key people in AI safety, frontier AI research, policy, and effective altruism with roles, affiliations, and key metrics.",
 };
 
-/** Extract a numeric value from a fact for sorting. */
 function numericValue(fact: Fact | undefined): number | null {
   if (!fact) return null;
   if (fact.value.type === "number") return fact.value.value;
   return null;
 }
 
-/** Format a fact value for display, returning null if no fact. */
-function formatFact(
-  fact: Fact | undefined,
-  property?: Partial<Property>,
-): string | null {
-  if (!fact) return null;
-  return formatKBFactValue(fact, property?.unit, property?.display);
-}
-
-/** Resolve a ref-type fact value to entity name + id. */
 function resolveRef(fact: Fact | undefined): { id: string; name: string } | null {
   if (!fact) return null;
   if (fact.value.type !== "ref") return null;
@@ -47,7 +36,6 @@ export default function PeoplePage() {
     const netWorthFact = getKBLatest(entity.id, "net-worth");
 
     const careerHistory = getKBRecords(entity.id, "career-history");
-
     const employer = resolveRef(employedByFact);
 
     return {
@@ -63,15 +51,12 @@ export default function PeoplePage() {
       employerName: employer?.name ?? null,
 
       bornYear: numericValue(bornYearFact),
-
-      netWorth: formatFact(netWorthFact, { unit: "USD", display: { divisor: 1e9, prefix: "$", suffix: "B" } }),
       netWorthNum: numericValue(netWorthFact),
 
       careerHistoryCount: careerHistory.length,
     };
   });
 
-  // Compute summary stats
   const withRole = rows.filter((r) => r.role != null).length;
   const withEmployer = rows.filter((r) => r.employerName != null).length;
   const withBornYear = rows.filter((r) => r.bornYear != null).length;
@@ -102,17 +87,7 @@ export default function PeoplePage() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
         {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4"
-          >
-            <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1">
-              {stat.label}
-            </div>
-            <div className="text-2xl font-bold tabular-nums tracking-tight">
-              {stat.value}
-            </div>
-          </div>
+          <ProfileStatCard key={stat.label} label={stat.label} value={stat.value} />
         ))}
       </div>
 
