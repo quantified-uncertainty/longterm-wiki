@@ -990,6 +990,32 @@ export function resolveEntityArg(arg: string, kb: LoadedKB): Entity | undefined 
   return resolveEntity(arg, kb);
 }
 
+/** Shared entity + file resolution for authoring commands. */
+async function resolveEntityFile(entityArg: string): Promise<
+  | { ok: true; entity: Entity; graph: Graph; filePath: string; filenameMap: Map<string, string> }
+  | { ok: false; result: CommandResult }
+> {
+  const kb = await loadGraphFull();
+  const { graph, filenameMap } = kb;
+
+  const entity = resolveEntityArg(entityArg, kb);
+  if (!entity) {
+    return { ok: false, result: { exitCode: 1, output: `Entity not found: "${entityArg}"\n  Try: crux kb search ${entityArg}` } };
+  }
+
+  const slug = filenameMap.get(entity.id);
+  if (!slug) {
+    return { ok: false, result: { exitCode: 1, output: `Cannot find filename for entity "${entity.name}" (${entity.id})` } };
+  }
+
+  const filePath = findEntityFilePath(slug, KB_DATA_DIR);
+  if (!filePath) {
+    return { ok: false, result: { exitCode: 1, output: `YAML file not found for entity "${entity.name}" (slug: ${slug})` } };
+  }
+
+  return { ok: true, entity, graph, filePath, filenameMap };
+}
+
 /**
  * Coerce a string value to the appropriate type for a property.
  */
@@ -1048,18 +1074,9 @@ Examples:
 
   const [entityArg, propertyArg, valueArg] = positionalArgs;
 
-  // Load graph
-  const kb = await loadGraphFull();
-  const { graph, filenameMap } = kb;
-
-  // Resolve entity
-  const entity = resolveEntityArg(entityArg, kb);
-  if (!entity) {
-    return {
-      exitCode: 1,
-      output: `Entity not found: "${entityArg}"\n  Try: crux kb search ${entityArg}`,
-    };
-  }
+  const resolved = await resolveEntityFile(entityArg);
+  if (!resolved.ok) return resolved.result;
+  const { entity, graph, filePath } = resolved;
 
   // Validate property exists
   const property = graph.getProperty(propertyArg);
@@ -1081,17 +1098,6 @@ Examples:
   const coerced = coerceValue(valueArg, property.dataType, graph);
   if (!coerced.ok) {
     return { exitCode: 1, output: coerced.error };
-  }
-
-  // Find the entity's YAML file
-  const slug = filenameMap.get(entity.id);
-  if (!slug) {
-    return { exitCode: 1, output: `Cannot find filename for entity "${entity.name}" (${entity.id})` };
-  }
-
-  const filePath = findEntityFilePath(slug, KB_DATA_DIR);
-  if (!filePath) {
-    return { exitCode: 1, output: `YAML file not found for entity "${entity.name}" (slug: ${slug})` };
   }
 
   // Build fact input
@@ -1141,18 +1147,9 @@ Examples:
   const recordTypeArg = positionalArgs[1];
   const kvArgs = positionalArgs.slice(2);
 
-  // Load graph
-  const kb = await loadGraphFull();
-  const { graph, filenameMap } = kb;
-
-  // Resolve entity
-  const entity = resolveEntityArg(entityArg, kb);
-  if (!entity) {
-    return {
-      exitCode: 1,
-      output: `Entity not found: "${entityArg}"\n  Try: crux kb search ${entityArg}`,
-    };
-  }
+  const resolved = await resolveEntityFile(entityArg);
+  if (!resolved.ok) return resolved.result;
+  const { entity, graph, filePath } = resolved;
 
   // Validate record type
   const recordSchema = graph.getRecordSchema(recordTypeArg);
@@ -1191,17 +1188,6 @@ Examples:
   const asOf = options.asOf ?? options['as-of'];
   if (asOf) {
     entry.asOf = asOf;
-  }
-
-  // Find the entity's YAML file
-  const slug = filenameMap.get(entity.id);
-  if (!slug) {
-    return { exitCode: 1, output: `Cannot find filename for entity "${entity.name}" (${entity.id})` };
-  }
-
-  const filePath = findEntityFilePath(slug, KB_DATA_DIR);
-  if (!filePath) {
-    return { exitCode: 1, output: `YAML file not found for entity "${entity.name}" (slug: ${slug})` };
   }
 
   // Generate key and determine collection name

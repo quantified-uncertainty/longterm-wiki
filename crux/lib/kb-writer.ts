@@ -8,7 +8,7 @@
  */
 
 import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join } from 'node:path';
 import { Document, parseDocument, isSeq, isMap } from 'yaml';
 import type { ScalarTag, Scalar } from 'yaml';
 import { generateFactId, generateId } from '../../packages/kb/src/ids.ts';
@@ -16,52 +16,20 @@ import { generateFactId, generateId } from '../../packages/kb/src/ids.ts';
 // ── Custom YAML tags (recreated for parseDocument compatibility) ──────
 
 /**
- * Custom YAML tag definitions matching those in packages/kb/src/loader.ts.
- * We recreate them here rather than importing the marker classes because
- * parseDocument needs ScalarTag[] for the customTags option, and we want
- * to preserve !ref, !date, !src tags as-is during round-trip editing.
+ * Passthrough ScalarTag for round-trip editing: resolves to the raw string,
+ * never auto-identifies during writing, and stringifies as-is.
+ * Matches tags in packages/kb/src/loader.ts but without marker classes.
  */
-const refTag: ScalarTag = {
-  tag: '!ref',
-  resolve(str: string): string {
-    // During round-trip editing we keep the raw string value
-    return str;
-  },
-  identify(): boolean {
-    return false; // Never auto-identify during writing
-  },
-  stringify(item: Scalar): string {
-    return `${item.value}`;
-  },
-};
+function passthroughTag(tagName: string): ScalarTag {
+  return {
+    tag: tagName,
+    resolve(str: string): string { return str; },
+    identify(): boolean { return false; },
+    stringify(item: Scalar): string { return `${item.value}`; },
+  };
+}
 
-const dateTag: ScalarTag = {
-  tag: '!date',
-  resolve(str: string): string {
-    return str;
-  },
-  identify(): boolean {
-    return false;
-  },
-  stringify(item: Scalar): string {
-    return `${item.value}`;
-  },
-};
-
-const srcTag: ScalarTag = {
-  tag: '!src',
-  resolve(str: string): string {
-    return str;
-  },
-  identify(): boolean {
-    return false;
-  },
-  stringify(item: Scalar): string {
-    return `${item.value}`;
-  },
-};
-
-const WRITER_CUSTOM_TAGS = [refTag, dateTag, srcTag];
+const WRITER_CUSTOM_TAGS = [passthroughTag('!ref'), passthroughTag('!date'), passthroughTag('!src')];
 
 // ── Public types ──────────────────────────────────────────────────────
 
