@@ -79,7 +79,7 @@ export interface SyncResource {
 
 // --- Helpers ---
 
-function normalizeDate(d: string | Date | undefined): string | null {
+export function normalizeDate(d: string | Date | undefined): string | null {
   if (!d) return null;
   if (d instanceof Date) return d.toISOString().split("T")[0];
   const dateStr = String(d).split(" ")[0];
@@ -87,7 +87,7 @@ function normalizeDate(d: string | Date | undefined): string | null {
   return null;
 }
 
-function normalizeTimestamp(d: string | Date | undefined): string | null {
+export function normalizeTimestamp(d: string | Date | undefined): string | null {
   if (!d) return null;
   if (d instanceof Date) return d.toISOString();
   const str = String(d);

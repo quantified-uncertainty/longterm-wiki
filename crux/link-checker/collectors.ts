@@ -87,7 +87,7 @@ function extractUrlsFromContent(body: string): Array<{ url: string; line: number
 
 // ── Source Collectors ─────────────────────────────────────────────────────────
 
-/** Extract URLs from resource YAML files (data/resources/*.yaml). */
+/** Extract URLs from resources (PG-native, loaded via snapshot fallback). */
 export function collectResourceUrls(): UrlEntry[] {
   const entries = new Map<string, UrlEntry>();
 
@@ -98,7 +98,7 @@ export function collectResourceUrls(): UrlEntry[] {
     if (!url.startsWith('http')) continue;
 
     const source: UrlSource = {
-      file: `data/resources/${r._sourceFile || 'unknown'}.yaml`,
+      file: `resource:${r.id}`,
       context: r.title,
     };
 

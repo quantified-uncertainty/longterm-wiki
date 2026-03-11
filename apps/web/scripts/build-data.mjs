@@ -1526,7 +1526,7 @@ async function main() {
     console.log(`  ${key}: ${countEntries(data)} entries`);
   }
 
-  // Load resources: PG → snapshot → YAML (fallback chain)
+  // Load resources: PG → snapshot (fallback chain, PG-native since R6)
   if (!CONTENT_ONLY) {
     const pgResources = await fetchResourcesFromPG();
     if (pgResources !== null) {
@@ -1549,13 +1549,31 @@ async function main() {
         }
       }
       if (!snapshotLoaded) {
-        database.resources = loadYamlDir('resources');
-        console.log(`  resources: ${countEntries(database.resources)} loaded from YAML (PG + snapshot unavailable)`);
+        database.resources = [];
+        console.warn(`  resources: 0 loaded (PG + snapshot unavailable)`);
       }
     }
   } else {
-    database.resources = loadYamlDir('resources');
-    console.log(`  resources: ${countEntries(database.resources)} entries (YAML, content-only mode)`);
+    // Content-only mode: load from snapshot
+    const snapshotPath = join(DATA_DIR, 'resources-snapshot.json');
+    if (existsSync(snapshotPath)) {
+      try {
+        const snapshotData = JSON.parse(readFileSync(snapshotPath, 'utf-8'));
+        if (Array.isArray(snapshotData)) {
+          database.resources = snapshotData;
+          console.log(`  resources: ${snapshotData.length} entries (snapshot, content-only mode)`);
+        } else {
+          database.resources = [];
+          console.warn(`  resources: 0 (snapshot not an array, content-only mode)`);
+        }
+      } catch (_err) {
+        database.resources = [];
+        console.warn(`  resources: 0 (snapshot parse failed, content-only mode)`);
+      }
+    } else {
+      database.resources = [];
+      console.log(`  resources: 0 entries (no snapshot, content-only mode)`);
+    }
   }
 
   // Compute derived data for entities

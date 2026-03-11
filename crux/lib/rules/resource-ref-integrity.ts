@@ -2,7 +2,7 @@
  * Rule: Resource Reference Integrity
  *
  * Checks that all <R id="..."> components reference valid resource IDs.
- * Uses PG-first loading (falls back to YAML when wiki-server is unavailable).
+ * Uses PG-first loading (falls back to snapshot when wiki-server is unavailable).
  */
 
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
@@ -63,7 +63,7 @@ export const resourceRefIntegrityRule = createRule({
             rule: 'resource-ref-integrity',
             file: content.path,
             line: lineIdx + 1,
-            message: `<R id="${id}"> does not match any resource in data/resources/`,
+            message: `<R id="${id}"> does not match any known resource`,
             severity: Severity.ERROR,
           }));
         }
