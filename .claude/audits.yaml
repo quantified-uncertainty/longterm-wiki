@@ -207,3 +207,11 @@ post_merge:
     how_to_verify: "After next scheduled runs, check: (1) server-health-monitor succeeds, (2) auto-update push succeeds (if pages modified), (3) ci-pr-health no longer flags scheduled-deploy as missing"
     status: pending
     deadline: "2026-03-17"
+
+  - id: snapshot-resources-workflow
+    pr: 2072
+    merged: "2026-03-11"
+    claim: "Snapshot-resources workflow runs daily at 04:30 UTC and commits updated data/resources-snapshot.json"
+    how_to_verify: "After merge, trigger workflow_dispatch manually and check that a commit is created (or 'No changes' if snapshot is current). Also verify next scheduled run at 04:30 UTC."
+    status: pending
+    deadline: "2026-03-25"
