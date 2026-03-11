@@ -79,8 +79,8 @@ function FactValueDisplay({ fact, property }: { fact: Fact; property?: Property 
     const refEntity = getKBEntity(v.value);
     if (refEntity) {
       const refSlug = resolveEntitySlug(v.value);
-      const href = refSlug
-        ? refEntity.type === "organization" ? `/organizations/${refSlug}` : `/people/${refSlug}`
+      const href = refSlug && refEntity.type === "organization" ? `/organizations/${refSlug}`
+        : refSlug && refEntity.type === "person" ? `/people/${refSlug}`
         : `/kb/entity/${v.value}`;
       return (
         <Link href={href} className="text-primary hover:underline">
@@ -97,8 +97,8 @@ function FactValueDisplay({ fact, property }: { fact: Fact; property?: Property 
           const refEntity = getKBEntity(refId);
           if (refEntity) {
             const refSlug = resolveEntitySlug(refId);
-            const href = refSlug
-              ? refEntity.type === "organization" ? `/organizations/${refSlug}` : `/people/${refSlug}`
+            const href = refSlug && refEntity.type === "organization" ? `/organizations/${refSlug}`
+              : refSlug && refEntity.type === "person" ? `/people/${refSlug}`
               : `/kb/entity/${refId}`;
             return (
               <span key={refId}>
@@ -298,8 +298,10 @@ function resolveRefName(
     const entityId = resolveKBSlug(slug);
     const entity = entityId ? getKBEntity(entityId) : null;
     if (entity) {
-      const prefix = entity.type === "organization" ? "/organizations" : "/people";
-      return { name: entity.name, href: `${prefix}/${slug}` };
+      const prefix = entity.type === "organization" ? "/organizations"
+        : entity.type === "person" ? "/people"
+        : null;
+      return { name: entity.name, href: prefix ? `${prefix}/${slug}` : `/kb/entity/${entityId}` };
     }
   }
 
@@ -575,10 +577,11 @@ export default async function OrgProfilePage({
                   const raised = round.fields.raised;
                   const valuation = round.fields.valuation;
                   const leadInvestor = field(round, "lead_investor");
+                  const { name: leadInvestorName, href: leadInvestorHref } =
+                    resolveRefName(leadInvestor, undefined);
                   const instrument = field(round, "instrument");
                   const notes = field(round, "notes");
                   const source = field(round, "source");
-                  const leadEntity = leadInvestor ? getKBEntity(leadInvestor) : null;
 
                   return (
                     <div
@@ -616,15 +619,15 @@ export default async function OrgProfilePage({
                           {leadInvestor && (
                             <span className="text-xs text-muted-foreground">
                               Led by{" "}
-                              {leadEntity ? (
+                              {leadInvestorHref ? (
                                 <Link
-                                  href={`/kb/entity/${leadInvestor}`}
+                                  href={leadInvestorHref}
                                   className="text-primary hover:underline"
                                 >
-                                  {leadEntity.name}
+                                  {leadInvestorName}
                                 </Link>
                               ) : (
-                                titleCase(leadInvestor)
+                                leadInvestorName
                               )}
                             </span>
                           )}
@@ -975,7 +978,7 @@ export default async function OrgProfilePage({
           {/* Facts sidebar with FactValueDisplay for proper ref resolution */}
           {allFacts.length > 0 && (
             <section>
-              <SectionHeader title="Facts" count={allFacts.length} />
+              <SectionHeader title="Facts" count={latestByProp.size} />
               <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
                 {categoryGroups.map(({ category, label, props }) => (
                   <div key={category} className="px-4 py-3">
