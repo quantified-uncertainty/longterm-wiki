@@ -1107,7 +1107,10 @@ Examples:
   // Build fact input
   const asOf = options.asOf ?? options['as-of'];
 
-  // Duplicate detection: check if a fact with the same (property, value, asOf) already exists
+  // Duplicate detection: check if a fact with the same (property, value, asOf) already exists.
+  // Note: range-type FactValues ({ type: "range", low, high }) lack a `value` property
+  // and will not be detected as duplicates. This is acceptable since range facts cannot
+  // currently be added via the CLI, and no range-type facts exist in the KB data.
   if (!options.force) {
     const existingFacts = graph.getFacts(entity.id, { property: propertyArg });
     const duplicate = existingFacts.find((f) => {
@@ -1118,7 +1121,8 @@ Examples:
       if ('value' in fv) {
         valuesMatch = fv.value === rawVal;
       }
-      // Compare asOf (both undefined counts as a match)
+      // Compare asOf (both undefined counts as a match).
+      // Uses string equality — no date normalization, so "2024-01" !== "2024-01-01".
       const asOfMatch = (f.asOf ?? undefined) === (asOf ?? undefined);
       return valuesMatch && asOfMatch;
     });
