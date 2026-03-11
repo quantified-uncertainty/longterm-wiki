@@ -1529,17 +1529,17 @@ async function main() {
   // Load resources: PG → snapshot → YAML (fallback chain)
   if (!CONTENT_ONLY) {
     const pgResources = await fetchResourcesFromPG();
-    if (pgResources && pgResources.length > 0) {
+    if (pgResources !== null) {
       database.resources = pgResources;
       console.log(`  resources: ${pgResources.length} loaded from PG`);
     } else {
-      // Try snapshot fallback
+      // Try snapshot fallback (PG unavailable)
       const snapshotPath = join(DATA_DIR, 'resources-snapshot.json');
       let snapshotLoaded = false;
       if (existsSync(snapshotPath)) {
         try {
           const snapshotData = JSON.parse(readFileSync(snapshotPath, 'utf-8'));
-          if (Array.isArray(snapshotData) && snapshotData.length > 0) {
+          if (Array.isArray(snapshotData)) {
             database.resources = snapshotData;
             console.log(`  resources: ${snapshotData.length} loaded from snapshot (PG unavailable)`);
             snapshotLoaded = true;
