@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
-import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources, claims } from "../schema.js";
+import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
@@ -20,8 +20,6 @@ import {
   MarkAccuracyBatchSchema as SharedMarkAccuracyBatchSchema,
   UpsertCitationContentSchema,
   CITATION_CONTENT_PREVIEW_MAX,
-  LinkCitationClaimSchema,
-  LinkCitationsClaimsBatchSchema,
 } from "../api-types.js";
 import { logger } from "../logger.js";
 import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
@@ -1135,81 +1133,20 @@ const citationsApp = new Hono()
     });
   })
 
-  // ---- PATCH /quotes/:id/link-claim ---- [DEPRECATED: claims are now the source of truth]
-  // Links a citation_quote to a claim via the claim_id FK.
+  // ---- PATCH /quotes/:id/link-claim ---- [REMOVED: claims tables archived by migration 0065]
   .patch("/quotes/:id/link-claim", async (c) => {
-    deprecationWarning("PATCH /quotes/:id/link-claim");
-    const idStr = c.req.param("id");
-    const id = Number(idStr);
-    if (!Number.isInteger(id) || id <= 0) {
-      return validationError(c, "Quote ID must be a positive integer");
-    }
-
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = LinkCitationClaimSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const db = getDrizzleDb();
-
-    // Verify claim exists
-    const claimRows = await db.select({ id: claims.id }).from(claims).where(eq(claims.id, parsed.data.claimId)).limit(1);
-    if (claimRows.length === 0) return notFoundError(c, `Claim not found: ${parsed.data.claimId}`);
-
-    const rows = await db
-      .update(citationQuotes)
-      .set({ claimId: parsed.data.claimId, updatedAt: sql`now()` })
-      .where(eq(citationQuotes.id, id))
-      .returning({ id: citationQuotes.id, pageId: citationQuotes.pageId, footnote: citationQuotes.footnote });
-
-    if (rows.length === 0) return notFoundError(c, `Citation quote not found: ${id}`);
-
-    return c.json({ linked: true, quoteId: Number(rows[0].id), claimId: parsed.data.claimId });
+    return c.json(
+      { error: "Claim linking is no longer supported. The claims tables were archived by migration 0065." },
+      410,
+    );
   })
 
-  // ---- POST /quotes/link-claims-batch ---- [DEPRECATED: claims are now the source of truth]
+  // ---- POST /quotes/link-claims-batch ---- [REMOVED: claims tables archived by migration 0065]
   .post("/quotes/link-claims-batch", async (c) => {
-    deprecationWarning("POST /quotes/link-claims-batch");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = LinkCitationsClaimsBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    // Pre-validate that all referenced claim IDs exist (mirrors the single-item endpoint)
-    const uniqueClaimIds = [...new Set(items.map((i) => i.claimId))];
-    const existingClaims = await db
-      .select({ id: claims.id })
-      .from(claims)
-      .where(sql`${claims.id} = ANY(${uniqueClaimIds})`);
-    const existingClaimIdSet = new Set(existingClaims.map((r) => r.id));
-    const missingClaimIds = uniqueClaimIds.filter((id) => !existingClaimIdSet.has(id));
-    if (missingClaimIds.length > 0) {
-      return validationError(c, `Referenced claims not found: ${missingClaimIds.join(", ")}`);
-    }
-
-    let linkedCount = 0;
-
-    try {
-      await db.transaction(async (tx) => {
-        for (const item of items) {
-          const rows = await tx
-            .update(citationQuotes)
-            .set({ claimId: item.claimId, updatedAt: sql`now()` })
-            .where(eq(citationQuotes.id, item.quoteId))
-            .returning({ id: citationQuotes.id });
-          if (rows.length > 0) linkedCount++;
-        }
-      });
-    } catch (err) {
-      return dbError(c, "citation quotes link-claims-batch", err, { itemCount: items.length });
-    }
-
-    return c.json({ linked: linkedCount });
+    return c.json(
+      { error: "Claim linking is no longer supported. The claims tables were archived by migration 0065." },
+      410,
+    );
   })
 
   // NOTE: POST /quotes/propagate-from-claims was removed in #1310.
