@@ -117,24 +117,44 @@ export function getKBLatest(
   return facts.find((f) => !isFactExpired(f));
 }
 
+/** Lazy-initialized index: propertyId → Property. Built once on first call. */
+let propertyByIdIndex: Map<string, Property> | undefined;
+
 /**
  * Get a property definition by ID.
+ * Uses a lazy-built index for O(1) lookups after initial build.
  */
 export function getKBProperty(propertyId: string): Property | undefined {
   const kb = getKB();
   if (!kb) return undefined;
 
-  return kb.properties.find((p) => p.id === propertyId);
+  if (!propertyByIdIndex) {
+    propertyByIdIndex = new Map();
+    for (const p of kb.properties) {
+      propertyByIdIndex.set(p.id, p);
+    }
+  }
+  return propertyByIdIndex.get(propertyId);
 }
+
+/** Lazy-initialized index: entityId → Entity. Built once on first call. */
+let entityByIdIndex: Map<string, Entity> | undefined;
 
 /**
  * Get an entity definition by ID.
+ * Uses a lazy-built index for O(1) lookups after initial build.
  */
 export function getKBEntity(entityId: string): Entity | undefined {
   const kb = getKB();
   if (!kb) return undefined;
 
-  return kb.entities.find((t: Entity) => t.id === entityId);
+  if (!entityByIdIndex) {
+    entityByIdIndex = new Map();
+    for (const e of kb.entities) {
+      entityByIdIndex.set(e.id, e);
+    }
+  }
+  return entityByIdIndex.get(entityId);
 }
 
 /**

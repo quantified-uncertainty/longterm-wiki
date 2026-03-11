@@ -54,20 +54,32 @@ interface KBRecordCollectionProps {
 /** Fields that are hidden by default unless explicitly requested. */
 const HIDDEN_BY_DEFAULT = new Set(["source", "notes", "key-publication", "key_publication"]);
 
-/** Determine columns to display. */
+/** Determine columns to display. Includes explicit endpoints (member, pledger, etc.) as ref columns. */
 function resolveColumns(
   items: RecordEntry[],
   fieldDefs: Record<string, unknown> | undefined,
+  endpointDefs: Record<string, { implicit?: boolean }> | undefined,
   columns?: string[],
   showNotes?: boolean,
   showSource?: boolean,
 ): string[] {
   if (columns && columns.length > 0) return columns;
 
-  // Use schema field order if available, otherwise collect from entries
-  const allFields: string[] = fieldDefs
+  // Explicit (non-implicit) endpoints go first — these are the "who" columns
+  const explicitEndpoints: string[] = endpointDefs
+    ? Object.entries(endpointDefs)
+        .filter(([, def]) => !def.implicit)
+        .map(([name]) => name)
+    : [];
+
+  // Data fields from schema, or fallback to collecting from entries
+  const dataFields: string[] = fieldDefs
     ? Object.keys(fieldDefs)
-    : [...new Set(items.flatMap((item) => Object.keys(item.fields)))];
+    : [...new Set(items.flatMap((item) => Object.keys(item.fields)))].filter(
+        (f) => !explicitEndpoints.includes(f),
+      );
+
+  const allFields = [...explicitEndpoints, ...dataFields];
 
   // Filter hidden fields unless explicitly shown
   return allFields.filter((f) => {
@@ -124,7 +136,8 @@ export function KBRecordCollection({
   }
 
   const fieldDefs = recordSchema?.fields;
-  const cols = resolveColumns(items, fieldDefs, columns, showNotes, showSource);
+  const endpointDefs = recordSchema?.endpoints;
+  const cols = resolveColumns(items, fieldDefs, endpointDefs, columns, showNotes, showSource);
 
   // Sort items
   const effectiveSortBy = sortBy ?? findDateField(fieldDefs, cols);
@@ -162,19 +175,29 @@ export function KBRecordCollection({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sorted.map((item) => (
-              <TableRow key={item.key}>
-                {cols.map((col) => (
-                  <TableCell key={col} className="whitespace-normal py-2">
-                    <KBCellValue
-                      value={item.fields[col]}
-                      fieldName={col}
-                      fieldDef={fieldDefs?.[col]}
-                    />
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
+            {sorted.map((item) => {
+              // For endpoint columns, use displayName if the value is a slug/ID
+              // and synthesize a ref fieldDef so KBCellValue renders it as an EntityLink
+              return (
+                <TableRow key={item.key}>
+                  {cols.map((col) => {
+                    const isEndpoint = endpointDefs && col in endpointDefs;
+                    const cellFieldDef = fieldDefs?.[col] ?? (isEndpoint ? { type: "ref" as const } : undefined);
+                    // For endpoint columns, prefer displayName when the raw value is a slug
+                    const rawValue = item.fields[col];
+                    return (
+                      <TableCell key={col} className="whitespace-normal py-2">
+                        <KBCellValue
+                          value={rawValue}
+                          fieldName={col}
+                          fieldDef={cellFieldDef}
+                        />
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </CardContent>
