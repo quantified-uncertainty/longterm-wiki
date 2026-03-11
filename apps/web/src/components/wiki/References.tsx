@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  getResourceById,
+  resolveResource,
   getResourceCredibility,
   getResourcePublication,
   getPageCitationHealth,
@@ -50,17 +50,22 @@ function resolveRefs(ids: string[]): {
 } {
   const refs: ResolvedRef[] = [];
   const missing: string[] = [];
-  const seen = new Set<string>();
+  const seenInput = new Set<string>();
+  const seenResourceId = new Set<string>();
 
   for (const id of ids) {
-    if (seen.has(id)) continue;
-    seen.add(id);
+    if (seenInput.has(id)) continue;
+    seenInput.add(id);
 
-    const resource = getResourceById(id);
+    const resource = resolveResource(id);
     if (!resource) {
       missing.push(id);
       continue;
     }
+
+    // Dedup by resolved resource ID — same resource referenced by hash + stable_id
+    if (seenResourceId.has(resource.id)) continue;
+    seenResourceId.add(resource.id);
 
     const publication = getResourcePublication(resource);
     refs.push({
