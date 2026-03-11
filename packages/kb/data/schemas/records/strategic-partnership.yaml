@@ -1,5 +1,6 @@
 name: Strategic Partnership
 description: "Major strategic partnerships and cloud/compute deals."
+collectionName: strategic-partnerships
 temporal: false
 
 endpoints:

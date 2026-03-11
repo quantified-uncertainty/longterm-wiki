@@ -1,23 +1,20 @@
 /**
  * Unit tests for the resource-ref-integrity rule.
  *
- * Mocks `fs` so tests run deterministically without reading actual YAML files.
+ * Mocks resource-io so tests run deterministically without reading actual files.
  */
 
 import { describe, it, expect, vi } from 'vitest';
 import { Severity } from '../validation/validation-engine.ts';
 
-// vi.mock is hoisted before all imports by vitest — fs is mocked before
-// resource-ref-integrity.ts initialises its module-level resourceIdCache.
-vi.mock('fs', () => ({
-  readdirSync: vi.fn(() => ['test-resources.yaml']),
-  readFileSync: vi.fn(
-    () =>
-      '- id: aabbccdd11223344\n  title: Valid Resource A\n- id: ccdd1122aabb5566\n  title: Valid Resource B\n',
+// Mock resource-io.ts to return test resource IDs (including stable_ids)
+vi.mock('../../resource-io.ts', () => ({
+  loadResourceIdsPGFirst: vi.fn(async () =>
+    new Set(['aabbccdd11223344', 'ccdd1122aabb5566', 'aB1cD2eF3g']),
   ),
 }));
 
-// Import AFTER vi.mock so the mocked fs is used when the module initialises.
+// Import AFTER vi.mock so the mocked module is used.
 import { resourceRefIntegrityRule } from './resource-ref-integrity.ts';
 
 function mockContent(
@@ -35,7 +32,7 @@ function mockContent(
 }
 
 describe('resource-ref-integrity rule', () => {
-  it('passes when resource ID exists in YAML', async () => {
+  it('passes when resource ID exists', async () => {
     const content = mockContent('<R id="aabbccdd11223344">Valid Resource</R>');
     const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(0);
@@ -111,12 +108,18 @@ describe('resource-ref-integrity rule', () => {
     expect(issues[0].message).toContain('deadbeefdeadbeef');
   });
 
-  it('accepts both valid IDs loaded from YAML', async () => {
+  it('accepts both valid IDs', async () => {
     const body = [
       '<R id="aabbccdd11223344">Resource A</R>',
       '<R id="ccdd1122aabb5566">Resource B</R>',
     ].join('\n');
     const content = mockContent(body);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('accepts a stable_id in <R> tag', async () => {
+    const content = mockContent('<R id="aB1cD2eF3g">Resource via stable_id</R>');
     const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(0);
   });

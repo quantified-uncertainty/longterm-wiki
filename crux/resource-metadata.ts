@@ -4,7 +4,7 @@
  * Fetches metadata from ArXiv, LW/AF/EAF forums, Semantic Scholar, and Firecrawl.
  */
 
-import { loadResources, saveResources } from './resource-io.ts';
+import { loadResourcesPGFirst, saveResources } from './resource-io.ts';
 import { extractArxivId, extractForumSlug, extractDOI, isScholarlyUrl, sleep } from './resource-utils.ts';
 import { getApiKey } from './lib/api-keys.ts';
 import type { Resource, ParsedOpts, ArxivMetadata, ForumMetadata, ScholarMetadata } from './resource-types.ts';
@@ -64,7 +64,7 @@ export async function extractArxivMetadata(opts: ParsedOpts): Promise<number> {
   if (!opts._skipSave) console.log('📚 ArXiv Metadata Extractor');
   if (dryRun && !opts._skipSave) console.log('   DRY RUN');
 
-  const resources: Resource[] = (opts._resources as Resource[] | undefined) || loadResources();
+  const resources: Resource[] = (opts._resources as Resource[] | undefined) || await loadResourcesPGFirst();
   const arxivResources = resources.filter(r => {
     if (!r.url || !r.url.includes('arxiv.org')) return false;
     if (r.authors && r.authors.length > 0) return false;
@@ -111,8 +111,8 @@ export async function extractArxivMetadata(opts: ParsedOpts): Promise<number> {
   if (!opts._skipSave) console.log(`   ✅ Updated ${updated} papers`);
 
   if (!dryRun && updated > 0 && !opts._skipSave) {
-    saveResources(resources);
-    console.log('   Saved resources files');
+    await saveResources(resources);
+    console.log('   Saved resources to PG');
   }
   return updated;
 }
@@ -161,7 +161,7 @@ export async function extractForumMetadata(opts: ParsedOpts): Promise<number> {
   if (!opts._skipSave) console.log('📝 Forum Metadata Extractor (LW/AF/EAF)');
   if (dryRun && !opts._skipSave) console.log('   DRY RUN');
 
-  const resources: Resource[] = (opts._resources as Resource[] | undefined) || loadResources();
+  const resources: Resource[] = (opts._resources as Resource[] | undefined) || await loadResourcesPGFirst();
   const forumResources = resources.filter(r => {
     if (!r.url) return false;
     if (r.authors && r.authors.length > 0) return false;
@@ -198,8 +198,8 @@ export async function extractForumMetadata(opts: ParsedOpts): Promise<number> {
   if (!opts._skipSave) console.log(`   ✅ Updated ${updated} posts`);
 
   if (!dryRun && updated > 0 && !opts._skipSave) {
-    saveResources(resources);
-    console.log('   Saved resources files');
+    await saveResources(resources);
+    console.log('   Saved resources to PG');
   }
   return updated;
 }
@@ -235,7 +235,7 @@ export async function extractScholarMetadata(opts: ParsedOpts): Promise<number> 
   if (!opts._skipSave) console.log('🎓 Semantic Scholar Metadata Extractor');
   if (dryRun && !opts._skipSave) console.log('   DRY RUN');
 
-  const resources: Resource[] = (opts._resources as Resource[] | undefined) || loadResources();
+  const resources: Resource[] = (opts._resources as Resource[] | undefined) || await loadResourcesPGFirst();
 
   // Find scholarly resources without authors
   const scholarResources = resources.filter(r => {
@@ -293,8 +293,8 @@ export async function extractScholarMetadata(opts: ParsedOpts): Promise<number> 
   if (!opts._skipSave) console.log(`   ✅ Updated ${updated} resources (${failed} failed/no data)`);
 
   if (!dryRun && updated > 0 && !opts._skipSave) {
-    saveResources(resources);
-    console.log('   Saved resources files');
+    await saveResources(resources);
+    console.log('   Saved resources to PG');
   }
   return updated;
 }
@@ -319,7 +319,7 @@ export async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
 
   if (dryRun && !opts._skipSave) console.log('   DRY RUN');
 
-  const resources: Resource[] = (opts._resources as Resource[] | undefined) || loadResources();
+  const resources: Resource[] = (opts._resources as Resource[] | undefined) || await loadResourcesPGFirst();
 
   // Find web resources without authors (excluding those handled by other extractors)
   const webResources = resources.filter(r => {
@@ -453,8 +453,8 @@ export async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
   if (!opts._skipSave) console.log(`   ✅ Updated ${updated} resources`);
 
   if (!dryRun && updated > 0 && !opts._skipSave) {
-    saveResources(resources);
-    console.log('   Saved resources files');
+    await saveResources(resources);
+    console.log('   Saved resources to PG');
   }
   return updated;
 }
@@ -464,10 +464,10 @@ export async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
 /**
  * Show metadata statistics
  */
-export function showMetadataStats(): void {
+export async function showMetadataStats(): Promise<void> {
   console.log('📊 Resource Metadata Statistics\n');
 
-  const resources = loadResources();
+  const resources = await loadResourcesPGFirst();
   const total = resources.length;
   const withAuthors = resources.filter(r => r.authors?.length && r.authors.length > 0).length;
   const withDate = resources.filter(r => r.published_date).length;
@@ -516,7 +516,7 @@ export async function cmdMetadata(opts: ParsedOpts): Promise<void> {
   const parallel = opts.parallel;
 
   if (!source || source === 'stats') {
-    showMetadataStats();
+    await showMetadataStats();
     return;
   }
 
@@ -530,10 +530,10 @@ export async function cmdMetadata(opts: ParsedOpts): Promise<void> {
 
   if (source === 'all' && parallel) {
     // Run all extractors in parallel (they use different APIs)
-    // Load resources once, pass to all, save once at end
+    // Load resources once from PG, pass to all, save once at end
     console.log('🚀 Running all extractors in parallel...\n');
 
-    const resources = loadResources();
+    const resources = await loadResourcesPGFirst();
     const sharedOpts: ParsedOpts = { ...opts, _resources: resources, _skipSave: true };
 
     const results = await Promise.allSettled([
@@ -555,8 +555,8 @@ export async function cmdMetadata(opts: ParsedOpts): Promise<void> {
 
     // Save once at the end
     if (totalUpdated > 0 && !opts['dry-run']) {
-      saveResources(resources);
-      console.log('\n📁 Saved resources files');
+      await saveResources(resources);
+      console.log('\n📁 Saved resources to PG');
     }
   } else {
     // Sequential execution

@@ -16,7 +16,7 @@ import { basename } from 'path';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { hashId, guessResourceType, buildUrlToResourceMap } from '../resource-utils.ts';
-import { loadResources, saveResources, getResourceCategory } from '../resource-io.ts';
+import { loadResources, saveResources } from '../resource-io.ts';
 import { parseFootnoteSources } from '../lib/footnote-parser.ts';
 import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
@@ -234,24 +234,24 @@ async function main() {
     process.exit(0);
   }
 
-  // Merge new resources into existing and save
-  const merged = [...existingResources, ...newResources];
-  saveResources(merged);
+  // Save only the new resources (not the full list, to avoid overwriting
+  // fresher PG data with stale snapshot values)
+  await saveResources(newResources);
 
   console.log(`${c.bold}Results:${c.reset}`);
   console.log(`  ${c.green}Created:${c.reset} ${newResources.length} new resource entries`);
   console.log(`  ${c.dim}Enriched from cache: ${enrichedFromCache}${c.reset}`);
   console.log(`  ${c.dim}Cache miss: ${fetchFailed}${c.reset}`);
 
-  // Show breakdown by category
-  const byCat = new Map<string, number>();
+  // Show breakdown by type
+  const byType = new Map<string, number>();
   for (const r of newResources) {
-    const cat = getResourceCategory(r);
-    byCat.set(cat, (byCat.get(cat) || 0) + 1);
+    const t = r.type || 'unknown';
+    byType.set(t, (byType.get(t) || 0) + 1);
   }
-  console.log(`\n  By category:`);
-  for (const [cat, count] of [...byCat.entries()].sort((a, b) => b[1] - a[1])) {
-    console.log(`    ${cat}: ${count}`);
+  console.log(`\n  By type:`);
+  for (const [t, count] of [...byType.entries()].sort((a, b) => b[1] - a[1])) {
+    console.log(`    ${t}: ${count}`);
   }
 
   console.log();

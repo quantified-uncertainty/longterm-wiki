@@ -5,11 +5,7 @@
 import { join } from 'path';
 import { DATA_DIR_ABS as DATA_DIR } from './lib/content-types.ts';
 
-export const RESOURCES_DIR: string = join(DATA_DIR, 'resources');
 export const PUBLICATIONS_FILE: string = join(DATA_DIR, 'publications.yaml');
-
-// Forum publication IDs that go in forums.yaml
-export const FORUM_PUBLICATION_IDS: Set<string> = new Set(['lesswrong', 'alignment-forum', 'ea-forum']);
 
 export interface Resource {
   id: string;
@@ -27,7 +23,12 @@ export interface Resource {
   cited_by?: string[];
   doi?: string;
   date?: string;
-  _sourceFile?: string;
+  stable_id?: string;
+  // YAML-era fields (kept for PG sync compatibility)
+  local_filename?: string;
+  credibility_override?: number;
+  fetched_at?: string;
+  content_hash?: string;
 }
 
 export interface MarkdownLink {

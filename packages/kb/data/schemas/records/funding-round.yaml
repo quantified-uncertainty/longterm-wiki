@@ -1,5 +1,6 @@
 name: Funding Round
 description: "Equity and strategic investment rounds, in chronological order."
+collectionName: funding-rounds
 temporal: false
 
 endpoints:

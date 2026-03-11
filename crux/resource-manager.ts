@@ -32,7 +32,7 @@ import { CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, type Entity }
 import { findMdxFiles } from './lib/file-utils.ts';
 
 import type { Resource, ParsedOpts, Conversion } from './resource-types.ts';
-import { loadResources, saveResources, loadPages, loadPublications } from './resource-io.ts';
+import { loadResources, loadResourcesPGFirst, saveResources, loadPages, loadPublications } from './resource-io.ts';
 import { hashId, normalizeUrl, buildUrlToResourceMap, extractMarkdownLinks, findFileByName, guessResourceType } from './resource-utils.ts';
 import { cmdMetadata } from './resource-metadata.ts';
 import { cmdValidate } from './resource-validator.ts';
@@ -161,7 +161,7 @@ function cmdShow(opts: ParsedOpts): void {
 
 // ============ Process Command ============
 
-function cmdProcess(opts: ParsedOpts): void {
+async function cmdProcess(opts: ParsedOpts): Promise<void> {
   const name = opts._args?.[0];
   const dryRun = !opts.apply;
   const skipCreate = opts['skip-create'];
@@ -254,9 +254,10 @@ function cmdProcess(opts: ParsedOpts): void {
 
   // Save changes
   if (!dryRun) {
-    // Save resources first
+    // Save only the new resources (not the full list, to avoid overwriting
+    // fresher PG data with stale snapshot values)
     if (newResources.length > 0) {
-      saveResources(resources);
+      await saveResources(newResources);
       console.log(`✅ Saved ${newResources.length} new resources`);
     }
 
@@ -274,7 +275,7 @@ function cmdProcess(opts: ParsedOpts): void {
 
 // ============ Create Command ============
 
-function cmdCreate(opts: ParsedOpts): void {
+async function cmdCreate(opts: ParsedOpts): Promise<void> {
   const url = opts._args?.[0];
   const title = opts.title as string | undefined;
   const type = opts.type as string | undefined;
@@ -307,7 +308,9 @@ function cmdCreate(opts: ParsedOpts): void {
   resources.push(resource);
 
   if (!opts['dry-run']) {
-    saveResources(resources);
+    // Save only the new resource (not the full list, to avoid overwriting
+    // fresher PG data with stale snapshot values)
+    await saveResources([resource]);
     console.log(`✅ Created resource: ${id}`);
     console.log(`   URL: ${url}`);
     console.log(`   Title: ${resource.title}`);
@@ -330,7 +333,8 @@ async function cmdRebuildCitations(opts: ParsedOpts): Promise<void> {
   console.log('🔗 Rebuilding cited_by relationships');
   if (dryRun) console.log('   DRY RUN');
 
-  const resources = loadResources();
+  // Load from PG first to avoid overwriting fresher data with stale snapshot
+  const resources = await loadResourcesPGFirst();
   const resourceMap = new Map<string, Resource>();
   for (const r of resources) {
     r.cited_by = [];
@@ -371,8 +375,8 @@ async function cmdRebuildCitations(opts: ParsedOpts): Promise<void> {
   console.log(`   Total citations: ${totalCitations}`);
 
   if (!dryRun) {
-    saveResources(resources);
-    console.log('   Saved resources files');
+    await saveResources(resources);
+    console.log('   Saved resources to PG');
     console.log('\n💡 Run `pnpm build` to update the database.');
   }
 }
@@ -442,7 +446,8 @@ async function cmdEnrich(opts: ParsedOpts): Promise<void> {
   console.log('🏷️  Enriching resources with publication data and tags');
   if (dryRun) console.log('   DRY RUN');
 
-  const resources = loadResources();
+  // Load from PG first to avoid overwriting fresher data with stale snapshot
+  const resources = await loadResourcesPGFirst();
   const publications = loadPublications();
   const domainMap = buildDomainToPublicationMap(publications);
 
@@ -499,8 +504,8 @@ async function cmdEnrich(opts: ParsedOpts): Promise<void> {
   console.log(`   Total with tags: ${withTags} (${Math.round(withTags/resources.length*100)}%)`);
 
   if (!dryRun && (pubMapped > 0 || tagsAdded > 0)) {
-    saveResources(resources);
-    console.log('\n   Saved resources files');
+    await saveResources(resources);
+    console.log('\n   Saved resources to PG');
     console.log('💡 Run `pnpm build` to update the database.');
   }
 }
@@ -578,10 +583,10 @@ async function main(): Promise<void> {
       cmdShow(opts);
       break;
     case 'process':
-      cmdProcess(opts);
+      await cmdProcess(opts);
       break;
     case 'create':
-      cmdCreate(opts);
+      await cmdCreate(opts);
       break;
     case 'metadata':
       await cmdMetadata(opts);

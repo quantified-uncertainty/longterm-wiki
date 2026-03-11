@@ -1,5 +1,6 @@
 name: Career History
 description: "Chronological career positions, including current and past roles."
+collectionName: career-history
 temporal: true
 
 endpoints:

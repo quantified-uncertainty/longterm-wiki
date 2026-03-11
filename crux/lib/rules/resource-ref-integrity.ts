@@ -1,43 +1,24 @@
 /**
  * Rule: Resource Reference Integrity
  *
- * Checks that all <R id="..."> components reference valid resource IDs
- * from data/resources/*.yaml files.
+ * Checks that all <R id="..."> components reference valid resource IDs.
+ * Uses PG-first loading (falls back to snapshot when wiki-server is unavailable).
  */
 
-import { readdirSync, readFileSync } from 'fs';
-import { join } from 'path';
-import { parse as parseYaml } from 'yaml';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
-import { DATA_DIR_ABS } from '../content-types.ts';
+import { loadResourceIdsPGFirst } from '../../resource-io.ts';
 
-const RESOURCES_DIR = join(DATA_DIR_ABS, 'resources');
-
-// Cache to avoid re-reading YAML on every file check
+// Cache to avoid re-fetching on every file check
 let resourceIdCache: Set<string> | null = null;
 
-function loadResourceIds(): Set<string> {
+async function getResourceIds(): Promise<Set<string> | null> {
   if (resourceIdCache) return resourceIdCache;
-  resourceIdCache = new Set<string>();
   try {
-    const files = readdirSync(RESOURCES_DIR).filter((f) => f.endsWith('.yaml'));
-    for (const file of files) {
-      try {
-        const raw = readFileSync(join(RESOURCES_DIR, file), 'utf-8');
-        const entries = parseYaml(raw);
-        if (Array.isArray(entries)) {
-          for (const entry of entries) {
-            if (entry && typeof entry.id === 'string' && entry.id) {
-              resourceIdCache.add(entry.id);
-            }
-          }
-        }
-      } catch {
-        // skip unreadable files
-      }
-    }
+    resourceIdCache = await loadResourceIdsPGFirst();
   } catch {
-    // skip if resources dir doesn't exist
+    // Neither PG nor snapshot available (e.g. CI without wiki-server).
+    // Return null so the rule can skip gracefully.
+    return null;
   }
   return resourceIdCache;
 }
@@ -48,9 +29,9 @@ const RESOURCE_REF_RE = /<R\s+id=["']([^"']+)["'][^>]*>/g;
 export const resourceRefIntegrityRule = createRule({
   id: 'resource-ref-integrity',
   name: 'Resource Reference Integrity',
-  description: 'Verify all <R id="..."> components reference valid resource IDs in data/resources/',
+  description: 'Verify all <R id="..."> components reference valid resource IDs',
 
-  check(content: ContentFile, _engine: ValidationEngine): Issue[] {
+  async check(content: ContentFile, _engine: ValidationEngine): Promise<Issue[]> {
     const issues: Issue[] = [];
 
     // Skip internal documentation pages (relativePath is relative to content/docs/)
@@ -61,7 +42,8 @@ export const resourceRefIntegrityRule = createRule({
       return issues;
     }
 
-    const resourceIds = loadResourceIds();
+    const resourceIds = await getResourceIds();
+    if (!resourceIds) return issues; // No resource data available — skip check
     const lines = content.body.split('\n');
     let inFencedBlock = false;
 
@@ -88,7 +70,7 @@ export const resourceRefIntegrityRule = createRule({
             rule: 'resource-ref-integrity',
             file: content.path,
             line: lineIdx + 1,
-            message: `<R id="${id}"> does not match any resource in data/resources/*.yaml`,
+            message: `<R id="${id}"> does not match any known resource`,
             severity: Severity.ERROR,
           }));
         }

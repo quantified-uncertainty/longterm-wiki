@@ -1,5 +1,6 @@
 name: Board Seat
 description: "Board of directors membership, current and former."
+collectionName: board-seats
 temporal: true
 
 endpoints:

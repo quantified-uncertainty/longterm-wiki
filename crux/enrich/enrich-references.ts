@@ -21,13 +21,13 @@
  *   const result = enrichReferences(content, { pageId: 'anthropic', root: ROOT });
  */
 
-import { readFileSync, readdirSync, writeFileSync } from 'fs';
-import { join, resolve } from 'path';
-import { parse as parseYaml } from 'yaml';
+import { readFileSync, writeFileSync } from 'fs';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles, findPageFile } from '../lib/file-utils.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
+import { loadResources as loadResourcesFromYaml } from '../resource-io.ts';
+import type { Resource } from '../resource-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -44,38 +44,23 @@ export interface ReferencesEnrichResult {
   ids: string[];
 }
 
-interface ResourceEntry {
-  id: string;
-  url?: string;
-  title?: string;
-  cited_by?: string[];
-}
-
 // ---------------------------------------------------------------------------
-// Resource loading & index building
+// Resource loading & index building (uses centralized loader from resource-io)
 // ---------------------------------------------------------------------------
 
-let _resourceCache: ResourceEntry[] | null = null;
+let _resourceCache: Resource[] | null = null;
 let _citedByCache: Map<string, Set<string>> | null = null;
 let _validIdCache: Set<string> | null = null;
 
-function loadResources(root: string): ResourceEntry[] {
+function getResources(): Resource[] {
   if (_resourceCache) return _resourceCache;
-  const dir = join(root, 'data/resources');
-  const files = readdirSync(dir).filter(f => f.endsWith('.yaml'));
-  const all: ResourceEntry[] = [];
-  for (const file of files) {
-    const raw = readFileSync(join(dir, file), 'utf-8');
-    const parsed = parseYaml(raw);
-    if (Array.isArray(parsed)) all.push(...parsed);
-  }
-  _resourceCache = all;
-  return all;
+  _resourceCache = loadResourcesFromYaml();
+  return _resourceCache;
 }
 
-function getCitedByIndex(root: string): Map<string, Set<string>> {
+function getCitedByIndex(): Map<string, Set<string>> {
   if (_citedByCache) return _citedByCache;
-  const resources = loadResources(root);
+  const resources = getResources();
   const index = new Map<string, Set<string>>();
   for (const r of resources) {
     if (!r.cited_by || !Array.isArray(r.cited_by)) continue;
@@ -88,9 +73,9 @@ function getCitedByIndex(root: string): Map<string, Set<string>> {
   return index;
 }
 
-function getValidIds(root: string): Set<string> {
+function getValidIds(): Set<string> {
   if (_validIdCache) return _validIdCache;
-  _validIdCache = new Set(loadResources(root).map(r => r.id));
+  _validIdCache = new Set(getResources().map(r => r.id));
   return _validIdCache;
 }
 
@@ -155,12 +140,11 @@ export function enrichReferences(
   content: string,
   options: { pageId?: string; root?: string } = {},
 ): ReferencesEnrichResult {
-  const root = options.root ?? PROJECT_ROOT;
   const pageId = options.pageId ?? '';
   const slug = slugFromPageId(pageId);
 
-  const validIds = getValidIds(root);
-  const citedByIndex = getCitedByIndex(root);
+  const validIds = getValidIds();
+  const citedByIndex = getCitedByIndex();
 
   // Collect IDs from inline <R> tags
   const inlineIds = extractInlineResourceIds(content);

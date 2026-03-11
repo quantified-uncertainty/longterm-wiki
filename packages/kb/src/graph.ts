@@ -261,6 +261,19 @@ export class Graph {
   }
 
   /**
+   * Find a record schema by its collection name (e.g., "funding-rounds" → funding-round schema).
+   * Returns undefined if no schema has this collectionName.
+   */
+  getRecordSchemaByCollectionName(collectionName: string): RecordSchema | undefined {
+    for (const schema of this.recordSchemas.values()) {
+      if (schema.collectionName === collectionName) {
+        return schema;
+      }
+    }
+    return undefined;
+  }
+
+  /**
    * Get record entries for a collection owned by an entity.
    */
   getRecords(entityId: string, collectionName: string): RecordEntry[] {

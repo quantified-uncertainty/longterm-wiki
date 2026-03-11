@@ -1,89 +1,228 @@
 /**
- * Resource Manager — YAML I/O
+ * Resource Manager — PG-native I/O with snapshot fallback
  *
- * Reading and writing resource YAML files, publication loading.
+ * Resources are stored in PostgreSQL (wiki-server). Reads try PG first,
+ * falling back to the snapshot file (data/resources-snapshot.json).
+ * Writes go directly to PG via the batch API.
  *
- * Note: Resources are NOT dual-written to the wiki-server here because the
- * server's upsert endpoint does a full column replacement. The in-memory
- * Resource type lacks fields like review, keyPoints, localFilename, etc.
- * that exist in the YAML files, so a fire-and-forget upsert from here would
- * overwrite valid data with nulls. Instead, `crux wiki-server sync-resources`
- * (which reads the full YAML) handles syncing to Postgres.
+ * The snapshot file is maintained by `pnpm crux wiki-server snapshot-resources`
+ * and serves as an offline/CI fallback when the wiki-server is unavailable.
  */
 
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import { loadPages as loadPagesJson, type PageEntry } from './lib/content-types.ts';
-import { RESOURCES_DIR, PUBLICATIONS_FILE, FORUM_PUBLICATION_IDS } from './resource-types.ts';
+import { parse as parseYaml } from 'yaml';
+import { loadPages as loadPagesJson, type PageEntry, DATA_DIR_ABS as DATA_DIR } from './lib/content-types.ts';
+import { PUBLICATIONS_FILE } from './resource-types.ts';
 import type { Resource, Publication } from './resource-types.ts';
+import { apiRequest } from './lib/wiki-server/client.ts';
+import { generateId } from '../packages/kb/src/ids.ts';
+import { normalizeDate, normalizeTimestamp } from './wiki-server/sync-resources.ts';
+import type { SyncResource } from './wiki-server/sync-resources.ts';
+
+const SNAPSHOT_FILE = join(DATA_DIR, 'resources-snapshot.json');
+const PG_BATCH_SIZE = 200;
 
 /**
- * Determine which file a new resource belongs to based on type/publication.
- * Only used for NEW resources that don't have a source file yet.
- */
-export function getResourceCategory(resource: Resource): string {
-  if (resource.type === 'paper') return 'papers';
-  if (resource.type === 'government') return 'government';
-  if (resource.type === 'reference') return 'reference';
-  if (resource.publication_id && FORUM_PUBLICATION_IDS.has(resource.publication_id)) return 'forums';
-  // Check URL domain for better categorization
-  if (resource.url) {
-    try {
-      const domain = new URL(resource.url).hostname.replace('www.', '');
-      if (['nature.com', 'science.org', 'springer.com', 'wiley.com', 'sciencedirect.com'].some(d => domain.includes(d))) return 'academic';
-      if (['openai.com', 'anthropic.com', 'deepmind.com', 'google.com/deepmind'].some(d => domain.includes(d))) return 'ai-labs';
-      if (['nytimes.com', 'washingtonpost.com', 'bbc.com', 'reuters.com', 'theguardian.com'].some(d => domain.includes(d))) return 'news-media';
-    } catch (_err: unknown) {}
-  }
-  return 'web-other';
-}
-
-/**
- * Load all resources from the split directory.
- * Tags each resource with _sourceFile so we can write back to the same file.
+ * Load resources from the snapshot file (synchronous fallback).
+ * Used when the wiki-server is unavailable.
  */
 export function loadResources(): Resource[] {
-  const resources: Resource[] = [];
-  if (!existsSync(RESOURCES_DIR)) {
-    return resources;
+  if (!existsSync(SNAPSHOT_FILE)) {
+    throw new Error(
+      `Resources snapshot not found: ${SNAPSHOT_FILE}\n` +
+      `Run: pnpm crux wiki-server snapshot-resources`
+    );
   }
+  const parsed = JSON.parse(readFileSync(SNAPSHOT_FILE, 'utf-8'));
+  if (!Array.isArray(parsed)) {
+    throw new Error(`Invalid resources snapshot: expected an array in ${SNAPSHOT_FILE}`);
+  }
+  return parsed as Resource[];
+}
 
-  const files = readdirSync(RESOURCES_DIR).filter((f) => f.endsWith('.yaml'));
-  for (const file of files) {
-    const filepath = join(RESOURCES_DIR, file);
-    const content = readFileSync(filepath, 'utf-8');
-    const data = (parseYaml(content) || []) as Resource[];
-    const category = file.replace('.yaml', '');
-    for (const resource of data) {
-      resource._sourceFile = category;
-    }
-    resources.push(...data);
-  }
-  return resources;
+// ---------------------------------------------------------------------------
+// PG-first resource loading
+// ---------------------------------------------------------------------------
+
+interface PGResourceRow {
+  id: string;
+  url: string;
+  title: string | null;
+  type: string | null;
+  summary: string | null;
+  review: string | null;
+  abstract: string | null;
+  keyPoints: string[] | null;
+  publicationId: string | null;
+  authors: string[] | null;
+  publishedDate: string | null;
+  tags: string[] | null;
+  stableId: string | null;
+  localFilename: string | null;
+  credibilityOverride: number | null;
+  fetchedAt: string | null;
+  contentHash: string | null;
+}
+
+interface PGResourcesResponse {
+  resources: PGResourceRow[];
+  total: number;
+}
+
+interface PGCitationsResponse {
+  citations: Record<string, string[]>;
+  count: number;
+}
+
+function pgRowToResource(row: PGResourceRow, citedBy?: string[]): Resource {
+  return {
+    id: row.id,
+    url: row.url,
+    title: row.title ?? '',
+    type: row.type ?? '',
+    authors: row.authors ?? undefined,
+    published_date: row.publishedDate ?? undefined,
+    abstract: row.abstract ?? undefined,
+    summary: row.summary ?? undefined,
+    review: row.review ?? undefined,
+    key_points: row.keyPoints ?? undefined,
+    publication_id: row.publicationId ?? undefined,
+    tags: row.tags ?? undefined,
+    cited_by: citedBy && citedBy.length > 0 ? citedBy : undefined,
+    stable_id: row.stableId ?? undefined,
+    local_filename: row.localFilename ?? undefined,
+    credibility_override: row.credibilityOverride ?? undefined,
+    fetched_at: row.fetchedAt ?? undefined,
+    content_hash: row.contentHash ?? undefined,
+  };
 }
 
 /**
- * Save resources back to their source files, preserving the existing directory structure.
- * New resources (without _sourceFile) are categorized by getResourceCategory().
+ * Fetch all resources from the wiki-server API (paginated).
+ * Returns null if the server is unavailable.
  */
-export function saveResources(resources: Resource[]): void {
-  // Group by source file, preserving the original structure
-  const byFile: Record<string, Omit<Resource, '_sourceFile'>[]> = {};
+async function fetchResourcesFromPG(): Promise<Resource[] | null> {
+  const allResources: PGResourceRow[] = [];
+  let offset = 0;
+  const limit = 200;
 
-  for (const resource of resources) {
-    const category = resource._sourceFile || getResourceCategory(resource);
-    if (!byFile[category]) byFile[category] = [];
-    // Remove internal tracking field before writing
-    const { _sourceFile, ...cleanResource } = resource;
-    byFile[category].push(cleanResource);
+  while (true) {
+    const result = await apiRequest<PGResourcesResponse>(
+      'GET',
+      `/api/resources/all?limit=${limit}&offset=${offset}`,
+    );
+    if (!result.ok) return null;
+
+    const rows = result.data.resources;
+    if (rows.length === 0) break;
+
+    allResources.push(...rows);
+    offset += rows.length;
+    if (rows.length < limit) break;
   }
 
-  // Write each file that has resources
-  for (const [category, items] of Object.entries(byFile)) {
-    const filepath = join(RESOURCES_DIR, `${category}.yaml`);
-    const content = stringifyYaml(items, { lineWidth: 100 });
-    writeFileSync(filepath, content);
+  // Fetch bulk citations
+  let citationsIndex: Record<string, string[]> = {};
+  const citResult = await apiRequest<PGCitationsResponse>(
+    'GET',
+    '/api/resources/citations/all',
+  );
+  if (citResult.ok) {
+    citationsIndex = citResult.data.citations;
+  } else {
+    // Abort PG load — continuing with empty citations would cause
+    // read-modify-write commands to wipe cited_by edges via null.
+    console.warn(`  resources: failed to fetch citations (${citResult.message}), falling back to snapshot`);
+    return null;
+  }
+
+  return allResources.map(row =>
+    pgRowToResource(row, citationsIndex[row.id])
+  );
+}
+
+/**
+ * Load resources preferring PG, falling back to snapshot.
+ *
+ * PG resources include stableId and are always fresher than the snapshot.
+ * Falls back silently to the snapshot when the wiki-server is unavailable
+ * (no env vars, server down, timeout).
+ */
+export async function loadResourcesPGFirst(): Promise<Resource[]> {
+  const pgResources = await fetchResourcesFromPG();
+  if (pgResources !== null) {
+    return pgResources;
+  }
+  return loadResources();
+}
+
+/**
+ * Load just the set of valid resource IDs, preferring PG.
+ * Optimized for validation rules that only need to check ID existence.
+ */
+export async function loadResourceIdsPGFirst(): Promise<Set<string>> {
+  const resources = await loadResourcesPGFirst();
+  const ids = new Set(resources.map(r => r.id));
+  // Also include stable_ids so <R id="stableId"> lookups resolve
+  for (const r of resources) {
+    if (r.stable_id) ids.add(r.stable_id);
+  }
+  return ids;
+}
+
+// ---------------------------------------------------------------------------
+// Resource writing — PG-native via batch API
+// ---------------------------------------------------------------------------
+
+/** Convert a Resource to the camelCase API payload for PG upsert.
+ * Normalizes date formats and generates a stableId for new resources. */
+function resourceToSyncPayload(r: Resource): SyncResource {
+  return {
+    id: r.id,
+    url: r.url,
+    title: r.title ?? null,
+    type: r.type ?? null,
+    summary: r.summary ?? null,
+    review: r.review ?? null,
+    abstract: r.abstract ?? null,
+    keyPoints: r.key_points ?? null,
+    publicationId: r.publication_id ?? null,
+    authors: r.authors ?? null,
+    publishedDate: normalizeDate(r.published_date),
+    tags: r.tags ?? null,
+    localFilename: r.local_filename ?? null,
+    credibilityOverride: r.credibility_override ?? null,
+    fetchedAt: normalizeTimestamp(r.fetched_at),
+    contentHash: r.content_hash ?? null,
+    // Generate a stableId for new resources; existing resources pass through
+    // their value. The server-side COALESCE preserves existing stableIds.
+    stableId: r.stable_id ?? generateId(),
+    citedBy: r.cited_by ?? null,
+  };
+}
+
+/**
+ * Save resources to the wiki-server PG database via batch API.
+ *
+ * Requires the wiki-server to be running. Throws on failure (unlike
+ * the old YAML write path, PG writes are the authoritative operation).
+ */
+export async function saveResources(resources: Resource[]): Promise<void> {
+  if (resources.length === 0) return;
+
+  const items: SyncResource[] = resources.map(resourceToSyncPayload);
+
+  for (let i = 0; i < items.length; i += PG_BATCH_SIZE) {
+    const batch = items.slice(i, i + PG_BATCH_SIZE);
+    const result = await apiRequest<{ upserted: number }>(
+      'POST',
+      '/api/resources/batch',
+      { items: batch },
+    );
+    if (!result.ok) {
+      throw new Error(`Failed to save resources (batch ${Math.floor(i / PG_BATCH_SIZE) + 1}): ${result.message}`);
+    }
   }
 }
 
