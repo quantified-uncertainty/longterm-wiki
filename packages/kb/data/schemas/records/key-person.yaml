@@ -1,5 +1,6 @@
 name: Key Person
 description: "Current and former key personnel including founders, executives, and notable researchers."
+collectionName: key-persons
 temporal: true
 
 endpoints:

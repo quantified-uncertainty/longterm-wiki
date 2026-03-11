@@ -1,5 +1,6 @@
 name: Charitable Pledge
 description: "Charitable giving commitment by a person."
+collectionName: charitable-pledges
 temporal: false
 
 endpoints:

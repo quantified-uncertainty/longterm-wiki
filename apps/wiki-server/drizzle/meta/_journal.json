@@ -517,7 +517,21 @@
       "idx": 73,
       "version": "7",
       "when": 1774944000000,
-      "tag": "0073_add_funding_rounds_investments_equity",
+      "tag": "0073_drop_orphaned_kb_fact_verifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1775030400000,
+      "tag": "0074_deduplicate_drizzle_migrations",
+      "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1775116800000,
+      "tag": "0075_add_funding_rounds_investments_equity",
       "breakpoints": true
     }
   ]

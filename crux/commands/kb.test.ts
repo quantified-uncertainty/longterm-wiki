@@ -406,6 +406,29 @@ describe('crux kb add-fact', () => {
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Cannot parse');
   }, 30_000);
+
+  it('detects duplicate fact by (property, value, asOf)', async () => {
+    // Anthropic has a revenue fact: value=100e6 (100000000), asOf=2023-12
+    const result = await commands['add-fact'](['anthropic', 'revenue', '100e6'], { asOf: '2023-12' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Duplicate fact');
+    expect(result.output).toContain('revenue');
+    expect(result.output).toContain('--force');
+  }, 30_000);
+
+  it('detects duplicate with equivalent numeric notation', async () => {
+    // 100000000 === 100e6 after coercion — should detect as duplicate
+    const result = await commands['add-fact'](['anthropic', 'revenue', '100000000'], { asOf: '2023-12' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Duplicate fact');
+  }, 30_000);
+
+  it('includes fact ID in duplicate error message', async () => {
+    const result = await commands['add-fact'](['anthropic', 'revenue', '100e6'], { asOf: '2023-12' });
+    expect(result.exitCode).toBe(1);
+    // The error should include the existing fact's ID
+    expect(result.output).toMatch(/fact ID: \w+/);
+  }, 30_000);
 });
 
 // ── add-record command tests (integration with real data) ────────────────
@@ -433,5 +456,23 @@ describe('crux kb add-record', () => {
     const result = await commands['add-record'](['anthropic', 'funding-round', 'badformat'], {});
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Invalid key=value');
+  }, 30_000);
+
+  it('returns error for unknown field names with list of valid fields', async () => {
+    const result = await commands['add-record']([
+      'anthropic', 'funding-round', 'amunt=2e9', 'naem=SeriesX'],
+      {},
+    );
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Unknown field');
+    expect(result.output).toContain('"amunt"');
+    expect(result.output).toContain('"naem"');
+    // Should list valid fields so the user can fix the typo
+    expect(result.output).toContain('Valid fields');
+    expect(result.output).toContain('raised');
+    expect(result.output).toContain('name');
+    // Should also mention convention fields
+    expect(result.output).toContain('Also allowed');
+    expect(result.output).toContain('asOf');
   }, 30_000);
 });

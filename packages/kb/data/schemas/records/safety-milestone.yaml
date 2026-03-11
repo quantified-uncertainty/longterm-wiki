@@ -1,5 +1,6 @@
 name: Safety Milestone
 description: "Significant safety research publications and policy milestones."
+collectionName: safety-milestones
 temporal: false
 
 endpoints:

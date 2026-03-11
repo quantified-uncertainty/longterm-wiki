@@ -1,5 +1,6 @@
 name: Product
 description: "Major products and services launched by an organization."
+collectionName: products
 temporal: false
 
 endpoints:
