@@ -96,14 +96,14 @@ describe('extractPageIdsFromReport', () => {
     rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('extracts successful page IDs from run report', () => {
+  it('extracts successful page IDs from run report (execution.results)', () => {
     const reportPath = join(tmpDir, 'report.yaml');
     writeFileSync(reportPath, `
 date: '2026-02-20'
 execution:
   pagesUpdated: 2
   pagesFailed: 1
-  pages:
+  results:
     - pageId: existential-risk
       status: success
     - pageId: miri
@@ -114,6 +114,22 @@ execution:
 
     const ids = extractPageIdsFromReport(reportPath);
     expect(ids).toEqual(['existential-risk', 'miri']);
+  });
+
+  it('also supports legacy execution.pages field name', () => {
+    const reportPath = join(tmpDir, 'report-legacy.yaml');
+    writeFileSync(reportPath, `
+date: '2026-02-20'
+execution:
+  pagesUpdated: 1
+  pagesFailed: 0
+  pages:
+    - pageId: legacy-page
+      status: success
+`);
+
+    const ids = extractPageIdsFromReport(reportPath);
+    expect(ids).toEqual(['legacy-page']);
   });
 
   it('returns empty array for missing file', () => {
