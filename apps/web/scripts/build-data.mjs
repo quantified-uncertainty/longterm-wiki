@@ -1519,32 +1519,43 @@ async function main() {
   const database = {};
 
   for (const { key, file, dir } of DATA_FILES) {
+    // Resources are loaded separately via PG → snapshot → YAML fallback chain
+    if (key === 'resources') continue;
     const data = dir ? loadYamlDir(dir) : loadYaml(file);
     database[key] = data;
     console.log(`  ${key}: ${countEntries(data)} entries`);
   }
 
-  // Try to load resources from PG → snapshot → YAML (fallback chain)
+  // Load resources: PG → snapshot → YAML (fallback chain)
   if (!CONTENT_ONLY) {
     const pgResources = await fetchResourcesFromPG();
-    if (pgResources && pgResources.length > 0) {
+    if (pgResources !== null) {
       database.resources = pgResources;
-      console.log(`  resources: ${pgResources.length} loaded from PG (overrides YAML)`);
+      console.log(`  resources: ${pgResources.length} loaded from PG`);
     } else {
-      // Try snapshot fallback
+      // Try snapshot fallback (PG unavailable)
       const snapshotPath = join(DATA_DIR, 'resources-snapshot.json');
+      let snapshotLoaded = false;
       if (existsSync(snapshotPath)) {
         try {
           const snapshotData = JSON.parse(readFileSync(snapshotPath, 'utf-8'));
-          if (Array.isArray(snapshotData) && snapshotData.length > 0) {
+          if (Array.isArray(snapshotData)) {
             database.resources = snapshotData;
             console.log(`  resources: ${snapshotData.length} loaded from snapshot (PG unavailable)`);
+            snapshotLoaded = true;
           }
         } catch (err) {
-          console.warn(`  resources: snapshot parse failed (${err.message}), using YAML`);
+          console.warn(`  resources: snapshot parse failed (${err.message})`);
         }
       }
+      if (!snapshotLoaded) {
+        database.resources = loadYamlDir('resources');
+        console.log(`  resources: ${countEntries(database.resources)} loaded from YAML (PG + snapshot unavailable)`);
+      }
     }
+  } else {
+    database.resources = loadYamlDir('resources');
+    console.log(`  resources: ${countEntries(database.resources)} entries (YAML, content-only mode)`);
   }
 
   // Compute derived data for entities

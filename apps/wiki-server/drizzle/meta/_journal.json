@@ -512,6 +512,20 @@
       "when": 1774857600000,
       "tag": "0072_add_stable_id_to_resources",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1774944000000,
+      "tag": "0073_drop_orphaned_kb_fact_verifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1775030400000,
+      "tag": "0074_deduplicate_drizzle_migrations",
+      "breakpoints": true
     }
   ]
 }
