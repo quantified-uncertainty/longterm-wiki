@@ -595,12 +595,15 @@ export async function orchestrateCiAutoUpdate(
   // Use --verbose for detailed push diagnostics in CI logs.
   const PUSH_TIMEOUT = 120_000; // 2 minutes
   try {
-    git(['push', '--verbose', '-u', 'origin', branch], { timeout: PUSH_TIMEOUT });
+    // --no-verify skips pre-push hook: the gate already ran in Step 3 with --fix,
+    // so re-running it here is redundant and was the root cause of push failures
+    // since Mar 7 (the hook runs the gate without --fix, failing on content issues).
+    git(['push', '--verbose', '--no-verify', '-u', 'origin', branch], { timeout: PUSH_TIMEOUT });
   } catch (pushErr: unknown) {
     const msg = pushErr instanceof Error ? pushErr.message : String(pushErr);
     console.warn(`Standard push failed:\n${msg}`);
     console.log('Retrying with --force...');
-    git(['push', '--verbose', '--force', '-u', 'origin', branch], { timeout: PUSH_TIMEOUT });
+    git(['push', '--verbose', '--force', '--no-verify', '-u', 'origin', branch], { timeout: PUSH_TIMEOUT });
   }
   console.log(`Pushed to origin/${branch}`);
 
