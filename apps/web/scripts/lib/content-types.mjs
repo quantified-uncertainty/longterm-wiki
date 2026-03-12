@@ -164,4 +164,5 @@ export const TOP_LEVEL_CONTENT_DIRS = [
   'project',
   'kb',
   'sources',
+  'risks',
 ];
