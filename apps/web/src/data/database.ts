@@ -416,8 +416,6 @@ interface DatabaseShape {
     accuracyIssues: string | null;
     accuracyCheckedAt: string | null;
   }>>;
-  /** KB (Knowledge Base) structured entity data from packages/kb */
-  kb?: import("@longterm-wiki/kb").SerializedKB;
   /** KB fact verification status: factId → verdict (from citation quotes cross-reference) */
   kbFactVerification?: Record<string, string>;
 }
