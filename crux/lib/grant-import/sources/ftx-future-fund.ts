@@ -1,5 +1,6 @@
 import { readFileSync, existsSync } from "fs";
 import { execSync } from "child_process";
+import { truncateToMonth } from "../dates.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 
@@ -149,7 +150,7 @@ export const source: GrantSource = {
           name = `Grant to ${g.donee}`;
         }
 
-        const isoDate = g.date ? g.date.substring(0, 7) : null;
+        const isoDate = g.date ? truncateToMonth(g.date) : null;
 
         const focusParts: string[] = [];
         if (g.causeArea) focusParts.push(g.causeArea);

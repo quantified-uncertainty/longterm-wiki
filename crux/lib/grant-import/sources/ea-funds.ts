@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import { parseCSVLine } from "../csv.ts";
+import { parseQuarterYear } from "../dates.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
@@ -59,16 +60,7 @@ export const source: GrantSource = {
       const granteeId = matchGrantee(grantee, matcher);
 
       // Date from round: "2025 Q3" → "2025-07", "2024 Q1" → "2024-01"
-      let isoDate: string | null = null;
-      if (round) {
-        const m = round.match(/^(\d{4})\s+Q(\d)$/);
-        if (m) {
-          const qMonth: Record<string, string> = {
-            "1": "01", "2": "04", "3": "07", "4": "10",
-          };
-          isoDate = `${m[1]}-${qMonth[m[2]] || "01"}`;
-        }
-      }
+      let isoDate: string | null = round ? parseQuarterYear(round) : null;
       if (!isoDate && year) {
         isoDate = year;
       }

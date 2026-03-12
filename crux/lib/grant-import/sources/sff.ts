@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+import { QUARTER_TO_MONTH } from "../dates.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
@@ -48,10 +49,7 @@ export function sffRoundToDate(round: string): string | null {
   const qMatch = round.match(/SFF-(\d{4})-Q(\d)/);
   if (qMatch) {
     const year = qMatch[1];
-    const qMonth: Record<string, string> = {
-      "1": "01", "2": "04", "3": "07", "4": "10",
-    };
-    return `${year}-${qMonth[qMatch[2]] || "01"}`;
+    return `${year}-${QUARTER_TO_MONTH[qMatch[2]] || "01"}`;
   }
 
   const yearMatch = round.match(/SFF-(\d{4})/);
