@@ -23,11 +23,11 @@ import {
   Breadcrumbs,
   CurrentBadge,
   FounderBadge,
-  SourceLink,
-  DirectoryEntityLink,
   FactsPanel,
 } from "@/components/directory";
 import { formatKBDate } from "@/components/wiki/kb/format";
+import { getExpertById } from "@/data";
+import { ExpertPositions } from "./expert-positions";
 
 export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
@@ -66,9 +66,9 @@ export default async function PersonProfilePage({
   const notableForFact = getKBLatest(entity.id, "notable-for");
   const socialMediaFact = getKBLatest(entity.id, "social-media");
 
-  // Records removed — these collections now return empty arrays
-  const careerHistory: Array<{ key: string; fields: Record<string, unknown> }> = [];
-  const boardSeats: Array<{ key: string; fields: Record<string, unknown> }> = [];
+  // Expert positions from experts.yaml
+  const expert = getExpertById(slug);
+  const positions = expert?.positions ?? [];
 
   // Reverse lookup: org key-person records referencing this person
   const orgRoles = getOrgRolesForPerson(entity.id);
@@ -83,13 +83,6 @@ export default async function PersonProfilePage({
     employedByFact?.value.type === "ref"
       ? resolveEntityRef(employedByFact.value.value)
       : null;
-
-  // Sort career history by start date (most recent first)
-  const sortedCareer = [...careerHistory].sort((a, b) => {
-    const sa = a.fields.start ? String(a.fields.start) : "";
-    const sb = b.fields.start ? String(b.fields.start) : "";
-    return sb.localeCompare(sa);
-  });
 
   // Sort org roles: current first, then by start date
   const sortedOrgRoles = [...orgRoles].sort((a, b) => {
@@ -214,74 +207,8 @@ export default async function PersonProfilePage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content */}
         <div className="lg:col-span-2 space-y-8">
-          {/* Career History Timeline */}
-          {sortedCareer.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Career History
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {sortedCareer.length} positions
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
-                {sortedCareer.map((entry) => {
-                  const org = resolveEntityRef(entry.fields.organization);
-                  const title = fieldStr(entry.fields, "title");
-                  const start = fieldStr(entry.fields, "start");
-                  const end = fieldStr(entry.fields, "end");
-                  const notes = fieldStr(entry.fields, "notes");
-                  const source = fieldStr(entry.fields, "source");
-
-                  return (
-                    <div
-                      key={entry.key}
-                      className="flex gap-4 px-5 py-4 border-b border-border/40 last:border-b-0 group hover:bg-muted/20 transition-colors"
-                    >
-                      {/* Timeline dot */}
-                      <div className="flex flex-col items-center pt-1.5">
-                        <div
-                          className={`w-3 h-3 rounded-full border-2 shrink-0 transition-colors ${
-                            !end
-                              ? "border-primary bg-primary/20 group-hover:bg-primary/30"
-                              : "border-border bg-card group-hover:border-primary/50"
-                          }`}
-                        />
-                        <div className="w-px flex-1 bg-gradient-to-b from-border/50 to-transparent mt-1" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-baseline gap-2 flex-wrap">
-                          {title && (
-                            <span className="font-semibold text-sm">
-                              {title}
-                            </span>
-                          )}
-                          {!end && <CurrentBadge />}
-                        </div>
-                        {org && (
-                          <div className="text-sm mt-0.5">
-                            <DirectoryEntityLink
-                              entity={org}
-                              basePath="/organizations"
-                              className="text-primary hover:underline font-medium"
-                            />
-                          </div>
-                        )}
-                        <div className="text-[10px] text-muted-foreground/60 mt-1">
-                          {formatDateRange(start, end)}
-                        </div>
-                        {notes && (
-                          <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                            {notes}
-                          </p>
-                        )}
-                        <SourceLink source={source} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
+          {/* Expert Positions */}
+          <ExpertPositions positions={positions} />
 
           {/* Education */}
           {educationFact?.value.type === "text" && (
@@ -341,47 +268,6 @@ export default async function PersonProfilePage({
                           {title}
                         </div>
                       )}
-                      <div className="text-[10px] text-muted-foreground/50 mt-1">
-                        {formatDateRange(start, end)}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {/* Board Seats */}
-          {boardSeats.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Board Seats
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {boardSeats.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card">
-                {boardSeats.map((seat) => {
-                  const org = resolveEntityRef(seat.fields.organization);
-                  const role = fieldStr(seat.fields, "role") ?? "Board Member";
-                  const start = fieldStr(seat.fields, "start");
-                  const end = fieldStr(seat.fields, "end");
-
-                  return (
-                    <div
-                      key={seat.key}
-                      className="px-4 py-3 border-b border-border/40 last:border-b-0"
-                    >
-                      <div className="flex items-baseline gap-2">
-                        <DirectoryEntityLink
-                          entity={org}
-                          basePath="/organizations"
-                          className="font-semibold text-sm hover:text-primary transition-colors"
-                        />
-                        <span className="text-xs text-muted-foreground">
-                          {role}
-                        </span>
-                      </div>
                       <div className="text-[10px] text-muted-foreground/50 mt-1">
                         {formatDateRange(start, end)}
                       </div>
