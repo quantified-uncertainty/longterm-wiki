@@ -43,6 +43,8 @@
  *   audits      System-level behavioral verification (ongoing + post-merge)
  *   release     Production release management (create release PRs from main → production)
  *   import-grants Import external grant databases (Coefficient Giving, EA Funds)
+ *   import-divisions Import curated organizational divisions
+ *   import-funding-programs Import curated funding programs
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -99,6 +101,8 @@ import * as kbCommands from './commands/kb.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
 import * as importGrantsCommands from './commands/import-grants.ts';
+import * as importDivisionsCommands from './commands/import-divisions.ts';
+import * as importFundingProgramsCommands from './commands/import-funding-programs.ts';
 
 const domains = {
   validate: validateCommands,
@@ -142,6 +146,8 @@ const domains = {
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
   'import-grants': importGrantsCommands,
+  'import-divisions': importDivisionsCommands,
+  'import-funding-programs': importFundingProgramsCommands,
 };
 
 /**
@@ -229,6 +235,8 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   footnotes        Footnote migration tools (migrate-cr)
   agent-workspace  Multi-agent directory management (setup, sync-env, list, clean)
   import-grants    Import external grant databases (Coefficient Giving, EA Funds)
+  import-divisions Import curated organizational divisions
+  import-funding-programs Import curated funding programs
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
