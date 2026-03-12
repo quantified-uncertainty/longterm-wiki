@@ -24,7 +24,7 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
     fetchDetailed<RpcDivisionsStatsResult>("/api/divisions/stats", {
       revalidate: 60,
     }),
-    fetchDetailed<RpcDivisionsAllResult>("/api/divisions/all?limit=500", {
+    fetchDetailed<RpcDivisionsAllResult>("/api/divisions/all?limit=200", {
       revalidate: 60,
     }),
   ]);

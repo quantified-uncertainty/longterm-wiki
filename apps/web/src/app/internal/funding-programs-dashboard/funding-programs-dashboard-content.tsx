@@ -29,7 +29,7 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
       { revalidate: 60 }
     ),
     fetchDetailed<RpcFundingProgramsAllResult>(
-      "/api/funding-programs/all?limit=500",
+      "/api/funding-programs/all?limit=200",
       { revalidate: 60 }
     ),
   ]);
