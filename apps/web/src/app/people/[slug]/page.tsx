@@ -5,6 +5,9 @@ import {
   resolvePersonBySlug,
   getPersonSlugs,
   getOrgRolesForPerson,
+  getBoardSeatsForPerson,
+  getCareerHistoryForPerson,
+  resolveOrgForCareer,
 } from "../people-utils";
 import {
   getKBFacts,
@@ -73,6 +76,12 @@ export default async function PersonProfilePage({
   // Reverse lookup: org key-person records referencing this person
   const orgRoles = getOrgRolesForPerson(entity.id);
 
+  // Board seats across all organizations referencing this person
+  const boardSeats = getBoardSeatsForPerson(entity.id);
+
+  // Career history records owned by this person
+  const careerHistory = getCareerHistoryForPerson(entity.id);
+
   // All facts for count
   const allFacts = getKBFacts(entity.id).filter(
     (f) => f.propertyId !== "description",
@@ -91,6 +100,30 @@ export default async function PersonProfilePage({
     if (endA !== endB) return endA - endB;
     const sa = a.record.fields.start ? String(a.record.fields.start) : "";
     const sb = b.record.fields.start ? String(b.record.fields.start) : "";
+    return sb.localeCompare(sa);
+  });
+
+  // Sort board seats: current first, then by appointment date
+  const sortedBoardSeats = [...boardSeats].sort((a, b) => {
+    const endA = a.record.fields.departed ? 1 : 0;
+    const endB = b.record.fields.departed ? 1 : 0;
+    if (endA !== endB) return endA - endB;
+    const sa = a.record.fields.appointed
+      ? String(a.record.fields.appointed)
+      : "";
+    const sb = b.record.fields.appointed
+      ? String(b.record.fields.appointed)
+      : "";
+    return sb.localeCompare(sa);
+  });
+
+  // Sort career history: current first, then by start date
+  const sortedCareer = [...careerHistory].sort((a, b) => {
+    const endA = a.fields.end ? 1 : 0;
+    const endB = b.fields.end ? 1 : 0;
+    if (endA !== endB) return endA - endB;
+    const sa = a.fields.start ? String(a.fields.start) : "";
+    const sb = b.fields.start ? String(b.fields.start) : "";
     return sb.localeCompare(sa);
   });
 
@@ -210,6 +243,62 @@ export default async function PersonProfilePage({
           {/* Expert Positions */}
           <ExpertPositions positions={positions} />
 
+          {/* Career History */}
+          {sortedCareer.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold tracking-tight mb-4">
+                Career History
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  {sortedCareer.length}
+                </span>
+              </h2>
+              <div className="border border-border/60 rounded-xl bg-card">
+                {sortedCareer.map((rec) => {
+                  const title = fieldStr(rec.fields, "title");
+                  const start = fieldStr(rec.fields, "start");
+                  const end = fieldStr(rec.fields, "end");
+                  const orgId = rec.fields.organization as string | undefined;
+                  const org = orgId ? resolveOrgForCareer(orgId) : null;
+
+                  return (
+                    <div
+                      key={rec.key}
+                      className="px-4 py-3 border-b border-border/40 last:border-b-0"
+                    >
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {org?.slug ? (
+                          <Link
+                            href={`/organizations/${org.slug}`}
+                            className="font-semibold text-sm hover:text-primary transition-colors"
+                          >
+                            {org.name}
+                          </Link>
+                        ) : org ? (
+                          <span className="font-semibold text-sm">
+                            {org.name}
+                          </span>
+                        ) : orgId ? (
+                          <span className="font-semibold text-sm text-muted-foreground">
+                            {orgId}
+                          </span>
+                        ) : null}
+                        {!end && <CurrentBadge />}
+                      </div>
+                      {title && (
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          {title}
+                        </div>
+                      )}
+                      <div className="text-[10px] text-muted-foreground/50 mt-1">
+                        {formatDateRange(start, end)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
           {/* Education */}
           {educationFact?.value.type === "text" && (
             <section>
@@ -270,6 +359,57 @@ export default async function PersonProfilePage({
                       )}
                       <div className="text-[10px] text-muted-foreground/50 mt-1">
                         {formatDateRange(start, end)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Board Seats */}
+          {sortedBoardSeats.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold tracking-tight mb-4">
+                Board Seats
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  {sortedBoardSeats.length}
+                </span>
+              </h2>
+              <div className="border border-border/60 rounded-xl bg-card">
+                {sortedBoardSeats.map(({ org, record }) => {
+                  const role = fieldStr(record.fields, "role");
+                  const appointed = fieldStr(record.fields, "appointed");
+                  const departed = fieldStr(record.fields, "departed");
+                  const orgSlug = getKBEntitySlug(org.id);
+
+                  return (
+                    <div
+                      key={`${org.id}-${record.key}`}
+                      className="px-4 py-3 border-b border-border/40 last:border-b-0"
+                    >
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {orgSlug ? (
+                          <Link
+                            href={`/organizations/${orgSlug}`}
+                            className="font-semibold text-sm hover:text-primary transition-colors"
+                          >
+                            {org.name}
+                          </Link>
+                        ) : (
+                          <span className="font-semibold text-sm">
+                            {org.name}
+                          </span>
+                        )}
+                        {!departed && <CurrentBadge />}
+                      </div>
+                      {role && (
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          {role}
+                        </div>
+                      )}
+                      <div className="text-[10px] text-muted-foreground/50 mt-1">
+                        {formatDateRange(appointed, departed)}
                       </div>
                     </div>
                   );
