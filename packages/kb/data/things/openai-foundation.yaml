@@ -11,3 +11,50 @@ facts:
       board appointment rights and philanthropic commitments focused on health and AI resilience.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+records:
+  funding-programs:
+    superalignment-fast-grants:
+      name: "Superalignment Fast Grants"
+      type: "round"
+      amount: 10e6
+      date: "2024-01"
+      status: "completed"
+      url: https://openai.com/index/superalignment-fast-grants/
+      notes: "Grants for academic labs and nonprofits working on alignment; part of broader $100M Superalignment commitment. Awarded to researchers at top universities"
+
+    people-first-ai-journalism:
+      name: "People-First AI Journalism Initiative"
+      type: "program"
+      amount: 50e6
+      date: "2025-07"
+      status: "active"
+      source: https://openai.com/index/people-first-ai-journalism-initiative/
+      notes: "Grants over 5 years for AI-powered journalism tools; partnership with Columbia and Pulitzer Center"
+
+    nextgenai-fund:
+      name: "NextGenAI Fund"
+      type: "program"
+      amount: 50e6
+      date: "2025-07"
+      status: "active"
+      source: https://openai.com/index/announcing-the-nextgenai-fund/
+      notes: "Grants for AI deployment in health, education, and public services in the Global South"
+
+    cybersecurity-grant-program:
+      name: "Cybersecurity Grant Program"
+      type: "round"
+      amount: 1e6
+      date: "2024-06"
+      status: "active"
+      url: https://openai.com/index/openai-cybersecurity-grant-program-update/
+      notes: "Supports defenders using AI for cybersecurity; 28 grants in first round, expanded with $1M+ additional funding"
+
+    economic-blueprint:
+      name: "Economic Blueprint Grants"
+      type: "round"
+      amount: 10e6
+      date: "2025-01"
+      status: "active"
+      source: https://openai.com/index/economic-blueprint/
+      notes: "Grants for research on AI's economic impact; 15 university research teams funded"

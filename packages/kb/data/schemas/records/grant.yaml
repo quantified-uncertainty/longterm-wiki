@@ -1,5 +1,5 @@
-name: Grant or Program
-description: "Major grants, programs, and spending initiatives."
+name: Grant
+description: "Individual grant disbursement to a specific recipient."
 collectionName: grants
 temporal: false
 
@@ -9,10 +9,12 @@ endpoints:
     implicit: true
 
 fields:
-  name: { type: text, required: true, description: "Program or grant name" }
+  name: { type: text, required: true, description: "Grant name or description" }
+  recipient: { type: text, description: "Recipient organization or person (entity slug or display name)" }
+  program: { type: text, description: "Key of parent funding-program record on the same entity" }
   amount: { type: number, unit: USD, description: "Funding amount in USD" }
   period: { type: text, description: "Time period (e.g. 2016-2025)" }
-  date: { type: date, description: "Start or announcement date (YYYY-MM)" }
-  status: { type: text, description: "Current status (active, completed, winding-down)" }
+  date: { type: date, description: "Grant date or announcement (YYYY-MM)" }
+  status: { type: text, description: "Current status (active, completed, terminated)" }
   source: { type: text, description: "URL to announcement or report" }
   notes: { type: text, description: "Context, impact, or important details" }
