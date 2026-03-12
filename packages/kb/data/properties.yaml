@@ -52,18 +52,6 @@ properties:
       prefix: "$"
       suffix: "B"
 
-  funding-round-amount:
-    name: Funding Round Amount
-    description: "Capital raised in a specific funding round"
-    dataType: number
-    unit: USD
-    category: financial
-    appliesTo: [organization]
-    display:
-      divisor: 1e6
-      prefix: "$"
-      suffix: "M"
-
   # ── People & Relationships ────────────────────────────────────
 
   employed-by:
@@ -532,17 +520,6 @@ properties:
 
   # ── Risk & Concept Properties ─────────────────────────────────────────
 
-  p-doom:
-    name: P(doom)
-    description: "Expert estimate of probability of catastrophic/existential AI outcome (%)"
-    dataType: number
-    unit: percent
-    category: risk
-    temporal: true
-    appliesTo: [risk, concept, debate]
-    display:
-      suffix: "%"
-
   expert-consensus-level:
     name: Expert Consensus Level
     description: "Degree of expert agreement: high / medium / low / contested / unknown"
@@ -605,20 +582,6 @@ properties:
     category: approach
     appliesTo: [approach, capability, safety-agenda]
 
-  key-proponents:
-    name: Key Proponents
-    description: "People or organizations most associated with advocating this approach"
-    dataType: refs
-    category: approach
-    appliesTo: [approach, debate, safety-agenda]
-
-  addresses-risk:
-    name: Addresses Risk
-    description: "Risk(s) this approach is designed to mitigate (refs to risk entities)"
-    dataType: refs
-    category: approach
-    appliesTo: [approach, safety-agenda]
-
   tractability:
     name: Tractability
     description: "How tractable the approach is: high / medium / low / unknown"
@@ -631,20 +594,6 @@ properties:
   core-question:
     name: Core Question
     description: "The central question or crux of the debate"
-    dataType: text
-    category: debate
-    appliesTo: [debate]
-
-  mainstream-position:
-    name: Mainstream Position
-    description: "The dominant or most widely-held view among experts"
-    dataType: text
-    category: debate
-    appliesTo: [debate]
-
-  minority-position:
-    name: Minority Position
-    description: "A significant dissenting or minority view"
     dataType: text
     category: debate
     appliesTo: [debate]
@@ -664,17 +613,6 @@ properties:
     dataType: text
     category: epistemic
     appliesTo: [risk, risk-factor, approach, debate, concept, capability, safety-agenda]
-
-  survey-result:
-    name: Survey Result
-    description: "Numerical result from a relevant survey or poll (e.g., expert survey response)"
-    dataType: number
-    unit: percent
-    category: epistemic
-    temporal: true
-    appliesTo: [risk, risk-factor, approach, debate, concept]
-    display:
-      suffix: "%"
 
   open-questions:
     name: Open Questions
@@ -698,13 +636,6 @@ properties:
     dataType: text
     category: general
     appliesTo: [organization, person, project, funder, safety-agenda]
-
-  org-type:
-    name: Organization Type
-    description: "Type of organization (company, nonprofit, research lab, government agency, etc.)"
-    dataType: text
-    category: organization
-    appliesTo: [organization]
 
   # ── Event Properties ───────────────────────────────────────────────
 
