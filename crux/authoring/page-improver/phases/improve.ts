@@ -150,6 +150,34 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   );
 
   improvedContent = repairFrontmatter(improvedContent);
+
+  // Guard: ensure required frontmatter fields survive the LLM rewrite.
+  // The LLM occasionally drops `title` or `description`, which fails the gate.
+  const originalFmMatch = currentContent.match(/^---\n([\s\S]*?)\n---/);
+  const improvedFmMatch = improvedContent.match(/^---\n([\s\S]*?)\n---/);
+  if (originalFmMatch && improvedFmMatch) {
+    let fm = improvedFmMatch[1];
+    const getField = (block: string, key: string) =>
+      block.match(new RegExp(`^${key}:\\s*(.+)`, 'm'))?.[1]?.trim();
+
+    for (const field of ['title', 'description']) {
+      if (!getField(fm, field)) {
+        const original = getField(originalFmMatch[1], field);
+        if (original) {
+          log('improve', `⚠ LLM dropped required field "${field}" — restoring from original`);
+          fm = `${field}: ${original}\n${fm}`;
+        }
+      }
+    }
+
+    if (fm !== improvedFmMatch[1]) {
+      improvedContent = improvedContent.replace(
+        `---\n${improvedFmMatch[1]}\n---`,
+        `---\n${fm}\n---`
+      );
+    }
+  }
+
   improvedContent = stripRelatedPagesSections(improvedContent);
 
   const { content: convertedContent, converted: slugsConverted } = convertSlugsToNumericIds(improvedContent, ROOT);

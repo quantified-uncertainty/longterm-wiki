@@ -199,6 +199,14 @@ const COST_MAP: Record<string, number> = {
 
 const TIER_RANK = { polish: 1, standard: 2, deep: 3 } as const;
 
+/** Wiki-server enforces max 5000 chars on the directions field. */
+const MAX_DIRECTIONS_LENGTH = 4500;
+
+function truncateDirections(directions: string): string {
+  if (directions.length <= MAX_DIRECTIONS_LENGTH) return directions;
+  return directions.slice(0, MAX_DIRECTIONS_LENGTH - 50) + '\n... (truncated)';
+}
+
 /**
  * Deduplicate page updates by pageId.
  * For duplicates: merge relevantNews arrays and take the highest tier.
@@ -214,7 +222,7 @@ export function deduplicatePageUpdates(updates: PageUpdate[]): PageUpdate[] {
         existing.suggestedTier = update.suggestedTier;
       }
       if (update.directions && !existing.directions.includes(update.directions)) {
-        existing.directions += '\n' + update.directions;
+        existing.directions = truncateDirections(existing.directions + '\n' + update.directions);
       }
     } else {
       seen.set(update.pageId, { ...update, relevantNews: [...update.relevantNews] });
@@ -321,7 +329,7 @@ export async function routeDigest(
         url: i.url,
         summary: i.summary.slice(0, 200),
       })),
-      directions: `Review and incorporate recent developments: ${items.map(i => i.title).join('; ')}`,
+      directions: truncateDirections(`Review and incorporate recent developments: ${items.map(i => i.title).join('; ')}`),
     });
   }
 
@@ -343,7 +351,7 @@ export async function routeDigest(
       if ((TIER_RANK[update.suggestedTier] ?? 0) > (TIER_RANK[existing.suggestedTier] ?? 0)) {
         existing.suggestedTier = update.suggestedTier;
       }
-      existing.directions += '\n' + update.directions;
+      existing.directions = truncateDirections(existing.directions + '\n' + update.directions);
     } else {
       const page = pages.find(p => p.id === update.pageId);
       pageUpdateMap.set(update.pageId, {
