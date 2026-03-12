@@ -1,6 +1,6 @@
-import { readFileSync, existsSync } from "fs";
-import { execSync } from "child_process";
+import { readFileSync } from "fs";
 import { parseCSVLine } from "../csv.ts";
+import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 
@@ -28,13 +28,7 @@ export const source: GrantSource = {
   sourceUrl: "https://funds.effectivealtruism.org/grants",
 
   ensureData() {
-    if (existsSync(EA_FUNDS_CSV_PATH)) return;
-    console.log("Downloading EA Funds CSV...");
-    execSync(`curl -fsSL --retry 3 --connect-timeout 10 -o "${EA_FUNDS_CSV_PATH}" "${EA_FUNDS_CSV_URL}"`, {
-      stdio: "inherit",
-    });
-    const size = readFileSync(EA_FUNDS_CSV_PATH).length;
-    console.log(`  → ${(size / 1024).toFixed(0)} KB`);
+    downloadIfMissing(EA_FUNDS_CSV_URL, EA_FUNDS_CSV_PATH, "EA Funds CSV");
   },
 
   parse(matcher: EntityMatcher): RawGrant[] {

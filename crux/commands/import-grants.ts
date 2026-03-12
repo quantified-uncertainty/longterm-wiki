@@ -26,6 +26,13 @@ import {
 import { ALL_SOURCES } from "../lib/grant-import/sources/index.ts";
 import type { GrantSource, RawGrant, SyncGrant } from "../lib/grant-import/types.ts";
 
+/** Map from source ID to sourceUrl, built once from ALL_SOURCES */
+const SOURCE_URL_MAP = new Map(ALL_SOURCES.map(s => [s.id, s.sourceUrl]));
+
+function sourceUrlFor(sourceId: string): string {
+  return SOURCE_URL_MAP.get(sourceId) ?? ALL_SOURCES[0].sourceUrl;
+}
+
 function filterSources(sourceFilter?: string): GrantSource[] {
   if (!sourceFilter) return ALL_SOURCES;
   const src = ALL_SOURCES.find(s => s.id === sourceFilter);
@@ -71,8 +78,7 @@ async function cmdAnalyze(sourceFilter?: string) {
   printTopUnmatched(allGrants);
 
   const syncGrants = allGrants.map(g => {
-    const src = sources.find(s => s.id === g.source) || sources[0];
-    return toSyncGrant(g, src.sourceUrl);
+    return toSyncGrant(g, sourceUrlFor(g.source));
   });
   checkIdCollisions(syncGrants);
   printByFunder(syncGrants);

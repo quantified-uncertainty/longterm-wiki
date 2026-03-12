@@ -1,6 +1,6 @@
-import { readFileSync, existsSync } from "fs";
-import { execSync } from "child_process";
+import { readFileSync } from "fs";
 import { parseCSVLine, reassembleCSVRows } from "../csv.ts";
+import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 
@@ -15,13 +15,7 @@ export const source: GrantSource = {
   sourceUrl: "https://coefficientgiving.org/grants/",
 
   ensureData() {
-    if (existsSync(CG_CSV_PATH)) return;
-    console.log("Downloading Coefficient Giving CSV...");
-    execSync(`curl -fsSL --retry 3 --connect-timeout 10 -o "${CG_CSV_PATH}" "${CG_CSV_URL}"`, {
-      stdio: "inherit",
-    });
-    const size = readFileSync(CG_CSV_PATH).length;
-    console.log(`  → ${(size / 1024).toFixed(0)} KB`);
+    downloadIfMissing(CG_CSV_URL, CG_CSV_PATH, "Coefficient Giving CSV");
   },
 
   parse(matcher: EntityMatcher): RawGrant[] {

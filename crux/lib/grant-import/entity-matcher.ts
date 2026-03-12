@@ -72,7 +72,7 @@ export function buildEntityMatcher(): EntityMatcher {
   const slugToId: Record<string, string> = kbData.slugToEntityId || {};
   const idToSlug = new Map<string, string>();
   for (const [slug, id] of Object.entries(slugToId)) {
-    idToSlug.set(id as string, slug);
+    idToSlug.set(id, slug);
   }
 
   if (kbData.entities) {

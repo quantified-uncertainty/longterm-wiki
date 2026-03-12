@@ -1,5 +1,5 @@
-import { readFileSync, existsSync } from "fs";
-import { execSync } from "child_process";
+import { readFileSync } from "fs";
+import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 
@@ -69,14 +69,7 @@ export const source: GrantSource = {
   sourceUrl: "https://survivalandflourishing.fund/recommendations",
 
   ensureData() {
-    if (existsSync(SFF_HTML_PATH)) return;
-    console.log("Downloading SFF recommendations HTML...");
-    execSync(
-      `curl -fsSL --retry 3 --connect-timeout 10 -o "${SFF_HTML_PATH}" "${SFF_URL}"`,
-      { stdio: "inherit" }
-    );
-    const size = readFileSync(SFF_HTML_PATH).length;
-    console.log(`  → ${(size / 1024).toFixed(0)} KB`);
+    downloadIfMissing(SFF_URL, SFF_HTML_PATH, "SFF recommendations HTML");
   },
 
   parse(matcher: EntityMatcher): RawGrant[] {
