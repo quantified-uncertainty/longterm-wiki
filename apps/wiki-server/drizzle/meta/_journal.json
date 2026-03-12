@@ -540,6 +540,13 @@
       "when": 1775203200000,
       "tag": "0076_add_fetch_status_to_resources",
       "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1775289600000,
+      "tag": "0077_add_divisions_and_funding_programs",
+      "breakpoints": true
     }
   ]
 }
