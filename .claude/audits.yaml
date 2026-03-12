@@ -35,7 +35,7 @@ audits:
       "heartbeat OK" messages.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-03-05"
+    last_checked: "2026-03-12"
     last_result: pass
 
   - id: agent-sessions-logged
@@ -50,7 +50,7 @@ audits:
       A large gap means agents are completing work without logging sessions.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-03-10"
+    last_checked: "2026-03-12"
     last_result: pass
 
   - id: scheduled-workflows-running
@@ -73,7 +73,7 @@ audits:
       - server-health-monitor: weekly (within 9 days)
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-03-10"
+    last_checked: "2026-03-12"
     last_result: fail
 
   - id: vercel-production-only
@@ -90,7 +90,7 @@ audits:
     frequency: weekly
     added: "2026-03-04"
     added_by_pr: 1630
-    last_checked: "2026-03-05"
+    last_checked: "2026-03-12"
     last_result: pass
 
   - id: active-agents-dashboard-adoption
@@ -138,6 +138,8 @@ audits:
       "Anthropic" appears as the first result.
     frequency: weekly
     added: "2026-03-07"
+    last_checked: "2026-03-12"
+    last_result: pass
 
   - id: audits-system-adoption
     category: process
@@ -201,9 +203,10 @@ post_merge:
     deadline: "2026-03-19"
 
   - id: workflow-fixes-maintenance-sweep
-    pr: TBD
+    pr: 1953
     merged: "2026-03-10"
     claim: "server-health-monitor jq fix, auto-update push --force fix, and scheduled-deploy removal from health checks all work correctly in CI"
     how_to_verify: "After next scheduled runs, check: (1) server-health-monitor succeeds, (2) auto-update push succeeds (if pages modified), (3) ci-pr-health no longer flags scheduled-deploy as missing"
-    status: pending
+    status: partial
+    notes: "server-health-monitor passes (3/11). auto-update push still fails (tracked in #2093). ci-pr-health fetch returned GitHub 502 during verification."
     deadline: "2026-03-17"
