@@ -3,6 +3,7 @@ import Link from "next/link";
 import { DevModeToggle } from "@/components/DevModeToggle";
 import { SearchButton, SearchDialog } from "@/components/SearchDialog";
 import { MobileNav } from "@/components/MobileNav";
+import { NAV_LINKS } from "@/lib/nav-links";
 import { SITE_URL } from "@/lib/site-config";
 import "./globals.css";
 import "katex/dist/katex.min.css";
@@ -56,60 +57,15 @@ export default function RootLayout({
               Longterm Wiki
             </Link>
             <nav className="flex-1 flex items-center justify-end gap-4 px-6 py-3">
-              <Link
-                href="/wiki"
-                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
-              >
-                Explore
-              </Link>
-              <Link
-                href="/organizations"
-                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
-              >
-                Organizations
-              </Link>
-              <Link
-                href="/people"
-                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
-              >
-                People
-              </Link>
-              <Link
-                href="/risks"
-                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
-              >
-                Risks
-              </Link>
-              <Link
-                href="/grants"
-                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
-              >
-                Grants
-              </Link>
-              <Link
-                href="/sources"
-                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
-              >
-                Sources
-              </Link>
-              <Link
-                href="/kb"
-                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
-              >
-                Data
-              </Link>
-              <Link
-                href="/wiki/E755"
-                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                href="/wiki/E779"
-                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
-              >
-                Internal
-              </Link>
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
               <Link
                 href="/feed.xml"
                 className="hidden md:inline text-muted-foreground no-underline hover:text-foreground transition-colors"

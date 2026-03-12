@@ -18,6 +18,7 @@ import {
 } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import Link from "next/link";
+import { Breadcrumbs } from "@/components/directory";
 
 export function generateStaticParams() {
   return getOrgSlugs().map((slug) => ({ slug }));
@@ -251,14 +252,12 @@ export default async function OrgProfilePage({
 
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
-      {/* Breadcrumbs */}
-      <nav className="text-sm text-muted-foreground mb-4">
-        <Link href="/organizations" className="hover:underline">
-          Organizations
-        </Link>
-        <span className="mx-1.5">/</span>
-        <span>{entity.name}</span>
-      </nav>
+      <Breadcrumbs
+        items={[
+          { label: "Organizations", href: "/organizations" },
+          { label: entity.name },
+        ]}
+      />
 
       {/* Header */}
       <div className="mb-8">
@@ -269,7 +268,7 @@ export default async function OrgProfilePage({
           {orgType && (
             <span
               className={`px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
-                ORG_TYPE_COLORS[orgType] ?? "bg-gray-100 text-gray-600"
+                ORG_TYPE_COLORS[orgType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
               }`}
             >
               {ORG_TYPE_LABELS[orgType] ?? orgType}

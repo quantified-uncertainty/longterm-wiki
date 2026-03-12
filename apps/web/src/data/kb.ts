@@ -156,8 +156,9 @@ export function getKBProperty(propertyId: string): Property | undefined {
 let entityByIdIndex: Map<string, Entity> | undefined;
 
 /**
- * Get an entity definition by ID.
- * Uses a lazy-built index for O(1) lookups after initial build.
+ * Get an entity definition by ID or slug.
+ * Accepts either an internal entity ID (e.g. "mK9pX3rQ7n") or a YAML slug
+ * (e.g. "anthropic"). Uses a lazy-built index for O(1) lookups after initial build.
  */
 export function getKBEntity(entityId: string): Entity | undefined {
   const kb = getKB();
@@ -169,7 +170,11 @@ export function getKBEntity(entityId: string): Entity | undefined {
       entityByIdIndex.set(e.id, e);
     }
   }
-  return entityByIdIndex.get(entityId);
+  // Try direct ID lookup first, then resolve as slug
+  const direct = entityByIdIndex.get(entityId);
+  if (direct) return direct;
+  const resolvedId = resolveEntityKey(entityId, kb);
+  return resolvedId !== entityId ? entityByIdIndex.get(resolvedId) : undefined;
 }
 
 /**

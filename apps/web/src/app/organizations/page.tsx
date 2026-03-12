@@ -70,8 +70,6 @@ export default function OrganizationsPage() {
             ? String(foundedFact.value.value)
             : null,
 
-      fundingRoundsCount: 0, // Records removed
-      keyPeopleCount: 0, // Records removed
     };
   });
 
@@ -79,16 +77,11 @@ export default function OrganizationsPage() {
   const withRevenue = rows.filter((r) => r.revenueNum != null).length;
   const withValuation = rows.filter((r) => r.valuationNum != null).length;
   const withHeadcount = rows.filter((r) => r.headcount != null).length;
-  const totalKeyPeople = rows.reduce((s, r) => s + r.keyPeopleCount, 0);
-  const totalRounds = rows.reduce((s, r) => s + r.fundingRoundsCount, 0);
-
   const stats = [
     { label: "Organizations", value: String(rows.length) },
     { label: "With Revenue Data", value: String(withRevenue) },
     { label: "With Valuation Data", value: String(withValuation) },
     { label: "With Headcount", value: String(withHeadcount) },
-    { label: "Key People Tracked", value: String(totalKeyPeople) },
-    { label: "Funding Rounds", value: String(totalRounds) },
   ];
 
   return (
@@ -104,7 +97,7 @@ export default function OrganizationsPage() {
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
         {stats.map((stat) => (
           <div
             key={stat.label}

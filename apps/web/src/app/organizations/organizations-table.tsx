@@ -26,8 +26,6 @@ export interface OrgRow {
   totalFundingNum: number | null;
 
   foundedDate: string | null;
-  fundingRoundsCount: number;
-  keyPeopleCount: number;
 }
 
 const ORG_TYPE_LABELS: Record<string, string> = {
@@ -58,9 +56,7 @@ type SortKey =
   | "valuation"
   | "headcount"
   | "totalFunding"
-  | "founded"
-  | "fundingRounds"
-  | "keyPeople";
+  | "founded";
 
 type SortDir = "asc" | "desc";
 
@@ -196,8 +192,6 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
           case "headcount": return row.headcount;
           case "totalFunding": return row.totalFundingNum;
           case "founded": return row.foundedDate;
-          case "fundingRounds": return row.fundingRoundsCount;
-          case "keyPeople": return row.keyPeopleCount;
         }
       };
 
@@ -277,8 +271,6 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
               <SortHeader label="Headcount" sortKey="headcount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Total Funding" sortKey="totalFunding" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Founded" sortKey="founded" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
-              <SortHeader label="Rounds" sortKey="fundingRounds" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
-              <SortHeader label="People" sortKey="keyPeople" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -315,7 +307,7 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
                   {row.orgType && (
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        ORG_TYPE_COLORS[row.orgType] ?? "bg-gray-100 text-gray-600"
+                        ORG_TYPE_COLORS[row.orgType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                       }`}
                     >
                       {ORG_TYPE_LABELS[row.orgType] ?? row.orgType}
@@ -365,19 +357,6 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
                   {row.foundedDate ?? ""}
                 </td>
 
-                {/* Funding Rounds */}
-                <td className="py-2.5 px-3 text-center">
-                  {row.fundingRoundsCount > 0 && (
-                    <span className="tabular-nums">{row.fundingRoundsCount}</span>
-                  )}
-                </td>
-
-                {/* Key People */}
-                <td className="py-2.5 px-3 text-center">
-                  {row.keyPeopleCount > 0 && (
-                    <span className="tabular-nums">{row.keyPeopleCount}</span>
-                  )}
-                </td>
               </tr>
             ))}
           </tbody>

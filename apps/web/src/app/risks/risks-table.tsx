@@ -219,7 +219,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
                   {row.riskCategory && (
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        RISK_CATEGORY_COLORS[row.riskCategory] ?? "bg-gray-100 text-gray-600"
+                        RISK_CATEGORY_COLORS[row.riskCategory] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                       }`}
                     >
                       {RISK_CATEGORY_LABELS[row.riskCategory] ?? row.riskCategory}
