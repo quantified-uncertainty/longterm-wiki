@@ -42,6 +42,7 @@
  *   ids         Entity ID allocation and lookup (allocate, check, list)
  *   audits      System-level behavioral verification (ongoing + post-merge)
  *   release     Production release management (create release PRs from main → production)
+ *   import-grants Import external grant databases (Coefficient Giving, EA Funds)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -97,6 +98,7 @@ import * as prPatrolCommands from './commands/pr-patrol.ts';
 import * as kbCommands from './commands/kb.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
+import * as importGrantsCommands from './commands/import-grants.ts';
 
 const domains = {
   validate: validateCommands,
@@ -139,6 +141,7 @@ const domains = {
   kb: kbCommands,
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
+  'import-grants': importGrantsCommands,
 };
 
 /**
@@ -225,6 +228,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   kb          Knowledge base readability tools (show, list, lookup)
   footnotes        Footnote migration tools (migrate-cr)
   agent-workspace  Multi-agent directory management (setup, sync-env, list, clean)
+  import-grants    Import external grant databases (Coefficient Giving, EA Funds)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

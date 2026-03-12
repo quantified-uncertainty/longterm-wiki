@@ -8,6 +8,7 @@ import {
 } from "@/data/kb";
 import { formatKBDate } from "@/components/wiki/kb/format";
 import type { Fact } from "@longterm-wiki/kb";
+import { Breadcrumbs } from "@/components/directory";
 
 export function generateStaticParams() {
   return getOrgSlugs().map((slug) => ({ slug }));
@@ -74,18 +75,13 @@ export default async function OrgFundingPage({
 
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
-      {/* Breadcrumbs */}
-      <nav className="text-sm text-muted-foreground mb-4">
-        <Link href="/organizations" className="hover:underline">
-          Organizations
-        </Link>
-        <span className="mx-1.5">/</span>
-        <Link href={`/organizations/${slug}`} className="hover:underline">
-          {entity.name}
-        </Link>
-        <span className="mx-1.5">/</span>
-        <span>Funding</span>
-      </nav>
+      <Breadcrumbs
+        items={[
+          { label: "Organizations", href: "/organizations" },
+          { label: entity.name, href: `/organizations/${slug}` },
+          { label: "Funding" },
+        ]}
+      />
 
       {/* Header */}
       <div className="mb-8">

@@ -330,6 +330,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Schema Diagrams", href: internalHref("diagrams") },
         { label: "Automation Tools", href: internalHref("automation-tools") },
         { label: "Content Database", href: internalHref("content-database") },
+        { label: "DB Schema Overview", href: internalHref("db-schema-overview") },
       ],
     },
   ];

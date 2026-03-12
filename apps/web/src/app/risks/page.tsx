@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { getKBEntities, getKBLatest, getKBEntitySlug } from "@/data/kb";
-import { getTypedEntityById, isRisk } from "@/data";
+import { getTypedEntities, isRisk } from "@/data";
+import type { RiskEntity } from "@/data/entity-schemas";
+import { titleCase } from "@/components/wiki/kb/format";
 import { ProfileStatCard } from "@/components/directory";
-import { formatKBFactValue } from "@/components/wiki/kb/format";
 import { RisksTable, type RiskRow } from "./risks-table";
-import type { Fact } from "@longterm-wiki/kb";
 
 export const metadata: Metadata = {
   title: "Risks",
@@ -12,41 +11,40 @@ export const metadata: Metadata = {
     "Directory of AI-related risks tracked in the knowledge base, including accident risks, misuse risks, structural risks, and epistemic risks.",
 };
 
-/** Extract a text value from a KB fact for display. */
-function textValue(fact: Fact | undefined): string | null {
-  if (!fact) return null;
-  return formatKBFactValue(fact);
+/** Extract a display string from a likelihood field (string or object). */
+function getLikelihoodStr(likelihood: RiskEntity["likelihood"]): string | null {
+  if (!likelihood) return null;
+  if (typeof likelihood === "string") return titleCase(likelihood);
+  if (likelihood.display) return likelihood.display;
+  if (likelihood.level) return titleCase(likelihood.level);
+  return null;
+}
+
+/** Extract a display string from a timeframe field (string or object). */
+function getTimeframeStr(timeframe: RiskEntity["timeframe"]): string | null {
+  if (!timeframe) return null;
+  if (typeof timeframe === "string") return timeframe;
+  if (timeframe.display) return timeframe.display;
+  if (timeframe.earliest && timeframe.latest) return `${timeframe.earliest}–${timeframe.latest}`;
+  if (timeframe.median) return `~${timeframe.median}`;
+  return null;
 }
 
 export default function RisksPage() {
-  const allEntities = getKBEntities();
-  const risks = allEntities.filter((e) => e.type === "risk");
+  const allEntities = getTypedEntities();
+  const risks = allEntities.filter(isRisk);
 
-  const rows: RiskRow[] = risks.map((entity) => {
-    const typedEntity = getTypedEntityById(entity.id);
-    const riskCategory =
-      typedEntity && isRisk(typedEntity) ? (typedEntity.riskCategory ?? null) : null;
-
-    const severityFact = getKBLatest(entity.id, "severity-level");
-    const likelihoodFact = getKBLatest(entity.id, "likelihood-estimate");
-    const timeHorizonFact = getKBLatest(entity.id, "time-horizon");
-    const evidenceFact = getKBLatest(entity.id, "evidence-strength");
-    const consensusFact = getKBLatest(entity.id, "expert-consensus-level");
-
-    return {
-      id: entity.id,
-      slug: getKBEntitySlug(entity.id) ?? null,
-      name: entity.name,
-      numericId: entity.numericId ?? null,
-      wikiPageId: entity.wikiPageId ?? entity.numericId ?? null,
-      riskCategory,
-      severity: textValue(severityFact),
-      likelihood: textValue(likelihoodFact),
-      timeHorizon: textValue(timeHorizonFact),
-      evidenceStrength: textValue(evidenceFact),
-      expertConsensus: textValue(consensusFact),
-    };
-  });
+  const rows: RiskRow[] = risks.map((risk) => ({
+    id: risk.id,
+    slug: risk.id,
+    name: risk.title,
+    numericId: risk.numericId ?? null,
+    wikiPageId: risk.numericId ?? null,
+    riskCategory: risk.riskCategory ?? null,
+    severity: risk.severity ? titleCase(risk.severity) : null,
+    likelihood: getLikelihoodStr(risk.likelihood),
+    timeHorizon: getTimeframeStr(risk.timeframe),
+  }));
 
   // Compute summary stats
   const byCategory = {
@@ -64,8 +62,8 @@ export default function RisksPage() {
     { label: "Misuse", value: String(byCategory.misuse) },
     { label: "Structural", value: String(byCategory.structural) },
     { label: "Epistemic", value: String(byCategory.epistemic) },
-    { label: "With Severity Data", value: String(withSeverity) },
-    { label: "With Likelihood Data", value: String(withLikelihood) },
+    { label: "With Severity", value: String(withSeverity) },
+    { label: "With Likelihood", value: String(withLikelihood) },
   ];
 
   return (

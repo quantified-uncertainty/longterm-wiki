@@ -33,8 +33,23 @@ type SortDir = "asc" | "desc";
 
 export function PeopleTable({ rows }: { rows: PersonRow[] }) {
   const [search, setSearch] = useState("");
+  const [affiliationFilter, setAffiliationFilter] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+
+  // Collect top affiliations for filter (only those with 2+ people)
+  const affiliations = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of rows) {
+      if (r.employerName) {
+        counts.set(r.employerName, (counts.get(r.employerName) ?? 0) + 1);
+      }
+    }
+    return [...counts.entries()]
+      .filter(([, count]) => count >= 2)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10);
+  }, [rows]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -47,6 +62,10 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
 
   const filtered = useMemo(() => {
     let result = rows;
+
+    if (affiliationFilter !== "all") {
+      result = result.filter((r) => r.employerName === affiliationFilter);
+    }
 
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -90,11 +109,11 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
     });
 
     return result;
-  }, [rows, search, sortKey, sortDir]);
+  }, [rows, search, affiliationFilter, sortKey, sortDir]);
 
   return (
     <div>
-      {/* Search */}
+      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <input
           type="text"
@@ -103,6 +122,35 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
           onChange={(e) => setSearch(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
         />
+        {affiliations.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              onClick={() => setAffiliationFilter("all")}
+              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                affiliationFilter === "all"
+                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
+                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+              }`}
+            >
+              All
+              <span className="ml-1 text-[10px] opacity-60">{rows.length}</span>
+            </button>
+            {affiliations.map(([name, count]) => (
+              <button
+                key={name}
+                onClick={() => setAffiliationFilter(affiliationFilter === name ? "all" : name)}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                  affiliationFilter === name
+                    ? "bg-primary/10 border-primary/30 text-primary font-semibold"
+                    : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+                }`}
+              >
+                {name}
+                <span className="ml-1 text-[10px] opacity-60">{count}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Results count */}

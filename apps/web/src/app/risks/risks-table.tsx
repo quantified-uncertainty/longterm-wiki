@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { SortHeader } from "@/components/directory";
+import { SortHeader } from "@/components/directory/SortHeader";
 
 export interface RiskRow {
   id: string;
@@ -14,8 +14,6 @@ export interface RiskRow {
   severity: string | null;
   likelihood: string | null;
   timeHorizon: string | null;
-  evidenceStrength: string | null;
-  expertConsensus: string | null;
 }
 
 const RISK_CATEGORY_LABELS: Record<string, string> = {
@@ -181,8 +179,6 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
               <SortHeader label="Severity" sortKey="severity" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Likelihood" sortKey="likelihood" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Time Horizon" sortKey="timeHorizon" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
-              <th className="py-2.5 px-3 font-medium text-left">Evidence</th>
-              <th className="py-2.5 px-3 font-medium text-left">Consensus</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -219,7 +215,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
                   {row.riskCategory && (
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        RISK_CATEGORY_COLORS[row.riskCategory] ?? "bg-gray-100 text-gray-600"
+                        RISK_CATEGORY_COLORS[row.riskCategory] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                       }`}
                     >
                       {RISK_CATEGORY_LABELS[row.riskCategory] ?? row.riskCategory}
@@ -240,16 +236,6 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
                 {/* Time Horizon */}
                 <td className="py-2.5 px-3 text-sm">
                   {row.timeHorizon ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                </td>
-
-                {/* Evidence Strength */}
-                <td className="py-2.5 px-3 text-sm capitalize">
-                  {row.evidenceStrength ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                </td>
-
-                {/* Expert Consensus */}
-                <td className="py-2.5 px-3 text-sm capitalize">
-                  {row.expertConsensus ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
               </tr>
             ))}

@@ -1177,7 +1177,7 @@ function grantRowToRecordEntry(row) {
     name: row.name,
   };
   if (row.amount != null) fields.amount = row.amount;
-  if (row.granteeId) fields.grantee = row.granteeId;
+  if (row.granteeId) fields.recipient = row.granteeId;
   if (row.period) fields.period = row.period;
   if (row.date) fields.date = row.date;
   if (row.status) fields.status = row.status;

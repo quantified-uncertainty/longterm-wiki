@@ -3,18 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-const NAV_LINKS = [
-  { href: "/wiki", label: "Explore" },
-  { href: "/organizations", label: "Organizations" },
-  { href: "/people", label: "People" },
-  { href: "/risks", label: "Risks" },
-  { href: "/grants", label: "Grants" },
-  { href: "/sources", label: "Sources" },
-  { href: "/kb", label: "Data" },
-  { href: "/wiki/E755", label: "About" },
-  { href: "/wiki/E779", label: "Internal" },
-];
+import { NAV_LINKS } from "@/lib/nav-links";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);

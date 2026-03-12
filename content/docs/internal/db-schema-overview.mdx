@@ -1,0 +1,625 @@
+---
+numericId: E1054
+title: "Database Schema Overview"
+description: "Complete reference for the wiki-server PostgreSQL schema — tables, relationships, ER diagrams, and migration history"
+subcategory: architecture
+contentFormat: dashboard
+lastEdited: "2026-03-12"
+---
+
+import { Mermaid } from '@components/wiki';
+
+The wiki-server PostgreSQL database has **39 active tables** (plus 7 archived) organized into six domains. This page documents every table, its purpose, key relationships, and the ongoing Phase 4a integer-PK migration.
+
+**Schema source of truth:** `apps/wiki-server/src/schema.ts` (Drizzle ORM)
+
+---
+
+## High-Level Architecture
+
+<Mermaid chart={`
+flowchart TD
+    subgraph YAML["YAML Source Files"]
+        YE["data/entities/*.yaml"]
+        YR["data/resources/*.yaml"]
+        YF["packages/kb/data/things/*.yaml"]
+        YFin["data/financial/*.yaml"]
+    end
+    subgraph MDX["Content"]
+        Pages["content/docs/**/*.mdx"]
+    end
+    subgraph DB["PostgreSQL (wiki-server)"]
+        direction TB
+        Core["Core Content\n(wiki_pages, entities,\nresources, facts)"]
+        Citations["Citation System\n(citation_quotes, citation_content,\npage_citations)"]
+        Auto["Auto-Update\n(runs, results,\nnews_items)"]
+        Agent["Agent Tracking\n(agent_sessions, active_agents,\nevents)"]
+        Financial["Financial Data\n(personnel, grants,\nfunding_rounds, investments,\nequity_positions)"]
+        Infra["Infrastructure\n(jobs, groundskeeper_runs,\nservice_health_incidents)"]
+    end
+    YAML -->|build-data sync| Core
+    MDX -->|build-data sync| Core
+    Core --- Citations
+    Core --- Auto
+    Core --- Agent
+    Core --- Financial
+    Core --- Infra
+`} />
+
+---
+
+## Domain 1: Core Content
+
+The foundational tables that mirror YAML/MDX source data into a queryable PostgreSQL store.
+
+<Mermaid chart={`
+erDiagram
+    entity_ids {
+        integer numeric_id PK
+        text slug UK
+        text description
+        timestamp created_at
+    }
+    wiki_pages {
+        text id PK
+        text slug UK
+        integer integer_id UK
+        text title
+        text description
+        text category
+        text subcategory
+        text entity_type
+        integer quality
+        integer word_count
+        text content_plaintext
+        real recommended_score
+        text search_vector "tsvector + GIN index"
+        timestamp synced_at
+    }
+    entities {
+        text id PK
+        text numeric_id
+        text entity_type
+        text title
+        text description
+        jsonb tags
+        jsonb related_entries
+        jsonb sources
+        timestamp synced_at
+    }
+    resources {
+        text id PK
+        text url UK
+        text title
+        text type
+        jsonb authors
+        jsonb tags
+        text search_vector "tsvector + GIN index"
+        timestamp last_fetched_at
+    }
+    facts {
+        bigserial id PK
+        text entity_id FK
+        text fact_id
+        text label
+        text value
+        real numeric
+        text as_of
+        text measure
+        text subject FK
+    }
+    summaries {
+        text entity_id PK "FK to entities"
+        text entity_type
+        text one_liner
+        text summary
+        text model
+        timestamp generated_at
+    }
+    page_links {
+        bigserial id PK
+        integer source_id_int FK
+        integer target_id_int FK
+        text link_type
+        text relationship
+        real weight
+    }
+    entities ||--o{ facts : "has"
+    entities ||--o| summaries : "has"
+    entities ||--o{ facts : "subject of"
+    wiki_pages ||--o{ page_links : "source"
+    wiki_pages ||--o{ page_links : "target"
+`} />
+
+### Key tables
+
+| Table | Rows (typical) | Purpose |
+|-------|---------------|---------|
+| **wiki_pages** | ≈700 | Mirror of MDX pages. Full-text searchable via GIN index on `search_vector`. Dual-ID system: text `id` (legacy) + `integer_id` (Phase 4a). |
+| **entities** | ≈600 | Mirror of `data/entities/*.yaml`. Organizations, people, concepts, risks, etc. |
+| **resources** | ≈1,000 | Mirror of `data/resources/*.yaml`. Papers, blog posts, reports — the source library. |
+| **facts** | ≈3,000 | Mirror of KB YAML. Numeric/string facts with timeseries support via `measure` + `as_of`. Unique on `(entity_id, fact_id)`. |
+| **summaries** | ≈400 | LLM-generated entity summaries. One per entity. |
+| **page_links** | ≈10,000 | Directional knowledge graph. Link types: `yaml_related`, `entity_link`, `name_prefix`, `similarity`, `shared_tag`. |
+| **entity_ids** | ≈1,000 | Central ID registry. Sequence-allocated. Used for stable E-prefixed URLs (e.g., `/wiki/E42`). |
+
+### Phase 4a: Integer PK migration
+
+Many tables have **dual columns**: `page_id_old` (TEXT, legacy) and `page_id_int` (INTEGER, new). The migration is in progress:
+- New writes go to both columns (dual-write)
+- Reads are migrating from old to new
+- Once reads are fully cut over, `page_id_old` columns will be dropped (Phase D2b)
+
+---
+
+## Domain 2: Citation & Verification System
+
+Tracks footnote citations, fetched source content, accuracy verification, and hallucination risk scoring.
+
+<Mermaid chart={`
+erDiagram
+    wiki_pages ||--o{ citation_quotes : "has"
+    wiki_pages ||--o{ page_citations : "has"
+    wiki_pages ||--o{ citation_accuracy_snapshots : "scored by"
+    wiki_pages ||--o{ hallucination_risk_snapshots : "assessed by"
+    resources ||--o{ citation_quotes : "sourced from"
+    resources ||--o{ page_citations : "linked to"
+    resources ||--o| citation_content : "fetched as"
+    resources ||--o{ resource_citations : "cited on"
+    wiki_pages ||--o{ resource_citations : "uses"
+    citation_quotes {
+        bigserial id PK
+        text page_id_old FK
+        integer footnote
+        text url
+        text resource_id FK
+        text claim_text
+        text source_quote
+        boolean quote_verified
+        text accuracy_verdict
+        real accuracy_score
+    }
+    citation_content {
+        text url PK
+        text resource_id
+        integer http_status
+        text page_title
+        text full_text
+        text content_hash
+    }
+    citation_accuracy_snapshots {
+        bigserial id PK
+        text page_id_old FK
+        integer total_citations
+        integer checked_citations
+        integer accurate_count
+        real average_score
+        timestamp snapshot_at
+    }
+    page_citations {
+        bigserial id PK
+        varchar reference_id UK
+        text page_id_old FK
+        varchar title
+        varchar url
+        text resource_id FK
+    }
+    hallucination_risk_snapshots {
+        bigserial id PK
+        text page_id_old FK
+        integer score
+        text level
+        jsonb factors
+        timestamp computed_at
+    }
+    resource_citations {
+        text resource_id PK "FK to resources"
+        text page_id_old PK "FK to wiki_pages"
+    }
+`} />
+
+### Key tables
+
+| Table | Purpose |
+|-------|---------|
+| **citation_quotes** | Per-footnote citation data with LLM verification. `accuracy_verdict`: accurate, minor_issues, inaccurate, unsupported, not_verifiable. Unique on `(page_id, footnote)`. |
+| **citation_content** | Cached fetched HTML/text from source URLs. Keyed by URL. |
+| **citation_accuracy_snapshots** | Point-in-time page-level citation health aggregations. |
+| **page_citations** | Regular (non-claim) footnote citations. `reference_id` shared namespace with legacy claim references. |
+| **hallucination_risk_snapshots** | LLM-assessed hallucination risk per page. Score 0–100, level: low/medium/high. |
+| **resource_citations** | Many-to-many join: which resources are cited on which pages. |
+
+---
+
+## Domain 3: KB Fact Verification
+
+Independent verification system for structured KB facts against external sources.
+
+<Mermaid chart={`
+erDiagram
+    kb_fact_verdicts {
+        text fact_id PK
+        text verdict
+        real confidence
+        text reasoning
+        integer sources_checked
+        boolean needs_recheck
+    }
+    kb_fact_resource_verifications {
+        bigserial id PK
+        text fact_id
+        text resource_id FK
+        text verdict
+        real confidence
+        text extracted_value
+        text checker_model
+        boolean is_primary_source
+    }
+    resources ||--o{ kb_fact_resource_verifications : "checked against"
+    kb_fact_verdicts ||--o{ kb_fact_resource_verifications : "derived from"
+`} />
+
+The verification system has two layers:
+1. **Evidence** (`kb_fact_resource_verifications`): One row per fact-resource check. Records what the LLM found.
+2. **Conclusions** (`kb_fact_verdicts`): One row per fact. Aggregated verdict derived from all evidence rows. Verdict options: confirmed, contradicted, unverifiable, outdated, partial, unchecked.
+
+---
+
+## Domain 4: Auto-Update System
+
+Daily automated content updates driven by RSS feeds and web searches.
+
+<Mermaid chart={`
+erDiagram
+    auto_update_runs ||--o{ auto_update_results : "produces"
+    auto_update_runs ||--o{ auto_update_news_items : "discovers"
+    wiki_pages ||--o{ auto_update_results : "updated by"
+    wiki_pages ||--o{ auto_update_news_items : "routed to"
+    auto_update_runs {
+        bigserial id PK
+        date date
+        text trigger
+        real budget_limit
+        real budget_spent
+        integer items_fetched
+        integer pages_updated
+    }
+    auto_update_results {
+        bigserial id PK
+        bigint run_id FK
+        text page_id_old FK
+        text status
+        text tier
+        integer duration_ms
+    }
+    auto_update_news_items {
+        bigserial id PK
+        bigint run_id FK
+        text title
+        text url
+        text source_id
+        integer relevance_score
+        text routed_to_page_id_old FK
+        text routed_tier
+    }
+`} />
+
+Pipeline flow: **Fetch sources** → **Score relevance** → **Route to pages** → **Run improve pipeline** → **Record results**
+
+---
+
+## Domain 5: Agent & Session Tracking
+
+Coordinates concurrent Claude Code agents and records session history.
+
+<Mermaid chart={`
+erDiagram
+    active_agents ||--o{ agent_session_events : "logs"
+    agent_sessions ||--o{ agent_session_pages : "modified"
+    wiki_pages ||--o{ agent_session_pages : "changed by"
+    sessions ||--o{ session_pages : "modified"
+    wiki_pages ||--o{ session_pages : "changed by"
+    active_agents {
+        bigserial id PK
+        text session_id UK
+        text branch
+        text task
+        text status
+        text current_step
+        integer issue_number
+        jsonb files_touched
+        timestamp heartbeat_at
+    }
+    agent_session_events {
+        bigserial id PK
+        bigint agent_id FK
+        text event_type
+        text message
+        jsonb metadata
+        timestamp timestamp
+    }
+    agent_sessions {
+        bigserial id PK
+        text branch
+        text task
+        text session_type
+        integer issue_number
+        text checklist_md
+        text pr_url
+        text pr_outcome
+        text status
+        date date
+        text title
+        integer cost_cents
+    }
+    agent_session_pages {
+        bigint agent_session_id PK "FK to agent_sessions"
+        text page_id PK "FK to wiki_pages"
+    }
+    sessions {
+        bigserial id PK
+        date date
+        text branch
+        text title
+        text model
+        integer cost_cents
+        text pr_url
+    }
+    session_pages {
+        bigint session_id PK "FK to sessions"
+        text page_id_old PK "FK to wiki_pages"
+    }
+`} />
+
+### Key tables
+
+| Table | Purpose |
+|-------|---------|
+| **active_agents** | Live agent coordination. Heartbeat-based stale detection (>30 min). Status: active, completed, errored, stale. |
+| **agent_session_events** | Audit trail timeline. Event types: registered, checklist_check, status_update, error, note, completed. |
+| **agent_sessions** | Full session lifecycle. Stores checklist, PR outcome, cost, duration, and session log fields. |
+| **sessions** | Legacy session log (being superseded by `agent_sessions`). |
+
+---
+
+## Domain 6: Financial Data
+
+Structured financial records for AI companies and organizations — funding, personnel, equity.
+
+<Mermaid chart={`
+erDiagram
+    personnel {
+        varchar id PK "10-char"
+        text person_id
+        text organization_id
+        text role
+        text role_type
+        text start_date
+        text end_date
+        boolean is_founder
+    }
+    grants {
+        varchar id PK "10-char"
+        text organization_id
+        text grantee_id
+        text name
+        numeric amount
+        text currency
+        text status
+    }
+    funding_rounds {
+        varchar id PK "10-char"
+        text company_id
+        text name
+        text date
+        numeric raised
+        numeric valuation
+        text instrument
+        text lead_investor
+    }
+    investments {
+        varchar id PK "10-char"
+        text company_id
+        text investor_id
+        text round_name
+        numeric amount
+        text stake_acquired
+        text role
+    }
+    equity_positions {
+        varchar id PK "10-char"
+        text company_id
+        text holder_id
+        text stake
+        text as_of
+        text valid_end
+    }
+`} />
+
+### Design notes
+
+- **NUMERIC type** for amounts (not FLOAT) — preserves exact financial values
+- **TEXT references** for person/org IDs — supports both entity IDs and display names for non-entity records (e.g., "D. E. Shaw Research")
+- **10-char VARCHAR primary keys** — stable IDs allocated from `entity_ids` sequence
+- **Temporal support**: `start_date`/`end_date` for personnel, `as_of`/`valid_end` for equity positions
+
+---
+
+## Domain 7: Infrastructure
+
+Background job processing, maintenance tracking, and incident monitoring.
+
+<Mermaid chart={`
+erDiagram
+    jobs {
+        bigserial id PK
+        text type
+        text status
+        jsonb params
+        jsonb result
+        integer priority
+        integer retries
+        text worker_id
+    }
+    groundskeeper_runs {
+        bigserial id PK
+        text task_name
+        text event
+        boolean success
+        integer duration_ms
+        integer consecutive_failures
+        boolean circuit_breaker_active
+    }
+    service_health_incidents {
+        bigserial id PK
+        text service
+        text severity
+        text status
+        text title
+        timestamp detected_at
+        timestamp resolved_at
+        integer github_issue_number
+    }
+    properties {
+        text id PK
+        text label
+        text category
+        text value_type
+        text default_unit
+        text staleness_cadence
+    }
+`} />
+
+### Key tables
+
+| Table | Purpose |
+|-------|---------|
+| **jobs** | Background task queue. Workers claim via `SELECT ... FOR UPDATE SKIP LOCKED`. Status: pending → claimed → running → completed/failed. |
+| **groundskeeper_runs** | Maintenance daemon execution history. Circuit breaker pattern: tracks consecutive failures. |
+| **service_health_incidents** | Infrastructure outage tracking. Severity: critical/high/medium/low. Status: open → investigating → resolved. |
+| **properties** | Controlled vocabulary for structured data. Defines attributes like "valuation", "headcount", "ceo". Referenced by the (now archived) statements system. |
+
+---
+
+## Archived Tables
+
+Seven tables were archived in migration 0065 (March 2026). They are renamed to `_archived_*` and kept for backward-compatible FK references but are no longer written to.
+
+| Archived Table | Original Purpose | Replacement |
+|---------------|-----------------|-------------|
+| `_archived_claims` | Extracted factual claims | KB facts system (`packages/kb/data/things/`) |
+| `_archived_claim_sources` | Per-claim resource linking | KB fact resource verifications |
+| `_archived_claim_page_references` | Claim-to-page mapping | Page citations + KB components |
+| `_archived_statements` | Typed structured/attributed facts | KB facts YAML + `facts` table |
+| `_archived_statement_citations` | Statement resource linking | KB fact resource verifications |
+| `_archived_statement_page_references` | Statement-to-page mapping | Page citations |
+| `_archived_entity_coverage_scores` | Entity quality snapshots | KB-level quality metrics |
+
+---
+
+## Full Relationship Map
+
+This diagram shows all active foreign key relationships in the database.
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Core
+        WP[wiki_pages]
+        ENT[entities]
+        RES[resources]
+        EID[entity_ids]
+    end
+    subgraph Content
+        CQ[citation_quotes]
+        CC[citation_content]
+        CAS[citation_accuracy_snapshots]
+        HRS[hallucination_risk_snapshots]
+        PC[page_citations]
+        RC[resource_citations]
+        EL[edit_logs]
+        PL[page_links]
+        F[facts]
+        SUM[summaries]
+        PIR[page_improve_runs]
+    end
+    subgraph AutoUpdate
+        AUR[auto_update_runs]
+        AURES[auto_update_results]
+        AUNI[auto_update_news_items]
+    end
+    subgraph Agents
+        AA[active_agents]
+        AS[agent_sessions]
+        ASP[agent_session_pages]
+        ASE[agent_session_events]
+        SESS[sessions]
+        SP[session_pages]
+    end
+    subgraph Finance
+        PER[personnel]
+        GR[grants]
+        FR[funding_rounds]
+        INV[investments]
+        EP[equity_positions]
+    end
+    subgraph Verification
+        KBFRV[kb_fact_resource_verifications]
+        KBFV[kb_fact_verdicts]
+    end
+    subgraph Infra
+        JOBS[jobs]
+        GKR[groundskeeper_runs]
+        SHI[service_health_incidents]
+        PROP[properties]
+    end
+    WP --> CQ
+    WP --> CAS
+    WP --> HRS
+    WP --> EL
+    WP --> PC
+    WP --> RC
+    WP --> PL
+    WP --> AURES
+    WP --> AUNI
+    WP --> PIR
+    WP --> ASP
+    WP --> SP
+    ENT --> F
+    ENT --> SUM
+    RES --> CQ
+    RES --> RC
+    RES --> PC
+    RES --> KBFRV
+    AUR --> AURES
+    AUR --> AUNI
+    AA --> ASE
+    AS --> ASP
+    SESS --> SP
+`} />
+
+---
+
+## Connection Architecture
+
+```
+Application Pool:  max 10 connections, statement_timeout: 30s
+Migration Pool:    max 1 connection, statement_timeout: unlimited, lock_timeout: 60s
+```
+
+- `DATABASE_URL` → application queries
+- `DATABASE_MIGRATION_URL` → DDL migrations (falls back to `DATABASE_URL`)
+- Drizzle ORM for schema management, migrations run on server startup
+- 77 migration files tracking schema evolution since project inception
+
+---
+
+## Migration History
+
+| Phase | Migrations | Period | Key Changes |
+|-------|-----------|--------|-------------|
+| Phase 0 | 0000–0007 | Initial | Entity, fact, claim, resource systems |
+| Phase 1 | 0008–0014 | — | Auto-update, performance tuning, page links |
+| Phase 2 | 0015–0020 | — | Entity data model, facts timeseries, jobs, agent sessions |
+| Phase 3 | 0021–0045 | — | Claims → statements unification, hallucination risk, health monitoring |
+| Phase 4a | 0046–0066 | — | Integer PK migration (dual-write strategy), table archival |
+| Phase 5 | 0067–0076 | Current | KB verification, personnel, grants, funding, equity, investments |
