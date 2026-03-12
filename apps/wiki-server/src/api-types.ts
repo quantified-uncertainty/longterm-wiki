@@ -630,6 +630,15 @@ export interface ResourceStatsResult {
   fetched: number;
 }
 
+// -- Resources: Fetch status update ------------------------------------------
+
+export const UpdateResourceFetchStatusSchema = z.object({
+  fetchStatus: z.enum(["ok", "dead", "paywall", "error"]),
+  lastFetchedAt: z.string().datetime(),
+  fetchedTitle: z.string().max(1000).optional(),
+});
+export type UpdateResourceFetchStatus = z.infer<typeof UpdateResourceFetchStatusSchema>;
+
 export interface ResourceSearchResult {
   results: ResourceRow[];
   count: number;
