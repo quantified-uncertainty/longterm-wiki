@@ -97,6 +97,7 @@ import * as prPatrolCommands from './commands/pr-patrol.ts';
 import * as kbCommands from './commands/kb.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
+import * as importGrantsCommands from './commands/import-grants.ts';
 
 const domains = {
   validate: validateCommands,
@@ -139,6 +140,7 @@ const domains = {
   kb: kbCommands,
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
+  'import-grants': importGrantsCommands,
 };
 
 /**
