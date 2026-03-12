@@ -38,6 +38,9 @@ import { grantsRoute } from "./routes/grants.js";
 import { fundingRoundsRoute } from "./routes/funding-rounds.js";
 import { investmentsRoute } from "./routes/investments.js";
 import { equityPositionsRoute } from "./routes/equity-positions.js";
+import { divisionsRoute } from "./routes/divisions.js";
+import { divisionPersonnelRoute } from "./routes/division-personnel.js";
+import { fundingProgramsRoute } from "./routes/funding-programs.js";
 
 let requestCounter = 0;
 
@@ -151,6 +154,9 @@ export function createApp() {
   app.route("/api/funding-rounds", fundingRoundsRoute);
   app.route("/api/investments", investmentsRoute);
   app.route("/api/equity-positions", equityPositionsRoute);
+  app.route("/api/divisions", divisionsRoute);
+  app.route("/api/division-personnel", divisionPersonnelRoute);
+  app.route("/api/funding-programs", fundingProgramsRoute);
 
   return app;
 }

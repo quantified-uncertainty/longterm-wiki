@@ -20,6 +20,14 @@ export function paginationQuery(opts?: {
   });
 }
 
+/**
+ * Zod refine check: rejects arrays with duplicate `id` values.
+ * Use with `.refine(noDuplicateIds, { message: "Duplicate id values in items array" })`.
+ */
+export function noDuplicateIds(items: { id: string }[]) {
+  return new Set(items.map((i) => i.id)).size === items.length;
+}
+
 /** Standard error codes for 400 responses. */
 export const VALIDATION_ERROR = "validation_error" as const;
 export const INVALID_JSON_ERROR = "invalid_json" as const;
