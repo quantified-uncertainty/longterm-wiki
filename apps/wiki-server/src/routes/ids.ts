@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, asc } from "drizzle-orm";
@@ -10,11 +11,32 @@ import {
   notFoundError,
 } from "./utils.js";
 
+/**
+ * Generate a random 10-char alphanumeric stable ID.
+ * Same algorithm as packages/kb/src/ids.ts — duplicated here to avoid
+ * cross-package dependencies in the wiki-server build.
+ */
+function generateStableId(): string {
+  const REPLACEMENT_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
+  const raw = randomBytes(7).toString("base64url").slice(0, 10);
+  return raw
+    .split("")
+    .map((ch) => {
+      if (ch === "-" || ch === "_") {
+        const byte = randomBytes(1)[0];
+        return REPLACEMENT_CHARS[byte % REPLACEMENT_CHARS.length];
+      }
+      return ch;
+    })
+    .join("");
+}
+
 // ---- Helpers ----
 
 type EntityIdRow = {
   numericId: number;
   slug: string;
+  stableId: string | null;
   description: string | null;
   createdAt: Date;
 };
@@ -23,6 +45,7 @@ function formatIdResponse(row: EntityIdRow, created: boolean) {
   return {
     numericId: `E${row.numericId}`,
     slug: row.slug,
+    stableId: row.stableId,
     description: row.description,
     created,
     createdAt: row.createdAt,
@@ -33,6 +56,7 @@ function formatIdSummary(row: EntityIdRow) {
   return {
     numericId: `E${row.numericId}`,
     slug: row.slug,
+    stableId: row.stableId,
     description: row.description,
     createdAt: row.createdAt,
   };
@@ -86,12 +110,13 @@ const idsApp = new Hono()
       return c.json(formatIdResponse(existing[0], false));
     }
 
-    // Slug is new — allocate next sequence value
+    // Slug is new — allocate next sequence value + stable ID
     const inserted = await db
       .insert(entityIds)
       .values({
         numericId: sql`nextval('entity_id_seq')`,
         slug,
+        stableId: generateStableId(),
         description: description ?? null,
       })
       .onConflictDoNothing({ target: entityIds.slug })
@@ -149,6 +174,7 @@ const idsApp = new Hono()
           .values({
             numericId: sql`nextval('entity_id_seq')`,
             slug: item.slug,
+            stableId: generateStableId(),
             description: item.description ?? null,
           })
           .onConflictDoNothing({ target: entityIds.slug })
@@ -197,6 +223,58 @@ const idsApp = new Hono()
       limit,
       offset,
     });
+  })
+
+  // ---- POST /backfill-stable-ids ----
+  // Batch-set stableIds for existing slugs (used for KB import and generating
+  // stableIds for entities that were allocated before this column existed).
+  .post("/backfill-stable-ids", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const schema = z.object({
+      items: z.array(z.object({
+        slug: z.string().min(1).max(500),
+        stableId: z.string().length(10),
+      })).min(1).max(200),
+    });
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const db = getDrizzleDb();
+    let updated = 0;
+    let generated = 0;
+
+    await db.transaction(async (tx) => {
+      for (const item of parsed.data.items) {
+        const result = await tx
+          .update(entityIds)
+          .set({ stableId: item.stableId })
+          .where(eq(entityIds.slug, item.slug))
+          .returning();
+        if (result.length > 0) updated++;
+      }
+    });
+
+    // Generate stableIds for any rows that still lack one
+    const missing = await db
+      .select({ slug: entityIds.slug })
+      .from(entityIds)
+      .where(sql`${entityIds.stableId} IS NULL`);
+
+    if (missing.length > 0) {
+      await db.transaction(async (tx) => {
+        for (const row of missing) {
+          await tx
+            .update(entityIds)
+            .set({ stableId: generateStableId() })
+            .where(eq(entityIds.slug, row.slug));
+          generated++;
+        }
+      });
+    }
+
+    return c.json({ updated, generated, totalMissing: missing.length });
   })
 
   // ---- GET /by-slug?slug=... ----

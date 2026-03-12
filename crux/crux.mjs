@@ -105,6 +105,7 @@ import * as importGrantsCommands from './commands/import-grants.ts';
 import * as importDivisionsCommands from './commands/import-divisions.ts';
 import * as importFundingProgramsCommands from './commands/import-funding-programs.ts';
 import * as peopleCommands from './commands/people.ts';
+import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
 
 const domains = {
   validate: validateCommands,
@@ -151,6 +152,7 @@ const domains = {
   'import-divisions': importDivisionsCommands,
   'import-funding-programs': importFundingProgramsCommands,
   people: peopleCommands,
+  'backfill-stable-ids': backfillStableIdsCommand,
 };
 
 /**

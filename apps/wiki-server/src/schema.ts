@@ -24,6 +24,7 @@ export const entityIdSeq = pgSequence("entity_id_seq", { startWith: 1 });
 export const entityIds = pgTable("entity_ids", {
   numericId: integer("numeric_id").primaryKey(),
   slug: text("slug").notNull().unique(),
+  stableId: text("stable_id").unique(),
   description: text("description"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
@@ -626,6 +627,7 @@ export const entities = pgTable(
   {
     id: text("id").primaryKey(),
     numericId: text("numeric_id"),
+    stableId: text("stable_id").unique(),
     entityType: text("entity_type").notNull(),
     title: text("title").notNull(),
     description: text("description"),

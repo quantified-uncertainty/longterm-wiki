@@ -554,6 +554,13 @@
       "when": 1775376000000,
       "tag": "0078_add_grants_program_id",
       "breakpoints": true
+    },
+    {
+      "idx": 79,
+      "version": "7",
+      "when": 1775462400000,
+      "tag": "0079_add_stable_id",
+      "breakpoints": true
     }
   ]
 }

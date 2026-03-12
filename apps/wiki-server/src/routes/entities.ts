@@ -41,6 +41,7 @@ function formatEntity(e: typeof entities.$inferSelect) {
   return {
     id: e.id,
     numericId: e.numericId,
+    stableId: e.stableId,
     entityType: e.entityType,
     title: e.title,
     description: e.description,
@@ -123,11 +124,11 @@ const entitiesApp = new Hono()
 
     const db = getDrizzleDb();
 
-    // Look up by slug or numeric ID
+    // Look up by slug, numeric ID, or stable ID
     const rows = await db
       .select()
       .from(entities)
-      .where(or(eq(entities.id, id), eq(entities.numericId, id)));
+      .where(or(eq(entities.id, id), eq(entities.numericId, id), eq(entities.stableId, id)));
 
     if (rows.length === 0) {
       return notFoundError(c, `No entity found for id: ${id}`);
@@ -159,6 +160,7 @@ const entitiesApp = new Hono()
       .select({
         id: entities.id,
         numericId: entities.numericId,
+        stableId: entities.stableId,
         entityType: entities.entityType,
         title: entities.title,
         description: entities.description,
@@ -221,6 +223,7 @@ const entitiesApp = new Hono()
       const allVals = items.map((e) => ({
         id: e.id,
         numericId: e.numericId ?? null,
+        stableId: e.stableId ?? null,
         entityType: e.entityType,
         title: e.title,
         description: e.description ?? null,
@@ -241,6 +244,9 @@ const entitiesApp = new Hono()
           target: entities.id,
           set: {
             numericId: sql`excluded.numeric_id`,
+            // Only overwrite stableId if the incoming value is non-null
+            // (avoid clobbering a previously-set stableId with null)
+            stableId: sql`COALESCE(excluded.stable_id, "entities"."stable_id")`,
             entityType: sql`excluded.entity_type`,
             title: sql`excluded.title`,
             description: sql`excluded.description`,
