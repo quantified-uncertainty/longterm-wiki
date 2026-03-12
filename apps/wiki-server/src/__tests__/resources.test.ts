@@ -2,6 +2,15 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { mockDbModule, postJson } from "./test-utils.js";
 
+/** PATCH JSON helper for tests. */
+function patchJson(app: Hono, path: string, body: unknown) {
+  return app.request(path, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
 // ---- In-memory stores ----
 
 let resourceStore: Map<string, Record<string, unknown>>;
@@ -69,6 +78,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
+  // ---- UPDATE resources SET fetch_status (PATCH /:id/fetch-status) ----
+  if (q.startsWith("update") && q.includes("set") && q.includes('"fetch_status"')) {
+    const id = params[params.length - 1] as string;
+    const r = resourceStore.get(id);
+    if (r) {
+      r.fetch_status = params[0];
+      r.last_fetched_at = params[1];
+      r.updated_at = new Date();
+    }
+    return [];
+  }
+
   // ---- INSERT INTO resources ... ON CONFLICT ----
   if (q.includes("insert into") && q.includes('"resources"') && !q.includes("resource_citations")) {
     const now = new Date();
@@ -94,6 +115,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       content_hash: params[15],
       // COALESCE: preserve existing stable_id, only set if row didn't have one
       stable_id: existing?.stable_id ?? params[16] ?? null,
+      fetch_status: existing?.fetch_status ?? null,
+      last_fetched_at: existing?.last_fetched_at ?? null,
       created_at: existing?.created_at ?? now,
       updated_at: now,
     };
@@ -520,6 +543,76 @@ describe("Resources API", () => {
       expect(body.total).toBe(5);
       expect(body.limit).toBe(2);
       expect(body.offset).toBe(0);
+    });
+  });
+
+  describe("PATCH /api/resources/:id/fetch-status", () => {
+    it("updates fetch status on an existing resource", async () => {
+      await postJson(app, "/api/resources", sampleResource);
+
+      const res = await patchJson(app, "/api/resources/abc123def456/fetch-status", {
+        fetchStatus: "ok",
+        lastFetchedAt: "2026-03-12T00:00:00.000Z",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.ok).toBe(true);
+      expect(body.id).toBe("abc123def456");
+      expect(body.fetchStatus).toBe("ok");
+      expect(body.lastFetchedAt).toBe("2026-03-12T00:00:00.000Z");
+    });
+
+    it("returns 404 for non-existent resource", async () => {
+      const res = await patchJson(app, "/api/resources/nonexistent/fetch-status", {
+        fetchStatus: "dead",
+        lastFetchedAt: "2026-03-12T00:00:00.000Z",
+      });
+      expect(res.status).toBe(404);
+    });
+
+    it("rejects invalid fetchStatus value", async () => {
+      await postJson(app, "/api/resources", sampleResource);
+
+      const res = await patchJson(app, "/api/resources/abc123def456/fetch-status", {
+        fetchStatus: "invalid-status",
+        lastFetchedAt: "2026-03-12T00:00:00.000Z",
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects missing required fields", async () => {
+      await postJson(app, "/api/resources", sampleResource);
+
+      const res = await patchJson(app, "/api/resources/abc123def456/fetch-status", {
+        fetchStatus: "ok",
+        // missing lastFetchedAt
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("accepts all valid fetchStatus enum values", async () => {
+      await postJson(app, "/api/resources", sampleResource);
+
+      for (const status of ["ok", "dead", "paywall", "error"]) {
+        const res = await patchJson(app, "/api/resources/abc123def456/fetch-status", {
+          fetchStatus: status,
+          lastFetchedAt: "2026-03-12T00:00:00.000Z",
+        });
+        expect(res.status).toBe(200);
+        const body = await res.json();
+        expect(body.fetchStatus).toBe(status);
+      }
+    });
+
+    it("rejects fetchedTitle exceeding max length", async () => {
+      await postJson(app, "/api/resources", sampleResource);
+
+      const res = await patchJson(app, "/api/resources/abc123def456/fetch-status", {
+        fetchStatus: "ok",
+        lastFetchedAt: "2026-03-12T00:00:00.000Z",
+        fetchedTitle: "x".repeat(1001),
+      });
+      expect(res.status).toBe(400);
     });
   });
 });
