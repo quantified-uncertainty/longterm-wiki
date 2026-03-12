@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import { parseCSVLine, reassembleCSVRows } from "../csv.ts";
+import { parseMonthYear } from "../dates.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
@@ -40,21 +41,7 @@ export const source: GrantSource = {
       const granteeId = matchGrantee(orgName, matcher);
 
       // Parse date: "February 2016" → "2016-02"
-      let isoDate: string | null = null;
-      if (date) {
-        const parts = date.split(" ");
-        if (parts.length === 2) {
-          const monthNames: Record<string, string> = {
-            January: "01", February: "02", March: "03", April: "04",
-            May: "05", June: "06", July: "07", August: "08",
-            September: "09", October: "10", November: "11", December: "12",
-          };
-          const monthNum = monthNames[parts[0]];
-          if (monthNum && parts[1]) {
-            isoDate = `${parts[1]}-${monthNum}`;
-          }
-        }
-      }
+      const isoDate = date ? parseMonthYear(date) : null;
 
       grants.push({
         source: "coefficient-giving",
