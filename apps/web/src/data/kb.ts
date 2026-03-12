@@ -334,9 +334,10 @@ export function getAllKBRecords(collection: string): KBRecordEntry[] {
   const kb = getKB();
   if (!kb) return [];
 
-  const records = (kb as Record<string, unknown>).records as
-    | Record<string, Record<string, KBRecordEntry[]>>
-    | undefined;
+  type RecordsMap = Record<string, Record<string, KBRecordEntry[]>>;
+  const records = "records" in kb
+    ? (kb as { records?: RecordsMap }).records
+    : undefined;
   if (!records) return [];
 
   const result: KBRecordEntry[] = [];
