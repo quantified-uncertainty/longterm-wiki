@@ -3,6 +3,7 @@ import { execSync } from "child_process";
 import { truncateToMonth } from "../dates.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
+import { FUNDER_IDS } from "../constants.ts";
 
 const FTX_SQL_BASE_URL =
   "https://raw.githubusercontent.com/vipulnaik/donations/master/sql/donations/private-foundations/ftx-future-fund/";
@@ -20,7 +21,6 @@ const FTX_SQL_FILES = [
   "ftx-future-fund-staff-led-grants.sql",
 ];
 const FTX_SQL_DIR = "/tmp/ftx-future-fund-sql";
-const FUNDER_ID = "JhIGCaI3Ng";
 
 interface FTXSQLGrant {
   donee: string;
@@ -159,7 +159,7 @@ export const source: GrantSource = {
 
         grants.push({
           source: "ftx-future-fund",
-          funderId: FUNDER_ID,
+          funderId: FUNDER_IDS.FTX_FUTURE_FUND,
           granteeName: g.donee,
           granteeId,
           name,

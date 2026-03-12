@@ -3,8 +3,8 @@ import { execSync } from "child_process";
 import { extractISODate } from "../dates.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
+import { FUNDER_IDS } from "../constants.ts";
 
-const MANIFUND_FUNDER_ID = "fFVOuFZCRf";
 const MANIFUND_API_URL = "https://manifund.org/api/v0/projects";
 const MANIFUND_CACHE_PATH = "/tmp/manifund-projects.json";
 
@@ -170,7 +170,7 @@ export function parseManifundProjects(
 
     grants.push({
       source: "manifund",
-      funderId: MANIFUND_FUNDER_ID,
+      funderId: FUNDER_IDS.MANIFUND,
       granteeName: creatorName,
       granteeId,
       name: project.title.substring(0, 500),

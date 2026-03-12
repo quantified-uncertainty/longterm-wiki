@@ -4,6 +4,7 @@ import { parseQuarterYear } from "../dates.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
+import { FUNDER_IDS } from "../constants.ts";
 
 const EA_FUNDS_CSV_URL = "https://funds.effectivealtruism.org/api/grants";
 const EA_FUNDS_CSV_PATH = "/tmp/ea-funds-grants.csv";
@@ -15,11 +16,11 @@ export function resolveEAFundEntityIds(
   const cea = matcher.match("cea");
 
   return {
-    "Long-Term Future Fund": ltff?.stableId || "yA12C1KcjQ",
-    "Animal Welfare Fund": cea?.stableId || "gNsqAes7Dw",
-    "EA Infrastructure Fund": cea?.stableId || "gNsqAes7Dw",
-    "Effective Altruism Infrastructure Fund": cea?.stableId || "gNsqAes7Dw",
-    "Global Health and Development Fund": cea?.stableId || "gNsqAes7Dw",
+    "Long-Term Future Fund": ltff?.stableId || FUNDER_IDS.LTFF,
+    "Animal Welfare Fund": cea?.stableId || FUNDER_IDS.CEA,
+    "EA Infrastructure Fund": cea?.stableId || FUNDER_IDS.CEA,
+    "Effective Altruism Infrastructure Fund": cea?.stableId || FUNDER_IDS.CEA,
+    "Global Health and Development Fund": cea?.stableId || FUNDER_IDS.CEA,
   };
 }
 

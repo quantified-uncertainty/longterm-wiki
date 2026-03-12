@@ -3,10 +3,10 @@ import { QUARTER_TO_MONTH } from "../dates.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
+import { FUNDER_IDS } from "../constants.ts";
 
 const SFF_URL = "https://survivalandflourishing.fund/recommendations";
 const SFF_HTML_PATH = "/tmp/sff-recommendations.html";
-const FUNDER_ID = "sIFjGbxVct";
 
 /**
  * Parse the SFF amount field which can have several formats:
@@ -131,7 +131,7 @@ export const source: GrantSource = {
 
       grants.push({
         source: "sff",
-        funderId: FUNDER_ID,
+        funderId: FUNDER_IDS.SFF,
         granteeName: organization,
         granteeId,
         name,
