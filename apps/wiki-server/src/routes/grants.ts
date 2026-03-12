@@ -184,7 +184,8 @@ const grantsApp = new Hono()
       .from(grants)
       .where(sql`${grants.granteeId} is not null`)
       .groupBy(grants.granteeId)
-      .orderBy(sql`coalesce(sum(${grants.amount}), 0) desc`);
+      .orderBy(sql`coalesce(sum(${grants.amount}), 0) desc`)
+      .limit(50);
 
     return c.json({
       grantees: rows.map((r) => ({

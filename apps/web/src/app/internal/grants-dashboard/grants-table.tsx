@@ -63,7 +63,7 @@ const columns: ColumnDef<GrantRow>[] = [
       const source = row.original.source;
       return source ? (
         <a
-          href={source}
+          href={source.startsWith("http") ? source : "#"}
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm font-medium text-accent-foreground hover:underline no-underline max-w-[300px] truncate block"
