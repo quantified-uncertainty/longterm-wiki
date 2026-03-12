@@ -85,7 +85,8 @@ function resolveColumns(
   return allFields.filter((f) => {
     if (f === "notes" && !showNotes) return false;
     if (f === "source" && !showSource) return false;
-    if (HIDDEN_BY_DEFAULT.has(f) && !showNotes && !showSource) return false;
+    // Hide other hidden-by-default fields (not notes/source) unconditionally
+    if (HIDDEN_BY_DEFAULT.has(f) && f !== "notes" && f !== "source") return false;
     return true;
   });
 }

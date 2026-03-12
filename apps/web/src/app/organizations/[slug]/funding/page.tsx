@@ -313,7 +313,7 @@ export default async function OrgFundingPage({
                             : null;
                           const displayName =
                             investorEntity?.name ??
-                            (inv.fields.display_name as string) ??
+                            inv.displayName ??
                             investorId ??
                             inv.key;
                           const amount = inv.fields.amount;

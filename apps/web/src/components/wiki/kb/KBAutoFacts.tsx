@@ -200,8 +200,8 @@ function resolveRecordColumns(
     const schemaFields = Object.keys(fieldDefs).filter(
       (f) => !EXCLUDED_RECORD_FIELDS.has(f),
     );
-    // Put explicit endpoints first, then schema fields
-    const allCols = [...explicitEndpoints, ...schemaFields];
+    // Put explicit endpoints first, then schema fields (deduplicate)
+    const allCols = Array.from(new Set([...explicitEndpoints, ...schemaFields]));
     if (!defaults) return allCols;
     // Prefer defaults order, but only for columns actually available
     const available = new Set(allCols);

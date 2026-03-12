@@ -285,7 +285,7 @@ function field(item: RecordEntry, key: string): string | undefined {
 function PersonCard({ item }: { item: RecordEntry }) {
   const personId = field(item, "person");
   const personEntity = personId ? getKBEntity(personId) : null;
-  const name = personEntity?.name ?? field(item, "display_name") ?? titleCase(item.key);
+  const name = personEntity?.name ?? item.displayName ?? titleCase(item.key);
   const title = field(item, "title");
   const start = field(item, "start");
   const end = field(item, "end");
@@ -592,6 +592,7 @@ function GenericCollectionTable({
 }) {
   const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
   const fieldDefs = recordSchema?.fields;
+  const endpointDefs = recordSchema?.endpoints;
 
   const schemaFieldNames = fieldDefs ? Object.keys(fieldDefs) : [];
   const allFieldNames = new Set<string>();
@@ -623,7 +624,11 @@ function GenericCollectionTable({
               <tr key={item.key}>
                 {columns.map((col) => {
                   const cellValue = item.fields[col];
-                  const fieldDef = fieldDefs?.[col];
+                  const fieldDef =
+                    fieldDefs?.[col] ??
+                    (endpointDefs && col in endpointDefs
+                      ? { type: "ref" as const }
+                      : undefined);
 
                   if (fieldDef?.type === "ref" && typeof cellValue === "string") {
                     const refEntity = getKBEntity(cellValue);

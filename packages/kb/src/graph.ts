@@ -84,6 +84,14 @@ export class Graph {
     collectionName: string,
     entry: RecordEntry,
   ): void {
+    // Validate collectionName matches the schema's expected collection
+    const schema = this.recordSchemas.get(entry.schema);
+    if (schema && schema.collectionName !== collectionName) {
+      throw new Error(
+        `Record collection mismatch: schema "${entry.schema}" expects "${schema.collectionName}" but got "${collectionName}"`,
+      );
+    }
+
     // Primary index: ownerEntityId → collectionName → entries
     let ownerCollections = this.records.get(entry.ownerEntityId);
     if (!ownerCollections) {
@@ -98,7 +106,6 @@ export class Graph {
     entries.push(entry);
 
     // Endpoint index: scan explicit endpoint fields
-    const schema = this.recordSchemas.get(entry.schema);
     if (schema) {
       for (const [endpointName, endpointDef] of Object.entries(schema.endpoints)) {
         if (endpointDef.implicit) continue; // implicit endpoint = owner, already indexed

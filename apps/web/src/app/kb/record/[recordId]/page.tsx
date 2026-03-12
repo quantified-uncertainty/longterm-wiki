@@ -67,9 +67,10 @@ export default async function RecordDetailPage({ params }: PageProps) {
   const entity = getKBEntity(entityId);
   const entityName = entity?.name ?? entityId;
 
-  // Get schema for field definitions
+  // Get schema for field definitions and endpoint info
   const recordSchema = getKBRecordSchema(entry.schema);
   const fieldDefs = recordSchema?.fields;
+  const endpointDefs = recordSchema?.endpoints;
 
   // Get sibling records in the same collection
   const siblingRecords = getKBRecords(entityId, collection);
@@ -155,7 +156,11 @@ export default async function RecordDetailPage({ params }: PageProps) {
       <h2 className="text-base font-semibold mt-6 mb-2">Fields</h2>
       <KVTable>
         {Object.entries(entry.fields).map(([fieldName, fieldValue]) => {
-          const fieldDef = fieldDefs?.[fieldName];
+          const fieldDef =
+            fieldDefs?.[fieldName] ??
+            (endpointDefs && fieldName in endpointDefs
+              ? { type: "ref" as const }
+              : undefined);
 
           // Ref field -> link to entity
           if (
@@ -251,14 +256,31 @@ export default async function RecordDetailPage({ params }: PageProps) {
                             {sibling.key}
                           </Link>
                         </td>
-                        {previewFields.map((col) => (
-                          <td key={col} className="px-3 py-1.5">
-                            {formatKBCellValue(
-                              sibling.fields[col],
-                              fieldDefs?.[col],
-                            )}
-                          </td>
-                        ))}
+                        {previewFields.map((col) => {
+                          const colDef =
+                            fieldDefs?.[col] ??
+                            (endpointDefs && col in endpointDefs
+                              ? { type: "ref" as const }
+                              : undefined);
+                          const cellVal = sibling.fields[col];
+
+                          if (colDef?.type === "ref" && typeof cellVal === "string") {
+                            const refEnt = getKBEntity(cellVal);
+                            return (
+                              <td key={col} className="px-3 py-1.5">
+                                <Link href={`/kb/entity/${cellVal}`} className="text-primary hover:underline">
+                                  {refEnt?.name ?? cellVal}
+                                </Link>
+                              </td>
+                            );
+                          }
+
+                          return (
+                            <td key={col} className="px-3 py-1.5">
+                              {formatKBCellValue(cellVal, colDef)}
+                            </td>
+                          );
+                        })}
                       </tr>
                     );
                   })}
