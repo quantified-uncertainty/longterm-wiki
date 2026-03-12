@@ -21,8 +21,9 @@ records:
       amount: 20e6
       period: "2017-present"
       status: "active"
+      lead: "Caleb Parikh"
       url: https://funds.effectivealtruism.org/funds/far-future
-      notes: "Core regranting program with quarterly rounds. ~$10M to AI safety, ~$3M to biosecurity, ~$4M to EA community building. Median grant $25K. 19.3% acceptance rate (2023). $6.67M granted in 2023"
+      notes: "Core regranting program; 14 payout rounds. ~$10M to AI safety, ~$3M to biosecurity, ~$4M to EA community building. Median grant $25K. 19.3% acceptance rate (2023). Annual volume: $500K (2017) → $6.67M (2023) → ~$8M (2024). Fund managers include Lawrence Chan (METR), Thomas Larsen (AI Futures Project), Oliver Habryka (Lightcone)"
 
     individual-researcher-grants:
       name: "Individual Researcher Grants"
@@ -30,4 +31,73 @@ records:
       period: "2017-present"
       status: "active"
       url: https://funds.effectivealtruism.org/funds/far-future
-      notes: "Distinctive niche funding individual researchers and small projects that larger funders miss. Typical grant $10K-$100K"
+      notes: "Distinctive niche funding individual researchers and small projects that larger funders miss. Typical grant $10K-$100K. Funds alignment research, interpretability, AI governance"
+
+  grants:
+    manifold-markets-2022:
+      name: "Prediction market platform development"
+      recipient: "manifund"
+      amount: 200e3
+      date: "2022-02"
+      status: "completed"
+      program: "main-fund"
+      source: https://funds.effectivealtruism.org/grants
+      notes: "4-month runway for Manifold Markets; grew to major EA forecasting tool"
+
+    alexander-turner-2023:
+      name: "AI safety research"
+      recipient: "alexander-turner"
+      amount: 220e3
+      date: "2023"
+      status: "completed"
+      program: "individual-researcher-grants"
+      source: https://funds.effectivealtruism.org/grants
+      notes: "One of the largest individual researcher grants"
+
+    david-krueger-lab-2023:
+      name: "AI safety lab PhD students and compute"
+      recipient: "david-krueger"
+      amount: 200e3
+      date: "2023"
+      status: "completed"
+      program: "main-fund"
+      notes: "Established academic AI safety presence at Cambridge"
+
+    epistea-haaiss-2024:
+      name: "Human-Aligned AI Summer School (HAAISS 4th)"
+      recipient: "epistea"
+      amount: 160e3
+      date: "2024-01"
+      status: "completed"
+      program: "main-fund"
+      source: https://funds.effectivealtruism.org/grants
+      notes: "4-day AI alignment conference in Prague"
+
+    macrostrategy-bostrom-2025:
+      name: "Long-term strategy research facilitation"
+      recipient: "macrostrategy-research-initiative"
+      amount: 150e3
+      date: "2025-01"
+      status: "active"
+      program: "main-fund"
+      source: https://funds.effectivealtruism.org/grants
+      notes: "Facilitating Nick Bostrom's work on long-term strategy for one year"
+
+    robert-miles-2023:
+      name: "AI safety educational videos and podcasts"
+      recipient: "robert-miles"
+      amount: 121575
+      date: "2023-07"
+      status: "completed"
+      program: "main-fund"
+      source: https://funds.effectivealtruism.org/grants
+      notes: "Long-running LTFF-funded AI safety communicator"
+
+    vanessa-kosoy-2023:
+      name: "Agent foundations and alignment theory research"
+      recipient: "vanessa-kosoy"
+      amount: 100e3
+      date: "2023"
+      status: "completed"
+      program: "individual-researcher-grants"
+      source: https://funds.effectivealtruism.org/grants
