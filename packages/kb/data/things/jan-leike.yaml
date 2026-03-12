@@ -95,15 +95,3 @@ records:
       source: https://anthropic.com/news/jan-leike-joins-anthropic
       notes: "Joined Anthropic same month he left OpenAI; leads scalable oversight and alignment research"
 
-  notable-publications:
-    i_jLoP1qR2s:
-      title: "Scalable agent alignment via reward modeling: a research direction"
-      year: 2018
-      url: https://arxiv.org/abs/1811.07871
-      notes: "Influential research agenda laying out iterated amplification and reward modeling for alignment"
-
-    i_jLtU3vW4x:
-      title: "AI alignment research overview"
-      year: 2022
-      url: https://arxiv.org/abs/2209.00626
-      notes: "Comprehensive overview of the alignment research landscape"

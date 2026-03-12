@@ -1,7 +1,7 @@
 thing:
   id: claude-opus-4-6
   stableId: Ac7c55KtVw
-  type: project
+  type: ai-model
   name: Claude Opus 4.6
   numericId: E1039
 facts:

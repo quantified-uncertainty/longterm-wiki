@@ -17,3 +17,100 @@ facts:
   - id: f_KTWCJv2vQw
     property: website
     value: https://forum.effectivealtruism.org/posts/2mx6xrDrwiEKzfgks/announcing-the-future-fund-1
+
+records:
+  funding-programs:
+    staff-led-grants:
+      name: "Staff-led Grants"
+      type: "program"
+      amount: 73e6
+      period: "2022-02 to 2022-11"
+      status: "terminated"
+      source: https://forum.effectivealtruism.org/posts/paMYXYFYbbjpdjgbt/future-fund-june-2022-update
+      notes: "25 staff-led grants before FTX collapse"
+
+    regranting-program:
+      name: "Regranting Program"
+      type: "program"
+      amount: 50e6
+      period: "2022-04 to 2022-10"
+      status: "terminated"
+      source: https://ftxfuturefund.org/announcing-our-regranting-program/
+      notes: "100+ regrantors with discretionary budgets; 168 grants totaling ~$31M by June 2022; $100M allocated total"
+
+    open-call:
+      name: "Open Call"
+      type: "round"
+      amount: 26e6
+      period: "2022-03 to 2022-11"
+      status: "terminated"
+      notes: "69 funded from 1,700+ applications (4% acceptance rate)"
+
+  grants:
+    longview-philanthropy-general:
+      name: "General support for independent grantmaking"
+      recipient: "longview-philanthropy"
+      amount: 15e6
+      date: "2022-06"
+      status: "terminated"
+      program: "staff-led-grants"
+      source: https://forum.effectivealtruism.org/posts/paMYXYFYbbjpdjgbt/future-fund-june-2022-update
+      notes: "Global priorities research grantmaking"
+
+    cea-general:
+      name: "General support"
+      recipient: "cea"
+      amount: 13.9e6
+      date: "2022-06"
+      status: "terminated"
+      program: "staff-led-grants"
+      source: https://forum.effectivealtruism.org/topics/future-fund
+      notes: "Conferences, student groups, online resources"
+
+    redwood-research-safety:
+      name: "AI safety research"
+      recipient: "redwood-research"
+      amount: 6.6e6
+      date: "2022-06"
+      status: "terminated"
+      program: "staff-led-grants"
+      source: https://forum.effectivealtruism.org/topics/future-fund
+      notes: "Grant committed but reportedly never fully received due to FTX collapse"
+
+    elicit-research-tool:
+      name: "AI research assistant development"
+      recipient: "elicit"
+      amount: 5e6
+      date: "2022-06"
+      status: "terminated"
+      program: "staff-led-grants"
+      source: https://forum.effectivealtruism.org/topics/future-fund
+      notes: "LLM-based research assistant (formerly Ought); alignment risk reduction"
+
+    atlas-fellowship-scholarships:
+      name: "Scholarships for talented high school students"
+      recipient: "atlas-fellowship"
+      amount: 5e6
+      date: "2022-06"
+      status: "terminated"
+      program: "staff-led-grants"
+      source: https://forum.effectivealtruism.org/posts/paMYXYFYbbjpdjgbt/future-fund-june-2022-update
+
+    lightcone-operations:
+      name: "Forum operations, conferences, EA office space"
+      recipient: "lighthaven"
+      amount: 2e6
+      date: "2022-06"
+      status: "terminated"
+      program: "staff-led-grants"
+      source: https://forum.effectivealtruism.org/posts/paMYXYFYbbjpdjgbt/future-fund-june-2022-update
+      notes: "Lightcone Infrastructure (now Lighthaven); LessWrong operations"
+
+    securebio-biosecurity:
+      name: "DNA synthesis screening and pathogen early-warning"
+      recipient: "securebio"
+      amount: 1.2e6
+      date: "2022-06"
+      status: "terminated"
+      program: "staff-led-grants"
+      source: https://donations.vipulnaik.com/donorDonee.php?donor=FTX+Future+Fund&donee=SecureBio

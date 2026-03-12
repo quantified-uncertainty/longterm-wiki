@@ -101,7 +101,8 @@ describe('dollar-signs rule', () => {
     expect(fmIssues[0].message).toContain('Unescaped dollar sign in frontmatter description');
     expect(fmIssues[0].fix).not.toBeNull();
     expect(fmIssues[0].fix!.type).toBe(FixType.REPLACE_LINE);
-    expect(fmIssues[0].fix!.content).toBe('description: Costs \\$100 per unit');
+    // Unquoted $ fix now produces double-quoted YAML for MDX safety
+    expect(fmIssues[0].fix!.content).toBe('description: "Costs \\\\$100 per unit"');
   });
 
   it('detects unescaped $ in double-quoted frontmatter description', () => {
@@ -117,7 +118,7 @@ describe('dollar-signs rule', () => {
     expect(fmIssues[0].fix!.content).toBe('description: "Costs \\\\$100 per unit"');
   });
 
-  it('skips already-escaped $ in unquoted frontmatter', () => {
+  it('detects \\$ in unquoted frontmatter as MDX-unsafe', () => {
     const raw = '---\ntitle: Test\ndescription: Costs \\$100 per unit\n---\nBody text here.';
     const content = mockContent('Body text here.', {
       raw,
@@ -125,7 +126,11 @@ describe('dollar-signs rule', () => {
     });
     const issues = check(dollarSignsRule, content);
     const fmIssues = issues.filter((i: any) => i.message.includes('frontmatter'));
-    expect(fmIssues.length).toBe(0);
+    expect(fmIssues.length).toBe(1);
+    expect(fmIssues[0].message).toContain('breaks MDX compilation');
+    expect(fmIssues[0].fix).not.toBeNull();
+    // Fix converts to double-quoted YAML where \\ represents literal backslash
+    expect(fmIssues[0].fix!.content).toBe('description: "Costs \\\\$100 per unit"');
   });
 
   it('skips already-escaped $ in double-quoted frontmatter', () => {
@@ -163,7 +168,8 @@ describe('dollar-signs rule', () => {
     // Only first issue carries the fix (REPLACE_LINE fixes all at once)
     expect(fmIssues[0].fix).not.toBeNull();
     expect(fmIssues[1].fix).toBeNull();
-    expect(fmIssues[0].fix!.content).toBe('description: Between \\$5 and \\$10 range');
+    // Fix now produces double-quoted YAML for MDX safety
+    expect(fmIssues[0].fix!.content).toBe('description: "Between \\\\$5 and \\\\$10 range"');
   });
 
   it('ignores $ not followed by digit in frontmatter', () => {

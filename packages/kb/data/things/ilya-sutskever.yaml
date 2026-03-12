@@ -106,21 +106,3 @@ records:
       source: https://ssi.inc
       notes: "Co-founded Safe Superintelligence Inc with Daniel Gross and Daniel Levy; raised $1B in initial funding"
 
-  notable-publications:
-    i_iStU3vW4x:
-      title: "ImageNet Classification with Deep Convolutional Neural Networks (AlexNet)"
-      year: 2012
-      url: https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html
-      notes: "Co-authored with Alex Krizhevsky and Geoffrey Hinton; catalyzed the deep learning revolution by winning ImageNet with a large margin"
-
-    i_iSyZ5aB6c:
-      title: "Sequence to Sequence Learning with Neural Networks"
-      year: 2014
-      url: https://arxiv.org/abs/1409.3215
-      notes: "Foundational paper for neural machine translation and many NLP tasks; introduced seq2seq architecture"
-
-    i_iSdE7fG8h:
-      title: "Language Models are Unsupervised Multitask Learners (GPT-2)"
-      year: 2019
-      url: https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf
-      notes: "Demonstrated large language models could perform tasks without task-specific training"

@@ -106,27 +106,3 @@ records:
       source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
       notes: "Joined after Google acquired DNNresearch (his startup with Alex Krizhevsky and Ilya Sutskever); resigned May 2023 to speak freely about AI risks"
 
-  notable-publications:
-    i_gHyZ5aB6c:
-      title: "Learning representations by back-propagating errors"
-      year: 1986
-      url: https://www.nature.com/articles/323533a0
-      notes: "Co-authored with David Rumelhart and Ronald Williams; popularized backpropagation for training neural networks"
-
-    i_gHdE7fG8h:
-      title: "A fast learning algorithm for deep belief nets"
-      year: 2006
-      url: https://www.cs.toronto.edu/~hinton/absps/fastnc.pdf
-      notes: "Demonstrated greedy layer-wise pretraining; reignited interest in deep learning"
-
-    i_gHiJ9kL1m:
-      title: "ImageNet Classification with Deep Convolutional Neural Networks (AlexNet)"
-      year: 2012
-      url: https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html
-      notes: "Co-authored with Alex Krizhevsky and Ilya Sutskever; won ImageNet 2012 by a large margin, triggering the deep learning revolution"
-
-    i_gHnO2pQ3r:
-      title: "Distilling the Knowledge in a Neural Network"
-      year: 2015
-      url: https://arxiv.org/abs/1503.02531
-      notes: "Introduced knowledge distillation; foundational technique for model compression"

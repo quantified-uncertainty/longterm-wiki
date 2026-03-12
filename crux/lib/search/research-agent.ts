@@ -5,13 +5,15 @@
  * citation-auditor (which consume SourceCacheEntry[]).
  *
  * Pipeline:
+ *   0. Initialize PG resource cache + pre-seed from existing DB resources
  *   1. Accept a topic / query (+ optional page context)
  *   2. Run multi-source search: Exa, Perplexity/Sonar, SCRY
  *      — each source runs only if its API key is present; degrades gracefully
- *   3. Deduplicate URLs from multiple providers (fetch once, merge metadata)
+ *   3. Deduplicate URLs from multiple providers + PG (fetch once, merge metadata)
  *   4. Fetch each URL via source-fetcher.fetchSource()
  *   5. Extract 1-sentence structured facts with Haiku (cheap call per source)
- *   6. Return SourceCacheEntry[] ready for section-writer + research metadata
+ *   6. Register newly discovered URLs as bare resources in PG
+ *   7. Return SourceCacheEntry[] ready for section-writer + research metadata
  *
  * Usage:
  *   import { runResearch } from './research-agent.ts';
@@ -33,6 +35,11 @@ import { createLlmClient, streamingCreate, extractText, MODELS } from '../llm.ts
 import type { SourceCacheEntry } from '../content/section-writer.ts';
 import type { CostTracker } from '../cost-tracker.ts';
 import { MODEL_PRICING } from '../pricing.ts';
+import { initFromPG, getResourceByUrl } from './resource-lookup.ts';
+import { saveResources } from '../../resource-io.ts';
+import { hashId, guessResourceType } from '../../resource-utils.ts';
+import { apiRequest } from '../wiki-server/client.ts';
+import type { Resource } from '../../resource-types.ts';
 
 // ---------------------------------------------------------------------------
 // Public interfaces
@@ -96,7 +103,7 @@ export interface ResearchResult {
   sources: SourceCacheEntry[];
   /** Metadata about the research run. */
   metadata: {
-    /** Which providers were searched (e.g. ['exa', 'perplexity', 'scry']). */
+    /** Which providers were searched (e.g. ['exa', 'perplexity', 'scry', 'pg']). */
     sourcesSearched: string[];
     /** Total unique URLs discovered across all providers. */
     urlsFound: number;
@@ -104,6 +111,12 @@ export interface ResearchResult {
     urlsFetched: number;
     /** URLs that appeared in multiple providers and were deduplicated. */
     urlsDeduplicated: number;
+    /** URLs that were already known in PG and also found by web search. */
+    urlsAlreadyInPG: number;
+    /** Number of new resource entries registered in PG after research. */
+    newResourcesRegistered: number;
+    /** Whether the PG resource cache was successfully initialized. */
+    pgCacheInitialized: boolean;
     /** Total USD cost (search + LLM calls). */
     totalCost: number;
     costBreakdown: ResearchCostBreakdown;
@@ -424,6 +437,85 @@ Rules:
 }
 
 // ---------------------------------------------------------------------------
+// PG resource search — pre-seed from existing DB resources
+// ---------------------------------------------------------------------------
+
+interface PGSearchResult {
+  id: string;
+  url: string;
+  title: string | null;
+  type: string | null;
+  summary: string | null;
+}
+
+interface PGSearchResponse {
+  results: PGSearchResult[];
+  count: number;
+  query: string;
+}
+
+/**
+ * Query PG for existing resources matching a topic.
+ * Returns URLs already in the database so we can include them in dedup
+ * and avoid redundant web searches for already-known content.
+ */
+async function searchPGResources(query: string, limit: number = 20): Promise<SearchHit[]> {
+  const result = await apiRequest<PGSearchResponse>(
+    'GET',
+    `/api/resources/search?q=${encodeURIComponent(query)}&limit=${limit}`,
+  );
+
+  if (!result.ok) return [];
+
+  return result.data.results
+    .filter(r => r.url)
+    .map(r => ({
+      url: r.url,
+      title: r.title ?? r.url,
+      snippet: r.summary ?? undefined,
+      provider: 'pg',
+    }));
+}
+
+/**
+ * Register newly discovered URLs as bare Resource entries in PG.
+ * Only registers URLs not already present in the resource cache.
+ * Failures are logged but do not block the research pipeline.
+ */
+async function registerNewResources(urls: string[], urlTitles: Map<string, string>): Promise<number> {
+  const newResources: Resource[] = [];
+
+  for (const url of urls) {
+    // Skip URLs already in the resource cache
+    if (getResourceByUrl(url)) continue;
+
+    try {
+      const id = hashId(url);
+      const type = guessResourceType(url);
+      const title = urlTitles.get(url) ?? url;
+
+      newResources.push({
+        id,
+        url,
+        title,
+        type,
+        tags: [],
+      });
+    } catch (err: unknown) {
+      // Invalid URL or hash failure — skip this URL
+      console.warn(
+        `[research-agent] Failed to create resource entry for ${url}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  if (newResources.length === 0) return 0;
+
+  await saveResources(newResources);
+  return newResources.length;
+}
+
+// ---------------------------------------------------------------------------
 // Main exported function
 // ---------------------------------------------------------------------------
 
@@ -470,6 +562,41 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
   let searchCost = 0;
   let factExtractionCost = 0;
   const sourcesSearched: string[] = [];
+  let pgCacheInitialized = false;
+  let urlsAlreadyInPG = 0;
+  let newResourcesRegistered = 0;
+
+  // -------------------------------------------------------------------------
+  // Phase 0: Initialize PG resource cache (best-effort)
+  // -------------------------------------------------------------------------
+
+  try {
+    await initFromPG();
+    pgCacheInitialized = true;
+  } catch (err: unknown) {
+    // PG unavailable — continue with snapshot fallback.
+    // Research must not be blocked by PG availability.
+    console.warn(
+      `[research-agent] initFromPG failed, continuing without PG cache: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // Phase 0b: Pre-seed from PG — query for existing resources matching topic
+  // -------------------------------------------------------------------------
+
+  let pgHits: SearchHit[] = [];
+  try {
+    pgHits = await searchPGResources(focusedQuery, maxResultsPerSource);
+    if (pgHits.length > 0) {
+      sourcesSearched.push('pg');
+    }
+  } catch (err: unknown) {
+    // PG search failed — continue with web search providers only
+    console.warn(
+      `[research-agent] PG resource search failed, continuing: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
 
   // -------------------------------------------------------------------------
   // Phase 1: Multi-source search (run providers in parallel)
@@ -527,10 +654,24 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
   }
 
   // -------------------------------------------------------------------------
-  // Phase 2: Deduplicate URLs
+  // Phase 2: Deduplicate URLs (including PG hits)
   // -------------------------------------------------------------------------
 
   const urlToHits = new Map<string, SearchHit[]>();
+
+  // Include PG hits first — these are already-known resources
+  for (const hit of pgHits) {
+    const normalized = hit.url
+      .replace(/^http:\/\//, 'https://')
+      .replace(/^(https:\/\/)www\./, '$1')
+      .replace(/\/$/, '');
+    const existing = urlToHits.get(normalized) ?? [];
+    existing.push(hit);
+    urlToHits.set(normalized, existing);
+  }
+
+  // Track which URLs came from PG to count overlaps with web search
+  const pgNormalizedUrls = new Set(urlToHits.keys());
 
   for (const hits of allHitArrays) {
     for (const hit of hits) {
@@ -545,8 +686,16 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
     }
   }
 
+  // Count URLs that were already in PG and also found by web search
+  for (const [url, hits] of urlToHits) {
+    if (pgNormalizedUrls.has(url) && hits.some(h => h.provider !== 'pg')) {
+      urlsAlreadyInPG++;
+    }
+  }
+
   const urlsFound = urlToHits.size;
-  const urlsDeduplicated = allHitArrays.reduce((sum, arr) => sum + arr.length, 0) - urlsFound;
+  const totalHitsBeforeDedup = allHitArrays.reduce((sum, arr) => sum + arr.length, 0) + pgHits.length;
+  const urlsDeduplicated = totalHitsBeforeDedup - urlsFound;
 
   // Build a best-title mapping from all hits for each URL
   const urlBestTitle = new Map<string, string>();
@@ -617,6 +766,23 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
     });
   }
 
+  // -------------------------------------------------------------------------
+  // Phase 5: Register newly discovered URLs as bare resources in PG
+  // -------------------------------------------------------------------------
+
+  try {
+    const allFetchedUrls = fetchedSources.map(s => s.url);
+    newResourcesRegistered = await registerNewResources(allFetchedUrls, urlBestTitle);
+    if (newResourcesRegistered > 0) {
+      console.log(`[research-agent] Registered ${newResourcesRegistered} new resources in PG`);
+    }
+  } catch (err: unknown) {
+    // Resource registration is best-effort — log and continue
+    console.warn(
+      `[research-agent] Failed to register new resources: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+
   const durationMs = Date.now() - startMs;
 
   return {
@@ -626,6 +792,9 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
       urlsFound,
       urlsFetched,
       urlsDeduplicated,
+      urlsAlreadyInPG,
+      newResourcesRegistered,
+      pgCacheInitialized,
       totalCost,
       costBreakdown: {
         searchCost,

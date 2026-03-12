@@ -1,7 +1,7 @@
 thing:
   id: claude-3-opus
   stableId: Ko9DCNV87A
-  type: project
+  type: ai-model
   name: Claude 3 Opus
   numericId: E1027
 facts:

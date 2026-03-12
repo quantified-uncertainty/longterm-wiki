@@ -20,8 +20,6 @@ export interface PersonRow {
   bornYear: number | null;
 
   netWorthNum: number | null;
-
-  careerHistoryCount: number;
 }
 
 type SortKey =
@@ -29,8 +27,7 @@ type SortKey =
   | "role"
   | "employer"
   | "bornYear"
-  | "netWorth"
-  | "careerHistory";
+  | "netWorth";
 
 type SortDir = "asc" | "desc";
 
@@ -75,8 +72,6 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
             return row.bornYear;
           case "netWorth":
             return row.netWorthNum;
-          case "careerHistory":
-            return row.careerHistoryCount;
         }
       };
 
@@ -125,7 +120,6 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
               <SortHeader label="Affiliation" sortKey="employer" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Born" sortKey="bornYear" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               <SortHeader label="Net Worth" sortKey="netWorth" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
-              <SortHeader label="Career Entries" sortKey="careerHistory" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -184,12 +178,6 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
                   )}
                 </td>
 
-                {/* Career History */}
-                <td className="py-2.5 px-3 text-center">
-                  {row.careerHistoryCount > 0 && (
-                    <span className="tabular-nums">{row.careerHistoryCount}</span>
-                  )}
-                </td>
               </tr>
             ))}
           </tbody>

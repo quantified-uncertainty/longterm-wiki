@@ -12,3 +12,101 @@ facts:
       Philanthropy. While comprehensive in covering the foundation's history and controve
     asOf: 2026-03
     notes: Migrated from old entity system
+
+records:
+  funding-programs:
+    environment:
+      name: "Environment (Climate & Conservation)"
+      type: "program"
+      amount: 241e6
+      date: "2024"
+      status: "active"
+      url: https://hewlett.org/programs/environment/
+      notes: "2024: 289 grants; largest program area. Includes climate mitigation and conservation"
+
+    cyber-initiative:
+      name: "Cyber Initiative"
+      type: "program"
+      amount: 164e6
+      period: "2014-2023"
+      status: "completed"
+      url: https://hewlett.org/programs/cyber/
+      notes: "Built the cyber policy field from scratch over 10 years. Funded research institutions, workforce development, and policy centers"
+
+    education:
+      name: "Education Program"
+      type: "program"
+      amount: 66e6
+      date: "2024"
+      status: "active"
+      url: https://hewlett.org/programs/education/
+      notes: "2024: 174 grants; K-12 and higher education"
+
+    effective-philanthropy:
+      name: "Effective Philanthropy Program"
+      type: "program"
+      amount: 11e6
+      date: "2024"
+      status: "active"
+      url: https://hewlett.org/programs/effective-philanthropy/
+      notes: "2024: 57 grants; strengthening philanthropy sector"
+
+    ethics-governance-ai:
+      name: "Ethics and Governance of AI Fund"
+      type: "fund"
+      amount: 27e6
+      date: "2017"
+      status: "completed"
+      source: https://knightfoundation.org/press/releases/the-ethics-and-governance-of-artificial-intelligence-fund-commits-7-6-million-to-organizations-that-bolster-civil-society-efforts-around-the-world/
+      notes: "Multi-funder pool with Knight Foundation, Omidyar Network, Reid Hoffman. $7.6M first round to Harvard Berkman Klein + MIT Media Lab"
+
+  grants:
+    cyber-policy-famu:
+      name: "Cyber policy at FAMU"
+      recipient: "famu"
+      amount: 5e6
+      date: "2023"
+      status: "active"
+      program: "cyber-initiative"
+      source: https://hewlett.org/newsroom/hewlett-foundation-announces-major-effort-funding-cyber-policy-studies-at-institutions-serving-diverse-student-populations/
+      notes: "Part of $20M initiative across four diverse-serving institutions"
+
+    cyber-policy-spelman:
+      name: "Cyber policy at Spelman College"
+      recipient: "spelman-college"
+      amount: 5e6
+      date: "2023"
+      status: "active"
+      program: "cyber-initiative"
+      source: https://hewlett.org/newsroom/hewlett-foundation-announces-major-effort-funding-cyber-policy-studies-at-institutions-serving-diverse-student-populations/
+      notes: "Part of $20M initiative across four diverse-serving institutions"
+
+    cyber-policy-fiu:
+      name: "Cyber policy at Florida International University"
+      recipient: "fiu"
+      amount: 5e6
+      date: "2023"
+      status: "active"
+      program: "cyber-initiative"
+      source: https://hewlett.org/newsroom/hewlett-foundation-announces-major-effort-funding-cyber-policy-studies-at-institutions-serving-diverse-student-populations/
+      notes: "Part of $20M initiative across four diverse-serving institutions"
+
+    cyber-policy-turtle-mountain:
+      name: "Cyber policy at Turtle Mountain Community College"
+      recipient: "turtle-mountain-cc"
+      amount: 5e6
+      date: "2023"
+      status: "active"
+      program: "cyber-initiative"
+      source: https://hewlett.org/newsroom/hewlett-foundation-announces-major-effort-funding-cyber-policy-studies-at-institutions-serving-diverse-student-populations/
+      notes: "Part of $20M initiative across four diverse-serving institutions"
+
+    cset-cyberai:
+      name: "CyberAI research project"
+      recipient: "cset"
+      amount: 5e6
+      period: "2020-2028"
+      status: "active"
+      program: "cyber-initiative"
+      source: https://cset.georgetown.edu/article/the-hewlett-foundation-awards-cset-an-additional-3-million-to-continue-cyber-and-ai-research/
+      notes: "Research on ML vulnerabilities, AI-cybersecurity intersection, policy primers"

@@ -65,7 +65,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          # Full clone needed for reliable git push. Shallow clones (fetch-depth: 1)
+          # cause push failures: git cannot negotiate objects with the remote,
+          # leading to 2-minute hangs and generic "failed to push some refs" errors.
+          # See issue #2093.
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: pnpm/action-setup@v4

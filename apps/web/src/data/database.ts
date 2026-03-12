@@ -416,8 +416,6 @@ interface DatabaseShape {
     accuracyIssues: string | null;
     accuracyCheckedAt: string | null;
   }>>;
-  /** KB (Knowledge Base) structured entity data from packages/kb */
-  kb?: import("@longterm-wiki/kb").SerializedKB;
   /** KB fact verification status: factId → verdict (from citation quotes cross-reference) */
   kbFactVerification?: Record<string, string>;
 }
@@ -492,8 +490,8 @@ export function getTypedEntities(): AnyEntity[] {
 // TYPES (re-exported for consumers)
 // ============================================================================
 
-export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity } from "./entity-schemas";
-export { isRisk, isPerson, isOrganization, isPolicy } from "./entity-schemas";
+export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity, AiModelEntity } from "./entity-schemas";
+export { isRisk, isPerson, isOrganization, isPolicy, isAiModel } from "./entity-schemas";
 
 /** @deprecated Use TypedEntity instead */
 interface Entity {

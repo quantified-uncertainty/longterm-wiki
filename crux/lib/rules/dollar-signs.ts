@@ -43,9 +43,27 @@ function getEngineFrontmatterEndLine(raw: string): number {
 }
 
 /**
- * Check a single frontmatter field line for unescaped dollar signs.
- * Uses REPLACE_LINE to fix all occurrences on the line at once,
- * avoiding cascading backslash issues from multiple REPLACE_TEXT on one line.
+ * Convert an unquoted YAML field value to a double-quoted YAML string.
+ * Escapes internal double quotes and backslashes for YAML double-quote context.
+ */
+function toDoubleQuotedYaml(fieldName: string, unquotedValue: string): string {
+  const escaped = unquotedValue
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"');
+  return `${fieldName}: "${escaped}"`;
+}
+
+/**
+ * Check a single frontmatter field line for dollar sign issues.
+ *
+ * Two problems are detected:
+ * 1. Unescaped $<digit> in any quoting style
+ * 2. \$ in unquoted YAML -- valid YAML but breaks MDX compilation because
+ *    remark-mdx-frontmatter converts values to JS string literals where
+ *    \$ is an invalid escape sequence
+ *
+ * All fixes output double-quoted YAML with \\$ for MDX safety.
+ * Uses REPLACE_LINE to fix all occurrences on the line at once.
  */
 function checkFrontmatterField(
   ruleId: string,
@@ -64,17 +82,44 @@ function checkFrontmatterField(
   const isDoubleQuoted = afterKey.startsWith('"');
   const isSingleQuoted = afterKey.startsWith("'");
 
-  // Single-quoted YAML has no escape mechanism — skip
+  // Single-quoted YAML has no escape mechanism -- skip
   if (isSingleQuoted) return issues;
 
-  // Regex to find unescaped $ before a digit in the raw YAML line:
-  // - Unquoted:       match $ not preceded by \ (one backslash)
-  // - Double-quoted:  match $ not preceded by \\ (two backslashes = YAML-escaped literal \)
+  // Body-relative line for the fix system:
+  //   engine computes: absLine = issue.line + fmEndLine
+  //   We need absLine = rawLineNum1, so issue.line = rawLineNum1 - fmEndLine
+  const bodyRelativeLine = rawLineNum1 - fmEndLine;
+
+  // --- Check 1: \$ in unquoted YAML (breaks MDX compilation) ---
+  // In unquoted YAML, \$ is literal backslash+dollar. But remark-mdx-frontmatter
+  // converts this to a JS string literal where \$ is an invalid escape sequence.
+  // Fix: convert to double-quoted YAML where \\ represents literal backslash.
+  if (!isDoubleQuoted && /\\\$/.test(rawLine)) {
+    const unquotedValue = afterKey;
+    const fixedLine = toDoubleQuotedYaml(fieldName, unquotedValue);
+    const bsIndex = rawLine.indexOf('\\$');
+    const context = rawLine.slice(Math.max(0, bsIndex - 10), bsIndex + 15);
+
+    issues.push(new Issue({
+      rule: ruleId,
+      file: content.path,
+      line: bodyRelativeLine,
+      message: `Backslash-dollar in unquoted YAML frontmatter ${fieldName} breaks MDX compilation. Must use double-quoted YAML with \\\\$ (context: ...${context}...)`,
+      severity: Severity.ERROR,
+      fix: {
+        type: FixType.REPLACE_LINE,
+        content: fixedLine,
+      },
+    }));
+
+    return issues;
+  }
+
+  // --- Check 2: Unescaped $<digit> ---
   const regex = isDoubleQuoted
     ? /(?<!\\\\)\$(\d)/g
     : /(?<!\\)\$(\d)/g;
 
-  // Collect matches
   const matches: { match: string; index: number }[] = [];
   let m: RegExpExecArray | null;
   while ((m = regex.exec(rawLine)) !== null) {
@@ -82,23 +127,18 @@ function checkFrontmatterField(
   }
   if (matches.length === 0) return issues;
 
-  // Build fixed line replacing ALL unescaped $ at once.
-  // Replacement string uses $$ for literal $ and $1 for capture group 1.
-  // - Double-quoted: \\\\$$$1 -> \\$<digit> in output (YAML parses \\ as literal \)
-  // - Unquoted:      \$$$1 -> \$<digit> in output
-  const replaceStr = isDoubleQuoted ? '\\\\$$$1' : '\\$$$1';
-  const fixRegex = isDoubleQuoted
-    ? /(?<!\\\\)\$(\d)/g
-    : /(?<!\\)\$(\d)/g;
-  const fixedLine = rawLine.replace(fixRegex, replaceStr);
+  // Build fixed line -- always target double-quoted YAML for MDX safety.
+  let fixedLine: string;
+  if (isDoubleQuoted) {
+    // Already double-quoted: add \\ before each unescaped $
+    const fixRegex = /(?<!\\\\)\$(\d)/g;
+    fixedLine = rawLine.replace(fixRegex, '\\\\$$$1');
+  } else {
+    // Unquoted: escape $ signs then convert to double-quoted YAML
+    const valueWithEscapedDollars = afterKey.replace(/(?<!\\)\$(?=\d)/g, '\\$');
+    fixedLine = toDoubleQuotedYaml(fieldName, valueWithEscapedDollars);
+  }
 
-  // Body-relative line for the fix system:
-  //   engine computes: absLine = issue.line + fmEndLine
-  //   We need absLine = rawLineNum1, so issue.line = rawLineNum1 - fmEndLine
-  const bodyRelativeLine = rawLineNum1 - fmEndLine;
-
-  // One diagnostic per match for clear messaging;
-  // only the first carries the REPLACE_LINE fix.
   for (let i = 0; i < matches.length; i++) {
     const { match, index } = matches[i];
     const context = rawLine.slice(Math.max(0, index - 10), index + 15);

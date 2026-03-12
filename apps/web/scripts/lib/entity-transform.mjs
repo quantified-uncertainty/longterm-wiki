@@ -223,6 +223,23 @@ function transformEntity(raw, expertMap, orgMap) {
     case 'safety-agenda':
       return { ...base, entityType: 'safety-agenda', goal: cf('Goal') };
 
+    case 'ai-model':
+      return {
+        ...base,
+        entityType: 'ai-model',
+        modelFamily: raw.modelFamily,
+        modelTier: raw.modelTier,
+        generation: raw.generation,
+        releaseDate: raw.releaseDate,
+        developer: raw.developer,
+        inputPrice: raw.inputPrice,
+        outputPrice: raw.outputPrice,
+        contextWindow: raw.contextWindow,
+        safetyLevel: raw.safetyLevel,
+        benchmarks: raw.benchmarks || [],
+        capabilities: raw.capabilities || [],
+      };
+
     case 'approach':
     case 'concept':
     case 'crux':

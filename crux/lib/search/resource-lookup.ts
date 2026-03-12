@@ -141,19 +141,35 @@ export function resolveResource(id: string): Resource | null {
 }
 
 /**
- * Update a resource's fetch status.
+ * Update a resource's fetch status by calling the wiki-server PATCH endpoint.
  *
- * Previously wrote to YAML files; now a no-op since resources are PG-native.
- * The fetch_status field is not currently in the PG schema — a future
- * migration should add it and implement a PATCH endpoint.
- *
- * TODO: Add fetch_status column to PG resources table and implement
- * a targeted PATCH /api/resources/:id/fetch-status endpoint.
+ * Fire-and-forget: errors are logged but do not propagate to the caller.
+ * The source-fetcher should not fail because the status write failed.
  */
 export function updateResourceFetchStatus(
-  _resourceId: string,
-  _status: ResourceFetchStatus,
+  resourceId: string,
+  status: ResourceFetchStatus,
 ): void {
-  // No-op: PG resources table does not have a fetch_status column yet.
-  // The source-fetcher still works — it just won't persist fetch status.
+  // Fire-and-forget: call the wiki-server PATCH endpoint asynchronously.
+  // Errors are logged at warn level — this is best-effort telemetry.
+  import('../wiki-server/resources.ts')
+    .then((mod) =>
+      mod.updateResourceFetchStatus(resourceId, {
+        fetchStatus: status.fetchStatus,
+        lastFetchedAt: status.fetchedAt,
+        fetchedTitle: status.fetchedTitle,
+      }),
+    )
+    .then((result) => {
+      if (!result.ok) {
+        console.warn(
+          `[resource-lookup] Failed to update fetch status for ${resourceId}: ${result.error}`,
+        );
+      }
+    })
+    .catch((e: unknown) => {
+      console.warn(
+        `[resource-lookup] Failed to update fetch status for ${resourceId}: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    });
 }

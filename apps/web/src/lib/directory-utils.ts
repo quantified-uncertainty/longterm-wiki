@@ -78,7 +78,7 @@ export function getEntityWikiHref(entity: Entity): string | null {
  */
 export function resolveEntityBySlug(
   slug: string,
-  type: "person" | "organization",
+  type: "person" | "organization" | "risk",
 ): Entity | undefined {
   const entityId = resolveKBSlug(slug);
   if (!entityId) return undefined;
@@ -90,7 +90,7 @@ export function resolveEntityBySlug(
 /**
  * Get all slugs for entities of a given type (for generateStaticParams).
  */
-export function getEntitySlugs(type: "person" | "organization"): string[] {
+export function getEntitySlugs(type: "person" | "organization" | "risk"): string[] {
   const slugMap = getKBSlugMap();
   const entities = getKBEntities();
   const ids = new Set(

@@ -5,6 +5,7 @@
 import { getDatabase, getTypedEntities, isRisk } from "./database";
 import type { ContentFormat, RawEntity, AnyEntity } from "./database";
 import { getEntityHref } from "./entity-nav";
+import { getKB } from "./kb";
 import type { SerializedKB } from "@longterm-wiki/kb";
 
 export interface ExploreItem {
@@ -66,11 +67,9 @@ function getKBCounts(entityId: string, kb: SerializedKB | undefined): { factCoun
   const facts = kb.facts[entityId] ?? [];
   const factCount = facts.filter((f) => f.propertyId !== "description").length;
 
-  const collections = kb.records?.[entityId] ?? {};
-  const itemCount = Object.values(collections).reduce(
-    (sum, entries) => sum + entries.length,
-    0,
-  );
+  // Records were removed from KB and moved to PostgreSQL (wiki-server).
+  // kbItemCount is always 0 now; record counts come from PG at runtime.
+  const itemCount = 0;
 
   return { factCount, itemCount };
 }
@@ -101,7 +100,7 @@ export function getExploreItems(): ExploreItem[] {
   const db = getDatabase();
   const typedEntities = getTypedEntities();
   const pageMap = new Map((db.pages || []).map((p) => [p.id, p]));
-  const kb = db.kb;
+  const kb = getKB();
 
   // Build a set of page IDs claimed by entities (including aliased ones)
   const entityClaimedPageIds = new Set<string>();

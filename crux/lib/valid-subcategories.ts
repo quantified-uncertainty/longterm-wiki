@@ -86,6 +86,9 @@ export const VALID_SUBCATEGORIES = [
   'ai-history',
   'applications',
 
+  // sources
+  'sources',
+
   // internal pages
   'style-guides',
   'architecture',

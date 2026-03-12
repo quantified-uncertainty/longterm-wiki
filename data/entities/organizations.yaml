@@ -39,7 +39,7 @@
       type: person
       relationship: leads-to
     - id: claude
-      type: project
+      type: ai-model
       relationship: composed-of
     - id: constitutional-ai
       type: concept

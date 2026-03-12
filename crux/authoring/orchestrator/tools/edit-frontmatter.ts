@@ -8,6 +8,7 @@
 
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { reorderFrontmatterObject } from '../../../lib/frontmatter-order.ts';
+import { ensureMdxSafeYaml } from '../../../lib/yaml-mdx-safe.ts';
 import type { ToolRegistration } from './types.ts';
 
 /** Fields the edit_frontmatter tool is allowed to update. */
@@ -91,6 +92,10 @@ export const tool: ToolRegistration = {
         defaultKeyType: 'PLAIN',
         lineWidth: 0,
       });
+
+      // Ensure \$ in plain YAML values are double-quoted for MDX safety.
+      // Without this, remark-mdx-frontmatter converts \$ to invalid JS escapes.
+      newFmStr = ensureMdxSafeYaml(newFmStr);
 
       // Date strings must be quoted to prevent YAML parsing them as Date objects
       newFmStr = newFmStr.replace(/^(lastEdited:\s*)(\d{4}-\d{2}-\d{2})$/m, '$1"$2"');

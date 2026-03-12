@@ -26,6 +26,7 @@ import {
 import {
   UpsertResourceSchema as SharedUpsertResourceSchema,
   UpsertResourceBatchSchema,
+  UpdateResourceFetchStatusSchema,
   type ResourceStatsResult,
 } from "../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
@@ -51,6 +52,8 @@ interface ResourceSearchRow {
   fetched_at: string | null;
   content_hash: string | null;
   stable_id: string | null;
+  fetch_status: string | null;
+  last_fetched_at: string | null;
   created_at: string;
   updated_at: string;
   rank: number;
@@ -228,6 +231,8 @@ function formatResource(r: typeof resources.$inferSelect) {
     fetchedAt: r.fetchedAt,
     contentHash: r.contentHash,
     stableId: r.stableId,
+    fetchStatus: r.fetchStatus,
+    lastFetchedAt: r.lastFetchedAt,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
   };
@@ -347,7 +352,9 @@ const resourcesApp = new Hono()
           id, url, title, type, summary, review, abstract,
           key_points, publication_id, authors, published_date,
           tags, local_filename, credibility_override,
-          fetched_at, content_hash, stable_id, created_at, updated_at,
+          fetched_at, content_hash, stable_id,
+          fetch_status, last_fetched_at,
+          created_at, updated_at,
           ts_rank_cd(search_vector, to_tsquery('english', $1), 1) AS rank
         FROM resources
         WHERE search_vector @@ to_tsquery('english', $1)
@@ -376,6 +383,8 @@ const resourcesApp = new Hono()
         fetchedAt: r.fetched_at,
         contentHash: r.content_hash,
         stableId: r.stable_id,
+        fetchStatus: r.fetch_status,
+        lastFetchedAt: r.last_fetched_at,
         createdAt: r.created_at,
         updatedAt: r.updated_at,
       })),
@@ -603,6 +612,46 @@ const resourcesApp = new Hono()
     }
 
     return c.json({ citations: index, count: rows.length });
+  })
+
+  // ---- PATCH /:id/fetch-status (update fetch status from source-fetcher) ----
+
+  .patch("/:id/fetch-status", async (c) => {
+    const id = c.req.param("id");
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = UpdateResourceFetchStatusSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const db = getDrizzleDb();
+
+    const { fetchStatus, lastFetchedAt, fetchedTitle } = parsed.data;
+
+    const updateSet: Record<string, unknown> = {
+      fetchStatus,
+      lastFetchedAt: new Date(lastFetchedAt),
+      updatedAt: sql`now()`,
+    };
+
+    // Optionally update title if provided and resource has no title yet
+    if (fetchedTitle) {
+      updateSet.title = sql`COALESCE(${resources.title}, ${fetchedTitle})`;
+    }
+
+    const updated = await db
+      .update(resources)
+      .set(updateSet)
+      .where(eq(resources.id, id))
+      .returning({ id: resources.id });
+
+    if (updated.length === 0) {
+      return notFoundError(c, `Resource not found: ${id}`);
+    }
+
+    logger.info({ resourceId: id, fetchStatus, lastFetchedAt }, "Updated resource fetch status");
+
+    return c.json({ ok: true, id, fetchStatus, lastFetchedAt });
   })
 
   // ---- GET /:id (get by ID) ----

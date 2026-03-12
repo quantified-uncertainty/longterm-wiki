@@ -1,7 +1,7 @@
 thing:
   id: claude-haiku-4-5
   stableId: y87VxEBBIA
-  type: project
+  type: ai-model
   name: Claude Haiku 4.5
   numericId: E1037
 facts:

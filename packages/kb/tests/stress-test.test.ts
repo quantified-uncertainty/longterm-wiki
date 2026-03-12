@@ -78,47 +78,11 @@ describe("Q3: Compare all AI labs valuations", () => {
   });
 });
 
-// ── Query 4: Who are Anthropic's board members? (was IMPOSSIBLE) ────
-// Rating: CLEAN — key-persons records have titles, start dates, founder status.
-// Board-seats records provide dedicated board member data.
-describe("Q4: Anthropic board/key people", () => {
-  it("is answered via key-persons records", () => {
-    const people = graph.getRecords(idOf("anthropic"), "key-persons");
-    expect(people.length).toBeGreaterThan(0);
+// ── Query 4: Who are Anthropic's board members? ────
+// Rating: AWKWARD — records have been removed; would need facts or external data.
+// Skipped: record infrastructure removed.
 
-    // Verify we can find the CEO
-    const ceo = people.find((p) => p.fields.title === "CEO");
-    expect(ceo).toBeDefined();
-    expect(ceo!.fields.person).toBe("dario-amodei");
-
-    // Verify we can find founders
-    const founders = people.filter((p) => p.fields.is_founder === true);
-    expect(founders.length).toBeGreaterThanOrEqual(2);
-
-    // All entries should have person and title fields
-    for (const p of people) {
-      expect(p.fields.person).toBeDefined();
-      expect(p.fields.title).toBeDefined();
-    }
-  });
-
-  it("board-seats records provide dedicated board data", () => {
-    const seats = graph.getRecords(idOf("anthropic"), "board-seats");
-    expect(seats.length).toBeGreaterThanOrEqual(4);
-
-    // Dario should be on the board
-    const dario = seats.find((s) => s.key === "dario-amodei");
-    expect(dario).toBeDefined();
-    expect(dario!.fields.member).toBe("dario-amodei");
-
-    // Board members with display_name (no KB entity)
-    const yasmin = seats.find((s) => s.key === "yasmin-razavi");
-    expect(yasmin).toBeDefined();
-    expect(yasmin!.displayName).toBe("Yasmin Razavi");
-  });
-});
-
-// ── Query 5: Who works at Anthropic right now? (was awkward) ────────
+// ── Query 5: Who works at Anthropic right now? ────────
 // Rating: CLEAN — inverse computation generates employer-of facts
 describe("Q5: Who works at Anthropic right now", () => {
   it("returns current employees via inverse employer-of facts", () => {
@@ -138,14 +102,6 @@ describe("Q5: Who works at Anthropic right now", () => {
     // Dario and Jan should both currently work at Anthropic
     expect(employeeIds).toContain(idOf("dario-amodei"));
     expect(employeeIds).toContain(idOf("jan-leike"));
-  });
-
-  it("can also be answered via key-persons records for richer data", () => {
-    // key-persons gives title, start date, founder status
-    const people = graph.getRecords(idOf("anthropic"), "key-persons");
-    // Filter to currently active (no end date)
-    const current = people.filter((p) => p.fields.end === undefined);
-    expect(current.length).toBeGreaterThanOrEqual(2);
   });
 });
 
@@ -175,28 +131,8 @@ describe("Q6: Total funding raised by all AI labs", () => {
   });
 });
 
-// ── Query 7: List all funding rounds for Anthropic with investors
-//             and valuations (event-based) ────────────────────────────
-// Rating: CLEAN
-describe("Q7: Anthropic funding rounds", () => {
-  it("returns all funding rounds with detail fields", () => {
-    const rounds = graph.getRecords(idOf("anthropic"), "funding-rounds");
-    expect(rounds.length).toBeGreaterThanOrEqual(9);
-
-    // Check a specific round with full data (Series G)
-    const seriesG = rounds.find((r) => r.key === "series-g");
-    expect(seriesG).toBeDefined();
-    expect(seriesG!.fields.raised).toBe(30e9);
-    expect(seriesG!.fields.valuation).toBe(380e9);
-    expect(seriesG!.fields.lead_investor).toBe("gic");
-
-    // Rounds with valuations
-    const withValuation = rounds.filter(
-      (r) => r.fields.valuation !== undefined
-    );
-    expect(withValuation.length).toBeGreaterThanOrEqual(4);
-  });
-});
+// ── Query 7: List all funding rounds for Anthropic ────────────────────
+// Skipped: record infrastructure removed. Funding rounds were stored as records.
 
 // ── Query 8: What is OpenAI's current valuation?
 //             (was IMPOSSIBLE -- data was in a different layer) ───────
@@ -335,53 +271,10 @@ describe("Q14: Anthropic revenue-to-valuation ratio", () => {
 });
 
 // ── Query 15: What safety research does Anthropic do? ───────────────
-// Rating: CLEAN — research-areas item collection provides structured data.
-describe("Q15: Anthropic safety research", () => {
-  it("is answerable via research-areas and key-persons records", () => {
-    // Research areas collection (now records)
-    const areas = graph.getRecords(idOf("anthropic"), "research-areas");
-    expect(areas.length).toBeGreaterThanOrEqual(3);
-
-    // Find specific research areas
-    const mechInterp = areas.find((a) => a.key === "mechanistic-interpretability");
-    expect(mechInterp).toBeDefined();
-    expect(mechInterp!.fields.name).toBe("Mechanistic Interpretability");
-    expect(mechInterp!.fields["team-size"]).toBe(50);
-
-    // Safety-related people from key-persons records
-    const people = graph.getRecords(idOf("anthropic"), "key-persons");
-    const safetyPeople = people.filter((p) => {
-      const title = String(p.fields.title ?? "").toLowerCase();
-      return (
-        title.includes("alignment") ||
-        title.includes("safety") ||
-        title.includes("interpretability")
-      );
-    });
-    expect(safetyPeople.length).toBeGreaterThanOrEqual(2);
-  });
-});
+// Skipped: record infrastructure removed. Research areas were stored as records.
 
 // ── Query 16: What products has Anthropic launched? ──────────────────
-// Rating: CLEAN — products item collection provides structured data.
-describe("Q16: Anthropic products launched", () => {
-  it("returns products from the products record collection", () => {
-    const products = graph.getRecords(idOf("anthropic"), "products");
-    expect(products.length).toBeGreaterThanOrEqual(3);
-
-    // Check specific products
-    const claudeCode = products.find((p) => p.key === "claude-code");
-    expect(claudeCode).toBeDefined();
-    expect(claudeCode!.fields.name).toBe("Claude Code");
-    expect(claudeCode!.fields.launched).toBe("2025-02");
-
-    // All products should have name and launch date
-    for (const p of products) {
-      expect(p.fields.name).toBeDefined();
-      expect(p.fields.launched).toBeDefined();
-    }
-  });
-});
+// Skipped: record infrastructure removed. Products were stored as records.
 
 // ── Query 17: Anthropic vs OpenAI market share ──────────────────────
 // Rating: AWKWARD — Anthropic uses enterprise-market-share and
@@ -564,20 +457,7 @@ describe("Q20: Bidirectional person-org lookup", () => {
     expect(dario!.type).toBe("person");
   });
 
-  it("org -> person: Anthropic CEO is Dario Amodei", () => {
-    // Via key-persons records
-    const people = graph.getRecords(idOf("anthropic"), "key-persons");
-    const ceo = people.find((p) => p.fields.title === "CEO");
-    expect(ceo).toBeDefined();
-    expect(ceo!.fields.person).toBe("dario-amodei");
-
-    // Verify the referenced person exists
-    const person = graph.getAllEntities().find(e => e.name === "Dario Amodei");
-    expect(person).toBeDefined();
-    expect(person!.name).toBe("Dario Amodei");
-  });
-
-  it("org -> person: also works via inverse employer-of facts", () => {
+  it("org -> person: works via inverse employer-of facts", () => {
     // computeInverses should have created employer-of facts on Anthropic
     const employees = graph.getRelated(idOf("anthropic"), "employer-of");
     expect(employees).toContain(idOf("dario-amodei"));

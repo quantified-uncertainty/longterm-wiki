@@ -82,27 +82,3 @@ records:
       source: https://deepmind.google/about/
       notes: "Co-founded DeepMind with Shane Legg and Mustafa Suleyman; acquired by Google for ~$500M in 2014; became CEO of Google DeepMind after 2023 merger with Google Brain"
 
-  notable-publications:
-    i_dHtU3vW4x:
-      title: "Mastering the game of Go with deep neural networks and tree search (AlphaGo)"
-      year: 2016
-      url: https://www.nature.com/articles/nature16961
-      notes: "AlphaGo defeated world champion Lee Sedol; landmark achievement in AI"
-
-    i_dHyZ5aB6c:
-      title: "Mastering the game of Go without human knowledge (AlphaGo Zero)"
-      year: 2017
-      url: https://www.nature.com/articles/nature24270
-      notes: "Achieved superhuman play with zero human games as training data"
-
-    i_dHdE7fG8h:
-      title: "Highly accurate protein structure prediction with AlphaFold (AlphaFold 2)"
-      year: 2021
-      url: https://www.nature.com/articles/s41586-021-03819-2
-      notes: "Solved the 50-year-old protein folding problem; predicted structures for 200M+ proteins; led to 2024 Nobel Prize in Chemistry"
-
-    i_dHiJ9kL1m:
-      title: "A generalist agent (Gato)"
-      year: 2022
-      url: https://arxiv.org/abs/2205.06175
-      notes: "Single model performing 600+ tasks across robotics, games, language, and vision"

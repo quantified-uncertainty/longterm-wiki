@@ -75,10 +75,22 @@ export default function RootLayout({
                 People
               </Link>
               <Link
+                href="/risks"
+                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+              >
+                Risks
+              </Link>
+              <Link
                 href="/grants"
                 className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
               >
                 Grants
+              </Link>
+              <Link
+                href="/sources"
+                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+              >
+                Sources
               </Link>
               <Link
                 href="/kb"

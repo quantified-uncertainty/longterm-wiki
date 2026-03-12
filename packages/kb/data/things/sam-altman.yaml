@@ -125,15 +125,3 @@ records:
       source: https://openai.com/about
       notes: "Co-founded OpenAI Dec 2015; became CEO in 2019; briefly fired Nov 17 2023, reinstated Nov 22 2023"
 
-  notable-publications:
-    i_sAvW3xY4z:
-      title: "Moore's Law for Everything"
-      year: 2021
-      url: https://moores.samaltman.com/
-      notes: "Influential essay arguing AI-driven productivity gains should fund universal basic income via wealth taxes"
-
-    i_sA5aB6cD7:
-      title: "The Intelligence Age"
-      year: 2024
-      url: https://ia.samaltman.com/
-      notes: "Essay outlining vision for AI's transformative impact on society and economics"

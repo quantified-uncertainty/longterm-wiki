@@ -77,27 +77,3 @@ records:
       source: https://anthropic.com/company
       notes: "Leads mechanistic interpretability research; Transformer Circuits thread; scaling monosemanticity work"
 
-  notable-publications:
-    i_cOoP1qR2s:
-      title: "Understanding LSTM Networks"
-      year: 2015
-      url: https://colah.github.io/posts/2015-08-Understanding-LSTMs/
-      notes: "Widely read blog post explaining LSTM architecture; one of the most influential ML explainers ever written"
-
-    i_cOtU3vW4x:
-      title: "Neural Network, Types, and Functional Programming"
-      year: 2015
-      url: https://colah.github.io/posts/2015-09-NN-Types-FP/
-      notes: "Influential essay connecting neural network design to type theory and functional programming"
-
-    i_cOyZ5aB6c:
-      title: "Zoom In: An Introduction to Circuits"
-      year: 2020
-      url: https://distill.pub/2020/circuits/zoom-in/
-      notes: "First paper in the Circuits thread; foundational for mechanistic interpretability; showed neural networks contain understandable features and circuits"
-
-    i_cOdE7fG8h:
-      title: "Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet"
-      year: 2024
-      url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
-      notes: "Applied sparse autoencoders to Claude 3 Sonnet; identified ~34M interpretable features; landmark result in interpretability"

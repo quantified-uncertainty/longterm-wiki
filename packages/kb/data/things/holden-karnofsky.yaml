@@ -106,15 +106,3 @@ records:
       source: https://www.anthropic.com/
       notes: "Works on responsible scaling policy; also serves as Anthropic board observer"
 
-  notable-publications:
-    i_hKtU3vW4x:
-      title: "Most Important Century (blog series)"
-      year: 2021
-      url: https://www.cold-takes.com/most-important-century/
-      notes: "Influential series arguing we may live in the most pivotal century in human history due to transformative AI; widely read in EA/AI safety communities"
-
-    i_hKyZ5aB6c:
-      title: "AI Could Defeat All Of Us Combined"
-      year: 2022
-      url: https://www.cold-takes.com/ai-could-defeat-all-of-us-combined/
-      notes: "Essay on AI takeover scenarios and why they deserve serious attention"

@@ -5,7 +5,4 @@ required: []
 # Debates are open-ended; no properties are universally required.
 
 recommended:
-  - core-question
-  - expert-consensus-level
-  - evidence-strength
-  - time-horizon
+  - description

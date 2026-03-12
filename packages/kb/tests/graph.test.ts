@@ -203,40 +203,6 @@ describe("graph", () => {
     });
   });
 
-  describe("getRecords", () => {
-    it("returns record entries with keys and fields", () => {
-      const rounds = graph.getRecords(idOf("anthropic"), "funding-rounds");
-      expect(rounds.length).toBeGreaterThan(0);
-
-      // Each entry has a key, schema, and fields
-      for (const entry of rounds) {
-        expect(typeof entry.key).toBe("string");
-        expect(typeof entry.fields).toBe("object");
-        expect(entry.schema).toBe("funding-round");
-      }
-    });
-
-    it("returns correct data for a specific record entry", () => {
-      const people = graph.getRecords(idOf("anthropic"), "key-persons");
-      const darioCeo = people.find((p) => p.key === "dario-amodei");
-      expect(darioCeo).toBeDefined();
-      expect(darioCeo!.fields.person).toBe("dario-amodei");
-      expect(darioCeo!.fields.title).toBe("CEO");
-      expect(darioCeo!.fields.start).toBe("2021-01");
-      expect(darioCeo!.fields.is_founder).toBe(true);
-    });
-
-    it("returns empty array for missing collection", () => {
-      const records = graph.getRecords(idOf("anthropic"), "nonexistent");
-      expect(records).toEqual([]);
-    });
-
-    it("returns empty array for entity without records", () => {
-      const records = graph.getRecords(idOf("jan-leike"), "key-persons");
-      expect(records).toEqual([]);
-    });
-  });
-
   describe("property and schema queries", () => {
     it("getProperty returns correct property", () => {
       const prop = graph.getProperty("headquarters");

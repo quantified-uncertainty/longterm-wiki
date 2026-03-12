@@ -99,21 +99,3 @@ records:
       source: https://anthropic.com/company
       notes: "Co-founded Anthropic with sister Daniela and five other former OpenAI researchers"
 
-  notable-publications:
-    i_dAzA3bC4d:
-      title: "Concrete Problems in AI Safety"
-      year: 2016
-      url: https://arxiv.org/abs/1606.06565
-      notes: "Co-authored influential paper outlining five practical safety problems for ML systems"
-
-    i_dAeF5gH6i:
-      title: "Language Models are Few-Shot Learners (GPT-3)"
-      year: 2020
-      url: https://arxiv.org/abs/2005.14165
-      notes: "Key contributor to GPT-3 paper demonstrating in-context learning at scale"
-
-    i_dAjK7lM8n:
-      title: "Machines of Loving Grace"
-      year: 2024
-      url: https://darioamodei.com/machines-of-loving-grace
-      notes: "Influential essay on how AI could transform biology, poverty, governance, and work"

@@ -6,6 +6,3 @@ required: []
 
 recommended:
   - description
-  - evidence-strength
-  - expert-consensus-level
-  - related-entities

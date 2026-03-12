@@ -42,3 +42,23 @@ facts:
     asOf: "2024"
     source: https://survivalandflourishing.fund/2024/recommendations
     notes: "Includes $0.85M Speculation Grants; above $5-15M estimate"
+
+records:
+  funding-programs:
+    s-process:
+      name: "S-Process"
+      type: "program"
+      amount: 125e6
+      period: "2019-present"
+      status: "active"
+      url: https://survivalandflourishing.fund/recommendations
+      notes: "Main grant mechanism using simulated marketplace. Annual rounds: $34.33M (2025), $19.86M (2024). Three tracks since 2025: Main, Freedom, Fairness. ~89 orgs funded in 2025. Top cumulative recipients: MIRI (~$10M), CAIS (~$5M), ARC (~$4M)"
+
+    speculation-grants:
+      name: "Speculation Grants"
+      type: "program"
+      amount: 16e6
+      period: "2021-present"
+      status: "active"
+      url: https://survivalandflourishing.fund/speculation-grants
+      notes: "Novel donor coordination mechanism with ~35 grantors. Budget grown from $4M to $16M. $0.59M in 2025, $0.85M in 2024"

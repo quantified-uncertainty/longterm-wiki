@@ -12,3 +12,39 @@ facts:
     asOf: "2025"
     source: https://manifund.org/about/regranting
     notes: "2025 AI safety regranting pool with first 10 regrantors announced"
+
+records:
+  funding-programs:
+    ai-safety-regranting-2025:
+      name: "AI Safety Regranting (2025)"
+      type: "round"
+      amount: 2.25e6
+      date: "2025"
+      status: "active"
+      url: https://manifund.org/about/regranting
+      notes: "10 regrantors distributing AI safety funding; individual regrantors have $100K-$500K budgets"
+
+    ai-safety-regranting-2024:
+      name: "AI Safety Regranting (2024)"
+      type: "round"
+      amount: 1.4e6
+      date: "2024"
+      status: "completed"
+      url: https://manifund.org/about/regranting
+      notes: "Regranting program funded primarily by Coefficient Giving; multiple regrantors"
+
+    impact-certificates:
+      name: "Impact Certificates Marketplace"
+      type: "program"
+      period: "2023-present"
+      status: "active"
+      url: https://manifund.org
+      notes: "Retroactive funding via impact certificates; allows projects to sell equity-like stakes to funders. Novel funding mechanism"
+
+    open-call-regranting:
+      name: "Open Call Regranting"
+      type: "program"
+      period: "2023-present"
+      status: "active"
+      url: https://manifund.org
+      notes: "General regranting program beyond AI safety; regrantors distribute funds across EA cause areas"

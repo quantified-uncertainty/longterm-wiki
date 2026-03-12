@@ -14,6 +14,8 @@ export interface GrantRow {
   organizationName: string;
   organizationSlug: string | null;
   organizationWikiPageId: string | null;
+  recipient: string | null;
+  program: string | null;
   amount: number | null;
   period: string | null;
   date: string | null;
@@ -21,13 +23,14 @@ export interface GrantRow {
   source: string | null;
 }
 
-type SortKey = "name" | "organization" | "amount" | "period" | "date" | "status";
+type SortKey = "name" | "organization" | "recipient" | "program" | "amount" | "period" | "date" | "status";
 type SortDir = "asc" | "desc";
 
 const STATUS_COLORS: Record<string, string> = {
   active: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
   completed: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
   "winding-down": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+  terminated: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
 };
 
 export function GrantsTable({ rows }: { rows: GrantRow[] }) {
@@ -74,7 +77,9 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
       result = result.filter(
         (r) =>
           r.name.toLowerCase().includes(q) ||
-          r.organizationName.toLowerCase().includes(q),
+          r.organizationName.toLowerCase().includes(q) ||
+          (r.recipient && r.recipient.toLowerCase().includes(q)) ||
+          (r.program && r.program.toLowerCase().includes(q)),
       );
     }
 
@@ -86,6 +91,10 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
             return row.name.toLowerCase();
           case "organization":
             return row.organizationName.toLowerCase();
+          case "recipient":
+            return row.recipient?.toLowerCase() ?? null;
+          case "program":
+            return row.program?.toLowerCase() ?? null;
           case "amount":
             return row.amount;
           case "period":
@@ -119,7 +128,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <input
           type="text"
-          placeholder="Search grants or organizations..."
+          placeholder="Search grants, recipients, or funders..."
           aria-label="Search grants"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -172,10 +181,11 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <SortHeader label="Grant / Program" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
-              <SortHeader label="Organization" sortKey="organization" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              <SortHeader label="Grant" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              <SortHeader label="Funder" sortKey="organization" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              <SortHeader label="Recipient" sortKey="recipient" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              <SortHeader label="Program" sortKey="program" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Amount" sortKey="amount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
-              <SortHeader label="Period" sortKey="period" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Date" sortKey="date" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               <SortHeader label="Status" sortKey="status" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
             </tr>
@@ -204,7 +214,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
                   )}
                 </td>
 
-                {/* Organization */}
+                {/* Funder */}
                 <td className="py-2.5 px-3">
                   {row.organizationSlug ? (
                     <Link
@@ -227,6 +237,16 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
                   )}
                 </td>
 
+                {/* Recipient */}
+                <td className="py-2.5 px-3 text-muted-foreground">
+                  {row.recipient ?? ""}
+                </td>
+
+                {/* Program */}
+                <td className="py-2.5 px-3 text-muted-foreground text-xs">
+                  {row.program ?? ""}
+                </td>
+
                 {/* Amount */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
                   {row.amount != null && (
@@ -236,14 +256,9 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
                   )}
                 </td>
 
-                {/* Period */}
-                <td className="py-2.5 px-3 text-muted-foreground whitespace-nowrap">
-                  {row.period ?? ""}
-                </td>
-
                 {/* Date */}
                 <td className="py-2.5 px-3 text-center text-muted-foreground">
-                  {row.date ?? ""}
+                  {row.date ?? row.period ?? ""}
                 </td>
 
                 {/* Status */}

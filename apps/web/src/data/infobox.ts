@@ -11,6 +11,7 @@ import {
   isPerson,
   isOrganization,
   isPolicy,
+  isAiModel,
 } from "./database";
 import { getEntityHref } from "./entity-nav";
 
@@ -147,6 +148,29 @@ export function getEntityInfoBoxData(entityId: string) {
     scope = entity.scope;
   }
 
+  // AI Model-specific fields
+  let modelFamily: string | undefined;
+  let modelTier: string | undefined;
+  let releaseDate: string | undefined;
+  let developer: string | undefined;
+  let inputPrice: number | undefined;
+  let outputPrice: number | undefined;
+  let contextWindow: number | undefined;
+  let safetyLevel: string | undefined;
+  let benchmarks: Array<{ name: string; score: number; unit?: string }> | undefined;
+
+  if (isAiModel(entity)) {
+    modelFamily = entity.modelFamily;
+    modelTier = entity.modelTier;
+    releaseDate = entity.releaseDate;
+    developer = entity.developer;
+    inputPrice = entity.inputPrice;
+    outputPrice = entity.outputPrice;
+    contextWindow = entity.contextWindow;
+    safetyLevel = entity.safetyLevel;
+    benchmarks = entity.benchmarks?.length ? entity.benchmarks : undefined;
+  }
+
   // Resolve summaryPage to title + href
   let summaryPage: { title: string; href: string } | undefined;
   if (entity.summaryPage) {
@@ -194,6 +218,15 @@ export function getEntityInfoBoxData(entityId: string) {
     policyStatus,
     policyAuthor,
     scope,
+    // AI Model
+    modelTier,
+    releaseDate,
+    developer,
+    inputPrice,
+    outputPrice,
+    contextWindow,
+    safetyLevel,
+    benchmarks,
     // Overview
     childPages: entity.entityType === "overview"
       ? getChildPagesForOverview(entity.id)
