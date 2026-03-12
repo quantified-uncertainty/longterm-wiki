@@ -6,9 +6,4 @@ required: []
 
 recommended:
   - description
-  - developed-by
-  - project-status
-  - project-type
-  - launched-date
   - website
-  - related-risks

@@ -5,7 +5,4 @@ required: []
 # Capabilities are descriptive; no properties are universally required.
 
 recommended:
-  - maturity-level
-  - evidence-strength
-  - expert-consensus-level
-  - time-horizon
+  - description
