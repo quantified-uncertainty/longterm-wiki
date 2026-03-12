@@ -51,6 +51,10 @@ export const MANUAL_GRANTEE_OVERRIDES: Record<string, string> = {
   GiveDirectly: "givedirectly",
   "Effective Ventures Foundation": "cea",
   "Against Malaria Foundation": "against-malaria-foundation",
+  // ACX Grants grantees
+  "1DaySooner": "1day-sooner",
+  "1DaySooner and Rethink Priorities": "1day-sooner",
+  "Blueprint Biosecurity": "blueprint-biosecurity",
   // FTX Future Fund grantees
   Ought: "elicit",
   "Manifold Markets": "manifold",

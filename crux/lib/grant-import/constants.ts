@@ -10,4 +10,9 @@ export const FUNDER_IDS = {
   MANIFUND: "fFVOuFZCRf",
   LTFF: "yA12C1KcjQ",
   CEA: "gNsqAes7Dw",
+  // TODO: GiveWell and ACX Grants don't have entity pages yet.
+  // Allocate stableIds with `pnpm crux ids allocate givewell` and
+  // `pnpm crux ids allocate acx-grants` once entity YAML files are created.
+  GIVEWELL: "NEEDS_ALLOCATION",
+  ACX_GRANTS: "NEEDS_ALLOCATION",
 } as const;
