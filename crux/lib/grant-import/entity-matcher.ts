@@ -67,8 +67,20 @@ export function buildEntityMatcher(): EntityMatcher {
   const nameMap = new Map<string, EntityMatch>();
 
   // Load KB data from kb-data.json (database.json strips the kb field)
+  let kbData: { slugToEntityId?: Record<string, string>; entities?: Record<string, { name?: string; aliases?: string[] }> } = {};
   const kbDataPath = resolve("apps/web/src/data/kb-data.json");
-  const kbData = JSON.parse(readFileSync(kbDataPath, "utf8"));
+  try {
+    kbData = JSON.parse(readFileSync(kbDataPath, "utf8"));
+  } catch (e: unknown) {
+    if (e instanceof Error && "code" in e && (e as NodeJS.ErrnoException).code === "ENOENT") {
+      console.warn(
+        `kb-data.json not found — run 'pnpm build-data:content' first. Entity matching will be limited to manual overrides.`
+      );
+    } else {
+      throw e;
+    }
+  }
+
   const slugToId: Record<string, string> = kbData.slugToEntityId || {};
   const idToSlug = new Map<string, string>();
   for (const [slug, id] of Object.entries(slugToId)) {
@@ -76,9 +88,7 @@ export function buildEntityMatcher(): EntityMatcher {
   }
 
   if (kbData.entities) {
-    for (const [eid, entity] of Object.entries(
-      kbData.entities as Record<string, { name?: string; aliases?: string[] }>
-    )) {
+    for (const [eid, entity] of Object.entries(kbData.entities)) {
       const slug = idToSlug.get(eid) || "";
       const match: EntityMatch = {
         stableId: eid,
@@ -97,8 +107,20 @@ export function buildEntityMatcher(): EntityMatcher {
   }
 
   // Also load typedEntities from database.json for non-KB entities
+  let db: { typedEntities?: Array<{ id: string; title?: string }> } = {};
   const dbPath = resolve("apps/web/src/data/database.json");
-  const db = JSON.parse(readFileSync(dbPath, "utf8"));
+  try {
+    db = JSON.parse(readFileSync(dbPath, "utf8"));
+  } catch (e: unknown) {
+    if (e instanceof Error && "code" in e && (e as NodeJS.ErrnoException).code === "ENOENT") {
+      console.warn(
+        `database.json not found — run 'pnpm build-data:content' first. Entity matching will be limited to manual overrides.`
+      );
+    } else {
+      throw e;
+    }
+  }
+
   for (const e of db.typedEntities || []) {
     const slug = e.id;
     const stableId = slugToId[slug] || slug;

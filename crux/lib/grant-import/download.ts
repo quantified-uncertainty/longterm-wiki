@@ -9,10 +9,11 @@ export function downloadIfMissing(url: string, path: string, label: string): voi
     } catch {
       // Broken symlink, permission error, etc. — re-download
     }
+    console.warn(`Found empty/broken file at ${path}, re-downloading...`);
     try { unlinkSync(path); } catch { /* already gone */ }
   }
   console.log(`Downloading ${label}...`);
-  execFileSync("curl", ["-fsSL", "--retry", "3", "--connect-timeout", "10", "-o", path, url], {
+  execFileSync("curl", ["-fsSL", "--retry", "3", "--connect-timeout", "10", "--max-time", "120", "-o", path, url], {
     stdio: "inherit",
   });
   const size = readFileSync(path).length;

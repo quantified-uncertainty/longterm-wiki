@@ -1,11 +1,12 @@
 import { readFileSync } from "fs";
+import { QUARTER_TO_MONTH } from "../dates.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
+import { FUNDER_IDS } from "../constants.ts";
 
 const SFF_URL = "https://survivalandflourishing.fund/recommendations";
 const SFF_HTML_PATH = "/tmp/sff-recommendations.html";
-const FUNDER_ID = "sIFjGbxVct";
 
 /**
  * Parse the SFF amount field which can have several formats:
@@ -52,10 +53,7 @@ export function sffRoundToDate(round: string): string | null {
   const qMatch = round.match(/SFF-(\d{4})-Q(\d)/);
   if (qMatch) {
     const year = qMatch[1];
-    const qMonth: Record<string, string> = {
-      "1": "01", "2": "04", "3": "07", "4": "10",
-    };
-    const month = qMonth[qMatch[2]];
+    const month = QUARTER_TO_MONTH[qMatch[2]];
     if (!month) return null;
     return `${year}-${month}`;
   }
@@ -139,7 +137,7 @@ export const source: GrantSource = {
 
       grants.push({
         source: "sff",
-        funderId: FUNDER_ID,
+        funderId: FUNDER_IDS.SFF,
         granteeName: organization,
         granteeId,
         name,

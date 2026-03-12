@@ -1,8 +1,10 @@
 import { readFileSync } from "fs";
 import { parseCSVLine } from "../csv.ts";
+import { parseQuarterYear } from "../dates.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
+import { FUNDER_IDS } from "../constants.ts";
 
 const EA_FUNDS_CSV_URL = "https://funds.effectivealtruism.org/api/grants";
 const EA_FUNDS_CSV_PATH = "/tmp/ea-funds-grants.csv";
@@ -14,11 +16,11 @@ export function resolveEAFundEntityIds(
   const cea = matcher.match("cea");
 
   return {
-    "Long-Term Future Fund": ltff?.stableId || "yA12C1KcjQ",
-    "Animal Welfare Fund": cea?.stableId || "gNsqAes7Dw",
-    "EA Infrastructure Fund": cea?.stableId || "gNsqAes7Dw",
-    "Effective Altruism Infrastructure Fund": cea?.stableId || "gNsqAes7Dw",
-    "Global Health and Development Fund": cea?.stableId || "gNsqAes7Dw",
+    "Long-Term Future Fund": ltff?.stableId || FUNDER_IDS.LTFF,
+    "Animal Welfare Fund": cea?.stableId || FUNDER_IDS.CEA,
+    "EA Infrastructure Fund": cea?.stableId || FUNDER_IDS.CEA,
+    "Effective Altruism Infrastructure Fund": cea?.stableId || FUNDER_IDS.CEA,
+    "Global Health and Development Fund": cea?.stableId || FUNDER_IDS.CEA,
   };
 }
 
@@ -59,16 +61,7 @@ export const source: GrantSource = {
       const granteeId = matchGrantee(grantee, matcher);
 
       // Date from round: "2025 Q3" → "2025-07", "2024 Q1" → "2024-01"
-      let isoDate: string | null = null;
-      if (round) {
-        const m = round.match(/^(\d{4})\s+Q(\d)$/);
-        if (m) {
-          const qMonth: Record<string, string> = {
-            "1": "01", "2": "04", "3": "07", "4": "10",
-          };
-          isoDate = `${m[1]}-${qMonth[m[2]] || "01"}`;
-        }
-      }
+      let isoDate: string | null = round ? parseQuarterYear(round) : null;
       if (!isoDate && year) {
         isoDate = year;
       }
